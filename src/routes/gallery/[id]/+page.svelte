@@ -21,28 +21,27 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import AppShell from '$lib/components/AppShell.svelte';
   import Card from '$lib/components/Card.svelte';
   import ColorPalette from '$lib/components/ColorPalette.svelte';
+  import Spinner from '$lib/components/Spinner.svelte';
   import YarnSources from '$lib/components/YarnSources.svelte';
   import ViewToggle from '$lib/components/buttons/ViewToggle.svelte';
   import { settings as daytimeGaugeSettings } from '$lib/components/gauges/DaytimeGauge.svelte';
   import { settings as rainGaugeSettings } from '$lib/components/gauges/RainGauge.svelte';
   import { settings as snowGaugeSettings } from '$lib/components/gauges/SnowGauge.svelte';
   import { settings as temperatureGaugeSettings } from '$lib/components/gauges/TemperatureGauge.svelte';
+  import { ICONS } from '$lib/constants';
   import { gaugeProperties, layout, valid } from '$lib/stores';
   import {
     exists,
     getProjectParametersFromURLHash,
     getTextColor,
-    pluralize,
-    parseGaugeURLHash,
     getTitleFromLocationsMeta,
+    parseGaugeURLHash,
+    pluralize,
     stripHTMLTags,
   } from '$lib/utils';
   import { Accordion, AccordionItem } from '@skeletonlabs/skeleton';
-  import { colors as yarnPalleteCreatorPageColors } from './../../yarn/+page.svelte';
   import { onMount } from 'svelte';
-  import Spinner from '$lib/components/Spinner.svelte';
-  import { goto } from '$app/navigation';
-  import { ICONS } from '$lib/constants';
+  import { colors as yarnPalleteCreatorPageColors } from './../../yarn/+page.svelte';
 
   export let data;
 

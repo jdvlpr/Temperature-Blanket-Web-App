@@ -65,10 +65,10 @@ async function getProject(event) {
 
   await recordPageView(id);
 
-  // Remove protocol and host from project url so that it can be opened on any domain (for example localhost in dev);
-  // create a relative url
+  // Modify the project url origin to match the event url's origin
+  // For example https://temperature-blanket.com gets changed to http://localhost:5173 in dev
   const projectURL = new URL(project?.data?.project?.projectUrl);
-  const newUrl = `${projectURL.pathname}${projectURL.search}${projectURL.hash}`;
+  const newUrl = `${event.url.origin}${projectURL.pathname}${projectURL.search}${projectURL.hash}`;
   project.data.project.projectUrl = newUrl;
 
   return { project: project?.data?.project };
