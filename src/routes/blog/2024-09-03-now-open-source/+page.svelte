@@ -14,7 +14,11 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { PUBLIC_BASE_URL, PUBLIC_GITHUB_LINK } from '$env/static/public';
+  import {
+    PUBLIC_BASE_DOMAIN_NAME,
+    PUBLIC_BASE_URL,
+    PUBLIC_GITHUB_LINK,
+  } from '$env/static/public';
   import AppLogo from '$lib/components/AppLogo.svelte';
   import AppShell from '$lib/components/AppShell.svelte';
   import Card from '$lib/components/Card.svelte';
@@ -25,7 +29,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <title>Now Open Source</title>
   <meta
     name="description"
-    content="Making the source code for {PUBLIC_BASE_URL} available on GitHub"
+    content="Making the source code for {PUBLIC_BASE_DOMAIN_NAME} available on GitHub"
   />
   <meta
     name="viewport"
@@ -34,7 +38,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <meta property="og:title" content="Now Open Source" />
   <meta
     property="og:description"
-    content="Making the source code for {PUBLIC_BASE_URL} available on GitHub"
+    content="Making the source code for {PUBLIC_BASE_DOMAIN_NAME} available on GitHub"
   />
   <meta
     property="og:url"
