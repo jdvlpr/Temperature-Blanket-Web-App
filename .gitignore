@@ -1,0 +1,12 @@
+.dev
+.DS_Store
+.env
+.htaccess
+.svelte-kit
+.vscode
+.dev
+build
+node_modules
+package-lock.json
+src/routes/.dev-tools
+test-results

@@ -1,0 +1,135 @@
+{
+  "display_override": ["window-controls-overlay"],
+  "short_name": "temperature-blanket.com",
+  "name": "Temperature Blanket",
+  "description": "Weather Data + Art! Visualize your city's historical climate data, create color gauges, and preview your pattern for your crochet or knitting temperature project. Save the information as PDF, CSV, or PNG files",
+  "display": "standalone",
+  "icons": [
+    {
+      "src": "/images/manifest-icon-192-any.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/images/manifest-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/images/manifest-icon-512-any.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/images/manifest-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "start_url": "/?utm_source=homescreen",
+  "shortcuts": [
+    {
+      "name": "Open Project Planner",
+      "short_name": "Project Planner",
+      "description": "View your projects and create new ones.",
+      "url": "/?utm_source=homescreen-shortcut",
+      "icons": [
+        {
+          "src": "/images/manifest-icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Open Yarn Palette Creator",
+      "short_name": "Yarn Palette Creator",
+      "url": "/yarn?utm_source=homescreen-shortcut",
+      "description": "Design a yarn color palette.",
+      "icons": [
+        {
+          "src": "/images/manifest-icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Open Yarn Colorway Finder",
+      "short_name": "Yarn Colorway Finder",
+      "url": "/yarn-colorway-finder?utm_source=homescreen-shortcut",
+      "description": "Browse a collection of yarn colorways. Filter by brand or yarn name, and search by HTML color name or hex code to find matching yarn colorways.",
+      "icons": [
+        {
+          "src": "/images/manifest-icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Open Weather Forecast",
+      "short_name": "Weather Forecast",
+      "url": "/weather?utm_source=homescreen-shortcut",
+      "description": "Hourly and daily temperature and precipitation data from Open-Meteo.",
+      "icons": [
+        {
+          "src": "/images/manifest-icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ],
+  "id": "/?homescreen=1",
+  "background_color": "#fafafa",
+  "theme_color": "#fafafa",
+  "launch_handler": {
+    "client_mode": "auto"
+  },
+  "orientation": "any",
+  "screenshots": [
+    {
+      "src": "/images/screenshots/1280x800-screenshot.png",
+      "sizes": "1280x800",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Project Planner"
+    },
+    {
+      "src": "/images/screenshots/1280x800-screenshot-2.png",
+      "sizes": "1280x800",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Yarn Palette Creator"
+    },
+    {
+      "src": "/images/screenshots/1280x800-screenshot-3.png",
+      "sizes": "1280x800",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Project Preview"
+    },
+    {
+      "src": "/images/screenshots/750x1334-screenshot.png",
+      "sizes": "750x1334",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Project Planner"
+    },
+    {
+      "src": "/images/screenshots/750x1334-screenshot-2.png",
+      "sizes": "750x1334",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Yarn Palette Creator"
+    },
+    {
+      "src": "/images/screenshots/750x1334-screenshot-3.png",
+      "sizes": "750x1334",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Project Preview"
+    }
+  ]
+}
