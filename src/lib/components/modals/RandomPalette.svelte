@@ -149,8 +149,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
           >
             <p>
               A yarn that says Link Unavailable means the webpage from which the
-              colorways were accessed is no longer available. Yarns whos links
-              are unavailable will remain on this website for legacy purposes,
+              colorways were accessed is no longer available. Yarns whose links
+              are unavailable will remain on this web app for legacy purposes,
               but links to the yarn and its colorways will not work.
             </p>
 

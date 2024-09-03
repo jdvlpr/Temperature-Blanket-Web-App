@@ -68,7 +68,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           Making a request for a yarn to be included in the search results does
           not guarantee its inclusion. Requests will be processed based the
           order the request was received, the availability of the yarn, and the
-          website developer’s schedule.
+          web app developer’s schedule.
         </p>
         <div class="flex flex-wrap gap-4">
           <div class="flex flex-col gap-2 card p-4">

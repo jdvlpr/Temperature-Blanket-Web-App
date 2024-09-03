@@ -527,7 +527,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <div slot="content">
               <div class="p-4 my-2">
                 <p class="max-w-screen-md mx-auto mb-2">
-                  Is this website worth a cup of coffee to you? Your support
+                  Is this web app worth a cup of coffee to you? Your support
                   enables ongoing development, keeps the site ad-free, and helps
                   make this service available to craftspeople all around the
                   world. Thanks!

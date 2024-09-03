@@ -78,7 +78,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           >
             <p>
               🎉 Temperature-blanket.com is reaching a new milestone! The source
-              code for this website is now available on GitHub for anyone to
+              code for this web app is now available on GitHub for anyone to
               view or contribute to. Thanks for the fun journey together so far!
               I hope open-sourcing this project will lead to an even better
               crochet and knitting resource for craftspeople everywhere.
@@ -108,9 +108,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
             From the beginning, the goal of temperature-blanket.com has been to
             provide free, useful tools for crocheters and knitters all around
             the world. Since 2020, the number of users, features, and
-            improvement has grown; thousands of craftspeople have used this
-            website to help make their work easier. Feedback and support from
-            people like you have been tremendously helpful in developing and
+            improvement has grown; thousands of craftspeople have used this web
+            app to help make their work easier. Feedback and support from people
+            like you have been tremendously helpful in developing and
             maintaining the site. Thank you! During the past four years, I've
             enjoyed working on this project as a hobby; I've added new features,
             streamlined my own development process, made plenty of mistakes, and
@@ -128,23 +128,23 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <ul class="flex flex-col gap-2">
             <li>
               <span class="font-bold">👥 Collaboration:</span> By allowing other
-              people to contribute their ideas and improvements to this website,
+              people to contribute their ideas and improvements to this web app,
               more craftspeople can have access to better tools for their projects.
               Whether it’s a new feature, an improvement to the user experience,
               or something I haven’t even thought of yet—other developers can now
-              explore the source code and propose their updates to this website.
+              explore the source code and propose their updates to this web app.
             </li>
 
             <li>
               <span class="font-bold">👋 Community:</span> Many people have already
               contributed in some way to temperature-blanket.com through feedback,
-              support, and encouragement. I see open-sourcing this website as my
+              support, and encouragement. I see open-sourcing this web app as my
               way to give back. With the source code on GitHub, others can learn
               from and participate in the community that makes this project special.
             </li>
 
             <li>
-              <span class="font-bold">🔄 Continuity:</span> By making this website
+              <span class="font-bold">🔄 Continuity:</span> By making this web app
               open source, someone else could theoretically continue working on it
               without me. I don't intend to stop developing temperature-blanket.com,
               but open-sourcing it provides redundancy and allows for other developers
@@ -170,7 +170,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               href="https://kit.svelte.dev/"
               class="link"
               target="_blank">SvelteKit</a
-            >), you can develop your own local copy of this website; just
+            >), you can develop your own local copy of this web app; just
             <a
               href="{PUBLIC_GITHUB_LINK}?tab=readme-ov-file#-getting-started"
               class="link"

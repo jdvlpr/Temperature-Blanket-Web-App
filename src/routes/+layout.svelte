@@ -182,7 +182,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <div
   class="bg-tertiary-200-700-token w-full p-2 flex flex-wrap gap-2 justify-center items-center text-sm text-center [view-transition-name:top-notification]"
 >
-  <p>🎉 This website is now open source!</p>
+  <p>🎉 This web app is now open source!</p>
   <a href="/blog/2024-09-03-now-open-source" class="link">Learn more</a>
 </div>
 

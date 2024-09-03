@@ -225,7 +225,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </svelte:fragment>
             <svelte:fragment slot="summary"
               ><p class="font-bold">
-                Why isn’t the yarn I want to use on this website?
+                Why isn’t the yarn I want to use on this web app?
               </p></svelte:fragment
             >
             <svelte:fragment slot="content">

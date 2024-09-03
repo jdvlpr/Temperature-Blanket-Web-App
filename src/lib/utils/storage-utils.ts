@@ -61,7 +61,7 @@ export const setupLocalStorageTheme = () => {
 };
 
 /**
- * Sets up the local storage 'layout' for the Temperature Blanket website.
+ * Sets up the local storage 'layout' for the Temperature Blanket web app.
  * Retrieves the stored 'layout' from local storage and sets it as the initial value of the 'layout' variable.
  * Subscribes to changes in the 'layout' variable and updates the local storage whenever the value changes.
  */

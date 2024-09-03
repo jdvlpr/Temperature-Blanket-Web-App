@@ -187,7 +187,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <h3 class="font-bold text-xl">Save Project</h3>
           <p>
             When you save a project, a shareable URL is created, and the project
-            is saved in your browser's local storage. This website does not
+            is saved in your browser's local storage. This web app does not
             store your project in a backend database. This means:
           </p>
           <ul>
@@ -1258,7 +1258,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <h3 class="font-bold text-xl">Getting Yarn Colorway Data</h3>
 
           <p>
-            This website uses color approximations of real yarn colorways in
+            This web app uses color approximations of real yarn colorways in
             order to display them as colors on your screen.
           </p>
           <p>
@@ -1280,7 +1280,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </li>
             <li>
               - The HTML color code, colorway name, and link to the colorway’s
-              webpage is saved in a database which this website uses to display
+              webpage is saved in a database which this web apps uses to display
               the colorway data.
             </li>
           </ol>
@@ -1307,7 +1307,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <p>
             A yarn that says Link Unavailable means the webpage from which the
             colorways were accessed is no longer available. Yarns whos links are
-            unavailable will remain on this website for legacy purposes, but
+            unavailable will remain on this web app for legacy purposes, but
             links to the yarn and its colorways will not work.
           </p>
           <p>A yarn with unavailable links could mean:</p>

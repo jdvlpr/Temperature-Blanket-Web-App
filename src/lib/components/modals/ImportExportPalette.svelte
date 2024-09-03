@@ -170,13 +170,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <pre class="pre select-all">#FF0000 #FFA500 #ADD8E6</pre>
           <pre class="pre select-all">red, FFA500, #ADD8E6</pre>
         </div>
-        <p>• A palette code from this website</p>
+        <p>• A palette code from this web app</p>
         <div class="ml-2 flex flex-wrap gap-2 my-2">
           <pre
             class="break-all pre select-all">palette:40004bae8bbdf7f7f780c58100441b</pre>
         </div>
         <p>
-          • The URL of a saved project or yarn search result from this website.
+          • The URL of a saved project or yarn search result from this web app.
         </p>
         <p>
           • The URL of a palette from <a
