@@ -18,11 +18,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
     PUBLIC_BASE_DOMAIN_NAME,
     PUBLIC_BASE_URL,
     PUBLIC_GITHUB_LINK,
+    PUBLIC_KOFI_LINK,
   } from '$env/static/public';
   import AppLogo from '$lib/components/AppLogo.svelte';
   import AppShell from '$lib/components/AppShell.svelte';
   import Card from '$lib/components/Card.svelte';
   import { ICONS } from '$lib/constants';
+
+  const kofiURL = PUBLIC_KOFI_LINK ? new URL(PUBLIC_KOFI_LINK) : null;
+  const kofiLink = kofiURL ? `${kofiURL.hostname}${kofiURL.pathname}` : '';
 </script>
 
 <svelte:head>
@@ -181,6 +185,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
               target="_blank">follow the Getting Started instructions</a
             >.
           </p>
+
+          {#if kofiLink}
+            <p>
+              You can also become a <a
+                href="/supporters"
+                class="link"
+                target="_blank">supporter</a
+              >
+              through one-time or monthly donations at
+              <a href={PUBLIC_KOFI_LINK} class="link" target="_blank"
+                >{kofiLink}</a
+              >. Thank you!
+            </p>
+          {/if}
 
           <h2 class="font-bold text-2xl">What’s Next?</h2>
 
