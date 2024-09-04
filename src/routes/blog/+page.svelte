@@ -99,7 +99,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     slot="main"
     class="max-w-screen-xl m-auto px-2 lg:px-0 lg:mt-0 gap-4 flex flex-col items-center"
   >
-    <div class="col-span-full mx-auto">
+    <div class="col-span-full mx-auto max-lg:mt-2">
       <RadioGroup class="flex wrap gap-y-2" active="bg-secondary-active-token">
         {#each tags as tag}
           <!-- {@const numberOfItems =
