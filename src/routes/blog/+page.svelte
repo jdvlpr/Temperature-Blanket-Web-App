@@ -97,28 +97,24 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   <main
     slot="main"
-    class="max-w-screen-xl m-auto px-2 lg:px-0 lg:mt-0 gap-4 flex flex-col items-center"
+    class="max-w-screen-xl m-auto px-2 gap-4 flex flex-col items-center"
   >
-    <div class="col-span-full mx-auto max-lg:mt-2">
-      <RadioGroup class="flex wrap gap-y-2" active="bg-secondary-active-token">
-        {#each tags as tag}
-          <!-- {@const numberOfItems =
+    <RadioGroup
+      class="flex wrap gap-y-2 max-lg:mt-4"
+      active="bg-secondary-active-token"
+    >
+      {#each tags as tag}
+        <!-- {@const numberOfItems =
             tag === 'All'
               ? posts.length
               : posts.filter((post) => post.tags?.includes(tag)).length} -->
-          <RadioItem
-            bind:group={selectedTag}
-            name={tag}
-            value={tag}
-            title={tag}
-          >
-            <span class="flex gap-1 justify-center items-center">
-              {tag}
-            </span>
-          </RadioItem>
-        {/each}
-      </RadioGroup>
-    </div>
+        <RadioItem bind:group={selectedTag} name={tag} value={tag} title={tag}>
+          <span class="flex gap-1 justify-center items-center">
+            {tag}
+          </span>
+        </RadioItem>
+      {/each}
+    </RadioGroup>
 
     {#key selectedTag}
       <div

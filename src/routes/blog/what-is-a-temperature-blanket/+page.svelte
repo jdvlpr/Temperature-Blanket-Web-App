@@ -48,8 +48,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <div class="hidden lg:inline-flex mx-auto"><AppLogo /></div>
   </svelte:fragment>
   <main slot="main" class="pb-8">
-    <a href="/blog" class="btn bg-secondary-hover-token gap-1 mb-2 max-lg:mx-2"
-      >{@html ICONS.arrowBack}Blog</a
+    <a
+      href="/blog"
+      class="btn bg-secondary-hover-token gap-1 mb-2 max-lg:mx-2 max-lg:mt-2"
+      >{@html ICONS.arrowBack} Blog</a
     >
     <Card>
       <div slot="header">
