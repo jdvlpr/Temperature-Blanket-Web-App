@@ -119,6 +119,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   async function fetchPopularProjectsWrapper() {
     let promisePopularProjects = await fetchPopularProjects({
       months: $timePeriod,
+      limit: 5,
     });
     $popularProjects = promisePopularProjects;
   }
@@ -206,7 +207,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             />
           {/each}
         {:else}
-          {#each $popularProjects as { date, featured_image_src, id, meta }}
+          {#each $popularProjects as { featured_image_src, id, meta }}
             {@const title = getTitleFromLocationsMeta(meta.locations)}
             <a
               href="/gallery/{id}"
