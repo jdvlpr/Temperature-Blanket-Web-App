@@ -51,7 +51,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <meta property="og:type" content="website" />
   <meta
     property="og:image"
-    content="{PUBLIC_BASE_URL}/images/blog-images/2024-09-03-now-open-source/banner.png"
+    content="{PUBLIC_BASE_URL}/images/blog-images/2024-09-03-now-open-source/banner.jpeg"
   />
   <meta property="og:image:width" content="1366" />
   <meta property="og:image:height" content="768" />
@@ -70,7 +70,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <Card>
       <div slot="header">
         <img
-          src="/images/blog-images/2024-09-03-now-open-source/banner.png"
+          src="/images/blog-images/2024-09-03-now-open-source/banner.jpeg"
           class="h-36 object-cover w-full"
           alt="Now Open Source"
         />

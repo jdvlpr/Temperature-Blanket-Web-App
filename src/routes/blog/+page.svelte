@@ -23,7 +23,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   const posts = [
     {
       href: '/blog/2024-09-03-now-open-source',
-      imgSrc: '/images/blog-images/2024-09-03-now-open-source/banner.png',
+      imgSrc: '/images/blog-images/2024-09-03-now-open-source/banner.jpeg',
       imgAlt: 'Open Source',
       title: 'Now Open Source',
       date: 'September 3, 2024',
