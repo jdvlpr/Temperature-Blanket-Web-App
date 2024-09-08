@@ -180,13 +180,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
           >
         </tr>
         <tr>
-          <td class="border border-surface-500 p-2">Can include future dates</td
-          >
-          <td class="border border-surface-500 p-2"
-            >Cannot include future dates</td
-          >
-        </tr>
-        <tr>
           <td class="border border-surface-500 p-2">1 to 7 day delay</td>
           <td class="border border-surface-500 p-2">5 day delay</td>
         </tr>
