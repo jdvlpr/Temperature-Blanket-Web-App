@@ -18,7 +18,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import {
     PUBLIC_BASE_DOMAIN_NAME,
     PUBLIC_BASE_URL,
-    PUBLIC_KOFI_LINK,
+    PUBLIC_GITHUB_LINK,
   } from '$env/static/public';
   import AppLogo from '$lib/components/AppLogo.svelte';
   import AppShell from '$lib/components/AppShell.svelte';
@@ -87,12 +87,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
       >
         <p class="text-left">
           See what's new and review past changes from {PUBLIC_BASE_DOMAIN_NAME}.
-          The changelog includes only the most recent changes and selected
-          milestones. Continued maintenance and development of this web app is
-          made possible by people like you. Thank you for
-          {#if PUBLIC_KOFI_LINK}
-            <a href={PUBLIC_KOFI_LINK} class="link">your contributions!</a>
-          {/if}
+          This changelog includes only certain select milestones.
+          <a
+            href="{PUBLIC_GITHUB_LINK}/activity?ref=main"
+            class="link"
+            target="_blank"
+            >Visit the GitHub repository to see the full changelog for version
+            4.</a
+          >.
         </p>
       </div>
       <div
