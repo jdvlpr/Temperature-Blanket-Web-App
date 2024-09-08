@@ -11,8 +11,6 @@ Built with:
 - [Sveltekit](https://github.com/sveltejs/kit)
 - [Tailwind](https://github.com/tailwindlabs/tailwindcss)
 - [Skeleton](https://github.com/skeletonlabs/skeleton)
-- [Open-Meteo](https://github.com/open-meteo/open-meteo)
-- [Meteostat](https://github.com/meteostat)
 - And [more...](package.json)
 
 > 🚧 Note: Some of the codebase lacks documentation. I plan to update and refactor code as needed.
@@ -63,9 +61,9 @@ Test internal api routes (for the Yarn Colorways API)
 npm run test:api
 ```
 
-# 📚 Documentation & Notes
+## 🙌 Acknowledgments
 
-### 🌐 API Services
+Thanks for the support and feedback from users like you!
 
 Temperature-blanket.com gets data from several APIs:
 
@@ -74,6 +72,8 @@ Temperature-blanket.com gets data from several APIs:
 - **[Open-Meteo](https://open-meteo.com)** for weather data
 
 - **[Meteostat](https://meteostat.net)** for weather data
+
+# 📚 Documentation & Notes
 
 ### 🗄️ Database
 
