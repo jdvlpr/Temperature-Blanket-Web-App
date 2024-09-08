@@ -14,7 +14,6 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { NO_DATA_SRTM3 } from '$lib/constants';
   import {
     activeWeatherElementIndex,
     controller,
@@ -32,12 +31,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   // Note: the signal store is a weird necessity, investigate this
   import Spinner from '$lib/components/Spinner.svelte';
   import CloseButton from '$lib/components/modals/CloseButton.svelte';
-  import {
-    delay,
-    displayGeoNamesErrorMessage,
-    getOpenMeteo,
-    goToProjectSection,
-  } from '$lib/utils';
+  import { delay, getOpenMeteo, goToProjectSection } from '$lib/utils';
 
   let container: HTMLDivElement;
 
@@ -111,7 +105,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
           if (data !== null) location.elevation = data;
         } catch (e) {
-          // I don't have a nice way to handle these errors at the moment; but I don't think it's super important.
+          // I don't have a nice way to handle these errors at the moment; but I don't think it's super important either.
           // Opening a modal would interfere with the Getting Weather modal
           console.log(e);
         }
@@ -142,13 +136,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
             let data = await response.json();
 
             if (data?.message) throw Error(data.message);
+
             data = data.map((day) => {
               return {
                 ...day,
                 date: new Date(day.date),
               };
             });
+
             tempAllData.push(data);
+
             $locations[thisLocation].source = 'Meteostat';
           } catch (error) {
             errors.push(error);
