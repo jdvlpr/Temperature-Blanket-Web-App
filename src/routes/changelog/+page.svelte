@@ -89,7 +89,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           See what's new and review past changes from {PUBLIC_BASE_DOMAIN_NAME}.
           This changelog includes only certain select milestones.
           <a
-            href="{PUBLIC_GITHUB_LINK}/activity?ref=main"
+            href="{PUBLIC_GITHUB_LINK}/commits/main/"
             class="link"
             target="_blank"
             >Visit the GitHub repository to see the full changelog for version
