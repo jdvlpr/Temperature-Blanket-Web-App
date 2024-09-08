@@ -81,7 +81,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   $: if ($createdGauges)
     $settings.selectedTarget = setTargets($settings.selectedTarget);
 
-  $: totalLength = $weather?.length * $settings.lineLength;
+  $: totalLength = $weather ? $weather?.length * $settings.lineLength : 0;
+
+  $: console.log({ $weather, totalLength });
 
   $: lengthFactors = getLengthFactors(totalLength);
   function getLengthFactors(_totalLength) {
@@ -118,8 +120,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     }
     return options;
   }
-
-  $: console.log({ $settings });
 </script>
 
 <div class="w-full">
@@ -148,15 +148,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
   icon={true}
 />
 
-<label class="label">
-  <span>Dimensions (W x H)</span>
-  <select
-    class="select w-fit"
-    id="crnr-dimensions"
-    bind:value={$settings.dimensions}
-  >
-    {#each dimensionsOptions as value}
-      <option {value}>{value}</option>
-    {/each}
-  </select>
-</label>
+{#if dimensionsOptions}
+  <label class="label">
+    <span>Dimensions (W x H)</span>
+    <select
+      class="select w-fit"
+      id="crnr-dimensions"
+      bind:value={$settings.dimensions}
+    >
+      {#each dimensionsOptions as value}
+        <option {value}>{value}</option>
+      {/each}
+    </select>
+  </label>
+{/if}

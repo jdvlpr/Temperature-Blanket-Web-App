@@ -144,8 +144,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     }
     sections = sections;
   }
-
-  $: console.log({ sections });
 </script>
 
 <svg

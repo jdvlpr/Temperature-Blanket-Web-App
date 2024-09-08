@@ -131,7 +131,6 @@ export const getOpenMeteo = async ({ location }) => {
   url += `&end_date=${_to}`;
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'auto';
   url += `&daily=temperature_2m_max,temperature_2m_min,rain_sum,snowfall_sum&timezone=${timezone}`;
-  console.log({ url });
 
   const response = await fetch(url, { signal: get(signal) });
 
