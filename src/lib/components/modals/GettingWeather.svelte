@@ -87,6 +87,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       thisLocation += 1
     ) {
       let location = allLocations[thisLocation];
+
       $gettingLocationWeather = location.label;
       $gettingLocationWeatherIndex = thisLocation;
       // Setup Weather Data Object
@@ -120,6 +121,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
         tempAllData.length === thisLocation &&
         continueWhile
       ) {
+        console.log({ errors });
+
         if ($defaultWeatherSource === 'Meteostat' || errors.length > 0) {
           try {
             const response = await fetch('/api/weather/v1/meteostat/daily', {

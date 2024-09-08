@@ -118,6 +118,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     }
     return options;
   }
+
+  $: console.log({ $settings });
 </script>
 
 <div class="w-full">

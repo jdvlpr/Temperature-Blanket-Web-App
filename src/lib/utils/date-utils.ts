@@ -48,6 +48,7 @@ export const getIsRecentDate = (date) => {
   }
   return false;
 };
+
 /**
  * One year from the given date
  *
@@ -158,4 +159,10 @@ export const isDateWithinLastSevenDays = (date) => {
 
   // Check if the input date is within the last seven days
   return inputDate >= sevenDaysAgo && inputDate <= currentDate;
+};
+
+export const getToday = () => {
+  let dateToday = new Date(new Date().setHours(24, 0, 0, 0));
+  let today = dateToday.setDate(dateToday.getDate() - 1); // why this way??
+  return today;
 };

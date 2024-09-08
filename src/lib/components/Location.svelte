@@ -30,6 +30,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     pluralize,
     dateToISO8601String,
     yearFrom,
+    getToday,
   } from '$lib/utils';
   import autocomplete from 'autocompleter';
   import { onMount } from 'svelte';
@@ -56,8 +57,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
       return { isValid: false };
     const from = new Date($locations[index].from.replace(/-/g, '/'));
     const to = new Date($locations[index].to.replace(/-/g, '/'));
-    let dateToday = new Date(new Date().setHours(24, 0, 0, 0));
-    let today = dateToday.setDate(dateToday.getDate() - 1); // why this way??
+    const today = getToday();
+
     if (!from || !to) return { isValid: false };
     if (from >= today)
       return {

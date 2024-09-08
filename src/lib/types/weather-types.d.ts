@@ -34,27 +34,27 @@ export interface WeatherDay {
   location: number;
   date: Date;
   tavg: {
-    metric: number;
-    imperial: number;
+    metric: number | null;
+    imperial: number | null;
   };
   tmin: {
-    metric: number;
-    imperial: number;
+    metric: number | null;
+    imperial: number | null;
   };
   tmax: {
-    metric: number;
-    imperial: number;
+    metric: number | null;
+    imperial: number | null;
   };
   prcp: {
-    metric: number;
-    imperial: number;
+    metric: number | null;
+    imperial: number | null;
   };
   snow: {
-    metric: number;
-    imperial: number;
+    metric: number | null;
+    imperial: number | null;
   };
   dayt: {
-    metric: number;
-    imperial: number;
+    metric: number | null;
+    imperial: number | null;
   };
 }

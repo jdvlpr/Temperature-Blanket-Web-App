@@ -119,7 +119,8 @@ export async function POST({ request }) {
     date.setDate(date.getDate() + index);
     const thisDate = date;
 
-    // With the Meteostat API, if the "model" param is set to "true" (which is the default), it will include future weather predictions. Our application does not want this, so make null any weather parameters which are for days in the future.
+    // With the Meteostat API, if the "model" param is set to "true" (which is the default), it will include future weather predictions.
+    //Our application does not want this, so make null any weather parameters which are for days in the future.
     const isDateInPast =
       thisDate.setHours(0, 0, 0, 0) < today.setHours(0, 0, 0, 0);
     if (!isDateInPast) {

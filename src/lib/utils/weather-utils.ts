@@ -28,6 +28,7 @@ import {
   units,
   weather,
 } from '$lib/stores';
+import type { WeatherDay } from '$lib/types';
 import {
   celsiusToFahrenheit,
   displayNumber,
@@ -37,6 +38,8 @@ import {
   millimetersToInches,
   numberOfDays,
   pluralize,
+  getToday,
+  dateToISO8601String,
 } from '$lib/utils';
 import SunCalc from 'suncalc';
 import { get } from 'svelte/store';
@@ -101,15 +104,37 @@ export const missingDaysCount = () => {
  * @throws {Error} - Throws an error if there is an issue with the API request or if the data is invalid.
  */
 export const getOpenMeteo = async ({ location }) => {
-  let allData = [];
+  let allData: WeatherDay[] = [];
+  let totalDaysInFuture = 0;
+
+  let today = getToday();
+  let _to = location.to;
+
+  // If the end date is in the future, set it instead to yesterday
+  // The reason for this is because Open-Meteo does not accept end dates in the future
+  if (stringToDate(_to) >= today) {
+    // get today as a date
+    const _today = new Date();
+    _today.setHours(0, 0, 0, 0);
+
+    // set the number of days which are in the future, including today
+    totalDaysInFuture = numberOfDays(_today, stringToDate(_to));
+
+    // set the _to end date to yesterday, the last day which should be included in the request for weather data
+    const yesterday = new Date(_today.getTime() - 24 * 60 * 60 * 1000);
+    _to = dateToISO8601String(yesterday);
+  }
+
   let url = API_SERVICES.openMeteo.baseURL;
   url += `?latitude=${location.lat}&longitude=${location.lng}`;
   url += `&start_date=${location.from}`;
-  url += `&end_date=${location.to}`;
+  url += `&end_date=${_to}`;
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'auto';
   url += `&daily=temperature_2m_max,temperature_2m_min,rain_sum,snowfall_sum&timezone=${timezone}`;
+  console.log({ url });
 
   const response = await fetch(url, { signal: get(signal) });
+
   if (response.status === 503) {
     // Service Temporarily Unavailable
     throw new Error(
@@ -125,8 +150,7 @@ export const getOpenMeteo = async ({ location }) => {
       const from = stringToDate(location.from);
       const to = stringToDate(location.to);
 
-      let today = new Date(new Date().setHours(24, 0, 0, 0));
-      today = today.setDate(today.getDate() - 1); // why this way??
+      let today = getToday();
 
       let daysInFuture = null;
       if (to >= today) {
@@ -165,11 +189,12 @@ export const getOpenMeteo = async ({ location }) => {
   }
 
   if (!data?.daily) {
-    // No data returned from meteostat
+    // No data returned from Open-Meteo
     throw new Error(
       '<p class="font-bold text-xl my-4">Something Went Wrong</p><p class="mt-4">There appears to be insufficient weather data, please try a different location or dates.</p>',
     );
   }
+
   if (data.daily?.temperature_2m_max.every((value) => value === null)) {
     // Empty data
     throw new Error(
@@ -177,72 +202,109 @@ export const getOpenMeteo = async ({ location }) => {
     );
   }
 
-  location.stations = null;
+  location.stations = null; // No station details from Open-Meteo, only from Meteostat
+
   const times = data.daily.time;
   const tmaxs = data.daily.temperature_2m_max;
   const tmins = data.daily.temperature_2m_min;
   const prcps = data.daily.rain_sum;
   const snows = data.daily.snowfall_sum;
+
   for (let index = 0; index < times.length; index += 1) {
     // const day = data.data[index];
     const tmin = tmins[index];
     const tmax = tmaxs[index];
     const tavg =
-      tmin === null || tmax === null ? null : displayNumber((tmin + tmax) / 2);
+      tmin === null || tmax === null ? null : displayNumber((tmin + tmax) / 2); // Calculate average temp based on max and min temps
     const snow = snows[index];
     const prcp = prcps[index];
+
     const date = stringToDate(location.from);
     date.setDate(date.getDate() + index);
-    const thisDate = date;
-    const dayData = {};
-    dayData.location = location.index;
-    dayData.date = date;
-    dayData.tavg = {
-      metric: tavg,
-      imperial: celsiusToFahrenheit(tavg),
-    }; // Average Temp
-    dayData.tmin = {
-      metric: tmin,
-      imperial: celsiusToFahrenheit(tmin),
-    }; // Minimum Temp
-    dayData.tmax = {
-      metric: tmax,
-      imperial: celsiusToFahrenheit(tmax),
-    }; // Maximum Temp
-    dayData.prcp = {
-      metric: prcp,
-      imperial: millimetersToInches(prcp),
-    }; // Precipitation
-    dayData.snow = {
-      metric: snow === null ? null : displayNumber(snow * 10),
-      imperial: snow === null ? null : millimetersToInches(snow * 10),
-    }; // Snow
+
+    const dayTime = getDayTime({ date, lat: location.lat, lng: location.lng });
+
+    const dayData: WeatherDay = {
+      location: location.index,
+      date,
+      tavg: {
+        metric: tavg,
+        imperial: celsiusToFahrenheit(tavg),
+      },
+      tmin: {
+        metric: tmin,
+        imperial: celsiusToFahrenheit(tmin),
+      },
+      tmax: {
+        metric: tmax,
+        imperial: celsiusToFahrenheit(tmax),
+      },
+      prcp: {
+        metric: prcp,
+        imperial: millimetersToInches(prcp),
+      },
+      snow: {
+        metric: snow === null ? null : displayNumber(snow * 10),
+        imperial: snow === null ? null : millimetersToInches(snow * 10),
+      },
+      dayt: {
+        metric: dayTime.metric,
+        imperial: dayTime.imperial,
+      },
+    };
+
+    // Other possible parameters from Open-Meteo, not used
     // dayData.wdir = day.wdir; // Wind Direction degrees (unused)
     // dayData.wspd = day.wspd; // WindSpeed km/hr (unused)
     // dayData.wpgt = day.wpgt; //T he peak wind gust in km/h (unused)
     // dayData.pres = day.pres; // The average sea-level air pressure in hPa (unused)
     // dayData.tsun = day.tsun; // The daily sunshine total in minutes (m) (unused)
-    // End of open-meteo data
-    const times = SunCalc.getTimes(thisDate, location.lat, location.lng);
-    // dayData.sunrise = times.sunrise;
-    // dayData.sunset = times.sunset;
-    const isValidSunset =
-      times.sunset instanceof Date && !isNaN(times.sunset.getTime());
-    const isValidSunRise =
-      times.sunrise instanceof Date && !isNaN(times.sunrise.getTime());
-    if (isValidSunset && isValidSunRise) {
-      const daytime = parseFloat(
-        ((times.sunset - times.sunrise) / 1000 / 60 / 60).toFixed(6),
-      );
-      dayData.dayt = {
-        metric: hoursToMinutes(daytime, 4),
-        imperial: displayNumber(daytime, 4),
-      }; // Convert metric to minutes because of Weather chart scale
-    } else {
-      dayData.dayt = { metric: null, imperial: null };
-    }
+
     allData = [...allData, dayData];
   }
+
+  if (totalDaysInFuture > 0) {
+    for (let index = 0; index < totalDaysInFuture; index += 1) {
+      const _date = stringToDate(_to);
+      _date.setDate(_date.getDate() + index + 1);
+      const _dayTime = getDayTime({
+        date: _date,
+        lat: location.lat,
+        lng: location.lng,
+      });
+
+      const _day: WeatherDay = {
+        location: location.index,
+        date: _date,
+        tavg: {
+          metric: null,
+          imperial: null,
+        },
+        tmin: {
+          metric: null,
+          imperial: null,
+        },
+        tmax: {
+          metric: null,
+          imperial: null,
+        },
+        prcp: {
+          metric: null,
+          imperial: null,
+        },
+        snow: {
+          metric: null,
+          imperial: null,
+        },
+        dayt: {
+          metric: _dayTime.metric,
+          imperial: _dayTime.imperial,
+        },
+      };
+      allData = [...allData, _day];
+    }
+  }
+
   return allData;
 };
 
@@ -331,4 +393,26 @@ export const CSVtoArray = ({ str, delimiter = ',' }) => {
 export const getWeatherTargets = ({ weatherParameters }) => {
   const props = get(gaugeProperties)?.flatMap((gauge) => gauge.targets);
   return props.filter((n) => weatherParameters?.[n.id]);
+};
+
+export const getDayTime = ({ date, lat, lng }) => {
+  const times = SunCalc.getTimes(date, lat, lng);
+  const isValidSunset =
+    times.sunset instanceof Date && !isNaN(times.sunset.getTime());
+  const isValidSunRise =
+    times.sunrise instanceof Date && !isNaN(times.sunrise.getTime());
+  if (isValidSunset && isValidSunRise) {
+    const daytime = parseFloat(
+      ((times.sunset - times.sunrise) / 1000 / 60 / 60).toFixed(6),
+    );
+    return {
+      metric: hoursToMinutes(daytime, 4),
+      imperial: displayNumber(daytime, 4),
+    }; // Convert metric to minutes because of Weather chart scale
+  } else {
+    return {
+      metric: null,
+      imperial: null,
+    };
+  }
 };
