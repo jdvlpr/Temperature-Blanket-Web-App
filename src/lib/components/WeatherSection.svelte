@@ -329,7 +329,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   {#if projectHasRecentWeatherData}
     <div
-      class="variant-ghost-warning rounded-container-token text-token text-left w-full max-w-screen-sm"
+      class="variant-ghost-warning rounded-container-token text-token text-left w-fit max-w-screen-sm text-sm"
     >
       <Accordion>
         <AccordionItem>
@@ -340,7 +340,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               viewBox="0 0 24 24"
               stroke-width="1.5"
               stroke="currentColor"
-              class="w-6 h-6"
+              class="size-6"
             >
               <path
                 stroke-linecap="round"
@@ -349,15 +349,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
               />
             </svg>
           </svelte:fragment>
-          <svelte:fragment slot="summary"
-            ><p class="">
-              Weather within the past {$defaultWeatherSource === 'Open-Meteo'
-                ? OPEN_METEO_DELAY_DAYS
-                : $defaultWeatherSource === 'Meteostat'
-                  ? METEOSTAT_DELAY_DAYS
-                  : 'few'} days may be revised as new data comes in.
-            </p></svelte:fragment
-          >
+          <svelte:fragment slot="summary">
+            Weather within the past {$defaultWeatherSource === 'Open-Meteo'
+              ? OPEN_METEO_DELAY_DAYS
+              : $defaultWeatherSource === 'Meteostat'
+                ? METEOSTAT_DELAY_DAYS
+                : 'few'} days may be revised as new data comes in.
+          </svelte:fragment>
           <svelte:fragment slot="content">
             Weather data comes from <a
               href="https://open-meteo.com/"
@@ -587,14 +585,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   {#if isDataMissing}
     <div
-      class=" variant-outline-surface rounded-container-token text-token flex flex-col gap-2 justify-center items-center text-left w-full max-w-screen-sm"
+      class="variant-outline-surface rounded-container-token text-token flex flex-col gap-2 justify-center items-center text-left w-fit max-w-screen-sm text-sm"
     >
       <Accordion>
         <AccordionItem>
           <svelte:fragment slot="lead"
             ><svg
               xmlns="http://www.w3.org/2000/svg"
-              class="w-6 h-6"
+              class="size-6"
               viewBox="0 0 24 24"
               ><path
                 fill="currentColor"
