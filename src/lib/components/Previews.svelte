@@ -61,9 +61,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </Drawer.Portal>
       </Drawer.Root>
     </div>
+
     <div class="flex w-full flex-wrap items-end justify-center gap-4">
       <svelte:component this={$activePreview.settings} />
     </div>
+
     <div
       class="flex flex-wrap gap-2 justify-center my-2 lg:mb-4 px-4 py-2 shadow-inner rounded-container-token variant-soft-surface w-full"
     >
