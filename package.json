@@ -1,6 +1,6 @@
 {
   "name": "temperature-blanket-web-app",
-  "version": "4.0.9",
+  "version": "4.0.10",
   "description": "Weather Data + Art! Web app for creating a temperature blanket",
   "main": "index.html",
   "private": true,
