@@ -23,13 +23,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <svelte:head>
   <title>What is a Temperature Blanket?</title>
-  <meta name="description" content="What is a Temperature Blanket?" />
+  <meta
+    name="description"
+    content="Find out more about beautiful and creative yarn projects based on weather data."
+  />
   <meta
     name="viewport"
     content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no"
   />
   <meta property="og:title" content="What is a Temperature Blanket?" />
-  <meta property="og:description" content="What is a Temperature Blanket?" />
+  <meta
+    property="og:description"
+    content="Find out more about beautiful and creative yarn projects based on weather data."
+  />
   <meta
     property="og:url"
     content="{PUBLIC_BASE_URL}/blog/what-is-a-temperature-blanket"
@@ -76,6 +82,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
             temperature blanket, but they all have one thing in common: the
             color of each section is based on meteorological events.
           </p>
+
+          <img
+            src="/images/blog-images/what-is-a-temperature-blanket/symea_3270.png"
+            alt="Example of a temperature blanket"
+            class="w-full"
+          />
+
           <div class="flex flex-col gap-4">
             <h3 class="font-bold text-2xl">Make a Temperature Blanket</h3>
             <p>
