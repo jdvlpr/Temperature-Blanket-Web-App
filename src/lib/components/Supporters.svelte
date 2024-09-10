@@ -21,7 +21,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 {#if SUPPORTERS}
   <!-- when there are more items, add these classes: sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-4 -->
-  <div class="my-4 grid grid-cols-1 gap-4 rounded-none">
+  <div
+    class="my-4 grid grid-cols-1 gap-4 rounded-none lg:grid-cols-2 2xl:grid-cols-3"
+  >
     {#if SUPPORTERS?.gold?.length}
       <div class="relative flex items-center w-full col-span-full">
         <div class="flex-grow border-t border-surface-300-600-token"></div>
@@ -45,12 +47,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </div>
       {#each SUPPORTERS?.gold as { name, href, linkText, imageSrc, date }}
         <div
-          class="bg-surface-300-600-token text-token px-2 py-4 rounded-container-token w-full flex flex-col justify-center"
+          class="bg-surface-200-700-token text-token px-2 py-4 rounded-container-token w-full flex flex-col justify-center"
         >
           <Avatar
             src={imageSrc}
             width="w-24"
-            rounded="rounded-md"
+            rounded="rounded-[5px]"
+            background="bg-none"
             class="mx-auto flex-shrink-0"
           />
           <div class="flex flex-col justify-center items-center">
@@ -67,11 +70,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </div>
       {/each}
     {/if}
-  </div>
 
-  <div
-    class="my-4 grid grid-cols-1 gap-4 rounded-none lg:grid-cols-2 2xl:grid-cols-3"
-  >
     {#if SUPPORTERS?.silver?.length}
       <div class="relative flex items-center w-full col-span-full">
         <div class="flex-grow border-t border-surface-300-600-token"></div>
@@ -95,7 +94,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </div>
       {#each SUPPORTERS.silver as { name, href, linkText, date }}
         <div
-          class="h-fit bg-surface-300-600-token text-token p-4 rounded-container-token flex flex-col items-center"
+          class="h-fit bg-surface-200-700-token text-token p-4 rounded-container-token flex flex-col items-center"
         >
           <p class="text-xl font-bold">{name}</p>
           <a {href} target="_blank" class="link">{linkText}</a>
@@ -129,7 +128,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </div>
       {#each SUPPORTERS?.bronze as { name, date }}
         <div
-          class="h-fit bg-surface-300-600-token text-token p-4 rounded-container-token flex flex-col items-center"
+          class="h-fit bg-surface-200-700-token text-token p-4 rounded-container-token flex flex-col items-center"
         >
           <p class="text-xl font-bold">{name}</p>
           <p class="text-sm font-normal w-fit">
