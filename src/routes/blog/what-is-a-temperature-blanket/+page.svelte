@@ -19,6 +19,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import AppShell from '$lib/components/AppShell.svelte';
   import Card from '$lib/components/Card.svelte';
   import { ICONS } from '$lib/constants';
+  import { getColorsFromInput, getTextColor } from '$lib/utils';
+
+  const colorsCode = `palette:ca2c29a4435b46203cea9d5deec06697b2dc5ea1de3271c51838971a2d46yarn:hobbii-amigo`;
+  const colors = getColorsFromInput({ string: colorsCode });
+  const ranges = [
+    [96, 76],
+    [76, 71],
+    [71, 66],
+    [66, 62],
+    [62, 57],
+    [57, 49],
+    [49, 42],
+    [42, 38],
+    [38, 35],
+    [35, 4],
+  ];
 </script>
 
 <svelte:head>
@@ -45,8 +61,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     property="og:image"
     content="{PUBLIC_BASE_URL}/images/blog-images/what-is-a-temperature-blanket/temperature-blanket-featured-image.png"
   />
-  <meta property="og:image:width" content="3000" />
-  <meta property="og:image:height" content="3650" />
+  <meta property="og:image:width" content="986" />
+  <meta property="og:image:height" content="1200" />
 </svelte:head>
 
 <AppShell pageName="What is a Temperature Blanket?">
@@ -74,128 +90,177 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </h1>
         <div class="flex flex-col gap-4">
           <p>
-            Imagine turning weather data into a cozy and colorful work of art!
-            That’s what a temperature blanket is: a crafty way to show how the
-            temperature of a place changes over time. Usually one row or section
-            represents each day of a year, using different yarn colors for
-            different weather conditions. There are many ways to make a
-            temperature blanket, but they all have one thing in common: the
-            color of each section is based on meteorological events.
+            A temperature blanket is a crocheted or knit project which uses
+            weather data to create a beautiful, creative, and cozy work of art!
+            Using various colors of yarn, it shows how the temperature of a
+            place changes over time. Each row or section of a temperature
+            blanket represents a different day of the year. Temperature blankets
+            are unique and completely customizable.
           </p>
 
-          <img
-            src="/images/blog-images/what-is-a-temperature-blanket/symea_3270.png"
-            alt="Example of a temperature blanket"
-            class="w-full"
-          />
+          <div
+            class="grid grid-cols-1 md:grid-cols-12 md:items-center gap-4 md:gap-2 my-4 bg-surface-100-800-token rounded-container-token p-4 shadow-inner"
+          >
+            <div
+              class="order-3 md:order-1 col-span-full md:col-span-7 flex flex-col"
+            >
+              <img
+                src="/images/blog-images/what-is-a-temperature-blanket/symea_3270.png"
+                alt="Example of a temperature blanket"
+                class=""
+              />
+              <p class="col-span-full text-xs mt-2">
+                Temperature blanket by <a
+                  href="https://www.ravelry.com/projects/symea/temperature-blanket---temperaturdecke"
+                  class="link"
+                  target="_blank">symea</a
+                >
+              </p>
+            </div>
+
+            <p
+              class="order-2 font-ornament hidden md:inline-block text-4xl md:text-5xl md:relative md:right-6 xl:right-0 md:-top-4 md:rotate-0 col-span-full text-center -rotate-90 md:col-span-1"
+            >
+              1
+            </p>
+
+            <p
+              class="order-1 md:order-3 text-xl font-sans_light font-bold col-span-full md:col-span-4 text-center md:-top-6 md:relative text-balance"
+            >
+              These 366 rows of yarn represent the temperature in Göppingen,
+              Germany from May 15, 1943 to May 14, 1944!
+            </p>
+          </div>
+
+          <p>
+            Want help making your own temperature blanket? See <a
+              href="/blog/2024-02-09-how-to-plan-a-temperature-blanket"
+              class="link">How to Plan a Temperature Blanket</a
+            >.
+          </p>
 
           <div class="flex flex-col gap-4">
-            <h3 class="font-bold text-2xl">Make a Temperature Blanket</h3>
-            <p>
-              For a detailed guide, read <a
-                href="/blog/2024-02-09-how-to-plan-a-temperature-blanket"
-                class="link">How to Plan a Temperature Blanket</a
-              >. Here's a general overview:
-            </p>
-            <div>
-              <p class="font-bold text-xl">1) Pick Your Colors</p>
+            <div class="">
+              <p class="font-bold text-lg">Yarn Colors & Gauge</p>
               <p>
-                The first step to making a temperature blanket is to decide what
-                colors of yarn you want to use and what temperatures they will
-                represent. You can use as many or as few colors as you like.
-                Then make a temperature gauge (also called a color gauge or
-                color chart) to keep track of your choices.
+                Any yarn colors can be used to create a temperature blanket.
+                Usually, people choose between 6 and 14 different colors of
+                yarn. Each color is then assigned a temperature range, making
+                what is called a temperature gauge.
               </p>
             </div>
-            <img
-              src="/images/blog-images/what-is-a-temperature-blanket/temperature-blanket-gauge.png"
-              class="w-full"
-              alt="Example of a temperature gauge"
-            />
-            <a href="/yarn" class="btn variant-filled-primary w-fit text-token"
-              >Create a Yarn Palette</a
-            >
+
+            <div class="flex flex-col gap-2 max-w-sm">
+              <p class="text-sm">Example of a temperature gauge:</p>
+              <div
+                class="flex flex-col rounded-container-token overflow-hidden shadow-md"
+              >
+                {#each colors as { hex, brandName, yarnName, name }, _i}
+                  {@const textColor = getTextColor(hex)}
+                  <div
+                    style="background:{hex}; color:{textColor}"
+                    class="w-full h-[60px] flex items-center justify-around"
+                  >
+                    <div class="col-span-1 flex flex-col">
+                      <p class="text-xs">{brandName} - {yarnName}</p>
+                      <p>{name}</p>
+                    </div>
+                    <div class="col-span-1 flex gap-2">
+                      <div class="flex flex-col">
+                        <p class="text-xs">From</p>
+                        <p>{ranges[_i][0]} °</p>
+                      </div>
+                      <div class="flex flex-col">
+                        <p class="text-xs">To</p>
+                        <p>{ranges[_i][1]} °</p>
+                      </div>
+                    </div>
+                  </div>
+                {/each}
+              </div>
+            </div>
+
             <div>
-              <p class="font-bold text-xl">2) Keep Track of the Weather</p>
+              <p class="font-bold text-lg">Weather Data</p>
               <p>
-                Next, write down the temperature over time (or look up the
-                weather history using the
-                <a href="/" class="link">Project Planner</a>). You can use the
-                average temperature of the day, the highest or lowest
-                temperature, or something else, like rain or snow. You can even
-                use more than one weather factor for each day to make your
-                pattern more interesting. It’s up to you how or what you want to
-                track; just make sure you do it consistently.
+                People either get historical weather data or track the current
+                temperature over time. Then the yarn corresponding to each day's
+                temperature is used in the project. For example, if the day's
+                temperature is 36°, then the yarn who's range contains that
+                temperature is used.
               </p>
             </div>
 
             <div>
-              <p class="font-bold text-xl">3) Create Your Project</p>
+              <p class="font-bold text-lg">Project Pattern</p>
               <p>
-                When you have the weather data you need, for each day, crochet
-                or knit a part of your blanket with the yarn color that matches
-                that day’s temperature, based on your color gauge.
+                There are countless options for a temperature blanket pattern. A
+                typical project has one row for each day, but zigzags, squares,
+                diagonal designs, or other patterns can be used.
               </p>
             </div>
-            <p>
-              You can make any pattern you want. A typical temperature blanket
-              has one row for each day, but you can also try zigzags, squares,
-              diagonal designs, mix the highest and lowest temperature in the
-              same part, and many other options. The sky is the limit.
-            </p>
-            <div class="flex flex-wrap gap-2 justify-center items-start">
-              <img
-                src="/images/blog-images/what-is-a-temperature-blanket/tbchevron.png"
-                alt="Chevron Temperature Blanket"
-                class="w-48 h-56 object-contain"
-              />
-              <img
-                src="/images/blog-images/what-is-a-temperature-blanket/tbdaylightrows.png"
-                alt="Daylight Rows Temperature Blanket"
-                class="w-48 h-56 object-contain"
-              />
-              <img
-                src="/images/blog-images/what-is-a-temperature-blanket/tbmonthrows.png"
-                alt="Month Rows Temperature Blanket"
-                class="w-48 h-56 object-contain"
-              />
-              <img
-                src="/images/blog-images/what-is-a-temperature-blanket/tbsquares.png"
-                alt="Squares Temperature Blanket"
-                class="w-48 h-56 object-contain"
-              />
+
+            <div class="flex flex-col gap-2">
+              <p class="text-sm">Examples of different types of patterns:</p>
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-2 items-start">
+                <img
+                  src="/images/blog-images/what-is-a-temperature-blanket/chevron.png"
+                  alt="Chevron Temperature Blanket"
+                  class="w-48 object-contain"
+                />
+                <img
+                  src="/images/blog-images/what-is-a-temperature-blanket/cornertocorner.png"
+                  alt="Daylight Rows Temperature Blanket"
+                  class="w-48 object-contain"
+                />
+                <img
+                  src="/images/blog-images/what-is-a-temperature-blanket/squares.png"
+                  alt="Month Rows Temperature Blanket"
+                  class="w-48 object-contain"
+                />
+                <img
+                  src="/images/blog-images/what-is-a-temperature-blanket/daylightrows.png"
+                  alt="Squares Temperature Blanket"
+                  class="w-48 object-contain"
+                />
+              </div>
             </div>
           </div>
+
           <div>
             <h3 class="font-bold text-lg">Variations</h3>
-            <p>
-              Temperature blankets are unique and completely customizable. To
-              make your project, you could use any of the following principles:
-            </p>
+            <p>There are many ways to customize a temperature blanket.</p>
           </div>
-          <ul class="ml-4">
+
+          <ul class="ml-4 flex flex-col gap-2">
             <li>
-              - Mix in other weather events to the pattern, like rain, snow, or
-              even daytime
+              - Other weather events, like rain, snow, or even daytime,
+              incorporated into the design
             </li>
             <li>
-              - Group or mark sections to show weeks, months, or other time
+              - Sections grouped or marked to show weeks, months, or other time
               frames
             </li>
-            <li>- Put the color gauge in the project itself</li>
-            <li>- Put more than one location in the pattern</li>
-            <li>
-              - Use the color gauge to crochet or knit something else, like a
-              scarf, rug, or sweater
-            </li>
+            <li>- More than one location in the project</li>
+            <li>- A scarf, rug, or sweater instead of a blanket!</li>
           </ul>
-          <h3 class="font-bold text-lg">More Resources</h3>
-          <p>
-            The internet is full of inspiration and tips for making temperature
-            blankets. If you want to make one or learn more about them, here are
-            some places to check out:
-          </p>
+
+          <div>
+            <h3 class="font-bold text-lg">Resources</h3>
+            <p>
+              The internet is full of inspiration and tips for making
+              temperature blankets. If you want to make one or learn more, here
+              are some places to check out:
+            </p>
+          </div>
+
           <ul class="ml-4 flex flex-col gap-2">
+            <li>
+              <a class="link" href="/" target="_blank"
+                >temperature-blanket.com</a
+              > (this site) - get weather data, choose yarn colors, and preview your
+              design
+            </li>
             <li>
               <a
                 class="link"
@@ -234,12 +299,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <a
                 class="link"
                 rel="noreferrer noopener"
-                href="https://www.facebook.com/search/groups?q=temperature%20blanket"
-                target="_blank"
-                >Search for <em>temperature blanket</em> Facebook groups</a
-              > – community discussion, yarn alongs, project help, inspiration
+                href="https://www.facebook.com/groups/272448773170943"
+                target="_blank">Temperature/ Weather Blanket! Facebook Group</a
+              > – community discussion, project help, inspiration
             </li>
           </ul>
+
+          <p>
+            Want help making your own temperature blanket? See <a
+              href="/blog/2024-02-09-how-to-plan-a-temperature-blanket"
+              class="link">How to Plan a Temperature Blanket</a
+            >.
+          </p>
         </div>
       </div>
     </Card>
