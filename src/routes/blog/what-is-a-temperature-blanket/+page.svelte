@@ -168,11 +168,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     <div class="col-span-1 flex gap-2">
                       <div class="flex flex-col">
                         <p class="text-xs">From</p>
-                        <p>{ranges[_i][0]} °</p>
+                        <p>{ranges[_i][0]}°</p>
                       </div>
                       <div class="flex flex-col">
                         <p class="text-xs">To</p>
-                        <p>{ranges[_i][1]} °</p>
+                        <p>{ranges[_i][1]}°</p>
                       </div>
                     </div>
                   </div>
@@ -186,8 +186,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 People either get historical weather data or track the current
                 temperature over time. Then the yarn corresponding to each day's
                 temperature is used in the project. For example, if the day's
-                temperature is 36°, then the yarn who's range contains that
-                temperature is used.
+                temperature is 36°, then according to the temperature gauge
+                above, the Royal Blue yarn would be used for that day's row in
+                the temperature blanket.
               </p>
             </div>
 
@@ -229,28 +230,24 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
           <div>
             <h3 class="font-bold text-lg">Variations</h3>
-            <p>There are many ways to customize a temperature blanket.</p>
+            <p>There are many other ways to customize a temperature blanket:</p>
           </div>
 
           <ul class="ml-4 flex flex-col gap-2">
             <li>
-              - Other weather events, like rain, snow, or even daytime,
+              - Other weather events besides the temperature, like rain or snow,
               incorporated into the design
             </li>
-            <li>
-              - Sections grouped or marked to show weeks, months, or other time
-              frames
-            </li>
-            <li>- More than one location in the project</li>
+            <li>- Sections grouped by weeks or months</li>
+            <li>- More than one location</li>
             <li>- A scarf, rug, or sweater instead of a blanket!</li>
           </ul>
 
           <div>
             <h3 class="font-bold text-lg">Resources</h3>
             <p>
-              The internet is full of inspiration and tips for making
-              temperature blankets. If you want to make one or learn more, here
-              are some places to check out:
+              Here are some resources for inspiration, tips, and more
+              information about temperature blankets:
             </p>
           </div>
 

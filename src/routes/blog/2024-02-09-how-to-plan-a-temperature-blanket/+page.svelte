@@ -602,14 +602,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     want to adjust the preview to use the same weather parameter
                     in the Preview section.
                   </p>
-                  <div class="flex flex-wrap gap-4">
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
                     <img
-                      class="max-w-[250px] h-auto max-h-fit w-full"
+                      class="w-full max-w-[280px]"
                       src="/images/blog-images/2024-02-09-how-to-plan-a-temperature-blanket/balance-focus.png"
                       alt="Balance Focus"
                     />
                     <img
-                      class="max-w-[250px] w-full h-auto max-h-fit"
+                      class="w-full max-w-[280px]"
                       src="/images/blog-images/2024-02-09-how-to-plan-a-temperature-blanket/preview-parameter.png"
                       alt="Preview Parameter"
                     />
@@ -639,20 +639,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
               </p>
               <div class="flex flex-wrap gap-4 justify-center items-center">
                 <img
-                  class="max-w-[400px] h-auto max-h-fit w-full"
+                  class="max-w-sm h-auto max-h-fit w-full"
                   src="/images/blog-images/2024-02-09-how-to-plan-a-temperature-blanket/previews.png"
                   alt="Preview Layout Options"
                 />
               </div>
               <div class="flex flex-wrap gap-4 justify-center items-center">
                 <img
-                  class="max-w-[200px] w-full h-auto max-h-fit"
+                  class="max-w-sm w-full h-auto max-h-fit"
                   src="/images/blog-images/2024-02-09-how-to-plan-a-temperature-blanket/preview.png"
-                  alt="Preview"
-                />
-                <img
-                  class="max-w-[200px] w-full h-auto max-h-fit"
-                  src="/images/blog-images/2024-02-09-how-to-plan-a-temperature-blanket/preview-split-daytime.png"
                   alt="Preview"
                 />
               </div>
