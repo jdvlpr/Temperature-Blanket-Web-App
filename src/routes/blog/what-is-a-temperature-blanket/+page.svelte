@@ -109,7 +109,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 alt="Example of a temperature blanket"
                 class=""
               />
-              <p class="col-span-full text-xs mt-2">
+              <p class="col-span-full text-sm mt-2">
                 Temperature blanket by <a
                   href="https://www.ravelry.com/projects/symea/temperature-blanket---temperaturdecke"
                   class="link"
@@ -144,9 +144,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <p class="font-bold text-lg">Yarn Colors & Gauge</p>
               <p>
                 Any yarn colors can be used to create a temperature blanket.
-                Usually, people choose between 6 and 14 different colors of
-                yarn. Each color is then assigned a temperature range, making
-                what is called a temperature gauge.
+                Usually, people choose between 6 and 18 different colors of
+                yarn, but the number of colors is totally up to the individual
+                making the project. Each color is then assigned a temperature
+                range, making what is called a temperature gauge.
               </p>
             </div>
 
@@ -159,7 +160,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   {@const textColor = getTextColor(hex)}
                   <div
                     style="background:{hex}; color:{textColor}"
-                    class="w-full h-[60px] flex items-center justify-around"
+                    class="w-full py-2 flex items-center justify-around"
                   >
                     <div class="col-span-1 flex flex-col">
                       <p class="text-xs">{brandName} - {yarnName}</p>
@@ -185,10 +186,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <p>
                 People either get historical weather data or track the current
                 temperature over time. Then the yarn corresponding to each day's
-                temperature is used in the project. For example, if the day's
-                temperature is 36°, then according to the temperature gauge
-                above, the Royal Blue yarn would be used for that day's row in
-                the temperature blanket.
+                temperature is used in it's place in the project. For example,
+                if the day's temperature is 36°, then according to the
+                temperature gauge above, the Royal Blue yarn would be used for
+                that day's row in the temperature blanket.
               </p>
             </div>
 
@@ -203,27 +204,39 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <div class="flex flex-col gap-2">
               <p class="text-sm">Examples of different types of patterns:</p>
-              <div class="grid grid-cols-2 md:grid-cols-4 gap-2 items-start">
-                <img
-                  src="/images/blog-images/what-is-a-temperature-blanket/chevron.png"
-                  alt="Chevron Temperature Blanket"
-                  class="w-48 object-contain"
-                />
-                <img
-                  src="/images/blog-images/what-is-a-temperature-blanket/cornertocorner.png"
-                  alt="Daylight Rows Temperature Blanket"
-                  class="w-48 object-contain"
-                />
-                <img
-                  src="/images/blog-images/what-is-a-temperature-blanket/squares.png"
-                  alt="Month Rows Temperature Blanket"
-                  class="w-48 object-contain"
-                />
-                <img
-                  src="/images/blog-images/what-is-a-temperature-blanket/daylightrows.png"
-                  alt="Squares Temperature Blanket"
-                  class="w-48 object-contain"
-                />
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-4 items-start">
+                <div>
+                  <img
+                    src="/images/blog-images/what-is-a-temperature-blanket/chevron.png"
+                    alt="Chevron Temperature Blanket"
+                    class=""
+                  />
+                  <p class="text-sm">Chevron Pattern</p>
+                </div>
+                <div>
+                  <img
+                    src="/images/blog-images/what-is-a-temperature-blanket/cornertocorner.png"
+                    alt="Corner to Corner Temperature Blanket"
+                    class=""
+                  />
+                  <p class="text-sm">Corner to Corner Pattern</p>
+                </div>
+                <div>
+                  <img
+                    src="/images/blog-images/what-is-a-temperature-blanket/squares.png"
+                    alt="Squares Temperature Blanket"
+                    class=""
+                  />
+                  <p class="text-sm">Squares Pattern</p>
+                </div>
+                <div>
+                  <img
+                    src="/images/blog-images/what-is-a-temperature-blanket/daylightrows.png"
+                    alt="Daylight Rows Temperature Blanket"
+                    class=""
+                  />
+                  <p class="text-sm">Daylight Rows Pattern</p>
+                </div>
               </div>
             </div>
           </div>
