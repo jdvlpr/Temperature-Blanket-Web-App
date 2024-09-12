@@ -97,7 +97,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   <main
     slot="main"
-    class="max-w-screen-xl m-auto px-2 gap-4 flex flex-col items-center"
+    class="max-w-screen-xl m-auto px-2 gap-4 flex flex-col items-center mb-4"
   >
     <RadioGroup
       class="flex wrap gap-y-2 max-lg:mt-4"
