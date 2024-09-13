@@ -22,6 +22,21 @@ export const entries: ChangelogItem[] = [
     date: 'September, 2024',
     notes: [
       {
+        icon: ICONS.checkCircle,
+        text: `3 new colorways`,
+        title: 'Added New Yarn Colorways: Bernat - Blanket Mist-ical',
+      },
+      {
+        icon: ICONS.checkCircle,
+        text: `12 colorways`,
+        title: 'Added Yarn: Lion Brand - Re-Up Bonus Bundle',
+      },
+    ],
+    version: '4.1.0',
+  },
+  {
+    notes: [
+      {
         icon: ICONS.wrenchScrewdriver,
         text: `Project locations can now include future dates even when the weather source is Open-Meteo. Previously this was possible only when the weather source was Meteostat.`,
         title: 'Allow Future Dates in Open-Meteo Weather Data',

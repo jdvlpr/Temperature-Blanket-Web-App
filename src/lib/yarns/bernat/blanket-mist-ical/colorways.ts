@@ -5,7 +5,7 @@ const colorways: Colorway[] = [
     source: {
       name: 'yarnspirations.com',
       href: 'https://www.yarnspirations.com/products/bernat-blanket-mist-ical-yarn-300g-10-5oz',
-      accessed: '2024-08-12',
+      accessed: '2024-09-13',
     },
     colors: [
       {
@@ -55,6 +55,18 @@ const colorways: Colorway[] = [
       {
         name: 'Fresh Green',
         hex: '#909e80',
+      },
+      {
+        name: 'Cactus Flower',
+        hex: '#d07964',
+      },
+      {
+        name: 'Phlox',
+        hex: '#c97694',
+      },
+      {
+        name: 'Crystal Ocean',
+        hex: '#4b6494',
       },
     ],
   },
