@@ -5,4 +5,5 @@ export const yarn: Yarn = {
   colorways,
   name: 'Blanket Mist-ical',
   id: 'blanket_mist_ical',
+  weight: 'Super Bulky',
 };

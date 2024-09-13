@@ -19,11 +19,28 @@ export interface Brand {
   yarns: Yarn[];
 }
 
+// Yarn Weights from Ravelry Standard Yarn Weights
+// See https://www.ravelry.com/help/yarn/weights?highlight=11
+export type YarnWeight =
+  | 'Thread'
+  | 'Cobweb'
+  | 'Lace'
+  | 'Light Fingering'
+  | 'Fingering'
+  | 'Sport'
+  | 'DK'
+  | 'Worsted'
+  | 'Aran'
+  | 'Bulky'
+  | 'Super Bulky'
+  | 'Jumbo';
+
 export interface Yarn {
   colorways: Colorway[];
   name: string;
   /** snake_case version of the name */
   id: Lowercase<string>;
+  weight?: YarnWeight;
 }
 
 export interface Colorway {
