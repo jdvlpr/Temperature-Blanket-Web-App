@@ -368,7 +368,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
           label="Selected Yarn"
           bind:selectedBrandId
           bind:selectedYarnId
-          showNumberOfColorways={true}
           on:select={() => {
             colorways = getColorways({
               selectedBrandId,

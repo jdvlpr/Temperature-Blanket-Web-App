@@ -13,9 +13,10 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script context="module">
+<script context="module" lang="ts">
   let selectedBrandId = writable('');
   let selectedYarnId = writable('');
+  let selectedYarnWeightId: Writable<YarnWeight['id'] | ''> = writable('');
   let search = writable('');
   let hex = writable('');
   let inputTypeTextValue = writable('');
@@ -23,7 +24,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let sortColors = writable('default');
 </script>
 
-<script>
+<script lang="ts">
   import { browser, version } from '$app/environment';
   import { PUBLIC_BASE_URL } from '$env/static/public';
   import AppLogo from '$lib/components/AppLogo.svelte';
@@ -31,6 +32,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Card from '$lib/components/Card.svelte';
   import Footer from '$lib/components/Footer.svelte';
   import SelectYarn from '$lib/components/SelectYarn.svelte';
+  import SelectYarnWeight from '$lib/components/SelectYarnWeight.svelte';
   import Share from '$lib/components/Share.svelte';
   import Spinner from '$lib/components/Spinner.svelte';
   import YarnSources from '$lib/components/YarnSources.svelte';
@@ -38,9 +40,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ViewToggle from '$lib/components/buttons/ViewToggle.svelte';
   import {
     ALL_COLORWAYS_WITH_AFFILIATE_LINKS,
+    ALL_YARN_WEIGHTS,
     YARN_COLORWAYS_PER_PAGE,
   } from '$lib/constants';
   import { layout } from '$lib/stores';
+  import type { YarnWeight } from '$lib/types';
   import {
     getTextColor,
     pluralize,
@@ -53,7 +57,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { Accordion, AccordionItem } from '@skeletonlabs/skeleton';
   import chroma from 'chroma-js';
   import { onMount } from 'svelte';
-  import { writable } from 'svelte/store';
+  import { writable, type Writable } from 'svelte/store';
 
   let loadMoreSpinner;
   let urlParams;
@@ -77,6 +81,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
     urlParams = new URLSearchParams(window.location.search);
     // Load URL
     if (urlParams?.has('f')) getURLYarnParams(urlParams.get('f'));
+
+    if (urlParams?.has('fw')) {
+      const weightId: YarnWeight['id'] = urlParams.get('fw');
+      if (weightId && ALL_YARN_WEIGHTS.map((n) => n.id).includes(weightId)) {
+        $selectedYarnWeightId = weightId;
+      }
+    }
 
     if (urlParams?.has('c')) {
       const color = urlParams.get('c');
@@ -152,20 +163,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   $: $selectedBrandId,
     $selectedYarnId,
+    $selectedYarnWeightId,
     $search,
     yarns,
     $sortColors,
     itemsToShow,
     $hex,
     getResults();
-
-  $: hasFilters =
-    !!$selectedBrandId ||
-    !!$selectedYarnId ||
-    !!$hex ||
-    !!$inputTypeTextValue ||
-    !!$search ||
-    $sortColors !== 'default';
 
   $: areAnyResultsAffiliate = results.some(
     (result) => result.affiliate_variant_href,
@@ -174,11 +178,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
   $: shareableURL = getShareableURL({
     selectedBrandId: $selectedBrandId,
     selectedYarnId: $selectedYarnId,
+    selectedYarnWeightId: $selectedYarnWeightId,
     search: $search,
     hex: $hex,
   });
 
-  function getShareableURL({ selectedBrandId, selectedYarnId, search, hex }) {
+  function getShareableURL({
+    selectedBrandId,
+    selectedYarnId,
+    selectedYarnWeightId,
+    search,
+    hex,
+  }) {
     if (!browser) return;
 
     let url = `${window.location.origin}${window.location.pathname}`;
@@ -190,10 +201,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     else if (selectedBrandId) params.f = selectedBrandId;
     else if (selectedYarnId) params.f = selectedYarnId;
 
+    if (selectedYarnWeightId) params.fw = selectedYarnWeightId;
+
     if (hex) params.c = hex.includes('#') ? hex.substring(1) : hex;
     if (search) params.n = search;
 
-    if (params?.f || params?.c || params?.n) {
+    if (params?.f || params?.fw || params?.c || params?.n) {
       params.v = version;
       url += '?';
       url += new URLSearchParams(params).toString();
@@ -234,9 +247,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
     debounce(() => {
       let _results = ALL_COLORWAYS_WITH_AFFILIATE_LINKS.filter((colorway) =>
         $selectedBrandId ? colorway.brandId === $selectedBrandId : true,
-      ).filter((colorway) =>
-        $selectedYarnId ? colorway.yarnId === $selectedYarnId : true,
-      );
+      )
+        .filter((colorway) =>
+          $selectedYarnId ? colorway.yarnId === $selectedYarnId : true,
+        )
+        .filter((colorway) =>
+          $selectedYarnWeightId
+            ? colorway.yarnWeightId === $selectedYarnWeightId
+            : true,
+        );
 
       // filter by search text
       if ($search !== '') {
@@ -441,14 +460,28 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </div>
           </div>
 
-          <div class="w-full col-span-12 md:col-span-6">
-            <SelectYarn
-              preselectDefaultYarn={false}
-              bind:selectedBrandId={$selectedBrandId}
-              bind:selectedYarnId={$selectedYarnId}
-              showNumberOfColorways={true}
-            />
-          </div>
+          {#key $selectedBrandId || $selectedYarnId}
+            <div
+              class="w-full col-span-12 md:col-span-9"
+              class:md:col-span-full={!!$selectedBrandId && !!$selectedYarnId}
+            >
+              <SelectYarn
+                preselectDefaultYarn={false}
+                bind:selectedBrandId={$selectedBrandId}
+                bind:selectedYarnId={$selectedYarnId}
+              />
+            </div>
+
+            <div
+              class="w-full col-span-12 md:col-span-3"
+              class:hidden={!!$selectedBrandId && !!$selectedYarnId}
+            >
+              <SelectYarnWeight
+                selectedBrandId={$selectedBrandId}
+                bind:selectedYarnWeightId={$selectedYarnWeightId}
+              />
+            </div>
+          {/key}
 
           <div
             class="flex flex-col justify-start w-full col-span-12 md:col-span-3"
@@ -538,32 +571,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <option value="name-z-to-a">Name Z-A</option>
             </select>
           </label>
-
-          <!-- <button
-                        disabled={!hasFilters}
-                        class="btn bg-secondary-hover-token flex items-center gap-0"
-                        on:click={() => {
-                            $selectedBrandId = "";
-                            $selectedYarnId = "";
-                            $hex = "";
-                            if (browser) $inputTypeColorElement.value = "#000000";
-                            $inputTypeTextValue = "";
-                            $search = "";
-                            $sortColors = "default";
-                        }}
-                    >
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke-width="1.5"
-                            stroke="currentColor"
-                            class="w-6 h-6"
-                        >
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                        <span>Clear Filters</span>
-                    </button> -->
         </div>
 
         {#if areAnyResultsAffiliate}

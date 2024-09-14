@@ -13,7 +13,8 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script>
+<script lang="ts">
+  import { ALL_YARN_WEIGHTS } from '$lib/constants';
   import { defaultYarn } from '$lib/stores';
   import { delay, pluralize, stringToBrandAndYarnDetails } from '$lib/utils';
   import { brands } from '$lib/yarns/brands';
@@ -26,21 +27,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   export let context = '';
   export let disabled = false;
   export let preselectDefaultYarn = true;
-  export let label = ` <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="1.5"
-            stroke="currentColor"
-            class="w-4 h-4 mr-1"
-        >
-            <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 01-.659 1.591l-5.432 5.432a2.25 2.25 0 00-.659 1.591v2.927a2.25 2.25 0 01-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 00-.659-1.591L3.659 7.409A2.25 2.25 0 013 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0112 3z"
-            />
-        </svg>
-        Filter by Yarn`;
 
   let inputElement, inputGroup;
   let forceDisplayAll = false;
@@ -65,7 +51,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     }
     autocomplete({
       onSelect: function (item, input) {
-        inputValue = `${item.meta.brandName} - ${item.meta.yarnName}`;
+        inputValue = `${item.meta.brandName} - ${item.meta.yarnName}${
+          item.meta.yarnWeightId
+            ? ` (${ALL_YARN_WEIGHTS.find((y) => y.id === item.meta.yarnWeightId).name})`
+            : ''
+        }`;
         selectedBrandId = item.meta.brandId;
         selectedYarnId = item.meta.yarnId;
         showingAutocomplete = false;
@@ -95,18 +85,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
         var div = document.createElement('div');
 
         const searchText = getSearchText(currentValue);
+
         let yarn = item.meta.yarnName;
+
+        let yarnWeight = item.meta.yarnWeightId
+          ? ALL_YARN_WEIGHTS.find((y) => y.id === item.meta.yarnWeightId).name
+          : null;
 
         if (currentValue) {
           if (typeof searchText !== 'string' && searchText.length === 2) {
             if (matches(searchText[0], item))
               yarn = boldMe(yarn, searchText[0].trim());
-            // if (matches(searchText[1], item)) brand = boldMe(brand, searchText[1]);
-            // if (matches(searchText[0], item)) yarn = boldMe(yarn, searchText[0]);
             if (matches(searchText[1], item))
               yarn = boldMe(yarn, searchText[1].trim());
           } else {
-            // brand = boldMe(brand, searchText);
             yarn = boldMe(yarn, searchText);
           }
         }
@@ -114,7 +106,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         div.innerHTML = `<div class="inline-block ml-4">
                                 ${yarn}${
                                   showNumberOfColorways
-                                    ? ` <span class="text-sm opacity-50">(${item.meta.numberOfColorways.toLocaleString()} colorways)</span>`
+                                    ? ` <span class="text-sm opacity-50">(${yarnWeight ? `${yarnWeight}, ` : ''}${item.meta.numberOfColorways.toLocaleString()} colorways)</span>`
                                     : ''
                                 }
                         </div>`;
@@ -126,9 +118,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
         var div = document.createElement('div');
         const meta = JSON.parse(groupName);
         const item = { meta };
+
         let { brandName, brandId, totalBrandColorways, totalBrandYarns } = meta;
 
         const searchText = getSearchText(currentValue);
+
         if (currentValue) {
           if (typeof searchText !== 'string' && searchText.length === 2) {
             if (matches(searchText[0], item))
@@ -188,11 +182,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
     let yarn = allYarns.filter(
       (yarn) => yarn.meta.brandId === brandId && yarn.meta.yarnId === yarnId,
     )?.[0];
-    if (yarn) return `${yarn.meta.brandName} - ${yarn.meta.yarnName}`;
+
+    let yarnWeight = yarn?.meta.yarnWeightId
+      ? ` (${ALL_YARN_WEIGHTS.find((y) => y.id === yarn?.meta.yarnWeightId)?.name})`
+      : null;
+
+    if (yarn)
+      return `${yarn.meta.brandName} - ${yarn.meta.yarnName}${yarnWeight || ''}`;
+
     yarn = allYarns.filter((yarn) => yarn.meta.brandId === brandId)?.[0];
+
     const numberOfYarns = brands.filter(
       (brand) => brand.id === yarn.meta.brandId,
     )[0].yarns.length;
+
     if (yarn)
       return `${yarn.meta.brandName} (${+numberOfYarns > 1 ? 'all ' : ''}${numberOfYarns} ${pluralize(
         'yarn',
@@ -255,6 +258,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           ...meta,
           yarnName: yarn.name,
           yarnId: yarn.id,
+          yarnWeightId: yarn?.weightId,
           numberOfColorways: yarn.colorways.reduce((a, b) => {
             return a + b.colors.length;
           }, 0),
@@ -264,9 +268,26 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 </script>
 
-<div class="w-full flex flex-col justify-start" bind:this={inputGroup}>
-  <span class="flex items-center label gap-1">
-    {@html label}
+<div
+  class="w-full flex flex-col justify-start md:col-span-2"
+  bind:this={inputGroup}
+>
+  <span class="flex items-center label">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke-width="1.5"
+      stroke="currentColor"
+      class="size-4 mr-1"
+    >
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 01-.659 1.591l-5.432 5.432a2.25 2.25 0 00-.659 1.591v2.927a2.25 2.25 0 01-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 00-.659-1.591L3.659 7.409A2.25 2.25 0 013 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0112 3z"
+      />
+    </svg>
+    Filter Yarn
   </span>
   <div class="flex flex-wrap items-center justify-center gap-1">
     <div class="input-group input-group-divider flex grid-cols-[1fr_auto]">

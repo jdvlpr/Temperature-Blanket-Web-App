@@ -22,25 +22,25 @@ export interface Brand {
 // Yarn Weights from Ravelry Standard Yarn Weights
 // See https://www.ravelry.com/help/yarn/weights?highlight=11
 export type YarnWeight =
-  | 'Thread'
-  | 'Cobweb'
-  | 'Lace'
-  | 'Light Fingering'
-  | 'Fingering'
-  | 'Sport'
-  | 'DK'
-  | 'Worsted'
-  | 'Aran'
-  | 'Bulky'
-  | 'Super Bulky'
-  | 'Jumbo';
+  | { name: 'Thread'; id: 't' }
+  | { name: 'Cobweb'; id: 'c' }
+  | { name: 'Lace'; id: 'l' }
+  | { name: 'Light Fingering'; id: 'lf' }
+  | { name: 'Fingering'; id: 'f' }
+  | { name: 'Sport'; id: 's' }
+  | { name: 'DK'; id: 'd' }
+  | { name: 'Worsted'; id: 'w' }
+  | { name: 'Aran'; id: 'a' }
+  | { name: 'Bulky'; id: 'b' }
+  | { name: 'Super Bulky'; id: 'sb' }
+  | { name: 'Jumbo'; id: 'j' };
 
 export interface Yarn {
   colorways: Colorway[];
   name: string;
   /** snake_case version of the name */
   id: Lowercase<string>;
-  weight?: YarnWeight;
+  weightId?: YarnWeight['id'];
 }
 
 export interface Colorway {
@@ -72,6 +72,7 @@ export interface Color {
   brandName?: string;
   yarnId?: string;
   yarnName?: string;
+  yarnWeightId?: YarnWeight['id'];
   dateAccessed?: string;
   href?: string;
   variant_href?: string;

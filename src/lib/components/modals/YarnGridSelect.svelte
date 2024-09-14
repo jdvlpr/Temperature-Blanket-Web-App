@@ -24,6 +24,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '$lib/constants';
   import { defaultYarn } from '$lib/stores';
   import {
+    getColorways,
     getTextColor,
     pluralize,
     sortColorsByName,
@@ -35,6 +36,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { brands } from '$lib/yarns/brands';
   import chroma from 'chroma-js';
   import { onMount } from 'svelte';
+  import SelectYarnWeight from '../SelectYarnWeight.svelte';
 
   export let selectedBrandId = '';
   export let selectedYarnId = '';
@@ -47,6 +49,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   // let showFilters = false;
   let loadMoreSpinner, loadMoreColors;
+
+  let selectedYarnWeightId = '';
 
   let filtersContainer;
   let showScrollToTopButton = false;
@@ -150,11 +154,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
       if (!selectedYarnId) return true;
       return yarn.id === selectedYarnId;
     })
+    .filter((yarn) => {
+      if (!selectedYarnWeightId) return true;
+      return yarn.weightId === selectedYarnWeightId;
+    })
     .flatMap((n) => n.colorways.map((m) => m.colors.length))
     .reduce((partialSum, a) => partialSum + a, 0);
 
   $: selectedBrandId,
     selectedYarnId,
+    selectedYarnWeightId,
     search,
     yarns,
     sortColors,
@@ -171,11 +180,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     gettingResults = true;
     debounce(() => {
-      let _results = ALL_COLORWAYS_WITH_AFFILIATE_LINKS.filter((colorway) =>
-        selectedBrandId ? colorway.brandId === selectedBrandId : true,
-      ).filter((colorway) =>
-        selectedYarnId ? colorway.yarnId === selectedYarnId : true,
-      );
+      let _results = getColorways({
+        selectedBrandId,
+        selectedYarnId,
+        selectedYarnWeightId,
+      });
 
       // filter by search text
       if (search !== '') {
@@ -223,6 +232,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       }
 
       if (_results.length > itemsToShow) _results.length = itemsToShow;
+
       results = _results;
       gettingResults = false;
       loadingAllColors = false;
@@ -283,23 +293,30 @@ If not, see <https://www.gnu.org/licenses/>. -->
   class="w-full grid grid-cols-12 items-end gap-2 my-2"
   bind:this={filtersContainer}
 >
-  <div class="w-full col-span-full">
-    <SelectYarn
-      context="modal"
-      bind:selectedBrandId
-      bind:selectedYarnId
-      showNumberOfColorways={true}
-    />
+  <div
+    class="w-full col-span-full md:col-span-9 order-1"
+    class:md:col-span-full={!!selectedBrandId && !!selectedYarnId}
+  >
+    <SelectYarn context="modal" bind:selectedBrandId bind:selectedYarnId />
   </div>
 
   {#if selectedBrandId && selectedYarnId}
-    <div class="w-full col-span-full">
+    <div class="w-full col-span-full order-2 md:order-3">
       <DefaultYarnSet {selectedBrandId} {selectedYarnId} />
     </div>
   {/if}
 
+  {#key selectedBrandId}
+    <div
+      class="w-full col-span-full md:col-span-3 order-3 md:order-2"
+      class:hidden={!!selectedBrandId && !!selectedYarnId}
+    >
+      <SelectYarnWeight {selectedBrandId} bind:selectedYarnWeightId />
+    </div>
+  {/key}
+
   <div
-    class="tex-left flex flex-col items-start w-full col-span-full md:col-span-5"
+    class="tex-left flex flex-col items-start w-full col-span-full md:col-span-5 order-4"
   >
     <label for="yarn-select-search-input" class="label flex items-center"
       ><svg
@@ -331,7 +348,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     />
   </div>
 
-  <label class="label w-full col-span-8 md:col-span-3 md:col-start-10">
+  <label class="label w-full col-span-8 md:col-span-3 md:col-start-10 order-5">
     <span class="flex items-center">
       <svg
         xmlns="http://www.w3.org/2000/svg"

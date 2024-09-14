@@ -14,7 +14,7 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { PUBLIC_AFFILIATE_YARNS } from '$env/static/public';
-import type { AffiliateYarn, Color } from '$lib/types';
+import type { AffiliateYarn, Color, YarnWeight } from '$lib/types';
 import { brands } from '$lib/yarns/brands';
 import chroma from 'chroma-js';
 
@@ -27,6 +27,21 @@ export const MAXIMUM_COLORWAYS_MATCHES_FOR_IMAGES = 50;
 const affiliateYarns: AffiliateYarn[] | null = PUBLIC_AFFILIATE_YARNS
   ? JSON.parse(PUBLIC_AFFILIATE_YARNS)
   : null;
+
+export const ALL_YARN_WEIGHTS: YarnWeight[] = [
+  { name: 'Thread', id: 't' },
+  { name: 'Cobweb', id: 'c' },
+  { name: 'Lace', id: 'l' },
+  { name: 'Light Fingering', id: 'lf' },
+  { name: 'Fingering', id: 'f' },
+  { name: 'Sport', id: 's' },
+  { name: 'DK', id: 'd' },
+  { name: 'Worsted', id: 'w' },
+  { name: 'Aran', id: 'a' },
+  { name: 'Bulky', id: 'b' },
+  { name: 'Super Bulky', id: 'sb' },
+  { name: 'Jumbo', id: 'j' },
+];
 
 export const ALL_COLORWAYS_WITH_AFFILIATE_LINKS: Color[] = brands.flatMap(
   (n, i) => {
@@ -64,6 +79,7 @@ export const ALL_COLORWAYS_WITH_AFFILIATE_LINKS: Color[] = brands.flatMap(
             brandName: yarn.brandName,
             yarnId: yarn.id,
             yarnName: yarn.name,
+            yarnWeightId: yarn.weightId,
           };
         }),
       )
@@ -85,6 +101,7 @@ export const ALL_COLORWAYS_WITH_AFFILIATE_LINKS: Color[] = brands.flatMap(
             brandId: colorway.brandId,
             yarnId: colorway.yarnId,
             yarnName: colorway.yarnName,
+            yarnWeightId: colorway.yarnWeightId,
             unavailable,
           };
         }),

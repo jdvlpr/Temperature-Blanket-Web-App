@@ -113,7 +113,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
           disabled={loading}
           bind:selectedBrandId={$filteredBrandId}
           bind:selectedYarnId={$filteredYarnId}
-          showNumberOfColorways={false}
           context="modal"
         />
       </div>

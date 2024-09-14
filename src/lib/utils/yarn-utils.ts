@@ -107,14 +107,21 @@ export const getFilteredYarns = ({ selectedBrandId }) => {
     : brands.flatMap((n) => n.yarns);
 };
 
-export const getColorways = ({ selectedBrandId, selectedYarnId }) => {
-  if (selectedBrandId && selectedYarnId)
-    return ALL_COLORWAYS_WITH_AFFILIATE_LINKS.filter(
-      (colorway) => colorway.brandId === selectedBrandId,
-    ).filter((colorway) => colorway.yarnId === selectedYarnId);
-  if (selectedBrandId)
-    return ALL_COLORWAYS_WITH_AFFILIATE_LINKS.filter(
-      (colorway) => colorway.brandId === selectedBrandId,
-    );
-  return ALL_COLORWAYS_WITH_AFFILIATE_LINKS;
+export const getColorways = ({
+  selectedBrandId,
+  selectedYarnId,
+  selectedYarnWeightId,
+}) => {
+  return ALL_COLORWAYS_WITH_AFFILIATE_LINKS.filter((colorway) => {
+    if (!selectedBrandId) return true;
+    return colorway.brandId === selectedBrandId;
+  })
+    .filter((colorway) => {
+      if (!selectedYarnId) return true;
+      return colorway.yarnId === selectedYarnId;
+    })
+    .filter((colorway) => {
+      if (!selectedYarnWeightId) return true;
+      return colorway.yarnWeightId === selectedYarnWeightId;
+    });
 };
