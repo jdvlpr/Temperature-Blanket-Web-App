@@ -6,6 +6,7 @@ const colorways: Colorway[] = [
       name: 'joann.com',
       href: 'https://www.joann.com/big-twist-soft-yarn/zprd_16801086a.html',
       accessed: '2022-03-12',
+      unavailable: '2024-09-25',
     },
     colors: [
       {

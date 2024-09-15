@@ -83,8 +83,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   $: totalLength = $weather ? $weather?.length * $settings.lineLength : 0;
 
-  $: console.log({ $weather, totalLength });
-
   $: lengthFactors = getLengthFactors(totalLength);
   function getLengthFactors(_totalLength) {
     if (!_totalLength) return;

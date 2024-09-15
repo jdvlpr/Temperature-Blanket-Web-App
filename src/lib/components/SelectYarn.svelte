@@ -21,9 +21,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import autocomplete from 'autocompleter';
   import { createEventDispatcher, onMount } from 'svelte';
 
-  export let showNumberOfColorways = true;
   export let selectedBrandId = '';
   export let selectedYarnId = '';
+  export let selectedYarnWeightId = '';
   export let context = '';
   export let disabled = false;
   export let preselectDefaultYarn = true;
@@ -104,11 +104,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         }
 
         div.innerHTML = `<div class="inline-block ml-4">
-                                ${yarn}${
-                                  showNumberOfColorways
-                                    ? ` <span class="text-sm opacity-50">(${yarnWeight ? `${yarnWeight}, ` : ''}${item.meta.numberOfColorways.toLocaleString()} colorways)</span>`
-                                    : ''
-                                }
+                            ${yarn} <span class="text-sm opacity-60">(${yarnWeight ? `${yarnWeight}, ` : ''}${item.meta.numberOfColorways.toLocaleString()} colorways)</span>
                         </div>`;
         div.dataset.id = `${item.meta.brandId}-${item.meta.yarnId}`;
         div.classList.add('selectable-yarn-list-item');
@@ -135,18 +131,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
           }
         }
 
-        div.innerHTML = `<span class="font-bold">${brandName}</span> <span class="text-sm opacity-50">(${totalBrandYarns} ${pluralize(
+        div.innerHTML = `<span class="font-bold">${brandName}</span> <span class="text-sm opacity-60">(${totalBrandYarns} ${pluralize(
           'yarn',
           +totalBrandYarns,
-        )}${showNumberOfColorways ? `, ${totalBrandColorways.toLocaleString()} colorways` : ''})</span>`;
+        )}, ${totalBrandColorways.toLocaleString()} colorways)</span>`;
         div.dataset.id = brandId;
         div.classList.add('selectable-yarn-list-item');
         div.onclick = (e) => {
           e.preventDefault();
           inputElement.blur();
-          inputValue = `${meta.brandName} (${
-            +totalBrandYarns > 1 ? 'all ' : ''
-          }${totalBrandYarns} ${pluralize('yarn', +totalBrandYarns)})`;
+          inputValue = `${meta.brandName} (${totalBrandYarns} ${pluralize('yarn', +totalBrandYarns)})`;
           selectedBrandId = brandId;
           selectedYarnId = '';
           forceDisplayAll = true;
@@ -179,9 +173,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 
   function getYarnValue({ brandId, yarnId }) {
-    let yarn = allYarns.filter(
+    let yarn = allYarns.find(
       (yarn) => yarn.meta.brandId === brandId && yarn.meta.yarnId === yarnId,
-    )?.[0];
+    );
 
     let yarnWeight = yarn?.meta.yarnWeightId
       ? ` (${ALL_YARN_WEIGHTS.find((y) => y.id === yarn?.meta.yarnWeightId)?.name})`
@@ -190,17 +184,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
     if (yarn)
       return `${yarn.meta.brandName} - ${yarn.meta.yarnName}${yarnWeight || ''}`;
 
-    yarn = allYarns.filter((yarn) => yarn.meta.brandId === brandId)?.[0];
+    yarn = allYarns.find((yarn) => yarn?.meta.brandId === brandId);
 
-    const numberOfYarns = brands.filter(
-      (brand) => brand.id === yarn.meta.brandId,
-    )[0].yarns.length;
+    if (yarn) {
+      const numberOfYarns = brands
+        .find((brand) => brand.id === yarn.meta.brandId)
+        .yarns.filter((yarn) => {
+          if (!selectedYarnWeightId) return true;
+          return yarn.weightId === selectedYarnWeightId;
+        }).length;
 
-    if (yarn)
-      return `${yarn.meta.brandName} (${+numberOfYarns > 1 ? 'all ' : ''}${numberOfYarns} ${pluralize(
+      return `${yarn.meta.brandName} (${numberOfYarns} ${pluralize(
         'yarn',
         +numberOfYarns,
       )})`;
+    }
+
     return '';
   }
 
@@ -236,35 +235,47 @@ If not, see <https://www.gnu.org/licenses/>. -->
   const dispatch = createEventDispatcher();
 
   const allYarns = brands.flatMap((brand) => {
-    return brand.yarns.map((yarn) => {
-      const totalBrandColorways = brand.yarns
-        .flatMap((n) =>
-          n.colorways.reduce((a, b) => {
-            return a + b.colors.length;
-          }, 0),
-        )
-        .reduce((a, b) => {
-          return a + b;
-        }, 0);
-      const meta = {
-        brandName: brand.name,
-        brandId: brand.id,
-        totalBrandYarns: brand.yarns.length,
-        totalBrandColorways,
-      };
-      return {
-        group: JSON.stringify(meta),
-        meta: {
-          ...meta,
-          yarnName: yarn.name,
-          yarnId: yarn.id,
-          yarnWeightId: yarn?.weightId,
-          numberOfColorways: yarn.colorways.reduce((a, b) => {
-            return a + b.colors.length;
-          }, 0),
-        },
-      };
-    });
+    return brand.yarns
+      .filter((yarn) => {
+        if (!selectedYarnWeightId) return true;
+        return yarn.weightId === selectedYarnWeightId;
+      })
+      .map((yarn) => {
+        const totalBrandColorways = brand.yarns
+          .filter((yarn) => {
+            if (!selectedYarnWeightId) return true;
+            return yarn.weightId === selectedYarnWeightId;
+          })
+          .flatMap((n) =>
+            n.colorways.reduce((a, b) => {
+              return a + b.colors.length;
+            }, 0),
+          )
+          .reduce((a, b) => {
+            return a + b;
+          }, 0);
+        const meta = {
+          brandName: brand.name,
+          brandId: brand.id,
+          totalBrandYarns: brand.yarns.filter((yarn) => {
+            if (!selectedYarnWeightId) return true;
+            return yarn.weightId === selectedYarnWeightId;
+          }).length,
+          totalBrandColorways,
+        };
+        return {
+          group: JSON.stringify(meta),
+          meta: {
+            ...meta,
+            yarnName: yarn.name,
+            yarnId: yarn.id,
+            yarnWeightId: yarn?.weightId,
+            numberOfColorways: yarn.colorways.reduce((a, b) => {
+              return a + b.colors.length;
+            }, 0),
+          },
+        };
+      });
   });
 </script>
 
@@ -287,7 +298,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 01-.659 1.591l-5.432 5.432a2.25 2.25 0 00-.659 1.591v2.927a2.25 2.25 0 01-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 00-.659-1.591L3.659 7.409A2.25 2.25 0 013 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0112 3z"
       />
     </svg>
-    Filter Yarn
+    Yarn
   </span>
   <div class="flex flex-wrap items-center justify-center gap-1">
     <div class="input-group input-group-divider flex grid-cols-[1fr_auto]">
@@ -339,7 +350,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
         }}
         on:blur={() => (showingAutocomplete = false)}
         bind:value={inputValue}
-        placeholder="{allYarns.length} Yarns ({allYarns
+        placeholder="{allYarns.length} {pluralize(
+          'Yarn',
+          allYarns.length,
+        )} ({allYarns
           .reduce((a, b) => {
             return a + b.meta.numberOfColorways;
           }, 0)

@@ -5,4 +5,5 @@ export const yarn: Yarn = {
   colorways,
   name: 'Softee Cotton',
   id: 'softee_cotton',
+  weightId: 'd',
 };

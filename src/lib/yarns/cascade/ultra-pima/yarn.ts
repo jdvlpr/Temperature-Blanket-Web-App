@@ -5,4 +5,5 @@ export const yarn: Yarn = {
   colorways,
   name: 'Ultra Pima',
   id: 'ultra_pima',
+  weightId: 'd',
 };

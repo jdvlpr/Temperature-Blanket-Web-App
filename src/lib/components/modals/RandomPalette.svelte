@@ -124,7 +124,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
       class="w-full col-span-full md:col-span-9 order-1"
       class:md:col-span-full={!!selectedBrandId && !!selectedYarnId}
     >
-      <SelectYarn context="modal" bind:selectedBrandId bind:selectedYarnId />
+      {#key selectedYarnWeightId}
+        <SelectYarn
+          context="modal"
+          bind:selectedBrandId
+          bind:selectedYarnId
+          {selectedYarnWeightId}
+        />
+      {/key}
     </div>
 
     {#if selectedBrandId && selectedYarnId}

@@ -297,7 +297,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
     class="w-full col-span-full md:col-span-9 order-1"
     class:md:col-span-full={!!selectedBrandId && !!selectedYarnId}
   >
-    <SelectYarn context="modal" bind:selectedBrandId bind:selectedYarnId />
+    {#key selectedYarnWeightId}
+      <SelectYarn
+        context="modal"
+        bind:selectedBrandId
+        bind:selectedYarnId
+        {selectedYarnWeightId}
+      />
+    {/key}
   </div>
 
   {#if selectedBrandId && selectedYarnId}
@@ -333,7 +340,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
         />
       </svg>
-      Filter Colorway Names</label
+      Colorway Names</label
     >
     <input
       id="yarn-select-search-input"

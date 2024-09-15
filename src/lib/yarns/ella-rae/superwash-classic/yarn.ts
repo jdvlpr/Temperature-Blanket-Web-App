@@ -5,4 +5,5 @@ export const yarn: Yarn = {
   colorways,
   name: 'Superwash Classic',
   id: 'superwash_classic',
+  weightId: 'w',
 };

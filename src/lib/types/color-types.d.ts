@@ -40,6 +40,29 @@ export interface Yarn {
   name: string;
   /** snake_case version of the name */
   id: Lowercase<string>;
+  /** { name: 'Thread'; id: 't' }
+
+  { name: 'Cobweb'; id: 'c' }
+  
+  { name: 'Lace'; id: 'l' }
+  
+  { name: 'Light Fingering'; id: 'lf' }
+   
+  { name: 'Fingering'; id: 'f' }
+  
+  { name: 'Sport'; id: 's' }
+  
+  { name: 'DK'; id: 'd' }
+  
+  { name: 'Worsted'; id: 'w' }
+  
+  { name: 'Aran'; id: 'a' }
+  
+  { name: 'Bulky'; id: 'b' }
+  
+  { name: 'Super Bulky'; id: 'sb' }
+  
+  { name: 'Jumbo'; id: 'j' }  */
   weightId?: YarnWeight['id'];
 }
 
