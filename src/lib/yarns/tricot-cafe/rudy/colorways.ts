@@ -9,180 +9,180 @@ const colorways: Colorway[] = [
     },
     colors: [
       {
-        name: 'Bianco 1',
         hex: '#e9e2d9',
+        name: 'Bianco 1',
       },
       {
-        name: 'Panna 2',
         hex: '#e0d3c0',
+        name: 'Panna 2',
       },
       {
-        name: 'Avorio 40',
         hex: '#a9a08f',
+        name: 'Avorio 40',
       },
       {
-        name: 'Beige 29/9904',
         hex: '#bb9c8a',
+        name: 'Beige 29/9904',
       },
       {
-        name: 'Cammello 47',
         hex: '#8f6444',
+        name: 'Cammello 47',
       },
       {
-        name: 'Ocra 1295',
         hex: '#9b6c2d',
+        name: 'Ocra 1295',
       },
       {
-        name: 'Noce 8',
         hex: '#6c584c',
+        name: 'Noce 8',
       },
       {
-        name: 'Noce Scuro 7368',
         hex: '#5e5147',
+        name: 'Noce Scuro 7368',
       },
       {
-        name: 'Marrone 4',
         hex: '#7b624f',
+        name: 'Marrone 4',
       },
       {
-        name: 'Marrone 8309',
         hex: '#59291e',
+        name: 'Marrone 8309',
       },
       {
-        name: 'Testa Di Moro 5',
         hex: '#1d1a16',
+        name: 'Testa Di Moro 5',
       },
       {
-        name: 'Bordeaux 14',
         hex: '#5e333c',
+        name: 'Bordeaux 14',
       },
       {
-        name: 'Bordeaux Chiaro 34',
         hex: '#7e2738',
+        name: 'Bordeaux Chiaro 34',
       },
       {
-        name: 'Rosso 15',
         hex: '#a4221d',
+        name: 'Rosso 15',
       },
       {
-        name: 'Arancione 18',
         hex: '#d47a3e',
+        name: 'Arancione 18',
       },
       {
-        name: 'Arancione 914',
         hex: '#c64f27',
+        name: 'Arancione 914',
       },
       {
-        name: 'Mandarino 1014',
         hex: '#eb9a3b',
+        name: 'Mandarino 1014',
       },
       {
-        name: 'Giallo 17',
         hex: '#e6bb40',
+        name: 'Giallo 17',
       },
       {
-        name: 'Verde Acqua 22',
         hex: '#e4eddb',
+        name: 'Verde Acqua 22',
       },
       {
-        name: 'Tiffany 909',
         hex: '#699692',
+        name: 'Tiffany 909',
       },
       {
-        name: 'Verde Acido 21/287',
         hex: '#7f9044',
+        name: 'Verde Acido 21/287',
       },
       {
-        name: 'Verde Muschio 462',
         hex: '#978f4d',
+        name: 'Verde Muschio 462',
       },
       {
-        name: 'Verde Bandiera 19',
         hex: '#446840',
+        name: 'Verde Bandiera 19',
       },
       {
-        name: 'Verde Smeraldo 14',
         hex: '#2f6a61',
+        name: 'Verde Smeraldo 14',
       },
       {
-        name: 'Verde 20',
         hex: '#586a3a',
+        name: 'Verde 20',
       },
       {
-        name: 'Turchese 2002',
         hex: '#59afcb',
+        name: 'Turchese 2002',
       },
       {
-        name: 'Ottanio 7441',
         hex: '#18394b',
+        name: 'Ottanio 7441',
       },
       {
-        name: 'Azzurro Baby 23',
         hex: '#a9bad8',
+        name: 'Azzurro Baby 23',
       },
       {
-        name: 'Celeste 24',
         hex: '#5080c1',
+        name: 'Celeste 24',
       },
       {
-        name: 'Blu Elettrico 25',
         hex: '#0d247c',
+        name: 'Blu Elettrico 25',
       },
       {
-        name: 'Blu Chiaro 27',
         hex: '#2753a0',
+        name: 'Blu Chiaro 27',
       },
       {
-        name: 'Blu Notte 26',
         hex: '#2e3144',
+        name: 'Blu Notte 26',
       },
       {
-        name: 'Viola 701',
         hex: '#412c83',
+        name: 'Viola 701',
       },
       {
-        name: 'Lilla 28/139/28',
         hex: '#a8a0ca',
+        name: 'Lilla 28/139/28',
       },
       {
-        name: 'Ciclamino 8997',
         hex: '#7c4879',
+        name: 'Ciclamino 8997',
       },
       {
-        name: 'Fucsia 42/105/12',
         hex: '#bc327a',
+        name: 'Fucsia 42/105/12',
       },
       {
-        name: 'Rosa 103',
         hex: '#e299bc',
+        name: 'Rosa 103',
       },
       {
-        name: 'Rosa Baby 32/9',
         hex: '#f4dede',
+        name: 'Rosa Baby 32/9',
       },
       {
-        name: 'Pesco 16',
         hex: '#cf9981',
+        name: 'Pesco 16',
       },
       {
-        name: 'Grigio 7',
         hex: '#8f918c',
+        name: 'Grigio 7',
       },
       {
-        name: 'Antracite 8',
         hex: '#5a5b57',
+        name: 'Antracite 8',
       },
       {
-        name: 'Nero 200',
         hex: '#1a1b1b',
+        name: 'Nero 200',
       },
       {
-        name: 'Verde Ottanio 1296',
         hex: '#2a6057',
+        name: 'Verde Ottanio 1296',
       },
       {
-        name: 'Avio 1375',
         hex: '#3c4e6a',
+        name: 'Avio 1375',
       },
     ],
   },

@@ -5,4 +5,5 @@ export const yarn: Yarn = {
   colorways,
   name: 'Feels Like Butta',
   id: 'feels_like_butta',
+  weightId: 'w',
 };

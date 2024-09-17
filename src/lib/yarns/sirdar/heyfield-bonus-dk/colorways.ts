@@ -9,416 +9,416 @@ const colorways: Colorway[] = [
     },
     colors: [
       {
-        name: 'Fawn',
         hex: '#8c7867',
+        name: 'Fawn',
       },
       {
-        name: 'Walnut',
         hex: '#a48b76',
+        name: 'Walnut',
       },
       {
-        name: 'Pearl Grey',
         hex: '#c4c0ba',
+        name: 'Pearl Grey',
       },
       {
-        name: 'Oatmeal',
         hex: '#d3c2a9',
+        name: 'Oatmeal',
       },
       {
-        name: 'Mink',
         hex: '#bda48f',
+        name: 'Mink',
       },
       {
-        name: 'Champagne',
         hex: '#d3b998',
+        name: 'Champagne',
       },
       {
-        name: 'Biscuit',
         hex: '#f0e3c8',
+        name: 'Biscuit',
       },
       {
-        name: 'Birch',
         hex: '#f0e4bf',
+        name: 'Birch',
       },
       {
-        name: 'Aran',
         hex: '#f0f2ca',
+        name: 'Aran',
       },
       {
-        name: 'Cream',
         hex: '#f2f3ed',
+        name: 'Cream',
       },
       {
-        name: 'White',
         hex: '#fbfcf8',
+        name: 'White',
       },
       {
-        name: 'Sky Marl',
         hex: '#acb6c2',
+        name: 'Sky Marl',
       },
       {
-        name: 'Powder Blue',
         hex: '#b3cee6',
+        name: 'Powder Blue',
       },
       {
-        name: 'Bluebell',
         hex: '#82a7d7',
+        name: 'Bluebell',
       },
       {
-        name: 'Gentle Jade',
         hex: '#bccba7',
+        name: 'Gentle Jade',
       },
       {
-        name: 'Silver Mist',
         hex: '#c6cbcb',
+        name: 'Silver Mist',
       },
       {
-        name: 'Peaches',
         hex: '#dbcbbe',
+        name: 'Peaches',
       },
       {
-        name: 'Lemon',
         hex: '#edd989',
+        name: 'Lemon',
       },
       {
-        name: 'Primrose',
         hex: '#e6d787',
+        name: 'Primrose',
       },
       {
-        name: 'Mauve',
         hex: '#a57e7d',
+        name: 'Mauve',
       },
       {
-        name: 'Dusky Pink',
         hex: '#c79c94',
+        name: 'Dusky Pink',
       },
       {
-        name: 'Frost Blue',
         hex: '#d0d9e4',
+        name: 'Frost Blue',
       },
       {
-        name: 'Lavender',
         hex: '#dcd5df',
+        name: 'Lavender',
       },
       {
-        name: 'Mauve Marl',
         hex: '#d5c5c0',
+        name: 'Mauve Marl',
       },
       {
-        name: 'Oyster Pink',
         hex: '#cfafa3',
+        name: 'Oyster Pink',
       },
       {
-        name: 'Ocean Blue',
         hex: '#6f7c92',
+        name: 'Ocean Blue',
       },
       {
-        name: 'Cornflower',
         hex: '#a8b6d6',
+        name: 'Cornflower',
       },
       {
-        name: 'Platinum',
         hex: '#bebdc3',
+        name: 'Platinum',
       },
       {
-        name: 'Blue',
         hex: '#a1a3bc',
+        name: 'Blue',
       },
       {
-        name: 'Sapphire Blue',
         hex: '#252c3f',
+        name: 'Sapphire Blue',
       },
       {
-        name: 'Navy',
         hex: '#383a4c',
+        name: 'Navy',
       },
       {
-        name: 'Midnight',
         hex: '#2b262a',
+        name: 'Midnight',
       },
       {
-        name: 'Bronze',
         hex: '#755325',
+        name: 'Bronze',
       },
       {
-        name: 'Olive Green',
         hex: '#857748',
+        name: 'Olive Green',
       },
       {
-        name: 'Lime',
         hex: '#cbc378',
+        name: 'Lime',
       },
       {
-        name: 'Grass',
         hex: '#8f9158',
+        name: 'Grass',
       },
       {
-        name: 'Fern Green',
         hex: '#8e883d',
+        name: 'Fern Green',
       },
       {
-        name: 'Aloe',
         hex: '#8996a7',
+        name: 'Aloe',
       },
       {
-        name: 'Teal',
         hex: '#567ba5',
+        name: 'Teal',
       },
       {
-        name: 'Denim',
         hex: '#506b93',
+        name: 'Denim',
       },
       {
-        name: 'Royal',
         hex: '#264095',
+        name: 'Royal',
       },
       {
-        name: 'Emerald',
         hex: '#36762c',
+        name: 'Emerald',
       },
       {
-        name: 'Azure',
         hex: '#50aed4',
+        name: 'Azure',
       },
       {
-        name: 'Pea Green',
         hex: '#88a750',
+        name: 'Pea Green',
       },
       {
-        name: 'Lemongrass',
         hex: '#7b7d27',
+        name: 'Lemongrass',
       },
       {
-        name: 'Purple',
         hex: '#311a32',
+        name: 'Purple',
       },
       {
-        name: 'Bottle Green',
         hex: '#254225',
+        name: 'Bottle Green',
       },
       {
-        name: 'Peacock',
         hex: '#4f7492',
+        name: 'Peacock',
       },
       {
-        name: 'Rainforest',
         hex: '#4b8a9c',
+        name: 'Rainforest',
       },
       {
-        name: 'Gilt',
         hex: '#dcc74c',
+        name: 'Gilt',
       },
       {
-        name: 'Magenta',
         hex: '#ae2b83',
+        name: 'Magenta',
       },
       {
-        name: 'Cocoa',
         hex: '#33241d',
+        name: 'Cocoa',
       },
       {
-        name: 'Chocolate',
         hex: '#42322b',
+        name: 'Chocolate',
       },
       {
-        name: 'Russet',
         hex: '#8f4831',
+        name: 'Russet',
       },
       {
-        name: 'Hazelnut',
         hex: '#824527',
+        name: 'Hazelnut',
       },
       {
-        name: 'Mahogany',
         hex: '#734032',
+        name: 'Mahogany',
       },
       {
-        name: 'Rustic Pink',
         hex: '#8f5b4e',
+        name: 'Rustic Pink',
       },
       {
-        name: 'Sunflower',
         hex: '#f1c044',
+        name: 'Sunflower',
       },
       {
-        name: 'Cornfield',
         hex: '#ebd64a',
+        name: 'Cornfield',
       },
       {
-        name: 'Sunshine',
         hex: '#d7c742',
+        name: 'Sunshine',
       },
       {
-        name: 'Bright Lemon',
         hex: '#e9db61',
+        name: 'Bright Lemon',
       },
       {
-        name: 'Golden',
         hex: '#b3852e',
+        name: 'Golden',
       },
       {
-        name: 'Fields Of Gold',
         hex: '#bfa15a',
+        name: 'Fields Of Gold',
       },
       {
-        name: 'Blonde',
         hex: '#deb96f',
+        name: 'Blonde',
       },
       {
-        name: 'Auburn',
         hex: '#bf7b3e',
+        name: 'Auburn',
       },
       {
-        name: 'Cantaloupe',
         hex: '#db9235',
+        name: 'Cantaloupe',
       },
       {
-        name: 'Ladybird',
         hex: '#83192e',
+        name: 'Ladybird',
       },
       {
-        name: 'Burnt Orange',
         hex: '#c26d30',
+        name: 'Burnt Orange',
       },
       {
-        name: 'Fox',
         hex: '#ab4b31',
+        name: 'Fox',
       },
       {
-        name: 'Soft Red',
         hex: '#b34236',
+        name: 'Soft Red',
       },
       {
-        name: 'Scarlet',
         hex: '#6c1c1c',
+        name: 'Scarlet',
       },
       {
-        name: 'Claret',
         hex: '#501b1e',
+        name: 'Claret',
       },
       {
-        name: 'Signal Red',
         hex: '#8b2920',
+        name: 'Signal Red',
       },
       {
-        name: 'Flame',
         hex: '#d5652a',
+        name: 'Flame',
       },
       {
-        name: 'Tomato',
         hex: '#dc5c34',
+        name: 'Tomato',
       },
       {
-        name: 'Grape',
         hex: '#923874',
+        name: 'Grape',
       },
       {
-        name: 'Deep Rose',
         hex: '#cd9096',
+        name: 'Deep Rose',
       },
       {
-        name: 'Pink',
         hex: '#dd94a1',
+        name: 'Pink',
       },
       {
-        name: 'Iced Pink',
         hex: '#ecb9cd',
+        name: 'Iced Pink',
       },
       {
-        name: 'Cupid',
         hex: '#de3595',
+        name: 'Cupid',
       },
       {
-        name: 'Coral',
         hex: '#de7068',
+        name: 'Coral',
       },
       {
-        name: 'Black',
         hex: '#262629',
+        name: 'Black',
       },
       {
-        name: 'Slate Grey',
         hex: '#50545a',
+        name: 'Slate Grey',
       },
       {
-        name: 'Dark Grey Mix',
         hex: '#807f7a',
+        name: 'Dark Grey Mix',
       },
       {
-        name: 'Granite Marl',
         hex: '#7c8388',
+        name: 'Granite Marl',
       },
       {
-        name: 'Light Grey Mix',
         hex: '#c7c7c7',
+        name: 'Light Grey Mix',
       },
       {
-        name: 'Stormcloud',
         hex: '#d5dbdd',
+        name: 'Stormcloud',
       },
       {
-        name: 'Clementine',
         hex: '#de8a33',
+        name: 'Clementine',
       },
       {
-        name: 'Electric Pink',
         hex: '#bf2a69',
+        name: 'Electric Pink',
       },
       {
-        name: 'Zest',
         hex: '#b9ad3d',
+        name: 'Zest',
       },
       {
-        name: 'Bright Purple',
         hex: '#35288c',
+        name: 'Bright Purple',
       },
       {
-        name: 'Turquoise',
         hex: '#71a5c4',
+        name: 'Turquoise',
       },
       {
-        name: 'Neon Purple',
         hex: '#8023a0',
+        name: 'Neon Purple',
       },
       {
-        name: 'Bright Orange',
         hex: '#eb6f4a',
+        name: 'Bright Orange',
       },
       {
-        name: 'Neon Blue',
         hex: '#4b90c5',
+        name: 'Neon Blue',
       },
       {
-        name: 'Neon Yellow',
         hex: '#ddde67',
+        name: 'Neon Yellow',
       },
       {
-        name: 'Neon Green',
         hex: '#cada74',
+        name: 'Neon Green',
       },
       {
-        name: 'Neon Pink',
         hex: '#df397f',
+        name: 'Neon Pink',
       },
       {
-        name: 'Petal Pink',
         hex: '#e5c8d8',
+        name: 'Petal Pink',
       },
       {
-        name: 'Stone Marl',
         hex: '#747763',
+        name: 'Stone Marl',
       },
       {
-        name: 'Salmon',
         hex: '#e08882',
+        name: 'Salmon',
       },
       {
-        name: 'Peach Melba',
         hex: '#e8986b',
+        name: 'Peach Melba',
       },
       {
-        name: 'Lilac',
         hex: '#bba9ca',
+        name: 'Lilac',
       },
     ],
   },

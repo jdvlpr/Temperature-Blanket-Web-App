@@ -9,172 +9,172 @@ const colorways: Colorway[] = [
     },
     colors: [
       {
-        name: 'White',
         hex: '#ebeaf2',
+        name: 'White',
       },
       {
-        name: 'Aran',
         hex: '#f0e7d4',
+        name: 'Aran',
       },
       {
-        name: 'Oatmeal',
         hex: '#d6ccbe',
+        name: 'Oatmeal',
       },
       {
-        name: 'Winter White',
         hex: '#f2efed',
+        name: 'Winter White',
       },
       {
-        name: "Fool's Gold",
         hex: '#bb7e33',
+        name: "Fool's Gold",
       },
       {
-        name: 'Pale Yellow',
         hex: '#e7d3ac',
+        name: 'Pale Yellow',
       },
       {
-        name: 'Tweet Yellow',
         hex: '#f3bb45',
+        name: 'Tweet Yellow',
       },
       {
-        name: 'Rich Brown',
         hex: '#433329',
+        name: 'Rich Brown',
       },
       {
-        name: 'Stone Heather',
         hex: '#312321',
+        name: 'Stone Heather',
       },
       {
-        name: 'Toasty Gray',
         hex: '#79685c',
+        name: 'Toasty Gray',
       },
       {
-        name: 'Pumpkin',
         hex: '#d36346',
+        name: 'Pumpkin',
       },
       {
-        name: 'Burgundy',
         hex: '#341114',
+        name: 'Burgundy',
       },
       {
-        name: 'Cardinal',
         hex: '#9e201b',
+        name: 'Cardinal',
       },
       {
-        name: 'Lava Red',
         hex: '#661d21',
+        name: 'Lava Red',
       },
       {
-        name: 'Cherished Pink',
         hex: '#d1a8c1',
+        name: 'Cherished Pink',
       },
       {
-        name: 'Raspberry',
         hex: '#c43544',
+        name: 'Raspberry',
       },
       {
-        name: 'Rosette',
         hex: '#9c5b5a',
+        name: 'Rosette',
       },
       {
-        name: 'Fucshia',
         hex: '#5d2443',
+        name: 'Fucshia',
       },
       {
-        name: 'Grape Jelly',
         hex: '#35274f',
+        name: 'Grape Jelly',
       },
       {
-        name: 'Pink Dust',
         hex: '#c4b4b2',
+        name: 'Pink Dust',
       },
       {
-        name: 'Purple Wine',
         hex: '#572e51',
+        name: 'Purple Wine',
       },
       {
-        name: 'Blue Cloud',
         hex: '#566775',
+        name: 'Blue Cloud',
       },
       {
-        name: 'Clearwater Blue',
         hex: '#6491c0',
+        name: 'Clearwater Blue',
       },
       {
-        name: 'Mediterranean Blue',
         hex: '#53667a',
+        name: 'Mediterranean Blue',
       },
       {
-        name: 'Medium Teal',
         hex: '#588091',
+        name: 'Medium Teal',
       },
       {
-        name: 'Navy',
         hex: '#15162e',
+        name: 'Navy',
       },
       {
-        name: 'Pale Teal',
         hex: '#86a5b1',
+        name: 'Pale Teal',
       },
       {
-        name: 'Royal Blue',
         hex: '#1e2d65',
+        name: 'Royal Blue',
       },
       {
-        name: 'Sea Glass',
         hex: '#b2c2ba',
+        name: 'Sea Glass',
       },
       {
-        name: 'Cherished Green',
         hex: '#b5bc96',
+        name: 'Cherished Green',
       },
       {
-        name: 'Dark Green Tea',
         hex: '#333d29',
+        name: 'Dark Green Tea',
       },
       {
-        name: 'Ivy',
         hex: '#273b2f',
+        name: 'Ivy',
       },
       {
-        name: 'Medium Green Tea',
         hex: '#747964',
+        name: 'Medium Green Tea',
       },
       {
-        name: 'Moss',
         hex: '#767049',
+        name: 'Moss',
       },
       {
-        name: 'Pale Gray Mix',
         hex: '#959698',
+        name: 'Pale Gray Mix',
       },
       {
-        name: 'Spring Green',
         hex: '#77703c',
+        name: 'Spring Green',
       },
       {
-        name: 'Teal Heather',
         hex: '#233e55',
+        name: 'Teal Heather',
       },
       {
-        name: 'Wax Leaf',
         hex: '#31685c',
+        name: 'Wax Leaf',
       },
       {
-        name: 'Lilac Wasp',
         hex: '#bcb6c1',
+        name: 'Lilac Wasp',
       },
       {
-        name: 'Medium Gray Mix',
         hex: '#595a5b',
+        name: 'Medium Gray Mix',
       },
       {
-        name: 'Black',
         hex: '#191a19',
+        name: 'Black',
       },
       {
-        name: 'Dark Gray Mix',
         hex: '#252525',
+        name: 'Dark Gray Mix',
       },
     ],
   },

@@ -5,4 +5,5 @@ export const yarn: Yarn = {
   colorways,
   name: 'Friends Cotton 8/4',
   id: 'friends_cotton_8_4',
+  weightId: 'f',
 };

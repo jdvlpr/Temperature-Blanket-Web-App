@@ -18,10 +18,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import SelectYarn from '$lib/components/SelectYarn.svelte';
   import Spinner from '$lib/components/Spinner.svelte';
   import ToTopButton from '$lib/components/buttons/ToTopButton.svelte';
-  import {
-    ALL_COLORWAYS_WITH_AFFILIATE_LINKS,
-    YARN_COLORWAYS_PER_PAGE,
-  } from '$lib/constants';
+  import { YARN_COLORWAYS_PER_PAGE } from '$lib/constants';
   import { defaultYarn } from '$lib/stores';
   import {
     getColorways,
@@ -47,7 +44,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   export let onClickScrollToTop;
   export let scrollToTopButtonBottom = '100px';
 
-  // let showFilters = false;
   let loadMoreSpinner, loadMoreColors;
 
   let selectedYarnWeightId = '';
@@ -66,8 +62,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     },
     { threshold: 1 },
   );
-
-  let filtersExpanded = false;
 
   onMount(() => {
     scrollObserver.observe(filtersContainer);
@@ -297,14 +291,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     class="w-full col-span-full md:col-span-9 order-1"
     class:md:col-span-full={!!selectedBrandId && !!selectedYarnId}
   >
-    {#key selectedYarnWeightId}
-      <SelectYarn
-        context="modal"
-        bind:selectedBrandId
-        bind:selectedYarnId
-        {selectedYarnWeightId}
-      />
-    {/key}
+    <SelectYarn
+      context="modal"
+      bind:selectedBrandId
+      bind:selectedYarnId
+      {selectedYarnWeightId}
+    />
   </div>
 
   {#if selectedBrandId && selectedYarnId}

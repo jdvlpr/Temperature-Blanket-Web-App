@@ -9,408 +9,408 @@ const colorways: Colorway[] = [
     },
     colors: [
       {
-        name: 'Anthrazit',
         hex: '#40363e',
+        name: 'Anthrazit',
       },
       {
-        name: 'Bordeaux',
         hex: '#9e2d38',
+        name: 'Bordeaux',
       },
       {
-        name: 'Denim',
         hex: '#5c89a4',
+        name: 'Denim',
       },
       {
-        name: 'Fuchs',
         hex: '#ca653d',
+        name: 'Fuchs',
       },
       {
-        name: 'Greenery',
         hex: '#afdb75',
+        name: 'Greenery',
       },
       {
-        name: 'Kirsche',
         hex: '#551816',
+        name: 'Kirsche',
       },
       {
-        name: 'Lavendel',
         hex: '#b7a8cd',
+        name: 'Lavendel',
       },
       {
-        name: 'Monaco',
         hex: '#142c73',
+        name: 'Monaco',
       },
       {
-        name: 'Sand',
         hex: '#efe5da',
+        name: 'Sand',
       },
       {
-        name: 'Scampi',
         hex: '#e0684f',
+        name: 'Scampi',
       },
       {
-        name: 'Tannenbaum',
         hex: '#b4c0b8',
+        name: 'Tannenbaum',
       },
       {
-        name: 'Vintage',
         hex: '#f6e7e9',
+        name: 'Vintage',
       },
       {
-        name: 'Agave',
         hex: '#203237',
+        name: 'Agave',
       },
       {
-        name: 'Altrosa',
         hex: '#e7a9ad',
+        name: 'Altrosa',
       },
       {
-        name: 'Anis',
         hex: '#e1db54',
+        name: 'Anis',
       },
       {
-        name: 'Apfel',
         hex: '#dee6c1',
+        name: 'Apfel',
       },
       {
-        name: 'Aprikose',
         hex: '#eca483',
+        name: 'Aprikose',
       },
       {
-        name: 'Azalee',
         hex: '#ce83b3',
+        name: 'Azalee',
       },
       {
-        name: 'Bast',
         hex: '#c5a596',
+        name: 'Bast',
       },
       {
-        name: 'Burgund',
         hex: '#3e1520',
+        name: 'Burgund',
       },
       {
-        name: 'Camel',
         hex: '#b07748',
+        name: 'Camel',
       },
       {
-        name: 'Camouflage',
         hex: '#574831',
+        name: 'Camouflage',
       },
       {
-        name: 'Capri',
         hex: '#4998c1',
+        name: 'Capri',
       },
       {
-        name: 'Creme',
         hex: '#c1ae97',
+        name: 'Creme',
       },
       {
-        name: 'Curry',
         hex: '#c79246',
+        name: 'Curry',
       },
       {
-        name: 'Cyclam',
         hex: '#cb3e5c',
+        name: 'Cyclam',
       },
       {
-        name: 'Dahlie',
         hex: '#e66f80',
+        name: 'Dahlie',
       },
       {
-        name: 'Deep Amber',
         hex: '#71442d',
+        name: 'Deep Amber',
       },
       {
-        name: 'Erdbeere',
         hex: '#b83437',
+        name: 'Erdbeere',
       },
       {
-        name: 'Fango',
         hex: '#60534b',
+        name: 'Fango',
       },
       {
-        name: 'Flieder',
         hex: '#a67e97',
+        name: 'Flieder',
       },
       {
-        name: 'Fresie',
         hex: '#b0357b',
+        name: 'Fresie',
       },
       {
-        name: 'Fuchsia',
         hex: '#c7acbc',
+        name: 'Fuchsia',
       },
       {
-        name: 'Gelbgrün',
         hex: '#d9e1ab',
+        name: 'Gelbgrün',
       },
       {
-        name: 'Gold',
         hex: '#d19735',
+        name: 'Gold',
       },
       {
-        name: 'Golfgrün',
         hex: '#4da385',
+        name: 'Golfgrün',
       },
       {
-        name: 'Graphit',
         hex: '#424450',
+        name: 'Graphit',
       },
       {
-        name: 'Graublau',
         hex: '#536a8c',
+        name: 'Graublau',
       },
       {
-        name: 'Hellblau',
         hex: '#9fb6c6',
+        name: 'Hellblau',
       },
       {
-        name: 'Himbeer',
         hex: '#e35c6b',
+        name: 'Himbeer',
       },
       {
-        name: 'Honig',
         hex: '#f5d5a6',
+        name: 'Honig',
       },
       {
-        name: 'Hyazinth',
         hex: '#6e3546',
+        name: 'Hyazinth',
       },
       {
-        name: 'Ivory',
         hex: '#d1ae90',
+        name: 'Ivory',
       },
       {
-        name: 'Jade',
         hex: '#51a4aa',
+        name: 'Jade',
       },
       {
-        name: 'Jaffa',
         hex: '#e24d29',
+        name: 'Jaffa',
       },
       {
-        name: 'Jeans',
         hex: '#acb2be',
+        name: 'Jeans',
       },
       {
-        name: 'Kachelblau',
         hex: '#4d94b4',
+        name: 'Kachelblau',
       },
       {
-        name: 'Kaffee',
         hex: '#bdb1af',
+        name: 'Kaffee',
       },
       {
-        name: 'Kamelie',
         hex: '#db5148',
+        name: 'Kamelie',
       },
       {
-        name: 'Khaki',
         hex: '#415732',
+        name: 'Khaki',
       },
       {
-        name: 'Koralle',
         hex: '#eb7e5d',
+        name: 'Koralle',
       },
       {
-        name: 'Leinen',
         hex: '#e4e1d9',
+        name: 'Leinen',
       },
       {
-        name: 'Löwenzahn',
         hex: '#f8e465',
+        name: 'Löwenzahn',
       },
       {
-        name: 'Maigrün',
         hex: '#50ac66',
+        name: 'Maigrün',
       },
       {
-        name: 'Malve',
         hex: '#a0a1c0',
+        name: 'Malve',
       },
       {
-        name: 'Mango',
         hex: '#ed9737',
+        name: 'Mango',
       },
       {
-        name: 'Marine',
         hex: '#142642',
+        name: 'Marine',
       },
       {
-        name: 'Marone',
         hex: '#744823',
+        name: 'Marone',
       },
       {
-        name: 'Marsalarot',
         hex: '#8e3735',
+        name: 'Marsalarot',
       },
       {
-        name: 'Mimose',
         hex: '#c1be6f',
+        name: 'Mimose',
       },
       {
-        name: 'Mint',
         hex: '#78baad',
+        name: 'Mint',
       },
       {
-        name: 'Moos',
         hex: '#bdd5c1',
+        name: 'Moos',
       },
       {
-        name: 'Natur',
         hex: '#e3ded1',
+        name: 'Natur',
       },
       {
-        name: 'Nebel',
         hex: '#e5e5e3',
+        name: 'Nebel',
       },
       {
-        name: 'Ocean',
         hex: '#275c93',
+        name: 'Ocean',
       },
       {
-        name: 'Orange',
         hex: '#e4782f',
+        name: 'Orange',
       },
       {
-        name: 'Orchidee',
         hex: '#ebadca',
+        name: 'Orchidee',
       },
       {
-        name: 'Petrol',
         hex: '#b9cbce',
+        name: 'Petrol',
       },
       {
-        name: 'Pfau',
         hex: '#3373a3',
+        name: 'Pfau',
       },
       {
-        name: 'Phlox',
         hex: '#7d2d65',
+        name: 'Phlox',
       },
       {
-        name: 'Pink',
         hex: '#efa9bd',
+        name: 'Pink',
       },
       {
-        name: 'Rauchgrau',
         hex: '#87847f',
+        name: 'Rauchgrau',
       },
       {
-        name: 'Regatta',
         hex: '#2d558e',
+        name: 'Regatta',
       },
       {
-        name: 'Reseda',
         hex: '#dbe2df',
+        name: 'Reseda',
       },
       {
-        name: 'Rosa',
         hex: '#ddbbcd',
+        name: 'Rosa',
       },
       {
-        name: 'Rosé Gold',
         hex: '#ddb39d',
+        name: 'Rosé Gold',
       },
       {
-        name: 'Royal',
         hex: '#1e499c',
+        name: 'Royal',
       },
       {
-        name: 'Schlamm',
         hex: '#a88d91',
+        name: 'Schlamm',
       },
       {
-        name: 'Schwarz',
         hex: '#171213',
+        name: 'Schwarz',
       },
       {
-        name: 'Serenity',
         hex: '#b5c1de',
+        name: 'Serenity',
       },
       {
-        name: 'Signalrot',
         hex: '#c4301f',
+        name: 'Signalrot',
       },
       {
-        name: 'Silber',
         hex: '#9d9c95',
+        name: 'Silber',
       },
       {
-        name: 'Smaragd',
         hex: '#387c64',
+        name: 'Smaragd',
       },
       {
-        name: 'Soft Apricot',
         hex: '#dbb9a5',
+        name: 'Soft Apricot',
       },
       {
-        name: 'Sonne',
         hex: '#f3c448',
+        name: 'Sonne',
       },
       {
-        name: 'Stein',
         hex: '#5a5b57',
+        name: 'Stein',
       },
       {
-        name: 'Sun-kissed',
         hex: '#99775f',
+        name: 'Sun-kissed',
       },
       {
-        name: 'Taupe',
         hex: '#755c48',
+        name: 'Taupe',
       },
       {
-        name: 'Teddy',
         hex: '#9f7a7a',
+        name: 'Teddy',
       },
       {
-        name: 'Terracotta',
         hex: '#a2411e',
+        name: 'Terracotta',
       },
       {
-        name: 'Tiffany',
         hex: '#6bbbb7',
+        name: 'Tiffany',
       },
       {
-        name: 'Tomate',
         hex: '#cf3423',
+        name: 'Tomate',
       },
       {
-        name: 'Türkis',
         hex: '#96d2e5',
+        name: 'Türkis',
       },
       {
-        name: 'Vanille',
         hex: '#f8e39f',
+        name: 'Vanille',
       },
       {
-        name: 'Very Peri',
         hex: '#594675',
+        name: 'Very Peri',
       },
       {
-        name: 'Violett',
         hex: '#cbbedb',
+        name: 'Violett',
       },
       {
-        name: 'Weinrot',
         hex: '#d1aeac',
+        name: 'Weinrot',
       },
       {
-        name: 'Weiβ',
         hex: '#c8c3bb',
+        name: 'Weiβ',
       },
       {
-        name: 'Wolke',
         hex: '#4e7caa',
+        name: 'Wolke',
       },
       {
-        name: 'Zartbitter',
         hex: '#322521',
+        name: 'Zartbitter',
       },
       {
-        name: 'Zimt',
         hex: '#b27129',
+        name: 'Zimt',
       },
     ],
   },

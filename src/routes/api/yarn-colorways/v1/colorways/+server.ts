@@ -118,7 +118,7 @@ export async function GET({ url, request }) {
     if (direction === 'DESC') colorways.reverse();
   }
 
-  let offset = 0; // maximum 500
+  let offset = 0;
   if (searchParams.has('offset')) {
     offset = Number(searchParams.get('offset'));
     if (isNaN(offset))
@@ -128,7 +128,7 @@ export async function GET({ url, request }) {
   }
   colorways = colorways.slice(offset);
 
-  let limit = 50; // maximum 499
+  let limit = 50; // default number of results is 50, maximum 500
   if (searchParams.has('limit')) {
     limit = Number(searchParams.get('limit'));
     if (isNaN(limit))
@@ -140,6 +140,7 @@ export async function GET({ url, request }) {
         message: "Parameter 'limit' must be less than 501",
       });
   }
+
   if (colorways.length > limit) colorways.length = limit;
 
   return json({

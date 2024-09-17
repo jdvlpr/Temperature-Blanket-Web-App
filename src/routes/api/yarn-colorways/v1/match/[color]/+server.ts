@@ -39,6 +39,7 @@ export async function GET({ url, params, request }) {
     return error(400, {
       message: "Parameter 'color' is not a valid color",
     });
+
   let colorways = ALL_COLORWAYS;
 
   if (searchParams.has('brand')) {
@@ -91,6 +92,7 @@ export async function GET({ url, params, request }) {
     })
     .sort((a, b) => a.delta - b.delta);
 
+  // Default threshold value is 75
   let threshold = 75;
   if (searchParams.has('threshold')) {
     threshold = Number(searchParams.get('threshold'));
@@ -99,9 +101,11 @@ export async function GET({ url, params, request }) {
         message: "Parameter 'threshold' must be a number",
       });
   }
+
   colorways = colorways.filter(
     (colorway) => colorway.percentMatch >= threshold,
   );
+
   const numberOfResults = colorways.length;
 
   let offset = 0; // maximum 500
@@ -112,9 +116,10 @@ export async function GET({ url, params, request }) {
         message: "Parameter 'offset' must be a number",
       });
   }
+
   colorways = colorways.slice(offset);
 
-  let limit = 50; // maximum 500
+  let limit = 50; // default number of results is 50, maximum is 500
   if (searchParams.has('limit')) {
     limit = Number(searchParams.get('limit'));
     if (isNaN(limit))

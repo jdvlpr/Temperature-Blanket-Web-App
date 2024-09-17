@@ -3,6 +3,7 @@ import colorways from './colorways';
 
 export const yarn: Yarn = {
   colorways,
-  name: 'Basix Worsted',
   id: 'basix_worsted',
+  name: 'Basix Worsted',
+  weightId: 'w',
 };

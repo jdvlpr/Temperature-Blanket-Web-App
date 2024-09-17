@@ -9,88 +9,88 @@ const colorways: Colorway[] = [
     },
     colors: [
       {
-        name: 'Hot Lilac',
         hex: '#9d8bc0',
+        name: 'Hot Lilac',
       },
       {
-        name: 'Fantasy',
         hex: '#29122b',
+        name: 'Fantasy',
       },
       {
-        name: 'Medium Tan',
         hex: '#80614a',
+        name: 'Medium Tan',
       },
       {
-        name: 'Deep Pink',
         hex: '#df899c',
+        name: 'Deep Pink',
       },
       {
-        name: 'Emerald',
         hex: '#306a54',
+        name: 'Emerald',
       },
       {
-        name: 'Medium Gray',
         hex: '#545353',
+        name: 'Medium Gray',
       },
       {
-        name: 'Silver Gray Mix',
         hex: '#959497',
+        name: 'Silver Gray Mix',
       },
       {
-        name: 'Apricot',
         hex: '#f1dacd',
+        name: 'Apricot',
       },
       {
-        name: 'Electric Blue',
         hex: '#1e2a6e',
+        name: 'Electric Blue',
       },
       {
-        name: 'White',
         hex: '#e9e7f0',
+        name: 'White',
       },
       {
-        name: 'Baby Pink',
         hex: '#e9d9e6',
+        name: 'Baby Pink',
       },
       {
-        name: 'Cardinal',
         hex: '#b62825',
+        name: 'Cardinal',
       },
       {
-        name: 'Black',
         hex: '#151513',
+        name: 'Black',
       },
       {
-        name: 'Medium Blue',
         hex: '#6e99d0',
+        name: 'Medium Blue',
       },
       {
-        name: 'Aran',
         hex: '#eae2d5',
+        name: 'Aran',
       },
       {
-        name: 'Navy',
         hex: '#171721',
+        name: 'Navy',
       },
       {
-        name: 'School Bus Yellow',
         hex: '#f3b842',
+        name: 'School Bus Yellow',
       },
       {
-        name: 'Maize Yellow',
         hex: '#f1d47e',
+        name: 'Maize Yellow',
       },
       {
-        name: 'Hot Orange',
         hex: '#e64f30',
+        name: 'Hot Orange',
       },
       {
-        name: 'Hot Green',
         hex: '#96d197',
+        name: 'Hot Green',
       },
       {
-        name: 'Hot Blue',
         hex: '#62a4cb',
+        name: 'Hot Blue',
       },
     ],
   },

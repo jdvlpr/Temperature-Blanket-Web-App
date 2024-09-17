@@ -40,30 +40,35 @@ export interface Yarn {
   name: string;
   /** snake_case version of the name */
   id: Lowercase<string>;
-  /** { name: 'Thread'; id: 't' }
-
-  { name: 'Cobweb'; id: 'c' }
+  /** 
+  Using https://www.ravelry.com/help/yarn/weights for the list of yarn weights.
   
-  { name: 'Lace'; id: 'l' }
+  Thread = t
   
-  { name: 'Light Fingering'; id: 'lf' }
+  Cobweb = c
+  
+  Lace = l
+  
+  Light Fingering = lf
    
-  { name: 'Fingering'; id: 'f' }
+  Fingering = f
   
-  { name: 'Sport'; id: 's' }
+  Sport = s
   
-  { name: 'DK'; id: 'd' }
+  DK = d
   
-  { name: 'Worsted'; id: 'w' }
+  Worsted = w
   
-  { name: 'Aran'; id: 'a' }
+  Aran = a
   
-  { name: 'Bulky'; id: 'b' }
+  Bulky = b
   
-  { name: 'Super Bulky'; id: 'sb' }
+  Super Bulky = sb
   
-  { name: 'Jumbo'; id: 'j' }  */
-  weightId?: YarnWeight['id'];
+  Jumbo = j
+  
+  */
+  weightId: YarnWeight['id'];
 }
 
 export interface Colorway {

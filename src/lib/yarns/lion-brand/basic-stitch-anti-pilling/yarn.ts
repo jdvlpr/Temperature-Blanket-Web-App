@@ -5,4 +5,5 @@ export const yarn: Yarn = {
   colorways,
   name: 'Basic Stitch Anti Pilling',
   id: 'basic_stitch_anti_pilling',
+  weightId: 'w',
 };

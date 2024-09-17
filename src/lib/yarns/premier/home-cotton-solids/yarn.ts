@@ -3,6 +3,7 @@ import colorways from './colorways';
 
 export const yarn: Yarn = {
   colorways,
-  name: 'Home Cotton Solids',
   id: 'home_cotton_solids',
+  name: 'Home Cotton Solids',
+  weightId: 'a',
 };

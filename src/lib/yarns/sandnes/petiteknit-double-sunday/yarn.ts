@@ -3,6 +3,7 @@ import colorways from './colorways';
 
 export const yarn: Yarn = {
   colorways,
-  name: 'Petiteknit Double Sunday',
   id: 'petiteknit_double_sunday',
+  name: 'Petiteknit Double Sunday',
+  weightId: 'd',
 };

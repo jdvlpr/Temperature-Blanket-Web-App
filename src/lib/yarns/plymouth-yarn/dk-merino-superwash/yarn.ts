@@ -3,6 +3,7 @@ import colorways from './colorways';
 
 export const yarn: Yarn = {
   colorways,
-  name: 'DK Merino Superwash',
   id: 'dk_merino_superwash',
+  name: 'DK Merino Superwash',
+  weightId: 'd',
 };

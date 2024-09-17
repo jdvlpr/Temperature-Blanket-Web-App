@@ -3,6 +3,7 @@ import colorways from './colorways';
 
 export const yarn: Yarn = {
   colorways,
-  name: 'Canadiana',
   id: 'canadiana',
+  name: 'Canadiana',
+  weightId: 'w',
 };

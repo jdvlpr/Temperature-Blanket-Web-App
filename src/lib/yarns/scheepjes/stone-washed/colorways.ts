@@ -9,148 +9,148 @@ const colorways: Colorway[] = [
     },
     colors: [
       {
-        name: 'Black Onyx',
         hex: '#434340',
+        name: 'Black Onyx',
       },
       {
-        name: 'Smokey Quartz',
         hex: '#888885',
+        name: 'Smokey Quartz',
       },
       {
-        name: 'Moon Stone',
         hex: '#e0d8c9',
+        name: 'Moon Stone',
       },
       {
-        name: 'Pink Quartzite',
         hex: '#e2d5bd',
+        name: 'Pink Quartzite',
       },
       {
-        name: 'Axinite',
         hex: '#d3c5af',
+        name: 'Axinite',
       },
       {
-        name: 'Boulder Opal',
         hex: '#998265',
+        name: 'Boulder Opal',
       },
       {
-        name: 'Enstatite',
         hex: '#ad8b56',
+        name: 'Enstatite',
       },
       {
-        name: 'Brown Agate',
         hex: '#8c735a',
+        name: 'Brown Agate',
       },
       {
-        name: 'Obsidian',
         hex: '#73645f',
+        name: 'Obsidian',
       },
       {
-        name: 'Yellow Jasper',
         hex: '#b28d52',
+        name: 'Yellow Jasper',
       },
       {
-        name: 'Beryl',
         hex: '#eccc7f',
+        name: 'Beryl',
       },
       {
-        name: 'Citrine',
         hex: '#efe59b',
+        name: 'Citrine',
       },
       {
-        name: 'New Jade',
         hex: '#c6cd9e',
+        name: 'New Jade',
       },
       {
-        name: 'Lemon Quartz',
         hex: '#d2c170',
+        name: 'Lemon Quartz',
       },
       {
-        name: 'Peridot',
         hex: '#bcbb62',
+        name: 'Peridot',
       },
       {
-        name: 'Canada Jade',
         hex: '#959b69',
+        name: 'Canada Jade',
       },
       {
-        name: 'Fosterite',
         hex: '#71b58e',
+        name: 'Fosterite',
       },
       {
-        name: 'Malachite',
         hex: '#599a7b',
+        name: 'Malachite',
       },
       {
-        name: 'Lepidolite',
         hex: '#6a5756',
+        name: 'Lepidolite',
       },
       {
-        name: 'Deep Amethyst',
         hex: '#a28d9b',
+        name: 'Deep Amethyst',
       },
       {
-        name: 'Lilac Quartz',
         hex: '#c3bcc5',
+        name: 'Lilac Quartz',
       },
       {
-        name: 'Crystal Quartz',
         hex: '#bcbfb1',
+        name: 'Crystal Quartz',
       },
       {
-        name: 'Amazonite',
         hex: '#a1c3c2',
+        name: 'Amazonite',
       },
       {
-        name: 'Larimar',
         hex: '#9dbfb4',
+        name: 'Larimar',
       },
       {
-        name: 'Green Agate',
         hex: '#62aaa3',
+        name: 'Green Agate',
       },
       {
-        name: 'Turquoise',
         hex: '#70b9b5',
+        name: 'Turquoise',
       },
       {
-        name: 'Blue Apatite',
         hex: '#628799',
+        name: 'Blue Apatite',
       },
       {
-        name: 'Coral',
         hex: '#d38d6c',
+        name: 'Coral',
       },
       {
-        name: 'Morganite',
         hex: '#e8ad7f',
+        name: 'Morganite',
       },
       {
-        name: 'Rose Quartz',
         hex: '#ebc6c6',
+        name: 'Rose Quartz',
       },
       {
-        name: 'Rhodochrosite',
         hex: '#de8a96',
+        name: 'Rhodochrosite',
       },
       {
-        name: 'Tourmaline',
         hex: '#dd98aa',
+        name: 'Tourmaline',
       },
       {
-        name: 'Carnelian',
         hex: '#cf6260',
+        name: 'Carnelian',
       },
       {
-        name: 'Red Jasper',
         hex: '#ba4e56',
+        name: 'Red Jasper',
       },
       {
-        name: 'Corundum Ruby',
         hex: '#b1878b',
+        name: 'Corundum Ruby',
       },
       {
-        name: 'Garnet',
         hex: '#835b61',
+        name: 'Garnet',
       },
     ],
   },

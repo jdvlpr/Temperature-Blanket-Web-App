@@ -41,6 +41,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import {
     ALL_COLORWAYS_WITH_AFFILIATE_LINKS,
     ALL_YARN_WEIGHTS,
+    ICONS,
     YARN_COLORWAYS_PER_PAGE,
   } from '$lib/constants';
   import { layout } from '$lib/stores';
@@ -469,14 +470,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
               class="w-full col-span-12 md:col-span-9"
               class:md:col-span-full={!!$selectedBrandId && !!$selectedYarnId}
             >
-              {#key $selectedYarnWeightId}
-                <SelectYarn
-                  preselectDefaultYarn={false}
-                  bind:selectedBrandId={$selectedBrandId}
-                  bind:selectedYarnId={$selectedYarnId}
-                  selectedYarnWeightId={$selectedYarnWeightId}
-                />
-              {/key}
+              <SelectYarn
+                preselectDefaultYarn={false}
+                bind:selectedBrandId={$selectedBrandId}
+                bind:selectedYarnId={$selectedYarnId}
+                selectedYarnWeightId={$selectedYarnWeightId}
+              />
             </div>
 
             <div
@@ -501,12 +500,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 stroke-width="1.5"
                 stroke="currentColor"
                 class="w-4 h-4"
-                ><path
+              >
+                <path
                   stroke-linecap="round"
                   stroke-linejoin="round"
-                  d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 01-.659 1.591l-5.432 5.432a2.25 2.25 0 00-.659 1.591v2.927a2.25 2.25 0 01-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 00-.659-1.591L3.659 7.409A2.25 2.25 0 013 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0112 3z"
-                ></path></svg
-              >
+                  d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+                />
+              </svg>
               Colorway Names</span
             >
             <div class="flex flex-wrap items-center justify-center gap-1">
@@ -608,7 +608,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               ? 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5'
               : 'flex flex-col'}"
           >
-            {#each results as { hex, name, delta, brandName, yarnName, brandId, yarnId, variant_href, affiliate_variant_href, unavailable }}
+            {#each results as { hex, name, delta, brandName, yarnName, variant_href, affiliate_variant_href, unavailable }}
               {@const percentMatch = delta ? Math.floor(100 - delta) : null}
               <div
                 class="shadow-sm flex-1 min-w-fit p-2 flex items-center gap-x-2 rounded-container-token {$layout ===
@@ -669,11 +669,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 </div>
                 <div class="flex flex-col items-start text-pretty">
                   <span class="text-left text-xs">
-                    {brandName}
-                    -
-                    {yarnName}
+                    {brandName} - {yarnName}
                   </span>
+
                   <span class="text-lg leading-tight">{name}</span>
+
                   {#if percentMatch}
                     <p class="text-xs">
                       {percentMatch}% Match

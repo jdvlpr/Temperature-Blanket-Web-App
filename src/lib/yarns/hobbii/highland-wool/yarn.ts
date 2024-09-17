@@ -5,4 +5,5 @@ export const yarn: Yarn = {
   colorways,
   name: 'Highland Wool',
   id: 'highland_wool',
+  weightId: 'd',
 };
