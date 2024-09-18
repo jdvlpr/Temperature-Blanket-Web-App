@@ -99,7 +99,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div class="p-2 sm:p-4 mt-8">
-  <div class="flex flex-col text-left">
+  <div class="flex flex-col text-left gap-1">
     <label for="palette-code" class="text-small"
       >Enter colors or palette code</label
     >

@@ -315,7 +315,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/key}
 
   <div
-    class="tex-left flex flex-col items-start w-full col-span-full md:col-span-5 order-4"
+    class="tex-left flex flex-col items-start w-full col-span-full md:col-span-5 order-4 gap-1"
   >
     <label for="yarn-select-search-input" class="label flex items-center"
       ><svg

@@ -397,7 +397,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
   {/if}
   <div class="grid grid-cols-1 gap-4">
-    <div class="flex flex-col w-full text-left">
+    <div class="flex flex-col w-full text-left gap-1">
       <p>
         {#if hasError}
           <span class="text-error-800-100-token">Choose a result</span>

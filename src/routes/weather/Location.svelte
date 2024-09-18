@@ -214,7 +214,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div class="py-2 flex flex-wrap items-end gap-y-2 gap-x-4 justify-center">
-  <div class="flex flex-col w-full text-left">
+  <div class="flex flex-col w-full text-left gap-1">
     <p>
       {#if hasError}
         <span class="text-error-800-100-token">Choose a result</span>

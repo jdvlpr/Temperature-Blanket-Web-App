@@ -273,7 +273,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </div>
           {/if}
 
-          <div class="flex flex-col justify-start col-span-12 md:col-span-5">
+          <div
+            class="flex flex-col justify-start col-span-12 md:col-span-5 gap-1"
+          >
             <span class="flex items-center label gap-1">
               <svg
                 xmlns="http://www.w3.org/2000/svg"

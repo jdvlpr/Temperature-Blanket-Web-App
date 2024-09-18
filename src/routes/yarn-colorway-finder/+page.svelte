@@ -395,7 +395,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           bind:this={filtersContainer}
           class="grid grid-cols-12 gap-4 items-end scroll-mt-[66px] justify-between my-2 w-full"
         >
-          <div class="flex flex-col justify-start w-full col-span-full">
+          <div class="flex flex-col justify-start w-full col-span-full gap-1">
             <span class="flex items-center label gap-1"
               ><svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -490,7 +490,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {/key}
 
           <div
-            class="flex flex-col justify-start w-full col-span-12 md:col-span-3"
+            class="flex flex-col justify-start w-full col-span-12 md:col-span-3 gap-1"
           >
             <span class="flex items-center label gap-1">
               <svg

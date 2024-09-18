@@ -319,7 +319,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               {/if}
 
               <div
-                class="flex flex-col justify-start w-full col-span-12 md:col-span-3"
+                class="flex flex-col justify-start w-full col-span-12 md:col-span-3 gap-1"
               >
                 <span class="flex items-center label gap-1">
                   <svg

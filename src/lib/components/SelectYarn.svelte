@@ -298,12 +298,26 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div
-  class="w-full flex flex-col justify-start md:col-span-2"
+  class="w-full flex flex-col justify-start md:col-span-2 gap-1"
   bind:this={inputGroup}
 >
   <span class="flex items-center label gap-1">
     {@html ICONS.filter}
-    Yarn
+    <!-- <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="1em"
+      height="1em"
+      viewBox="0 0 24 24"
+      ><path
+        fill="none"
+        stroke="currentColor"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        d="M11 18H3m12 0l2 2l4-4m-5-4H3m13-6H3"
+      /></svg
+    > -->
+    Yarn Name
   </span>
   <div class="flex flex-wrap items-center justify-center gap-1">
     <div class="input-group input-group-divider flex grid-cols-[1fr_auto]">

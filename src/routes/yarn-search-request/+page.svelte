@@ -114,7 +114,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             method="POST"
             class="flex flex-col gap-4 m-2 mb-4"
           >
-            <div class="tex-left flex flex-col items-start">
+            <div class="tex-left flex flex-col items-start gap-1">
               <label for="brand-name" class="label flex items-center"
                 >Brand Name</label
               >
@@ -128,7 +128,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               />
             </div>
 
-            <div class="tex-left flex flex-col items-start">
+            <div class="tex-left flex flex-col items-start gap-1">
               <label for="yarn-name" class="label flex items-center"
                 >Yarn Name</label
               >
@@ -142,7 +142,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               />
             </div>
 
-            <div class="tex-left flex flex-col items-start">
+            <div class="tex-left flex flex-col items-start gap-1">
               <label
                 for="web-address"
                 class="label flex items-start flex-col max-w-screen-sm"
@@ -164,7 +164,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               />
             </div>
 
-            <div class="tex-left flex flex-col items-start">
+            <div class="tex-left flex flex-col items-start gap-1">
               <label for="other-comments" class="label">Other Comments </label>
               <textarea
                 id="other-comments"
@@ -174,7 +174,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               />
             </div>
 
-            <div class="tex-left flex flex-col items-start">
+            <div class="tex-left flex flex-col items-start gap-1">
               <label for="your-email" class="label flex items-center"
                 >Your email (if you want a reply)</label
               >
