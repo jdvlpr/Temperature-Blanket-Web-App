@@ -22,13 +22,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <svelte:head>
   <title>Temperature Blanket Project Gallery</title>
-  <meta name="description" content="Browse a collection of projects." />
+  <meta
+    name="description"
+    content="Browse a collection of temperature blanket projects."
+  />
   <meta
     name="viewport"
     content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no"
   />
-  <meta property="og:title" content="Project Gallery" />
-  <meta property="og:description" content="Browse a collection of projects." />
+  <meta property="og:title" content="Temperature Blanket Project Gallery" />
+  <meta
+    property="og:description"
+    content="Browse a collection of temperature blanket projects."
+  />
   <meta property="og:url" content="{PUBLIC_BASE_URL}/gallery" />
   <meta property="og:type" content="website" />
 </svelte:head>
