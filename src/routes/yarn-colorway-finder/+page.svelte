@@ -428,7 +428,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 />
                 <input
                   type="text"
-                  placeholder="pink, #c3f4d2"
+                  placeholder="e.g., pink, #c3f4d2"
                   style="background:{$hex} !important;color:{getTextColor(
                     $hex,
                   )}"
@@ -507,14 +507,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
                 />
               </svg>
-              Colorway Names</span
+              Colorway Name</span
             >
             <div class="flex flex-wrap items-center justify-center gap-1">
               <div class="input-group input-group-divider grid-cols-[1fr_auto]">
                 <input
                   id="yarn-select-search-input"
                   autocomplete="off"
-                  placeholder="Wisteria, Cream"
+                  placeholder="e.g., Wisteria, Cream"
                   type="text"
                   class="w-full input"
                   bind:value={$search}

@@ -209,7 +209,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             You can also use the following keyboard shortcut to save your
             project:
           </p>
-          <figure class="wp-block-table">
+          <figure class="">
             <table>
               <tbody
                 ><tr
@@ -269,7 +269,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             three-dot menu icon, then choose your Units selection. On the
             Project Planner you can also use the following keyboard shortcut:
           </p>
-          <figure class="wp-block-table">
+          <figure class="">
             <table>
               <tbody
                 ><tr
@@ -294,7 +294,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             to change the theme. In the Project Planner, you can also use the
             following keyboard shortcut:
           </p>
-          <figure class="wp-block-table">
+          <figure class="">
             <table>
               <tbody
                 ><tr
@@ -317,7 +317,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             name of the section at the bottom of the page. You can also use the
             following keyboard shortcuts:
           </p>
-          <figure class="wp-block-table">
+          <figure class="">
             <table>
               <tbody class="flex flex-col gap-2"
                 ><tr
@@ -353,7 +353,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             Redo buttons at the top of the page. You can also use the following
             keyboard shortcuts:
           </p>
-          <figure class="wp-block-table is-style-regular">
+          <figure class=" ">
             <table>
               <tbody class="flex flex-col gap-2"
                 ><tr
@@ -1043,7 +1043,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             Here’s a table showing which values would be included in an example
             range from 13 degrees to 12 degrees.
           </p>
-          <figure class="wp-block-table is-style-regular">
+          <figure class=" ">
             <table
               class="table-autoborder-surface-900-50-token border p-2 rounded-container-token"
             >
@@ -1458,7 +1458,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             Color Charts and Weather Data (PDF) button. You can also open the
             download menu by using the following keyboard shortcut:
           </p>
-          <figure class="wp-block-table">
+          <figure class="">
             <table>
               <tbody
                 ><tr
@@ -1480,7 +1480,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             You can also open the download menu by using the following keyboard
             shortcut:
           </p>
-          <figure class="wp-block-table">
+          <figure class="">
             <table>
               <tbody
                 ><tr
@@ -1502,7 +1502,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             You can also open the download menu by using the following keyboard
             shortcut:
           </p>
-          <figure class="wp-block-table">
+          <figure class="">
             <table>
               <tbody
                 ><tr

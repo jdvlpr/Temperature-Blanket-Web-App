@@ -1,0 +1,67 @@
+<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+
+This file is part of Temperature-Blanket-Web-App.
+
+Temperature-Blanket-Web-App is free software: you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the Free Software Foundation, 
+either version 3 of the License, or (at your option) any later version.
+
+Temperature-Blanket-Web-App is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
+If not, see <https://www.gnu.org/licenses/>. -->
+
+<script lang="ts">
+  import { page } from '$app/stores';
+  import { PUBLIC_BASE_URL } from '$env/static/public';
+  import AppLogo from '$lib/components/AppLogo.svelte';
+  import AppShell from '$lib/components/AppShell.svelte';
+  import Card from '$lib/components/Card.svelte';
+  import YarnWeightChart from '$lib/components/YarnWeightChart.svelte';
+  import { ICONS } from '$lib/constants';
+</script>
+
+<svelte:head>
+  <title>Yarn Weights</title>
+  <meta
+    name="description"
+    content="A chart with information about different yarn weights."
+  />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no"
+  />
+  <meta property="og:title" content="Yarn Weights" />
+  <meta
+    property="og:description"
+    content="A chart with information about different yarn weights."
+  />
+  <meta property="og:url" content="{PUBLIC_BASE_URL}/blog/yarn-weights" />
+  <meta property="og:type" content="website" />
+  <meta
+    property="og:image"
+    content="{PUBLIC_BASE_URL}/images/blog-images/yarn-weights/banner.png"
+  />
+  <meta property="og:image:width" content="1366" />
+  <meta property="og:image:height" content="768" />
+</svelte:head>
+
+<AppShell pageName="Yarn Weights">
+  <svelte:fragment slot="stickyHeader">
+    <div class="hidden lg:inline-flex mx-auto"><AppLogo /></div>
+  </svelte:fragment>
+  <main slot="main" class="pb-8">
+    <a
+      href="/blog"
+      class="btn bg-secondary-hover-token gap-1 mb-2 max-lg:mx-2 max-lg:mt-2"
+      >{@html ICONS.arrowBack} Blog</a
+    >
+    <Card>
+      <div slot="content" class="pb-4 px-2">
+        <YarnWeightChart />
+      </div>
+    </Card>
+  </main>
+</AppShell>

@@ -28,7 +28,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { settings as rainGaugeSettings } from '$lib/components/gauges/RainGauge.svelte';
   import { settings as snowGaugeSettings } from '$lib/components/gauges/SnowGauge.svelte';
   import { settings as temperatureGaugeSettings } from '$lib/components/gauges/TemperatureGauge.svelte';
-  import { ICONS } from '$lib/constants';
+  import { ALL_YARN_WEIGHTS, ICONS } from '$lib/constants';
   import { gaugeProperties, layout, valid } from '$lib/stores';
   import {
     exists,
@@ -78,7 +78,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   $: reshapedColors =
     flatColors?.reduce((acc, color) => {
-      const { brandId, yarnId, brandName, yarnName, name, hex } = color;
+      const { brandId, yarnId, brandName, yarnName, name, hex, yarnWeightId } =
+        color;
       if (
         !yarns.find(
           (item) => item.brandId === brandId && item.yarnId === yarnId,
@@ -87,6 +88,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         yarns.push({
           brandId,
           brandName,
+          yarnWeightId,
           yarnId,
           yarnName,
           colors: [],
@@ -296,15 +298,28 @@ If not, see <https://www.gnu.org/licenses/>. -->
                           <span class="">
                             <span class="font-bold">Yarn</span>:
                             <div class="pl-4 flex flex-col gap-2">
-                              {#each reshapedColors as { brandName, yarnName, colors }}
+                              {#each reshapedColors as { brandName, yarnName, yarnWeightId, colors }}
+                                {@const yarnWeightName = ALL_YARN_WEIGHTS.find(
+                                  (n) => n.id === yarnWeightId,
+                                )?.name}
                                 {#if brandName && yarnName}
                                   <div>
                                     <span>
                                       {brandName}
                                       -
                                       {yarnName}
-                                      ({colors.length}
-                                      {pluralize('colorway', colors.length)})
+                                      <span class="text-sm opacity-70">
+                                        ({#if yarnWeightName}
+                                          <a
+                                            href="/blog/yarn-weights?highlight={yarnWeightName}"
+                                            class="link"
+                                            target="_blank"
+                                            title="See the yarn weights chart"
+                                            >{yarnWeightName}</a
+                                          >,
+                                        {/if}{colors.length}
+                                        {pluralize('colorway', colors.length)})
+                                      </span>
                                     </span>
                                     <div class="pl-4">
                                       {#each colors as { name, hex }, index}
