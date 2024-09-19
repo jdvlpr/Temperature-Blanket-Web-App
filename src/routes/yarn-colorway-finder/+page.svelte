@@ -41,7 +41,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import {
     ALL_COLORWAYS_WITH_AFFILIATE_LINKS,
     ALL_YARN_WEIGHTS,
-    ICONS,
     YARN_COLORWAYS_PER_PAGE,
   } from '$lib/constants';
   import { layout } from '$lib/stores';

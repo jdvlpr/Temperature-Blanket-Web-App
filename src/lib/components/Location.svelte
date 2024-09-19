@@ -25,12 +25,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     weatherUngrouped,
   } from '$lib/stores';
   import {
+    dateToISO8601String,
     displayGeoNamesErrorMessage,
+    getToday,
     numberOfDays,
     pluralize,
-    dateToISO8601String,
     yearFrom,
-    getToday,
   } from '$lib/utils';
   import autocomplete from 'autocompleter';
   import { onMount } from 'svelte';

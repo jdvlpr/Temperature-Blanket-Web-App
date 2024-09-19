@@ -22,6 +22,26 @@ export const entries: ChangelogItem[] = [
     date: 'September, 2024',
     notes: [
       {
+        icon: `<svg
+      xmlns="http://www.w3.org/2000/svg"
+      class="size-6"
+      viewBox="0 0 20 20"
+      ><path
+        fill="currentColor"
+        d="M2.75 4a.75.75 0 0 0 0 1.5h14.5a.75.75 0 0 0 0-1.5zM2 9.25C2 8.56 2.56 8 3.25 8h13.5a1.25 1.25 0 1 1 0 2.5H3.25C2.56 10.5 2 9.94 2 9.25m0 5.5c0-.966.784-1.75 1.75-1.75h12.5a1.75 1.75 0 1 1 0 3.5H3.75A1.75 1.75 0 0 1 2 14.75"
+      /></svg
+    >`,
+        instructions:
+          "<a href='/blog/yarn-weights' class='link'>See the Yarn Weights chart</a>",
+        text: `Yarns include weight information. When selecting or searching for a yarn colorway, you can filter results by yarn weight.`,
+        title: 'Added Yarn Weights',
+      },
+    ],
+    version: '4.2.0',
+  },
+  {
+    notes: [
+      {
         icon: ICONS.wrenchScrewdriver,
         text: `Project locations can now include future dates even when the weather source is Open-Meteo. Previously this was possible only when the weather source was Meteostat.`,
         title: 'Allow Future Dates in Open-Meteo Weather Data',

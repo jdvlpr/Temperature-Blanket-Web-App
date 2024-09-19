@@ -1,10 +1,8 @@
 <script lang="ts">
-  import { ALL_YARN_WEIGHTS, ICONS } from '$lib/constants';
+  import { ALL_YARN_WEIGHTS } from '$lib/constants';
   import type { YarnWeight } from '$lib/types';
   import { pluralize } from '$lib/utils';
   import { brands } from '$lib/yarns/brands';
-  import Tooltip from './Tooltip.svelte';
-  import YarnWeightChart from './YarnWeightChart.svelte';
 
   export let selectedBrandId = '';
   export let selectedYarnWeightId = '';
@@ -49,7 +47,6 @@
 
 <label class="label text-left">
   <span class="flex items-center label gap-1">
-    <!-- {@html ICONS.filter} -->
     <svg
       xmlns="http://www.w3.org/2000/svg"
       width="1em"

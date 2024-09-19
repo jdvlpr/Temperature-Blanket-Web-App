@@ -24,8 +24,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import {
     getColorways,
     getFilteredYarns,
-    pickRandomFromArray,
     getSortedPalette,
+    pickRandomFromArray,
   } from '$lib/utils';
   import { getContext } from 'svelte';
   import SelectYarnWeight from '../SelectYarnWeight.svelte';
