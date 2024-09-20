@@ -9,324 +9,324 @@ const colorways: Colorway[] = [
     },
     colors: [
       {
-        name: 'Blueberry Parfait',
         hex: '#30425a',
+        name: 'Blueberry Parfait',
       },
       {
-        name: 'Coconut Blueberry Muffins',
         hex: '#3d4b5c',
+        name: 'Coconut Blueberry Muffins',
       },
       {
-        name: 'Butterfly Pea Fl. Mousse',
         hex: '#3a4d7c',
+        name: 'Butterfly Pea Fl. Mousse',
       },
       {
-        name: 'Concord Grape Pie',
         hex: '#36507c',
+        name: 'Concord Grape Pie',
       },
       {
-        name: 'Cosmic Cupcake',
         hex: '#272840',
+        name: 'Cosmic Cupcake',
       },
       {
-        name: 'Blackberry Plum Galette',
         hex: '#43486d',
+        name: 'Blackberry Plum Galette',
       },
       {
-        name: 'Grape Jelly',
         hex: '#5452a0',
+        name: 'Grape Jelly',
       },
       {
-        name: 'Lavender Slice',
         hex: '#b3aece',
+        name: 'Lavender Slice',
       },
       {
-        name: 'Raspberry Mousse',
         hex: '#c291a5',
+        name: 'Raspberry Mousse',
       },
       {
-        name: 'Blackberry Honey Gelato',
         hex: '#9c5f8b',
+        name: 'Blackberry Honey Gelato',
       },
       {
-        name: 'Açaí Bowl',
         hex: '#7d4079',
+        name: 'Açaí Bowl',
       },
       {
-        name: 'Sweet Potato Mochi',
         hex: '#a07ac9',
+        name: 'Sweet Potato Mochi',
       },
       {
-        name: 'Huckleberry Pie',
         hex: '#442f47',
+        name: 'Huckleberry Pie',
       },
       {
-        name: 'Mulled Wine Plum Cobbler',
         hex: '#532f3f',
+        name: 'Mulled Wine Plum Cobbler',
       },
       {
-        name: 'Cabernet Gelato',
         hex: '#542d42',
+        name: 'Cabernet Gelato',
       },
       {
-        name: 'Ube Halaya',
         hex: '#553443',
+        name: 'Ube Halaya',
       },
       {
-        name: 'Blue Surf Cake',
         hex: '#354960',
+        name: 'Blue Surf Cake',
       },
       {
-        name: 'Blueberry Basil Galette',
         hex: '#304864',
+        name: 'Blueberry Basil Galette',
       },
       {
-        name: 'Cocon. Spirulina Cheesec.',
         hex: '#3c6da2',
+        name: 'Cocon. Spirulina Cheesec.',
       },
       {
-        name: 'Ocean Pudding Cup',
         hex: '#488b93',
+        name: 'Ocean Pudding Cup',
       },
       {
-        name: 'Bubblegum Ice Cream',
         hex: '#57a6b5',
+        name: 'Bubblegum Ice Cream',
       },
       {
-        name: 'Raspberry Rock Candy',
         hex: '#7ea0c1',
+        name: 'Raspberry Rock Candy',
       },
       {
-        name: 'French Blue Macaron',
         hex: '#bbdded',
+        name: 'French Blue Macaron',
       },
       {
-        name: 'Blue Glazed Doughnut',
         hex: '#96c2c5',
+        name: 'Blue Glazed Doughnut',
       },
       {
-        name: 'Grasshopper Pie',
         hex: '#a0d6c0',
+        name: 'Grasshopper Pie',
       },
       {
-        name: 'Mint Whoopie Pie',
         hex: '#99d8c1',
+        name: 'Mint Whoopie Pie',
       },
       {
-        name: 'Shamrock Shortbread',
         hex: '#468b73',
+        name: 'Shamrock Shortbread',
       },
       {
-        name: 'Mint Chocolate Cookie',
         hex: '#499182',
+        name: 'Mint Chocolate Cookie',
       },
       {
-        name: 'Rainforest Cake',
         hex: '#426e67',
+        name: 'Rainforest Cake',
       },
       {
-        name: 'Spirulina Bites',
         hex: '#436c61',
+        name: 'Spirulina Bites',
       },
       {
-        name: 'Green Velvet Cake',
         hex: '#3d553d',
+        name: 'Green Velvet Cake',
       },
       {
-        name: 'Chocolate Mint Bark',
         hex: '#4a4d3b',
+        name: 'Chocolate Mint Bark',
       },
       {
-        name: 'Kale Chocolate Bar',
         hex: '#3f4f4f',
+        name: 'Kale Chocolate Bar',
       },
       {
-        name: 'Apple Kale Cake',
         hex: '#394847',
+        name: 'Apple Kale Cake',
       },
       {
-        name: 'Blue Cornmeal Muffins',
         hex: '#4e676d',
+        name: 'Blue Cornmeal Muffins',
       },
       {
-        name: 'Fresh Berries Panna Cotta',
         hex: '#3c5863',
+        name: 'Fresh Berries Panna Cotta',
       },
       {
-        name: 'Forest Fruit Pound Cake',
         hex: '#2d4a56',
+        name: 'Forest Fruit Pound Cake',
       },
       {
-        name: 'Chocolate Trifle',
         hex: '#523a2b',
+        name: 'Chocolate Trifle',
       },
       {
-        name: 'Coconut Truffle',
         hex: '#7c5c4d',
+        name: 'Coconut Truffle',
       },
       {
-        name: 'Hazelnut Mocha Slice',
         hex: '#7c6352',
+        name: 'Hazelnut Mocha Slice',
       },
       {
-        name: 'Custard Pie',
         hex: '#f4de76',
+        name: 'Custard Pie',
       },
       {
-        name: 'Citrus Rice Pudding',
         hex: '#b9a65c',
+        name: 'Citrus Rice Pudding',
       },
       {
-        name: 'Chai Shortbread',
         hex: '#c3a878',
+        name: 'Chai Shortbread',
       },
       {
-        name: 'Honeycomb Crunch',
         hex: '#b0975c',
+        name: 'Honeycomb Crunch',
       },
       {
-        name: 'Cinnamon Peach Cobbler',
         hex: '#a98644',
+        name: 'Cinnamon Peach Cobbler',
       },
       {
-        name: 'Lemon Poppy Seed Loaf',
         hex: '#948053',
+        name: 'Lemon Poppy Seed Loaf',
       },
       {
-        name: 'Apple Crumble',
         hex: '#745831',
+        name: 'Apple Crumble',
       },
       {
-        name: 'Gingerbread Pudding',
         hex: '#634b30',
+        name: 'Gingerbread Pudding',
       },
       {
-        name: 'Blueberry Chocolate Tart',
         hex: '#4b4143',
+        name: 'Blueberry Chocolate Tart',
       },
       {
-        name: 'Chocolate Berry Mug Cake',
         hex: '#514f58',
+        name: 'Chocolate Berry Mug Cake',
       },
       {
-        name: 'Morello Fudge Cake',
         hex: '#4c2f3b',
+        name: 'Morello Fudge Cake',
       },
       {
-        name: 'Choco. Raspberry Bavarois',
         hex: '#66515d',
+        name: 'Choco. Raspberry Bavarois',
       },
       {
-        name: 'Cherry Bonbon',
         hex: '#624c4e',
+        name: 'Cherry Bonbon',
       },
       {
-        name: 'Black Forest Gâteau',
         hex: '#62473e',
+        name: 'Black Forest Gâteau',
       },
       {
-        name: 'Salted Caramel Brownie',
         hex: '#5c3024',
+        name: 'Salted Caramel Brownie',
       },
       {
-        name: 'Red Velvet Cake',
         hex: '#632a22',
+        name: 'Red Velvet Cake',
       },
       {
-        name: 'Orange Cheesecake',
         hex: '#efbf92',
+        name: 'Orange Cheesecake',
       },
       {
-        name: 'Cotton Candy Meringue',
         hex: '#e9aabc',
+        name: 'Cotton Candy Meringue',
       },
       {
-        name: 'Turkish Delight',
         hex: '#e192aa',
+        name: 'Turkish Delight',
       },
       {
-        name: 'Rose Barfi',
         hex: '#e8828f',
+        name: 'Rose Barfi',
       },
       {
-        name: 'Strawberry Shortcake',
         hex: '#c26257',
+        name: 'Strawberry Shortcake',
       },
       {
-        name: 'Grapefruit Curd Tart',
         hex: '#c57a71',
+        name: 'Grapefruit Curd Tart',
       },
       {
-        name: 'Summer Berry Tartlet',
         hex: '#9f5761',
+        name: 'Summer Berry Tartlet',
       },
       {
-        name: 'Summer Pudding',
         hex: '#692630',
+        name: 'Summer Pudding',
       },
       {
-        name: 'Matcha Chocolate Brownie',
         hex: '#51865b',
+        name: 'Matcha Chocolate Brownie',
       },
       {
-        name: 'Pistachio Mafroukeh',
         hex: '#6d8767',
+        name: 'Pistachio Mafroukeh',
       },
       {
-        name: 'Green Tea Éclairs',
         hex: '#788954',
+        name: 'Green Tea Éclairs',
       },
       {
-        name: 'Baklava',
         hex: '#8a914e',
+        name: 'Baklava',
       },
       {
-        name: 'Matcha Chiffon Cake',
         hex: '#91a664',
+        name: 'Matcha Chiffon Cake',
       },
       {
-        name: 'Pistachio Bundt Cake',
         hex: '#a2b384',
+        name: 'Pistachio Bundt Cake',
       },
       {
-        name: 'Key Lime Pie',
         hex: '#cbd09c',
+        name: 'Key Lime Pie',
       },
       {
-        name: 'Honeydew Melon Sorbet',
         hex: '#e7ead2',
+        name: 'Honeydew Melon Sorbet',
       },
       {
-        name: 'Buttercream Icing',
         hex: '#f2f1ee',
+        name: 'Buttercream Icing',
       },
       {
-        name: 'Poppy Seed Blondie',
         hex: '#8c7f6e',
+        name: 'Poppy Seed Blondie',
       },
       {
-        name: 'Liquorice Ice Cream',
         hex: '#625f55',
+        name: 'Liquorice Ice Cream',
       },
       {
-        name: 'Chia Seed Pudding',
         hex: '#57585c',
+        name: 'Chia Seed Pudding',
       },
       {
-        name: 'Black Sesame Muffin',
         hex: '#58595d',
+        name: 'Black Sesame Muffin',
       },
       {
-        name: 'Lamington',
         hex: '#55545f',
+        name: 'Lamington',
       },
       {
-        name: 'Chocolate Ganache',
         hex: '#554842',
+        name: 'Chocolate Ganache',
       },
       {
-        name: 'Charcoal Ice Cream',
         hex: '#232321',
+        name: 'Charcoal Ice Cream',
       },
     ],
   },

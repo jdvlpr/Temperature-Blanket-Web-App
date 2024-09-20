@@ -3,6 +3,7 @@ import colorways from './colorways';
 
 export const yarn: Yarn = {
   colorways,
-  name: 'Mega Ball',
   id: 'mega_ball',
+  name: 'Mega Ball',
+  weightId: 'w',
 };

@@ -3,6 +3,7 @@ import colorways from './colorways';
 
 export const yarn: Yarn = {
   colorways,
-  name: 'Basix DK',
   id: 'basix_dk',
+  name: 'Basix DK',
+  weightId: 'd',
 };

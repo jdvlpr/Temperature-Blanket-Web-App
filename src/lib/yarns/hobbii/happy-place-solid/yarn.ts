@@ -5,4 +5,5 @@ export const yarn: Yarn = {
   colorways,
   name: 'Happy Place Solid',
   id: 'happy_place_solid',
+  weightId: 'd',
 };

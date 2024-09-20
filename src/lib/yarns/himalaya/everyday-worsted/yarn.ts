@@ -5,4 +5,5 @@ export const yarn: Yarn = {
   colorways,
   name: 'Everyday Worsted',
   id: 'everyday_worsted',
+  weightId: 'w',
 };

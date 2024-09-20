@@ -61,6 +61,7 @@ export async function GET({ url, request }) {
         brandName: brand.name,
         yarnId: yarn.id,
         yarnName: yarn.name,
+        yarnWeightId: yarn.weightId,
         colorways,
       };
     });

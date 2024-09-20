@@ -31,6 +31,8 @@ describe('Yarn Colorways API', () => {
     expect(data.data[0]).toHaveProperty('name');
     expect(data.data[0]).toHaveProperty('brandId');
     expect(data.data[0]).toHaveProperty('yarnId');
+    expect(data.data[0]).toHaveProperty('yarnName');
+    expect(data.data[0]).toHaveProperty('yarnWeightId');
   });
 
   test('Endpoint /match/green', async () => {
@@ -46,6 +48,8 @@ describe('Yarn Colorways API', () => {
     expect(data.data[0]).toHaveProperty('name');
     expect(data.data[0]).toHaveProperty('brandId');
     expect(data.data[0]).toHaveProperty('yarnId');
+    expect(data.data[0]).toHaveProperty('yarnName');
+    expect(data.data[0]).toHaveProperty('yarnWeightId');
   });
 
   test('Endpoint /brands', async () => {
@@ -59,6 +63,7 @@ describe('Yarn Colorways API', () => {
     expect(data).toHaveProperty('meta');
     expect(data.data[0]).toHaveProperty('brandId');
     expect(data.data[0]).toHaveProperty('brandName');
+    expect(data.data[0]).toHaveProperty('yarns');
   });
 
   test('Endpoint /yarns', async () => {
@@ -72,6 +77,21 @@ describe('Yarn Colorways API', () => {
     expect(data).toHaveProperty('meta');
     expect(data.data[0]).toHaveProperty('yarnId');
     expect(data.data[0]).toHaveProperty('yarnName');
+    expect(data.data[0]).toHaveProperty('colorways');
+  });
+
+  test('Endpoint /weights', async () => {
+    const response = await fetch(
+      'http://localhost:5180/api/yarn-colorways/v1/weights',
+    );
+    const data = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(data).toHaveProperty('data');
+    expect(data).toHaveProperty('meta');
+    expect(data.data[0]).toHaveProperty('id');
+    expect(data.data[0]).toHaveProperty('name');
+    expect(data.data[0]).toHaveProperty('yarns');
   });
 
   // Once I made a mistake and included "api/*" in the excluded routes list in svelte.config.js,

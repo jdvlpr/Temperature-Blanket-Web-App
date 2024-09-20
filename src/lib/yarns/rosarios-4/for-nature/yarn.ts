@@ -3,6 +3,7 @@ import colorways from './colorways';
 
 export const yarn: Yarn = {
   colorways,
-  name: 'For Nature',
   id: 'for_nature',
+  name: 'For Nature',
+  weightId: 'd',
 };

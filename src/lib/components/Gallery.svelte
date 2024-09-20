@@ -60,6 +60,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let scrollContainer;
   let projectsList;
   let totalProjects = 0;
+  let featuredProjectsEl;
 
   onMount(async () => {
     if (!$projects.length) {
@@ -185,6 +186,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             on:change={() => {
               $popularProjects = [];
               fetchPopularProjectsWrapper();
+              featuredProjectsEl.scrollLeft = 0;
             }}
           >
             <option value={0.0357}>day</option>
@@ -197,6 +199,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <div
         slot="content"
         class="w-full flex items-start gap-2 snap-x snap-mandatory overflow-x-scroll mx-auto bg-surface-50-900-token p-2"
+        bind:this={featuredProjectsEl}
       >
         {#if !$popularProjects.length}
           <!-- <div class="my-36 mx-auto"><Spinner /></div> -->
@@ -252,7 +255,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
               disabled={loading}
               bind:selectedBrandId={$filteredBrandId}
               bind:selectedYarnId={$filteredYarnId}
-              showNumberOfColorways={false}
             />
           </div>
 
@@ -274,7 +276,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </div>
           {/if}
 
-          <div class="flex flex-col justify-start col-span-12 md:col-span-5">
+          <div
+            class="flex flex-col justify-start col-span-12 md:col-span-5 gap-1"
+          >
             <span class="flex items-center label gap-1">
               <svg
                 xmlns="http://www.w3.org/2000/svg"

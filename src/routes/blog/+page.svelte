@@ -22,11 +22,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   const posts = [
     {
+      href: '/blog/yarn-weights',
+      imgSrc: '/images/blog-images/yarn-weights/banner.png',
+      imgAlt: 'Yarn Weights',
+      title: 'Yarn Weights',
+      tags: ['Help'],
+    },
+    {
       href: '/blog/2024-09-03-now-open-source',
       imgSrc: '/images/blog-images/2024-09-03-now-open-source/banner.jpeg',
       imgAlt: 'Open Source',
       title: 'Now Open Source',
-      date: 'September 3, 2024',
       tags: ['News'],
     },
     {
@@ -35,8 +41,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         '/images/blog-images/2024-02-09-how-to-plan-a-temperature-blanket/how-to-plan-your-project.png',
       imgAlt: 'Open Source',
       title: 'How to Plan a Temperature Blanket',
-      date: 'February 9, 2024',
-      tags: ['Tutorials'],
+      tags: ['Help'],
     },
     {
       href: '/blog/2023-12-19-version-3-unified-site-design',
@@ -44,7 +49,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
         '/images/blog-images/2023-12-19-version-3-unified-site-design/featured-image.png',
       imgAlt: 'Version 3',
       title: 'Version 3: Unified Site Design',
-      date: 'December 19, 2023',
       tags: ['News'],
     },
     {
@@ -53,8 +57,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         '/images/blog-images/what-is-a-temperature-blanket/temperature-blanket-featured-image.png',
       imgAlt: 'Preview of a Temperature Blanket Project',
       title: 'What is a Temperature Blanket?',
-      date: 'August 9, 2023',
-      tags: ['Tutorials'],
+      tags: ['Help'],
     },
   ];
 
@@ -77,10 +80,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     name="description"
     content="Blog posts from {PUBLIC_BASE_DOMAIN_NAME}."
   />
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no"
-  />
+
   <meta property="og:title" content="Blog" />
   <meta
     property="og:description"
@@ -127,9 +127,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
               class="w-full card bg-surface-200-700-token bg-primary-hover-token p-4 whitespace-pre-wrap text-center flex flex-col items-center justify-center gap-2"
               {href}
             >
-              <img src={imgSrc} class="h-36 object-fill w-full" alt={imgAlt} />
+              <img src={imgSrc} class="h-36 object-cover w-full" alt={imgAlt} />
               <span class="font-bold text-lg">{title}</span>
-              <p class="text-sm">{date}</p>
+
               {#if tags}
                 {#each tags as item}
                   <p

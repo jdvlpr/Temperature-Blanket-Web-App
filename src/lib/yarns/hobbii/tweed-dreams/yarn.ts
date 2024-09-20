@@ -5,4 +5,5 @@ export const yarn: Yarn = {
   colorways,
   name: 'Tweed Dreams',
   id: 'tweed_dreams',
+  weightId: 'd',
 };

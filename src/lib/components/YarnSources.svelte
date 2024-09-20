@@ -16,7 +16,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import HelpIcon from '$lib/components/buttons/HelpIcon.svelte';
   import Expand from '$lib/components/Expand.svelte';
-  import { stringToDate, pluralize } from '$lib/utils';
+  import { ALL_YARN_WEIGHTS } from '$lib/constants';
+  import { pluralize, stringToDate } from '$lib/utils';
   import { brands } from '$lib/yarns/brands';
   import { slide } from 'svelte/transition';
 
@@ -52,13 +53,30 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {@const unavailable = yarn.colorways.some(
             (n) => !!n.source?.unavailable,
           )}
+          {@const yarnWeightName = ALL_YARN_WEIGHTS.find(
+            (n) => n.id === yarn.weightId,
+          )?.name}
           <div
             class="flex text-left flex-1 basis-[270px] items-center flex-wrap gap-x-2"
           >
             <p class="font-bold w-full">
               {brand.name} - {yarn.name}
-              {#if unavailable}[{pluralize('Link', yarn.colorways.length)} Unavailable]
-                <HelpIcon href="/documentation#link-unavailable" />{/if}
+              {#if yarnWeightName}
+                <span class="font-normal">
+                  (<a
+                    href="/blog/yarn-weights?highlight={yarnWeightName}"
+                    class="link"
+                    target="_blank"
+                    title="See the yarn weights chart">{yarnWeightName}</a
+                  >)
+                </span>
+              {/if}
+              {#if unavailable}
+                <span class="font-normal"
+                  >[{pluralize('Link', yarn.colorways.length)} Unavailable]
+
+                  <HelpIcon href="/documentation#link-unavailable" /></span
+                >{/if}
             </p>
 
             <p>

@@ -5,4 +5,5 @@ export const yarn: Yarn = {
   colorways,
   name: 'Posie',
   id: 'posie',
+  weightId: 'f',
 };

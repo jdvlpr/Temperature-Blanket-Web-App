@@ -5,4 +5,5 @@ export const yarn: Yarn = {
   colorways,
   name: 'Aegean Tweed',
   id: 'aegean_tweed',
+  weightId: 'd',
 };

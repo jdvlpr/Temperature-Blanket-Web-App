@@ -5,4 +5,5 @@ export const yarn: Yarn = {
   colorways,
   name: 'LoLa Bobbel Solo',
   id: 'lola_bobbel_solo',
+  weightId: 'a',
 };

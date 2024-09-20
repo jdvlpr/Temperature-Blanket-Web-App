@@ -28,7 +28,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <span class="range-input-container">
   <button
-    class="btn bg-secondary-hover-token flex gap-1 justify-start items-center"
+    class="btn bg-secondary-hover-token flex gap-2 justify-start items-center"
     title="Adjust Range"
     on:click={(e) => {
       const wasToClicked =
@@ -54,16 +54,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
   >
     <span class="flex flex-col text-left" id="range-{index}-from"
       ><span class="text-xs">From</span>
-      <span class="flex gap-1"
+      <span class="flex items-start"
         ><span class="text-lg">{ranges[index]?.from}</span>
-        <span class="text-sm">{props.unit.label[$units]}</span></span
+        <span class="text-xs">{props.unit.label[$units]}</span></span
       ></span
     >
     <span class="flex flex-col text-left" id="range-{index}-to"
       ><span class="text-xs">To</span>
-      <span class="flex gap-1"
+      <span class="flex items-start"
         ><span class="text-lg">{ranges[index]?.to}</span>
-        <span class="text-sm">{props.unit.label[$units]}</span></span
+        <span class="text-xs">{props.unit.label[$units]}</span></span
       ></span
     ></button
   >

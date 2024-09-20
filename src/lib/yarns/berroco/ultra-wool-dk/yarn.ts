@@ -5,4 +5,5 @@ export const yarn: Yarn = {
   colorways,
   name: 'Ultra Wool DK',
   id: 'ultra_wool_dk',
+  weightId: 'd',
 };

@@ -28,10 +28,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     name="description"
     content="Thanks to the supporters who help contribute to this site."
   />
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no"
-  />
+
   <meta property="og:title" content="Supporters" />
   <meta
     property="og:description"

@@ -6,6 +6,7 @@ const colorways: Colorway[] = [
       name: 'lionbrand.com',
       href: 'https://www.lionbrand.com/collections/schittscreek/products/schitts-creek-yarn',
       accessed: '2023-01-06',
+      unavailable: '2024-09-15',
     },
     colors: [
       {

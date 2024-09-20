@@ -5,4 +5,5 @@ export const yarn: Yarn = {
   colorways,
   name: 'Merino Classic',
   id: 'merino_classic',
+  weightId: 'd',
 };

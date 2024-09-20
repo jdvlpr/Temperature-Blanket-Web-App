@@ -15,7 +15,7 @@
 
 import { dev } from '$app/environment';
 import { SECRET_RAPID_API_PROXY_HEADER_KEY } from '$env/static/private';
-import { ALL_COLORWAYS } from '$lib/constants';
+import { ALL_COLORWAYS, ALL_YARN_WEIGHTS } from '$lib/constants';
 import { error, json } from '@sveltejs/kit';
 import chroma from 'chroma-js';
 
@@ -39,11 +39,16 @@ export async function GET({ url, params, request }) {
     return error(400, {
       message: "Parameter 'color' is not a valid color",
     });
+
   let colorways = ALL_COLORWAYS;
 
   if (searchParams.has('brand')) {
     let brand = searchParams.get('brand');
-    if (!brand) return error(400);
+    if (!brand)
+      return error(400, {
+        message: "Parameter 'brand' is empty",
+      });
+
     brand = decodeURIComponent(brand).toLowerCase();
     if (brand?.includes(',')) {
       let brands = brand.split(',');
@@ -62,7 +67,10 @@ export async function GET({ url, params, request }) {
 
   if (searchParams.has('yarn')) {
     let yarn = searchParams.get('yarn');
-    if (!yarn) return error(400);
+    if (!yarn)
+      return error(400, {
+        message: "Parameter 'yarn' is empty",
+      });
     yarn = decodeURIComponent(yarn).toLowerCase();
     if (yarn?.includes(',')) {
       const yarns = yarn.split(',');
@@ -79,6 +87,34 @@ export async function GET({ url, params, request }) {
       );
   }
 
+  if (searchParams.has('weight')) {
+    let weight = searchParams.get('weight');
+    if (!weight)
+      return error(400, {
+        message: "Parameter 'weight' is empty",
+      });
+
+    const yarnWeightIds = ALL_YARN_WEIGHTS.map((n) => n.id);
+    const yarnWeightNames = ALL_YARN_WEIGHTS.map((n) => n.name.toLowerCase());
+
+    if (yarnWeightIds.includes(weight)) {
+      colorways = colorways.filter(
+        (colorway) => colorway.yarnWeightId === weight,
+      );
+    } else if (yarnWeightNames.includes(weight.toLowerCase())) {
+      colorways = colorways.filter((colorway) => {
+        const yarnWeightId = ALL_YARN_WEIGHTS.find(
+          (n) => n.name.toLowerCase() === weight.toLowerCase(),
+        )?.id;
+        return colorway.yarnWeightId === yarnWeightId;
+      });
+    } else {
+      return error(400, {
+        message: "Parameter 'weight' is not a valid yarn weight",
+      });
+    }
+  }
+
   const hex = chroma(color).hex();
   colorways = colorways
     .map((n) => {
@@ -91,6 +127,7 @@ export async function GET({ url, params, request }) {
     })
     .sort((a, b) => a.delta - b.delta);
 
+  // Default threshold value is 75
   let threshold = 75;
   if (searchParams.has('threshold')) {
     threshold = Number(searchParams.get('threshold'));
@@ -99,9 +136,11 @@ export async function GET({ url, params, request }) {
         message: "Parameter 'threshold' must be a number",
       });
   }
+
   colorways = colorways.filter(
     (colorway) => colorway.percentMatch >= threshold,
   );
+
   const numberOfResults = colorways.length;
 
   let offset = 0; // maximum 500
@@ -112,9 +151,10 @@ export async function GET({ url, params, request }) {
         message: "Parameter 'offset' must be a number",
       });
   }
+
   colorways = colorways.slice(offset);
 
-  let limit = 50; // maximum 500
+  let limit = 50; // default number of results is 50, maximum is 500
   if (searchParams.has('limit')) {
     limit = Number(searchParams.get('limit'));
     if (isNaN(limit))

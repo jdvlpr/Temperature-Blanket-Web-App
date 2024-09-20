@@ -5,4 +5,5 @@ export const yarn: Yarn = {
   colorways,
   name: 'Rainbow Cotton 8/8',
   id: 'rainbow_cotton_8_8',
+  weightId: 'd',
 };

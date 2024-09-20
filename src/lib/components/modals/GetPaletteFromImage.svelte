@@ -31,6 +31,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import chroma from 'chroma-js';
   import { getContext, onMount } from 'svelte';
   import { fade } from 'svelte/transition';
+  import SelectYarnWeight from '../SelectYarnWeight.svelte';
 
   export let updateGauge, numberOfColors;
 
@@ -67,6 +68,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let touching = false;
   let selectedBrandId;
   let selectedYarnId;
+  let selectedYarnWeightId;
   let colorways = getColorways({ selectedBrandId, selectedYarnId });
   let hoverDiv;
   let colorHoverDiv;
@@ -278,6 +280,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
       return sortedColorways[sortedColorways.length - 1];
     return sortedColorways[index];
   }
+
+  function onYarnFilterChange(e) {
+    colorways = getColorways({
+      selectedBrandId,
+      selectedYarnId,
+      selectedYarnWeightId,
+    });
+    matchingYarnColors = getMatchingYarnColors({
+      img,
+      numberOfColors,
+    });
+  }
 </script>
 
 <div class="p-2 sm:p-4 max-w-screen-lg">
@@ -361,30 +375,38 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </button>
   </div>
   {#if !loading}
-    <div class="flex flex-wrap gap-2 justify-center items-end text-left my-2">
-      <div class="w-full">
+    <div class="grid grid-cols-12 gap-4 justify-center items-end w-full my-2">
+      <div
+        class="w-full col-span-full md:col-span-9 order-1"
+        class:md:col-span-full={!!selectedBrandId && !!selectedYarnId}
+      >
         <SelectYarn
           context="modal"
-          label="Selected Yarn"
           bind:selectedBrandId
           bind:selectedYarnId
-          showNumberOfColorways={true}
-          on:select={() => {
-            colorways = getColorways({
-              selectedBrandId,
-              selectedYarnId,
-            });
-            matchingYarnColors = getMatchingYarnColors({
-              img,
-              numberOfColors,
-            });
-          }}
+          on:select={onYarnFilterChange}
+          {selectedYarnWeightId}
         />
       </div>
 
       {#if selectedBrandId && selectedYarnId}
-        <DefaultYarnSet {selectedBrandId} {selectedYarnId} />
+        <div class="w-full col-span-full order-2 md:order-3">
+          <DefaultYarnSet {selectedBrandId} {selectedYarnId} />
+        </div>
       {/if}
+
+      {#key selectedBrandId}
+        <div
+          class="w-full col-span-full md:col-span-3 order-3 md:order-2"
+          class:hidden={!!selectedBrandId && !!selectedYarnId}
+        >
+          <SelectYarnWeight
+            {selectedBrandId}
+            bind:selectedYarnWeightId
+            on:change={onYarnFilterChange}
+          />
+        </div>
+      {/key}
     </div>
   {/if}
 

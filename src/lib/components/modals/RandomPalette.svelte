@@ -24,10 +24,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import {
     getColorways,
     getFilteredYarns,
-    pickRandomFromArray,
     getSortedPalette,
+    pickRandomFromArray,
   } from '$lib/utils';
   import { getContext } from 'svelte';
+  import SelectYarnWeight from '../SelectYarnWeight.svelte';
 
   export let numberOfColors, updateGauge;
 
@@ -42,21 +43,29 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let _yarnColorwaysPalette = [];
   let selectedBrandId;
   let selectedYarnId;
+  let selectedYarnWeightId = '';
   let sortColors = 'light-to-dark';
   let key = 0;
 
   $: filteredYarnsList = getFilteredYarns({
     selectedBrandId,
-    selectedYarnId,
   });
 
-  $: colorways = getColorways({ selectedBrandId, selectedYarnId });
+  $: colorways = getColorways({
+    selectedBrandId,
+    selectedYarnId,
+    selectedYarnWeightId,
+  });
 
   $: isYarnUnavailable = filteredYarnsList
     ?.filter((n) => n.id === selectedYarnId)[0]
     ?.colorways.some((colorway) => !!colorway.source?.unavailable);
 
-  $: selectedBrandId, selectedYarnId, numberOfColors, getRandomColors();
+  $: selectedBrandId,
+    selectedYarnId,
+    selectedYarnWeightId,
+    numberOfColors,
+    getRandomColors();
 
   function getRandomColors() {
     debounce(() => {
@@ -109,26 +118,37 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 </script>
 
-<div class="p-2 sm:p-4 w-[98vw] md:w-[700px]">
+<div class="p-2 sm:p-4 w-[98vw] md:w-[760px] lg:w-[1000px]">
   <div class="grid grid-cols-12 gap-4 justify-center items-end w-full">
-    <div class="col-span-full">
+    <div
+      class="w-full col-span-full md:col-span-9 order-1"
+      class:md:col-span-full={!!selectedBrandId && !!selectedYarnId}
+    >
       <SelectYarn
+        context="modal"
         bind:selectedBrandId
         bind:selectedYarnId
-        showNumberOfColorways={true}
-        context="modal"
-        label="Selected Yarn"
+        {selectedYarnWeightId}
       />
     </div>
 
     {#if selectedBrandId && selectedYarnId}
-      <div class="col-span-full">
+      <div class="w-full col-span-full order-2 md:order-3">
         <DefaultYarnSet {selectedBrandId} {selectedYarnId} />
       </div>
     {/if}
 
+    {#key selectedBrandId}
+      <div
+        class="w-full col-span-full md:col-span-3 order-3 md:order-2"
+        class:hidden={!!selectedBrandId && !!selectedYarnId}
+      >
+        <SelectYarnWeight {selectedBrandId} bind:selectedYarnWeightId />
+      </div>
+    {/key}
+
     {#if isYarnUnavailable}
-      <div class="w-full col-span-full">
+      <div class="w-full col-span-full order-4">
         <Tooltip>
           Link Unavailable <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -169,7 +189,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </div>
     {/if}
 
-    <div class="col-span-full sm:col-span-3 justify-self-start">
+    <div class="col-span-full sm:col-span-3 justify-self-start order-5">
       <SelectNumberOfColors
         {numberOfColors}
         max={99}
@@ -177,7 +197,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       />
     </div>
 
-    <label class="label w-full col-span-full sm:col-span-4">
+    <label class="label w-full col-span-full sm:col-span-4 order-6">
       <span class="flex items-center">
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -213,8 +233,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <option value="name-z-to-a">Name Z-A</option>
       </select>
     </label>
+
     <button
-      class="btn variant-filled-primary col-span-full sm:col-span-4 sm:col-start-9"
+      class="btn variant-filled-primary col-span-full sm:col-span-4 sm:col-start-9 order-7"
       title="Generate Random Colors"
       on:click={() => {
         getRandomColors();

@@ -13,9 +13,10 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script context="module">
+<script context="module" lang="ts">
   let selectedBrandId = writable('');
   let selectedYarnId = writable('');
+  let selectedYarnWeightId: Writable<YarnWeight['id'] | ''> = writable('');
   let search = writable('');
   let hex = writable('');
   let inputTypeTextValue = writable('');
@@ -23,7 +24,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let sortColors = writable('default');
 </script>
 
-<script>
+<script lang="ts">
   import { browser, version } from '$app/environment';
   import { PUBLIC_BASE_URL } from '$env/static/public';
   import AppLogo from '$lib/components/AppLogo.svelte';
@@ -31,6 +32,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Card from '$lib/components/Card.svelte';
   import Footer from '$lib/components/Footer.svelte';
   import SelectYarn from '$lib/components/SelectYarn.svelte';
+  import SelectYarnWeight from '$lib/components/SelectYarnWeight.svelte';
   import Share from '$lib/components/Share.svelte';
   import Spinner from '$lib/components/Spinner.svelte';
   import YarnSources from '$lib/components/YarnSources.svelte';
@@ -38,9 +40,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ViewToggle from '$lib/components/buttons/ViewToggle.svelte';
   import {
     ALL_COLORWAYS_WITH_AFFILIATE_LINKS,
+    ALL_YARN_WEIGHTS,
     YARN_COLORWAYS_PER_PAGE,
   } from '$lib/constants';
   import { layout } from '$lib/stores';
+  import type { YarnWeight } from '$lib/types';
   import {
     getTextColor,
     pluralize,
@@ -53,7 +57,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { Accordion, AccordionItem } from '@skeletonlabs/skeleton';
   import chroma from 'chroma-js';
   import { onMount } from 'svelte';
-  import { writable } from 'svelte/store';
+  import { writable, type Writable } from 'svelte/store';
 
   let loadMoreSpinner;
   let urlParams;
@@ -77,6 +81,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
     urlParams = new URLSearchParams(window.location.search);
     // Load URL
     if (urlParams?.has('f')) getURLYarnParams(urlParams.get('f'));
+
+    if (urlParams?.has('fw')) {
+      const weightId: YarnWeight['id'] = urlParams.get('fw');
+      if (weightId && ALL_YARN_WEIGHTS.map((n) => n.id).includes(weightId)) {
+        $selectedYarnWeightId = weightId;
+      }
+    }
 
     if (urlParams?.has('c')) {
       const color = urlParams.get('c');
@@ -147,25 +158,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
       if (!$selectedYarnId) return true;
       return yarn.id === $selectedYarnId;
     })
+    .filter((yarn) => {
+      if (!$selectedYarnWeightId) return true;
+      return yarn.weightId === $selectedYarnWeightId;
+    })
     .flatMap((n) => n.colorways.map((m) => m.colors.length))
     .reduce((partialSum, a) => partialSum + a, 0);
 
   $: $selectedBrandId,
     $selectedYarnId,
+    $selectedYarnWeightId,
     $search,
     yarns,
     $sortColors,
     itemsToShow,
     $hex,
     getResults();
-
-  $: hasFilters =
-    !!$selectedBrandId ||
-    !!$selectedYarnId ||
-    !!$hex ||
-    !!$inputTypeTextValue ||
-    !!$search ||
-    $sortColors !== 'default';
 
   $: areAnyResultsAffiliate = results.some(
     (result) => result.affiliate_variant_href,
@@ -174,11 +182,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
   $: shareableURL = getShareableURL({
     selectedBrandId: $selectedBrandId,
     selectedYarnId: $selectedYarnId,
+    selectedYarnWeightId: $selectedYarnWeightId,
     search: $search,
     hex: $hex,
   });
 
-  function getShareableURL({ selectedBrandId, selectedYarnId, search, hex }) {
+  function getShareableURL({
+    selectedBrandId,
+    selectedYarnId,
+    selectedYarnWeightId,
+    search,
+    hex,
+  }) {
     if (!browser) return;
 
     let url = `${window.location.origin}${window.location.pathname}`;
@@ -190,10 +205,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     else if (selectedBrandId) params.f = selectedBrandId;
     else if (selectedYarnId) params.f = selectedYarnId;
 
+    if (selectedYarnWeightId) params.fw = selectedYarnWeightId;
+
     if (hex) params.c = hex.includes('#') ? hex.substring(1) : hex;
     if (search) params.n = search;
 
-    if (params?.f || params?.c || params?.n) {
+    if (params?.f || params?.fw || params?.c || params?.n) {
       params.v = version;
       url += '?';
       url += new URLSearchParams(params).toString();
@@ -234,9 +251,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
     debounce(() => {
       let _results = ALL_COLORWAYS_WITH_AFFILIATE_LINKS.filter((colorway) =>
         $selectedBrandId ? colorway.brandId === $selectedBrandId : true,
-      ).filter((colorway) =>
-        $selectedYarnId ? colorway.yarnId === $selectedYarnId : true,
-      );
+      )
+        .filter((colorway) =>
+          $selectedYarnId ? colorway.yarnId === $selectedYarnId : true,
+        )
+        .filter((colorway) =>
+          $selectedYarnWeightId
+            ? colorway.yarnWeightId === $selectedYarnWeightId
+            : true,
+        );
 
       // filter by search text
       if ($search !== '') {
@@ -321,10 +344,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     name="description"
     content="Browse a collection of yarn colorways. Filter by brand or yarn name, and search by HTML color name or hex code to find matching yarn colorways."
   />
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no"
-  />
+
   <meta property="og:title" content="Yarn Colorway Finder" />
   <meta
     property="og:description"
@@ -371,7 +391,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           bind:this={filtersContainer}
           class="grid grid-cols-12 gap-4 items-end scroll-mt-[66px] justify-between my-2 w-full"
         >
-          <div class="flex flex-col justify-start w-full col-span-full">
+          <div class="flex flex-col justify-start w-full col-span-full gap-1">
             <span class="flex items-center label gap-1"
               ><svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -404,7 +424,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 />
                 <input
                   type="text"
-                  placeholder="pink, #c3f4d2"
+                  placeholder="e.g., pink, #c3f4d2"
                   style="background:{$hex} !important;color:{getTextColor(
                     $hex,
                   )}"
@@ -441,17 +461,32 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </div>
           </div>
 
-          <div class="w-full col-span-12 md:col-span-6">
-            <SelectYarn
-              preselectDefaultYarn={false}
-              bind:selectedBrandId={$selectedBrandId}
-              bind:selectedYarnId={$selectedYarnId}
-              showNumberOfColorways={true}
-            />
-          </div>
+          {#key $selectedBrandId || $selectedYarnId}
+            <div
+              class="w-full col-span-12 md:col-span-9"
+              class:md:col-span-full={!!$selectedBrandId && !!$selectedYarnId}
+            >
+              <SelectYarn
+                preselectDefaultYarn={false}
+                bind:selectedBrandId={$selectedBrandId}
+                bind:selectedYarnId={$selectedYarnId}
+                selectedYarnWeightId={$selectedYarnWeightId}
+              />
+            </div>
+
+            <div
+              class="w-full col-span-12 md:col-span-3"
+              class:hidden={!!$selectedBrandId && !!$selectedYarnId}
+            >
+              <SelectYarnWeight
+                selectedBrandId={$selectedBrandId}
+                bind:selectedYarnWeightId={$selectedYarnWeightId}
+              />
+            </div>
+          {/key}
 
           <div
-            class="flex flex-col justify-start w-full col-span-12 md:col-span-3"
+            class="flex flex-col justify-start w-full col-span-12 md:col-span-3 gap-1"
           >
             <span class="flex items-center label gap-1">
               <svg
@@ -461,20 +496,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 stroke-width="1.5"
                 stroke="currentColor"
                 class="w-4 h-4"
-                ><path
+              >
+                <path
                   stroke-linecap="round"
                   stroke-linejoin="round"
-                  d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 01-.659 1.591l-5.432 5.432a2.25 2.25 0 00-.659 1.591v2.927a2.25 2.25 0 01-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 00-.659-1.591L3.659 7.409A2.25 2.25 0 013 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0112 3z"
-                ></path></svg
-              >
-              Filter Colorway Names</span
+                  d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+                />
+              </svg>
+              Colorway Name</span
             >
             <div class="flex flex-wrap items-center justify-center gap-1">
               <div class="input-group input-group-divider grid-cols-[1fr_auto]">
                 <input
                   id="yarn-select-search-input"
                   autocomplete="off"
-                  placeholder="Wisteria, Cream"
+                  placeholder="e.g., Wisteria, Cream"
                   type="text"
                   class="w-full input"
                   bind:value={$search}
@@ -538,32 +574,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <option value="name-z-to-a">Name Z-A</option>
             </select>
           </label>
-
-          <!-- <button
-                        disabled={!hasFilters}
-                        class="btn bg-secondary-hover-token flex items-center gap-0"
-                        on:click={() => {
-                            $selectedBrandId = "";
-                            $selectedYarnId = "";
-                            $hex = "";
-                            if (browser) $inputTypeColorElement.value = "#000000";
-                            $inputTypeTextValue = "";
-                            $search = "";
-                            $sortColors = "default";
-                        }}
-                    >
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke-width="1.5"
-                            stroke="currentColor"
-                            class="w-6 h-6"
-                        >
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                        <span>Clear Filters</span>
-                    </button> -->
         </div>
 
         {#if areAnyResultsAffiliate}
@@ -594,7 +604,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               ? 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5'
               : 'flex flex-col'}"
           >
-            {#each results as { hex, name, delta, brandName, yarnName, brandId, yarnId, variant_href, affiliate_variant_href, unavailable }}
+            {#each results as { hex, name, delta, brandName, yarnName, variant_href, affiliate_variant_href, unavailable }}
               {@const percentMatch = delta ? Math.floor(100 - delta) : null}
               <div
                 class="shadow-sm flex-1 min-w-fit p-2 flex items-center gap-x-2 rounded-container-token {$layout ===
@@ -655,11 +665,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 </div>
                 <div class="flex flex-col items-start text-pretty">
                   <span class="text-left text-xs">
-                    {brandName}
-                    -
-                    {yarnName}
+                    {brandName} - {yarnName}
                   </span>
+
                   <span class="text-lg leading-tight">{name}</span>
+
                   {#if percentMatch}
                     <p class="text-xs">
                       {percentMatch}% Match

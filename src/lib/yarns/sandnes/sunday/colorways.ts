@@ -9,220 +9,220 @@ const colorways: Colorway[] = [
     },
     colors: [
       {
-        name: 'White',
         hex: '#f2ede6',
+        name: 'White',
       },
       {
-        name: 'Putty',
         hex: '#ded8d2',
+        name: 'Putty',
       },
       {
-        name: 'Gråmelert',
         hex: '#a0a09a',
+        name: 'Gråmelert',
       },
       {
-        name: 'Black',
         hex: '#131217',
+        name: 'Black',
       },
       {
-        name: 'Gul Månesten',
         hex: '#ead4a2',
+        name: 'Gul Månesten',
       },
       {
-        name: 'Marsipan',
         hex: '#d8c6b7',
+        name: 'Marsipan',
       },
       {
-        name: 'Brown Sugar',
         hex: '#8e603f',
+        name: 'Brown Sugar',
       },
       {
-        name: 'Chestnut',
         hex: '#614434',
+        name: 'Chestnut',
       },
       {
-        name: 'Beigemelert',
         hex: '#c2afa4',
+        name: 'Beigemelert',
       },
       {
-        name: 'Light Beige',
         hex: '#c3aa99',
+        name: 'Light Beige',
       },
       {
-        name: 'Acorn',
         hex: '#68554c',
+        name: 'Acorn',
       },
       {
-        name: 'Powder Pink',
         hex: '#d9bfb8',
+        name: 'Powder Pink',
       },
       {
-        name: 'Cameo',
         hex: '#b89382',
+        name: 'Cameo',
       },
       {
-        name: 'Lys Kobberbrun',
         hex: '#a05d4c',
+        name: 'Lys Kobberbrun',
       },
       {
-        name: 'Rusty',
         hex: '#6e301f',
+        name: 'Rusty',
       },
       {
-        name: 'Bristol Black',
         hex: '#2f2a2c',
+        name: 'Bristol Black',
       },
       {
-        name: 'Pearl Grey',
         hex: '#cdcac4',
+        name: 'Pearl Grey',
       },
       {
-        name: 'Mørk Sjokolade',
         hex: '#4a3e3a',
+        name: 'Mørk Sjokolade',
       },
       {
-        name: 'Scarlet Red',
         hex: '#b02c2b',
+        name: 'Scarlet Red',
       },
       {
-        name: 'Deep Wine Red',
         hex: '#571e20',
+        name: 'Deep Wine Red',
       },
       {
-        name: 'Blossom',
         hex: '#f3c2c3',
+        name: 'Blossom',
       },
       {
-        name: 'Deep Red',
         hex: '#721d22',
+        name: 'Deep Red',
       },
       {
-        name: 'Bubblegum Pink',
         hex: '#eb869e',
+        name: 'Bubblegum Pink',
       },
       {
-        name: 'Dusty Rose',
         hex: '#b49590',
+        name: 'Dusty Rose',
       },
       {
-        name: 'Raspberry Sorbet',
         hex: '#9a5c67',
+        name: 'Raspberry Sorbet',
       },
       {
-        name: 'Deep Burgundy',
         hex: '#3b1923',
+        name: 'Deep Burgundy',
       },
       {
-        name: 'Jazzy Pink',
         hex: '#9f254e',
+        name: 'Jazzy Pink',
       },
       {
-        name: 'Shocking Pink',
         hex: '#cd80a5',
+        name: 'Shocking Pink',
       },
       {
-        name: 'Magenta',
         hex: '#a05177',
+        name: 'Magenta',
       },
       {
-        name: 'Rosa Lavendel',
         hex: '#a18492',
+        name: 'Rosa Lavendel',
       },
       {
-        name: 'Bjørnebærsaft',
         hex: '#4d3047',
+        name: 'Bjørnebærsaft',
       },
       {
-        name: 'Pink Lilac',
         hex: '#e2bac2',
+        name: 'Pink Lilac',
       },
       {
-        name: 'Lilac',
         hex: '#c1aec7',
+        name: 'Lilac',
       },
       {
-        name: 'Lys Lilla',
         hex: '#9387b8',
+        name: 'Lys Lilla',
       },
       {
-        name: 'Blå',
         hex: '#253a67',
+        name: 'Blå',
       },
       {
-        name: 'Marineblå',
         hex: '#1f2337',
+        name: 'Marineblå',
       },
       {
-        name: 'Dark Sky Blue',
         hex: '#567390',
+        name: 'Dark Sky Blue',
       },
       {
-        name: 'Regatta Blå',
         hex: '#6380b1',
+        name: 'Regatta Blå',
       },
       {
-        name: 'Mørk Blå',
         hex: '#1d2e43',
+        name: 'Mørk Blå',
       },
       {
-        name: 'Turkis',
         hex: '#6aadc2',
+        name: 'Turkis',
       },
       {
-        name: 'Ice Blue',
         hex: '#80949f',
+        name: 'Ice Blue',
       },
       {
-        name: 'Dream Blue',
         hex: '#cdd9da',
+        name: 'Dream Blue',
       },
       {
-        name: 'Dark Greyish Blue',
         hex: '#363542',
+        name: 'Dark Greyish Blue',
       },
       {
-        name: 'Sea Breeze',
         hex: '#768689',
+        name: 'Sea Breeze',
       },
       {
-        name: 'Dyp Petrol',
         hex: '#193c3e',
+        name: 'Dyp Petrol',
       },
       {
-        name: 'Blå Dis',
         hex: '#bed3cb',
+        name: 'Blå Dis',
       },
       {
-        name: 'Forest Green',
         hex: '#2f3e2f',
+        name: 'Forest Green',
       },
       {
-        name: 'Dusty Light Green',
         hex: '#8f9482',
+        name: 'Dusty Light Green',
       },
       {
-        name: 'Spring Green',
         hex: '#a5ba8e',
+        name: 'Spring Green',
       },
       {
-        name: 'Lemon',
         hex: '#eddc86',
+        name: 'Lemon',
       },
       {
-        name: 'Olivengrønn',
         hex: '#5f6549',
+        name: 'Olivengrønn',
       },
       {
-        name: 'Dusty Olive',
         hex: '#565750',
+        name: 'Dusty Olive',
       },
       {
-        name: 'Urban Chic',
         hex: '#444d4a',
+        name: 'Urban Chic',
       },
       {
-        name: 'Sunny Lime',
         hex: '#c3b66b',
+        name: 'Sunny Lime',
       },
     ],
   },

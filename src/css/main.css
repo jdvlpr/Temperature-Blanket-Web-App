@@ -2,6 +2,25 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  :root [data-theme='classic'],
+  :root [data-theme='crimson'],
+  :root [data-theme='hamlindigo'],
+  :root [data-theme='modern'],
+  :root [data-theme='rocket'],
+  :root [data-theme='skeleton'] {
+    --theme-font-family-base: 'apparat', sans-serif;
+    --theme-font-family-heading: 'apparat', sans-serif;
+  }
+
+  /* Disable double-tap to zoom */
+  * {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    touch-action: manipulation;
+  }
+}
+
 @layer components {
   @media (prefers-reduced-motion) {
     ::view-transition-group(*),
@@ -33,11 +52,13 @@
   }
 }
 
-#preview-svg-image > * {
-  cursor: pointer;
-}
+@layer utilities {
+  #preview-svg-image > * {
+    cursor: pointer;
+  }
 
-/* This is to center data table headers... */
-th div {
-  justify-content: center !important;
+  /* This is to center data table headers... */
+  th div {
+    justify-content: center !important;
+  }
 }

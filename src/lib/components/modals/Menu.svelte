@@ -378,8 +378,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               target="_blank"
               rel="noopener noreferrer"
               class="link">Apache 2</a
-            >. Any trademarked yarn or colorway details are owned by their
-            respective companies.
+            >.
           </p>
           <YarnSources />
         </div>

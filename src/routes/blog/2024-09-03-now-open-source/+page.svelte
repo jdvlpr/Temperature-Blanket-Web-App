@@ -35,10 +35,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     name="description"
     content="Making the source code for {PUBLIC_BASE_DOMAIN_NAME} available on GitHub"
   />
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no"
-  />
+
   <meta property="og:title" content="Now Open Source" />
   <meta
     property="og:description"

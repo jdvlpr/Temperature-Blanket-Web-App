@@ -197,10 +197,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     name="description"
     content="Browse a collection of yarn palettes from user-created projects."
   />
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no"
-  />
+
   <meta property="og:title" content="Yarn Palette Gallery" />
   <meta
     property="og:description"
@@ -297,7 +294,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   disabled={loading}
                   bind:selectedBrandId={$filteredBrandId}
                   bind:selectedYarnId={$filteredYarnId}
-                  showNumberOfColorways={false}
                 />
               </div>
 
@@ -320,7 +316,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               {/if}
 
               <div
-                class="flex flex-col justify-start w-full col-span-12 md:col-span-3"
+                class="flex flex-col justify-start w-full col-span-12 md:col-span-3 gap-1"
               >
                 <span class="flex items-center label gap-1">
                   <svg

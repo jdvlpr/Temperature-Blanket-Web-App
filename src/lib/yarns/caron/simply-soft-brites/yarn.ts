@@ -5,4 +5,5 @@ export const yarn: Yarn = {
   colorways,
   name: 'Simply Soft Brites',
   id: 'simply_soft_brites',
+  weightId: 'w',
 };

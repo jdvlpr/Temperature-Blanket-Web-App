@@ -5,4 +5,5 @@ export const yarn: Yarn = {
   colorways,
   name: 'Soft & Shiny Solid',
   id: 'soft_and_shiny_solid',
+  weightId: 'a',
 };

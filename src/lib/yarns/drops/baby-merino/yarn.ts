@@ -5,4 +5,5 @@ export const yarn: Yarn = {
   colorways,
   name: 'Baby Merino',
   id: 'baby-merino',
+  weightId: 's',
 };
