@@ -60,6 +60,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let scrollContainer;
   let projectsList;
   let totalProjects = 0;
+  let featuredProjectsEl;
 
   onMount(async () => {
     if (!$projects.length) {
@@ -185,6 +186,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             on:change={() => {
               $popularProjects = [];
               fetchPopularProjectsWrapper();
+              featuredProjectsEl.scrollLeft = 0;
             }}
           >
             <option value={0.0357}>day</option>
@@ -197,6 +199,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <div
         slot="content"
         class="w-full flex items-start gap-2 snap-x snap-mandatory overflow-x-scroll mx-auto bg-surface-50-900-token p-2"
+        bind:this={featuredProjectsEl}
       >
         {#if !$popularProjects.length}
           <!-- <div class="my-36 mx-auto"><Spinner /></div> -->
