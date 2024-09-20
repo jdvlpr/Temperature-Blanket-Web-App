@@ -80,10 +80,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     name="description"
     content="Blog posts from {PUBLIC_BASE_DOMAIN_NAME}."
   />
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no"
-  />
+
   <meta property="og:title" content="Blog" />
   <meta
     property="og:description"
@@ -130,7 +127,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               class="w-full card bg-surface-200-700-token bg-primary-hover-token p-4 whitespace-pre-wrap text-center flex flex-col items-center justify-center gap-2"
               {href}
             >
-              <img src={imgSrc} class="h-36 object-fill w-full" alt={imgAlt} />
+              <img src={imgSrc} class="h-36 object-cover w-full" alt={imgAlt} />
               <span class="font-bold text-lg">{title}</span>
 
               {#if tags}

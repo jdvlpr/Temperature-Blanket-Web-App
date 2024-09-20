@@ -161,10 +161,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <svelte:head>
   <title>Project Gallery: {projectTitleNoHTML}</title>
   <meta name="description" content="Project Gallery: {projectTitleNoHTML}" />
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no"
-  />
+
   <meta property="og:title" content="Project Gallery: {projectTitleNoHTML}" />
   <meta
     property="og:description"

@@ -38,10 +38,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     name="description"
     content="Request yarn colorways to be added to the site."
   />
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no"
-  />
+
   <meta property="og:title" content="Request Yarn Colorways" />
   <meta
     property="og:description"

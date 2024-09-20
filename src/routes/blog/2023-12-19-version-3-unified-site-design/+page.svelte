@@ -24,10 +24,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <svelte:head>
   <title>Version 3: Unified Site Design</title>
   <meta name="description" content="Version 3: Unified Site Design" />
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no"
-  />
+
   <meta property="og:title" content="Version 3: Unified Site Design" />
   <meta property="og:description" content="Version 3: Unified Site Design" />
   <meta

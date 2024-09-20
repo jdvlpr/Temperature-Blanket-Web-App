@@ -31,10 +31,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     name="description"
     content="Find yarn colorways by HTML hex color code."
   />
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no"
-  />
+
   <meta property="og:title" content="Yarn Colorways JSON API" />
   <meta
     property="og:description"

@@ -23,10 +23,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <svelte:head>
   <title>Contact</title>
   <meta name="description" content="Contact" />
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no"
-  />
+
   <meta property="og:title" content="Contact " />
   <meta property="og:description" content="Contact" />
   <meta property="og:url" content="{PUBLIC_BASE_URL}/contact" />

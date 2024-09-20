@@ -34,10 +34,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     name="description"
     content="Using temperature-blanket.com to help you plan your crochet or knitting project."
   />
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no"
-  />
+
   <meta property="og:title" content="How to Plan a Temperature Blanket" />
   <meta
     property="og:description"

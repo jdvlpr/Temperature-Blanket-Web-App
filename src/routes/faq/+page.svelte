@@ -23,10 +23,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <svelte:head>
   <title>FAQ</title>
   <meta name="description" content="Frequently Asked Questions" />
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no"
-  />
+
   <meta property="og:title" content="Frequently Asked Questions" />
   <meta property="og:description" content="Frequently Asked Questions" />
   <meta property="og:url" content="{PUBLIC_BASE_URL}/faq" />
