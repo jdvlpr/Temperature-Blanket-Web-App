@@ -15,7 +15,7 @@
 
 import { dev } from '$app/environment';
 import { SECRET_RAPID_API_PROXY_HEADER_KEY } from '$env/static/private';
-import { ALL_COLORWAYS } from '$lib/constants';
+import { ALL_COLORWAYS, ALL_YARN_WEIGHTS } from '$lib/constants';
 import { sortColorsByName, sortColorsLightToDark } from '$lib/utils.js';
 import { error, json } from '@sveltejs/kit';
 import chroma from 'chroma-js';
@@ -72,6 +72,34 @@ export async function GET({ url, request }) {
           colorway.yarnId.toLowerCase() === yarn ||
           colorway.yarnName.toLowerCase() === yarn,
       );
+  }
+
+  if (searchParams.has('weight')) {
+    let weight = searchParams.get('weight');
+    if (!weight)
+      return error(400, {
+        message: "Parameter 'weight' is empty",
+      });
+
+    const yarnWeightIds = ALL_YARN_WEIGHTS.map((n) => n.id);
+    const yarnWeightNames = ALL_YARN_WEIGHTS.map((n) => n.name.toLowerCase());
+
+    if (yarnWeightIds.includes(weight)) {
+      colorways = colorways.filter(
+        (colorway) => colorway.yarnWeightId === weight,
+      );
+    } else if (yarnWeightNames.includes(weight.toLowerCase())) {
+      colorways = colorways.filter((colorway) => {
+        const yarnWeightId = ALL_YARN_WEIGHTS.find(
+          (n) => n.name.toLowerCase() === weight.toLowerCase(),
+        )?.id;
+        return colorway.yarnWeightId === yarnWeightId;
+      });
+    } else {
+      return error(400, {
+        message: "Parameter 'weight' is not a valid yarn weight",
+      });
+    }
   }
 
   if (searchParams.has('color')) {

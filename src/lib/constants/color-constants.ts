@@ -126,6 +126,7 @@ export const ALL_COLORWAYS: Color[] = brands.flatMap((n, i) => {
           brandName: yarn.brandName,
           yarnId: yarn.id,
           yarnName: yarn.name,
+          yarnWeightId: yarn.weightId,
         };
       }),
     )
@@ -142,6 +143,7 @@ export const ALL_COLORWAYS: Color[] = brands.flatMap((n, i) => {
           brandName: colorway.brandName,
           yarnId: colorway.yarnId,
           yarnName: colorway.yarnName,
+          yarnWeightId: colorway.yarnWeightId,
           dateAccessed: colorway.source.accessed,
           href,
           // isAvailable,

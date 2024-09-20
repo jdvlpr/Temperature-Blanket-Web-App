@@ -15,6 +15,7 @@
 
 import { dev } from '$app/environment';
 import { SECRET_RAPID_API_PROXY_HEADER_KEY } from '$env/static/private';
+import { ALL_YARN_WEIGHTS } from '$lib/constants.js';
 import { brands } from '$lib/yarns/brands.js';
 import { error, json } from '@sveltejs/kit';
 
@@ -30,47 +31,23 @@ export async function GET({ url, request }) {
       return error(401, { message: 'Not authorized' });
   }
 
-  const { searchParams } = url;
-
-  let results = [...brands];
-
-  if (searchParams.has('brand')) {
-    let brand = searchParams.get('brand');
-    if (!brand) return error(400);
-    brand = decodeURIComponent(brand).toLowerCase();
-    if (brand.includes(',')) {
-      let _brands = brand.split(',');
-      results = results.filter(
-        (item) =>
-          _brands.includes(item.id) ||
-          _brands.includes(item.name.toLowerCase()),
-      );
-    } else
-      results = results.filter(
-        (item) => item.id === brand || item.name.toLowerCase() === brand,
-      );
-  }
-
-  const data = results.flatMap((brand) => {
-    return brand.yarns.map((yarn) => {
-      const colorways = yarn.colorways.reduce((a, b) => {
-        return a + b.colors.length;
-      }, 0);
-      return {
-        brandId: brand.id,
-        brandName: brand.name,
-        yarnId: yarn.id,
-        yarnName: yarn.name,
-        yarnWeightId: yarn.weightId,
-        colorways,
-      };
-    });
+  const results = ALL_YARN_WEIGHTS.map((weight) => {
+    const yarns = brands
+      .flatMap((brand) => brand.yarns)
+      .filter((yarn) => {
+        if (!yarn.weightId) return false;
+        return yarn.weightId === weight.id;
+      }).length;
+    return {
+      ...weight,
+      yarns,
+    };
   });
 
   return json({
     meta: {
-      total: data.length,
+      total: results.length,
     },
-    data: data,
+    data: results,
   });
 }

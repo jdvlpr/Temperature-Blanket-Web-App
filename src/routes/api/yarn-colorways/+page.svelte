@@ -228,6 +228,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             "brandName": "Bernat"
             "yarnId": "blanket"
             "yarnName": "Blanket"
+            "yarnWeightId": 'sb'
             "dateAccessed": "2024-01-19"
             "href": "https://www.yarnspirations.com/products/bernat-blanket-yarn-300g-10-5oz-1"
         },
@@ -304,8 +305,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 <tr>
                   <td>brand</td>
                   <td
-                    >A brand ID or name, or a comma-separated list of brand IDs
-                    or brand names to filter the results by.</td
+                    >A <a href="#brands" class="link">brand ID or name</a>, or a
+                    comma-separated list of brand IDs or brand names to filter
+                    the results by.</td
                   >
                   <td>String</td>
                   <td>No</td>
@@ -319,8 +321,24 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 <tr>
                   <td>yarn</td>
                   <td
-                    >A yarn ID or name, or a comma-separated list of yarn IDs or
-                    yarn names to filter the results by.</td
+                    >A <a href="#yarns" class="link">yarn ID or name</a>, or a
+                    comma-separated list of yarn IDs or yarn names to filter the
+                    results by.</td
+                  >
+                  <td>String</td>
+                  <td>No</td>
+                  <td
+                    ><span
+                      class="variant-soft-surface rounded-container-token px-2 text-token"
+                      >undefined</span
+                    ></td
+                  >
+                </tr>
+                <tr>
+                  <td>weight</td>
+                  <td
+                    >A <a href="#weights" class="link">yarn weight ID or name</a
+                    >.</td
                   >
                   <td>String</td>
                   <td>No</td>
@@ -426,6 +444,11 @@ GET https://yarn-colorways.p.rapidapi.com/v1/match/665e3f?brand=cascade&yarn=anc
                 <tr>
                   <td>yarnName</td>
                   <td>The name of the yarn.</td>
+                  <td>String</td>
+                </tr>
+                <tr>
+                  <td>yarnWeightId</td>
+                  <td>The id of the yarn weight.</td>
                   <td>String</td>
                 </tr>
                 <tr>
@@ -543,8 +566,9 @@ GET https://yarn-colorways.p.rapidapi.com/v1/match/665e3f?brand=cascade&yarn=anc
                 <tr>
                   <td>brand</td>
                   <td
-                    >A brand ID or name, or a comma-separated list of brand IDs
-                    or brand names to filter the results by.</td
+                    >A <a href="#brands" class="link">brand ID or name</a>, or a
+                    comma-separated list of brand IDs or brand names to filter
+                    the results by.</td
                   >
                   <td>String</td>
                   <td>No</td>
@@ -558,8 +582,24 @@ GET https://yarn-colorways.p.rapidapi.com/v1/match/665e3f?brand=cascade&yarn=anc
                 <tr>
                   <td>yarn</td>
                   <td
-                    >A yarn ID or name, or a comma-separated list of yarn IDs or
-                    yarn names to filter the results by.</td
+                    >A <a href="#yarns" class="link">yarn ID or name</a>, or a
+                    comma-separated list of yarn IDs or yarn names to filter the
+                    results by.</td
+                  >
+                  <td>String</td>
+                  <td>No</td>
+                  <td
+                    ><span
+                      class="variant-soft-surface rounded-container-token px-2 text-token"
+                      >undefined</span
+                    ></td
+                  >
+                </tr>
+                <tr>
+                  <td>weight</td>
+                  <td
+                    >A <a href="#weights" class="link">yarn weight ID or name</a
+                    >.</td
                   >
                   <td>String</td>
                   <td>No</td>
@@ -672,6 +712,11 @@ GET https://yarn-colorways.p.rapidapi.com/v1/colorways?name=peach
                 <tr>
                   <td>yarnName</td>
                   <td>The name of the yarn.</td>
+                  <td>String</td>
+                </tr>
+                <tr>
+                  <td>yarnWeightId</td>
+                  <td>The id of the yarn weight.</td>
                   <td>String</td>
                 </tr>
                 <tr>
@@ -828,7 +873,7 @@ GET https://yarn-colorways.p.rapidapi.com/v1/brands
                 <tr>
                   <td>brand</td>
                   <td
-                    >The brand ID or name, or a comma-sepparated list of brand
+                    >The brand ID or name, or a comma-separated list of brand
                     IDs or brand names to filter the results by.</td
                   >
                   <td>String</td>
@@ -892,19 +937,101 @@ GET https://yarn-colorways.p.rapidapi.com/v1/yarns?brand=bernat,loops_and_thread
                   <td>String</td>
                 </tr>
                 <tr>
+                  <td>yarnId</td>
+                  <td>The ID of the yarn.</td>
+                  <td>String</td>
+                </tr>
+                <tr>
                   <td>yarnName</td>
                   <td>The name of the yarn.</td>
                   <td>String</td>
                 </tr>
                 <tr>
-                  <td>yarnId</td>
-                  <td>The ID of the yarn.</td>
+                  <td>yarnWeightId</td>
+                  <td>The id of the yarn weight.</td>
                   <td>String</td>
                 </tr>
                 <tr>
                   <td>colorways</td>
                   <td>The number of colorways in this yarn.</td>
                   <td>Number</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section
+          id="weights"
+          class="scroll-mt-[58px] card bg-surface-200-700-token p-4 gap-2 flex flex-col"
+        >
+          <h3 class="font-bold text-xl">Yarn Weights</h3>
+          <p>
+            Get all yarn weight IDs and names, useful to filter <a
+              href="#find-yarn-by-color"
+              class="link">/match</a
+            >
+            or
+            <a href="#colorways" class="link">/colorways</a> results.
+          </p>
+
+          <p>
+            <span class="font-bold">Method</span>
+            <span class="code px-2 text-token">GET</span>
+          </p>
+          <p>
+            <span class="font-bold">URL</span>
+            <span class="code px-2 text-token">/weights</span>
+          </p>
+
+          <p class="font-bold">Parameters</p>
+          <p>There are no parameters when calling this request.</p>
+
+          <p class="font-bold">Example</p>
+
+          <p
+            class="break-all whitespace-pre-wrap codeblock code text-token p-4 w-fit"
+          >
+            {`// get all yarn weights 
+GET https://yarn-colorways.p.rapidapi.com/v1/weights
+`}
+          </p>
+
+          <p class="font-bold">Response</p>
+
+          <p>
+            A successful response's <span class="font-bold">data</span> property
+            will contain an array of yarn weight objects with the following properties:
+          </p>
+
+          <div class="overflow-scroll max-w-[80vw] sm:max-w-[90vw]">
+            <table
+              class="border-separate border-spacing-0 w-full border-surface-300-600-token border rounded-container-token overflow-hidden"
+            >
+              <thead>
+                <tr>
+                  <th>Parameter</th>
+                  <th>Description</th>
+                  <th>Type</th>
+                </tr>
+              </thead>
+              <tbody
+                class="[&>tr:nth-child(odd)]:bg-surface-50-900-token [&>tr:nth-child(even)]:bg-surface-100-800-token"
+              >
+                <tr>
+                  <td>id</td>
+                  <td>The id of the yarn weight.</td>
+                  <td>String</td>
+                </tr>
+                <tr>
+                  <td>name</td>
+                  <td>The name of the yarn weight.</td>
+                  <td>String</td>
+                </tr>
+                <tr>
+                  <td>yarns</td>
+                  <td>The number of yarns in this weight</td>
+                  <td>String</td>
                 </tr>
               </tbody>
             </table>
