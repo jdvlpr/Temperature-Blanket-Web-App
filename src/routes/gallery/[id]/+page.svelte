@@ -507,16 +507,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
                                 {i + 1}
                               </p>
                               <div
-                                class="flex gap-1 justify-start items-center"
+                                class="flex gap-2 justify-start items-center"
                               >
                                 <span
                                   class="flex flex-col text-left items-start"
                                   id="range-0-from"
                                 >
                                   <span class="text-xs">From</span>
-                                  <span class="flex gap-1">
+                                  <span class="flex items-start">
                                     <span class="text-lg">{from}</span>
-                                    <span class="text-sm">{unitLabel}</span>
+                                    <span class="text-xs">{unitLabel}</span>
                                   </span>
                                 </span>
                                 <span
@@ -524,9 +524,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
                                   id="range-0-to"
                                 >
                                   <span class="text-xs">To</span>
-                                  <span class="flex gap-1">
+                                  <span class="flex items-start">
                                     <span class="text-lg">{to}</span>
-                                    <span class="text-sm">{unitLabel}</span>
+                                    <span class="text-xs">{unitLabel}</span>
                                   </span>
                                 </span>
                               </div>
