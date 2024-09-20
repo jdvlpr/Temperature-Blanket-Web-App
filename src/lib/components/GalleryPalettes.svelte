@@ -161,7 +161,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             class="truncate w-full"
             autocomplete="off"
             disabled={loading}
-            placeholder="Kansas, 2003"
+            placeholder="e.g., Kansas, 2003"
             bind:value={$search}
           />
 

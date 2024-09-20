@@ -302,7 +302,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 type="text"
                 class="truncate"
                 autocomplete="off"
-                placeholder="Kansas, 2003"
+                placeholder="e.g., Kansas, 2003"
                 bind:value={$search}
               />
 
