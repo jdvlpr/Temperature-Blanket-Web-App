@@ -3,9 +3,10 @@
   import { ALL_YARN_WEIGHTS, yarnWeightIcons } from '$lib/constants';
   import { onMount } from 'svelte';
 
-  let highlight = $page.url.searchParams.get('highlight') || null;
+  let highlight = null;
 
   onMount(() => {
+    highlight = $page.url.searchParams.get('highlight') || null;
     if (highlight) {
       const el = document.getElementById(highlight);
       if (el) {
