@@ -45,7 +45,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </div>
         <div class="flex-grow border-t border-surface-300-600-token"></div>
       </div>
-      {#each SUPPORTERS?.gold as { name, href, linkText, imageSrc, date }}
+      {#each SUPPORTERS?.gold as { name, href, linkText, imageSrc }}
         <div
           class="bg-surface-200-700-token text-token px-2 py-4 rounded-container-token w-full flex flex-col justify-center"
         >
@@ -63,9 +63,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <a {href} target="_blank" class="link break-all">
               {linkText}
             </a>
-            <p class="text-sm font-normal">
-              Since {new Date(date).toLocaleDateString()}
-            </p>
           </div>
         </div>
       {/each}
@@ -92,15 +89,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </div>
         <div class="flex-grow border-t border-surface-300-600-token"></div>
       </div>
-      {#each SUPPORTERS.silver as { name, href, linkText, date }}
+      {#each SUPPORTERS.silver as { name, href, linkText }}
         <div
           class="h-fit bg-surface-200-700-token text-token p-4 rounded-container-token flex flex-col items-center"
         >
           <p class="text-xl font-bold">{name}</p>
           <a {href} target="_blank" class="link">{linkText}</a>
-          <p class="text-sm font-normal w-fit">
-            Since {new Date(date).toLocaleDateString()}
-          </p>
         </div>
       {/each}
     {/if}
@@ -126,14 +120,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </div>
         <div class="flex-grow border-t border-surface-300-600-token"></div>
       </div>
-      {#each SUPPORTERS?.bronze as { name, date }}
+      {#each SUPPORTERS?.bronze as { name }}
         <div
           class="h-fit bg-surface-200-700-token text-token p-4 rounded-container-token flex flex-col items-center"
         >
           <p class="text-xl font-bold">{name}</p>
-          <p class="text-sm font-normal w-fit">
-            Since {new Date(date).toLocaleDateString()}
-          </p>
         </div>
       {/each}
     {/if}
