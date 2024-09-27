@@ -104,10 +104,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
       active="bg-secondary-active-token"
     >
       {#each tags as tag}
-        <!-- {@const numberOfItems =
-            tag === 'All'
-              ? posts.length
-              : posts.filter((post) => post.tags?.includes(tag)).length} -->
         <RadioItem bind:group={selectedTag} name={tag} value={tag} title={tag}>
           <span class="flex gap-1 justify-center items-center">
             {tag}
@@ -121,7 +117,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         in:fade
         class="max-w-screen-xl m-auto grid grid-cols-1 md:grid-cols-3 gap-4 justify-start"
       >
-        {#each filteredPosts as { href, imgSrc, imgAlt, title, date, tags }}
+        {#each filteredPosts as { href, imgSrc, imgAlt, title, tags }}
           <div class="flex flex-col gap-4">
             <a
               class="w-full card bg-surface-200-700-token bg-primary-hover-token p-4 whitespace-pre-wrap text-center flex flex-col items-center justify-center gap-2"
