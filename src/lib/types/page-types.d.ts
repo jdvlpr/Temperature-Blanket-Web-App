@@ -19,7 +19,7 @@ export interface ChangelogItem {
   /** Only necessary for new months, in the format of Month, Year. For example: August, 2024 */
   date?: string;
   notes: ChangelogItemNote[];
-  version: string;
+  version?: string;
 }
 
 export interface ChangelogItemNote {

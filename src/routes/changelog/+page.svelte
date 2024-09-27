@@ -89,7 +89,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             href="{PUBLIC_GITHUB_LINK}/commits/main/"
             class="link"
             target="_blank">Visit the GitHub repository</a
-          > to see the full changelog for version 4.
+          > to see the full changelog since version 4.
         </p>
       </div>
       <div

@@ -22,6 +22,16 @@ export const entries: ChangelogItem[] = [
     date: 'September, 2024',
     notes: [
       {
+        icon: ICONS.checkCircle,
+        text: `50 colorways`,
+        title: 'Added Yarn: Sandnes - Tynn Peer Gynt',
+      },
+    ],
+    version: '4.3.0',
+  },
+  {
+    notes: [
+      {
         icon: `<svg
       xmlns="http://www.w3.org/2000/svg"
       class="size-6"
