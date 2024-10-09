@@ -14,8 +14,7 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import Alert from '$lib/components/modals/Alert.svelte';
-import { modal } from '$lib/stores';
-import { onlineStore } from 'svelte-legos';
+import { isOnline, modal } from '$lib/stores';
 import { bind } from 'svelte-simple-modal';
 import { get } from 'svelte/store';
 
@@ -27,14 +26,13 @@ import { get } from 'svelte/store';
  *
  */
 export const displayGeoNamesErrorMessage = (message) => {
-  const isOnline = onlineStore();
-  const isOffline = !get(isOnline);
+  const _isOnline = get(isOnline);
 
   let text = `
   <p class='font-bold text-2xl'>Whoa!</p>
   <p class='font-bold'>There's been a problem.</p>`;
 
-  if (isOffline) {
+  if (!_isOnline) {
     text += `<p class="my-4">It appears you're offline.</p>`;
   } else {
     text += `<p class='my-4'>It appears the location-fetching service is experiencing technical difficulties.

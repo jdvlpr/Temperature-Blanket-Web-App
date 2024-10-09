@@ -15,7 +15,6 @@
 
 import { ICONS } from '$lib/constants';
 import { localStorageStore } from '@skeletonlabs/skeleton';
-import { mediaQuery } from 'svelte-legos';
 import { derived, readable, writable, type Writable } from 'svelte/store';
 
 export const modal = writable(null);
@@ -33,7 +32,49 @@ export const pinAllSections = writable(false);
 
 export const wasProjectLoadedFromURL = writable(false);
 
-export const isDesktop = mediaQuery('(min-width: 768px)');
+export const isOnline = writable(await checkIsOnline());
+async function checkIsOnline() {
+  if (typeof window === 'undefined') return false;
+  if (!window.navigator.onLine) return false;
+
+  // avoid CORS errors with a request to your own origin
+  const url = new URL(window.location.origin);
+
+  // random value to prevent cached responses
+  const randomString = Math.random().toString(36).substring(2, 15);
+  url.searchParams.set('rand', randomString);
+
+  try {
+    const response = await fetch(url.toString(), { method: 'HEAD' });
+
+    return response.ok;
+  } catch {
+    return false;
+  }
+}
+
+export const isDesktop = mediaQueryStore('(min-width: 768px)');
+
+// Based on https://github.com/michaelbelete/svelte-media-query-store/tree/main
+function mediaQueryStore(query: string) {
+  if (typeof window === 'undefined') {
+    // check if it's rendered in the dom so window is not undefined
+    return readable('');
+  }
+  const mediaQueryList = window.matchMedia(query);
+
+  const mediaStore = readable(mediaQueryList.matches, (set) => {
+    const handleChange = () => set(mediaQueryList.matches);
+
+    mediaQueryList.addEventListener('change', handleChange);
+
+    return () => {
+      mediaQueryList.removeEventListener('change', handleChange);
+    };
+  });
+
+  return mediaStore;
+}
 
 export const windowLanguage = writable(null);
 

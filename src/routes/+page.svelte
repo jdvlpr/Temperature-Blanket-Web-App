@@ -46,7 +46,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     pageSections,
     pinAllSections,
     projectStatus,
-    projectTitle,
     valid,
     wasProjectLoadedFromURL,
     weather,
