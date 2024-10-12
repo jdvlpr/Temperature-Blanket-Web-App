@@ -78,7 +78,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       id="select-sort-by"
       bind:value={currentScheme}
       on:change={() => {
-        if (document.getElementsByClassName('content'))
+        if (typeof document.getElementsByClassName('content') !== 'undefined')
           document.getElementsByClassName('content')[0].scrollTop = 0;
       }}
     >

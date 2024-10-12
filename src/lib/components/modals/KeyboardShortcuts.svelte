@@ -22,7 +22,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let modal;
 
   onMount(() => {
-    modal.parentElement.scrollTop = 0;
+    if (typeof modal?.parentElement !== 'undefined')
+      modal.parentElement.scrollTop = 0;
   });
 </script>
 

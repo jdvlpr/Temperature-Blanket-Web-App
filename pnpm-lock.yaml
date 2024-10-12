@@ -99,9 +99,6 @@ importers:
       svelte-floating-ui:
         specifier: ^1.5.6
         version: 1.5.9
-      svelte-legos:
-        specifier: ^0.2.4
-        version: 0.2.5(svelte@4.2.19)
       tailwindcss:
         specifier: ^3.4.10
         version: 3.4.12
@@ -961,9 +958,6 @@ packages:
   caniuse-lite@1.0.30001660:
     resolution: {integrity: sha512-GacvNTTuATm26qC74pt+ad1fW15mlQ/zuTzzY1ZoIzECTP8HURDfF43kNxPgf7H1jmelCBQTTbBNxdSXOA7Bqg==}
 
-  canvas-confetti@1.9.3:
-    resolution: {integrity: sha512-rFfTURMvmVEX1gyXFgn5QMn81bYk70qa0HLzcIOSVEyl57n6o9ItHeBtUSWdvKAPY0xlvBHno4/v3QPrT83q9g==}
-
   canvg@3.0.10:
     resolution: {integrity: sha512-qwR2FRNO9NlzTeKIPIKpnTY6fqwuYSequ8Ru8c0YkYU7U0oW+hLUvWadLvAu1Rl72OMNiFhoLu4f8eUjQ7l/+Q==}
     engines: {node: '>=10.0.0'}
@@ -1810,13 +1804,6 @@ packages:
   printable-characters@1.0.42:
     resolution: {integrity: sha512-dKp+C4iXWK4vVYZmYSd0KBH5F/h1HoZRsbJ82AVKRO3PEo8L4lBS/vLwhVtpwwuYcoIsVY+1JYKR268yn480uQ==}
 
-  prism-svelte@0.5.0:
-    resolution: {integrity: sha512-db91Bf3pRGKDPz1lAqLFSJXeW13mulUJxhycysFpfXV5MIK7RgWWK2E5aPAa71s8TCzQUXxF5JOV42/iOs6QkA==}
-
-  prismjs@1.29.0:
-    resolution: {integrity: sha512-Kx/1w86q/epKcmte75LNrEoT+lX8pBpavuAbvJWRXar7Hz8jrtF+e3vY751p0R8H9HdArwaCTNDDzHg/ScJK1Q==}
-    engines: {node: '>=6'}
-
   psl@1.9.0:
     resolution: {integrity: sha512-E/ZsdU4HLs/68gYzgGTkMicWTLPdAftJLfJFlLUAAKZGkStNU72sZjT66SnMDVOfOWY/YAoiD7Jxa9iHvngcag==}
 
@@ -2042,11 +2029,6 @@ packages:
     engines: {node: ^12.20 || ^14.13.1 || >= 16}
     peerDependencies:
       svelte: ^3.19.0 || ^4.0.0
-
-  svelte-legos@0.2.5:
-    resolution: {integrity: sha512-r4HbLYripCLECgraqJMvsykW/8FaPBd1hLkt3ejJzJRfhhOnCgGTo6lJT27qrestDFbiIASQV3xOnjRr/D6cGw==}
-    peerDependencies:
-      svelte: ^4.0.0
 
   svelte-simple-modal@1.6.2:
     resolution: {integrity: sha512-cRjpqjZTH0rU5G+SRhUDHOV6TISQs6AnEW/Z7D5uXiz5V/3axrBYcBCPnKMI2Z0EyXmpwPXK4q9grroQTL6rhQ==}
@@ -3030,8 +3012,6 @@ snapshots:
 
   caniuse-lite@1.0.30001660: {}
 
-  canvas-confetti@1.9.3: {}
-
   canvg@3.0.10:
     dependencies:
       '@babel/runtime': 7.25.6
@@ -3878,10 +3858,6 @@ snapshots:
 
   printable-characters@1.0.42: {}
 
-  prism-svelte@0.5.0: {}
-
-  prismjs@1.29.0: {}
-
   psl@1.9.0: {}
 
   punycode@2.3.1: {}
@@ -4133,13 +4109,6 @@ snapshots:
 
   svelte-hmr@0.16.0(svelte@4.2.19):
     dependencies:
-      svelte: 4.2.19
-
-  svelte-legos@0.2.5(svelte@4.2.19):
-    dependencies:
-      canvas-confetti: 1.9.3
-      prism-svelte: 0.5.0
-      prismjs: 1.29.0
       svelte: 4.2.19
 
   svelte-simple-modal@1.6.2(svelte@4.2.19):

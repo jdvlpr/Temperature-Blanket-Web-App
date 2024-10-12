@@ -22,12 +22,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
   export let handler,
     search = true,
     hidePageLabel = false;
+
   let element;
 
   const triggerChange = handler.getTriggerChange();
 
   const scrollTop = () => {
-    if (element) element.scrollTop = 0;
+    if (typeof element !== 'undefined') element.scrollTop = 0;
   };
 
   const rowCount = handler.getRowCount();

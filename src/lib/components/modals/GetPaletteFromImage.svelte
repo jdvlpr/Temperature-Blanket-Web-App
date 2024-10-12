@@ -350,7 +350,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <button
       class="btn bg-secondary-hover-token gap-1"
       on:click={() => {
-        if (input) input.click();
+        if (typeof input !== 'undefined') input.click();
       }}
       ><svg
         xmlns="http://www.w3.org/2000/svg"
