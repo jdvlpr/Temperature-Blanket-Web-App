@@ -61,7 +61,6 @@ export const svgToPNG = async ({
 
   // Read the SVG string using the fromString method
   // of Canvg
-
   const { Canvg } = await import('canvg');
   let v = Canvg.fromString(ctx, outerHTML);
 
