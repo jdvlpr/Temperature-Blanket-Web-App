@@ -327,7 +327,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </p>
 
         <p>
-          <a href="/changelog" rel="noreferrer" class="link">Changelog</a>
+          <a href="/changelog" rel="noreferrer" class="link"
+            >Changelog - What's New?</a
+          >
         </p>
 
         <div class="flex items-center gap-2">
