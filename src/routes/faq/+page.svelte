@@ -119,8 +119,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
             >
             <svelte:fragment slot="content">
               <p>
-                No. And Yes. The website is the app. It's not in the Apple or
-                Google app store, but you can
+                The website is the app. It's not in the Apple or Google app
+                store, but you can
                 <a
                   href="https://www.cdc.gov/niosh/mining/content/hearingloss/installPWA.html"
                   target="_blank"

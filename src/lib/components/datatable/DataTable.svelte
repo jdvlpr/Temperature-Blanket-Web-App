@@ -27,7 +27,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   const triggerChange = handler.getTriggerChange();
 
   const scrollTop = () => {
-    if (element) element.scrollTop = 0;
+    if (typeof element !== 'undefined') element.scrollTop = 0;
   };
 
   const rowCount = handler.getRowCount();

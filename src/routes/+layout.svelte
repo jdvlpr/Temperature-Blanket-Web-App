@@ -179,15 +179,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <Toast max={3} position="b" />
 
-<div
-  class="bg-tertiary-200-700-token w-full p-2 text-sm text-center [view-transition-name:top-notification]"
->
-  <p>
-    🎉 This web app is
-    <a href="/blog/2024-09-03-now-open-source" class="link">now open source</a>!
-  </p>
-</div>
-
 <slot />
 
 <style>

@@ -84,7 +84,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       >
         <p class="text-left">
           See what's new and review past changes from {PUBLIC_BASE_DOMAIN_NAME}.
-          This changelog includes only certain select milestones.
+          This changelog includes only select milestones.
           <a
             href="{PUBLIC_GITHUB_LINK}/commits/main/"
             class="link"

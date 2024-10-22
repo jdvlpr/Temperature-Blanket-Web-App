@@ -33,7 +33,8 @@ import { get } from 'svelte/store';
 // Go to a section
 export const goToProjectSection = async (index) => {
   if (index === 0) {
-    document.documentElement.scrollTop = 0;
+    if (typeof document.documentElement !== 'undefined')
+      document.documentElement.scrollTop = 0;
     return;
   }
 
