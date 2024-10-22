@@ -140,6 +140,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         $projects = results;
 
         loading = false;
+
         if (typeof document.getElementsByClassName('content') !== 'undefined')
           document.getElementsByClassName('content')[0].scrollTop = 0;
       }}
