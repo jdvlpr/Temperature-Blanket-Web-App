@@ -408,6 +408,26 @@ const colorways: Colorway[] = [
         name: 'Misty Green',
         hex: '#92a792',
       },
+      {
+        name: 'Creamy Peach',
+        hex: '#efb992',
+      },
+      {
+        name: 'Warm Coral',
+        hex: '#e68163',
+      },
+      {
+        name: 'Orange Red',
+        hex: '#e24930',
+      },
+      {
+        name: 'Pastel Purple',
+        hex: '#e4bcd0',
+      },
+      {
+        name: 'Waterfall',
+        hex: '#d9e5eb',
+      },
     ],
   },
 ];
