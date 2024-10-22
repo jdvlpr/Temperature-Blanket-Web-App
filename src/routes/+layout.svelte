@@ -15,11 +15,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import { onNavigate } from '$app/navigation';
-  import {
-    PUBLIC_GITHUB_LINK,
-    PUBLIC_MICROSOFT_CLARITY_ID,
-  } from '$env/static/public';
-  import { consentToMSClarityCookies, isOnline } from '$lib/stores';
+  import { PUBLIC_MICROSOFT_CLARITY_ID } from '$env/static/public';
+  import { consentToMSClarityCookies } from '$lib/stores';
   import {
     privacy,
     setupLocalStorageLayout,
@@ -40,8 +37,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     offset,
     shift,
   } from 'svelte-floating-ui/dom';
+  import { onlineStore } from 'svelte-legos';
   import '../css/main.css';
-  import { page } from '$app/stores';
 
   initializeStores();
 
@@ -54,6 +51,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     arrow,
   });
 
+  const isOnline = onlineStore();
   const toastStore = getToastStore();
 
   privacy.init();
@@ -65,8 +63,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     // NOTE: Set window variable in order to access it inside the MS clarity function
     // See the script tag with id="clarity-script"
     window.MS_CLARITY_ID = PUBLIC_MICROSOFT_CLARITY_ID || null;
-
-    listenForOnlineStatusChanges();
   });
 
   onNavigate((navigation) => {
@@ -80,11 +76,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     });
   });
 
-  function listenForOnlineStatusChanges() {
-    // Alert if online connection restored
-    window.addEventListener('online', () => {
-      $isOnline = true;
+  let networkChangeCount = 0;
+  $: $isOnline, onChangeIsOnline();
 
+  function onChangeIsOnline() {
+    if ($isOnline && networkChangeCount > 0) {
+      // Alert if online connection restored
       toastStore.trigger({
         message: `<div
     class="w-full text-center p-2 m-auto flex flex-col items-start justify-center"
@@ -96,11 +93,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </div>`,
         background: 'bg-success-200-700-token text-token',
       });
-    });
-
-    // Alert if connection is offline
-    window.addEventListener('offline', () => {
-      $isOnline = false;
+    } else if (!$isOnline) {
       toastStore.trigger({
         message: `<div
     class="w-full p-2 m-auto flex flex-col items-start text-left"
@@ -127,7 +120,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </div>`,
         background: 'bg-warning-200-700-token text-token',
       });
-    });
+    }
+    networkChangeCount++;
   }
 </script>
 

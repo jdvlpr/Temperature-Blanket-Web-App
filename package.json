@@ -48,6 +48,7 @@
     "svelte-check": "^4.0.5",
     "svelte-dnd-action": "^0.9.51",
     "svelte-floating-ui": "^1.5.6",
+    "svelte-legos": "^0.2.4",
     "tailwindcss": "^3.4.13",
     "tslib": "^2.7.0",
     "typescript": "^5.5.4",
