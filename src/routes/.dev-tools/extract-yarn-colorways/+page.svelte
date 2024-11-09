@@ -12,6 +12,8 @@
   let content: string = '';
   let showClearButton = false;
 
+  let numberOfColumns = '3';
+
   $: querySelector = '';
   $: useElementAttribute = false;
   $: querySelectorAttribute = '';
@@ -233,21 +235,43 @@
           {/if}
         </div>
 
+        <div class="flex flex-col">
+          <label class="label" for="numberOfColumns">Number of Columns</label>
+          <select
+            class="select w-fit"
+            id="numberOfColumns"
+            bind:value={numberOfColumns}
+          >
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="6">6</option>
+          </select>
+        </div>
+
         {#if names?.length}
           <p>{names.length} Colorways</p>
-          <div
-            class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 justify-start"
-          >
+          <div class="grid justify-start grid-cols-12">
             {#each names as { name, hex }, index}
               <div
-                class="p-2 flex flex-col gap-1 shadow min-w-[100px]"
+                class="p-2 flex flex-col gap-1"
+                class:col-span-full={numberOfColumns === '1'}
+                class:col-span-6={numberOfColumns === '2'}
+                class:col-span-4={numberOfColumns === '3'}
+                class:col-span-3={numberOfColumns === '4'}
+                class:col-span-2={numberOfColumns === '6'}
                 style="background:{hex};color:{getTextColor(hex)}"
               >
                 <p class="text-sm">{index + 1}</p>
                 <div contenteditable="true" bind:innerHTML={name} class="">
                   {name}
                 </div>
-                <div contenteditable="true" bind:innerHTML={hex} class="">
+                <div
+                  contenteditable="true"
+                  bind:innerHTML={hex}
+                  class="border bg-white text-black"
+                >
                   {hex}
                 </div>
               </div>

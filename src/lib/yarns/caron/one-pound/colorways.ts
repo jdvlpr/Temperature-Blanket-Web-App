@@ -4,8 +4,8 @@ const colorways: Colorway[] = [
   {
     source: {
       name: 'yarnspirations.com',
-      href: 'https://www.yarnspirations.com/caron-one-pound-yarn/294010.html',
-      accessed: '2022-03-18',
+      href: 'https://www.yarnspirations.com/products/caron-one-pound-yarn',
+      accessed: '2024-11-09',
     },
     colors: [
       {
@@ -46,7 +46,7 @@ const colorways: Colorway[] = [
       },
       {
         hex: '#c1d7ef',
-        name: 'Sky blue',
+        name: 'Sky Blue',
       },
       {
         hex: '#e0d4c9',
@@ -171,6 +171,58 @@ const colorways: Colorway[] = [
       {
         hex: '#456164',
         name: 'Hosta',
+      },
+      {
+        hex: '#ece3e9',
+        name: 'Pink',
+      },
+      {
+        hex: '#a89a98',
+        name: 'Dove',
+      },
+      {
+        hex: '#eb8270',
+        name: 'Living Coral',
+      },
+      {
+        hex: '#f0d164',
+        name: 'Sun Yellow',
+      },
+      {
+        hex: '#90566d',
+        name: 'Raspberry Pink',
+      },
+      {
+        hex: '#2c434a',
+        name: 'Deep Sea Teal',
+      },
+      {
+        hex: '#947d75',
+        name: 'Truffle',
+      },
+      {
+        hex: '#cb8f74',
+        name: 'Faded Brick',
+      },
+      {
+        hex: '#e0bb7d',
+        name: 'Dijon',
+      },
+      {
+        hex: '#98a897',
+        name: 'Succulent',
+      },
+      {
+        hex: '#ae3f62',
+        name: 'Raspberry',
+      },
+      {
+        hex: '#443b46',
+        name: 'Black Plum',
+      },
+      {
+        hex: '#3b84b1',
+        name: 'Blue Danube',
       },
     ],
   },

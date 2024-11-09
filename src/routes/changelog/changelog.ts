@@ -19,6 +19,22 @@ import type { ChangelogItem } from '$lib/types';
 
 export const entries: ChangelogItem[] = [
   {
+    date: 'November, 2024',
+    notes: [
+      {
+        icon: ICONS.checkCircle,
+        text: `13 new colorways`,
+        title: 'Added New Yarn Colorways: Caron - One Pound',
+      },
+      {
+        icon: ICONS.checkCircle,
+        text: `39 colorways`,
+        title: 'Added Yarn: Hobbii - Winter Glow Solid',
+      },
+    ],
+    version: '4.5.0',
+  },
+  {
     date: 'October, 2024',
     notes: [
       {
