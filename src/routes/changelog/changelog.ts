@@ -28,6 +28,16 @@ export const entries: ChangelogItem[] = [
       },
       {
         icon: ICONS.checkCircle,
+        text: `50 colorways`,
+        title: 'Added Yarn: Hobbii - Friends Wheel',
+      },
+      {
+        icon: ICONS.checkCircle,
+        text: `50 colorways`,
+        title: 'Added Yarn: Hobbii - Twister Solid',
+      },
+      {
+        icon: ICONS.checkCircle,
         text: `39 colorways`,
         title: 'Added Yarn: Hobbii - Winter Glow Solid',
       },

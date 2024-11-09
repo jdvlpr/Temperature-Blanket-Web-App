@@ -12,7 +12,7 @@
   let content: string = '';
   let showClearButton = false;
 
-  let numberOfColumns = '3';
+  let columnWidth = 200;
 
   $: querySelector = '';
   $: useElementAttribute = false;
@@ -236,32 +236,24 @@
         </div>
 
         <div class="flex flex-col">
-          <label class="label" for="numberOfColumns">Number of Columns</label>
-          <select
+          <label class="label" for="numberOfColumns">Column Width (px)</label>
+          <input
+            type="number"
             class="select w-fit"
             id="numberOfColumns"
-            bind:value={numberOfColumns}
-          >
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="6">6</option>
-          </select>
+            bind:value={columnWidth}
+          />
         </div>
 
         {#if names?.length}
           <p>{names.length} Colorways</p>
-          <div class="grid justify-start grid-cols-12">
+          <div class="flex justify-start flex-wrap">
             {#each names as { name, hex }, index}
               <div
                 class="p-2 flex flex-col gap-1"
-                class:col-span-full={numberOfColumns === '1'}
-                class:col-span-6={numberOfColumns === '2'}
-                class:col-span-4={numberOfColumns === '3'}
-                class:col-span-3={numberOfColumns === '4'}
-                class:col-span-2={numberOfColumns === '6'}
-                style="background:{hex};color:{getTextColor(hex)}"
+                style="background:{hex};color:{getTextColor(
+                  hex,
+                )};width:{columnWidth}px"
               >
                 <p class="text-sm">{index + 1}</p>
                 <div contenteditable="true" bind:innerHTML={name} class="">
