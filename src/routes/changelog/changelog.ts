@@ -23,6 +23,16 @@ export const entries: ChangelogItem[] = [
     notes: [
       {
         icon: ICONS.checkCircle,
+        text: `45 colorways`,
+        title: 'Added Yarn: Ice Yarns - Lorena Worsted',
+      },
+    ],
+    version: '4.6.0',
+  },
+  {
+    notes: [
+      {
+        icon: ICONS.checkCircle,
         text: `13 new colorways`,
         title: 'Added New Yarn Colorways: Caron - One Pound',
       },

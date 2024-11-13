@@ -15,6 +15,7 @@
 
 export interface Brand {
   name: string;
+  /** snake_case version of the name */
   id: string;
   yarns: Yarn[];
 }
