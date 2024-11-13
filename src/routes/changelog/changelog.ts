@@ -26,6 +26,11 @@ export const entries: ChangelogItem[] = [
         text: `45 colorways`,
         title: 'Added Yarn: Ice Yarns - Lorena Worsted',
       },
+      {
+        icon: ICONS.checkCircle,
+        text: `29 colorways`,
+        title: 'Added Yarn: Knitting for Olive - Cotton Merino',
+      },
     ],
     version: '4.6.0',
   },
