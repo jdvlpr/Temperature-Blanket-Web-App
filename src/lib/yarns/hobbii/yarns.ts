@@ -12,6 +12,7 @@ import { yarn as rainbowCottonEightFour } from './rainbow-cotton-8-4/yarn';
 import { yarn as rainbowCottonEightEight } from './rainbow-cotton-8-8/yarn';
 import { yarn as tweedDreams } from './tweed-dreams/yarn';
 import { yarn as twisterSolid } from './twister-solid/yarn';
+import { yarn as udon } from './udon/yarn';
 import { yarn as unicornSolid } from './unicorn-solid/yarn';
 import { yarn as winterGlowSolid } from './winter-glow-solid/yarn';
 
@@ -32,6 +33,7 @@ export const brand: Brand = {
     rainbowCottonEightEight,
     tweedDreams,
     twisterSolid,
+    udon,
     unicornSolid,
     winterGlowSolid,
   ],
