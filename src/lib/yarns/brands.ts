@@ -46,6 +46,7 @@ import { brand as svartaFaret } from './svarta-faret/yarns';
 import { brand as tricotCafe } from './tricot-cafe/yarns';
 import { brand as valleyYarns } from './valley-yarns/yarns';
 import { brand as weLoveYarn } from './we-love-yarn/yarns';
+import { brand as westYorkshireSpinners } from './west-yorkshire-spinners/yarns';
 import { brand as willowYarns } from './willow-yarns/yarns';
 import { brand as yarnAndColors } from './yarn-and-colors/yarns';
 import { brand as yarnart } from './yarnart/yarns';
@@ -99,6 +100,7 @@ export const brands: Brand[] = [
   tricotCafe,
   valleyYarns,
   weLoveYarn,
+  westYorkshireSpinners,
   willowYarns,
   yarnAndColors,
   yarnart,

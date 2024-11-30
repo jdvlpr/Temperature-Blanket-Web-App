@@ -26,6 +26,11 @@ export const entries: ChangelogItem[] = [
         text: `14 colorways`,
         title: 'Added Yarn: Hobbii - Udon',
       },
+      {
+        icon: ICONS.checkCircle,
+        text: `25 colorways`,
+        title: 'Added Yarn: West Yorkshire Spinners - The Croft DK',
+      },
     ],
     version: '4.7.0',
   },
