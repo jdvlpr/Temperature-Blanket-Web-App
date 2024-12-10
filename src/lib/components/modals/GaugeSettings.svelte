@@ -49,7 +49,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let incrementMode = _rangeOptions.isCustomRanges ? '' : _rangeOptions.mode;
 
   let customRanges = [...ranges];
-  let showAdvancedControls = false;
+  let showAdvancedControls = true;
   let changedGaugeDirectionOnCustomRanges = false;
   let start, increment;
   let setupContainer;
