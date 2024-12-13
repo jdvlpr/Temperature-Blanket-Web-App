@@ -41,6 +41,7 @@ import { brand as schachenmayr } from './schachenmayr/yarns';
 import { brand as scheepjes } from './scheepjes/yarns';
 import { brand as sirdar } from './sirdar/yarns';
 import { brand as skeinz } from './skeinz/yarns';
+import { brand as sourceOfFibre } from './source-of-fibre/yarns';
 import { brand as stylecraft } from './stylecraft/yarns';
 import { brand as svartaFaret } from './svarta-faret/yarns';
 import { brand as tricotCafe } from './tricot-cafe/yarns';
@@ -95,6 +96,7 @@ export const brands: Brand[] = [
   scheepjes,
   sirdar,
   skeinz,
+  sourceOfFibre,
   stylecraft,
   svartaFaret,
   tricotCafe,
