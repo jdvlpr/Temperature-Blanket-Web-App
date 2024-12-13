@@ -86,28 +86,7 @@ export const entries: ChangelogItem[] = [
     version: '4.5.0',
   },
   {
-    date: 'October, 2024',
-    notes: [
-      {
-        icon: ICONS.checkCircle,
-        text: `5 new colorways`,
-        title: 'Added New Yarn Colorways: Hobbii - Friends Cotton 8/4',
-      },
-    ],
-    version: '4.4.0',
-  },
-  {
     date: 'September, 2024',
-    notes: [
-      {
-        icon: ICONS.checkCircle,
-        text: `50 colorways`,
-        title: 'Added Yarn: Sandnes - Tynn Peer Gynt',
-      },
-    ],
-    version: '4.3.0',
-  },
-  {
     notes: [
       {
         icon: `<svg
@@ -127,21 +106,7 @@ export const entries: ChangelogItem[] = [
     ],
     version: '4.2.0',
   },
-  {
-    notes: [
-      {
-        icon: ICONS.checkCircle,
-        text: `3 new colorways`,
-        title: 'Added New Yarn Colorways: Bernat - Blanket Mist-ical',
-      },
-      {
-        icon: ICONS.checkCircle,
-        text: `12 colorways`,
-        title: 'Added Yarn: Lion Brand - Re-Up Bonus Bundle',
-      },
-    ],
-    version: '4.1.0',
-  },
+
   {
     notes: [
       {
