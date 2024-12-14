@@ -28,13 +28,13 @@ export const entries: ChangelogItem[] = [
       },
       {
         icon: ICONS.checkCircle,
-        text: `Added 34 new colorways`,
-        title: 'Updated Yarn: Knit Picks - Swish Worsted',
+        text: `22 colorways`,
+        title: 'Added Yarn: Source of Fibre - Dirty DK',
       },
       {
         icon: ICONS.checkCircle,
-        text: `22 colorways`,
-        title: 'Added Yarn: Source of Fibre - Dirty DK',
+        text: `Added 34 new colorways`,
+        title: 'Updated Yarn: Knit Picks - Swish Worsted',
       },
     ],
     version: '4.8.0',
