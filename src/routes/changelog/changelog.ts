@@ -28,6 +28,11 @@ export const entries: ChangelogItem[] = [
       },
       {
         icon: ICONS.checkCircle,
+        text: `Added 34 new colorways`,
+        title: 'Updated Yarn: Knit Picks - Swish Worsted',
+      },
+      {
+        icon: ICONS.checkCircle,
         text: `22 colorways`,
         title: 'Added Yarn: Source of Fibre - Dirty DK',
       },

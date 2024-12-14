@@ -5,7 +5,7 @@ const colorways: Colorway[] = [
     source: {
       name: 'knitpicks.com',
       href: 'https://www.knitpicks.com/yarn/swish-worsted/c/5420153',
-      accessed: '2023-01-16',
+      accessed: '2024-12-14',
     },
     colors: [
       {
@@ -19,6 +19,10 @@ const colorways: Colorway[] = [
       {
         hex: '#323852',
         name: 'Delft Heather',
+      },
+      {
+        hex: '#66829f',
+        name: 'Denim',
       },
       {
         hex: '#1f2c5a',
@@ -41,6 +45,10 @@ const colorways: Colorway[] = [
         name: 'Serene',
       },
       {
+        hex: '#a8bbdd',
+        name: 'Stonewash',
+      },
+      {
         hex: '#0b6672',
         name: 'Voyage Heather',
       },
@@ -61,8 +69,24 @@ const colorways: Colorway[] = [
         name: 'Rainforest Heather',
       },
       {
+        hex: '#beb149',
+        name: 'Bracken',
+      },
+      {
         hex: '#4e5d40',
         name: 'Dublin',
+      },
+      {
+        hex: '#3a4b39',
+        name: 'Forest Heather',
+      },
+      {
+        hex: '#c7cf4e',
+        name: 'Granny Smith',
+      },
+      {
+        hex: '#396241',
+        name: 'Grass',
       },
       {
         hex: '#b6b56c',
@@ -77,8 +101,32 @@ const colorways: Colorway[] = [
         name: 'Lost Lake Heather',
       },
       {
+        hex: '#a2c59a',
+        name: 'Mint Julep',
+      },
+      {
         hex: '#97b75e',
         name: 'Peapod',
+      },
+      {
+        hex: '#9baa91',
+        name: 'Savory',
+      },
+      {
+        hex: '#677963',
+        name: 'Seaweed',
+      },
+      {
+        hex: '#d9bc63',
+        name: 'Banana Pudding',
+      },
+      {
+        hex: '#e9c342',
+        name: 'Citron',
+      },
+      {
+        hex: '#cd9c36',
+        name: 'Dijon',
       },
       {
         hex: '#947b32',
@@ -97,12 +145,44 @@ const colorways: Colorway[] = [
         name: 'Allspice',
       },
       {
+        hex: '#dd7637',
+        name: 'California Poppy',
+      },
+      {
+        hex: '#e2743d',
+        name: 'Carrot Juice',
+      },
+      {
         hex: '#d7804c',
         name: 'Clementine',
       },
       {
         hex: '#743a2a',
         name: 'Copper',
+      },
+      {
+        hex: '#ce9138',
+        name: 'Curry',
+      },
+      {
+        hex: '#cb5f32',
+        name: 'Solar Flare Heather',
+      },
+      {
+        hex: '#eab03e',
+        name: 'Squash Blossom',
+      },
+      {
+        hex: '#ca4930',
+        name: 'Buoy',
+      },
+      {
+        hex: '#64292e',
+        name: 'Cranberry Heather',
+      },
+      {
+        hex: '#8a322f',
+        name: 'Firecracker Heather',
       },
       {
         hex: '#511e23',
@@ -113,8 +193,20 @@ const colorways: Colorway[] = [
         name: 'Hollyberry',
       },
       {
+        hex: '#ab3c2a',
+        name: 'Phoenix',
+      },
+      {
         hex: '#a52732',
         name: 'Serrano',
+      },
+      {
+        hex: '#d23d37',
+        name: 'Smooch',
+      },
+      {
+        hex: '#a62231',
+        name: 'Beet Juice',
       },
       {
         hex: '#e19aa4',
@@ -127,6 +219,10 @@ const colorways: Colorway[] = [
       {
         hex: '#cc2a71',
         name: 'Crush',
+      },
+      {
+        hex: '#d46596',
+        name: 'Doll Shoes',
       },
       {
         hex: '#e9c4c3',
@@ -149,6 +245,14 @@ const colorways: Colorway[] = [
         name: 'Throne',
       },
       {
+        hex: '#a89ec5',
+        name: 'Allium',
+      },
+      {
+        hex: '#a31d6d',
+        name: 'Throne',
+      },
+      {
         hex: '#553156',
         name: 'Amethyst Heather',
       },
@@ -165,8 +269,40 @@ const colorways: Colorway[] = [
         name: 'Indigo Heather',
       },
       {
+        hex: '#bd79b5',
+        name: 'Lady Slipper',
+      },
+      {
+        hex: '#432e54',
+        name: 'Mixed Berry Heather',
+      },
+      {
+        hex: '#3a1e2e',
+        name: 'Night Shade Heather',
+      },
+      {
+        hex: '#5e3283',
+        name: 'Poet',
+      },
+      {
+        hex: '#55569f',
+        name: 'Purplewinkle',
+      },
+      {
+        hex: '#46251b',
+        name: 'Burnt Umber Heather',
+      },
+      {
+        hex: '#784122',
+        name: 'Cider',
+      },
+      {
         hex: '#5c4127',
         name: 'Pinecone Heather',
+      },
+      {
+        hex: '#bc9a76',
+        name: 'Shortbread',
       },
       {
         hex: '#8b8079',
