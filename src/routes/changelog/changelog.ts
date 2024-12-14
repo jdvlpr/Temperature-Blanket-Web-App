@@ -23,6 +23,11 @@ export const entries: ChangelogItem[] = [
     notes: [
       {
         icon: ICONS.checkCircle,
+        text: `75 colorways`,
+        title: 'Added Yarn: Hobbii - Friends Cotton 8/8',
+      },
+      {
+        icon: ICONS.checkCircle,
         text: `22 colorways`,
         title: 'Added Yarn: Source of Fibre - Dirty DK',
       },
