@@ -98,6 +98,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   <div class="range-select">
     <button
+      aria-label="Show Previous {capitalizeFirstLetter(
+        $weatherGrouping,
+      )}'s Weather"
       class="prev scale-125 btn-icon bg-secondary-hover-token"
       on:click={() => $activeWeatherElementIndex--}
       disabled={$activeWeatherElementIndex === 0}
@@ -118,6 +121,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </svg>
     </button>
     <input
+      aria-label="Select {capitalizeFirstLetter($weatherGrouping)}'s Weather"
       type="range"
       min="0"
       max={data?.length - 1}
@@ -132,6 +136,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     />
 
     <button
+      aria-label="Show Next {capitalizeFirstLetter($weatherGrouping)}'s Weather"
       class="next scale-125 btn-icon bg-secondary-hover-token"
       on:click={() => $activeWeatherElementIndex++}
       disabled={$activeWeatherElementIndex === data?.length - 1}

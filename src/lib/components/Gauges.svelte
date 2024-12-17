@@ -53,7 +53,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <div class="inline-flex justify-center items-center gap-2 mb-2 mt-3">
   {#key $gaugesState}
     <label class="label">
-      <span />
       <select
         class="select w-fit"
         id="gauges-select"

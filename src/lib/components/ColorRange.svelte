@@ -39,17 +39,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
           `range-${index}-to`;
 
       const focusOn = wasToClicked ? 'to' : 'from';
-      modal.set(
-        bind(GaugeSettings, {
-          index,
-          focusOn,
-          props,
-          ranges,
-          colors,
-          rangeOptions,
-          onSave: onSaveRangeOptinos,
-        }),
-      );
+      modal.state.trigger({
+        type: 'component',
+        component: {
+          ref: GaugeSettings,
+          props: {
+            index,
+            focusOn,
+            props,
+            ranges,
+            colors,
+            rangeOptions,
+            onSave: onSaveRangeOptinos,
+          },
+        },
+      });
     }}
   >
     <span class="flex flex-col text-left" id="range-{index}-from"

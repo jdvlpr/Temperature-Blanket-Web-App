@@ -13,7 +13,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script>
+<script lang="ts">
   import { browser } from '$app/environment';
   import LocalProjects from '$lib/components/LocalProjects.svelte';
   import ProjectDetails from '$lib/components/ProjectDetails.svelte';
@@ -21,7 +21,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import YarnSources from '$lib/components/YarnSources.svelte';
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
   import ChooseWeatherSource from '$lib/components/modals/ChooseWeatherSource.svelte';
-  import CloseButton from '$lib/components/modals/CloseButton.svelte';
   import KeyboardShortcuts from '$lib/components/modals/KeyboardShortcuts.svelte';
   import {
     activePreview,
@@ -41,13 +40,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     setLocalStorageProject,
   } from '$lib/utils';
   import { getToastStore } from '@skeletonlabs/skeleton';
-  import { getContext } from 'svelte';
-  import { bind } from 'svelte-simple-modal';
+  import ModalShell from './ModalShell.svelte';
 
   const toastStore = getToastStore();
 
-  const { close } = getContext('simple-modal');
-
+  export let parent: any;
   export let page = 'main';
 
   let copiedMessage = '';
@@ -110,12 +107,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 </script>
 
-<CloseButton onClose={close} />
-
-<div class="p-2 sm:p-4">
+<ModalShell {parent}>
   <div class="m-2 text-left">
     {#if !pages.main}
       <button
+        aria-label="Go To Main Menu"
         class="btn-icon bg-secondary-hover-token"
         on:click={() => goTo('main')}
         title="Go To Main Menu"
@@ -192,7 +188,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
           <button
             class="btn bg-secondary-hover-token w-fit gap-2"
-            on:click={() => close(modal.set(bind(KeyboardShortcuts)))}
+            on:click={async () => {
+              modal.state.close();
+              modal.state.trigger({
+                type: 'component',
+                component: { ref: KeyboardShortcuts },
+              });
+            }}
             title="View Keyboard Shortcuts"
           >
             <svg
@@ -218,12 +220,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <h2 class="mb-2 mt-8 text-xl font-bold">Settings</h2>
         <div class="flex flex-col items-start gap-2 w-full card p-4">
           <UnitChanger />
-          <!-- <ThemeSwitcher showText={true} /> -->
 
           <button
             class="btn bg-secondary-hover-token w-fit"
             on:click={() => {
-              close(modal.set(bind(ChooseWeatherSource)));
+              modal.state.trigger({
+                type: 'component',
+                component: { ref: ChooseWeatherSource },
+              });
             }}
           >
             <svg
@@ -515,4 +519,4 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </div>
 
   <p class="font-ornament text-5xl mt-8">T</p>
-</div>
+</ModalShell>

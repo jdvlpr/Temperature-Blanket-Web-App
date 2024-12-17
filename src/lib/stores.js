@@ -19,7 +19,7 @@ export * from '$lib/stores/location-stores';
 export * from '$lib/stores/units-stores';
 export * from '$lib/stores/weather-stores';
 export * from '$lib/stores/gauges-stores';
-export * from '$lib/stores/page-stores';
+export * from '$lib/stores/page-stores.svelte';
 export * from '$lib/stores/preview-stores';
 export * from '$lib/stores/project-stores';
 export * from '$lib/stores/history-stores';

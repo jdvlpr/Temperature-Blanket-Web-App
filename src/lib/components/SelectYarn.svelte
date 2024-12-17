@@ -380,6 +380,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       />
       {#if !showingAutocomplete}
         <button
+          aria-label="Show All Yarns"
           {disabled}
           class="btn-icon !px-2 h-10"
           on:click={() => {
@@ -405,10 +406,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {/if}
       {#if inputValue.length || showingAutocomplete}
         <button
+          aria-label="Clear"
           {disabled}
           class="btn-icon !px-2 h-10"
           on:click={async () => {
-            // showingAutocomplete = false;
             inputValue = '';
             selectedBrandId = '';
             selectedYarnId = '';

@@ -447,7 +447,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           style="left:{coords.x}px;top:{coords.y}px;background:{cursorColor.hex};border:2px solid {getTextColor(
             cursorColor.hex,
           )}"
-        />
+        ></div>
       </div>
     {/if}
     <canvas
@@ -475,7 +475,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         addColorTouch(e);
         showCursor = true;
       }}
-    />
+    ></canvas>
   </div>
 
   {#if matchingYarnColors.length === MAXIMUM_COLORWAYS_MATCHES_FOR_IMAGES && !loading}

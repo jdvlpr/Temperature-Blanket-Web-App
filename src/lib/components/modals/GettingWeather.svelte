@@ -22,16 +22,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
     gettingLocationWeatherIndex,
     isCustomWeather,
     locations,
+    modal,
     signal,
     useSecondaryWeatherSources,
     wasWeatherLoadedFromLocalStorage,
     weatherUngrouped,
   } from '$lib/stores';
-  import { getContext, onMount } from 'svelte';
+  import { onMount } from 'svelte';
   // Note: the signal store is a weird necessity, investigate this
   import Spinner from '$lib/components/Spinner.svelte';
-  import CloseButton from '$lib/components/modals/CloseButton.svelte';
   import { delay, getOpenMeteo, goToProjectSection } from '$lib/utils';
+  import ModalShell from './ModalShell.svelte';
+
+  export let parent: any;
 
   let container: HTMLDivElement;
 
@@ -39,8 +42,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     container.focus();
     getWeatherData();
   });
-
-  const { close } = getContext('simple-modal');
 
   let error = false;
 
@@ -66,7 +67,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         $controller = null;
         $isCustomWeather = false;
         $wasWeatherLoadedFromLocalStorage = false;
-        close();
+        modal.state.close();
         goToProjectSection(2);
       })
       .catch((e) => {
@@ -188,31 +189,35 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 </script>
 
-<CloseButton onClose={close} />
-
-<div bind:this={container} class="px-2 pt-10 pb-6 sm:px-10">
-  {#if $signal && !error}
-    <Spinner />
-    <p class="font-bold text-xl my-4">Searching for Weather Data</p>
-    <p class="my-4 flex flex-col items-center">
-      <span> {@html $gettingLocationWeather}</span>
-      {#if allLocations?.length > 1}
-        <span class="flex flex-col items-center mt-2 w-full gap-1">
-          <progress
-            value={$gettingLocationWeatherIndex + 1}
-            max={allLocations.length}
-          />
-          <span class="text-xs">
-            {Math.round(
-              (($gettingLocationWeatherIndex + 1) / allLocations.length) * 100,
-            )}%
+<ModalShell {parent}>
+  <div
+    bind:this={container}
+    class="px-2 pt-10 pb-6 sm:px-10 flex flex-col items-center"
+  >
+    {#if $signal && !error}
+      <Spinner />
+      <p class="font-bold text-xl my-4">Searching for Weather Data</p>
+      <p class="my-4 flex flex-col items-center">
+        <span> {@html $gettingLocationWeather}</span>
+        {#if allLocations?.length > 1}
+          <span class="flex flex-col items-center mt-2 w-full gap-1">
+            <progress
+              value={$gettingLocationWeatherIndex + 1}
+              max={allLocations.length}
+            ></progress>
+            <span class="text-xs">
+              {Math.round(
+                (($gettingLocationWeatherIndex + 1) / allLocations.length) *
+                  100,
+              )}%
+            </span>
           </span>
-        </span>
-      {/if}
-    </p>
-  {/if}
+        {/if}
+      </p>
+    {/if}
 
-  {#if error}
-    <div class="mt-4">{@html error}</div>
-  {/if}
-</div>
+    {#if error}
+      <div class="mt-4">{@html error}</div>
+    {/if}
+  </div>
+</ModalShell>

@@ -54,7 +54,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <div class="bg-surface-300-600-token rounded-container-token my-2 mb-4 p-2">
   <div class="mb-2 flex flex-wrap justify-center items-center">
     <label class="label">
-      <span />
       <select
         class="select w-fit"
         id="select-pattern-type"

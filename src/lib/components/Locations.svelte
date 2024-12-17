@@ -18,7 +18,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Location from '$lib/components/Location.svelte';
   import ChooseWeatherSource from '$lib/components/modals/ChooseWeatherSource.svelte';
   import Tooltip from '$lib/components/Tooltip.svelte';
-  import { ICONS, MAXIMUM_LOCATIONS } from '$lib/constants';
+  import { MAXIMUM_LOCATIONS } from '$lib/constants';
   import {
     createdGauges,
     defaultWeatherSource,
@@ -35,7 +35,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '$lib/stores';
   import type { Location as LocationType } from '$lib/types';
   import { numberOfDays, pluralize } from '$lib/utils';
-  import { bind } from 'svelte-simple-modal';
   import { slide } from 'svelte/transition';
   import SearchForWeather from './buttons/SearchForWeather.svelte';
 
@@ -240,7 +239,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
       class="btn bg-secondary-hover-token text-left"
       disabled={$isProjectLoading}
       on:click={() => {
-        modal.set(bind(ChooseWeatherSource));
+        modal.state.trigger({
+          type: 'component',
+          component: { ref: ChooseWeatherSource },
+        });
       }}
     >
       <svg

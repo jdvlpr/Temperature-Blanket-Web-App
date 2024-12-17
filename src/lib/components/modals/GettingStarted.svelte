@@ -14,25 +14,18 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import CloseButton from '$lib/components/modals/CloseButton.svelte';
-  import { openDrawerGettingStarted } from '$lib/stores';
+  import { modal, openDrawerGettingStarted } from '$lib/stores';
   import { Step, Stepper } from '@skeletonlabs/skeleton';
-  import { getContext, hasContext, onMount } from 'svelte';
-
-  let close = null;
-  if (hasContext('simple-modal')) close = getContext('simple-modal')?.close;
+  import { onMount } from 'svelte';
+  export let parent: any;
 
   let container: HTMLDivElement;
   onMount(() => container.focus());
 </script>
 
-{#if close}
-  <CloseButton onClose={close} />
-{/if}
-
 <div
   bind:this={container}
-  class="px-2 pb-6 sm:px-10 text-left max-w-screen-lg {close
+  class="{parent?.background} {parent?.rounded} px-2 pb-6 sm:px-10 text-left max-w-screen-lg {close
     ? 'pt-16'
     : 'pt-4'}"
 >
@@ -40,7 +33,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     stepTerm=""
     buttonCompleteLabel="Lets Go!"
     on:complete={() => {
-      if (close) close();
+      if (modal[0]) modal.close();
       else $openDrawerGettingStarted = false;
     }}
   >

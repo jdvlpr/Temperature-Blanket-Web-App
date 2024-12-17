@@ -263,5 +263,5 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div class="bg-surface-50-900-token mb-4 h-[300px]">
-  <canvas id="weather-chart" bind:this={ctx} />
+  <canvas id="weather-chart" bind:this={ctx}></canvas>
 </div>

@@ -17,10 +17,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import WeatherTable from '$lib/components/modals/WeatherTable.svelte';
   import { modal, weatherGrouping } from '$lib/stores';
   import { getDaysInRange, getDaysPercent, pluralize } from '$lib/utils';
-  import { getContext } from 'svelte';
-  import { bind } from 'svelte-simple-modal';
+  import { getModalStore } from '@skeletonlabs/skeleton';
 
-  const isModal = typeof getContext('simple-modal') !== 'undefined';
+  const modalStore = getModalStore();
+  const isModal = modalStore[0];
 
   export let range, rangeOptions, props;
 
@@ -52,11 +52,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
         disabled={!daysInRange?.length}
         class="btn bg-secondary-hover-token"
         on:click={() =>
-          modal.set(
-            bind(WeatherTable, {
-              weatherData: daysInRange,
-            }),
-          )}
+          modal.state.trigger({
+            type: 'component',
+            component: {
+              ref: WeatherTable,
+              props: {
+                weatherData: daysInRange,
+              },
+            },
+          })}
       >
         <span class="flex flex-col items-start justify-center">
           <span class="text-xs">

@@ -14,18 +14,20 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  // This property is used by Modal.svelte to pass down the close function
-  export let onClose;
-  export let absolute = true;
+  /**
+   * @typedef {Object} Props
+   * @property {any} onClose - This property is used by Modal.svelte to pass down the close function
+   * @property {boolean} [absolute]
+   */
+
+  /** @type {Props} */
+  let { onClose, absolute = true } = $props();
 </script>
 
 <button
-  class="btn z-20 variant-glass-secondary flex justify-center items-center flex-auto"
-  class:btn-icon={absolute}
-  class:m-2={absolute}
-  class:fixed={absolute}
-  class:right-2={absolute}
-  on:click={onClose}
+  aria-label="Close"
+  class="btn btn-icon z-20 variant-glass-secondary flex justify-center items-center flex-auto float-right"
+  onclick={onClose}
 >
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -41,7 +43,4 @@ If not, see <https://www.gnu.org/licenses/>. -->
       d="M6 18L18 6M6 6l12 12"
     />
   </svg>
-  {#if !absolute}
-    <span class="font-bold pr-2">Cancel</span>
-  {/if}
 </button>

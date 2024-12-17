@@ -109,7 +109,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       bind:value={code}
       on:keyup={triggerChange}
       on:change={triggerChange}
-    />
+    ></textarea>
   </div>
 
   <div class="flex flex-wrap my-2 gap-2 items-center justify-start">

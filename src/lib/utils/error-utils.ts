@@ -15,7 +15,7 @@
 
 import Alert from '$lib/components/modals/Alert.svelte';
 import { modal } from '$lib/stores';
-import { onlineStore } from 'svelte-legos';
+import { onlineStore } from '@sveltelegos-blue/svelte-legos';
 import { bind } from 'svelte-simple-modal';
 import { get } from 'svelte/store';
 

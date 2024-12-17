@@ -188,9 +188,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 class="flex w-full h-6 overflow-hidden border-surface-50-900-token border"
                 style="border-radius:{rounded}"
               >
-                <div class="flex-auto" style="background:{colors.surface}" />
-                <div class="flex-auto" style="background:{colors.primary}" />
-                <div class="flex-auto" style="background:{colors.secondary}" />
+                <div
+                  class="flex-auto"
+                  style="background:{colors.surface}"
+                ></div>
+                <div
+                  class="flex-auto"
+                  style="background:{colors.primary}"
+                ></div>
+                <div
+                  class="flex-auto"
+                  style="background:{colors.secondary}"
+                ></div>
                 <!-- <div class="flex-auto" style="background:{colors.tertiary}" /> -->
               </div>
             </svelte:fragment>
@@ -198,8 +207,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </ListBoxItem>
         {/each}
       </ListBox>
-      <button class="close" />
+      <button class="close" aria-label="Close"></button>
     </div>
-    <div class="arrow bg-surface-300-600-token shadow-lg" />
+    <div class="arrow bg-surface-300-600-token shadow-lg"></div>
   </div>
 </div>

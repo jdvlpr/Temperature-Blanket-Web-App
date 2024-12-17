@@ -15,42 +15,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import AppNavigation from '$lib/components/AppNavigation.svelte';
-  import { controller, modal, showNavigationSideBar } from '$lib/stores';
+  import { showNavigationSideBar } from '$lib/stores';
   import {
     Drawer,
     TableOfContents,
     getDrawerStore,
   } from '@skeletonlabs/skeleton';
-  import { Modal } from 'svelte-simple-modal';
-  import { fade, slide } from 'svelte/transition';
+  import { slide } from 'svelte/transition';
 
   export let pageName = 'Menu';
 
   const drawerStore = getDrawerStore();
 </script>
-
-<Modal
-  show={$modal}
-  closeOnOuterClick={true}
-  closeButton={false}
-  transitionWindow={slide}
-  transitionWindowProps={{
-    duration: 200,
-  }}
-  transitionBg={fade}
-  transitionBgProps={{
-    duration: 200,
-  }}
-  classWindowWrap="!m-0 relative h-[100svh]"
-  classWindow="modal-window text-center !max-h-[calc(100svh)] !w-fit !max-w-screen-lg !m-0 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 max-md:!rounded-none md:!rounded-container-token !overflow-hidden !bg-surface-50-900-token"
-  classContent="text-token !p-0 !max-h-[calc(100svh)]"
-  classBg="backdrop-blur-md !justify-start sm:!justify-center !z-[300]"
-  on:close={(callback) => {
-    if ($controller) $controller.abort();
-    if (callback) callback;
-    $modal = false;
-  }}
-/>
 
 <Drawer
   position="left"

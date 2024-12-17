@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { page } from '$app/stores';
+import { page } from '$app/state';
 import KeyboardShortcuts from '$lib/components/modals/KeyboardShortcuts.svelte';
 import Menu from '$lib/components/modals/Menu.svelte';
 import {
@@ -27,6 +27,7 @@ import {
   weather,
 } from '$lib/stores';
 import { loadFromHistory, setTheme } from '$lib/utils';
+import { getModalStore, LightSwitch } from '@skeletonlabs/skeleton';
 import { bind } from 'svelte-simple-modal';
 import { get } from 'svelte/store';
 
@@ -115,11 +116,13 @@ const isRedo = (ev, style) => {
 
 export const handleKeyDown = (ev) => {
   // Only handle keyboard shortcuts on the main Project Planner page
-  const isProjectPlannerRoute = get(page).route.id === '/';
+  const isProjectPlannerRoute = page.route.id === '/';
+
+  const modalStore = get(modal.state);
 
   if (
     !isProjectPlannerRoute ||
-    get(modal) ||
+    modalStore[0] ||
     ev.target.tagName === 'INPUT' ||
     ev.target.tagName === 'TD'
   )
@@ -128,10 +131,16 @@ export const handleKeyDown = (ev) => {
   // Check for global shortcuts
   switch (ev.key) {
     case 'k':
-      modal.set(bind(KeyboardShortcuts));
+      modal.state.trigger({
+        type: 'component',
+        component: { ref: KeyboardShortcuts },
+      });
       break;
     case '.':
-      modal.set(bind(Menu, { page: 'main' }));
+      modal.state.trigger({
+        type: 'component',
+        component: { ref: Menu, props: { page: 'main' } },
+      });
       break;
     case 'u':
       units.toggle();
@@ -154,13 +163,19 @@ export const handleKeyDown = (ev) => {
     loadFromHistory({ action: 'redo' });
   } else if ((ev.metaKey || ev.ctrlKey) && ev.key === 's') {
     ev.preventDefault();
-    modal.set(bind(Menu, { page: 'save' }));
+    modal.state.trigger({
+      type: 'component',
+      component: { ref: Menu, props: { page: 'save' } },
+    });
   }
 
   // Check for section navigation shortcuts
   switch (ev.key) {
     case 'd':
-      modal.set(bind(Menu, { page: 'download' }));
+      modal.state.trigger({
+        type: 'component',
+        component: { ref: Menu, props: { page: 'download' } },
+      });
       break;
     case '0':
     case '1':

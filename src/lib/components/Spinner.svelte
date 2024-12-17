@@ -22,7 +22,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <div
   class="circle mx-auto border-y-surface-900 border-r-transparent border-l-surface-900 dark:border-y-surface-200 dark:border-l-surface-200"
   style="--size: {size}{unit}; --duration: {duration}"
-/>
+></div>
 
 <style>
   .circle {

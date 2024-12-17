@@ -56,8 +56,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {previousSectionTitle}
       </span>
     </button>
-  {:else}
-    <div />
   {/if}
   {#if nextSectionIndex}
     <button

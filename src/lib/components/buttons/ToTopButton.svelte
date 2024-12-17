@@ -22,6 +22,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <button
+  aria-label="Back to Top"
   transition:fade
   class="btn-icon backdrop-blur-sm p-2 m-2 z-20 shadow variant-filled-primary opacity-80 text-token transition-all inline-flex justify-center items-center gap-1 right-0"
   style="bottom:{bottom};position:{position}"

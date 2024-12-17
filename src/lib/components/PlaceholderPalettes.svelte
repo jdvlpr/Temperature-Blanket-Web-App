@@ -29,6 +29,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <div
       class="placeholder animate-pulse w-full rounded-container-token"
       style="height:{height}"
-    />
+    ></div>
   {/each}
 </div>

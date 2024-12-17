@@ -13,55 +13,55 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script>
-  import CloseButton from '$lib/components/modals/CloseButton.svelte';
+<script lang="ts">
   import { KEYBOARD_SHORTCUTS } from '$lib/constants';
-  import { getContext, onMount } from 'svelte';
-  const { close } = getContext('simple-modal');
+  import { onMount } from 'svelte';
+  import ModalShell from './ModalShell.svelte';
 
-  let modal;
+  export let parent: any;
+  let container;
 
   onMount(() => {
-    if (typeof modal?.parentElement !== 'undefined')
-      modal.parentElement.scrollTop = 0;
+    if (typeof container?.parentElement !== 'undefined')
+      container.parentElement.scrollTop = 0;
   });
 </script>
 
-<CloseButton onClose={close} />
+<ModalShell {parent}>
+  <div class="px-2 py-10 sm:px-10 text-left" bind:this={container}>
+    <h2 class="font-bold my-2 text-2xl">Keyboard Shortcuts</h2>
 
-<div class="px-2 py-10 sm:px-10 text-left" bind:this={modal}>
-  <h2 class="font-bold my-2 text-2xl">Keyboard Shortcuts</h2>
-
-  {#each KEYBOARD_SHORTCUTS as { group, items, details }}
-    <p class="mt-2 font-bold text-xl">{group}</p>
-    <p class="mb-2 italic">{details}</p>
-    <table
-      class="table-auto m-auto border border-surface-300-600-token py-1 px-2 text-left w-full mb-8"
-    >
-      <thead class="divide-y border-b border-surface-300-600-token">
-        <tr>
-          <th class=" py-0 px-2">Shortcut</th>
-          <th class=" py-0 px-2">Description</th>
-        </tr>
-      </thead>
-      <tbody class="divide-y divide-surface-300 dark:divide-surface-600">
-        {#each items as { keys, description }}
+    {#each KEYBOARD_SHORTCUTS as { group, items, details }}
+      <p class="mt-2 font-bold text-xl">{group}</p>
+      <p class="mb-2 italic">{details}</p>
+      <table
+        class="table-auto m-auto border border-surface-300-600-token py-1 px-2 text-left w-full mb-8"
+      >
+        <thead class="divide-y border-b border-surface-300-600-token">
           <tr>
-            <td
-              class="py-0 px-2 flex flex-col sm:flex-row sm:flex-wrap justify-start sm:gap-2 items-start sm:items-center gap-0"
-            >
-              {#each keys as keys, index}
-                {#if index > 0}<span class="-my-2">or</span>{/if}
-                {@const shortcut =
-                  typeof keys === 'object' ? keys.join(' + ') : keys}
-                <kbd class="kbd my-2">{shortcut}</kbd>
-              {/each}
-            </td>
-            <td class="py-0 px-2">{description}</td>
+            <th class=" py-0 px-2">Shortcut</th>
+            <th class=" py-0 px-2">Description</th>
           </tr>
-        {/each}
-      </tbody>
-    </table>
-  {/each}
-  <p class="font-ornament text-5xl mt-8 text-center w-full">O</p>
-</div>
+        </thead>
+        <tbody class="divide-y divide-surface-300 dark:divide-surface-600">
+          {#each items as { keys, description }}
+            <tr>
+              <td
+                class="py-0 px-2 flex flex-col sm:flex-row sm:flex-wrap justify-start sm:gap-2 items-start sm:items-center gap-0"
+              >
+                {#each keys as keys, index}
+                  {#if index > 0}<span class="-my-2">or</span>{/if}
+                  {@const shortcut =
+                    typeof keys === 'object' ? keys.join(' + ') : keys}
+                  <kbd class="kbd my-2">{shortcut}</kbd>
+                {/each}
+              </td>
+              <td class="py-0 px-2">{description}</td>
+            </tr>
+          {/each}
+        </tbody>
+      </table>
+    {/each}
+    <p class="font-ornament text-5xl mt-8 text-center w-full">O</p>
+  </div>
+</ModalShell>

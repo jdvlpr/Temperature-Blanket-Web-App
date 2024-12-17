@@ -165,6 +165,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
       style="position:absolute; {tooltipStyle}"
       class="w-4 h-4 {tooltipBg} z-40"
       bind:this={$arrowRef}
-    />
+    ></div>
   </div>
 {/if}

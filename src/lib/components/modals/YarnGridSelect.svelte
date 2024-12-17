@@ -437,7 +437,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <span
               class="rounded-full mx-[2.5px] p-2 w-3 h-3 border-[1.5px]"
               style="border-color:{getTextColor(hex)}"
-            />
+            ></span>
           {/if}
           <div
             class="flex flex-col items-start justify-start text-left break-all"

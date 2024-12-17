@@ -16,15 +16,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import { onNavigate } from '$app/navigation';
   import { PUBLIC_MICROSOFT_CLARITY_ID } from '$env/static/public';
-  import { consentToMSClarityCookies } from '$lib/stores';
+  import { consentToMSClarityCookies, modal } from '$lib/stores';
   import {
     privacy,
     setupLocalStorageLayout,
     setupLocalStorageTheme,
   } from '$lib/utils';
   import {
+    Modal,
     Toast,
     getToastStore,
+    getModalStore,
     initializeStores,
     storePopup,
   } from '@skeletonlabs/skeleton';
@@ -37,7 +39,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     offset,
     shift,
   } from 'svelte-floating-ui/dom';
-  import { onlineStore } from 'svelte-legos';
+  import { onlineStore } from '@sveltelegos-blue/svelte-legos';
   import '../css/main.css';
 
   initializeStores();
@@ -53,6 +55,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   const isOnline = onlineStore();
   const toastStore = getToastStore();
+
+  modal.state = getModalStore() || false;
 
   privacy.init();
 
@@ -178,6 +182,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </svelte:head>
 
 <Toast max={3} position="b" />
+
+<Modal />
 
 <slot />
 

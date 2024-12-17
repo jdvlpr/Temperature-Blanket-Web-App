@@ -15,10 +15,22 @@
 
 import { ICONS } from '$lib/constants';
 import { localStorageStore } from '@skeletonlabs/skeleton';
-import { mediaQuery } from 'svelte-legos';
+import { mediaQuery } from '@sveltelegos-blue/svelte-legos';
 import { derived, readable, writable, type Writable } from 'svelte/store';
 
-export const modal = writable(null);
+class ModalState {
+  constructor() {
+    this.state = writable(null);
+  }
+
+  state: Writable<any>;
+
+  // Temporary until migration to skelton modal is done
+  public set(value) {
+    this.state.set(value);
+  }
+}
+export let modal = $state(new ModalState());
 
 export const disableToastAnalytics: Writable<boolean> = localStorageStore(
   'disable_toast_analytics',

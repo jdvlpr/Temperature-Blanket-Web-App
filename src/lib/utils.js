@@ -24,7 +24,7 @@ export * from '$lib/utils/load-project-utils';
 export * from '$lib/utils/location-utils';
 export * from '$lib/utils/number-utils';
 export * from '$lib/utils/other-utils';
-export * from '$lib/utils/page-utils';
+export * from '$lib/utils/page-utils.svelte';
 export * from '$lib/utils/preview-utils';
 export * from '$lib/utils/privacy-utils';
 export * from '$lib/utils/project-utils';

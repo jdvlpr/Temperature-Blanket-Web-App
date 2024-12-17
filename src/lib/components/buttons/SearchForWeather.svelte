@@ -28,11 +28,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
   export let disabled = true;
 
   function setModal() {
-    modal.set(bind(GettingWeather));
+    modal.state.trigger({
+      type: 'component',
+      component: { ref: GettingWeather },
+    });
   }
 
   function setWarnCustomWeatherModal() {
-    modal.set(bind(GettingWeatherWarnCustomWeather));
+    modal.state.trigger({
+      type: 'component',
+      component: { ref: GettingWeatherWarnCustomWeather },
+    });
   }
 </script>
 

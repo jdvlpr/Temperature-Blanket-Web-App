@@ -185,13 +185,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
       class="btn bg-secondary-hover-token justify-start"
       title="Browse Preset & User-Created Color Palettes"
       on:click={() =>
-        modal.set(
-          bind(BrowsePalettes, {
-            numberOfColors,
-            schemeId,
-            updateGauge,
-          }),
-        )}
+        modal.state.trigger({
+          type: 'component',
+          component: {
+            ref: BrowsePalettes,
+            props: {
+              numberOfColors,
+              schemeId,
+              updateGauge,
+            },
+          },
+        })}
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -249,7 +253,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         >
           <div
             class="mx-auto w-12 h-1.5 flex-shrink-0 rounded-full mb-4 bg-surface-900-50-token"
-          />
+          ></div>
           <div class="mx-auto text-center">
             <BrowsePalettes
               {numberOfColors}
@@ -266,7 +270,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <button
     class="btn bg-secondary-hover-token justify-start"
     title="Choose Yarn Colorways, Filtered by Brand and Yarn"
-    on:click={() => modal.set(bind(ChooseColorways, { updateGauge }))}
+    on:click={() =>
+      modal.state.trigger({
+        type: 'component',
+        component: {
+          ref: ChooseColorways,
+          props: {
+            updateGauge,
+          },
+        },
+      })}
   >
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -288,12 +301,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
     class="btn bg-secondary-hover-token justify-start"
     title="Get Palette from Image"
     on:click={() =>
-      modal.set(
-        bind(GetPaletteFromImage, {
-          numberOfColors,
-          updateGauge,
-        }),
-      )}
+      modal.state.trigger({
+        type: 'component',
+        component: {
+          ref: GetPaletteFromImage,
+          props: {
+            numberOfColors,
+            updateGauge,
+          },
+        },
+      })}
     ><svg
       xmlns="http://www.w3.org/2000/svg"
       fill="none"
@@ -314,12 +331,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
     class="btn bg-secondary-hover-token justify-start"
     title="Load Colors or Get a Palette Code to Share"
     on:click={() =>
-      modal.set(
-        bind(ImportExportPalette, {
-          colors,
-          updateGauge,
-        }),
-      )}
+      modal.state.trigger({
+        type: 'component',
+        component: {
+          ref: ImportExportPalette,
+          props: {
+            colors,
+            updateGauge,
+          },
+        },
+      })}
   >
     <svg
       xmlns="http://www.w3.org/2000/svg"

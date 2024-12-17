@@ -62,7 +62,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '$lib/utils';
   import { getToastStore } from '@skeletonlabs/skeleton';
   import { onDestroy, onMount } from 'svelte';
-  import { bind } from 'svelte-simple-modal';
   import { fade } from 'svelte/transition';
   import { Drawer } from 'vaul-svelte';
 
@@ -110,7 +109,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     // Check if the project needs to show a legacy notification
     // Use this to display warnings about backwards compatibility if the project is incompatible
     if (!upToDate(LOADED_APP_VERSION, '0.98'))
-      modal.set(bind(LegacyNotification, { v: 'v0.98' }));
+      modal.state.trigger({
+        type: 'component',
+        component: { ref: LegacyNotification, props: { v: 'v0.98' } },
+      });
 
     await setProjectSettings();
 
@@ -183,12 +185,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <Tooltip
             class="btn bg-secondary-hover-token"
             title="Save Project [Cmd]+[s] or [Ctrl]+[s]"
-            on:click={() =>
-              modal.set(
-                bind(Menu, {
-                  page: 'save',
-                }),
-              )}
+            onclick={() =>
+              modal.state.trigger({
+                type: 'component',
+                component: { ref: Menu, props: { page: 'save' } },
+              })}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -222,7 +223,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             title="Undo [Cmd ⌘]+[z] or [Ctrl]+[z]"
             id="undo"
             disabled={!$weather || $history.first || $isHistoryUpdating}
-            on:click={() => {
+            onclick={() => {
               loadFromHistory({
                 action: 'undo',
               });
@@ -239,7 +240,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             id="redo"
             title="Redo [Cmd ⌘]+[Shift ⇧]+[z] or [Ctrl]+[Shift ⇧]+[Z]"
             disabled={!$weather || $history.last || $isHistoryUpdating}
-            on:click={() => {
+            onclick={() => {
               loadFromHistory({
                 action: 'redo',
               });
@@ -282,7 +283,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
       >
         <button
           class="btn variant-filled-secondary gap-1 items-center"
-          on:click={() => modal.set(bind(GettingStarted))}
+          onclick={() =>
+            modal.state.trigger({
+              type: 'component',
+              component: { ref: GettingStarted },
+            })}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -344,9 +349,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </Tooltip>
 
     <button
+      aria-label="Open Menu"
       class="btn-icon bg-secondary-hover-token"
       title="Open Menu [.]"
-      on:click={() => modal.set(bind(Menu, { page: 'main' }))}
+      onclick={() =>
+        modal.state.trigger({
+          type: 'component',
+          component: { ref: Menu, props: { page: 'main' } },
+        })}
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -397,7 +407,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   {#if $isDesktop}
                     <button
                       class="btn variant-filled-secondary gap-1 items-center"
-                      on:click={() => modal.set(bind(GettingStarted))}
+                      onclick={() =>
+                        modal.state.trigger({
+                          type: 'component',
+                          component: { ref: GettingStarted },
+                        })}
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -415,7 +429,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   <Drawer.Root bind:open={$openDrawerGettingStarted}>
                     {#if !$isDesktop}
                       <Drawer.Trigger
-                        on:click={() => ($openDrawerGettingStarted = true)}
+                        onclick={() => ($openDrawerGettingStarted = true)}
                       >
                         <button
                           class="btn variant-filled-secondary gap-1 items-center"
@@ -444,7 +458,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         >
                           <div
                             class="mx-auto mt-4 w-12 h-1.5 flex-shrink-0 rounded-full mb-4 bg-surface-900-50-token"
-                          />
+                          ></div>
                           <div class="mx-auto text-center">
                             <GettingStarted />
                           </div>

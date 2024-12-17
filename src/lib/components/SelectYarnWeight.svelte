@@ -59,6 +59,7 @@
     >
     <span>Yarn Weight</span>
     <a
+      aria-label="See the yarn weights chart"
       href="/blog/yarn-weights{selectedYarnWeightId
         ? `?highlight=${ALL_YARN_WEIGHTS.find((n) => n.id === selectedYarnWeightId)?.name}`
         : ''}"

@@ -230,20 +230,24 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <button
                 class="btn bg-secondary-hover-token flex items-center justify-start"
                 on:click={() =>
-                  modal.set(
-                    bind(ChangeColor, {
-                      index,
-                      hex,
-                      name,
-                      brandId,
-                      yarnId,
-                      brandName,
-                      yarnName,
-                      variant_href,
-                      affiliate_variant_href,
-                      onChangeColor,
-                    }),
-                  )}
+                  modal.state.trigger({
+                    type: 'component',
+                    component: {
+                      ref: ChangeColor,
+                      props: {
+                        index,
+                        hex,
+                        name,
+                        brandId,
+                        yarnId,
+                        brandName,
+                        yarnName,
+                        variant_href,
+                        affiliate_variant_href,
+                        onChangeColor,
+                      },
+                    },
+                  })}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"

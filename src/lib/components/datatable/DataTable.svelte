@@ -78,6 +78,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {#if $pageCount > 1}
         <section class="flex flex-wrap items-end gap-2">
           <button
+            aria-label="Previous Page"
             class="btn-icon bg-secondary-hover-token"
             title="Previous Page"
             disabled={$pageNumber === 1}
@@ -122,6 +123,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </label>
 
           <button
+            aria-label="Next Page"
             class="btn-icon bg-secondary-hover-token"
             title="Next Page"
             disabled={$pageNumber === $pageCount}
