@@ -13,31 +13,32 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
+import WeatherDetails from '$lib/components/WeatherDetails.svelte';
 import {
-  projectFilename,
-  weather,
-  gaugesState,
   createdGauges,
-  previewWeatherTargets,
+  gaugesState,
   isDesktop,
   modal,
   openDrawerWeatherDetails,
+  previewWeatherTargets,
+  projectFilename,
+  weather,
 } from '$lib/stores';
-import { get } from 'svelte/store';
 import { exists, getTargetParentGaugeId } from '$lib/utils';
-import WeatherDetails from '$lib/components/WeatherDetails.svelte';
-import { bind } from 'svelte-simple-modal';
+import { get } from 'svelte/store';
 
 export const showPreviewImageWeatherDetails = (targets) => {
   previewWeatherTargets.set(targets);
 
   if (get(isDesktop)) {
-    modal.set(
-      bind(WeatherDetails, {
+    modal.state.trigger({
+      type: 'component',
+      component: WeatherDetails,
+      props: {
         weatherTargets: targets,
         context: 'modal',
-      }),
-    );
+      },
+    });
   } else {
     openDrawerWeatherDetails.set(true);
   }

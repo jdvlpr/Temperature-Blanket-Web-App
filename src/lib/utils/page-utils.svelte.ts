@@ -27,8 +27,6 @@ import {
   weather,
 } from '$lib/stores';
 import { loadFromHistory, setTheme } from '$lib/utils';
-import { getModalStore, LightSwitch } from '@skeletonlabs/skeleton';
-import { bind } from 'svelte-simple-modal';
 import { get } from 'svelte/store';
 
 // Go to a section

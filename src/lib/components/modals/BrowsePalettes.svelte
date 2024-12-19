@@ -13,25 +13,37 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script>
+<script lang="ts">
   import GalleryPalettes from '$lib/components/GalleryPalettes.svelte';
   import GalleryPalettesPopular from '$lib/components/GalleryPalettesPopular.svelte';
   import PaletteSchemes from '$lib/components/PaletteSchemes.svelte';
   import ToTopButton from '$lib/components/buttons/ToTopButton.svelte';
-  import CloseButton from '$lib/components/modals/CloseButton.svelte';
   import { RadioGroup, RadioItem } from '@skeletonlabs/skeleton';
-  import { getContext, onMount } from 'svelte';
+  import ModalShell from './ModalShell.svelte';
 
-  export let schemeId = 'Custom',
-    numberOfColors,
+  interface Props {
+    schemeId?: string;
+    numberOfColors: any;
+    updateGauge: any;
+    context?: string;
+    parent: any;
+  }
+
+  let {
+    schemeId = 'Custom',
+    numberOfColors = $bindable(),
     updateGauge,
-    context = '';
+    context = '',
+    parent,
+  }: Props = $props();
 
-  let category = getParentCategory(schemeId);
-  let container;
-  let showScrollToTopButton = false;
+  if (parent) parent.width = 'w-modal-wide';
 
-  let filtersContainer;
+  let category = $state(getParentCategory(schemeId));
+  let container = $state();
+  let showScrollToTopButton = $state(false);
+
+  let filtersContainer: HTMLElement;
   let scrollObserver = new IntersectionObserver(
     (entries, observer) => {
       entries.forEach((entry) => {
@@ -46,66 +58,59 @@ If not, see <https://www.gnu.org/licenses/>. -->
   );
   const categories = ['Gallery', 'Featured', 'Schemes'];
 
-  let close = null;
-  if (typeof getContext === 'function')
-    close = getContext('simple-modal')?.close;
-
-  onMount(() => {
-    scrollObserver.observe(filtersContainer);
-  });
-
   function getParentCategory(schemeId) {
     if (schemeId === 'Custom') return 'Gallery';
     else return 'Schemes';
   }
+
+  $effect(() => {
+    scrollObserver.observe(filtersContainer);
+  });
 </script>
 
-{#if showScrollToTopButton}
-  <ToTopButton
-    onClick={() => {
-      container.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start',
-      });
-    }}
-    bottom="1rem"
-  />
-{/if}
+<ModalShell {parent}>
+  <div class="" bind:this={container}>
+    <div
+      class="w-full flex flex-wrap justify-center items-end gap-2 px-2 pb-2 bg-surface-100-800-token"
+      class:pt-4={context === 'drawer'}
+      bind:this={filtersContainer}
+    >
+      <RadioGroup class="flex wrap gap-y-2" active="bg-secondary-active-token">
+        {#each categories as categoryItem}
+          <RadioItem
+            bind:group={category}
+            name="category-{categoryItem}"
+            value={categoryItem}
+            title={categoryItem}
+          >
+            <span class="flex gap-1 justify-center items-center">
+              {categoryItem}
+            </span>
+          </RadioItem>
+        {/each}
+      </RadioGroup>
+    </div>
 
-{#if context !== 'drawer'}
-  <CloseButton onClose={close} />
-{/if}
+    {#if category === 'Gallery'}
+      <GalleryPalettes {updateGauge} />
+    {:else if category === 'Featured'}
+      <GalleryPalettesPopular {updateGauge} />
+    {:else if category === 'Schemes'}
+      <PaletteSchemes {updateGauge} bind:numberOfColors />
+    {/if}
 
-<div class="sm:pb-4" bind:this={container}>
-  <div
-    class="w-full flex flex-wrap justify-center items-end gap-2 sm:pt-4 px-2 pb-2 bg-surface-100-800-token"
-    class:pt-14={context !== 'drawer'}
-    class:pt-4={context === 'drawer'}
-    bind:this={filtersContainer}
-  >
-    <RadioGroup class="flex wrap gap-y-2" active="bg-secondary-active-token">
-      {#each categories as categoryItem}
-        <RadioItem
-          bind:group={category}
-          name="category-{categoryItem}"
-          value={categoryItem}
-          title={categoryItem}
-        >
-          <span class="flex gap-1 justify-center items-center">
-            {categoryItem}
-          </span>
-        </RadioItem>
-      {/each}
-    </RadioGroup>
+    {#if showScrollToTopButton}
+      <ToTopButton
+        onClick={() => {
+          container.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start',
+          });
+        }}
+        bottom={parent ? '0rem' : '5rem'}
+      />
+    {/if}
   </div>
 
-  {#if category === 'Gallery'}
-    <GalleryPalettes {updateGauge} />
-  {:else if category === 'Featured'}
-    <GalleryPalettesPopular {updateGauge} />
-  {:else if category === 'Schemes'}
-    <PaletteSchemes {updateGauge} bind:numberOfColors />
-  {/if}
-</div>
-
-<p class="font-ornament text-3xl mb-4">k</p>
+  <p class="font-ornament text-3xl mb-4 text-center w-full inline-block">k</p>
+</ModalShell>

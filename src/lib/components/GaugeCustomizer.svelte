@@ -25,7 +25,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import type { Color } from '$lib/types';
   import { getTextColor } from '$lib/utils';
   import { dndzone } from 'svelte-dnd-action';
-  import { bind } from 'svelte-simple-modal';
   import { flip } from 'svelte/animate';
 
   export let props,
@@ -207,20 +206,24 @@ If not, see <https://www.gnu.org/licenses/>. -->
         class="btn bg-secondary-hover-token flex items-center justify-start"
         title="Choose a Color"
         on:click={() =>
-          modal.set(
-            bind(ChangeColor, {
-              index,
-              hex,
-              name,
-              brandId,
-              yarnId,
-              brandName,
-              yarnName,
-              variant_href,
-              affiliate_variant_href,
-              onChangeColor,
-            }),
-          )}
+          modal.state.trigger({
+            type: 'component',
+            component: {
+              ref: ChangeColor,
+              props: {
+                index,
+                hex,
+                name,
+                brandId,
+                yarnId,
+                brandName,
+                yarnName,
+                variant_href,
+                affiliate_variant_href,
+                onChangeColor,
+              },
+            },
+          })}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"

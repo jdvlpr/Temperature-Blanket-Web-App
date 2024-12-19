@@ -28,7 +28,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <ModalShell {parent}>
-  <div class="px-2 py-10 sm:px-10 text-left" bind:this={container}>
+  <div bind:this={container}>
     <h2 class="font-bold my-2 text-2xl">Keyboard Shortcuts</h2>
 
     {#each KEYBOARD_SHORTCUTS as { group, items, details }}

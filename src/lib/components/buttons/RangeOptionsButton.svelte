@@ -17,7 +17,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Tooltip from '$lib/components/Tooltip.svelte';
   import GaugeSettings from '$lib/components/modals/GaugeSettings.svelte';
   import { modal } from '$lib/stores';
-  import { bind } from 'svelte-simple-modal';
 
   export let props, ranges, colors, rangeOptions;
 
@@ -32,15 +31,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
   title="Configure Ranges"
   fullWidth={true}
   on:click={() =>
-    modal.set(
-      bind(GaugeSettings, {
-        props,
-        ranges,
-        colors,
-        rangeOptions,
-        onSave: onSaveRangeOptinos,
-      }),
-    )}
+    modal.state.trigger({
+      type: 'component',
+      component: {
+        ref: GaugeSettings,
+        props: {
+          props,
+          ranges,
+          colors,
+          rangeOptions,
+          onSave: onSaveRangeOptinos,
+        },
+      },
+    })}
 >
   <svg
     xmlns="http://www.w3.org/2000/svg"

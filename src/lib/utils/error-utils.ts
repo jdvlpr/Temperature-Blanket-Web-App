@@ -16,7 +16,6 @@
 import Alert from '$lib/components/modals/Alert.svelte';
 import { modal } from '$lib/stores';
 import { onlineStore } from '@sveltelegos-blue/svelte-legos';
-import { bind } from 'svelte-simple-modal';
 import { get } from 'svelte/store';
 
 /**
@@ -45,9 +44,11 @@ export const displayGeoNamesErrorMessage = (message) => {
 
   text += `<p class="text-5xl mt-2 font-ornament">J</p>`;
 
-  modal.set(
-    bind(Alert, {
+  modal.state.trigger({
+    type: 'component',
+    component: Alert,
+    props: {
       message: text,
-    }),
-  );
+    },
+  });
 };

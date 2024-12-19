@@ -55,6 +55,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <div class="w-fit text-left">
   <button
+    aria-label="Get a URL to share this page"
     class="btn-icon bg-secondary-hover-token"
     id="share-button"
     title="Get a URL to share this page"
@@ -141,6 +142,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
         >
       </div>
     </div>
-    <div class="arrow bg-surface-300-600-token shadow-lg" />
+    <div class="arrow bg-surface-300-600-token shadow-lg"></div>
   </div>
 </div>

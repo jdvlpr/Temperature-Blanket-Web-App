@@ -27,7 +27,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     projectTitle,
   } from '$lib/stores';
   import { downloadPreviewPNG } from '$lib/utils';
-  import { bind } from 'svelte-simple-modal';
   import { Drawer } from 'vaul-svelte';
 </script>
 
@@ -98,7 +97,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
       <button
         class="btn variant-ghost-primary text-token gap-2 items-center"
-        on:click={() => modal.set(bind(AddToGallery))}
+        on:click={() =>
+          modal.state.trigger({
+            type: 'component',
+            component: {
+              ref: AddToGallery,
+            },
+          })}
         title="Show Send to Gallery Dialog"
       >
         <svg

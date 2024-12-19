@@ -118,7 +118,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     setTargets,
     weatherMonthsData,
   } from '$lib/utils';
-  import { bind } from 'svelte-simple-modal';
 
   $: targets = $createdGauges.map((n) => n.targets).flat();
 
@@ -197,12 +196,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
   class="btn bg-secondary-hover-token gap-1"
   title="Choose a Color"
   on:click={() =>
-    modal.set(
-      bind(ChangeColor, {
+    modal.state.trigger({
+      type: 'component',
+      component: ChangeColor,
+      props: {
         hex: $settings.extrasColor,
         onChangeColor: ({ hex }) => ($settings.extrasColor = hex),
-      }),
-    )}
+      },
+    })}
   ><svg
     xmlns="http://www.w3.org/2000/svg"
     fill="none"
@@ -232,12 +233,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
     class="btn bg-secondary-hover-token gap-1"
     title="Choose a Color"
     on:click={() =>
-      modal.set(
-        bind(ChangeColor, {
+      modal.state.trigger({
+        type: 'component',
+        component: ChangeColor,
+        props: {
           hex: $settings.borderColor,
           onChangeColor: ({ hex }) => ($settings.borderColor = hex),
-        }),
-      )}
+        },
+      })}
     ><svg
       xmlns="http://www.w3.org/2000/svg"
       fill="none"

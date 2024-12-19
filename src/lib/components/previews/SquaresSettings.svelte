@@ -175,7 +175,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import SquareDesigner from '$lib/components/modals/SquareDesigner.svelte';
   import { createdGauges, modal } from '$lib/stores';
   import { pluralize, setTargets } from '$lib/utils';
-  import { bind } from 'svelte-simple-modal';
 
   $: targets = $createdGauges.map((n) => n.targets).flat();
 
@@ -205,16 +204,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
   class="btn bg-secondary-hover-token gap-1"
   title="Edit Square Design"
   on:click={() =>
-    modal.set(
-      bind(SquareDesigner, {
+    modal.state.trigger({
+      type: 'component',
+      component: SquareDesigner,
+      props: {
         targets,
         squareSize: $settings.squareSize,
         primaryTarget: $settings.primaryTarget,
         secondaryTargets: $settings.secondaryTargets,
         primaryTargetAsBackup: $settings.primaryTargetAsBackup,
         onOkay: handelOkaySquareDesigner,
-      }),
-    )}
+      },
+    })}
   ><svg
     xmlns="http://www.w3.org/2000/svg"
     fill="none"
@@ -280,12 +281,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
     class="btn bg-secondary-hover-token gap-1"
     title="Choose a Color"
     on:click={() =>
-      modal.set(
-        bind(ChangeColor, {
+      modal.state.trigger({
+        type: 'component',
+        component: ChangeColor,
+        props: {
           hex: $settings.additionalSquaresColor,
           onChangeColor: ({ hex }) => ($settings.additionalSquaresColor = hex),
-        }),
-      )}
+        },
+      })}
     ><svg
       xmlns="http://www.w3.org/2000/svg"
       fill="none"

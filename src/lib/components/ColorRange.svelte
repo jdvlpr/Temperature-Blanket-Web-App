@@ -16,7 +16,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script>
   import GaugeSettings from '$lib/components/modals/GaugeSettings.svelte';
   import { modal, units } from '$lib/stores';
-  import { bind } from 'svelte-simple-modal';
 
   export let index, colors, ranges, rangeOptions, props;
 

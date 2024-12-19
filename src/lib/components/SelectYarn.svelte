@@ -200,7 +200,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           container.style.width = `${group.width}px`;
           container.style.left = `${group.left}px`;
         }
-        container.style.zIndex = `400`;
+        container.style.zIndex = `1000`;
         if (maxHeight > 480) container.style.maxHeight = `480px`;
         container.style.overflowY = `scroll`;
         if (context === 'modal') container.style.position = 'fixed';
@@ -303,20 +303,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 >
   <span class="flex items-center label gap-1">
     {@html ICONS.filter}
-    <!-- <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="1em"
-      height="1em"
-      viewBox="0 0 24 24"
-      ><path
-        fill="none"
-        stroke="currentColor"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        stroke-width="2"
-        d="M11 18H3m12 0l2 2l4-4m-5-4H3m13-6H3"
-      /></svg
-    > -->
     Yarn Name
   </span>
   <div class="flex flex-wrap items-center justify-center gap-1">

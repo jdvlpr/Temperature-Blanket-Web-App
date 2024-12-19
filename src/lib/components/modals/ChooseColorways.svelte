@@ -18,18 +18,26 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
   import StickyPart from '$lib/components/modals/StickyPart.svelte';
   import YarnGridSelect from '$lib/components/modals/YarnGridSelect.svelte';
+  import { isDesktop } from '$lib/stores';
   import { pluralize } from '$lib/utils';
-  import { getContext, hasContext } from 'svelte';
+  import { getModalStore } from '@skeletonlabs/skeleton';
+  import ModalShell from './ModalShell.svelte';
 
-  let close = null;
-  if (hasContext('simple-modal')) close = getContext('simple-modal')?.close;
+  const modalStore = getModalStore();
 
-  export let updateGauge;
+  interface Props {
+    updateGauge: any;
+    parent: any;
+  }
 
-  let selectedColors: object[] = [];
-  let container;
+  let { updateGauge, parent}: Props = $props();
 
-  $: paletteTitleText = getPaletteTitleText(selectedColors);
+  if (parent) parent.width = 'w-modal-wide';
+  if (!$isDesktop)  parent.width = 'w-full';
+
+  let selectedColors: object[] = $state([]);
+  let container = null;
+
 
   function getPaletteTitleText(colors) {
     if (colors.length) {
@@ -39,47 +47,57 @@ If not, see <https://www.gnu.org/licenses/>. -->
       return '';
     }
   }
+
+  let paletteTitleText = $derived(getPaletteTitleText(selectedColors));
+
+$effect(() => {
+  container.focus();
+})
 </script>
 
-<div class="p-2 sm:p-4 mt-4 relative" bind:this={container}>
-  <YarnGridSelect
-    bind:selectedColors
-    onClickScrollToTop={() => {
-      container.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start',
-      });
-    }}
-    scrollToTopButtonBottom={selectedColors.length ? '11rem' : '5rem'}
-  />
-  <!-- <YarnSources /> -->
-</div>
 
-<StickyPart position="bottom">
-  <div class="p-2 sm:px-4">
-    {#if selectedColors.length}
-      <div class="mb-2 sm:mb-4">
-        <div>
-          <ColorPaletteEditable
-            canUserEditColor={false}
-            schemeName={paletteTitleText}
-            bind:colors={selectedColors}
-          />
-        </div>
-      </div>
-    {/if}
 
-    <SaveAndCloseButtons
-      onSave={() => {
-        updateGauge({
-          _colors: selectedColors,
+<ModalShell {parent}>
+  <div class="focus:!outline-none" tabindex="0" bind:this={container}>
+    <YarnGridSelect
+      bind:selectedColors
+      onClickScrollToTop={() => {
+        container.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
         });
-        if (close) close();
       }}
-      onClose={() => {
-        if (close) close();
-      }}
-      disabled={!selectedColors.length}
+      scrollToTopButtonBottom={selectedColors.length ? '10rem' : '4rem'}
     />
   </div>
-</StickyPart>
+
+  {#snippet stickyPart()}
+    <StickyPart position="bottom">
+      <div class="p-2 sm:px-4">
+        {#if selectedColors.length}
+          <div class="mb-2 sm:mb-4">
+              <ColorPaletteEditable
+                canUserEditColor={false}
+                schemeName={paletteTitleText}
+                bind:colors={selectedColors}
+              />
+          </div>
+        {/if}
+
+        <SaveAndCloseButtons
+          onSave={() => {
+            updateGauge({
+              _colors: selectedColors,
+            });
+            if ($modalStore[0]) modalStore.close();
+          }}
+          onClose={() => {
+            if ($modalStore[0]) modalStore.close();
+          }}
+          disabled={!selectedColors.length}
+        />
+      </div>
+    </StickyPart>
+  {/snippet}
+
+</ModalShell>

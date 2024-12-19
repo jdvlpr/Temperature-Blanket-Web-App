@@ -26,7 +26,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '$lib/stores';
   import { downloadWeatherCSV, getWeatherTargets } from '$lib/utils';
   import { RadioGroup, RadioItem } from '@skeletonlabs/skeleton';
-  import { bind } from 'svelte-simple-modal';
 
   export let data = $weather ? $weather : [];
   export let context = 'body';
@@ -92,7 +91,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <button
         class="btn bg-secondary-hover-token whitespace-pre-wrap"
         on:click={() => {
-          modal.set(bind(ImportWeatherData));
+          modal.state.trigger({
+            type: 'component',
+            component: {
+              ref: ImportWeatherData,
+            },
+          });
         }}
         title="Import Weather Data"
       >

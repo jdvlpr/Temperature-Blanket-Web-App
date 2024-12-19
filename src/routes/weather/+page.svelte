@@ -43,7 +43,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     setUnitsFromNavigator,
   } from '$lib/utils';
   import { onDestroy, onMount } from 'svelte';
-  import { bind } from 'svelte-simple-modal';
   import { writable } from 'svelte/store';
   import { fade } from 'svelte/transition';
   import Chart from './Chart.svelte';
@@ -300,14 +299,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <div class="flex flex-wrap items-center">
       <Share href={shareableURL} />
       <button
+        aria-label="Open Settings"
         class="btn-icon bg-secondary-hover-token"
         title="Open Settings"
         on:click={() =>
-          modal.set(
-            bind(Menu, {
+          modal.state.trigger({
+            type: 'component',
+            component: Menu,
+            props: {
               page: 'settings',
-            }),
-          )}
+            },
+          })}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -331,14 +333,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </button>
       {#if $locations.filter((item) => item?.saved).length}
         <button
+          aria-label="Open Locations"
           class="btn-icon bg-secondary-hover-token"
           title="Open Locations"
           on:click={() =>
-            modal.set(
-              bind(Menu, {
+            modal.state.trigger({
+              type: 'component',
+              component: Menu,
+              props: {
                 page: 'locations',
-              }),
-            )}
+              },
+            })}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -429,11 +434,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       in:fade
                       class="btn bg-secondary-hover-token"
                       on:click={() =>
-                        modal.set(
-                          bind(Menu, {
+                        modal.state.trigger({
+                          type: 'component',
+                          component: Menu,
+                          props: {
                             page: 'locations',
-                          }),
-                        )}
+                          },
+                        })}
                       ><svg
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"

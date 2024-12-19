@@ -23,7 +23,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     modal,
     weather,
   } from '$lib/stores';
-  import { bind } from 'svelte-simple-modal';
 
   export let disabled = true;
 

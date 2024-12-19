@@ -26,7 +26,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { getTextColor } from '$lib/utils';
   import { createEventDispatcher } from 'svelte';
   import { SOURCES, TRIGGERS, dndzone } from 'svelte-dnd-action';
-  import { bind } from 'svelte-simple-modal';
   import { flip } from 'svelte/animate';
   import { writable } from 'svelte/store';
 
@@ -116,7 +115,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 </script>
 
-<div class="flex flex-col text-left gap-y-1">
+<div class="flex flex-col text-left gap-y-1 w-full">
   <div
     class="w-full inline-flex h-[70px]"
     use:dndzone={{

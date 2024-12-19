@@ -32,7 +32,7 @@
 
   /* AUTOCOMPLETE */
   .autocomplete {
-    @apply text-token bg-surface-200-700-token shadow-lg overflow-hidden border-token border-primary-500 rounded-container-token z-[400];
+    @apply text-token bg-surface-200-700-token shadow-lg overflow-hidden border-token border-primary-500 rounded-container-token z-[1000];
   }
 
   .autocomplete > div {

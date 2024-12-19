@@ -25,10 +25,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     valid,
     weather,
   } from '$lib/stores';
-  import { getContext, onMount } from 'svelte';
-  import { bind } from 'svelte-simple-modal';
+  import { getModalStore } from '@skeletonlabs/skeleton';
+  import { onMount } from 'svelte';
 
-  const { close } = getContext('simple-modal');
+  const modalStore = getModalStore();
 
   let warnSearchAgain = false;
 
@@ -258,9 +258,23 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <button
         class="btn variant-filled-primary font-bold text-2xl"
         on:click={() => {
-          if ($isCustomWeather)
-            close(modal.set(bind(GettingWeatherWarnCustomWeather)));
-          else close(modal.set(bind(GettingWeather)));
+          if ($isCustomWeather) {
+            $modalStore.close();
+            modal.state.trigger({
+              type: 'component',
+              component: {
+                ref: GettingWeatherWarnCustomWeather,
+              },
+            });
+          } else {
+            $modalStore.close();
+            modal.state.trigger({
+              type: 'component',
+              component: {
+                ref: GettingWeather,
+              },
+            });
+          }
         }}
         disabled={invalid}
         >Search <svg

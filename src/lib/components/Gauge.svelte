@@ -43,7 +43,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     getStart,
     hasParentWithClass,
   } from '$lib/utils';
-  import { bind } from 'svelte-simple-modal';
   import { Drawer } from 'vaul-svelte';
 
   export let numberOfColors: number,
@@ -362,12 +361,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
     class="btn bg-secondary-hover-token justify-start"
     title="Generate Random Colors"
     on:click={() =>
-      modal.set(
-        bind(RandomPalette, {
-          numberOfColors: colors?.length,
-          updateGauge,
-        }),
-      )}
+      modal.state.trigger({
+        type: 'component',
+        component: {
+          ref: RandomPalette,
+          props: {
+            numberOfColors: colors?.length,
+            updateGauge,
+          },
+        },
+      })}
   >
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -389,12 +392,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
     class="btn bg-secondary-hover-token justify-start"
     title="Sort Colors"
     on:click={() =>
-      modal.set(
-        bind(SortPalette, {
-          colors,
-          updateGauge,
-        }),
-      )}
+      modal.state.trigger({
+        type: 'component',
+        component: {
+          ref: SortPalette,
+          props: {
+            colors,
+            updateGauge,
+          },
+        },
+      })}
   >
     <svg
       xmlns="http://www.w3.org/2000/svg"

@@ -34,7 +34,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { delay, getOpenMeteo, goToProjectSection } from '$lib/utils';
   import ModalShell from './ModalShell.svelte';
 
-  export let parent: any;
+  interface Props {
+    parent: any;
+  }
+
+  let { parent }: Props = $props();
+
+  if (parent) parent.width = 'w-modal-slim';
 
   let container: HTMLDivElement;
 
@@ -43,9 +49,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     getWeatherData();
   });
 
-  let error = false;
-
-  $: allLocations = getAllLocations($locations);
+  let error = $state(false);
 
   function getAllLocations(_locations) {
     let _allLocations = [];
@@ -187,12 +191,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
     $weatherUngrouped = tempAllData;
     tempAllData = null;
   }
+  let allLocations = $derived(getAllLocations($locations));
 </script>
 
 <ModalShell {parent}>
   <div
     bind:this={container}
-    class="px-2 pt-10 pb-6 sm:px-10 flex flex-col items-center"
+    class="flex flex-col items-center text-center w-full"
   >
     {#if $signal && !error}
       <Spinner />

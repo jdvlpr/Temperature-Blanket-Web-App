@@ -16,7 +16,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import NumberInput from '$lib/components/modals/NumberInput.svelte';
   import { modal } from '$lib/stores';
-  import { bind } from 'svelte-simple-modal';
 
   export let value: number,
     title: string,
@@ -35,15 +34,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
   class="btn bg-secondary-hover-token gap-1"
   title="Set {title}"
   on:click={() =>
-    modal.set(
-      bind(NumberInput, {
-        value,
-        title,
-        min,
-        max,
-        onOkay: (_value) => (value = _value),
-      }),
-    )}
+    modal.state.trigger({
+      type: 'component',
+      component: {
+        ref: NumberInput,
+        props: {
+          value,
+          title,
+          min,
+          max,
+          onOkay: (_value) => (value = _value),
+        },
+      },
+    })}
 >
   {#if icon}
     {@html icon}

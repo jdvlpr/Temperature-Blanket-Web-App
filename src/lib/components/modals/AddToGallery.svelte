@@ -13,9 +13,8 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script>
+<script lang="ts">
   import Spinner from '$lib/components/Spinner.svelte';
-  import CloseButton from '$lib/components/modals/CloseButton.svelte';
   import {
     activePreview,
     projectGalleryLink,
@@ -23,13 +22,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
     projectTitle,
   } from '$lib/stores';
   import { sendToProjectGallery, svgToPNG } from '$lib/utils';
-  import { getContext } from 'svelte';
+  import ModalShell from './ModalShell.svelte';
   import StickyPart from './StickyPart.svelte';
 
-  const { close } = getContext('simple-modal');
+  interface Props {
+    parent: any;
+  }
 
-  let submitting = false,
-    message;
+  let { parent }: Props = $props();
+
+  let submitting = $state(false),
+    message = $state();
 
   async function submit() {
     submitting = true;
@@ -59,73 +62,74 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 </script>
 
-<CloseButton onClose={close} />
-
-<div
-  class="p-2 sm:p-4 mt-10 max-w-screen-sm grid grid-cols-1 sm:grid-cols-3 gap-4"
->
-  {#if !message}
-    <div class="flex flex-col gap-2 col-span-full sm:col-span-2">
-      <p class="font-bold text-left text-lg">
-        Do you understand and agree to the following terms and conditions?
-      </p>
-      <div class="text-left flex flex-col gap-2">
-        <p>
-          &#8226; I am submitting this project's location and dates, gauge and
-          yarn information, URL, preview image, and the current date to be
-          displayed on a public gallery page. No personal information will be
-          sent.
+<ModalShell {parent}>
+  <div class="max-w-screen-sm grid grid-cols-1 sm:grid-cols-3 gap-4">
+    {#if !message}
+      <div class="flex flex-col gap-2 col-span-full sm:col-span-2">
+        <p class="font-bold text-left text-lg">
+          Do you understand and agree to the following terms and conditions?
         </p>
-        <p>
-          &#8226; This project's gallery page cannot be edited once it is
-          submitted.
-        </p>
-        <p>
-          &#8226; Submissions which appear to be spam or abuse of this service
-          may be removed.
-        </p>
-        <p>&#8226; Gallery pages are subject to change.</p>
+        <div class="text-left flex flex-col gap-2">
+          <p>
+            &#8226; I am submitting this project's location and dates, gauge and
+            yarn information, URL, preview image, and the current date to be
+            displayed on a public gallery page. No personal information will be
+            sent.
+          </p>
+          <p>
+            &#8226; This project's gallery page cannot be edited once it is
+            submitted.
+          </p>
+          <p>
+            &#8226; Submissions which appear to be spam or abuse of this service
+            may be removed.
+          </p>
+          <p>&#8226; Gallery pages are subject to change.</p>
+        </div>
       </div>
-    </div>
-    <div
-      class="w-full col-span-full sm:col-span-1 max-w-[250px] m-auto pointer-events-none flex flex-col gap-2 p-2 card mb-4"
-    >
-      <span class="font-bold line-clamp-4">{$projectTitle}</span>
-      <svelte:component this={$activePreview.preview} />
-    </div>
-  {:else}
-    <div
-      class="flex flex-col gap-4 items-center justify-center w-full col-span-full"
-    >
-      {#if message.icon === 'spinner'}
-        <Spinner />
-      {/if}
-
-      <div class="flex flex-col gap-2 justify-center items-center my-2">
-        {@html message.text}
-      </div>
-    </div>
-  {/if}
-</div>
-{#if $projectGalleryLink && $projectGalleryTitle && $projectGalleryTitle === $projectTitle}
-  <p class="my-2">
-    <a
-      href={$projectGalleryLink}
-      target="_blank"
-      class="link btn bg-secondary-hover-token w-fit whitespace-pre-wrap"
-      rel="noreferrer">{$projectGalleryTitle}</a
-    >
-  </p>
-{/if}
-
-<StickyPart position="bottom">
-  {#if !submitting && !message}
-    <div class="pb-2 pt-4">
-      <button
-        class="btn variant-filled-primary"
-        title="Add project to gallery"
-        on:click={submit}>Yes, Send to Gallery</button
+      {@const SvelteComponent = $activePreview.preview}
+      <div
+        class="w-full col-span-full sm:col-span-1 max-w-[250px] m-auto pointer-events-none flex flex-col gap-2 p-4 bg-surface-50-900-token rounded-container-token mb-4"
       >
-    </div>
+        <span class="font-bold line-clamp-4">{$projectTitle}</span>
+        <SvelteComponent />
+      </div>
+    {:else}
+      <div
+        class="flex flex-col gap-4 items-center justify-center w-full col-span-full"
+      >
+        {#if message.icon === 'spinner'}
+          <Spinner />
+        {/if}
+
+        <div class="flex flex-col gap-2 justify-center items-center my-2">
+          {@html message.text}
+        </div>
+      </div>
+    {/if}
+  </div>
+  {#if $projectGalleryLink && $projectGalleryTitle && $projectGalleryTitle === $projectTitle}
+    <p class="my-2">
+      <a
+        href={$projectGalleryLink}
+        target="_blank"
+        class="link btn bg-secondary-hover-token w-fit whitespace-pre-wrap"
+        rel="noreferrer">{$projectGalleryTitle}</a
+      >
+    </p>
   {/if}
-</StickyPart>
+
+  {#snippet stickyPart()}
+    <StickyPart position="bottom">
+      {#if !submitting && !message}
+        <div class="p-2 text-center flex items-center justify-center">
+          <button
+            class="btn variant-filled-primary"
+            title="Add project to gallery"
+            onclick={submit}>Yes, Send to Gallery</button
+          >
+        </div>
+      {/if}
+    </StickyPart>
+  {/snippet}
+</ModalShell>

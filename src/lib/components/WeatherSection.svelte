@@ -65,7 +65,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '$lib/utils';
   import { Accordion, AccordionItem } from '@skeletonlabs/skeleton';
   import { onDestroy, onMount } from 'svelte';
-  import { bind } from 'svelte-simple-modal';
 
   let graph;
   let isAnyWeatherSourceDifferentFromDefault;
@@ -250,7 +249,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <button
       class="btn bg-secondary-hover-token w-fit"
       on:click={() => {
-        modal.set(bind(ChooseWeatherSource));
+        modal.state.trigger({
+          type: 'component',
+          component: {
+            ref: ChooseWeatherSource,
+          },
+        });
       }}
     >
       <svg
@@ -630,7 +634,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     <button
                       class="link"
                       on:click={() => {
-                        modal.set(bind(ChooseWeatherSource));
+                        modal.state.trigger({
+                          type: 'component',
+                          component: {
+                            ref: ChooseWeatherSource,
+                          },
+                        });
                       }}>Weather Source</button
                     >.
                   </p>

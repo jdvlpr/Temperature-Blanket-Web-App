@@ -31,7 +31,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   };
 </script>
 
-<script>
+<script lang="ts">
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
   import ColorPalette from '$lib/components/ColorPalette.svelte';
   import Expand from '$lib/components/Expand.svelte';
@@ -45,14 +45,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
     getPalettesFromProjects,
     recordPageView,
   } from '$lib/utils';
-  import { getContext, onMount } from 'svelte';
+  import { getModalStore } from '@skeletonlabs/skeleton';
+  import { onMount } from 'svelte';
   import { writable } from 'svelte/store';
   import { slide } from 'svelte/transition';
 
-  let close = null;
+  const modalStore = getModalStore();
+
   let filtersExpanded = false;
-  if (typeof getContext === 'function')
-    close = getContext('simple-modal')?.close;
 
   export let updateGauge = null;
 
@@ -92,8 +92,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <div
   class="bg-surface-100-800-token text-token pb-2 text-center flex flex-wrap justify-center items-end gap-2"
 >
-  <!-- <p class="text-sm w-full">All user-created color palettes.</p> -->
-
   <Expand
     bind:isExpanded={filtersExpanded}
     more="Show Filters"
@@ -289,7 +287,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               _colors: colors,
               _schemeId: 'Custom',
             });
-            if (close) close();
+            if ($modalStore[0]) modalStore.close();
           }}
           title="Use This Palette"
         >

@@ -23,9 +23,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div
-  class="flex flex-wrap items-center gap-x-2 gap-y-2 justify-between mx-auto"
+  class="flex flex-wrap items-center gap-x-2 gap-y-2 justify-between mx-auto w-full"
 >
-  <CloseButton {onClose} absolute={false} />
+  <CloseButton {onClose} text="Cancel" />
+
   <button
     class="btn variant-filled-primary flex justify-center items-center flex-auto"
     on:click={onSave}

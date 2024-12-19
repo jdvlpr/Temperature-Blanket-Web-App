@@ -20,6 +20,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ToTopButton from '$lib/components/buttons/ToTopButton.svelte';
   import { YARN_COLORWAYS_PER_PAGE } from '$lib/constants';
   import { defaultYarn } from '$lib/stores';
+  import type { Color } from '$lib/types';
   import {
     getColorways,
     getTextColor,
@@ -35,21 +36,35 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { onMount } from 'svelte';
   import SelectYarnWeight from '../SelectYarnWeight.svelte';
 
-  export let selectedBrandId = '';
-  export let selectedYarnId = '';
-  export let search = '';
-  export let selectedColors: object[];
-  export let limit = false;
-  export let currentColor = { hex: '#ffffff' };
-  export let onClickScrollToTop;
-  export let scrollToTopButtonBottom = '100px';
+  interface Props {
+    selectedBrandId?: string;
+    selectedYarnId?: string;
+    search?: string;
+    selectedColors: Color[];
+    limit?: boolean;
+    currentColor?: Color;
+    onClickScrollToTop: any;
+    scrollToTopButtonBottom?: string;
+  }
 
-  let loadMoreSpinner, loadMoreColors;
+  let {
+    selectedBrandId = $bindable(''),
+    selectedYarnId = $bindable(''),
+    search = $bindable(''),
+    selectedColors = $bindable(),
+    limit = false,
+    currentColor = $bindable(),
+    onClickScrollToTop,
+    scrollToTopButtonBottom = '100px',
+  }: Props = $props();
 
-  let selectedYarnWeightId = '';
+  let loadMoreSpinner = $state(),
+    loadMoreColors = $state();
 
-  let filtersContainer;
-  let showScrollToTopButton = false;
+  let selectedYarnWeightId = $state('');
+
+  let filtersContainer = $state();
+  let showScrollToTopButton = $state(false);
   let scrollObserver = new IntersectionObserver(
     (entries, observer) => {
       entries.forEach((entry) => {
@@ -85,89 +100,26 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 
   let hasIncomingColor = !!selectedColors.length;
-  let itemsToShow = YARN_COLORWAYS_PER_PAGE;
+  let itemsToShow = $state(YARN_COLORWAYS_PER_PAGE);
 
   // This is for preview extra colors, so that they can be marked as selected even though their color object only has a hex
-  let canMarkIfHexMatches =
+  let canMarkIfHexMatches = $state(
     selectedColors.length === 1 &&
-    !selectedColors?.[0].name &&
-    !selectedColors?.[0].brandId &&
-    !selectedColors?.[0].yarnId;
+      !selectedColors?.[0].name &&
+      !selectedColors?.[0].brandId &&
+      !selectedColors?.[0].yarnId,
+  );
 
-  let sortColors = hasIncomingColor ? 'best-match' : 'default';
-  let results = [];
-  let gettingResults = true;
-  let loadingAllColors = false;
+  let sortColors = $state(hasIncomingColor ? 'best-match' : 'default');
+  let results = $state([]);
+  let gettingResults = $state(true);
+  let loadingAllColors = $state(false);
 
   let debounceTimer;
   const debounce = (callback, time) => {
     window.clearTimeout(debounceTimer);
     debounceTimer = window.setTimeout(callback, time);
   };
-
-  $: if (loadMoreSpinner) loadMoreColors.observe(loadMoreSpinner);
-
-  $: yarns =
-    selectedBrandId === ''
-      ? brands
-          .flatMap((n, i) =>
-            n.yarns.map((n) => {
-              return {
-                ...n,
-                brandId: brands[i].id,
-                brandName: brands[i].name,
-              };
-            }),
-          )
-          .sort((a, b) => {
-            const nameA = a.name.toUpperCase(); // ignore upper and lowercase
-            const nameB = b.name.toUpperCase(); // ignore upper and lowercase
-            if (nameA > nameB) {
-              return 1;
-            }
-            if (nameA < nameB) {
-              return -1;
-            }
-            // names must be equal
-            return 0;
-          })
-      : brands
-          ?.filter((brand) => brand.id === selectedBrandId)
-          ?.flatMap((n) => {
-            return n.yarns.map((yarn) => {
-              return {
-                ...yarn,
-                brandId: n.id,
-                brandName: n.name,
-              };
-            });
-          });
-
-  $: totalResults = yarns
-    .filter((yarn) => {
-      if (!selectedYarnId) return true;
-      return yarn.id === selectedYarnId;
-    })
-    .filter((yarn) => {
-      if (!selectedYarnWeightId) return true;
-      return yarn.weightId === selectedYarnWeightId;
-    })
-    .flatMap((n) => n.colorways.map((m) => m.colors.length))
-    .reduce((partialSum, a) => partialSum + a, 0);
-
-  $: selectedBrandId,
-    selectedYarnId,
-    selectedYarnWeightId,
-    search,
-    yarns,
-    sortColors,
-    currentColor,
-    itemsToShow,
-    getResults();
-
-  $: selectedIds = selectedColors.map(
-    (n) => `${n.hex}${n.name}${n.brandId}${n.yarnId}`,
-  );
 
   function getResults() {
     // debounce is because it sometimes got called more than once at a time
@@ -277,11 +229,78 @@ If not, see <https://www.gnu.org/licenses/>. -->
         });
     }
   }
-</script>
 
-{#if showScrollToTopButton}
-  <ToTopButton bottom={scrollToTopButtonBottom} onClick={onClickScrollToTop} />
-{/if}
+  $effect(() => {
+    if (loadMoreSpinner) loadMoreColors.observe(loadMoreSpinner);
+  });
+
+  let yarns = $derived(
+    selectedBrandId === ''
+      ? brands
+          .flatMap((n, i) =>
+            n.yarns.map((n) => {
+              return {
+                ...n,
+                brandId: brands[i].id,
+                brandName: brands[i].name,
+              };
+            }),
+          )
+          .sort((a, b) => {
+            const nameA = a.name.toUpperCase(); // ignore upper and lowercase
+            const nameB = b.name.toUpperCase(); // ignore upper and lowercase
+            if (nameA > nameB) {
+              return 1;
+            }
+            if (nameA < nameB) {
+              return -1;
+            }
+            // names must be equal
+            return 0;
+          })
+      : brands
+          ?.filter((brand) => brand.id === selectedBrandId)
+          ?.flatMap((n) => {
+            return n.yarns.map((yarn) => {
+              return {
+                ...yarn,
+                brandId: n.id,
+                brandName: n.name,
+              };
+            });
+          }),
+  );
+
+  let totalResults = $derived(
+    yarns
+      .filter((yarn) => {
+        if (!selectedYarnId) return true;
+        return yarn.id === selectedYarnId;
+      })
+      .filter((yarn) => {
+        if (!selectedYarnWeightId) return true;
+        return yarn.weightId === selectedYarnWeightId;
+      })
+      .flatMap((n) => n.colorways.map((m) => m.colors.length))
+      .reduce((partialSum, a) => partialSum + a, 0),
+  );
+
+  $effect(() => {
+    selectedBrandId,
+      selectedYarnId,
+      selectedYarnWeightId,
+      search,
+      yarns,
+      sortColors,
+      currentColor,
+      itemsToShow,
+      getResults();
+  });
+
+  let selectedIds = $derived(
+    selectedColors.map((n) => `${n.hex}${n.name}${n.brandId}${n.yarnId}`),
+  );
+</script>
 
 <div
   class="w-full grid grid-cols-12 items-end gap-2 my-2"
@@ -341,7 +360,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       type="text"
       class="w-full input"
       bind:value={search}
-      on:input={() => {
+      oninput={() => {
         itemsToShow = YARN_COLORWAYS_PER_PAGE;
       }}
     />
@@ -393,6 +412,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {pluralize('Colorway', totalResults)}
   </p>
 {/if}
+
 <div class="flex flex-wrap gap-1 my-4 justify-center">
   {#if results?.length && !loadingAllColors}
     {#each results as { hex, name, delta, brandName, yarnName, brandId, yarnId, variant_href, affiliate_variant_href }}
@@ -405,7 +425,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         type="button"
         class="rounded-container-token shadow-sm cursor-pointer flex-1 min-w-fit p-2 flex flex-col gap-2 items-start justify-start"
         style="background:{hex}; color:{getTextColor(hex)};"
-        on:click={() =>
+        onclick={() =>
           toggleSelected({
             brandId,
             yarnId,
@@ -462,5 +482,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {/if}
   {:else}
     <p class="italic">No Matching Colorways</p>
+  {/if}
+  {#if showScrollToTopButton}
+    <ToTopButton
+      bottom={scrollToTopButtonBottom}
+      onClick={onClickScrollToTop}
+    />
   {/if}
 </div>

@@ -16,17 +16,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script>
   /**
    * @typedef {Object} Props
-   * @property {any} onClose - This property is used by Modal.svelte to pass down the close function
+   * @property {any} onClose
    * @property {boolean} [absolute]
+   * @property {string} [text]
    */
 
   /** @type {Props} */
-  let { onClose, absolute = true } = $props();
+  let { onClose, absolute = true, text = '' } = $props();
 </script>
 
 <button
   aria-label="Close"
-  class="btn btn-icon z-20 variant-glass-secondary flex justify-center items-center flex-auto float-right"
+  class=" {text
+    ? 'btn'
+    : 'btn-icon'} relative variant-glass-secondary flex justify-center items-center flex-auto float-right"
   onclick={onClose}
 >
   <svg
@@ -43,4 +46,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       d="M6 18L18 6M6 6l12 12"
     />
   </svg>
+  {#if text}
+    <span class="font-bold">{text}</span>
+  {/if}
 </button>

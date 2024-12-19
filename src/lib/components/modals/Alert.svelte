@@ -13,15 +13,18 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script>
-  import CloseButton from '$lib/components/modals/CloseButton.svelte';
-  import { getContext } from 'svelte';
+<script lang="ts">
+  import ModalShell from './ModalShell.svelte';
 
-  const { close } = getContext('simple-modal');
-
-  export let message = 'Alert';
+  let {
+    message = 'Alert',
+    parent,
+  }: {
+    message?: string;
+    parent: any;
+  } = $props();
 </script>
 
-<CloseButton onClose={close} />
-
-<p class="p-2 sm:p-4 mt-10">{@html message}</p>
+<ModalShell {parent}>
+  <p class="">{@html message}</p>
+</ModalShell>

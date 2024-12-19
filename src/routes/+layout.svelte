@@ -41,6 +41,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from 'svelte-floating-ui/dom';
   import { onlineStore } from '@sveltelegos-blue/svelte-legos';
   import '../css/main.css';
+  import { fade, scale } from 'svelte/transition';
 
   initializeStores();
 

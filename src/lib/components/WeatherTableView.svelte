@@ -15,7 +15,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import { DataHandler, Th } from '@vincjo/datatables';
-  import { bind } from 'svelte-simple-modal';
   import { UNIT_LABELS } from '$lib/constants';
   import RecentWeatherDataTooltip from '$lib/components/RecentWeatherDataTooltip.svelte';
   import {
@@ -140,83 +139,87 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     class:hover:px-2={$weatherGrouping === 'day'}
                     on:click={() => {
                       if (id === 'dayt') {
-                        modal.set(
-                          bind(TextInput, {
-                            value: row[id],
-                            title: `<div class="flex flex-col items-center justify-center"><span class="font-bold">${row.date}</span><span>${label}</span></div>`,
-                            onOkay: (_value) => {
-                              $isCustomWeather = true;
-                              const time = _value.split(':');
-                              if (time.length !== 2) return;
-                              const hours = +time[0] + +time[1] / 60;
-                              page = handler.getPageNumber();
-                              perPage = handler.getRowsPerPage();
-                              sort = handler.getSorted();
-                              $tablePage = $page;
-                              $tableRowsPerPage = $perPage;
-                              $tableSort = $sort;
-                              const mappedWeather = $weatherUngrouped.map(
-                                (n) =>
-                                  `${dateToISO8601String(n.date)}-${n.location}`,
-                              );
-                              const i = mappedWeather.indexOf(
-                                `${row.date}-${row.location}`,
-                              );
-                              $weatherUngrouped[i][id].metric = hoursToMinutes(
-                                hours,
-                                4,
-                              );
-                              $weatherUngrouped[i][id].imperial = displayNumber(
-                                +hours,
-                                4,
-                              );
+                        modal.state.trigger({
+                          type: 'component',
+                          component: {
+                            ref: TextInput,
+                            props: {
+                              value: row[id],
+                              title: `<div class="flex flex-col items-center justify-center"><span class="font-bold">${row.date}</span><span>${label}</span></div>`,
+                              onOkay: (_value) => {
+                                $isCustomWeather = true;
+                                const time = _value.split(':');
+                                if (time.length !== 2) return;
+                                const hours = +time[0] + +time[1] / 60;
+                                page = handler.getPageNumber();
+                                perPage = handler.getRowsPerPage();
+                                sort = handler.getSorted();
+                                $tablePage = $page;
+                                $tableRowsPerPage = $perPage;
+                                $tableSort = $sort;
+                                const mappedWeather = $weatherUngrouped.map(
+                                  (n) =>
+                                    `${dateToISO8601String(n.date)}-${n.location}`,
+                                );
+                                const i = mappedWeather.indexOf(
+                                  `${row.date}-${row.location}`,
+                                );
+                                $weatherUngrouped[i][id].metric =
+                                  hoursToMinutes(hours, 4);
+                                $weatherUngrouped[i][id].imperial =
+                                  displayNumber(+hours, 4);
+                              },
                             },
-                          }),
-                        );
+                          },
+                        });
                       } else {
-                        modal.set(
-                          bind(NumberInput, {
-                            max: 1000,
-                            value: row[id],
-                            title: `<div class="flex flex-col items-center justify-center"><span class="font-bold">${row.date}</span><span>${label} <span class="text-sm">(${UNIT_LABELS[type][$units]})</span></span></div>`,
-                            noMinMax: true,
-                            showSlider: false,
-                            onOkay: (_value) => {
-                              $isCustomWeather = true;
-                              page = handler.getPageNumber();
-                              perPage = handler.getRowsPerPage();
-                              sort = handler.getSorted();
-                              $tablePage = $page;
-                              $tableRowsPerPage = $perPage;
-                              $tableSort = $sort;
-                              const mappedWeather = $weatherUngrouped.map(
-                                (n) =>
-                                  `${dateToISO8601String(n.date)}-${n.location}`,
-                              );
-                              const i = mappedWeather.indexOf(
-                                `${row.date}-${row.location}`,
-                              );
-                              if ($units === 'metric') {
-                                $weatherUngrouped[i][id].metric = _value;
-                                if (type === 'temperature')
-                                  $weatherUngrouped[i][id].imperial =
-                                    celsiusToFahrenheit(_value);
-                                if (type === 'height')
-                                  $weatherUngrouped[i][id].imperial =
-                                    millimetersToInches(_value);
-                              }
-                              if ($units === 'imperial') {
-                                $weatherUngrouped[i][id].imperial = _value;
-                                if (type === 'temperature')
-                                  $weatherUngrouped[i][id].metric =
-                                    fahrenheitToCelsius(_value);
-                                if (type === 'height')
-                                  $weatherUngrouped[i][id].metric =
-                                    inchesToMillimeters(_value);
-                              }
+                        modal.state.trigger({
+                          type: 'component',
+                          component: {
+                            ref: NumberInput,
+                            props: {
+                              max: 1000,
+                              value: row[id],
+                              title: `<div class="flex flex-col items-center justify-center"><span class="font-bold">${row.date}</span><span>${label} <span class="text-sm">(${UNIT_LABELS[type][$units]})</span></span></div>`,
+                              noMinMax: true,
+                              showSlider: false,
+                              onOkay: (_value) => {
+                                $isCustomWeather = true;
+                                page = handler.getPageNumber();
+                                perPage = handler.getRowsPerPage();
+                                sort = handler.getSorted();
+                                $tablePage = $page;
+                                $tableRowsPerPage = $perPage;
+                                $tableSort = $sort;
+                                const mappedWeather = $weatherUngrouped.map(
+                                  (n) =>
+                                    `${dateToISO8601String(n.date)}-${n.location}`,
+                                );
+                                const i = mappedWeather.indexOf(
+                                  `${row.date}-${row.location}`,
+                                );
+                                if ($units === 'metric') {
+                                  $weatherUngrouped[i][id].metric = _value;
+                                  if (type === 'temperature')
+                                    $weatherUngrouped[i][id].imperial =
+                                      celsiusToFahrenheit(_value);
+                                  if (type === 'height')
+                                    $weatherUngrouped[i][id].imperial =
+                                      millimetersToInches(_value);
+                                }
+                                if ($units === 'imperial') {
+                                  $weatherUngrouped[i][id].imperial = _value;
+                                  if (type === 'temperature')
+                                    $weatherUngrouped[i][id].metric =
+                                      fahrenheitToCelsius(_value);
+                                  if (type === 'height')
+                                    $weatherUngrouped[i][id].metric =
+                                      inchesToMillimeters(_value);
+                                }
+                              },
                             },
-                          }),
-                        );
+                          },
+                        });
                       }
                     }}>{row[id]}</button
                   ></td
@@ -228,7 +231,4 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </tbody>
     </table>
   </DataTable>
-  <!-- {#if $weatherGrouping === "day"}
-        <p class="my-2 text-sm">To edit a value, select it from the table above.</p>
-    {/if} -->
 </div>

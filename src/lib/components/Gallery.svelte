@@ -209,7 +209,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {#each Array(5) as _, i}
             <div
               class="placeholder animate-pulse snap-center shrink-0 h-[324px] w-[245px] rounded-container-token bg-surface-100-800-token"
-            />
+            ></div>
           {/each}
         {:else}
           {#each $popularProjects as { featured_image_src, id, meta }}
@@ -483,7 +483,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </p>
         {/if}
         {#if loading}
-          <!-- <div class="h-28 flex items-center"><Spinner /></div> -->
           <div
             class=" gap-4 w-full {$layout === 'grid'
               ? 'grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 justify-center items-start '
@@ -495,7 +494,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 'grid'
                   ? 'w-full h-[350px]'
                   : 'w-full h-[120px]'}"
-              />
+              ></div>
             {/each}
           </div>
         {:else if $displayedProjects.length && hasNextPage}
