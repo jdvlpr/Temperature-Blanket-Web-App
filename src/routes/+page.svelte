@@ -376,7 +376,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <div class="lg:rounded-container-token overflow-hidden lg:mb-4">
           <div
             class="flex flex-wrap justify-center items-center p-4 text-center bg-cover bg-no-repeat bg-center"
-            style="background-image:url('/images/layout/bg.png');"
+            style="background-image:url('/images/layout/tb-cover-image-winter-trees-sunset.webp');"
           >
             <div
               class="max-w-screen-md w-full rounded-container-token bg-surface-50/85 dark:bg-surface-900/85 shadow px-4 py-4 inline-flex flex-col justify-center items-center gap-4"
