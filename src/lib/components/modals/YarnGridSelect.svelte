@@ -42,8 +42,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     search?: string;
     selectedColors: Color[];
     limit?: boolean;
-    currentColor?: Color;
+    incomingColor?: Color;
     onClickScrollToTop: any;
+    onSelection?: any;
     scrollToTopButtonBottom?: string;
   }
 
@@ -53,8 +54,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     search = $bindable(''),
     selectedColors = $bindable(),
     limit = false,
-    currentColor = $bindable(),
+    incomingColor = { hex: '#ffffff' },
     onClickScrollToTop,
+    onSelection,
     scrollToTopButtonBottom = '100px',
   }: Props = $props();
 
@@ -146,7 +148,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             .map((color) => {
               return {
                 ...color,
-                delta: chroma.deltaE(currentColor.hex, color.hex),
+                delta: chroma.deltaE(incomingColor.hex, color.hex),
               };
             })
             .sort((a, b) =>
@@ -228,6 +230,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
           block: 'start',
         });
     }
+
+    if (onSelection) onSelection(selectedColors);
   }
 
   $effect(() => {
@@ -292,7 +296,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       search,
       yarns,
       sortColors,
-      currentColor,
+      incomingColor,
       itemsToShow,
       getResults();
   });
@@ -418,8 +422,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {#each results as { hex, name, delta, brandName, yarnName, brandId, yarnId, variant_href, affiliate_variant_href }}
       {@const isSelected =
         (selectedIds.includes(`${hex}${name}${brandId}${yarnId}`) &&
-          (hasIncomingColor ? currentColor.hex === hex : true)) ||
-        (canMarkIfHexMatches && currentColor.hex === hex)}
+          (hasIncomingColor ? incomingColor.hex === hex : true)) ||
+        (canMarkIfHexMatches && incomingColor.hex === hex)}
       {@const percentMatch = Math.floor(100 - delta)}
       <button
         type="button"

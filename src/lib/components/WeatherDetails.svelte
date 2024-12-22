@@ -76,15 +76,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
   $: isRecentDate = getIsRecentDate(day?.date);
 </script>
 
-{#if context === 'modal' && $isDesktop}
+{#if context === 'modal' && isDesktop.current}
   <CloseButton onClose={close} />
 {/if}
 
 <div
   class="overflow-x-hidden mt-2 outline-none"
-  class:p-2={context === 'modal' && $isDesktop}
-  class:sm:p-4={context === 'modal' && $isDesktop}
-  class:!mt-16={context === 'modal' && $isDesktop}
+  class:p-2={context === 'modal' && isDesktop.current}
+  class:sm:p-4={context === 'modal' && isDesktop.current}
+  class:!mt-16={context === 'modal' && isDesktop.current}
   bind:this={navigatorElement}
 >
   <div class="font-semibold text-lg">

@@ -15,8 +15,7 @@
 
 import Alert from '$lib/components/modals/Alert.svelte';
 import { modal } from '$lib/stores';
-import { onlineStore } from '@sveltelegos-blue/svelte-legos';
-import { get } from 'svelte/store';
+import { online } from 'svelte/reactivity/window';
 
 /**
  * Display error message
@@ -26,14 +25,11 @@ import { get } from 'svelte/store';
  *
  */
 export const displayGeoNamesErrorMessage = (message) => {
-  const isOnline = onlineStore();
-  const isOffline = !get(isOnline);
-
   let text = `
   <p class='font-bold text-2xl'>Whoa!</p>
   <p class='font-bold'>There's been a problem.</p>`;
 
-  if (isOffline) {
+  if (!online.current) {
     text += `<p class="my-4">It appears you're offline.</p>`;
   } else {
     text += `<p class='my-4'>It appears the location-fetching service is experiencing technical difficulties.

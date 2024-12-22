@@ -32,9 +32,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let { updateGauge, parent}: Props = $props();
 
-  if (parent) parent.width = 'w-modal-wide';
-  if (!$isDesktop)  parent.width = 'w-full';
-
   let selectedColors: object[] = $state([]);
   let container = null;
 
@@ -49,16 +46,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 
   let paletteTitleText = $derived(getPaletteTitleText(selectedColors));
-
-$effect(() => {
-  container.focus();
-})
 </script>
 
 
 
-<ModalShell {parent}>
-  <div class="focus:!outline-none" tabindex="0" bind:this={container}>
+<ModalShell {parent} size="large" preventDefaultFocus={true}>
+  <div bind:this={container}>
     <YarnGridSelect
       bind:selectedColors
       onClickScrollToTop={() => {

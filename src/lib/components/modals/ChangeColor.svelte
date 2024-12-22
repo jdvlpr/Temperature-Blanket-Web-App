@@ -14,6 +14,8 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
   import StickyPart from '$lib/components/modals/StickyPart.svelte';
   import YarnGridSelect from '$lib/components/modals/YarnGridSelect.svelte';
@@ -21,27 +23,45 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import chroma from 'chroma-js';
   import ModalShell from './ModalShell.svelte';
 
-  export let index = null,
-    hex,
-    name,
-    brandId,
-    yarnId,
-    brandName,
-    yarnName,
-    variant_href,
-    affiliate_variant_href,
-    onChangeColor;
 
-    export let parent: any;
+  interface Props {
+    index?: any;
+    hex: any;
+    name: any;
+    brandId: any;
+    yarnId: any;
+    brandName: any;
+    yarnName: any;
+    variant_href: any;
+    affiliate_variant_href: any;
+    onChangeColor: any;
+    parent: any;
+  }
 
-    let container: HTMLElement;
+  let {
+    index = null,
+    hex = $bindable(),
+    name = $bindable(),
+    brandId = $bindable(),
+    yarnId = $bindable(),
+    brandName = $bindable(),
+    yarnName = $bindable(),
+    variant_href = $bindable(),
+    affiliate_variant_href = $bindable(),
+    onChangeColor,
+    parent
+  }: Props = $props();
+
+    let container: HTMLElement = $state();
 
   const modalStore = getModalStore();
 
-  let valid = true;
-  let inputTypeColorValue = hex;
-  let inputTypeTextValue = hex;
-  let selectedColors = [
+    if (parent) parent.width = 'w-modal-wide';
+
+  let valid = $state(true);
+  let inputTypeColorValue = $state(hex);
+  let inputTypeTextValue = $state(hex);
+  let selectedColors = $state([
     {
       hex,
       name,
@@ -52,20 +72,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
       variant_href,
       affiliate_variant_href,
     },
-  ];
+  ]);
   let title = index !== null ? `${index + 1}` : '';
   let _brandId = brandId;
   let _yarnId = yarnId;
-
-  $: if (selectedColors?.length) {
-    const color = selectedColors[0];
-    inputTypeColorOnChange({ value: color.hex, color });
-  }
-
-  $: currentColor = {
-    hex,
-    name,
-  };
 
   function inputTypeColorOnChange({ value, color }) {
     name = color?.name;
@@ -77,6 +87,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     affiliate_variant_href = color?.affiliate_variant_href;
 
     let __color = value;
+    
     if (!chroma.valid(__color)) {
       valid = false;
       return;
@@ -123,10 +134,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     else onChangeColor({ hex });
     modalStore.close();
   }
+  
+  let currentColor = $derived({hex});
 </script>
-<ModalShell {parent}>
+<ModalShell {parent} size="large" preventDefaultFocus={true}>
   <div class="" bind:this={container}>
-    <p class="my-2">Color {title}</p>
+    <p class="my-2 text-center text-xs">Color {title}</p>
     {#if affiliate_variant_href}
       <a
         class="btn bg-secondary-hover-token flex flex-wrap justify-center items-center gap-2 underline w-fit mx-auto"
@@ -208,7 +221,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           type="color"
           class="input"
           value={inputTypeColorValue}
-          on:change={(e) =>
+          onchange={(e) =>
             inputTypeColorOnChange({
               value: e.target.value,
             })}
@@ -219,7 +232,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           type="text"
           class="input mb-2 mt-1 grow w-full"
           value={inputTypeTextValue}
-          on:keyup={(e) =>
+          onkeyup={(e) =>
             inputTypeTextOnChange({
               value: e.target.value,
             })}
@@ -232,12 +245,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
       bind:selectedColors
       selectedBrandId={_brandId}
       selectedYarnId={_yarnId}
-      bind:currentColor
+      incomingColor={currentColor}
       onClickScrollToTop={() => {
         container.scrollIntoView({
           behavior: 'smooth',
           block: 'start',
         });
+      }}
+      onSelection={(e) => {
+        const color = e[0];      
+        inputTypeColorOnChange({ value: color.hex, color });
       }}
       scrollToTopButtonBottom="4rem"
     />
@@ -246,15 +263,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {#snippet stickyPart()}
       <StickyPart position="bottom">
         <div class="p-2 sm:px-4">
+          {#if !valid}
+            <p class="card variant-soft-warning p-4 my-2">Please enter a valid color</p>
+          {/if}
           <SaveAndCloseButtons
             onSave={_onOkay}
             onClose={modalStore.close}
             disabled={!valid}
           />
       
-          {#if !valid}
-            <p class="card variant-soft-warning p-4">Please enter a valid color</p>
-          {/if}
         </div>
       </StickyPart>
   {/snippet}

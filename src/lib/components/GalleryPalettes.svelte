@@ -309,7 +309,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       disabled={!hasNextPage || isLoadingMore}
       on:click={async () => {
         isLoadingMore = true;
-        if ($isDesktop) loading = true;
+        if (isDesktop.current) loading = true;
         const yarnSearch = getYarnSearch({
           brandId: $filteredBrandId,
           yarnId: $filteredYarnId,

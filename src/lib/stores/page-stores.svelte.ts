@@ -15,7 +15,7 @@
 
 import { ICONS } from '$lib/constants';
 import { localStorageStore } from '@skeletonlabs/skeleton';
-import { mediaQuery } from '@sveltelegos-blue/svelte-legos';
+import { MediaQuery } from 'svelte/reactivity';
 import { derived, readable, writable, type Writable } from 'svelte/store';
 
 class ModalState {
@@ -45,7 +45,7 @@ export const pinAllSections = writable(false);
 
 export const wasProjectLoadedFromURL = writable(false);
 
-export const isDesktop = mediaQuery('(min-width: 768px)');
+export const isDesktop = new MediaQuery('(min-width: 768px)');
 
 export const windowLanguage = writable(null);
 

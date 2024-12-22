@@ -14,14 +14,21 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  export let position = 'top';
+  /**
+   * @typedef {Object} Props
+   * @property {string} [position]
+   * @property {import('svelte').Snippet} [children]
+   */
 
-  $: classPosition = position === 'top' ? 'top-0' : 'bottom-0';
-  $: paddingTop = position === 'top' ? 'pt-2 sm:pt-0' : 'pb-2 sm:pb-0';
+  /** @type {Props} */
+  let { position = 'top', children } = $props();
+
+  let classPosition = $derived(position === 'top' ? 'top-0' : 'bottom-0');
+  let paddingTop = $derived(position === 'top' ? 'pt-2 sm:pt-0' : 'pb-2 sm:pb-0');
 </script>
 
 <div
   class="sticky {classPosition} {paddingTop} rounded-br-container-token rounded-bl-container-token z-10 bg-surface-200-700-token px-0 mx-0"
 >
-  <slot />
+  {@render children?.()}
 </div>

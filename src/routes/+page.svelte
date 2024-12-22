@@ -404,7 +404,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   class="flex flex-col gap-x-4 gap-y-2 text-sm space-around justify-center items-center"
                   data-sveltekit-preload-data="hover"
                 >
-                  {#if $isDesktop}
+                  {#if isDesktop.current}
                     <button
                       class="btn variant-filled-secondary gap-1 items-center"
                       onclick={() =>
@@ -427,7 +427,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     >
                   {/if}
                   <Drawer.Root bind:open={$openDrawerGettingStarted}>
-                    {#if !$isDesktop}
+                    {#if !isDesktop.current}
                       <Drawer.Trigger
                         onclick={() => ($openDrawerGettingStarted = true)}
                       >

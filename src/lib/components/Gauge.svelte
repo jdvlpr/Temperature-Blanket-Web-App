@@ -179,7 +179,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     />
   </div>
 
-  {#if $isDesktop}
+  {#if isDesktop.current}
     <button
       class="btn bg-secondary-hover-token justify-start"
       title="Browse Preset & User-Created Color Palettes"
@@ -218,7 +218,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     }}
     bind:open={$openDrawerBrowsePalettes}
   >
-    {#if !$isDesktop}
+    {#if !isDesktop.current}
       <Drawer.Trigger on:click={() => ($openDrawerBrowsePalettes = true)}>
         <button
           class="btn bg-secondary-hover-token justify-start"

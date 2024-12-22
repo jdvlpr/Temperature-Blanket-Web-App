@@ -23,12 +23,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div
-  class="flex flex-wrap items-center gap-x-2 gap-y-2 justify-between mx-auto w-full"
+  class="flex flex-wrap items-center gap-x-2 gap-y-2 justify-end mx-auto w-full"
 >
   <CloseButton {onClose} text="Cancel" />
 
   <button
-    class="btn variant-filled-primary flex justify-center items-center flex-auto"
+    class="btn variant-filled-primary flex justify-center items-center"
     on:click={onSave}
     {disabled}
     title={saveText}

@@ -14,6 +14,8 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import { onNavigate } from '$app/navigation';
   import { PUBLIC_MICROSOFT_CLARITY_ID } from '$env/static/public';
   import { consentToMSClarityCookies, modal } from '$lib/stores';
@@ -25,8 +27,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import {
     Modal,
     Toast,
-    getToastStore,
     getModalStore,
+    getToastStore,
     initializeStores,
     storePopup,
   } from '@skeletonlabs/skeleton';
@@ -39,9 +41,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
     offset,
     shift,
   } from 'svelte-floating-ui/dom';
-  import { onlineStore } from '@sveltelegos-blue/svelte-legos';
+  import { online } from 'svelte/reactivity/window';
   import '../css/main.css';
-  import { fade, scale } from 'svelte/transition';
+  interface Props {
+    children?: import('svelte').Snippet;
+  }
+
+  let { children }: Props = $props();
 
   initializeStores();
 
@@ -54,7 +60,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     arrow,
   });
 
-  const isOnline = onlineStore();
   const toastStore = getToastStore();
 
   modal.state = getModalStore() || false;
@@ -82,10 +87,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 
   let networkChangeCount = 0;
-  $: $isOnline, onChangeIsOnline();
 
   function onChangeIsOnline() {
-    if ($isOnline && networkChangeCount > 0) {
+    if (online.current && networkChangeCount > 0) {
       // Alert if online connection restored
       toastStore.trigger({
         message: `<div
@@ -98,7 +102,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </div>`,
         background: 'bg-success-200-700-token text-token',
       });
-    } else if (!$isOnline) {
+    } else if (!online.current) {
       toastStore.trigger({
         message: `<div
     class="w-full p-2 m-auto flex flex-col items-start text-left"
@@ -128,6 +132,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     }
     networkChangeCount++;
   }
+  $effect(() => {
+    online.current, onChangeIsOnline();
+  });
 </script>
 
 <svelte:head>
@@ -186,7 +193,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <Modal />
 
-<slot />
+{@render children?.()}
 
 <style>
   @keyframes fade-in {
