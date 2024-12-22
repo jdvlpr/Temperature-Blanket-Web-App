@@ -385,11 +385,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
       >
         <div class="lg:rounded-container-token overflow-hidden lg:mb-4">
           <div
-            class="flex flex-wrap justify-center items-center p-4 text-center bg-cover bg-no-repeat bg-top"
-            style="background-image:url('/images/layout/aspose-a+colorful+blanket+in+the+style+of+Monet+-50.webp');"
+            class="flex flex-wrap justify-center items-center p-4 text-center bg-cover bg-no-repeat bg-center"
+            style="background-image:url('/images/layout/tb-cover-image-winter-trees-sunset.webp');"
           >
             <div
-              class="max-w-screen-md w-full rounded-container-token bg-surface-50/80 dark:bg-surface-900/80 shadow px-8 py-4 lg:py-8 inline-flex flex-col justify-center items-center gap-4"
+              class="max-w-screen-md w-full rounded-container-token bg-surface-50/85 dark:bg-surface-900/85 shadow px-4 py-4 inline-flex flex-col justify-center items-center gap-4"
             >
               <div class="flex flex-col gap-2">
                 <h2 class="font-light text-lg uppercase tracking-widest">
