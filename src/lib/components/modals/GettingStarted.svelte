@@ -17,6 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { modal, openDrawerGettingStarted } from '$lib/stores';
   import { Step, Stepper } from '@skeletonlabs/skeleton';
   import { onMount } from 'svelte';
+
   export let parent: any;
 
   let container: HTMLDivElement;
@@ -25,7 +26,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <div
   bind:this={container}
-  class="{parent?.background} {parent?.rounded} px-2 pb-6 sm:px-10 text-left max-w-screen-lg {close
+  class="{parent?.background} {parent?.rounded} px-2 pb-6 sm:px-10 text-left max-w-screen-lg {parent
     ? 'pt-16'
     : 'pt-4'}"
 >
@@ -33,7 +34,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     stepTerm=""
     buttonCompleteLabel="Lets Go!"
     on:complete={() => {
-      if (modal[0]) modal.close();
+      if (parent) modal.close();
       else $openDrawerGettingStarted = false;
     }}
   >

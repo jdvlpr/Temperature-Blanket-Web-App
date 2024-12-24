@@ -14,16 +14,14 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import CloseButton from '$lib/components/modals/CloseButton.svelte';
   import WeatherSources from '$lib/components/WeatherSources.svelte';
-  import { getContext } from 'svelte';
+  import ModalShell from './ModalShell.svelte';
 
-  const { close } = getContext('simple-modal');
+  export let parent;
 </script>
 
-<CloseButton onClose={close} />
-<div class="p-2 sm:p-4 mt-4">
-  <div class="mt-6">
+<ModalShell {parent} size="small">
+  <div class="flex flex-col items-center text-left w-full">
     <WeatherSources />
   </div>
-</div>
+</ModalShell>

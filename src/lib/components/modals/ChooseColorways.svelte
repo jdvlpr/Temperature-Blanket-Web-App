@@ -18,13 +18,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
   import StickyPart from '$lib/components/modals/StickyPart.svelte';
   import YarnGridSelect from '$lib/components/modals/YarnGridSelect.svelte';
-  import { isDesktop } from '$lib/stores';
   import { pluralize } from '$lib/utils';
   import { getModalStore } from '@skeletonlabs/skeleton';
   import ModalShell from './ModalShell.svelte';
 
-  const modalStore = getModalStore();
-
+  
   interface Props {
     updateGauge: any;
     parent: any;
@@ -32,9 +30,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let { updateGauge, parent}: Props = $props();
 
-  let selectedColors: object[] = $state([]);
-  let container = null;
+  const modalStore = getModalStore();
 
+  let selectedColors: object[] = $state([]);
+
+  let paletteTitleText = $derived(getPaletteTitleText(selectedColors));
+
+  let container = null;
 
   function getPaletteTitleText(colors) {
     if (colors.length) {
@@ -44,11 +46,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       return '';
     }
   }
-
-  let paletteTitleText = $derived(getPaletteTitleText(selectedColors));
 </script>
-
-
 
 <ModalShell {parent} size="large" preventDefaultFocus={true}>
   <div bind:this={container}>

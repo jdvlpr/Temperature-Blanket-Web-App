@@ -222,7 +222,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
         <button
           class="btn bg-secondary-hover-token w-fit"
-          on:click={() => {
+          on:click={async () => {
+            modal.state.close();
             modal.state.trigger({
               type: 'component',
               component: { ref: ChooseWeatherSource },

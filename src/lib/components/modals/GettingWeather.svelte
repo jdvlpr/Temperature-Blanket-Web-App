@@ -40,12 +40,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let { parent }: Props = $props();
 
-  if (parent) parent.width = 'w-modal-slim';
-
   let container: HTMLDivElement;
 
-  onMount(() => {
-    container.focus();
+  $effect(() => {
     getWeatherData();
   });
 
@@ -194,11 +191,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let allLocations = $derived(getAllLocations($locations));
 </script>
 
-<ModalShell {parent}>
-  <div
-    bind:this={container}
-    class="flex flex-col items-center text-center w-full"
-  >
+<ModalShell {parent} size="small">
+  <div class="flex flex-col items-center text-center w-full">
     {#if $signal && !error}
       <Spinner />
       <p class="font-bold text-xl my-4">Searching for Weather Data</p>

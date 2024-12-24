@@ -9,11 +9,11 @@ const pkg = JSON.parse(json);
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
-  compilerOptions: {
-    compatibility: {
-      componentApi: 4,
-    },
-  },
+  // compilerOptions: {
+  //   compatibility: {
+  //     componentApi: 4,
+  //   },
+  // },
   // Consult https://kit.svelte.dev/docs/integrations#preprocessors
   // for more information about preprocessors
   preprocess: vitePreprocess(),

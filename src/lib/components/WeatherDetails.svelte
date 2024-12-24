@@ -38,29 +38,41 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { getTextColor } from '$lib/utils/color-utils';
   import { getContext } from 'svelte';
 
-  let close = null;
+  let close = $state(null);
+  
   if (typeof getContext === 'function')
     close = getContext('simple-modal')?.close;
 
-  export let data = $weather ? $weather : [];
-  export let viewGaugeInfo = true;
-  export let context;
-  export let weatherTargets;
+  /**
+   * @typedef {Object} Props
+   * @property {any} [data]
+   * @property {boolean} [viewGaugeInfo]
+   * @property {any} context
+   * @property {any} weatherTargets
+   */
 
-  let rangeInput;
-  let navigatorElement;
+  /** @type {Props} */
+  let {
+    data = $weather ? $weather : [],
+    viewGaugeInfo = $bindable(true),
+    context,
+    weatherTargets
+  } = $props();
 
-  $: dayWeather = data[$activeWeatherElementIndex];
-  $: dayLocation = $locations?.filter(
+  let rangeInput = $state();
+  let navigatorElement = $state();
+
+  let dayWeather = $derived(data[$activeWeatherElementIndex]);
+  let dayLocation = $derived($locations?.filter(
     (location) => location.index === dayWeather?.location,
-  )[0];
-  $: day = { ...dayWeather, ...dayLocation };
+  )[0]);
+  let day = $derived({ ...dayWeather, ...dayLocation });
 
-  $: colorInfo = (targetId, day) => {
+  let colorInfo = $derived((targetId, day) => {
     if (!exists(day)) return null;
     let gaugeId = getTargetParentGaugeId(targetId);
     return getColorInfo(gaugeId, day[targetId][$units]);
-  };
+  });
 
   // function handleKeydown(e) {
   //     if (e.code === "ArrowRight" && $activeWeatherElementIndex < $weather.length - 1) {
@@ -73,7 +85,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   //     }
   // }
 
-  $: isRecentDate = getIsRecentDate(day?.date);
+  let isRecentDate = $derived(getIsRecentDate(day?.date));
 </script>
 
 {#if context === 'modal' && isDesktop.current}
@@ -102,7 +114,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         $weatherGrouping,
       )}'s Weather"
       class="prev scale-125 btn-icon bg-secondary-hover-token"
-      on:click={() => $activeWeatherElementIndex--}
+      onclick={() => $activeWeatherElementIndex--}
       disabled={$activeWeatherElementIndex === 0}
       title="Show Previous {capitalizeFirstLetter($weatherGrouping)}'s Weather"
       ><svg
@@ -127,7 +139,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       max={data?.length - 1}
       bind:this={rangeInput}
       bind:value={$activeWeatherElementIndex}
-      on:keydown={(event) =>
+      onkeydown={(event) =>
         event.code === 'ArrowRight' || event.code === 'ArrowLeft'
           ? event.preventDefault()
           : null}
@@ -138,7 +150,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <button
       aria-label="Show Next {capitalizeFirstLetter($weatherGrouping)}'s Weather"
       class="next scale-125 btn-icon bg-secondary-hover-token"
-      on:click={() => $activeWeatherElementIndex++}
+      onclick={() => $activeWeatherElementIndex++}
       disabled={$activeWeatherElementIndex === data?.length - 1}
       title="Show Next {capitalizeFirstLetter($weatherGrouping)}'s Weather"
       ><svg
@@ -176,43 +188,45 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 {icon}
                 value={convertTime(day[id][$units])}
               >
-                <span slot="details">
-                  {#if viewGaugeInfo !== false && day[id][$units] !== null}
-                    {#if typeof index === 'number'}
-                      <div
-                        class="my-2 rounded-container-token py-2 px-4 text-center"
-                        style={viewGaugeInfo
-                          ? `background:${hex};color:${getTextColor(hex)};`
-                          : 'display:none'}
-                      >
-                        {#if brandName && yarnName}
+                {#snippet details()}
+                                <span >
+                    {#if viewGaugeInfo !== false && day[id][$units] !== null}
+                      {#if typeof index === 'number'}
+                        <div
+                          class="my-2 rounded-container-token py-2 px-4 text-center"
+                          style={viewGaugeInfo
+                            ? `background:${hex};color:${getTextColor(hex)};`
+                            : 'display:none'}
+                        >
+                          {#if brandName && yarnName}
+                            <p class="text-xs">
+                              {brandName}
+                              -
+                              {yarnName}
+                            </p>
+                          {/if}
+                          {#if name}
+                            <p class="text-lg">
+                              {name}
+                            </p>
+                          {/if}
                           <p class="text-xs">
-                            {brandName}
-                            -
-                            {yarnName}
+                            Color
+                            {index + 1}
+                            of
+                            {gaugeLength}
                           </p>
-                        {/if}
-                        {#if name}
-                          <p class="text-lg">
-                            {name}
-                          </p>
-                        {/if}
-                        <p class="text-xs">
-                          Color
-                          {index + 1}
-                          of
-                          {gaugeLength}
+                        </div>
+                      {:else}
+                        <p
+                          class="text-sm italic my-2 py-2 px-4 border-token border-surface-400-500-token rounded-container-token"
+                        >
+                          No Color Assigned
                         </p>
-                      </div>
-                    {:else}
-                      <p
-                        class="text-sm italic my-2 py-2 px-4 border-token border-surface-400-500-token rounded-container-token"
-                      >
-                        No Color Assigned
-                      </p>
+                      {/if}
                     {/if}
-                  {/if}
-                </span>
+                  </span>
+                              {/snippet}
               </WeatherItem>
             {:else}
               <WeatherItem
@@ -223,43 +237,45 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 units={UNIT_LABELS[type][$units]}
                 {isRecentDate}
               >
-                <span slot="details">
-                  {#if viewGaugeInfo !== false && day[id][$units] !== null}
-                    {#if typeof index === 'number'}
-                      <div
-                        class="my-2 rounded-container-token py-2 px-4 text-center"
-                        style={viewGaugeInfo
-                          ? `background:${hex};color:${getTextColor(hex)};`
-                          : 'display:none'}
-                      >
-                        {#if brandName && yarnName}
+                {#snippet details()}
+                                <span >
+                    {#if viewGaugeInfo !== false && day[id][$units] !== null}
+                      {#if typeof index === 'number'}
+                        <div
+                          class="my-2 rounded-container-token py-2 px-4 text-center"
+                          style={viewGaugeInfo
+                            ? `background:${hex};color:${getTextColor(hex)};`
+                            : 'display:none'}
+                        >
+                          {#if brandName && yarnName}
+                            <p class="text-xs">
+                              {brandName}
+                              -
+                              {yarnName}
+                            </p>
+                          {/if}
+                          {#if name}
+                            <p class="text-lg">
+                              {name}
+                            </p>
+                          {/if}
                           <p class="text-xs">
-                            {brandName}
-                            -
-                            {yarnName}
+                            Color
+                            {index + 1}
+                            of
+                            {gaugeLength}
                           </p>
-                        {/if}
-                        {#if name}
-                          <p class="text-lg">
-                            {name}
-                          </p>
-                        {/if}
-                        <p class="text-xs">
-                          Color
-                          {index + 1}
-                          of
-                          {gaugeLength}
+                        </div>
+                      {:else}
+                        <p
+                          class="text-sm italic my-2 py-2 px-4 border-token border-surface-400-500-token rounded-container-token"
+                        >
+                          No Color Assigned
                         </p>
-                      </div>
-                    {:else}
-                      <p
-                        class="text-sm italic my-2 py-2 px-4 border-token border-surface-400-500-token rounded-container-token"
-                      >
-                        No Color Assigned
-                      </p>
+                      {/if}
                     {/if}
-                  {/if}
-                </span>
+                  </span>
+                              {/snippet}
               </WeatherItem>
             {/if}
           {:else}

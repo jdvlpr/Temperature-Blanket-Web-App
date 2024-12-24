@@ -13,7 +13,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script context="module">
+<script module>
   export let search = writable('');
   export let filteredBrandId = writable('');
   export let filteredYarnId = writable('');
@@ -50,16 +50,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { writable } from 'svelte/store';
   import { slide } from 'svelte/transition';
 
+  interface Props {
+    updateGauge?: any;
+  }
+
+  let { updateGauge = null }: Props = $props();
+
   const modalStore = getModalStore();
 
-  let filtersExpanded = false;
-
-  export let updateGauge = null;
+  let filtersExpanded = $state(false);
 
   let first = 40;
-  let loading = true;
-  let projectsList;
-  let isLoadingMore = false;
+  let loading = $state(true);
+  let projectsList = $state();
+  let isLoadingMore = $state(false);
 
   onMount(async () => {
     if (!$projects.length) {
@@ -83,10 +87,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     } else loading = false;
   });
 
-  $: showSearchReset = !!$search.length;
+  let showSearchReset = $derived(!!$search.length);
 
-  $: hasNextPage = $gallery?.pageInfo?.hasNextPage;
-  $: endCursor = $gallery?.pageInfo?.endCursor;
+  let hasNextPage = $derived($gallery?.pageInfo?.hasNextPage);
+  let endCursor = $derived($gallery?.pageInfo?.endCursor);
 </script>
 
 <div
@@ -168,7 +172,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               disabled={loading}
               class=""
               title="Reset Search"
-              on:click={() => {
+              onclick={() => {
                 $search = '';
               }}
             >
@@ -215,7 +219,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <button
           disabled={loading}
           class="btn variant-filled-primary flex items-center font-bold w-full"
-          on:click={async () => {
+          onclick={async () => {
             projectsList.scrollIntoView({
               behavior: 'smooth',
               block: 'start',
@@ -281,7 +285,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <button
           type="button"
           class="cursor-pointer w-full"
-          on:click={() => {
+          onclick={() => {
             recordPageView(projectId);
             updateGauge({
               _colors: colors,
@@ -307,7 +311,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <button
       class="btn variant-filled-primary flex m-auto my-4"
       disabled={!hasNextPage || isLoadingMore}
-      on:click={async () => {
+      onclick={async () => {
         isLoadingMore = true;
         if (isDesktop.current) loading = true;
         const yarnSearch = getYarnSearch({

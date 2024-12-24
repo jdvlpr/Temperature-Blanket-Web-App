@@ -13,7 +13,7 @@
 
   let { parent, size, preventDefaultFocus, children, stickyPart }: Props = $props();
 
-  let width = $state(parent.width);
+  let width = $state(parent?.width);
   const modalStore = getModalStore();
 
   let shellElement;
@@ -21,7 +21,8 @@
 $effect(() => {
   if (!isDesktop.current) width = 'w-[100vw]';
   else if (size === 'large') width = 'w-modal-wide';
-  else width = parent.width;
+  else if (size === 'small') width = 'w-modal-slim';
+  else width = parent?.width || '';
 })
 
 $effect(() => {
@@ -34,7 +35,7 @@ $effect(() => {
 <div
 bind:this={shellElement}
 tabindex="0"
-  class="{parent?.background} {parent?.rounded} {parent?.position} {width} {parent?.height} {stickyPart ? '' : parent?.padding} {parent?.spacing} {parent?.shadow} max-h-[96svh] overflow-scroll relative focus:!outline-none"
+  class="{parent?.background} {parent?.rounded} {parent?.position} {width} {parent?.height} {stickyPart ? '' : parent?.padding} {parent?.spacing} {parent?.shadow} max-h-[100svh] sm:max-h-[96svh] overflow-auto focus:!outline-none"
 >
   <div class="{stickyPart ? 'p-4' : ''}">
     {#if $modalStore[0] && !stickyPart}

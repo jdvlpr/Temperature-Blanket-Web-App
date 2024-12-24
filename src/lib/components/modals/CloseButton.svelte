@@ -22,7 +22,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
    */
 
   /** @type {Props} */
-  let { onClose, absolute = true, text = '' } = $props();
+  let { onClose, text = '' } = $props();
 </script>
 
 <button
