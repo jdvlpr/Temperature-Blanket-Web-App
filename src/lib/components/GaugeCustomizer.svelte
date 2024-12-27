@@ -14,7 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
   import ColorRange from '$lib/components/ColorRange.svelte';
   import DaysInRange from '$lib/components/DaysInRange.svelte';
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
@@ -27,26 +27,29 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { dndzone } from 'svelte-dnd-action';
   import { flip } from 'svelte/animate';
 
-  export let props,
-    schemeId,
-    numberOfColors,
-    ranges,
-    rangeOptions,
-    context,
-    colors: Color[] = [];
+  interface Props {
+    gaugeAttributes: any;
+    schemeId: any;
+    numberOfColors: number;
+    ranges: any;
+    rangeOptions: any;
+    context: any;
+    colors?: Color[];
+  }
 
-  let dragDisabled = true;
+  let {
+    gaugeAttributes,
+    schemeId = $bindable(),
+    numberOfColors = $bindable(),
+    ranges = $bindable(),
+    rangeOptions = $bindable(),
+    context,
+    colors = $bindable([]),
+  }: Props = $props();
+
+  let dragDisabled = $state(true);
 
   const flipDurationMs = 90;
-
-  $: movable = colors?.length > 1;
-
-  $: hasAnyAffiliateURLs = checkForAffiliateURLs({ colors });
-
-  $: sortableColors = colors.map((color, i) => {
-    color.id = i;
-    return color;
-  });
 
   function checkForAffiliateURLs({ colors }) {
     return colors?.some((n) => n?.affiliate_variant_href);
@@ -112,14 +115,27 @@ If not, see <https://www.gnu.org/licenses/>. -->
     dragDisabled = false;
   }
 
+  let movable = $derived(colors?.length > 1);
+  let hasAnyAffiliateURLs = $derived(checkForAffiliateURLs({ colors }));
+  let sortableColors: Color[] = $state([]);
+
+  $effect(() => {
+    sortableColors = colors.map((color, i) => {
+      color.id = i;
+      return color;
+    });
+  });
+
   /**
    * Checks if the variable $showDaysInRange is of type boolean.
    * If it is not a boolean, it assigns the value true to $showDaysInRange.
    * I don't know why sometimes the value of $showDaysInRange is not a boolean.
    */
-  $: if (typeof $showDaysInRange !== 'boolean') {
-    $showDaysInRange = true;
-  }
+  $effect(() => {
+    if (typeof $showDaysInRange !== 'boolean') {
+      $showDaysInRange = true;
+    }
+  });
 </script>
 
 {#if hasAnyAffiliateURLs}
@@ -161,7 +177,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     class:md:justify-end={context !== 'weatherless'}
     class:md:col-span-4={context !== 'weatherless'}
     class:md:cols-start-9={context !== 'weatherless'}
-    class:mt-4={$page.url.pathname === '/yarn'}
+    class:mt-4={page.url.pathname === '/yarn'}
   >
     <ViewToggle />
   </div>
@@ -178,8 +194,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     type: 'gaugeCustomizer',
     dragDisabled,
   }}
-  on:consider={handleConsider}
-  on:finalize={handleFinalize}
+  onconsider={handleConsider}
+  onfinalize={handleFinalize}
 >
   {#each sortableColors as { hex, name, brandId, yarnId, brandName, yarnName, variant_href, affiliate_variant_href, id }, index (id)}
     <div
@@ -193,7 +209,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <button
           title="Remove Color"
           class="btn bg-secondary-hover-token flex flex-wrap justify-center items-center order-1"
-          on:click={() => removeColor(index)}
+          onclick={() => removeColor(index)}
         >
           <span class="text-xs">{index + 1}</span>
           {@html ICONS.trash}
@@ -205,7 +221,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         class:order-4={context !== 'weatherless'}
         class="btn bg-secondary-hover-token flex items-center justify-start"
         title="Choose a Color"
-        on:click={() =>
+        onclick={() =>
           modal.state.trigger({
             type: 'component',
             component: {
@@ -262,8 +278,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
           aria-label="drag-handle"
           class="btn-icon bg-secondary-hover-token handle order-5 p-2"
           style={dragDisabled ? 'cursor: grab' : 'cursor: grabbing'}
-          on:mousedown={startDrag}
-          on:touchstart={startDrag}
+          onmousedown={startDrag}
+          ontouchstart={startDrag}
         >
           {@html ICONS.arrowsPointingOut}
         </button>
@@ -304,7 +320,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               {colors}
               bind:ranges
               bind:rangeOptions
-              {props}
+              {gaugeAttributes}
             />
           {/key}
         </div>
@@ -313,7 +329,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <div
             class="flex flex-wrap w-fit justify-center items-center bg-surface-900/10 rounded-container-token shadow-inner order-7"
           >
-            <DaysInRange range={ranges[index]} {props} {rangeOptions} />
+            <DaysInRange
+              range={ranges[index]}
+              {gaugeAttributes}
+              {rangeOptions}
+            />
           </div>
         {/if}
       {/if}

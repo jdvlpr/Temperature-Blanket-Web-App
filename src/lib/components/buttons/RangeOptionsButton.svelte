@@ -18,7 +18,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import GaugeSettings from '$lib/components/modals/GaugeSettings.svelte';
   import { modal } from '$lib/stores';
 
-  export let props, ranges, colors, rangeOptions;
+  let {
+    gaugeAttributes,
+    ranges = $bindable(),
+    colors,
+    rangeOptions = $bindable()
+  } = $props();
 
   function onSaveRangeOptinos(e) {
     ranges = e.ranges;
@@ -36,7 +41,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       component: {
         ref: GaugeSettings,
         props: {
-          props,
+          gaugeAttributes,
           ranges,
           colors,
           rangeOptions,
@@ -61,7 +66,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </svg>
 
   Configure Ranges
-  <div slot="tooltip">
-    <p>Change the gauge direction, generate ranges, and more.</p>
-  </div>
+  {#snippet tooltip()}
+    <div >
+      <p>Change the gauge direction, generate ranges, and more.</p>
+    </div>
+  {/snippet}
 </Tooltip>

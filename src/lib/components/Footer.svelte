@@ -13,8 +13,14 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script>
-  export let subtleBackground = true;
+<script lang="ts">
+  interface Props {
+    subtleBackground?: boolean;
+    about?: import('svelte').Snippet;
+    sources?: import('svelte').Snippet;
+  }
+
+  let { subtleBackground = true, about, sources }: Props = $props();
 </script>
 
 <footer
@@ -22,17 +28,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
   class:bg-transparent={subtleBackground}
   class:dark:bg-transparent={subtleBackground}
 >
-  {#if $$slots.about}
+  {#if about}
     <div class="card h-fit variant-soft-surface p-4 text-token col-span-full">
       <h3 class="font-bold text-xl mb-2">About</h3>
-      <slot name="about" />
+      {@render about?.()}
     </div>
   {/if}
 
-  {#if $$slots.sources}
+  {#if sources}
     <div class="card variant-soft-surface p-4 h-fit text-token col-span-full">
       <h3 class="font-bold text-xl mb-2">Sources</h3>
-      <slot name="sources" />
+      {@render sources?.()}
     </div>
   {/if}
 </footer>

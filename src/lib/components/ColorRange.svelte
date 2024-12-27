@@ -17,7 +17,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import GaugeSettings from '$lib/components/modals/GaugeSettings.svelte';
   import { modal, units } from '$lib/stores';
 
-  export let index, colors, ranges, rangeOptions, props;
+  let {
+    index,
+    colors,
+    ranges = $bindable(),
+    rangeOptions = $bindable(),
+    gaugeAttributes,
+  } = $props();
 
   function onSaveRangeOptinos(e) {
     ranges = e.ranges;
@@ -29,7 +35,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <button
     class="btn bg-secondary-hover-token flex gap-2 justify-start items-center"
     title="Adjust Range"
-    on:click={(e) => {
+    onclick={(e) => {
       const wasToClicked =
         e.target.id === `range-${index}-to` ||
         e.target.parentElement.id === `range-${index}-to` ||
@@ -45,7 +51,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           props: {
             index,
             focusOn,
-            props,
+            gaugeAttributes,
             ranges,
             colors,
             rangeOptions,

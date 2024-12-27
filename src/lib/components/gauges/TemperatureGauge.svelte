@@ -13,12 +13,11 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script context="module" lang="ts">
+<script module lang="ts">
   import type { GaugeSettings } from '$lib/types';
   import chroma from 'chroma-js';
-  import { readable, writable, type Writable } from 'svelte/store';
 
-  export const settings: Writable<GaugeSettings> = writable({
+  export const gaugeSettings: GaugeSettings = $state({
     colors: chroma
       .scale('Spectral')
       .colors(10)
@@ -52,7 +51,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     schemeId: 'Spectral',
   });
 
-  export const props = readable({
+  export const gaugeAttributes = {
     id: 'temp',
     label: 'Temperature Gauge',
     unit: {
@@ -100,10 +99,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
         icon: '↓',
       },
     ],
-  });
+  };
 </script>
 
 <script>
+  
   import Gauge from '$lib/components/Gauge.svelte';
   import { tmax, tmin } from '$lib/stores';
   import {
@@ -111,66 +111,76 @@ If not, see <https://www.gnu.org/licenses/>. -->
     getEvenlyDistributedRangeValuesWithEqualDayCount,
   } from '$lib/utils';
 
-  $: maxes = $tmax.filter((n) => n !== null);
-  $: mins = $tmin.filter((n) => n !== null);
+  let maxes = $derived($tmax.filter((n) => n !== null));
+  let mins = $derived($tmin.filter((n) => n !== null));
 
-  $: max = Number.isInteger(Math.max(...maxes))
+  let max = $derived(Number.isInteger(Math.max(...maxes))
     ? Math.max(...maxes) + 1
-    : Math.ceil(Math.max(...maxes));
-  $: min = Number.isInteger(Math.min(...mins))
+    : Math.ceil(Math.max(...maxes)));
+  let min = $derived(Number.isInteger(Math.min(...mins))
     ? Math.min(...mins) - 1
-    : Math.floor(Math.min(...mins));
+    : Math.floor(Math.min(...mins)));
 
-  $: $settings.rangeOptions.auto.increment = displayNumber(
-    (max - min) / $settings.colors.length || 10,
-    2,
-  );
-  $: $settings.rangeOptions.auto.start.high = max;
-  $: $settings.rangeOptions.auto.start.low = min;
+  $effect(() => {
+    gaugeSettings.rangeOptions.auto.increment = displayNumber(
+      (max - min) / gaugeSettings.colors.length || 10,
+      2,
+    );
+  });
 
-  $: if ($settings.rangeOptions.manual.increment === null)
-    $settings.rangeOptions.manual.increment =
-      $settings.rangeOptions.auto.increment;
+  $effect(() => {
+    gaugeSettings.rangeOptions.auto.start.high = max;
+  });
 
-  $: if ($settings.rangeOptions.manual.start === null)
-    $settings.rangeOptions.manual.start =
-      $settings.rangeOptions.auto.start.high;
+  $effect(() => {
+    gaugeSettings.rangeOptions.auto.start.low = min;
+  });
 
-  $: if (!$settings.ranges.length) {
-    let start = max;
-    let increment = $settings.rangeOptions.auto.increment;
-    if (
-      $settings.rangeOptions?.auto?.optimization !== 'ranges' &&
-      $settings.rangeOptions?.mode === 'auto'
-    ) {
-      const newRanges = getEvenlyDistributedRangeValuesWithEqualDayCount({
-        weatherData: null,
-        numRanges: $settings.colors.length,
-        prop: $settings.rangeOptions.auto.optimization,
-        gaugeDirection: $settings.rangeOptions.direction,
-        roundIncrement: $settings.rangeOptions.auto.roundIncrement,
-        includeFrom: $settings.rangeOptions.includeFromValue,
-        includeTo: $settings.rangeOptions.includeToValue,
-      });
-      $settings.ranges = newRanges;
-    } else {
-      $settings.ranges = $settings?.colors.map((n, i) => {
-        let item = {
-          from: displayNumber(start, 0),
-          to: displayNumber(start - increment, 0),
-        };
-        start -= increment;
-        return item;
-      });
+  $effect(() => {
+    if (gaugeSettings.rangeOptions.manual.increment === null)
+      gaugeSettings.rangeOptions.manual.increment =
+        gaugeSettings.rangeOptions.auto.increment;
+  });
+
+  $effect(() => {
+    if (gaugeSettings.rangeOptions.manual.start === null)
+      gaugeSettings.rangeOptions.manual.start =
+        gaugeSettings.rangeOptions.auto.start.high;
+  });
+
+  $effect(() => {
+    if (!gaugeSettings.ranges.length) {
+      let start = max;
+      let increment = gaugeSettings.rangeOptions.auto.increment;
+      if (
+        gaugeSettings.rangeOptions?.auto?.optimization !== 'ranges' &&
+        gaugeSettings.rangeOptions?.mode === 'auto'
+      ) {
+        const newRanges = getEvenlyDistributedRangeValuesWithEqualDayCount({
+          weatherData: null,
+          numRanges: gaugeSettings.colors.length,
+          prop: gaugeSettings.rangeOptions.auto.optimization,
+          gaugeDirection: gaugeSettings.rangeOptions.direction,
+          roundIncrement: gaugeSettings.rangeOptions.auto.roundIncrement,
+          includeFrom: gaugeSettings.rangeOptions.includeFromValue,
+          includeTo: gaugeSettings.rangeOptions.includeToValue,
+        });
+        gaugeSettings.ranges = newRanges;
+      } else {
+        gaugeSettings.ranges = gaugeSettings?.colors.map((n, i) => {
+          let item = {
+            from: displayNumber(start, 0),
+            to: displayNumber(start - increment, 0),
+          };
+          start -= increment;
+          return item;
+        });
+      }
     }
-  }
+  });
 </script>
 
 <Gauge
-  bind:colors={$settings.colors}
-  bind:numberOfColors={$settings.numberOfColors}
-  bind:ranges={$settings.ranges}
-  bind:schemeId={$settings.schemeId}
-  bind:rangeOptions={$settings.rangeOptions}
-  props={$props}
+  bind:numberOfColors={gaugeSettings.numberOfColors}
+  {gaugeAttributes}
 />

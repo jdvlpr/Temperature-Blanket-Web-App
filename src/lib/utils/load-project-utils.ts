@@ -17,7 +17,7 @@ import { version } from '$app/environment';
 import { settings as daytimeGaugeSettings } from '$lib/components/gauges/DaytimeGauge.svelte';
 import { settings as rainGaugeSettings } from '$lib/components/gauges/RainGauge.svelte';
 import { settings as snowGaugeSettings } from '$lib/components/gauges/SnowGauge.svelte';
-import { settings as temperatureGaugeSettings } from '$lib/components/gauges/TemperatureGauge.svelte';
+import { gaugeSettings as temperatureGaugeSettings } from '$lib/components/gauges/TemperatureGauge.svelte';
 import { load as loadClnr } from '$lib/components/previews/CalendarSettings.svelte';
 import { load as loadChev } from '$lib/components/previews/ChevronsSettings.svelte';
 import { load as loadCosq } from '$lib/components/previews/ContinuousSquareSettings.svelte';

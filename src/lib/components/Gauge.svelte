@@ -14,7 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
   import ColorPaletteEditable from '$lib/components/ColorPaletteEditable.svelte';
   import GaugeCustomizer from '$lib/components/GaugeCustomizer.svelte';
   import SelectNumberOfColors from '$lib/components/SelectNumberOfColors.svelte';
@@ -45,73 +45,87 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '$lib/utils';
   import { Drawer } from 'vaul-svelte';
 
-  export let numberOfColors: number,
-    schemeId: string,
-    props: object = {},
-    ranges: object[] = [],
-    rangeOptions: object = {},
+  interface Props {
+    gaugeAttributes?: object;
+    numberOfColors?: number;
+    schemeId: string;
+    ranges?: object[];
+    rangeOptions?: object;
+    context?: string;
+    colors?: Color[];
+  }
+
+  let {
+    gaugeAttributes = {},
+    numberOfColors = $bindable(10),
+    schemeId = $bindable(),
+    ranges = $bindable([]),
+    rangeOptions = $bindable({}),
     context = 'weather',
-    colors: Color[] = [];
+    colors = $bindable([]),
+  }: Props = $props();
 
-  $: schemeName = getSchemeName(schemeId);
+  let schemeName = $derived(getSchemeName(schemeId));
 
-  let key;
+  let key = $state();
 
-  $: if (
-    ranges &&
-    rangeOptions &&
-    Object.keys(rangeOptions)?.length &&
-    colors?.length !== ranges?.length &&
-    context !== 'weatherless'
-  ) {
-    let start = getStart(rangeOptions);
-    let increment = getIncrement(rangeOptions);
+  $effect(() => {
+    if (
+      ranges &&
+      rangeOptions &&
+      Object.keys(rangeOptions)?.length &&
+      colors?.length !== ranges?.length &&
+      context !== 'weatherless'
+    ) {
+      let start = getStart(rangeOptions);
+      let increment = getIncrement(rangeOptions);
 
-    if (rangeOptions?.isCustomRanges) {
-      let difference = Math.abs(colors.length - ranges.length);
-      let newRanges = [];
-      if (colors.length > ranges.length) {
-        let last = ranges[ranges.length - 1].to;
-        for (let i = 0; i < difference; i++) {
-          newRanges.push({
-            from: displayNumber(last),
-            to: displayNumber(last + increment),
-          });
-          last = last + increment;
+      if (rangeOptions?.isCustomRanges) {
+        let difference = Math.abs(colors.length - ranges.length);
+        let newRanges = [];
+        if (colors.length > ranges.length) {
+          let last = ranges[ranges.length - 1].to;
+          for (let i = 0; i < difference; i++) {
+            newRanges.push({
+              from: displayNumber(last),
+              to: displayNumber(last + increment),
+            });
+            last = last + increment;
+          }
+          ranges = [...ranges, ...newRanges];
+        } else if (colors.length < ranges.length) {
+          ranges.splice(ranges.length - difference);
+          ranges = ranges;
         }
-        ranges = [...ranges, ...newRanges];
-      } else if (colors.length < ranges.length) {
-        ranges.splice(ranges.length - difference);
-        ranges = ranges;
-      }
-    } else {
-      if (
-        rangeOptions?.auto?.optimization !== 'ranges' &&
-        rangeOptions?.mode === 'auto'
-      ) {
-        const newRanges = getEvenlyDistributedRangeValuesWithEqualDayCount({
-          weatherData: null,
-          numRanges: colors.length,
-          prop: rangeOptions.auto.optimization,
-          gaugeDirection: rangeOptions.direction,
-          roundIncrement: rangeOptions.auto.roundIncrement,
-          includeFrom: rangeOptions.includeFromValue,
-          includeTo: rangeOptions.includeToValue,
-        });
-        ranges = newRanges;
       } else {
-        ranges = colors?.map((n) => {
-          const decimals = rangeOptions.auto.roundIncrement ? 0 : 2;
-          let item = {
-            from: displayNumber(start, decimals),
-            to: displayNumber(start + increment, decimals),
-          };
-          start += increment;
-          return item;
-        });
+        if (
+          rangeOptions?.auto?.optimization !== 'ranges' &&
+          rangeOptions?.mode === 'auto'
+        ) {
+          const newRanges = getEvenlyDistributedRangeValuesWithEqualDayCount({
+            weatherData: null,
+            numRanges: colors.length,
+            prop: rangeOptions.auto.optimization,
+            gaugeDirection: rangeOptions.direction,
+            roundIncrement: rangeOptions.auto.roundIncrement,
+            includeFrom: rangeOptions.includeFromValue,
+            includeTo: rangeOptions.includeToValue,
+          });
+          ranges = newRanges;
+        } else {
+          ranges = colors?.map((n) => {
+            const decimals = rangeOptions.auto.roundIncrement ? 0 : 2;
+            let item = {
+              from: displayNumber(start, decimals),
+              to: displayNumber(start + increment, decimals),
+            };
+            start += increment;
+            return item;
+          });
+        }
       }
     }
-  }
+  });
 
   function updateGauge({ _colors, _schemeId = 'Custom' }) {
     if (_colors) {
@@ -123,12 +137,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 </script>
 
-{#if props.id !== 'temp' && $page.route.id === '/'}
+{#if gaugeAttributes.id !== 'temp' && page.route.id === '/'}
   <button
     class="btn bg-secondary-hover-token justify-start gap-1 top-2 relative max-sm:mb-2"
-    title="Delete {props.label}"
-    on:click={() => {
-      gaugesState.removeCreated(props.id);
+    title="Delete {gaugeAttributes.label}"
+    onclick={() => {
+      gaugesState.removeCreated(gaugeAttributes.id);
     }}
   >
     <svg
@@ -145,7 +159,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
       />
     </svg>
-    Delete {props.label}
+    Delete {gaugeAttributes.label}
   </button>
 {/if}
 
@@ -183,7 +197,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <button
       class="btn bg-secondary-hover-token justify-start"
       title="Browse Preset & User-Created Color Palettes"
-      on:click={() =>
+      onclick={() =>
         modal.state.trigger({
           type: 'component',
           component: {
@@ -269,7 +283,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <button
     class="btn bg-secondary-hover-token justify-start"
     title="Choose Yarn Colorways, Filtered by Brand and Yarn"
-    on:click={() =>
+    onclick={() =>
       modal.state.trigger({
         type: 'component',
         component: {
@@ -299,7 +313,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <button
     class="btn bg-secondary-hover-token justify-start"
     title="Get Palette from Image"
-    on:click={() =>
+    onclick={() =>
       modal.state.trigger({
         type: 'component',
         component: {
@@ -329,7 +343,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <button
     class="btn bg-secondary-hover-token justify-start"
     title="Load Colors or Get a Palette Code to Share"
-    on:click={() =>
+    onclick={() =>
       modal.state.trigger({
         type: 'component',
         component: {
@@ -360,7 +374,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <button
     class="btn bg-secondary-hover-token justify-start"
     title="Generate Random Colors"
-    on:click={() =>
+    onclick={() =>
       modal.state.trigger({
         type: 'component',
         component: {
@@ -391,7 +405,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <button
     class="btn bg-secondary-hover-token justify-start"
     title="Sort Colors"
-    on:click={() =>
+    onclick={() =>
       modal.state.trigger({
         type: 'component',
         component: {
@@ -422,13 +436,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 {#if context !== 'weatherless'}
   <div class="mt-2 mb-4">
-    <RangeOptionsButton {props} {colors} bind:ranges bind:rangeOptions />
+    <RangeOptionsButton
+      {gaugeAttributes}
+      {colors}
+      bind:ranges
+      bind:rangeOptions
+    />
   </div>
 {/if}
 
 {#key $weather}
   <GaugeCustomizer
-    {props}
+    {gaugeAttributes}
     {context}
     bind:schemeId
     bind:numberOfColors

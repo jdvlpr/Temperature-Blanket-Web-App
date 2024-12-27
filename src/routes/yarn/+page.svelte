@@ -13,8 +13,8 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script context="module" lang="ts">
-  export let colors: Writable<Array<Color>> = writable([]);
+<script module lang="ts">
+  export let yarn: {colors: Color[]} = $state( {colors: []});
 </script>
 
 <script lang="ts">
@@ -37,31 +37,30 @@ If not, see <https://www.gnu.org/licenses/>. -->
     yarnDetailsToColors,
   } from '$lib/utils';
   import { onMount } from 'svelte';
-  import { writable, type Writable } from 'svelte/store';
 
   let urlParams,
-    schemeId = 'Custom';
-  let isFinishedOnMount = false;
+    schemeId = $state('Custom');
+  let isFinishedOnMount = $state(false);
   onMount(() => {
     urlParams = new URLSearchParams(window.location.search);
     // Load URL
     if (urlParams?.has('s')) {
-      $colors =
+      yarn.colors =
         stringToColors({
           string: urlParams.get('s'),
-        }) || $colors;
+        }) || yarn.colors;
     }
     if (urlParams?.has('f')) {
       let yarn = urlParams.get('f');
 
-      $colors = yarnDetailsToColors({
+      yarn.colors = yarnDetailsToColors({
         string: yarn,
-        colors: $colors,
+        colors: yarn.colors,
       });
     }
 
-    if ($colors.length === 0) {
-      $colors = [
+    if (yarn.colors.length === 0) {
+      yarn.colors = [
         {
           hex: '#f43f5e',
         },
@@ -92,9 +91,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     isFinishedOnMount = true;
   });
 
-  $: $layout, setLocalStorageLayout();
 
-  // $: $colors, updateUrl();
+  // $: colors, updateUrl();
 
   function getYarnFilterParams(colors) {
     const details = colorsToYarnDetails({ colors });
@@ -102,7 +100,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     return `&f=${details}`;
   }
 
-  $: shareableURL = getShareableURL($colors);
 
   function getShareableURL(colors) {
     if (!browser || !isFinishedOnMount) return;
@@ -116,6 +113,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     const href = new URL(url).href;
     return href;
   }
+  $effect(() => {
+    $layout, setLocalStorageLayout();
+  });
+  let shareableURL = $derived(getShareableURL(yarn.colors));
 </script>
 
 <svelte:head>
@@ -141,89 +142,101 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </svelte:head>
 
 <AppShell pageName="Yarn Palette Creator">
-  <svelte:fragment slot="stickyHeader">
-    <div class="hidden lg:inline-flex mx-auto"><AppLogo /></div>
-    <Share href={shareableURL} />
-  </svelte:fragment>
-  <div slot="main">
-    <main class="max-w-screen-xl m-auto text-center">
-      <Card>
-        <div slot="header" class="bg-surface-200-700-token text-token p-4">
-          <p class="text-center">
-            Create a yarn color palette from a collection of brands and yarns.
-            Find matching colorways from HTML hex color codes or from an image.
-          </p>
-        </div>
-        <div
-          class="transition-opacity opacity-100 mt-4"
-          class:opacity-50={!isFinishedOnMount}
-          slot="content"
-        >
-          {#if $colors.length}
-            <Gauge
-              bind:colors={$colors}
-              bind:numberOfColors={$colors.length}
-              bind:schemeId
-              context="weatherless"
-            />
-          {:else}
-            <Gauge
-              colors={[
-                {
-                  hex: '#f9fafb',
-                },
-                {
-                  hex: '#f3f4f6',
-                },
-                {
-                  hex: '#e5e7eb',
-                },
-                {
-                  hex: '#d1d5db',
-                },
-                {
-                  hex: '#9ca3af',
-                },
-                {
-                  hex: '#6b7280',
-                },
-                {
-                  hex: '#4b5563',
-                },
-                {
-                  hex: '#374151',
-                },
-              ]}
-              numberOfColors={8}
-              bind:schemeId
-              context="weatherless"
-            />
-          {/if}
-        </div>
-      </Card>
-    </main>
-  </div>
-  <div slot="footer">
-    <Footer>
-      <div slot="sources" class="text-sm">
-        <p>
-          Default color schemes based on <a
-            href="https://www.ColorBrewer2.org"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="link">ColorBrewer2.org</a
-          >
-          by Cynthia A. Brewer, Geography, Pennsylvania State University, licenced
-          under under
-          <a
-            href="https://www.apache.org/licenses/LICENSE-2.0"
-            target="_blank"
-            rel="noreferrer"
-            class="link">Apache 2</a
-          >.
-        </p>
-        <YarnSources />
-      </div>
-    </Footer>
-  </div>
+  {#snippet stickyHeader()}
+  
+      <div class="hidden lg:inline-flex mx-auto"><AppLogo /></div>
+      <Share href={shareableURL} />
+    
+  {/snippet}
+  {#snippet main()}
+    <div >
+      <main class="max-w-screen-xl m-auto text-center">
+        <Card>
+          {#snippet header()}
+                <div  class="bg-surface-200-700-token text-token p-4">
+              <p class="text-center">
+                Create a yarn color palette from a collection of brands and yarns.
+                Find matching colorways from HTML hex color codes or from an image.
+              </p>
+            </div>
+              {/snippet}
+          {#snippet content()}
+                <div
+              class="transition-opacity opacity-100 mt-4"
+              class:opacity-50={!isFinishedOnMount}
+              
+            >
+              {#if yarn.colors.length}
+                <Gauge
+                  bind:colors={yarn.colors}
+                  bind:numberOfColors={yarn.colors.length}
+                  bind:schemeId
+                  context="weatherless"
+                />
+              {:else}
+                <Gauge
+                  colors={[
+                    {
+                      hex: '#f9fafb',
+                    },
+                    {
+                      hex: '#f3f4f6',
+                    },
+                    {
+                      hex: '#e5e7eb',
+                    },
+                    {
+                      hex: '#d1d5db',
+                    },
+                    {
+                      hex: '#9ca3af',
+                    },
+                    {
+                      hex: '#6b7280',
+                    },
+                    {
+                      hex: '#4b5563',
+                    },
+                    {
+                      hex: '#374151',
+                    },
+                  ]}
+                  numberOfColors={8}
+                  bind:schemeId
+                  context="weatherless"
+                />
+              {/if}
+            </div>
+              {/snippet}
+        </Card>
+      </main>
+    </div>
+  {/snippet}
+  {#snippet footer()}
+    <div >
+      <Footer>
+        {#snippet sources()}
+            <div  class="text-sm">
+            <p>
+              Default color schemes based on <a
+                href="https://www.ColorBrewer2.org"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="link">ColorBrewer2.org</a
+              >
+              by Cynthia A. Brewer, Geography, Pennsylvania State University, licenced
+              under under
+              <a
+                href="https://www.apache.org/licenses/LICENSE-2.0"
+                target="_blank"
+                rel="noreferrer"
+                class="link">Apache 2</a
+              >.
+            </p>
+            <YarnSources />
+          </div>
+          {/snippet}
+      </Footer>
+    </div>
+  {/snippet}
 </AppShell>

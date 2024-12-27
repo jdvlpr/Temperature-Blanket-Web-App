@@ -27,7 +27,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { settings as daytimeGaugeSettings } from '$lib/components/gauges/DaytimeGauge.svelte';
   import { settings as rainGaugeSettings } from '$lib/components/gauges/RainGauge.svelte';
   import { settings as snowGaugeSettings } from '$lib/components/gauges/SnowGauge.svelte';
-  import { settings as temperatureGaugeSettings } from '$lib/components/gauges/TemperatureGauge.svelte';
+  import { gaugeSettings as temperatureGaugeSettings } from '$lib/components/gauges/TemperatureGauge.svelte';
   import { ALL_YARN_WEIGHTS, ICONS } from '$lib/constants';
   import { gaugeProperties, layout, valid } from '$lib/stores';
   import {

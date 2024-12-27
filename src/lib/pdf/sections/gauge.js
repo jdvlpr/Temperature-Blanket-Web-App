@@ -26,8 +26,8 @@ import {
   settings as snowGaugeSettings,
 } from '$lib/components/gauges/SnowGauge.svelte';
 import {
-  props as tempGaugeProps,
-  settings as tempGaugeSettings,
+  gaugeAttributes as tempGaugeProps,
+  gaugeSettings as tempGaugeSettings,
 } from '$lib/components/gauges/TemperatureGauge.svelte';
 import { showDaysInRange, units } from '$lib/stores';
 import { get } from 'svelte/store';

@@ -27,8 +27,8 @@ import {
   settings as snowGaugeSettings,
 } from '$lib/components/gauges/SnowGauge.svelte';
 import {
-  props as tempGaugeProps,
-  settings as tempGaugeSettings,
+  gaugeAttributes as tempGaugeProps,
+  gaugeSettings as tempGaugeSettings,
 } from '$lib/components/gauges/TemperatureGauge.svelte';
 import { CHARACTERS_FOR_URL_HASH } from '$lib/constants';
 import type { PageLayout } from '$lib/types';

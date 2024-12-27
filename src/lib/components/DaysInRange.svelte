@@ -22,10 +22,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   const modalStore = getModalStore();
   const isModal = modalStore[0];
 
-  export let range, rangeOptions, props;
+  let { range, rangeOptions, gaugeAttributes } = $props();
 
-  $: noDaysInRange = () =>
-    props.targets.every(
+  let noDaysInRange = $derived(() =>
+    gaugeAttributes.targets.every(
       (n) =>
         !getDaysInRange({
           id: n.id,
@@ -34,11 +34,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
           includeFromValue: rangeOptions?.includeFromValue,
           includeToValue: rangeOptions?.includeToValue,
         })?.length,
-    );
+    ),
+  );
 </script>
 
 {#if !noDaysInRange()}
-  {#each props.targets as { id, icon, gaugeLabel }}
+  {#each gaugeAttributes.targets as { id, icon, gaugeLabel }}
     {@const daysInRange = getDaysInRange({
       id,
       range,
@@ -51,7 +52,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         type="button"
         disabled={!daysInRange?.length}
         class="btn bg-secondary-hover-token"
-        on:click={() =>
+        onclick={() =>
           modal.state.trigger({
             type: 'component',
             component: {

@@ -13,7 +13,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script>
+<script lang="ts">
   import ChooseRangeDirection from '$lib/components/ChooseRangeDirection.svelte';
   import DaysInRange from '$lib/components/DaysInRange.svelte';
   import Expand from '$lib/components/Expand.svelte';
@@ -36,24 +36,36 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { fade, slide } from 'svelte/transition';
 
   const { close } = getContext('simple-modal');
-  export let props,
+  interface Props {
+    gaugeAttributes: any;
+    ranges: any;
+    colors: any;
+    rangeOptions: any;
+    onSave: any;
+    index?: any;
+    focusOn?: any;
+  }
+
+  let {
+    gaugeAttributes,
     ranges,
     colors,
     rangeOptions,
     onSave,
     index = null,
-    focusOn = null;
+    focusOn = null
+  }: Props = $props();
 
-  let _ranges = [...ranges];
-  let _rangeOptions = { ...rangeOptions };
-  let incrementMode = _rangeOptions.isCustomRanges ? '' : _rangeOptions.mode;
+  let _ranges = $state([...ranges]);
+  let _rangeOptions = $state({ ...rangeOptions });
+  let incrementMode = $state(_rangeOptions.isCustomRanges ? '' : _rangeOptions.mode);
 
-  let customRanges = [...ranges];
-  let showAdvancedControls = true;
-  let changedGaugeDirectionOnCustomRanges = false;
-  let start, increment;
-  let setupContainer;
-  let showScrollToTopButton = false;
+  let customRanges = $state([...ranges]);
+  let showAdvancedControls = $state(true);
+  let changedGaugeDirectionOnCustomRanges = $state(false);
+  let start = $state(), increment = $state();
+  let setupContainer = $state();
+  let showScrollToTopButton = $state(false);
   let scrollObserver = new IntersectionObserver((entries, observer) => {
     if (!entries[0].isIntersecting) {
       showScrollToTopButton = true;
@@ -81,39 +93,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     scrollObserver.observe(setupContainer);
   });
 
-  $: start = getStart(_rangeOptions);
-  $: increment = getIncrement(_rangeOptions);
-  $: _ranges = getRanges(_rangeOptions);
 
-  $: dontIncludeFromAndTo =
-    !_rangeOptions.includeFromValue && !_rangeOptions.includeToValue;
-  $: includeFromAndTo =
-    _rangeOptions.includeFromValue && _rangeOptions.includeToValue;
 
-  $: calculatedIncrement = dontIncludeFromAndTo
-    ? increment - 0.01
-    : includeFromAndTo
-      ? increment + 0.01
-      : increment;
-  $: displayedIncrement = Math.abs(calculatedIncrement);
 
-  $: rangeExample = getRangeExample({
-    direction: _rangeOptions.direction,
-    includeFromValue: _rangeOptions.includeFromValue,
-    includeToValue: _rangeOptions.includeToValue,
-  });
 
-  $: isNotAutoIncrements =
-    _rangeOptions.mode !== 'auto' || _rangeOptions.isCustomRanges;
 
-  $: isRangeCalculationUnavailable =
-    (_rangeOptions.includeFromValue === _rangeOptions.includeToValue &&
-      _rangeOptions.auto.roundIncrement &&
-      _rangeOptions.mode === 'auto') ||
-    (_rangeOptions.includeFromValue === _rangeOptions.includeToValue &&
-      _rangeOptions.mode !== 'auto');
 
-  $: incrementMode, onChangeIncrementMode();
 
   function _onSave() {
     onSave({ ranges: _ranges, rangeOptions: _rangeOptions });
@@ -185,13 +170,48 @@ If not, see <https://www.gnu.org/licenses/>. -->
     });
     return newRanges;
   }
+  $effect(() => {
+    start = getStart(_rangeOptions);
+  });
+  $effect(() => {
+    increment = getIncrement(_rangeOptions);
+  });
+  $effect(() => {
+    _ranges = getRanges(_rangeOptions);
+  });
+  let dontIncludeFromAndTo =
+    $derived(!_rangeOptions.includeFromValue && !_rangeOptions.includeToValue);
+  let includeFromAndTo =
+    $derived(_rangeOptions.includeFromValue && _rangeOptions.includeToValue);
+  let calculatedIncrement = $derived(dontIncludeFromAndTo
+    ? increment - 0.01
+    : includeFromAndTo
+      ? increment + 0.01
+      : increment);
+  let displayedIncrement = $derived(Math.abs(calculatedIncrement));
+  let rangeExample = $derived(getRangeExample({
+    direction: _rangeOptions.direction,
+    includeFromValue: _rangeOptions.includeFromValue,
+    includeToValue: _rangeOptions.includeToValue,
+  }));
+  let isNotAutoIncrements =
+    $derived(_rangeOptions.mode !== 'auto' || _rangeOptions.isCustomRanges);
+  let isRangeCalculationUnavailable =
+    $derived((_rangeOptions.includeFromValue === _rangeOptions.includeToValue &&
+      _rangeOptions.auto.roundIncrement &&
+      _rangeOptions.mode === 'auto') ||
+    (_rangeOptions.includeFromValue === _rangeOptions.includeToValue &&
+      _rangeOptions.mode !== 'auto'));
+  $effect(() => {
+    incrementMode, onChangeIncrementMode();
+  });
 </script>
 
 {#if showScrollToTopButton}
   <button
     transition:fade
     class="btn px-4 bottom-[4rem] fixed -translate-x-1/2 left-1/2 w-fit py-2 m-2 z-20 shadow variant-filled-surface lg:hidden transition-all inline-flex justify-center items-center gap-1 right-0"
-    on:click={() =>
+    onclick={() =>
       setupContainer.scrollIntoView({
         behavior: 'smooth',
         block: 'start',
@@ -339,7 +359,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <div class="flex flex-col gap-2 justify-start items-start">
             {#if _rangeOptions.mode === 'auto'}
               <div class="flex flex-col gap-2 justify-start items-start">
-                {#if props.id === 'temp'}
+                {#if gaugeAttributes.id === 'temp'}
                   <label class="label">
                     <span class="flex flex-wrap gap-1">
                       <svg
@@ -360,13 +380,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     >
                     <select
                       bind:value={_rangeOptions.auto.optimization}
-                      on:change={() => {
+                      onchange={() => {
                         _ranges = getAutoOptimizationRanges();
                       }}
                       class="select"
                     >
                       <option value="ranges">Range Increments</option>
-                      {#each props.targets as { id, label, icon }}
+                      {#each gaugeAttributes.targets as { id, label, icon }}
                         <option value={id}>
                           {icon}
                           {label}
@@ -411,14 +431,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         <span class="font-bold"
                           >{Math.ceil(displayedIncrement)}</span
                         >
-                        {props.unit.label[$units]}
+                        {gaugeAttributes.unit.label[$units]}
                       {:else}
                         <span class="font-bold">
                           {_rangeOptions.auto.roundIncrement
                             ? Math.round(displayedIncrement)
                             : displayNumber(displayedIncrement)}
                         </span>
-                        {props.unit.label[$units]}
+                        {gaugeAttributes.unit.label[$units]}
                       {/if}
 
                       <Tooltip>
@@ -436,10 +456,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
                             d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"
                           />
                         </svg>
-                        <p slot="tooltip">
-                          This was calculated based on your weather data and the
-                          number of colors in this gauge.
-                        </p>
+                        {#snippet tooltip()}
+                                                <p >
+                            This was calculated based on your weather data and the
+                            number of colors in this gauge.
+                          </p>
+                                              {/snippet}
                       </Tooltip>
                     {/if}
                   </p>
@@ -462,14 +484,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   class="tex-left flex flex-col items-start justify-end w-fit"
                 >
                   <label for="manual-increment" class="label"
-                    >Increment ({props.unit.label[$units]})</label
+                    >Increment ({gaugeAttributes.unit.label[$units]})</label
                   >
                   <input
                     id="manual-increment"
                     type="number"
                     min="0"
                     class="input w-fit"
-                    on:focus={() => {
+                    onfocus={() => {
                       _rangeOptions.mode = 'manual';
                       _rangeOptions.isCustomRanges = false;
                     }}
@@ -492,7 +514,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         d="M2 4.5A2.5 2.5 0 014.5 2h11a2.5 2.5 0 010 5h-11A2.5 2.5 0 012 4.5zM2.75 9.083a.75.75 0 000 1.5h14.5a.75.75 0 000-1.5H2.75zM2.75 12.663a.75.75 0 000 1.5h14.5a.75.75 0 000-1.5H2.75zM2.75 16.25a.75.75 0 000 1.5h14.5a.75.75 0 100-1.5H2.75z"
                       />
                     </svg>
-                    Start From ({props.unit.label[$units]})
+                    Start From ({gaugeAttributes.unit.label[$units]})
                     <Tooltip>
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -508,20 +530,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
                           d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"
                         />
                       </svg>
-                      <p slot="tooltip">
-                        This should usually be the
-                        {_rangeOptions.direction === 'high-to-low'
-                          ? 'highest'
-                          : 'lowest'}
-                        possible value from your weather data.
-                      </p>
+                      {#snippet tooltip()}
+                                            <p >
+                          This should usually be the
+                          {_rangeOptions.direction === 'high-to-low'
+                            ? 'highest'
+                            : 'lowest'}
+                          possible value from your weather data.
+                        </p>
+                                          {/snippet}
                     </Tooltip>
                   </label>
                   <input
                     id="startFrom"
                     type="number"
                     class="input w-fit"
-                    on:focus={() => (_rangeOptions.mode = 'manual')}
+                    onfocus={() => (_rangeOptions.mode = 'manual')}
                     bind:value={_rangeOptions.manual.start}
                   />
                 </div>
@@ -609,12 +633,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 class="label flex flex-col justify-start items-start"
                 id="range-{index}-from"
               >
-                <span class="text-xs">From ({props.unit.label[$units]})</span>
+                <span class="text-xs"
+                  >From ({gaugeAttributes.unit.label[$units]})</span
+                >
                 <input
                   type="number"
                   class="input text-lg text-token max-w-[105px]"
                   value={from}
-                  on:change={(e) => {
+                  onchange={(e) => {
                     const value = +e.target.value;
                     _rangeOptions.isCustomRanges = true;
 
@@ -631,12 +657,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 class="label flex flex-col justify-start items-start"
                 id="range-{index}-to"
               >
-                <span class="text-xs">To ({props.unit.label[$units]})</span>
+                <span class="text-xs"
+                  >To ({gaugeAttributes.unit.label[$units]})</span
+                >
                 <input
                   type="number"
                   class="input text-lg text-token max-w-[105px]"
                   value={to}
-                  on:change={(e) => {
+                  onchange={(e) => {
                     const value = +e.target.value;
 
                     _rangeOptions.isCustomRanges = true;
@@ -657,7 +685,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             >
               <DaysInRange
                 range={_ranges[index]}
-                {props}
+                {gaugeAttributes}
                 rangeOptions={_rangeOptions}
               />
             </div>
