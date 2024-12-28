@@ -305,9 +305,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
         on:click={() =>
           modal.state.trigger({
             type: 'component',
-            component: Menu,
-            props: {
-              page: 'settings',
+            component: {
+              ref: Menu,
+              props: {
+                page: 'settings',
+              },
             },
           })}
       >
@@ -339,9 +341,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
           on:click={() =>
             modal.state.trigger({
               type: 'component',
-              component: Menu,
-              props: {
-                page: 'locations',
+              component: {
+                ref: Menu,
+                props: {
+                  page: 'locations',
+                },
               },
             })}
         >
@@ -436,9 +440,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       on:click={() =>
                         modal.state.trigger({
                           type: 'component',
-                          component: Menu,
-                          props: {
-                            page: 'locations',
+                          component: {
+                            ref: Menu,
+                            props: {
+                              page: 'locations',
+                            },
                           },
                         })}
                       ><svg

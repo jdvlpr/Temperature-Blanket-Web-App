@@ -26,7 +26,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     $modalStore.close();
     modal.state.trigger({
       type: 'component',
-      component: GettingWeather,
+      component: { ref: GettingWeather },
     });
   }
 </script>

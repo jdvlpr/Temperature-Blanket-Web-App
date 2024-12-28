@@ -33,10 +33,12 @@ export const showPreviewImageWeatherDetails = (targets) => {
   if (isDesktop) {
     modal.state.trigger({
       type: 'component',
-      component: WeatherDetails,
-      props: {
-        weatherTargets: targets,
-        context: 'modal',
+      component: {
+        ref: WeatherDetails,
+        props: {
+          weatherTargets: targets,
+          context: 'modal',
+        },
       },
     });
   } else {

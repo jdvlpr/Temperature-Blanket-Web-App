@@ -42,9 +42,11 @@ export const displayGeoNamesErrorMessage = (message) => {
 
   modal.state.trigger({
     type: 'component',
-    component: Alert,
-    props: {
-      message: text,
+    component: {
+      ref: Alert,
+      props: {
+        message: text,
+      },
     },
   });
 };

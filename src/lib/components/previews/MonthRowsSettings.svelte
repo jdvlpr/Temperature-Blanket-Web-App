@@ -198,10 +198,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   on:click={() =>
     modal.state.trigger({
       type: 'component',
-      component: ChangeColor,
-      props: {
-        hex: $settings.extrasColor,
-        onChangeColor: ({ hex }) => ($settings.extrasColor = hex),
+      component: {
+        ref: ChangeColor,
+        props: {
+          hex: $settings.extrasColor,
+          onChangeColor: ({ hex }) => ($settings.extrasColor = hex),
+        },
       },
     })}
   ><svg
@@ -235,10 +237,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     on:click={() =>
       modal.state.trigger({
         type: 'component',
-        component: ChangeColor,
-        props: {
-          hex: $settings.borderColor,
-          onChangeColor: ({ hex }) => ($settings.borderColor = hex),
+        component: {
+          ref: ChangeColor,
+          props: {
+            hex: $settings.borderColor,
+            onChangeColor: ({ hex }) => ($settings.borderColor = hex),
+          },
         },
       })}
     ><svg

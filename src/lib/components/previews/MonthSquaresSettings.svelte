@@ -154,10 +154,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   on:click={() =>
     modal.state.trigger({
       type: 'component',
-      component: ChangeColor,
-      props: {
-        hex: $settings.additionalRoundsColor,
-        onChangeColor: ({ hex }) => ($settings.additionalRoundsColor = hex),
+      component: {
+        ref: ChangeColor,
+        props: {
+          hex: $settings.additionalRoundsColor,
+          onChangeColor: ({ hex }) => ($settings.additionalRoundsColor = hex),
+        },
       },
     })}
   ><svg

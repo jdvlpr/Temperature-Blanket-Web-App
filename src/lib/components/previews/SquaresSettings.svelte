@@ -206,14 +206,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
   on:click={() =>
     modal.state.trigger({
       type: 'component',
-      component: SquareDesigner,
-      props: {
-        targets,
-        squareSize: $settings.squareSize,
-        primaryTarget: $settings.primaryTarget,
-        secondaryTargets: $settings.secondaryTargets,
-        primaryTargetAsBackup: $settings.primaryTargetAsBackup,
-        onOkay: handelOkaySquareDesigner,
+      component: {
+        ref: SquareDesigner,
+        props: {
+          targets,
+          squareSize: $settings.squareSize,
+          primaryTarget: $settings.primaryTarget,
+          secondaryTargets: $settings.secondaryTargets,
+          primaryTargetAsBackup: $settings.primaryTargetAsBackup,
+          onOkay: handelOkaySquareDesigner,
+        },
       },
     })}
   ><svg
@@ -283,10 +285,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
     on:click={() =>
       modal.state.trigger({
         type: 'component',
-        component: ChangeColor,
-        props: {
-          hex: $settings.additionalSquaresColor,
-          onChangeColor: ({ hex }) => ($settings.additionalSquaresColor = hex),
+        component: {
+          ref: ChangeColor,
+          props: {
+            hex: $settings.additionalSquaresColor,
+            onChangeColor: ({ hex }) =>
+              ($settings.additionalSquaresColor = hex),
+          },
         },
       })}
     ><svg

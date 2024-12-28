@@ -195,19 +195,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <button
   class="btn bg-secondary-hover-token gap-1"
   title="Edit Square Design"
-  on:click={() =>
+  on:click={async () => {
     modal.state.trigger({
       type: 'component',
-      component: SquareDesigner,
-      props: {
-        targets,
-        squareSize: $settings.squareSize,
-        primaryTarget: $settings.primaryTarget,
-        secondaryTargets: $settings.secondaryTargets,
-        primaryTargetAsBackup: $settings.primaryTargetAsBackup,
-        onOkay: handelOkaySquareDesigner,
+      component: {
+        ref: SquareDesigner,
+        props: {
+          targets,
+          squareSize: $settings.squareSize,
+          primaryTarget: $settings.primaryTarget,
+          secondaryTargets: $settings.secondaryTargets,
+          primaryTargetAsBackup: $settings.primaryTargetAsBackup,
+          onOkay: handelOkaySquareDesigner,
+        },
       },
-    })}
+    });
+  }}
   ><svg
     xmlns="http://www.w3.org/2000/svg"
     fill="none"
@@ -255,10 +258,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   on:click={() =>
     modal.state.trigger({
       type: 'component',
-      component: ChangeColor,
-      props: {
-        hex: $settings.additionalSquaresColor,
-        onChangeColor: ({ hex }) => ($settings.additionalSquaresColor = hex),
+      component: {
+        ref: ChangeColor,
+        props: {
+          hex: $settings.additionalSquaresColor,
+          onChangeColor: ({ hex }) => ($settings.additionalSquaresColor = hex),
+        },
       },
     })}
   ><svg

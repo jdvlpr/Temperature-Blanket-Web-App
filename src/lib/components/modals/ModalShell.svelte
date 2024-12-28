@@ -2,7 +2,7 @@
   import { isDesktop } from '$lib/stores';
   import { getModalStore } from '@skeletonlabs/skeleton';
   import CloseButton from './CloseButton.svelte';
-  import { onMount } from 'svelte';
+  import { onMount, type Snippet } from 'svelte';
 
   interface Props {
     parent: any;
@@ -10,8 +10,8 @@
     preventDefaultFocus?: boolean; // used when the yarn grid select component is inside the modal. Focusing on the first element (the default modal behavior) causes the yarn select element to render its' menu in the wrong position, because of the transition time.
     hideCloseButton?: boolean;
     preventScroll?: boolean; // used for the Image Palette modal, so that when the user is moving their finger over the image to select colors, the modal itself won't scroll
-    children?: import('svelte').Snippet;
-    stickyPart?: import('svelte').Snippet;
+    children?: Snippet;
+    stickyPart?: Snippet;
   }
 
   let { parent, size, preventDefaultFocus, hideCloseButton = false, preventScroll = false, children, stickyPart }: Props = $props();
