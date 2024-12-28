@@ -18,17 +18,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { onMount } from 'svelte';
   import ModalShell from './ModalShell.svelte';
 
-  export let parent: any;
-  let container;
+  interface Props {
+    parent: any;
+  }
 
-  onMount(() => {
-    if (typeof container?.parentElement !== 'undefined')
-      container.parentElement.scrollTop = 0;
-  });
+  let { parent }: Props = $props();
 </script>
 
 <ModalShell {parent}>
-  <div bind:this={container}>
+  <div>
     <h2 class="font-bold my-2 text-2xl">Keyboard Shortcuts</h2>
 
     {#each KEYBOARD_SHORTCUTS as { group, items, details }}
