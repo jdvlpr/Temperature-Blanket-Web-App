@@ -14,6 +14,8 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import { browser } from '$app/environment';
   import LocalProjects from '$lib/components/LocalProjects.svelte';
   import ProjectDetails from '$lib/components/ProjectDetails.svelte';
@@ -44,19 +46,23 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   const toastStore = getToastStore();
 
-  export let parent: any;
-  export let page = 'main';
+  interface Props {
+    parent: any;
+    page?: string;
+  }
 
-  let copiedMessage = '';
+  let { parent, page = 'main' }: Props = $props();
 
-  let pages = {
+  let copiedMessage = $state('');
+
+  let pages = $state({
     download: false,
     galleryShare: false,
     main: false,
     save: false,
-  };
+  });
 
-  let project = null;
+  let project = $state(null);
 
   function goTo(page) {
     pages.download = false;
@@ -66,7 +72,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     if (page === 'save') saveProject({ copy: false });
   }
 
-  $: if (page) goTo(page);
+  $effect(() => {
+    if (page) goTo(page);
+  });
 
   function saveProject({ copy = true }) {
     // Copy window url to clipboard
@@ -98,13 +106,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
     }
   }
 
-  $: if (copiedMessage !== '') {
-    toastStore.trigger({
-      message: copiedMessage,
-      background: 'bg-success-300 text-black',
-    });
-    copiedMessage = '';
-  }
+  $effect(() => {
+    if (copiedMessage !== '') {
+      toastStore.trigger({
+        message: copiedMessage,
+        background: 'bg-success-300 text-black',
+      });
+      copiedMessage = '';
+    }
+  });
 </script>
 
 <ModalShell {parent}>
@@ -112,7 +122,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <button
       aria-label="Go To Main Menu"
       class="btn-icon bg-secondary-hover-token"
-      on:click={() => goTo('main')}
+      onclick={() => goTo('main')}
       title="Go To Main Menu"
     >
       <svg
@@ -138,7 +148,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <div class="flex flex-col gap-2 w-full my-4">
         <button
           class="btn bg-secondary-hover-token w-fit gap-2"
-          on:click={() => {
+          onclick={() => {
             goTo('save');
             copiedMessage = '';
           }}
@@ -164,7 +174,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {#if $weather}
           <button
             class="btn bg-secondary-hover-token w-fit gap-2"
-            on:click={() => goTo('download')}
+            onclick={() => goTo('download')}
             disabled={!$weather}
             title="Open Download Menu"
             ><svg
@@ -187,7 +197,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
         <button
           class="btn bg-secondary-hover-token w-fit gap-2"
-          on:click={async () => {
+          onclick={async () => {
             modal.state.close();
             modal.state.trigger({
               type: 'component',
@@ -222,7 +232,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
         <button
           class="btn bg-secondary-hover-token w-fit"
-          on:click={async () => {
+          onclick={async () => {
             modal.state.close();
             modal.state.trigger({
               type: 'component',
@@ -390,12 +400,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/if}
 
   {#if pages.download}
+    {@const SvelteComponent = $activePreview.preview}
     <div>
       <h2 class="my-2 text-lg font-bold">Download</h2>
       <div class="flex flex-col gap-2 items-start text-left">
         <button
           class="btn bg-secondary-hover-token gap-2"
-          on:click={downloadPDF}
+          onclick={downloadPDF}
           title="Download PDF File"
           ><svg
             xmlns="http://www.w3.org/2000/svg"
@@ -415,7 +426,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </button>
         <button
           class="btn bg-secondary-hover-token gap-2"
-          on:click={downloadWeatherCSV}
+          onclick={downloadWeatherCSV}
           title="Download CSV File"
           ><svg
             xmlns="http://www.w3.org/2000/svg"
@@ -437,7 +448,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <button
           class="btn bg-secondary-hover-token gap-2"
           title="Download PNG File"
-          on:click={() => {
+          onclick={() => {
             downloadPreviewPNG(
               $activePreview.width,
               $activePreview.height,
@@ -445,9 +456,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             );
           }}
         >
-          <span class="w-[40px] m-auto">
-            <svelte:component this={$activePreview.preview} /></span
-          >
+          <span class="w-[40px] m-auto"> <SvelteComponent /></span>
 
           Preview Image (PNG)
         </button>
@@ -490,7 +499,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <div class="inline-flex flex-wrap my-2 gap-2 items-center">
         <button
           class="btn bg-secondary-hover-token gap-1"
-          on:click={saveProject}
+          onclick={saveProject}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
