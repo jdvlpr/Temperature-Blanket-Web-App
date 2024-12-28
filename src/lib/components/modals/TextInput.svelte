@@ -15,41 +15,55 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
-  import { getContext } from 'svelte';
+  import { getModalStore } from '@skeletonlabs/skeleton';
+  import ModalShell from './ModalShell.svelte';
 
-  export let value: string, title: string, onOkay;
+  interface Props {
+    value: string;
+    title: string;
+    onOkay: any;
+    parent: any;
+  }
+
+  let { value = $bindable(), title, onOkay, parent }: Props = $props();
 
   const id = 'text-input-daytime';
 
-  const { close } = getContext('simple-modal');
+  const modalStore = getModalStore();
 
   function _onOkay() {
     onOkay(value);
-    close();
+    modalStore.close();
   }
 </script>
 
-<div class="p-2 sm:p-4 mt-4">
-  <label for={id} class="my-2"><h3>{@html title}</h3></label>
-  <p class="text-sm my-2">Hours:Minutes</p>
-
+<ModalShell {parent} size="small">
   <div
-    class="flex flex-col gap-2 justify-center items-center my-2 w-fit mx-auto"
+    class="inline-flex flex-col items-center mx-auto justify-center w-full text-center"
   >
-    <input
-      type="text"
-      class="w-fit grow input text-xl"
-      {id}
-      {title}
-      bind:value
-    />
-  </div>
+    <div>
+      <label for={id} class="my-2"><h3>{@html title}</h3></label>
+      <p class="text-sm my-2">Hours:Minutes</p>
 
-  <div class="my-4">
-    <SaveAndCloseButtons
-      onSave={_onOkay}
-      onClose={close}
-      disabled={!value.includes(':')}
-    />
+      <div
+        class="flex flex-col gap-2 justify-center items-center my-2 w-fit mx-auto"
+      >
+        <input
+          type="text"
+          class="w-fit grow input text-xl"
+          {id}
+          {title}
+          bind:value
+        />
+      </div>
+
+      <div class="my-4">
+        <SaveAndCloseButtons
+          onSave={_onOkay}
+          onClose={modalStore.close}
+          disabled={!value.includes(':')}
+        />
+      </div>
+    </div>
   </div>
-</div>
+</ModalShell>

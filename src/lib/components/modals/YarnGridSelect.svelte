@@ -80,7 +80,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     { threshold: 1 },
   );
 
-  onMount(() => {
+  $effect(() => {
     scrollObserver.observe(filtersContainer);
     loadMoreColors = new IntersectionObserver(
       function (element) {

@@ -124,7 +124,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <SaveAndCloseButtons
         onSave={_onOkay}
         disabled={isNaN(value) || noMinMax ? false : value < min}
-        onClose={close}
+        onClose={modalStore.close}
       />
     </div>
   </div>
