@@ -24,11 +24,6 @@ class ModalState {
   }
 
   state: Writable<any>;
-
-  // Temporary until migration to skelton modal is done
-  public set(value) {
-    this.state.set(value);
-  }
 }
 export let modal = $state(new ModalState());
 

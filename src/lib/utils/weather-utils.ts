@@ -16,7 +16,7 @@
 import { API_SERVICES } from '$lib/constants';
 import {
   dayt,
-  gaugeProperties,
+  allGaugesAttributes,
   isCustomWeather,
   locations,
   prcp,
@@ -390,7 +390,7 @@ export const CSVtoArray = ({ str, delimiter = ',' }) => {
 };
 
 export const getWeatherTargets = ({ weatherParameters }) => {
-  const props = get(gaugeProperties)?.flatMap((gauge) => gauge.targets);
+  const props = allGaugesAttributes?.flatMap((gauge) => gauge.targets);
   return props.filter((n) => weatherParameters?.[n.id]);
 };
 

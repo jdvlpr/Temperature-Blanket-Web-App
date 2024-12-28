@@ -62,6 +62,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '$lib/utils';
   import { getToastStore } from '@skeletonlabs/skeleton';
   import { onDestroy, onMount } from 'svelte';
+  import { run } from 'svelte/legacy';
   import { fade } from 'svelte/transition';
   import { Drawer } from 'vaul-svelte';
 
@@ -177,7 +178,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <AppShell pageName="">
   {#snippet stickyHeader()}
-  
       <div
         class="hidden lg:inline-flex mx-auto absolute translate-x-1/2 right-1/2"
       >

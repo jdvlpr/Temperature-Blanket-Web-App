@@ -15,19 +15,19 @@
 
 import { browser } from '$app/environment';
 import {
-  props as daytimeGaugeProps,
+  gaugeAttributes as daytimeGaugeAttributes,
   settings as daytimeGaugeSettings,
 } from '$lib/components/gauges/DaytimeGauge.svelte';
 import {
-  props as prcpGaugeProps,
+  gaugeAttributes as prcpGaugeAttributes,
   settings as prcpGaugeSettings,
 } from '$lib/components/gauges/RainGauge.svelte';
 import {
-  props as snowGaugeProps,
+  gaugeAttributes as snowGaugeAttributes,
   settings as snowGaugeSettings,
 } from '$lib/components/gauges/SnowGauge.svelte';
 import {
-  gaugeAttributes as tempGaugeProps,
+  gaugeAttributes as tempGaugeAttributes,
   gaugeSettings as tempGaugeSettings,
 } from '$lib/components/gauges/TemperatureGauge.svelte';
 import { CHARACTERS_FOR_URL_HASH } from '$lib/constants';
@@ -97,26 +97,18 @@ export const gaugeSettings = derived(
   },
 );
 
-export const gaugeProperties = derived(
-  [tempGaugeProps, daytimeGaugeProps, snowGaugeProps, prcpGaugeProps],
-  ([$tempGaugeProps, $daytimeGaugeProps, $snowGaugeProps, $prcpGaugeProps]) => {
-    return [
-      $tempGaugeProps,
-      $prcpGaugeProps,
-      $snowGaugeProps,
-      $daytimeGaugeProps,
-    ];
-  },
-);
+export const allGaugesAttributes = [
+  tempGaugeAttributes,
+  prcpGaugeAttributes,
+  snowGaugeAttributes,
+  daytimeGaugeAttributes,
+];
 
-export const gauges = derived(
-  [gaugeSettings, gaugeProperties],
-  ([$gaugeSettings, $gaugeProperties]) => {
-    return $gaugeSettings.map((n, i) => {
-      return { ...n, ...$gaugeProperties[i] };
-    });
-  },
-);
+export const gauges = derived([gaugeSettings], ([$gaugeSettings]) => {
+  return $gaugeSettings.map((n, i) => {
+    return { ...n, ...allGaugesAttributes[i] };
+  });
+});
 
 export const createdGauges = derived(
   [gaugesState, gauges],

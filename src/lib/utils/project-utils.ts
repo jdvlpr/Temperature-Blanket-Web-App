@@ -18,7 +18,7 @@ import pdfWeatherData from '$lib/pdf/sections/weather-data';
 import {
   activePreview,
   createdGauges,
-  gaugeProperties,
+  allGaugesAttributes,
   locations,
   projectFilename,
   projectGalleryLink,
@@ -70,7 +70,7 @@ export const downloadPDF = async () => {
 
 export const downloadWeatherCSV = () => {
   const labels = [];
-  get(gaugeProperties).forEach((gauge) => {
+  allGaugesAttributes.forEach((gauge) => {
     gauge.targets.forEach((target) => {
       if (target?.id === 'dayt') {
         labels.push(`${target.label} (h:m)`);
@@ -84,7 +84,7 @@ export const downloadWeatherCSV = () => {
   const _units = get(units);
   const _weather = [...weatherStore].map((day, index) => {
     const gaugeInfo = [];
-    get(gaugeProperties)?.forEach((gauge) => {
+    allGaugesAttributes?.forEach((gauge) => {
       gauge.targets?.forEach((target) => {
         if (target?.id === 'dayt') {
           gaugeInfo.push(

@@ -15,7 +15,7 @@
 
 import { gaugeSettings, gaugesState } from '$lib/stores';
 import { get } from 'svelte/store';
-import pdfGauge from './gauge';
+import pdfGauge from './gauge.svelte';
 
 const gaugeGroup = {
   pages: () => {

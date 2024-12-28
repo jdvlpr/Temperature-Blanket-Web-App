@@ -36,7 +36,7 @@ import {
 } from '$lib/constants';
 import {
   defaultWeatherSource,
-  gaugeProperties,
+  allGaugesAttributes,
   gaugesState,
   locations,
   units,
@@ -73,7 +73,7 @@ export const setProjectSettings = async (
   if (exists(params.l)) await parseLocationURLHash(params.l.value);
 
   // Load Gauges
-  get(gaugeProperties).forEach((gauge) => {
+  allGaugesAttributes.forEach((gauge) => {
     if (!exists(params[gauge.id])) return;
     switch (gauge.id) {
       case 'temp': {

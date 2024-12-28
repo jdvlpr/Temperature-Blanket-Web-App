@@ -23,7 +23,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '@skeletonlabs/skeleton';
   import { slide } from 'svelte/transition';
 
-  export let pageName = 'Menu';
+  /**
+   * @typedef {Object} Props
+   * @property {string} [pageName]
+   * @property {import('svelte').Snippet} [stickyHeader]
+   * @property {import('svelte').Snippet} [main]
+   * @property {import('svelte').Snippet} [footer]
+   */
+
+  /** @type {Props} */
+  let {
+    pageName = 'Menu',
+    stickyHeader,
+    main,
+    footer
+  } = $props();
 
   const drawerStore = getDrawerStore();
 </script>
@@ -46,7 +60,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <div data-vaul-drawer-wrapper="true">
   <div
     class="sticky top-0 bg-surface-50/90 dark:bg-surface-800/90 backdrop-blur-md z-20 text-token [view-transition-name:sticky-header]"
-    class:lg:py-2={$$slots.stickyHeader}
+    class:lg:py-2={stickyHeader}
     id="top-navbar"
   >
     <div
@@ -56,7 +70,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         class="btn bg-secondary-hover-token lg:hidden my-2 flex items-center"
         class:btn-icon={!pageName}
         title="Open Navigation Sidebar"
-        on:click={() => drawerStore.open({ id: 'menu' })}
+        onclick={() => drawerStore.open({ id: 'menu' })}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -80,7 +94,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </span>
         {/if}
       </button>
-      <slot name="stickyHeader" />
+      {@render stickyHeader?.()}
     </div>
   </div>
 
@@ -91,7 +105,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <button
         class="btn bg-surface-hover-token mx-2 lg:flex justify-center hidden mt-2"
         title={`${$showNavigationSideBar ? 'Hide' : 'Show'} Sidebar`}
-        on:click={() => ($showNavigationSideBar = !$showNavigationSideBar)}
+        onclick={() => ($showNavigationSideBar = !$showNavigationSideBar)}
       >
         {#if $showNavigationSideBar}
           <svg
@@ -143,8 +157,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
 
     <div class="w-full">
-      <div class="lg:m-2 xl:mx-0"><slot name="main" /></div>
-      <slot name="footer" />
+      <div class="lg:m-2 xl:mx-0">{@render main?.()}</div>
+      {@render footer?.()}
     </div>
   </div>
 </div>

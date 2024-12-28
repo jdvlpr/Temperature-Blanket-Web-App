@@ -30,7 +30,7 @@ import { get } from 'svelte/store';
 export const showPreviewImageWeatherDetails = (targets) => {
   previewWeatherTargets.set(targets);
 
-  if (get(isDesktop)) {
+  if (isDesktop) {
     modal.state.trigger({
       type: 'component',
       component: WeatherDetails,

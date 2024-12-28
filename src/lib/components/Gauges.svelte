@@ -18,7 +18,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import RainGauge from '$lib/components/gauges/RainGauge.svelte';
   import SnowGauge from '$lib/components/gauges/SnowGauge.svelte';
   import TemperatureGauge from '$lib/components/gauges/TemperatureGauge.svelte';
-  import { gaugeProperties, gaugesState, units, weather } from '$lib/stores';
+  import {
+    allGaugesAttributes,
+    gaugesState,
+    units,
+    weather,
+  } from '$lib/stores';
   import { downloadPDF } from '$lib/utils';
   import { onMount } from 'svelte';
 
@@ -35,7 +40,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   );
 
   function setupAvailableGauges() {
-    $gaugeProperties.forEach((gauge) => {
+    allGaugesAttributes.forEach((gauge) => {
       gauge.targets.forEach((target) => {
         if ($weather?.some((day) => day[target.id][$units] !== null)) {
           gaugesState.addAvailable(gauge.id);
@@ -46,7 +51,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 
   function getGaugeLabel(id) {
-    return $gaugeProperties.find((gauge) => gauge.id === id)?.label;
+    return allGaugesAttributes.find((gauge) => gauge.id === id)?.label;
   }
 </script>
 

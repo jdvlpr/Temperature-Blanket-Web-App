@@ -17,7 +17,7 @@ import { weatherGrouping } from '$lib/stores';
 import { getDaysInRange, getDaysPercent } from '$lib/utils';
 import { get } from 'svelte/store';
 import pdfConfig from '../pdf-config';
-import pdfGauge from './gauge';
+import pdfGauge from './gauge.svelte';
 
 const pdfColorDetails = {
   positionX: 95,

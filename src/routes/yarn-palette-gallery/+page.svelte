@@ -44,7 +44,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ToTopButton from '$lib/components/buttons/ToTopButton.svelte';
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
   import { ICONS } from '$lib/constants';
-  import { gaugeProperties } from '$lib/stores';
+  import { allGaugesAttributes } from '$lib/stores';
   import {
     fetchPopularProjects,
     fetchProjects,
@@ -132,7 +132,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       );
 
       JSON.parse(project.meta.yarn_urls).forEach((yarn_url, i) => {
-        const isNotPresetScheme = $gaugeProperties.every(
+        const isNotPresetScheme = allGaugesAttributes.every(
           (p) => !params?.[p.id]?.value?.includes('~'),
         );
         const colors = getColorsFromInput({

@@ -16,7 +16,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script context="module" lang="ts">
   import type { GaugeSettings } from '$lib/types';
   import chroma from 'chroma-js';
-  import { readable, writable, type Writable } from 'svelte/store';
+  import { writable, type Writable } from 'svelte/store';
 
   export const settings: Writable<GaugeSettings> = writable({
     colors: chroma
@@ -52,7 +52,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     schemeId: 'YlOrBr',
   });
 
-  export const props = readable({
+  export const gaugeAttributes: GaugeAttributes = {
     id: 'dayt',
     label: 'Daytime Gauge',
     unit: {
@@ -76,12 +76,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
         icon: '☼',
       },
     ],
-  });
+  };
 </script>
 
 <script>
   import Gauge from '$lib/components/Gauge.svelte';
   import { dayt } from '$lib/stores';
+  import type { GaugeAttributes } from '$lib/types/gauge-types';
   import { displayNumber } from '$lib/utils';
 
   $: maxes = $dayt.filter((n) => n !== null);
@@ -133,5 +134,5 @@ If not, see <https://www.gnu.org/licenses/>. -->
   bind:ranges={$settings.ranges}
   bind:schemeId={$settings.schemeId}
   bind:rangeOptions={$settings.rangeOptions}
-  props={$props}
+  {gaugeAttributes}
 />

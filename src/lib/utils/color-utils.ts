@@ -14,7 +14,7 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { CHARACTERS_FOR_URL_HASH } from '$lib/constants';
-import { gaugeProperties, gaugeSettings } from '$lib/stores';
+import { allGaugesAttributes, gaugeSettings } from '$lib/stores';
 import type { Color } from '$lib/types';
 import {
   capitalizeFirstLetter,
@@ -284,7 +284,7 @@ const getColorsFromProjectURL = (string: string): string[] | false => {
   }, {});
 
   let colors = [];
-  get(gaugeProperties).forEach((gauge) => {
+  allGaugesAttributes.forEach((gauge) => {
     if (gauge.id in params === true) {
       let text = params[gauge.id].value;
 
@@ -544,7 +544,7 @@ export const getPalettesFromProjects = ({
     );
 
     JSON.parse(project.yarnUrls).forEach((yarn_url, i) => {
-      const isNotPresetScheme = get(gaugeProperties).every(
+      const isNotPresetScheme = allGaugesAttributes.every(
         (p) => !params?.[p.id]?.value?.includes('~'),
       );
       let colors = getColorsFromInput({ string: yarn_url });

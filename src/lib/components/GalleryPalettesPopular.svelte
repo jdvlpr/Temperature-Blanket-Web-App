@@ -22,7 +22,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script>
   import ColorPalette from '$lib/components/ColorPalette.svelte';
   import PlaceholderPalettes from '$lib/components/PlaceholderPalettes.svelte';
-  import { gaugeProperties } from '$lib/stores';
+  import { allGaugesAttributes } from '$lib/stores';
   import {
     fetchPopularProjects,
     getColorsFromInput,
@@ -65,7 +65,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       );
 
       JSON.parse(project.meta.yarn_urls).forEach((yarn_url, i) => {
-        const isNotPresetScheme = $gaugeProperties.every(
+        const isNotPresetScheme = allGaugesAttributes.every(
           (p) => !params?.[p.id]?.value?.includes('~'),
         );
         const colors = getColorsFromInput({

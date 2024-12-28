@@ -436,6 +436,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 />
                 {#if (!!$hex || !!$inputTypeTextValue) && !!$inputTypeColorElement?.value}
                   <button
+                    aria-label="Clear Color"
                     on:click={() => {
                       $hex = '';
                       $inputTypeTextValue = '';
@@ -520,6 +521,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 />
                 {#if $search}
                   <button
+                    aria-label="Clear Search"
                     on:click={() => {
                       $search = '';
                     }}
@@ -618,6 +620,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   {#if !unavailable}
                     {#if affiliate_variant_href}
                       <a
+                        aria-label="Buy this yarn colorway"
                         class="btn-icon bg-secondary-hover-token"
                         title="Buy this yarn colorway"
                         href={affiliate_variant_href}
@@ -640,6 +643,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       </a>
                     {:else}
                       <a
+                        aria-label="Open link to this yarn colorway"
                         class="btn-icon bg-secondary-hover-token"
                         href={variant_href}
                         target="_blank"

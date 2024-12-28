@@ -14,19 +14,19 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import {
-  props as daytimeGaugeProps,
+  gaugeAttributes as daytimeGaugeAttributes,
   settings as daytimeGaugeSettings,
 } from '$lib/components/gauges/DaytimeGauge.svelte';
 import {
-  props as rainGaugeProps,
+  gaugeAttributes as rainGaugeAttributes,
   settings as rainGaugeSettings,
 } from '$lib/components/gauges/RainGauge.svelte';
 import {
-  props as snowGaugeProps,
+  gaugeAttributes as snowGaugeAttributes,
   settings as snowGaugeSettings,
 } from '$lib/components/gauges/SnowGauge.svelte';
 import {
-  gaugeAttributes as tempGaugeProps,
+  gaugeAttributes as tempGaugeAttributes,
   gaugeSettings as tempGaugeSettings,
 } from '$lib/components/gauges/TemperatureGauge.svelte';
 import { showDaysInRange, units } from '$lib/stores';
@@ -111,30 +111,29 @@ const pdfGauge = {
       doc,
       pdfConfig.leftMargin,
       pdfColorDetails.positionX - pdfGauge.linePadding,
-      gauge.targets.length,
-    ); // TODO: what is this last item for?
+    );
   },
   create: function (doc, gaugeId) {
     let gauge;
     if (gaugeId === 'temp')
       gauge = {
         ...get(tempGaugeSettings),
-        ...get(tempGaugeProps),
+        ...tempGaugeAttributes,
       };
     if (gaugeId === 'prcp')
       gauge = {
         ...get(rainGaugeSettings),
-        ...get(rainGaugeProps),
+        ...rainGaugeAttributes,
       };
     if (gaugeId === 'snow')
       gauge = {
         ...get(snowGaugeSettings),
-        ...get(snowGaugeProps),
+        ...snowGaugeAttributes,
       };
     if (gaugeId === 'dayt')
       gauge = {
         ...get(daytimeGaugeSettings),
-        ...get(daytimeGaugeProps),
+        ...daytimeGaugeAttributes,
       };
     // Gauge Item
     const length = gauge.ranges.length;

@@ -17,7 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import type { GaugeSettings } from '$lib/types';
   import chroma from 'chroma-js';
 
-  export const gaugeSettings: GaugeSettings = $state({
+  export let gaugeSettings: Writable<GaugeSettings> = writable({
     colors: chroma
       .scale('Spectral')
       .colors(10)
@@ -51,7 +51,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     schemeId: 'Spectral',
   });
 
-  export const gaugeAttributes = {
+  export const gaugeAttributes: GaugeAttributes = {
     id: 'temp',
     label: 'Temperature Gauge',
     unit: {
@@ -106,10 +106,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
   
   import Gauge from '$lib/components/Gauge.svelte';
   import { tmax, tmin } from '$lib/stores';
+  import type { GaugeAttributes } from '$lib/types/gauge-types';
   import {
     displayNumber,
     getEvenlyDistributedRangeValuesWithEqualDayCount,
   } from '$lib/utils';
+  import { run } from 'svelte/legacy';
+  import { writable, type Writable } from 'svelte/store';
 
   let maxes = $derived($tmax.filter((n) => n !== null));
   let mins = $derived($tmin.filter((n) => n !== null));
@@ -117,57 +120,58 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let max = $derived(Number.isInteger(Math.max(...maxes))
     ? Math.max(...maxes) + 1
     : Math.ceil(Math.max(...maxes)));
+
   let min = $derived(Number.isInteger(Math.min(...mins))
     ? Math.min(...mins) - 1
     : Math.floor(Math.min(...mins)));
 
-  $effect(() => {
-    gaugeSettings.rangeOptions.auto.increment = displayNumber(
-      (max - min) / gaugeSettings.colors.length || 10,
-      2,
-    );
+  run(() => {
+    $gaugeSettings.rangeOptions.auto.increment =  displayNumber(
+        (max - min) / $gaugeSettings.colors.length || 10,
+        2,
+      );
   });
 
-  $effect(() => {
-    gaugeSettings.rangeOptions.auto.start.high = max;
+  run(() => {
+    $gaugeSettings.rangeOptions.auto.start.high = max;
   });
 
-  $effect(() => {
-    gaugeSettings.rangeOptions.auto.start.low = min;
+  run(() => {
+    $gaugeSettings.rangeOptions.auto.start.low = min;
   });
 
-  $effect(() => {
-    if (gaugeSettings.rangeOptions.manual.increment === null)
-      gaugeSettings.rangeOptions.manual.increment =
-        gaugeSettings.rangeOptions.auto.increment;
+  run(() => {
+    if ($gaugeSettings.rangeOptions.manual.increment === null)
+      $gaugeSettings.rangeOptions.manual.increment =
+        $gaugeSettings.rangeOptions.auto.increment;
   });
 
-  $effect(() => {
-    if (gaugeSettings.rangeOptions.manual.start === null)
-      gaugeSettings.rangeOptions.manual.start =
-        gaugeSettings.rangeOptions.auto.start.high;
+  run(() => {
+    if ($gaugeSettings.rangeOptions.manual.start === null)
+      $gaugeSettings.rangeOptions.manual.start =
+        $gaugeSettings.rangeOptions.auto.start.high;
   });
 
-  $effect(() => {
-    if (!gaugeSettings.ranges.length) {
+  run(() => {
+    if (!$gaugeSettings.ranges.length) {
       let start = max;
-      let increment = gaugeSettings.rangeOptions.auto.increment;
+      let increment = $gaugeSettings.rangeOptions.auto.increment;
       if (
-        gaugeSettings.rangeOptions?.auto?.optimization !== 'ranges' &&
-        gaugeSettings.rangeOptions?.mode === 'auto'
+        $gaugeSettings.rangeOptions?.auto?.optimization !== 'ranges' &&
+        $gaugeSettings.rangeOptions?.mode === 'auto'
       ) {
         const newRanges = getEvenlyDistributedRangeValuesWithEqualDayCount({
           weatherData: null,
-          numRanges: gaugeSettings.colors.length,
-          prop: gaugeSettings.rangeOptions.auto.optimization,
-          gaugeDirection: gaugeSettings.rangeOptions.direction,
-          roundIncrement: gaugeSettings.rangeOptions.auto.roundIncrement,
-          includeFrom: gaugeSettings.rangeOptions.includeFromValue,
-          includeTo: gaugeSettings.rangeOptions.includeToValue,
+          numRanges: $gaugeSettings.colors.length,
+          prop: $gaugeSettings.rangeOptions.auto.optimization,
+          gaugeDirection: $gaugeSettings.rangeOptions.direction,
+          roundIncrement: $gaugeSettings.rangeOptions.auto.roundIncrement,
+          includeFrom: $gaugeSettings.rangeOptions.includeFromValue,
+          includeTo: $gaugeSettings.rangeOptions.includeToValue,
         });
-        gaugeSettings.ranges = newRanges;
+        $gaugeSettings.ranges = newRanges;
       } else {
-        gaugeSettings.ranges = gaugeSettings?.colors.map((n, i) => {
+        $gaugeSettings.ranges = $gaugeSettings?.colors.map((n, i) => {
           let item = {
             from: displayNumber(start, 0),
             to: displayNumber(start - increment, 0),
@@ -181,6 +185,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <Gauge
-  bind:numberOfColors={gaugeSettings.numberOfColors}
-  {gaugeAttributes}
+{gaugeAttributes}
+  bind:numberOfColors={$gaugeSettings.numberOfColors}
+  bind:schemeId={$gaugeSettings.schemeId}
+  bind:ranges={$gaugeSettings.ranges}
+  bind:rangeOptions={$gaugeSettings.rangeOptions}
+  bind:colors={$gaugeSettings.colors}
 />

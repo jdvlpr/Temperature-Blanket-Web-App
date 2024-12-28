@@ -29,7 +29,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { settings as snowGaugeSettings } from '$lib/components/gauges/SnowGauge.svelte';
   import { gaugeSettings as temperatureGaugeSettings } from '$lib/components/gauges/TemperatureGauge.svelte';
   import { ALL_YARN_WEIGHTS, ICONS } from '$lib/constants';
-  import { gaugeProperties, layout, valid } from '$lib/stores';
+  import { allGaugesAttributes, layout, valid } from '$lib/stores';
   import {
     exists,
     getProjectParametersFromURLHash,
@@ -105,12 +105,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   function getGauges(params) {
     if (!browser) return [];
     let _gauges = [];
-    $gaugeProperties.forEach((gauge) => {
+    allGaugesAttributes.forEach((gauge) => {
       if (!exists(params[gauge.id])) return;
       switch (gauge.id) {
         case 'temp': {
           const settings = parseGaugeURLHash(params[gauge.id].value, {
-            ...$temperatureGaugeSettings,
+            ...temperatureGaugeSettings,
           });
           _gauges.push(settings);
           break;
@@ -324,7 +324,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                                           <div
                                             class="w-4 h-4 rounded-full"
                                             style="background:{hex};"
-                                          />
+                                          ></div>
                                           <p class="">
                                             {name}
                                           </p>
@@ -424,11 +424,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
                           ...colors[index],
                         };
                       })}
-                      {@const unitLabel = $gaugeProperties.find(
+                      {@const unitLabel = allGaugesAttributes.find(
                         (item) => item.id === id,
                       )?.unit.label[projectUnits]}
                       {@const gaugeLabel = `${
-                        $gaugeProperties.find((item) => item.id === id)?.label
+                        allGaugesAttributes.find((item) => item.id === id)
+                          ?.label
                       } Yarn Palette`}
                       {@const hasAffiliateLinks = colors
                         ? colors?.some(

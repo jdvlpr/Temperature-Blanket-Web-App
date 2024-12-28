@@ -14,7 +14,7 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import {
-  gaugeProperties,
+  allGaugesAttributes,
   gaugesState,
   locations,
   tavg,
@@ -61,9 +61,7 @@ const pdfWeatherData = {
     return (
       this.weatherDataPositionX +
       this.weatherDataColumnWidth *
-        get(gaugeProperties)
-          .map((n) => n.targets)
-          .flat().length -
+        allGaugesAttributes.map((n) => n.targets).flat().length -
       this.linePadding
     );
   },
@@ -206,9 +204,7 @@ const pdfWeatherData = {
       );
     }
     // Row Data
-    const targets = get(gaugeProperties)
-      .map((n) => n.targets)
-      .flat();
+    const targets = allGaugesAttributes.map((n) => n.targets).flat();
     targets.forEach((target, i) => {
       const x = this.weatherDataPositionX + this.weatherDataColumnWidth * i;
       doc.text(target.pdfHeader[get(units)], x, positionY);
@@ -238,9 +234,7 @@ const pdfWeatherData = {
   },
   createRowData: function (doc, day, line) {
     doc.setFont(pdfConfig.font.paragraph, 'normal');
-    const params = get(gaugeProperties)
-      .map((n) => n.targets)
-      .flat();
+    const params = allGaugesAttributes.map((n) => n.targets).flat();
     for (
       let i = 0, marginRight = this.weatherDataPositionX;
       i < params.length;
@@ -281,7 +275,7 @@ const pdfWeatherData = {
 
       if (hasGauge) {
         // Color box
-        const gaugeId = get(gaugeProperties).filter((gauge) =>
+        const gaugeId = allGaugesAttributes.filter((gauge) =>
           gauge.targets.some((item) => item.id === param),
         )[0].id;
         const colorInfo = getColorInfo(gaugeId, day[param][get(units)]);

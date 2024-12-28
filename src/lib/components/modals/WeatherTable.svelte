@@ -16,11 +16,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script>
   import DataTable from '$lib/components/datatable/DataTable.svelte';
   import CloseButton from '$lib/components/modals/CloseButton.svelte';
-  import { gaugeProperties, units, weatherGrouping } from '$lib/stores';
+  import { allGaugesAttributes, units, weatherGrouping } from '$lib/stores';
   import { convertTime, dateToISO8601String } from '$lib/utils';
   import { DataHandler, Th } from '@vincjo/datatables';
   import { getContext } from 'svelte';
-
   export let weatherData;
 
   const { close } = getContext('simple-modal');
@@ -28,7 +27,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   const handler = new DataHandler(tableData, { rowsPerPage: 10 });
   const rows = handler.getRows();
 
-  let weatherTargets = $gaugeProperties.map((gauge) => gauge.targets).flat();
+  let weatherTargets = allGaugesAttributes.map((gauge) => gauge.targets).flat();
 
   $: tableData = [
     ...weatherData.map((n) => {

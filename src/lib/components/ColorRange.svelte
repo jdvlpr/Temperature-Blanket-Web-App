@@ -65,14 +65,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
       ><span class="text-xs">From</span>
       <span class="flex items-start"
         ><span class="text-lg">{ranges[index]?.from}</span>
-        <span class="text-xs">{props.unit.label[$units]}</span></span
+        <span class="text-xs">{gaugeAttributes.unit.label[$units]}</span></span
       ></span
     >
     <span class="flex flex-col text-left" id="range-{index}-to"
       ><span class="text-xs">To</span>
       <span class="flex items-start"
         ><span class="text-lg">{ranges[index]?.to}</span>
-        <span class="text-xs">{props.unit.label[$units]}</span></span
+        <span class="text-xs">{gaugeAttributes.unit.label[$units]}</span></span
       ></span
     ></button
   >

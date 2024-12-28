@@ -31,7 +31,7 @@ import { load as loadSqrs } from '$lib/components/previews/SquaresSettings.svelt
 import { ICONS } from '$lib/constants';
 import {
   defaultWeatherSource,
-  gaugeProperties,
+  allGaugesAttributes,
   gaugesState,
   history,
   historyChangeMessage,
@@ -103,8 +103,8 @@ export const loadFromHistory = (props) => {
   }
 
   // Change Gauges
-  for (let i = 0; i < get(gaugeProperties).length; i++) {
-    const gauge = get(gaugeProperties)[i];
+  for (let i = 0; i < allGaugesAttributes.length; i++) {
+    const gauge = allGaugesAttributes[i];
     if (exists(newParams[gauge.id])) {
       if (
         !exists(oldParams[gauge.id]) ||
@@ -115,9 +115,14 @@ export const loadFromHistory = (props) => {
           case 'temp':
             settings = parseGaugeURLHash(
               newParams[gauge.id].value,
-              get(temperatureGaugeSettings),
+              temperatureGaugeSettings,
             );
-            temperatureGaugeSettings.set(settings);
+
+            Object.keys(temperatureGaugeSettings).forEach((key) => {
+              if (settings[key] !== undefined) {
+                temperatureGaugeSettings[key] = settings[key];
+              }
+            });
             message = 'Colors';
             break;
           case 'prcp':
@@ -258,7 +263,7 @@ export const updateHistory = () => {
   const liveParams = getProjectParametersFromURLHash(live);
 
   // There must be a gauge created... sometimes this block gets called and the liveHash doesn't have any gauge params...
-  const hasGauge = get(gaugeProperties).some((gauge) =>
+  const hasGauge = allGaugesAttributes.some((gauge) =>
     exists(liveParams[gauge.id]),
   );
   if (!hasGauge) return;
