@@ -16,7 +16,7 @@
   let width = $state(parent?.width);
   const modalStore = getModalStore();
 
-  let shellElement;
+  let shellElement: HTMLElement;
 
 $effect(() => {
   if (!isDesktop.current) width = 'w-[100vw]';
@@ -35,7 +35,7 @@ $effect(() => {
 <div
 bind:this={shellElement}
 tabindex="0"
-  class="{parent?.background} {parent?.rounded} {parent?.position} {width} {parent?.height} {stickyPart ? '' : parent?.padding} {parent?.spacing} {parent?.shadow} max-h-[100svh] sm:max-h-[96svh] overflow-auto focus:!outline-none"
+  class="{parent?.background} {parent?.rounded} {parent?.position} {width} {parent?.height} {stickyPart ? '' : parent?.padding} {parent?.spacing} {parent?.shadow} max-h-[97svh] overflow-auto focus:!outline-none"
 >
   <div class="{stickyPart ? 'p-4' : ''}">
     {#if $modalStore[0] && !stickyPart}

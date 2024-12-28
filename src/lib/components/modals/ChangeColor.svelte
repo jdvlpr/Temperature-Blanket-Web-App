@@ -52,11 +52,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     parent
   }: Props = $props();
 
-    let container: HTMLElement = $state();
-
   const modalStore = getModalStore();
+  
+  let container: HTMLElement = $state();
 
-    if (parent) parent.width = 'w-modal-wide';
+  if (parent) parent.width = 'w-modal-wide';
 
   let valid = $state(true);
   let inputTypeColorValue = $state(hex);
@@ -137,6 +137,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   
   let currentColor = $derived({hex});
 </script>
+
 <ModalShell {parent} size="large" preventDefaultFocus={true}>
   <div class="" bind:this={container}>
     <p class="my-2 text-center text-xs">Color {title}</p>
