@@ -13,13 +13,22 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script>
+<script lang="ts">
   import CloseButton from '$lib/components/modals/CloseButton.svelte';
 
-  export let onSave;
-  export let onClose;
-  export let saveText = 'Save';
-  export let disabled = false;
+  interface Props {
+    onSave: any;
+    onClose: any;
+    saveText?: string;
+    disabled?: boolean;
+  }
+
+  let {
+    onSave,
+    onClose,
+    saveText = 'Save',
+    disabled = false,
+  }: Props = $props();
 </script>
 
 <div
@@ -29,7 +38,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   <button
     class="btn variant-filled-primary flex justify-center items-center"
-    on:click={onSave}
+    onclick={onSave}
     {disabled}
     title={saveText}
   >
