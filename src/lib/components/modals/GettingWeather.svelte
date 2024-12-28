@@ -195,9 +195,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <div class="flex flex-col items-center text-center w-full">
     {#if $signal && !error}
       <Spinner />
+
       <p class="font-bold text-xl my-4">Searching for Weather Data</p>
-      <p class="my-4 flex flex-col items-center">
+
+      <p class="mb-4 flex flex-col items-center">
         <span> {@html $gettingLocationWeather}</span>
+
         {#if allLocations?.length > 1}
           <span class="flex flex-col items-center mt-2 w-full gap-1">
             <progress

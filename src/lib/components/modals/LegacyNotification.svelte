@@ -13,31 +13,36 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script>
-  import CloseButton from '$lib/components/modals/CloseButton.svelte';
-  import { getContext } from 'svelte';
-  const { close } = getContext('simple-modal');
+<script lang="ts">
+  import ModalShell from './ModalShell.svelte';
 
-  export let v;
+  let { v, parent } = $props();
 </script>
 
-<CloseButton onClose={close} />
+<ModalShell {parent} size="small">
+  <div class="flex flex-col items-start gap-4">
+    <h2 class="font-bold my-2 text-xl">There's Been An Update</h2>
 
-<div class="p-2 sm:p-4">
-  <h2 class="font-bold my-2">There's Been An Update</h2>
+    <p>
+      Some breaking changes were made to improve the accuracy and functionality
+      of this site. Because your project was made before these changes,
+      unfortunately it can't be loaded.
+    </p>
 
-  <p>
-    Some changes were recently made to improve the accuracy and functionality of
-    this site, and your project is unable to be loaded.
-  </p>
-  <p>
-    You can <a
-      href="/changelog#{v}"
-      target="_blank"
-      rel="nofollow noreferrer"
-      class="link"
-      >click here to read more details about the changes that caused this
-      notification.</a
-    > Sorry for any inconvenience!
-  </p>
-</div>
+    <p>
+      You can <a
+        href="/changelog#{v}"
+        target="_blank"
+        rel="nofollow noreferrer"
+        class="link"
+        >click here to read more details about the changes that caused this
+        notification.</a
+      >
+    </p>
+
+    <p>
+      Please start a new project after closing this notification. Sorry for any
+      inconvenience!
+    </p>
+  </div>
+</ModalShell>
