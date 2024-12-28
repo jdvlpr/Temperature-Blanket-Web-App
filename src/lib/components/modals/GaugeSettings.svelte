@@ -79,7 +79,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     }
   });
 
-  onMount(() => {
+  $effect(() => {
     if (index !== null) {
       if (focusOn === 'to') {
         document.getElementById(`range-${index}-to`)?.scrollIntoView();
@@ -250,10 +250,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/if}
   
   <div
-    class="flex flex-wrap justify-center items-start gap-2 mx-auto"
+    class="flex max-lg:flex-col justify-center items-start gap-2 mx-auto w-full"
   >
     <div
-      class="flex flex-col justify-start items-start max-lg:w-full lg:max-w-[300px]"
+      class="flex flex-col justify-start items-start"
       bind:this={setupContainer}
     >
       <h2 class="font-bold text-xl flex flex-wrap items-start mb-2">
@@ -606,7 +606,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </div>
     </div>
   
-    <div class="flex flex-col justify-start items-start max-lg:w-full">
+    <div class="flex flex-col justify-start items-start w-full">
       <h2 class="font-bold text-xl flex flex-wrap items-start mb-2">
         Edit Ranges
       </h2>

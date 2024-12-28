@@ -20,7 +20,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { getModalStore } from '@skeletonlabs/skeleton';
 
   const modalStore = getModalStore();
-  const isModal = modalStore[0];
+  const isModal = !!$modalStore[0];
 
   let { range, rangeOptions, gaugeAttributes } = $props();
 
