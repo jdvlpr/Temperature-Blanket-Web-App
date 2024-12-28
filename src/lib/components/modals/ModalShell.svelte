@@ -43,6 +43,7 @@ $effect(() => {
 })
 </script>
 
+<!-- TODO: Fix the tabindex warning -->
 <div
 bind:this={shellElement}
 tabindex="0"
