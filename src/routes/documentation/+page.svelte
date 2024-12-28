@@ -677,7 +677,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <div
               class="sticky-block-placeholder sticky-block-placeholder-1"
               style="width:0; height:0; margin:0; padding:0; visibility:hidden;"
-            />
+            ></div>
             <div
               class="wp-block-senff-sticky-block senff-sticky-block-1 sticky-block-original-1 block-is-not-sticky sticky-block-active-1"
               data-topspace="0"
