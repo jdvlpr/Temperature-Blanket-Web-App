@@ -250,7 +250,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/if}
   
   <div
-    class="p-2 sm:p-4 mt-4 flex flex-wrap justify-center items-start gap-2 mx-auto"
+    class="flex flex-wrap justify-center items-start gap-2 mx-auto"
   >
     <div
       class="flex flex-col justify-start items-start max-lg:w-full lg:max-w-[300px]"

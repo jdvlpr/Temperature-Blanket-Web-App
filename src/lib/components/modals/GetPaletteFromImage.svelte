@@ -28,14 +28,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
     getTextColor,
     stringToBrandAndYarnDetails,
   } from '$lib/utils';
+  import { getModalStore } from '@skeletonlabs/skeleton';
   import chroma from 'chroma-js';
-  import { getContext, onMount } from 'svelte';
+  import { onMount } from 'svelte';
   import { fade } from 'svelte/transition';
   import SelectYarnWeight from '../SelectYarnWeight.svelte';
+  import ModalShell from './ModalShell.svelte';
 
-  export let updateGauge, numberOfColors;
+  let { updateGauge, numberOfColors = $bindable(), parent } = $props();
 
-  const { close } = getContext('simple-modal');
+  const modalStore = getModalStore();
 
   let debounceTimer;
   const debounce = (callback, time) => {
@@ -43,36 +45,26 @@ If not, see <https://www.gnu.org/licenses/>. -->
     debounceTimer = window.setTimeout(callback, time);
   };
 
-  const adjectives = [
-    'colorful',
-    'colors',
-    'nature',
-    'leaves',
-    'autumn',
-    'bouquet',
-    'blossom',
-  ];
-
-  let coords = { x: 0, y: 0 };
-  let canvas;
-  let ctx;
-  let matchingYarnColors = [];
+  let coords = $state({ x: 0, y: 0 });
+  let canvas = $state();
+  let ctx = $state();
+  let matchingYarnColors = $state([]);
   let rect;
-  let img;
-  let cursorColor = {};
+  let img = $state();
+  let cursorColor = $state({});
   let cursorX, cursorY;
-  let input;
-  let showCursor = null;
+  let input = $state();
+  let showCursor = $state(null);
   let ColorThief;
-  let loading = true;
-  let touching = false;
-  let selectedBrandId;
-  let selectedYarnId;
-  let selectedYarnWeightId;
-  let colorways = getColorways({ selectedBrandId, selectedYarnId });
-  let hoverDiv;
-  let colorHoverDiv;
-  let hoverName;
+  let loading = $state(true);
+  let touching = $state(false);
+  let selectedBrandId = $state();
+  let selectedYarnId = $state();
+  let selectedYarnWeightId = $state();
+  let colorways = $state(getColorways({ selectedBrandId: null, selectedYarnId : null, selectedYarnWeightId:null}));
+  let hoverDiv = $state();
+  let colorHoverDiv = $state();
+  let hoverName = $state();
 
   onMount(async () => {
     const ct = await import(
@@ -118,7 +110,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     return chroma(data[0], data[1], data[2]).hex();
   }
 
-  function addColor(e) {
+  function addColor(e) {    
     if (matchingYarnColors.length === MAXIMUM_COLORWAYS_MATCHES_FOR_IMAGES)
       return;
     debounce(() => {
@@ -175,7 +167,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         x: e.pageX - rect.left,
         y: e.pageY - rect.top,
       };
-    }, 0);
+    },0);
   }
 
   function showColorTouch(e) {
@@ -294,18 +286,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 </script>
 
-<div class="p-2 sm:p-4 max-w-screen-lg">
-  <div class="mt-8 sm:mt-0">
+<ModalShell {parent} size="large">
+  <div class="flex justify-center">
     <input
       type="file"
       accept="image/*"
       hidden
       bind:this={input}
-      on:change={handleImageChange}
+      onchange={handleImageChange}
     />
     <button
       class="btn bg-secondary-hover-token gap-1"
-      on:click={() => {
+      onclick={() => {
         const context = canvas.getContext('2d');
         context.clearRect(0, 0, canvas.width, canvas.height);
         canvas.style.display = 'none';
@@ -349,7 +341,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     >
     <button
       class="btn bg-secondary-hover-token gap-1"
-      on:click={() => {
+      onclick={() => {
         if (typeof input !== 'undefined') input.click();
       }}
       ><svg
@@ -453,24 +445,32 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <canvas
       bind:this={canvas}
       class="w-full h-full cursor-crosshair"
-      on:mousedown|preventDefault={(e) => {
+      onmousedown={(e) => {
+        e.preventDefault();
         addColor(e);
       }}
-      on:mousemove|preventDefault={showColor}
-      on:touchmove|preventDefault={(e) => {
+      onmousemove={(e) => {
+         e.preventDefault();
+          showColor(e);
+        }}
+      ontouchmove={(e) => {
         showColorTouch(e);
       }}
-      on:mouseenter|preventDefault={(e) => {
+      onmouseenter={(e) => {
+         e.preventDefault();
         showColor(e);
         showCursor = false;
       }}
-      on:touchstart|preventDefault={(e) => {
+      ontouchstart={(e) => {
         touching = true;
         showColorTouch(e);
         showCursor = false;
       }}
-      on:mouseleave|preventDefault={() => (showCursor = true)}
-      on:touchend|preventDefault={(e) => {
+      onmouseleave={(e) => {
+         e.preventDefault();
+        showCursor = true;
+      }}
+      ontouchend={(e) => {
         touching = false;
         addColorTouch(e);
         showCursor = true;
@@ -483,7 +483,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/if}
 
   {#if loading}
-    <div class="my-12">
+    <div class="my-12 text-center">
       <Spinner />
       <p class="my-2">Loading Image...</p>
     </div>
@@ -516,7 +516,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
       <button
         class="btn bg-secondary-hover-token gap-1"
-        on:click={() => {
+        onclick={() => {
           if (numberOfColors < 2) numberOfColors = 2;
           matchingYarnColors = getMatchingYarnColors({
             img,
@@ -538,7 +538,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </button>
       <button
         class="btn bg-secondary-hover-token gap-1"
-        on:click={() => {
+        onclick={() => {
           matchingYarnColors = [];
         }}
       >
@@ -548,7 +548,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
   {/if}
 
-  <p class="text-sm my-2">
+  <p class="text-sm my-2 text-center">
     Random images from <a
       href="https://unsplash.com"
       class="link"
@@ -556,34 +556,36 @@ If not, see <https://www.gnu.org/licenses/>. -->
       rel="nofollower noreferrer">unsplash.com</a
     >. All images are processed on your device.
   </p>
-</div>
 
-<StickyPart position="bottom">
-  <div class="p-2 sm:px-4">
-    {#if matchingYarnColors.length && !loading}
-      <div class="mb-2">
-        <ColorPaletteEditable
-          canUserEditColor={false}
-          bind:colors={matchingYarnColors}
-          on:changed={() => {
-            if (matchingYarnColors.length !== numberOfColors)
-              numberOfColors = matchingYarnColors.length;
+  {#snippet stickyPart()}
+    <StickyPart position="bottom">
+      <div class="p-2 sm:px-4">
+        {#if matchingYarnColors.length && !loading}
+          <div class="mb-2">
+            <ColorPaletteEditable
+              canUserEditColor={false}
+              bind:colors={matchingYarnColors}
+              on:changed={() => {
+                if (matchingYarnColors.length !== numberOfColors)
+                  numberOfColors = matchingYarnColors.length;
+              }}
+            />
+          </div>
+        {/if}
+        <SaveAndCloseButtons
+          disabled={!ctx || loading || !matchingYarnColors.length}
+          onSave={() => {
+            updateGauge({
+              _colors: matchingYarnColors.map((n) => {
+                delete n.id;
+                return n;
+              }),
+            });
+            modalStore.close();
           }}
+          onClose={modalStore.close}
         />
       </div>
-    {/if}
-    <SaveAndCloseButtons
-      disabled={!ctx || loading || !matchingYarnColors.length}
-      onSave={() => {
-        updateGauge({
-          _colors: matchingYarnColors.map((n) => {
-            delete n.id;
-            return n;
-          }),
-        });
-        close();
-      }}
-      onClose={close}
-    />
-  </div>
-</StickyPart>
+    </StickyPart>
+  {/snippet}
+</ModalShell>
