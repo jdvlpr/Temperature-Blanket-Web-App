@@ -115,14 +115,9 @@ export const loadFromHistory = (props) => {
           case 'temp':
             settings = parseGaugeURLHash(
               newParams[gauge.id].value,
-              temperatureGaugeSettings,
+              get(temperatureGaugeSettings),
             );
-
-            Object.keys(temperatureGaugeSettings).forEach((key) => {
-              if (settings[key] !== undefined) {
-                temperatureGaugeSettings[key] = settings[key];
-              }
-            });
+            temperatureGaugeSettings.set(settings);
             message = 'Colors';
             break;
           case 'prcp':

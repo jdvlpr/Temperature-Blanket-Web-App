@@ -1,12 +1,11 @@
 <script lang="ts">
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
   import { ALL_YARN_WEIGHTS, yarnWeightIcons } from '$lib/constants';
-  import { onMount } from 'svelte';
 
-  let highlight = null;
+  let highlight = $state(null);
 
-  onMount(() => {
-    highlight = $page.url.searchParams.get('highlight') || null;
+  $effect(() => {
+    highlight = page.url.searchParams.get('highlight') || null;
     if (highlight) {
       const el = document.getElementById(highlight);
       if (el) {
@@ -146,15 +145,15 @@
             id={name}
             class=" scroll-mt-20"
             class:!bg-primary-50-900-token={highlight === name}
-            on:click={() => {
+            onclick={() => {
               if (highlight !== name) {
                 highlight = name;
-                $page.url.searchParams.set('highlight', name);
-                history.replaceState(history.state, '', $page.url);
+                page.url.searchParams.set('highlight', name);
+                history.replaceState(history.state, '', page.url);
               } else {
                 highlight = null;
-                $page.url.searchParams.delete('highlight');
-                history.replaceState(history.state, '', $page.url);
+                page.url.searchParams.delete('highlight');
+                history.replaceState(history.state, '', page.url);
               }
             }}
           >

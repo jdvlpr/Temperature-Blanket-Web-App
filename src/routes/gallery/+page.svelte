@@ -37,14 +37,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </svelte:head>
 
 <AppShell pageName="Project Gallery">
-  <svelte:fragment slot="stickyHeader">
-    <div class="hidden lg:inline-flex mx-auto"><AppLogo /></div>
-  </svelte:fragment>
+  {#snippet stickyHeader()}
+  
+      <div class="hidden lg:inline-flex mx-auto"><AppLogo /></div>
+    
+  {/snippet}
 
-  <main
-    slot="main"
-    class="max-w-screen-xl m-auto flex flex-col justify-start gap-2"
-  >
-    <Gallery />
-  </main>
+  {#snippet main()}
+    <main
+      
+      class="max-w-screen-xl m-auto flex flex-col justify-start gap-2"
+    >
+      <Gallery />
+    </main>
+  {/snippet}
 </AppShell>

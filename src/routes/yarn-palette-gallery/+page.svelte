@@ -57,7 +57,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '$lib/utils';
   import { onMount } from 'svelte';
   import { writable } from 'svelte/store';
-  import { colors as yarnPalleteCreatorPageColors } from './../yarn/+page.svelte';
+  import { yarn as yarnPalleteCreatorPageColors } from './../yarn/+page.svelte';
 
   let first = 40;
   let loading = true;
@@ -263,7 +263,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         })}&f=${colorsToYarnDetails({ colors })}&v=${version}`} -->
                 <a
                   on:click={async () => {
-                    $yarnPalleteCreatorPageColors = colors;
+                    yarnPalleteCreatorPageColors.colors = colors;
                     await recordPageView(projectId);
                   }}
                   href="/yarn"
@@ -458,7 +458,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             {#each $palettes as { colors, schemeName, projectId }}
               <a
                 on:click={async () => {
-                  $yarnPalleteCreatorPageColors = colors;
+                  yarnPalleteCreatorPageColors.colors = colors;
                   await recordPageView(projectId);
                 }}
                 href="/yarn"

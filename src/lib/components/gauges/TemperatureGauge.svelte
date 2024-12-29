@@ -17,7 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import type { GaugeSettings } from '$lib/types';
   import chroma from 'chroma-js';
 
-  export let gaugeSettings: Writable<GaugeSettings> = writable({
+  export const gaugeSettings: Writable<GaugeSettings> = writable({
     colors: chroma
       .scale('Spectral')
       .colors(10)

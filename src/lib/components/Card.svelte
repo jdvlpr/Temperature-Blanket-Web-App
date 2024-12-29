@@ -13,13 +13,24 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
+<script>
+  /**
+   * @typedef {Object} Props
+   * @property {import('svelte').Snippet} [header]
+   * @property {import('svelte').Snippet} [content]
+   */
+
+  /** @type {Props} */
+  let { header, content } = $props();
+</script>
+
 <div
   class="lg:rounded-container-token lg:shadow-lg bg-surface-50-900-token text-token overflow-hidden"
 >
   <div>
-    <slot name="header" />
+    {@render header?.()}
   </div>
   <div class="px-2 lg:px-4">
-    <slot name="content" />
+    {@render content?.()}
   </div>
 </div>
