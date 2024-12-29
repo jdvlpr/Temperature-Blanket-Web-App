@@ -120,7 +120,7 @@ export const handleKeyDown = (ev) => {
 
   if (
     !isProjectPlannerRoute ||
-    get(modalStore)[0] ||
+    modalStore[0] ||
     ev.target.tagName === 'INPUT' ||
     ev.target.tagName === 'TD'
   )

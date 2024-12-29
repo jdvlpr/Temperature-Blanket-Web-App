@@ -48,7 +48,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </div>
         </svelte:fragment>
 
-        <p class="">
+        <p class="text-center">
           This Project Planner tool helps crocheters, knitters, and craftspeople
           to visualize designs inspired by the weather.
         </p>
@@ -61,7 +61,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </div>
         </svelte:fragment>
         <div class="flex flex-col gap-4">
-          <p>
+          <p class="text-center">
             Use the buttons at the bottom of the page to navigate between the
             four main sections of the Project Planner.
           </p>
@@ -103,7 +103,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </div>
         </svelte:fragment>
 
-        <p class="">
+        <p class="text-center">
           Create a palette for your project by picking from thousands of yarn
           colorways, getting colors from an image, or browsing the gallery for
           inspiration.
@@ -171,7 +171,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </div>
         </svelte:fragment>
 
-        <p class="">
+        <p class="text-center">
           Customizations will be reflected in the live visualization, which you
           can use to make sure you like your project before you begin.
         </p>
@@ -238,7 +238,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <p>Get Started and Explore!</p>
           </div>
         </svelte:fragment>
-        <p>
+        <p class="text-center">
           Start planning your project and discover many more features like
           downloading, saving, or sharing your project.
         </p>

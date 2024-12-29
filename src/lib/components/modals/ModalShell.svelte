@@ -33,7 +33,7 @@ $effect(() => {
   if (!isDesktop.current) width = 'w-[100vw]';
   else if (size === 'large') width = 'w-modal-wide';
   else if (size === 'small') width = 'w-modal-slim';
-  else width = parent?.width || '';
+  else width = parent?.width || 'w-modal';
 })
 
 $effect(() => {
