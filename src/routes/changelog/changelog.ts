@@ -23,6 +23,16 @@ export const entries: ChangelogItem[] = [
     notes: [
       {
         icon: ICONS.checkCircle,
+        text: `Added 20 new colorways`,
+        title: 'Updated Yarn: Stylecraft - Special DK',
+      },
+    ],
+    version: '4.10.0',
+  },
+  {
+    notes: [
+      {
+        icon: ICONS.checkCircle,
         text: `57 colorways`,
         title: 'Added Yarn: Sandnes - Peer Gynt',
       },
