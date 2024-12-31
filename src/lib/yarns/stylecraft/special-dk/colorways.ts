@@ -5,7 +5,7 @@ const colorways: Colorway[] = [
     source: {
       name: 'stylecraft-yarns.co.uk',
       href: 'https://www.stylecraft-yarns.co.uk/yarns/special-dk',
-      accessed: '2022-03-19',
+      accessed: '2024-12-31',
     },
     colors: [
       {
@@ -407,6 +407,86 @@ const colorways: Colorway[] = [
       {
         hex: '#e6a50c',
         name: 'Dandelion',
+      },
+      {
+        hex: '#b5281e',
+        name: 'Poppy',
+      },
+      {
+        hex: '#a96c67',
+        name: 'Cinder Rose',
+      },
+      {
+        hex: '#d7a793',
+        name: 'Milky Tea',
+      },
+      {
+        hex: '#b3ae77',
+        name: 'Mushy Peas',
+      },
+      {
+        hex: '#e5d6d7',
+        name: 'Hint of Lilac',
+      },
+      {
+        hex: '#b95046',
+        name: 'Pink Rhubarb',
+      },
+      {
+        hex: '#7e8c4b',
+        name: 'Leaf',
+      },
+      {
+        hex: '#55a782',
+        name: 'Jade',
+      },
+      {
+        hex: '#6b8088',
+        name: 'North Sea',
+      },
+      {
+        hex: '#97bedc',
+        name: 'Nigella',
+      },
+      {
+        hex: '#8e8733',
+        name: 'Mistletoe',
+      },
+      {
+        hex: '#3e1f25',
+        name: 'Purple Smoke',
+      },
+      {
+        hex: '#dbc1ab',
+        name: 'Wild Orchid',
+      },
+      {
+        hex: '#6e80a5',
+        name: 'Periwinkle',
+      },
+      {
+        hex: '#cbbcc6',
+        name: 'Heather',
+      },
+      {
+        hex: '#405769',
+        name: 'Mallard Blue',
+      },
+      {
+        hex: '#c6d8d8',
+        name: 'Blue Sky',
+      },
+      {
+        hex: '#61c3d3',
+        name: 'Aquamarine',
+      },
+      {
+        hex: '#f6eeb1',
+        name: 'Green Lemon',
+      },
+      {
+        hex: '#cfdebf',
+        name: 'Tea Green',
       },
     ],
   },

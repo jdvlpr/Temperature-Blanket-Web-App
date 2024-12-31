@@ -14,6 +14,7 @@ import { yarn as schittsCreek } from './schitts-creek/yarn';
 import { yarn as truboo } from './truboo/yarn';
 import { yarn as vannasChoice } from './vannas-choice/yarn';
 import { yarn as woolEase } from './wool-ease/yarn';
+import { yarn as woolEaseDK } from './wool-ease-dk/yarn';
 
 export const brand: Brand = {
   name: 'Lion Brand',
@@ -34,5 +35,6 @@ export const brand: Brand = {
     truboo,
     vannasChoice,
     woolEase,
+    woolEaseDK,
   ],
 };

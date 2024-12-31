@@ -5,6 +5,7 @@ import { brand as berroco } from './berroco/yarns';
 import { brand as bigTwist } from './big-twist/yarns';
 import { brand as caron } from './caron/yarns';
 import { brand as cascade } from './cascade/yarns';
+import { brand as coopKnits } from './coop-knits/yarns';
 import { brand as drops } from './drops/yarns';
 import { brand as ellaRae } from './ella-rae/yarns';
 import { brand as elle } from './elle/yarns';
@@ -60,6 +61,7 @@ export const brands: Brand[] = [
   bigTwist,
   caron,
   cascade,
+  coopKnits,
   drops,
   ellaRae,
   elle,
