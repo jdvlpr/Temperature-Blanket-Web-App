@@ -23,6 +23,11 @@ export const entries: ChangelogItem[] = [
     notes: [
       {
         icon: ICONS.checkCircle,
+        text: `35 colorways`,
+        title: 'Added Yarn: Coop Knits - Socks Yeah!',
+      },
+      {
+        icon: ICONS.checkCircle,
         text: `18 colorways`,
         title: 'Added Yarn: Lion Brand - Wool-Ease DK',
       },
