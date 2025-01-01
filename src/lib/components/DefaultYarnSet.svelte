@@ -23,7 +23,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <ToggleSwitch
     label="Set as Default Yarn"
     details="Automatically select this yarn for certain areas of this site, like for colors with no assigned yarn."
-    on:change={(e) => {
+    onchange={(e) => {
       if (e.target.checked) {
         $defaultYarn = `${selectedBrandId}-${selectedYarnId}`;
       } else $defaultYarn = '';

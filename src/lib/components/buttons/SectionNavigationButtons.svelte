@@ -17,7 +17,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { pageSections } from '$lib/stores';
   import { goToProjectSection } from '$lib/utils';
 
-  export let thisSectionIndex = 1;
+  /**
+   * @typedef {Object} Props
+   * @property {number} [thisSectionIndex]
+   */
+
+  /** @type {Props} */
+  let { thisSectionIndex = 1 } = $props();
 
   let previousSectionIndex = thisSectionIndex > 1 ? thisSectionIndex - 1 : null;
   let previousSectionTitle = $pageSections.find(
@@ -35,8 +41,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {#if previousSectionIndex}
     <button
       class="btn variant-soft-tertiary text-token"
-      on:click={() => goToProjectSection(previousSectionIndex)}
-      important
+      onclick={() => goToProjectSection(previousSectionIndex)}
     >
       <span class="flex gap-2 items-center">
         <svg
@@ -56,12 +61,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {previousSectionTitle}
       </span>
     </button>
+  {:else}
+    <div></div>
   {/if}
   {#if nextSectionIndex}
     <button
       class="btn variant-soft-tertiary text-token"
-      on:click={() => goToProjectSection(nextSectionIndex)}
-      important
+      onclick={() => goToProjectSection(nextSectionIndex)}
     >
       <span class="flex gap-2 items-center">
         {nextSectionTitle}
@@ -81,5 +87,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </svg>
       </span>
     </button>
+  {:else}
+    <div></div>
   {/if}
 </div>

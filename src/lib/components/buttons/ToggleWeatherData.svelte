@@ -14,7 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  export let view;
+  let { view, onclick, children } = $props();
 
   const visibleIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">
   <path d="M10 12.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5z" />
@@ -31,14 +31,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <button
   type="button"
   class="flex w-fit p-2 gap-2 items-center justify-center cursor-pointer"
-  on:click
+  {onclick}
   title="Toggle Visibility"
 >
   {#if view}
     <span class="">{@html visibleIcon}</span>
-    <p class="text-sm"><slot /></p>
+    <p class="text-sm">{@render children?.()}</p>
   {:else}
     <span class="">{@html hiddenIcon}</span>
-    <p class="text-sm"><s><slot /></s></p>
+    <p class="text-sm"><s>{@render children?.()}</s></p>
   {/if}
 </button>

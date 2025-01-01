@@ -530,7 +530,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <div class="flex flex-wrap justify-center items-center">
     <ToggleWeatherData
       view={$weatherParametersInView.tmax}
-      on:click={() => {
+      onclick={() => {
         $weatherParametersInView.tmax = !$weatherParametersInView.tmax;
         $weatherParametersInView = $weatherParametersInView;
       }}
@@ -540,7 +540,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     <ToggleWeatherData
       view={$weatherParametersInView.tavg}
-      on:click={() => {
+      onclick={() => {
         $weatherParametersInView.tavg = !$weatherParametersInView.tavg;
         $weatherParametersInView = $weatherParametersInView;
       }}
@@ -550,7 +550,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     <ToggleWeatherData
       view={$weatherParametersInView.tmin}
-      on:click={() => {
+      onclick={() => {
         $weatherParametersInView.tmin = !$weatherParametersInView.tmin;
         $weatherParametersInView = $weatherParametersInView;
       }}
@@ -560,7 +560,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     <ToggleWeatherData
       view={$weatherParametersInView.prcp}
-      on:click={() => {
+      onclick={() => {
         $weatherParametersInView.prcp = !$weatherParametersInView.prcp;
         $weatherParametersInView = $weatherParametersInView;
       }}
@@ -569,7 +569,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </ToggleWeatherData>
     <ToggleWeatherData
       view={$weatherParametersInView.snow}
-      on:click={() => {
+      onclick={() => {
         $weatherParametersInView.snow = !$weatherParametersInView.snow;
         $weatherParametersInView = $weatherParametersInView;
       }}
@@ -578,7 +578,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </ToggleWeatherData>
     <ToggleWeatherData
       view={$weatherParametersInView.dayt}
-      on:click={() => {
+      onclick={() => {
         $weatherParametersInView.dayt = !$weatherParametersInView.dayt;
         $weatherParametersInView = $weatherParametersInView;
       }}

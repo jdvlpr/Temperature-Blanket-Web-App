@@ -28,7 +28,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     wasWeatherLoadedFromLocalStorage,
     weatherUngrouped,
   } from '$lib/stores';
-  import { onMount } from 'svelte';
   // Note: the signal store is a weird necessity, investigate this
   import Spinner from '$lib/components/Spinner.svelte';
   import { delay, getOpenMeteo, goToProjectSection } from '$lib/utils';

@@ -16,7 +16,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
   import { getModalStore } from '@skeletonlabs/skeleton';
-  import { onMount } from 'svelte';
   import ModalShell from './ModalShell.svelte';
 
   const modalStore = getModalStore();
@@ -43,11 +42,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     noMinMax = false,
   }: Props = $props();
 
-  onMount(() => {
-    // Weather values which are not available are represented by a string '-'. Modify them to a number 0;
-    if (typeof value !== 'number') value = 0;
-  });
-
   let _value = $state(value);
 
   function _onOkay() {
@@ -60,6 +54,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     if (value < 5) return value * 10;
     return value * 2;
   }
+
+  $effect(() => {
+    // Weather values which are not available are represented by a string '-'. Modify them to a number 0;
+    if (typeof value !== 'number') value = 0;
+  });
 
   $effect(() => {
     if (value > getMaxValue(_value)) _value = value;

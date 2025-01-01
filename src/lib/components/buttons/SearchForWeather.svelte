@@ -24,7 +24,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
     weather,
   } from '$lib/stores';
 
-  export let disabled = true;
+  /**
+   * @typedef {Object} Props
+   * @property {boolean} [disabled]
+   */
+
+  /** @type {Props} */
+  let { disabled = $bindable(true) } = $props();
 
   function setModal() {
     modal.state.trigger({
@@ -68,12 +74,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
         d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75"
       />
     </svg>
-    <p slot="tooltip">Choose a valid location and dates above.</p>
+    {#snippet tooltip()}
+      <p>Choose a valid location and dates above.</p>
+    {/snippet}
   </Tooltip>
 {:else}
   <button
     class="btn variant-filled-primary text-2xl font-bold w-full sm:w-fit"
-    on:click={() => {
+    onclick={() => {
       if ($isCustomWeather) setWarnCustomWeatherModal();
       else setModal();
     }}

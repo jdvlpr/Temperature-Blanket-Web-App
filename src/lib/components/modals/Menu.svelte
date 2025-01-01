@@ -272,7 +272,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             label="Always display all sections"
             details="Keep the Location, Weather, Colors, and Preview sections visible on the same page."
             bind:checked={$pinAllSections}
-            on:change={() => {
+            onchange={() => {
               $pageSections.forEach((section) => {
                 section.pinned = $pinAllSections;
                 section.active = $pinAllSections;

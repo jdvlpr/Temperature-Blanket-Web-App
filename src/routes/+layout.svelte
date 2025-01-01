@@ -191,7 +191,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <Toast max={3} position="b" />
 
-<Modal regionBackdrop='backdrop-blur-md'/>
+<Modal regionBackdrop="backdrop-blur-sm" />
 
 {@render children?.()}
 

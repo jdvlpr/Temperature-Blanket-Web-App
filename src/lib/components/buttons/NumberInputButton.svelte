@@ -17,11 +17,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import NumberInput from '$lib/components/modals/NumberInput.svelte';
   import { modal } from '$lib/stores';
 
-  export let value: number,
-    title: string,
-    min: number | undefined = undefined,
-    max: number | undefined = undefined,
-    icon: string = undefined;
+  interface Props {
+    value: number;
+    title: string;
+    min?: number | undefined;
+    max?: number | undefined;
+    icon?: boolean | string;
+  }
+
+  let { value = $bindable(), title, min, max, icon }: Props = $props();
 
   if (icon === true)
     icon = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
@@ -33,7 +37,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <button
   class="btn bg-secondary-hover-token gap-1"
   title="Set {title}"
-  on:click={() =>
+  onclick={() =>
     modal.state.trigger({
       type: 'component',
       component: {

@@ -77,7 +77,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <div class="flex flex-col">
           <ToggleSwitch
             label="Analytics"
-            on:change={() => {
+            onchange={() => {
               let thisEvent;
               if ($consentToMSClarityCookies)
                 thisEvent = new CustomEvent('consentToMSClarity');

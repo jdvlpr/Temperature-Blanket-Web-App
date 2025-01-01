@@ -16,7 +16,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script>
   import { PUBLIC_KOFI_LINK } from '$env/static/public';
 
-  export let showlink = true;
+  /**
+   * @typedef {Object} Props
+   * @property {boolean} [showlink]
+   */
+
+  /** @type {Props} */
+  let { showlink = true } = $props();
   let url = new URL(PUBLIC_KOFI_LINK || 'https://kofi.com');
   let linkTitle = url?.hostname + url?.pathname;
 </script>

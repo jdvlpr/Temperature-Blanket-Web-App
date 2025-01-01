@@ -17,13 +17,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import {
     PUBLIC_BASE_DOMAIN_NAME,
     PUBLIC_FACEBOOK_LINK,
-    PUBLIC_SITE_TITLE,
     PUBLIC_GITHUB_LINK,
+    PUBLIC_SITE_TITLE,
   } from '$env/static/public';
-  import { onMount } from 'svelte';
 
-  let email = 'Loading...';
-  onMount(() => {
+  let email = $state('Loading...');
+
+  $effect(() => {
     email = `hello@${PUBLIC_BASE_DOMAIN_NAME}`;
   });
 </script>

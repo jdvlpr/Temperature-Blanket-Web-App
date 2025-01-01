@@ -19,11 +19,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { getModalStore } from '@skeletonlabs/skeleton';
   import ModalShell from './ModalShell.svelte';
 
-  export let parent: any;
+  interface Props {
+    parent: any;
+  }
+
+  let { parent }: Props = $props();
+
   const modalStore = getModalStore();
 
   function setModal() {
-    $modalStore.close();
+    modalStore.close();
     modal.state.trigger({
       type: 'component',
       component: { ref: GettingWeather },
@@ -32,7 +37,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <ModalShell {parent}>
-  <div class="p-2 sm:p-4 mt-10">
+  <div class="flex flex-col text-center">
     <p class="text-lg font-bold">Are you sure?</p>
 
     <p class="my-4">This will overwrite your custom weather data.</p>
@@ -40,7 +45,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <div class="mb-4">
       <button
         class="btn variant-filled-primary"
-        on:click={() => {
+        onclick={() => {
           setModal();
         }}
         title="Search for Weather Data"
