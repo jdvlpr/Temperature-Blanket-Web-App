@@ -14,7 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  export let handler;
+  let { handler } = $props();
 
   const rowsPerPage = handler.getRowsPerPage();
   const pages = handler.getPages({ ellipsis: false });
@@ -37,7 +37,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     bind:value={$rowsPerPage}
     id="rows-per-page"
     title="Choose how many rows per page"
-    on:change={() => {
+    onchange={() => {
       if ($pageNumber > $pages.length) handler.setPage(1);
     }}
   >

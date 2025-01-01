@@ -19,11 +19,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { weather, weatherGrouping } from '$lib/stores';
   import { dateToISO8601String } from '$lib/utils';
 
-  export let handler,
-    search = true,
-    hidePageLabel = false;
+  /**
+   * @typedef {Object} Props
+   * @property {any} handler
+   * @property {boolean} [search]
+   * @property {boolean} [hidePageLabel]
+   * @property {import('svelte').Snippet} [children]
+   */
 
-  let element;
+  /** @type {Props} */
+  let { handler, search = true, hidePageLabel = false, children } = $props();
+
+  let element = $state();
 
   const triggerChange = handler.getTriggerChange();
 
@@ -38,7 +45,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   const pages = handler.getPages({ ellipsis: false });
   const sorted = handler.getSorted();
 
-  $: $triggerChange, scrollTop();
+  $effect(() => {
+    $triggerChange, scrollTop();
+  });
 
   function getFrom({ page }) {
     let from = '';
@@ -58,7 +67,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <section class="relative w-full">
   <article class="relative overflow-x-scroll" bind:this={element}>
-    <slot />
+    {@render children?.()}
   </article>
   <div
     class="flex flex-wrap gap-x-8 gap-y-4 justify-center sm:justify-between items-start mt-2 mb-4 w-full mx-auto"
@@ -82,7 +91,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             class="btn-icon bg-secondary-hover-token"
             title="Previous Page"
             disabled={$pageNumber === 1}
-            on:click={() => handler.setPage('previous')}
+            onclick={() => handler.setPage('previous')}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -104,7 +113,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               class="select"
               id="datatable-page"
               bind:value={$pageNumber}
-              on:change={() => {
+              onchange={() => {
                 handler.setPage($pageNumber);
               }}
             >
@@ -127,7 +136,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             class="btn-icon bg-secondary-hover-token"
             title="Next Page"
             disabled={$pageNumber === $pageCount}
-            on:click={() => handler.setPage('next')}
+            onclick={() => handler.setPage('next')}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"

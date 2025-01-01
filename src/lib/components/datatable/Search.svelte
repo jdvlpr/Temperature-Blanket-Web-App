@@ -14,8 +14,8 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  export let handler;
-  let value = '';
+  let { handler } = $props();
+  let value = $state('');
 </script>
 
 <input
@@ -23,5 +23,5 @@ If not, see <https://www.gnu.org/licenses/>. -->
   class="input"
   bind:value
   placeholder="Filter..."
-  on:input={() => handler.search(value)}
+  oninput={() => handler.search(value)}
 />
