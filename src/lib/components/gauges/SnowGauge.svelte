@@ -99,6 +99,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     (max - min) / $settings.colors.length,
     2,
   );
+
   $: $settings.rangeOptions.auto.start.high = max;
   $: $settings.rangeOptions.auto.start.low = min;
 

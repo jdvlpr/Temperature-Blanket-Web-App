@@ -103,7 +103,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <script>
-  
   import Gauge from '$lib/components/Gauge.svelte';
   import { tmax, tmin } from '$lib/stores';
   import type { GaugeAttributes } from '$lib/types/gauge-types';
@@ -117,19 +116,23 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let maxes = $derived($tmax.filter((n) => n !== null));
   let mins = $derived($tmin.filter((n) => n !== null));
 
-  let max = $derived(Number.isInteger(Math.max(...maxes))
-    ? Math.max(...maxes) + 1
-    : Math.ceil(Math.max(...maxes)));
+  let max = $derived(
+    Number.isInteger(Math.max(...maxes))
+      ? Math.max(...maxes) + 1
+      : Math.ceil(Math.max(...maxes)),
+  );
 
-  let min = $derived(Number.isInteger(Math.min(...mins))
-    ? Math.min(...mins) - 1
-    : Math.floor(Math.min(...mins)));
+  let min = $derived(
+    Number.isInteger(Math.min(...mins))
+      ? Math.min(...mins) - 1
+      : Math.floor(Math.min(...mins)),
+  );
 
   run(() => {
-    $gaugeSettings.rangeOptions.auto.increment =  displayNumber(
-        (max - min) / $gaugeSettings.colors.length || 10,
-        2,
-      );
+    $gaugeSettings.rangeOptions.auto.increment = displayNumber(
+      (max - min) / $gaugeSettings.colors.length || 10,
+      2,
+    );
   });
 
   run(() => {
@@ -185,7 +188,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <Gauge
-{gaugeAttributes}
+  {gaugeAttributes}
   bind:numberOfColors={$gaugeSettings.numberOfColors}
   bind:schemeId={$gaugeSettings.schemeId}
   bind:ranges={$gaugeSettings.ranges}
