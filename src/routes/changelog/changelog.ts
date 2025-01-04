@@ -23,6 +23,11 @@ export const entries: ChangelogItem[] = [
     notes: [
       {
         icon: ICONS.checkCircle,
+        text: `57 colorways`,
+        title: 'Added Yarn: DROPS - Paris',
+      },
+      {
+        icon: ICONS.checkCircle,
         text: `31 colorways`,
         title: 'Added Yarn: Pingouin - Pingo First',
       },
