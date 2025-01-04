@@ -28,6 +28,11 @@ export const entries: ChangelogItem[] = [
       },
       {
         icon: ICONS.checkCircle,
+        text: `86 colorways`,
+        title: 'Added Yarn: Miss Babs - Sojourn',
+      },
+      {
+        icon: ICONS.checkCircle,
         text: `31 colorways`,
         title: 'Added Yarn: Pingouin - Pingo First',
       },
