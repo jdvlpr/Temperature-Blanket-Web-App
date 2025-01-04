@@ -31,6 +31,7 @@ import { brand as mauriceBrassard } from './maurice-brassard/yarns';
 import { brand as nako } from './nako/yarns';
 import { brand as paintboxYarns } from './paintbox-yarns/yarns';
 import { brand as patons } from './patons/yarns';
+import { brand as pingouin } from './pingouin/yarns';
 import { brand as plymouthYarn } from './plymouth-yarn/yarns';
 import { brand as premier } from './premier/yarns';
 import { brand as rauma } from './rauma/yarns';
@@ -87,6 +88,7 @@ export const brands: Brand[] = [
   nako,
   paintboxYarns,
   patons,
+  pingouin,
   plymouthYarn,
   rauma,
   premier,

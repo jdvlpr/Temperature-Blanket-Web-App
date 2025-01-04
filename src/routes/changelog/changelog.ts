@@ -19,6 +19,17 @@ import type { ChangelogItem } from '$lib/types';
 
 export const entries: ChangelogItem[] = [
   {
+    date: 'January, 2025',
+    notes: [
+      {
+        icon: ICONS.checkCircle,
+        text: `31 colorways`,
+        title: 'Added Yarn: Pingouin - Pingo First',
+      },
+    ],
+    version: '4.11.0',
+  },
+  {
     date: 'December, 2024',
     notes: [
       {
