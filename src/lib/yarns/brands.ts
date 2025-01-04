@@ -28,9 +28,11 @@ import { brand as lionBrand } from './lion-brand/yarns';
 import { brand as loopsAndThreads } from './loops-and-threads/yarns';
 import { brand as malabrigo } from './malabrigo/yarns';
 import { brand as mauriceBrassard } from './maurice-brassard/yarns';
+import { brand as missBabs } from './miss-babs/yarns';
 import { brand as nako } from './nako/yarns';
 import { brand as paintboxYarns } from './paintbox-yarns/yarns';
 import { brand as patons } from './patons/yarns';
+import { brand as pingouin } from './pingouin/yarns';
 import { brand as plymouthYarn } from './plymouth-yarn/yarns';
 import { brand as premier } from './premier/yarns';
 import { brand as rauma } from './rauma/yarns';
@@ -84,9 +86,11 @@ export const brands: Brand[] = [
   loopsAndThreads,
   malabrigo,
   mauriceBrassard,
+  missBabs,
   nako,
   paintboxYarns,
   patons,
+  pingouin,
   plymouthYarn,
   rauma,
   premier,

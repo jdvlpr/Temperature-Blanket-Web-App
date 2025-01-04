@@ -9,180 +9,180 @@ const colorways: Colorway[] = [
     },
     colors: [
       {
-        name: 'White',
         hex: '#f3f0ec',
+        name: 'White',
       },
       {
-        name: 'Chalk',
         hex: '#e6e1df',
+        name: 'Chalk',
       },
       {
-        name: 'Off White',
         hex: '#efe7d7',
+        name: 'Off White',
       },
       {
-        name: 'Light Grey',
         hex: '#c9c3b5',
+        name: 'Light Grey',
       },
       {
-        name: 'Grey',
         hex: '#aba7a1',
+        name: 'Grey',
       },
       {
-        name: 'Medium Grey',
         hex: '#656464',
+        name: 'Medium Grey',
       },
       {
-        name: 'Dark Grey',
         hex: '#42413f',
+        name: 'Dark Grey',
       },
       {
-        name: 'Medium Brown',
         hex: '#5a493c',
+        name: 'Medium Brown',
       },
       {
-        name: 'Walnut',
         hex: '#735744',
+        name: 'Walnut',
       },
       {
-        name: 'Camel',
         hex: '#a18b74',
+        name: 'Camel',
       },
       {
-        name: 'Beige',
         hex: '#b9a088',
+        name: 'Beige',
       },
       {
-        name: 'Light Beige',
         hex: '#e3d0bb',
+        name: 'Light Beige',
       },
       {
-        name: 'Lemonade',
         hex: '#f9e8a8',
+        name: 'Lemonade',
       },
       {
-        name: 'Dandelion',
         hex: '#e3ca83',
+        name: 'Dandelion',
       },
       {
-        name: 'Goldenrod',
         hex: '#e1b262',
+        name: 'Goldenrod',
       },
       {
-        name: 'Orange',
         hex: '#d76a48',
+        name: 'Orange',
       },
       {
-        name: 'Red',
         hex: '#ce393c',
+        name: 'Red',
       },
       {
-        name: 'Pomegranate',
         hex: '#b9414d',
+        name: 'Pomegranate',
       },
       {
-        name: 'Cerise',
         hex: '#d4466c',
+        name: 'Cerise',
       },
       {
-        name: 'Raspberry Rose',
         hex: '#c25b76',
+        name: 'Raspberry Rose',
       },
       {
-        name: 'Bordeaux',
         hex: '#7f4d4c',
+        name: 'Bordeaux',
       },
       {
-        name: 'Red Clay',
         hex: '#b37061',
+        name: 'Red Clay',
       },
       {
-        name: 'Blush',
         hex: '#b67573',
+        name: 'Blush',
       },
       {
-        name: 'Medium Pink',
         hex: '#daa9b0',
+        name: 'Medium Pink',
       },
       {
-        name: 'Powder Pink',
         hex: '#ebcdcf',
+        name: 'Powder Pink',
       },
       {
-        name: 'Grey/Purple',
         hex: '#a593a2',
+        name: 'Grey/Purple',
       },
       {
-        name: 'Purple',
         hex: '#81667c',
+        name: 'Purple',
       },
       {
-        name: 'Navy Blue',
         hex: '#3a3651',
+        name: 'Navy Blue',
       },
       {
-        name: 'Royal Blue',
         hex: '#555b77',
+        name: 'Royal Blue',
       },
       {
-        name: 'Denim Blue',
         hex: '#84859e',
+        name: 'Denim Blue',
       },
       {
-        name: 'Blue Ice',
         hex: '#9da1bd',
+        name: 'Blue Ice',
       },
       {
-        name: 'Light Blue',
         hex: '#9daab3',
+        name: 'Light Blue',
       },
       {
-        name: 'Fog',
         hex: '#bcbfc5',
+        name: 'Fog',
       },
       {
-        name: 'Light Gray Blue',
         hex: '#c6cdca',
+        name: 'Light Gray Blue',
       },
       {
-        name: 'Grey Green',
         hex: '#9aa3a0',
+        name: 'Grey Green',
       },
       {
-        name: 'Aqua Blue',
         hex: '#c4dbda',
+        name: 'Aqua Blue',
       },
       {
-        name: 'Sea Blue',
         hex: '#72a8b2',
+        name: 'Sea Blue',
       },
       {
-        name: 'Forget-me-not',
         hex: '#7ea8c2',
+        name: 'Forget-me-not',
       },
       {
-        name: 'Deep Ocean',
         hex: '#174050',
+        name: 'Deep Ocean',
       },
       {
-        name: 'Forest',
         hex: '#545a4c',
+        name: 'Forest',
       },
       {
-        name: 'Olive',
         hex: '#74793e',
+        name: 'Olive',
       },
       {
-        name: 'Moss Green',
         hex: '#aeb280',
+        name: 'Moss Green',
       },
       {
-        name: 'Dark Ivy',
         hex: '#415844',
+        name: 'Dark Ivy',
       },
       {
-        name: 'Black',
         hex: '#18181b',
+        name: 'Black',
       },
     ],
   },
