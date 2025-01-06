@@ -9,764 +9,444 @@ const colorways: Colorway[] = [
     },
     colors: [
       {
-        hex: '#514d58',
-        name: 'Frost Grey',
-      },
-      {
-        hex: '#b3b1b6',
-        name: 'Harbor Mist',
-      },
-      {
-        hex: '#7c797e',
-        name: 'Sleet',
-      },
-      {
-        hex: '#303233',
-        name: 'Grey',
-      },
-      {
-        hex: '#171715',
-        name: 'Black',
-      },
-      {
-        hex: '#272727',
-        name: 'Jet',
-      },
-      {
-        hex: '#323132',
-        name: 'Charcoal',
-      },
-      {
-        hex: '#767871',
-        name: 'Silver Grey',
-      },
-      {
-        hex: '#989c96',
-        name: 'Aspen Heather',
-      },
-      {
-        hex: '#a7a58f',
-        name: 'White',
-      },
-      {
-        hex: '#ac98a6',
-        name: 'Orchid Ice',
-      },
-      {
-        hex: '#846777',
-        name: 'Dawn Pink',
-      },
-      {
-        hex: '#5b3647',
-        name: 'Then Theres Mauve',
-      },
-      {
-        hex: '#5c3245',
-        name: 'Razzleberry Heather',
-      },
-      {
-        hex: '#3d172e',
-        name: 'Marionberry',
-      },
-      {
-        hex: '#371c41',
-        name: 'Plum Purple',
-      },
-      {
-        hex: '#3d1f3d',
-        name: 'Gloxinia',
-      },
-      {
-        hex: '#523d69',
-        name: 'Heather',
-      },
-      {
-        hex: '#92778e',
-        name: 'Iris',
-      },
-      {
-        hex: '#5d4960',
-        name: 'Petunia Heather',
-      },
-      {
-        hex: '#7a6073',
-        name: 'Iridescense',
-      },
-      {
-        hex: '#382d47',
-        name: 'Nightshade',
-      },
-      {
-        hex: '#69698b',
-        name: 'Heirloom Lilac',
-      },
-      {
-        hex: '#9494b0',
-        name: 'Evening Haze',
-      },
-      {
-        hex: '#404e83',
-        name: 'Periwinkle',
-      },
-      {
-        hex: '#7d80a1',
-        name: 'Lavender',
-      },
-      {
-        hex: '#2c2439',
-        name: 'Mystic Purple',
-      },
-      {
-        hex: '#645c6f',
-        name: 'Purple Sage',
-      },
-      {
-        hex: '#2f2c4d',
-        name: 'Royal Purple',
-      },
-      {
-        hex: '#35285b',
-        name: 'Dark Violet',
-      },
-      {
-        hex: '#3f2d6f',
-        name: 'Purple Hyacinth',
-      },
-      {
-        hex: '#1b0c3c',
-        name: 'Violet Indigo',
-      },
-      {
-        hex: '#8a67af',
-        name: 'Amethyst',
-      },
-      {
-        hex: '#8b759f',
-        name: 'Light Iris',
-      },
-      {
-        hex: '#c197b8',
-        name: 'Mauve Mist',
-      },
-      {
-        hex: '#7a4365',
-        name: 'Atahitian Rose',
-      },
-      {
-        hex: '#641844',
-        name: 'Raspberry',
-      },
-      {
-        hex: '#3d0e2c',
-        name: 'Magenta',
-      },
-      {
-        hex: '#4c1e4c',
-        name: 'Plum Crazy',
-      },
-      {
-        hex: '#491626',
-        name: 'Very Berry',
-      },
-      {
-        hex: '#8d3351',
-        name: 'Flamingo Pink',
-      },
-      {
-        hex: '#a15c79',
-        name: 'Rose Petal',
-      },
-      {
-        hex: '#a56079',
-        name: 'Pink Rose',
-      },
-      {
-        hex: '#9b878c',
-        name: 'Soft Pink',
-      },
-      {
-        hex: '#947f86',
-        name: 'Strawberry Cream',
-      },
-      {
-        hex: '#967587',
-        name: 'Pink Ice',
-      },
-      {
-        hex: '#a5527b',
-        name: 'Cotton Candy',
-      },
-      {
-        hex: '#671938',
-        name: 'Berry Pink',
-      },
-      {
-        hex: '#b84c4b',
-        name: 'Strawberry Pink',
-      },
-      {
-        hex: '#dc9991',
-        name: 'Salmon',
-      },
-      {
-        hex: '#b35f5f',
-        name: 'Peach',
-      },
-      {
-        hex: '#ac4f43',
-        name: 'Coral',
-      },
-      {
-        hex: '#c13e51',
-        name: 'Deep Sea Coral',
-      },
-      {
-        hex: '#942a40',
-        name: 'Chrysanthemum',
-      },
-      {
-        hex: '#7a2326',
-        name: 'Garnet',
-      },
-      {
-        hex: '#9f4b45',
-        name: 'Faded Rose',
-      },
-      {
-        hex: '#aa8086',
-        name: 'Silver Pink',
-      },
-      {
-        hex: '#765350',
-        name: 'Ash Rose',
-      },
-      {
-        hex: '#2c141c',
-        name: 'Grape Wine',
-      },
-      {
-        hex: '#251316',
-        name: 'Malbec Heather',
-      },
-      {
-        hex: '#6f3e30',
-        name: 'Pumpkin Spice',
-      },
-      {
-        hex: '#271918',
-        name: 'Cordovan',
-      },
-      {
-        hex: '#27070d',
-        name: 'Red Wine Heather',
-      },
-      {
-        hex: '#371019',
-        name: 'Maroon',
-      },
-      {
-        hex: '#450612',
-        name: 'Ruby',
-      },
-      {
-        hex: '#770d19',
-        name: 'Really Red',
-      },
-      {
-        hex: '#530a13',
-        name: 'Christmas Red Heather',
-      },
-      {
-        hex: '#700a0f',
-        name: 'Sunset Orange',
-      },
-      {
-        hex: '#d0332d',
-        name: 'Cherry Tomato',
-      },
-      {
-        hex: '#a03015',
-        name: 'Tangerine Heather',
-      },
-      {
-        hex: '#c8613d',
-        name: 'Autumn Sunset',
-      },
-      {
-        hex: '#9d3316',
-        name: 'Pureed Pumpkin',
-      },
-      {
-        hex: '#281e25',
-        name: 'Galaxy',
-      },
-      {
-        hex: '#2b1815',
-        name: 'Cocoa',
-      },
-      {
-        hex: '#542818',
-        name: 'Copper Heather',
-      },
-      {
-        hex: '#562210',
-        name: 'Dark Ginger',
-      },
-      {
-        hex: '#6a3814',
-        name: 'Sandalwood',
-      },
-      {
-        hex: '#9c681f',
-        name: 'Golden',
-      },
-      {
-        hex: '#875210',
-        name: 'Gold Fusion',
-      },
-      {
-        hex: '#904a16',
-        name: 'Desert Sun',
-      },
-      {
-        hex: '#bc4f0c',
-        name: 'Marmalade',
-      },
-      {
-        hex: '#54130c',
-        name: 'Provence',
-      },
-      {
-        hex: '#681614',
-        name: 'Burnt Orange',
-      },
-      {
-        hex: '#a63723',
-        name: 'Pumpkin',
-      },
-      {
-        hex: '#91321a',
-        name: 'Blaze',
-      },
-      {
-        hex: '#e0b197',
-        name: 'Cream Puff',
-      },
-      {
-        hex: '#8e8b74',
-        name: 'Banana Cream',
-      },
-      {
-        hex: '#a4986a',
-        name: 'Yellow',
-      },
-      {
-        hex: '#af9653',
-        name: 'Lemon',
-      },
-      {
-        hex: '#ca9f06',
-        name: 'Daisy Yellow',
-      },
-      {
-        hex: '#ad9f73',
-        name: 'Chamomile',
-      },
-      {
-        hex: '#a17c34',
-        name: 'Daffodil',
-      },
-      {
-        hex: '#725a30',
-        name: 'Straw',
-      },
-      {
-        hex: '#624e36',
-        name: 'Mocha',
-      },
-      {
-        hex: '#7a6349',
-        name: 'Vinci',
-      },
-      {
-        hex: '#ac9872',
-        name: 'Antiqued Heather',
-      },
-      {
-        hex: '#473c32',
+        hex: '#514842',
         name: 'Walnut Heather',
       },
       {
-        hex: '#796c5f',
+        hex: '#9f8e7a',
         name: 'Doeskin Heather',
       },
       {
-        hex: '#947f74',
-        name: 'White Pepper Heather',
+        hex: '#d2cab6',
+        name: 'White Pepper',
       },
       {
-        hex: '#a7a591',
-        name: 'Ecru',
+        hex: '#d4ccb8',
+        name: 'Parsnip',
       },
       {
-        hex: '#71655d',
-        name: 'Extra Creme Cafe',
+        hex: '#dec98c',
+        name: 'Straw',
       },
       {
-        hex: '#1c1009',
-        name: 'Chocolate',
+        hex: '#c0b390',
+        name: 'Silver Fern',
       },
       {
-        hex: '#533f28',
-        name: 'Camel',
+        hex: '#937d31',
+        name: 'Golden Palm',
       },
       {
-        hex: '#382922',
-        name: 'Rich Brown',
+        hex: '#514e28',
+        name: 'Dried Herb',
       },
       {
-        hex: '#1c130f',
-        name: 'Bitter Chocolate',
+        hex: '#786b35',
+        name: 'Shadow Green',
       },
       {
-        hex: '#8e7c6c',
-        name: 'Irish Cream',
+        hex: '#d8bf66',
+        name: 'Lemon',
       },
       {
-        hex: '#857770',
-        name: 'Frosted Almond',
+        hex: '#d09d49',
+        name: 'Artisan Gold',
       },
       {
-        hex: '#abb91d',
-        name: 'Sulfur',
+        hex: '#9e6523',
+        name: 'Cadmium Yellow',
       },
       {
-        hex: '#7c742a',
-        name: 'Citron',
+        hex: '#ab873f',
+        name: 'Golden Yellow',
       },
       {
-        hex: '#454124',
-        name: 'Turtle',
+        hex: '#c5d1b2',
+        name: 'Seafoam Green',
       },
       {
-        hex: '#26281d',
-        name: 'Olive Heather',
+        hex: '#adb777',
+        name: 'Sweet Pea',
       },
       {
-        hex: '#4f502a',
-        name: 'Avocado',
+        hex: '#727956',
+        name: 'Iguana',
       },
       {
-        hex: '#58522c',
-        name: 'Cedar',
+        hex: '#363d23',
+        name: 'Chive',
       },
       {
-        hex: '#5e5a4c',
-        name: 'Lincoln Heather',
+        hex: '#8e9c71',
+        name: 'Celery Heather',
       },
       {
-        hex: '#737f67',
-        name: 'Laurel Green',
-      },
-      {
-        hex: '#1b1f1a',
-        name: 'Pine Grove',
-      },
-      {
-        hex: '#363e2a',
-        name: 'Lichen',
-      },
-      {
-        hex: '#505750',
-        name: 'Smoke Heather',
-      },
-      {
-        hex: '#586845',
-        name: 'Seagrass',
-      },
-      {
-        hex: '#4b6560',
-        name: 'Chinois Green',
-      },
-      {
-        hex: '#95a89f',
-        name: 'Pale Jade',
-      },
-      {
-        hex: '#9d937f',
-        name: 'Awinter White',
-      },
-      {
-        hex: '#969088',
-        name: 'Feather Grey',
-      },
-      {
-        hex: '#97948b',
-        name: 'Ridge Rock',
-      },
-      {
-        hex: '#015225',
-        name: 'Christmas Green',
-      },
-      {
-        hex: '#19231d',
-        name: 'Forest Heather',
-      },
-      {
-        hex: '#1e3931',
-        name: 'Myrtle Heather',
-      },
-      {
-        hex: '#51a36b',
-        name: 'Green Spruce',
-      },
-      {
-        hex: '#234a2c',
-        name: 'Verdant Green',
-      },
-      {
-        hex: '#456e32',
-        name: 'Chartreuse',
-      },
-      {
-        hex: '#81a134',
-        name: 'Wasabi',
-      },
-      {
-        hex: '#507137',
-        name: 'Green Apple',
-      },
-      {
-        hex: '#909f51',
-        name: 'Lime',
-      },
-      {
-        hex: '#859a6c',
-        name: 'Lime Sherbet',
-      },
-      {
-        hex: '#5d7154',
-        name: 'Celery',
-      },
-      {
-        hex: '#4e7749',
-        name: 'Peppermint',
-      },
-      {
-        hex: '#273b1a',
-        name: 'Mint Green',
-      },
-      {
-        hex: '#233722',
-        name: 'Army Green',
-      },
-      {
-        hex: '#161f07',
-        name: 'Treetop',
-      },
-      {
-        hex: '#66782e',
+        hex: '#656e2c',
         name: 'Peridot',
       },
       {
-        hex: '#6b7d3d',
-        name: 'Moss',
+        hex: '#9cab56',
+        name: 'Lime',
       },
       {
-        hex: '#2b3328',
-        name: 'Shire',
+        hex: '#445c2d',
+        name: 'Treetop',
       },
       {
-        hex: '#152a38',
-        name: 'Aporto',
+        hex: '#1a271e',
+        name: 'Pine',
       },
       {
-        hex: '#0d5a7a',
-        name: 'Celestial',
+        hex: '#2a492e',
+        name: 'Verdant Green',
       },
       {
-        hex: '#308ea4',
-        name: 'Bachelor Button',
+        hex: '#758c59',
+        name: 'Green Tea',
       },
       {
-        hex: '#056989',
-        name: 'Turquoise',
+        hex: '#899e7e',
+        name: 'Nile Green',
       },
       {
-        hex: '#0b446d',
-        name: 'Blue Sapphire',
+        hex: '#814c32',
+        name: 'Flame Heather',
       },
       {
-        hex: '#277a88',
-        name: 'Dark Aqua',
+        hex: '#76331d',
+        name: 'Burnt Orange',
       },
       {
-        hex: '#002e3e',
-        name: 'Deep Ocean',
+        hex: '#b64637',
+        name: 'Carrot',
       },
       {
-        hex: '#649c9b',
-        name: 'Seafoam Heather',
+        hex: '#bf6c4e',
+        name: 'Bird Of Paradise',
       },
       {
-        hex: '#153c48',
-        name: 'Como Blue',
+        hex: '#c38065',
+        name: 'Apricot Ice',
       },
       {
-        hex: '#5b8389',
-        name: 'Summer Sky Heather',
+        hex: '#ae6c6b',
+        name: 'Apricot Blush',
       },
       {
-        hex: '#124d53',
-        name: 'Pacific',
+        hex: '#702f25',
+        name: 'Desert Flower',
       },
       {
-        hex: '#005445',
-        name: 'Teal',
+        hex: '#87241a',
+        name: 'Paprika',
       },
       {
-        hex: '#0d3b40',
-        name: 'Emerald City',
+        hex: '#4c120d',
+        name: 'Molten Lava',
       },
       {
-        hex: '#2e7f7b',
-        name: 'Blue Turquoise',
+        hex: '#421820',
+        name: 'Christmas Red Heather',
       },
       {
-        hex: '#072724',
-        name: 'Deep Teal',
+        hex: '#4d1125',
+        name: 'Red',
       },
       {
-        hex: '#29574c',
-        name: 'Lake Chelan Heather',
+        hex: '#882026',
+        name: 'Cherry',
       },
       {
-        hex: '#06342b',
-        name: 'Hunter Green',
+        hex: '#795775',
+        name: 'Petunia Heather',
       },
       {
-        hex: '#2f4a3e',
-        name: 'Duck Egg Blue',
+        hex: '#743e58',
+        name: 'Mauve',
       },
       {
-        hex: '#3f494c',
-        name: 'Pigeon Heather',
+        hex: '#2e1630',
+        name: 'Dark Berry',
       },
       {
-        hex: '#131a2f',
-        name: 'Midnight Heather',
+        hex: '#591d44',
+        name: 'Raspberry',
       },
       {
-        hex: '#2d6195',
-        name: 'Puget Sound',
+        hex: '#b5395e',
+        name: 'Lilac Rose',
       },
       {
-        hex: '#4f7faf',
-        name: 'Blue',
+        hex: '#b24f90',
+        name: 'Azalea Pink',
       },
       {
-        hex: '#638ba4',
-        name: 'Caribbean',
+        hex: '#cf87ac',
+        name: 'Candy Pink',
       },
       {
-        hex: '#17304c',
-        name: 'Blueberry',
+        hex: '#bb9c9d',
+        name: 'Pink Pearl',
       },
       {
-        hex: '#10161d',
-        name: 'Navy',
+        hex: '#dddcd2',
+        name: 'White',
       },
       {
-        hex: '#1e2d47',
-        name: 'Inthe Navy',
+        hex: '#91908d',
+        name: 'Silver Heather',
       },
       {
-        hex: '#3b5a80',
-        name: 'Skyline Blue',
+        hex: '#454549',
+        name: 'Charcoal Heather',
       },
       {
-        hex: '#5f799d',
-        name: 'Baby Denim',
+        hex: '#232323',
+        name: 'Jet',
       },
       {
-        hex: '#416383',
-        name: 'Blue Horizon',
+        hex: '#0c0c10',
+        name: 'Black',
       },
       {
-        hex: '#213556',
-        name: 'Sapphire Heather',
+        hex: '#42464b',
+        name: 'Forged Iron',
       },
       {
-        hex: '#283f72',
-        name: 'Hyacinth',
+        hex: '#7a7889',
+        name: 'December Sky',
       },
       {
-        hex: '#142653',
-        name: 'Cobalt Heather',
+        hex: '#a1a3b0',
+        name: 'Flint Grey',
       },
       {
-        hex: '#252e5f',
-        name: 'Blue Velvet',
+        hex: '#a9aab7',
+        name: 'Glacier Grey',
       },
       {
-        hex: '#273b64',
-        name: 'Denim',
+        hex: '#90a0b6',
+        name: 'Winter Sky',
       },
       {
-        hex: '#375a60',
-        name: 'Mallard Blue',
-      },
-      {
-        hex: '#8da8a1',
-        name: 'Mint',
-      },
-      {
-        hex: '#384753',
-        name: 'Stormy Weather',
-      },
-      {
-        hex: '#4f6e78',
-        name: 'Smoke Blue',
-      },
-      {
-        hex: '#1e242f',
-        name: 'Colonial Blue Heather',
-      },
-      {
-        hex: '#4a546a',
+        hex: '#656f90',
         name: 'Westpoint Blue Heather',
       },
       {
-        hex: '#516b92',
-        name: 'Placid Blue',
+        hex: '#8693b5',
+        name: 'Baby Blue',
       },
       {
-        hex: '#9db0c9',
-        name: 'Sterling Blue',
+        hex: '#475589',
+        name: 'Medium Blue',
       },
       {
-        hex: '#727977',
-        name: 'Alaska Sky',
+        hex: '#161e51',
+        name: 'Deep Ultramarine',
       },
       {
-        hex: '#5e6162',
-        name: 'Space Needle',
+        hex: '#1a2346',
+        name: 'French Blue',
       },
       {
-        hex: '#585d60',
-        name: 'Coast Heather',
+        hex: '#1e2342',
+        name: 'Navy',
       },
       {
-        hex: '#2e3132',
-        name: 'Stormy Seas Heather',
+        hex: '#2b416c',
+        name: 'Ocean Heather',
       },
       {
-        hex: '#4a535c',
-        name: 'Storm Cloud Heather',
+        hex: '#006792',
+        name: 'Hawaiian Ocean',
       },
       {
-        hex: '#898c9b',
-        name: 'Indigo Frost Heather',
+        hex: '#194158',
+        name: 'Dark Teal',
+      },
+      {
+        hex: '#5c999d',
+        name: 'Aqua Heather',
+      },
+      {
+        hex: '#79a2af',
+        name: 'Aqua',
+      },
+      {
+        hex: '#6f949c',
+        name: 'Summer Sky Heather',
+      },
+      {
+        hex: '#06515a',
+        name: 'Teal',
+      },
+      {
+        hex: '#8cc6bb',
+        name: 'Ice Green',
+      },
+      {
+        hex: '#a1b1ac',
+        name: 'Pastel Turquoise',
+      },
+      {
+        hex: '#799394',
+        name: 'Aqua Haze',
+      },
+      {
+        hex: '#4b6567',
+        name: 'Green Blue Slate',
+      },
+      {
+        hex: '#324d47',
+        name: 'North Sea',
+      },
+      {
+        hex: '#88b098',
+        name: 'Honeydew',
+      },
+      {
+        hex: '#87799f',
+        name: 'Pastel Lilac',
+      },
+      {
+        hex: '#4b456a',
+        name: 'Violet Heather',
+      },
+      {
+        hex: '#241848',
+        name: 'Dark Violet',
+      },
+      {
+        hex: '#7e71a5',
+        name: 'Violet Tulip',
+      },
+      {
+        hex: '#7b789c',
+        name: 'Lavender Heather',
+      },
+      {
+        hex: '#9ea1c3',
+        name: 'Arctic Ice',
+      },
+      {
+        hex: '#7a80a0',
+        name: 'Stonewash',
+      },
+      {
+        hex: '#5a6690',
+        name: 'Country Blue',
+      },
+      {
+        hex: '#393e5a',
+        name: 'Blue Indigo',
+      },
+      {
+        hex: '#a12b28',
+        name: 'Poppy Red',
+      },
+      {
+        hex: '#c54e23',
+        name: 'Dragon Fire',
+      },
+      {
+        hex: '#e7c55f',
+        name: 'Freesia',
+      },
+      {
+        hex: '#6cb73c',
+        name: 'Green Flash',
+      },
+      {
+        hex: '#255830',
+        name: 'Jolly Green',
+      },
+      {
+        hex: '#2a5481',
+        name: 'Bluejay',
+      },
+      {
+        hex: '#4599b9',
+        name: 'Cyan Blue',
+      },
+      {
+        hex: '#423c7c',
+        name: 'Blue Iris',
+      },
+      {
+        hex: '#571c58',
+        name: 'Dahlia',
+      },
+      {
+        hex: '#9a305a',
+        name: 'Very Berry',
+      },
+      {
+        hex: '#48564a',
+        name: 'Lily Pad',
+      },
+      {
+        hex: '#88918f',
+        name: 'Smoke',
+      },
+      {
+        hex: '#ada6aa',
+        name: 'Moonbeam',
+      },
+      {
+        hex: '#d1cbb6',
+        name: 'Cream',
+      },
+      {
+        hex: '#afa99b',
+        name: 'White Sand',
+      },
+      {
+        hex: '#918781',
+        name: 'Tuffet',
+      },
+      {
+        hex: '#40302a',
+        name: 'Rich Brown',
+      },
+      {
+        hex: '#7e677a',
+        name: 'Ash Rose',
+      },
+      {
+        hex: '#c29ba5',
+        name: 'Coral Cloud',
+      },
+      {
+        hex: '#d2b0bf',
+        name: 'Seashell Pink',
+      },
+      {
+        hex: '#c7b1ca',
+        name: 'Pale Lilac',
+      },
+      {
+        hex: '#a189a7',
+        name: 'Violet Ice',
+      },
+      {
+        hex: '#69546e',
+        name: 'Grapeade',
+      },
+      {
+        hex: '#3e2851',
+        name: 'Blackberry Wine',
+      },
+      {
+        hex: '#422437',
+        name: 'Bordeaux Heather',
+      },
+      {
+        hex: '#753039',
+        name: 'Slate Rose',
+      },
+      {
+        hex: '#3d1b23',
+        name: 'Burgundy',
       },
     ],
   },
