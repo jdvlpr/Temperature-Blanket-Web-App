@@ -4,7 +4,7 @@ const colorways: Colorway[] = [
   {
     source: {
       accessed: '2022-03-15',
-      name: 'cascade.com',
+      name: 'cascadeyarns.com',
       unavailable: '2023-01-02',
       href: 'http://www.cascadeyarns.com/cascade-Cascade220.htm',
     },

@@ -4,8 +4,8 @@ const colorways: Colorway[] = [
   {
     source: {
       name: 'cascadeyarns.com',
-      href: 'https://www.cascadeyarns.com/product/220-superwash',
-      accessed: '2023-01-02',
+      href: 'https://www.cascadeyarns.com/product/220-superwash-merino',
+      accessed: '2024-01-06',
     },
     colors: [
       {
