@@ -23,8 +23,18 @@ export const entries: ChangelogItem[] = [
     notes: [
       {
         icon: ICONS.checkCircle,
+        text: `57 colorways`,
+        title: 'Added Yarn: 4 Seasons - Marvel 8 Ply',
+      },
+      {
+        icon: ICONS.checkCircle,
         text: `110 colorways`,
-        title: 'Added Yarn: Cascade - 220 Superwash Merino ',
+        title: 'Added Yarn: Cascade - 220 Superwash Merino',
+      },
+      {
+        icon: ICONS.checkCircle,
+        text: `68 colorways`,
+        title: 'Added Yarn: Katia - Promo Fin',
       },
     ],
     version: '4.12.0',
