@@ -33,6 +33,11 @@ export const entries: ChangelogItem[] = [
       },
       {
         icon: ICONS.checkCircle,
+        text: `506 colorways`,
+        title: 'Added Yarn: DMC - Six-Strand Embroidery Floss',
+      },
+      {
+        icon: ICONS.checkCircle,
         text: `68 colorways`,
         title: 'Added Yarn: Katia - Promo Fin',
       },
