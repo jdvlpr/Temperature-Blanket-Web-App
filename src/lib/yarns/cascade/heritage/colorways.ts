@@ -3,7 +3,7 @@ import type { Colorway } from '$lib/types';
 const colorways: Colorway[] = [
   {
     source: {
-      name: 'cascade.com',
+      name: 'cascadeyarns.com',
       href: 'https://www.cascadeyarns.com/product/heritage',
       accessed: '2024-01-18',
     },
