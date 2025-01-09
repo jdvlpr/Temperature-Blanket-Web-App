@@ -14,14 +14,20 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { hideTooltips } from '$lib/components/ColorPaletteEditable.svelte';
   import { arrow, createFloatingActions } from 'svelte-floating-ui';
-  import { flip, offset, shift, size } from 'svelte-floating-ui/dom';
+  import {
+    autoPlacement,
+    flip,
+    offset,
+    shift,
+    size,
+    type Placement,
+  } from 'svelte-floating-ui/dom';
   import { writable } from 'svelte/store';
   import { scale } from 'svelte/transition';
 
   interface Props {
-    placement?: string;
+    placement?: Placement;
     minWidth?: string;
     disableTooltip?: boolean;
     fullWidth?: boolean;
@@ -61,8 +67,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }: Props = $props();
 
   const arrowRef = writable(null);
-  let showTooltip: boolean = $state(false);
+
   let isTooltipActive = $state(false);
+
+  let showTooltip = $state(false);
 
   let debounceTimer;
   const debounce = (callback, time) => {
@@ -188,7 +196,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </button>
   {/if}
 </div>
-{#if showTooltip && !$hideTooltips}
+
+{#if showTooltip}
   <div
     role="dialog"
     aria-labelledby="Tooltip or Menu"
@@ -214,6 +223,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     >
       {@render tooltip?.()}
     </div>
+
     <div
       style="position:absolute; {tooltipStyle}"
       class="w-4 h-4 {tooltipBg} z-40"

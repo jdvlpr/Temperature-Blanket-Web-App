@@ -14,15 +14,12 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { run } from 'svelte/legacy';
-
   import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
   import StickyPart from '$lib/components/modals/StickyPart.svelte';
   import YarnGridSelect from '$lib/components/modals/YarnGridSelect.svelte';
   import { getModalStore } from '@skeletonlabs/skeleton';
   import chroma from 'chroma-js';
   import ModalShell from './ModalShell.svelte';
-
 
   interface Props {
     index?: any;
@@ -49,11 +46,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     variant_href = $bindable(),
     affiliate_variant_href = $bindable(),
     onChangeColor,
-    parent
+    parent,
   }: Props = $props();
 
   const modalStore = getModalStore();
-  
+
   let container: HTMLElement = $state();
 
   if (parent) parent.width = 'w-modal-wide';
@@ -87,7 +84,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     affiliate_variant_href = color?.affiliate_variant_href;
 
     let __color = value;
-    
+
     if (!chroma.valid(__color)) {
       valid = false;
       return;
@@ -134,8 +131,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     else onChangeColor({ hex });
     modalStore.close();
   }
-  
-  let currentColor = $derived({hex});
+
+  let currentColor = $derived({ hex });
 </script>
 
 <ModalShell {parent} size="large" preventDefaultFocus={true}>
@@ -198,7 +195,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"
           />
         </svg>
-  
+
         <span class="flex flex-col items-start">
           <p class="text-xs">
             {#if brandName}
@@ -215,7 +212,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </span>
       </a>
     {/if}
-  
+
     <div class="flex flex-wrap items-center justify-center gap-2 my-2 w-full">
       <label class="color-select-label" title="Choose a Color">
         <input
@@ -240,7 +237,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         />
       </label>
     </div>
-  
+
     <YarnGridSelect
       limit={true}
       bind:selectedColors
@@ -254,27 +251,27 @@ If not, see <https://www.gnu.org/licenses/>. -->
         });
       }}
       onSelection={(e) => {
-        const color = e[0];      
+        const color = e[0];
         inputTypeColorOnChange({ value: color.hex, color });
       }}
       scrollToTopButtonBottom="4rem"
     />
   </div>
-  
+
   {#snippet stickyPart()}
-      <StickyPart position="bottom">
-        <div class="p-2 sm:px-4">
-          {#if !valid}
-            <p class="card variant-soft-warning p-4 my-2">Please enter a valid color</p>
-          {/if}
-          <SaveAndCloseButtons
-            onSave={_onOkay}
-            onClose={modalStore.close}
-            disabled={!valid}
-          />
-      
-        </div>
-      </StickyPart>
+    <StickyPart position="bottom">
+      <div class="p-2 sm:px-4">
+        {#if !valid}
+          <p class="card variant-soft-warning p-4 my-2">
+            Please enter a valid color
+          </p>
+        {/if}
+        <SaveAndCloseButtons
+          onSave={_onOkay}
+          onClose={modalStore.close}
+          disabled={!valid}
+        />
+      </div>
+    </StickyPart>
   {/snippet}
-  
 </ModalShell>

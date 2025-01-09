@@ -14,7 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script module>
-  export let hideTooltips = writable(false);
+  export let isDragging = $state({ value: false });
 </script>
 
 <script lang="ts">
@@ -26,7 +26,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { getTextColor } from '$lib/utils';
   import { SOURCES, TRIGGERS, dndzone } from 'svelte-dnd-action';
   import { flip } from 'svelte/animate';
-  import { writable } from 'svelte/store';
 
   interface Props {
     colors?: Color[];
@@ -40,7 +39,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 
   let {
-    colors = $bindable([{ id: 0 }]),
+    colors = $bindable([]),
     schemeName = 'Palette Preview',
     canUserEditColor = true,
     canUserDeleteColor = true,
@@ -71,22 +70,25 @@ If not, see <https://www.gnu.org/licenses/>. -->
       variant_href,
       affiliate_variant_href,
     };
+
     sortableColors = getSortableColors();
   }
-  const flipDurationMs = 200;
 
-  let dragDisabled = $state(false);
+  const flipDurationMs = 200;
 
   let sortableColors = $state(getSortableColors());
 
   function getSortableColors() {
-    return colors.map((color, i) => {
-      color.id = i;
-      return color;
+    const _sortableColors = [];
+    colors.forEach((color, i) => {
+      _sortableColors.push({ ...color, id: i });
     });
+    return _sortableColors;
   }
 
   function handleConsider(e) {
+    isDragging.value = true;
+
     const {
       items: newItems,
       info: { source, trigger },
@@ -96,11 +98,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     // Ensure dragging is stopped on drag finish via keyboard
     if (source === SOURCES.KEYBOARD && trigger === TRIGGERS.DRAG_STOPPED) {
-      dragDisabled = true;
+      isDragging.value = false;
     }
   }
 
   async function handleFinalize(e) {
+    isDragging.value = false;
+
     const {
       items: newItems,
       info: { source },
@@ -108,38 +112,35 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     sortableColors = newItems;
 
-    // colors = sortableColors.map((color) => {
-    //   delete color.id;
-    //   return { ...color };
-    // });
+    colors = newItems;
 
     // Ensure dragging is stopped on drag finish via pointer (mouse, touch)
     if (source === SOURCES.POINTER) {
-      dragDisabled = true;
+      isDragging.value = false;
     }
+
     onChanged();
   }
   function startDrag(e) {
     // preventing default to prevent lag on touch devices (because of the browser checking for screen scrolling)
     e.preventDefault();
-    dragDisabled = false;
+    isDragging.value = true;
   }
+
   function handleKeyDown(e) {
-    if ((e.key === 'Enter' || e.key === ' ') && dragDisabled)
-      dragDisabled = false;
+    if ((e.key === 'Enter' || e.key === ' ') && !isDragging.value)
+      isDragging.value = true;
   }
 
   // function transformDraggedElement(draggedEl, data, index) {
-  //   // draggedEl.style.minWidth = "24px";
-  //   // draggedEl.querySelector(".dragicon").style.display = "block";
+  //   console.log({ draggedEl });
+
+  //   draggedEl.style.minWidth = '24px';
+  //   draggedEl.querySelector('.dragicon').style.display = 'block';
   // }
 
   $effect(() => {
     if (schemeName === 'Custom') schemeName = 'Color Palette';
-  });
-
-  $effect(() => {
-    $hideTooltips = !dragDisabled;
   });
 </script>
 
@@ -148,7 +149,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     class="w-full inline-flex h-[70px]"
     use:dndzone={{
       items: sortableColors,
-      dragDisabled,
       flipDurationMs,
       type: typeId,
       centreDraggedOnCursor: true,
@@ -170,7 +170,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
         affiliate_variant_href,
       } = color}
       {@const isLocked = typeof color.locked !== undefined && color?.locked}
-      <!-- <div class="flex-1" style="background:{hex}" in:fade /> -->
       <div
         class="first:rounded-tl-container-token first:overflow-hidden last:rounded-tr-container-token last:overflow-hidden w-full h-[70px] group {roundedBottom
           ? 'first:rounded-bl-container-token last:rounded-br-container-token'
@@ -216,13 +215,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
             {/if}
             <div
               role="button"
-              tabindex={dragDisabled ? 0 : -1}
+              tabindex={!isDragging.value ? 0 : -1}
               aria-label="drag-handle"
               class="w-fit dragicon hidden group-hover:block group-focus:block"
-              class:group-hover:inline-block={dragDisabled}
-              style="color:{getTextColor(hex)}; {dragDisabled
-                ? 'cursor: grab'
-                : 'cursor: grabbing'}"
+              class:group-hover:inline-block={isDragging.value}
+              style="color:{getTextColor(hex)}; {isDragging.value
+                ? 'cursor: grabbing'
+                : 'cursor: grab'}"
               onmousedown={startDrag}
               ontouchstart={startDrag}
               onkeydown={handleKeyDown}
@@ -233,19 +232,23 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
           {#snippet tooltip()}
             <div
-              style="background:{hex};color:{getTextColor(hex)}"
+              style="background:{hex};color:{getTextColor(hex)};"
               class="w-full rounded-container-token text-center break-all flex flex-wrap items-center justify-center gap-4 z-30"
             >
               {#if canUserDeleteColor && sortableColors.length > 1}
                 <button
-                  onclick={() => {
-                    sortableColors.splice(index, 1);
-                    colors = sortableColors.map((color) => {
-                      delete color.id;
-                      return {
-                        ...color,
-                      };
-                    });
+                  onclick={async () => {
+                    colors = colors.filter((_, i) => i !== index);
+
+                    sortableColors = getSortableColors();
+                    // colors = sortableColors.map((color) => {
+                    //   delete color.id;
+                    //   return {
+                    //     ...color,
+                    //   };
+                    // });
+                    console.log({ colors, sortableColors });
+
                     onChanged();
                   }}
                   class="btn-icon bg-secondary-hover-token"
