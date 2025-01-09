@@ -13,7 +13,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script context="module" lang="ts">
+<script module lang="ts">
   let selectedBrandId = writable('');
   let selectedYarnId = writable('');
   let selectedYarnWeightId: Writable<YarnWeight['id'] | ''> = writable('');
@@ -59,16 +59,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { onMount } from 'svelte';
   import { writable, type Writable } from 'svelte/store';
 
-  let loadMoreSpinner;
+  let loadMoreSpinner = $state();
   let urlParams;
   let isLoaded = false;
-  let filtersContainer;
-  let showScrollToTopButton = false;
-  let itemsToShow = YARN_COLORWAYS_PER_PAGE;
+  let filtersContainer = $state();
+  let showScrollToTopButton = $state(false);
+  let itemsToShow = $state(YARN_COLORWAYS_PER_PAGE);
 
-  let results = [];
-  let gettingResults = true;
-  let loadingAllColors = false;
+  let results = $state([]);
+  let gettingResults = $state(true);
+  let loadingAllColors = $state(false);
 
   let debounceTimer;
   const debounce = (callback, time) => {
@@ -115,76 +115,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     scrollObserver.observe(filtersContainer);
     isLoaded = true;
     getResults();
-  });
-
-  $: yarns =
-    $selectedBrandId === ''
-      ? brands
-          .flatMap((n, i) =>
-            n.yarns.map((n) => {
-              return {
-                ...n,
-                brandId: brands[i].id,
-                brandName: brands[i].name,
-              };
-            }),
-          )
-          .sort((a, b) => {
-            const nameA = a.name.toUpperCase(); // ignore upper and lowercase
-            const nameB = b.name.toUpperCase(); // ignore upper and lowercase
-            if (nameA > nameB) {
-              return 1;
-            }
-            if (nameA < nameB) {
-              return -1;
-            }
-            // names must be equal
-            return 0;
-          })
-      : brands
-          ?.filter((brand) => brand.id === $selectedBrandId)
-          ?.flatMap((n) => {
-            return n.yarns.map((yarn) => {
-              return {
-                ...yarn,
-                brandId: n.id,
-                brandName: n.name,
-              };
-            });
-          });
-
-  $: totalResults = yarns
-    .filter((yarn) => {
-      if (!$selectedYarnId) return true;
-      return yarn.id === $selectedYarnId;
-    })
-    .filter((yarn) => {
-      if (!$selectedYarnWeightId) return true;
-      return yarn.weightId === $selectedYarnWeightId;
-    })
-    .flatMap((n) => n.colorways.map((m) => m.colors.length))
-    .reduce((partialSum, a) => partialSum + a, 0);
-
-  $: $selectedBrandId,
-    $selectedYarnId,
-    $selectedYarnWeightId,
-    $search,
-    yarns,
-    $sortColors,
-    itemsToShow,
-    $hex,
-    getResults();
-
-  $: areAnyResultsAffiliate = results.some(
-    (result) => result.affiliate_variant_href,
-  );
-
-  $: shareableURL = getShareableURL({
-    selectedBrandId: $selectedBrandId,
-    selectedYarnId: $selectedYarnId,
-    selectedYarnWeightId: $selectedYarnWeightId,
-    search: $search,
-    hex: $hex,
   });
 
   function getShareableURL({
@@ -336,6 +266,80 @@ If not, see <https://www.gnu.org/licenses/>. -->
     }
     $hex = chroma(__color).hex('rgb'); // use 'rgb' to prevent alpha hex codes
   }
+  let yarns = $derived(
+    $selectedBrandId === ''
+      ? brands
+          .flatMap((n, i) =>
+            n.yarns.map((n) => {
+              return {
+                ...n,
+                brandId: brands[i].id,
+                brandName: brands[i].name,
+              };
+            }),
+          )
+          .sort((a, b) => {
+            const nameA = a.name.toUpperCase(); // ignore upper and lowercase
+            const nameB = b.name.toUpperCase(); // ignore upper and lowercase
+            if (nameA > nameB) {
+              return 1;
+            }
+            if (nameA < nameB) {
+              return -1;
+            }
+            // names must be equal
+            return 0;
+          })
+      : brands
+          ?.filter((brand) => brand.id === $selectedBrandId)
+          ?.flatMap((n) => {
+            return n.yarns.map((yarn) => {
+              return {
+                ...yarn,
+                brandId: n.id,
+                brandName: n.name,
+              };
+            });
+          }),
+  );
+  let totalResults = $derived(
+    yarns
+      .filter((yarn) => {
+        if (!$selectedYarnId) return true;
+        return yarn.id === $selectedYarnId;
+      })
+      .filter((yarn) => {
+        if (!$selectedYarnWeightId) return true;
+        return yarn.weightId === $selectedYarnWeightId;
+      })
+      .flatMap((n) => n.colorways.map((m) => m.colors.length))
+      .reduce((partialSum, a) => partialSum + a, 0),
+  );
+
+  $effect(() => {
+    $selectedBrandId,
+      $selectedYarnId,
+      $selectedYarnWeightId,
+      $search,
+      yarns,
+      $sortColors,
+      itemsToShow,
+      $hex,
+      getResults();
+  });
+
+  let areAnyResultsAffiliate = $derived(
+    results.some((result) => result.affiliate_variant_href),
+  );
+  let shareableURL = $derived(
+    getShareableURL({
+      selectedBrandId: $selectedBrandId,
+      selectedYarnId: $selectedYarnId,
+      selectedYarnWeightId: $selectedYarnWeightId,
+      search: $search,
+      hex: $hex,
+    }),
+  );
 </script>
 
 <svelte:head>
@@ -372,260 +376,83 @@ If not, see <https://www.gnu.org/licenses/>. -->
 {/if}
 
 <AppShell pageName="Yarn Colorway Finder">
-  <svelte:fragment slot="stickyHeader">
+  {#snippet stickyHeader()}
     <div class="hidden lg:inline-flex mx-auto"><AppLogo /></div>
     <Share href={shareableURL} />
-  </svelte:fragment>
-  <main slot="main" class="max-w-screen-xl m-auto pb-6">
-    <Card>
-      <div slot="header">
-        <div class="bg-surface-200-700-token text-token p-4">
-          <p class="text-center">
-            Browse a collection of yarn colorways. Filter by brand or yarn name,
-            and search by HTML hex color code to find matching yarn colorways.
-          </p>
-        </div>
-      </div>
-      <div slot="content" class=" flex-col flex items-center my-2">
-        <div
-          bind:this={filtersContainer}
-          class="grid grid-cols-12 gap-4 items-end scroll-mt-[66px] justify-between my-2 w-full"
-        >
-          <div class="flex flex-col justify-start w-full col-span-full gap-1">
-            <span class="flex items-center label gap-1"
-              ><svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="currentColor"
-                class="w-4 h-4"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
-                />
-              </svg>
-              Search by Color</span
-            >
-            <div class="flex flex-wrap items-center justify-center gap-1">
-              <div
-                class="input-group input-group-divider grid-cols-[auto_1fr_auto]"
-              >
-                <input
-                  type="color"
-                  class="input !rounded-none input-group-shim"
-                  bind:this={$inputTypeColorElement}
-                  on:change={(e) =>
-                    inputTypeColorOnChange({
-                      value: e.target.value,
-                    })}
-                />
-                <input
-                  type="text"
-                  placeholder="e.g., pink, #c3f4d2"
-                  style="background:{$hex} !important;color:{getTextColor(
-                    $hex,
-                  )}"
-                  value={$inputTypeTextValue}
-                  on:keyup={(e) =>
-                    inputTypeTextOnChange({
-                      value: e.target.value,
-                    })}
-                />
-                {#if (!!$hex || !!$inputTypeTextValue) && !!$inputTypeColorElement?.value}
-                  <button
-                    aria-label="Clear Color"
-                    on:click={() => {
-                      $hex = '';
-                      $inputTypeTextValue = '';
-                      if (browser) $inputTypeColorElement.value = '#000000';
-                    }}
-                    ><svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke-width="1.5"
-                      stroke="currentColor"
-                      class="w-5 h-5"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="M6 18L18 6M6 6l12 12"
-                      />
-                    </svg>
-                  </button>
-                {/if}
-              </div>
+  {/snippet}
+  {#snippet main()}
+    <main class="max-w-screen-xl m-auto pb-6">
+      <Card>
+        {#snippet header()}
+          <div>
+            <div class="bg-surface-200-700-token text-token p-4">
+              <p class="text-center">
+                Browse a collection of yarn colorways. Filter by brand or yarn
+                name, and search by HTML hex color code to find matching yarn
+                colorways.
+              </p>
             </div>
           </div>
-
-          {#key $selectedBrandId || $selectedYarnId}
+        {/snippet}
+        {#snippet content()}
+          <div class=" flex-col flex items-center my-2">
             <div
-              class="w-full col-span-12 md:col-span-9"
-              class:md:col-span-full={!!$selectedBrandId && !!$selectedYarnId}
+              bind:this={filtersContainer}
+              class="grid grid-cols-12 gap-4 items-end scroll-mt-[66px] justify-between my-2 w-full"
             >
-              <SelectYarn
-                preselectDefaultYarn={false}
-                bind:selectedBrandId={$selectedBrandId}
-                bind:selectedYarnId={$selectedYarnId}
-                selectedYarnWeightId={$selectedYarnWeightId}
-              />
-            </div>
-
-            <div
-              class="w-full col-span-12 md:col-span-3"
-              class:hidden={!!$selectedBrandId && !!$selectedYarnId}
-            >
-              <SelectYarnWeight
-                selectedBrandId={$selectedBrandId}
-                bind:selectedYarnWeightId={$selectedYarnWeightId}
-              />
-            </div>
-          {/key}
-
-          <div
-            class="flex flex-col justify-start w-full col-span-12 md:col-span-3 gap-1"
-          >
-            <span class="flex items-center label gap-1">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="currentColor"
-                class="w-4 h-4"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
-                />
-              </svg>
-              Colorway Name</span
-            >
-            <div class="flex flex-wrap items-center justify-center gap-1">
-              <div class="input-group input-group-divider grid-cols-[1fr_auto]">
-                <input
-                  id="yarn-select-search-input"
-                  autocomplete="off"
-                  placeholder="e.g., Wisteria, Cream"
-                  type="text"
-                  class="w-full input"
-                  bind:value={$search}
-                  on:input={() => {
-                    itemsToShow = YARN_COLORWAYS_PER_PAGE;
-                  }}
-                />
-                {#if $search}
-                  <button
-                    aria-label="Clear Search"
-                    on:click={() => {
-                      $search = '';
-                    }}
-                    ><svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke-width="1.5"
-                      stroke="currentColor"
-                      class="w-6 h-6"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="M6 18L18 6M6 6l12 12"
-                      />
-                    </svg>
-                  </button>
-                {/if}
-              </div>
-            </div>
-          </div>
-
-          <label class="label w-full col-span-8 md:col-span-3">
-            <span class="flex items-center">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="currentColor"
-                class="w-4 h-4 mr-1"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M3 7.5L7.5 3m0 0L12 7.5M7.5 3v13.5m13.5 0L16.5 21m0 0L12 16.5m4.5 4.5V7.5"
-                />
-              </svg>
-              Sort By
-            </span>
-            <select
-              class="select"
-              id="sort-colors-by"
-              bind:value={$sortColors}
-              disabled={gettingResults}
-            >
-              <option value="default">Default</option>
-              <option value="light-to-dark">Lightest to Darkest</option>
-              <option value="dark-to-light">Darkest to Lightest</option>
-              <option value="name">Name A-Z</option>
-              <option value="name-z-to-a">Name Z-A</option>
-            </select>
-          </label>
-        </div>
-
-        {#if areAnyResultsAffiliate}
-          <p class="text-sm text-center mt-2">
-            Items purchased through some links (marked with a shopping bag icon)
-            earn the developer of this site a percentage of the sale at no
-            additional cost to you.
-          </p>
-        {/if}
-
-        {#if results?.length && !loadingAllColors}
-          <p class=" my-2">
-            {#if totalResults === results.length}
-              {totalResults}
-            {:else}
-              Showing {results.length.toLocaleString()}
-              of {totalResults.toLocaleString()}
-            {/if}
-            {pluralize('Colorway', totalResults)}
-          </p>
-          <ViewToggle />
-        {/if}
-
-        {#if results?.length && !loadingAllColors}
-          <div
-            class="rounded-container-token overflow-hidden my-4 justify-center w-full gap-1 {$layout ===
-            'grid'
-              ? 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5'
-              : 'flex flex-col'}"
-          >
-            {#each results as { hex, name, delta, brandName, yarnName, variant_href, affiliate_variant_href, unavailable }}
-              {@const percentMatch = delta ? Math.floor(100 - delta) : null}
               <div
-                class="shadow-sm flex-1 min-w-fit p-2 flex items-center gap-x-2 rounded-container-token {$layout ===
-                'grid'
-                  ? 'justify-center'
-                  : ''}"
-                style="background:{hex}; color:{getTextColor(hex)};"
+                class="flex flex-col justify-start w-full col-span-full gap-1"
               >
-                <!-- <div class={$layout === "grid" ? "" : "md:w-2/5"}></div> -->
-                <div class="min-w-[43px] min-h-[43px]">
-                  {#if !unavailable}
-                    {#if affiliate_variant_href}
-                      <a
-                        aria-label="Buy this yarn colorway"
-                        class="btn-icon bg-secondary-hover-token"
-                        title="Buy this yarn colorway"
-                        href={affiliate_variant_href}
-                        target="_blank"
-                        rel="noopener noreferrer"
+                <span class="flex items-center label gap-1"
+                  ><svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="currentColor"
+                    class="w-4 h-4"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+                    />
+                  </svg>
+                  Search by Color</span
+                >
+                <div class="flex flex-wrap items-center justify-center gap-1">
+                  <div
+                    class="input-group input-group-divider grid-cols-[auto_1fr_auto]"
+                  >
+                    <input
+                      type="color"
+                      class="input !rounded-none input-group-shim"
+                      bind:this={$inputTypeColorElement}
+                      onchange={(e) =>
+                        inputTypeColorOnChange({
+                          value: e.target.value,
+                        })}
+                    />
+                    <input
+                      type="text"
+                      placeholder="e.g., pink, #c3f4d2"
+                      style="background:{$hex} !important;color:{getTextColor(
+                        $hex,
+                      )}"
+                      value={$inputTypeTextValue}
+                      onkeyup={(e) =>
+                        inputTypeTextOnChange({
+                          value: e.target.value,
+                        })}
+                    />
+                    {#if (!!$hex || !!$inputTypeTextValue) && !!$inputTypeColorElement?.value}
+                      <button
+                        aria-label="Clear Color"
+                        onclick={() => {
+                          $hex = '';
+                          $inputTypeTextValue = '';
+                          if (browser) $inputTypeColorElement.value = '#000000';
+                        }}
                         ><svg
                           xmlns="http://www.w3.org/2000/svg"
                           fill="none"
@@ -637,168 +464,363 @@ If not, see <https://www.gnu.org/licenses/>. -->
                           <path
                             stroke-linecap="round"
                             stroke-linejoin="round"
-                            d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
+                            d="M6 18L18 6M6 6l12 12"
                           />
                         </svg>
-                      </a>
-                    {:else}
-                      <a
-                        aria-label="Open link to this yarn colorway"
-                        class="btn-icon bg-secondary-hover-token"
-                        href={variant_href}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        title="Open link to this yarn colorway"
-                        ><svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke-width="1.5"
-                          stroke="currentColor"
-                          class="w-5 h-5"
-                        >
-                          <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"
-                          />
-                        </svg>
-                      </a>
+                      </button>
                     {/if}
-                  {/if}
-                </div>
-                <div class="flex flex-col items-start text-pretty">
-                  <span class="text-left text-xs">
-                    {brandName} - {yarnName}
-                  </span>
-
-                  <span class="text-lg leading-tight">{name}</span>
-
-                  {#if percentMatch}
-                    <p class="text-xs">
-                      {percentMatch}% Match
-                    </p>
-                  {/if}
+                  </div>
                 </div>
               </div>
-            {/each}
-          </div>
-        {:else if gettingResults}
-          <div class="my-6 mx-auto">
-            <Spinner />
-          </div>
-        {:else}
-          <div
-            class="mx-auto variant-soft-warning text-token text-center card p-4 my-2"
-          >
-            <p>No Matching Colorways</p>
-            <p class="text-sm">Try changing the filters above</p>
-          </div>
-        {/if}
-        {#if results.length === itemsToShow}
-          <div class="w-full flex justify-center mx-auto">
-            <button
-              class="btn rounded-container-token bg-primary-200-700-token text-token gap-1 mb-2 font-bold"
-              bind:this={loadMoreSpinner}
-              on:click={() => {
-                if (itemsToShow <= results.length)
-                  itemsToShow += YARN_COLORWAYS_PER_PAGE;
-                getResults();
-              }}
-              ><svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="currentColor"
-                class="w-6 h-6"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M12 4.5v15m7.5-7.5h-15"
-                />
-              </svg>
-              Show More</button
-            >
-          </div>
-        {/if}
-      </div>
-    </Card>
-  </main>
-  <Footer slot="footer">
-    <span slot="about">
-      <Accordion>
-        <AccordionItem>
-          <svelte:fragment slot="lead">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-              class="w-6 h-6"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z"
-              />
-            </svg>
-          </svelte:fragment>
-          <svelte:fragment slot="summary"
-            ><p class="font-bold">Are the colors accurate?</p></svelte:fragment
-          >
-          <svelte:fragment slot="content">
-            Colors on a screen will always look different from actual yarn
-            colorways. The colors used for this site are meant to be an
-            approximation. They also might not be up-to-date; some colorways
-            might have changed or not be available. These results do not
-            represent official colorway information from their respective
-            companies. The process used to obtain colorway information is
-            described here: <a
-              href="/documentation/#getting-yarn-colorway-data"
-              class="link">Getting Yarn Colorway Data</a
-            >. If you find an inaccuracy, send an email to
-            hello@temperature-blanket.com.
-          </svelte:fragment>
-        </AccordionItem>
-        <AccordionItem>
-          <svelte:fragment slot="lead">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-              class="w-6 h-6"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z"
-              />
-            </svg>
-          </svelte:fragment>
-          <svelte:fragment slot="summary"
-            ><p class="font-bold">
-              What if I can't find the yarn I'm looking for?
-            </p></svelte:fragment
-          >
-          <svelte:fragment slot="content">
-            Requests for yarn to be included in these results can be made by
-            anyone using <a
-              href="/yarn-search-request"
-              rel="noreferrer"
-              class="link">this request form.</a
-            >.
-          </svelte:fragment>
-        </AccordionItem>
-      </Accordion>
-    </span>
 
-    <span slot="sources">
-      <YarnSources />
-    </span>
-  </Footer>
+              {#key $selectedBrandId || $selectedYarnId}
+                <div
+                  class="w-full col-span-12 md:col-span-9"
+                  class:md:col-span-full={!!$selectedBrandId &&
+                    !!$selectedYarnId}
+                >
+                  <SelectYarn
+                    preselectDefaultYarn={false}
+                    bind:selectedBrandId={$selectedBrandId}
+                    bind:selectedYarnId={$selectedYarnId}
+                    selectedYarnWeightId={$selectedYarnWeightId}
+                  />
+                </div>
+
+                <div
+                  class="w-full col-span-12 md:col-span-3"
+                  class:hidden={!!$selectedBrandId && !!$selectedYarnId}
+                >
+                  <SelectYarnWeight
+                    selectedBrandId={$selectedBrandId}
+                    bind:selectedYarnWeightId={$selectedYarnWeightId}
+                  />
+                </div>
+              {/key}
+
+              <div
+                class="flex flex-col justify-start w-full col-span-12 md:col-span-3 gap-1"
+              >
+                <span class="flex items-center label gap-1">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="currentColor"
+                    class="w-4 h-4"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+                    />
+                  </svg>
+                  Colorway Name</span
+                >
+                <div class="flex flex-wrap items-center justify-center gap-1">
+                  <div
+                    class="input-group input-group-divider grid-cols-[1fr_auto]"
+                  >
+                    <input
+                      id="yarn-select-search-input"
+                      autocomplete="off"
+                      placeholder="e.g., Wisteria, Cream"
+                      type="text"
+                      class="w-full input"
+                      bind:value={$search}
+                      oninput={() => {
+                        itemsToShow = YARN_COLORWAYS_PER_PAGE;
+                      }}
+                    />
+                    {#if $search}
+                      <button
+                        aria-label="Clear Search"
+                        onclick={() => {
+                          $search = '';
+                        }}
+                        ><svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke-width="1.5"
+                          stroke="currentColor"
+                          class="w-6 h-6"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="M6 18L18 6M6 6l12 12"
+                          />
+                        </svg>
+                      </button>
+                    {/if}
+                  </div>
+                </div>
+              </div>
+
+              <label class="label w-full col-span-8 md:col-span-3">
+                <span class="flex items-center">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="currentColor"
+                    class="w-4 h-4 mr-1"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M3 7.5L7.5 3m0 0L12 7.5M7.5 3v13.5m13.5 0L16.5 21m0 0L12 16.5m4.5 4.5V7.5"
+                    />
+                  </svg>
+                  Sort By
+                </span>
+                <select
+                  class="select"
+                  id="sort-colors-by"
+                  bind:value={$sortColors}
+                  disabled={gettingResults}
+                >
+                  <option value="default">Default</option>
+                  <option value="light-to-dark">Lightest to Darkest</option>
+                  <option value="dark-to-light">Darkest to Lightest</option>
+                  <option value="name">Name A-Z</option>
+                  <option value="name-z-to-a">Name Z-A</option>
+                </select>
+              </label>
+            </div>
+
+            {#if areAnyResultsAffiliate}
+              <p class="text-sm text-center mt-2">
+                Items purchased through some links (marked with a shopping bag
+                icon) earn the developer of this site a percentage of the sale
+                at no additional cost to you.
+              </p>
+            {/if}
+
+            {#if results?.length && !loadingAllColors}
+              <p class=" my-2">
+                {#if totalResults === results.length}
+                  {totalResults}
+                {:else}
+                  Showing {results.length.toLocaleString()}
+                  of {totalResults.toLocaleString()}
+                {/if}
+                {pluralize('Colorway', totalResults)}
+              </p>
+              <ViewToggle />
+            {/if}
+
+            {#if results?.length && !loadingAllColors}
+              <div
+                class="rounded-container-token overflow-hidden my-4 justify-center w-full gap-1 {$layout ===
+                'grid'
+                  ? 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5'
+                  : 'flex flex-col'}"
+              >
+                {#each results as { hex, name, delta, brandName, yarnName, variant_href, affiliate_variant_href, unavailable }}
+                  {@const percentMatch = delta ? Math.floor(100 - delta) : null}
+                  <div
+                    class="shadow-sm flex-1 min-w-fit p-2 flex items-center gap-x-2 rounded-container-token {$layout ===
+                    'grid'
+                      ? 'justify-center'
+                      : ''}"
+                    style="background:{hex}; color:{getTextColor(hex)};"
+                  >
+                    <!-- <div class={$layout === "grid" ? "" : "md:w-2/5"}></div> -->
+                    <div class="min-w-[43px] min-h-[43px]">
+                      {#if !unavailable}
+                        {#if affiliate_variant_href}
+                          <a
+                            aria-label="Buy this yarn colorway"
+                            class="btn-icon bg-secondary-hover-token"
+                            title="Buy this yarn colorway"
+                            href={affiliate_variant_href}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            ><svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke-width="1.5"
+                              stroke="currentColor"
+                              class="w-5 h-5"
+                            >
+                              <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
+                              />
+                            </svg>
+                          </a>
+                        {:else}
+                          <a
+                            aria-label="Open link to this yarn colorway"
+                            class="btn-icon bg-secondary-hover-token"
+                            href={variant_href}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            title="Open link to this yarn colorway"
+                            ><svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke-width="1.5"
+                              stroke="currentColor"
+                              class="w-5 h-5"
+                            >
+                              <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"
+                              />
+                            </svg>
+                          </a>
+                        {/if}
+                      {/if}
+                    </div>
+                    <div class="flex flex-col items-start text-pretty">
+                      <span class="text-left text-xs">
+                        {brandName} - {yarnName}
+                      </span>
+
+                      <span class="text-lg leading-tight">{name}</span>
+
+                      {#if percentMatch}
+                        <p class="text-xs">
+                          {percentMatch}% Match
+                        </p>
+                      {/if}
+                    </div>
+                  </div>
+                {/each}
+              </div>
+            {:else if gettingResults}
+              <div class="my-6 mx-auto">
+                <Spinner />
+              </div>
+            {:else}
+              <div
+                class="mx-auto variant-soft-warning text-token text-center card p-4 my-2"
+              >
+                <p>No Matching Colorways</p>
+                <p class="text-sm">Try changing the filters above</p>
+              </div>
+            {/if}
+            {#if results.length === itemsToShow}
+              <div class="w-full flex justify-center mx-auto">
+                <button
+                  class="btn rounded-container-token bg-primary-200-700-token text-token gap-1 mb-2 font-bold"
+                  bind:this={loadMoreSpinner}
+                  onclick={() => {
+                    if (itemsToShow <= results.length)
+                      itemsToShow += YARN_COLORWAYS_PER_PAGE;
+                    getResults();
+                  }}
+                  ><svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="currentColor"
+                    class="w-6 h-6"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M12 4.5v15m7.5-7.5h-15"
+                    />
+                  </svg>
+                  Show More</button
+                >
+              </div>
+            {/if}
+          </div>
+        {/snippet}
+      </Card>
+    </main>
+  {/snippet}
+  {#snippet footer()}
+    <Footer>
+      {#snippet about()}
+        <span>
+          <Accordion>
+            <AccordionItem>
+              {#snippet lead()}
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="currentColor"
+                  class="w-6 h-6"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z"
+                  />
+                </svg>
+              {/snippet}
+              {#snippet summary()}
+                <p class="font-bold">Are the colors accurate?</p>
+              {/snippet}
+              {#snippet content()}
+                Colors on a screen will always look different from actual yarn
+                colorways. The colors used for this site are meant to be an
+                approximation. They also might not be up-to-date; some colorways
+                might have changed or not be available. These results do not
+                represent official colorway information from their respective
+                companies. The process used to obtain colorway information is
+                described here: <a
+                  href="/documentation/#getting-yarn-colorway-data"
+                  class="link">Getting Yarn Colorway Data</a
+                >. If you find an inaccuracy, send an email to
+                hello@temperature-blanket.com.
+              {/snippet}
+            </AccordionItem>
+            <AccordionItem>
+              {#snippet lead()}
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="currentColor"
+                  class="w-6 h-6"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z"
+                  />
+                </svg>
+              {/snippet}
+              {#snippet summary()}
+                <p class="font-bold">
+                  What if I can't find the yarn I'm looking for?
+                </p>
+              {/snippet}
+              {#snippet content()}
+                Requests for yarn to be included in these results can be made by
+                anyone using <a
+                  href="/yarn-search-request"
+                  rel="noreferrer"
+                  class="link">this request form.</a
+                >.
+              {/snippet}
+            </AccordionItem>
+          </Accordion>
+        </span>
+      {/snippet}
+
+      {#snippet sources()}
+        <span>
+          <YarnSources />
+        </span>
+      {/snippet}
+    </Footer>
+  {/snippet}
 </AppShell>
