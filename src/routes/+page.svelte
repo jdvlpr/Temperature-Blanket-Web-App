@@ -178,426 +178,418 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <AppShell pageName="">
   {#snippet stickyHeader()}
-      <div
-        class="hidden lg:inline-flex mx-auto absolute translate-x-1/2 right-1/2"
-      >
-        <AppLogo />
-      </div>
+    <div
+      class="hidden lg:inline-flex mx-auto absolute translate-x-1/2 right-1/2"
+    >
+      <AppLogo />
+    </div>
 
-      <div class="flex gap-2 flex-1 justify-between sm:justify-end">
-        {#if $weather && $valid}
-          <div class="hidden lg:inline-flex">
-            <Tooltip
-              class="btn bg-secondary-hover-token"
-              title="Save Project [Cmd]+[s] or [Ctrl]+[s]"
-              onclick={() =>
-                modal.state.trigger({
-                  type: 'component',
-                  component: { ref: Menu, props: { page: 'save' } },
-                })}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="currentColor"
-                class="w-6 h-6"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z"
-                />
-              </svg>
-
-              <span class="max-[700px]:hidden min-[700px]:inline-block text-sm"
-                >Save</span
-              >
-              {#snippet tooltip()}
-                        <p >
-                  Save your project in this browser and as a URL.
-                </p>
-                      {/snippet}
-            </Tooltip>
-          </div>
-        {/if}
-
-        {#if !!$weather}
-          <div class="mx-auto sm:mx-0">
-            <button
-              class="btn bg-secondary-hover-token"
-              title="Undo [Cmd ⌘]+[z] or [Ctrl]+[z]"
-              id="undo"
-              disabled={!$weather || $history.first || $isHistoryUpdating}
-              onclick={() => {
-                loadFromHistory({
-                  action: 'undo',
-                });
-              }}
-            >
-              {@html ICONS.arrowUturnLeft}
-              <span class="text-sm max-[740px]:hidden min-[740px]:inline-block"
-                >Undo</span
-              >
-            </button>
-
-            <button
-              class="btn bg-secondary-hover-token"
-              id="redo"
-              title="Redo [Cmd ⌘]+[Shift ⇧]+[z] or [Ctrl]+[Shift ⇧]+[Z]"
-              disabled={!$weather || $history.last || $isHistoryUpdating}
-              onclick={() => {
-                loadFromHistory({
-                  action: 'redo',
-                });
-              }}
-            >
-              {@html ICONS.arrowUturnRight}
-              <span class="text-sm max-[740px]:hidden min-[740px]:inline-block"
-                >Redo</span
-              >
-            </button>
-          </div>
-        {/if}
-      </div>
-
-      <Tooltip
-        class="btn-icon bg-secondary-hover-token"
-        minWidth="265px"
-        title="Help"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke-width="1.5"
-          stroke="currentColor"
-          class="w-6 h-6 flex-shrink-0"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z"
-          />
-        </svg>
-        {#snippet tooltip()}
-            <div
-            
-            class="p-2 flex flex-col gap-4"
-            aria-orientation="vertical"
-            aria-labelledby="menu-button"
-            tabindex="-1"
+    <div class="flex gap-2 flex-1 justify-between sm:justify-end">
+      {#if $weather && $valid}
+        <div class="hidden lg:inline-flex">
+          <Tooltip
+            classNames="btn bg-secondary-hover-token"
+            title="Save Project [Cmd]+[s] or [Ctrl]+[s]"
+            onclick={() =>
+              modal.state.trigger({
+                type: 'component',
+                component: { ref: Menu, props: { page: 'save' } },
+              })}
           >
-            <button
-              class="btn variant-filled-secondary gap-1 items-center"
-              onclick={() =>
-                modal.state.trigger({
-                  type: 'component',
-                  component: { ref: GettingStarted },
-                })}
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="w-6 h-6"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="size-6 relative bottom-[2px]"
-                viewBox="0 0 24 24"
-                ><path
-                  fill="currentColor"
-                  d="M20 11h3v2h-3zM1 11h3v2H1zM13 1v3h-2V1zM4.92 3.5l2.13 2.14l-1.42 1.41L3.5 4.93zm12.03 2.13l2.12-2.13l1.43 1.43l-2.13 2.12zM12 6a6 6 0 0 1 6 6c0 2.22-1.21 4.16-3 5.2V19a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1v-1.8c-1.79-1.04-3-2.98-3-5.2a6 6 0 0 1 6-6m2 15v1a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1v-1zm-3-3h2v-2.13c1.73-.44 3-2.01 3-3.87a4 4 0 0 0-4-4a4 4 0 0 0-4 4c0 1.86 1.27 3.43 3 3.87z"
-                /></svg
-              >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z"
+              />
+            </svg>
 
-              Getting Started</button
+            <span class="max-[700px]:hidden min-[700px]:inline-block text-sm"
+              >Save</span
             >
-            <!-- <div class="flex-grow border-t border-surface-300-600-token"></div> -->
+            {#snippet tooltip()}
+              <p>Save your project in this browser and as a URL.</p>
+            {/snippet}
+          </Tooltip>
+        </div>
+      {/if}
 
-            <p>
-              <a
-                href="/faq"
-                rel="noopener noreferrer"
-                title="View Frequently Asked Questions"
-                class="link"
-              >
-                Frequently Asked Questions</a
-              >
-            </p>
+      {#if !!$weather}
+        <div class="mx-auto sm:mx-0">
+          <button
+            class="btn bg-secondary-hover-token"
+            title="Undo [Cmd ⌘]+[z] or [Ctrl]+[z]"
+            id="undo"
+            disabled={!$weather || $history.first || $isHistoryUpdating}
+            onclick={() => {
+              loadFromHistory({
+                action: 'undo',
+              });
+            }}
+          >
+            {@html ICONS.arrowUturnLeft}
+            <span class="text-sm max-[740px]:hidden min-[740px]:inline-block"
+              >Undo</span
+            >
+          </button>
 
-            <p>
-              <a
-                href="/blog/2024-02-09-how-to-plan-a-temperature-blanket"
-                rel="noopener noreferrer"
-                title="View Frequently Asked Questions"
-                class="link"
-              >
-                How to Plan a Temperature Blanket</a
-              >
-            </p>
+          <button
+            class="btn bg-secondary-hover-token"
+            id="redo"
+            title="Redo [Cmd ⌘]+[Shift ⇧]+[z] or [Ctrl]+[Shift ⇧]+[Z]"
+            disabled={!$weather || $history.last || $isHistoryUpdating}
+            onclick={() => {
+              loadFromHistory({
+                action: 'redo',
+              });
+            }}
+          >
+            {@html ICONS.arrowUturnRight}
+            <span class="text-sm max-[740px]:hidden min-[740px]:inline-block"
+              >Redo</span
+            >
+          </button>
+        </div>
+      {/if}
+    </div>
 
-            <p>
-              <a href="/documentation" rel="noreferrer" class="link"
-                >Documentation</a
-              >
-            </p>
-
-            <p>
-              <a href="/changelog" rel="noreferrer" class="link"
-                >Changelog - What's New?</a
-              >
-            </p>
-
-            <div class="flex items-center gap-2">
-              <div class="flex-grow border-t border-surface-300-600-token"></div>
-
-              <p class="flex-shrink text-xs">
-                Version {version}
-              </p>
-              <div class="flex-grow border-t border-surface-300-600-token"></div>
-            </div>
-          </div>
-          {/snippet}
-      </Tooltip>
-
-      <button
-        aria-label="Open Menu"
-        class="btn-icon bg-secondary-hover-token"
-        title="Open Menu [.]"
-        onclick={() =>
-          modal.state.trigger({
-            type: 'component',
-            component: { ref: Menu, props: { page: 'main' } },
-          })}
+    <Tooltip
+      class="btn-icon bg-secondary-hover-token"
+      minWidth="265px"
+      title="Help"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke-width="1.5"
+        stroke="currentColor"
+        class="w-6 h-6 flex-shrink-0"
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke-width="1.5"
-          stroke="currentColor"
-          class="w-6 h-6"
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z"
+        />
+      </svg>
+      {#snippet tooltip()}
+        <div
+          class="p-2 flex flex-col gap-4"
+          aria-orientation="vertical"
+          aria-labelledby="menu-button"
+          tabindex="-1"
         >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z"
-          />
-        </svg>
-      </button>
-    
+          <button
+            class="btn variant-filled-secondary gap-1 items-center"
+            onclick={() =>
+              modal.state.trigger({
+                type: 'component',
+                component: { ref: GettingStarted },
+              })}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="size-6 relative bottom-[2px]"
+              viewBox="0 0 24 24"
+              ><path
+                fill="currentColor"
+                d="M20 11h3v2h-3zM1 11h3v2H1zM13 1v3h-2V1zM4.92 3.5l2.13 2.14l-1.42 1.41L3.5 4.93zm12.03 2.13l2.12-2.13l1.43 1.43l-2.13 2.12zM12 6a6 6 0 0 1 6 6c0 2.22-1.21 4.16-3 5.2V19a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1v-1.8c-1.79-1.04-3-2.98-3-5.2a6 6 0 0 1 6-6m2 15v1a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1v-1zm-3-3h2v-2.13c1.73-.44 3-2.01 3-3.87a4 4 0 0 0-4-4a4 4 0 0 0-4 4c0 1.86 1.27 3.43 3 3.87z"
+              /></svg
+            >
+
+            Getting Started</button
+          >
+          <!-- <div class="flex-grow border-t border-surface-300-600-token"></div> -->
+
+          <p>
+            <a
+              href="/faq"
+              rel="noopener noreferrer"
+              title="View Frequently Asked Questions"
+              class="link"
+            >
+              Frequently Asked Questions</a
+            >
+          </p>
+
+          <p>
+            <a
+              href="/blog/2024-02-09-how-to-plan-a-temperature-blanket"
+              rel="noopener noreferrer"
+              title="View Frequently Asked Questions"
+              class="link"
+            >
+              How to Plan a Temperature Blanket</a
+            >
+          </p>
+
+          <p>
+            <a href="/documentation" rel="noreferrer" class="link"
+              >Documentation</a
+            >
+          </p>
+
+          <p>
+            <a href="/changelog" rel="noreferrer" class="link"
+              >Changelog - What's New?</a
+            >
+          </p>
+
+          <div class="flex items-center gap-2">
+            <div class="flex-grow border-t border-surface-300-600-token"></div>
+
+            <p class="flex-shrink text-xs">
+              Version {version}
+            </p>
+            <div class="flex-grow border-t border-surface-300-600-token"></div>
+          </div>
+        </div>
+      {/snippet}
+    </Tooltip>
+
+    <button
+      aria-label="Open Menu"
+      class="btn-icon bg-secondary-hover-token"
+      title="Open Menu [.]"
+      onclick={() =>
+        modal.state.trigger({
+          type: 'component',
+          component: { ref: Menu, props: { page: 'main' } },
+        })}
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke-width="1.5"
+        stroke="currentColor"
+        class="w-6 h-6"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z"
+        />
+      </svg>
+    </button>
   {/snippet}
   {#snippet main()}
-  
-      <main
-        class="text-center mx-auto max-md:min-h-[calc(100svh-123px)] md:min-h-[calc(100svh-115px)] lg:min-h-[calc(100svh-131px)]"
+    <main
+      class="text-center mx-auto max-md:min-h-[calc(100svh-123px)] md:min-h-[calc(100svh-115px)] lg:min-h-[calc(100svh-131px)]"
+    >
+      <div
+        id="page-section-location"
+        class="scroll-mt-[58px]"
+        class:hidden={$pageSections[1].active === false}
       >
-        <div
-          id="page-section-location"
-          class="scroll-mt-[58px]"
-          class:hidden={$pageSections[1].active === false}
-        >
-          <div class="lg:rounded-container-token overflow-hidden lg:mb-4">
+        <div class="lg:rounded-container-token overflow-hidden lg:mb-4">
+          <div
+            class="flex flex-wrap justify-center items-center p-4 text-center bg-cover bg-no-repeat bg-center"
+            style="background-image:url('/images/layout/tb-cover-image-winter-trees-sunset.webp');"
+          >
             <div
-              class="flex flex-wrap justify-center items-center p-4 text-center bg-cover bg-no-repeat bg-center"
-              style="background-image:url('/images/layout/tb-cover-image-winter-trees-sunset.webp');"
+              class="max-w-screen-md w-full rounded-container-token bg-surface-50/85 dark:bg-surface-900/85 shadow px-4 py-4 inline-flex flex-col justify-center items-center gap-4"
             >
-              <div
-                class="max-w-screen-md w-full rounded-container-token bg-surface-50/85 dark:bg-surface-900/85 shadow px-4 py-4 inline-flex flex-col justify-center items-center gap-4"
-              >
-                <div class="flex flex-col gap-2">
-                  <h2 class="font-light text-lg uppercase tracking-widest">
-                    Weather Data + Art
-                  </h2>
-                  <p class="">
-                    Get historical weather data, choose yarn colors, and visualize
-                    your crochet or knitting project.
-                  </p>
+              <div class="flex flex-col gap-2">
+                <h2 class="font-light text-lg uppercase tracking-widest">
+                  Weather Data + Art
+                </h2>
+                <p class="">
+                  Get historical weather data, choose yarn colors, and visualize
+                  your crochet or knitting project.
+                </p>
 
-                  <div
-                    class="flex flex-col gap-x-4 gap-y-2 text-sm space-around justify-center items-center"
-                    data-sveltekit-preload-data="hover"
-                  >
-                    {#if isDesktop.current}
-                      <button
-                        class="btn variant-filled-secondary gap-1 items-center"
-                        onclick={() =>
-                          modal.state.trigger({
-                            type: 'component',
-                            component: { ref: GettingStarted },
-                          })}
+                <div
+                  class="flex flex-col gap-x-4 gap-y-2 text-sm space-around justify-center items-center"
+                  data-sveltekit-preload-data="hover"
+                >
+                  {#if isDesktop.current}
+                    <button
+                      class="btn variant-filled-secondary gap-1 items-center"
+                      onclick={() =>
+                        modal.state.trigger({
+                          type: 'component',
+                          component: { ref: GettingStarted },
+                        })}
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="size-5 relative bottom-[2px]"
+                        viewBox="0 0 24 24"
+                        ><path
+                          fill="currentColor"
+                          d="M20 11h3v2h-3zM1 11h3v2H1zM13 1v3h-2V1zM4.92 3.5l2.13 2.14l-1.42 1.41L3.5 4.93zm12.03 2.13l2.12-2.13l1.43 1.43l-2.13 2.12zM12 6a6 6 0 0 1 6 6c0 2.22-1.21 4.16-3 5.2V19a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1v-1.8c-1.79-1.04-3-2.98-3-5.2a6 6 0 0 1 6-6m2 15v1a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1v-1zm-3-3h2v-2.13c1.73-.44 3-2.01 3-3.87a4 4 0 0 0-4-4a4 4 0 0 0-4 4c0 1.86 1.27 3.43 3 3.87z"
+                        /></svg
                       >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          class="size-5 relative bottom-[2px]"
-                          viewBox="0 0 24 24"
-                          ><path
-                            fill="currentColor"
-                            d="M20 11h3v2h-3zM1 11h3v2H1zM13 1v3h-2V1zM4.92 3.5l2.13 2.14l-1.42 1.41L3.5 4.93zm12.03 2.13l2.12-2.13l1.43 1.43l-2.13 2.12zM12 6a6 6 0 0 1 6 6c0 2.22-1.21 4.16-3 5.2V19a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1v-1.8c-1.79-1.04-3-2.98-3-5.2a6 6 0 0 1 6-6m2 15v1a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1v-1zm-3-3h2v-2.13c1.73-.44 3-2.01 3-3.87a4 4 0 0 0-4-4a4 4 0 0 0-4 4c0 1.86 1.27 3.43 3 3.87z"
-                          /></svg
+
+                      Getting Started</button
+                    >
+                  {/if}
+                  <Drawer.Root bind:open={$openDrawerGettingStarted}>
+                    {#if !isDesktop.current}
+                      <Drawer.Trigger
+                        onclick={() => ($openDrawerGettingStarted = true)}
+                      >
+                        <button
+                          class="btn variant-filled-secondary gap-1 items-center"
                         >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="size-6 relative bottom-[2px]"
+                            viewBox="0 0 24 24"
+                            ><path
+                              fill="currentColor"
+                              d="M20 11h3v2h-3zM1 11h3v2H1zM13 1v3h-2V1zM4.92 3.5l2.13 2.14l-1.42 1.41L3.5 4.93zm12.03 2.13l2.12-2.13l1.43 1.43l-2.13 2.12zM12 6a6 6 0 0 1 6 6c0 2.22-1.21 4.16-3 5.2V19a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1v-1.8c-1.79-1.04-3-2.98-3-5.2a6 6 0 0 1 6-6m2 15v1a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1v-1zm-3-3h2v-2.13c1.73-.44 3-2.01 3-3.87a4 4 0 0 0-4-4a4 4 0 0 0-4 4c0 1.86 1.27 3.43 3 3.87z"
+                            /></svg
+                          >
 
-                        Getting Started</button
-                      >
+                          Getting Started</button
+                        >
+                      </Drawer.Trigger>
                     {/if}
-                    <Drawer.Root bind:open={$openDrawerGettingStarted}>
-                      {#if !isDesktop.current}
-                        <Drawer.Trigger
-                          onclick={() => ($openDrawerGettingStarted = true)}
-                        >
-                          <button
-                            class="btn variant-filled-secondary gap-1 items-center"
-                          >
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              class="size-6 relative bottom-[2px]"
-                              viewBox="0 0 24 24"
-                              ><path
-                                fill="currentColor"
-                                d="M20 11h3v2h-3zM1 11h3v2H1zM13 1v3h-2V1zM4.92 3.5l2.13 2.14l-1.42 1.41L3.5 4.93zm12.03 2.13l2.12-2.13l1.43 1.43l-2.13 2.12zM12 6a6 6 0 0 1 6 6c0 2.22-1.21 4.16-3 5.2V19a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1v-1.8c-1.79-1.04-3-2.98-3-5.2a6 6 0 0 1 6-6m2 15v1a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1v-1zm-3-3h2v-2.13c1.73-.44 3-2.01 3-3.87a4 4 0 0 0-4-4a4 4 0 0 0-4 4c0 1.86 1.27 3.43 3 3.87z"
-                              /></svg
-                            >
-
-                            Getting Started</button
-                          >
-                        </Drawer.Trigger>
-                      {/if}
-                      <Drawer.Portal>
-                        <Drawer.Overlay class="fixed inset-0 bg-black/40 z-40" />
-                        <Drawer.Content
-                          class="bg-surface-50-900-token text-token flex flex-col rounded-tl-container-token rounded-tr-container-token mt-24 fixed bottom-0 left-0 right-0 z-50"
+                    <Drawer.Portal>
+                      <Drawer.Overlay class="fixed inset-0 bg-black/40 z-40" />
+                      <Drawer.Content
+                        class="bg-surface-50-900-token text-token flex flex-col rounded-tl-container-token rounded-tr-container-token mt-24 fixed bottom-0 left-0 right-0 z-50"
+                      >
+                        <div
+                          class="rounded-tl-container-token rounded-tr-container-token overflow-auto"
                         >
                           <div
-                            class="rounded-tl-container-token rounded-tr-container-token overflow-auto"
-                          >
-                            <div
-                              class="mx-auto mt-4 w-12 h-1.5 flex-shrink-0 rounded-full mb-4 bg-surface-900-50-token"
-                            ></div>
-                            <div class="mx-auto text-center">
-                              <GettingStarted />
-                            </div>
+                            class="mx-auto mt-4 w-12 h-1.5 flex-shrink-0 rounded-full mb-4 bg-surface-900-50-token"
+                          ></div>
+                          <div class="mx-auto text-center">
+                            <GettingStarted />
                           </div>
-                        </Drawer.Content>
-                      </Drawer.Portal>
-                    </Drawer.Root>
-                    <a
-                      href="/blog/what-is-a-temperature-blanket"
-                      class="link whitespace-pre-wrap mt-2"
-                      rel="noreferrer"
-                    >
-                      What is a Temperature Blanket?</a
-                    >
-                    <!-- <a href="/gallery" class="btn variant-soft-surface text-token">View the Project Gallery</a> -->
-                  </div>
+                        </div>
+                      </Drawer.Content>
+                    </Drawer.Portal>
+                  </Drawer.Root>
+                  <a
+                    href="/blog/what-is-a-temperature-blanket"
+                    class="link whitespace-pre-wrap mt-2"
+                    rel="noreferrer"
+                  >
+                    What is a Temperature Blanket?</a
+                  >
+                  <!-- <a href="/gallery" class="btn variant-soft-surface text-token">View the Project Gallery</a> -->
                 </div>
               </div>
             </div>
           </div>
+        </div>
+        <Card>
+          {#snippet header()}
+            <SectionDetails sectionIndex={1} />
+          {/snippet}
+          {#snippet content()}
+            <Locations />
+          {/snippet}
+        </Card>
+        {#if !$pinAllSections && $weather}
+          <SectionNavigationButtons thisSectionIndex={1} />
+        {/if}
+      </div>
+
+      {#if $weather}
+        <div
+          id="page-section-weather-data"
+          class="lg:my-4 scroll-mt-[58px] w-full"
+          in:fade
+          class:hidden={$pageSections[2].active === false}
+        >
           <Card>
             {#snippet header()}
-                    <SectionDetails  sectionIndex={1} />
-                  {/snippet}
+              <SectionDetails sectionIndex={2} />
+            {/snippet}
             {#snippet content()}
-                    <Locations  />
-                  {/snippet}
+              <div class="max-w-[90vw] mx-auto">
+                <WeatherSection />
+              </div>
+            {/snippet}
           </Card>
           {#if !$pinAllSections && $weather}
-            <SectionNavigationButtons thisSectionIndex={1} />
+            <SectionNavigationButtons thisSectionIndex={2} />
           {/if}
         </div>
 
-        {#if $weather}
-          <div
-            id="page-section-weather-data"
-            class="lg:my-4 scroll-mt-[58px] w-full"
-            in:fade
-            class:hidden={$pageSections[2].active === false}
-          >
-            <Card>
-              {#snippet header()}
-                        <SectionDetails  sectionIndex={2} />
-                      {/snippet}
-              {#snippet content()}
-                        <div class="max-w-[90vw] mx-auto" >
-                  <WeatherSection />
+        <div
+          id="page-section-gauges"
+          class="lg:my-4 scroll-mt-[58px] w-full"
+          in:fade
+          class:hidden={$pageSections[3].active === false}
+        >
+          <Card>
+            {#snippet header()}
+              <SectionDetails sectionIndex={3} />
+            {/snippet}
+
+            {#snippet content()}
+              <Gauges />
+            {/snippet}
+          </Card>
+          {#if !$pinAllSections && $weather}
+            <SectionNavigationButtons thisSectionIndex={3} />
+          {/if}
+          <p class="max-lg:mx-2 text-center text-sm my-4">
+            Real yarn colors will look different than what's on the screen. Any
+            trademarked yarn or colorway details are owned by their respective
+            companies.
+          </p>
+          {#if $pinAllSections && $weather}
+            <div class="flex-grow border-t border-surface-300-600-token"></div>
+          {/if}
+        </div>
+
+        <div
+          id="page-section-preview"
+          in:fade
+          class="lg:my-4 scroll-mt-[58px] w-full"
+          class:hidden={$pageSections[4].active === false}
+        >
+          <Card>
+            {#snippet header()}
+              <SectionDetails sectionIndex={4} />
+            {/snippet}
+
+            {#snippet content()}
+              <div>
+                <div class="p-4 my-2">
+                  <p class="max-w-screen-md mx-auto mb-2">
+                    Is this web app worth a cup of coffee to you? Your support
+                    enables ongoing development, keeps the site ad-free, and
+                    helps make this service available to craftspeople all around
+                    the world. Thanks!
+                  </p>
+                  <DonateButton />
                 </div>
-                      {/snippet}
-            </Card>
-            {#if !$pinAllSections && $weather}
-              <SectionNavigationButtons thisSectionIndex={2} />
-            {/if}
-          </div>
 
-          <div
-            id="page-section-gauges"
-            class="lg:my-4 scroll-mt-[58px] w-full"
-            in:fade
-            class:hidden={$pageSections[3].active === false}
-          >
-            <Card>
-              {#snippet header()}
-                        <SectionDetails  sectionIndex={3} />
-                      {/snippet}
-
-              {#snippet content()}
-                        <Gauges  />
-                      {/snippet}
-            </Card>
-            {#if !$pinAllSections && $weather}
-              <SectionNavigationButtons thisSectionIndex={3} />
-            {/if}
-            <p class="max-lg:mx-2 text-center text-sm my-4">
-              Real yarn colors will look different than what's on the screen. Any
-              trademarked yarn or colorway details are owned by their respective
-              companies.
-            </p>
-            {#if $pinAllSections && $weather}
-              <div class="flex-grow border-t border-surface-300-600-token"></div>
-            {/if}
-          </div>
-
-          <div
-            id="page-section-preview"
-            in:fade
-            class="lg:my-4 scroll-mt-[58px] w-full"
-            class:hidden={$pageSections[4].active === false}
-          >
-            <Card>
-              {#snippet header()}
-                        <SectionDetails sectionIndex={4}  />
-                      {/snippet}
-
-              {#snippet content()}
-                        <div >
-                  <div class="p-4 my-2">
-                    <p class="max-w-screen-md mx-auto mb-2">
-                      Is this web app worth a cup of coffee to you? Your support
-                      enables ongoing development, keeps the site ad-free, and helps
-                      make this service available to craftspeople all around the
-                      world. Thanks!
-                    </p>
-                    <DonateButton />
-                  </div>
-
-                  {#key $weatherGrouping}
-                    <Previews />
-                  {/key}
-                </div>
-                      {/snippet}
-            </Card>
-            {#if !$pinAllSections && $weather}
-              <SectionNavigationButtons thisSectionIndex={4} />
-            {/if}
-            <p class="text-sm max-lg:mx-2 text-center my-4">
-              Real projects will look different than the preview. Patterns not
-              provided.
-            </p>
-          </div>
-        {/if}
-      </main>
-    
+                {#key $weatherGrouping}
+                  <Previews />
+                {/key}
+              </div>
+            {/snippet}
+          </Card>
+          {#if !$pinAllSections && $weather}
+            <SectionNavigationButtons thisSectionIndex={4} />
+          {/if}
+          <p class="text-sm max-lg:mx-2 text-center my-4">
+            Real projects will look different than the preview. Patterns not
+            provided.
+          </p>
+        </div>
+      {/if}
+    </main>
   {/snippet}
 
   {#snippet footer()}
-  
-      <Navigation />
-    
+    <Navigation />
   {/snippet}
 </AppShell>

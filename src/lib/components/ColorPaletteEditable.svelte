@@ -13,7 +13,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script context="module">
+<script module>
   export let hideTooltips = writable(false);
 </script>
 
@@ -24,28 +24,31 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { modal } from '$lib/stores';
   import type { Color } from '$lib/types';
   import { getTextColor } from '$lib/utils';
-  import { createEventDispatcher } from 'svelte';
   import { SOURCES, TRIGGERS, dndzone } from 'svelte-dnd-action';
   import { flip } from 'svelte/animate';
   import { writable } from 'svelte/store';
 
-  const dispatch = createEventDispatcher();
+  interface Props {
+    colors?: Color[];
+    schemeName?: string;
+    canUserEditColor?: boolean;
+    canUserDeleteColor?: boolean;
+    showSchemeName?: boolean;
+    roundedBottom?: boolean;
+    typeId?: string;
+    onChanged?: any;
+  }
 
-  export let colors: Color[] = [];
-  export let schemeName = 'Palette Preview';
-  export let canUserEditColor = true;
-  export let canUserDeleteColor = true;
-  export let showSchemeName = true;
-  export let roundedBottom = true;
-
-  $: sortableColors = colors.map((color, i) => {
-    color.id = i;
-    return color;
-  });
-
-  $: if (schemeName === 'Custom') schemeName = 'Color Palette';
-
-  $: $hideTooltips = !dragDisabled;
+  let {
+    colors = $bindable([{ id: 0 }]),
+    schemeName = 'Palette Preview',
+    canUserEditColor = true,
+    canUserDeleteColor = true,
+    showSchemeName = true,
+    roundedBottom = true,
+    typeId = 'palettePreview',
+    onChanged,
+  }: Props = $props();
 
   function onChangeColor({
     index,
@@ -68,37 +71,53 @@ If not, see <https://www.gnu.org/licenses/>. -->
       variant_href,
       affiliate_variant_href,
     };
-    colors = colors;
+    sortableColors = getSortableColors();
   }
   const flipDurationMs = 200;
-  let dragDisabled = true;
+
+  let dragDisabled = $state(false);
+
+  let sortableColors = $state(getSortableColors());
+
+  function getSortableColors() {
+    return colors.map((color, i) => {
+      color.id = i;
+      return color;
+    });
+  }
 
   function handleConsider(e) {
     const {
       items: newItems,
       info: { source, trigger },
     } = e.detail;
+
     sortableColors = newItems;
+
     // Ensure dragging is stopped on drag finish via keyboard
     if (source === SOURCES.KEYBOARD && trigger === TRIGGERS.DRAG_STOPPED) {
       dragDisabled = true;
     }
   }
+
   async function handleFinalize(e) {
     const {
       items: newItems,
       info: { source },
     } = e.detail;
+
     sortableColors = newItems;
-    colors = sortableColors.map((color) => {
-      delete color.id;
-      return { ...color };
-    });
+
+    // colors = sortableColors.map((color) => {
+    //   delete color.id;
+    //   return { ...color };
+    // });
+
     // Ensure dragging is stopped on drag finish via pointer (mouse, touch)
     if (source === SOURCES.POINTER) {
       dragDisabled = true;
     }
-    dispatch('changed');
+    onChanged();
   }
   function startDrag(e) {
     // preventing default to prevent lag on touch devices (because of the browser checking for screen scrolling)
@@ -109,10 +128,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
     if ((e.key === 'Enter' || e.key === ' ') && dragDisabled)
       dragDisabled = false;
   }
-  function transformDraggedElement(draggedEl, data, index) {
-    // draggedEl.style.minWidth = "24px";
-    // draggedEl.querySelector(".dragicon").style.display = "block";
-  }
+
+  // function transformDraggedElement(draggedEl, data, index) {
+  //   // draggedEl.style.minWidth = "24px";
+  //   // draggedEl.querySelector(".dragicon").style.display = "block";
+  // }
+
+  $effect(() => {
+    if (schemeName === 'Custom') schemeName = 'Color Palette';
+  });
+
+  $effect(() => {
+    $hideTooltips = !dragDisabled;
+  });
 </script>
 
 <div class="flex flex-col text-left gap-y-1 w-full">
@@ -122,12 +150,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
       items: sortableColors,
       dragDisabled,
       flipDurationMs,
-      type: 'palettePreview',
+      type: typeId,
       centreDraggedOnCursor: true,
-      transformDraggedElement,
+      dropFromOthersDisabled: true,
+      // transformDraggedElement,
     }}
-    on:consider={handleConsider}
-    on:finalize={handleFinalize}
+    onconsider={handleConsider}
+    onfinalize={handleFinalize}
   >
     {#each sortableColors as color, index (color.id)}
       {@const {
@@ -150,10 +179,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
       >
         <Tooltip
           tooltipStyle="background:{hex};"
-          tooltipClass=""
           tooltipBg=""
           fullWidth={true}
-          class="w-full h-[70px]"
+          classNames="w-full h-[70px]"
           minWidth="260px"
         >
           <div
@@ -195,74 +223,89 @@ If not, see <https://www.gnu.org/licenses/>. -->
               style="color:{getTextColor(hex)}; {dragDisabled
                 ? 'cursor: grab'
                 : 'cursor: grabbing'}"
-              on:mousedown={startDrag}
-              on:touchstart|passive={startDrag}
-              on:keydown={handleKeyDown}
-              on:keydown={handleKeyDown}
+              onmousedown={startDrag}
+              ontouchstart={startDrag}
+              onkeydown={handleKeyDown}
             >
               {@html ICONS.arrowsPointingOut}
             </div>
           </div>
 
-          <div
-            slot="tooltip"
-            style="background:{hex};color:{getTextColor(hex)}"
-            class="w-full rounded-container-token text-center break-all flex flex-wrap items-center justify-center gap-4 z-30"
-          >
-            {#if canUserDeleteColor && sortableColors.length > 1}
-              <button
-                on:click={() => {
-                  sortableColors.splice(index, 1);
-                  colors = sortableColors.map((color) => {
-                    delete color.id;
-                    return {
-                      ...color,
-                    };
-                  });
-                  dispatch('changed');
-                }}
-                class="btn-icon bg-secondary-hover-token"
-                >{@html ICONS.trash}</button
-              >
-            {/if}
-            {#if canUserEditColor}
-              <button
-                class="btn bg-secondary-hover-token flex items-center justify-start"
-                on:click={() =>
-                  modal.state.trigger({
-                    type: 'component',
-                    component: {
-                      ref: ChangeColor,
-                      props: {
-                        index,
-                        hex,
-                        name,
-                        brandId,
-                        yarnId,
-                        brandName,
-                        yarnName,
-                        variant_href,
-                        affiliate_variant_href,
-                        onChangeColor,
-                      },
-                    },
-                  })}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke-width="1.5"
-                  stroke="currentColor"
-                  class="w-6 h-6 flex-shrink-0"
+          {#snippet tooltip()}
+            <div
+              style="background:{hex};color:{getTextColor(hex)}"
+              class="w-full rounded-container-token text-center break-all flex flex-wrap items-center justify-center gap-4 z-30"
+            >
+              {#if canUserDeleteColor && sortableColors.length > 1}
+                <button
+                  onclick={() => {
+                    sortableColors.splice(index, 1);
+                    colors = sortableColors.map((color) => {
+                      delete color.id;
+                      return {
+                        ...color,
+                      };
+                    });
+                    onChanged();
+                  }}
+                  class="btn-icon bg-secondary-hover-token"
+                  >{@html ICONS.trash}</button
                 >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
-                  />
-                </svg>
-                <span
+              {/if}
+              {#if canUserEditColor}
+                <button
+                  class="btn bg-secondary-hover-token flex items-center justify-start"
+                  onclick={() =>
+                    modal.state.trigger({
+                      type: 'component',
+                      component: {
+                        ref: ChangeColor,
+                        props: {
+                          index,
+                          hex,
+                          name,
+                          brandId,
+                          yarnId,
+                          brandName,
+                          yarnName,
+                          variant_href,
+                          affiliate_variant_href,
+                          onChangeColor,
+                        },
+                      },
+                    })}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="currentColor"
+                    class="w-6 h-6 flex-shrink-0"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+                    />
+                  </svg>
+                  <span
+                    class="flex flex-col items-start justify-start text-left text-wrap"
+                  >
+                    <span class="text-xs">
+                      {#if brandName && yarnName}
+                        {brandName}
+                        -
+                        {yarnName}
+                      {:else}
+                        Find Matching Yarn
+                      {/if}
+                    </span>
+                    <span class="text-lg leading-tight"> {name || hex}</span>
+                  </span>
+                </button>
+              {:else}
+                <div
                   class="flex flex-col items-start justify-start text-left text-wrap"
                 >
                   <span class="text-xs">
@@ -270,70 +313,55 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       {brandName}
                       -
                       {yarnName}
-                    {:else}
-                      Find Matching Yarn
                     {/if}
                   </span>
-                  <span class="text-lg leading-tight"> {name || hex}</span>
-                </span>
-              </button>
-            {:else}
-              <div
-                class="flex flex-col items-start justify-start text-left text-wrap"
-              >
-                <span class="text-xs">
-                  {#if brandName && yarnName}
-                    {brandName}
-                    -
-                    {yarnName}
+                  <span class="text-lg leading-tight">
+                    {name || hex}
+                  </span>
+                </div>
+              {/if}
+              {#if typeof color.locked !== 'undefined'}
+                <button
+                  class="btn btn-icon"
+                  onclick={(e) => {
+                    e.preventDefault();
+                    color.locked = !color.locked;
+                    onChanged();
+                  }}
+                >
+                  {#if color.locked}
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                      class="w-6 h-6"
+                    >
+                      <path
+                        fill-rule="evenodd"
+                        d="M12 1.5a5.25 5.25 0 0 0-5.25 5.25v3a3 3 0 0 0-3 3v6.75a3 3 0 0 0 3 3h10.5a3 3 0 0 0 3-3v-6.75a3 3 0 0 0-3-3v-3c0-2.9-2.35-5.25-5.25-5.25Zm3.75 8.25v-3a3.75 3.75 0 1 0-7.5 0v3h7.5Z"
+                        clip-rule="evenodd"
+                      />
+                    </svg>
+                  {:else}
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="1.5"
+                      stroke="currentColor"
+                      class="w-6 h-6"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M13.5 10.5V6.75a4.5 4.5 0 1 1 9 0v3.75M3.75 21.75h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H3.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z"
+                      />
+                    </svg>
                   {/if}
-                </span>
-                <span class="text-lg leading-tight">
-                  {name || hex}
-                </span>
-              </div>
-            {/if}
-            {#if typeof color.locked !== 'undefined'}
-              <button
-                class="btn btn-icon"
-                on:click={(e) => {
-                  e.preventDefault();
-                  color.locked = !color.locked;
-                  dispatch('changed');
-                }}
-              >
-                {#if color.locked}
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                    class="w-6 h-6"
-                  >
-                    <path
-                      fill-rule="evenodd"
-                      d="M12 1.5a5.25 5.25 0 0 0-5.25 5.25v3a3 3 0 0 0-3 3v6.75a3 3 0 0 0 3 3h10.5a3 3 0 0 0 3-3v-6.75a3 3 0 0 0-3-3v-3c0-2.9-2.35-5.25-5.25-5.25Zm3.75 8.25v-3a3.75 3.75 0 1 0-7.5 0v3h7.5Z"
-                      clip-rule="evenodd"
-                    />
-                  </svg>
-                {:else}
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke-width="1.5"
-                    stroke="currentColor"
-                    class="w-6 h-6"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M13.5 10.5V6.75a4.5 4.5 0 1 1 9 0v3.75M3.75 21.75h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H3.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z"
-                    />
-                  </svg>
-                {/if}
-              </button>
-            {/if}
-          </div>
+                </button>
+              {/if}
+            </div>
+          {/snippet}
         </Tooltip>
       </div>
     {/each}

@@ -377,22 +377,24 @@ If not, see <https://www.gnu.org/licenses/>. -->
             />
           </svg>
         </div>
-        <div class="flex items-center gap-2 justify-center" slot="tooltip">
-          <button
-            class="btn bg-secondary-hover-token"
-            on:click={() => {
-              remove();
-              $weatherUngrouped = null;
-            }}
-            disabled={!!$isCustomWeather || $isProjectLoading}
-            title="Remove Location"
-          >
-            {@html ICONS.trash}
-            <p>
-              Remove Location {index + 1}
-            </p>
-          </button>
-        </div>
+        {#snippet tooltip()}
+          <div class="flex items-center gap-2 justify-center">
+            <button
+              class="btn bg-secondary-hover-token"
+              on:click={() => {
+                remove();
+                $weatherUngrouped = null;
+              }}
+              disabled={!!$isCustomWeather || $isProjectLoading}
+              title="Remove Location"
+            >
+              {@html ICONS.trash}
+              <p>
+                Remove Location {index + 1}
+              </p>
+            </button>
+          </div>
+        {/snippet}
       </Tooltip>
     </div>
   {/if}

@@ -173,7 +173,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {schemeName}
         showSchemeName={false}
         roundedBottom={false}
-        on:changed={() => {
+        onChanged={() => {
           key = Math.random();
         }}
       />

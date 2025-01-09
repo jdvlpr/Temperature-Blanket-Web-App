@@ -22,7 +22,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     gaugeAttributes,
     ranges = $bindable(),
     colors,
-    rangeOptions = $bindable()
+    rangeOptions = $bindable(),
   } = $props();
 
   function onSaveRangeOptinos(e) {
@@ -32,10 +32,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <Tooltip
-  class="btn variant-filled-primary font-bold text-xl gap-1 relative top-2 w-full sm:w-fit"
+  classNames="btn variant-filled-primary font-bold text-xl gap-1 relative top-2 w-full sm:w-fit"
   title="Configure Ranges"
   fullWidth={true}
-  on:click={() =>
+  onclick={() =>
     modal.state.trigger({
       type: 'component',
       component: {
@@ -67,7 +67,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   Configure Ranges
   {#snippet tooltip()}
-    <div >
+    <div>
       <p>Change the gauge direction, generate ranges, and more.</p>
     </div>
   {/snippet}

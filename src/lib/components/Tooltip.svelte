@@ -20,18 +20,49 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { writable } from 'svelte/store';
   import { scale } from 'svelte/transition';
 
-  export let placement = 'top';
-  export let minWidth = '110px';
-  export let disableTooltip = false;
-  export let fullWidth = false;
-  export let buttonDisabled = false;
-  export let tooltipClass = 'text-sm';
-  export let tooltipBg = 'bg-surface-200-700-token';
-  export let tooltipStyle = '';
+  interface Props {
+    placement?: string;
+    minWidth?: string;
+    disableTooltip?: boolean;
+    fullWidth?: boolean;
+    buttonDisabled?: boolean;
+    tooltipClass?: string;
+    tooltipBg?: string;
+    tooltipStyle?: string;
+    classNames?: string;
+    dataPinned?: boolean;
+    dataActive?: boolean;
+    dataNoWeather?: boolean;
+    title?: string;
+    id?: string;
+    onclick?: (event: MouseEvent) => void;
+    children?: import('svelte').Snippet;
+    tooltip?: import('svelte').Snippet;
+  }
+
+  let {
+    placement = 'top',
+    minWidth = '110px',
+    disableTooltip = false,
+    fullWidth = false,
+    buttonDisabled = false,
+    tooltipClass = 'text-sm',
+    tooltipBg = 'bg-surface-200-700-token',
+    tooltipStyle = '',
+    classNames = '',
+    dataPinned,
+    dataActive,
+    dataNoWeather,
+    title = '',
+    id = '',
+    onclick,
+    children,
+    tooltip,
+  }: Props = $props();
 
   const arrowRef = writable(null);
-  let showTooltip: boolean = false;
-  let isTooltipActive = false;
+  let showTooltip: boolean = $state(false);
+  let isTooltipActive = $state(false);
 
   let debounceTimer;
   const debounce = (callback, time) => {
@@ -99,39 +130,61 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <div
       role="button"
       tabindex="0"
-      on:mouseenter={() => {
+      onmouseenter={() => {
         debounce(() => (showTooltip = true), 50);
       }}
-      on:mouseleave={handelLeaveEvent}
-      on:focus={() => {
+      onmouseleave={handelLeaveEvent}
+      onfocus={() => {
         debounce(() => (showTooltip = true), 50);
       }}
-      on:blur={handelLeaveEvent}
+      onblur={handelLeaveEvent}
       use:floatingRef
     >
-      <button on:click {...$$props} disabled>
-        <slot />
+      <button
+        {onclick}
+        disabled
+        class={classNames}
+        data-pinned={dataPinned}
+        data-active={dataActive}
+        data-no-weather={dataNoWeather}
+        {title}
+        {id}
+      >
+        {@render children?.()}
       </button>
     </div>
   {:else if !disableTooltip}
     <button
-      on:click
-      {...$$props}
-      on:mouseenter={() => {
+      {onclick}
+      class={classNames}
+      data-pinned={dataPinned}
+      data-active={dataActive}
+      data-no-weather={dataNoWeather}
+      {title}
+      {id}
+      onmouseenter={() => {
         debounce(() => (showTooltip = true), 50);
       }}
-      on:mouseleave={handelLeaveEvent}
-      on:focus={() => {
+      onmouseleave={handelLeaveEvent}
+      onfocus={() => {
         debounce(() => (showTooltip = true), 50);
       }}
-      on:blur={handelLeaveEvent}
+      onblur={handelLeaveEvent}
       use:floatingRef
     >
-      <slot />
+      {@render children?.()}
     </button>
   {:else}
-    <button on:click {...$$props}>
-      <slot />
+    <button
+      {onclick}
+      class={classNames}
+      data-pinned={dataPinned}
+      data-active={dataActive}
+      data-no-weather={dataNoWeather}
+      {title}
+      {id}
+    >
+      {@render children?.()}
     </button>
   {/if}
 </div>
@@ -144,13 +197,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
     class="absolute shadow-lg text-token cursor-text z-40 rounded-container-token"
     style="min-width:{minWidth}"
     use:floatingContent
-    on:mouseenter={() => (isTooltipActive = true)}
-    on:mouseleave={(event) => {
+    onmouseenter={() => (isTooltipActive = true)}
+    onmouseleave={(event) => {
       isTooltipActive = false;
       handelLeaveEvent(event);
     }}
-    on:focus={() => (isTooltipActive = true)}
-    on:blur={(event) => {
+    onfocus={() => (isTooltipActive = true)}
+    onblur={(event) => {
       isTooltipActive = false;
       handelLeaveEvent(event);
     }}
@@ -159,7 +212,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       class="p-2 rounded-container-token {tooltipBg} {tooltipClass}"
       style={tooltipStyle}
     >
-      <slot name="tooltip" />
+      {@render tooltip?.()}
     </div>
     <div
       style="position:absolute; {tooltipStyle}"

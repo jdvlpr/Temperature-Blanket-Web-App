@@ -34,7 +34,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     secondaryTargets = $bindable(),
     primaryTargetAsBackup = $bindable(),
     onOkay,
-    parent
+    parent,
   } = $props();
 
   const modalStore = getModalStore();
@@ -47,8 +47,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     snow: '#94a3b8',
     dayt: '#facc15',
   };
-
-
 
   function reset() {
     secondaryTargets = [];
@@ -88,8 +86,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     });
     modalStore.close();
   }
-  let secondaryTargetIndexes = $derived(getSecondaryTargetIndexes(secondaryTargets));
-  let squares = $derived(createSquares(squareSize, secondaryTargetIndexes, primaryTarget));
+  let secondaryTargetIndexes = $derived(
+    getSecondaryTargetIndexes(secondaryTargets),
+  );
+  let squares = $derived(
+    createSquares(squareSize, secondaryTargetIndexes, primaryTarget),
+  );
   let maxGridItemWidth = $derived(displayNumber((1 / squareSize) * 800));
 </script>
 
@@ -98,7 +100,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <p class="italic my-2 text-center">
       Each sqaure in your layout will use the following properties.
     </p>
-  
+
     <div class="flex flex-col gap-4 justify-center items-center">
       <div class="flex flex-wrap gap-4 justify-center w-full">
         <label class="label">
@@ -113,7 +115,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             {/each}
           </select>
         </label>
-  
+
         <label class="label">
           <span>Primary (Background) Color Using the Day's</span>
           <select
@@ -127,12 +129,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </select>
         </label>
       </div>
-  
+
       <p class="italic">
         Tap the sections below to use a secondary color for that part of each
         square.
       </p>
-  
+
       <div
         class="grid gap-1 max-w-[500px] max-h-[500px] aspect-square my-2"
         style="grid-template-columns:repeat({squareSize},minmax(1rem,{maxGridItemWidth}px));"
@@ -171,8 +173,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {/each}
         {/key}
       </div>
-  
-      <Tooltip on:click={reset} class="btn bg-secondary-hover-token gap-2">
+
+      <Tooltip onclick={reset} classNames="btn bg-secondary-hover-token gap-2">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
@@ -189,13 +191,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </svg>
         Reset Sections
         {#snippet tooltip()}
-                <p >
-            All square sections will be reset to the primary color.
-          </p>
-              {/snippet}
+          <p>All square sections will be reset to the primary color.</p>
+        {/snippet}
       </Tooltip>
     </div>
-  
+
     <div
       class="flex flex-col gap-2 justify-start items-start bg-surface-100-800-token rounde-container-token p-4 mt-2 mx-auto w-fit"
     >

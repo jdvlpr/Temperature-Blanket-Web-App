@@ -189,7 +189,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/if}
 </svelte:head>
 
-<Toast max={3} position="b" />
+<Toast max={3} position="b" zIndex={'z-[1100]'} />
 
 <Modal regionBackdrop="backdrop-blur-sm" />
 

@@ -31,11 +31,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
             disableTooltip={!!$weather || index === 1}
             fullWidth={true}
             buttonDisabled={!$weather && index !== 1}
-            on:click={() => goToProjectSection(index)}
-            data-pinned={pinned}
-            data-active={active}
-            data-no-weather={!$weather}
-            class={`
+            onclick={() => goToProjectSection(index)}
+            dataPinned={pinned}
+            dataActive={active}
+            dataNoWeather={!$weather}
+            classNames={`
                                 flex flex-col justify-center items-center disabled:opacity-30 p-2 pb-4 md:pb-2 w-full
                                 text-token
                                 data-[active=false]:data-[no-weather=true]:opacity-50 

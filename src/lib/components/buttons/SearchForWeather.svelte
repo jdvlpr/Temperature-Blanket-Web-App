@@ -53,7 +53,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     title="Search for Weather Data"
     id="location-action-button"
     fullWidth={true}
-    class="btn variant-filled-primary text-2xl font-bold w-full sm:w-fit"
+    classNames="btn variant-filled-primary text-2xl font-bold w-full sm:w-fit"
   >
     {#if !!$isCustomWeather}
       Reload Weather Data

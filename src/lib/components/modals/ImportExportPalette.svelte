@@ -25,16 +25,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
     getColorsFromInput,
     pluralize,
   } from '$lib/utils';
-  import { getToastStore } from '@skeletonlabs/skeleton';
+  import { getModalStore, getToastStore } from '@skeletonlabs/skeleton';
   import { getContext, hasContext } from 'svelte';
   import { slide } from 'svelte/transition';
+  import ModalShell from './ModalShell.svelte';
 
-  export let colors, updateGauge;
+  export let colors, updateGauge, parent;
 
   const toastStore = getToastStore();
 
-  let close = null;
-  if (hasContext('simple-modal')) close = getContext('simple-modal')?.close;
+  const modalStore = getModalStore();
 
   $: palette = colors.map((n) => n?.hex);
 
@@ -98,7 +98,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 </script>
 
-<div class="p-2 sm:p-4 mt-8">
+<ModalShell {parent}>
   <div class="flex flex-col text-left gap-1">
     <label for="palette-code" class="text-small"
       >Enter colors or palette code</label
@@ -201,11 +201,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <SaveAndCloseButtons
       onSave={() => {
         updateGauge({ _colors: colors });
-        if (close) close();
+        modalStore.close();
       }}
       disabled={!palette}
       onClose={() => {
-        if (close) close();
+        modalStore.close();
       }}
     />
   </div>
@@ -319,5 +319,5 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
   {/if}
 
-  <p class="font-ornament text-4xl my-8">I</p>
-</div>
+  <p class="font-ornament text-4xl my-8 text-center">I</p>
+</ModalShell>

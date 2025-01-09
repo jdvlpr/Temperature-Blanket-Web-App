@@ -18,11 +18,23 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { getTextColor } from '$lib/utils';
   import { fade } from 'svelte/transition';
 
-  export let colors;
-  export let schemeName = 'Palette Preview';
-  export let height = '70px';
+  /**
+   * @typedef {Object} Props
+   * @property {any} colors
+   * @property {string} [schemeName]
+   * @property {string} [height]
+   */
 
-  $: if (schemeName === 'Custom') schemeName = 'Color Palette';
+  /** @type {Props} */
+  let {
+    colors,
+    schemeName = $bindable('Palette Preview'),
+    height = '70px',
+  } = $props();
+
+  $effect(() => {
+    if (schemeName === 'Custom') schemeName = 'Color Palette';
+  });
 </script>
 
 <div class="flex flex-col text-left gap-y-1 w-full">
@@ -40,7 +52,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             tooltipClass=""
             tooltipBg=""
             fullWidth={true}
-            class="w-full h-full"
+            classNames="w-full h-full"
             minWidth="260px"
           >
             <div
@@ -50,31 +62,29 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 ? `${brandName} - ${yarnName}: ${name}`
                 : hex}
             ></div>
-            <div
-              slot="tooltip"
-              style="background:{hex}"
-              class="p-2 rounded-container-token"
-            >
-              <div
-                class="flex flex-col justify-center items-center text-wrap text-center"
-                style="color:{getTextColor(hex)}"
-              >
-                {#if brandName && yarnName && name}
-                  <p class="text-xs">
-                    {brandName}
-                    -
-                    {yarnName}
-                  </p>
-                  <p class="text-lg leading-tight">
-                    {name}
-                  </p>
-                {:else}
-                  <p class="text-lg">
-                    {hex}
-                  </p>
-                {/if}
+            {#snippet tooltip()}
+              <div style="background:{hex}" class="p-2 rounded-container-token">
+                <div
+                  class="flex flex-col justify-center items-center text-wrap text-center"
+                  style="color:{getTextColor(hex)}"
+                >
+                  {#if brandName && yarnName && name}
+                    <p class="text-xs">
+                      {brandName}
+                      -
+                      {yarnName}
+                    </p>
+                    <p class="text-lg leading-tight">
+                      {name}
+                    </p>
+                  {:else}
+                    <p class="text-lg">
+                      {hex}
+                    </p>
+                  {/if}
+                </div>
               </div>
-            </div>
+            {/snippet}
           </Tooltip>
         {/key}
       {/each}
