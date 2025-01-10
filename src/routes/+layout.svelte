@@ -191,11 +191,25 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <Modal regionBackdrop="backdrop-blur-sm" />
 
-<p class="text-center p-4 bg-warning-backdrop-token text-token">
-  You are viewing an experimental version. For the stable release, visit <a
-    href="https://temperature-blanket.com"
-    class="link"
-    target="_blank">temperature-blanket.com</a
+<p class="sm:text-center px-4 py-8 bg-warning-backdrop-token text-token">
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    fill="none"
+    viewBox="0 0 24 24"
+    stroke-width="1.5"
+    stroke="currentColor"
+    class="size-5 inline-block relative -top-[1px]"
+  >
+    <path
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z"
+    />
+  </svg>
+  This version is for testing purposes and some features may be broken. For the stable
+  website, visit
+  <a href="https://temperature-blanket.com" class="link" target="_blank"
+    >temperature-blanket.com</a
   >.
 </p>
 {@render children?.()}

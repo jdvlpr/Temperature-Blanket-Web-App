@@ -14,8 +14,6 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { run } from 'svelte/legacy';
-
   import { browser } from '$app/environment';
   import Spinner from '$lib/components/Spinner.svelte';
   import UnitChanger from '$lib/components/UnitChanger.svelte';
@@ -42,12 +40,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     locations,
     modal,
     showNavigationSideBar,
-    weatherParametersData,
     units,
     weather,
     weatherGroupedByWeek,
     weatherGrouping,
     weatherMonthGroupingStartDay,
+    weatherParametersData,
     weatherParametersInView,
     weatherUngrouped,
   } from '$lib/stores';
@@ -169,9 +167,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     $activeWeatherElementIndex = index;
     $weatherChart.update();
   }
-  run(() => {
+
+  $effect(() => {
     if ($activeWeatherElementIndex) triggerHover($activeWeatherElementIndex);
   });
+
   let missingTmin = $derived(
     weatherParametersData.tmin.filter((n) => n === null),
   );
