@@ -89,7 +89,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <div class="text-left">
   <ToggleSwitchGroup
-    groupLabel={`Color Using the ${capitalizeFirstLetter($weatherGrouping)}'s`}
+    groupLabel={`Color Using the ${capitalizeFirstLetter(weatherGrouping.value)}'s`}
     {targets}
     bind:value={$settings.selectedTargets}
   />

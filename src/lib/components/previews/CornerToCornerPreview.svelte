@@ -103,7 +103,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let sections = [];
 
-  $: if ($projectStatus.liveURL) {
+  $: if (projectStatus.state.liveURL) {
     let row = 0,
       x = 0,
       y = 0,
@@ -111,13 +111,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
     sections = [];
     for (
       let x = width - STITCH_SIZE, y = height - STITCH_SIZE;
-      dayIndex < $weather?.length;
+      dayIndex < weather.data?.length;
       dayIndex++
     ) {
       let section = [];
-      let day = $weather[dayIndex];
+      let day = weather.data[dayIndex];
       let target = $settings.selectedTarget;
-      let value = day[target][$units];
+      let value = day[target][units.value];
       let gaugeId = getTargetParentGaugeId(target);
       let color = getColorInfo(gaugeId, value).hex;
       for (

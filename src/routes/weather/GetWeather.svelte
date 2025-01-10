@@ -32,13 +32,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
         date1: new Date(),
         date2: new Date(location.update_time),
       });
-      if (needsUpdate || location.units !== get(units)) {
+      if (needsUpdate || location.units !== units.value) {
         try {
           const data = await getOpenMeteoForecast({ location });
           location.source = 'Open-Meteo';
           // savedLocation.current_weather = data.current_weather;
           location.update_time = new Date().toUTCString();
-          location.units = get(units);
+          location.units = units.value;
           location.data = data;
         } catch (error) {
           throw error;
@@ -62,7 +62,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     let windspeedUnit = 'kmh';
     let precipitationUnit = 'mm';
 
-    if (get(units) === 'imperial') {
+    if (units.value === 'imperial') {
       temperatureUnit = 'fahrenheit';
       windspeedUnit = 'mph';
       precipitationUnit = 'inch';

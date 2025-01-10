@@ -17,10 +17,6 @@ import type { Writable } from 'svelte/store';
 
 export type Unit = 'imperial' | 'metric';
 
-export interface UnitStore extends Writable<Unit> {
-  toggle: () => void;
-}
-
 /* In the project URL hash, this is '0' for 'Meteostat' or '1' for 'Open-Meteo' */
 export type WeatherSource = 'Open-Meteo' | 'Meteostat';
 

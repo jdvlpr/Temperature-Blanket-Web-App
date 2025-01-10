@@ -91,14 +91,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
   $: if ($createdGauges)
     $settings.selectedTarget = setTargets($settings.selectedTarget);
 
-  $: months = weatherMonthsData({ weatherData: $weather });
+  $: months = weatherMonthsData({ weatherData: weather.data });
 
   $: factors = getFactors({ length: months.length });
 
   $: possibleDimensions = getPossibleDimensions({ factors });
 
   // If a new weather search happens, and the current dimensions are not possible, set new dimensions
-  $: if ($weather && !possibleDimensions.includes($settings.dimensions))
+  $: if (weather.data && !possibleDimensions.includes($settings.dimensions))
     $settings.dimensions = getMiddleValueOfArray(possibleDimensions);
 </script>
 
@@ -129,7 +129,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </label>
 
 <label class="label">
-  <span>Color Using the {capitalizeFirstLetter($weatherGrouping)}'s</span>
+  <span>Color Using the {capitalizeFirstLetter(weatherGrouping.value)}'s</span>
   <select
     class="select w-fit"
     id="msqs-param"

@@ -49,8 +49,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   );
 
   function getTotalStitches(target, perRow, perDay) {
-    if (target === 'none') return perRow * $weather?.length;
-    if (target === 'custom') return perDay * $weather?.length;
+    if (target === 'none') return perRow * weather.data?.length;
+    if (target === 'custom') return perDay * weather.data?.length;
     return sum(target);
   }
 
@@ -72,7 +72,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   function getSectionStitchesCount(dayIndex: number) {
     if ($settings.lengthTarget === 'none') return $settings.stitchesPerRow;
     if ($settings.lengthTarget === 'custom') return $settings.stitchesPerDay;
-    let value = Math.abs($weather[dayIndex][$settings.lengthTarget][$units]);
+    let value = Math.abs(
+      weather.data[dayIndex][$settings.lengthTarget][units.value],
+    );
     if (isNaN(value)) value = $settings.stitchesPerDay;
     if (value === 0) value = 1;
     return value;
@@ -87,23 +89,25 @@ If not, see <https://www.gnu.org/licenses/>. -->
    * @param {number} countOfAdditionalStitches - The count of additional stitches needed.
    * @param {Array} activeParams - The selected target parameters.
    * @param {number} width - The width of the preview.
-   * @param {Array} $weather - The weather data.
+   * @param {Array} weather - The weather data.
    * @param {Array} $settings - The settings data.
    */
-  $: if ($projectStatus.liveURL) {
+  $: if (projectStatus.state.liveURL) {
     // Setup constants
     const stitchSize = STITCH_SIZE; // Size of each stitch
     const additionalStitchesColor = $settings.extrasColor; // Color for additional stitches section
     const additionalLengthNeeded = countOfAdditionalStitches; // Count of additional stitches needed
     const activeParams = $settings.selectedTargets; // Selected target parameters
     const totalSections =
-      countOfAdditionalStitches > 0 ? $weather?.length + 1 : $weather?.length; // Total number of sections
+      countOfAdditionalStitches > 0
+        ? weather.data?.length + 1
+        : weather.data?.length; // Total number of sections
     let columnIndex = 0; // Current column index
     let stitchYRow = 0; // Current row position
     let isWeatherSection: boolean; // Flag indicating if it's a weather section
     let lineWidth: number; // Width of the current line
     let remainderLineCount: number; // Count of remaining stitches in the line
-    const daysCount = $weather?.length; // Total number of days in the weather data
+    const daysCount = weather.data?.length; // Total number of days in the weather data
     sections = []; // Array to store the generated sections
 
     // Loop through each section
@@ -167,7 +171,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           if (isWeatherSection) {
             // If it's a weather section, determine the color based on the weather value and gauge ID
             let param = activeParams[paramIndex];
-            let value = $weather[dayIndex][param][$units];
+            let value = weather.data[dayIndex][param][units.value];
             let gaugeId = getTargetParentGaugeId(param);
             color = getColorInfo(gaugeId, value).hex;
           } else {

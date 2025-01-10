@@ -16,12 +16,27 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import RecentWeatherDataTooltip from '$lib/components/RecentWeatherDataTooltip.svelte';
 
-  export let id;
-  export let icon;
-  export let label;
-  export let value;
-  export let units: string | undefined = undefined;
-  export let isRecentDate = false;
+  interface Props {
+    id: any;
+    icon: any;
+    label: any;
+    value: any;
+    units?: string | undefined;
+    isRecentDate?: boolean;
+    button?: import('svelte').Snippet;
+    details?: import('svelte').Snippet;
+  }
+
+  let {
+    id,
+    icon,
+    label,
+    value,
+    units = undefined,
+    isRecentDate = false,
+    button,
+    details,
+  }: Props = $props();
 
   // Colors from tailwind.config.js
   const colors = {
@@ -50,6 +65,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {/if}
   </div>
   <span class="text-sm ml-1">{label}</span>
-  <slot name="button" />
-  <slot name="details" />
+  {@render button?.()}
+  {@render details?.()}
 </span>

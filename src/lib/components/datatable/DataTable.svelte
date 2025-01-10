@@ -57,9 +57,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
       $sorted.identifier === null
     ) {
       if ($sorted.direction === 'asc' || $sorted.direction === null)
-        from = `(${dateToISO8601String($weather[page * $rowsPerPage - $rowsPerPage].date)})`;
+        from = `(${dateToISO8601String(weather.data[page * $rowsPerPage - $rowsPerPage].date)})`;
       else
-        from = `(${dateToISO8601String($weather[$weather?.length - 1 - (page * $rowsPerPage - $rowsPerPage)].date)})`;
+        from = `(${dateToISO8601String(weather.data[weather.data?.length - 1 - (page * $rowsPerPage - $rowsPerPage)].date)})`;
     }
     return from;
   }
@@ -75,9 +75,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <p class="text-sm">
       {#if $rowCount.total > 0}
         Showing {$rowCount.start} to {$rowCount.end} of {$rowCount.total}
-        {$weatherGrouping}s
+        {weatherGrouping.value}s
       {:else}
-        No {$weatherGrouping}s found
+        No {weatherGrouping.value}s found
       {/if}
     </p>
     <div class="flex flex-wrap gap-4 items-end justify-center">

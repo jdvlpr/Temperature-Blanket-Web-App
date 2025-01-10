@@ -70,7 +70,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </span>
           <span>
             {daysInRange.length}
-            {pluralize($weatherGrouping, daysInRange.length)} ({getDaysPercent(
+            {pluralize(weatherGrouping.value, daysInRange.length)} ({getDaysPercent(
               daysInRange.length,
             )}%)
           </span>
@@ -84,7 +84,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </span>
         <span>
           {daysInRange.length}
-          {pluralize($weatherGrouping, daysInRange.length)} ({getDaysPercent(
+          {pluralize(weatherGrouping.value, daysInRange.length)} ({getDaysPercent(
             daysInRange.length,
           )}%)
         </span>

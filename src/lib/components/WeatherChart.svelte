@@ -21,12 +21,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import {
-    dayt,
-    prcp,
-    snow,
-    tavg,
-    tmax,
-    tmin,
+    weatherParametersData,
     units,
     weather,
     weatherParametersInView,
@@ -72,7 +67,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {
         label: 'High Temperature',
         id: 'tmax',
-        data: $tmax,
+        data: weatherParametersData.tmax,
         borderColor: '#f8717170',
         pointHoverBorderColor: '#f8717120',
         pointBorderColor: '#f87171',
@@ -83,7 +78,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {
         label: 'Average Temperature',
         id: 'tavg',
-        data: $tavg,
+        data: weatherParametersData.tavg,
         borderColor: '#a3a3a370',
         pointHoverBorderColor: '#a3a3a320',
         pointBorderColor: '#a3a3a3',
@@ -94,7 +89,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {
         label: 'Low Temperature',
         id: 'tmin',
-        data: $tmin,
+        data: weatherParametersData.tmin,
         borderColor: '#38bdf870',
         pointHoverBorderColor: '#38bdf820',
         pointBorderColor: '#38bdf8',
@@ -105,7 +100,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {
         label: 'Rain',
         id: 'prcp',
-        data: $prcp,
+        data: weatherParametersData.prcp,
         borderColor: '#818cf870',
         pointHoverBorderColor: '#818cf820',
         pointBorderColor: '#818cf8',
@@ -117,7 +112,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {
         label: 'Snow',
         id: 'snow',
-        data: $snow,
+        data: weatherParametersData.snow,
         borderColor: '#94a3b870',
         pointHoverBorderColor: '#94a3b820',
         pointBorderColor: '#94a3b8',
@@ -129,7 +124,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {
         label: 'Daytime',
         id: 'dayt',
-        data: $dayt,
+        data: weatherParametersData.dayt,
         fill: {
           target: 'origin',
           above: 'rgba(255, 203, 71, 0.03)', // Why above and not below?
@@ -204,7 +199,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
             },
             title: {
               text:
-                $units === 'metric' ? 'Degrees Celsius' : 'Degrees Fahrenheit',
+                units.value === 'metric'
+                  ? 'Degrees Celsius'
+                  : 'Degrees Fahrenheit',
               display: true,
               color: '#94a3b8',
             },
@@ -222,7 +219,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             },
             title: {
               text:
-                $units === 'metric'
+                units.value === 'metric'
                   ? 'Millimeters / Minutes'
                   : 'Inches / Hours',
               display: true,
@@ -238,7 +235,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     setView();
   });
 
-  const labels = $weather?.map((day) => day.date?.toLocaleDateString());
+  const labels = weather.data?.map((day) => day.date?.toLocaleDateString());
 
   let ctx;
 
@@ -256,8 +253,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   function onHover(e) {
     let value = $weatherChart.scales.x.getValueForPixel(e.x);
     if (value < 0) $activeWeatherElementIndex = 0;
-    else if (value > $weather?.length - 1)
-      $activeWeatherElementIndex = $weather?.length - 1;
+    else if (value > weather.data?.length - 1)
+      $activeWeatherElementIndex = weather.data?.length - 1;
     else $activeWeatherElementIndex = value;
   }
 </script>

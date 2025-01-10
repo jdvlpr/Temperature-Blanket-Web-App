@@ -66,17 +66,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   onMount(async () => {
     // units
     const paramUnits = page.url.searchParams.get('u');
-    if (paramUnits === 'i') $units = 'imperial';
-    else if (paramUnits === 'm') $units = 'metric';
+    if (paramUnits === 'i') units.value = 'imperial';
+    else if (paramUnits === 'm') units.value = 'metric';
     else if (localStorage.getItem('[/weather]units'))
-      $units = localStorage.getItem('[/weather]units');
+      units.value = localStorage.getItem('[/weather]units');
     else setUnitsFromNavigator();
-    units.subscribe(async (value) => {
-      localStorage.setItem('[/weather]units', value);
-      // page.url.searchParams.set("u", value === "metric" ? "m" : "i");
-      // if (isMounted) window.history.replaceState({ path: page.url.href }, "", page.url.href);
-      if ($locations?.some((item) => item.units !== $units)) await fetchData();
-    });
 
     // hour12
     const hourFormat = page.url.searchParams.get('h');
@@ -84,7 +78,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     else if (hourFormat === '1') $hour = '24';
     else if (localStorage.getItem('[/weather]hour_format'))
       $hour = localStorage.getItem('[/weather]hour_format');
-    else $hour = $units === 'metric' ? '24' : '12';
+    else $hour = units.value === 'metric' ? '24' : '12';
     hour.subscribe(async (value) => {
       localStorage.setItem('[/weather]hour_format', value);
       // page.url.searchParams.set("h", value === "12" ? "0" : "1");
@@ -114,7 +108,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         // if ($locations.find((item) => item.id === value)?.saved) page.url.searchParams.set("id", value);
         // page.url.searchParams.set("id", value);
         // page.url.searchParams.set("h", $hour === "12" ? "0" : "1");
-        // page.url.searchParams.set("u", $units === "metric" ? "m" : "i");
+        // page.url.searchParams.set("u", units.value === "metric" ? "m" : "i");
         // window.history.replaceState({ path: page.url.href }, "", page.url.href);
       } else {
         // window.history.replaceState({ path: page.url.href }, "", page.url.href);
@@ -263,13 +257,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   $effect(() => {
     $activeLocationID;
-    $units;
+    units.value;
     $hour;
     getShareableURL({
       id: $activeLocationID,
-      units: $units,
+      units: units.value,
       hourFormat: $hour,
     });
+  });
+
+  $effect(async () => {
+    localStorage.setItem('[/weather]units', units.value);
+    // page.url.searchParams.set("u", value === "metric" ? "m" : "i");
+    // if (isMounted) window.history.replaceState({ path: page.url.href }, "", page.url.href);
+    if ($locations?.some((item) => item.units !== units.value))
+      await fetchData();
   });
 </script>
 
@@ -423,7 +425,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                             );
                             page.url.searchParams.set(
                               'u',
-                              $units === 'metric' ? 'm' : 'i',
+                              units.value === 'metric' ? 'm' : 'i',
                             );
                             // window.history.replaceState(
                             //     { path: page.url.href },

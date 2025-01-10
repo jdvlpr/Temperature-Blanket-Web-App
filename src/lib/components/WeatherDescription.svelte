@@ -17,8 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import {
     defaultWeatherSource,
     locations,
-    prcp,
-    snow,
+    weatherParametersData,
     weatherParametersInView,
   } from '$lib/stores';
   import { exists, pluralize } from '$lib/utils';
@@ -32,9 +31,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
       (n) => n.source === $defaultWeatherSource,
     );
 
-    if ($prcp.every((n) => n === null)) $weatherParametersInView.prcp = false;
+    if (weatherParametersData.prcp.every((n) => n === null))
+      $weatherParametersInView.prcp = false;
     else $weatherParametersInView.prcp = true;
-    if ($snow.every((n) => n === null)) $weatherParametersInView.snow = false;
+    if (weatherParametersData.snow.every((n) => n === null))
+      $weatherParametersInView.snow = false;
     else $weatherParametersInView.snow = true;
     $weatherParametersInView = $weatherParametersInView;
   });

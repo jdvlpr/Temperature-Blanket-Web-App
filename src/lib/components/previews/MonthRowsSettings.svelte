@@ -124,14 +124,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
   $: if ($createdGauges)
     $settings.selectedTargets = setTargets($settings.selectedTargets);
 
-  $: months = weatherMonthsData({ weatherData: $weather });
+  $: months = weatherMonthsData({ weatherData: weather.data });
 
   $: factors = getFactors({ length: months.length });
 
   $: possibleDimensions = getPossibleDimensions({ factors });
 
   // If a new weather search happens, and the current dimensions are not possible, set new dimensions
-  $: if ($weather && !possibleDimensions.includes($settings.dimensions))
+  $: if (weather.data && !possibleDimensions.includes($settings.dimensions))
     $settings.dimensions = getMiddleValueOfArray(possibleDimensions);
 </script>
 
@@ -180,7 +180,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <div class="text-left">
   <ToggleSwitchGroup
-    groupLabel={`Color Using the ${capitalizeFirstLetter($weatherGrouping)}'s`}
+    groupLabel={`Color Using the ${capitalizeFirstLetter(weatherGrouping.value)}'s`}
     {targets}
     bind:value={$settings.selectedTargets}
   />

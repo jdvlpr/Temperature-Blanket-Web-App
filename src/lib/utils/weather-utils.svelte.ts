@@ -15,16 +15,11 @@
 
 import { API_SERVICES } from '$lib/constants';
 import {
-  dayt,
   allGaugesAttributes,
   isCustomWeather,
   locations,
-  prcp,
   signal,
-  snow,
-  tavg,
-  tmax,
-  tmin,
+  weatherParametersData,
   units,
   weather,
 } from '$lib/stores';
@@ -53,18 +48,18 @@ import { get } from 'svelte/store';
  * @returns {number} - The sum of the specified parameter.
  */
 export const sum = (param) => {
-  return get(weather)
+  return weather.data
     .map((n) => {
       let value = n[param];
       if (typeof value !== 'undefined' && value !== null)
-        value = value[get(units)];
+        value = value[units.value];
       else {
-        if (param === 'tmax') return getAverage(get(tmax));
-        if (param === 'tavg') return getAverage(get(tavg));
-        if (param === 'tmin') return getAverage(get(tmin));
-        if (param === 'prcp') return getAverage(get(prcp));
-        if (param === 'snow') return getAverage(get(snow));
-        if (param === 'dayt') return getAverage(get(dayt));
+        if (param === 'tmax') return getAverage(weatherParametersData.tmax);
+        if (param === 'tavg') return getAverage(weatherParametersData.tavg);
+        if (param === 'tmin') return getAverage(weatherParametersData.tmin);
+        if (param === 'prcp') return getAverage(weatherParametersData.prcp);
+        if (param === 'snow') return getAverage(weatherParametersData.snow);
+        if (param === 'dayt') return getAverage(weatherParametersData.dayt);
       }
       value = Math.abs(value);
       value = value === 0 ? 1 : value;
@@ -80,8 +75,8 @@ export const sum = (param) => {
  * @returns {number} The count of missing days.
  */
 export const missingDaysCount = () => {
-  const _units = get(units);
-  const missingDays = get(weather).filter(
+  const _units = units.value;
+  const missingDays = weather.data.filter(
     (day) =>
       day?.tavg[_units] === null &&
       day?.tmin[_units] === null &&

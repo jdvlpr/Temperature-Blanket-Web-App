@@ -44,7 +44,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   $: width = $settings.columns * SQUARE_SECTION_SIZE * $settings.squareSize;
   $: height = rows * SQUARE_SECTION_SIZE * $settings.squareSize;
   $: squaresCreatedCount =
-    $weather?.length +
+    weather.data?.length +
     monthSepparatorSquaresIndexes.length +
     $settings.squaresAtBeginning;
   $: rows = Math.ceil(squaresCreatedCount / $settings.columns);
@@ -110,7 +110,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     return squares;
   }
 
-  $: if ($projectStatus.liveURL) {
+  $: if (projectStatus.state.liveURL) {
     // Calculate the number of square sections
     const squareSectionsCount = $settings.squareSize * $settings.squareSize;
 
@@ -157,9 +157,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
         let color: string;
         if (isWeatherSquare) {
           // Get the weather data for the current day
-          const day: object = $weather[dayIndex];
+          const day: object = weather.data[dayIndex];
           let targetId: string = squareSectionTargetIds[squareSectionIndex];
-          let value = day[targetId][$units];
+          let value = day[targetId][units.value];
 
           // Check if the primary target value is 0 or null, use the primary target as a backup
           if (
@@ -167,7 +167,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             ($settings.primaryTargetAsBackup === 1 && value === null)
           ) {
             targetId = $settings.primaryTarget;
-            value = day[targetId][$units];
+            value = day[targetId][units.value];
           }
 
           // Get the gauge ID for the target

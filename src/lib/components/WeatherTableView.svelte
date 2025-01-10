@@ -61,14 +61,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
           // make sure daytime is always in the same hr:mn format
           weather = {
             ...weather,
-            [target.id]: convertTime(n[target.id][$units], {
+            [target.id]: convertTime(n[target.id][units.value], {
               displayUnits: false,
               padStart: true,
             }),
           };
         } else {
           let value =
-            n[target.id][$units] !== null ? n[target.id][$units] : '-';
+            n[target.id][units.value] !== null
+              ? n[target.id][units.value]
+              : '-';
           weather = {
             ...weather,
             [target.id]: value,
@@ -98,12 +100,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <tr>
           <Th {handler} orderBy={'date'}>
             <span class="flex flex-col items-center justify-center"
-              >{$weatherItemHeading}
+              >{weatherItemHeading.value}
               <span class="text-xs whitespace-nowrap">(YYYY-MM-DD)</span></span
             >
           </Th>
           {#each weatherTargets as { id, pdfHeader }}
-            {@const header = pdfHeader[$units]}
+            {@const header = pdfHeader[units.value]}
             {@const headerLabel = header.slice(0, header.indexOf('('))}
             {@const headerUnits = header.slice(header.indexOf('('))}
             <Th {handler} orderBy={id}>
@@ -133,10 +135,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 <td
                   ><button
                     class="transition-all"
-                    disabled={$weatherGrouping === 'week'}
-                    class:bg-secondary-hover-token={$weatherGrouping === 'day'}
-                    class:btn={$weatherGrouping === 'day'}
-                    class:hover:px-2={$weatherGrouping === 'day'}
+                    disabled={weatherGrouping.value === 'week'}
+                    class:bg-secondary-hover-token={weatherGrouping.value ===
+                      'day'}
+                    class:btn={weatherGrouping.value === 'day'}
+                    class:hover:px-2={weatherGrouping.value === 'day'}
                     on:click={() => {
                       if (id === 'dayt') {
                         modal.state.trigger({
@@ -180,7 +183,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                             props: {
                               max: 1000,
                               value: row[id],
-                              title: `<div class="flex flex-col items-center justify-center"><span class="font-bold">${row.date}</span><span>${label} <span class="text-sm">(${UNIT_LABELS[type][$units]})</span></span></div>`,
+                              title: `<div class="flex flex-col items-center justify-center"><span class="font-bold">${row.date}</span><span>${label} <span class="text-sm">(${UNIT_LABELS[type][units.value]})</span></span></div>`,
                               noMinMax: true,
                               showSlider: false,
                               onOkay: (_value) => {
@@ -198,7 +201,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                                 const i = mappedWeather.indexOf(
                                   `${row.date}-${row.location}`,
                                 );
-                                if ($units === 'metric') {
+                                if (units.value === 'metric') {
                                   $weatherUngrouped[i][id].metric = _value;
                                   if (type === 'temperature')
                                     $weatherUngrouped[i][id].imperial =
@@ -207,7 +210,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                                     $weatherUngrouped[i][id].imperial =
                                       millimetersToInches(_value);
                                 }
-                                if ($units === 'imperial') {
+                                if (units.value === 'imperial') {
                                   $weatherUngrouped[i][id].imperial = _value;
                                   if (type === 'temperature')
                                     $weatherUngrouped[i][id].metric =

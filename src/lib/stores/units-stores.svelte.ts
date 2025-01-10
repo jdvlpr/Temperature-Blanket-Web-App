@@ -13,24 +13,23 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import type { Unit, UnitStore } from '$lib/types';
-import { writable } from 'svelte/store';
+import type { Unit } from '$lib/types';
 
 /**
- * Creates a units store
- * The units store manages the current unit system (metric or imperial).
- * @returns An object containing the store's subscribe, change, metric, imperial, and set methods.
+ * Represents a unit of measurement class.
+ *
+ * @class UnitClass
+ * @property {Unit} value - The current unit of measurement, either 'imperial' or 'metric'.
+ *
+ * @method toggle
+ * @description Toggles the unit of measurement between 'imperial' and 'metric'.
  */
-function createUnitsStore(): UnitStore {
-  const { subscribe, set, update } = writable<Unit>('imperial');
+class UnitClass {
+  value: Unit = $state('imperial');
 
-  return {
-    subscribe,
-    update,
-    toggle: () =>
-      update((n: Unit) => (n === 'imperial' ? 'metric' : 'imperial')),
-    set,
-  };
+  toggle(): void {
+    this.value = this.value === 'imperial' ? 'metric' : 'imperial';
+  }
 }
 
-export const units = createUnitsStore();
+export const units = new UnitClass();

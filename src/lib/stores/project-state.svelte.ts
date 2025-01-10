@@ -27,47 +27,26 @@ import {
   weatherMonthGroupingStartDay,
 } from '$lib/stores';
 import { getLocationTitle } from '$lib/utils';
-import { derived, writable } from 'svelte/store';
+import { derived, get, writable } from 'svelte/store';
 
-// The current part of the project URL after #
-export const liveProjectURLHash = derived(
-  [
-    units,
-    locationsURLHash,
-    gaugesURLHash,
-    previewURLHash,
-    weatherGrouping,
-    weatherMonthGroupingStartDay,
-    defaultWeatherSource,
-    useSecondaryWeatherSources,
-  ],
-  (
-    [
-      $units,
-      $locationsURLHash,
-      $gaugesURLHash,
-      $previewURLHash,
-      $weatherGrouping,
-      $weatherMonthGroupingStartDay,
-      $defaultWeatherSource,
-      $useSecondaryWeatherSources,
-    ],
-    set,
-  ) => {
+class liveProjectURLHashClass {
+  value = $derived.by(() => {
     let hash = '';
-    hash += $locationsURLHash;
-    hash += $gaugesURLHash;
-    hash += $previewURLHash;
-    if ($defaultWeatherSource === 'Meteostat') hash += '&s=0';
-    else if ($defaultWeatherSource === 'Open-Meteo') hash += '&s=1';
-    if (!$useSecondaryWeatherSources) hash += '0';
-    else if ($useSecondaryWeatherSources) hash += '1';
-    if ($weatherGrouping === 'week')
-      hash += `&w=${$weatherMonthGroupingStartDay}`; // Set Weather Grouping to Weeks with the starting Day of Week
-    hash += $units === 'metric' ? '&u=m' : '&u=i'; // Units
-    set(hash);
-  },
-);
+    hash += get(locationsURLHash);
+    hash += get(gaugesURLHash);
+    hash += previewURLHash.value;
+    if (get(defaultWeatherSource) === 'Meteostat') hash += '&s=0';
+    else if (get(defaultWeatherSource) === 'Open-Meteo') hash += '&s=1';
+    if (!get(useSecondaryWeatherSources)) hash += '0';
+    else if (get(useSecondaryWeatherSources)) hash += '1';
+    if (weatherGrouping.value === 'week')
+      hash += `&w=${get(weatherMonthGroupingStartDay)}`; // Set Weather Grouping to Weeks with the starting Day of Week
+    hash += units.value === 'metric' ? '&u=m' : '&u=i'; // Units
+    return hash;
+  });
+}
+// The current part of the project URL after #
+export const liveProjectURLHash = new liveProjectURLHashClass();
 
 export const isProjectSaved = writable(false);
 
@@ -107,16 +86,19 @@ export const projectSaveMessage = writable({
   message: null,
 });
 
-export const projectStatus = derived(
-  [locations, liveProjectURLHash],
-  ([$locations, $liveProjectURLHash]) => {
-    const isValid = $locations.every((location) => location.valid === true);
+class ProjectStatusClass {
+  state = $derived.by(() => {
+    const isValid = get(locations).every((location) => location.valid === true);
     const base = browser ? window.location.origin + '/' : '';
     const query = `?project=${PROJECT_TIMESTAMP_ID}&v=${version}`;
-    const liveURL = !isValid ? base : base + query + '#' + $liveProjectURLHash;
+    const liveURL = !isValid
+      ? base
+      : base + query + '#' + liveProjectURLHash.value;
     return {
       isValid,
       liveURL,
     };
-  },
-);
+  });
+}
+
+export const projectStatus = new ProjectStatusClass();

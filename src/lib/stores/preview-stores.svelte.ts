@@ -25,7 +25,7 @@ import { hash as rowsHash } from '$lib/components/previews/RowsSettings.svelte';
 import { hash as smsqHash } from '$lib/components/previews/SplitMonthSquaresSettings.svelte';
 import { hash as sqrsHash } from '$lib/components/previews/SquaresSettings.svelte';
 import { weather } from '$lib/stores';
-import { derived, writable } from 'svelte/store';
+import { derived, get, writable } from 'svelte/store';
 
 export const previewWeatherTargets = writable([]);
 
@@ -49,59 +49,34 @@ function createActivePreviewStore() {
 }
 export const activePreview = createActivePreviewStore();
 
-export const previewURLHash = derived(
-  [
-    weather,
-    activePreview,
-    rowsHash,
-    rsunHash,
-    chevHash,
-    cosqHash,
-    crnrHash,
-    sqrsHash,
-    clnrHash,
-    smsqHash,
-    mrwsHash,
-    msqsHash,
-  ],
-  ([
-    $weather,
-    $activePreview,
-    $rowsHash,
-    $rsunHash,
-    $chevHash,
-    $cosqHash,
-    $crnrHash,
-    $sqrsHash,
-    $clnrHash,
-    $smsqHash,
-    $mrwsHash,
-    $msqsHash,
-  ]) => {
-    if (!$weather) return ''; // Is this necessary?
-    switch ($activePreview.id) {
+class PreviewURLHashClass {
+  value = $derived.by(() => {
+    if (!weather.data) return ''; // Is this necessary?
+    switch (get(activePreview).id) {
       case 'chev':
-        return $chevHash;
+        return get(chevHash);
       case 'clnr':
-        return $clnrHash;
+        return get(clnrHash);
       case 'cosq':
-        return $cosqHash;
+        return get(cosqHash);
       case 'crnr':
-        return $crnrHash;
+        return get(crnrHash);
       case 'smsq':
-        return $smsqHash;
+        return get(smsqHash);
       case 'mrws':
-        return $mrwsHash;
+        return get(mrwsHash);
       case 'msqs':
-        return $msqsHash;
+        return get(msqsHash);
       case 'rows':
-        return $rowsHash;
+        return get(rowsHash);
       case 'rsun':
-        return $rsunHash;
+        return get(rsunHash);
       case 'sqrs':
-        return $sqrsHash;
+        return get(sqrsHash);
       default:
         return '';
     }
-  },
-);
+  });
+}
+
+export const previewURLHash = new PreviewURLHashClass();

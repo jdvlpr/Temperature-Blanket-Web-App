@@ -85,7 +85,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     ),
   });
 
-  $: if ($projectStatus.liveURL) {
+  $: if (projectStatus.state.liveURL) {
     const squareSectionsCount = $settings.squareSize * $settings.squareSize;
     const squareSectionParams = getSquareSectionTargetIds(
       squareSectionsCount,
@@ -157,7 +157,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         row * ($settings.squareSize * SQUARE_SECTION_SIZE) + rowPadding;
 
       let _dayIndex = dayIndex;
-      if ($weatherGrouping === 'week') {
+      if (weatherGrouping.value === 'week') {
         _dayIndex = Math.ceil((dayIndex - $weatherMonthGroupingStartDay) / 7);
       }
       for (
@@ -167,15 +167,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
       ) {
         let color;
         if (isWeatherSquare) {
-          const day = $weather[_dayIndex];
+          const day = weather.data[_dayIndex];
           let param = squareSectionParams[squareSectionIndex];
-          let value = day[param][$units];
+          let value = day[param][units.value];
           if (
             ($settings.primaryTargetAsBackup === 1 && value === 0) ||
             ($settings.primaryTargetAsBackup === 1 && value === null)
           ) {
             param = $settings.primaryTarget;
-            value = day[param][$units];
+            value = day[param][units.value];
           }
           let gaugeId = getTargetParentGaugeId(param);
           color = getColorInfo(gaugeId, value).hex;
@@ -284,7 +284,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 </script>
 
-{#if $weather}
+{#if weather.data}
   <svg
     id="preview-svg-image"
     class="max-h-[80svh] mx-auto"

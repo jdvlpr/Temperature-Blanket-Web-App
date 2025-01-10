@@ -50,7 +50,7 @@ export const convertTime = (
 ) => {
   let hours, minutes;
   const { displayUnits, padStart, forceUnits } = props;
-  const _units = forceUnits || get(units);
+  const _units = forceUnits || units.value;
   if (_units === 'metric') {
     hours = Math.floor(value / 60);
     minutes = value % 60;
@@ -87,11 +87,11 @@ export const setUnitsFromNavigator = () => {
     windowLanguage.set(letters);
     // Set imperial for United States, Myenmar, and Liberia
     if (letters === 'US' || letters === 'MY') {
-      units.set('imperial');
+      units.value = 'imperial';
     } else {
-      units.set('metric');
+      units.value = 'metric';
     }
   } else {
-    units.set('metric');
+    units.value = 'metric';
   }
 };

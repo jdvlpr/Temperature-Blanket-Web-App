@@ -42,7 +42,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   $: previews[previewIndex].svg = svg;
 
   $: width = $settings.stitchesPerRow * STITCH_SIZE;
-  $: height = $weather?.length * STITCH_SIZE;
+  $: height = weather.data?.length * STITCH_SIZE;
 
   $: targets = $createdGauges
     .map((n) => n.targets)
@@ -51,7 +51,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       (n) => $settings.nightTarget === n.id || $settings.daytimeTarget === n.id,
     );
 
-  $: if ($projectStatus.liveURL) {
+  $: if (projectStatus.state.liveURL) {
     const _days = [];
     let weatherParams = [];
     switch ($settings.daytimePosition) {
@@ -81,11 +81,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     }
     for (
       let sectionIndex = 0, dayIndex = 0, y = 0;
-      sectionIndex < $weather?.length;
+      sectionIndex < weather.data?.length;
       sectionIndex++, dayIndex++, y += STITCH_SIZE
     ) {
       const daytime = displayNumber(
-        ($weather[dayIndex].dayt['imperial'] / HOURS_PER_DAY) * width,
+        (weather.data[dayIndex].dayt['imperial'] / HOURS_PER_DAY) * width,
       );
       const _day = [];
       for (
@@ -116,7 +116,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             break;
         }
         let param = weatherParams[paramIndex];
-        let value = $weather[dayIndex][param][$units];
+        let value = weather.data[dayIndex][param][units.value];
         let gaugeId = getTargetParentGaugeId(param);
         let color = getColorInfo(gaugeId, value);
         _day.push({

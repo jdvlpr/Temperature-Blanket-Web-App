@@ -15,7 +15,6 @@
 
 import { weatherGrouping } from '$lib/stores';
 import { getDaysInRange, getDaysPercent } from '$lib/utils';
-import { get } from 'svelte/store';
 import pdfConfig from '../pdf-config';
 import pdfGauge from './gauge.svelte';
 
@@ -39,7 +38,7 @@ const pdfColorDetails = {
     doc.line(x1, y, x2, y);
   },
   createColorDetailsHeader: (doc, gauge) => {
-    const header = get(weatherGrouping) === 'week' ? 'Weeks' : 'Days';
+    const header = weatherGrouping.value === 'week' ? 'Weeks' : 'Days';
     const items = {
       davg: {
         name: `${header} High`,

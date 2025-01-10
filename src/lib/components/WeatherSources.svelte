@@ -40,7 +40,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   $: invalid = !$valid;
 
   function checkWarn() {
-    if (!$weather) return;
+    if (!weather.data) return;
     warnSearchAgain = true;
   }
 </script>

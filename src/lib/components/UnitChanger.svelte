@@ -21,7 +21,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <RadioGroup class="flex-wrap gap-y-2" active="bg-secondary-active-token">
   <RadioItem
-    bind:group={$units}
+    bind:group={units.value}
     name="units-metric"
     value={'metric'}
     title="Set units to metric"
@@ -29,7 +29,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 	    ${UNIT_LABELS.height.metric}`}</RadioItem
   >
   <RadioItem
-    bind:group={$units}
+    bind:group={units.value}
     name="units-imperial"
     value={'imperial'}
     title="Set units to imperial"

@@ -64,7 +64,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div class="mt-4 max-w-screen-md mx-auto">
-  {#if $wasWeatherLoadedFromLocalStorage && $weather}
+  {#if $wasWeatherLoadedFromLocalStorage && weather.data}
     <p
       class="text-sm flex flex-wrap gap-1 items-center justify-center w-full text-center"
     >
@@ -131,10 +131,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
             {#snippet tooltip()}
               <span>
                 To edit location details, reload weather data or <a
-                  href={`/?project=${new Date().getTime()?.toString()}&v=${version}#${$liveProjectURLHash.substring(
+                  href={`/?project=${new Date().getTime()?.toString()}&v=${version}#${liveProjectURLHash.value.substring(
                     0,
-                    $liveProjectURLHash.indexOf('l='),
-                  )}${$liveProjectURLHash.substring($liveProjectURLHash.indexOf($createdGauges[0].id))}`}
+                    liveProjectURLHash.value.indexOf('l='),
+                  )}${liveProjectURLHash.value.substring(liveProjectURLHash.value.indexOf($createdGauges[0].id))}`}
                   class="underline cursor-pointer"
                   target="_blank"
                   rel="noreferrer">open a new project</a

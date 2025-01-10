@@ -55,7 +55,7 @@ import { get } from 'svelte/store';
 export const loadFromHistory = (props) => {
   historyChangeMessage.set('what');
   const { action } = props;
-  const oldParams = getProjectParametersFromURLHash(get(liveProjectURLHash));
+  const oldParams = getProjectParametersFromURLHash(liveProjectURLHash.value);
   if (action === 'undo') history.undo();
   if (action === 'redo') history.redo();
   const newParams = getProjectParametersFromURLHash(get(history).current);
@@ -66,11 +66,11 @@ export const loadFromHistory = (props) => {
   if (exists(newParams.u)) {
     if (!exists(oldParams.u) || oldParams.u.value !== newParams.u.value) {
       if (newParams.u.value === 'i') {
-        units.set('imperial');
+        units.value = 'imperial';
         message = 'Units';
       }
       if (newParams.u.value === 'm') {
-        units.set('metric');
+        units.value = 'metric';
         message = 'Units';
       }
     }
@@ -247,14 +247,14 @@ export const loadFromHistory = (props) => {
 };
 export const updateHistory = () => {
   if (
-    !get(weather) ||
-    !get(liveProjectURLHash) ||
-    !get(projectStatus).isValid ||
+    !weather.data ||
+    !liveProjectURLHash.value ||
+    !projectStatus.state.isValid ||
     !browser
   )
     return;
 
-  let live = get(liveProjectURLHash);
+  let live = liveProjectURLHash.value;
   const liveParams = getProjectParametersFromURLHash(live);
 
   // There must be a gauge created... sometimes this block gets called and the liveHash doesn't have any gauge params...
@@ -289,6 +289,6 @@ export const updateHistory = () => {
 };
 
 export const updateURL = () => {
-  const newURL = new URL(get(projectStatus).liveURL);
+  const newURL = new URL(projectStatus.state.liveURL);
   window.history.pushState({ path: newURL.href }, '', newURL.href);
 };

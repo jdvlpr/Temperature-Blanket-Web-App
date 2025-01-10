@@ -55,7 +55,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   $: width = dimensionsWidth * squareSize + STITCH_SIZE / 2;
   $: height = dimensionsHeight * squareSize + STITCH_SIZE / 2;
 
-  $: months = weatherMonthsData({ weatherData: $weather });
+  $: months = weatherMonthsData({ weatherData: weather.data });
 
   $: daysInLongestMonth = getDaysInLongestMonth(months);
 
@@ -82,7 +82,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     return { left, right };
   }
 
-  $: if ($projectStatus.liveURL) {
+  $: if (projectStatus.state.liveURL) {
     squares = [];
     let squareIndex = 0;
     let x = squareSize / 2;
@@ -127,16 +127,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
       );
 
       let _dayIndex = dayIndex;
-      if ($weatherGrouping === 'week') {
+      if (weatherGrouping.value === 'week') {
         _dayIndex = Math.ceil((dayIndex - $weatherMonthGroupingStartDay) / 7);
       }
 
       let color = { left: '', right: '' };
       if (day.length) {
-        const leftValue = $weather[_dayIndex][$settings.leftTarget][$units];
+        const leftValue =
+          weather.data[_dayIndex][$settings.leftTarget][units.value];
         const leftGaugeId = getTargetParentGaugeId($settings.leftTarget);
         color.left = getColorInfo(leftGaugeId, leftValue).hex;
-        const rightValue = $weather[_dayIndex][$settings.rightTarget][$units];
+        const rightValue =
+          weather.data[_dayIndex][$settings.rightTarget][units.value];
         const rightGaugeId = getTargetParentGaugeId($settings.rightTarget);
         color.right = getColorInfo(rightGaugeId, rightValue).hex;
         isWeather = true;
@@ -178,7 +180,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 </script>
 
-{#if $weather}
+{#if weather.data}
   <svg
     id="preview-svg-image"
     class="max-h-[80svh] mx-auto"

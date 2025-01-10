@@ -81,12 +81,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import Gauge from '$lib/components/Gauge.svelte';
-  import { dayt } from '$lib/stores';
+  import { weatherParametersData } from '$lib/stores';
   import type { GaugeAttributes } from '$lib/types/gauge-types';
   import { displayNumber } from '$lib/utils';
 
-  $: maxes = $dayt.filter((n) => n !== null);
-  $: mins = $dayt.filter((n) => n !== null);
+  $: maxes = weatherParametersData.dayt.filter((n) => n !== null);
+  $: mins = weatherParametersData.dayt.filter((n) => n !== null);
 
   $: max = Number.isInteger(Math.max(...maxes))
     ? Math.max(...maxes) + 1

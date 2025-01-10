@@ -124,7 +124,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   $: targets = $createdGauges.map((n) => n.targets).flat();
 
-  $: tableData = $weather?.map((n, i) => {
+  $: tableData = weather.data?.map((n, i) => {
     let left, center, right, divided;
     let daytimeStitches = displayNumber(
       (n.dayt['imperial'] * $settings.stitchesPerRow) / HOURS_PER_DAY,
@@ -208,7 +208,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 
   function downloadStitchesTableCSV() {
-    const headers = ['Row', $weatherItemHeading];
+    const headers = ['Row', weatherItemHeading.value];
     switch ($settings.daytimePosition) {
       case 'left':
         headers.push(`Daytime stitches (${daytimeLabel})`);
@@ -247,7 +247,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <div class="w-full">
   <div class="mx-auto max-w-screen-sm">
     <p class="">
-      Each row is split according to the duration of sunlight that {$weatherGrouping}.
+      Each row is split according to the duration of sunlight that {weatherGrouping.value}.
     </p>
 
     <div class="my-1 flex flex-col justify-center items-center italic">
@@ -311,7 +311,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
 
     <p class="text-sm italic">
-      d = Daytime (time from the {$weatherGrouping}'s sunrise to sunset in
+      d = Daytime (time from the {weatherGrouping.value}'s sunrise to sunset in
       hours). {$settings.stitchesPerRow}
       is the total stitches per row. 24 is the number of hours in a day. Stitches
       are rounded to the nearest integer.
@@ -336,7 +336,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <label class="label">
   <span
     >Color Daytime ({daytimeLabel}) Using the {capitalizeFirstLetter(
-      $weatherGrouping,
+      weatherGrouping.value,
     )}'s</span
   >
   <select
@@ -353,7 +353,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <label class="label">
   <span
     >Color Night ({nightLabel}) Using the {capitalizeFirstLetter(
-      $weatherGrouping,
+      weatherGrouping.value,
     )}'s</span
   >
   <select
@@ -388,7 +388,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <tr>
             <Th {handler} orderBy={'row'}>Row</Th>
             <Th {handler} orderBy={'date'}
-              >{$weatherItemHeading}
+              >{weatherItemHeading.value}
               <span class="text-xs">(YYYY-MM-DD)</span></Th
             >
             {#if $settings.daytimePosition === 'left'}

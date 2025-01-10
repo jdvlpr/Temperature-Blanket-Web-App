@@ -16,7 +16,7 @@
 import { locations, units } from '$lib/stores';
 import type { WeatherDay, WeatherSource } from '$lib/types';
 import { createWeeksProperty, displayNumber } from '$lib/utils';
-import { derived, writable, type Readable, type Writable } from 'svelte/store';
+import { derived, get, writable, type Writable } from 'svelte/store';
 
 export const defaultWeatherSource: Writable<WeatherSource> =
   writable('Open-Meteo');
@@ -24,12 +24,17 @@ export const defaultWeatherSource: Writable<WeatherSource> =
 /* In the project URL hash, this is '0' for 'false' or '1' for 'true' */
 export const useSecondaryWeatherSources: Writable<boolean> = writable(true);
 
-export const weatherGrouping: Writable<'day' | 'week'> = writable('day');
+class WeatherGroupingState {
+  value: 'day' | 'week' = $state('day');
+}
+export let weatherGrouping = new WeatherGroupingState();
 
-export const weatherItemHeading = derived(
-  [weatherGrouping],
-  ([$weatherGrouping]) => ($weatherGrouping === 'week' ? 'Week of' : 'Day'),
-);
+class WeatherItemHeadingState {
+  value: 'Week of' | 'Day' = $derived(
+    weatherGrouping.value === 'week' ? 'Week of' : 'Day',
+  );
+}
+export const weatherItemHeading = new WeatherItemHeadingState();
 
 export const weatherMonthGroupingStartDay = writable(1);
 
@@ -163,67 +168,65 @@ export const weatherGroupedByWeek = derived(
   },
 );
 
-export const weather: Readable<WeatherDay[]> = derived(
-  [weatherUngrouped, weatherGroupedByWeek, weatherGrouping],
-  ([$weatherUngrouped, $weatherGroupedByWeek, $weatherGrouping], set) => {
-    switch ($weatherGrouping) {
+class WeatherClass {
+  data: WeatherDay[] | null = $derived.by(() => {
+    switch (weatherGrouping.value) {
       case 'day':
         activeWeatherElementIndex.set(0);
-        set($weatherUngrouped);
+        return get(weatherUngrouped);
         break;
 
       case 'week':
         activeWeatherElementIndex.set(0);
-        if (!$weatherGroupedByWeek) {
-          set(null);
+        if (!get(weatherGroupedByWeek)) {
+          return null;
           break;
         }
 
-        set($weatherGroupedByWeek);
+        return get(weatherGroupedByWeek);
         break;
 
       default:
-        set($weatherUngrouped);
+        return get(weatherUngrouped);
         break;
     }
-  },
-);
+  });
+}
+export const weather = new WeatherClass();
 
-// All the minimum temperatures
-export const tmin = derived([weather, units], ([$weather, $units], set) => {
-  if (!$weather) return null;
-  set($weather.map((day) => day.tmin[$units]));
-});
+class weatherParametersDataClass {
+  tmin = $derived.by(() => {
+    if (!weather.data) return null;
+    return weather.data.map((day) => day.tmin[units.value]);
+  });
 
-// All the average temperatures
-export const tavg = derived([weather, units], ([$weather, $units], set) => {
-  if (!$weather) return null;
-  set($weather.map((day) => day.tavg[$units]));
-});
+  tavg = $derived.by(() => {
+    if (!weather.data) return null;
+    return weather.data.map((day) => day.tavg[units.value]);
+  });
 
-// All the maximum temperatures
-export const tmax = derived([weather, units], ([$weather, $units], set) => {
-  if (!$weather) return null;
-  set($weather.map((day) => day.tmax[$units]));
-});
+  tmax = $derived.by(() => {
+    if (!weather.data) return null;
+    return weather.data.map((day) => day.tmax[units.value]);
+  });
 
-// All the precipitation values
-export const prcp = derived([weather, units], ([$weather, $units], set) => {
-  if (!$weather) return null;
-  set($weather.map((day) => day.prcp[$units]));
-});
+  prcp = $derived.by(() => {
+    if (!weather.data) return null;
+    return weather.data.map((day) => day.prcp[units.value]);
+  });
 
-// All the snow values
-export const snow = derived([weather, units], ([$weather, $units], set) => {
-  if (!$weather) return null;
-  set($weather.map((day) => day.snow[$units]));
-});
+  snow = $derived.by(() => {
+    if (!weather.data) return null;
+    return weather.data.map((day) => day.snow[units.value]);
+  });
 
-// All the daytime values
-export const dayt = derived([weather, units], ([$weather, $units], set) => {
-  if (!$weather) return null;
-  set($weather.map((day) => day.dayt[$units]));
-});
+  dayt = $derived.by(() => {
+    if (!weather.data) return null;
+    return weather.data.map((day) => day.dayt[units.value]);
+  });
+}
+
+export const weatherParametersData = new weatherParametersDataClass();
 
 export const activeWeatherElementIndex = writable(0);
 

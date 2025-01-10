@@ -31,14 +31,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
         if (target.id === 'dayt') {
           weather = {
             ...weather,
-            [target.id]: convertTime(n[target.id][$units], {
+            [target.id]: convertTime(n[target.id][units.value], {
               displayUnits: false,
               padStart: true,
             }),
           };
         } else {
           let value =
-            n[target.id][$units] !== null ? n[target.id][$units] : '-';
+            n[target.id][units.value] !== null
+              ? n[target.id][units.value]
+              : '-';
           weather = {
             ...weather,
             [target.id]: value,
@@ -55,7 +57,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   const handler = $derived(new DataHandler(tableData, { rowsPerPage: 10 }));
   const rows = $derived(handler.getRows());
 
-  let dateHeader = $derived($weatherGrouping === 'week' ? 'Week of' : 'Date');
+  let dateHeader = $derived(
+    weatherGrouping.value === 'week' ? 'Week of' : 'Date',
+  );
 
   //TODO: Is this necessary?
   $effect(() => {
@@ -79,7 +83,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 >
               </Th>
               {#each weatherTargets as { id, pdfHeader }}
-                {@const header = pdfHeader[$units]}
+                {@const header = pdfHeader[units.value]}
                 {@const headerLabel = header.slice(0, header.indexOf('('))}
                 {@const headerUnits = header.slice(header.indexOf('('))}
                 <Th {handler} orderBy={id}>

@@ -450,7 +450,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </div>
 {/if}
 
-{#key $weather}
+{#key weather.data}
   {#key colors}
     <GaugeCustomizer
       {gaugeAttributes}

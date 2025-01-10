@@ -32,17 +32,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 
   // If an initially empty weather parameter gets some user-created data, add the available gauge to the options
-  $: $weather, setupAvailableGauges();
+  $effect(() => {
+    weather.data;
+    setupAvailableGauges();
+  });
 
-  $: gaugesToAdd = $gaugesState.available.filter(
-    (gauge) =>
-      gauge !== $gaugesState.active && !$gaugesState.created.includes(gauge),
+  let gaugesToAdd = $derived(
+    $gaugesState.available.filter(
+      (gauge) =>
+        gauge !== $gaugesState.active && !$gaugesState.created.includes(gauge),
+    ),
   );
 
   function setupAvailableGauges() {
     allGaugesAttributes.forEach((gauge) => {
       gauge.targets.forEach((target) => {
-        if ($weather?.some((day) => day[target.id][$units] !== null)) {
+        if (weather.data?.some((day) => day[target.id][units.value] !== null)) {
           gaugesState.addAvailable(gauge.id);
           $gaugesState.active ||= gauge.id;
         } else gaugesState.removeAvailable(gauge.id);
@@ -62,7 +67,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         class="select w-fit"
         id="gauges-select"
         value={$gaugesState.active}
-        on:change={(e) => {
+        onchange={(e) => {
           gaugesState.addCreated(e.target.value);
         }}
       >
@@ -94,7 +99,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 >
   <button
     class="btn bg-secondary-hover-token whitespace-pre-wrap"
-    on:click={downloadPDF}
+    onclick={downloadPDF}
     title="Download PDF File"
   >
     <span class="">

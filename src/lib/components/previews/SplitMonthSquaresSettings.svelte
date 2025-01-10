@@ -99,13 +99,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
     $settings.rightTarget = setTargets($settings.rightTarget);
   }
 
-  $: months = weatherMonthsData({ weatherData: $weather });
+  $: months = weatherMonthsData({ weatherData: weather.data });
 
   $: factors = getFactors({ length: months.length });
 
   $: possibleDimensions = getPossibleDimensions({ factors });
 
-  $: if ($weather && !possibleDimensions.includes($settings.dimensions)) {
+  $: if (weather.data && !possibleDimensions.includes($settings.dimensions)) {
     $settings.dimensions = getMiddleValueOfArray(possibleDimensions);
   }
 </script>
@@ -139,7 +139,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <label class="label">
   <span
-    >Color Left Side Using the {capitalizeFirstLetter($weatherGrouping)}'s</span
+    >Color Left Side Using the {capitalizeFirstLetter(
+      weatherGrouping.value,
+    )}'s</span
   >
   <select
     class="select w-fit"
@@ -155,7 +157,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <label class="label">
   <span
     >Color Right Side Using the {capitalizeFirstLetter(
-      $weatherGrouping,
+      weatherGrouping.value,
     )}'s</span
   >
   <select

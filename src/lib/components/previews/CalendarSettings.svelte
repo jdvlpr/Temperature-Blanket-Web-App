@@ -148,13 +148,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   $: targets = $createdGauges.map((n) => n.targets).flat();
 
-  $: months = weatherMonthsData({ weatherData: $weather });
+  $: months = weatherMonthsData({ weatherData: weather.data });
 
   $: factors = getFactors({ length: months.length });
 
   $: possibleDimensions = getPossibleDimensions({ factors });
 
-  $: if ($weatherGrouping === 'week') {
+  $: if (weatherGrouping.value === 'week') {
     $settings.weekStartCode = $weatherMonthGroupingStartDay;
   }
 
@@ -164,7 +164,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 
   // If a new weather search happens, and the current dimensions are not possible, set new dimensions
-  $: if ($weather && !possibleDimensions.includes($settings.dimensions))
+  $: if (weather.data && !possibleDimensions.includes($settings.dimensions))
     $settings.dimensions = getMiddleValueOfArray(possibleDimensions);
 
   function handelOkaySquareDesigner(e) {
@@ -235,7 +235,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     class="select w-fit"
     bind:value={$settings.weekStartCode}
     on:change={() => {
-      if ($weatherGrouping === 'week')
+      if (weatherGrouping.value === 'week')
         $weatherMonthGroupingStartDay = $settings.weekStartCode;
     }}
   >

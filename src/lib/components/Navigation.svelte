@@ -28,25 +28,27 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <div class="flex-1">
           <Tooltip
             minWidth={'200px'}
-            disableTooltip={!!$weather || index === 1}
+            disableTooltip={!!weather.data || index === 1}
             fullWidth={true}
-            buttonDisabled={!$weather && index !== 1}
+            buttonDisabled={!weather.data && index !== 1}
             onclick={() => goToProjectSection(index)}
             dataPinned={pinned}
             dataActive={active}
-            dataNoWeather={!$weather}
+            dataNoWeather={!weather.data}
             classNames={`
                                 flex flex-col justify-center items-center disabled:opacity-30 p-2 pb-4 md:pb-2 w-full
                                 text-token
                                 data-[active=false]:data-[no-weather=true]:opacity-50 
                                 data-[pinned=false]:data-[active=true]:data-[no-weather=false]:variant-filled-primary
                                 hover:data-[no-weather=false]:data-[active=false]:bg-primary-hover-token
-                                ${$weather ? '' : 'bg-none backdrop-blur-none'}`}
+                                ${weather.data ? '' : 'bg-none backdrop-blur-none'}`}
           >
             <span>
               {@html icon}
             </span><span class="text-xs flex gap-1 items-center">{title} </span>
-            <p slot="tooltip">{tooltip}</p>
+            {#snippet tooltip()}
+              <p>{tooltip}</p>
+            {/snippet}
           </Tooltip>
         </div>
       {/if}

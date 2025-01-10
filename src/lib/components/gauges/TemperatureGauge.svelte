@@ -104,7 +104,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import Gauge from '$lib/components/Gauge.svelte';
-  import { tmax, tmin } from '$lib/stores';
+  import { weatherParametersData } from '$lib/stores';
   import type { GaugeAttributes } from '$lib/types/gauge-types';
   import {
     displayNumber,
@@ -113,8 +113,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { run } from 'svelte/legacy';
   import { writable, type Writable } from 'svelte/store';
 
-  let maxes = $derived($tmax.filter((n) => n !== null));
-  let mins = $derived($tmin.filter((n) => n !== null));
+  let maxes = $derived(weatherParametersData.tmax.filter((n) => n !== null));
+  let mins = $derived(weatherParametersData.tmin.filter((n) => n !== null));
 
   let max = $derived(
     Number.isInteger(Math.max(...maxes))

@@ -158,7 +158,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <p>
         Stitches are counted using the parameter's absolute value rounded to the
         nearest non-zero integer. A temperature or hieght of zero is rounded up
-        to one. Any missing values use the custom stitches per {$weatherGrouping}
+        to one. Any missing values use the custom stitches per {weatherGrouping.value}
         value.
       </p>
     {/if}
@@ -167,7 +167,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <div class="text-left">
   <ToggleSwitchGroup
-    groupLabel={`Color Using the ${capitalizeFirstLetter($weatherGrouping)}'s`}
+    groupLabel={`Color Using the ${capitalizeFirstLetter(weatherGrouping.value)}'s`}
     {targets}
     bind:value={$settings.selectedTargets}
   />
@@ -180,7 +180,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 />
 
 <label class="label">
-  <span>Stitches Per {capitalizeFirstLetter($weatherGrouping)} Using</span>
+  <span>Stitches Per {capitalizeFirstLetter(weatherGrouping.value)} Using</span>
   <select
     class="select w-fit"
     id="rows-length-param"
@@ -197,7 +197,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 {#if $settings.lengthTarget === 'custom'}
   <NumberInputButton
     bind:value={$settings.stitchesPerDay}
-    title="Stitches Per {capitalizeFirstLetter($weatherGrouping)}"
+    title="Stitches Per {capitalizeFirstLetter(weatherGrouping.value)}"
     icon={true}
   />
 {/if}

@@ -115,7 +115,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 {/if}
 
 <label class="label">
-  <span>Color Using the {capitalizeFirstLetter($weatherGrouping)}'s</span>
+  <span>Color Using the {capitalizeFirstLetter(weatherGrouping.value)}'s</span>
   <select
     class="select w-fit"
     id="cosq-param"
@@ -129,7 +129,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <NumberInputButton
   bind:value={$settings.stitchesPerDay}
-  title="Stitches Per {capitalizeFirstLetter($weatherGrouping)}"
+  title="Stitches Per {capitalizeFirstLetter(weatherGrouping.value)}"
   icon={true}
 />
 

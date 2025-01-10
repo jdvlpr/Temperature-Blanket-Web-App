@@ -181,7 +181,7 @@ export const setLocalStorageProject = () => {
     new URL(project.href).searchParams.get('project'),
   );
 
-  const thisID = new URL(get(projectStatus).liveURL).searchParams.get(
+  const thisID = new URL(projectStatus.state.liveURL).searchParams.get(
     'project',
   );
 
@@ -222,7 +222,7 @@ const createProjectLocalStorageProjectObject = () => {
 
   const _title = get(projectTitle) || '';
 
-  const href = get(projectStatus).liveURL;
+  const href = projectStatus.state.liveURL;
 
   const weatherData =
     get(weatherUngrouped)?.map((day) => {

@@ -14,6 +14,8 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import { browser } from '$app/environment';
   import Spinner from '$lib/components/Spinner.svelte';
   import UnitChanger from '$lib/components/UnitChanger.svelte';
@@ -35,17 +37,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '$lib/constants';
   import {
     activeWeatherElementIndex,
-    dayt,
     defaultWeatherSource,
     isCustomWeather,
     locations,
     modal,
-    prcp,
     showNavigationSideBar,
-    snow,
-    tavg,
-    tmax,
-    tmin,
+    weatherParametersData,
     units,
     weather,
     weatherGroupedByWeek,
@@ -66,11 +63,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { Accordion, AccordionItem } from '@skeletonlabs/skeleton';
   import { onDestroy, onMount } from 'svelte';
 
-  let graph;
+  let graph = $state();
   let isAnyWeatherSourceDifferentFromDefault;
-  let defaultWeatherSourceCopy;
-  let wasDefaultWeatherSourceChanged = false;
-  let showWeatherChart = true;
+  let defaultWeatherSourceCopy = $state();
+  let wasDefaultWeatherSourceChanged = $state(false);
+  let showWeatherChart = $state(true);
   let windowWidth;
 
   let debounceTimer;
@@ -107,72 +104,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     if (!browser) return;
     window.removeEventListener('resize', updateShowWeatherChart);
   });
-
-  $: if ($activeWeatherElementIndex) triggerHover($activeWeatherElementIndex);
-
-  $: missingTmin = $tmin.filter((n) => n === null);
-  $: missingTavg = $tavg.filter((n) => n === null);
-  $: missingTmax = $tmax.filter((n) => n === null);
-  $: missingPrcp = $prcp.filter((n) => n === null);
-  $: missingSnow = $snow.filter((n) => n === null);
-  $: missingData = [
-    {
-      count: missingTmin.length,
-      label: 'low',
-      type: 'temperature',
-    },
-    {
-      count: missingTavg.length,
-      label: 'average',
-      type: 'temperature',
-    },
-    {
-      count: missingTmax.length,
-      label: 'high',
-      type: 'temperature',
-    },
-    { count: missingPrcp.length, label: 'rain', type: 'height' },
-    { count: missingSnow.length, label: 'snow', type: 'height' },
-  ];
-
-  $: isDataMissing =
-    !!missingTmin.length || !!missingTavg.length || !!missingTmax.length;
-
-  $: tMinDay = $weather
-    ? $weather
-        .map((day, index) => {
-          return { ...day, index };
-        })
-        .filter((day) => day.tmin[$units] !== null)
-        .reduce((prev, curr) =>
-          prev.tmin[$units] < curr.tmin[$units] ? prev : curr,
-        )
-    : null;
-
-  $: tMaxDay = $weather
-    ? $weather
-        .map((day, index) => {
-          return { ...day, index };
-        })
-        .filter((day) => day.tmax[$units] !== null)
-        .reduce((prev, curr) =>
-          prev.tmax[$units] > curr.tmax[$units] ? prev : curr,
-        )
-    : null;
-
-  $: missingDataMerged = getMissingDataMerged(missingData);
-
-  $: $showNavigationSideBar, forceUpdateShowWeatherChart();
-
-  $: projectHasRecentWeatherData = $weather?.some((date) => {
-    return isDateWithinLastSevenDays(date?.date);
-  });
-
-  $: data = createWeeksProperty({
-    weatherData: $weatherUngrouped,
-    dowOffset: $weatherMonthGroupingStartDay,
-  });
-  $: length = [...new Set(data?.map((day) => day.weekId))].length;
 
   async function updateShowWeatherChart() {
     debounce(async () => {
@@ -238,6 +169,82 @@ If not, see <https://www.gnu.org/licenses/>. -->
     $activeWeatherElementIndex = index;
     $weatherChart.update();
   }
+  run(() => {
+    if ($activeWeatherElementIndex) triggerHover($activeWeatherElementIndex);
+  });
+  let missingTmin = $derived(
+    weatherParametersData.tmin.filter((n) => n === null),
+  );
+  let missingTavg = $derived(
+    weatherParametersData.tavg.filter((n) => n === null),
+  );
+  let missingTmax = $derived(
+    weatherParametersData.tmax.filter((n) => n === null),
+  );
+  let missingPrcp = $derived(
+    weatherParametersData.prcp.filter((n) => n === null),
+  );
+  let missingSnow = $derived(
+    weatherParametersData.snow.filter((n) => n === null),
+  );
+  let missingData = $derived([
+    {
+      count: missingTmin.length,
+      label: 'low',
+      type: 'temperature',
+    },
+    {
+      count: missingTavg.length,
+      label: 'average',
+      type: 'temperature',
+    },
+    {
+      count: missingTmax.length,
+      label: 'high',
+      type: 'temperature',
+    },
+    { count: missingPrcp.length, label: 'rain', type: 'height' },
+    { count: missingSnow.length, label: 'snow', type: 'height' },
+  ]);
+  let isDataMissing = $derived(
+    !!missingTmin.length || !!missingTavg.length || !!missingTmax.length,
+  );
+  let tMinDay = $derived(
+    weather.data
+      .map((day, index) => {
+        return { ...day, index };
+      })
+      .filter((day) => day.tmin[units.value] !== null)
+      .reduce((prev, curr) =>
+        prev.tmin[units.value] < curr.tmin[units.value] ? prev : curr,
+      ) || null,
+  );
+  let tMaxDay = $derived(
+    weather.data
+      .map((day, index) => {
+        return { ...day, index };
+      })
+      .filter((day) => day.tmax[units.value] !== null)
+      .reduce((prev, curr) =>
+        prev.tmax[units.value] > curr.tmax[units.value] ? prev : curr,
+      ) || null,
+  );
+  let missingDataMerged = $derived(getMissingDataMerged(missingData));
+  run(() => {
+    $showNavigationSideBar, forceUpdateShowWeatherChart();
+  });
+  let projectHasRecentWeatherData = $derived(
+    weather.data?.some((date) => {
+      return isDateWithinLastSevenDays(date?.date);
+    }),
+  );
+  let data = $derived(
+    createWeeksProperty({
+      weatherData: $weatherUngrouped,
+      dowOffset: $weatherMonthGroupingStartDay,
+    }),
+  );
+  let length = $derived([...new Set(data?.map((day) => day.weekId))].length);
 </script>
 
 <div class="flex flex-col gap-4 justify-center w-full items-center mt-4">
@@ -248,7 +255,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     <button
       class="btn bg-secondary-hover-token w-fit"
-      on:click={() => {
+      onclick={() => {
         modal.state.trigger({
           type: 'component',
           component: {
@@ -293,7 +300,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </p>
   {/if}
 
-  {#if $weatherGrouping === 'week'}
+  {#if weatherGrouping.value === 'week'}
     <div
       class="rounded-container-token flex flex-col gap-2 items-center justify-center w-full"
     >
@@ -337,7 +344,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     >
       <Accordion>
         <AccordionItem>
-          <svelte:fragment slot="lead">
+          {#snippet lead()}
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -352,15 +359,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"
               />
             </svg>
-          </svelte:fragment>
-          <svelte:fragment slot="summary">
+          {/snippet}
+          {#snippet summary()}
             Weather within the past {$defaultWeatherSource === 'Open-Meteo'
               ? OPEN_METEO_DELAY_DAYS
               : $defaultWeatherSource === 'Meteostat'
                 ? METEOSTAT_DELAY_DAYS
                 : 'few'} days may be revised as new data comes in.
-          </svelte:fragment>
-          <svelte:fragment slot="content">
+          {/snippet}
+          {#snippet content()}
             Weather data comes from <a
               href="https://open-meteo.com/"
               target="_blank"
@@ -378,7 +385,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 ? METEOSTAT_DELAY_DAYS
                 : 'a few'} days behind to account for possible changes. Sorry for
             any inconvenience.
-          </svelte:fragment>
+          {/snippet}
         </AccordionItem>
       </Accordion>
     </div>
@@ -390,26 +397,28 @@ If not, see <https://www.gnu.org/licenses/>. -->
         id="tmax"
         icon="&uarr;"
         label="Highest Temperature"
-        value={Math.max(...$tmax?.filter((n) => n !== null))}
-        units={UNIT_LABELS.temperature[$units]}
+        value={Math.max(...tmax?.filter((n) => n !== null))}
+        units={UNIT_LABELS.temperature[units.value]}
       >
-        <div slot="button">
-          <button
-            class="btn text-sm bg-secondary-hover-token"
-            title="Go to Date"
-            on:click={(e) => {
-              e.stopPropagation();
-              triggerHover(tMaxDay.index);
-              graph.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start',
-              });
-            }}
-          >
-            {#if $weatherGrouping === 'week'}Week of{/if}
-            {tMaxDay?.date.toLocaleDateString()}
-          </button>
-        </div>
+        {#snippet button()}
+          <div>
+            <button
+              class="btn text-sm bg-secondary-hover-token"
+              title="Go to Date"
+              onclick={(e) => {
+                e.stopPropagation();
+                triggerHover(tMaxDay.index);
+                graph.scrollIntoView({
+                  behavior: 'smooth',
+                  block: 'start',
+                });
+              }}
+            >
+              {#if weatherGrouping.value === 'week'}Week of{/if}
+              {tMaxDay?.date.toLocaleDateString()}
+            </button>
+          </div>
+        {/snippet}
       </WeatherItem>
     {/if}
 
@@ -418,8 +427,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
         id="tavg"
         icon="~"
         label="Average Temperature"
-        value={getAverage($tavg?.filter((n) => n !== null))}
-        units={UNIT_LABELS.temperature[$units]}
+        value={getAverage(
+          weatherParametersData.tavg?.filter((n) => n !== null),
+        )}
+        units={UNIT_LABELS.temperature[units.value]}
       />
     {/if}
 
@@ -428,26 +439,30 @@ If not, see <https://www.gnu.org/licenses/>. -->
         id="tmin"
         icon="&darr;"
         label="Lowest Temperature"
-        value={Math.min(...$tmin?.filter((n) => n !== null))}
-        units={UNIT_LABELS.temperature[$units]}
+        value={Math.min(
+          ...weatherParametersData.tmin?.filter((n) => n !== null),
+        )}
+        units={UNIT_LABELS.temperature[units.value]}
       >
-        <div slot="button">
-          <button
-            class="btn text-sm bg-secondary-hover-token"
-            title="Go to Date"
-            on:click={(e) => {
-              e.stopPropagation();
-              triggerHover(tMinDay.index);
-              graph.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start',
-              });
-            }}
-          >
-            {#if $weatherGrouping === 'week'}Week of{/if}
-            {tMinDay?.date.toLocaleDateString()}
-          </button>
-        </div>
+        {#snippet button()}
+          <div>
+            <button
+              class="btn text-sm bg-secondary-hover-token"
+              title="Go to Date"
+              onclick={(e) => {
+                e.stopPropagation();
+                triggerHover(tMinDay.index);
+                graph.scrollIntoView({
+                  behavior: 'smooth',
+                  block: 'start',
+                });
+              }}
+            >
+              {#if weatherGrouping.value === 'week'}Week of{/if}
+              {tMinDay?.date.toLocaleDateString()}
+            </button>
+          </div>
+        {/snippet}
       </WeatherItem>
     {/if}
 
@@ -456,14 +471,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
         id="prcp"
         icon="∴"
         label="Total Rainfall"
-        value={$prcp?.every((n) => n === null)
+        value={weatherParametersData.prcp?.every((n) => n === null)
           ? '-'
           : displayNumber(
-              $prcp
+              weatherParametersData.prcp
                 ?.filter((n) => n !== null)
                 ?.reduce((partialSum, a) => partialSum + a, 0),
             )}
-        units={UNIT_LABELS.height[$units]}
+        units={UNIT_LABELS.height[units.value]}
       />
     {/if}
 
@@ -474,27 +489,31 @@ If not, see <https://www.gnu.org/licenses/>. -->
         label={$locations?.every((n) => n.source === 'Meteostat')
           ? 'Highest Snow Depth'
           : 'Total SnowFall'}
-        value={$snow?.every((n) => n === null)
+        value={weatherParametersData.snow?.every((n) => n === null)
           ? '-'
           : $locations?.every((n) => n.source === 'Meteostat')
-            ? Math.max(...$snow?.filter((n) => n !== null))
+            ? Math.max(...snow?.filter((n) => n !== null))
             : displayNumber(
-                $snow
+                weatherParametersData.snow
                   ?.filter((n) => n !== null)
                   ?.reduce((partialSum, a) => partialSum + a, 0),
               )}
-        units={UNIT_LABELS.height[$units]}
+        units={UNIT_LABELS.height[units.value]}
       >
-        <div slot="button" class="my-2 text-sm">
-          {#if $locations.some((n) => n.source === 'Meteostat') && $locations.some((n) => n.source === 'Open-Meteo')}
-            <HelpIcon
-              href="/documentation/#mixed-snow-parameters"
-              title="Read About Mixed Snow Parameters"
-            >
-              <span slot="text" class="link">Error: Mixed Parameters</span>
-            </HelpIcon>
-          {/if}
-        </div>
+        {#snippet button()}
+          <div class="my-2 text-sm">
+            {#if $locations.some((n) => n.source === 'Meteostat') && $locations.some((n) => n.source === 'Open-Meteo')}
+              <HelpIcon
+                href="/documentation/#mixed-snow-parameters"
+                title="Read About Mixed Snow Parameters"
+              >
+                {#snippet text()}
+                  <span class="link">Error: Mixed Parameters</span>
+                {/snippet}
+              </HelpIcon>
+            {/if}
+          </div>
+        {/snippet}
       </WeatherItem>
     {/if}
 
@@ -505,7 +524,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         label="Average Daytime"
         value={convertTime(
           getAverage(
-            $dayt?.filter((n) => n !== null),
+            weatherParametersData.dayt?.filter((n) => n !== null),
             { decimals: 6 },
           ),
         )}
@@ -516,8 +535,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <div bind:this={graph} class="scroll-m-[60px] w-full">
   {#if showWeatherChart}
-    {#key $weather}
-      {#key $units}
+    {#key weather.data}
+      {#key units.value}
         <WeatherChart />
       {/key}
     {/key}
@@ -593,8 +612,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     >
       <Accordion>
         <AccordionItem>
-          <svelte:fragment slot="lead"
-            ><svg
+          {#snippet lead()}
+            <svg
               xmlns="http://www.w3.org/2000/svg"
               class="size-6"
               viewBox="0 0 24 24"
@@ -602,18 +621,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 fill="currentColor"
                 d="M21.86 12.5A4.313 4.313 0 0 0 19 11c0-1.95-.68-3.6-2.04-4.96C15.6 4.68 13.95 4 12 4c-1.58 0-3 .47-4.25 1.43s-2.08 2.19-2.5 3.72c-1.25.28-2.29.93-3.08 1.95S1 13.28 1 14.58c0 1.51.54 2.8 1.61 3.85C3.69 19.5 5 20 6.5 20h12c1.25 0 2.31-.44 3.19-1.31c.87-.88 1.31-1.94 1.31-3.19c0-1.15-.38-2.15-1.14-3m-1.59 4.77c-.48.49-1.07.73-1.77.73h-12c-.97 0-1.79-.34-2.47-1C3.34 16.29 3 15.47 3 14.5s.34-1.79 1.03-2.47C4.71 11.34 5.53 11 6.5 11H7c0-1.38.5-2.56 1.46-3.54C9.44 6.5 10.62 6 12 6s2.56.5 3.54 1.46C16.5 8.44 17 9.62 17 11v2h1.5c.7 0 1.29.24 1.77.73S21 14.8 21 15.5s-.24 1.29-.73 1.77M11 15h2v2h-2zm3.43-6.32c.54.45.81 1.07.81 1.82c0 .5-.15.91-.44 1.32c-.3.39-.67.68-1.13.93c-.26.16-.43.32-.52.51A1.7 1.7 0 0 0 13 14h-2c0-.55.11-.92.3-1.18c.2-.26.55-.57 1.07-.91c.26-.16.47-.35.63-.59c.15-.23.23-.51.23-.82c0-.32-.09-.56-.27-.74c-.18-.2-.46-.29-.76-.29c-.27 0-.49.08-.7.23c-.15.15-.25.38-.25.69H9.28c-.05-.75.22-1.39.78-1.8C10.6 8.2 11.31 8 12.2 8c.94 0 1.69.23 2.23.68"
               /></svg
-            ></svelte:fragment
-          >
-          <svelte:fragment slot="summary"
-            >There's some missing data</svelte:fragment
-          >
-          <svelte:fragment slot="content">
+            >
+          {/snippet}
+          {#snippet summary()}
+            There's some missing data
+          {/snippet}
+          {#snippet content()}
             {#each missingDataMerged as { count, type, label }}
-              {#if count && count < $weather?.length}
+              {#if count && count < weather.data?.length}
                 {count}
-                {pluralize($weatherGrouping, count)} with missing {label}
+                {pluralize(weatherGrouping.value, count)} with missing {label}
                 {pluralize(type, count)}.&nbsp;
-              {:else if count && count === $weather?.length}
+              {:else if count && count === weather.data?.length}
                 No days have {label}
                 {type} data.
               {/if}
@@ -633,7 +652,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     - Choose a different
                     <button
                       class="link"
-                      on:click={() => {
+                      onclick={() => {
                         modal.state.trigger({
                           type: 'component',
                           component: {
@@ -652,7 +671,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 missing weather data.
               </p>
             </div>
-          </svelte:fragment>
+          {/snippet}
         </AccordionItem>
       </Accordion>
     </div>
@@ -660,7 +679,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </div>
 
 <div class="mt-2">
-  {#if $weather}
-    <WeatherNavigator data={$weather ? $weather : []} />
+  {#if weather.data}
+    <WeatherNavigator data={weather.data || []} />
   {/if}
 </div>

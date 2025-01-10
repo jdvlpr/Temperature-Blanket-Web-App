@@ -65,8 +65,8 @@ export const setProjectSettings = async (
 
   // Load Units
   if (exists(params.u)) {
-    if (params.u.value === 'i') units.set('imperial');
-    if (params.u.value === 'm') units.set('metric');
+    if (params.u.value === 'i') units.value = 'imperial';
+    if (params.u.value === 'm') units.value = 'metric';
   }
 
   // Load Locations
@@ -388,7 +388,7 @@ export const parseGaugeURLHash = (
     // Before version 1.700, all numbers were saved in metric
     // So convert the From and To values if needed
     if (!upToDate(LOADED_APP_VERSION, '1.700')) {
-      if (get(units) === 'imperial') {
+      if (units.value === 'imperial') {
         switch (gaugeSettings.id) {
           case 'temp':
             from = celsiusToFahrenheit(from);
@@ -519,7 +519,7 @@ export const parseGaugeURLHash = (
 
     // Before version 1.700, all numbers were in metric
     // So update them if needed
-    if (!upToDate(LOADED_APP_VERSION, '1.700') && get(units) === 'imperial') {
+    if (!upToDate(LOADED_APP_VERSION, '1.700') && units.value === 'imperial') {
       increment = celsiusToFahrenheit(increment);
       start = celsiusToFahrenheit(start);
     }

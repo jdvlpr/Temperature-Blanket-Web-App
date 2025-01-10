@@ -58,7 +58,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {#if !!$isCustomWeather}
       Reload Weather Data
     {:else}
-      Search {#if $weather}Again{/if}
+      Search {#if weather.data}Again{/if}
     {/if}
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -92,7 +92,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {#if !!$isCustomWeather}
       Reload Weather Data
     {:else}
-      Search {#if $weather}Again{/if}
+      Search {#if weather.data}Again{/if}
     {/if}
     <svg
       xmlns="http://www.w3.org/2000/svg"

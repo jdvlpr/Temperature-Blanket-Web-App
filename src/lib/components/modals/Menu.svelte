@@ -80,7 +80,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     // Copy window url to clipboard
     if (copy) {
       try {
-        window.navigator.clipboard.writeText($projectStatus.liveURL);
+        window.navigator.clipboard.writeText(projectStatus.state.liveURL);
         copiedMessage = `<span class="inline-flex items-center gap-1">
 						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">
 			<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" />
@@ -93,11 +93,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     }
 
     try {
-      const newURL = new URL($projectStatus.liveURL);
+      const newURL = new URL(projectStatus.state.liveURL);
       window.history.replaceState({ path: newURL.href }, '', newURL.href);
       setLocalStorageProject();
       project = JSON.parse(localStorage.getItem('projects'))?.filter(
-        (project) => project.href === $projectStatus.liveURL,
+        (project) => project.href === projectStatus.state.liveURL,
       )?.[0];
       $isProjectSaved = true;
     } catch {
@@ -171,11 +171,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
           Save
         </button>
 
-        {#if $weather}
+        {#if weather.data}
           <button
             class="btn bg-secondary-hover-token w-fit gap-2"
             onclick={() => goTo('download')}
-            disabled={!$weather}
+            disabled={!weather.data}
             title="Open Download Menu"
             ><svg
               xmlns="http://www.w3.org/2000/svg"
@@ -467,7 +467,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {#if pages.save}
     <div class="">
       <h2 class="my-2 text-lg font-bold">Save</h2>
-      {#if browser && typeof window.localStorage !== 'undefined' && $weather}
+      {#if browser && typeof window.localStorage !== 'undefined' && weather.data}
         <p class="my-2 inline-flex justify-start items-center gap-2 w-full">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -494,7 +494,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <p
         class="select-all break-all card bg-primary-50-900-token p-4 basis-full"
       >
-        {$projectStatus.liveURL}
+        {projectStatus.state.liveURL}
       </p>
       <div class="inline-flex flex-wrap my-2 gap-2 items-center">
         <button

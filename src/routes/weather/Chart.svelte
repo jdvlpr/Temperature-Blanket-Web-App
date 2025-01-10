@@ -36,7 +36,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { onMount } from 'svelte';
   import { hour } from './+page.svelte';
 
-  export let data;
+  let { data } = $props();
 
   Chart.register(
     LineElement,
@@ -204,7 +204,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
             },
             title: {
               text:
-                $units === 'metric' ? 'Degrees Celsius' : 'Degrees Fahrenheit',
+                units.value === 'metric'
+                  ? 'Degrees Celsius'
+                  : 'Degrees Fahrenheit',
               display: true,
               color: '#94a3b8',
             },
@@ -235,7 +237,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     }));
   });
 
-  let ctx;
+  let ctx = $state();
 </script>
 
 <div class="rounded-container-token my-2 h-[240px]">

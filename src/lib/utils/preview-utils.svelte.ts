@@ -161,7 +161,7 @@ export const getSecondaryTargetIndexes = (secondaryTargets) => {
  */
 export const getMonthSepparatorIndexes = () => {
   const spaceIndexes = [];
-  get(weather).forEach((day, index, all) => {
+  weather.data.forEach((day, index, all) => {
     if (index === 0) {
       spaceIndexes.push(0);
       return;

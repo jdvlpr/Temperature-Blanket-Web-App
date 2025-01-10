@@ -123,7 +123,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 
   $effect(() => {
-    if ($liveProjectURLHash) debounce(() => updateHistory(), 300);
+    if (liveProjectURLHash.value) debounce(() => updateHistory(), 300);
   });
 
   $effect(() => {
@@ -138,7 +138,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <svelte:window
   onbeforeunload={(event) => {
-    const url = new URL($projectStatus.liveURL);
+    const url = new URL(projectStatus.state.liveURL);
     if (
       $isProjectSaved ||
       !url.searchParams.has('project') ||
@@ -185,7 +185,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
 
     <div class="flex gap-2 flex-1 justify-between sm:justify-end">
-      {#if $weather && $valid}
+      {#if weather.data && $valid}
         <div class="hidden lg:inline-flex">
           <Tooltip
             classNames="btn bg-secondary-hover-token"
@@ -221,13 +221,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </div>
       {/if}
 
-      {#if !!$weather}
+      {#if !!weather.data}
         <div class="mx-auto sm:mx-0">
           <button
             class="btn bg-secondary-hover-token"
             title="Undo [Cmd ⌘]+[z] or [Ctrl]+[z]"
             id="undo"
-            disabled={!$weather || $history.first || $isHistoryUpdating}
+            disabled={!weather.data || $history.first || $isHistoryUpdating}
             onclick={() => {
               loadFromHistory({
                 action: 'undo',
@@ -244,7 +244,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             class="btn bg-secondary-hover-token"
             id="redo"
             title="Redo [Cmd ⌘]+[Shift ⇧]+[z] or [Ctrl]+[Shift ⇧]+[Z]"
-            disabled={!$weather || $history.last || $isHistoryUpdating}
+            disabled={!weather.data || $history.last || $isHistoryUpdating}
             onclick={() => {
               loadFromHistory({
                 action: 'redo',
@@ -494,12 +494,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <Locations />
           {/snippet}
         </Card>
-        {#if !$pinAllSections && $weather}
+        {#if !$pinAllSections && weather.data}
           <SectionNavigationButtons thisSectionIndex={1} />
         {/if}
       </div>
 
-      {#if $weather}
+      {#if weather.data}
         <div
           id="page-section-weather-data"
           class="lg:my-4 scroll-mt-[58px] w-full"
@@ -516,7 +516,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               </div>
             {/snippet}
           </Card>
-          {#if !$pinAllSections && $weather}
+          {#if !$pinAllSections && weather.data}
             <SectionNavigationButtons thisSectionIndex={2} />
           {/if}
         </div>
@@ -536,7 +536,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <Gauges />
             {/snippet}
           </Card>
-          {#if !$pinAllSections && $weather}
+          {#if !$pinAllSections && weather.data}
             <SectionNavigationButtons thisSectionIndex={3} />
           {/if}
           <p class="max-lg:mx-2 text-center text-sm my-4">
@@ -544,7 +544,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             trademarked yarn or colorway details are owned by their respective
             companies.
           </p>
-          {#if $pinAllSections && $weather}
+          {#if $pinAllSections && weather.data}
             <div class="flex-grow border-t border-surface-300-600-token"></div>
           {/if}
         </div>
@@ -578,7 +578,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               </div>
             {/snippet}
           </Card>
-          {#if !$pinAllSections && $weather}
+          {#if !$pinAllSections && weather.data}
             <SectionNavigationButtons thisSectionIndex={4} />
           {/if}
           <p class="text-sm max-lg:mx-2 text-center my-4">

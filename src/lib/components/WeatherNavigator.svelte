@@ -27,7 +27,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { downloadWeatherCSV, getWeatherTargets } from '$lib/utils';
   import { RadioGroup, RadioItem } from '@skeletonlabs/skeleton';
 
-  export let data = $weather ? $weather : [];
+  export let data = weather.data || [];
   export let context = 'body';
 
   $: weatherTargets = getWeatherTargets({
@@ -87,7 +87,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </span>
     </button>
 
-    {#if $weatherGrouping !== 'week' && context === 'body'}
+    {#if weatherGrouping.value !== 'week' && context === 'body'}
       <button
         class="btn bg-secondary-hover-token whitespace-pre-wrap"
         on:click={() => {

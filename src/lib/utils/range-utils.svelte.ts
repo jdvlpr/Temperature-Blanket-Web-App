@@ -65,8 +65,8 @@ export const getEvenlyDistributedRangeValuesWithEqualDayCount = ({
   includeFrom,
   includeTo,
 }) => {
-  if (!weatherData) weatherData = get(weather);
-  const _units = get(units);
+  if (!weatherData) weatherData = weather.data;
+  const _units = units.value;
 
   let _weatherData = [...weatherData];
   _weatherData = _weatherData.filter((day) => day[prop][_units] !== null); // filter out any missing values
@@ -157,7 +157,7 @@ export const getDaysInRange = ({
   includeFromValue,
   includeToValue,
 }) => {
-  const _weather = get(weather);
+  const _weather = weather.data;
   if (
     !direction ||
     !_weather ||
@@ -165,7 +165,7 @@ export const getDaysInRange = ({
     typeof includeToValue === 'undefined'
   )
     return [];
-  const _units = get(units);
+  const _units = units.value;
   const days = _weather.filter((day) => {
     return isValueInRange({
       value: day[id][_units],
@@ -215,7 +215,7 @@ export const isValueInRange = ({
  * @return  {Number}             Percentage (supply your own sign %)
  */
 export const getDaysPercent = (daysCount) => {
-  const weatherLength = get(weather).length;
+  const weatherLength = weather.data.length;
   let round = Math.round((daysCount / weatherLength) * 100);
   if (daysCount > 0 && round === 0) {
     round = 1;

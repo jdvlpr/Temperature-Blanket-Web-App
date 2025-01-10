@@ -81,7 +81,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   $: if ($createdGauges)
     $settings.selectedTarget = setTargets($settings.selectedTarget);
 
-  $: totalLength = $weather ? $weather?.length * $settings.lineLength : 0;
+  $: totalLength = weather.data
+    ? weather.data?.length * $settings.lineLength
+    : 0;
 
   $: lengthFactors = getLengthFactors(totalLength);
   function getLengthFactors(_totalLength) {
@@ -128,7 +130,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </div>
 
 <label class="label">
-  <span>Color Using the {capitalizeFirstLetter($weatherGrouping)}'s</span>
+  <span>Color Using the {capitalizeFirstLetter(weatherGrouping.value)}'s</span>
   <select
     class="select w-fit"
     id="crnr-param"

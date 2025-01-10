@@ -18,7 +18,7 @@ import { locations } from '$lib/stores';
 import { get } from 'svelte/store';
 import pdfConfig from '../pdf-config';
 import gauges from './gauges';
-import weatherData from './weather-data';
+import weatherData from './weather-data.svelte';
 
 const pdfFooter = {
   pages: () => {

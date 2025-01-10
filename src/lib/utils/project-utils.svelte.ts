@@ -14,7 +14,7 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import pdfGauges from '$lib/pdf/sections/gauges';
-import pdfWeatherData from '$lib/pdf/sections/weather-data';
+import pdfWeatherData from '$lib/pdf/sections/weather-data.svelte';
 import {
   activePreview,
   createdGauges,
@@ -79,10 +79,9 @@ export const downloadWeatherCSV = () => {
       }
     });
   });
-  const weatherStore = get(weather);
-  if (!weatherStore) return;
+  if (!weather.data) return;
   const _units = get(units);
-  const _weather = [...weatherStore].map((day, index) => {
+  const _weather = [...weather.data].map((day, index) => {
     const gaugeInfo = [];
     allGaugesAttributes?.forEach((gauge) => {
       gauge.targets?.forEach((target) => {
@@ -177,7 +176,7 @@ export const sendToProjectGallery = async (img) => {
     locations: JSON.stringify(_locations),
     missing_days: missingDaysCount(),
     palettes: JSON.stringify(palettes),
-    project_url: get(projectStatus).liveURL,
+    project_url: projectStatus.state.liveURL,
     tables: JSON.stringify(tables),
     title: get(projectTitle),
     total_days: get(weatherUngrouped)?.length,

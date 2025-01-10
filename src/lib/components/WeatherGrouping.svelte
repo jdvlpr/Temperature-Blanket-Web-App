@@ -22,13 +22,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <div class="flex gap-1 items-center">
     <RadioGroup class="flex-wrap gap-y-2" active="bg-secondary-active-token">
       <RadioItem
-        bind:group={$weatherGrouping}
+        bind:group={weatherGrouping.value}
         name="weatherGrouping"
         value={'day'}
         title="Set weather grouping to days">Daily</RadioItem
       >
       <RadioItem
-        bind:group={$weatherGrouping}
+        bind:group={weatherGrouping.value}
         name="weatherGrouping"
         value={'week'}
         title="Set weather grouping to weeks">Weekly</RadioItem

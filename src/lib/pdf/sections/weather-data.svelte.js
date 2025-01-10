@@ -17,9 +17,7 @@ import {
   allGaugesAttributes,
   gaugesState,
   locations,
-  tavg,
-  tmax,
-  tmin,
+  weatherParametersData,
   units,
   weather,
   weatherGrouping,
@@ -66,7 +64,7 @@ const pdfWeatherData = {
     );
   },
   pages: () => {
-    let rows = get(weather).length;
+    let rows = weather.data.length;
     rows -= pdfWeatherData.MAX_ROWS; // count first page rows
     let pages = 1; // add first page
     pages += Math.ceil(rows / pdfWeatherData.MAX_ROWS_FULL_PAGE); // Add the rest of the pages
@@ -78,17 +76,17 @@ const pdfWeatherData = {
     // Heading
     doc.setFontSize(pdfConfig.font.h2);
     doc.setFont(pdfConfig.font.heading, 'normal');
-    const description = `Weather Data for ${get(locations).length} ${pluralize('Location', get(locations).length)}, ${get(weather).length} ${pluralize(capitalizeFirstLetter(get(weatherGrouping)), get(weather).length)}`;
+    const description = `Weather Data for ${get(locations).length} ${pluralize('Location', get(locations).length)}, ${weather.data.length} ${pluralize(capitalizeFirstLetter(weatherGrouping.value), weather.data.length)}`;
     doc.text(description, pdfConfig.leftMargin, pdfConfig.topMargin);
     // Low Avg High Temps
     doc.setFontSize(pdfConfig.font.p);
     doc.setFont(pdfConfig.font.paragraph, 'normal');
-    const tempSymbol = get(units) === 'metric' ? 'C' : 'F';
-    const average = `Lowest Temperature: ${Math.min(...get(tmin).filter((n) => n !== null))} °${tempSymbol}`;
+    const tempSymbol = units.value === 'metric' ? 'C' : 'F';
+    const average = `Lowest Temperature: ${Math.min(...weatherParametersData.tmin.filter((n) => n !== null))} °${tempSymbol}`;
     doc.text(average, pdfConfig.leftMargin, pdfConfig.topMargin + 9);
-    const high = `Average Temperature: ${getAverage(get(tavg).filter((n) => n !== null))} °${tempSymbol}`;
+    const high = `Average Temperature: ${getAverage(weatherParametersData.tavg.filter((n) => n !== null))} °${tempSymbol}`;
     doc.text(high, pdfConfig.leftMargin + 60, pdfConfig.topMargin + 9);
-    const low = `Highest Temperature: ${Math.max(...get(tmax).filter((n) => n !== null))} °${tempSymbol}`;
+    const low = `Highest Temperature: ${Math.max(...weatherParametersData.tmax.filter((n) => n !== null))} °${tempSymbol}`;
     doc.text(low, pdfConfig.leftMargin + 125, pdfConfig.topMargin + 9);
 
     // Create footer
@@ -104,7 +102,7 @@ const pdfWeatherData = {
           pdfConfig.topMargin +
           this.headerMarginY * this.linePadding +
           this.LINE_HEIGHT;
-      i < get(weather).length;
+      i < weather.data.length;
       i++, line += this.LINE_HEIGHT, pageRows += 1
     ) {
       if (i === pdfWeatherData.MAX_ROWS) {
@@ -133,11 +131,11 @@ const pdfWeatherData = {
       doc.setFontSize(pdfConfig.font.p);
       doc.setFont(pdfConfig.font.paragraph, 'normal');
       // Date
-      const heading = `${i + 1}) ${get(weather)[i]?.date.toLocaleDateString()}`;
+      const heading = `${i + 1}) ${weather.data[i]?.date.toLocaleDateString()}`;
       doc.text(heading, this.headings[0].positionX, line);
       // Location
       let location = String(
-        get(locations).filter((n) => n.index === get(weather)[i].location)[0]
+        get(locations).filter((n) => n.index === weather.data[i].location)[0]
           .label,
       );
       if (location.includes(',')) {
@@ -153,7 +151,7 @@ const pdfWeatherData = {
       doc.text(location, this.headings[1].positionX, line);
       doc.setFontSize(pdfConfig.font.p);
       // Data
-      pdfWeatherData.createRowData(doc, get(weather)[i], line);
+      pdfWeatherData.createRowData(doc, weather.data[i], line);
       // Horizontal Line
       doc.line(
         pdfConfig.leftMargin - this.linePadding,
@@ -194,7 +192,7 @@ const pdfWeatherData = {
     // Date and Location
     for (let i = 0; i < this.headings.length; i += 1) {
       let text = this.headings[i].text;
-      if (this.headings[i].text === 'Day') text = get(weatherItemHeading);
+      if (this.headings[i].text === 'Day') text = weatherItemHeading.value;
       doc.text(text, this.headings[i].positionX, positionY);
       doc.line(
         this.headings[i].positionX - this.linePadding,
@@ -207,7 +205,7 @@ const pdfWeatherData = {
     const targets = allGaugesAttributes.map((n) => n.targets).flat();
     targets.forEach((target, i) => {
       const x = this.weatherDataPositionX + this.weatherDataColumnWidth * i;
-      doc.text(target.pdfHeader[get(units)], x, positionY);
+      doc.text(target.pdfHeader[units.value], x, positionY);
       doc.line(
         x - this.linePadding,
         yBottomLine,
@@ -243,15 +241,15 @@ const pdfWeatherData = {
       const param = params[i].id;
       // Number
       let sValue;
-      if (day[param][get(units)] === null) {
+      if (day[param][units.value] === null) {
         sValue = '';
       } else {
         if (param === 'dayt') {
-          sValue = convertTime(day[param][get(units)], {
+          sValue = convertTime(day[param][units.value], {
             displayUnits: false,
           });
         } else {
-          sValue = String(day[param][get(units)]); // gauge.unit.label[Project.units]
+          sValue = String(day[param][units.value]); // gauge.unit.label[Project.units]
         }
       }
       // const sValue = param.id.toString(); //gauge.unit.label[Project.units]
@@ -278,7 +276,7 @@ const pdfWeatherData = {
         const gaugeId = allGaugesAttributes.filter((gauge) =>
           gauge.targets.some((item) => item.id === param),
         )[0].id;
-        const colorInfo = getColorInfo(gaugeId, day[param][get(units)]);
+        const colorInfo = getColorInfo(gaugeId, day[param][units.value]);
         doc.setFillColor(colorInfo.hex);
         doc.rect(marginRight + 15, line - 4, 5, 5, 'F');
         // Color Number

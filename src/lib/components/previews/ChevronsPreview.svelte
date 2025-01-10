@@ -38,7 +38,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   const ROW_HEIGHT = 5;
   $: width = $settings.chevronsPerRow * chevronSideLength;
   $: height =
-    ROW_HEIGHT * $weather?.length +
+    ROW_HEIGHT * weather.data?.length +
     ROW_HEIGHT * $settings.selectedTargets.length +
     $settings.chevronSideLength;
   $: chevronHeight = chevronSideLength / 2;
@@ -50,13 +50,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
     .filter((n) => $settings.selectedTargets.includes(n.id));
 
   $: $details = {
-    rows: $weather?.length * $settings.selectedTargets.length,
+    rows: weather.data?.length * $settings.selectedTargets.length,
   };
 
   let sections = [];
 
-  $: if ($projectStatus.liveURL) {
-    let total = $weather?.length;
+  $: if (projectStatus.state.liveURL) {
+    let total = weather.data?.length;
     sections = [];
     for (let dayIndex = 0, line = ROW_HEIGHT; dayIndex < total; dayIndex++) {
       let section = [];
@@ -76,7 +76,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           },${line} `;
         }
         const target = $settings.selectedTargets[paramIndex];
-        let value = $weather[dayIndex][target][$units];
+        let value = weather.data[dayIndex][target][units.value];
         let gaugeId = getTargetParentGaugeId(target);
         let color = getColorInfo(gaugeId, value).hex;
         section.push({ color, p: points, dayIndex });

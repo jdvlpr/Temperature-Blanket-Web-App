@@ -55,7 +55,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       STITCH_SIZE +
     (dimensionsHeight + 1) * $settings.borderStitches * STITCH_SIZE;
 
-  $: monthsInData = weatherMonthsData({ weatherData: $weather });
+  $: monthsInData = weatherMonthsData({ weatherData: weather.data });
 
   $: daysInLongestMonth = getDaysInLongestMonth(monthsInData);
 
@@ -72,7 +72,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let months = [];
   let borders = [];
 
-  $: if ($projectStatus.liveURL) {
+  $: if (projectStatus.state.liveURL) {
     months = [];
     borders = [
       {
@@ -135,7 +135,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       }
 
       let _dayIndex = dayIndex;
-      if ($weatherGrouping === 'week') {
+      if (weatherGrouping.value === 'week') {
         _dayIndex = Math.ceil((dayIndex - $weatherMonthGroupingStartDay) / 7);
       }
 
@@ -157,7 +157,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
         let color;
         if (day.length) {
           const value =
-            $weather[_dayIndex][$settings.selectedTargets[paramIndex]][$units];
+            weather.data[_dayIndex][$settings.selectedTargets[paramIndex]][
+              units.value
+            ];
           const gaugeId = getTargetParentGaugeId(
             $settings.selectedTargets[paramIndex],
           );
@@ -192,7 +194,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 </script>
 
-{#if $weather}
+{#if weather.data}
   <svg
     id="preview-svg-image"
     class="max-h-[80svh] mx-auto"

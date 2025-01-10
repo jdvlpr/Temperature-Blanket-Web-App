@@ -32,7 +32,7 @@ import {
 import { showDaysInRange, units } from '$lib/stores';
 import { get } from 'svelte/store';
 import pdfConfig from '../pdf-config';
-import pdfColorDetails from './color-details';
+import pdfColorDetails from './color-details.svelte';
 import pdfFooter from './footer';
 
 const pdfGauge = {
@@ -211,9 +211,9 @@ const pdfGauge = {
       }
       // Item From & To Values
       const from =
-        String(gauge.ranges[i].from) + ' ' + gauge.unit.label[get(units)];
+        String(gauge.ranges[i].from) + ' ' + gauge.unit.label[units.value];
       const to =
-        String(gauge.ranges[i].to) + ' ' + gauge.unit.label[get(units)];
+        String(gauge.ranges[i].to) + ' ' + gauge.unit.label[units.value];
       doc.setFontSize(pdfConfig.font.p);
       doc.text(
         from,

@@ -287,7 +287,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
             $validId = false;
             if (document.querySelector('.autocomplete'))
               document.querySelector('.autocomplete').remove();
-            // $weatherData = null;
             await goto('?');
             $inputLocation.focus();
           }}

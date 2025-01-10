@@ -81,12 +81,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import Gauge from '$lib/components/Gauge.svelte';
-  import { prcp } from '$lib/stores';
+  import { weatherParametersData } from '$lib/stores';
   import type { GaugeAttributes } from '$lib/types/gauge-types';
   import { displayNumber } from '$lib/utils';
 
-  $: maxes = $prcp.filter((n) => n !== null);
-  $: mins = $prcp.filter((n) => n !== null);
+  $: maxes = weatherParametersData.prcp.filter((n) => n !== null);
+  $: mins = weatherParametersData.prcp.filter((n) => n !== null);
 
   $: max = Number.isInteger(Math.max(...maxes))
     ? Math.max(...maxes) + 1

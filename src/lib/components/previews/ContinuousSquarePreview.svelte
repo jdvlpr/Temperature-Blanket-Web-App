@@ -37,7 +37,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   $: previews[previewIndex].svg = svg;
 
   const STITCH_SIZE = 5;
-  $: dayStitches = $settings.stitchesPerDay * $weather?.length;
+  $: dayStitches = $settings.stitchesPerDay * weather.data?.length;
   $: initialRounds = getInitialNumberOfRounds(dayStitches);
   $: rounds =
     initialCountOfAdditionalStitches > getNumberOfStitchesInRound(initialRounds)
@@ -129,7 +129,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let sections = [];
 
-  $: if ($projectStatus.liveURL) {
+  $: if (projectStatus.state.liveURL) {
     // Setup constants
     let x = width / 2 - STITCH_SIZE * 2;
     let y = height / 2 - STITCH_SIZE * 4;
@@ -139,8 +139,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     let isExtraStitch = false;
     sections = [];
     for (let stitch = 1; stitch <= totalStitches; stitch += 1) {
-      if (dayIndex < $weather?.length) {
-        value = $weather[dayIndex][$settings.selectedTarget][$units];
+      if (dayIndex < weather.data?.length) {
+        value = weather.data[dayIndex][$settings.selectedTarget][units.value];
         gaugeId = getTargetParentGaugeId($settings.selectedTarget);
         color = getColorInfo(gaugeId, value).hex;
         isExtraStitch = false;
