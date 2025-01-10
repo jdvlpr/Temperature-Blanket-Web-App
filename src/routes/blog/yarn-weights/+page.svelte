@@ -46,12 +46,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <AppShell pageName="Yarn Weights">
   {#snippet stickyHeader()}
-  
-      <div class="hidden lg:inline-flex mx-auto"><AppLogo /></div>
-    
+    <div class="hidden lg:inline-flex mx-auto"><AppLogo /></div>
   {/snippet}
   {#snippet main()}
-    <main  class="pb-8">
+    <main class="pb-8">
       <a
         href="/blog"
         class="btn bg-secondary-hover-token gap-1 mb-2 max-lg:mx-2 max-lg:mt-2"
@@ -59,10 +57,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
       >
       <Card>
         {#snippet content()}
-            <div  class="pb-4 px-2">
+          <div class="pb-4 px-2">
             <YarnWeightChart />
           </div>
-          {/snippet}
+        {/snippet}
       </Card>
     </main>
   {/snippet}

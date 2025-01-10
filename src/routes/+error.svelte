@@ -14,21 +14,22 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
   import AppLogo from '$lib/components/AppLogo.svelte';
   import AppShell from '$lib/components/AppShell.svelte';
 </script>
 
 <AppShell pageName="Error">
-  <svelte:fragment slot="stickyHeader">
+  {#snippet stickyHeader()}
     <div class="hidden lg:inline-flex mx-auto"><AppLogo /></div>
-  </svelte:fragment>
-  <main
-    slot="main"
-    class="max-w-screen-lg m-auto text-center flex flex-col gap-2 my-12 px-2"
-  >
-    <p class="font-ornament text-6xl">E</p>
-    <p>{$page.status} Error</p>
-    <p>{$page.error.message}</p>
-  </main>
+  {/snippet}
+  {#snippet main()}
+    <main
+      class="max-w-screen-lg m-auto text-center flex flex-col gap-2 my-12 px-2"
+    >
+      <p class="font-ornament text-6xl">E</p>
+      <p>{page.status} Error</p>
+      <p>{page.error?.message}</p>
+    </main>
+  {/snippet}
 </AppShell>

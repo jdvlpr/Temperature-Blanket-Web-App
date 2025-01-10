@@ -28,8 +28,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { onMount } from 'svelte';
   import { entries } from './changelog';
 
-  let container;
-  let showScrollToTopButton = false;
+  let container = $state();
+  let showScrollToTopButton = $state(false);
   let scrollObserver = browser
     ? new IntersectionObserver((entries, observer) => {
         if (!entries[0].isIntersecting) {
@@ -72,34 +72,36 @@ If not, see <https://www.gnu.org/licenses/>. -->
 {/if}
 
 <AppShell pageName="Changelog">
-  <svelte:fragment slot="stickyHeader">
+  {#snippet stickyHeader()}
     <div class="hidden lg:inline-flex mx-auto"><AppLogo /></div>
-  </svelte:fragment>
-  <main slot="main" class="max-w-screen-xl m-auto text-center mb-6">
-    <Card>
-      <div
-        slot="header"
-        class="bg-surface-200-700-token text-token p-4"
-        bind:this={container}
-      >
-        <p class="text-left">
-          See what's new and review past changes from {PUBLIC_BASE_DOMAIN_NAME}.
-          This changelog includes only select milestones.
-          <a
-            href="{PUBLIC_GITHUB_LINK}/commits/main/"
-            class="link"
-            target="_blank">Visit the GitHub repository</a
-          > to see the full changelog since version 4.
-        </p>
-      </div>
-      <div
-        slot="content"
-        class="flex flex-col gap-2 text-left items-start py-4"
-      >
-        {#each entries as { version, date, notes }}
-          <ChangelogItem {version} {date} {notes} />
-        {/each}
-      </div>
-    </Card>
-  </main>
+  {/snippet}
+  {#snippet main()}
+    <main class="max-w-screen-xl m-auto text-center mb-6">
+      <Card>
+        {#snippet header()}
+          <div
+            class="bg-surface-200-700-token text-token p-4"
+            bind:this={container}
+          >
+            <p class="text-left">
+              See what's new and review past changes from {PUBLIC_BASE_DOMAIN_NAME}.
+              This changelog includes only select milestones.
+              <a
+                href="{PUBLIC_GITHUB_LINK}/commits/main/"
+                class="link"
+                target="_blank">Visit the GitHub repository</a
+              > to see the full changelog since version 4.
+            </p>
+          </div>
+        {/snippet}
+        {#snippet content()}
+          <div class="flex flex-col gap-2 text-left items-start py-4">
+            {#each entries as { version, date, notes }}
+              <ChangelogItem {version} {date} {notes} />
+            {/each}
+          </div>
+        {/snippet}
+      </Card>
+    </main>
+  {/snippet}
 </AppShell>

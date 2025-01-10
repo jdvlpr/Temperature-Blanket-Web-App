@@ -9,19 +9,10 @@
   import chroma from 'chroma-js';
   import { onMount } from 'svelte';
 
-  let content: string = '';
-  let showClearButton = false;
+  let content: string = $state('');
+  let showClearButton = $state(false);
 
-  let columnWidth = 200;
-
-  $: querySelector = '';
-  $: useElementAttribute = false;
-  $: querySelectorAttribute = '';
-  $: excludeBefore = false;
-  $: excludeBeforeString = '';
-  $: excludeAfter = false;
-  $: excludeAfterString = '';
-  $: removeNumbers = true;
+  let columnWidth = $state(200);
 
   let mounted = false;
 
@@ -42,13 +33,6 @@
 
     mounted = true;
   });
-
-  $: names = [];
-
-  $: data = { querySelector, content, names };
-  $: data, setLocalStorage();
-
-  $: htmlObject = createHTMLObject(content);
 
   function setLocalStorage() {
     if (!browser || !mounted) return;
@@ -111,6 +95,31 @@
     }
     names = names;
   }
+  let querySelector = $state('');
+
+  let useElementAttribute = $state(false);
+
+  let querySelectorAttribute = $state('');
+
+  let excludeBefore = $state(false);
+
+  let excludeBeforeString = $state('');
+
+  let excludeAfter = $state(false);
+
+  let excludeAfterString = $state('');
+
+  let removeNumbers = $state(true);
+
+  let names = $state([]);
+
+  let data = $derived({ querySelector, content, names });
+
+  $effect(() => {
+    data;
+    setLocalStorage();
+  });
+  let htmlObject = $derived(createHTMLObject(content));
 </script>
 
 <svelte:head>
@@ -127,177 +136,185 @@
 </svelte:head>
 
 <AppShell pageName="Extract Yarn Colorways">
-  <svelte:fragment slot="stickyHeader">
+  {#snippet stickyHeader()}
     <div class="hidden lg:inline-flex mx-auto"><AppLogo /></div>
-  </svelte:fragment>
-  <main slot="main" class="max-w-screen-xl px-2 lg:px-0 text-left">
-    {#if dev}
-      <h2 class="text-3xl my-2 font-cursive">Input</h2>
+  {/snippet}
+  {#snippet main()}
+    <main class="max-w-screen-xl px-2 lg:px-0 text-left">
+      {#if dev}
+        <h2 class="text-3xl my-2 font-cursive">Input</h2>
 
-      <div class="px-2 flex flex-col gap-4">
-        <label class="text-sm"
-          >Paste HTML Here
-          <textarea
-            class="w-full grow textarea shadow-inner border-none"
-            bind:value={content}
-            rows="5"
-          />
-        </label>
-
-        <div class="tex-left flex flex-col items-start">
-          <label class="text-sm pl-[12px]">
-            Element Query Selector
-            <input
-              type="text"
-              placeholder="e.g., a, .description"
-              class="w-full grow bg-surface-50 placeholder-surface-400 dark:placeholder-surface-500 rounded-full cursor-text text-surface-800 dark:text-surface-50 shadow-inner dark:bg-surface-800 border-none"
-              bind:value={querySelector}
-            />
+        <div class="px-2 flex flex-col gap-4">
+          <label class="text-sm"
+            >Paste HTML Here
+            <textarea
+              class="w-full grow textarea shadow-inner border-none"
+              bind:value={content}
+              rows="5"
+            ></textarea>
           </label>
-        </div>
 
-        <div>
-          <ToggleSwitch bind:checked={removeNumbers} label="Remove Numbers" />
-        </div>
-
-        <div>
-          <ToggleSwitch
-            bind:checked={useElementAttribute}
-            label="Use Element Attribute"
-          />
-
-          {#if useElementAttribute}
-            <div class="tex-left flex flex-col items-start">
-              <label class="text-sm pl-[12px]">
-                Element Attribute
-                <input
-                  type="text"
-                  placeholder="e.g., title, data-name"
-                  class="w-full grow bg-surface-50 placeholder-surface-400 dark:placeholder-surface-500 rounded-full cursor-text text-surface-800 dark:text-surface-50 shadow-inner dark:bg-surface-800 border-none"
-                  bind:value={querySelectorAttribute}
-                />
-              </label>
-            </div>
-          {/if}
-        </div>
-
-        <div>
-          <ToggleSwitch bind:checked={excludeBefore} label="Exclude Before" />
-          {#if excludeBefore}
-            <div class="tex-left flex flex-col items-start">
-              <label class="text-sm pl-[12px]">
-                Exclude Before
-                <input
-                  type="text"
-                  class="w-full grow bg-surface-50 placeholder-surface-800 dark:placeholder-white rounded-full cursor-text text-surface-800 dark:text-surface-50 shadow-inner dark:bg-surface-800 border-none"
-                  bind:value={excludeBeforeString}
-                />
-              </label>
-            </div>
-          {/if}
-        </div>
-
-        <div>
-          <ToggleSwitch bind:checked={excludeAfter} label="Exclude After" />
-          {#if excludeAfter}
-            <div class="tex-left flex flex-col items-start">
-              <label class="text-sm pl-[12px]">
-                Exclude After
-                <input
-                  type="text"
-                  class="w-full grow bg-surface-50 placeholder-surface-800 dark:placeholder-white rounded-full cursor-text text-surface-800 dark:text-surface-50 shadow-inner dark:bg-surface-800 border-none"
-                  bind:value={excludeAfterString}
-                />
-              </label>
-            </div>
-          {/if}
-        </div>
-
-        <h2 class="text-3xl my-2 font-cursive">Output</h2>
-
-        <div class="">
-          <button
-            class="btn variant-filled-primary"
-            on:click={async () => await getNames()}
-            disabled={querySelector === '' || content === ''}
-            >Get Colorway Names</button
-          >
-          <Expand
-            bind:isExpanded={showClearButton}
-            less="Hide Clear Button"
-            more="Show Clear Button"
-          />
-          {#if showClearButton}
-            <button
-              class="btn variant-filled-primary"
-              on:click={() => (names = [])}>Clear</button
-            >
-          {/if}
-        </div>
-
-        <div class="flex flex-col">
-          <label class="label" for="numberOfColumns">Column Width (px)</label>
-          <input
-            type="number"
-            class="select w-fit"
-            id="numberOfColumns"
-            bind:value={columnWidth}
-          />
-        </div>
-
-        {#if names?.length}
-          <p>{names.length} Colorways</p>
-          <div class="flex justify-start flex-wrap">
-            {#each names as { name, hex }, index}
-              <div
-                class="p-2 flex flex-col gap-1"
-                style="background:{hex};color:{getTextColor(
-                  hex,
-                )};width:{columnWidth}px"
-              >
-                <p class="text-sm">{index + 1}</p>
-                <div contenteditable="true" bind:innerHTML={name} class="">
-                  {name}
-                </div>
-                <div
-                  contenteditable="true"
-                  bind:innerHTML={hex}
-                  class="border bg-white text-black"
-                >
-                  {hex}
-                </div>
-              </div>
-            {/each}
+          <div class="tex-left flex flex-col items-start">
+            <label class="text-sm pl-[12px]">
+              Element Query Selector
+              <input
+                type="text"
+                placeholder="e.g., a, .description"
+                class="w-full grow bg-surface-50 placeholder-surface-400 dark:placeholder-surface-500 rounded-full cursor-text text-surface-800 dark:text-surface-50 shadow-inner dark:bg-surface-800 border-none"
+                bind:value={querySelector}
+              />
+            </label>
           </div>
+
           <div>
+            <ToggleSwitch bind:checked={removeNumbers} label="Remove Numbers" />
+          </div>
+
+          <div>
+            <ToggleSwitch
+              bind:checked={useElementAttribute}
+              label="Use Element Attribute"
+            />
+
+            {#if useElementAttribute}
+              <div class="tex-left flex flex-col items-start">
+                <label class="text-sm pl-[12px]">
+                  Element Attribute
+                  <input
+                    type="text"
+                    placeholder="e.g., title, data-name"
+                    class="w-full grow bg-surface-50 placeholder-surface-400 dark:placeholder-surface-500 rounded-full cursor-text text-surface-800 dark:text-surface-50 shadow-inner dark:bg-surface-800 border-none"
+                    bind:value={querySelectorAttribute}
+                  />
+                </label>
+              </div>
+            {/if}
+          </div>
+
+          <div>
+            <ToggleSwitch bind:checked={excludeBefore} label="Exclude Before" />
+            {#if excludeBefore}
+              <div class="tex-left flex flex-col items-start">
+                <label class="text-sm pl-[12px]">
+                  Exclude Before
+                  <input
+                    type="text"
+                    class="w-full grow bg-surface-50 placeholder-surface-800 dark:placeholder-white rounded-full cursor-text text-surface-800 dark:text-surface-50 shadow-inner dark:bg-surface-800 border-none"
+                    bind:value={excludeBeforeString}
+                  />
+                </label>
+              </div>
+            {/if}
+          </div>
+
+          <div>
+            <ToggleSwitch bind:checked={excludeAfter} label="Exclude After" />
+            {#if excludeAfter}
+              <div class="tex-left flex flex-col items-start">
+                <label class="text-sm pl-[12px]">
+                  Exclude After
+                  <input
+                    type="text"
+                    class="w-full grow bg-surface-50 placeholder-surface-800 dark:placeholder-white rounded-full cursor-text text-surface-800 dark:text-surface-50 shadow-inner dark:bg-surface-800 border-none"
+                    bind:value={excludeAfterString}
+                  />
+                </label>
+              </div>
+            {/if}
+          </div>
+
+          <h2 class="text-3xl my-2 font-cursive">Output</h2>
+
+          <div class="">
             <button
               class="btn variant-filled-primary"
-              on:click={() => {
-                let namesToCopy = names.map((n) => {
-                  return {
-                    hex: chroma.valid(n.hex)
-                      ? chroma(n.hex).hex().toLowerCase()
-                      : '',
-                    name: n.name,
-                  };
-                });
-                window.navigator.clipboard.writeText(
-                  JSON.stringify(namesToCopy),
-                );
-                console.log(namesToCopy);
-              }}
+              onclick={async () => await getNames()}
+              disabled={querySelector === '' || content === ''}
+              >Get Colorway Names</button
             >
-              Copy to Clipboard As Array
-            </button>
+            <Expand
+              bind:isExpanded={showClearButton}
+              less="Hide Clear Button"
+              more="Show Clear Button"
+            />
+            {#if showClearButton}
+              <button
+                class="btn variant-filled-primary"
+                onclick={() => (names = [])}>Clear</button
+              >
+            {/if}
           </div>
-        {/if}
-      </div>
-    {:else}
-      <div class="mb-4">
-        <p class="font-ornament text-8xl my-12">d</p>
-        <p class="">This page is not available to you.</p>
-      </div>
-    {/if}
-  </main>
-  <Footer slot="footer" />
+
+          <div class="flex flex-col">
+            <label class="label" for="numberOfColumns">Column Width (px)</label>
+            <input
+              type="number"
+              class="select w-fit"
+              id="numberOfColumns"
+              bind:value={columnWidth}
+            />
+          </div>
+
+          {#if names?.length}
+            <p>{names.length} Colorways</p>
+            <div class="flex justify-start flex-wrap">
+              {#each names as { name, hex }, index}
+                <div
+                  class="p-2 flex flex-col gap-1"
+                  style="background:{hex};color:{getTextColor(
+                    hex,
+                  )};width:{columnWidth}px"
+                >
+                  <p class="text-sm">{index + 1}</p>
+                  <div
+                    contenteditable="true"
+                    bind:innerHTML={names[index].name}
+                    class=""
+                  >
+                    {name}
+                  </div>
+                  <div
+                    contenteditable="true"
+                    bind:innerHTML={names[index].hex}
+                    class="border bg-white text-black"
+                  >
+                    {hex}
+                  </div>
+                </div>
+              {/each}
+            </div>
+            <div>
+              <button
+                class="btn variant-filled-primary"
+                onclick={() => {
+                  let namesToCopy = names.map((n) => {
+                    return {
+                      hex: chroma.valid(n.hex)
+                        ? chroma(n.hex).hex().toLowerCase()
+                        : '',
+                      name: n.name,
+                    };
+                  });
+                  window.navigator.clipboard.writeText(
+                    JSON.stringify(namesToCopy),
+                  );
+                  console.log(namesToCopy);
+                }}
+              >
+                Copy to Clipboard As Array
+              </button>
+            </div>
+          {/if}
+        </div>
+      {:else}
+        <div class="mb-4">
+          <p class="font-ornament text-8xl my-12">d</p>
+          <p class="">This page is not available to you.</p>
+        </div>
+      {/if}
+    </main>
+  {/snippet}
+  {#snippet footer()}
+    <Footer />
+  {/snippet}
 </AppShell>
