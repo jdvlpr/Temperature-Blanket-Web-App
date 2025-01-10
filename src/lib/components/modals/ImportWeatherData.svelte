@@ -50,8 +50,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
       errorMessages = [];
       const text = e.target.result;
       const data = CSVtoArray({ str: text });
-      if (!$weatherUngrouped) return;
-      const weatherToMatch = $weatherUngrouped.map(
+      if (!weatherUngrouped.data) return;
+      const weatherToMatch = weatherUngrouped.data.map(
         (n) => `${dateToISO8601String(n.date)}-${n.location}`,
       );
 
@@ -89,7 +89,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             );
           continue;
         }
-        let day = $weatherUngrouped[index];
+        let day = weatherUngrouped.data[index];
 
         const highF = +row?.['High Temperature (°F)'];
         if (!isNaN(highF)) {
@@ -173,9 +173,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
             day.dayt.metric = hoursToMinutes(hours, 4);
           }
         }
-        $weatherUngrouped[index] = day;
+        weatherUngrouped.data[index] = day;
       }
-      $weatherUngrouped = $weatherUngrouped;
+      weatherUngrouped.data = weatherUngrouped.data;
       imported = true;
       processing = false;
     };
@@ -184,7 +184,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 </script>
 
-<ModalShell {parent} size='small'>
+<ModalShell {parent} size="small">
   <div class="inline-flex flex-col justify-center items-center w-full">
     <div class="mt-2">
       <HelpIcon
@@ -192,8 +192,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
         title="Get more help"
       >
         {#snippet text()}
-                <p class="font-bold underline" >CSV File Requirements</p>
-              {/snippet}
+          <p class="font-bold underline">CSV File Requirements</p>
+        {/snippet}
       </HelpIcon>
     </div>
 
@@ -210,33 +210,30 @@ If not, see <https://www.gnu.org/licenses/>. -->
           }}
         >
           {#snippet lead()}
-                    <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="currentColor"
-                class="w-8 h-8 mx-auto mb-2"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m6.75 12l-3-3m0 0l-3 3m3-3v6m-1.5-15H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"
-                />
-              </svg>
-            
-                  {/snippet}
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="w-8 h-8 mx-auto mb-2"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m6.75 12l-3-3m0 0l-3 3m3-3v6m-1.5-15H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"
+              />
+            </svg>
+          {/snippet}
           {#snippet message()}
-                  
-              <p>
-                <span class="font-bold">Upload a file</span>
-                or drag and drop
-              </p>
-            
-                  {/snippet}
+            <p>
+              <span class="font-bold">Upload a file</span>
+              or drag and drop
+            </p>
+          {/snippet}
           {#snippet meta()}
-                    Only CSV files allowed
-                  {/snippet}
+            Only CSV files allowed
+          {/snippet}
         </FileDropzone>
         {#if errorMessages.length > 0}
           <p>Import finished, but there were some issues (listed below).</p>

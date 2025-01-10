@@ -49,7 +49,7 @@ export const goToProjectSection = async (index) => {
     if (currentScrollTop !== newScrollTop && newScrollTop !== 0) {
       document.documentElement.scrollTop = newScrollTop;
     } else {
-      activeElement.scrollIntoView({
+      activeElement?.scrollIntoView({
         behavior: 'smooth',
         block: 'start',
       });

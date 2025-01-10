@@ -93,7 +93,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     let dayIndex = 0;
     let roundInSquare = 1;
     let isWeather = true;
-    let daysInSquare = $weatherUngrouped?.filter(
+    let daysInSquare = weatherUngrouped.data?.filter(
       (n) =>
         n.date.getFullYear() === months[squareIndex].year &&
         n.date.getMonth() === months[squareIndex].month,
@@ -102,7 +102,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       if (roundsIndex % roundsPerSquare === 0 && roundsIndex !== 0) {
         // New Square
         squareIndex += 1;
-        daysInSquare = $weatherUngrouped?.filter(
+        daysInSquare = weatherUngrouped.data?.filter(
           (n) =>
             n.date.getFullYear() === months[squareIndex].year &&
             n.date.getMonth() === months[squareIndex].month,

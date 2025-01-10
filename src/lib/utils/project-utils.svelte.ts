@@ -179,7 +179,7 @@ export const sendToProjectGallery = async (img) => {
     project_url: projectStatus.state.liveURL,
     tables: JSON.stringify(tables),
     title: get(projectTitle),
-    total_days: get(weatherUngrouped)?.length,
+    total_days: weatherUngrouped.data?.length,
     yarn_urls: JSON.stringify(yarnUrls),
     yarn_details: JSON.stringify(yarnDetails),
     weather_grouping: get(weatherGrouping),

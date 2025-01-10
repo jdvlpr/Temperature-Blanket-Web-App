@@ -62,7 +62,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '$lib/utils';
   import { getToastStore } from '@skeletonlabs/skeleton';
   import { onDestroy, onMount } from 'svelte';
-  import { run } from 'svelte/legacy';
   import { fade } from 'svelte/transition';
   import { Drawer } from 'vaul-svelte';
 
@@ -134,6 +133,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
       });
     }
   });
+
+  $inspect(weatherGrouping.value, weather.data);
 </script>
 
 <svelte:window
@@ -572,7 +573,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   <DonateButton />
                 </div>
 
-                {#key $weatherGrouping}
+                {#key weatherGrouping.value}
                   <Previews />
                 {/key}
               </div>

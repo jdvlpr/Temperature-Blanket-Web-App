@@ -62,7 +62,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   $: monthPadding = $settings.monthPadding ? SQUARE_SECTION_SIZE : 0;
 
-  $: months = weatherMonthsData({ weatherData: $weatherUngrouped });
+  $: months = weatherMonthsData({ weatherData: weatherUngrouped.data });
 
   $: daysInLongestMonth = getDaysInLongestMonth(months);
 
@@ -97,7 +97,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     let monthColumnIndex = 0;
     let monthIndex = 0;
     let monthRowIndex = 0;
-    let total = $weatherUngrouped?.length + extraSquares.length;
+    let total = weatherUngrouped.data?.length + extraSquares.length;
     let weekIndex = 0;
     let rowPadding = 0;
     let columnPadding = 0;
@@ -257,7 +257,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     let max = _squaresPerMonth;
     months.forEach((month, index) => {
       let days = [
-        ...$weatherUngrouped.filter(
+        ...weatherUngrouped.data.filter(
           (day) =>
             day.date.getFullYear() === month.year &&
             day.date.getMonth() === month.month,

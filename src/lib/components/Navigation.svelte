@@ -23,7 +23,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   class="sticky bottom-0 flex justify-center z-10 gap-2 w-full bg-surface-100-800-token backdrop-blur-md"
 >
   <div class="flex justify-around w-full">
-    {#each $pageSections as { title, icon, index, active, pinned, tooltip }}
+    {#each $pageSections as { title, icon, index, active, pinned, tooltipText }}
       {#if index !== 0}
         <div class="flex-1">
           <Tooltip
@@ -35,9 +35,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             dataPinned={pinned}
             dataActive={active}
             dataNoWeather={!weather.data}
-            classNames={`
-                                flex flex-col justify-center items-center disabled:opacity-30 p-2 pb-4 md:pb-2 w-full
-                                text-token
+            classNames={`flex flex-col justify-center items-center disabled:opacity-30 p-2 pb-4 md:pb-2 w-full text-token
                                 data-[active=false]:data-[no-weather=true]:opacity-50 
                                 data-[pinned=false]:data-[active=true]:data-[no-weather=false]:variant-filled-primary
                                 hover:data-[no-weather=false]:data-[active=false]:bg-primary-hover-token
@@ -47,7 +45,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               {@html icon}
             </span><span class="text-xs flex gap-1 items-center">{title} </span>
             {#snippet tooltip()}
-              <p>{tooltip}</p>
+              <p>{tooltipText}</p>
             {/snippet}
           </Tooltip>
         </div>

@@ -87,7 +87,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     // let extraInMonthIndex = 0;
     let dayInMonthCount = 1;
     let isWeather = true;
-    let daysInSquare = $weatherUngrouped?.filter(
+    let daysInSquare = weatherUngrouped.data?.filter(
       (n) =>
         n.date.getFullYear() === monthsInData[monthIndex].year &&
         n.date.getMonth() === monthsInData[monthIndex].month,
@@ -96,7 +96,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       if (rowIndex % rowsPerMonth === 0 && rowIndex !== 0) {
         // New Month
         monthIndex += 1;
-        daysInSquare = $weatherUngrouped?.filter(
+        daysInSquare = weatherUngrouped.data?.filter(
           (n) =>
             n.date.getFullYear() === monthsInData[monthIndex].year &&
             n.date.getMonth() === monthsInData[monthIndex].month,

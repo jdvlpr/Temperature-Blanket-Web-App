@@ -44,7 +44,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   $: disabled = invalid || $isProjectLoading;
 
   function addLocation() {
-    if ($weatherUngrouped) $weatherUngrouped = null;
+    if (weatherUngrouped.data) weatherUngrouped.data = null;
     $locations = $locations.concat({ index: $locations.length });
   }
 

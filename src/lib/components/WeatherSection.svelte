@@ -230,9 +230,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
       ) || null,
   );
   let missingDataMerged = $derived(getMissingDataMerged(missingData));
-  run(() => {
-    $showNavigationSideBar, forceUpdateShowWeatherChart();
+
+  $effect(() => {
+    $showNavigationSideBar;
+    forceUpdateShowWeatherChart();
   });
+
   let projectHasRecentWeatherData = $derived(
     weather.data?.some((date) => {
       return isDateWithinLastSevenDays(date?.date);
@@ -240,7 +243,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   );
   let data = $derived(
     createWeeksProperty({
-      weatherData: $weatherUngrouped,
+      weatherData: weatherUngrouped.data,
       dowOffset: $weatherMonthGroupingStartDay,
     }),
   );
@@ -397,7 +400,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
         id="tmax"
         icon="&uarr;"
         label="Highest Temperature"
-        value={Math.max(...tmax?.filter((n) => n !== null))}
+        value={Math.max(
+          ...weatherParametersData.tmax?.filter((n) => n !== null),
+        )}
         units={UNIT_LABELS.temperature[units.value]}
       >
         {#snippet button()}
@@ -492,7 +497,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         value={weatherParametersData.snow?.every((n) => n === null)
           ? '-'
           : $locations?.every((n) => n.source === 'Meteostat')
-            ? Math.max(...snow?.filter((n) => n !== null))
+            ? Math.max(...weatherParametersData.snow?.filter((n) => n !== null))
             : displayNumber(
                 weatherParametersData.snow
                   ?.filter((n) => n !== null)

@@ -237,7 +237,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   function validate() {
     if ($isCustomWeather) return;
 
-    $weatherUngrouped = null;
+    weatherUngrouped.data = null;
 
     const value = inputLocation.value;
 
@@ -290,7 +290,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 
   function setDates({ from = null, to = null, unsetWeather = true }) {
-    if (unsetWeather) $weatherUngrouped = null;
+    if (unsetWeather) weatherUngrouped.data = null;
     let setDate = new Date(year, month - 1, day, 1);
     const _padFromMonth = String(setDate.getMonth() + 1).padStart(2, '0');
     const _padFromDate = String(setDate.getDate()).padStart(2, '0');
@@ -383,7 +383,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               class="btn bg-secondary-hover-token"
               on:click={() => {
                 remove();
-                $weatherUngrouped = null;
+                weatherUngrouped.data = null;
               }}
               disabled={!!$isCustomWeather || $isProjectLoading}
               title="Remove Location"
@@ -469,7 +469,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             disabled={!!$isCustomWeather}
             on:click={() => {
               if ($isCustomWeather) return;
-              $weatherUngrouped = null;
+              weatherUngrouped.data = null;
               inputLocation.value = '';
               inputLocation.focus();
               $locations[index].label = '';
@@ -563,7 +563,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               max={getYesterday()}
               bind:value={$locations[index].from}
               bind:this={inputStart}
-              on:change={() => ($weatherUngrouped = null)}
+              on:change={() => (weatherUngrouped.data = null)}
               disabled={$isProjectLoading || !!$isCustomWeather}
             />
           </label>
@@ -579,7 +579,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               max={getYesterday()}
               bind:value={$locations[index].to}
               bind:this={inputEnd}
-              on:change={() => ($weatherUngrouped = null)}
+              on:change={() => (weatherUngrouped.data = null)}
               disabled={$isProjectLoading || !!$isCustomWeather}
             />
           </label>

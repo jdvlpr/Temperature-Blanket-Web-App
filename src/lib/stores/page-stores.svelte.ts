@@ -84,7 +84,7 @@ export const pageSections = writable([
     icon: `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
   <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15a4.5 4.5 0 004.5 4.5H18a3.75 3.75 0 001.332-7.257 3 3 0 00-3.758-3.848 5.25 5.25 0 00-10.233 2.33A4.502 4.502 0 002.25 15z" />
 </svg>`,
-    tooltip:
+    tooltipText:
       'See weather data after choosing a valid location and pressing the Search button.',
   },
   {
@@ -97,7 +97,7 @@ export const pageSections = writable([
     scrollTop: 0,
     title: 'Colors',
     icon: ICONS.palette,
-    tooltip:
+    tooltipText:
       'Choose yarn colors and create ranges after choosing a valid location and pressing the Search button.',
   },
   {
@@ -110,7 +110,7 @@ export const pageSections = writable([
     scrollTop: 0,
     title: 'Preview',
     icon: `<svg xmlns="http://www.w3.org/2000/svg" class="size-6" viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="4"><path d="M24 36c11.046 0 20-12 20-12s-8.954-12-20-12S4 24 4 24s8.954 12 20 12Z"/><path d="M24 29a5 5 0 1 0 0-10a5 5 0 0 0 0 10Z"/></g></svg>`,
-    tooltip:
+    tooltipText:
       'Preview and customize your project after choosing a valid location and pressing the Search button.',
   },
 ]);

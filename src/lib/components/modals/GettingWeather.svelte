@@ -22,7 +22,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     gettingLocationWeatherIndex,
     isCustomWeather,
     locations,
-    modal,
     signal,
     useSecondaryWeatherSources,
     wasWeatherLoadedFromLocalStorage,
@@ -31,6 +30,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   // Note: the signal store is a weird necessity, investigate this
   import Spinner from '$lib/components/Spinner.svelte';
   import { delay, getOpenMeteo, goToProjectSection } from '$lib/utils';
+  import { getModalStore } from '@skeletonlabs/skeleton';
   import ModalShell from './ModalShell.svelte';
 
   interface Props {
@@ -38,6 +38,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 
   let { parent }: Props = $props();
+
+  const modalStore = getModalStore();
 
   let container: HTMLDivElement;
 
@@ -60,19 +62,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   async function getWeatherData() {
     $controller = new AbortController();
-    $weatherUngrouped = null;
+    weatherUngrouped.data = null;
     $activeWeatherElementIndex = 0;
     await fetchData()
       .then(() => {
         $controller = null;
         $isCustomWeather = false;
         $wasWeatherLoadedFromLocalStorage = false;
-        modal.state.close();
+        modalStore.close();
         goToProjectSection(2);
       })
       .catch((e) => {
         $controller = null;
-        $weatherUngrouped = null;
+        weatherUngrouped.data = null;
         $isCustomWeather = false;
         $wasWeatherLoadedFromLocalStorage = false;
         error = e?.message;
@@ -184,7 +186,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     }
     tempAllData = tempAllData.flat();
     tempAllData.sort((a, b) => a.date - b.date); // Sort by date, regardless of location
-    $weatherUngrouped = tempAllData;
+    weatherUngrouped.data = tempAllData;
     tempAllData = null;
   }
   let allLocations = $derived(getAllLocations($locations));

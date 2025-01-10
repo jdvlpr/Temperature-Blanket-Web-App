@@ -131,7 +131,7 @@ export const checkForProjectInLocalStorage = async () => {
   if (daysInFuture > 0 && !matchedProject.isCustomWeatherData) return;
 
   // Set the weather data and indicate that it was loaded from local storage
-  weatherUngrouped.set(newWeatherUngrouped);
+  weatherUngrouped.data = newWeatherUngrouped;
   wasWeatherLoadedFromLocalStorage.set(true);
 };
 
@@ -225,7 +225,7 @@ const createProjectLocalStorageProjectObject = () => {
   const href = projectStatus.state.liveURL;
 
   const weatherData =
-    get(weatherUngrouped)?.map((day) => {
+    weatherUngrouped.data?.map((day) => {
       return {
         ...day,
         date: dateToISO8601String(day.date),

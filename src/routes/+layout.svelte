@@ -191,6 +191,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <Modal regionBackdrop="backdrop-blur-sm" />
 
+<p class="text-center p-4 bg-warning-backdrop-token text-token">
+  You are viewing an experimental version. For the stable release, visit <a
+    href="https://temperature-blanket.com"
+    class="link"
+    target="_blank">temperature-blanket.com</a
+  >.
+</p>
 {@render children?.()}
 
 <style>

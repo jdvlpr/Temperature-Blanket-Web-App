@@ -24,29 +24,32 @@ export const defaultWeatherSource: Writable<WeatherSource> =
 /* In the project URL hash, this is '0' for 'false' or '1' for 'true' */
 export const useSecondaryWeatherSources: Writable<boolean> = writable(true);
 
-class WeatherGroupingState {
+class WeatherGroupingClass {
   value: 'day' | 'week' = $state('day');
 }
-export let weatherGrouping = new WeatherGroupingState();
+export let weatherGrouping = new WeatherGroupingClass();
 
-class WeatherItemHeadingState {
+class WeatherItemHeadingClass {
   value: 'Week of' | 'Day' = $derived(
     weatherGrouping.value === 'week' ? 'Week of' : 'Day',
   );
 }
-export const weatherItemHeading = new WeatherItemHeadingState();
+export const weatherItemHeading = new WeatherItemHeadingClass();
 
 export const weatherMonthGroupingStartDay = writable(1);
 
-export const weatherUngrouped: Writable<WeatherDay[] | null> = writable(null);
+class WeatherUngroupedClass {
+  data: WeatherDay[] | null = $state(null);
+}
 
-export const weatherGroupedByWeek = derived(
-  [weatherUngrouped, locations],
-  ([$weatherUngrouped, $locations]) => {
-    if (!$weatherUngrouped) return null;
+export const weatherUngrouped = new WeatherUngroupedClass();
+
+class weatherGroupedByWeekClass {
+  data: WeatherDay[] | null = $derived.by(() => {
+    if (!weatherUngrouped.data) return null;
 
     // Create a deep copy of the ungrouped weather array
-    let copy = JSON.parse(JSON.stringify($weatherUngrouped));
+    let copy = JSON.parse(JSON.stringify(weatherUngrouped.data));
 
     // Recreate date objects
     copy = copy.map((n) => {
@@ -55,7 +58,7 @@ export const weatherGroupedByWeek = derived(
 
     // Check if every location is from Meteostat as the data source
     // Used because Meteostat handle's snow data differently than Open-Meteo
-    const isEveryDayFromMeteostat = $locations?.every(
+    const isEveryDayFromMeteostat = get(locations)?.every(
       (n) => n.source === 'Meteostat',
     );
 
@@ -165,30 +168,27 @@ export const weatherGroupedByWeek = derived(
     });
 
     return _weather;
-  },
-);
+  });
+}
+export const weatherGroupedByWeek = new weatherGroupedByWeekClass();
 
 class WeatherClass {
   data: WeatherDay[] | null = $derived.by(() => {
     switch (weatherGrouping.value) {
       case 'day':
         activeWeatherElementIndex.set(0);
-        return get(weatherUngrouped);
-        break;
+        return weatherUngrouped.data;
 
       case 'week':
         activeWeatherElementIndex.set(0);
         if (!get(weatherGroupedByWeek)) {
           return null;
-          break;
         }
 
         return get(weatherGroupedByWeek);
-        break;
 
       default:
-        return get(weatherUngrouped);
-        break;
+        return weatherUngrouped.data;
     }
   });
 }

@@ -160,16 +160,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
                                 $tablePage = $page;
                                 $tableRowsPerPage = $perPage;
                                 $tableSort = $sort;
-                                const mappedWeather = $weatherUngrouped.map(
+                                const mappedWeather = weatherUngrouped.data.map(
                                   (n) =>
                                     `${dateToISO8601String(n.date)}-${n.location}`,
                                 );
                                 const i = mappedWeather.indexOf(
                                   `${row.date}-${row.location}`,
                                 );
-                                $weatherUngrouped[i][id].metric =
+                                weatherUngrouped.data[i][id].metric =
                                   hoursToMinutes(hours, 4);
-                                $weatherUngrouped[i][id].imperial =
+                                weatherUngrouped.data[i][id].imperial =
                                   displayNumber(+hours, 4);
                               },
                             },
@@ -194,7 +194,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                                 $tablePage = $page;
                                 $tableRowsPerPage = $perPage;
                                 $tableSort = $sort;
-                                const mappedWeather = $weatherUngrouped.map(
+                                const mappedWeather = weatherUngrouped.data.map(
                                   (n) =>
                                     `${dateToISO8601String(n.date)}-${n.location}`,
                                 );
@@ -202,21 +202,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
                                   `${row.date}-${row.location}`,
                                 );
                                 if (units.value === 'metric') {
-                                  $weatherUngrouped[i][id].metric = _value;
+                                  weatherUngrouped.data[i][id].metric = _value;
                                   if (type === 'temperature')
-                                    $weatherUngrouped[i][id].imperial =
+                                    weatherUngrouped.data[i][id].imperial =
                                       celsiusToFahrenheit(_value);
                                   if (type === 'height')
-                                    $weatherUngrouped[i][id].imperial =
+                                    weatherUngrouped.data[i][id].imperial =
                                       millimetersToInches(_value);
                                 }
                                 if (units.value === 'imperial') {
-                                  $weatherUngrouped[i][id].imperial = _value;
+                                  weatherUngrouped.data[i][id].imperial =
+                                    _value;
                                   if (type === 'temperature')
-                                    $weatherUngrouped[i][id].metric =
+                                    weatherUngrouped.data[i][id].metric =
                                       fahrenheitToCelsius(_value);
                                   if (type === 'height')
-                                    $weatherUngrouped[i][id].metric =
+                                    weatherUngrouped.data[i][id].metric =
                                       inchesToMillimeters(_value);
                                 }
                               },
