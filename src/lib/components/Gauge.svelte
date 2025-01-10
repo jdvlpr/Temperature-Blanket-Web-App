@@ -33,6 +33,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     weather,
   } from '$lib/stores';
   import type { Color } from '$lib/types';
+  import type { GaugeAttributes } from '$lib/types/gauge-types';
   import {
     closeAllDrawers,
     createGaugeColors,
@@ -47,7 +48,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { Drawer } from 'vaul-svelte';
 
   interface Props {
-    gaugeAttributes?: object;
+    gaugeAttributes?: GaugeAttributes;
     numberOfColors?: number;
     schemeId: string;
     ranges?: object[];
@@ -169,13 +170,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
   class="w-full flex flex-wrap gap-2 justify-center items-center rounded-container-token bg-surface-300-600-token text-token shadow-inner mt-2 pb-2"
 >
   <div class="w-full">
-    {#key colors}
-      <ColorPaletteEditable
-        bind:colors
-        {schemeName}
-        showSchemeName={false}
-        roundedBottom={false}
-      />
+    {#key colors.length}
+      {#key colors}
+        <ColorPaletteEditable
+          bind:colors
+          {schemeName}
+          showSchemeName={false}
+          roundedBottom={false}
+        />
+      {/key}
     {/key}
   </div>
   <div class="">
@@ -448,13 +451,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
 {/if}
 
 {#key $weather}
-  <GaugeCustomizer
-    {gaugeAttributes}
-    {context}
-    bind:schemeId
-    bind:numberOfColors
-    bind:ranges
-    bind:rangeOptions
-    bind:colors
-  />
+  {#key colors}
+    <GaugeCustomizer
+      {gaugeAttributes}
+      {context}
+      bind:schemeId
+      bind:numberOfColors
+      bind:ranges
+      bind:rangeOptions
+      bind:colors
+    />
+  {/key}
 {/key}

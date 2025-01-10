@@ -24,7 +24,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { layout, modal, showDaysInRange } from '$lib/stores';
   import type { Color } from '$lib/types';
   import { getTextColor } from '$lib/utils';
-  import { dndzone } from 'svelte-dnd-action';
+  import { dndzone, SOURCES } from 'svelte-dnd-action';
   import { flip } from 'svelte/animate';
 
   interface Props {
@@ -47,20 +47,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     colors = $bindable([]),
   }: Props = $props();
 
-  let dragDisabled = $state(true);
+  let dragDisabled = $state(false);
 
   const flipDurationMs = 90;
 
   function checkForAffiliateURLs({ colors }) {
     return colors?.some((n) => n?.affiliate_variant_href);
-  }
-
-  function removeColor(index) {
-    let _colors = colors;
-    _colors.splice(index, 1);
-    schemeId = 'Custom';
-    colors = _colors;
-    numberOfColors = colors.length;
   }
 
   function onChangeColor({
@@ -75,6 +67,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     affiliate_variant_href,
   }) {
     schemeId = 'Custom';
+
     colors[index] = {
       hex,
       name,
@@ -85,29 +78,36 @@ If not, see <https://www.gnu.org/licenses/>. -->
       variant_href,
       affiliate_variant_href,
     };
-    colors = colors;
+
+    sortableColors = getSortableColors();
   }
 
   function handleConsider(e) {
+    dragDisabled = true;
     const {
       items: newItems,
       info: { source, trigger },
     } = e.detail;
     sortableColors = newItems;
   }
+
   function handleFinalize(e) {
     const {
       items: newItems,
       info: { source },
     } = e.detail;
     sortableColors = newItems;
-    colors = sortableColors.map((color) => {
+
+    colors = $state.snapshot(sortableColors).map((color) => {
       delete color.id;
       return color;
     });
+
     schemeId = 'Custom';
     // Ensure dragging is stopped on drag finish via pointer (mouse, touch)
-    dragDisabled = true;
+    if (source === SOURCES.POINTER) {
+      dragDisabled = false;
+    }
   }
   function startDrag(e) {
     // preventing default to prevent lag on touch devices (because of the browser checking for screen scrolling)
@@ -116,15 +116,25 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 
   let movable = $derived(colors?.length > 1);
-  let hasAnyAffiliateURLs = $derived(checkForAffiliateURLs({ colors }));
-  let sortableColors: Color[] = $state([]);
 
-  $effect(() => {
-    sortableColors = colors.map((color, i) => {
-      color.id = i;
-      return color;
+  let hasAnyAffiliateURLs = $derived(checkForAffiliateURLs({ colors }));
+
+  let sortableColors: Color[] = $state(getSortableColors());
+
+  function getSortableColors() {
+    const _sortableColors = [];
+    colors.forEach((color, i) => {
+      _sortableColors.push({ ...color, id: i });
     });
-  });
+    return _sortableColors;
+  }
+
+  // $effect(() => {
+  //   sortableColors = colors.map((color, i) => {
+  //     color.id = i;
+  //     return color;
+  //   });
+  // });
 
   /**
    * Checks if the variable $showDaysInRange is of type boolean.
@@ -209,7 +219,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <button
           title="Remove Color"
           class="btn bg-secondary-hover-token flex flex-wrap justify-center items-center order-1"
-          onclick={() => removeColor(index)}
+          onclick={() => {
+            colors = colors.filter((_, i) => i !== index);
+            sortableColors = getSortableColors();
+            schemeId = 'Custom';
+            numberOfColors = colors.length;
+          }}
         >
           <span class="text-xs">{index + 1}</span>
           {@html ICONS.trash}

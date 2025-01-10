@@ -79,7 +79,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     sortableColors = getSortableColors();
     activeColorIndex = null;
-    document.body.focus();
   }
 
   function getSortableColors() {
@@ -114,7 +113,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     sortableColors = newItems;
 
-    colors = newItems;
+    colors = $state.snapshot(sortableColors).map((color) => {
+      delete color.id;
+      return color;
+    });
 
     // Ensure dragging is stopped on drag finish via pointer (mouse, touch)
     if (source === SOURCES.POINTER) {
@@ -264,13 +266,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     colors = colors.filter((_, i) => i !== index);
 
                     sortableColors = getSortableColors();
-                    // colors = sortableColors.map((color) => {
-                    //   delete color.id;
-                    //   return {
-                    //     ...color,
-                    //   };
-                    // });
-
                     if (onchanged) onchanged();
                   }}
                   class="btn-icon bg-secondary-hover-token"

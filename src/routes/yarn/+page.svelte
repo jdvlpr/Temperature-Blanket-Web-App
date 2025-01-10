@@ -14,7 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script module lang="ts">
-  export let yarn: {colors: Color[]} = $state( {colors: []});
+  export let yarn: { colors: Color[] } = $state({ colors: [] });
 </script>
 
 <script lang="ts">
@@ -91,15 +91,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     isFinishedOnMount = true;
   });
 
-
-  // $: colors, updateUrl();
-
   function getYarnFilterParams(colors) {
     const details = colorsToYarnDetails({ colors });
     if (!details) return '';
     return `&f=${details}`;
   }
-
 
   function getShareableURL(colors) {
     if (!browser || !isFinishedOnMount) return;
@@ -114,8 +110,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     return href;
   }
   $effect(() => {
-    $layout, setLocalStorageLayout();
+    $layout;
+    setLocalStorageLayout();
   });
+
   let shareableURL = $derived(getShareableURL(yarn.colors));
 </script>
 
@@ -143,28 +141,26 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <AppShell pageName="Yarn Palette Creator">
   {#snippet stickyHeader()}
-  
-      <div class="hidden lg:inline-flex mx-auto"><AppLogo /></div>
-      <Share href={shareableURL} />
-    
+    <div class="hidden lg:inline-flex mx-auto"><AppLogo /></div>
+    <Share href={shareableURL} />
   {/snippet}
   {#snippet main()}
-    <div >
+    <div>
       <main class="max-w-screen-xl m-auto text-center">
         <Card>
           {#snippet header()}
-                <div  class="bg-surface-200-700-token text-token p-4">
+            <div class="bg-surface-200-700-token text-token p-4">
               <p class="text-center">
-                Create a yarn color palette from a collection of brands and yarns.
-                Find matching colorways from HTML hex color codes or from an image.
+                Create a yarn color palette from a collection of brands and
+                yarns. Find matching colorways from HTML hex color codes or from
+                an image.
               </p>
             </div>
-              {/snippet}
+          {/snippet}
           {#snippet content()}
-                <div
+            <div
               class="transition-opacity opacity-100 mt-4"
               class:opacity-50={!isFinishedOnMount}
-              
             >
               {#if yarn.colors.length}
                 <Gauge
@@ -207,16 +203,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 />
               {/if}
             </div>
-              {/snippet}
+          {/snippet}
         </Card>
       </main>
     </div>
   {/snippet}
   {#snippet footer()}
-    <div >
+    <div>
       <Footer>
         {#snippet sources()}
-            <div  class="text-sm">
+          <div class="text-sm">
             <p>
               Default color schemes based on <a
                 href="https://www.ColorBrewer2.org"
@@ -235,7 +231,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </p>
             <YarnSources />
           </div>
-          {/snippet}
+        {/snippet}
       </Footer>
     </div>
   {/snippet}
