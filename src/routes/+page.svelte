@@ -437,7 +437,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       <Drawer.Trigger
                         onclick={() => ($openDrawerGettingStarted = true)}
                       >
-                        <button
+                        <div
+                          role="button"
                           class="btn variant-filled-secondary gap-1 items-center"
                         >
                           <svg
@@ -450,8 +451,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
                             /></svg
                           >
 
-                          Getting Started</button
-                        >
+                          Getting Started
+                        </div>
                       </Drawer.Trigger>
                     {/if}
                     <Drawer.Portal>
