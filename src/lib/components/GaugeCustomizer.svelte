@@ -68,18 +68,28 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }) {
     schemeId = 'Custom';
 
-    colors[index] = {
-      hex,
-      name,
-      brandId,
-      yarnId,
-      brandName,
-      yarnName,
-      variant_href,
-      affiliate_variant_href,
-    };
+    const _colors = [];
+    colors.forEach((color, i) => {
+      if (i === index) {
+        _colors.push({
+          hex,
+          name,
+          brandId,
+          yarnId,
+          brandName,
+          yarnName,
+          variant_href,
+          affiliate_variant_href,
+        });
+      } else {
+        _colors.push(color);
+      }
+      colors = _colors;
+    });
 
     sortableColors = getSortableColors();
+
+    console.log({ colors });
   }
 
   function handleConsider(e) {

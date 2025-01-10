@@ -161,8 +161,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </button>
     </div>
   {:else if !disableTooltip}
-    <div
-      role="button"
+    <button
       {onclick}
       class={classNames}
       data-pinned={dataPinned}
@@ -181,7 +180,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       use:floatingRef
     >
       {@render children?.()}
-    </div>
+    </button>
   {:else}
     <button
       {onclick}
