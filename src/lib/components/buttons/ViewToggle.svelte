@@ -23,7 +23,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   active="bg-secondary-active-token"
 >
   <RadioItem
-    bind:group={$layout}
+    bind:group={layout.value}
     name="layout-list"
     value="list"
     title="Set layout view to list"
@@ -46,7 +46,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <span class="">List</span>
   </RadioItem>
   <RadioItem
-    bind:group={$layout}
+    bind:group={layout.value}
     name="layout-grid"
     value="grid"
     title="Set layout view to grid"

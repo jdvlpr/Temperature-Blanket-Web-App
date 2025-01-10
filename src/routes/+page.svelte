@@ -133,8 +133,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
       });
     }
   });
-
-  $inspect(weatherGrouping.value, weather.data);
 </script>
 
 <svelte:window

@@ -16,7 +16,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import { onNavigate } from '$app/navigation';
   import { PUBLIC_MICROSOFT_CLARITY_ID } from '$env/static/public';
-  import { consentToMSClarityCookies, modal } from '$lib/stores';
+  import {
+    consentToMSClarityCookies,
+    initialLayout,
+    layout,
+    modal,
+  } from '$lib/stores';
   import {
     privacy,
     setupLocalStorageLayout,

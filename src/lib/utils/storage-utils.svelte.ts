@@ -67,10 +67,10 @@ export const setupLocalStorageTheme = () => {
  */
 export const setupLocalStorageLayout = () => {
   const viewStored = localStorage.getItem('view') as PageLayout;
-  if (viewStored === 'grid' || viewStored === 'list') layout.set(viewStored);
-  layout.subscribe((value) => {
-    if (value === 'grid' || value === 'list')
-      localStorage.setItem('layout', value);
+  if (viewStored === 'grid' || viewStored === 'list') layout.value = viewStored;
+  $effect(() => {
+    if (layout.value === 'grid' || layout.value === 'list')
+      localStorage.setItem('layout', layout.value);
     else localStorage.setItem('layout', initialLayout);
   });
 };
@@ -167,7 +167,7 @@ export const setTheme = (value) => {
 export const setLocalStorageLayout = () => {
   if (!browser) return;
   if (typeof window.localStorage === 'undefined') return;
-  const _layout = get(layout);
+  const _layout = layout.value;
   if (_layout !== 'grid' && _layout !== 'list') return;
   localStorage.layout = _layout;
 };

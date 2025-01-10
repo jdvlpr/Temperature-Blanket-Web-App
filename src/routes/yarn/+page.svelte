@@ -110,7 +110,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     return href;
   }
   $effect(() => {
-    $layout;
+    layout.value;
     setLocalStorageLayout();
   });
 

@@ -210,16 +210,11 @@ export const initialLayout: PageLayout = browser
       : 'grid'
   : 'list';
 
-function createLayoutStore(): Writable<PageLayout> {
-  const { subscribe, set, update } = writable<PageLayout>(initialLayout);
-  return {
-    subscribe,
-    update,
-    set: (n: PageLayout) => {
-      if (n === 'list' || n === 'grid') {
-        set(n);
-      }
-    },
-  };
+class LayoutClass {
+  value: PageLayout = $state(initialLayout);
+  constructor(value: PageLayout) {
+    this.value = value;
+  }
 }
-export const layout = createLayoutStore();
+
+export const layout = new LayoutClass(initialLayout);

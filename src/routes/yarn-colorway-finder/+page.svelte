@@ -615,7 +615,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             {#if results?.length && !loadingAllColors}
               <div
-                class="rounded-container-token overflow-hidden my-4 justify-center w-full gap-1 {$layout ===
+                class="rounded-container-token overflow-hidden my-4 justify-center w-full gap-1 {layout.value ===
                 'grid'
                   ? 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5'
                   : 'flex flex-col'}"
@@ -623,13 +623,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 {#each results as { hex, name, delta, brandName, yarnName, variant_href, affiliate_variant_href, unavailable }}
                   {@const percentMatch = delta ? Math.floor(100 - delta) : null}
                   <div
-                    class="shadow-sm flex-1 min-w-fit p-2 flex items-center gap-x-2 rounded-container-token {$layout ===
+                    class="shadow-sm flex-1 min-w-fit p-2 flex items-center gap-x-2 rounded-container-token {layout.value ===
                     'grid'
                       ? 'justify-center'
                       : ''}"
                     style="background:{hex}; color:{getTextColor(hex)};"
                   >
-                    <!-- <div class={$layout === "grid" ? "" : "md:w-2/5"}></div> -->
+                    <!-- <div class={layout.value === "grid" ? "" : "md:w-2/5"}></div> -->
                     <div class="min-w-[43px] min-h-[43px]">
                       {#if !unavailable}
                         {#if affiliate_variant_href}

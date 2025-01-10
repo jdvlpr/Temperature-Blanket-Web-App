@@ -76,8 +76,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let yarns = [];
 
-  let reshapedColors =
-    $derived(flatColors?.reduce((acc, color) => {
+  let reshapedColors = $derived(
+    flatColors?.reduce((acc, color) => {
       const { brandId, yarnId, brandName, yarnName, name, hex, yarnWeightId } =
         color;
       if (
@@ -98,7 +98,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
         .find((item) => item.brandId === brandId && item.yarnId === yarnId)
         .colors.push({ name, hex });
       return yarns;
-    }, {}) || null);
+    }, {}) || null,
+  );
 
   let projectUnits = $derived(params?.u?.value === 'i' ? 'imperial' : 'metric');
 
@@ -155,7 +156,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   // This triggers after the project is loaded
   // It sets to image width and height value for the og:image meta property in head
-  let preloadedImage = $derived(preloadImage(project?.featuredImage?.node.mediaItemUrl));
+  let preloadedImage = $derived(
+    preloadImage(project?.featuredImage?.node.mediaItemUrl),
+  );
 </script>
 
 <svelte:head>
@@ -186,12 +189,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <AppShell pageName="Project Preivew">
   {#snippet stickyHeader()}
-  
-      <div class="hidden lg:inline-flex mx-auto"><AppLogo /></div>
-    
+    <div class="hidden lg:inline-flex mx-auto"><AppLogo /></div>
   {/snippet}
   {#snippet main()}
-    <div  class="transition-opacity opacity-100">
+    <div class="transition-opacity opacity-100">
       <main class="max-w-screen-xl m-auto flex flex-col justify-start gap-2">
         <a
           href="/gallery"
@@ -202,8 +203,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         >
         <Card>
           {#snippet header()}
-                <div
-              
+            <div
               class="bg-surface-200-700-token text-token p-4 text-center flex flex-col gap-2"
             >
               <p class="text-xl">
@@ -268,144 +268,149 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 <Accordion>
                   <AccordionItem disabled={!project}>
                     {#snippet lead()}
-                              
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke-width="1.5"
-                          stroke="currentColor"
-                          class="w-6 h-6"
-                        >
-                          <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"
-                          />
-                        </svg>
-                      
-                              {/snippet}
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke-width="1.5"
+                        stroke="currentColor"
+                        class="w-6 h-6"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"
+                        />
+                      </svg>
+                    {/snippet}
                     {#snippet summary()}
-                                <p class="">About this Project</p>
-                              {/snippet}
+                      <p class="">About this Project</p>
+                    {/snippet}
                     {#snippet content()}
-                              
-                        {#await data.stream then}
-                          <div class="flex flex-col gap-2">
-                            <p class="">
-                              <span class="font-bold">Date Created:</span>
-                              {new Date(project?.date).toLocaleDateString()}
-                            </p>
+                      {#await data.stream then}
+                        <div class="flex flex-col gap-2">
+                          <p class="">
+                            <span class="font-bold">Date Created:</span>
+                            {new Date(project?.date).toLocaleDateString()}
+                          </p>
 
-                            {#if JSON.stringify(reshapedColors) !== '{}'}
-                              {#if reshapedColors?.some((item) => item.brandName && item.yarnName)}
-                                <span class="">
-                                  <span class="font-bold">Yarn</span>:
-                                  <div class="pl-4 flex flex-col gap-2">
-                                    {#each reshapedColors as { brandName, yarnName, yarnWeightId, colors }}
-                                      {@const yarnWeightName = ALL_YARN_WEIGHTS.find(
+                          {#if JSON.stringify(reshapedColors) !== '{}'}
+                            {#if reshapedColors?.some((item) => item.brandName && item.yarnName)}
+                              <span class="">
+                                <span class="font-bold">Yarn</span>:
+                                <div class="pl-4 flex flex-col gap-2">
+                                  {#each reshapedColors as { brandName, yarnName, yarnWeightId, colors }}
+                                    {@const yarnWeightName =
+                                      ALL_YARN_WEIGHTS.find(
                                         (n) => n.id === yarnWeightId,
                                       )?.name}
-                                      {#if brandName && yarnName}
-                                        <div>
-                                          <span>
-                                            {brandName}
-                                            -
-                                            {yarnName}
-                                            <span class="text-sm opacity-70">
-                                              ({#if yarnWeightName}
-                                                <a
-                                                  href="/blog/yarn-weights?highlight={yarnWeightName}"
-                                                  class="link"
-                                                  target="_blank"
-                                                  title="See the yarn weights chart"
-                                                  >{yarnWeightName}</a
-                                                >,
-                                              {/if}{colors.length}
-                                              {pluralize('colorway', colors.length)})
-                                            </span>
+                                    {#if brandName && yarnName}
+                                      <div>
+                                        <span>
+                                          {brandName}
+                                          -
+                                          {yarnName}
+                                          <span class="text-sm opacity-70">
+                                            ({#if yarnWeightName}
+                                              <a
+                                                href="/blog/yarn-weights?highlight={yarnWeightName}"
+                                                class="link"
+                                                target="_blank"
+                                                title="See the yarn weights chart"
+                                                >{yarnWeightName}</a
+                                              >,
+                                            {/if}{colors.length}
+                                            {pluralize(
+                                              'colorway',
+                                              colors.length,
+                                            )})
                                           </span>
-                                          <div class="pl-4">
-                                            {#each colors as { name, hex }, index}
-                                              <div class="flex gap-2 items-center">
-                                                <div
-                                                  class="w-4 h-4 rounded-full"
-                                                  style="background:{hex};"
-                                                ></div>
-                                                <p class="">
-                                                  {name}
-                                                </p>
-                                              </div>
-                                            {/each}
-                                          </div>
+                                        </span>
+                                        <div class="pl-4">
+                                          {#each colors as { name, hex }, index}
+                                            <div
+                                              class="flex gap-2 items-center"
+                                            >
+                                              <div
+                                                class="w-4 h-4 rounded-full"
+                                                style="background:{hex};"
+                                              ></div>
+                                              <p class="">
+                                                {name}
+                                              </p>
+                                            </div>
+                                          {/each}
                                         </div>
-                                      {/if}
-                                    {/each}
-                                  </div>
-                                </span>
-                              {/if}
+                                      </div>
+                                    {/if}
+                                  {/each}
+                                </div>
+                              </span>
                             {/if}
+                          {/if}
 
-                            {#if project?.projectTags.nodes[0].name}
-                              <p>
-                                <span class="font-bold">Pattern Type</span>:
-                                <span class=""
-                                  >{project?.projectTags.nodes[0].name}</span
-                                >
-                              </p>
-                            {/if}
-
-                            {#if project?.projectTags.nodes[0].description}
-                              <p>
-                                <span class="font-bold">Pattern Description</span>:
-                                <span class="">
-                                  {project?.projectTags.nodes[0].description}</span
-                                >
-                              </p>
-                            {/if}
-
-                            {#if project?.totalDays}
-                              <p>
-                                <span class="font-bold">Total Days</span>:
-                                <span class="">{project?.totalDays}</span>
-                              </p>
-                            {/if}
-
-                            {#if project?.missingDays}
-                              <p>
-                                <span class="font-bold"
-                                  >Days Without Weather Data</span
-                                >:
-                                <span class="">{project?.missingDays}</span>
-                              </p>
-                            {/if}
-
-                            {#if weatherSources}
-                              {#each weatherSources as { name, url }}
-                                <p>
-                                  <span class="font-bold">Weather Source</span>:
-                                  <a href={url} target="_blank" class="link">{name}</a
-                                  >
-                                </p>
-                              {/each}
-                            {/if}
-
-                            <p class="italic">
-                              The preview image below may not reflect the most recent
-                              weather information. Open the project in the Project
-                              Planner to see any updates.
+                          {#if project?.projectTags.nodes[0].name}
+                            <p>
+                              <span class="font-bold">Pattern Type</span>:
+                              <span class=""
+                                >{project?.projectTags.nodes[0].name}</span
+                              >
                             </p>
-                          </div>
-                        {/await}
-                      
-                              {/snippet}
+                          {/if}
+
+                          {#if project?.projectTags.nodes[0].description}
+                            <p>
+                              <span class="font-bold">Pattern Description</span
+                              >:
+                              <span class="">
+                                {project?.projectTags.nodes[0]
+                                  .description}</span
+                              >
+                            </p>
+                          {/if}
+
+                          {#if project?.totalDays}
+                            <p>
+                              <span class="font-bold">Total Days</span>:
+                              <span class="">{project?.totalDays}</span>
+                            </p>
+                          {/if}
+
+                          {#if project?.missingDays}
+                            <p>
+                              <span class="font-bold"
+                                >Days Without Weather Data</span
+                              >:
+                              <span class="">{project?.missingDays}</span>
+                            </p>
+                          {/if}
+
+                          {#if weatherSources}
+                            {#each weatherSources as { name, url }}
+                              <p>
+                                <span class="font-bold">Weather Source</span>:
+                                <a href={url} target="_blank" class="link"
+                                  >{name}</a
+                                >
+                              </p>
+                            {/each}
+                          {/if}
+
+                          <p class="italic">
+                            The preview image below may not reflect the most
+                            recent weather information. Open the project in the
+                            Project Planner to see any updates.
+                          </p>
+                        </div>
+                      {/await}
+                    {/snippet}
                   </AccordionItem>
                 </Accordion>
               </div>
             </div>
-              {/snippet}
+          {/snippet}
           {#snippet content()}
-                <div  class="grid grid-cols-1 gap-2 py-2">
+            <div class="grid grid-cols-1 gap-2 py-2">
               <div class="text-center mt-2">
                 {#await data.stream}
                   <div class="my-40"><Spinner /></div>
@@ -452,8 +457,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
                               <a
                                 class="btn variant-ghost-primary w-fit m-auto mt-4 flex flex-wrap items-center gap-1"
                                 onclick={() => {
-                              yarnPalleteCreatorPageColors.colors = colors;
-                            }}
+                                  yarnPalleteCreatorPageColors.colors = colors;
+                                }}
                                 href="/yarn"
                               >
                                 <svg
@@ -475,8 +480,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
                             </div>
                             {#if hasAffiliateLinks}
                               <p class="px-2 mt-4 text-sm">
-                                Items purchased through links with a shopping bag
-                                icon
+                                Items purchased through links with a shopping
+                                bag icon
                                 <svg
                                   xmlns="http://www.w3.org/2000/svg"
                                   fill="none"
@@ -491,22 +496,23 @@ If not, see <https://www.gnu.org/licenses/>. -->
                                     d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
                                   />
                                 </svg>
-                                help support this site by earning the developer a percentage
-                                of each sale, at no additional cost to you.
+                                help support this site by earning the developer a
+                                percentage of each sale, at no additional cost to
+                                you.
                               </p>
                             {/if}
                             <div class="mt-4">
                               <ViewToggle />
                             </div>
                             <div
-                              class="rounded-container-token overflow-hidden mt-4 mb-2 xl:mb-4 {$layout ===
+                              class="rounded-container-token overflow-hidden mt-4 mb-2 xl:mb-4 {layout.value ===
                               'grid'
                                 ? 'gap-1 grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4'
                                 : 'flex flex-col'}"
                             >
                               {#each item as { from, to, hex, name, yarnName, brandName, affiliate_variant_href, variant_href }, i}
                                 <div
-                                  class="flex p-2 gap-2 items-center justify-around flex-wrap {$layout ===
+                                  class="flex p-2 gap-2 items-center justify-around flex-wrap {layout.value ===
                                   'grid'
                                     ? 'rounded-container-token md:basis-1/5 sm:basis-1/4 basis-1/3 flex-auto'
                                     : ''}"
@@ -592,13 +598,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 </div>
               {/await}
             </div>
-              {/snippet}
+          {/snippet}
         </Card>
       </main>
     </div>
   {/snippet}
   {#snippet footer()}
-    <div  class="px-2">
+    <div class="px-2">
       <YarnSources />
     </div>
   {/snippet}

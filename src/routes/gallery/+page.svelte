@@ -38,16 +38,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <AppShell pageName="Project Gallery">
   {#snippet stickyHeader()}
-  
-      <div class="hidden lg:inline-flex mx-auto"><AppLogo /></div>
-    
+    <div class="hidden lg:inline-flex mx-auto"><AppLogo /></div>
   {/snippet}
 
   {#snippet main()}
-    <main
-      
-      class="max-w-screen-xl m-auto flex flex-col justify-start gap-2"
-    >
+    <main class="max-w-screen-xl m-auto flex flex-col justify-start gap-2">
       <Gallery />
     </main>
   {/snippet}
