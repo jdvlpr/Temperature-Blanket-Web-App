@@ -45,7 +45,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     getPalettesFromProjects,
     recordPageView,
   } from '$lib/utils';
-  import { getModalStore } from '@skeletonlabs/skeleton';
   import { onMount } from 'svelte';
   import { writable } from 'svelte/store';
   import { slide } from 'svelte/transition';
@@ -55,8 +54,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 
   let { updateGauge = null }: Props = $props();
-
-  const modalStore = getModalStore();
 
   let filtersExpanded = $state(false);
 
@@ -291,7 +288,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
               _colors: colors,
               _schemeId: 'Custom',
             });
-            if ($modalStore[0]) modalStore.close();
           }}
           title="Use This Palette"
         >

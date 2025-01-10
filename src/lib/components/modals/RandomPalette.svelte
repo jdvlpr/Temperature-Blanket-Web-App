@@ -116,11 +116,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   );
 
   $effect(() => {
-    selectedBrandId,
-      selectedYarnId,
-      selectedYarnWeightId,
-      numberOfColors,
-      getRandomColors();
+    selectedBrandId;
+    selectedYarnId;
+    selectedYarnWeightId;
+    numberOfColors;
+    getRandomColors();
   });
 </script>
 
@@ -198,7 +198,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <SelectNumberOfColors
         {numberOfColors}
         max={99}
-        on:change={(e) => (numberOfColors = +e.target.value)}
+        onchange={(e) => (numberOfColors = +e.target.value)}
       />
     </div>
 
@@ -266,21 +266,23 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {#snippet stickyPart()}
     <StickyPart position="bottom">
       <div class="p-2 sm:p-4">
-        {#if _yarnColorwaysPalette.length}
-          <div class="mb-2 sm:mb-4">
-            {#key key}
-              <ColorPaletteEditable
-                canUserEditColor={false}
-                typeId="randomPalette"
-                bind:colors={_yarnColorwaysPalette}
-                onChanged={() => {
-                  numberOfColors = _yarnColorwaysPalette.length;
-                  key++;
-                }}
-              />
-            {/key}
-          </div>
-        {/if}
+        {#key _yarnColorwaysPalette}
+          {#if _yarnColorwaysPalette.length}
+            <div class="mb-2 sm:mb-4">
+              {#key key}
+                <ColorPaletteEditable
+                  canUserEditColor={false}
+                  typeId="randomPalette"
+                  bind:colors={_yarnColorwaysPalette}
+                  onChanged={() => {
+                    numberOfColors = _yarnColorwaysPalette.length;
+                    key++;
+                  }}
+                />
+              {/key}
+            </div>
+          {/if}
+        {/key}
 
         <SaveAndCloseButtons
           onSave={() => {

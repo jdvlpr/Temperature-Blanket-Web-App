@@ -502,7 +502,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         bind:numberOfColors
         max={MAXIMUM_COLORWAYS_MATCHES_FOR_IMAGES}
         allowZero={true}
-        on:change={() => {
+        onchange={() => {
           if (numberOfColors < matchingYarnColors.length) {
             matchingYarnColors.length = numberOfColors;
           } else {

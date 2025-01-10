@@ -22,13 +22,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { getModalStore } from '@skeletonlabs/skeleton';
   import ModalShell from './ModalShell.svelte';
 
-  
   interface Props {
     updateGauge: any;
     parent: any;
   }
 
-  let { updateGauge, parent}: Props = $props();
+  let { updateGauge, parent }: Props = $props();
 
   const modalStore = getModalStore();
 
@@ -67,11 +66,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <div class="p-2 sm:px-4">
         {#if selectedColors.length}
           <div class="mb-2 sm:mb-4">
+            {#key selectedColors.length}
               <ColorPaletteEditable
                 canUserEditColor={false}
                 schemeName={paletteTitleText}
                 bind:colors={selectedColors}
               />
+            {/key}
           </div>
         {/if}
 
@@ -90,5 +91,4 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </div>
     </StickyPart>
   {/snippet}
-
 </ModalShell>

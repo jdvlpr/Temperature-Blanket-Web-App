@@ -35,7 +35,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     showSchemeName?: boolean;
     roundedBottom?: boolean;
     typeId?: string;
-    onChanged?: any;
+    onchanged?: any;
   }
 
   let {
@@ -46,8 +46,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
     showSchemeName = true,
     roundedBottom = true,
     typeId = 'palettePreview',
-    onChanged,
+    onchanged = null,
   }: Props = $props();
+
+  const flipDurationMs = 200;
+
+  let sortableColors = $state(getSortableColors());
+
+  let activeColorIndex: number | null = $state(null);
 
   function onChangeColor({
     index,
@@ -72,11 +78,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     };
 
     sortableColors = getSortableColors();
+    activeColorIndex = null;
+    document.body.focus();
   }
-
-  const flipDurationMs = 200;
-
-  let sortableColors = $state(getSortableColors());
 
   function getSortableColors() {
     const _sortableColors = [];
@@ -102,9 +106,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     }
   }
 
-  async function handleFinalize(e) {
-    isDragging.value = false;
-
+  function handleFinalize(e) {
     const {
       items: newItems,
       info: { source },
@@ -119,7 +121,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       isDragging.value = false;
     }
 
-    onChanged();
+    if (onchanged) onchanged();
   }
   function startDrag(e) {
     // preventing default to prevent lag on touch devices (because of the browser checking for screen scrolling)
@@ -132,17 +134,26 @@ If not, see <https://www.gnu.org/licenses/>. -->
       isDragging.value = true;
   }
 
-  // function transformDraggedElement(draggedEl, data, index) {
-  //   console.log({ draggedEl });
+  function transformDraggedElement(draggedEl, data, index) {
+    const tooltipElement = draggedEl.querySelector('.tooltip');
 
-  //   draggedEl.style.minWidth = '24px';
-  //   draggedEl.querySelector('.dragicon').style.display = 'block';
-  // }
+    if (tooltipElement) tooltipElement.style.display = 'none';
+
+    // draggedEl.style.minWidth = '24px';
+    // draggedEl.querySelector('.dragicon').style.display = 'block';
+  }
 
   $effect(() => {
     if (schemeName === 'Custom') schemeName = 'Color Palette';
   });
 </script>
+
+<svelte:window
+  onclick={(e) => {
+    if (!(e.target as Element).closest('.palette-item'))
+      activeColorIndex = null;
+  }}
+/>
 
 <div class="flex flex-col text-left gap-y-1 w-full">
   <div
@@ -153,7 +164,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       type: typeId,
       centreDraggedOnCursor: true,
       dropFromOthersDisabled: true,
-      // transformDraggedElement,
+      transformDraggedElement,
     }}
     onconsider={handleConsider}
     onfinalize={handleFinalize}
@@ -170,11 +181,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
         affiliate_variant_href,
       } = color}
       {@const isLocked = typeof color.locked !== undefined && color?.locked}
-      <div
-        class="first:rounded-tl-container-token first:overflow-hidden last:rounded-tr-container-token last:overflow-hidden w-full h-[70px] group {roundedBottom
+      <button
+        class="first:rounded-tl-container-token first:overflow-hidden last:rounded-tr-container-token last:overflow-hidden w-full h-[70px] group palette-item {roundedBottom
           ? 'first:rounded-bl-container-token last:rounded-br-container-token'
           : ''}"
         animate:flip={{ duration: flipDurationMs }}
+        onclick={() => {
+          if (activeColorIndex !== index) activeColorIndex = index;
+          else if (activeColorIndex === index) activeColorIndex = null;
+          else activeColorIndex = index;
+        }}
       >
         <Tooltip
           tooltipStyle="background:{hex};"
@@ -182,6 +198,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           fullWidth={true}
           classNames="w-full h-[70px]"
           minWidth="260px"
+          showTooltip={activeColorIndex === index && !isDragging.value}
         >
           <div
             class="flex-auto flex flex-col justify-center items-center h-[70px]"
@@ -205,8 +222,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
               </svg>
             {:else}
               <div
+                role="button"
+                tabindex="0"
                 class="group-hover:hidden group-focus:hidden h-2 w-2 rounded-full opacity-20"
-                class:hidden={sortableColors.length > 30}
+                class:hidden={sortableColors.length > 30 ||
+                  (activeColorIndex === index && !isDragging.value)}
                 class:sm:block={sortableColors.length > 30 &&
                   sortableColors.length <= 50}
                 class:xl:block={sortableColors.length > 50}
@@ -215,9 +235,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
             {/if}
             <div
               role="button"
-              tabindex={!isDragging.value ? 0 : -1}
+              tabindex="0"
               aria-label="drag-handle"
-              class="w-fit dragicon hidden group-hover:block group-focus:block"
+              class="w-fit dragicon {activeColorIndex === index &&
+              !isDragging.value
+                ? ''
+                : 'hidden group-hover:block group-focus:block'}"
               class:group-hover:inline-block={isDragging.value}
               style="color:{getTextColor(hex)}; {isDragging.value
                 ? 'cursor: grabbing'
@@ -247,9 +270,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     //     ...color,
                     //   };
                     // });
-                    console.log({ colors, sortableColors });
 
-                    onChanged();
+                    if (onchanged) onchanged();
                   }}
                   class="btn-icon bg-secondary-hover-token"
                   >{@html ICONS.trash}</button
@@ -329,7 +351,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   onclick={(e) => {
                     e.preventDefault();
                     color.locked = !color.locked;
-                    onChanged();
+                    if (onchanged) onchanged();
                   }}
                 >
                   {#if color.locked}
@@ -366,7 +388,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </div>
           {/snippet}
         </Tooltip>
-      </div>
+      </button>
     {/each}
   </div>
   {#if showSchemeName}

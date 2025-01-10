@@ -43,6 +43,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     getStart,
     hasParentWithClass,
   } from '$lib/utils';
+  import { getModalStore } from '@skeletonlabs/skeleton';
   import { Drawer } from 'vaul-svelte';
 
   interface Props {
@@ -67,7 +68,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let schemeName = $derived(getSchemeName(schemeId));
 
-  let key = $state();
+  const modalStore = getModalStore();
 
   $effect(() => {
     if (
@@ -134,6 +135,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     }
     schemeId = _schemeId;
     closeAllDrawers();
+    if ($modalStore[0]) modalStore.close();
   }
 </script>
 
@@ -167,30 +169,30 @@ If not, see <https://www.gnu.org/licenses/>. -->
   class="w-full flex flex-wrap gap-2 justify-center items-center rounded-container-token bg-surface-300-600-token text-token shadow-inner mt-2 pb-2"
 >
   <div class="w-full">
-    {#key key}
+    {#key colors}
       <ColorPaletteEditable
         bind:colors
         {schemeName}
         showSchemeName={false}
         roundedBottom={false}
-        onChanged={() => {
-          key = Math.random();
-        }}
       />
     {/key}
   </div>
   <div class="">
-    <SelectNumberOfColors
-      {numberOfColors}
-      on:change={(e) => {
-        colors = createGaugeColors({
-          schemeId,
-          numberOfColors: +e.target.value,
-          colors,
-        });
-        numberOfColors = colors.length;
-      }}
-    />
+    {#key colors.length}
+      <SelectNumberOfColors
+        {numberOfColors}
+        onchange={(e) => {
+          colors = createGaugeColors({
+            schemeId,
+            numberOfColors: +e.target.value,
+            colors: $state.snapshot(colors),
+          });
+
+          numberOfColors = colors.length;
+        }}
+      />
+    {/key}
   </div>
 
   {#if isDesktop.current}

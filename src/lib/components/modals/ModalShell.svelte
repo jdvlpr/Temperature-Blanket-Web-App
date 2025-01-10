@@ -14,10 +14,18 @@
     stickyPart?: Snippet;
   }
 
-  let { parent, size, preventDefaultFocus, hideCloseButton = false, preventScroll = false, children, stickyPart }: Props = $props();
+  let {
+    parent,
+    size,
+    preventDefaultFocus,
+    hideCloseButton = false,
+    preventScroll = false,
+    children,
+    stickyPart,
+  }: Props = $props();
 
   let width = $state(parent?.width);
-  
+
   const modalStore = getModalStore();
 
   let shellElement: HTMLElement;
@@ -26,30 +34,35 @@
     document.body.style.overflow = 'hidden';
     return () => {
       document.body.style.overflow = 'auto';
+    };
+  });
+
+  $effect(() => {
+    if (!isDesktop.current) width = 'w-[100vw]';
+    else if (size === 'large') width = 'w-modal-wide';
+    else if (size === 'small') width = 'w-modal-slim';
+    else width = parent?.width || 'w-modal';
+  });
+
+  $effect(() => {
+    if (preventDefaultFocus) {
+      shellElement.focus();
     }
-  })
-
-$effect(() => {
-  if (!isDesktop.current) width = 'w-[100vw]';
-  else if (size === 'large') width = 'w-modal-wide';
-  else if (size === 'small') width = 'w-modal-slim';
-  else width = parent?.width || 'w-modal';
-})
-
-$effect(() => {
-  if (preventDefaultFocus) {
-    shellElement.focus();
-  }
-})
+  });
 </script>
 
 <!-- TODO: Fix the tabindex warning -->
 <div
-bind:this={shellElement}
-tabindex="0"
-  class="{parent?.background} {parent?.rounded} {parent?.position} {width} {parent?.height} {stickyPart ? '' : parent?.padding} {parent?.spacing} {parent?.shadow} max-h-[97svh] overflow-auto focus:!outline-none {preventScroll ? 'overflow-hidden' : ''}"
+  role="button"
+  bind:this={shellElement}
+  tabindex="0"
+  class="{parent?.background} {parent?.rounded} {parent?.position} {width} {parent?.height} {stickyPart
+    ? ''
+    : parent?.padding} {parent?.spacing} {parent?.shadow} max-h-[97svh] overflow-auto focus:!outline-none {preventScroll
+    ? 'overflow-hidden'
+    : ''}"
 >
-  <div class="{stickyPart ? 'p-4' : ''}">
+  <div class={stickyPart ? 'p-4' : ''}>
     {#if !hideCloseButton && $modalStore[0] && !stickyPart}
       <CloseButton
         onClose={() => {

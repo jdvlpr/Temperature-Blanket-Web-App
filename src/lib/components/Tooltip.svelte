@@ -16,7 +16,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import { arrow, createFloatingActions } from 'svelte-floating-ui';
   import {
-    autoPlacement,
     flip,
     offset,
     shift,
@@ -41,6 +40,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     dataNoWeather?: boolean;
     title?: string;
     id?: string;
+    showTooltip?: boolean;
     onclick?: (event: MouseEvent) => void;
     children?: import('svelte').Snippet;
     tooltip?: import('svelte').Snippet;
@@ -61,6 +61,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     dataNoWeather,
     title = '',
     id = '',
+    showTooltip = false,
     onclick,
     children,
     tooltip,
@@ -69,8 +70,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   const arrowRef = writable(null);
 
   let isTooltipActive = $state(false);
-
-  let showTooltip = $state(false);
 
   let debounceTimer;
   const debounce = (callback, time) => {
@@ -162,7 +161,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </button>
     </div>
   {:else if !disableTooltip}
-    <button
+    <div
+      role="button"
       {onclick}
       class={classNames}
       data-pinned={dataPinned}
@@ -181,7 +181,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       use:floatingRef
     >
       {@render children?.()}
-    </button>
+    </div>
   {:else}
     <button
       {onclick}
@@ -203,7 +203,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     aria-labelledby="Tooltip or Menu"
     aria-describedby="A dialog box showing information or menu items."
     in:scale={{ duration: 175 }}
-    class="absolute shadow-lg text-token cursor-text z-40 rounded-container-token"
+    class="absolute shadow-lg text-token cursor-text z-40 rounded-container-token tooltip"
     style="min-width:{minWidth}"
     use:floatingContent
     onmouseenter={() => (isTooltipActive = true)}

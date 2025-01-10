@@ -14,13 +14,23 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  export let numberOfColors: number,
+  interface Props {
+    numberOfColors: number;
+    max?: number;
+    allowZero?: boolean;
+    onchange?: (event: Event) => void;
+  }
+
+  let {
+    numberOfColors = $bindable(),
     max = 99,
-    allowZero = false;
+    allowZero = false,
+    onchange,
+  }: Props = $props();
 
   let start = allowZero ? -1 : 0;
 
-  let numEl;
+  let numEl = $state();
 </script>
 
 <label class="label">
@@ -31,7 +41,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       id="number-of-colors"
       bind:value={numberOfColors}
       title="Choose Number of Colors"
-      on:change
+      {onchange}
     >
       {#each Array(max + 1) as _, i}
         {#if i > start}
