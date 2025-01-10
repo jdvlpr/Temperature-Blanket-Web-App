@@ -239,5 +239,5 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div class="rounded-container-token my-2 h-[240px]">
-  <canvas id="weather-chart" bind:this={ctx} />
+  <canvas id="weather-chart" bind:this={ctx}></canvas>
 </div>

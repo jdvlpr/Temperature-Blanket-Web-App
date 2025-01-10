@@ -14,42 +14,54 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
+  import ModalShell from '$lib/components/modals/ModalShell.svelte';
   import UnitChanger from '$lib/components/UnitChanger.svelte';
-  import CloseButton from '$lib/components/modals/CloseButton.svelte';
   import { getWeatherCodeDetails } from '$lib/utils';
-  import { RadioGroup, RadioItem } from '@skeletonlabs/skeleton';
-  import { getContext } from 'svelte';
+  import { getModalStore, RadioGroup, RadioItem } from '@skeletonlabs/skeleton';
   import { activeLocationID, hour, locations } from './+page.svelte';
   import { fetchData } from './GetWeather.svelte';
   import { validId } from './Location.svelte';
 
-  export let page = 'settings';
+  /**
+   * @typedef {Object} Props
+   * @property {string} [page]
+   * @property {any} parent
+   */
 
-  const { close } = getContext('simple-modal');
+  /** @type {Props} */
+  let { page = 'settings', parent } = $props();
 
-  $: savedWeatherLocations = $locations.filter((item) => item.saved);
+  const modalStore = getModalStore();
+
+  let savedWeatherLocations = $derived($locations.filter((item) => item.saved));
 </script>
 
-<CloseButton onClose={close} />
-
-<div class="w-full block sm:w-fit" />
-
-<div class="p-2 sm:p-4">
+<ModalShell {parent}>
   <div class="m-2 text-left">
     {#if page === 'locations'}
       <div class="mt-4">
         <h2 class="mb-2 text-xl font-bold">Locations</h2>
         <div class="flex flex-col gap-2">
           {#each savedWeatherLocations as { id, data, label }}
-            <button
+            <div
+              role="button"
+              tabindex="0"
               data-active={id === $activeLocationID}
               class="flex-1 w-full justify-center flex items-start gap-2 bg-surface-200-700-token rounded-container-token p-2 shadow max-w-screen-lg mx-auto data-[active=true]:bg-primary-200-700-token"
               title="View this Location"
-              on:click={async () => {
+              onclick={async () => {
                 $activeLocationID = id;
                 await fetchData();
                 $validId = true;
-                close();
+                modalStore.close();
+              }}
+              onkeydown={async (e) => {
+                if (e.key === 'Enter') {
+                  $activeLocationID = id;
+                  await fetchData();
+                  $validId = true;
+                  modalStore.close();
+                }
               }}
             >
               <div class="flex flex-col gap-1 items-start justify-start">
@@ -89,9 +101,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 </div>
               </div>
               <button
+                aria-label="Remove from Locations"
                 class="btn-icon bg-secondary-hover-token"
                 title="Remove from Locations"
-                on:click={(e) => {
+                onclick={(e) => {
                   e.stopPropagation();
                   e.preventDefault();
                   $locations.map((item) => {
@@ -107,7 +120,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       $locations.find((item) => item.saved)?.id || null;
 
                   if (!$locations.filter((item) => item?.saved)?.length)
-                    close();
+                    modalStore.close();
                 }}
               >
                 <svg
@@ -125,7 +138,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   />
                 </svg>
               </button>
-            </button>
+            </div>
           {/each}
         </div>
       </div>
@@ -169,4 +182,4 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </div>
     {/if}
   </div>
-</div>
+</ModalShell>
