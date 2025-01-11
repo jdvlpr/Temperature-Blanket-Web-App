@@ -22,45 +22,30 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import {
     createdGauges,
     defaultWeatherSource,
+    getLocationsState,
     isCustomWeather,
     isProjectLoading,
     liveProjectURLHash,
-    locations,
     modal,
     valid,
     wasProjectLoadedFromURL,
     wasWeatherLoadedFromLocalStorage,
     weather,
-    weatherUngrouped,
   } from '$lib/stores';
-  import type { Location as LocationType } from '$lib/types';
-  import { numberOfDays, pluralize } from '$lib/utils';
+  import { pluralize } from '$lib/utils';
   import { slide } from 'svelte/transition';
   import SearchForWeather from './buttons/SearchForWeather.svelte';
 
-  $: invalid = !$valid;
+  const locationsState = getLocationsState();
 
-  $: totalDays = getTotalDays($locations);
-  $: disabled = invalid || $isProjectLoading;
+  $inspect(locationsState?.locations);
 
-  function addLocation() {
-    if (weatherUngrouped.data) weatherUngrouped.data = null;
-    $locations = $locations.concat({ index: $locations.length });
-  }
+  let invalid = $derived(!$valid);
+  let disabled = $state(true);
 
-  function getTotalDays(_locations: LocationType[]) {
-    const arrayOfDayCount = _locations.map((n) => {
-      if (!n.from || !n.to) return null;
-      const from = new Date(n.from.replace(/-/g, '/'));
-      const to = new Date(n.to.replace(/-/g, '/'));
-      if (!from || !to) return null;
-      return numberOfDays(from, to);
-    });
-    const sum = arrayOfDayCount.reduce((accumulator, value) => {
-      return accumulator + value;
-    }, 0);
-    return sum;
-  }
+  $effect(() => {
+    disabled = invalid || $isProjectLoading;
+  });
 </script>
 
 <div class="mt-4 max-w-screen-md mx-auto">
@@ -105,7 +90,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   {#if !!$isCustomWeather}
     <div class="flex flex-col gap-2 my-4 items-center">
-      {#each $locations as location (location.index)}
+      {#each locationsState.locations as location (location.index)}
         <p class="flex flex-wrap gap-x-1 items-center justify-center">
           <span class="font-bold">{@html location.result}</span>
           <span>
@@ -145,7 +130,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </p>
       {/each}
       <p class="w-full text-sm italic">
-        {totalDays} Total {pluralize('Day', totalDays)}
+        {locationsState.totalDays} Total {pluralize(
+          'Day',
+          locationsState.totalDays,
+        )}
       </p>
     </div>
   {/if}
@@ -154,19 +142,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
     class:hidden={!!$isCustomWeather}
     class="divide-y divide-solid divide-surface-300 dark:divide-surface-600"
   >
-    {#each $locations as location, index (location.index)}
-      <Location {index} />
+    {#each locationsState.locations as location, index (location.index)}
+      <Location bind:location={locationsState.locations[index]} />
     {/each}
   </div>
 
   <div
     class="flex flex-col gap-2 mb-4 w-full"
-    class:border-t={$locations.length > 1}
-    class:border-surface-300={$locations.length > 1}
-    class:dark:border-surface-600={$locations.length > 1}
-    class:pt-4={$locations.length > 1}
+    class:border-t={locationsState.locations.length > 1}
+    class:border-surface-300={locationsState.locations.length > 1}
+    class:dark:border-surface-600={locationsState.locations.length > 1}
+    class:pt-4={locationsState.locations.length > 1}
   >
-    {#if $valid && totalDays === 1}
+    {#if $valid && locationsState.totalDays === 1}
       <!-- The range calculation functionality expects there to be more than one day of weather data.
      So if there's only one day of weather data the color ranges will have some NaN values. 
      This notice discourages users from using only one day of weather data. -->
@@ -194,9 +182,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <SearchForWeather bind:disabled />
     </div>
 
-    {#if $locations?.length > 1 && totalDays && $valid && !$isCustomWeather}
+    {#if locationsState.locations.length > 1 && locationsState.totalDays && $valid && !$isCustomWeather}
       <p class="w-full text-sm italic">
-        {totalDays} Total {pluralize('Day', totalDays)}
+        {locationsState.totalDays} Total {pluralize(
+          'Day',
+          locationsState.totalDays,
+        )}
       </p>
     {/if}
   </div>
@@ -208,12 +199,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     transition:slide
   >
     <div class:hidden={!$valid || $isCustomWeather}>
-      {#if $locations?.length < MAXIMUM_LOCATIONS}
+      {#if locationsState.locations.length < MAXIMUM_LOCATIONS}
         <button
           class="btn bg-secondary-hover-token gap-2"
           id="add-location-button"
           disabled={$isProjectLoading}
-          on:click={addLocation}
+          onclick={() => locationsState.add()}
           title="Add a New Location"
         >
           <svg
@@ -240,7 +231,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <button
       class="btn bg-secondary-hover-token text-left"
       disabled={$isProjectLoading}
-      on:click={() => {
+      onclick={() => {
         modal.state.trigger({
           type: 'component',
           component: { ref: ChooseWeatherSource },

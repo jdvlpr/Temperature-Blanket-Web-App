@@ -14,9 +14,11 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { CHARACTERS_FOR_URL_HASH } from '$lib/constants';
-import type { Location } from '$lib/types';
+import type { Location, WeatherSource } from '$lib/types';
 import { stringToDate, numberOfDays } from '$lib/utils';
+import { getContext, setContext } from 'svelte';
 import { derived, writable, type Writable } from 'svelte/store';
+import { weatherUngrouped } from './weather-state.svelte';
 
 function createLocationsStore() {
   const { subscribe, set, update } = writable([{ index: 0 }]);
@@ -35,6 +37,57 @@ function createLocationsStore() {
   };
 }
 export const locations: Writable<Location[]> = createLocationsStore();
+
+export class LocationsState {
+  locations = $state<Location[]>([]);
+
+  constructor() {
+    this.locations = [{ index: 0 }];
+  }
+
+  add(): void {
+    if (weatherUngrouped.data) weatherUngrouped.data = null;
+    const index = this.locations.length;
+    this.locations.push({ index });
+  }
+
+  remove(index: number) {
+    this.locations = this.locations.filter(
+      (location) => location.index !== index,
+    );
+  }
+
+  clearAutocomplete(index: number) {
+    if (index === -1) return;
+    delete this.locations[index].id;
+    delete this.locations[index].lat;
+    delete this.locations[index].lng;
+  }
+
+  totalDays = $derived.by(() => {
+    const arrayOfDayCount = this.locations.map((n) => {
+      if (!n.from || !n.to) return null;
+      const from = new Date(n.from.replace(/-/g, '/'));
+      const to = new Date(n.to.replace(/-/g, '/'));
+      if (!from || !to) return null;
+      return numberOfDays(from, to);
+    });
+    const sum = arrayOfDayCount.reduce((accumulator, value) => {
+      return accumulator + value;
+    }, 0);
+    return sum;
+  });
+}
+
+const LOCATIONS_KEY = Symbol('LOCATIONS');
+
+export function setLocationsState() {
+  return setContext(LOCATIONS_KEY, new LocationsState());
+}
+
+export function getLocationsState() {
+  return getContext<ReturnType<typeof setLocationsState>>(LOCATIONS_KEY);
+}
 
 export const valid = derived(locations, ($locations) =>
   $locations?.every((location) => location.valid === true),

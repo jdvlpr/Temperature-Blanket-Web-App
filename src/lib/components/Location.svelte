@@ -18,6 +18,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { ICONS, MAXIMUM_DAYS_PER_LOCATION, MONTHS } from '$lib/constants';
   import {
     defaultWeatherSource,
+    getLocationsState,
     isCustomWeather,
     isProjectLoading,
     locations,
@@ -36,10 +37,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { onMount } from 'svelte';
   import { derived, writable } from 'svelte/store';
   import '../../css/flag-icons.css';
+  import type { Location } from '$lib/types';
 
-  export let index: number = 0; // Default index in $locations
+  export let location: Location; // Default index in locationsState.locations
 
   const years = createYears();
+
+  const locationsState = getLocationsState();
 
   let inputLocation: HTMLInputElement, inputStart, inputEnd; // Bindings to elements
   let locationGroup;
@@ -52,11 +56,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let hasLoaded = false; // If the location was loaded from a saved project, then this gets set to true. It gets checked so that the initial setup function doesn't run again.
 
   let datesDetails = derived(locations, ($locations) => {
-    if (!$locations[index]) return { isValid: false };
-    if (!$locations[index].from || !$locations[index].to)
-      return { isValid: false };
-    const from = new Date($locations[index].from.replace(/-/g, '/'));
-    const to = new Date($locations[index].to.replace(/-/g, '/'));
+    if (!location) return { isValid: false };
+    if (!location.from || !location.to) return { isValid: false };
+    const from = new Date(location.from.replace(/-/g, '/'));
+    const to = new Date(location.to.replace(/-/g, '/'));
     const today = getToday();
 
     if (!from || !to) return { isValid: false };
@@ -103,20 +106,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
     set($validId && $validDates);
   });
 
-  $: $locations[index].valid = $valid;
+  $: location.valid = $valid;
 
   $: if (inputLocation) {
     showReset =
       (!searching && inputLocation.value?.length > 1) ||
-      (!searching && $locations[index]?.label);
-    if (!$locations[index]?.from && !$locations[index]?.to) setDates({});
+      (!searching && location?.label);
+    if (!location?.from && !location?.to) setDates({});
   }
 
   $: hasError =
-    !$validId &&
-    !$locations[index]?.id &&
-    $locations[index]?.label &&
-    !$isProjectLoading;
+    !$validId && !location?.id && location?.label && !$isProjectLoading;
 
   $: days = getDays(month, year);
 
@@ -131,13 +131,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
   // 'hasLoaded' gets checked so that the initial setup function doesn't run again. This is important because otherwise it would get called on every keystroke.
   // NOTE: This is a bit of a hack, but it works.
   // TODO: Find a better way to do this. putting it in onMount is too early, I believe
-  $: if ($locations[index]?.wasLoadedFromSavedProject && !hasLoaded) {
+  $: if (location?.wasLoadedFromSavedProject && !hasLoaded) {
     $validId = true;
-    $locations[index].valid = true;
-    $locations[index].duration = $locations[index]?.duration || 'c';
+    location.valid = true;
+    location.duration = location?.duration || 'c';
 
-    if ($locations[index]?.from) {
-      const from = new Date($locations[index].from.replace(/-/g, '/'));
+    if (location?.from) {
+      const from = new Date(location.from.replace(/-/g, '/'));
       year = from.getFullYear();
       month = from.getMonth() + 1;
       day = from.getDate();
@@ -211,28 +211,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
         return div;
       },
       onSelect: function (item) {
-        $locations[index].label = item?.label;
-        $locations[index].result = item?.result;
-        $locations[index].id = item?.id;
-        $locations[index].lat = item?.lat;
-        $locations[index].lng = item?.lng;
-        $locations[index].elevation = null;
+        location.label = item?.label;
+        location.result = item?.result;
+        location.id = item?.id;
+        location.lat = item?.lat;
+        location.lng = item?.lng;
+        location.elevation = null;
         $validId = true;
       },
     });
   }); // End of onMount
-
-  // Removes location
-  function remove() {
-    let _locations = [...$locations];
-    _locations.splice(index, 1);
-    _locations = _locations.map((location, i) => {
-      location.index = i;
-      return { ...location };
-    });
-
-    $locations = _locations;
-  }
 
   function validate() {
     if ($isCustomWeather) return;
@@ -254,7 +242,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       searching = false;
     }
 
-    if (!$locations[index]?.id) {
+    if (!location?.id) {
       $validId = false;
       return;
     }
@@ -279,7 +267,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   function invalidate() {
     $validId = false;
-    locations.clearAutocompleteData(index);
+    locationsState.clearAutocomplete(location.index);
   }
 
   function createYears() {
@@ -296,7 +284,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     const _padFromDate = String(setDate.getDate()).padStart(2, '0');
     from = from || `${year}-${_padFromMonth}-${_padFromDate}`;
 
-    if ($locations[index].duration === 'y') {
+    if (location.duration === 'y') {
       let yearFromSetDate = yearFrom(setDate);
       const _padToMonth = String(yearFromSetDate.getMonth() + 1).padStart(
         2,
@@ -307,10 +295,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
         to || `${yearFromSetDate.getFullYear()}-${_padToMonth}-${_padToDate}`;
     }
 
-    $locations[index].from = from;
-    $locations[index].to = to;
+    location.from = from;
+    location.to = to;
 
-    if ($locations[index]?.id) $validId = true;
+    if (location?.id) $validId = true;
   }
 
   // Get's the date of yesterday to set the max date
@@ -358,7 +346,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div class="py-2 grid grid-cols-1 items-end gap-4 justify-center">
-  {#if $locations?.length > 1}
+  {#if locationsState.locations?.length > 1}
     <div class="justify-self-end">
       <Tooltip placement="bottom" minWidth="250px">
         <div class="btn-icon bg-secondary-hover-token">
@@ -382,7 +370,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <button
               class="btn bg-secondary-hover-token"
               on:click={() => {
-                remove();
+                locationsState.remove();
                 weatherUngrouped.data = null;
               }}
               disabled={!!$isCustomWeather || $isProjectLoading}
@@ -390,7 +378,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             >
               {@html ICONS.trash}
               <p>
-                Remove Location {index + 1}
+                Remove Location {location.index + 1}
               </p>
             </button>
           </div>
@@ -403,8 +391,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <p>
         {#if hasError}
           <span class="text-error-800-100-token">Choose a result</span>
-        {:else if $locations.length > 1 && $locations[index]?.label}
-          Location {$locations.length > 1 ? index + 1 : ''}
+        {:else if locationsState.locations.length > 1 && location?.label}
+          Location {locationsState.locations.length > 1
+            ? location.index + 1
+            : ''}
         {:else}
           Search for a city, region, or landmark
         {/if}
@@ -431,12 +421,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </div>
         <input
           type="text"
-          id="location-{index}"
+          id="location-{location.index}"
           class="truncate"
           autocomplete="off"
           placeholder={$isProjectLoading ? 'Loading...' : 'Enter a place'}
           title="Enter a city, region, or landmark"
-          bind:value={$locations[index].label}
+          bind:value={location.label}
           bind:this={inputLocation}
           on:input={validate}
           on:keyup={validateKeyup}
@@ -472,11 +462,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
               weatherUngrouped.data = null;
               inputLocation.value = '';
               inputLocation.focus();
-              $locations[index].label = '';
-              $locations[index].id = '';
-              $locations[index].lat = '';
-              $locations[index].lng = '';
-              $locations[index].result = '';
+              location.label = '';
+              delete location.id;
+              location.lat = '';
+              location.lng = '';
+              location.result = '';
               $validId = false;
               if (document.querySelector('.autocomplete'))
                 document.querySelector('.autocomplete').remove();
@@ -491,7 +481,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <div
       class="grid grid-cols-12 justify-between items-start gap-4 text-left w-full"
     >
-      {#if $locations[index].duration != 'c'}
+      {#if location.duration != 'c'}
         <div
           class="grid grid-cols-3 justify-between items-center gap-4 col-span-12 sm:col-span-6"
         >
@@ -500,7 +490,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <select
               class="select"
               bind:value={year}
-              id={`choose-year-${index}`}
+              id={`choose-year-${location.index}`}
               title="Choose a Year"
               disabled={!!$isCustomWeather || $isProjectLoading}
               on:change={() => {
@@ -518,7 +508,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <select
               class="select"
               bind:value={month}
-              id={`choose-month-${index}`}
+              id={`choose-month-${location.index}`}
               title="Choose a Month"
               disabled={!!$isCustomWeather || $isProjectLoading}
               on:change={() => {
@@ -536,7 +526,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <select
               class="select"
               bind:value={day}
-              id={`choose-day-${index}`}
+              id={`choose-day-${location.index}`}
               title="Choose a Day"
               disabled={!!$isCustomWeather || $isProjectLoading}
               on:change={() => setDates({})}
@@ -548,36 +538,36 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </label>
         </div>
       {/if}
-      {#if $locations[index]?.duration === 'c'}
+      {#if location?.duration === 'c'}
         <div
           class="grid grid-cols-2 justify-between items-center gap-4 col-span-12 sm:col-span-6"
         >
-          <label for="datepicker-from-{index}" class="">
+          <label for="datepicker-from-{location.index}" class="">
             <span>From</span>
             <input
               type="date"
               class="input"
               data-type="from"
-              id="datepicker-from-{index}"
+              id="datepicker-from-{location.index}"
               title="Choose a Start Date"
               max={getYesterday()}
-              bind:value={$locations[index].from}
+              bind:value={location.from}
               bind:this={inputStart}
               on:change={() => (weatherUngrouped.data = null)}
               disabled={$isProjectLoading || !!$isCustomWeather}
             />
           </label>
-          <label for="datepicker-to-{index}" class="">
+          <label for="datepicker-to-{location.index}" class="">
             <span>To</span>
             <input
               type="date"
               class="input"
               data-type="to"
-              id="datepicker-to-{index}"
+              id="datepicker-to-{location.index}"
               placeholder="Choose end date"
               title="Choose an End Date"
               max={getYesterday()}
-              bind:value={$locations[index].to}
+              bind:value={location.to}
               bind:this={inputEnd}
               on:change={() => (weatherUngrouped.data = null)}
               disabled={$isProjectLoading || !!$isCustomWeather}
@@ -590,20 +580,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <span>Duration</span>
         <select
           class="select w-full"
-          id={`duration-${index}`}
-          bind:value={$locations[index].duration}
+          id={`duration-${location.index}`}
+          bind:value={location.duration}
           disabled={!!$isCustomWeather || $isProjectLoading}
           on:change={() => {
-            if ($locations[index]?.duration === 'y') {
-              year = new Date(
-                $locations[index].from.replace(/-/g, '/'),
-              ).getFullYear();
-              month =
-                new Date($locations[index].from.replace(/-/g, '/')).getMonth() +
-                1;
-              day = new Date(
-                $locations[index].from.replace(/-/g, '/'),
-              ).getDate();
+            if (location?.duration === 'y') {
+              year = new Date(location.from.replace(/-/g, '/')).getFullYear();
+              month = new Date(location.from.replace(/-/g, '/')).getMonth() + 1;
+              day = new Date(location.from.replace(/-/g, '/')).getDate();
               setDates({});
             }
           }}

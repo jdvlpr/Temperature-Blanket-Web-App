@@ -21,6 +21,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     initialLayout,
     layout,
     modal,
+    setLocationsState,
   } from '$lib/stores';
   import {
     privacy,
