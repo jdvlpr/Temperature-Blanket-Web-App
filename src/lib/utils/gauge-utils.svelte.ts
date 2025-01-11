@@ -68,7 +68,7 @@ export const getWPGauge = (gauge) => {
         if (index === 1) label = 'Average Temperature';
         if (index === 2) label = 'Low Temperature';
       }
-      return `${count} ${pluralize(get(weatherGrouping), count)} ${percentage} ${label}`;
+      return `${count} ${pluralize(weatherGrouping.value, count)} ${percentage} ${label}`;
     });
     // details.reverse();
     content.push({

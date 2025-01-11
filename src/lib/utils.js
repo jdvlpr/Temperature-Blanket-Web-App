@@ -20,7 +20,7 @@ export * from '$lib/utils/function-utils';
 export * from '$lib/utils/gallery-utils';
 export * from '$lib/utils/gauge-utils.svelte';
 export * from '$lib/utils/history-utils.svelte';
-export * from '$lib/utils/load-project-utils';
+export * from '$lib/utils/load-project-utils.svelte';
 export * from '$lib/utils/location-utils';
 export * from '$lib/utils/number-utils';
 export * from '$lib/utils/other-utils';

@@ -143,13 +143,13 @@ export const setProjectSettings = async (
 
   // Load Weather Grouping Setting if present
   if (exists(params.w)) {
-    weatherGrouping.set('week');
+    weatherGrouping.value = 'week';
     const value = +params.w?.value;
     if (DAYS_OF_THE_WEEK.map((n) => n.value).includes(value))
       weatherMonthGroupingStartDay.set(value);
   } else {
     // Otherwise set to the default 'day'
-    weatherGrouping.set('day');
+    weatherGrouping.value = 'day';
   }
 };
 
@@ -167,20 +167,20 @@ const parseLocationURLHash = async (hashString) => {
 
   let currentPosition = 0;
 
-  let $locations = get(locations);
+  let _locations = get(locations);
 
   // The number of locations is the number of separator characters present after the 'l=' key in the URL hash
   for (let i = 0; i < separatorIndices.length; i++) {
     // The position of the separator character for this location
     const separatorPosition = separatorIndices[i];
 
-    if ($locations.length - 1 < i) {
+    if (_locations.length - 1 < i) {
       // There needs to be another location, so create it
-      $locations = [...$locations, { index: i }];
-      locations.set($locations);
+      _locations = [..._locations, { index: i }];
+      locations.set(_locations);
     }
 
-    $locations[i].label = 'Loading...';
+    _locations[i].label = 'Loading...';
 
     const id = hashString.substring(currentPosition, separatorPosition); // from start to separator
 
@@ -217,7 +217,7 @@ const parseLocationURLHash = async (hashString) => {
 
     if (isDurationOneYear) {
       // This short format for year duration was added in version 1.730
-      $locations[i].duration = 'y';
+      _locations[i].duration = 'y';
 
       thisLocationStringLength =
         separatorPosition + durationOneYearStringLength - currentPosition;
@@ -228,7 +228,7 @@ const parseLocationURLHash = async (hashString) => {
     } else {
       // Custom duration
       // All projects before 1.730 used this format
-      $locations[i].duration = 'c';
+      _locations[i].duration = 'c';
 
       thisLocationStringLength =
         separatorPosition + durationCustomStringLength - currentPosition;
@@ -244,13 +244,13 @@ const parseLocationURLHash = async (hashString) => {
     currentPosition += thisLocationStringLength + 1;
 
     // Set the location's from date
-    $locations[i].from = from;
+    _locations[i].from = from;
 
     // Set the location's to date
-    $locations[i].to = to;
+    _locations[i].to = to;
 
     // Set this to true so that certain functions on the Project Planner page know to run when this location is loaded
-    $locations[i].wasLoadedFromSavedProject = true;
+    _locations[i].wasLoadedFromSavedProject = true;
 
     // Get  data from GeoNames using the location's id
     try {
@@ -261,30 +261,30 @@ const parseLocationURLHash = async (hashString) => {
       if (!response.ok) throw new Error(data.message);
 
       // Set the location's id
-      $locations[i].id = id;
+      _locations[i].id = id;
 
       // Set the location's latitude
-      $locations[i].lat = data.lat;
+      _locations[i].lat = data.lat;
 
       // Set the location's longitude
-      $locations[i].lng = data.lng;
+      _locations[i].lng = data.lng;
 
       // Set the location's elevation
-      if (data.srtm3 !== NO_DATA_SRTM3) $locations[i].elevation = data.srtm3;
+      if (data.srtm3 !== NO_DATA_SRTM3) _locations[i].elevation = data.srtm3;
 
       // Set the location's label
       const label = `${data.name}, ${data.adminName1}, ${data.countryName}`;
-      $locations[i].label = label;
+      _locations[i].label = label;
 
       // Set the location's result (used for displaying the location with country flag icon in various places)
-      $locations[i].result =
+      _locations[i].result =
         `<span class="fflag fflag-${data.countryCode?.toUpperCase()}"></span>${label}`;
     } catch (e) {
       throw displayGeoNamesErrorMessage(e);
     }
   }
 
-  locations.set($locations);
+  locations.set(_locations);
 };
 
 export const parseGaugeURLHash = (

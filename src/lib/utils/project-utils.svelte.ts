@@ -107,7 +107,7 @@ export const downloadWeatherCSV = () => {
       gaugeInfo,
     ];
   });
-  const dateHeader = get(weatherGrouping) === 'week' ? 'Week Of' : 'Date';
+  const dateHeader = weatherGrouping.value === 'week' ? 'Week Of' : 'Date';
   const data = [
     [
       'Item Number',
@@ -182,7 +182,7 @@ export const sendToProjectGallery = async (img) => {
     total_days: weatherUngrouped.data?.length,
     yarn_urls: JSON.stringify(yarnUrls),
     yarn_details: JSON.stringify(yarnDetails),
-    weather_grouping: get(weatherGrouping),
+    weather_grouping: weatherGrouping.value,
     weather_sources: JSON.stringify(getWeatherSourceDetails()),
     wp_tag_id: get(activePreview).wpTagId,
   };

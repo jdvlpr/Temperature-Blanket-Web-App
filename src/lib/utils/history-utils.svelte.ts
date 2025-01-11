@@ -93,12 +93,12 @@ export const loadFromHistory = (props) => {
   // Change Weather Grouping
   if (exists(newParams.w)) {
     if (!exists(oldParams.w) || oldParams.w?.value !== newParams.w?.value) {
-      weatherGrouping.set('week');
+      weatherGrouping.value = 'week';
       weatherMonthGroupingStartDay.set(+newParams.w.value);
       message = 'Weather Grouping';
     }
   } else {
-    weatherGrouping.set('day');
+    weatherGrouping.value = 'day';
     message = 'Weather Grouping';
   }
 
