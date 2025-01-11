@@ -14,7 +14,34 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script module lang="ts">
-  export let yarn: { colors: Color[] } = $state({ colors: [] });
+  export let yarn: { colors: Color[] } = $state({
+    colors: [
+      {
+        hex: '#f43f5e',
+      },
+      {
+        hex: '#d946ef',
+      },
+      {
+        hex: '#8b5cf6',
+      },
+      {
+        hex: '#3b82f6',
+      },
+      {
+        hex: '#06b6d4',
+      },
+      {
+        hex: '#10b981',
+      },
+      {
+        hex: '#eab308',
+      },
+      {
+        hex: '#f97316',
+      },
+    ],
+  });
 </script>
 
 <script lang="ts">
@@ -58,35 +85,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
         string: _yarnString,
         colors: $state.snapshot(yarn.colors),
       });
-    }
-
-    if (yarn.colors.length === 0) {
-      yarn.colors = [
-        {
-          hex: '#f43f5e',
-        },
-        {
-          hex: '#d946ef',
-        },
-        {
-          hex: '#8b5cf6',
-        },
-        {
-          hex: '#3b82f6',
-        },
-        {
-          hex: '#06b6d4',
-        },
-        {
-          hex: '#10b981',
-        },
-        {
-          hex: '#eab308',
-        },
-        {
-          hex: '#f97316',
-        },
-      ];
     }
 
     isFinishedOnMount = true;
@@ -159,46 +157,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
               class="transition-opacity opacity-100 mt-4"
               class:opacity-50={!isFinishedOnMount}
             >
-              {#if yarn.colors.length}
-                <Gauge
-                  bind:colors={yarn.colors}
-                  bind:numberOfColors={yarn.colors.length}
-                  bind:schemeId
-                  context="weatherless"
-                />
-              {:else}
-                <Gauge
-                  colors={[
-                    {
-                      hex: '#f9fafb',
-                    },
-                    {
-                      hex: '#f3f4f6',
-                    },
-                    {
-                      hex: '#e5e7eb',
-                    },
-                    {
-                      hex: '#d1d5db',
-                    },
-                    {
-                      hex: '#9ca3af',
-                    },
-                    {
-                      hex: '#6b7280',
-                    },
-                    {
-                      hex: '#4b5563',
-                    },
-                    {
-                      hex: '#374151',
-                    },
-                  ]}
-                  numberOfColors={8}
-                  bind:schemeId
-                  context="weatherless"
-                />
-              {/if}
+              <Gauge
+                bind:colors={yarn.colors}
+                bind:numberOfColors={yarn.colors.length}
+                bind:schemeId
+                context="weatherless"
+              />
             </div>
           {/snippet}
         </Card>
