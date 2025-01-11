@@ -33,6 +33,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Menu from '$lib/components/modals/Menu.svelte';
   import { ICONS, LOADED_APP_VERSION } from '$lib/constants';
   import {
+    drawerState,
     gaugesState,
     history,
     historyChangeMessage,
@@ -42,7 +43,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     isProjectSaved,
     liveProjectURLHash,
     modal,
-    openDrawerGettingStarted,
     pageSections,
     pinAllSections,
     projectStatus,
@@ -433,10 +433,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       Getting Started</button
                     >
                   {/if}
-                  <Drawer.Root bind:open={$openDrawerGettingStarted}>
-                    {#if !isDesktop.current}
+                  {#if !isDesktop.current}
+                    <Drawer.Root bind:open={drawerState.gettingStarted}>
                       <Drawer.Trigger
-                        onclick={() => ($openDrawerGettingStarted = true)}
+                        onclick={() => (drawerState.gettingStarted = true)}
                       >
                         <div
                           role="button"
@@ -455,25 +455,27 @@ If not, see <https://www.gnu.org/licenses/>. -->
                           Getting Started
                         </div>
                       </Drawer.Trigger>
-                    {/if}
-                    <Drawer.Portal>
-                      <Drawer.Overlay class="fixed inset-0 bg-black/40 z-40" />
-                      <Drawer.Content
-                        class="bg-surface-50-900-token text-token flex flex-col rounded-tl-container-token rounded-tr-container-token mt-24 fixed bottom-0 left-0 right-0 z-50"
-                      >
-                        <div
-                          class="rounded-tl-container-token rounded-tr-container-token overflow-auto"
+                      <Drawer.Portal>
+                        <Drawer.Overlay
+                          class="fixed inset-0 bg-black/40 z-40"
+                        />
+                        <Drawer.Content
+                          class="bg-surface-50-900-token text-token flex flex-col rounded-tl-container-token rounded-tr-container-token mt-24 fixed bottom-0 left-0 right-0 z-50"
                         >
                           <div
-                            class="mx-auto mt-4 w-12 h-1.5 flex-shrink-0 rounded-full mb-4 bg-surface-900-50-token"
-                          ></div>
-                          <div class="mx-auto text-center">
-                            <GettingStarted />
+                            class="rounded-tl-container-token rounded-tr-container-token overflow-auto"
+                          >
+                            <div
+                              class="mx-auto mt-4 w-12 h-1.5 flex-shrink-0 rounded-full mb-4 bg-surface-900-50-token"
+                            ></div>
+                            <div class="mx-auto text-center">
+                              <GettingStarted />
+                            </div>
                           </div>
-                        </div>
-                      </Drawer.Content>
-                    </Drawer.Portal>
-                  </Drawer.Root>
+                        </Drawer.Content>
+                      </Drawer.Portal>
+                    </Drawer.Root>
+                  {/if}
                   <a
                     href="/blog/what-is-a-temperature-blanket"
                     class="link whitespace-pre-wrap mt-2"

@@ -14,7 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { openDrawerGettingStarted } from '$lib/stores';
+  import { drawerState } from '$lib/stores';
   import { getModalStore, Step, Stepper } from '@skeletonlabs/skeleton';
   import ModalShell from './ModalShell.svelte';
 
@@ -41,7 +41,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       buttonCompleteLabel="Lets Go!"
       on:complete={() => {
         if (parent) modalStore.close();
-        else $openDrawerGettingStarted = false;
+        else drawerState.browsePalettes = false;
       }}
     >
       <Step>

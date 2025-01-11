@@ -26,16 +26,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import RandomPalette from '$lib/components/modals/RandomPalette.svelte';
   import SortPalette from '$lib/components/modals/SortPalette.svelte';
   import {
+    drawerState,
     gaugesState,
     isDesktop,
     modal,
-    openDrawerBrowsePalettes,
     weather,
   } from '$lib/stores';
   import type { Color } from '$lib/types';
   import type { GaugeAttributes } from '$lib/types/gauge-types';
   import {
-    closeAllDrawers,
     createGaugeColors,
     displayNumber,
     getEvenlyDistributedRangeValuesWithEqualDayCount,
@@ -134,7 +133,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       numberOfColors = colors.length;
     }
     schemeId = _schemeId;
-    closeAllDrawers();
+    drawerState.closeAll();
     if ($modalStore[0]) modalStore.close();
   }
 </script>
@@ -230,9 +229,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </svg> Browse Palettes
     </button>
   {/if}
-  <Drawer.Root bind:open={$openDrawerBrowsePalettes}>
-    {#if !isDesktop.current}
-      <Drawer.Trigger on:click={() => ($openDrawerBrowsePalettes = true)}>
+  {#if !isDesktop.current}
+    <Drawer.Root bind:open={drawerState.browsePalettes}>
+      <Drawer.Trigger on:click={() => (drawerState.browsePalettes = true)}>
         <button
           class="btn bg-secondary-hover-token justify-start"
           title="Browse Preset & User-Created Color Palettes"
@@ -253,31 +252,31 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </svg> Browse Palettes
         </button>
       </Drawer.Trigger>
-    {/if}
-    <Drawer.Portal>
-      <Drawer.Overlay class="fixed inset-0 bg-black/40 z-40" />
+      <Drawer.Portal>
+        <Drawer.Overlay class="fixed inset-0 bg-black/40 z-40" />
 
-      <Drawer.Content
-        class="h-[90svh] bg-surface-200-700-token text-token flex flex-col rounded-tl-container-token rounded-tr-container-token mt-24 fixed bottom-0 left-0 right-0 z-50"
-      >
-        <div
-          class="pt-4 rounded-tl-container-token rounded-tr-container-token overflow-auto"
+        <Drawer.Content
+          class="h-[90svh] bg-surface-200-700-token text-token flex flex-col rounded-tl-container-token rounded-tr-container-token mt-24 fixed bottom-0 left-0 right-0 z-50"
         >
           <div
-            class="mx-auto w-12 h-1.5 flex-shrink-0 rounded-full mb-4 bg-surface-900-50-token"
-          ></div>
-          <div class="mx-auto text-center">
-            <BrowsePalettes
-              {numberOfColors}
-              {schemeId}
-              {updateGauge}
-              context="drawer"
-            />
+            class="pt-4 rounded-tl-container-token rounded-tr-container-token overflow-auto"
+          >
+            <div
+              class="mx-auto w-12 h-1.5 flex-shrink-0 rounded-full mb-4 bg-surface-900-50-token"
+            ></div>
+            <div class="mx-auto text-center">
+              <BrowsePalettes
+                {numberOfColors}
+                {schemeId}
+                {updateGauge}
+                context="drawer"
+              />
+            </div>
           </div>
-        </div>
-      </Drawer.Content>
-    </Drawer.Portal>
-  </Drawer.Root>
+        </Drawer.Content>
+      </Drawer.Portal>
+    </Drawer.Root>
+  {/if}
 
   <button
     class="btn bg-secondary-hover-token justify-start"

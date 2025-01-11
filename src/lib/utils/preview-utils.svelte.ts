@@ -16,10 +16,10 @@
 import WeatherDetails from '$lib/components/WeatherDetails.svelte';
 import {
   createdGauges,
+  drawerState,
   gaugesState,
   isDesktop,
   modal,
-  openDrawerWeatherDetails,
   previewWeatherTargets,
   projectFilename,
   weather,
@@ -41,7 +41,7 @@ export const showPreviewImageWeatherDetails = (targets) => {
       },
     });
   } else {
-    openDrawerWeatherDetails.set(true);
+    drawerState.weatherDetails = true;
   }
 };
 export const svgToPNG = async ({

@@ -217,6 +217,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     >temperature-blanket.com</a
   >.
 </p>
+
 {@render children?.()}
 
 <style>

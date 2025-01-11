@@ -16,16 +16,7 @@
 import { page } from '$app/state';
 import KeyboardShortcuts from '$lib/components/modals/KeyboardShortcuts.svelte';
 import Menu from '$lib/components/modals/Menu.svelte';
-import {
-  modal,
-  openDrawerBrowsePalettes,
-  openDrawerGettingStarted,
-  openDrawerWeatherDetails,
-  pageSections,
-  theme,
-  units,
-  weather,
-} from '$lib/stores';
+import { modal, pageSections, theme, units, weather } from '$lib/stores';
 import { loadFromHistory, setTheme } from '$lib/utils';
 import { get } from 'svelte/store';
 
@@ -55,12 +46,6 @@ export const goToProjectSection = async (index) => {
       });
     }
   });
-};
-
-export const closeAllDrawers = () => {
-  openDrawerBrowsePalettes.set(false);
-  openDrawerGettingStarted.set(false);
-  openDrawerWeatherDetails.set(false);
 };
 
 const setSections = async (index) => {

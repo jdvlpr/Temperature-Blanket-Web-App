@@ -44,9 +44,18 @@ export const isDesktop = new MediaQuery('(min-width: 768px)');
 
 export const windowLanguage = writable(null);
 
-export const openDrawerBrowsePalettes = writable(false);
-export const openDrawerGettingStarted = writable(false);
-export const openDrawerWeatherDetails = writable(false);
+class DrawerStateClass {
+  browsePalettes = $state(false);
+  gettingStarted = $state(false);
+  weatherDetails = $state(false);
+  closeAll = () => {
+    this.browsePalettes = false;
+    this.gettingStarted = false;
+    this.weatherDetails = false;
+  };
+}
+
+export const drawerState = new DrawerStateClass();
 
 export const pageSections = writable([
   {

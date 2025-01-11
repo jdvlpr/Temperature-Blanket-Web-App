@@ -19,8 +19,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import WeatherDetails from '$lib/components/WeatherDetails.svelte';
   import {
     activePreview,
+    drawerState,
     modal,
-    openDrawerWeatherDetails,
     previewWeatherTargets,
     projectGalleryLink,
     projectGalleryTitle,
@@ -36,7 +36,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <div class="flex flex-col gap-2 justify-center items-start">
     <div class="flex w-full flex-col gap-4 justify-center items-center">
       <svelte:component this={$activePreview.preview} />
-      <Drawer.Root bind:open={$openDrawerWeatherDetails}>
+      <Drawer.Root bind:open={drawerState.weatherDetails}>
         <Drawer.Portal>
           <Drawer.Overlay class="fixed inset-0 bg-black/40 z-40" />
 
