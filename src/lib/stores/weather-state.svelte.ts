@@ -16,7 +16,7 @@
 import { locations, units } from '$lib/stores';
 import type { WeatherDay, WeatherSource } from '$lib/types';
 import { createWeeksProperty, displayNumber } from '$lib/utils';
-import { derived, get, writable, type Writable } from 'svelte/store';
+import { get, writable, type Writable } from 'svelte/store';
 
 export const defaultWeatherSource: Writable<WeatherSource> =
   writable('Open-Meteo');

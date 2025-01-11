@@ -25,7 +25,7 @@ class ModalState {
 
   state: Writable<any>;
 }
-export let modal = $state(new ModalState());
+export let modal = new ModalState();
 
 export const disableToastAnalytics: Writable<boolean> = localStorageStore(
   'disable_toast_analytics',
