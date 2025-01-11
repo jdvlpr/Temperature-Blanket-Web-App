@@ -50,12 +50,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
           string: urlParams.get('s'),
         }) || yarn.colors;
     }
+
     if (urlParams?.has('f')) {
-      let yarn = urlParams.get('f');
+      let _yarnString = urlParams.get('f');
 
       yarn.colors = yarnDetailsToColors({
-        string: yarn,
-        colors: yarn.colors,
+        string: _yarnString,
+        colors: $state.snapshot(yarn.colors),
       });
     }
 
@@ -109,10 +110,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     const href = new URL(url).href;
     return href;
   }
-  $effect(() => {
-    layout.value;
-    setLocalStorageLayout();
-  });
 
   let shareableURL = $derived(getShareableURL(yarn.colors));
 </script>
