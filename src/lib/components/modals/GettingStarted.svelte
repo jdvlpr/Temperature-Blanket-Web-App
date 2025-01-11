@@ -19,10 +19,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ModalShell from './ModalShell.svelte';
 
   const modalStore = getModalStore();
-  export let parent: any;
+  interface Props {
+    parent?: any;
+  }
+
+  let { parent }: Props = $props();
 </script>
 
-<ModalShell {parent} hideCloseButton={true}>
+{#if parent}
+  <ModalShell {parent} hideCloseButton={true}>
+    {@render content()}
+  </ModalShell>
+{:else}
+  {@render content()}
+{/if}
+
+{#snippet content()}
   <div class={parent ? '' : 'p-4'}>
     <Stepper
       stepTerm=""
@@ -33,7 +45,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       }}
     >
       <Step>
-        <svelte:fragment slot="header">
+        {#snippet header()}
           <div class="w-full flex flex-col items-center">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -46,7 +58,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             >
             <p>Welcome!</p>
           </div>
-        </svelte:fragment>
+        {/snippet}
 
         <p class="text-center">
           This Project Planner tool helps crocheters, knitters, and craftspeople
@@ -55,11 +67,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </Step>
 
       <Step>
-        <svelte:fragment slot="header">
+        {#snippet header()}
           <div class="w-full flex flex-col items-center">
             <p>Navigation</p>
           </div>
-        </svelte:fragment>
+        {/snippet}
         <div class="flex flex-col gap-4">
           <p class="text-center">
             Use the buttons at the bottom of the page to navigate between the
@@ -97,11 +109,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </Step>
 
       <Step>
-        <svelte:fragment slot="header">
+        {#snippet header()}
           <div class="w-full flex flex-col items-center">
             <p>Yarn Colorways</p>
           </div>
-        </svelte:fragment>
+        {/snippet}
 
         <p class="text-center">
           Create a palette for your project by picking from thousands of yarn
@@ -165,11 +177,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </div>
       </Step>
       <Step>
-        <svelte:fragment slot="header">
+        {#snippet header()}
           <div class="w-full flex flex-col items-center">
             <p>Preview Your Project</p>
           </div>
-        </svelte:fragment>
+        {/snippet}
 
         <p class="text-center">
           Customizations will be reflected in the live visualization, which you
@@ -233,11 +245,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </Step>
 
       <Step>
-        <svelte:fragment slot="header">
+        {#snippet header()}
           <div class="w-full flex flex-col items-center">
             <p>Get Started and Explore!</p>
           </div>
-        </svelte:fragment>
+        {/snippet}
         <p class="text-center">
           Start planning your project and discover many more features like
           downloading, saving, or sharing your project.
@@ -295,4 +307,4 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </Step>
     </Stepper>
   </div>
-</ModalShell>
+{/snippet}

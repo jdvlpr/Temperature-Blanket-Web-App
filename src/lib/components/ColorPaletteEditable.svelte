@@ -233,8 +233,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
               </svg>
             {:else}
               <div
-                role="button"
-                tabindex="0"
                 class="group-hover:hidden group-focus:hidden h-2 w-2 rounded-full opacity-20"
                 class:hidden={sortableColors.length > 30 ||
                   (activeColorIndex === index && !isDragging.value)}
@@ -247,6 +245,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <div
               role="button"
               tabindex="0"
+              aria-roledescription="button"
               aria-label="drag-handle"
               class="w-fit dragicon {activeColorIndex === index &&
               !isDragging.value
@@ -270,8 +269,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               class="w-full rounded-container-token text-center break-all flex flex-wrap items-center justify-center gap-4 z-30"
             >
               {#if canUserDeleteColor && sortableColors.length > 1}
-                <div
-                  role="button"
+                <button
                   onclick={async () => {
                     colors = colors.filter((_, i) => i !== index);
 
@@ -281,11 +279,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   class="btn-icon bg-secondary-hover-token"
                 >
                   {@html ICONS.trash}
-                </div>
+                </button>
               {/if}
               {#if canUserEditColor}
-                <div
-                  role="button"
+                <button
                   class="btn bg-secondary-hover-token flex items-center justify-start"
                   onclick={() =>
                     modal.state.trigger({
@@ -335,7 +332,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     </span>
                     <span class="text-lg leading-tight"> {name || hex}</span>
                   </span>
-                </div>
+                </button>
               {:else}
                 <div
                   class="flex flex-col items-start justify-start text-left text-wrap"
@@ -353,8 +350,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 </div>
               {/if}
               {#if typeof color.locked !== 'undefined'}
-                <div
-                  role="button"
+                <button
                   class="btn btn-icon"
                   onclick={(e) => {
                     e.preventDefault();
@@ -391,7 +387,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       />
                     </svg>
                   {/if}
-                </div>
+                </button>
               {/if}
             </div>
           {/snippet}

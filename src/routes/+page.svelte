@@ -75,6 +75,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   const toastStore = getToastStore();
 
+  let dialogOpen = $state(false);
+
   onMount(async () => {
     const hasProjectURLParam = new URL(window.location.href).searchParams.has(
       'project',

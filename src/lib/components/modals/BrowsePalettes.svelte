@@ -26,7 +26,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     numberOfColors: any;
     updateGauge: any;
     context?: string;
-    parent: any;
+    parent?: any;
   }
 
   let {
@@ -68,7 +68,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 </script>
 
-<ModalShell {parent}>
+{#if parent}
+  <ModalShell {parent}>
+    {@render content()}
+  </ModalShell>
+{:else}
+  {@render content()}
+{/if}
+
+{#snippet content()}
   <div class="" bind:this={container}>
     <div
       class="w-full flex flex-wrap justify-center items-end gap-2 px-2 pb-2 bg-surface-100-800-token"
@@ -113,4 +121,4 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </div>
 
   <p class="font-ornament text-3xl mb-4 text-center w-full inline-block">k</p>
-</ModalShell>
+{/snippet}

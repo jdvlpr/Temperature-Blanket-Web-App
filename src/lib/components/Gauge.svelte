@@ -42,7 +42,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     getIncrement,
     getSchemeName,
     getStart,
-    hasParentWithClass,
   } from '$lib/utils';
   import { getModalStore } from '@skeletonlabs/skeleton';
   import { Drawer } from 'vaul-svelte';
@@ -231,12 +230,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </svg> Browse Palettes
     </button>
   {/if}
-  <Drawer.Root
-    onOutsideClick={(e) => {
-      if (hasParentWithClass(e, 'autocomplete')) e.preventDefault();
-    }}
-    bind:open={$openDrawerBrowsePalettes}
-  >
+  <Drawer.Root bind:open={$openDrawerBrowsePalettes}>
     {#if !isDesktop.current}
       <Drawer.Trigger on:click={() => ($openDrawerBrowsePalettes = true)}>
         <button
