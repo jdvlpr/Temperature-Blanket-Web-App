@@ -56,7 +56,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/if}
 
   {#if $weatherView === 'range' || context !== 'body'}
-    <WeatherDetails {data} {context} {weatherTargets} />
+    <WeatherDetails {data} {weatherTargets} />
   {:else if $weatherView === 'table'}
     <WeatherTableView {data} {weatherTargets} />
   {/if}

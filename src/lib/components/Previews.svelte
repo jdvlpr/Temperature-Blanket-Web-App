@@ -50,10 +50,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 class="mx-auto w-12 h-1.5 flex-shrink-0 rounded-full mb-4 bg-surface-900-50-token"
               ></div>
               <div class="mx-auto text-center">
-                <WeatherDetails
-                  weatherTargets={$previewWeatherTargets}
-                  context="modal"
-                />
+                <WeatherDetails weatherTargets={$previewWeatherTargets} />
               </div>
             </div>
           </Drawer.Content>

@@ -270,7 +270,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
               class="w-full rounded-container-token text-center break-all flex flex-wrap items-center justify-center gap-4 z-30"
             >
               {#if canUserDeleteColor && sortableColors.length > 1}
-                <button
+                <div
+                  role="button"
                   onclick={async () => {
                     colors = colors.filter((_, i) => i !== index);
 
@@ -278,11 +279,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     if (onchanged) onchanged();
                   }}
                   class="btn-icon bg-secondary-hover-token"
-                  >{@html ICONS.trash}</button
                 >
+                  {@html ICONS.trash}
+                </div>
               {/if}
               {#if canUserEditColor}
-                <button
+                <div
+                  role="button"
                   class="btn bg-secondary-hover-token flex items-center justify-start"
                   onclick={() =>
                     modal.state.trigger({
@@ -332,7 +335,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     </span>
                     <span class="text-lg leading-tight"> {name || hex}</span>
                   </span>
-                </button>
+                </div>
               {:else}
                 <div
                   class="flex flex-col items-start justify-start text-left text-wrap"
@@ -350,7 +353,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 </div>
               {/if}
               {#if typeof color.locked !== 'undefined'}
-                <button
+                <div
+                  role="button"
                   class="btn btn-icon"
                   onclick={(e) => {
                     e.preventDefault();
@@ -387,7 +391,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       />
                     </svg>
                   {/if}
-                </button>
+                </div>
               {/if}
             </div>
           {/snippet}
