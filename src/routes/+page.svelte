@@ -260,7 +260,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
 
     <Tooltip
-      class="btn-icon bg-secondary-hover-token"
+      classNames="btn-icon bg-secondary-hover-token"
       minWidth="265px"
       title="Help"
     >
