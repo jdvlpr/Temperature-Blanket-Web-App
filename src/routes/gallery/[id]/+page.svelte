@@ -29,7 +29,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { settings as snowGaugeSettings } from '$lib/components/gauges/SnowGauge.svelte';
   import { gaugeSettings as temperatureGaugeSettings } from '$lib/components/gauges/TemperatureGauge.svelte';
   import { ALL_YARN_WEIGHTS, ICONS } from '$lib/constants';
-  import { allGaugesAttributes, layout, valid } from '$lib/stores';
+  import { allGaugesAttributes, getLocationsState, layout } from '$lib/stores';
   import {
     exists,
     getProjectParametersFromURLHash,
@@ -57,6 +57,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let params = $state();
   let gauges = $state();
   let flatColors = $state();
+
+  const locationsState = getLocationsState();
 
   onMount(async () => {
     const { project: streamedProject } = await data.stream;
@@ -223,9 +225,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   <a
                     class="btn variant-filled-primary w-fit m-auto flex flex-wrap items-center gap-1"
                     href={projectURL}
-                    target={$valid ? '_blank' : '_self'}
+                    target={locationsState.allValid ? '_blank' : '_self'}
                   >
-                    {#if $valid}
+                    {#if locationsState.allValid}
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
@@ -256,7 +258,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         />
                       </svg>
                     {/if}
-                    Open in {#if $valid}
+                    Open in {#if locationsState.allValid}
                       New
                     {/if} Project Planner
                   </a>

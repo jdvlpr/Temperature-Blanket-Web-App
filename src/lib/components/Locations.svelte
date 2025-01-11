@@ -27,7 +27,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     isProjectLoading,
     liveProjectURLHash,
     modal,
-    valid,
     wasProjectLoadedFromURL,
     wasWeatherLoadedFromLocalStorage,
     weather,
@@ -40,12 +39,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   $inspect(locationsState?.locations);
 
-  let invalid = $derived(!$valid);
-  let disabled = $state(true);
-
-  $effect(() => {
-    disabled = invalid || $isProjectLoading;
-  });
+  let disabled = $state(!locationsState.allValid || $isProjectLoading);
 </script>
 
 <div class="mt-4 max-w-screen-md mx-auto">
@@ -154,7 +148,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     class:dark:border-surface-600={locationsState.locations.length > 1}
     class:pt-4={locationsState.locations.length > 1}
   >
-    {#if $valid && locationsState.totalDays === 1}
+    {#if locationsState.allValid && locationsState.totalDays === 1}
       <!-- The range calculation functionality expects there to be more than one day of weather data.
      So if there's only one day of weather data the color ranges will have some NaN values. 
      This notice discourages users from using only one day of weather data. -->
@@ -182,7 +176,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <SearchForWeather bind:disabled />
     </div>
 
-    {#if locationsState.locations.length > 1 && locationsState.totalDays && $valid && !$isCustomWeather}
+    {#if locationsState.locations.length > 1 && locationsState.totalDays && locationsState.allValid && !$isCustomWeather}
       <p class="w-full text-sm italic">
         {locationsState.totalDays} Total {pluralize(
           'Day',
@@ -193,12 +187,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </div>
 </div>
 
-{#if $valid}
+{#if locationsState.allValid}
   <div
     class="flex flex-wrap gap-2 justify-center mt-4 mb-2 lg:mb-4 px-4 py-2 shadow-inner rounded-container-token variant-soft-surface max-w-screen-md mx-auto"
     transition:slide
   >
-    <div class:hidden={!$valid || $isCustomWeather}>
+    <div class:hidden={!locationsState.allValid || $isCustomWeather}>
       {#if locationsState.locations.length < MAXIMUM_LOCATIONS}
         <button
           class="btn bg-secondary-hover-token gap-2"

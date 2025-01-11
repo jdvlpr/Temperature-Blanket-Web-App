@@ -15,7 +15,7 @@
 
 import { CHARACTERS_FOR_URL_HASH } from '$lib/constants';
 import type { Location, WeatherSource } from '$lib/types';
-import { stringToDate, numberOfDays } from '$lib/utils';
+import { numberOfDays, stringToDate } from '$lib/utils';
 import { getContext, setContext } from 'svelte';
 import { derived, writable, type Writable } from 'svelte/store';
 import { weatherUngrouped } from './weather-state.svelte';
@@ -38,17 +38,40 @@ function createLocationsStore() {
 }
 export const locations: Writable<Location[]> = createLocationsStore();
 
+export class LocationClass implements Location {
+  index: number;
+  valid?: boolean;
+  duration?: 'c' | 'y';
+  from?: string;
+  to?: string;
+  label?: string;
+  result?: string;
+  id?: number;
+  lat?: string;
+  lng?: string;
+  elevation?: number;
+  stations?: null | any[];
+  source?: WeatherSource;
+  wasLoadedFromSavedProject?: boolean;
+
+  constructor(value: number) {
+    this.index = value;
+  }
+}
+
 export class LocationsState {
   locations = $state<Location[]>([]);
 
   constructor() {
-    this.locations = [{ index: 0 }];
+    const location = new LocationClass(0);
+    this.locations = [{ ...location }];
   }
 
   add(): void {
     if (weatherUngrouped.data) weatherUngrouped.data = null;
     const index = this.locations.length;
-    this.locations.push({ index });
+    const newLocation = new LocationClass(index);
+    this.locations.push({ ...newLocation });
   }
 
   remove(index: number) {
@@ -77,6 +100,10 @@ export class LocationsState {
     }, 0);
     return sum;
   });
+
+  allValid = $derived.by(() => {
+    return this.locations.every((location) => location.valid === true);
+  });
 }
 
 const LOCATIONS_KEY = Symbol('LOCATIONS');
@@ -88,10 +115,6 @@ export function setLocationsState() {
 export function getLocationsState() {
   return getContext<ReturnType<typeof setLocationsState>>(LOCATIONS_KEY);
 }
-
-export const valid = derived(locations, ($locations) =>
-  $locations?.every((location) => location.valid === true),
-);
 
 export const gettingLocationWeather = writable('Searching...');
 

@@ -21,7 +21,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     getLocationsState,
     isCustomWeather,
     isProjectLoading,
-    locations,
     useSecondaryWeatherSources,
     weatherUngrouped,
   } from '$lib/stores';
@@ -35,11 +34,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '$lib/utils';
   import autocomplete from 'autocompleter';
   import { onMount } from 'svelte';
-  import { derived, writable } from 'svelte/store';
   import '../../css/flag-icons.css';
-  import type { Location } from '$lib/types';
 
-  export let location: Location; // Default index in locationsState.locations
+  let { location = $bindable() } = $props(); // Default index in locationsState.locations
 
   const years = createYears();
 
@@ -47,15 +44,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let inputLocation: HTMLInputElement, inputStart, inputEnd; // Bindings to elements
   let locationGroup;
-  let year = getLastYear();
-  let month = 1;
-  let day = 1;
+  let year = $state(getLastYear());
+  let month = $state(1);
+  let day = $state(1);
 
-  let searching = false; // Are the autocomplete results fetching?
-  let showReset = false; // Should the clear input button appear?
-  let hasLoaded = false; // If the location was loaded from a saved project, then this gets set to true. It gets checked so that the initial setup function doesn't run again.
+  let searching = $state(false); // Are the autocomplete results fetching?
+  let showReset = $state(false); // Should the clear input button appear?
+  let hasLoaded = $state(false); // If the location was loaded from a saved project, then this gets set to true. It gets checked so that the initial setup function doesn't run again.
 
-  let datesDetails = derived(locations, ($locations) => {
+  let datesDetails = $derived.by(() => {
     if (!location) return { isValid: false };
     if (!location.from || !location.to) return { isValid: false };
     const from = new Date(location.from.replace(/-/g, '/'));
@@ -95,56 +92,61 @@ If not, see <https://www.gnu.org/licenses/>. -->
     };
   });
 
-  let validId = writable(false);
-  let validDates = derived(
-    datesDetails,
-    ($datesDetails) => $datesDetails.isValid,
-  );
+  let validId = $state(false);
+  let validDates = $derived(datesDetails.isValid);
 
   // Is Valid Location ID and Dates
-  let valid = derived([validId, validDates], ([$validId, $validDates], set) => {
-    set($validId && $validDates);
+  let valid = $derived(validId && validDates);
+
+  $effect(() => {
+    location.valid = valid;
   });
 
-  $: location.valid = $valid;
+  $effect(() => {
+    if (inputLocation) {
+      showReset =
+        (!searching && inputLocation.value?.length > 1) ||
+        (!searching && location?.label);
+      if (!location?.from && !location?.to) setDates({});
+    }
+  });
 
-  $: if (inputLocation) {
-    showReset =
-      (!searching && inputLocation.value?.length > 1) ||
-      (!searching && location?.label);
-    if (!location?.from && !location?.to) setDates({});
-  }
+  let hasError = $derived(
+    !validId && !location?.id && location?.label && !$isProjectLoading,
+  );
 
-  $: hasError =
-    !$validId && !location?.id && location?.label && !$isProjectLoading;
+  let days = $derived(getDays(month, year));
 
-  $: days = getDays(month, year);
-
-  $: datesMustBeHistorical =
+  let datesMustBeHistorical = $derived(
     $defaultWeatherSource === 'Open-Meteo' &&
-    $datesDetails?.daysInFuture >= 1 &&
-    !$useSecondaryWeatherSources;
+      datesDetails?.daysInFuture >= 1 &&
+      !$useSecondaryWeatherSources,
+  );
 
-  $: if (day > days) day = 1;
+  $effect(() => {
+    if (day > days) day = 1;
+  });
 
   // If the location was loaded from a saved project, then this gets run to setup initial variables.
   // 'hasLoaded' gets checked so that the initial setup function doesn't run again. This is important because otherwise it would get called on every keystroke.
   // NOTE: This is a bit of a hack, but it works.
   // TODO: Find a better way to do this. putting it in onMount is too early, I believe
-  $: if (location?.wasLoadedFromSavedProject && !hasLoaded) {
-    $validId = true;
-    location.valid = true;
-    location.duration = location?.duration || 'c';
+  $effect(() => {
+    if (location?.wasLoadedFromSavedProject && !hasLoaded) {
+      validId = true;
+      location.valid = true;
+      location.duration = location?.duration || 'c';
 
-    if (location?.from) {
-      const from = new Date(location.from.replace(/-/g, '/'));
-      year = from.getFullYear();
-      month = from.getMonth() + 1;
-      day = from.getDate();
+      if (location?.from) {
+        const from = new Date(location.from.replace(/-/g, '/'));
+        year = from.getFullYear();
+        month = from.getMonth() + 1;
+        day = from.getDate();
+      }
+
+      hasLoaded = true;
     }
-
-    hasLoaded = true;
-  }
+  });
 
   onMount(() => {
     // Setup the autocomplete location
@@ -217,7 +219,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         location.lat = item?.lat;
         location.lng = item?.lng;
         location.elevation = null;
-        $validId = true;
+        validId = true;
       },
     });
   }); // End of onMount
@@ -243,7 +245,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     }
 
     if (!location?.id) {
-      $validId = false;
+      validId = false;
       return;
     }
 
@@ -256,7 +258,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   // Listen for backspace keypress, in which case invalidate the location
   function validateKeyup(e) {
     if (!e) {
-      $validId = true;
+      validId = true;
       return;
     }
 
@@ -266,7 +268,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 
   function invalidate() {
-    $validId = false;
+    validId = false;
     locationsState.clearAutocomplete(location.index);
   }
 
@@ -298,7 +300,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     location.from = from;
     location.to = to;
 
-    if (location?.id) $validId = true;
+    if (location?.id) validId = true;
   }
 
   // Get's the date of yesterday to set the max date
@@ -369,8 +371,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <div class="flex items-center gap-2 justify-center">
             <button
               class="btn bg-secondary-hover-token"
-              on:click={() => {
-                locationsState.remove();
+              onclick={() => {
+                locationsState.remove(location.index);
                 weatherUngrouped.data = null;
               }}
               disabled={!!$isCustomWeather || $isProjectLoading}
@@ -428,8 +430,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
           title="Enter a city, region, or landmark"
           bind:value={location.label}
           bind:this={inputLocation}
-          on:input={validate}
-          on:keyup={validateKeyup}
+          oninput={validate}
+          onkeyup={validateKeyup}
           disabled={$isProjectLoading || !!$isCustomWeather}
         />
         {#if searching}
@@ -457,7 +459,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             class=""
             title="Reset Location Search"
             disabled={!!$isCustomWeather}
-            on:click={() => {
+            onclick={() => {
               if ($isCustomWeather) return;
               weatherUngrouped.data = null;
               inputLocation.value = '';
@@ -467,7 +469,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               location.lat = '';
               location.lng = '';
               location.result = '';
-              $validId = false;
+              validId = false;
               if (document.querySelector('.autocomplete'))
                 document.querySelector('.autocomplete').remove();
             }}
@@ -493,7 +495,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               id={`choose-year-${location.index}`}
               title="Choose a Year"
               disabled={!!$isCustomWeather || $isProjectLoading}
-              on:change={() => {
+              onchange={() => {
                 setDates({});
               }}
             >
@@ -511,7 +513,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               id={`choose-month-${location.index}`}
               title="Choose a Month"
               disabled={!!$isCustomWeather || $isProjectLoading}
-              on:change={() => {
+              onchange={() => {
                 setDates({});
               }}
             >
@@ -529,7 +531,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               id={`choose-day-${location.index}`}
               title="Choose a Day"
               disabled={!!$isCustomWeather || $isProjectLoading}
-              on:change={() => setDates({})}
+              onchange={() => setDates({})}
             >
               {#each Array(days) as _, i}
                 <option value={i + 1}>{i + 1}</option>
@@ -553,7 +555,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               max={getYesterday()}
               bind:value={location.from}
               bind:this={inputStart}
-              on:change={() => (weatherUngrouped.data = null)}
+              onchange={() => (weatherUngrouped.data = null)}
               disabled={$isProjectLoading || !!$isCustomWeather}
             />
           </label>
@@ -569,7 +571,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               max={getYesterday()}
               bind:value={location.to}
               bind:this={inputEnd}
-              on:change={() => (weatherUngrouped.data = null)}
+              onchange={() => (weatherUngrouped.data = null)}
               disabled={$isProjectLoading || !!$isCustomWeather}
             />
           </label>
@@ -583,7 +585,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           id={`duration-${location.index}`}
           bind:value={location.duration}
           disabled={!!$isCustomWeather || $isProjectLoading}
-          on:change={() => {
+          onchange={() => {
             if (location?.duration === 'y') {
               year = new Date(location.from.replace(/-/g, '/')).getFullYear();
               month = new Date(location.from.replace(/-/g, '/')).getMonth() + 1;
@@ -600,12 +602,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
 
     <div class="w-full flex flex-col gap-2 justify-center items-center">
-      {#if $datesDetails.isValid && $datesDetails?.length}
+      {#if datesDetails.isValid && datesDetails?.length}
         <p class="italic text-sm">
-          {$datesDetails?.length}
-          {pluralize('Day', $datesDetails?.length)}
+          {datesDetails?.length}
+          {pluralize('Day', datesDetails?.length)}
         </p>
-        {#if $datesDetails.daysInFuture}
+        {#if datesDetails.daysInFuture}
           <p
             class="text-sm variant-ghost-warning text-token rounded-container-token p-2 w-full my-2"
           >
@@ -622,13 +624,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
             {#if !datesMustBeHistorical}
               For best results, don't include future dates.
             {/if}
-            {$datesDetails.daysInFuture} of these days
+            {datesDetails.daysInFuture} of these days
             {pluralize(
               {
                 singular: 'is',
                 plural: 'are',
               },
-              $datesDetails.daysInFuture,
+              datesDetails.daysInFuture,
             )}
             not in the past and won't have weather data.
             {#if datesMustBeHistorical}
@@ -636,7 +638,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             {/if}
           </p>
         {/if}
-      {:else if $datesDetails.message}
+      {:else if datesDetails.message}
         <p
           class="variant-ghost-error text-token rounded-container-token p-2 text-sm w-full my-2"
         >
@@ -654,7 +656,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"
             />
           </svg>
-          {$datesDetails.message}
+          {datesDetails.message}
         </p>
       {:else if $isProjectLoading}
         <p class="italic text-sm">...</p>

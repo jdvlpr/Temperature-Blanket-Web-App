@@ -14,15 +14,17 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
+  import { run } from 'svelte/legacy';
+
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
   import GettingWeather from '$lib/components/modals/GettingWeather.svelte';
   import GettingWeatherWarnCustomWeather from '$lib/components/modals/GettingWeatherWarnCustomWeather.svelte';
   import {
     defaultWeatherSource,
+    getLocationsState,
     isCustomWeather,
     modal,
     useSecondaryWeatherSources,
-    valid,
     weather,
   } from '$lib/stores';
   import { getModalStore } from '@skeletonlabs/skeleton';
@@ -30,19 +32,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   const modalStore = getModalStore();
 
-  let warnSearchAgain = false;
+  const locationsState = getLocationsState();
+
+  let warnSearchAgain = $state(false);
 
   onMount(() => {
     warnSearchAgain = $isCustomWeather ? true : false;
   });
 
-  $: $defaultWeatherSource, $useSecondaryWeatherSources, checkWarn();
-  $: invalid = !$valid;
-
   function checkWarn() {
     if (!weather.data) return;
     warnSearchAgain = true;
   }
+  run(() => {
+    $defaultWeatherSource, $useSecondaryWeatherSources, checkWarn();
+  });
 </script>
 
 <div class="flex flex-col gap-4 items-center">
@@ -57,7 +61,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           >
             <button
               class="btn bg-secondary-hover-token gap-2"
-              on:click={() => ($defaultWeatherSource = 'Meteostat')}
+              onclick={() => ($defaultWeatherSource = 'Meteostat')}
             >
               <span class="flex flex-shrink-0 gap-1">
                 {#if $defaultWeatherSource === 'Meteostat'}
@@ -91,7 +95,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           >
             <button
               class="btn bg-secondary-hover-token gap-2"
-              on:click={() => ($defaultWeatherSource = 'Open-Meteo')}
+              onclick={() => ($defaultWeatherSource = 'Open-Meteo')}
             >
               <span class="flex flex-shrink-0 gap-1">
                 {#if $defaultWeatherSource === 'Open-Meteo'}
@@ -251,13 +255,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <div class="variant-soft-warning text-token card p-4">
       <p class="text-sm mb-4">
         Search again for weather data to apply weather source changes.
-        {#if invalid}
+        {#if !locationsState.allValid}
           Close this modal, then choose a valid location and dates.
         {/if}
       </p>
       <button
         class="btn variant-filled-primary font-bold text-2xl"
-        on:click={() => {
+        onclick={() => {
           if ($isCustomWeather) {
             $modalStore.close();
             modal.state.trigger({
@@ -276,7 +280,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             });
           }
         }}
-        disabled={invalid}
+        disabled={!locationsState.allValid}
         >Search <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"

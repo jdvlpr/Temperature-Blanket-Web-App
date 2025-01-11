@@ -48,7 +48,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     pinAllSections,
     projectStatus,
     setLocationsState,
-    valid,
     wasProjectLoadedFromURL,
     weather,
     weatherGrouping,
@@ -78,6 +77,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   const toastStore = getToastStore();
 
   setLocationsState();
+
+  const locationsState = getLocationsState();
 
   let dialogOpen = $state(false);
 
@@ -190,7 +191,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
 
     <div class="flex gap-2 flex-1 justify-between sm:justify-end">
-      {#if weather.data && $valid}
+      {#if weather.data && locationsState.allValid}
         <div class="hidden lg:inline-flex">
           <Tooltip
             classNames="btn bg-secondary-hover-token"
