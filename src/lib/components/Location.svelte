@@ -71,7 +71,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     if (!location?.from && !location?.to) setDates({});
   });
 
-  let showLocationErrorLabel = $derived(
+  let showSelectLocationLabelMessage = $derived(
     !location?.id && location?.label && !$isProjectLoading,
   );
 
@@ -337,7 +337,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <div class="grid grid-cols-1 gap-4">
     <div class="flex flex-col w-full text-left gap-1">
       <p>
-        {#if showLocationErrorLabel}
+        {#if showSelectLocationLabelMessage}
           <span class="text-error-800-100-token">Choose a result</span>
         {:else if locationsState.locations.length > 1 && location?.label}
           Location {locationsState.locations.length > 1 ? index + 1 : ''}

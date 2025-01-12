@@ -65,7 +65,7 @@ export class LocationState extends LocationClass {
     this.uuid = crypto.randomUUID();
   }
 
-  isValid = $derived(!!this.id);
+  isValid = $derived(!!this.id && this.#fromDate < this.#today);
 
   #fromDate = $derived.by(() => {
     if (!this.from) return null;
