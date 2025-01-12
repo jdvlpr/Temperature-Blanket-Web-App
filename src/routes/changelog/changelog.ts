@@ -26,6 +26,11 @@ export const entries: ChangelogItem[] = [
         text: `85 colorways`,
         title: 'Added Yarn: Fiddlesticks - Superb 8',
       },
+      {
+        icon: ICONS.checkCircle,
+        text: `18 colorways`,
+        title: 'Added Yarn: Hobbii - Acacia',
+      },
     ],
     version: '4.13.0',
   },
