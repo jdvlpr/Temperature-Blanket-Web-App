@@ -36,6 +36,11 @@ export const entries: ChangelogItem[] = [
         text: `12 colorways`,
         title: 'Added Yarn: Source of Fibre - Clear As Cotton',
       },
+      {
+        icon: ICONS.checkCircle,
+        text: `21 colorways`,
+        title: "Added Yarn: The Women's Institute - Premium Acrylic",
+      },
     ],
     version: '4.13.0',
   },
