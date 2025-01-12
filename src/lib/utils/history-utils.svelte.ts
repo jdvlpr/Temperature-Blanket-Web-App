@@ -81,8 +81,8 @@ export const loadFromHistory = (props) => {
   if (exists(newParams.s)) {
     if (!exists(oldParams.s) || oldParams.s?.value !== newParams.s?.value) {
       const sourceCode = newParams.s.value.substring(0, 1);
-      if (sourceCode === '0') defaultWeatherSource.set('Meteostat');
-      else if (sourceCode === '1') defaultWeatherSource.set('Open-Meteo');
+      if (sourceCode === '0') defaultWeatherSource.value = 'Meteostat';
+      else if (sourceCode === '1') defaultWeatherSource.value = 'Open-Meteo';
 
       const secondaryCode = newParams.s.value.substring(1, 2);
       if (secondaryCode === '0') useSecondaryWeatherSources.set(false);

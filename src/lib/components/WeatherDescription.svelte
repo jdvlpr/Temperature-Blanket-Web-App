@@ -39,7 +39,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   onMount(() => {
     isAnyWeatherSourceDifferentFromDefault = !locationsState.locations?.some(
-      (n) => n.source === $defaultWeatherSource,
+      (n) => n.source === defaultWeatherSource.value,
     );
 
     if (weatherParametersData.prcp.every((n) => n === null))

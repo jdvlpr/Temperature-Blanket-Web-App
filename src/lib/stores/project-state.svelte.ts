@@ -33,8 +33,8 @@ class liveProjectURLHashClass {
     hash += locationsState.urlHash;
     hash += get(gaugesURLHash);
     hash += previewURLHash.value;
-    if (get(defaultWeatherSource) === 'Meteostat') hash += '&s=0';
-    else if (get(defaultWeatherSource) === 'Open-Meteo') hash += '&s=1';
+    if (defaultWeatherSource.value === 'Meteostat') hash += '&s=0';
+    else if (defaultWeatherSource.value === 'Open-Meteo') hash += '&s=1';
     if (!get(useSecondaryWeatherSources)) hash += '0';
     else if (get(useSecondaryWeatherSources)) hash += '1';
     if (weatherGrouping.value === 'week')

@@ -28,7 +28,7 @@ import { get } from 'svelte/store';
  */
 export const getIsRecentDate = (date) => {
   if (!date || get(isCustomWeather)) return false;
-  const weatherSource = get(defaultWeatherSource);
+  const weatherSource = defaultWeatherSource.value;
   if (weatherSource === 'Open-Meteo') {
     return (
       new Date(date) >

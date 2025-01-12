@@ -18,8 +18,9 @@ import type { WeatherDay, WeatherSource } from '$lib/types';
 import { createWeeksProperty, displayNumber } from '$lib/utils';
 import { get, writable, type Writable } from 'svelte/store';
 
-export const defaultWeatherSource: Writable<WeatherSource> =
-  writable('Open-Meteo');
+export const defaultWeatherSource: { value: WeatherSource } = $state({
+  value: 'Open-Meteo',
+});
 
 /* In the project URL hash, this is '0' for 'false' or '1' for 'true' */
 export const useSecondaryWeatherSources: Writable<boolean> = writable(true);

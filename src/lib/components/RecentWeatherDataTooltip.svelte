@@ -36,9 +36,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </svg>
   <p slot="tooltip" class="text-base">
     Weather data may adjust as new information arrives. Consider working at
-    least {$defaultWeatherSource === 'Open-Meteo'
+    least {defaultWeatherSource.value === 'Open-Meteo'
       ? OPEN_METEO_DELAY_DAYS
-      : $defaultWeatherSource === 'Meteostat'
+      : defaultWeatherSource.value === 'Meteostat'
         ? METEOSTAT_DELAY_DAYS
         : 'a few'} days behind to account for possible changes.
   </p>

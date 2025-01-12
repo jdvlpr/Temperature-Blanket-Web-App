@@ -97,7 +97,7 @@ export const checkForProjectInLocalStorage = async () => {
   const weatherSource = matchedProject.weatherSource;
   if (weatherSource) {
     const { name, useSecondary } = weatherSource;
-    if (name) defaultWeatherSource.set(name);
+    if (name) defaultWeatherSource.value = name;
     useSecondaryWeatherSources.set(useSecondary);
   }
 
@@ -233,7 +233,7 @@ const createProjectLocalStorageProjectObject = () => {
     }) || [];
 
   const weatherSource: WeatherSourceOptions = {
-    name: get(defaultWeatherSource),
+    name: defaultWeatherSource.value,
     useSecondary: get(useSecondaryWeatherSources),
   };
 

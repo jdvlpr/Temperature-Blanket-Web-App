@@ -77,18 +77,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   onMount(() => {
     isAnyWeatherSourceDifferentFromDefault = !locationsState.locations?.some(
-      (n) => n.source === $defaultWeatherSource,
+      (n) => n.source === defaultWeatherSource.value,
     );
 
-    defaultWeatherSourceCopy = $defaultWeatherSource;
+    defaultWeatherSourceCopy = defaultWeatherSource.value;
     if (isAnyWeatherSourceDifferentFromDefault) {
       if (locationsState.locations?.every((n) => n.source === 'Meteostat')) {
-        $defaultWeatherSource = 'Meteostat';
+        defaultWeatherSource.value = 'Meteostat';
         wasDefaultWeatherSourceChanged = true;
       } else if (
         locationsState.locations?.every((n) => n.source === 'Open-Meteo')
       ) {
-        $defaultWeatherSource = 'Open-Meteo';
+        defaultWeatherSource.value = 'Open-Meteo';
         wasDefaultWeatherSourceChanged = true;
       }
     }
@@ -292,7 +292,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <span class="whitespace-pre-wrap text-left"
         >Weather Source: {$isCustomWeather
           ? 'Custom'
-          : $defaultWeatherSource}</span
+          : defaultWeatherSource.value}</span
       >
     </button>
   </div>
@@ -300,7 +300,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {#if wasDefaultWeatherSourceChanged}
     <p class="text-sm w-full">
       No weather data was available from the default source ({defaultWeatherSourceCopy}),
-      so another source was used ({$defaultWeatherSource}) and the Weather
+      so another source was used ({defaultWeatherSource.value}) and the Weather
       Source setting was automatically updated.
     </p>
   {/if}
@@ -366,9 +366,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </svg>
           {/snippet}
           {#snippet summary()}
-            Weather within the past {$defaultWeatherSource === 'Open-Meteo'
+            Weather within the past {defaultWeatherSource.value === 'Open-Meteo'
               ? OPEN_METEO_DELAY_DAYS
-              : $defaultWeatherSource === 'Meteostat'
+              : defaultWeatherSource.value === 'Meteostat'
                 ? METEOSTAT_DELAY_DAYS
                 : 'few'} days may be revised as new data comes in.
           {/snippet}
@@ -383,10 +383,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
               >Meteostat</a
             >, and for some locations their weather models may take up to a week
             to incorporate the latest information. Sometimes even older weather
-            data is updated. Consider working at least {$defaultWeatherSource ===
+            data is updated. Consider working at least {defaultWeatherSource.value ===
             'Open-Meteo'
               ? OPEN_METEO_DELAY_DAYS
-              : $defaultWeatherSource === 'Meteostat'
+              : defaultWeatherSource.value === 'Meteostat'
                 ? METEOSTAT_DELAY_DAYS
                 : 'a few'} days behind to account for possible changes. Sorry for
             any inconvenience.

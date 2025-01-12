@@ -114,7 +114,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         tempAllData.length === thisLocation &&
         continueWhile
       ) {
-        if ($defaultWeatherSource === 'Meteostat' || errors.length > 0) {
+        if (defaultWeatherSource.value === 'Meteostat' || errors.length > 0) {
           try {
             const response = await fetch('/api/weather/v1/meteostat/daily', {
               method: 'POST',
@@ -148,12 +148,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
         if (
           (errors.length > 0 && !$useSecondaryWeatherSources) ||
-          (errors.length && $defaultWeatherSource === 'Open-Meteo')
+          (errors.length && defaultWeatherSource.value === 'Open-Meteo')
         )
           continueWhile = false;
 
         if (
-          ($defaultWeatherSource === 'Open-Meteo' || errors.length > 0) &&
+          (defaultWeatherSource.value === 'Open-Meteo' || errors.length > 0) &&
           continueWhile
         ) {
           try {

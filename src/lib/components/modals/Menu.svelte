@@ -262,7 +262,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <span class="whitespace-pre-wrap text-left"
             >Weather Source: {$isCustomWeather
               ? 'Custom'
-              : $defaultWeatherSource}</span
+              : defaultWeatherSource.value}</span
           >
         </button>
 

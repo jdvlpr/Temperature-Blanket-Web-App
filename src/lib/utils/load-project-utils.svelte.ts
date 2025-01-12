@@ -129,15 +129,15 @@ export const setProjectSettings = async (
   // Load Weather Source (added in v1.823)
   if (exists(params.s)) {
     const sourceCode = params.s.value.substring(0, 1);
-    if (sourceCode === '0') defaultWeatherSource.set('Meteostat');
-    else if (sourceCode === '1') defaultWeatherSource.set('Open-Meteo');
+    if (sourceCode === '0') defaultWeatherSource.value = 'Meteostat';
+    else if (sourceCode === '1') defaultWeatherSource.value = 'Open-Meteo';
 
     const secondaryCode = params.s.value.substring(1, 2);
     if (secondaryCode === '0') useSecondaryWeatherSources.set(false);
     else if (secondaryCode === '1') useSecondaryWeatherSources.set(true);
   } else {
     // Projects before v1.823 didn't have this param, and only used Meteostat as a weather source
-    defaultWeatherSource.set('Meteostat');
+    defaultWeatherSource.value = 'Meteostat';
     useSecondaryWeatherSources.set(true);
   }
 

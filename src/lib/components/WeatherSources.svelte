@@ -43,7 +43,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     warnSearchAgain = true;
   }
   run(() => {
-    $defaultWeatherSource, $useSecondaryWeatherSources, checkWarn();
+    defaultWeatherSource.value, $useSecondaryWeatherSources, checkWarn();
   });
 </script>
 
@@ -54,15 +54,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <tr>
           <th
             class="border border-surface-500 p-2"
-            class:bg-surface-200={$defaultWeatherSource === 'Meteostat'}
-            class:dark:bg-surface-700={$defaultWeatherSource === 'Meteostat'}
+            class:bg-surface-200={defaultWeatherSource.value === 'Meteostat'}
+            class:dark:bg-surface-700={defaultWeatherSource.value ===
+              'Meteostat'}
           >
             <button
               class="btn bg-secondary-hover-token gap-2"
-              onclick={() => ($defaultWeatherSource = 'Meteostat')}
+              onclick={() => (defaultWeatherSource.value = 'Meteostat')}
             >
               <span class="flex flex-shrink-0 gap-1">
-                {#if $defaultWeatherSource === 'Meteostat'}
+                {#if defaultWeatherSource.value === 'Meteostat'}
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
@@ -88,15 +89,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </th>
           <th
             class="border border-surface-500 p-2"
-            class:bg-surface-200={$defaultWeatherSource === 'Open-Meteo'}
-            class:dark:bg-surface-700={$defaultWeatherSource === 'Open-Meteo'}
+            class:bg-surface-200={defaultWeatherSource.value === 'Open-Meteo'}
+            class:dark:bg-surface-700={defaultWeatherSource.value ===
+              'Open-Meteo'}
           >
             <button
               class="btn bg-secondary-hover-token gap-2"
-              onclick={() => ($defaultWeatherSource = 'Open-Meteo')}
+              onclick={() => (defaultWeatherSource.value = 'Open-Meteo')}
             >
               <span class="flex flex-shrink-0 gap-1">
-                {#if $defaultWeatherSource === 'Open-Meteo'}
+                {#if defaultWeatherSource.value === 'Open-Meteo'}
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
@@ -261,7 +263,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         class="btn variant-filled-primary font-bold text-2xl"
         onclick={() => {
           if ($isCustomWeather) {
-            $modalStore.close();
+            modalStore.close();
             modal.state.trigger({
               type: 'component',
               component: {
@@ -269,7 +271,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               },
             });
           } else {
-            $modalStore.close();
+            modalStore.close();
             modal.state.trigger({
               type: 'component',
               component: {
