@@ -25,8 +25,7 @@ import {
   weatherGrouping,
   weatherMonthGroupingStartDay,
 } from '$lib/stores';
-import { getLocationTitle } from '$lib/utils';
-import { get, writable } from 'svelte/store';
+import { get } from 'svelte/store';
 
 class liveProjectURLHashClass {
   value = $derived.by(() => {
@@ -47,18 +46,13 @@ class liveProjectURLHashClass {
 // The current part of the project URL after #
 export const liveProjectURLHash = new liveProjectURLHashClass();
 
-export const isProjectSaved = writable(false);
+export const isProjectSaved = $state({ value: false });
 
-export const isProjectLoading = writable(true);
+export const isProjectLoading = $state({ value: true });
 
-export const projectGalleryLink = writable(null);
+export const projectGalleryLink = $state({ value: null });
 
-export const projectGalleryTitle = writable(null);
-
-export const projectSaveMessage = writable({
-  show: false,
-  message: null,
-});
+export const projectGalleryTitle = $state({ value: null });
 
 class ProjectStatusClass {
   state = $derived.by(() => {

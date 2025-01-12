@@ -109,13 +109,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </div>
     {/if}
   </div>
-  {#if $projectGalleryLink && $projectGalleryTitle && $projectGalleryTitle === locationsState.projectTitle}
+  {#if projectGalleryLink.value && projectGalleryTitle.value && projectGalleryTitle.value === locationsState.projectTitle}
     <p class="my-2">
       <a
-        href={$projectGalleryLink}
+        href={projectGalleryLink.value}
         target="_blank"
         class="link btn bg-secondary-hover-token w-fit whitespace-pre-wrap"
-        rel="noreferrer">{$projectGalleryTitle}</a
+        rel="noreferrer">{projectGalleryTitle.value}</a
       >
     </p>
   {/if}

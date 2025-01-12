@@ -28,7 +28,7 @@ import { exists, getTargetParentGaugeId } from '$lib/utils';
 import { get } from 'svelte/store';
 
 export const showPreviewImageWeatherDetails = (targets) => {
-  previewWeatherTargets.set(targets);
+  previewWeatherTargets.value = targets;
 
   if (isDesktop.current) {
     modal.state.trigger({

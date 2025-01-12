@@ -395,7 +395,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </Card>
       </div>
 
-      {#if weatherData && !$isProjectLoading}
+      {#if weatherData && !isProjectLoading.value}
         <Card>
           {#snippet content()}
             <div
@@ -403,8 +403,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
               id="weather-data"
               bind:this={$weatherDataElement}
             >
-              {#key $isProjectLoading || $activeLocationID}
-                <div class:opacity-50={$isProjectLoading} in:fade>
+              {#key isProjectLoading.value || $activeLocationID}
+                <div class:opacity-50={isProjectLoading.value} in:fade>
                   <div
                     class="mb-4 flex flex-col gap-2 items-center p-2 w-fit mx-auto"
                   >

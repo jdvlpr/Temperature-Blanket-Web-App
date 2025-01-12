@@ -99,7 +99,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       project = JSON.parse(localStorage.getItem('projects'))?.filter(
         (project) => project.href === projectStatus.state.liveURL,
       )?.[0];
-      $isProjectSaved = true;
+      isProjectSaved.value = true;
     } catch {
       project = null;
       console.log("Can't save project");

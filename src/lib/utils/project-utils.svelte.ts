@@ -202,8 +202,8 @@ export const sendToProjectGallery = async (img) => {
     if (response.code === 200) {
       // success
       message = `<p class="font-bold text-xl my-2">${response.message}</p><p>The project gallery webpage has been created:</p>`;
-      projectGalleryLink.set(response.link);
-      projectGalleryTitle.set(response.title);
+      projectGalleryLink.value = response.link;
+      projectGalleryTitle.value = response.title;
       // reloadRecentGalleryProjects();
     } else if (response.code === 409) {
       // duplicate project

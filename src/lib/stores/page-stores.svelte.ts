@@ -133,4 +133,4 @@ class ActiveThemeClass {
 }
 export const activeTheme = new ActiveThemeClass();
 
-export const defaultYarn = writable('');
+export const defaultYarn = $state({ value: '' });

@@ -50,7 +50,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 class="mx-auto w-12 h-1.5 flex-shrink-0 rounded-full mb-4 bg-surface-900-50-token"
               ></div>
               <div class="mx-auto text-center">
-                <WeatherDetails weatherTargets={$previewWeatherTargets} />
+                <WeatherDetails weatherTargets={previewWeatherTargets.value} />
               </div>
             </div>
           </Drawer.Content>
@@ -120,15 +120,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
         Send to Project Gallery
       </button>
 
-      {#if $projectGalleryLink && $projectGalleryTitle && $projectGalleryTitle === locationsState.projectTitle}
+      {#if projectGalleryLink.value && projectGalleryTitle.value && projectGalleryTitle.value === locationsState.projectTitle}
         <div class="flex flex-col gap-1 justify-center w-full">
           <p>View this project's gallery page:</p>
           <p>
             <a
-              href={$projectGalleryLink}
+              href={projectGalleryLink.value}
               target="_blank"
               class="underline btn bg-secondary-hover-token w-fit whitespace-pre-wrap"
-              rel="noreferrer">{$projectGalleryTitle}</a
+              rel="noreferrer">{projectGalleryTitle.value}</a
             >
           </p>
         </div>

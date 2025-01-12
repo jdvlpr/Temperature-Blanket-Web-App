@@ -191,7 +191,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <button
           class="btn bg-secondary-hover-token gap-2"
           id="add-location-button"
-          disabled={$isProjectLoading}
+          disabled={isProjectLoading.value}
           onclick={() => locationsState.add()}
           title="Add a New Location"
         >
@@ -218,7 +218,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     <button
       class="btn bg-secondary-hover-token text-left"
-      disabled={$isProjectLoading}
+      disabled={isProjectLoading.value}
       onclick={() => {
         modal.state.trigger({
           type: 'component',

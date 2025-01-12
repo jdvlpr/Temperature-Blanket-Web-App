@@ -100,8 +100,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     };
     img.src = `https://picsum.photos/720/480?random=${Math.floor(Math.random() * 100)}`;
 
-    if ($defaultYarn) {
-      const details = stringToBrandAndYarnDetails($defaultYarn);
+    if (defaultYarn.value) {
+      const details = stringToBrandAndYarnDetails(defaultYarn.value);
       selectedBrandId = details.brandId;
       selectedYarnId = details.yarnId;
       colorways = getColorways({

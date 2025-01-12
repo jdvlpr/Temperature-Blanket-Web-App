@@ -41,7 +41,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     showReset = !searching && $inputLocation?.value?.length > 1;
   }
 
-  $: hasError = !$validId && $inputLocation?.value && !$isProjectLoading;
+  $: hasError = !$validId && $inputLocation?.value && !isProjectLoading.value;
 
   onMount(async () => {
     // Setup the autocomplete location
@@ -115,7 +115,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       await setLocationFromId({ id });
     } else {
       $validId = true;
-      $isProjectLoading = false;
+      isProjectLoading.value = false;
     }
   }); // End of onMount
 
@@ -249,12 +249,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
         id="location-0"
         class="truncate"
         autocomplete="off"
-        placeholder={$isProjectLoading ? 'Loading...' : 'Enter a place'}
+        placeholder={isProjectLoading.value ? 'Loading...' : 'Enter a place'}
         title="Enter a city, region, or landmark"
         bind:this={$inputLocation}
         on:input={validate}
         on:keyup={validateKeyup}
-        disabled={$isProjectLoading}
+        disabled={isProjectLoading.value}
       />
       {#if searching}
         <div class="flex items-center justify-center">

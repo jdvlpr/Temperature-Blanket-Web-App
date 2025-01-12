@@ -163,8 +163,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
         yarnId: selectedYarnId,
       });
       forceDisplayAll = true;
-    } else if ($defaultYarn && preselectDefaultYarn) {
-      let { brandId, yarnId } = stringToBrandAndYarnDetails($defaultYarn);
+    } else if (defaultYarn.value && preselectDefaultYarn) {
+      let { brandId, yarnId } = stringToBrandAndYarnDetails(defaultYarn.value);
       if (brandId) selectedBrandId = brandId;
       if (yarnId) selectedYarnId = yarnId;
       inputValue = getYarnValue({

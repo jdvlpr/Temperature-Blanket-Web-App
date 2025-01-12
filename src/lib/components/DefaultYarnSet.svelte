@@ -25,9 +25,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     details="Automatically select this yarn for certain areas of this site, like for colors with no assigned yarn."
     onchange={(e) => {
       if (e.target.checked) {
-        $defaultYarn = `${selectedBrandId}-${selectedYarnId}`;
-      } else $defaultYarn = '';
+        defaultYarn.value = `${selectedBrandId}-${selectedYarnId}`;
+      } else defaultYarn.value = '';
     }}
-    checked={$defaultYarn === `${selectedBrandId}-${selectedYarnId}`}
+    checked={defaultYarn.value === `${selectedBrandId}-${selectedYarnId}`}
   />
 </div>

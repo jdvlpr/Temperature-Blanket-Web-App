@@ -66,7 +66,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 
   let showSelectLocationLabelMessage = $derived(
-    !location?.id && location?.label && !$isProjectLoading,
+    !location?.id && location?.label && !isProjectLoading.value,
   );
 
   let days = $derived(getDays(month, year));
@@ -314,7 +314,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 locationsState.remove(location.uuid);
                 weatherUngrouped.data = null;
               }}
-              disabled={!!$isCustomWeather || $isProjectLoading}
+              disabled={!!$isCustomWeather || isProjectLoading.value}
               title="Remove Location"
             >
               {@html ICONS.trash}
@@ -363,13 +363,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
           id="location-{location.uuid}"
           class="truncate"
           autocomplete="off"
-          placeholder={$isProjectLoading ? 'Loading...' : 'Enter a place'}
+          placeholder={isProjectLoading.value ? 'Loading...' : 'Enter a place'}
           title="Enter a city, region, or landmark"
           bind:value={location.label}
           bind:this={inputLocation}
           oninput={validate}
           onkeyup={validateKeyup}
-          disabled={$isProjectLoading || !!$isCustomWeather}
+          disabled={isProjectLoading.value || !!$isCustomWeather}
         />
         {#if searching}
           <div class="flex items-center justify-center">
@@ -430,7 +430,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               bind:value={year}
               id={`choose-year-${location.uuid}`}
               title="Choose a Year"
-              disabled={!!$isCustomWeather || $isProjectLoading}
+              disabled={!!$isCustomWeather || isProjectLoading.value}
               onchange={() => {
                 setDates({});
               }}
@@ -448,7 +448,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               bind:value={month}
               id={`choose-month-${location.uuid}`}
               title="Choose a Month"
-              disabled={!!$isCustomWeather || $isProjectLoading}
+              disabled={!!$isCustomWeather || isProjectLoading.value}
               onchange={() => {
                 setDates({});
               }}
@@ -466,7 +466,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               bind:value={day}
               id={`choose-day-${location.uuid}`}
               title="Choose a Day"
-              disabled={!!$isCustomWeather || $isProjectLoading}
+              disabled={!!$isCustomWeather || isProjectLoading.value}
               onchange={() => setDates({})}
             >
               {#each Array(days) as _, i}
@@ -492,7 +492,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               bind:value={location.from}
               bind:this={inputStart}
               onchange={() => (weatherUngrouped.data = null)}
-              disabled={$isProjectLoading || !!$isCustomWeather}
+              disabled={isProjectLoading.value || !!$isCustomWeather}
             />
           </label>
           <label for="datepicker-to-{location.uuid}" class="">
@@ -508,7 +508,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               bind:value={location.to}
               bind:this={inputEnd}
               onchange={() => (weatherUngrouped.data = null)}
-              disabled={$isProjectLoading || !!$isCustomWeather}
+              disabled={isProjectLoading.value || !!$isCustomWeather}
             />
           </label>
         </div>
@@ -520,7 +520,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           class="select w-full"
           id={`duration-${location.uuid}`}
           bind:value={location.duration}
-          disabled={!!$isCustomWeather || $isProjectLoading}
+          disabled={!!$isCustomWeather || isProjectLoading.value}
           onchange={() => {
             if (location?.duration === 'y') {
               year = new Date(location.from.replace(/-/g, '/')).getFullYear();
@@ -594,7 +594,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </svg>
           {location.errorMessage}
         </p>
-      {:else if $isProjectLoading}
+      {:else if isProjectLoading.value}
         <p class="italic text-sm">...</p>
       {/if}
     </div>

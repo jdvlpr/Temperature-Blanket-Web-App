@@ -264,7 +264,7 @@ export const updateHistory = () => {
   if (!hasGauge) return;
 
   isHistoryUpdating.set(true);
-  isProjectSaved.set(false);
+  isProjectSaved.value = false;
   let old = get(history).current;
 
   // Compare from the first param ('&')

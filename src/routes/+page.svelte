@@ -99,7 +99,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     // Listen for keyboard events to handle keyboard shortcuts
     window.addEventListener('keydown', handleKeyDown, { passive: true });
 
-    $isProjectLoading = false;
+    isProjectLoading.value = false;
   });
 
   onDestroy(() => {
@@ -141,7 +141,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   onbeforeunload={(event) => {
     const url = new URL(projectStatus.state.liveURL);
     if (
-      $isProjectSaved ||
+      isProjectSaved.value ||
       !url.searchParams.has('project') ||
       $history.length === 0
     )

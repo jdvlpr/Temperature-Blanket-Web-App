@@ -94,8 +94,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
       },
       { threshold: [0] },
     );
-    if (!selectedBrandId && !selectedYarnId && $defaultYarn) {
-      let { brandId, yarnId } = stringToBrandAndYarnDetails($defaultYarn);
+    if (!selectedBrandId && !selectedYarnId && defaultYarn.value) {
+      let { brandId, yarnId } = stringToBrandAndYarnDetails(defaultYarn.value);
       if (brandId) selectedBrandId = brandId;
       if (yarnId) selectedYarnId = yarnId;
     }

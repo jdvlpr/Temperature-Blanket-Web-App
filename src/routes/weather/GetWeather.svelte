@@ -19,7 +19,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { activeLocationID, locations } from './+page.svelte';
 
   export async function fetchData() {
-    isProjectLoading.set(true);
+    isProjectLoading.value = true;
 
     let _locations = locationsState.locations;
 
@@ -49,7 +49,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     locations.set(newWeatherForcastData);
 
-    isProjectLoading.set(false);
+    isProjectLoading.value = false;
 
     if (!get(activeLocationID))
       activeLocationID.set(locationsState.locations[0]?.id);

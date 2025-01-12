@@ -39,10 +39,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     });
   }
 
-  let disabled = $derived(!locationsState.allValid || $isProjectLoading);
+  let disabled = $derived(!locationsState.allValid || isProjectLoading.value);
 </script>
 
-{#if disabled && !$isProjectLoading}
+{#if disabled && !isProjectLoading.value}
   <Tooltip
     buttonDisabled={disabled}
     title="Search for Weather Data"

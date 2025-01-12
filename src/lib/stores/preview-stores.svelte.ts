@@ -26,28 +26,9 @@ import { hash as smsqHash } from '$lib/components/previews/SplitMonthSquaresSett
 import { hash as sqrsHash } from '$lib/components/previews/SquaresSettings.svelte';
 import { weather } from '$lib/stores';
 import type { Preview } from '$lib/types';
-import { derived, get, writable } from 'svelte/store';
+import { get, writable } from 'svelte/store';
 
-export const previewWeatherTargets = writable([]);
-
-function createActivePreviewStore() {
-  const rowsIndex = previews.findIndex((n) => n.id === 'rows'); // default preview is "rows"
-  const { subscribe, set, update } = writable(previews[rowsIndex]);
-
-  return {
-    subscribe,
-    setId: (id) =>
-      update(() => {
-        previews
-          .filter((n) => n.id !== id)
-          .forEach((n) => {
-            n.svg = null;
-          });
-        return previews.filter((n) => n.id === id)[0];
-      }),
-    set: (value) => set(value),
-  };
-}
+export const previewWeatherTargets = $state({ value: [] });
 
 class ActivePreviewClass {
   rowsIndex = previews.findIndex((n) => n.id === 'rows'); // default preview is "rows"
