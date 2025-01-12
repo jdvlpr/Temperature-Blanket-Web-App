@@ -56,10 +56,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let searching = $state(false); // Are the autocomplete results fetching?
   let hasLoaded = $state(false); // If the location was loaded from a saved project, then this gets set to true. It gets checked so that the initial setup function doesn't run again.
 
-  // $effect(() => {
-  // location.valid = $derived(!datesErrorMessage);
-  // });
-
   let showReset = $derived(
     (!searching && inputLocation?.value?.length > 1) ||
       (!searching && location?.label),
@@ -90,7 +86,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   // NOTE: This is a bit of a hack, but it works.
   $effect(() => {
     if (location?.wasLoadedFromSavedProject && !hasLoaded) {
-      // location.valid = true;
       location.duration = location?.duration || 'c';
 
       if (location?.from) {

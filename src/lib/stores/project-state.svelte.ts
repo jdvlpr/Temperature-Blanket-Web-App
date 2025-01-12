@@ -62,9 +62,7 @@ export const projectSaveMessage = writable({
 
 class ProjectStatusClass {
   state = $derived.by(() => {
-    const isValid = locationsState.locations.every(
-      (location) => location.valid === true,
-    );
+    const isValid = locationsState.allValid;
     const base = browser ? window.location.origin + '/' : '';
     const query = `?project=${PROJECT_TIMESTAMP_ID}&v=${version}`;
     const liveURL = !isValid

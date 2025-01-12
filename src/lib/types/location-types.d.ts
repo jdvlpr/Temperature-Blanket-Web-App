@@ -18,8 +18,6 @@ import type { WeatherSource } from './weather-types';
 export interface LocationType {
   uuid?: string;
   index?: number;
-  /** Are the dates and fetched location data valid? */
-  valid?: boolean;
   /** 'c' is for Custom, 'y' is for One Year */
   duration?: 'c' | 'y';
   /** ISO 8601 date string `YYYY-MM-DD` */
@@ -36,7 +34,6 @@ export interface LocationType {
   stations?: null | any[]; // TODO: Change 'any[]' to a more specific type if possible. Stations are set when using Meteostat for a weather source.
   source?: WeatherSource;
   wasLoadedFromSavedProject?: boolean;
-  isValid?: boolean;
 }
 
 export interface LocationStateType {

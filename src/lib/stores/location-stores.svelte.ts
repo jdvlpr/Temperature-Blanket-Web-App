@@ -31,7 +31,6 @@ import { getContext, setContext } from 'svelte';
 export class LocationClass implements LocationType {
   uuid: string = $state();
   index: number = $state();
-  valid?: boolean = $state();
   duration?: 'c' | 'y' = $state();
   from?: string = $state();
   to?: string = $state();
