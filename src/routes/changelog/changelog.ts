@@ -23,6 +23,31 @@ export const entries: ChangelogItem[] = [
     notes: [
       {
         icon: ICONS.checkCircle,
+        text: `85 colorways`,
+        title: 'Added Yarn: Fiddlesticks - Superb 8',
+      },
+      {
+        icon: ICONS.checkCircle,
+        text: `18 colorways`,
+        title: 'Added Yarn: Hobbii - Acacia',
+      },
+      {
+        icon: ICONS.checkCircle,
+        text: `12 colorways`,
+        title: 'Added Yarn: Source of Fibre - Clear As Cotton',
+      },
+      {
+        icon: ICONS.checkCircle,
+        text: `21 colorways`,
+        title: "Added Yarn: The Women's Institute - Premium Acrylic",
+      },
+    ],
+    version: '4.13.0',
+  },
+  {
+    notes: [
+      {
+        icon: ICONS.checkCircle,
         text: `57 colorways`,
         title: 'Added Yarn: 4 Seasons - Marvel 8 Ply',
       },

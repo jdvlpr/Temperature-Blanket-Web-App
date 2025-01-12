@@ -1,4 +1,5 @@
 import type { Brand } from '$lib/types';
+import { yarn as acacia } from './acacia/yarn';
 import { yarn as amigo } from './amigo/yarn';
 import { yarn as friendsCottonEightFour } from './friends-cotton-8-4/yarn';
 import { yarn as friendsCottonEightEight } from './friends-cotton-8-8/yarn';
@@ -21,6 +22,7 @@ export const brand: Brand = {
   name: 'Hobbii',
   id: 'hobbii',
   yarns: [
+    acacia,
     amigo,
     friendsCottonEightFour,
     friendsCottonEightEight,
