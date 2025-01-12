@@ -31,6 +31,11 @@ export const entries: ChangelogItem[] = [
         text: `18 colorways`,
         title: 'Added Yarn: Hobbii - Acacia',
       },
+      {
+        icon: ICONS.checkCircle,
+        text: `12 colorways`,
+        title: 'Added Yarn: Source of Fibre - Clear As Cotton',
+      },
     ],
     version: '4.13.0',
   },
