@@ -20,17 +20,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import {
     isCustomWeather,
     isProjectLoading,
+    locationsState,
     modal,
     weather,
   } from '$lib/stores';
-
-  /**
-   * @typedef {Object} Props
-   * @property {boolean} [disabled]
-   */
-
-  /** @type {Props} */
-  let { disabled = $bindable(true) } = $props();
 
   function setModal() {
     modal.state.trigger({
@@ -45,6 +38,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
       component: { ref: GettingWeatherWarnCustomWeather },
     });
   }
+
+  let disabled = $derived(!locationsState.allValid || $isProjectLoading);
 </script>
 
 {#if disabled && !$isProjectLoading}

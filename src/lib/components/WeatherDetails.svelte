@@ -20,7 +20,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import {
     activeWeatherElementIndex,
     gaugeSettings,
-    locations,
+    locationsState,
     units,
     weather,
     weatherGrouping,
@@ -51,7 +51,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let dayWeather = $derived(data[$activeWeatherElementIndex]);
   let dayLocation = $derived(
-    $locations?.filter(
+    locationsState?.filter(
       (location) => location.index === dayWeather?.location,
     )[0],
   );

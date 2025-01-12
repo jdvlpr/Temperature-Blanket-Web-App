@@ -16,6 +16,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script context="module">
   import {
     activePreview,
+    locationsState,
     weatherGrouping,
     weatherItemHeading,
   } from '$lib/stores';
@@ -106,12 +107,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import DataTable from '$lib/components/datatable/DataTable.svelte';
   import Expand from '$lib/components/Expand.svelte';
   import { HOURS_PER_DAY } from '$lib/constants';
-  import { createdGauges, projectFilename, weather } from '$lib/stores';
+  import { createdGauges, weather } from '$lib/stores';
   import {
     capitalizeFirstLetter,
+    dateToISO8601String,
     displayNumber,
     setTargets,
-    dateToISO8601String,
   } from '$lib/utils';
   import { DataHandler, Th } from '@vincjo/datatables';
   import { slide } from 'svelte/transition';
@@ -236,7 +237,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement('a');
     link.setAttribute('href', encodedUri);
-    link.setAttribute('download', `Stitches Table for ${$projectFilename}`);
+    link.setAttribute(
+      'download',
+      `Stitches Table for ${locationsState.projectFilename}`,
+    );
     link.className = 'hidden';
     document.body.appendChild(link);
     link.click();

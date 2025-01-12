@@ -18,8 +18,7 @@ import { PROJECT_TIMESTAMP_ID } from '$lib/constants';
 import {
   defaultWeatherSource,
   gaugesURLHash,
-  locations,
-  locationsURLHash,
+  locationsState,
   previewURLHash,
   units,
   useSecondaryWeatherSources,
@@ -27,12 +26,12 @@ import {
   weatherMonthGroupingStartDay,
 } from '$lib/stores';
 import { getLocationTitle } from '$lib/utils';
-import { derived, get, writable } from 'svelte/store';
+import { get, writable } from 'svelte/store';
 
 class liveProjectURLHashClass {
   value = $derived.by(() => {
     let hash = '';
-    hash += get(locationsURLHash);
+    hash += locationsState.urlHash;
     hash += get(gaugesURLHash);
     hash += previewURLHash.value;
     if (get(defaultWeatherSource) === 'Meteostat') hash += '&s=0';
@@ -52,31 +51,6 @@ export const isProjectSaved = writable(false);
 
 export const isProjectLoading = writable(true);
 
-export const projectFilename = derived(locations, ($locations) => {
-  if (!$locations.length) return false;
-  let filename = '';
-  $locations.forEach((location) => {
-    filename += `${location?.label}-from-${location?.from}-to-${location?.to}`;
-  });
-  return filename;
-});
-
-export const projectTitle = derived(locations, ($locations) => {
-  if (
-    !$locations.length ||
-    !$locations?.every((item) => item?.label && item?.from && item?.to)
-  )
-    return '';
-  let titles = [];
-  $locations.forEach((location, index) => {
-    if (location?.from && location?.to)
-      titles.push(getLocationTitle({ location }));
-  });
-  if (titles.length === 0) return;
-  let title = titles.join('; ');
-  return title;
-});
-
 export const projectGalleryLink = writable(null);
 
 export const projectGalleryTitle = writable(null);
@@ -88,7 +62,9 @@ export const projectSaveMessage = writable({
 
 class ProjectStatusClass {
   state = $derived.by(() => {
-    const isValid = get(locations).every((location) => location.valid === true);
+    const isValid = locationsState.locations.every(
+      (location) => location.valid === true,
+    );
     const base = browser ? window.location.origin + '/' : '';
     const query = `?project=${PROJECT_TIMESTAMP_ID}&v=${version}`;
     const liveURL = !isValid

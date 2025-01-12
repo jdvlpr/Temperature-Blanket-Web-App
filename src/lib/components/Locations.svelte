@@ -22,10 +22,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import {
     createdGauges,
     defaultWeatherSource,
-    getLocationsState,
     isCustomWeather,
     isProjectLoading,
     liveProjectURLHash,
+    locationsState,
     modal,
     wasProjectLoadedFromURL,
     wasWeatherLoadedFromLocalStorage,
@@ -35,11 +35,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { slide } from 'svelte/transition';
   import SearchForWeather from './buttons/SearchForWeather.svelte';
 
-  const locationsState = getLocationsState();
-
-  $inspect(locationsState?.locations);
-
-  let disabled = $state(!locationsState.allValid || $isProjectLoading);
+  $inspect(locationsState.locations);
 </script>
 
 <div class="mt-4 max-w-screen-md mx-auto">
@@ -84,7 +80,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   {#if !!$isCustomWeather}
     <div class="flex flex-col gap-2 my-4 items-center">
-      {#each locationsState.locations as location (location.index)}
+      {#each locationsState.locations as location}
         <p class="flex flex-wrap gap-x-1 items-center justify-center">
           <span class="font-bold">{@html location.result}</span>
           <span>
@@ -136,7 +132,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     class:hidden={!!$isCustomWeather}
     class="divide-y divide-solid divide-surface-300 dark:divide-surface-600"
   >
-    {#each locationsState.locations as location, index (location.index)}
+    {#each locationsState.locations as location}
+      {@const index = locationsState.locations
+        .map((i) => i.uuid)
+        .indexOf(location.uuid)}
       <Location bind:location={locationsState.locations[index]} />
     {/each}
   </div>
@@ -173,7 +172,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {/if}
 
     <div class="flex flex-col items-center gap-4 w-full">
-      <SearchForWeather bind:disabled />
+      <SearchForWeather />
     </div>
 
     {#if locationsState.locations.length > 1 && locationsState.totalDays && locationsState.allValid && !$isCustomWeather}

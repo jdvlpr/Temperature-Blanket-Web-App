@@ -33,7 +33,7 @@ import { showDaysInRange, units } from '$lib/stores';
 import { get } from 'svelte/store';
 import pdfConfig from '../pdf-config';
 import pdfColorDetails from './color-details.svelte';
-import pdfFooter from './footer';
+import pdfFooter from './footer.svelte';
 
 const pdfGauge = {
   MAX_COLORS_PER_PAGE: 15,

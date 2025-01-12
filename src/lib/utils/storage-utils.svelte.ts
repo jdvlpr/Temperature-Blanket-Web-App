@@ -23,8 +23,8 @@ import {
   initialLayout,
   isCustomWeather,
   layout,
+  locationsState,
   projectStatus,
-  projectTitle,
   theme,
   useSecondaryWeatherSources,
   wasWeatherLoadedFromLocalStorage,
@@ -35,7 +35,7 @@ import type {
   SavedProject,
   WeatherSourceOptions,
 } from '$lib/types';
-import { stringToDate, numberOfDays, dateToISO8601String } from '$lib/utils';
+import { dateToISO8601String, numberOfDays, stringToDate } from '$lib/utils';
 import { get } from 'svelte/store';
 
 export const setupLocalStorageTheme = () => {
@@ -220,7 +220,7 @@ const createProjectLocalStorageProjectObject = () => {
 
   const isCustomWeatherData = get(isCustomWeather) || false;
 
-  const _title = get(projectTitle) || '';
+  const _title = locationsState.projectTitle || '';
 
   const href = projectStatus.state.liveURL;
 

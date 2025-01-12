@@ -15,8 +15,7 @@
 
 import { CHARACTERS_FOR_URL_HASH } from '$lib/constants';
 import type { Location, WeatherSource } from '$lib/types';
-import { numberOfDays, stringToDate } from '$lib/utils';
-import { getContext, setContext } from 'svelte';
+import { getLocationTitle, numberOfDays } from '$lib/utils';
 import { derived, writable, type Writable } from 'svelte/store';
 import { weatherUngrouped } from './weather-state.svelte';
 
@@ -39,6 +38,7 @@ function createLocationsStore() {
 export const locations: Writable<Location[]> = createLocationsStore();
 
 export class LocationClass implements Location {
+  uuid: string;
   index: number;
   valid?: boolean;
   duration?: 'c' | 'y';
@@ -54,8 +54,8 @@ export class LocationClass implements Location {
   source?: WeatherSource;
   wasLoadedFromSavedProject?: boolean;
 
-  constructor(value: number) {
-    this.index = value;
+  constructor() {
+    this.uuid = crypto.randomUUID();
   }
 }
 
@@ -63,28 +63,28 @@ export class LocationsState {
   locations = $state<Location[]>([]);
 
   constructor() {
-    const location = new LocationClass(0);
+    const location = new LocationClass();
+    location.index = 0;
     this.locations = [{ ...location }];
   }
 
   add(): void {
     if (weatherUngrouped.data) weatherUngrouped.data = null;
-    const index = this.locations.length;
-    const newLocation = new LocationClass(index);
+    const newLocation = new LocationClass();
+    newLocation.index = this.locations.length;
+    console.log(this.locations.length);
+    console.log({ ...newLocation });
+
     this.locations.push({ ...newLocation });
   }
 
-  remove(index: number) {
+  remove(uuid: string) {
     this.locations = this.locations.filter(
-      (location) => location.index !== index,
+      (location) => location.uuid !== uuid,
     );
-  }
-
-  clearAutocomplete(index: number) {
-    if (index === -1) return;
-    delete this.locations[index].id;
-    delete this.locations[index].lat;
-    delete this.locations[index].lng;
+    this.locations.map((location, i) => {
+      location.index = i;
+    });
   }
 
   totalDays = $derived.by(() => {
@@ -104,65 +104,78 @@ export class LocationsState {
   allValid = $derived.by(() => {
     return this.locations.every((location) => location.valid === true);
   });
+
+  urlHash = $derived.by(() => {
+    // Every location must be valid
+    if (!this.allValid) return '';
+
+    // Each location's Id, From, and To date gets encoded in the URL hash
+    // After the 'l=' key
+    let content = 'l=';
+    this.locations.forEach((location) => {
+      // Format the From date as 'YYYYMMDD' instead of 'YYYY-MM-DD'
+      const from = location?.from?.replace(/-/g, '') || '';
+
+      let to;
+      if (location?.duration === 'y') {
+        // If the duration is one year, symbolize the To date as '!'
+        to = '!';
+      } else {
+        // Otherwise, the duration is custom
+        // and the To date should be formatted as 'YYYYMMDD'
+        to = location?.to?.replace(/-/g, '') || '';
+      }
+
+      content += location?.id + CHARACTERS_FOR_URL_HASH.separator + from + to;
+    });
+
+    return content;
+  });
+
+  projectFilename = $derived.by(() => {
+    if (!this.locations.length) return false;
+    let filename = '';
+    this.locations.forEach((location) => {
+      filename += `${location?.label}-from-${location?.from}-to-${location?.to}`;
+    });
+    return filename;
+  });
+
+  projectTitle = $derived.by(() => {
+    if (
+      !this.locations.length ||
+      !this.locations?.every((item) => item?.label && item?.from && item?.to)
+    )
+      return '';
+    let titles = [];
+    this.locations.forEach((location, index) => {
+      if (location?.from && location?.to)
+        titles.push(getLocationTitle({ location }));
+    });
+    if (titles.length === 0) return;
+    let title = titles.join('; ');
+    return title;
+  });
 }
 
-const LOCATIONS_KEY = Symbol('LOCATIONS');
+export const locationsState = new LocationsState();
 
-export function setLocationsState() {
-  return setContext(LOCATIONS_KEY, new LocationsState());
-}
+// const LOCATIONS_KEY = Symbol('LOCATIONS');
 
-export function getLocationsState() {
-  return getContext<ReturnType<typeof setLocationsState>>(LOCATIONS_KEY);
-}
+// export function setLocationsState() {
+//   return setContext(LOCATIONS_KEY, new LocationsState());
+// }
+
+// export function getLocationsState() {
+//   return getContext<ReturnType<typeof setLocationsState>>(LOCATIONS_KEY);
+// }
 
 export const gettingLocationWeather = writable('Searching...');
 
 export const gettingLocationWeatherIndex = writable(0);
-
-export const locationsFutureDays = derived(locations, ($locations) => {
-  if (!$locations?.length || !$locations?.every((n) => n.from && n.to)) return;
-  return $locations.map((n) => {
-    const from = stringToDate(n.from);
-    const to = stringToDate(n.to);
-    let today = new Date(new Date().setHours(24, 0, 0, 0));
-    today = today.setDate(today.getDate() - 1); // why this way??
-    if (from >= today) return numberOfDays(from, to) - 1;
-    if (to >= today) return numberOfDays(today, to) - 1;
-    return 0;
-  });
-});
 
 // Controller and signal for when searching for locations
 export const controller = writable(null);
 export const signal = derived(controller, ($controller) =>
   $controller ? $controller.signal : null,
 );
-
-// Locations Hash Param
-export const locationsURLHash = derived(locations, ($locations) => {
-  // Every location must be valid
-  if (!$locations.every((location) => location.valid === true)) return '';
-
-  // Each location's Id, From, and To date gets encoded in the URL hash
-  // After the 'l=' key
-  let content = 'l=';
-  $locations.forEach((location) => {
-    // Format the From date as 'YYYYMMDD' instead of 'YYYY-MM-DD'
-    const from = location?.from?.replace(/-/g, '') || '';
-
-    let to;
-    if (location?.duration === 'y') {
-      // If the duration is one year, symbolize the To date as '!'
-      to = '!';
-    } else {
-      // Otherwise, the duration is custom
-      // and the To date should be formatted as 'YYYYMMDD'
-      to = location?.to?.replace(/-/g, '') || '';
-    }
-
-    content += location?.id + CHARACTERS_FOR_URL_HASH.separator + from + to;
-  });
-
-  return content;
-});

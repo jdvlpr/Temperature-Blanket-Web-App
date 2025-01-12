@@ -19,9 +19,9 @@ import {
   drawerState,
   gaugesState,
   isDesktop,
+  locationsState,
   modal,
   previewWeatherTargets,
-  projectFilename,
   weather,
 } from '$lib/stores';
 import { exists, getTargetParentGaugeId } from '$lib/utils';
@@ -83,7 +83,7 @@ export const downloadPreviewPNG = async (
   const img = await svgToPNG({ svgNode: svg, width, height });
 
   const a = document.createElement('a');
-  const fileName = `Temperature-Blanket-Preview-${get(projectFilename)}.png`;
+  const fileName = `Temperature-Blanket-Preview-${locationsState.projectFilename}.png`;
   a.setAttribute('download', fileName);
   a.setAttribute('href', img);
   a.setAttribute('target', '_blank');

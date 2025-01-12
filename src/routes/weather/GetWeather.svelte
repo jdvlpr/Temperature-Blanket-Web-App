@@ -14,14 +14,14 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script context="module">
-  import { isProjectLoading, signal, units } from '$lib/stores';
+  import { isProjectLoading, locationsState, signal, units } from '$lib/stores';
   import { get } from 'svelte/store';
   import { activeLocationID, locations } from './+page.svelte';
 
   export async function fetchData() {
     isProjectLoading.set(true);
 
-    let _locations = get(locations);
+    let _locations = locationsState.locations;
 
     // Update All Locations
     let newWeatherForcastData = [];
@@ -51,7 +51,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     isProjectLoading.set(false);
 
-    if (!get(activeLocationID)) activeLocationID.set(get(locations)[0]?.id);
+    if (!get(activeLocationID))
+      activeLocationID.set(locationsState.locations[0]?.id);
   }
 
   const getOpenMeteoForecast = async ({ location }) => {

@@ -16,7 +16,8 @@
 import type { WeatherSource } from './weather-types';
 
 export interface Location {
-  index: number;
+  uuid?: string;
+  index?: number;
   /** Are the dates and fetched location data valid? */
   valid?: boolean;
   /** 'c' is for Custom, 'y' is for One Year */

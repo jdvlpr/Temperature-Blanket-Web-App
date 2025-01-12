@@ -37,7 +37,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     activeWeatherElementIndex,
     defaultWeatherSource,
     isCustomWeather,
-    locations,
+    locationsState,
     modal,
     showNavigationSideBar,
     units,
@@ -76,16 +76,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
   };
 
   onMount(() => {
-    isAnyWeatherSourceDifferentFromDefault = !$locations?.some(
+    isAnyWeatherSourceDifferentFromDefault = !locationsState.locations?.some(
       (n) => n.source === $defaultWeatherSource,
     );
 
     defaultWeatherSourceCopy = $defaultWeatherSource;
     if (isAnyWeatherSourceDifferentFromDefault) {
-      if ($locations?.every((n) => n.source === 'Meteostat')) {
+      if (locationsState.locations?.every((n) => n.source === 'Meteostat')) {
         $defaultWeatherSource = 'Meteostat';
         wasDefaultWeatherSourceChanged = true;
-      } else if ($locations?.every((n) => n.source === 'Open-Meteo')) {
+      } else if (
+        locationsState.locations?.every((n) => n.source === 'Open-Meteo')
+      ) {
         $defaultWeatherSource = 'Open-Meteo';
         wasDefaultWeatherSourceChanged = true;
       }
@@ -491,12 +493,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <WeatherItem
         id="snow"
         icon="∗"
-        label={$locations?.every((n) => n.source === 'Meteostat')
+        label={locationsState.locations?.every((n) => n.source === 'Meteostat')
           ? 'Highest Snow Depth'
           : 'Total SnowFall'}
         value={weatherParametersData.snow?.every((n) => n === null)
           ? '-'
-          : $locations?.every((n) => n.source === 'Meteostat')
+          : locationsState.locations?.every((n) => n.source === 'Meteostat')
             ? Math.max(...weatherParametersData.snow?.filter((n) => n !== null))
             : displayNumber(
                 weatherParametersData.snow
@@ -507,7 +509,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       >
         {#snippet button()}
           <div class="my-2 text-sm">
-            {#if $locations.some((n) => n.source === 'Meteostat') && $locations.some((n) => n.source === 'Open-Meteo')}
+            {#if locationsState.locations.some((n) => n.source === 'Meteostat') && locationsState.locations.some((n) => n.source === 'Open-Meteo')}
               <HelpIcon
                 href="/documentation/#mixed-snow-parameters"
                 title="Read About Mixed Snow Parameters"

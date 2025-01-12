@@ -17,9 +17,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Spinner from '$lib/components/Spinner.svelte';
   import {
     activePreview,
+    locationsState,
     projectGalleryLink,
     projectGalleryTitle,
-    projectTitle,
   } from '$lib/stores';
   import { sendToProjectGallery, svgToPNG } from '$lib/utils';
   import ModalShell from './ModalShell.svelte';
@@ -91,7 +91,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <div
         class="w-full col-span-full sm:col-span-1 max-w-[250px] m-auto pointer-events-none flex flex-col gap-2 p-4 bg-surface-50-900-token rounded-container-token mb-4"
       >
-        <span class="font-bold line-clamp-4">{$projectTitle}</span>
+        <span class="font-bold line-clamp-4">{locationsState.projectTitle}</span
+        >
         <SvelteComponent />
       </div>
     {:else}
@@ -108,7 +109,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </div>
     {/if}
   </div>
-  {#if $projectGalleryLink && $projectGalleryTitle && $projectGalleryTitle === $projectTitle}
+  {#if $projectGalleryLink && $projectGalleryTitle && $projectGalleryTitle === locationsState.projectTitle}
     <p class="my-2">
       <a
         href={$projectGalleryLink}

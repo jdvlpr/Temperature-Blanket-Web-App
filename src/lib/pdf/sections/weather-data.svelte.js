@@ -16,12 +16,12 @@
 import {
   allGaugesAttributes,
   gaugesState,
-  locations,
-  weatherParametersData,
+  locationsState,
   units,
   weather,
   weatherGrouping,
   weatherItemHeading,
+  weatherParametersData,
 } from '$lib/stores';
 import {
   capitalizeFirstLetter,
@@ -33,7 +33,7 @@ import {
 } from '$lib/utils';
 import { get } from 'svelte/store';
 import pdfConfig from '../pdf-config';
-import pdfFooter from './footer';
+import pdfFooter from './footer.svelte';
 
 const pdfWeatherData = {
   linePadding: 2,
@@ -76,7 +76,7 @@ const pdfWeatherData = {
     // Heading
     doc.setFontSize(pdfConfig.font.h2);
     doc.setFont(pdfConfig.font.heading, 'normal');
-    const description = `Weather Data for ${get(locations).length} ${pluralize('Location', get(locations).length)}, ${weather.data.length} ${pluralize(capitalizeFirstLetter(weatherGrouping.value), weather.data.length)}`;
+    const description = `Weather Data for ${locationsState.locations.length} ${pluralize('Location', locationsState.locations.length)}, ${weather.data.length} ${pluralize(capitalizeFirstLetter(weatherGrouping.value), weather.data.length)}`;
     doc.text(description, pdfConfig.leftMargin, pdfConfig.topMargin);
     // Low Avg High Temps
     doc.setFontSize(pdfConfig.font.p);
@@ -135,8 +135,9 @@ const pdfWeatherData = {
       doc.text(heading, this.headings[0].positionX, line);
       // Location
       let location = String(
-        get(locations).filter((n) => n.index === weather.data[i].location)[0]
-          .label,
+        locationsState.locations.filter(
+          (n) => n.index === weather.data[i].location,
+        )[0].label,
       );
       if (location.includes(',')) {
         location = location.slice(0, location.indexOf(','));

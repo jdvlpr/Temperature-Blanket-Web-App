@@ -35,10 +35,10 @@ import {
   NO_DATA_SRTM3,
 } from '$lib/constants';
 import {
-  defaultWeatherSource,
   allGaugesAttributes,
+  defaultWeatherSource,
   gaugesState,
-  locations,
+  locationsState,
   units,
   useSecondaryWeatherSources,
   weatherGrouping,
@@ -47,12 +47,12 @@ import {
 import type { GaugeSettings } from '$lib/types';
 import {
   celsiusToFahrenheit,
+  dateToISO8601String,
   displayGeoNamesErrorMessage,
   exists,
   getColorsFromInput,
   getProjectParametersFromURLHash,
   millimetersToInches,
-  dateToISO8601String,
   upToDate,
   yearFrom,
 } from '$lib/utils';
@@ -167,7 +167,7 @@ const parseLocationURLHash = async (hashString) => {
 
   let currentPosition = 0;
 
-  let _locations = get(locations);
+  let _locations = locationsState.locations;
 
   // The number of locations is the number of separator characters present after the 'l=' key in the URL hash
   for (let i = 0; i < separatorIndices.length; i++) {
@@ -177,7 +177,7 @@ const parseLocationURLHash = async (hashString) => {
     if (_locations.length - 1 < i) {
       // There needs to be another location, so create it
       _locations = [..._locations, { index: i }];
-      locations.set(_locations);
+      locationsState.locations = _locations;
     }
 
     _locations[i].label = 'Loading...';
@@ -284,7 +284,7 @@ const parseLocationURLHash = async (hashString) => {
     }
   }
 
-  locations.set(_locations);
+  locationsState.locations = _locations;
 };
 
 export const parseGaugeURLHash = (

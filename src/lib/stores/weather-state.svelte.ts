@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { locations, units } from '$lib/stores';
+import { locationsState, units } from '$lib/stores';
 import type { WeatherDay, WeatherSource } from '$lib/types';
 import { createWeeksProperty, displayNumber } from '$lib/utils';
 import { get, writable, type Writable } from 'svelte/store';
@@ -58,7 +58,7 @@ class weatherGroupedByWeekClass {
 
     // Check if every location is from Meteostat as the data source
     // Used because Meteostat handle's snow data differently than Open-Meteo
-    const isEveryDayFromMeteostat = get(locations)?.every(
+    const isEveryDayFromMeteostat = locationsState.locations?.every(
       (n) => n.source === 'Meteostat',
     );
 

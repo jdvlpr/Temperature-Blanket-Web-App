@@ -17,24 +17,24 @@ import { API_SERVICES } from '$lib/constants';
 import {
   allGaugesAttributes,
   isCustomWeather,
-  locations,
+  locationsState,
   signal,
-  weatherParametersData,
   units,
   weather,
+  weatherParametersData,
 } from '$lib/stores';
 import type { WeatherDay } from '$lib/types';
 import {
   celsiusToFahrenheit,
+  dateToISO8601String,
   displayNumber,
   getAverage,
-  stringToDate,
+  getToday,
   hoursToMinutes,
   millimetersToInches,
   numberOfDays,
   pluralize,
-  getToday,
-  dateToISO8601String,
+  stringToDate,
 } from '$lib/utils';
 import SunCalc from 'suncalc';
 import { get } from 'svelte/store';
@@ -307,7 +307,7 @@ export const getOpenMeteo = async ({ location }) => {
  * @returns {Array<object>} An array of weather data sources with their names and URLs.
  */
 export const getWeatherSourceDetails = () => {
-  const _locations = get(locations);
+  const _locations = locationsState.locations;
 
   if (!_locations) return;
 

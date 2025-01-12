@@ -21,7 +21,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     gettingLocationWeather,
     gettingLocationWeatherIndex,
     isCustomWeather,
-    locations,
+    locationsState,
     signal,
     useSecondaryWeatherSources,
     wasWeatherLoadedFromLocalStorage,
@@ -49,17 +49,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let error = $state(false);
 
-  function getAllLocations(_locations) {
-    let _allLocations = [];
-
-    for (let index = 0; index < _locations.length; index++) {
-      let location = _locations[index];
-      _allLocations.push(location);
-    }
-
-    return _allLocations;
-  }
-
   async function getWeatherData() {
     $controller = new AbortController();
     weatherUngrouped.data = null;
@@ -86,10 +75,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     for (
       let thisLocation = 0;
-      thisLocation < allLocations.length;
+      thisLocation < locationsState.locations.length;
       thisLocation += 1
     ) {
-      let location = allLocations[thisLocation];
+      let location = locationsState.locations[thisLocation];
 
       $gettingLocationWeather = location.label;
       $gettingLocationWeatherIndex = thisLocation;
@@ -150,7 +139,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             tempAllData.push(data);
 
-            $locations[thisLocation].source = 'Meteostat';
+            location.source = 'Meteostat';
           } catch (error) {
             errors.push(error);
           }
@@ -169,7 +158,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           try {
             const data = await getOpenMeteo({ location });
             tempAllData.push(data);
-            $locations[thisLocation].source = 'Open-Meteo';
+            location.source = 'Open-Meteo';
           } catch (error) {
             errors.push(error);
           }
@@ -189,7 +178,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     weatherUngrouped.data = tempAllData;
     tempAllData = null;
   }
-  let allLocations = $derived(getAllLocations($locations));
 </script>
 
 <ModalShell {parent} size="small">
@@ -202,15 +190,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <p class="mb-4 flex flex-col items-center">
         <span> {@html $gettingLocationWeather}</span>
 
-        {#if allLocations?.length > 1}
+        {#if locationsState.locations.length > 1}
           <span class="flex flex-col items-center mt-2 w-full gap-1">
             <progress
               value={$gettingLocationWeatherIndex + 1}
-              max={allLocations.length}
+              max={locationsState.locations.length}
             ></progress>
             <span class="text-xs">
               {Math.round(
-                (($gettingLocationWeatherIndex + 1) / allLocations.length) *
+                (($gettingLocationWeatherIndex + 1) /
+                  locationsState.locations.length) *
                   100,
               )}%
             </span>

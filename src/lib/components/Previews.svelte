@@ -20,11 +20,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import {
     activePreview,
     drawerState,
+    locationsState,
     modal,
     previewWeatherTargets,
     projectGalleryLink,
     projectGalleryTitle,
-    projectTitle,
   } from '$lib/stores';
   import { downloadPreviewPNG } from '$lib/utils';
   import { Drawer } from 'vaul-svelte';
@@ -120,7 +120,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         Send to Project Gallery
       </button>
 
-      {#if $projectGalleryLink && $projectGalleryTitle && $projectGalleryTitle === $projectTitle}
+      {#if $projectGalleryLink && $projectGalleryTitle && $projectGalleryTitle === locationsState.projectTitle}
         <div class="flex flex-col gap-1 justify-center w-full">
           <p>View this project's gallery page:</p>
           <p>

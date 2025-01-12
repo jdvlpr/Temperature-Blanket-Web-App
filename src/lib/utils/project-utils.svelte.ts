@@ -17,14 +17,12 @@ import pdfGauges from '$lib/pdf/sections/gauges';
 import pdfWeatherData from '$lib/pdf/sections/weather-data.svelte';
 import {
   activePreview,
-  createdGauges,
   allGaugesAttributes,
-  locations,
-  projectFilename,
+  createdGauges,
+  locationsState,
   projectGalleryLink,
   projectGalleryTitle,
   projectStatus,
-  projectTitle,
   units,
   weather,
   weatherGrouping,
@@ -61,7 +59,7 @@ export const downloadPDF = async () => {
       pdfWeatherData.create(doc);
       // Remove blank first page, ugly hack
       doc.deletePage(1);
-      doc.save(`Temperature-Blanket-${get(projectFilename)}.pdf`);
+      doc.save(`Temperature-Blanket-${locationsState.projectFilename}.pdf`);
     })
     .catch((error) => {
       throw new Error(error);
@@ -100,8 +98,9 @@ export const downloadWeatherCSV = () => {
     return [
       index + 1,
       dateToISO8601String(day.date),
-      get(locations).filter((n) => n.index === day.location)[0]?.index,
-      ...get(locations)
+      locationsState.locations.filter((n) => n.index === day.location)[0]
+        ?.index,
+      ...locationsState.locations
         ?.filter((n) => n.index === day.location)?.[0]
         ?.label.split(','),
       gaugeInfo,
@@ -124,7 +123,10 @@ export const downloadWeatherCSV = () => {
   const encodedUri = encodeURI(csvContent);
   const link = document.createElement('a');
   link.setAttribute('href', encodedUri);
-  link.setAttribute('download', `Weather-Data-${get(projectFilename)}`);
+  link.setAttribute(
+    'download',
+    `Weather-Data-${locationsState.projectFilename}`,
+  );
   link.className = 'hidden';
   document.body.appendChild(link);
   link.click();
@@ -160,7 +162,7 @@ export const sendToProjectGallery = async (img) => {
     yarnUrls.push(yarnSearchUrl);
     tables.push(getWPGauge(gauge));
   });
-  const _locations = get(locations)?.map((location) => {
+  const _locations = locationsState.locations?.map((location) => {
     return {
       label: location.label,
       from: location.from,
@@ -178,7 +180,7 @@ export const sendToProjectGallery = async (img) => {
     palettes: JSON.stringify(palettes),
     project_url: projectStatus.state.liveURL,
     tables: JSON.stringify(tables),
-    title: get(projectTitle),
+    title: locationsState.projectTitle,
     total_days: weatherUngrouped.data?.length,
     yarn_urls: JSON.stringify(yarnUrls),
     yarn_details: JSON.stringify(yarnDetails),

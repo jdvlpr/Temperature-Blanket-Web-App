@@ -29,7 +29,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { settings as snowGaugeSettings } from '$lib/components/gauges/SnowGauge.svelte';
   import { gaugeSettings as temperatureGaugeSettings } from '$lib/components/gauges/TemperatureGauge.svelte';
   import { ALL_YARN_WEIGHTS, ICONS } from '$lib/constants';
-  import { allGaugesAttributes, getLocationsState, layout } from '$lib/stores';
+  import { allGaugesAttributes, layout, locationsState } from '$lib/stores';
   import {
     exists,
     getProjectParametersFromURLHash,
@@ -57,8 +57,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let params = $state();
   let gauges = $state();
   let flatColors = $state();
-
-  const locationsState = getLocationsState();
 
   onMount(async () => {
     const { project: streamedProject } = await data.stream;

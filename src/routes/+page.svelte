@@ -35,7 +35,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import {
     drawerState,
     gaugesState,
-    getLocationsState,
     history,
     historyChangeMessage,
     isDesktop,
@@ -43,11 +42,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     isProjectLoading,
     isProjectSaved,
     liveProjectURLHash,
+    locationsState,
     modal,
     pageSections,
     pinAllSections,
     projectStatus,
-    setLocationsState,
     wasProjectLoadedFromURL,
     weather,
     weatherGrouping,
@@ -75,10 +74,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   };
 
   const toastStore = getToastStore();
-
-  setLocationsState();
-
-  const locationsState = getLocationsState();
 
   let dialogOpen = $state(false);
 

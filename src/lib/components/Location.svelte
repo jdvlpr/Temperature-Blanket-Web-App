@@ -18,9 +18,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { ICONS, MAXIMUM_DAYS_PER_LOCATION, MONTHS } from '$lib/constants';
   import {
     defaultWeatherSource,
-    getLocationsState,
     isCustomWeather,
     isProjectLoading,
+    locationsState,
     useSecondaryWeatherSources,
     weatherUngrouped,
   } from '$lib/stores';
@@ -40,8 +40,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   const years = createYears();
 
-  const locationsState = getLocationsState();
-
   let inputLocation: HTMLInputElement, inputStart, inputEnd; // Bindings to elements
   let locationGroup;
   let year = $state(getLastYear());
@@ -51,6 +49,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let searching = $state(false); // Are the autocomplete results fetching?
   let showReset = $state(false); // Should the clear input button appear?
   let hasLoaded = $state(false); // If the location was loaded from a saved project, then this gets set to true. It gets checked so that the initial setup function doesn't run again.
+
+  let thisIndex = $derived(
+    locationsState.locations.map((i) => i.uuid).indexOf(location?.uuid),
+  );
 
   let datesDetails = $derived.by(() => {
     if (!location) return { isValid: false };
@@ -269,7 +271,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   function invalidate() {
     validId = false;
-    locationsState.clearAutocomplete(location.index);
+    delete location.id;
+    delete location.lat;
+    delete location.lng;
   }
 
   function createYears() {
@@ -372,7 +376,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <button
               class="btn bg-secondary-hover-token"
               onclick={() => {
-                locationsState.remove(location.index);
+                locationsState.remove(location.uuid);
                 weatherUngrouped.data = null;
               }}
               disabled={!!$isCustomWeather || $isProjectLoading}
@@ -380,7 +384,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             >
               {@html ICONS.trash}
               <p>
-                Remove Location {location.index + 1}
+                Remove Location {thisIndex + 1}
               </p>
             </button>
           </div>
@@ -394,9 +398,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {#if hasError}
           <span class="text-error-800-100-token">Choose a result</span>
         {:else if locationsState.locations.length > 1 && location?.label}
-          Location {locationsState.locations.length > 1
-            ? location.index + 1
-            : ''}
+          Location {locationsState.locations.length > 1 ? thisIndex + 1 : ''}
         {:else}
           Search for a city, region, or landmark
         {/if}
@@ -423,7 +425,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </div>
         <input
           type="text"
-          id="location-{location.index}"
+          id="location-{location.uuid}"
           class="truncate"
           autocomplete="off"
           placeholder={$isProjectLoading ? 'Loading...' : 'Enter a place'}
@@ -492,7 +494,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <select
               class="select"
               bind:value={year}
-              id={`choose-year-${location.index}`}
+              id={`choose-year-${location.uuid}`}
               title="Choose a Year"
               disabled={!!$isCustomWeather || $isProjectLoading}
               onchange={() => {
@@ -510,7 +512,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <select
               class="select"
               bind:value={month}
-              id={`choose-month-${location.index}`}
+              id={`choose-month-${location.uuid}`}
               title="Choose a Month"
               disabled={!!$isCustomWeather || $isProjectLoading}
               onchange={() => {
@@ -528,7 +530,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <select
               class="select"
               bind:value={day}
-              id={`choose-day-${location.index}`}
+              id={`choose-day-${location.uuid}`}
               title="Choose a Day"
               disabled={!!$isCustomWeather || $isProjectLoading}
               onchange={() => setDates({})}
@@ -544,13 +546,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <div
           class="grid grid-cols-2 justify-between items-center gap-4 col-span-12 sm:col-span-6"
         >
-          <label for="datepicker-from-{location.index}" class="">
+          <label for="datepicker-from-{location.uuid}" class="">
             <span>From</span>
             <input
               type="date"
               class="input"
               data-type="from"
-              id="datepicker-from-{location.index}"
+              id="datepicker-from-{location.uuid}"
               title="Choose a Start Date"
               max={getYesterday()}
               bind:value={location.from}
@@ -559,13 +561,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
               disabled={$isProjectLoading || !!$isCustomWeather}
             />
           </label>
-          <label for="datepicker-to-{location.index}" class="">
+          <label for="datepicker-to-{location.uuid}" class="">
             <span>To</span>
             <input
               type="date"
               class="input"
               data-type="to"
-              id="datepicker-to-{location.index}"
+              id="datepicker-to-{location.uuid}"
               placeholder="Choose end date"
               title="Choose an End Date"
               max={getYesterday()}
@@ -582,7 +584,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <span>Duration</span>
         <select
           class="select w-full"
-          id={`duration-${location.index}`}
+          id={`duration-${location.uuid}`}
           bind:value={location.duration}
           disabled={!!$isCustomWeather || $isProjectLoading}
           onchange={() => {

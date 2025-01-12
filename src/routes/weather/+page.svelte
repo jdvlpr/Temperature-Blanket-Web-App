@@ -33,6 +33,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import UnitChanger from '$lib/components/UnitChanger.svelte';
   import {
     isProjectLoading,
+    locationsState,
     modal,
     showNavigationSideBar,
     units,
@@ -87,13 +88,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     // saved weather locations
     if (localStorage.getItem('[/weather]locations')) {
-      $locations = JSON.parse(localStorage.getItem('[/weather]locations')).map(
-        (item) => {
-          return { ...item, id: +item.id };
-        },
-      );
+      locationsState.locations = JSON.parse(
+        localStorage.getItem('[/weather]locations'),
+      ).map((item) => {
+        return { ...item, id: +item.id };
+      });
 
-      $activeLocationID = $locations[0]?.id || null;
+      $activeLocationID = locationsState.locations[0]?.id || null;
       await fetchData();
     }
     locations.subscribe(async (value) => {
@@ -104,8 +105,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     });
 
     activeLocationID.subscribe(async (value) => {
-      if (value && $locations.find((item) => item.id === value)?.saved) {
-        // if ($locations.find((item) => item.id === value)?.saved) page.url.searchParams.set("id", value);
+      if (
+        value &&
+        locationsState.locations.find((item) => item.id === value)?.saved
+      ) {
+        // if (locationsState.locations.find((item) => item.id === value)?.saved) page.url.searchParams.set("id", value);
         // page.url.searchParams.set("id", value);
         // page.url.searchParams.set("h", $hour === "12" ? "0" : "1");
         // page.url.searchParams.set("u", units.value === "metric" ? "m" : "i");
@@ -197,7 +201,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     return nd;
   }
   let weatherData = $derived(
-    $locations?.find((item) => item.id === $activeLocationID)?.data || null,
+    locationsState.locations?.find((item) => item.id === $activeLocationID)
+      ?.data || null,
   );
   let hourlyData = $derived(
     weatherData?.hourly.time.map((item, index) => {
@@ -270,7 +275,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     localStorage.setItem('[/weather]units', units.value);
     // page.url.searchParams.set("u", value === "metric" ? "m" : "i");
     // if (isMounted) window.history.replaceState({ path: page.url.href }, "", page.url.href);
-    if ($locations?.some((item) => item.units !== units.value))
+    if (locationsState.locations?.some((item) => item.units !== units.value))
       await fetchData();
   });
 </script>
@@ -343,7 +348,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           />
         </svg>
       </button>
-      {#if $locations.filter((item) => item?.saved).length}
+      {#if locationsState.locations.filter((item) => item?.saved).length}
         <button
           aria-label="Open Locations"
           class="btn-icon bg-secondary-hover-token"
@@ -406,18 +411,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     <div
                       class="flex flex-col justify-center items-center gap-2"
                     >
-                      {#if !$locations.find((item) => item.id === $activeLocationID)?.saved}
+                      {#if !locationsState.locations.find((item) => item.id === $activeLocationID)?.saved}
                         <button
                           in:fade
                           class="btn bg-secondary-hover-token"
                           title="Add to Locations"
                           onclick={async () => {
-                            $locations.map((item) => {
+                            locationsState.locations.map((item) => {
                               if (item.id === $activeLocationID)
                                 item.saved = true;
                               return item;
                             });
-                            $locations = $locations;
+                            locationsState.locations = locationsState.locations;
                             page.url.searchParams.set('id', $activeLocationID);
                             page.url.searchParams.set(
                               'h',
@@ -449,7 +454,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                           </svg>
                           Add
                         </button>
-                      {:else if $locations.filter((item) => item?.saved)?.length}
+                      {:else if locationsState.locations.filter((item) => item?.saved)?.length}
                         <button
                           in:fade
                           class="btn bg-secondary-hover-token"
@@ -482,7 +487,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       {/if}
                     </div>
                     <p class="font-bold md:text-xl">
-                      {@html $locations.find(
+                      {@html locationsState.locations.find(
                         (item) => item.id === $activeLocationID,
                       ).result}
                     </p>

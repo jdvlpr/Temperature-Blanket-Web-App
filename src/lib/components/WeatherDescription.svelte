@@ -16,7 +16,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script>
   import {
     defaultWeatherSource,
-    locations,
+    locationsState,
     weatherParametersData,
     weatherParametersInView,
   } from '$lib/stores';
@@ -24,10 +24,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { onMount } from 'svelte';
 
   let isAnyWeatherSourceDifferentFromDefault;
-  let stations;
+
+  let stations = $derived(
+    locationsState.locations
+      ?.filter((location) => exists(location.stations))
+      ?.map((location) =>
+        location.stations.map(
+          (station) =>
+            `<a href="https://meteostat.net/en/station/${station}?t=${location.from}/${location.to}" target="_blank" rel="noreferrer" class="link">#${station}</a>`,
+        ),
+      )
+      ?.flat(),
+  );
 
   onMount(() => {
-    isAnyWeatherSourceDifferentFromDefault = !$locations?.some(
+    isAnyWeatherSourceDifferentFromDefault = !locationsState.locations?.some(
       (n) => n.source === $defaultWeatherSource,
     );
 
@@ -39,32 +50,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
     else $weatherParametersInView.snow = true;
     $weatherParametersInView = $weatherParametersInView;
   });
-
-  $: stations = $locations
-    ?.filter((location) => exists(location.stations))
-    ?.map((location) =>
-      location.stations.map(
-        (station) =>
-          `<a href="https://meteostat.net/en/station/${station}?t=${location.from}/${location.to}" target="_blank" rel="noreferrer" class="link">#${station}</a>`,
-      ),
-    )
-    ?.flat();
 </script>
 
 <p class="my-2 text-sm">
-  {#if $locations?.some((n) => n.source === 'Meteostat') && stations?.length}
+  {#if locationsState.locations?.some((n) => n.source === 'Meteostat') && stations?.length}
     Includes aggregated data from <a
       href="https://meteostat.net/"
       target="_blank"
       rel="noopener noreferrer"
       class="link">Meteostat</a
     >
-    {$locations?.length > 1 &&
-    $locations?.some((n) => n.source === 'Meteostat') &&
-    $locations?.some((n) => n.source === 'Open-Meteo')
+    {locationsState.locations?.length > 1 &&
+    locationsState.locations?.some((n) => n.source === 'Meteostat') &&
+    locationsState.locations?.some((n) => n.source === 'Open-Meteo')
       ? `for ${new Intl.ListFormat().format([
           ...new Set(
-            $locations
+            locationsState.locations
               .filter((n) => n.source === 'Meteostat')
               .map((n) => n.label),
           ),
@@ -81,18 +82,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
     around—not directly in—your location. The accuracy of the results will vary.
   {/if}
 
-  {#if $locations?.some((n) => n.source === 'Open-Meteo')}
+  {#if locationsState.locations?.some((n) => n.source === 'Open-Meteo')}
     Includes weather data from <a
       href="https://open-meteo.com/"
       rel="noopener noreferrer"
       class="link"
       target="_blank">Open-Meteo</a
-    >{$locations?.length > 1 &&
-    $locations?.some((n) => n.source === 'Meteostat') &&
-    $locations?.some((n) => n.source === 'Open-Meteo')
+    >{locationsState.locations?.length > 1 &&
+    locationsState.locations?.some((n) => n.source === 'Meteostat') &&
+    locationsState.locations?.some((n) => n.source === 'Open-Meteo')
       ? ` for ${new Intl.ListFormat().format([
           ...new Set(
-            $locations
+            locationsState.locations
               .filter((n) => n.source === 'Open-Meteo')
               .map((n) => n.label),
           ),

@@ -21,8 +21,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import GettingWeatherWarnCustomWeather from '$lib/components/modals/GettingWeatherWarnCustomWeather.svelte';
   import {
     defaultWeatherSource,
-    getLocationsState,
     isCustomWeather,
+    locationsState,
     modal,
     useSecondaryWeatherSources,
     weather,
@@ -31,8 +31,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { onMount } from 'svelte';
 
   const modalStore = getModalStore();
-
-  const locationsState = getLocationsState();
 
   let warnSearchAgain = $state(false);
 
