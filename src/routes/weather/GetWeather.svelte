@@ -71,7 +71,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     url += `&hourly=temperature_2m,precipitation_probability,cloudcover,apparent_temperature,weathercode,is_day&daily=temperature_2m_max,temperature_2m_min,apparent_temperature_max,apparent_temperature_min,rain_sum,snowfall_sum,precipitation_probability_max,weathercode&current_weather=true&temperature_unit=${temperatureUnit}&windspeed_unit=${windspeedUnit}&precipitation_unit=${precipitationUnit}&timezone=auto&forecast_days=7`;
 
-    const response = await fetch(url, { signal: get(signal) });
+    const response = await fetch(url, { signal: signal.value });
 
     if (response.status === 503) {
       // Service Temporarily Unavailable

@@ -127,7 +127,7 @@ export const getOpenMeteo = async ({ location }) => {
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'auto';
   url += `&daily=temperature_2m_max,temperature_2m_min,rain_sum,snowfall_sum&timezone=${timezone}`;
 
-  const response = await fetch(url, { signal: get(signal) });
+  const response = await fetch(url, { signal: signal.value });
 
   if (response.status === 503) {
     // Service Temporarily Unavailable

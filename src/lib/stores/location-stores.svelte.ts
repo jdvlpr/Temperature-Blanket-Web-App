@@ -195,7 +195,9 @@ export const locationsState = new LocationsState();
 // }
 
 // Controller and signal for when searching for locations
-export const controller = writable(null);
-export const signal = derived(controller, ($controller) =>
-  $controller ? $controller.signal : null,
-);
+export const controller = $state({ value: null });
+
+class SignalClass {
+  value = $derived(controller.value?.signal || null);
+}
+export const signal = new SignalClass();

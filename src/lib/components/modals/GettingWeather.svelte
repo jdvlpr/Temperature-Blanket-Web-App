@@ -51,19 +51,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let error = $state(false);
 
   async function getWeatherData() {
-    $controller = new AbortController();
+    controller.value = new AbortController();
     weatherUngrouped.data = null;
     $activeWeatherElementIndex = 0;
     await fetchData()
       .then(() => {
-        $controller = null;
+        controller.value = null;
         $isCustomWeather = false;
         $wasWeatherLoadedFromLocalStorage = false;
         modalStore.close();
         goToProjectSection(2);
       })
       .catch((e) => {
-        $controller = null;
+        controller.value = null;
         weatherUngrouped.data = null;
         $isCustomWeather = false;
         $wasWeatherLoadedFromLocalStorage = false;
@@ -124,7 +124,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               body: JSON.stringify({
                 location,
               }),
-              signal: $signal,
+              signal: signal.value,
             });
 
             let data = await response.json();
@@ -183,7 +183,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <ModalShell {parent} size="small">
   <div class="flex flex-col items-center text-center w-full">
-    {#if $signal && !error}
+    {#if signal.value && !error}
       <Spinner />
 
       <p class="font-bold text-xl my-4">Searching for Weather Data</p>
