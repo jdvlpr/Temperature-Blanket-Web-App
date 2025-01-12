@@ -16,7 +16,7 @@
 import pdfGauges from '$lib/pdf/sections/gauges';
 import pdfWeatherData from '$lib/pdf/sections/weather-data.svelte';
 import {
-  activePreview,
+  preview,
   allGaugesAttributes,
   createdGauges,
   locationsState,
@@ -186,7 +186,7 @@ export const sendToProjectGallery = async (img) => {
     yarn_details: JSON.stringify(yarnDetails),
     weather_grouping: weatherGrouping.value,
     weather_sources: JSON.stringify(getWeatherSourceDetails()),
-    wp_tag_id: get(activePreview).wpTagId,
+    wp_tag_id: preview.current.wpTagId,
   };
   let message = '';
   try {

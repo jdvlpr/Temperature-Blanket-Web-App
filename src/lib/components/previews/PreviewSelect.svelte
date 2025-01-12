@@ -14,10 +14,10 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import { activePreview, activeTheme } from '$lib/stores';
+  import { browser } from '$app/environment';
+  import { activeTheme, preview } from '$lib/stores';
   import { onDestroy, onMount } from 'svelte';
   import { previews } from './previews';
-  import { browser } from '$app/environment';
 
   onMount(() => {
     window
@@ -33,15 +33,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 
   function handleColorSchemeChange() {
-    theme = getTheme($activeTheme);
+    theme = getTheme(activeTheme.value);
   }
 
-  let activePreviewSelectId = $activePreview.id;
-
-  $: theme = getTheme($activeTheme);
-
-  $: if ($activePreview.id !== activePreviewSelectId)
-    activePreviewSelectId = $activePreview.id;
+  let activePreviewSelectId = $state(preview.current.id);
 
   function getTheme(_theme) {
     if (_theme.id !== 'system') return _theme.id;
@@ -49,6 +44,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
       return 'dark';
     return 'light';
   }
+  let theme = $derived(getTheme(activeTheme.value));
+
+  $effect(() => {
+    if (preview.current.id !== activePreviewSelectId)
+      activePreviewSelectId = preview.current.id;
+  });
 </script>
 
 <div class="bg-surface-300-600-token rounded-container-token my-2 mb-4 p-2">
@@ -58,8 +59,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
         class="select w-fit"
         id="select-pattern-type"
         value={activePreviewSelectId}
-        on:change={(e) => {
-          activePreview.setId(e.target.value);
+        onchange={(e) => {
+          preview.setId(e.target.value);
         }}
       >
         {#each previews as { name, id }}
@@ -77,14 +78,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {#key theme}
           <button
             class="flex flex-col p-4 rounded-container-token justify-center gap-2 items-center snap-center {id ===
-            $activePreview.id
+            preview.current.id
               ? ''
               : 'bg-surface-hover-token'}"
-            class:bg-primary-300-600-token={id === $activePreview.id}
-            class:selected={id === $activePreview.id}
-            class:shadow={id === $activePreview.id}
-            on:click={() => {
-              activePreview.setId(id);
+            class:bg-primary-300-600-token={id === preview.current.id}
+            class:selected={id === preview.current.id}
+            class:shadow={id === preview.current.id}
+            onclick={() => {
+              preview.setId(id);
             }}
             title="Preview {name} Design"
           >
@@ -92,7 +93,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               src={img[theme]}
               alt={name}
               class="size-[48px] opacity-40"
-              class:!opacity-100={id === $activePreview.id}
+              class:!opacity-100={id === preview.current.id}
             />
           </button>
         {/key}

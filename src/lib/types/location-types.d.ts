@@ -15,7 +15,7 @@
 
 import type { WeatherSource } from './weather-types';
 
-export interface Location {
+export interface LocationType {
   uuid?: string;
   index?: number;
   /** Are the dates and fetched location data valid? */
@@ -37,4 +37,23 @@ export interface Location {
   source?: WeatherSource;
   wasLoadedFromSavedProject?: boolean;
   isValid?: boolean;
+}
+
+export interface LocationStateType {
+  isValid: boolean;
+  #fromDate: Date | null;
+  #toDate: Date | null;
+  days: number;
+  #today: Date;
+  daysInFuture: number;
+  errorMessage: string;
+}
+
+export interface LocationsStateType {
+  locations: LocationStateType[];
+  totalDays: number;
+  allValid: boolean;
+  urlHash: string;
+  projectFileName: string;
+  projectTitle: string | undefined | null;
 }

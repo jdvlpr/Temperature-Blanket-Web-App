@@ -256,7 +256,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   );
   // Update the weather chart when the sidebar is closed or opened
   $effect(() => {
-    $showNavigationSideBar;
+    showNavigationSideBar.value;
     forceUpdateShowChart();
   });
 

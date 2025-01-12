@@ -15,7 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script context="module">
   import { CHARACTERS_FOR_URL_HASH } from '$lib/constants';
-  import { activePreview } from '$lib/stores';
+  import { preview } from '$lib/stores';
   import { capitalizeFirstLetter, pluralize } from '$lib/utils';
   import chroma from 'chroma-js';
   import { derived, writable } from 'svelte/store';
@@ -119,7 +119,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     // Update the settings and active preview
     settings.set(_settings);
-    activePreview.setId(id);
+    preview.setId(id);
   };
 </script>
 

@@ -15,7 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import Tooltip from '$lib/components/Tooltip.svelte';
-  import { ICONS, MAXIMUM_DAYS_PER_LOCATION, MONTHS } from '$lib/constants';
+  import { ICONS, MONTHS } from '$lib/constants';
   import {
     defaultWeatherSource,
     isCustomWeather,
@@ -24,21 +24,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
     useSecondaryWeatherSources,
     weatherUngrouped,
   } from '$lib/stores';
+  import type { LocationType } from '$lib/types/location-types';
   import {
     dateToISO8601String,
     displayGeoNamesErrorMessage,
-    getToday,
-    numberOfDays,
     pluralize,
     yearFrom,
   } from '$lib/utils';
   import autocomplete from 'autocompleter';
   import { onMount } from 'svelte';
-  import type { Location } from '$lib/types/location-types';
   import '../../css/flag-icons.css';
 
   interface Props {
-    location: Location;
+    location: LocationType;
     index: number;
   }
 

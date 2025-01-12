@@ -15,7 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script context="module">
   import { CHARACTERS_FOR_URL_HASH } from '$lib/constants';
-  import { activePreview } from '$lib/stores';
+  import { preview } from '$lib/stores';
   import chroma from 'chroma-js';
   import { derived, writable } from 'svelte/store';
 
@@ -75,7 +75,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       hash.substring(separatorIndex[1] + 1, endIndex[0]),
     ).hex();
     settings.set(_settings);
-    activePreview.setId(id);
+    preview.setId(id);
   };
 </script>
 

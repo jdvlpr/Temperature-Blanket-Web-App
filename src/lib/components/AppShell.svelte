@@ -32,12 +32,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
    */
 
   /** @type {Props} */
-  let {
-    pageName = 'Menu',
-    stickyHeader,
-    main,
-    footer
-  } = $props();
+  let { pageName = 'Menu', stickyHeader, main, footer } = $props();
 
   const drawerStore = getDrawerStore();
 </script>
@@ -104,10 +99,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     >
       <button
         class="btn bg-surface-hover-token mx-2 lg:flex justify-center hidden mt-2"
-        title={`${$showNavigationSideBar ? 'Hide' : 'Show'} Sidebar`}
-        onclick={() => ($showNavigationSideBar = !$showNavigationSideBar)}
+        title={`${showNavigationSideBar.value ? 'Hide' : 'Show'} Sidebar`}
+        onclick={() =>
+          (showNavigationSideBar.value = !showNavigationSideBar.value)}
       >
-        {#if $showNavigationSideBar}
+        {#if showNavigationSideBar.value}
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="24"
@@ -144,7 +140,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           >
         {/if}
       </button>
-      {#if $showNavigationSideBar}
+      {#if showNavigationSideBar.value}
         <div
           class="hidden lg:flex flex-col w-fit"
           transition:slide={{ axis: 'x' }}

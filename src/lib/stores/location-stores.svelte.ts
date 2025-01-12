@@ -17,32 +17,18 @@ import {
   CHARACTERS_FOR_URL_HASH,
   MAXIMUM_DAYS_PER_LOCATION,
 } from '$lib/constants';
-import type { Location, WeatherSource } from '$lib/types';
+import type {
+  LocationType,
+  LocationStateType,
+  WeatherSource,
+  LocationsStateType,
+} from '$lib/types';
 import { getLocationTitle, getToday, numberOfDays } from '$lib/utils';
 import { derived, writable, type Writable } from 'svelte/store';
 import { weatherUngrouped } from './weather-state.svelte';
 import { getContext, setContext } from 'svelte';
 
-function createLocationsStore() {
-  const { subscribe, set, update } = writable([{ index: 0 }]);
-
-  return {
-    subscribe,
-    clearAutocompleteData: (index) =>
-      update((locations) => {
-        delete locations[index].id;
-        delete locations[index].lat;
-        delete locations[index].lng;
-        return locations;
-      }),
-    set: (value) => set(value),
-    update,
-  };
-}
-
-export const locations: Writable<Location[]> = createLocationsStore();
-
-class LocationClass implements Location {
+export class LocationClass implements LocationType {
   uuid: string = $state();
   index: number = $state();
   valid?: boolean = $state();
@@ -59,7 +45,7 @@ class LocationClass implements Location {
   source?: WeatherSource = $state();
   wasLoadedFromSavedProject?: boolean = $state();
 }
-export class LocationState extends LocationClass {
+export class LocationState extends LocationClass implements LocationStateType {
   constructor() {
     super();
     this.uuid = crypto.randomUUID();
@@ -101,7 +87,7 @@ export class LocationState extends LocationClass {
   });
 }
 
-export class LocationsState {
+export class LocationsState implements LocationsStateType {
   locations = $state([]);
 
   constructor() {
@@ -162,10 +148,10 @@ export class LocationsState {
       } else {
         // Otherwise, the duration is custom
         // and the To date should be formatted as 'YYYYMMDD'
-        to = location?.to?.replace(/-/g, '') || '';
+        to = location.to?.replace(/-/g, '') || '';
       }
 
-      content += location?.id + CHARACTERS_FOR_URL_HASH.separator + from + to;
+      content += location.id + CHARACTERS_FOR_URL_HASH.separator + from + to;
     });
 
     return content;
@@ -199,19 +185,15 @@ export class LocationsState {
 
 export const locationsState = new LocationsState();
 
-const LOCATIONS_KEY = Symbol('LOCATIONS');
+// const LOCATIONS_KEY = Symbol('LOCATIONS');
 
-export function setLocationsState() {
-  return setContext(LOCATIONS_KEY, new LocationsState());
-}
+// export function setLocationsState() {
+//   return setContext(LOCATIONS_KEY, new LocationsState());
+// }
 
-export function getLocationsState() {
-  return getContext<ReturnType<typeof setLocationsState>>(LOCATIONS_KEY);
-}
-
-export const gettingLocationWeather = writable('Searching...');
-
-export const gettingLocationWeatherIndex = writable(0);
+// export function getLocationsState() {
+//   return getContext<ReturnType<typeof setLocationsState>>(LOCATIONS_KEY);
+// }
 
 // Controller and signal for when searching for locations
 export const controller = writable(null);

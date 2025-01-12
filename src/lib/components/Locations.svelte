@@ -56,7 +56,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       Loaded project and {#if $isCustomWeather}custom weather{:else}weather{/if}
       data
     </p>
-  {:else if $wasProjectLoadedFromURL}
+  {:else if wasProjectLoadedFromURL.value}
     <p
       class="text-sm flex flex-wrap gap-1 items-center justify-center w-full text-center"
     >

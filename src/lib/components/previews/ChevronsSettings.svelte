@@ -15,7 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script context="module">
   import { LOADED_APP_VERSION, CHARACTERS_FOR_URL_HASH } from '$lib/constants';
-  import { activePreview } from '$lib/stores';
+  import { preview } from '$lib/stores';
   import { derived, writable } from 'svelte/store';
 
   const id = 'chev';
@@ -62,7 +62,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         (_settings.chevronSideLength / 2) * Math.sqrt(2),
       ); // Version 1.747 changed chevronWidth to the length of each side of the chevron
     settings.set(_settings);
-    activePreview.setId(id);
+    preview.setId(id);
   };
 </script>
 

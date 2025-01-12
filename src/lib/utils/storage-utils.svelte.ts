@@ -51,7 +51,7 @@ export const setupLocalStorageTheme = () => {
   window
     .matchMedia('(prefers-color-scheme: dark)')
     .addEventListener('change', () => {
-      if (get(theme) === 'system') setTheme('system');
+      if (theme.value === 'system') setTheme('system');
     });
 
   skeletonTheme.subscribe((id) => {
@@ -161,7 +161,7 @@ export const setTheme = (value) => {
   } else {
     document.documentElement.classList.remove('dark');
   }
-  theme.set(value);
+  theme.value = value;
 };
 
 export const setLocalStorageLayout = () => {

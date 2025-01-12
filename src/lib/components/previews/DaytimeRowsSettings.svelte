@@ -15,7 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script context="module">
   import {
-    activePreview,
+    preview,
     locationsState,
     weatherGrouping,
     weatherItemHeading,
@@ -98,7 +98,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     }
 
     settings.set(_settings);
-    activePreview.setId(id);
+    preview.setId(id);
   };
 </script>
 

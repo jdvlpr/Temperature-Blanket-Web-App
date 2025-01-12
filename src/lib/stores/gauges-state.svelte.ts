@@ -210,11 +210,4 @@ export const initialLayout: PageLayout = browser
       : 'grid'
   : 'list';
 
-class LayoutClass {
-  value: PageLayout = $state(initialLayout);
-  constructor(value: PageLayout) {
-    this.value = value;
-  }
-}
-
-export const layout = new LayoutClass(initialLayout);
+export const layout: { value: PageLayout } = $state({ value: initialLayout });

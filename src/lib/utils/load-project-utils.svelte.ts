@@ -176,8 +176,7 @@ const parseLocationURLHash = async (hashString) => {
 
     if (_locations.length - 1 < i) {
       // There needs to be another location, so create it
-      _locations = [..._locations, { index: i }];
-      locationsState.locations = _locations;
+      locationsState.add();
     }
 
     _locations[i].label = 'Loading...';

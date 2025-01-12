@@ -18,7 +18,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import PreviewSelect from '$lib/components/previews/PreviewSelect.svelte';
   import WeatherDetails from '$lib/components/WeatherDetails.svelte';
   import {
-    activePreview,
+    preview,
     drawerState,
     locationsState,
     modal,
@@ -32,10 +32,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <PreviewSelect />
 
-{#key $activePreview.id}
+{#key preview.current.id}
   <div class="flex flex-col gap-2 justify-center items-start">
     <div class="flex w-full flex-col gap-4 justify-center items-center">
-      <svelte:component this={$activePreview.preview} />
+      <svelte:component this={preview.current.preview} />
       <Drawer.Root bind:open={drawerState.weatherDetails}>
         <Drawer.Portal>
           <Drawer.Overlay class="fixed inset-0 bg-black/40 z-40" />
@@ -59,7 +59,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
 
     <div class="flex w-full flex-wrap items-end justify-center gap-4">
-      <svelte:component this={$activePreview.settings} />
+      <svelte:component this={preview.current.settings} />
     </div>
 
     <div
@@ -70,9 +70,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
         title="Download PNG"
         on:click={() => {
           downloadPreviewPNG(
-            $activePreview.width,
-            $activePreview.height,
-            $activePreview.svg,
+            preview.current.width,
+            preview.current.height,
+            preview.current.svg,
           );
         }}
         ><svg

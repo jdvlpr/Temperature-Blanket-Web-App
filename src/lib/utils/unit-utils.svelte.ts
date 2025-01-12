@@ -84,7 +84,7 @@ export const setUnitsFromNavigator = () => {
   const language = window.navigator.language;
   if (exists(language)) {
     const letters = language.slice(-2).toUpperCase();
-    windowLanguage.set(letters);
+    windowLanguage.value = letters;
     // Set imperial for United States, Myenmar, and Liberia
     if (letters === 'US' || letters === 'MY') {
       units.value = 'imperial';

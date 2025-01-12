@@ -60,9 +60,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   const toastStore = getToastStore();
 
-  modal.state = getModalStore() || false;
-
   privacy.init();
+
+  modal.state = getModalStore() || false;
 
   onMount(async () => {
     setupLocalStorageTheme();
@@ -131,7 +131,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     networkChangeCount++;
   }
   $effect(() => {
-    online.current, onChangeIsOnline();
+    online.current;
+    onChangeIsOnline();
   });
 </script>
 
@@ -159,7 +160,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   <meta name="theme-color" content="#f5f5f5" />
 
-  {#if $consentToMSClarityCookies && PUBLIC_MICROSOFT_CLARITY_ID}
+  {#if consentToMSClarityCookies.value && PUBLIC_MICROSOFT_CLARITY_ID}
     <script type="text/javascript" async id="clarity-script">
       (function (c, l, a, r, i, t, y) {
         c[a] =

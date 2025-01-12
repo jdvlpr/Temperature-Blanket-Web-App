@@ -25,7 +25,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ChooseWeatherSource from '$lib/components/modals/ChooseWeatherSource.svelte';
   import KeyboardShortcuts from '$lib/components/modals/KeyboardShortcuts.svelte';
   import {
-    activePreview,
+    preview,
     defaultWeatherSource,
     isCustomWeather,
     isProjectSaved,
@@ -271,14 +271,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
             maxWidth="50px"
             label="Always display all sections"
             details="Keep the Location, Weather, Colors, and Preview sections visible on the same page."
-            bind:checked={$pinAllSections}
+            bind:checked={pinAllSections.value}
             onchange={() => {
-              $pageSections.forEach((section) => {
-                section.pinned = $pinAllSections;
-                section.active = $pinAllSections;
+              pageSections.items.forEach((section) => {
+                section.pinned = pinAllSections.value;
+                section.active = pinAllSections.value;
               });
-              if (!$pinAllSections) $pageSections[1].active = true;
-              $pageSections = $pageSections;
+              if (!pinAllSections.value) pageSections.items[1].active = true;
+              pageSections.items = pageSections.items;
             }}
           />
         </div>
@@ -400,7 +400,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/if}
 
   {#if pages.download}
-    {@const SvelteComponent = $activePreview.preview}
+    {@const SvelteComponent = preview.current.preview}
     <div>
       <h2 class="my-2 text-lg font-bold">Download</h2>
       <div class="flex flex-col gap-2 items-start text-left">
@@ -450,9 +450,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           title="Download PNG File"
           onclick={() => {
             downloadPreviewPNG(
-              $activePreview.width,
-              $activePreview.height,
-              $activePreview.svg,
+              preview.current.width,
+              preview.current.height,
+              preview.current.svg,
             );
           }}
         >

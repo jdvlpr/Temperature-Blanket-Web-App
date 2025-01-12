@@ -15,7 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script context="module">
   import { CHARACTERS_FOR_URL_HASH } from '$lib/constants';
-  import { activePreview, weather } from '$lib/stores';
+  import { preview, weather } from '$lib/stores';
   import { derived, writable } from 'svelte/store';
 
   const id = 'crnr';
@@ -65,7 +65,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     _settings.dimensions = _settings.dimensions.replace('×', 'x'); // sometimes firefox formated this as multiplcation sign
 
     settings.set(_settings);
-    activePreview.setId(id);
+    preview.setId(id);
   };
 </script>
 

@@ -234,7 +234,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let missingDataMerged = $derived(getMissingDataMerged(missingData));
 
   $effect(() => {
-    $showNavigationSideBar;
+    showNavigationSideBar.value;
     forceUpdateShowWeatherChart();
   });
 

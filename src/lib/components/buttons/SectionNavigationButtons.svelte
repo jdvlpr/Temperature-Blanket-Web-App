@@ -26,11 +26,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let { thisSectionIndex = 1 } = $props();
 
   let previousSectionIndex = thisSectionIndex > 1 ? thisSectionIndex - 1 : null;
-  let previousSectionTitle = $pageSections.find(
+  let previousSectionTitle = pageSections.items.find(
     (section) => section.index === previousSectionIndex,
   )?.title;
   let nextSectionIndex = thisSectionIndex < 4 ? thisSectionIndex + 1 : null;
-  let nextSectionTitle = $pageSections.find(
+  let nextSectionTitle = pageSections.items.find(
     (section) => section.index === nextSectionIndex,
   )?.title;
 </script>

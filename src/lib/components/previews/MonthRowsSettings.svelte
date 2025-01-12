@@ -15,7 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script context="module">
   import { CHARACTERS_FOR_URL_HASH } from '$lib/constants';
-  import { activePreview } from '$lib/stores';
+  import { preview } from '$lib/stores';
   import {
     capitalizeFirstLetter,
     getMiddleValueOfArray,
@@ -103,7 +103,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       : _settings.borderColor;
 
     settings.set(_settings);
-    activePreview.setId(id);
+    preview.setId(id);
   };
 </script>
 

@@ -120,7 +120,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     await checkForProjectInLocalStorage();
 
-    $wasProjectLoadedFromURL = true;
+    wasProjectLoadedFromURL.value = true;
   }
 
   $effect(() => {
@@ -388,7 +388,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <div
         id="page-section-location"
         class="scroll-mt-[58px]"
-        class:hidden={$pageSections[1].active === false}
+        class:hidden={pageSections.items[1].active === false}
       >
         <div class="lg:rounded-container-token overflow-hidden lg:mb-4">
           <div
@@ -497,7 +497,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <Locations />
           {/snippet}
         </Card>
-        {#if !$pinAllSections && weather.data}
+        {#if !pinAllSections.value && weather.data}
           <SectionNavigationButtons thisSectionIndex={1} />
         {/if}
       </div>
@@ -507,7 +507,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           id="page-section-weather-data"
           class="lg:my-4 scroll-mt-[58px] w-full"
           in:fade
-          class:hidden={$pageSections[2].active === false}
+          class:hidden={pageSections.items[2].active === false}
         >
           <Card>
             {#snippet header()}
@@ -519,7 +519,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               </div>
             {/snippet}
           </Card>
-          {#if !$pinAllSections && weather.data}
+          {#if !pinAllSections.value && weather.data}
             <SectionNavigationButtons thisSectionIndex={2} />
           {/if}
         </div>
@@ -528,7 +528,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           id="page-section-gauges"
           class="lg:my-4 scroll-mt-[58px] w-full"
           in:fade
-          class:hidden={$pageSections[3].active === false}
+          class:hidden={pageSections.items[3].active === false}
         >
           <Card>
             {#snippet header()}
@@ -539,7 +539,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <Gauges />
             {/snippet}
           </Card>
-          {#if !$pinAllSections && weather.data}
+          {#if !pinAllSections.value && weather.data}
             <SectionNavigationButtons thisSectionIndex={3} />
           {/if}
           <p class="max-lg:mx-2 text-center text-sm my-4">
@@ -547,7 +547,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             trademarked yarn or colorway details are owned by their respective
             companies.
           </p>
-          {#if $pinAllSections && weather.data}
+          {#if pinAllSections.value && weather.data}
             <div class="flex-grow border-t border-surface-300-600-token"></div>
           {/if}
         </div>
@@ -556,7 +556,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           id="page-section-preview"
           in:fade
           class="lg:my-4 scroll-mt-[58px] w-full"
-          class:hidden={$pageSections[4].active === false}
+          class:hidden={pageSections.items[4].active === false}
         >
           <Card>
             {#snippet header()}
@@ -581,7 +581,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               </div>
             {/snippet}
           </Card>
-          {#if !$pinAllSections && weather.data}
+          {#if !pinAllSections.value && weather.data}
             <SectionNavigationButtons thisSectionIndex={4} />
           {/if}
           <p class="text-sm max-lg:mx-2 text-center my-4">

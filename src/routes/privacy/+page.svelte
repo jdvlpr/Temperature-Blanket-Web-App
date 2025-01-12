@@ -79,12 +79,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
               label="Analytics"
               onchange={() => {
                 let thisEvent;
-                if ($consentToMSClarityCookies)
+                if (consentToMSClarityCookies.value)
                   thisEvent = new CustomEvent('consentToMSClarity');
                 else thisEvent = new CustomEvent('removeConsentToMSClarity');
                 window.dispatchEvent(thisEvent);
               }}
-              bind:checked={$consentToMSClarityCookies}
+              bind:checked={consentToMSClarityCookies.value}
             />
           </div>
           <p>

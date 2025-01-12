@@ -81,7 +81,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <script>
-  import { activeTheme, theme, themes } from '$lib/stores';
+  import { THEMES } from '$lib/constants';
+  import { activeTheme, theme } from '$lib/stores';
   import { setTheme } from '$lib/utils';
   import {
     ListBox,
@@ -116,14 +117,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
     title="Change Theme [t]"
     use:popup={popupTheme}
   >
-    {#key $theme}
+    {#key theme.value}
       {#if showText}
         <span class="flex items-center">
-          <span class="pr-2">{@html $activeTheme.icon}</span>
+          <span class="pr-2">{@html activeTheme.value.icon}</span>
           Theme
         </span>
       {:else}
-        <span>{@html $activeTheme.icon}</span>
+        <span>{@html activeTheme.value.icon}</span>
       {/if}
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -159,9 +160,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   >
     <div class="flex flex-col gap-2">
       <RadioGroup class="flex wrap gap-y-2" active="bg-secondary-active-token">
-        {#each $themes as { name, id, icon, description }}
+        {#each THEMES as { name, id, icon, description }}
           <RadioItem
-            bind:group={$theme}
+            bind:group={theme.value}
             on:click={() => setTheme(id)}
             name="theme-{id}"
             value={id}

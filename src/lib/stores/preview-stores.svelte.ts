@@ -25,6 +25,7 @@ import { hash as rowsHash } from '$lib/components/previews/RowsSettings.svelte';
 import { hash as smsqHash } from '$lib/components/previews/SplitMonthSquaresSettings.svelte';
 import { hash as sqrsHash } from '$lib/components/previews/SquaresSettings.svelte';
 import { weather } from '$lib/stores';
+import type { Preview } from '$lib/types';
 import { derived, get, writable } from 'svelte/store';
 
 export const previewWeatherTargets = writable([]);
@@ -47,12 +48,26 @@ function createActivePreviewStore() {
     set: (value) => set(value),
   };
 }
-export const activePreview = createActivePreviewStore();
+
+class ActivePreviewClass {
+  rowsIndex = previews.findIndex((n) => n.id === 'rows'); // default preview is "rows"
+  current: Preview = $state(previews[this.rowsIndex]);
+  setId(id) {
+    previews
+      .filter((n) => n.id !== id)
+      .forEach((n) => {
+        n.svg = null;
+      });
+
+    this.current = previews.find((preview) => preview.id === id);
+  }
+}
+export const preview = new ActivePreviewClass();
 
 class PreviewURLHashClass {
   value = $derived.by(() => {
     if (!weather.data) return ''; // Is this necessary?
-    switch (get(activePreview).id) {
+    switch (preview.current.id) {
       case 'chev':
         return get(chevHash);
       case 'clnr':

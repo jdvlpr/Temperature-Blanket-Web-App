@@ -16,23 +16,31 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script>
   import { pageSections } from '$lib/stores';
 
-  export let title = '';
-  export let sectionIndex = 0;
+  /**
+   * @typedef {Object} Props
+   * @property {string} [title]
+   * @property {number} [sectionIndex]
+   * @property {import('svelte').Snippet} [description]
+   */
 
-  $: pinned = $pageSections.find(
-    (section) => section.index === sectionIndex,
-  )?.pinned;
+  /** @type {Props} */
+  let { title = '', sectionIndex = 0, description } = $props();
+
+  let pinned = $derived(
+    pageSections.items.find((section) => section.index === sectionIndex)
+      ?.pinned,
+  );
 </script>
 
 <div data-pinned={pinned}></div>
-{#if title || $$slots.description}
+{#if title || description}
   <div class="bg-surface-200-700-token text-token p-4">
     {#if title}
       <p class="font-bold text-lg">{title}</p>
     {/if}
-    {#if $$slots.description}
+    {#if description}
       <div>
-        <slot name="description" />
+        {@render description?.()}
       </div>
     {/if}
   </div>

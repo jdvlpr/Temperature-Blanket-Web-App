@@ -18,8 +18,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     activeWeatherElementIndex,
     controller,
     defaultWeatherSource,
-    gettingLocationWeather,
-    gettingLocationWeatherIndex,
     isCustomWeather,
     locationsState,
     signal,
@@ -42,6 +40,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   const modalStore = getModalStore();
 
   let container: HTMLDivElement;
+
+  let title = $state('Searching...');
+  let currentIndex = $state(0);
 
   $effect(() => {
     getWeatherData();
@@ -80,8 +81,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     ) {
       let location = locationsState.locations[thisLocation];
 
-      $gettingLocationWeather = location.label;
-      $gettingLocationWeatherIndex = thisLocation;
+      title = location.label;
+      currentIndex = thisLocation;
       // Setup Weather Data Object
 
       if (!location.elevation) {
@@ -188,19 +189,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <p class="font-bold text-xl my-4">Searching for Weather Data</p>
 
       <p class="mb-4 flex flex-col items-center">
-        <span> {@html $gettingLocationWeather}</span>
+        <span> {title}</span>
 
         {#if locationsState.locations.length > 1}
           <span class="flex flex-col items-center mt-2 w-full gap-1">
             <progress
-              value={$gettingLocationWeatherIndex + 1}
+              value={currentIndex + 1}
               max={locationsState.locations.length}
             ></progress>
             <span class="text-xs">
               {Math.round(
-                (($gettingLocationWeatherIndex + 1) /
-                  locationsState.locations.length) *
-                  100,
+                ((currentIndex + 1) / locationsState.locations.length) * 100,
               )}%
             </span>
           </span>

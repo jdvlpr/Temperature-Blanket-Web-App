@@ -29,7 +29,7 @@ export const goToProjectSection = async (index) => {
   }
 
   await setSections(index).then(() => {
-    const activeSection = get(pageSections).find(
+    const activeSection = pageSections.items.find(
       (section) => section.active === true && section.index === index,
     );
 
@@ -49,10 +49,9 @@ export const goToProjectSection = async (index) => {
 };
 
 const setSections = async (index) => {
-  let _sections = get(pageSections);
   const currentScrollTop = document.documentElement.scrollTop;
 
-  _sections.forEach((section, i) => {
+  pageSections.items.forEach((section, i, sections) => {
     if (section.active === true) {
       section.scrollTop = currentScrollTop;
     }
@@ -60,16 +59,14 @@ const setSections = async (index) => {
     const isPinned = section.pinned === true;
     if (
       !isPinned &&
-      _sections[i].active &&
-      _sections.filter((section) => section.active).length > 1
+      section.active &&
+      sections.filter((section) => section.active).length > 1
     ) {
-      _sections[i].active = false;
+      section.active = false;
     } else {
-      _sections[i].active = isActive || isPinned;
+      section.active = isActive || isPinned;
     }
   });
-
-  pageSections.set(_sections);
 };
 
 const checkUndoRedo = (ev, style, shift) => {
@@ -174,7 +171,7 @@ export const handleKeyDown = (ev) => {
 
 // Function to toggle between light, dark, and system themes
 const toggleTheme = () => {
-  switch (get(theme)) {
+  switch (theme.value) {
     case 'light':
       setTheme('dark');
       break;

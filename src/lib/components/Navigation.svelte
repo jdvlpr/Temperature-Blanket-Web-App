@@ -23,7 +23,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   class="sticky bottom-0 flex justify-center z-10 gap-2 w-full bg-surface-100-800-token backdrop-blur-md"
 >
   <div class="flex justify-around w-full">
-    {#each $pageSections as { title, icon, index, active, pinned, tooltipText }}
+    {#each pageSections.items as { title, icon, index, active, pinned, tooltipText }}
       {#if index !== 0}
         <div class="flex-1">
           <Tooltip

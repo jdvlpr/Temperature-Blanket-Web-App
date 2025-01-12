@@ -42,7 +42,7 @@ export const privacy = {
     // Event listener for when consent is given to Microsoft Clarity
     // If consent is given, it sets the `consentToMSClarityCookies` store to true
     window.addEventListener('consentToMSClarity', () => {
-      consentToMSClarityCookies.set(true);
+      consentToMSClarityCookies.value = true;
     });
 
     window.addEventListener('removeConsentToMSClarity', () => {
@@ -55,7 +55,7 @@ export const privacy = {
       privacy.delete_cookie('_clck', '/', domain);
       privacy.delete_cookie('_clsk', '/', domain);
 
-      consentToMSClarityCookies.set(false);
+      consentToMSClarityCookies.value = false;
     });
 
     window.addEventListener('analyticsUnableToLoad', () => {
@@ -126,7 +126,7 @@ export const privacy = {
         });
       }
     } else {
-      consentToMSClarityCookies.set(true);
+      consentToMSClarityCookies.value = true;
     }
   },
 };
