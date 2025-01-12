@@ -23,6 +23,16 @@ export const entries: ChangelogItem[] = [
     notes: [
       {
         icon: ICONS.checkCircle,
+        text: `85 colorways`,
+        title: 'Added Yarn: Fiddlesticks - Superb 8',
+      },
+    ],
+    version: '4.13.0',
+  },
+  {
+    notes: [
+      {
+        icon: ICONS.checkCircle,
         text: `57 colorways`,
         title: 'Added Yarn: 4 Seasons - Marvel 8 Ply',
       },
