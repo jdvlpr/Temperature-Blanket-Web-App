@@ -13,11 +13,15 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { CHARACTERS_FOR_URL_HASH } from '$lib/constants';
+import {
+  CHARACTERS_FOR_URL_HASH,
+  MAXIMUM_DAYS_PER_LOCATION,
+} from '$lib/constants';
 import type { Location, WeatherSource } from '$lib/types';
-import { getLocationTitle, numberOfDays } from '$lib/utils';
+import { getLocationTitle, getToday, numberOfDays } from '$lib/utils';
 import { derived, writable, type Writable } from 'svelte/store';
 import { weatherUngrouped } from './weather-state.svelte';
+import { getContext, setContext } from 'svelte';
 
 function createLocationsStore() {
   const { subscribe, set, update } = writable([{ index: 0 }]);
@@ -35,47 +39,82 @@ function createLocationsStore() {
     update,
   };
 }
+
 export const locations: Writable<Location[]> = createLocationsStore();
 
-export class LocationClass implements Location {
-  uuid: string;
-  index: number;
-  valid?: boolean;
-  duration?: 'c' | 'y';
-  from?: string;
-  to?: string;
-  label?: string;
-  result?: string;
-  id?: number;
-  lat?: string;
-  lng?: string;
-  elevation?: number;
-  stations?: null | any[];
-  source?: WeatherSource;
-  wasLoadedFromSavedProject?: boolean;
-
+class LocationClass implements Location {
+  uuid: string = $state();
+  index: number = $state();
+  valid?: boolean = $state();
+  duration?: 'c' | 'y' = $state();
+  from?: string = $state();
+  to?: string = $state();
+  label?: string = $state();
+  result?: string = $state();
+  id?: number = $state();
+  lat?: string = $state();
+  lng?: string = $state();
+  elevation?: number = $state();
+  stations?: null | any[] = $state();
+  source?: WeatherSource = $state();
+  wasLoadedFromSavedProject?: boolean = $state();
+}
+export class LocationState extends LocationClass {
   constructor() {
+    super();
     this.uuid = crypto.randomUUID();
   }
+
+  isValid = $derived(!!this.id);
+
+  #fromDate = $derived.by(() => {
+    if (!this.from) return null;
+    return new Date(this.from.replace(/-/g, '/'));
+  });
+
+  #toDate = $derived.by(() => {
+    if (!this.to) return null;
+    return new Date(this.to.replace(/-/g, '/'));
+  });
+
+  days = $derived(numberOfDays(this.#fromDate, this.#toDate));
+
+  #today = getToday();
+
+  daysInFuture = $derived.by(() => {
+    if (this.#toDate >= this.#today)
+      return numberOfDays(this.#today, this.#toDate);
+    else return 0;
+  });
+
+  errorMessage = $derived.by(() => {
+    if (this.#fromDate >= this.#today)
+      return 'The starting date must be at least one day in the past.';
+
+    if (this.days > MAXIMUM_DAYS_PER_LOCATION)
+      return `Please select a maximum of ${MAXIMUM_DAYS_PER_LOCATION} days. You've selected ${this.days} days.`;
+
+    if (this.days < 1)
+      return `It looks like the selected end date comes before the selected start date. Please select an end date which comes after the start date.`;
+
+    return '';
+  });
 }
 
 export class LocationsState {
-  locations = $state<Location[]>([]);
+  locations = $state([]);
 
   constructor() {
-    const location = new LocationClass();
-    location.index = 0;
-    this.locations = [{ ...location }];
+    const location = new LocationState();
+    location.index = this.locations.length;
+    this.locations.push(location);
   }
 
   add(): void {
     if (weatherUngrouped.data) weatherUngrouped.data = null;
-    const newLocation = new LocationClass();
+    const newLocation = new LocationState();
     newLocation.index = this.locations.length;
-    console.log(this.locations.length);
-    console.log({ ...newLocation });
-
-    this.locations.push({ ...newLocation });
+    this.locations.push(newLocation);
   }
 
   remove(uuid: string) {
@@ -101,9 +140,9 @@ export class LocationsState {
     return sum;
   });
 
-  allValid = $derived.by(() => {
-    return this.locations.every((location) => location.valid === true);
-  });
+  allValid = $derived(
+    this.locations.every((location) => location.isValid === true),
+  );
 
   urlHash = $derived.by(() => {
     // Every location must be valid
@@ -160,15 +199,15 @@ export class LocationsState {
 
 export const locationsState = new LocationsState();
 
-// const LOCATIONS_KEY = Symbol('LOCATIONS');
+const LOCATIONS_KEY = Symbol('LOCATIONS');
 
-// export function setLocationsState() {
-//   return setContext(LOCATIONS_KEY, new LocationsState());
-// }
+export function setLocationsState() {
+  return setContext(LOCATIONS_KEY, new LocationsState());
+}
 
-// export function getLocationsState() {
-//   return getContext<ReturnType<typeof setLocationsState>>(LOCATIONS_KEY);
-// }
+export function getLocationsState() {
+  return getContext<ReturnType<typeof setLocationsState>>(LOCATIONS_KEY);
+}
 
 export const gettingLocationWeather = writable('Searching...');
 

@@ -36,4 +36,5 @@ export interface Location {
   stations?: null | any[]; // TODO: Change 'any[]' to a more specific type if possible. Stations are set when using Meteostat for a weather source.
   source?: WeatherSource;
   wasLoadedFromSavedProject?: boolean;
+  isValid?: boolean;
 }

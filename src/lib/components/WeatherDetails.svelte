@@ -51,7 +51,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let dayWeather = $derived(data[$activeWeatherElementIndex]);
   let dayLocation = $derived(
-    locationsState?.filter(
+    locationsState.locations.filter(
       (location) => location.index === dayWeather?.location,
     )[0],
   );

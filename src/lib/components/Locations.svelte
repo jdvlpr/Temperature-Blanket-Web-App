@@ -34,8 +34,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { pluralize } from '$lib/utils';
   import { slide } from 'svelte/transition';
   import SearchForWeather from './buttons/SearchForWeather.svelte';
-
-  $inspect(locationsState.locations);
 </script>
 
 <div class="mt-4 max-w-screen-md mx-auto">
@@ -132,11 +130,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     class:hidden={!!$isCustomWeather}
     class="divide-y divide-solid divide-surface-300 dark:divide-surface-600"
   >
-    {#each locationsState.locations as location}
-      {@const index = locationsState.locations
-        .map((i) => i.uuid)
-        .indexOf(location.uuid)}
-      <Location bind:location={locationsState.locations[index]} />
+    {#each locationsState.locations, index}
+      <Location location={locationsState.locations[index]} {index} />
     {/each}
   </div>
 

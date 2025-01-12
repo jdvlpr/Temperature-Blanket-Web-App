@@ -34,94 +34,52 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '$lib/utils';
   import autocomplete from 'autocompleter';
   import { onMount } from 'svelte';
+  import type { Location } from '$lib/types/location-types';
   import '../../css/flag-icons.css';
 
-  let { location = $bindable() } = $props(); // Default index in locationsState.locations
+  interface Props {
+    location: Location;
+    index: number;
+  }
+
+  let { location, index }: Props = $props(); // Default index in locationsState.locations
 
   const years = createYears();
 
-  let inputLocation: HTMLInputElement, inputStart, inputEnd; // Bindings to elements
-  let locationGroup;
+  let inputLocation: HTMLInputElement = $state();
+  let inputStart: HTMLInputElement = $state();
+  let inputEnd: HTMLInputElement = $state();
+  let locationGroup: HTMLElement;
+
   let year = $state(getLastYear());
   let month = $state(1);
   let day = $state(1);
 
   let searching = $state(false); // Are the autocomplete results fetching?
-  let showReset = $state(false); // Should the clear input button appear?
   let hasLoaded = $state(false); // If the location was loaded from a saved project, then this gets set to true. It gets checked so that the initial setup function doesn't run again.
 
-  let thisIndex = $derived(
-    locationsState.locations.map((i) => i.uuid).indexOf(location?.uuid),
-  );
+  // $effect(() => {
+  // location.valid = $derived(!datesErrorMessage);
+  // });
 
-  let datesDetails = $derived.by(() => {
-    if (!location) return { isValid: false };
-    if (!location.from || !location.to) return { isValid: false };
-    const from = new Date(location.from.replace(/-/g, '/'));
-    const to = new Date(location.to.replace(/-/g, '/'));
-    const today = getToday();
+  let showReset = $derived(
+    (!searching && inputLocation?.value?.length > 1) ||
+      (!searching && location?.label),
+  ); // Should the clear input button appear?
 
-    if (!from || !to) return { isValid: false };
-    if (from >= today)
-      return {
-        isValid: false,
-        message: 'The starting date must be at least one day in the past.',
-      };
-
-    let daysInFuture = null;
-    if (to >= today) daysInFuture = numberOfDays(today, to);
-
-    let length = numberOfDays(from, to);
-
-    if (length > MAXIMUM_DAYS_PER_LOCATION)
-      return {
-        isValid: false,
-        length,
-        daysInFuture,
-        message: `Please select a maximum of ${MAXIMUM_DAYS_PER_LOCATION} days. You've selected ${length} days.`,
-      };
-    if (length < 1)
-      return {
-        isValid: false,
-        length,
-        daysInFuture,
-        message: `It looks like the selected end date comes before the selected start date. Please select an end date which comes after the start date.`,
-      };
-    return {
-      isValid: true,
-      length,
-      daysInFuture,
-    };
+  onMount(() => {
+    if (!location?.from && !location?.to) setDates({});
   });
 
-  let validId = $state(false);
-  let validDates = $derived(datesDetails.isValid);
-
-  // Is Valid Location ID and Dates
-  let valid = $derived(validId && validDates);
-
-  $effect(() => {
-    location.valid = valid;
-  });
-
-  $effect(() => {
-    if (inputLocation) {
-      showReset =
-        (!searching && inputLocation.value?.length > 1) ||
-        (!searching && location?.label);
-      if (!location?.from && !location?.to) setDates({});
-    }
-  });
-
-  let hasError = $derived(
-    !validId && !location?.id && location?.label && !$isProjectLoading,
+  let showLocationErrorLabel = $derived(
+    !location?.id && location?.label && !$isProjectLoading,
   );
 
   let days = $derived(getDays(month, year));
 
   let datesMustBeHistorical = $derived(
     $defaultWeatherSource === 'Open-Meteo' &&
-      datesDetails?.daysInFuture >= 1 &&
+      location.daysInFuture >= 1 &&
       !$useSecondaryWeatherSources,
   );
 
@@ -132,11 +90,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   // If the location was loaded from a saved project, then this gets run to setup initial variables.
   // 'hasLoaded' gets checked so that the initial setup function doesn't run again. This is important because otherwise it would get called on every keystroke.
   // NOTE: This is a bit of a hack, but it works.
-  // TODO: Find a better way to do this. putting it in onMount is too early, I believe
   $effect(() => {
     if (location?.wasLoadedFromSavedProject && !hasLoaded) {
-      validId = true;
-      location.valid = true;
+      // location.valid = true;
       location.duration = location?.duration || 'c';
 
       if (location?.from) {
@@ -221,7 +177,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
         location.lat = item?.lat;
         location.lng = item?.lng;
         location.elevation = null;
-        validId = true;
       },
     });
   }); // End of onMount
@@ -246,11 +201,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
       searching = false;
     }
 
-    if (!location?.id) {
-      validId = false;
-      return;
-    }
-
     if (inputLocation.value?.length < 2) {
       invalidate();
       return;
@@ -259,18 +209,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   // Listen for backspace keypress, in which case invalidate the location
   function validateKeyup(e) {
-    if (!e) {
-      validId = true;
-      return;
-    }
-
     if (e.key === 'Backspace') {
       invalidate();
     }
   }
 
   function invalidate() {
-    validId = false;
     delete location.id;
     delete location.lat;
     delete location.lng;
@@ -303,8 +247,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     location.from = from;
     location.to = to;
-
-    if (location?.id) validId = true;
   }
 
   // Get's the date of yesterday to set the max date
@@ -384,7 +326,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             >
               {@html ICONS.trash}
               <p>
-                Remove Location {thisIndex + 1}
+                Remove Location {index + 1}
               </p>
             </button>
           </div>
@@ -395,10 +337,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <div class="grid grid-cols-1 gap-4">
     <div class="flex flex-col w-full text-left gap-1">
       <p>
-        {#if hasError}
+        {#if showLocationErrorLabel}
           <span class="text-error-800-100-token">Choose a result</span>
         {:else if locationsState.locations.length > 1 && location?.label}
-          Location {locationsState.locations.length > 1 ? thisIndex + 1 : ''}
+          Location {locationsState.locations.length > 1 ? index + 1 : ''}
         {:else}
           Search for a city, region, or landmark
         {/if}
@@ -471,7 +413,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
               location.lat = '';
               location.lng = '';
               location.result = '';
-              validId = false;
               if (document.querySelector('.autocomplete'))
                 document.querySelector('.autocomplete').remove();
             }}
@@ -604,12 +545,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
 
     <div class="w-full flex flex-col gap-2 justify-center items-center">
-      {#if datesDetails.isValid && datesDetails?.length}
+      {#if !location.errorMessage && location.days}
         <p class="italic text-sm">
-          {datesDetails?.length}
-          {pluralize('Day', datesDetails?.length)}
+          {location.days}
+          {pluralize('Day', location.days)}
         </p>
-        {#if datesDetails.daysInFuture}
+        {#if location.daysInFuture}
           <p
             class="text-sm variant-ghost-warning text-token rounded-container-token p-2 w-full my-2"
           >
@@ -626,13 +567,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
             {#if !datesMustBeHistorical}
               For best results, don't include future dates.
             {/if}
-            {datesDetails.daysInFuture} of these days
+            {location.daysInFuture} of these days
             {pluralize(
               {
                 singular: 'is',
                 plural: 'are',
               },
-              datesDetails.daysInFuture,
+              location.daysInFuture,
             )}
             not in the past and won't have weather data.
             {#if datesMustBeHistorical}
@@ -640,7 +581,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             {/if}
           </p>
         {/if}
-      {:else if datesDetails.message}
+      {:else if location.errorMessage}
         <p
           class="variant-ghost-error text-token rounded-container-token p-2 text-sm w-full my-2"
         >
@@ -658,7 +599,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"
             />
           </svg>
-          {datesDetails.message}
+          {location.errorMessage}
         </p>
       {:else if $isProjectLoading}
         <p class="italic text-sm">...</p>
