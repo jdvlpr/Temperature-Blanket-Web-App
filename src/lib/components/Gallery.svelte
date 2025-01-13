@@ -42,7 +42,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ToTopButton from '$lib/components/buttons/ToTopButton.svelte';
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
   import ViewToggle from '$lib/components/buttons/ViewToggle.svelte';
-  import { previews } from '$lib/components/previews/previews';
+  import { previews } from '$lib/components/previews/previews.svelte';
   import { ICONS } from '$lib/constants';
   import { layout } from '$lib/state';
   import {

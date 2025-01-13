@@ -35,7 +35,7 @@ import SplitMonthSquaresSettings from './SplitMonthSquaresSettings.svelte';
 import SquaresPreview from './SquaresPreview.svelte';
 import SquaresSettings from './SquaresSettings.svelte';
 
-export const previews: Preview[] = [
+export const previews: Preview[] = $state([
   {
     name: 'Calendar',
     id: 'clnr',
@@ -148,8 +148,8 @@ export const previews: Preview[] = [
     height: null,
     svg: null,
     img: {
-      light: './images/preview_icons/Rows.png',
-      dark: './images/preview_icons/Rows White.png',
+      light: './images/preview_icons/rows_black.png',
+      dark: './images/preview_icons/rows_white.png',
     },
     wpTagId: 2,
     wpTagSlug: 'rows',
@@ -186,4 +186,4 @@ export const previews: Preview[] = [
     preview: SquaresPreview,
     settings: SquaresSettings,
   },
-];
+]);

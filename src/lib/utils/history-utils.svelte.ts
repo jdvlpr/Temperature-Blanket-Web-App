@@ -21,7 +21,6 @@ import { load as loadCrnr } from '$lib/components/previews/CornerToCornerSetting
 import { load as loadTsun } from '$lib/components/previews/DaytimeRowsSettings.svelte';
 import { load as loadMrws } from '$lib/components/previews/MonthRowsSettings.svelte';
 import { load as loadMsqs } from '$lib/components/previews/MonthSquaresSettings.svelte';
-import { load as loadRows } from '$lib/components/previews/RowsSettings.svelte';
 import { load as loadSmsq } from '$lib/components/previews/SplitMonthSquaresSettings.svelte';
 import { load as loadSqrs } from '$lib/components/previews/SquaresSettings.svelte';
 import { ICONS } from '$lib/constants';
@@ -41,6 +40,7 @@ import {
   weatherGrouping,
   weatherMonthGroupingStartDay,
 } from '$lib/state';
+import { rowsPreview } from '$lib/state/previews/rows-preview-state.svelte';
 import {
   exists,
   getProjectParametersFromURLHash,
@@ -135,7 +135,7 @@ export const loadFromHistory = ({ action }: { action: 'Undo' | 'Redo' }) => {
       !exists(oldParams.rows) ||
       oldParams.rows.value !== newParams.rows.value
     ) {
-      loadRows(newParams.rows.value);
+      rowsPreview.load(newParams.rows.value);
       message = 'Preview';
     }
   } else if (exists(newParams.rsun)) {

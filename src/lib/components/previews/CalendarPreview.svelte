@@ -33,7 +33,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     weatherMonthsData,
   } from '$lib/utils';
   import { settings } from './CalendarSettings.svelte';
-  import { previews } from './previews';
+  import { previews } from './previews.svelte';
 
   const previewIndex = previews.findIndex((n) => n.id === 'clnr');
   const SQUARE_SECTION_SIZE = 10;

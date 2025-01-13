@@ -21,7 +21,6 @@ import { load as loadCrnr } from '$lib/components/previews/CornerToCornerSetting
 import { load as loadTsun } from '$lib/components/previews/DaytimeRowsSettings.svelte';
 import { load as loadMrws } from '$lib/components/previews/MonthRowsSettings.svelte';
 import { load as loadMsqs } from '$lib/components/previews/MonthSquaresSettings.svelte';
-import { load as loadRows } from '$lib/components/previews/RowsSettings.svelte';
 import { load as loadSmsq } from '$lib/components/previews/SplitMonthSquaresSettings.svelte';
 import { load as loadSqrs } from '$lib/components/previews/SquaresSettings.svelte';
 import {
@@ -40,6 +39,7 @@ import {
   weatherGrouping,
   weatherMonthGroupingStartDay,
 } from '$lib/state';
+import { rowsPreview } from '$lib/state/previews/rows-preview-state.svelte';
 import type { GaugeSettingsType } from '$lib/types';
 import {
   celsiusToFahrenheit,
@@ -79,7 +79,7 @@ export const setProjectSettings = async (
   });
 
   // Load Preview
-  if (exists(params.rows)) loadRows(params.rows.value);
+  if (exists(params.rows)) rowsPreview.load(params.rows.value);
   else if (exists(params.rsun)) loadTsun(params.rsun.value);
   else if (exists(params.chev)) loadChev(params.chev.value);
   else if (exists(params.cosq)) loadCosq(params.cosq.value);

@@ -27,7 +27,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     showPreviewImageWeatherDetails,
   } from '$lib/utils';
   import { settings } from './CornerToCornerSettings.svelte';
-  import { previews } from './previews';
+  import { previews } from './previews.svelte';
 
   let svg;
   const previewIndex = previews.findIndex((n) => n.id === 'crnr');

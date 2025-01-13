@@ -28,7 +28,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     getWeatherTargets,
     showPreviewImageWeatherDetails,
   } from '$lib/utils';
-  import { previews } from './previews';
+  import { previews } from './previews.svelte';
   import { details, settings } from './SquaresSettings.svelte';
 
   const previewIndex = previews.findIndex((n) => n.id === 'sqrs');

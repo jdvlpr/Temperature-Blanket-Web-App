@@ -20,13 +20,13 @@ import { hash as crnrHash } from '$lib/components/previews/CornerToCornerSetting
 import { hash as rsunHash } from '$lib/components/previews/DaytimeRowsSettings.svelte';
 import { hash as mrwsHash } from '$lib/components/previews/MonthRowsSettings.svelte';
 import { hash as msqsHash } from '$lib/components/previews/MonthSquaresSettings.svelte';
-import { previews } from '$lib/components/previews/previews';
-import { hash as rowsHash } from '$lib/components/previews/RowsSettings.svelte';
+import { previews } from '$lib/components/previews/previews.svelte';
 import { hash as smsqHash } from '$lib/components/previews/SplitMonthSquaresSettings.svelte';
 import { hash as sqrsHash } from '$lib/components/previews/SquaresSettings.svelte';
 import { weather } from '$lib/state';
 import type { Preview } from '$lib/types';
-import { get, writable } from 'svelte/store';
+import { get } from 'svelte/store';
+import { RowsPreviewClass } from './previews/rows-preview-state.svelte';
 
 export const previewWeatherTargets = $state({ value: [] });
 
@@ -44,6 +44,25 @@ class ActivePreviewClass {
   }
 }
 export const preview = new ActivePreviewClass();
+
+class PreviewsState {
+  previews = $state([]);
+
+  activeId = $state();
+
+  active = $derived(this.previews.find((n) => n.id === this.activeId));
+
+  hash = $derived(this.active?.hash || '');
+
+  add(preview) {
+    this.previews.push(preview);
+    console.log(preview.id);
+
+    this.activeId = preview.id;
+  }
+}
+
+export const previewsState = new PreviewsState();
 
 class PreviewURLHashClass {
   value = $derived.by(() => {
@@ -63,8 +82,8 @@ class PreviewURLHashClass {
         return get(mrwsHash);
       case 'msqs':
         return get(msqsHash);
-      case 'rows':
-        return get(rowsHash);
+      // case 'rows':
+      //   return get(rowsHash);
       case 'rsun':
         return get(rsunHash);
       case 'sqrs':

@@ -19,7 +19,7 @@ import {
   defaultWeatherSource,
   gaugesState,
   locationsState,
-  previewURLHash,
+  previewsState,
   units,
   useSecondaryWeatherSources,
   weatherGrouping,
@@ -32,7 +32,7 @@ class liveProjectURLHashClass {
     let hash = '';
     hash += locationsState.urlHash;
     hash += gaugesState.urlHash;
-    hash += previewURLHash.value;
+    hash += previewsState.hash;
     if (defaultWeatherSource.value === 'Meteostat') hash += '&s=0';
     else if (defaultWeatherSource.value === 'Open-Meteo') hash += '&s=1';
     if (!fromStore(useSecondaryWeatherSources).current) hash += '0';

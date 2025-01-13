@@ -14,8 +14,6 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { run } from 'svelte/legacy';
-
   import { browser } from '$app/environment';
   import LocalProjects from '$lib/components/LocalProjects.svelte';
   import ProjectDetails from '$lib/components/ProjectDetails.svelte';
@@ -25,13 +23,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ChooseWeatherSource from '$lib/components/modals/ChooseWeatherSource.svelte';
   import KeyboardShortcuts from '$lib/components/modals/KeyboardShortcuts.svelte';
   import {
-    preview,
     defaultWeatherSource,
     isCustomWeather,
     isProjectSaved,
     modal,
     pageSections,
     pinAllSections,
+    previewsState,
     projectStatus,
     weather,
   } from '$lib/state';
@@ -400,7 +398,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/if}
 
   {#if pages.download}
-    {@const SvelteComponent = preview.current.preview}
+    {@const SvelteComponent = previewsState.active.preview}
     <div>
       <h2 class="my-2 text-lg font-bold">Download</h2>
       <div class="flex flex-col gap-2 items-start text-left">
@@ -445,21 +443,23 @@ If not, see <https://www.gnu.org/licenses/>. -->
           Weather Data (CSV)</button
         >
 
-        <button
-          class="btn bg-secondary-hover-token gap-2"
-          title="Download PNG File"
-          onclick={() => {
-            downloadPreviewPNG(
-              preview.current.width,
-              preview.current.height,
-              preview.current.svg,
-            );
-          }}
-        >
-          <span class="w-[40px] m-auto"> <SvelteComponent /></span>
+        {#if SvelteComponent}
+          <button
+            class="btn bg-secondary-hover-token gap-2"
+            title="Download PNG File"
+            onclick={() => {
+              downloadPreviewPNG(
+                previewsState.active.width,
+                previewsState.active.height,
+                previewsState.active.svg,
+              );
+            }}
+          >
+            <span class="w-[40px] m-auto"> <SvelteComponent /></span>
 
-          Preview Image (PNG)
-        </button>
+            Preview Image (PNG)
+          </button>
+        {/if}
       </div>
     </div>
   {/if}

@@ -16,8 +16,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import Spinner from '$lib/components/Spinner.svelte';
   import {
-    preview,
     locationsState,
+    previewsState,
     projectGalleryLink,
     projectGalleryTitle,
   } from '$lib/state';
@@ -41,9 +41,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
       icon: 'spinner',
     };
     const imgSrc = await svgToPNG({
-      svgNode: preview.current.svg,
-      width: preview.current.width,
-      height: preview.current.height,
+      svgNode: previewsState.active.svg,
+      width: previewsState.active.width,
+      height: previewsState.active.height,
       download: false,
     });
 
@@ -87,7 +87,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <p>&#8226; Gallery pages are subject to change.</p>
         </div>
       </div>
-      {@const SvelteComponent = preview.current.preview}
+      {@const SvelteComponent = previewsState.active.preview}
       <div
         class="w-full col-span-full sm:col-span-1 max-w-[250px] m-auto pointer-events-none flex flex-col gap-2 p-4 bg-surface-50-900-token rounded-container-token mb-4"
       >

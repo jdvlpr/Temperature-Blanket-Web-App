@@ -28,7 +28,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '$lib/utils';
   import { displayNumber } from '$lib/utils/number-utils';
   import { details, settings } from './ContinuousSquareSettings.svelte';
-  import { previews } from './previews';
+  import { previews } from './previews.svelte';
 
   let svg;
   const previewIndex = previews.findIndex((n) => n.id === 'cosq');

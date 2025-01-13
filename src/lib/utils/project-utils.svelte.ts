@@ -19,7 +19,7 @@ import {
   allGaugesAttributes,
   gaugesState,
   locationsState,
-  preview,
+  previewsState,
   projectGalleryLink,
   projectGalleryTitle,
   projectStatus,
@@ -186,7 +186,7 @@ export const sendToProjectGallery = async (img) => {
     yarn_details: JSON.stringify(yarnDetails),
     weather_grouping: weatherGrouping.value,
     weather_sources: JSON.stringify(getWeatherSourceDetails()),
-    wp_tag_id: preview.current.wpTagId,
+    wp_tag_id: previewsState.active.wpTagId,
   };
   let message = '';
   try {

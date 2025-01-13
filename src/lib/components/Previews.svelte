@@ -18,24 +18,37 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import PreviewSelect from '$lib/components/previews/PreviewSelect.svelte';
   import WeatherDetails from '$lib/components/WeatherDetails.svelte';
   import {
-    preview,
     drawerState,
+    gaugesState,
     locationsState,
     modal,
+    previewsState,
     previewWeatherTargets,
     projectGalleryLink,
     projectGalleryTitle,
+    weather,
   } from '$lib/state';
+  import { rowsPreview } from '$lib/state/previews/rows-preview-state.svelte';
   import { downloadPreviewPNG } from '$lib/utils';
+  import { onMount } from 'svelte';
   import { Drawer } from 'vaul-svelte';
+
+  onMount(() => {
+    if (!previewsState.active) {
+      // add the default rows preview
+      previewsState.add(rowsPreview);
+    }
+  });
 </script>
 
-<PreviewSelect />
-
-{#key preview.current.id}
+{#if previewsState.active && weather.data}
+  <PreviewSelect />
   <div class="flex flex-col gap-2 justify-center items-start">
     <div class="flex w-full flex-col gap-4 justify-center items-center">
-      <svelte:component this={preview.current.preview} />
+      {#key gaugesState.activeGauge.colors || gaugesState.activeGauge?.ranges}
+        <previewsState.active.previewComponent />
+      {/key}
+
       <Drawer.Root bind:open={drawerState.weatherDetails}>
         <Drawer.Portal>
           <Drawer.Overlay class="fixed inset-0 bg-black/40 z-40" />
@@ -59,7 +72,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
 
     <div class="flex w-full flex-wrap items-end justify-center gap-4">
-      <svelte:component this={preview.current.settings} />
+      <previewsState.active.settingsComponent />
     </div>
 
     <div
@@ -68,11 +81,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <button
         class="btn bg-secondary-hover-token gap-1 text-token"
         title="Download PNG"
-        on:click={() => {
+        onclick={() => {
           downloadPreviewPNG(
-            preview.current.width,
-            preview.current.height,
-            preview.current.svg,
+            previewsState.active.width,
+            previewsState.active.height,
+            previewsState.active.svg,
           );
         }}
         ><svg
@@ -94,7 +107,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
       <button
         class="btn variant-ghost-primary text-token gap-2 items-center"
-        on:click={() =>
+        onclick={() =>
           modal.state.trigger({
             type: 'component',
             component: {
@@ -135,4 +148,4 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {/if}
     </div>
   </div>
-{/key}
+{/if}

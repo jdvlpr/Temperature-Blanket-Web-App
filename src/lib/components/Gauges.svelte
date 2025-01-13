@@ -23,8 +23,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     setupAvailableGauges();
   });
 
-  $inspect(gaugesState.activeGauge, gaugesState.gauges);
-
   // If an initially empty weather parameter gets some user-created data, add the available gauge to the options
   $effect(() => {
     weather.data;
@@ -53,7 +51,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         (gauge) => gauge.id === gaugesState.activeGaugeId,
       )
     )
-      gaugesState.activeGaugeId = gaugesState.gauges[0].id;
+      gaugesState.activeGaugeId = gaugesState.gauges[0]?.id;
   }
 </script>
 

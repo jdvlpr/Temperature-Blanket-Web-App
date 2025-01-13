@@ -310,19 +310,17 @@ export const getPossibleDimensions = ({ factors, currentDimensions }) => {
  *
  * @param   {String || Array}  data  String of weather param 'tavg', or array of strings of weather params '['tavg','prcp'], or array of square secondary weather params
  *
- * @return  {String || Aray}
+ * @return  {String || Array}
  */
 export const setTargets = (data) => {
   if (typeof data === 'string') {
     // If a gauge gets removed and it contains the target weather param, reset the primary weather param
-    let _target = data;
-    _target = gaugesState.gauges
+    if (data === null) return gaugesState.gauges[0].targets[0].id;
+    return gaugesState.gauges
       .map((g) => g.id)
-      .includes(getTargetParentGaugeId(_target))
-      ? _target
+      .includes(getTargetParentGaugeId(data))
+      ? data
       : null;
-    if (_target === null) _target = gaugesState.gauges[0].targets[0].id;
-    return _target;
   }
 
   if (typeof data === 'object') {
@@ -337,7 +335,7 @@ export const setTargets = (data) => {
       _targets = data.map((n) => n.targetId).flat();
     _targets = _targets.filter((n) => {
       n = getTargetParentGaugeId(n);
-      return gaugesState.gauges.map((g) => g.id).includes(n);
+      return $state.snapshot(gaugesState.gauges.map((g) => g.id).includes(n));
     });
 
     if (_targets.length === 0) {
