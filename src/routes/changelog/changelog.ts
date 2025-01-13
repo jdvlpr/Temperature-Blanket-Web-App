@@ -36,6 +36,11 @@ export const entries: ChangelogItem[] = [
         text: `41 colorways`,
         title: 'Added Yarn: Lindehobby - Velvet Lux',
       },
+      {
+        icon: ICONS.checkCircle,
+        text: `7 colorways`,
+        title: 'Added Yarn: Loops & Threads - Color Craft',
+      },
     ],
     version: '4.14.0',
   },
