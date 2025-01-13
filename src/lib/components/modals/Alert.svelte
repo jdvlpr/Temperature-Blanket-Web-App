@@ -26,5 +26,5 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <ModalShell {parent}>
-  <p class="">{@html message}</p>
+  <div class="text-center w-full inline-block">{@html message}</div>
 </ModalShell>
