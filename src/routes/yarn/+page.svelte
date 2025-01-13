@@ -51,15 +51,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import AppShell from '$lib/components/AppShell.svelte';
   import Card from '$lib/components/Card.svelte';
   import Footer from '$lib/components/Footer.svelte';
-  import Gauge from '$lib/components/Gauge.svelte';
   import Share from '$lib/components/Share.svelte';
   import YarnSources from '$lib/components/YarnSources.svelte';
-  import { layout } from '$lib/state';
   import type { Color } from '$lib/types';
   import {
     colorsToCode,
     colorsToYarnDetails,
-    setLocalStorageLayout,
     stringToColors,
     yarnDetailsToColors,
   } from '$lib/utils';
@@ -157,12 +154,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
               class="transition-opacity opacity-100 mt-4"
               class:opacity-50={!isFinishedOnMount}
             >
-              <Gauge
+              <!-- <Gauge
                 bind:colors={yarn.colors}
                 bind:numberOfColors={yarn.colors.length}
                 bind:schemeId
                 context="weatherless"
-              />
+              /> -->
             </div>
           {/snippet}
         </Card>

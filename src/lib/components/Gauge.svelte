@@ -51,7 +51,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 </script>
 
-{#if gaugesState.activeGauge.id !== 'temp' && page.route.id === '/'}
+{#if gaugesState.activeGaugeId !== 'temp'}
   <!-- If this is not the default temperature gauge and we're on the project planner page -->
   <button
     class="btn bg-secondary-hover-token justify-start gap-1 top-2 relative max-sm:mb-2"
