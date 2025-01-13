@@ -25,10 +25,9 @@ export const defaultWeatherSource: { value: WeatherSource } = $state({
 /* In the project URL hash, this is '0' for 'false' or '1' for 'true' */
 export const useSecondaryWeatherSources: Writable<boolean> = writable(true);
 
-class WeatherGroupingClass {
-  value: 'day' | 'week' = $state('day');
-}
-export let weatherGrouping = new WeatherGroupingClass();
+export const weatherGrouping: { value: 'day' | 'week' } = $state({
+  value: 'day',
+});
 
 class WeatherItemHeadingClass {
   value: 'Week of' | 'Day' = $derived(

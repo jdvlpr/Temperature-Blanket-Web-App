@@ -33,7 +33,7 @@ import {
   defaultWeatherSource,
   allGaugesAttributes,
   gaugesState,
-  history,
+  historyState,
   historyChangeMessage,
   isHistoryUpdating,
   isProjectSaved,
@@ -52,26 +52,48 @@ import {
 } from '$lib/utils';
 import { get } from 'svelte/store';
 
-export const loadFromHistory = (props) => {
-  historyChangeMessage.set('what');
-  const { action } = props;
-  const oldParams = getProjectParametersFromURLHash(liveProjectURLHash.value);
-  if (action === 'undo') history.undo();
-  if (action === 'redo') history.redo();
-  const newParams = getProjectParametersFromURLHash(get(history).current);
+export const loadFromHistory = ({ action }: { action: 'Undo' | 'Redo' }) => {
+  historyChangeMessage.value = '';
 
-  const actionVerb = action === 'undo' ? 'Undo:' : 'Redo:';
+  let oldHistoryState = historyState.current;
+  let newHistoryState;
+  if (action === 'Undo') {
+    newHistoryState = historyState.previous;
+    historyState.undo();
+  } else if (action === 'Redo') {
+    newHistoryState = historyState.next;
+    historyState.redo();
+  }
+
+  const oldParams = getProjectParametersFromURLHash(oldHistoryState);
+  const newParams = getProjectParametersFromURLHash(newHistoryState);
+
   let message = '';
+
+  // Change Weather Grouping
+  if (exists(newParams.w)) {
+    if (!exists(oldParams.w) || oldParams.w?.value !== newParams.w?.value) {
+      weatherGrouping.value = 'week';
+      weatherMonthGroupingStartDay.set(+newParams.w.value);
+      message = 'Weather Grouping set to Weekly';
+    }
+  } else {
+    if (weatherGrouping.value !== 'day') {
+      weatherGrouping.value = 'day';
+      message = 'Weather Grouping set to Daily';
+    }
+  }
+
   // Change Units
   if (exists(newParams.u)) {
     if (!exists(oldParams.u) || oldParams.u.value !== newParams.u.value) {
       if (newParams.u.value === 'i') {
         units.value = 'imperial';
-        message = 'Units';
+        message = 'Units set to Imperial';
       }
       if (newParams.u.value === 'm') {
         units.value = 'metric';
-        message = 'Units';
+        message = 'Units set to Metric';
       }
     }
   }
@@ -88,18 +110,6 @@ export const loadFromHistory = (props) => {
       if (secondaryCode === '0') useSecondaryWeatherSources.set(false);
       else if (secondaryCode === '1') useSecondaryWeatherSources.set(true);
     }
-  }
-
-  // Change Weather Grouping
-  if (exists(newParams.w)) {
-    if (!exists(oldParams.w) || oldParams.w?.value !== newParams.w?.value) {
-      weatherGrouping.value = 'week';
-      weatherMonthGroupingStartDay.set(+newParams.w.value);
-      message = 'Weather Grouping';
-    }
-  } else {
-    weatherGrouping.value = 'day';
-    message = 'Weather Grouping';
   }
 
   // Change Gauges
@@ -240,10 +250,9 @@ export const loadFromHistory = (props) => {
       message = 'Preview';
     }
   }
+
   if (message)
-    historyChangeMessage.set(
-      `<span class="flex flex-wrap items-start gap-2"><span class="">${action === 'undo' ? ICONS.arrowUturnLeft : ICONS.arrowUturnRight}</span> <span>${actionVerb} ${message}</span></span>`,
-    );
+    historyChangeMessage.value = `<span class="flex flex-wrap items-start gap-2"><span class="">${action === 'Undo' ? ICONS.arrowUturnLeft : ICONS.arrowUturnRight}</span> <span>${action}: ${message}</span></span>`;
 };
 export const updateHistory = () => {
   if (
@@ -263,29 +272,20 @@ export const updateHistory = () => {
   );
   if (!hasGauge) return;
 
-  isHistoryUpdating.set(true);
+  isHistoryUpdating.value = true;
   isProjectSaved.value = false;
-  let old = get(history).current;
 
-  // Compare from the first param ('&')
   // This excludes the location param ('l=...'); changes to the location or dates are not considered to be an undoable or redoable change
   live = live.substring(live.indexOf('&'));
-  old = old.substring(old.indexOf('&'));
 
-  // // Don't consider Weather Source setting in history changes
-  if (live.includes('&s=00')) live = live.replace('&s=00', '');
-  else if (live.includes('&s=01')) live = live.replace('&s=01', '');
-  else if (live.includes('&s=10')) live = live.replace('&s=10', '');
-  else if (live.includes('&s=11')) live = live.replace('&s=11', '');
+  if (
+    live !== historyState.current &&
+    live !== historyState.previous &&
+    live !== historyState.next
+  )
+    historyState.push(live);
 
-  if (old.includes('&s=00')) old = old.replace('&s=00', '');
-  else if (old.includes('&s=01')) old = old.replace('&s=01', '');
-  else if (old.includes('&s=10')) old = old.replace('&s=10', '');
-  else if (old.includes('&s=11')) old = old.replace('&s=11', '');
-
-  if (live !== old) history.push(live);
-
-  isHistoryUpdating.set(false);
+  isHistoryUpdating.value = false;
 };
 
 export const updateURL = () => {

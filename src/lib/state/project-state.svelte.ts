@@ -25,20 +25,20 @@ import {
   weatherGrouping,
   weatherMonthGroupingStartDay,
 } from '$lib/state';
-import { get } from 'svelte/store';
+import { fromStore } from 'svelte/store';
 
 class liveProjectURLHashClass {
   value = $derived.by(() => {
     let hash = '';
     hash += locationsState.urlHash;
-    hash += get(gaugesURLHash);
+    hash += fromStore(gaugesURLHash).current;
     hash += previewURLHash.value;
     if (defaultWeatherSource.value === 'Meteostat') hash += '&s=0';
     else if (defaultWeatherSource.value === 'Open-Meteo') hash += '&s=1';
-    if (!get(useSecondaryWeatherSources)) hash += '0';
-    else if (get(useSecondaryWeatherSources)) hash += '1';
+    if (!fromStore(useSecondaryWeatherSources).current) hash += '0';
+    else if (fromStore(useSecondaryWeatherSources).current) hash += '1';
     if (weatherGrouping.value === 'week')
-      hash += `&w=${get(weatherMonthGroupingStartDay)}`; // Set Weather Grouping to Weeks with the starting Day of Week
+      hash += `&w=${fromStore(weatherMonthGroupingStartDay).current}`; // Set Weather Grouping to Weeks with the starting Day of Week
     hash += units.value === 'metric' ? '&u=m' : '&u=i'; // Units
     return hash;
   });

@@ -137,10 +137,10 @@ export const handleKeyDown = (ev) => {
 
   if (isUndo(ev)) {
     ev.preventDefault();
-    loadFromHistory({ action: 'undo' });
+    loadFromHistory({ action: 'Undo' });
   } else if (isRedo(ev)) {
     ev.preventDefault();
-    loadFromHistory({ action: 'redo' });
+    loadFromHistory({ action: 'Redo' });
   } else if ((ev.metaKey || ev.ctrlKey) && ev.key === 's') {
     ev.preventDefault();
     modal.state.trigger({

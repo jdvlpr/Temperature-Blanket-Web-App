@@ -35,7 +35,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import {
     drawerState,
     gaugesState,
-    history,
+    historyState,
     historyChangeMessage,
     isDesktop,
     isHistoryUpdating,
@@ -74,8 +74,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   };
 
   const toastStore = getToastStore();
-
-  let dialogOpen = $state(false);
 
   onMount(async () => {
     const hasProjectURLParam = new URL(window.location.href).searchParams.has(
@@ -128,9 +126,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 
   $effect(() => {
-    if ($historyChangeMessage !== '') {
+    if (historyChangeMessage.value !== '') {
       toastStore.trigger({
-        message: $historyChangeMessage,
+        message: historyChangeMessage.value,
         background: 'bg-success-300 text-black',
       });
     }
@@ -143,7 +141,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     if (
       isProjectSaved.value ||
       !url.searchParams.has('project') ||
-      $history.length === 0
+      historyState.length === 0
     )
       return;
     event.preventDefault();
@@ -228,10 +226,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
             class="btn bg-secondary-hover-token"
             title="Undo [Cmd ⌘]+[z] or [Ctrl]+[z]"
             id="undo"
-            disabled={!weather.data || $history.first || $isHistoryUpdating}
+            disabled={!weather.data ||
+              historyState.isFirst ||
+              isHistoryUpdating.value}
             onclick={() => {
               loadFromHistory({
-                action: 'undo',
+                action: 'Undo',
               });
             }}
           >
@@ -245,10 +245,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
             class="btn bg-secondary-hover-token"
             id="redo"
             title="Redo [Cmd ⌘]+[Shift ⇧]+[z] or [Ctrl]+[Shift ⇧]+[Z]"
-            disabled={!weather.data || $history.last || $isHistoryUpdating}
+            disabled={!weather.data ||
+              historyState.isLast ||
+              isHistoryUpdating.value}
             onclick={() => {
               loadFromHistory({
-                action: 'redo',
+                action: 'Redo',
               });
             }}
           >

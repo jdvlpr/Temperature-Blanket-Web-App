@@ -22,4 +22,4 @@ export * from '$lib/state/gauges-state.svelte';
 export * from '$lib/state/page-stores.svelte';
 export * from '$lib/state/preview-stores.svelte';
 export * from '$lib/state/project-state.svelte';
-export * from '$lib/state/history-stores';
+export * from '$lib/state/history-state.svelte';
