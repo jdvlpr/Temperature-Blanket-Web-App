@@ -23,6 +23,31 @@ export const entries: ChangelogItem[] = [
     notes: [
       {
         icon: ICONS.checkCircle,
+        text: `25 colorways`,
+        title: 'Added Yarn: Gründl - Funny uni',
+      },
+      {
+        icon: ICONS.checkCircle,
+        text: `49 colorways`,
+        title: 'Added Yarn: Himalaya - Velvet',
+      },
+      {
+        icon: ICONS.checkCircle,
+        text: `41 colorways`,
+        title: 'Added Yarn: Lindehobby - Velvet Lux',
+      },
+      {
+        icon: ICONS.checkCircle,
+        text: `7 colorways`,
+        title: 'Added Yarn: Loops & Threads - Color Craft',
+      },
+    ],
+    version: '4.14.0',
+  },
+  {
+    notes: [
+      {
+        icon: ICONS.checkCircle,
         text: `85 colorways`,
         title: 'Added Yarn: Fiddlesticks - Superb 8',
       },
