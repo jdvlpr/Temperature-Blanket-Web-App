@@ -18,6 +18,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { PUBLIC_MICROSOFT_CLARITY_ID } from '$env/static/public';
   import { consentToMSClarityCookies, modal } from '$lib/state';
   import {
+    handleKeyDown,
     privacy,
     setupLocalStorageLayout,
     setupLocalStorageTheme,
@@ -135,6 +136,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     onChangeIsOnline();
   });
 </script>
+
+<svelte:window onkeydown={handleKeyDown} />
 
 <svelte:head>
   <link rel="manifest" href="/manifest.json" />

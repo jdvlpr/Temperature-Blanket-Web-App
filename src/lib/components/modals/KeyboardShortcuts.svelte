@@ -15,7 +15,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import { KEYBOARD_SHORTCUTS } from '$lib/constants';
-  import { onMount } from 'svelte';
   import ModalShell from './ModalShell.svelte';
 
   interface Props {

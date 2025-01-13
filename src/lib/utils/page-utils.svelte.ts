@@ -96,76 +96,75 @@ const isRedo = (ev, style) => {
 
 export const handleKeyDown = (ev) => {
   // Only handle keyboard shortcuts on the main Project Planner page
-  const isProjectPlannerRoute = page.route.id === '/';
 
   const modalStore = get(modal.state);
 
   if (
-    !isProjectPlannerRoute ||
     modalStore[0] ||
     ev.target.tagName === 'INPUT' ||
     ev.target.tagName === 'TD'
   )
     return;
 
-  // Check for global shortcuts
-  switch (ev.key) {
-    case 'k':
-      modal.state.trigger({
-        type: 'component',
-        component: { ref: KeyboardShortcuts },
-      });
-      break;
-    case '.':
-      modal.state.trigger({
-        type: 'component',
-        component: { ref: Menu, props: { page: 'main' } },
-      });
-      break;
-    case 'u':
-      units.toggle();
-      break;
-    case 't':
-      toggleTheme();
-      break;
-    default:
-      break;
-  }
+  const routeId = page.route.id;
 
-  // Check for weather-related shortcuts if weather data exists
-  if (!weather.data) return;
+  if (ev.key === 't') toggleTheme();
 
-  if (isUndo(ev)) {
-    ev.preventDefault();
-    loadFromHistory({ action: 'Undo' });
-  } else if (isRedo(ev)) {
-    ev.preventDefault();
-    loadFromHistory({ action: 'Redo' });
-  } else if ((ev.metaKey || ev.ctrlKey) && ev.key === 's') {
-    ev.preventDefault();
-    modal.state.trigger({
-      type: 'component',
-      component: { ref: Menu, props: { page: 'save' } },
-    });
-  }
+  // Shortcuts only for the main Project Planner page
+  if (routeId === '/') {
+    // Check for global shortcuts
+    switch (ev.key) {
+      case 'k':
+        modal.state.trigger({
+          type: 'component',
+          component: { ref: KeyboardShortcuts },
+        });
+        break;
+      case '.':
+        modal.state.trigger({
+          type: 'component',
+          component: { ref: Menu, props: { page: 'main' } },
+        });
+        break;
+      case 'u':
+        units.toggle();
+        break;
+    }
 
-  // Check for section navigation shortcuts
-  switch (ev.key) {
-    case 'd':
-      modal.state.trigger({
-        type: 'component',
-        component: { ref: Menu, props: { page: 'download' } },
-      });
-      break;
-    case '0':
-    case '1':
-    case '2':
-    case '3':
-    case '4':
-      goToProjectSection(Number(ev.key));
-      break;
-    default:
-      break;
+    // Check for weather-related shortcuts if weather data exists
+    if (weather.data) {
+      if (isUndo(ev)) {
+        ev.preventDefault();
+        loadFromHistory({ action: 'Undo' });
+      } else if (isRedo(ev)) {
+        ev.preventDefault();
+        loadFromHistory({ action: 'Redo' });
+      } else if ((ev.metaKey || ev.ctrlKey) && ev.key === 's') {
+        ev.preventDefault();
+        modal.state.trigger({
+          type: 'component',
+          component: { ref: Menu, props: { page: 'save' } },
+        });
+      }
+      // Check for section navigation shortcuts
+      switch (ev.key) {
+        case 'd':
+          modal.state.trigger({
+            type: 'component',
+            component: { ref: Menu, props: { page: 'download' } },
+          });
+          break;
+        case '0':
+        case '1':
+        case '2':
+        case '3':
+        case '4':
+          goToProjectSection(Number(ev.key));
+          break;
+        default:
+          break;
+      }
+    }
   }
 };
 

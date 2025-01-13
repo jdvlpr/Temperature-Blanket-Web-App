@@ -35,8 +35,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import {
     drawerState,
     gaugesState,
-    historyState,
     historyChangeMessage,
+    historyState,
     isDesktop,
     isHistoryUpdating,
     isProjectLoading,
@@ -53,7 +53,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '$lib/state';
   import {
     checkForProjectInLocalStorage,
-    handleKeyDown,
     loadFromHistory,
     setProjectSettings,
     setUnitsFromNavigator,
@@ -61,7 +60,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     upToDate,
   } from '$lib/utils';
   import { getToastStore } from '@skeletonlabs/skeleton';
-  import { onDestroy, onMount } from 'svelte';
+  import { onMount } from 'svelte';
   import { fade } from 'svelte/transition';
   import { Drawer } from 'vaul-svelte';
 
@@ -94,15 +93,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       }
     }
 
-    // Listen for keyboard events to handle keyboard shortcuts
-    window.addEventListener('keydown', handleKeyDown, { passive: true });
-
     isProjectLoading.value = false;
-  });
-
-  onDestroy(() => {
-    if (!browser) return;
-    window.removeEventListener('keydown', handleKeyDown);
   });
 
   async function loadProjectFromURL() {
