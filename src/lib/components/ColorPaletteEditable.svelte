@@ -24,7 +24,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { modal } from '$lib/state';
   import type { Color } from '$lib/types';
   import { getTextColor } from '$lib/utils';
-  import { SOURCES, TRIGGERS, dndzone } from 'svelte-dnd-action';
+  import {
+    SOURCES,
+    TRIGGERS,
+    dndzone,
+    dragHandle,
+    dragHandleZone,
+  } from 'svelte-dnd-action';
   import { flip } from 'svelte/animate';
 
   interface Props {
@@ -169,7 +175,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <div class="flex flex-col text-left gap-y-1 w-full">
   <div
     class="w-full inline-flex h-[70px]"
-    use:dndzone={{
+    use:dragHandleZone={{
       items: sortableColors,
       flipDurationMs,
       type: typeId,
@@ -246,7 +252,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
               role="button"
               tabindex="0"
               aria-roledescription="button"
-              aria-label="drag-handle"
+              aria-label="Drag handle for color {index + 1}"
+              use:dragHandle
               class="w-fit dragicon {activeColorIndex === index &&
               !isDragging.value
                 ? ''

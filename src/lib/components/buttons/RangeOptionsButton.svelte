@@ -17,7 +17,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Tooltip from '$lib/components/Tooltip.svelte';
   import GaugeSettings from '$lib/components/modals/GaugeSettings.svelte';
   import { gaugesState, modal } from '$lib/state';
-  import type { GaugeStateInterface } from '$lib/types';
 
   function onSaveRangeOptinos(e) {
     gaugesState.activeGauge.ranges = e.ranges;

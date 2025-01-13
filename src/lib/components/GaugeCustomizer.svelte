@@ -23,7 +23,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { gaugesState, layout, modal, showDaysInRange } from '$lib/state';
   import type { Color } from '$lib/types';
   import { getTextColor } from '$lib/utils';
-  import { dndzone, SOURCES } from 'svelte-dnd-action';
+  import {
+    dndzone,
+    dragHandle,
+    dragHandleZone,
+    SOURCES,
+  } from 'svelte-dnd-action';
   import { flip } from 'svelte/animate';
 
   let dragDisabled = $state(false);
@@ -73,8 +78,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     dragDisabled = true;
     const {
       items: newItems,
-      info: { source, trigger },
+      info: { source, trigger, id },
     } = e.detail;
+
     sortableColors = newItems;
   }
 
@@ -83,6 +89,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       items: newItems,
       info: { source },
     } = e.detail;
+
     sortableColors = newItems;
 
     gaugesState.activeGauge.colors = sortableColors.map((color) => {
@@ -171,7 +178,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   'grid'
     ? 'gap-1 grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4'
     : 'flex flex-col'}"
-  use:dndzone={{
+  use:dragHandleZone={{
     items: sortableColors,
     flipDurationMs,
     type: 'gaugeCustomizer',
@@ -192,7 +199,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {#if movable}
         <button
           title="Remove Color"
-          class="btn bg-secondary-hover-token flex flex-wrap justify-center items-center order-1"
+          class="btn bg-secondary-hover-token flex flex-wrap justify-center items-center"
           onclick={() => {
             gaugesState.activeGauge.colors =
               gaugesState.activeGauge.colors.filter((_, i) => i !== index);
@@ -210,18 +217,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <button
         title="Move Color"
         tabindex="-1"
-        aria-label="drag-handle"
-        class="btn-icon bg-secondary-hover-token handle order-5 p-2 {dragDisabled
+        aria-label="Crag handle for color {index + 1}"
+        class="btn-icon bg-secondary-hover-token handle p-2 {dragDisabled
           ? 'cursor-grabbing'
           : 'cursor-grab'}"
         onmousedown={startDrag}
         ontouchstart={startDrag}
+        use:dragHandle
       >
         {@html ICONS.arrowsPointingOut}
       </button>
 
       <button
-        class="btn bg-secondary-hover-token flex items-center justify-start order-4"
+        class="btn bg-secondary-hover-token flex items-center justify-start"
         title="Choose a Color"
         onclick={() =>
           modal.state.trigger({
@@ -275,7 +283,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
       {#if affiliate_variant_href}
         <a
-          class="btn bg-secondary-hover-token flex flex-wrap justify-center items-center order-3"
+          class="btn bg-secondary-hover-token flex flex-wrap justify-center items-center"
           href={affiliate_variant_href}
           target="_blank"
           rel="noreferrer nofollow"
@@ -298,7 +306,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </a>
       {/if}
 
-      <div class="flex gap-2 order-6">
+      <div class="flex gap-2">
         {#key index}
           <ColorRange {index} />
         {/key}
@@ -306,7 +314,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
       {#if showDaysInRange.value}
         <div
-          class="flex flex-wrap w-fit justify-center items-center bg-surface-900/10 rounded-container-token shadow-inner order-7"
+          class="flex flex-wrap w-fit justify-center items-center bg-surface-900/10 rounded-container-token shadow-inner"
         >
           <DaysInRange
             range={gaugesState.activeGauge.ranges[index]}

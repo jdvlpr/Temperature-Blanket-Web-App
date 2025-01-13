@@ -46,10 +46,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let { gauge, onSave, index = null, focusOn = null, parent }: Props = $props();
 
+  console.log({ gauge });
+
   const modalStore = getModalStore();
 
   let incrementMode = $state(
-    gauge.rangeOptions.isCustomRanges ? null : gauge.rangeOptions.mode,
+    gauge.rangeOptions?.isCustomRanges ? null : gauge.rangeOptions.mode,
   );
 
   let customRanges = $state([]);
