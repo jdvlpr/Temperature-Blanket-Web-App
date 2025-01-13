@@ -16,7 +16,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script>
   import {
     activeWeatherElementIndex,
-    createdGauges,
+    gaugesState,
     projectStatus,
     units,
     weather,
@@ -40,7 +40,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   $: previews[previewIndex].height = height;
   $: previews[previewIndex].svg = svg;
 
-  $: targets = $createdGauges
+  $: targets = gaugesState.gauges
     .flatMap((n) => n.targets)
     .filter(
       (n) => $settings.rightTarget === n.id || $settings.leftTarget === n.id,

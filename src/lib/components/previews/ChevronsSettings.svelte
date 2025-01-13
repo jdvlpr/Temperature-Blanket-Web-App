@@ -14,8 +14,8 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script context="module">
-  import { LOADED_APP_VERSION, CHARACTERS_FOR_URL_HASH } from '$lib/constants';
-  import { preview } from '$lib/state';
+  import { CHARACTERS_FOR_URL_HASH, LOADED_APP_VERSION } from '$lib/constants';
+  import { gaugesState, preview } from '$lib/state';
   import { derived, writable } from 'svelte/store';
 
   const id = 'chev';
@@ -67,16 +67,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <script>
-  import { createdGauges, weatherGrouping } from '$lib/state';
+  import NumberInputButton from '$lib/components/buttons/NumberInputButton.svelte';
+  import ToggleSwitchGroup from '$lib/components/buttons/ToggleSwitchGroup.svelte';
+  import { weatherGrouping } from '$lib/state';
   import { setTargets } from '$lib/utils';
   import { capitalizeFirstLetter, upToDate } from '$lib/utils/other-utils';
   import { pluralize } from '$lib/utils/string-utils';
-  import NumberInputButton from '$lib/components/buttons/NumberInputButton.svelte';
-  import ToggleSwitchGroup from '$lib/components/buttons/ToggleSwitchGroup.svelte';
 
-  $: targets = $createdGauges.map((n) => n.targets).flat();
+  $: targets = gaugesState.gauges.map((n) => n.targets).flat();
 
-  $: if ($createdGauges)
+  $: if (gaugesState.gauges)
     $settings.selectedTargets = setTargets($settings.selectedTargets);
 </script>
 

@@ -19,7 +19,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { UNIT_LABELS } from '$lib/constants';
   import {
     activeWeatherElementIndex,
-    gaugeSettings,
     locationsState,
     units,
     weather,
@@ -162,123 +161,121 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {@html day.result}
     </p>
 
-    {#key $gaugeSettings}
-      <div class="weather-details">
-        <div class="flex flex-wrap gap-x-4 items-start justify-center my-2">
-          {#each weatherTargets as { id, label, icon, type }}
-            {@const { name, hex, index, gaugeLength, brandName, yarnName } =
-              colorInfo(id, day)}
-            {#if exists(day) && day[id][units.value] !== null}
-              {#if id === 'dayt'}
-                <WeatherItem
-                  {id}
-                  {label}
-                  {icon}
-                  value={convertTime(day[id][units.value])}
-                >
-                  {#snippet details()}
-                    <span>
-                      {#if viewGaugeInfo !== false && day[id][units.value] !== null}
-                        {#if typeof index === 'number'}
-                          <div
-                            class="my-2 rounded-container-token py-2 px-4 text-center"
-                            style={viewGaugeInfo
-                              ? `background:${hex};color:${getTextColor(hex)};`
-                              : 'display:none'}
-                          >
-                            {#if brandName && yarnName}
-                              <p class="text-xs">
-                                {brandName}
-                                -
-                                {yarnName}
-                              </p>
-                            {/if}
-                            {#if name}
-                              <p class="text-lg">
-                                {name}
-                              </p>
-                            {/if}
+    <div class="weather-details">
+      <div class="flex flex-wrap gap-x-4 items-start justify-center my-2">
+        {#each weatherTargets as { id, label, icon, type }}
+          {@const { name, hex, index, gaugeLength, brandName, yarnName } =
+            colorInfo(id, day)}
+          {#if exists(day) && day[id][units.value] !== null}
+            {#if id === 'dayt'}
+              <WeatherItem
+                {id}
+                {label}
+                {icon}
+                value={convertTime(day[id][units.value])}
+              >
+                {#snippet details()}
+                  <span>
+                    {#if viewGaugeInfo !== false && day[id][units.value] !== null}
+                      {#if typeof index === 'number'}
+                        <div
+                          class="my-2 rounded-container-token py-2 px-4 text-center"
+                          style={viewGaugeInfo
+                            ? `background:${hex};color:${getTextColor(hex)};`
+                            : 'display:none'}
+                        >
+                          {#if brandName && yarnName}
                             <p class="text-xs">
-                              Color
-                              {index + 1}
-                              of
-                              {gaugeLength}
+                              {brandName}
+                              -
+                              {yarnName}
                             </p>
-                          </div>
-                        {:else}
-                          <p
-                            class="text-sm italic my-2 py-2 px-4 border-token border-surface-400-500-token rounded-container-token"
-                          >
-                            No Color Assigned
-                          </p>
-                        {/if}
-                      {/if}
-                    </span>
-                  {/snippet}
-                </WeatherItem>
-              {:else}
-                <WeatherItem
-                  {id}
-                  {label}
-                  {icon}
-                  value={day[id][units.value]}
-                  units={UNIT_LABELS[type][units.value]}
-                  {isRecentDate}
-                >
-                  {#snippet details()}
-                    <span>
-                      {#if viewGaugeInfo !== false && day[id][units.value] !== null}
-                        {#if typeof index === 'number'}
-                          <div
-                            class="my-2 rounded-container-token py-2 px-4 text-center"
-                            style={viewGaugeInfo
-                              ? `background:${hex};color:${getTextColor(hex)};`
-                              : 'display:none'}
-                          >
-                            {#if brandName && yarnName}
-                              <p class="text-xs">
-                                {brandName}
-                                -
-                                {yarnName}
-                              </p>
-                            {/if}
-                            {#if name}
-                              <p class="text-lg">
-                                {name}
-                              </p>
-                            {/if}
-                            <p class="text-xs">
-                              Color
-                              {index + 1}
-                              of
-                              {gaugeLength}
+                          {/if}
+                          {#if name}
+                            <p class="text-lg">
+                              {name}
                             </p>
-                          </div>
-                        {:else}
-                          <p
-                            class="text-sm italic my-2 py-2 px-4 border-token border-surface-400-500-token rounded-container-token"
-                          >
-                            No Color Assigned
+                          {/if}
+                          <p class="text-xs">
+                            Color
+                            {index + 1}
+                            of
+                            {gaugeLength}
                           </p>
-                        {/if}
+                        </div>
+                      {:else}
+                        <p
+                          class="text-sm italic my-2 py-2 px-4 border-token border-surface-400-500-token rounded-container-token"
+                        >
+                          No Color Assigned
+                        </p>
                       {/if}
-                    </span>
-                  {/snippet}
-                </WeatherItem>
-              {/if}
+                    {/if}
+                  </span>
+                {/snippet}
+              </WeatherItem>
             {:else}
               <WeatherItem
                 {id}
                 {label}
                 {icon}
-                value="?"
+                value={day[id][units.value]}
                 units={UNIT_LABELS[type][units.value]}
-              />
+                {isRecentDate}
+              >
+                {#snippet details()}
+                  <span>
+                    {#if viewGaugeInfo !== false && day[id][units.value] !== null}
+                      {#if typeof index === 'number'}
+                        <div
+                          class="my-2 rounded-container-token py-2 px-4 text-center"
+                          style={viewGaugeInfo
+                            ? `background:${hex};color:${getTextColor(hex)};`
+                            : 'display:none'}
+                        >
+                          {#if brandName && yarnName}
+                            <p class="text-xs">
+                              {brandName}
+                              -
+                              {yarnName}
+                            </p>
+                          {/if}
+                          {#if name}
+                            <p class="text-lg">
+                              {name}
+                            </p>
+                          {/if}
+                          <p class="text-xs">
+                            Color
+                            {index + 1}
+                            of
+                            {gaugeLength}
+                          </p>
+                        </div>
+                      {:else}
+                        <p
+                          class="text-sm italic my-2 py-2 px-4 border-token border-surface-400-500-token rounded-container-token"
+                        >
+                          No Color Assigned
+                        </p>
+                      {/if}
+                    {/if}
+                  </span>
+                {/snippet}
+              </WeatherItem>
             {/if}
-          {/each}
-        </div>
+          {:else}
+            <WeatherItem
+              {id}
+              {label}
+              {icon}
+              value="?"
+              units={UNIT_LABELS[type][units.value]}
+            />
+          {/if}
+        {/each}
       </div>
-    {/key}
+    </div>
     <div class="my-2">
       <ToggleSwitch bind:checked={viewGaugeInfo} label={'Show Color Details'} />
     </div>

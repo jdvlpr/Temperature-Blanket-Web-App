@@ -15,11 +15,20 @@
 
 import { SCHEMES } from '$lib/constants';
 import { units, weatherGrouping } from '$lib/state';
+import type { Color, GaugeSettingsType } from '$lib/types';
 import { getDaysInRange, getDaysPercent, pluralize } from '$lib/utils';
 import chroma from 'chroma-js';
 import { get } from 'svelte/store';
 
-export const createGaugeColors = ({ schemeId, numberOfColors, colors }) => {
+export const createGaugeColors = ({
+  schemeId,
+  numberOfColors,
+  colors,
+}: {
+  schemeId: GaugeSettingsType['schemeId'];
+  numberOfColors: GaugeSettingsType['numberOfColors'];
+  colors: Color[];
+}) => {
   if (schemeId === 'Custom') {
     if (numberOfColors > colors.length) {
       const diff = numberOfColors - colors.length;

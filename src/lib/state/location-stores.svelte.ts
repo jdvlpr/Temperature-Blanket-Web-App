@@ -87,29 +87,13 @@ export class LocationState extends LocationClass implements LocationStateType {
 }
 
 export class LocationsState implements LocationsStateType {
-  locations = $state([]);
-
   constructor() {
     const location = new LocationState();
     location.index = this.locations.length;
     this.locations.push(location);
   }
 
-  add(): void {
-    if (weatherUngrouped.data) weatherUngrouped.data = null;
-    const newLocation = new LocationState();
-    newLocation.index = this.locations.length;
-    this.locations.push(newLocation);
-  }
-
-  remove(uuid: string) {
-    this.locations = this.locations.filter(
-      (location) => location.uuid !== uuid,
-    );
-    this.locations.map((location, i) => {
-      location.index = i;
-    });
-  }
+  locations = $state([]);
 
   totalDays = $derived.by(() => {
     const arrayOfDayCount = this.locations.map((n) => {
@@ -180,6 +164,22 @@ export class LocationsState implements LocationsStateType {
     let title = titles.join('; ');
     return title;
   });
+
+  add(): void {
+    if (weatherUngrouped.data) weatherUngrouped.data = null;
+    const newLocation = new LocationState();
+    newLocation.index = this.locations.length;
+    this.locations.push(newLocation);
+  }
+
+  remove(uuid: string) {
+    this.locations = this.locations.filter(
+      (location) => location.uuid !== uuid,
+    );
+    this.locations.map((location, i) => {
+      location.index = i;
+    });
+  }
 }
 
 export const locationsState = new LocationsState();

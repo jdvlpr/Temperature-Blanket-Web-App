@@ -15,7 +15,6 @@
 
 import { units, weather } from '$lib/state';
 import { displayNumber } from '$lib/utils';
-import { get } from 'svelte/store';
 
 export const getStart = (rangeOptions) => {
   if (rangeOptions?.mode === 'auto') {

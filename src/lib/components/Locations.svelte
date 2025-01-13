@@ -20,7 +20,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Tooltip from '$lib/components/Tooltip.svelte';
   import { MAXIMUM_LOCATIONS } from '$lib/constants';
   import {
-    createdGauges,
     defaultWeatherSource,
     isCustomWeather,
     isProjectLoading,
@@ -107,7 +106,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   href={`/?project=${new Date().getTime()?.toString()}&v=${version}#${liveProjectURLHash.value.substring(
                     0,
                     liveProjectURLHash.value.indexOf('l='),
-                  )}${liveProjectURLHash.value.substring(liveProjectURLHash.value.indexOf($createdGauges[0].id))}`}
+                  )}${liveProjectURLHash.value.substring(liveProjectURLHash.value.indexOf('temp'))}`}
                   class="underline cursor-pointer"
                   target="_blank"
                   rel="noreferrer">open a new project</a

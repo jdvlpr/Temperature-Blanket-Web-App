@@ -86,11 +86,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
       // Setup up a new project
       // Load the default units based on window.navigator
       setUnitsFromNavigator();
-
-      // If there's no gauge yet, add the default Temperature Gauge
-      if ($gaugesState.created?.length === 0) {
-        gaugesState.addCreated('temp');
-      }
     }
 
     isProjectLoading.value = false;

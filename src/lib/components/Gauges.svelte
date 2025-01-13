@@ -14,17 +14,16 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import DaytimeGauge from '$lib/components/gauges/DaytimeGauge.svelte';
-  import RainGauge from '$lib/components/gauges/RainGauge.svelte';
-  import SnowGauge from '$lib/components/gauges/SnowGauge.svelte';
-  import TemperatureGauge from '$lib/components/gauges/TemperatureGauge.svelte';
   import { allGaugesAttributes, gaugesState, units, weather } from '$lib/state';
   import { downloadPDF } from '$lib/utils';
   import { onMount } from 'svelte';
+  import Gauge from './Gauge.svelte';
 
   onMount(() => {
     setupAvailableGauges();
   });
+
+  $inspect(gaugesState.activeGauge, gaugesState.gauges);
 
   // If an initially empty weather parameter gets some user-created data, add the available gauge to the options
   $effect(() => {
@@ -32,61 +31,61 @@ If not, see <https://www.gnu.org/licenses/>. -->
     setupAvailableGauges();
   });
 
-  let gaugesToAdd = $derived(
-    $gaugesState.available.filter(
-      (gauge) =>
-        gauge !== $gaugesState.active && !$gaugesState.created.includes(gauge),
-    ),
-  );
-
   function setupAvailableGauges() {
     allGaugesAttributes.forEach((gauge) => {
       gauge.targets.forEach((target) => {
         if (weather.data?.some((day) => day[target.id][units.value] !== null)) {
-          gaugesState.addAvailable(gauge.id);
-          $gaugesState.active ||= gauge.id;
-        } else gaugesState.removeAvailable(gauge.id);
+          // For each of the gauge's weather parameter targets, check to see if there is any data, and if so setup the default gauge
+          gaugesState.addToAvailable({
+            id: gauge.id,
+            label: gauge.label,
+          });
+        } else {
+          // Otherwise remove the gauge. Weather data may no longer be available for a certain gauge if, for example, the user changes the location
+          gaugesState.removeFromAvailable(gauge.id);
+        }
       });
     });
-  }
 
-  function getGaugeLabel(id) {
-    return allGaugesAttributes.find((gauge) => gauge.id === id)?.label;
+    // If the active gauge is no longer available, set it to the first available
+    if (
+      !gaugesState.gauges.find(
+        (gauge) => gauge.id === gaugesState.activeGaugeId,
+      )
+    )
+      gaugesState.activeGaugeId = gaugesState.gauges[0].id;
   }
 </script>
 
 <div class="inline-flex justify-center items-center gap-2 mb-2 mt-3">
-  {#key $gaugesState}
-    <label class="label">
-      <select
-        class="select w-fit"
-        id="gauges-select"
-        value={$gaugesState.active}
-        onchange={(e) => {
-          gaugesState.addCreated(e.target.value);
-        }}
-      >
-        {#each $gaugesState.created as id}
-          <option value={id} selected={$gaugesState.active === id}
-            >{getGaugeLabel(id)}</option
-          >
-        {/each}
-        {#each gaugesToAdd as id}
-          <option value={id}>New {getGaugeLabel(id)}</option>
-        {/each}
-      </select>
-    </label>
-  {/key}
+  <label class="label">
+    <select
+      class="select w-fit"
+      id="gauges-select"
+      bind:value={gaugesState.activeGaugeId}
+      onchange={(e) => {
+        const id = e.target.value;
+
+        if (!gaugesState.gauges.map((gauge) => gauge.id).includes(id)) {
+          // If the gauge is not created yet, then set it up
+          gaugesState.addById(id);
+        }
+      }}
+    >
+      {#each gaugesState.availableGauges as { id, label }}
+        <option value={id} selected={gaugesState.activeGaugeId === id}>
+          {#if !gaugesState.gauges.map((gauge) => gauge.id).includes(id)}
+            Add
+          {/if}
+          {label}
+        </option>
+      {/each}
+    </select>
+  </label>
 </div>
 
-{#if $gaugesState.active === 'temp'}
-  <TemperatureGauge />
-{:else if $gaugesState.active === 'prcp'}
-  <RainGauge />
-{:else if $gaugesState.active === 'snow'}
-  <SnowGauge />
-{:else if $gaugesState.active === 'dayt'}
-  <DaytimeGauge />
+{#if gaugesState.activeGauge}
+  <Gauge />
 {/if}
 
 <div

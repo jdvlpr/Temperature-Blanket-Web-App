@@ -270,7 +270,9 @@ const pdfWeatherData = {
       );
 
       const parentGaugeId = getTargetParentGaugeId(param);
-      const hasGauge = get(gaugesState).created.includes(parentGaugeId);
+      const hasGauge = gaugesState.gauges
+        .map((gauge) => gauge.id)
+        .includes(parentGaugeId);
 
       if (hasGauge) {
         // Color box

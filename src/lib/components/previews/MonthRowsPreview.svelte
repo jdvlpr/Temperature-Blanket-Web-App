@@ -16,7 +16,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script>
   import {
     activeWeatherElementIndex,
-    createdGauges,
+    gaugesState,
     projectStatus,
     units,
     weather,
@@ -65,7 +65,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   $: totalRows = monthsInData?.length * rowsPerMonth;
 
-  $: targets = $createdGauges
+  $: targets = gaugesState.gauges
     .flatMap((n) => n.targets)
     .filter((n) => $settings.selectedTargets.includes(n.id));
 

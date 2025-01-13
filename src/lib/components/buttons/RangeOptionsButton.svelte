@@ -13,21 +13,15 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script>
+<script lang="ts">
   import Tooltip from '$lib/components/Tooltip.svelte';
   import GaugeSettings from '$lib/components/modals/GaugeSettings.svelte';
-  import { modal } from '$lib/state';
-
-  let {
-    gaugeAttributes,
-    ranges = $bindable(),
-    colors,
-    rangeOptions = $bindable(),
-  } = $props();
+  import { gaugesState, modal } from '$lib/state';
+  import type { GaugeStateInterface } from '$lib/types';
 
   function onSaveRangeOptinos(e) {
-    ranges = e.ranges;
-    rangeOptions = e.rangeOptions;
+    gaugesState.activeGauge.ranges = e.ranges;
+    gaugesState.activeGauge.rangeOptions = e.rangeOptions;
   }
 </script>
 
@@ -41,10 +35,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       component: {
         ref: GaugeSettings,
         props: {
-          gaugeAttributes,
-          ranges,
-          colors,
-          rangeOptions,
+          gauge: $state.snapshot(gaugesState.activeGauge),
           onSave: onSaveRangeOptinos,
         },
       },

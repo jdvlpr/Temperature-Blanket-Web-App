@@ -14,11 +14,10 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script context="module" lang="ts">
-  import type { GaugeSettings } from '$lib/types';
+  import type { GaugeSettingsType } from '$lib/types';
   import chroma from 'chroma-js';
-  import { writable, type Writable } from 'svelte/store';
 
-  export const settings: Writable<GaugeSettings> = writable({
+  export const defaultGaugeSettings: GaugeSettingsType = {
     colors: chroma
       .scale('YlOrBr')
       .colors(5)
@@ -27,7 +26,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
       }),
     id: 'dayt',
     numberOfColors: 5,
-    ranges: [],
     rangeOptions: {
       auto: {
         optimization: 'ranges', // 'ranges | 'dayt'
@@ -50,7 +48,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       isCustomRanges: false,
     },
     schemeId: 'YlOrBr',
-  });
+  };
 
   export const gaugeAttributes: GaugeAttributes = {
     id: 'dayt',
@@ -82,7 +80,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script>
   import Gauge from '$lib/components/Gauge.svelte';
   import { weatherParametersData } from '$lib/state';
-  import type { GaugeAttributes } from '$lib/types/gauge-types';
+  import type { GaugeAttributes } from '$lib/types';
   import { displayNumber } from '$lib/utils';
 
   $: maxes = weatherParametersData.dayt.filter((n) => n !== null);
@@ -95,29 +93,29 @@ If not, see <https://www.gnu.org/licenses/>. -->
     ? Math.min(...mins) - 1
     : Math.floor(Math.min(...mins));
 
-  $: $settings.rangeOptions.auto.increment = displayNumber(
-    (max - min) / $settings.colors.length,
+  $: $defaultGaugeSettings.rangeOptions.auto.increment = displayNumber(
+    (max - min) / $defaultGaugeSettings.colors.length,
     2,
   );
-  $: $settings.rangeOptions.auto.start.high = max;
-  $: $settings.rangeOptions.auto.start.low = min;
+  $: $defaultGaugeSettings.rangeOptions.auto.start.high = max;
+  $: $defaultGaugeSettings.rangeOptions.auto.start.low = min;
 
-  $: if ($settings.rangeOptions.manual.increment === null)
-    $settings.rangeOptions.manual.increment =
-      $settings.rangeOptions.auto.increment;
+  $: if ($defaultGaugeSettings.rangeOptions.manual.increment === null)
+    $defaultGaugeSettings.rangeOptions.manual.increment =
+      $defaultGaugeSettings.rangeOptions.auto.increment;
 
-  $: if ($settings.rangeOptions.manual.start === null)
-    $settings.rangeOptions.manual.start =
-      $settings.rangeOptions.auto.start.high;
+  $: if ($defaultGaugeSettings.rangeOptions.manual.start === null)
+    $defaultGaugeSettings.rangeOptions.manual.start =
+      $defaultGaugeSettings.rangeOptions.auto.start.high;
 
-  $: if (!$settings.ranges.length) {
+  $: if (!$defaultGaugeSettings.ranges.length) {
     let start = max;
-    let increment = $settings.rangeOptions.auto.increment;
-    if (increment * $settings.colors.length > start) {
-      $settings.colors.length = start;
-      $settings.numberOfColors = start;
+    let increment = $defaultGaugeSettings.rangeOptions.auto.increment;
+    if (increment * $defaultGaugeSettings.colors.length > start) {
+      $defaultGaugeSettings.colors.length = start;
+      $defaultGaugeSettings.numberOfColors = start;
     }
-    $settings.ranges = $settings.colors.map((n, i) => {
+    $defaultGaugeSettings.ranges = $defaultGaugeSettings.colors.map((n, i) => {
       let item = {
         from: displayNumber(start),
         to: displayNumber(start - increment),
@@ -127,12 +125,3 @@ If not, see <https://www.gnu.org/licenses/>. -->
     });
   }
 </script>
-
-<Gauge
-  bind:colors={$settings.colors}
-  bind:numberOfColors={$settings.numberOfColors}
-  bind:ranges={$settings.ranges}
-  bind:schemeId={$settings.schemeId}
-  bind:rangeOptions={$settings.rangeOptions}
-  {gaugeAttributes}
-/>

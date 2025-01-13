@@ -15,8 +15,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script context="module">
   import {
-    preview,
+    gaugesState,
     locationsState,
+    preview,
     weatherGrouping,
     weatherItemHeading,
   } from '$lib/state';
@@ -107,7 +108,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import DataTable from '$lib/components/datatable/DataTable.svelte';
   import Expand from '$lib/components/Expand.svelte';
   import { HOURS_PER_DAY } from '$lib/constants';
-  import { createdGauges, weather } from '$lib/state';
+  import { weather } from '$lib/state';
   import {
     capitalizeFirstLetter,
     dateToISO8601String,
@@ -123,7 +124,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let isExpanded = false;
   let daytimeLabel, nightLabel;
 
-  $: targets = $createdGauges.map((n) => n.targets).flat();
+  $: targets = gaugesState.gauges.map((n) => n.targets).flat();
 
   $: tableData = weather.data?.map((n, i) => {
     let left, center, right, divided;
@@ -176,7 +177,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     };
   });
 
-  $: if ($createdGauges) {
+  $: if (gaugesState.gauges) {
     $settings.daytimeTarget = setTargets($settings.daytimeTarget);
     $settings.nightTarget = setTargets($settings.nightTarget);
   }

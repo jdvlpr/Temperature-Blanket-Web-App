@@ -15,19 +15,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import GaugeSettings from '$lib/components/modals/GaugeSettings.svelte';
-  import { modal, units } from '$lib/state';
+  import { gaugesState, modal, units } from '$lib/state';
 
-  let {
-    index,
-    colors,
-    ranges = $bindable(),
-    rangeOptions = $bindable(),
-    gaugeAttributes,
-  } = $props();
+  let { index } = $props();
 
   function onSaveRangeOptinos(e) {
-    ranges = e.ranges;
-    rangeOptions = e.rangeOptions;
+    gaugesState.activeGauge.ranges = e.ranges;
+    gaugesState.activeGauge.rangeOptions = e.rangeOptions;
   }
 </script>
 
@@ -49,12 +43,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
         component: {
           ref: GaugeSettings,
           props: {
+            gauge,
             index,
             focusOn,
-            gaugeAttributes,
-            ranges,
-            colors,
-            rangeOptions,
             onSave: onSaveRangeOptinos,
           },
         },
@@ -64,16 +55,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <span class="flex flex-col text-left" id="range-{index}-from"
       ><span class="text-xs">From</span>
       <span class="flex items-start"
-        ><span class="text-lg">{ranges[index]?.from}</span>
-        <span class="text-xs">{gaugeAttributes.unit.label[units.value]}</span
+        ><span class="text-lg"
+          >{gaugesState.activeGauge.ranges[index]?.from}</span
+        >
+        <span class="text-xs"
+          >{gaugesState.activeGauge.unit.label[units.value]}</span
         ></span
       ></span
     >
     <span class="flex flex-col text-left" id="range-{index}-to"
       ><span class="text-xs">To</span>
       <span class="flex items-start"
-        ><span class="text-lg">{ranges[index]?.to}</span>
-        <span class="text-xs">{gaugeAttributes.unit.label[units.value]}</span
+        ><span class="text-lg">{gaugesState.activeGauge.ranges[index]?.to}</span
+        >
+        <span class="text-xs"
+          >{gaugesState.activeGauge.unit.label[units.value]}</span
         ></span
       ></span
     ></button

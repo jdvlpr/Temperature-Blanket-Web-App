@@ -24,10 +24,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Spinner from '$lib/components/Spinner.svelte';
   import YarnSources from '$lib/components/YarnSources.svelte';
   import ViewToggle from '$lib/components/buttons/ViewToggle.svelte';
-  import { settings as daytimeGaugeSettings } from '$lib/components/gauges/DaytimeGauge.svelte';
-  import { settings as rainGaugeSettings } from '$lib/components/gauges/RainGauge.svelte';
-  import { settings as snowGaugeSettings } from '$lib/components/gauges/SnowGauge.svelte';
-  import { gaugeSettings as temperatureGaugeSettings } from '$lib/components/gauges/TemperatureGauge.svelte';
   import { ALL_YARN_WEIGHTS, ICONS } from '$lib/constants';
   import { allGaugesAttributes, layout, locationsState } from '$lib/state';
   import {
@@ -106,41 +102,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
   function getGauges(params) {
     if (!browser) return [];
     let _gauges = [];
+
     allGaugesAttributes.forEach((gauge) => {
       if (!exists(params[gauge.id])) return;
-      switch (gauge.id) {
-        case 'temp': {
-          const settings = parseGaugeURLHash(params[gauge.id].value, {
-            ...$temperatureGaugeSettings,
-          });
-          _gauges.push(settings);
-          break;
-        }
-        case 'prcp': {
-          const settings = parseGaugeURLHash(params[gauge.id].value, {
-            ...$rainGaugeSettings,
-          });
-          _gauges.push(settings);
-          break;
-        }
-        case 'snow': {
-          const settings = parseGaugeURLHash(params[gauge.id].value, {
-            ...$snowGaugeSettings,
-          });
-          _gauges.push(settings);
-          break;
-        }
-        case 'dayt': {
-          const settings = parseGaugeURLHash(params[gauge.id].value, {
-            ...$daytimeGaugeSettings,
-          });
-          _gauges.push(settings);
-          break;
-        }
-        default:
-          break;
-      }
+      const settings = parseGaugeURLHash(params[gauge.id].value);
+      _gauges.push(settings);
     });
+
     return _gauges;
   }
   const preloadImage = (src) => {

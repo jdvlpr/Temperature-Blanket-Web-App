@@ -17,7 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { HOURS_PER_DAY } from '$lib/constants';
   import {
     activeWeatherElementIndex,
-    createdGauges,
+    gaugesState,
     projectStatus,
     units,
     weather,
@@ -44,7 +44,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   $: width = $settings.stitchesPerRow * STITCH_SIZE;
   $: height = weather.data?.length * STITCH_SIZE;
 
-  $: targets = $createdGauges
+  $: targets = gaugesState.gauges
     .map((n) => n.targets)
     .flat()
     .filter(

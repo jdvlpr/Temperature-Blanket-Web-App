@@ -18,6 +18,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     activeWeatherElementIndex,
     controller,
     defaultWeatherSource,
+    gaugesState,
     isCustomWeather,
     locationsState,
     signal,
@@ -30,6 +31,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { delay, getOpenMeteo, goToProjectSection } from '$lib/utils';
   import { getModalStore } from '@skeletonlabs/skeleton';
   import ModalShell from './ModalShell.svelte';
+  import { onMount } from 'svelte';
 
   interface Props {
     parent: any;
@@ -44,9 +46,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let title = $state('Searching...');
   let currentIndex = $state(0);
 
-  $effect(() => {
-    getWeatherData();
-  });
+  getWeatherData();
 
   let error = $state(false);
 
@@ -59,6 +59,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
         controller.value = null;
         $isCustomWeather = false;
         $wasWeatherLoadedFromLocalStorage = false;
+        // Add the default temperature gauge
+        gaugesState.addById('temp');
         modalStore.close();
         goToProjectSection(2);
       })

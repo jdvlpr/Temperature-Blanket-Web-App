@@ -17,7 +17,7 @@ import { browser, version } from '$app/environment';
 import { PROJECT_TIMESTAMP_ID } from '$lib/constants';
 import {
   defaultWeatherSource,
-  gaugesURLHash,
+  gaugesState,
   locationsState,
   previewURLHash,
   units,
@@ -31,7 +31,7 @@ class liveProjectURLHashClass {
   value = $derived.by(() => {
     let hash = '';
     hash += locationsState.urlHash;
-    hash += fromStore(gaugesURLHash).current;
+    hash += gaugesState.urlHash;
     hash += previewURLHash.value;
     if (defaultWeatherSource.value === 'Meteostat') hash += '&s=0';
     else if (defaultWeatherSource.value === 'Open-Meteo') hash += '&s=1';

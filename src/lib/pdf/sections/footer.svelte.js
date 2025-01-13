@@ -16,7 +16,7 @@
 import { PUBLIC_BASE_DOMAIN_NAME, PUBLIC_BASE_URL } from '$env/static/public';
 import { locationsState } from '$lib/state';
 import pdfConfig from '../pdf-config';
-import gauges from './gauges';
+import gauges from './gauges.svelte';
 import weatherData from './weather-data.svelte';
 
 const pdfFooter = {

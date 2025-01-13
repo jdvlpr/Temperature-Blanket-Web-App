@@ -31,7 +31,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     initializeStores,
     storePopup,
   } from '@skeletonlabs/skeleton';
-  import { onMount } from 'svelte';
+  import { onMount, type Snippet } from 'svelte';
   import {
     arrow,
     autoUpdate,
@@ -40,12 +40,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     offset,
     shift,
   } from 'svelte-floating-ui/dom';
-  import { online } from 'svelte/reactivity/window';
   import '../css/main.css';
   interface Props {
-    children?: import('svelte').Snippet;
+    children?: Snippet;
   }
-
   let { children }: Props = $props();
 
   initializeStores();
@@ -61,17 +59,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   const toastStore = getToastStore();
 
-  privacy.init();
-
-  modal.state = getModalStore() || false;
-
   onMount(async () => {
+    modal.state = getModalStore();
     setupLocalStorageTheme();
     setupLocalStorageLayout();
 
     // NOTE: Set window variable in order to access it inside the MS clarity function
     // See the script tag with id="clarity-script"
     window.MS_CLARITY_ID = PUBLIC_MICROSOFT_CLARITY_ID || null;
+    privacy.init();
   });
 
   onNavigate((navigation) => {
@@ -84,26 +80,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
       });
     });
   });
+</script>
 
-  let networkChangeCount = 0;
-
-  function onChangeIsOnline() {
-    if (online.current && networkChangeCount > 0) {
-      // Alert if online connection restored
-      toastStore.trigger({
-        message: `<div
-    class="w-full text-center p-2 m-auto flex flex-col items-start justify-center"
-  >
-    <div class="flex flex-wrap items-center justify-center gap-2">
-      <svg xmlns="http://www.w3.org/2000/svg"class="size-4" viewBox="0 0 24 24"><path fill="currentColor" d="M12 21q-1.05 0-1.775-.725T9.5 18.5t.725-1.775T12 16t1.775.725t.725 1.775t-.725 1.775T12 21m-5.65-5.65l-2.1-2.15q1.475-1.475 3.463-2.337T12 10t4.288.875t3.462 2.375l-2.1 2.1q-1.1-1.1-2.55-1.725T12 13t-3.1.625t-2.55 1.725M2.1 11.1L0 9q2.3-2.35 5.375-3.675T12 4t6.625 1.325T24 9l-2.1 2.1q-1.925-1.925-4.462-3.012T12 7T6.563 8.088T2.1 11.1"/></svg>
-     You are online
-    </div>
-  </div>`,
-        background: 'bg-success-200-700-token text-token',
-      });
-    } else if (!online.current) {
-      toastStore.trigger({
-        message: `<div
+<svelte:window
+  onkeydown={handleKeyDown}
+  onoffline={() => {
+    // Alert if offline
+    toastStore.trigger({
+      message: `<div
     class="w-full p-2 m-auto flex flex-col items-start text-left"
   >
     <div class="flex items-center justify-start gap-2">
@@ -126,18 +110,24 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
     <p class="text-sm">Some features may not work as expected.</p>
   </div>`,
-        background: 'bg-warning-200-700-token text-token',
-      });
-    }
-    networkChangeCount++;
-  }
-  $effect(() => {
-    online.current;
-    onChangeIsOnline();
-  });
-</script>
-
-<svelte:window onkeydown={handleKeyDown} />
+      background: 'bg-warning-200-700-token text-token',
+    });
+  }}
+  ononline={() => {
+    // Alert if online connection restored
+    toastStore.trigger({
+      message: `<div
+    class="w-full text-center p-2 m-auto flex flex-col items-start justify-center"
+  >
+    <div class="flex flex-wrap items-center justify-center gap-2">
+      <svg xmlns="http://www.w3.org/2000/svg"class="size-4" viewBox="0 0 24 24"><path fill="currentColor" d="M12 21q-1.05 0-1.775-.725T9.5 18.5t.725-1.775T12 16t1.775.725t.725 1.775t-.725 1.775T12 21m-5.65-5.65l-2.1-2.15q1.475-1.475 3.463-2.337T12 10t4.288.875t3.462 2.375l-2.1 2.1q-1.1-1.1-2.55-1.725T12 13t-3.1.625t-2.55 1.725M2.1 11.1L0 9q2.3-2.35 5.375-3.675T12 4t6.625 1.325T24 9l-2.1 2.1q-1.925-1.925-4.462-3.012T12 7T6.563 8.088T2.1 11.1"/></svg>
+     You are online
+    </div>
+  </div>`,
+      background: 'bg-success-200-700-token text-token',
+    });
+  }}
+/>
 
 <svelte:head>
   <link rel="manifest" href="/manifest.json" />
@@ -195,7 +185,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <Modal regionBackdrop="backdrop-blur-sm" />
 
-<p class="sm:text-center px-4 py-8 bg-warning-backdrop-token text-token">
+<p
+  class="sm:text-center px-4 py-8 bg-warning-backdrop-token text-token [view-transition-name:top-banner]"
+>
   <svg
     xmlns="http://www.w3.org/2000/svg"
     fill="none"

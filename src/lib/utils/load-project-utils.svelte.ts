@@ -14,10 +14,6 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { version } from '$app/environment';
-import { settings as daytimeGaugeSettings } from '$lib/components/gauges/DaytimeGauge.svelte';
-import { settings as rainGaugeSettings } from '$lib/components/gauges/RainGauge.svelte';
-import { settings as snowGaugeSettings } from '$lib/components/gauges/SnowGauge.svelte';
-import { gaugeSettings as temperatureGaugeSettings } from '$lib/components/gauges/TemperatureGauge.svelte';
 import { load as loadClnr } from '$lib/components/previews/CalendarSettings.svelte';
 import { load as loadChev } from '$lib/components/previews/ChevronsSettings.svelte';
 import { load as loadCosq } from '$lib/components/previews/ContinuousSquareSettings.svelte';
@@ -44,7 +40,7 @@ import {
   weatherGrouping,
   weatherMonthGroupingStartDay,
 } from '$lib/state';
-import type { GaugeSettings } from '$lib/types';
+import type { GaugeSettingsType } from '$lib/types';
 import {
   celsiusToFahrenheit,
   dateToISO8601String,
@@ -56,7 +52,6 @@ import {
   upToDate,
   yearFrom,
 } from '$lib/utils';
-import { get } from 'svelte/store';
 
 export const setProjectSettings = async (
   hash = window.location.hash.substring(1),
@@ -75,43 +70,12 @@ export const setProjectSettings = async (
   // Load Gauges
   allGaugesAttributes.forEach((gauge) => {
     if (!exists(params[gauge.id])) return;
-    switch (gauge.id) {
-      case 'temp': {
-        const settings = parseGaugeURLHash(
-          params[gauge.id].value,
-          get(temperatureGaugeSettings),
-        );
-        temperatureGaugeSettings.set(settings);
-        break;
-      }
-      case 'prcp': {
-        const settings = parseGaugeURLHash(
-          params[gauge.id].value,
-          get(rainGaugeSettings),
-        );
-        rainGaugeSettings.set(settings);
-        break;
-      }
-      case 'snow': {
-        const settings = parseGaugeURLHash(
-          params[gauge.id].value,
-          get(snowGaugeSettings),
-        );
-        snowGaugeSettings.set(settings);
-        break;
-      }
-      case 'dayt': {
-        const settings = parseGaugeURLHash(
-          params[gauge.id].value,
-          get(daytimeGaugeSettings),
-        );
-        daytimeGaugeSettings.set(settings);
-        break;
-      }
-      default:
-        break;
-    }
-    gaugesState.addCreated(gauge.id);
+    gaugesState.addById(gauge.id);
+    const settings = parseGaugeURLHash(params[gauge.id].value);
+    Object.assign(
+      gaugesState.gauges.find((g) => g.id === gauge.id),
+      settings,
+    );
   });
 
   // Load Preview
@@ -286,10 +250,7 @@ const parseLocationURLHash = async (hashString) => {
   locationsState.locations = _locations;
 };
 
-export const parseGaugeURLHash = (
-  hashString: string,
-  gaugeSettings: GaugeSettings,
-) => {
+export const parseGaugeURLHash = (hashString: string): GaugeSettingsType => {
   // Each gauge should have a '!' which separates the gauge colors from the gauge settings
   let hashStringParts;
   if (hashString.includes('!')) hashStringParts = hashString.split('!');

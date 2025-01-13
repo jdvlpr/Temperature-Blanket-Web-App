@@ -14,38 +14,17 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { page } from '$app/state';
   import ColorRange from '$lib/components/ColorRange.svelte';
   import DaysInRange from '$lib/components/DaysInRange.svelte';
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
   import ViewToggle from '$lib/components/buttons/ViewToggle.svelte';
   import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
   import { ICONS } from '$lib/constants';
-  import { layout, modal, showDaysInRange } from '$lib/state';
+  import { gaugesState, layout, modal, showDaysInRange } from '$lib/state';
   import type { Color } from '$lib/types';
   import { getTextColor } from '$lib/utils';
   import { dndzone, SOURCES } from 'svelte-dnd-action';
   import { flip } from 'svelte/animate';
-
-  interface Props {
-    gaugeAttributes: any;
-    schemeId: any;
-    numberOfColors: number;
-    ranges: any;
-    rangeOptions: any;
-    context: any;
-    colors?: Color[];
-  }
-
-  let {
-    gaugeAttributes,
-    schemeId = $bindable(),
-    numberOfColors = $bindable(),
-    ranges = $bindable(),
-    rangeOptions = $bindable(),
-    context,
-    colors = $bindable([]),
-  }: Props = $props();
 
   let dragDisabled = $state(false);
 
@@ -66,10 +45,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     variant_href,
     affiliate_variant_href,
   }) {
-    schemeId = 'Custom';
+    gaugesState.activeGauge.schemeId = 'Custom';
 
     const _colors = [];
-    colors.forEach((color, i) => {
+    gaugesState.activeGauge.colors.forEach((color, i) => {
       if (i === index) {
         _colors.push({
           hex,
@@ -84,12 +63,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
       } else {
         _colors.push(color);
       }
-      colors = _colors;
+      gaugesState.activeGauge.colors = _colors;
     });
 
     sortableColors = getSortableColors();
-
-    console.log({ colors });
   }
 
   function handleConsider(e) {
@@ -108,12 +85,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     } = e.detail;
     sortableColors = newItems;
 
-    colors = $state.snapshot(sortableColors).map((color) => {
+    gaugesState.activeGauge.colors = sortableColors.map((color) => {
       delete color.id;
       return color;
     });
 
-    schemeId = 'Custom';
+    gaugesState.activeGauge.schemeId = 'Custom';
     // Ensure dragging is stopped on drag finish via pointer (mouse, touch)
     if (source === SOURCES.POINTER) {
       dragDisabled = false;
@@ -125,15 +102,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
     dragDisabled = false;
   }
 
-  let movable = $derived(colors?.length > 1);
+  let movable = $derived(gaugesState.activeGauge.colors?.length > 1);
 
-  let hasAnyAffiliateURLs = $derived(checkForAffiliateURLs({ colors }));
+  let hasAnyAffiliateURLs = $derived(
+    checkForAffiliateURLs({ colors: gaugesState.activeGauge.colors }),
+  );
 
   let sortableColors: Color[] = $state(getSortableColors());
 
   function getSortableColors() {
     const _sortableColors = [];
-    colors.forEach((color, i) => {
+    gaugesState.activeGauge.colors.forEach((color, i) => {
       _sortableColors.push({ ...color, id: i });
     });
     return _sortableColors;
@@ -145,17 +124,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   //     return color;
   //   });
   // });
-
-  /**
-   * Checks if the variable $showDaysInRange is of type boolean.
-   * If it is not a boolean, it assigns the value true to $showDaysInRange.
-   * I don't know why sometimes the value of $showDaysInRange is not a boolean.
-   */
-  $effect(() => {
-    if (typeof $showDaysInRange !== 'boolean') {
-      $showDaysInRange = true;
-    }
-  });
 </script>
 
 {#if hasAnyAffiliateURLs}
@@ -180,24 +148,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </p>
 {/if}
 
-<div class="grid grid-cols-12 gap-2" class:pt-2={context !== 'weatherless'}>
-  {#if context !== 'weatherless'}
-    <div
-      class="flex flex-col items-start text-left gap-1 col-span-full md:col-span-8"
-    >
-      <ToggleSwitch
-        bind:checked={$showDaysInRange}
-        label={`Show number of days in ranges`}
-        details="Applies to the view below and PDF file"
-      />
-    </div>
-  {/if}
+<div class="grid grid-cols-12 gap-2 pt-2">
   <div
-    class="my-2 col-span-full flex flex-wrap justify-center"
-    class:md:justify-end={context !== 'weatherless'}
-    class:md:col-span-4={context !== 'weatherless'}
-    class:md:cols-start-9={context !== 'weatherless'}
-    class:mt-4={page.url.pathname === '/yarn'}
+    class="flex flex-col items-start text-left gap-1 col-span-full md:col-span-8"
+  >
+    <ToggleSwitch
+      bind:checked={showDaysInRange.value}
+      label={`Show number of days in ranges`}
+      details="Applies to the view below and PDF file"
+    />
+  </div>
+
+  <div
+    class="my-2 col-span-full flex flex-wrap justify-center md:justify-end md:col-span-4 md:cols-start-9"
   >
     <ViewToggle />
   </div>
@@ -231,10 +194,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
           title="Remove Color"
           class="btn bg-secondary-hover-token flex flex-wrap justify-center items-center order-1"
           onclick={() => {
-            colors = colors.filter((_, i) => i !== index);
+            gaugesState.activeGauge.colors =
+              gaugesState.activeGauge.colors.filter((_, i) => i !== index);
             sortableColors = getSortableColors();
-            schemeId = 'Custom';
-            numberOfColors = colors.length;
+            gaugesState.activeGauge.schemeId = 'Custom';
+            gaugesState.activeGauge.numberOfColors =
+              gaugesState.activeGauge.colors.length;
           }}
         >
           <span class="text-xs">{index + 1}</span>
@@ -243,9 +208,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {/if}
 
       <button
-        class:order-3={context === 'weatherless'}
-        class:order-4={context !== 'weatherless'}
-        class="btn bg-secondary-hover-token flex items-center justify-start"
+        title="Move Color"
+        tabindex="-1"
+        aria-label="drag-handle"
+        class="btn-icon bg-secondary-hover-token handle order-5 p-2 {dragDisabled
+          ? 'cursor-grabbing'
+          : 'cursor-grab'}"
+        onmousedown={startDrag}
+        ontouchstart={startDrag}
+      >
+        {@html ICONS.arrowsPointingOut}
+      </button>
+
+      <button
+        class="btn bg-secondary-hover-token flex items-center justify-start order-4"
         title="Choose a Color"
         onclick={() =>
           modal.state.trigger({
@@ -297,25 +273,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </span>
       </button>
 
-      {#if context === 'weatherless'}
-        <button
-          title="Move Color"
-          tabindex="-1"
-          aria-label="drag-handle"
-          class="btn-icon bg-secondary-hover-token handle order-5 p-2"
-          style={dragDisabled ? 'cursor: grab' : 'cursor: grabbing'}
-          onmousedown={startDrag}
-          ontouchstart={startDrag}
-        >
-          {@html ICONS.arrowsPointingOut}
-        </button>
-      {/if}
-
       {#if affiliate_variant_href}
         <a
-          class="btn bg-secondary-hover-token flex flex-wrap justify-center items-center"
-          class:order-2={context === 'weatherless'}
-          class:order-3={context !== 'weatherless'}
+          class="btn bg-secondary-hover-token flex flex-wrap justify-center items-center order-3"
           href={affiliate_variant_href}
           target="_blank"
           rel="noreferrer nofollow"
@@ -338,30 +298,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </a>
       {/if}
 
-      {#if context !== 'weatherless'}
-        <div class="flex gap-2 order-6">
-          {#key index}
-            <ColorRange
-              {index}
-              {colors}
-              bind:ranges
-              bind:rangeOptions
-              {gaugeAttributes}
-            />
-          {/key}
-        </div>
+      <div class="flex gap-2 order-6">
+        {#key index}
+          <ColorRange {index} />
+        {/key}
+      </div>
 
-        {#if $showDaysInRange}
-          <div
-            class="flex flex-wrap w-fit justify-center items-center bg-surface-900/10 rounded-container-token shadow-inner order-7"
-          >
-            <DaysInRange
-              range={ranges[index]}
-              {gaugeAttributes}
-              {rangeOptions}
-            />
-          </div>
-        {/if}
+      {#if showDaysInRange.value}
+        <div
+          class="flex flex-wrap w-fit justify-center items-center bg-surface-900/10 rounded-container-token shadow-inner order-7"
+        >
+          <DaysInRange
+            range={gaugesState.activeGauge.ranges[index]}
+            rangeOptions={gaugesState.activeGauge.rangeOptions}
+            targets={gaugesState.activeGauge.targets}
+          />
+        </div>
       {/if}
     </div>
   {/each}

@@ -15,7 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script context="module" lang="ts">
   import { CHARACTERS_FOR_URL_HASH } from '$lib/constants';
-  import { preview } from '$lib/state';
+  import { gaugesState, preview } from '$lib/state';
   import { setSecondaryTargets } from '$lib/utils';
   import chroma from 'chroma-js';
   import { derived, writable } from 'svelte/store';
@@ -173,12 +173,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
   import SquareDesigner from '$lib/components/modals/SquareDesigner.svelte';
-  import { createdGauges, modal } from '$lib/state';
+  import { modal } from '$lib/state';
   import { pluralize, setTargets } from '$lib/utils';
 
-  $: targets = $createdGauges.map((n) => n.targets).flat();
+  $: targets = gaugesState.gauges.map((n) => n.targets).flat();
 
-  $: if ($createdGauges) {
+  $: if (gaugesState.gauges) {
     $settings.primaryTarget = setTargets($settings.primaryTarget);
     $settings.secondaryTargets = setTargets($settings.secondaryTargets);
   }

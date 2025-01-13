@@ -13,24 +13,7 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import {
-  gaugeAttributes as daytimeGaugeAttributes,
-  settings as daytimeGaugeSettings,
-} from '$lib/components/gauges/DaytimeGauge.svelte';
-import {
-  gaugeAttributes as rainGaugeAttributes,
-  settings as rainGaugeSettings,
-} from '$lib/components/gauges/RainGauge.svelte';
-import {
-  gaugeAttributes as snowGaugeAttributes,
-  settings as snowGaugeSettings,
-} from '$lib/components/gauges/SnowGauge.svelte';
-import {
-  gaugeAttributes as tempGaugeAttributes,
-  gaugeSettings as tempGaugeSettings,
-} from '$lib/components/gauges/TemperatureGauge.svelte';
-import { showDaysInRange, units } from '$lib/state';
-import { get } from 'svelte/store';
+import { gaugesState, showDaysInRange, units } from '$lib/state';
 import pdfConfig from '../pdf-config';
 import pdfColorDetails from './color-details.svelte';
 import pdfFooter from './footer.svelte';
@@ -114,27 +97,8 @@ const pdfGauge = {
     );
   },
   create: function (doc, gaugeId) {
-    let gauge;
-    if (gaugeId === 'temp')
-      gauge = {
-        ...get(tempGaugeSettings),
-        ...tempGaugeAttributes,
-      };
-    if (gaugeId === 'prcp')
-      gauge = {
-        ...get(rainGaugeSettings),
-        ...rainGaugeAttributes,
-      };
-    if (gaugeId === 'snow')
-      gauge = {
-        ...get(snowGaugeSettings),
-        ...snowGaugeAttributes,
-      };
-    if (gaugeId === 'dayt')
-      gauge = {
-        ...get(daytimeGaugeSettings),
-        ...daytimeGaugeAttributes,
-      };
+    let gauge = gaugesState.gauges.find((g) => g.id === gaugeId);
+
     // Gauge Item
     const length = gauge.ranges.length;
     let l =
@@ -144,7 +108,7 @@ const pdfGauge = {
         doc.addPage();
         // pdfHeader.create(doc);
         pdfGauge.createHeader(doc, gauge);
-        if (get(showDaysInRange))
+        if (showDaysInRange.value)
           pdfColorDetails.createColorDetailsHeader(doc, gauge);
         l =
           pdfConfig.topMargin +
@@ -229,7 +193,7 @@ const pdfGauge = {
         l + 5,
       );
       // Color Details
-      if (get(showDaysInRange)) pdfColorDetails.create(doc, gauge, i, l);
+      if (showDaysInRange.value) pdfColorDetails.create(doc, gauge, i, l);
     }
   },
 };

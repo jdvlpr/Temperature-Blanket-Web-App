@@ -13,19 +13,14 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
+import { browser } from '$app/environment';
 import { ICONS, THEMES } from '$lib/constants';
+import type { PageLayout } from '$lib/types';
 import { localStorageStore } from '@skeletonlabs/skeleton';
 import { MediaQuery } from 'svelte/reactivity';
 import { writable, type Writable } from 'svelte/store';
 
-class ModalState {
-  constructor() {
-    this.state = writable(null);
-  }
-
-  state: Writable<any>;
-}
-export let modal = new ModalState();
+export let modal = $state({ state: writable(null) });
 
 export const disableToastAnalytics: Writable<boolean> = localStorageStore(
   'disable_toast_analytics',
@@ -134,3 +129,14 @@ class ActiveThemeClass {
 export const activeTheme = new ActiveThemeClass();
 
 export const defaultYarn = $state({ value: '' });
+
+export const initialLayout: PageLayout = browser
+  ? localStorage.getItem('layout') === 'list' ||
+    localStorage.getItem('layout') === 'grid'
+    ? (localStorage.getItem('layout') as PageLayout)
+    : window.innerWidth < 640
+      ? 'list'
+      : 'grid'
+  : 'list';
+
+export const layout: { value: PageLayout } = $state({ value: initialLayout });

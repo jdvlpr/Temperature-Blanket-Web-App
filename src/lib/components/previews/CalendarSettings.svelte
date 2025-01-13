@@ -15,7 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script context="module">
   import { CHARACTERS_FOR_URL_HASH } from '$lib/constants';
-  import { preview } from '$lib/state';
+  import { gaugesState, preview } from '$lib/state';
   import { setSecondaryTargets } from '$lib/utils';
   import chroma from 'chroma-js';
   import { derived, writable } from 'svelte/store';
@@ -132,7 +132,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import SquareDesigner from '$lib/components/modals/SquareDesigner.svelte';
   import { DAYS_OF_THE_WEEK } from '$lib/constants';
   import {
-    createdGauges,
     modal,
     weather,
     weatherGrouping,
@@ -146,7 +145,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     weatherMonthsData,
   } from '$lib/utils';
 
-  $: targets = $createdGauges.map((n) => n.targets).flat();
+  $: targets = gaugesState.gauges.map((n) => n.targets).flat();
 
   $: months = weatherMonthsData({ weatherData: weather.data });
 
@@ -158,7 +157,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     $settings.weekStartCode = $weatherMonthGroupingStartDay;
   }
 
-  $: if ($createdGauges) {
+  $: if (gaugesState.gauges) {
     $settings.primaryTarget = setTargets($settings.primaryTarget);
     $settings.secondaryTargets = setTargets($settings.secondaryTargets);
   }

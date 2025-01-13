@@ -15,7 +15,6 @@
 
 import WeatherDetails from '$lib/components/WeatherDetails.svelte';
 import {
-  createdGauges,
   drawerState,
   gaugesState,
   isDesktop,
@@ -317,10 +316,12 @@ export const setTargets = (data) => {
   if (typeof data === 'string') {
     // If a gauge gets removed and it contains the target weather param, reset the primary weather param
     let _target = data;
-    _target = get(gaugesState).created.includes(getTargetParentGaugeId(_target))
+    _target = gaugesState.gauges
+      .map((g) => g.id)
+      .includes(getTargetParentGaugeId(_target))
       ? _target
       : null;
-    if (_target === null) _target = get(createdGauges)[0].targets[0].id;
+    if (_target === null) _target = gaugesState.gauges[0].targets[0].id;
     return _target;
   }
 
@@ -336,11 +337,11 @@ export const setTargets = (data) => {
       _targets = data.map((n) => n.targetId).flat();
     _targets = _targets.filter((n) => {
       n = getTargetParentGaugeId(n);
-      return get(gaugesState).created.includes(n);
+      return gaugesState.gauges.map((g) => g.id).includes(n);
     });
 
     if (_targets.length === 0) {
-      _targets = [get(createdGauges)[0].targets[0].id];
+      _targets = [gaugesState.gauges[0]?.targets[0].id];
     }
 
     if (isSecondarySquareParamData) {

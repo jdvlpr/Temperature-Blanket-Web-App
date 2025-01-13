@@ -13,201 +13,147 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { browser } from '$app/environment';
-import {
-  gaugeAttributes as daytimeGaugeAttributes,
-  settings as daytimeGaugeSettings,
-} from '$lib/components/gauges/DaytimeGauge.svelte';
-import {
-  gaugeAttributes as prcpGaugeAttributes,
-  settings as prcpGaugeSettings,
-} from '$lib/components/gauges/RainGauge.svelte';
-import {
-  gaugeAttributes as snowGaugeAttributes,
-  settings as snowGaugeSettings,
-} from '$lib/components/gauges/SnowGauge.svelte';
-import {
-  gaugeAttributes as tempGaugeAttributes,
-  gaugeSettings as tempGaugeSettings,
-} from '$lib/components/gauges/TemperatureGauge.svelte';
+import { gaugeAttributes as tempGaugeAttributes } from '$lib/state/gauges/temperature-gauge-state.svelte';
 import { CHARACTERS_FOR_URL_HASH } from '$lib/constants';
-import type { PageLayout } from '$lib/types';
+import type { GaugeAttributes, GaugeStateInterface } from '$lib/types';
 import { colorsToYarnDetails, displayNumber } from '$lib/utils';
-import { derived, writable, type Writable } from 'svelte/store';
+import { TemperatureGauge } from '$lib/state/gauges/temperature-gauge-state.svelte';
 
-export let showDaysInRange: Writable<boolean> = writable(true);
+export let showDaysInRange: { value: boolean } = $state({ value: true });
 
-function createGaugesStateStore() {
-  const { subscribe, set, update } = writable({
-    active: '',
-    created: [],
-    available: [],
-  });
+class GaugesState {
+  gauges: GaugeStateInterface[] = $state([]);
 
-  return {
-    subscribe,
-    addCreated: (id) =>
-      update((n) => {
-        n.created = !n.created.includes(id) ? [...n.created, id] : n.created;
-        n.active = id;
-        return n;
-      }),
-    removeCreated: (id) =>
-      update((n) => {
-        n.created = n.created.filter((gauge) => gauge !== id);
-        n.active = n.created[n.created.length - 1];
-        return n;
-      }),
-    addAvailable: (id) =>
-      update((n) => {
-        n.available = !n.available.includes(id)
-          ? [...n.available, id]
-          : n.available;
-        return n;
-      }),
-    removeAvailable: (id) =>
-      update((n) => {
-        n.available = n.available.filter((gauge) => gauge !== id);
-        return n;
-      }),
-    set: (value) => set(value),
-  };
-}
-export const gaugesState = createGaugesStateStore();
+  availableGauges: {
+    id: GaugeAttributes['id'];
+    label: GaugeAttributes['label'];
+  }[] = $state([]);
 
-export const gaugeSettings = derived(
-  [
-    tempGaugeSettings,
-    prcpGaugeSettings,
-    snowGaugeSettings,
-    daytimeGaugeSettings,
-  ],
-  ([
-    $tempGaugeSettings,
-    $prcpGaugeSettings,
-    $snowGaugeSettings,
-    $daytimeGaugeSettings,
-  ]) => {
-    return [
-      $tempGaugeSettings,
-      $prcpGaugeSettings,
-      $snowGaugeSettings,
-      $daytimeGaugeSettings,
-    ];
-  },
-);
+  activeGaugeId = $state('');
 
-export const allGaugesAttributes = [
-  tempGaugeAttributes,
-  prcpGaugeAttributes,
-  snowGaugeAttributes,
-  daytimeGaugeAttributes,
-];
+  activeGauge = $derived(
+    this.gauges.find((gauge) => gauge.id === this.activeGaugeId),
+  );
 
-export const gauges = derived([gaugeSettings], ([$gaugeSettings]) => {
-  return $gaugeSettings.map((n, i) => {
-    return { ...n, ...allGaugesAttributes[i] };
-  });
-});
-
-export const createdGauges = derived(
-  [gaugesState, gauges],
-  ([$gaugesState, $gauges]) => {
-    return $gauges.filter((n) => $gaugesState.created.some((m) => n.id === m));
-  },
-);
-
-export const gaugesURLHash = derived(
-  [gaugeSettings, gaugesState],
-  ([$gaugeSettings, $gaugesState]) => {
+  urlHash = $derived.by(() => {
     let hash = '';
-    const createdGauges = $gaugeSettings.filter((settings) =>
-      $gaugesState.created.includes(settings.id),
-    );
-    for (const settings of createdGauges) {
-      if (!settings.rangeOptions || !settings.colors || !settings.ranges)
-        return hash;
-      if (settings.ranges?.length !== settings.colors?.length) return hash;
+    this.gauges.forEach((gauge) => {
+      if (!gauge.rangeOptions || !gauge.colors || !gauge.ranges) return hash;
+      if (gauge.ranges?.length !== gauge.colors?.length) return hash;
       hash += '&';
-      hash += `${settings.id}=`;
-      hash += settings.schemeId === 'Custom' ? '' : `${settings.schemeId}~`;
-      settings.colors.forEach((color, index) => {
+      hash += `${gauge.id}=`;
+      hash += gauge.schemeId === 'Custom' ? '' : `${gauge.schemeId}~`;
+      gauge.colors.forEach((color, index) => {
         const code = color.hex.substring(color.hex.indexOf('#') + 1);
         hash += encodeURIComponent(
-          `${code}(${settings.ranges[index].from + CHARACTERS_FOR_URL_HASH.separator + settings.ranges[index].to})`,
+          `${code}(${gauge.ranges[index].from + CHARACTERS_FOR_URL_HASH.separator + gauge.ranges[index].to})`,
         );
       });
       hash += '!';
-      hash += settings.rangeOptions.mode === 'auto' ? 'a' : 'm'; // Manual or auto ranges
-      hash += settings.rangeOptions.linked === true ? 'l' : 'u'; // linked or unlinked ranges
-      hash += settings.rangeOptions.direction === 'high-to-low' ? 'h' : 'l'; // high-to-low or low-to-high direction
+      hash += gauge.rangeOptions.mode === 'auto' ? 'a' : 'm'; // Manual or auto ranges
+      hash += gauge.rangeOptions.linked === true ? 'l' : 'u'; // linked or unlinked ranges
+      hash += gauge.rangeOptions.direction === 'high-to-low' ? 'h' : 'l'; // high-to-low or low-to-high direction
 
       // Include From or To values included in v1.808
       if (
-        settings.rangeOptions.includeFromValue &&
-        !settings.rangeOptions.includeToValue
+        gauge.rangeOptions.includeFromValue &&
+        !gauge.rangeOptions.includeToValue
       )
         hash += '0';
       else if (
-        !settings.rangeOptions.includeFromValue &&
-        settings.rangeOptions.includeToValue
+        !gauge.rangeOptions.includeFromValue &&
+        gauge.rangeOptions.includeToValue
       )
         hash += '1';
       else if (
-        settings.rangeOptions.includeFromValue &&
-        settings.rangeOptions.includeToValue
+        gauge.rangeOptions.includeFromValue &&
+        gauge.rangeOptions.includeToValue
       )
         hash += '2';
       else if (
-        !settings.rangeOptions.includeFromValue &&
-        !settings.rangeOptions.includeToValue
+        !gauge.rangeOptions.includeFromValue &&
+        !gauge.rangeOptions.includeToValue
       )
         hash += '3';
 
-      hash += settings.rangeOptions.isCustomRanges === true ? 't' : 'f'; // Save custom ranges setting
+      hash += gauge.rangeOptions.isCustomRanges === true ? 't' : 'f'; // Save custom ranges setting
 
       if (
-        settings.rangeOptions.mode === 'manual' &&
-        settings.rangeOptions.isCustomRanges === false
+        gauge.rangeOptions.mode === 'manual' &&
+        gauge.rangeOptions.isCustomRanges === false
       ) {
         // If manual ranges, include integer and starting value '10'100'
-        hash += `${displayNumber(settings.rangeOptions.manual.increment)}${CHARACTERS_FOR_URL_HASH.separator}${displayNumber(settings.rangeOptions.manual.start)}`;
+        hash += `${displayNumber(gauge.rangeOptions.manual.increment)}${CHARACTERS_FOR_URL_HASH.separator}${displayNumber(gauge.rangeOptions.manual.start)}`;
       }
 
       // Save range Balance Auto Focus mode for temperature gauges
       // Added in version 2.5.0
       if (
-        settings.id === 'temp' &&
-        settings.rangeOptions.mode === 'auto' &&
-        !settings.rangeOptions.isCustomRanges
+        gauge.id === 'temp' &&
+        gauge.rangeOptions.mode === 'auto' &&
+        !gauge.rangeOptions.isCustomRanges
       ) {
-        if (settings.rangeOptions.auto.optimization === 'ranges') hash += '_r';
-        if (settings.rangeOptions.auto.optimization === 'tmax') hash += '_h';
-        else if (settings.rangeOptions.auto.optimization === 'tavg')
-          hash += '_a';
-        else if (settings.rangeOptions.auto.optimization === 'tmin')
-          hash += '_l';
+        if (gauge.rangeOptions.auto.optimization === 'ranges') hash += '_r';
+        if (gauge.rangeOptions.auto.optimization === 'tmax') hash += '_h';
+        else if (gauge.rangeOptions.auto.optimization === 'tavg') hash += '_a';
+        else if (gauge.rangeOptions.auto.optimization === 'tmin') hash += '_l';
       }
 
-      if (settings.colors.some((color) => color?.brandId && color?.yarnId)) {
+      if (gauge.colors.some((color) => color?.brandId && color?.yarnId)) {
         hash +=
           '!' +
           colorsToYarnDetails({
-            colors: settings.colors,
+            colors: gauge.colors,
           });
       }
-    }
+    });
+
     return hash;
-  },
-);
+  });
 
-export const initialLayout: PageLayout = browser
-  ? localStorage.getItem('layout') === 'list' ||
-    localStorage.getItem('layout') === 'grid'
-    ? (localStorage.getItem('layout') as PageLayout)
-    : window.innerWidth < 640
-      ? 'list'
-      : 'grid'
-  : 'list';
+  addById(id: GaugeAttributes['id']): void {
+    if (this.gauges.length && this.gauges.map((gauge) => gauge.id).includes(id))
+      return;
 
-export const layout: { value: PageLayout } = $state({ value: initialLayout });
+    let newGauge;
+    if (id === 'temp') newGauge = new TemperatureGauge();
+    // else newGauge = new GaugeState({ attributes, settings });
+
+    this.gauges.push(newGauge);
+
+    // This should only happen the first time, when the default temperature gauge is set up.
+    if (!this.availableGauges.map((gauge) => gauge.id).includes(newGauge.id)) {
+      this.availableGauges.push({ id: newGauge.id, label: newGauge.label });
+    }
+
+    this.activeGaugeId = newGauge.id;
+  }
+
+  remove(id: string): void {
+    if (id === 'temp') return; // don't allow deleting the temperature gauge
+    this.gauges = this.gauges?.filter((gauge) => gauge.id !== id);
+    if (this.activeGaugeId === id) this.activeGaugeId = this.gauges[0].id;
+  }
+
+  addToAvailable({
+    id,
+    label,
+  }: {
+    id: GaugeAttributes['id'];
+    label: GaugeAttributes['label'];
+  }): void {
+    if (!this.availableGauges.map((gauge) => gauge.id).includes(id))
+      this.availableGauges.push({ id, label });
+  }
+
+  removeFromAvailable(id: GaugeAttributes['id']): void {
+    this.availableGauges = this.availableGauges.filter(
+      (gauge) => gauge.id !== id,
+    );
+  }
+}
+
+// Create the gaugesState object with the default temperature gauge
+export const gaugesState = new GaugesState();
+
+export const allGaugesAttributes = [tempGaugeAttributes];

@@ -14,10 +14,6 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { browser } from '$app/environment';
-import { settings as daytimeGaugeSettings } from '$lib/components/gauges/DaytimeGauge.svelte';
-import { settings as rainGaugeSettings } from '$lib/components/gauges/RainGauge.svelte';
-import { settings as snowGaugeSettings } from '$lib/components/gauges/SnowGauge.svelte';
-import { gaugeSettings as temperatureGaugeSettings } from '$lib/components/gauges/TemperatureGauge.svelte';
 import { load as loadClnr } from '$lib/components/previews/CalendarSettings.svelte';
 import { load as loadChev } from '$lib/components/previews/ChevronsSettings.svelte';
 import { load as loadCosq } from '$lib/components/previews/ContinuousSquareSettings.svelte';
@@ -30,11 +26,11 @@ import { load as loadSmsq } from '$lib/components/previews/SplitMonthSquaresSett
 import { load as loadSqrs } from '$lib/components/previews/SquaresSettings.svelte';
 import { ICONS } from '$lib/constants';
 import {
-  defaultWeatherSource,
   allGaugesAttributes,
+  defaultWeatherSource,
   gaugesState,
-  historyState,
   historyChangeMessage,
+  historyState,
   isHistoryUpdating,
   isProjectSaved,
   liveProjectURLHash,
@@ -50,7 +46,6 @@ import {
   getProjectParametersFromURLHash,
   parseGaugeURLHash,
 } from '$lib/utils';
-import { get } from 'svelte/store';
 
 export const loadFromHistory = ({ action }: { action: 'Undo' | 'Redo' }) => {
   historyChangeMessage.value = '';
@@ -120,50 +115,16 @@ export const loadFromHistory = ({ action }: { action: 'Undo' | 'Redo' }) => {
         !exists(oldParams[gauge.id]) ||
         oldParams[gauge.id].value !== newParams[gauge.id].value
       ) {
-        let settings;
-        switch (gauge.id) {
-          case 'temp':
-            settings = parseGaugeURLHash(
-              newParams[gauge.id].value,
-              get(temperatureGaugeSettings),
-            );
-            temperatureGaugeSettings.set(settings);
-            message = 'Colors';
-            break;
-          case 'prcp':
-            settings = parseGaugeURLHash(
-              newParams[gauge.id].value,
-              get(rainGaugeSettings),
-            );
-            rainGaugeSettings.set(settings);
-            message = 'Colors';
-            break;
-          case 'snow':
-            settings = parseGaugeURLHash(
-              newParams[gauge.id].value,
-              get(snowGaugeSettings),
-            );
-            snowGaugeSettings.set(settings);
-            message = 'Colors';
-            break;
-          case 'dayt':
-            settings = parseGaugeURLHash(
-              newParams[gauge.id].value,
-              get(daytimeGaugeSettings),
-            );
-            daytimeGaugeSettings.set(settings);
-            message = 'Colors';
-            break;
-          default:
-            break;
-        }
-        if (!get(gaugesState).created.includes(gauge.id)) {
-          gaugesState.addCreated(gauge.id); // if the gauge is not created, add it
-          message = 'Colors';
-        }
+        gaugesState.addById(gauge.id);
+        const settings = parseGaugeURLHash(newParams[gauge.id].value);
+        Object.assign(
+          gaugesState.gauges.find((g) => g.id === gauge.id),
+          settings,
+        );
+        message = 'Colors';
       }
     } else if (exists(oldParams[gauge.id])) {
-      gaugesState.removeCreated(gauge.id);
+      gaugesState.remove(gauge.id);
       message = 'Colors';
     }
   }

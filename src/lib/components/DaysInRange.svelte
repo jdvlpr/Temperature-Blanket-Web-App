@@ -13,19 +13,29 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script>
+<script lang="ts">
   import WeatherTable from '$lib/components/modals/WeatherTable.svelte';
   import { modal, weatherGrouping } from '$lib/state';
+  import type {
+    GaugeAttributes,
+    GaugeRange,
+    GaugeSettingsType,
+  } from '$lib/types';
   import { getDaysInRange, getDaysPercent, pluralize } from '$lib/utils';
   import { getModalStore } from '@skeletonlabs/skeleton';
 
   const modalStore = getModalStore();
   const isModal = !!$modalStore[0];
 
-  let { range, rangeOptions, gaugeAttributes } = $props();
+  type Props = {
+    range: GaugeRange;
+    rangeOptions: GaugeSettingsType['rangeOptions'];
+    targets: GaugeAttributes['targets'];
+  };
+  let { range, rangeOptions, targets }: Props = $props();
 
   let noDaysInRange = $derived(() =>
-    gaugeAttributes.targets.every(
+    targets.every(
       (n) =>
         !getDaysInRange({
           id: n.id,
@@ -39,7 +49,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 {#if !noDaysInRange()}
-  {#each gaugeAttributes.targets as { id, icon, gaugeLabel }}
+  {#each targets as { id, icon, gaugeLabel }}
     {@const daysInRange = getDaysInRange({
       id,
       range,

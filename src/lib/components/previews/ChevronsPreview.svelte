@@ -16,7 +16,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script>
   import {
     activeWeatherElementIndex,
-    createdGauges,
+    gaugesState,
     projectStatus,
     units,
     weather,
@@ -44,7 +44,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   $: chevronHeight = chevronSideLength / 2;
   $: chevronSideLength = $settings.chevronSideLength * Math.sqrt(2);
 
-  $: targets = $createdGauges
+  $: targets = gaugesState.gauges
     .map((n) => n.targets)
     .flat()
     .filter((n) => $settings.selectedTargets.includes(n.id));

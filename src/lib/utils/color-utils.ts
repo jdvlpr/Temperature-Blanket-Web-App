@@ -14,7 +14,7 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { CHARACTERS_FOR_URL_HASH } from '$lib/constants';
-import { allGaugesAttributes, gaugeSettings } from '$lib/state';
+import { allGaugesAttributes, gaugesState } from '$lib/state';
 import type { Color } from '$lib/types';
 import {
   capitalizeFirstLetter,
@@ -25,7 +25,6 @@ import {
   pluralize,
 } from '$lib/utils';
 import chroma from 'chroma-js';
-import { get } from 'svelte/store';
 
 /**
  * Returns the appropriate text color based on the given color.
@@ -218,7 +217,7 @@ export const getColorsFromInput = ({
  * @returns {object} - The color information object with the hexadecimal color value, index, and gauge length.
  */
 export const getColorInfo = (gaugeId, value) => {
-  const gauge = get(gaugeSettings).find((n) => n.id === gaugeId);
+  const gauge = gaugesState.gauges.find((n) => n.id === gaugeId);
   const color = { hex: '#ffffff' };
 
   if (

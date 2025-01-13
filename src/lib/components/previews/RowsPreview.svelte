@@ -16,7 +16,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import {
     activeWeatherElementIndex,
-    createdGauges,
+    gaugesState,
     projectStatus,
     units,
     weather,
@@ -60,7 +60,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     6,
   );
 
-  $: targets = $createdGauges
+  $: targets = gaugesState.gauges
     .flatMap((n) => n.targets)
     .filter((n) => $settings.selectedTargets.includes(n.id));
 

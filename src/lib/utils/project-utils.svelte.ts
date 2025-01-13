@@ -13,13 +13,13 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import pdfGauges from '$lib/pdf/sections/gauges';
+import pdfGauges from '$lib/pdf/sections/gauges.svelte';
 import pdfWeatherData from '$lib/pdf/sections/weather-data.svelte';
 import {
-  preview,
   allGaugesAttributes,
-  createdGauges,
+  gaugesState,
   locationsState,
+  preview,
   projectGalleryLink,
   projectGalleryTitle,
   projectStatus,
@@ -140,7 +140,7 @@ export const sendToProjectGallery = async (img) => {
   const yarnDetails = [];
   const gauges = [];
   const tables = [];
-  get(createdGauges).forEach((gauge) => {
+  gaugesState.gauges.forEach((gauge) => {
     colors.push(gauge.colors);
     gauges.push(gauge.label);
     palettes.push(colorsToCode(gauge.colors, { includePrefix: true }));

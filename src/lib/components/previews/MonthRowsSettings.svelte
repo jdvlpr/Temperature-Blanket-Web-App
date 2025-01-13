@@ -15,7 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script context="module">
   import { CHARACTERS_FOR_URL_HASH } from '$lib/constants';
-  import { preview } from '$lib/state';
+  import { gaugesState, preview } from '$lib/state';
   import {
     capitalizeFirstLetter,
     getMiddleValueOfArray,
@@ -111,7 +111,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import NumberInputButton from '$lib/components/buttons/NumberInputButton.svelte';
   import ToggleSwitchGroup from '$lib/components/buttons/ToggleSwitchGroup.svelte';
   import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
-  import { createdGauges, modal, weather, weatherGrouping } from '$lib/state';
+  import { modal, weather, weatherGrouping } from '$lib/state';
   import {
     getFactors,
     getPossibleDimensions,
@@ -119,9 +119,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     weatherMonthsData,
   } from '$lib/utils';
 
-  $: targets = $createdGauges.map((n) => n.targets).flat();
+  $: targets = gaugesState.gauges.map((n) => n.targets).flat();
 
-  $: if ($createdGauges)
+  $: if (gaugesState.gauges)
     $settings.selectedTargets = setTargets($settings.selectedTargets);
 
   $: months = weatherMonthsData({ weatherData: weather.data });
