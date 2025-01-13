@@ -15,11 +15,11 @@
 
 // NOTE: Don't rearrange these alphabetically; the order matters!!!
 // TODO: Find out why and fix why the order matters :)
-export * from '$lib/stores/location-stores.svelte';
-export * from '$lib/stores/units-stores.svelte';
-export * from '$lib/stores/weather-state.svelte';
-export * from '$lib/stores/gauges-state.svelte';
-export * from '$lib/stores/page-stores.svelte';
-export * from '$lib/stores/preview-stores.svelte';
-export * from '$lib/stores/project-state.svelte';
-export * from '$lib/stores/history-stores';
+export * from '$lib/state/location-stores.svelte';
+export * from '$lib/state/units-stores.svelte';
+export * from '$lib/state/weather-state.svelte';
+export * from '$lib/state/gauges-state.svelte';
+export * from '$lib/state/page-stores.svelte';
+export * from '$lib/state/preview-stores.svelte';
+export * from '$lib/state/project-state.svelte';
+export * from '$lib/state/history-stores';

@@ -20,7 +20,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     locationsState,
     projectGalleryLink,
     projectGalleryTitle,
-  } from '$lib/stores';
+  } from '$lib/state';
   import { sendToProjectGallery, svgToPNG } from '$lib/utils';
   import ModalShell from './ModalShell.svelte';
   import StickyPart from './StickyPart.svelte';

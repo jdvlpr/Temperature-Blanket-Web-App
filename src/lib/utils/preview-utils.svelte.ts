@@ -23,7 +23,7 @@ import {
   modal,
   previewWeatherTargets,
   weather,
-} from '$lib/stores';
+} from '$lib/state';
 import { exists, getTargetParentGaugeId } from '$lib/utils';
 import { get } from 'svelte/store';
 

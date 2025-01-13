@@ -15,7 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import GaugeSettings from '$lib/components/modals/GaugeSettings.svelte';
-  import { modal, units } from '$lib/stores';
+  import { modal, units } from '$lib/state';
 
   let {
     index,

@@ -54,7 +54,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Gauge from '$lib/components/Gauge.svelte';
   import Share from '$lib/components/Share.svelte';
   import YarnSources from '$lib/components/YarnSources.svelte';
-  import { layout } from '$lib/stores';
+  import { layout } from '$lib/state';
   import type { Color } from '$lib/types';
   import {
     colorsToCode,

@@ -15,7 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import WeatherTable from '$lib/components/modals/WeatherTable.svelte';
-  import { modal, weatherGrouping } from '$lib/stores';
+  import { modal, weatherGrouping } from '$lib/state';
   import { getDaysInRange, getDaysPercent, pluralize } from '$lib/utils';
   import { getModalStore } from '@skeletonlabs/skeleton';
 

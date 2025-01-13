@@ -23,7 +23,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     weatherGrouping,
     weatherParametersInView,
     weatherView,
-  } from '$lib/stores';
+  } from '$lib/state';
   import { downloadWeatherCSV, getWeatherTargets } from '$lib/utils';
   import { RadioGroup, RadioItem } from '@skeletonlabs/skeleton';
 

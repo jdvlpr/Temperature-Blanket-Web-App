@@ -15,7 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script context="module">
   import { CHARACTERS_FOR_URL_HASH } from '$lib/constants';
-  import { preview } from '$lib/stores';
+  import { preview } from '$lib/state';
   import chroma from 'chroma-js';
   import { derived, writable } from 'svelte/store';
 
@@ -82,7 +82,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script>
   import NumberInputButton from '$lib/components/buttons/NumberInputButton.svelte';
   import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
-  import { createdGauges, modal, weather, weatherGrouping } from '$lib/stores';
+  import { createdGauges, modal, weather, weatherGrouping } from '$lib/state';
   import {
     capitalizeFirstLetter,
     getFactors,

@@ -21,7 +21,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ViewToggle from '$lib/components/buttons/ViewToggle.svelte';
   import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
   import { ICONS } from '$lib/constants';
-  import { layout, modal, showDaysInRange } from '$lib/stores';
+  import { layout, modal, showDaysInRange } from '$lib/state';
   import type { Color } from '$lib/types';
   import { getTextColor } from '$lib/utils';
   import { dndzone, SOURCES } from 'svelte-dnd-action';

@@ -14,7 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { drawerState } from '$lib/stores';
+  import { drawerState } from '$lib/state';
   import { getModalStore, Step, Stepper } from '@skeletonlabs/skeleton';
   import ModalShell from './ModalShell.svelte';
 

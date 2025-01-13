@@ -22,7 +22,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script>
   import ColorPalette from '$lib/components/ColorPalette.svelte';
   import PlaceholderPalettes from '$lib/components/PlaceholderPalettes.svelte';
-  import { allGaugesAttributes } from '$lib/stores';
+  import { allGaugesAttributes } from '$lib/state';
   import {
     fetchPopularProjects,
     getColorsFromInput,

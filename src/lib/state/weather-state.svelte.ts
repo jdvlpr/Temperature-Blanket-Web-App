@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { locationsState, units } from '$lib/stores';
+import { locationsState, units } from '$lib/state';
 import type { WeatherDay, WeatherSource } from '$lib/types';
 import { createWeeksProperty, displayNumber } from '$lib/utils';
 import { get, writable, type Writable } from 'svelte/store';

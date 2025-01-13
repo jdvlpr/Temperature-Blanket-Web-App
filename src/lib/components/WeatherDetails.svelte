@@ -24,7 +24,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     units,
     weather,
     weatherGrouping,
-  } from '$lib/stores';
+  } from '$lib/state';
   import {
     capitalizeFirstLetter,
     convertTime,

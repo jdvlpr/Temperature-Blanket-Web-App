@@ -27,7 +27,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     weatherGrouping,
     weatherItemHeading,
     weatherUngrouped,
-  } from '$lib/stores';
+  } from '$lib/state';
   import {
     millimetersToInches,
     inchesToMillimeters,

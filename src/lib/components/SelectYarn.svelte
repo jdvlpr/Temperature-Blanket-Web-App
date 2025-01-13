@@ -15,7 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import { ALL_YARN_WEIGHTS, ICONS } from '$lib/constants';
-  import { defaultYarn } from '$lib/stores';
+  import { defaultYarn } from '$lib/state';
   import { delay, pluralize, stringToBrandAndYarnDetails } from '$lib/utils';
   import { brands } from '$lib/yarns/brands';
   import autocomplete from 'autocompleter';

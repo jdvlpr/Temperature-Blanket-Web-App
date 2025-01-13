@@ -15,7 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import NumberInput from '$lib/components/modals/NumberInput.svelte';
-  import { modal } from '$lib/stores';
+  import { modal } from '$lib/state';
 
   interface Props {
     value: number;

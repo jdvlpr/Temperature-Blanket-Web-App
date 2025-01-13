@@ -16,7 +16,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script>
   import Tooltip from '$lib/components/Tooltip.svelte';
   import { METEOSTAT_DELAY_DAYS, OPEN_METEO_DELAY_DAYS } from '$lib/constants';
-  import { defaultWeatherSource } from '$lib/stores';
+  import { defaultWeatherSource } from '$lib/state';
 </script>
 
 <Tooltip minWidth="290px" tooltipBg="bg-warning-50-900-token">

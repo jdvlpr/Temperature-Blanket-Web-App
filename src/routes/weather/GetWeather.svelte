@@ -14,7 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script context="module">
-  import { isProjectLoading, locationsState, signal, units } from '$lib/stores';
+  import { isProjectLoading, locationsState, signal, units } from '$lib/state';
   import { get } from 'svelte/store';
   import { activeLocationID, locations } from './+page.svelte';
 

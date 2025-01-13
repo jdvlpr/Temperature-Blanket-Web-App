@@ -19,7 +19,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     locationsState,
     weatherGrouping,
     weatherItemHeading,
-  } from '$lib/stores';
+  } from '$lib/state';
   import { derived, writable } from 'svelte/store';
 
   const id = 'rsun';
@@ -107,7 +107,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import DataTable from '$lib/components/datatable/DataTable.svelte';
   import Expand from '$lib/components/Expand.svelte';
   import { HOURS_PER_DAY } from '$lib/constants';
-  import { createdGauges, weather } from '$lib/stores';
+  import { createdGauges, weather } from '$lib/state';
   import {
     capitalizeFirstLetter,
     dateToISO8601String,

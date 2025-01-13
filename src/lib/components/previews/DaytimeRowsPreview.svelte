@@ -21,7 +21,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     projectStatus,
     units,
     weather,
-  } from '$lib/stores';
+  } from '$lib/state';
   import {
     displayNumber,
     getColorInfo,

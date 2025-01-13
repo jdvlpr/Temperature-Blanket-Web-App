@@ -15,7 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
-  import { defaultYarn } from '$lib/stores';
+  import { defaultYarn } from '$lib/state';
   export let selectedBrandId, selectedYarnId;
 </script>
 

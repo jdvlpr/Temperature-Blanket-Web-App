@@ -15,7 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import GettingWeather from '$lib/components/modals/GettingWeather.svelte';
-  import { modal } from '$lib/stores';
+  import { modal } from '$lib/state';
   import { getModalStore } from '@skeletonlabs/skeleton';
   import ModalShell from './ModalShell.svelte';
 

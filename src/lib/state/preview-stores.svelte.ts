@@ -24,7 +24,7 @@ import { previews } from '$lib/components/previews/previews';
 import { hash as rowsHash } from '$lib/components/previews/RowsSettings.svelte';
 import { hash as smsqHash } from '$lib/components/previews/SplitMonthSquaresSettings.svelte';
 import { hash as sqrsHash } from '$lib/components/previews/SquaresSettings.svelte';
-import { weather } from '$lib/stores';
+import { weather } from '$lib/state';
 import type { Preview } from '$lib/types';
 import { get, writable } from 'svelte/store';
 

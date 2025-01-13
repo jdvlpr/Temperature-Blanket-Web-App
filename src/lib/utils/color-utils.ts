@@ -14,7 +14,7 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { CHARACTERS_FOR_URL_HASH } from '$lib/constants';
-import { allGaugesAttributes, gaugeSettings } from '$lib/stores';
+import { allGaugesAttributes, gaugeSettings } from '$lib/state';
 import type { Color } from '$lib/types';
 import {
   capitalizeFirstLetter,

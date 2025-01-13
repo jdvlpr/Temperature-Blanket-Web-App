@@ -34,7 +34,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     pinAllSections,
     projectStatus,
     weather,
-  } from '$lib/stores';
+  } from '$lib/state';
   import {
     downloadPDF,
     downloadPreviewPNG,

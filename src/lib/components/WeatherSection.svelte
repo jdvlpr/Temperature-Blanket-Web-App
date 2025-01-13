@@ -48,7 +48,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     weatherParametersData,
     weatherParametersInView,
     weatherUngrouped,
-  } from '$lib/stores';
+  } from '$lib/state';
   import {
     convertTime,
     createWeeksProperty,

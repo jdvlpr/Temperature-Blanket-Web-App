@@ -14,7 +14,7 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { browser } from '$app/environment';
-import { consentToMSClarityCookies, disableToastAnalytics } from '$lib/stores';
+import { consentToMSClarityCookies, disableToastAnalytics } from '$lib/state';
 import { getToastStore } from '@skeletonlabs/skeleton';
 import { get } from 'svelte/store';
 

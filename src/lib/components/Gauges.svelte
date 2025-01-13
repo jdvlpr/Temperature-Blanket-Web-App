@@ -18,12 +18,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import RainGauge from '$lib/components/gauges/RainGauge.svelte';
   import SnowGauge from '$lib/components/gauges/SnowGauge.svelte';
   import TemperatureGauge from '$lib/components/gauges/TemperatureGauge.svelte';
-  import {
-    allGaugesAttributes,
-    gaugesState,
-    units,
-    weather,
-  } from '$lib/stores';
+  import { allGaugesAttributes, gaugesState, units, weather } from '$lib/state';
   import { downloadPDF } from '$lib/utils';
   import { onMount } from 'svelte';
 

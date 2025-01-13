@@ -23,7 +23,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     locationsState,
     useSecondaryWeatherSources,
     weatherUngrouped,
-  } from '$lib/stores';
+  } from '$lib/state';
   import type { LocationType } from '$lib/types/location-types';
   import {
     dateToISO8601String,

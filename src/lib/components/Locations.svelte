@@ -30,7 +30,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     wasProjectLoadedFromURL,
     wasWeatherLoadedFromLocalStorage,
     weather,
-  } from '$lib/stores';
+  } from '$lib/state';
   import { pluralize } from '$lib/utils';
   import { slide } from 'svelte/transition';
   import SearchForWeather from './buttons/SearchForWeather.svelte';

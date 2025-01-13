@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { units, weather } from '$lib/stores';
+import { units, weather } from '$lib/state';
 import { displayNumber } from '$lib/utils';
 import { get } from 'svelte/store';
 

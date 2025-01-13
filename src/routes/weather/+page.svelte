@@ -37,7 +37,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     modal,
     showNavigationSideBar,
     units,
-  } from '$lib/stores';
+  } from '$lib/state';
   import {
     delay,
     getWeatherCodeDetails,

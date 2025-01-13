@@ -18,7 +18,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import AppLogo from '$lib/components/AppLogo.svelte';
   import AppShell from '$lib/components/AppShell.svelte';
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
-  import { consentToMSClarityCookies } from '$lib/stores';
+  import { consentToMSClarityCookies } from '$lib/state';
   import { disableToastAnalytics } from '$lib/stores/page-stores.svelte';
   import { getToastStore } from '@skeletonlabs/skeleton';
 

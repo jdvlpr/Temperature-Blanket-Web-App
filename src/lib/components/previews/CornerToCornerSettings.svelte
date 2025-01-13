@@ -15,7 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script context="module">
   import { CHARACTERS_FOR_URL_HASH } from '$lib/constants';
-  import { preview, weather } from '$lib/stores';
+  import { preview, weather } from '$lib/state';
   import { derived, writable } from 'svelte/store';
 
   const id = 'crnr';
@@ -71,7 +71,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import NumberInputButton from '$lib/components/buttons/NumberInputButton.svelte';
-  import { createdGauges, weatherGrouping } from '$lib/stores';
+  import { createdGauges, weatherGrouping } from '$lib/state';
   import { capitalizeFirstLetter, setTargets } from '$lib/utils';
 
   $: targets = $createdGauges.map((n) => n.targets).flat();

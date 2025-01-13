@@ -15,7 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import { browser } from '$app/environment';
-  import { activeTheme, preview } from '$lib/stores';
+  import { activeTheme, preview } from '$lib/state';
   import { onDestroy, onMount } from 'svelte';
   import { previews } from './previews';
 

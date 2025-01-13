@@ -15,7 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import AppNavigation from '$lib/components/AppNavigation.svelte';
-  import { showNavigationSideBar } from '$lib/stores';
+  import { showNavigationSideBar } from '$lib/state';
   import {
     Drawer,
     TableOfContents,

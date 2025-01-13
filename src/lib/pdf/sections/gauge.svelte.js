@@ -29,7 +29,7 @@ import {
   gaugeAttributes as tempGaugeAttributes,
   gaugeSettings as tempGaugeSettings,
 } from '$lib/components/gauges/TemperatureGauge.svelte';
-import { showDaysInRange, units } from '$lib/stores';
+import { showDaysInRange, units } from '$lib/state';
 import { get } from 'svelte/store';
 import pdfConfig from '../pdf-config';
 import pdfColorDetails from './color-details.svelte';

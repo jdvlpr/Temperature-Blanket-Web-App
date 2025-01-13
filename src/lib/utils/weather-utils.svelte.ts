@@ -22,7 +22,7 @@ import {
   units,
   weather,
   weatherParametersData,
-} from '$lib/stores';
+} from '$lib/state';
 import type { WeatherDay } from '$lib/types';
 import {
   celsiusToFahrenheit,

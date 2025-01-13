@@ -16,7 +16,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script>
   import Spinner from '$lib/components/Spinner.svelte';
   import HelpIcon from '$lib/components/buttons/HelpIcon.svelte';
-  import { weatherUngrouped } from '$lib/stores';
+  import { weatherUngrouped } from '$lib/state';
   import {
     CSVtoArray,
     celsiusToFahrenheit,

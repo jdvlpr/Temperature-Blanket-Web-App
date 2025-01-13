@@ -31,7 +31,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     isDesktop,
     modal,
     weather,
-  } from '$lib/stores';
+  } from '$lib/state';
   import type { Color } from '$lib/types';
   import type { GaugeAttributes } from '$lib/types/gauge-types';
   import {

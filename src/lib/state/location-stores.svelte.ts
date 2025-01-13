@@ -13,20 +13,19 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
+import { browser } from '$app/environment';
 import {
   CHARACTERS_FOR_URL_HASH,
   MAXIMUM_DAYS_PER_LOCATION,
 } from '$lib/constants';
 import type {
-  LocationType,
-  LocationStateType,
-  WeatherSource,
   LocationsStateType,
+  LocationStateType,
+  LocationType,
+  WeatherSource,
 } from '$lib/types';
 import { getLocationTitle, getToday, numberOfDays } from '$lib/utils';
-import { derived, writable, type Writable } from 'svelte/store';
 import { weatherUngrouped } from './weather-state.svelte';
-import { getContext, setContext } from 'svelte';
 
 export class LocationClass implements LocationType {
   uuid: string = $state();
@@ -48,6 +47,7 @@ export class LocationState extends LocationClass implements LocationStateType {
   constructor() {
     super();
     this.uuid = crypto.randomUUID();
+    this.#today = browser ? getToday() : null; // caused a build error without the browser check...
   }
 
   isValid = $derived(!!this.id && this.#fromDate < this.#today);
@@ -64,7 +64,7 @@ export class LocationState extends LocationClass implements LocationStateType {
 
   days = $derived(numberOfDays(this.#fromDate, this.#toDate));
 
-  #today = getToday();
+  #today = $state();
 
   daysInFuture = $derived.by(() => {
     if (this.#toDate >= this.#today)

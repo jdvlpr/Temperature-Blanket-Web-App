@@ -43,7 +43,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     ALL_YARN_WEIGHTS,
     YARN_COLORWAYS_PER_PAGE,
   } from '$lib/constants';
-  import { layout } from '$lib/stores';
+  import { layout } from '$lib/state';
   import type { YarnWeight } from '$lib/types';
   import {
     getTextColor,

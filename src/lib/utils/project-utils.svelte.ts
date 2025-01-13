@@ -27,7 +27,7 @@ import {
   weather,
   weatherGrouping,
   weatherUngrouped,
-} from '$lib/stores';
+} from '$lib/state';
 import {
   colorsToCode,
   colorsToYarnDetails,

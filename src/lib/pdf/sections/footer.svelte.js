@@ -14,7 +14,7 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { PUBLIC_BASE_DOMAIN_NAME, PUBLIC_BASE_URL } from '$env/static/public';
-import { locationsState } from '$lib/stores';
+import { locationsState } from '$lib/state';
 import pdfConfig from '../pdf-config';
 import gauges from './gauges';
 import weatherData from './weather-data.svelte';

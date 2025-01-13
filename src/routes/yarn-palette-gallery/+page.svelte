@@ -44,7 +44,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ToTopButton from '$lib/components/buttons/ToTopButton.svelte';
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
   import { ICONS } from '$lib/constants';
-  import { allGaugesAttributes } from '$lib/stores';
+  import { allGaugesAttributes } from '$lib/state';
   import {
     fetchPopularProjects,
     fetchProjects,

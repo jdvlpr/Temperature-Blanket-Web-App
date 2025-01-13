@@ -81,7 +81,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import Gauge from '$lib/components/Gauge.svelte';
-  import { weatherParametersData } from '$lib/stores';
+  import { weatherParametersData } from '$lib/state';
   import type { GaugeAttributes } from '$lib/types/gauge-types';
   import { displayNumber } from '$lib/utils';
 

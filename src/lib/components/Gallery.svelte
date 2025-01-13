@@ -44,7 +44,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ViewToggle from '$lib/components/buttons/ViewToggle.svelte';
   import { previews } from '$lib/components/previews/previews';
   import { ICONS } from '$lib/constants';
-  import { layout } from '$lib/stores';
+  import { layout } from '$lib/state';
   import {
     fetchPopularProjects,
     fetchProjects,

@@ -13,12 +13,13 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
+import { browser } from '$app/environment';
 import { METEOSTAT_DELAY_DAYS, OPEN_METEO_DELAY_DAYS } from '$lib/constants';
 import {
   defaultWeatherSource,
   isCustomWeather,
   weatherMonthGroupingStartDay,
-} from '$lib/stores';
+} from '$lib/state';
 import { get } from 'svelte/store';
 
 /**

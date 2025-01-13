@@ -25,7 +25,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     previewWeatherTargets,
     projectGalleryLink,
     projectGalleryTitle,
-  } from '$lib/stores';
+  } from '$lib/state';
   import { downloadPreviewPNG } from '$lib/utils';
   import { Drawer } from 'vaul-svelte';
 </script>

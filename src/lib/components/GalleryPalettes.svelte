@@ -39,7 +39,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import SelectYarn from '$lib/components/SelectYarn.svelte';
   import Spinner from '$lib/components/Spinner.svelte';
   import { ICONS } from '$lib/constants';
-  import { isDesktop } from '$lib/stores';
+  import { isDesktop } from '$lib/state';
   import {
     fetchProjects,
     getPalettesFromProjects,

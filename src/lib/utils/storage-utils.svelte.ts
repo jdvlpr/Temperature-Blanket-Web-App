@@ -29,7 +29,7 @@ import {
   useSecondaryWeatherSources,
   wasWeatherLoadedFromLocalStorage,
   weatherUngrouped,
-} from '$lib/stores';
+} from '$lib/state';
 import type {
   PageLayout,
   SavedProject,

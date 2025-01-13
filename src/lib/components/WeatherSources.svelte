@@ -26,7 +26,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     modal,
     useSecondaryWeatherSources,
     weather,
-  } from '$lib/stores';
+  } from '$lib/state';
   import { getModalStore } from '@skeletonlabs/skeleton';
   import { onMount } from 'svelte';
 

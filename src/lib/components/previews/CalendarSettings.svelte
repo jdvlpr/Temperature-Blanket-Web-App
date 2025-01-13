@@ -15,7 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script context="module">
   import { CHARACTERS_FOR_URL_HASH } from '$lib/constants';
-  import { preview } from '$lib/stores';
+  import { preview } from '$lib/state';
   import { setSecondaryTargets } from '$lib/utils';
   import chroma from 'chroma-js';
   import { derived, writable } from 'svelte/store';
@@ -137,7 +137,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     weather,
     weatherGrouping,
     weatherMonthGroupingStartDay,
-  } from '$lib/stores';
+  } from '$lib/state';
   import {
     getFactors,
     getMiddleValueOfArray,

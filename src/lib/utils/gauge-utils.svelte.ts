@@ -14,7 +14,7 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { SCHEMES } from '$lib/constants';
-import { units, weatherGrouping } from '$lib/stores';
+import { units, weatherGrouping } from '$lib/state';
 import { getDaysInRange, getDaysPercent, pluralize } from '$lib/utils';
 import chroma from 'chroma-js';
 import { get } from 'svelte/store';

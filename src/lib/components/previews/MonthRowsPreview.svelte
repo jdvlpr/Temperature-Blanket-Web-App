@@ -23,7 +23,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     weatherGrouping,
     weatherMonthGroupingStartDay,
     weatherUngrouped,
-  } from '$lib/stores';
+  } from '$lib/state';
   import {
     getColorInfo,
     getDaysInLongestMonth,

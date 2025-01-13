@@ -14,7 +14,7 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { WEATHER_DATA_DECIMALS } from '$lib/constants';
-import { units, windowLanguage } from '$lib/stores';
+import { units, windowLanguage } from '$lib/state';
 import { displayNumber, exists, pluralize } from '$lib/utils';
 import { get } from 'svelte/store';
 /**

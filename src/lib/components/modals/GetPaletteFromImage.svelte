@@ -22,7 +22,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
   import StickyPart from '$lib/components/modals/StickyPart.svelte';
   import { ICONS, MAXIMUM_COLORWAYS_MATCHES_FOR_IMAGES } from '$lib/constants';
-  import { defaultYarn } from '$lib/stores';
+  import { defaultYarn } from '$lib/state';
   import {
     getColorways,
     getTextColor,

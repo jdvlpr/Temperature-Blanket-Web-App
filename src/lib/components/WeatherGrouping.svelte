@@ -14,7 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import { weatherGrouping } from '$lib/stores';
+  import { weatherGrouping } from '$lib/state';
   import { RadioGroup, RadioItem } from '@skeletonlabs/skeleton';
 </script>
 

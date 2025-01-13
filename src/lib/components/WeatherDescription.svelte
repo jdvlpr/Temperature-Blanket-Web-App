@@ -19,7 +19,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     locationsState,
     weatherParametersData,
     weatherParametersInView,
-  } from '$lib/stores';
+  } from '$lib/state';
   import { exists, pluralize } from '$lib/utils';
   import { onMount } from 'svelte';
 

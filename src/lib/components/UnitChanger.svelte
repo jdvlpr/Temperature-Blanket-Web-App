@@ -15,7 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import { UNIT_LABELS } from '$lib/constants';
-  import { units } from '$lib/stores';
+  import { units } from '$lib/state';
   import { RadioGroup, RadioItem } from '@skeletonlabs/skeleton';
 </script>
 

@@ -14,7 +14,7 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import Alert from '$lib/components/modals/Alert.svelte';
-import { modal } from '$lib/stores';
+import { modal } from '$lib/state';
 import { online } from 'svelte/reactivity/window';
 
 /**

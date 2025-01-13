@@ -15,7 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script context="module">
   import { CHARACTERS_FOR_URL_HASH } from '$lib/constants';
-  import { preview } from '$lib/stores';
+  import { preview } from '$lib/state';
   import { capitalizeFirstLetter, pluralize } from '$lib/utils';
   import chroma from 'chroma-js';
   import { derived, writable } from 'svelte/store';
@@ -127,7 +127,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import NumberInputButton from '$lib/components/buttons/NumberInputButton.svelte';
   import ToggleSwitchGroup from '$lib/components/buttons/ToggleSwitchGroup.svelte';
   import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
-  import { createdGauges, modal, weatherGrouping } from '$lib/stores';
+  import { createdGauges, modal, weatherGrouping } from '$lib/state';
   import { setTargets } from '$lib/utils';
 
   $: targets = $createdGauges.map((n) => n.targets).flat();

@@ -14,7 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script context="module">
-  import { activeWeatherElementIndex } from '$lib/stores';
+  import { activeWeatherElementIndex } from '$lib/state';
   import { writable } from 'svelte/store';
   export let weatherChart = writable(null);
 </script>
@@ -25,7 +25,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     units,
     weather,
     weatherParametersInView,
-  } from '$lib/stores';
+  } from '$lib/state';
   import {
     CategoryScale,
     Chart,

@@ -15,7 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import Tooltip from '$lib/components/Tooltip.svelte';
-  import { pageSections, weather } from '$lib/stores';
+  import { pageSections, weather } from '$lib/state';
   import { goToProjectSection } from '$lib/utils';
 </script>
 

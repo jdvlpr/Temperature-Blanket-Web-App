@@ -22,9 +22,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import { browser } from '$app/environment';
   import { goto } from '$app/navigation';
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
   import { ICONS, NO_DATA_SRTM3 } from '$lib/constants';
-  import { isProjectLoading } from '$lib/stores';
+  import { isProjectLoading } from '$lib/state';
   import { displayGeoNamesErrorMessage } from '$lib/utils';
   import autocomplete from 'autocompleter';
   import { onMount } from 'svelte';
@@ -110,7 +110,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         $validId = true;
       },
     });
-    const id = $page.url.searchParams.get('id');
+    const id = page.url.searchParams.get('id');
     if (id) {
       await setLocationFromId({ id });
     } else {

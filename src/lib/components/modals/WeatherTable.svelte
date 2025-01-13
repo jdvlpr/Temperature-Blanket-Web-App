@@ -15,7 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import DataTable from '$lib/components/datatable/DataTable.svelte';
-  import { allGaugesAttributes, units, weatherGrouping } from '$lib/stores';
+  import { allGaugesAttributes, units, weatherGrouping } from '$lib/state';
   import { convertTime, dateToISO8601String } from '$lib/utils';
   import { DataHandler, Th } from '@vincjo/datatables';
   import ModalShell from './ModalShell.svelte';

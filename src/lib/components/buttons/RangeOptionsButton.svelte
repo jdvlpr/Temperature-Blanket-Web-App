@@ -16,7 +16,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script>
   import Tooltip from '$lib/components/Tooltip.svelte';
   import GaugeSettings from '$lib/components/modals/GaugeSettings.svelte';
-  import { modal } from '$lib/stores';
+  import { modal } from '$lib/state';
 
   let {
     gaugeAttributes,

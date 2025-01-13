@@ -24,7 +24,7 @@ import {
   useSecondaryWeatherSources,
   weatherGrouping,
   weatherMonthGroupingStartDay,
-} from '$lib/stores';
+} from '$lib/state';
 import { get } from 'svelte/store';
 
 class liveProjectURLHashClass {

@@ -15,7 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script context="module">
   import { LOADED_APP_VERSION, CHARACTERS_FOR_URL_HASH } from '$lib/constants';
-  import { preview } from '$lib/stores';
+  import { preview } from '$lib/state';
   import { derived, writable } from 'svelte/store';
 
   const id = 'chev';
@@ -67,7 +67,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <script>
-  import { createdGauges, weatherGrouping } from '$lib/stores';
+  import { createdGauges, weatherGrouping } from '$lib/state';
   import { setTargets } from '$lib/utils';
   import { capitalizeFirstLetter, upToDate } from '$lib/utils/other-utils';
   import { pluralize } from '$lib/utils/string-utils';

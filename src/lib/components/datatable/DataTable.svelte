@@ -16,7 +16,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script>
   import RowsPerPage from '$lib/components/datatable/RowsPerPage.svelte';
   import Search from '$lib/components/datatable/Search.svelte';
-  import { weather, weatherGrouping } from '$lib/stores';
+  import { weather, weatherGrouping } from '$lib/state';
   import { dateToISO8601String } from '$lib/utils';
 
   /**

@@ -22,7 +22,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
   import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
   import StickyPart from '$lib/components/modals/StickyPart.svelte';
-  import { units, weather } from '$lib/stores';
+  import { units, weather } from '$lib/state';
   import {
     displayNumber,
     getEvenlyDistributedRangeValuesWithEqualDayCount,

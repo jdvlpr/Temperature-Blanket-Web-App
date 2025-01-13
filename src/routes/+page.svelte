@@ -50,7 +50,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     wasProjectLoadedFromURL,
     weather,
     weatherGrouping,
-  } from '$lib/stores';
+  } from '$lib/state';
   import {
     checkForProjectInLocalStorage,
     handleKeyDown,

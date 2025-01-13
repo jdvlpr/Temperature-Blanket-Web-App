@@ -82,7 +82,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import { THEMES } from '$lib/constants';
-  import { activeTheme, theme } from '$lib/stores';
+  import { activeTheme, theme } from '$lib/state';
   import { setTheme } from '$lib/utils';
   import {
     ListBox,

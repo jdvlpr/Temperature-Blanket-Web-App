@@ -21,7 +21,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Tooltip from '$lib/components/Tooltip.svelte';
   import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
   import { ICONS } from '$lib/constants';
-  import { modal } from '$lib/stores';
+  import { modal } from '$lib/state';
   import type { Color } from '$lib/types';
   import { getTextColor } from '$lib/utils';
   import { SOURCES, TRIGGERS, dndzone } from 'svelte-dnd-action';

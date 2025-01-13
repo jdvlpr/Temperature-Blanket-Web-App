@@ -23,7 +23,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     locationsState,
     modal,
     weather,
-  } from '$lib/stores';
+  } from '$lib/state';
 
   function setModal() {
     modal.state.trigger({

@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { weatherGrouping } from '$lib/stores';
+import { weatherGrouping } from '$lib/state';
 import { getDaysInRange, getDaysPercent } from '$lib/utils';
 import pdfConfig from '../pdf-config';
 import pdfGauge from './gauge.svelte';

@@ -24,7 +24,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     useSecondaryWeatherSources,
     wasWeatherLoadedFromLocalStorage,
     weatherUngrouped,
-  } from '$lib/stores';
+  } from '$lib/state';
   // Note: the signal store is a weird necessity, investigate this
   import Spinner from '$lib/components/Spinner.svelte';
   import { delay, getOpenMeteo, goToProjectSection } from '$lib/utils';

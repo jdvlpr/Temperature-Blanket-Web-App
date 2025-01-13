@@ -19,7 +19,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Spinner from '$lib/components/Spinner.svelte';
   import ToTopButton from '$lib/components/buttons/ToTopButton.svelte';
   import { YARN_COLORWAYS_PER_PAGE } from '$lib/constants';
-  import { defaultYarn } from '$lib/stores';
+  import { defaultYarn } from '$lib/state';
   import type { Color } from '$lib/types';
   import {
     getColorways,

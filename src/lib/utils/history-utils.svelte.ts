@@ -44,7 +44,7 @@ import {
   weather,
   weatherGrouping,
   weatherMonthGroupingStartDay,
-} from '$lib/stores';
+} from '$lib/state';
 import {
   exists,
   getProjectParametersFromURLHash,

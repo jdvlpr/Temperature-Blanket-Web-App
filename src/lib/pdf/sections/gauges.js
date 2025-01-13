@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { gaugeSettings, gaugesState } from '$lib/stores';
+import { gaugeSettings, gaugesState } from '$lib/state';
 import { get } from 'svelte/store';
 import pdfGauge from './gauge.svelte';
 

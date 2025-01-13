@@ -43,7 +43,7 @@ import {
   useSecondaryWeatherSources,
   weatherGrouping,
   weatherMonthGroupingStartDay,
-} from '$lib/stores';
+} from '$lib/state';
 import type { GaugeSettings } from '$lib/types';
 import {
   celsiusToFahrenheit,

@@ -22,7 +22,7 @@ import {
   weatherGrouping,
   weatherItemHeading,
   weatherParametersData,
-} from '$lib/stores';
+} from '$lib/state';
 import {
   capitalizeFirstLetter,
   convertTime,
