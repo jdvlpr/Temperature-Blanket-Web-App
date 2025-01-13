@@ -26,6 +26,7 @@ import { brand as katia } from './katia/yarns';
 import { brand as knitPicks } from './knit-picks/yarns';
 import { brand as knittingForOlive } from './knitting-for-olive/yarns';
 import { brand as lilySugarNCream } from './lily-sugar-n-cream/yarns';
+import { brand as lindehobby } from './lindehobby/yarns';
 import { brand as lionBrand } from './lion-brand/yarns';
 import { brand as loopsAndThreads } from './loops-and-threads/yarns';
 import { brand as malabrigo } from './malabrigo/yarns';
@@ -87,6 +88,7 @@ export const brands: Brand[] = [
   knitPicks,
   knittingForOlive,
   lilySugarNCream,
+  lindehobby,
   lionBrand,
   loopsAndThreads,
   malabrigo,
