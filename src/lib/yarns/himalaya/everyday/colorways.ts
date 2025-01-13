@@ -4,7 +4,7 @@ const colorways: Colorway[] = [
   {
     source: {
       name: 'himalaya.com',
-      href: 'http://www.himalaya.com.tr/everyday.html',
+      href: 'https://www.himalaya.com.tr/everyday.html',
       accessed: '2024-03-06',
     },
     colors: [

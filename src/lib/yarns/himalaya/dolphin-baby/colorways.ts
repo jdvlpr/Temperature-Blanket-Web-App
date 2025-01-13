@@ -4,7 +4,7 @@ const colorways: Colorway[] = [
   {
     source: {
       name: 'himalaya.com',
-      href: 'http://www.himalaya.com.tr/dolphin-baby.html',
+      href: 'https://www.himalaya.com.tr/dolphin-baby.html',
       accessed: '2023-01-04',
     },
     colors: [
