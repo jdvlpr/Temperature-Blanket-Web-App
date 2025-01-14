@@ -53,7 +53,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     roundedBottom = true,
     typeId = 'palettePreview',
     onchanged = null,
-    fullscreen,
+    fullscreen = $bindable(),
   }: Props = $props();
 
   const flipDurationMs = 200;
@@ -177,7 +177,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   class="flex flex-col text-left gap-y-1 w-full {fullscreen ? 'h-full' : ''}"
 >
   <div
-    class="w-full inline-flex {fullscreen ? 'h-full' : 'h-[70px]'}"
+    class="w-full inline-flex {fullscreen ? 'h-full flex-col' : 'h-[70px]'}"
     use:dragHandleZone={{
       items: sortableColors,
       flipDurationMs,
@@ -215,47 +215,48 @@ If not, see <https://www.gnu.org/licenses/>. -->
           else activeColorIndex = index;
         }}
       >
-        <Tooltip
-          tooltipStyle="background:{hex};"
-          tooltipBg=""
-          fullWidth={true}
-          classNames="w-full {fullscreen ? 'h-full' : 'h-[70px]'}"
-          minWidth="260px"
-          showTooltip={activeColorIndex === index && !isDragging.value}
+        <div
+          class="flex-auto flex flex-col justify-center items-center {fullscreen
+            ? 'h-full'
+            : 'h-[70px]'}"
+          title={brandName && yarnName && name
+            ? `${brandName} - ${yarnName}: ${name}`
+            : hex}
+          style="background:{hex};color:{getTextColor(hex)}"
         >
-          <div
-            class="flex-auto flex flex-col justify-center items-center {fullscreen
-              ? 'h-full'
-              : 'h-[70px]'}"
-            title={brandName && yarnName && name
-              ? `${brandName} - ${yarnName}: ${name}`
-              : hex}
-            style="background:{hex};color:{getTextColor(hex)}"
+          {#if isLocked}
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 16 16"
+              fill="currentColor"
+              class="w-4 h-4 opacity-40 group-hover:hidden group-focus:hidden"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M8 1a3.5 3.5 0 0 0-3.5 3.5V7A1.5 1.5 0 0 0 3 8.5v5A1.5 1.5 0 0 0 4.5 15h7a1.5 1.5 0 0 0 1.5-1.5v-5A1.5 1.5 0 0 0 11.5 7V4.5A3.5 3.5 0 0 0 8 1Zm2 6V4.5a2 2 0 1 0-4 0V7h4Z"
+                clip-rule="evenodd"
+              />
+            </svg>
+          {:else}
+            <div
+              class="group-hover:hidden group-focus:hidden h-2 w-2 rounded-full opacity-20 relative top-[calc(50%-4px)] inline-block"
+              class:hidden={sortableColors.length > 30 ||
+                (activeColorIndex === index && !isDragging.value)}
+              class:sm:block={sortableColors.length > 30 &&
+                sortableColors.length <= 50}
+              class:xl:block={sortableColors.length > 50}
+              style="background:{getTextColor(hex)}"
+            ></div>
+          {/if}
+
+          <Tooltip
+            tooltipStyle="background:{hex};"
+            tooltipBg=""
+            fullWidth={false}
+            classNames="w-full {fullscreen ? 'h-full' : 'h-[70px]'}"
+            minWidth="260px"
+            showTooltip={activeColorIndex === index && !isDragging.value}
           >
-            {#if isLocked}
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 16 16"
-                fill="currentColor"
-                class="w-4 h-4 opacity-40 group-hover:hidden group-focus:hidden"
-              >
-                <path
-                  fill-rule="evenodd"
-                  d="M8 1a3.5 3.5 0 0 0-3.5 3.5V7A1.5 1.5 0 0 0 3 8.5v5A1.5 1.5 0 0 0 4.5 15h7a1.5 1.5 0 0 0 1.5-1.5v-5A1.5 1.5 0 0 0 11.5 7V4.5A3.5 3.5 0 0 0 8 1Zm2 6V4.5a2 2 0 1 0-4 0V7h4Z"
-                  clip-rule="evenodd"
-                />
-              </svg>
-            {:else}
-              <div
-                class="group-hover:hidden group-focus:hidden h-2 w-2 rounded-full opacity-20"
-                class:hidden={sortableColors.length > 30 ||
-                  (activeColorIndex === index && !isDragging.value)}
-                class:sm:block={sortableColors.length > 30 &&
-                  sortableColors.length <= 50}
-                class:xl:block={sortableColors.length > 50}
-                style="background:{getTextColor(hex)}"
-              ></div>
-            {/if}
             <div
               role="button"
               tabindex="0"
@@ -276,64 +277,78 @@ If not, see <https://www.gnu.org/licenses/>. -->
             >
               {@html ICONS.arrowsPointingOut}
             </div>
-          </div>
+            {#snippet tooltip()}
+              <div
+                style="background:{hex};color:{getTextColor(hex)};"
+                class="w-full rounded-container-token text-center break-all flex flex-wrap items-center justify-center gap-4 z-30"
+              >
+                {#if canUserDeleteColor && sortableColors.length > 1}
+                  <button
+                    onclick={async () => {
+                      colors = colors.filter((_, i) => i !== index);
 
-          {#snippet tooltip()}
-            <div
-              style="background:{hex};color:{getTextColor(hex)};"
-              class="w-full rounded-container-token text-center break-all flex flex-wrap items-center justify-center gap-4 z-30"
-            >
-              {#if canUserDeleteColor && sortableColors.length > 1}
-                <button
-                  onclick={async () => {
-                    colors = colors.filter((_, i) => i !== index);
-
-                    sortableColors = getSortableColors();
-                    if (onchanged) onchanged();
-                  }}
-                  class="btn-icon bg-secondary-hover-token"
-                >
-                  {@html ICONS.trash}
-                </button>
-              {/if}
-              {#if canUserEditColor}
-                <button
-                  class="btn bg-secondary-hover-token flex items-center justify-start"
-                  onclick={() =>
-                    modal.state.trigger({
-                      type: 'component',
-                      component: {
-                        ref: ChangeColor,
-                        props: {
-                          index,
-                          hex,
-                          name,
-                          brandId,
-                          yarnId,
-                          brandName,
-                          yarnName,
-                          variant_href,
-                          affiliate_variant_href,
-                          onChangeColor,
-                        },
-                      },
-                    })}
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke-width="1.5"
-                    stroke="currentColor"
-                    class="w-6 h-6 flex-shrink-0"
+                      sortableColors = getSortableColors();
+                      if (onchanged) onchanged();
+                    }}
+                    class="btn-icon bg-secondary-hover-token"
                   >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
-                    />
-                  </svg>
-                  <span
+                    {@html ICONS.trash}
+                  </button>
+                {/if}
+                {#if canUserEditColor}
+                  <button
+                    class="btn bg-secondary-hover-token flex items-center justify-start"
+                    onclick={() =>
+                      modal.state.trigger({
+                        type: 'component',
+                        component: {
+                          ref: ChangeColor,
+                          props: {
+                            index,
+                            hex,
+                            name,
+                            brandId,
+                            yarnId,
+                            brandName,
+                            yarnName,
+                            variant_href,
+                            affiliate_variant_href,
+                            onChangeColor,
+                          },
+                        },
+                      })}
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="1.5"
+                      stroke="currentColor"
+                      class="w-6 h-6 flex-shrink-0"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+                      />
+                    </svg>
+                    <span
+                      class="flex flex-col items-start justify-start text-left text-wrap"
+                    >
+                      <span class="text-xs">
+                        {#if brandName && yarnName}
+                          {brandName}
+                          -
+                          {yarnName}
+                        {:else}
+                          Find Matching Yarn
+                        {/if}
+                      </span>
+                      <span class="text-lg leading-tight"> {name || hex}</span>
+                    </span>
+                  </button>
+                {:else}
+                  <div
                     class="flex flex-col items-start justify-start text-left text-wrap"
                   >
                     <span class="text-xs">
@@ -341,72 +356,57 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         {brandName}
                         -
                         {yarnName}
-                      {:else}
-                        Find Matching Yarn
                       {/if}
                     </span>
-                    <span class="text-lg leading-tight"> {name || hex}</span>
-                  </span>
-                </button>
-              {:else}
-                <div
-                  class="flex flex-col items-start justify-start text-left text-wrap"
-                >
-                  <span class="text-xs">
-                    {#if brandName && yarnName}
-                      {brandName}
-                      -
-                      {yarnName}
+                    <span class="text-lg leading-tight">
+                      {name || hex}
+                    </span>
+                  </div>
+                {/if}
+                {#if typeof color.locked !== 'undefined'}
+                  <button
+                    class="btn btn-icon"
+                    onclick={(e) => {
+                      e.preventDefault();
+                      color.locked = !color.locked;
+                      if (onchanged) onchanged();
+                    }}
+                  >
+                    {#if color.locked}
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                        class="w-6 h-6"
+                      >
+                        <path
+                          fill-rule="evenodd"
+                          d="M12 1.5a5.25 5.25 0 0 0-5.25 5.25v3a3 3 0 0 0-3 3v6.75a3 3 0 0 0 3 3h10.5a3 3 0 0 0 3-3v-6.75a3 3 0 0 0-3-3v-3c0-2.9-2.35-5.25-5.25-5.25Zm3.75 8.25v-3a3.75 3.75 0 1 0-7.5 0v3h7.5Z"
+                          clip-rule="evenodd"
+                        />
+                      </svg>
+                    {:else}
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke-width="1.5"
+                        stroke="currentColor"
+                        class="w-6 h-6"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M13.5 10.5V6.75a4.5 4.5 0 1 1 9 0v3.75M3.75 21.75h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H3.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z"
+                        />
+                      </svg>
                     {/if}
-                  </span>
-                  <span class="text-lg leading-tight">
-                    {name || hex}
-                  </span>
-                </div>
-              {/if}
-              {#if typeof color.locked !== 'undefined'}
-                <button
-                  class="btn btn-icon"
-                  onclick={(e) => {
-                    e.preventDefault();
-                    color.locked = !color.locked;
-                    if (onchanged) onchanged();
-                  }}
-                >
-                  {#if color.locked}
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      fill="currentColor"
-                      class="w-6 h-6"
-                    >
-                      <path
-                        fill-rule="evenodd"
-                        d="M12 1.5a5.25 5.25 0 0 0-5.25 5.25v3a3 3 0 0 0-3 3v6.75a3 3 0 0 0 3 3h10.5a3 3 0 0 0 3-3v-6.75a3 3 0 0 0-3-3v-3c0-2.9-2.35-5.25-5.25-5.25Zm3.75 8.25v-3a3.75 3.75 0 1 0-7.5 0v3h7.5Z"
-                        clip-rule="evenodd"
-                      />
-                    </svg>
-                  {:else}
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke-width="1.5"
-                      stroke="currentColor"
-                      class="w-6 h-6"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="M13.5 10.5V6.75a4.5 4.5 0 1 1 9 0v3.75M3.75 21.75h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H3.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z"
-                      />
-                    </svg>
-                  {/if}
-                </button>
-              {/if}
-            </div>
-          {/snippet}
-        </Tooltip>
+                  </button>
+                {/if}
+              </div>
+            {/snippet}
+          </Tooltip>
+        </div>
       </button>
     {/each}
   </div>
@@ -414,3 +414,30 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <p class="text-xs">{@html schemeName}</p>
   {/if}
 </div>
+<!-- 
+{#if fullscreen}
+  <div class="flex w-full justify-center p-2">
+    <button
+      aria-label="Fullscreen"
+      class="btn bg-secondary-hover-token flex gap-1 justify-start items-center"
+      onclick={() => (fullscreen = false)}
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke-width="1.5"
+        stroke="currentColor"
+        class="size-6"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M9 9V4.5M9 9H4.5M9 9 3.75 3.75M9 15v4.5M9 15H4.5M9 15l-5.25 5.25M15 9h4.5M15 9V4.5M15 9l5.25-5.25M15 15h4.5M15 15v4.5m0-4.5 5.25 5.25"
+        />
+      </svg>
+
+      Exit Fullscreen
+    </button>
+  </div>
+{/if} -->

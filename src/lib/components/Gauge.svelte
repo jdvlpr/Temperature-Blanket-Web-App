@@ -64,21 +64,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   $effect(() => {
     if (fullscreen) {
-      toastStore.trigger({
-        message: 'Fullscreen editing',
-        timeout: 31556952000, // one year
-        hideDismiss: true,
-        action: {
-          label: ICONS.xMark,
-          response: () => {
-            fullscreen = false;
-          },
-        },
-      });
       gaugeContainerElement.style.zIndex = '40';
     } else {
       gaugeContainerElement.style.zIndex = '';
-      toastStore.clear();
     }
   });
 </script>
@@ -127,17 +115,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
 {/if}
 
 <div
-  class="w-full flex flex-wrap gap-2 justify-center items-center rounded-container-token bg-surface-300-600-token text-token shadow-inner mt-2 pb-2"
+  class="w-full flex flex-col justify-center items-center rounded-container-token bg-surface-300-600-token text-token {fullscreen
+    ? 'fixed w-full h-full left-0 top-0 bg-surface-50-900-token'
+    : 'shadow-inner mt-2 pb-2 gap-2'}"
+  bind:this={gaugeContainerElement}
 >
-  <div
-    class="w-full {fullscreen
-      ? 'fixed w-full h-full left-0 top-0 bg-surface-50-900-token'
-      : ''}"
-    bind:this={gaugeContainerElement}
-  >
+  <div class="w-full {fullscreen ? 'flex-auto w-full h-fullf' : ''}">
     {#key gauges.activeGauge.colors}
       <ColorPaletteEditable
-        {fullscreen}
+        bind:fullscreen
         bind:colors={gauges.activeGauge.colors}
         schemeName={gauges.activeGauge.schemeId}
         showSchemeName={false}
@@ -146,33 +132,118 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {/key}
   </div>
 
-  <div class="">
-    <SelectNumberOfColors
-      numberOfColors={gauges.activeGauge.colors.length}
-      onchange={(e) => {
-        gauges.activeGauge.colors = createGaugeColors({
-          schemeId: gauges.activeGauge.schemeId,
-          numberOfColors: +e.target.value,
-          colors: $state.snapshot(gauges.activeGauge.colors),
-        });
+  <div
+    class="flex flex-wrap justify-center items-center gap-2 {fullscreen
+      ? 'p-2'
+      : ''}"
+  >
+    <div class="">
+      <SelectNumberOfColors
+        numberOfColors={gauges.activeGauge.colors.length}
+        onchange={(e) => {
+          gauges.activeGauge.colors = createGaugeColors({
+            schemeId: gauges.activeGauge.schemeId,
+            numberOfColors: +e.target.value,
+            colors: $state.snapshot(gauges.activeGauge.colors),
+          });
 
-        gauges.activeGauge.numberOfColors = gauges.activeGauge.colors.length;
-      }}
-    />
-  </div>
+          gauges.activeGauge.numberOfColors = gauges.activeGauge.colors.length;
+        }}
+      />
+    </div>
 
-  {#if isDesktop.current}
+    {#if isDesktop.current}
+      <button
+        class="btn bg-secondary-hover-token justify-start"
+        title="Browse Preset & User-Created Color Palettes"
+        onclick={() =>
+          modal.state.trigger({
+            type: 'component',
+            component: {
+              ref: BrowsePalettes,
+              props: {
+                numberOfColors: gauges.activeGauge.numberOfColors,
+                schemeId: gauges.activeGauge.schemeId,
+                updateGauge,
+              },
+            },
+          })}
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="currentColor"
+          class="w-6 h-6 mr-1"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M4.098 19.902a3.75 3.75 0 005.304 0l6.401-6.402M6.75 21A3.75 3.75 0 013 17.25V4.125C3 3.504 3.504 3 4.125 3h5.25c.621 0 1.125.504 1.125 1.125v4.072M6.75 21a3.75 3.75 0 003.75-3.75V8.197M6.75 21h13.125c.621 0 1.125-.504 1.125-1.125v-5.25c0-.621-.504-1.125-1.125-1.125h-4.072M10.5 8.197l2.88-2.88c.438-.439 1.15-.439 1.59 0l3.712 3.713c.44.44.44 1.152 0 1.59l-2.879 2.88M6.75 17.25h.008v.008H6.75v-.008z"
+          />
+        </svg> Browse Palettes
+      </button>
+    {/if}
+
+    {#if !isDesktop.current}
+      <Drawer.Root bind:open={drawerState.browsePalettes}>
+        <Drawer.Trigger on:click={() => (drawerState.browsePalettes = true)}>
+          <button
+            class="btn bg-secondary-hover-token justify-start"
+            title="Browse Preset & User-Created Color Palettes"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="w-6 h-6 mr-1"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M4.098 19.902a3.75 3.75 0 005.304 0l6.401-6.402M6.75 21A3.75 3.75 0 013 17.25V4.125C3 3.504 3.504 3 4.125 3h5.25c.621 0 1.125.504 1.125 1.125v4.072M6.75 21a3.75 3.75 0 003.75-3.75V8.197M6.75 21h13.125c.621 0 1.125-.504 1.125-1.125v-5.25c0-.621-.504-1.125-1.125-1.125h-4.072M10.5 8.197l2.88-2.88c.438-.439 1.15-.439 1.59 0l3.712 3.713c.44.44.44 1.152 0 1.59l-2.879 2.88M6.75 17.25h.008v.008H6.75v-.008z"
+              />
+            </svg> Browse Palettes
+          </button>
+        </Drawer.Trigger>
+        <Drawer.Portal>
+          <Drawer.Overlay class="fixed inset-0 bg-black/40 z-40" />
+
+          <Drawer.Content
+            class="h-[90svh] bg-surface-200-700-token text-token flex flex-col rounded-tl-container-token rounded-tr-container-token mt-24 fixed bottom-0 left-0 right-0 z-50"
+          >
+            <div
+              class="pt-4 rounded-tl-container-token rounded-tr-container-token overflow-auto"
+            >
+              <div
+                class="mx-auto w-12 h-1.5 flex-shrink-0 rounded-full mb-4 bg-surface-900-50-token"
+              ></div>
+              <div class="mx-auto text-center">
+                <BrowsePalettes
+                  numberOfColors={gauges.activeGauge.numberOfColors}
+                  schemeId={gauges.activeGauge.schemeId}
+                  {updateGauge}
+                  context="drawer"
+                />
+              </div>
+            </div>
+          </Drawer.Content>
+        </Drawer.Portal>
+      </Drawer.Root>
+    {/if}
+
     <button
       class="btn bg-secondary-hover-token justify-start"
-      title="Browse Preset & User-Created Color Palettes"
+      title="Choose Yarn Colorways, Filtered by Brand and Yarn"
       onclick={() =>
         modal.state.trigger({
           type: 'component',
           component: {
-            ref: BrowsePalettes,
+            ref: ChooseColorways,
             props: {
-              numberOfColors: gauges.activeGauge.numberOfColors,
-              schemeId: gauges.activeGauge.schemeId,
               updateGauge,
             },
           },
@@ -189,235 +260,159 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <path
           stroke-linecap="round"
           stroke-linejoin="round"
-          d="M4.098 19.902a3.75 3.75 0 005.304 0l6.401-6.402M6.75 21A3.75 3.75 0 013 17.25V4.125C3 3.504 3.504 3 4.125 3h5.25c.621 0 1.125.504 1.125 1.125v4.072M6.75 21a3.75 3.75 0 003.75-3.75V8.197M6.75 21h13.125c.621 0 1.125-.504 1.125-1.125v-5.25c0-.621-.504-1.125-1.125-1.125h-4.072M10.5 8.197l2.88-2.88c.438-.439 1.15-.439 1.59 0l3.712 3.713c.44.44.44 1.152 0 1.59l-2.879 2.88M6.75 17.25h.008v.008H6.75v-.008z"
+          d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
         />
-      </svg> Browse Palettes
+      </svg> Choose Colorways
     </button>
-  {/if}
 
-  {#if !isDesktop.current}
-    <Drawer.Root bind:open={drawerState.browsePalettes}>
-      <Drawer.Trigger on:click={() => (drawerState.browsePalettes = true)}>
-        <button
-          class="btn bg-secondary-hover-token justify-start"
-          title="Browse Preset & User-Created Color Palettes"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="1.5"
-            stroke="currentColor"
-            class="w-6 h-6 mr-1"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M4.098 19.902a3.75 3.75 0 005.304 0l6.401-6.402M6.75 21A3.75 3.75 0 013 17.25V4.125C3 3.504 3.504 3 4.125 3h5.25c.621 0 1.125.504 1.125 1.125v4.072M6.75 21a3.75 3.75 0 003.75-3.75V8.197M6.75 21h13.125c.621 0 1.125-.504 1.125-1.125v-5.25c0-.621-.504-1.125-1.125-1.125h-4.072M10.5 8.197l2.88-2.88c.438-.439 1.15-.439 1.59 0l3.712 3.713c.44.44.44 1.152 0 1.59l-2.879 2.88M6.75 17.25h.008v.008H6.75v-.008z"
-            />
-          </svg> Browse Palettes
-        </button>
-      </Drawer.Trigger>
-      <Drawer.Portal>
-        <Drawer.Overlay class="fixed inset-0 bg-black/40 z-40" />
-
-        <Drawer.Content
-          class="h-[90svh] bg-surface-200-700-token text-token flex flex-col rounded-tl-container-token rounded-tr-container-token mt-24 fixed bottom-0 left-0 right-0 z-50"
-        >
-          <div
-            class="pt-4 rounded-tl-container-token rounded-tr-container-token overflow-auto"
-          >
-            <div
-              class="mx-auto w-12 h-1.5 flex-shrink-0 rounded-full mb-4 bg-surface-900-50-token"
-            ></div>
-            <div class="mx-auto text-center">
-              <BrowsePalettes
-                numberOfColors={gauges.activeGauge.numberOfColors}
-                schemeId={gauges.activeGauge.schemeId}
-                {updateGauge}
-                context="drawer"
-              />
-            </div>
-          </div>
-        </Drawer.Content>
-      </Drawer.Portal>
-    </Drawer.Root>
-  {/if}
-
-  <button
-    class="btn bg-secondary-hover-token justify-start"
-    title="Choose Yarn Colorways, Filtered by Brand and Yarn"
-    onclick={() =>
-      modal.state.trigger({
-        type: 'component',
-        component: {
-          ref: ChooseColorways,
-          props: {
-            updateGauge,
+    <button
+      class="btn bg-secondary-hover-token justify-start"
+      title="Get Palette from Image"
+      onclick={() =>
+        modal.state.trigger({
+          type: 'component',
+          component: {
+            ref: GetPaletteFromImage,
+            props: {
+              numberOfColors: gauges.activeGauge.numberOfColors,
+              updateGauge,
+            },
           },
-        },
-      })}
-  >
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke-width="1.5"
-      stroke="currentColor"
-      class="w-6 h-6 mr-1"
+        })}
+      ><svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke-width="1.5"
+        stroke="currentColor"
+        class="w-6 h-6 mr-1"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
+        />
+      </svg> Image Palette</button
     >
-      <path
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
-      />
-    </svg> Choose Colorways
-  </button>
 
-  <button
-    class="btn bg-secondary-hover-token justify-start"
-    title="Get Palette from Image"
-    onclick={() =>
-      modal.state.trigger({
-        type: 'component',
-        component: {
-          ref: GetPaletteFromImage,
-          props: {
-            numberOfColors: gauges.activeGauge.numberOfColors,
-            updateGauge,
+    <button
+      class="btn bg-secondary-hover-token justify-start"
+      title="Load Colors or Get a Palette Code to Share"
+      onclick={() =>
+        modal.state.trigger({
+          type: 'component',
+          component: {
+            ref: ImportExportPalette,
+            props: {
+              colors: $state.snapshot(gauges.activeGauge.colors),
+              updateGauge,
+            },
           },
-        },
-      })}
-    ><svg
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke-width="1.5"
-      stroke="currentColor"
-      class="w-6 h-6 mr-1"
+        })}
     >
-      <path
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
-      />
-    </svg> Image Palette</button
-  >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke-width="1.5"
+        stroke="currentColor"
+        class="w-6 h-6 mr-1"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"
+        />
+      </svg> Import/Export
+    </button>
 
-  <button
-    class="btn bg-secondary-hover-token justify-start"
-    title="Load Colors or Get a Palette Code to Share"
-    onclick={() =>
-      modal.state.trigger({
-        type: 'component',
-        component: {
-          ref: ImportExportPalette,
-          props: {
-            colors: $state.snapshot(gauges.activeGauge.colors),
-            updateGauge,
+    <button
+      class="btn bg-secondary-hover-token justify-start"
+      title="Generate Random Colors"
+      onclick={() =>
+        modal.state.trigger({
+          type: 'component',
+          component: {
+            ref: RandomPalette,
+            props: {
+              numberOfColors: gauges.activeGauge.numberOfColors,
+              updateGauge,
+            },
           },
-        },
-      })}
-  >
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke-width="1.5"
-      stroke="currentColor"
-      class="w-6 h-6 mr-1"
+        })}
     >
-      <path
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"
-      />
-    </svg> Import/Export
-  </button>
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke-width="1.5"
+        stroke="currentColor"
+        class="w-6 h-6 mr-1"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"
+        />
+      </svg> Random
+    </button>
 
-  <button
-    class="btn bg-secondary-hover-token justify-start"
-    title="Generate Random Colors"
-    onclick={() =>
-      modal.state.trigger({
-        type: 'component',
-        component: {
-          ref: RandomPalette,
-          props: {
-            numberOfColors: gauges.activeGauge.numberOfColors,
-            updateGauge,
+    <button
+      class="btn bg-secondary-hover-token justify-start"
+      title="Sort Colors"
+      onclick={() =>
+        modal.state.trigger({
+          type: 'component',
+          component: {
+            ref: SortPalette,
+            props: {
+              colors: $state.snapshot(gauges.activeGauge.colors),
+              updateGauge,
+            },
           },
-        },
-      })}
-  >
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke-width="1.5"
-      stroke="currentColor"
-      class="w-6 h-6 mr-1"
+        })}
     >
-      <path
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"
-      />
-    </svg> Random
-  </button>
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke-width="1.5"
+        stroke="currentColor"
+        class="w-6 h-6 mr-1"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M3 7.5L7.5 3m0 0L12 7.5M7.5 3v13.5m13.5 0L16.5 21m0 0L12 16.5m4.5 4.5V7.5"
+        />
+      </svg> Sort
+    </button>
 
-  <button
-    class="btn bg-secondary-hover-token justify-start"
-    title="Sort Colors"
-    onclick={() =>
-      modal.state.trigger({
-        type: 'component',
-        component: {
-          ref: SortPalette,
-          props: {
-            colors: $state.snapshot(gauges.activeGauge.colors),
-            updateGauge,
-          },
-        },
-      })}
-  >
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke-width="1.5"
-      stroke="currentColor"
-      class="w-6 h-6 mr-1"
+    <button
+      aria-label="Fullscreen"
+      class="btn bg-secondary-hover-token flex gap-1 justify-start items-center"
+      onclick={() => (fullscreen = !fullscreen)}
     >
-      <path
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        d="M3 7.5L7.5 3m0 0L12 7.5M7.5 3v13.5m13.5 0L16.5 21m0 0L12 16.5m4.5 4.5V7.5"
-      />
-    </svg> Sort
-  </button>
-
-  <button
-    aria-label="Fullscreen"
-    class="btn bg-secondary-hover-token flex gap-1 justify-start items-center"
-    onclick={() => (fullscreen = true)}
-  >
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke-width="1.5"
-      stroke="currentColor"
-      class="size-6"
-    >
-      <path
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15"
-      />
-    </svg>
-    Fullscreen
-  </button>
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke-width="1.5"
+        stroke="currentColor"
+        class="size-6"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15"
+        />
+      </svg>
+      {#if fullscreen}
+        Exit
+      {/if}
+      Fullscreen
+    </button>
+  </div>
 </div>
 
 <div class="mt-2 mb-4">

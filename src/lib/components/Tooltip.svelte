@@ -71,6 +71,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let isTooltipActive = $state(false);
 
+  let tooltipElement = $state();
+
   let debounceTimer;
   const debounce = (callback, time) => {
     window.clearTimeout(debounceTimer);
@@ -130,6 +132,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
       } else clearTimeout(timeout);
     }, duration);
   }
+
+  $effect(() => {
+    if (showTooltip) {
+      tooltipElement.style.zIndex = '100';
+    }
+  });
 </script>
 
 <div class="inline-block h-full" class:w-full={fullWidth}>
@@ -202,7 +210,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     aria-labelledby="Tooltip or Menu"
     aria-describedby="A dialog box showing information or menu items."
     in:scale={{ duration: 175 }}
-    class="absolute shadow-lg text-token cursor-text z-200 rounded-container-token tooltip"
+    class="absolute shadow-lg text-token cursor-text z-200 rounded-container-token tooltip block"
     style="min-width:{minWidth}"
     use:floatingContent
     onmouseenter={() => (isTooltipActive = true)}
@@ -215,6 +223,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       isTooltipActive = false;
       handelLeaveEvent(event);
     }}
+    bind:this={tooltipElement}
   >
     <div
       class="p-2 rounded-container-token {tooltipBg} {tooltipClass}"
@@ -225,7 +234,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     <div
       style="position:absolute; {tooltipStyle}"
-      class="w-4 h-4 {tooltipBg} z-40"
+      class="w-4 h-4 {tooltipBg}"
       bind:this={$arrowRef}
     ></div>
   </div>
