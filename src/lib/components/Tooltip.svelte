@@ -17,6 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { arrow, createFloatingActions } from 'svelte-floating-ui';
   import {
     autoPlacement,
+    flip,
     offset,
     shift,
     size,

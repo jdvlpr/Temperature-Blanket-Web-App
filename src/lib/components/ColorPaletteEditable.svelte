@@ -170,6 +170,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   onclick={(e) => {
     if (!(e.target as Element).closest('.palette-item'))
       activeColorIndex = null;
+    else
+      activeColorIndex = +(e.target as Element).closest('.palette-item')
+        ?.dataset.index;
   }}
 />
 
@@ -208,6 +211,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         !fullscreen
           ? 'first:rounded-bl-container-token last:rounded-br-container-token'
           : ''}"
+        data-index={index}
         animate:flip={{ duration: flipDurationMs }}
         onclick={() => {
           if (activeColorIndex !== index) activeColorIndex = index;
