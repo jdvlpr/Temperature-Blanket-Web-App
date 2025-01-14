@@ -24,6 +24,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ImportExportPalette from '$lib/components/modals/ImportExportPalette.svelte';
   import RandomPalette from '$lib/components/modals/RandomPalette.svelte';
   import SortPalette from '$lib/components/modals/SortPalette.svelte';
+  import { ICONS } from '$lib/constants';
   import {
     drawerState,
     gauges,
@@ -64,10 +65,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
   $effect(() => {
     if (fullscreen) {
       toastStore.trigger({
-        message: 'Press ESC to exit fullscreen',
-        timeout: 2000,
+        message: 'Fullscreen editing',
+        timeout: 31556952000, // one year
+        hideDismiss: true,
+        action: {
+          label: ICONS.xMark,
+          response: () => {
+            fullscreen = false;
+          },
+        },
       });
       gaugeContainerElement.style.zIndex = '40';
+    } else {
+      gaugeContainerElement.style.zIndex = '';
+      toastStore.clear();
     }
   });
 </script>
@@ -134,6 +145,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       />
     {/key}
   </div>
+
   <div class="">
     <SelectNumberOfColors
       numberOfColors={gauges.activeGauge.colors.length}
@@ -383,6 +395,28 @@ If not, see <https://www.gnu.org/licenses/>. -->
         d="M3 7.5L7.5 3m0 0L12 7.5M7.5 3v13.5m13.5 0L16.5 21m0 0L12 16.5m4.5 4.5V7.5"
       />
     </svg> Sort
+  </button>
+
+  <button
+    aria-label="Fullscreen"
+    class="btn bg-secondary-hover-token flex gap-1 justify-start items-center"
+    onclick={() => (fullscreen = true)}
+  >
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke-width="1.5"
+      stroke="currentColor"
+      class="size-6"
+    >
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15"
+      />
+    </svg>
+    Fullscreen
   </button>
 </div>
 
