@@ -69,9 +69,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   $effect(() => {
     if (fullscreen) {
       gaugeContainerElement.style.zIndex = '40';
-      document.body.classList.add('overflow-hidden');
+      document.body.classList.add('overflow-y-hidden');
     } else {
-      document.body.classList.remove('overflow-hidden');
+      document.body.classList.remove('overflow-y-hidden');
       gaugeContainerElement.style.zIndex = '';
     }
   });
@@ -121,9 +121,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 {/if}
 
 <div
-  class="w-full flex flex-col justify-center items-center rounded-container-token bg-surface-300-600-token text-token {fullscreen
-    ? 'fixed w-full h-full left-0 top-0 bg-surface-50-900-token'
-    : 'shadow-inner mt-2 pb-2 gap-2'}"
+  class="w-full flex flex-col justify-center items-center bg-surface-300-600-token text-token {fullscreen
+    ? 'fixed w-full h-full left-0 top-0 bg-surface-50-900-token overflow-scroll'
+    : 'shadow-inner mt-2 pb-2 gap-2 rounded-container-token'}"
   bind:this={gaugeContainerElement}
   use:focusTrap={fullscreen}
 >
