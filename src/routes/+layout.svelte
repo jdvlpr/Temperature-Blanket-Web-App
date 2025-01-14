@@ -183,7 +183,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <Toast max={3} position="b" zIndex={'z-[10000]'} />
 
-<Modal regionBackdrop="backdrop-blur-sm" />
+<Modal regionBackdrop="backdrop-blur-sm" zIndex={'z-[10010]'} />
 
 <p
   class="sm:text-center px-4 py-8 bg-warning-backdrop-token text-token [view-transition-name:top-banner]"
