@@ -46,7 +46,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   $effect(() => {
     projectStatus.state.liveURL;
-    if (!weather.data || !gauges.gauges) return;
+    if (!weather.data || !gauges.allCreated) return;
     debounce(() => {
       // Setup constants
       let columnIndex = 0; // Current column index

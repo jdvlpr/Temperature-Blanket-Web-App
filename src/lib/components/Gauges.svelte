@@ -23,12 +23,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     setupAvailableGauges();
   });
 
-  // If an initially empty weather parameter gets some user-created data, add the available gauge to the options
-  $effect(() => {
-    weather.data;
-    setupAvailableGauges();
-  });
-
   function setupAvailableGauges() {
     allGaugesAttributes.forEach((gauge) => {
       gauge.targets.forEach((target) => {
@@ -46,9 +40,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
     });
 
     // If the active gauge is no longer available, set it to the first available
-    if (!gauges.gauges.find((gauge) => gauge.id === gauges.activeGaugeId))
-      gauges.activeGaugeId = gauges.gauges[0]?.id;
+    if (!gauges.allCreated.find((gauge) => gauge.id === gauges.activeGaugeId))
+      gauges.activeGaugeId = gauges.allCreated[0]?.id;
   }
+
+  // If an initially empty weather parameter gets some user-created data, add the available gauge to the options
+  $effect(() => {
+    weather.data;
+    setupAvailableGauges();
+  });
 </script>
 
 <div class="inline-flex justify-center items-center gap-2 mb-2 mt-3">
@@ -60,15 +60,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
       onchange={(e) => {
         const id = e.target.value;
 
-        if (!gauges.gauges.map((gauge) => gauge.id).includes(id)) {
+        if (!gauges.allCreated.map((gauge) => gauge.id).includes(id)) {
           // If the gauge is not created yet, then set it up
           gauges.addById(id);
         }
       }}
     >
-      {#each gauges.availableGauges as { id, label }}
+      {#each gauges.allAvailable as { id, label }}
         <option value={id} selected={gauges.activeGaugeId === id}>
-          {#if !gauges.gauges.map((gauge) => gauge.id).includes(id)}
+          {#if !gauges.allCreated.map((gauge) => gauge.id).includes(id)}
             Add
           {/if}
           {label}
@@ -78,7 +78,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </label>
 </div>
 
-{#if gauges.activeGauge}
+{#if gauges.activeGauge && !gauges.activeGauge.calculating}
   <Gauge />
 {/if}
 

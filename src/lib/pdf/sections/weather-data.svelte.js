@@ -265,7 +265,7 @@ const pdfWeatherData = {
       );
 
       const parentGaugeId = getTargetParentGaugeId(param);
-      const hasGauge = gauges.gauges
+      const hasGauge = gauges.allCreated
         .map((gauge) => gauge.id)
         .includes(parentGaugeId);
 

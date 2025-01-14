@@ -58,7 +58,7 @@ export class RowsPreviewClass {
   previewComponent = RowsPreview;
   settingsComponent = RowsSettings;
   targets = $derived(
-    gauges.gauges
+    gauges.allCreated
       .flatMap((n) => n.targets)
       .filter((n) => this.settings.selectedTargets.includes(n.id)),
   );

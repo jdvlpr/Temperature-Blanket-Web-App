@@ -73,9 +73,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { capitalizeFirstLetter, upToDate } from '$lib/utils/other-utils';
   import { pluralize } from '$lib/utils/string-utils';
 
-  $: targets = gauges.gauges.map((n) => n.targets).flat();
+  $: targets = gauges.allCreated.map((n) => n.targets).flat();
 
-  $: if (gauges.gauges)
+  $: if (gauges.allCreated)
     $settings.selectedTargets = setTargets($settings.selectedTargets);
 </script>
 

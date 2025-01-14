@@ -217,7 +217,7 @@ export const getColorsFromInput = ({
  * @returns {object} - The color information object with the hexadecimal color value, index, and gauge length.
  */
 export const getColorInfo = (gaugeId, value) => {
-  const gauge = gauges.gauges.find((n) => n.id === gaugeId);
+  const gauge = gauges.allCreated.find((n) => n.id === gaugeId);
   const color = { hex: '#ffffff' };
 
   if (

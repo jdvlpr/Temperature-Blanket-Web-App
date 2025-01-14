@@ -38,7 +38,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   $: width = $settings.stitchesPerRow * STITCH_SIZE;
   $: height = weather.data?.length * STITCH_SIZE;
 
-  $: targets = gauges.gauges
+  $: targets = gauges.allCreated
     .map((n) => n.targets)
     .flat()
     .filter(

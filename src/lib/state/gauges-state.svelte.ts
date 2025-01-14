@@ -22,9 +22,9 @@ import { TemperatureGauge } from '$lib/state/gauges/temperature-gauge-state.svel
 export let showDaysInRange: { value: boolean } = $state({ value: true });
 
 class GaugesState {
-  gauges: GaugeStateInterface[] = $state([]);
+  allCreated: GaugeStateInterface[] = $state([]);
 
-  availableGauges: {
+  allAvailable: {
     id: GaugeAttributes['id'];
     label: GaugeAttributes['label'];
   }[] = $state([]);
@@ -32,12 +32,12 @@ class GaugesState {
   activeGaugeId = $state('');
 
   activeGauge = $derived(
-    this.gauges.find((gauge) => gauge.id === this.activeGaugeId),
+    this.allCreated.find((gauge) => gauge.id === this.activeGaugeId),
   );
 
   urlHash = $derived.by(() => {
     let hash = '';
-    this.gauges.forEach((gauge) => {
+    this.allCreated.forEach((gauge) => {
       if (!gauge.rangeOptions || !gauge.colors || !gauge.ranges) return hash;
       if (gauge.ranges?.length !== gauge.colors?.length) return hash;
       hash += '&';
@@ -112,18 +112,21 @@ class GaugesState {
   });
 
   addById(id: GaugeAttributes['id']): void {
-    if (this.gauges.length && this.gauges.map((gauge) => gauge.id).includes(id))
+    if (
+      this.allCreated.length &&
+      this.allCreated.map((gauge) => gauge.id).includes(id)
+    )
       return;
 
     let newGauge;
     if (id === 'temp') newGauge = new TemperatureGauge();
     // else newGauge = new GaugeState({ attributes, settings });
 
-    this.gauges.push(newGauge);
+    this.allCreated.push(newGauge);
 
     // This should only happen the first time, when the default temperature gauge is set up.
-    if (!this.availableGauges.map((gauge) => gauge.id).includes(newGauge.id)) {
-      this.availableGauges.push({ id: newGauge.id, label: newGauge.label });
+    if (!this.allAvailable.map((gauge) => gauge.id).includes(newGauge.id)) {
+      this.allAvailable.push({ id: newGauge.id, label: newGauge.label });
     }
 
     this.activeGaugeId = newGauge.id;
@@ -131,8 +134,8 @@ class GaugesState {
 
   remove(id: string): void {
     if (id === 'temp') return; // don't allow deleting the temperature gauge
-    this.gauges = this.gauges?.filter((gauge) => gauge.id !== id);
-    if (this.activeGaugeId === id) this.activeGaugeId = this.gauges[0].id;
+    this.allCreated = this.allCreated?.filter((gauge) => gauge.id !== id);
+    if (this.activeGaugeId === id) this.activeGaugeId = this.allCreated[0].id;
   }
 
   addToAvailable({
@@ -142,14 +145,32 @@ class GaugesState {
     id: GaugeAttributes['id'];
     label: GaugeAttributes['label'];
   }): void {
-    if (!this.availableGauges.map((gauge) => gauge.id).includes(id))
-      this.availableGauges.push({ id, label });
+    if (!this.allAvailable.map((gauge) => gauge.id).includes(id))
+      this.allAvailable.push({ id, label });
   }
 
   removeFromAvailable(id: GaugeAttributes['id']): void {
-    this.availableGauges = this.availableGauges.filter(
-      (gauge) => gauge.id !== id,
+    this.allAvailable = this.allAvailable.filter((gauge) => gauge.id !== id);
+  }
+
+  getSnapshot(id) {
+    const rangeOptions = $state.snapshot(
+      this.allCreated.find((gauge) => gauge.id === id)?.rangeOptions,
     );
+
+    const ranges = $state.snapshot(
+      this.allCreated.find((gauge) => gauge.id === id)?.ranges,
+    );
+
+    const colors = $state.snapshot(
+      this.allCreated.find((gauge) => gauge.id === id)?.colors,
+    );
+
+    const gauge = $state.snapshot(
+      this.allCreated.find((gauge) => gauge.id === id),
+    );
+
+    return { ...gauge, rangeOptions, ranges, colors };
   }
 }
 

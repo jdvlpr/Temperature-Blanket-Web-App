@@ -18,7 +18,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import GaugeSettings from '$lib/components/modals/GaugeSettings.svelte';
   import { gauges, modal } from '$lib/state';
 
-  function onSaveRangeOptinos(e) {
+  function onSaveRangeOptions(e) {
     gauges.activeGauge.ranges = e.ranges;
     gauges.activeGauge.rangeOptions = e.rangeOptions;
   }
@@ -34,8 +34,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       component: {
         ref: GaugeSettings,
         props: {
-          gauge: $state.snapshot(gauges.activeGauge),
-          onSave: onSaveRangeOptinos,
+          onSave: onSaveRangeOptions,
         },
       },
     })}

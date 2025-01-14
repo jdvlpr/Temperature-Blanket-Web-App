@@ -140,7 +140,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     weatherMonthsData,
   } from '$lib/utils';
 
-  $: targets = gauges.gauges.map((n) => n.targets).flat();
+  $: targets = gauges.allCreated.map((n) => n.targets).flat();
 
   $: months = weatherMonthsData({ weatherData: weather.data });
 
@@ -152,7 +152,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     $settings.weekStartCode = weather.monthGroupingStartDay;
   }
 
-  $: if (gauges.gauges) {
+  $: if (gauges.allCreated) {
     $settings.primaryTarget = setTargets($settings.primaryTarget);
     $settings.secondaryTargets = setTargets($settings.secondaryTargets);
   }

@@ -21,7 +21,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { rowsPreview } from '$lib/state/previews/rows-preview-state.svelte';
   import { capitalizeFirstLetter, pluralize, setTargets } from '$lib/utils';
 
-  let targets = $derived(gauges.gauges.map((n) => n.targets).flat());
+  let targets = $derived(gauges.allCreated.map((n) => n.targets).flat());
 
   let debounceTimer;
   const debounce = (callback, time) => {
@@ -31,7 +31,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   $effect(() => {
     debounce(() => {
-      if (gauges.gauges)
+      if (gauges.allCreated)
         rowsPreview.settings.selectedTargets = setTargets(
           rowsPreview.settings.selectedTargets,
         );

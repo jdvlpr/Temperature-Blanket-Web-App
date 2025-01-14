@@ -56,7 +56,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   $: totalRows = monthsInData?.length * rowsPerMonth;
 
-  $: targets = gauges.gauges
+  $: targets = gauges.allCreated
     .flatMap((n) => n.targets)
     .filter((n) => $settings.selectedTargets.includes(n.id));
 

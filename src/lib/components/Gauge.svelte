@@ -54,10 +54,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     _schemeId?: GaugeSettingsType['schemeId'];
   }) {
     if (_colors) {
-      gauges.activeGauge.colors = _colors;
-      gauges.activeGauge.numberOfColors = gauges.activeGauge.colors.length;
+      gauges.activeGauge.updateColors({ colors: _colors });
     }
+
     gauges.activeGauge.schemeId = _schemeId;
+
     drawerState.closeAll();
     if ($modalStore[0]) modalStore.close();
   }
@@ -79,6 +80,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <svelte:window
   onkeydown={(e) => {
+    if (
+      e.target.tagName === 'INPUT' ||
+      e.target.tagName === 'TD' ||
+      e.target.tagName === 'SELECT' ||
+      e.target.tagName === 'BUTTON' ||
+      $modalStore[0]
+    )
+      return;
     if (e.key === 'f') {
       if (
         !pageSections.items.find((p) => p.id === 'page-section-gauges')
@@ -149,13 +158,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
         hideText={fullscreen}
         numberOfColors={gauges.activeGauge.colors.length}
         onchange={(e) => {
-          gauges.activeGauge.colors = createGaugeColors({
+          const colors = createGaugeColors({
             schemeId: gauges.activeGauge.schemeId,
             numberOfColors: +e.target.value,
             colors: $state.snapshot(gauges.activeGauge.colors),
           });
-
-          gauges.activeGauge.numberOfColors = gauges.activeGauge.colors.length;
+          gauges.activeGauge.updateColors({ colors });
         }}
       />
     </div>

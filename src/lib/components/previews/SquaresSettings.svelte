@@ -176,9 +176,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { modal } from '$lib/state';
   import { pluralize, setTargets } from '$lib/utils';
 
-  $: targets = gauges.gauges.map((n) => n.targets).flat();
+  $: targets = gauges.allCreated.map((n) => n.targets).flat();
 
-  $: if (gauges.gauges) {
+  $: if (gauges.allCreated) {
     $settings.primaryTarget = setTargets($settings.primaryTarget);
     $settings.secondaryTargets = setTargets($settings.secondaryTargets);
   }

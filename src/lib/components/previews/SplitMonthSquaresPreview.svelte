@@ -31,7 +31,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   $: previewsData[previewIndex].height = height;
   $: previewsData[previewIndex].svg = svg;
 
-  $: targets = gauges.gauges
+  $: targets = gauges.allCreated
     .flatMap((n) => n.targets)
     .filter(
       (n) => $settings.rightTarget === n.id || $settings.leftTarget === n.id,

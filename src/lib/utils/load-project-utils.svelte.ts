@@ -37,7 +37,7 @@ import {
   weather,
 } from '$lib/state';
 import { rowsPreview } from '$lib/state/previews/rows-preview-state.svelte';
-import type { GaugeSettingsType } from '$lib/types';
+import type { GaugeRangeOptions, GaugeSettingsType } from '$lib/types';
 import {
   celsiusToFahrenheit,
   dateToISO8601String,
@@ -70,7 +70,7 @@ export const setProjectSettings = async (
     gauges.addById(gauge.id);
     const settings = parseGaugeURLHash(params[gauge.id].value);
     Object.assign(
-      gauges.gauges.find((g) => g.id === gauge.id),
+      gauges.allCreated.find((g) => g.id === gauge.id),
       settings,
     );
   });
@@ -128,7 +128,7 @@ const parseLocationURLHash = async (hashString) => {
 
   let currentPosition = 0;
 
-  let _locations = locations.all;
+  let _locations = locations.locations;
 
   // The number of locations is the number of separator characters present after the 'l=' key in the URL hash
   for (let i = 0; i < separatorIndices.length; i++) {
@@ -244,11 +244,13 @@ const parseLocationURLHash = async (hashString) => {
     }
   }
 
-  locations.all = _locations;
+  locations.locations = _locations;
 };
 
-export const parseGaugeURLHash = (hashString: string): GaugeSettingsType => {
+export const parseGaugeURLHash = (hashString: string, gauge) => {
   // Each gauge should have a '!' which separates the gauge colors from the gauge settings
+  console.log({ gauge });
+
   let hashStringParts;
   if (hashString.includes('!')) hashStringParts = hashString.split('!');
 
@@ -300,7 +302,7 @@ export const parseGaugeURLHash = (hashString: string): GaugeSettingsType => {
 
   // If the gauge uses a scheme instead of individual colors, set the scheme Id
   // Otherwise the schemeId is 'Custom'
-  gaugeSettings.schemeId = schemeIdSeparatorPosition
+  gauge.schemeId = schemeIdSeparatorPosition
     ? hashStringColors.substring(0, schemeIdSeparatorPosition)
     : 'Custom';
 
@@ -318,14 +320,14 @@ export const parseGaugeURLHash = (hashString: string): GaugeSettingsType => {
   const search = window.location.search.includes('project')
     ? window.location.search
     : `?project=${new Date().getTime()}&v=${version}`;
-  const href = origin + search + '#&' + gaugeSettings.id + '=' + hashString;
+  const href = origin + search + '#&' + gauge.id + '=' + hashString;
 
   // Get the colors from the href string
   const colors = getColorsFromInput({ string: href });
 
   if (typeof colors !== 'boolean') {
-    gaugeSettings.colors = colors;
-    gaugeSettings.numberOfColors = colors.length;
+    gauge.colors = colors;
+    gauge.numberOfColors = colors.length;
   }
 
   const ranges = [];
@@ -346,7 +348,7 @@ export const parseGaugeURLHash = (hashString: string): GaugeSettingsType => {
     // So convert the From and To values if needed
     if (!upToDate(LOADED_APP_VERSION, '1.700')) {
       if (units.value === 'imperial') {
-        switch (gaugeSettings.id) {
+        switch (gauge.id) {
           case 'temp':
             from = celsiusToFahrenheit(from);
             to = celsiusToFahrenheit(to);
@@ -378,48 +380,47 @@ export const parseGaugeURLHash = (hashString: string): GaugeSettingsType => {
     });
   }
 
-  gaugeSettings.ranges = ranges;
+  gauge.ranges = ranges;
 
-  // If there's no hashStringSettings (the part after '!') then just use the default gaugeSettings
+  // If there's no hashStringSettings (the part after '!') then just use the default gauge
   // and stop parsing the hashString
-  if (!hashStringSettings) return gaugeSettings;
+  if (!hashStringSettings) return gauge;
 
-  gaugeSettings.rangeOptions.mode =
+  gauge.rangeOptions.mode =
     hashStringSettings.substring(0, 1) === 'a' ? 'auto' : 'manual';
 
-  gaugeSettings.rangeOptions.linked =
-    hashStringSettings.substring(1, 2) === 'l';
+  gauge.rangeOptions.linked = hashStringSettings.substring(1, 2) === 'l';
 
-  gaugeSettings.rangeOptions.direction =
+  gauge.rangeOptions.direction =
     hashStringSettings.substring(2, 3) === 'h' ? 'high-to-low' : 'low-to-high';
 
   // From version v1.808, the range calculation mode is determined from these settings
   let currentCharacterPosition = 0;
   switch (hashStringSettings.substring(3, 4)) {
     case '0':
-      gaugeSettings.rangeOptions.includeFromValue = true;
-      gaugeSettings.rangeOptions.includeToValue = false;
+      gauge.rangeOptions.includeFromValue = true;
+      gauge.rangeOptions.includeToValue = false;
       currentCharacterPosition += 1;
       break;
     case '1':
-      gaugeSettings.rangeOptions.includeFromValue = false;
-      gaugeSettings.rangeOptions.includeToValue = true;
+      gauge.rangeOptions.includeFromValue = false;
+      gauge.rangeOptions.includeToValue = true;
       currentCharacterPosition += 1;
       break;
     case '2':
-      gaugeSettings.rangeOptions.includeFromValue = true;
-      gaugeSettings.rangeOptions.includeToValue = true;
+      gauge.rangeOptions.includeFromValue = true;
+      gauge.rangeOptions.includeToValue = true;
       currentCharacterPosition += 1;
       break;
     case '3':
-      gaugeSettings.rangeOptions.includeFromValue = false;
-      gaugeSettings.rangeOptions.includeToValue = false;
+      gauge.rangeOptions.includeFromValue = false;
+      gauge.rangeOptions.includeToValue = false;
       currentCharacterPosition += 1;
       break;
 
     default:
-      gaugeSettings.rangeOptions.includeFromValue = true;
-      gaugeSettings.rangeOptions.includeToValue = false;
+      gauge.rangeOptions.includeFromValue = true;
+      gauge.rangeOptions.includeToValue = false;
       break;
   }
 
@@ -434,13 +435,12 @@ export const parseGaugeURLHash = (hashString: string): GaugeSettingsType => {
     customRangesSettingCharacter === 'f';
 
   if (isValidCustomRangeValue) {
-    gaugeSettings.rangeOptions.isCustomRanges =
-      customRangesSettingCharacter === 't';
+    gauge.rangeOptions.isCustomRanges = customRangesSettingCharacter === 't';
     // Move the "cursor" to the next character
     currentCharacterPosition += 1;
   } else {
     // Otherwise the character is the next setting's character, so don't move the "cursor" forward
-    gaugeSettings.rangeOptions.isCustomRanges = true;
+    gauge.rangeOptions.isCustomRanges = true;
   }
 
   // Find if the hashStringSettings contains a custom range increment number (the increment and start values are separated by the default separator character)
@@ -454,14 +454,14 @@ export const parseGaugeURLHash = (hashString: string): GaugeSettingsType => {
     );
 
   const hasManualCustomRanges =
-    gaugeSettings.rangeOptions.mode === 'manual' &&
-    gaugeSettings.rangeOptions.isCustomRanges === false &&
+    gauge.rangeOptions.mode === 'manual' &&
+    gauge.rangeOptions.isCustomRanges === false &&
     customRangeIncrementSeparatorPosition !== -1;
 
   const isTempGaugeWithAutoRanges =
-    gaugeSettings.id === 'temp' &&
-    gaugeSettings.rangeOptions.mode === 'auto' &&
-    !gaugeSettings.rangeOptions.isCustomRanges;
+    gauge.id === 'temp' &&
+    gauge.rangeOptions.mode === 'auto' &&
+    !gauge.rangeOptions.isCustomRanges;
 
   if (hasManualCustomRanges) {
     // from the
@@ -481,23 +481,23 @@ export const parseGaugeURLHash = (hashString: string): GaugeSettingsType => {
       start = celsiusToFahrenheit(start);
     }
 
-    gaugeSettings.rangeOptions.manual.increment = increment;
-    gaugeSettings.rangeOptions.manual.start = start;
+    gauge.rangeOptions.manual.increment = increment;
+    gauge.rangeOptions.manual.start = start;
   } else if (isTempGaugeWithAutoRanges) {
     // From v2.4.4, the range Balance Auto Focus mode is included in the settings string for temperature gauges
     if (hashStringSettings.includes('_h'))
-      gaugeSettings.rangeOptions.auto.optimization = 'tmax';
+      gauge.rangeOptions.auto.optimization = 'tmax';
     else if (hashStringSettings.includes('_a'))
-      gaugeSettings.rangeOptions.auto.optimization = 'tavg';
+      gauge.rangeOptions.auto.optimization = 'tavg';
     else if (hashStringSettings.includes('_l'))
-      gaugeSettings.rangeOptions.auto.optimization = 'tmin';
-    else gaugeSettings.rangeOptions.auto.optimization = 'ranges';
+      gauge.rangeOptions.auto.optimization = 'tmin';
+    else gauge.rangeOptions.auto.optimization = 'ranges';
   }
 
   // From v2.4.4, the roundIncrement setting is determined by checking if all range From and To values are integers.
-  gaugeSettings.rangeOptions.auto.roundIncrement = gaugeSettings?.ranges.every(
+  gauge.rangeOptions.auto.roundIncrement = gauge?.ranges.every(
     (range) => Number.isInteger(range.from) && Number.isInteger(range.to),
   );
 
-  return gaugeSettings;
+  return gauge;
 };

@@ -315,8 +315,10 @@ export const getPossibleDimensions = ({ factors, currentDimensions }) => {
 export const setTargets = (data) => {
   if (typeof data === 'string') {
     // If a gauge gets removed and it contains the target weather param, reset the primary weather param
-    if (data === null) return gauges.gauges[0].targets[0].id;
-    return gauges.gauges.map((g) => g.id).includes(getTargetParentGaugeId(data))
+    if (data === null) return gauges.allCreated[0].targets[0].id;
+    return gauges.allCreated
+      .map((g) => g.id)
+      .includes(getTargetParentGaugeId(data))
       ? data
       : null;
   }
@@ -333,11 +335,11 @@ export const setTargets = (data) => {
       _targets = data.map((n) => n.targetId).flat();
     _targets = _targets.filter((n) => {
       n = getTargetParentGaugeId(n);
-      return $state.snapshot(gauges.gauges.map((g) => g.id).includes(n));
+      return $state.snapshot(gauges.allCreated.map((g) => g.id).includes(n));
     });
 
     if (_targets.length === 0) {
-      _targets = [gauges.gauges[0]?.targets[0].id];
+      _targets = [gauges.allCreated[0]?.targets[0].id];
     }
 
     if (isSecondarySquareParamData) {

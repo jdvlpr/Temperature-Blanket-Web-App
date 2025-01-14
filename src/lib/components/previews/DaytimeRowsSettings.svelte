@@ -118,7 +118,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let isExpanded = false;
   let daytimeLabel, nightLabel;
 
-  $: targets = gauges.gauges.map((n) => n.targets).flat();
+  $: targets = gauges.allCreated.map((n) => n.targets).flat();
 
   $: tableData = weather.data?.map((n, i) => {
     let left, center, right, divided;
@@ -171,7 +171,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     };
   });
 
-  $: if (gauges.gauges) {
+  $: if (gauges.allCreated) {
     $settings.daytimeTarget = setTargets($settings.daytimeTarget);
     $settings.nightTarget = setTargets($settings.nightTarget);
   }

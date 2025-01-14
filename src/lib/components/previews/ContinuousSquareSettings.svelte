@@ -91,9 +91,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { modal, weather } from '$lib/state';
   import { setTargets } from '$lib/utils';
 
-  $: targets = gauges.gauges.map((n) => n.targets).flat();
+  $: targets = gauges.allCreated.map((n) => n.targets).flat();
 
-  $: if (gauges.gauges)
+  $: if (gauges.allCreated)
     $settings.selectedTarget = setTargets($settings.selectedTarget);
 </script>
 

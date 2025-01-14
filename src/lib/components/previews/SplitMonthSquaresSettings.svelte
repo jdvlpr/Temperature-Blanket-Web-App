@@ -92,9 +92,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     weatherMonthsData,
   } from '$lib/utils';
 
-  $: targets = gauges.gauges.map((n) => n.targets).flat();
+  $: targets = gauges.allCreated.map((n) => n.targets).flat();
 
-  $: if (gauges.gauges) {
+  $: if (gauges.allCreated) {
     $settings.leftTarget = setTargets($settings.leftTarget);
     $settings.rightTarget = setTargets($settings.rightTarget);
   }

@@ -97,7 +97,7 @@ const pdfGauge = {
     );
   },
   create: function (doc, gaugeId) {
-    let gauge = gauges.gauges.find((g) => g.id === gaugeId);
+    let gauge = gauges.allCreated.find((g) => g.id === gaugeId);
 
     // Gauge Item
     const length = gauge.ranges.length;

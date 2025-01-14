@@ -35,7 +35,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   $: width = dimensions[0] * STITCH_SIZE;
   $: height = dimensions[1] * STITCH_SIZE;
 
-  $: targets = gauges.gauges
+  $: targets = gauges.allCreated
     .flatMap((n) => n.targets)
     .filter((n) => $settings.selectedTarget === n.id);
 

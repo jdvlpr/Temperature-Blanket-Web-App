@@ -38,7 +38,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   $: chevronHeight = chevronSideLength / 2;
   $: chevronSideLength = $settings.chevronSideLength * Math.sqrt(2);
 
-  $: targets = gauges.gauges
+  $: targets = gauges.allCreated
     .map((n) => n.targets)
     .flat()
     .filter((n) => $settings.selectedTargets.includes(n.id));

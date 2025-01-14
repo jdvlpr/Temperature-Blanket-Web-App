@@ -56,7 +56,7 @@ export const gaugeAttributes: GaugeAttributes = {
   ],
 };
 
-export class TemperatureGauge implements GaugeStateInterface {
+export class TemperatureGauge {
   constructor() {
     Object.assign(this, gaugeAttributes);
   }
@@ -91,7 +91,7 @@ export class TemperatureGauge implements GaugeStateInterface {
 
   numberOfColors = $state(10);
 
-  rangeOptions = $state({
+  rangeOptions = {
     auto: {
       optimization: 'tmax',
       start: {
@@ -111,7 +111,7 @@ export class TemperatureGauge implements GaugeStateInterface {
     linked: true,
     mode: 'auto', // equal range increments ('auto') | equal days ('jenks') | 'manua'
     isCustomRanges: false,
-  });
+  };
 
   ranges = $state(
     getEvenlyDistributedRangeValuesWithEqualDayCount({
@@ -125,5 +125,52 @@ export class TemperatureGauge implements GaugeStateInterface {
     }),
   );
 
+  autoRangeOptions = $derived({
+    auto: {
+      optimization: this.rangeOptions.auto.optimization,
+      start: {
+        high: this.#max,
+        low: this.#min,
+      },
+      increment: displayNumber((this.#max - this.#min) / this.colors.length, 2),
+      roundIncrement: this.rangeOptions.auto.roundIncrement,
+    },
+    manual: {
+      start: this.rangeOptions.manual.start,
+      increment: this.rangeOptions.manual.increment,
+    },
+    direction: this.rangeOptions.direction,
+    includeFromValue: this.rangeOptions.includeFromValue,
+    includeToValue: this.rangeOptions.includeToValue,
+    linked: this.rangeOptions.linked,
+    mode: this.rangeOptions.mode, // equal range increments ('auto') | equal days ('jenks') | 'manua'
+    isCustomRanges: this.rangeOptions.isCustomRanges,
+  });
+
+  autoRanges = $derived(
+    getEvenlyDistributedRangeValuesWithEqualDayCount({
+      weatherData: weather.data,
+      numRanges: this.colors.length,
+      prop: this.rangeOptions.auto.optimization,
+      gaugeDirection: this.rangeOptions.direction,
+      roundIncrement: this.rangeOptions.auto.roundIncrement,
+      includeFrom: this.rangeOptions.includeFromValue,
+      includeTo: this.rangeOptions.includeToValue,
+    }),
+  );
+
+  calculating = $state(false);
+
   schemeId = $state('Spectral');
+  updateColors({ colors }) {
+    console.log('updating');
+    this.calculating = true;
+    this.colors = colors;
+    this.ranges = this.autoRanges;
+    this.rangeOptions = this.autoRangeOptions;
+    this.numberOfColors = this.colors.length;
+    console.log(this.ranges);
+
+    this.calculating = false;
+  }
 }
