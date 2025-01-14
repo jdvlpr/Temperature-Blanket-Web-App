@@ -47,9 +47,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     projectStatus.state.liveURL;
     if (!weather.data || !gauges.gauges) return;
     debounce(() => {
-      console.count('update');
-
       isUpdating = true;
+
       // Setup constants
       let columnIndex = 0; // Current column index
       let stitchYRow = 0; // Current row position
@@ -57,7 +56,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       let lineWidth: number; // Width of the current line
       let remainderLineCount: number; // Count of remaining stitches in the line
       // Loop through each section
-      rowsPreview.sections = [];
+      const sections = [];
 
       for (
         let sectionIndex = 0, dayIndex = 0;
@@ -151,11 +150,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
           sectionStitchIndex += lineWidth;
 
           // Push the section to the sections array
-          rowsPreview.sections.push(section);
+          sections.push(section);
         }
+        rowsPreview.sections = sections;
       }
       isUpdating = false;
-    }, 500);
+    }, 200);
   });
 </script>
 

@@ -44,8 +44,6 @@ class PreviewsState {
 
   add(preview) {
     this.all.push(preview);
-    console.log(preview.id);
-
     this.activeId = preview.id;
   }
 }
