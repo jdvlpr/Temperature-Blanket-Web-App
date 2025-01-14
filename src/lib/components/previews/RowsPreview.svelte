@@ -14,7 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { gauges, projectStatus, units, weather } from '$lib/state';
+  import { gauges, previews, projectStatus, units, weather } from '$lib/state';
   import { rowsPreview } from '$lib/state/previews/rows-preview-state.svelte';
   import {
     getColorInfo,
@@ -22,7 +22,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     showPreviewImageWeatherDetails,
   } from '$lib/utils';
 
-  let isUpdating = $state(false);
+  let width = $state(rowsPreview.width);
+  let height = $state(rowsPreview.height);
 
   function getSectionStitchesCount(dayIndex: number) {
     if (rowsPreview.settings.lengthTarget === 'none')
@@ -47,8 +48,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     projectStatus.state.liveURL;
     if (!weather.data || !gauges.gauges) return;
     debounce(() => {
-      isUpdating = true;
-
       // Setup constants
       let columnIndex = 0; // Current column index
       let stitchYRow = 0; // Current row position
@@ -152,38 +151,37 @@ If not, see <https://www.gnu.org/licenses/>. -->
           // Push the section to the sections array
           sections.push(section);
         }
+        width = rowsPreview.width;
+        height = rowsPreview.height;
         rowsPreview.sections = sections;
       }
-      isUpdating = false;
-    }, 200);
+    }, 10);
   });
 </script>
 
-{#if !isUpdating}
-  <svg
-    id="preview-svg-image"
-    class="max-h-[80svh] mx-auto"
-    aria-hidden="true"
-    viewBox="0 0 {rowsPreview.width} {rowsPreview.height}"
-    bind:this={rowsPreview.svg}
-    onclick={async (e) => {
-      if (e.target.tagName !== 'rect') return;
-      const group = e.target.parentElement;
-      if (group.tagName !== 'g') return;
+<svg
+  id="preview-svg-image"
+  class="max-h-[80svh] mx-auto"
+  aria-hidden="true"
+  viewBox="0 0 {width} {height}"
+  bind:this={rowsPreview.svg}
+  onclick={async (e) => {
+    if (e.target.tagName !== 'rect') return;
+    const group = e.target.parentElement;
+    if (group.tagName !== 'g') return;
 
-      if (group.dataset.isweathersection === 'true') {
-        weather.currentIndex = +group.dataset.dayindex;
-        showPreviewImageWeatherDetails(rowsPreview.targets);
-      }
-    }}
-  >
-    {#each rowsPreview.sections as section}
-      {@const isWeather = section[0].isWeatherSection}
-      <g data-isweathersection={isWeather} data-dayindex={section[0].dayIndex}>
-        {#each section as { width, height, color, x, y }}
-          <rect {width} {height} fill={color} {x} {y} />
-        {/each}
-      </g>
-    {/each}
-  </svg>
-{/if}
+    if (group.dataset.isweathersection === 'true') {
+      weather.currentIndex = +group.dataset.dayindex;
+      showPreviewImageWeatherDetails(rowsPreview.targets);
+    }
+  }}
+>
+  {#each rowsPreview.sections as section}
+    {@const isWeather = section[0].isWeatherSection}
+    <g data-isweathersection={isWeather} data-dayindex={section[0].dayIndex}>
+      {#each section as { width, height, color, x, y }}
+        <rect {width} {height} fill={color} {x} {y} />
+      {/each}
+    </g>
+  {/each}
+</svg>

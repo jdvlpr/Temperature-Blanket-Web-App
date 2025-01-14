@@ -22,6 +22,7 @@ export class RowsPreviewClass {
     lengthTarget: 'none',
     extrasColor: '#f0f3f3',
   });
+
   totalStitches = $derived(
     getTotalStitches(
       this.settings.lengthTarget,
