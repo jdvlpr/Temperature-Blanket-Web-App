@@ -15,7 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import DataTable from '$lib/components/datatable/DataTable.svelte';
-  import { allGaugesAttributes, units, weatherGrouping } from '$lib/state';
+  import { allGaugesAttributes, units, weather } from '$lib/state';
   import { convertTime, dateToISO8601String } from '$lib/utils';
   import { DataHandler, Th } from '@vincjo/datatables';
   import ModalShell from './ModalShell.svelte';
@@ -57,9 +57,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   const handler = $derived(new DataHandler(tableData, { rowsPerPage: 10 }));
   const rows = $derived(handler.getRows());
 
-  let dateHeader = $derived(
-    weatherGrouping.value === 'week' ? 'Week of' : 'Date',
-  );
+  let dateHeader = $derived(weather.grouping === 'week' ? 'Week of' : 'Date');
 
   //TODO: Is this necessary?
   $effect(() => {

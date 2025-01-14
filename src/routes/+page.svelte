@@ -34,7 +34,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { ICONS, LOADED_APP_VERSION } from '$lib/constants';
   import {
     drawerState,
-    gaugesState,
     historyChangeMessage,
     historyState,
     isDesktop,
@@ -49,7 +48,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     projectStatus,
     wasProjectLoadedFromURL,
     weather,
-    weatherGrouping,
   } from '$lib/state';
   import {
     checkForProjectInLocalStorage,
@@ -563,7 +561,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   <DonateButton />
                 </div>
 
-                {#key weatherGrouping.value}
+                {#key weather.grouping}
                   <Previews />
                 {/key}
               </div>

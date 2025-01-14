@@ -14,16 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import {
-    activeWeatherElementIndex,
-    gaugesState,
-    projectStatus,
-    units,
-    weather,
-    weatherGrouping,
-    weatherMonthGroupingStartDay,
-    weatherUngrouped,
-  } from '$lib/state';
+  import { gaugesState, projectStatus, units, weather } from '$lib/state';
   import {
     getColorInfo,
     getDaysInLongestMonth,
@@ -87,7 +78,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     // let extraInMonthIndex = 0;
     let dayInMonthCount = 1;
     let isWeather = true;
-    let daysInSquare = weatherUngrouped.data?.filter(
+    let daysInSquare = weather.rawData?.filter(
       (n) =>
         n.date.getFullYear() === monthsInData[monthIndex].year &&
         n.date.getMonth() === monthsInData[monthIndex].month,
@@ -96,7 +87,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       if (rowIndex % rowsPerMonth === 0 && rowIndex !== 0) {
         // New Month
         monthIndex += 1;
-        daysInSquare = weatherUngrouped.data?.filter(
+        daysInSquare = weather.rawData?.filter(
           (n) =>
             n.date.getFullYear() === monthsInData[monthIndex].year &&
             n.date.getMonth() === monthsInData[monthIndex].month,
@@ -135,8 +126,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
       }
 
       let _dayIndex = dayIndex;
-      if (weatherGrouping.value === 'week') {
-        _dayIndex = Math.ceil((dayIndex - $weatherMonthGroupingStartDay) / 7);
+      if (weather.grouping === 'week') {
+        _dayIndex = Math.ceil((dayIndex - weather.monthGroupingStartDay) / 7);
       }
 
       let day = daysInSquare?.filter(
@@ -204,7 +195,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     on:click={(e) => {
       if (e.target.tagName !== 'rect') return;
       if (e.target.dataset.isweather !== 'true') return;
-      $activeWeatherElementIndex = +e.target.dataset.dayindex;
+      weather.currentIndex = +e.target.dataset.dayindex;
 
       showPreviewImageWeatherDetails(targets);
     }}

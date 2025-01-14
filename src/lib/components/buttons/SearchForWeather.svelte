@@ -17,13 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Tooltip from '$lib/components/Tooltip.svelte';
   import GettingWeather from '$lib/components/modals/GettingWeather.svelte';
   import GettingWeatherWarnCustomWeather from '$lib/components/modals/GettingWeatherWarnCustomWeather.svelte';
-  import {
-    isCustomWeather,
-    isProjectLoading,
-    locationsState,
-    modal,
-    weather,
-  } from '$lib/state';
+  import { isProjectLoading, locationsState, modal, weather } from '$lib/state';
 
   function setModal() {
     modal.state.trigger({
@@ -50,7 +44,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     fullWidth={true}
     classNames="btn variant-filled-primary text-2xl font-bold w-full sm:w-fit"
   >
-    {#if !!$isCustomWeather}
+    {#if !!weather.isUserEdited}
       Reload Weather Data
     {:else}
       Search {#if weather.data}Again{/if}
@@ -77,14 +71,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <button
     class="btn variant-filled-primary text-2xl font-bold w-full sm:w-fit"
     onclick={() => {
-      if ($isCustomWeather) setWarnCustomWeatherModal();
+      if (weather.isUserEdited) setWarnCustomWeatherModal();
       else setModal();
     }}
     title="Search for Weather Data"
     id="location-action-button"
     {disabled}
   >
-    {#if !!$isCustomWeather}
+    {#if !!weather.isUserEdited}
       Reload Weather Data
     {:else}
       Search {#if weather.data}Again{/if}

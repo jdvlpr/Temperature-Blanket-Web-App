@@ -26,7 +26,6 @@ import { load as loadSqrs } from '$lib/components/previews/SquaresSettings.svelt
 import { ICONS } from '$lib/constants';
 import {
   allGaugesAttributes,
-  defaultWeatherSource,
   gaugesState,
   historyChangeMessage,
   historyState,
@@ -35,10 +34,7 @@ import {
   liveProjectURLHash,
   projectStatus,
   units,
-  useSecondaryWeatherSources,
   weather,
-  weatherGrouping,
-  weatherMonthGroupingStartDay,
 } from '$lib/state';
 import { rowsPreview } from '$lib/state/previews/rows-preview-state.svelte';
 import {
@@ -68,13 +64,13 @@ export const loadFromHistory = ({ action }: { action: 'Undo' | 'Redo' }) => {
   // Change Weather Grouping
   if (exists(newParams.w)) {
     if (!exists(oldParams.w) || oldParams.w?.value !== newParams.w?.value) {
-      weatherGrouping.value = 'week';
-      weatherMonthGroupingStartDay.set(+newParams.w.value);
+      weather.grouping = 'week';
+      weather.monthGroupingStartDay = +newParams.w.value;
       message = 'Weather Grouping set to Weekly';
     }
   } else {
-    if (weatherGrouping.value !== 'day') {
-      weatherGrouping.value = 'day';
+    if (weather.grouping !== 'day') {
+      weather.grouping = 'day';
       message = 'Weather Grouping set to Daily';
     }
   }
@@ -98,12 +94,12 @@ export const loadFromHistory = ({ action }: { action: 'Undo' | 'Redo' }) => {
   if (exists(newParams.s)) {
     if (!exists(oldParams.s) || oldParams.s?.value !== newParams.s?.value) {
       const sourceCode = newParams.s.value.substring(0, 1);
-      if (sourceCode === '0') defaultWeatherSource.value = 'Meteostat';
-      else if (sourceCode === '1') defaultWeatherSource.value = 'Open-Meteo';
+      if (sourceCode === '0') weather.defaultSource = 'Meteostat';
+      else if (sourceCode === '1') weather.defaultSource = 'Open-Meteo';
 
       const secondaryCode = newParams.s.value.substring(1, 2);
-      if (secondaryCode === '0') useSecondaryWeatherSources.set(false);
-      else if (secondaryCode === '1') useSecondaryWeatherSources.set(true);
+      if (secondaryCode === '0') weather.useSecondarySources = false;
+      else if (secondaryCode === '1') weather.useSecondarySources = true;
     }
   }
 

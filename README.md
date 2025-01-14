@@ -8,7 +8,7 @@ Visualize your city's historical climate data, create color gauges, and preview 
 
 Built with:
 
-- [Svelte 5](https://svelte.dev/)
+- [Svelte 5 & Sveltekit](https://svelte.dev/)
 - [Tailwind](https://github.com/tailwindlabs/tailwindcss)
 - [Skeleton](https://github.com/skeletonlabs/skeleton)
 - And [more...](package.json)

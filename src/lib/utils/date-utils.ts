@@ -13,14 +13,9 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { browser } from '$app/environment';
 import { METEOSTAT_DELAY_DAYS, OPEN_METEO_DELAY_DAYS } from '$lib/constants';
-import {
-  defaultWeatherSource,
-  isCustomWeather,
-  weatherMonthGroupingStartDay,
-} from '$lib/state';
-import { get } from 'svelte/store';
+import { weather } from '$lib/state';
+import type { WeatherDay } from '$lib/types';
 
 /**
  * Checks if a given date is recent based on the weather source.
@@ -28,8 +23,8 @@ import { get } from 'svelte/store';
  * @returns {boolean} - True if the date is recent, false otherwise.
  */
 export const getIsRecentDate = (date) => {
-  if (!date || get(isCustomWeather)) return false;
-  const weatherSource = defaultWeatherSource.value;
+  if (!date || weather.isUserEdited) return false;
+  const weatherSource = weather.defaultSource;
   if (weatherSource === 'Open-Meteo') {
     return (
       new Date(date) >
@@ -132,7 +127,10 @@ export const getWeek = ({ date, dowOffset }) => {
 
 export const createWeeksProperty = ({
   weatherData,
-  dowOffset = get(weatherMonthGroupingStartDay),
+  dowOffset = weather.monthGroupingStartDay,
+}: {
+  weatherData: WeatherDay[];
+  dowOffset: number;
 }) => {
   if (!weatherData) return weatherData;
   const data = weatherData.map((day, i) => {

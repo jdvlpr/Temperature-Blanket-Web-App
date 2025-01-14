@@ -25,8 +25,6 @@ import {
   projectStatus,
   units,
   weather,
-  weatherGrouping,
-  weatherUngrouped,
 } from '$lib/state';
 import {
   colorsToCode,
@@ -106,7 +104,7 @@ export const downloadWeatherCSV = () => {
       gaugeInfo,
     ];
   });
-  const dateHeader = weatherGrouping.value === 'week' ? 'Week Of' : 'Date';
+  const dateHeader = weather.grouping === 'week' ? 'Week Of' : 'Date';
   const data = [
     [
       'Item Number',
@@ -181,10 +179,10 @@ export const sendToProjectGallery = async (img) => {
     project_url: projectStatus.state.liveURL,
     tables: JSON.stringify(tables),
     title: locationsState.projectTitle,
-    total_days: weatherUngrouped.data?.length,
+    total_days: weather.rawData?.length,
     yarn_urls: JSON.stringify(yarnUrls),
     yarn_details: JSON.stringify(yarnDetails),
-    weather_grouping: weatherGrouping.value,
+    weather_grouping: weather.grouping,
     weather_sources: JSON.stringify(getWeatherSourceDetails()),
     wp_tag_id: previewsState.active.wpTagId,
   };

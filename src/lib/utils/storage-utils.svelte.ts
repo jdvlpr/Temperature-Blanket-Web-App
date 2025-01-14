@@ -19,16 +19,12 @@ import {
   skeletonThemes,
 } from '$lib/components/ThemeSwitcher.svelte';
 import {
-  defaultWeatherSource,
   initialLayout,
-  isCustomWeather,
   layout,
   locationsState,
   projectStatus,
   theme,
-  useSecondaryWeatherSources,
-  wasWeatherLoadedFromLocalStorage,
-  weatherUngrouped,
+  weather,
 } from '$lib/state';
 import type {
   PageLayout,
@@ -36,7 +32,6 @@ import type {
   WeatherSourceOptions,
 } from '$lib/types';
 import { dateToISO8601String, numberOfDays, stringToDate } from '$lib/utils';
-import { get } from 'svelte/store';
 
 export const setupLocalStorageTheme = () => {
   // Check if theme is set, or match the system's theme
@@ -97,14 +92,14 @@ export const checkForProjectInLocalStorage = async () => {
   const weatherSource = matchedProject.weatherSource;
   if (weatherSource) {
     const { name, useSecondary } = weatherSource;
-    if (name) defaultWeatherSource.value = name;
-    useSecondaryWeatherSources.set(useSecondary);
+    if (name) weather.defaultSource = name;
+    weather.useSecondarySources = useSecondary;
   }
 
   // Set isCustomWeather
   const _isCustomWeather = matchedProject.isCustomWeatherData;
-  if (_isCustomWeather === true) isCustomWeather.set(true);
-  else if (_isCustomWeather === false) isCustomWeather.set(false);
+  if (_isCustomWeather === true) weather.isUserEdited = true;
+  else if (_isCustomWeather === false) weather.isUserEdited = false;
 
   // Set weather data and convert dates to Date objects
   const weatherLocalStorage = matchedProject.weatherData;
@@ -131,8 +126,8 @@ export const checkForProjectInLocalStorage = async () => {
   if (daysInFuture > 0 && !matchedProject.isCustomWeatherData) return;
 
   // Set the weather data and indicate that it was loaded from local storage
-  weatherUngrouped.data = newWeatherUngrouped;
-  wasWeatherLoadedFromLocalStorage.set(true);
+  weather.rawData = newWeatherUngrouped;
+  weather.isFromLocalStorage = true;
 };
 
 /**
@@ -218,14 +213,14 @@ const createProjectLocalStorageProjectObject = () => {
       minute: '2-digit',
     });
 
-  const isCustomWeatherData = get(isCustomWeather) || false;
+  const isCustomWeatherData = weather.isUserEdited || false;
 
   const _title = locationsState.projectTitle || '';
 
   const href = projectStatus.state.liveURL;
 
   const weatherData =
-    weatherUngrouped.data?.map((day) => {
+    weather.rawData?.map((day) => {
       return {
         ...day,
         date: dateToISO8601String(day.date),
@@ -233,8 +228,8 @@ const createProjectLocalStorageProjectObject = () => {
     }) || [];
 
   const weatherSource: WeatherSourceOptions = {
-    name: defaultWeatherSource.value,
-    useSecondary: get(useSecondaryWeatherSources),
+    name: weather.defaultSource,
+    useSecondary: weather.useSecondarySources,
   };
 
   const project: SavedProject = {

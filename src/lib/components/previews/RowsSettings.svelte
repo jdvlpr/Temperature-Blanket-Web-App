@@ -17,7 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import NumberInputButton from '$lib/components/buttons/NumberInputButton.svelte';
   import ToggleSwitchGroup from '$lib/components/buttons/ToggleSwitchGroup.svelte';
   import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
-  import { gaugesState, modal, weatherGrouping } from '$lib/state';
+  import { gaugesState, modal, weather } from '$lib/state';
   import { rowsPreview } from '$lib/state/previews/rows-preview-state.svelte';
   import { capitalizeFirstLetter, pluralize, setTargets } from '$lib/utils';
 
@@ -60,7 +60,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <p>
       Stitches are counted using the parameter's absolute value rounded to the
       nearest non-zero integer. A temperature or hieght of zero is rounded up to
-      one. Any missing values use the custom stitches per {weatherGrouping.value}
+      one. Any missing values use the custom stitches per {weather.grouping}
       value.
     </p>
   {/if}
@@ -68,7 +68,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <div class="text-left">
   <ToggleSwitchGroup
-    groupLabel={`Color Using the ${capitalizeFirstLetter(weatherGrouping.value)}'s`}
+    groupLabel={`Color Using the ${capitalizeFirstLetter(weather.grouping)}'s`}
     {targets}
     bind:value={rowsPreview.settings.selectedTargets}
   />
@@ -81,7 +81,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 />
 
 <label class="label">
-  <span>Stitches Per {capitalizeFirstLetter(weatherGrouping.value)} Using</span>
+  <span>Stitches Per {capitalizeFirstLetter(weather.grouping)} Using</span>
   <select
     class="select w-fit"
     id="rows-length-param"
@@ -98,7 +98,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 {#if rowsPreview.settings.lengthTarget === 'custom'}
   <NumberInputButton
     bind:value={rowsPreview.settings.stitchesPerDay}
-    title="Stitches Per {capitalizeFirstLetter(weatherGrouping.value)}"
+    title="Stitches Per {capitalizeFirstLetter(weather.grouping)}"
     icon={true}
   />
 {/if}

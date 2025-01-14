@@ -15,23 +15,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import {
-    activeWeatherElementIndex,
     controller,
-    defaultWeatherSource,
     gaugesState,
-    isCustomWeather,
     locationsState,
     signal,
-    useSecondaryWeatherSources,
-    wasWeatherLoadedFromLocalStorage,
-    weatherUngrouped,
+    weather,
   } from '$lib/state';
   // Note: the signal store is a weird necessity, investigate this
   import Spinner from '$lib/components/Spinner.svelte';
   import { delay, getOpenMeteo, goToProjectSection } from '$lib/utils';
   import { getModalStore } from '@skeletonlabs/skeleton';
   import ModalShell from './ModalShell.svelte';
-  import { onMount } from 'svelte';
 
   interface Props {
     parent: any;
@@ -41,24 +35,24 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   const modalStore = getModalStore();
 
-  let container: HTMLDivElement;
-
   let title = $state('Searching...');
-  let currentIndex = $state(0);
 
-  getWeatherData();
+  // Index of the location which is currently getting weather data
+  let currentIndex = $state(0);
 
   let error = $state(false);
 
+  getWeatherData();
+
   async function getWeatherData() {
     controller.value = new AbortController();
-    weatherUngrouped.data = null;
-    $activeWeatherElementIndex = 0;
+    weather.rawData = null;
+    weather.currentIndex = 0;
     await fetchData()
       .then(() => {
         controller.value = null;
-        $isCustomWeather = false;
-        $wasWeatherLoadedFromLocalStorage = false;
+        weather.isUserEdited = false;
+        weather.isFromLocalStorage = false;
         // Add the default temperature gauge
         gaugesState.addById('temp');
         modalStore.close();
@@ -66,9 +60,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
       })
       .catch((e) => {
         controller.value = null;
-        weatherUngrouped.data = null;
-        $isCustomWeather = false;
-        $wasWeatherLoadedFromLocalStorage = false;
+        weather.rawData = null;
+        weather.isUserEdited = false;
+        weather.isFromLocalStorage = false;
         error = e?.message;
       });
   }
@@ -116,7 +110,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         tempAllData.length === thisLocation &&
         continueWhile
       ) {
-        if (defaultWeatherSource.value === 'Meteostat' || errors.length > 0) {
+        if (weather.defaultSource === 'Meteostat' || errors.length > 0) {
           try {
             const response = await fetch('/api/weather/v1/meteostat/daily', {
               method: 'POST',
@@ -149,13 +143,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
         }
 
         if (
-          (errors.length > 0 && !$useSecondaryWeatherSources) ||
-          (errors.length && defaultWeatherSource.value === 'Open-Meteo')
+          (errors.length > 0 && !weather.useSecondarySources) ||
+          (errors.length && weather.defaultSource === 'Open-Meteo')
         )
           continueWhile = false;
 
         if (
-          (defaultWeatherSource.value === 'Open-Meteo' || errors.length > 0) &&
+          (weather.defaultSource === 'Open-Meteo' || errors.length > 0) &&
           continueWhile
         ) {
           try {
@@ -167,7 +161,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           }
         }
 
-        if (errors.length > 0 && !$useSecondaryWeatherSources)
+        if (errors.length > 0 && !weather.useSecondarySources)
           continueWhile = false;
       }
 
@@ -178,7 +172,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     }
     tempAllData = tempAllData.flat();
     tempAllData.sort((a, b) => a.date - b.date); // Sort by date, regardless of location
-    weatherUngrouped.data = tempAllData;
+    weather.rawData = tempAllData;
     tempAllData = null;
   }
 </script>

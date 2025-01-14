@@ -16,14 +16,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import Tooltip from '$lib/components/Tooltip.svelte';
   import { ICONS, MONTHS } from '$lib/constants';
-  import {
-    defaultWeatherSource,
-    isCustomWeather,
-    isProjectLoading,
-    locationsState,
-    useSecondaryWeatherSources,
-    weatherUngrouped,
-  } from '$lib/state';
+  import { isProjectLoading, locationsState, weather } from '$lib/state';
   import type { LocationType } from '$lib/types/location-types';
   import {
     dateToISO8601String,
@@ -72,9 +65,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let days = $derived(getDays(month, year));
 
   let datesMustBeHistorical = $derived(
-    defaultWeatherSource.value === 'Open-Meteo' &&
+    weather.defaultSource === 'Open-Meteo' &&
       location.daysInFuture >= 1 &&
-      !$useSecondaryWeatherSources,
+      !weather.useSecondarySources,
   );
 
   $effect(() => {
@@ -175,9 +168,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }); // End of onMount
 
   function validate() {
-    if ($isCustomWeather) return;
+    if (weather.isUserEdited) return;
 
-    weatherUngrouped.data = null;
+    weather.rawData = null;
 
     const value = inputLocation.value;
 
@@ -221,7 +214,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 
   function setDates({ from = null, to = null, unsetWeather = true }) {
-    if (unsetWeather) weatherUngrouped.data = null;
+    if (unsetWeather) weather.rawData = null;
     let setDate = new Date(year, month - 1, day, 1);
     const _padFromMonth = String(setDate.getMonth() + 1).padStart(2, '0');
     const _padFromDate = String(setDate.getDate()).padStart(2, '0');
@@ -312,9 +305,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
               class="btn bg-secondary-hover-token"
               onclick={() => {
                 locationsState.remove(location.uuid);
-                weatherUngrouped.data = null;
+                weather.rawData = null;
               }}
-              disabled={!!$isCustomWeather || isProjectLoading.value}
+              disabled={!!weather.isUserEdited || isProjectLoading.value}
               title="Remove Location"
             >
               {@html ICONS.trash}
@@ -369,7 +362,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           bind:this={inputLocation}
           oninput={validate}
           onkeyup={validateKeyup}
-          disabled={isProjectLoading.value || !!$isCustomWeather}
+          disabled={isProjectLoading.value || !!weather.isUserEdited}
         />
         {#if searching}
           <div class="flex items-center justify-center">
@@ -395,10 +388,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <button
             class=""
             title="Reset Location Search"
-            disabled={!!$isCustomWeather}
+            disabled={!!weather.isUserEdited}
             onclick={() => {
-              if ($isCustomWeather) return;
-              weatherUngrouped.data = null;
+              if (weather.isUserEdited) return;
+              weather.rawData = null;
               inputLocation.value = '';
               inputLocation.focus();
               location.label = '';
@@ -430,7 +423,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               bind:value={year}
               id={`choose-year-${location.uuid}`}
               title="Choose a Year"
-              disabled={!!$isCustomWeather || isProjectLoading.value}
+              disabled={!!weather.isUserEdited || isProjectLoading.value}
               onchange={() => {
                 setDates({});
               }}
@@ -448,7 +441,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               bind:value={month}
               id={`choose-month-${location.uuid}`}
               title="Choose a Month"
-              disabled={!!$isCustomWeather || isProjectLoading.value}
+              disabled={!!weather.isUserEdited || isProjectLoading.value}
               onchange={() => {
                 setDates({});
               }}
@@ -466,7 +459,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               bind:value={day}
               id={`choose-day-${location.uuid}`}
               title="Choose a Day"
-              disabled={!!$isCustomWeather || isProjectLoading.value}
+              disabled={!!weather.isUserEdited || isProjectLoading.value}
               onchange={() => setDates({})}
             >
               {#each Array(days) as _, i}
@@ -491,8 +484,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
               max={getYesterday()}
               bind:value={location.from}
               bind:this={inputStart}
-              onchange={() => (weatherUngrouped.data = null)}
-              disabled={isProjectLoading.value || !!$isCustomWeather}
+              onchange={() => (weather.rawData = null)}
+              disabled={isProjectLoading.value || !!weather.isUserEdited}
             />
           </label>
           <label for="datepicker-to-{location.uuid}" class="">
@@ -507,8 +500,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
               max={getYesterday()}
               bind:value={location.to}
               bind:this={inputEnd}
-              onchange={() => (weatherUngrouped.data = null)}
-              disabled={isProjectLoading.value || !!$isCustomWeather}
+              onchange={() => (weather.rawData = null)}
+              disabled={isProjectLoading.value || !!weather.isUserEdited}
             />
           </label>
         </div>
@@ -520,7 +513,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           class="select w-full"
           id={`duration-${location.uuid}`}
           bind:value={location.duration}
-          disabled={!!$isCustomWeather || isProjectLoading.value}
+          disabled={!!weather.isUserEdited || isProjectLoading.value}
           onchange={() => {
             if (location?.duration === 'y') {
               year = new Date(location.from.replace(/-/g, '/')).getFullYear();

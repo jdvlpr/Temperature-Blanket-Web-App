@@ -14,13 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script context="module">
-  import {
-    gaugesState,
-    locationsState,
-    preview,
-    weatherGrouping,
-    weatherItemHeading,
-  } from '$lib/state';
+  import { gaugesState, locationsState, preview } from '$lib/state';
   import { derived, writable } from 'svelte/store';
 
   const id = 'rsun';
@@ -210,7 +204,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 
   function downloadStitchesTableCSV() {
-    const headers = ['Row', weatherItemHeading.value];
+    const headers = ['Row', weather.groupingHeading];
     switch ($settings.daytimePosition) {
       case 'left':
         headers.push(`Daytime stitches (${daytimeLabel})`);
@@ -252,7 +246,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <div class="w-full">
   <div class="mx-auto max-w-screen-sm">
     <p class="">
-      Each row is split according to the duration of sunlight that {weatherGrouping.value}.
+      Each row is split according to the duration of sunlight that {weather.grouping}.
     </p>
 
     <div class="my-1 flex flex-col justify-center items-center italic">
@@ -316,7 +310,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
 
     <p class="text-sm italic">
-      d = Daytime (time from the {weatherGrouping.value}'s sunrise to sunset in
+      d = Daytime (time from the {weather.grouping}'s sunrise to sunset in
       hours). {$settings.stitchesPerRow}
       is the total stitches per row. 24 is the number of hours in a day. Stitches
       are rounded to the nearest integer.
@@ -341,7 +335,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <label class="label">
   <span
     >Color Daytime ({daytimeLabel}) Using the {capitalizeFirstLetter(
-      weatherGrouping.value,
+      weather.grouping,
     )}'s</span
   >
   <select
@@ -358,7 +352,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <label class="label">
   <span
     >Color Night ({nightLabel}) Using the {capitalizeFirstLetter(
-      weatherGrouping.value,
+      weather.grouping,
     )}'s</span
   >
   <select
@@ -393,7 +387,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <tr>
             <Th {handler} orderBy={'row'}>Row</Th>
             <Th {handler} orderBy={'date'}
-              >{weatherItemHeading.value}
+              >{weather.groupingHeading}
               <span class="text-xs">(YYYY-MM-DD)</span></Th
             >
             {#if $settings.daytimePosition === 'left'}

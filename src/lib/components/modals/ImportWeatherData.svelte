@@ -16,7 +16,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script>
   import Spinner from '$lib/components/Spinner.svelte';
   import HelpIcon from '$lib/components/buttons/HelpIcon.svelte';
-  import { weatherUngrouped } from '$lib/state';
+  import { weather } from '$lib/state';
   import {
     CSVtoArray,
     celsiusToFahrenheit,
@@ -50,8 +50,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
       errorMessages = [];
       const text = e.target.result;
       const data = CSVtoArray({ str: text });
-      if (!weatherUngrouped.data) return;
-      const weatherToMatch = weatherUngrouped.data.map(
+      if (!weather.rawData) return;
+      const weatherToMatch = weather.rawData.map(
         (n) => `${dateToISO8601String(n.date)}-${n.location}`,
       );
 
@@ -89,7 +89,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             );
           continue;
         }
-        let day = weatherUngrouped.data[index];
+        let day = weather.rawData[index];
 
         const highF = +row?.['High Temperature (°F)'];
         if (!isNaN(highF)) {
@@ -173,9 +173,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
             day.dayt.metric = hoursToMinutes(hours, 4);
           }
         }
-        weatherUngrouped.data[index] = day;
+        weather.rawData[index] = day;
       }
-      weatherUngrouped.data = weatherUngrouped.data;
+      weather.rawData = weather.rawData;
       imported = true;
       processing = false;
     };

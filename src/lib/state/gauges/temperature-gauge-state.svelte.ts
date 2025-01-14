@@ -1,10 +1,10 @@
+import { weather } from '$lib/state';
 import type { GaugeAttributes, GaugeStateInterface } from '$lib/types';
-import chroma from 'chroma-js';
-import { weather, weatherParametersData } from '$lib/state';
 import {
   displayNumber,
   getEvenlyDistributedRangeValuesWithEqualDayCount,
 } from '$lib/utils';
+import chroma from 'chroma-js';
 
 export const gaugeAttributes: GaugeAttributes = {
   id: 'temp',
@@ -61,10 +61,10 @@ export class TemperatureGauge implements GaugeStateInterface {
     Object.assign(this, gaugeAttributes);
   }
   // All the high temperatures, without missing values
-  #maxes = $derived(weatherParametersData?.tmax?.filter((n) => n !== null));
+  #maxes = $derived(weather.params?.tmax?.filter((n) => n !== null));
 
   // All the low temperatures, without missing values
-  #mins = $derived(weatherParametersData?.tmin?.filter((n) => n !== null));
+  #mins = $derived(weather.params?.tmin?.filter((n) => n !== null));
 
   // Set the max value to above the highest integer based on the weather data
   #max = $derived(

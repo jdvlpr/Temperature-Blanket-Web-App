@@ -20,14 +20,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Tooltip from '$lib/components/Tooltip.svelte';
   import { MAXIMUM_LOCATIONS } from '$lib/constants';
   import {
-    defaultWeatherSource,
-    isCustomWeather,
     isProjectLoading,
     liveProjectURLHash,
     locationsState,
     modal,
     wasProjectLoadedFromURL,
-    wasWeatherLoadedFromLocalStorage,
     weather,
   } from '$lib/state';
   import { pluralize } from '$lib/utils';
@@ -36,7 +33,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div class="mt-4 max-w-screen-md mx-auto">
-  {#if $wasWeatherLoadedFromLocalStorage && weather.data}
+  {#if weather.isFromLocalStorage && weather.data}
     <p
       class="text-sm flex flex-wrap gap-1 items-center justify-center w-full text-center"
     >
@@ -52,7 +49,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           clip-rule="evenodd"
         />
       </svg>
-      Loaded project and {#if $isCustomWeather}custom weather{:else}weather{/if}
+      Loaded project and {#if weather.isUserEdited}custom weather{:else}weather{/if}
       data
     </p>
   {:else if wasProjectLoadedFromURL.value}
@@ -75,7 +72,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </p>
   {/if}
 
-  {#if !!$isCustomWeather}
+  {#if !!weather.isUserEdited}
     <div class="flex flex-col gap-2 my-4 items-center">
       {#each locationsState.locations as location}
         <p class="flex flex-wrap gap-x-1 items-center justify-center">
@@ -126,7 +123,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/if}
 
   <div
-    class:hidden={!!$isCustomWeather}
+    class:hidden={!!weather.isUserEdited}
     class="divide-y divide-solid divide-surface-300 dark:divide-surface-600"
   >
     {#each locationsState.locations, index}
@@ -169,7 +166,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <SearchForWeather />
     </div>
 
-    {#if locationsState.locations.length > 1 && locationsState.totalDays && locationsState.allValid && !$isCustomWeather}
+    {#if locationsState.locations.length > 1 && locationsState.totalDays && locationsState.allValid && !weather.isUserEdited}
       <p class="w-full text-sm italic">
         {locationsState.totalDays} Total {pluralize(
           'Day',
@@ -185,7 +182,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     class="flex flex-wrap gap-2 justify-center mt-4 mb-2 lg:mb-4 px-4 py-2 shadow-inner rounded-container-token variant-soft-surface max-w-screen-md mx-auto"
     transition:slide
   >
-    <div class:hidden={!locationsState.allValid || $isCustomWeather}>
+    <div class:hidden={!locationsState.allValid || weather.isUserEdited}>
       {#if locationsState.locations.length < MAXIMUM_LOCATIONS}
         <button
           class="btn bg-secondary-hover-token gap-2"
@@ -245,9 +242,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
         />
       </svg>
       <span class="whitespace-pre-wrap"
-        >Weather Source: {$isCustomWeather
+        >Weather Source: {weather.isUserEdited
           ? 'Custom'
-          : defaultWeatherSource.value}</span
+          : weather.defaultSource}</span
       >
     </button>
   </div>

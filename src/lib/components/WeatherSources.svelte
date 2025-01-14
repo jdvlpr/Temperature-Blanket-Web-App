@@ -19,14 +19,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
   import GettingWeather from '$lib/components/modals/GettingWeather.svelte';
   import GettingWeatherWarnCustomWeather from '$lib/components/modals/GettingWeatherWarnCustomWeather.svelte';
-  import {
-    defaultWeatherSource,
-    isCustomWeather,
-    locationsState,
-    modal,
-    useSecondaryWeatherSources,
-    weather,
-  } from '$lib/state';
+  import { locationsState, modal, weather } from '$lib/state';
   import { getModalStore } from '@skeletonlabs/skeleton';
   import { onMount } from 'svelte';
 
@@ -35,7 +28,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let warnSearchAgain = $state(false);
 
   onMount(() => {
-    warnSearchAgain = $isCustomWeather ? true : false;
+    warnSearchAgain = weather.isUserEdited ? true : false;
   });
 
   function checkWarn() {
@@ -43,7 +36,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     warnSearchAgain = true;
   }
   run(() => {
-    defaultWeatherSource.value, $useSecondaryWeatherSources, checkWarn();
+    weather.defaultSource, weather.useSecondarySources, checkWarn();
   });
 </script>
 
@@ -54,16 +47,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <tr>
           <th
             class="border border-surface-500 p-2"
-            class:bg-surface-200={defaultWeatherSource.value === 'Meteostat'}
-            class:dark:bg-surface-700={defaultWeatherSource.value ===
-              'Meteostat'}
+            class:bg-surface-200={weather.defaultSource === 'Meteostat'}
+            class:dark:bg-surface-700={weather.defaultSource === 'Meteostat'}
           >
             <button
               class="btn bg-secondary-hover-token gap-2"
-              onclick={() => (defaultWeatherSource.value = 'Meteostat')}
+              onclick={() => (weather.defaultSource = 'Meteostat')}
             >
               <span class="flex flex-shrink-0 gap-1">
-                {#if defaultWeatherSource.value === 'Meteostat'}
+                {#if weather.defaultSource === 'Meteostat'}
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
@@ -89,16 +81,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </th>
           <th
             class="border border-surface-500 p-2"
-            class:bg-surface-200={defaultWeatherSource.value === 'Open-Meteo'}
-            class:dark:bg-surface-700={defaultWeatherSource.value ===
-              'Open-Meteo'}
+            class:bg-surface-200={weather.defaultSource === 'Open-Meteo'}
+            class:dark:bg-surface-700={weather.defaultSource === 'Open-Meteo'}
           >
             <button
               class="btn bg-secondary-hover-token gap-2"
-              onclick={() => (defaultWeatherSource.value = 'Open-Meteo')}
+              onclick={() => (weather.defaultSource = 'Open-Meteo')}
             >
               <span class="flex flex-shrink-0 gap-1">
-                {#if defaultWeatherSource.value === 'Open-Meteo'}
+                {#if weather.defaultSource === 'Open-Meteo'}
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
@@ -246,7 +237,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   <div>
     <ToggleSwitch
-      bind:checked={$useSecondaryWeatherSources}
+      bind:checked={weather.useSecondarySources}
       label="Use the other weather source if data is not available."
     />
   </div>
@@ -262,7 +253,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <button
         class="btn variant-filled-primary font-bold text-2xl"
         onclick={() => {
-          if ($isCustomWeather) {
+          if (weather.isUserEdited) {
             modalStore.close();
             modal.state.trigger({
               type: 'component',

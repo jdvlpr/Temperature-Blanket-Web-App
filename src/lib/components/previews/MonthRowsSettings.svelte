@@ -111,7 +111,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import NumberInputButton from '$lib/components/buttons/NumberInputButton.svelte';
   import ToggleSwitchGroup from '$lib/components/buttons/ToggleSwitchGroup.svelte';
   import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
-  import { modal, weather, weatherGrouping } from '$lib/state';
+  import { modal, weather } from '$lib/state';
   import {
     getFactors,
     getPossibleDimensions,
@@ -180,7 +180,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <div class="text-left">
   <ToggleSwitchGroup
-    groupLabel={`Color Using the ${capitalizeFirstLetter(weatherGrouping.value)}'s`}
+    groupLabel={`Color Using the ${capitalizeFirstLetter(weather.grouping)}'s`}
     {targets}
     bind:value={$settings.selectedTargets}
   />

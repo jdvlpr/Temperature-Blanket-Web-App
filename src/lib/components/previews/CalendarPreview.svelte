@@ -14,15 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import {
-    activeWeatherElementIndex,
-    projectStatus,
-    units,
-    weather,
-    weatherGrouping,
-    weatherMonthGroupingStartDay,
-    weatherUngrouped,
-  } from '$lib/state';
+  import { projectStatus, units, weather } from '$lib/state';
   import {
     getColorInfo,
     getDaysInLongestMonth,
@@ -62,7 +54,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   $: monthPadding = $settings.monthPadding ? SQUARE_SECTION_SIZE : 0;
 
-  $: months = weatherMonthsData({ weatherData: weatherUngrouped.data });
+  $: months = weatherMonthsData({ weatherData: weather.rawData });
 
   $: daysInLongestMonth = getDaysInLongestMonth(months);
 
@@ -97,7 +89,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     let monthColumnIndex = 0;
     let monthIndex = 0;
     let monthRowIndex = 0;
-    let total = weatherUngrouped.data?.length + extraSquares.length;
+    let total = weather.rawData?.length + extraSquares.length;
     let weekIndex = 0;
     let rowPadding = 0;
     let columnPadding = 0;
@@ -157,8 +149,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
         row * ($settings.squareSize * SQUARE_SECTION_SIZE) + rowPadding;
 
       let _dayIndex = dayIndex;
-      if (weatherGrouping.value === 'week') {
-        _dayIndex = Math.ceil((dayIndex - $weatherMonthGroupingStartDay) / 7);
+      if (weather.grouping === 'week') {
+        _dayIndex = Math.ceil((dayIndex - weather.monthGroupingStartDay) / 7);
       }
       for (
         let squareSectionIndex = 0, x = xStart, y = yStart;
@@ -257,7 +249,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     let max = _squaresPerMonth;
     months.forEach((month, index) => {
       let days = [
-        ...weatherUngrouped.data.filter(
+        ...weather.rawData.filter(
           (day) =>
             day.date.getFullYear() === month.year &&
             day.date.getMonth() === month.month,
@@ -298,7 +290,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
       if (group.dataset.isweathersquare === 'true') {
         let index = +group.dataset.dayindex;
-        $activeWeatherElementIndex = index;
+        weather.currentIndex = index;
 
         showPreviewImageWeatherDetails(targets);
       }

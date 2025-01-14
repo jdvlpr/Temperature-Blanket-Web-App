@@ -79,12 +79,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import Gauge from '$lib/components/Gauge.svelte';
-  import { weatherParametersData } from '$lib/state';
+  import { weather } from '$lib/state';
   import type { GaugeAttributes } from '$lib/types';
   import { displayNumber } from '$lib/utils';
 
-  $: maxes = weatherParametersData.snow.filter((n) => n !== null);
-  $: mins = weatherParametersData.snow.filter((n) => n !== null);
+  $: maxes = weather.params.snow.filter((n) => n !== null);
+  $: mins = weather.params.snow.filter((n) => n !== null);
 
   $: max = Number.isInteger(Math.max(...maxes))
     ? Math.max(...maxes) + 1

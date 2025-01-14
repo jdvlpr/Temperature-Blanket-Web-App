@@ -16,7 +16,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script>
   import RowsPerPage from '$lib/components/datatable/RowsPerPage.svelte';
   import Search from '$lib/components/datatable/Search.svelte';
-  import { weather, weatherGrouping } from '$lib/state';
+  import { weather } from '$lib/state';
   import { dateToISO8601String } from '$lib/utils';
 
   /**
@@ -75,9 +75,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <p class="text-sm">
       {#if $rowCount.total > 0}
         Showing {$rowCount.start} to {$rowCount.end} of {$rowCount.total}
-        {weatherGrouping.value}s
+        {weather.grouping}s
       {:else}
-        No {weatherGrouping.value}s found
+        No {weather.grouping}s found
       {/if}
     </p>
     <div class="flex flex-wrap gap-4 items-end justify-center">

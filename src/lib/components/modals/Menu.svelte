@@ -23,8 +23,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ChooseWeatherSource from '$lib/components/modals/ChooseWeatherSource.svelte';
   import KeyboardShortcuts from '$lib/components/modals/KeyboardShortcuts.svelte';
   import {
-    defaultWeatherSource,
-    isCustomWeather,
     isProjectSaved,
     modal,
     pageSections,
@@ -258,9 +256,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
             />
           </svg>
           <span class="whitespace-pre-wrap text-left"
-            >Weather Source: {$isCustomWeather
+            >Weather Source: {weather.isUserEdited
               ? 'Custom'
-              : defaultWeatherSource.value}</span
+              : weather.defaultSource}</span
           >
         </button>
 
@@ -481,7 +479,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               clip-rule="evenodd"
             />
           </svg>
-          Project and {#if $isCustomWeather}custom weather{:else}weather{/if}
+          Project and {#if weather.isUserEdited}custom weather{:else}weather{/if}
           data saved to this browser
         </p>
         {#if project}

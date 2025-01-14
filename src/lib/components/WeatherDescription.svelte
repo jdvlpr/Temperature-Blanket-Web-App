@@ -14,12 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import {
-    defaultWeatherSource,
-    locationsState,
-    weatherParametersData,
-    weatherParametersInView,
-  } from '$lib/state';
+  import { locationsState, weather } from '$lib/state';
   import { exists, pluralize } from '$lib/utils';
   import { onMount } from 'svelte';
 
@@ -39,16 +34,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   onMount(() => {
     isAnyWeatherSourceDifferentFromDefault = !locationsState.locations?.some(
-      (n) => n.source === defaultWeatherSource.value,
+      (n) => n.source === weather.defaultSource,
     );
 
-    if (weatherParametersData.prcp.every((n) => n === null))
-      $weatherParametersInView.prcp = false;
-    else $weatherParametersInView.prcp = true;
-    if (weatherParametersData.snow.every((n) => n === null))
-      $weatherParametersInView.snow = false;
-    else $weatherParametersInView.snow = true;
-    $weatherParametersInView = $weatherParametersInView;
+    if (weather.params.prcp.every((n) => n === null))
+      weather.table.show.prcp = false;
+    else weather.table.show.prcp = true;
+    if (weather.params.snow.every((n) => n === null))
+      weather.table.show.snow = false;
+    else weather.table.show.snow = true;
+    weather.table.show = weather.table.show;
   });
 </script>
 

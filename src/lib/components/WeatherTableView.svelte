@@ -14,20 +14,12 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
+  import { run } from 'svelte/legacy';
+
   import { DataHandler, Th } from '@vincjo/datatables';
   import { UNIT_LABELS } from '$lib/constants';
   import RecentWeatherDataTooltip from '$lib/components/RecentWeatherDataTooltip.svelte';
-  import {
-    isCustomWeather,
-    modal,
-    tablePage,
-    tableRowsPerPage,
-    tableSort,
-    units,
-    weatherGrouping,
-    weatherItemHeading,
-    weatherUngrouped,
-  } from '$lib/state';
+  import { modal, units, weather } from '$lib/state';
   import {
     millimetersToInches,
     inchesToMillimeters,
@@ -43,17 +35,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import NumberInput from '$lib/components/modals/NumberInput.svelte';
   import TextInput from '$lib/components/modals/TextInput.svelte';
 
-  export let data;
-  export let weatherTargets;
+  let { data, weatherTargets } = $props();
 
-  const handler = new DataHandler(tableData, {
-    rowsPerPage: $tableRowsPerPage,
-  });
-  const rows = handler.getRows();
+  let tablePage = $state(1);
 
-  let page, perPage, sort;
+  let tableRowsPerPage = $state(10);
 
-  $: tableData = [
+  let tableSort = $state({});
+
+  const tableData = $derived([
     ...data.map((n) => {
       let weather = {};
       weatherTargets.forEach((target) => {
@@ -83,14 +73,27 @@ If not, see <https://www.gnu.org/licenses/>. -->
         ...weather,
       };
     }),
-  ];
+  ]);
 
-  $: if (tableData) {
-    handler.setRows(tableData);
-    handler.setPage($tablePage);
-    const { identifier, direction } = $tableSort;
-    handler.applySorting({ orderBy: identifier, direction });
-  }
+  const handler = $derived(
+    new DataHandler(tableData, {
+      rowsPerPage: tableRowsPerPage,
+    }),
+  );
+  const rows = $derived(handler.getRows());
+
+  let page = $state(),
+    perPage = $state(),
+    sort = $state();
+
+  run(() => {
+    if (tableData) {
+      handler.setRows(tableData);
+      handler.setPage(tablePage);
+      const { identifier, direction } = tableSort;
+      handler.applySorting({ orderBy: identifier, direction });
+    }
+  });
 </script>
 
 <div class="w-full my-4">
@@ -100,7 +103,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <tr>
           <Th {handler} orderBy={'date'}>
             <span class="flex flex-col items-center justify-center"
-              >{weatherItemHeading.value}
+              >{weather.groupingHeading}
               <span class="text-xs whitespace-nowrap">(YYYY-MM-DD)</span></span
             >
           </Th>
@@ -135,12 +138,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 <td
                   ><button
                     class="transition-all"
-                    disabled={weatherGrouping.value === 'week'}
-                    class:bg-secondary-hover-token={weatherGrouping.value ===
-                      'day'}
-                    class:btn={weatherGrouping.value === 'day'}
-                    class:hover:px-2={weatherGrouping.value === 'day'}
-                    on:click={() => {
+                    disabled={weather.grouping === 'week'}
+                    class:bg-secondary-hover-token={weather.grouping === 'day'}
+                    class:btn={weather.grouping === 'day'}
+                    class:hover:px-2={weather.grouping === 'day'}
+                    onclick={() => {
                       if (id === 'dayt') {
                         modal.state.trigger({
                           type: 'component',
@@ -150,27 +152,31 @@ If not, see <https://www.gnu.org/licenses/>. -->
                               value: row[id],
                               title: `<div class="flex flex-col items-center justify-center"><span class="font-bold">${row.date}</span><span>${label}</span></div>`,
                               onOkay: (_value) => {
-                                $isCustomWeather = true;
+                                weather.isUserEdited = true;
                                 const time = _value.split(':');
                                 if (time.length !== 2) return;
                                 const hours = +time[0] + +time[1] / 60;
                                 page = handler.getPageNumber();
                                 perPage = handler.getRowsPerPage();
                                 sort = handler.getSorted();
-                                $tablePage = $page;
-                                $tableRowsPerPage = $perPage;
-                                $tableSort = $sort;
-                                const mappedWeather = weatherUngrouped.data.map(
+                                tablePage = $page;
+                                tableRowsPerPage = $perPage;
+                                tableSort = $sort;
+                                const mappedWeather = weather.rawData.map(
                                   (n) =>
                                     `${dateToISO8601String(n.date)}-${n.location}`,
                                 );
                                 const i = mappedWeather.indexOf(
                                   `${row.date}-${row.location}`,
                                 );
-                                weatherUngrouped.data[i][id].metric =
-                                  hoursToMinutes(hours, 4);
-                                weatherUngrouped.data[i][id].imperial =
-                                  displayNumber(+hours, 4);
+                                weather.rawData[i][id].metric = hoursToMinutes(
+                                  hours,
+                                  4,
+                                );
+                                weather.rawData[i][id].imperial = displayNumber(
+                                  +hours,
+                                  4,
+                                );
                               },
                             },
                           },
@@ -187,14 +193,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
                               noMinMax: true,
                               showSlider: false,
                               onOkay: (_value) => {
-                                $isCustomWeather = true;
+                                weather.isUserEdited = true;
                                 page = handler.getPageNumber();
                                 perPage = handler.getRowsPerPage();
                                 sort = handler.getSorted();
-                                $tablePage = $page;
-                                $tableRowsPerPage = $perPage;
-                                $tableSort = $sort;
-                                const mappedWeather = weatherUngrouped.data.map(
+                                tablePage = $page;
+                                tableRowsPerPage = $perPage;
+                                tableSort = $sort;
+                                const mappedWeather = weather.rawData.map(
                                   (n) =>
                                     `${dateToISO8601String(n.date)}-${n.location}`,
                                 );
@@ -202,22 +208,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
                                   `${row.date}-${row.location}`,
                                 );
                                 if (units.value === 'metric') {
-                                  weatherUngrouped.data[i][id].metric = _value;
+                                  weather.rawData[i][id].metric = _value;
                                   if (type === 'temperature')
-                                    weatherUngrouped.data[i][id].imperial =
+                                    weather.rawData[i][id].imperial =
                                       celsiusToFahrenheit(_value);
                                   if (type === 'height')
-                                    weatherUngrouped.data[i][id].imperial =
+                                    weather.rawData[i][id].imperial =
                                       millimetersToInches(_value);
                                 }
                                 if (units.value === 'imperial') {
-                                  weatherUngrouped.data[i][id].imperial =
-                                    _value;
+                                  weather.rawData[i][id].imperial = _value;
                                   if (type === 'temperature')
-                                    weatherUngrouped.data[i][id].metric =
+                                    weather.rawData[i][id].metric =
                                       fahrenheitToCelsius(_value);
                                   if (type === 'height')
-                                    weatherUngrouped.data[i][id].metric =
+                                    weather.rawData[i][id].metric =
                                       inchesToMillimeters(_value);
                                 }
                               },

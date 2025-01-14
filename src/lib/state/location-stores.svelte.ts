@@ -18,6 +18,7 @@ import {
   CHARACTERS_FOR_URL_HASH,
   MAXIMUM_DAYS_PER_LOCATION,
 } from '$lib/constants';
+import { weather } from '$lib/state';
 import type {
   LocationsStateType,
   LocationStateType,
@@ -25,7 +26,6 @@ import type {
   WeatherSource,
 } from '$lib/types';
 import { getLocationTitle, getToday, numberOfDays } from '$lib/utils';
-import { weatherUngrouped } from './weather-state.svelte';
 
 export class LocationClass implements LocationType {
   uuid: string = $state();
@@ -166,7 +166,7 @@ export class LocationsState implements LocationsStateType {
   });
 
   add(): void {
-    if (weatherUngrouped.data) weatherUngrouped.data = null;
+    if (weather.rawData) weather.rawData = null;
     const newLocation = new LocationState();
     newLocation.index = this.locations.length;
     this.locations.push(newLocation);

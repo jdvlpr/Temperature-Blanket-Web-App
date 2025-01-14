@@ -31,13 +31,10 @@ import {
 } from '$lib/constants';
 import {
   allGaugesAttributes,
-  defaultWeatherSource,
   gaugesState,
   locationsState,
   units,
-  useSecondaryWeatherSources,
-  weatherGrouping,
-  weatherMonthGroupingStartDay,
+  weather,
 } from '$lib/state';
 import { rowsPreview } from '$lib/state/previews/rows-preview-state.svelte';
 import type { GaugeSettingsType } from '$lib/types';
@@ -93,27 +90,27 @@ export const setProjectSettings = async (
   // Load Weather Source (added in v1.823)
   if (exists(params.s)) {
     const sourceCode = params.s.value.substring(0, 1);
-    if (sourceCode === '0') defaultWeatherSource.value = 'Meteostat';
-    else if (sourceCode === '1') defaultWeatherSource.value = 'Open-Meteo';
+    if (sourceCode === '0') weather.defaultSource = 'Meteostat';
+    else if (sourceCode === '1') weather.defaultSource = 'Open-Meteo';
 
     const secondaryCode = params.s.value.substring(1, 2);
-    if (secondaryCode === '0') useSecondaryWeatherSources.set(false);
-    else if (secondaryCode === '1') useSecondaryWeatherSources.set(true);
+    if (secondaryCode === '0') weather.useSecondarySources = false;
+    else if (secondaryCode === '1') weather.useSecondarySources = true;
   } else {
     // Projects before v1.823 didn't have this param, and only used Meteostat as a weather source
-    defaultWeatherSource.value = 'Meteostat';
-    useSecondaryWeatherSources.set(true);
+    weather.defaultSource = 'Meteostat';
+    weather.useSecondarySources = true;
   }
 
   // Load Weather Grouping Setting if present
   if (exists(params.w)) {
-    weatherGrouping.value = 'week';
+    weather.grouping = 'week';
     const value = +params.w?.value;
     if (DAYS_OF_THE_WEEK.map((n) => n.value).includes(value))
-      weatherMonthGroupingStartDay.set(value);
+      weather.monthGroupingStartDay = value;
   } else {
     // Otherwise set to the default 'day'
-    weatherGrouping.value = 'day';
+    weather.grouping = 'day';
   }
 };
 

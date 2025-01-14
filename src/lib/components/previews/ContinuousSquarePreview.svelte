@@ -14,12 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import {
-    activeWeatherElementIndex,
-    projectStatus,
-    units,
-    weather,
-  } from '$lib/state';
+  import { projectStatus, units, weather } from '$lib/state';
   import {
     getColorInfo,
     getTargetParentGaugeId,
@@ -176,7 +171,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     if (e.target.tagName !== 'rect') return;
     if (e.target.dataset.isextrastitch === 'true') return;
 
-    $activeWeatherElementIndex = +e.target.dataset.dayindex;
+    weather.currentIndex = +e.target.dataset.dayindex;
     showPreviewImageWeatherDetails(targets);
   }}
 >

@@ -14,7 +14,7 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { SCHEMES } from '$lib/constants';
-import { units, weatherGrouping } from '$lib/state';
+import { units, weather } from '$lib/state';
 import type { Color, GaugeSettingsType } from '$lib/types';
 import { getDaysInRange, getDaysPercent, pluralize } from '$lib/utils';
 import chroma from 'chroma-js';
@@ -77,7 +77,7 @@ export const getWPGauge = (gauge) => {
         if (index === 1) label = 'Average Temperature';
         if (index === 2) label = 'Low Temperature';
       }
-      return `${count} ${pluralize(weatherGrouping.value, count)} ${percentage} ${label}`;
+      return `${count} ${pluralize(weather.grouping, count)} ${percentage} ${label}`;
     });
     // details.reverse();
     content.push({

@@ -17,13 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import WeatherItem from '$lib/components/WeatherItem.svelte';
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
   import { UNIT_LABELS } from '$lib/constants';
-  import {
-    activeWeatherElementIndex,
-    locationsState,
-    units,
-    weather,
-    weatherGrouping,
-  } from '$lib/state';
+  import { locationsState, units, weather } from '$lib/state';
   import {
     capitalizeFirstLetter,
     convertTime,
@@ -48,7 +42,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let rangeInput = $state();
   let navigatorElement = $state();
 
-  let dayWeather = $derived(data[$activeWeatherElementIndex]);
+  let dayWeather = $derived(data[weather.currentIndex]);
   let dayLocation = $derived(
     locationsState.locations.filter(
       (location) => location.index === dayWeather?.location,
@@ -83,20 +77,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
 
     <p class="italic mb-2">
-      {capitalizeFirstLetter(weatherGrouping.value)}
-      {$activeWeatherElementIndex + 1} of {data?.length}
+      {capitalizeFirstLetter(weather.grouping)}
+      {weather.currentIndex + 1} of {data?.length}
     </p>
 
     <div class="range-select">
       <button
         aria-label="Show Previous {capitalizeFirstLetter(
-          weatherGrouping.value,
+          weather.grouping,
         )}'s Weather"
         class="prev scale-125 btn-icon bg-secondary-hover-token"
-        onclick={() => $activeWeatherElementIndex--}
-        disabled={$activeWeatherElementIndex === 0}
+        onclick={() => weather.currentIndex--}
+        disabled={weather.currentIndex === 0}
         title="Show Previous {capitalizeFirstLetter(
-          weatherGrouping.value,
+          weather.grouping,
         )}'s Weather"
         ><svg
           xmlns="http://www.w3.org/2000/svg"
@@ -114,14 +108,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </svg>
       </button>
       <input
-        aria-label="Select {capitalizeFirstLetter(
-          weatherGrouping.value,
-        )}'s Weather"
+        aria-label="Select {capitalizeFirstLetter(weather.grouping)}'s Weather"
         type="range"
         min="0"
         max={data?.length - 1}
         bind:this={rangeInput}
-        bind:value={$activeWeatherElementIndex}
+        bind:value={weather.currentIndex}
         onkeydown={(event) =>
           event.code === 'ArrowRight' || event.code === 'ArrowLeft'
             ? event.preventDefault()
@@ -132,14 +124,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
       <button
         aria-label="Show Next {capitalizeFirstLetter(
-          weatherGrouping.value,
+          weather.grouping,
         )}'s Weather"
         class="next scale-125 btn-icon bg-secondary-hover-token"
-        onclick={() => $activeWeatherElementIndex++}
-        disabled={$activeWeatherElementIndex === data?.length - 1}
-        title="Show Next {capitalizeFirstLetter(
-          weatherGrouping.value,
-        )}'s Weather"
+        onclick={() => weather.currentIndex++}
+        disabled={weather.currentIndex === data?.length - 1}
+        title="Show Next {capitalizeFirstLetter(weather.grouping)}'s Weather"
         ><svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"

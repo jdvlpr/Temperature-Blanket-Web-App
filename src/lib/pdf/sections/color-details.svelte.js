@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { weatherGrouping } from '$lib/state';
+import { weather } from '$lib/state';
 import { getDaysInRange, getDaysPercent } from '$lib/utils';
 import pdfConfig from '../pdf-config';
 import pdfGauge from './gauge.svelte';
@@ -38,7 +38,7 @@ const pdfColorDetails = {
     doc.line(x1, y, x2, y);
   },
   createColorDetailsHeader: (doc, gauge) => {
-    const header = weatherGrouping.value === 'week' ? 'Weeks' : 'Days';
+    const header = weather.grouping === 'week' ? 'Weeks' : 'Days';
     const items = {
       davg: {
         name: `${header} High`,

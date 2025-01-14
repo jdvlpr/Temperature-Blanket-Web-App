@@ -16,45 +16,18 @@
 import { locationsState, units } from '$lib/state';
 import type { WeatherDay, WeatherSource } from '$lib/types';
 import { createWeeksProperty, displayNumber } from '$lib/utils';
-import { get, writable, type Writable } from 'svelte/store';
 
-export const defaultWeatherSource: { value: WeatherSource } = $state({
-  value: 'Open-Meteo',
-});
+class WeatherClass {
+  // ***************
+  //    Weather Data
+  // ***************
+  rawData: WeatherDay[] | null = $state(null);
 
-/* In the project URL hash, this is '0' for 'false' or '1' for 'true' */
-export const useSecondaryWeatherSources: Writable<boolean> = writable(true);
-
-export const weatherGrouping: { value: 'day' | 'week' } = $state({
-  value: 'day',
-});
-
-class WeatherItemHeadingClass {
-  value: 'Week of' | 'Day' = $derived(
-    weatherGrouping.value === 'week' ? 'Week of' : 'Day',
-  );
-}
-export const weatherItemHeading = new WeatherItemHeadingClass();
-
-export const weatherMonthGroupingStartDay = writable(1);
-
-class WeatherUngroupedClass {
-  data: WeatherDay[] | null = $state(null);
-}
-
-export const weatherUngrouped = new WeatherUngroupedClass();
-
-class weatherGroupedByWeekClass {
-  data: WeatherDay[] | null = $derived.by(() => {
-    if (!weatherUngrouped.data) return null;
-
-    // Create a deep copy of the ungrouped weather array
-    let copy = JSON.parse(JSON.stringify(weatherUngrouped.data));
-
-    // Recreate date objects
-    copy = copy.map((n) => {
-      return { ...n, date: new Date(n.date) };
-    });
+  // ***************
+  //    Derived Weather Data
+  // ***************
+  goupedByWeek: WeatherDay[] | null = $derived.by(() => {
+    if (!this.rawData) return null;
 
     // Check if every location is from Meteostat as the data source
     // Used because Meteostat handle's snow data differently than Open-Meteo
@@ -64,7 +37,7 @@ class weatherGroupedByWeekClass {
 
     // Create weeks property for the weather data
     const _weatherWithWeek = createWeeksProperty({
-      weatherData: copy,
+      weatherData: this.rawData,
     });
 
     // Get unique week IDs
@@ -169,86 +142,97 @@ class weatherGroupedByWeekClass {
 
     return _weather;
   });
-}
-export const weatherGroupedByWeek = new weatherGroupedByWeekClass();
 
-class WeatherClass {
+  // The currently used weather data
   data: WeatherDay[] | null = $derived.by(() => {
-    switch (weatherGrouping.value) {
+    switch (this.grouping) {
       case 'day':
-        activeWeatherElementIndex.set(0);
-        return weatherUngrouped.data;
+        this.currentIndex = 0;
+        return this.rawData;
 
       case 'week':
-        activeWeatherElementIndex.set(0);
-        if (!get(weatherGroupedByWeek)) {
+        this.currentIndex = 0;
+        if (!this.goupedByWeek) {
           return null;
         }
 
-        return get(weatherGroupedByWeek);
+        return this.goupedByWeek;
 
       default:
-        return weatherUngrouped.data;
+        return this.rawData;
     }
   });
+
+  params = $derived.by(() => {
+    let tmin, tavg, tmax, prcp, snow, dayt;
+
+    if (!this.data)
+      return {
+        tmin,
+        tavg,
+        tmax,
+        prcp,
+        snow,
+        dayt,
+      };
+
+    tmin = this.data.map((day) => day.tmin[units.value]);
+    tavg = this.data.map((day) => day.tavg[units.value]);
+    tmax = this.data.map((day) => day.tmax[units.value]);
+    prcp = this.data.map((day) => day.prcp[units.value]);
+    snow = this.data.map((day) => day.snow[units.value]);
+    dayt = this.data.map((day) => day.dayt[units.value]);
+
+    return {
+      tmin,
+      tavg,
+      tmax,
+      prcp,
+      snow,
+      dayt,
+    };
+  });
+
+  // ***************
+  //    User Settings
+  // ***************
+  defaultSource: WeatherSource = $state('Open-Meteo');
+
+  /* In the project URL hash, this is '0' for 'false' or '1' for 'true' */
+  useSecondarySources: boolean = $state(true);
+
+  grouping: 'day' | 'week' = $state('day');
+
+  monthGroupingStartDay: number = $state(1);
+
+  // ***************
+  // Derived From Settings
+  // ***************
+  groupingHeading = $derived(this.grouping === 'week' ? 'Week of' : 'Day');
+
+  // ***************
+  // Other State
+  // ***************
+  currentIndex = $state(0);
+
+  isUserEdited: null | boolean = $state(null);
+
+  isFromLocalStorage: boolean = $state(false);
+
+  // ***************
+  // Table
+  // ***************
+  table: { viewAs: 'table' | 'range'; show: { [key: string]: boolean } } =
+    $state({
+      viewAs: 'table',
+      show: {
+        tmin: true,
+        tavg: true,
+        tmax: true,
+        prcp: true,
+        snow: true,
+        dayt: true,
+      },
+    });
 }
 export const weather = new WeatherClass();
-
-class weatherParametersDataClass {
-  tmin = $derived.by(() => {
-    if (!weather.data) return null;
-    return weather.data.map((day) => day.tmin[units.value]);
-  });
-
-  tavg = $derived.by(() => {
-    if (!weather.data) return null;
-    return weather.data.map((day) => day.tavg[units.value]);
-  });
-
-  tmax = $derived.by(() => {
-    if (!weather.data) return null;
-    return weather.data.map((day) => day.tmax[units.value]);
-  });
-
-  prcp = $derived.by(() => {
-    if (!weather.data) return null;
-    return weather.data.map((day) => day.prcp[units.value]);
-  });
-
-  snow = $derived.by(() => {
-    if (!weather.data) return null;
-    return weather.data.map((day) => day.snow[units.value]);
-  });
-
-  dayt = $derived.by(() => {
-    if (!weather.data) return null;
-    return weather.data.map((day) => day.dayt[units.value]);
-  });
-}
-
-export const weatherParametersData = new weatherParametersDataClass();
-
-export const activeWeatherElementIndex = writable(0);
-
-export const weatherView: Writable<'table' | 'range'> = writable('table');
-
-export const isCustomWeather: Writable<null | boolean> = writable(null);
-
-export const wasWeatherLoadedFromLocalStorage = writable(false);
-
-export const isWeatherValid = writable(false);
-
-export const tablePage = writable(1);
-
-export const tableRowsPerPage = writable(10);
-
-export const tableSort = writable({});
-
-export const weatherParametersInView = writable({
-  tmin: true,
-  tavg: true,
-  tmax: true,
-  prcp: true,
-  snow: true,
-  dayt: true,
-});

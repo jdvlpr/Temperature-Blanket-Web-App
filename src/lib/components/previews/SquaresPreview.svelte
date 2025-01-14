@@ -14,12 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import {
-    activeWeatherElementIndex,
-    projectStatus,
-    units,
-    weather,
-  } from '$lib/state';
+  import { projectStatus, units, weather } from '$lib/state';
   import {
     getColorInfo,
     getMonthSepparatorIndexes,
@@ -235,7 +230,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     if (group.tagName !== 'g') return;
 
     if (group.dataset.isweathersquare === 'true') {
-      $activeWeatherElementIndex = +group.dataset.dayindex;
+      weather.currentIndex = +group.dataset.dayindex;
       showPreviewImageWeatherDetails(targets);
     }
   }}

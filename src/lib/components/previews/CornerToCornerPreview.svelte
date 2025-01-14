@@ -14,13 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import {
-    activeWeatherElementIndex,
-    gaugesState,
-    projectStatus,
-    units,
-    weather,
-  } from '$lib/state';
+  import { gaugesState, projectStatus, units, weather } from '$lib/state';
   import {
     getColorInfo,
     getTargetParentGaugeId,
@@ -157,7 +151,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     const group = e.target.parentElement;
     if (group.tagName !== 'g') return;
 
-    $activeWeatherElementIndex = +group.dataset.dayindex;
+    weather.currentIndex = +group.dataset.dayindex;
 
     showPreviewImageWeatherDetails(targets);
   }}

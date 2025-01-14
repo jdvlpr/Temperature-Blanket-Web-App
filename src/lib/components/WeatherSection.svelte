@@ -34,20 +34,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     UNIT_LABELS,
   } from '$lib/constants';
   import {
-    activeWeatherElementIndex,
-    defaultWeatherSource,
-    isCustomWeather,
     locationsState,
     modal,
     showNavigationSideBar,
     units,
     weather,
-    weatherGroupedByWeek,
-    weatherGrouping,
-    weatherMonthGroupingStartDay,
-    weatherParametersData,
-    weatherParametersInView,
-    weatherUngrouped,
   } from '$lib/state';
   import {
     convertTime,
@@ -77,18 +68,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   onMount(() => {
     isAnyWeatherSourceDifferentFromDefault = !locationsState.locations?.some(
-      (n) => n.source === defaultWeatherSource.value,
+      (n) => n.source === weather.defaultSource,
     );
 
-    defaultWeatherSourceCopy = defaultWeatherSource.value;
+    defaultWeatherSourceCopy = weather.defaultSource;
     if (isAnyWeatherSourceDifferentFromDefault) {
       if (locationsState.locations?.every((n) => n.source === 'Meteostat')) {
-        defaultWeatherSource.value = 'Meteostat';
+        weather.defaultSource = 'Meteostat';
         wasDefaultWeatherSourceChanged = true;
       } else if (
         locationsState.locations?.every((n) => n.source === 'Open-Meteo')
       ) {
-        defaultWeatherSource.value = 'Open-Meteo';
+        weather.defaultSource = 'Open-Meteo';
         wasDefaultWeatherSourceChanged = true;
       }
     }
@@ -166,29 +157,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
       });
 
     $weatherChart.setActiveElements(datasets);
-    $activeWeatherElementIndex = index;
+    weather.currentIndex = index;
     $weatherChart.update();
   }
 
   $effect(() => {
-    if ($activeWeatherElementIndex) triggerHover($activeWeatherElementIndex);
+    if (weather.currentIndex) triggerHover(weather.currentIndex);
   });
 
-  let missingTmin = $derived(
-    weatherParametersData.tmin.filter((n) => n === null),
-  );
-  let missingTavg = $derived(
-    weatherParametersData.tavg.filter((n) => n === null),
-  );
-  let missingTmax = $derived(
-    weatherParametersData.tmax.filter((n) => n === null),
-  );
-  let missingPrcp = $derived(
-    weatherParametersData.prcp.filter((n) => n === null),
-  );
-  let missingSnow = $derived(
-    weatherParametersData.snow.filter((n) => n === null),
-  );
+  let missingTmin = $derived(weather.params.tmin.filter((n) => n === null));
+  let missingTavg = $derived(weather.params.tavg.filter((n) => n === null));
+  let missingTmax = $derived(weather.params.tmax.filter((n) => n === null));
+  let missingPrcp = $derived(weather.params.prcp.filter((n) => n === null));
+  let missingSnow = $derived(weather.params.snow.filter((n) => n === null));
   let missingData = $derived([
     {
       count: missingTmin.length,
@@ -245,8 +226,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   );
   let data = $derived(
     createWeeksProperty({
-      weatherData: weatherUngrouped.data,
-      dowOffset: $weatherMonthGroupingStartDay,
+      weatherData: weather.rawData,
+      dowOffset: weather.monthGroupingStartDay,
     }),
   );
   let length = $derived([...new Set(data?.map((day) => day.weekId))].length);
@@ -290,9 +271,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </svg>
 
       <span class="whitespace-pre-wrap text-left"
-        >Weather Source: {$isCustomWeather
+        >Weather Source: {weather.isUserEdited
           ? 'Custom'
-          : defaultWeatherSource.value}</span
+          : weather.defaultSource}</span
       >
     </button>
   </div>
@@ -300,12 +281,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {#if wasDefaultWeatherSourceChanged}
     <p class="text-sm w-full">
       No weather data was available from the default source ({defaultWeatherSourceCopy}),
-      so another source was used ({defaultWeatherSource.value}) and the Weather
+      so another source was used ({weather.defaultSource}) and the Weather
       Source setting was automatically updated.
     </p>
   {/if}
 
-  {#if weatherGrouping.value === 'week'}
+  {#if weather.grouping === 'week'}
     <div
       class="rounded-container-token flex flex-col gap-2 items-center justify-center w-full"
     >
@@ -316,15 +297,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
           class="link"
           rel="noopener noreferrer">Read more details.</a
         >
-        {#if $weatherGroupedByWeek}
+        {#if weather.goupedByWeek}
           Your project starts on {DAYS_OF_THE_WEEK.filter(
-            (n) => n.value === $weatherGroupedByWeek[0].date.getDay(),
+            (n) => n.value === weather.goupedByWeek[0].date.getDay(),
           )[0].label},
           {MONTHS.filter(
-            (n) => n.value - 1 === $weatherGroupedByWeek[0].date.getMonth(),
+            (n) => n.value - 1 === weather.goupedByWeek[0].date.getMonth(),
           )[0]?.name}
-          {$weatherGroupedByWeek[0].date.getDate()},
-          {$weatherGroupedByWeek[0].date.getFullYear()}. It spans {length}
+          {weather.goupedByWeek[0].date.getDate()},
+          {weather.goupedByWeek[0].date.getFullYear()}. It spans {length}
           {pluralize('week', length)}.
         {/if}
       </p>
@@ -332,7 +313,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <span>Weeks Start On</span>
         <select
           class="select w-fit"
-          bind:value={$weatherMonthGroupingStartDay}
+          bind:value={weather.monthGroupingStartDay}
           id="weather-weeks-start-week-on"
         >
           {#each DAYS_OF_THE_WEEK as { value, label }}
@@ -366,9 +347,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </svg>
           {/snippet}
           {#snippet summary()}
-            Weather within the past {defaultWeatherSource.value === 'Open-Meteo'
+            Weather within the past {weather.defaultSource === 'Open-Meteo'
               ? OPEN_METEO_DELAY_DAYS
-              : defaultWeatherSource.value === 'Meteostat'
+              : weather.defaultSource === 'Meteostat'
                 ? METEOSTAT_DELAY_DAYS
                 : 'few'} days may be revised as new data comes in.
           {/snippet}
@@ -383,10 +364,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
               >Meteostat</a
             >, and for some locations their weather models may take up to a week
             to incorporate the latest information. Sometimes even older weather
-            data is updated. Consider working at least {defaultWeatherSource.value ===
+            data is updated. Consider working at least {weather.defaultSource ===
             'Open-Meteo'
               ? OPEN_METEO_DELAY_DAYS
-              : defaultWeatherSource.value === 'Meteostat'
+              : weather.defaultSource === 'Meteostat'
                 ? METEOSTAT_DELAY_DAYS
                 : 'a few'} days behind to account for possible changes. Sorry for
             any inconvenience.
@@ -397,14 +378,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/if}
 
   <div class="flex flex-wrap gap-x-2 items-start justify-center">
-    {#if $weatherParametersInView.tmax}
+    {#if weather.table.show.tmax}
       <WeatherItem
         id="tmax"
         icon="&uarr;"
         label="Highest Temperature"
-        value={Math.max(
-          ...weatherParametersData.tmax?.filter((n) => n !== null),
-        )}
+        value={Math.max(...weather.params.tmax?.filter((n) => n !== null))}
         units={UNIT_LABELS.temperature[units.value]}
       >
         {#snippet button()}
@@ -421,7 +400,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 });
               }}
             >
-              {#if weatherGrouping.value === 'week'}Week of{/if}
+              {#if weather.grouping === 'week'}Week of{/if}
               {tMaxDay?.date.toLocaleDateString()}
             </button>
           </div>
@@ -429,26 +408,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </WeatherItem>
     {/if}
 
-    {#if $weatherParametersInView.tavg}
+    {#if weather.table.show.tavg}
       <WeatherItem
         id="tavg"
         icon="~"
         label="Average Temperature"
-        value={getAverage(
-          weatherParametersData.tavg?.filter((n) => n !== null),
-        )}
+        value={getAverage(weather.params.tavg?.filter((n) => n !== null))}
         units={UNIT_LABELS.temperature[units.value]}
       />
     {/if}
 
-    {#if $weatherParametersInView.tmin}
+    {#if weather.table.show.tmin}
       <WeatherItem
         id="tmin"
         icon="&darr;"
         label="Lowest Temperature"
-        value={Math.min(
-          ...weatherParametersData.tmin?.filter((n) => n !== null),
-        )}
+        value={Math.min(...weather.params.tmin?.filter((n) => n !== null))}
         units={UNIT_LABELS.temperature[units.value]}
       >
         {#snippet button()}
@@ -465,7 +440,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 });
               }}
             >
-              {#if weatherGrouping.value === 'week'}Week of{/if}
+              {#if weather.grouping === 'week'}Week of{/if}
               {tMinDay?.date.toLocaleDateString()}
             </button>
           </div>
@@ -473,15 +448,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </WeatherItem>
     {/if}
 
-    {#if $weatherParametersInView.prcp}
+    {#if weather.table.show.prcp}
       <WeatherItem
         id="prcp"
         icon="∴"
         label="Total Rainfall"
-        value={weatherParametersData.prcp?.every((n) => n === null)
+        value={weather.params.prcp?.every((n) => n === null)
           ? '-'
           : displayNumber(
-              weatherParametersData.prcp
+              weather.params.prcp
                 ?.filter((n) => n !== null)
                 ?.reduce((partialSum, a) => partialSum + a, 0),
             )}
@@ -489,19 +464,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
       />
     {/if}
 
-    {#if $weatherParametersInView.snow}
+    {#if weather.table.show.snow}
       <WeatherItem
         id="snow"
         icon="∗"
         label={locationsState.locations?.every((n) => n.source === 'Meteostat')
           ? 'Highest Snow Depth'
           : 'Total SnowFall'}
-        value={weatherParametersData.snow?.every((n) => n === null)
+        value={weather.params.snow?.every((n) => n === null)
           ? '-'
           : locationsState.locations?.every((n) => n.source === 'Meteostat')
-            ? Math.max(...weatherParametersData.snow?.filter((n) => n !== null))
+            ? Math.max(...weather.params.snow?.filter((n) => n !== null))
             : displayNumber(
-                weatherParametersData.snow
+                weather.params.snow
                   ?.filter((n) => n !== null)
                   ?.reduce((partialSum, a) => partialSum + a, 0),
               )}
@@ -524,14 +499,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </WeatherItem>
     {/if}
 
-    {#if $weatherParametersInView.dayt}
+    {#if weather.table.show.dayt}
       <WeatherItem
         id="dayt"
         icon="☼"
         label="Average Daytime"
         value={convertTime(
           getAverage(
-            weatherParametersData.dayt?.filter((n) => n !== null),
+            weather.params.dayt?.filter((n) => n !== null),
             { decimals: 6 },
           ),
         )}
@@ -555,58 +530,58 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <div class="flex flex-col justify-center w-full items-center gap-4">
   <div class="flex flex-wrap justify-center items-center">
     <ToggleWeatherData
-      view={$weatherParametersInView.tmax}
+      view={weather.table.show.tmax}
       onclick={() => {
-        $weatherParametersInView.tmax = !$weatherParametersInView.tmax;
-        $weatherParametersInView = $weatherParametersInView;
+        weather.table.show.tmax = !weather.table.show.tmax;
+        weather.table.show = weather.table.show;
       }}
     >
       <span class="border-b-2 border-tmax">High Temps</span>
     </ToggleWeatherData>
 
     <ToggleWeatherData
-      view={$weatherParametersInView.tavg}
+      view={weather.table.show.tavg}
       onclick={() => {
-        $weatherParametersInView.tavg = !$weatherParametersInView.tavg;
-        $weatherParametersInView = $weatherParametersInView;
+        weather.table.show.tavg = !weather.table.show.tavg;
+        weather.table.show = weather.table.show;
       }}
     >
       <span class="border-b-2 border-tavg">Average Temps</span>
     </ToggleWeatherData>
 
     <ToggleWeatherData
-      view={$weatherParametersInView.tmin}
+      view={weather.table.show.tmin}
       onclick={() => {
-        $weatherParametersInView.tmin = !$weatherParametersInView.tmin;
-        $weatherParametersInView = $weatherParametersInView;
+        weather.table.show.tmin = !weather.table.show.tmin;
+        weather.table.show = weather.table.show;
       }}
     >
       <span class="border-b-2 border-tmin">Low Temps</span>
     </ToggleWeatherData>
 
     <ToggleWeatherData
-      view={$weatherParametersInView.prcp}
+      view={weather.table.show.prcp}
       onclick={() => {
-        $weatherParametersInView.prcp = !$weatherParametersInView.prcp;
-        $weatherParametersInView = $weatherParametersInView;
+        weather.table.show.prcp = !weather.table.show.prcp;
+        weather.table.show = weather.table.show;
       }}
     >
       <span class="border-b-2 border-prcp">Rain</span>
     </ToggleWeatherData>
     <ToggleWeatherData
-      view={$weatherParametersInView.snow}
+      view={weather.table.show.snow}
       onclick={() => {
-        $weatherParametersInView.snow = !$weatherParametersInView.snow;
-        $weatherParametersInView = $weatherParametersInView;
+        weather.table.show.snow = !weather.table.show.snow;
+        weather.table.show = weather.table.show;
       }}
     >
       <span class="border-b-2 border-snow">Snow</span>
     </ToggleWeatherData>
     <ToggleWeatherData
-      view={$weatherParametersInView.dayt}
+      view={weather.table.show.dayt}
       onclick={() => {
-        $weatherParametersInView.dayt = !$weatherParametersInView.dayt;
-        $weatherParametersInView = $weatherParametersInView;
+        weather.table.show.dayt = !weather.table.show.dayt;
+        weather.table.show = weather.table.show;
       }}
     >
       <span class="border-b-2 border-dayt">Daytime</span>
@@ -637,7 +612,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             {#each missingDataMerged as { count, type, label }}
               {#if count && count < weather.data?.length}
                 {count}
-                {pluralize(weatherGrouping.value, count)} with missing {label}
+                {pluralize(weather.grouping, count)} with missing {label}
                 {pluralize(type, count)}.&nbsp;
               {:else if count && count === weather.data?.length}
                 No days have {label}

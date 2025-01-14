@@ -16,12 +16,10 @@
 import { API_SERVICES } from '$lib/constants';
 import {
   allGaugesAttributes,
-  isCustomWeather,
   locationsState,
   signal,
   units,
   weather,
-  weatherParametersData,
 } from '$lib/state';
 import type { WeatherDay } from '$lib/types';
 import {
@@ -37,7 +35,6 @@ import {
   stringToDate,
 } from '$lib/utils';
 import SunCalc from 'suncalc';
-import { get } from 'svelte/store';
 
 /**
  * Calculates the sum of a specific parameter from the weather data.
@@ -54,12 +51,12 @@ export const sum = (param) => {
       if (typeof value !== 'undefined' && value !== null)
         value = value[units.value];
       else {
-        if (param === 'tmax') return getAverage(weatherParametersData.tmax);
-        if (param === 'tavg') return getAverage(weatherParametersData.tavg);
-        if (param === 'tmin') return getAverage(weatherParametersData.tmin);
-        if (param === 'prcp') return getAverage(weatherParametersData.prcp);
-        if (param === 'snow') return getAverage(weatherParametersData.snow);
-        if (param === 'dayt') return getAverage(weatherParametersData.dayt);
+        if (param === 'tmax') return getAverage(weather.params.tmax);
+        if (param === 'tavg') return getAverage(weather.params.tavg);
+        if (param === 'tmin') return getAverage(weather.params.tmin);
+        if (param === 'prcp') return getAverage(weather.params.prcp);
+        if (param === 'snow') return getAverage(weather.params.snow);
+        if (param === 'dayt') return getAverage(weather.params.dayt);
       }
       value = Math.abs(value);
       value = value === 0 ? 1 : value;
@@ -330,7 +327,7 @@ export const getWeatherSourceDetails = () => {
     });
   }
 
-  if (get(isCustomWeather)) {
+  if (weather.isUserEdited) {
     sources.push({
       name: 'custom weather data',
     });

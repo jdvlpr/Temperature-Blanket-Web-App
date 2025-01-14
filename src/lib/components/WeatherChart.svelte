@@ -14,18 +14,12 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script context="module">
-  import { activeWeatherElementIndex } from '$lib/state';
   import { writable } from 'svelte/store';
   export let weatherChart = writable(null);
 </script>
 
 <script>
-  import {
-    weatherParametersData,
-    units,
-    weather,
-    weatherParametersInView,
-  } from '$lib/state';
+  import { units, weather } from '$lib/state';
   import {
     CategoryScale,
     Chart,
@@ -67,7 +61,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {
         label: 'High Temperature',
         id: 'tmax',
-        data: weatherParametersData.tmax,
+        data: weather.params.tmax,
         borderColor: '#f8717170',
         pointHoverBorderColor: '#f8717120',
         pointBorderColor: '#f87171',
@@ -78,7 +72,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {
         label: 'Average Temperature',
         id: 'tavg',
-        data: weatherParametersData.tavg,
+        data: weather.params.tavg,
         borderColor: '#a3a3a370',
         pointHoverBorderColor: '#a3a3a320',
         pointBorderColor: '#a3a3a3',
@@ -89,7 +83,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {
         label: 'Low Temperature',
         id: 'tmin',
-        data: weatherParametersData.tmin,
+        data: weather.params.tmin,
         borderColor: '#38bdf870',
         pointHoverBorderColor: '#38bdf820',
         pointBorderColor: '#38bdf8',
@@ -100,7 +94,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {
         label: 'Rain',
         id: 'prcp',
-        data: weatherParametersData.prcp,
+        data: weather.params.prcp,
         borderColor: '#818cf870',
         pointHoverBorderColor: '#818cf820',
         pointBorderColor: '#818cf8',
@@ -112,7 +106,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {
         label: 'Snow',
         id: 'snow',
-        data: weatherParametersData.snow,
+        data: weather.params.snow,
         borderColor: '#94a3b870',
         pointHoverBorderColor: '#94a3b820',
         pointBorderColor: '#94a3b8',
@@ -124,7 +118,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {
         label: 'Daytime',
         id: 'dayt',
-        data: weatherParametersData.dayt,
+        data: weather.params.dayt,
         fill: {
           target: 'origin',
           above: 'rgba(255, 203, 71, 0.03)', // Why above and not below?
@@ -239,23 +233,23 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let ctx;
 
-  $: if ($weatherParametersInView) setView();
+  $: if (weather.table.show) setView();
 
   function setView() {
     if (!dataSets) return;
     dataSets?.forEach((item, index) => {
       const meta = $weatherChart.getDatasetMeta(index);
-      meta.hidden = !$weatherParametersInView[item.id];
+      meta.hidden = !weather.table.show[item.id];
     });
     $weatherChart.update();
   }
 
   function onHover(e) {
     let value = $weatherChart.scales.x.getValueForPixel(e.x);
-    if (value < 0) $activeWeatherElementIndex = 0;
+    if (value < 0) weather.currentIndex = 0;
     else if (value > weather.data?.length - 1)
-      $activeWeatherElementIndex = weather.data?.length - 1;
-    else $activeWeatherElementIndex = value;
+      weather.currentIndex = weather.data?.length - 1;
+    else weather.currentIndex = value;
   }
 </script>
 

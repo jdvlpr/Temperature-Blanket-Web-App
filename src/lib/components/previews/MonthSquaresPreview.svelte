@@ -14,15 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import {
-    activeWeatherElementIndex,
-    projectStatus,
-    units,
-    weather,
-    weatherGrouping,
-    weatherMonthGroupingStartDay,
-    weatherUngrouped,
-  } from '$lib/state';
+  import { projectStatus, units, weather } from '$lib/state';
   import {
     getColorInfo,
     getDaysInLongestMonth,
@@ -84,7 +76,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     let dayIndex = 0;
     let roundInSquare = 1;
     let isWeather = true;
-    let daysInSquare = weatherUngrouped.data?.filter(
+    let daysInSquare = weather.rawData?.filter(
       (n) =>
         n.date.getFullYear() === months[squareIndex].year &&
         n.date.getMonth() === months[squareIndex].month,
@@ -94,7 +86,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       if (roundsIndex % roundsPerSquare === 0 && roundsIndex !== 0) {
         // New Square
         squareIndex += 1;
-        daysInSquare = weatherUngrouped.data?.filter(
+        daysInSquare = weather.rawData?.filter(
           (n) =>
             n.date.getFullYear() === months[squareIndex].year &&
             n.date.getMonth() === months[squareIndex].month,
@@ -125,8 +117,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
       );
 
       let _dayIndex = dayIndex;
-      if (weatherGrouping.value === 'week') {
-        _dayIndex = Math.ceil((dayIndex - $weatherMonthGroupingStartDay) / 7);
+      if (weather.grouping === 'week') {
+        _dayIndex = Math.ceil((dayIndex - weather.monthGroupingStartDay) / 7);
       }
 
       let color;
@@ -177,7 +169,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     on:click={(e) => {
       if (e.target.tagName !== 'rect') return;
       if (e.target.dataset.isweather !== 'true') return;
-      $activeWeatherElementIndex = +e.target.dataset.dayindex;
+      weather.currentIndex = +e.target.dataset.dayindex;
       showPreviewImageWeatherDetails(targets);
     }}
   >

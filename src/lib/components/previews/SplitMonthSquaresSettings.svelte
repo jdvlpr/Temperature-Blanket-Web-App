@@ -82,7 +82,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script>
   import NumberInputButton from '$lib/components/buttons/NumberInputButton.svelte';
   import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
-  import { modal, weather, weatherGrouping } from '$lib/state';
+  import { modal, weather } from '$lib/state';
   import {
     capitalizeFirstLetter,
     getFactors,
@@ -139,9 +139,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <label class="label">
   <span
-    >Color Left Side Using the {capitalizeFirstLetter(
-      weatherGrouping.value,
-    )}'s</span
+    >Color Left Side Using the {capitalizeFirstLetter(weather.grouping)}'s</span
   >
   <select
     class="select w-fit"
@@ -157,7 +155,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <label class="label">
   <span
     >Color Right Side Using the {capitalizeFirstLetter(
-      weatherGrouping.value,
+      weather.grouping,
     )}'s</span
   >
   <select

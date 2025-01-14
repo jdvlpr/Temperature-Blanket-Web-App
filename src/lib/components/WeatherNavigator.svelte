@@ -17,13 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import WeatherDetails from '$lib/components/WeatherDetails.svelte';
   import WeatherTableView from '$lib/components/WeatherTableView.svelte';
   import ImportWeatherData from '$lib/components/modals/ImportWeatherData.svelte';
-  import {
-    modal,
-    weather,
-    weatherGrouping,
-    weatherParametersInView,
-    weatherView,
-  } from '$lib/state';
+  import { modal, weather } from '$lib/state';
   import { downloadWeatherCSV, getWeatherTargets } from '$lib/utils';
   import { RadioGroup, RadioItem } from '@skeletonlabs/skeleton';
 
@@ -31,7 +25,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   export let context = 'body';
 
   $: weatherTargets = getWeatherTargets({
-    weatherParameters: $weatherParametersInView,
+    weatherParameters: weather.table.show,
   });
 </script>
 
@@ -40,7 +34,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <RadioGroup class="flex-wrap gap-y-2" active="bg-secondary-active-token">
       <RadioItem
         title="Set Daily Weather Display to Table"
-        bind:group={$weatherView}
+        bind:group={weather.table.viewAs}
         name="weatherDisplay"
         value={'table'}
       >
@@ -48,16 +42,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
       >
       <RadioItem
         title="Set Daily Weather Display to Details"
-        bind:group={$weatherView}
+        bind:group={weather.table.viewAs}
         name="weatherDisplay"
         value={'range'}>Details</RadioItem
       >
     </RadioGroup>
   {/if}
 
-  {#if $weatherView === 'range' || context !== 'body'}
+  {#if weather.table.viewAs === 'range' || context !== 'body'}
     <WeatherDetails {data} {weatherTargets} />
-  {:else if $weatherView === 'table'}
+  {:else if weather.table.viewAs === 'table'}
     <WeatherTableView {data} {weatherTargets} />
   {/if}
 
@@ -87,7 +81,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </span>
     </button>
 
-    {#if weatherGrouping.value !== 'week' && context === 'body'}
+    {#if weather.grouping !== 'week' && context === 'body'}
       <button
         class="btn bg-secondary-hover-token whitespace-pre-wrap"
         on:click={() => {

@@ -19,9 +19,6 @@ import {
   locationsState,
   units,
   weather,
-  weatherGrouping,
-  weatherItemHeading,
-  weatherParametersData,
 } from '$lib/state';
 import {
   capitalizeFirstLetter,
@@ -31,7 +28,6 @@ import {
   getTargetParentGaugeId,
   pluralize,
 } from '$lib/utils';
-import { get } from 'svelte/store';
 import pdfConfig from '../pdf-config';
 import pdfFooter from './footer.svelte';
 
@@ -44,7 +40,7 @@ const pdfWeatherData = {
   MINI_FONT_LOCATION_LENGTH: 8,
   headings: [
     {
-      text: 'Day', // uses weatherItemHeading below, the default is "Day"
+      text: 'Day', // uses groupingHeading below, the default is "Day"
       positionX: pdfConfig.leftMargin,
     },
     {
@@ -76,17 +72,17 @@ const pdfWeatherData = {
     // Heading
     doc.setFontSize(pdfConfig.font.h2);
     doc.setFont(pdfConfig.font.heading, 'normal');
-    const description = `Weather Data for ${locationsState.locations.length} ${pluralize('Location', locationsState.locations.length)}, ${weather.data.length} ${pluralize(capitalizeFirstLetter(weatherGrouping.value), weather.data.length)}`;
+    const description = `Weather Data for ${locationsState.locations.length} ${pluralize('Location', locationsState.locations.length)}, ${weather.data.length} ${pluralize(capitalizeFirstLetter(weather.grouping), weather.data.length)}`;
     doc.text(description, pdfConfig.leftMargin, pdfConfig.topMargin);
     // Low Avg High Temps
     doc.setFontSize(pdfConfig.font.p);
     doc.setFont(pdfConfig.font.paragraph, 'normal');
     const tempSymbol = units.value === 'metric' ? 'C' : 'F';
-    const average = `Lowest Temperature: ${Math.min(...weatherParametersData.tmin.filter((n) => n !== null))} °${tempSymbol}`;
+    const average = `Lowest Temperature: ${Math.min(...weather.params.tmin.filter((n) => n !== null))} °${tempSymbol}`;
     doc.text(average, pdfConfig.leftMargin, pdfConfig.topMargin + 9);
-    const high = `Average Temperature: ${getAverage(weatherParametersData.tavg.filter((n) => n !== null))} °${tempSymbol}`;
+    const high = `Average Temperature: ${getAverage(weather.params.tavg.filter((n) => n !== null))} °${tempSymbol}`;
     doc.text(high, pdfConfig.leftMargin + 60, pdfConfig.topMargin + 9);
-    const low = `Highest Temperature: ${Math.max(...weatherParametersData.tmax.filter((n) => n !== null))} °${tempSymbol}`;
+    const low = `Highest Temperature: ${Math.max(...weather.params.tmax.filter((n) => n !== null))} °${tempSymbol}`;
     doc.text(low, pdfConfig.leftMargin + 125, pdfConfig.topMargin + 9);
 
     // Create footer
@@ -193,7 +189,7 @@ const pdfWeatherData = {
     // Date and Location
     for (let i = 0; i < this.headings.length; i += 1) {
       let text = this.headings[i].text;
-      if (this.headings[i].text === 'Day') text = weatherItemHeading.value;
+      if (this.headings[i].text === 'Day') text = weather.groupingHeading;
       doc.text(text, this.headings[i].positionX, positionY);
       doc.line(
         this.headings[i].positionX - this.linePadding,

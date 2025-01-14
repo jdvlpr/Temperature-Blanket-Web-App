@@ -15,7 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import WeatherTable from '$lib/components/modals/WeatherTable.svelte';
-  import { modal, weatherGrouping } from '$lib/state';
+  import { modal, weather } from '$lib/state';
   import type {
     GaugeAttributes,
     GaugeRange,
@@ -80,7 +80,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </span>
           <span>
             {daysInRange.length}
-            {pluralize(weatherGrouping.value, daysInRange.length)} ({getDaysPercent(
+            {pluralize(weather.grouping, daysInRange.length)} ({getDaysPercent(
               daysInRange.length,
             )}%)
           </span>
@@ -94,7 +94,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </span>
         <span>
           {daysInRange.length}
-          {pluralize(weatherGrouping.value, daysInRange.length)} ({getDaysPercent(
+          {pluralize(weather.grouping, daysInRange.length)} ({getDaysPercent(
             daysInRange.length,
           )}%)
         </span>

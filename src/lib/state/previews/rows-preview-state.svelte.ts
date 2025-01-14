@@ -15,6 +15,13 @@ export class RowsPreviewClass {
   stitchSize = 10;
   id = 'rows';
   name = 'Rows';
+  settings = $state({
+    selectedTargets: ['tmax'],
+    stitchesPerRow: 300,
+    stitchesPerDay: 300,
+    lengthTarget: 'none',
+    extrasColor: '#f0f3f3',
+  });
   totalStitches = $derived(
     getTotalStitches(
       this.settings.lengthTarget,
@@ -34,13 +41,13 @@ export class RowsPreviewClass {
       6,
     ),
   );
+  sections = $state([]);
   svg = $state(null);
   totalSections = $derived(
     this.countOfAdditionalStitches > 0
       ? weather.data?.length + 1
       : weather.data?.length,
   );
-  sections = $state([]);
   img = $state({
     light: './images/preview_icons/Rows.png',
     dark: './images/preview_icons/Rows White.png',
@@ -54,14 +61,6 @@ export class RowsPreviewClass {
       .flatMap((n) => n.targets)
       .filter((n) => this.settings.selectedTargets.includes(n.id)),
   );
-
-  settings = $state({
-    selectedTargets: ['tmax'],
-    stitchesPerRow: 300,
-    stitchesPerDay: 300,
-    lengthTarget: 'none',
-    extrasColor: '#f0f3f3',
-  });
 
   totalRows = $derived(this.rows * this.settings.selectedTargets.length);
 

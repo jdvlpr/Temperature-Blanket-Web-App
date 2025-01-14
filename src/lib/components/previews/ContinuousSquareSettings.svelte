@@ -88,7 +88,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script>
   import NumberInputButton from '$lib/components/buttons/NumberInputButton.svelte';
   import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
-  import { modal, weatherGrouping } from '$lib/state';
+  import { modal, weather } from '$lib/state';
   import { setTargets } from '$lib/utils';
 
   $: targets = gaugesState.gauges.map((n) => n.targets).flat();
@@ -115,7 +115,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 {/if}
 
 <label class="label">
-  <span>Color Using the {capitalizeFirstLetter(weatherGrouping.value)}'s</span>
+  <span>Color Using the {capitalizeFirstLetter(weather.grouping)}'s</span>
   <select
     class="select w-fit"
     id="cosq-param"
@@ -129,7 +129,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <NumberInputButton
   bind:value={$settings.stitchesPerDay}
-  title="Stitches Per {capitalizeFirstLetter(weatherGrouping.value)}"
+  title="Stitches Per {capitalizeFirstLetter(weather.grouping)}"
   icon={true}
 />
 

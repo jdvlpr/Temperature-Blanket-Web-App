@@ -131,12 +131,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
   import SquareDesigner from '$lib/components/modals/SquareDesigner.svelte';
   import { DAYS_OF_THE_WEEK } from '$lib/constants';
-  import {
-    modal,
-    weather,
-    weatherGrouping,
-    weatherMonthGroupingStartDay,
-  } from '$lib/state';
+  import { modal, weather } from '$lib/state';
   import {
     getFactors,
     getMiddleValueOfArray,
@@ -153,8 +148,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   $: possibleDimensions = getPossibleDimensions({ factors });
 
-  $: if (weatherGrouping.value === 'week') {
-    $settings.weekStartCode = $weatherMonthGroupingStartDay;
+  $: if (weather.grouping === 'week') {
+    $settings.weekStartCode = weather.monthGroupingStartDay;
   }
 
   $: if (gaugesState.gauges) {
@@ -234,8 +229,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     class="select w-fit"
     bind:value={$settings.weekStartCode}
     on:change={() => {
-      if (weatherGrouping.value === 'week')
-        $weatherMonthGroupingStartDay = $settings.weekStartCode;
+      if (weather.grouping === 'week')
+        weather.monthGroupingStartDay = $settings.weekStartCode;
     }}
   >
     {#each DAYS_OF_THE_WEEK as { value, label }}

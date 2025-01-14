@@ -16,7 +16,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script>
   import Tooltip from '$lib/components/Tooltip.svelte';
   import { METEOSTAT_DELAY_DAYS, OPEN_METEO_DELAY_DAYS } from '$lib/constants';
-  import { defaultWeatherSource } from '$lib/state';
+  import { weather } from '$lib/state';
 </script>
 
 <Tooltip minWidth="290px" tooltipBg="bg-warning-50-900-token">
@@ -36,9 +36,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </svg>
   <p slot="tooltip" class="text-base">
     Weather data may adjust as new information arrives. Consider working at
-    least {defaultWeatherSource.value === 'Open-Meteo'
+    least {weather.defaultSource === 'Open-Meteo'
       ? OPEN_METEO_DELAY_DAYS
-      : defaultWeatherSource.value === 'Meteostat'
+      : weather.defaultSource === 'Meteostat'
         ? METEOSTAT_DELAY_DAYS
         : 'a few'} days behind to account for possible changes.
   </p>

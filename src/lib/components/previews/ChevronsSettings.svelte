@@ -15,7 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script context="module">
   import { CHARACTERS_FOR_URL_HASH, LOADED_APP_VERSION } from '$lib/constants';
-  import { gaugesState, preview } from '$lib/state';
+  import { gaugesState, preview, weather } from '$lib/state';
   import { derived, writable } from 'svelte/store';
 
   const id = 'chev';
@@ -69,7 +69,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script>
   import NumberInputButton from '$lib/components/buttons/NumberInputButton.svelte';
   import ToggleSwitchGroup from '$lib/components/buttons/ToggleSwitchGroup.svelte';
-  import { weatherGrouping } from '$lib/state';
   import { setTargets } from '$lib/utils';
   import { capitalizeFirstLetter, upToDate } from '$lib/utils/other-utils';
   import { pluralize } from '$lib/utils/string-utils';
@@ -89,7 +88,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <div class="text-left">
   <ToggleSwitchGroup
-    groupLabel={`Color Using the ${capitalizeFirstLetter(weatherGrouping.value)}'s`}
+    groupLabel={`Color Using the ${capitalizeFirstLetter(weather.grouping)}'s`}
     {targets}
     bind:value={$settings.selectedTargets}
   />

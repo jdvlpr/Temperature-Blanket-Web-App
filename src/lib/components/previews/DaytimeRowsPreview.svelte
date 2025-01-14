@@ -15,13 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import { HOURS_PER_DAY } from '$lib/constants';
-  import {
-    activeWeatherElementIndex,
-    gaugesState,
-    projectStatus,
-    units,
-    weather,
-  } from '$lib/state';
+  import { gaugesState, projectStatus, units, weather } from '$lib/state';
   import {
     displayNumber,
     getColorInfo,
@@ -145,7 +139,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     const group = e.target.parentElement;
     if (group.tagName !== 'g') return;
 
-    $activeWeatherElementIndex = +group.dataset.dayindex;
+    weather.currentIndex = +group.dataset.dayindex;
 
     showPreviewImageWeatherDetails(targets);
   }}

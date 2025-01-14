@@ -60,13 +60,12 @@ export const gaugeAttributes: GaugeAttributes = {
   ],
 };
 
-import Gauge from '$lib/components/Gauge.svelte';
-import { weatherParametersData } from '$lib/state';
+import { weather } from '$lib/state';
 import type { GaugeAttributes } from '$lib/types';
 import { displayNumber } from '$lib/utils';
 
-$: maxes = weatherParametersData.dayt.filter((n) => n !== null);
-$: mins = weatherParametersData.dayt.filter((n) => n !== null);
+$: maxes = weather.params.dayt.filter((n) => n !== null);
+$: mins = weather.params.dayt.filter((n) => n !== null);
 
 $: max = Number.isInteger(Math.max(...maxes))
   ? Math.max(...maxes) + 1

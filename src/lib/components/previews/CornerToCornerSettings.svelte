@@ -15,7 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script context="module">
   import { CHARACTERS_FOR_URL_HASH } from '$lib/constants';
-  import { gaugesState, preview, weather } from '$lib/state';
+  import { gaugesState, preview } from '$lib/state';
   import { derived, writable } from 'svelte/store';
 
   const id = 'crnr';
@@ -71,7 +71,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import NumberInputButton from '$lib/components/buttons/NumberInputButton.svelte';
-  import { weatherGrouping } from '$lib/state';
+  import { weather } from '$lib/state';
   import { capitalizeFirstLetter, setTargets } from '$lib/utils';
 
   $: targets = gaugesState.gauges.map((n) => n.targets).flat();
@@ -130,7 +130,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </div>
 
 <label class="label">
-  <span>Color Using the {capitalizeFirstLetter(weatherGrouping.value)}'s</span>
+  <span>Color Using the {capitalizeFirstLetter(weather.grouping)}'s</span>
   <select
     class="select w-fit"
     id="crnr-param"
