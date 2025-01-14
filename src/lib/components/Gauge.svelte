@@ -35,7 +35,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '$lib/state';
   import type { Color, GaugeSettingsType } from '$lib/types';
   import { createGaugeColors } from '$lib/utils';
-  import { getModalStore, getToastStore } from '@skeletonlabs/skeleton';
+  import {
+    focusTrap,
+    getModalStore,
+    getToastStore,
+  } from '@skeletonlabs/skeleton';
   import { Drawer } from 'vaul-svelte';
 
   const modalStore = getModalStore();
@@ -65,7 +69,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   $effect(() => {
     if (fullscreen) {
       gaugeContainerElement.style.zIndex = '40';
+      document.body.classList.add('overflow-hidden');
     } else {
+      document.body.classList.remove('overflow-hidden');
       gaugeContainerElement.style.zIndex = '';
     }
   });
@@ -119,6 +125,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     ? 'fixed w-full h-full left-0 top-0 bg-surface-50-900-token'
     : 'shadow-inner mt-2 pb-2 gap-2'}"
   bind:this={gaugeContainerElement}
+  use:focusTrap={fullscreen}
 >
   <div class="w-full {fullscreen ? 'flex-auto w-full h-fullf' : ''}">
     {#key gauges.activeGauge.colors}
@@ -182,7 +189,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
             stroke-linejoin="round"
             d="M4.098 19.902a3.75 3.75 0 005.304 0l6.401-6.402M6.75 21A3.75 3.75 0 013 17.25V4.125C3 3.504 3.504 3 4.125 3h5.25c.621 0 1.125.504 1.125 1.125v4.072M6.75 21a3.75 3.75 0 003.75-3.75V8.197M6.75 21h13.125c.621 0 1.125-.504 1.125-1.125v-5.25c0-.621-.504-1.125-1.125-1.125h-4.072M10.5 8.197l2.88-2.88c.438-.439 1.15-.439 1.59 0l3.712 3.713c.44.44.44 1.152 0 1.59l-2.879 2.88M6.75 17.25h.008v.008H6.75v-.008z"
           />
-        </svg> Browse Palettes
+        </svg>
+        {#if !fullscreen}
+          Browse Palettes
+        {/if}
       </button>
     {/if}
 
@@ -206,7 +216,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 stroke-linejoin="round"
                 d="M4.098 19.902a3.75 3.75 0 005.304 0l6.401-6.402M6.75 21A3.75 3.75 0 013 17.25V4.125C3 3.504 3.504 3 4.125 3h5.25c.621 0 1.125.504 1.125 1.125v4.072M6.75 21a3.75 3.75 0 003.75-3.75V8.197M6.75 21h13.125c.621 0 1.125-.504 1.125-1.125v-5.25c0-.621-.504-1.125-1.125-1.125h-4.072M10.5 8.197l2.88-2.88c.438-.439 1.15-.439 1.59 0l3.712 3.713c.44.44.44 1.152 0 1.59l-2.879 2.88M6.75 17.25h.008v.008H6.75v-.008z"
               />
-            </svg> Browse Palettes
+            </svg>
+            {#if !fullscreen}
+              Browse Palettes
+            {/if}
           </button>
         </Drawer.Trigger>
         <Drawer.Portal>
@@ -262,7 +275,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
           stroke-linejoin="round"
           d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
         />
-      </svg> Choose Colorways
+      </svg>
+      {#if !fullscreen}
+        Choose Colorways
+      {/if}
     </button>
 
     <button
@@ -292,7 +308,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
           stroke-linejoin="round"
           d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
         />
-      </svg> Image Palette</button
+      </svg>
+      {#if !fullscreen}
+        Image Palette
+      {/if}</button
     >
 
     <button
@@ -323,7 +342,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
           stroke-linejoin="round"
           d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"
         />
-      </svg> Import/Export
+      </svg>
+      {#if !fullscreen}
+        Import/Export
+      {/if}
     </button>
 
     <button
@@ -354,7 +376,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
           stroke-linejoin="round"
           d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"
         />
-      </svg> Random
+      </svg>
+      {#if !fullscreen}
+        Random
+      {/if}
     </button>
 
     <button
@@ -385,7 +410,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
           stroke-linejoin="round"
           d="M3 7.5L7.5 3m0 0L12 7.5M7.5 3v13.5m13.5 0L16.5 21m0 0L12 16.5m4.5 4.5V7.5"
         />
-      </svg> Sort
+      </svg>
+      {#if !fullscreen}
+        Sort
+      {/if}
     </button>
 
     <button
@@ -393,20 +421,37 @@ If not, see <https://www.gnu.org/licenses/>. -->
       class="btn bg-secondary-hover-token flex gap-1 justify-start items-center"
       onclick={() => (fullscreen = !fullscreen)}
     >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke-width="1.5"
-        stroke="currentColor"
-        class="size-6"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15"
-        />
-      </svg>
+      {#if !fullscreen}
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="currentColor"
+          class="size-6"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15"
+          />
+        </svg>
+      {:else}
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="currentColor"
+          class="size-6"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M9 9V4.5M9 9H4.5M9 9 3.75 3.75M9 15v4.5M9 15H4.5M9 15l-5.25 5.25M15 9h4.5M15 9V4.5M15 9l5.25-5.25M15 15h4.5M15 15v4.5m0-4.5 5.25 5.25"
+          />
+        </svg>
+      {/if}
       {#if fullscreen}
         Exit
       {/if}
