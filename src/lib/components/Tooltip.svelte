@@ -16,7 +16,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import { arrow, createFloatingActions } from 'svelte-floating-ui';
   import {
-    flip,
+    autoPlacement,
     offset,
     shift,
     size,
@@ -82,7 +82,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     placement,
     middleware: [
       offset(12),
-      flip(),
+      autoPlacement(),
       size({
         apply({ availableWidth, availableHeight, elements }) {
           // Do things with the data, e.g.
@@ -202,7 +202,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     aria-labelledby="Tooltip or Menu"
     aria-describedby="A dialog box showing information or menu items."
     in:scale={{ duration: 175 }}
-    class="absolute shadow-lg text-token cursor-text z-40 rounded-container-token tooltip"
+    class="absolute shadow-lg text-token cursor-text z-200 rounded-container-token tooltip"
     style="min-width:{minWidth}"
     use:floatingContent
     onmouseenter={() => (isTooltipActive = true)}

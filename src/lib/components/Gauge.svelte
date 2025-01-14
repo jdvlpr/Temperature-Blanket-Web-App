@@ -14,7 +14,6 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { page } from '$app/state';
   import ColorPaletteEditable from '$lib/components/ColorPaletteEditable.svelte';
   import GaugeCustomizer from '$lib/components/GaugeCustomizer.svelte';
   import SelectNumberOfColors from '$lib/components/SelectNumberOfColors.svelte';
@@ -25,13 +24,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ImportExportPalette from '$lib/components/modals/ImportExportPalette.svelte';
   import RandomPalette from '$lib/components/modals/RandomPalette.svelte';
   import SortPalette from '$lib/components/modals/SortPalette.svelte';
-  import { drawerState, gauges, isDesktop, modal } from '$lib/state';
+  import {
+    drawerState,
+    gauges,
+    isDesktop,
+    modal,
+    pageSections,
+    pinAllSections,
+  } from '$lib/state';
   import type { Color, GaugeSettingsType } from '$lib/types';
   import { createGaugeColors } from '$lib/utils';
-  import { getModalStore } from '@skeletonlabs/skeleton';
+  import { getModalStore, getToastStore } from '@skeletonlabs/skeleton';
   import { Drawer } from 'vaul-svelte';
 
   const modalStore = getModalStore();
+
+  const toastStore = getToastStore();
 
   function updateGauge({
     _colors,
@@ -48,7 +56,37 @@ If not, see <https://www.gnu.org/licenses/>. -->
     drawerState.closeAll();
     if ($modalStore[0]) modalStore.close();
   }
+
+  let fullscreen = $state(false);
+
+  let gaugeContainerElement = $state();
+
+  $effect(() => {
+    if (fullscreen) {
+      toastStore.trigger({
+        message: 'Press ESC to exit fullscreen',
+        timeout: 2000,
+      });
+      gaugeContainerElement.style.zIndex = '40';
+    }
+  });
 </script>
+
+<svelte:window
+  onkeydown={(e) => {
+    if (e.key === 'f') {
+      if (
+        !pageSections.items.find((p) => p.id === 'page-section-gauges')
+          ?.active &&
+        !pinAllSections.value
+      )
+        return;
+      fullscreen = !fullscreen;
+    } else if (e.key === 'Escape') {
+      fullscreen = false;
+    }
+  }}
+/>
 
 {#if gauges.activeGaugeId !== 'temp'}
   <!-- If this is not the default temperature gauge and we're on the project planner page -->
@@ -80,9 +118,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <div
   class="w-full flex flex-wrap gap-2 justify-center items-center rounded-container-token bg-surface-300-600-token text-token shadow-inner mt-2 pb-2"
 >
-  <div class="w-full">
+  <div
+    class="w-full {fullscreen
+      ? 'fixed w-full h-full left-0 top-0 bg-surface-50-900-token'
+      : ''}"
+    bind:this={gaugeContainerElement}
+  >
     {#key gauges.activeGauge.colors}
       <ColorPaletteEditable
+        {fullscreen}
         bind:colors={gauges.activeGauge.colors}
         schemeName={gauges.activeGauge.schemeId}
         showSchemeName={false}

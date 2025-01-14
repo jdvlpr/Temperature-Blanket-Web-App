@@ -27,7 +27,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import {
     SOURCES,
     TRIGGERS,
-    dndzone,
     dragHandle,
     dragHandleZone,
   } from 'svelte-dnd-action';
@@ -42,6 +41,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     roundedBottom?: boolean;
     typeId?: string;
     onchanged?: any;
+    fullscreen: boolean;
   }
 
   let {
@@ -53,6 +53,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     roundedBottom = true,
     typeId = 'palettePreview',
     onchanged = null,
+    fullscreen,
   }: Props = $props();
 
   const flipDurationMs = 200;
@@ -172,9 +173,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }}
 />
 
-<div class="flex flex-col text-left gap-y-1 w-full">
+<div
+  class="flex flex-col text-left gap-y-1 w-full {fullscreen ? 'h-full' : ''}"
+>
   <div
-    class="w-full inline-flex h-[70px]"
+    class="w-full inline-flex {fullscreen ? 'h-full' : 'h-[70px]'}"
     use:dragHandleZone={{
       items: sortableColors,
       flipDurationMs,
@@ -199,7 +202,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
       } = color}
       {@const isLocked = typeof color.locked !== undefined && color?.locked}
       <button
-        class="first:rounded-tl-container-token first:overflow-hidden last:rounded-tr-container-token last:overflow-hidden w-full h-[70px] group palette-item {roundedBottom
+        class=" w-full {fullscreen
+          ? 'h-full'
+          : 'h-[70px] first:rounded-tl-container-token first:overflow-hidden last:rounded-tr-container-token last:overflow-hidden'} group palette-item {roundedBottom &&
+        !fullscreen
           ? 'first:rounded-bl-container-token last:rounded-br-container-token'
           : ''}"
         animate:flip={{ duration: flipDurationMs }}
@@ -213,12 +219,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
           tooltipStyle="background:{hex};"
           tooltipBg=""
           fullWidth={true}
-          classNames="w-full h-[70px]"
+          classNames="w-full {fullscreen ? 'h-full' : 'h-[70px]'}"
           minWidth="260px"
           showTooltip={activeColorIndex === index && !isDragging.value}
         >
           <div
-            class="flex-auto flex flex-col justify-center items-center h-[70px]"
+            class="flex-auto flex flex-col justify-center items-center {fullscreen
+              ? 'h-full'
+              : 'h-[70px]'}"
             title={brandName && yarnName && name
               ? `${brandName} - ${yarnName}: ${name}`
               : hex}
