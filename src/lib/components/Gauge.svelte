@@ -146,6 +146,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   >
     <div class="">
       <SelectNumberOfColors
+        hideText={fullscreen}
         numberOfColors={gauges.activeGauge.colors.length}
         onchange={(e) => {
           gauges.activeGauge.colors = createGaugeColors({

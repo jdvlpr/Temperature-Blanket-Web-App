@@ -18,6 +18,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     numberOfColors: number;
     max?: number;
     allowZero?: boolean;
+    hideText?: boolean;
     onchange?: (event: Event) => void;
   }
 
@@ -25,6 +26,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     numberOfColors = $bindable(),
     max = 99,
     allowZero = false,
+    hideText = false,
     onchange,
   }: Props = $props();
 
@@ -47,7 +49,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {#if i > start}
           <option value={i}>
             {i}
-            {i === 1 ? 'Color' : 'Colors'}
+            {#if !hideText}
+              {i === 1 ? 'Color' : 'Colors'}
+            {/if}
           </option>
         {/if}
       {/each}
