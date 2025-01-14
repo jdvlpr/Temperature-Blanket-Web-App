@@ -47,7 +47,7 @@ export interface LocationStateType {
 }
 
 export interface LocationsStateType {
-  locations: LocationStateType[];
+  all: LocationStateType[];
   totalDays: number;
   allValid: boolean;
   urlHash: string;

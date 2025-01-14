@@ -25,18 +25,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
     weatherMonthsData,
   } from '$lib/utils';
   import { settings } from './CalendarSettings.svelte';
-  import { previews } from './previews.svelte';
+  import { previewsData } from './previews.svelte';
 
-  const previewIndex = previews.findIndex((n) => n.id === 'clnr');
+  const previewIndex = previewsData.findIndex((n) => n.id === 'clnr');
   const SQUARE_SECTION_SIZE = 10;
   const WEEK_LENGTH = 7;
 
   let svg;
   let sections = [];
 
-  $: previews[previewIndex].width = width;
-  $: previews[previewIndex].height = height;
-  $: previews[previewIndex].svg = svg;
+  $: previewsData[previewIndex].width = width;
+  $: previewsData[previewIndex].height = height;
+  $: previewsData[previewIndex].svg = svg;
 
   $: width =
     dimensionsWidth * WEEK_LENGTH * $settings.squareSize * SQUARE_SECTION_SIZE +

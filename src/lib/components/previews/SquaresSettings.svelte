@@ -15,7 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script context="module" lang="ts">
   import { CHARACTERS_FOR_URL_HASH } from '$lib/constants';
-  import { gaugesState, preview } from '$lib/state';
+  import { gauges, preview } from '$lib/state';
   import { setSecondaryTargets } from '$lib/utils';
   import chroma from 'chroma-js';
   import { derived, writable } from 'svelte/store';
@@ -176,9 +176,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { modal } from '$lib/state';
   import { pluralize, setTargets } from '$lib/utils';
 
-  $: targets = gaugesState.gauges.map((n) => n.targets).flat();
+  $: targets = gauges.gauges.map((n) => n.targets).flat();
 
-  $: if (gaugesState.gauges) {
+  $: if (gauges.gauges) {
     $settings.primaryTarget = setTargets($settings.primaryTarget);
     $settings.secondaryTargets = setTargets($settings.secondaryTargets);
   }

@@ -14,7 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import { allGaugesAttributes, gaugesState, units, weather } from '$lib/state';
+  import { allGaugesAttributes, gauges, units, weather } from '$lib/state';
   import { downloadPDF } from '$lib/utils';
   import { onMount } from 'svelte';
   import Gauge from './Gauge.svelte';
@@ -34,24 +34,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
       gauge.targets.forEach((target) => {
         if (weather.data?.some((day) => day[target.id][units.value] !== null)) {
           // For each of the gauge's weather parameter targets, check to see if there is any data, and if so setup the default gauge
-          gaugesState.addToAvailable({
+          gauges.addToAvailable({
             id: gauge.id,
             label: gauge.label,
           });
         } else {
           // Otherwise remove the gauge. Weather data may no longer be available for a certain gauge if, for example, the user changes the location
-          gaugesState.removeFromAvailable(gauge.id);
+          gauges.removeFromAvailable(gauge.id);
         }
       });
     });
 
     // If the active gauge is no longer available, set it to the first available
-    if (
-      !gaugesState.gauges.find(
-        (gauge) => gauge.id === gaugesState.activeGaugeId,
-      )
-    )
-      gaugesState.activeGaugeId = gaugesState.gauges[0]?.id;
+    if (!gauges.gauges.find((gauge) => gauge.id === gauges.activeGaugeId))
+      gauges.activeGaugeId = gauges.gauges[0]?.id;
   }
 </script>
 
@@ -60,19 +56,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <select
       class="select w-fit"
       id="gauges-select"
-      bind:value={gaugesState.activeGaugeId}
+      bind:value={gauges.activeGaugeId}
       onchange={(e) => {
         const id = e.target.value;
 
-        if (!gaugesState.gauges.map((gauge) => gauge.id).includes(id)) {
+        if (!gauges.gauges.map((gauge) => gauge.id).includes(id)) {
           // If the gauge is not created yet, then set it up
-          gaugesState.addById(id);
+          gauges.addById(id);
         }
       }}
     >
-      {#each gaugesState.availableGauges as { id, label }}
-        <option value={id} selected={gaugesState.activeGaugeId === id}>
-          {#if !gaugesState.gauges.map((gauge) => gauge.id).includes(id)}
+      {#each gauges.availableGauges as { id, label }}
+        <option value={id} selected={gauges.activeGaugeId === id}>
+          {#if !gauges.gauges.map((gauge) => gauge.id).includes(id)}
             Add
           {/if}
           {label}
@@ -82,7 +78,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </label>
 </div>
 
-{#if gaugesState.activeGauge}
+{#if gauges.activeGauge}
   <Gauge />
 {/if}
 

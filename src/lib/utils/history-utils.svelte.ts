@@ -26,7 +26,7 @@ import { load as loadSqrs } from '$lib/components/previews/SquaresSettings.svelt
 import { ICONS } from '$lib/constants';
 import {
   allGaugesAttributes,
-  gaugesState,
+  gauges,
   historyChangeMessage,
   historyState,
   isHistoryUpdating,
@@ -111,16 +111,16 @@ export const loadFromHistory = ({ action }: { action: 'Undo' | 'Redo' }) => {
         !exists(oldParams[gauge.id]) ||
         oldParams[gauge.id].value !== newParams[gauge.id].value
       ) {
-        gaugesState.addById(gauge.id);
+        gauges.addById(gauge.id);
         const settings = parseGaugeURLHash(newParams[gauge.id].value);
         Object.assign(
-          gaugesState.gauges.find((g) => g.id === gauge.id),
+          gauges.gauges.find((g) => g.id === gauge.id),
           settings,
         );
         message = 'Colors';
       }
     } else if (exists(oldParams[gauge.id])) {
-      gaugesState.remove(gauge.id);
+      gauges.remove(gauge.id);
       message = 'Colors';
     }
   }

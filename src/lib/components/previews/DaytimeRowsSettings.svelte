@@ -14,7 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script context="module">
-  import { gaugesState, locationsState, preview } from '$lib/state';
+  import { gauges, locations, preview } from '$lib/state';
   import { derived, writable } from 'svelte/store';
 
   const id = 'rsun';
@@ -118,7 +118,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let isExpanded = false;
   let daytimeLabel, nightLabel;
 
-  $: targets = gaugesState.gauges.map((n) => n.targets).flat();
+  $: targets = gauges.gauges.map((n) => n.targets).flat();
 
   $: tableData = weather.data?.map((n, i) => {
     let left, center, right, divided;
@@ -171,7 +171,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     };
   });
 
-  $: if (gaugesState.gauges) {
+  $: if (gauges.gauges) {
     $settings.daytimeTarget = setTargets($settings.daytimeTarget);
     $settings.nightTarget = setTargets($settings.nightTarget);
   }
@@ -234,7 +234,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     link.setAttribute('href', encodedUri);
     link.setAttribute(
       'download',
-      `Stitches Table for ${locationsState.projectFilename}`,
+      `Stitches Table for ${locations.projectFilename}`,
     );
     link.className = 'hidden';
     document.body.appendChild(link);

@@ -30,7 +30,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { onMount } from 'svelte';
   import { writable } from 'svelte/store';
   import '../../css/flag-icons.css';
-  import { activeLocationID, locations } from './+page.svelte';
+  import { activeLocationID, weatherLocations } from './+page.svelte';
   import { fetchData } from './GetWeather.svelte';
 
   let searching = false; // Autocomplete searching status
@@ -101,8 +101,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
         return div;
       },
       onSelect: async function (item) {
-        if (!$locations.some((location) => location.id === +item.id)) {
-          $locations.unshift(item);
+        if (
+          !weatherLocations.data.some((location) => location.id === +item.id)
+        ) {
+          weatherLocations.data.unshift(item);
         }
         await fetchData();
         $activeLocationID = item.id;
@@ -120,7 +122,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }); // End of onMount
 
   function validate() {
-    if (!$locations?.find((item) => item.id === $activeLocationID)?.id) {
+    if (
+      !weatherLocations.data?.find((item) => item.id === $activeLocationID)?.id
+    ) {
       $validId = false;
       return;
     }
@@ -169,8 +173,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
       _location.result = `<span class="fflag fflag-${data.countryCode?.toUpperCase()}"></span>${label}`;
       $inputLocation.value = '';
 
-      if (!$locations.map((item) => item.id).includes(+id))
-        $locations.unshift(_location);
+      if (!weatherLocations.data.map((item) => item.id).includes(+id))
+        weatherLocations.data.unshift(_location);
 
       $activeLocationID = +id;
       await fetchData();
@@ -199,8 +203,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
       _location.label = label;
       _location.result = `<span class="fflag fflag-${geonames.countryCode?.toUpperCase()}"></span>${label}`;
 
-      if (!$locations.map((item) => item.id).includes(+geonames.geonameId))
-        $locations.unshift(_location);
+      if (
+        !weatherLocations.data
+          .map((item) => item.id)
+          .includes(+geonames.geonameId)
+      )
+        weatherLocations.data.unshift(_location);
 
       $activeLocationID = +geonames.geonameId;
 

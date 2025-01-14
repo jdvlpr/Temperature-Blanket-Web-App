@@ -16,8 +16,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import Spinner from '$lib/components/Spinner.svelte';
   import {
-    locationsState,
-    previewsState,
+    locations,
+    previews,
     projectGalleryLink,
     projectGalleryTitle,
   } from '$lib/state';
@@ -41,9 +41,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
       icon: 'spinner',
     };
     const imgSrc = await svgToPNG({
-      svgNode: previewsState.active.svg,
-      width: previewsState.active.width,
-      height: previewsState.active.height,
+      svgNode: previews.active.svg,
+      width: previews.active.width,
+      height: previews.active.height,
       download: false,
     });
 
@@ -87,12 +87,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <p>&#8226; Gallery pages are subject to change.</p>
         </div>
       </div>
-      {@const SvelteComponent = previewsState.active.preview}
+      {@const SvelteComponent = previews.active.preview}
       <div
         class="w-full col-span-full sm:col-span-1 max-w-[250px] m-auto pointer-events-none flex flex-col gap-2 p-4 bg-surface-50-900-token rounded-container-token mb-4"
       >
-        <span class="font-bold line-clamp-4">{locationsState.projectTitle}</span
-        >
+        <span class="font-bold line-clamp-4">{locations.projectTitle}</span>
         <SvelteComponent />
       </div>
     {:else}
@@ -109,7 +108,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </div>
     {/if}
   </div>
-  {#if projectGalleryLink.value && projectGalleryTitle.value && projectGalleryTitle.value === locationsState.projectTitle}
+  {#if projectGalleryLink.value && projectGalleryTitle.value && projectGalleryTitle.value === locations.projectTitle}
     <p class="my-2">
       <a
         href={projectGalleryLink.value}

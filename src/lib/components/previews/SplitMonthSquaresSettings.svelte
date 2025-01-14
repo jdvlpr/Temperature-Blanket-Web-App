@@ -15,7 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script context="module">
   import { CHARACTERS_FOR_URL_HASH } from '$lib/constants';
-  import { gaugesState, preview } from '$lib/state';
+  import { gauges, preview } from '$lib/state';
   import chroma from 'chroma-js';
   import { derived, writable } from 'svelte/store';
 
@@ -92,9 +92,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     weatherMonthsData,
   } from '$lib/utils';
 
-  $: targets = gaugesState.gauges.map((n) => n.targets).flat();
+  $: targets = gauges.gauges.map((n) => n.targets).flat();
 
-  $: if (gaugesState.gauges) {
+  $: if (gauges.gauges) {
     $settings.leftTarget = setTargets($settings.leftTarget);
     $settings.rightTarget = setTargets($settings.rightTarget);
   }

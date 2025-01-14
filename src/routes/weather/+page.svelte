@@ -15,7 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script module>
   export const hour = writable('24');
-  export const locations = writable([]);
+  export const weatherLocations = $state({ data: [] });
   export const activeLocationID = writable(null);
   export const weatherDataElement = writable(null);
 </script>
@@ -33,7 +33,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import UnitChanger from '$lib/components/UnitChanger.svelte';
   import {
     isProjectLoading,
-    locationsState,
     modal,
     showNavigationSideBar,
     units,
@@ -88,16 +87,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     // saved weather locations
     if (localStorage.getItem('[/weather]locations')) {
-      locationsState.locations = JSON.parse(
+      weatherLocations.data = JSON.parse(
         localStorage.getItem('[/weather]locations'),
       ).map((item) => {
         return { ...item, id: +item.id };
       });
 
-      $activeLocationID = locationsState.locations[0]?.id || null;
+      $activeLocationID = weatherLocations.data[0]?.id || null;
       await fetchData();
     }
-    locations.subscribe(async (value) => {
+    weatherLocations.data.subscribe(async (value) => {
       localStorage.setItem(
         '[/weather]locations',
         JSON.stringify(value.filter((value) => value.saved === true)),
@@ -107,7 +106,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     activeLocationID.subscribe(async (value) => {
       if (
         value &&
-        locationsState.locations.find((item) => item.id === value)?.saved
+        weatherLocations.data.find((item) => item.id === value)?.saved
       ) {
         // if (locationsState.locations.find((item) => item.id === value)?.saved) page.url.searchParams.set("id", value);
         // page.url.searchParams.set("id", value);
@@ -201,7 +200,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     return nd;
   }
   let weatherData = $derived(
-    locationsState.locations?.find((item) => item.id === $activeLocationID)
+    weatherLocations.data?.find((item) => item.id === $activeLocationID)
       ?.data || null,
   );
   let hourlyData = $derived(
@@ -275,7 +274,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     localStorage.setItem('[/weather]units', units.value);
     // page.url.searchParams.set("u", value === "metric" ? "m" : "i");
     // if (isMounted) window.history.replaceState({ path: page.url.href }, "", page.url.href);
-    if (locationsState.locations?.some((item) => item.units !== units.value))
+    if (weatherLocations.data?.some((item) => item.units !== units.value))
       await fetchData();
   });
 </script>
@@ -348,7 +347,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           />
         </svg>
       </button>
-      {#if locationsState.locations.filter((item) => item?.saved).length}
+      {#if weatherLocations.data.filter((item) => item?.saved).length}
         <button
           aria-label="Open Locations"
           class="btn-icon bg-secondary-hover-token"
@@ -411,18 +410,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     <div
                       class="flex flex-col justify-center items-center gap-2"
                     >
-                      {#if !locationsState.locations.find((item) => item.id === $activeLocationID)?.saved}
+                      {#if !weatherLocations.data.find((item) => item.id === $activeLocationID)?.saved}
                         <button
                           in:fade
                           class="btn bg-secondary-hover-token"
                           title="Add to Locations"
                           onclick={async () => {
-                            locationsState.locations.map((item) => {
+                            weatherLocations.data.map((item) => {
                               if (item.id === $activeLocationID)
                                 item.saved = true;
                               return item;
                             });
-                            locationsState.locations = locationsState.locations;
+                            weatherLocations.data = weatherLocations.data;
                             page.url.searchParams.set('id', $activeLocationID);
                             page.url.searchParams.set(
                               'h',
@@ -454,7 +453,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                           </svg>
                           Add
                         </button>
-                      {:else if locationsState.locations.filter((item) => item?.saved)?.length}
+                      {:else if weatherLocations.data.filter((item) => item?.saved)?.length}
                         <button
                           in:fade
                           class="btn bg-secondary-hover-token"
@@ -487,7 +486,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       {/if}
                     </div>
                     <p class="font-bold md:text-xl">
-                      {@html locationsState.locations.find(
+                      {@html weatherLocations.data.find(
                         (item) => item.id === $activeLocationID,
                       ).result}
                     </p>

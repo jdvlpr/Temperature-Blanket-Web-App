@@ -16,9 +16,9 @@
 import WeatherDetails from '$lib/components/WeatherDetails.svelte';
 import {
   drawerState,
-  gaugesState,
+  gauges,
   isDesktop,
-  locationsState,
+  locations,
   modal,
   previewWeatherTargets,
   weather,
@@ -82,7 +82,7 @@ export const downloadPreviewPNG = async (
   const img = await svgToPNG({ svgNode: svg, width, height });
 
   const a = document.createElement('a');
-  const fileName = `Temperature-Blanket-Preview-${locationsState.projectFilename}.png`;
+  const fileName = `Temperature-Blanket-Preview-${locations.projectFilename}.png`;
   a.setAttribute('download', fileName);
   a.setAttribute('href', img);
   a.setAttribute('target', '_blank');
@@ -315,10 +315,8 @@ export const getPossibleDimensions = ({ factors, currentDimensions }) => {
 export const setTargets = (data) => {
   if (typeof data === 'string') {
     // If a gauge gets removed and it contains the target weather param, reset the primary weather param
-    if (data === null) return gaugesState.gauges[0].targets[0].id;
-    return gaugesState.gauges
-      .map((g) => g.id)
-      .includes(getTargetParentGaugeId(data))
+    if (data === null) return gauges.gauges[0].targets[0].id;
+    return gauges.gauges.map((g) => g.id).includes(getTargetParentGaugeId(data))
       ? data
       : null;
   }
@@ -335,11 +333,11 @@ export const setTargets = (data) => {
       _targets = data.map((n) => n.targetId).flat();
     _targets = _targets.filter((n) => {
       n = getTargetParentGaugeId(n);
-      return $state.snapshot(gaugesState.gauges.map((g) => g.id).includes(n));
+      return $state.snapshot(gauges.gauges.map((g) => g.id).includes(n));
     });
 
     if (_targets.length === 0) {
-      _targets = [gaugesState.gauges[0]?.targets[0].id];
+      _targets = [gauges.gauges[0]?.targets[0].id];
     }
 
     if (isSecondarySquareParamData) {

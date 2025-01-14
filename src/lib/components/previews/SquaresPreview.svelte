@@ -23,18 +23,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
     getWeatherTargets,
     showPreviewImageWeatherDetails,
   } from '$lib/utils';
-  import { previews } from './previews.svelte';
+  import { previewsData } from './previews.svelte';
   import { details, settings } from './SquaresSettings.svelte';
 
-  const previewIndex = previews.findIndex((n) => n.id === 'sqrs');
+  const previewIndex = previewsData.findIndex((n) => n.id === 'sqrs');
   const SQUARE_SECTION_SIZE = 10;
 
   let svg: SVGSVGElement;
   let sections = [];
 
-  $: previews[previewIndex].width = width;
-  $: previews[previewIndex].height = height;
-  $: previews[previewIndex].svg = svg;
+  $: previewsData[previewIndex].width = width;
+  $: previewsData[previewIndex].height = height;
+  $: previewsData[previewIndex].svg = svg;
 
   $: width = $settings.columns * SQUARE_SECTION_SIZE * $settings.squareSize;
   $: height = rows * SQUARE_SECTION_SIZE * $settings.squareSize;

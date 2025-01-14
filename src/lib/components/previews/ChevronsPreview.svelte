@@ -14,20 +14,20 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import { gaugesState, projectStatus, units, weather } from '$lib/state';
+  import { gauges, projectStatus, units, weather } from '$lib/state';
   import {
     getColorInfo,
     getTargetParentGaugeId,
     showPreviewImageWeatherDetails,
   } from '$lib/utils';
   import { details, settings } from './ChevronsSettings.svelte';
-  import { previews } from './previews.svelte';
+  import { previewsData } from './previews.svelte';
 
   let svg;
-  const previewIndex = previews.findIndex((n) => n.id === 'chev');
-  $: previews[previewIndex].width = width;
-  $: previews[previewIndex].height = height;
-  $: previews[previewIndex].svg = svg;
+  const previewIndex = previewsData.findIndex((n) => n.id === 'chev');
+  $: previewsData[previewIndex].width = width;
+  $: previewsData[previewIndex].height = height;
+  $: previewsData[previewIndex].svg = svg;
 
   const ROW_HEIGHT = 5;
   $: width = $settings.chevronsPerRow * chevronSideLength;
@@ -38,7 +38,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   $: chevronHeight = chevronSideLength / 2;
   $: chevronSideLength = $settings.chevronSideLength * Math.sqrt(2);
 
-  $: targets = gaugesState.gauges
+  $: targets = gauges.gauges
     .map((n) => n.targets)
     .flat()
     .filter((n) => $settings.selectedTargets.includes(n.id));

@@ -15,8 +15,8 @@
 
 import {
   allGaugesAttributes,
-  gaugesState,
-  locationsState,
+  gauges,
+  locations,
   units,
   weather,
 } from '$lib/state';
@@ -72,7 +72,7 @@ const pdfWeatherData = {
     // Heading
     doc.setFontSize(pdfConfig.font.h2);
     doc.setFont(pdfConfig.font.heading, 'normal');
-    const description = `Weather Data for ${locationsState.locations.length} ${pluralize('Location', locationsState.locations.length)}, ${weather.data.length} ${pluralize(capitalizeFirstLetter(weather.grouping), weather.data.length)}`;
+    const description = `Weather Data for ${locations.all.length} ${pluralize('Location', locations.all.length)}, ${weather.data.length} ${pluralize(capitalizeFirstLetter(weather.grouping), weather.data.length)}`;
     doc.text(description, pdfConfig.leftMargin, pdfConfig.topMargin);
     // Low Avg High Temps
     doc.setFontSize(pdfConfig.font.p);
@@ -131,9 +131,8 @@ const pdfWeatherData = {
       doc.text(heading, this.headings[0].positionX, line);
       // Location
       let location = String(
-        locationsState.locations.filter(
-          (n) => n.index === weather.data[i].location,
-        )[0].label,
+        locations.all.filter((n) => n.index === weather.data[i].location)[0]
+          .label,
       );
       if (location.includes(',')) {
         location = location.slice(0, location.indexOf(','));
@@ -266,7 +265,7 @@ const pdfWeatherData = {
       );
 
       const parentGaugeId = getTargetParentGaugeId(param);
-      const hasGauge = gaugesState.gauges
+      const hasGauge = gauges.gauges
         .map((gauge) => gauge.id)
         .includes(parentGaugeId);
 

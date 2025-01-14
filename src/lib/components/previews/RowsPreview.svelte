@@ -14,7 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { gaugesState, projectStatus, units, weather } from '$lib/state';
+  import { gauges, projectStatus, units, weather } from '$lib/state';
   import { rowsPreview } from '$lib/state/previews/rows-preview-state.svelte';
   import {
     getColorInfo,
@@ -45,7 +45,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   $effect(() => {
     projectStatus.state.liveURL;
-    if (!weather.data || !gaugesState.gauges) return;
+    if (!weather.data || !gauges.gauges) return;
     debounce(() => {
       console.count('update');
 

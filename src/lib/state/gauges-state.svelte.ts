@@ -154,6 +154,6 @@ class GaugesState {
 }
 
 // Create the gaugesState object with the default temperature gauge
-export const gaugesState = new GaugesState();
+export const gauges = new GaugesState();
 
 export const allGaugesAttributes = [tempGaugeAttributes];

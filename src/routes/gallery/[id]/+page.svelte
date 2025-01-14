@@ -25,7 +25,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import YarnSources from '$lib/components/YarnSources.svelte';
   import ViewToggle from '$lib/components/buttons/ViewToggle.svelte';
   import { ALL_YARN_WEIGHTS, ICONS } from '$lib/constants';
-  import { allGaugesAttributes, layout, locationsState } from '$lib/state';
+  import { allGaugesAttributes, layout, locations } from '$lib/state';
   import {
     exists,
     getProjectParametersFromURLHash,
@@ -191,9 +191,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   <a
                     class="btn variant-filled-primary w-fit m-auto flex flex-wrap items-center gap-1"
                     href={projectURL}
-                    target={locationsState.allValid ? '_blank' : '_self'}
+                    target={locations.allValid ? '_blank' : '_self'}
                   >
-                    {#if locationsState.allValid}
+                    {#if locations.allValid}
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
@@ -224,7 +224,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         />
                       </svg>
                     {/if}
-                    Open in {#if locationsState.allValid}
+                    Open in {#if locations.allValid}
                       New
                     {/if} Project Planner
                   </a>

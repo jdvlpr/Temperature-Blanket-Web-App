@@ -18,7 +18,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import UnitChanger from '$lib/components/UnitChanger.svelte';
   import { getWeatherCodeDetails } from '$lib/utils';
   import { getModalStore, RadioGroup, RadioItem } from '@skeletonlabs/skeleton';
-  import { activeLocationID, hour, locations } from './+page.svelte';
+  import { activeLocationID, hour, weatherLocations } from './+page.svelte';
   import { fetchData } from './GetWeather.svelte';
   import { validId } from './Location.svelte';
 
@@ -33,7 +33,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   const modalStore = getModalStore();
 
-  let savedWeatherLocations = $derived($locations.filter((item) => item.saved));
+  let savedWeatherLocations = $derived(
+    weatherLocations.data.filter((item) => item.saved),
+  );
 </script>
 
 <ModalShell {parent}>
@@ -107,19 +109,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 onclick={(e) => {
                   e.stopPropagation();
                   e.preventDefault();
-                  $locations.map((item) => {
+                  weatherLocations.data.map((item) => {
                     if (item.id === id) item.saved = false;
                     return item;
                   });
-                  $locations = $locations;
-                  // const _weatherForecastData = $locations.filter((item) => item.id !== id);
-                  // $locations = _weatherForecastData;
+                  // const _weatherForecastData = weatherLocations.data.filter((item) => item.id !== id);
+                  // weatherLocations.data = _weatherForecastData;
 
                   if (id === $activeLocationID)
                     $activeLocationID =
-                      $locations.find((item) => item.saved)?.id || null;
+                      weatherLocations.data.find((item) => item.saved)?.id ||
+                      null;
 
-                  if (!$locations.filter((item) => item?.saved)?.length)
+                  if (
+                    !weatherLocations.data.filter((item) => item?.saved)?.length
+                  )
                     modalStore.close();
                 }}
               >

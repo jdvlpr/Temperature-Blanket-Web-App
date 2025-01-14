@@ -19,10 +19,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import WeatherDetails from '$lib/components/WeatherDetails.svelte';
   import {
     drawerState,
-    gaugesState,
-    locationsState,
+    gauges,
+    locations,
     modal,
-    previewsState,
+    previews,
     previewWeatherTargets,
     projectGalleryLink,
     projectGalleryTitle,
@@ -34,19 +34,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { Drawer } from 'vaul-svelte';
 
   onMount(() => {
-    if (!previewsState.active) {
+    if (!previews.active) {
       // add the default rows preview
-      previewsState.add(rowsPreview);
+      previews.add(rowsPreview);
     }
   });
 </script>
 
-{#if previewsState.active && weather.data}
+{#if previews.active && weather.data}
   <PreviewSelect />
   <div class="flex flex-col gap-2 justify-center items-start">
     <div class="flex w-full flex-col gap-4 justify-center items-center">
-      {#key gaugesState.activeGauge.colors || gaugesState.activeGauge?.ranges}
-        <previewsState.active.previewComponent />
+      {#key gauges.activeGauge.colors || gauges.activeGauge?.ranges}
+        <previews.active.previewComponent />
       {/key}
 
       <Drawer.Root bind:open={drawerState.weatherDetails}>
@@ -72,7 +72,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
 
     <div class="flex w-full flex-wrap items-end justify-center gap-4">
-      <previewsState.active.settingsComponent />
+      <previews.active.settingsComponent />
     </div>
 
     <div
@@ -83,9 +83,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
         title="Download PNG"
         onclick={() => {
           downloadPreviewPNG(
-            previewsState.active.width,
-            previewsState.active.height,
-            previewsState.active.svg,
+            previews.active.width,
+            previews.active.height,
+            previews.active.svg,
           );
         }}
         ><svg
@@ -133,7 +133,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         Send to Project Gallery
       </button>
 
-      {#if projectGalleryLink.value && projectGalleryTitle.value && projectGalleryTitle.value === locationsState.projectTitle}
+      {#if projectGalleryLink.value && projectGalleryTitle.value && projectGalleryTitle.value === locations.projectTitle}
         <div class="flex flex-col gap-1 justify-center w-full">
           <p>View this project's gallery page:</p>
           <p>

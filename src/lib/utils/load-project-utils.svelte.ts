@@ -31,8 +31,8 @@ import {
 } from '$lib/constants';
 import {
   allGaugesAttributes,
-  gaugesState,
-  locationsState,
+  gauges,
+  locations,
   units,
   weather,
 } from '$lib/state';
@@ -67,10 +67,10 @@ export const setProjectSettings = async (
   // Load Gauges
   allGaugesAttributes.forEach((gauge) => {
     if (!exists(params[gauge.id])) return;
-    gaugesState.addById(gauge.id);
+    gauges.addById(gauge.id);
     const settings = parseGaugeURLHash(params[gauge.id].value);
     Object.assign(
-      gaugesState.gauges.find((g) => g.id === gauge.id),
+      gauges.gauges.find((g) => g.id === gauge.id),
       settings,
     );
   });
@@ -128,7 +128,7 @@ const parseLocationURLHash = async (hashString) => {
 
   let currentPosition = 0;
 
-  let _locations = locationsState.locations;
+  let _locations = locations.all;
 
   // The number of locations is the number of separator characters present after the 'l=' key in the URL hash
   for (let i = 0; i < separatorIndices.length; i++) {
@@ -137,7 +137,7 @@ const parseLocationURLHash = async (hashString) => {
 
     if (_locations.length - 1 < i) {
       // There needs to be another location, so create it
-      locationsState.add();
+      locations.add();
     }
 
     _locations[i].label = 'Loading...';
@@ -244,7 +244,7 @@ const parseLocationURLHash = async (hashString) => {
     }
   }
 
-  locationsState.locations = _locations;
+  locations.all = _locations;
 };
 
 export const parseGaugeURLHash = (hashString: string): GaugeSettingsType => {

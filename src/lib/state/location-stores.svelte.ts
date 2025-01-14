@@ -89,14 +89,14 @@ export class LocationState extends LocationClass implements LocationStateType {
 export class LocationsState implements LocationsStateType {
   constructor() {
     const location = new LocationState();
-    location.index = this.locations.length;
-    this.locations.push(location);
+    location.index = this.all.length;
+    this.all.push(location);
   }
 
-  locations = $state([]);
+  all = $state([]);
 
   totalDays = $derived.by(() => {
-    const arrayOfDayCount = this.locations.map((n) => {
+    const arrayOfDayCount = this.all.map((n) => {
       if (!n.from || !n.to) return null;
       const from = new Date(n.from.replace(/-/g, '/'));
       const to = new Date(n.to.replace(/-/g, '/'));
@@ -109,9 +109,7 @@ export class LocationsState implements LocationsStateType {
     return sum;
   });
 
-  allValid = $derived(
-    this.locations.every((location) => location.isValid === true),
-  );
+  allValid = $derived(this.all.every((location) => location.isValid === true));
 
   urlHash = $derived.by(() => {
     // Every location must be valid
@@ -120,7 +118,7 @@ export class LocationsState implements LocationsStateType {
     // Each location's Id, From, and To date gets encoded in the URL hash
     // After the 'l=' key
     let content = 'l=';
-    this.locations.forEach((location) => {
+    this.all.forEach((location) => {
       // Format the From date as 'YYYYMMDD' instead of 'YYYY-MM-DD'
       const from = location?.from?.replace(/-/g, '') || '';
 
@@ -141,9 +139,9 @@ export class LocationsState implements LocationsStateType {
   });
 
   projectFilename = $derived.by(() => {
-    if (!this.locations.length) return false;
+    if (!this.all.length) return false;
     let filename = '';
-    this.locations.forEach((location) => {
+    this.all.forEach((location) => {
       filename += `${location?.label}-from-${location?.from}-to-${location?.to}`;
     });
     return filename;
@@ -151,12 +149,12 @@ export class LocationsState implements LocationsStateType {
 
   projectTitle = $derived.by(() => {
     if (
-      !this.locations.length ||
-      !this.locations?.every((item) => item?.label && item?.from && item?.to)
+      !this.all.length ||
+      !this.all?.every((item) => item?.label && item?.from && item?.to)
     )
       return '';
     let titles = [];
-    this.locations.forEach((location, index) => {
+    this.all.forEach((location, index) => {
       if (location?.from && location?.to)
         titles.push(getLocationTitle({ location }));
     });
@@ -168,21 +166,19 @@ export class LocationsState implements LocationsStateType {
   add(): void {
     if (weather.rawData) weather.rawData = null;
     const newLocation = new LocationState();
-    newLocation.index = this.locations.length;
-    this.locations.push(newLocation);
+    newLocation.index = this.all.length;
+    this.all.push(newLocation);
   }
 
   remove(uuid: string) {
-    this.locations = this.locations.filter(
-      (location) => location.uuid !== uuid,
-    );
-    this.locations.map((location, i) => {
+    this.all = this.all.filter((location) => location.uuid !== uuid);
+    this.all.map((location, i) => {
       location.index = i;
     });
   }
 }
 
-export const locationsState = new LocationsState();
+export const locations = new LocationsState();
 
 // const LOCATIONS_KEY = Symbol('LOCATIONS');
 

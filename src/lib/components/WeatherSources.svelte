@@ -19,7 +19,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
   import GettingWeather from '$lib/components/modals/GettingWeather.svelte';
   import GettingWeatherWarnCustomWeather from '$lib/components/modals/GettingWeatherWarnCustomWeather.svelte';
-  import { locationsState, modal, weather } from '$lib/state';
+  import { locations, modal, weather } from '$lib/state';
   import { getModalStore } from '@skeletonlabs/skeleton';
   import { onMount } from 'svelte';
 
@@ -246,7 +246,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <div class="variant-soft-warning text-token card p-4">
       <p class="text-sm mb-4">
         Search again for weather data to apply weather source changes.
-        {#if !locationsState.allValid}
+        {#if !locations.allValid}
           Close this modal, then choose a valid location and dates.
         {/if}
       </p>
@@ -271,7 +271,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             });
           }
         }}
-        disabled={!locationsState.allValid}
+        disabled={!locations.allValid}
         >Search <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"

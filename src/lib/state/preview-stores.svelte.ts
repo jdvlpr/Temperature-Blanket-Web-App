@@ -13,85 +13,41 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { hash as clnrHash } from '$lib/components/previews/CalendarSettings.svelte';
-import { hash as chevHash } from '$lib/components/previews/ChevronsSettings.svelte';
-import { hash as cosqHash } from '$lib/components/previews/ContinuousSquareSettings.svelte';
-import { hash as crnrHash } from '$lib/components/previews/CornerToCornerSettings.svelte';
-import { hash as rsunHash } from '$lib/components/previews/DaytimeRowsSettings.svelte';
-import { hash as mrwsHash } from '$lib/components/previews/MonthRowsSettings.svelte';
-import { hash as msqsHash } from '$lib/components/previews/MonthSquaresSettings.svelte';
-import { previews } from '$lib/components/previews/previews.svelte';
-import { hash as smsqHash } from '$lib/components/previews/SplitMonthSquaresSettings.svelte';
-import { hash as sqrsHash } from '$lib/components/previews/SquaresSettings.svelte';
-import { weather } from '$lib/state';
+import { previewsData } from '$lib/components/previews/previews.svelte';
 import type { Preview } from '$lib/types';
-import { get } from 'svelte/store';
-import { RowsPreviewClass } from './previews/rows-preview-state.svelte';
 
 export const previewWeatherTargets = $state({ value: [] });
 
 class ActivePreviewClass {
-  rowsIndex = previews.findIndex((n) => n.id === 'rows'); // default preview is "rows"
-  current: Preview = $state(previews[this.rowsIndex]);
+  rowsIndex = previewsData.findIndex((n) => n.id === 'rows'); // default preview is "rows"
+  current: Preview = $state(previewsData[this.rowsIndex]);
   setId(id) {
-    previews
+    previewsData
       .filter((n) => n.id !== id)
       .forEach((n) => {
         n.svg = null;
       });
 
-    this.current = previews.find((preview) => preview.id === id);
+    this.current = previewsData.find((preview) => preview.id === id);
   }
 }
 export const preview = new ActivePreviewClass();
 
 class PreviewsState {
-  previews = $state([]);
+  all = $state([]);
 
   activeId = $state();
 
-  active = $derived(this.previews.find((n) => n.id === this.activeId));
+  active = $derived(this.all.find((n) => n.id === this.activeId));
 
   hash = $derived(this.active?.hash || '');
 
   add(preview) {
-    this.previews.push(preview);
+    this.all.push(preview);
     console.log(preview.id);
 
     this.activeId = preview.id;
   }
 }
 
-export const previewsState = new PreviewsState();
-
-class PreviewURLHashClass {
-  value = $derived.by(() => {
-    if (!weather.data) return ''; // Is this necessary?
-    switch (preview.current.id) {
-      case 'chev':
-        return get(chevHash);
-      case 'clnr':
-        return get(clnrHash);
-      case 'cosq':
-        return get(cosqHash);
-      case 'crnr':
-        return get(crnrHash);
-      case 'smsq':
-        return get(smsqHash);
-      case 'mrws':
-        return get(mrwsHash);
-      case 'msqs':
-        return get(msqsHash);
-      // case 'rows':
-      //   return get(rowsHash);
-      case 'rsun':
-        return get(rsunHash);
-      case 'sqrs':
-        return get(sqrsHash);
-      default:
-        return '';
-    }
-  });
-}
-
-export const previewURLHash = new PreviewURLHashClass();
+export const previews = new PreviewsState();

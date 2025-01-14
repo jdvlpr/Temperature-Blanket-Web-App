@@ -27,7 +27,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     modal,
     pageSections,
     pinAllSections,
-    previewsState,
+    previews,
     projectStatus,
     weather,
   } from '$lib/state';
@@ -396,7 +396,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/if}
 
   {#if pages.download}
-    {@const SvelteComponent = previewsState.active.preview}
+    {@const SvelteComponent = previews.active.preview}
     <div>
       <h2 class="my-2 text-lg font-bold">Download</h2>
       <div class="flex flex-col gap-2 items-start text-left">
@@ -447,9 +447,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
             title="Download PNG File"
             onclick={() => {
               downloadPreviewPNG(
-                previewsState.active.width,
-                previewsState.active.height,
-                previewsState.active.svg,
+                previews.active.width,
+                previews.active.height,
+                previews.active.svg,
               );
             }}
           >

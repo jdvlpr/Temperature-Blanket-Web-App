@@ -22,7 +22,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import {
     isProjectLoading,
     liveProjectURLHash,
-    locationsState,
+    locations,
     modal,
     wasProjectLoadedFromURL,
     weather,
@@ -74,7 +74,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   {#if !!weather.isUserEdited}
     <div class="flex flex-col gap-2 my-4 items-center">
-      {#each locationsState.locations as location}
+      {#each locations.all as location}
         <p class="flex flex-wrap gap-x-1 items-center justify-center">
           <span class="font-bold">{@html location.result}</span>
           <span>
@@ -114,10 +114,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </p>
       {/each}
       <p class="w-full text-sm italic">
-        {locationsState.totalDays} Total {pluralize(
-          'Day',
-          locationsState.totalDays,
-        )}
+        {locations.totalDays} Total {pluralize('Day', locations.totalDays)}
       </p>
     </div>
   {/if}
@@ -126,19 +123,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
     class:hidden={!!weather.isUserEdited}
     class="divide-y divide-solid divide-surface-300 dark:divide-surface-600"
   >
-    {#each locationsState.locations, index}
-      <Location location={locationsState.locations[index]} {index} />
+    {#each locations.all, index}
+      <Location location={locations.all[index]} {index} />
     {/each}
   </div>
 
   <div
     class="flex flex-col gap-2 mb-4 w-full"
-    class:border-t={locationsState.locations.length > 1}
-    class:border-surface-300={locationsState.locations.length > 1}
-    class:dark:border-surface-600={locationsState.locations.length > 1}
-    class:pt-4={locationsState.locations.length > 1}
+    class:border-t={locations.all.length > 1}
+    class:border-surface-300={locations.all.length > 1}
+    class:dark:border-surface-600={locations.all.length > 1}
+    class:pt-4={locations.all.length > 1}
   >
-    {#if locationsState.allValid && locationsState.totalDays === 1}
+    {#if locations.allValid && locations.totalDays === 1}
       <!-- The range calculation functionality expects there to be more than one day of weather data.
      So if there's only one day of weather data the color ranges will have some NaN values. 
      This notice discourages users from using only one day of weather data. -->
@@ -166,29 +163,26 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <SearchForWeather />
     </div>
 
-    {#if locationsState.locations.length > 1 && locationsState.totalDays && locationsState.allValid && !weather.isUserEdited}
+    {#if locations.all.length > 1 && locations.totalDays && locations.allValid && !weather.isUserEdited}
       <p class="w-full text-sm italic">
-        {locationsState.totalDays} Total {pluralize(
-          'Day',
-          locationsState.totalDays,
-        )}
+        {locations.totalDays} Total {pluralize('Day', locations.totalDays)}
       </p>
     {/if}
   </div>
 </div>
 
-{#if locationsState.allValid}
+{#if locations.allValid}
   <div
     class="flex flex-wrap gap-2 justify-center mt-4 mb-2 lg:mb-4 px-4 py-2 shadow-inner rounded-container-token variant-soft-surface max-w-screen-md mx-auto"
     transition:slide
   >
-    <div class:hidden={!locationsState.allValid || weather.isUserEdited}>
-      {#if locationsState.locations.length < MAXIMUM_LOCATIONS}
+    <div class:hidden={!locations.allValid || weather.isUserEdited}>
+      {#if locations.all.length < MAXIMUM_LOCATIONS}
         <button
           class="btn bg-secondary-hover-token gap-2"
           id="add-location-button"
           disabled={isProjectLoading.value}
-          onclick={() => locationsState.add()}
+          onclick={() => locations.add()}
           title="Add a New Location"
         >
           <svg

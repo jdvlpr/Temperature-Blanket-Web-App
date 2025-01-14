@@ -16,7 +16,7 @@
 import { API_SERVICES } from '$lib/constants';
 import {
   allGaugesAttributes,
-  locationsState,
+  locations,
   signal,
   units,
   weather,
@@ -304,7 +304,7 @@ export const getOpenMeteo = async ({ location }) => {
  * @returns {Array<object>} An array of weather data sources with their names and URLs.
  */
 export const getWeatherSourceDetails = () => {
-  const _locations = locationsState.locations;
+  const _locations = locations.all;
 
   if (!_locations) return;
 

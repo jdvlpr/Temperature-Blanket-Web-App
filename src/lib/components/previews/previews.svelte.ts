@@ -35,7 +35,7 @@ import SplitMonthSquaresSettings from './SplitMonthSquaresSettings.svelte';
 import SquaresPreview from './SquaresPreview.svelte';
 import SquaresSettings from './SquaresSettings.svelte';
 
-export const previews: Preview[] = $state([
+export const previewsData: Preview[] = $state([
   {
     name: 'Calendar',
     id: 'clnr',

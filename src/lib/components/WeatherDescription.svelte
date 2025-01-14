@@ -14,14 +14,14 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import { locationsState, weather } from '$lib/state';
+  import { locations, weather } from '$lib/state';
   import { exists, pluralize } from '$lib/utils';
   import { onMount } from 'svelte';
 
   let isAnyWeatherSourceDifferentFromDefault;
 
   let stations = $derived(
-    locationsState.locations
+    locations.all
       ?.filter((location) => exists(location.stations))
       ?.map((location) =>
         location.stations.map(
@@ -33,7 +33,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   );
 
   onMount(() => {
-    isAnyWeatherSourceDifferentFromDefault = !locationsState.locations?.some(
+    isAnyWeatherSourceDifferentFromDefault = !locations.all?.some(
       (n) => n.source === weather.defaultSource,
     );
 
@@ -48,19 +48,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <p class="my-2 text-sm">
-  {#if locationsState.locations?.some((n) => n.source === 'Meteostat') && stations?.length}
+  {#if locations.all?.some((n) => n.source === 'Meteostat') && stations?.length}
     Includes aggregated data from <a
       href="https://meteostat.net/"
       target="_blank"
       rel="noopener noreferrer"
       class="link">Meteostat</a
     >
-    {locationsState.locations?.length > 1 &&
-    locationsState.locations?.some((n) => n.source === 'Meteostat') &&
-    locationsState.locations?.some((n) => n.source === 'Open-Meteo')
+    {locations.all?.length > 1 &&
+    locations.all?.some((n) => n.source === 'Meteostat') &&
+    locations.all?.some((n) => n.source === 'Open-Meteo')
       ? `for ${new Intl.ListFormat().format([
           ...new Set(
-            locationsState.locations
+            locations.all
               .filter((n) => n.source === 'Meteostat')
               .map((n) => n.label),
           ),
@@ -77,18 +77,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
     around—not directly in—your location. The accuracy of the results will vary.
   {/if}
 
-  {#if locationsState.locations?.some((n) => n.source === 'Open-Meteo')}
+  {#if locations.all?.some((n) => n.source === 'Open-Meteo')}
     Includes weather data from <a
       href="https://open-meteo.com/"
       rel="noopener noreferrer"
       class="link"
       target="_blank">Open-Meteo</a
-    >{locationsState.locations?.length > 1 &&
-    locationsState.locations?.some((n) => n.source === 'Meteostat') &&
-    locationsState.locations?.some((n) => n.source === 'Open-Meteo')
+    >{locations.all?.length > 1 &&
+    locations.all?.some((n) => n.source === 'Meteostat') &&
+    locations.all?.some((n) => n.source === 'Open-Meteo')
       ? ` for ${new Intl.ListFormat().format([
           ...new Set(
-            locationsState.locations
+            locations.all
               .filter((n) => n.source === 'Open-Meteo')
               .map((n) => n.label),
           ),

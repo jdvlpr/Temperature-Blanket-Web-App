@@ -16,11 +16,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import Tooltip from '$lib/components/Tooltip.svelte';
   import GaugeSettings from '$lib/components/modals/GaugeSettings.svelte';
-  import { gaugesState, modal } from '$lib/state';
+  import { gauges, modal } from '$lib/state';
 
   function onSaveRangeOptinos(e) {
-    gaugesState.activeGauge.ranges = e.ranges;
-    gaugesState.activeGauge.rangeOptions = e.rangeOptions;
+    gauges.activeGauge.ranges = e.ranges;
+    gauges.activeGauge.rangeOptions = e.rangeOptions;
   }
 </script>
 
@@ -34,7 +34,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       component: {
         ref: GaugeSettings,
         props: {
-          gauge: $state.snapshot(gaugesState.activeGauge),
+          gauge: $state.snapshot(gauges.activeGauge),
           onSave: onSaveRangeOptinos,
         },
       },

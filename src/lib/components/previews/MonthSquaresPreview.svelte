@@ -24,13 +24,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
     weatherMonthsData,
   } from '$lib/utils';
   import { details, settings } from './MonthSquaresSettings.svelte';
-  import { previews } from './previews.svelte';
+  import { previewsData } from './previews.svelte';
 
   let svg;
-  const previewIndex = previews.findIndex((n) => n.id === 'msqs');
-  $: previews[previewIndex].width = width;
-  $: previews[previewIndex].height = height;
-  $: previews[previewIndex].svg = svg;
+  const previewIndex = previewsData.findIndex((n) => n.id === 'msqs');
+  $: previewsData[previewIndex].width = width;
+  $: previewsData[previewIndex].height = height;
+  $: previewsData[previewIndex].svg = svg;
 
   const STITCH_SIZE = 10;
   $: squareSize = roundsPerSquare * 2 * STITCH_SIZE;

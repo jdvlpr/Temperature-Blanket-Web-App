@@ -17,7 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Tooltip from '$lib/components/Tooltip.svelte';
   import GettingWeather from '$lib/components/modals/GettingWeather.svelte';
   import GettingWeatherWarnCustomWeather from '$lib/components/modals/GettingWeatherWarnCustomWeather.svelte';
-  import { isProjectLoading, locationsState, modal, weather } from '$lib/state';
+  import { isProjectLoading, locations, modal, weather } from '$lib/state';
 
   function setModal() {
     modal.state.trigger({
@@ -33,7 +33,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     });
   }
 
-  let disabled = $derived(!locationsState.allValid || isProjectLoading.value);
+  let disabled = $derived(!locations.allValid || isProjectLoading.value);
 </script>
 
 {#if disabled && !isProjectLoading.value}

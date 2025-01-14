@@ -15,7 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script context="module">
   import { CHARACTERS_FOR_URL_HASH, LOADED_APP_VERSION } from '$lib/constants';
-  import { gaugesState, preview, weather } from '$lib/state';
+  import { gauges, preview, weather } from '$lib/state';
   import { derived, writable } from 'svelte/store';
 
   const id = 'chev';
@@ -73,9 +73,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { capitalizeFirstLetter, upToDate } from '$lib/utils/other-utils';
   import { pluralize } from '$lib/utils/string-utils';
 
-  $: targets = gaugesState.gauges.map((n) => n.targets).flat();
+  $: targets = gauges.gauges.map((n) => n.targets).flat();
 
-  $: if (gaugesState.gauges)
+  $: if (gauges.gauges)
     $settings.selectedTargets = setTargets($settings.selectedTargets);
 </script>
 

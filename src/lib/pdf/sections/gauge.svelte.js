@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { gaugesState, showDaysInRange, units } from '$lib/state';
+import { gauges, showDaysInRange, units } from '$lib/state';
 import pdfConfig from '../pdf-config';
 import pdfColorDetails from './color-details.svelte';
 import pdfFooter from './footer.svelte';
@@ -97,7 +97,7 @@ const pdfGauge = {
     );
   },
   create: function (doc, gaugeId) {
-    let gauge = gaugesState.gauges.find((g) => g.id === gaugeId);
+    let gauge = gauges.gauges.find((g) => g.id === gaugeId);
 
     // Gauge Item
     const length = gauge.ranges.length;

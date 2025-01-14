@@ -15,7 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script context="module">
   import { CHARACTERS_FOR_URL_HASH } from '$lib/constants';
-  import { gaugesState, preview } from '$lib/state';
+  import { gauges, preview } from '$lib/state';
   import { derived, writable } from 'svelte/store';
 
   const id = 'crnr';
@@ -74,11 +74,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { weather } from '$lib/state';
   import { capitalizeFirstLetter, setTargets } from '$lib/utils';
 
-  $: targets = gaugesState.gauges.map((n) => n.targets).flat();
+  $: targets = gauges.gauges.map((n) => n.targets).flat();
 
   let lengthFactors, possibleDimensions, dimensionsOptions;
 
-  $: if (gaugesState.gauges)
+  $: if (gauges.gauges)
     $settings.selectedTarget = setTargets($settings.selectedTarget);
 
   $: totalLength = weather.data

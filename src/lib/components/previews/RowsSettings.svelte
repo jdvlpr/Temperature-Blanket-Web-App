@@ -17,11 +17,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import NumberInputButton from '$lib/components/buttons/NumberInputButton.svelte';
   import ToggleSwitchGroup from '$lib/components/buttons/ToggleSwitchGroup.svelte';
   import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
-  import { gaugesState, modal, weather } from '$lib/state';
+  import { gauges, modal, weather } from '$lib/state';
   import { rowsPreview } from '$lib/state/previews/rows-preview-state.svelte';
   import { capitalizeFirstLetter, pluralize, setTargets } from '$lib/utils';
 
-  let targets = $derived(gaugesState.gauges.map((n) => n.targets).flat());
+  let targets = $derived(gauges.gauges.map((n) => n.targets).flat());
 
   let debounceTimer;
   const debounce = (callback, time) => {
@@ -31,7 +31,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   $effect(() => {
     debounce(() => {
-      if (gaugesState.gauges)
+      if (gauges.gauges)
         rowsPreview.settings.selectedTargets = setTargets(
           rowsPreview.settings.selectedTargets,
         );

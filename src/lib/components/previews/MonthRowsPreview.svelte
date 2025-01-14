@@ -14,7 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import { gaugesState, projectStatus, units, weather } from '$lib/state';
+  import { gauges, projectStatus, units, weather } from '$lib/state';
   import {
     getColorInfo,
     getDaysInLongestMonth,
@@ -23,13 +23,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
     weatherMonthsData,
   } from '$lib/utils';
   import { details, settings } from './MonthRowsSettings.svelte';
-  import { previews } from './previews.svelte';
+  import { previewsData } from './previews.svelte';
 
   let svg;
-  const previewIndex = previews.findIndex((n) => n.id === 'mrws');
-  $: previews[previewIndex].width = width;
-  $: previews[previewIndex].height = height;
-  $: previews[previewIndex].svg = svg;
+  const previewIndex = previewsData.findIndex((n) => n.id === 'mrws');
+  $: previewsData[previewIndex].width = width;
+  $: previewsData[previewIndex].height = height;
+  $: previewsData[previewIndex].svg = svg;
 
   const STITCH_SIZE = 10;
 
@@ -56,7 +56,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   $: totalRows = monthsInData?.length * rowsPerMonth;
 
-  $: targets = gaugesState.gauges
+  $: targets = gauges.gauges
     .flatMap((n) => n.targets)
     .filter((n) => $settings.selectedTargets.includes(n.id));
 

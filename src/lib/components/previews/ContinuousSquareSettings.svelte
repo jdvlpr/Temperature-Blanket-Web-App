@@ -15,7 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script context="module">
   import { CHARACTERS_FOR_URL_HASH } from '$lib/constants';
-  import { gaugesState, preview } from '$lib/state';
+  import { gauges, preview } from '$lib/state';
   import { capitalizeFirstLetter, pluralize } from '$lib/utils';
   import chroma from 'chroma-js';
   import { derived, writable } from 'svelte/store';
@@ -91,9 +91,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { modal, weather } from '$lib/state';
   import { setTargets } from '$lib/utils';
 
-  $: targets = gaugesState.gauges.map((n) => n.targets).flat();
+  $: targets = gauges.gauges.map((n) => n.targets).flat();
 
-  $: if (gaugesState.gauges)
+  $: if (gauges.gauges)
     $settings.selectedTarget = setTargets($settings.selectedTarget);
 </script>
 

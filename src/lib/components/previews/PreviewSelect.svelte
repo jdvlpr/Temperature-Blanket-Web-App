@@ -15,9 +15,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import { browser } from '$app/environment';
-  import { activeTheme, previewsState } from '$lib/state';
+  import { activeTheme, previews } from '$lib/state';
   import { onDestroy, onMount } from 'svelte';
-  import { previews } from './previews.svelte';
+  import { previewsData } from './previews.svelte';
 
   onMount(() => {
     window
@@ -36,7 +36,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     theme = getTheme(activeTheme.value);
   }
 
-  let activePreviewSelectId = $state(previewsState.activeId);
+  let activePreviewSelectId = $state(previews.activeId);
 
   function getTheme(_theme) {
     if (_theme.id !== 'system') return _theme.id;
@@ -47,8 +47,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let theme = $derived(getTheme(activeTheme.value));
 
   $effect(() => {
-    if (previewsState.activeId !== activePreviewSelectId)
-      activePreviewSelectId = previewsState.activeId;
+    if (previews.activeId !== activePreviewSelectId)
+      activePreviewSelectId = previews.activeId;
   });
 </script>
 
@@ -60,10 +60,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
         id="select-pattern-type"
         value={activePreviewSelectId}
         onchange={(e) => {
-          previewsState.activeId = e.target.value;
+          previews.activeId = e.target.value;
         }}
       >
-        {#each previews as { name, id }}
+        {#each previewsData as { name, id }}
           <option value={id}>{name}</option>
         {/each}
       </select>
@@ -73,19 +73,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <div
     class="preview-image-select flex flex-wrap gap-2 justify-center items-center"
   >
-    {#each previewsState.previews as { img, name, id }}
+    {#each previews.all as { img, name, id }}
       {#if img}
         {#key theme}
           <button
             class="flex flex-col p-4 rounded-container-token justify-center gap-2 items-center snap-center {id ===
-            previewsState.activeId
+            previews.activeId
               ? ''
               : 'bg-surface-hover-token'}"
-            class:bg-primary-300-600-token={id === previewsState.activeId}
-            class:selected={id === previewsState.activeId}
-            class:shadow={id === previewsState.activeId}
+            class:bg-primary-300-600-token={id === previews.activeId}
+            class:selected={id === previews.activeId}
+            class:shadow={id === previews.activeId}
             onclick={() => {
-              previewsState.activeId = id;
+              previews.activeId = id;
             }}
             title="Preview {name} Design"
           >
@@ -93,7 +93,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               src={img[theme]}
               alt={name}
               class="size-[48px] opacity-40"
-              class:!opacity-100={id === previewsState.activeId}
+              class:!opacity-100={id === previews.activeId}
             />
           </button>
         {/key}

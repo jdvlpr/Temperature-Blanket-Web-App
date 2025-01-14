@@ -14,7 +14,7 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { CHARACTERS_FOR_URL_HASH } from '$lib/constants';
-import { allGaugesAttributes, gaugesState } from '$lib/state';
+import { allGaugesAttributes, gauges } from '$lib/state';
 import type { Color } from '$lib/types';
 import {
   capitalizeFirstLetter,
@@ -217,7 +217,7 @@ export const getColorsFromInput = ({
  * @returns {object} - The color information object with the hexadecimal color value, index, and gauge length.
  */
 export const getColorInfo = (gaugeId, value) => {
-  const gauge = gaugesState.gauges.find((n) => n.id === gaugeId);
+  const gauge = gauges.gauges.find((n) => n.id === gaugeId);
   const color = { hex: '#ffffff' };
 
   if (

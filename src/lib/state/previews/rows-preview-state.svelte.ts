@@ -1,7 +1,7 @@
 import RowsPreview from '$lib/components/previews/RowsPreview.svelte';
 import RowsSettings from '$lib/components/previews/RowsSettings.svelte';
 import { CHARACTERS_FOR_URL_HASH } from '$lib/constants';
-import { gaugesState, previewsState, weather } from '$lib/state';
+import { gauges, previews, weather } from '$lib/state';
 import { displayNumber, sum } from '$lib/utils';
 import chroma from 'chroma-js';
 
@@ -57,7 +57,7 @@ export class RowsPreviewClass {
   previewComponent = RowsPreview;
   settingsComponent = RowsSettings;
   targets = $derived(
-    gaugesState.gauges
+    gauges.gauges
       .flatMap((n) => n.targets)
       .filter((n) => this.settings.selectedTargets.includes(n.id)),
   );
@@ -139,7 +139,7 @@ export class RowsPreviewClass {
     }
 
     // Update active preview
-    previewsState.activeId = this.id;
+    previews.activeId = this.id;
   }
 }
 

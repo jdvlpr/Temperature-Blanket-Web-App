@@ -34,7 +34,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     UNIT_LABELS,
   } from '$lib/constants';
   import {
-    locationsState,
+    locations,
     modal,
     showNavigationSideBar,
     units,
@@ -67,18 +67,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
   };
 
   onMount(() => {
-    isAnyWeatherSourceDifferentFromDefault = !locationsState.locations?.some(
+    isAnyWeatherSourceDifferentFromDefault = !locations.all?.some(
       (n) => n.source === weather.defaultSource,
     );
 
     defaultWeatherSourceCopy = weather.defaultSource;
     if (isAnyWeatherSourceDifferentFromDefault) {
-      if (locationsState.locations?.every((n) => n.source === 'Meteostat')) {
+      if (locations.all?.every((n) => n.source === 'Meteostat')) {
         weather.defaultSource = 'Meteostat';
         wasDefaultWeatherSourceChanged = true;
-      } else if (
-        locationsState.locations?.every((n) => n.source === 'Open-Meteo')
-      ) {
+      } else if (locations.all?.every((n) => n.source === 'Open-Meteo')) {
         weather.defaultSource = 'Open-Meteo';
         wasDefaultWeatherSourceChanged = true;
       }
@@ -468,12 +466,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <WeatherItem
         id="snow"
         icon="∗"
-        label={locationsState.locations?.every((n) => n.source === 'Meteostat')
+        label={locations.all?.every((n) => n.source === 'Meteostat')
           ? 'Highest Snow Depth'
           : 'Total SnowFall'}
         value={weather.params.snow?.every((n) => n === null)
           ? '-'
-          : locationsState.locations?.every((n) => n.source === 'Meteostat')
+          : locations.all?.every((n) => n.source === 'Meteostat')
             ? Math.max(...weather.params.snow?.filter((n) => n !== null))
             : displayNumber(
                 weather.params.snow
@@ -484,7 +482,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       >
         {#snippet button()}
           <div class="my-2 text-sm">
-            {#if locationsState.locations.some((n) => n.source === 'Meteostat') && locationsState.locations.some((n) => n.source === 'Open-Meteo')}
+            {#if locations.all.some((n) => n.source === 'Meteostat') && locations.all.some((n) => n.source === 'Open-Meteo')}
               <HelpIcon
                 href="/documentation/#mixed-snow-parameters"
                 title="Read About Mixed Snow Parameters"

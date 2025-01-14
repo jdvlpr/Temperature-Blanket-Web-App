@@ -20,7 +20,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ViewToggle from '$lib/components/buttons/ViewToggle.svelte';
   import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
   import { ICONS } from '$lib/constants';
-  import { gaugesState, layout, modal, showDaysInRange } from '$lib/state';
+  import { gauges, layout, modal, showDaysInRange } from '$lib/state';
   import type { Color } from '$lib/types';
   import { getTextColor } from '$lib/utils';
   import {
@@ -50,10 +50,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     variant_href,
     affiliate_variant_href,
   }) {
-    gaugesState.activeGauge.schemeId = 'Custom';
+    gauges.activeGauge.schemeId = 'Custom';
 
     const _colors = [];
-    gaugesState.activeGauge.colors.forEach((color, i) => {
+    gauges.activeGauge.colors.forEach((color, i) => {
       if (i === index) {
         _colors.push({
           hex,
@@ -68,7 +68,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       } else {
         _colors.push(color);
       }
-      gaugesState.activeGauge.colors = _colors;
+      gauges.activeGauge.colors = _colors;
     });
 
     sortableColors = getSortableColors();
@@ -92,12 +92,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     sortableColors = newItems;
 
-    gaugesState.activeGauge.colors = sortableColors.map((color) => {
+    gauges.activeGauge.colors = sortableColors.map((color) => {
       delete color.id;
       return color;
     });
 
-    gaugesState.activeGauge.schemeId = 'Custom';
+    gauges.activeGauge.schemeId = 'Custom';
     // Ensure dragging is stopped on drag finish via pointer (mouse, touch)
     if (source === SOURCES.POINTER) {
       dragDisabled = false;
@@ -109,17 +109,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
     dragDisabled = false;
   }
 
-  let movable = $derived(gaugesState.activeGauge.colors?.length > 1);
+  let movable = $derived(gauges.activeGauge.colors?.length > 1);
 
   let hasAnyAffiliateURLs = $derived(
-    checkForAffiliateURLs({ colors: gaugesState.activeGauge.colors }),
+    checkForAffiliateURLs({ colors: gauges.activeGauge.colors }),
   );
 
   let sortableColors: Color[] = $state(getSortableColors());
 
   function getSortableColors() {
     const _sortableColors = [];
-    gaugesState.activeGauge.colors.forEach((color, i) => {
+    gauges.activeGauge.colors.forEach((color, i) => {
       _sortableColors.push({ ...color, id: i });
     });
     return _sortableColors;
@@ -201,12 +201,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
           title="Remove Color"
           class="btn bg-secondary-hover-token flex flex-wrap justify-center items-center"
           onclick={() => {
-            gaugesState.activeGauge.colors =
-              gaugesState.activeGauge.colors.filter((_, i) => i !== index);
+            gauges.activeGauge.colors = gauges.activeGauge.colors.filter(
+              (_, i) => i !== index,
+            );
             sortableColors = getSortableColors();
-            gaugesState.activeGauge.schemeId = 'Custom';
-            gaugesState.activeGauge.numberOfColors =
-              gaugesState.activeGauge.colors.length;
+            gauges.activeGauge.schemeId = 'Custom';
+            gauges.activeGauge.numberOfColors =
+              gauges.activeGauge.colors.length;
           }}
         >
           <span class="text-xs">{index + 1}</span>
@@ -317,9 +318,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           class="flex flex-wrap w-fit justify-center items-center bg-surface-900/10 rounded-container-token shadow-inner"
         >
           <DaysInRange
-            range={gaugesState.activeGauge.ranges[index]}
-            rangeOptions={gaugesState.activeGauge.rangeOptions}
-            targets={gaugesState.activeGauge.targets}
+            range={gauges.activeGauge.ranges[index]}
+            rangeOptions={gauges.activeGauge.rangeOptions}
+            targets={gauges.activeGauge.targets}
           />
         </div>
       {/if}

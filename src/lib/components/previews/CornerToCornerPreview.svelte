@@ -14,28 +14,28 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import { gaugesState, projectStatus, units, weather } from '$lib/state';
+  import { gauges, projectStatus, units, weather } from '$lib/state';
   import {
     getColorInfo,
     getTargetParentGaugeId,
     showPreviewImageWeatherDetails,
   } from '$lib/utils';
   import { settings } from './CornerToCornerSettings.svelte';
-  import { previews } from './previews.svelte';
+  import { previewsData } from './previews.svelte';
 
   let svg;
-  const previewIndex = previews.findIndex((n) => n.id === 'crnr');
+  const previewIndex = previewsData.findIndex((n) => n.id === 'crnr');
 
-  $: previews[previewIndex].width = width;
-  $: previews[previewIndex].height = height;
-  $: previews[previewIndex].svg = svg;
+  $: previewsData[previewIndex].width = width;
+  $: previewsData[previewIndex].height = height;
+  $: previewsData[previewIndex].svg = svg;
 
   const STITCH_SIZE = 5;
   $: dimensions = $settings.dimensions.split('x').map((n) => +n);
   $: width = dimensions[0] * STITCH_SIZE;
   $: height = dimensions[1] * STITCH_SIZE;
 
-  $: targets = gaugesState.gauges
+  $: targets = gauges.gauges
     .flatMap((n) => n.targets)
     .filter((n) => $settings.selectedTarget === n.id);
 

@@ -15,7 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script context="module">
   import { CHARACTERS_FOR_URL_HASH } from '$lib/constants';
-  import { gaugesState, preview } from '$lib/state';
+  import { gauges, preview } from '$lib/state';
   import {
     capitalizeFirstLetter,
     getMiddleValueOfArray,
@@ -119,9 +119,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     weatherMonthsData,
   } from '$lib/utils';
 
-  $: targets = gaugesState.gauges.map((n) => n.targets).flat();
+  $: targets = gauges.gauges.map((n) => n.targets).flat();
 
-  $: if (gaugesState.gauges)
+  $: if (gauges.gauges)
     $settings.selectedTargets = setTargets($settings.selectedTargets);
 
   $: months = weatherMonthsData({ weatherData: weather.data });

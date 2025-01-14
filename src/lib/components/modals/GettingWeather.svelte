@@ -14,13 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import {
-    controller,
-    gaugesState,
-    locationsState,
-    signal,
-    weather,
-  } from '$lib/state';
+  import { controller, gauges, locations, signal, weather } from '$lib/state';
   // Note: the signal store is a weird necessity, investigate this
   import Spinner from '$lib/components/Spinner.svelte';
   import { delay, getOpenMeteo, goToProjectSection } from '$lib/utils';
@@ -54,7 +48,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         weather.isUserEdited = false;
         weather.isFromLocalStorage = false;
         // Add the default temperature gauge
-        gaugesState.addById('temp');
+        gauges.addById('temp');
         modalStore.close();
         goToProjectSection(2);
       })
@@ -72,10 +66,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     for (
       let thisLocation = 0;
-      thisLocation < locationsState.locations.length;
+      thisLocation < locations.all.length;
       thisLocation += 1
     ) {
-      let location = locationsState.locations[thisLocation];
+      let location = locations.all[thisLocation];
 
       title = location.label;
       currentIndex = thisLocation;
@@ -187,16 +181,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <p class="mb-4 flex flex-col items-center">
         <span> {title}</span>
 
-        {#if locationsState.locations.length > 1}
+        {#if locations.all.length > 1}
           <span class="flex flex-col items-center mt-2 w-full gap-1">
-            <progress
-              value={currentIndex + 1}
-              max={locationsState.locations.length}
+            <progress value={currentIndex + 1} max={locations.all.length}
             ></progress>
             <span class="text-xs">
-              {Math.round(
-                ((currentIndex + 1) / locationsState.locations.length) * 100,
-              )}%
+              {Math.round(((currentIndex + 1) / locations.all.length) * 100)}%
             </span>
           </span>
         {/if}

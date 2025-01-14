@@ -15,7 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import { HOURS_PER_DAY } from '$lib/constants';
-  import { gaugesState, projectStatus, units, weather } from '$lib/state';
+  import { gauges, projectStatus, units, weather } from '$lib/state';
   import {
     displayNumber,
     getColorInfo,
@@ -23,22 +23,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
     showPreviewImageWeatherDetails,
   } from '$lib/utils';
   import { settings } from './DaytimeRowsSettings.svelte';
-  import { previews } from './previews.svelte';
+  import { previewsData } from './previews.svelte';
 
-  const previewIndex = previews.findIndex((n) => n.id === 'rsun');
+  const previewIndex = previewsData.findIndex((n) => n.id === 'rsun');
   const STITCH_SIZE = 10;
 
   let svg;
   let days = [];
 
-  $: previews[previewIndex].width = width;
-  $: previews[previewIndex].height = height;
-  $: previews[previewIndex].svg = svg;
+  $: previewsData[previewIndex].width = width;
+  $: previewsData[previewIndex].height = height;
+  $: previewsData[previewIndex].svg = svg;
 
   $: width = $settings.stitchesPerRow * STITCH_SIZE;
   $: height = weather.data?.length * STITCH_SIZE;
 
-  $: targets = gaugesState.gauges
+  $: targets = gauges.gauges
     .map((n) => n.targets)
     .flat()
     .filter(

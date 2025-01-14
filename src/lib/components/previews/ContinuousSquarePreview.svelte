@@ -23,13 +23,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '$lib/utils';
   import { displayNumber } from '$lib/utils/number-utils';
   import { details, settings } from './ContinuousSquareSettings.svelte';
-  import { previews } from './previews.svelte';
+  import { previewsData } from './previews.svelte';
 
   let svg;
-  const previewIndex = previews.findIndex((n) => n.id === 'cosq');
-  $: previews[previewIndex].width = width;
-  $: previews[previewIndex].height = height;
-  $: previews[previewIndex].svg = svg;
+  const previewIndex = previewsData.findIndex((n) => n.id === 'cosq');
+  $: previewsData[previewIndex].width = width;
+  $: previewsData[previewIndex].height = height;
+  $: previewsData[previewIndex].svg = svg;
 
   const STITCH_SIZE = 5;
   $: dayStitches = $settings.stitchesPerDay * weather.data?.length;

@@ -13,19 +13,19 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { gaugesState } from '$lib/state';
+import { gauges } from '$lib/state';
 import pdfGauge from './gauge.svelte';
 
 const gaugeGroup = {
   pages: () => {
     let pages = 0;
-    gaugesState.gauges.forEach((gauge) => {
+    gauges.gauges.forEach((gauge) => {
       pages += Math.ceil(gauge.ranges.length / pdfGauge.MAX_COLORS_PER_PAGE);
     });
     return pages;
   },
   create: (doc) => {
-    gaugesState.gauges.forEach((gauge) => {
+    gauges.gauges.forEach((gauge) => {
       // doc.addPage();
       // pdfHeader.create(doc);
       // doc.setFontSize(pdfConfig.font.h2);

@@ -17,7 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import WeatherItem from '$lib/components/WeatherItem.svelte';
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
   import { UNIT_LABELS } from '$lib/constants';
-  import { locationsState, units, weather } from '$lib/state';
+  import { locations, units, weather } from '$lib/state';
   import {
     capitalizeFirstLetter,
     convertTime,
@@ -44,7 +44,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let dayWeather = $derived(data[weather.currentIndex]);
   let dayLocation = $derived(
-    locationsState.locations.filter(
+    locations.all.filter(
       (location) => location.index === dayWeather?.location,
     )[0],
   );

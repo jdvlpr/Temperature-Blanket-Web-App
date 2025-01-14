@@ -14,7 +14,7 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { PUBLIC_BASE_DOMAIN_NAME, PUBLIC_BASE_URL } from '$env/static/public';
-import { locationsState } from '$lib/state';
+import { locations } from '$lib/state';
 import pdfConfig from '../pdf-config';
 import gauges from './gauges.svelte';
 import weatherData from './weather-data.svelte';
@@ -40,9 +40,7 @@ const pdfFooter = {
         url: PUBLIC_BASE_URL,
       },
     );
-    const sources = [
-      ...new Set(locationsState.locations.map((n) => n?.source)),
-    ];
+    const sources = [...new Set(locations.all.map((n) => n?.source))];
     let margin = 97;
     if (sources.every((source) => source === undefined)) return; // TODO: investigate this bug; source should be defined
     sources.forEach((source) => {

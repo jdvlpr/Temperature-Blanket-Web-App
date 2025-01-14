@@ -16,7 +16,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import Tooltip from '$lib/components/Tooltip.svelte';
   import { ICONS, MONTHS } from '$lib/constants';
-  import { isProjectLoading, locationsState, weather } from '$lib/state';
+  import { isProjectLoading, locations, weather } from '$lib/state';
   import type { LocationType } from '$lib/types/location-types';
   import {
     dateToISO8601String,
@@ -280,7 +280,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div class="py-2 grid grid-cols-1 items-end gap-4 justify-center">
-  {#if locationsState.locations?.length > 1}
+  {#if locations.all?.length > 1}
     <div class="justify-self-end">
       <Tooltip placement="bottom" minWidth="250px">
         <div class="btn-icon bg-secondary-hover-token">
@@ -304,7 +304,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <button
               class="btn bg-secondary-hover-token"
               onclick={() => {
-                locationsState.remove(location.uuid);
+                locations.remove(location.uuid);
                 weather.rawData = null;
               }}
               disabled={!!weather.isUserEdited || isProjectLoading.value}
@@ -325,8 +325,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <p>
         {#if showSelectLocationLabelMessage}
           <span class="text-error-800-100-token">Choose a result</span>
-        {:else if locationsState.locations.length > 1 && location?.label}
-          Location {locationsState.locations.length > 1 ? index + 1 : ''}
+        {:else if locations.all.length > 1 && location?.label}
+          Location {locations.all.length > 1 ? index + 1 : ''}
         {:else}
           Search for a city, region, or landmark
         {/if}

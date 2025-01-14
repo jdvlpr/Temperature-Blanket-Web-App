@@ -21,7 +21,7 @@ import {
 import {
   initialLayout,
   layout,
-  locationsState,
+  locations,
   projectStatus,
   theme,
   weather,
@@ -215,7 +215,7 @@ const createProjectLocalStorageProjectObject = () => {
 
   const isCustomWeatherData = weather.isUserEdited || false;
 
-  const _title = locationsState.projectTitle || '';
+  const _title = locations.projectTitle || '';
 
   const href = projectStatus.state.liveURL;
 

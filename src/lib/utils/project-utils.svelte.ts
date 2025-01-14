@@ -17,9 +17,9 @@ import pdfGauges from '$lib/pdf/sections/gauges.svelte';
 import pdfWeatherData from '$lib/pdf/sections/weather-data.svelte';
 import {
   allGaugesAttributes,
-  gaugesState,
-  locationsState,
-  previewsState,
+  gauges,
+  locations,
+  previews,
   projectGalleryLink,
   projectGalleryTitle,
   projectStatus,
@@ -57,7 +57,7 @@ export const downloadPDF = async () => {
       pdfWeatherData.create(doc);
       // Remove blank first page, ugly hack
       doc.deletePage(1);
-      doc.save(`Temperature-Blanket-${locationsState.projectFilename}.pdf`);
+      doc.save(`Temperature-Blanket-${locations.projectFilename}.pdf`);
     })
     .catch((error) => {
       throw new Error(error);
@@ -96,9 +96,8 @@ export const downloadWeatherCSV = () => {
     return [
       index + 1,
       dateToISO8601String(day.date),
-      locationsState.locations.filter((n) => n.index === day.location)[0]
-        ?.index,
-      ...locationsState.locations
+      locations.all.filter((n) => n.index === day.location)[0]?.index,
+      ...locations.all
         ?.filter((n) => n.index === day.location)?.[0]
         ?.label.split(','),
       gaugeInfo,
@@ -121,10 +120,7 @@ export const downloadWeatherCSV = () => {
   const encodedUri = encodeURI(csvContent);
   const link = document.createElement('a');
   link.setAttribute('href', encodedUri);
-  link.setAttribute(
-    'download',
-    `Weather-Data-${locationsState.projectFilename}`,
-  );
+  link.setAttribute('download', `Weather-Data-${locations.projectFilename}`);
   link.className = 'hidden';
   document.body.appendChild(link);
   link.click();
@@ -138,7 +134,7 @@ export const sendToProjectGallery = async (img) => {
   const yarnDetails = [];
   const gauges = [];
   const tables = [];
-  gaugesState.gauges.forEach((gauge) => {
+  gauges.gauges.forEach((gauge) => {
     colors.push(gauge.colors);
     gauges.push(gauge.label);
     palettes.push(colorsToCode(gauge.colors, { includePrefix: true }));
@@ -160,7 +156,7 @@ export const sendToProjectGallery = async (img) => {
     yarnUrls.push(yarnSearchUrl);
     tables.push(getWPGauge(gauge));
   });
-  const _locations = locationsState.locations?.map((location) => {
+  const _locations = locations.all?.map((location) => {
     return {
       label: location.label,
       from: location.from,
@@ -178,13 +174,13 @@ export const sendToProjectGallery = async (img) => {
     palettes: JSON.stringify(palettes),
     project_url: projectStatus.state.liveURL,
     tables: JSON.stringify(tables),
-    title: locationsState.projectTitle,
+    title: locations.projectTitle,
     total_days: weather.rawData?.length,
     yarn_urls: JSON.stringify(yarnUrls),
     yarn_details: JSON.stringify(yarnDetails),
     weather_grouping: weather.grouping,
     weather_sources: JSON.stringify(getWeatherSourceDetails()),
-    wp_tag_id: previewsState.active.wpTagId,
+    wp_tag_id: previews.active.wpTagId,
   };
   let message = '';
   try {

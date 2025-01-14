@@ -41,7 +41,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     isProjectLoading,
     isProjectSaved,
     liveProjectURLHash,
-    locationsState,
+    locations,
     modal,
     pageSections,
     pinAllSections,
@@ -168,7 +168,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
 
     <div class="flex gap-2 flex-1 justify-between sm:justify-end">
-      {#if weather.data && locationsState.allValid}
+      {#if weather.data && locations.allValid}
         <div class="hidden lg:inline-flex">
           <Tooltip
             classNames="btn bg-secondary-hover-token"

@@ -15,20 +15,14 @@
 
 import { browser, version } from '$app/environment';
 import { PROJECT_TIMESTAMP_ID } from '$lib/constants';
-import {
-  gaugesState,
-  locationsState,
-  previewsState,
-  units,
-  weather,
-} from '$lib/state';
+import { gauges, locations, previews, units, weather } from '$lib/state';
 
 class liveProjectURLHashClass {
   value = $derived.by(() => {
     let hash = '';
-    hash += locationsState.urlHash;
-    hash += gaugesState.urlHash;
-    hash += previewsState.hash;
+    hash += locations.urlHash;
+    hash += gauges.urlHash;
+    hash += previews.hash;
     if (weather.defaultSource === 'Meteostat') hash += '&s=0';
     else if (weather.defaultSource === 'Open-Meteo') hash += '&s=1';
     if (!weather.useSecondarySources) hash += '0';
@@ -52,7 +46,7 @@ export const projectGalleryTitle = $state({ value: null });
 
 class ProjectStatusClass {
   state = $derived.by(() => {
-    const isValid = locationsState.allValid;
+    const isValid = locations.allValid;
     const base = browser ? window.location.origin + '/' : '';
     const query = `?project=${PROJECT_TIMESTAMP_ID}&v=${version}`;
     const liveURL = !isValid
