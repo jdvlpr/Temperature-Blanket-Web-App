@@ -102,9 +102,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <div class="mx-auto max-w-screen-sm">
       <p class="mb-2">
         Starting from the center, stitches are added in a clockwise square
-        pattern. Possible crochet patterns: Granny Square, Moss Stitch/Linen
-        Stitch Square.
+        pattern. Possible crochet patterns: Granny Squaall Stitch Square.
       </p>
+      all
       <p class="italic">
         {$details.rounds} rounds with {$details.countOfAdditionalStitches}
         additional

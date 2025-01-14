@@ -89,8 +89,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   $: targets = gauges.allCreated.map((n) => n.targets).flat();
 
   $: if (gauges.allCreated)
-    $settings.selectedTarget = setTargets($settings.selectedTarget);
-
+    $settings.selectedTargetallets($settings.selectedTarget);
+  all;
   $: months = weatherMonthsData({ weatherData: weather.data });
 
   $: factors = getFactors({ length: months.length });

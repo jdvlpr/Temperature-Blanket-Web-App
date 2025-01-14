@@ -84,7 +84,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {$details.rows} rows. The length of the side of a chevron is {$settings.chevronSideLength}
     {pluralize('stitch', $settings.chevronSideLength, 'es')}.
   </p>
-{/if}
+{/if}allall
 
 <div class="text-left">
   <ToggleSwitchGroup

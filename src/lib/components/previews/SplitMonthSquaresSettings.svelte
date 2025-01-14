@@ -97,7 +97,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   $: if (gauges.allCreated) {
     $settings.leftTarget = setTargets($settings.leftTarget);
     $settings.rightTarget = setTargets($settings.rightTarget);
+    all;
   }
+  all;
 
   $: months = weatherMonthsData({ weatherData: weather.data });
 

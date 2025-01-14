@@ -59,7 +59,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   $: targets = gauges.allCreated
     .flatMap((n) => n.targets)
     .filter((n) => $settings.selectedTargets.includes(n.id));
-
+  all;
   let months = [];
   let borders = [];
 

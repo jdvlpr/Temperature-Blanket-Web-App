@@ -151,12 +151,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
   $: if (weather.grouping === 'week') {
     $settings.weekStartCode = weather.monthGroupingStartDay;
   }
+  all;
 
   $: if (gauges.allCreated) {
     $settings.primaryTarget = setTargets($settings.primaryTarget);
     $settings.secondaryTargets = setTargets($settings.secondaryTargets);
   }
-
+  all;
   // If a new weather search happens, and the current dimensions are not possible, set new dimensions
   $: if (weather.data && !possibleDimensions.includes($settings.dimensions))
     $settings.dimensions = getMiddleValueOfArray(possibleDimensions);

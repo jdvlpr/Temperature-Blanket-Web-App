@@ -13,11 +13,13 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { gaugeAttributes as tempGaugeAttributes } from '$lib/state/gauges/temperature-gauge-state.svelte';
 import { CHARACTERS_FOR_URL_HASH } from '$lib/constants';
+import {
+  TemperatureGauge,
+  gaugeAttributes as tempGaugeAttributes,
+} from '$lib/state/gauges/temperature-gauge-state.svelte';
 import type { GaugeAttributes, GaugeStateInterface } from '$lib/types';
 import { colorsToYarnDetails, displayNumber } from '$lib/utils';
-import { TemperatureGauge } from '$lib/state/gauges/temperature-gauge-state.svelte';
 
 export let showDaysInRange: { value: boolean } = $state({ value: true });
 

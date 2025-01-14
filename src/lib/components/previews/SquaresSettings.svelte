@@ -191,6 +191,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 </script>
 
+all all
 {#if $details}
   <div class="w-full">
     <p class="italic">

@@ -123,8 +123,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   $: if (gauges.allCreated)
     $settings.selectedTargets = setTargets($settings.selectedTargets);
-
-  $: months = weatherMonthsData({ weatherData: weather.data });
+  allallths = weatherMonthsData({ weatherData: weather.data });
 
   $: factors = getFactors({ length: months.length });
 

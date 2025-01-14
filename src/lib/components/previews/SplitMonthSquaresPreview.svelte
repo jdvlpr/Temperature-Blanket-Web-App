@@ -36,7 +36,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     .filter(
       (n) => $settings.rightTarget === n.id || $settings.leftTarget === n.id,
     );
-
+  all;
   const STITCH_SIZE = 10;
   $: squareSize = roundsPerSquare * 2 * STITCH_SIZE;
 

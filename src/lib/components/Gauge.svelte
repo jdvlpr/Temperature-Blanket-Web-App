@@ -24,7 +24,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ImportExportPalette from '$lib/components/modals/ImportExportPalette.svelte';
   import RandomPalette from '$lib/components/modals/RandomPalette.svelte';
   import SortPalette from '$lib/components/modals/SortPalette.svelte';
-  import { ICONS } from '$lib/constants';
   import {
     drawerState,
     gauges,
@@ -70,10 +69,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   $effect(() => {
     if (fullscreen) {
       gaugeContainerElement.style.zIndex = '40';
-      document.body.classList.add('overflow-y-hidden');
+      document.body.classList.add('overflow-hidden');
     } else {
-      document.body.classList.remove('overflow-y-hidden');
       gaugeContainerElement.style.zIndex = '';
+      document.body.classList.remove('overflow-hidden');
     }
   });
 </script>
