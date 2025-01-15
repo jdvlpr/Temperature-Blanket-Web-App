@@ -13,17 +13,12 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { browser, version } from '$app/environment';
+import { browser } from '$app/environment';
 
 // Timestamp identifying when the app was initialized, used as a kind of unique ID for the project (though technically may not be unique if two users initialize at the exact same time). But it doesn't have any real meaning apart from an identifier for a project.
 export const PROJECT_TIMESTAMP_ID = browser
   ? new URL(window.location).searchParams.get('project') ||
     new Date().getTime()?.toString()
-  : '';
-
-// App Version
-export const LOADED_APP_VERSION = browser
-  ? new URL(window.location).searchParams.get('v') || version
   : '';
 
 // Symbols used in a project's URL hash

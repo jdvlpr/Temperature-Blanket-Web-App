@@ -26,18 +26,17 @@ import { load as loadSqrs } from '$lib/components/previews/SquaresSettings.svelt
 import {
   CHARACTERS_FOR_URL_HASH,
   DAYS_OF_THE_WEEK,
-  LOADED_APP_VERSION,
   NO_DATA_SRTM3,
 } from '$lib/constants';
 import {
   allGaugesAttributes,
   gauges,
   locations,
+  project,
   units,
   weather,
 } from '$lib/state';
 import { rowsPreview } from '$lib/state/previews/rows-preview-state.svelte';
-import type { GaugeRangeOptions, GaugeSettingsType } from '$lib/types';
 import {
   celsiusToFahrenheit,
   dateToISO8601String,
@@ -346,7 +345,7 @@ export const parseGaugeURLHash = (hashString: string, gauge) => {
 
     // Before version 1.700, all numbers were saved in metric
     // So convert the From and To values if needed
-    if (!upToDate(LOADED_APP_VERSION, '1.700')) {
+    if (!upToDate(project.loaded.version, '1.700')) {
       if (units.value === 'imperial') {
         switch (gauge.id) {
           case 'temp':
@@ -476,7 +475,10 @@ export const parseGaugeURLHash = (hashString: string, gauge) => {
 
     // Before version 1.700, all numbers were in metric
     // So update them if needed
-    if (!upToDate(LOADED_APP_VERSION, '1.700') && units.value === 'imperial') {
+    if (
+      !upToDate(project.loaded.version, '1.700') &&
+      units.value === 'imperial'
+    ) {
       increment = celsiusToFahrenheit(increment);
       start = celsiusToFahrenheit(start);
     }

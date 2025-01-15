@@ -14,12 +14,12 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script context="module">
-  import { isProjectLoading, signal, units } from '$lib/state';
+  import { project, signal, units } from '$lib/state';
   import { get } from 'svelte/store';
   import { activeLocationID, weatherLocations } from './+page.svelte';
 
   export async function fetchData() {
-    isProjectLoading.value = true;
+    project.status.loading = true;
 
     let _locations = weatherLocations.data;
 
@@ -49,7 +49,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     weatherLocations.data = newWeatherForcastData;
 
-    isProjectLoading.value = false;
+    project.status.loading = false;
 
     if (!get(activeLocationID))
       activeLocationID.set(weatherLocations.data[0]?.id);

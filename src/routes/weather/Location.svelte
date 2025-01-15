@@ -24,7 +24,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { goto } from '$app/navigation';
   import { page } from '$app/state';
   import { ICONS, NO_DATA_SRTM3 } from '$lib/constants';
-  import { isProjectLoading } from '$lib/state';
+  import { project } from '$lib/state';
   import { displayGeoNamesErrorMessage } from '$lib/utils';
   import autocomplete from 'autocompleter';
   import { onMount } from 'svelte';
@@ -41,7 +41,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     showReset = !searching && $inputLocation?.value?.length > 1;
   }
 
-  $: hasError = !$validId && $inputLocation?.value && !isProjectLoading.value;
+  $: hasError = !$validId && $inputLocation?.value && !project.status.loading;
 
   onMount(async () => {
     // Setup the autocomplete location
@@ -117,7 +117,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       await setLocationFromId({ id });
     } else {
       $validId = true;
-      isProjectLoading.value = false;
+      project.status.loading = false;
     }
   }); // End of onMount
 
@@ -257,12 +257,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
         id="location-0"
         class="truncate"
         autocomplete="off"
-        placeholder={isProjectLoading.value ? 'Loading...' : 'Enter a place'}
+        placeholder={project.status.loading ? 'Loading...' : 'Enter a place'}
         title="Enter a city, region, or landmark"
         bind:this={$inputLocation}
         on:input={validate}
         on:keyup={validateKeyup}
-        disabled={isProjectLoading.value}
+        disabled={project.status.loading}
       />
       {#if searching}
         <div class="flex items-center justify-center">

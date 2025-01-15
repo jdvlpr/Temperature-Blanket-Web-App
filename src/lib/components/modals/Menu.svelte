@@ -23,11 +23,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ChooseWeatherSource from '$lib/components/modals/ChooseWeatherSource.svelte';
   import KeyboardShortcuts from '$lib/components/modals/KeyboardShortcuts.svelte';
   import {
-    isProjectSaved,
     modal,
     pageSections,
     pinAllSections,
     previews,
+    project,
     projectStatus,
     weather,
   } from '$lib/state';
@@ -58,7 +58,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     save: false,
   });
 
-  let project = $state(null);
+  let currentSavedProject = $state(null);
 
   function goTo(page) {
     pages.download = false;
@@ -92,12 +92,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
       const newURL = new URL(projectStatus.state.liveURL);
       window.history.replaceState({ path: newURL.href }, '', newURL.href);
       setLocalStorageProject();
-      project = JSON.parse(localStorage.getItem('projects'))?.filter(
-        (project) => project.href === projectStatus.state.liveURL,
-      )?.[0];
-      isProjectSaved.value = true;
+      currentSavedProject = JSON.parse(
+        localStorage.getItem('projects'),
+      )?.filter((project) => project.href === projectStatus.state.liveURL)?.[0];
+      project.status.saved = true;
     } catch {
-      project = null;
+      currentSavedProject = null;
       console.log("Can't save project");
     }
   }
@@ -482,9 +482,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           Project and {#if weather.isUserEdited}custom weather{:else}weather{/if}
           data saved to this browser
         </p>
-        {#if project}
+        {#if currentSavedProject}
           <div class="">
-            <ProjectDetails {project} canRemove={false} />
+            <ProjectDetails project={currentSavedProject} canRemove={false} />
           </div>
         {/if}
       {/if}

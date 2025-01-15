@@ -14,8 +14,8 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script context="module">
-  import { CHARACTERS_FOR_URL_HASH, LOADED_APP_VERSION } from '$lib/constants';
-  import { gauges, preview, weather } from '$lib/state';
+  import { CHARACTERS_FOR_URL_HASH } from '$lib/constants';
+  import { gauges, preview, project, weather } from '$lib/state';
   import { derived, writable } from 'svelte/store';
 
   const id = 'chev';
@@ -57,7 +57,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     _settings.selectedTargets = params;
     _settings.chevronsPerRow = +hash.substring(startIndex + 1, separatorIndex);
     _settings.chevronSideLength = +hash.substring(separatorIndex + 1, endIndex);
-    if (!upToDate(LOADED_APP_VERSION, '1.747'))
+    if (!upToDate(project.loaded.version, '1.747'))
       _settings.chevronSideLength = Math.round(
         (_settings.chevronSideLength / 2) * Math.sqrt(2),
       ); // Version 1.747 changed chevronWidth to the length of each side of the chevron

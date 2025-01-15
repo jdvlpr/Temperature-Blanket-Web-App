@@ -31,12 +31,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Share from '$lib/components/Share.svelte';
   import Spinner from '$lib/components/Spinner.svelte';
   import UnitChanger from '$lib/components/UnitChanger.svelte';
-  import {
-    isProjectLoading,
-    modal,
-    showNavigationSideBar,
-    units,
-  } from '$lib/state';
+  import { modal, project, showNavigationSideBar, units } from '$lib/state';
   import {
     delay,
     getWeatherCodeDetails,
@@ -394,7 +389,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </Card>
       </div>
 
-      {#if weatherData && !isProjectLoading.value}
+      {#if weatherData && !project.status.loading}
         <Card>
           {#snippet content()}
             <div
@@ -402,8 +397,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
               id="weather-data"
               bind:this={$weatherDataElement}
             >
-              {#key isProjectLoading.value || $activeLocationID}
-                <div class:opacity-50={isProjectLoading.value} in:fade>
+              {#key project.status.loading || $activeLocationID}
+                <div class:opacity-50={project.status.loading} in:fade>
                   <div
                     class="mb-4 flex flex-col gap-2 items-center p-2 w-fit mx-auto"
                   >

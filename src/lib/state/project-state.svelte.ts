@@ -17,8 +17,82 @@ import { browser, version } from '$app/environment';
 import { PROJECT_TIMESTAMP_ID } from '$lib/constants';
 import { gauges, locations, previews, units, weather } from '$lib/state';
 
-class liveProjectURLHashClass {
-  value = $derived.by(() => {
+export const projectGalleryLink = $state({ value: null });
+
+export const projectGalleryTitle = $state({ value: null });
+
+class ProjectStatusClass {
+  state = $derived.by(() => {
+    const isValid = locations.allValid;
+    const base = browser ? window.location.origin + '/' : '';
+    const query = `?project=${PROJECT_TIMESTAMP_ID}&v=${version}`;
+    const liveURL = !isValid ? base : base + query + '#' + project.current.hash;
+    return {
+      isValid,
+      liveURL,
+    };
+  });
+}
+
+export const projectStatus = new ProjectStatusClass();
+
+export class HistoryStateClass {
+  stack: string[] = $state([]);
+
+  currentIndex: number = $state(-1);
+
+  length = $derived(this.stack.length);
+
+  isFirst = $derived(this.currentIndex === 0 || this.length === 0);
+
+  isLast = $derived(this.currentIndex === this.length - 1 || this.length === 0);
+
+  current = $derived.by(() => {
+    if (this.length < 1 || this.currentIndex < 0) return null;
+    return this.stack[this.currentIndex];
+  });
+
+  previous = $derived.by(() => {
+    if (this.isFirst) return null;
+    return this.stack[this.currentIndex - 1];
+  });
+
+  next = $derived.by(() => {
+    if (this.isLast) return null;
+    return this.stack[this.currentIndex + 1];
+  });
+
+  isUpdating = $state(false);
+
+  updateMessage = $state('');
+
+  push(value: string) {
+    // If it's the same as the previous value, don't add it, or if it's not on the last stack item
+    if (this.previous === value || !this.isLast) return;
+    this.stack.push(value);
+    this.currentIndex = this.length - 1;
+  }
+
+  undo() {
+    if (this.currentIndex > 0) this.currentIndex--;
+  }
+
+  redo() {
+    if (this.currentIndex < this.stack.length) this.currentIndex++;
+  }
+}
+
+class ProjectClass {
+  loaded = $state({
+    version: browser
+      ? new URL(window.location).searchParams.get('v') || version
+      : '',
+    href: browser ? new URL(window.location).href : '',
+  });
+
+  history = new HistoryStateClass();
+
+  current = $derived.by(() => {
     let hash = '';
     hash += locations.urlHash;
     hash += gauges.urlHash;
@@ -30,33 +104,17 @@ class liveProjectURLHashClass {
     if (weather.grouping === 'week')
       hash += `&w=${weather.monthGroupingStartDay}`; // Set Weather Grouping to Weeks with the starting Day of Week
     hash += units.value === 'metric' ? '&u=m' : '&u=i'; // Units
-    return hash;
-  });
-}
-// The current part of the project URL after #
-export const liveProjectURLHash = new liveProjectURLHashClass();
-
-export const isProjectSaved = $state({ value: false });
-
-export const isProjectLoading = $state({ value: true });
-
-export const projectGalleryLink = $state({ value: null });
-
-export const projectGalleryTitle = $state({ value: null });
-
-class ProjectStatusClass {
-  state = $derived.by(() => {
-    const isValid = locations.allValid;
-    const base = browser ? window.location.origin + '/' : '';
-    const query = `?project=${PROJECT_TIMESTAMP_ID}&v=${version}`;
-    const liveURL = !isValid
-      ? base
-      : base + query + '#' + liveProjectURLHash.value;
     return {
-      isValid,
-      liveURL,
+      version,
+      // The current part of the project URL after #
+      hash,
     };
   });
+
+  status = $state({
+    saved: false,
+    loading: true,
+  });
 }
 
-export const projectStatus = new ProjectStatusClass();
+export const project = new ProjectClass();

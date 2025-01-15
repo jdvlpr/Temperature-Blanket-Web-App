@@ -20,10 +20,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Tooltip from '$lib/components/Tooltip.svelte';
   import { MAXIMUM_LOCATIONS } from '$lib/constants';
   import {
-    isProjectLoading,
-    liveProjectURLHash,
     locations,
     modal,
+    project,
     wasProjectLoadedFromURL,
     weather,
   } from '$lib/state';
@@ -100,10 +99,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
             {#snippet tooltip()}
               <span>
                 To edit location details, reload weather data or <a
-                  href={`/?project=${new Date().getTime()?.toString()}&v=${version}#${liveProjectURLHash.value.substring(
+                  href={`/?project=${new Date().getTime()?.toString()}&v=${version}#${project.current.hash.substring(
                     0,
-                    liveProjectURLHash.value.indexOf('l='),
-                  )}${liveProjectURLHash.value.substring(liveProjectURLHash.value.indexOf('temp'))}`}
+                    project.current.hash.indexOf('l='),
+                  )}${project.current.hash.substring(project.current.hash.indexOf('temp'))}`}
                   class="underline cursor-pointer"
                   target="_blank"
                   rel="noreferrer">open a new project</a
@@ -181,7 +180,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <button
           class="btn bg-secondary-hover-token gap-2"
           id="add-location-button"
-          disabled={isProjectLoading.value}
+          disabled={project.status.loading}
           onclick={() => locations.add()}
           title="Add a New Location"
         >
@@ -208,7 +207,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     <button
       class="btn bg-secondary-hover-token text-left"
-      disabled={isProjectLoading.value}
+      disabled={project.status.loading}
       onclick={() => {
         modal.state.trigger({
           type: 'component',

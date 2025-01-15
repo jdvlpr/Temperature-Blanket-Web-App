@@ -31,20 +31,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import GettingStarted from '$lib/components/modals/GettingStarted.svelte';
   import LegacyNotification from '$lib/components/modals/LegacyNotification.svelte';
   import Menu from '$lib/components/modals/Menu.svelte';
-  import { ICONS, LOADED_APP_VERSION } from '$lib/constants';
+  import { ICONS } from '$lib/constants';
   import {
     drawerState,
-    historyChangeMessage,
-    historyState,
     isDesktop,
-    isHistoryUpdating,
-    isProjectLoading,
-    isProjectSaved,
-    liveProjectURLHash,
     locations,
     modal,
     pageSections,
     pinAllSections,
+    project,
     projectStatus,
     wasProjectLoadedFromURL,
     weather,
@@ -86,13 +81,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
       setUnitsFromNavigator();
     }
 
-    isProjectLoading.value = false;
+    project.status.loading = false;
   });
 
   async function loadProjectFromURL() {
     // Check if the project needs to show a legacy notification
     // Use this to display warnings about backwards compatibility if the project is incompatible
-    if (!upToDate(LOADED_APP_VERSION, '0.98'))
+    if (!upToDate(project.loaded.version, '0.98'))
       modal.state.trigger({
         type: 'component',
         component: { ref: LegacyNotification, props: { v: 'v0.98' } },
@@ -106,13 +101,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 
   $effect(() => {
-    if (liveProjectURLHash.value) debounce(() => updateHistory(), 300);
+    if (project.current.hash) debounce(() => updateHistory(), 300);
   });
 
   $effect(() => {
-    if (historyChangeMessage.value !== '') {
+    if (project.history.updateMessage !== '') {
       toastStore.trigger({
-        message: historyChangeMessage.value,
+        message: project.history.updateMessage,
         background: 'bg-success-300 text-black',
       });
     }
@@ -123,9 +118,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   onbeforeunload={(event) => {
     const url = new URL(projectStatus.state.liveURL);
     if (
-      isProjectSaved.value ||
+      project.status.saved ||
       !url.searchParams.has('project') ||
-      historyState.length === 0
+      project.history.length === 0
     )
       return;
     event.preventDefault();
@@ -211,8 +206,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
             title="Undo [Cmd ⌘]+[z] or [Ctrl]+[z]"
             id="undo"
             disabled={!weather.data ||
-              historyState.isFirst ||
-              isHistoryUpdating.value}
+              project.history.isFirst ||
+              project.history.isUpdating}
             onclick={() => {
               loadFromHistory({
                 action: 'Undo',
@@ -230,8 +225,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
             id="redo"
             title="Redo [Cmd ⌘]+[Shift ⇧]+[z] or [Ctrl]+[Shift ⇧]+[Z]"
             disabled={!weather.data ||
-              historyState.isLast ||
-              isHistoryUpdating.value}
+              project.history.isLast ||
+              project.history.isUpdating}
             onclick={() => {
               loadFromHistory({
                 action: 'Redo',

@@ -27,11 +27,7 @@ import { ICONS } from '$lib/constants';
 import {
   allGaugesAttributes,
   gauges,
-  historyChangeMessage,
-  historyState,
-  isHistoryUpdating,
-  isProjectSaved,
-  liveProjectURLHash,
+  project,
   projectStatus,
   units,
   weather,
@@ -44,16 +40,16 @@ import {
 } from '$lib/utils';
 
 export const loadFromHistory = ({ action }: { action: 'Undo' | 'Redo' }) => {
-  historyChangeMessage.value = '';
+  project.history.updateMessage = '';
 
-  let oldHistoryState = historyState.current;
+  let oldHistoryState = project.history.current;
   let newHistoryState;
   if (action === 'Undo') {
-    newHistoryState = historyState.previous;
-    historyState.undo();
+    newHistoryState = project.history.previous;
+    project.history.undo();
   } else if (action === 'Redo') {
-    newHistoryState = historyState.next;
-    historyState.redo();
+    newHistoryState = project.history.next;
+    project.history.redo();
   }
 
   const oldParams = getProjectParametersFromURLHash(oldHistoryState);
@@ -212,18 +208,18 @@ export const loadFromHistory = ({ action }: { action: 'Undo' | 'Redo' }) => {
   }
 
   if (message)
-    historyChangeMessage.value = `<span class="flex flex-wrap items-start gap-2"><span class="">${action === 'Undo' ? ICONS.arrowUturnLeft : ICONS.arrowUturnRight}</span> <span>${action}: ${message}</span></span>`;
+    project.history.updateMessage = `<span class="flex flex-wrap items-start gap-2"><span class="">${action === 'Undo' ? ICONS.arrowUturnLeft : ICONS.arrowUturnRight}</span> <span>${action}: ${message}</span></span>`;
 };
 export const updateHistory = () => {
   if (
     !weather.data ||
-    !liveProjectURLHash.value ||
+    !project.current.hash ||
     !projectStatus.state.isValid ||
     !browser
   )
     return;
 
-  let live = liveProjectURLHash.value;
+  let live = project.current.hash;
   const liveParams = getProjectParametersFromURLHash(live);
 
   // There must be a gauge created... sometimes this block gets called and the liveHash doesn't have any gauge params...
@@ -232,20 +228,20 @@ export const updateHistory = () => {
   );
   if (!hasGauge) return;
 
-  isHistoryUpdating.value = true;
-  isProjectSaved.value = false;
+  project.history.isUpdating = true;
+  project.status.saved = false;
 
   // This excludes the location param ('l=...'); changes to the location or dates are not considered to be an undoable or redoable change
   live = live.substring(live.indexOf('&'));
 
   if (
-    live !== historyState.current &&
-    live !== historyState.previous &&
-    live !== historyState.next
+    live !== project.history.current &&
+    live !== project.history.previous &&
+    live !== project.history.next
   )
-    historyState.push(live);
+    project.history.push(live);
 
-  isHistoryUpdating.value = false;
+  project.history.isUpdating = false;
 };
 
 export const updateURL = () => {

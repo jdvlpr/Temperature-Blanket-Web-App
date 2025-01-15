@@ -16,7 +16,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import Tooltip from '$lib/components/Tooltip.svelte';
   import { ICONS, MONTHS } from '$lib/constants';
-  import { isProjectLoading, locations, weather } from '$lib/state';
+  import { locations, project, weather } from '$lib/state';
   import type { LocationType } from '$lib/types/location-types';
   import {
     dateToISO8601String,
@@ -59,7 +59,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 
   let showSelectLocationLabelMessage = $derived(
-    !location?.id && location?.label && !isProjectLoading.value,
+    !location?.id && location?.label && !project.status.loading,
   );
 
   let days = $derived(getDays(month, year));
@@ -307,7 +307,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 locations.remove(location.uuid);
                 weather.rawData = null;
               }}
-              disabled={!!weather.isUserEdited || isProjectLoading.value}
+              disabled={!!weather.isUserEdited || project.status.loading}
               title="Remove Location"
             >
               {@html ICONS.trash}
@@ -356,13 +356,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
           id="location-{location.uuid}"
           class="truncate"
           autocomplete="off"
-          placeholder={isProjectLoading.value ? 'Loading...' : 'Enter a place'}
+          placeholder={project.status.loading ? 'Loading...' : 'Enter a place'}
           title="Enter a city, region, or landmark"
           bind:value={location.label}
           bind:this={inputLocation}
           oninput={validate}
           onkeyup={validateKeyup}
-          disabled={isProjectLoading.value || !!weather.isUserEdited}
+          disabled={project.status.loading || !!weather.isUserEdited}
         />
         {#if searching}
           <div class="flex items-center justify-center">
@@ -423,7 +423,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               bind:value={year}
               id={`choose-year-${location.uuid}`}
               title="Choose a Year"
-              disabled={!!weather.isUserEdited || isProjectLoading.value}
+              disabled={!!weather.isUserEdited || project.status.loading}
               onchange={() => {
                 setDates({});
               }}
@@ -441,7 +441,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               bind:value={month}
               id={`choose-month-${location.uuid}`}
               title="Choose a Month"
-              disabled={!!weather.isUserEdited || isProjectLoading.value}
+              disabled={!!weather.isUserEdited || project.status.loading}
               onchange={() => {
                 setDates({});
               }}
@@ -459,7 +459,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               bind:value={day}
               id={`choose-day-${location.uuid}`}
               title="Choose a Day"
-              disabled={!!weather.isUserEdited || isProjectLoading.value}
+              disabled={!!weather.isUserEdited || project.status.loading}
               onchange={() => setDates({})}
             >
               {#each Array(days) as _, i}
@@ -485,7 +485,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               bind:value={location.from}
               bind:this={inputStart}
               onchange={() => (weather.rawData = null)}
-              disabled={isProjectLoading.value || !!weather.isUserEdited}
+              disabled={project.status.loading || !!weather.isUserEdited}
             />
           </label>
           <label for="datepicker-to-{location.uuid}" class="">
@@ -501,7 +501,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               bind:value={location.to}
               bind:this={inputEnd}
               onchange={() => (weather.rawData = null)}
-              disabled={isProjectLoading.value || !!weather.isUserEdited}
+              disabled={project.status.loading || !!weather.isUserEdited}
             />
           </label>
         </div>
@@ -513,7 +513,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           class="select w-full"
           id={`duration-${location.uuid}`}
           bind:value={location.duration}
-          disabled={!!weather.isUserEdited || isProjectLoading.value}
+          disabled={!!weather.isUserEdited || project.status.loading}
           onchange={() => {
             if (location?.duration === 'y') {
               year = new Date(location.from.replace(/-/g, '/')).getFullYear();
@@ -587,7 +587,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </svg>
           {location.errorMessage}
         </p>
-      {:else if isProjectLoading.value}
+      {:else if project.status.loading}
         <p class="italic text-sm">...</p>
       {/if}
     </div>
