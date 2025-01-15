@@ -13,10 +13,8 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script>
-  import { run } from 'svelte/legacy';
-
-  import { DataHandler, Th } from '@vincjo/datatables';
+<script lang="ts">
+  import { TableHandler, ThSort } from '@vincjo/datatables';
   import { UNIT_LABELS } from '$lib/constants';
   import RecentWeatherDataTooltip from '$lib/components/RecentWeatherDataTooltip.svelte';
   import { modal, project, weather } from '$lib/state';
@@ -35,16 +33,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import NumberInput from '$lib/components/modals/NumberInput.svelte';
   import TextInput from '$lib/components/modals/TextInput.svelte';
 
-  let { data, weatherTargets } = $props();
-
-  let tablePage = $state(1);
-
-  let tableRowsPerPage = $state(10);
-
-  let tableSort = $state({});
+  let { weatherTargets } = $props();
 
   const tableData = $derived([
-    ...data.map((n) => {
+    ...weather.data.map((n) => {
       let weather = {};
       weatherTargets.forEach((target) => {
         if (target.id === 'dayt') {
@@ -75,68 +67,52 @@ If not, see <https://www.gnu.org/licenses/>. -->
     }),
   ]);
 
-  const handler = $derived(
-    new DataHandler(tableData, {
-      rowsPerPage: tableRowsPerPage,
-    }),
-  );
-  const rows = $derived(handler.getRows());
-
-  let page = $state(),
-    perPage = $state(),
-    sort = $state();
-
-  run(() => {
-    if (tableData) {
-      handler.setRows(tableData);
-      handler.setPage(tablePage);
-      const { identifier, direction } = tableSort;
-      handler.applySorting({ orderBy: identifier, direction });
-    }
+  const table = new TableHandler(tableData, {
+    rowsPerPage: 10,
   });
 </script>
 
 <div class="w-full my-4">
-  <DataTable {handler} search={false}>
+  <DataTable {table} search={false}>
     <table class="border-separate border-spacing-0 w-full mx-auto">
       <thead>
         <tr>
-          <Th {handler} orderBy={'date'}>
+          <ThSort {table} field="date">
             <span class="flex flex-col items-center justify-center"
               >{weather.groupingHeading}
               <span class="text-xs whitespace-nowrap">(YYYY-MM-DD)</span></span
             >
-          </Th>
+          </ThSort>
           {#each weatherTargets as { id, pdfHeader }}
             {@const header = pdfHeader[project.units]}
             {@const headerLabel = header.slice(0, header.indexOf('('))}
             {@const headerUnits = header.slice(header.indexOf('('))}
-            <Th {handler} orderBy={id}>
+            <ThSort {table} field={id}>
               <span class="flex flex-wrap gap-1 items-center justify-center"
                 >{headerLabel}
                 <span class="text-xs">{headerUnits}</span></span
-              ></Th
-            >
+              >
+            </ThSort>
           {/each}
         </tr>
       </thead>
       <tbody
         class="[&>tr:nth-child(odd)]:bg-surface-100 [&>tr:nth-child(odd)]:dark:bg-surface-800"
       >
-        {#if $rows}
-          {#each $rows as row}
+        {#if table.rows}
+          {#each table.rows as row}
             {@const isRecentDate = getIsRecentDate(row.date)}
 
             <tr class:!variant-soft-warning={isRecentDate} class="!text-token">
-              <td
-                >{#if isRecentDate}
+              <td>
+                {#if isRecentDate}
                   <RecentWeatherDataTooltip />
                 {/if}
-                {row.date}</td
-              >
+                {row.date}
+              </td>
               {#each weatherTargets as { id, label, type }}
-                <td
-                  ><button
+                <td>
+                  <button
                     class="transition-all"
                     disabled={weather.grouping === 'week'}
                     class:bg-secondary-hover-token={weather.grouping === 'day'}
@@ -152,16 +128,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
                               value: row[id],
                               title: `<div class="flex flex-col items-center justify-center"><span class="font-bold">${row.date}</span><span>${label}</span></div>`,
                               onOkay: (_value) => {
-                                weather.isUserEdited = true;
+                                weather.isUserEdited++;
+
                                 const time = _value.split(':');
                                 if (time.length !== 2) return;
                                 const hours = +time[0] + +time[1] / 60;
-                                page = handler.getPageNumber();
-                                perPage = handler.getRowsPerPage();
-                                sort = handler.getSorted();
-                                tablePage = $page;
-                                tableRowsPerPage = $perPage;
-                                tableSort = $sort;
                                 const mappedWeather = weather.rawData.map(
                                   (n) =>
                                     `${dateToISO8601String(n.date)}-${n.location}`,
@@ -193,13 +164,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                               noMinMax: true,
                               showSlider: false,
                               onOkay: (_value) => {
-                                weather.isUserEdited = true;
-                                page = handler.getPageNumber();
-                                perPage = handler.getRowsPerPage();
-                                sort = handler.getSorted();
-                                tablePage = $page;
-                                tableRowsPerPage = $perPage;
-                                tableSort = $sort;
+                                weather.isUserEdited++;
                                 const mappedWeather = weather.rawData.map(
                                   (n) =>
                                     `${dateToISO8601String(n.date)}-${n.location}`,
@@ -230,9 +195,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
                           },
                         });
                       }
-                    }}>{row[id]}</button
-                  ></td
-                >
+                    }}
+                  >
+                    {row[id]}
+                  </button>
+                </td>
               {/each}
             </tr>
           {/each}

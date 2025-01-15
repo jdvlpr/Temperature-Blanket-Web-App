@@ -155,6 +155,8 @@ class GaugesState {
     this.allAvailable = this.allAvailable.filter((gauge) => gauge.id !== id);
   }
 
+  // I think this is necessary because a simple $state.snapshot(gauge) does not include deeply reactive objects, only the top level ones.
+  // So this "freezes" what I need from the whole gauge
   getSnapshot(id) {
     const rangeOptions = $state.snapshot(
       this.allCreated.find((gauge) => gauge.id === id)?.rangeOptions,

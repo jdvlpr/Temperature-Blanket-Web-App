@@ -276,7 +276,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 </script>
 
-{#if weather.data}
+{#if weather.data.length}
   <svg
     id="preview-svg-image"
     class="max-h-[80svh] mx-auto"

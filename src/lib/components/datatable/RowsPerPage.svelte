@@ -13,15 +13,16 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script>
-  let { handler } = $props();
+<script lang="ts">
+  import type { TableHandler } from '@vincjo/datatables';
 
-  const rowsPerPage = handler.getRowsPerPage();
-  const pages = handler.getPages({ ellipsis: false });
-  const pageNumber = handler.getPageNumber();
-  const rowCount = handler.getRowCount();
+  interface Props {
+    table: TableHandler;
+  }
 
-  const options = createOptions($rowCount.total);
+  let { table }: Props = $props();
+
+  const options = createOptions(table.rowCount.total);
   function createOptions(totalCount) {
     if (totalCount < 10) return [10];
     if (totalCount < 50) return [10, totalCount];
@@ -34,11 +35,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <span class="text-sm">Rows Per Page</span>
   <select
     class="select"
-    bind:value={$rowsPerPage}
+    bind:value={table.rowsPerPage}
     id="rows-per-page"
     title="Choose how many rows per page"
     onchange={() => {
-      if ($pageNumber > $pages.length) handler.setPage(1);
+      if (table.currentPage > table.pages.length) table.setPage(1);
     }}
   >
     {#each options as option}

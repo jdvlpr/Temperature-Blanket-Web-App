@@ -61,8 +61,8 @@ importers:
         specifier: ^8.18.1
         version: 8.18.1(eslint@9.17.0(jiti@1.21.6))(typescript@5.7.2)
       '@vincjo/datatables':
-        specifier: ^1.14.5
-        version: 1.14.10(svelte@5.17.3)
+        specifier: ^2.2.0
+        version: 2.2.0(svelte@5.17.3)
       autoprefixer:
         specifier: ^10.4.20
         version: 10.4.20(postcss@8.4.49)
@@ -1005,10 +1005,10 @@ packages:
     resolution: {integrity: sha512-Vj0WLm5/ZsD013YeUKn+K0y8p1M0jPpxOkKdbD1wB0ns53a5piVY02zjf072TblEweAbcYiFiPoSMF3kp+VhhQ==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
-  '@vincjo/datatables@1.14.10':
-    resolution: {integrity: sha512-gtojSC/LKDHbh2ZGZeaAQ+lLltcmcSDDLkecgb9WpG7lHmd4b/1HUTtFWAJt43TnaK8SrciGugh9VRRZN53bpw==}
+  '@vincjo/datatables@2.2.0':
+    resolution: {integrity: sha512-I/U+SoXRU7sHdIgm48nFhBlWWc0brgxf3ZTFkt0rKu466wZNRXeaIUF8ZALM7unZyv5KYTm1hid62QvYqyF6fQ==}
     peerDependencies:
-      svelte: ^3.56.0 || ^4.0.0 || ^5.0.0-next.120
+      svelte: ^5.0.0
 
   '@vitest/expect@2.1.8':
     resolution: {integrity: sha512-8ytZ/fFHq2g4PJVAtDX57mayemKgDR6X3Oa2Foro+EygiOJHUXhCqBAAKQYYajZpFoIfvBCF1j6R6IYRSIUFuw==}
@@ -3275,7 +3275,7 @@ snapshots:
       '@typescript-eslint/types': 8.18.1
       eslint-visitor-keys: 4.2.0
 
-  '@vincjo/datatables@1.14.10(svelte@5.17.3)':
+  '@vincjo/datatables@2.2.0(svelte@5.17.3)':
     dependencies:
       svelte: 5.17.3
 

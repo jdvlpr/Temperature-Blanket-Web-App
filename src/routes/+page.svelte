@@ -162,7 +162,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
 
     <div class="flex gap-2 flex-1 justify-between sm:justify-end">
-      {#if weather.data && locations.allValid}
+      {#if weather.data.length && locations.allValid}
         <div class="hidden lg:inline-flex">
           <Tooltip
             classNames="btn bg-secondary-hover-token"
@@ -482,7 +482,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {/if}
       </div>
 
-      {#if weather.data}
+      {#if weather.data.length}
         <div
           id="page-section-weather-data"
           class="lg:my-4 scroll-mt-[58px] w-full"

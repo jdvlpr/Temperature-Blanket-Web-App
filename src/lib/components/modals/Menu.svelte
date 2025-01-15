@@ -166,7 +166,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           Save
         </button>
 
-        {#if weather.data}
+        {#if weather.data.length}
           <button
             class="btn bg-secondary-hover-token w-fit gap-2"
             onclick={() => goTo('download')}

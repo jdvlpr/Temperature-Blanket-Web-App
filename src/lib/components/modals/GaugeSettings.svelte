@@ -46,14 +46,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   const modalStore = getModalStore();
 
-  let gaugeSnapshot = $state(gauges.getSnapshot(gauges.activeGaugeId));
-
-  $inspect(gaugeSnapshot);
+  let _gauge = $state(gauges.getSnapshot(gauges.activeGaugeId));
 
   let incrementMode = $state(
-    gaugeSnapshot.rangeOptions?.isCustomRanges
-      ? null
-      : gaugeSnapshot.rangeOptions.mode,
+    _gauge.rangeOptions?.isCustomRanges ? null : _gauge.rangeOptions.mode,
   );
 
   let customRanges = $state([]);
@@ -62,9 +58,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let changedGaugeDirectionOnCustomRanges = $state(false);
 
-  let start = getStart(gaugeSnapshot.rangeOptions);
+  let start = getStart(_gauge.rangeOptions);
 
-  let increment = getIncrement(gaugeSnapshot.rangeOptions);
+  let increment = getIncrement(_gauge.rangeOptions);
 
   let setupContainer: HTMLElement | undefined;
 
@@ -94,13 +90,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
           .focus();
       }
     }
+  });
+
+  $effect(() => {
     scrollObserver.observe(setupContainer);
   });
 
   function _onSave() {
     onSave({
-      ranges: gaugeSnapshot.ranges,
-      rangeOptions: gaugeSnapshot.rangeOptions,
+      ranges: _gauge.ranges,
+      rangeOptions: _gauge.rangeOptions,
     });
     modalStore.close();
   }
@@ -116,9 +115,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
       newRanges = getAutoOptimizationRanges();
       customRanges = newRanges;
     } else {
-      newRanges = gaugeSnapshot.colors.map((n, i) => {
+      newRanges = _gauge.colors.map((n, i) => {
         const isFirstRange = i === 0;
-        const isLastRange = i === gaugeSnapshot.colors.length - 1;
+        const isLastRange = i === _gauge.colors.length - 1;
 
         let from = start;
         let to = start + increment;
@@ -144,30 +143,32 @@ If not, see <https://www.gnu.org/licenses/>. -->
     return newRanges;
   }
 
-  function onChangeIncrementMode() {
+  //TODO, working on this
+  $effect(() => {
+    console.log(incrementMode);
+
     if (incrementMode === 'auto') {
-      gaugeSnapshot.rangeOptions.mode = 'auto';
-      gaugeSnapshot.rangeOptions.isCustomRanges = false;
+      _gauge.rangeOptions.mode = 'auto';
+      _gauge.rangeOptions.isCustomRanges = false;
     } else if (incrementMode === 'manual') {
-      gaugeSnapshot.rangeOptions.mode = 'manual';
-      gaugeSnapshot.rangeOptions.isCustomRanges = false;
+      _gauge.rangeOptions.mode = 'manual';
+      _gauge.rangeOptions.isCustomRanges = false;
     }
-    start = getStart(gaugeSnapshot.rangeOptions);
-    increment = getIncrement(gaugeSnapshot.rangeOptions);
-    gaugeSnapshot.ranges = getRanges(gaugeSnapshot.rangeOptions);
-  }
+    start = getStart(_gauge.rangeOptions);
+    increment = getIncrement(_gauge.rangeOptions);
+    _gauge.ranges = getRanges(_gauge.rangeOptions);
+  });
 
   function getAutoOptimizationRanges() {
-    if (gaugeSnapshot.rangeOptions.auto.optimization === 'ranges')
-      return ranges;
+    if (_gauge.rangeOptions.auto.optimization === 'ranges') return ranges;
     const newRanges = getEvenlyDistributedRangeValuesWithEqualDayCount({
       weatherData: weather.data,
-      numRanges: gaugeSnapshot.ranges.length,
-      prop: gaugeSnapshot.rangeOptions.auto.optimization,
-      gaugeDirection: gaugeSnapshot.rangeOptions.direction,
-      roundIncrement: gaugeSnapshot.rangeOptions.auto.roundIncrement,
-      includeFrom: gaugeSnapshot.rangeOptions.includeFromValue,
-      includeTo: gaugeSnapshot.rangeOptions.includeToValue,
+      numRanges: _gauge.ranges.length,
+      prop: _gauge.rangeOptions.auto.optimization,
+      gaugeDirection: _gauge.rangeOptions.direction,
+      roundIncrement: _gauge.rangeOptions.auto.roundIncrement,
+      includeFrom: _gauge.rangeOptions.includeFromValue,
+      includeTo: _gauge.rangeOptions.includeToValue,
     });
     return newRanges;
   }
@@ -177,8 +178,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   );
 
   let includeFromAndTo = $derived(
-    gaugeSnapshot.rangeOptions.includeFromValue &&
-      gaugeSnapshot.rangeOptions.includeToValue,
+    _gauge.rangeOptions.includeFromValue && _gauge.rangeOptions.includeToValue,
   );
 
   let calculatedIncrement = $derived(
@@ -193,25 +193,24 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let rangeExample = $derived(
     getRangeExample({
-      direction: gaugeSnapshot.rangeOptions.direction,
-      includeFromValue: gaugeSnapshot.rangeOptions.includeFromValue,
-      includeToValue: gaugeSnapshot.rangeOptions.includeToValue,
+      direction: _gauge.rangeOptions.direction,
+      includeFromValue: _gauge.rangeOptions.includeFromValue,
+      includeToValue: _gauge.rangeOptions.includeToValue,
     }),
   );
 
   let isNotAutoIncrements = $derived(
-    gaugeSnapshot.rangeOptions.mode !== 'auto' ||
-      gaugeSnapshot.rangeOptions.isCustomRanges,
+    _gauge.rangeOptions.mode !== 'auto' || _gauge.rangeOptions.isCustomRanges,
   );
 
   let isRangeCalculationUnavailable = $derived(
-    (gaugeSnapshot.rangeOptions.includeFromValue ===
-      gaugeSnapshot.rangeOptions.includeToValue &&
-      gaugeSnapshot.rangeOptions.auto.roundIncrement &&
-      gaugeSnapshot.rangeOptions.mode === 'auto') ||
-      (gaugeSnapshot.rangeOptions.includeFromValue ===
-        gaugeSnapshot.rangeOptions.includeToValue &&
-        gaugeSnapshot.rangeOptions.mode !== 'auto'),
+    (_gauge.rangeOptions.includeFromValue ===
+      _gauge.rangeOptions.includeToValue &&
+      _gauge.rangeOptions.auto.roundIncrement &&
+      _gauge.rangeOptions.mode === 'auto') ||
+      (_gauge.rangeOptions.includeFromValue ===
+        _gauge.rangeOptions.includeToValue &&
+        _gauge.rangeOptions.mode !== 'auto'),
   );
 </script>
 
@@ -276,12 +275,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
       >
         <div class="flex flex-col justify-start items-start gap-1">
           <ChooseRangeDirection
-            bind:direction={gaugeSnapshot.rangeOptions.direction}
+            bind:direction={_gauge.rangeOptions.direction}
             on:change={() => {
               changedGaugeDirectionOnCustomRanges =
-                gaugeSnapshot.rangeOptions.isCustomRanges;
+                _gauge.rangeOptions.isCustomRanges;
               if (changedGaugeDirectionOnCustomRanges) {
-                gaugeSnapshot.ranges = gaugeSnapshot.ranges
+                _gauge.ranges = _gauge.ranges
                   .map((n) => {
                     return {
                       from: n.to,
@@ -289,7 +288,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     };
                   })
                   .reverse();
-                customRanges = gaugeSnapshot.ranges;
+                customRanges = _gauge.ranges;
               }
             }}
           />
@@ -327,7 +326,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <RadioGroup
               class="flex-wrap gap-y-2"
               active="bg-secondary-active-token"
-              on:change={onChangeIncrementMode}
             >
               <RadioItem
                 bind:group={incrementMode}
@@ -368,11 +366,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
             {/if}
           </div>
 
-          {#if gaugeSnapshot.rangeOptions.isCustomRanges === false}
+          {#if _gauge.rangeOptions.isCustomRanges === false}
             <div class="flex flex-col gap-2 justify-start items-start">
-              {#if gaugeSnapshot.rangeOptions.mode === 'auto'}
+              {#if _gauge.rangeOptions.mode === 'auto'}
                 <div class="flex flex-col gap-2 justify-start items-start">
-                  {#if gaugeSnapshot.id === 'temp'}
+                  {#if _gauge.id === 'temp'}
                     <label class="label">
                       <span class="flex flex-wrap gap-1">
                         <svg
@@ -392,15 +390,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         <span>Balance Focus</span></span
                       >
                       <select
-                        bind:value={gaugeSnapshot.rangeOptions.auto
-                          .optimization}
+                        bind:value={_gauge.rangeOptions.auto.optimization}
                         onchange={() => {
-                          gaugeSnapshot.ranges = getAutoOptimizationRanges();
+                          _gauge.ranges = getAutoOptimizationRanges();
                         }}
                         class="select"
                       >
                         <option value="ranges">Range Increments</option>
-                        {#each gaugeSnapshot.targets as { id, label, icon }}
+                        {#each _gauge.targets as { id, label, icon }}
                           <option value={id}>
                             {icon}
                             {label}
@@ -420,24 +417,24 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         /></svg
                       >
 
-                      {#if gaugeSnapshot.rangeOptions.auto.optimization === 'ranges'}
+                      {#if _gauge.rangeOptions.auto.optimization === 'ranges'}
                         Range increments are as even as possible.
                       {:else}
                         Ranges contain a similar number of days, based on the
                         <span class="font-bold">
-                          {#if gaugeSnapshot.rangeOptions.auto.optimization === 'tmax'}
+                          {#if _gauge.rangeOptions.auto.optimization === 'tmax'}
                             high
-                          {:else if gaugeSnapshot.rangeOptions.auto.optimization === 'tavg'}
+                          {:else if _gauge.rangeOptions.auto.optimization === 'tavg'}
                             average
-                          {:else if gaugeSnapshot.rangeOptions.auto.optimization === 'tmin'}
+                          {:else if _gauge.rangeOptions.auto.optimization === 'tmin'}
                             low
                           {/if}
                         </span>
                         temperature of each day.
                       {/if}
-                      {#if gaugeSnapshot.rangeOptions.auto.optimization === 'ranges'}
+                      {#if _gauge.rangeOptions.auto.optimization === 'ranges'}
                         Increment:
-                        {#if gaugeSnapshot.rangeOptions.auto.roundIncrement && Math.floor(displayedIncrement) !== Math.ceil(displayedIncrement)}
+                        {#if _gauge.rangeOptions.auto.roundIncrement && Math.floor(displayedIncrement) !== Math.ceil(displayedIncrement)}
                           <span class="font-bold">
                             {Math.floor(displayedIncrement)}</span
                           >
@@ -445,14 +442,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
                           <span class="font-bold"
                             >{Math.ceil(displayedIncrement)}</span
                           >
-                          {gaugeSnapshot.unit.label[project.units]}
+                          {_gauge.unit.label[project.units]}
                         {:else}
                           <span class="font-bold">
-                            {gaugeSnapshot.rangeOptions.auto.roundIncrement
+                            {_gauge.rangeOptions.auto.roundIncrement
                               ? Math.round(displayedIncrement)
                               : displayNumber(displayedIncrement)}
                           </span>
-                          {gaugeSnapshot.unit.label[project.units]}
+                          {_gauge.unit.label[project.units]}
                         {/if}
 
                         <Tooltip>
@@ -481,19 +478,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     </p>
                   {/if}
 
-                  {#if Math.floor(gaugeSnapshot.rangeOptions.auto.increment) !== Math.ceil(gaugeSnapshot.rangeOptions.auto.increment)}
+                  {#if Math.floor(_gauge.rangeOptions.auto.increment) !== Math.ceil(_gauge.rangeOptions.auto.increment) && _gauge.rangeOptions.mode === 'auto'}
                     <div class="mt-2">
                       <ToggleSwitch
-                        bind:checked={gaugeSnapshot.rangeOptions.auto
-                          .roundIncrement}
+                        bind:checked={_gauge.rangeOptions.auto.roundIncrement}
                         label="Round Numbers"
+                        onchange={() => {
+                          _gauge.ranges = getRanges(_gauge.rangeOptions);
+                        }}
                       />
                     </div>
                   {/if}
                 </div>
               {/if}
 
-              {#if gaugeSnapshot.rangeOptions.mode === 'manual'}
+              {#if _gauge.rangeOptions.mode === 'manual'}
                 <div class="flex flex-wrap gap-2 justify-start">
                   <div
                     class="tex-left flex flex-col items-start justify-end w-fit"
@@ -507,10 +506,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       min="0"
                       class="input w-fit"
                       onfocus={() => {
-                        gaugeSnapshot.rangeOptions.mode = 'manual';
-                        gaugeSnapshot.rangeOptions.isCustomRanges = false;
+                        _gauge.rangeOptions.mode = 'manual';
+                        _gauge.rangeOptions.isCustomRanges = false;
                       }}
-                      bind:value={gaugeSnapshot.rangeOptions.manual.increment}
+                      bind:value={_gauge.rangeOptions.manual.increment}
                     />
                   </div>
 
@@ -548,8 +547,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         {#snippet tooltip()}
                           <p>
                             This should usually be the
-                            {gaugeSnapshot.rangeOptions.direction ===
-                            'high-to-low'
+                            {_gauge.rangeOptions.direction === 'high-to-low'
                               ? 'highest'
                               : 'lowest'}
                             possible value from your weather data.
@@ -561,9 +559,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       id="startFrom"
                       type="number"
                       class="input w-fit"
-                      onfocus={() =>
-                        (gaugeSnapshot.rangeOptions.mode = 'manual')}
-                      bind:value={gaugeSnapshot.rangeOptions.manual.start}
+                      onfocus={() => (_gauge.rangeOptions.mode = 'manual')}
+                      bind:value={_gauge.rangeOptions.manual.start}
                     />
                   </div>
                 </div>
@@ -585,17 +582,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
             class="flex flex-col gap-2 justify-start items-start rounded-container-token bg-surface-200-700-token p-4 text-left w-full"
           >
             <ToggleSwitch
-              bind:checked={gaugeSnapshot.rangeOptions.linked}
+              bind:checked={_gauge.rangeOptions.linked}
               label="Linked Ranges"
               details="When editing an individual range's From or To value, update the next or previous range's corresponding value."
             />
           </div>
           <div class="" transition:slide>
             <SelectRangeOperators
-              direction={gaugeSnapshot.rangeOptions.direction}
-              bind:includeFromValue={gaugeSnapshot.rangeOptions
-                .includeFromValue}
-              bind:includeToValue={gaugeSnapshot.rangeOptions.includeToValue}
+              direction={_gauge.rangeOptions.direction}
+              bind:includeFromValue={_gauge.rangeOptions.includeFromValue}
+              bind:includeToValue={_gauge.rangeOptions.includeToValue}
             />
           </div>
         {/if}
@@ -633,10 +629,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
       <div class="p-4 bg-surface-300-600-token rounded-container-token w-full">
         <div class="rounded-container-token overflow-hidden flex flex-col">
-          {#if gaugeSnapshot.ranges}
-            {#each gaugeSnapshot.ranges as { from, to }, index}
-              {@const { hex, brandId, yarnId, name } =
-                gaugeSnapshot.colors[index]}
+          {#if _gauge.ranges}
+            {#each _gauge.ranges as { from, to }, index}
+              {@const { hex, brandId, yarnId, name } = _gauge.colors[index]}
               <div
                 class="flex gap-2 flex-wrap justify-normal items-center p-2 w-full"
                 style="background:{hex};color:{getTextColor(hex)}"
@@ -652,7 +647,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     id="range-{index}-from"
                   >
                     <span class="text-xs"
-                      >From ({gaugeSnapshot.unit.label[project.units]})</span
+                      >From ({_gauge.unit.label[project.units]})</span
                     >
                     <input
                       type="number"
@@ -660,12 +655,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       value={from}
                       onchange={(e) => {
                         const value = +e.target.value;
-                        gaugeSnapshot.rangeOptions.isCustomRanges = true;
+                        _gauge.rangeOptions.isCustomRanges = true;
 
-                        gaugeSnapshot.ranges[index].from = value;
-                        if (gaugeSnapshot.rangeOptions.linked) {
-                          if (index !== 0)
-                            gaugeSnapshot.ranges[index - 1].to = value;
+                        _gauge.ranges[index].from = value;
+                        if (_gauge.rangeOptions.linked) {
+                          if (index !== 0) _gauge.ranges[index - 1].to = value;
                         }
                         incrementMode = null;
                         // _ranges = customRanges;
@@ -677,7 +671,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     id="range-{index}-to"
                   >
                     <span class="text-xs"
-                      >To ({gaugeSnapshot.unit.label[project.units]})</span
+                      >To ({_gauge.unit.label[project.units]})</span
                     >
                     <input
                       type="number"
@@ -686,14 +680,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       onchange={(e) => {
                         const value = +e.target.value;
 
-                        gaugeSnapshot.rangeOptions.isCustomRanges = true;
+                        _gauge.rangeOptions.isCustomRanges = true;
 
-                        gaugeSnapshot.ranges[index].to = value;
+                        _gauge.ranges[index].to = value;
                         if (
-                          gaugeSnapshot.rangeOptions.linked &&
-                          index !== gaugeSnapshot.ranges.length - 1
+                          _gauge.rangeOptions.linked &&
+                          index !== _gauge.ranges.length - 1
                         ) {
-                          gaugeSnapshot.ranges[index + 1].from = value;
+                          _gauge.ranges[index + 1].from = value;
                         }
 
                         incrementMode = null;
@@ -705,9 +699,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   class="flex gap-2 p-2 flex-wrap w-full lg:w-fit justify-around"
                 >
                   <DaysInRange
-                    range={gaugeSnapshot.ranges[index]}
-                    rangeOptions={gaugeSnapshot.rangeOptions}
-                    targets={gaugeSnapshot.targets}
+                    range={_gauge.ranges[index]}
+                    rangeOptions={_gauge.rangeOptions}
+                    targets={_gauge.targets}
                   />
                 </div>
               </div>

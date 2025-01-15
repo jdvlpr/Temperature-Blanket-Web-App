@@ -376,7 +376,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/if}
 
   <div class="flex flex-wrap gap-x-2 items-start justify-center">
-    {#if weather.table.show.tmax}
+    {#if weather.table.properties.tmax}
       <WeatherItem
         id="tmax"
         icon="&uarr;"
@@ -406,7 +406,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </WeatherItem>
     {/if}
 
-    {#if weather.table.show.tavg}
+    {#if weather.table.properties.tavg}
       <WeatherItem
         id="tavg"
         icon="~"
@@ -416,7 +416,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       />
     {/if}
 
-    {#if weather.table.show.tmin}
+    {#if weather.table.properties.tmin}
       <WeatherItem
         id="tmin"
         icon="&darr;"
@@ -446,7 +446,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </WeatherItem>
     {/if}
 
-    {#if weather.table.show.prcp}
+    {#if weather.table.properties.prcp}
       <WeatherItem
         id="prcp"
         icon="∴"
@@ -462,7 +462,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       />
     {/if}
 
-    {#if weather.table.show.snow}
+    {#if weather.table.properties.snow}
       <WeatherItem
         id="snow"
         icon="∗"
@@ -497,7 +497,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </WeatherItem>
     {/if}
 
-    {#if weather.table.show.dayt}
+    {#if weather.table.properties.dayt}
       <WeatherItem
         id="dayt"
         icon="☼"
@@ -515,11 +515,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <div bind:this={graph} class="scroll-m-[60px] w-full">
   {#if showWeatherChart}
-    {#key weather.data}
+    {#if weather.data.length}
       {#key project.units}
         <WeatherChart />
       {/key}
-    {/key}
+    {/if}
   {:else}
     <div class="my-36"><Spinner /></div>
   {/if}
@@ -528,58 +528,58 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <div class="flex flex-col justify-center w-full items-center gap-4">
   <div class="flex flex-wrap justify-center items-center">
     <ToggleWeatherData
-      view={weather.table.show.tmax}
+      view={weather.table.properties.tmax}
       onclick={() => {
-        weather.table.show.tmax = !weather.table.show.tmax;
-        weather.table.show = weather.table.show;
+        weather.table.properties.tmax = !weather.table.properties.tmax;
+        weather.table.properties = weather.table.properties;
       }}
     >
       <span class="border-b-2 border-tmax">High Temps</span>
     </ToggleWeatherData>
 
     <ToggleWeatherData
-      view={weather.table.show.tavg}
+      view={weather.table.properties.tavg}
       onclick={() => {
-        weather.table.show.tavg = !weather.table.show.tavg;
-        weather.table.show = weather.table.show;
+        weather.table.properties.tavg = !weather.table.properties.tavg;
+        weather.table.properties = weather.table.properties;
       }}
     >
       <span class="border-b-2 border-tavg">Average Temps</span>
     </ToggleWeatherData>
 
     <ToggleWeatherData
-      view={weather.table.show.tmin}
+      view={weather.table.properties.tmin}
       onclick={() => {
-        weather.table.show.tmin = !weather.table.show.tmin;
-        weather.table.show = weather.table.show;
+        weather.table.properties.tmin = !weather.table.properties.tmin;
+        weather.table.properties = weather.table.properties;
       }}
     >
       <span class="border-b-2 border-tmin">Low Temps</span>
     </ToggleWeatherData>
 
     <ToggleWeatherData
-      view={weather.table.show.prcp}
+      view={weather.table.properties.prcp}
       onclick={() => {
-        weather.table.show.prcp = !weather.table.show.prcp;
-        weather.table.show = weather.table.show;
+        weather.table.properties.prcp = !weather.table.properties.prcp;
+        weather.table.properties = weather.table.properties;
       }}
     >
       <span class="border-b-2 border-prcp">Rain</span>
     </ToggleWeatherData>
     <ToggleWeatherData
-      view={weather.table.show.snow}
+      view={weather.table.properties.snow}
       onclick={() => {
-        weather.table.show.snow = !weather.table.show.snow;
-        weather.table.show = weather.table.show;
+        weather.table.properties.snow = !weather.table.properties.snow;
+        weather.table.properties = weather.table.properties;
       }}
     >
       <span class="border-b-2 border-snow">Snow</span>
     </ToggleWeatherData>
     <ToggleWeatherData
-      view={weather.table.show.dayt}
+      view={weather.table.properties.dayt}
       onclick={() => {
-        weather.table.show.dayt = !weather.table.show.dayt;
-        weather.table.show = weather.table.show;
+        weather.table.properties.dayt = !weather.table.properties.dayt;
+        weather.table.properties = weather.table.properties;
       }}
     >
       <span class="border-b-2 border-dayt">Daytime</span>
@@ -659,7 +659,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </div>
 
 <div class="mt-2">
-  {#if weather.data}
-    <WeatherNavigator data={weather.data || []} />
+  {#if weather.data.length}
+    {#key project.units && weather.isUserEdited}
+      <WeatherNavigator />
+    {/key}
   {/if}
 </div>

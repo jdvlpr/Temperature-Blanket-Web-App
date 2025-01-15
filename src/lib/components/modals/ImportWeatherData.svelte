@@ -50,7 +50,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       errorMessages = [];
       const text = e.target.result;
       const data = CSVtoArray({ str: text });
-      if (!weather.rawData) return;
+      if (!weather.rawData.length) return;
       const weatherToMatch = weather.rawData.map(
         (n) => `${dateToISO8601String(n.date)}-${n.location}`,
       );
@@ -175,7 +175,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
         }
         weather.rawData[index] = day;
       }
-      weather.rawData = weather.rawData;
       imported = true;
       processing = false;
     };

@@ -132,7 +132,7 @@ export const createWeeksProperty = ({
   weatherData: WeatherDay[];
   dowOffset: number;
 }) => {
-  if (!weatherData) return weatherData;
+  if (!weatherData.length) return weatherData;
   const data = weatherData.map((day, i) => {
     const week = getWeek({ date: day.date, dowOffset });
     const year = day.date.getFullYear();

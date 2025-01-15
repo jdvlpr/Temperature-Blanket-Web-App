@@ -109,11 +109,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     displayNumber,
     setTargets,
   } from '$lib/utils';
-  import { DataHandler, Th } from '@vincjo/datatables';
+  import { TableHandler, Th } from '@vincjo/datatables';
   import { slide } from 'svelte/transition';
 
-  const handler = new DataHandler(tableData, { rowsPerPage: 10 });
-  const rows = handler.getRows();
+  const table = new TableHandler(tableData, { rowsPerPage: 10 });
 
   let isExpanded = false;
   let daytimeLabel, nightLabel;
@@ -174,10 +173,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   $: if (gauges.allCreated) {
     $settings.daytimeTarget = setTargets($settings.daytimeTarget);
     $settings.nightTarget = setTargets($settings.nightTarget);
-  }
-
-  $: if (tableData) {
-    handler.setRows(tableData);
   }
 
   $: if ($settings.daytimePosition) {
@@ -381,54 +376,37 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </div>
 {#if isExpanded}
   <div in:slide out:slide class="w-full max-w-[90vw] mx-auto relative">
-    <DataTable {handler} search={false}>
+    <DataTable {table} search={false}>
       <table class="border-separate border-spacing-0 w-full">
         <thead>
           <tr>
-            <Th {handler} orderBy={'row'}>Row</Th>
-            <Th {handler} orderBy={'date'}
+            <Th>Row</Th>
+            <Th
               >{weather.groupingHeading}
               <span class="text-xs">(YYYY-MM-DD)</span></Th
             >
             {#if $settings.daytimePosition === 'left'}
-              <Th {handler} orderBy={'left'}
-                >Daytime stitches <br />({daytimeLabel})</Th
-              >
-              <Th {handler} orderBy={'right'}
-                >Night stitches<br />({nightLabel})</Th
-              >
+              <Th>Daytime stitches <br />({daytimeLabel})</Th>
+              <Th>Night stitches<br />({nightLabel})</Th>
             {:else if $settings.daytimePosition === 'right'}
-              <Th {handler} orderBy={'left'}
-                >Night stitches<br />({nightLabel})</Th
-              >
-              <Th {handler} orderBy={'right'}
-                >Daytime stitches<br />({daytimeLabel})</Th
-              >
+              <Th>Night stitches<br />({nightLabel})</Th>
+              <Th>Daytime stitches<br />({daytimeLabel})</Th>
             {:else if $settings.daytimePosition === 'center'}
-              <Th {handler} orderBy={'left'}>Night stitches<br />(left side)</Th
-              >
-              <Th {handler} orderBy={'center'}
-                >Daytime stitches<br />(center)</Th
-              >
-              <Th {handler} orderBy={'right'}
-                >Night stitches<br />(right side)</Th
-              >
+              <Th>Night stitches<br />(left side)</Th>
+              <Th>Daytime stitches<br />(center)</Th>
+              <Th>Night stitches<br />(right side)</Th>
             {:else if $settings.daytimePosition === 'sides'}
-              <Th {handler} orderBy={'left'}
-                >Daytime stitches<br />(left side)</Th
-              >
-              <Th {handler} orderBy={'center'}>Night stitches<br />(center)</Th>
-              <Th {handler} orderBy={'right'}
-                >Daytime stitches<br />(right side)</Th
-              >
+              <Th>Daytime stitches<br />(left side)</Th>
+              <Th>Night stitches<br />(center)</Th>
+              <Th>Daytime stitches<br />(right side)</Th>
             {/if}
           </tr>
         </thead>
         <tbody
           class="[&>tr:nth-child(odd)]:bg-surface-100 [&>tr:nth-child(odd)]:dark:bg-surface-800"
         >
-          {#if $rows}
-            {#each $rows as row}
+          {#if table.rows}
+            {#each table.rows as row}
               <tr>
                 <td>{row.row}</td>
                 <td>{row.date}</td>

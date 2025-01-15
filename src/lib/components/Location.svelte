@@ -168,9 +168,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }); // End of onMount
 
   function validate() {
-    if (weather.isUserEdited) return;
+    if (weather.isUserEdited > 0) return;
 
-    weather.rawData = null;
+    weather.rawData = [];
 
     const value = inputLocation.value;
 
@@ -214,7 +214,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 
   function setDates({ from = null, to = null, unsetWeather = true }) {
-    if (unsetWeather) weather.rawData = null;
+    if (unsetWeather) weather.rawData = [];
     let setDate = new Date(year, month - 1, day, 1);
     const _padFromMonth = String(setDate.getMonth() + 1).padStart(2, '0');
     const _padFromDate = String(setDate.getDate()).padStart(2, '0');
@@ -305,9 +305,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
               class="btn bg-secondary-hover-token"
               onclick={() => {
                 locations.remove(location.uuid);
-                weather.rawData = null;
+                weather.rawData = [];
               }}
-              disabled={!!weather.isUserEdited || project.status.loading}
+              disabled={weather.isUserEdited > 0 || project.status.loading}
               title="Remove Location"
             >
               {@html ICONS.trash}
@@ -362,7 +362,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           bind:this={inputLocation}
           oninput={validate}
           onkeyup={validateKeyup}
-          disabled={project.status.loading || !!weather.isUserEdited}
+          disabled={project.status.loading || weather.isUserEdited > 0}
         />
         {#if searching}
           <div class="flex items-center justify-center">
@@ -391,7 +391,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             disabled={!!weather.isUserEdited}
             onclick={() => {
               if (weather.isUserEdited) return;
-              weather.rawData = null;
+              weather.rawData = [];
               inputLocation.value = '';
               inputLocation.focus();
               location.label = '';
@@ -484,7 +484,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               max={getYesterday()}
               bind:value={location.from}
               bind:this={inputStart}
-              onchange={() => (weather.rawData = null)}
+              onchange={() => (weather.rawData = [])}
               disabled={project.status.loading || !!weather.isUserEdited}
             />
           </label>
@@ -500,7 +500,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               max={getYesterday()}
               bind:value={location.to}
               bind:this={inputEnd}
-              onchange={() => (weather.rawData = null)}
+              onchange={() => (weather.rawData = [])}
               disabled={project.status.loading || !!weather.isUserEdited}
             />
           </label>

@@ -38,12 +38,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     );
 
     if (weather.params.prcp.every((n) => n === null))
-      weather.table.show.prcp = false;
-    else weather.table.show.prcp = true;
+      weather.table.properties.prcp = false;
+    else weather.table.properties.prcp = true;
     if (weather.params.snow.every((n) => n === null))
-      weather.table.show.snow = false;
-    else weather.table.show.snow = true;
-    weather.table.show = weather.table.show;
+      weather.table.properties.snow = false;
+    else weather.table.properties.snow = true;
+    weather.table.properties = weather.table.properties;
   });
 </script>
 

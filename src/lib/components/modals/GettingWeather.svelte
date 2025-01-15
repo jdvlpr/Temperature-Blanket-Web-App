@@ -40,12 +40,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   async function getWeatherData() {
     controller.value = new AbortController();
-    weather.rawData = null;
+    weather.rawData = [];
     weather.currentIndex = 0;
     await fetchData()
       .then(() => {
         controller.value = null;
-        weather.isUserEdited = false;
+        weather.isUserEdited = 0;
         weather.isFromLocalStorage = false;
         // Add the default temperature gauge
         gauges.addById('temp');
@@ -54,8 +54,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
       })
       .catch((e) => {
         controller.value = null;
-        weather.rawData = null;
-        weather.isUserEdited = false;
+        weather.rawData = [];
+        weather.isUserEdited = 0;
         weather.isFromLocalStorage = false;
         error = e?.message;
       });

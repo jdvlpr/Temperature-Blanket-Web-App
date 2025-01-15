@@ -17,7 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import DataTable from '$lib/components/datatable/DataTable.svelte';
   import { allGaugesAttributes, project, weather } from '$lib/state';
   import { convertTime, dateToISO8601String } from '$lib/utils';
-  import { DataHandler, Th } from '@vincjo/datatables';
+  import { Datatable, TableHandler, Th } from '@vincjo/datatables';
   import ModalShell from './ModalShell.svelte';
 
   let { weatherData, parent } = $props();
@@ -54,15 +54,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
     }),
   ]);
 
-  const handler = $derived(new DataHandler(tableData, { rowsPerPage: 10 }));
-  const rows = $derived(handler.getRows());
+  const table = new TableHandler(tableData, { rowsPerPage: 10 });
 
   let dateHeader = $derived(weather.grouping === 'week' ? 'Week of' : 'Date');
 
   //TODO: Is this necessary?
   $effect(() => {
     if (tableData) {
-      handler.setRows(tableData);
+      table.setRows(tableData);
     }
   });
 </script>
@@ -70,11 +69,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <ModalShell {parent}>
   <div class="w-full inline-flex text-center">
     <div class="w-[85vw] max-w-screen-sm">
-      <DataTable {handler} search={false} hidePageLabel={true}>
+      <DataTable {table} search={false} hidePageLabel={true}>
         <table class="border-separate border-spacing-0 w-fit mx-auto">
           <thead>
             <tr>
-              <Th {handler} orderBy={'date'}>
+              <Th {table} orderBy={'date'}>
                 <span class="flex flex-col items-center"
                   >{dateHeader}
                   <span class="text-xs">(YYYY-MM-DD)</span></span
@@ -84,7 +83,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 {@const header = pdfHeader[project.units]}
                 {@const headerLabel = header.slice(0, header.indexOf('('))}
                 {@const headerUnits = header.slice(header.indexOf('('))}
-                <Th {handler} orderBy={id}>
+                <Th {table} orderBy={id}>
                   <span class="flex flex-col items-center"
                     >{headerLabel}
                     <span class="text-xs">{headerUnits}</span></span
@@ -96,8 +95,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <tbody
             class="[&>tr:nth-child(odd)]:bg-surface-100 [&>tr:nth-child(odd)]:dark:bg-surface-700"
           >
-            {#if $rows}
-              {#each $rows as row}
+            {#if table.rows}
+              {#each table.rows as row}
                 <tr>
                   <td>{row.date}</td>
                   {#each weatherTargets as { id }}

@@ -13,12 +13,14 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script context="module">
+<script module>
   import { writable } from 'svelte/store';
   export let weatherChart = writable(null);
 </script>
 
 <script>
+  import { run } from 'svelte/legacy';
+
   import { project, weather } from '$lib/state';
   import {
     CategoryScale,
@@ -231,15 +233,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   const labels = weather.data?.map((day) => day.date?.toLocaleDateString());
 
-  let ctx;
-
-  $: if (weather.table.show) setView();
+  let ctx = $state();
 
   function setView() {
     if (!dataSets) return;
     dataSets?.forEach((item, index) => {
       const meta = $weatherChart.getDatasetMeta(index);
-      meta.hidden = !weather.table.show[item.id];
+      meta.hidden = !weather.table.properties[item.id];
     });
     $weatherChart.update();
   }
@@ -251,6 +251,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
       weather.currentIndex = weather.data?.length - 1;
     else weather.currentIndex = value;
   }
+  run(() => {
+    if (weather.table.properties) setView();
+  });
 </script>
 
 <div class="bg-surface-50-900-token mb-4 h-[300px]">

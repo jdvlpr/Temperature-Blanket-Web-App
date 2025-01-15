@@ -21,38 +21,35 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { downloadWeatherCSV, getWeatherTargets } from '$lib/utils';
   import { RadioGroup, RadioItem } from '@skeletonlabs/skeleton';
 
-  export let data = weather.data || [];
-  export let context = 'body';
-
-  $: weatherTargets = getWeatherTargets({
-    weatherParameters: weather.table.show,
-  });
+  let weatherTargets = $derived(
+    getWeatherTargets({
+      weatherParameters: weather.table.properties,
+    }),
+  );
 </script>
 
 <div class="relative">
-  {#if context === 'body'}
-    <RadioGroup class="flex-wrap gap-y-2" active="bg-secondary-active-token">
-      <RadioItem
-        title="Set Daily Weather Display to Table"
-        bind:group={weather.table.viewAs}
-        name="weatherDisplay"
-        value={'table'}
-      >
-        Table</RadioItem
-      >
-      <RadioItem
-        title="Set Daily Weather Display to Details"
-        bind:group={weather.table.viewAs}
-        name="weatherDisplay"
-        value={'range'}>Details</RadioItem
-      >
-    </RadioGroup>
-  {/if}
+  <RadioGroup class="flex-wrap gap-y-2" active="bg-secondary-active-token">
+    <RadioItem
+      title="Set Daily Weather Display to Table"
+      bind:group={weather.table.viewAs}
+      name="weatherDisplay"
+      value={'table'}
+    >
+      Table</RadioItem
+    >
+    <RadioItem
+      title="Set Daily Weather Display to Details"
+      bind:group={weather.table.viewAs}
+      name="weatherDisplay"
+      value={'range'}>Details</RadioItem
+    >
+  </RadioGroup>
 
-  {#if weather.table.viewAs === 'range' || context !== 'body'}
-    <WeatherDetails {data} {weatherTargets} />
+  {#if weather.table.viewAs === 'range'}
+    <WeatherDetails data={weather.data} {weatherTargets} />
   {:else if weather.table.viewAs === 'table'}
-    <WeatherTableView {data} {weatherTargets} />
+    <WeatherTableView {weatherTargets} />
   {/if}
 
   <div
@@ -60,7 +57,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   >
     <button
       class="btn bg-secondary-hover-token whitespace-pre-wrap"
-      on:click={downloadWeatherCSV}
+      onclick={downloadWeatherCSV}
       title="Download CSV File"
     >
       <span>
@@ -81,10 +78,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </span>
     </button>
 
-    {#if weather.grouping !== 'week' && context === 'body'}
+    {#if weather.grouping !== 'week'}
       <button
         class="btn bg-secondary-hover-token whitespace-pre-wrap"
-        on:click={() => {
+        onclick={() => {
           modal.state.trigger({
             type: 'component',
             component: {

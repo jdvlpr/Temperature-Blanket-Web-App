@@ -47,7 +47,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {#if !!weather.isUserEdited}
       Reload Weather Data
     {:else}
-      Search {#if weather.data}Again{/if}
+      Search {#if weather.data.length}Again{/if}
     {/if}
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -81,7 +81,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {#if !!weather.isUserEdited}
       Reload Weather Data
     {:else}
-      Search {#if weather.data}Again{/if}
+      Search {#if weather.data.length}Again{/if}
     {/if}
     <svg
       xmlns="http://www.w3.org/2000/svg"

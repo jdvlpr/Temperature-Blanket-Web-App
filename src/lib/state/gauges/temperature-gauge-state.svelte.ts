@@ -169,8 +169,6 @@ export class TemperatureGauge {
     this.ranges = this.autoRanges;
     this.rangeOptions = this.autoRangeOptions;
     this.numberOfColors = this.colors.length;
-    console.log(this.ranges);
-
     this.calculating = false;
   }
 }

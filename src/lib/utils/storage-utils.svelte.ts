@@ -91,8 +91,8 @@ export const checkForProjectInLocalStorage = async () => {
 
   // Set isCustomWeather
   const _isCustomWeather = matchedProject.isCustomWeatherData;
-  if (_isCustomWeather === true) weather.isUserEdited = true;
-  else if (_isCustomWeather === false) weather.isUserEdited = false;
+  if (_isCustomWeather === true) weather.isUserEdited++;
+  else if (_isCustomWeather === false) weather.isUserEdited = 0;
 
   // Set weather data and convert dates to Date objects
   const weatherLocalStorage = matchedProject.weatherData;
@@ -211,7 +211,7 @@ const createProjectLocalStorageProjectObject = () => {
   const href = project.url.href;
 
   const weatherData =
-    weather.rawData?.map((day) => {
+    weather.rawData.map((day) => {
       return {
         ...day,
         date: dateToISO8601String(day.date),

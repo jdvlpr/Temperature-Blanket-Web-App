@@ -43,7 +43,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
         component: {
           ref: GaugeSettings,
           props: {
-            gauge: gauges.activeGauge,
             index,
             focusOn,
             onSave: onSaveRangeOptinos,

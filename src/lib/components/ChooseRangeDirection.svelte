@@ -16,7 +16,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script>
   import { RadioGroup, RadioItem } from '@skeletonlabs/skeleton';
 
-  export let direction;
+  let { direction = $bindable() } = $props();
 </script>
 
 <p class="flex justify-start items-start gap-1">

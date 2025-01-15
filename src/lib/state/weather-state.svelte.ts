@@ -21,13 +21,13 @@ class WeatherClass {
   // ***************
   //    Weather Data
   // ***************
-  rawData: WeatherDay[] | null = $state(null);
+  rawData: WeatherDay[] = $state([]);
 
   // ***************
   //    Derived Weather Data
   // ***************
   goupedByWeek: WeatherDay[] | null = $derived.by(() => {
-    if (!this.rawData) return null;
+    if (!this.rawData.length) return [];
 
     // Check if every location is from Meteostat as the data source
     // Used because Meteostat handle's snow data differently than Open-Meteo
@@ -144,7 +144,7 @@ class WeatherClass {
   });
 
   // The currently used weather data
-  data: WeatherDay[] | null = $derived.by(() => {
+  data: WeatherDay[] = $derived.by(() => {
     switch (this.grouping) {
       case 'day':
         this.currentIndex = 0;
@@ -153,7 +153,7 @@ class WeatherClass {
       case 'week':
         this.currentIndex = 0;
         if (!this.goupedByWeek) {
-          return null;
+          return [];
         }
 
         return this.goupedByWeek;
@@ -215,17 +215,19 @@ class WeatherClass {
   // ***************
   currentIndex = $state(0);
 
-  isUserEdited: null | boolean = $state(null);
+  // user a number to track when the user makes an edit
+  // not using boolean because of using this as a key to trigger updates
+  isUserEdited: number = $state(0);
 
   isFromLocalStorage: boolean = $state(false);
 
   // ***************
   // Table
   // ***************
-  table: { viewAs: 'table' | 'range'; show: { [key: string]: boolean } } =
+  table: { viewAs: 'table' | 'range'; properties: { [key: string]: boolean } } =
     $state({
       viewAs: 'table',
-      show: {
+      properties: {
         tmin: true,
         tavg: true,
         tmax: true,

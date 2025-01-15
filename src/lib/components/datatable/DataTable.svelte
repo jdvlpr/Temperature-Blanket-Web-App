@@ -13,56 +13,52 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script>
+<script lang="ts">
   import RowsPerPage from '$lib/components/datatable/RowsPerPage.svelte';
   import Search from '$lib/components/datatable/Search.svelte';
   import { weather } from '$lib/state';
   import { dateToISO8601String } from '$lib/utils';
+  import type { TableHandler } from '@vincjo/datatables';
+  import type { Snippet } from 'svelte';
 
-  /**
-   * @typedef {Object} Props
-   * @property {any} handler
-   * @property {boolean} [search]
-   * @property {boolean} [hidePageLabel]
-   * @property {import('svelte').Snippet} [children]
-   */
+  interface Props {
+    table: TableHandler;
+    search?: boolean;
+    hidePageLabel?: boolean;
+    children: Snippet;
+  }
 
-  /** @type {Props} */
-  let { handler, search = true, hidePageLabel = false, children } = $props();
+  let {
+    table,
+    search = true,
+    hidePageLabel = false,
+    children,
+  }: Props = $props();
 
   let element = $state();
 
-  const triggerChange = handler.getTriggerChange();
+  table.on('change', () => {
+    scrollTop();
+  });
 
   const scrollTop = () => {
     if (typeof element !== 'undefined') element.scrollTop = 0;
   };
 
-  const rowCount = handler.getRowCount();
-  const pageNumber = handler.getPageNumber();
-  const pageCount = handler.getPageCount();
-  const rowsPerPage = handler.getRowsPerPage();
-  const pages = handler.getPages({ ellipsis: false });
-  const sorted = handler.getSorted();
-
-  $effect(() => {
-    $triggerChange, scrollTop();
-  });
-
-  function getFrom({ page }) {
-    let from = '';
-    if (
-      $sorted.identifier === 'date' ||
-      $sorted.identifier === 'row' ||
-      $sorted.identifier === null
-    ) {
-      if ($sorted.direction === 'asc' || $sorted.direction === null)
-        from = `(${dateToISO8601String(weather.data[page * $rowsPerPage - $rowsPerPage].date)})`;
-      else
-        from = `(${dateToISO8601String(weather.data[weather.data?.length - 1 - (page * $rowsPerPage - $rowsPerPage)].date)})`;
-    }
-    return from;
-  }
+  // function getFrom({ page }) {
+  //   let from = '';
+  //   if (
+  //     $sorted.identifier === 'date' ||
+  //     $sorted.identifier === 'row' ||
+  //     $sorted.identifier === null
+  //   ) {
+  //     if ($sorted.direction === 'asc' || $sorted.direction === null)
+  //       from = `(${dateToISO8601String(weather.data[page * $rowsPerPage - $rowsPerPage].date)})`;
+  //     else
+  //       from = `(${dateToISO8601String(weather.data[weather.data?.length - 1 - (page * $rowsPerPage - $rowsPerPage)].date)})`;
+  //   }
+  //   return from;
+  // }
 </script>
 
 <section class="relative w-full">
@@ -73,25 +69,26 @@ If not, see <https://www.gnu.org/licenses/>. -->
     class="flex flex-wrap gap-x-8 gap-y-4 justify-center sm:justify-between items-start mt-2 mb-4 w-full mx-auto"
   >
     <p class="text-sm">
-      {#if $rowCount.total > 0}
-        Showing {$rowCount.start} to {$rowCount.end} of {$rowCount.total}
+      {#if table.rowCount.total > 0}
+        Showing {table.rowCount.start} to {table.rowCount.end} of {table
+          .rowCount.total}
         {weather.grouping}s
       {:else}
         No {weather.grouping}s found
       {/if}
     </p>
     <div class="flex flex-wrap gap-4 items-end justify-center">
-      {#if $pageCount > 1 || $rowsPerPage !== 10}
-        <RowsPerPage {handler} />
+      {#if table.pageCount > 1 || table.rowsPerPage !== 10}
+        <RowsPerPage {table} />
       {/if}
-      {#if $pageCount > 1}
+      {#if table.pageCount > 1}
         <section class="flex flex-wrap items-end gap-2">
           <button
             aria-label="Previous Page"
             class="btn-icon bg-secondary-hover-token"
             title="Previous Page"
-            disabled={$pageNumber === 1}
-            onclick={() => handler.setPage('previous')}
+            disabled={table.currentPage === 1}
+            onclick={() => table.setPage('previous')}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -112,19 +109,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <select
               class="select"
               id="datatable-page"
-              bind:value={$pageNumber}
+              bind:value={table.currentPage}
               onchange={() => {
-                handler.setPage($pageNumber);
+                table.setPage(table.currentPage);
               }}
             >
-              {#each $pages as page}
-                {@const from = getFrom({
+              {#each table.pages as page}
+                <!-- {@const from = getFrom({
                   page,
-                })}
+                })} -->
                 <option value={page}
                   >{page}
                   {#if !hidePageLabel}
-                    {from}
+                    <!-- {from} -->from
                   {/if}
                 </option>
               {/each}
@@ -135,8 +132,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
             aria-label="Next Page"
             class="btn-icon bg-secondary-hover-token"
             title="Next Page"
-            disabled={$pageNumber === $pageCount}
-            onclick={() => handler.setPage('next')}
+            disabled={table.currentPage === table.pages.length}
+            onclick={() => table.setPage('next')}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -156,7 +153,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {/if}
     </div>
     {#if search}
-      <Search {handler} />
+      <Search {table} />
     {/if}
   </div>
 </section>
