@@ -31,7 +31,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Share from '$lib/components/Share.svelte';
   import Spinner from '$lib/components/Spinner.svelte';
   import UnitChanger from '$lib/components/UnitChanger.svelte';
-  import { modal, project, showNavigationSideBar, units } from '$lib/state';
+  import { modal, project, showNavigationSideBar } from '$lib/state';
   import {
     delay,
     getWeatherCodeDetails,
