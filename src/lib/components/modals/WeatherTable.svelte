@@ -15,7 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import DataTable from '$lib/components/datatable/DataTable.svelte';
-  import { allGaugesAttributes, units, weather } from '$lib/state';
+  import { allGaugesAttributes, project, weather } from '$lib/state';
   import { convertTime, dateToISO8601String } from '$lib/utils';
   import { DataHandler, Th } from '@vincjo/datatables';
   import ModalShell from './ModalShell.svelte';
@@ -31,15 +31,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
         if (target.id === 'dayt') {
           weather = {
             ...weather,
-            [target.id]: convertTime(n[target.id][units.value], {
+            [target.id]: convertTime(n[target.id][project.units], {
               displayUnits: false,
               padStart: true,
             }),
           };
         } else {
           let value =
-            n[target.id][units.value] !== null
-              ? n[target.id][units.value]
+            n[target.id][project.units] !== null
+              ? n[target.id][project.units]
               : '-';
           weather = {
             ...weather,
@@ -81,7 +81,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 >
               </Th>
               {#each weatherTargets as { id, pdfHeader }}
-                {@const header = pdfHeader[units.value]}
+                {@const header = pdfHeader[project.units]}
                 {@const headerLabel = header.slice(0, header.indexOf('('))}
                 {@const headerUnits = header.slice(header.indexOf('('))}
                 <Th {handler} orderBy={id}>

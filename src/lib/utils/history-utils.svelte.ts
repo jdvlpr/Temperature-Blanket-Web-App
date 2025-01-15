@@ -27,9 +27,8 @@ import { ICONS } from '$lib/constants';
 import {
   allGaugesAttributes,
   gauges,
+  locations,
   project,
-  projectStatus,
-  units,
   weather,
 } from '$lib/state';
 import { rowsPreview } from '$lib/state/previews/rows-preview-state.svelte';
@@ -75,11 +74,11 @@ export const loadFromHistory = ({ action }: { action: 'Undo' | 'Redo' }) => {
   if (exists(newParams.u)) {
     if (!exists(oldParams.u) || oldParams.u.value !== newParams.u.value) {
       if (newParams.u.value === 'i') {
-        units.value = 'imperial';
+        project.units = 'imperial';
         message = 'Units set to Imperial';
       }
       if (newParams.u.value === 'm') {
-        units.value = 'metric';
+        project.units = 'metric';
         message = 'Units set to Metric';
       }
     }
@@ -211,12 +210,7 @@ export const loadFromHistory = ({ action }: { action: 'Undo' | 'Redo' }) => {
     project.history.updateMessage = `<span class="flex flex-wrap items-start gap-2"><span class="">${action === 'Undo' ? ICONS.arrowUturnLeft : ICONS.arrowUturnRight}</span> <span>${action}: ${message}</span></span>`;
 };
 export const updateHistory = () => {
-  if (
-    !weather.data ||
-    !project.current.hash ||
-    !projectStatus.state.isValid ||
-    !browser
-  )
+  if (!weather.data || !project.current.hash || !locations.allValid || !browser)
     return;
 
   let live = project.current.hash;
@@ -245,6 +239,6 @@ export const updateHistory = () => {
 };
 
 export const updateURL = () => {
-  const newURL = new URL(projectStatus.state.liveURL);
+  const newURL = new URL(project.href);
   window.history.pushState({ path: newURL.href }, '', newURL.href);
 };

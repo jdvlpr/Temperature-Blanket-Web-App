@@ -14,7 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import { allGaugesAttributes, gauges, units, weather } from '$lib/state';
+  import { allGaugesAttributes, gauges, project, weather } from '$lib/state';
   import { downloadPDF } from '$lib/utils';
   import { onMount } from 'svelte';
   import Gauge from './Gauge.svelte';
@@ -26,7 +26,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   function setupAvailableGauges() {
     allGaugesAttributes.forEach((gauge) => {
       gauge.targets.forEach((target) => {
-        if (weather.data?.some((day) => day[target.id][units.value] !== null)) {
+        if (
+          weather.data?.some((day) => day[target.id][project.units] !== null)
+        ) {
           // For each of the gauge's weather parameter targets, check to see if there is any data, and if so setup the default gauge
           gauges.addToAvailable({
             id: gauge.id,

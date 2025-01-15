@@ -14,7 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import { projectStatus, units, weather } from '$lib/state';
+  import { project, weather } from '$lib/state';
   import {
     getColorInfo,
     getTargetParentGaugeId,
@@ -124,7 +124,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let sections = [];
 
-  $: if (projectStatus.state.liveURL) {
+  $: if (project.href) {
     // Setup constants
     let x = width / 2 - STITCH_SIZE * 2;
     let y = height / 2 - STITCH_SIZE * 4;
@@ -135,7 +135,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     sections = [];
     for (let stitch = 1; stitch <= totalStitches; stitch += 1) {
       if (dayIndex < weather.data?.length) {
-        value = weather.data[dayIndex][$settings.selectedTarget][units.value];
+        value = weather.data[dayIndex][$settings.selectedTarget][project.units];
         gaugeId = getTargetParentGaugeId($settings.selectedTarget);
         color = getColorInfo(gaugeId, value).hex;
         isExtraStitch = false;

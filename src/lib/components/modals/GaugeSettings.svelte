@@ -22,7 +22,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
   import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
   import StickyPart from '$lib/components/modals/StickyPart.svelte';
-  import { gauges, units, weather } from '$lib/state';
+  import { gauges, project, weather } from '$lib/state';
   import {
     displayNumber,
     getEvenlyDistributedRangeValuesWithEqualDayCount,
@@ -445,14 +445,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
                           <span class="font-bold"
                             >{Math.ceil(displayedIncrement)}</span
                           >
-                          {gaugeSnapshot.unit.label[units.value]}
+                          {gaugeSnapshot.unit.label[project.units]}
                         {:else}
                           <span class="font-bold">
                             {gaugeSnapshot.rangeOptions.auto.roundIncrement
                               ? Math.round(displayedIncrement)
                               : displayNumber(displayedIncrement)}
                           </span>
-                          {gaugeSnapshot.unit.label[units.value]}
+                          {gaugeSnapshot.unit.label[project.units]}
                         {/if}
 
                         <Tooltip>
@@ -499,7 +499,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     class="tex-left flex flex-col items-start justify-end w-fit"
                   >
                     <label for="manual-increment" class="label"
-                      >Increment ({gauge.unit.label[units.value]})</label
+                      >Increment ({gauge.unit.label[project.units]})</label
                     >
                     <input
                       id="manual-increment"
@@ -529,7 +529,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                           d="M2 4.5A2.5 2.5 0 014.5 2h11a2.5 2.5 0 010 5h-11A2.5 2.5 0 012 4.5zM2.75 9.083a.75.75 0 000 1.5h14.5a.75.75 0 000-1.5H2.75zM2.75 12.663a.75.75 0 000 1.5h14.5a.75.75 0 000-1.5H2.75zM2.75 16.25a.75.75 0 000 1.5h14.5a.75.75 0 100-1.5H2.75z"
                         />
                       </svg>
-                      Start From ({gauge.unit.label[units.value]})
+                      Start From ({gauge.unit.label[project.units]})
                       <Tooltip>
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
@@ -652,7 +652,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     id="range-{index}-from"
                   >
                     <span class="text-xs"
-                      >From ({gaugeSnapshot.unit.label[units.value]})</span
+                      >From ({gaugeSnapshot.unit.label[project.units]})</span
                     >
                     <input
                       type="number"
@@ -677,7 +677,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     id="range-{index}-to"
                   >
                     <span class="text-xs"
-                      >To ({gaugeSnapshot.unit.label[units.value]})</span
+                      >To ({gaugeSnapshot.unit.label[project.units]})</span
                     >
                     <input
                       type="number"

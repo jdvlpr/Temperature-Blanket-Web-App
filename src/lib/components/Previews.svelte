@@ -24,8 +24,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     modal,
     previews,
     previewWeatherTargets,
-    projectGalleryLink,
-    projectGalleryTitle,
+    project,
     weather,
   } from '$lib/state';
   import { rowsPreview } from '$lib/state/previews/rows-preview-state.svelte';
@@ -133,15 +132,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
         Send to Project Gallery
       </button>
 
-      {#if projectGalleryLink.value && projectGalleryTitle.value && projectGalleryTitle.value === locations.projectTitle}
+      {#if project.gallery.href && project.gallery.title && project.gallery.title === locations.projectTitle}
         <div class="flex flex-col gap-1 justify-center w-full">
           <p>View this project's gallery page:</p>
           <p>
             <a
-              href={projectGalleryLink.value}
+              href={project.gallery.href}
               target="_blank"
               class="underline btn bg-secondary-hover-token w-fit whitespace-pre-wrap"
-              rel="noreferrer">{projectGalleryTitle.value}</a
+              rel="noreferrer">{project.gallery.title}</a
             >
           </p>
         </div>

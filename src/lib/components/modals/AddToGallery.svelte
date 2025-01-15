@@ -15,12 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import Spinner from '$lib/components/Spinner.svelte';
-  import {
-    locations,
-    previews,
-    projectGalleryLink,
-    projectGalleryTitle,
-  } from '$lib/state';
+  import { locations, previews, project } from '$lib/state';
   import { sendToProjectGallery, svgToPNG } from '$lib/utils';
   import ModalShell from './ModalShell.svelte';
   import StickyPart from './StickyPart.svelte';
@@ -108,13 +103,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </div>
     {/if}
   </div>
-  {#if projectGalleryLink.value && projectGalleryTitle.value && projectGalleryTitle.value === locations.projectTitle}
+  {#if project.gallery.href && project.gallery.title && project.gallery.title === locations.projectTitle}
     <p class="my-2">
       <a
-        href={projectGalleryLink.value}
+        href={project.gallery.href}
         target="_blank"
         class="link btn bg-secondary-hover-token w-fit whitespace-pre-wrap"
-        rel="noreferrer">{projectGalleryTitle.value}</a
+        rel="noreferrer">{project.gallery.title}</a
       >
     </p>
   {/if}

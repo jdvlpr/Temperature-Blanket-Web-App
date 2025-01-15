@@ -17,13 +17,9 @@ import pdfGauges from '$lib/pdf/sections/gauges.svelte';
 import pdfWeatherData from '$lib/pdf/sections/weather-data.svelte';
 import {
   allGaugesAttributes,
-  gauges,
   locations,
   previews,
-  projectGalleryLink,
-  projectGalleryTitle,
-  projectStatus,
-  units,
+  project,
   weather,
 } from '$lib/state';
 import {
@@ -71,12 +67,12 @@ export const downloadWeatherCSV = () => {
       if (target?.id === 'dayt') {
         labels.push(`${target.label} (h:m)`);
       } else {
-        labels.push(`${target.label} (${gauge.unit.label[get(units)]})`);
+        labels.push(`${target.label} (${gauge.unit.label[project.units]})`);
       }
     });
   });
   if (!weather.data) return;
-  const _units = get(units);
+  const _units = project.units;
   const _weather = [...weather.data].map((day, index) => {
     const gaugeInfo = [];
     allGaugesAttributes?.forEach((gauge) => {
@@ -172,7 +168,7 @@ export const sendToProjectGallery = async (img) => {
     locations: JSON.stringify(_locations),
     missing_days: missingDaysCount(),
     palettes: JSON.stringify(palettes),
-    project_url: projectStatus.state.liveURL,
+    project_url: project.href,
     tables: JSON.stringify(tables),
     title: locations.projectTitle,
     total_days: weather.rawData?.length,
@@ -196,8 +192,8 @@ export const sendToProjectGallery = async (img) => {
     if (response.code === 200) {
       // success
       message = `<p class="font-bold text-xl my-2">${response.message}</p><p>The project gallery webpage has been created:</p>`;
-      projectGalleryLink.value = response.link;
-      projectGalleryTitle.value = response.title;
+      project.gallery.href = response.link;
+      project.gallery.title = response.title;
       // reloadRecentGalleryProjects();
     } else if (response.code === 409) {
       // duplicate project

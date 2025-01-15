@@ -16,7 +16,7 @@
 import { page } from '$app/state';
 import KeyboardShortcuts from '$lib/components/modals/KeyboardShortcuts.svelte';
 import Menu from '$lib/components/modals/Menu.svelte';
-import { modal, pageSections, theme, units, weather } from '$lib/state';
+import { modal, pageSections, project, theme, weather } from '$lib/state';
 import { loadFromHistory, setTheme } from '$lib/utils';
 import { get } from 'svelte/store';
 
@@ -129,7 +129,7 @@ export const handleKeyDown = (ev) => {
         });
         break;
       case 'u':
-        units.toggle();
+        project.toggleUnits();
         break;
     }
 

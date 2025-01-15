@@ -14,11 +14,10 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { SCHEMES } from '$lib/constants';
-import { units, weather } from '$lib/state';
+import { project, weather } from '$lib/state';
 import type { Color, GaugeSettingsType } from '$lib/types';
 import { getDaysInRange, getDaysPercent, pluralize } from '$lib/utils';
 import chroma from 'chroma-js';
-import { get } from 'svelte/store';
 
 export const createGaugeColors = ({
   schemeId,
@@ -82,8 +81,8 @@ export const getWPGauge = (gauge) => {
     // details.reverse();
     content.push({
       color: color.hex,
-      from: gauge.ranges[i].from + ' ' + gauge.unit.label[get(units)],
-      to: gauge.ranges[i].to + ' ' + gauge.unit.label[get(units)],
+      from: gauge.ranges[i].from + ' ' + gauge.unit.label[project.units],
+      to: gauge.ranges[i].to + ' ' + gauge.unit.label[project.units],
       details,
     });
   });

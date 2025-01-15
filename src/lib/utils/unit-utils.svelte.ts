@@ -14,9 +14,8 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { WEATHER_DATA_DECIMALS } from '$lib/constants';
-import { units, windowLanguage } from '$lib/state';
+import { project, windowLanguage } from '$lib/state';
 import { displayNumber, exists, pluralize } from '$lib/utils';
-import { get } from 'svelte/store';
 /**
  * [description]
  */
@@ -50,7 +49,7 @@ export const convertTime = (
 ) => {
   let hours, minutes;
   const { displayUnits, padStart, forceUnits } = props;
-  const _units = forceUnits || units.value;
+  const _units = forceUnits || project.units;
   if (_units === 'metric') {
     hours = Math.floor(value / 60);
     minutes = value % 60;
@@ -87,11 +86,11 @@ export const setUnitsFromNavigator = () => {
     windowLanguage.value = letters;
     // Set imperial for United States, Myenmar, and Liberia
     if (letters === 'US' || letters === 'MY') {
-      units.value = 'imperial';
+      project.units = 'imperial';
     } else {
-      units.value = 'metric';
+      project.units = 'metric';
     }
   } else {
-    units.value = 'metric';
+    project.units = 'metric';
   }
 };

@@ -15,7 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import { HOURS_PER_DAY } from '$lib/constants';
-  import { gauges, projectStatus, units, weather } from '$lib/state';
+  import { gauges, project, weather } from '$lib/state';
   import {
     displayNumber,
     getColorInfo,
@@ -45,7 +45,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       (n) => $settings.nightTarget === n.id || $settings.daytimeTarget === n.id,
     );
 
-  $: if (projectStatus.state.liveURL) {
+  $: if (project.href) {
     const _days = [];
     let weatherParams = [];
     switch ($settings.daytimePosition) {
@@ -110,7 +110,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             break;
         }
         let param = weatherParams[paramIndex];
-        let value = weather.data[dayIndex][param][units.value];
+        let value = weather.data[dayIndex][param][project.units];
         let gaugeId = getTargetParentGaugeId(param);
         let color = getColorInfo(gaugeId, value);
         _day.push({

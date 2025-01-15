@@ -18,7 +18,7 @@ import {
   allGaugesAttributes,
   locations,
   signal,
-  units,
+  project,
   weather,
 } from '$lib/state';
 import type { WeatherDay } from '$lib/types';
@@ -49,7 +49,7 @@ export const sum = (param) => {
     .map((n) => {
       let value = n[param];
       if (typeof value !== 'undefined' && value !== null)
-        value = value[units.value];
+        value = value[project.units];
       else {
         if (param === 'tmax') return getAverage(weather.params.tmax);
         if (param === 'tavg') return getAverage(weather.params.tavg);
@@ -72,7 +72,7 @@ export const sum = (param) => {
  * @returns {number} The count of missing days.
  */
 export const missingDaysCount = () => {
-  const _units = units.value;
+  const _units = project.units;
   const missingDays = weather.data.filter(
     (day) =>
       day?.tavg[_units] === null &&

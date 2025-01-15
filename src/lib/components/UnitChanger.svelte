@@ -15,13 +15,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import { UNIT_LABELS } from '$lib/constants';
-  import { units } from '$lib/state';
+  import { project } from '$lib/state';
   import { RadioGroup, RadioItem } from '@skeletonlabs/skeleton';
 </script>
 
 <RadioGroup class="flex-wrap gap-y-2" active="bg-secondary-active-token">
   <RadioItem
-    bind:group={units.value}
+    bind:group={project.units}
     name="units-metric"
     value={'metric'}
     title="Set units to metric"
@@ -29,7 +29,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 	    ${UNIT_LABELS.height.metric}`}</RadioItem
   >
   <RadioItem
-    bind:group={units.value}
+    bind:group={project.units}
     name="units-imperial"
     value={'imperial'}
     title="Set units to imperial"

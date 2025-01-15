@@ -19,7 +19,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { DataHandler, Th } from '@vincjo/datatables';
   import { UNIT_LABELS } from '$lib/constants';
   import RecentWeatherDataTooltip from '$lib/components/RecentWeatherDataTooltip.svelte';
-  import { modal, units, weather } from '$lib/state';
+  import { modal, project, weather } from '$lib/state';
   import {
     millimetersToInches,
     inchesToMillimeters,
@@ -51,15 +51,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
           // make sure daytime is always in the same hr:mn format
           weather = {
             ...weather,
-            [target.id]: convertTime(n[target.id][units.value], {
+            [target.id]: convertTime(n[target.id][project.units], {
               displayUnits: false,
               padStart: true,
             }),
           };
         } else {
           let value =
-            n[target.id][units.value] !== null
-              ? n[target.id][units.value]
+            n[target.id][project.units] !== null
+              ? n[target.id][project.units]
               : '-';
           weather = {
             ...weather,
@@ -108,7 +108,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             >
           </Th>
           {#each weatherTargets as { id, pdfHeader }}
-            {@const header = pdfHeader[units.value]}
+            {@const header = pdfHeader[project.units]}
             {@const headerLabel = header.slice(0, header.indexOf('('))}
             {@const headerUnits = header.slice(header.indexOf('('))}
             <Th {handler} orderBy={id}>
@@ -189,7 +189,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                             props: {
                               max: 1000,
                               value: row[id],
-                              title: `<div class="flex flex-col items-center justify-center"><span class="font-bold">${row.date}</span><span>${label} <span class="text-sm">(${UNIT_LABELS[type][units.value]})</span></span></div>`,
+                              title: `<div class="flex flex-col items-center justify-center"><span class="font-bold">${row.date}</span><span>${label} <span class="text-sm">(${UNIT_LABELS[type][project.units]})</span></span></div>`,
                               noMinMax: true,
                               showSlider: false,
                               onOkay: (_value) => {
@@ -207,7 +207,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                                 const i = mappedWeather.indexOf(
                                   `${row.date}-${row.location}`,
                                 );
-                                if (units.value === 'metric') {
+                                if (project.units === 'metric') {
                                   weather.rawData[i][id].metric = _value;
                                   if (type === 'temperature')
                                     weather.rawData[i][id].imperial =
@@ -216,7 +216,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                                     weather.rawData[i][id].imperial =
                                       millimetersToInches(_value);
                                 }
-                                if (units.value === 'imperial') {
+                                if (project.units === 'imperial') {
                                   weather.rawData[i][id].imperial = _value;
                                   if (type === 'temperature')
                                     weather.rawData[i][id].metric =

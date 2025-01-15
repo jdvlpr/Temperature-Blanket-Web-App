@@ -18,14 +18,7 @@ import {
   skeletonTheme,
   skeletonThemes,
 } from '$lib/components/ThemeSwitcher.svelte';
-import {
-  initialLayout,
-  layout,
-  locations,
-  projectStatus,
-  theme,
-  weather,
-} from '$lib/state';
+import { initialLayout, layout, locations, theme, weather } from '$lib/state';
 import type {
   PageLayout,
   SavedProject,
@@ -176,9 +169,7 @@ export const setLocalStorageProject = () => {
     new URL(project.href).searchParams.get('project'),
   );
 
-  const thisID = new URL(projectStatus.state.liveURL).searchParams.get(
-    'project',
-  );
+  const thisID = new URL(project.href).searchParams.get('project');
 
   if (!thisID) return;
 
@@ -217,7 +208,7 @@ const createProjectLocalStorageProjectObject = () => {
 
   const _title = locations.projectTitle || '';
 
-  const href = projectStatus.state.liveURL;
+  const href = project.href;
 
   const weatherData =
     weather.rawData?.map((day) => {

@@ -61,10 +61,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   onMount(async () => {
     // units
     const paramUnits = page.url.searchParams.get('u');
-    if (paramUnits === 'i') units.value = 'imperial';
-    else if (paramUnits === 'm') units.value = 'metric';
+    if (paramUnits === 'i') project.units = 'imperial';
+    else if (paramUnits === 'm') project.units = 'metric';
     else if (localStorage.getItem('[/weather]units'))
-      units.value = localStorage.getItem('[/weather]units');
+      project.units = localStorage.getItem('[/weather]units');
     else setUnitsFromNavigator();
 
     // hour12
@@ -73,7 +73,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     else if (hourFormat === '1') $hour = '24';
     else if (localStorage.getItem('[/weather]hour_format'))
       $hour = localStorage.getItem('[/weather]hour_format');
-    else $hour = units.value === 'metric' ? '24' : '12';
+    else $hour = project.units === 'metric' ? '24' : '12';
     hour.subscribe(async (value) => {
       localStorage.setItem('[/weather]hour_format', value);
       // page.url.searchParams.set("h", value === "12" ? "0" : "1");
@@ -106,7 +106,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         // if (locationsState.locations.find((item) => item.id === value)?.saved) page.url.searchParams.set("id", value);
         // page.url.searchParams.set("id", value);
         // page.url.searchParams.set("h", $hour === "12" ? "0" : "1");
-        // page.url.searchParams.set("u", units.value === "metric" ? "m" : "i");
+        // page.url.searchParams.set("u", project.units === "metric" ? "m" : "i");
         // window.history.replaceState({ path: page.url.href }, "", page.url.href);
       } else {
         // window.history.replaceState({ path: page.url.href }, "", page.url.href);
@@ -256,20 +256,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   $effect(() => {
     $activeLocationID;
-    units.value;
+    project.units;
     $hour;
     getShareableURL({
       id: $activeLocationID,
-      units: units.value,
+      units: project.units,
       hourFormat: $hour,
     });
   });
 
   $effect(async () => {
-    localStorage.setItem('[/weather]units', units.value);
+    localStorage.setItem('[/weather]units', project.units);
     // page.url.searchParams.set("u", value === "metric" ? "m" : "i");
     // if (isMounted) window.history.replaceState({ path: page.url.href }, "", page.url.href);
-    if (weatherLocations.data?.some((item) => item.units !== units.value))
+    if (weatherLocations.data?.some((item) => item.units !== project.units))
       await fetchData();
   });
 </script>
@@ -424,7 +424,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                             );
                             page.url.searchParams.set(
                               'u',
-                              units.value === 'metric' ? 'm' : 'i',
+                              project.units === 'metric' ? 'm' : 'i',
                             );
                             // window.history.replaceState(
                             //     { path: page.url.href },

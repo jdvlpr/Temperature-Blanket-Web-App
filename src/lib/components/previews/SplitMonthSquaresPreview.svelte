@@ -14,7 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import { gauges, projectStatus, units, weather } from '$lib/state';
+  import { gauges, project, weather } from '$lib/state';
   import {
     getColorInfo,
     getDaysInLongestMonth,
@@ -73,7 +73,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     return { left, right };
   }
 
-  $: if (projectStatus.state.liveURL) {
+  $: if (project.href) {
     squares = [];
     let squareIndex = 0;
     let x = squareSize / 2;
@@ -125,11 +125,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
       let color = { left: '', right: '' };
       if (day.length) {
         const leftValue =
-          weather.data[_dayIndex][$settings.leftTarget][units.value];
+          weather.data[_dayIndex][$settings.leftTarget][project.units];
         const leftGaugeId = getTargetParentGaugeId($settings.leftTarget);
         color.left = getColorInfo(leftGaugeId, leftValue).hex;
         const rightValue =
-          weather.data[_dayIndex][$settings.rightTarget][units.value];
+          weather.data[_dayIndex][$settings.rightTarget][project.units];
         const rightGaugeId = getTargetParentGaugeId($settings.rightTarget);
         color.right = getColorInfo(rightGaugeId, rightValue).hex;
         isWeather = true;

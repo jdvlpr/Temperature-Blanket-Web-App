@@ -14,27 +14,8 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { browser, version } from '$app/environment';
-import { PROJECT_TIMESTAMP_ID } from '$lib/constants';
-import { gauges, locations, previews, units, weather } from '$lib/state';
-
-export const projectGalleryLink = $state({ value: null });
-
-export const projectGalleryTitle = $state({ value: null });
-
-class ProjectStatusClass {
-  state = $derived.by(() => {
-    const isValid = locations.allValid;
-    const base = browser ? window.location.origin + '/' : '';
-    const query = `?project=${PROJECT_TIMESTAMP_ID}&v=${version}`;
-    const liveURL = !isValid ? base : base + query + '#' + project.current.hash;
-    return {
-      isValid,
-      liveURL,
-    };
-  });
-}
-
-export const projectStatus = new ProjectStatusClass();
+import { gauges, locations, previews, weather } from '$lib/state';
+import type { Unit } from '$lib/types';
 
 export class HistoryStateClass {
   stack: string[] = $state([]);
@@ -83,6 +64,9 @@ export class HistoryStateClass {
 }
 
 class ProjectClass {
+  // *****************
+  // Constants
+  // *****************
   loaded = $state({
     version: browser
       ? new URL(window.location).searchParams.get('v') || version
@@ -90,6 +74,28 @@ class ProjectClass {
     href: browser ? new URL(window.location).href : '',
   });
 
+  // Timestamp identifying when the app was initialized, used as a kind of unique ID for the project (though technically may not be unique if two users initialize at the exact same time).
+  // It doesn't have any real meaning apart from an identifier for a project.
+  timeStampId = browser
+    ? new URL(window.location).searchParams.get('project') ||
+      new Date().getTime()?.toString()
+    : '';
+
+  // *****************
+  // Settings
+  // *****************
+  units: Unit = $state('imperial');
+
+  // *****************
+  // Methods
+  // *****************
+  toggleUnits(): void {
+    this.units = this.units === 'imperial' ? 'metric' : 'imperial';
+  }
+
+  // *****************
+  // Other Variables
+  // *****************
   history = new HistoryStateClass();
 
   current = $derived.by(() => {
@@ -103,9 +109,10 @@ class ProjectClass {
     else if (weather.useSecondarySources) hash += '1';
     if (weather.grouping === 'week')
       hash += `&w=${weather.monthGroupingStartDay}`; // Set Weather Grouping to Weeks with the starting Day of Week
-    hash += units.value === 'metric' ? '&u=m' : '&u=i'; // Units
+    hash += project.units === 'metric' ? '&u=m' : '&u=i'; // Units
+
     return {
-      version,
+      version: version,
       // The current part of the project URL after #
       hash,
     };
@@ -114,6 +121,20 @@ class ProjectClass {
   status = $state({
     saved: false,
     loading: true,
+  });
+
+  gallery = $state({
+    href: '',
+    title: '',
+  });
+
+  href = $derived.by(() => {
+    const base = browser ? window.location.origin + '/' : '';
+    const query = `?project=${this.timeStampId}&v=${version}`;
+    const href = !locations.allValid
+      ? base
+      : base + query + '#' + this.current.hash;
+    return href;
   });
 }
 

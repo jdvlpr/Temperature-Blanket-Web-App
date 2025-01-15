@@ -14,7 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import { projectStatus, units, weather } from '$lib/state';
+  import { weather, project } from '$lib/state';
   import {
     getColorInfo,
     getDaysInLongestMonth,
@@ -77,7 +77,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     ),
   });
 
-  $: if (projectStatus.state.liveURL) {
+  $: if (project.href) {
     const squareSectionsCount = $settings.squareSize * $settings.squareSize;
     const squareSectionParams = getSquareSectionTargetIds(
       squareSectionsCount,
@@ -161,13 +161,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
         if (isWeatherSquare) {
           const day = weather.data[_dayIndex];
           let param = squareSectionParams[squareSectionIndex];
-          let value = day[param][units.value];
+          let value = day[param][project.units];
           if (
             ($settings.primaryTargetAsBackup === 1 && value === 0) ||
             ($settings.primaryTargetAsBackup === 1 && value === null)
           ) {
             param = $settings.primaryTarget;
-            value = day[param][units.value];
+            value = day[param][project.units];
           }
           let gaugeId = getTargetParentGaugeId(param);
           color = getColorInfo(gaugeId, value).hex;

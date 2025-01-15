@@ -14,7 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script context="module">
-  import { project, signal, units } from '$lib/state';
+  import { project, signal } from '$lib/state';
   import { get } from 'svelte/store';
   import { activeLocationID, weatherLocations } from './+page.svelte';
 
@@ -32,13 +32,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
         date1: new Date(),
         date2: new Date(location.update_time),
       });
-      if (needsUpdate || location.units !== units.value) {
+      if (needsUpdate || location.units !== project.units) {
         try {
           const data = await getOpenMeteoForecast({ location });
           location.source = 'Open-Meteo';
           // savedLocation.current_weather = data.current_weather;
           location.update_time = new Date().toUTCString();
-          location.units = units.value;
+          location.units = project.units;
           location.data = data;
         } catch (error) {
           throw error;
@@ -63,7 +63,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     let windspeedUnit = 'kmh';
     let precipitationUnit = 'mm';
 
-    if (units.value === 'imperial') {
+    if (project.units === 'imperial') {
       temperatureUnit = 'fahrenheit';
       windspeedUnit = 'mph';
       precipitationUnit = 'inch';

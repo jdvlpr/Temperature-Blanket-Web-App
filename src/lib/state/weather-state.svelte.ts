@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { locations, units } from '$lib/state';
+import { locations, project } from '$lib/state';
 import type { WeatherDay, WeatherSource } from '$lib/types';
 import { createWeeksProperty, displayNumber } from '$lib/utils';
 
@@ -176,12 +176,12 @@ class WeatherClass {
         dayt,
       };
 
-    tmin = this.data.map((day) => day.tmin[units.value]);
-    tavg = this.data.map((day) => day.tavg[units.value]);
-    tmax = this.data.map((day) => day.tmax[units.value]);
-    prcp = this.data.map((day) => day.prcp[units.value]);
-    snow = this.data.map((day) => day.snow[units.value]);
-    dayt = this.data.map((day) => day.dayt[units.value]);
+    tmin = this.data.map((day) => day.tmin[project.units]);
+    tavg = this.data.map((day) => day.tavg[project.units]);
+    tmax = this.data.map((day) => day.tmax[project.units]);
+    prcp = this.data.map((day) => day.prcp[project.units]);
+    snow = this.data.map((day) => day.snow[project.units]);
+    dayt = this.data.map((day) => day.dayt[project.units]);
 
     return {
       tmin,

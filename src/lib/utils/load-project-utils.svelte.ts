@@ -33,7 +33,6 @@ import {
   gauges,
   locations,
   project,
-  units,
   weather,
 } from '$lib/state';
 import { rowsPreview } from '$lib/state/previews/rows-preview-state.svelte';
@@ -56,8 +55,8 @@ export const setProjectSettings = async (
 
   // Load Units
   if (exists(params.u)) {
-    if (params.u.value === 'i') units.value = 'imperial';
-    if (params.u.value === 'm') units.value = 'metric';
+    if (params.u.value === 'i') project.units = 'imperial';
+    if (params.u.value === 'm') project.units = 'metric';
   }
 
   // Load Locations
@@ -346,7 +345,7 @@ export const parseGaugeURLHash = (hashString: string, gauge) => {
     // Before version 1.700, all numbers were saved in metric
     // So convert the From and To values if needed
     if (!upToDate(project.loaded.version, '1.700')) {
-      if (units.value === 'imperial') {
+      if (project.units === 'imperial') {
         switch (gauge.id) {
           case 'temp':
             from = celsiusToFahrenheit(from);
@@ -477,7 +476,7 @@ export const parseGaugeURLHash = (hashString: string, gauge) => {
     // So update them if needed
     if (
       !upToDate(project.loaded.version, '1.700') &&
-      units.value === 'imperial'
+      project.units === 'imperial'
     ) {
       increment = celsiusToFahrenheit(increment);
       start = celsiusToFahrenheit(start);

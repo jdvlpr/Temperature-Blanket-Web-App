@@ -40,7 +40,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     pageSections,
     pinAllSections,
     project,
-    projectStatus,
     wasProjectLoadedFromURL,
     weather,
   } from '$lib/state';
@@ -116,7 +115,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <svelte:window
   onbeforeunload={(event) => {
-    const url = new URL(projectStatus.state.liveURL);
+    const url = new URL(project.href);
     if (
       project.status.saved ||
       !url.searchParams.has('project') ||

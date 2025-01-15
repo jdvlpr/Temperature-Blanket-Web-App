@@ -14,7 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { gauges, previews, projectStatus, units, weather } from '$lib/state';
+  import { gauges, project, weather } from '$lib/state';
   import { rowsPreview } from '$lib/state/previews/rows-preview-state.svelte';
   import {
     getColorInfo,
@@ -31,7 +31,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     if (rowsPreview.settings.lengthTarget === 'custom')
       return rowsPreview.settings.stitchesPerDay;
     let value = Math.abs(
-      weather.data[dayIndex][rowsPreview.settings.lengthTarget][units.value],
+      weather.data[dayIndex][rowsPreview.settings.lengthTarget][project.units],
     );
     if (isNaN(value)) value = rowsPreview.settings.stitchesPerDay;
     if (value === 0) value = 1;
@@ -45,7 +45,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   };
 
   $effect(() => {
-    projectStatus.state.liveURL;
+    project.href;
     if (!weather.data || !gauges.allCreated) return;
     debounce(() => {
       // Setup constants
@@ -125,7 +125,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             if (isWeatherSection) {
               // If it's a weather section, determine the color based on the weather value and gauge ID
               let param = rowsPreview.settings.selectedTargets[paramIndex];
-              let value = weather.data[dayIndex][param][units.value];
+              let value = weather.data[dayIndex][param][project.units];
               let gaugeId = getTargetParentGaugeId(param);
               color = getColorInfo(gaugeId, value).hex;
             } else {

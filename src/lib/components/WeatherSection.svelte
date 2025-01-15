@@ -36,8 +36,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import {
     locations,
     modal,
+    project,
     showNavigationSideBar,
-    units,
     weather,
   } from '$lib/state';
   import {
@@ -195,9 +195,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
       .map((day, index) => {
         return { ...day, index };
       })
-      .filter((day) => day.tmin[units.value] !== null)
+      .filter((day) => day.tmin[project.units] !== null)
       .reduce((prev, curr) =>
-        prev.tmin[units.value] < curr.tmin[units.value] ? prev : curr,
+        prev.tmin[project.units] < curr.tmin[project.units] ? prev : curr,
       ) || null,
   );
   let tMaxDay = $derived(
@@ -205,9 +205,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
       .map((day, index) => {
         return { ...day, index };
       })
-      .filter((day) => day.tmax[units.value] !== null)
+      .filter((day) => day.tmax[project.units] !== null)
       .reduce((prev, curr) =>
-        prev.tmax[units.value] > curr.tmax[units.value] ? prev : curr,
+        prev.tmax[project.units] > curr.tmax[project.units] ? prev : curr,
       ) || null,
   );
   let missingDataMerged = $derived(getMissingDataMerged(missingData));
@@ -382,7 +382,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         icon="&uarr;"
         label="Highest Temperature"
         value={Math.max(...weather.params.tmax?.filter((n) => n !== null))}
-        units={UNIT_LABELS.temperature[units.value]}
+        units={UNIT_LABELS.temperature[project.units]}
       >
         {#snippet button()}
           <div>
@@ -412,7 +412,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         icon="~"
         label="Average Temperature"
         value={getAverage(weather.params.tavg?.filter((n) => n !== null))}
-        units={UNIT_LABELS.temperature[units.value]}
+        units={UNIT_LABELS.temperature[project.units]}
       />
     {/if}
 
@@ -422,7 +422,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         icon="&darr;"
         label="Lowest Temperature"
         value={Math.min(...weather.params.tmin?.filter((n) => n !== null))}
-        units={UNIT_LABELS.temperature[units.value]}
+        units={UNIT_LABELS.temperature[project.units]}
       >
         {#snippet button()}
           <div>
@@ -458,7 +458,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 ?.filter((n) => n !== null)
                 ?.reduce((partialSum, a) => partialSum + a, 0),
             )}
-        units={UNIT_LABELS.height[units.value]}
+        units={UNIT_LABELS.height[project.units]}
       />
     {/if}
 
@@ -478,7 +478,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   ?.filter((n) => n !== null)
                   ?.reduce((partialSum, a) => partialSum + a, 0),
               )}
-        units={UNIT_LABELS.height[units.value]}
+        units={UNIT_LABELS.height[project.units]}
       >
         {#snippet button()}
           <div class="my-2 text-sm">
@@ -516,7 +516,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <div bind:this={graph} class="scroll-m-[60px] w-full">
   {#if showWeatherChart}
     {#key weather.data}
-      {#key units.value}
+      {#key project.units}
         <WeatherChart />
       {/key}
     {/key}

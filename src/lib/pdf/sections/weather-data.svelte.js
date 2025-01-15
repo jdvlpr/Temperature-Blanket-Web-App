@@ -17,7 +17,7 @@ import {
   allGaugesAttributes,
   gauges,
   locations,
-  units,
+  project,
   weather,
 } from '$lib/state';
 import {
@@ -77,7 +77,7 @@ const pdfWeatherData = {
     // Low Avg High Temps
     doc.setFontSize(pdfConfig.font.p);
     doc.setFont(pdfConfig.font.paragraph, 'normal');
-    const tempSymbol = units.value === 'metric' ? 'C' : 'F';
+    const tempSymbol = project.units === 'metric' ? 'C' : 'F';
     const average = `Lowest Temperature: ${Math.min(...weather.params.tmin.filter((n) => n !== null))} °${tempSymbol}`;
     doc.text(average, pdfConfig.leftMargin, pdfConfig.topMargin + 9);
     const high = `Average Temperature: ${getAverage(weather.params.tavg.filter((n) => n !== null))} °${tempSymbol}`;
@@ -201,7 +201,7 @@ const pdfWeatherData = {
     const targets = allGaugesAttributes.map((n) => n.targets).flat();
     targets.forEach((target, i) => {
       const x = this.weatherDataPositionX + this.weatherDataColumnWidth * i;
-      doc.text(target.pdfHeader[units.value], x, positionY);
+      doc.text(target.pdfHeader[project.units], x, positionY);
       doc.line(
         x - this.linePadding,
         yBottomLine,
@@ -237,15 +237,15 @@ const pdfWeatherData = {
       const param = params[i].id;
       // Number
       let sValue;
-      if (day[param][units.value] === null) {
+      if (day[param][project.units] === null) {
         sValue = '';
       } else {
         if (param === 'dayt') {
-          sValue = convertTime(day[param][units.value], {
+          sValue = convertTime(day[param][project.units], {
             displayUnits: false,
           });
         } else {
-          sValue = String(day[param][units.value]); // gauge.unit.label[Project.units]
+          sValue = String(day[param][project.units]); // gauge.unit.label[Project.units]
         }
       }
       // const sValue = param.id.toString(); //gauge.unit.label[Project.units]
@@ -274,7 +274,7 @@ const pdfWeatherData = {
         const gaugeId = allGaugesAttributes.filter((gauge) =>
           gauge.targets.some((item) => item.id === param),
         )[0].id;
-        const colorInfo = getColorInfo(gaugeId, day[param][units.value]);
+        const colorInfo = getColorInfo(gaugeId, day[param][project.units]);
         doc.setFillColor(colorInfo.hex);
         doc.rect(marginRight + 15, line - 4, 5, 5, 'F');
         // Color Number

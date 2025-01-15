@@ -14,7 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import { units } from '$lib/state';
+  import { project } from '$lib/state';
   import {
     BarController,
     BarElement,
@@ -204,7 +204,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             },
             title: {
               text:
-                units.value === 'metric'
+                project.units === 'metric'
                   ? 'Degrees Celsius'
                   : 'Degrees Fahrenheit',
               display: true,

@@ -14,7 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { projectStatus, units, weather } from '$lib/state';
+  import { project, weather } from '$lib/state';
   import {
     getColorInfo,
     getMonthSepparatorIndexes,
@@ -105,7 +105,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     return squares;
   }
 
-  $: if (projectStatus.state.liveURL) {
+  $: if (project.href) {
     // Calculate the number of square sections
     const squareSectionsCount = $settings.squareSize * $settings.squareSize;
 
@@ -154,7 +154,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           // Get the weather data for the current day
           const day: object = weather.data[dayIndex];
           let targetId: string = squareSectionTargetIds[squareSectionIndex];
-          let value = day[targetId][units.value];
+          let value = day[targetId][project.units];
 
           // Check if the primary target value is 0 or null, use the primary target as a backup
           if (
@@ -162,7 +162,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             ($settings.primaryTargetAsBackup === 1 && value === null)
           ) {
             targetId = $settings.primaryTarget;
-            value = day[targetId][units.value];
+            value = day[targetId][project.units];
           }
 
           // Get the gauge ID for the target

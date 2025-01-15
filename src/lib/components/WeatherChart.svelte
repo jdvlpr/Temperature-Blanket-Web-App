@@ -19,7 +19,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <script>
-  import { units, weather } from '$lib/state';
+  import { project, weather } from '$lib/state';
   import {
     CategoryScale,
     Chart,
@@ -193,7 +193,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             },
             title: {
               text:
-                units.value === 'metric'
+                project.units === 'metric'
                   ? 'Degrees Celsius'
                   : 'Degrees Fahrenheit',
               display: true,
@@ -213,7 +213,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             },
             title: {
               text:
-                units.value === 'metric'
+                project.units === 'metric'
                   ? 'Millimeters / Minutes'
                   : 'Inches / Hours',
               display: true,

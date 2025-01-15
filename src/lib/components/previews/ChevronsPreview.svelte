@@ -14,7 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import { gauges, projectStatus, units, weather } from '$lib/state';
+  import { gauges, project, weather } from '$lib/state';
   import {
     getColorInfo,
     getTargetParentGaugeId,
@@ -49,7 +49,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let sections = [];
 
-  $: if (projectStatus.state.liveURL) {
+  $: if (project.href) {
     let total = weather.data?.length;
     sections = [];
     for (let dayIndex = 0, line = ROW_HEIGHT; dayIndex < total; dayIndex++) {
@@ -70,7 +70,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           },${line} `;
         }
         const target = $settings.selectedTargets[paramIndex];
-        let value = weather.data[dayIndex][target][units.value];
+        let value = weather.data[dayIndex][target][project.units];
         let gaugeId = getTargetParentGaugeId(target);
         let color = getColorInfo(gaugeId, value).hex;
         section.push({ color, p: points, dayIndex });
