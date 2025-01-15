@@ -25,7 +25,7 @@ import type {
   LocationType,
   WeatherSource,
 } from '$lib/types';
-import { getLocationTitle, getToday, numberOfDays } from '$lib/utils';
+import { getToday, numberOfDays, stringToDate } from '$lib/utils';
 
 export class LocationClass implements LocationType {
   uuid: string = $state();
@@ -154,9 +154,13 @@ export class LocationsState implements LocationsStateType {
     )
       return '';
     let titles = [];
-    this.all.forEach((location, index) => {
-      if (location?.from && location?.to)
-        titles.push(getLocationTitle({ location }));
+    this.all.forEach((location) => {
+      if (location?.from && location?.to) {
+        let from = stringToDate(location.from).toLocaleDateString();
+        let to = stringToDate(location.to).toLocaleDateString();
+        let title = `${location.label} from ${from} to ${to}`;
+        titles.push(title);
+      }
     });
     if (titles.length === 0) return;
     let title = titles.join('; ');

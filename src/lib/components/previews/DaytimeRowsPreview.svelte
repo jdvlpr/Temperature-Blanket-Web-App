@@ -45,7 +45,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       (n) => $settings.nightTarget === n.id || $settings.daytimeTarget === n.id,
     );
 
-  $: if (project.href) {
+  $: if (project.url.href) {
     const _days = [];
     let weatherParams = [];
     switch ($settings.daytimePosition) {

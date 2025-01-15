@@ -63,7 +63,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let months = [];
   let borders = [];
 
-  $: if (project.href) {
+  $: if (project.url.href) {
     months = [];
     borders = [
       {

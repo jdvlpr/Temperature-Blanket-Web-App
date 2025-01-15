@@ -77,7 +77,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     ),
   });
 
-  $: if (project.href) {
+  $: if (project.url.href) {
     const squareSectionsCount = $settings.squareSize * $settings.squareSize;
     const squareSectionParams = getSquareSectionTargetIds(
       squareSectionsCount,

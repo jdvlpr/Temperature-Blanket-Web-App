@@ -77,7 +77,7 @@ export const checkForProjectInLocalStorage = async () => {
   const localProjects = JSON.parse(localStorage.getItem('projects'));
   if (!localProjects) return;
   const matchedProject = localProjects.filter(
-    (project) => project.href === window.location.href,
+    (project) => project.url.href === window.location.href,
   )?.[0];
   if (!matchedProject) return;
 
@@ -105,7 +105,7 @@ export const checkForProjectInLocalStorage = async () => {
   });
 
   // Check if there are any days in the project past the day the project was created
-  let url = new URL(matchedProject.href);
+  let url = new URL(matchedproject.url.href);
   const timestamp = new URLSearchParams(url.search).get('project');
   if (timestamp === null || typeof +timestamp !== 'number') return;
   const dateCreated = new Date(+timestamp).getTime();
@@ -166,10 +166,10 @@ export const setLocalStorageProject = () => {
   const localProjects = JSON.parse(localStorage.getItem('projects'));
 
   const projectIDs = localProjects?.map((project) =>
-    new URL(project.href).searchParams.get('project'),
+    new URL(project.url.href).searchParams.get('project'),
   );
 
-  const thisID = new URL(project.href).searchParams.get('project');
+  const thisID = new URL(project.url.href).searchParams.get('project');
 
   if (!thisID) return;
 
@@ -208,7 +208,7 @@ const createProjectLocalStorageProjectObject = () => {
 
   const _title = locations.projectTitle || '';
 
-  const href = project.href;
+  const href = project.url.href;
 
   const weatherData =
     weather.rawData?.map((day) => {

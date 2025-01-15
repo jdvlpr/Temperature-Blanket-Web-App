@@ -75,11 +75,11 @@ export const loadFromHistory = ({ action }: { action: 'Undo' | 'Redo' }) => {
     if (!exists(oldParams.u) || oldParams.u.value !== newParams.u.value) {
       if (newParams.u.value === 'i') {
         project.units = 'imperial';
-        message = 'Units set to Imperial';
+        message = 'Units';
       }
       if (newParams.u.value === 'm') {
         project.units = 'metric';
-        message = 'Units set to Metric';
+        message = 'Units';
       }
     }
   }
@@ -210,10 +210,10 @@ export const loadFromHistory = ({ action }: { action: 'Undo' | 'Redo' }) => {
     project.history.updateMessage = `<span class="flex flex-wrap items-start gap-2"><span class="">${action === 'Undo' ? ICONS.arrowUturnLeft : ICONS.arrowUturnRight}</span> <span>${action}: ${message}</span></span>`;
 };
 export const updateHistory = () => {
-  if (!weather.data || !project.current.hash || !locations.allValid || !browser)
+  if (!weather.data || !project.url.hash || !locations.allValid || !browser)
     return;
 
-  let live = project.current.hash;
+  let live = project.url.hash;
   const liveParams = getProjectParametersFromURLHash(live);
 
   // There must be a gauge created... sometimes this block gets called and the liveHash doesn't have any gauge params...
@@ -239,6 +239,6 @@ export const updateHistory = () => {
 };
 
 export const updateURL = () => {
-  const newURL = new URL(project.href);
+  const newURL = new URL(project.url.href);
   window.history.pushState({ path: newURL.href }, '', newURL.href);
 };

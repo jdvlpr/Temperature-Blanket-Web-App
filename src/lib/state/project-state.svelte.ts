@@ -65,14 +65,14 @@ export class HistoryStateClass {
 
 class ProjectClass {
   // *****************
-  // Constants
+  // Constant Properties
   // *****************
-  loaded = $state({
+  loaded = {
     version: browser
       ? new URL(window.location).searchParams.get('v') || version
       : '',
     href: browser ? new URL(window.location).href : '',
-  });
+  };
 
   // Timestamp identifying when the app was initialized, used as a kind of unique ID for the project (though technically may not be unique if two users initialize at the exact same time).
   // It doesn't have any real meaning apart from an identifier for a project.
@@ -82,23 +82,14 @@ class ProjectClass {
     : '';
 
   // *****************
-  // Settings
-  // *****************
-  units: Unit = $state('imperial');
-
-  // *****************
-  // Methods
-  // *****************
-  toggleUnits(): void {
-    this.units = this.units === 'imperial' ? 'metric' : 'imperial';
-  }
-
-  // *****************
-  // Other Variables
+  // History State Property
   // *****************
   history = new HistoryStateClass();
 
-  current = $derived.by(() => {
+  // *****************
+  // Derived URL Properties
+  // *****************
+  url = $derived.by(() => {
     let hash = '';
     hash += locations.urlHash;
     hash += gauges.urlHash;
@@ -109,12 +100,16 @@ class ProjectClass {
     else if (weather.useSecondarySources) hash += '1';
     if (weather.grouping === 'week')
       hash += `&w=${weather.monthGroupingStartDay}`; // Set Weather Grouping to Weeks with the starting Day of Week
-    hash += project.units === 'metric' ? '&u=m' : '&u=i'; // Units
+    hash += this.units === 'metric' ? '&u=m' : '&u=i'; // Units
+
+    let href = '';
+    const base = browser ? window.location.origin + '/' : '';
+    const query = `?project=${this.timeStampId}&v=${version}`;
+    href = !locations.allValid ? base : base + query + '#' + hash;
 
     return {
-      version: version,
-      // The current part of the project URL after #
       hash,
+      href,
     };
   });
 
@@ -128,14 +123,17 @@ class ProjectClass {
     title: '',
   });
 
-  href = $derived.by(() => {
-    const base = browser ? window.location.origin + '/' : '';
-    const query = `?project=${this.timeStampId}&v=${version}`;
-    const href = !locations.allValid
-      ? base
-      : base + query + '#' + this.current.hash;
-    return href;
-  });
+  // *****************
+  // Settings
+  // *****************
+  units: Unit = $state('imperial');
+
+  // *****************
+  // Methods
+  // *****************
+  toggleUnits(): void {
+    this.units = this.units === 'imperial' ? 'metric' : 'imperial';
+  }
 }
 
 export const project = new ProjectClass();

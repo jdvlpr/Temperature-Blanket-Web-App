@@ -35,7 +35,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             {project}
             on:click={() => {
               const newProjects = projects.filter(
-                (project) => project.href !== href,
+                (project) => project.url.href !== href,
               );
               localStorage.setItem('projects', JSON.stringify(newProjects));
               projects = newProjects;

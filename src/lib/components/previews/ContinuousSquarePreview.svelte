@@ -124,7 +124,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let sections = [];
 
-  $: if (project.href) {
+  $: if (project.url.href) {
     // Setup constants
     let x = width / 2 - STITCH_SIZE * 2;
     let y = height / 2 - STITCH_SIZE * 4;

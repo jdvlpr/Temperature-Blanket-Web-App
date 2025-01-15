@@ -66,7 +66,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let squares = [];
 
-  $: if (project.href) {
+  $: if (project.url.href) {
     squares = [];
     let squareIndex = 0;
     let x = squareSize / 2;

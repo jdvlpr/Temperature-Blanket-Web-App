@@ -73,7 +73,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     return { left, right };
   }
 
-  $: if (project.href) {
+  $: if (project.url.href) {
     squares = [];
     let squareIndex = 0;
     let x = squareSize / 2;

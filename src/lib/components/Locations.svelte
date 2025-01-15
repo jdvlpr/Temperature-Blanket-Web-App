@@ -99,10 +99,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
             {#snippet tooltip()}
               <span>
                 To edit location details, reload weather data or <a
-                  href={`/?project=${new Date().getTime()?.toString()}&v=${version}#${project.current.hash.substring(
+                  href={`/?project=${new Date().getTime()?.toString()}&v=${version}#${project.url.hash.substring(
                     0,
-                    project.current.hash.indexOf('l='),
-                  )}${project.current.hash.substring(project.current.hash.indexOf('temp'))}`}
+                    project.url.hash.indexOf('l='),
+                  )}${project.url.hash.substring(project.url.hash.indexOf('temp'))}`}
                   class="underline cursor-pointer"
                   target="_blank"
                   rel="noreferrer">open a new project</a

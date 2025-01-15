@@ -49,7 +49,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let sections = [];
 
-  $: if (project.href) {
+  $: if (project.url.href) {
     let total = weather.data?.length;
     sections = [];
     for (let dayIndex = 0, line = ROW_HEIGHT; dayIndex < total; dayIndex++) {

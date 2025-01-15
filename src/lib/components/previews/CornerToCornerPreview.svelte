@@ -97,7 +97,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let sections = [];
 
-  $: if (project.href) {
+  $: if (project.url.href) {
     let row = 0,
       x = 0,
       y = 0,

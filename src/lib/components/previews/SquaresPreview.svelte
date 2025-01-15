@@ -105,7 +105,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     return squares;
   }
 
-  $: if (project.href) {
+  $: if (project.url.href) {
     // Calculate the number of square sections
     const squareSectionsCount = $settings.squareSize * $settings.squareSize;
 

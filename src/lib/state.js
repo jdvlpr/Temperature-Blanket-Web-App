@@ -13,11 +13,9 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-// NOTE: Don't rearrange these alphabetically; the order matters!!!
-// TODO: Find out why and fix why the order matters :)
-export * from '$lib/state/location-stores.svelte';
-export * from '$lib/state/weather-state.svelte';
 export * from '$lib/state/gauges-state.svelte';
+export * from '$lib/state/location-stores.svelte';
 export * from '$lib/state/page-stores.svelte';
 export * from '$lib/state/preview-state.svelte';
 export * from '$lib/state/project-state.svelte';
+export * from '$lib/state/weather-state.svelte';

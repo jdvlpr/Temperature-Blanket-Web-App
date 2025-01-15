@@ -45,7 +45,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   };
 
   $effect(() => {
-    project.href;
+    project.url.href;
     if (!weather.data || !gauges.allCreated) return;
     debounce(() => {
       // Setup constants

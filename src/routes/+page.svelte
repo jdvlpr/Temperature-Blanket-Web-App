@@ -100,7 +100,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 
   $effect(() => {
-    if (project.current.hash) debounce(() => updateHistory(), 300);
+    if (project.url.hash) debounce(() => updateHistory(), 300);
   });
 
   $effect(() => {
@@ -115,7 +115,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <svelte:window
   onbeforeunload={(event) => {
-    const url = new URL(project.href);
+    const url = new URL(project.url.href);
     if (
       project.status.saved ||
       !url.searchParams.has('project') ||
