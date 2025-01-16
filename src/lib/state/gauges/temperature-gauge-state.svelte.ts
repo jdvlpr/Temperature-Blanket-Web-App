@@ -103,7 +103,7 @@ export class TemperatureGauge {
     },
     manual: {
       start: this.#max,
-      increment: this.#min,
+      increment: displayNumber((this.#max - this.#min) / this.colors.length, 2),
     },
     direction: 'high-to-low',
     includeFromValue: true,

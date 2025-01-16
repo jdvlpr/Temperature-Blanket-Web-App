@@ -58,9 +58,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let changedGaugeDirectionOnCustomRanges = $state(false);
 
-  let start = getStart(_gauge.rangeOptions);
+  let start = $derived.by(() => {
+    _gauge.rangeOptions.mode;
+    _gauge.rangeOptions?.direction;
+    _gauge.rangeOptions?.manual.start;
+    return getStart(_gauge.rangeOptions);
+  });
 
-  let increment = getIncrement(_gauge.rangeOptions);
+  let increment = $derived.by(() => {
+    _gauge.rangeOptions.mode;
+    _gauge.rangeOptions?.direction;
+    _gauge.rangeOptions?.isCustomRanges;
+    _gauge.rangeOptions.manual.increment;
+
+    return getIncrement(_gauge.rangeOptions);
+  });
 
   let setupContainer: HTMLElement | undefined;
 
@@ -96,6 +108,30 @@ If not, see <https://www.gnu.org/licenses/>. -->
     scrollObserver.observe(setupContainer);
   });
 
+  let debounceTimer;
+  const debounce = (callback, time) => {
+    window.clearTimeout(debounceTimer);
+    debounceTimer = window.setTimeout(callback, time);
+  };
+
+  $effect(() => {
+    incrementMode;
+    debounce(() => {
+      onChangeIncrementMode();
+    }, 10);
+  });
+
+  function onChangeIncrementMode() {
+    if (incrementMode === 'auto') {
+      _gauge.rangeOptions.mode = 'auto';
+      _gauge.rangeOptions.isCustomRanges = false;
+    } else if (incrementMode === 'manual') {
+      _gauge.rangeOptions.mode = 'manual';
+      _gauge.rangeOptions.isCustomRanges = false;
+    }
+    _gauge.ranges = getRanges(_gauge.rangeOptions);
+  }
+
   function _onSave() {
     onSave({
       ranges: _gauge.ranges,
@@ -116,16 +152,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
       customRanges = newRanges;
     } else {
       newRanges = _gauge.colors.map((n, i) => {
+        let _start = start;
         const isFirstRange = i === 0;
         const isLastRange = i === _gauge.colors.length - 1;
 
-        let from = start;
-        let to = start + increment;
+        let from = _start;
+        let to = _start + increment;
 
         if (!isLastRange && _rangeOptions.mode !== 'manual')
           to += includeFromAndTo ? 0.01 : dontIncludeFromAndTo ? -0.01 : 0;
 
-        start += increment;
+        _start += increment;
 
         const decimals =
           _rangeOptions.auto.roundIncrement && _rangeOptions.mode !== 'manual'
@@ -142,22 +179,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     return newRanges;
   }
-
-  //TODO, working on this
-  $effect(() => {
-    console.log(incrementMode);
-
-    if (incrementMode === 'auto') {
-      _gauge.rangeOptions.mode = 'auto';
-      _gauge.rangeOptions.isCustomRanges = false;
-    } else if (incrementMode === 'manual') {
-      _gauge.rangeOptions.mode = 'manual';
-      _gauge.rangeOptions.isCustomRanges = false;
-    }
-    start = getStart(_gauge.rangeOptions);
-    increment = getIncrement(_gauge.rangeOptions);
-    _gauge.ranges = getRanges(_gauge.rangeOptions);
-  });
 
   function getAutoOptimizationRanges() {
     if (_gauge.rangeOptions.auto.optimization === 'ranges') return ranges;
@@ -498,16 +519,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     class="tex-left flex flex-col items-start justify-end w-fit"
                   >
                     <label for="manual-increment" class="label"
-                      >Increment ({gauge.unit.label[project.units]})</label
+                      >Increment ({_gauge.unit.label[project.units]})</label
                     >
                     <input
                       id="manual-increment"
                       type="number"
                       min="0"
                       class="input w-fit"
+                      onchange={() => {
+                        _gauge.ranges = getRanges(_gauge.rangeOptions);
+                      }}
                       onfocus={() => {
-                        _gauge.rangeOptions.mode = 'manual';
-                        _gauge.rangeOptions.isCustomRanges = false;
+                        // _gauge.rangeOptions.mode = 'manual';
+                        // _gauge.rangeOptions.isCustomRanges = false;
                       }}
                       bind:value={_gauge.rangeOptions.manual.increment}
                     />
@@ -528,7 +552,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                           d="M2 4.5A2.5 2.5 0 014.5 2h11a2.5 2.5 0 010 5h-11A2.5 2.5 0 012 4.5zM2.75 9.083a.75.75 0 000 1.5h14.5a.75.75 0 000-1.5H2.75zM2.75 12.663a.75.75 0 000 1.5h14.5a.75.75 0 000-1.5H2.75zM2.75 16.25a.75.75 0 000 1.5h14.5a.75.75 0 100-1.5H2.75z"
                         />
                       </svg>
-                      Start From ({gauge.unit.label[project.units]})
+                      Start From ({_gauge.unit.label[project.units]})
                       <Tooltip>
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
