@@ -163,7 +163,6 @@ export class TemperatureGauge {
 
   schemeId = $state('Spectral');
   updateColors({ colors }) {
-    console.log('updating');
     this.calculating = true;
     this.colors = colors;
     this.ranges = this.autoRanges;

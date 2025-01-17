@@ -14,14 +14,12 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { run } from 'svelte/legacy';
-
   import { ALL_YARN_WEIGHTS, ICONS } from '$lib/constants';
   import { defaultYarn } from '$lib/state';
   import { delay, pluralize, stringToBrandAndYarnDetails } from '$lib/utils';
   import { brands } from '$lib/yarns/brands';
   import autocomplete from 'autocompleter';
-  import { createEventDispatcher, onMount, untrack } from 'svelte';
+  import { onMount, untrack } from 'svelte';
 
   interface Props {
     selectedBrandId?: string;
@@ -30,15 +28,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
     context?: string;
     disabled?: boolean;
     preselectDefaultYarn?: boolean;
+    onselectautocomplete?;
   }
 
   let {
-    selectedBrandId = $bindable(''),
-    selectedYarnId = $bindable(''),
+    selectedBrandId = $bindable(),
+    selectedYarnId = $bindable(),
     selectedYarnWeightId = '',
     context = '',
     disabled = false,
     preselectDefaultYarn = true,
+    onselectautocomplete = () => {},
   }: Props = $props();
 
   let inputElement = $state(),
@@ -118,8 +118,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     );
   }
 
-  const dispatch = createEventDispatcher();
-
   function getAllYarns(selectedYarnWeightId) {
     return brands.flatMap((brand) => {
       return brand.yarns
@@ -194,7 +192,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         selectedYarnId = item.meta.yarnId;
         showingAutocomplete = false;
         inputElement.blur();
-        dispatch('select', {
+        onselectautocomplete({
           selectedBrandId,
           selectedYarnId,
         });
@@ -210,10 +208,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
           container.style.width = `${group.width}px`;
           container.style.left = `${group.left}px`;
         }
-        container.style.zIndex = `1000`;
+        container.style.zIndex = `12000`;
         if (maxHeight > 480) container.style.maxHeight = `480px`;
         container.style.overflowY = `scroll`;
-        if (context === 'modal') container.style.position = 'fixed';
+        if (context === 'modal') {
+          container.style.position = 'fixed';
+          container.style.top = `${inputRect.bottom}px`;
+        }
       },
       render: function (item, currentValue) {
         var div = document.createElement('div');
@@ -278,7 +279,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           selectedBrandId = brandId;
           selectedYarnId = '';
           forceDisplayAll = true;
-          dispatch('select', {
+          onselectautocomplete({
             selectedBrandId,
             selectedYarnId,
           });
@@ -305,11 +306,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
       },
     });
   });
-  
+
   $effect(() => {
     selectedYarnWeightId;
-    onSelectedYarnWeightIdChange();
-    untrack(() => allYarns) = getAllYarns(selectedYarnWeightId);
+    untrack(() => {
+      onSelectedYarnWeightIdChange();
+      allYarns = getAllYarns(selectedYarnWeightId);
+    });
   });
 </script>
 
@@ -418,7 +421,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             await delay(10);
             if (!inputValue.length) showingAutocomplete = false;
             document.getElementById('input-select-yarn')?.focus();
-            dispatch('select', {
+            onselectautocomplete({
               selectedBrandId,
               selectedYarnId,
             });

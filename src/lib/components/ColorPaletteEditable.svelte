@@ -41,7 +41,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     roundedBottom?: boolean;
     typeId?: string;
     onchanged?: any;
-    fullscreen: boolean;
+    fullscreen?: boolean;
   }
 
   let {

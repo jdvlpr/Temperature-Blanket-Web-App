@@ -384,7 +384,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           context="modal"
           bind:selectedBrandId
           bind:selectedYarnId
-          on:select={onYarnFilterChange}
+          onselectautocomplete={onYarnFilterChange}
           {selectedYarnWeightId}
         />
       </div>
@@ -574,7 +574,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <ColorPaletteEditable
               canUserEditColor={false}
               bind:colors={matchingYarnColors}
-              onChanged={() => {
+              onchanged={() => {
                 if (matchingYarnColors.length !== numberOfColors)
                   numberOfColors = matchingYarnColors.length;
               }}

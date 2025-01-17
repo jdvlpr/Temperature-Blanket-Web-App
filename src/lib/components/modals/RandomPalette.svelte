@@ -31,7 +31,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import SelectYarnWeight from '../SelectYarnWeight.svelte';
   import ModalShell from './ModalShell.svelte';
 
-  let { numberOfColors = $bindable(), updateGauge, parent } = $props();
+  let { numberOfColors, updateGauge, parent } = $props();
 
   const modalStore = getModalStore();
 
@@ -266,23 +266,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {#snippet stickyPart()}
     <StickyPart position="bottom">
       <div class="p-2 sm:p-4">
-        {#key _yarnColorwaysPalette}
-          {#if _yarnColorwaysPalette.length}
-            <div class="mb-2 sm:mb-4">
-              {#key key}
-                <ColorPaletteEditable
-                  canUserEditColor={false}
-                  typeId="randomPalette"
-                  bind:colors={_yarnColorwaysPalette}
-                  onChanged={() => {
-                    numberOfColors = _yarnColorwaysPalette.length;
-                    key++;
-                  }}
-                />
-              {/key}
-            </div>
-          {/if}
-        {/key}
+        {#if _yarnColorwaysPalette.length}
+          <div class="mb-2 sm:mb-4">
+            {#key key}
+              <ColorPaletteEditable
+                canUserEditColor={false}
+                typeId="randomPalette"
+                bind:colors={_yarnColorwaysPalette}
+                onchanged={() => {
+                  numberOfColors = _yarnColorwaysPalette.length;
+                  key++;
+                }}
+              />
+            {/key}
+          </div>
+        {/if}
 
         <SaveAndCloseButtons
           onSave={() => {
