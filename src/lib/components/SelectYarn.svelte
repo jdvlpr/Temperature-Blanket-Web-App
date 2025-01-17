@@ -14,30 +14,40 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import { ALL_YARN_WEIGHTS, ICONS } from '$lib/constants';
   import { defaultYarn } from '$lib/state';
   import { delay, pluralize, stringToBrandAndYarnDetails } from '$lib/utils';
   import { brands } from '$lib/yarns/brands';
   import autocomplete from 'autocompleter';
-  import { createEventDispatcher, onMount } from 'svelte';
+  import { createEventDispatcher, onMount, untrack } from 'svelte';
 
-  export let selectedBrandId = '';
-  export let selectedYarnId = '';
-  export let selectedYarnWeightId = '';
-  export let context = '';
-  export let disabled = false;
-  export let preselectDefaultYarn = true;
+  interface Props {
+    selectedBrandId?: string;
+    selectedYarnId?: string;
+    selectedYarnWeightId?: string;
+    context?: string;
+    disabled?: boolean;
+    preselectDefaultYarn?: boolean;
+  }
 
-  let inputElement, inputGroup;
-  let forceDisplayAll = false;
-  let inputValue = '';
-  let showingAutocomplete = false;
+  let {
+    selectedBrandId = $bindable(''),
+    selectedYarnId = $bindable(''),
+    selectedYarnWeightId = '',
+    context = '',
+    disabled = false,
+    preselectDefaultYarn = true,
+  }: Props = $props();
 
-  let allYarns = [];
+  let inputElement = $state(),
+    inputGroup = $state();
+  let forceDisplayAll = $state(false);
+  let inputValue = $state('');
+  let showingAutocomplete = $state(false);
 
-  $: selectedYarnWeightId, onSelectedYarnWeightIdChange();
-
-  $: allYarns = getAllYarns(selectedYarnWeightId);
+  let allYarns = $state([]);
 
   function onSelectedYarnWeightIdChange() {
     if (selectedBrandId || selectedYarnId) {
@@ -295,6 +305,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
       },
     });
   });
+  
+  $effect(() => {
+    selectedYarnWeightId;
+    onSelectedYarnWeightIdChange();
+    untrack(() => allYarns) = getAllYarns(selectedYarnWeightId);
+  });
 </script>
 
 <div
@@ -315,7 +331,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         type="text"
         name="yarn-filter-search"
         autocomplete="off"
-        on:focus={async () => {
+        onfocus={async () => {
           showingAutocomplete = true;
 
           if (selectedBrandId && selectedYarnId) {
@@ -353,7 +369,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             }
           }
         }}
-        on:blur={() => (showingAutocomplete = false)}
+        onblur={() => (showingAutocomplete = false)}
         bind:value={inputValue}
         placeholder="{allYarns.length} {pluralize(
           'Yarn',
@@ -369,7 +385,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           aria-label="Show All Yarns"
           {disabled}
           class="btn-icon !px-2 h-10"
-          on:click={() => {
+          onclick={() => {
             forceDisplayAll = true;
             inputElement.focus();
           }}
@@ -395,7 +411,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           aria-label="Clear"
           {disabled}
           class="btn-icon !px-2 h-10"
-          on:click={async () => {
+          onclick={async () => {
             inputValue = '';
             selectedBrandId = '';
             selectedYarnId = '';
