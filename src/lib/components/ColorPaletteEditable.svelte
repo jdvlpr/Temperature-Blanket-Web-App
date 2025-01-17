@@ -296,8 +296,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       sortableColors = getSortableColors();
                       if (onchanged) onchanged();
                     }}
-                    class="btn-icon bg-secondary-hover-token"
+                    class="btn bg-secondary-hover-token flex items-center"
                   >
+                    <span class="text-xs">{index + 1}</span>
                     {@html ICONS.trash}
                   </button>
                 {/if}

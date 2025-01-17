@@ -52,7 +52,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     _gauge.rangeOptions?.isCustomRanges ? null : _gauge.rangeOptions.mode,
   );
 
-  let customRanges = $state([]);
+  let customRanges = $state(gauges.getSnapshot(gauges.activeGaugeId).ranges);
 
   let showAdvancedControls = $state(true);
 
@@ -148,11 +148,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
       _rangeOptions.auto.optimization !== 'ranges' &&
       _rangeOptions.mode === 'auto'
     ) {
-      newRanges = getAutoOptimizationRanges();
+      newRanges = getEvenlyDistributedRangeValuesWithEqualDayCount({
+        weatherData: weather.data,
+        numRanges: _gauge.ranges.length,
+        prop: _gauge.rangeOptions.auto.optimization,
+        gaugeDirection: _gauge.rangeOptions.direction,
+        roundIncrement: _gauge.rangeOptions.auto.roundIncrement,
+        includeFrom: _gauge.rangeOptions.includeFromValue,
+        includeTo: _gauge.rangeOptions.includeToValue,
+      });
       customRanges = newRanges;
     } else {
+      let _start = start;
       newRanges = _gauge.colors.map((n, i) => {
-        let _start = start;
         const isFirstRange = i === 0;
         const isLastRange = i === _gauge.colors.length - 1;
 
@@ -180,22 +188,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     return newRanges;
   }
 
-  function getAutoOptimizationRanges() {
-    if (_gauge.rangeOptions.auto.optimization === 'ranges') return ranges;
-    const newRanges = getEvenlyDistributedRangeValuesWithEqualDayCount({
-      weatherData: weather.data,
-      numRanges: _gauge.ranges.length,
-      prop: _gauge.rangeOptions.auto.optimization,
-      gaugeDirection: _gauge.rangeOptions.direction,
-      roundIncrement: _gauge.rangeOptions.auto.roundIncrement,
-      includeFrom: _gauge.rangeOptions.includeFromValue,
-      includeTo: _gauge.rangeOptions.includeToValue,
-    });
-    return newRanges;
-  }
-
   let dontIncludeFromAndTo = $derived(
-    !rangeOptions.includeFromValue && !rangeOptions.includeToValue,
+    !_gauge.rangeOptions.includeFromValue &&
+      !_gauge.rangeOptions.includeToValue,
   );
 
   let includeFromAndTo = $derived(
@@ -301,7 +296,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               changedGaugeDirectionOnCustomRanges =
                 _gauge.rangeOptions.isCustomRanges;
               if (changedGaugeDirectionOnCustomRanges) {
-                _gauge.ranges = _gauge.ranges
+                _gauge.ranges = customRanges
                   .map((n) => {
                     return {
                       from: n.to,
@@ -310,6 +305,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   })
                   .reverse();
                 customRanges = _gauge.ranges;
+              } else {
+                _gauge.ranges = getRanges(_gauge.rangeOptions);
               }
             }}
           />
@@ -413,7 +410,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       <select
                         bind:value={_gauge.rangeOptions.auto.optimization}
                         onchange={() => {
-                          _gauge.ranges = getAutoOptimizationRanges();
+                          _gauge.ranges = getRanges(_gauge.rangeOptions);
                         }}
                         class="select"
                       >
@@ -583,7 +580,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       id="startFrom"
                       type="number"
                       class="input w-fit"
-                      onfocus={() => (_gauge.rangeOptions.mode = 'manual')}
+                      onfocus={() => {
+                        _gauge.rangeOptions.mode = 'manual';
+                        _gauge.ranges = getRanges(_gauge.rangeOptions);
+                      }}
+                      onchange={() => {
+                        _gauge.ranges = getRanges(_gauge.rangeOptions);
+                      }}
                       bind:value={_gauge.rangeOptions.manual.start}
                     />
                   </div>
@@ -611,11 +614,35 @@ If not, see <https://www.gnu.org/licenses/>. -->
               details="When editing an individual range's From or To value, update the next or previous range's corresponding value."
             />
           </div>
-          <div class="" transition:slide>
+          <div class="">
             <SelectRangeOperators
-              direction={_gauge.rangeOptions.direction}
-              bind:includeFromValue={_gauge.rangeOptions.includeFromValue}
-              bind:includeToValue={_gauge.rangeOptions.includeToValue}
+              {rangeExample}
+              includeFromValue={_gauge.rangeOptions.includeFromValue}
+              includeToValue={_gauge.rangeOptions.includeToValue}
+              onchange={(e) => {
+                switch (e.target.value) {
+                  case 'true-false':
+                    _gauge.rangeOptions.includeFromValue = true;
+                    _gauge.rangeOptions.includeToValue = false;
+                    break;
+                  case 'false-true':
+                    _gauge.rangeOptions.includeFromValue = false;
+                    _gauge.rangeOptions.includeToValue = true;
+                    break;
+                  case 'true-true':
+                    _gauge.rangeOptions.includeFromValue = true;
+                    _gauge.rangeOptions.includeToValue = true;
+                    break;
+                  case 'false-false':
+                    _gauge.rangeOptions.includeFromValue = false;
+                    _gauge.rangeOptions.includeToValue = false;
+                    break;
+
+                  default:
+                    break;
+                }
+                _gauge.ranges = getRanges(_gauge.rangeOptions);
+              }}
             />
           </div>
         {/if}

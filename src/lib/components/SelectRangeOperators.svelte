@@ -15,15 +15,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import Tooltip from '$lib/components/Tooltip.svelte';
-  import { getRangeExample } from '$lib/utils';
 
-  export let direction, includeFromValue, includeToValue;
-
-  $: rangeExample = getRangeExample({
-    direction,
-    includeFromValue,
-    includeToValue,
-  });
+  let {
+    includeFromValue = $bindable(),
+    includeToValue = $bindable(),
+    rangeExample,
+    onchange,
+  } = $props();
 </script>
 
 <label class="label">
@@ -77,29 +75,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <select
       class="select max-w-[500px] truncate"
       value={`${includeFromValue.toString()}-${includeToValue.toString()}`}
-      on:change={(e) => {
-        switch (e.target.value) {
-          case 'true-false':
-            includeFromValue = true;
-            includeToValue = false;
-            break;
-          case 'false-true':
-            includeFromValue = false;
-            includeToValue = true;
-            break;
-          case 'true-true':
-            includeFromValue = true;
-            includeToValue = true;
-            break;
-          case 'false-false':
-            includeFromValue = false;
-            includeToValue = false;
-            break;
-
-          default:
-            break;
-        }
-      }}
+      {onchange}
       title="Change Range Calculation Method"
       id="select-range-calculation-method"
     >
