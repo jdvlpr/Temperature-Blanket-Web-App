@@ -208,7 +208,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         affiliate_variant_href,
       } = color}
       {@const isLocked = typeof color.locked !== undefined && color?.locked}
-      <button
+      <div
         class=" w-full {fullscreen
           ? 'h-full'
           : 'h-[70px] first:rounded-tl-container-token first:overflow-hidden last:rounded-tr-container-token last:overflow-hidden'} group palette-item-{uniqueId} {roundedBottom &&
@@ -217,10 +217,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
           : ''}"
         data-index={index}
         animate:flip={{ duration: flipDurationMs }}
+        role="button"
+        tabindex="0"
         onclick={() => {
           if (activeColorIndex !== index) activeColorIndex = index;
           else if (activeColorIndex === index) activeColorIndex = null;
           else activeColorIndex = index;
+        }}
+        onkeydown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            if (activeColorIndex !== index) activeColorIndex = index;
+            else if (activeColorIndex === index) activeColorIndex = null;
+            else activeColorIndex = index;
+          }
         }}
       >
         <div
@@ -419,7 +428,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             {/snippet}
           </Tooltip>
         </div>
-      </button>
+      </div>
     {/each}
   </div>
   {#if showSchemeName}

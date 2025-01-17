@@ -14,26 +14,26 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
+  import { page } from '$app/state';
   import ColorRange from '$lib/components/ColorRange.svelte';
   import DaysInRange from '$lib/components/DaysInRange.svelte';
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
   import ViewToggle from '$lib/components/buttons/ViewToggle.svelte';
   import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
   import { ICONS } from '$lib/constants';
-  import { gauges, layout, modal, showDaysInRange } from '$lib/state';
+  import { layout, modal, showDaysInRange } from '$lib/state';
   import type { Color } from '$lib/types';
   import { getTextColor } from '$lib/utils';
-  import {
-    dndzone,
-    dragHandle,
-    dragHandleZone,
-    SOURCES,
-  } from 'svelte-dnd-action';
+  import { dragHandle, dragHandleZone, SOURCES } from 'svelte-dnd-action';
   import { flip } from 'svelte/animate';
+
+  let { gauge = $bindable() } = $props();
 
   let dragDisabled = $state(false);
 
   const flipDurationMs = 90;
+
+  const isProjectPlannerPage = page.route.id === '/';
 
   function checkForAffiliateURLs({ colors }) {
     return colors?.some((n) => n?.affiliate_variant_href);
@@ -50,10 +50,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     variant_href,
     affiliate_variant_href,
   }) {
-    gauges.activeGauge.schemeId = 'Custom';
+    gauge.schemeId = 'Custom';
 
     const _colors = [];
-    gauges.activeGauge.colors.forEach((color, i) => {
+    gauge.colors.forEach((color, i) => {
       if (i === index) {
         _colors.push({
           hex,
@@ -68,7 +68,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       } else {
         _colors.push(color);
       }
-      gauges.activeGauge.colors = _colors;
+      gauge.colors = _colors;
     });
 
     sortableColors = getSortableColors();
@@ -92,12 +92,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     sortableColors = newItems;
 
-    gauges.activeGauge.colors = sortableColors.map((color) => {
+    gauge.colors = sortableColors.map((color) => {
       delete color.id;
       return color;
     });
 
-    gauges.activeGauge.schemeId = 'Custom';
+    gauge.schemeId = 'Custom';
     // Ensure dragging is stopped on drag finish via pointer (mouse, touch)
     if (source === SOURCES.POINTER) {
       dragDisabled = false;
@@ -109,17 +109,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
     dragDisabled = false;
   }
 
-  let movable = $derived(gauges.activeGauge.colors?.length > 1);
+  let movable = $derived(gauge.colors?.length > 1);
 
   let hasAnyAffiliateURLs = $derived(
-    checkForAffiliateURLs({ colors: gauges.activeGauge.colors }),
+    checkForAffiliateURLs({ colors: gauge.colors }),
   );
 
   let sortableColors: Color[] = $state(getSortableColors());
 
   function getSortableColors() {
     const _sortableColors = [];
-    gauges.activeGauge.colors.forEach((color, i) => {
+    gauge.colors.forEach((color, i) => {
       _sortableColors.push({ ...color, id: i });
     });
     return _sortableColors;
@@ -156,18 +156,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
 {/if}
 
 <div class="grid grid-cols-12 gap-2 pt-2">
-  <div
-    class="flex flex-col items-start text-left gap-1 col-span-full md:col-span-8"
-  >
-    <ToggleSwitch
-      bind:checked={showDaysInRange.value}
-      label={`Show number of days in ranges`}
-      details="Applies to the view below and PDF file"
-    />
-  </div>
+  {#if isProjectPlannerPage}
+    <div
+      class="flex flex-col items-start text-left gap-1 col-span-full md:col-span-8"
+    >
+      <ToggleSwitch
+        bind:checked={showDaysInRange.value}
+        label={`Show number of days in ranges`}
+        details="Applies to the view below and PDF file"
+      />
+    </div>
+  {/if}
 
   <div
-    class="my-2 col-span-full flex flex-wrap justify-center md:justify-end md:col-span-4 md:cols-start-9"
+    class="my-2 col-span-full flex flex-wrap justify-center {isProjectPlannerPage
+      ? 'md:justify-end md:col-span-4 md:cols-start-9'
+      : ''}"
   >
     <ViewToggle />
   </div>
@@ -201,13 +205,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
           title="Remove Color"
           class="btn bg-secondary-hover-token flex flex-wrap justify-center items-center"
           onclick={() => {
-            gauges.activeGauge.colors = gauges.activeGauge.colors.filter(
-              (_, i) => i !== index,
-            );
+            gauge.colors = gauge.colors.filter((_, i) => i !== index);
             sortableColors = getSortableColors();
-            gauges.activeGauge.schemeId = 'Custom';
-            gauges.activeGauge.numberOfColors =
-              gauges.activeGauge.colors.length;
+            gauge.schemeId = 'Custom';
+            gauge.numberOfColors = gauge.colors.length;
           }}
         >
           <span class="text-xs">{index + 1}</span>
@@ -307,22 +308,24 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </a>
       {/if}
 
-      <div class="flex gap-2">
-        {#key index}
-          <ColorRange {index} />
-        {/key}
-      </div>
-
-      {#if showDaysInRange.value}
-        <div
-          class="flex flex-wrap w-fit justify-center items-center bg-surface-900/10 rounded-container-token shadow-inner"
-        >
-          <DaysInRange
-            range={gauges.activeGauge.ranges[index]}
-            rangeOptions={gauges.activeGauge.rangeOptions}
-            targets={gauges.activeGauge.targets}
-          />
+      {#if isProjectPlannerPage}
+        <div class="flex gap-2">
+          {#key index}
+            <ColorRange {index} />
+          {/key}
         </div>
+
+        {#if showDaysInRange.value}
+          <div
+            class="flex flex-wrap w-fit justify-center items-center bg-surface-900/10 rounded-container-token shadow-inner"
+          >
+            <DaysInRange
+              range={gauge.ranges[index]}
+              rangeOptions={gauge.rangeOptions}
+              targets={gauge.targets}
+            />
+          </div>
+        {/if}
       {/if}
     </div>
   {/each}

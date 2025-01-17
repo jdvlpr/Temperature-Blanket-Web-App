@@ -14,10 +14,9 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
+  import { page } from '$app/state';
   import ColorPaletteEditable from '$lib/components/ColorPaletteEditable.svelte';
-  import GaugeCustomizer from '$lib/components/GaugeCustomizer.svelte';
   import SelectNumberOfColors from '$lib/components/SelectNumberOfColors.svelte';
-  import RangeOptionsButton from '$lib/components/buttons/RangeOptionsButton.svelte';
   import BrowsePalettes from '$lib/components/modals/BrowsePalettes.svelte';
   import ChooseColorways from '$lib/components/modals/ChooseColorways.svelte';
   import GetPaletteFromImage from '$lib/components/modals/GetPaletteFromImage.svelte';
@@ -26,7 +25,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import SortPalette from '$lib/components/modals/SortPalette.svelte';
   import {
     drawerState,
-    gauges,
     isDesktop,
     modal,
     pageSections,
@@ -34,16 +32,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '$lib/state';
   import type { Color, GaugeSettingsType } from '$lib/types';
   import { createGaugeColors } from '$lib/utils';
-  import {
-    focusTrap,
-    getModalStore,
-    getToastStore,
-  } from '@skeletonlabs/skeleton';
+  import { focusTrap, getModalStore } from '@skeletonlabs/skeleton';
   import { Drawer } from 'vaul-svelte';
 
-  const modalStore = getModalStore();
+  let { gauge = $bindable() } = $props();
 
-  const toastStore = getToastStore();
+  const modalStore = getModalStore();
 
   function updateGauge({
     _colors,
@@ -53,10 +47,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     _schemeId?: GaugeSettingsType['schemeId'];
   }) {
     if (_colors) {
-      gauges.activeGauge.updateColors({ colors: _colors });
+      gauge.updateColors({ colors: _colors });
     }
 
-    gauges.activeGauge.schemeId = _schemeId;
+    gauge.schemeId = _schemeId;
 
     drawerState.closeAll();
     if ($modalStore[0]) modalStore.close();
@@ -91,7 +85,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
       if (
         !pageSections.items.find((p) => p.id === 'page-section-gauges')
           ?.active &&
-        !pinAllSections.value
+        !pinAllSections.value &&
+        page.route.id === '/'
       )
         return;
       fullscreen = !fullscreen;
@@ -101,33 +96,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }}
 />
 
-{#if gauges.activeGaugeId !== 'temp'}
-  <!-- If this is not the default temperature gauge and we're on the project planner page -->
-  <button
-    class="btn bg-secondary-hover-token justify-start gap-1 top-2 relative max-sm:mb-2"
-    title="Delete {gauges.activeGauge.label}"
-    onclick={() => {
-      gauges.remove(gauges.activeGauge.id);
-    }}
-  >
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke-width="1.5"
-      stroke="currentColor"
-      class="w-6 h-6 mr-1"
-    >
-      <path
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
-      />
-    </svg>
-    Delete {gauges.activeGauge.label}
-  </button>
-{/if}
-
 <div
   class="w-full flex flex-col justify-center items-center bg-surface-300-600-token text-token {fullscreen
     ? 'fixed w-full h-full left-0 top-0 bg-surface-50-900-token overflow-scroll'
@@ -136,11 +104,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   use:focusTrap={fullscreen}
 >
   <div class="w-full {fullscreen ? 'flex-auto w-full h-fullf' : ''}">
-    {#key gauges.activeGauge.colors}
+    {#key gauge.colors}
       <ColorPaletteEditable
         bind:fullscreen
-        bind:colors={gauges.activeGauge.colors}
-        schemeName={gauges.activeGauge.schemeId}
+        bind:colors={gauge.colors}
+        schemeName={gauge.schemeId}
         showSchemeName={false}
         roundedBottom={false}
       />
@@ -155,14 +123,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <div class="">
       <SelectNumberOfColors
         hideText={fullscreen}
-        numberOfColors={gauges.activeGauge.colors.length}
+        numberOfColors={gauge.colors.length}
         onchange={(e) => {
           const colors = createGaugeColors({
-            schemeId: gauges.activeGauge.schemeId,
+            schemeId: gauge.schemeId,
             numberOfColors: +e.target.value,
-            colors: $state.snapshot(gauges.activeGauge.colors),
+            colors: $state.snapshot(gauge.colors),
           });
-          gauges.activeGauge.updateColors({ colors });
+          gauge.updateColors({ colors });
         }}
       />
     </div>
@@ -177,8 +145,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
             component: {
               ref: BrowsePalettes,
               props: {
-                numberOfColors: gauges.activeGauge.numberOfColors,
-                schemeId: gauges.activeGauge.schemeId,
+                numberOfColors: gauge.numberOfColors,
+                schemeId: gauge.schemeId,
                 updateGauge,
               },
             },
@@ -244,8 +212,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
               ></div>
               <div class="mx-auto text-center">
                 <BrowsePalettes
-                  numberOfColors={gauges.activeGauge.numberOfColors}
-                  schemeId={gauges.activeGauge.schemeId}
+                  numberOfColors={gauge.numberOfColors}
+                  schemeId={gauge.schemeId}
                   {updateGauge}
                   context="drawer"
                 />
@@ -298,7 +266,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           component: {
             ref: GetPaletteFromImage,
             props: {
-              numberOfColors: gauges.activeGauge.numberOfColors,
+              numberOfColors: gauge.numberOfColors,
               updateGauge,
             },
           },
@@ -331,7 +299,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           component: {
             ref: ImportExportPalette,
             props: {
-              colors: $state.snapshot(gauges.activeGauge.colors),
+              colors: $state.snapshot(gauge.colors),
               updateGauge,
             },
           },
@@ -365,7 +333,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           component: {
             ref: RandomPalette,
             props: {
-              numberOfColors: gauges.activeGauge.numberOfColors,
+              numberOfColors: gauge.numberOfColors,
               updateGauge,
             },
           },
@@ -399,7 +367,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           component: {
             ref: SortPalette,
             props: {
-              colors: $state.snapshot(gauges.activeGauge.colors),
+              colors: $state.snapshot(gauge.colors),
               updateGauge,
             },
           },
@@ -428,6 +396,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       aria-label="Fullscreen"
       class="btn bg-secondary-hover-token flex gap-1 justify-start items-center"
       onclick={() => (fullscreen = !fullscreen)}
+      title="Toggle Fullscreen Editing Mode (f)"
     >
       {#if !fullscreen}
         <svg
@@ -467,11 +436,3 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </button>
   </div>
 </div>
-
-<div class="mt-2 mb-4">
-  <RangeOptionsButton />
-</div>
-
-{#key gauges.activeGauge.colors}
-  <GaugeCustomizer />
-{/key}

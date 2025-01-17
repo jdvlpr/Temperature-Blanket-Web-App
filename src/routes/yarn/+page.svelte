@@ -51,8 +51,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import AppShell from '$lib/components/AppShell.svelte';
   import Card from '$lib/components/Card.svelte';
   import Footer from '$lib/components/Footer.svelte';
+  import Gauge from '$lib/components/Gauge.svelte';
+  import GaugeCustomizer from '$lib/components/GaugeCustomizer.svelte';
   import Share from '$lib/components/Share.svelte';
   import YarnSources from '$lib/components/YarnSources.svelte';
+  import { TemperatureGauge } from '$lib/state/gauges/temperature-gauge-state.svelte';
   import type { Color } from '$lib/types';
   import {
     colorsToCode,
@@ -65,6 +68,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let urlParams,
     schemeId = $state('Custom');
   let isFinishedOnMount = $state(false);
+
+  let yarnGauge = $state(new TemperatureGauge());
+
   onMount(() => {
     urlParams = new URLSearchParams(window.location.search);
     // Load URL
@@ -154,12 +160,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
               class="transition-opacity opacity-100 mt-4"
               class:opacity-50={!isFinishedOnMount}
             >
-              <!-- <Gauge
-                bind:colors={yarn.colors}
-                bind:numberOfColors={yarn.colors.length}
-                bind:schemeId
-                context="weatherless"
-              /> -->
+              <Gauge bind:gauge={yarnGauge} />
+
+              {#key yarnGauge.colors}
+                <GaugeCustomizer bind:gauge={yarnGauge} />
+              {/key}
             </div>
           {/snippet}
         </Card>
