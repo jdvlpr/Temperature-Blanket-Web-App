@@ -343,18 +343,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke-width="1.5"
-        stroke="currentColor"
         class="size-6 mr-1"
-      >
-        <path
+        viewBox="0 0 24 24"
+        ><path
+          fill="none"
+          stroke="currentColor"
           stroke-linecap="round"
           stroke-linejoin="round"
-          d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"
-        />
-      </svg>
+          stroke-width="1.5"
+          d="M3 17h2.735a4 4 0 0 0 3.43-1.942l3.67-6.116A4 4 0 0 1 16.265 7H21m0 0l-2-2m2 2l-2 2M3 7h2.735a4 4 0 0 1 2.871 1.215M21 17h-4.735a4 4 0 0 1-2.871-1.215M21 17l-2 2m2-2l-2-2"
+        /></svg
+      >
       {#if !fullscreen}
         Random
       {/if}
