@@ -18,6 +18,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <script lang="ts">
+  import { browser } from '$app/environment';
   import Tooltip from '$lib/components/Tooltip.svelte';
   import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
   import { ICONS } from '$lib/constants';
@@ -57,6 +58,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }: Props = $props();
 
   const flipDurationMs = 200;
+
+  const uniqueId = browser ? crypto.randomUUID() : '';
 
   let sortableColors = $state(getSortableColors());
 
@@ -157,7 +160,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     if (tooltipElement) tooltipElement.style.display = 'none';
 
-    // draggedEl.style.minWidth = '24px';
+    draggedEl.style.zIndex = '30000';
     // draggedEl.querySelector('.dragicon').style.display = 'block';
   }
 
@@ -168,11 +171,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <svelte:window
   onclick={(e) => {
-    if (!(e.target as Element).closest('.palette-item'))
+    if (!(e.target as Element).closest(`.palette-item-${uniqueId}`))
       activeColorIndex = null;
     else
-      activeColorIndex = +(e.target as Element).closest('.palette-item')
-        ?.dataset.index;
+      activeColorIndex = +(e.target as Element).closest(
+        `.palette-item-${uniqueId}`,
+      )?.dataset.index;
   }}
 />
 
@@ -207,7 +211,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <button
         class=" w-full {fullscreen
           ? 'h-full'
-          : 'h-[70px] first:rounded-tl-container-token first:overflow-hidden last:rounded-tr-container-token last:overflow-hidden'} group palette-item {roundedBottom &&
+          : 'h-[70px] first:rounded-tl-container-token first:overflow-hidden last:rounded-tr-container-token last:overflow-hidden'} group palette-item-{uniqueId} {roundedBottom &&
         !fullscreen
           ? 'first:rounded-bl-container-token last:rounded-br-container-token'
           : ''}"
@@ -375,8 +379,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     class="btn btn-icon"
                     onclick={(e) => {
                       e.preventDefault();
-                      color.locked = !color.locked;
-                      if (onchanged) onchanged();
+                      colors[index].locked = !colors[index].locked;
+                      color.locked = colors[index].locked;
+                      if (onchanged) onchanged($state.snapshot(colors));
                     }}
                   >
                     {#if color.locked}

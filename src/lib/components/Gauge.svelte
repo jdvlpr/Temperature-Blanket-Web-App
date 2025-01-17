@@ -69,10 +69,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   $effect(() => {
     if (fullscreen) {
       gaugeContainerElement.style.zIndex = '40';
-      document.body.classList.add('overflow-hidden');
+      document.body.style.overflow = 'hidden';
     } else {
       gaugeContainerElement.style.zIndex = '';
-      document.body.classList.remove('overflow-hidden');
+      document.body.style.overflow = '';
     }
   });
 </script>

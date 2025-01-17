@@ -41,12 +41,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
     debounceTimer = window.setTimeout(callback, time);
   };
 
-  let _yarnColorwaysPalette = $state([]);
+  let randomPalette = $state([getRandomColors()]);
   let selectedBrandId = $state();
   let selectedYarnId = $state();
   let selectedYarnWeightId = $state('');
   let sortColors = $state('light-to-dark');
-  let key = $state(0);
+
+  $inspect(randomPalette);
 
   function getRandomColors() {
     debounce(() => {
@@ -62,9 +63,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
         // Check if the current index has a locked color
         const currentIndex = tempYarnColorways.length;
         let color;
-        if (_yarnColorwaysPalette[currentIndex]?.locked) {
+        if (randomPalette[currentIndex]?.locked) {
           // Use the locked color instead of a random one
-          color = _yarnColorwaysPalette[currentIndex];
+          color = randomPalette[currentIndex];
           const colorId = `${color.hex}-${color.name}-${color.brandId}-${color.yarnId}`;
           tempYarnColorways.push(color);
           existingColorways.add(colorId);
@@ -91,11 +92,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
           }
         }
       }
-      _yarnColorwaysPalette = getSortedPalette({
+      randomPalette = getSortedPalette({
         palette: tempYarnColorways,
         sortColors,
       });
-    }, 0);
+    }, 10);
   }
   let filteredYarnsList = $derived(
     getFilteredYarns({
@@ -225,8 +226,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
         id="sort-colors-by"
         bind:value={sortColors}
         onchange={() => {
-          _yarnColorwaysPalette = getSortedPalette({
-            palette: _yarnColorwaysPalette,
+          randomPalette = getSortedPalette({
+            palette: randomPalette,
             sortColors,
           });
         }}
@@ -266,26 +267,24 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {#snippet stickyPart()}
     <StickyPart position="bottom">
       <div class="p-2 sm:p-4">
-        {#if _yarnColorwaysPalette.length}
-          <div class="mb-2 sm:mb-4">
-            {#key key}
-              <ColorPaletteEditable
-                canUserEditColor={false}
-                typeId="randomPalette"
-                bind:colors={_yarnColorwaysPalette}
-                onchanged={() => {
-                  numberOfColors = _yarnColorwaysPalette.length;
-                  key++;
-                }}
-              />
-            {/key}
-          </div>
-        {/if}
+        <div class="mb-2 sm:mb-4">
+          {#key randomPalette}
+            <ColorPaletteEditable
+              canUserEditColor={false}
+              typeId="randomPalette"
+              bind:colors={randomPalette}
+              onchanged={(eventColors) => {
+                if (eventColors) randomPalette = eventColors;
+                numberOfColors = randomPalette.length;
+              }}
+            />
+          {/key}
+        </div>
 
         <SaveAndCloseButtons
           onSave={() => {
             updateGauge({
-              _colors: _yarnColorwaysPalette.map((color) => {
+              _colors: randomPalette.map((color) => {
                 delete color.locked;
                 return color;
               }),

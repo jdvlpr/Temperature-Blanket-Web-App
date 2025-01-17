@@ -85,7 +85,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     placement,
     middleware: [
       offset(12),
-      autoPlacement(),
+      flip(),
       size({
         apply({ availableWidth, availableHeight, elements }) {
           // Do things with the data, e.g.
