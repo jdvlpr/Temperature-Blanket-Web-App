@@ -30,6 +30,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { getModalStore } from '@skeletonlabs/skeleton';
   import SelectYarnWeight from '../SelectYarnWeight.svelte';
   import ModalShell from './ModalShell.svelte';
+  import { isDesktop } from '$lib/state';
 
   let { numberOfColors, updateGauge, parent } = $props();
 
@@ -46,8 +47,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let selectedYarnId = $state();
   let selectedYarnWeightId = $state('');
   let sortColors = $state('light-to-dark');
-
-  $inspect(randomPalette);
 
   function getRandomColors() {
     debounce(() => {
@@ -124,6 +123,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
     getRandomColors();
   });
 </script>
+
+<svelte:window
+  onkeydown={(e) => {
+    if (
+      e.target.tagName === 'INPUT' ||
+      e.target.tagName === 'TD' ||
+      e.target.tagName === 'SELECT' ||
+      e.target.tagName === 'BUTTON'
+    )
+      return;
+    if (e.key === 'r') {
+      getRandomColors();
+    }
+  }}
+/>
 
 <ModalShell {parent}>
   <div class="grid grid-cols-12 gap-4 justify-center items-end w-full">
@@ -242,7 +256,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     <button
       class="btn variant-filled-primary col-span-full sm:col-span-4 sm:col-start-9 order-7"
-      title="Generate Random Colors"
+      title="Generate Random Colors (r)"
       onclick={() => {
         getRandomColors();
       }}
