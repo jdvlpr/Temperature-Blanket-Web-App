@@ -51,6 +51,11 @@ export const entries: ChangelogItem[] = [
         text: `61 colorways`,
         title: 'Added Yarn: Hobbii - Amigo XL',
       },
+      {
+        icon: ICONS.checkCircle,
+        text: `18 colorways`,
+        title: 'Added Yarn: Lion Brand - Re-Spun',
+      },
     ],
     version: '4.15.0',
   },

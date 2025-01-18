@@ -9,6 +9,7 @@ import { yarn as heartland } from './heartland/yarn';
 import { yarn as hueMe } from './hue-me/yarn';
 import { yarn as lbCollectionSuperwashMerino } from './lb-collection-superwash-merino/yarn';
 import { yarn as poundOfLove } from './pound-of-love/yarn';
+import { yarn as reSpun } from './re-spun/yarn';
 import { yarn as reUpBonusBundle } from './re-up-bonus-bundle/yarn';
 import { yarn as schittsCreek } from './schitts-creek/yarn';
 import { yarn as truboo } from './truboo/yarn';
@@ -30,6 +31,7 @@ export const brand: Brand = {
     hueMe,
     lbCollectionSuperwashMerino,
     poundOfLove,
+    reSpun,
     reUpBonusBundle,
     schittsCreek,
     truboo,
