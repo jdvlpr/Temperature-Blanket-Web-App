@@ -33,6 +33,11 @@ export const entries: ChangelogItem[] = [
       },
       {
         icon: ICONS.checkCircle,
+        text: `47 colorways`,
+        title: 'Added Yarn: Fiddlesticks - Superb 10',
+      },
+      {
+        icon: ICONS.checkCircle,
         text: `21 colorways`,
         title: 'Added Yarn: Filatura Di Crosa - Zara 8',
       },
