@@ -23,6 +23,16 @@ export const entries: ChangelogItem[] = [
     notes: [
       {
         icon: ICONS.checkCircle,
+        text: `65 colorways`,
+        title: 'Added Yarn: Alize - Cotton Gold',
+      },
+    ],
+    version: '4.15.0',
+  },
+  {
+    notes: [
+      {
+        icon: ICONS.checkCircle,
         text: `25 colorways`,
         title: 'Added Yarn: Gründl - Funny uni',
       },
