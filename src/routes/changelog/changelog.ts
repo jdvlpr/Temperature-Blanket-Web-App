@@ -28,6 +28,16 @@ export const entries: ChangelogItem[] = [
       },
       {
         icon: ICONS.checkCircle,
+        text: `58 colorways`,
+        title: 'Added Yarn: Bellissimo - Bellissimo 8',
+      },
+      {
+        icon: ICONS.checkCircle,
+        text: `21 colorways`,
+        title: 'Added Yarn: Filatura Di Crosa - Zara 8',
+      },
+      {
+        icon: ICONS.checkCircle,
         text: `57 colorways`,
         title: 'Added Yarn: Hobbii - Amigo Chunky',
       },
