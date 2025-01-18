@@ -26,6 +26,11 @@ export const entries: ChangelogItem[] = [
         text: `65 colorways`,
         title: 'Added Yarn: Alize - Cotton Gold',
       },
+      {
+        icon: ICONS.checkCircle,
+        text: `61 colorways`,
+        title: 'Added Yarn: Hobbii - Amigo XL',
+      },
     ],
     version: '4.15.0',
   },
