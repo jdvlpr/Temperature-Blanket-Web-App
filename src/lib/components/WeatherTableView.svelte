@@ -67,9 +67,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     }),
   ]);
 
-  const table = new TableHandler(tableData, {
-    rowsPerPage: 10,
-  });
+  const table = $derived(
+    new TableHandler(tableData, {
+      rowsPerPage: 10,
+    }),
+  );
 </script>
 
 <div class="w-full my-4">
