@@ -28,6 +28,11 @@ export const entries: ChangelogItem[] = [
       },
       {
         icon: ICONS.checkCircle,
+        text: `57 colorways`,
+        title: 'Added Yarn: Hobbii - Amigo Chunky',
+      },
+      {
+        icon: ICONS.checkCircle,
         text: `61 colorways`,
         title: 'Added Yarn: Hobbii - Amigo XL',
       },
