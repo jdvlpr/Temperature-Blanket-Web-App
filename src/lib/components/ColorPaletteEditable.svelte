@@ -32,6 +32,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     dragHandleZone,
   } from 'svelte-dnd-action';
   import { flip } from 'svelte/animate';
+  import { fade } from 'svelte/transition';
 
   interface Props {
     colors?: Color[];
@@ -57,6 +58,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     fullscreen = $bindable(),
   }: Props = $props();
 
+  let debounceTimer;
+  const debounce = (callback, time) => {
+    window.clearTimeout(debounceTimer);
+    debounceTimer = window.setTimeout(callback, time);
+  };
+
   const flipDurationMs = 200;
 
   const uniqueId = browser ? crypto.randomUUID() : '';
@@ -64,6 +71,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let sortableColors = $state(getSortableColors());
 
   let activeColorIndex: number | null = $state(null);
+
+  $inspect(activeColorIndex);
 
   function onChangeColor({
     index,
@@ -231,6 +240,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
             else activeColorIndex = index;
           }
         }}
+        onmouseenter={() => {
+          debounce(() => {
+            activeColorIndex = index;
+          }, 50);
+        }}
+        onmouseleave={() => {
+          debounce(() => {
+            activeColorIndex = null;
+          }, 50);
+        }}
       >
         <Tooltip
           tooltipStyle="background:{hex};"
@@ -254,7 +273,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 16 16"
                 fill="currentColor"
-                class="w-4 h-4 opacity-40 group-hover:hidden group-focus:hidden"
+                class="w-4 h-4 opacity-40"
               >
                 <path
                   fill-rule="evenodd"
@@ -269,7 +288,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 !isDragging.value &&
                 !isLocked
                   ? '!hidden'
-                  : '!inline-block'}"
+                  : 'inline-block'}"
                 class:hidden={sortableColors.length > 30}
                 class:sm:block={sortableColors.length > 30 &&
                   sortableColors.length <= 50}
@@ -286,12 +305,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
               !isDragging.value &&
               !isLocked
                 ? '!inline-block'
-                : 'hidden'}"
+                : '!hidden'}"
               class:group-hover:inline-block={isDragging.value}
               style="color:{getTextColor(hex)}; {isDragging.value
                 ? 'cursor: grab'
                 : 'cursor: grabbing'}"
               onmousedown={startDrag}
+              in:fade
               use:dragHandle
               ontouchstart={startDrag}
               onkeydown={handleKeyDown}
