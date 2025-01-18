@@ -302,21 +302,33 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 class="w-full rounded-container-token text-center break-all flex flex-wrap items-center justify-center gap-4 z-30"
               >
                 {#if canUserDeleteColor && sortableColors.length > 1}
-                  <button
-                    onclick={async () => {
+                  <div
+                    role="button"
+                    tabindex="0"
+                    onclick={() => {
                       colors = colors.filter((_, i) => i !== index);
 
                       sortableColors = getSortableColors();
                       if (onchanged) onchanged();
                     }}
+                    onkeydown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        colors = colors.filter((_, i) => i !== index);
+
+                        sortableColors = getSortableColors();
+                        if (onchanged) onchanged();
+                      }
+                    }}
                     class="btn bg-secondary-hover-token flex items-center"
                   >
                     <span class="text-xs">{index + 1}</span>
                     {@html ICONS.trash}
-                  </button>
+                  </div>
                 {/if}
                 {#if canUserEditColor}
-                  <button
+                  <div
+                    role="button"
+                    tabindex="0"
                     class="btn bg-secondary-hover-token flex items-center justify-start"
                     onclick={() =>
                       modal.state.trigger({
@@ -337,6 +349,28 @@ If not, see <https://www.gnu.org/licenses/>. -->
                           },
                         },
                       })}
+                    onkeydown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        modal.state.trigger({
+                          type: 'component',
+                          component: {
+                            ref: ChangeColor,
+                            props: {
+                              index,
+                              hex,
+                              name,
+                              brandId,
+                              yarnId,
+                              brandName,
+                              yarnName,
+                              variant_href,
+                              affiliate_variant_href,
+                              onChangeColor,
+                            },
+                          },
+                        });
+                      }
+                    }}
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -366,7 +400,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       </span>
                       <span class="text-lg leading-tight"> {name || hex}</span>
                     </span>
-                  </button>
+                  </div>
                 {:else}
                   <div
                     class="flex flex-col items-start justify-start text-left text-wrap"
@@ -384,13 +418,23 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   </div>
                 {/if}
                 {#if typeof color.locked !== 'undefined'}
-                  <button
+                  <div
+                    role="button"
+                    tabindex="0"
                     class="btn btn-icon"
                     onclick={(e) => {
                       e.preventDefault();
                       colors[index].locked = !colors[index].locked;
                       color.locked = colors[index].locked;
                       if (onchanged) onchanged($state.snapshot(colors));
+                    }}
+                    onkeydown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        colors[index].locked = !colors[index].locked;
+                        color.locked = colors[index].locked;
+                        if (onchanged) onchanged($state.snapshot(colors));
+                      }
                     }}
                   >
                     {#if color.locked}
@@ -422,7 +466,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         />
                       </svg>
                     {/if}
-                  </button>
+                  </div>
                 {/if}
               </div>
             {/snippet}
@@ -435,30 +479,3 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <p class="text-xs">{@html schemeName}</p>
   {/if}
 </div>
-<!-- 
-{#if fullscreen}
-  <div class="flex w-full justify-center p-2">
-    <button
-      aria-label="Fullscreen"
-      class="btn bg-secondary-hover-token flex gap-1 justify-start items-center"
-      onclick={() => (fullscreen = false)}
-    >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke-width="1.5"
-        stroke="currentColor"
-        class="size-6"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="M9 9V4.5M9 9H4.5M9 9 3.75 3.75M9 15v4.5M9 15H4.5M9 15l-5.25 5.25M15 9h4.5M15 9V4.5M15 9l5.25-5.25M15 15h4.5M15 15v4.5m0-4.5 5.25 5.25"
-        />
-      </svg>
-
-      Exit Fullscreen
-    </button>
-  </div>
-{/if} -->

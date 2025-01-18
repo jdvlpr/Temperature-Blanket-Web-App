@@ -14,6 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
+  import { browser } from '$app/environment';
   import { page } from '$app/state';
   import ColorPaletteEditable from '$lib/components/ColorPaletteEditable.svelte';
   import SelectNumberOfColors from '$lib/components/SelectNumberOfColors.svelte';
@@ -135,7 +136,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       />
     </div>
 
-    {#if isDesktop.current}
+    {#if isDesktop.current || !browser}
       <button
         class="btn bg-secondary-hover-token justify-start"
         title="Browse Preset & User-Created Color Palettes"
@@ -170,11 +171,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
           Browse Palettes
         {/if}
       </button>
-    {/if}
-
-    {#if !isDesktop.current}
+    {:else}
       <Drawer.Root bind:open={drawerState.browsePalettes}>
-        <Drawer.Trigger on:click={() => (drawerState.browsePalettes = true)}>
+        <Drawer.Trigger
+          on:click={() => {
+            drawerState.browsePalettes = true;
+          }}
+        >
           <button
             class="btn bg-secondary-hover-token justify-start"
             title="Browse Preset & User-Created Color Palettes"
