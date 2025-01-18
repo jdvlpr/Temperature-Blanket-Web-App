@@ -99,7 +99,7 @@ export const privacy = {
       `,
           hideDismiss: true,
           classes: 'flex max-sm:flex-col max-sm:gap-2 max-sm:items-end',
-          background: 'bg-surface-200-700-token',
+          background: 'bg-surface-50-900-token',
           timeout: 31556952000, // one year
           action: {
             label: 'Save',

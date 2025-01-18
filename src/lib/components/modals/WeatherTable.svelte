@@ -57,13 +57,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   const table = $derived(new TableHandler(tableData, { rowsPerPage: 10 }));
 
   let dateHeader = $derived(weather.grouping === 'week' ? 'Week of' : 'Date');
-
-  //TODO: Is this necessary?
-  // $effect(() => {
-  //   if (tableData) {
-  //     table.setRows(tableData);
-  //   }
-  // });
 </script>
 
 <ModalShell {parent}>

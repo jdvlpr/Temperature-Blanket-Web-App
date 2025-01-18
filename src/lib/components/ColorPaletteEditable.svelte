@@ -72,8 +72,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let activeColorIndex: number | null = $state(null);
 
-  $inspect(activeColorIndex);
-
   function onChangeColor({
     index,
     hex,
