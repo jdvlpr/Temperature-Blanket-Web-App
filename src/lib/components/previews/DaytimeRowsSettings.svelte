@@ -109,7 +109,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     displayNumber,
     setTargets,
   } from '$lib/utils';
-  import { TableHandler, Th } from '@vincjo/datatables';
+  import { TableHandler } from '@vincjo/datatables';
   import { slide } from 'svelte/transition';
 
   const table = new TableHandler(tableData, { rowsPerPage: 10 });
@@ -380,25 +380,25 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <table class="border-separate border-spacing-0 w-full">
         <thead>
           <tr>
-            <Th>Row</Th>
-            <Th
+            <th>Row</th>
+            <th
               >{weather.groupingHeading}
-              <span class="text-xs">(YYYY-MM-DD)</span></Th
+              <span class="text-xs">(YYYY-MM-DD)</span></th
             >
             {#if $settings.daytimePosition === 'left'}
-              <Th>Daytime stitches <br />({daytimeLabel})</Th>
-              <Th>Night stitches<br />({nightLabel})</Th>
+              <th>Daytime stitches <br />({daytimeLabel})</th>
+              <th>Night stitches<br />({nightLabel})</th>
             {:else if $settings.daytimePosition === 'right'}
-              <Th>Night stitches<br />({nightLabel})</Th>
-              <Th>Daytime stitches<br />({daytimeLabel})</Th>
+              <th>Night stitches<br />({nightLabel})</th>
+              <th>Daytime stitches<br />({daytimeLabel})</th>
             {:else if $settings.daytimePosition === 'center'}
-              <Th>Night stitches<br />(left side)</Th>
-              <Th>Daytime stitches<br />(center)</Th>
-              <Th>Night stitches<br />(right side)</Th>
+              <th>Night stitches<br />(left side)</th>
+              <th>Daytime stitches<br />(center)</th>
+              <th>Night stitches<br />(right side)</th>
             {:else if $settings.daytimePosition === 'sides'}
-              <Th>Daytime stitches<br />(left side)</Th>
-              <Th>Night stitches<br />(center)</Th>
-              <Th>Daytime stitches<br />(right side)</Th>
+              <th>Daytime stitches<br />(left side)</th>
+              <th>Night stitches<br />(center)</th>
+              <th>Daytime stitches<br />(right side)</th>
             {/if}
           </tr>
         </thead>

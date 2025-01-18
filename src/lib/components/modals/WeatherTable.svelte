@@ -17,7 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import DataTable from '$lib/components/datatable/DataTable.svelte';
   import { allGaugesAttributes, project, weather } from '$lib/state';
   import { convertTime, dateToISO8601String } from '$lib/utils';
-  import { Datatable, TableHandler, Th } from '@vincjo/datatables';
+  import { TableHandler, ThSort } from '@vincjo/datatables';
   import ModalShell from './ModalShell.svelte';
 
   let { weatherData, parent } = $props();
@@ -59,11 +59,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let dateHeader = $derived(weather.grouping === 'week' ? 'Week of' : 'Date');
 
   //TODO: Is this necessary?
-  $effect(() => {
-    if (tableData) {
-      table.setRows(tableData);
-    }
-  });
+  // $effect(() => {
+  //   if (tableData) {
+  //     table.setRows(tableData);
+  //   }
+  // });
 </script>
 
 <ModalShell {parent}>
@@ -73,22 +73,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <table class="border-separate border-spacing-0 w-fit mx-auto">
           <thead>
             <tr>
-              <Th {table} orderBy={'date'}>
+              <ThSort {table} field={'date'}>
                 <span class="flex flex-col items-center"
                   >{dateHeader}
                   <span class="text-xs">(YYYY-MM-DD)</span></span
                 >
-              </Th>
+              </ThSort>
               {#each weatherTargets as { id, pdfHeader }}
                 {@const header = pdfHeader[project.units]}
                 {@const headerLabel = header.slice(0, header.indexOf('('))}
                 {@const headerUnits = header.slice(header.indexOf('('))}
-                <Th {table} orderBy={id}>
+                <ThSort {table} field={id}>
                   <span class="flex flex-col items-center"
                     >{headerLabel}
                     <span class="text-xs">{headerUnits}</span></span
-                  ></Th
-                >
+                  >
+                </ThSort>
               {/each}
             </tr>
           </thead>
