@@ -232,29 +232,29 @@ If not, see <https://www.gnu.org/licenses/>. -->
           }
         }}
       >
-        <div
-          class="flex-auto flex flex-col justify-center items-center {fullscreen
-            ? 'h-full'
-            : 'h-[70px]'}"
-          title={brandName && yarnName && name
-            ? `${brandName} - ${yarnName}: ${name}`
-            : hex}
-          style="background:{hex};color:{getTextColor(hex)}"
+        <Tooltip
+          tooltipStyle="background:{hex};"
+          tooltipBg=""
+          fullWidth={true}
+          classNames="w-full {fullscreen ? 'h-full' : 'h-[70px]'}"
+          minWidth="260px"
+          showTooltip={activeColorIndex === index && !isDragging.value}
         >
-          <Tooltip
-            tooltipStyle="background:{hex};"
-            tooltipBg=""
-            fullWidth={false}
-            classNames="w-full {fullscreen ? 'h-full' : 'h-[70px]'}"
-            minWidth="260px"
-            showTooltip={activeColorIndex === index && !isDragging.value}
+          <div
+            class="flex-auto flex flex-col justify-center items-center {fullscreen
+              ? 'h-full'
+              : 'h-[70px]'}"
+            title={brandName && yarnName && name
+              ? `${brandName} - ${yarnName}: ${name}`
+              : hex}
+            style="background:{hex};color:{getTextColor(hex)}"
           >
             {#if isLocked}
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 16 16"
                 fill="currentColor"
-                class="w-4 h-4 opacity-40"
+                class="w-4 h-4 opacity-40 group-hover:hidden group-focus:hidden"
               >
                 <path
                   fill-rule="evenodd"
@@ -264,85 +264,105 @@ If not, see <https://www.gnu.org/licenses/>. -->
               </svg>
             {:else}
               <div
-                role="button"
-                tabindex="0"
-                aria-roledescription="Move this color"
-                aria-label="Drag handle for color {index + 1}"
-                use:dragHandle
-                class="dragicon"
-                style="color:{getTextColor(hex)}; {isDragging.value
-                  ? 'cursor: grabbing'
-                  : 'cursor: grab'}"
-                onclick={(e) => {
-                  e.target.focus();
-                }}
-                onmousedown={startDrag}
-                ontouchstart={startDrag}
-                onkeydown={handleKeyDown}
-              >
-                <div
-                  class="h-2 w-2 rounded-full opacity-20 group-hover:hidden group-focus:hidden inline-block {activeColorIndex ===
-                    index && !isDragging.value
-                    ? '!hidden'
-                    : 'inline-block'}"
-                  style="background:{getTextColor(hex)}"
-                ></div>
-                <span
-                  class="group-hover:inline-block group-focus:inline-block hidden top-1 relative {activeColorIndex ===
-                    index && !isDragging.value
-                    ? '!inline-block'
-                    : 'hidden'}">{@html ICONS.arrowsPointingOut}</span
-                >
-              </div>
+                class="group-hover:hidden group-focus:hidden h-2 w-2 rounded-full opacity-20 {activeColorIndex ===
+                  index &&
+                !isDragging.value &&
+                !isLocked
+                  ? '!hidden'
+                  : '!inline-block'}"
+                class:hidden={sortableColors.length > 30}
+                class:sm:block={sortableColors.length > 30 &&
+                  sortableColors.length <= 50}
+                class:xl:block={sortableColors.length > 50}
+                style="background:{getTextColor(hex)}"
+              ></div>
             {/if}
+            <div
+              role="button"
+              tabindex={isDragging.value ? 0 : -1}
+              aria-label="drag-handle"
+              class="w-fit dragicon hidden group-hover:block group-focus:block {activeColorIndex ===
+                index &&
+              !isDragging.value &&
+              !isLocked
+                ? '!inline-block'
+                : 'hidden'}"
+              class:group-hover:inline-block={isDragging.value}
+              style="color:{getTextColor(hex)}; {isDragging.value
+                ? 'cursor: grab'
+                : 'cursor: grabbing'}"
+              onmousedown={startDrag}
+              use:dragHandle
+              ontouchstart={startDrag}
+              onkeydown={handleKeyDown}
+            >
+              {@html ICONS.arrowsPointingOut}
+            </div>
+          </div>
 
-            {#snippet tooltip()}
-              <div
-                style="background:{hex};color:{getTextColor(hex)};"
-                class="w-full rounded-container-token text-center break-all flex flex-wrap items-center justify-center gap-4 z-30"
-              >
-                {#if canUserDeleteColor && sortableColors.length > 1}
-                  <div
-                    role="button"
-                    tabindex="0"
-                    onclick={() => {
+          {#snippet tooltip()}
+            <div
+              style="background:{hex};color:{getTextColor(hex)};"
+              class="w-full rounded-container-token text-center break-all flex flex-wrap items-center justify-center gap-4 z-30"
+            >
+              {#if canUserDeleteColor && sortableColors.length > 1}
+                <button
+                  onclick={() => {
+                    colors = colors.filter((_, i) => i !== index);
+
+                    sortableColors = getSortableColors();
+                    if (onchanged) onchanged();
+                  }}
+                  onkeydown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
                       colors = colors.filter((_, i) => i !== index);
 
                       sortableColors = getSortableColors();
                       if (onchanged) onchanged();
-                    }}
-                    onkeydown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        colors = colors.filter((_, i) => i !== index);
-
-                        sortableColors = getSortableColors();
-                        if (onchanged) onchanged();
-                      }
-                    }}
-                    class="btn bg-secondary-hover-token flex items-center"
+                    }
+                  }}
+                  class="btn bg-secondary-hover-token flex items-center"
+                >
+                  <span class="text-xs">{index + 1}</span>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="currentColor"
+                    class="size-6"
+                    ><path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
+                    /></svg
                   >
-                    <span class="text-xs">{index + 1}</span>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke-width="1.5"
-                      stroke="currentColor"
-                      class="size-6"
-                      ><path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
-                      /></svg
-                    >
-                  </div>
-                {/if}
-                {#if canUserEditColor}
-                  <div
-                    role="button"
-                    tabindex="0"
-                    class="btn bg-secondary-hover-token flex items-center justify-start"
-                    onclick={() =>
+                </button>
+              {/if}
+              {#if canUserEditColor}
+                <button
+                  class="btn bg-secondary-hover-token flex items-center justify-start"
+                  onclick={() =>
+                    modal.state.trigger({
+                      type: 'component',
+                      component: {
+                        ref: ChangeColor,
+                        props: {
+                          index,
+                          hex,
+                          name,
+                          brandId,
+                          yarnId,
+                          brandName,
+                          yarnName,
+                          variant_href,
+                          affiliate_variant_href,
+                          onChangeColor,
+                        },
+                      },
+                    })}
+                  onkeydown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
                       modal.state.trigger({
                         type: 'component',
                         component: {
@@ -360,61 +380,25 @@ If not, see <https://www.gnu.org/licenses/>. -->
                             onChangeColor,
                           },
                         },
-                      })}
-                    onkeydown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        modal.state.trigger({
-                          type: 'component',
-                          component: {
-                            ref: ChangeColor,
-                            props: {
-                              index,
-                              hex,
-                              name,
-                              brandId,
-                              yarnId,
-                              brandName,
-                              yarnName,
-                              variant_href,
-                              affiliate_variant_href,
-                              onChangeColor,
-                            },
-                          },
-                        });
-                      }
-                    }}
+                      });
+                    }
+                  }}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="currentColor"
+                    class="w-6 h-6 flex-shrink-0"
                   >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke-width="1.5"
-                      stroke="currentColor"
-                      class="w-6 h-6 flex-shrink-0"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
-                      />
-                    </svg>
-                    <span
-                      class="flex flex-col items-start justify-start text-left text-wrap"
-                    >
-                      <span class="text-xs">
-                        {#if brandName && yarnName}
-                          {brandName}
-                          -
-                          {yarnName}
-                        {:else}
-                          Find Matching Yarn
-                        {/if}
-                      </span>
-                      <span class="text-lg leading-tight"> {name || hex}</span>
-                    </span>
-                  </div>
-                {:else}
-                  <div
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+                    />
+                  </svg>
+                  <span
                     class="flex flex-col items-start justify-start text-left text-wrap"
                   >
                     <span class="text-xs">
@@ -422,68 +406,81 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         {brandName}
                         -
                         {yarnName}
+                      {:else}
+                        Find Matching Yarn
                       {/if}
                     </span>
-                    <span class="text-lg leading-tight">
-                      {name || hex}
-                    </span>
-                  </div>
-                {/if}
-                {#if typeof color.locked !== 'undefined'}
-                  <div
-                    role="button"
-                    tabindex="0"
-                    class="btn btn-icon"
-                    onclick={(e) => {
+                    <span class="text-lg leading-tight"> {name || hex}</span>
+                  </span>
+                </button>
+              {:else}
+                <div
+                  class="flex flex-col items-start justify-start text-left text-wrap"
+                >
+                  <span class="text-xs">
+                    {#if brandName && yarnName}
+                      {brandName}
+                      -
+                      {yarnName}
+                    {/if}
+                  </span>
+                  <span class="text-lg leading-tight">
+                    {name || hex}
+                  </span>
+                </div>
+              {/if}
+              {#if typeof color.locked !== 'undefined'}
+                <button
+                  class="btn btn-icon"
+                  onclick={(e) => {
+                    e.preventDefault();
+                    colors[index].locked = !colors[index].locked;
+                    color.locked = colors[index].locked;
+                    if (onchanged) onchanged($state.snapshot(colors));
+                  }}
+                  onkeydown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
                       e.preventDefault();
                       colors[index].locked = !colors[index].locked;
                       color.locked = colors[index].locked;
                       if (onchanged) onchanged($state.snapshot(colors));
-                    }}
-                    onkeydown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        colors[index].locked = !colors[index].locked;
-                        color.locked = colors[index].locked;
-                        if (onchanged) onchanged($state.snapshot(colors));
-                      }
-                    }}
-                  >
-                    {#if color.locked}
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 24 24"
-                        fill="currentColor"
-                        class="w-6 h-6"
-                      >
-                        <path
-                          fill-rule="evenodd"
-                          d="M12 1.5a5.25 5.25 0 0 0-5.25 5.25v3a3 3 0 0 0-3 3v6.75a3 3 0 0 0 3 3h10.5a3 3 0 0 0 3-3v-6.75a3 3 0 0 0-3-3v-3c0-2.9-2.35-5.25-5.25-5.25Zm3.75 8.25v-3a3.75 3.75 0 1 0-7.5 0v3h7.5Z"
-                          clip-rule="evenodd"
-                        />
-                      </svg>
-                    {:else}
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke-width="1.5"
-                        stroke="currentColor"
-                        class="w-6 h-6"
-                      >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          d="M13.5 10.5V6.75a4.5 4.5 0 1 1 9 0v3.75M3.75 21.75h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H3.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z"
-                        />
-                      </svg>
-                    {/if}
-                  </div>
-                {/if}
-              </div>
-            {/snippet}
-          </Tooltip>
-        </div>
+                    }
+                  }}
+                >
+                  {#if color.locked}
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                      class="w-6 h-6"
+                    >
+                      <path
+                        fill-rule="evenodd"
+                        d="M12 1.5a5.25 5.25 0 0 0-5.25 5.25v3a3 3 0 0 0-3 3v6.75a3 3 0 0 0 3 3h10.5a3 3 0 0 0 3-3v-6.75a3 3 0 0 0-3-3v-3c0-2.9-2.35-5.25-5.25-5.25Zm3.75 8.25v-3a3.75 3.75 0 1 0-7.5 0v3h7.5Z"
+                        clip-rule="evenodd"
+                      />
+                    </svg>
+                  {:else}
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="1.5"
+                      stroke="currentColor"
+                      class="w-6 h-6"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M13.5 10.5V6.75a4.5 4.5 0 1 1 9 0v3.75M3.75 21.75h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H3.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z"
+                      />
+                    </svg>
+                  {/if}
+                </button>
+              {/if}
+            </div>
+          {/snippet}
+        </Tooltip>
       </div>
     {/each}
   </div>
