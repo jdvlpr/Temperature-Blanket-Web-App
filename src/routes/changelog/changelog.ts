@@ -23,6 +23,46 @@ export const entries: ChangelogItem[] = [
     notes: [
       {
         icon: ICONS.checkCircle,
+        text: `65 colorways`,
+        title: 'Added Yarn: Alize - Cotton Gold',
+      },
+      {
+        icon: ICONS.checkCircle,
+        text: `58 colorways`,
+        title: 'Added Yarn: Bellissimo - Bellissimo 8',
+      },
+      {
+        icon: ICONS.checkCircle,
+        text: `47 colorways`,
+        title: 'Added Yarn: Fiddlesticks - Superb 10',
+      },
+      {
+        icon: ICONS.checkCircle,
+        text: `21 colorways`,
+        title: 'Added Yarn: Filatura Di Crosa - Zara 8',
+      },
+      {
+        icon: ICONS.checkCircle,
+        text: `57 colorways`,
+        title: 'Added Yarn: Hobbii - Amigo Chunky',
+      },
+      {
+        icon: ICONS.checkCircle,
+        text: `61 colorways`,
+        title: 'Added Yarn: Hobbii - Amigo XL',
+      },
+      {
+        icon: ICONS.checkCircle,
+        text: `18 colorways`,
+        title: 'Added Yarn: Lion Brand - Re-Spun',
+      },
+    ],
+    version: '4.15.0',
+  },
+  {
+    notes: [
+      {
+        icon: ICONS.checkCircle,
         text: `25 colorways`,
         title: 'Added Yarn: Gründl - Funny uni',
       },

@@ -3,7 +3,7 @@ import colorways from './colorways';
 
 export const yarn: Yarn = {
   colorways,
-  name: 'Re-Up Bonus Bundle',
-  id: 're_up_bonus_bundle',
-  weightId: 'w',
+  name: 'Superb 10',
+  id: 'superb_10',
+  weightId: 'd',
 };

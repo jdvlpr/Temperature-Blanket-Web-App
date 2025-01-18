@@ -1,6 +1,8 @@
 import type { Brand } from '$lib/types';
 import { brand as _4Seasons } from './4-seasons/yarns'; // Add underscore to keep alpha-numeric placement at top of import list and avoid linting error
+import { brand as alize } from './alize/yarns';
 import { brand as bcGarn } from './bc-garn/yarns';
+import { brand as bellissimo } from './bellissimo/yarns';
 import { brand as bernat } from './bernat/yarns';
 import { brand as berroco } from './berroco/yarns';
 import { brand as bigTwist } from './big-twist/yarns';
@@ -12,6 +14,7 @@ import { brand as drops } from './drops/yarns';
 import { brand as ellaRae } from './ella-rae/yarns';
 import { brand as elle } from './elle/yarns';
 import { brand as fiddlesticks } from './fiddlesticks/yarns';
+import { brand as filaturaDiCrosa } from './filatura-di-crosa/yarns';
 import { brand as garnmanufaktur } from './garnmanufaktur/yarns';
 import { brand as gepard } from './gepard/yarns';
 import { brand as grundl } from './grundl/yarns';
@@ -62,7 +65,9 @@ import { brand as yarnsmiths } from './yarnsmiths/yarns';
 
 export const brands: Brand[] = [
   _4Seasons,
+  alize,
   bcGarn,
+  bellissimo,
   bernat,
   berroco,
   bigTwist,
@@ -74,6 +79,7 @@ export const brands: Brand[] = [
   ellaRae,
   elle,
   fiddlesticks,
+  filaturaDiCrosa,
   garnmanufaktur,
   gepard,
   grundl,
