@@ -299,6 +299,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             updateGauge({
               _colors: randomPalette.map((color) => {
                 delete color.locked;
+                delete color.id;
                 return color;
               }),
             });

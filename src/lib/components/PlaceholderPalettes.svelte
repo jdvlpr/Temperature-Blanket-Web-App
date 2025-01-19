@@ -14,10 +14,19 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  export let items: Number = 10;
-  export let maxWFull: Boolean = false;
-  export let wFull: Boolean = false;
-  export let height = '90px';
+  interface Props {
+    items?: Number;
+    maxWFull?: Boolean;
+    wFull?: Boolean;
+    height?: string;
+  }
+
+  let {
+    items = 10,
+    maxWFull = false,
+    wFull = false,
+    height = '90px',
+  }: Props = $props();
 </script>
 
 <div

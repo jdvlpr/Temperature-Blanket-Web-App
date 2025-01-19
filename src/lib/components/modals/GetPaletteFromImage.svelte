@@ -13,7 +13,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script>
+<script lang="ts">
   import ColorPaletteEditable from '$lib/components/ColorPaletteEditable.svelte';
   import DefaultYarnSet from '$lib/components/DefaultYarnSet.svelte';
   import SelectNumberOfColors from '$lib/components/SelectNumberOfColors.svelte';
@@ -26,6 +26,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import {
     getColorways,
     getTextColor,
+    pluralize,
     stringToBrandAndYarnDetails,
   } from '$lib/utils';
   import { getModalStore } from '@skeletonlabs/skeleton';
@@ -35,7 +36,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import SelectYarnWeight from '../SelectYarnWeight.svelte';
   import ModalShell from './ModalShell.svelte';
 
-  let { updateGauge, numberOfColors = $bindable(), parent } = $props();
+  let { updateGauge, numberOfColors, parent } = $props();
 
   const modalStore = getModalStore();
 
@@ -71,6 +72,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let hoverDiv = $state();
   let colorHoverDiv = $state();
   let hoverName = $state();
+  let key = $state(false);
+  let numberOfColorsKey = $state(false);
+
+  let warningMessage = $state<String | null>(null);
 
   onMount(async () => {
     const ct = await import(
@@ -153,7 +158,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   function handelAddColor({ color }) {
     color = getBestMatch({ color });
     color.id = new Date().getTime();
-    matchingYarnColors = [...matchingYarnColors, color];
+    color.locked = false;
+    matchingYarnColors.push(color);
     numberOfColors = matchingYarnColors.length;
   }
 
@@ -226,6 +232,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       img.src = event.target.result;
     };
     reader.readAsDataURL(e.target.files[0]);
+    key = !key;
   }
 
   function getPalette({ img, numberOfColors }) {
@@ -264,6 +271,23 @@ If not, see <https://www.gnu.org/licenses/>. -->
         skip++;
       }
     }
+
+    let lockedIndexes = [];
+
+    matchingYarnColors?.forEach((n, i) => {
+      if (n.locked) lockedIndexes.push(i);
+    });
+
+    _yarnColors = _yarnColors.map((color, index) => {
+      if (lockedIndexes.includes(index)) {
+        color = matchingYarnColors[index];
+        color.locked = true;
+      } else {
+        color.locked = false;
+      }
+      return color;
+    });
+
     return _yarnColors;
   }
 
@@ -289,6 +313,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       img,
       numberOfColors,
     });
+    key = !key;
   }
 
   function getRandomImage() {
@@ -498,30 +523,79 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
   {:else}
     <div class="mt-4 mb-2 flex flex-wrap gap-2 justify-center items-center">
-      <SelectNumberOfColors
-        bind:numberOfColors
-        max={MAXIMUM_COLORWAYS_MATCHES_FOR_IMAGES}
-        allowZero={true}
-        onchange={() => {
-          if (numberOfColors < matchingYarnColors.length) {
-            matchingYarnColors.length = numberOfColors;
-          } else {
-            const _yarnColors = getMatchingYarnColors({
-              img,
-              numberOfColors,
-            });
-            const newColors = _yarnColors
-              .slice(matchingYarnColors.length)
-              .map((color, i) => {
-                return {
-                  ...color,
-                  id: i + matchingYarnColors.length,
-                };
+      {#key numberOfColorsKey}
+        <SelectNumberOfColors
+          {numberOfColors}
+          max={MAXIMUM_COLORWAYS_MATCHES_FOR_IMAGES}
+          allowZero={true}
+          onchange={(e) => {
+            e.preventDefault();
+
+            const value = parseInt(e.target.value);
+            const lastLockedIndex = matchingYarnColors.findLastIndex(
+              (color) => color.locked,
+            );
+
+            if (value - 1 < lastLockedIndex) {
+              warningMessage = `Cannot decrease number of colors because it would delete a locked color`;
+              numberOfColorsKey = !numberOfColorsKey;
+              return;
+            }
+
+            numberOfColors = value;
+            console.log('here');
+
+            if (numberOfColors < matchingYarnColors.length) {
+              matchingYarnColors.length = numberOfColors;
+            } else {
+              const _yarnColors = getMatchingYarnColors({
+                img,
+                numberOfColors,
               });
-            matchingYarnColors = [...matchingYarnColors, ...newColors];
-          }
-        }}
-      />
+
+              const newColors = _yarnColors
+                .slice(matchingYarnColors.length)
+                .map((color, i) => {
+                  return {
+                    ...color,
+                    id: i + matchingYarnColors.length,
+                  };
+                });
+              matchingYarnColors = [
+                ...$state.snapshot(matchingYarnColors),
+                ...newColors,
+              ];
+            }
+            key = !key;
+          }}
+        />
+      {/key}
+
+      {#if warningMessage}
+        <div class="flex gap-2 text-warning-800-100-token">
+          <p>{warningMessage}</p>
+          <button
+            class="btn bg-secondary-hover-token"
+            aria-label="close"
+            onclick={() => (warningMessage = null)}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="size-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
+        </div>
+      {/if}
 
       <button
         class="btn bg-secondary-hover-token gap-1"
@@ -531,6 +605,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             img,
             numberOfColors,
           });
+          key = !key;
         }}
       >
         <svg
@@ -545,14 +620,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
         Auto Palette
       </button>
+
       <button
         class="btn bg-secondary-hover-token gap-1"
         onclick={() => {
-          matchingYarnColors = [];
+          matchingYarnColors = matchingYarnColors.filter(
+            (color) => color.locked,
+          );
+          if (matchingYarnColors.length)
+            numberOfColors = matchingYarnColors.length;
         }}
       >
         {@html ICONS.trash}
-        Reset Colors
+        Delete Colors
       </button>
     </div>
   {/if}
@@ -571,22 +651,27 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <div class="p-2 sm:px-4">
         {#if matchingYarnColors.length && !loading}
           <div class="mb-2">
-            <ColorPaletteEditable
-              canUserEditColor={false}
-              bind:colors={matchingYarnColors}
-              onchanged={() => {
-                if (matchingYarnColors.length !== numberOfColors)
-                  numberOfColors = matchingYarnColors.length;
-              }}
-            />
+            {#key numberOfColors}
+              {#key key}
+                <ColorPaletteEditable
+                  canUserEditColor={false}
+                  bind:colors={matchingYarnColors}
+                  onchanged={() => {
+                    if (matchingYarnColors.length !== numberOfColors)
+                      numberOfColors = matchingYarnColors.length;
+                  }}
+                />
+              {/key}
+            {/key}
           </div>
         {/if}
         <SaveAndCloseButtons
           disabled={!ctx || loading || !matchingYarnColors.length}
           onSave={() => {
             updateGauge({
-              _colors: matchingYarnColors.map((n) => {
+              _colors: $state.snapshot(matchingYarnColors).map((n) => {
                 delete n.id;
+                delete n.locked;
                 return n;
               }),
             });

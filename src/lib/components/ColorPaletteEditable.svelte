@@ -53,7 +53,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     canUserDeleteColor = true,
     showSchemeName = true,
     roundedBottom = true,
-    typeId = 'palettePreview',
+    typeId = crypto.randomUUID(),
     onchanged = null,
     fullscreen = $bindable(),
   }: Props = $props();
