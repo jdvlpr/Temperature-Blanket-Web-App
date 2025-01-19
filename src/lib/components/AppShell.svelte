@@ -22,6 +22,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     getDrawerStore,
   } from '@skeletonlabs/skeleton';
   import { slide } from 'svelte/transition';
+  import { weatherChart } from './WeatherChart.svelte';
 
   /**
    * @typedef {Object} Props
@@ -35,6 +36,23 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let { pageName = 'Menu', stickyHeader, main, footer } = $props();
 
   const drawerStore = getDrawerStore();
+
+  let sidebarWidth = $state(0);
+
+  let debounceTimer;
+  const debounce = (callback, time) => {
+    window.clearTimeout(debounceTimer);
+    debounceTimer = window.setTimeout(callback, time);
+  };
+
+  $effect(() => {
+    sidebarWidth;
+    debounce(() => {
+      console.log($state.snapshot(sidebarWidth));
+
+      weatherChart.update();
+    }, 101);
+  });
 </script>
 
 <Drawer
@@ -81,7 +99,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
             d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
           />
         </svg>
-        <!-- <img src="/images/icon.png" class="w-6 h-6" alt="Logo" /> -->
 
         {#if pageName}
           <span class="max-[355px]:hidden">
@@ -96,12 +113,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <div class="flex justify-start max-w-screen-xl mx-auto">
     <div
       class="flex flex-col justify-start items-start h-fit [view-transition-name:sidebar-navigation]"
+      bind:clientWidth={sidebarWidth}
     >
       <button
         class="btn bg-surface-hover-token mx-2 lg:flex justify-center hidden mt-2"
         title={`${showNavigationSideBar.value ? 'Hide' : 'Show'} Sidebar`}
-        onclick={() =>
-          (showNavigationSideBar.value = !showNavigationSideBar.value)}
+        onclick={async () => {
+          showNavigationSideBar.value = !showNavigationSideBar.value;
+        }}
       >
         {#if showNavigationSideBar.value}
           <svg
@@ -120,7 +139,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               /></g
             ></svg
           >
-          <span in:slide={{ axis: 'x' }}>Hide Sidebar</span>
+          <span in:slide={{ axis: 'x', duration: 90 }}>Hide Sidebar</span>
         {:else}
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -143,7 +162,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {#if showNavigationSideBar.value}
         <div
           class="hidden lg:flex flex-col w-fit"
-          transition:slide={{ axis: 'x' }}
+          transition:slide={{ axis: 'x', duration: 100 }}
         >
           <div class="w-fit">
             <AppNavigation />

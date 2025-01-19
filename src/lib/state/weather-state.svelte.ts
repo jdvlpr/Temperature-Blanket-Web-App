@@ -224,17 +224,19 @@ class WeatherClass {
   // ***************
   // Table
   // ***************
-  table: { viewAs: 'table' | 'range'; properties: { [key: string]: boolean } } =
-    $state({
-      viewAs: 'table',
-      properties: {
-        tmin: true,
-        tavg: true,
-        tmax: true,
-        prcp: true,
-        snow: true,
-        dayt: true,
-      },
-    });
+  table: {
+    viewAs: 'table' | 'range';
+    showParameters: { [key: string]: boolean };
+  } = $state({
+    viewAs: 'table',
+    showParameters: {
+      tmin: true,
+      tavg: true,
+      tmax: true,
+      prcp: true,
+      snow: true,
+      dayt: true,
+    },
+  });
 }
 export const weather = new WeatherClass();

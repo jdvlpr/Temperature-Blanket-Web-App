@@ -107,6 +107,7 @@ export const loadFromHistory = ({ action }: { action: 'Undo' | 'Redo' }) => {
         oldParams[gauge.id].value !== newParams[gauge.id].value
       ) {
         gauges.addById(gauge.id);
+
         const settings = parseGaugeURLHash(
           newParams[gauge.id].value,
           gauges.getSnapshot(gauge.id),

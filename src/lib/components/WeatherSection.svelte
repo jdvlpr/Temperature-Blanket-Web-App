@@ -33,31 +33,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
     OPEN_METEO_DELAY_DAYS,
     UNIT_LABELS,
   } from '$lib/constants';
-  import {
-    locations,
-    modal,
-    project,
-    showNavigationSideBar,
-    weather,
-  } from '$lib/state';
+  import { locations, modal, project, weather } from '$lib/state';
   import {
     convertTime,
     createWeeksProperty,
-    delay,
     displayNumber,
     getAverage,
     isDateWithinLastSevenDays,
     pluralize,
   } from '$lib/utils';
   import { Accordion, AccordionItem } from '@skeletonlabs/skeleton';
-  import { onDestroy, onMount } from 'svelte';
+  import { onMount } from 'svelte';
 
   let graph = $state();
-  let isAnyWeatherSourceDifferentFromDefault;
   let defaultWeatherSourceCopy = $state();
   let wasDefaultWeatherSourceChanged = $state(false);
   let showWeatherChart = $state(true);
-  let windowWidth;
 
   let debounceTimer;
   const debounce = (callback, time) => {
@@ -66,6 +57,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     debounceTimer = window.setTimeout(callback, time);
   };
 
+  let isAnyWeatherSourceDifferentFromDefault;
   onMount(() => {
     isAnyWeatherSourceDifferentFromDefault = !locations.all?.some(
       (n) => n.source === weather.defaultSource,
@@ -81,41 +73,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         wasDefaultWeatherSourceChanged = true;
       }
     }
-
-    windowWidth = window.innerWidth;
-
-    window.addEventListener('resize', updateShowWeatherChart, {
-      passive: true,
-    });
   });
-
-  onDestroy(() => {
-    if (!browser) return;
-    window.removeEventListener('resize', updateShowWeatherChart);
-  });
-
-  async function updateShowWeatherChart() {
-    debounce(async () => {
-      // I think sometimes on scroll this would trigger a window width change
-      // So check if the window actually resized
-      if (window.innerWidth === windowWidth) return;
-      showWeatherChart = false;
-      // Delay in order to let the navigation bar finish it's animation.
-      await delay(400);
-      showWeatherChart = true;
-      windowWidth = window.innerWidth;
-    }, 450);
-  }
-
-  async function forceUpdateShowWeatherChart() {
-    debounce(async () => {
-      showWeatherChart = false;
-      // Delay in order to let the navigation bar finish it's animation.
-      await delay(400);
-      showWeatherChart = true;
-      windowWidth = window.innerWidth;
-    }, 450);
-  }
 
   function getMissingDataMerged(missingData) {
     let _countsofTMinTAvgTMax = [...missingData];
@@ -145,7 +103,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 
   function triggerHover(index) {
-    const datasets = $weatherChart._metasets
+    const datasets = weatherChart.current._metasets
       .filter((item) => item.hidden !== true)
       .map((item) => {
         return {
@@ -154,9 +112,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
         };
       });
 
-    $weatherChart.setActiveElements(datasets);
+    weatherChart.current.setActiveElements(datasets);
     weather.currentIndex = index;
-    $weatherChart.update();
+    weatherChart.update();
   }
 
   $effect(() => {
@@ -211,11 +169,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
       ) || null,
   );
   let missingDataMerged = $derived(getMissingDataMerged(missingData));
-
-  $effect(() => {
-    showNavigationSideBar.value;
-    forceUpdateShowWeatherChart();
-  });
 
   let projectHasRecentWeatherData = $derived(
     weather.data?.some((date) => {
@@ -376,7 +329,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/if}
 
   <div class="flex flex-wrap gap-x-2 items-start justify-center">
-    {#if weather.table.properties.tmax}
+    {#if weather.table.showParameters.tmax}
       <WeatherItem
         id="tmax"
         icon="&uarr;"
@@ -406,7 +359,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </WeatherItem>
     {/if}
 
-    {#if weather.table.properties.tavg}
+    {#if weather.table.showParameters.tavg}
       <WeatherItem
         id="tavg"
         icon="~"
@@ -416,7 +369,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       />
     {/if}
 
-    {#if weather.table.properties.tmin}
+    {#if weather.table.showParameters.tmin}
       <WeatherItem
         id="tmin"
         icon="&darr;"
@@ -446,7 +399,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </WeatherItem>
     {/if}
 
-    {#if weather.table.properties.prcp}
+    {#if weather.table.showParameters.prcp}
       <WeatherItem
         id="prcp"
         icon="∴"
@@ -462,7 +415,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       />
     {/if}
 
-    {#if weather.table.properties.snow}
+    {#if weather.table.showParameters.snow}
       <WeatherItem
         id="snow"
         icon="∗"
@@ -497,7 +450,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </WeatherItem>
     {/if}
 
-    {#if weather.table.properties.dayt}
+    {#if weather.table.showParameters.dayt}
       <WeatherItem
         id="dayt"
         icon="☼"
@@ -528,58 +481,52 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <div class="flex flex-col justify-center w-full items-center gap-4">
   <div class="flex flex-wrap justify-center items-center">
     <ToggleWeatherData
-      view={weather.table.properties.tmax}
+      view={weather.table.showParameters.tmax}
       onclick={() => {
-        weather.table.properties.tmax = !weather.table.properties.tmax;
-        weather.table.properties = weather.table.properties;
+        weather.table.showParameters.tmax = !weather.table.showParameters.tmax;
       }}
     >
       <span class="border-b-2 border-tmax">High Temps</span>
     </ToggleWeatherData>
 
     <ToggleWeatherData
-      view={weather.table.properties.tavg}
+      view={weather.table.showParameters.tavg}
       onclick={() => {
-        weather.table.properties.tavg = !weather.table.properties.tavg;
-        weather.table.properties = weather.table.properties;
+        weather.table.showParameters.tavg = !weather.table.showParameters.tavg;
       }}
     >
       <span class="border-b-2 border-tavg">Average Temps</span>
     </ToggleWeatherData>
 
     <ToggleWeatherData
-      view={weather.table.properties.tmin}
+      view={weather.table.showParameters.tmin}
       onclick={() => {
-        weather.table.properties.tmin = !weather.table.properties.tmin;
-        weather.table.properties = weather.table.properties;
+        weather.table.showParameters.tmin = !weather.table.showParameters.tmin;
       }}
     >
       <span class="border-b-2 border-tmin">Low Temps</span>
     </ToggleWeatherData>
 
     <ToggleWeatherData
-      view={weather.table.properties.prcp}
+      view={weather.table.showParameters.prcp}
       onclick={() => {
-        weather.table.properties.prcp = !weather.table.properties.prcp;
-        weather.table.properties = weather.table.properties;
+        weather.table.showParameters.prcp = !weather.table.showParameters.prcp;
       }}
     >
       <span class="border-b-2 border-prcp">Rain</span>
     </ToggleWeatherData>
     <ToggleWeatherData
-      view={weather.table.properties.snow}
+      view={weather.table.showParameters.snow}
       onclick={() => {
-        weather.table.properties.snow = !weather.table.properties.snow;
-        weather.table.properties = weather.table.properties;
+        weather.table.showParameters.snow = !weather.table.showParameters.snow;
       }}
     >
       <span class="border-b-2 border-snow">Snow</span>
     </ToggleWeatherData>
     <ToggleWeatherData
-      view={weather.table.properties.dayt}
+      view={weather.table.showParameters.dayt}
       onclick={() => {
-        weather.table.properties.dayt = !weather.table.properties.dayt;
-        weather.table.properties = weather.table.properties;
+        weather.table.showParameters.dayt = !weather.table.showParameters.dayt;
       }}
     >
       <span class="border-b-2 border-dayt">Daytime</span>

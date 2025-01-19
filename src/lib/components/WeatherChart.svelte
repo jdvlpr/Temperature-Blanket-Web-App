@@ -14,13 +14,6 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script module>
-  import { writable } from 'svelte/store';
-  export let weatherChart = writable(null);
-</script>
-
-<script>
-  import { run } from 'svelte/legacy';
-
   import { project, weather } from '$lib/state';
   import {
     CategoryScale,
@@ -38,7 +31,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     Title,
     Tooltip,
   } from 'chart.js';
-  import { onMount } from 'svelte';
 
   Chart.register(
     LineElement,
@@ -56,10 +48,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
     Tooltip,
   );
 
-  let dataSets;
+  let ctx = $state(null);
 
-  onMount(() => {
-    dataSets = [
+  class WeatherChartClass {
+    #labels = $derived(
+      weather.data?.map((day) => day.date?.toLocaleDateString()),
+    );
+
+    #dataSets = $derived([
       {
         label: 'High Temperature',
         id: 'tmax',
@@ -70,6 +66,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         pointHoverBackgroundColor: '#f87171',
         yAxisID: 'y',
         type: 'line',
+        hidden: !weather.table.showParameters.tmax,
       },
       {
         label: 'Average Temperature',
@@ -81,6 +78,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         pointHoverBackgroundColor: '#a3a3a3',
         yAxisID: 'y',
         type: 'line',
+        hidden: !weather.table.showParameters.tavg,
       },
       {
         label: 'Low Temperature',
@@ -92,6 +90,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         pointHoverBackgroundColor: '#38bdf8',
         yAxisID: 'y',
         type: 'line',
+        hidden: !weather.table.showParameters.tmin,
       },
       {
         label: 'Rain',
@@ -103,7 +102,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         pointHoverBackgroundColor: '#818cf8',
         yAxisID: 'y2',
         type: 'line',
-        // hidden: true
+        hidden: !weather.table.showParameters.prcp,
       },
       {
         label: 'Snow',
@@ -115,7 +114,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         pointHoverBackgroundColor: '#94a3b8',
         yAxisID: 'y2',
         type: 'line',
-        // hidden: true
+        hidden: !weather.table.showParameters.snow,
       },
       {
         label: 'Daytime',
@@ -130,129 +129,142 @@ If not, see <https://www.gnu.org/licenses/>. -->
         pointBorderColor: '#facc15',
         pointHoverBackgroundColor: '#facc15',
         yAxisID: 'y2',
+        hidden: !weather.table.showParameters.dayt,
       },
-    ];
+    ]);
 
-    const events = ($weatherChart = new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: labels,
-        datasets: dataSets,
-      },
-      options: {
-        elements: {
-          line: {
-            tension: 0,
+    current;
+
+    setup() {
+      this.current = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: $state.snapshot(this.#labels),
+          datasets: $state.snapshot(this.#dataSets),
+        },
+        options: {
+          elements: {
+            line: {
+              tension: 0,
+            },
+            point: {
+              pointRadius: 1,
+              pointHitRadius: 15,
+              borderWidth: 1,
+              fill: false,
+              pointHoverRadius: 6,
+              hoverBorderWidth: 25,
+            },
           },
-          point: {
-            pointRadius: 1,
-            pointHitRadius: 15,
-            borderWidth: 1,
-            fill: false,
-            pointHoverRadius: 6,
-            hoverBorderWidth: 25,
+          // events: ["click", "mousemove", "touchstart", "touchmove"],
+          events: ['click', 'touchstart'],
+          animation: false,
+          onHover,
+          plugins: {
+            tooltip: {
+              enabled: false,
+            },
+            legend: {
+              display: false,
+            },
+          },
+          responsive: true,
+          maintainAspectRatio: false,
+          aspectRatio: 3,
+          interaction: {
+            position: 'nearest',
+            intersect: false,
+            mode: 'index',
+          },
+          scales: {
+            x: {
+              ticks: {
+                color: '#94a3b8',
+              },
+              title: {
+                color: '#94a3b8',
+              },
+              grid: {
+                drawOnChartArea: false, // only want the grid lines for one axis to show up
+              },
+            },
+            y: {
+              type: 'linear',
+              position: 'left',
+              // display: false,
+              grid: {
+                drawOnChartArea: true, // only want the grid lines for one axis to show up
+                color: '#94a3b8',
+              },
+              title: {
+                text:
+                  project.units === 'metric'
+                    ? 'Degrees Celsius'
+                    : 'Degrees Fahrenheit',
+                display: true,
+                color: '#94a3b8',
+              },
+              ticks: {
+                color: '#94a3b8',
+              },
+            },
+            y2: {
+              type: 'linear',
+              position: 'right',
+              // display: false,
+              beginAtZero: true,
+              grid: {
+                drawOnChartArea: false, // only want the grid lines for one axis to show up
+              },
+              title: {
+                text:
+                  project.units === 'metric'
+                    ? 'Millimeters / Minutes'
+                    : 'Inches / Hours',
+                display: true,
+                color: '#94a3b8',
+              },
+              ticks: {
+                color: '#94a3b8',
+              },
+            },
           },
         },
-        // events: ["click", "mousemove", "touchstart", "touchmove"],
-        events: ['click', 'touchstart'],
-        animation: false,
-        onHover,
-        plugins: {
-          tooltip: {
-            enabled: false,
-          },
-          legend: {
-            display: false,
-          },
-        },
-        responsive: true,
-        maintainAspectRatio: false,
-        aspectRatio: 3,
-        interaction: {
-          position: 'nearest',
-          intersect: false,
-          mode: 'index',
-        },
-        scales: {
-          x: {
-            ticks: {
-              color: '#94a3b8',
-            },
-            title: {
-              color: '#94a3b8',
-            },
-            grid: {
-              drawOnChartArea: false, // only want the grid lines for one axis to show up
-            },
-          },
-          y: {
-            type: 'linear',
-            position: 'left',
-            // display: false,
-            grid: {
-              drawOnChartArea: true, // only want the grid lines for one axis to show up
-              color: '#94a3b8',
-            },
-            title: {
-              text:
-                project.units === 'metric'
-                  ? 'Degrees Celsius'
-                  : 'Degrees Fahrenheit',
-              display: true,
-              color: '#94a3b8',
-            },
-            ticks: {
-              color: '#94a3b8',
-            },
-          },
-          y2: {
-            type: 'linear',
-            position: 'right',
-            // display: false,
-            beginAtZero: true,
-            grid: {
-              drawOnChartArea: false, // only want the grid lines for one axis to show up
-            },
-            title: {
-              text:
-                project.units === 'metric'
-                  ? 'Millimeters / Minutes'
-                  : 'Inches / Hours',
-              display: true,
-              color: '#94a3b8',
-            },
-            ticks: {
-              color: '#94a3b8',
-            },
-          },
-        },
-      },
-    }));
-    setView();
-  });
+      });
+    }
 
-  const labels = weather.data?.map((day) => day.date?.toLocaleDateString());
-
-  let ctx = $state();
-
-  function setView() {
-    if (!dataSets) return;
-    dataSets?.forEach((item, index) => {
-      const meta = $weatherChart.getDatasetMeta(index);
-      meta.hidden = !weather.table.properties[item.id];
-    });
-    $weatherChart.update();
+    update() {
+      if (this.current) this.current.destroy();
+      this.setup();
+    }
   }
 
+  export let weatherChart = new WeatherChartClass();
+
   function onHover(e) {
-    let value = $weatherChart.scales.x.getValueForPixel(e.x);
+    let value = weatherChart.current.scales.x.getValueForPixel(e.x);
     if (value < 0) weather.currentIndex = 0;
     else if (value > weather.data?.length - 1)
       weather.currentIndex = weather.data?.length - 1;
     else weather.currentIndex = value;
   }
-  run(() => {
-    if (weather.table.properties) setView();
+</script>
+
+<script>
+  import { onMount } from 'svelte';
+
+  onMount(() => {
+    weatherChart.setup();
+  });
+
+  $effect(() => {
+    if (weather.data) {
+      weatherChart.update();
+    }
+  });
+  $effect(() => {
+    weather.table.showParameters;
+    weatherChart.update();
   });
 </script>
 

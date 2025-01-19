@@ -66,7 +66,10 @@ export const setProjectSettings = async (
   allGaugesAttributes.forEach((gauge) => {
     if (!exists(params[gauge.id])) return;
     gauges.addById(gauge.id);
-    const settings = parseGaugeURLHash(params[gauge.id].value);
+    const settings = parseGaugeURLHash(
+      params[gauge.id].value,
+      gauges.getSnapshot(gauge.id),
+    );
     Object.assign(
       gauges.allCreated.find((g) => g.id === gauge.id),
       settings,
@@ -126,7 +129,7 @@ const parseLocationURLHash = async (hashString) => {
 
   let currentPosition = 0;
 
-  let _locations = locations.locations;
+  let _locations = locations.all;
 
   // The number of locations is the number of separator characters present after the 'l=' key in the URL hash
   for (let i = 0; i < separatorIndices.length; i++) {
@@ -242,12 +245,11 @@ const parseLocationURLHash = async (hashString) => {
     }
   }
 
-  locations.locations = _locations;
+  locations.all = _locations;
 };
 
 export const parseGaugeURLHash = (hashString: string, gauge) => {
   // Each gauge should have a '!' which separates the gauge colors from the gauge settings
-  console.log({ gauge });
 
   let hashStringParts;
   if (hashString.includes('!')) hashStringParts = hashString.split('!');

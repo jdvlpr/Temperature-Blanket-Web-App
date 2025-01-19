@@ -23,7 +23,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let weatherTargets = $derived(
     getWeatherTargets({
-      weatherParameters: weather.table.properties,
+      weatherParameters: weather.table.showParameters,
     }),
   );
 </script>

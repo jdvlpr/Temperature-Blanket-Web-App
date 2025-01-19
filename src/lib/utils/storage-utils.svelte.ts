@@ -76,9 +76,10 @@ export const checkForProjectInLocalStorage = async () => {
   if (typeof window.localStorage === 'undefined') return;
   const localProjects = JSON.parse(localStorage.getItem('projects'));
   if (!localProjects) return;
-  const matchedProject = localProjects.filter(
-    (project) => project.url.href === window.location.href,
-  )?.[0];
+  const matchedProject = localProjects.find((localProject) => {
+    return localProject.href === window.location.href;
+  });
+
   if (!matchedProject) return;
 
   // Set weather source
@@ -105,7 +106,7 @@ export const checkForProjectInLocalStorage = async () => {
   });
 
   // Check if there are any days in the project past the day the project was created
-  let url = new URL(matchedproject.url.href);
+  let url = new URL(matchedProject.href);
   const timestamp = new URLSearchParams(url.search).get('project');
   if (timestamp === null || typeof +timestamp !== 'number') return;
   const dateCreated = new Date(+timestamp).getTime();
