@@ -32,6 +32,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import DataTable from '$lib/components/datatable/DataTable.svelte';
   import NumberInput from '$lib/components/modals/NumberInput.svelte';
   import TextInput from '$lib/components/modals/TextInput.svelte';
+  import { onMount } from 'svelte';
 
   let { weatherTargets } = $props();
 
@@ -67,15 +68,23 @@ If not, see <https://www.gnu.org/licenses/>. -->
     }),
   ]);
 
-  const table = $derived(
-    new TableHandler(tableData, {
-      rowsPerPage: 10,
-    }),
-  );
+  let _rowsPerPage = $state(10);
+
+  let _page = $state(1);
+
+  const table = new TableHandler(tableData, {
+    rowsPerPage: 10,
+  });
+
+  function updateTable() {
+    table.setRows(tableData);
+    table.setRowsPerPage(_rowsPerPage);
+    table.setPage(_page);
+  }
 </script>
 
 <div class="w-full my-4 inline-block">
-  <DataTable {table} search={false}>
+  <DataTable {table} search={true}>
     <table class="border-separate border-spacing-0 w-full mx-auto">
       <thead>
         <tr>
@@ -130,10 +139,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
                               value: row[id],
                               title: `<div class="flex flex-col items-center justify-center"><span class="font-bold">${row.date}</span><span>${label}</span></div>`,
                               onOkay: (_value) => {
-                                weather.isUserEdited++;
+                                weather.isUserEdited = true;
 
                                 const time = _value.split(':');
+
                                 if (time.length !== 2) return;
+
+                                _rowsPerPage = table.rowsPerPage;
+                                _page = table.currentPage;
+
                                 const hours = +time[0] + +time[1] / 60;
                                 const mappedWeather = weather.rawData.map(
                                   (n) =>
@@ -150,6 +164,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                                   +hours,
                                   4,
                                 );
+                                updateTable();
                               },
                             },
                           },
@@ -166,7 +181,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                               noMinMax: true,
                               showSlider: false,
                               onOkay: (_value) => {
-                                weather.isUserEdited++;
+                                weather.isUserEdited = true;
                                 const mappedWeather = weather.rawData.map(
                                   (n) =>
                                     `${dateToISO8601String(n.date)}-${n.location}`,
@@ -174,6 +189,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
                                 const i = mappedWeather.indexOf(
                                   `${row.date}-${row.location}`,
                                 );
+
+                                _rowsPerPage = table.rowsPerPage;
+                                _page = table.currentPage;
+
                                 if (project.units === 'metric') {
                                   weather.rawData[i][id].metric = _value;
                                   if (type === 'temperature')
@@ -192,6 +211,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
                                     weather.rawData[i][id].metric =
                                       inchesToMillimeters(_value);
                                 }
+
+                                updateTable();
                               },
                             },
                           },

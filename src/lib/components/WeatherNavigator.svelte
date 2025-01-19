@@ -16,8 +16,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script>
   import WeatherTableView from '$lib/components/WeatherTableView.svelte';
   import ImportWeatherData from '$lib/components/modals/ImportWeatherData.svelte';
+  import { ICONS } from '$lib/constants';
   import { modal, weather } from '$lib/state';
-  import { downloadWeatherCSV, getWeatherTargets } from '$lib/utils';
+  import {
+    downloadPDF,
+    downloadWeatherCSV,
+    getWeatherTargets,
+  } from '$lib/utils';
   import { weatherChart } from './WeatherChart.svelte';
 
   let weatherTargets = $derived(
@@ -51,25 +56,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
   >
     <button
       class="btn bg-secondary-hover-token whitespace-pre-wrap"
+      onclick={downloadPDF}
+      title="Download PDF File"
+    >
+      {@html ICONS.download} Download Gauges and Weather Data (PDF)
+    </button>
+
+    <button
+      class="btn bg-secondary-hover-token whitespace-pre-wrap"
       onclick={downloadWeatherCSV}
       title="Download CSV File"
     >
-      <span>
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke-width="1.5"
-          stroke="currentColor"
-          class="w-6 h-6 inline bottom-1 relative"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M9 8.25H7.5a2.25 2.25 0 00-2.25 2.25v9a2.25 2.25 0 002.25 2.25h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25H15M9 12l3 3m0 0l3-3m-3 3V2.25"
-          />
-        </svg> Download Weather Data (CSV)
-      </span>
+      {@html ICONS.download} Download Weather Data (CSV)
     </button>
 
     {#if weather.grouping !== 'week'}

@@ -45,7 +45,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     await fetchData()
       .then(() => {
         controller.value = null;
-        weather.isUserEdited = 0;
+        weather.isUserEdited = false;
         weather.isFromLocalStorage = false;
         // Add the default temperature gauge
         gauges.addById('temp');
@@ -55,7 +55,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       .catch((e) => {
         controller.value = null;
         weather.rawData = [];
-        weather.isUserEdited = 0;
+        weather.isUserEdited = false;
         weather.isFromLocalStorage = false;
         error = e?.message;
       });

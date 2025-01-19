@@ -20,6 +20,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Gauge from './Gauge.svelte';
   import RangeOptionsButton from './buttons/RangeOptionsButton.svelte';
   import GaugeCustomizer from './GaugeCustomizer.svelte';
+  import { ICONS } from '$lib/constants';
 
   onMount(() => {
     setupAvailableGauges();
@@ -129,21 +130,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     onclick={downloadPDF}
     title="Download PDF File"
   >
-    <span class="">
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke-width="1.5"
-        stroke="currentColor"
-        class="w-6 h-6 inline bottom-1 relative"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="M9 8.25H7.5a2.25 2.25 0 00-2.25 2.25v9a2.25 2.25 0 002.25 2.25h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25H15M9 12l3 3m0 0l3-3m-3 3V2.25"
-        />
-      </svg> Download Gauges and Weather Data (PDF)
-    </span>
+    {@html ICONS.download} Download Gauges and Weather Data (PDF)
   </button>
 </div>

@@ -555,7 +555,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <div class="mt-2">
   {#if weather.data.length}
-    {#key project.units && weather.isUserEdited}
+    {#key project.units}
       <WeatherNavigator />
     {/key}
   {/if}

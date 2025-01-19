@@ -92,8 +92,8 @@ export const checkForProjectInLocalStorage = async () => {
 
   // Set isCustomWeather
   const _isCustomWeather = matchedProject.isCustomWeatherData;
-  if (_isCustomWeather === true) weather.isUserEdited++;
-  else if (_isCustomWeather === false) weather.isUserEdited = 0;
+  if (_isCustomWeather === true) weather.isUserEdited = true;
+  else if (_isCustomWeather === false) weather.isUserEdited = false;
 
   // Set weather data and convert dates to Date objects
   const weatherLocalStorage = matchedProject.weatherData;

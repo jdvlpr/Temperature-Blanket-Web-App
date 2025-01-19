@@ -215,9 +215,7 @@ class WeatherClass {
   // ***************
   currentIndex = $state(0);
 
-  // user a number to track when the user makes an edit
-  // not using boolean because of using this as a key to trigger updates
-  isUserEdited: number = $state(0);
+  isUserEdited: boolean = $state(false);
 
   isFromLocalStorage: boolean = $state(false);
 

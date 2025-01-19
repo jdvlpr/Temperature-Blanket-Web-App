@@ -15,9 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import RowsPerPage from '$lib/components/datatable/RowsPerPage.svelte';
-  import Search from '$lib/components/datatable/Search.svelte';
   import { weather } from '$lib/state';
-  import { dateToISO8601String } from '$lib/utils';
   import type { TableHandler } from '@vincjo/datatables';
   import type { Snippet } from 'svelte';
 
@@ -28,45 +26,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
     children: Snippet;
   }
 
-  let {
-    table,
-    search = true,
-    hidePageLabel = false,
-    children,
-  }: Props = $props();
+  let { table, search = true, children }: Props = $props();
 
-  let element = $state();
-
-  table.on('change', () => {
-    scrollTop();
-  });
-
-  const scrollTop = () => {
-    if (typeof element !== 'undefined') element.scrollTop = 0;
-  };
-
-  // function getFrom({ page }) {
-  //   let from = '';
-  //   if (
-  //     $sorted.identifier === 'date' ||
-  //     $sorted.identifier === 'row' ||
-  //     $sorted.identifier === null
-  //   ) {
-  //     if ($sorted.direction === 'asc' || $sorted.direction === null)
-  //       from = `(${dateToISO8601String(weather.data[page * $rowsPerPage - $rowsPerPage].date)})`;
-  //     else
-  //       from = `(${dateToISO8601String(weather.data[weather.data?.length - 1 - (page * $rowsPerPage - $rowsPerPage)].date)})`;
-  //   }
-  //   return from;
-  // }
+  const searchInput = table.createSearch();
 </script>
 
 <section class="relative w-full">
-  <article class="relative overflow-x-scroll" bind:this={element}>
+  <article class="relative overflow-x-scroll">
     {@render children?.()}
   </article>
+
   <div
-    class="flex flex-wrap gap-x-8 gap-y-4 justify-center sm:justify-between items-start mt-2 mb-4 w-full mx-auto"
+    class="flex flex-wrap gap-4 justify-center sm:justify-between items-start mt-2 mb-4 w-full mx-auto"
   >
     <p class="text-sm">
       {#if table.rowCount.total > 0}
@@ -77,7 +48,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
         No {weather.grouping}s found
       {/if}
     </p>
-    <div class="flex flex-wrap gap-4 items-end justify-center">
+
+    <div
+      class="flex flex-wrap gap-4 items-end justify-between max-sm:w-full sm:justify-center"
+    >
       {#if table.pageCount > 1 || table.rowsPerPage !== 10}
         <RowsPerPage {table} />
       {/if}
@@ -115,15 +89,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               }}
             >
               {#each table.pages as page}
-                <!-- {@const from = getFrom({
-                  page,
-                })} -->
-                <option value={page}
-                  >{page}
-                  {#if !hidePageLabel}
-                    <!-- {from} -->from
-                  {/if}
-                </option>
+                <option value={page}>{page} </option>
               {/each}
             </select>
           </label>
@@ -153,7 +119,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {/if}
     </div>
     {#if search}
-      <Search {table} />
+      <input
+        type="text"
+        class="input w-full sm:max-w-[200px]"
+        bind:value={searchInput.value}
+        placeholder="Search..."
+        oninput={() => searchInput.set()}
+      />
     {/if}
   </div>
 </section>

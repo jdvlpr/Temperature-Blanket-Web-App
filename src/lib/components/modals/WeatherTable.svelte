@@ -62,7 +62,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <ModalShell {parent}>
   <div class="w-full inline-flex text-center">
     <div class="w-[85vw] max-w-screen-sm">
-      <DataTable {table} search={false} hidePageLabel={true}>
+      <DataTable {table} search={false}>
         <table class="border-separate border-spacing-0 w-fit mx-auto">
           <thead>
             <tr>

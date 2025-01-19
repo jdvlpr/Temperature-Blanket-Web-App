@@ -38,6 +38,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '$lib/utils';
   import { getToastStore } from '@skeletonlabs/skeleton';
   import ModalShell from './ModalShell.svelte';
+  import { ICONS } from '$lib/constants';
 
   const toastStore = getToastStore();
 
@@ -172,20 +173,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
             onclick={() => goTo('download')}
             disabled={!weather.data}
             title="Open Download Menu"
-            ><svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-              class="w-6 h-6"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M9 8.25H7.5a2.25 2.25 0 00-2.25 2.25v9a2.25 2.25 0 002.25 2.25h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25H15M9 12l3 3m0 0l3-3m-3 3V2.25"
-              />
-            </svg>
+          >
+            {@html ICONS.download}
             Download
           </button>
         {/if}
@@ -403,40 +392,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
           class="btn bg-secondary-hover-token gap-2"
           onclick={downloadPDF}
           title="Download PDF File"
-          ><svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="1.5"
-            stroke="currentColor"
-            class="w-6 h-6"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M9 8.25H7.5a2.25 2.25 0 00-2.25 2.25v9a2.25 2.25 0 002.25 2.25h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25H15M9 12l3 3m0 0l3-3m-3 3V2.25"
-            />
-          </svg>
+        >
+          {@html ICONS.download}
           Gauges and Weather Data (PDF)
         </button>
         <button
           class="btn bg-secondary-hover-token gap-2"
           onclick={downloadWeatherCSV}
           title="Download CSV File"
-          ><svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="1.5"
-            stroke="currentColor"
-            class="w-6 h-6"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M9 8.25H7.5a2.25 2.25 0 00-2.25 2.25v9a2.25 2.25 0 002.25 2.25h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25H15M9 12l3 3m0 0l3-3m-3 3V2.25"
-            />
-          </svg>
+        >
+          {@html ICONS.download}
           Weather Data (CSV)</button
         >
 
