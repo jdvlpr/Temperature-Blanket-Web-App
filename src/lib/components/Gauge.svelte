@@ -320,7 +320,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <path
           stroke-linecap="round"
           stroke-linejoin="round"
-          d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"
+          d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"
         />
       </svg>
 
@@ -379,18 +379,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke-width="1.5"
-        stroke="currentColor"
         class="size-6 mr-1"
-      >
-        <path
+        viewBox="0 0 24 24"
+        ><path
+          fill="none"
+          stroke="currentColor"
           stroke-linecap="round"
           stroke-linejoin="round"
-          d="M3 7.5L7.5 3m0 0L12 7.5M7.5 3v13.5m13.5 0L16.5 21m0 0L12 16.5m4.5 4.5V7.5"
-        />
-      </svg>
+          stroke-width="1.5"
+          d="M10 14H2m6-4H2m4-4H2m10 12H2m17 2V4m0 16l3-3m-3 3l-3-3m3-13l3 3m-3-3l-3 3"
+        /></svg
+      >
       {#if !fullscreen}
         Sort
       {/if}
