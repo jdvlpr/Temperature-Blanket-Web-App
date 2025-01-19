@@ -26,11 +26,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
    */
 
   /** @type {Props} */
-  let {
-    colors,
-    schemeName = $bindable('Palette Preview'),
-    height = '70px',
-  } = $props();
+  let { colors, schemeName = 'Palette Preview', height = '70px' } = $props();
 
   $effect(() => {
     if (schemeName === 'Custom') schemeName = 'Color Palette';

@@ -563,18 +563,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 <span class="flex items-center">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
+                    class="size-5 mr-1"
                     viewBox="0 0 24 24"
-                    stroke-width="1.5"
-                    stroke="currentColor"
-                    class="w-4 h-4 mr-1"
-                  >
-                    <path
+                    ><path
+                      fill="none"
+                      stroke="currentColor"
                       stroke-linecap="round"
                       stroke-linejoin="round"
-                      d="M3 7.5L7.5 3m0 0L12 7.5M7.5 3v13.5m13.5 0L16.5 21m0 0L12 16.5m4.5 4.5V7.5"
-                    />
-                  </svg>
+                      stroke-width="1.5"
+                      d="M10 14H2m6-4H2m4-4H2m10 12H2m17 2V4m0 16l3-3m-3 3l-3-3m3-13l3 3m-3-3l-3 3"
+                    /></svg
+                  >
                   Sort By
                 </span>
                 <select

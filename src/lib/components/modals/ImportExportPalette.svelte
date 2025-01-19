@@ -14,6 +14,8 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
+  import { run } from 'svelte/legacy';
+
   import { PUBLIC_COOLORS_LINK } from '$env/static/public';
   import ColorPalette from '$lib/components/ColorPalette.svelte';
   import Expand from '$lib/components/Expand.svelte';
@@ -26,24 +28,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
     pluralize,
   } from '$lib/utils';
   import { getModalStore, getToastStore } from '@skeletonlabs/skeleton';
-  import { getContext, hasContext } from 'svelte';
   import { slide } from 'svelte/transition';
   import ModalShell from './ModalShell.svelte';
 
-  export let colors, updateGauge, parent;
+  let { colors, updateGauge, parent } = $props();
 
   const toastStore = getToastStore();
 
   const modalStore = getModalStore();
 
-  $: palette = colors.map((n) => n?.hex);
-
-  let copiedPalette = false;
-  let copiedNames = false;
-  let copiedHexes = false;
-  let colorNamesAsArray = false;
-  let colorCodesAsArray = false;
-  let colorHexesWithHashes = true;
+  let copiedPalette = $state(false);
+  let copiedNames = $state(false);
+  let copiedHexes = $state(false);
+  let colorNamesAsArray = $state(false);
+  let colorCodesAsArray = $state(false);
+  let colorHexesWithHashes = $state(true);
 
   let copiedNotice = `<span transition:fade class="inline-flex items-center gap-1">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">
@@ -56,34 +55,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 Copied to your clipboard
             </span>`;
 
-  let isExpanded = false;
+  let isExpanded = $state(false);
 
-  let code = `${colorsToCode(colors, {
-    includePrefixes: true,
-  })}${colorsToYarnDetails({ colors }) ? 'yarn:' + colorsToYarnDetails({ colors }) : ''}`;
-
-  $: colorNames = colorNamesAsArray
-    ? JSON.stringify(colors.filter((n) => n.name).map((n) => n.name))
-    : colors
-        .filter((n) => n.name)
-        .map((n) => n.name)
-        .join(', ');
-
-  $: colorHexes = getColorHexes({
-    palette,
-    asArray: colorCodesAsArray,
-    withHashes: colorHexesWithHashes,
-  });
-
-  $: if (copiedPalette || copiedNames || copiedHexes) {
-    toastStore.trigger({
-      message: copiedNotice,
-      background: 'bg-success-300 text-black',
-    });
-    copiedPalette = false;
-    copiedNames = false;
-    copiedHexes = false;
-  }
+  let code = $state(
+    `${colorsToCode(colors, {
+      includePrefixes: true,
+    })}${colorsToYarnDetails({ colors }) ? 'yarn:' + colorsToYarnDetails({ colors }) : ''}`,
+  );
 
   function triggerChange() {
     if (code === null || code === '') return;
@@ -96,6 +74,36 @@ If not, see <https://www.gnu.org/licenses/>. -->
     if (asArray) return JSON.stringify(palette);
     return palette.join(', ');
   }
+  let palette = $derived(colors.map((n) => n?.hex));
+
+  let colorNames = $derived(
+    colorNamesAsArray
+      ? JSON.stringify(colors.filter((n) => n.name).map((n) => n.name))
+      : colors
+          .filter((n) => n.name)
+          .map((n) => n.name)
+          .join(', '),
+  );
+
+  let colorHexes = $derived(
+    getColorHexes({
+      palette,
+      asArray: colorCodesAsArray,
+      withHashes: colorHexesWithHashes,
+    }),
+  );
+
+  $effect(() => {
+    if (copiedPalette || copiedNames || copiedHexes) {
+      toastStore.trigger({
+        message: copiedNotice,
+        background: 'bg-success-300 text-black',
+      });
+      copiedPalette = false;
+      copiedNames = false;
+      copiedHexes = false;
+    }
+  });
 </script>
 
 <ModalShell {parent}>
@@ -107,15 +115,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
       id="palette-code"
       class="select-all textarea"
       bind:value={code}
-      on:keyup={triggerChange}
-      on:change={triggerChange}
+      onkeyup={triggerChange}
+      onchange={triggerChange}
     ></textarea>
   </div>
 
   <div class="flex flex-wrap my-2 gap-2 items-center justify-start">
     <button
       class="btn bg-secondary-hover-token gap-1"
-      on:click={() => {
+      onclick={() => {
         try {
           window.navigator.clipboard.writeText(code);
           copiedPalette = true;
@@ -226,19 +234,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {colorHexes}
         </p>
       </div>
+
       <div
         class="flex flex-wrap gap-2 justify-center items-center cursor-pointer"
       >
         <ToggleSwitch bind:checked={colorCodesAsArray} label="Array" />
       </div>
+
       <div
         class="flex flex-wrap gap-2 justify-center items-center cursor-pointer"
       >
         <ToggleSwitch bind:checked={colorHexesWithHashes} label="Hashes" />
       </div>
+
       <button
         class="btn bg-secondary-hover-token gap-1"
-        on:click={() => {
+        onclick={() => {
           try {
             window.navigator.clipboard.writeText(colorHexes);
             copiedHexes = true;
@@ -288,7 +299,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </div>
       <button
         class="btn bg-secondary-hover-token gap-1"
-        on:click={() => {
+        onclick={() => {
           try {
             window.navigator.clipboard.writeText(colorNames);
             copiedNames = true;

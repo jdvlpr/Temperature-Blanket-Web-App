@@ -138,7 +138,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     {#if isDesktop.current || !browser}
       <button
-        class="btn bg-secondary-hover-token justify-start"
+        class={[
+          'bg-secondary-hover-token',
+          fullscreen ? 'btn-icon' : 'btn justify-start',
+        ]}
         title="Browse Preset & User-Created Color Palettes"
         onclick={() =>
           modal.state.trigger({
@@ -159,7 +162,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           viewBox="0 0 24 24"
           stroke-width="1.5"
           stroke="currentColor"
-          class="size-6 mr-1"
+          class={['size-6', !fullscreen && 'mr-1']}
         >
           <path
             stroke-linecap="round"
@@ -179,7 +182,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
           }}
         >
           <button
-            class="btn bg-secondary-hover-token justify-start"
+            class={[
+              'bg-secondary-hover-token',
+              fullscreen ? 'btn-icon' : 'btn justify-start',
+            ]}
             title="Browse Preset & User-Created Color Palettes"
           >
             <svg
@@ -188,7 +194,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               viewBox="0 0 24 24"
               stroke-width="1.5"
               stroke="currentColor"
-              class="size-6 mr-1"
+              class={['size-6', !fullscreen && 'mr-1']}
             >
               <path
                 stroke-linecap="round"
@@ -228,7 +234,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {/if}
 
     <button
-      class="btn bg-secondary-hover-token justify-start"
+      class={[
+        'bg-secondary-hover-token',
+        fullscreen ? 'btn-icon' : 'btn justify-start',
+      ]}
       title="Choose Yarn Colorways, Filtered by Brand and Yarn"
       onclick={() =>
         modal.state.trigger({
@@ -247,7 +256,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         viewBox="0 0 24 24"
         stroke-width="1.5"
         stroke="currentColor"
-        class="size-6 mr-1"
+        class={['size-6', !fullscreen && 'mr-1']}
       >
         <path
           stroke-linecap="round"
@@ -262,7 +271,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </button>
 
     <button
-      class="btn bg-secondary-hover-token justify-start"
+      class={[
+        'bg-secondary-hover-token',
+        fullscreen ? 'btn-icon' : 'btn justify-start',
+      ]}
       title="Get Palette from Image"
       onclick={() =>
         modal.state.trigger({
@@ -281,7 +293,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         viewBox="0 0 24 24"
         stroke-width="1.5"
         stroke="currentColor"
-        class="size-6 mr-1"
+        class={['size-6', !fullscreen && 'mr-1']}
       >
         <path
           stroke-linecap="round"
@@ -295,7 +307,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     >
 
     <button
-      class="btn bg-secondary-hover-token justify-start"
+      class={[
+        'bg-secondary-hover-token',
+        fullscreen ? 'btn-icon' : 'btn justify-start',
+      ]}
       title="Load Colors or Get a Palette Code to Share"
       onclick={() =>
         modal.state.trigger({
@@ -315,7 +330,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         viewBox="0 0 24 24"
         stroke-width="1.5"
         stroke="currentColor"
-        class="size-6 mr-1"
+        class={['size-6', !fullscreen && 'mr-1']}
       >
         <path
           stroke-linecap="round"
@@ -330,7 +345,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </button>
 
     <button
-      class="btn bg-secondary-hover-token justify-start"
+      class={[
+        'bg-secondary-hover-token',
+        fullscreen ? 'btn-icon' : 'btn justify-start',
+      ]}
       title="Generate Random Colors"
       onclick={() =>
         modal.state.trigger({
@@ -346,7 +364,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
-        class="size-6 mr-1"
+        class={['size-6', !fullscreen && 'mr-1']}
         viewBox="0 0 24 24"
         ><path
           fill="none"
@@ -363,7 +381,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </button>
 
     <button
-      class="btn bg-secondary-hover-token justify-start"
+      class={[
+        'bg-secondary-hover-token',
+        fullscreen ? 'btn-icon' : 'btn justify-start',
+      ]}
       title="Sort Colors"
       onclick={() =>
         modal.state.trigger({
@@ -379,7 +400,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
-        class="size-6 mr-1"
+        class={['size-6', !fullscreen && 'mr-1']}
         viewBox="0 0 24 24"
         ><path
           fill="none"
@@ -408,7 +429,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           viewBox="0 0 24 24"
           stroke-width="1.5"
           stroke="currentColor"
-          class="size-6 mr-1"
+          class={['size-6', !fullscreen && 'mr-1']}
         >
           <path
             stroke-linecap="round"
@@ -423,7 +444,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           viewBox="0 0 24 24"
           stroke-width="1.5"
           stroke="currentColor"
-          class="size-6 mr-1"
+          class={['size-6', !fullscreen && 'mr-1']}
         >
           <path
             stroke-linecap="round"
