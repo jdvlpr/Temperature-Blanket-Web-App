@@ -14,43 +14,37 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import WeatherDetails from '$lib/components/WeatherDetails.svelte';
   import WeatherTableView from '$lib/components/WeatherTableView.svelte';
   import ImportWeatherData from '$lib/components/modals/ImportWeatherData.svelte';
   import { modal, weather } from '$lib/state';
   import { downloadWeatherCSV, getWeatherTargets } from '$lib/utils';
-  import { RadioGroup, RadioItem } from '@skeletonlabs/skeleton';
+  import { weatherChart } from './WeatherChart.svelte';
 
   let weatherTargets = $derived(
     getWeatherTargets({
       weatherParameters: weather.table.showParameters,
     }),
   );
+
+  let debounceTimer;
+  const debounce = (callback, time) => {
+    window.clearTimeout(debounceTimer);
+    debounceTimer = window.setTimeout(callback, time);
+  };
 </script>
 
-<div class="relative">
-  <RadioGroup class="flex-wrap gap-y-2" active="bg-secondary-active-token">
-    <RadioItem
-      title="Set Daily Weather Display to Table"
-      bind:group={weather.table.viewAs}
-      name="weatherDisplay"
-      value={'table'}
-    >
-      Table</RadioItem
-    >
-    <RadioItem
-      title="Set Daily Weather Display to Details"
-      bind:group={weather.table.viewAs}
-      name="weatherDisplay"
-      value={'range'}>Details</RadioItem
-    >
-  </RadioGroup>
+<svelte:window
+  on:resize={() => {
+    debounce(() => {
+      // when resizing the window, at certain widths the chart does not automatically resize
+      // so force it to update
+      if (weatherChart.current) weatherChart?.update();
+    }, 101);
+  }}
+/>
 
-  {#if weather.table.viewAs === 'range'}
-    <WeatherDetails data={weather.data} {weatherTargets} />
-  {:else if weather.table.viewAs === 'table'}
-    <WeatherTableView {weatherTargets} />
-  {/if}
+<div class="">
+  <WeatherTableView {weatherTargets} />
 
   <div
     class="flex flex-wrap gap-2 justify-center mt-4 mb-2 lg:mb-4 px-4 py-2 shadow-inner rounded-container-token variant-soft-surface"

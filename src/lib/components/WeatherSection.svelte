@@ -50,13 +50,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let wasDefaultWeatherSourceChanged = $state(false);
   let showWeatherChart = $state(true);
 
-  let debounceTimer;
-  const debounce = (callback, time) => {
-    if (!browser) return;
-    window.clearTimeout(debounceTimer);
-    debounceTimer = window.setTimeout(callback, time);
-  };
-
   let isAnyWeatherSourceDifferentFromDefault;
   onMount(() => {
     isAnyWeatherSourceDifferentFromDefault = !locations.all?.some(
@@ -101,25 +94,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
       ];
     } else return missingData;
   }
-
-  function triggerHover(index) {
-    const datasets = weatherChart.current._metasets
-      .filter((item) => item.hidden !== true)
-      .map((item) => {
-        return {
-          datasetIndex: item.index,
-          index,
-        };
-      });
-
-    weatherChart.current.setActiveElements(datasets);
-    weather.currentIndex = index;
-    weatherChart.update();
-  }
-
-  $effect(() => {
-    if (weather.currentIndex) triggerHover(weather.currentIndex);
-  });
 
   let missingTmin = $derived(weather.params.tmin.filter((n) => n === null));
   let missingTavg = $derived(weather.params.tavg.filter((n) => n === null));
@@ -337,24 +311,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
         value={Math.max(...weather.params.tmax?.filter((n) => n !== null))}
         units={UNIT_LABELS.temperature[project.units]}
       >
-        {#snippet button()}
-          <div>
-            <button
-              class="btn text-sm bg-secondary-hover-token"
-              title="Go to Date"
-              onclick={(e) => {
-                e.stopPropagation();
-                triggerHover(tMaxDay.index);
-                graph.scrollIntoView({
-                  behavior: 'smooth',
-                  block: 'start',
-                });
-              }}
-            >
-              {#if weather.grouping === 'week'}Week of{/if}
-              {tMaxDay?.date.toLocaleDateString()}
-            </button>
-          </div>
+        {#snippet date()}
+          <p class="text-xs">
+            {#if weather.grouping === 'week'}Week of{/if}
+            {tMaxDay?.date.toLocaleDateString()}
+          </p>
         {/snippet}
       </WeatherItem>
     {/if}
@@ -377,24 +338,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
         value={Math.min(...weather.params.tmin?.filter((n) => n !== null))}
         units={UNIT_LABELS.temperature[project.units]}
       >
-        {#snippet button()}
-          <div>
-            <button
-              class="btn text-sm bg-secondary-hover-token"
-              title="Go to Date"
-              onclick={(e) => {
-                e.stopPropagation();
-                triggerHover(tMinDay.index);
-                graph.scrollIntoView({
-                  behavior: 'smooth',
-                  block: 'start',
-                });
-              }}
-            >
-              {#if weather.grouping === 'week'}Week of{/if}
-              {tMinDay?.date.toLocaleDateString()}
-            </button>
-          </div>
+        {#snippet date()}
+          <p class="text-xs">
+            {#if weather.grouping === 'week'}Week of{/if}
+            {tMinDay?.date.toLocaleDateString()}
+          </p>
         {/snippet}
       </WeatherItem>
     {/if}

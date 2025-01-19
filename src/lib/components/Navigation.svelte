@@ -28,9 +28,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <div class="flex-1">
           <Tooltip
             minWidth={'200px'}
-            disableTooltip={!!weather.data || index === 1}
+            disableTooltip={!!weather.data.length || index === 1}
             fullWidth={true}
-            buttonDisabled={!weather.data && index !== 1}
+            buttonDisabled={!weather.data.length && index !== 1}
             onclick={() => goToProjectSection(index)}
             dataPinned={pinned}
             dataActive={active}

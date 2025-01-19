@@ -48,9 +48,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   $effect(() => {
     sidebarWidth;
     debounce(() => {
-      console.log($state.snapshot(sidebarWidth));
-
-      weatherChart.update();
+      if (weatherChart.current) weatherChart.update();
     }, 101);
   });
 </script>

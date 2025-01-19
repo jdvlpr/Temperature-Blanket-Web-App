@@ -74,7 +74,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   );
 </script>
 
-<div class="w-full my-4">
+<div class="w-full my-4 inline-block">
   <DataTable {table} search={false}>
     <table class="border-separate border-spacing-0 w-full mx-auto">
       <thead>

@@ -14,6 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script module>
+  import { browser } from '$app/environment';
   import { project, weather } from '$lib/state';
   import {
     CategoryScale,
@@ -157,12 +158,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
             },
           },
           // events: ["click", "mousemove", "touchstart", "touchmove"],
-          events: ['click', 'touchstart'],
+          events: ['click'],
           animation: false,
-          onHover,
+          // onHover,
           plugins: {
             tooltip: {
-              enabled: false,
+              enabled: true,
+              interaction: {
+                mode: 'index',
+                axis: 'y',
+              },
+              usePointStyle: true,
             },
             legend: {
               display: false,
@@ -171,11 +177,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
           responsive: true,
           maintainAspectRatio: false,
           aspectRatio: 3,
-          interaction: {
-            position: 'nearest',
-            intersect: false,
-            mode: 'index',
-          },
           scales: {
             x: {
               ticks: {
@@ -239,10 +240,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     }
   }
 
-  export let weatherChart = new WeatherChartClass();
+  export let weatherChart = browser ? new WeatherChartClass() : null;
 
   function onHover(e) {
     let value = weatherChart.current.scales.x.getValueForPixel(e.x);
+
     if (value < 0) weather.currentIndex = 0;
     else if (value > weather.data?.length - 1)
       weather.currentIndex = weather.data?.length - 1;

@@ -23,7 +23,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     value: any;
     units?: string | undefined;
     isRecentDate?: boolean;
-    button?: import('svelte').Snippet;
+    date?: import('svelte').Snippet;
     details?: import('svelte').Snippet;
   }
 
@@ -34,7 +34,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     value,
     units = undefined,
     isRecentDate = false,
-    button,
+    date,
     details,
   }: Props = $props();
 
@@ -65,6 +65,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {/if}
   </div>
   <span class="text-sm ml-1">{label}</span>
-  {@render button?.()}
+  {@render date?.()}
   {@render details?.()}
 </span>

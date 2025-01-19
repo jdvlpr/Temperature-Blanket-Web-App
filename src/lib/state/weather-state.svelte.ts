@@ -225,10 +225,8 @@ class WeatherClass {
   // Table
   // ***************
   table: {
-    viewAs: 'table' | 'range';
     showParameters: { [key: string]: boolean };
   } = $state({
-    viewAs: 'table',
     showParameters: {
       tmin: true,
       tavg: true,
