@@ -556,7 +556,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <div class="mt-2">
   {#if weather.data.length}
     <!-- {#key []} -->
-    {#if !gauges.activeGauge.calculating}
+    {#if !gauges.activeGauge?.calculating}
       <WeatherNavigator />
     {/if}
     <!-- {/key} -->

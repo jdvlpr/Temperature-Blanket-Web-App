@@ -54,7 +54,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     // gauges.activeGauge?.ranges;
     // weather.table.showParameters;
     // weather.tableData;
-    if (weather.tableData.length && !gauges.activeGauge.calculating)
+    if (weather.tableData.length && !gauges.activeGauge?.calculating)
       updateTable();
   });
 </script>

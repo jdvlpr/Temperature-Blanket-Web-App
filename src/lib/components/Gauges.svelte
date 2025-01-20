@@ -83,7 +83,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </label>
 </div>
 
-{#if gauges.activeGauge && !gauges.activeGauge.calculating}
+{#if gauges.activeGauge && !gauges.activeGauge?.calculating}
   {#if gauges.activeGauge.id !== 'temp'}
     <!-- If this is not the default temperature gauge and we're on the project planner page -->
     <button
