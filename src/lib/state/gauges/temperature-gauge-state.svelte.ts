@@ -1,8 +1,11 @@
-import { weather } from '$lib/state';
+import { project, weather } from '$lib/state';
 import type { GaugeAttributes, GaugeStateInterface } from '$lib/types';
 import {
   displayNumber,
   getEvenlyDistributedRangeValuesWithEqualDayCount,
+  getIncrement,
+  getRanges,
+  getStart,
 } from '$lib/utils';
 import chroma from 'chroma-js';
 
@@ -58,27 +61,69 @@ export const gaugeAttributes: GaugeAttributes = {
 
 export class TemperatureGauge {
   constructor() {
+    // Assign the gauge attributes as properties
     Object.assign(this, gaugeAttributes);
+
+    // Since rangeOptions needs to be $state that the user can update,
+    // it doesn't benefit from the derived auto properties which are used to calculate the rangeOptions
+    // So we need to set up an $effect to update the rangeOptions with the default derived values when the project loads
+    $effect.root(() => {
+      $effect(() => {
+        if (!Number.isFinite(this.rangeOptions?.auto.increment))
+          this.rangeOptions.auto.increment =
+            this.autoRangeOptions?.auto.increment;
+
+        if (!Number.isFinite(this.rangeOptions?.auto.start.high))
+          this.rangeOptions.auto.start.high =
+            this.autoRangeOptions?.auto.start.high;
+
+        if (!Number.isFinite(this.rangeOptions?.auto.start.low))
+          this.rangeOptions.auto.start.low =
+            this.autoRangeOptions?.auto.start.low;
+
+        if (!Number.isFinite(this.rangeOptions?.manual.start))
+          this.rangeOptions.manual.start = this.autoRangeOptions?.manual.start;
+
+        if (!Number.isFinite(this.rangeOptions?.manual.increment))
+          this.rangeOptions.manual.increment =
+            this.autoRangeOptions?.manual.increment;
+      });
+    });
   }
+
+  // *************************
+  // Derived properties from weather data
+  // Used for auto calculating ranges
+  // *************************
+
   // All the high temperatures, without missing values
-  #maxes = $derived(weather.params?.tmax?.filter((n) => n !== null));
+  #maxes = $derived.by(() => {
+    weather.params?.tmax;
+    const tmaxes = weather.params.tmax;
+    return tmaxes?.filter((n) => n !== null) || [];
+  });
 
   // All the low temperatures, without missing values
   #mins = $derived(weather.params?.tmin?.filter((n) => n !== null));
 
   // Set the max value to above the highest integer based on the weather data
-  #max = $derived(
-    Number.isInteger(Math.max(...this.#maxes))
+  #max = $derived.by(() => {
+    return Number.isInteger(Math.max(...this.#maxes))
       ? Math.max(...this.#maxes) + 1
-      : Math.ceil(Math.max(...this.#maxes)),
-  );
+      : Math.ceil(Math.max(...this.#maxes));
+  });
 
   // Set the min value to below the lowest integer based on the weather data
-  #min = $derived(
-    Number.isInteger(Math.max(...this.#mins))
-      ? Math.max(...this.#mins) - 1
-      : Math.floor(Math.max(...this.#mins)),
-  );
+  #min = $derived.by(() => {
+    return Number.isInteger(Math.min(...this.#mins))
+      ? Math.min(...this.#mins) - 1
+      : Math.floor(Math.min(...this.#mins));
+  });
+
+  // *************************
+  // Properties
+  // User can update these
+  // *************************
 
   colors = $state(
     chroma
@@ -125,6 +170,15 @@ export class TemperatureGauge {
     }),
   );
 
+  schemeId = $state('Spectral');
+
+  calculating = $state(false);
+
+  // *************************
+  // Derived properties from ranges
+  // Used for auto calculating ranges
+  // *************************
+
   autoRangeOptions = $derived({
     auto: {
       optimization: this.rangeOptions.auto.optimization,
@@ -136,8 +190,8 @@ export class TemperatureGauge {
       roundIncrement: this.rangeOptions.auto.roundIncrement,
     },
     manual: {
-      start: this.rangeOptions.manual.start,
-      increment: this.rangeOptions.manual.increment,
+      start: this.#max,
+      increment: this.#min,
     },
     direction: this.rangeOptions.direction,
     includeFromValue: this.rangeOptions.includeFromValue,
@@ -147,26 +201,46 @@ export class TemperatureGauge {
     isCustomRanges: this.rangeOptions.isCustomRanges,
   });
 
-  autoRanges = $derived(
-    getEvenlyDistributedRangeValuesWithEqualDayCount({
-      weatherData: weather.data,
-      numRanges: this.colors.length,
-      prop: this.rangeOptions.auto.optimization,
-      gaugeDirection: this.rangeOptions.direction,
-      roundIncrement: this.rangeOptions.auto.roundIncrement,
-      includeFrom: this.rangeOptions.includeFromValue,
-      includeTo: this.rangeOptions.includeToValue,
-    }),
+  #start = $derived.by(() => {
+    this.rangeOptions.mode;
+    this.rangeOptions?.direction;
+    this.rangeOptions?.manual.start;
+    return getStart(this.rangeOptions);
+  });
+
+  #increment = $derived.by(() => {
+    this.rangeOptions.mode;
+    this.rangeOptions?.direction;
+    this.rangeOptions?.isCustomRanges;
+    this.rangeOptions.manual.increment;
+    return getIncrement(this.rangeOptions);
+  });
+
+  #dontIncludeFromAndTo = $derived(
+    !this.rangeOptions.includeFromValue && !this.rangeOptions.includeToValue,
   );
 
-  calculating = $state(false);
+  #includeFromAndTo = $derived(
+    this.rangeOptions.includeFromValue && this.rangeOptions.includeToValue,
+  );
 
-  schemeId = $state('Spectral');
+  // *************************
+  // Mothods
+  // *************************
   updateColors({ colors }) {
     this.calculating = true;
     this.colors = colors;
-    this.ranges = this.autoRanges;
-    this.rangeOptions = this.autoRangeOptions;
+    const { ranges } = getRanges({
+      rangeOptions: this.rangeOptions,
+      ranges: this.ranges,
+      start: this.#start,
+      increment: this.#increment,
+      colors: this.colors,
+      includeFromAndTo: this.#includeFromAndTo,
+      dontIncludeFromAndTo: this.#dontIncludeFromAndTo,
+    });
+    this.ranges = ranges;
+    this.rangeOptions = this.rangeOptions;
     this.numberOfColors = this.colors.length;
     this.calculating = false;
   }

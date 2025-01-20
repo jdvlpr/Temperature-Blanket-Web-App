@@ -47,12 +47,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
         weather.table.page = 1;
         table.setPage(1);
       }
-
-      console.log(
-        +e.target.value,
-        table.rowsPerPage,
-        weather.table.rowsPerPage,
-      );
     }}
   >
     {#each options as option}

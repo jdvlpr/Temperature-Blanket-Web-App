@@ -65,6 +65,7 @@ export const getEvenlyDistributedRangeValuesWithEqualDayCount = ({
   includeTo,
 }) => {
   if (!weatherData) weatherData = weather.data;
+
   const _units = project.units;
 
   let _weatherData = [...weatherData];

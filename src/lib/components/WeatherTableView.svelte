@@ -42,7 +42,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 
   function updateTable() {
-    console.count('updateTable');
     table.setRows($state.snapshot(weather.tableData));
     table.setRowsPerPage($state.snapshot(weather.table.rowsPerPage));
     table.setPage($state.snapshot(weather.table.page));
@@ -65,7 +64,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <div class="w-full my-4 inline-block">
   <DataTable {table} search={true}>
-    <table class="border-separate border-spacing-0 w-full mx-auto">
+    <table class={'border-separate border-spacing-0 w-full mx-auto'}>
       <thead>
         <tr>
           <ThSort {table} field="date">
@@ -95,7 +94,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
           <tr
             class:!variant-soft-warning={isRecentDate}
-            class="!text-token divide-x-2 divide-y-2 divide-surface-50 dark:divide-surface-900"
+            class={[
+              '!text-token',
+              showColorDetails &&
+                'divide-x-2 divide-y-2 divide-surface-50 dark:divide-surface-900',
+            ]}
           >
             <td class="">
               {#if isRecentDate}

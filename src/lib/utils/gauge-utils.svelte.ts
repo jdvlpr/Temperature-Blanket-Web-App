@@ -16,8 +16,81 @@
 import { SCHEMES } from '$lib/constants';
 import { project, weather } from '$lib/state';
 import type { Color, GaugeSettingsType } from '$lib/types';
-import { getDaysInRange, getDaysPercent, pluralize } from '$lib/utils';
+import {
+  displayNumber,
+  getDaysInRange,
+  getDaysPercent,
+  getEvenlyDistributedRangeValuesWithEqualDayCount,
+  pluralize,
+} from '$lib/utils';
 import chroma from 'chroma-js';
+
+export function getRanges({
+  rangeOptions,
+  ranges,
+  start,
+  increment,
+  colors,
+  includeFromAndTo,
+  dontIncludeFromAndTo,
+}) {
+  let newRanges;
+  let mustUpdateCustomRanges = false;
+  if (rangeOptions.isCustomRanges) {
+    // If 'manual' range calculations are used
+    // newRanges = customRanges;
+
+    newRanges = ranges;
+  } else if (
+    rangeOptions.auto.optimization !== 'ranges' &&
+    rangeOptions.mode === 'auto'
+  ) {
+    // If 'auto' range calculations are used, and anything but 'equal ranges' is set
+    newRanges = getEvenlyDistributedRangeValuesWithEqualDayCount({
+      weatherData: weather.data,
+      numRanges: colors.length,
+      prop: rangeOptions.auto.optimization,
+      gaugeDirection: rangeOptions.direction,
+      roundIncrement: rangeOptions.auto.roundIncrement,
+      includeFrom: rangeOptions.includeFromValue,
+      includeTo: rangeOptions.includeToValue,
+    });
+    // customRanges = newRanges;
+    mustUpdateCustomRanges = true;
+  } else {
+    // If 'auto' range calculations and 'equal ranges' is set
+    let _start = start;
+
+    newRanges = colors.map((n, i) => {
+      const isFirstRange = i === 0;
+      const isLastRange = i === colors.length - 1;
+
+      let from = _start;
+      let to = _start + increment;
+
+      if (!isLastRange && rangeOptions.mode !== 'manual')
+        to += includeFromAndTo ? 0.01 : dontIncludeFromAndTo ? -0.01 : 0;
+
+      _start += increment;
+
+      const decimals =
+        rangeOptions.auto.roundIncrement && rangeOptions.mode !== 'manual'
+          ? 0
+          : 2;
+
+      return {
+        from: displayNumber(from, decimals),
+        to: displayNumber(to, decimals),
+      };
+    });
+    console.log('equal ranges', newRanges);
+
+    // customRanges = newRanges;
+    mustUpdateCustomRanges = true;
+  }
+
+  return { ranges: newRanges, mustUpdateCustomRanges };
+}
 
 export const createGaugeColors = ({
   schemeId,

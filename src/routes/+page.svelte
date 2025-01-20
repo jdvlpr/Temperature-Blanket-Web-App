@@ -34,6 +34,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { ICONS } from '$lib/constants';
   import {
     drawerState,
+    gauges,
     isDesktop,
     locations,
     modal,

@@ -70,6 +70,7 @@ export const setProjectSettings = async (
       params[gauge.id].value,
       gauges.getSnapshot(gauge.id),
     );
+
     Object.assign(
       gauges.allCreated.find((g) => g.id === gauge.id),
       settings,

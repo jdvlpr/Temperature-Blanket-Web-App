@@ -121,6 +121,7 @@ export const checkForProjectInLocalStorage = async () => {
 
   // Set the weather data and indicate that it was loaded from local storage
   weather.rawData = newWeatherUngrouped;
+
   weather.isFromLocalStorage = true;
 };
 

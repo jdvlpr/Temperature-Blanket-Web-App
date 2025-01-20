@@ -22,12 +22,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
   import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
   import StickyPart from '$lib/components/modals/StickyPart.svelte';
-  import { gauges, project, weather } from '$lib/state';
+  import { gauges, project } from '$lib/state';
   import {
     displayNumber,
-    getEvenlyDistributedRangeValuesWithEqualDayCount,
     getIncrement,
     getRangeExample,
+    getRanges,
     getStart,
     getTextColor,
   } from '$lib/utils';
@@ -47,6 +47,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   const modalStore = getModalStore();
 
   let _gauge = $state(gauges.getSnapshot(gauges.activeGaugeId));
+
+  const unitLabel = _gauge.unit.label[project.units];
 
   let incrementMode = $state(
     _gauge.rangeOptions?.isCustomRanges ? null : _gauge.rangeOptions.mode,
@@ -73,120 +75,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     return getIncrement(_gauge.rangeOptions);
   });
-
-  let setupContainer: HTMLElement | undefined;
-
-  let showScrollToTopButton = $state(false);
-
-  let scrollObserver = new IntersectionObserver((entries, observer) => {
-    if (!entries[0].isIntersecting) {
-      showScrollToTopButton = true;
-    } else {
-      showScrollToTopButton = false;
-    }
-  });
-
-  $effect(() => {
-    if (index !== null) {
-      if (focusOn === 'to') {
-        document.getElementById(`range-${index}-to`)?.scrollIntoView();
-        document
-          .getElementById(`range-${index}-to`)
-          ?.getElementsByTagName('input')[0]
-          .focus();
-      } else {
-        document.getElementById(`range-${index}-from`)?.scrollIntoView();
-        document
-          .getElementById(`range-${index}-from`)
-          ?.getElementsByTagName('input')[0]
-          .focus();
-      }
-    }
-  });
-
-  $effect(() => {
-    scrollObserver.observe(setupContainer);
-  });
-
-  let debounceTimer;
-  const debounce = (callback, time) => {
-    window.clearTimeout(debounceTimer);
-    debounceTimer = window.setTimeout(callback, time);
-  };
-
-  $effect(() => {
-    incrementMode;
-    debounce(() => {
-      onChangeIncrementMode();
-    }, 10);
-  });
-
-  function onChangeIncrementMode() {
-    if (incrementMode === 'auto') {
-      _gauge.rangeOptions.mode = 'auto';
-      _gauge.rangeOptions.isCustomRanges = false;
-    } else if (incrementMode === 'manual') {
-      _gauge.rangeOptions.mode = 'manual';
-      _gauge.rangeOptions.isCustomRanges = false;
-    }
-    _gauge.ranges = getRanges(_gauge.rangeOptions);
-  }
-
-  function _onSave() {
-    onSave({
-      ranges: _gauge.ranges,
-      rangeOptions: _gauge.rangeOptions,
-    });
-    modalStore.close();
-  }
-
-  function getRanges(_rangeOptions) {
-    let newRanges;
-    if (_rangeOptions.isCustomRanges) {
-      newRanges = customRanges;
-    } else if (
-      _rangeOptions.auto.optimization !== 'ranges' &&
-      _rangeOptions.mode === 'auto'
-    ) {
-      newRanges = getEvenlyDistributedRangeValuesWithEqualDayCount({
-        weatherData: weather.data,
-        numRanges: _gauge.ranges.length,
-        prop: _gauge.rangeOptions.auto.optimization,
-        gaugeDirection: _gauge.rangeOptions.direction,
-        roundIncrement: _gauge.rangeOptions.auto.roundIncrement,
-        includeFrom: _gauge.rangeOptions.includeFromValue,
-        includeTo: _gauge.rangeOptions.includeToValue,
-      });
-      customRanges = newRanges;
-    } else {
-      let _start = start;
-      newRanges = _gauge.colors.map((n, i) => {
-        const isFirstRange = i === 0;
-        const isLastRange = i === _gauge.colors.length - 1;
-
-        let from = _start;
-        let to = _start + increment;
-
-        if (!isLastRange && _rangeOptions.mode !== 'manual')
-          to += includeFromAndTo ? 0.01 : dontIncludeFromAndTo ? -0.01 : 0;
-
-        _start += increment;
-
-        const decimals =
-          _rangeOptions.auto.roundIncrement && _rangeOptions.mode !== 'manual'
-            ? 0
-            : 2;
-
-        return {
-          from: displayNumber(from, decimals),
-          to: displayNumber(to, decimals),
-        };
-      });
-      customRanges = newRanges;
-    }
-
-    return newRanges;
-  }
 
   let dontIncludeFromAndTo = $derived(
     !_gauge.rangeOptions.includeFromValue &&
@@ -228,6 +116,94 @@ If not, see <https://www.gnu.org/licenses/>. -->
         _gauge.rangeOptions.includeToValue &&
         _gauge.rangeOptions.mode !== 'auto'),
   );
+
+  let setupContainer: HTMLElement | undefined;
+
+  let showScrollToTopButton = $state(false);
+
+  let scrollObserver = new IntersectionObserver((entries, observer) => {
+    if (!entries[0].isIntersecting) {
+      showScrollToTopButton = true;
+    } else {
+      showScrollToTopButton = false;
+    }
+  });
+
+  $effect(() => {
+    if (index !== null) {
+      setTimeout(() => {
+        // small delay to allow the modal to open
+        // then scroll to and focus on the number input
+        if (focusOn === 'to') {
+          document.getElementById(`range-${index}-to`)?.scrollIntoView({
+            behavior: 'smooth',
+          });
+          document
+            .getElementById(`range-${index}-to`)
+            ?.getElementsByTagName('input')[0]
+            .focus();
+        } else {
+          document
+            .getElementById(`range-${index}-from`)
+            ?.scrollIntoView({ behavior: 'smooth' });
+          document
+            .getElementById(`range-${index}-from`)
+            ?.getElementsByTagName('input')[0]
+            .focus();
+        }
+      }, 300);
+    }
+  });
+
+  function onChangeIncrementMode() {
+    if (incrementMode === 'auto') {
+      _gauge.rangeOptions.mode = 'auto';
+      _gauge.rangeOptions.isCustomRanges = false;
+    } else if (incrementMode === 'manual') {
+      _gauge.rangeOptions.mode = 'manual';
+      _gauge.rangeOptions.isCustomRanges = false;
+    }
+    autoUpdateRanges();
+  }
+
+  function _onSave() {
+    onSave({
+      ranges: _gauge.ranges,
+      rangeOptions: _gauge.rangeOptions,
+    });
+    modalStore.close();
+  }
+
+  function autoUpdateRanges() {
+    const { ranges, mustUpdateCustomRanges } = getRanges({
+      rangeOptions: _gauge.rangeOptions,
+      ranges: customRanges,
+      start,
+      increment,
+      colors: _gauge.colors,
+      includeFromAndTo,
+      dontIncludeFromAndTo,
+    });
+    _gauge.ranges = ranges;
+    if (mustUpdateCustomRanges) customRanges = ranges;
+  }
+
+  $effect(() => {
+    scrollObserver.observe(setupContainer);
+  });
+
+  let debounceTimer;
+  const debounce = (callback, time) => {
+    window.clearTimeout(debounceTimer);
+    debounceTimer = window.setTimeout(callback, time);
+  };
+
+  $effect(() => {
+    incrementMode;
+    debounce(() => {
+      onChangeIncrementMode();
+    }, 10);
+  });
 </script>
 
 <ModalShell {parent} size="large">
@@ -275,11 +251,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </button>
   {/if}
 
-  <div
-    class="flex max-lg:flex-col justify-center items-start gap-2 mx-auto w-full"
-  >
+  <div class="flex max-lg:flex-col justify-center items-start gap-2">
     <div
-      class="flex flex-col justify-start items-start"
+      class="flex flex-col justify-start items-start lg:max-w-[500px]"
       bind:this={setupContainer}
     >
       <h2 class="font-bold text-xl flex flex-wrap items-start mb-2">
@@ -306,7 +280,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   .reverse();
                 customRanges = _gauge.ranges;
               } else {
-                _gauge.ranges = getRanges(_gauge.rangeOptions);
+                autoUpdateRanges();
               }
             }}
           />
@@ -410,7 +384,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       <select
                         bind:value={_gauge.rangeOptions.auto.optimization}
                         onchange={() => {
-                          _gauge.ranges = getRanges(_gauge.rangeOptions);
+                          autoUpdateRanges();
                         }}
                         class="select"
                       >
@@ -460,14 +434,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
                           <span class="font-bold"
                             >{Math.ceil(displayedIncrement)}</span
                           >
-                          {_gauge.unit.label[project.units]}
+                          {unitLabel}
                         {:else}
                           <span class="font-bold">
                             {_gauge.rangeOptions.auto.roundIncrement
                               ? Math.round(displayedIncrement)
                               : displayNumber(displayedIncrement)}
                           </span>
-                          {_gauge.unit.label[project.units]}
+                          {unitLabel}
                         {/if}
 
                         <Tooltip>
@@ -502,7 +476,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         bind:checked={_gauge.rangeOptions.auto.roundIncrement}
                         label="Round Numbers"
                         onchange={() => {
-                          _gauge.ranges = getRanges(_gauge.rangeOptions);
+                          autoUpdateRanges();
                         }}
                       />
                     </div>
@@ -516,7 +490,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     class="tex-left flex flex-col items-start justify-end w-fit"
                   >
                     <label for="manual-increment" class="label"
-                      >Increment ({_gauge.unit.label[project.units]})</label
+                      >Increment ({unitLabel})</label
                     >
                     <input
                       id="manual-increment"
@@ -524,7 +498,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       min="0"
                       class="input w-fit"
                       onchange={() => {
-                        _gauge.ranges = getRanges(_gauge.rangeOptions);
+                        autoUpdateRanges();
                       }}
                       onfocus={() => {
                         // _gauge.rangeOptions.mode = 'manual';
@@ -549,7 +523,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                           d="M2 4.5A2.5 2.5 0 014.5 2h11a2.5 2.5 0 010 5h-11A2.5 2.5 0 012 4.5zM2.75 9.083a.75.75 0 000 1.5h14.5a.75.75 0 000-1.5H2.75zM2.75 12.663a.75.75 0 000 1.5h14.5a.75.75 0 000-1.5H2.75zM2.75 16.25a.75.75 0 000 1.5h14.5a.75.75 0 100-1.5H2.75z"
                         />
                       </svg>
-                      Start From ({_gauge.unit.label[project.units]})
+                      Start From ({unitLabel})
                       <Tooltip>
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
@@ -582,10 +556,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       class="input w-fit"
                       onfocus={() => {
                         _gauge.rangeOptions.mode = 'manual';
-                        _gauge.ranges = getRanges(_gauge.rangeOptions);
+                        autoUpdateRanges();
                       }}
                       onchange={() => {
-                        _gauge.ranges = getRanges(_gauge.rangeOptions);
+                        autoUpdateRanges();
+                      }}
+                      onkeyup={() => {
+                        autoUpdateRanges();
                       }}
                       bind:value={_gauge.rangeOptions.manual.start}
                     />
@@ -641,7 +618,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   default:
                     break;
                 }
-                _gauge.ranges = getRanges(_gauge.rangeOptions);
+                autoUpdateRanges();
               }}
             />
           </div>
@@ -673,7 +650,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </div>
     </div>
 
-    <div class="flex flex-col justify-start items-start w-full">
+    <div class="flex flex-col justify-start items-start w-full max-w-screen-md">
       <h2 class="font-bold text-xl flex flex-wrap items-start mb-2">
         Edit Ranges
       </h2>
@@ -684,27 +661,36 @@ If not, see <https://www.gnu.org/licenses/>. -->
             {#each _gauge.ranges as { from, to }, index}
               {@const { hex, brandId, yarnId, name } = _gauge.colors[index]}
               <div
-                class="flex gap-2 flex-wrap justify-normal items-center p-2 w-full"
+                class="max-xl:flex max-xl:flex-col max-xl:justify-center items-center xl:grid xl:grid-cols-12 gap-2 p-2 w-full"
                 style="background:{hex};color:{getTextColor(hex)}"
               >
-                <p class="text-xs">
-                  {index + 1}
+                <p class="text-xs col-span-2">
+                  Color {index + 1}
                 </p>
+
                 <div
-                  class="flex flex-wrap gap-2 min-w-[220px] justify-center lg:justify-normal items-start flex-auto"
+                  class="col-span-4 col-start-3 flex flex-wrap gap-2 min-w-[220px] max-xl:justify-center xl:justify-start items-start"
                 >
                   <label
                     class="label flex flex-col justify-start items-start"
                     id="range-{index}-from"
                   >
-                    <span class="text-xs"
-                      >From ({_gauge.unit.label[project.units]})</span
-                    >
+                    <span class="text-xs">From ({unitLabel})</span>
                     <input
                       type="number"
-                      class="input text-lg text-token max-w-[105px]"
+                      class="input text-lg text-token max-w-[75px]"
                       value={from}
                       onchange={(e) => {
+                        const value = +e.target.value;
+                        _gauge.rangeOptions.isCustomRanges = true;
+
+                        _gauge.ranges[index].from = value;
+                        if (_gauge.rangeOptions.linked) {
+                          if (index !== 0) _gauge.ranges[index - 1].to = value;
+                        }
+                        incrementMode = null;
+                      }}
+                      onkeyup={(e) => {
                         const value = +e.target.value;
                         _gauge.rangeOptions.isCustomRanges = true;
 
@@ -721,14 +707,27 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     class="label flex flex-col justify-start items-start"
                     id="range-{index}-to"
                   >
-                    <span class="text-xs"
-                      >To ({_gauge.unit.label[project.units]})</span
-                    >
+                    <span class="text-xs">To ({unitLabel})</span>
                     <input
                       type="number"
-                      class="input text-lg text-token max-w-[105px]"
+                      class="input text-lg text-token max-w-[75px]"
                       value={to}
                       onchange={(e) => {
+                        const value = +e.target.value;
+
+                        _gauge.rangeOptions.isCustomRanges = true;
+
+                        _gauge.ranges[index].to = value;
+                        if (
+                          _gauge.rangeOptions.linked &&
+                          index !== _gauge.ranges.length - 1
+                        ) {
+                          _gauge.ranges[index + 1].from = value;
+                        }
+
+                        incrementMode = null;
+                      }}
+                      onkeyup={(e) => {
                         const value = +e.target.value;
 
                         _gauge.rangeOptions.isCustomRanges = true;
@@ -746,8 +745,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     />
                   </label>
                 </div>
+
                 <div
-                  class="flex gap-2 p-2 flex-wrap w-full lg:w-fit justify-around"
+                  class="col-span-6 col-start-7 flex flex-wrap gap-2 justify-center"
                 >
                   <DaysInRange
                     range={_gauge.ranges[index]}
