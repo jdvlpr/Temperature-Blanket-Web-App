@@ -13,9 +13,17 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { locations, project } from '$lib/state';
+import { gauges, locations, project } from '$lib/state';
 import type { WeatherDay, WeatherSource } from '$lib/types';
-import { createWeeksProperty, displayNumber } from '$lib/utils';
+import {
+  convertTime,
+  createWeeksProperty,
+  dateToISO8601String,
+  displayNumber,
+  getColorInfo,
+  getTargetParentGaugeId,
+  getWeatherTargets,
+} from '$lib/utils';
 
 class WeatherClass {
   // ***************
@@ -161,6 +169,51 @@ class WeatherClass {
       default:
         return this.rawData;
     }
+  });
+
+  tableData = $derived.by(() => {
+    gauges.activeGauge?.colors;
+    gauges.activeGauge?.ranges;
+
+    const weatherTargets = getWeatherTargets({
+      weatherParameters: this.table.showParameters,
+    });
+
+    return [
+      ...this.data.map((n) => {
+        let weather = {};
+        weather.color = {};
+        weatherTargets.forEach((target) => {
+          const gaugeId = getTargetParentGaugeId(target.id);
+          const colorInfo = getColorInfo(gaugeId, n[target.id][project.units]);
+          weather.color[target.id] = colorInfo;
+          if (target.id === 'dayt') {
+            // make sure daytime is always in the same hr:mn format
+            weather = {
+              ...weather,
+              [target.id]: convertTime(n[target.id][project.units], {
+                displayUnits: false,
+                padStart: true,
+              }),
+            };
+          } else {
+            let value =
+              n[target.id][project.units] !== null
+                ? n[target.id][project.units]
+                : '-';
+            weather = {
+              ...weather,
+              [target.id]: value,
+            };
+          }
+        });
+        return {
+          date: dateToISO8601String(n.date),
+          location: n.location,
+          ...weather,
+        };
+      }),
+    ];
   });
 
   params = $derived.by(() => {

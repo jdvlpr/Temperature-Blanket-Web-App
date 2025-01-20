@@ -33,7 +33,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     OPEN_METEO_DELAY_DAYS,
     UNIT_LABELS,
   } from '$lib/constants';
-  import { locations, modal, project, weather } from '$lib/state';
+  import { gauges, locations, modal, project, weather } from '$lib/state';
   import {
     convertTime,
     createWeeksProperty,
@@ -556,7 +556,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <div class="mt-2">
   {#if weather.data.length}
     {#key project.units}
-      <WeatherNavigator />
+      {#key gauges.activeGauge.colors}
+        {#key gauges.activeGauge.ranges}
+          <WeatherNavigator />
+        {/key}
+      {/key}
     {/key}
   {/if}
 </div>

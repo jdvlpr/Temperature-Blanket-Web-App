@@ -17,7 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { TableHandler, ThSort } from '@vincjo/datatables';
   import { UNIT_LABELS } from '$lib/constants';
   import RecentWeatherDataTooltip from '$lib/components/RecentWeatherDataTooltip.svelte';
-  import { modal, project, weather } from '$lib/state';
+  import { modal, project, weather, gauges } from '$lib/state';
   import {
     millimetersToInches,
     inchesToMillimeters,
@@ -28,7 +28,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     hoursToMinutes,
     dateToISO8601String,
     getIsRecentDate,
+    getTargetParentGaugeId,
+    getColorInfo,
+    getTextColor,
   } from '$lib/utils';
+  import ToggleSwitch from './buttons/ToggleSwitch.svelte';
   import DataTable from '$lib/components/datatable/DataTable.svelte';
   import NumberInput from '$lib/components/modals/NumberInput.svelte';
   import TextInput from '$lib/components/modals/TextInput.svelte';
@@ -36,52 +40,24 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let { weatherTargets } = $props();
 
-  const tableData = $derived([
-    ...weather.data.map((n) => {
-      let weather = {};
-      weatherTargets.forEach((target) => {
-        if (target.id === 'dayt') {
-          // make sure daytime is always in the same hr:mn format
-          weather = {
-            ...weather,
-            [target.id]: convertTime(n[target.id][project.units], {
-              displayUnits: false,
-              padStart: true,
-            }),
-          };
-        } else {
-          let value =
-            n[target.id][project.units] !== null
-              ? n[target.id][project.units]
-              : '-';
-          weather = {
-            ...weather,
-            [target.id]: value,
-          };
-        }
-      });
-      return {
-        date: dateToISO8601String(n.date),
-        location: n.location,
-        ...weather,
-      };
-    }),
-  ]);
+  let showColorDetails = $state(true);
 
   let _rowsPerPage = $state(10);
 
   let _page = $state(1);
 
-  const table = new TableHandler(tableData, {
+  const table = new TableHandler(weather.tableData, {
     rowsPerPage: 10,
   });
 
   function updateTable() {
-    table.setRows(tableData);
-    table.setRowsPerPage(_rowsPerPage);
-    table.setPage(_page);
+    table.setRows(weather.tableData);
+    table.setRowsPerPage(weather.tableData);
+    table.setPage(weather.tableData);
   }
 </script>
+
+<ToggleSwitch bind:checked={showColorDetails} label={'Show Color Details'} />
 
 <div class="w-full my-4 inline-block">
   <DataTable {table} search={true}>
@@ -115,20 +91,25 @@ If not, see <https://www.gnu.org/licenses/>. -->
             {@const isRecentDate = getIsRecentDate(row.date)}
 
             <tr class:!variant-soft-warning={isRecentDate} class="!text-token">
-              <td>
+              <td class="rounded-container-token overflow-hidden">
                 {#if isRecentDate}
                   <RecentWeatherDataTooltip />
                 {/if}
                 {row.date}
               </td>
               {#each weatherTargets as { id, label, type }}
-                <td>
+                <td
+                  class={[showColorDetails && 'pb-2 border-2']}
+                  style={row.color[id] && showColorDetails
+                    ? `background-color:${row.color[id].hex};color:${getTextColor(row.color[id].hex)}`
+                    : ''}
+                >
                   <button
-                    class="transition-all"
+                    class={[
+                      weather.grouping === 'day' &&
+                        'bg-secondary-hover-token btn-icon',
+                    ]}
                     disabled={weather.grouping === 'week'}
-                    class:bg-secondary-hover-token={weather.grouping === 'day'}
-                    class:btn={weather.grouping === 'day'}
-                    class:hover:px-2={weather.grouping === 'day'}
                     onclick={() => {
                       if (id === 'dayt') {
                         modal.state.trigger({
@@ -222,6 +203,47 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   >
                     {row[id]}
                   </button>
+                  {#if row.color[id] && showColorDetails}
+                    {@const {
+                      hex,
+                      name,
+                      brandName,
+                      yarnName,
+                      index,
+                      gaugeLength,
+                    } = row.color[id]}
+                    {#if typeof index === 'number'}
+                      <div class="flex flex-col justify-center text-center">
+                        {#if brandName && yarnName}
+                          <p class="text-xs">
+                            {brandName}
+                            -
+                            {yarnName}
+                          </p>
+                        {/if}
+                        {#if name}
+                          <p class="">
+                            {name}
+                          </p>
+                          <p class="text-xs">
+                            Color
+                            {index + 1}
+                            of
+                            {gaugeLength}
+                          </p>
+                        {:else}
+                          <p class="text-xs">
+                            Color
+                            {index + 1}
+                            of
+                            {gaugeLength}
+                          </p>
+                        {/if}
+                      </div>
+                    {:else}
+                      <p class="text-xs">No Color Assigned</p>
+                    {/if}
+                  {/if}
                 </td>
               {/each}
             </tr>
