@@ -93,8 +93,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {#each table.rows as row}
           {@const isRecentDate = getIsRecentDate(row.date)}
 
-          <tr class:!variant-soft-warning={isRecentDate} class="!text-token">
-            <td class="rounded-container-token overflow-hidden">
+          <tr
+            class:!variant-soft-warning={isRecentDate}
+            class="!text-token divide-x-2 divide-y-2 divide-surface-50 dark:divide-surface-900"
+          >
+            <td class="">
               {#if isRecentDate}
                 <RecentWeatherDataTooltip />
               {/if}
@@ -102,7 +105,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </td>
             {#each weather.tableWeatherTargets as { id, label, type }}
               <td
-                class={[showColorDetails && 'pb-2 border-2']}
+                class={[showColorDetails && 'pb-2']}
                 style={row.color[id] && showColorDetails
                   ? `background-color:${row.color[id].hex};color:${getTextColor(row.color[id].hex)}`
                   : ''}
