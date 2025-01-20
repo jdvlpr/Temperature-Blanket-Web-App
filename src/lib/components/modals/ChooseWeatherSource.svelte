@@ -34,7 +34,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 
   function checkWarn() {
-    if (!weather.data) return;
+    if (!weather.data.length) return;
     warnSearchAgain = true;
   }
 

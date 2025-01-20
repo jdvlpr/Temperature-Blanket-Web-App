@@ -199,13 +199,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </div>
       {/if}
 
-      {#if !!weather.data}
+      {#if weather.data.length}
         <div class="mx-auto sm:mx-0">
           <button
             class="btn bg-secondary-hover-token"
             title="Undo [Cmd ⌘]+[z] or [Ctrl]+[z]"
             id="undo"
-            disabled={!weather.data ||
+            disabled={!weather.data.length ||
               project.history.isFirst ||
               project.history.isUpdating}
             onclick={() => {
@@ -224,7 +224,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             class="btn bg-secondary-hover-token"
             id="redo"
             title="Redo [Cmd ⌘]+[Shift ⇧]+[z] or [Ctrl]+[Shift ⇧]+[Z]"
-            disabled={!weather.data ||
+            disabled={!weather.data.length ||
               project.history.isLast ||
               project.history.isUpdating}
             onclick={() => {
@@ -478,7 +478,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <Locations />
           {/snippet}
         </Card>
-        {#if !pinAllSections.value && weather.data}
+        {#if !pinAllSections.value && weather.data.length}
           <SectionNavigationButtons thisSectionIndex={1} />
         {/if}
       </div>
@@ -500,7 +500,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               </div>
             {/snippet}
           </Card>
-          {#if !pinAllSections.value && weather.data}
+          {#if !pinAllSections.value && weather.data.length}
             <SectionNavigationButtons thisSectionIndex={2} />
           {/if}
         </div>
@@ -520,7 +520,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <Gauges />
             {/snippet}
           </Card>
-          {#if !pinAllSections.value && weather.data}
+          {#if !pinAllSections.value && weather.data.length}
             <SectionNavigationButtons thisSectionIndex={3} />
           {/if}
           <p class="max-lg:mx-2 text-center text-sm my-4">
@@ -528,7 +528,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             trademarked yarn or colorway details are owned by their respective
             companies.
           </p>
-          {#if pinAllSections.value && weather.data}
+          {#if pinAllSections.value && weather.data.length}
             <div class="flex-grow border-t border-surface-300-600-token"></div>
           {/if}
         </div>
@@ -562,7 +562,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               </div>
             {/snippet}
           </Card>
-          {#if !pinAllSections.value && weather.data}
+          {#if !pinAllSections.value && weather.data.length}
             <SectionNavigationButtons thisSectionIndex={4} />
           {/if}
           <p class="text-sm max-lg:mx-2 text-center my-4">

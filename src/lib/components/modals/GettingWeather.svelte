@@ -106,13 +106,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
       ) {
         if (weather.defaultSource === 'Meteostat' || errors.length > 0) {
           try {
+            // Since location is a proxy state, and for some reason $state.snapshot doesn't include all the properties,
+            // we have to manually get each property and make a new non-proxy object
+            const { lat, lng, from, to, id, index } = location;
+
+            const _location = { lat, lng, from, to, id, index };
+
             const response = await fetch('/api/weather/v1/meteostat/daily', {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
               },
               body: JSON.stringify({
-                location,
+                location: _location,
               }),
               signal: signal.value,
             });
