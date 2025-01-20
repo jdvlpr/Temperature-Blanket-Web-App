@@ -13,51 +13,55 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script lang="ts">
+<script>
+  import { browser } from '$app/environment';
   import { TableHandler, ThSort } from '@vincjo/datatables';
   import { UNIT_LABELS } from '$lib/constants';
   import RecentWeatherDataTooltip from '$lib/components/RecentWeatherDataTooltip.svelte';
-  import { modal, project, weather, gauges } from '$lib/state';
+  import { modal, gauges, project, weather } from '$lib/state';
   import {
     millimetersToInches,
     inchesToMillimeters,
     celsiusToFahrenheit,
     fahrenheitToCelsius,
-    convertTime,
     displayNumber,
     hoursToMinutes,
     dateToISO8601String,
     getIsRecentDate,
-    getTargetParentGaugeId,
-    getColorInfo,
     getTextColor,
   } from '$lib/utils';
   import ToggleSwitch from './buttons/ToggleSwitch.svelte';
   import DataTable from '$lib/components/datatable/DataTable.svelte';
   import NumberInput from '$lib/components/modals/NumberInput.svelte';
   import TextInput from '$lib/components/modals/TextInput.svelte';
-  import { onMount } from 'svelte';
-
-  let { weatherTargets } = $props();
 
   let showColorDetails = $state(true);
 
-  let _rowsPerPage = $state(10);
-
-  let _page = $state(1);
-
-  const table = new TableHandler(weather.tableData, {
-    rowsPerPage: 10,
+  let table = new TableHandler($state.snapshot(weather.tableData), {
+    rowsPerPage: $state.snapshot(weather.table.rowsPerPage),
   });
 
   function updateTable() {
-    table.setRows(weather.tableData);
-    table.setRowsPerPage(weather.tableData);
-    table.setPage(weather.tableData);
+    console.count('updateTable');
+    table.setRows($state.snapshot(weather.tableData));
+    table.setRowsPerPage($state.snapshot(weather.table.rowsPerPage));
+    table.setPage($state.snapshot(weather.table.page));
   }
+
+  $effect(() => {
+    // project.units;
+    gauges.activeGauge?.colors;
+    // gauges.activeGauge?.ranges;
+    // weather.table.showParameters;
+    // weather.tableData;
+    if (weather.tableData.length && !gauges.activeGauge.calculating)
+      updateTable();
+  });
 </script>
 
-<ToggleSwitch bind:checked={showColorDetails} label={'Show Color Details'} />
+<div class="mt-4">
+  <ToggleSwitch bind:checked={showColorDetails} label={'Show Color Details'} />
+</div>
 
 <div class="w-full my-4 inline-block">
   <DataTable {table} search={true}>
@@ -70,7 +74,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <span class="text-xs whitespace-nowrap">(YYYY-MM-DD)</span></span
             >
           </ThSort>
-          {#each weatherTargets as { id, pdfHeader }}
+          {#each weather.tableWeatherTargets as { id, pdfHeader }}
             {@const header = pdfHeader[project.units]}
             {@const headerLabel = header.slice(0, header.indexOf('('))}
             {@const headerUnits = header.slice(header.indexOf('('))}
@@ -86,169 +90,168 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <tbody
         class="[&>tr:nth-child(odd)]:bg-surface-100 [&>tr:nth-child(odd)]:dark:bg-surface-800"
       >
-        {#if table.rows}
-          {#each table.rows as row}
-            {@const isRecentDate = getIsRecentDate(row.date)}
+        {#each table.rows as row}
+          {@const isRecentDate = getIsRecentDate(row.date)}
 
-            <tr class:!variant-soft-warning={isRecentDate} class="!text-token">
-              <td class="rounded-container-token overflow-hidden">
-                {#if isRecentDate}
-                  <RecentWeatherDataTooltip />
-                {/if}
-                {row.date}
-              </td>
-              {#each weatherTargets as { id, label, type }}
-                <td
-                  class={[showColorDetails && 'pb-2 border-2']}
-                  style={row.color[id] && showColorDetails
-                    ? `background-color:${row.color[id].hex};color:${getTextColor(row.color[id].hex)}`
-                    : ''}
+          <tr class:!variant-soft-warning={isRecentDate} class="!text-token">
+            <td class="rounded-container-token overflow-hidden">
+              {#if isRecentDate}
+                <RecentWeatherDataTooltip />
+              {/if}
+              {row.date}
+            </td>
+            {#each weather.tableWeatherTargets as { id, label, type }}
+              <td
+                class={[showColorDetails && 'pb-2 border-2']}
+                style={row.color[id] && showColorDetails
+                  ? `background-color:${row.color[id].hex};color:${getTextColor(row.color[id].hex)}`
+                  : ''}
+              >
+                <button
+                  class={[
+                    weather.grouping === 'day' &&
+                      'bg-secondary-hover-token btn',
+                    showColorDetails && 'font-bold',
+                  ]}
+                  disabled={weather.grouping === 'week'}
+                  onclick={() => {
+                    if (id === 'dayt') {
+                      modal.state.trigger({
+                        type: 'component',
+                        component: {
+                          ref: TextInput,
+                          props: {
+                            value: row[id],
+                            title: `<div class="flex flex-col items-center justify-center"><span class="font-bold">${row.date}</span><span>${label}</span></div>`,
+                            onOkay: (_value) => {
+                              weather.isUserEdited = true;
+
+                              const time = _value.split(':');
+
+                              if (time.length !== 2) return;
+
+                              weather.table.rowsPerPage = table.rowsPerPage;
+                              weather.table.page = table.currentPage;
+
+                              const hours = +time[0] + +time[1] / 60;
+                              const mappedWeather = weather.rawData.map(
+                                (n) =>
+                                  `${dateToISO8601String(n.date)}-${n.location}`,
+                              );
+                              const i = mappedWeather.indexOf(
+                                `${row.date}-${row.location}`,
+                              );
+                              weather.rawData[i][id].metric = hoursToMinutes(
+                                hours,
+                                4,
+                              );
+                              weather.rawData[i][id].imperial = displayNumber(
+                                +hours,
+                                4,
+                              );
+                              updateTable();
+                            },
+                          },
+                        },
+                      });
+                    } else {
+                      modal.state.trigger({
+                        type: 'component',
+                        component: {
+                          ref: NumberInput,
+                          props: {
+                            max: 1000,
+                            value: row[id],
+                            title: `<div class="flex flex-col items-center justify-center"><span class="font-bold">${row.date}</span><span>${label} <span class="text-sm">(${UNIT_LABELS[type][project.units]})</span></span></div>`,
+                            noMinMax: true,
+                            showSlider: false,
+                            onOkay: (_value) => {
+                              weather.isUserEdited = true;
+                              const mappedWeather = weather.rawData.map(
+                                (n) =>
+                                  `${dateToISO8601String(n.date)}-${n.location}`,
+                              );
+                              const i = mappedWeather.indexOf(
+                                `${row.date}-${row.location}`,
+                              );
+
+                              weather.table.rowsPerPage = table.rowsPerPage;
+                              weather.table.page = table.currentPage;
+
+                              if (project.units === 'metric') {
+                                weather.rawData[i][id].metric = _value;
+                                if (type === 'temperature')
+                                  weather.rawData[i][id].imperial =
+                                    celsiusToFahrenheit(_value);
+                                if (type === 'height')
+                                  weather.rawData[i][id].imperial =
+                                    millimetersToInches(_value);
+                              }
+                              if (project.units === 'imperial') {
+                                weather.rawData[i][id].imperial = _value;
+                                if (type === 'temperature')
+                                  weather.rawData[i][id].metric =
+                                    fahrenheitToCelsius(_value);
+                                if (type === 'height')
+                                  weather.rawData[i][id].metric =
+                                    inchesToMillimeters(_value);
+                              }
+
+                              updateTable();
+                            },
+                          },
+                        },
+                      });
+                    }
+                  }}
                 >
-                  <button
-                    class={[
-                      weather.grouping === 'day' &&
-                        'bg-secondary-hover-token btn-icon',
-                    ]}
-                    disabled={weather.grouping === 'week'}
-                    onclick={() => {
-                      if (id === 'dayt') {
-                        modal.state.trigger({
-                          type: 'component',
-                          component: {
-                            ref: TextInput,
-                            props: {
-                              value: row[id],
-                              title: `<div class="flex flex-col items-center justify-center"><span class="font-bold">${row.date}</span><span>${label}</span></div>`,
-                              onOkay: (_value) => {
-                                weather.isUserEdited = true;
-
-                                const time = _value.split(':');
-
-                                if (time.length !== 2) return;
-
-                                _rowsPerPage = table.rowsPerPage;
-                                _page = table.currentPage;
-
-                                const hours = +time[0] + +time[1] / 60;
-                                const mappedWeather = weather.rawData.map(
-                                  (n) =>
-                                    `${dateToISO8601String(n.date)}-${n.location}`,
-                                );
-                                const i = mappedWeather.indexOf(
-                                  `${row.date}-${row.location}`,
-                                );
-                                weather.rawData[i][id].metric = hoursToMinutes(
-                                  hours,
-                                  4,
-                                );
-                                weather.rawData[i][id].imperial = displayNumber(
-                                  +hours,
-                                  4,
-                                );
-                                updateTable();
-                              },
-                            },
-                          },
-                        });
-                      } else {
-                        modal.state.trigger({
-                          type: 'component',
-                          component: {
-                            ref: NumberInput,
-                            props: {
-                              max: 1000,
-                              value: row[id],
-                              title: `<div class="flex flex-col items-center justify-center"><span class="font-bold">${row.date}</span><span>${label} <span class="text-sm">(${UNIT_LABELS[type][project.units]})</span></span></div>`,
-                              noMinMax: true,
-                              showSlider: false,
-                              onOkay: (_value) => {
-                                weather.isUserEdited = true;
-                                const mappedWeather = weather.rawData.map(
-                                  (n) =>
-                                    `${dateToISO8601String(n.date)}-${n.location}`,
-                                );
-                                const i = mappedWeather.indexOf(
-                                  `${row.date}-${row.location}`,
-                                );
-
-                                _rowsPerPage = table.rowsPerPage;
-                                _page = table.currentPage;
-
-                                if (project.units === 'metric') {
-                                  weather.rawData[i][id].metric = _value;
-                                  if (type === 'temperature')
-                                    weather.rawData[i][id].imperial =
-                                      celsiusToFahrenheit(_value);
-                                  if (type === 'height')
-                                    weather.rawData[i][id].imperial =
-                                      millimetersToInches(_value);
-                                }
-                                if (project.units === 'imperial') {
-                                  weather.rawData[i][id].imperial = _value;
-                                  if (type === 'temperature')
-                                    weather.rawData[i][id].metric =
-                                      fahrenheitToCelsius(_value);
-                                  if (type === 'height')
-                                    weather.rawData[i][id].metric =
-                                      inchesToMillimeters(_value);
-                                }
-
-                                updateTable();
-                              },
-                            },
-                          },
-                        });
-                      }
-                    }}
-                  >
-                    {row[id]}
-                  </button>
-                  {#if row.color[id] && showColorDetails}
-                    {@const {
-                      hex,
-                      name,
-                      brandName,
-                      yarnName,
-                      index,
-                      gaugeLength,
-                    } = row.color[id]}
-                    {#if typeof index === 'number'}
-                      <div class="flex flex-col justify-center text-center">
-                        {#if brandName && yarnName}
-                          <p class="text-xs">
-                            {brandName}
-                            -
-                            {yarnName}
-                          </p>
-                        {/if}
-                        {#if name}
-                          <p class="">
-                            {name}
-                          </p>
-                          <p class="text-xs">
-                            Color
-                            {index + 1}
-                            of
-                            {gaugeLength}
-                          </p>
-                        {:else}
-                          <p class="text-xs">
-                            Color
-                            {index + 1}
-                            of
-                            {gaugeLength}
-                          </p>
-                        {/if}
-                      </div>
-                    {:else}
-                      <p class="text-xs">No Color Assigned</p>
-                    {/if}
+                  {row[id]}
+                </button>
+                {#if row.color[id] && showColorDetails}
+                  {@const {
+                    hex,
+                    name,
+                    brandName,
+                    yarnName,
+                    index,
+                    gaugeLength,
+                  } = row.color[id]}
+                  {#if typeof index === 'number'}
+                    <div class="flex flex-col justify-center text-center">
+                      {#if brandName && yarnName}
+                        <p class="text-xs">
+                          {brandName}
+                          -
+                          {yarnName}
+                        </p>
+                      {/if}
+                      {#if name}
+                        <p class="">
+                          {name}
+                        </p>
+                        <p class="text-xs">
+                          Color
+                          {index + 1}
+                          of
+                          {gaugeLength}
+                        </p>
+                      {:else}
+                        <p class="text-xs">
+                          Color
+                          {index + 1}
+                          of
+                          {gaugeLength}
+                        </p>
+                      {/if}
+                    </div>
+                  {:else}
+                    <p class="text-xs">No Color Assigned</p>
                   {/if}
-                </td>
-              {/each}
-            </tr>
-          {/each}
-        {/if}
+                {/if}
+              </td>
+            {/each}
+          </tr>
+        {/each}
       </tbody>
     </table>
   </DataTable>

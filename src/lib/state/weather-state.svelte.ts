@@ -171,19 +171,24 @@ class WeatherClass {
     }
   });
 
-  tableData = $derived.by(() => {
-    gauges.activeGauge?.colors;
-    gauges.activeGauge?.ranges;
-
+  tableWeatherTargets = $derived.by(() => {
     const weatherTargets = getWeatherTargets({
       weatherParameters: this.table.showParameters,
     });
+    return weatherTargets;
+  });
+
+  tableData = $derived.by(() => {
+    gauges.activeGauge?.colors;
+    gauges.activeGauge?.ranges;
+    gauges.activeGauge?.numberOfColors;
+    console.count('tableData');
 
     return [
       ...this.data.map((n) => {
         let weather = {};
         weather.color = {};
-        weatherTargets.forEach((target) => {
+        this.tableWeatherTargets.forEach((target) => {
           const gaugeId = getTargetParentGaugeId(target.id);
           const colorInfo = getColorInfo(gaugeId, n[target.id][project.units]);
           weather.color[target.id] = colorInfo;
@@ -277,7 +282,11 @@ class WeatherClass {
   // ***************
   table: {
     showParameters: { [key: string]: boolean };
+    rowsPerPage: number;
+    page: number;
   } = $state({
+    rowsPerPage: 10,
+    page: 1,
     showParameters: {
       tmin: true,
       tavg: true,

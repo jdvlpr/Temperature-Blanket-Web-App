@@ -14,6 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
+  import { weather } from '$lib/state';
   import type { TableHandler } from '@vincjo/datatables';
 
   interface Props {
@@ -35,11 +36,23 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <span class="text-sm">Rows Per Page</span>
   <select
     class="select"
-    bind:value={table.rowsPerPage}
+    value={table.rowsPerPage}
     id="rows-per-page"
     title="Choose how many rows per page"
-    onchange={() => {
-      if (table.currentPage > table.pages.length) table.setPage(1);
+    onchange={(e) => {
+      weather.table.rowsPerPage = +e.target.value;
+      table.setRowsPerPage(+e.target.value);
+
+      if (table.currentPage > table.pages.length) {
+        weather.table.page = 1;
+        table.setPage(1);
+      }
+
+      console.log(
+        +e.target.value,
+        table.rowsPerPage,
+        weather.table.rowsPerPage,
+      );
     }}
   >
     {#each options as option}

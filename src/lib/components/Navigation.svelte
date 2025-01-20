@@ -35,11 +35,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
             dataPinned={pinned}
             dataActive={active}
             dataNoWeather={!weather.data}
-            classNames={`flex flex-col justify-center items-center disabled:opacity-30 p-2 pb-4 md:pb-2 w-full text-token
+            classNames={[
+              `flex flex-col justify-center items-center disabled:opacity-30 p-2 pb-4 md:pb-2 w-full text-token
                                 data-[active=false]:data-[no-weather=true]:opacity-50 
                                 data-[pinned=false]:data-[active=true]:data-[no-weather=false]:variant-filled-primary
-                                hover:data-[no-weather=false]:data-[active=false]:bg-primary-hover-token
-                                ${weather.data ? '' : 'bg-none backdrop-blur-none'}`}
+                                hover:data-[no-weather=false]:data-[active=false]:bg-primary-hover-token`,
+
+              !weather.data && 'bg-none backdrop-blur-none',
+            ]}
           >
             <span>
               {@html icon}

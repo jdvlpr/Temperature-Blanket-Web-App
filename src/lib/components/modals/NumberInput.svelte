@@ -17,6 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
   import { getModalStore } from '@skeletonlabs/skeleton';
   import ModalShell from './ModalShell.svelte';
+  import { displayNumber } from '$lib/utils';
 
   const modalStore = getModalStore();
 
@@ -91,30 +92,30 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <div class="flex flex-wrap gap-2 justify-center items-center">
         <button
           class="btn-icon bg-secondary-hover-token"
-          onclick={() => (value -= 20)}
+          onclick={() => (value = displayNumber(value - 20))}
           disabled={noMinMax ? false : value < min + 20}>-20</button
         >
         <button
           class="btn-icon bg-secondary-hover-token"
-          onclick={() => (value -= 5)}
+          onclick={() => (value = displayNumber(value - 5))}
           disabled={noMinMax ? false : value < min + 5}>-5</button
         >
         <button
           class="btn-icon bg-secondary-hover-token"
-          onclick={() => (value -= 1)}
+          onclick={() => (value = displayNumber(value - 1))}
           disabled={noMinMax ? false : value < min + 1}>-1</button
         >
         <button
           class="btn-icon bg-secondary-hover-token"
-          onclick={() => (value += 1)}>+1</button
+          onclick={() => (value = displayNumber(value + 1))}>+1</button
         >
         <button
           class="btn-icon bg-secondary-hover-token"
-          onclick={() => (value += 5)}>+5</button
+          onclick={() => (value = displayNumber(value + 5))}>+5</button
         >
         <button
           class="btn-icon bg-secondary-hover-token"
-          onclick={() => (value += 20)}>+20</button
+          onclick={() => (value = displayNumber(value + 20))}>+20</button
         >
       </div>
     </div>

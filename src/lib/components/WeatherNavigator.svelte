@@ -18,18 +18,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ImportWeatherData from '$lib/components/modals/ImportWeatherData.svelte';
   import { ICONS } from '$lib/constants';
   import { modal, weather } from '$lib/state';
-  import {
-    downloadPDF,
-    downloadWeatherCSV,
-    getWeatherTargets,
-  } from '$lib/utils';
+  import { downloadPDF, downloadWeatherCSV } from '$lib/utils';
   import { weatherChart } from './WeatherChart.svelte';
-
-  let weatherTargets = $derived(
-    getWeatherTargets({
-      weatherParameters: weather.table.showParameters,
-    }),
-  );
 
   let debounceTimer;
   const debounce = (callback, time) => {
@@ -49,7 +39,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 />
 
 <div class="">
-  <WeatherTableView {weatherTargets} />
+  <WeatherTableView />
 
   <div
     class="flex flex-wrap gap-2 justify-center mt-4 mb-2 lg:mb-4 px-4 py-2 shadow-inner rounded-container-token variant-soft-surface"

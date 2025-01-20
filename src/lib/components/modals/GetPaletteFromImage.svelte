@@ -543,7 +543,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
             }
 
             numberOfColors = value;
-            console.log('here');
 
             if (numberOfColors < matchingYarnColors.length) {
               matchingYarnColors.length = numberOfColors;

@@ -217,8 +217,9 @@ export const getColorsFromInput = ({
  * @returns {object} - The color information object with the hexadecimal color value, index, and gauge length.
  */
 export const getColorInfo = (gaugeId, value) => {
-  const gauge = gauges.allCreated.find((n) => n.id === gaugeId);
-  const color = { hex: '#ffffff' };
+  const gauge = gauges.getSnapshot(gaugeId);
+
+  const color = { hex: '#ffffff' }; // default white color will show on the preview if the weather value has no range associated with it
 
   if (
     value === null ||

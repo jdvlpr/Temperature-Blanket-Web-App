@@ -37,10 +37,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     if (!weather.data) return;
     warnSearchAgain = true;
   }
+
+  //TODO: Investigate if this is working as expected
   $effect(() => {
     weather.defaultSource;
     weather.useSecondarySources;
-    console.log('checkwarn');
     checkWarn();
   });
 </script>

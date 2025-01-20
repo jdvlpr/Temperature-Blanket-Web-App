@@ -205,10 +205,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
           title="Remove Color"
           class="btn bg-secondary-hover-token flex flex-wrap justify-center items-center"
           onclick={() => {
-            gauge.colors = gauge.colors.filter((_, i) => i !== index);
+            gauge.updateColors({
+              colors: gauge.colors.filter((_, i) => i !== index),
+            });
             sortableColors = getSortableColors();
             gauge.schemeId = 'Custom';
-            gauge.numberOfColors = gauge.colors.length;
           }}
         >
           <span class="text-xs">{index + 1}</span>

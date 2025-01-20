@@ -86,6 +86,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               bind:value={table.currentPage}
               onchange={() => {
                 table.setPage(table.currentPage);
+                weather.table.page = table.currentPage;
               }}
             >
               {#each table.pages as page}
@@ -123,7 +124,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         type="text"
         class="input w-full sm:max-w-[200px]"
         bind:value={searchInput.value}
-        placeholder="Search..."
+        placeholder="Search rows..."
         oninput={() => searchInput.set()}
       />
     {/if}

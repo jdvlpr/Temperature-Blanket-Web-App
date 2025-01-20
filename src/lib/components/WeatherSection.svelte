@@ -555,12 +555,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <div class="mt-2">
   {#if weather.data.length}
-    {#key project.units}
-      {#key gauges.activeGauge.colors}
-        {#key gauges.activeGauge.ranges}
-          <WeatherNavigator />
-        {/key}
-      {/key}
-    {/key}
+    <!-- {#key []} -->
+    {#if !gauges.activeGauge.calculating}
+      <WeatherNavigator />
+    {/if}
+    <!-- {/key} -->
   {/if}
 </div>
