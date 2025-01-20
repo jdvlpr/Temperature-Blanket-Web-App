@@ -52,7 +52,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     gauges.activeGauge?.colors;
     // gauges.activeGauge?.ranges;
     // weather.table.showParameters;
-    // weather.tableData;
+    weather.tableData;
     if (weather.tableData.length && !gauges.activeGauge?.calculating)
       updateTable();
   });
