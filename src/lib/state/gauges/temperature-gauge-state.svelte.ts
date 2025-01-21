@@ -59,19 +59,6 @@ export const gaugeAttributes: GaugeAttributes = {
   ],
 };
 
-export const defaults = {
-  colors: chroma
-    .scale('Spectral')
-    .colors(10)
-    .map((n) => {
-      return { hex: n };
-    }),
-  optimization: 'tmax',
-  schemeId: 'Spectral',
-  maxes: 'tmax',
-  mins: 'tmin',
-};
-
 export class TemperatureGauge {
   constructor() {
     // Assign the gauge attributes as properties

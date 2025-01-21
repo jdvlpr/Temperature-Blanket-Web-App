@@ -35,19 +35,6 @@ export const gaugeAttributes: GaugeAttributes = {
   ],
 };
 
-export const defaults = {
-  colors: chroma
-    .scale('Blues')
-    .colors(4)
-    .map((n) => {
-      return { hex: n };
-    }),
-  optimization: 'ranges',
-  schemeId: 'Blues',
-  maxes: 'prcp',
-  mins: 'prcp',
-};
-
 function getFirstRanges({
   rangeOptions,
   start,

@@ -34,8 +34,6 @@ export function getRanges({
   includeFromAndTo,
   dontIncludeFromAndTo,
 }) {
-  console.log('getRanges', { rangeOptions, start, increment, colors });
-
   let newRanges;
   let mustUpdateCustomRanges = false;
   if (rangeOptions.isCustomRanges) {
