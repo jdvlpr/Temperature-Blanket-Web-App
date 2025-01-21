@@ -27,6 +27,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import autocomplete from 'autocompleter';
   import { onMount } from 'svelte';
   import '../../css/flag-icons.css';
+  import { browser } from '$app/environment';
 
   interface Props {
     location: LocationType;
@@ -567,7 +568,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             {/if}
           </p>
         {/if}
-      {:else if location.errorMessage}
+      {:else if location.errorMessage && browser}
         <p
           class="variant-ghost-error text-token rounded-container-token p-2 text-sm w-full my-2"
         >

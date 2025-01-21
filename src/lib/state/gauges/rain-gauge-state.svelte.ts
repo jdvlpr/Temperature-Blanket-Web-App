@@ -1,4 +1,4 @@
-import { project, weather } from '$lib/state';
+import { weather } from '$lib/state';
 import type { GaugeAttributes, GaugeStateInterface } from '$lib/types';
 import {
   displayNumber,
@@ -10,69 +10,65 @@ import {
 import chroma from 'chroma-js';
 
 export const gaugeAttributes: GaugeAttributes = {
-  id: 'temp',
-  label: 'Temperature Gauge',
+  id: 'prcp',
+  label: 'Rain Gauge',
   unit: {
-    type: 'temperature',
+    type: 'height',
     label: {
-      metric: '°C',
-      imperial: '°F',
+      metric: 'mm',
+      imperial: 'in',
     },
   },
   targets: [
     {
-      id: 'tmax',
-      label: 'High Temperature',
-      type: 'temperature',
-      gaugeLabel: 'High',
-      shortLabel: 'High Temp',
+      id: 'prcp',
+      label: 'Rain',
+      type: 'height',
+      gaugeLabel: 'Rain',
+      shortLabel: 'Rain',
       pdfHeader: {
-        metric: 'High (°C)',
-        imperial: 'High (°F)',
+        metric: 'Rain (mm)',
+        imperial: 'Rain (in)',
       },
-      icon: '↑',
-    },
-    {
-      id: 'tavg',
-      label: 'Average Temperature',
-      type: 'temperature',
-      gaugeLabel: 'Average',
-      shortLabel: 'Average Temp',
-      pdfHeader: {
-        metric: 'Avg (°C)',
-        imperial: 'Avg (°F)',
-      },
-      icon: '~',
-    },
-    {
-      id: 'tmin',
-      label: 'Low Temperature',
-      type: 'temperature',
-      gaugeLabel: 'Low',
-      shortLabel: 'Low Temp',
-      pdfHeader: {
-        metric: 'Low (°C)',
-        imperial: 'Low (°F)',
-      },
-      icon: '↓',
+      icon: '∴',
     },
   ],
 };
 
 export const defaults = {
   colors: chroma
-    .scale('Spectral')
-    .colors(10)
+    .scale('Blues')
+    .colors(4)
     .map((n) => {
       return { hex: n };
     }),
-  optimization: 'tmax',
-  schemeId: 'Spectral',
-  maxes: 'tmax',
-  mins: 'tmin',
+  optimization: 'ranges',
+  schemeId: 'Blues',
+  maxes: 'prcp',
+  mins: 'prcp',
 };
 
-export class TemperatureGauge {
+function getFirstRanges({
+  rangeOptions,
+  start,
+  increment,
+  colors,
+  includeFromAndTo,
+  dontIncludeFromAndTo,
+}) {
+  const { ranges } = getRanges({
+    rangeOptions,
+    ranges: [],
+    start,
+    increment,
+    colors,
+    includeFromAndTo,
+    dontIncludeFromAndTo,
+  });
+  return ranges;
+}
+
+export class RainGauge {
   constructor() {
     // Assign the gauge attributes as properties
     Object.assign(this, gaugeAttributes);
@@ -110,14 +106,10 @@ export class TemperatureGauge {
   // *************************
 
   // All the high temperatures, without missing values
-  #maxes = $derived.by(() => {
-    weather.params?.tmax;
-    const tmaxes = weather.params.tmax;
-    return tmaxes?.filter((n) => n !== null) || [];
-  });
+  #maxes = $derived(weather.params?.prcp.filter((n) => n !== null) || []);
 
   // All the low temperatures, without missing values
-  #mins = $derived(weather.params?.tmin?.filter((n) => n !== null));
+  #mins = $derived(weather.params?.prcp?.filter((n) => n !== null) || []);
 
   // Set the max value to above the highest integer based on the weather data
   #max = $derived.by(() => {
@@ -133,25 +125,18 @@ export class TemperatureGauge {
       : Math.floor(Math.min(...this.#mins));
   });
 
-  // *************************
-  // Properties
-  // User can update these
-  // *************************
-
   colors = $state(
     chroma
-      .scale('Spectral')
-      .colors(10)
+      .scale('Blues')
+      .colors(4)
       .map((n) => {
         return { hex: n };
       }),
   );
 
-  numberOfColors = $state(10);
-
   rangeOptions = {
     auto: {
-      optimization: 'tmax',
+      optimization: 'ranges',
       start: {
         high: this.#max,
         low: this.#min,
@@ -170,22 +155,6 @@ export class TemperatureGauge {
     mode: 'auto', // equal range increments ('auto') | equal days ('jenks') | 'manua'
     isCustomRanges: false,
   };
-
-  ranges = $state(
-    getEvenlyDistributedRangeValuesWithEqualDayCount({
-      weatherData: weather.data,
-      numRanges: this.colors.length,
-      prop: this.rangeOptions.auto.optimization,
-      gaugeDirection: this.rangeOptions.direction,
-      roundIncrement: this.rangeOptions.auto.roundIncrement,
-      includeFrom: this.rangeOptions.includeFromValue,
-      includeTo: this.rangeOptions.includeToValue,
-    }),
-  );
-
-  schemeId = $state('Spectral');
-
-  calculating = $state(false);
 
   // *************************
   // Derived properties from ranges
@@ -236,6 +205,23 @@ export class TemperatureGauge {
   #includeFromAndTo = $derived(
     this.rangeOptions.includeFromValue && this.rangeOptions.includeToValue,
   );
+
+  numberOfColors = $state(4);
+
+  schemeId = $state('Blues');
+
+  ranges = $state(
+    getFirstRanges({
+      rangeOptions: this.rangeOptions,
+      start: this.#start,
+      increment: this.#increment,
+      colors: this.colors,
+      includeFromAndTo: this.#includeFromAndTo,
+      dontIncludeFromAndTo: this.#dontIncludeFromAndTo,
+    }),
+  );
+
+  calculating = $state(false);
 
   // *************************
   // Methods

@@ -34,6 +34,8 @@ export function getRanges({
   includeFromAndTo,
   dontIncludeFromAndTo,
 }) {
+  console.log('getRanges', { rangeOptions, start, increment, colors });
+
   let newRanges;
   let mustUpdateCustomRanges = false;
   if (rangeOptions.isCustomRanges) {
@@ -83,7 +85,6 @@ export function getRanges({
         to: displayNumber(to, decimals),
       };
     });
-    console.log('equal ranges', newRanges);
 
     // customRanges = newRanges;
     mustUpdateCustomRanges = true;

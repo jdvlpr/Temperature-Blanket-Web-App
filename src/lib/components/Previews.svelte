@@ -45,9 +45,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <PreviewSelect />
   <div class="flex flex-col gap-2 justify-center items-start">
     <div class="flex w-full flex-col gap-4 justify-center items-center">
-      {#key [gauges.activeGauge.colors, gauges.activeGauge?.ranges, weather.tableData]}
-        <previews.active.previewComponent />
-      {/key}
+      {#if gauges.activeGauge?.colors}
+        {#key [gauges.activeGauge.colors, gauges.activeGauge?.ranges, weather.tableData]}
+          <previews.active.previewComponent />
+        {/key}
+      {/if}
 
       <Drawer.Root bind:open={drawerState.weatherDetails}>
         <Drawer.Portal>

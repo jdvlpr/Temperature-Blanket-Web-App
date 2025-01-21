@@ -182,7 +182,6 @@ class WeatherClass {
     gauges.activeGauge?.colors;
     gauges.activeGauge?.ranges;
     gauges.activeGauge?.numberOfColors;
-    console.count('tableData');
 
     return [
       ...this.data.map((n) => {

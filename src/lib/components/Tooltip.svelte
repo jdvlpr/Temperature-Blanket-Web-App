@@ -15,7 +15,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import { arrow, createFloatingActions } from 'svelte-floating-ui';
-  import { flip, shift, size, type Placement } from 'svelte-floating-ui/dom';
+  import { autoPlacement } from 'svelte-floating-ui/core';
+  import { shift, size, type Placement } from 'svelte-floating-ui/dom';
   import { writable } from 'svelte/store';
   import { scale } from 'svelte/transition';
 
@@ -77,7 +78,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     strategy: 'absolute',
     placement,
     middleware: [
-      flip(),
+      autoPlacement({
+        allowedPlacements: ['top', 'right', 'left', 'bottom'],
+      }),
       size({
         apply({ availableWidth, availableHeight, elements }) {
           // Do things with the data, e.g.

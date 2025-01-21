@@ -104,7 +104,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   bind:this={gaugeContainerElement}
   use:focusTrap={fullscreen}
 >
-  <div class="w-full {fullscreen ? 'flex-auto w-full h-fullf' : ''}">
+  <div class={['w-full', fullscreen && 'flex-auto']}>
     {#key gauge.colors}
       <ColorPaletteEditable
         bind:fullscreen

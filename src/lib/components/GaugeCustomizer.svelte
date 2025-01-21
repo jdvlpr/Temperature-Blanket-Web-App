@@ -193,7 +193,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 >
   {#each sortableColors as { hex, name, brandId, yarnId, brandName, yarnName, variant_href, affiliate_variant_href, id }, index (id)}
     <div
-      class="color p-2 gap-2 flex flex-wrap justify-around {layout.value ===
+      class="color p-2 gap-2 flex flex-wrap items-center justify-around {layout.value ===
       'grid'
         ? 'rounded-container-token md:basis-1/5 sm:basis-1/4 basis-1/3 flex-auto'
         : ''}"

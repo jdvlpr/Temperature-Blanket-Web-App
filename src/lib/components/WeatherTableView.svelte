@@ -35,7 +35,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import NumberInput from '$lib/components/modals/NumberInput.svelte';
   import TextInput from '$lib/components/modals/TextInput.svelte';
 
-  let showColorDetails = $state(true);
+  let showColorDetails = $state(false);
 
   let table = new TableHandler($state.snapshot(weather.tableData), {
     rowsPerPage: $state.snapshot(weather.table.rowsPerPage),

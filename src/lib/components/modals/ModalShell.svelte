@@ -56,11 +56,18 @@
   role="button"
   bind:this={shellElement}
   tabindex="0"
-  class="{parent?.background} {parent?.rounded} {parent?.position} {width} {parent?.height} {stickyPart
-    ? ''
-    : parent?.padding} {parent?.spacing} {parent?.shadow} max-h-[97svh] overflow-auto focus:!outline-none {preventScroll
-    ? 'overflow-hidden'
-    : ''}"
+  class={[
+    'max-h-[97svh] overflow-auto focus:!outline-none cursor-default',
+    parent?.background,
+    parent?.rounded,
+    parent?.position,
+    parent?.height,
+    parent?.spacing,
+    parent?.shadow,
+    width,
+    !stickyPart && parent?.padding,
+    preventScroll && 'overflow-hidden',
+  ]}
 >
   <div class={stickyPart ? 'p-4' : ''}>
     {#if !hideCloseButton && $modalStore[0] && !stickyPart}
