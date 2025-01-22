@@ -14,14 +14,18 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script module lang="ts">
-  let selectedBrandId = writable('');
-  let selectedYarnId = writable('');
-  let selectedYarnWeightId: Writable<YarnWeight['id'] | ''> = writable('');
-  let search = writable('');
-  let hex = writable('');
-  let inputTypeTextValue = writable('');
-  let inputTypeColorElement = writable(null);
-  let sortColors = writable('default');
+  class YarnColorwayFinderState {
+    selectedBrandId = $state('');
+    selectedYarnId = $state('');
+    selectedYarnWeightId: YarnWeight['id'] | '' = $state('');
+    search = $state('');
+    hex = $state('');
+    inputTypeTextValue = $state('');
+    inputTypeColorElement = $state(null);
+    sortColors = $state('default');
+  }
+
+  const yarnColorwayFinderState = new YarnColorwayFinderState();
 </script>
 
 <script lang="ts">
@@ -57,7 +61,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { Accordion, AccordionItem } from '@skeletonlabs/skeleton';
   import chroma from 'chroma-js';
   import { onMount } from 'svelte';
-  import { writable, type Writable } from 'svelte/store';
 
   let loadMoreSpinner = $state();
   let urlParams;
@@ -85,20 +88,24 @@ If not, see <https://www.gnu.org/licenses/>. -->
     if (urlParams?.has('fw')) {
       const weightId: YarnWeight['id'] = urlParams.get('fw');
       if (weightId && ALL_YARN_WEIGHTS.map((n) => n.id).includes(weightId)) {
-        $selectedYarnWeightId = weightId;
+        yarnColorwayFinderState.selectedYarnWeightId = weightId;
       }
     }
 
     if (urlParams?.has('c')) {
       const color = urlParams.get('c');
       if (chroma.valid(color)) {
-        $hex = chroma(color).hex('rgb');
-        $inputTypeTextValue = color;
-        $inputTypeColorElement.value = chroma(color).hex('rgb');
-        $inputTypeColorElement.dispatchEvent(new Event('change'));
+        yarnColorwayFinderState.hex = chroma(color).hex('rgb');
+        yarnColorwayFinderState.inputTypeTextValue = color;
+        yarnColorwayFinderState.inputTypeColorElement.value =
+          chroma(color).hex('rgb');
+        yarnColorwayFinderState.inputTypeColorElement.dispatchEvent(
+          new Event('change'),
+        );
       }
     }
-    if (urlParams?.has('n')) $search = urlParams.get('n');
+    if (urlParams?.has('n'))
+      yarnColorwayFinderState.search = urlParams.get('n');
 
     const scrollObserver = new IntersectionObserver(
       (entries, observer) => {
@@ -153,25 +160,25 @@ If not, see <https://www.gnu.org/licenses/>. -->
     if (!paramString?.includes('-')) {
       // check if brandId exists
       if (brands.find((brand) => brand.id === paramString))
-        $selectedBrandId = paramString;
+        yarnColorwayFinderState.selectedBrandId = paramString;
       // check if yarnId exists
       if (
         brands
           .flatMap((brand) => brand.yarns)
           .find((yarn) => yarn.id === paramString)
       )
-        $selectedYarnId = paramString;
+        yarnColorwayFinderState.selectedYarnId = paramString;
       return;
     }
     const [brandId, yarnId] = paramString.split('-');
     // check if brandId exists
     if (brands.find((brand) => brand.id === brandId))
-      $selectedBrandId = brandId;
+      yarnColorwayFinderState.selectedBrandId = brandId;
     // check if yarnId exists
     if (
       brands.flatMap((brand) => brand.yarns).find((yarn) => yarn.id === yarnId)
     )
-      $selectedYarnId = yarnId;
+      yarnColorwayFinderState.selectedYarnId = yarnId;
   }
 
   function getResults() {
@@ -180,37 +187,42 @@ If not, see <https://www.gnu.org/licenses/>. -->
     gettingResults = true;
     debounce(() => {
       let _results = ALL_COLORWAYS_WITH_AFFILIATE_LINKS.filter((colorway) =>
-        $selectedBrandId ? colorway.brandId === $selectedBrandId : true,
+        yarnColorwayFinderState.selectedBrandId
+          ? colorway.brandId === yarnColorwayFinderState.selectedBrandId
+          : true,
       )
         .filter((colorway) =>
-          $selectedYarnId ? colorway.yarnId === $selectedYarnId : true,
+          yarnColorwayFinderState.selectedYarnId
+            ? colorway.yarnId === yarnColorwayFinderState.selectedYarnId
+            : true,
         )
         .filter((colorway) =>
-          $selectedYarnWeightId
-            ? colorway.yarnWeightId === $selectedYarnWeightId
+          yarnColorwayFinderState.selectedYarnWeightId
+            ? colorway.yarnWeightId ===
+              yarnColorwayFinderState.selectedYarnWeightId
             : true,
         );
 
       // filter by search text
-      if ($search !== '') {
+      if (yarnColorwayFinderState.search !== '') {
         _results = _results.filter((color) => {
-          let find = $search.toLowerCase();
+          let find = yarnColorwayFinderState.search.toLowerCase();
           return color.name.toLowerCase().includes(find);
         });
       }
 
-      if ($hex)
+      if (yarnColorwayFinderState.hex)
         _results = _results
           .map((color) => {
             return {
               ...color,
-              delta: chroma.deltaE($hex, color.hex),
+              delta: chroma.deltaE(yarnColorwayFinderState.hex, color.hex),
             };
           })
           .sort((a, b) => (a.delta > b.delta ? 1 : b.delta > a.delta ? -1 : 0))
           .filter((color) => color.delta < 40);
 
-      switch ($sortColors) {
+      switch (yarnColorwayFinderState.sortColors) {
         case 'light-to-dark':
           _results = sortColorsLightToDark({
             colors: _results,
@@ -247,10 +259,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     if (!chroma.valid(__color)) {
       return;
     }
-    $inputTypeTextValue = __color;
-    $hex = chroma(__color).hex('rgb'); // use 'rgb' to prevent alpha hex codes
+    yarnColorwayFinderState.inputTypeTextValue = __color;
+    yarnColorwayFinderState.hex = chroma(__color).hex('rgb'); // use 'rgb' to prevent alpha hex codes
     if (browser) {
-      $inputTypeColorElement.value = chroma(__color).hex('rgb');
+      yarnColorwayFinderState.inputTypeColorElement.value =
+        chroma(__color).hex('rgb');
     }
   }
 
@@ -259,15 +272,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
     if (!chroma.valid(__color)) {
       return;
     }
-    $inputTypeTextValue = __color;
+    yarnColorwayFinderState.inputTypeTextValue = __color;
     if (browser) {
-      $inputTypeColorElement.value = chroma(__color).hex('rgb');
-      $inputTypeColorElement.dispatchEvent(new Event('change'));
+      yarnColorwayFinderState.inputTypeColorElement.value =
+        chroma(__color).hex('rgb');
+      yarnColorwayFinderState.inputTypeColorElement.dispatchEvent(
+        new Event('change'),
+      );
     }
-    $hex = chroma(__color).hex('rgb'); // use 'rgb' to prevent alpha hex codes
+    yarnColorwayFinderState.hex = chroma(__color).hex('rgb'); // use 'rgb' to prevent alpha hex codes
   }
   let yarns = $derived(
-    $selectedBrandId === ''
+    yarnColorwayFinderState.selectedBrandId === ''
       ? brands
           .flatMap((n, i) =>
             n.yarns.map((n) => {
@@ -291,7 +307,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
             return 0;
           })
       : brands
-          ?.filter((brand) => brand.id === $selectedBrandId)
+          ?.filter(
+            (brand) => brand.id === yarnColorwayFinderState.selectedBrandId,
+          )
           ?.flatMap((n) => {
             return n.yarns.map((yarn) => {
               return {
@@ -305,26 +323,26 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let totalResults = $derived(
     yarns
       .filter((yarn) => {
-        if (!$selectedYarnId) return true;
-        return yarn.id === $selectedYarnId;
+        if (!yarnColorwayFinderState.selectedYarnId) return true;
+        return yarn.id === yarnColorwayFinderState.selectedYarnId;
       })
       .filter((yarn) => {
-        if (!$selectedYarnWeightId) return true;
-        return yarn.weightId === $selectedYarnWeightId;
+        if (!yarnColorwayFinderState.selectedYarnWeightId) return true;
+        return yarn.weightId === yarnColorwayFinderState.selectedYarnWeightId;
       })
       .flatMap((n) => n.colorways.map((m) => m.colors.length))
       .reduce((partialSum, a) => partialSum + a, 0),
   );
 
   $effect(() => {
-    $selectedBrandId,
-      $selectedYarnId,
-      $selectedYarnWeightId,
-      $search,
+    yarnColorwayFinderState.selectedBrandId,
+      yarnColorwayFinderState.selectedYarnId,
+      yarnColorwayFinderState.selectedYarnWeightId,
+      yarnColorwayFinderState.search,
       yarns,
-      $sortColors,
+      yarnColorwayFinderState.sortColors,
       itemsToShow,
-      $hex,
+      yarnColorwayFinderState.hex,
       getResults();
   });
 
@@ -333,11 +351,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   );
   let shareableURL = $derived(
     getShareableURL({
-      selectedBrandId: $selectedBrandId,
-      selectedYarnId: $selectedYarnId,
-      selectedYarnWeightId: $selectedYarnWeightId,
-      search: $search,
-      hex: $hex,
+      selectedBrandId: yarnColorwayFinderState.selectedBrandId,
+      selectedYarnId: yarnColorwayFinderState.selectedYarnId,
+      selectedYarnWeightId: yarnColorwayFinderState.selectedYarnWeightId,
+      search: yarnColorwayFinderState.search,
+      hex: yarnColorwayFinderState.hex,
     }),
   );
 </script>
@@ -427,7 +445,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     <input
                       type="color"
                       class="input !rounded-none input-group-shim"
-                      bind:this={$inputTypeColorElement}
+                      bind:this={yarnColorwayFinderState.inputTypeColorElement}
                       onchange={(e) =>
                         inputTypeColorOnChange({
                           value: e.target.value,
@@ -436,22 +454,24 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     <input
                       type="text"
                       placeholder="e.g., pink, #c3f4d2"
-                      style="background:{$hex} !important;color:{getTextColor(
-                        $hex,
+                      style="background:{yarnColorwayFinderState.hex} !important;color:{getTextColor(
+                        yarnColorwayFinderState.hex,
                       )}"
-                      value={$inputTypeTextValue}
+                      value={yarnColorwayFinderState.inputTypeTextValue}
                       onkeyup={(e) =>
                         inputTypeTextOnChange({
                           value: e.target.value,
                         })}
                     />
-                    {#if (!!$hex || !!$inputTypeTextValue) && !!$inputTypeColorElement?.value}
+                    {#if (!!yarnColorwayFinderState.hex || !!yarnColorwayFinderState.inputTypeTextValue) && !!yarnColorwayFinderState.inputTypeColorElement?.value}
                       <button
                         aria-label="Clear Color"
                         onclick={() => {
-                          $hex = '';
-                          $inputTypeTextValue = '';
-                          if (browser) $inputTypeColorElement.value = '#000000';
+                          yarnColorwayFinderState.hex = '';
+                          yarnColorwayFinderState.inputTypeTextValue = '';
+                          if (browser)
+                            yarnColorwayFinderState.inputTypeColorElement.value =
+                              '#000000';
                         }}
                         ><svg
                           xmlns="http://www.w3.org/2000/svg"
@@ -473,27 +493,28 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 </div>
               </div>
 
-              {#key $selectedBrandId || $selectedYarnId}
+              {#key yarnColorwayFinderState.selectedBrandId || yarnColorwayFinderState.selectedYarnId}
                 <div
                   class="w-full col-span-12 md:col-span-9"
-                  class:md:col-span-full={!!$selectedBrandId &&
-                    !!$selectedYarnId}
+                  class:md:col-span-full={!!yarnColorwayFinderState.selectedBrandId &&
+                    !!yarnColorwayFinderState.selectedYarnId}
                 >
                   <SelectYarn
                     preselectDefaultYarn={false}
-                    bind:selectedBrandId={$selectedBrandId}
-                    bind:selectedYarnId={$selectedYarnId}
-                    selectedYarnWeightId={$selectedYarnWeightId}
+                    bind:selectedBrandId={yarnColorwayFinderState.selectedBrandId}
+                    bind:selectedYarnId={yarnColorwayFinderState.selectedYarnId}
+                    selectedYarnWeightId={yarnColorwayFinderState.selectedYarnWeightId}
                   />
                 </div>
 
                 <div
                   class="w-full col-span-12 md:col-span-3"
-                  class:hidden={!!$selectedBrandId && !!$selectedYarnId}
+                  class:hidden={!!yarnColorwayFinderState.selectedBrandId &&
+                    !!yarnColorwayFinderState.selectedYarnId}
                 >
                   <SelectYarnWeight
-                    selectedBrandId={$selectedBrandId}
-                    bind:selectedYarnWeightId={$selectedYarnWeightId}
+                    selectedBrandId={yarnColorwayFinderState.selectedBrandId}
+                    bind:selectedYarnWeightId={yarnColorwayFinderState.selectedYarnWeightId}
                   />
                 </div>
               {/key}
@@ -528,16 +549,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       placeholder="e.g., Wisteria, Cream"
                       type="text"
                       class="w-full input"
-                      bind:value={$search}
+                      bind:value={yarnColorwayFinderState.search}
                       oninput={() => {
                         itemsToShow = YARN_COLORWAYS_PER_PAGE;
                       }}
                     />
-                    {#if $search}
+                    {#if yarnColorwayFinderState.search}
                       <button
                         aria-label="Clear Search"
                         onclick={() => {
-                          $search = '';
+                          yarnColorwayFinderState.search = '';
                         }}
                         ><svg
                           xmlns="http://www.w3.org/2000/svg"
@@ -579,7 +600,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 <select
                   class="select"
                   id="sort-colors-by"
-                  bind:value={$sortColors}
+                  bind:value={yarnColorwayFinderState.sortColors}
                   disabled={gettingResults}
                 >
                   <option value="default">Default</option>
