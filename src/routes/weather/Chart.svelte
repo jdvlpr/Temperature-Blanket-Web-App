@@ -34,7 +34,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     Tooltip,
   } from 'chart.js';
   import { onMount } from 'svelte';
-  import { hour } from './+page.svelte';
+  import { weatherState } from './+page.svelte';
 
   let { data } = $props();
 
@@ -141,7 +141,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               ' ' +
               new Date(item.time).toLocaleTimeString(locale, {
                 timeStyle: 'short',
-                hour12: $hour === '12' ? true : false,
+                hour12: weatherState.hour === '12' ? true : false,
               });
           }
           return time;

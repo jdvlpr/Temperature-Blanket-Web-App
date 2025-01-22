@@ -18,9 +18,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import UnitChanger from '$lib/components/UnitChanger.svelte';
   import { getWeatherCodeDetails } from '$lib/utils';
   import { getModalStore, RadioGroup, RadioItem } from '@skeletonlabs/skeleton';
-  import { activeLocationID, hour, weatherLocations } from './+page.svelte';
+  import { weatherState } from './+page.svelte';
   import { fetchData } from './GetWeather.svelte';
-  import { validId } from './Location.svelte';
+  import { weatherLocationState } from './Location.svelte';
 
   /**
    * @typedef {Object} Props
@@ -34,7 +34,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   const modalStore = getModalStore();
 
   let savedWeatherLocations = $derived(
-    weatherLocations.data.filter((item) => item.saved),
+    weatherState.weatherLocations.filter((item) => item.saved),
   );
 </script>
 
@@ -48,20 +48,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <div
               role="button"
               tabindex="0"
-              data-active={id === $activeLocationID}
+              data-active={id === weatherState.activeLocationID}
               class="flex-1 w-full justify-center flex items-start gap-2 bg-surface-200-700-token rounded-container-token p-2 shadow max-w-screen-lg mx-auto data-[active=true]:bg-primary-200-700-token"
               title="View this Location"
               onclick={async () => {
-                $activeLocationID = id;
+                weatherState.activeLocationID = id;
                 await fetchData();
-                $validId = true;
+                weatherLocationState.validId = true;
                 modalStore.close();
               }}
               onkeydown={async (e) => {
                 if (e.key === 'Enter') {
-                  $activeLocationID = id;
+                  weatherState.activeLocationID = id;
                   await fetchData();
-                  $validId = true;
+                  weatherLocationState.validId = true;
                   modalStore.close();
                 }
               }}
@@ -75,7 +75,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     navigator.language,
                     {
                       timeStyle: 'short',
-                      hour12: $hour === '12' ? true : false,
+                      hour12: weatherState.hour === '12' ? true : false,
                     },
                   )}
                 </p>
@@ -109,20 +109,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 onclick={(e) => {
                   e.stopPropagation();
                   e.preventDefault();
-                  weatherLocations.data.map((item) => {
+                  weatherState.weatherLocations.map((item) => {
                     if (item.id === id) item.saved = false;
                     return item;
                   });
-                  // const _weatherForecastData = weatherLocations.data.filter((item) => item.id !== id);
-                  // weatherLocations.data = _weatherForecastData;
+                  // const _weatherForecastData = weatherState.weatherLocations.filter((item) => item.id !== id);
+                  // weatherState.weatherLocations = _weatherForecastData;
 
-                  if (id === $activeLocationID)
-                    $activeLocationID =
-                      weatherLocations.data.find((item) => item.saved)?.id ||
-                      null;
+                  if (id === weatherState.activeLocationID)
+                    weatherState.activeLocationID =
+                      weatherState.weatherLocations.find((item) => item.saved)
+                        ?.id || null;
 
                   if (
-                    !weatherLocations.data.filter((item) => item?.saved)?.length
+                    !weatherState.weatherLocations.filter((item) => item?.saved)
+                      ?.length
                   )
                     modalStore.close();
                 }}
@@ -162,13 +163,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 active="bg-secondary-active-token"
               >
                 <RadioItem
-                  bind:group={$hour}
+                  bind:group={weatherState.hour}
                   name="hour-format-12"
                   value="12"
                   title="Set hour format to 12">12hr</RadioItem
                 >
                 <RadioItem
-                  bind:group={$hour}
+                  bind:group={weatherState.hour}
                   name="hour-format-24"
                   value="24"
                   title="Set hour format to 24">24hr</RadioItem
@@ -177,7 +178,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <p class="text-sm">
                 {new Date().toLocaleTimeString(navigator.language, {
                   timeStyle: 'short',
-                  hour12: $hour === '12' ? true : false,
+                  hour12: weatherState.hour === '12' ? true : false,
                 })}
               </p>
             </div>

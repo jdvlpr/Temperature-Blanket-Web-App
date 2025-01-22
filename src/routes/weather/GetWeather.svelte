@@ -15,13 +15,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script context="module">
   import { project, signal } from '$lib/state';
-  import { get } from 'svelte/store';
-  import { activeLocationID, weatherLocations } from './+page.svelte';
+  import { weatherState } from './+page.svelte';
 
   export async function fetchData() {
     project.status.loading = true;
 
-    let _locations = weatherLocations.data;
+    let _locations = weatherState.weatherLocations;
 
     // Update All Locations
     let newWeatherForcastData = [];
@@ -47,12 +46,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
       newWeatherForcastData.push(location);
     }
 
-    weatherLocations.data = newWeatherForcastData;
+    weatherState.weatherLocations = newWeatherForcastData;
 
     project.status.loading = false;
 
-    if (!get(activeLocationID))
-      activeLocationID.set(weatherLocations.data[0]?.id);
+    if (!weatherState.activeLocationID)
+      weatherState.activeLocationID.set(weatherState.weatherLocations[0]?.id);
   }
 
   const getOpenMeteoForecast = async ({ location }) => {

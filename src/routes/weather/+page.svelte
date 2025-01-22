@@ -14,10 +14,14 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script module>
-  export const hour = writable('24');
-  export const weatherLocations = $state({ data: [] });
-  export const activeLocationID = writable(null);
-  export const weatherDataElement = writable(null);
+  class WeatherState {
+    hour = $state('24');
+    weatherLocations = $state([]);
+    activeLocationID = $state(null);
+    weatherDataElement = $state(null);
+  }
+
+  export const weatherState = new WeatherState();
 </script>
 
 <script lang="ts">
@@ -38,7 +42,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     setUnitsFromNavigator,
   } from '$lib/utils';
   import { onDestroy, onMount } from 'svelte';
-  import { writable } from 'svelte/store';
   import { fade } from 'svelte/transition';
   import Chart from './Chart.svelte';
   import { fetchData } from './GetWeather.svelte';
@@ -47,7 +50,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Symbols from './Symbols.svelte';
 
   let showChart = $state(true);
-  let isFinishedOnMount = false;
   let shareableURL = $state(page.url.href);
   let windowWidth;
 
@@ -69,53 +71,57 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     // hour12
     const hourFormat = page.url.searchParams.get('h');
-    if (hourFormat === '0') $hour = '12';
-    else if (hourFormat === '1') $hour = '24';
+    if (hourFormat === '0') weatherState.hour = '12';
+    else if (hourFormat === '1') weatherState.hour = '24';
     else if (localStorage.getItem('[/weather]hour_format'))
-      $hour = localStorage.getItem('[/weather]hour_format');
-    else $hour = project.units === 'metric' ? '24' : '12';
-    hour.subscribe(async (value) => {
-      localStorage.setItem('[/weather]hour_format', value);
-      // page.url.searchParams.set("h", value === "12" ? "0" : "1");
-      // if (isMounted) window.history.replaceState({ path: page.url.href }, "", page.url.href);
-    });
+      weatherState.hour = localStorage.getItem('[/weather]hour_format');
+    else weatherState.hour = project.units === 'metric' ? '24' : '12';
 
     // saved weather locations
     if (localStorage.getItem('[/weather]locations')) {
-      weatherLocations.data = JSON.parse(
+      weatherState.weatherLocations = JSON.parse(
         localStorage.getItem('[/weather]locations'),
       ).map((item) => {
         return { ...item, id: +item.id };
       });
 
-      $activeLocationID = weatherLocations.data[0]?.id || null;
+      weatherState.activeLocationID =
+        weatherState.weatherLocations[0]?.id || null;
       await fetchData();
     }
-    weatherLocations.data.subscribe(async (value) => {
-      localStorage.setItem(
-        '[/weather]locations',
-        JSON.stringify(value.filter((value) => value.saved === true)),
-      );
-    });
-
-    activeLocationID.subscribe(async (value) => {
-      if (
-        value &&
-        weatherLocations.data.find((item) => item.id === value)?.saved
-      ) {
-        // if (locationsState.locations.find((item) => item.id === value)?.saved) page.url.searchParams.set("id", value);
-        // page.url.searchParams.set("id", value);
-        // page.url.searchParams.set("h", $hour === "12" ? "0" : "1");
-        // page.url.searchParams.set("u", project.units === "metric" ? "m" : "i");
-        // window.history.replaceState({ path: page.url.href }, "", page.url.href);
-      } else {
-        // window.history.replaceState({ path: page.url.href }, "", page.url.href);
-      }
-    });
-    isFinishedOnMount = true;
 
     windowWidth = window.innerWidth;
     window.addEventListener('resize', updateShowChart, { passive: true });
+  });
+
+  $effect(() => {
+    localStorage.setItem('[/weather]hour_format', weatherState.hour);
+  });
+
+  $effect(() => {
+    localStorage.setItem(
+      '[/weather]locations',
+      JSON.stringify(
+        weatherState.weatherLocations.filter((value) => value.saved === true),
+      ),
+    );
+  });
+
+  $effect(() => {
+    if (
+      weatherState.activeLocationID &&
+      weatherState.weatherLocations.find(
+        (item) => item.id === weatherState.activeLocationID,
+      )?.saved
+    ) {
+      // if (locationsState.locations.find((item) => item.id === value)?.saved) page.url.searchParams.set("id", value);
+      // page.url.searchParams.set("id", value);
+      // page.url.searchParams.set("h", weatherState.hour === "12" ? "0" : "1");
+      // page.url.searchParams.set("u", project.units === "metric" ? "m" : "i");
+      // window.history.replaceState({ path: page.url.href }, "", page.url.href);
+    } else {
+      // window.history.replaceState({ path: page.url.href }, "", page.url.href);
+    }
   });
 
   onDestroy(() => {
@@ -195,8 +201,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     return nd;
   }
   let weatherData = $derived(
-    weatherLocations.data?.find((item) => item.id === $activeLocationID)
-      ?.data || null,
+    weatherState.weatherLocations?.find(
+      (item) => item.id === weatherState.activeLocationID,
+    )?.data || null,
   );
   let hourlyData = $derived(
     weatherData?.hourly.time.map((item, index) => {
@@ -245,7 +252,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let currentTime = $derived(
     getCurrentTime({
       weatherData: weatherData,
-      hourFormat: $hour,
+      hourFormat: weatherState.hour,
     }),
   );
   // Update the weather chart when the sidebar is closed or opened
@@ -255,13 +262,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 
   $effect(() => {
-    $activeLocationID;
+    weatherState.activeLocationID;
     project.units;
-    $hour;
+    weatherState.hour;
     getShareableURL({
-      id: $activeLocationID,
+      id: weatherState.activeLocationID,
       units: project.units,
-      hourFormat: $hour,
+      hourFormat: weatherState.hour,
     });
   });
 
@@ -269,7 +276,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     localStorage.setItem('[/weather]units', project.units);
     // page.url.searchParams.set("u", value === "metric" ? "m" : "i");
     // if (isMounted) window.history.replaceState({ path: page.url.href }, "", page.url.href);
-    if (weatherLocations.data?.some((item) => item.units !== project.units))
+    if (
+      weatherState.weatherLocations?.some(
+        (item) => item.units !== project.units,
+      )
+    )
       await fetchData();
   });
 </script>
@@ -342,7 +353,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           />
         </svg>
       </button>
-      {#if weatherLocations.data.filter((item) => item?.saved).length}
+      {#if weatherState.weatherLocations.filter((item) => item?.saved).length}
         <button
           aria-label="Open Locations"
           class="btn-icon bg-secondary-hover-token"
@@ -395,9 +406,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <div
               class="xl:pt-2 pb-4 max-w-full"
               id="weather-data"
-              bind:this={$weatherDataElement}
+              bind:this={weatherState.weatherDataElement}
             >
-              {#key project.status.loading || $activeLocationID}
+              {#key project.status.loading || weatherState.activeLocationID}
                 <div class:opacity-50={project.status.loading} in:fade>
                   <div
                     class="mb-4 flex flex-col gap-2 items-center p-2 w-fit mx-auto"
@@ -405,22 +416,26 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     <div
                       class="flex flex-col justify-center items-center gap-2"
                     >
-                      {#if !weatherLocations.data.find((item) => item.id === $activeLocationID)?.saved}
+                      {#if !weatherState.weatherLocations.find((item) => item.id === weatherState.activeLocationID)?.saved}
                         <button
                           in:fade
                           class="btn bg-secondary-hover-token"
                           title="Add to Locations"
                           onclick={async () => {
-                            weatherLocations.data.map((item) => {
-                              if (item.id === $activeLocationID)
+                            weatherState.weatherLocations.map((item) => {
+                              if (item.id === weatherState.activeLocationID)
                                 item.saved = true;
                               return item;
                             });
-                            weatherLocations.data = weatherLocations.data;
-                            page.url.searchParams.set('id', $activeLocationID);
+                            weatherState.weatherLocations =
+                              weatherState.weatherLocations;
+                            page.url.searchParams.set(
+                              'id',
+                              weatherState.activeLocationID,
+                            );
                             page.url.searchParams.set(
                               'h',
-                              $hour === '12' ? '0' : '1',
+                              weatherState.hour === '12' ? '0' : '1',
                             );
                             page.url.searchParams.set(
                               'u',
@@ -448,7 +463,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                           </svg>
                           Add
                         </button>
-                      {:else if weatherLocations.data.filter((item) => item?.saved)?.length}
+                      {:else if weatherState.weatherLocations.filter((item) => item?.saved)?.length}
                         <button
                           in:fade
                           class="btn bg-secondary-hover-token"
@@ -481,8 +496,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       {/if}
                     </div>
                     <p class="font-bold md:text-xl">
-                      {@html weatherLocations.data.find(
-                        (item) => item.id === $activeLocationID,
+                      {@html weatherState.weatherLocations.find(
+                        (item) => item.id === weatherState.activeLocationID,
                       ).result}
                     </p>
 
@@ -552,7 +567,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     </p>
 
                     {#if showChart}
-                      {#key $hour}
+                      {#key weatherState.hour}
                         <div class="max-w-[90vw]">
                           <Chart data={hourlyForcastData} />
                         </div>
@@ -581,7 +596,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
                                   navigator.language,
                                   {
                                     timeStyle: 'short',
-                                    hour12: $hour === '12' ? true : false,
+                                    hour12:
+                                      weatherState.hour === '12' ? true : false,
                                   },
                                 )}
                           </p>

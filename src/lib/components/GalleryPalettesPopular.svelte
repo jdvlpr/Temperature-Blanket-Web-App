@@ -23,8 +23,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <script>
-  import { run } from 'svelte/legacy';
-
   import ColorPalette from '$lib/components/ColorPalette.svelte';
   import PlaceholderPalettes from '$lib/components/PlaceholderPalettes.svelte';
   import { allGaugesAttributes } from '$lib/state';

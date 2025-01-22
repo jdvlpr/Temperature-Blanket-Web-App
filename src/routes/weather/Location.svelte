@@ -15,13 +15,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script module>
   // Validates location id
-  export let validId = writable(false);
-  export let inputLocation = writable(null);
+
+  class WeatherLocationState {
+    validId = $state(false);
+    inputLocation = $state(null);
+  }
+
+  export const weatherLocationState = new WeatherLocationState();
 </script>
 
 <script lang="ts">
-  import { run } from 'svelte/legacy';
-
   import { browser } from '$app/environment';
   import { goto } from '$app/navigation';
   import { page } from '$app/state';
@@ -30,29 +33,31 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { displayGeoNamesErrorMessage } from '$lib/utils';
   import autocomplete from 'autocompleter';
   import { onMount } from 'svelte';
-  import { writable } from 'svelte/store';
   import '../../css/flag-icons.css';
-  import { activeLocationID, weatherLocations } from './+page.svelte';
+  import { weatherState } from './+page.svelte';
   import { fetchData } from './GetWeather.svelte';
 
   let searching = $state(false); // Autocomplete searching status
   let showReset = $state(false);
   let locationGroup = $state();
 
-  run(() => {
-    if ($inputLocation) {
-      showReset = !searching && $inputLocation?.value?.length > 1;
+  $effect(() => {
+    if (weatherLocationState.inputLocation) {
+      showReset =
+        !searching && weatherLocationState.inputLocation?.value?.length > 1;
     }
   });
 
   let hasError = $derived(
-    !$validId && $inputLocation?.value && !project.status.loading,
+    !weatherLocationState.validId &&
+      weatherLocationState.inputLocation?.value &&
+      !project.status.loading,
   );
 
   onMount(async () => {
     // Setup the autocomplete location
     autocomplete({
-      input: $inputLocation,
+      input: weatherLocationState.inputLocation,
       minLength: 2,
       debounceWaitMs: 550,
       showOnFocus: false,
@@ -108,34 +113,38 @@ If not, see <https://www.gnu.org/licenses/>. -->
       },
       onSelect: async function (item) {
         if (
-          !weatherLocations.data.some((location) => location.id === +item.id)
+          !weatherState.weatherLocations.some(
+            (location) => location.id === +item.id,
+          )
         ) {
-          weatherLocations.data.unshift(item);
+          weatherState.weatherLocations.unshift(item);
         }
         await fetchData();
-        $activeLocationID = item.id;
-        $inputLocation.value = '';
-        $validId = true;
+        weatherState.activeLocationID = item.id;
+        weatherLocationState.inputLocation.value = '';
+        weatherLocationState.validId = true;
       },
     });
     const id = page.url.searchParams.get('id');
     if (id) {
       await setLocationFromId({ id });
     } else {
-      $validId = true;
+      weatherLocationState.validId = true;
       project.status.loading = false;
     }
   }); // End of onMount
 
   function validate() {
     if (
-      !weatherLocations.data?.find((item) => item.id === $activeLocationID)?.id
+      !weatherState.weatherLocations?.find(
+        (item) => item.id === weatherState.activeLocationID,
+      )?.id
     ) {
-      $validId = false;
+      weatherLocationState.validId = false;
       return;
     }
 
-    if ($inputLocation?.value?.length < 2) {
+    if (weatherLocationState.inputLocation?.value?.length < 2) {
       invalidate();
       return;
     }
@@ -143,7 +152,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   function validateKeyup(e) {
     if (!e) {
-      $validId = true;
+      weatherLocationState.validId = true;
       return;
     }
 
@@ -153,11 +162,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 
   function invalidate() {
-    $validId = false;
+    weatherLocationState.validId = false;
   }
 
   const setLocationFromId = async ({ id }) => {
-    $inputLocation.value = 'Loading...';
+    weatherLocationState.inputLocation.value = 'Loading...';
 
     // Get location information from GeoNames using the location's id
     try {
@@ -177,14 +186,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
       _location.label = label;
       _location.result = `<span class="fflag fflag-${data.countryCode?.toUpperCase()}"></span>${label}`;
-      $inputLocation.value = '';
+      weatherLocationState.inputLocation.value = '';
 
-      if (!weatherLocations.data.map((item) => item.id).includes(+id))
-        weatherLocations.data.unshift(_location);
+      if (!weatherState.weatherLocations.map((item) => item.id).includes(+id))
+        weatherState.weatherLocations.unshift(_location);
 
-      $activeLocationID = +id;
+      weatherState.activeLocationID = +id;
       await fetchData();
-      $validId = true;
+      weatherLocationState.validId = true;
     } catch (e) {
       throw displayGeoNamesErrorMessage(e);
     }
@@ -210,17 +219,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
       _location.result = `<span class="fflag fflag-${geonames.countryCode?.toUpperCase()}"></span>${label}`;
 
       if (
-        !weatherLocations.data
+        !weatherState.weatherLocations
           .map((item) => item.id)
           .includes(+geonames.geonameId)
       )
-        weatherLocations.data.unshift(_location);
+        weatherState.weatherLocations.unshift(_location);
 
-      $activeLocationID = +geonames.geonameId;
+      weatherState.activeLocationID = +geonames.geonameId;
 
       await fetchData();
 
-      $validId = true;
+      weatherLocationState.validId = true;
     } catch (error) {
       displayGeoNamesErrorMessage(error);
     }
@@ -232,7 +241,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <p>
       {#if hasError}
         <span class="text-error-800-100-token">Choose a result</span>
-      {:else if $inputLocation?.value}
+      {:else if weatherLocationState.inputLocation?.value}
         Location
       {:else}
         Search for a city, region, or landmark
@@ -265,7 +274,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         autocomplete="off"
         placeholder={project.status.loading ? 'Loading...' : 'Enter a place'}
         title="Enter a city, region, or landmark"
-        bind:this={$inputLocation}
+        bind:this={weatherLocationState.inputLocation}
         oninput={validate}
         onkeyup={validateKeyup}
         disabled={project.status.loading}
@@ -295,14 +304,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
           class=""
           title="Reset Location Search"
           onclick={async () => {
-            $inputLocation.value = '';
+            weatherLocationState.inputLocation.value = '';
             // $location.label = "";
             // $location.id = null;
-            $validId = false;
+            weatherLocationState.validId = false;
             if (document.querySelector('.autocomplete'))
               document.querySelector('.autocomplete').remove();
             await goto('?');
-            $inputLocation.focus();
+            weatherLocationState.inputLocation.focus();
           }}
         >
           {@html ICONS.xMark}
@@ -316,16 +325,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
       class="btn bg-secondary-hover-token gap-1 flex items-center"
       title="Use My Location"
       onclick={async () => {
-        $inputLocation.value = 'Loading...';
+        weatherLocationState.inputLocation.value = 'Loading...';
         navigator.geolocation.getCurrentPosition(
           async (response) => {
             await setLocationFromCoords({
               coords: response.coords,
             });
-            $inputLocation.value = '';
+            weatherLocationState.inputLocation.value = '';
           },
           (error) => {
-            $inputLocation.value = '';
+            weatherLocationState.inputLocation.value = '';
           },
         );
       }}

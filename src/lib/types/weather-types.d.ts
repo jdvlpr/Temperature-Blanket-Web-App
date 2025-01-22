@@ -13,8 +13,6 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import type { Writable } from 'svelte/store';
-
 export type Unit = 'imperial' | 'metric';
 
 /* In the project URL hash, this is '0' for 'Meteostat' or '1' for 'Open-Meteo' */
