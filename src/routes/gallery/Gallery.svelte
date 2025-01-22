@@ -13,28 +13,6 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script module>
-  export let search = writable('');
-  export let filteredYarn = writable(null);
-  export let filteredBrandId = writable('');
-  export let filteredYarnId = writable('');
-  export let palettesContainOnlyFilteredYarn = writable(false);
-  export let filteredPatternType = writable('');
-  export let orderBy = writable('DESC');
-  export let projects = writable([]);
-  export let displayedProjects = writable([]);
-  export let popularProjects = writable([]);
-  export let gallery = writable({});
-  export let timePeriod = writable(0.25);
-
-  export const getYarnSearch = ({ brandId, yarnId }) => {
-    if (brandId && yarnId) return `${brandId}-${yarnId}`;
-    else if (brandId) return brandId;
-    else if (yarnId) return yarnId;
-    return '';
-  };
-</script>
-
 <script>
   import { PUBLIC_WORDPRESS_BASE_URL } from '$env/static/public';
   import Card from '$lib/components/Card.svelte';
@@ -52,7 +30,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     getTitleFromLocationsMeta,
   } from '$lib/utils';
   import { onMount } from 'svelte';
-  import { writable } from 'svelte/store';
+  import { galleryState } from './state.svelte';
 
   let first = 40;
   let loading = $state(true);
@@ -63,22 +41,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let featuredProjectsEl = $state();
 
   onMount(async () => {
-    if (!$projects.length) {
+    if (!galleryState.projects.length) {
       let results = await fetchProjects({
         first,
         after: endCursor,
-        search: $search,
-        order: $orderBy,
-        pattern: $filteredPatternType,
+        search: galleryState.search,
+        order: galleryState.orderBy,
+        pattern: galleryState.filteredPatternType,
       });
-      $gallery.pageInfo = results.pageInfo;
-      $projects.push(...results.edges.flatMap((item) => item.node));
-      $projects = $projects;
-      $displayedProjects = getFilteredProjects();
+      galleryState.gallery.pageInfo = results.pageInfo;
+      galleryState.projects.push(...results.edges.flatMap((item) => item.node));
+      galleryState.projects = galleryState.projects;
+      galleryState.displayedProjects = getFilteredProjects();
       loading = false;
     }
 
-    if (!$popularProjects.length) {
+    if (!galleryState.popularProjects.length) {
       await fetchPopularProjectsWrapper();
     }
 
@@ -112,35 +90,36 @@ If not, see <https://www.gnu.org/licenses/>. -->
         : undefined;
   });
 
-  let showSearchReset = $derived(!!$search.length);
+  let showSearchReset = $derived(!!galleryState.search.length);
 
-  let hasNextPage = $derived($gallery?.pageInfo?.hasNextPage);
-  let endCursor = $derived($gallery?.pageInfo?.endCursor);
+  let hasNextPage = $derived(galleryState.gallery?.pageInfo?.hasNextPage);
+  let endCursor = $derived(galleryState.gallery?.pageInfo?.endCursor);
 
   async function fetchPopularProjectsWrapper() {
     let promisePopularProjects = await fetchPopularProjects({
-      months: $timePeriod,
+      months: galleryState.timePeriod,
       limit: 5,
     });
-    $popularProjects = promisePopularProjects;
+    galleryState.popularProjects = promisePopularProjects;
   }
 
   function getFilteredProjects() {
-    return $projects.filter((project) => {
-      if (!$filteredBrandId && !$filteredYarnId) return true;
+    return galleryState.projects.filter((project) => {
+      if (!galleryState.filteredBrandId && !galleryState.filteredYarnId)
+        return true;
       const yarnURLs = JSON.parse(project?.yarnUrls);
-      if (!$palettesContainOnlyFilteredYarn)
+      if (!galleryState.palettesContainOnlyFilteredYarn)
         return yarnURLs?.some((yarnURL) => {
           let colors = getColorsFromInput({
             string: yarnURL,
           });
           return colors?.some((color) => {
-            if ($filteredBrandId && $filteredYarnId)
+            if (galleryState.filteredBrandId && galleryState.filteredYarnId)
               return (
-                color?.brandId === $filteredBrandId &&
-                color?.yarnId === $filteredYarnId
+                color?.brandId === galleryState.filteredBrandId &&
+                color?.yarnId === galleryState.filteredYarnId
               );
-            return color?.brandId === $filteredBrandId;
+            return color?.brandId === galleryState.filteredBrandId;
           });
         });
       else
@@ -149,19 +128,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
             string: yarnURL,
           });
           return colors?.every((color) => {
-            if ($filteredBrandId && $filteredYarnId)
+            if (galleryState.filteredBrandId && galleryState.filteredYarnId)
               return (
-                color?.brandId === $filteredBrandId &&
-                color?.yarnId === $filteredYarnId
+                color?.brandId === galleryState.filteredBrandId &&
+                color?.yarnId === galleryState.filteredYarnId
               );
-            return color?.brandId === $filteredBrandId;
+            return color?.brandId === galleryState.filteredBrandId;
           });
         });
     });
   }
 </script>
 
-{#if showScrollToTopButton && $projects.length}
+{#if showScrollToTopButton && galleryState.projects.length}
   <ToTopButton
     bottom="1rem"
     onClick={() => {
@@ -182,10 +161,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <label>
             <span>Popular during the past</span>
             <select
-              bind:value={$timePeriod}
+              bind:value={galleryState.timePeriod}
               class="select w-fit"
               onchange={() => {
-                $popularProjects = [];
+                galleryState.popularProjects = [];
                 fetchPopularProjectsWrapper();
                 featuredProjectsEl.scrollLeft = 0;
               }}
@@ -203,7 +182,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           class="w-full flex items-start gap-2 snap-x snap-mandatory overflow-x-scroll mx-auto bg-surface-50-900-token p-2"
           bind:this={featuredProjectsEl}
         >
-          {#if !$popularProjects.length}
+          {#if !galleryState.popularProjects.length}
             <!-- <div class="my-36 mx-auto"><Spinner /></div> -->
 
             {#each Array(5) as _, i}
@@ -212,7 +191,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               ></div>
             {/each}
           {:else}
-            {#each $popularProjects as { featured_image_src, id, meta }}
+            {#each galleryState.popularProjects as { featured_image_src, id, meta }}
               {@const title = getTitleFromLocationsMeta(meta.locations)}
               <a
                 href="/gallery/{id}"
@@ -256,23 +235,24 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <SelectYarn
                 preselectDefaultYarn={false}
                 disabled={loading}
-                bind:selectedBrandId={$filteredBrandId}
-                bind:selectedYarnId={$filteredYarnId}
+                bind:selectedBrandId={galleryState.filteredBrandId}
+                bind:selectedYarnId={galleryState.filteredYarnId}
               />
             </div>
 
-            {#if $filteredBrandId || $filteredYarnId}
+            {#if galleryState.filteredBrandId || galleryState.filteredYarnId}
               <div
                 class="w-full col-span-12 text-left md:col-span-5 flex flex-col items-start gap-1"
               >
                 <ToggleSwitch
                   disabled={loading}
-                  bind:checked={$palettesContainOnlyFilteredYarn}
-                  label="Only This {$filteredBrandId && $filteredYarnId
+                  bind:checked={galleryState.palettesContainOnlyFilteredYarn}
+                  label="Only This {galleryState.filteredBrandId &&
+                  galleryState.filteredYarnId
                     ? 'Yarn'
                     : 'Brand'}"
-                  details="All colorways in project must be this {$filteredBrandId &&
-                  $filteredYarnId
+                  details="All colorways in project must be this {galleryState.filteredBrandId &&
+                  galleryState.filteredYarnId
                     ? 'yarn'
                     : 'brand'}"
                 />
@@ -306,7 +286,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   class="truncate"
                   autocomplete="off"
                   placeholder="e.g., Kansas, 2003"
-                  bind:value={$search}
+                  bind:value={galleryState.search}
                 />
 
                 {#if showSearchReset}
@@ -315,7 +295,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     class=""
                     title="Reset Search"
                     onclick={() => {
-                      $search = '';
+                      galleryState.search = '';
                     }}
                   >
                     {@html ICONS.xMark}
@@ -346,7 +326,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 disabled={loading}
                 class="select truncate"
                 id="select-gallery-pattern-type"
-                bind:value={$filteredPatternType}
+                bind:value={galleryState.filteredPatternType}
               >
                 <option value="">Any Pattern</option>
                 {#each previewsData as { name, wpTagSlug }}
@@ -375,7 +355,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               </span>
               <select
                 class="select truncate"
-                bind:value={$orderBy}
+                bind:value={galleryState.orderBy}
                 disabled={loading}
               >
                 <option value="DESC" selected>Newest First</option>
@@ -384,8 +364,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </label>
 
             <div
-              class="justify-center flex col-span-12 {$filteredBrandId ||
-              $filteredYarnId
+              class="justify-center flex col-span-12 {galleryState.filteredBrandId ||
+              galleryState.filteredYarnId
                 ? 'md:col-start-5 md:col-span-4'
                 : 'md:col-start-10 md:col-span-3'}"
             >
@@ -397,32 +377,34 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     behavior: 'smooth',
                     block: 'start',
                   });
-                  $projects = [];
-                  $displayedProjects = [];
+                  galleryState.projects = [];
+                  galleryState.displayedProjects = [];
                   loading = true;
-                  const yarnSearch = getYarnSearch({
-                    brandId: $filteredBrandId,
-                    yarnId: $filteredYarnId,
+                  const yarnSearch = galleryState.getYarnSearch({
+                    brandId: galleryState.filteredBrandId,
+                    yarnId: galleryState.filteredYarnId,
                   });
 
                   let results = await fetchProjects({
-                    search: $search,
-                    order: $orderBy,
+                    search: galleryState.search,
+                    order: galleryState.orderBy,
                     yarn: yarnSearch,
-                    pattern: $filteredPatternType,
+                    pattern: galleryState.filteredPatternType,
                   });
 
-                  if ($search) {
-                    $gallery.pageInfo = results.pageInfo;
-                    $projects = results.edges.flatMap((item) => item.node);
+                  if (galleryState.search) {
+                    galleryState.gallery.pageInfo = results.pageInfo;
+                    galleryState.projects = results.edges.flatMap(
+                      (item) => item.node,
+                    );
                   } else {
-                    $gallery.pageInfo = results.pageInfo;
-                    $projects.push(
+                    galleryState.gallery.pageInfo = results.pageInfo;
+                    galleryState.projects.push(
                       ...results.edges.flatMap((item) => item.node),
                     );
-                    $projects = $projects;
+                    galleryState.projects = galleryState.projects;
                   }
-                  $displayedProjects = getFilteredProjects();
+                  galleryState.displayedProjects = getFilteredProjects();
                   loading = false;
                 }}
               >
@@ -458,7 +440,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               ? 'grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 justify-center items-start '
               : 'flex flex-col items-start justify-start'}"
           >
-            {#each $displayedProjects as { databaseId, featuredImage, locations }}
+            {#each galleryState.displayedProjects as { databaseId, featuredImage, locations }}
               {@const title = getTitleFromLocationsMeta(locations)}
               <a
                 href="/gallery/{databaseId}"
@@ -481,7 +463,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               </a>
             {/each}
           </div>
-          {#if !$displayedProjects.length && !loading}
+          {#if !galleryState.displayedProjects.length && !loading}
             <p class="text-center my-8">
               No results. Try changing the filters above.
             </p>
@@ -501,28 +483,30 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 ></div>
               {/each}
             </div>
-          {:else if $displayedProjects.length && hasNextPage}
+          {:else if galleryState.displayedProjects.length && hasNextPage}
             <button
               class="btn variant-filled-primary flex m-auto my-4"
               disabled={!hasNextPage}
               onclick={async () => {
                 loading = true;
-                const yarnSearch = getYarnSearch({
-                  brandId: $filteredBrandId,
-                  yarnId: $filteredYarnId,
+                const yarnSearch = galleryState.getYarnSearch({
+                  brandId: galleryState.filteredBrandId,
+                  yarnId: galleryState.filteredYarnId,
                 });
                 let results = await fetchProjects({
                   first,
                   after: endCursor,
-                  search: $search,
-                  order: $orderBy,
-                  pattern: $filteredPatternType,
+                  search: galleryState.search,
+                  order: galleryState.orderBy,
+                  pattern: galleryState.filteredPatternType,
                   yarn: yarnSearch,
                 });
-                $gallery.pageInfo = results.pageInfo;
-                $projects.push(...results.edges.flatMap((item) => item.node));
-                $projects = $projects;
-                $displayedProjects = getFilteredProjects();
+                galleryState.gallery.pageInfo = results.pageInfo;
+                galleryState.projects.push(
+                  ...results.edges.flatMap((item) => item.node),
+                );
+                galleryState.projects = galleryState.projects;
+                galleryState.displayedProjects = getFilteredProjects();
                 loading = false;
               }}
             >
