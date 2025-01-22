@@ -191,9 +191,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   class="flex flex-col text-left gap-y-1 w-full {fullscreen ? 'h-full' : ''}"
 >
   <div
-    class="w-full inline-flex {fullscreen
-      ? 'h-full max-md:flex-col'
-      : 'h-[70px]'}"
+    class="w-full inline-flex {fullscreen ? 'max-md:flex-col' : 'h-[70px]'}"
     use:dragHandleZone={{
       items: sortableColors,
       flipDurationMs,

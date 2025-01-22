@@ -13,13 +13,15 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script context="module">
+<script module>
   // Validates location id
   export let validId = writable(false);
   export let inputLocation = writable(null);
 </script>
 
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import { browser } from '$app/environment';
   import { goto } from '$app/navigation';
   import { page } from '$app/state';
@@ -33,15 +35,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { activeLocationID, weatherLocations } from './+page.svelte';
   import { fetchData } from './GetWeather.svelte';
 
-  let searching = false; // Autocomplete searching status
-  let showReset = false;
-  let locationGroup;
+  let searching = $state(false); // Autocomplete searching status
+  let showReset = $state(false);
+  let locationGroup = $state();
 
-  $: if ($inputLocation) {
-    showReset = !searching && $inputLocation?.value?.length > 1;
-  }
+  run(() => {
+    if ($inputLocation) {
+      showReset = !searching && $inputLocation?.value?.length > 1;
+    }
+  });
 
-  $: hasError = !$validId && $inputLocation?.value && !project.status.loading;
+  let hasError = $derived(
+    !$validId && $inputLocation?.value && !project.status.loading,
+  );
 
   onMount(async () => {
     // Setup the autocomplete location
@@ -260,8 +266,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
         placeholder={project.status.loading ? 'Loading...' : 'Enter a place'}
         title="Enter a city, region, or landmark"
         bind:this={$inputLocation}
-        on:input={validate}
-        on:keyup={validateKeyup}
+        oninput={validate}
+        onkeyup={validateKeyup}
         disabled={project.status.loading}
       />
       {#if searching}
@@ -288,7 +294,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <button
           class=""
           title="Reset Location Search"
-          on:click={async () => {
+          onclick={async () => {
             $inputLocation.value = '';
             // $location.label = "";
             // $location.id = null;
@@ -309,7 +315,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <button
       class="btn bg-secondary-hover-token gap-1 flex items-center"
       title="Use My Location"
-      on:click={async () => {
+      onclick={async () => {
         $inputLocation.value = 'Loading...';
         navigator.geolocation.getCurrentPosition(
           async (response) => {

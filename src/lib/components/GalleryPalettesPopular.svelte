@@ -13,13 +13,15 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script context="module">
+<script module>
   export let projects = writable([]);
   export let gallery = writable({});
   export let months = writable(0.25);
 </script>
 
 <script>
+  import { run } from 'svelte/legacy';
+
   import ColorPalette from '$lib/components/ColorPalette.svelte';
   import PlaceholderPalettes from '$lib/components/PlaceholderPalettes.svelte';
   import { allGaugesAttributes } from '$lib/state';
@@ -34,14 +36,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { getContext, onMount } from 'svelte';
   import { writable } from 'svelte/store';
 
-  let close = null;
+  let close = $state(null);
   if (typeof getContext === 'function')
     close = getContext('simple-modal')?.close;
 
-  export let updateGauge;
+  let { updateGauge } = $props();
 
-  let palettes = [];
-  let loading = true;
+  let palettes = $state([]);
+  let loading = $state(true);
 
   onMount(async () => {
     if (!$projects.length) {
@@ -53,8 +55,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
       loading = false;
     } else loading = false;
   });
-
-  $: palettes = getPalettesFromPopularProjects($projects);
 
   function getPalettesFromPopularProjects(projects) {
     let _palettes = [];
@@ -119,6 +119,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     });
     return _palettes;
   }
+  run(() => {
+    palettes = getPalettesFromPopularProjects($projects);
+  });
 </script>
 
 <div
@@ -130,7 +133,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       class="select truncate w-fit"
       id="select-time-period"
       bind:value={$months}
-      on:change={async () => {
+      onchange={async () => {
         loading = true;
         $projects = [];
         let results = await fetchPopularProjects({
@@ -165,7 +168,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <button
           type="button"
           class="cursor-pointer w-full"
-          on:click={() => {
+          onclick={() => {
             recordPageView(projectId);
             updateGauge({
               _colors: colors,

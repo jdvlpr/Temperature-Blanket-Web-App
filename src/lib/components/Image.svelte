@@ -13,10 +13,10 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script>
+<script lang="ts">
   import { createEventDispatcher } from 'svelte';
 
-  export let src, alt;
+  let { src, alt } = $props();
 
   const dispatch = createEventDispatcher();
 </script>
@@ -26,8 +26,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <img
       {src}
       {alt}
-      on:load={() => dispatch('loaded')}
-      type="image/png"
+      onload={() => dispatch('loaded')}
       class="object-contain max-w-full max-h-[90vh]"
     />
   </picture>

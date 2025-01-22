@@ -16,7 +16,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script>
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
   import { defaultYarn } from '$lib/state';
-  export let selectedBrandId, selectedYarnId;
+  let { selectedBrandId, selectedYarnId } = $props();
 </script>
 
 <div class="mt-1 flex flex-col gap-1 items-start text-left">

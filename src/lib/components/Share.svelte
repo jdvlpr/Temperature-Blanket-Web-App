@@ -14,13 +14,15 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
+  import { run } from 'svelte/legacy';
+
   import { getToastStore, popup } from '@skeletonlabs/skeleton';
 
   const toastStore = getToastStore();
 
-  export let href;
+  let { href } = $props();
 
-  let copiedMessage = '';
+  let copiedMessage = $state('');
 
   const popupShare = {
     // Represents the type of event that opens/closed the popup
@@ -44,13 +46,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
     }
   }
 
-  $: if (copiedMessage !== '') {
-    toastStore.trigger({
-      message: copiedMessage,
-      background: 'bg-success-300 text-black',
-    });
-    copiedMessage = '';
-  }
+  run(() => {
+    if (copiedMessage !== '') {
+      toastStore.trigger({
+        message: copiedMessage,
+        background: 'bg-success-300 text-black',
+      });
+      copiedMessage = '';
+    }
+  });
 </script>
 
 <div class="w-fit text-left">
@@ -104,7 +108,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <div class="inline-flex flex-wrap gap-4 items-center">
         <button
           class="btn variant-filled-primary gap-1"
-          on:click={() => copyURL()}
+          onclick={() => copyURL()}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"

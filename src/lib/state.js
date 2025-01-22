@@ -14,8 +14,8 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 export * from '$lib/state/gauges-state.svelte';
-export * from '$lib/state/location-stores.svelte';
-export * from '$lib/state/page-stores.svelte';
+export * from '$lib/state/location-state.svelte';
+export * from '$lib/state/page-state.svelte';
 export * from '$lib/state/preview-state.svelte';
 export * from '$lib/state/project-state.svelte';
 export * from '$lib/state/weather-state.svelte';

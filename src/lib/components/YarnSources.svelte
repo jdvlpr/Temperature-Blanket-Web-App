@@ -21,7 +21,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { brands } from '$lib/yarns/brands';
   import { slide } from 'svelte/transition';
 
-  export let viewSources = false;
+  interface Props {
+    viewSources?: boolean;
+  }
+
+  let { viewSources = $bindable(false) }: Props = $props();
 </script>
 
 <div class="flex flex-wrap gap-2 justify-center my-4">

@@ -13,10 +13,14 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script>
-  export let date = null,
-    version = null,
-    notes;
+<script lang="ts">
+  interface Props {
+    date?: any;
+    version?: any;
+    notes: any;
+  }
+
+  let { date = null, version = null, notes }: Props = $props();
 </script>
 
 <div class="flex flex-col gap-2">
