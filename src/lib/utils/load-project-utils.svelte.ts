@@ -387,6 +387,10 @@ export const parseGaugeURLHash = (hashString: string, gauge) => {
   // and stop parsing the hashString
   if (!hashStringSettings) return gauge;
 
+  // when this function is run in /gallery/[id], the gauge does not have rangeOptions and doesn't need the range options to be updated,
+  // so just return the gauge as it is
+  if (!gauge?.rangeOptions) return gauge;
+
   gauge.rangeOptions.mode =
     hashStringSettings.substring(0, 1) === 'a' ? 'auto' : 'manual';
 

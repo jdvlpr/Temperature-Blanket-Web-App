@@ -37,7 +37,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '$lib/utils';
   import { Accordion, AccordionItem } from '@skeletonlabs/skeleton';
   import { onMount } from 'svelte';
-  import { yarn as yarnPalleteCreatorPageColors } from './../../yarn/+page.svelte';
+  import { yarnPageState } from '../../yarn/state.svelte';
 
   let { data } = $props();
 
@@ -105,12 +105,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     allGaugesAttributes.forEach((gauge) => {
       if (!exists(params[gauge.id])) return;
-      const settings = parseGaugeURLHash(params[gauge.id].value);
+      const settings = parseGaugeURLHash(params[gauge.id].value, gauge);
       _gauges.push(settings);
     });
 
     return _gauges;
   }
+
   const preloadImage = (src) => {
     if (!browser) return;
     return new Promise(async (resolve) => {
@@ -425,7 +426,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                               <a
                                 class="btn variant-ghost-primary w-fit m-auto mt-4 flex flex-wrap items-center gap-1"
                                 onclick={() => {
-                                  yarnPalleteCreatorPageColors.colors = colors;
+                                  yarnPageState.colors = colors;
                                 }}
                                 href="/yarn"
                               >

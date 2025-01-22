@@ -14,34 +14,34 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script module lang="ts">
-  export let yarn: { colors: Color[] } = $state({
-    colors: [
-      {
-        hex: '#f43f5e',
-      },
-      {
-        hex: '#d946ef',
-      },
-      {
-        hex: '#8b5cf6',
-      },
-      {
-        hex: '#3b82f6',
-      },
-      {
-        hex: '#06b6d4',
-      },
-      {
-        hex: '#10b981',
-      },
-      {
-        hex: '#eab308',
-      },
-      {
-        hex: '#f97316',
-      },
-    ],
-  });
+  // export let yarn: { colors: Color[] } = $state({
+  //   colors: [
+  //     {
+  //       hex: '#f43f5e',
+  //     },
+  //     {
+  //       hex: '#d946ef',
+  //     },
+  //     {
+  //       hex: '#8b5cf6',
+  //     },
+  //     {
+  //       hex: '#3b82f6',
+  //     },
+  //     {
+  //       hex: '#06b6d4',
+  //     },
+  //     {
+  //       hex: '#10b981',
+  //     },
+  //     {
+  //       hex: '#eab308',
+  //     },
+  //     {
+  //       hex: '#f97316',
+  //     },
+  //   ],
+  // });
 </script>
 
 <script lang="ts">
@@ -64,6 +64,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     yarnDetailsToColors,
   } from '$lib/utils';
   import { onMount } from 'svelte';
+  import { yarnPageState } from './state.svelte';
 
   let urlParams,
     schemeId = $state('Custom');
@@ -75,18 +76,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
     urlParams = new URLSearchParams(window.location.search);
     // Load URL
     if (urlParams?.has('s')) {
-      yarn.colors =
+      yarnPageState.colors =
         stringToColors({
           string: urlParams.get('s'),
-        }) || yarn.colors;
+        }) || yarnPageState.colors;
     }
 
     if (urlParams?.has('f')) {
       let _yarnString = urlParams.get('f');
 
-      yarn.colors = yarnDetailsToColors({
+      yarnPageState.colors = yarnDetailsToColors({
         string: _yarnString,
-        colors: $state.snapshot(yarn.colors),
+        colors: $state.snapshot(yarnPageState.colors),
       });
     }
 
@@ -112,7 +113,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     return href;
   }
 
-  let shareableURL = $derived(getShareableURL(yarn.colors));
+  let shareableURL = $derived(getShareableURL(yarnPageState.colors));
 </script>
 
 <svelte:head>
