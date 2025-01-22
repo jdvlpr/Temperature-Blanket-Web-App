@@ -26,6 +26,10 @@ import {
   TemperatureGauge,
   gaugeAttributes as tempGaugeAttributes,
 } from '$lib/state/gauges/temperature-gauge-state.svelte';
+import {
+  DayTimeGauge,
+  gaugeAttributes as daytGaugeAttributes,
+} from '$lib/state/gauges/daytime-gauge-state.svelte';
 import type { GaugeAttributes, GaugeStateInterface } from '$lib/types';
 import { colorsToYarnDetails, displayNumber } from '$lib/utils';
 
@@ -133,6 +137,7 @@ class GaugesState {
     if (id === 'temp') newGauge = new TemperatureGauge();
     if (id === 'prcp') newGauge = new RainGauge();
     if (id === 'snow') newGauge = new SnowGauge();
+    if (id === 'dayt') newGauge = new DayTimeGauge();
 
     // if (id === 'prcp') newGauge = new RainGauge();
     // else newGauge = new GaugeState({ attributes, settings });
@@ -198,4 +203,5 @@ export const allGaugesAttributes = [
   tempGaugeAttributes,
   rainGaugeAttributes,
   snowGaugeAttributes,
+  daytGaugeAttributes,
 ];
