@@ -250,8 +250,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         </p>
                       {/if}
                     </div>
-                  {:else}
+                  {:else if typeof gaugeLength === 'number'}
                     <p class="text-xs">No Color Assigned</p>
+                  {:else}
+                    <p class="text-xs">No Gauge Created</p>
                   {/if}
                 {/if}
               </td>

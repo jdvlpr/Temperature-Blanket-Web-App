@@ -19,6 +19,10 @@ import {
   gaugeAttributes as rainGaugeAttributes,
 } from '$lib/state/gauges/rain-gauge-state.svelte';
 import {
+  SnowGauge,
+  gaugeAttributes as snowGaugeAttributes,
+} from '$lib/state/gauges/snow-gauge-state.svelte';
+import {
   TemperatureGauge,
   gaugeAttributes as tempGaugeAttributes,
 } from '$lib/state/gauges/temperature-gauge-state.svelte';
@@ -126,11 +130,10 @@ class GaugesState {
 
     let newGauge;
 
-    if (id === 'temp') {
-      newGauge = new TemperatureGauge();
-    }
-
+    if (id === 'temp') newGauge = new TemperatureGauge();
     if (id === 'prcp') newGauge = new RainGauge();
+    if (id === 'snow') newGauge = new SnowGauge();
+
     // if (id === 'prcp') newGauge = new RainGauge();
     // else newGauge = new GaugeState({ attributes, settings });
 
@@ -191,4 +194,8 @@ class GaugesState {
 // Create the gaugesState object with the default temperature gauge
 export const gauges = new GaugesState();
 
-export const allGaugesAttributes = [tempGaugeAttributes, rainGaugeAttributes];
+export const allGaugesAttributes = [
+  tempGaugeAttributes,
+  rainGaugeAttributes,
+  snowGaugeAttributes,
+];

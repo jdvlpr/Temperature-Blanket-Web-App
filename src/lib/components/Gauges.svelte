@@ -21,11 +21,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import RangeOptionsButton from './buttons/RangeOptionsButton.svelte';
   import GaugeCustomizer from './GaugeCustomizer.svelte';
   import { ICONS } from '$lib/constants';
-  import { RadioGroup, RadioItem } from '@skeletonlabs/skeleton';
+  import { getModalStore, RadioGroup, RadioItem } from '@skeletonlabs/skeleton';
 
   onMount(() => {
     setupAvailableGauges();
   });
+
+  const modalStore = getModalStore();
 
   function setupAvailableGauges() {
     allGaugesAttributes.forEach((gauge) => {
@@ -67,7 +69,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
         if (!gauges.allCreated.map((gauge) => gauge.id).includes(id)) {
           // If the gauge is not created yet, then set it up
-          gauges.addById(id);
+          modalStore.trigger({
+            type: 'confirm',
+            title: `Add a ${label}?`,
+            body: `This will add a new gauge to your project. You can delete it later.`,
+            response: (response) => {
+              if (response) gauges.addById(id);
+            },
+          });
         }
       }}
       name="gauge-{id}"
@@ -80,7 +89,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </RadioItem>
   {/each}
 </RadioGroup>
-
 <!-- <div class="inline-flex justify-center items-center gap-2 mb-2 mt-3">
   <label class="label">
     <select
@@ -111,7 +119,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 {#if gauges.activeGauge && !gauges.activeGauge?.calculating}
   {#if gauges.activeGauge.id !== 'temp'}
     <!-- If this is not the default temperature gauge and we're on the project planner page -->
-    <div class="w-full flex justify-center mb-8 mt-4">
+    <div class="w-full flex justify-center mb-4">
       <button
         class="btn bg-secondary-hover-token justify-start gap-1 top-2 relative max-sm:mb-2"
         title="Delete {gauges.activeGauge.label}"

@@ -219,7 +219,10 @@ export const getColorsFromInput = ({
 export const getColorInfo = (gaugeId, value) => {
   const gauge = gauges.getSnapshot(gaugeId);
 
-  const color = { hex: '#ffffff' }; // default white color will show on the preview if the weather value has no range associated with it
+  let color: { hex: Color['hex']; gaugeLength: undefined | number } = {
+    hex: '#ffffff',
+    gaugeLength: undefined,
+  }; // default white color will show on the preview if the weather value has no range associated with it
 
   if (
     value === null ||
@@ -244,13 +247,15 @@ export const getColorInfo = (gaugeId, value) => {
         includeToValue: gauge.rangeOptions.includeToValue,
       })
     ) {
-      return {
+      color = {
         ...gauge.colors[i],
         index: i,
         gaugeLength,
       };
     }
   }
+
+  color = { ...color, gaugeLength };
 
   return color;
 };
