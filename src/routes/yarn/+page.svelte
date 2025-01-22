@@ -13,37 +13,6 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script module lang="ts">
-  // export let yarn: { colors: Color[] } = $state({
-  //   colors: [
-  //     {
-  //       hex: '#f43f5e',
-  //     },
-  //     {
-  //       hex: '#d946ef',
-  //     },
-  //     {
-  //       hex: '#8b5cf6',
-  //     },
-  //     {
-  //       hex: '#3b82f6',
-  //     },
-  //     {
-  //       hex: '#06b6d4',
-  //     },
-  //     {
-  //       hex: '#10b981',
-  //     },
-  //     {
-  //       hex: '#eab308',
-  //     },
-  //     {
-  //       hex: '#f97316',
-  //     },
-  //   ],
-  // });
-</script>
-
 <script lang="ts">
   import { browser, version } from '$app/environment';
   import { PUBLIC_BASE_URL } from '$env/static/public';
@@ -56,7 +25,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Share from '$lib/components/Share.svelte';
   import YarnSources from '$lib/components/YarnSources.svelte';
   import { TemperatureGauge } from '$lib/state/gauges/temperature-gauge-state.svelte';
-  import type { Color } from '$lib/types';
   import {
     colorsToCode,
     colorsToYarnDetails,

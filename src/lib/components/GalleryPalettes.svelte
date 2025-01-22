@@ -14,21 +14,24 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script module>
-  export let search = writable('');
-  export let filteredBrandId = writable('');
-  export let filteredYarnId = writable('');
-  export let palettesContainOnlyFilteredYarn = writable(false);
-  export let orderBy = writable('DESC');
-  export let projects = writable([]);
-  export let palettes = writable([]);
-  export let gallery = writable({});
+  class GalleryPalettesState {
+    search = $state('');
+    filteredBrandId = $state('');
+    filteredYarnId = $state('');
+    palettesContainOnlyFilteredYarn = $state(false);
+    orderBy = $state('DESC');
+    projects = $state([]);
+    palettes = $state([]);
+    gallery = $state({});
 
-  export const getYarnSearch = ({ brandId, yarnId }) => {
-    if (brandId && yarnId) return `${brandId}-${yarnId}`;
-    else if (brandId) return brandId;
-    else if (yarnId) return yarnId;
-    return '';
-  };
+    getYarnSearch = ({ brandId, yarnId }) => {
+      if (brandId && yarnId) return `${brandId}-${yarnId}`;
+      else if (brandId) return brandId;
+      else if (yarnId) return yarnId;
+      return '';
+    };
+  }
+  export const galleryPalettesState = new GalleryPalettesState();
 </script>
 
 <script lang="ts">
@@ -46,7 +49,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     recordPageView,
   } from '$lib/utils';
   import { onMount } from 'svelte';
-  import { writable } from 'svelte/store';
   import { slide } from 'svelte/transition';
 
   interface Props {
@@ -63,31 +65,36 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let isLoadingMore = $state(false);
 
   onMount(async () => {
-    if (!$projects.length) {
+    if (!galleryPalettesState.projects.length) {
       loading = true;
       let results = await fetchProjects({
         first,
         after: endCursor,
-        search: $search,
-        order: $orderBy,
+        search: galleryPalettesState.search,
+        order: galleryPalettesState.orderBy,
       });
-      $gallery.pageInfo = results.pageInfo;
-      $projects.push(...results.edges.flatMap((item) => item.node));
-      $projects = $projects;
-      $palettes = getPalettesFromProjects({
-        projects: $projects,
-        selectedBrandId: $filteredBrandId,
-        selectedYarnId: $filteredYarnId,
-        palettesContainOnlyFilteredYarn: $palettesContainOnlyFilteredYarn,
+      galleryPalettesState.gallery.pageInfo = results.pageInfo;
+      galleryPalettesState.projects.push(
+        ...results.edges.flatMap((item) => item.node),
+      );
+      galleryPalettesState.projects = galleryPalettesState.projects;
+      galleryPalettesState.palettes = getPalettesFromProjects({
+        projects: galleryPalettesState.projects,
+        selectedBrandId: galleryPalettesState.filteredBrandId,
+        selectedYarnId: galleryPalettesState.filteredYarnId,
+        palettesContainOnlyFilteredYarn:
+          galleryPalettesState.palettesContainOnlyFilteredYarn,
       });
       loading = false;
     } else loading = false;
   });
 
-  let showSearchReset = $derived(!!$search.length);
+  let showSearchReset = $derived(!!galleryPalettesState.search.length);
 
-  let hasNextPage = $derived($gallery?.pageInfo?.hasNextPage);
-  let endCursor = $derived($gallery?.pageInfo?.endCursor);
+  let hasNextPage = $derived(
+    galleryPalettesState.gallery?.pageInfo?.hasNextPage,
+  );
+  let endCursor = $derived(galleryPalettesState.gallery?.pageInfo?.endCursor);
 </script>
 
 <div
@@ -110,24 +117,25 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <SelectYarn
           preselectDefaultYarn={false}
           disabled={loading}
-          bind:selectedBrandId={$filteredBrandId}
-          bind:selectedYarnId={$filteredYarnId}
+          bind:selectedBrandId={galleryPalettesState.filteredBrandId}
+          bind:selectedYarnId={galleryPalettesState.filteredYarnId}
           context="modal"
         />
       </div>
 
-      {#if $filteredBrandId || $filteredYarnId}
+      {#if galleryPalettesState.filteredBrandId || galleryPalettesState.filteredYarnId}
         <div
           class="w-full col-span-12 text-left md:col-span-4 flex flex-col items-start gap-0 top-[2px] relative"
         >
           <ToggleSwitch
             disabled={loading}
-            bind:checked={$palettesContainOnlyFilteredYarn}
-            label="Only This {$filteredBrandId && $filteredYarnId
+            bind:checked={galleryPalettesState.palettesContainOnlyFilteredYarn}
+            label="Only This {galleryPalettesState.filteredBrandId &&
+            galleryPalettesState.filteredYarnId
               ? 'Yarn'
               : 'Brand'}"
-            details="All colorways in palette must be this {$filteredBrandId &&
-            $filteredYarnId
+            details="All colorways in palette must be this {galleryPalettesState.filteredBrandId &&
+            galleryPalettesState.filteredYarnId
               ? 'yarn'
               : 'brand'}"
           />
@@ -161,7 +169,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             autocomplete="off"
             disabled={loading}
             placeholder="e.g., Kansas, 2003"
-            bind:value={$search}
+            bind:value={galleryPalettesState.search}
           />
 
           {#if showSearchReset}
@@ -170,7 +178,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               class=""
               title="Reset Search"
               onclick={() => {
-                $search = '';
+                galleryPalettesState.search = '';
               }}
             >
               {@html ICONS.xMark}
@@ -199,7 +207,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </span>
         <select
           class="select truncate"
-          bind:value={$orderBy}
+          bind:value={galleryPalettesState.orderBy}
           disabled={loading}
         >
           <option value="DESC" selected>Newest First</option>
@@ -208,8 +216,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </label>
 
       <div
-        class="w-full justify-center flex col-span-12 md:col-span-2 {$filteredBrandId ||
-        $filteredYarnId
+        class="w-full justify-center flex col-span-12 md:col-span-2 {galleryPalettesState.filteredBrandId ||
+        galleryPalettesState.filteredYarnId
           ? 'md:col-start-11'
           : ''}"
       >
@@ -221,33 +229,38 @@ If not, see <https://www.gnu.org/licenses/>. -->
               behavior: 'smooth',
               block: 'start',
             });
-            $projects = [];
-            $palettes = [];
+            galleryPalettesState.projects = [];
+            galleryPalettesState.palettes = [];
             loading = true;
-            const yarnSearch = getYarnSearch({
-              brandId: $filteredBrandId,
-              yarnId: $filteredYarnId,
+            const yarnSearch = galleryPalettesState.getYarnSearch({
+              brandId: galleryPalettesState.filteredBrandId,
+              yarnId: galleryPalettesState.filteredYarnId,
             });
 
             let results = await fetchProjects({
-              search: $search,
-              order: $orderBy,
+              search: galleryPalettesState.search,
+              order: galleryPalettesState.orderBy,
               yarn: yarnSearch,
             });
 
-            if ($search) {
-              $gallery.pageInfo = results.pageInfo;
-              $projects = results.edges.flatMap((item) => item.node);
+            if (galleryPalettesState.search) {
+              galleryPalettesState.gallery.pageInfo = results.pageInfo;
+              galleryPalettesState.projects = results.edges.flatMap(
+                (item) => item.node,
+              );
             } else {
-              $gallery.pageInfo = results.pageInfo;
-              $projects.push(...results.edges.flatMap((item) => item.node));
-              $projects = $projects;
+              galleryPalettesState.gallery.pageInfo = results.pageInfo;
+              galleryPalettesState.projects.push(
+                ...results.edges.flatMap((item) => item.node),
+              );
+              galleryPalettesState.projects = galleryPalettesState.projects;
             }
-            $palettes = getPalettesFromProjects({
-              projects: $projects,
-              selectedBrandId: $filteredBrandId,
-              selectedYarnId: $filteredYarnId,
-              palettesContainOnlyFilteredYarn: $palettesContainOnlyFilteredYarn,
+            galleryPalettesState.palettes = getPalettesFromProjects({
+              projects: galleryPalettesState.projects,
+              selectedBrandId: galleryPalettesState.filteredBrandId,
+              selectedYarnId: galleryPalettesState.filteredYarnId,
+              palettesContainOnlyFilteredYarn:
+                galleryPalettesState.palettesContainOnlyFilteredYarn,
             });
             loading = false;
           }}
@@ -273,12 +286,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/if}
 </div>
 <div class="flex flex-col items-center px-2" bind:this={projectsList}>
-  {#if loading && !$palettes.length}
+  {#if loading && !galleryPalettesState.palettes.length}
     <div class="my-1"></div>
     <PlaceholderPalettes items={20} maxWFull={true} />
   {:else}
     <div class="gap-4 my-2 flex flex-col items-start justify-start w-full">
-      {#each $palettes as { colors, schemeName, projectId }}
+      {#each galleryPalettesState.palettes as { colors, schemeName, projectId }}
         <button
           type="button"
           class="cursor-pointer w-full"
@@ -296,11 +309,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {/each}
     </div>
   {/if}
-  {#if !$palettes.length && !loading}
+  {#if !galleryPalettesState.palettes.length && !loading}
     <p class="text-center my-8">No results. Try changing the filters above.</p>
   {/if}
 
-  {#if $palettes.length && hasNextPage}
+  {#if galleryPalettesState.palettes.length && hasNextPage}
     {#if isLoadingMore}
       <div class="h-28 flex items-center"><Spinner /></div>
     {/if}
@@ -310,25 +323,28 @@ If not, see <https://www.gnu.org/licenses/>. -->
       onclick={async () => {
         isLoadingMore = true;
         if (isDesktop.current) loading = true;
-        const yarnSearch = getYarnSearch({
-          brandId: $filteredBrandId,
-          yarnId: $filteredYarnId,
+        const yarnSearch = galleryPalettesState.getYarnSearch({
+          brandId: galleryPalettesState.filteredBrandId,
+          yarnId: galleryPalettesState.filteredYarnId,
         });
         let results = await fetchProjects({
           first,
           after: endCursor,
-          search: $search,
-          order: $orderBy,
+          search: galleryPalettesState.search,
+          order: galleryPalettesState.orderBy,
           yarn: yarnSearch,
         });
-        $gallery.pageInfo = results.pageInfo;
-        $projects.push(...results.edges.flatMap((item) => item.node));
-        $projects = $projects;
-        $palettes = getPalettesFromProjects({
-          projects: $projects,
-          selectedBrandId: $filteredBrandId,
-          selectedYarnId: $filteredYarnId,
-          palettesContainOnlyFilteredYarn: $palettesContainOnlyFilteredYarn,
+        galleryPalettesState.gallery.pageInfo = results.pageInfo;
+        galleryPalettesState.projects.push(
+          ...results.edges.flatMap((item) => item.node),
+        );
+        galleryPalettesState.projects = galleryPalettesState.projects;
+        galleryPalettesState.palettes = getPalettesFromProjects({
+          projects: galleryPalettesState.projects,
+          selectedBrandId: galleryPalettesState.filteredBrandId,
+          selectedYarnId: galleryPalettesState.filteredYarnId,
+          palettesContainOnlyFilteredYarn:
+            galleryPalettesState.palettesContainOnlyFilteredYarn,
         });
         loading = false;
         isLoadingMore = false;

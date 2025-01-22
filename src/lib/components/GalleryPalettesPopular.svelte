@@ -14,9 +14,12 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script module>
-  export let projects = writable([]);
-  export let gallery = writable({});
-  export let months = writable(0.25);
+  class GalleryPalettesPopularState {
+    projects = $state([]);
+    months = $state(0.25);
+  }
+
+  export const galleryPalettesPopularState = new GalleryPalettesPopularState();
 </script>
 
 <script>
@@ -34,7 +37,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     recordPageView,
   } from '$lib/utils';
   import { getContext, onMount } from 'svelte';
-  import { writable } from 'svelte/store';
 
   let close = $state(null);
   if (typeof getContext === 'function')
@@ -46,12 +48,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let loading = $state(true);
 
   onMount(async () => {
-    if (!$projects.length) {
+    if (!galleryPalettesPopularState.projects.length) {
       loading = true;
       let results = await fetchPopularProjects({
-        months: $months,
+        months: galleryPalettesPopularState.months,
       });
-      $projects = results;
+      galleryPalettesPopularState.projects = results;
       loading = false;
     } else loading = false;
   });
@@ -119,8 +121,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     });
     return _palettes;
   }
-  run(() => {
-    palettes = getPalettesFromPopularProjects($projects);
+
+  $effect(() => {
+    palettes = getPalettesFromPopularProjects(
+      galleryPalettesPopularState.projects,
+    );
   });
 </script>
 
@@ -132,15 +137,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <select
       class="select truncate w-fit"
       id="select-time-period"
-      bind:value={$months}
+      bind:value={galleryPalettesPopularState.months}
       onchange={async () => {
         loading = true;
-        $projects = [];
+        galleryPalettesPopularState.projects = [];
         let results = await fetchPopularProjects({
-          months: $months,
+          months: galleryPalettesPopularState.months,
         });
 
-        $projects = results;
+        galleryPalettesPopularState.projects = results;
 
         loading = false;
 
@@ -184,7 +189,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
   {/if}
 
-  {#if !$projects.length && !loading}
+  {#if !galleryPalettesPopularState.projects.length && !loading}
     <p class="text-center my-8">No Results</p>
   {/if}
 </div>
