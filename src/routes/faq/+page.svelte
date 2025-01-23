@@ -108,6 +108,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   stroke="currentColor"
                   class="w-6 h-6"
                 >
+<<<<<<< HEAD
                   <path
                     stroke-linecap="round"
                     stroke-linejoin="round"
@@ -266,6 +267,105 @@ If not, see <https://www.gnu.org/licenses/>. -->
               {/snippet}
               {#snippet content()}
                 If your location doesn’t have weather data, it means one of the
+=======
+                when you first create your project, and then
+                <a
+                  href="/documentation#import-weather-data"
+                  class="link"
+                  target="_blank">import it back into your project</a
+                > if you need. Sorry for any inconvenience.
+              </p>
+            </svelte:fragment>
+          </AccordionItem>
+          <AccordionItem id="is-there-an-app">
+            <svelte:fragment slot="lead">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="w-6 h-6"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z"
+                />
+              </svg>
+            </svelte:fragment>
+            <svelte:fragment slot="summary"
+              ><p class="font-bold">Is there an app?</p></svelte:fragment
+            >
+            <svelte:fragment slot="content">
+              <p>
+                The website is the app. It's not in the Apple or Google app
+                store, but you can
+                <a
+                  href="https://support.google.com/chrome/answer/9658361"
+                  target="_blank"
+                  class="link"
+                  >install {PUBLIC_BASE_DOMAIN_NAME}
+                  like an app on your device</a
+                >.
+              </p>
+            </svelte:fragment>
+          </AccordionItem>
+          <AccordionItem id="is-it-free">
+            <svelte:fragment slot="lead">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="w-6 h-6"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z"
+                />
+              </svg>
+            </svelte:fragment>
+            <svelte:fragment slot="summary"
+              ><p class="font-bold">Is it free?</p></svelte:fragment
+            >
+            <svelte:fragment slot="content">
+              <p>Yep!</p>
+            </svelte:fragment>
+          </AccordionItem>
+          <AccordionItem>
+            <svelte:fragment slot="lead">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="w-6 h-6"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z"
+                />
+              </svg>
+            </svelte:fragment>
+            <svelte:fragment slot="summary"
+              ><p class="font-bold">
+                Why do the range values repeat (0 to 10, 10 to 20…), and how can
+                I make them not overlap (0 to 9, 10 to 19…)?
+              </p></svelte:fragment
+            >
+            <svelte:fragment slot="content">
+              <p>
+                The default setting (From ≤ Range &lt; To) will include the
+                first number up to but not including the second number, so
+                there’s not actually any weather value that would be in two
+                ranges at once. To make the range values not overlap, you will
+                need to change the
+>>>>>>> main
                 <a
                   class="link"
                   href="/documentation#weather-sources"

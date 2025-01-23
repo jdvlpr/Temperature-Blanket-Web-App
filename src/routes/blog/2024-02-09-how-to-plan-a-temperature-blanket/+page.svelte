@@ -85,6 +85,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         class="btn bg-secondary-hover-token gap-1 mb-2 max-lg:mx-2 max-lg:mt-2"
         >{@html ICONS.arrowBack} Blog</a
       >
+<<<<<<< HEAD
       <div class="pb-4 text-left flex gap-4">
         <div
           use:tocCrawler={{ mode: 'generate' }}
@@ -92,6 +93,208 @@ If not, see <https://www.gnu.org/licenses/>. -->
         >
           <Card>
             {#snippet header()}
+=======
+        <Card>
+          <div slot="header">
+            <img
+              src="/images/blog-images/2024-02-09-how-to-plan-a-temperature-blanket/cover.jpg"
+              class="h-36 object-cover w-full"
+              alt="How to Plan a Temperature Blanket"
+            />
+          </div>
+
+          <div slot="content" class="pb-4 px-2">
+            <div class="flex flex-col gap-4">
+              <div class="mt-4 flex flex-col gap-2">
+                <h1
+                  class="font-bold font-cursive text-4xl text-secondary-700-200-token"
+                >
+                  How to Plan a Temperature Blanket
+                </h1>
+                <p class="text-secondary-700-200-token font-bold">
+                  With temperature-blanket.com
+                </p>
+                <p class="text-sm">February 9, 2024</p>
+              </div>
+              <p>
+                Starting a temperature blanket can be a daunting task. Maybe
+                you're thinking of starting, but you feel overwhelmed by some of
+                these questions:
+              </p>
+              <p
+                class="p-4 variant-soft-surface text-token rounded-container-token"
+              >
+                🤔
+                <span class="italic">Which colors should I pick?</span>
+                <span class="italic">How much yarn will I need?</span>
+                <span class="italic">Where do I find weather data?</span>
+                <span class="italic">What pattern should I use?</span>
+                <span class="italic"
+                  >Should I have 5 or 10 degree increments?</span
+                >
+                <span class="italic"
+                  >Should I use the high, average, or low temperature?</span
+                >
+                <a
+                  href="/blog/what-is-a-temperature-blanket"
+                  class="underline italic"
+                  title="What is a Temperature Blanket?"
+                  >What even is a temperature blanket?</a
+                >
+              </p>
+
+              <div
+                class="flex flex-wrap gap-4 items-center justify-center variant-outline-warning p-4 rounded-container-token"
+              >
+                <img
+                  src="/images/blog-images/2024-02-09-how-to-plan-a-temperature-blanket/profile.webp"
+                  class="rounded-full h-24 w-24"
+                  alt="profile"
+                />
+                <p class="sm:flex-1">
+                  Hello! I'm Thomas (J), the developer of
+                  temperature-blanket.com, and in this guide I'll walk you
+                  through using the <a href="/" class="link">Project Planner</a>
+                  tool on this site to hopefully remove some of the stress of starting
+                  a new project. By the end, I hope you feel educated, equipped,
+                  and excited to start creating!
+                </p>
+              </div>
+
+              <h2
+                class="font-bold text-3xl scroll-mt-[70px] text-secondary-700-200-token"
+              >
+                The Project: Blanket? Scarf? Socks?
+              </h2>
+
+              <p>
+                Yes, it's called a temperature <span class="italic"
+                  >blanket</span
+                >, but have you considered making some other weather-based
+                project? If a scarf, socks, shawl, or even a ssssnake sounds
+                more doable to you, you're free to change your idea! Blankets
+                are fantastic but can be a big commitment. Pick a project you're
+                likely to finish. The
+                <a href="/" class="link">Project Planner</a> was designed with blankets
+                in mind, but it can help you plan other weather-inspired creations
+                too.
+              </p>
+
+              <h2
+                class="font-bold text-3xl scroll-mt-[70px] text-secondary-700-200-token"
+              >
+                The Place: Location, Location, Location
+              </h2>
+
+              <div class="flex flex-wrap gap-4">
+                <div class="flex-1">
+                  <p>
+                    Ok, first step: go to
+                    <a href="/" class="link">temperature-blanket.com</a>. Here
+                    is the Project Planner. You'll see a bit of information at
+                    the top about temperature blankets, and under that a section
+                    called Location:
+                  </p>
+                  <img
+                    class="my-2 w-full h-auto max-h-fit"
+                    src="/images/blog-images/2024-02-09-how-to-plan-a-temperature-blanket/location-temperature-blanket.png"
+                    alt="Location Section"
+                  />
+                </div>
+                <div
+                  class="variant-soft-surface text-token p-4 rounded-container-token md:basis-1/3 h-fit"
+                >
+                  <p>
+                    🤔
+                    <span class="italic">What device should I use?</span>
+                  </p>
+                  <p>
+                    You can use the Project Planner on a mobile phone, tablet,
+                    or bigger computer. I recommend using the largest screen
+                    available to you.
+                  </p>
+                  <div class="my-4"></div>
+                  <p>
+                    🤔
+                    <span class="italic">Is there an app?</span>
+                  </p>
+                  <p>
+                    The website is the app. It's not in the Apple or Google app
+                    store, but you can
+                    <a
+                      href="https://support.google.com/chrome/answer/9658361"
+                      target="_blank"
+                      class="link"
+                      >install temperature-blanket.com like an app on your
+                      device</a
+                    >.
+                  </p>
+                </div>
+              </div>
+
+              <p>
+                Enter a city, region, or landmark, and select a result from the
+                list. Great job! You're now able to press that Search button and
+                get weather data.
+              </p>
+
+              <h2
+                class="font-bold text-3xl scroll-mt-[70px] text-secondary-700-200-token"
+              >
+                The Time: This Year? Last Year? 50 Years Ago?
+              </h2>
+
+              <p>
+                Wait! Before you search for weather, notice the Year, Month, and
+                Day options. The default is January 1st, last year.
+              </p>
+              <p>
+                Now, you may want to make a project using this year's weather
+                data, so you change the year to this year. Right? Well, you are
+                free to do that, but I recommend a different approach.
+              </p>
+              <div class="flex flex-wrap gap-4">
+                <div class="flex-1 flex flex-col gap-4">
+                  <p>
+                    I recommend selecting last year or an older year—at least in
+                    the beginning when you're planning your project. Here's why:
+                    all the weather data for this year isn't available yet, so
+                    you won't be able to fully take advantage of the Project
+                    Planner if you change the date to this year.
+                  </p>
+                  <p>
+                    If you do want this year's weather data, you can always come
+                    back and change the date after going through the other
+                    sections of the Project Planner. All your color and pattern
+                    settings are saved even if you change the date later and
+                    search for new weather.
+                  </p>
+                </div>
+                <div
+                  class="variant-soft-surface text-token p-4 rounded-container-token md:basis-1/3 h-fit w-fit"
+                >
+                  <p>
+                    🤔
+                    <span class="italic">How far back can I go?</span>
+                  </p>
+                  <p>
+                    It depends on the location. For some places, the oldest
+                    available weather data is about 1940.
+                  </p>
+                </div>
+              </div>
+
+              <div
+                class="variant-outline-primary p-4 rounded-container-token w-fit"
+              >
+                <p class="font-bold">💡 Handy Hints</p>
+                <div class="ml-4">
+                  <p>- Choose a custom duration to make a smaller project.</p>
+                  <p>- If you're traveling, why not add multiple locations?</p>
+                </div>
+              </div>
+
+>>>>>>> main
               <div>
                 <img
                   src="/images/blog-images/2024-02-09-how-to-plan-a-temperature-blanket/cover.jpg"
