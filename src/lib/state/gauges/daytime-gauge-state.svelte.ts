@@ -1,12 +1,6 @@
 import { weather } from '$lib/state';
-import type { GaugeAttributes, GaugeStateInterface } from '$lib/types';
-import {
-  displayNumber,
-  getEvenlyDistributedRangeValuesWithEqualDayCount,
-  getIncrement,
-  getRanges,
-  getStart,
-} from '$lib/utils';
+import type { GaugeAttributes } from '$lib/types';
+import { displayNumber, getIncrement, getRanges, getStart } from '$lib/utils';
 import chroma from 'chroma-js';
 
 export const gaugeAttributes: GaugeAttributes = {

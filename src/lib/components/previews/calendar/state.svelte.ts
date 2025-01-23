@@ -1,5 +1,5 @@
-import CalendarPreview from '$lib/components/previews/CalendarPreview.svelte';
-import CalendarSettings from '$lib/components/previews/CalendarSettings.svelte';
+import Preview from '$lib/components/previews/calendar/Preview.svelte';
+import Settings from '$lib/components/previews/calendar/Settings.svelte';
 import { CHARACTERS_FOR_URL_HASH } from '$lib/constants';
 import { gauges, previews, weather } from '$lib/state';
 import {
@@ -73,9 +73,9 @@ export class CalendarPreviewClass {
 
   wpTagSlug = 'calendar';
 
-  previewComponent = CalendarPreview;
+  previewComponent = Preview;
 
-  settingsComponent = CalendarSettings;
+  settingsComponent = Settings;
 
   // *******************
   // User settings properties

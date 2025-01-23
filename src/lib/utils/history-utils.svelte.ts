@@ -30,8 +30,8 @@ import {
   project,
   weather,
 } from '$lib/state';
-import { calendarPreview } from '$lib/state/previews/calendar-preview-state.svelte';
-import { rowsPreview } from '$lib/state/previews/rows-preview-state.svelte';
+import { calendarPreview } from '$lib/components/previews/calendar/state.svelte';
+import { rowsPreview } from '$lib/components/previews/rows/state.svelte';
 import {
   exists,
   getProjectParametersFromURLHash,

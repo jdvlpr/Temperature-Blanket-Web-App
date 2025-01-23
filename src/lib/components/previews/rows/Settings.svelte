@@ -17,9 +17,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import NumberInputButton from '$lib/components/buttons/NumberInputButton.svelte';
   import ToggleSwitchGroup from '$lib/components/buttons/ToggleSwitchGroup.svelte';
   import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
+  import { rowsPreview } from '$lib/components/previews/rows/state.svelte';
   import { gauges, modal, weather } from '$lib/state';
-  import { rowsPreview } from '$lib/state/previews/rows-preview-state.svelte';
-  import { capitalizeFirstLetter, pluralize, setTargets } from '$lib/utils';
+  import { capitalizeFirstLetter, pluralize } from '$lib/utils';
 
   let targets = $derived(gauges.allCreated.map((n) => n.targets).flat());
 </script>

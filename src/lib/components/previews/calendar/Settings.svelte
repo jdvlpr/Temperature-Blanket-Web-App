@@ -17,9 +17,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
   import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
   import SquareDesigner from '$lib/components/modals/SquareDesigner.svelte';
+  import { calendarPreview } from '$lib/components/previews/calendar/state.svelte';
   import { DAYS_OF_THE_WEEK } from '$lib/constants';
   import { gauges, modal, weather } from '$lib/state';
-  import { calendarPreview } from '$lib/state/previews/calendar-preview-state.svelte';
 
   let targets = $derived(gauges.allCreated.map((n) => n.targets).flat());
 

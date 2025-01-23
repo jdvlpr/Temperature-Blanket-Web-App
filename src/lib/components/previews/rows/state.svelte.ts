@@ -1,9 +1,9 @@
-import RowsPreview from '$lib/components/previews/RowsPreview.svelte';
-import RowsSettings from '$lib/components/previews/RowsSettings.svelte';
 import { CHARACTERS_FOR_URL_HASH } from '$lib/constants';
 import { gauges, previews, weather } from '$lib/state';
 import { displayNumber, setTargets, sum } from '$lib/utils';
 import chroma from 'chroma-js';
+import Preview from './Preview.svelte';
+import Settings from './Settings.svelte';
 
 export class RowsPreviewClass {
   constructor() {
@@ -41,9 +41,9 @@ export class RowsPreviewClass {
 
   wpTagSlug = 'rows';
 
-  previewComponent = RowsPreview;
+  previewComponent = Preview;
 
-  settingsComponent = RowsSettings;
+  settingsComponent = Settings;
 
   // *******************
   // User settings properties

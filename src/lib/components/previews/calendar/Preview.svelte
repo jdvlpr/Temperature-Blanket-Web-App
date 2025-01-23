@@ -14,8 +14,8 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
+  import { calendarPreview } from '$lib/components/previews/calendar/state.svelte';
   import { gauges, project, weather } from '$lib/state';
-  import { calendarPreview } from '$lib/state/previews/calendar-preview-state.svelte';
   import {
     getColorInfo,
     getTargetParentGaugeId,

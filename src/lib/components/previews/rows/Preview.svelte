@@ -15,7 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import { gauges, project, weather } from '$lib/state';
-  import { rowsPreview } from '$lib/state/previews/rows-preview-state.svelte';
+  import { rowsPreview } from '$lib/components/previews/rows/state.svelte';
   import {
     getColorInfo,
     getTargetParentGaugeId,

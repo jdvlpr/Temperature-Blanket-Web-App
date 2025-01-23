@@ -13,13 +13,13 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { calendarPreview } from './previews/calendar-preview-state.svelte';
-import { rowsPreview } from './previews/rows-preview-state.svelte';
+import { calendarPreview } from '$lib/components/previews/calendar/state.svelte';
+import { rowsPreview } from '$lib/components/previews/rows/state.svelte';
 
 export const previewWeatherTargets = $state({ value: [] });
 
 class PreviewsState {
-  all = $state([rowsPreview, calendarPreview]);
+  all = $state([calendarPreview, rowsPreview]);
 
   activeId = $state();
 

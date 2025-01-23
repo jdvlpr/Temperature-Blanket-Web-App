@@ -14,12 +14,14 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { version } from '$app/environment';
+import { calendarPreview } from '$lib/components/previews/calendar/state.svelte';
 import { load as loadChev } from '$lib/components/previews/ChevronsSettings.svelte';
 import { load as loadCosq } from '$lib/components/previews/ContinuousSquareSettings.svelte';
 import { load as loadCrnr } from '$lib/components/previews/CornerToCornerSettings.svelte';
 import { load as loadTsun } from '$lib/components/previews/DaytimeRowsSettings.svelte';
 import { load as loadMrws } from '$lib/components/previews/MonthRowsSettings.svelte';
 import { load as loadMsqs } from '$lib/components/previews/MonthSquaresSettings.svelte';
+import { rowsPreview } from '$lib/components/previews/rows/state.svelte';
 import { load as loadSmsq } from '$lib/components/previews/SplitMonthSquaresSettings.svelte';
 import { load as loadSqrs } from '$lib/components/previews/SquaresSettings.svelte';
 import {
@@ -34,8 +36,6 @@ import {
   project,
   weather,
 } from '$lib/state';
-import { rowsPreview } from '$lib/state/previews/rows-preview-state.svelte';
-import { calendarPreview } from '$lib/state/previews/calendar-preview-state.svelte';
 import {
   celsiusToFahrenheit,
   dateToISO8601String,
