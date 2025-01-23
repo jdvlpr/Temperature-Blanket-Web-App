@@ -38,9 +38,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
             classNames={[
               `flex flex-col justify-center items-center disabled:opacity-30 p-2 pb-4 md:pb-2 w-full text-token
                                 data-[active=false]:data-[no-weather=true]:opacity-50 
-                                data-[pinned=false]:data-[active=true]:data-[no-weather=false]:variant-filled-primary
+                                data-[pinned=false]:data-[active=true]:data-[no-weather=false]:dark:bg-primary-900
+                                data-[pinned=false]:data-[active=true]:data-[no-weather=false]:dark:!text-surface-50
+                                data-[pinned=false]:data-[active=true]:data-[no-weather=false]:bg-primary-300
+                                data-[pinned=false]:data-[active=true]:data-[no-weather=false]:!text-surface-900
                                 hover:data-[no-weather=false]:data-[active=false]:bg-primary-hover-token`,
-
               !weather.data && 'bg-none backdrop-blur-none',
             ]}
           >
