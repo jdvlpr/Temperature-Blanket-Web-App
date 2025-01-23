@@ -17,7 +17,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { browser } from '$app/environment';
   import { activeTheme, previews } from '$lib/state';
   import { onDestroy, onMount } from 'svelte';
-  import { previewsData } from './previews.svelte';
 
   onMount(() => {
     window
@@ -63,7 +62,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           previews.activeId = e.target.value;
         }}
       >
-        {#each previewsData as { name, id }}
+        {#each previews.all as { name, id }}
           <option value={id}>{name}</option>
         {/each}
       </select>

@@ -2,19 +2,52 @@ import RowsPreview from '$lib/components/previews/RowsPreview.svelte';
 import RowsSettings from '$lib/components/previews/RowsSettings.svelte';
 import { CHARACTERS_FOR_URL_HASH } from '$lib/constants';
 import { gauges, previews, weather } from '$lib/state';
-import { displayNumber, sum } from '$lib/utils';
+import { displayNumber, setTargets, sum } from '$lib/utils';
 import chroma from 'chroma-js';
 
-function getTotalStitches(target, perRow, perDay) {
-  if (target === 'none') return perRow * weather.data?.length;
-  if (target === 'custom') return perDay * weather.data?.length;
-  return sum(target);
-}
-
 export class RowsPreviewClass {
+  constructor() {
+    $effect.root(() => {
+      // If a gauge is created or deleted, handle updating the available weather parameter targets
+      $effect(() => {
+        if (gauges.allCreated.length) {
+          this.settings.selectedTargets = setTargets(
+            this.settings.selectedTargets,
+          );
+        }
+      });
+    });
+  }
+
+  // *******************
+  // Constant properties
+  // *******************
   stitchSize = 10;
+
   id = 'rows';
+
   name = 'Rows';
+
+  sections = $state([]);
+
+  svg = $state(null);
+
+  img = $state({
+    light: './images/preview_icons/Rows.png',
+    dark: './images/preview_icons/Rows White.png',
+  });
+
+  wpTagId = 2;
+
+  wpTagSlug = 'rows';
+
+  previewComponent = RowsPreview;
+
+  settingsComponent = RowsSettings;
+
+  // *******************
+  // User settings properties
+  // *******************
   settings = $state({
     selectedTargets: ['tmax'],
     stitchesPerRow: 300,
@@ -23,40 +56,38 @@ export class RowsPreviewClass {
     extrasColor: '#f0f3f3',
   });
 
-  totalStitches = $derived(
-    getTotalStitches(
-      this.settings.lengthTarget,
-      this.settings.stitchesPerRow,
-      this.settings.stitchesPerDay,
-      this.settings.rowsBetweenMonths,
-    ),
-  );
+  // *******************
+  // Derived properties
+  // *******************
+  totalStitches = $derived.by(() => {
+    if (this.settings.lengthTarget === 'none')
+      return this.settings.stitchesPerRow * weather.data?.length;
+    if (this.settings.lengthTarget === 'custom')
+      return this.settings.stitchesPerDay * weather.data?.length;
+    return sum(this.settings.lengthTarget);
+  });
+
   rows = $derived(Math.ceil(this.totalStitches / this.settings.stitchesPerRow));
+
   width = $derived(this.settings.stitchesPerRow * this.stitchSize);
+
   height = $derived(
     this.rows * this.stitchSize * this.settings.selectedTargets.length,
   );
+
   countOfAdditionalStitches = $derived(
     displayNumber(
       this.rows * this.settings.stitchesPerRow - this.totalStitches,
       6,
     ),
   );
-  sections = $state([]);
-  svg = $state(null);
+
   totalSections = $derived(
     this.countOfAdditionalStitches > 0
       ? weather.data?.length + 1
       : weather.data?.length,
   );
-  img = $state({
-    light: './images/preview_icons/Rows.png',
-    dark: './images/preview_icons/Rows White.png',
-  });
-  wpTagId = 2;
-  wpTagSlug = 'rows';
-  previewComponent = RowsPreview;
-  settingsComponent = RowsSettings;
+
   targets = $derived(
     gauges.allCreated
       .flatMap((n) => n.targets)
@@ -65,6 +96,9 @@ export class RowsPreviewClass {
 
   totalRows = $derived(this.rows * this.settings.selectedTargets.length);
 
+  // *******************
+  // URL hash derived from settings
+  // *******************
   hash = $derived.by(() => {
     let hash = '&';
     hash += `${this.id}=`;
@@ -85,6 +119,9 @@ export class RowsPreviewClass {
     return hash;
   });
 
+  // *******************
+  // Method for loading settings from a url hash string
+  // *******************
   load(hash) {
     // Initialize variables
     let startIndex, separatorIndex, exclamationIndex, lengthEndIndex;

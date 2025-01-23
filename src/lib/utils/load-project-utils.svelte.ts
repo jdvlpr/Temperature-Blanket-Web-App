@@ -14,7 +14,6 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { version } from '$app/environment';
-import { load as loadClnr } from '$lib/components/previews/CalendarSettings.svelte';
 import { load as loadChev } from '$lib/components/previews/ChevronsSettings.svelte';
 import { load as loadCosq } from '$lib/components/previews/ContinuousSquareSettings.svelte';
 import { load as loadCrnr } from '$lib/components/previews/CornerToCornerSettings.svelte';
@@ -36,6 +35,7 @@ import {
   weather,
 } from '$lib/state';
 import { rowsPreview } from '$lib/state/previews/rows-preview-state.svelte';
+import { calendarPreview } from '$lib/state/previews/calendar-preview-state.svelte';
 import {
   celsiusToFahrenheit,
   dateToISO8601String,
@@ -79,6 +79,7 @@ export const setProjectSettings = async (
 
   // Load Preview
   if (exists(params.rows)) rowsPreview.load(params.rows.value);
+  else if (exists(params.clnr)) calendarPreview.load(params.clnr.value);
   else if (exists(params.rsun)) loadTsun(params.rsun.value);
   else if (exists(params.chev)) loadChev(params.chev.value);
   else if (exists(params.cosq)) loadCosq(params.cosq.value);
@@ -87,7 +88,6 @@ export const setProjectSettings = async (
   else if (exists(params.mrws)) loadMrws(params.mrws.value);
   else if (exists(params.msqs)) loadMsqs(params.msqs.value);
   else if (exists(params.sqrs)) loadSqrs(params.sqrs.value);
-  else if (exists(params.clnr)) loadClnr(params.clnr.value);
 
   // Load Weather Source (added in v1.823)
   if (exists(params.s)) {

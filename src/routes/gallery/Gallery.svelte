@@ -20,9 +20,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ToTopButton from '$lib/components/buttons/ToTopButton.svelte';
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
   import ViewToggle from '$lib/components/buttons/ViewToggle.svelte';
-  import { previewsData } from '$lib/components/previews/previews.svelte';
   import { ICONS } from '$lib/constants';
-  import { layout } from '$lib/state';
+  import { layout, previews } from '$lib/state';
   import {
     fetchPopularProjects,
     fetchProjects,
@@ -329,7 +328,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 bind:value={galleryState.filteredPatternType}
               >
                 <option value="">Any Pattern</option>
-                {#each previewsData as { name, wpTagSlug }}
+                {#each previews.all as { name, wpTagSlug }}
                   <option value={wpTagSlug}>{name}</option>
                 {/each}
               </select>

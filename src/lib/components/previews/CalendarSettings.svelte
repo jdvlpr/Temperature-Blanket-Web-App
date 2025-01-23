@@ -13,160 +13,25 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script context="module">
-  import { CHARACTERS_FOR_URL_HASH } from '$lib/constants';
-  import { gauges, preview } from '$lib/state';
-  import { setSecondaryTargets } from '$lib/utils';
-  import chroma from 'chroma-js';
-  import { derived, writable } from 'svelte/store';
-
-  const id = 'clnr';
-
-  const defaultSettings = {
-    primaryTarget: 'tmax',
-    squareSize: 3,
-    secondaryTargets: [],
-    dimensions: '3x4',
-    weekStartCode: 1,
-    monthPadding: true,
-    additionalSquaresColor: '#f0f3f3',
-    primaryTargetAsBackup: 1,
-  };
-
-  export const settings = writable(JSON.parse(JSON.stringify(defaultSettings)));
-
-  export const hash = derived(settings, ($settings) => {
-    let hash = '&';
-    hash += `${id}=`;
-    hash += `${$settings.primaryTarget}(${$settings.squareSize}${CHARACTERS_FOR_URL_HASH.separator}${$settings.dimensions}${
-      CHARACTERS_FOR_URL_HASH.separator
-    }${$settings.weekStartCode}${CHARACTERS_FOR_URL_HASH.separator}${$settings.monthPadding ? 1 : 0}${
-      CHARACTERS_FOR_URL_HASH.separator
-    }${chroma($settings.additionalSquaresColor).hex().substring(1)})`;
-    hash += `${$settings.primaryTargetAsBackup}`;
-    if ($settings.secondaryTargets) {
-      $settings.secondaryTargets.forEach((item) => {
-        hash += `${item.targetId}(${item.indexes.join(CHARACTERS_FOR_URL_HASH.separator)})`;
-      });
-    }
-    return hash;
-  });
-
-  export const load = (hash) => {
-    let _settings = JSON.parse(JSON.stringify(defaultSettings));
-
-    let startIndex = [],
-      endIndex = [];
-    const separatorIndex = [];
-    for (let i = 0; i < hash.length; i++) {
-      if (hash[i] === '(') startIndex.push(i);
-      if (
-        hash[i] === CHARACTERS_FOR_URL_HASH.separator ||
-        hash[i] === CHARACTERS_FOR_URL_HASH.separator_alt
-      )
-        separatorIndex.push(i);
-      if (hash[i] === ')') endIndex.push(i);
-    }
-    if (!startIndex || !separatorIndex || !endIndex) return; // format of hash was wrong, so stop processing
-
-    _settings.primaryTarget = hash.substring(0, startIndex[0]);
-    _settings.squareSize = +hash.substring(
-      startIndex[0] + 1,
-      separatorIndex[0],
-    );
-    _settings.dimensions = hash.substring(
-      separatorIndex[0] + 1,
-      separatorIndex[1],
-    );
-    _settings.dimensions = _settings.dimensions.replace('×', 'x'); // sometimes firefox formated this as multiplcation sign
-    _settings.weekStartCode = +hash.substring(
-      separatorIndex[1] + 1,
-      separatorIndex[2],
-    );
-    _settings.monthPadding = +hash.substring(
-      separatorIndex[2] + 1,
-      separatorIndex[3],
-    );
-    _settings.additionalSquaresColor = chroma(
-      hash.substring(separatorIndex[3] + 1, endIndex[0]),
-    ).hex();
-    _settings.primaryTargetAsBackup = +hash.substring(
-      endIndex[0] + 1,
-      endIndex[0] + 2,
-    );
-    // Secondary Targets
-    if (startIndex.length > 1) {
-      for (let i = 1; i < startIndex.length; i++) {
-        let targetId = hash.substring(startIndex[i] - 4, startIndex[i]);
-        if (targetId === 'time') targetId = 'dayt'; // Bug fix in 1.67 (previous id was daytime so it got cut off)
-        const secondaryParamSeparatorIndex = separatorIndex.filter(
-          (item) => item > startIndex[i] && item < endIndex[i],
-        );
-        let start = startIndex[i] + 1;
-        for (
-          let positionIndex = 0;
-          positionIndex < secondaryParamSeparatorIndex.length + 1;
-          positionIndex++
-        ) {
-          let end =
-            typeof secondaryParamSeparatorIndex[positionIndex] === 'undefined'
-              ? endIndex[i]
-              : secondaryParamSeparatorIndex[positionIndex];
-          let value = hash.substring(start, end);
-          start = end + 1;
-          _settings.secondaryTargets = setSecondaryTargets(
-            [targetId, +value],
-            _settings.secondaryTargets,
-          );
-        }
-      }
-    }
-    settings.set(_settings);
-    preview.setId(id);
-  };
-</script>
-
 <script>
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
   import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
   import SquareDesigner from '$lib/components/modals/SquareDesigner.svelte';
   import { DAYS_OF_THE_WEEK } from '$lib/constants';
-  import { modal, weather } from '$lib/state';
-  import {
-    getFactors,
-    getMiddleValueOfArray,
-    getPossibleDimensions,
-    setTargets,
-    weatherMonthsData,
-  } from '$lib/utils';
+  import { gauges, modal, weather } from '$lib/state';
+  import { calendarPreview } from '$lib/state/previews/calendar-preview-state.svelte';
 
-  $: targets = gauges.allCreated.map((n) => n.targets).flat();
+  let targets = $derived(gauges.allCreated.map((n) => n.targets).flat());
 
-  $: months = weatherMonthsData({ weatherData: weather.data });
+  // let factors = $derived(getFactors({ length: calendarPreview.months.length }));
 
-  $: factors = getFactors({ length: months.length });
-
-  $: possibleDimensions = getPossibleDimensions({ factors });
-
-  $: if (weather.grouping === 'week') {
-    $settings.weekStartCode = weather.monthGroupingStartDay;
-  }
-  all;
-
-  $: if (gauges.allCreated) {
-    $settings.primaryTarget = setTargets($settings.primaryTarget);
-    $settings.secondaryTargets = setTargets($settings.secondaryTargets);
-  }
-  all;
-  // If a new weather search happens, and the current dimensions are not possible, set new dimensions
-  $: if (weather.data && !possibleDimensions.includes($settings.dimensions))
-    $settings.dimensions = getMiddleValueOfArray(possibleDimensions);
+  // let possibleDimensions = $derived(getPossibleDimensions({ factors }));
 
   function handelOkaySquareDesigner(e) {
-    $settings.squareSize = e.squareSize;
-    $settings.primaryTarget = e.primaryTarget;
-    $settings.secondaryTargets = e.secondaryTargets;
-    $settings.primaryTargetAsBackup = e.primaryTargetAsBackup;
+    calendarPreview.settings.squareSize = e.squareSize;
+    calendarPreview.settings.primaryTarget = e.primaryTarget;
+    calendarPreview.settings.secondaryTargets = e.secondaryTargets;
+    calendarPreview.settings.primaryTargetAsBackup = e.primaryTargetAsBackup;
   }
 </script>
 
@@ -179,9 +44,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <select
     class="select w-fit"
     id="clnr-dimensions"
-    bind:value={$settings.dimensions}
+    bind:value={calendarPreview.settings.dimensions}
   >
-    {#each possibleDimensions as value}
+    {#each calendarPreview.possibleDimensions as value}
       <option {value}>{value}</option>
     {/each}
   </select>
@@ -190,17 +55,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <button
   class="btn bg-secondary-hover-token gap-1"
   title="Edit Square Design"
-  on:click={async () => {
+  onclick={async () => {
     modal.state.trigger({
       type: 'component',
       component: {
         ref: SquareDesigner,
         props: {
           targets,
-          squareSize: $settings.squareSize,
-          primaryTarget: $settings.primaryTarget,
-          secondaryTargets: $settings.secondaryTargets,
-          primaryTargetAsBackup: $settings.primaryTargetAsBackup,
+          squareSize: calendarPreview.settings.squareSize,
+          primaryTarget: calendarPreview.settings.primaryTarget,
+          secondaryTargets: calendarPreview.settings.secondaryTargets,
+          primaryTargetAsBackup: calendarPreview.settings.primaryTargetAsBackup,
           onOkay: handelOkaySquareDesigner,
         },
       },
@@ -228,10 +93,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <span>Weeks Start On</span>
   <select
     class="select w-fit"
-    bind:value={$settings.weekStartCode}
-    on:change={() => {
+    bind:value={calendarPreview.settings.weekStartCode}
+    onchange={() => {
       if (weather.grouping === 'week')
-        weather.monthGroupingStartDay = $settings.weekStartCode;
+        weather.monthGroupingStartDay = calendarPreview.settings.weekStartCode;
     }}
   >
     {#each DAYS_OF_THE_WEEK as { value, label }}
@@ -242,7 +107,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <div class="flex gap-2 items-center">
   <ToggleSwitch
-    bind:checked={$settings.monthPadding}
+    bind:checked={calendarPreview.settings.monthPadding}
     label="Space around months"
   />
 </div>
@@ -250,14 +115,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <button
   class="btn bg-secondary-hover-token gap-1"
   title="Choose a Color"
-  on:click={() =>
+  onclick={() =>
     modal.state.trigger({
       type: 'component',
       component: {
         ref: ChangeColor,
         props: {
-          hex: $settings.additionalSquaresColor,
-          onChangeColor: ({ hex }) => ($settings.additionalSquaresColor = hex),
+          hex: calendarPreview.settings.additionalSquaresColor,
+          onChangeColor: ({ hex }) =>
+            (calendarPreview.settings.additionalSquaresColor = hex),
         },
       },
     })}

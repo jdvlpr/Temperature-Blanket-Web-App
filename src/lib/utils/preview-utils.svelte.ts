@@ -329,7 +329,7 @@ export const setTargets = (data) => {
 
     let _targets = data;
 
-    const isSecondarySquareParamData = data.some((n) => n?.targetId); // for square secondary params, arrays contian objects, not just strings
+    const isSecondarySquareParamData = data.some((n) => n?.targetId); // for square secondary params, arrays contain objects, not just strings
 
     if (isSecondarySquareParamData)
       _targets = data.map((n) => n.targetId).flat();

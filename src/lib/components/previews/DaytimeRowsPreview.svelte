@@ -23,7 +23,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     showPreviewImageWeatherDetails,
   } from '$lib/utils';
   import { settings } from './DaytimeRowsSettings.svelte';
-  import { previewsData } from './previews.svelte';
+  // import { previewsData } from './previews.svelte';
 
   const previewIndex = previewsData.findIndex((n) => n.id === 'rsun');
   const STITCH_SIZE = 10;

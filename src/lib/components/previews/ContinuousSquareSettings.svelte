@@ -15,7 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script context="module">
   import { CHARACTERS_FOR_URL_HASH } from '$lib/constants';
-  import { gauges, preview } from '$lib/state';
+  import { gauges } from '$lib/state';
   import { capitalizeFirstLetter, pluralize } from '$lib/utils';
   import chroma from 'chroma-js';
   import { derived, writable } from 'svelte/store';
@@ -81,7 +81,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     if (chroma.valid(color)) _settings.extrasColor = chroma(color).hex();
 
     settings.set(_settings);
-    preview.setId(id);
+    // preview.setId(id);
   };
 </script>
 

@@ -13,28 +13,13 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { previewsData } from '$lib/components/previews/previews.svelte';
-import type { Preview } from '$lib/types';
+import { calendarPreview } from './previews/calendar-preview-state.svelte';
+import { rowsPreview } from './previews/rows-preview-state.svelte';
 
 export const previewWeatherTargets = $state({ value: [] });
 
-class ActivePreviewClass {
-  rowsIndex = previewsData.findIndex((n) => n.id === 'rows'); // default preview is "rows"
-  current: Preview = $state(previewsData[this.rowsIndex]);
-  setId(id) {
-    previewsData
-      .filter((n) => n.id !== id)
-      .forEach((n) => {
-        n.svg = null;
-      });
-
-    this.current = previewsData.find((preview) => preview.id === id);
-  }
-}
-export const preview = new ActivePreviewClass();
-
 class PreviewsState {
-  all = $state([]);
+  all = $state([rowsPreview, calendarPreview]);
 
   activeId = $state();
 

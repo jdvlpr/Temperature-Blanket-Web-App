@@ -23,7 +23,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     weatherMonthsData,
   } from '$lib/utils';
   import { details, settings } from './SplitMonthSquaresSettings.svelte';
-  import { previewsData } from './previews.svelte';
+  // import { previewsData } from './previews.svelte';
 
   let svg;
   const previewIndex = previewsData.findIndex((n) => n.id === 'smsq');

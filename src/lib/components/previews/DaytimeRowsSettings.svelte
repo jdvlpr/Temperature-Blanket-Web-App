@@ -14,7 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script context="module">
-  import { gauges, locations, preview } from '$lib/state';
+  import { gauges, locations } from '$lib/state';
   import { derived, writable } from 'svelte/store';
 
   const id = 'rsun';
@@ -93,7 +93,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     }
 
     settings.set(_settings);
-    preview.setId(id);
+    // preview.setId(id);
   };
 </script>
 

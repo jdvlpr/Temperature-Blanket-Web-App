@@ -14,7 +14,6 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { browser } from '$app/environment';
-import { load as loadClnr } from '$lib/components/previews/CalendarSettings.svelte';
 import { load as loadChev } from '$lib/components/previews/ChevronsSettings.svelte';
 import { load as loadCosq } from '$lib/components/previews/ContinuousSquareSettings.svelte';
 import { load as loadCrnr } from '$lib/components/previews/CornerToCornerSettings.svelte';
@@ -31,6 +30,7 @@ import {
   project,
   weather,
 } from '$lib/state';
+import { calendarPreview } from '$lib/state/previews/calendar-preview-state.svelte';
 import { rowsPreview } from '$lib/state/previews/rows-preview-state.svelte';
 import {
   exists,
@@ -133,6 +133,14 @@ export const loadFromHistory = ({ action }: { action: 'Undo' | 'Redo' }) => {
       rowsPreview.load(newParams.rows.value);
       message = 'Preview';
     }
+  } else if (exists(newParams.clnr)) {
+    if (
+      !exists(oldParams.clnr) ||
+      oldParams.clnr.value !== newParams.clnr.value
+    ) {
+      calendarPreview.load(newParams.clnr.value);
+      message = 'Preview';
+    }
   } else if (exists(newParams.rsun)) {
     if (
       !exists(oldParams.rsun) ||
@@ -195,14 +203,6 @@ export const loadFromHistory = ({ action }: { action: 'Undo' | 'Redo' }) => {
       oldParams.sqrs.value !== newParams.sqrs.value
     ) {
       loadSqrs(newParams.sqrs.value);
-      message = 'Preview';
-    }
-  } else if (exists(newParams.clnr)) {
-    if (
-      !exists(oldParams.clnr) ||
-      oldParams.clnr.value !== newParams.clnr.value
-    ) {
-      loadClnr(newParams.clnr.value);
       message = 'Preview';
     }
   }

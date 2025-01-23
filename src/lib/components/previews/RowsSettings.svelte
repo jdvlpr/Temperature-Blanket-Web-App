@@ -22,21 +22,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { capitalizeFirstLetter, pluralize, setTargets } from '$lib/utils';
 
   let targets = $derived(gauges.allCreated.map((n) => n.targets).flat());
-
-  let debounceTimer;
-  const debounce = (callback, time) => {
-    window.clearTimeout(debounceTimer);
-    debounceTimer = window.setTimeout(callback, time);
-  };
-
-  $effect(() => {
-    debounce(() => {
-      if (gauges.allCreated)
-        rowsPreview.settings.selectedTargets = setTargets(
-          rowsPreview.settings.selectedTargets,
-        );
-    }, 1000);
-  });
 </script>
 
 <div class="w-full italic">

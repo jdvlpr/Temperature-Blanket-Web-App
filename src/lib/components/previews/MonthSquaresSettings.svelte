@@ -15,7 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script context="module">
   import { CHARACTERS_FOR_URL_HASH } from '$lib/constants';
-  import { gauges, preview } from '$lib/state';
+  import { gauges } from '$lib/state';
   import chroma from 'chroma-js';
   import { derived, writable } from 'svelte/store';
 
@@ -69,7 +69,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       hash.substring(separatorIndex[1] + 1, endIndex[0]),
     ).hex();
     settings.set(_settings);
-    preview.setId(id);
+    // preview.setId(id);
   };
 </script>
 
@@ -82,7 +82,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     getFactors,
     getMiddleValueOfArray,
     getPossibleDimensions,
-    setTargets,
     weatherMonthsData,
   } from '$lib/utils';
 

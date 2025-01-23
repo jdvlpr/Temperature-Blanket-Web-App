@@ -15,7 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script context="module">
   import { CHARACTERS_FOR_URL_HASH } from '$lib/constants';
-  import { gauges, preview } from '$lib/state';
+  import { gauges } from '$lib/state';
   import {
     capitalizeFirstLetter,
     getMiddleValueOfArray,
@@ -103,7 +103,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       : _settings.borderColor;
 
     settings.set(_settings);
-    preview.setId(id);
+    // preview.setId(id);
   };
 </script>
 
