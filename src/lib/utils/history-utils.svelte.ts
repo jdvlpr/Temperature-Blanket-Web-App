@@ -14,7 +14,6 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { browser } from '$app/environment';
-import { load as loadChev } from '$lib/components/previews/ChevronsSettings.svelte';
 import { load as loadCosq } from '$lib/components/previews/ContinuousSquareSettings.svelte';
 import { load as loadCrnr } from '$lib/components/previews/CornerToCornerSettings.svelte';
 import { load as loadTsun } from '$lib/components/previews/DaytimeRowsSettings.svelte';
@@ -31,6 +30,7 @@ import {
   weather,
 } from '$lib/state';
 import { calendarPreview } from '$lib/components/previews/calendar/state.svelte';
+import { chevronsPreview } from '$lib/components/previews/chevrons/state.svelte';
 import { rowsPreview } from '$lib/components/previews/rows/state.svelte';
 import {
   exists,
@@ -125,20 +125,22 @@ export const loadFromHistory = ({ action }: { action: 'Undo' | 'Redo' }) => {
   }
 
   // Change Preview
-  if (exists(newParams.rows)) {
-    if (
-      !exists(oldParams.rows) ||
-      oldParams.rows.value !== newParams.rows.value
-    ) {
-      rowsPreview.load(newParams.rows.value);
-      message = 'Preview';
-    }
-  } else if (exists(newParams.clnr)) {
+  if (exists(newParams.clnr)) {
     if (
       !exists(oldParams.clnr) ||
       oldParams.clnr.value !== newParams.clnr.value
     ) {
+      // Load Calendar Preview
       calendarPreview.load(newParams.clnr.value);
+      message = 'Preview';
+    }
+  } else if (exists(newParams.chev)) {
+    if (
+      !exists(oldParams.chev) ||
+      oldParams.chev.value !== newParams.chev.value
+    ) {
+      // Load Chevron Preview
+      chevronsPreview.load(newParams.chev.value);
       message = 'Preview';
     }
   } else if (exists(newParams.rsun)) {
@@ -147,14 +149,6 @@ export const loadFromHistory = ({ action }: { action: 'Undo' | 'Redo' }) => {
       oldParams.rsun.value !== newParams.rsun.value
     ) {
       loadTsun(newParams.rsun.value);
-      message = 'Preview';
-    }
-  } else if (exists(newParams.chev)) {
-    if (
-      !exists(oldParams.chev) ||
-      oldParams.chev.value !== newParams.chev.value
-    ) {
-      loadChev(newParams.chev.value);
       message = 'Preview';
     }
   } else if (exists(newParams.cosq)) {
@@ -195,6 +189,15 @@ export const loadFromHistory = ({ action }: { action: 'Undo' | 'Redo' }) => {
       oldParams.msqs.value !== newParams.msqs.value
     ) {
       loadMsqs(newParams.msqs.value);
+      message = 'Preview';
+    }
+  } else if (exists(newParams.rows)) {
+    if (
+      !exists(oldParams.rows) ||
+      oldParams.rows.value !== newParams.rows.value
+    ) {
+      // Load Rows Preview
+      rowsPreview.load(newParams.rows.value);
       message = 'Preview';
     }
   } else if (exists(newParams.sqrs)) {

@@ -39,6 +39,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { getToastStore } from '@skeletonlabs/skeleton';
   import ModalShell from './ModalShell.svelte';
   import { ICONS } from '$lib/constants';
+  import { replaceState } from '$app/navigation';
 
   const toastStore = getToastStore();
 
@@ -90,15 +91,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     try {
       const newURL = new URL(project.url.href);
-      window.history.replaceState({ path: newURL.href }, '', newURL.href);
+      replaceState(newURL, '');
       setLocalStorageProject();
-      currentSavedProject = JSON.parse(
-        localStorage.getItem('projects'),
-      )?.filter((project) => project.url.href === project.url.href)?.[0];
+      currentSavedProject = JSON.parse(localStorage.getItem('projects'))?.find(
+        (_project) => _project.href === project.url.href,
+      );
       project.status.saved = true;
-    } catch {
+    } catch (e) {
       currentSavedProject = null;
-      console.log("Can't save project");
+      console.log("Can't save project", { e });
     }
   }
 

@@ -15,7 +15,7 @@
 
 import { version } from '$app/environment';
 import { calendarPreview } from '$lib/components/previews/calendar/state.svelte';
-import { load as loadChev } from '$lib/components/previews/ChevronsSettings.svelte';
+import { chevronsPreview } from '$lib/components/previews/chevrons/state.svelte';
 import { load as loadCosq } from '$lib/components/previews/ContinuousSquareSettings.svelte';
 import { load as loadCrnr } from '$lib/components/previews/CornerToCornerSettings.svelte';
 import { load as loadTsun } from '$lib/components/previews/DaytimeRowsSettings.svelte';
@@ -78,14 +78,14 @@ export const setProjectSettings = async (
   });
 
   // Load Preview
-  if (exists(params.rows)) rowsPreview.load(params.rows.value);
-  else if (exists(params.clnr)) calendarPreview.load(params.clnr.value);
+  if (exists(params.clnr)) calendarPreview.load(params.clnr.value);
   else if (exists(params.rsun)) loadTsun(params.rsun.value);
-  else if (exists(params.chev)) loadChev(params.chev.value);
+  else if (exists(params.chev)) chevronsPreview.load(params.chev.value);
   else if (exists(params.cosq)) loadCosq(params.cosq.value);
   else if (exists(params.crnr)) loadCrnr(params.crnr.value);
   else if (exists(params.smsq)) loadSmsq(params.smsq.value);
   else if (exists(params.mrws)) loadMrws(params.mrws.value);
+  else if (exists(params.rows)) rowsPreview.load(params.rows.value);
   else if (exists(params.msqs)) loadMsqs(params.msqs.value);
   else if (exists(params.sqrs)) loadSqrs(params.sqrs.value);
 

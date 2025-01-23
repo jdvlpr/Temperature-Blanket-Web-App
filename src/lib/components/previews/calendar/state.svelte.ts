@@ -235,8 +235,6 @@ export class CalendarPreviewClass {
   // Method for loading settings from a url hash string
   // *******************
   load(hash) {
-    let _settings = JSON.parse(JSON.stringify(defaultSettings));
-
     let startIndex = [],
       endIndex = [];
     const separatorIndex = [];

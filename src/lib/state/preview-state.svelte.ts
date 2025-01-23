@@ -14,12 +14,13 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { calendarPreview } from '$lib/components/previews/calendar/state.svelte';
+import { chevronsPreview } from '$lib/components/previews/chevrons/state.svelte';
 import { rowsPreview } from '$lib/components/previews/rows/state.svelte';
 
 export const previewWeatherTargets = $state({ value: [] });
 
 class PreviewsState {
-  all = $state([calendarPreview, rowsPreview]);
+  all = $state([calendarPreview, chevronsPreview, rowsPreview]);
 
   activeId = $state();
 

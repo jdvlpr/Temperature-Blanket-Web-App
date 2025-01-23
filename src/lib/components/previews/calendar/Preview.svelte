@@ -33,7 +33,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   $effect(() => {
     project.url.href;
-    if (!weather.data || !gauges.allCreated) return;
+    if (!weather.data.length || !gauges.allCreated.length) return;
     debounce(() => {
       let row = 0;
       let additionalSquaresAddedCount = 0;

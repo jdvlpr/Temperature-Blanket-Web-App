@@ -14,9 +14,6 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import { createBubbler } from 'svelte/legacy';
-
-  const bubble = createBubbler();
   import ColorPalette from '$lib/components/ColorPalette.svelte';
   import { ICONS, MAXIMUM_YARN_DETAILS_DESCRIPTIONS } from '$lib/constants';
   import { getColorsFromInput, pluralize } from '$lib/utils';
@@ -25,10 +22,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
    * @typedef {Object} Props
    * @property {any} project
    * @property {boolean} [canRemove]
+   * @property {() => void} [onclick]
    */
 
   /** @type {Props} */
-  let { project, canRemove = true } = $props();
+  let { project, canRemove = true, onclick } = $props();
 
   const { href, title, date, isCustomWeatherData } = project;
   let colors = getColorsFromInput({ string: href });
@@ -82,7 +80,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     />
   </div>
   {#if canRemove}
-    <button class="btn-icon bg-secondary-hover-token" onclick={bubble('click')}>
+    <button class="btn-icon bg-secondary-hover-token" {onclick}>
       {@html ICONS.trash}
     </button>
   {/if}

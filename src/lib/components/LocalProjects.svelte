@@ -17,10 +17,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { browser } from '$app/environment';
   import ProjectDetails from '$lib/components/ProjectDetails.svelte';
 
-  $: projects =
-    browser && localStorage.getItem('projects')
-      ? JSON.parse(localStorage.getItem('projects'))?.reverse()
-      : [];
+  let projects = $state([]);
+
+  $effect(() => {
+    projects =
+      browser && localStorage.getItem('projects')
+        ? JSON.parse(localStorage.getItem('projects'))?.reverse()
+        : [];
+  });
 </script>
 
 {#key projects}
@@ -33,9 +37,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {@const { href } = project}
           <ProjectDetails
             {project}
-            on:click={() => {
+            onclick={() => {
               const newProjects = projects.filter(
-                (project) => project.url.href !== href,
+                (_project) => _project.href !== href,
               );
               localStorage.setItem('projects', JSON.stringify(newProjects));
               projects = newProjects;

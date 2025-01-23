@@ -18,7 +18,14 @@ import {
   skeletonTheme,
   skeletonThemes,
 } from '$lib/components/ThemeSwitcher.svelte';
-import { initialLayout, layout, locations, theme, weather } from '$lib/state';
+import {
+  initialLayout,
+  layout,
+  locations,
+  project,
+  theme,
+  weather,
+} from '$lib/state';
 import type {
   PageLayout,
   SavedProject,
@@ -167,8 +174,8 @@ export const setLocalStorageProject = () => {
 
   const localProjects = JSON.parse(localStorage.getItem('projects'));
 
-  const projectIDs = localProjects?.map((project) =>
-    new URL(project.url.href).searchParams.get('project'),
+  const projectIDs = localProjects?.map((_project) =>
+    new URL(_project.href).searchParams.get('project'),
   );
 
   const thisID = new URL(project.url.href).searchParams.get('project');
@@ -182,9 +189,11 @@ export const setLocalStorageProject = () => {
     localProjects.splice(index, 1);
   }
 
-  const project = createProjectLocalStorageProjectObject();
+  const localProject = createProjectLocalStorageProjectObject();
 
-  const newProjects = localProjects ? [...localProjects, project] : [project];
+  const newProjects = localProjects.length
+    ? [...localProjects, localProject]
+    : [localProject];
 
   localStorage.setItem('projects', JSON.stringify(newProjects));
 };
@@ -225,7 +234,7 @@ const createProjectLocalStorageProjectObject = () => {
     useSecondary: weather.useSecondarySources,
   };
 
-  const project: SavedProject = {
+  const localProject: SavedProject = {
     date,
     isCustomWeatherData,
     href,
@@ -234,5 +243,5 @@ const createProjectLocalStorageProjectObject = () => {
     weatherSource,
   };
 
-  return project;
+  return localProject;
 };
