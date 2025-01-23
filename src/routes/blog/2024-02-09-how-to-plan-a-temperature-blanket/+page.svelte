@@ -217,7 +217,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     The website is the app. It's not in the Apple or Google app
                     store, but you can
                     <a
-                      href="https://www.cdc.gov/niosh/mining/content/hearingloss/installPWA.html"
+                      href="https://support.google.com/chrome/answer/9658361"
                       target="_blank"
                       class="link"
                       >install temperature-blanket.com like an app on your
