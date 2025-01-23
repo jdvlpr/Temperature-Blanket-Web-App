@@ -13,7 +13,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script context="module">
+<script module>
   import { localStorageStore } from '@skeletonlabs/skeleton';
   export const skeletonTheme = localStorageStore('skeletonTheme', 'classic');
   export const skeletonThemes = [
@@ -92,8 +92,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
     popup,
   } from '@skeletonlabs/skeleton';
 
-  export let showText = false;
-  export let target = 'popupTheme';
+  /**
+   * @typedef {Object} Props
+   * @property {boolean} [showText]
+   * @property {string} [target]
+   */
+
+  /** @type {Props} */
+  let { showText = false, target = 'popupTheme' } = $props();
 
   const popupTheme = {
     // Represents the type of event that opens/closed the popup
@@ -105,9 +111,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     closeQuery: '.close',
   };
 
-  $: skeletonThemeName = skeletonThemes.find(
-    (theme) => theme.id === $skeletonTheme,
-  )?.name;
+  let skeletonThemeName = $derived(
+    skeletonThemes.find((theme) => theme.id === $skeletonTheme)?.name,
+  );
 </script>
 
 <div class="w-fit text-left">
@@ -163,7 +169,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {#each THEMES as { name, id, icon, description }}
           <RadioItem
             bind:group={theme.value}
-            on:click={() => setTheme(id)}
+            onclick={() => setTheme(id)}
             name="theme-{id}"
             value={id}
             title={description}
@@ -184,7 +190,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             value={id}
             regionLead="w-16"
           >
-            <svelte:fragment slot="lead">
+            {#snippet lead()}
               <div
                 class="flex w-full h-6 overflow-hidden border-surface-50-900-token border"
                 style="border-radius:{rounded}"
@@ -203,7 +209,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 ></div>
                 <!-- <div class="flex-auto" style="background:{colors.tertiary}" /> -->
               </div>
-            </svelte:fragment>
+            {/snippet}
             {name}
           </ListBoxItem>
         {/each}

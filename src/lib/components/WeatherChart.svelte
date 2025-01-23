@@ -160,7 +160,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
           // events: ["click", "mousemove", "touchstart", "touchmove"],
           events: ['click'],
           animation: false,
-          // onHover,
           plugins: {
             tooltip: {
               enabled: true,
@@ -241,15 +240,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 
   export let weatherChart = browser ? new WeatherChartClass() : null;
-
-  function onHover(e) {
-    let value = weatherChart.current.scales.x.getValueForPixel(e.x);
-
-    if (value < 0) weather.currentIndex = 0;
-    else if (value > weather.data?.length - 1)
-      weather.currentIndex = weather.data?.length - 1;
-    else weather.currentIndex = value;
-  }
 </script>
 
 <script>

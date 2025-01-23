@@ -29,7 +29,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <svelte:window
-  on:resize={() => {
+  onresize={() => {
     debounce(() => {
       // when resizing the window, at certain widths the chart does not automatically resize
       // so force it to update

@@ -64,7 +64,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {#each gauges.allAvailable as { id, label }}
     <RadioItem
       bind:group={gauges.activeGaugeId}
-      on:click={(e) => {
+      onclick={(e) => {
         const id = e.target.value;
 
         if (!gauges.allCreated.map((gauge) => gauge.id).includes(id)) {

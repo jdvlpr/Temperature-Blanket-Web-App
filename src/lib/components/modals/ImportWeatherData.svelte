@@ -204,7 +204,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           bind:files={csvUpload}
           slotLead="justify-center"
           accept=".csv"
-          on:change={(event) => {
+          onchange={(event) => {
             submitForm(event);
           }}
         >

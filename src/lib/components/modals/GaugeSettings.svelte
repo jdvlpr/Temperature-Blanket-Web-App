@@ -266,7 +266,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <div class="flex flex-col justify-start items-start gap-1">
           <ChooseRangeDirection
             bind:direction={_gauge.rangeOptions.direction}
-            on:change={() => {
+            onchange={() => {
               changedGaugeDirectionOnCustomRanges =
                 _gauge.rangeOptions.isCustomRanges;
               if (changedGaugeDirectionOnCustomRanges) {

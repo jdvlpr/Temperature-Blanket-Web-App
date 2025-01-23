@@ -3,9 +3,19 @@
   import type { YarnWeight } from '$lib/types';
   import { pluralize } from '$lib/utils';
   import { brands } from '$lib/yarns/brands';
+  import { createBubbler } from 'svelte/legacy';
 
-  export let selectedBrandId = '';
-  export let selectedYarnWeightId = '';
+  interface Props {
+    selectedBrandId?: string;
+    selectedYarnWeightId?: string;
+    onchange?: (event: Event) => void;
+  }
+
+  let {
+    selectedBrandId = '',
+    selectedYarnWeightId = $bindable(''),
+    onchange,
+  }: Props = $props();
 
   const yarnWeightIds: YarnWeight['id'][] = [
     ...new Set(
@@ -82,7 +92,7 @@
       </svg></a
     >
   </span>
-  <select class="select" bind:value={selectedYarnWeightId} on:change>
+  <select class="select" bind:value={selectedYarnWeightId} {onchange}>
     <option value="">All</option>
     {#each yarnWeights as { name, id, numberOfYarns }}
       <option value={id}

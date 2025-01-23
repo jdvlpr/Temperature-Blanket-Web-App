@@ -16,14 +16,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import { pluralize } from '$lib/utils';
 
-  export let yarns,
-    showAllOption: boolean = false;
+  interface Props {
+    yarns: any;
+    showAllOption?: boolean;
+  }
 
-  $: numberOfAllYarnColorways = showAllOption
-    ? yarns
-        .flatMap((n) => n.colorways.map((m) => m.colors.length))
-        .reduce((partialSum, a) => partialSum + a, 0)
-    : 0;
+  let { yarns, showAllOption = false }: Props = $props();
+
+  let numberOfAllYarnColorways = $derived(
+    showAllOption
+      ? yarns
+          .flatMap((n) => n.colorways.map((m) => m.colors.length))
+          .reduce((partialSum, a) => partialSum + a, 0)
+      : 0,
+  );
 </script>
 
 {#if showAllOption && yarns.length > 1}

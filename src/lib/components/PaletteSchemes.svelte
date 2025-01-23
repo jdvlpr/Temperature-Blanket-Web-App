@@ -17,16 +17,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ColorPalette from '$lib/components/ColorPalette.svelte';
   import SelectNumberOfColors from '$lib/components/SelectNumberOfColors.svelte';
   import { SCHEMES } from '$lib/constants';
+  import { getModalStore } from '@skeletonlabs/skeleton';
   import chroma from 'chroma-js';
-  import { getContext } from 'svelte';
 
-  export let updateGauge, numberOfColors;
+  let { updateGauge, numberOfColors } = $props();
 
-  let close = null;
-  if (typeof getContext === 'function')
-    close = getContext('simple-modal')?.close;
+  const modalStore = getModalStore();
 
-  let currentScheme = 'Creative';
+  let currentScheme = $state('Creative');
   const schemes = [
     ...new Set(
       SCHEMES.map((item) => item.categories)
@@ -34,12 +32,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
         .sort(),
     ),
   ];
-
-  $: palettes = presets.filter((item) => {
-    return item.categories.includes(currentScheme);
-  });
-
-  $: presets = getPresetPalettes(numberOfColors);
 
   function getPresetPalettes(numberOfColors) {
     return SCHEMES.map((scheme) => {
@@ -54,6 +46,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
       return { ...scheme, colors };
     });
   }
+  let presets = $derived(getPresetPalettes(numberOfColors));
+  let palettes = $derived(
+    presets.filter((item) => {
+      return item.categories.includes(currentScheme);
+    }),
+  );
 </script>
 
 <div
@@ -77,7 +75,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       class="select truncate"
       id="select-sort-by"
       bind:value={currentScheme}
-      on:change={() => {
+      onchange={() => {
         if (typeof document.getElementsByClassName('content') !== 'undefined')
           document.getElementsByClassName('content')[0].scrollTop = 0;
       }}
@@ -98,12 +96,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <button
         type="button"
         class="cursor-pointer w-full"
-        on:click={() => {
+        onclick={() => {
           updateGauge({
             _colors: colors,
             _schemeId: value,
           });
-          if (close) close();
+          if ($modalStore[0]) modalStore.close();
         }}
         title="Use This Palette"
       >

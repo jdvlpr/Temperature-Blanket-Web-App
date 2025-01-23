@@ -16,7 +16,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script>
   import { RadioGroup, RadioItem } from '@skeletonlabs/skeleton';
 
-  let { direction = $bindable() } = $props();
+  let { direction = $bindable(), onchange } = $props();
 </script>
 
 <p class="flex justify-start items-start gap-1">
@@ -41,14 +41,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
 >
   <RadioItem
     bind:group={direction}
-    on:change
+    {onchange}
     name="direction-high-to-low"
     value={'high-to-low'}
     title="Set gauge direction to High to Low">High to Low</RadioItem
   >
   <RadioItem
     bind:group={direction}
-    on:change
+    {onchange}
     name="direction-low-to-high"
     value={'low-to-high'}
     title="Set gauge direction to Low to High">Low to High</RadioItem

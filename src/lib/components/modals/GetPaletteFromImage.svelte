@@ -428,7 +428,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <SelectYarnWeight
             {selectedBrandId}
             bind:selectedYarnWeightId
-            on:change={onYarnFilterChange}
+            onchange={onYarnFilterChange}
           />
         </div>
       {/key}

@@ -20,7 +20,7 @@ import { localStorageStore } from '@skeletonlabs/skeleton';
 import { MediaQuery } from 'svelte/reactivity';
 import { writable, type Writable } from 'svelte/store';
 
-export let modal = $state({ state: writable(null) });
+export const modal = $state({ state: writable(null) });
 
 export const disableToastAnalytics: Writable<boolean> = localStorageStore(
   'disable_toast_analytics',

@@ -33,7 +33,7 @@ import {
 import type { GaugeAttributes, GaugeStateInterface } from '$lib/types';
 import { colorsToYarnDetails, displayNumber } from '$lib/utils';
 
-export let showDaysInRange: { value: boolean } = $state({ value: true });
+export const showDaysInRange: { value: boolean } = $state({ value: true });
 
 class GaugesState {
   allCreated: GaugeStateInterface[] = $state([]);
