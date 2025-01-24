@@ -261,7 +261,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                             })}&f=${colorsToYarnDetails({ colors })}&v=${version}`} -->
                     <a
                       onclick={async () => {
-                        yarnPageState.colors = colors;
+                        yarnPageState.gauge.colors = colors;
                         await recordPageView(projectId);
                       }}
                       href="/yarn"
@@ -291,8 +291,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     <SelectYarn
                       preselectDefaultYarn={false}
                       disabled={loading}
-                      bind:selectedBrandId={yarnPaletteGalleryState.filteredBrandId}
-                      bind:selectedYarnId={yarnPaletteGalleryState.filteredYarnId}
+                      bind:selectedBrandId={
+                        yarnPaletteGalleryState.filteredBrandId
+                      }
+                      bind:selectedYarnId={
+                        yarnPaletteGalleryState.filteredYarnId
+                      }
                     />
                   </div>
 
@@ -302,7 +306,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     >
                       <ToggleSwitch
                         disabled={loading}
-                        bind:checked={yarnPaletteGalleryState.palettesContainOnlyFilteredYarn}
+                        bind:checked={
+                          yarnPaletteGalleryState.palettesContainOnlyFilteredYarn
+                        }
                         label="Only This {yarnPaletteGalleryState.filteredBrandId &&
                         yarnPaletteGalleryState.filteredYarnId
                           ? 'Yarn'
@@ -466,7 +472,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 {#each yarnPaletteGalleryState.palettes as { colors, schemeName, projectId }}
                   <a
                     onclick={async () => {
-                      yarnPageState.colors = colors;
+                      yarnPageState.gauge.colors = colors;
                       await recordPageView(projectId);
                     }}
                     href="/yarn"

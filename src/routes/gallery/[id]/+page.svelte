@@ -426,7 +426,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                               <a
                                 class="btn variant-ghost-primary w-fit m-auto mt-4 flex flex-wrap items-center gap-1"
                                 onclick={() => {
-                                  yarnPageState.colors = colors;
+                                  yarnPageState.gauge.colors = colors;
                                 }}
                                 href="/yarn"
                               >

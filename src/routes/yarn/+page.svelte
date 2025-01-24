@@ -24,7 +24,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import GaugeCustomizer from '$lib/components/GaugeCustomizer.svelte';
   import Share from '$lib/components/Share.svelte';
   import YarnSources from '$lib/components/YarnSources.svelte';
-  import { TemperatureGauge } from '$lib/state/gauges/temperature-gauge-state.svelte';
   import {
     colorsToCode,
     colorsToYarnDetails,
@@ -38,24 +37,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
     schemeId = $state('Custom');
   let isFinishedOnMount = $state(false);
 
-  let yarnGauge = $state(new TemperatureGauge());
-
   onMount(() => {
     urlParams = new URLSearchParams(window.location.search);
     // Load URL
     if (urlParams?.has('s')) {
-      yarnPageState.colors =
+      yarnPageState.gauge.colors =
         stringToColors({
           string: urlParams.get('s'),
-        }) || yarnPageState.colors;
+        }) || yarnPageState.gauge.colors;
     }
 
     if (urlParams?.has('f')) {
       let _yarnString = urlParams.get('f');
 
-      yarnPageState.colors = yarnDetailsToColors({
+      yarnPageState.gauge.colors = yarnDetailsToColors({
         string: _yarnString,
-        colors: $state.snapshot(yarnPageState.colors),
+        colors: $state.snapshot(yarnPageState.gauge.colors),
       });
     }
 
@@ -81,7 +78,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     return href;
   }
 
-  let shareableURL = $derived(getShareableURL(yarnPageState.colors));
+  let shareableURL = $derived(getShareableURL(yarnPageState.gauge.colors));
 </script>
 
 <svelte:head>
@@ -129,10 +126,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
               class="transition-opacity opacity-100 mt-4"
               class:opacity-50={!isFinishedOnMount}
             >
-              <Gauge bind:gauge={yarnGauge} />
+              <Gauge bind:gauge={yarnPageState.gauge} />
 
-              {#key yarnGauge.colors}
-                <GaugeCustomizer bind:gauge={yarnGauge} />
+              {#key yarnPageState.gauge.colors}
+                <GaugeCustomizer bind:gauge={yarnPageState.gauge} />
               {/key}
             </div>
           {/snippet}
