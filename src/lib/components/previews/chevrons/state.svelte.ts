@@ -56,19 +56,17 @@ export class ChevronsPreviewClass {
   // *******************
   // Derived properties
   // *******************
-  width = $derived(
-    this.settings.chevronsPerRow * this.settings.chevronSideLength,
-  );
+  chevronSideLength = $derived(this.settings.chevronSideLength * Math.sqrt(2));
+
+  chevronHeight = $derived(this.chevronSideLength / 2);
+
+  width = $derived(this.settings.chevronsPerRow * this.chevronSideLength);
 
   height = $derived(
     this.ROW_HEIGHT * weather.data?.length +
       this.ROW_HEIGHT * this.settings.selectedTargets.length +
       this.settings.chevronSideLength,
   );
-
-  chevronHeight = $derived(this.settings.chevronSideLength / 2);
-
-  chevronSideLength = $derived(this.settings.chevronSideLength * Math.sqrt(2));
 
   targets = $derived(
     gauges.allCreated

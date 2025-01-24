@@ -36,8 +36,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   $effect(() => {
     project.url.href;
-    // chevronsPreview.settings.chevronSideLength;
-    // chevronsPreview.settings.chevronsPerRow;
     if (!weather.data.length || !gauges.allCreated.length) return;
     debounce(() => {
       let total = weather.data?.length;
