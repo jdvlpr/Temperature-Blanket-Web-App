@@ -23,6 +23,31 @@ export const entries: ChangelogItem[] = [
     notes: [
       {
         icon: ICONS.checkCircle,
+        text: `43 colorways`,
+        title: 'Added Yarn: Tessiland - Chuck',
+      },
+    ],
+    version: '4.17.0',
+  },
+  {
+    notes: [
+      {
+        icon: ICONS.checkCircle,
+        text: `36 colorways`,
+        title: 'Added Yarn: DROPS - Lima',
+      },
+      {
+        icon: ICONS.checkCircle,
+        text: `33 colorways`,
+        title: 'Added Yarn: Hobbii - Daily Stitch Acrylic XL',
+      },
+    ],
+    version: '4.16.0',
+  },
+  {
+    notes: [
+      {
+        icon: ICONS.checkCircle,
         text: `65 colorways`,
         title: 'Added Yarn: Alize - Cotton Gold',
       },
