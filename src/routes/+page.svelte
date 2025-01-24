@@ -23,7 +23,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Locations from '$lib/components/Locations.svelte';
   import Navigation from '$lib/components/Navigation.svelte';
   import Previews from '$lib/components/Previews.svelte';
-  import SectionDetails from '$lib/components/SectionDetails.svelte';
   import Tooltip from '$lib/components/Tooltip.svelte';
   import WeatherSection from '$lib/components/WeatherSection.svelte';
   import DonateButton from '$lib/components/buttons/DonateButton.svelte';
@@ -34,7 +33,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { ICONS } from '$lib/constants';
   import {
     drawerState,
-    gauges,
     isDesktop,
     locations,
     modal,
@@ -471,9 +469,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </div>
         </div>
         <Card>
-          {#snippet header()}
-            <SectionDetails sectionIndex={1} />
-          {/snippet}
           {#snippet content()}
             <Locations />
           {/snippet}
@@ -491,9 +486,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
           class:hidden={pageSections.items[2].active === false}
         >
           <Card>
-            {#snippet header()}
-              <SectionDetails sectionIndex={2} />
-            {/snippet}
             {#snippet content()}
               <div class="max-w-[90vw] mx-auto">
                 <WeatherSection />
@@ -512,10 +504,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
           class:hidden={pageSections.items[3].active === false}
         >
           <Card>
-            {#snippet header()}
-              <SectionDetails sectionIndex={3} />
-            {/snippet}
-
             {#snippet content()}
               <Gauges />
             {/snippet}
@@ -540,10 +528,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
           class:hidden={pageSections.items[4].active === false}
         >
           <Card>
-            {#snippet header()}
-              <SectionDetails sectionIndex={4} />
-            {/snippet}
-
             {#snippet content()}
               <div>
                 <div class="p-4 my-2">

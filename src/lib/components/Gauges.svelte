@@ -60,35 +60,38 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 </script>
 
-<RadioGroup class="flex wrap gap-y-2" active="bg-secondary-active-token">
-  {#each gauges.allAvailable as { id, label }}
-    <RadioItem
-      bind:group={gauges.activeGaugeId}
-      onclick={(e) => {
-        const id = e.target.value;
+<div class="w-full overflow-scroll relative">
+  <RadioGroup
+    class="flex wrap gap-y-2 mt-4 mb-2"
+    active="bg-secondary-active-token"
+  >
+    {#each gauges.allAvailable as { id, label }}
+      <RadioItem
+        bind:group={gauges.activeGaugeId}
+        onclick={(e) => {
+          const id = e.target.value;
 
-        if (!gauges.allCreated.map((gauge) => gauge.id).includes(id)) {
-          // If the gauge is not created yet, then set it up
-          modalStore.trigger({
-            type: 'confirm',
-            title: `Add a ${label}?`,
-            body: `This will add a new gauge to your project. You can delete it later.`,
-            response: (response) => {
-              if (response) gauges.addById(id);
-            },
-          });
-        }
-      }}
-      name="gauge-{id}"
-      value={id}
-      title={label}
-    >
-      <span class="flex gap-1 justify-center items-center">
-        <span class="hidden min-[360px]:inline">{label}</span>
-      </span>
-    </RadioItem>
-  {/each}
-</RadioGroup>
+          if (!gauges.allCreated.map((gauge) => gauge.id).includes(id)) {
+            // If the gauge is not created yet, then set it up
+            modalStore.trigger({
+              type: 'confirm',
+              title: `Add a ${label}?`,
+              body: `This will add a new gauge to your project. You can delete it later.`,
+              response: (response) => {
+                if (response) gauges.addById(id);
+              },
+            });
+          }
+        }}
+        name="gauge-{id}"
+        value={id}
+        title={label}
+      >
+        <span class="whitespace-nowrap"> {label}</span>
+      </RadioItem>
+    {/each}
+  </RadioGroup>
+</div>
 <!-- <div class="inline-flex justify-center items-center gap-2 mb-2 mt-3">
   <label class="label">
     <select
