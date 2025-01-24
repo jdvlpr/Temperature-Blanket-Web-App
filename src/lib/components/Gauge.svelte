@@ -14,7 +14,6 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { browser } from '$app/environment';
   import { page } from '$app/state';
   import ColorPaletteEditable from '$lib/components/ColorPaletteEditable.svelte';
   import SelectNumberOfColors from '$lib/components/SelectNumberOfColors.svelte';
@@ -24,17 +23,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ImportExportPalette from '$lib/components/modals/ImportExportPalette.svelte';
   import RandomPalette from '$lib/components/modals/RandomPalette.svelte';
   import SortPalette from '$lib/components/modals/SortPalette.svelte';
-  import {
-    drawerState,
-    isDesktop,
-    modal,
-    pageSections,
-    pinAllSections,
-  } from '$lib/state';
+  import { drawerState, modal, pageSections, pinAllSections } from '$lib/state';
   import type { Color, GaugeSettingsType } from '$lib/types';
   import { createGaugeColors } from '$lib/utils';
   import { focusTrap, getModalStore } from '@skeletonlabs/skeleton';
-  import { Drawer } from 'vaul-svelte';
 
   let { gauge = $bindable() } = $props();
 
@@ -170,7 +162,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         />
       </svg>
       {#if !fullscreen}
-        Browse Palettes
+        Palettes
       {/if}
     </button>
 
@@ -207,7 +199,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </svg>
 
       {#if !fullscreen}
-        Choose Colorways
+        Colorways
       {/if}
     </button>
 
@@ -243,47 +235,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
         />
       </svg>
       {#if !fullscreen}
-        Image Palette
+        Image
       {/if}</button
     >
-
-    <button
-      class={[
-        'bg-secondary-hover-token',
-        fullscreen ? 'btn-icon' : 'btn justify-start',
-      ]}
-      title="Load Colors or Get a Palette Code to Share"
-      onclick={() =>
-        modal.state.trigger({
-          type: 'component',
-          component: {
-            ref: ImportExportPalette,
-            props: {
-              colors: $state.snapshot(gauge.colors),
-              updateGauge,
-            },
-          },
-        })}
-    >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke-width="1.5"
-        stroke="currentColor"
-        class={['size-6', !fullscreen && 'mr-1']}
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"
-        />
-      </svg>
-
-      {#if !fullscreen}
-        Import/Export
-      {/if}
-    </button>
 
     <button
       class={[
@@ -318,6 +272,43 @@ If not, see <https://www.gnu.org/licenses/>. -->
       >
       {#if !fullscreen}
         Random
+      {/if}
+    </button>
+
+    <button
+      class={[
+        'bg-secondary-hover-token',
+        fullscreen ? 'btn-icon' : 'btn justify-start',
+      ]}
+      title="Load Colors or Get a Palette Code to Share"
+      onclick={() =>
+        modal.state.trigger({
+          type: 'component',
+          component: {
+            ref: ImportExportPalette,
+            props: {
+              colors: $state.snapshot(gauge.colors),
+              updateGauge,
+            },
+          },
+        })}
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class={['size-6', !fullscreen && 'mr-1']}
+        viewBox="0 0 24 24"
+        ><path
+          fill="none"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="1.5"
+          d="M9.697 4L6.678 21M17.054 4l-3.019 17M21 8.781H3m18 7.438H3"
+        /></svg
+      >
+
+      {#if !fullscreen}
+        Codes
       {/if}
     </button>
 
