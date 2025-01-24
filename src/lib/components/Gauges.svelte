@@ -60,7 +60,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 </script>
 
-<div class="w-full overflow-scroll relative">
+<div class="w-full overflow-scroll relative hide-scrollbar">
   <RadioGroup
     class="flex wrap gap-y-2 mt-4 mb-2"
     active="bg-secondary-active-token"
@@ -69,8 +69,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <RadioItem
         bind:group={gauges.activeGaugeId}
         onclick={(e) => {
+          e.preventDefault();
           const id = e.target.value;
-
           if (!gauges.allCreated.map((gauge) => gauge.id).includes(id)) {
             // If the gauge is not created yet, then set it up
             modalStore.trigger({
@@ -81,6 +81,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 if (response) gauges.addById(id);
               },
             });
+          } else {
+            gauges.activeGaugeId = id;
           }
         }}
         name="gauge-{id}"
