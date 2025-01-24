@@ -53,6 +53,7 @@ import { brand as skeinz } from './skeinz/yarns';
 import { brand as sourceOfFibre } from './source-of-fibre/yarns';
 import { brand as stylecraft } from './stylecraft/yarns';
 import { brand as svartaFaret } from './svarta-faret/yarns';
+import { brand as tessiland } from './tessiland/yarns';
 import { brand as theWomensInstitute } from './the-womens-institute/yarns';
 import { brand as tricotCafe } from './tricot-cafe/yarns';
 import { brand as valleyYarns } from './valley-yarns/yarns';
@@ -118,6 +119,7 @@ export const brands: Brand[] = [
   sourceOfFibre,
   stylecraft,
   svartaFaret,
+  tessiland,
   theWomensInstitute,
   tricotCafe,
   valleyYarns,

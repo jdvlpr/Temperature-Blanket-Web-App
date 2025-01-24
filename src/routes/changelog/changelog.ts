@@ -23,6 +23,16 @@ export const entries: ChangelogItem[] = [
     notes: [
       {
         icon: ICONS.checkCircle,
+        text: `43 colorways`,
+        title: 'Added Yarn: Tessiland - Chuck',
+      },
+    ],
+    version: '4.17.0',
+  },
+  {
+    notes: [
+      {
+        icon: ICONS.checkCircle,
         text: `36 colorways`,
         title: 'Added Yarn: DROPS - Lima',
       },
