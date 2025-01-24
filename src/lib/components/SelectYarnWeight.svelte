@@ -13,7 +13,7 @@
 
   let {
     selectedBrandId = '',
-    selectedYarnWeightId = $bindable(''),
+    selectedYarnWeightId = $bindable(),
     onchange,
   }: Props = $props();
 
