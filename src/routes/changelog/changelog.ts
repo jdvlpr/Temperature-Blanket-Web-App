@@ -23,6 +23,16 @@ export const entries: ChangelogItem[] = [
     notes: [
       {
         icon: ICONS.checkCircle,
+        text: `33 colorways`,
+        title: 'Added Yarn: Hobbii - Daily Stitch Acrylic XL',
+      },
+    ],
+    version: '4.16.0',
+  },
+  {
+    notes: [
+      {
+        icon: ICONS.checkCircle,
         text: `65 colorways`,
         title: 'Added Yarn: Alize - Cotton Gold',
       },
