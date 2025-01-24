@@ -30,6 +30,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   const modalStore = getModalStore();
 
   let key = $state(false);
+
+  let allColorsHaveNames = $derived(_colors.every((color) => color?.name));
 </script>
 
 <ModalShell {parent}>
@@ -67,6 +69,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <option value="custom">Custom</option>
           <option value="light-to-dark">Lightest to Darkest</option>
           <option value="dark-to-light">Darkest to Lightest</option>
+          {#if allColorsHaveNames}
+            <option value="name">Name A-Z</option>
+            <option value="name-z-to-a">Name Z-A</option>
+          {/if}
         </select>
       </label>
 
