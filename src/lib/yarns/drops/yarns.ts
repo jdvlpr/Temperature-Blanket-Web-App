@@ -4,6 +4,7 @@ import { yarn as babyMerino } from './baby-merino/yarn';
 import { yarn as cottonLight } from './cotton-light/yarn';
 import { yarn as cottonMerino } from './cotton-merino/yarn';
 import { yarn as karisma } from './karisma/yarn';
+import { yarn as lima } from './lima/yarn';
 import { yarn as lovesYou7 } from './loves-you-7/yarn';
 import { yarn as lovesYou9 } from './loves-you-9/yarn';
 import { yarn as merinoExtraFine } from './merino-extra-fine/yarn';
@@ -20,6 +21,7 @@ export const brand: Brand = {
     cottonLight,
     cottonMerino,
     karisma,
+    lima,
     lovesYou7,
     lovesYou9,
     merinoExtraFine,
