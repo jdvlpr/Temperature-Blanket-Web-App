@@ -47,7 +47,6 @@ export class ChevronsPreviewClass {
   // *******************
   // User settings properties
   // *******************
-
   settings = $state({
     selectedTargets: ['tmax'],
     chevronsPerRow: 30,
@@ -57,7 +56,6 @@ export class ChevronsPreviewClass {
   // *******************
   // Derived properties
   // *******************
-
   width = $derived(
     this.settings.chevronsPerRow * this.settings.chevronSideLength,
   );
@@ -70,7 +68,7 @@ export class ChevronsPreviewClass {
 
   chevronHeight = $derived(this.settings.chevronSideLength / 2);
 
-  chevronSideLength = $derived(this.settings.chevronSideLength * Math.sqrt(1));
+  chevronSideLength = $derived(this.settings.chevronSideLength * Math.sqrt(2));
 
   targets = $derived(
     gauges.allCreated
@@ -86,7 +84,6 @@ export class ChevronsPreviewClass {
   // *******************
   // URL hash derived from settings
   // *******************
-
   hash = $derived.by(() => {
     let hash = '&';
     hash += `${this.id}=`;
