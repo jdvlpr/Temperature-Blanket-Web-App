@@ -309,7 +309,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         >
           <div class="flex flex-col">
             <p class="font-bold text-lg">Palette Code</p>
-            <p class="text-xs">To share between projects on this site</p>
+            <p class="text-xs">For sharing between projects on this site</p>
           </div>
           <p
             class="card variant-soft-primary p-4 basis-full w-full break-all text-token select-all"

@@ -57,7 +57,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let { updateGauge = null }: Props = $props();
 
-  let filtersExpanded = $state(false);
+  let filtersExpanded = $state(true);
 
   let first = 40;
   let loading = $state(true);
