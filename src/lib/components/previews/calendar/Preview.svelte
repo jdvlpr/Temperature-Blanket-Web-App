@@ -15,6 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import { calendarPreview } from '$lib/components/previews/calendar/state.svelte';
+  import Spinner from '$lib/components/Spinner.svelte';
   import { gauges, project, weather } from '$lib/state';
   import {
     getColorInfo,
@@ -160,39 +161,45 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 </script>
 
-<svg
-  id="preview-svg-image"
-  class="max-h-[80svh] mx-auto"
-  aria-hidden="true"
-  viewBox="0 0 {width} {height}"
-  bind:this={calendarPreview.svg}
-  onclick={(e) => {
-    if (e.target.tagName !== 'rect') return;
-    const group = e.target.parentElement;
-    if (group.tagName !== 'g') return;
+{#if !calendarPreview.sections.length}
+  <div class="w-full h-[80svh] inline-flex justify-center items-center">
+    <Spinner />
+  </div>
+{:else}
+  <svg
+    id="preview-svg-image"
+    class="max-h-[80svh] mx-auto"
+    aria-hidden="true"
+    viewBox="0 0 {width} {height}"
+    bind:this={calendarPreview.svg}
+    onclick={(e) => {
+      if (e.target.tagName !== 'rect') return;
+      const group = e.target.parentElement;
+      if (group.tagName !== 'g') return;
 
-    if (group.dataset.isweathersquare === 'true') {
-      let index = +group.dataset.dayindex;
-      weather.currentIndex = index;
+      if (group.dataset.isweathersquare === 'true') {
+        let index = +group.dataset.dayindex;
+        weather.currentIndex = index;
 
-      showPreviewImageWeatherDetails(calendarPreview.targets);
-    }
-  }}
->
-  {#each calendarPreview.sections as square}
-    <g
-      data-isweathersquare={square[0].isWeatherSquare}
-      data-dayindex={square[0].dayIndex}
-    >
-      {#each square as { color, x, y }}
-        <rect
-          width={calendarPreview.squareSectionSize}
-          height={calendarPreview.squareSectionSize}
-          fill={color}
-          {x}
-          {y}
-        />
-      {/each}
-    </g>
-  {/each}
-</svg>
+        showPreviewImageWeatherDetails(calendarPreview.targets);
+      }
+    }}
+  >
+    {#each calendarPreview.sections as square}
+      <g
+        data-isweathersquare={square[0].isWeatherSquare}
+        data-dayindex={square[0].dayIndex}
+      >
+        {#each square as { color, x, y }}
+          <rect
+            width={calendarPreview.squareSectionSize}
+            height={calendarPreview.squareSectionSize}
+            fill={color}
+            {x}
+            {y}
+          />
+        {/each}
+      </g>
+    {/each}
+  </svg>
+{/if}

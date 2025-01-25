@@ -23,6 +23,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '$lib/utils';
 
   let width = $state(rowsPreview.width);
+
   let height = $state(rowsPreview.height);
 
   function getSectionStitchesCount(dayIndex: number) {

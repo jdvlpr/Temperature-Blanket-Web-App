@@ -15,12 +15,18 @@
 
 import { calendarPreview } from '$lib/components/previews/calendar/state.svelte';
 import { chevronsPreview } from '$lib/components/previews/chevrons/state.svelte';
+import { continuousSquarePreview } from '$lib/components/previews/continuous-square/state.svelte';
 import { rowsPreview } from '$lib/components/previews/rows/state.svelte';
 
 export const previewWeatherTargets = $state({ value: [] });
 
 class PreviewsState {
-  all = $state([calendarPreview, chevronsPreview, rowsPreview]);
+  all = $state([
+    calendarPreview,
+    chevronsPreview,
+    continuousSquarePreview,
+    rowsPreview,
+  ]);
 
   activeId = $state();
 

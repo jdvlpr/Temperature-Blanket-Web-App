@@ -14,7 +14,6 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { browser } from '$app/environment';
-import { load as loadCosq } from '$lib/components/previews/ContinuousSquareSettings.svelte';
 import { load as loadCrnr } from '$lib/components/previews/CornerToCornerSettings.svelte';
 import { load as loadTsun } from '$lib/components/previews/DaytimeRowsSettings.svelte';
 import { load as loadMrws } from '$lib/components/previews/MonthRowsSettings.svelte';
@@ -31,6 +30,7 @@ import {
 } from '$lib/state';
 import { calendarPreview } from '$lib/components/previews/calendar/state.svelte';
 import { chevronsPreview } from '$lib/components/previews/chevrons/state.svelte';
+import { continuousSquarePreview } from '$lib/components/previews/continuous-square/state.svelte';
 import { rowsPreview } from '$lib/components/previews/rows/state.svelte';
 import {
   exists,
@@ -143,20 +143,20 @@ export const loadFromHistory = ({ action }: { action: 'Undo' | 'Redo' }) => {
       chevronsPreview.load(newParams.chev.value);
       message = 'Preview';
     }
+  } else if (exists(newParams.cosq)) {
+    if (
+      !exists(oldParams.cosq) ||
+      oldParams.cosq.value !== newParams.cosq.value
+    ) {
+      continuousSquarePreview.load(newParams.cosq.value);
+      message = 'Preview';
+    }
   } else if (exists(newParams.rsun)) {
     if (
       !exists(oldParams.rsun) ||
       oldParams.rsun.value !== newParams.rsun.value
     ) {
       loadTsun(newParams.rsun.value);
-      message = 'Preview';
-    }
-  } else if (exists(newParams.cosq)) {
-    if (
-      !exists(oldParams.cosq) ||
-      oldParams.cosq.value !== newParams.cosq.value
-    ) {
-      loadCosq(newParams.cosq.value);
       message = 'Preview';
     }
   } else if (exists(newParams.crnr)) {
