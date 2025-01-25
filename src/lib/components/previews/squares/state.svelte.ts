@@ -71,6 +71,7 @@ export class SquaresPreviewClass {
   // *******************
   // Derived properties
   // *******************
+
   monthSepparatorSquaresIndexes = $derived.by(() => {
     if (this.settings.squaresBetweenMonthsCount === 0) return [];
     let squaresIndexes = [];

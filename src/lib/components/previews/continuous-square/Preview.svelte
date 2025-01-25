@@ -163,7 +163,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       if (e.target.dataset.isextrastitch === 'true') return;
 
       weather.currentIndex = +e.target.dataset.dayindex;
-      showPreviewImageWeatherDetails(targets);
+      showPreviewImageWeatherDetails(continuousSquarePreview.targets);
     }}
   >
     {#each continuousSquarePreview.sections as { color, x, y, isExtraStitch, dayIndex }}
