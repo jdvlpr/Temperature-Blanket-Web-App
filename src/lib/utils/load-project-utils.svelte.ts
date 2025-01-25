@@ -18,7 +18,7 @@ import { calendarPreview } from '$lib/components/previews/calendar/state.svelte'
 import { chevronsPreview } from '$lib/components/previews/chevrons/state.svelte';
 import { continuousSquarePreview } from '$lib/components/previews/continuous-square/state.svelte';
 import { cornerToCornerPreview } from '$lib/components/previews/corner-to-corner/state.svelte';
-import { load as loadTsun } from '$lib/components/previews/DaytimeRowsSettings.svelte';
+import { daytimeRowsPreview } from '$lib/components/previews/daytime-rows/state.svelte';
 import { load as loadMrws } from '$lib/components/previews/MonthRowsSettings.svelte';
 import { load as loadMsqs } from '$lib/components/previews/MonthSquaresSettings.svelte';
 import { rowsPreview } from '$lib/components/previews/rows/state.svelte';
@@ -82,10 +82,10 @@ export const setProjectSettings = async (
   else if (exists(params.chev)) chevronsPreview.load(params.chev.value);
   else if (exists(params.cosq)) continuousSquarePreview.load(params.cosq.value);
   else if (exists(params.crnr)) cornerToCornerPreview.load(params.crnr.value);
+  else if (exists(params.rsun)) daytimeRowsPreview.load(params.rsun.value);
   else if (exists(params.smsq)) loadSmsq(params.smsq.value);
   else if (exists(params.mrws)) loadMrws(params.mrws.value);
   else if (exists(params.rows)) rowsPreview.load(params.rows.value);
-  else if (exists(params.rsun)) loadTsun(params.rsun.value);
   else if (exists(params.msqs)) loadMsqs(params.msqs.value);
   else if (exists(params.sqrs)) loadSqrs(params.sqrs.value);
 

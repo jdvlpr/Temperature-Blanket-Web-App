@@ -18,7 +18,7 @@ import { calendarPreview } from '$lib/components/previews/calendar/state.svelte'
 import { chevronsPreview } from '$lib/components/previews/chevrons/state.svelte';
 import { continuousSquarePreview } from '$lib/components/previews/continuous-square/state.svelte';
 import { cornerToCornerPreview } from '$lib/components/previews/corner-to-corner/state.svelte';
-import { load as loadTsun } from '$lib/components/previews/DaytimeRowsSettings.svelte';
+import { daytimeRowsPreview } from '$lib/components/previews/daytime-rows/state.svelte';
 import { load as loadMrws } from '$lib/components/previews/MonthRowsSettings.svelte';
 import { load as loadMsqs } from '$lib/components/previews/MonthSquaresSettings.svelte';
 import { rowsPreview } from '$lib/components/previews/rows/state.svelte';
@@ -164,7 +164,7 @@ export const loadFromHistory = ({ action }: { action: 'Undo' | 'Redo' }) => {
       !exists(oldParams.rsun) ||
       oldParams.rsun.value !== newParams.rsun.value
     ) {
-      loadTsun(newParams.rsun.value);
+      daytimeRowsPreview.load(newParams.rsun.value);
       message = 'Preview';
     }
   } else if (exists(newParams.smsq)) {
