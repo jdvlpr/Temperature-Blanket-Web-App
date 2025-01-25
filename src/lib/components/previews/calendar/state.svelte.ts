@@ -31,17 +31,16 @@ export class CalendarPreviewClass {
       // If the weather data is grouped by week, then update the start of the week to match the start of the month grouping day
       $effect(() => {
         if (weather.grouping === 'week')
-          calendarPreview.settings.weekStartCode =
-            weather.monthGroupingStartDay;
+          this.settings.weekStartCode = weather.monthGroupingStartDay;
       });
 
       // If a new weather search happens, and the current dimensions are not possible, set new dimensions
       $effect(() => {
         if (
           weather.data.length &&
-          !this.possibleDimensions.includes(calendarPreview.settings.dimensions)
+          !this.possibleDimensions.includes(this.settings.dimensions)
         )
-          calendarPreview.settings.dimensions = getMiddleValueOfArray(
+          this.settings.dimensions = getMiddleValueOfArray(
             this.possibleDimensions,
           );
       });

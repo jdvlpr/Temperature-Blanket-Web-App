@@ -14,16 +14,6 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { version } from '$app/environment';
-import { calendarPreview } from '$lib/components/previews/calendar/state.svelte';
-import { chevronsPreview } from '$lib/components/previews/chevrons/state.svelte';
-import { continuousSquarePreview } from '$lib/components/previews/continuous-square/state.svelte';
-import { cornerToCornerPreview } from '$lib/components/previews/corner-to-corner/state.svelte';
-import { daytimeRowsPreview } from '$lib/components/previews/daytime-rows/state.svelte';
-import { load as loadMrws } from '$lib/components/previews/MonthRowsSettings.svelte';
-import { load as loadMsqs } from '$lib/components/previews/MonthSquaresSettings.svelte';
-import { rowsPreview } from '$lib/components/previews/rows/state.svelte';
-import { load as loadSmsq } from '$lib/components/previews/SplitMonthSquaresSettings.svelte';
-import { load as loadSqrs } from '$lib/components/previews/SquaresSettings.svelte';
 import {
   CHARACTERS_FOR_URL_HASH,
   DAYS_OF_THE_WEEK,
@@ -33,6 +23,7 @@ import {
   allGaugesAttributes,
   gauges,
   locations,
+  previews,
   project,
   weather,
 } from '$lib/state';
@@ -78,16 +69,9 @@ export const setProjectSettings = async (
   });
 
   // Load Preview
-  if (exists(params.clnr)) calendarPreview.load(params.clnr.value);
-  else if (exists(params.chev)) chevronsPreview.load(params.chev.value);
-  else if (exists(params.cosq)) continuousSquarePreview.load(params.cosq.value);
-  else if (exists(params.crnr)) cornerToCornerPreview.load(params.crnr.value);
-  else if (exists(params.rsun)) daytimeRowsPreview.load(params.rsun.value);
-  else if (exists(params.smsq)) loadSmsq(params.smsq.value);
-  else if (exists(params.mrws)) loadMrws(params.mrws.value);
-  else if (exists(params.rows)) rowsPreview.load(params.rows.value);
-  else if (exists(params.msqs)) loadMsqs(params.msqs.value);
-  else if (exists(params.sqrs)) loadSqrs(params.sqrs.value);
+  previews.all.forEach((p) => {
+    if (exists(params[p.id])) p.load(params[p.id].value);
+  });
 
   // Load Weather Source (added in v1.823)
   if (exists(params.s)) {

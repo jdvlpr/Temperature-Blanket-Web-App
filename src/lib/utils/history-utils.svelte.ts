@@ -14,21 +14,12 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { browser } from '$app/environment';
-import { calendarPreview } from '$lib/components/previews/calendar/state.svelte';
-import { chevronsPreview } from '$lib/components/previews/chevrons/state.svelte';
-import { continuousSquarePreview } from '$lib/components/previews/continuous-square/state.svelte';
-import { cornerToCornerPreview } from '$lib/components/previews/corner-to-corner/state.svelte';
-import { daytimeRowsPreview } from '$lib/components/previews/daytime-rows/state.svelte';
-import { load as loadMrws } from '$lib/components/previews/MonthRowsSettings.svelte';
-import { load as loadMsqs } from '$lib/components/previews/MonthSquaresSettings.svelte';
-import { rowsPreview } from '$lib/components/previews/rows/state.svelte';
-import { load as loadSmsq } from '$lib/components/previews/SplitMonthSquaresSettings.svelte';
-import { load as loadSqrs } from '$lib/components/previews/SquaresSettings.svelte';
 import { ICONS } from '$lib/constants';
 import {
   allGaugesAttributes,
   gauges,
   locations,
+  previews,
   project,
   weather,
 } from '$lib/state';
@@ -125,90 +116,18 @@ export const loadFromHistory = ({ action }: { action: 'Undo' | 'Redo' }) => {
   }
 
   // Change Preview
-  if (exists(newParams.clnr)) {
-    if (
-      !exists(oldParams.clnr) ||
-      oldParams.clnr.value !== newParams.clnr.value
-    ) {
-      // Load Calendar Preview
-      calendarPreview.load(newParams.clnr.value);
-      message = 'Preview';
+
+  previews.all.forEach((p) => {
+    if (exists(newParams[p.id])) {
+      if (
+        !exists(oldParams[p.id]) ||
+        oldParams[p.id].value !== newParams[p.id].value
+      ) {
+        p.load(newParams[p.id].value);
+        message = 'Preview';
+      }
     }
-  } else if (exists(newParams.chev)) {
-    if (
-      !exists(oldParams.chev) ||
-      oldParams.chev.value !== newParams.chev.value
-    ) {
-      // Load Chevron Preview
-      chevronsPreview.load(newParams.chev.value);
-      message = 'Preview';
-    }
-  } else if (exists(newParams.cosq)) {
-    if (
-      !exists(oldParams.cosq) ||
-      oldParams.cosq.value !== newParams.cosq.value
-    ) {
-      continuousSquarePreview.load(newParams.cosq.value);
-      message = 'Preview';
-    }
-  } else if (exists(newParams.crnr)) {
-    if (
-      !exists(oldParams.crnr) ||
-      oldParams.crnr.value !== newParams.crnr.value
-    ) {
-      cornerToCornerPreview.load(newParams.crnr.value);
-      message = 'Preview';
-    }
-  } else if (exists(newParams.rsun)) {
-    if (
-      !exists(oldParams.rsun) ||
-      oldParams.rsun.value !== newParams.rsun.value
-    ) {
-      daytimeRowsPreview.load(newParams.rsun.value);
-      message = 'Preview';
-    }
-  } else if (exists(newParams.smsq)) {
-    if (
-      !exists(oldParams.smsq) ||
-      oldParams.smsq.value !== newParams.smsq.value
-    ) {
-      loadSmsq(newParams.smsq.value);
-      message = 'Preview';
-    }
-  } else if (exists(newParams.mrws)) {
-    if (
-      !exists(oldParams.mrws) ||
-      oldParams.mrws.value !== newParams.mrws.value
-    ) {
-      loadMrws(newParams.mrws.value);
-      message = 'Preview';
-    }
-  } else if (exists(newParams.msqs)) {
-    if (
-      !exists(oldParams.msqs) ||
-      oldParams.msqs.value !== newParams.msqs.value
-    ) {
-      loadMsqs(newParams.msqs.value);
-      message = 'Preview';
-    }
-  } else if (exists(newParams.rows)) {
-    if (
-      !exists(oldParams.rows) ||
-      oldParams.rows.value !== newParams.rows.value
-    ) {
-      // Load Rows Preview
-      rowsPreview.load(newParams.rows.value);
-      message = 'Preview';
-    }
-  } else if (exists(newParams.sqrs)) {
-    if (
-      !exists(oldParams.sqrs) ||
-      oldParams.sqrs.value !== newParams.sqrs.value
-    ) {
-      loadSqrs(newParams.sqrs.value);
-      message = 'Preview';
-    }
-  }
+  });
 
   if (message)
     project.history.updateMessage = `<span class="flex flex-wrap items-start gap-2"><span class="">${action === 'Undo' ? ICONS.arrowUturnLeft : ICONS.arrowUturnRight}</span> <span>${action}: ${message}</span></span>`;
