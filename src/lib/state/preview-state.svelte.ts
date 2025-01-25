@@ -19,6 +19,7 @@ import { continuousSquarePreview } from '$lib/components/previews/continuous-squ
 import { cornerToCornerPreview } from '$lib/components/previews/corner-to-corner/state.svelte';
 import { daytimeRowsPreview } from '$lib/components/previews/daytime-rows/state.svelte';
 import { monthRowsPreview } from '$lib/components/previews/month-rows/state.svelte';
+import { monthSquaresPreview } from '$lib/components/previews/month-squares/state.svelte';
 import { rowsPreview } from '$lib/components/previews/rows/state.svelte';
 
 export const previewWeatherTargets = $state({ value: [] });
@@ -31,6 +32,7 @@ class PreviewsState {
     cornerToCornerPreview,
     daytimeRowsPreview,
     monthRowsPreview,
+    monthSquaresPreview,
     rowsPreview,
   ]);
 

@@ -28,7 +28,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let isTableExpanded = $state(false);
 
-  let table;
+  let table = $state();
 
   $effect(() => {
     daytimeRowsPreview.tableData;

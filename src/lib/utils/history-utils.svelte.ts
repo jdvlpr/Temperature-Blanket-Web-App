@@ -116,7 +116,6 @@ export const loadFromHistory = ({ action }: { action: 'Undo' | 'Redo' }) => {
   }
 
   // Change Preview
-
   previews.all.forEach((p) => {
     if (exists(newParams[p.id])) {
       if (
