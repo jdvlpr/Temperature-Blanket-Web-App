@@ -1,14 +1,9 @@
 import { CHARACTERS_FOR_URL_HASH } from '$lib/constants';
-import { gauges, previews, project, weather } from '$lib/state';
-import {
-  displayNumber,
-  getWeatherTargets,
-  setTargets,
-  upToDate,
-} from '$lib/utils';
+import { gauges, previews, weather } from '$lib/state';
+import { displayNumber, getWeatherTargets, setTargets } from '$lib/utils';
+import chroma from 'chroma-js';
 import Preview from './Preview.svelte';
 import Settings from './Settings.svelte';
-import chroma from 'chroma-js';
 
 function getNumberOfStitchesInRound(round) {
   if (round === 1) return 4;

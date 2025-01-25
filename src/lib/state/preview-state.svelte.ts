@@ -16,6 +16,7 @@
 import { calendarPreview } from '$lib/components/previews/calendar/state.svelte';
 import { chevronsPreview } from '$lib/components/previews/chevrons/state.svelte';
 import { continuousSquarePreview } from '$lib/components/previews/continuous-square/state.svelte';
+import { cornerToCornerPreview } from '$lib/components/previews/corner-to-corner/state.svelte';
 import { rowsPreview } from '$lib/components/previews/rows/state.svelte';
 
 export const previewWeatherTargets = $state({ value: [] });
@@ -25,6 +26,7 @@ class PreviewsState {
     calendarPreview,
     chevronsPreview,
     continuousSquarePreview,
+    cornerToCornerPreview,
     rowsPreview,
   ]);
 

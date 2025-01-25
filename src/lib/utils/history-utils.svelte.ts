@@ -14,10 +14,14 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { browser } from '$app/environment';
-import { load as loadCrnr } from '$lib/components/previews/CornerToCornerSettings.svelte';
+import { calendarPreview } from '$lib/components/previews/calendar/state.svelte';
+import { chevronsPreview } from '$lib/components/previews/chevrons/state.svelte';
+import { continuousSquarePreview } from '$lib/components/previews/continuous-square/state.svelte';
+import { cornerToCornerPreview } from '$lib/components/previews/corner-to-corner/state.svelte';
 import { load as loadTsun } from '$lib/components/previews/DaytimeRowsSettings.svelte';
 import { load as loadMrws } from '$lib/components/previews/MonthRowsSettings.svelte';
 import { load as loadMsqs } from '$lib/components/previews/MonthSquaresSettings.svelte';
+import { rowsPreview } from '$lib/components/previews/rows/state.svelte';
 import { load as loadSmsq } from '$lib/components/previews/SplitMonthSquaresSettings.svelte';
 import { load as loadSqrs } from '$lib/components/previews/SquaresSettings.svelte';
 import { ICONS } from '$lib/constants';
@@ -28,10 +32,6 @@ import {
   project,
   weather,
 } from '$lib/state';
-import { calendarPreview } from '$lib/components/previews/calendar/state.svelte';
-import { chevronsPreview } from '$lib/components/previews/chevrons/state.svelte';
-import { continuousSquarePreview } from '$lib/components/previews/continuous-square/state.svelte';
-import { rowsPreview } from '$lib/components/previews/rows/state.svelte';
 import {
   exists,
   getProjectParametersFromURLHash,
@@ -151,20 +151,20 @@ export const loadFromHistory = ({ action }: { action: 'Undo' | 'Redo' }) => {
       continuousSquarePreview.load(newParams.cosq.value);
       message = 'Preview';
     }
+  } else if (exists(newParams.crnr)) {
+    if (
+      !exists(oldParams.crnr) ||
+      oldParams.crnr.value !== newParams.crnr.value
+    ) {
+      cornerToCornerPreview.load(newParams.crnr.value);
+      message = 'Preview';
+    }
   } else if (exists(newParams.rsun)) {
     if (
       !exists(oldParams.rsun) ||
       oldParams.rsun.value !== newParams.rsun.value
     ) {
       loadTsun(newParams.rsun.value);
-      message = 'Preview';
-    }
-  } else if (exists(newParams.crnr)) {
-    if (
-      !exists(oldParams.crnr) ||
-      oldParams.crnr.value !== newParams.crnr.value
-    ) {
-      loadCrnr(newParams.crnr.value);
       message = 'Preview';
     }
   } else if (exists(newParams.smsq)) {
