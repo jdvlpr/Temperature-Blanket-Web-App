@@ -33,11 +33,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     debounceTimer = window.setTimeout(callback, time);
   };
 
-  function getNextStitch({ x, y, stitch, round }) {
-    const unit = continuousSquarePreview.STITCH_SIZE * 2;
-    const doubleUnit = unit * 2;
+  let unit = $derived(continuousSquarePreview.STITCH_SIZE * 2);
+  let doubleUnit = $derived(unit * 2);
 
+  function getNextStitch({ x, y, stitch, round }) {
     const endOfRoundStitch = getEndOfRoundStitch(round);
+
     if (stitch === endOfRoundStitch)
       return { x: x - unit, y: y - unit, isEndOfRound: true }; // Up Left
 
