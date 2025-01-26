@@ -21,6 +21,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     getTargetParentGaugeId,
     showPreviewImageWeatherDetails,
   } from '$lib/utils';
+  import Spinner from '$lib/components/Spinner.svelte';
 
   let width = $state(rowsPreview.width);
 
@@ -160,29 +161,35 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 </script>
 
-<svg
-  id="preview-svg-image"
-  class="max-h-[80svh] mx-auto"
-  aria-hidden="true"
-  viewBox="0 0 {width} {height}"
-  bind:this={rowsPreview.svg}
-  onclick={async (e) => {
-    if (e.target.tagName !== 'rect') return;
-    const group = e.target.parentElement;
-    if (group.tagName !== 'g') return;
+{#if !rowsPreview.sections.length}
+  <div class="w-full h-[80svh] inline-flex justify-center items-center">
+    <Spinner />
+  </div>
+{:else}
+  <svg
+    id="preview-svg-image"
+    class="max-h-[80svh] mx-auto"
+    aria-hidden="true"
+    viewBox="0 0 {width} {height}"
+    bind:this={rowsPreview.svg}
+    onclick={async (e) => {
+      if (e.target.tagName !== 'rect') return;
+      const group = e.target.parentElement;
+      if (group.tagName !== 'g') return;
 
-    if (group.dataset.isweathersection === 'true') {
-      weather.currentIndex = +group.dataset.dayindex;
-      showPreviewImageWeatherDetails(rowsPreview.targets);
-    }
-  }}
->
-  {#each rowsPreview.sections as section}
-    {@const isWeather = section[0].isWeatherSection}
-    <g data-isweathersection={isWeather} data-dayindex={section[0].dayIndex}>
-      {#each section as { width, height, color, x, y }}
-        <rect {width} {height} fill={color} {x} {y} />
-      {/each}
-    </g>
-  {/each}
-</svg>
+      if (group.dataset.isweathersection === 'true') {
+        weather.currentIndex = +group.dataset.dayindex;
+        showPreviewImageWeatherDetails(rowsPreview.targets);
+      }
+    }}
+  >
+    {#each rowsPreview.sections as section}
+      {@const isWeather = section[0].isWeatherSection}
+      <g data-isweathersection={isWeather} data-dayindex={section[0].dayIndex}>
+        {#each section as { width, height, color, x, y }}
+          <rect {width} {height} fill={color} {x} {y} />
+        {/each}
+      </g>
+    {/each}
+  </svg>
+{/if}

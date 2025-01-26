@@ -24,6 +24,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '$lib/utils';
 
   let width = $state(calendarPreview.width);
+
   let height = $state(calendarPreview.height);
 
   let debounceTimer;

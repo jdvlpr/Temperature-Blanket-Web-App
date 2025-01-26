@@ -100,9 +100,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
         continuousSquarePreview.STITCH_SIZE * 4;
       let round = 1;
       let dayIndex = 0;
-      let value, gaugeId, color;
+      let value, color;
       let isExtraStitch = false;
       const sections = [];
+      const gaugeId = getTargetParentGaugeId(
+        continuousSquarePreview.settings.selectedTarget,
+      );
       for (
         let stitch = 1;
         stitch <= continuousSquarePreview.totalStitches;
@@ -113,9 +116,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
             weather.data[dayIndex][
               continuousSquarePreview.settings.selectedTarget
             ][project.units];
-          gaugeId = getTargetParentGaugeId(
-            continuousSquarePreview.settings.selectedTarget,
-          );
           color = getColorInfo(gaugeId, value).hex;
           isExtraStitch = false;
         } else {
