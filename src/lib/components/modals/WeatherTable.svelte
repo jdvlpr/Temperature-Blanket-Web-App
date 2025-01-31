@@ -54,8 +54,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     }),
   ]);
 
-  console.log({ weatherData, tableData });
-
   const table = $derived(new TableHandler(tableData, { rowsPerPage: 10 }));
 
   let dateHeader = $derived(weather.grouping === 'week' ? 'Week of' : 'Date');
