@@ -51,12 +51,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     upToDate,
   } from '$lib/utils';
   import { getToastStore } from '@skeletonlabs/skeleton';
-  import { getContext, onMount } from 'svelte';
-  import type { Context } from 'svelte-simple-modal';
+  import { onMount } from 'svelte';
   import { fade } from 'svelte/transition';
   import { Drawer } from 'vaul-svelte';
-
-  const { open } = getContext<Context>('simple-modal');
 
   let debounceTimer: number;
 
@@ -271,7 +268,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
         >
           <button
             class="btn variant-filled-secondary gap-1 items-center"
-            onclick={() => open(GettingStarted)}
+            onclick={() =>
+              modal.state.trigger({
+                type: 'component',
+                component: { ref: GettingStarted },
+              })}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
