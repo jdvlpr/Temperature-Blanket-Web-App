@@ -23,7 +23,8 @@
     "getimagepalette": "^2.4.0",
     "jspdf": "^2.3.1",
     "node-fetch": "^3.3.2",
-    "suncalc": "^1.9.0"
+    "suncalc": "^1.9.0",
+    "svelte-simple-modal": "^2.0.0"
   },
   "devDependencies": {
     "@playwright/test": "^1.50.0",

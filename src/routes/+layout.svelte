@@ -16,7 +16,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import { onNavigate } from '$app/navigation';
   import { PUBLIC_MICROSOFT_CLARITY_ID } from '$env/static/public';
-  import { consentToMSClarityCookies, modal } from '$lib/state';
+  import { consentToMSClarityCookies } from '$lib/state';
   import {
     handleKeyDown,
     privacy,
@@ -24,9 +24,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     setupLocalStorageTheme,
   } from '$lib/utils';
   import {
-    Modal,
     Toast,
-    getModalStore,
     getToastStore,
     initializeStores,
     storePopup,
@@ -40,6 +38,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     offset,
     shift,
   } from 'svelte-floating-ui/dom';
+  import Modal from 'svelte-simple-modal';
   import '../css/main.css';
   interface Props {
     children?: Snippet;
@@ -60,7 +59,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   const toastStore = getToastStore();
 
   onMount(async () => {
-    modal.state = getModalStore();
+    // modal.state = getModalStore();
     setupLocalStorageTheme();
     setupLocalStorageLayout();
 
@@ -183,7 +182,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <Toast max={3} position="b" zIndex={'z-[12000]'} />
 
-<Modal regionBackdrop="backdrop-blur-sm" zIndex={'z-[10010]'} />
+<!-- <Modal regionBackdrop="backdrop-blur-sm" zIndex={'z-[10010]'} /> -->
+
+<Modal><p>hello</p></Modal>
 
 <p
   class="sm:text-center px-4 py-8 bg-warning-backdrop-token text-token [view-transition-name:top-banner]"
