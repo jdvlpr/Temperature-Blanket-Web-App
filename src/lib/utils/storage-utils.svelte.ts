@@ -270,6 +270,7 @@ function getStorage(type: StorageType) {
   return type === 'local' ? localStorage : sessionStorage;
 }
 
+// This function was copied from: https://github.com/oMaN-Rod/svelte-persisted-state/blob/main/src/lib/index.svelte.ts
 export function persistedState<T>(
   key: string,
   initialValue: T,
