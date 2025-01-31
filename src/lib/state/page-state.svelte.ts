@@ -16,13 +16,13 @@
 import { browser } from '$app/environment';
 import { ICONS, THEMES } from '$lib/constants';
 import type { PageLayout } from '$lib/types';
-import { localStorageStore } from '@skeletonlabs/skeleton';
+import { persistedState } from '$lib/utils';
 import { MediaQuery } from 'svelte/reactivity';
-import { writable, type Writable } from 'svelte/store';
+import { writable } from 'svelte/store';
 
 export const modal = $state({ state: writable(null) });
 
-export const disableToastAnalytics: Writable<boolean> = localStorageStore(
+export const disableToastAnalytics = persistedState<boolean>(
   'disable_toast_analytics',
   false,
 );

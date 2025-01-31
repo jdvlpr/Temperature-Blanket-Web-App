@@ -16,7 +16,6 @@
 import { browser } from '$app/environment';
 import { consentToMSClarityCookies, disableToastAnalytics } from '$lib/state';
 import { getToastStore } from '@skeletonlabs/skeleton';
-import { get } from 'svelte/store';
 
 export const privacy = {
   get_cookie: function (name) {
@@ -73,7 +72,7 @@ export const privacy = {
     // Microsoft Clarity Cookie Names include '_clck' and '_clsk'
     // See https://learn.microsoft.com/en-us/clarity/setup-and-installation/cookie-list
     if (!this.get_cookie('_clck') || !this.get_cookie('_clsk')) {
-      if (!get(disableToastAnalytics)) {
+      if (!disableToastAnalytics.value) {
         toastStore.trigger({
           message: `
       <div class="flex flex-col gap-2 justify-start items-start">
@@ -110,8 +109,9 @@ export const privacy = {
             const dontShowAgainElement = document.getElementById(
               'cookies-dont-show-again',
             );
-            if (dontShowAgainElement?.checked) disableToastAnalytics.set(true);
-            else disableToastAnalytics.set(false);
+            if (dontShowAgainElement?.checked)
+              disableToastAnalytics.value = true;
+            else disableToastAnalytics.value = false;
 
             const consentToggleElement = document.getElementById(
               'clarity-consent-toggle',

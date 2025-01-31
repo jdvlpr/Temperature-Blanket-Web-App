@@ -108,11 +108,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
               target="_blank">Microsoft Privacy Statement</a
             >.
           </p>
-          {#if $disableToastAnalytics}
+          {#if disableToastAnalytics.value}
             <button
               class="btn variant-filled-secondary w-fit my-2 whitespace-pre-wrap"
               onclick={() => {
-                $disableToastAnalytics = false;
+                disableToastAnalytics.value = false;
                 toastStore.trigger({
                   message: 'The Analytics message can be shown again.',
                   background: 'bg-success-300 text-black',

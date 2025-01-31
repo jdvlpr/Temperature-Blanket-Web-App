@@ -14,8 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script module>
-  import { localStorageStore } from '@skeletonlabs/skeleton';
-  export const skeletonTheme = localStorageStore('skeletonTheme', 'classic');
+  export const skeletonTheme = persistedState('skeletonTheme', 'classic');
   export const skeletonThemes = [
     {
       id: 'classic',
@@ -83,7 +82,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script>
   import { THEMES } from '$lib/constants';
   import { activeTheme, theme } from '$lib/state';
-  import { setTheme } from '$lib/utils';
+  import { persistedState, setTheme } from '$lib/utils';
   import {
     ListBox,
     ListBoxItem,
@@ -112,7 +111,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   };
 
   let skeletonThemeName = $derived(
-    skeletonThemes.find((theme) => theme.id === $skeletonTheme)?.name,
+    skeletonThemes.find((theme) => theme.id === skeletonTheme.value)?.name,
   );
 </script>
 
@@ -185,7 +184,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <ListBox active="bg-secondary-active-token">
         {#each skeletonThemes as { name, id, colors, rounded }}
           <ListBoxItem
-            bind:group={$skeletonTheme}
+            bind:group={skeletonTheme.value}
             name="medium"
             value={id}
             regionLead="w-16"
