@@ -63,11 +63,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     const scrollObserver = new IntersectionObserver(
       (entries, observer) => {
         entries.forEach((entry) => {
-          if (entry.intersectionRatio === 0) {
-            showScrollToTopButton = true;
-          } else {
-            showScrollToTopButton = false;
-          }
+          showScrollToTopButton =
+            !entry.isIntersecting && entry.boundingClientRect.top < 0;
         });
       },
       { threshold: 0 },
@@ -138,18 +135,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     });
   }
 </script>
-
-{#if showScrollToTopButton && galleryState.projects.length}
-  <ToTopButton
-    bottom="1rem"
-    onClick={() => {
-      scrollContainer.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start',
-      });
-    }}
-  />
-{/if}
 
 <div class="flex flex-col justify-center gap-8">
   <div class="inline-grid gap-2 text-center">
@@ -531,3 +516,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </Card>
   </div>
 </div>
+
+{#if showScrollToTopButton && galleryState.projects.length}
+  <ToTopButton
+    bottom="1rem"
+    onClick={() => {
+      scrollContainer.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
+    }}
+  />
+{/if}

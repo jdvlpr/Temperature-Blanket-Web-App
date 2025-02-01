@@ -32,9 +32,6 @@ importers:
       suncalc:
         specifier: ^1.9.0
         version: 1.9.0
-      svelte-simple-modal:
-        specifier: ^2.0.0
-        version: 2.0.0(svelte@5.19.3)
     devDependencies:
       '@playwright/test':
         specifier: ^1.50.0
@@ -2124,11 +2121,6 @@ packages:
 
   svelte-floating-ui@1.5.9:
     resolution: {integrity: sha512-X5690AOuPlox+C2C4RvL6JAl/hDHEvwXXrUqWXYLN4L9ClMEZfZIfXYl8IMw6Mf7Hv9z8VjUKGsfN4IwxjDqSA==}
-
-  svelte-simple-modal@2.0.0:
-    resolution: {integrity: sha512-Rm7MnyL5lsTpai1aRtdq2Gku1VxrGYu1R//ygV3HIdzK1EuJeU6r+fAKc8sq8GMvL0wukaa9mnwBlrcoc2tXzg==}
-    peerDependencies:
-      svelte: ^5.0.0
 
   svelte-toolbelt@0.4.6:
     resolution: {integrity: sha512-k8OUvXBUifHZcAlWeY/HLg/4J0v5m2iOfOhn8fDmjt4AP8ZluaDh9eBFus9lFiLX6O5l6vKqI1dKL5wy7090NQ==}
@@ -4285,10 +4277,6 @@ snapshots:
     dependencies:
       '@floating-ui/core': 1.6.8
       '@floating-ui/dom': 1.6.11
-
-  svelte-simple-modal@2.0.0(svelte@5.19.3):
-    dependencies:
-      svelte: 5.19.3
 
   svelte-toolbelt@0.4.6(svelte@5.19.3):
     dependencies:
