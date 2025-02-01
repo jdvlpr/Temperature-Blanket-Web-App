@@ -9,6 +9,7 @@ import { yarn as swishBulky } from './swish-bulky/yarn';
 import { yarn as swishDK } from './swish-dk/yarn';
 import { yarn as swishWorsted } from './swish-worsted/yarn';
 import { yarn as woolOfTheAndesWorsted } from './wool-of-the-andes-worsted/yarn';
+import { yarn as woolenCotton } from './woolen-cotton/yarn';
 
 export const brand: Brand = {
   name: 'Knit Picks',
@@ -24,5 +25,6 @@ export const brand: Brand = {
     swishDK,
     swishWorsted,
     woolOfTheAndesWorsted,
+    woolenCotton,
   ],
 };
