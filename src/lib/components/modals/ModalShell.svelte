@@ -51,7 +51,6 @@
   });
 </script>
 
-<!-- TODO: Fix the tabindex warning -->
 <div
   role="button"
   bind:this={shellElement}
