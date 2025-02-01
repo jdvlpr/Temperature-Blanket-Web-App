@@ -89,42 +89,33 @@ If not, see <https://www.gnu.org/licenses/>. -->
         value={id}
         title={label}
       >
-        <span class="whitespace-nowrap"> {label}</span>
+        <span class="whitespace-nowrap">
+          {#if !gauges.allCreated.map((gauge) => gauge.id).includes(id)}
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="size-5 inline relative bottom-[2px]"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M12 4.5v15m7.5-7.5h-15"
+              />
+            </svg>
+          {/if}
+          {label}</span
+        >
       </RadioItem>
     {/each}
   </RadioGroup>
 </div>
-<!-- <div class="inline-flex justify-center items-center gap-2 mb-2 mt-3">
-  <label class="label">
-    <select
-      class="select w-fit"
-      id="gauges-select"
-      bind:value={gauges.activeGaugeId}
-      onchange={(e) => {
-        const id = e.target.value;
-
-        if (!gauges.allCreated.map((gauge) => gauge.id).includes(id)) {
-          // If the gauge is not created yet, then set it up
-          gauges.addById(id);
-        }
-      }}
-    >
-      {#each gauges.allAvailable as { id, label }}
-        <option value={id} selected={gauges.activeGaugeId === id}>
-          {#if !gauges.allCreated.map((gauge) => gauge.id).includes(id)}
-            Add
-          {/if}
-          {label}
-        </option>
-      {/each}
-    </select>
-  </label>
-</div> -->
-
 {#if gauges.activeGauge && !gauges.activeGauge?.calculating}
   {#if gauges.activeGauge.id !== 'temp'}
     <!-- If this is not the default temperature gauge and we're on the project planner page -->
-    <div class="w-full flex justify-center mb-4">
+    <div class="w-full flex justify-center mb-4 sm:mb-8">
       <button
         class="btn bg-secondary-hover-token justify-start gap-1 top-2 relative max-sm:mb-2"
         title="Delete {gauges.activeGauge.label}"

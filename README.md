@@ -8,10 +8,16 @@ Visualize your city's historical climate data, create color gauges, and preview 
 
 Built with:
 
-- [Svelte 5 & Sveltekit](https://svelte.dev/)
-- [Tailwind](https://github.com/tailwindlabs/tailwindcss)
+- [Svelte 5](https://svelte.dev/)
+- [Sveltekit 2](https://svelte.dev/)
 - [Skeleton](https://github.com/skeletonlabs/skeleton)
-- And [more...](package.json)
+- [Tailwind](https://github.com/tailwindlabs/tailwindcss)
+
+What's new in version 5?
+
+- Fullscreen color editor
+- Option to show color details in the weather table
+- Move colors directly in the gauge editor
 
 ## 🚀 Getting Started
 

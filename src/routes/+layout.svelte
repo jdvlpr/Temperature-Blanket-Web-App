@@ -194,16 +194,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
     viewBox="0 0 24 24"
     stroke-width="1.5"
     stroke="currentColor"
-    class="size-5 inline-block relative -top-[1px]"
+    class="size-6 inline-block -top-1"
   >
     <path
       stroke-linecap="round"
       stroke-linejoin="round"
-      d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z"
+      d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"
     />
   </svg>
-  This version is for testing purposes and some features may be broken. For the stable
-  website, visit
+
+  This version is for testing purposes and some features may be broken. For the
+  stable website, visit
   <a href="https://temperature-blanket.com" class="link" target="_blank"
     >temperature-blanket.com</a
   >.
