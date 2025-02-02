@@ -41,13 +41,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Spinner from '$lib/components/Spinner.svelte';
   import YarnSources from '$lib/components/YarnSources.svelte';
   import ToTopButton from '$lib/components/buttons/ToTopButton.svelte';
-  import ViewToggle from '$lib/components/buttons/ViewToggle.svelte';
+  import ViewToggleBindable from '$lib/components/buttons/ViewToggleBindable.svelte';
   import {
     ALL_COLORWAYS_WITH_AFFILIATE_LINKS,
     ALL_YARN_WEIGHTS,
     YARN_COLORWAYS_PER_PAGE,
   } from '$lib/constants';
-  import { layout } from '$lib/state';
   import type { YarnWeight } from '$lib/types';
   import {
     getTextColor,
@@ -72,6 +71,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let results = $state([]);
   let gettingResults = $state(true);
   let loadingAllColors = $state(false);
+
+  let layout = $state('grid');
 
   let debounceTimer;
   const debounce = (callback, time) => {
@@ -501,7 +502,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 >
                   <SelectYarn
                     preselectDefaultYarn={false}
-                    bind:selectedBrandId={yarnColorwayFinderState.selectedBrandId}
+                    bind:selectedBrandId={
+                      yarnColorwayFinderState.selectedBrandId
+                    }
                     bind:selectedYarnId={yarnColorwayFinderState.selectedYarnId}
                     selectedYarnWeightId={yarnColorwayFinderState.selectedYarnWeightId}
                   />
@@ -514,7 +517,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 >
                   <SelectYarnWeight
                     selectedBrandId={yarnColorwayFinderState.selectedBrandId}
-                    bind:selectedYarnWeightId={yarnColorwayFinderState.selectedYarnWeightId}
+                    bind:selectedYarnWeightId={
+                      yarnColorwayFinderState.selectedYarnWeightId
+                    }
                   />
                 </div>
               {/key}
@@ -630,12 +635,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 {/if}
                 {pluralize('Colorway', totalResults)}
               </p>
-              <ViewToggle />
+              <ViewToggleBindable bind:value={layout} />
             {/if}
 
             {#if results?.length && !loadingAllColors}
               <div
-                class="rounded-container-token overflow-hidden my-4 justify-center w-full gap-1 {layout.value ===
+                class="rounded-container-token overflow-hidden my-4 justify-center w-full gap-1 {layout ===
                 'grid'
                   ? 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5'
                   : 'flex flex-col'}"
@@ -643,13 +648,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 {#each results as { hex, name, delta, brandName, yarnName, variant_href, affiliate_variant_href, unavailable }}
                   {@const percentMatch = delta ? Math.floor(100 - delta) : null}
                   <div
-                    class="shadow-sm flex-1 min-w-fit p-2 flex items-center gap-x-2 rounded-container-token {layout.value ===
+                    class="shadow-sm flex-1 min-w-fit p-2 flex items-center gap-x-2 rounded-container-token {layout ===
                     'grid'
                       ? 'justify-center'
                       : ''}"
                     style="background:{hex}; color:{getTextColor(hex)};"
                   >
-                    <!-- <div class={layout.value === "grid" ? "" : "md:w-2/5"}></div> -->
+                    <!-- <div class={layout === "grid" ? "" : "md:w-2/5"}></div> -->
                     <div class="min-w-[43px] min-h-[43px]">
                       {#if !unavailable}
                         {#if affiliate_variant_href}

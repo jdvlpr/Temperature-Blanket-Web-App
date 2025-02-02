@@ -17,12 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { onNavigate } from '$app/navigation';
   import { PUBLIC_MICROSOFT_CLARITY_ID } from '$env/static/public';
   import { consentToMSClarityCookies, modal } from '$lib/state';
-  import {
-    handleKeyDown,
-    privacy,
-    setupLocalStorageLayout,
-    setupLocalStorageTheme,
-  } from '$lib/utils';
+  import { handleKeyDown, initializeLocalStorage, privacy } from '$lib/utils';
   import {
     Modal,
     Toast,
@@ -61,8 +56,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   onMount(async () => {
     modal.state = getModalStore();
-    // setupLocalStorageTheme();
-    setupLocalStorageLayout();
+
+    initializeLocalStorage();
 
     // NOTE: Set window variable in order to access it inside the MS clarity function
     // See the script tag with id="clarity-script"

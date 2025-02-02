@@ -21,7 +21,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ViewToggle from '$lib/components/buttons/ViewToggle.svelte';
   import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
   import { ICONS } from '$lib/constants';
-  import { layout, modal, showDaysInRange } from '$lib/state';
+  import { preferences, modal, showDaysInRange } from '$lib/state';
   import type { Color } from '$lib/types';
   import { getTextColor } from '$lib/utils';
   import { dragHandle, dragHandleZone, SOURCES } from 'svelte-dnd-action';
@@ -178,8 +178,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </div>
 
 <div
-  class="rounded-container-token overflow-hidden mt-2 mb-2 lg:mb-4 {layout.value ===
-  'grid'
+  class="rounded-container-token overflow-hidden mt-2 mb-2 lg:mb-4 {preferences
+    .value.layout === 'grid'
     ? 'gap-1 grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4'
     : 'flex flex-col'}"
   use:dragHandleZone={{
@@ -193,8 +193,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 >
   {#each sortableColors as { hex, name, brandId, yarnId, brandName, yarnName, variant_href, affiliate_variant_href, id }, index (id)}
     <div
-      class="color p-2 gap-2 flex flex-wrap items-center justify-around {layout.value ===
-      'grid'
+      class="color p-2 gap-2 flex flex-wrap items-center justify-around {preferences
+        .value.layout === 'grid'
         ? 'rounded-container-token md:basis-1/5 sm:basis-1/4 basis-1/3 flex-auto'
         : ''}"
       style="background:{hex};color:{getTextColor(hex)}"

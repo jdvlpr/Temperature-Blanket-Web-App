@@ -19,9 +19,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import SelectYarn from '$lib/components/SelectYarn.svelte';
   import ToTopButton from '$lib/components/buttons/ToTopButton.svelte';
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
-  import ViewToggle from '$lib/components/buttons/ViewToggle.svelte';
+  import ViewToggleBindable from '$lib/components/buttons/ViewToggleBindable.svelte';
   import { ICONS } from '$lib/constants';
-  import { layout, previews } from '$lib/state';
+  import { previews } from '$lib/state';
   import {
     fetchPopularProjects,
     fetchProjects,
@@ -38,6 +38,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let projectsList = $state();
   let totalProjects = $state(0);
   let featuredProjectsEl = $state();
+  let layout = $state('grid');
 
   onMount(async () => {
     if (!galleryState.projects.length) {
@@ -417,10 +418,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
           class="flex flex-col items-center scroll-mt-[58px] lg:scroll-mt-[44px] bg-surface-50-900-token p-2 rounded-container-token"
           bind:this={projectsList}
         >
-          <div class="my-2 mx-auto"><ViewToggle /></div>
+          <div class="my-2 mx-auto">
+            <ViewToggleBindable bind:value={layout} />
+          </div>
 
           <div
-            class=" gap-2 my-2 w-full {layout.value === 'grid'
+            class=" gap-2 my-2 w-full {layout === 'grid'
               ? 'grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 justify-center items-start '
               : 'flex flex-col items-start justify-start'}"
           >
@@ -428,7 +431,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               {@const title = getTitleFromLocationsMeta(locations)}
               <a
                 href="/gallery/{databaseId}"
-                class="text-center bg-surface-hover-token rounded-container-token p-2 flex gap-1 group {layout.value ===
+                class="text-center bg-surface-hover-token rounded-container-token p-2 flex gap-1 group {layout ===
                 'grid'
                   ? 'flex-col items-center justify-center'
                   : 'flex-col items-center justify-start w-full'}"
@@ -437,7 +440,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   src={featuredImage?.node?.mediaDetails.sizes?.[0].sourceUrl ||
                     featuredImage?.node?.mediaItemUrl}
                   alt="Preview"
-                  class={layout.value === 'grid'
+                  class={layout === 'grid'
                     ? 'max-w-[130px] sm:max-w-[210px] md:max-w-[215px]'
                     : 'max-w-full max-h-[900px]'}
                 />
@@ -454,13 +457,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {/if}
           {#if loading}
             <div
-              class=" gap-4 w-full {layout.value === 'grid'
+              class=" gap-4 w-full {layout === 'grid'
                 ? 'grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 justify-center items-start '
                 : 'flex flex-col items-start justify-start'}"
             >
               {#each Array(20) as _, i}
                 <div
-                  class="placeholder animate-pulse text-center card bg-surface-100-800-token rounded-container-token {layout.value ===
+                  class="placeholder animate-pulse text-center card bg-surface-100-800-token rounded-container-token {layout ===
                   'grid'
                     ? 'w-full h-[350px]'
                     : 'w-full h-[120px]'}"

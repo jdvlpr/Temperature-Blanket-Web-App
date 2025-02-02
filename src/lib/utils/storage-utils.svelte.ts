@@ -15,14 +15,7 @@
 
 import { browser } from '$app/environment';
 import { skeletonThemes } from '$lib/components/ThemeSwitcher.svelte';
-import {
-  initialLayout,
-  layout,
-  locations,
-  preferences,
-  project,
-  weather,
-} from '$lib/state';
+import { layout, locations, preferences, project, weather } from '$lib/state';
 import type {
   PageLayout,
   SavedProject,
@@ -30,24 +23,60 @@ import type {
 } from '$lib/types';
 import { dateToISO8601String, numberOfDays, stringToDate } from '$lib/utils';
 
-export const setupLocalStorageTheme = () => {
-  // Check if theme is set, or match the system's theme
-  // if (
-  //   !('theme' in localStorage) &&
-  //   window.matchMedia('(prefers-color-scheme: dark)').matches
-  // )
-  //   setTheme('system');
-  // else if (!('theme' in localStorage)) setTheme('system');
-  // else setTheme(localStorage.theme);
-  // Listen for change in color scheme
-  // window
-  //   .matchMedia('(prefers-color-scheme: dark)')
-  //   .addEventListener('change', () => {
-  //     if (preferences.value.theme.mode === 'system') setTheme('system');
-  //   });
+export function initializeLocalStorage() {
+  // ****************
+  // Handle Legacy Local Storage Items
+  // ****************
+
+  // 'layout' item has been incorporated into the 'preferences' object
+  if (localStorage.getItem('layout')) {
+    preferences.value.layout = localStorage.getItem('layout') as PageLayout;
+    localStorage.removeItem('layout');
+  }
+
+  // 'disable_toast_analytics' item has been incorporated into the 'preferences' object
+  const disableToastAnalytics = localStorage.getItem('disable_toast_analytics');
+  if (disableToastAnalytics === 'true' || disableToastAnalytics === 'false') {
+    let value = JSON.parse(disableToastAnalytics);
+    preferences.value.disableToastAnalytics = value;
+    localStorage.removeItem('disable_toast_analytics');
+  }
+
+  // 'theme' item has been incorporated into the 'preferences' object
+  const theme = localStorage.getItem('theme');
+  if (theme === 'light' || theme === 'dark' || theme === 'system') {
+    preferences.value.theme.mode = theme;
+    localStorage.removeItem('theme');
+  }
+
+  // 'skeletonTheme' item has been incorporated into the 'preferences' object
+  const skeletonTheme = localStorage.getItem('skeletonTheme');
+  if (skeletonTheme) {
+    const parsedSkeletonTheme = JSON.parse(skeletonTheme); // themes were stored as "example" (included the quotes), so we need to parse them
+    if (skeletonThemes.map((theme) => theme.id).includes(parsedSkeletonTheme)) {
+      console.log({ parsedSkeletonTheme });
+      preferences.value.theme.id = parsedSkeletonTheme;
+      localStorage.removeItem('skeletonTheme');
+    }
+  }
+
+  // ****************
+  // Setup Theme Listeners
+  // ****************
+
+  // Change the theme when the system preferences changes, if the user has chosen 'system'
+  window
+    .matchMedia('(prefers-color-scheme: dark)')
+    .addEventListener('change', (e) => {
+      if (preferences.value.theme.mode === 'system') {
+        if (e.matches) document.documentElement.classList.add('dark');
+        else document.documentElement.classList.remove('dark');
+      }
+    });
 
   $effect.root(() => {
     $effect(() => {
+      // Update the body data-theme attribute when the user changes the skeleton theme
       if (
         skeletonThemes
           .map((theme) => theme.id)
@@ -57,22 +86,7 @@ export const setupLocalStorageTheme = () => {
           preferences.value.theme.id;
     });
   });
-};
-
-/**
- * Sets up the local storage 'layout' for the Temperature Blanket web app.
- * Retrieves the stored 'layout' from local storage and sets it as the initial value of the 'layout' variable.
- * Subscribes to changes in the 'layout' variable and updates the local storage whenever the value changes.
- */
-export const setupLocalStorageLayout = () => {
-  const viewStored = localStorage.getItem('view') as PageLayout;
-  if (viewStored === 'grid' || viewStored === 'list') layout.value = viewStored;
-  $effect(() => {
-    if (layout.value === 'grid' || layout.value === 'list')
-      localStorage.setItem('layout', layout.value);
-    else localStorage.setItem('layout', initialLayout);
-  });
-};
+}
 
 /**
  * Retrieves the project data from local storage and sets the necessary values.
@@ -134,43 +148,6 @@ export const checkForProjectInLocalStorage = async () => {
   weather.rawData = newWeatherUngrouped;
 
   weather.isFromLocalStorage = true;
-};
-
-/**
- * Set the page theme
- *
- * @param   {string}  value  'light', 'dark', or 'system'
- *
- */
-export const setTheme = (value) => {
-  // Whenever the user explicitly chooses light mode
-  if (value === 'light') localStorage.theme = 'light';
-
-  // Whenever the user explicitly chooses dark mode
-  if (value === 'dark') localStorage.theme = 'dark';
-
-  // Whenever the user explicitly chooses to respect the OS preference
-  if (value === 'system') localStorage.removeItem('theme');
-
-  // On page load or when changing themes, best to add inline in `head` to avoid FOUC
-  if (
-    localStorage.theme === 'dark' ||
-    (!('theme' in localStorage) &&
-      window.matchMedia('(prefers-color-scheme: dark)').matches)
-  ) {
-    document.documentElement.classList.add('dark');
-  } else {
-    document.documentElement.classList.remove('dark');
-  }
-  theme.value = value;
-};
-
-export const setLocalStorageLayout = () => {
-  if (!browser) return;
-  if (typeof window.localStorage === 'undefined') return;
-  const _layout = layout.value;
-  if (_layout !== 'grid' && _layout !== 'list') return;
-  localStorage.layout = _layout;
 };
 
 export const setLocalStorageProject = () => {
@@ -249,102 +226,3 @@ const createProjectLocalStorageProjectObject = () => {
 
   return localProject;
 };
-
-type Serializer<T> = {
-  parse: (text: string) => T;
-  stringify: (object: T) => string;
-};
-
-type StorageType = 'local' | 'session';
-
-interface Options<T> {
-  storage?: StorageType;
-  serializer?: Serializer<T>;
-  syncTabs?: boolean;
-  onWriteError?: (error: unknown) => void;
-  onParseError?: (error: unknown) => void;
-  beforeRead?: (value: T) => T;
-  beforeWrite?: (value: T) => T;
-}
-
-function getStorage(type: StorageType) {
-  return type === 'local' ? localStorage : sessionStorage;
-}
-
-// This function was copied from: https://github.com/oMaN-Rod/svelte-persisted-state/blob/main/src/lib/index.svelte.ts
-export function persistedState<T>(
-  key: string,
-  initialValue: T,
-  options: Options<T> = {},
-) {
-  const {
-    storage = 'local',
-    serializer = JSON,
-    syncTabs = true,
-    onWriteError = console.error,
-    onParseError = console.error,
-    beforeRead = (v: T) => v,
-    beforeWrite = (v: T) => v,
-  } = options;
-
-  const browser =
-    typeof window !== 'undefined' && typeof document !== 'undefined';
-  const storageArea = browser ? getStorage(storage) : null;
-
-  let storedValue: T;
-
-  try {
-    const item = storageArea?.getItem(key);
-    storedValue = item ? beforeRead(serializer.parse(item)) : initialValue;
-  } catch (error) {
-    onParseError(error);
-    storedValue = initialValue;
-  }
-
-  let state = $state(storedValue);
-
-  function updateStorage(value: T) {
-    try {
-      const valueToStore = beforeWrite(value);
-      console.log({ valueToStore });
-      storageArea?.setItem(key, serializer.stringify(valueToStore));
-    } catch (error) {
-      onWriteError(error);
-    }
-  }
-
-  if (syncTabs && typeof window !== 'undefined' && storage === 'local') {
-    window.addEventListener('storage', (event) => {
-      if (event.key === key && event.storageArea === localStorage) {
-        try {
-          const newValue = event.newValue
-            ? serializer.parse(event.newValue)
-            : initialValue;
-          state = beforeRead(newValue);
-        } catch (error) {
-          onParseError(error);
-        }
-      }
-    });
-  }
-
-  $effect.root(() => {
-    $effect(() => {
-      updateStorage(state);
-    });
-
-    return () => {};
-  });
-
-  return {
-    get value() {
-      return state;
-    },
-    set value(newValue: T) {
-      state = newValue;
-    },
-    reset() {
-      state = initialValue;
-    },
-  };
-}

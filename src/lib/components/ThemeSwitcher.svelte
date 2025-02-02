@@ -80,9 +80,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <script>
+  import { browser } from '$app/environment';
   import { THEMES } from '$lib/constants';
   import { preferences } from '$lib/state';
-  import { setTheme } from '$lib/utils';
   import {
     ListBox,
     ListBoxItem,
@@ -130,11 +130,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {#key preferences.value?.theme.mode}
       {#if showText}
         <span class="flex items-center">
-          <span class="pr-2">{@html activeTheme.icon}</span>
+          <span class="pr-2"
+            >{#if browser}{@html activeTheme.icon}{:else}{@html THEMES.find(
+                (t) => t.id === 'system',
+              ).icon}{/if}</span
+          >
           Theme
         </span>
       {:else}
-        <span>{@html activeTheme.icon}</span>
+        <span
+          >{#if browser}{@html activeTheme.icon}{:else}{@html THEMES.find(
+              (t) => t.id === 'system',
+            ).icon}{/if}</span
+        >
       {/if}
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -173,7 +181,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {#each THEMES as { name, id, icon, description }}
           <RadioItem
             bind:group={preferences.value.theme.mode}
-            onclick={() => setTheme(id)}
             name="theme-{id}"
             value={id}
             title={description}

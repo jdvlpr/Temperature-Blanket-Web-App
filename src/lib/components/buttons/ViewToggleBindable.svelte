@@ -14,8 +14,8 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import { preferences } from '$lib/state';
   import { RadioGroup, RadioItem } from '@skeletonlabs/skeleton';
+  let { value = $bindable() } = $props();
 </script>
 
 <RadioGroup
@@ -23,7 +23,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   active="bg-secondary-active-token"
 >
   <RadioItem
-    bind:group={preferences.value.layout}
+    bind:group={value}
     name="layout-list"
     value="list"
     title="Set layout view to list"
@@ -46,7 +46,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <span class="">List</span>
   </RadioItem>
   <RadioItem
-    bind:group={preferences.value.layout}
+    bind:group={value}
     name="layout-grid"
     value="grid"
     title="Set layout view to grid"

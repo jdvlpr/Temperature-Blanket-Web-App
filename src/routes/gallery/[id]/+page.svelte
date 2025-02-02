@@ -25,7 +25,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import YarnSources from '$lib/components/YarnSources.svelte';
   import ViewToggle from '$lib/components/buttons/ViewToggle.svelte';
   import { ALL_YARN_WEIGHTS, ICONS } from '$lib/constants';
-  import { allGaugesAttributes, layout, locations } from '$lib/state';
+  import { allGaugesAttributes, locations, preferences } from '$lib/state';
   import {
     exists,
     getProjectParametersFromURLHash,
@@ -474,15 +474,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
                               <ViewToggle />
                             </div>
                             <div
-                              class="rounded-container-token overflow-hidden mt-4 mb-2 xl:mb-4 {layout.value ===
-                              'grid'
+                              class="rounded-container-token overflow-hidden mt-4 mb-2 xl:mb-4 {preferences
+                                .value.layout === 'grid'
                                 ? 'gap-1 grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4'
                                 : 'flex flex-col'}"
                             >
                               {#each item as { from, to, hex, name, yarnName, brandName, affiliate_variant_href, variant_href }, i}
                                 <div
-                                  class="flex p-2 gap-2 items-center justify-around flex-wrap {layout.value ===
-                                  'grid'
+                                  class="flex p-2 gap-2 items-center justify-around flex-wrap {preferences
+                                    .value.layout === 'grid'
                                     ? 'rounded-container-token md:basis-1/5 sm:basis-1/4 basis-1/3 flex-auto'
                                     : ''}"
                                   style="background-color:{hex};color:{getTextColor(

@@ -16,8 +16,8 @@
 import { page } from '$app/state';
 import KeyboardShortcuts from '$lib/components/modals/KeyboardShortcuts.svelte';
 import Menu from '$lib/components/modals/Menu.svelte';
-import { modal, pageSections, project, preferences, weather } from '$lib/state';
-import { loadFromHistory, setTheme } from '$lib/utils';
+import { modal, pageSections, preferences, project, weather } from '$lib/state';
+import { loadFromHistory } from '$lib/utils';
 import { get } from 'svelte/store';
 
 // Go to a section
@@ -174,13 +174,15 @@ export const handleKeyDown = (ev) => {
 const toggleTheme = () => {
   switch (preferences.value.theme.mode) {
     case 'light':
-      setTheme('dark');
+      preferences.value.theme.mode = 'dark';
       break;
     case 'dark':
-      setTheme('system');
+      // setTheme('system');
+      preferences.value.theme.mode = 'system';
       break;
     case 'system':
-      setTheme('light');
+      // setTheme('light');
+      preferences.value.theme.mode = 'light';
       break;
     default:
       break;
