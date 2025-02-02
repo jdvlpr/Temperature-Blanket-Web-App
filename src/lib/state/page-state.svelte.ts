@@ -69,11 +69,9 @@ export const windowLanguage = $state({ value: null });
 
 class DrawerStateClass {
   browsePalettes = $state(false);
-  gettingStarted = $state(false);
   weatherDetails = $state(false);
   closeAll = () => {
     this.browsePalettes = false;
-    this.gettingStarted = false;
     this.weatherDetails = false;
   };
 }

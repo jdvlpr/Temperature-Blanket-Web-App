@@ -32,8 +32,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Menu from '$lib/components/modals/Menu.svelte';
   import { ICONS } from '$lib/constants';
   import {
-    drawerState,
-    isDesktop,
     locations,
     modal,
     pageSections,
@@ -53,7 +51,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { getToastStore } from '@skeletonlabs/skeleton';
   import { onMount } from 'svelte';
   import { fade } from 'svelte/transition';
-  import { Drawer } from 'vaul-svelte';
 
   let debounceTimer: number;
 
@@ -390,71 +387,27 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   class="flex flex-col gap-x-4 gap-y-2 text-sm space-around justify-center items-center"
                   data-sveltekit-preload-data="hover"
                 >
-                  {#if isDesktop.current}
-                    <button
-                      class="btn variant-filled-secondary gap-1 items-center"
-                      onclick={() =>
-                        modal.state.trigger({
-                          type: 'component',
-                          component: { ref: GettingStarted },
-                        })}
+                  <button
+                    class="btn variant-filled-secondary gap-1 items-center"
+                    onclick={() =>
+                      modal.state.trigger({
+                        type: 'component',
+                        component: { ref: GettingStarted },
+                      })}
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="size-5 relative bottom-[2px]"
+                      viewBox="0 0 24 24"
+                      ><path
+                        fill="currentColor"
+                        d="M20 11h3v2h-3zM1 11h3v2H1zM13 1v3h-2V1zM4.92 3.5l2.13 2.14l-1.42 1.41L3.5 4.93zm12.03 2.13l2.12-2.13l1.43 1.43l-2.13 2.12zM12 6a6 6 0 0 1 6 6c0 2.22-1.21 4.16-3 5.2V19a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1v-1.8c-1.79-1.04-3-2.98-3-5.2a6 6 0 0 1 6-6m2 15v1a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1v-1zm-3-3h2v-2.13c1.73-.44 3-2.01 3-3.87a4 4 0 0 0-4-4a4 4 0 0 0-4 4c0 1.86 1.27 3.43 3 3.87z"
+                      /></svg
                     >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        class="size-5 relative bottom-[2px]"
-                        viewBox="0 0 24 24"
-                        ><path
-                          fill="currentColor"
-                          d="M20 11h3v2h-3zM1 11h3v2H1zM13 1v3h-2V1zM4.92 3.5l2.13 2.14l-1.42 1.41L3.5 4.93zm12.03 2.13l2.12-2.13l1.43 1.43l-2.13 2.12zM12 6a6 6 0 0 1 6 6c0 2.22-1.21 4.16-3 5.2V19a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1v-1.8c-1.79-1.04-3-2.98-3-5.2a6 6 0 0 1 6-6m2 15v1a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1v-1zm-3-3h2v-2.13c1.73-.44 3-2.01 3-3.87a4 4 0 0 0-4-4a4 4 0 0 0-4 4c0 1.86 1.27 3.43 3 3.87z"
-                        /></svg
-                      >
 
-                      Getting Started</button
-                    >
-                  {/if}
-                  {#if !isDesktop.current}
-                    <Drawer.Root bind:open={drawerState.gettingStarted}>
-                      <Drawer.Trigger
-                        onclick={() => (drawerState.gettingStarted = true)}
-                      >
-                        <div
-                          role="button"
-                          class="btn variant-filled-secondary gap-1 items-center"
-                        >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            class="size-6 relative bottom-[2px]"
-                            viewBox="0 0 24 24"
-                            ><path
-                              fill="currentColor"
-                              d="M20 11h3v2h-3zM1 11h3v2H1zM13 1v3h-2V1zM4.92 3.5l2.13 2.14l-1.42 1.41L3.5 4.93zm12.03 2.13l2.12-2.13l1.43 1.43l-2.13 2.12zM12 6a6 6 0 0 1 6 6c0 2.22-1.21 4.16-3 5.2V19a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1v-1.8c-1.79-1.04-3-2.98-3-5.2a6 6 0 0 1 6-6m2 15v1a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1v-1zm-3-3h2v-2.13c1.73-.44 3-2.01 3-3.87a4 4 0 0 0-4-4a4 4 0 0 0-4 4c0 1.86 1.27 3.43 3 3.87z"
-                            /></svg
-                          >
+                    Getting Started</button
+                  >
 
-                          Getting Started
-                        </div>
-                      </Drawer.Trigger>
-                      <Drawer.Portal>
-                        <Drawer.Overlay
-                          class="fixed inset-0 bg-black/40 z-40"
-                        />
-                        <Drawer.Content
-                          class="bg-surface-50-900-token text-token flex flex-col rounded-tl-container-token rounded-tr-container-token mt-24 fixed bottom-0 left-0 right-0 z-50"
-                        >
-                          <div
-                            class="rounded-tl-container-token rounded-tr-container-token overflow-auto"
-                          >
-                            <div
-                              class="mx-auto mt-4 w-12 h-1.5 flex-shrink-0 rounded-full mb-4 bg-surface-900-50-token"
-                            ></div>
-                            <div class="mx-auto text-center">
-                              <GettingStarted />
-                            </div>
-                          </div>
-                        </Drawer.Content>
-                      </Drawer.Portal>
-                    </Drawer.Root>
-                  {/if}
                   <a
                     href="/blog/what-is-a-temperature-blanket"
                     class="link whitespace-pre-wrap mt-2"
