@@ -38,7 +38,6 @@ export const isDesktop = mediaQuery('(min-width: 768px)');
 export const windowLanguage = writable(null);
 
 export const openDrawerBrowsePalettes = writable(false);
-export const openDrawerGettingStarted = writable(false);
 export const openDrawerWeatherDetails = writable(false);
 
 export const pageSections = writable([

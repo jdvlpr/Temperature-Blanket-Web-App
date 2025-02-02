@@ -15,7 +15,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import CloseButton from '$lib/components/modals/CloseButton.svelte';
-  import { openDrawerGettingStarted } from '$lib/stores';
   import { Step, Stepper } from '@skeletonlabs/skeleton';
   import { getContext, hasContext, onMount } from 'svelte';
 
@@ -41,7 +40,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     buttonCompleteLabel="Lets Go!"
     on:complete={() => {
       if (close) close();
-      else $openDrawerGettingStarted = false;
     }}
   >
     <Step>

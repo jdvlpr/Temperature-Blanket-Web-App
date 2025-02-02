@@ -19,7 +19,6 @@ import Menu from '$lib/components/modals/Menu.svelte';
 import {
   modal,
   openDrawerBrowsePalettes,
-  openDrawerGettingStarted,
   openDrawerWeatherDetails,
   pageSections,
   theme,
@@ -60,7 +59,6 @@ export const goToProjectSection = async (index) => {
 
 export const closeAllDrawers = () => {
   openDrawerBrowsePalettes.set(false);
-  openDrawerGettingStarted.set(false);
   openDrawerWeatherDetails.set(false);
 };
 
