@@ -407,7 +407,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
                     Getting Started</button
                   >
-
                   <a
                     href="/blog/what-is-a-temperature-blanket"
                     class="link whitespace-pre-wrap mt-2"
@@ -415,7 +414,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   >
                     What is a Temperature Blanket?</a
                   >
-                  <!-- <a href="/gallery" class="btn variant-soft-surface text-token">View the Project Gallery</a> -->
                 </div>
               </div>
             </div>
