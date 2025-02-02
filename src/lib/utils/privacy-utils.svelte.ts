@@ -14,7 +14,7 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { browser } from '$app/environment';
-import { consentToMSClarityCookies, disableToastAnalytics } from '$lib/state';
+import { consentToMSClarityCookies, preferences } from '$lib/state';
 import { getToastStore } from '@skeletonlabs/skeleton';
 
 export const privacy = {
@@ -72,7 +72,7 @@ export const privacy = {
     // Microsoft Clarity Cookie Names include '_clck' and '_clsk'
     // See https://learn.microsoft.com/en-us/clarity/setup-and-installation/cookie-list
     if (!this.get_cookie('_clck') || !this.get_cookie('_clsk')) {
-      if (!disableToastAnalytics.value) {
+      if (!preferences.value.disableToastAnalytics) {
         toastStore.trigger({
           message: `
       <div class="flex flex-col gap-2 justify-start items-start">
@@ -110,8 +110,8 @@ export const privacy = {
               'cookies-dont-show-again',
             );
             if (dontShowAgainElement?.checked)
-              disableToastAnalytics.value = true;
-            else disableToastAnalytics.value = false;
+              preferences.value.disableToastAnalytics = true;
+            else preferences.value.disableToastAnalytics = false;
 
             const consentToggleElement = document.getElementById(
               'clarity-consent-toggle',

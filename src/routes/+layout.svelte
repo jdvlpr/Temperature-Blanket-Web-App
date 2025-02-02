@@ -61,7 +61,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   onMount(async () => {
     modal.state = getModalStore();
-    setupLocalStorageTheme();
+    // setupLocalStorageTheme();
     setupLocalStorageLayout();
 
     // NOTE: Set window variable in order to access it inside the MS clarity function

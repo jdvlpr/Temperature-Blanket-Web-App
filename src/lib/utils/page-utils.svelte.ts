@@ -16,7 +16,7 @@
 import { page } from '$app/state';
 import KeyboardShortcuts from '$lib/components/modals/KeyboardShortcuts.svelte';
 import Menu from '$lib/components/modals/Menu.svelte';
-import { modal, pageSections, project, theme, weather } from '$lib/state';
+import { modal, pageSections, project, preferences, weather } from '$lib/state';
 import { loadFromHistory, setTheme } from '$lib/utils';
 import { get } from 'svelte/store';
 
@@ -172,7 +172,7 @@ export const handleKeyDown = (ev) => {
 
 // Function to toggle between light, dark, and system themes
 const toggleTheme = () => {
-  switch (theme.value) {
+  switch (preferences.value.theme.mode) {
     case 'light':
       setTheme('dark');
       break;

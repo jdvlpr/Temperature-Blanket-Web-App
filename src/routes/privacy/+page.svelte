@@ -18,8 +18,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import AppLogo from '$lib/components/AppLogo.svelte';
   import AppShell from '$lib/components/AppShell.svelte';
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
-  import { consentToMSClarityCookies } from '$lib/state';
-  import { disableToastAnalytics } from '$lib/state/page-state.svelte';
+  import { consentToMSClarityCookies, preferences } from '$lib/state';
   import { getToastStore } from '@skeletonlabs/skeleton';
 
   const toastStore = getToastStore();
@@ -108,11 +107,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
               target="_blank">Microsoft Privacy Statement</a
             >.
           </p>
-          {#if disableToastAnalytics.value}
+          {#if preferences.value.disableToastAnalytics}
             <button
               class="btn variant-filled-secondary w-fit my-2 whitespace-pre-wrap"
               onclick={() => {
-                disableToastAnalytics.value = false;
+                preferences.value.disableToastAnalytics = false;
                 toastStore.trigger({
                   message: 'The Analytics message can be shown again.',
                   background: 'bg-success-300 text-black',

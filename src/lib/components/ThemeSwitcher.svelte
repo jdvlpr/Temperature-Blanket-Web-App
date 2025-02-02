@@ -14,7 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script module>
-  export const skeletonTheme = persistedState('skeletonTheme', 'classic');
+  // export const skeletonTheme = persistedState('skeletonTheme', 'classic');
   export const skeletonThemes = [
     {
       id: 'classic',
@@ -81,8 +81,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import { THEMES } from '$lib/constants';
-  import { activeTheme, theme } from '$lib/state';
-  import { persistedState, setTheme } from '$lib/utils';
+  import { preferences } from '$lib/state';
+  import { setTheme } from '$lib/utils';
   import {
     ListBox,
     ListBoxItem,
@@ -111,7 +111,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   };
 
   let skeletonThemeName = $derived(
-    skeletonThemes.find((theme) => theme.id === skeletonTheme.value)?.name,
+    skeletonThemes.find((theme) => theme.id === preferences.value.theme.id)
+      ?.name,
+  );
+
+  let activeTheme = $derived(
+    THEMES.find((n) => n.id === preferences.value.theme.mode),
   );
 </script>
 
@@ -122,14 +127,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
     title="Change Theme [t]"
     use:popup={popupTheme}
   >
-    {#key theme.value}
+    {#key preferences.value?.theme.mode}
       {#if showText}
         <span class="flex items-center">
-          <span class="pr-2">{@html activeTheme.value.icon}</span>
+          <span class="pr-2">{@html activeTheme.icon}</span>
           Theme
         </span>
       {:else}
-        <span>{@html activeTheme.value.icon}</span>
+        <span>{@html activeTheme.icon}</span>
       {/if}
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -167,7 +172,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <RadioGroup class="flex wrap gap-y-2" active="bg-secondary-active-token">
         {#each THEMES as { name, id, icon, description }}
           <RadioItem
-            bind:group={theme.value}
+            bind:group={preferences.value.theme.mode}
             onclick={() => setTheme(id)}
             name="theme-{id}"
             value={id}
@@ -184,7 +189,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <ListBox active="bg-secondary-active-token">
         {#each skeletonThemes as { name, id, colors, rounded }}
           <ListBoxItem
-            bind:group={skeletonTheme.value}
+            bind:group={preferences.value.theme.id}
             name="medium"
             value={id}
             regionLead="w-16"

@@ -27,6 +27,34 @@ export const disableToastAnalytics = persistedState<boolean>(
   false,
 );
 
+// User preferences for the web app stored in local storage
+export const preferences = persistedState<{
+  disableToastAnalytics: boolean;
+  theme: {
+    id: string;
+    mode: 'light' | 'dark' | 'system';
+  };
+}>(
+  'preferences',
+  {
+    disableToastAnalytics: false,
+    theme: {
+      id: 'classic',
+      mode: 'system',
+    },
+  },
+  {
+    beforeRead: (value) => {
+      console.log('beforeRead', value);
+      return value;
+    },
+    beforeWrite: (value) => {
+      console.log('beforeWrite', value);
+      return value;
+    },
+  },
+);
+
 export const consentToMSClarityCookies = $state({ value: false });
 
 export const showNavigationSideBar = $state({ value: true });
@@ -123,10 +151,10 @@ export const pageSections = $state({
 
 export const theme = $state({ value: 'system' });
 
-class ActiveThemeClass {
-  value = $derived(THEMES.find((n) => n.id === theme.value));
-}
-export const activeTheme = new ActiveThemeClass();
+// class ActiveThemeClass {
+//   value = $derived(THEMES.find((n) => n.id === preferences.value.theme.mode));
+// }
+// export const activeTheme = new ActiveThemeClass();
 
 export const defaultYarn = $state({ value: '' });
 

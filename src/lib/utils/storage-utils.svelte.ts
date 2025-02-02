@@ -14,16 +14,13 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { browser } from '$app/environment';
-import {
-  skeletonTheme,
-  skeletonThemes,
-} from '$lib/components/ThemeSwitcher.svelte';
+import { skeletonThemes } from '$lib/components/ThemeSwitcher.svelte';
 import {
   initialLayout,
   layout,
   locations,
+  preferences,
   project,
-  theme,
   weather,
 } from '$lib/state';
 import type {
@@ -35,25 +32,29 @@ import { dateToISO8601String, numberOfDays, stringToDate } from '$lib/utils';
 
 export const setupLocalStorageTheme = () => {
   // Check if theme is set, or match the system's theme
-  if (
-    !('theme' in localStorage) &&
-    window.matchMedia('(prefers-color-scheme: dark)').matches
-  )
-    setTheme('system');
-  else if (!('theme' in localStorage)) setTheme('system');
-  else setTheme(localStorage.theme);
+  // if (
+  //   !('theme' in localStorage) &&
+  //   window.matchMedia('(prefers-color-scheme: dark)').matches
+  // )
+  //   setTheme('system');
+  // else if (!('theme' in localStorage)) setTheme('system');
+  // else setTheme(localStorage.theme);
   // Listen for change in color scheme
-  window
-    .matchMedia('(prefers-color-scheme: dark)')
-    .addEventListener('change', () => {
-      if (theme.value === 'system') setTheme('system');
-    });
+  // window
+  //   .matchMedia('(prefers-color-scheme: dark)')
+  //   .addEventListener('change', () => {
+  //     if (preferences.value.theme.mode === 'system') setTheme('system');
+  //   });
 
   $effect.root(() => {
     $effect(() => {
-      if (skeletonThemes.map((theme) => theme.id).includes(skeletonTheme.value))
+      if (
+        skeletonThemes
+          .map((theme) => theme.id)
+          .includes(preferences.value.theme.id)
+      )
         document.getElementsByTagName('body')[0].dataset.theme =
-          skeletonTheme.value;
+          preferences.value.theme.id;
     });
   });
 };
@@ -305,6 +306,7 @@ export function persistedState<T>(
   function updateStorage(value: T) {
     try {
       const valueToStore = beforeWrite(value);
+      console.log({ valueToStore });
       storageArea?.setItem(key, serializer.stringify(valueToStore));
     } catch (error) {
       onWriteError(error);

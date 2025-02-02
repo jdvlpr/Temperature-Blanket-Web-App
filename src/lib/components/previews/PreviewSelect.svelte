@@ -15,8 +15,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import { browser } from '$app/environment';
-  import { activeTheme, previews } from '$lib/state';
+  import { THEMES } from '$lib/constants';
+  import { preferences, previews } from '$lib/state';
   import { onDestroy, onMount } from 'svelte';
+
+  let activeTheme = $derived(
+    THEMES.find((n) => n.id === preferences.value.theme.mode),
+  );
 
   onMount(() => {
     window
@@ -32,7 +37,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 
   function handleColorSchemeChange() {
-    theme = getTheme(activeTheme.value);
+    theme = getTheme(activeTheme);
   }
 
   let activePreviewSelectId = $state(previews.activeId);
@@ -43,7 +48,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
       return 'dark';
     return 'light';
   }
-  let theme = $derived(getTheme(activeTheme.value));
+
+  let theme = $derived(getTheme(activeTheme));
 
   $effect(() => {
     if (previews.activeId !== activePreviewSelectId)
