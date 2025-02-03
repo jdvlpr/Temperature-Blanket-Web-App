@@ -104,11 +104,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     closeQuery: '.close',
   };
 
-  let skeletonThemeName = $derived(
-    skeletonThemes.find((theme) => theme.id === preferences.value.theme.id)
-      ?.name,
-  );
-
   let activeTheme = $derived(
     THEMES.find((n) => n.id === preferences.value.theme.mode),
   );
