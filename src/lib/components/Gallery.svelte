@@ -210,7 +210,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {#each placeHolderPopularProjects as item}
             <div
               class="placeholder animate-pulse snap-center shrink-0 h-[324px] w-[245px] rounded-container-token bg-surface-100-800-token"
-              id="placeholder-{item}"
             />
           {/each}
         {:else}
