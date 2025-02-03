@@ -13,9 +13,7 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { browser } from '$app/environment';
 import { ICONS } from '$lib/constants';
-import type { PageLayout } from '$lib/types';
 import { MediaQuery } from 'svelte/reactivity';
 import { writable } from 'svelte/store';
 
@@ -114,14 +112,3 @@ export const pageSections = $state({
 });
 
 export const defaultYarn = $state({ value: '' });
-
-export const initialLayout: PageLayout = browser
-  ? localStorage.getItem('layout') === 'list' ||
-    localStorage.getItem('layout') === 'grid'
-    ? (localStorage.getItem('layout') as PageLayout)
-    : window.innerWidth < 640
-      ? 'list'
-      : 'grid'
-  : 'list';
-
-export const layout: { value: PageLayout } = $state({ value: initialLayout });

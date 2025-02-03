@@ -51,7 +51,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     project.status.loading = false;
 
     if (!weatherState.activeLocationID)
-      weatherState.activeLocationID.set(weatherState.weatherLocations[0]?.id);
+      weatherState.activeLocationID = weatherState.weatherLocations[0]?.id;
   }
 
   const getOpenMeteoForecast = async ({ location }) => {

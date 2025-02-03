@@ -274,8 +274,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   $effect(async () => {
     localStorage.setItem('[/weather]units', project.units);
-    // page.url.searchParams.set("u", value === "metric" ? "m" : "i");
-    // if (isMounted) window.history.replaceState({ path: page.url.href }, "", page.url.href);
     if (
       weatherState.weatherLocations?.some(
         (item) => item.units !== project.units,

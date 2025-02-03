@@ -1,41 +1,23 @@
+import type { LocationType, PageLayout, Unit } from '$lib/types';
+
 // User preferences for the web app stored in local storage
-export const preferences = persistedState<{
+type Preferences = {
   disableToastAnalytics: boolean;
   theme: {
-    id: string;
+    id: string; // `"classic"` or one of the presets in plugins.themes.presets in [tailwind.config.js])
     mode: 'light' | 'dark' | 'system';
   };
-  layout: string;
-}>(
-  'preferences',
-  {
-    disableToastAnalytics: false,
-    theme: {
-      id: 'classic',
-      mode: 'system',
-    },
-    layout: 'list',
+  layout: PageLayout;
+};
+
+export const preferences = persistedState<Preferences>('preferences', {
+  disableToastAnalytics: false,
+  theme: {
+    id: 'classic',
+    mode: 'system',
   },
-  // {
-  //   beforeRead: (value) => {
-  //     // console.log('beforeRead', value);
-  //     return value;
-  //   },
-  //   beforeWrite: (value) => {
-  //     // console.log('beforeWrite', value);
-  //     if (
-  //       value.theme.mode === 'dark' ||
-  //       (!('preferences' in localStorage) &&
-  //         window.matchMedia('(prefers-color-scheme: dark)').matches)
-  //     ) {
-  //       document.documentElement.classList.add('dark');
-  //     } else {
-  //       document.documentElement.classList.remove('dark');
-  //     }
-  //     return value;
-  //   },
-  // },
-);
+  layout: 'list',
+});
 
 // The following persisted state functionality was copied from: https://github.com/oMaN-Rod/svelte-persisted-state/blob/main/src/lib/index.svelte.ts
 type Serializer<T> = {

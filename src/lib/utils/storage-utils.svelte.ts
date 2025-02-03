@@ -15,7 +15,7 @@
 
 import { browser } from '$app/environment';
 import { skeletonThemes } from '$lib/components/ThemeSwitcher.svelte';
-import { layout, locations, preferences, project, weather } from '$lib/state';
+import { locations, preferences, project, weather } from '$lib/state';
 import type {
   PageLayout,
   SavedProject,
@@ -87,6 +87,7 @@ export function initializeLocalStorage() {
     });
 
     $effect(() => {
+      // Update the dark or light mode when the user changes the theme mode
       if (
         preferences.value.theme.mode === 'dark' ||
         (!('preferences' in localStorage) &&
@@ -96,7 +97,6 @@ export function initializeLocalStorage() {
       } else {
         document.documentElement.classList.remove('dark');
       }
-      console.log('here');
     });
   });
 }
