@@ -63,6 +63,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let featuredProjectsEl;
 
   onMount(async () => {
+    console.log('mounted');
+
+    if (!$popularProjects.length) {
+      await fetchPopularProjectsWrapper();
+    }
+
     if (!$projects.length) {
       let results = await fetchProjects({
         first,
@@ -76,10 +82,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
       $projects = $projects;
       $displayedProjects = getFilteredProjects();
       loading = false;
-    }
-
-    if (!$popularProjects.length) {
-      await fetchPopularProjectsWrapper();
     }
 
     loading = false;
@@ -164,7 +166,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     });
   }
 
-  $: console.log($popularProjects);
+  $: console.log({ $popularProjects });
 </script>
 
 {#if showScrollToTopButton && $projects.length}
