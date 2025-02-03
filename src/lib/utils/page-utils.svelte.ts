@@ -134,7 +134,7 @@ export const handleKeyDown = (ev) => {
     }
 
     // Check for weather-related shortcuts if weather data exists
-    if (weather.data) {
+    if (weather.data.length) {
       if (isUndo(ev)) {
         ev.preventDefault();
         loadFromHistory({ action: 'Undo' });

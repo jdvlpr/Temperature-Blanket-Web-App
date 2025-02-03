@@ -17,7 +17,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { PUBLIC_BASE_URL } from '$env/static/public';
   import AppLogo from '$lib/components/AppLogo.svelte';
   import AppShell from '$lib/components/AppShell.svelte';
-  import ThemeSwitcher from '$lib/components/ThemeSwitcher.svelte';
   import { MAXIMUM_DAYS_PER_LOCATION, MAXIMUM_LOCATIONS } from '$lib/constants';
   import {
     TableOfContents,
@@ -285,14 +284,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
             class="scroll-mt-[58px] card bg-surface-200-700-token p-4 gap-2 flex flex-col"
           >
             <h3 class="font-bold text-xl">Change Theme</h3>
-            <ThemeSwitcher target="popupThemeDocumentation" showText={true} />
             <p>
-              To choose a theme for this site, press the Theme Switcher Icon,
-              then select a theme in Light, Dark, or System mode. The System
-              option will follow the light or dark preference of your device. On
-              smaller screens, press the menu icon, then select the Theme
-              Switcher button to change the theme. In the Project Planner, you
-              can also use the following keyboard shortcut:
+              To choose a theme for this site, press the Theme Switcher Icon at
+              the top of the left menu, then select a theme in Light, Dark, or
+              System mode. The System option will follow the light or dark
+              preference of your device. On smaller screens, press the menu
+              icon, then select the Theme Switcher button to change the theme.
+              You can also use the following keyboard shortcut:
             </p>
             <figure class="">
               <table>

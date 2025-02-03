@@ -131,7 +131,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {#if showText}
         <span class="flex items-center">
           <span class="pr-2"
-            >{#if browser}{@html activeTheme.icon}{:else}{@html THEMES.find(
+            >{#if browser}{@html activeTheme?.icon}{:else}{@html THEMES.find(
                 (t) => t.id === 'system',
               ).icon}{/if}</span
           >
@@ -139,7 +139,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </span>
       {:else}
         <span
-          >{#if browser}{@html activeTheme.icon}{:else}{@html THEMES.find(
+          >{#if browser}{@html activeTheme?.icon}{:else}{@html THEMES.find(
               (t) => t.id === 'system',
             ).icon}{/if}</span
         >
