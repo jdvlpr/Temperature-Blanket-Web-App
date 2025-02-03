@@ -207,9 +207,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
         bind:this={featuredProjectsEl}
       >
         {#if !$popularProjects.length}
-          {#each placeHolderPopularProjects as item}
+          {#each Array(5) as _, i}
             <div
               class="placeholder animate-pulse snap-center shrink-0 h-[324px] w-[245px] rounded-container-token bg-surface-100-800-token"
+              id="featured-placeholder-{i}"
             />
           {/each}
         {:else}
