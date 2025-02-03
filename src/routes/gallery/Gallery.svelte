@@ -170,7 +170,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {#if !galleryState.popularProjects.length}
             <!-- <div class="my-36 mx-auto"><Spinner /></div> -->
 
-            {#each Array(5) as _, i}
+            {#each Array(5)}
               <div
                 class="placeholder animate-pulse snap-center shrink-0 h-[324px] w-[245px] rounded-container-token bg-surface-100-800-token"
               ></div>
@@ -461,7 +461,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 ? 'grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 justify-center items-start '
                 : 'flex flex-col items-start justify-start'}"
             >
-              {#each Array(20) as _, i}
+              {#each Array(20)}
                 <div
                   class="placeholder animate-pulse text-center card bg-surface-100-800-token rounded-container-token {layout ===
                   'grid'
