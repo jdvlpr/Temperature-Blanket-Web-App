@@ -64,6 +64,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   const placeHolderPopularProjects = Array.from({ length: 5 }, (_, i) => i);
 
+  console.log({ placeHolderPopularProjects });
+
   onMount(async () => {
     if (!$popularProjects.length) {
       await fetchPopularProjectsWrapper();
@@ -205,9 +207,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
         bind:this={featuredProjectsEl}
       >
         {#if !$popularProjects.length}
-          {#each placeHolderPopularProjects as _}
+          {#each placeHolderPopularProjects as item}
             <div
               class="placeholder animate-pulse snap-center shrink-0 h-[324px] w-[245px] rounded-container-token bg-surface-100-800-token"
+              id="placeholder-{item}"
             />
           {/each}
         {:else}
