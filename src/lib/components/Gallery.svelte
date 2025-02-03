@@ -62,10 +62,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let totalProjects = 0;
   let featuredProjectsEl;
 
-  const placeHolderPopularProjects = Array.from({ length: 5 }, (_, i) => i);
-
-  console.log({ placeHolderPopularProjects });
-
   onMount(async () => {
     if (!$popularProjects.length) {
       await fetchPopularProjectsWrapper();
@@ -493,14 +489,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
               ? 'grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 justify-center items-start '
               : 'flex flex-col items-start justify-start'}"
           >
-            <!-- {#each Array(20) as _, i}
-                <div
-                  class="placeholder animate-pulse text-center card bg-surface-100-800-token rounded-container-token {$layout ===
-                  'grid'
-                    ? 'w-full h-[350px]'
-                    : 'w-full h-[120px]'}"
-                />
-              {/each} -->
+            {#each Array(20) as _, i}
+              <div
+                class="placeholder animate-pulse text-center card bg-surface-100-800-token rounded-container-token {$layout ===
+                'grid'
+                  ? 'w-full h-[350px]'
+                  : 'w-full h-[120px]'}"
+                id="placeholder-project-{i}"
+              />
+            {/each}
           </div>
         {:else if $displayedProjects.length && hasNextPage}
           <button
