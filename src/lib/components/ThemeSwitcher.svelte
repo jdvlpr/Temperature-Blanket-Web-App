@@ -83,13 +83,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { browser } from '$app/environment';
   import { THEMES } from '$lib/constants';
   import { preferences } from '$lib/state';
-  import {
-    ListBox,
-    ListBoxItem,
-    RadioGroup,
-    RadioItem,
-    popup,
-  } from '@skeletonlabs/skeleton';
+  import { RadioGroup, RadioItem, popup } from '@skeletonlabs/skeleton';
 
   /**
    * @typedef {Object} Props
@@ -193,38 +187,32 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {/each}
       </RadioGroup>
 
-      <ListBox active="bg-secondary-active-token">
+      <div class="flex flex-col items-start gap-2">
         {#each skeletonThemes as { name, id, colors, rounded }}
-          <ListBoxItem
-            bind:group={preferences.value.theme.id}
-            name="medium"
-            value={id}
-            regionLead="w-16"
+          <button
+            onclick={() => {
+              preferences.value.theme.id = id;
+            }}
+            class={[
+              'btn bg-secondary-hover-token flex items-center gap-2 w-full justify-start',
+              preferences.value.theme.id === id && 'bg-secondary-active-token',
+            ]}
           >
-            {#snippet lead()}
+            <div
+              class="flex w-16 h-6 overflow-hidden border-surface-50-900-token border"
+              style="border-radius:{rounded}"
+            >
+              <div class="flex-auto" style="background:{colors.surface}"></div>
+              <div class="flex-auto" style="background:{colors.primary}"></div>
               <div
-                class="flex w-full h-6 overflow-hidden border-surface-50-900-token border"
-                style="border-radius:{rounded}"
-              >
-                <div
-                  class="flex-auto"
-                  style="background:{colors.surface}"
-                ></div>
-                <div
-                  class="flex-auto"
-                  style="background:{colors.primary}"
-                ></div>
-                <div
-                  class="flex-auto"
-                  style="background:{colors.secondary}"
-                ></div>
-                <!-- <div class="flex-auto" style="background:{colors.tertiary}" /> -->
-              </div>
-            {/snippet}
+                class="flex-auto"
+                style="background:{colors.secondary}"
+              ></div>
+            </div>
             {name}
-          </ListBoxItem>
+          </button>
         {/each}
-      </ListBox>
+      </div>
       <button class="close" aria-label="Close"></button>
     </div>
     <div class="arrow bg-surface-300-600-token shadow-lg"></div>
