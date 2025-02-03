@@ -205,11 +205,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
         bind:this={featuredProjectsEl}
       >
         {#if !$popularProjects.length}
-          <!-- {#each Array(5) as _, i}
-              <div
-                class="placeholder animate-pulse snap-center shrink-0 h-[324px] w-[245px] rounded-container-token bg-surface-100-800-token"
-              />
-            {/each} -->
+          {#each Array(5) as _}
+            <div
+              class="placeholder animate-pulse snap-center shrink-0 h-[324px] w-[245px] rounded-container-token bg-surface-100-800-token"
+            />
+          {/each}
         {:else}
           {#each $popularProjects as { featured_image_src, id, meta }}
             {@const title = getTitleFromLocationsMeta(meta.locations)}
