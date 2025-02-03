@@ -26,6 +26,9 @@ import { dateToISO8601String, numberOfDays, stringToDate } from '$lib/utils';
 export function initializeLocalStorage() {
   // ****************
   // Handle Legacy Local Storage Items
+  // Clean up old local storage items which are no longer used
+  // New in version 5.0.0
+  // Probably can remove these in version 6x
   // ****************
 
   // 'layout' item has been incorporated into the 'preferences' object
@@ -54,7 +57,6 @@ export function initializeLocalStorage() {
   if (skeletonTheme) {
     const parsedSkeletonTheme = JSON.parse(skeletonTheme); // themes were stored as "example" (included the quotes), so we need to parse them
     if (skeletonThemes.map((theme) => theme.id).includes(parsedSkeletonTheme)) {
-      console.log({ parsedSkeletonTheme });
       preferences.value.theme.id = parsedSkeletonTheme;
       localStorage.removeItem('skeletonTheme');
     }
@@ -76,14 +78,23 @@ export function initializeLocalStorage() {
 
   $effect.root(() => {
     $effect(() => {
-      // Update the body data-theme attribute when the user changes the skeleton theme
+      // Update the body data-theme attribute when the user changes the skeleton theme or mode
       if (
         skeletonThemes
           .map((theme) => theme.id)
           .includes(preferences.value.theme.id)
-      )
-        document.getElementsByTagName('body')[0].dataset.theme =
-          preferences.value.theme.id;
+      ) {
+        document.body.setAttribute('data-theme', preferences.value.theme.id);
+
+        // Set theme cookies, in order to read them when loading the page (to avoid flash of content)
+        fetch('/api/preferences/theme', {
+          method: 'POST',
+          body: JSON.stringify({
+            theme: preferences.value.theme.id,
+            mode: preferences.value.theme.mode,
+          }),
+        });
+      }
     });
 
     $effect(() => {

@@ -333,7 +333,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
       });
       ctx.drawImage(img, 0, 0);
       loading = false;
-      console.log('loaded');
       matchingYarnColors = getMatchingYarnColors({
         img,
         numberOfColors,

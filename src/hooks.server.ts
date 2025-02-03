@@ -78,7 +78,44 @@ const devRedirects: Handle = async ({ event, resolve }) => {
   return resolve(event);
 };
 
-export const handle: Handle = sequence(legacyRedirects, devRedirects);
+// Read theme cookies and update the html accordingly
+const themeCookies: Handle = async ({ event, resolve }) => {
+  let theme = '';
+  let mode = '';
+
+  const cookieTheme = event.cookies.get('theme');
+  const cookieThemeMode = event.cookies.get('theme_mode');
+
+  if (cookieTheme) {
+    theme = cookieTheme;
+  } else {
+    event.cookies.set('theme', 'classic', { path: '/' });
+    theme = 'classic';
+  }
+
+  if (cookieThemeMode) {
+    mode = cookieThemeMode;
+  } else {
+    event.cookies.set('theme_mode', 'system', { path: '/' });
+    mode = 'system';
+  }
+
+  return await resolve(event, {
+    transformPageChunk: ({ html }) =>
+      html
+        .replace('data-theme=""', `data-theme="${theme}"`)
+        .replace(
+          'id="html-root"',
+          mode === 'dark' ? `id="html-root" class="${mode}"` : `id="html-root"`,
+        ),
+  });
+};
+
+export const handle: Handle = sequence(
+  legacyRedirects,
+  devRedirects,
+  themeCookies,
+);
 
 export function handleError({ event, error }) {
   console.error(error.stack);
