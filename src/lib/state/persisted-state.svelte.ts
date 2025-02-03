@@ -16,25 +16,25 @@ export const preferences = persistedState<{
     },
     layout: 'list',
   },
-  {
-    beforeRead: (value) => {
-      // console.log('beforeRead', value);
-      return value;
-    },
-    beforeWrite: (value) => {
-      // console.log('beforeWrite', value);
-      if (
-        value.theme.mode === 'dark' ||
-        (!('preferences' in localStorage) &&
-          window.matchMedia('(prefers-color-scheme: dark)').matches)
-      ) {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
-      }
-      return value;
-    },
-  },
+  // {
+  //   beforeRead: (value) => {
+  //     // console.log('beforeRead', value);
+  //     return value;
+  //   },
+  //   beforeWrite: (value) => {
+  //     // console.log('beforeWrite', value);
+  //     if (
+  //       value.theme.mode === 'dark' ||
+  //       (!('preferences' in localStorage) &&
+  //         window.matchMedia('(prefers-color-scheme: dark)').matches)
+  //     ) {
+  //       document.documentElement.classList.add('dark');
+  //     } else {
+  //       document.documentElement.classList.remove('dark');
+  //     }
+  //     return value;
+  //   },
+  // },
 );
 
 // The following persisted state functionality was copied from: https://github.com/oMaN-Rod/svelte-persisted-state/blob/main/src/lib/index.svelte.ts

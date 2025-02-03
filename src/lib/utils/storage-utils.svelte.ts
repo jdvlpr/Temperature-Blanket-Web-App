@@ -85,6 +85,19 @@ export function initializeLocalStorage() {
         document.getElementsByTagName('body')[0].dataset.theme =
           preferences.value.theme.id;
     });
+
+    $effect(() => {
+      if (
+        preferences.value.theme.mode === 'dark' ||
+        (!('preferences' in localStorage) &&
+          window.matchMedia('(prefers-color-scheme: dark)').matches)
+      ) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+      console.log('here');
+    });
   });
 }
 
