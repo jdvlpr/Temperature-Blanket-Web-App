@@ -161,6 +161,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
         });
     });
   }
+
+  $: console.log($popularProjects);
 </script>
 
 {#if showScrollToTopButton && $projects.length}
