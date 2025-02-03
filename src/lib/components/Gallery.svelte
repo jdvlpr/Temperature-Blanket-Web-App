@@ -457,7 +457,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             : 'flex flex-col items-start justify-start'}"
         >
           {#each $displayedProjects as { databaseId, featuredImage, locations }}
-            {@const title = getTitleFromLocationsMeta(locations)}
+            <!-- {@const title = getTitleFromLocationsMeta(locations)} -->
             <a
               href="/gallery/{databaseId}"
               class="text-center bg-surface-hover-token rounded-container-token p-2 flex gap-1 group {$layout ===
@@ -474,7 +474,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   : 'max-w-full max-h-[900px]'}
               />
               <p class="text-xs line-clamp-4">
-                {@html title || ''}
+                <!-- {@html title || ''} -->
               </p>
             </a>
           {/each}
