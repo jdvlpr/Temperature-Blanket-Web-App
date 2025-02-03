@@ -36,8 +36,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <script>
-  import { browser } from '$app/environment';
-
   import { PUBLIC_WORDPRESS_BASE_URL } from '$env/static/public';
   import Card from '$lib/components/Card.svelte';
   import SelectYarn from '$lib/components/SelectYarn.svelte';
@@ -63,6 +61,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let projectsList;
   let totalProjects = 0;
   let featuredProjectsEl;
+
+  const placeHolderPopularProjects = Array.from({ length: 5 }, (_, i) => i);
 
   onMount(async () => {
     if (!$popularProjects.length) {
@@ -205,7 +205,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         bind:this={featuredProjectsEl}
       >
         {#if !$popularProjects.length}
-          {#each Array(5) as _}
+          {#each placeHolderPopularProjects as _}
             <div
               class="placeholder animate-pulse snap-center shrink-0 h-[324px] w-[245px] rounded-container-token bg-surface-100-800-token"
             />
