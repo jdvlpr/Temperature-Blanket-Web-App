@@ -130,6 +130,8 @@ export const fetchPopularProjects = async ({
     months = 1;
   }
   const url = `${PUBLIC_WORDPRESS_BASE_URL}/wp-json/wordpress-popular-posts/v1/popular-posts/?post_type=tempblanket_project&limit=${limit}&range=custom&time_unit=${timeUnit}&time_quantity=${months}&_fields=id,title,date,featured_media,featured_image_src,meta`;
+  console.log('fetch', { url });
+
   const response = await fetch(url);
   const popularProjects = await response.json();
   return popularProjects;

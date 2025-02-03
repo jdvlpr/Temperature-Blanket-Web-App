@@ -124,6 +124,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
       months: $timePeriod,
       limit: 5,
     });
+    console.log({ promisePopularProjects });
+
     $popularProjects = promisePopularProjects;
   }
 
