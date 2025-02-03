@@ -483,7 +483,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </p>
         {/if}
         {#if loading}
-          <!-- <div class="h-28 flex items-center"><Spinner /></div> -->
           <div
             class=" gap-4 w-full {$layout === 'grid'
               ? 'grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 justify-center items-start '
