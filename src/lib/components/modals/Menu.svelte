@@ -96,13 +96,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
       currentSavedProject = JSON.parse(localStorage.getItem('projects'))?.find(
         (_project) => _project.href === project.url.href,
       );
-
-      console.log({ currentSavedProject });
       project.status.saved = true;
     } catch (e) {
       currentSavedProject = null;
       console.log("Can't save project", { e });
-      alert(JSON.stringify(e));
     }
   }
 
