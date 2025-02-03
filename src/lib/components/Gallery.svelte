@@ -65,8 +65,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let featuredProjectsEl;
 
   onMount(async () => {
-    console.log('mounted');
-
     if (!$popularProjects.length) {
       await fetchPopularProjectsWrapper();
     }
@@ -115,8 +113,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
         ? totalProjects.toLocaleString()
         : undefined;
   });
-
-  // $: projects = gallery?.edges?.flatMap((item) => item.node);
 
   $: showSearchReset = !!$search.length;
 
@@ -208,7 +204,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         class="w-full flex items-start gap-2 snap-x snap-mandatory overflow-x-scroll mx-auto bg-surface-50-900-token p-2"
         bind:this={featuredProjectsEl}
       >
-        {#if !$popularProjects || !$popularProjects.length}
+        {#if !$popularProjects.length}
           <!-- {#each Array(5) as _, i}
               <div
                 class="placeholder animate-pulse snap-center shrink-0 h-[324px] w-[245px] rounded-container-token bg-surface-100-800-token"
