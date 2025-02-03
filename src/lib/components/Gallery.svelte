@@ -213,9 +213,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {/each}
         {:else}
           {#each $popularProjects as { featured_image_src, id, meta }}
-            {@const title = meta.locations
-              ? getTitleFromLocationsMeta(meta.locations)
-              : ''}
+            <!-- {@const title = getTitleFromLocationsMeta(meta.locations)} -->
             <a
               href="/gallery/{id}"
               class="snap-center shrink-0 min-h-[200px] max-w-[245px] lg:max-w-[350px] gap-1 text-center flex flex-col items-center justify-start flex-wrap mx-auto rounded-container-token p-2 group bg-surface-hover-token"
@@ -226,9 +224,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 class="max-h-64 lg:max-h-[600px] max-w-[225px] lg:max-w-[370px]"
               />
               <p class="text-xs line-clamp-4">
-                {#if title}
+                <!-- {#if title}
                   {@html title}
-                {/if}
+                {/if} -->
               </p>
             </a>
           {/each}
