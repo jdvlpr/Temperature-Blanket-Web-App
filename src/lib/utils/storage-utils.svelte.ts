@@ -196,11 +196,9 @@ export const setLocalStorageProject = () => {
 
   const localProject = createProjectLocalStorageProjectObject();
 
-  const newProjects = localProjects.length
-    ? [...localProjects, localProject]
-    : [localProject];
+  localProjects.push(localProject);
 
-  localStorage.setItem('projects', JSON.stringify(newProjects));
+  localStorage.setItem('projects', JSON.stringify(localProjects));
 };
 
 /**

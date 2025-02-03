@@ -96,10 +96,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
       currentSavedProject = JSON.parse(localStorage.getItem('projects'))?.find(
         (_project) => _project.href === project.url.href,
       );
+
+      console.log({ currentSavedProject });
       project.status.saved = true;
     } catch (e) {
       currentSavedProject = null;
       console.log("Can't save project", { e });
+      alert(JSON.stringify(e));
     }
   }
 
@@ -430,7 +433,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {#if pages.save}
     <div class="">
       <h2 class="my-2 text-lg font-bold">Save</h2>
-      {#if browser && typeof window.localStorage !== 'undefined' && weather.data}
+      {#if browser && typeof window.localStorage !== 'undefined' && weather.data.length}
         <p class="my-2 inline-flex justify-start items-center gap-2 w-full">
           <svg
             xmlns="http://www.w3.org/2000/svg"
