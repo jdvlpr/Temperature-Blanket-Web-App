@@ -226,7 +226,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 class="max-h-64 lg:max-h-[600px] max-w-[225px] lg:max-w-[370px]"
               />
               <p class="text-xs line-clamp-4">
-                {@html title || ''}
+                {#if title}
+                  {@html title}
+                {/if}
               </p>
             </a>
           {/each}
