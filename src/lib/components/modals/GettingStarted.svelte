@@ -68,7 +68,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <div class="w-full">
     <!-- Stepper -->
     <div
-      class="space-y-8 flex flex-col justify-between items-between min-h-[85vh] sm:min-h-[530px]"
+      class="space-y-8 flex flex-col justify-between items-between min-h-[85svh] sm:min-h-[530px]"
     >
       <!-- Timeline -->
       <div class="relative">
