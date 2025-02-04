@@ -122,10 +122,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </div>
           {/snippet}
           {#snippet content()}
-            <div
-              class="transition-opacity opacity-100 mt-4"
-              class:opacity-50={!isFinishedOnMount}
-            >
+            <div class=" mt-4">
               <Gauge bind:gauge={yarnPageState.gauge} />
 
               {#key yarnPageState.gauge.colors}

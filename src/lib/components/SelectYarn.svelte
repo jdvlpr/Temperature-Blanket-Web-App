@@ -41,13 +41,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
     onselectautocomplete = () => {},
   }: Props = $props();
 
-  let inputElement = $state(),
-    inputGroup = $state();
+  let inputElement = $state();
+  let inputGroup = $state();
   let forceDisplayAll = $state(false);
   let inputValue = $state('');
   let showingAutocomplete = $state(false);
 
-  let allYarns = $state([]);
+  let allYarns = $state(getAllYarns());
 
   function onSelectedYarnWeightIdChange() {
     if (selectedBrandId || selectedYarnId) {
@@ -118,7 +118,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     );
   }
 
-  function getAllYarns(selectedYarnWeightId) {
+  function getAllYarns(selectedYarnWeightId = null) {
     return brands.flatMap((brand) => {
       return brand.yarns
         .filter((yarn) => {
@@ -166,6 +166,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   onMount(() => {
     if (selectedBrandId || selectedYarnId) {
+      console.log('here', { selectedBrandId });
+
       inputValue = getYarnValue({
         brandId: selectedBrandId,
         yarnId: selectedYarnId,
@@ -324,6 +326,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {@html ICONS.filter}
     Yarn Name
   </span>
+
   <div class="flex flex-wrap items-center justify-center gap-1">
     <div class="input-group input-group-divider flex grid-cols-[1fr_auto]">
       <input
