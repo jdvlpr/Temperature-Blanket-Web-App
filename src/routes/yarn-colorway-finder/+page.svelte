@@ -494,22 +494,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 </div>
               </div>
 
-              {#key yarnColorwayFinderState.selectedBrandId || yarnColorwayFinderState.selectedYarnId}
-                <div
-                  class="w-full col-span-12 md:col-span-9"
-                  class:md:col-span-full={!!yarnColorwayFinderState.selectedBrandId &&
-                    !!yarnColorwayFinderState.selectedYarnId}
-                >
-                  <SelectYarn
-                    preselectDefaultYarn={false}
-                    bind:selectedBrandId={
-                      yarnColorwayFinderState.selectedBrandId
-                    }
-                    bind:selectedYarnId={yarnColorwayFinderState.selectedYarnId}
-                    selectedYarnWeightId={yarnColorwayFinderState.selectedYarnWeightId}
-                  />
-                </div>
+              <div
+                class="w-full col-span-12 md:col-span-9"
+                class:md:col-span-full={!!yarnColorwayFinderState.selectedBrandId &&
+                  !!yarnColorwayFinderState.selectedYarnId}
+              >
+                <SelectYarn
+                  preselectDefaultYarn={false}
+                  bind:selectedBrandId={yarnColorwayFinderState.selectedBrandId}
+                  bind:selectedYarnId={yarnColorwayFinderState.selectedYarnId}
+                  selectedYarnWeightId={yarnColorwayFinderState.selectedYarnWeightId}
+                />
+              </div>
 
+              {#key yarnColorwayFinderState.selectedBrandId || yarnColorwayFinderState.selectedYarnId}
                 <div
                   class="w-full col-span-12 md:col-span-3"
                   class:hidden={!!yarnColorwayFinderState.selectedBrandId &&
