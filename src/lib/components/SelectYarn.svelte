@@ -166,8 +166,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   onMount(() => {
     if (selectedBrandId || selectedYarnId) {
-      console.log('here', { selectedBrandId });
-
       inputValue = getYarnValue({
         brandId: selectedBrandId,
         yarnId: selectedYarnId,
