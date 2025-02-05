@@ -115,7 +115,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 {#if gauges.activeGauge && !gauges.activeGauge?.calculating}
   {#if gauges.activeGauge.id !== 'temp'}
     <!-- If this is not the default temperature gauge and we're on the project planner page -->
-    <div class="w-full flex justify-center mb-4 sm:mb-8">
+    <div class="w-full flex justify-center mb-4 sm:mb-6">
       <button
         class="btn bg-secondary-hover-token justify-start gap-1 top-2 relative max-sm:mb-2"
         title="Delete {gauges.activeGauge.label}"

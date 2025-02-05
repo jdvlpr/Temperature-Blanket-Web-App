@@ -148,16 +148,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {/key}
   </button>
 
-  <!--
-          Dropdown menu, show/hide based on menu state.
-      
-          Entering: "transition ease-out duration-100"
-            From: "transform opacity-0 scale-95"
-            To: "transform opacity-100 scale-100"
-          Leaving: "transition ease-in duration-75"
-            From: "transform opacity-100 scale-100"
-            To: "transform opacity-0 scale-95"
-        -->
   <div
     data-popup={target}
     class="bg-surface-300-600-token rounded-container-token shadow-lg p-2 z-30"
