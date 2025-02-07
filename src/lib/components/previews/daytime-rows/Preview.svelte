@@ -80,10 +80,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
         sectionIndex < weather.data?.length;
         sectionIndex++, dayIndex++, y += daytimeRowsPreview.STITCH_SIZE
       ) {
-        const daytime = displayNumber(
-          (weather.data[dayIndex].dayt['imperial'] / HOURS_PER_DAY) *
-            daytimeRowsPreview.width,
-        );
+        const daytime =
+          displayNumber(
+            (weather.data[dayIndex].dayt['imperial'] *
+              daytimeRowsPreview.settings.stitchesPerRow) /
+              HOURS_PER_DAY,
+            0,
+          ) * daytimeRowsPreview.STITCH_SIZE;
         const _day = [];
         for (
           let paramIndex = 0, x = 0;

@@ -21,6 +21,16 @@ export const entries: ChangelogItem[] = [
   {
     date: 'February, 2025',
     notes: [
+       {
+        icon: ICONS.wrench,
+        text: `The Daytime Rows preview image was inaccurately representing the number of daytime and night stitches in each row. This update uses the actual daytime and night stitches values to generate the preview image, ensuring that it accurately reflects the values in the stitches table. Consequently, the apparent line between the daytime and night sections in the preview image may appear more jagged (less of a smooth curve). However, it provides a more precise representation of the final project's appearance. Only the Daytime Rows preview image in the Project Planner is affected by this update; preview images on Project Gallery pages created before this update remain unchanged.`,
+        title: 'Fixed Daytime Rows Preview Image',
+      },
+    ],
+    version: '4.19.1',
+  },
+  {
+    notes: [
       {
         icon: ICONS.checkCircle,
         text: `35 colorways`,
