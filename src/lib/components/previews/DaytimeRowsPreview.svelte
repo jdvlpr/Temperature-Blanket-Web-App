@@ -84,9 +84,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
       sectionIndex < $weather?.length;
       sectionIndex++, dayIndex++, y += STITCH_SIZE
     ) {
-      const daytime = displayNumber(
-        ($weather[dayIndex].dayt['imperial'] / HOURS_PER_DAY) * width,
-      );
+       const daytimeLength = displayNumber(
+      ($weather[dayIndex].dayt['imperial'] * $settings.stitchesPerRow) / HOURS_PER_DAY,
+      0,
+    ) * STITCH_SIZE;
       const _day = [];
       for (
         let paramIndex = 0, x = 0;
@@ -96,23 +97,23 @@ If not, see <https://www.gnu.org/licenses/>. -->
         let calcWidth;
         switch ($settings.daytimePosition) {
           case 'left':
-            if (paramIndex === 0) calcWidth = daytime;
-            if (paramIndex === 1) calcWidth = width - daytime;
+            if (paramIndex === 0) calcWidth = daytimeLength;
+            if (paramIndex === 1) calcWidth = width - daytimeLength;
             break;
           case 'right':
-            if (paramIndex === 0) calcWidth = width - daytime;
-            if (paramIndex === 1) calcWidth = daytime;
+            if (paramIndex === 0) calcWidth = width - daytimeLength;
+            if (paramIndex === 1) calcWidth = daytimeLength;
             break;
           case 'center':
             if (paramIndex === 0 || paramIndex === 2)
-              calcWidth = (width - daytime) / 2;
-            if (paramIndex === 1) calcWidth = daytime;
+              calcWidth = (width - daytimeLength) / 2;
+            if (paramIndex === 1) calcWidth = daytimeLength;
             // if (paramIndex === 0 || paramIndex === 2) calcWidth = daytime / 2;
             // if (paramIndex === 1) calcWidth = width - daytime;
             break;
           case 'sides':
-            if (paramIndex === 0 || paramIndex === 2) calcWidth = daytime / 2;
-            if (paramIndex === 1) calcWidth = width - daytime;
+            if (paramIndex === 0 || paramIndex === 2) calcWidth = daytimeLength / 2;
+            if (paramIndex === 1) calcWidth = width - daytimeLength;
             break;
         }
         let param = weatherParams[paramIndex];
