@@ -23,7 +23,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '$lib/types';
   import { getDaysInRange, getDaysPercent, pluralize } from '$lib/utils';
   import { getModalStore } from '@skeletonlabs/skeleton';
-  import { onMount } from 'svelte';
 
   const modalStore = getModalStore();
   let isModal = $derived(!!$modalStore[0]);

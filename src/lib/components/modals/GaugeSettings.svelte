@@ -49,7 +49,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let _gauge = $state(gauges.getSnapshot(gauges.activeGaugeId));
 
-  const unitLabel = _gauge.unit.label[project.units];
+  let unitLabel = $derived(_gauge.unit.label[project.units]);
 
   let incrementMode = $state(
     _gauge.rangeOptions?.isCustomRanges ? null : _gauge.rangeOptions.mode,
