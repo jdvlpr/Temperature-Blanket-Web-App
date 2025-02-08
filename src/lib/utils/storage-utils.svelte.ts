@@ -99,15 +99,12 @@ export function initializeLocalStorage() {
 
     $effect(() => {
       // Update the dark or light mode when the user changes the theme mode
-      if (
+      document.documentElement.classList.toggle(
+        'dark',
         preferences.value.theme.mode === 'dark' ||
-        (!('preferences' in localStorage) &&
-          window.matchMedia('(prefers-color-scheme: dark)').matches)
-      ) {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
-      }
+          (preferences.value.theme.mode === 'system' &&
+            window.matchMedia('(prefers-color-scheme: dark)').matches),
+      );
     });
   });
 }

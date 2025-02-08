@@ -23,6 +23,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     THEMES.find((n) => n.id === preferences.value.theme.mode),
   );
 
+  let theme = $state(
+    getTheme(THEMES.find((n) => n.id === preferences.value.theme.mode)),
+  );
+
+  let activePreviewSelectId = $state(previews.activeId);
+
   onMount(() => {
     window
       .matchMedia('(prefers-color-scheme: dark)')
@@ -36,24 +42,26 @@ If not, see <https://www.gnu.org/licenses/>. -->
       .removeEventListener('change', handleColorSchemeChange);
   });
 
+  // Update theme when the system theme changes
   function handleColorSchemeChange() {
-    theme = getTheme(activeTheme);
+    theme = getTheme(activeTheme.id);
   }
 
-  let activePreviewSelectId = $state(previews.activeId);
-
-  function getTheme(_theme) {
-    if (_theme.id !== 'system') return _theme.id;
+  function getTheme(id) {
+    if (id !== 'system') return id;
     if (window.matchMedia('(prefers-color-scheme: dark)').matches)
       return 'dark';
     return 'light';
   }
 
-  let theme = $derived(getTheme(activeTheme));
-
   $effect(() => {
     if (previews.activeId !== activePreviewSelectId)
       activePreviewSelectId = previews.activeId;
+  });
+
+  // Update theme when user changes the theme mode
+  $effect(() => {
+    theme = getTheme(activeTheme.id);
   });
 </script>
 
