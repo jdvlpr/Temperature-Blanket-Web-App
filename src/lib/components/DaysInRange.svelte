@@ -23,9 +23,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '$lib/types';
   import { getDaysInRange, getDaysPercent, pluralize } from '$lib/utils';
   import { getModalStore } from '@skeletonlabs/skeleton';
+  import { onMount } from 'svelte';
 
   const modalStore = getModalStore();
-  const isModal = !!$modalStore[0];
+  let isModal = $derived(!!$modalStore[0]);
 
   type Props = {
     range: GaugeRange;
