@@ -19,10 +19,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { preferences, previews } from '$lib/state';
   import { onDestroy, onMount } from 'svelte';
 
-  let activeTheme = $derived(
-    THEMES.find((n) => n.id === preferences.value.theme.mode),
-  );
-
   let theme = $state(
     getTheme(THEMES.find((n) => n.id === preferences.value.theme.mode)),
   );
@@ -44,7 +40,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   // Update theme when the system theme changes
   function handleColorSchemeChange() {
-    theme = getTheme(activeTheme.id);
+    theme = getTheme(preferences.value.theme.mode);
   }
 
   function getTheme(id) {
@@ -61,7 +57,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   // Update theme when user changes the theme mode
   $effect(() => {
-    theme = getTheme(activeTheme.id);
+    theme = getTheme(preferences.value.theme.mode);
   });
 </script>
 
@@ -90,13 +86,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {#if img}
         {#key theme}
           <button
-            class="flex flex-col p-4 rounded-container-token justify-center gap-2 items-center snap-center {id ===
-            previews.activeId
-              ? ''
-              : 'bg-surface-hover-token'}"
-            class:bg-primary-300-600-token={id === previews.activeId}
-            class:selected={id === previews.activeId}
-            class:shadow={id === previews.activeId}
+            class={[
+              'flex flex-col p-4 rounded-container-token justify-center gap-2 items-center snap-center',
+              id === previews.activeId
+                ? 'bg-primary-300-600-token selected shadow'
+                : 'bg-surface-hover-token',
+            ]}
             onclick={() => {
               previews.activeId = id;
             }}
