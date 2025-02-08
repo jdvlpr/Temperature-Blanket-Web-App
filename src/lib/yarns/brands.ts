@@ -3,6 +3,7 @@ import { brand as _4Seasons } from './4-seasons/yarns'; // Add underscore to kee
 import { brand as alize } from './alize/yarns';
 import { brand as bcGarn } from './bc-garn/yarns';
 import { brand as bellissimo } from './bellissimo/yarns';
+import { brand as bendigoWoolenMills } from './bendigo-woollen-mills/yarns';
 import { brand as bernat } from './bernat/yarns';
 import { brand as berroco } from './berroco/yarns';
 import { brand as bigTwist } from './big-twist/yarns';
@@ -69,6 +70,7 @@ export const brands: Brand[] = [
   alize,
   bcGarn,
   bellissimo,
+  bendigoWoolenMills,
   bernat,
   berroco,
   bigTwist,
