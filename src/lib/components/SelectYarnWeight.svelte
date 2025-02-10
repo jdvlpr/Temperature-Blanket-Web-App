@@ -3,7 +3,6 @@
   import type { YarnWeight } from '$lib/types';
   import { pluralize } from '$lib/utils';
   import { brands } from '$lib/yarns/brands';
-  import { createBubbler } from 'svelte/legacy';
 
   interface Props {
     selectedBrandId?: string;

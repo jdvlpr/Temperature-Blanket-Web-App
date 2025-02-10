@@ -13,15 +13,22 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script>
+<script lang="ts">
   import Tooltip from '$lib/components/Tooltip.svelte';
 
+    interface Props {
+    includeFromValue: boolean,
+    includeToValue:boolean,
+    rangeExample: string,
+    onchange: any,
+  }
+  
   let {
     includeFromValue = $bindable(),
     includeToValue = $bindable(),
     rangeExample,
     onchange,
-  } = $props();
+  }: Props = $props();
 </script>
 
 <label class="label">

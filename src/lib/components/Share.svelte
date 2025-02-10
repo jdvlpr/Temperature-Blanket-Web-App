@@ -14,8 +14,6 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import { run } from 'svelte/legacy';
-
   import { getToastStore, popup } from '@skeletonlabs/skeleton';
 
   const toastStore = getToastStore();
@@ -46,7 +44,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     }
   }
 
-  run(() => {
+  $effect(() => {
     if (copiedMessage !== '') {
       toastStore.trigger({
         message: copiedMessage,

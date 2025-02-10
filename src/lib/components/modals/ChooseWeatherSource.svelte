@@ -17,7 +17,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { locations, modal, weather } from '$lib/state';
   import { getModalStore } from '@skeletonlabs/skeleton';
   import { onMount } from 'svelte';
-  import { run } from 'svelte/legacy';
   import ToggleSwitch from '../buttons/ToggleSwitch.svelte';
   import GettingWeather from './GettingWeather.svelte';
   import GettingWeatherWarnCustomWeather from './GettingWeatherWarnCustomWeather.svelte';
