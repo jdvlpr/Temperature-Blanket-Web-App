@@ -17,6 +17,7 @@ import pdfGauges from '$lib/pdf/sections/gauges.svelte';
 import pdfWeatherData from '$lib/pdf/sections/weather-data.svelte';
 import {
   allGaugesAttributes,
+  gauges,
   locations,
   previews,
   project,
@@ -31,7 +32,6 @@ import {
   getWeatherSourceDetails,
   missingDaysCount,
 } from '$lib/utils';
-import { get } from 'svelte/store';
 
 export const getProjectParametersFromURLHash = (hash) => {
   return hash.split('&').reduce(function (res, item) {
@@ -128,14 +128,14 @@ export const sendToProjectGallery = async (img) => {
   const palettes = [];
   const yarnUrls = [];
   const yarnDetails = [];
-  const gauges = [];
+  const labels = [];
   const tables = [];
-  gauges.gauges.forEach((gauge) => {
+  gauges.allCreated.forEach((gauge) => {
     colors.push(gauge.colors);
-    gauges.push(gauge.label);
-    palettes.push(colorsToCode(gauge.colors, { includePrefix: true }));
+    labels.push(gauge.label);
+    palettes.push(colorsToCode(gauge.colors, { includePrefixes: true }));
     const colorsCode = colorsToCode(gauge.colors, {
-      includePrefix: false,
+      includePrefixes: false,
     });
     const names = [
       ...new Set(
@@ -152,6 +152,7 @@ export const sendToProjectGallery = async (img) => {
     yarnUrls.push(yarnSearchUrl);
     tables.push(getWPGauge(gauge));
   });
+
   const _locations = locations.all?.map((location) => {
     return {
       label: location.label,
@@ -163,7 +164,7 @@ export const sendToProjectGallery = async (img) => {
 
   const data = {
     colors: JSON.stringify(colors),
-    gauges: JSON.stringify(gauges),
+    gauges: JSON.stringify(labels),
     img,
     locations: JSON.stringify(_locations),
     missing_days: missingDaysCount(),

@@ -177,7 +177,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 
   onMount(() => {
-    console.log({index});
     scrollObserver.observe(setupContainer);
     
     if (index !== null) {
