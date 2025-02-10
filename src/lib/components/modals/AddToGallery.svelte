@@ -82,12 +82,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <p>&#8226; Gallery pages are subject to change.</p>
         </div>
       </div>
-      {@const SvelteComponent = previews.active.preview}
       <div
         class="w-full col-span-full sm:col-span-1 max-w-[250px] m-auto pointer-events-none flex flex-col gap-2 p-4 bg-surface-50-900-token rounded-container-token mb-4"
       >
         <span class="font-bold line-clamp-4">{locations.projectTitle}</span>
-        <SvelteComponent />
+        <previews.active.previewComponent />
       </div>
     {:else}
       <div

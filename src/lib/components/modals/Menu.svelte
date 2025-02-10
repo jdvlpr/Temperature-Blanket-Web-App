@@ -385,7 +385,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/if}
 
   {#if pages.download}
-    {@const SvelteComponent = previews.active.preview}
     <div>
       <h2 class="my-2 text-lg font-bold">Download</h2>
       <div class="flex flex-col gap-2 items-start text-left">
@@ -406,7 +405,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           Weather Data (CSV)</button
         >
 
-        {#if SvelteComponent}
+        {#if previews.active?.previewComponent}
           <button
             class="btn bg-secondary-hover-token gap-2"
             title="Download PNG File"
@@ -418,7 +417,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
               );
             }}
           >
-            <span class="w-[40px] m-auto"> <SvelteComponent /></span>
+            <span class="w-[50px] m-auto">
+              <previews.active.previewComponent />
+            </span>
 
             Preview Image (PNG)
           </button>
