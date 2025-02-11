@@ -18,7 +18,6 @@ What's new in version 5?
 - Fullscreen color editor
 - Option to show color details in the weather table
 - Move colors directly in the gauge editor
-- Improved page loading speed
 
 ## 🚀 Getting Started
 
