@@ -64,7 +64,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           targets,
           squareSize: calendarPreview.settings.squareSize,
           primaryTarget: calendarPreview.settings.primaryTarget,
-          secondaryTargets: calendarPreview.settings.secondaryTargets,
+          secondaryTargets: $state.snapshot(
+            calendarPreview.settings.secondaryTargets,
+          ),
           primaryTargetAsBackup: calendarPreview.settings.primaryTargetAsBackup,
           onOkay: handelOkaySquareDesigner,
         },
