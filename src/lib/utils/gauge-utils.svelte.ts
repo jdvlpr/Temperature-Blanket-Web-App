@@ -173,6 +173,9 @@ export const getSchemeName = (id) => {
   return 'Custom';
 };
 
+// Used to hold a temporary snapshot of a gauge when getting color info.
+// This is a performance improvement; instead of having to get a new snapshot each time,
+// if the gaugeId is the same as the previous one, then return the current temporary gauge.
 let temporaryGaugeId = null;
 let temporaryGauge = null;
 export const getTemporaryGauge = (gaugeId) => {
