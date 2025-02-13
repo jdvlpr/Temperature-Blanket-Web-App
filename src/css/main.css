@@ -32,19 +32,19 @@
 
   /* AUTOCOMPLETE */
   .autocomplete {
-    @apply text-token bg-surface-200-700-token shadow-lg overflow-hidden border-token border-primary-500 rounded-container-token z-[1000];
+    @apply bg-surface-200-800 shadow-lg overflow-hidden border border-primary-500 rounded-container z-[1000];
   }
 
   .autocomplete > div {
-    @apply px-2 py-3 cursor-pointer bg-surface-100-800-token border-y border-surface-300-600-token;
+    @apply px-2 py-3 cursor-pointer bg-surface-100-900 border-y border-surface-300-700;
   }
   .autocomplete > .group {
-    @apply bg-surface-100-800-token hover:bg-primary-400/20;
+    @apply bg-surface-100-900 hover:bg-primary-400/20;
   }
 
   .autocomplete > div.selected,
   .autocomplete > div:hover:not(.group) {
-    @apply variant-soft-primary text-token;
+    @apply preset-tonal-primary;
   }
 
   .link {

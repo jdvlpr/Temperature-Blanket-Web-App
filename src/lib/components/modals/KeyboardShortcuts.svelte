@@ -32,9 +32,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <p class="mt-2 font-bold text-xl">{group}</p>
       <p class="mb-2 italic">{details}</p>
       <table
-        class="table-auto m-auto border border-surface-300-600-token py-1 px-2 text-left w-full mb-8"
+        class="table-auto m-auto border border-surface-300-700 py-1 px-2 text-left w-full mb-8"
       >
-        <thead class="divide-y border-b border-surface-300-600-token">
+        <thead class="divide-y border-b border-surface-300-700">
           <tr>
             <th class=" py-0 px-2">Shortcut</th>
             <th class=" py-0 px-2">Description</th>

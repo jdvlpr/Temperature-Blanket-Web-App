@@ -25,18 +25,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
     getColorsFromInput,
     pluralize,
   } from '$lib/utils';
-  import {
-    getModalStore,
-    getToastStore,
-    RadioGroup,
-    RadioItem,
-  } from '@skeletonlabs/skeleton';
+  import { Segment } from '@skeletonlabs/skeleton-svelte';
   import { slide } from 'svelte/transition';
   import ModalShell from './ModalShell.svelte';
+  import { getContext } from 'svelte';
+  import type { ToastContext } from '@skeletonlabs/skeleton-svelte';
 
   let { colors, updateGauge, parent } = $props();
 
-  const toastStore = getToastStore();
+  const toast: ToastContext = getContext('toast');
 
   const modalStore = getModalStore();
 
@@ -111,9 +108,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   $effect(() => {
     if (copiedPalette || copiedNames || copiedHexes || copiedPaletteCode) {
-      toastStore.trigger({
-        message: copiedNotice,
-        background: 'bg-success-300 text-black',
+      toast.trigger({
+        description: copiedNotice,
       });
       copiedPalette = false;
       copiedNames = false;
@@ -125,27 +121,27 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <ModalShell {parent}>
   <div class="flex flex-col text-left gap-1 w-full mb-4">
-    <RadioGroup
+    <Segment
       class="flex wrap gap-y-2 w-fit mx-auto"
-      active="bg-secondary-active-token"
+      active="preset-filled-secondary-500"
     >
-      <RadioItem
+      <Segment.Item
         bind:group={showImport}
         value={false}
         name="Show Export Options"
         title="Show Export options"
       >
         Export
-      </RadioItem>
-      <RadioItem
+      </Segment.Item>
+      <Segment.Item
         bind:group={showImport}
         value={true}
         name="Show Import Options"
         title="Show Import options"
       >
         Import
-      </RadioItem>
-    </RadioGroup>
+      </Segment.Item>
+    </Segment>
   </div>
 
   {#if showImport}
@@ -230,7 +226,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {/if}
 
     {#if !inputColors.length && inputValue.length}
-      <p class="variant-soft-warning p-4 card">Code not valid</p>
+      <p class="preset-tonal-warning p-4 card">Code not valid</p>
     {/if}
   {:else}
     {#if colors}
@@ -251,7 +247,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <p class="text-xs">For web and design</p>
           </div>
           <p
-            class="card variant-soft-primary p-4 basis-full w-full break-all text-token select-all"
+            class="card preset-tonal-primary p-4 basis-full w-full break-all base-font-color select-all"
           >
             {colorHexes}
           </p>
@@ -270,7 +266,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </div>
 
         <button
-          class="btn bg-secondary-hover-token gap-1"
+          class="btn preset-tonal-secondary gap-1"
           onclick={() => {
             try {
               window.navigator.clipboard.writeText(colorHexes);
@@ -312,14 +308,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <p class="text-xs">For sharing between projects on this site</p>
           </div>
           <p
-            class="card variant-soft-primary p-4 basis-full w-full break-all text-token select-all"
+            class="card preset-tonal-primary p-4 basis-full w-full break-all base-font-color select-all"
           >
             {paletteCode}
           </p>
         </div>
 
         <button
-          class="btn bg-secondary-hover-token gap-1"
+          class="btn preset-tonal-secondary gap-1"
           onclick={() => {
             try {
               window.navigator.clipboard.writeText(paletteCode);
@@ -361,7 +357,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <p class="text-xs">For yarn colorways</p>
           </div>
           <p
-            class="card variant-soft-primary p-4 basis-full w-full break-all text-token select-all"
+            class="card preset-tonal-primary p-4 basis-full w-full break-all base-font-color select-all"
           >
             {colorNames}
           </p>
@@ -372,7 +368,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <ToggleSwitch bind:checked={colorNamesAsArray} label="Array" />
         </div>
         <button
-          class="btn bg-secondary-hover-token gap-1"
+          class="btn preset-tonal-secondary gap-1"
           onclick={() => {
             try {
               window.navigator.clipboard.writeText(colorNames);

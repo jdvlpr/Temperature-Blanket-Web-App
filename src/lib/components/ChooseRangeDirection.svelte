@@ -14,7 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import { RadioGroup, RadioItem } from '@skeletonlabs/skeleton';
+  import { Segment } from '@skeletonlabs/skeleton-svelte';
 
   let { direction = $bindable(), onchange } = $props();
 </script>
@@ -35,22 +35,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <span>Direction</span>
 </p>
 
-<RadioGroup
+<Segment
   class="flex-wrap gap-y-2 justify-start items-start"
-  active="bg-secondary-active-token"
+  active="preset-filled-secondary-500"
 >
-  <RadioItem
+  <Segment.Item
     bind:group={direction}
     {onchange}
     name="direction-high-to-low"
     value={'high-to-low'}
-    title="Set gauge direction to High to Low">High to Low</RadioItem
+    title="Set gauge direction to High to Low">High to Low</Segment.Item
   >
-  <RadioItem
+  <Segment.Item
     bind:group={direction}
     {onchange}
     name="direction-low-to-high"
     value={'low-to-high'}
-    title="Set gauge direction to Low to High">Low to High</RadioItem
+    title="Set gauge direction to Low to High">Low to High</Segment.Item
   >
-</RadioGroup>
+</Segment>

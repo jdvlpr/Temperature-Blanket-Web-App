@@ -43,7 +43,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   >
     <div class="flex flex-col gap-4">
       <a
-        class="card bg-secondary-hover-token p-4 whitespace-pre-wrap w-fit text-center flex flex-col items-center justify-center gap-2"
+        class="card preset-tonal-secondary p-4 whitespace-pre-wrap w-fit text-center flex flex-col items-center justify-center gap-2"
         href="/api/yarn-colorways"
       >
         <img

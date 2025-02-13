@@ -48,8 +48,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     updateHistory,
     upToDate,
   } from '$lib/utils';
-  import { getToastStore } from '@skeletonlabs/skeleton';
-  import { onMount } from 'svelte';
+  import type { ToastContext } from '@skeletonlabs/skeleton-svelte';
+  import { getContext, onMount } from 'svelte';
   import { fade } from 'svelte/transition';
 
   let debounceTimer: number;
@@ -60,7 +60,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     debounceTimer = window.setTimeout(callback, time);
   };
 
-  const toastStore = getToastStore();
+  const toast: ToastContext = getContext('toast');
 
   onMount(async () => {
     const hasProjectURLParam = new URL(window.location.href).searchParams.has(
@@ -101,9 +101,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   $effect(() => {
     if (project.history.updateMessage !== '') {
-      toastStore.trigger({
-        message: project.history.updateMessage,
-        background: 'bg-success-300 text-black',
+      toast.create({
+        description: project.history.updateMessage,
+        // background: 'bg-success-300 text-black',
       });
     }
   });
@@ -161,7 +161,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {#if weather.data.length && locations.allValid}
         <div class="hidden lg:inline-flex">
           <Tooltip
-            classNames="btn bg-secondary-hover-token"
+            classNames="btn preset-tonal-secondary"
             title="Save Project [Cmd]+[s] or [Ctrl]+[s]"
             onclick={() =>
               modal.state.trigger({
@@ -197,7 +197,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {#if weather.data.length}
         <div class="mx-auto sm:mx-0">
           <button
-            class="btn bg-secondary-hover-token"
+            class="btn preset-tonal-secondary"
             title="Undo [Cmd ⌘]+[z] or [Ctrl]+[z]"
             id="undo"
             disabled={!weather.data.length ||
@@ -216,7 +216,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </button>
 
           <button
-            class="btn bg-secondary-hover-token"
+            class="btn preset-tonal-secondary"
             id="redo"
             title="Redo [Cmd ⌘]+[Shift ⇧]+[z] or [Ctrl]+[Shift ⇧]+[Z]"
             disabled={!weather.data.length ||
@@ -238,7 +238,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
 
     <Tooltip
-      classNames="btn-icon bg-secondary-hover-token"
+      classNames="btn-icon preset-tonal-secondary"
       minWidth="265px"
       title="Help"
     >
@@ -264,7 +264,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           tabindex="-1"
         >
           <button
-            class="btn variant-filled-secondary gap-1 items-center"
+            class="btn preset-filled-secondary-500 gap-1 items-center"
             onclick={() =>
               modal.state.trigger({
                 type: 'component',
@@ -320,12 +320,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </p>
 
           <div class="flex items-center gap-2">
-            <div class="flex-grow border-t border-surface-300-600-token"></div>
+            <div class="flex-grow border-t border-surface-300-700"></div>
 
             <p class="flex-shrink text-xs">
               Version {version}
             </p>
-            <div class="flex-grow border-t border-surface-300-600-token"></div>
+            <div class="flex-grow border-t border-surface-300-700"></div>
           </div>
         </div>
       {/snippet}
@@ -333,7 +333,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     <button
       aria-label="Open Menu"
-      class="btn-icon bg-secondary-hover-token"
+      class="btn-icon preset-tonal-secondary"
       title="Open Menu [.]"
       onclick={() =>
         modal.state.trigger({
@@ -366,13 +366,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
         class="scroll-mt-[58px]"
         class:hidden={pageSections.items[1].active === false}
       >
-        <div class="lg:rounded-container-token overflow-hidden lg:mb-4">
+        <div class="lg:rounded-container overflow-hidden lg:mb-4">
           <div
             class="flex flex-wrap justify-center items-center p-4 text-center bg-cover bg-no-repeat bg-center"
             style="background-image:url('/images/layout/tb-cover-image-winter-trees-sunset.webp');"
           >
             <div
-              class="max-w-screen-md w-full rounded-container-token bg-surface-50/85 dark:bg-surface-900/85 shadow px-4 py-4 inline-flex flex-col justify-center items-center gap-4"
+              class="max-w-screen-md w-full rounded-container bg-surface-50/85 dark:bg-surface-900/85 shadow px-4 py-4 inline-flex flex-col justify-center items-center gap-4"
             >
               <div class="flex flex-col gap-2">
                 <h2 class="font-light text-lg uppercase tracking-widest">
@@ -388,7 +388,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   data-sveltekit-preload-data="hover"
                 >
                   <button
-                    class="btn variant-filled-secondary gap-1 items-center"
+                    class="btn preset-filled-secondary-500 gap-1 items-center"
                     onclick={() =>
                       modal.state.trigger({
                         type: 'component',
@@ -468,7 +468,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             companies.
           </p>
           {#if pinAllSections.value && weather.data.length}
-            <div class="flex-grow border-t border-surface-300-600-token"></div>
+            <div class="flex-grow border-t border-surface-300-700"></div>
           {/if}
         </div>
 

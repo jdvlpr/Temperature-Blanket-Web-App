@@ -18,7 +18,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   // Note: the signal store is a weird necessity, investigate this
   import Spinner from '$lib/components/Spinner.svelte';
   import { delay, getOpenMeteo, goToProjectSection } from '$lib/utils';
-  import { getModalStore } from '@skeletonlabs/skeleton';
   import ModalShell from './ModalShell.svelte';
 
   interface Props {

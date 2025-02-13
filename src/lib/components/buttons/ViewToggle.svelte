@@ -15,14 +15,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import { preferences } from '$lib/state';
-  import { RadioGroup, RadioItem } from '@skeletonlabs/skeleton';
+  import { Segment } from '@skeletonlabs/skeleton-svelte';
 </script>
 
-<RadioGroup
+<Segment
   class="flex-wrap gap-y-2 text-center"
-  active="bg-secondary-active-token"
+  active="preset-filled-secondary-500"
 >
-  <RadioItem
+  <Segment.Item
     bind:group={preferences.value.layout}
     name="layout-list"
     value="list"
@@ -44,8 +44,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
       />
     </svg>
     <span class="">List</span>
-  </RadioItem>
-  <RadioItem
+  </Segment.Item>
+  <Segment.Item
     bind:group={preferences.value.layout}
     name="layout-grid"
     value="grid"
@@ -67,5 +67,5 @@ If not, see <https://www.gnu.org/licenses/>. -->
       />
     </svg>
     <span class="">Grid</span>
-  </RadioItem>
-</RadioGroup>
+  </Segment.Item>
+</Segment>

@@ -318,7 +318,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <Share href={shareableURL} />
       <button
         aria-label="Open Settings"
-        class="btn-icon bg-secondary-hover-token"
+        class="btn-icon preset-tonal-secondary"
         title="Open Settings"
         onclick={() =>
           modal.state.trigger({
@@ -354,7 +354,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {#if weatherState.weatherLocations.filter((item) => item?.saved).length}
         <button
           aria-label="Open Locations"
-          class="btn-icon bg-secondary-hover-token"
+          class="btn-icon preset-tonal-secondary"
           title="Open Locations"
           onclick={() =>
             modal.state.trigger({
@@ -417,7 +417,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       {#if !weatherState.weatherLocations.find((item) => item.id === weatherState.activeLocationID)?.saved}
                         <button
                           in:fade
-                          class="btn bg-secondary-hover-token"
+                          class="btn preset-tonal-secondary"
                           title="Add to Locations"
                           onclick={async () => {
                             weatherState.weatherLocations.map((item) => {
@@ -464,7 +464,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       {:else if weatherState.weatherLocations.filter((item) => item?.saved)?.length}
                         <button
                           in:fade
-                          class="btn bg-secondary-hover-token"
+                          class="btn preset-tonal-secondary"
                           onclick={() =>
                             modal.state.trigger({
                               type: 'component',
@@ -544,7 +544,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     </div>
                   </div>
                   <div
-                    class="p-2 rounded-container-token bg-surface-100-800-token my-4 inline-grid"
+                    class="p-2 rounded-container bg-surface-100-900 my-4 inline-grid"
                   >
                     <p class="text-sm flex gap-1 items-center justify-center">
                       <svg
@@ -649,7 +649,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                             precipitation_probability_max,
                         })}
                         <div
-                          class="grid grid-cols-3 flex-1 gap-2 items-center rounded-container-token p-2 bg-surface-100-800-token w-full mx-auto"
+                          class="grid grid-cols-3 flex-1 gap-2 items-center rounded-container p-2 bg-surface-100-900 w-full mx-auto"
                         >
                           <p class="">
                             {index === 0 ? 'Today' : date}

@@ -66,24 +66,24 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </p>
         <div class="text-left flex flex-col gap-2">
           <p>
-            &#8226; I am submitting this project's location and dates, gauge and
+            • I am submitting this project's location and dates, gauge and
             yarn information, URL, preview image, and the current date to be
             displayed on a public gallery page. No personal information will be
             sent.
           </p>
           <p>
-            &#8226; This project's gallery page cannot be edited once it is
+            • This project's gallery page cannot be edited once it is
             submitted.
           </p>
           <p>
-            &#8226; Submissions which appear to be spam or abuse of this service
+            • Submissions which appear to be spam or abuse of this service
             may be removed.
           </p>
-          <p>&#8226; Gallery pages are subject to change.</p>
+          <p>• Gallery pages are subject to change.</p>
         </div>
       </div>
       <div
-        class="w-full col-span-full sm:col-span-1 max-w-[250px] m-auto pointer-events-none flex flex-col gap-2 p-4 bg-surface-50-900-token rounded-container-token mb-4"
+        class="w-full col-span-full sm:col-span-1 max-w-[250px] m-auto pointer-events-none flex flex-col gap-2 p-4 bg-surface-50-950 rounded-container mb-4"
       >
         <span class="font-bold line-clamp-4">{locations.projectTitle}</span>
         <previews.active.previewComponent />
@@ -107,7 +107,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <a
         href={project.gallery.href}
         target="_blank"
-        class="link btn bg-secondary-hover-token w-fit whitespace-pre-wrap"
+        class="link btn preset-tonal-secondary w-fit whitespace-pre-wrap"
         rel="noreferrer">{project.gallery.title}</a
       >
     </p>
@@ -118,7 +118,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {#if !submitting && !message}
         <div class="p-2 text-center flex items-center justify-center">
           <button
-            class="btn variant-filled-primary"
+            class="btn preset-filled-primary-500"
             title="Add project to gallery"
             onclick={submit}>Yes, Send to Gallery</button
           >

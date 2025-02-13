@@ -36,7 +36,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 >
   {#each Array(items) as _, index}
     <div
-      class="placeholder animate-pulse w-full rounded-container-token"
+      class="placeholder animate-pulse w-full rounded-container"
       style="height:{height}"
     ></div>
   {/each}

@@ -240,7 +240,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <div class="flex flex-col w-full text-left gap-1">
     <p>
       {#if hasError}
-        <span class="text-error-800-100-token">Choose a result</span>
+        <span class="text-error-900-100">Choose a result</span>
       {:else if weatherLocationState.inputLocation?.value}
         Location
       {:else}
@@ -322,7 +322,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   {#if browser && navigator.geolocation}
     <button
-      class="btn bg-secondary-hover-token gap-1 flex items-center"
+      class="btn preset-tonal-secondary gap-1 flex items-center"
       title="Use My Location"
       onclick={async () => {
         weatherLocationState.inputLocation.value = 'Loading...';

@@ -98,7 +98,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div
-  class="bg-surface-100-800-token text-token pb-2 text-center flex flex-wrap justify-center items-end gap-2"
+  class="bg-surface-100-900 base-font-color pb-2 text-center flex flex-wrap justify-center items-end gap-2"
 >
   <Expand
     bind:isExpanded={filtersExpanded}
@@ -110,7 +110,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   {#if filtersExpanded}
     <div
-      class="grid grid-cols-12 justify-center items-end gap-4 bg-surface-100-800-token px-2 w-full"
+      class="grid grid-cols-12 justify-center items-end gap-4 bg-surface-100-900 px-2 w-full"
       transition:slide
     >
       <div class="w-full col-span-12 md:col-span-5">
@@ -223,7 +223,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       >
         <button
           disabled={loading}
-          class="btn variant-filled-primary flex items-center font-bold w-full"
+          class="btn preset-filled-primary-500 flex items-center font-bold w-full"
           onclick={async () => {
             projectsList.scrollIntoView({
               behavior: 'smooth',
@@ -318,7 +318,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <div class="h-28 flex items-center"><Spinner /></div>
     {/if}
     <button
-      class="btn variant-filled-primary flex m-auto my-4"
+      class="btn preset-filled-primary-500 flex m-auto my-4"
       disabled={!hasNextPage || isLoadingMore}
       onclick={async () => {
         isLoadingMore = true;

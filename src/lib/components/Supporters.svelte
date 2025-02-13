@@ -16,7 +16,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script>
   import { PUBLIC_KOFI_LINK } from '$env/static/public';
   import { SUPPORTERS } from '$lib/constants';
-  import { Avatar } from '@skeletonlabs/skeleton';
+  import { Avatar } from '@skeletonlabs/skeleton-svelte';
 </script>
 
 {#if SUPPORTERS}
@@ -26,7 +26,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   >
     {#if SUPPORTERS?.gold?.length}
       <div class="relative flex items-center w-full col-span-full">
-        <div class="flex-grow border-t border-surface-300-600-token"></div>
+        <div class="flex-grow border-t border-surface-300-700"></div>
         <div class="flex-shrink mx-4 flex items-center gap-2">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -43,11 +43,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <p class="text-xs">$6 per month</p>
           </div>
         </div>
-        <div class="flex-grow border-t border-surface-300-600-token"></div>
+        <div class="flex-grow border-t border-surface-300-700"></div>
       </div>
       {#each SUPPORTERS?.gold as { name, href, linkText, imageSrc }}
         <div
-          class="bg-surface-200-700-token text-token px-2 py-4 rounded-container-token w-full flex flex-col justify-center"
+          class="bg-surface-200-800 base-font-color px-2 py-4 rounded-container w-full flex flex-col justify-center"
         >
           <Avatar
             src={imageSrc}
@@ -70,7 +70,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     {#if SUPPORTERS?.silver?.length}
       <div class="relative flex items-center w-full col-span-full">
-        <div class="flex-grow border-t border-surface-300-600-token"></div>
+        <div class="flex-grow border-t border-surface-300-700"></div>
         <div class="flex-shrink mx-4 flex items-center gap-2">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -87,11 +87,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <p class="text-xs">$4 per month</p>
           </div>
         </div>
-        <div class="flex-grow border-t border-surface-300-600-token"></div>
+        <div class="flex-grow border-t border-surface-300-700"></div>
       </div>
       {#each SUPPORTERS.silver as { name, href, linkText }}
         <div
-          class="h-fit bg-surface-200-700-token text-token p-4 rounded-container-token flex flex-col items-center"
+          class="h-fit bg-surface-200-800 base-font-color p-4 rounded-container flex flex-col items-center"
         >
           <p class="text-xl font-bold">{name}</p>
           <a {href} target="_blank" class="link">{linkText}</a>
@@ -101,7 +101,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     {#if SUPPORTERS?.bronze?.length}
       <div class="relative flex items-center w-full col-span-full">
-        <div class="flex-grow border-t border-surface-300-600-token"></div>
+        <div class="flex-grow border-t border-surface-300-700"></div>
         <div class="flex-shrink mx-4 flex items-center gap-2">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -118,11 +118,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <p class="text-xs">$2 per month</p>
           </div>
         </div>
-        <div class="flex-grow border-t border-surface-300-600-token"></div>
+        <div class="flex-grow border-t border-surface-300-700"></div>
       </div>
       {#each SUPPORTERS?.bronze as { name }}
         <div
-          class="h-fit bg-surface-200-700-token text-token p-4 rounded-container-token flex flex-col items-center"
+          class="h-fit bg-surface-200-800 base-font-color p-4 rounded-container flex flex-col items-center"
         >
           <p class="text-xl font-bold">{name}</p>
         </div>
@@ -134,17 +134,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
 {/if}
 {#if PUBLIC_KOFI_LINK}
   <div
-    class="variant-soft-surface rounded-container-token flex flex-col gap-1 items-center p-4"
+    class="preset-tonal-surface rounded-container flex flex-col gap-1 items-center p-4"
   >
     <Avatar
       initials=":)"
       width="w-16"
       rounded="rounded-full"
-      class="mx-auto flex-shrink-0 text-token"
+      class="mx-auto flex-shrink-0 base-font-color"
     />
     <a
       href="{PUBLIC_KOFI_LINK}/tiers"
-      class="btn bg-secondary-hover-token underline font-bold whitespace-pre-wrap"
+      class="btn preset-tonal-secondary underline font-bold whitespace-pre-wrap"
       target="_blank"
       rel="noopener noreferrer">Get your name or company listed here</a
     >

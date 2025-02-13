@@ -16,11 +16,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script>
   import { UNIT_LABELS } from '$lib/constants';
   import { project } from '$lib/state';
-  import { RadioGroup, RadioItem } from '@skeletonlabs/skeleton';
+  import { Segment } from '@skeletonlabs/skeleton-svelte';
 </script>
 
-<RadioGroup class="flex-wrap gap-y-2" active="bg-secondary-active-token">
-  <RadioItem
+<Segment class="flex-wrap gap-y-2" active="preset-filled-secondary-500">
+  <Segment.Item
     bind:group={project.units}
     name="units-metric"
     value={'metric'}
@@ -28,8 +28,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   >
     {`${UNIT_LABELS.temperature.metric} /
 	    ${UNIT_LABELS.height.metric}`}
-  </RadioItem>
-  <RadioItem
+  </Segment.Item>
+  <Segment.Item
     bind:group={project.units}
     name="units-imperial"
     value={'imperial'}
@@ -37,5 +37,5 @@ If not, see <https://www.gnu.org/licenses/>. -->
   >
     {`${UNIT_LABELS.temperature.imperial} /
 	    ${UNIT_LABELS.height.imperial}`}
-  </RadioItem>
-</RadioGroup>
+  </Segment.Item>
+</Segment>

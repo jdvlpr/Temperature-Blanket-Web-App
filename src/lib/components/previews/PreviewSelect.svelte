@@ -61,7 +61,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 </script>
 
-<div class="bg-surface-300-600-token rounded-container-token my-2 mb-4 p-2">
+<div class="bg-surface-300-700 rounded-container my-2 mb-4 p-2">
   <div class="mb-2 flex flex-wrap justify-center items-center">
     <label class="label">
       <select
@@ -87,10 +87,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {#key theme}
           <button
             class={[
-              'flex flex-col p-4 rounded-container-token justify-center gap-2 items-center snap-center',
+              'flex flex-col p-4 rounded-container justify-center gap-2 items-center snap-center',
               id === previews.activeId
-                ? 'bg-primary-300-600-token selected shadow'
-                : 'bg-surface-hover-token',
+                ? 'bg-primary-300-700 selected shadow'
+                : 'preset-tonal-surface',
             ]}
             onclick={() => {
               previews.activeId = id;

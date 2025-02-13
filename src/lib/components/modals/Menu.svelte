@@ -36,12 +36,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
     downloadWeatherCSV,
     setLocalStorageProject,
   } from '$lib/utils';
-  import { getToastStore } from '@skeletonlabs/skeleton';
   import ModalShell from './ModalShell.svelte';
   import { ICONS } from '$lib/constants';
   import { replaceState } from '$app/navigation';
+  import type { ToastContext } from '@skeletonlabs/skeleton-svelte';
+  import { getContext } from 'svelte';
 
-  const toastStore = getToastStore();
+  const toast: ToastContext = getContext('toast');
 
   interface Props {
     parent: any;
@@ -105,9 +106,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   $effect(() => {
     if (copiedMessage !== '') {
-      toastStore.trigger({
-        message: copiedMessage,
-        background: 'bg-success-300 text-black',
+      toast.create({
+        description: copiedMessage,
+        // background: 'bg-success-300 text-black',
       });
       copiedMessage = '';
     }
@@ -118,7 +119,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {#if !pages.main}
     <button
       aria-label="Go To Main Menu"
-      class="btn-icon bg-secondary-hover-token"
+      class="btn-icon preset-tonal-secondary"
       onclick={() => goTo('main')}
       title="Go To Main Menu"
     >
@@ -144,7 +145,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <h2 class="mb-2 text-xl font-bold">Project</h2>
       <div class="flex flex-col gap-2 w-full my-4">
         <button
-          class="btn bg-secondary-hover-token w-fit gap-2"
+          class="btn preset-tonal-secondary w-fit gap-2"
           onclick={() => {
             goTo('save');
             copiedMessage = '';
@@ -170,7 +171,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
         {#if weather.data.length}
           <button
-            class="btn bg-secondary-hover-token w-fit gap-2"
+            class="btn preset-tonal-secondary w-fit gap-2"
             onclick={() => goTo('download')}
             disabled={!weather.data}
             title="Open Download Menu"
@@ -181,7 +182,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {/if}
 
         <button
-          class="btn bg-secondary-hover-token w-fit gap-2"
+          class="btn preset-tonal-secondary w-fit gap-2"
           onclick={async () => {
             modal.state.close();
             modal.state.trigger({
@@ -216,7 +217,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <UnitChanger />
 
         <button
-          class="btn bg-secondary-hover-token w-fit"
+          class="btn preset-tonal-secondary w-fit"
           onclick={async () => {
             modal.state.close();
             modal.state.trigger({
@@ -389,7 +390,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <h2 class="my-2 text-lg font-bold">Download</h2>
       <div class="flex flex-col gap-2 items-start text-left">
         <button
-          class="btn bg-secondary-hover-token gap-2"
+          class="btn preset-tonal-secondary gap-2"
           onclick={downloadPDF}
           title="Download PDF File"
         >
@@ -397,7 +398,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           Gauges and Weather Data (PDF)
         </button>
         <button
-          class="btn bg-secondary-hover-token gap-2"
+          class="btn preset-tonal-secondary gap-2"
           onclick={downloadWeatherCSV}
           title="Download CSV File"
         >
@@ -407,7 +408,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
         {#if previews.active?.previewComponent}
           <button
-            class="btn bg-secondary-hover-token gap-2"
+            class="btn preset-tonal-secondary gap-2"
             title="Download PNG File"
             onclick={() => {
               downloadPreviewPNG(
@@ -455,14 +456,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {/if}
       {/if}
       <p class="text-sm mt-4 mb-2">Project URL</p>
-      <p
-        class="select-all break-all card bg-primary-50-900-token p-4 basis-full"
-      >
+      <p class="select-all break-all card bg-primary-50-950 p-4 basis-full">
         {project.url.href}
       </p>
       <div class="inline-flex flex-wrap my-2 gap-2 items-center">
         <button
-          class="btn bg-secondary-hover-token gap-1"
+          class="btn preset-tonal-secondary gap-1"
           onclick={() => {
             saveProject({ copy: false });
           }}

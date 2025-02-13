@@ -17,7 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { PUBLIC_BASE_DOMAIN_NAME, PUBLIC_BASE_URL } from '$env/static/public';
   import AppLogo from '$lib/components/AppLogo.svelte';
   import AppShell from '$lib/components/AppShell.svelte';
-  import { Accordion, AccordionItem } from '@skeletonlabs/skeleton';
+  import { Accordion } from '@skeletonlabs/skeleton-svelte';
 </script>
 
 <svelte:head>
@@ -40,10 +40,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <h2 class="font-bold text-2xl my-2">Frequently Asked Questions</h2>
         <section
           id="faq"
-          class="card variant-soft-surface p-4 flex flex-col gap-4"
+          class="card preset-tonal-surface p-4 flex flex-col gap-4"
         >
           <Accordion>
-            <AccordionItem id="weather-data-inaccurate">
+            <Accordion.Item id="weather-data-inaccurate">
               {#snippet lead()}
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -97,8 +97,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   > if you need. Sorry for any inconvenience.
                 </p>
               {/snippet}
-            </AccordionItem>
-            <AccordionItem id="is-there-an-app">
+            </Accordion.Item>
+            <Accordion.Item id="is-there-an-app">
               {#snippet lead()}
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -131,8 +131,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   >.
                 </p>
               {/snippet}
-            </AccordionItem>
-            <AccordionItem id="is-it-free">
+            </Accordion.Item>
+            <Accordion.Item id="is-it-free">
               {#snippet lead()}
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -155,8 +155,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
               {#snippet content()}
                 <p>Yep!</p>
               {/snippet}
-            </AccordionItem>
-            <AccordionItem>
+            </Accordion.Item>
+            <Accordion.Item>
               {#snippet lead()}
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -181,7 +181,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               {/snippet}
               {#snippet content()}
                 <p>
-                  The default setting (From ≤ Range &lt; To) will include the
+                  The default setting (From ≤ Range < To) will include the
                   first number up to but not including the second number, so
                   there’s not actually any weather value that would be in two
                   ranges at once. To make the range values not overlap, you will
@@ -205,8 +205,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   behavior.
                 </p>
               {/snippet}
-            </AccordionItem>
-            <AccordionItem>
+            </Accordion.Item>
+            <Accordion.Item>
               {#snippet lead()}
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -241,8 +241,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   >.
                 </p>
               {/snippet}
-            </AccordionItem>
-            <AccordionItem>
+            </Accordion.Item>
+            <Accordion.Item>
               {#snippet lead()}
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -275,7 +275,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 sure no days are in the future. If that doesn’t work, try searching
                 for a different nearby location.
               {/snippet}
-            </AccordionItem>
+            </Accordion.Item>
           </Accordion>
         </section>
       </div>

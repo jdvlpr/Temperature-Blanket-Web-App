@@ -17,11 +17,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { PUBLIC_BASE_DOMAIN_NAME, PUBLIC_BASE_URL } from '$env/static/public';
   import AppLogo from '$lib/components/AppLogo.svelte';
   import AppShell from '$lib/components/AppShell.svelte';
-  import {
-    TableOfContents,
-    getDrawerStore,
-    tocCrawler,
-  } from '@skeletonlabs/skeleton';
   const drawerStore = getDrawerStore();
 </script>
 
@@ -53,7 +48,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <AppLogo />
     </div>
     <button
-      class="btn bg-secondary-hover-token flex items-center sm:hidden"
+      class="btn preset-tonal-secondary flex items-center sm:hidden"
       title="Open Navigation Sidebar"
       onclick={() =>
         drawerStore.open({
@@ -78,7 +73,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <main class="max-w-screen-xl m-auto mb-4 pt-2 px-2 lg:px-0">
       <img
         src="/images/api-images/yarn-colorways-api.png"
-        class="h-56 object-cover w-full rounded-container-token mb-4"
+        class="h-56 object-cover w-full rounded-container mb-4"
         alt="Yarn Colorways API"
       />
       <div class="pb-4 text-left flex gap-4">
@@ -91,7 +86,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               Yarn Colorways API
             </h2>
             <section
-              class="gap-2 flex flex-col mt-2 lg:mt-0 card variant-soft-secondary p-4 rounded-container-token text-token"
+              class="gap-2 flex flex-col mt-2 lg:mt-0 card preset-tonal-secondary p-4 rounded-container base-font-color"
             >
               <p>Find yarn colorways by HTML hex color code.</p>
 
@@ -171,20 +166,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <h3 class="font-bold text-xl">Making a Request</h3>
             <p>This is the base URL for all endpoints:</p>
             <p
-              class="break-all whitespace-pre-wrap codeblock code text-token p-4 w-fit"
+              class="break-all whitespace-pre-wrap codeblock code base-font-color p-4 w-fit"
             >
               https://yarn-colorways.p.rapidapi.com/v1
             </p>
 
             <p>Include the following headers:</p>
             <p
-              class="break-all whitespace-pre-wrap codeblock code text-token p-4 w-fit"
+              class="break-all whitespace-pre-wrap codeblock code base-font-color p-4 w-fit"
             >
               "X-RapidAPI-Key": 'your-rapidapi-key', <br />"X-RapidAPI-Host":
               "yarn-colorways.p.rapidapi.com"
             </p>
             <p>
-              All requests should use the <span class="code text-token px-2"
+              All requests should use the <span class="code base-font-color px-2"
                 >GET</span
               > method.
             </p>
@@ -210,7 +205,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               > endpoint.
             </p>
             <p
-              class="break-all whitespace-pre-wrap codeblock code text-token p-4 w-fit"
+              class="break-all whitespace-pre-wrap codeblock code base-font-color p-4 w-fit"
             >
               {`{
       "meta": {
@@ -247,18 +242,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
           <section
             id="find-yarn-by-color"
-            class="scroll-mt-[58px] card bg-surface-200-700-token p-4 gap-2 flex flex-col"
+            class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
           >
             <h3 class="font-bold text-xl">Find Yarn by Color</h3>
             <p>Get best-matching yarn colorways for a specified color.</p>
 
             <p>
               <span class="font-bold">Method</span>
-              <span class="code px-2 text-token">GET</span>
+              <span class="code px-2 base-font-color">GET</span>
             </p>
             <p>
               <span class="font-bold">URL</span>
-              <span class="code px-2 text-token">/match/{`[color]`}</span>
+              <span class="code px-2 base-font-color">/match/{`[color]`}</span>
             </p>
 
             <p class="font-bold">Parameters</p>
@@ -267,7 +262,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </p>
             <div class="overflow-scroll max-w-[80vw] sm:max-w-[90vw]">
               <table
-                class="border-separate border-spacing-0 w-full border-surface-300-600-token border rounded-container-token overflow-hidden"
+                class="border-separate border-spacing-0 w-full border-surface-300-700 border rounded-container overflow-hidden"
               >
                 <thead>
                   <tr>
@@ -279,7 +274,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   </tr>
                 </thead>
                 <tbody
-                  class="[&>tr:nth-child(odd)]:bg-surface-50-900-token [&>tr:nth-child(even)]:bg-surface-100-800-token"
+                  class="[&>tr:nth-child(odd)]:bg-surface-50-950 [&>tr:nth-child(even)]:bg-surface-100-900"
                 >
                   <tr>
                     <td>color</td>
@@ -297,7 +292,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     <td><span class="">Yes</span></td>
                     <td
                       ><span
-                        class="variant-soft-surface rounded-container-token px-2 text-token"
+                        class="preset-tonal-surface rounded-container px-2 base-font-color"
                         >undefined</span
                       ></td
                     >
@@ -313,7 +308,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     <td>No</td>
                     <td
                       ><span
-                        class="variant-soft-surface rounded-container-token px-2 text-token"
+                        class="preset-tonal-surface rounded-container px-2 base-font-color"
                         >undefined</span
                       ></td
                     >
@@ -329,7 +324,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     <td>No</td>
                     <td
                       ><span
-                        class="variant-soft-surface rounded-container-token px-2 text-token"
+                        class="preset-tonal-surface rounded-container px-2 base-font-color"
                         >undefined</span
                       ></td
                     >
@@ -345,7 +340,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     <td>No</td>
                     <td
                       ><span
-                        class="variant-soft-surface rounded-container-token px-2 text-token"
+                        class="preset-tonal-surface rounded-container px-2 base-font-color"
                         >undefined</span
                       ></td
                     >
@@ -355,31 +350,31 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     <td
                       >The maximum number of yarn colorways to include in the
                       results. Maximum is
-                      <span class="code px-2 text-token">500</span>.</td
+                      <span class="code px-2 base-font-color">500</span>.</td
                     >
                     <td>Number</td>
                     <td>No</td>
-                    <td><span class="code px-2 text-token">50</span></td>
+                    <td><span class="code px-2 base-font-color">50</span></td>
                   </tr>
                   <tr>
                     <td>offset</td>
                     <td>The starting index of the data to return.</td>
                     <td>Number</td>
                     <td>No</td>
-                    <td><span class="code px-2 text-token">0</span></td>
+                    <td><span class="code px-2 base-font-color">0</span></td>
                   </tr>
                   <tr>
                     <td>threshold</td>
                     <td
                       >The minimum percentage amount the yarn colorway must
                       match the supplied color, between
-                      <span class="code px-2 text-token">0</span>
+                      <span class="code px-2 base-font-color">0</span>
                       and
-                      <span class="code px-2 text-token">100</span>.</td
+                      <span class="code px-2 base-font-color">100</span>.</td
                     >
                     <td>Number</td>
                     <td>No</td>
-                    <td><span class="code px-2 text-token">75</span></td>
+                    <td><span class="code px-2 base-font-color">75</span></td>
                   </tr>
                 </tbody>
               </table>
@@ -388,7 +383,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <p class="font-bold">Examples</p>
 
             <p
-              class="break-all whitespace-pre-wrap codeblock code text-token p-4 w-fit"
+              class="break-all whitespace-pre-wrap codeblock code base-font-color p-4 w-fit"
             >
               {`// get colorways matching an HTML hex code without the # hash 
   GET https://yarn-colorways.p.rapidapi.com/v1/match/665e3f 
@@ -415,7 +410,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <div class="overflow-scroll max-w-[80vw] sm:max-w-[90vw]">
               <table
-                class="border-separate border-spacing-0 w-full border-surface-300-600-token border rounded-container-token overflow-hidden"
+                class="border-separate border-spacing-0 w-full border-surface-300-700 border rounded-container overflow-hidden"
               >
                 <thead>
                   <tr>
@@ -425,7 +420,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   </tr>
                 </thead>
                 <tbody
-                  class="[&>tr:nth-child(odd)]:bg-surface-50-900-token [&>tr:nth-child(even)]:bg-surface-100-800-token"
+                  class="[&>tr:nth-child(odd)]:bg-surface-50-950 [&>tr:nth-child(even)]:bg-surface-100-900"
                 >
                   <tr>
                     <td>name</td>
@@ -499,18 +494,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
           <section
             id="colorways"
-            class="scroll-mt-[58px] card bg-surface-200-700-token p-4 gap-2 flex flex-col"
+            class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
           >
             <h3 class="font-bold text-xl">Colorways</h3>
             <p>Get yarn colorways.</p>
 
             <p>
               <span class="font-bold">Method</span>
-              <span class="code px-2 text-token">GET</span>
+              <span class="code px-2 base-font-color">GET</span>
             </p>
             <p>
               <span class="font-bold">URL</span>
-              <span class="code px-2 text-token">/colorways</span>
+              <span class="code px-2 base-font-color">/colorways</span>
             </p>
 
             <p class="font-bold">Parameters</p>
@@ -519,7 +514,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </p>
             <div class="overflow-scroll max-w-[80vw] sm:max-w-[90vw]">
               <table
-                class="border-separate border-spacing-0 w-full border-surface-300-600-token border rounded-container-token overflow-hidden"
+                class="border-separate border-spacing-0 w-full border-surface-300-700 border rounded-container overflow-hidden"
               >
                 <thead>
                   <tr>
@@ -531,7 +526,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   </tr>
                 </thead>
                 <tbody
-                  class="[&>tr:nth-child(odd)]:bg-surface-50-900-token [&>tr:nth-child(even)]:bg-surface-100-800-token"
+                  class="[&>tr:nth-child(odd)]:bg-surface-50-950 [&>tr:nth-child(even)]:bg-surface-100-900"
                 >
                   <tr>
                     <td>color</td>
@@ -549,7 +544,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     <td>No</td>
                     <td
                       ><span
-                        class="variant-soft-surface rounded-container-token px-2 text-token"
+                        class="preset-tonal-surface rounded-container px-2 base-font-color"
                         >undefined</span
                       ></td
                     >
@@ -561,7 +556,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     <td>No</td>
                     <td
                       ><span
-                        class="variant-soft-surface rounded-container-token px-2 text-token"
+                        class="preset-tonal-surface rounded-container px-2 base-font-color"
                         >undefined</span
                       ></td
                     >
@@ -577,7 +572,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     <td>No</td>
                     <td
                       ><span
-                        class="variant-soft-surface rounded-container-token px-2 text-token"
+                        class="preset-tonal-surface rounded-container px-2 base-font-color"
                         >undefined</span
                       ></td
                     >
@@ -593,7 +588,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     <td>No</td>
                     <td
                       ><span
-                        class="variant-soft-surface rounded-container-token px-2 text-token"
+                        class="preset-tonal-surface rounded-container px-2 base-font-color"
                         >undefined</span
                       ></td
                     >
@@ -609,7 +604,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     <td>No</td>
                     <td
                       ><span
-                        class="variant-soft-surface rounded-container-token px-2 text-token"
+                        class="preset-tonal-surface rounded-container px-2 base-font-color"
                         >undefined</span
                       ></td
                     >
@@ -622,39 +617,39 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     >
                     <td>Number</td>
                     <td>No</td>
-                    <td><span class="code px-2 text-token">50</span></td>
+                    <td><span class="code px-2 base-font-color">50</span></td>
                   </tr>
                   <tr>
                     <td>offset</td>
                     <td>The starting index of the data to return.</td>
                     <td>Number</td>
                     <td>No</td>
-                    <td><span class="code px-2 text-token">0</span></td>
+                    <td><span class="code px-2 base-font-color">0</span></td>
                   </tr>
                   <tr>
                     <td>sortBy</td>
                     <td
                       >The property to sort the results by. Accepted values are
-                      <span class="code px-2 text-token">default</span>,
-                      <span class="code px-2 text-token">lightness</span>, or
-                      <span class="code px-2 text-token">name</span>.
+                      <span class="code px-2 base-font-color">default</span>,
+                      <span class="code px-2 base-font-color">lightness</span>, or
+                      <span class="code px-2 base-font-color">name</span>.
                     </td>
                     <td>String</td>
                     <td>No</td>
-                    <td><span class="code px-2 text-token">default</span></td>
+                    <td><span class="code px-2 base-font-color">default</span></td>
                   </tr>
                   <tr>
                     <td>direction</td>
                     <td
                       >The direction to sort the results. Accepted values are
-                      <span class="code px-2 text-token">ASC</span>
+                      <span class="code px-2 base-font-color">ASC</span>
                       (ascending) or
-                      <span class="code px-2 text-token">DESC</span>
+                      <span class="code px-2 base-font-color">DESC</span>
                       (descending).
                     </td>
                     <td>String</td>
                     <td>No</td>
-                    <td><span class="code px-2 text-token">ASC</span></td>
+                    <td><span class="code px-2 base-font-color">ASC</span></td>
                   </tr>
                 </tbody>
               </table>
@@ -663,7 +658,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <p class="font-bold">Example</p>
 
             <p
-              class="break-all whitespace-pre-wrap codeblock code text-token p-4 w-fit"
+              class="break-all whitespace-pre-wrap codeblock code base-font-color p-4 w-fit"
             >
               {`// get all colorways 
   GET https://yarn-colorways.p.rapidapi.com/v1/colorways
@@ -686,7 +681,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <div class="overflow-scroll max-w-[80vw] sm:max-w-[90vw]">
               <table
-                class="border-separate border-spacing-0 w-full border-surface-300-600-token border rounded-container-token overflow-hidden"
+                class="border-separate border-spacing-0 w-full border-surface-300-700 border rounded-container overflow-hidden"
               >
                 <thead>
                   <tr>
@@ -696,7 +691,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   </tr>
                 </thead>
                 <tbody
-                  class="[&>tr:nth-child(odd)]:bg-surface-50-900-token [&>tr:nth-child(even)]:bg-surface-100-800-token"
+                  class="[&>tr:nth-child(odd)]:bg-surface-50-950 [&>tr:nth-child(even)]:bg-surface-100-900"
                 >
                   <tr>
                     <td>name</td>
@@ -753,7 +748,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
           <section
             id="brands"
-            class="scroll-mt-[58px] card bg-surface-200-700-token p-4 gap-2 flex flex-col"
+            class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
           >
             <h3 class="font-bold text-xl">Brands</h3>
             <p>
@@ -767,11 +762,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <p>
               <span class="font-bold">Method</span>
-              <span class="code px-2 text-token">GET</span>
+              <span class="code px-2 base-font-color">GET</span>
             </p>
             <p>
               <span class="font-bold">URL</span>
-              <span class="code px-2 text-token">/brands</span>
+              <span class="code px-2 base-font-color">/brands</span>
             </p>
 
             <p class="font-bold">Parameters</p>
@@ -780,7 +775,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <p class="font-bold">Example</p>
 
             <p
-              class="break-all whitespace-pre-wrap codeblock code text-token p-4 w-fit"
+              class="break-all whitespace-pre-wrap codeblock code base-font-color p-4 w-fit"
             >
               {`// get all brands 
   GET https://yarn-colorways.p.rapidapi.com/v1/brands 
@@ -796,7 +791,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <div class="overflow-scroll max-w-[80vw] sm:max-w-[90vw]">
               <table
-                class="border-separate border-spacing-0 w-full border-surface-300-600-token border rounded-container-token overflow-hidden"
+                class="border-separate border-spacing-0 w-full border-surface-300-700 border rounded-container overflow-hidden"
               >
                 <thead>
                   <tr>
@@ -806,7 +801,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   </tr>
                 </thead>
                 <tbody
-                  class="[&>tr:nth-child(odd)]:bg-surface-50-900-token [&>tr:nth-child(even)]:bg-surface-100-800-token"
+                  class="[&>tr:nth-child(odd)]:bg-surface-50-950 [&>tr:nth-child(even)]:bg-surface-100-900"
                 >
                   <tr>
                     <td>brandName</td>
@@ -835,7 +830,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
           <section
             id="yarns"
-            class="scroll-mt-[58px] card bg-surface-200-700-token p-4 gap-2 flex flex-col"
+            class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
           >
             <h3 class="font-bold text-xl">Yarns</h3>
             <p>
@@ -849,11 +844,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <p>
               <span class="font-bold">Method</span>
-              <span class="code px-2 text-token">GET</span>
+              <span class="code px-2 base-font-color">GET</span>
             </p>
             <p>
               <span class="font-bold">URL</span>
-              <span class="code px-2 text-token">/yarns</span>
+              <span class="code px-2 base-font-color">/yarns</span>
             </p>
 
             <p class="font-bold">Parameters</p>
@@ -862,7 +857,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </p>
             <div class="overflow-scroll max-w-[80vw] sm:max-w-[90vw]">
               <table
-                class="border-separate border-spacing-0 w-full border-surface-300-600-token border rounded-container-token overflow-hidden"
+                class="border-separate border-spacing-0 w-full border-surface-300-700 border rounded-container overflow-hidden"
               >
                 <thead>
                   <tr>
@@ -874,7 +869,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   </tr>
                 </thead>
                 <tbody
-                  class="[&>tr:nth-child(odd)]:bg-surface-50-900-token [&>tr:nth-child(even)]:bg-surface-100-800-token"
+                  class="[&>tr:nth-child(odd)]:bg-surface-50-950 [&>tr:nth-child(even)]:bg-surface-100-900"
                 >
                   <tr>
                     <td>brand</td>
@@ -886,7 +881,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     <td>No</td>
                     <td
                       ><span
-                        class="variant-soft-surface rounded-container-token px-2 text-token"
+                        class="preset-tonal-surface rounded-container px-2 base-font-color"
                         >undefined</span
                       ></td
                     >
@@ -898,7 +893,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <p class="font-bold">Example</p>
 
             <p
-              class="break-all whitespace-pre-wrap codeblock code text-token p-4 w-fit"
+              class="break-all whitespace-pre-wrap codeblock code base-font-color p-4 w-fit"
             >
               {`// get all yarns 
   GET https://yarn-colorways.p.rapidapi.com/v1/yarns
@@ -920,7 +915,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <div class="overflow-scroll max-w-[80vw] sm:max-w-[90vw]">
               <table
-                class="border-separate border-spacing-0 w-full border-surface-300-600-token border rounded-container-token overflow-hidden"
+                class="border-separate border-spacing-0 w-full border-surface-300-700 border rounded-container overflow-hidden"
               >
                 <thead>
                   <tr>
@@ -930,7 +925,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   </tr>
                 </thead>
                 <tbody
-                  class="[&>tr:nth-child(odd)]:bg-surface-50-900-token [&>tr:nth-child(even)]:bg-surface-100-800-token"
+                  class="[&>tr:nth-child(odd)]:bg-surface-50-950 [&>tr:nth-child(even)]:bg-surface-100-900"
                 >
                   <tr>
                     <td>brandName</td>
@@ -969,7 +964,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
           <section
             id="weights"
-            class="scroll-mt-[58px] card bg-surface-200-700-token p-4 gap-2 flex flex-col"
+            class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
           >
             <h3 class="font-bold text-xl">Yarn Weights</h3>
             <p>
@@ -983,11 +978,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <p>
               <span class="font-bold">Method</span>
-              <span class="code px-2 text-token">GET</span>
+              <span class="code px-2 base-font-color">GET</span>
             </p>
             <p>
               <span class="font-bold">URL</span>
-              <span class="code px-2 text-token">/weights</span>
+              <span class="code px-2 base-font-color">/weights</span>
             </p>
 
             <p class="font-bold">Parameters</p>
@@ -996,7 +991,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <p class="font-bold">Example</p>
 
             <p
-              class="break-all whitespace-pre-wrap codeblock code text-token p-4 w-fit"
+              class="break-all whitespace-pre-wrap codeblock code base-font-color p-4 w-fit"
             >
               {`// get all yarn weights 
   GET https://yarn-colorways.p.rapidapi.com/v1/weights
@@ -1012,7 +1007,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <div class="overflow-scroll max-w-[80vw] sm:max-w-[90vw]">
               <table
-                class="border-separate border-spacing-0 w-full border-surface-300-600-token border rounded-container-token overflow-hidden"
+                class="border-separate border-spacing-0 w-full border-surface-300-700 border rounded-container overflow-hidden"
               >
                 <thead>
                   <tr>
@@ -1022,7 +1017,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   </tr>
                 </thead>
                 <tbody
-                  class="[&>tr:nth-child(odd)]:bg-surface-50-900-token [&>tr:nth-child(even)]:bg-surface-100-800-token"
+                  class="[&>tr:nth-child(odd)]:bg-surface-50-950 [&>tr:nth-child(even)]:bg-surface-100-900"
                 >
                   <tr>
                     <td>id</td>
@@ -1052,7 +1047,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <p>Responses will have one of the following status codes:</p>
             <div class="overflow-scroll max-w-[80vw] sm:max-w-[90vw]">
               <table
-                class="border-separate border-spacing-0 w-full border-surface-300-600-token border rounded-container-token overflow-hidden"
+                class="border-separate border-spacing-0 w-full border-surface-300-700 border rounded-container overflow-hidden"
               >
                 <thead>
                   <tr>
@@ -1061,7 +1056,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   </tr>
                 </thead>
                 <tbody
-                  class="[&>tr:nth-child(odd)]:bg-surface-50-900-token [&>tr:nth-child(even)]:bg-surface-100-800-token"
+                  class="[&>tr:nth-child(odd)]:bg-surface-50-950 [&>tr:nth-child(even)]:bg-surface-100-900"
                 >
                   <tr>
                     <td>200</td>
@@ -1144,7 +1139,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               </div>
               <p class="font-bold">Example Attribution:</p>
               <p
-                class="text-token w-fit p-4 variant-soft-tertiary rounded-container-token break-all max-w-[90vw]"
+                class="base-font-color w-fit p-4 preset-tonal-tertiary rounded-container break-all max-w-[90vw]"
               >
                 Yarn colorways from
                 <a href={PUBLIC_BASE_URL} target="_blank" class="link"

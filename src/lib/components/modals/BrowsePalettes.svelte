@@ -18,7 +18,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import GalleryPalettesPopular from '$lib/components/GalleryPalettesPopular.svelte';
   import PaletteSchemes from '$lib/components/PaletteSchemes.svelte';
   import ToTopButton from '$lib/components/buttons/ToTopButton.svelte';
-  import { RadioGroup, RadioItem } from '@skeletonlabs/skeleton';
+  import { Segment } from '@skeletonlabs/skeleton-svelte';
   import ModalShell from './ModalShell.svelte';
 
   interface Props {
@@ -79,13 +79,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 {#snippet content()}
   <div class="" bind:this={container}>
     <div
-      class="w-full flex flex-wrap justify-center items-end gap-2 px-2 pb-2 bg-surface-100-800-token"
+      class="w-full flex flex-wrap justify-center items-end gap-2 px-2 pb-2 bg-surface-100-900"
       class:pt-4={context === 'drawer'}
       bind:this={filtersContainer}
     >
-      <RadioGroup class="flex wrap gap-y-2" active="bg-secondary-active-token">
+      <Segment class="flex wrap gap-y-2" active="preset-filled-secondary-500">
         {#each categories as categoryItem}
-          <RadioItem
+          <Segment.Item
             bind:group={category}
             name="category-{categoryItem}"
             value={categoryItem}
@@ -94,9 +94,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <span class="flex gap-1 justify-center items-center">
               {categoryItem}
             </span>
-          </RadioItem>
+          </Segment.Item>
         {/each}
-      </RadioGroup>
+      </Segment>
     </div>
 
     {#if category === 'Gallery'}

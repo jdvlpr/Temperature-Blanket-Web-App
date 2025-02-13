@@ -21,7 +21,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import RangeOptionsButton from './buttons/RangeOptionsButton.svelte';
   import GaugeCustomizer from './GaugeCustomizer.svelte';
   import { ICONS } from '$lib/constants';
-  import { getModalStore, RadioGroup, RadioItem } from '@skeletonlabs/skeleton';
+  import { Segment } from '@skeletonlabs/skeleton-svelte';
 
   onMount(() => {
     setupAvailableGauges();
@@ -61,12 +61,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div class="w-full overflow-scroll relative hide-scrollbar">
-  <RadioGroup
+  <Segment
     class="flex wrap gap-y-2 mt-4 mb-2"
-    active="bg-secondary-active-token"
+    active="preset-filled-secondary-500"
   >
     {#each gauges.allAvailable as { id, label }}
-      <RadioItem
+      <Segment.Item
         bind:group={gauges.activeGaugeId}
         onclick={(e) => {
           e.preventDefault();
@@ -108,16 +108,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {/if}
           {label}</span
         >
-      </RadioItem>
+      </Segment.Item>
     {/each}
-  </RadioGroup>
+  </Segment>
 </div>
 {#if gauges.activeGauge && !gauges.activeGauge?.calculating}
   {#if gauges.activeGauge.id !== 'temp'}
     <!-- If this is not the default temperature gauge and we're on the project planner page -->
     <div class="w-full flex justify-center mb-4 sm:mb-6">
       <button
-        class="btn bg-secondary-hover-token justify-start gap-1 top-2 relative max-sm:mb-2"
+        class="btn preset-tonal-secondary justify-start gap-1 top-2 relative max-sm:mb-2"
         title="Delete {gauges.activeGauge.label}"
         onclick={() => {
           gauges.remove(gauges.activeGauge.id);
@@ -154,10 +154,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 {/if}
 
 <div
-  class="flex flex-wrap gap-2 justify-center mt-4 mb-2 lg:mb-4 px-4 py-2 shadow-inner rounded-container-token variant-soft-surface"
+  class="flex flex-wrap gap-2 justify-center mt-4 mb-2 lg:mb-4 px-4 py-2 shadow-inner rounded-container preset-tonal-surface"
 >
   <button
-    class="btn bg-secondary-hover-token whitespace-pre-wrap"
+    class="btn preset-tonal-secondary whitespace-pre-wrap"
     onclick={downloadPDF}
     title="Download PDF File"
   >

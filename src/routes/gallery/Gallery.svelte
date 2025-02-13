@@ -141,7 +141,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <div class="inline-grid gap-2 text-center">
     <Card>
       {#snippet header()}
-        <div class="bg-surface-50-900-token py-4">
+        <div class="bg-surface-50-950 py-4">
           <h2 class="font-bold text-xl">Featured Projects</h2>
           <label>
             <span>Popular during the past</span>
@@ -164,7 +164,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {/snippet}
       {#snippet content()}
         <div
-          class="w-full flex items-start gap-2 snap-x snap-mandatory overflow-x-scroll mx-auto bg-surface-50-900-token p-2"
+          class="w-full flex items-start gap-2 snap-x snap-mandatory overflow-x-scroll mx-auto bg-surface-50-950 p-2"
           bind:this={featuredProjectsEl}
         >
           {#if !galleryState.popularProjects.length}
@@ -172,7 +172,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             {#each Array(5)}
               <div
-                class="placeholder animate-pulse snap-center shrink-0 h-[324px] w-[245px] rounded-container-token bg-surface-100-800-token"
+                class="placeholder animate-pulse snap-center shrink-0 h-[324px] w-[245px] rounded-container bg-surface-100-900"
               ></div>
             {/each}
           {:else}
@@ -180,7 +180,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               {@const title = getTitleFromLocationsMeta(meta.locations)}
               <a
                 href="/gallery/{id}"
-                class="snap-center shrink-0 min-h-[200px] max-w-[245px] lg:max-w-[350px] gap-1 text-center flex flex-col items-center justify-start flex-wrap mx-auto rounded-container-token p-2 group bg-surface-hover-token"
+                class="snap-center shrink-0 min-h-[200px] max-w-[245px] lg:max-w-[350px] gap-1 text-center flex flex-col items-center justify-start flex-wrap mx-auto rounded-container p-2 group preset-tonal-surface"
               >
                 <img
                   src={featured_image_src}
@@ -203,7 +203,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {#snippet header()}
         <div
           bind:this={scrollContainer}
-          class="bg-surface-50-900-token text-token pt-4 text-center flex flex-wrap justify-center items-end scroll-mt-[70px]"
+          class="bg-surface-50-950 base-font-color pt-4 text-center flex flex-wrap justify-center items-end scroll-mt-[70px]"
         >
           <h2 class="font-bold text-xl">All Projects</h2>
           <div class="w-full justify-center flex mb-2">
@@ -356,7 +356,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             >
               <button
                 disabled={loading}
-                class="btn variant-filled-primary flex items-center text-xl font-bold w-full h-fit"
+                class="btn preset-filled-primary-500 flex items-center text-xl font-bold w-full h-fit"
                 onclick={async () => {
                   projectsList.scrollIntoView({
                     behavior: 'smooth',
@@ -415,7 +415,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {/snippet}
       {#snippet content()}
         <div
-          class="flex flex-col items-center scroll-mt-[58px] lg:scroll-mt-[44px] bg-surface-50-900-token p-2 rounded-container-token"
+          class="flex flex-col items-center scroll-mt-[58px] lg:scroll-mt-[44px] bg-surface-50-950 p-2 rounded-container"
           bind:this={projectsList}
         >
           <div class="my-2 mx-auto">
@@ -431,7 +431,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               {@const title = getTitleFromLocationsMeta(locations)}
               <a
                 href="/gallery/{databaseId}"
-                class="text-center bg-surface-hover-token rounded-container-token p-2 flex gap-1 group {layout ===
+                class="text-center preset-tonal-surface rounded-container p-2 flex gap-1 group {layout ===
                 'grid'
                   ? 'flex-col items-center justify-center'
                   : 'flex-col items-center justify-start w-full'}"
@@ -463,7 +463,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             >
               {#each Array(20)}
                 <div
-                  class="placeholder animate-pulse text-center card bg-surface-100-800-token rounded-container-token {layout ===
+                  class="placeholder animate-pulse text-center card bg-surface-100-900 rounded-container {layout ===
                   'grid'
                     ? 'w-full h-[350px]'
                     : 'w-full h-[120px]'}"
@@ -472,7 +472,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </div>
           {:else if galleryState.displayedProjects.length && hasNextPage}
             <button
-              class="btn variant-filled-primary flex m-auto my-4"
+              class="btn preset-filled-primary-500 flex m-auto my-4"
               disabled={!hasNextPage}
               onclick={async () => {
                 loading = true;

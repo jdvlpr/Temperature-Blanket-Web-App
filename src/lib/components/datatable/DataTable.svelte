@@ -59,7 +59,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <section class="flex flex-wrap items-end gap-2">
           <button
             aria-label="Previous Page"
-            class="btn-icon bg-secondary-hover-token"
+            class="btn-icon preset-tonal-secondary"
             title="Previous Page"
             disabled={table.currentPage === 1}
             onclick={() => table.setPage('previous')}
@@ -97,7 +97,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
           <button
             aria-label="Next Page"
-            class="btn-icon bg-secondary-hover-token"
+            class="btn-icon preset-tonal-secondary"
             title="Next Page"
             disabled={table.currentPage === table.pages.length}
             onclick={() => table.setPage('next')}

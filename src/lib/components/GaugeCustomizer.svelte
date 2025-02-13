@@ -178,7 +178,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </div>
 
 <div
-  class="rounded-container-token overflow-hidden mt-2 mb-2 lg:mb-4 {preferences
+  class="rounded-container overflow-hidden mt-2 mb-2 lg:mb-4 {preferences
     .value.layout === 'grid'
     ? 'gap-1 grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4'
     : 'flex flex-col'}"
@@ -195,7 +195,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <div
       class="color p-2 gap-2 flex flex-wrap items-center justify-around {preferences
         .value.layout === 'grid'
-        ? 'rounded-container-token md:basis-1/5 sm:basis-1/4 basis-1/3 flex-auto'
+        ? 'rounded-container md:basis-1/5 sm:basis-1/4 basis-1/3 flex-auto'
         : ''}"
       style="background:{hex};color:{getTextColor(hex)}"
       animate:flip={{ duration: flipDurationMs }}
@@ -203,7 +203,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {#if movable}
         <button
           title="Remove Color"
-          class="btn bg-secondary-hover-token flex flex-wrap justify-center items-center"
+          class="btn preset-tonal-secondary flex flex-wrap justify-center items-center"
           onclick={() => {
             gauge.updateColors({
               colors: gauge.colors.filter((_, i) => i !== index),
@@ -221,7 +221,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         title="Move Color"
         tabindex="-1"
         aria-label="Crag handle for color {index + 1}"
-        class="btn-icon bg-secondary-hover-token handle p-2 {dragDisabled
+        class="btn-icon preset-tonal-secondary handle p-2 {dragDisabled
           ? 'cursor-grabbing'
           : 'cursor-grab'}"
         onmousedown={startDrag}
@@ -232,7 +232,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </button>
 
       <button
-        class="btn bg-secondary-hover-token flex items-center justify-start"
+        class="btn preset-tonal-secondary flex items-center justify-start"
         title="Choose a Color"
         onclick={() =>
           modal.state.trigger({
@@ -286,7 +286,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
       {#if affiliate_variant_href}
         <a
-          class="btn bg-secondary-hover-token flex flex-wrap justify-center items-center"
+          class="btn preset-tonal-secondary flex flex-wrap justify-center items-center"
           href={affiliate_variant_href}
           target="_blank"
           rel="noreferrer nofollow"
@@ -318,7 +318,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
         {#if showDaysInRange.value}
           <div
-            class="flex flex-wrap w-fit justify-center items-center bg-surface-900/10 rounded-container-token shadow-inner"
+            class="flex flex-wrap w-fit justify-center items-center bg-surface-900/10 rounded-container shadow-inner"
           >
             <DaysInRange
               range={gauge.ranges[index]}

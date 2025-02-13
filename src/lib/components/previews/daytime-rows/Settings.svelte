@@ -270,7 +270,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </DataTable>
     <div class="mt-4">
       <button
-        class="btn bg-secondary-hover-token gap-1"
+        class="btn preset-tonal-secondary gap-1"
         onclick={downloadStitchesTableCSV}
         title="Download CSV File"
       >

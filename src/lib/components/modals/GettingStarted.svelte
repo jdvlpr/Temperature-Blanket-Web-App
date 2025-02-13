@@ -14,8 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { getModalStore } from '@skeletonlabs/skeleton';
-  import ModalShell from './ModalShell.svelte';
+    import ModalShell from './ModalShell.svelte';
   import Step1 from './gettingStartedSteps/Step1.svelte';
   import Step2 from './gettingStartedSteps/Step2.svelte';
   import Step3 from './gettingStartedSteps/Step3.svelte';

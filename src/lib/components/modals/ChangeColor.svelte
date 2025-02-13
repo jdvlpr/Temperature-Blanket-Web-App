@@ -17,7 +17,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
   import StickyPart from '$lib/components/modals/StickyPart.svelte';
   import YarnGridSelect from '$lib/components/modals/YarnGridSelect.svelte';
-  import { getModalStore } from '@skeletonlabs/skeleton';
   import chroma from 'chroma-js';
   import ModalShell from './ModalShell.svelte';
 
@@ -140,7 +139,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <p class="my-2 text-center text-xs">Color {title}</p>
     {#if affiliate_variant_href}
       <a
-        class="btn bg-secondary-hover-token flex flex-wrap justify-center items-center gap-2 underline w-fit mx-auto"
+        class="btn preset-tonal-secondary flex flex-wrap justify-center items-center gap-2 underline w-fit mx-auto"
         href={affiliate_variant_href}
         target="_blank"
         rel="noreferrer nofollow"
@@ -176,7 +175,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </a>
     {:else if variant_href}
       <a
-        class="btn bg-secondary-hover-token flex flex-wrap justify-center items-center gap-2 underline w-fit mx-auto"
+        class="btn preset-tonal-secondary flex flex-wrap justify-center items-center gap-2 underline w-fit mx-auto"
         href={variant_href}
         target="_blank"
         rel="noreferrer nofollow"
@@ -262,7 +261,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <StickyPart position="bottom">
       <div class="p-2 sm:px-4">
         {#if !valid}
-          <p class="card variant-soft-warning p-4 my-2">
+          <p class="card preset-tonal-warning p-4 my-2">
             Please enter a valid color
           </p>
         {/if}

@@ -1,6 +1,5 @@
 <script lang="ts">
   import { isDesktop } from '$lib/state';
-  import { getModalStore } from '@skeletonlabs/skeleton';
   import CloseButton from './CloseButton.svelte';
   import { onMount, type Snippet } from 'svelte';
 

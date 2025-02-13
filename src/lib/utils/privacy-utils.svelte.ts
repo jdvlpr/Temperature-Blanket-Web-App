@@ -15,8 +15,8 @@
 
 import { browser } from '$app/environment';
 import { consentToMSClarityCookies, preferences } from '$lib/state';
-import { getToastStore } from '@skeletonlabs/skeleton';
-
+import type { ToastContext } from '@skeletonlabs/skeleton-svelte';
+import { getContext } from 'svelte';
 export const privacy = {
   get_cookie: function (name) {
     return document.cookie.split(';').some((c) => {
@@ -36,7 +36,7 @@ export const privacy = {
   init: function () {
     if (!browser) return;
 
-    const toastStore = getToastStore();
+    const toast: ToastContext = getContext('toast');
 
     // Event listener for when consent is given to Microsoft Clarity
     // If consent is given, it sets the `consentToMSClarityCookies` store to true
@@ -60,10 +60,10 @@ export const privacy = {
     window.addEventListener('analyticsUnableToLoad', () => {
       setTimeout(function () {
         // code to execute after 200 milliseconds
-        toastStore.trigger({
-          message:
+        toast.create({
+          description:
             'Unable to load analytics. Your browser or a plugin might be blocking it.',
-          background: 'variant-filled-error',
+          // background: 'preset-filled-error-500',
         });
       }, 1000);
     });
@@ -98,7 +98,7 @@ export const privacy = {
       `,
           hideDismiss: true,
           classes: 'flex max-sm:flex-col max-sm:gap-2 max-sm:items-end',
-          background: 'bg-surface-50-900-token',
+          background: 'bg-surface-50-950',
           timeout: 31556952000, // one year
           action: {
             label: 'Save',

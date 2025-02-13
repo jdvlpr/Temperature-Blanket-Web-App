@@ -29,7 +29,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     pluralize,
     stringToBrandAndYarnDetails,
   } from '$lib/utils';
-  import { getModalStore } from '@skeletonlabs/skeleton';
   import chroma from 'chroma-js';
   import { onMount } from 'svelte';
   import { fade } from 'svelte/transition';
@@ -351,7 +350,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       bind:this={input}
       onchange={handleImageChange}
     />
-    <button class="btn bg-secondary-hover-token gap-1" onclick={getRandomImage}>
+    <button class="btn preset-tonal-secondary gap-1" onclick={getRandomImage}>
       <svg
         xmlns="http://www.w3.org/2000/svg"
         fill="none"
@@ -370,7 +369,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       Random Image</button
     >
     <button
-      class="btn bg-secondary-hover-token gap-1"
+      class="btn preset-tonal-secondary gap-1"
       onclick={() => {
         if (typeof input !== 'undefined') input.click();
       }}
@@ -447,7 +446,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <div bind:this={hoverDiv} in:fade>
         <p
           bind:this={hoverName}
-          class="z-10 shadow-lg rounded-container-token min-w-[140px] max-w-[180px] absolute pointer-events-none box-border -translate-x-1/2 -translate-y-1/2 p-2 flex flex-col justify-center items-center"
+          class="z-10 shadow-lg rounded-container min-w-[140px] max-w-[180px] absolute pointer-events-none box-border -translate-x-1/2 -translate-y-1/2 p-2 flex flex-col justify-center items-center"
           style="left:{coords.x}px;top:{coords.y -
             70}px;background:{cursorColor.hex};color:{getTextColor(
             cursorColor.hex,
@@ -468,7 +467,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </p>
         <div
           bind:this={colorHoverDiv}
-          class="shadow-lg rounded-container-token w-10 h-10 absolute pointer-events-none box-border -translate-x-1/2 -translate-y-1/2 transition-transform"
+          class="shadow-lg rounded-container w-10 h-10 absolute pointer-events-none box-border -translate-x-1/2 -translate-y-1/2 transition-transform"
           style="left:{coords.x}px;top:{coords.y}px;background:{cursorColor.hex};border:2px solid {getTextColor(
             cursorColor.hex,
           )}"
@@ -571,10 +570,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {/key}
 
       {#if warningMessage}
-        <div class="flex gap-2 text-warning-800-100-token">
+        <div class="flex gap-2 text-warning-900-100">
           <p>{warningMessage}</p>
           <button
-            class="btn bg-secondary-hover-token"
+            class="btn preset-tonal-secondary"
             aria-label="close"
             onclick={() => (warningMessage = null)}
           >
@@ -597,7 +596,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {/if}
 
       <button
-        class="btn bg-secondary-hover-token gap-1"
+        class="btn preset-tonal-secondary gap-1"
         onclick={() => {
           if (numberOfColors < 2) numberOfColors = 2;
           matchingYarnColors = getMatchingYarnColors({
@@ -621,7 +620,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </button>
 
       <button
-        class="btn bg-secondary-hover-token gap-1"
+        class="btn preset-tonal-secondary gap-1"
         onclick={() => {
           matchingYarnColors = matchingYarnColors.filter(
             (color) => color.locked,

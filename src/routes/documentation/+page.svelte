@@ -18,12 +18,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import AppLogo from '$lib/components/AppLogo.svelte';
   import AppShell from '$lib/components/AppShell.svelte';
   import { MAXIMUM_DAYS_PER_LOCATION, MAXIMUM_LOCATIONS } from '$lib/constants';
-  import {
-    TableOfContents,
-    getDrawerStore,
-    tocCrawler,
-  } from '@skeletonlabs/skeleton';
-
   const drawerStore = getDrawerStore();
 
   let checkIcon = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 inline text-success-800-100-token">
@@ -61,7 +55,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <AppLogo />
     </div>
     <button
-      class="btn bg-secondary-hover-token flex items-center sm:hidden"
+      class="btn preset-tonal-secondary flex items-center sm:hidden"
       title="Open Navigation Sidebar"
       onclick={() =>
         drawerStore.open({
@@ -98,7 +92,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </h2>
             <section
               id="introduction"
-              class="scroll-mt-[58px] card bg-surface-200-700-token p-4 gap-2 flex flex-col mt-2 lg:mt-0"
+              class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col mt-2 lg:mt-0"
             >
               <h3 class="font-bold text-xl">Introduction</h3>
               <p>
@@ -111,7 +105,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </div>
           <section
             id="about-the-project-planner"
-            class="scroll-mt-[58px] card bg-surface-200-700-token p-4 gap-2 flex flex-col"
+            class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
           >
             <h3 class="font-bold text-xl">About the Project Planner</h3>
             <p>
@@ -180,7 +174,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
           <section
             id="save-project"
-            class="scroll-mt-[58px] card bg-surface-200-700-token p-4 gap-2 flex flex-col"
+            class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
           >
             <h3 class="font-bold text-xl">Save Project</h3>
             <p>
@@ -211,7 +205,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <table>
                 <tbody
                   ><tr
-                    class="flex flex-flow gap-2 justify-between items-center w-full font-bold border-surface-900-50-token border p-2 rounded-container-token"
+                    class="flex flex-flow gap-2 justify-between items-center w-full font-bold border-surface-950-50 border p-2 rounded-container"
                     ><td
                       ><span class="kbd">Cmd ⌘ + s</span>
                       or
@@ -231,7 +225,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               re-open your project from its Project Gallery Page.
             </p>
             <div
-              class="card variant-soft-warning text-token p-4 gap-2 flex flex-col"
+              class="card preset-tonal-warning base-font-color p-4 gap-2 flex flex-col"
             >
               <p>
                 Your project must first have a valid location and dates in order
@@ -242,7 +236,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </section>
           <section
             id="open-project"
-            class="scroll-mt-[58px] card bg-surface-200-700-token p-4 gap-2 flex flex-col"
+            class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
           >
             <h3 class="font-bold text-xl">Open Project</h3>
             <p>
@@ -258,7 +252,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </section>
           <section
             id="change-units"
-            class="scroll-mt-[58px] card bg-surface-200-700-token p-4 gap-2 flex flex-col"
+            class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
           >
             <h3 class="font-bold text-xl">Change Units</h3>
             <p>
@@ -271,7 +265,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <table>
                 <tbody
                   ><tr
-                    class="flex flex-flow gap-2 justify-between items-center w-full font-bold border-surface-900-50-token border p-2 rounded-container-token"
+                    class="flex flex-flow gap-2 justify-between items-center w-full font-bold border-surface-950-50 border p-2 rounded-container"
                     ><td><span class="kbd">u</span></td><td>Change Units</td
                     ></tr
                   ></tbody
@@ -281,7 +275,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </section>
           <section
             id="change-theme"
-            class="scroll-mt-[58px] card bg-surface-200-700-token p-4 gap-2 flex flex-col"
+            class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
           >
             <h3 class="font-bold text-xl">Change Theme</h3>
             <p>
@@ -296,7 +290,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <table>
                 <tbody
                   ><tr
-                    class="flex flex-flow gap-2 justify-between items-center w-full font-bold border-surface-900-50-token border p-2 rounded-container-token"
+                    class="flex flex-flow gap-2 justify-between items-center w-full font-bold border-surface-950-50 border p-2 rounded-container"
                     ><td><span class="kbd">t</span></td><td
                       >Toggle Theme (Light, Dark, System)</td
                     ></tr
@@ -307,7 +301,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </section>
           <section
             id="navigation"
-            class="scroll-mt-[58px] card bg-surface-200-700-token p-4 gap-2 flex flex-col"
+            class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
           >
             <h3 class="font-bold text-xl">Navigation</h3>
             <p>
@@ -319,21 +313,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <table>
                 <tbody class="flex flex-col gap-2"
                   ><tr
-                    class="flex flex-flow gap-2 justify-between items-center w-full font-bold border-surface-900-50-token border p-2 rounded-container-token"
+                    class="flex flex-flow gap-2 justify-between items-center w-full font-bold border-surface-950-50 border p-2 rounded-container"
                     ><td class="kbd">0</td><td>Go to the top of the page</td
                     ></tr
                   ><tr
-                    class="flex flex-flow gap-2 justify-between items-center w-full font-bold border-surface-900-50-token border p-2 rounded-container-token"
+                    class="flex flex-flow gap-2 justify-between items-center w-full font-bold border-surface-950-50 border p-2 rounded-container"
                     ><td class="kbd">1</td><td>Go to Location section</td></tr
                   >
                   <tr
-                    class="flex flex-flow gap-2 justify-between items-center w-full font-bold border-surface-900-50-token border p-2 rounded-container-token"
+                    class="flex flex-flow gap-2 justify-between items-center w-full font-bold border-surface-950-50 border p-2 rounded-container"
                     ><td class="kbd">2</td><td>Go to Weather section</td></tr
                   ><tr
-                    class="flex flex-flow gap-2 justify-between items-center w-full font-bold border-surface-900-50-token border p-2 rounded-container-token"
+                    class="flex flex-flow gap-2 justify-between items-center w-full font-bold border-surface-950-50 border p-2 rounded-container"
                     ><td class="kbd">3</td><td>Go to Colors section</td></tr
                   ><tr
-                    class="flex flex-flow gap-2 justify-between items-center w-full font-bold border-surface-900-50-token border p-2 rounded-container-token"
+                    class="flex flex-flow gap-2 justify-between items-center w-full font-bold border-surface-950-50 border p-2 rounded-container"
                     ><td class="kbd">4</td><td>Go to Preview section</td></tr
                   ></tbody
                 >
@@ -343,7 +337,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
           <section
             id="undoredo"
-            class="scroll-mt-[58px] card bg-surface-200-700-token p-4 gap-2 flex flex-col"
+            class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
           >
             <h3 class="font-bold text-xl">Undo/Redo</h3>
 
@@ -356,14 +350,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <table>
                 <tbody class="flex flex-col gap-2"
                   ><tr
-                    class="flex flex-flow gap-2 justify-between items-center w-full font-bold border-surface-900-50-token border p-2 rounded-container-token"
+                    class="flex flex-flow gap-2 justify-between items-center w-full font-bold border-surface-950-50 border p-2 rounded-container"
                     ><td
                       ><span class="kbd">Cmd ⌘ + z</span>
                       or
                       <span class="kbd">Ctrl + z</span></td
                     ><td>Undo</td></tr
                   ><tr
-                    class="flex flex-flow gap-2 justify-between items-center w-full font-bold border-surface-900-50-token border p-2 rounded-container-token"
+                    class="flex flex-flow gap-2 justify-between items-center w-full font-bold border-surface-950-50 border p-2 rounded-container"
                     ><td
                       ><span class="kbd">Cmd ⌘ + Shift ⇧ + z</span>
                       or
@@ -381,7 +375,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
           <section
             id="choose-a-location"
-            class="scroll-mt-[58px] card bg-surface-200-700-token p-4 gap-2 flex flex-col"
+            class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
           >
             <h3 class="font-bold text-xl">Choose a Location</h3>
             <p>
@@ -389,7 +383,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               box, then select a result from the autocomplete list.
             </p>
             <div
-              class="card variant-soft-warning text-token p-4 gap-2 flex flex-col"
+              class="card preset-tonal-warning base-font-color p-4 gap-2 flex flex-col"
             >
               <p>
                 You must choose an item from the suggested results. The
@@ -407,7 +401,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </section>
           <section
             id="select-dates"
-            class="scroll-mt-[58px] card bg-surface-200-700-token p-4 gap-2 flex flex-col"
+            class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
           >
             <h3 class="font-bold text-xl">Select Dates</h3>
             <p>
@@ -425,7 +419,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               </li>
             </ul>
             <div
-              class="card variant-soft-warning text-token p-4 gap-2 flex flex-col"
+              class="card preset-tonal-warning base-font-color p-4 gap-2 flex flex-col"
             >
               <p>
                 Selected dates should be in the past, not the future. Dates in
@@ -436,7 +430,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </section>
           <section
             id="multiple-locations"
-            class="scroll-mt-[58px] card bg-surface-200-700-token p-4 gap-2 flex flex-col"
+            class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
           >
             <h3 class="font-bold text-xl">Multiple Locations</h3>
             <p>
@@ -445,7 +439,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </p>
             <p>To remove a location, press the Remove Location icon.</p>
             <div
-              class="card variant-soft-warning text-token p-4 gap-2 flex flex-col"
+              class="card preset-tonal-warning base-font-color p-4 gap-2 flex flex-col"
             >
               <p>
                 The maximum number of locations per project is {MAXIMUM_LOCATIONS}.
@@ -454,7 +448,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </section>
           <section
             id="location-errors"
-            class="scroll-mt-[58px] card bg-surface-200-700-token p-4 gap-2 flex flex-col"
+            class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
           >
             <h3 class="font-bold text-xl">Location Errors</h3>
 
@@ -463,7 +457,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               message saying:
             </p>
             <blockquote class="wp-block-quote is-style-default">
-              <p class="card p-2 variant-soft-surface text-token">
+              <p class="card p-2 preset-tonal-surface base-font-color">
                 “<em
                   >Whoah! There’s been a problem. It appears the
                   location-fetching service is experiencing technical
@@ -489,7 +483,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </h2>
           <section
             id="weather-sources"
-            class="scroll-mt-[58px] card bg-surface-200-700-token p-4 gap-2 flex flex-col"
+            class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
           >
             <h3 class="font-bold text-xl">Weather Sources</h3>
 
@@ -508,35 +502,35 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   href="https://meteostat.net/"
                   target="_blank">Meteostat</a
                 >
-                – The&nbsp;<a
+                – The <a
                   class="link"
                   rel="noreferrer noopener"
                   href="https://meteostat.net/"
                   target="_blank">Meteostat</a
-                >&nbsp;platform provides access to open data from thousands of
+                > platform provides access to open data from thousands of
                 weather stations world-wide. Measurements from the nearest
                 stations are combined to produce an interpolated result. Weather
-                data from&nbsp;<a
+                data from <a
                   class="link"
                   rel="noreferrer noopener"
                   href="https://meteostat.net/"
                   target="_blank">Meteostat</a
-                >&nbsp;is licensed under&nbsp;<a
+                > is licensed under <a
                   class="link"
                   rel="noreferrer noopener"
                   href="https://creativecommons.org/licenses/by-nc/4.0/"
                   target="_blank">CC BY-NC 4.0</a
-                >, with raw data provided by&nbsp;<a
+                >, with raw data provided by <a
                   class="link"
                   rel="noreferrer noopener"
                   href="https://www.noaa.gov/"
                   target="_blank">NOAA</a
-                >,&nbsp;<a
+                >, <a
                   class="link"
                   rel="noreferrer noopener"
                   href="https://www.dwd.de/"
                   target="_blank">DWD</a
-                >&nbsp;and&nbsp;<a
+                > and <a
                   class="link"
                   rel="noreferrer noopener"
                   href="https://dev.meteostat.net/docs/sources.html"
@@ -550,28 +544,28 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   href="https://open-meteo.com/"
                   target="_blank">Open-Meteo</a
                 >
-                – The&nbsp;<a
+                – The <a
                   class="link"
                   rel="noreferrer noopener"
                   href="https://open-meteo.com/"
                   target="_blank">Open-Meteo</a
-                >&nbsp;database contains more than 60 years of weather data from
-                a variety of open sources, including data from the&nbsp;<a
+                > database contains more than 60 years of weather data from
+                a variety of open sources, including data from the <a
                   class="link"
                   rel="noreferrer noopener"
                   href="https://cds.climate.copernicus.eu/cdsapp#!/dataset/reanalysis-era5-land?tab=overview"
                   target="_blank">Copernicus Program</a
-                >. Weather data from&nbsp;<a
+                >. Weather data from <a
                   class="link"
                   rel="noreferrer noopener"
                   href="https://www.open-meteo.com/"
                   target="_blank">Open-Meteo</a
-                >&nbsp;is licensed under&nbsp;<a
+                > is licensed under <a
                   class="link"
                   rel="noreferrer noopener"
                   href="https://creativecommons.org/licenses/by/4.0/"
                   target="_blank">Attribution 4.0 International (CC BY 4.0)</a
-                >, and includes data from the&nbsp;<a
+                >, and includes data from the <a
                   class="link"
                   rel="noreferrer noopener"
                   href="https://cds.climate.copernicus.eu/cdsapp#!/dataset/reanalysis-era5-land?tab=overview"
@@ -580,12 +574,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
               </li>
             </ul>
             <p>
-              Daytime length calculations are by&nbsp;<a
+              Daytime length calculations are by <a
                 class="link"
                 rel="noreferrer noopener"
                 href="https://github.com/mourner/suncalc"
                 target="_blank">SunCalc</a
-              >&nbsp;licensed under&nbsp;<a
+              > licensed under <a
                 class="link"
                 rel="noreferrer noopener"
                 href="https://choosealicense.com/licenses/bsd-2-clause/"
@@ -599,7 +593,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               >.
             </p>
             <div
-              class="card variant-soft-warning text-token p-4 gap-2 flex flex-col"
+              class="card preset-tonal-warning base-font-color p-4 gap-2 flex flex-col"
             >
               <p>
                 For any weather provider, recent weather data may be delayed by
@@ -609,7 +603,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </section>
           <section
             id="get-weather-data"
-            class="scroll-mt-[58px] card bg-surface-200-700-token p-4 gap-2 flex flex-col"
+            class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
           >
             <h3 class="font-bold text-xl">Get Weather Data</h3>
 
@@ -622,7 +616,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </section>
           <section
             id="grouping-weather-data"
-            class="scroll-mt-[58px] card bg-surface-200-700-token p-4 gap-2 flex flex-col"
+            class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
           >
             <h3 class="font-bold text-xl">Grouping Weather Data</h3>
 
@@ -669,7 +663,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               </li>
             </ul>
             <div
-              class="card variant-soft-warning text-token p-4 gap-2 flex flex-col"
+              class="card preset-tonal-warning base-font-color p-4 gap-2 flex flex-col"
             >
               <p>
                 The Average Temperature and Average Daytime of all items in your
@@ -698,7 +692,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </section>
           <section
             id="view-weather-data"
-            class="scroll-mt-[58px] card bg-surface-200-700-token p-4 gap-2 flex flex-col"
+            class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
           >
             <h3 class="font-bold text-xl">View Weather Data</h3>
 
@@ -723,7 +717,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </section>
           <section
             id="edit-weather-data"
-            class="scroll-mt-[58px] card bg-surface-200-700-token p-4 gap-2 flex flex-col"
+            class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
           >
             <h3 class="font-bold text-xl">Edit Weather Data</h3>
 
@@ -775,7 +769,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </section>
           <section
             id="import-weather-data"
-            class="scroll-mt-[58px] card bg-surface-200-700-token p-4 gap-2 flex flex-col"
+            class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
           >
             <h3 class="font-bold text-xl">Import Weather Data</h3>
 
@@ -889,14 +883,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </section>
           <section
             id="weather-errors"
-            class="scroll-mt-[58px] card bg-surface-200-700-token p-4 gap-2 flex flex-col"
+            class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
           >
             <h3 class="font-bold text-xl">Weather Errors</h3>
 
             <p>
               When you press the Search button, you might get a message saying:
             </p>
-            <blockquote class="card p-2 variant-soft-surface text-token">
+            <blockquote class="card p-2 preset-tonal-surface base-font-color">
               <p>
                 Weather data not found. Please try a different location or
                 dates.
@@ -919,7 +913,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </section>
           <section
             id="mixed-snow-parameters"
-            class="scroll-mt-[58px] card bg-surface-200-700-token p-4 gap-2 flex flex-col"
+            class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
           >
             <h3 class="font-bold text-xl">Mixed Snow Parameters</h3>
 
@@ -948,7 +942,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </h2>
           <section
             id="add-a-gauge"
-            class="scroll-mt-[58px] card bg-surface-200-700-token p-4 gap-2 flex flex-col"
+            class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
           >
             <h3 class="font-bold text-xl">Add a Gauge</h3>
 
@@ -966,7 +960,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <li>Daytime gauge</li>
             </ul>
             <div
-              class="card variant-soft-warning text-token p-4 gap-2 flex flex-col"
+              class="card preset-tonal-warning base-font-color p-4 gap-2 flex flex-col"
             >
               <p>
                 You can only add a gauge if the weather data contains that
@@ -977,7 +971,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </section>
           <section
             id="gauge-direction"
-            class="scroll-mt-[58px] card bg-surface-200-700-token p-4 gap-2 flex flex-col"
+            class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
           >
             <h3 class="font-bold text-xl">Gauge Direction</h3>
 
@@ -998,7 +992,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </section>
           <section
             id="range-calculation-methods"
-            class="scroll-mt-[58px] card bg-surface-200-700-token p-4 gap-2 flex flex-col"
+            class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
           >
             <h3 class="font-bold text-xl">Range Calculation Methods</h3>
 
@@ -1056,7 +1050,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </p>
             <figure class=" ">
               <table
-                class="table-autoborder-surface-900-50-token border p-2 rounded-container-token"
+                class="table-autoborder-surface-950-50 border p-2 rounded-container"
               >
                 <thead>
                   <tr
@@ -1068,27 +1062,27 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   ><tr
                     ><td class="p-2"
                       >Include From, don’t include To (default)</td
-                    ><td class="p-2">From ≥ Range &gt;&nbsp;To</td><td
+                    ><td class="p-2">From ≥ Range > To</td><td
                       class="p-2">13 ✅<br />12.5 ✅<br />12 ❌</td
                     ></tr
                   ><tr
                     ><td class="p-2">Include To, don’t include From</td><td
-                      class="p-2">From&nbsp;&gt; Range ≥&nbsp;To</td
+                      class="p-2">From > Range ≥ To</td
                     ><td class="p-2">13 ❌<br />12.5 ✅<br />12 ✅</td></tr
                   ><tr
                     ><td class="p-2">Include both From and To</td><td
-                      >From&nbsp;≥ Range ≥&nbsp;To</td
+                      >From ≥ Range ≥ To</td
                     ><td class="p-2">13 ✅<br />12.5 ✅<br />12 ✅</td></tr
                   ><tr
                     ><td class="p-2">Don’t include From and To</td><td
-                      class="p-2">From&nbsp;&gt; Range &gt;&nbsp;To</td
+                      class="p-2">From > Range > To</td
                     ><td class="p-2">13 ❌<br />12.5 ✅<br />12 ❌</td></tr
                   ></tbody
                 >
               </table>
             </figure>
             <div
-              class="card variant-soft-warning text-token p-4 gap-2 flex flex-col"
+              class="card preset-tonal-warning base-font-color p-4 gap-2 flex flex-col"
             >
               <p>
                 If you choose the third or fourth Range Calculation Method but
@@ -1105,7 +1099,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </section>
           <section
             id="increment-modes"
-            class="scroll-mt-[58px] card bg-surface-200-700-token p-4 gap-2 flex flex-col"
+            class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
           >
             <h3 class="font-bold text-xl scroll-mt-[58px]">Increment Modes</h3>
 
@@ -1134,7 +1128,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               </li>
             </ul>
             <div
-              class="card variant-soft-warning text-token p-4 gap-2 flex flex-col"
+              class="card preset-tonal-warning base-font-color p-4 gap-2 flex flex-col"
             >
               <p>
                 When using Automatic Increments on height-type gauges (Rain
@@ -1147,7 +1141,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </section>
           <section
             id="adjust-ranges"
-            class="scroll-mt-[58px] card bg-surface-200-700-token p-4 gap-2 flex flex-col"
+            class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
           >
             <h3 class="font-bold text-xl">Adjust Ranges</h3>
 
@@ -1162,7 +1156,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </h2>
           <section
             id="preset-colors"
-            class="scroll-mt-[58px] card bg-surface-200-700-token p-4 gap-2 flex flex-col"
+            class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
           >
             <h3 class="font-bold text-xl">Preset Colors</h3>
 
@@ -1182,24 +1176,24 @@ If not, see <https://www.gnu.org/licenses/>. -->
               </li>
               <li>
                 <span class="font-bold">Schemes</span>
-                – Color schemes based on&nbsp;<a
+                – Color schemes based on <a
                   class="link"
                   rel="noreferrer noopener"
                   href="https://ColorBrewer2.org"
                   target="_blank">ColorBrewer2.org</a
-                >&nbsp;by Cynthia A. Brewer, Geography, Pennsylvania State
-                University, licenced under&nbsp;<a
+                > by Cynthia A. Brewer, Geography, Pennsylvania State
+                University, licenced under <a
                   class="link"
                   rel="noreferrer noopener"
                   href="https://www.apache.org/licenses/LICENSE-2.0"
                   target="_blank">Apache 2</a
-                >.&nbsp;
+                >. 
               </li>
             </ul>
           </section>
           <section
             id="image-palette"
-            class="scroll-mt-[58px] card bg-surface-200-700-token p-4 gap-2 flex flex-col"
+            class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
           >
             <h3 class="font-bold text-xl">Image Palette</h3>
 
@@ -1217,7 +1211,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </section>
           <section
             id="importexport"
-            class="scroll-mt-[58px] card bg-surface-200-700-token p-4 gap-2 flex flex-col"
+            class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
           >
             <h3 class="font-bold text-xl">Import/Export</h3>
 
@@ -1233,7 +1227,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </section>
           <section
             id="sort-colors"
-            class="scroll-mt-[58px] card bg-surface-200-700-token p-4 gap-2 flex flex-col"
+            class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
           >
             <h3 class="font-bold text-xl">Sort Colors</h3>
 
@@ -1247,7 +1241,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </section>
           <h2 class="font-bold text-2xl scroll-mt-[58px]" id="yarn">Yarn</h2>
           <div
-            class="card variant-soft-warning text-token p-4 gap-2 flex flex-col"
+            class="card preset-tonal-warning base-font-color p-4 gap-2 flex flex-col"
           >
             <p>
               Real yarn colors will look different than what’s on the screen.
@@ -1258,14 +1252,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
               the sale at no additional cost to you. Colors may be inaccurate,
               and may not represent yarn as it appears in physical reality.
               Requests for yarn to be included in these results can be made by
-              anyone using&nbsp;<a class="link" href="/yarn-search-request"
+              anyone using <a class="link" href="/yarn-search-request"
                 >this request form.</a
               >
             </p>
           </div>
           <section
             id="getting-yarn-colorway-data"
-            class="scroll-mt-[58px] card bg-surface-200-700-token p-4 gap-2 flex flex-col"
+            class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
           >
             <h3 class="font-bold text-xl">Getting Yarn Colorway Data</h3>
 
@@ -1299,7 +1293,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </section>
           <section
             id="choose-yarn-colorways"
-            class="scroll-mt-[58px] card bg-surface-200-700-token p-4 gap-2 flex flex-col"
+            class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
           >
             <h3 class="font-bold text-xl">Choose Yarn Colorways</h3>
 
@@ -1312,7 +1306,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </section>
           <section
             id="link-unavailable"
-            class="scroll-mt-[58px] card bg-surface-200-700-token p-4 gap-2 flex flex-col"
+            class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
           >
             <h3 class="font-bold text-xl">Link Unavailable</h3>
 
@@ -1337,7 +1331,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </h2>
           <section
             id="create-a-preview"
-            class="scroll-mt-[58px] card bg-surface-200-700-token p-4 gap-2 flex flex-col"
+            class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
           >
             <h3 class="font-bold text-xl">Create a Preview</h3>
 
@@ -1366,14 +1360,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <li>
                 <span class="font-bold">Daytime Rows</span>
                 – Each row is split according to the duration of sunlight that day.
-                Daytime stitches = d ×&nbsp;r&nbsp;∕ 24. Night stitches =&nbsp;<strong
+                Daytime stitches = d × r ∕ 24. Night stitches = <strong
                   >r</strong
-                >&nbsp;− Daytime stitches. d = Daytime (time from the day’s
-                sunrise to sunset in hours).&nbsp;r&nbsp;is the total stitches
+                > − Daytime stitches. d = Daytime (time from the day’s
+                sunrise to sunset in hours). r is the total stitches
                 per row. 24 is the number of hours in a day.
               </li>
               <li>
-                <span class="font-bold">Month Rows</span> – Rows are grouped by month&nbsp;from
+                <span class="font-bold">Month Rows</span> – Rows are grouped by month from
                 top to bottom or left to right. Months with fewer days have extra
                 rows added, so that each month has the same number of rows.
               </li>
@@ -1401,7 +1395,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               </li>
             </ul>
             <div
-              class="card variant-soft-warning text-token p-4 gap-2 flex flex-col"
+              class="card preset-tonal-warning base-font-color p-4 gap-2 flex flex-col"
             >
               <p>
                 The project preview might not look like a real crochet or
@@ -1415,7 +1409,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </h2>
           <section
             id="share-to-gallery"
-            class="scroll-mt-[58px] card bg-surface-200-700-token p-4 gap-2 flex flex-col"
+            class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
           >
             <h3 class="font-bold text-xl">Share to Gallery</h3>
 
@@ -1443,7 +1437,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               </li>
             </ul>
             <div
-              class="card variant-soft-warning text-token p-4 gap-2 flex flex-col"
+              class="card preset-tonal-warning base-font-color p-4 gap-2 flex flex-col"
             >
               <p>
                 Project Gallery Pages can’t be edited once they are submitted to
@@ -1459,7 +1453,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </h2>
           <section
             id="download-gauges-and-weather-data-pdf"
-            class="scroll-mt-[58px] card bg-surface-200-700-token p-4 gap-2 flex flex-col"
+            class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
           >
             <h3 class="font-bold text-xl">
               Download Gauges and Weather Data (PDF)
@@ -1475,7 +1469,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <table>
                 <tbody
                   ><tr
-                    class="flex flex-flow gap-2 justify-between items-center w-full font-bold border-surface-900-50-token border p-2 rounded-container-token"
+                    class="flex flex-flow gap-2 justify-between items-center w-full font-bold border-surface-950-50 border p-2 rounded-container"
                     ><td class="kbd">d</td><td>Open Download Menu</td></tr
                   ></tbody
                 >
@@ -1484,7 +1478,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </section>
           <section
             id="download-weather-data-csv"
-            class="scroll-mt-[58px] card bg-surface-200-700-token p-4 gap-2 flex flex-col"
+            class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
           >
             <h3 class="font-bold text-xl">Download Weather Data (CSV)</h3>
             <p>
@@ -1497,7 +1491,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <table>
                 <tbody
                   ><tr
-                    class="flex flex-flow gap-2 justify-between items-center w-full font-bold border-surface-900-50-token border p-2 rounded-container-token"
+                    class="flex flex-flow gap-2 justify-between items-center w-full font-bold border-surface-950-50 border p-2 rounded-container"
                     ><td class="kbd">d</td><td>Open Download Menu</td></tr
                   ></tbody
                 >
@@ -1506,7 +1500,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </section>
           <section
             id="download-preview-image-png"
-            class="scroll-mt-[58px] card bg-surface-200-700-token p-4 gap-2 flex flex-col"
+            class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
           >
             <h3 class="font-bold text-xl">Download Preview Image (PNG)</h3>
             <p>
@@ -1519,7 +1513,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <table>
                 <tbody
                   ><tr
-                    class="flex flex-flow gap-2 justify-between items-center w-full font-bold border-surface-900-50-token border p-2 rounded-container-token"
+                    class="flex flex-flow gap-2 justify-between items-center w-full font-bold border-surface-950-50 border p-2 rounded-container"
                     ><td class="kbd">d</td><td>Open Download Menu</td></tr
                   ></tbody
                 >

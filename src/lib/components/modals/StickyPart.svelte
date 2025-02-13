@@ -27,7 +27,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div
-  class="sticky {classPosition} rounded-br-container-token rounded-bl-container-token z-10 bg-surface-200-700-token px-0 mx-0"
+  class="sticky {classPosition} rounded-br-container rounded-bl-container z-10 bg-surface-200-800 px-0 mx-0"
 >
   {@render children?.()}
 </div>

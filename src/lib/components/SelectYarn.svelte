@@ -114,7 +114,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     const regex = new RegExp(`(${searchText})`, 'gi'); // Case-insensitive search
     return string.replace(
       regex,
-      "<span class='font-bold text-primary-600-300-token'>$1</span>",
+      "<span class='font-bold text-primary-700-300'>$1</span>",
     );
   }
 

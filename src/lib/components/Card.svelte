@@ -25,7 +25,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div
-  class="lg:rounded-container-token lg:shadow-lg bg-surface-50-900-token text-token overflow-hidden"
+  class="lg:rounded-container lg:shadow-lg bg-surface-50-950 base-font-color overflow-hidden"
 >
   <div>
     {@render header?.()}

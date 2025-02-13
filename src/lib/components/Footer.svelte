@@ -24,19 +24,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <footer
-  class="text-token py-4 max-w-screen-xl m-auto px-2 xl:px-0 text-left grid grid-cols-12 justify-center gap-4"
+  class="base-font-color py-4 max-w-screen-xl m-auto px-2 xl:px-0 text-left grid grid-cols-12 justify-center gap-4"
   class:bg-transparent={subtleBackground}
   class:dark:bg-transparent={subtleBackground}
 >
   {#if about}
-    <div class="card h-fit variant-soft-surface p-4 text-token col-span-full">
+    <div class="card h-fit preset-tonal-surface p-4 base-font-color col-span-full">
       <h3 class="font-bold text-xl mb-2">About</h3>
       {@render about?.()}
     </div>
   {/if}
 
   {#if sources}
-    <div class="card variant-soft-surface p-4 h-fit text-token col-span-full">
+    <div class="card preset-tonal-surface p-4 h-fit base-font-color col-span-full">
       <h3 class="font-bold text-xl mb-2">Sources</h3>
       {@render sources?.()}
     </div>

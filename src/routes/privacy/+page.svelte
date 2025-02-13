@@ -13,15 +13,16 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script>
+<script lang="ts">
   import { PUBLIC_BASE_URL, PUBLIC_KOFI_LINK } from '$env/static/public';
   import AppLogo from '$lib/components/AppLogo.svelte';
   import AppShell from '$lib/components/AppShell.svelte';
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
   import { consentToMSClarityCookies, preferences } from '$lib/state';
-  import { getToastStore } from '@skeletonlabs/skeleton';
+  import type { ToastContext } from '@skeletonlabs/skeleton-svelte';
+  import { getContext } from 'svelte';
 
-  const toastStore = getToastStore();
+  const toast: ToastContext = getContext('toast');
 
   let kofiUrl = new URL(PUBLIC_KOFI_LINK || 'https://ko-fi.com');
 
@@ -71,7 +72,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </p>
 
         <div
-          class="card p-2 rounded-container-token bg-surface-200-700-token my-2 flex flex-col gap-2"
+          class="card p-2 rounded-container bg-surface-200-800 my-2 flex flex-col gap-2"
         >
           <div class="flex flex-col">
             <ToggleSwitch
@@ -109,12 +110,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </p>
           {#if preferences.value.disableToastAnalytics}
             <button
-              class="btn variant-filled-secondary w-fit my-2 whitespace-pre-wrap"
+              class="btn preset-filled-secondary-500 w-fit my-2 whitespace-pre-wrap"
               onclick={() => {
                 preferences.value.disableToastAnalytics = false;
-                toastStore.trigger({
-                  message: 'The Analytics message can be shown again.',
-                  background: 'bg-success-300 text-black',
+                toast.create({
+                  description: 'The Analytics message can be shown again.',
+                  // background: 'bg-success-300 text-black',
                 });
               }}
               ><span

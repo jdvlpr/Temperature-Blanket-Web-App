@@ -57,7 +57,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     sortColorsLightToDark,
   } from '$lib/utils';
   import { brands } from '$lib/yarns/brands';
-  import { Accordion, AccordionItem } from '@skeletonlabs/skeleton';
+  import { Accordion } from '@skeletonlabs/skeleton-svelte';
   import chroma from 'chroma-js';
   import { onMount } from 'svelte';
 
@@ -404,7 +404,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <Card>
         {#snippet header()}
           <div>
-            <div class="bg-surface-200-700-token text-token p-4">
+            <div class="bg-surface-200-800 base-font-color p-4">
               <p class="text-center">
                 Browse a collection of yarn colorways. Filter by brand or yarn
                 name, and search by HTML hex color code to find matching yarn
@@ -638,7 +638,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             {#if results?.length && !loadingAllColors}
               <div
-                class="rounded-container-token overflow-hidden my-4 justify-center w-full gap-1 {layout ===
+                class="rounded-container overflow-hidden my-4 justify-center w-full gap-1 {layout ===
                 'grid'
                   ? 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5'
                   : 'flex flex-col'}"
@@ -646,7 +646,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 {#each results as { hex, name, delta, brandName, yarnName, variant_href, affiliate_variant_href, unavailable }}
                   {@const percentMatch = delta ? Math.floor(100 - delta) : null}
                   <div
-                    class="shadow-sm flex-1 min-w-fit p-2 flex items-center gap-x-2 rounded-container-token {layout ===
+                    class="shadow-sm flex-1 min-w-fit p-2 flex items-center gap-x-2 rounded-container {layout ===
                     'grid'
                       ? 'justify-center'
                       : ''}"
@@ -658,7 +658,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         {#if affiliate_variant_href}
                           <a
                             aria-label="Buy this yarn colorway"
-                            class="btn-icon bg-secondary-hover-token"
+                            class="btn-icon preset-tonal-secondary"
                             title="Buy this yarn colorway"
                             href={affiliate_variant_href}
                             target="_blank"
@@ -681,7 +681,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         {:else}
                           <a
                             aria-label="Open link to this yarn colorway"
-                            class="btn-icon bg-secondary-hover-token"
+                            class="btn-icon preset-tonal-secondary"
                             href={variant_href}
                             target="_blank"
                             rel="noopener noreferrer"
@@ -726,7 +726,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               </div>
             {:else}
               <div
-                class="mx-auto variant-soft-warning text-token text-center card p-4 my-2"
+                class="mx-auto preset-tonal-warning base-font-color text-center card p-4 my-2"
               >
                 <p>No Matching Colorways</p>
                 <p class="text-sm">Try changing the filters above</p>
@@ -735,7 +735,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             {#if results.length === itemsToShow}
               <div class="w-full flex justify-center mx-auto">
                 <button
-                  class="btn rounded-container-token bg-primary-200-700-token text-token gap-1 mb-2 font-bold"
+                  class="btn rounded-container bg-primary-200-800 base-font-color gap-1 mb-2 font-bold"
                   bind:this={loadMoreSpinner}
                   onclick={() => {
                     if (itemsToShow <= results.length)
@@ -770,7 +770,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {#snippet about()}
         <span>
           <Accordion>
-            <AccordionItem>
+            <Accordion.Item>
               {#snippet lead()}
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -803,8 +803,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 >. If you find an inaccuracy, send an email to
                 hello@temperature-blanket.com.
               {/snippet}
-            </AccordionItem>
-            <AccordionItem>
+            </Accordion.Item>
+            <Accordion.Item>
               {#snippet lead()}
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -834,7 +834,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   class="link">this request form.</a
                 >.
               {/snippet}
-            </AccordionItem>
+            </Accordion.Item>
           </Accordion>
         </span>
       {/snippet}

@@ -83,7 +83,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { browser } from '$app/environment';
   import { THEMES } from '$lib/constants';
   import { preferences } from '$lib/state';
-  import { RadioGroup, RadioItem, popup } from '@skeletonlabs/skeleton';
+  import { Segment } from '@skeletonlabs/skeleton-svelte';
 
   /**
    * @typedef {Object} Props
@@ -111,7 +111,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <div class="w-fit text-left">
   <button
-    class="btn bg-secondary-hover-token"
+    class="btn preset-tonal-secondary"
     id="menu-button"
     title="Change Theme [t]"
     use:popup={popupTheme}
@@ -150,15 +150,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   <div
     data-popup={target}
-    class="bg-surface-300-600-token rounded-container-token shadow-lg p-2 z-30"
+    class="bg-surface-300-700 rounded-container shadow-lg p-2 z-30"
     aria-orientation="vertical"
     aria-labelledby="menu-button"
     tabindex="-1"
   >
     <div class="flex flex-col gap-2">
-      <RadioGroup class="flex wrap gap-y-2" active="bg-secondary-active-token">
+      <Segment class="flex wrap gap-y-2" active="preset-filled-secondary-500">
         {#each THEMES as { name, id, icon, description }}
-          <RadioItem
+          <Segment.Item
             bind:group={preferences.value.theme.mode}
             name="theme-{id}"
             value={id}
@@ -168,9 +168,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
               {@html icon}
               <span class="hidden min-[360px]:inline">{name}</span>
             </span>
-          </RadioItem>
+          </Segment.Item>
         {/each}
-      </RadioGroup>
+      </Segment>
 
       <div class="flex flex-col items-start gap-2">
         {#each skeletonThemes as { name, id, colors, rounded }}
@@ -179,12 +179,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
               preferences.value.theme.id = id;
             }}
             class={[
-              'btn bg-secondary-hover-token flex items-center gap-2 w-full justify-start',
-              preferences.value.theme.id === id && 'bg-secondary-active-token',
+              'btn preset-tonal-secondary flex items-center gap-2 w-full justify-start',
+              preferences.value.theme.id === id && 'preset-filled-secondary-500',
             ]}
           >
             <div
-              class="flex w-16 h-6 overflow-hidden border-surface-50-900-token border"
+              class="flex w-16 h-6 overflow-hidden border-surface-50-950 border"
               style="border-radius:{rounded}"
             >
               <div class="flex-auto" style="background:{colors.surface}"></div>
@@ -200,6 +200,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </div>
       <button class="close" aria-label="Close"></button>
     </div>
-    <div class="arrow bg-surface-300-600-token shadow-lg"></div>
+    <div class="arrow bg-surface-300-700 shadow-lg"></div>
   </div>
 </div>

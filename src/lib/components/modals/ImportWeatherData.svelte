@@ -29,7 +29,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     millimetersToInches,
     stringToDate,
   } from '$lib/utils';
-  import { FileDropzone } from '@skeletonlabs/skeleton';
+  import { FileUpload } from '@skeletonlabs/skeleton-svelte';
   import ModalShell from './ModalShell.svelte';
 
   let { parent } = $props();
@@ -198,7 +198,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     {#if !processing}
       {#if !imported || errorMessages.length > 0}
-        <FileDropzone
+        <FileUpload
           name="files"
           class="mt-4"
           bind:files={csvUpload}
@@ -233,7 +233,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {#snippet meta()}
             Only CSV files allowed
           {/snippet}
-        </FileDropzone>
+        </FileUpload>
         {#if errorMessages.length > 0}
           <p>Import finished, but there were some issues (listed below).</p>
           <p class="mb-2">

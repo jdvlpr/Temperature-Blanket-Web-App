@@ -15,24 +15,24 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import { weather } from '$lib/state';
-  import { RadioGroup, RadioItem } from '@skeletonlabs/skeleton';
+  import { Segment } from '@skeletonlabs/skeleton-svelte';
 </script>
 
 <div class="flex flex-col items-start">
   <div class="flex gap-1 items-center">
-    <RadioGroup class="flex-wrap gap-y-2" active="bg-secondary-active-token">
-      <RadioItem
+    <Segment class="flex-wrap gap-y-2" active="preset-filled-secondary-500">
+      <Segment.Item
         bind:group={weather.grouping}
         name="weatherGrouping"
         value={'day'}
-        title="Set weather grouping to days">Daily</RadioItem
+        title="Set weather grouping to days">Daily</Segment.Item
       >
-      <RadioItem
+      <Segment.Item
         bind:group={weather.grouping}
         name="weatherGrouping"
         value={'week'}
-        title="Set weather grouping to weeks">Weekly</RadioItem
+        title="Set weather grouping to weeks">Weekly</Segment.Item
       >
-    </RadioGroup>
+    </Segment>
   </div>
 </div>

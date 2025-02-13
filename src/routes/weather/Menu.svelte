@@ -17,7 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ModalShell from '$lib/components/modals/ModalShell.svelte';
   import UnitChanger from '$lib/components/UnitChanger.svelte';
   import { getWeatherCodeDetails } from '$lib/utils';
-  import { getModalStore, RadioGroup, RadioItem } from '@skeletonlabs/skeleton';
+  import { Segment } from '@skeletonlabs/skeleton-svelte';
   import { weatherState } from './+page.svelte';
   import { fetchData } from './GetWeather.svelte';
   import { weatherLocationState } from './Location.svelte';
@@ -49,7 +49,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               role="button"
               tabindex="0"
               data-active={id === weatherState.activeLocationID}
-              class="flex-1 w-full justify-center flex items-start gap-2 bg-surface-200-700-token rounded-container-token p-2 shadow max-w-screen-lg mx-auto data-[active=true]:bg-primary-200-700-token"
+              class="flex-1 w-full justify-center flex items-start gap-2 bg-surface-200-800 rounded-container p-2 shadow max-w-screen-lg mx-auto data-[active=true]:bg-primary-200-800"
               title="View this Location"
               onclick={async () => {
                 weatherState.activeLocationID = id;
@@ -104,7 +104,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               </div>
               <button
                 aria-label="Remove from Locations"
-                class="btn-icon bg-secondary-hover-token"
+                class="btn-icon preset-tonal-secondary"
                 title="Remove from Locations"
                 onclick={(e) => {
                   e.stopPropagation();
@@ -155,26 +155,26 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <!-- <ThemeSwitcher showText={true} /> -->
           <div><UnitChanger /></div>
           <div
-            class="flex flex-wrap items-center justify-center gap-4 p-2 bg-surface-100-800-token rounded-container-token"
+            class="flex flex-wrap items-center justify-center gap-4 p-2 bg-surface-100-900 rounded-container"
           >
             <div class="flex flex-wrap items-center justify-center gap-2">
-              <RadioGroup
+              <Segment
                 class="flex-wrap gap-y-2"
-                active="bg-secondary-active-token"
+                active="preset-filled-secondary-500"
               >
-                <RadioItem
+                <Segment.Item
                   bind:group={weatherState.hour}
                   name="hour-format-12"
                   value="12"
-                  title="Set hour format to 12">12hr</RadioItem
+                  title="Set hour format to 12">12hr</Segment.Item
                 >
-                <RadioItem
+                <Segment.Item
                   bind:group={weatherState.hour}
                   name="hour-format-24"
                   value="24"
-                  title="Set hour format to 24">24hr</RadioItem
+                  title="Set hour format to 24">24hr</Segment.Item
                 >
-              </RadioGroup>
+              </Segment>
               <p class="text-sm">
                 {new Date().toLocaleTimeString(navigator.language, {
                   timeStyle: 'short',

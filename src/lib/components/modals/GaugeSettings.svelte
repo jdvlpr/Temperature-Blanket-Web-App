@@ -30,7 +30,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     getStart,
     getTextColor,
   } from '$lib/utils';
-  import { getModalStore, RadioGroup, RadioItem } from '@skeletonlabs/skeleton';
+  import { Segment } from '@skeletonlabs/skeleton-svelte';
   import { onMount } from 'svelte';
   import { fade, slide } from 'svelte/transition';
   import ModalShell from './ModalShell.svelte';
@@ -216,7 +216,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </h2>
 
       <div
-        class="rounded-container-token p-4 bg-surface-300-600-token gap-2 flex flex-col w-full"
+        class="rounded-container p-4 bg-surface-300-700 gap-2 flex flex-col w-full"
       >
         <div class="flex flex-col justify-start items-start gap-1">
           <ChooseRangeDirection
@@ -270,27 +270,27 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
               <span>Generate Ranges</span>
             </p>
-            <RadioGroup
+            <Segment
               class="flex-wrap gap-y-2"
-              active="bg-secondary-active-token"
+              active="preset-filled-secondary-500"
             >
-              <RadioItem
+              <Segment.Item
                 bind:group={incrementMode}
                 name="auto-increment"
                 value={'auto'}
-                title="Set increment mode to Automatic">Automatic</RadioItem
+                title="Set increment mode to Automatic">Automatic</Segment.Item
               >
-              <RadioItem
+              <Segment.Item
                 bind:group={incrementMode}
                 name="manual-increment"
                 value={'manual'}
-                title="Set increment mode to Manual">Manual</RadioItem
+                title="Set increment mode to Manual">Manual</Segment.Item
               >
-            </RadioGroup>
+            </Segment>
 
             {#if !incrementMode}
               <p
-                class="card p-4 variant-soft-warning text-token text-left mt-2"
+                class="card p-4 preset-tonal-warning base-font-color text-left mt-2"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -353,7 +353,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         {/each}
                       </select>
                     </label>
-                    <p class="card p-4 variant-ghost-success text-left">
+                    <p class="card p-4 preset-tonal-success border border-success-500 text-left">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         class="size-6 inline"
@@ -538,7 +538,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {#if showAdvancedControls}
           <div
             transition:slide
-            class="flex flex-col gap-2 justify-start items-start rounded-container-token bg-surface-200-700-token p-4 text-left w-full"
+            class="flex flex-col gap-2 justify-start items-start rounded-container bg-surface-200-800 p-4 text-left w-full"
           >
             <ToggleSwitch
               bind:checked={_gauge.rangeOptions.linked}
@@ -567,7 +567,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     />
                   </svg>
                   Range Calculation Method:<span>{@html rangeExample}</span
-                  >&nbsp;
+                  > 
                   <Tooltip>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -642,7 +642,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </div>
         {/if}
         {#if isRangeCalculationUnavailable}
-          <p class="card bg-warning-50-900-token text-left py-4 px-4">
+          <p class="card bg-warning-50-950 text-left py-4 px-4">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -661,7 +661,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             To values using these options and this range calculation method ({@html rangeExample}).
             To show the optimal From and To values, {#if isNotAutoIncrements}
               set Automatic Ranges above, then
-            {/if} uncheck Round Numbers{#if !isNotAutoIncrements}&nbsp;above{/if},
+            {/if} uncheck Round Numbers{#if !isNotAutoIncrements} above{/if},
             or change the Range Calculation Method.
           </p>
         {/if}
@@ -673,8 +673,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
         Edit Ranges
       </h2>
 
-      <div class="p-4 bg-surface-300-600-token rounded-container-token w-full">
-        <div class="rounded-container-token overflow-hidden flex flex-col">
+      <div class="p-4 bg-surface-300-700 rounded-container w-full">
+        <div class="rounded-container overflow-hidden flex flex-col">
           {#if _gauge.ranges}
             {#each _gauge.ranges as { from, to }, index}
               {@const { hex, brandId, yarnId, name } = _gauge.colors[index]}
@@ -696,7 +696,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     <span class="text-xs">From ({unitLabel})</span>
                     <input
                       type="number"
-                      class="input text-lg text-token max-w-[75px]"
+                      class="input text-lg base-font-color max-w-[75px]"
                       value={from}
                       onchange={(e) => {
                         const value = +e.target.value;
@@ -728,7 +728,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     <span class="text-xs">To ({unitLabel})</span>
                     <input
                       type="number"
-                      class="input text-lg text-token max-w-[75px]"
+                      class="input text-lg base-font-color max-w-[75px]"
                       value={to}
                       onchange={(e) => {
                         const value = +e.target.value;
@@ -784,7 +784,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {#if showScrollToTopButton}
     <button
       transition:fade
-      class="btn px-4 bottom-[7rem] sm:bottom-[5rem] fixed -translate-x-1/2 left-1/2 w-fit py-2 m-2 z-20 shadow variant-filled-surface lg:hidden transition-all inline-flex justify-center items-center gap-1 right-0"
+      class="btn px-4 bottom-[7rem] sm:bottom-[5rem] fixed -translate-x-1/2 left-1/2 w-fit py-2 m-2 z-20 shadow preset-filled-surface-500 lg:hidden transition-all inline-flex justify-center items-center gap-1 right-0"
       onclick={() =>
         setupContainer.scrollIntoView({
           behavior: 'smooth',

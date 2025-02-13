@@ -40,7 +40,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 >
   {#if previousSectionIndex}
     <button
-      class="btn variant-soft-tertiary text-token"
+      class="btn preset-tonal-tertiary base-font-color"
       onclick={() => goToProjectSection(previousSectionIndex)}
     >
       <span class="flex gap-2 items-center">
@@ -66,7 +66,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/if}
   {#if nextSectionIndex}
     <button
-      class="btn variant-soft-tertiary text-token"
+      class="btn preset-tonal-tertiary base-font-color"
       onclick={() => goToProjectSection(nextSectionIndex)}
     >
       <span class="flex gap-2 items-center">

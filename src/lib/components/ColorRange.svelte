@@ -27,7 +27,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <span class="range-input-container">
   <button
-    class="btn bg-secondary-hover-token flex gap-2 justify-start items-center"
+    class="btn preset-tonal-secondary flex gap-2 justify-start items-center"
     title="Adjust Range"
     onclick={(e) => {
       const wasToClicked =

@@ -22,8 +22,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     GaugeSettingsType,
   } from '$lib/types';
   import { getDaysInRange, getDaysPercent, pluralize } from '$lib/utils';
-  import { getModalStore } from '@skeletonlabs/skeleton';
-
   const modalStore = getModalStore();
   let isModal = $derived(!!$modalStore[0]);
 
@@ -61,7 +59,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <button
         type="button"
         disabled={!daysInRange?.length}
-        class="btn bg-secondary-hover-token"
+        class="btn preset-tonal-secondary"
         onclick={() =>
           modal.state.trigger({
             type: 'component',

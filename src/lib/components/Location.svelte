@@ -284,7 +284,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {#if locations.all?.length > 1}
     <div class="justify-self-end">
       <Tooltip placement="bottom" minWidth="250px">
-        <div class="btn-icon bg-secondary-hover-token">
+        <div class="btn-icon preset-tonal-secondary">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -303,7 +303,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {#snippet tooltip()}
           <div class="flex items-center gap-2 justify-center">
             <button
-              class="btn bg-secondary-hover-token"
+              class="btn preset-tonal-secondary"
               onclick={() => {
                 locations.remove(location.uuid);
                 weather.rawData = [];
@@ -325,7 +325,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <div class="flex flex-col w-full text-left gap-1">
       <p>
         {#if showSelectLocationLabelMessage}
-          <span class="text-error-800-100-token">Choose a result</span>
+          <span class="text-error-900-100">Choose a result</span>
         {:else if locations.all.length > 1 && location?.label}
           Location {locations.all.length > 1 ? index + 1 : ''}
         {:else}
@@ -539,7 +539,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </p>
         {#if location.daysInFuture}
           <p
-            class="text-sm variant-ghost-warning text-token rounded-container-token p-2 w-full my-2"
+            class="text-sm preset-tonal-warning border border-warning-500 base-font-color rounded-container p-2 w-full my-2"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -570,7 +570,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {/if}
       {:else if location.errorMessage && browser}
         <p
-          class="variant-ghost-error text-token rounded-container-token p-2 text-sm w-full my-2"
+          class="preset-tonal-error border border-error-500 base-font-color rounded-container p-2 text-sm w-full my-2"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"

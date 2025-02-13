@@ -92,9 +92,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {@const isRecentDate = getIsRecentDate(row.date)}
 
           <tr
-            class:!variant-soft-warning={isRecentDate}
+            class:!preset-tonal-warning={isRecentDate}
             class={[
-              '!text-token',
+              '!base-font-color',
               showColorDetails &&
                 'divide-x-2 divide-y-2 divide-surface-50 dark:divide-surface-900',
             ]}
@@ -115,7 +115,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 <button
                   class={[
                     weather.grouping === 'day' &&
-                      'bg-secondary-hover-token btn',
+                      'preset-tonal-secondary btn',
                     showColorDetails && 'font-bold',
                   ]}
                   disabled={weather.grouping === 'week'}

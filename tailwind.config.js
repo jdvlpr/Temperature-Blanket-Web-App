@@ -1,17 +1,24 @@
+/**
+ * SKELETON MIGRATION NOTICE
+ *
+ * The following custom themes were detected and commented out due to them not being compatible with the V3 theme format:
+ *
+ * - classic
+ *
+ * See https://github.com/skeletonlabs/skeleton/discussions/2921 for info on how to migrate these yourself.
+ */
 import { fontFamily } from 'tailwindcss/defaultTheme';
 import { join } from 'path';
-import { skeleton } from '@skeletonlabs/tw-plugin';
 import { classic } from './classic-theme';
+import { contentPath, skeleton } from "@skeletonlabs/skeleton/plugin";
+import * as themes from "@skeletonlabs/skeleton/themes";
 
 /** @type {import('tailwindcss').Config} */
 const config = {
   darkMode: 'class',
   content: [
     './src/**/*.{html,js,svelte,ts}',
-    join(
-      require.resolve('@skeletonlabs/skeleton'),
-      '../**/*.{html,js,svelte,ts}',
-    ),
+    contentPath(import.meta.url, "svelte"),
   ],
   safelist: ['dark'],
   theme: {
@@ -83,10 +90,7 @@ const config = {
   plugins: [
     require('@tailwindcss/forms'),
     skeleton({
-      themes: {
-        custom: [classic],
-        preset: ['crimson', 'hamlindigo', 'modern', 'rocket', 'skeleton'],
-      },
+      themes: [themes.crimson, themes.hamlindigo, themes.modern, themes.rocket, themes.legacy /* classic */],
     }),
   ],
   future: {

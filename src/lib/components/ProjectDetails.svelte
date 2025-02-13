@@ -64,7 +64,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div
-  class="flex justify-start items-center gap-2 w-full bg-surface-200-700-token rounded-container-token p-4"
+  class="flex justify-start items-center gap-2 w-full bg-surface-200-800 rounded-container p-4"
 >
   <div class="flex flex-col w-full">
     <a
@@ -80,7 +80,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     />
   </div>
   {#if canRemove}
-    <button class="btn-icon bg-secondary-hover-token" {onclick}>
+    <button class="btn-icon preset-tonal-secondary" {onclick}>
       {@html ICONS.trash}
     </button>
   {/if}

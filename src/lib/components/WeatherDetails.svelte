@@ -27,7 +27,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     getTargetParentGaugeId,
   } from '$lib/utils';
   import { getTextColor } from '$lib/utils/color-utils';
-  import { getModalStore } from '@skeletonlabs/skeleton';
   import ModalShell from './modals/ModalShell.svelte';
 
   const modalStore = getModalStore();
@@ -88,7 +87,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         aria-label="Show Previous {capitalizeFirstLetter(
           weather.grouping,
         )}'s Weather"
-        class="prev scale-125 btn-icon bg-secondary-hover-token"
+        class="prev scale-125 btn-icon preset-tonal-secondary"
         onclick={() => weather.currentIndex--}
         disabled={weather.currentIndex === 0}
         title="Show Previous {capitalizeFirstLetter(
@@ -128,7 +127,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         aria-label="Show Next {capitalizeFirstLetter(
           weather.grouping,
         )}'s Weather"
-        class="next scale-125 btn-icon bg-secondary-hover-token"
+        class="next scale-125 btn-icon preset-tonal-secondary"
         onclick={() => weather.currentIndex++}
         disabled={weather.currentIndex === data?.length - 1}
         title="Show Next {capitalizeFirstLetter(weather.grouping)}'s Weather"
@@ -171,7 +170,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     {#if viewGaugeInfo !== false && day[id][project.units] !== null}
                       {#if typeof index === 'number'}
                         <div
-                          class="my-2 rounded-container-token py-2 px-4 text-center"
+                          class="my-2 rounded-container py-2 px-4 text-center"
                           style={viewGaugeInfo
                             ? `background:${hex};color:${getTextColor(hex)};`
                             : 'display:none'}
@@ -197,7 +196,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         </div>
                       {:else}
                         <p
-                          class="text-sm italic my-2 py-2 px-4 border-token border-surface-400-500-token rounded-container-token"
+                          class="text-sm italic my-2 py-2 px-4 border border-surface-500 rounded-container"
                         >
                           No Color Assigned
                         </p>
@@ -220,7 +219,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     {#if viewGaugeInfo !== false && day[id][project.units] !== null}
                       {#if typeof index === 'number'}
                         <div
-                          class="my-2 rounded-container-token py-2 px-4 text-center"
+                          class="my-2 rounded-container py-2 px-4 text-center"
                           style={viewGaugeInfo
                             ? `background:${hex};color:${getTextColor(hex)};`
                             : 'display:none'}
@@ -246,7 +245,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         </div>
                       {:else}
                         <p
-                          class="text-sm italic my-2 py-2 px-4 border-token border-surface-400-500-token rounded-container-token"
+                          class="text-sm italic my-2 py-2 px-4 border border-surface-500 rounded-container"
                         >
                           No Color Assigned
                         </p>

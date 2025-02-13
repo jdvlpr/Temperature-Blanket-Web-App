@@ -62,7 +62,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <main class="pb-8">
       <a
         href="/blog"
-        class="btn bg-secondary-hover-token gap-1 mb-2 max-lg:mx-2 max-lg:mt-2"
+        class="btn preset-tonal-secondary gap-1 mb-2 max-lg:mx-2 max-lg:mt-2"
         >{@html ICONS.arrowBack} Blog</a
       >
       <Card>
@@ -85,7 +85,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               </div>
 
               <div
-                class="p-4 variant-soft-surface text-token rounded-container-token flex flex-col gap-2"
+                class="p-4 preset-tonal-surface base-font-color rounded-container flex flex-col gap-2"
               >
                 <p>
                   🎉 Temperature-blanket.com is reaching a new milestone! The
@@ -97,7 +97,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 </p>
                 <a
                   href={PUBLIC_GITHUB_LINK}
-                  class="btn variant-filled-primary w-fit gap-0"
+                  class="btn preset-filled-primary-500 w-fit gap-0"
                   target="_blank"
                 >
                   <svg

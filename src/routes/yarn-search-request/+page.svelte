@@ -57,7 +57,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <Card>
         {#snippet header()}
           <div
-            class="bg-surface-300-600-token text-token p-4 text-left flex flex-wrap justify-center items-end gap-4"
+            class="bg-surface-300-700 base-font-color p-4 text-left flex flex-wrap justify-center items-end gap-4"
           >
             <p>
               Making a request for a yarn to be included in the search results
@@ -187,7 +187,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 </div>
 
                 <button
-                  class="btn variant-filled-primary w-fit text-lg"
+                  class="btn preset-filled-primary-500 w-fit text-lg"
                   type="submit">Send Yarn Request</button
                 >
 

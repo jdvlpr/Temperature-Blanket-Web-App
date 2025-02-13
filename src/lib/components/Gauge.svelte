@@ -26,8 +26,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { drawerState, modal, pageSections, pinAllSections } from '$lib/state';
   import type { Color, GaugeSettingsType } from '$lib/types';
   import { createGaugeColors } from '$lib/utils';
-  import { focusTrap, getModalStore } from '@skeletonlabs/skeleton';
-
   let { gauge = $bindable() } = $props();
 
   const modalStore = getModalStore();
@@ -90,9 +88,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 />
 
 <div
-  class="w-full flex flex-col justify-center items-center bg-surface-300-600-token text-token {fullscreen
-    ? 'fixed w-full h-full left-0 top-0 bg-surface-50-900-token overflow-scroll'
-    : 'shadow-inner mt-2 pb-2 gap-2 rounded-container-token'}"
+  class="w-full flex flex-col justify-center items-center bg-surface-300-700 base-font-color {fullscreen
+    ? 'fixed w-full h-full left-0 top-0 bg-surface-50-950 overflow-scroll'
+    : 'shadow-inner mt-2 pb-2 gap-2 rounded-container'}"
   bind:this={gaugeContainerElement}
   use:focusTrap={fullscreen}
 >
@@ -130,7 +128,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     <button
       class={[
-        'bg-secondary-hover-token',
+        'preset-tonal-secondary',
         fullscreen ? 'btn-icon' : 'btn justify-start',
       ]}
       title="Browse Preset & User-Created Color Palettes"
@@ -168,7 +166,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     <button
       class={[
-        'bg-secondary-hover-token',
+        'preset-tonal-secondary',
         fullscreen ? 'btn-icon' : 'btn justify-start',
       ]}
       title="Choose Yarn Colorways, Filtered by Brand and Yarn"
@@ -205,7 +203,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     <button
       class={[
-        'bg-secondary-hover-token',
+        'preset-tonal-secondary',
         fullscreen ? 'btn-icon' : 'btn justify-start',
       ]}
       title="Get Palette from Image"
@@ -241,7 +239,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     <button
       class={[
-        'bg-secondary-hover-token',
+        'preset-tonal-secondary',
         fullscreen ? 'btn-icon' : 'btn justify-start',
       ]}
       title="Generate Random Colors"
@@ -277,7 +275,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     <button
       class={[
-        'bg-secondary-hover-token',
+        'preset-tonal-secondary',
         fullscreen ? 'btn-icon' : 'btn justify-start',
       ]}
       title="Load Colors or Get a Palette Code to Share"
@@ -314,7 +312,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     <button
       class={[
-        'bg-secondary-hover-token',
+        'preset-tonal-secondary',
         fullscreen ? 'btn-icon' : 'btn justify-start',
       ]}
       title="Sort Colors"
@@ -350,7 +348,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     <button
       aria-label="Fullscreen"
-      class="btn bg-secondary-hover-token flex gap-1 justify-start items-center"
+      class="btn preset-tonal-secondary flex gap-1 justify-start items-center"
       onclick={() => (fullscreen = !fullscreen)}
       title="Toggle Fullscreen Editing Mode (f)"
     >

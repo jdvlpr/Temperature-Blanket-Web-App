@@ -16,11 +16,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script>
   import AppNavigation from '$lib/components/AppNavigation.svelte';
   import { showNavigationSideBar } from '$lib/state';
-  import {
-    Drawer,
-    TableOfContents,
-    getDrawerStore,
-  } from '@skeletonlabs/skeleton';
   import { slide } from 'svelte/transition';
   import { weatherChart } from './WeatherChart.svelte';
 
@@ -59,7 +54,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   height="h-auto"
   width="w-fit"
   regionDrawer="pb-4"
-  bgDrawer="bg-surface-50-900-token"
+  bgDrawer="bg-surface-50-950"
 >
   {#if $drawerStore.id === 'menu'}
     <AppNavigation {drawerStore} />
@@ -70,7 +65,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <div data-vaul-drawer-wrapper="true">
   <div
-    class="sticky top-0 bg-surface-50/90 dark:bg-surface-800/90 backdrop-blur-md z-20 text-token [view-transition-name:sticky-header]"
+    class="sticky top-0 bg-surface-50/90 dark:bg-surface-800/90 backdrop-blur-md z-20 base-font-color [view-transition-name:sticky-header]"
     class:lg:py-2={stickyHeader}
     id="top-navbar"
   >
@@ -78,7 +73,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       class="max-w-screen-xl flex justify-between items-center m-auto px-2 gap-2"
     >
       <button
-        class="btn bg-secondary-hover-token lg:hidden my-2 flex items-center"
+        class="btn preset-tonal-secondary lg:hidden my-2 flex items-center"
         class:btn-icon={!pageName}
         title="Open Navigation Sidebar"
         onclick={() => drawerStore.open({ id: 'menu' })}
@@ -114,7 +109,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       bind:clientWidth={sidebarWidth}
     >
       <button
-        class="btn bg-surface-hover-token mx-2 lg:flex justify-center hidden mt-2"
+        class="btn preset-tonal-surface mx-2 lg:flex justify-center hidden mt-2"
         title={`${showNavigationSideBar.value ? 'Hide' : 'Show'} Sidebar`}
         onclick={async () => {
           showNavigationSideBar.value = !showNavigationSideBar.value;

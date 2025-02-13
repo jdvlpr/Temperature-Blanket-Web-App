@@ -226,9 +226,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <div
         class=" w-full {fullscreen
           ? 'h-full'
-          : 'h-[70px] first:rounded-tl-container-token first:overflow-hidden last:rounded-tr-container-token last:overflow-hidden'} group palette-item-{uniqueId} {roundedBottom &&
+          : 'h-[70px] first:rounded-tl-container first:overflow-hidden last:rounded-tr-container last:overflow-hidden'} group palette-item-{uniqueId} {roundedBottom &&
         !fullscreen
-          ? 'first:rounded-bl-container-token last:rounded-br-container-token'
+          ? 'first:rounded-bl-container last:rounded-br-container'
           : ''}"
         data-index={index}
         animate:flip={{ duration: flipDurationMs }}
@@ -329,7 +329,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {#snippet tooltip()}
             <div
               style="background:{hex};color:{getTextColor(hex)};"
-              class="w-full rounded-container-token text-center break-all flex flex-wrap items-center justify-center gap-4 z-30"
+              class="w-full rounded-container text-center break-all flex flex-wrap items-center justify-center gap-4 z-30"
             >
               {#if canUserDeleteColor && sortableColors.length > 1}
                 <button
@@ -347,7 +347,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       if (onchanged) onchanged();
                     }
                   }}
-                  class="btn bg-secondary-hover-token flex items-center"
+                  class="btn preset-tonal-secondary flex items-center"
                 >
                   <span class="text-xs">{index + 1}</span>
                   <svg
@@ -367,7 +367,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               {/if}
               {#if canUserEditColor}
                 <button
-                  class="btn bg-secondary-hover-token flex items-center justify-start"
+                  class="btn preset-tonal-secondary flex items-center justify-start"
                   onclick={() =>
                     modal.state.trigger({
                       type: 'component',

@@ -13,10 +13,10 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script>
-  import { getToastStore, popup } from '@skeletonlabs/skeleton';
+<script lang="ts">
+  import type { ToastContext } from '@skeletonlabs/skeleton-svelte';
 
-  const toastStore = getToastStore();
+  const toast: ToastContext = getContext('toast');
 
   let { href } = $props();
 
@@ -46,9 +46,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   $effect(() => {
     if (copiedMessage !== '') {
-      toastStore.trigger({
-        message: copiedMessage,
-        background: 'bg-success-300 text-black',
+      toast.create({
+        description: copiedMessage,
+        // background: 'bg-success-300 text-black',
       });
       copiedMessage = '';
     }
@@ -58,7 +58,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <div class="w-fit text-left">
   <button
     aria-label="Get a URL to share this page"
-    class="btn-icon bg-secondary-hover-token"
+    class="btn-icon preset-tonal-secondary"
     id="share-button"
     title="Get a URL to share this page"
     use:popup={popupShare}
@@ -91,21 +91,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
         -->
   <div
     data-popup="popupShare"
-    class="bg-surface-300-600-token rounded-container-token shadow-lg p-2 z-40 max-w-screen-sm pt-4"
+    class="bg-surface-300-700 rounded-container shadow-lg p-2 z-40 max-w-screen-sm pt-4"
     aria-orientation="vertical"
     aria-labelledby="menu-button"
     tabindex="-1"
   >
     <div class="flex flex-col gap-2">
       <p class="text-sm">Shareable Page URL</p>
-      <p
-        class="select-all break-all card bg-primary-50-900-token p-4 basis-full"
-      >
+      <p class="select-all break-all card bg-primary-50-950 p-4 basis-full">
         {href}
       </p>
       <div class="inline-flex flex-wrap gap-4 items-center">
         <button
-          class="btn variant-filled-primary gap-1"
+          class="btn preset-filled-primary-500 gap-1"
           onclick={() => copyURL()}
         >
           <svg
@@ -125,7 +123,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           Copy URL</button
         >
 
-        <button class="close btn variant-filled-secondary"
+        <button class="close btn preset-filled-secondary-500"
           ><svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -144,6 +142,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
         >
       </div>
     </div>
-    <div class="arrow bg-surface-300-600-token shadow-lg"></div>
+    <div class="arrow bg-surface-300-700 shadow-lg"></div>
   </div>
 </div>

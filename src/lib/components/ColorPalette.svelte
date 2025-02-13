@@ -35,7 +35,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <div class="flex flex-col text-left gap-y-1 w-full">
   <div
-    class="w-full flex rounded-container-token overflow-hidden"
+    class="w-full flex rounded-container overflow-hidden"
     style="height:{height}"
     in:fade
   >
@@ -59,7 +59,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 : hex}
             ></div>
             {#snippet tooltip()}
-              <div style="background:{hex}" class="p-2 rounded-container-token">
+              <div style="background:{hex}" class="p-2 rounded-container">
                 <div
                   class="flex flex-col justify-center items-center text-wrap text-center"
                   style="color:{getTextColor(hex)}"

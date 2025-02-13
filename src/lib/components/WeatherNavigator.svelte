@@ -42,10 +42,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <WeatherTableView />
 
   <div
-    class="flex flex-wrap gap-2 justify-center mt-4 mb-2 lg:mb-4 px-4 py-2 shadow-inner rounded-container-token variant-soft-surface"
+    class="flex flex-wrap gap-2 justify-center mt-4 mb-2 lg:mb-4 px-4 py-2 shadow-inner rounded-container preset-tonal-surface"
   >
     <button
-      class="btn bg-secondary-hover-token whitespace-pre-wrap"
+      class="btn preset-tonal-secondary whitespace-pre-wrap"
       onclick={downloadPDF}
       title="Download PDF File"
     >
@@ -53,7 +53,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </button>
 
     <button
-      class="btn bg-secondary-hover-token whitespace-pre-wrap"
+      class="btn preset-tonal-secondary whitespace-pre-wrap"
       onclick={downloadWeatherCSV}
       title="Download CSV File"
     >
@@ -62,7 +62,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     {#if weather.grouping !== 'week'}
       <button
-        class="btn bg-secondary-hover-token whitespace-pre-wrap"
+        class="btn preset-tonal-secondary whitespace-pre-wrap"
         onclick={() => {
           modal.state.trigger({
             type: 'component',

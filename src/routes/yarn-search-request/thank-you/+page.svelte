@@ -45,7 +45,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       class="max-w-screen-xl m-auto text-left flex flex-col gap-4 mx-4 lg:mx-0 mt-4 mb-2"
     >
       <h2 class="text-3xl font-bold flex flex-wrap items-center gap-2">
-        <span class="text-success-600-300-token">{@html ICONS.checkCircle}</span
+        <span class="text-success-700-300">{@html ICONS.checkCircle}</span
         > Success!
       </h2>
       <p class="">Your yarn search request has been received, thank you!</p>

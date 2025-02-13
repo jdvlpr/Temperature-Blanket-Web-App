@@ -35,7 +35,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <button
-  class="btn bg-secondary-hover-token gap-1"
+  class="btn preset-tonal-secondary gap-1"
   title="Set {title}"
   onclick={() =>
     modal.state.trigger({

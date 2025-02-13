@@ -228,7 +228,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <div class="inline-grid gap-2 text-center">
           <Card>
             {#snippet header()}
-              <div class="bg-surface-50-900-token py-4">
+              <div class="bg-surface-50-950 py-4">
                 <h2 class="font-bold text-xl">Featured Yarn Palettes</h2>
                 <label>
                   <span>From popular projects during the past</span>
@@ -280,7 +280,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             {#snippet header()}
               <div
                 bind:this={scrollContainer}
-                class="bg-surface-50-900-token text-token pt-4 text-center flex flex-col gap-2 justify-center items-center scroll-mt-[70px] pb-4 px-2"
+                class="bg-surface-50-950 base-font-color pt-4 text-center flex flex-col gap-2 justify-center items-center scroll-mt-[70px] pb-4 px-2"
               >
                 <div class="flex flex-col">
                   <h2 class="font-bold text-xl">All Yarn Palettes</h2>
@@ -403,7 +403,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       : ''}"
                   >
                     <button
-                      class="btn variant-filled-primary flex items-center font-bold w-full"
+                      class="btn preset-filled-primary-500 flex items-center font-bold w-full"
                       disabled={loading}
                       onclick={async () => {
                         yarnPaletteGalleryState.projects = [];
@@ -490,7 +490,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   <PlaceholderPalettes items={20} maxWFull={true} />
                 {:else if yarnPaletteGalleryState.palettes.length && hasNextPage}
                   <button
-                    class="btn variant-filled-primary flex m-auto my-4"
+                    class="btn preset-filled-primary-500 flex m-auto my-4"
                     disabled={!hasNextPage}
                     onclick={async () => {
                       loading = true;

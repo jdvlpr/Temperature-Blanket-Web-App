@@ -20,7 +20,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div
-  class="sticky bottom-0 flex justify-center z-10 gap-2 w-full bg-surface-100-800-token backdrop-blur-md"
+  class="sticky bottom-0 flex justify-center z-10 gap-2 w-full bg-surface-100-900 backdrop-blur-md"
 >
   <div class="flex justify-around w-full">
     {#each pageSections.items as { title, icon, index, active, pinned, tooltipText }}
@@ -36,7 +36,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             dataActive={active}
             dataNoWeather={!weather.data}
             classNames={[
-              `flex flex-col justify-center items-center disabled:opacity-30 p-2 pb-4 md:pb-2 w-full text-token
+              `flex flex-col justify-center items-center disabled:opacity-30 p-2 pb-4 md:pb-2 w-full 
                                 data-[active=false]:data-[no-weather=true]:opacity-50 
                                 data-[pinned=false]:data-[active=true]:data-[no-weather=false]:dark:bg-primary-900
                                 data-[pinned=false]:data-[active=true]:data-[no-weather=false]:dark:!text-surface-50

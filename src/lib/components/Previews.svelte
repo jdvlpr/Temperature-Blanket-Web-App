@@ -53,13 +53,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <Drawer.Overlay class="fixed inset-0 bg-black/40 z-40" />
 
               <Drawer.Content
-                class="bg-surface-50-900-token text-token flex flex-col rounded-tl-container-token rounded-tr-container-token mt-24 fixed bottom-0 left-0 right-0 z-50"
+                class="bg-surface-50-950 base-font-color flex flex-col rounded-tl-container rounded-tr-container mt-24 fixed bottom-0 left-0 right-0 z-50"
               >
                 <div
-                  class="pt-4 rounded-tl-container-token rounded-tr-container-token overflow-auto"
+                  class="pt-4 rounded-tl-container rounded-tr-container overflow-auto"
                 >
                   <div
-                    class="mx-auto w-12 h-1.5 flex-shrink-0 rounded-full mb-4 bg-surface-900-50-token"
+                    class="mx-auto w-12 h-1.5 flex-shrink-0 rounded-full mb-4 bg-surface-950-50"
                   ></div>
                   <div class="mx-auto text-center">
                     <WeatherDetails
@@ -77,10 +77,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </div>
 
         <div
-          class="flex flex-wrap gap-2 justify-center my-2 lg:mb-4 px-4 py-2 shadow-inner rounded-container-token variant-soft-surface w-full"
+          class="flex flex-wrap gap-2 justify-center my-2 lg:mb-4 px-4 py-2 shadow-inner rounded-container preset-tonal-surface w-full"
         >
           <button
-            class="btn bg-secondary-hover-token gap-1 text-token"
+            class="btn preset-tonal-secondary gap-1 base-font-color"
             title="Download PNG"
             onclick={() => {
               downloadPreviewPNG(
@@ -95,7 +95,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </button>
 
           <button
-            class="btn variant-ghost-primary text-token gap-2 items-center"
+            class="btn preset-tonal-primary border border-primary-500 base-font-color gap-2 items-center"
             onclick={() =>
               modal.state.trigger({
                 type: 'component',
@@ -130,7 +130,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 <a
                   href={project.gallery.href}
                   target="_blank"
-                  class="underline btn bg-secondary-hover-token w-fit whitespace-pre-wrap"
+                  class="underline btn preset-tonal-secondary w-fit whitespace-pre-wrap"
                   rel="noreferrer">{project.gallery.title}</a
                 >
               </p>

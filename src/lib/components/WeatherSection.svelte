@@ -42,7 +42,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     isDateWithinLastSevenDays,
     pluralize,
   } from '$lib/utils';
-  import { Accordion, AccordionItem } from '@skeletonlabs/skeleton';
+  import { Accordion } from '@skeletonlabs/skeleton-svelte';
   import { onMount } from 'svelte';
 
   let graph = $state();
@@ -165,7 +165,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <WeatherGrouping />
 
     <button
-      class="btn bg-secondary-hover-token w-fit"
+      class="btn preset-tonal-secondary w-fit"
       onclick={() => {
         modal.state.trigger({
           type: 'component',
@@ -213,7 +213,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   {#if weather.grouping === 'week'}
     <div
-      class="rounded-container-token flex flex-col gap-2 items-center justify-center w-full"
+      class="rounded-container flex flex-col gap-2 items-center justify-center w-full"
     >
       <p class="text-sm">
         Weekly weather grouping makes for a shorter project. <a
@@ -251,10 +251,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   {#if projectHasRecentWeatherData}
     <div
-      class="variant-ghost-warning rounded-container-token text-token text-left w-fit max-w-screen-sm text-sm"
+      class="preset-tonal-warning border border-warning-500 rounded-container base-font-color text-left w-fit max-w-screen-sm text-sm"
     >
       <Accordion>
-        <AccordionItem>
+        <Accordion.Item>
           {#snippet lead()}
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -297,7 +297,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 : 'a few'} days behind to account for possible changes. Sorry for
             any inconvenience.
           {/snippet}
-        </AccordionItem>
+        </Accordion.Item>
       </Accordion>
     </div>
   {/if}
@@ -306,7 +306,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {#if weather.table.showParameters.tmax}
       <WeatherItem
         id="tmax"
-        icon="&uarr;"
+        icon="↑"
         label="Highest Temperature"
         value={Math.max(...weather.params.tmax?.filter((n) => n !== null))}
         units={UNIT_LABELS.temperature[project.units]}
@@ -333,7 +333,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {#if weather.table.showParameters.tmin}
       <WeatherItem
         id="tmin"
-        icon="&darr;"
+        icon="↓"
         label="Lowest Temperature"
         value={Math.min(...weather.params.tmin?.filter((n) => n !== null))}
         units={UNIT_LABELS.temperature[project.units]}
@@ -483,10 +483,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   {#if isDataMissing}
     <div
-      class="variant-outline-surface rounded-container-token text-token flex flex-col gap-2 justify-center items-center text-left w-fit max-w-screen-sm text-sm"
+      class="variant-outline-surface rounded-container base-font-color flex flex-col gap-2 justify-center items-center text-left w-fit max-w-screen-sm text-sm"
     >
       <Accordion>
-        <AccordionItem>
+        <Accordion.Item>
           {#snippet lead()}
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -506,7 +506,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               {#if count && count < weather.data?.length}
                 {count}
                 {pluralize(weather.grouping, count)} with missing {label}
-                {pluralize(type, count)}.&nbsp;
+                {pluralize(type, count)}. 
               {:else if count && count === weather.data?.length}
                 No days have {label}
                 {type} data.
@@ -547,7 +547,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               </p>
             </div>
           {/snippet}
-        </AccordionItem>
+        </Accordion.Item>
       </Accordion>
     </div>
   {/if}

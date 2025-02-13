@@ -17,7 +17,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ColorPalette from '$lib/components/ColorPalette.svelte';
   import SelectNumberOfColors from '$lib/components/SelectNumberOfColors.svelte';
   import { SCHEMES } from '$lib/constants';
-  import { getModalStore } from '@skeletonlabs/skeleton';
   import chroma from 'chroma-js';
 
   let { updateGauge, numberOfColors } = $props();
@@ -55,7 +54,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div
-  class="text-center flex flex-wrap justify-center items-end scroll-mt-[70px] bg-surface-100-800-token pb-4 gap-4 px-2"
+  class="text-center flex flex-wrap justify-center items-end scroll-mt-[70px] bg-surface-100-900 pb-4 gap-4 px-2"
 >
   <label class="label">
     <span class="flex items-center gap-1">

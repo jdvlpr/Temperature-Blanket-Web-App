@@ -17,7 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { PUBLIC_BASE_DOMAIN_NAME, PUBLIC_BASE_URL } from '$env/static/public';
   import AppLogo from '$lib/components/AppLogo.svelte';
   import AppShell from '$lib/components/AppShell.svelte';
-  import { RadioGroup, RadioItem } from '@skeletonlabs/skeleton';
+  import { Segment } from '@skeletonlabs/skeleton-svelte';
   import { fade } from 'svelte/transition';
 
   const posts = [
@@ -100,12 +100,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <main
       class="max-w-screen-xl m-auto px-2 gap-4 flex flex-col items-center mb-4"
     >
-      <RadioGroup
+      <Segment
         class="flex wrap gap-y-2 max-lg:mt-4"
-        active="bg-secondary-active-token"
+        active="preset-filled-secondary-500"
       >
         {#each tags as tag}
-          <RadioItem
+          <Segment.Item
             bind:group={selectedTag}
             name={tag}
             value={tag}
@@ -114,9 +114,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <span class="flex gap-1 justify-center items-center">
               {tag}
             </span>
-          </RadioItem>
+          </Segment.Item>
         {/each}
-      </RadioGroup>
+      </Segment>
 
       {#key selectedTag}
         <div
@@ -126,7 +126,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {#each filteredPosts as { href, imgSrc, imgAlt, title, tags }}
             <div class="flex flex-col gap-4">
               <a
-                class="w-full card bg-surface-200-700-token bg-primary-hover-token p-4 whitespace-pre-wrap text-center flex flex-col items-center justify-center gap-2"
+                class="w-full card bg-surface-200-800 preset-tonal-primary p-4 whitespace-pre-wrap text-center flex flex-col items-center justify-center gap-2"
                 {href}
               >
                 <img
@@ -139,7 +139,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 {#if tags}
                   {#each tags as item}
                     <p
-                      class="text-sm inline bg-tertiary-200-700-token px-2 rounded-token"
+                      class="text-sm inline bg-tertiary-200-800 px-2 rounded"
                     >
                       {item}
                     </p>

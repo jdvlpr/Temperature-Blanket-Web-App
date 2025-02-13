@@ -15,7 +15,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import { locations, modal, weather } from '$lib/state';
-  import { getModalStore } from '@skeletonlabs/skeleton';
   import { onMount } from 'svelte';
   import ToggleSwitch from '../buttons/ToggleSwitch.svelte';
   import GettingWeather from './GettingWeather.svelte';
@@ -61,7 +60,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   'Meteostat'}
               >
                 <button
-                  class="btn bg-secondary-hover-token gap-2"
+                  class="btn preset-tonal-secondary gap-2"
                   onclick={() => (weather.defaultSource = 'Meteostat')}
                 >
                   <span class="flex flex-shrink-0 gap-1">
@@ -82,7 +81,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       </svg>
                     {:else}
                       <span
-                        class="rounded-full mx-[2.5px] p-2 w-3 h-3 border-[1.5px] border-surface-900-50-token"
+                        class="rounded-full mx-[2.5px] p-2 w-3 h-3 border-[1.5px] border-surface-950-50"
                       ></span>
                     {/if}
                   </span>
@@ -96,7 +95,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   'Open-Meteo'}
               >
                 <button
-                  class="btn bg-secondary-hover-token gap-2"
+                  class="btn preset-tonal-secondary gap-2"
                   onclick={() => (weather.defaultSource = 'Open-Meteo')}
                 >
                   <span class="flex flex-shrink-0 gap-1">
@@ -117,7 +116,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       </svg>
                     {:else}
                       <span
-                        class="rounded-full mx-[2.5px] p-2 w-3 h-3 border-[1.5px] border-surface-900-50-token"
+                        class="rounded-full mx-[2.5px] p-2 w-3 h-3 border-[1.5px] border-surface-950-50"
                       ></span>
                     {/if}
                   </span>
@@ -254,7 +253,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </div>
 
       {#if warnSearchAgain}
-        <div class="variant-soft-warning text-token card p-4">
+        <div class="preset-tonal-warning base-font-color card p-4">
           <p class="text-sm mb-4">
             Search again for weather data to apply weather source changes.
             {#if !locations.allValid}
@@ -262,7 +261,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             {/if}
           </p>
           <button
-            class="btn variant-filled-primary font-bold text-2xl"
+            class="btn preset-filled-primary-500 font-bold text-2xl"
             onclick={() => {
               if (weather.isUserEdited) {
                 modalStore.close();

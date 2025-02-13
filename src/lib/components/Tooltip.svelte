@@ -48,7 +48,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     fullWidth = false,
     buttonDisabled = false,
     tooltipClass = 'text-sm',
-    tooltipBg = 'bg-surface-200-700-token',
+    tooltipBg = 'bg-surface-200-800',
     tooltipStyle = '',
     classNames = '',
     dataPinned,
@@ -204,7 +204,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     aria-labelledby="Tooltip or Menu"
     aria-describedby="A dialog box showing information or menu items."
     in:scale={{ duration: 175 }}
-    class="absolute shadow-lg text-token cursor-text z-200 rounded-container-token tooltip block"
+    class="absolute shadow-lg base-font-color cursor-text z-200 rounded-container tooltip block"
     style="min-width:{minWidth}"
     use:floatingContent
     onmouseenter={() => (isTooltipActive = true)}
@@ -220,7 +220,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     bind:this={tooltipElement}
   >
     <div
-      class="p-2 rounded-container-token {tooltipBg} {tooltipClass}"
+      class="p-2 rounded-container {tooltipBg} {tooltipClass}"
       style={tooltipStyle}
     >
       {@render tooltip?.()}

@@ -138,7 +138,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <!-- The range calculation functionality expects there to be more than one day of weather data.
      So if there's only one day of weather data the color ranges will have some NaN values. 
      This notice discourages users from using only one day of weather data. -->
-      <p class="text-sm my-2 p-2 rounded-container-token variant-ghost-warning">
+      <p class="text-sm my-2 p-2 rounded-container preset-tonal-warning border border-warning-500">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
@@ -172,13 +172,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 {#if locations.allValid}
   <div
-    class="flex flex-wrap gap-2 justify-center mt-4 mb-2 lg:mb-4 px-4 py-2 shadow-inner rounded-container-token variant-soft-surface max-w-screen-md mx-auto"
+    class="flex flex-wrap gap-2 justify-center mt-4 mb-2 lg:mb-4 px-4 py-2 shadow-inner rounded-container preset-tonal-surface max-w-screen-md mx-auto"
     transition:slide
   >
     <div class:hidden={!locations.allValid || weather.isUserEdited}>
       {#if locations.all.length < MAXIMUM_LOCATIONS}
         <button
-          class="btn bg-secondary-hover-token gap-2"
+          class="btn preset-tonal-secondary gap-2"
           id="add-location-button"
           disabled={project.status.loading}
           onclick={() => locations.add()}
@@ -206,7 +206,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
 
     <button
-      class="btn bg-secondary-hover-token text-left"
+      class="btn preset-tonal-secondary text-left"
       disabled={project.status.loading}
       onclick={() => {
         modal.state.trigger({

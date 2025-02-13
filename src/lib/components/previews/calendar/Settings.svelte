@@ -53,7 +53,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </label>
 
 <button
-  class="btn bg-secondary-hover-token gap-1"
+  class="btn preset-tonal-secondary gap-1"
   title="Edit Square Design"
   onclick={async () => {
     modal.state.trigger({
@@ -115,7 +115,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </div>
 
 <button
-  class="btn bg-secondary-hover-token gap-1"
+  class="btn preset-tonal-secondary gap-1"
   title="Choose a Color"
   onclick={() =>
     modal.state.trigger({

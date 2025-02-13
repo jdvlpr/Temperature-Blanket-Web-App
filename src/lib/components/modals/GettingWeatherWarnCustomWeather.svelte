@@ -16,7 +16,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import GettingWeather from '$lib/components/modals/GettingWeather.svelte';
   import { modal } from '$lib/state';
-  import { getModalStore } from '@skeletonlabs/skeleton';
   import ModalShell from './ModalShell.svelte';
 
   interface Props {
@@ -44,7 +43,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     <div class="mb-4">
       <button
-        class="btn variant-filled-primary"
+        class="btn preset-filled-primary-500"
         onclick={() => {
           setModal();
         }}

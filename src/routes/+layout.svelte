@@ -16,17 +16,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import { onNavigate } from '$app/navigation';
   import { PUBLIC_MICROSOFT_CLARITY_ID } from '$env/static/public';
-  import { consentToMSClarityCookies, locations, modal } from '$lib/state';
+  import { consentToMSClarityCookies, modal } from '$lib/state';
   import { handleKeyDown, initializeLocalStorage, privacy } from '$lib/utils';
   import {
     Modal,
-    Toast,
-    getModalStore,
-    getToastStore,
-    initializeStores,
-    storePopup,
-  } from '@skeletonlabs/skeleton';
-  import { onMount, type Snippet } from 'svelte';
+    ToastProvider,
+    type ToastContext,
+  } from '@skeletonlabs/skeleton-svelte';
+  import { getContext, onMount, type Snippet } from 'svelte';
   import {
     arrow,
     autoUpdate,
@@ -41,21 +38,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
   let { children }: Props = $props();
 
-  initializeStores();
+  // initializeStores();
 
-  storePopup.set({
-    computePosition,
-    autoUpdate,
-    offset,
-    shift,
-    flip,
-    arrow,
-  });
+  // storePopup.set({
+  //   computePosition,
+  //   autoUpdate,
+  //   offset,
+  //   shift,
+  //   flip,
+  //   arrow,
+  // });
 
-  const toastStore = getToastStore();
+  const toast: ToastContext = getContext('toast');
 
   onMount(async () => {
-    modal.state = getModalStore();
+    // modal.state = getModalStore();
 
     initializeLocalStorage();
 
@@ -81,8 +78,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   onkeydown={handleKeyDown}
   onoffline={() => {
     // Alert if offline
-    toastStore.trigger({
-      message: `<div
+    toast.create({
+      description: `<div
     class="w-full p-2 m-auto flex flex-col items-start text-left"
   >
     <div class="flex items-center justify-start gap-2">
@@ -105,13 +102,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
     <p class="text-sm">Some features may not work as expected.</p>
   </div>`,
-      background: 'bg-warning-200-700-token text-token',
+      // background: 'bg-warning-200-800 base-font-color',
     });
   }}
   ononline={() => {
     // Alert if online connection restored
-    toastStore.trigger({
-      message: `<div
+    toast.create({
+      description: `<div
     class="w-full text-center p-2 m-auto flex flex-col items-start justify-center"
   >
     <div class="flex flex-wrap items-center justify-center gap-2">
@@ -119,7 +116,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
      You are online
     </div>
   </div>`,
-      background: 'bg-success-200-700-token text-token',
+      // background: 'bg-success-200-800 base-font-color',
     });
   }}
 />
@@ -176,12 +173,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/if}
 </svelte:head>
 
-<Toast max={3} position="b" zIndex={'z-[12000]'} />
+<ToastProvider />
 
-<Modal regionBackdrop="backdrop-blur-sm" zIndex={'z-[10010]'} />
+<Modal zIndex={'z-[10010]'} />
 
 <p
-  class="sm:text-center px-4 py-8 bg-warning-backdrop-token text-token [view-transition-name:top-banner]"
+  class="sm:text-center px-4 py-8 bg-warning-50/50 dark:bg-warning-950/50 base-font-color [view-transition-name:top-banner]"
 >
   <svg
     xmlns="http://www.w3.org/2000/svg"

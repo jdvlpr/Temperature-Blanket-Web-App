@@ -51,9 +51,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <span class="flex flex-col items-center justify-start p-2">
   <div
-    class="flex !text-token"
-    class:!variant-soft-warning={isRecentDate}
-    class:rounded-container-token={isRecentDate}
+    class="flex !base-font-color"
+    class:!preset-tonal-warning={isRecentDate}
+    class:rounded-container={isRecentDate}
     class:p-1={isRecentDate}
   >
     <span class="text-xl font-semibold tracking-wide"

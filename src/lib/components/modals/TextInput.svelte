@@ -15,7 +15,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
-  import { getModalStore } from '@skeletonlabs/skeleton';
   import ModalShell from './ModalShell.svelte';
 
   interface Props {

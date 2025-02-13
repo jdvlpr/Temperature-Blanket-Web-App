@@ -47,7 +47,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <Card>
         {#snippet header()}
           <div>
-            <div class="bg-surface-200-700-token text-token p-4">
+            <div class="bg-surface-200-800 base-font-color p-4">
               <p class="text-center mt-2">
                 Thanks to <a
                   href={PUBLIC_KOFI_LINK}

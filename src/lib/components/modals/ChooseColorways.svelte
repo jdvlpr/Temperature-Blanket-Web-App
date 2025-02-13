@@ -19,7 +19,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import StickyPart from '$lib/components/modals/StickyPart.svelte';
   import YarnGridSelect from '$lib/components/modals/YarnGridSelect.svelte';
   import { pluralize } from '$lib/utils';
-  import { getModalStore } from '@skeletonlabs/skeleton';
   import ModalShell from './ModalShell.svelte';
 
   interface Props {

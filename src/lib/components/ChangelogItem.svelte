@@ -29,7 +29,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <p class="font-bold text-2xl">{date}</p>
     {/if}
   </div>
-  <div class="flex flex-col gap-2 card p-2 bg-surface-300-600-token">
+  <div class="flex flex-col gap-2 card p-2 bg-surface-300-700">
     <div class="flex flex-wrap gap-2">
       {#each notes as { icon, text, title, instructions }}
         <div class="card p-4 flex-auto">
@@ -74,7 +74,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
     {#if version}
       <p class="text-xs flex flex-wrap gap-2" id={version}>
-        <span class="inline bg-tertiary-200-700-token px-2 rounded-token">
+        <span class="inline bg-tertiary-200-800 px-2 rounded">
           <span>Version {version}</span>
         </span>
       </p>

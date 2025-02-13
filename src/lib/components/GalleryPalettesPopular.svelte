@@ -128,7 +128,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div
-  class="text-center flex flex-wrap justify-center items-end bg-surface-100-800-token pb-4 gap-2"
+  class="text-center flex flex-wrap justify-center items-end bg-surface-100-900 pb-4 gap-2"
 >
   <label class="label text-sm">
     <span>Popular during the past</span>

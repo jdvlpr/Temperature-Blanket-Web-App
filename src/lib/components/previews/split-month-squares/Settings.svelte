@@ -90,7 +90,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 />
 
 <button
-  class="btn bg-secondary-hover-token gap-1"
+  class="btn preset-tonal-secondary gap-1"
   title="Choose a Color"
   onclick={() =>
     modal.state.trigger({

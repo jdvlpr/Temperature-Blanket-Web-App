@@ -29,7 +29,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   aria-label="Close"
   class=" {text
     ? 'btn'
-    : 'btn-icon'} relative variant-glass-secondary flex justify-center items-center float-right"
+    : 'btn-icon'} relative preset-tonal-secondary flex justify-center items-center float-right"
   onclick={onClose}
 >
   <svg

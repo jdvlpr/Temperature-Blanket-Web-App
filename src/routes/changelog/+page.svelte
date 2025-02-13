@@ -80,7 +80,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <Card>
         {#snippet header()}
           <div
-            class="bg-surface-200-700-token text-token p-4"
+            class="bg-surface-200-800 base-font-color p-4"
             bind:this={container}
           >
             <p class="text-left">

@@ -42,7 +42,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     title="Search for Weather Data"
     id="location-action-button"
     fullWidth={true}
-    classNames="btn variant-filled-primary text-2xl font-bold w-full sm:w-fit"
+    classNames="btn preset-filled-primary-500 text-2xl font-bold w-full sm:w-fit"
   >
     {#if !!weather.isUserEdited}
       Reload Weather Data
@@ -69,7 +69,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </Tooltip>
 {:else}
   <button
-    class="btn variant-filled-primary text-2xl font-bold w-full sm:w-fit"
+    class="btn preset-filled-primary-500 text-2xl font-bold w-full sm:w-fit"
     onclick={() => {
       if (weather.isUserEdited) setWarnCustomWeatherModal();
       else setModal();

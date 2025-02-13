@@ -15,7 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import { page } from '$app/state';
-  import { Accordion, AccordionItem } from '@skeletonlabs/skeleton';
+  import { Accordion } from '@skeletonlabs/skeleton-svelte';
   import AppLogo from '$lib/components/AppLogo.svelte';
   import ThemeSwitcher from '$lib/components/ThemeSwitcher.svelte';
   import { PUBLIC_GITHUB_LINK } from '$env/static/public';
@@ -46,7 +46,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <div><ThemeSwitcher showText={true} /></div>
 
   <Accordion>
-    <AccordionItem
+    <Accordion.Item
       open={page.url.pathname === '/yarn-colorway-finder' ||
         page.url.pathname === '/yarn' ||
         page.url.pathname === '/weather'}
@@ -61,9 +61,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <div class="flex flex-col w-full gap-2">
             <a
               href="/"
-              class="btn bg-secondary-hover-token w-fit gap-0 text-token"
+              class="btn preset-tonal-secondary w-fit gap-0 base-font-color"
               onclick={() => onClickItem()}
-              class:variant-soft-secondary={page.url.pathname === '/'}
+              class:preset-tonal-secondary={page.url.pathname === '/'}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -80,9 +80,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <a
               href="/yarn-colorway-finder"
-              class="btn bg-secondary-hover-token w-fit gap-0 text-token"
+              class="btn preset-tonal-secondary w-fit gap-0 base-font-color"
               onclick={() => onClickItem()}
-              class:variant-soft-secondary={page.url.pathname ===
+              class:preset-tonal-secondary={page.url.pathname ===
                 '/yarn-colorway-finder'}
             >
               <svg
@@ -102,9 +102,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </a>
             <a
               href="/yarn"
-              class="btn bg-secondary-hover-token w-fit gap-0 text-token"
+              class="btn preset-tonal-secondary w-fit gap-0 base-font-color"
               onclick={() => onClickItem()}
-              class:variant-soft-secondary={page.url.pathname === '/yarn'}
+              class:preset-tonal-secondary={page.url.pathname === '/yarn'}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -125,9 +125,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </a>
             <a
               href="/weather"
-              class="btn bg-secondary-hover-token w-fit gap-0 text-token"
+              class="btn preset-tonal-secondary w-fit gap-0 base-font-color"
               onclick={() => onClickItem()}
-              class:variant-soft-secondary={page.url.pathname === '/weather'}
+              class:preset-tonal-secondary={page.url.pathname === '/weather'}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -144,10 +144,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </div>
         
           {/snippet}
-    </AccordionItem>
+    </Accordion.Item>
   </Accordion>
   <Accordion>
-    <AccordionItem
+    <Accordion.Item
       open={page.url.pathname === '/gallery' ||
         page.url.pathname === '/yarn-palette-gallery' ||
         page.url.pathname.includes('/gallery')}
@@ -160,9 +160,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <div class="flex flex-col w-full gap-2">
             <a
               href="/gallery"
-              class="btn bg-secondary-hover-token w-fit gap-0 text-token"
+              class="btn preset-tonal-secondary w-fit gap-0 base-font-color"
               onclick={() => onClickItem()}
-              class:variant-soft-secondary={page.url.pathname === '/gallery'}
+              class:preset-tonal-secondary={page.url.pathname === '/gallery'}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -178,9 +178,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </a>
             <a
               href="/yarn-palette-gallery"
-              class="btn bg-secondary-hover-token w-fit gap-0 text-token"
+              class="btn preset-tonal-secondary w-fit gap-0 base-font-color"
               onclick={() => onClickItem()}
-              class:variant-soft-secondary={page.url.pathname ===
+              class:preset-tonal-secondary={page.url.pathname ===
                 '/yarn-palette-gallery'}
             >
               {@html ICONS.palette}
@@ -189,11 +189,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </div>
         
           {/snippet}
-    </AccordionItem>
+    </Accordion.Item>
   </Accordion>
 
   <Accordion>
-    <AccordionItem
+    <Accordion.Item
       open={page.url.pathname === '/faq' ||
         page.url.pathname === '/contact' ||
         page.url.pathname === '/blog' ||
@@ -214,9 +214,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <div class="flex flex-col gap-2 mb-4 w-full">
             <a
               href="/faq"
-              class="btn bg-secondary-hover-token w-fit gap-0 text-token"
+              class="btn preset-tonal-secondary w-fit gap-0 base-font-color"
               onclick={() => onClickItem()}
-              class:variant-soft-secondary={page.url.pathname === '/faq'}
+              class:preset-tonal-secondary={page.url.pathname === '/faq'}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -236,9 +236,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </a>
             <a
               href="/contact"
-              class="btn bg-secondary-hover-token w-fit gap-0 text-token"
+              class="btn preset-tonal-secondary w-fit gap-0 base-font-color"
               onclick={() => onClickItem()}
-              class:variant-soft-secondary={page.url.pathname === '/contact'}
+              class:preset-tonal-secondary={page.url.pathname === '/contact'}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -259,9 +259,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <a
               href="/yarn-search-request"
-              class="btn bg-secondary-hover-token w-fit gap-0 text-token"
+              class="btn preset-tonal-secondary w-fit gap-0 base-font-color"
               onclick={() => onClickItem()}
-              class:variant-soft-secondary={page.url.pathname ===
+              class:preset-tonal-secondary={page.url.pathname ===
                 '/yarn-search-request'}
             >
               <svg
@@ -280,13 +280,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <span>Request Yarn</span>
             </a>
 
-            <div class="w-full border-t border-surface-300-600-token"></div>
+            <div class="w-full border-t border-surface-300-700"></div>
 
             <a
               href="/blog"
-              class="btn bg-secondary-hover-token w-fit gap-0 text-token text-left"
+              class="btn preset-tonal-secondary w-fit gap-0 base-font-color text-left"
               onclick={() => onClickItem()}
-              class:variant-soft-secondary={page.url.pathname === '/blog' ||
+              class:preset-tonal-secondary={page.url.pathname === '/blog' ||
                 page.url.pathname.includes('/blog')}
             >
               <svg
@@ -302,13 +302,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <span class="">Blog</span>
             </a>
 
-            <div class="w-full border-t border-surface-300-600-token"></div>
+            <div class="w-full border-t border-surface-300-700"></div>
 
             <a
               href="/privacy"
-              class="btn bg-secondary-hover-token w-fit gap-0 text-token"
+              class="btn preset-tonal-secondary w-fit gap-0 base-font-color"
               onclick={() => onClickItem()}
-              class:variant-soft-secondary={page.url.pathname === '/privacy'}
+              class:preset-tonal-secondary={page.url.pathname === '/privacy'}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -328,13 +328,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <span>Privacy</span>
             </a>
 
-            <div class="w-full border-t border-surface-300-600-token"></div>
+            <div class="w-full border-t border-surface-300-700"></div>
 
             <a
               href="/documentation"
-              class="btn bg-secondary-hover-token w-fit gap-0 text-token"
+              class="btn preset-tonal-secondary w-fit gap-0 base-font-color"
               onclick={() => onClickItem()}
-              class:variant-soft-secondary={page.url.pathname ===
+              class:preset-tonal-secondary={page.url.pathname ===
                 '/documentation'}
             >
               <svg
@@ -356,9 +356,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <a
               href="/changelog"
-              class="btn bg-secondary-hover-token w-fit gap-0 text-token"
+              class="btn preset-tonal-secondary w-fit gap-0 base-font-color"
               onclick={() => onClickItem()}
-              class:variant-soft-secondary={page.url.pathname === '/changelog'}
+              class:preset-tonal-secondary={page.url.pathname === '/changelog'}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -379,9 +379,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <a
               href="/api/yarn-colorways"
-              class="btn bg-secondary-hover-token w-fit gap-0 text-token"
+              class="btn preset-tonal-secondary w-fit gap-0 base-font-color"
               onclick={() => onClickItem()}
-              class:variant-soft-secondary={page.url.pathname ===
+              class:preset-tonal-secondary={page.url.pathname ===
                 '/api/yarn-colorways'}
             >
               <svg
@@ -405,7 +405,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             {#if PUBLIC_GITHUB_LINK}
               <a
                 href={PUBLIC_GITHUB_LINK}
-                class="btn bg-secondary-hover-token w-fit gap-0 text-token"
+                class="btn preset-tonal-secondary w-fit gap-0 base-font-color"
                 target="_blank"
               >
                 <svg
@@ -424,14 +424,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </div>
         
           {/snippet}
-    </AccordionItem>
+    </Accordion.Item>
   </Accordion>
 
   <a
     href="/supporters"
-    class="btn bg-secondary-hover-token w-fit gap-0 text-token"
+    class="btn preset-tonal-secondary w-fit gap-0 base-font-color"
     onclick={() => onClickItem()}
-    class:variant-soft-secondary={page.url.pathname === '/supporters'}
+    class:preset-tonal-secondary={page.url.pathname === '/supporters'}
   >
     <svg
       xmlns="http://www.w3.org/2000/svg"

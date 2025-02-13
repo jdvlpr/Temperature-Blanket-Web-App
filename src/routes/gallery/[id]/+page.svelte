@@ -35,7 +35,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     pluralize,
     stripHTMLTags,
   } from '$lib/utils';
-  import { Accordion, AccordionItem } from '@skeletonlabs/skeleton';
+  import { Accordion } from '@skeletonlabs/skeleton-svelte';
   import { onMount } from 'svelte';
   import { yarnPageState } from '../../yarn/state.svelte';
 
@@ -165,7 +165,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <main class="max-w-screen-xl m-auto flex flex-col justify-start gap-2">
         <a
           href="/gallery"
-          class="flex items-center btn bg-primary-hover-token gap-1 w-fit mx-2 lg:mx-0 mt-2 lg:mt-0"
+          class="flex items-center btn preset-tonal-primary gap-1 w-fit mx-2 lg:mx-0 mt-2 lg:mt-0"
         >
           {@html ICONS.arrowBack}
           Project Gallery</a
@@ -173,7 +173,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <Card>
           {#snippet header()}
             <div
-              class="bg-surface-200-700-token text-token p-4 text-center flex flex-col gap-2"
+              class="bg-surface-200-800 base-font-color p-4 text-center flex flex-col gap-2"
             >
               <p class="text-xl">
                 {#await data.stream}
@@ -190,7 +190,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               {#await data.stream then}
                 {#if projectURL}
                   <a
-                    class="btn variant-filled-primary w-fit m-auto flex flex-wrap items-center gap-1"
+                    class="btn preset-filled-primary-500 w-fit m-auto flex flex-wrap items-center gap-1"
                     href={projectURL}
                     target={locations.allValid ? '_blank' : '_self'}
                   >
@@ -232,10 +232,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 {/if}
               {/await}
               <div
-                class="text-left max-w-screen-sm mx-auto w-full variant-soft-tertiary text-token rounded-container-token mt-2"
+                class="text-left max-w-screen-sm mx-auto w-full preset-tonal-tertiary base-font-color rounded-container mt-2"
               >
                 <Accordion>
-                  <AccordionItem disabled={!project}>
+                  <Accordion.Item disabled={!project}>
                     {#snippet lead()}
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -373,7 +373,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         </div>
                       {/await}
                     {/snippet}
-                  </AccordionItem>
+                  </Accordion.Item>
                 </Accordion>
               </div>
             </div>
@@ -424,7 +424,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                             <div class="flex flex-col">
                               <ColorPalette {colors} schemeName={gaugeLabel} />
                               <a
-                                class="btn variant-ghost-primary w-fit m-auto mt-4 flex flex-wrap items-center gap-1"
+                                class="btn preset-tonal-primary border border-primary-500 w-fit m-auto mt-4 flex flex-wrap items-center gap-1"
                                 onclick={() => {
                                   yarnPageState.gauge.colors = colors;
                                 }}
@@ -474,7 +474,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                               <ViewToggle />
                             </div>
                             <div
-                              class="rounded-container-token overflow-hidden mt-4 mb-2 xl:mb-4 {preferences
+                              class="rounded-container overflow-hidden mt-4 mb-2 xl:mb-4 {preferences
                                 .value.layout === 'grid'
                                 ? 'gap-1 grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4'
                                 : 'flex flex-col'}"
@@ -483,7 +483,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                                 <div
                                   class="flex p-2 gap-2 items-center justify-around flex-wrap {preferences
                                     .value.layout === 'grid'
-                                    ? 'rounded-container-token md:basis-1/5 sm:basis-1/4 basis-1/3 flex-auto'
+                                    ? 'rounded-container md:basis-1/5 sm:basis-1/4 basis-1/3 flex-auto'
                                     : ''}"
                                   style="background-color:{hex};color:{getTextColor(
                                     hex,
@@ -518,7 +518,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                                   </div>
                                   {#if affiliate_variant_href}
                                     <a
-                                      class="btn bg-secondary-hover-token flex flex-wrap justify-start items-center"
+                                      class="btn preset-tonal-secondary flex flex-wrap justify-start items-center"
                                       href={affiliate_variant_href}
                                       target="_blank"
                                       rel="noreferrer nofollow"

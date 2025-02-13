@@ -24,7 +24,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     getTextColor,
     setSecondaryTargets,
   } from '$lib/utils';
-  import { getModalStore } from '@skeletonlabs/skeleton';
   import ModalShell from './ModalShell.svelte';
 
   let {
@@ -147,7 +146,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {#key _secondaryTargets}
           {#each squares as { icon, label, targetId }, index (index)}
             <button
-              class="flex flex-col justify-center items-center select-none outline-none cursor-pointer rounded-container-token shadow aspect-square"
+              class="flex flex-col justify-center items-center select-none outline-none cursor-pointer rounded-container shadow aspect-square"
               style="background-color: {colors[targetId]};color:{getTextColor(
                 colors[targetId],
               )}"
@@ -179,7 +178,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {/key}
       </div>
 
-      <Tooltip onclick={reset} classNames="btn bg-secondary-hover-token gap-2">
+      <Tooltip onclick={reset} classNames="btn preset-tonal-secondary gap-2">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
@@ -202,7 +201,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
 
     <div
-      class="flex flex-col gap-2 justify-start items-start bg-surface-100-800-token rounde-container-token p-4 mt-2 mx-auto w-fit"
+      class="flex flex-col gap-2 justify-start items-start bg-surface-100-900 rounde-container-token p-4 mt-2 mx-auto w-fit"
     >
       <ToggleSwitch
         bind:checked={primaryTargetAsBackup}

@@ -18,7 +18,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
   import StickyPart from '$lib/components/modals/StickyPart.svelte';
   import { getSortedPalette } from '$lib/utils';
-  import { getModalStore } from '@skeletonlabs/skeleton';
   import ModalShell from './ModalShell.svelte';
 
   let { colors, updateGauge, parent } = $props();
@@ -77,7 +76,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </label>
 
       <button
-        class="btn bg-secondary-hover-token"
+        class="btn preset-tonal-secondary"
         onclick={() => {
           _colors.reverse();
           key = !key;

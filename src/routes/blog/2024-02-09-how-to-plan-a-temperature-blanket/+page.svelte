@@ -19,12 +19,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import AppShell from '$lib/components/AppShell.svelte';
   import Card from '$lib/components/Card.svelte';
   import { ICONS } from '$lib/constants';
-  import {
-    TableOfContents,
-    getDrawerStore,
-    tocCrawler,
-  } from '@skeletonlabs/skeleton';
-
   const drawerStore = getDrawerStore();
 </script>
 
@@ -57,7 +51,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {#snippet stickyHeader()}
     <div class="hidden lg:inline-flex mx-auto"><AppLogo /></div>
     <button
-      class="btn bg-secondary-hover-token flex items-center sm:hidden"
+      class="btn preset-tonal-secondary flex items-center sm:hidden"
       title="Open Navigation Sidebar"
       onclick={() =>
         drawerStore.open({
@@ -82,7 +76,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <main class="pb-8">
       <a
         href="/blog"
-        class="btn bg-secondary-hover-token gap-1 mb-2 max-lg:mx-2 max-lg:mt-2"
+        class="btn preset-tonal-secondary gap-1 mb-2 max-lg:mx-2 max-lg:mt-2"
         >{@html ICONS.arrowBack} Blog</a
       >
       <div class="pb-4 text-left flex gap-4">
@@ -106,11 +100,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 <div class="flex flex-col gap-4">
                   <div class="mt-4 flex flex-col gap-2">
                     <h1
-                      class="font-bold font-cursive text-4xl text-secondary-700-200-token"
+                      class="font-bold font-cursive text-4xl text-secondary-800-200"
                     >
                       How to Plan a Temperature Blanket
                     </h1>
-                    <p class="text-secondary-700-200-token font-bold">
+                    <p class="text-secondary-800-200 font-bold">
                       With temperature-blanket.com
                     </p>
                     <p class="text-sm">February 9, 2024</p>
@@ -121,7 +115,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     some of these questions:
                   </p>
                   <p
-                    class="p-4 variant-soft-surface text-token rounded-container-token"
+                    class="p-4 preset-tonal-surface base-font-color rounded-container"
                   >
                     🤔
                     <span class="italic">Which colors should I pick?</span>
@@ -143,7 +137,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   </p>
 
                   <div
-                    class="flex flex-wrap gap-4 items-center justify-center variant-outline-warning p-4 rounded-container-token"
+                    class="flex flex-wrap gap-4 items-center justify-center variant-outline-warning p-4 rounded-container"
                   >
                     <img
                       src="/images/blog-images/2024-02-09-how-to-plan-a-temperature-blanket/profile.webp"
@@ -163,7 +157,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   </div>
 
                   <h2
-                    class="font-bold text-3xl scroll-mt-[70px] text-secondary-700-200-token"
+                    class="font-bold text-3xl scroll-mt-[70px] text-secondary-800-200"
                   >
                     The Project: Blanket? Scarf? Socks?
                   </h2>
@@ -182,7 +176,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   </p>
 
                   <h2
-                    class="font-bold text-3xl scroll-mt-[70px] text-secondary-700-200-token"
+                    class="font-bold text-3xl scroll-mt-[70px] text-secondary-800-200"
                   >
                     The Place: Location, Location, Location
                   </h2>
@@ -203,7 +197,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       />
                     </div>
                     <div
-                      class="variant-soft-surface text-token p-4 rounded-container-token md:basis-1/3 h-fit"
+                      class="preset-tonal-surface base-font-color p-4 rounded-container md:basis-1/3 h-fit"
                     >
                       <p>
                         🤔
@@ -240,7 +234,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   </p>
 
                   <h2
-                    class="font-bold text-3xl scroll-mt-[70px] text-secondary-700-200-token"
+                    class="font-bold text-3xl scroll-mt-[70px] text-secondary-800-200"
                   >
                     The Time: This Year? Last Year? 50 Years Ago?
                   </h2>
@@ -274,7 +268,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       </p>
                     </div>
                     <div
-                      class="variant-soft-surface text-token p-4 rounded-container-token md:basis-1/3 h-fit w-fit"
+                      class="preset-tonal-surface base-font-color p-4 rounded-container md:basis-1/3 h-fit w-fit"
                     >
                       <p>
                         🤔
@@ -288,7 +282,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   </div>
 
                   <div
-                    class="variant-outline-primary p-4 rounded-container-token w-fit"
+                    class="variant-outline-primary p-4 rounded-container w-fit"
                   >
                     <p class="font-bold">💡 Handy Hints</p>
                     <div class="ml-4">
@@ -303,7 +297,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
                   <div>
                     <h2
-                      class="font-bold text-3xl scroll-mt-[70px] text-secondary-700-200-token"
+                      class="font-bold text-3xl scroll-mt-[70px] text-secondary-800-200"
                     >
                       The Weather: Whether Weather Matters
                     </h2>
@@ -338,7 +332,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       </div>
                     </div>
                     <div
-                      class="variant-soft-surface text-token p-4 rounded-container-token md:basis-1/3 h-fit"
+                      class="preset-tonal-surface base-font-color p-4 rounded-container md:basis-1/3 h-fit"
                     >
                       <p>
                         🤔
@@ -375,7 +369,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   </p>
 
                   <div
-                    class="variant-outline-primary p-4 rounded-container-token w-fit"
+                    class="variant-outline-primary p-4 rounded-container w-fit"
                   >
                     <p class="font-bold">💡 Handy Hints</p>
                     <div class="ml-4">
@@ -395,7 +389,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   </div>
 
                   <h2
-                    class="font-bold text-3xl scroll-mt-[70px] text-secondary-700-200-token"
+                    class="font-bold text-3xl scroll-mt-[70px] text-secondary-800-200"
                   >
                     The Yarn: Colors Galore
                   </h2>
@@ -497,7 +491,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   </div>
 
                   <div
-                    class="variant-outline-primary p-4 rounded-container-token w-fit"
+                    class="variant-outline-primary p-4 rounded-container w-fit"
                   >
                     <p class="font-bold">💡 Handy Hints</p>
                     <div class="ml-4">
@@ -576,7 +570,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       </p>
                     </div>
                     <div
-                      class="variant-soft-surface text-token p-4 rounded-container-token md:basis-1/2 h-fit"
+                      class="preset-tonal-surface base-font-color p-4 rounded-container md:basis-1/2 h-fit"
                     >
                       <p>
                         🤔
@@ -615,7 +609,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   </p>
 
                   <div
-                    class="variant-outline-primary p-4 rounded-container-token w-fit"
+                    class="variant-outline-primary p-4 rounded-container w-fit"
                   >
                     <p class="font-bold">💡 Handy Hints</p>
                     <div class="ml-4">
@@ -645,7 +639,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   </div>
 
                   <h2
-                    class="font-bold text-3xl scroll-mt-[70px] text-secondary-700-200-token"
+                    class="font-bold text-3xl scroll-mt-[70px] text-secondary-800-200"
                   >
                     The Preview: A Sneak Peek
                   </h2>
@@ -682,7 +676,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   </p>
 
                   <div
-                    class="variant-outline-primary p-4 rounded-container-token w-fit"
+                    class="variant-outline-primary p-4 rounded-container w-fit"
                   >
                     <p class="font-bold">💡 Handy Hints</p>
                     <div class="ml-4">
@@ -723,7 +717,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       </p>
                     </div>
                     <div
-                      class="variant-soft-surface text-token p-4 rounded-container-token md:basis-1/2 h-fit"
+                      class="preset-tonal-surface base-font-color p-4 rounded-container md:basis-1/2 h-fit"
                     >
                       <p>
                         🤔
@@ -742,7 +736,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   </div>
 
                   <h2
-                    class="font-bold text-3xl scroll-mt-[70px] text-secondary-700-200-token"
+                    class="font-bold text-3xl scroll-mt-[70px] text-secondary-800-200"
                   >
                     The End: Get Started!
                   </h2>
@@ -755,7 +749,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   </p>
 
                   <div
-                    class="variant-outline-primary p-4 rounded-container-token w-fit"
+                    class="variant-outline-primary p-4 rounded-container w-fit"
                   >
                     <p class="font-bold">💡 Handy Hint</p>
                     <div class="">
@@ -785,7 +779,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   </p>
 
                   <div
-                    class="p-4 rounded-container-token variant-ghost-tertiary flex flex-col gap-4"
+                    class="p-4 rounded-container preset-tonal-tertiary border border-tertiary-500 flex flex-col gap-4"
                   >
                     <p>
                       🎥 Are you a video creator? Let's collaborate! Make a

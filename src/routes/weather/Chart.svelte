@@ -240,6 +240,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let ctx = $state();
 </script>
 
-<div class="rounded-container-token my-2 h-[240px]">
+<div class="rounded-container my-2 h-[240px]">
   <canvas id="weather-chart" bind:this={ctx}></canvas>
 </div>

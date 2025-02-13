@@ -70,7 +70,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <main class="pb-8">
       <a
         href="/blog"
-        class="btn bg-secondary-hover-token gap-1 mb-2 max-lg:mx-2 max-lg:mt-2"
+        class="btn preset-tonal-secondary gap-1 mb-2 max-lg:mx-2 max-lg:mt-2"
         >{@html ICONS.arrowBack} Blog</a
       >
       <Card>
@@ -100,7 +100,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               </p>
 
               <div
-                class="grid grid-cols-1 md:grid-cols-12 md:items-center gap-4 md:gap-2 my-4 bg-surface-100-800-token rounded-container-token p-4 shadow-inner"
+                class="grid grid-cols-1 md:grid-cols-12 md:items-center gap-4 md:gap-2 my-4 bg-surface-100-900 rounded-container p-4 shadow-inner"
               >
                 <div
                   class="order-3 md:order-1 col-span-full md:col-span-7 flex flex-col"
@@ -156,7 +156,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 <div class="flex flex-col gap-2 max-w-sm">
                   <p class="text-sm">Example of a temperature gauge:</p>
                   <div
-                    class="flex flex-col rounded-container-token overflow-hidden shadow-md"
+                    class="flex flex-col rounded-container overflow-hidden shadow-md"
                   >
                     {#each colors as { hex, brandName, yarnName, name }, _i}
                       {@const textColor = getTextColor(hex)}
