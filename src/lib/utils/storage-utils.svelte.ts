@@ -174,7 +174,7 @@ export const checkForProjectInLocalStorage = async () => {
 export const setLocalStorageProject = () => {
   if (!browser || typeof window.localStorage === 'undefined') return;
 
-  const localProjects = JSON.parse(localStorage.getItem('projects'));
+  const localProjects = JSON.parse(localStorage.getItem('projects')) || [];
 
   const projectIDs = localProjects?.map((_project) =>
     new URL(_project.href).searchParams.get('project'),

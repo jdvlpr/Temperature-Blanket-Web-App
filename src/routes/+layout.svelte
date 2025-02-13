@@ -16,7 +16,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import { onNavigate } from '$app/navigation';
   import { PUBLIC_MICROSOFT_CLARITY_ID } from '$env/static/public';
-  import { consentToMSClarityCookies, modal } from '$lib/state';
+  import { consentToMSClarityCookies, locations, modal } from '$lib/state';
   import { handleKeyDown, initializeLocalStorage, privacy } from '$lib/utils';
   import {
     Modal,

@@ -157,18 +157,16 @@ export const getDaysInRange = ({
   includeFromValue,
   includeToValue,
 }) => {
-  const _weather = weather.data;
   if (
     !direction ||
-    !_weather ||
+    !weather.data ||
     typeof includeFromValue === 'undefined' ||
     typeof includeToValue === 'undefined'
   )
     return [];
-  const _units = project.units;
-  const days = _weather.filter((day) => {
+  const days = weather.data.filter((day) => {
     return isValueInRange({
-      value: day[id][_units],
+      value: day[id][project.units],
       range,
       direction,
       includeFromValue,

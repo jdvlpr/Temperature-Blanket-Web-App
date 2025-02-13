@@ -463,7 +463,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <div class="inline-flex flex-wrap my-2 gap-2 items-center">
         <button
           class="btn bg-secondary-hover-token gap-1"
-          onclick={saveProject}
+          onclick={() => {
+            saveProject({ copy: false });
+          }}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"

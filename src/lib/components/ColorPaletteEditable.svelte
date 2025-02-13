@@ -53,7 +53,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     canUserDeleteColor = true,
     showSchemeName = true,
     roundedBottom = true,
-    typeId = crypto.randomUUID(),
+    typeId = getTypeId(),
     onchanged = null,
     fullscreen = $bindable(),
   }: Props = $props();
@@ -66,12 +66,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   const flipDurationMs = 200;
 
-  const uniqueId = browser ? crypto.randomUUID() : '';
+  const uniqueId =
+    browser && crypto && typeof crypto.randomUUID === 'function'
+      ? crypto.randomUUID()
+      : `${Math.random() * 100}-${Math.random() * 100}-${Math.random() * 100}`;
 
   let sortableColors = $state(getSortableColors());
 
   let activeColorIndex: number | null = $state(null);
 
+  function getTypeId() {
+    return crypto && typeof crypto.randomUUID === 'function'
+      ? crypto.randomUUID()
+      : `${Math.random() * 100}-${Math.random() * 100}-${Math.random() * 100}`;
+  }
   function onChangeColor({
     index,
     hex,

@@ -46,7 +46,10 @@ export class LocationClass implements LocationType {
 export class LocationState extends LocationClass implements LocationStateType {
   constructor() {
     super();
-    this.uuid = crypto.randomUUID();
+    this.uuid =
+      crypto && typeof crypto.randomUUID === 'function'
+        ? crypto.randomUUID()
+        : `${Math.random() * 100}-${Math.random() * 100}-${Math.random() * 100}`;
     this.#today = browser ? getToday() : null; // caused a build error without the browser check...
   }
 
