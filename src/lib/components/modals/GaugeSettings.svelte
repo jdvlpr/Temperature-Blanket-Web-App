@@ -60,7 +60,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let changedGaugeDirectionOnCustomRanges = $state(false);
 
-  let initialValueSelectRangeCalculationMethod = `${_gauge.rangeOptions.includeFromValue.toString()}-${_gauge.rangeOptions.includeToValue.toString()}`;  
+  let initialValueSelectRangeCalculationMethod = `${_gauge.rangeOptions.includeFromValue.toString()}-${_gauge.rangeOptions.includeToValue.toString()}`;
 
   let start = $derived.by(() => {
     _gauge.rangeOptions.mode;
@@ -178,7 +178,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   onMount(() => {
     scrollObserver.observe(setupContainer);
-    
+
     if (index !== null) {
       setTimeout(() => {
         // small delay to allow the modal to open
@@ -203,7 +203,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
       }, 300);
     }
   });
-
 </script>
 
 <ModalShell {parent} size="large">
@@ -549,7 +548,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </div>
           <div class="">
             <label class="label">
-              <span class="flex flex-col justify-center items-center gap-2 my-2">
+              <span
+                class="flex flex-col justify-center items-center gap-2 my-2"
+              >
                 <span class="flex flex-wrap gap-1 justify-center items-center"
                   ><svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -565,7 +566,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       d="M15.75 15.75V18m-7.5-6.75h.008v.008H8.25v-.008zm0 2.25h.008v.008H8.25V13.5zm0 2.25h.008v.008H8.25v-.008zm0 2.25h.008v.008H8.25V18zm2.498-6.75h.007v.008h-.007v-.008zm0 2.25h.007v.008h-.007V13.5zm0 2.25h.007v.008h-.007v-.008zm0 2.25h.007v.008h-.007V18zm2.504-6.75h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V13.5zm0 2.25h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V18zm2.498-6.75h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V13.5zM8.25 6h7.5v2.25h-7.5V6zM12 2.25c-1.892 0-3.758.11-5.593.322C5.307 2.7 4.5 3.65 4.5 4.757V19.5a2.25 2.25 0 002.25 2.25h10.5a2.25 2.25 0 002.25-2.25V4.757c0-1.108-.806-2.057-1.907-2.185A48.507 48.507 0 0012 2.25z"
                     />
                   </svg>
-                  Range Calculation Method:<span>{@html rangeExample}</span>&nbsp;
+                  Range Calculation Method:<span>{@html rangeExample}</span
+                  >&nbsp;
                   <Tooltip>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -594,43 +596,44 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       </div>
                     {/snippet}
                   </Tooltip>
-                  </span
-                >
+                </span>
 
                 <select
                   class="select max-w-[500px] truncate"
                   value={initialValueSelectRangeCalculationMethod}
                   onchange={(e) => {
-                            switch (e.target.value) {
-                              case 'true-false':
-                                _gauge.rangeOptions.includeFromValue = true;
-                                _gauge.rangeOptions.includeToValue = false;
-                                break;
-                              case 'false-true':
-                                _gauge.rangeOptions.includeFromValue = false;
-                                _gauge.rangeOptions.includeToValue = true;
-                                break;
-                              case 'true-true':
-                                _gauge.rangeOptions.includeFromValue = true;
-                                _gauge.rangeOptions.includeToValue = true;
-                                break;
-                              case 'false-false':
-                                _gauge.rangeOptions.includeFromValue = false;
-                                _gauge.rangeOptions.includeToValue = false;
-                                break;
+                    switch (e.target.value) {
+                      case 'true-false':
+                        _gauge.rangeOptions.includeFromValue = true;
+                        _gauge.rangeOptions.includeToValue = false;
+                        break;
+                      case 'false-true':
+                        _gauge.rangeOptions.includeFromValue = false;
+                        _gauge.rangeOptions.includeToValue = true;
+                        break;
+                      case 'true-true':
+                        _gauge.rangeOptions.includeFromValue = true;
+                        _gauge.rangeOptions.includeToValue = true;
+                        break;
+                      case 'false-false':
+                        _gauge.rangeOptions.includeFromValue = false;
+                        _gauge.rangeOptions.includeToValue = false;
+                        break;
 
-                              default:
-                                break;
-                            }
-                            autoUpdateRanges();
-                          }}
+                      default:
+                        break;
+                    }
+                    autoUpdateRanges();
+                  }}
                   title="Change Range Calculation Method"
                   id="select-range-calculation-method"
                 >
                   <option value="true-false"
                     >Include From, don't include To (default)</option
                   >
-                  <option value="false-true">Include To, don't include From </option>
+                  <option value="false-true"
+                    >Include To, don't include From
+                  </option>
                   <option value="true-true">Include both From and To</option>
                   <option value="false-false">Don't include From and To</option>
                 </select>
@@ -781,7 +784,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {#if showScrollToTopButton}
     <button
       transition:fade
-      class="btn px-4 bottom-[5rem] fixed -translate-x-1/2 left-1/2 w-fit py-2 m-2 z-20 shadow variant-filled-surface lg:hidden transition-all inline-flex justify-center items-center gap-1 right-0"
+      class="btn px-4 bottom-[7rem] sm:bottom-[5rem] fixed -translate-x-1/2 left-1/2 w-fit py-2 m-2 z-20 shadow variant-filled-surface lg:hidden transition-all inline-flex justify-center items-center gap-1 right-0"
       onclick={() =>
         setupContainer.scrollIntoView({
           behavior: 'smooth',
