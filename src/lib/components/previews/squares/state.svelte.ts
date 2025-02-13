@@ -10,6 +10,18 @@ import {
 import chroma from 'chroma-js';
 import Preview from './Preview.svelte';
 import Settings from './Settings.svelte';
+import type { WeatherParam } from '$lib/types';
+
+type SquaresPreviewSettings = {
+  primaryTarget: WeatherParam['id'];
+  squareSize: number;
+  columns: number;
+  secondaryTargets: { indexes: number; targetId: WeatherParam['id'] }[];
+  squaresAtBeginning: number;
+  squaresBetweenMonthsCount: number;
+  additionalSquaresColor: string;
+  primaryTargetAsBackup: boolean;
+};
 
 export class SquaresPreviewClass {
   constructor() {
@@ -34,7 +46,7 @@ export class SquaresPreviewClass {
 
   name = 'Squares';
 
-  svg = $state(null);
+  svg = $state<SVGSVGElement | null>(null);
 
   img = $state({
     light: './images/preview_icons/Squares.png',
@@ -57,7 +69,7 @@ export class SquaresPreviewClass {
   // User settings properties
   // *******************
 
-  settings = $state({
+  settings = $state<SquaresPreviewSettings>({
     primaryTarget: 'tmax',
     squareSize: 3,
     columns: 17,

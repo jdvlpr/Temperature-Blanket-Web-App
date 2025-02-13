@@ -29,15 +29,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let {
     targets,
-    squareSize = $bindable(),
-    primaryTarget = $bindable(),
-    secondaryTargets = $bindable(),
-    primaryTargetAsBackup = $bindable(),
+    squareSize,
+    primaryTarget,
+    secondaryTargets,
+    primaryTargetAsBackup,
     onOkay,
     parent,
   } = $props();
 
   const modalStore = getModalStore();
+
+  let _secondaryTargets = $state(secondaryTargets);
 
   const colors = {
     tmin: '#38bdf8',
@@ -49,7 +51,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   };
 
   function reset() {
-    secondaryTargets = [];
+    _secondaryTargets = [];
   }
 
   function createSquares(_squareSize, _secondaryTargetIndexes, _primaryTarget) {
@@ -77,28 +79,31 @@ If not, see <https://www.gnu.org/licenses/>. -->
     return _squares;
   }
 
+  let secondaryTargetIndexes = $derived(
+    getSecondaryTargetIndexes(_secondaryTargets),
+  );
+ 
+  let squares = $derived(
+    createSquares(squareSize, secondaryTargetIndexes, primaryTarget),
+  );
+ 
+  let maxGridItemWidth = $derived(displayNumber((1 / squareSize) * 800));
+ 
   function _onOkay() {
     onOkay({
       squareSize,
       primaryTarget,
-      secondaryTargets,
+      secondaryTargets: _secondaryTargets,
       primaryTargetAsBackup,
     });
     modalStore.close();
   }
-  let secondaryTargetIndexes = $derived(
-    getSecondaryTargetIndexes(secondaryTargets),
-  );
-  let squares = $derived(
-    createSquares(squareSize, secondaryTargetIndexes, primaryTarget),
-  );
-  let maxGridItemWidth = $derived(displayNumber((1 / squareSize) * 800));
 </script>
 
 <ModalShell {parent} size="large">
   <div class="">
     <p class="italic my-2 text-center">
-      Each sqaure in your layout will use the following properties.
+      Each square in your layout will use the following properties.
     </p>
 
     <div class="flex flex-col gap-4 justify-center items-center">
@@ -139,7 +144,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         class="grid gap-1 max-w-[500px] max-h-[500px] aspect-square my-2"
         style="grid-template-columns:repeat({squareSize},minmax(1rem,{maxGridItemWidth}px));"
       >
-        {#key secondaryTargets}
+        {#key _secondaryTargets}
           {#each squares as { icon, label, targetId }, index (index)}
             <button
               class="flex flex-col justify-center items-center select-none outline-none cursor-pointer rounded-container-token shadow aspect-square"
@@ -156,9 +161,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 const nextTargetIndex =
                   targetIndex + 1 === targets.length ? 0 : targetIndex + 1;
                 const nextTarget = targets[nextTargetIndex];
-                secondaryTargets = setSecondaryTargets(
+                _secondaryTargets = setSecondaryTargets(
                   [nextTarget.id, index],
-                  secondaryTargets,
+                  _secondaryTargets,
                 );
               }}
             >

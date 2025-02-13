@@ -52,7 +52,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           targets,
           squareSize: squaresPreview.settings.squareSize,
           primaryTarget: squaresPreview.settings.primaryTarget,
-          secondaryTargets: squaresPreview.settings.secondaryTargets,
+          secondaryTargets: $state.snapshot(
+            squaresPreview.settings.secondaryTargets,
+          ),
           primaryTargetAsBackup: squaresPreview.settings.primaryTargetAsBackup,
           onOkay: handelOkaySquareDesigner,
         },

@@ -22,7 +22,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     getTargetParentGaugeId,
     showPreviewImageWeatherDetails,
   } from '$lib/utils';
+  import { untrack } from 'svelte';
   import { squaresPreview } from './state.svelte';
+  import type { WeatherDay, WeatherParam } from '$lib/types';
 
   let width = $state(squaresPreview.width);
   let height = $state(squaresPreview.height);
@@ -33,20 +35,23 @@ If not, see <https://www.gnu.org/licenses/>. -->
     debounceTimer = window.setTimeout(callback, time);
   };
 
+  const squareSectionsCount = $derived(
+    squaresPreview.settings.squareSize * squaresPreview.settings.squareSize,
+  );
+
+  const squareSectionTargetIds = $derived(
+    getSquareSectionTargetIds(
+      squareSectionsCount,
+      squaresPreview.settings.primaryTarget,
+      squaresPreview.settings.secondaryTargets,
+    ),
+  );
+
   $effect(() => {
     project.url.href;
-    if (!weather.data.length || !gauges.allCreated.length) return;
-    debounce(() => {
-      const squareSectionsCount =
-        squaresPreview.settings.squareSize * squaresPreview.settings.squareSize;
-
+    debounce(async () => {
+      if (!weather.data.length || !gauges.allCreated.length) return;
       // Get the target IDs for each square section
-      const squareSectionTargetIds = getSquareSectionTargetIds(
-        squareSectionsCount,
-        squaresPreview.settings.primaryTarget,
-        squaresPreview.settings.secondaryTargets,
-      );
-
       let row = 0;
       let y = 0,
         x = 0;
@@ -93,8 +98,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           let color: string;
           if (isWeatherSquare) {
             // Get the weather data for the current day
-            const day: object = weather.data[dayIndex];
-            let targetId: string = squareSectionTargetIds[squareSectionIndex];
+            const day: WeatherDay = weather.data[dayIndex];
+            let targetId: WeatherParam['id'] =
+              squareSectionTargetIds[squareSectionIndex];
             let value = day[targetId][project.units];
 
             // Check if the primary target value is 0 or null, use the primary target as a backup

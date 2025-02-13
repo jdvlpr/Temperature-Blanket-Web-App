@@ -23,6 +23,7 @@ import {
   previewWeatherTargets,
   weather,
 } from '$lib/state';
+import type { WeatherParam } from '$lib/types';
 import { exists, getTargetParentGaugeId } from '$lib/utils';
 import { get } from 'svelte/store';
 
@@ -180,15 +181,15 @@ export const getMonthSepparatorIndexes = () => {
  * Returns an array of target IDs for each square section based on the provided parameters.
  *
  * @param {number} squareSectionsCount - The total number of square sections.
- * @param {string} primaryTarget - The primary target ID.
- * @param {Array<{index: number, targetId: string}>} secondaryTargets - An array of secondary target objects, each containing an index and target ID.
- * @returns {Array<string>} - An array of target IDs for each square section. (eg. ['tavg',tmax','tmin',...])
+ * @param {WeatherParam['id']} primaryTarget - The primary target ID.
+ * @param {{indexes: number, targetId: WeatherParam['id']}[]} secondaryTargets - An array of secondary target objects, each containing an index and target ID.
+ * @returns {WeatherParam['id'][]} - An array of target IDs for each square section. (eg. ['tavg',tmax','tmin',...])
  */
 export const getSquareSectionTargetIds = (
   squareSectionsCount: number,
   primaryTarget: string,
-  secondaryTargets: Array<{ index: number; targetId: string }>,
-): Array<string> => {
+  secondaryTargets: { indexes: number; targetId: WeatherParam['id'] }[],
+): WeatherParam['id'] => {
   const secondaryParamIndexes = getSecondaryTargetIndexes(secondaryTargets);
   const defaultParam = primaryTarget;
   const params = [];
