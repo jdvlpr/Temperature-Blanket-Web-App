@@ -10,7 +10,7 @@ import {
 import chroma from 'chroma-js';
 import Preview from './Preview.svelte';
 import Settings from './Settings.svelte';
-import type { WeatherParam } from '$lib/types';
+import type { Color, WeatherParam } from '$lib/types';
 
 type SquaresPreviewSettings = {
   primaryTarget: WeatherParam['id'];
@@ -19,7 +19,7 @@ type SquaresPreviewSettings = {
   secondaryTargets: { indexes: number; targetId: WeatherParam['id'] }[];
   squaresAtBeginning: number;
   squaresBetweenMonthsCount: number;
-  additionalSquaresColor: string;
+  additionalSquaresColor: Color['hex'];
   primaryTargetAsBackup: boolean;
 };
 

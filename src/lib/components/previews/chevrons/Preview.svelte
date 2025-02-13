@@ -15,11 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import { gauges, project, weather } from '$lib/state';
-  import {
-    getColorInfo,
-    getTargetParentGaugeId,
-    showPreviewImageWeatherDetails,
-  } from '$lib/utils';
+  import { getColorInfo, showPreviewImageWeatherDetails } from '$lib/utils';
   import { chevronsPreview } from './state.svelte';
 
   let width = $state(chevronsPreview.width);
@@ -66,8 +62,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           }
           const target = chevronsPreview.settings.selectedTargets[paramIndex];
           let value = weather.data[dayIndex][target][project.units];
-          let gaugeId = getTargetParentGaugeId(target);
-          let color = getColorInfo(gaugeId, value).hex;
+
+          // Get the color based on the gauge ID and value
+          const color = getColorInfo({ param: target, value }).hex;
           section.push({ color, p: points, dayIndex });
           // elPolyline.setAttributeNS(null, "points", points);
           // elPolyline.setAttributeNS(null, "stroke", color);

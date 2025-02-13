@@ -16,15 +16,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import Spinner from '$lib/components/Spinner.svelte';
   import { gauges, project, weather } from '$lib/state';
+  import type { Color, WeatherDay, WeatherParam } from '$lib/types';
   import {
     getColorInfo,
     getSquareSectionTargetIds,
-    getTargetParentGaugeId,
     showPreviewImageWeatherDetails,
   } from '$lib/utils';
-  import { untrack } from 'svelte';
   import { squaresPreview } from './state.svelte';
-  import type { WeatherDay, WeatherParam } from '$lib/types';
 
   let width = $state(squaresPreview.width);
   let height = $state(squaresPreview.height);
@@ -95,7 +93,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           squareSectionIndex < squareSectionsCount;
           squareSectionIndex++
         ) {
-          let color: string;
+          let color: Color['hex'];
           if (isWeatherSquare) {
             // Get the weather data for the current day
             const day: WeatherDay = weather.data[dayIndex];
@@ -114,11 +112,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
               value = day[targetId][project.units];
             }
 
-            // Get the gauge ID for the target
-            let gaugeId = getTargetParentGaugeId(targetId);
-
             // Get the color based on the gauge ID and value
-            color = getColorInfo(gaugeId, value).hex;
+            color = getColorInfo({ param: targetId, value }).hex;
           } else {
             // Use the additional squares color
             color = squaresPreview.settings.additionalSquaresColor;

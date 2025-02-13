@@ -16,11 +16,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script>
   import Spinner from '$lib/components/Spinner.svelte';
   import { gauges, project, weather } from '$lib/state';
-  import {
-    getColorInfo,
-    getTargetParentGaugeId,
-    showPreviewImageWeatherDetails,
-  } from '$lib/utils';
+  import { getColorInfo, showPreviewImageWeatherDetails } from '$lib/utils';
   import { monthRowsPreview } from './state.svelte';
 
   let width = $state(monthRowsPreview.width);
@@ -167,10 +163,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
               weather.data[_dayIndex][
                 monthRowsPreview.settings.selectedTargets[paramIndex]
               ][project.units];
-            const gaugeId = getTargetParentGaugeId(
-              monthRowsPreview.settings.selectedTargets[paramIndex],
-            );
-            color = getColorInfo(gaugeId, value).hex;
+
+            // Get the color based on the gauge ID and value
+            color = getColorInfo({
+              param: monthRowsPreview.settings.selectedTargets[paramIndex],
+              value,
+            }).hex;
             isWeather = true;
             row = {
               ...row,

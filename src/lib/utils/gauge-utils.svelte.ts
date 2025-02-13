@@ -14,7 +14,7 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { SCHEMES } from '$lib/constants';
-import { project, weather } from '$lib/state';
+import { gauges, project, weather } from '$lib/state';
 import type { Color, GaugeSettingsType } from '$lib/types';
 import {
   displayNumber,
@@ -162,14 +162,23 @@ export const getWPGauge = (gauge) => {
 };
 
 export const getTargetParentGaugeId = (targetId) => {
-  let gaugeId = targetId;
-  if (targetId === 'tmax' || targetId === 'tavg' || targetId === 'tmin')
-    gaugeId = 'temp';
-  return gaugeId;
+  return targetId === 'tmax' || targetId === 'tavg' || targetId === 'tmin'
+    ? 'temp'
+    : targetId;
 };
 
 export const getSchemeName = (id) => {
   if (SCHEMES.some((n) => n.value === id))
     return SCHEMES.filter((scheme) => scheme.value === id)[0].label;
   return 'Custom';
+};
+
+let temporaryGaugeId = null;
+let temporaryGauge = null;
+export const getTemporaryGauge = (gaugeId) => {
+  if (temporaryGaugeId !== gaugeId || !temporaryGauge) {
+    temporaryGaugeId = gaugeId;
+    temporaryGauge = gauges.getSnapshot(temporaryGaugeId);
+  }
+  return temporaryGauge;
 };

@@ -17,7 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import WeatherItem from '$lib/components/WeatherItem.svelte';
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
   import { UNIT_LABELS } from '$lib/constants';
-  import { locations, project, weather } from '$lib/state';
+  import { gauges, locations, project, weather } from '$lib/state';
   import {
     capitalizeFirstLetter,
     convertTime,
@@ -52,8 +52,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let colorInfo = $derived((targetId, day) => {
     if (!exists(day)) return null;
-    let gaugeId = getTargetParentGaugeId(targetId);
-    return getColorInfo(gaugeId, day[targetId][project.units]);
+    return getColorInfo({
+      param: targetId,
+      value: day[targetId][project.units],
+    });
   });
 
   let isRecentDate = $derived(getIsRecentDate(day?.date));

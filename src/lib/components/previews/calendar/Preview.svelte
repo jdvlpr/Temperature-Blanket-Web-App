@@ -130,8 +130,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
               param = calendarPreview.settings.primaryTarget;
               value = day[param][project.units];
             }
-            let gaugeId = getTargetParentGaugeId(param);
-            color = getColorInfo(gaugeId, value).hex;
+
+            // Get the color based on the gauge ID and value
+            color = getColorInfo({ param, value }).hex;
           } else {
             color = calendarPreview.settings.additionalSquaresColor;
           }

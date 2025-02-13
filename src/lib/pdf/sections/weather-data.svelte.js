@@ -271,10 +271,10 @@ const pdfWeatherData = {
 
       if (hasGauge) {
         // Color box
-        const gaugeId = allGaugesAttributes.filter((gauge) =>
-          gauge.targets.some((item) => item.id === param),
-        )[0].id;
-        const colorInfo = getColorInfo(gaugeId, day[param][project.units]);
+        const colorInfo = getColorInfo({
+          param,
+          value: day[param][project.units],
+        });
         doc.setFillColor(colorInfo.hex);
         doc.rect(marginRight + 15, line - 4, 5, 5, 'F');
         // Color Number

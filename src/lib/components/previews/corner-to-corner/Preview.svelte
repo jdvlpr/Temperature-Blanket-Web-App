@@ -16,11 +16,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script>
   import Spinner from '$lib/components/Spinner.svelte';
   import { gauges, project, weather } from '$lib/state';
-  import {
-    getColorInfo,
-    getTargetParentGaugeId,
-    showPreviewImageWeatherDetails,
-  } from '$lib/utils';
+  import { getColorInfo, showPreviewImageWeatherDetails } from '$lib/utils';
   import { cornerToCornerPreview } from './state.svelte';
 
   let width = $state(cornerToCornerPreview.width);
@@ -119,8 +115,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
         let day = weather.data[dayIndex];
         let target = cornerToCornerPreview.settings.selectedTarget;
         let value = day[target][project.units];
-        let gaugeId = getTargetParentGaugeId(target);
-        let color = getColorInfo(gaugeId, value).hex;
+
+        // Get the color based on the gauge ID and value
+        const color = getColorInfo({ param: target, value }).hex;
         for (
           let squareIndex = 0;
           squareIndex < cornerToCornerPreview.settings.lineLength;

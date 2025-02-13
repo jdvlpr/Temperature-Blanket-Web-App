@@ -16,11 +16,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script>
   import Spinner from '$lib/components/Spinner.svelte';
   import { gauges, project, weather } from '$lib/state';
-  import {
-    getColorInfo,
-    getTargetParentGaugeId,
-    showPreviewImageWeatherDetails,
-  } from '$lib/utils';
+  import { getColorInfo, showPreviewImageWeatherDetails } from '$lib/utils';
   import { splitMonthSquaresPreview } from './state.svelte';
 
   let width = $state(splitMonthSquaresPreview.width);
@@ -112,18 +108,24 @@ If not, see <https://www.gnu.org/licenses/>. -->
             weather.data[_dayIndex][
               splitMonthSquaresPreview.settings.leftTarget
             ][project.units];
-          const leftGaugeId = getTargetParentGaugeId(
-            splitMonthSquaresPreview.settings.leftTarget,
-          );
-          color.left = getColorInfo(leftGaugeId, leftValue).hex;
+
+          // Get the color based on the gauge ID and value
+          color.left = getColorInfo({
+            param: splitMonthSquaresPreview.settings.leftTarget,
+            value: leftValue,
+          }).hex;
+
           const rightValue =
             weather.data[_dayIndex][
               splitMonthSquaresPreview.settings.rightTarget
             ][project.units];
-          const rightGaugeId = getTargetParentGaugeId(
-            splitMonthSquaresPreview.settings.rightTarget,
-          );
-          color.right = getColorInfo(rightGaugeId, rightValue).hex;
+
+          // Get the color based on the gauge ID and value
+          color.right = getColorInfo({
+            param: splitMonthSquaresPreview.settings.rightTarget,
+            value: rightValue,
+          }).hex;
+
           isWeather = true;
         } else {
           color.left = splitMonthSquaresPreview.settings.additionalRoundsColor;

@@ -14,14 +14,10 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { gauges, project, weather } from '$lib/state';
   import { rowsPreview } from '$lib/components/previews/rows/state.svelte';
-  import {
-    getColorInfo,
-    getTargetParentGaugeId,
-    showPreviewImageWeatherDetails,
-  } from '$lib/utils';
   import Spinner from '$lib/components/Spinner.svelte';
+  import { gauges, project, weather } from '$lib/state';
+  import { getColorInfo, showPreviewImageWeatherDetails } from '$lib/utils';
 
   let width = $state(rowsPreview.width);
 
@@ -128,8 +124,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
               // If it's a weather section, determine the color based on the weather value and gauge ID
               let param = rowsPreview.settings.selectedTargets[paramIndex];
               let value = weather.data[dayIndex][param][project.units];
-              let gaugeId = getTargetParentGaugeId(param);
-              color = getColorInfo(gaugeId, value).hex;
+
+              // Get the color based on the gauge ID and value
+              color = getColorInfo({ param, value }).hex;
             } else {
               // If it's an additional stitches section, use the specified color
               color = rowsPreview.settings.extrasColor;

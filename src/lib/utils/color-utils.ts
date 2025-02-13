@@ -15,11 +15,19 @@
 
 import { CHARACTERS_FOR_URL_HASH } from '$lib/constants';
 import { allGaugesAttributes, gauges } from '$lib/state';
-import type { Color } from '$lib/types';
+import type {
+  Color,
+  GaugeAttributes,
+  GaugeSettingsType,
+  GaugeStateInterface,
+  WeatherParam,
+} from '$lib/types';
 import {
   capitalizeFirstLetter,
   getColorPropertiesFromYarnStringAndHex,
   getProjectParametersFromURLHash,
+  getTargetParentGaugeId,
+  getTemporaryGauge,
   getTitleFromLocationsMeta,
   isValueInRange,
   pluralize,
@@ -210,19 +218,21 @@ export const getColorsFromInput = ({
   return colors;
 };
 
-/**
- * Retrieves the color information based on the gauge ID and value, for use in the project preview image or PDF
- * @param {string} gaugeId - The ID of the gauge. (e.g. "temp" or "prcp")
- * @param {number} value - The value to determine the color for.
- * @returns {object} - The color information object with the hexadecimal color value, index, and gauge length.
- */
-export const getColorInfo = (gaugeId, value) => {
-  const gauge = gauges.getSnapshot(gaugeId);
-
+export const getColorInfo = ({
+  param,
+  value,
+}: {
+  param: WeatherParam['id'];
+  value: number | null;
+}) => {
   let color: { hex: Color['hex']; gaugeLength: undefined | number } = {
     hex: '#ffffff',
     gaugeLength: undefined,
   }; // default white color will show on the preview if the weather value has no range associated with it
+
+  let gaugeId = getTargetParentGaugeId(param);
+
+  const gauge = getTemporaryGauge(gaugeId);
 
   if (
     value === null ||

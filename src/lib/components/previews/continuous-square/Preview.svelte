@@ -16,11 +16,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script>
   import Spinner from '$lib/components/Spinner.svelte';
   import { gauges, project, weather } from '$lib/state';
-  import {
-    getColorInfo,
-    getTargetParentGaugeId,
-    showPreviewImageWeatherDetails,
-  } from '$lib/utils';
+  import { getColorInfo, showPreviewImageWeatherDetails } from '$lib/utils';
   import { continuousSquarePreview } from './state.svelte';
 
   let width = $state(continuousSquarePreview.width);
@@ -104,9 +100,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       let value, color;
       let isExtraStitch = false;
       const sections = [];
-      const gaugeId = getTargetParentGaugeId(
-        continuousSquarePreview.settings.selectedTarget,
-      );
+
       for (
         let stitch = 1;
         stitch <= continuousSquarePreview.totalStitches;
@@ -117,7 +111,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
             weather.data[dayIndex][
               continuousSquarePreview.settings.selectedTarget
             ][project.units];
-          color = getColorInfo(gaugeId, value).hex;
+
+          // Get the color based on the gauge ID and value
+          color = getColorInfo({
+            param: continuousSquarePreview.settings.selectedTarget,
+            value,
+          }).hex;
           isExtraStitch = false;
         } else {
           color = continuousSquarePreview.settings.extrasColor;

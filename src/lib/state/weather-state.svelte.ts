@@ -21,7 +21,6 @@ import {
   dateToISO8601String,
   displayNumber,
   getColorInfo,
-  getTargetParentGaugeId,
   getWeatherTargets,
 } from '$lib/utils';
 
@@ -188,8 +187,10 @@ class WeatherClass {
         let weather = {};
         weather.color = {};
         this.tableWeatherTargets.forEach((target) => {
-          const gaugeId = getTargetParentGaugeId(target.id);
-          const colorInfo = getColorInfo(gaugeId, n[target.id][project.units]);
+          const colorInfo = getColorInfo({
+            param: target.id,
+            value: n[target.id][project.units],
+          });
           weather.color[target.id] = colorInfo;
           if (target.id === 'dayt') {
             // make sure daytime is always in the same hr:mn format
