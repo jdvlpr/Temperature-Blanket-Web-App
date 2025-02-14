@@ -100,17 +100,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <main
       class="max-w-screen-xl m-auto px-2 gap-4 flex flex-col items-center mb-4"
     >
-      <Segment
-        class="flex wrap gap-y-2 max-lg:mt-4"
-        active="preset-filled-secondary-500"
-      >
+      <Segment bind:value={selectedTag} classes="mt-4">
         {#each tags as tag}
-          <Segment.Item
-            bind:group={selectedTag}
-            name={tag}
-            value={tag}
-            title={tag}
-          >
+          <Segment.Item value={tag}>
             <span class="flex gap-1 justify-center items-center">
               {tag}
             </span>
@@ -138,9 +130,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
                 {#if tags}
                   {#each tags as item}
-                    <p
-                      class="text-sm inline bg-tertiary-200-800 px-2 rounded"
-                    >
+                    <p class="text-sm inline bg-tertiary-200-800 px-2 rounded">
                       {item}
                     </p>
                   {/each}

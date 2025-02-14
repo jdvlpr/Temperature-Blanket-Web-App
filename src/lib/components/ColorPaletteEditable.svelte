@@ -347,7 +347,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       if (onchanged) onchanged();
                     }
                   }}
-                  class="btn preset-tonal-secondary flex items-center"
+                  class="btn hover:preset-tonal flex items-center"
                 >
                   <span class="text-xs">{index + 1}</span>
                   <svg
@@ -367,7 +367,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               {/if}
               {#if canUserEditColor}
                 <button
-                  class="btn preset-tonal-secondary flex items-center justify-start"
+                  class="btn hover:preset-tonal flex items-center justify-start"
                   onclick={() =>
                     modal.state.trigger({
                       type: 'component',

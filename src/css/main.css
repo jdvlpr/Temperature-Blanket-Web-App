@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 @layer base {
-  :root [data-theme='classic'],
+  /* :root [data-theme='classic'], */
   :root [data-theme='crimson'],
   :root [data-theme='hamlindigo'],
   :root [data-theme='modern'],

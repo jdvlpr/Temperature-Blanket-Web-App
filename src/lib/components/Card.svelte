@@ -25,7 +25,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div
-  class="lg:rounded-container lg:shadow-lg bg-surface-50-950 base-font-color overflow-hidden"
+  class="lg:rounded-container lg:shadow-lg bg-surface-50-950 overflow-hidden"
 >
   <div>
     {@render header?.()}

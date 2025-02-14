@@ -52,7 +52,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <button
-  class="btn preset-tonal-secondary gap-2"
+  class="btn hover:preset-tonal gap-2"
   onclick={() => (isExpanded = !isExpanded)}
   {disabled}
 >

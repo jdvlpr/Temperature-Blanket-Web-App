@@ -204,7 +204,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     aria-labelledby="Tooltip or Menu"
     aria-describedby="A dialog box showing information or menu items."
     in:scale={{ duration: 175 }}
-    class="absolute shadow-lg base-font-color cursor-text z-200 rounded-container tooltip block"
+    class="absolute shadow-lg cursor-text z-200 rounded-container tooltip block"
     style="min-width:{minWidth}"
     use:floatingContent
     onmouseenter={() => (isTooltipActive = true)}

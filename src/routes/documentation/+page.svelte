@@ -225,9 +225,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               >, your project <em>is</em> saved to a backend database, and you can
               re-open your project from its Project Gallery Page.
             </p>
-            <div
-              class="card preset-tonal-warning base-font-color p-4 gap-2 flex flex-col"
-            >
+            <div class="card preset-tonal-warning p-4 gap-2 flex flex-col">
               <p>
                 Your project must first have a valid location and dates in order
                 to be saved, and it must first have weather data in order to
@@ -383,9 +381,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               Type a city, place, region, or landmark in the Location search
               box, then select a result from the autocomplete list.
             </p>
-            <div
-              class="card preset-tonal-warning base-font-color p-4 gap-2 flex flex-col"
-            >
+            <div class="card preset-tonal-warning p-4 gap-2 flex flex-col">
               <p>
                 You must choose an item from the suggested results. The
                 suggested results come from <a
@@ -419,9 +415,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 for the location’s weather data.
               </li>
             </ul>
-            <div
-              class="card preset-tonal-warning base-font-color p-4 gap-2 flex flex-col"
-            >
+            <div class="card preset-tonal-warning p-4 gap-2 flex flex-col">
               <p>
                 Selected dates should be in the past, not the future. Dates in
                 the future will not contain any weather data. The maximum number
@@ -439,9 +433,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               the Add Location button.
             </p>
             <p>To remove a location, press the Remove Location icon.</p>
-            <div
-              class="card preset-tonal-warning base-font-color p-4 gap-2 flex flex-col"
-            >
+            <div class="card preset-tonal-warning p-4 gap-2 flex flex-col">
               <p>
                 The maximum number of locations per project is {MAXIMUM_LOCATIONS}.
               </p>
@@ -458,7 +450,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               message saying:
             </p>
             <blockquote class="wp-block-quote is-style-default">
-              <p class="card p-2 preset-tonal-surface base-font-color">
+              <p class="card p-2 preset-tonal-surface">
                 “<em
                   >Whoah! There’s been a problem. It appears the
                   location-fetching service is experiencing technical
@@ -610,9 +602,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 >edit the weather data</a
               >.
             </p>
-            <div
-              class="card preset-tonal-warning base-font-color p-4 gap-2 flex flex-col"
-            >
+            <div class="card preset-tonal-warning p-4 gap-2 flex flex-col">
               <p>
                 For any weather provider, recent weather data may be delayed by
                 a few days.
@@ -680,9 +670,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 </ul>
               </li>
             </ul>
-            <div
-              class="card preset-tonal-warning base-font-color p-4 gap-2 flex flex-col"
-            >
+            <div class="card preset-tonal-warning p-4 gap-2 flex flex-col">
               <p>
                 The Average Temperature and Average Daytime of all items in your
                 weather data (displayed above the weather chart) might be
@@ -908,7 +896,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <p>
               When you press the Search button, you might get a message saying:
             </p>
-            <blockquote class="card p-2 preset-tonal-surface base-font-color">
+            <blockquote class="card p-2 preset-tonal-surface">
               <p>
                 Weather data not found. Please try a different location or
                 dates.
@@ -977,9 +965,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <li>Snow gauge</li>
               <li>Daytime gauge</li>
             </ul>
-            <div
-              class="card preset-tonal-warning base-font-color p-4 gap-2 flex flex-col"
-            >
+            <div class="card preset-tonal-warning p-4 gap-2 flex flex-col">
               <p>
                 You can only add a gauge if the weather data contains that
                 gauge’s information. For example, if there is no snow data, you
@@ -1099,9 +1085,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 >
               </table>
             </figure>
-            <div
-              class="card preset-tonal-warning base-font-color p-4 gap-2 flex flex-col"
-            >
+            <div class="card preset-tonal-warning p-4 gap-2 flex flex-col">
               <p>
                 If you choose the third or fourth Range Calculation Method but
                 don’t have Automatic Increments set or choose Round Increment
@@ -1145,9 +1129,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 your gauge, each range will be set using your increment value.
               </li>
             </ul>
-            <div
-              class="card preset-tonal-warning base-font-color p-4 gap-2 flex flex-col"
-            >
+            <div class="card preset-tonal-warning p-4 gap-2 flex flex-col">
               <p>
                 When using Automatic Increments on height-type gauges (Rain
                 Gauge, Snow Gauge), depending on the weather data, some ranges
@@ -1261,9 +1243,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </p>
           </section>
           <h2 class="font-bold text-2xl scroll-mt-[58px]" id="yarn">Yarn</h2>
-          <div
-            class="card preset-tonal-warning base-font-color p-4 gap-2 flex flex-col"
-          >
+          <div class="card preset-tonal-warning p-4 gap-2 flex flex-col">
             <p>
               Real yarn colors will look different than what’s on the screen.
               Any trademarked yarn or colorway details are owned by their
@@ -1414,9 +1394,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 day.
               </li>
             </ul>
-            <div
-              class="card preset-tonal-warning base-font-color p-4 gap-2 flex flex-col"
-            >
+            <div class="card preset-tonal-warning p-4 gap-2 flex flex-col">
               <p>
                 The project preview might not look like a real crochet or
                 knitted item. It is only meant to give you an idea of using the
@@ -1456,9 +1434,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 available for others to use
               </li>
             </ul>
-            <div
-              class="card preset-tonal-warning base-font-color p-4 gap-2 flex flex-col"
-            >
+            <div class="card preset-tonal-warning p-4 gap-2 flex flex-col">
               <p>
                 Project Gallery Pages can’t be edited once they are submitted to
                 the gallery. If you want to make a change to your Project

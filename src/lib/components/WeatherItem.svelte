@@ -51,7 +51,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <span class="flex flex-col items-center justify-start p-2">
   <div
-    class="flex !base-font-color"
+    class="flex !"
     class:!preset-tonal-warning={isRecentDate}
     class:rounded-container={isRecentDate}
     class:p-1={isRecentDate}

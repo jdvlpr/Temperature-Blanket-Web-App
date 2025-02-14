@@ -53,7 +53,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <Drawer.Overlay class="fixed inset-0 bg-black/40 z-40" />
 
               <Drawer.Content
-                class="bg-surface-50-950 base-font-color flex flex-col rounded-tl-container rounded-tr-container mt-24 fixed bottom-0 left-0 right-0 z-50"
+                class="bg-surface-50-950  flex flex-col rounded-tl-container rounded-tr-container mt-24 fixed bottom-0 left-0 right-0 z-50"
               >
                 <div
                   class="pt-4 rounded-tl-container rounded-tr-container overflow-auto"
@@ -80,7 +80,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           class="flex flex-wrap gap-2 justify-center my-2 lg:mb-4 px-4 py-2 shadow-inner rounded-container preset-tonal-surface w-full"
         >
           <button
-            class="btn preset-tonal-secondary gap-1 base-font-color"
+            class="btn preset-tonal-secondary gap-1"
             title="Download PNG"
             onclick={() => {
               downloadPreviewPNG(
@@ -95,7 +95,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </button>
 
           <button
-            class="btn preset-tonal-primary border border-primary-500 base-font-color gap-2 items-center"
+            class="btn preset-tonal-primary border border-primary-500 gap-2 items-center"
             onclick={() =>
               modal.state.trigger({
                 type: 'component',

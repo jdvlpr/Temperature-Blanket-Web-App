@@ -17,9 +17,23 @@ import { ICONS } from '$lib/constants';
 import { MediaQuery } from 'svelte/reactivity';
 import { writable } from 'svelte/store';
 
-export const modal = $state({ state: writable(null) });
+class ModalClass {
+  state = $state(writable(null)); // Obsolete TODO: remove
 
-export const leftDrawerState = $state({ value: false });
+  open = $state({
+    leftNavigationDrawer: false,
+    browsePalettes: false,
+    gettingStarted: false,
+  });
+
+  close = () => {
+    for (let key in this.open) {
+      this.open[key] = false;
+    }
+  };
+}
+
+export const modal = new ModalClass();
 
 export const consentToMSClarityCookies = $state({ value: false });
 
@@ -34,10 +48,8 @@ export const isDesktop = new MediaQuery('(min-width: 768px)');
 export const windowLanguage = $state({ value: null });
 
 class DrawerStateClass {
-  browsePalettes = $state(false);
   weatherDetails = $state(false);
   closeAll = () => {
-    this.browsePalettes = false;
     this.weatherDetails = false;
   };
 }

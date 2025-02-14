@@ -94,7 +94,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <tr
             class:!preset-tonal-warning={isRecentDate}
             class={[
-              '!base-font-color',
+              '!',
               showColorDetails &&
                 'divide-x-2 divide-y-2 divide-surface-50 dark:divide-surface-900',
             ]}
@@ -114,8 +114,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               >
                 <button
                   class={[
-                    weather.grouping === 'day' &&
-                      'preset-tonal-secondary btn',
+                    weather.grouping === 'day' && 'preset-tonal-secondary btn',
                     showColorDetails && 'font-bold',
                   ]}
                   disabled={weather.grouping === 'week'}

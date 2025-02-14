@@ -79,10 +79,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <main class="max-w-screen-xl m-auto text-center mb-6">
       <Card>
         {#snippet header()}
-          <div
-            class="bg-surface-200-800 base-font-color p-4"
-            bind:this={container}
-          >
+          <div class="bg-surface-200-800 p-4" bind:this={container}>
             <p class="text-left">
               See what's new and review past changes from {PUBLIC_BASE_DOMAIN_NAME}.
               This changelog includes only select milestones.

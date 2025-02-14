@@ -15,9 +15,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import AppNavigation from '$lib/components/AppNavigation.svelte';
-  import { leftDrawerState, showNavigationSideBar } from '$lib/state';
+  import { modal, showNavigationSideBar } from '$lib/state';
   import { slide } from 'svelte/transition';
   import { weatherChart } from './WeatherChart.svelte';
+  import { Modal } from '@skeletonlabs/skeleton-svelte';
+  import AppLogo from './AppLogo.svelte';
 
   /**
    * @typedef {Object} Props
@@ -46,44 +48,54 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 </script>
 
-<!-- <AppNavigation /> -->
-
 <div data-vaul-drawer-wrapper="true">
   <div
-    class="sticky top-0 bg-surface-50/90 dark:bg-surface-800/90 backdrop-blur-md z-20 base-font-color [view-transition-name:sticky-header]"
+    class="sticky top-0 bg-surface-50/90 dark:bg-surface-800/90 backdrop-blur-md z-20 [view-transition-name:sticky-header]"
     class:lg:py-2={stickyHeader}
     id="top-navbar"
   >
     <div
       class="max-w-screen-xl flex justify-between items-center m-auto px-2 gap-2"
     >
-      <button
-        class="btn preset-tonal-secondary lg:hidden my-2 flex items-center"
-        class:btn-icon={!pageName}
-        title="Open Navigation Sidebar"
-        onclick={() => (leftDrawerState.value = true)}
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke-width="1.5"
-          stroke="currentColor"
-          class="w-6 h-6"
+      <div class="lg:hidden">
+        <Modal
+          bind:open={modal.open.leftNavigationDrawer}
+          triggerBase="{pageName ? 'btn' : 'btn-icon'} hover:preset-tonal my-2"
+          contentBase="bg-surface-100-900 p-4 space-y-4 shadow-xl w-fit h-screen"
+          positionerJustify="justify-start"
+          positionerAlign=""
+          positionerPadding=""
+          transitionsPositionerIn={{ x: -480, duration: 200 }}
+          transitionsPositionerOut={{ x: -480, duration: 200 }}
         >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
-          />
-        </svg>
+          {#snippet trigger()}
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="size-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
+              />
+            </svg>
 
-        {#if pageName}
-          <span class="max-[355px]:hidden">
-            {pageName}
-          </span>
-        {/if}
-      </button>
+            {#if pageName}
+              <span class="max-[355px]:hidden">
+                {pageName}
+              </span>
+            {/if}{/snippet}
+          {#snippet content()}
+            <AppLogo />
+            <AppNavigation />
+          {/snippet}
+        </Modal>
+      </div>
+
       {@render stickyHeader?.()}
     </div>
   </div>
@@ -94,7 +106,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       bind:clientWidth={sidebarWidth}
     >
       <button
-        class="btn preset-tonal-surface mx-2 lg:flex justify-center hidden mt-2"
+        class="btn hover:preset-tonal mx-2 lg:flex justify-center hidden mt-2"
         title={`${showNavigationSideBar.value ? 'Hide' : 'Show'} Sidebar`}
         onclick={async () => {
           showNavigationSideBar.value = !showNavigationSideBar.value;

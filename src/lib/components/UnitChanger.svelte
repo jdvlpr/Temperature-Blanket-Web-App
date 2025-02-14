@@ -19,22 +19,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { Segment } from '@skeletonlabs/skeleton-svelte';
 </script>
 
-<Segment class="flex-wrap gap-y-2" active="preset-filled-secondary-500">
-  <Segment.Item
-    bind:group={project.units}
-    name="units-metric"
-    value={'metric'}
-    title="Set units to metric"
-  >
+<Segment bind:value={project.units}>
+  <Segment.Item value={'metric'}>
     {`${UNIT_LABELS.temperature.metric} /
 	    ${UNIT_LABELS.height.metric}`}
   </Segment.Item>
-  <Segment.Item
-    bind:group={project.units}
-    name="units-imperial"
-    value={'imperial'}
-    title="Set units to imperial"
-  >
+  <Segment.Item value={'imperial'}>
     {`${UNIT_LABELS.temperature.imperial} /
 	    ${UNIT_LABELS.height.imperial}`}
   </Segment.Item>

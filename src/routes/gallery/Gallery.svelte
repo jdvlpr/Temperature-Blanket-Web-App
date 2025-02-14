@@ -147,7 +147,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <span>Popular during the past</span>
             <select
               bind:value={galleryState.timePeriod}
-              class="select w-fit"
+              class="select w-fit mx-auto"
               onchange={() => {
                 galleryState.popularProjects = [];
                 fetchPopularProjectsWrapper();
@@ -203,7 +203,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {#snippet header()}
         <div
           bind:this={scrollContainer}
-          class="bg-surface-50-950 base-font-color pt-4 text-center flex flex-wrap justify-center items-end scroll-mt-[70px]"
+          class="bg-surface-50-950 pt-4 text-center flex flex-wrap justify-center items-end scroll-mt-[70px]"
         >
           <h2 class="font-bold text-xl">All Projects</h2>
           <div class="w-full justify-center flex mb-2">

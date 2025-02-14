@@ -48,7 +48,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     updateHistory,
     upToDate,
   } from '$lib/utils';
-  import type { ToastContext } from '@skeletonlabs/skeleton-svelte';
+  import { Modal, type ToastContext } from '@skeletonlabs/skeleton-svelte';
   import { getContext, onMount } from 'svelte';
   import { fade } from 'svelte/transition';
 
@@ -149,6 +149,32 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <meta property="og:image:height" content="630" />
 </svelte:head>
 
+{#snippet gettingStarted()}
+  <Modal
+    bind:open={modal.open.gettingStarted}
+    triggerBase="btn preset-filled-secondary-100-900 gap-2"
+    contentBase="card bg-surface-100-900 p-4 space-y-4 shadow-xl h-[80svh] lg:h-[90svh] overflow-auto max-w-screen-sm"
+    positionerPadding="p-0"
+    backdropClasses="backdrop-blur-sm"
+  >
+    {#snippet trigger()}
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="size-6 relative bottom-[2px]"
+        viewBox="0 0 24 24"
+        ><path
+          fill="currentColor"
+          d="M20 11h3v2h-3zM1 11h3v2H1zM13 1v3h-2V1zM4.92 3.5l2.13 2.14l-1.42 1.41L3.5 4.93zm12.03 2.13l2.12-2.13l1.43 1.43l-2.13 2.12zM12 6a6 6 0 0 1 6 6c0 2.22-1.21 4.16-3 5.2V19a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1v-1.8c-1.79-1.04-3-2.98-3-5.2a6 6 0 0 1 6-6m2 15v1a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1v-1zm-3-3h2v-2.13c1.73-.44 3-2.01 3-3.87a4 4 0 0 0-4-4a4 4 0 0 0-4 4c0 1.86 1.27 3.43 3 3.87z"
+        /></svg
+      >
+      Getting Started
+    {/snippet}
+    {#snippet content()}
+      <GettingStarted />
+    {/snippet}
+  </Modal>
+{/snippet}
+
 <AppShell pageName="">
   {#snippet stickyHeader()}
     <div
@@ -161,7 +187,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {#if weather.data.length && locations.allValid}
         <div class="hidden lg:inline-flex">
           <Tooltip
-            classNames="btn preset-tonal-secondary"
+            classNames="btn hover:preset-tonal"
             title="Save Project [Cmd]+[s] or [Ctrl]+[s]"
             onclick={() =>
               modal.state.trigger({
@@ -197,7 +223,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {#if weather.data.length}
         <div class="mx-auto sm:mx-0">
           <button
-            class="btn preset-tonal-secondary"
+            class="btn hover:preset-tonal"
             title="Undo [Cmd ⌘]+[z] or [Ctrl]+[z]"
             id="undo"
             disabled={!weather.data.length ||
@@ -216,7 +242,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </button>
 
           <button
-            class="btn preset-tonal-secondary"
+            class="btn hover:preset-tonal"
             id="redo"
             title="Redo [Cmd ⌘]+[Shift ⇧]+[z] or [Ctrl]+[Shift ⇧]+[Z]"
             disabled={!weather.data.length ||
@@ -238,7 +264,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
 
     <Tooltip
-      classNames="btn-icon preset-tonal-secondary"
+      classNames="btn-icon hover:preset-tonal"
       minWidth="265px"
       title="Help"
     >
@@ -263,27 +289,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           aria-labelledby="menu-button"
           tabindex="-1"
         >
-          <button
-            class="btn preset-filled-secondary-500 gap-1 items-center"
-            onclick={() =>
-              modal.state.trigger({
-                type: 'component',
-                component: { ref: GettingStarted },
-              })}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="size-6 relative bottom-[2px]"
-              viewBox="0 0 24 24"
-              ><path
-                fill="currentColor"
-                d="M20 11h3v2h-3zM1 11h3v2H1zM13 1v3h-2V1zM4.92 3.5l2.13 2.14l-1.42 1.41L3.5 4.93zm12.03 2.13l2.12-2.13l1.43 1.43l-2.13 2.12zM12 6a6 6 0 0 1 6 6c0 2.22-1.21 4.16-3 5.2V19a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1v-1.8c-1.79-1.04-3-2.98-3-5.2a6 6 0 0 1 6-6m2 15v1a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1v-1zm-3-3h2v-2.13c1.73-.44 3-2.01 3-3.87a4 4 0 0 0-4-4a4 4 0 0 0-4 4c0 1.86 1.27 3.43 3 3.87z"
-              /></svg
-            >
+          {@render gettingStarted()}
 
-            Getting Started</button
-          >
-          <!-- <div class="flex-grow border-t border-surface-300-600-token"></div> -->
+          <div class="flex-grow border-t border-surface-300-600-token"></div>
 
           <p>
             <a
@@ -333,7 +341,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     <button
       aria-label="Open Menu"
-      class="btn-icon preset-tonal-secondary"
+      class="btn-icon hover:preset-tonal"
       title="Open Menu [.]"
       onclick={() =>
         modal.state.trigger({
@@ -357,6 +365,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </svg>
     </button>
   {/snippet}
+
   {#snippet main()}
     <main
       class="text-center mx-auto max-md:min-h-[calc(100svh-123px)] md:min-h-[calc(100svh-115px)] lg:min-h-[calc(100svh-131px)]"
@@ -378,7 +387,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 <h2 class="font-light text-lg uppercase tracking-widest">
                   Weather Data + Art
                 </h2>
-                <p class="">
+                <p>
                   Get historical weather data, choose yarn colors, and visualize
                   your crochet or knitting project.
                 </p>
@@ -387,26 +396,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   class="flex flex-col gap-x-4 gap-y-2 text-sm space-around justify-center items-center"
                   data-sveltekit-preload-data="hover"
                 >
-                  <button
-                    class="btn preset-filled-secondary-500 gap-1 items-center"
-                    onclick={() =>
-                      modal.state.trigger({
-                        type: 'component',
-                        component: { ref: GettingStarted },
-                      })}
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      class="size-5 relative bottom-[2px]"
-                      viewBox="0 0 24 24"
-                      ><path
-                        fill="currentColor"
-                        d="M20 11h3v2h-3zM1 11h3v2H1zM13 1v3h-2V1zM4.92 3.5l2.13 2.14l-1.42 1.41L3.5 4.93zm12.03 2.13l2.12-2.13l1.43 1.43l-2.13 2.12zM12 6a6 6 0 0 1 6 6c0 2.22-1.21 4.16-3 5.2V19a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1v-1.8c-1.79-1.04-3-2.98-3-5.2a6 6 0 0 1 6-6m2 15v1a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1v-1zm-3-3h2v-2.13c1.73-.44 3-2.01 3-3.87a4 4 0 0 0-4-4a4 4 0 0 0-4 4c0 1.86 1.27 3.43 3 3.87z"
-                      /></svg
-                    >
+                  {@render gettingStarted()}
 
-                    Getting Started</button
-                  >
                   <a
                     href="/blog/what-is-a-temperature-blanket"
                     class="link whitespace-pre-wrap mt-2"

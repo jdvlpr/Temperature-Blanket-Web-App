@@ -234,7 +234,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <p class="text-xs">For web and design</p>
           </div>
           <p
-            class="card preset-tonal-primary p-4 basis-full w-full break-all base-font-color select-all"
+            class="card preset-tonal-primary p-4 basis-full w-full break-all select-all"
           >
             {colorHexes}
           </p>
@@ -295,7 +295,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <p class="text-xs">For sharing between projects on this site</p>
           </div>
           <p
-            class="card preset-tonal-primary p-4 basis-full w-full break-all base-font-color select-all"
+            class="card preset-tonal-primary p-4 basis-full w-full break-all select-all"
           >
             {paletteCode}
           </p>
@@ -344,7 +344,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <p class="text-xs">For yarn colorways</p>
           </div>
           <p
-            class="card preset-tonal-primary p-4 basis-full w-full break-all base-font-color select-all"
+            class="card preset-tonal-primary p-4 basis-full w-full break-all select-all"
           >
             {colorNames}
           </p>

@@ -178,8 +178,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </div>
 
 <div
-  class="rounded-container overflow-hidden mt-2 mb-2 lg:mb-4 {preferences
-    .value.layout === 'grid'
+  class="rounded-container overflow-hidden mt-2 mb-2 lg:mb-4 {preferences.value
+    .layout === 'grid'
     ? 'gap-1 grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4'
     : 'flex flex-col'}"
   use:dragHandleZone={{
@@ -203,7 +203,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {#if movable}
         <button
           title="Remove Color"
-          class="btn preset-tonal-secondary flex flex-wrap justify-center items-center"
+          class="btn hover:preset-tonal flex flex-wrap justify-center items-center"
           onclick={() => {
             gauge.updateColors({
               colors: gauge.colors.filter((_, i) => i !== index),
@@ -221,7 +221,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         title="Move Color"
         tabindex="-1"
         aria-label="Crag handle for color {index + 1}"
-        class="btn-icon preset-tonal-secondary handle p-2 {dragDisabled
+        class="btn-icon hover:preset-tonal handle p-2 {dragDisabled
           ? 'cursor-grabbing'
           : 'cursor-grab'}"
         onmousedown={startDrag}
@@ -232,7 +232,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </button>
 
       <button
-        class="btn preset-tonal-secondary flex items-center justify-start"
+        class="btn hover:preset-tonal flex items-center justify-start"
         title="Choose a Color"
         onclick={() =>
           modal.state.trigger({
@@ -286,7 +286,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
       {#if affiliate_variant_href}
         <a
-          class="btn preset-tonal-secondary flex flex-wrap justify-center items-center"
+          class="btn hover:preset-tonal flex flex-wrap justify-center items-center"
           href={affiliate_variant_href}
           target="_blank"
           rel="noreferrer nofollow"

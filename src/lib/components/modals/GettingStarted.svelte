@@ -14,14 +14,13 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-    import ModalShell from './ModalShell.svelte';
+  import { modal } from '$lib/state';
   import Step1 from './gettingStartedSteps/Step1.svelte';
   import Step2 from './gettingStartedSteps/Step2.svelte';
   import Step3 from './gettingStartedSteps/Step3.svelte';
   import Step4 from './gettingStartedSteps/Step4.svelte';
   import Step5 from './gettingStartedSteps/Step5.svelte';
 
-  const modalStore = getModalStore();
   interface Props {
     parent?: any;
   }
@@ -63,51 +62,77 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 </script>
 
-<ModalShell {parent} hideCloseButton={true}>
-  <div class="w-full">
-    <!-- Stepper -->
-    <div
-      class="space-y-8 flex flex-col justify-between items-between min-h-[85svh] sm:min-h-[530px]"
-    >
-      <!-- Timeline -->
-      <div class="relative">
-        <!-- Numerals -->
-        <div class="flex justify-between items-center gap-4">
-          {#each steps as step, i}
-            <!-- Numeral Button -->
-            <button
-              class="btn-icon btn-icon-sm rounded-full {isCurrentStep(i)
-                ? 'preset-filled-primary-500'
-                : 'preset-filled-surface-200-800'}"
-              onclick={() => setStep(i)}
-              title={step.label}
-            >
-              <span class="font-bold">{i + 1}</span>
-            </button>
-          {/each}
-        </div>
-        <!-- Line -->
-        <hr
-          class="hr !border-surface-200-800 absolute top-[50%] left-0 right-0 z-[-1]"
-        />
+<!-- <ModalShell {parent} hideCloseButton={true}> -->
+<div class="w-full">
+  <!-- Stepper -->
+  <div
+    class="space-y-8 flex flex-col justify-between items-between min-h-[85svh] sm:min-h-[530px]"
+  >
+    <!-- Timeline -->
+    <div class="relative">
+      <!-- Numerals -->
+      <div class="flex justify-between items-center gap-4">
+        {#each steps as step, i}
+          <!-- Numeral Button -->
+          <button
+            class="btn-icon btn-icon-sm rounded-full {isCurrentStep(i)
+              ? 'preset-filled-primary-500'
+              : 'preset-filled-surface-200-800'}"
+            onclick={() => setStep(i)}
+            title={step.label}
+          >
+            <span class="font-bold">{i + 1}</span>
+          </button>
+        {/each}
       </div>
-      <!-- Loop all steps -->
-      {#each steps as step, i (step)}
-        <!-- Filter to current step only -->
-        {#if isCurrentStep(i)}
-          <!-- Individual steps -->
-          <div class="flex flex-col items-center gap-2"><step.component /></div>
-        {/if}
-      {/each}
-      <!-- Navigation -->
-      <nav class="flex justify-between items-center gap-4">
-        <!-- Back Button -->
+      <!-- Line -->
+      <hr
+        class="hr !border-surface-200-800 absolute top-[50%] left-0 right-0 z-[-1]"
+      />
+    </div>
+    <!-- Loop all steps -->
+    {#each steps as step, i (step)}
+      <!-- Filter to current step only -->
+      {#if isCurrentStep(i)}
+        <!-- Individual steps -->
+        <div class="flex flex-col items-center gap-2"><step.component /></div>
+      {/if}
+    {/each}
+    <!-- Navigation -->
+    <nav class="flex justify-between items-center gap-4">
+      <!-- Back Button -->
+      <button
+        type="button"
+        class="btn preset-tonal hover:preset-filled"
+        onclick={prevStep}
+        disabled={isFirstStep}
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="currentColor"
+          class="size-6"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"
+          />
+        </svg>
+
+        <span>Previous</span>
+      </button>
+      {#if isLastStep}
         <button
           type="button"
           class="btn preset-tonal hover:preset-filled"
-          onclick={prevStep}
-          disabled={isFirstStep}
+          onclick={() => {
+            modal.close();
+          }}
         >
+          <span>Let's Go!</span>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -119,62 +144,36 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
-              d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"
+              d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
             />
           </svg>
-
-          <span>Previous</span>
         </button>
-        {#if isLastStep}
-          <button
-            type="button"
-            class="btn preset-tonal hover:preset-filled"
-            onclick={() => {
-              modalStore.close();
-            }}
+      {:else}
+        <!-- Next Button -->
+        <button
+          type="button"
+          class="btn preset-tonal hover:preset-filled"
+          onclick={nextStep}
+          disabled={isLastStep}
+        >
+          <span>Next</span>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            class="size-6"
           >
-            <span>Let's Go!</span>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-              class="size-6"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
-              />
-            </svg>
-          </button>
-        {:else}
-          <!-- Next Button -->
-          <button
-            type="button"
-            class="btn preset-tonal hover:preset-filled"
-            onclick={nextStep}
-            disabled={isLastStep}
-          >
-            <span>Next</span>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-              class="size-6"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
-              />
-            </svg>
-          </button>
-        {/if}
-      </nav>
-    </div>
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
+            />
+          </svg>
+        </button>
+      {/if}
+    </nav>
   </div>
-</ModalShell>
+</div>
+<!-- </ModalShell> -->

@@ -20,13 +20,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ToTopButton from '$lib/components/buttons/ToTopButton.svelte';
   import { Segment } from '@skeletonlabs/skeleton-svelte';
   import ModalShell from './ModalShell.svelte';
+  import CloseButton from './CloseButton.svelte';
+  import { modal } from '$lib/state';
 
   interface Props {
     schemeId?: string;
     numberOfColors: any;
     updateGauge: any;
     context?: string;
-    parent?: any;
   }
 
   let {
@@ -34,10 +35,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     numberOfColors = $bindable(),
     updateGauge,
     context = '',
-    parent,
   }: Props = $props();
-
-  if (parent) parent.width = 'w-modal-wide';
 
   let category = $state(getParentCategory(schemeId));
   let container = $state();
@@ -68,57 +66,49 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 </script>
 
-{#if parent}
-  <ModalShell {parent}>
-    {@render content()}
-  </ModalShell>
-{:else}
-  {@render content()}
-{/if}
-
-{#snippet content()}
-  <div class="" bind:this={container}>
-    <div
-      class="w-full flex flex-wrap justify-center items-end gap-2 px-2 pb-2 bg-surface-100-900"
-      class:pt-4={context === 'drawer'}
-      bind:this={filtersContainer}
-    >
-      <Segment class="flex wrap gap-y-2" active="preset-filled-secondary-500">
-        {#each categories as categoryItem}
-          <Segment.Item
-            bind:group={category}
-            name="category-{categoryItem}"
-            value={categoryItem}
-            title={categoryItem}
-          >
-            <span class="flex gap-1 justify-center items-center">
-              {categoryItem}
-            </span>
-          </Segment.Item>
-        {/each}
-      </Segment>
-    </div>
-
-    {#if category === 'Gallery'}
-      <GalleryPalettes {updateGauge} />
-    {:else if category === 'Featured'}
-      <GalleryPalettesPopular {updateGauge} />
-    {:else if category === 'Schemes'}
-      <PaletteSchemes {updateGauge} bind:numberOfColors />
-    {/if}
-
-    {#if showScrollToTopButton}
-      <ToTopButton
-        onClick={() => {
-          container.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start',
-          });
-        }}
-        bottom={parent ? '0rem' : '5rem'}
-      />
-    {/if}
+<div class="" bind:this={container}>
+  <div class="sticky pr-2 top-2">
+    <CloseButton
+      onClose={() => {
+        modal.close();
+      }}
+    />
+  </div>
+  <div
+    class="w-full flex flex-wrap justify-center items-end gap-2 px-2 pb-2 bg-surface-100-900"
+    class:pt-4={context === 'drawer'}
+    bind:this={filtersContainer}
+  >
+    <Segment bind:value={category}>
+      {#each categories as categoryItem}
+        <Segment.Item value={categoryItem}>
+          <span class="flex gap-1 justify-center items-center">
+            {categoryItem}
+          </span>
+        </Segment.Item>
+      {/each}
+    </Segment>
   </div>
 
-  <p class="font-ornament text-3xl mb-4 text-center w-full inline-block">k</p>
-{/snippet}
+  {#if category === 'Gallery'}
+    <GalleryPalettes {updateGauge} />
+  {:else if category === 'Featured'}
+    <GalleryPalettesPopular {updateGauge} />
+  {:else if category === 'Schemes'}
+    <PaletteSchemes {updateGauge} bind:numberOfColors />
+  {/if}
+
+  {#if showScrollToTopButton}
+    <ToTopButton
+      onClick={() => {
+        container.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+        });
+      }}
+      bottom="1rem"
+    />
+  {/if}
+</div>
+
+<p class="font-ornament text-3xl mb-4 text-center w-full inline-block">k</p>

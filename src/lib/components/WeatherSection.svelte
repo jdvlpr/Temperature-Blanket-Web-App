@@ -251,7 +251,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   {#if projectHasRecentWeatherData}
     <div
-      class="preset-tonal-warning border border-warning-500 rounded-container base-font-color text-left w-fit max-w-screen-sm text-sm"
+      class="preset-tonal-warning border border-warning-500 rounded-container text-left w-fit max-w-screen-sm text-sm"
     >
       <Accordion>
         <Accordion.Item>
@@ -483,7 +483,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   {#if isDataMissing}
     <div
-      class="variant-outline-surface rounded-container base-font-color flex flex-col gap-2 justify-center items-center text-left w-fit max-w-screen-sm text-sm"
+      class="variant-outline-surface rounded-container flex flex-col gap-2 justify-center items-center text-left w-fit max-w-screen-sm text-sm"
     >
       <Accordion>
         <Accordion.Item>
@@ -506,7 +506,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               {#if count && count < weather.data?.length}
                 {count}
                 {pluralize(weather.grouping, count)} with missing {label}
-                {pluralize(type, count)}. 
+                {pluralize(type, count)}.
               {:else if count && count === weather.data?.length}
                 No days have {label}
                 {type} data.

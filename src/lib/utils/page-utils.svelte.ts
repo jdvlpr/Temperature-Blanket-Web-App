@@ -97,10 +97,10 @@ const isRedo = (ev, style) => {
 export const handleKeyDown = (ev) => {
   // Only handle keyboard shortcuts on the main Project Planner page
 
-  const modalStore = get(modal.state);
+  // const modalStore = get(modal.state);
 
   if (
-    modalStore[0] ||
+    // modalStore[0] ||
     ev.target.tagName === 'INPUT' ||
     ev.target.tagName === 'TD' ||
     ev.target.tagName === 'SELECT' ||

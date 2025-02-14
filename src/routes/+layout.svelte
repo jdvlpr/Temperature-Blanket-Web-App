@@ -16,22 +16,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import { onNavigate } from '$app/navigation';
   import { PUBLIC_MICROSOFT_CLARITY_ID } from '$env/static/public';
-  import { consentToMSClarityCookies, modal } from '$lib/state';
+  import { consentToMSClarityCookies } from '$lib/state';
   import { handleKeyDown, initializeLocalStorage, privacy } from '$lib/utils';
   import {
-    Modal,
     ToastProvider,
     type ToastContext,
   } from '@skeletonlabs/skeleton-svelte';
   import { getContext, onMount, type Snippet } from 'svelte';
-  import {
-    arrow,
-    autoUpdate,
-    computePosition,
-    flip,
-    offset,
-    shift,
-  } from 'svelte-floating-ui/dom';
   import '../css/main.css';
   interface Props {
     children?: Snippet;
@@ -102,7 +93,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
     <p class="text-sm">Some features may not work as expected.</p>
   </div>`,
-      // background: 'bg-warning-200-800 base-font-color',
+      // background: 'bg-warning-200-800 ',
     });
   }}
   ononline={() => {
@@ -116,7 +107,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
      You are online
     </div>
   </div>`,
-      // background: 'bg-success-200-800 base-font-color',
+      // background: 'bg-success-200-800 ',
     });
   }}
 />
@@ -175,10 +166,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <ToastProvider />
 
-<Modal zIndex={'z-[10010]'} />
-
 <p
-  class="sm:text-center px-4 py-8 bg-warning-50/50 dark:bg-warning-950/50 base-font-color [view-transition-name:top-banner]"
+  class="sm:text-center px-4 py-8 bg-warning-50/50 dark:bg-warning-950/50 [view-transition-name:top-banner]"
 >
   <svg
     xmlns="http://www.w3.org/2000/svg"

@@ -26,9 +26,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { drawerState, modal, pageSections, pinAllSections } from '$lib/state';
   import type { Color, GaugeSettingsType } from '$lib/types';
   import { createGaugeColors } from '$lib/utils';
+  import { Modal } from '@skeletonlabs/skeleton-svelte';
   let { gauge = $bindable() } = $props();
-
-  const modalStore = getModalStore();
 
   function updateGauge({
     _colors,
@@ -44,7 +43,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     gauge.schemeId = _schemeId;
 
     drawerState.closeAll();
-    if ($modalStore[0]) modalStore.close();
+    modal.close();
   }
 
   let fullscreen = $state(false);
@@ -67,9 +66,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     if (
       e.target.tagName === 'INPUT' ||
       e.target.tagName === 'TD' ||
-      e.target.tagName === 'SELECT' ||
-      e.target.tagName === 'BUTTON' ||
-      $modalStore[0]
+      e.target.tagName === 'SELECT'
     )
       return;
     if (e.key === 'f') {
@@ -88,11 +85,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 />
 
 <div
-  class="w-full flex flex-col justify-center items-center bg-surface-300-700 base-font-color {fullscreen
+  class="w-full flex flex-col justify-center items-center bg-surface-300-700 {fullscreen
     ? 'fixed w-full h-full left-0 top-0 bg-surface-50-950 overflow-scroll'
     : 'shadow-inner mt-2 pb-2 gap-2 rounded-container'}"
   bind:this={gaugeContainerElement}
-  use:focusTrap={fullscreen}
 >
   <div class={['w-full', fullscreen && 'flex-auto']}>
     {#key gauge.colors}
@@ -126,47 +122,44 @@ If not, see <https://www.gnu.org/licenses/>. -->
       />
     </div>
 
-    <button
-      class={[
-        'preset-tonal-secondary',
-        fullscreen ? 'btn-icon' : 'btn justify-start',
-      ]}
-      title="Browse Preset & User-Created Color Palettes"
-      onclick={() =>
-        modal.state.trigger({
-          type: 'component',
-          component: {
-            ref: BrowsePalettes,
-            props: {
-              numberOfColors: gauge.numberOfColors,
-              schemeId: gauge.schemeId,
-              updateGauge,
-            },
-          },
-        })}
+    <Modal
+      bind:open={modal.open.browsePalettes}
+      triggerBase="{fullscreen ? 'btn-icon' : 'btn'} hover:preset-tonal gap-2"
+      contentBase="card bg-surface-100-900 lg:p-4 space-y-4 shadow-xl h-[100svh] lg:h-[90svh] overflow-auto max-w-screen-lg"
+      positionerPadding="p-0"
+      backdropClasses="backdrop-blur-sm"
     >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke-width="1.5"
-        stroke="currentColor"
-        class={['size-6', !fullscreen && 'mr-1']}
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="M4.098 19.902a3.75 3.75 0 005.304 0l6.401-6.402M6.75 21A3.75 3.75 0 013 17.25V4.125C3 3.504 3.504 3 4.125 3h5.25c.621 0 1.125.504 1.125 1.125v4.072M6.75 21a3.75 3.75 0 003.75-3.75V8.197M6.75 21h13.125c.621 0 1.125-.504 1.125-1.125v-5.25c0-.621-.504-1.125-1.125-1.125h-4.072M10.5 8.197l2.88-2.88c.438-.439 1.15-.439 1.59 0l3.712 3.713c.44.44.44 1.152 0 1.59l-2.879 2.88M6.75 17.25h.008v.008H6.75v-.008z"
+      {#snippet trigger()}
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="currentColor"
+          class={['size-6']}
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M4.098 19.902a3.75 3.75 0 005.304 0l6.401-6.402M6.75 21A3.75 3.75 0 013 17.25V4.125C3 3.504 3.504 3 4.125 3h5.25c.621 0 1.125.504 1.125 1.125v4.072M6.75 21a3.75 3.75 0 003.75-3.75V8.197M6.75 21h13.125c.621 0 1.125-.504 1.125-1.125v-5.25c0-.621-.504-1.125-1.125-1.125h-4.072M10.5 8.197l2.88-2.88c.438-.439 1.15-.439 1.59 0l3.712 3.713c.44.44.44 1.152 0 1.59l-2.879 2.88M6.75 17.25h.008v.008H6.75v-.008z"
+          />
+        </svg>
+        {#if !fullscreen}
+          Palettes
+        {/if}
+      {/snippet}
+      {#snippet content()}
+        <BrowsePalettes
+          numberOfColors={gauge.numberOfColors}
+          schemeId={gauge.schemeId}
+          {updateGauge}
         />
-      </svg>
-      {#if !fullscreen}
-        Palettes
-      {/if}
-    </button>
+      {/snippet}
+    </Modal>
 
     <button
       class={[
-        'preset-tonal-secondary',
+        'hover:preset-tonal',
         fullscreen ? 'btn-icon' : 'btn justify-start',
       ]}
       title="Choose Yarn Colorways, Filtered by Brand and Yarn"
@@ -203,7 +196,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     <button
       class={[
-        'preset-tonal-secondary',
+        'hover:preset-tonal',
         fullscreen ? 'btn-icon' : 'btn justify-start',
       ]}
       title="Get Palette from Image"
@@ -239,7 +232,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     <button
       class={[
-        'preset-tonal-secondary',
+        'hover:preset-tonal',
         fullscreen ? 'btn-icon' : 'btn justify-start',
       ]}
       title="Generate Random Colors"
@@ -275,7 +268,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     <button
       class={[
-        'preset-tonal-secondary',
+        'hover:preset-tonal',
         fullscreen ? 'btn-icon' : 'btn justify-start',
       ]}
       title="Load Colors or Get a Palette Code to Share"
@@ -312,7 +305,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     <button
       class={[
-        'preset-tonal-secondary',
+        'hover:preset-tonal',
         fullscreen ? 'btn-icon' : 'btn justify-start',
       ]}
       title="Sort Colors"
@@ -348,7 +341,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     <button
       aria-label="Fullscreen"
-      class="btn preset-tonal-secondary flex gap-1 justify-start items-center"
+      class="btn hover:preset-tonal flex gap-1 justify-start items-center"
       onclick={() => (fullscreen = !fullscreen)}
       title="Toggle Fullscreen Editing Mode (f)"
     >

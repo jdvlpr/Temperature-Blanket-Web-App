@@ -52,7 +52,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <Popover
     bind:open={openState}
     triggerBase="btn preset-tonal"
-    contentBase="card bg-surface-200-800 p-4 space-y-4 max-w-[320px]"
+    contentBase="card bg-surface-200-800 p-4 space-y-4 max-w-[90vw]"
     arrow
     arrowBackground="!bg-surface-200 dark:!bg-surface-800"
   >

@@ -14,6 +14,7 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { dev } from '$app/environment';
+import { skeletonThemes } from '$lib/components/ThemeSwitcher.svelte';
 import { redirect, type Handle } from '@sveltejs/kit';
 import { sequence } from '@sveltejs/kit/hooks';
 
@@ -86,11 +87,11 @@ const themeCookies: Handle = async ({ event, resolve }) => {
   const cookieTheme = event.cookies.get('theme');
   const cookieThemeMode = event.cookies.get('theme_mode');
 
-  if (cookieTheme) {
+  if (cookieTheme && skeletonThemes.map((n) => n.id).includes(cookieTheme)) {
     theme = cookieTheme;
   } else {
-    event.cookies.set('theme', 'classic', { path: '/' });
-    theme = 'classic';
+    event.cookies.set('theme', 'crimson', { path: '/' });
+    theme = 'crimson';
   }
 
   if (cookieThemeMode) {

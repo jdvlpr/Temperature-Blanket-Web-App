@@ -9,16 +9,16 @@
  */
 import { fontFamily } from 'tailwindcss/defaultTheme';
 import { join } from 'path';
-import { classic } from './classic-theme';
-import { contentPath, skeleton } from "@skeletonlabs/skeleton/plugin";
-import * as themes from "@skeletonlabs/skeleton/themes";
+// import { classic } from './classic-theme';
+import { contentPath, skeleton } from '@skeletonlabs/skeleton/plugin';
+import * as themes from '@skeletonlabs/skeleton/themes';
 
 /** @type {import('tailwindcss').Config} */
 const config = {
   darkMode: 'class',
   content: [
     './src/**/*.{html,js,svelte,ts}',
-    contentPath(import.meta.url, "svelte"),
+    contentPath(import.meta.url, 'svelte'),
   ],
   safelist: ['dark'],
   theme: {
@@ -90,7 +90,14 @@ const config = {
   plugins: [
     require('@tailwindcss/forms'),
     skeleton({
-      themes: [themes.crimson, themes.hamlindigo, themes.modern, themes.rocket, themes.legacy /* classic */],
+      themes: [
+        // classic,
+        themes.crimson,
+        themes.hamlindigo,
+        themes.modern,
+        themes.rocket,
+        themes.legacy,
+      ],
     }),
   ],
   future: {

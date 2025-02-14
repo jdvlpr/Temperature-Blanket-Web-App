@@ -19,9 +19,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { SCHEMES } from '$lib/constants';
   import chroma from 'chroma-js';
 
-  let { updateGauge, numberOfColors } = $props();
+  let { updateGauge, numberOfColors = $bindable() } = $props();
 
-  const modalStore = getModalStore();
+  // const modalStore = getModalStore();
 
   let currentScheme = $state('Creative');
   const schemes = [
@@ -74,10 +74,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
       class="select truncate"
       id="select-sort-by"
       bind:value={currentScheme}
-      onchange={() => {
-        if (typeof document.getElementsByClassName('content') !== 'undefined')
-          document.getElementsByClassName('content')[0].scrollTop = 0;
-      }}
     >
       {#each schemes as scheme}
         <option value={scheme}>{scheme}</option>
@@ -100,7 +96,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             _colors: colors,
             _schemeId: value,
           });
-          if ($modalStore[0]) modalStore.close();
+          // if ($modalStore[0]) modalStore.close();
         }}
         title="Use This Palette"
       >

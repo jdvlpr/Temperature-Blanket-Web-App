@@ -280,7 +280,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             {#snippet header()}
               <div
                 bind:this={scrollContainer}
-                class="bg-surface-50-950 base-font-color pt-4 text-center flex flex-col gap-2 justify-center items-center scroll-mt-[70px] pb-4 px-2"
+                class="bg-surface-50-950 pt-4 text-center flex flex-col gap-2 justify-center items-center scroll-mt-[70px] pb-4 px-2"
               >
                 <div class="flex flex-col">
                   <h2 class="font-bold text-xl">All Yarn Palettes</h2>

@@ -404,7 +404,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <Card>
         {#snippet header()}
           <div>
-            <div class="bg-surface-200-800 base-font-color p-4">
+            <div class="bg-surface-200-800 p-4">
               <p class="text-center">
                 Browse a collection of yarn colorways. Filter by brand or yarn
                 name, and search by HTML hex color code to find matching yarn
@@ -726,7 +726,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               </div>
             {:else}
               <div
-                class="mx-auto preset-tonal-warning base-font-color text-center card p-4 my-2"
+                class="mx-auto preset-tonal-warning text-center card p-4 my-2"
               >
                 <p>No Matching Colorways</p>
                 <p class="text-sm">Try changing the filters above</p>
@@ -735,7 +735,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             {#if results.length === itemsToShow}
               <div class="w-full flex justify-center mx-auto">
                 <button
-                  class="btn rounded-container bg-primary-200-800 base-font-color gap-1 mb-2 font-bold"
+                  class="btn rounded-container bg-primary-200-800 gap-1 mb-2 font-bold"
                   bind:this={loadMoreSpinner}
                   onclick={() => {
                     if (itemsToShow <= results.length)

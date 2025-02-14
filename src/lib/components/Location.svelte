@@ -539,7 +539,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </p>
         {#if location.daysInFuture}
           <p
-            class="text-sm preset-tonal-warning border border-warning-500 base-font-color rounded-container p-2 w-full my-2"
+            class="text-sm preset-tonal-warning border border-warning-500 rounded-container p-2 w-full my-2"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -570,7 +570,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {/if}
       {:else if location.errorMessage && browser}
         <p
-          class="preset-tonal-error border border-error-500 base-font-color rounded-container p-2 text-sm w-full my-2"
+          class="preset-tonal-error border border-error-500 rounded-container p-2 text-sm w-full my-2"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"

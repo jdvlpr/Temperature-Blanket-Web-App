@@ -18,11 +18,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { PUBLIC_GITHUB_LINK } from '$env/static/public';
   import ThemeSwitcher from '$lib/components/ThemeSwitcher.svelte';
   import { ICONS } from '$lib/constants';
+  import { modal } from '$lib/state';
   import { Accordion } from '@skeletonlabs/skeleton-svelte';
 
-  let value = $state();
+  let value = $state([]);
 
-  function onClickItem() {}
+  function onClickItem() {
+    modal.close();
+  }
 
   // Tools
   //{page.url.pathname === '/yarn-colorway-finder' ||
@@ -52,7 +55,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   <div><ThemeSwitcher /></div>
 
-  <Accordion {value}>
+  <Accordion {value} collapsible>
     <Accordion.Item value="tools">
       {#snippet control()}
         <p>Tools</p>
@@ -61,7 +64,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <div class="flex flex-col w-full gap-2">
           <a
             href="/"
-            class="btn preset-tonal-secondary w-fit gap-0 base-font-color"
+            class="btn preset-tonal-secondary w-fit gap-0"
             onclick={() => onClickItem()}
             class:preset-tonal-secondary={page.url.pathname === '/'}
           >
@@ -80,7 +83,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
           <a
             href="/yarn-colorway-finder"
-            class="btn preset-tonal-secondary w-fit gap-0 base-font-color"
+            class="btn preset-tonal-secondary w-fit gap-0"
             onclick={() => onClickItem()}
             class:preset-tonal-secondary={page.url.pathname ===
               '/yarn-colorway-finder'}
@@ -102,7 +105,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </a>
           <a
             href="/yarn"
-            class="btn preset-tonal-secondary w-fit gap-0 base-font-color"
+            class="btn preset-tonal-secondary w-fit gap-0"
             onclick={() => onClickItem()}
             class:preset-tonal-secondary={page.url.pathname === '/yarn'}
           >
@@ -125,7 +128,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </a>
           <a
             href="/weather"
-            class="btn preset-tonal-secondary w-fit gap-0 base-font-color"
+            class="btn preset-tonal-secondary w-fit gap-0"
             onclick={() => onClickItem()}
             class:preset-tonal-secondary={page.url.pathname === '/weather'}
           >
@@ -144,8 +147,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </div>
       {/snippet}
     </Accordion.Item>
-  </Accordion>
-  <Accordion>
     <Accordion.Item value="gallery">
       {#snippet control()}
         <p>Gallery</p>
@@ -154,7 +155,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <div class="flex flex-col w-full gap-2">
           <a
             href="/gallery"
-            class="btn preset-tonal-secondary w-fit gap-0 base-font-color"
+            class="btn preset-tonal-secondary w-fit gap-0"
             onclick={() => onClickItem()}
             class:preset-tonal-secondary={page.url.pathname === '/gallery'}
           >
@@ -172,7 +173,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </a>
           <a
             href="/yarn-palette-gallery"
-            class="btn preset-tonal-secondary w-fit gap-0 base-font-color"
+            class="btn preset-tonal-secondary w-fit gap-0"
             onclick={() => onClickItem()}
             class:preset-tonal-secondary={page.url.pathname ===
               '/yarn-palette-gallery'}
@@ -183,9 +184,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </div>
       {/snippet}
     </Accordion.Item>
-  </Accordion>
-
-  <Accordion>
     <Accordion.Item value="information">
       {#snippet control()}
         <p>Information</p>
@@ -194,7 +192,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <div class="flex flex-col gap-2 mb-4 w-full">
           <a
             href="/faq"
-            class="btn preset-tonal-secondary w-fit gap-0 base-font-color"
+            class="btn preset-tonal-secondary w-fit gap-0"
             onclick={() => onClickItem()}
             class:preset-tonal-secondary={page.url.pathname === '/faq'}
           >
@@ -216,7 +214,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </a>
           <a
             href="/contact"
-            class="btn preset-tonal-secondary w-fit gap-0 base-font-color"
+            class="btn preset-tonal-secondary w-fit gap-0"
             onclick={() => onClickItem()}
             class:preset-tonal-secondary={page.url.pathname === '/contact'}
           >
@@ -239,7 +237,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
           <a
             href="/yarn-search-request"
-            class="btn preset-tonal-secondary w-fit gap-0 base-font-color"
+            class="btn preset-tonal-secondary w-fit gap-0"
             onclick={() => onClickItem()}
             class:preset-tonal-secondary={page.url.pathname ===
               '/yarn-search-request'}
@@ -264,7 +262,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
           <a
             href="/blog"
-            class="btn preset-tonal-secondary w-fit gap-0 base-font-color text-left"
+            class="btn preset-tonal-secondary w-fit gap-0 text-left"
             onclick={() => onClickItem()}
             class:preset-tonal-secondary={page.url.pathname === '/blog' ||
               page.url.pathname.includes('/blog')}
@@ -286,7 +284,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
           <a
             href="/privacy"
-            class="btn preset-tonal-secondary w-fit gap-0 base-font-color"
+            class="btn preset-tonal-secondary w-fit gap-0"
             onclick={() => onClickItem()}
             class:preset-tonal-secondary={page.url.pathname === '/privacy'}
           >
@@ -312,7 +310,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
           <a
             href="/documentation"
-            class="btn preset-tonal-secondary w-fit gap-0 base-font-color"
+            class="btn preset-tonal-secondary w-fit gap-0"
             onclick={() => onClickItem()}
             class:preset-tonal-secondary={page.url.pathname ===
               '/documentation'}
@@ -336,7 +334,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
           <a
             href="/changelog"
-            class="btn preset-tonal-secondary w-fit gap-0 base-font-color"
+            class="btn preset-tonal-secondary w-fit gap-0"
             onclick={() => onClickItem()}
             class:preset-tonal-secondary={page.url.pathname === '/changelog'}
           >
@@ -359,7 +357,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
           <a
             href="/api/yarn-colorways"
-            class="btn preset-tonal-secondary w-fit gap-0 base-font-color"
+            class="btn preset-tonal-secondary w-fit gap-0"
             onclick={() => onClickItem()}
             class:preset-tonal-secondary={page.url.pathname ===
               '/api/yarn-colorways'}
@@ -385,7 +383,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {#if PUBLIC_GITHUB_LINK}
             <a
               href={PUBLIC_GITHUB_LINK}
-              class="btn preset-tonal-secondary w-fit gap-0 base-font-color"
+              class="btn preset-tonal-secondary w-fit gap-0"
               target="_blank"
             >
               <svg
@@ -408,7 +406,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   <a
     href="/supporters"
-    class="btn preset-tonal-secondary w-fit gap-0 base-font-color"
+    class="btn preset-tonal-secondary w-fit gap-0"
     onclick={() => onClickItem()}
     class:preset-tonal-secondary={page.url.pathname === '/supporters'}
   >
@@ -417,7 +415,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       viewBox="0 0 20 20"
       fill="currentColor"
       stroke="white"
-      class="w-8 h-8 transition-all text-red-400 flex-shrink-0 group-hover:text-red-500"
+      class="size-8 transition-all text-red-400 flex-shrink-0 group-hover:text-red-500 mr-1"
     >
       <path
         d="M9.653 16.915l-.005-.003-.019-.01a20.759 20.759 0 01-1.162-.682 22.045 22.045 0 01-2.582-1.9C4.045 12.733 2 10.352 2 7.5a4.5 4.5 0 018-2.828A4.5 4.5 0 0118 7.5c0 2.852-2.044 5.233-3.885 6.82a22.049 22.049 0 01-3.744 2.582l-.019.01-.005.003h-.002a.739.739 0 01-.69.001l-.002-.001z"

@@ -16,16 +16,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script module>
   // export const skeletonTheme = persistedState('skeletonTheme', 'classic');
   export const skeletonThemes = [
-    {
-      id: 'classic',
-      name: 'Marble',
-      colors: {
-        primary: '#fcd34d',
-        secondary: '#075985',
-        surface: '#64748b',
-      },
-      rounded: '8px',
-    },
+    // {
+    //   id: 'classic',
+    //   name: 'Marble',
+    //   colors: {
+    //     primary: '#fcd34d',
+    //     secondary: '#075985',
+    //     surface: '#64748b',
+    //   },
+    //   rounded: '8px',
+    // },
     {
       id: 'crimson',
       name: 'Garnet',
@@ -67,7 +67,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       rounded: '0px',
     },
     {
-      id: 'skeleton',
+      id: 'legacy',
       name: 'Tufa',
       colors: {
         surface: '#495a8f',
@@ -95,10 +95,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <div class="w-fit text-left">
   <Popover
     bind:open={openState}
-    triggerBase="btn preset-tonal"
-    contentBase="card bg-surface-200-800 p-4 space-y-4 max-w-[320px]"
+    triggerBase="btn hover:preset-tonal"
+    contentBase="card bg-surface-300-700 p-4 space-y-4"
+    zIndex="1000"
     arrow
-    arrowBackground="!bg-surface-200 dark:!bg-surface-800"
+    arrowBackground="!bg-surface-300 dark:!bg-surface-700"
+    modal={true}
   >
     {#snippet trigger()}
       {#key preferences.value?.theme.mode}
@@ -148,7 +150,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 preferences.value.theme.id = id;
               }}
               class={[
-                'btn preset-tonal-secondary flex items-center gap-2 w-full justify-start',
+                'btn hover:preset-tonal-secondary flex items-center gap-2 w-full justify-start',
                 preferences.value.theme.id === id &&
                   'preset-filled-secondary-500',
               ]}

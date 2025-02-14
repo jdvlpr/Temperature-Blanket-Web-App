@@ -85,7 +85,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               </div>
 
               <div
-                class="p-4 preset-tonal-surface base-font-color rounded-container flex flex-col gap-2"
+                class="p-4 preset-tonal-surface rounded-container flex flex-col gap-2"
               >
                 <p>
                   🎉 Temperature-blanket.com is reaching a new milestone! The

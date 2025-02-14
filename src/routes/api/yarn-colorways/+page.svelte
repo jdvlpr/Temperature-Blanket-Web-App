@@ -86,7 +86,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               Yarn Colorways API
             </h2>
             <section
-              class="gap-2 flex flex-col mt-2 lg:mt-0 card preset-tonal-secondary p-4 rounded-container base-font-color"
+              class="gap-2 flex flex-col mt-2 lg:mt-0 card preset-tonal-secondary p-4 rounded-container"
             >
               <p>Find yarn colorways by HTML hex color code.</p>
 
@@ -165,23 +165,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
           >
             <h3 class="font-bold text-xl">Making a Request</h3>
             <p>This is the base URL for all endpoints:</p>
-            <p
-              class="break-all whitespace-pre-wrap codeblock code base-font-color p-4 w-fit"
-            >
+            <p class="break-all whitespace-pre-wrap codeblock code p-4 w-fit">
               https://yarn-colorways.p.rapidapi.com/v1
             </p>
 
             <p>Include the following headers:</p>
-            <p
-              class="break-all whitespace-pre-wrap codeblock code base-font-color p-4 w-fit"
-            >
+            <p class="break-all whitespace-pre-wrap codeblock code p-4 w-fit">
               "X-RapidAPI-Key": 'your-rapidapi-key', <br />"X-RapidAPI-Host":
               "yarn-colorways.p.rapidapi.com"
             </p>
             <p>
-              All requests should use the <span
-                class="code base-font-color px-2">GET</span
-              > method.
+              All requests should use the <span class="code px-2">GET</span> method.
             </p>
           </section>
 
@@ -204,9 +198,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 class="link">/colorways</a
               > endpoint.
             </p>
-            <p
-              class="break-all whitespace-pre-wrap codeblock code base-font-color p-4 w-fit"
-            >
+            <p class="break-all whitespace-pre-wrap codeblock code p-4 w-fit">
               {`{
       "meta": {
           "limit": 50, // the maxmimum number of results
@@ -249,11 +241,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <p>
               <span class="font-bold">Method</span>
-              <span class="code px-2 base-font-color">GET</span>
+              <span class="code px-2">GET</span>
             </p>
             <p>
               <span class="font-bold">URL</span>
-              <span class="code px-2 base-font-color">/match/{`[color]`}</span>
+              <span class="code px-2">/match/{`[color]`}</span>
             </p>
 
             <p class="font-bold">Parameters</p>
@@ -291,8 +283,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     <td>String</td>
                     <td><span class="">Yes</span></td>
                     <td
-                      ><span
-                        class="preset-tonal-surface rounded-container px-2 base-font-color"
+                      ><span class="preset-tonal-surface rounded-container px-2"
                         >undefined</span
                       ></td
                     >
@@ -307,8 +298,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     <td>String</td>
                     <td>No</td>
                     <td
-                      ><span
-                        class="preset-tonal-surface rounded-container px-2 base-font-color"
+                      ><span class="preset-tonal-surface rounded-container px-2"
                         >undefined</span
                       ></td
                     >
@@ -323,8 +313,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     <td>String</td>
                     <td>No</td>
                     <td
-                      ><span
-                        class="preset-tonal-surface rounded-container px-2 base-font-color"
+                      ><span class="preset-tonal-surface rounded-container px-2"
                         >undefined</span
                       ></td
                     >
@@ -339,8 +328,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     <td>String</td>
                     <td>No</td>
                     <td
-                      ><span
-                        class="preset-tonal-surface rounded-container px-2 base-font-color"
+                      ><span class="preset-tonal-surface rounded-container px-2"
                         >undefined</span
                       ></td
                     >
@@ -350,31 +338,31 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     <td
                       >The maximum number of yarn colorways to include in the
                       results. Maximum is
-                      <span class="code px-2 base-font-color">500</span>.</td
+                      <span class="code px-2">500</span>.</td
                     >
                     <td>Number</td>
                     <td>No</td>
-                    <td><span class="code px-2 base-font-color">50</span></td>
+                    <td><span class="code px-2">50</span></td>
                   </tr>
                   <tr>
                     <td>offset</td>
                     <td>The starting index of the data to return.</td>
                     <td>Number</td>
                     <td>No</td>
-                    <td><span class="code px-2 base-font-color">0</span></td>
+                    <td><span class="code px-2">0</span></td>
                   </tr>
                   <tr>
                     <td>threshold</td>
                     <td
                       >The minimum percentage amount the yarn colorway must
                       match the supplied color, between
-                      <span class="code px-2 base-font-color">0</span>
+                      <span class="code px-2">0</span>
                       and
-                      <span class="code px-2 base-font-color">100</span>.</td
+                      <span class="code px-2">100</span>.</td
                     >
                     <td>Number</td>
                     <td>No</td>
-                    <td><span class="code px-2 base-font-color">75</span></td>
+                    <td><span class="code px-2">75</span></td>
                   </tr>
                 </tbody>
               </table>
@@ -382,9 +370,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <p class="font-bold">Examples</p>
 
-            <p
-              class="break-all whitespace-pre-wrap codeblock code base-font-color p-4 w-fit"
-            >
+            <p class="break-all whitespace-pre-wrap codeblock code p-4 w-fit">
               {`// get colorways matching an HTML hex code without the # hash 
   GET https://yarn-colorways.p.rapidapi.com/v1/match/665e3f 
 
@@ -501,11 +487,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <p>
               <span class="font-bold">Method</span>
-              <span class="code px-2 base-font-color">GET</span>
+              <span class="code px-2">GET</span>
             </p>
             <p>
               <span class="font-bold">URL</span>
-              <span class="code px-2 base-font-color">/colorways</span>
+              <span class="code px-2">/colorways</span>
             </p>
 
             <p class="font-bold">Parameters</p>
@@ -543,8 +529,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     <td>String</td>
                     <td>No</td>
                     <td
-                      ><span
-                        class="preset-tonal-surface rounded-container px-2 base-font-color"
+                      ><span class="preset-tonal-surface rounded-container px-2"
                         >undefined</span
                       ></td
                     >
@@ -555,8 +540,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     <td>String</td>
                     <td>No</td>
                     <td
-                      ><span
-                        class="preset-tonal-surface rounded-container px-2 base-font-color"
+                      ><span class="preset-tonal-surface rounded-container px-2"
                         >undefined</span
                       ></td
                     >
@@ -571,8 +555,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     <td>String</td>
                     <td>No</td>
                     <td
-                      ><span
-                        class="preset-tonal-surface rounded-container px-2 base-font-color"
+                      ><span class="preset-tonal-surface rounded-container px-2"
                         >undefined</span
                       ></td
                     >
@@ -587,8 +570,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     <td>String</td>
                     <td>No</td>
                     <td
-                      ><span
-                        class="preset-tonal-surface rounded-container px-2 base-font-color"
+                      ><span class="preset-tonal-surface rounded-container px-2"
                         >undefined</span
                       ></td
                     >
@@ -603,8 +585,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     <td>String</td>
                     <td>No</td>
                     <td
-                      ><span
-                        class="preset-tonal-surface rounded-container px-2 base-font-color"
+                      ><span class="preset-tonal-surface rounded-container px-2"
                         >undefined</span
                       ></td
                     >
@@ -617,43 +598,39 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     >
                     <td>Number</td>
                     <td>No</td>
-                    <td><span class="code px-2 base-font-color">50</span></td>
+                    <td><span class="code px-2">50</span></td>
                   </tr>
                   <tr>
                     <td>offset</td>
                     <td>The starting index of the data to return.</td>
                     <td>Number</td>
                     <td>No</td>
-                    <td><span class="code px-2 base-font-color">0</span></td>
+                    <td><span class="code px-2">0</span></td>
                   </tr>
                   <tr>
                     <td>sortBy</td>
                     <td
                       >The property to sort the results by. Accepted values are
-                      <span class="code px-2 base-font-color">default</span>,
-                      <span class="code px-2 base-font-color">lightness</span>,
-                      or
-                      <span class="code px-2 base-font-color">name</span>.
+                      <span class="code px-2">default</span>,
+                      <span class="code px-2">lightness</span>, or
+                      <span class="code px-2">name</span>.
                     </td>
                     <td>String</td>
                     <td>No</td>
-                    <td
-                      ><span class="code px-2 base-font-color">default</span
-                      ></td
-                    >
+                    <td><span class="code px-2">default</span></td>
                   </tr>
                   <tr>
                     <td>direction</td>
                     <td
                       >The direction to sort the results. Accepted values are
-                      <span class="code px-2 base-font-color">ASC</span>
+                      <span class="code px-2">ASC</span>
                       (ascending) or
-                      <span class="code px-2 base-font-color">DESC</span>
+                      <span class="code px-2">DESC</span>
                       (descending).
                     </td>
                     <td>String</td>
                     <td>No</td>
-                    <td><span class="code px-2 base-font-color">ASC</span></td>
+                    <td><span class="code px-2">ASC</span></td>
                   </tr>
                 </tbody>
               </table>
@@ -661,9 +638,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <p class="font-bold">Example</p>
 
-            <p
-              class="break-all whitespace-pre-wrap codeblock code base-font-color p-4 w-fit"
-            >
+            <p class="break-all whitespace-pre-wrap codeblock code p-4 w-fit">
               {`// get all colorways 
   GET https://yarn-colorways.p.rapidapi.com/v1/colorways
 
@@ -766,11 +741,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <p>
               <span class="font-bold">Method</span>
-              <span class="code px-2 base-font-color">GET</span>
+              <span class="code px-2">GET</span>
             </p>
             <p>
               <span class="font-bold">URL</span>
-              <span class="code px-2 base-font-color">/brands</span>
+              <span class="code px-2">/brands</span>
             </p>
 
             <p class="font-bold">Parameters</p>
@@ -778,9 +753,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <p class="font-bold">Example</p>
 
-            <p
-              class="break-all whitespace-pre-wrap codeblock code base-font-color p-4 w-fit"
-            >
+            <p class="break-all whitespace-pre-wrap codeblock code p-4 w-fit">
               {`// get all brands 
   GET https://yarn-colorways.p.rapidapi.com/v1/brands 
   `}
@@ -848,11 +821,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <p>
               <span class="font-bold">Method</span>
-              <span class="code px-2 base-font-color">GET</span>
+              <span class="code px-2">GET</span>
             </p>
             <p>
               <span class="font-bold">URL</span>
-              <span class="code px-2 base-font-color">/yarns</span>
+              <span class="code px-2">/yarns</span>
             </p>
 
             <p class="font-bold">Parameters</p>
@@ -884,8 +857,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     <td>String</td>
                     <td>No</td>
                     <td
-                      ><span
-                        class="preset-tonal-surface rounded-container px-2 base-font-color"
+                      ><span class="preset-tonal-surface rounded-container px-2"
                         >undefined</span
                       ></td
                     >
@@ -896,9 +868,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <p class="font-bold">Example</p>
 
-            <p
-              class="break-all whitespace-pre-wrap codeblock code base-font-color p-4 w-fit"
-            >
+            <p class="break-all whitespace-pre-wrap codeblock code p-4 w-fit">
               {`// get all yarns 
   GET https://yarn-colorways.p.rapidapi.com/v1/yarns
 
@@ -982,11 +952,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <p>
               <span class="font-bold">Method</span>
-              <span class="code px-2 base-font-color">GET</span>
+              <span class="code px-2">GET</span>
             </p>
             <p>
               <span class="font-bold">URL</span>
-              <span class="code px-2 base-font-color">/weights</span>
+              <span class="code px-2">/weights</span>
             </p>
 
             <p class="font-bold">Parameters</p>
@@ -994,9 +964,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <p class="font-bold">Example</p>
 
-            <p
-              class="break-all whitespace-pre-wrap codeblock code base-font-color p-4 w-fit"
-            >
+            <p class="break-all whitespace-pre-wrap codeblock code p-4 w-fit">
               {`// get all yarn weights 
   GET https://yarn-colorways.p.rapidapi.com/v1/weights
   `}
@@ -1143,7 +1111,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               </div>
               <p class="font-bold">Example Attribution:</p>
               <p
-                class="base-font-color w-fit p-4 preset-tonal-tertiary rounded-container break-all max-w-[90vw]"
+                class=" w-fit p-4 preset-tonal-tertiary rounded-container break-all max-w-[90vw]"
               >
                 Yarn colorways from
                 <a href={PUBLIC_BASE_URL} target="_blank" class="link"

@@ -27,8 +27,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     setupAvailableGauges();
   });
 
-  const modalStore = getModalStore();
-
   function setupAvailableGauges() {
     allGaugesAttributes.forEach((gauge) => {
       gauge.targets.forEach((target) => {
@@ -62,33 +60,26 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <div class="w-full overflow-scroll relative hide-scrollbar">
   <Segment
-    class="flex wrap gap-y-2 mt-4 mb-2"
-    active="preset-filled-secondary-500"
+    bind:value={gauges.activeGaugeId}
+    onValueChange={(e) => {
+      const id = e.target.value;
+      if (!gauges.allCreated.map((gauge) => gauge.id).includes(id)) {
+        // If the gauge is not created yet, then set it up
+        // modalStore.trigger({
+        //   type: 'confirm',
+        //   title: `Add a ${label}?`,
+        //   body: `This will add a new gauge to your project. You can delete it later.`,
+        //   response: (response) => {
+        //     if (response) gauges.addById(id);
+        //   },
+        // });
+      } else {
+        gauges.activeGaugeId = id;
+      }
+    }}
   >
     {#each gauges.allAvailable as { id, label }}
-      <Segment.Item
-        bind:group={gauges.activeGaugeId}
-        onclick={(e) => {
-          e.preventDefault();
-          const id = e.target.value;
-          if (!gauges.allCreated.map((gauge) => gauge.id).includes(id)) {
-            // If the gauge is not created yet, then set it up
-            modalStore.trigger({
-              type: 'confirm',
-              title: `Add a ${label}?`,
-              body: `This will add a new gauge to your project. You can delete it later.`,
-              response: (response) => {
-                if (response) gauges.addById(id);
-              },
-            });
-          } else {
-            gauges.activeGaugeId = id;
-          }
-        }}
-        name="gauge-{id}"
-        value={id}
-        title={label}
-      >
+      <Segment.Item value={id}>
         <span class="whitespace-nowrap">
           {#if !gauges.allCreated.map((gauge) => gauge.id).includes(id)}
             <svg

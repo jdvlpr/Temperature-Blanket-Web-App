@@ -115,9 +115,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     you're thinking of starting, but you feel overwhelmed by
                     some of these questions:
                   </p>
-                  <p
-                    class="p-4 preset-tonal-surface base-font-color rounded-container"
-                  >
+                  <p class="p-4 preset-tonal-surface rounded-container">
                     🤔
                     <span class="italic">Which colors should I pick?</span>
                     <span class="italic">How much yarn will I need?</span>
@@ -198,7 +196,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       />
                     </div>
                     <div
-                      class="preset-tonal-surface base-font-color p-4 rounded-container md:basis-1/3 h-fit"
+                      class="preset-tonal-surface p-4 rounded-container md:basis-1/3 h-fit"
                     >
                       <p>
                         🤔
@@ -269,7 +267,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       </p>
                     </div>
                     <div
-                      class="preset-tonal-surface base-font-color p-4 rounded-container md:basis-1/3 h-fit w-fit"
+                      class="preset-tonal-surface p-4 rounded-container md:basis-1/3 h-fit w-fit"
                     >
                       <p>
                         🤔
@@ -333,7 +331,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       </div>
                     </div>
                     <div
-                      class="preset-tonal-surface base-font-color p-4 rounded-container md:basis-1/3 h-fit"
+                      class="preset-tonal-surface p-4 rounded-container md:basis-1/3 h-fit"
                     >
                       <p>
                         🤔
@@ -571,7 +569,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       </p>
                     </div>
                     <div
-                      class="preset-tonal-surface base-font-color p-4 rounded-container md:basis-1/2 h-fit"
+                      class="preset-tonal-surface p-4 rounded-container md:basis-1/2 h-fit"
                     >
                       <p>
                         🤔
@@ -718,7 +716,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       </p>
                     </div>
                     <div
-                      class="preset-tonal-surface base-font-color p-4 rounded-container md:basis-1/2 h-fit"
+                      class="preset-tonal-surface p-4 rounded-container md:basis-1/2 h-fit"
                     >
                       <p>
                         🤔

@@ -47,14 +47,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </div>
       {#each SUPPORTERS?.gold as { name, href, linkText, imageSrc }}
         <div
-          class="bg-surface-200-800 base-font-color px-2 py-4 rounded-container w-full flex flex-col justify-center"
+          class="bg-surface-200-800 px-2 py-4 rounded-container w-full flex flex-col justify-center"
         >
           <Avatar
             src={imageSrc}
-            width="w-24"
+            {name}
+            size="size-24"
             rounded="rounded-[5px]"
             background="bg-none"
-            class="mx-auto flex-shrink-0"
+            classes="mx-auto flex-shrink-0"
           />
           <div class="flex flex-col justify-center items-center">
             <p class="text-xl font-bold">
@@ -91,7 +92,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </div>
       {#each SUPPORTERS.silver as { name, href, linkText }}
         <div
-          class="h-fit bg-surface-200-800 base-font-color p-4 rounded-container flex flex-col items-center"
+          class="h-fit bg-surface-200-800 p-4 rounded-container flex flex-col items-center"
         >
           <p class="text-xl font-bold">{name}</p>
           <a {href} target="_blank" class="link">{linkText}</a>
@@ -122,7 +123,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </div>
       {#each SUPPORTERS?.bronze as { name }}
         <div
-          class="h-fit bg-surface-200-800 base-font-color p-4 rounded-container flex flex-col items-center"
+          class="h-fit bg-surface-200-800 p-4 rounded-container flex flex-col items-center"
         >
           <p class="text-xl font-bold">{name}</p>
         </div>
@@ -131,22 +132,4 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </div>
 {:else}
   <p class="font-ornament my-40 text-8xl">8</p>
-{/if}
-{#if PUBLIC_KOFI_LINK}
-  <div
-    class="preset-tonal-surface rounded-container flex flex-col gap-1 items-center p-4"
-  >
-    <Avatar
-      initials=":)"
-      width="w-16"
-      rounded="rounded-full"
-      class="mx-auto flex-shrink-0 base-font-color"
-    />
-    <a
-      href="{PUBLIC_KOFI_LINK}/tiers"
-      class="btn preset-tonal-secondary underline font-bold whitespace-pre-wrap"
-      target="_blank"
-      rel="noopener noreferrer">Get your name or company listed here</a
-    >
-  </div>
 {/if}

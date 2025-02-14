@@ -289,9 +289,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </Segment>
 
             {#if !incrementMode}
-              <p
-                class="card p-4 preset-tonal-warning base-font-color text-left mt-2"
-              >
+              <p class="card p-4 preset-tonal-warning text-left mt-2">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
@@ -353,7 +351,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         {/each}
                       </select>
                     </label>
-                    <p class="card p-4 preset-tonal-success border border-success-500 text-left">
+                    <p
+                      class="card p-4 preset-tonal-success border border-success-500 text-left"
+                    >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         class="size-6 inline"
@@ -566,8 +566,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       d="M15.75 15.75V18m-7.5-6.75h.008v.008H8.25v-.008zm0 2.25h.008v.008H8.25V13.5zm0 2.25h.008v.008H8.25v-.008zm0 2.25h.008v.008H8.25V18zm2.498-6.75h.007v.008h-.007v-.008zm0 2.25h.007v.008h-.007V13.5zm0 2.25h.007v.008h-.007v-.008zm0 2.25h.007v.008h-.007V18zm2.504-6.75h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V13.5zm0 2.25h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V18zm2.498-6.75h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V13.5zM8.25 6h7.5v2.25h-7.5V6zM12 2.25c-1.892 0-3.758.11-5.593.322C5.307 2.7 4.5 3.65 4.5 4.757V19.5a2.25 2.25 0 002.25 2.25h10.5a2.25 2.25 0 002.25-2.25V4.757c0-1.108-.806-2.057-1.907-2.185A48.507 48.507 0 0012 2.25z"
                     />
                   </svg>
-                  Range Calculation Method:<span>{@html rangeExample}</span
-                  > 
+                  Range Calculation Method:<span>{@html rangeExample}</span>
                   <Tooltip>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -661,8 +660,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
             To values using these options and this range calculation method ({@html rangeExample}).
             To show the optimal From and To values, {#if isNotAutoIncrements}
               set Automatic Ranges above, then
-            {/if} uncheck Round Numbers{#if !isNotAutoIncrements} above{/if},
-            or change the Range Calculation Method.
+            {/if} uncheck Round Numbers{#if !isNotAutoIncrements}
+              above{/if}, or change the Range Calculation Method.
           </p>
         {/if}
       </div>
@@ -696,7 +695,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     <span class="text-xs">From ({unitLabel})</span>
                     <input
                       type="number"
-                      class="input text-lg base-font-color max-w-[75px]"
+                      class="input text-lg max-w-[75px]"
                       value={from}
                       onchange={(e) => {
                         const value = +e.target.value;
@@ -728,7 +727,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     <span class="text-xs">To ({unitLabel})</span>
                     <input
                       type="number"
-                      class="input text-lg base-font-color max-w-[75px]"
+                      class="input text-lg max-w-[75px]"
                       value={to}
                       onchange={(e) => {
                         const value = +e.target.value;

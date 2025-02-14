@@ -48,6 +48,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     getPalettesFromProjects,
     recordPageView,
   } from '$lib/utils';
+  import { ProgressRing } from '@skeletonlabs/skeleton-svelte';
   import { onMount } from 'svelte';
   import { slide } from 'svelte/transition';
 
@@ -98,7 +99,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div
-  class="bg-surface-100-900 base-font-color pb-2 text-center flex flex-wrap justify-center items-end gap-2"
+  class="bg-surface-100-900 pb-2 text-center flex flex-wrap justify-center items-end gap-2"
 >
   <Expand
     bind:isExpanded={filtersExpanded}
@@ -315,7 +316,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   {#if galleryPalettesState.palettes.length && hasNextPage}
     {#if isLoadingMore}
-      <div class="h-28 flex items-center"><Spinner /></div>
+      <div class="h-28 flex items-center">
+        <ProgressRing value={null} size="size-6" />
+      </div>
     {/if}
     <button
       class="btn preset-filled-primary-500 flex m-auto my-4"

@@ -32,7 +32,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     href={PUBLIC_KOFI_LINK}
     target="_blank"
     rel="noopener noreferrer"
-    class="btn preset-tonal-primary base-font-color inline-flex gap-1 justify-center items-center"
+    class="btn preset-tonal-primary inline-flex gap-1 justify-center items-center"
   >
     <span class="flex items-center justify-center gap-1">
       <svg
@@ -47,8 +47,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
         />
       </svg>
       <span class="whitespace-pre-wrap text-left"
-        >Donate{#if showlink} at <span class="link">{linkTitle}</span
-          >{/if}</span
+        >Donate {#if showlink}
+          at <span class="link">{linkTitle}</span>{/if}</span
       >
     </span>
   </a>

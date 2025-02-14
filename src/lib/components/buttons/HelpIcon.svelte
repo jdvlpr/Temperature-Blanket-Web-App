@@ -30,7 +30,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   rel="noopener noreferrer"
   target="_blank"
   {title}
-  class="base-font-color inline-flex gap-1 justify-start items-end relative underline"
+  class=" inline-flex gap-1 justify-start items-end relative underline"
   class:top-[5px]={!text}
 >
   <svg

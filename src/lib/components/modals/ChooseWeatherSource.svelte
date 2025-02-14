@@ -253,7 +253,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </div>
 
       {#if warnSearchAgain}
-        <div class="preset-tonal-warning base-font-color card p-4">
+        <div class="preset-tonal-warning card p-4">
           <p class="text-sm mb-4">
             Search again for weather data to apply weather source changes.
             {#if !locations.allValid}
