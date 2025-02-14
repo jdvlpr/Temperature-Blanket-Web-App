@@ -369,7 +369,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 <button
                   class="btn hover:preset-tonal flex items-center justify-start"
                   onclick={() =>
-                    modal.state.trigger({
+                    modal.trigger({
                       type: 'component',
                       component: {
                         ref: ChangeColor,
@@ -389,7 +389,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     })}
                   onkeydown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
-                      modal.state.trigger({
+                      modal.trigger({
                         type: 'component',
                         component: {
                           ref: ChangeColor,

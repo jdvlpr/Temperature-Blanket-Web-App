@@ -84,10 +84,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 />
 
 <button
-  class="btn preset-tonal-secondary gap-1"
+  class="btn hover:preset-tonal gap-1"
   title="Choose a Color"
   onclick={() =>
-    modal.state.trigger({
+    modal.trigger({
       type: 'component',
       component: {
         ref: ChangeColor,
@@ -124,10 +124,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 {#if monthRowsPreview.settings.borderStitches > 0}
   <button
-    class="btn preset-tonal-secondary gap-1"
+    class="btn hover:preset-tonal gap-1"
     title="Choose a Color"
     onclick={() =>
-      modal.state.trigger({
+      modal.trigger({
         type: 'component',
         component: {
           ref: ChangeColor,

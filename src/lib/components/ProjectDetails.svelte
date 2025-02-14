@@ -80,7 +80,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     />
   </div>
   {#if canRemove}
-    <button class="btn-icon preset-tonal-secondary" {onclick}>
+    <button class="btn-icon hover:preset-tonal" {onclick}>
       {@html ICONS.trash}
     </button>
   {/if}

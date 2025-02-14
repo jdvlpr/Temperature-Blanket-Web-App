@@ -30,12 +30,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ModalShell from './ModalShell.svelte';
   import { getContext } from 'svelte';
   import type { ToastContext } from '@skeletonlabs/skeleton-svelte';
+  import { modal } from '$lib/state';
 
   let { colors, updateGauge, parent } = $props();
 
   const toast: ToastContext = getContext('toast');
-
-  // const modalStore = getModalStore();
 
   let inputValue = $state('');
 
@@ -201,11 +200,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <SaveAndCloseButtons
             onSave={() => {
               updateGauge({ _colors: inputColors });
-              // modalStore.close();
+              modal.close();
             }}
             disabled={!inputColors.length}
             onClose={() => {
-              // modalStore.close();
+              modal.close();
             }}
           />
         </div>
@@ -253,7 +252,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </div>
 
         <button
-          class="btn preset-tonal-secondary gap-1"
+          class="btn hover:preset-tonal gap-1"
           onclick={() => {
             try {
               window.navigator.clipboard.writeText(colorHexes);
@@ -302,7 +301,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </div>
 
         <button
-          class="btn preset-tonal-secondary gap-1"
+          class="btn hover:preset-tonal gap-1"
           onclick={() => {
             try {
               window.navigator.clipboard.writeText(paletteCode);
@@ -355,7 +354,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <ToggleSwitch bind:checked={colorNamesAsArray} label="Array" />
         </div>
         <button
-          class="btn preset-tonal-secondary gap-1"
+          class="btn hover:preset-tonal gap-1"
           onclick={() => {
             try {
               window.navigator.clipboard.writeText(colorNames);

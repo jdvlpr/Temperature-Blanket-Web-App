@@ -18,6 +18,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
   import StickyPart from '$lib/components/modals/StickyPart.svelte';
   import Tooltip from '$lib/components/Tooltip.svelte';
+  import { modal } from '$lib/state';
   import {
     displayNumber,
     getSecondaryTargetIndexes,
@@ -35,8 +36,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     onOkay,
     parent,
   } = $props();
-
-  const modalStore = getModalStore();
 
   let _secondaryTargets = $state(secondaryTargets);
 
@@ -81,13 +80,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let secondaryTargetIndexes = $derived(
     getSecondaryTargetIndexes(_secondaryTargets),
   );
- 
+
   let squares = $derived(
     createSquares(squareSize, secondaryTargetIndexes, primaryTarget),
   );
- 
+
   let maxGridItemWidth = $derived(displayNumber((1 / squareSize) * 800));
- 
+
   function _onOkay() {
     onOkay({
       squareSize,
@@ -95,11 +94,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
       secondaryTargets: _secondaryTargets,
       primaryTargetAsBackup,
     });
-    modalStore.close();
+    modal.close();
   }
 </script>
 
-<ModalShell {parent} size="large">
+<ModalShell size="large">
   <div class="">
     <p class="italic my-2 text-center">
       Each square in your layout will use the following properties.
@@ -178,7 +177,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {/key}
       </div>
 
-      <Tooltip onclick={reset} classNames="btn preset-tonal-secondary gap-2">
+      <Tooltip onclick={reset} classNames="btn hover:preset-tonal gap-2">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
@@ -215,7 +214,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {#snippet stickyPart()}
     <StickyPart position="bottom">
       <div class="p-2">
-        <SaveAndCloseButtons onSave={_onOkay} onClose={modalStore.close} />
+        <SaveAndCloseButtons onSave={_onOkay} onClose={modal.close} />
       </div>
     </StickyPart>
   {/snippet}

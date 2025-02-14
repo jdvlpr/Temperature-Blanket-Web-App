@@ -29,11 +29,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '$lib/utils';
   import SelectYarnWeight from '../SelectYarnWeight.svelte';
   import ModalShell from './ModalShell.svelte';
-  import { isDesktop } from '$lib/state';
+  import { isDesktop, modal } from '$lib/state';
 
   let { numberOfColors, updateGauge, parent } = $props();
-
-  const modalStore = getModalStore();
 
   let debounceTimer;
   const debounce = (callback, time) => {
@@ -302,9 +300,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 return color;
               }),
             });
-            modalStore.close();
+            modal.close();
           }}
-          onClose={modalStore.close}
+          onClose={modal.close}
         />
       </div>
     </StickyPart>

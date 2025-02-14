@@ -27,7 +27,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <span class="range-input-container">
   <button
-    class="btn preset-tonal-secondary flex gap-2 justify-start items-center"
+    class="btn hover:preset-tonal flex gap-2 justify-start items-center"
     title="Adjust Range"
     onclick={(e) => {
       const wasToClicked =
@@ -38,7 +38,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           `range-${index}-to`;
 
       const focusOn = wasToClicked ? 'to' : 'from';
-      modal.state.trigger({
+      modal.trigger({
         type: 'component',
         component: {
           ref: GaugeSettings,

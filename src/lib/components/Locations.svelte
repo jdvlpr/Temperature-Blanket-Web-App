@@ -138,7 +138,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <!-- The range calculation functionality expects there to be more than one day of weather data.
      So if there's only one day of weather data the color ranges will have some NaN values. 
      This notice discourages users from using only one day of weather data. -->
-      <p class="text-sm my-2 p-2 rounded-container preset-tonal-warning border border-warning-500">
+      <p
+        class="text-sm my-2 p-2 rounded-container preset-tonal-warning border border-warning-500"
+      >
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
@@ -178,7 +180,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <div class:hidden={!locations.allValid || weather.isUserEdited}>
       {#if locations.all.length < MAXIMUM_LOCATIONS}
         <button
-          class="btn preset-tonal-secondary gap-2"
+          class="btn hover:preset-tonal gap-2"
           id="add-location-button"
           disabled={project.status.loading}
           onclick={() => locations.add()}
@@ -206,10 +208,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
 
     <button
-      class="btn preset-tonal-secondary text-left"
+      class="btn hover:preset-tonal text-left"
       disabled={project.status.loading}
       onclick={() => {
-        modal.state.trigger({
+        modal.trigger({
           type: 'component',
           component: { ref: ChooseWeatherSource },
         });

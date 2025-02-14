@@ -29,7 +29,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   title="Configure Ranges"
   fullWidth={true}
   onclick={() =>
-    modal.state.trigger({
+    modal.trigger({
       type: 'component',
       component: {
         ref: GaugeSettings,

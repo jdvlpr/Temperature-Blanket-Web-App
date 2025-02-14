@@ -17,6 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ColorPaletteEditable from '$lib/components/ColorPaletteEditable.svelte';
   import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
   import StickyPart from '$lib/components/modals/StickyPart.svelte';
+  import { modal } from '$lib/state';
   import { getSortedPalette } from '$lib/utils';
   import ModalShell from './ModalShell.svelte';
 
@@ -25,8 +26,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let _colors = $state(colors);
 
   let sortColors = $state('custom');
-
-  const modalStore = getModalStore();
 
   let key = $state(false);
 
@@ -76,7 +75,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </label>
 
       <button
-        class="btn preset-tonal-secondary"
+        class="btn hover:preset-tonal"
         onclick={() => {
           _colors.reverse();
           key = !key;
@@ -125,9 +124,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 return n;
               }),
             });
-            modalStore.close();
+            modal.close();
           }}
-          onClose={modalStore.close}
+          onClose={modal.close}
         />
       </div>
     </StickyPart>

@@ -51,7 +51,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {#snippet stickyHeader()}
     <div class="hidden lg:inline-flex mx-auto"><AppLogo /></div>
     <button
-      class="btn preset-tonal-secondary flex items-center sm:hidden"
+      class="btn hover:preset-tonal flex items-center sm:hidden"
       title="Open Navigation Sidebar"
       onclick={() => {
         // drawerStore.open({
@@ -77,7 +77,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <main class="pb-8">
       <a
         href="/blog"
-        class="btn preset-tonal-secondary gap-1 mb-2 max-lg:mx-2 max-lg:mt-2"
+        class="btn hover:preset-tonal gap-1 mb-2 max-lg:mx-2 max-lg:mt-2"
         >{@html ICONS.arrowBack} Blog</a
       >
       <div class="pb-4 text-left flex gap-4">

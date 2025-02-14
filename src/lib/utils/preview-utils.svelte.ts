@@ -31,7 +31,7 @@ export const showPreviewImageWeatherDetails = (targets) => {
   previewWeatherTargets.value = targets;
 
   if (isDesktop.current) {
-    modal.state.trigger({
+    modal.trigger({
       type: 'component',
       component: {
         ref: WeatherDetails,

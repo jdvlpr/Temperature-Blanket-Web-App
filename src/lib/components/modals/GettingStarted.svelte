@@ -21,12 +21,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Step4 from './gettingStartedSteps/Step4.svelte';
   import Step5 from './gettingStartedSteps/Step5.svelte';
 
-  interface Props {
-    parent?: any;
-  }
-
-  let { parent }: Props = $props();
-
   // Source Data
   const steps = [
     { component: Step1, label: 'Step 1' },
@@ -62,7 +56,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 </script>
 
-<!-- <ModalShell {parent} hideCloseButton={true}> -->
+<!-- <ModalShell hideCloseButton={true}> -->
 <div class="w-full">
   <!-- Stepper -->
   <div

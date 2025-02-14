@@ -21,6 +21,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { weatherState } from './+page.svelte';
   import { fetchData } from './GetWeather.svelte';
   import { weatherLocationState } from './Location.svelte';
+  import { modal } from '$lib/state';
 
   /**
    * @typedef {Object} Props
@@ -31,14 +32,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   /** @type {Props} */
   let { page = 'settings', parent } = $props();
 
-  const modalStore = getModalStore();
-
   let savedWeatherLocations = $derived(
     weatherState.weatherLocations.filter((item) => item.saved),
   );
 </script>
 
-<ModalShell {parent}>
+<ModalShell>
   <div class="m-2 text-left">
     {#if page === 'locations'}
       <div class="mt-4">
@@ -55,14 +54,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 weatherState.activeLocationID = id;
                 await fetchData();
                 weatherLocationState.validId = true;
-                modalStore.close();
+                modal.close();
               }}
               onkeydown={async (e) => {
                 if (e.key === 'Enter') {
                   weatherState.activeLocationID = id;
                   await fetchData();
                   weatherLocationState.validId = true;
-                  modalStore.close();
+                  modal.close();
                 }
               }}
             >
@@ -104,7 +103,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               </div>
               <button
                 aria-label="Remove from Locations"
-                class="btn-icon preset-tonal-secondary"
+                class="btn-icon hover:preset-tonal"
                 title="Remove from Locations"
                 onclick={(e) => {
                   e.stopPropagation();
@@ -125,7 +124,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     !weatherState.weatherLocations.filter((item) => item?.saved)
                       ?.length
                   )
-                    modalStore.close();
+                    modal.close();
                 }}
               >
                 <svg

@@ -22,20 +22,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
     parent: any;
   }
 
-  let { parent }: Props = $props();
-
-  const modalStore = getModalStore();
-
   function setModal() {
-    modalStore.close();
-    modal.state.trigger({
+    modal.trigger({
       type: 'component',
       component: { ref: GettingWeather },
     });
   }
 </script>
 
-<ModalShell {parent}>
+<ModalShell>
   <div class="flex flex-col text-center">
     <p class="text-lg font-bold">Are you sure?</p>
 

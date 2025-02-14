@@ -235,7 +235,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         class="btn hover:preset-tonal flex items-center justify-start"
         title="Choose a Color"
         onclick={() =>
-          modal.state.trigger({
+          modal.trigger({
             type: 'component',
             component: {
               ref: ChangeColor,

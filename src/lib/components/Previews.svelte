@@ -80,7 +80,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           class="flex flex-wrap gap-2 justify-center my-2 lg:mb-4 px-4 py-2 shadow-inner rounded-container preset-tonal-surface w-full"
         >
           <button
-            class="btn preset-tonal-secondary gap-1"
+            class="btn hover:preset-tonal gap-1"
             title="Download PNG"
             onclick={() => {
               downloadPreviewPNG(
@@ -97,7 +97,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <button
             class="btn preset-tonal-primary border border-primary-500 gap-2 items-center"
             onclick={() =>
-              modal.state.trigger({
+              modal.trigger({
                 type: 'component',
                 component: {
                   ref: AddToGallery,
@@ -130,7 +130,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 <a
                   href={project.gallery.href}
                   target="_blank"
-                  class="underline btn preset-tonal-secondary w-fit whitespace-pre-wrap"
+                  class="underline btn hover:preset-tonal w-fit whitespace-pre-wrap"
                   rel="noreferrer">{project.gallery.title}</a
                 >
               </p>

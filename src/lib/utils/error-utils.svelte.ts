@@ -40,7 +40,7 @@ export const displayGeoNamesErrorMessage = (message) => {
 
   text += `<p class="text-5xl mt-2 font-ornament">J</p>`;
 
-  modal.state.trigger({
+  modal.trigger({
     type: 'component',
     component: {
       ref: Alert,

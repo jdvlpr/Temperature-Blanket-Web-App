@@ -35,10 +35,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <button
-  class="btn preset-tonal-secondary gap-1"
+  class="btn hover:preset-tonal gap-1"
   title="Set {title}"
   onclick={() =>
-    modal.state.trigger({
+    modal.trigger({
       type: 'component',
       component: {
         ref: NumberInput,

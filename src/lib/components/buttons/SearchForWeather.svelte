@@ -20,14 +20,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { locations, modal, project, weather } from '$lib/state';
 
   function setModal() {
-    modal.state.trigger({
+    modal.trigger({
       type: 'component',
       component: { ref: GettingWeather },
     });
   }
 
   function setWarnCustomWeatherModal() {
-    modal.state.trigger({
+    modal.trigger({
       type: 'component',
       component: { ref: GettingWeatherWarnCustomWeather },
     });

@@ -18,18 +18,50 @@ import { MediaQuery } from 'svelte/reactivity';
 import { writable } from 'svelte/store';
 
 class ModalClass {
-  state = $state(writable(null)); // Obsolete TODO: remove
+  opened = $state(false);
 
-  open = $state({
-    leftNavigationDrawer: false,
-    browsePalettes: false,
-    gettingStarted: false,
+  drawer = $state({
+    leftNavigation: false,
   });
 
-  close = () => {
-    for (let key in this.open) {
-      this.open[key] = false;
+  options = $state({
+    showCloseButton: false,
+  });
+
+  contentComponent = $state({
+    ref: null,
+    props: null,
+  });
+
+  trigger = async ({ type, component }) => {
+    if (type === 'component') {
+      const { ref, props, options } = component;
+
+      // close the modal
+      this.opened = false;
+
+      // Delay necessary for zag to transition
+      await new Promise((resolve) => {
+        setTimeout(() => {
+          resolve(true);
+        }, 0);
+      });
+
+      // Set the the modal component and props
+      this.contentComponent = {
+        ref,
+        props,
+      };
+
+      this.options = { ...this.options, ...options };
+
+      // Open the modal
+      this.opened = true;
     }
+  };
+
+  close = () => {
+    this.opened = false;
   };
 }
 

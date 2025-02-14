@@ -21,7 +21,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
   import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
   import StickyPart from '$lib/components/modals/StickyPart.svelte';
-  import { gauges, project } from '$lib/state';
+  import { gauges, modal, project } from '$lib/state';
   import {
     displayNumber,
     getIncrement,
@@ -43,8 +43,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 
   let { onSave, index = null, focusOn = null, parent }: Props = $props();
-
-  const modalStore = getModalStore();
 
   let _gauge = $state(gauges.getSnapshot(gauges.activeGaugeId));
 
@@ -146,7 +144,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       ranges: _gauge.ranges,
       rangeOptions: _gauge.rangeOptions,
     });
-    modalStore.close();
+    modal.close();
   }
 
   function autoUpdateRanges() {
@@ -827,7 +825,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {#snippet stickyPart()}
     <StickyPart position="bottom">
       <div class="p-2 sm:px-4">
-        <SaveAndCloseButtons onSave={_onSave} onClose={modalStore.close} />
+        <SaveAndCloseButtons onSave={_onSave} onClose={modal.close} />
       </div>
     </StickyPart>
   {/snippet}

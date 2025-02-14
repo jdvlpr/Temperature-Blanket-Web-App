@@ -48,7 +48,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <main class="pb-8">
       <a
         href="/blog"
-        class="btn preset-tonal-secondary gap-1 mb-2 max-lg:mx-2 max-lg:mt-2"
+        class="btn hover:preset-tonal gap-1 mb-2 max-lg:mx-2 max-lg:mt-2"
         >{@html ICONS.arrowBack} Blog</a
       >
       <Card>

@@ -83,7 +83,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     // Check if the project needs to show a legacy notification
     // Use this to display warnings about backwards compatibility if the project is incompatible
     if (!upToDate(project.loaded.version, '0.98'))
-      modal.state.trigger({
+      modal.trigger({
         type: 'component',
         component: { ref: LegacyNotification, props: { v: 'v0.98' } },
       });
@@ -150,29 +150,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </svelte:head>
 
 {#snippet gettingStarted()}
-  <Modal
-    bind:open={modal.open.gettingStarted}
-    triggerBase="btn preset-filled-secondary-100-900 gap-2"
-    contentBase="card bg-surface-100-900 p-4 space-y-4 shadow-xl h-[80svh] lg:h-[90svh] overflow-auto max-w-screen-sm"
-    positionerPadding="p-0"
-    backdropClasses="backdrop-blur-sm"
+  <button
+    onclick={() =>
+      modal.trigger({
+        type: 'component',
+        component: { ref: GettingStarted, options: { showCloseButton: false } },
+      })}
+    class="btn preset-filled-primary-300-700 gap-2"
   >
-    {#snippet trigger()}
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        class="size-6 relative bottom-[2px]"
-        viewBox="0 0 24 24"
-        ><path
-          fill="currentColor"
-          d="M20 11h3v2h-3zM1 11h3v2H1zM13 1v3h-2V1zM4.92 3.5l2.13 2.14l-1.42 1.41L3.5 4.93zm12.03 2.13l2.12-2.13l1.43 1.43l-2.13 2.12zM12 6a6 6 0 0 1 6 6c0 2.22-1.21 4.16-3 5.2V19a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1v-1.8c-1.79-1.04-3-2.98-3-5.2a6 6 0 0 1 6-6m2 15v1a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1v-1zm-3-3h2v-2.13c1.73-.44 3-2.01 3-3.87a4 4 0 0 0-4-4a4 4 0 0 0-4 4c0 1.86 1.27 3.43 3 3.87z"
-        /></svg
-      >
-      Getting Started
-    {/snippet}
-    {#snippet content()}
-      <GettingStarted />
-    {/snippet}
-  </Modal>
+    <svg xmlns="http://www.w3.org/2000/svg" class="size-6" viewBox="0 0 24 24"
+      ><path
+        fill="currentColor"
+        d="M20 11h3v2h-3zM1 11h3v2H1zM13 1v3h-2V1zM4.92 3.5l2.13 2.14l-1.42 1.41L3.5 4.93zm12.03 2.13l2.12-2.13l1.43 1.43l-2.13 2.12zM12 6a6 6 0 0 1 6 6c0 2.22-1.21 4.16-3 5.2V19a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1v-1.8c-1.79-1.04-3-2.98-3-5.2a6 6 0 0 1 6-6m2 15v1a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1v-1zm-3-3h2v-2.13c1.73-.44 3-2.01 3-3.87a4 4 0 0 0-4-4a4 4 0 0 0-4 4c0 1.86 1.27 3.43 3 3.87z"
+      /></svg
+    >
+    Getting Started
+  </button>
 {/snippet}
 
 <AppShell pageName="">
@@ -190,7 +183,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             classNames="btn hover:preset-tonal"
             title="Save Project [Cmd]+[s] or [Ctrl]+[s]"
             onclick={() =>
-              modal.state.trigger({
+              modal.trigger({
                 type: 'component',
                 component: { ref: Menu, props: { page: 'save' } },
               })}
@@ -340,13 +333,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </Tooltip>
 
     <button
-      aria-label="Open Menu"
-      class="btn-icon hover:preset-tonal"
-      title="Open Menu [.]"
+      aria-label="menu"
+      class="btn hover:preset-tonal"
       onclick={() =>
-        modal.state.trigger({
+        modal.trigger({
           type: 'component',
-          component: { ref: Menu, props: { page: 'main' } },
+          component: {
+            ref: Menu,
+            props: { page: 'main' },
+            options: { showCloseButton: true },
+          },
         })}
     >
       <svg

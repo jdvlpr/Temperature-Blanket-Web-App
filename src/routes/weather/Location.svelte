@@ -322,7 +322,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   {#if browser && navigator.geolocation}
     <button
-      class="btn preset-tonal-secondary gap-1 flex items-center"
+      class="btn hover:preset-tonal gap-1 flex items-center"
       title="Use My Location"
       onclick={async () => {
         weatherLocationState.inputLocation.value = 'Loading...';

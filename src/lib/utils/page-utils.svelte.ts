@@ -97,10 +97,8 @@ const isRedo = (ev, style) => {
 export const handleKeyDown = (ev) => {
   // Only handle keyboard shortcuts on the main Project Planner page
 
-  // const modalStore = get(modal.state);
-
   if (
-    // modalStore[0] ||
+    modal.opened ||
     ev.target.tagName === 'INPUT' ||
     ev.target.tagName === 'TD' ||
     ev.target.tagName === 'SELECT' ||
@@ -117,13 +115,13 @@ export const handleKeyDown = (ev) => {
     // Check for global shortcuts
     switch (ev.key) {
       case 'k':
-        modal.state.trigger({
+        modal.trigger({
           type: 'component',
           component: { ref: KeyboardShortcuts },
         });
         break;
       case '.':
-        modal.state.trigger({
+        modal.trigger({
           type: 'component',
           component: { ref: Menu, props: { page: 'main' } },
         });
@@ -143,7 +141,7 @@ export const handleKeyDown = (ev) => {
         loadFromHistory({ action: 'Redo' });
       } else if ((ev.metaKey || ev.ctrlKey) && ev.key === 's') {
         ev.preventDefault();
-        modal.state.trigger({
+        modal.trigger({
           type: 'component',
           component: { ref: Menu, props: { page: 'save' } },
         });
@@ -151,7 +149,7 @@ export const handleKeyDown = (ev) => {
       // Check for section navigation shortcuts
       switch (ev.key) {
         case 'd':
-          modal.state.trigger({
+          modal.trigger({
             type: 'component',
             component: { ref: Menu, props: { page: 'download' } },
           });

@@ -17,11 +17,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ColorPalette from '$lib/components/ColorPalette.svelte';
   import SelectNumberOfColors from '$lib/components/SelectNumberOfColors.svelte';
   import { SCHEMES } from '$lib/constants';
+  import { modal } from '$lib/state';
   import chroma from 'chroma-js';
 
   let { updateGauge, numberOfColors = $bindable() } = $props();
-
-  // const modalStore = getModalStore();
 
   let currentScheme = $state('Creative');
   const schemes = [
@@ -96,7 +95,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             _colors: colors,
             _schemeId: value,
           });
-          // if ($modalStore[0]) modalStore.close();
+          modal.close();
         }}
         title="Use This Palette"
       >

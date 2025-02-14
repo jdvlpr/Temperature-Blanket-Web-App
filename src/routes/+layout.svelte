@@ -24,6 +24,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '@skeletonlabs/skeleton-svelte';
   import { getContext, onMount, type Snippet } from 'svelte';
   import '../css/main.css';
+  import ModalProvider from '$lib/components/modals/ModalProvider.svelte';
   interface Props {
     children?: Snippet;
   }
@@ -43,8 +44,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   const toast: ToastContext = getContext('toast');
 
   onMount(async () => {
-    // modal.state = getModalStore();
-
     initializeLocalStorage();
 
     // NOTE: Set window variable in order to access it inside the MS clarity function
@@ -192,6 +191,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </p>
 
 {@render children?.()}
+
+<ModalProvider />
 
 <style>
   @keyframes fade-in {

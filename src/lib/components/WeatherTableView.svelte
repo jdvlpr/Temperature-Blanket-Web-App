@@ -114,13 +114,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
               >
                 <button
                   class={[
-                    weather.grouping === 'day' && 'preset-tonal-secondary btn',
+                    weather.grouping === 'day' && 'hover:preset-tonal btn',
                     showColorDetails && 'font-bold',
                   ]}
                   disabled={weather.grouping === 'week'}
                   onclick={() => {
                     if (id === 'dayt') {
-                      modal.state.trigger({
+                      modal.trigger({
                         type: 'component',
                         component: {
                           ref: TextInput,
@@ -159,7 +159,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         },
                       });
                     } else {
-                      modal.state.trigger({
+                      modal.trigger({
                         type: 'component',
                         component: {
                           ref: NumberInput,

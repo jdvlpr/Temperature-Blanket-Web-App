@@ -22,7 +22,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
   import StickyPart from '$lib/components/modals/StickyPart.svelte';
   import { ICONS, MAXIMUM_COLORWAYS_MATCHES_FOR_IMAGES } from '$lib/constants';
-  import { defaultYarn } from '$lib/state';
+  import { defaultYarn, modal } from '$lib/state';
   import {
     getColorways,
     getTextColor,
@@ -36,8 +36,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ModalShell from './ModalShell.svelte';
 
   let { updateGauge, numberOfColors, parent } = $props();
-
-  const modalStore = getModalStore();
 
   let debounceTimer;
   const debounce = (callback, time) => {
@@ -350,7 +348,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       bind:this={input}
       onchange={handleImageChange}
     />
-    <button class="btn preset-tonal-secondary gap-1" onclick={getRandomImage}>
+    <button class="btn hover:preset-tonal gap-1" onclick={getRandomImage}>
       <svg
         xmlns="http://www.w3.org/2000/svg"
         fill="none"
@@ -369,7 +367,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       Random Image</button
     >
     <button
-      class="btn preset-tonal-secondary gap-1"
+      class="btn hover:preset-tonal gap-1"
       onclick={() => {
         if (typeof input !== 'undefined') input.click();
       }}
@@ -573,7 +571,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <div class="flex gap-2 text-warning-900-100">
           <p>{warningMessage}</p>
           <button
-            class="btn preset-tonal-secondary"
+            class="btn hover:preset-tonal"
             aria-label="close"
             onclick={() => (warningMessage = null)}
           >
@@ -596,7 +594,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {/if}
 
       <button
-        class="btn preset-tonal-secondary gap-1"
+        class="btn hover:preset-tonal gap-1"
         onclick={() => {
           if (numberOfColors < 2) numberOfColors = 2;
           matchingYarnColors = getMatchingYarnColors({
@@ -620,7 +618,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </button>
 
       <button
-        class="btn preset-tonal-secondary gap-1"
+        class="btn hover:preset-tonal gap-1"
         onclick={() => {
           matchingYarnColors = matchingYarnColors.filter(
             (color) => color.locked,
@@ -673,9 +671,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 return n;
               }),
             });
-            modalStore.close();
+            modal.close();
           }}
-          onClose={modalStore.close}
+          onClose={modal.close}
         />
       </div>
     </StickyPart>

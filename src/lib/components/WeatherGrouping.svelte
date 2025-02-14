@@ -20,19 +20,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <div class="flex flex-col items-start">
   <div class="flex gap-1 items-center">
-    <Segment class="flex-wrap gap-y-2" active="preset-filled-secondary-500">
-      <Segment.Item
-        bind:group={weather.grouping}
-        name="weatherGrouping"
-        value={'day'}
-        title="Set weather grouping to days">Daily</Segment.Item
-      >
-      <Segment.Item
-        bind:group={weather.grouping}
-        name="weatherGrouping"
-        value={'week'}
-        title="Set weather grouping to weeks">Weekly</Segment.Item
-      >
+    <Segment bind:value={weather.grouping}>
+      <Segment.Item value={'day'}>Daily</Segment.Item>
+      <Segment.Item value={'week'}>Weekly</Segment.Item>
     </Segment>
   </div>
 </div>

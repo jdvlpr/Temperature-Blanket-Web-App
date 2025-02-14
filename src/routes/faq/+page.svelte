@@ -18,6 +18,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import AppLogo from '$lib/components/AppLogo.svelte';
   import AppShell from '$lib/components/AppShell.svelte';
   import { Accordion } from '@skeletonlabs/skeleton-svelte';
+
+  const value = $state(['club']);
 </script>
 
 <svelte:head>
@@ -42,8 +44,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
           id="faq"
           class="card preset-tonal-surface p-4 flex flex-col gap-4"
         >
-          <Accordion>
-            <Accordion.Item id="weather-data-inaccurate">
+          <Accordion {value} multiple>
+            <Accordion.Item value="weather-data-inaccurate">
               {#snippet lead()}
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -60,12 +62,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   />
                 </svg>
               {/snippet}
-              {#snippet summary()}
+              {#snippet control()}
                 <p class="font-bold">
                   Why does the weather data change, or why is it inaccurate?
                 </p>
               {/snippet}
-              {#snippet content()}
+              {#snippet panel()}
                 <p>
                   For recent weather data, it may take up to a week for all the
                   latest data to be available. Older weather data may
@@ -98,7 +100,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 </p>
               {/snippet}
             </Accordion.Item>
-            <Accordion.Item id="is-there-an-app">
+            <Accordion.Item value="is-there-an-app">
               {#snippet lead()}
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -115,10 +117,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   />
                 </svg>
               {/snippet}
-              {#snippet summary()}
+              {#snippet control()}
                 <p class="font-bold">Is there an app?</p>
               {/snippet}
-              {#snippet content()}
+              {#snippet panel()}
                 <p>
                   The website is the app. It's not in the Apple or Google app
                   store, but you can
@@ -132,7 +134,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 </p>
               {/snippet}
             </Accordion.Item>
-            <Accordion.Item id="is-it-free">
+            <Accordion.Item value="is-it-free">
               {#snippet lead()}
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -149,14 +151,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   />
                 </svg>
               {/snippet}
-              {#snippet summary()}
+              {#snippet control()}
                 <p class="font-bold">Is it free?</p>
               {/snippet}
-              {#snippet content()}
+              {#snippet panel()}
                 <p>Yep!</p>
               {/snippet}
             </Accordion.Item>
-            <Accordion.Item>
+            <Accordion.Item value="how-do-the-range-values-work">
               {#snippet lead()}
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -173,19 +175,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   />
                 </svg>
               {/snippet}
-              {#snippet summary()}
+              {#snippet control()}
                 <p class="font-bold">
                   Why do the range values repeat (0 to 10, 10 to 20…), and how
                   can I make them not overlap (0 to 9, 10 to 19…)?
                 </p>
               {/snippet}
-              {#snippet content()}
+              {#snippet panel()}
                 <p>
-                  The default setting (From ≤ Range < To) will include the
-                  first number up to but not including the second number, so
-                  there’s not actually any weather value that would be in two
-                  ranges at once. To make the range values not overlap, you will
-                  need to change the
+                  The default setting will include the first number up to but
+                  not including the second number, so there’s not actually any
+                  weather value that would be in two ranges at once. To make the
+                  range values not overlap, you will need to change the
                   <a
                     class="link"
                     href="/documentation#range-calculation-methods"
@@ -206,7 +207,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 </p>
               {/snippet}
             </Accordion.Item>
-            <Accordion.Item>
+            <Accordion.Item value="yarn">
               {#snippet lead()}
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -223,12 +224,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   />
                 </svg>
               {/snippet}
-              {#snippet summary()}
+              {#snippet control()}
                 <p class="font-bold">
                   Why isn’t the yarn I want to use on this web app?
                 </p>
               {/snippet}
-              {#snippet content()}
+              {#snippet panel()}
                 <p>
                   Probably because nobody requested it yet!
                   <a
@@ -242,7 +243,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 </p>
               {/snippet}
             </Accordion.Item>
-            <Accordion.Item>
+            <Accordion.Item value="no-weather">
               {#snippet lead()}
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -259,12 +260,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   />
                 </svg>
               {/snippet}
-              {#snippet summary()}
+              {#snippet control()}
                 <p class="font-bold">
                   What if there’s no weather data for my location?
                 </p>
               {/snippet}
-              {#snippet content()}
+              {#snippet panel()}
                 If your location doesn’t have weather data, it means one of the
                 <a
                   class="link"

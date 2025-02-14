@@ -14,19 +14,25 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { controller, gauges, locations, signal, weather } from '$lib/state';
+  import {
+    controller,
+    gauges,
+    locations,
+    modal,
+    signal,
+    weather,
+  } from '$lib/state';
   // Note: the signal store is a weird necessity, investigate this
   import Spinner from '$lib/components/Spinner.svelte';
   import { delay, getOpenMeteo, goToProjectSection } from '$lib/utils';
   import ModalShell from './ModalShell.svelte';
+  import { ProgressRing } from '@skeletonlabs/skeleton-svelte';
 
   interface Props {
     parent: any;
   }
 
   let { parent }: Props = $props();
-
-  const modalStore = getModalStore();
 
   let title = $state('Searching...');
 
@@ -48,7 +54,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         weather.isFromLocalStorage = false;
         // Add the default temperature gauge
         gauges.addById('temp');
-        modalStore.close();
+        modal.close();
         goToProjectSection(2);
       })
       .catch((e) => {
@@ -179,7 +185,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <ModalShell {parent} size="small">
   <div class="flex flex-col items-center text-center w-full">
     {#if signal.value && !error}
-      <Spinner />
+      <ProgressRing value={null} size="size-12" strokeWidth="8px" />
 
       <p class="font-bold text-xl my-4">Searching for Weather Data</p>
 

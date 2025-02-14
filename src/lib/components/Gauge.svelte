@@ -122,40 +122,39 @@ If not, see <https://www.gnu.org/licenses/>. -->
       />
     </div>
 
-    <Modal
-      bind:open={modal.open.browsePalettes}
-      triggerBase="{fullscreen ? 'btn-icon' : 'btn'} hover:preset-tonal gap-2"
-      contentBase="card bg-surface-100-900 lg:p-4 space-y-4 shadow-xl h-[100svh] lg:h-[90svh] overflow-auto max-w-screen-lg"
-      positionerPadding="p-0"
-      backdropClasses="backdrop-blur-sm"
+    <button
+      class="btn hover:preset-tonal"
+      onclick={() =>
+        modal.trigger({
+          type: 'component',
+          component: {
+            ref: BrowsePalettes,
+            props: {
+              numberOfColors: gauge.numberOfColors,
+              schemeId: gauge.schemeId,
+              updateGauge,
+            },
+          },
+        })}
     >
-      {#snippet trigger()}
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke-width="1.5"
-          stroke="currentColor"
-          class={['size-6']}
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M4.098 19.902a3.75 3.75 0 005.304 0l6.401-6.402M6.75 21A3.75 3.75 0 013 17.25V4.125C3 3.504 3.504 3 4.125 3h5.25c.621 0 1.125.504 1.125 1.125v4.072M6.75 21a3.75 3.75 0 003.75-3.75V8.197M6.75 21h13.125c.621 0 1.125-.504 1.125-1.125v-5.25c0-.621-.504-1.125-1.125-1.125h-4.072M10.5 8.197l2.88-2.88c.438-.439 1.15-.439 1.59 0l3.712 3.713c.44.44.44 1.152 0 1.59l-2.879 2.88M6.75 17.25h.008v.008H6.75v-.008z"
-          />
-        </svg>
-        {#if !fullscreen}
-          Palettes
-        {/if}
-      {/snippet}
-      {#snippet content()}
-        <BrowsePalettes
-          numberOfColors={gauge.numberOfColors}
-          schemeId={gauge.schemeId}
-          {updateGauge}
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke-width="1.5"
+        stroke="currentColor"
+        class={['size-6']}
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M4.098 19.902a3.75 3.75 0 005.304 0l6.401-6.402M6.75 21A3.75 3.75 0 013 17.25V4.125C3 3.504 3.504 3 4.125 3h5.25c.621 0 1.125.504 1.125 1.125v4.072M6.75 21a3.75 3.75 0 003.75-3.75V8.197M6.75 21h13.125c.621 0 1.125-.504 1.125-1.125v-5.25c0-.621-.504-1.125-1.125-1.125h-4.072M10.5 8.197l2.88-2.88c.438-.439 1.15-.439 1.59 0l3.712 3.713c.44.44.44 1.152 0 1.59l-2.879 2.88M6.75 17.25h.008v.008H6.75v-.008z"
         />
-      {/snippet}
-    </Modal>
+      </svg>
+      {#if !fullscreen}
+        Palettes
+      {/if}
+    </button>
 
     <button
       class={[
@@ -164,7 +163,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       ]}
       title="Choose Yarn Colorways, Filtered by Brand and Yarn"
       onclick={() =>
-        modal.state.trigger({
+        modal.trigger({
           type: 'component',
           component: {
             ref: ChooseColorways,
@@ -201,7 +200,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       ]}
       title="Get Palette from Image"
       onclick={() =>
-        modal.state.trigger({
+        modal.trigger({
           type: 'component',
           component: {
             ref: GetPaletteFromImage,
@@ -237,7 +236,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       ]}
       title="Generate Random Colors"
       onclick={() =>
-        modal.state.trigger({
+        modal.trigger({
           type: 'component',
           component: {
             ref: RandomPalette,
@@ -273,7 +272,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       ]}
       title="Load Colors or Get a Palette Code to Share"
       onclick={() =>
-        modal.state.trigger({
+        modal.trigger({
           type: 'component',
           component: {
             ref: ImportExportPalette,
@@ -310,7 +309,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       ]}
       title="Sort Colors"
       onclick={() =>
-        modal.state.trigger({
+        modal.trigger({
           type: 'component',
           component: {
             ref: SortPalette,

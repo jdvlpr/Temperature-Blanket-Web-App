@@ -318,10 +318,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <Share href={shareableURL} />
       <button
         aria-label="Open Settings"
-        class="btn-icon preset-tonal-secondary"
+        class="btn-icon hover:preset-tonal"
         title="Open Settings"
         onclick={() =>
-          modal.state.trigger({
+          modal.trigger({
             type: 'component',
             component: {
               ref: Menu,
@@ -354,10 +354,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {#if weatherState.weatherLocations.filter((item) => item?.saved).length}
         <button
           aria-label="Open Locations"
-          class="btn-icon preset-tonal-secondary"
+          class="btn-icon hover:preset-tonal"
           title="Open Locations"
           onclick={() =>
-            modal.state.trigger({
+            modal.trigger({
               type: 'component',
               component: {
                 ref: Menu,
@@ -417,7 +417,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       {#if !weatherState.weatherLocations.find((item) => item.id === weatherState.activeLocationID)?.saved}
                         <button
                           in:fade
-                          class="btn preset-tonal-secondary"
+                          class="btn hover:preset-tonal"
                           title="Add to Locations"
                           onclick={async () => {
                             weatherState.weatherLocations.map((item) => {
@@ -464,9 +464,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       {:else if weatherState.weatherLocations.filter((item) => item?.saved)?.length}
                         <button
                           in:fade
-                          class="btn preset-tonal-secondary"
+                          class="btn hover:preset-tonal"
                           onclick={() =>
-                            modal.state.trigger({
+                            modal.trigger({
                               type: 'component',
                               component: {
                                 ref: Menu,

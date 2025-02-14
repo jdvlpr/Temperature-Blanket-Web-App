@@ -17,8 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
   import ModalShell from './ModalShell.svelte';
   import { displayNumber } from '$lib/utils';
-
-  const modalStore = getModalStore();
+  import { modal } from '$lib/state';
 
   interface Props {
     value: number;
@@ -46,7 +45,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   function _onOkay() {
     onOkay(value);
-    modalStore.close();
+    modal.close();
   }
 
   function getMaxValue(value: number) {
@@ -90,30 +89,30 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {/if}
       <div class="flex flex-wrap gap-2 justify-center items-center">
         <button
-          class="btn-icon preset-tonal-secondary"
+          class="btn-icon hover:preset-tonal"
           onclick={() => (value = displayNumber(value - 20))}
           disabled={noMinMax ? false : value < min + 20}>-20</button
         >
         <button
-          class="btn-icon preset-tonal-secondary"
+          class="btn-icon hover:preset-tonal"
           onclick={() => (value = displayNumber(value - 5))}
           disabled={noMinMax ? false : value < min + 5}>-5</button
         >
         <button
-          class="btn-icon preset-tonal-secondary"
+          class="btn-icon hover:preset-tonal"
           onclick={() => (value = displayNumber(value - 1))}
           disabled={noMinMax ? false : value < min + 1}>-1</button
         >
         <button
-          class="btn-icon preset-tonal-secondary"
+          class="btn-icon hover:preset-tonal"
           onclick={() => (value = displayNumber(value + 1))}>+1</button
         >
         <button
-          class="btn-icon preset-tonal-secondary"
+          class="btn-icon hover:preset-tonal"
           onclick={() => (value = displayNumber(value + 5))}>+5</button
         >
         <button
-          class="btn-icon preset-tonal-secondary"
+          class="btn-icon hover:preset-tonal"
           onclick={() => (value = displayNumber(value + 20))}>+20</button
         >
       </div>
@@ -123,7 +122,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <SaveAndCloseButtons
         onSave={_onOkay}
         disabled={isNaN(value) || noMinMax ? false : value < min}
-        onClose={modalStore.close}
+        onClose={modal.close}
       />
     </div>
   </div>

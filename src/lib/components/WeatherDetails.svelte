@@ -17,7 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import WeatherItem from '$lib/components/WeatherItem.svelte';
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
   import { UNIT_LABELS } from '$lib/constants';
-  import { gauges, locations, project, weather } from '$lib/state';
+  import { gauges, locations, modal, project, weather } from '$lib/state';
   import {
     capitalizeFirstLetter,
     convertTime,
@@ -28,8 +28,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '$lib/utils';
   import { getTextColor } from '$lib/utils/color-utils';
   import ModalShell from './modals/ModalShell.svelte';
-
-  const modalStore = getModalStore();
 
   let {
     data = weather.data || [],
@@ -60,8 +58,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let isRecentDate = $derived(getIsRecentDate(day?.date));
 </script>
 
-{#if $modalStore[0]}
-  <ModalShell {parent}>
+{#if modal.opened}
+  <ModalShell>
     {@render content()}
   </ModalShell>
 {:else}
@@ -87,7 +85,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         aria-label="Show Previous {capitalizeFirstLetter(
           weather.grouping,
         )}'s Weather"
-        class="prev scale-125 btn-icon preset-tonal-secondary"
+        class="prev scale-125 btn-icon hover:preset-tonal"
         onclick={() => weather.currentIndex--}
         disabled={weather.currentIndex === 0}
         title="Show Previous {capitalizeFirstLetter(
@@ -127,7 +125,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         aria-label="Show Next {capitalizeFirstLetter(
           weather.grouping,
         )}'s Weather"
-        class="next scale-125 btn-icon preset-tonal-secondary"
+        class="next scale-125 btn-icon hover:preset-tonal"
         onclick={() => weather.currentIndex++}
         disabled={weather.currentIndex === data?.length - 1}
         title="Show Next {capitalizeFirstLetter(weather.grouping)}'s Weather"

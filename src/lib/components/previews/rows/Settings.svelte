@@ -90,10 +90,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 {#if rowsPreview.countOfAdditionalStitches}
   <button
-    class="btn preset-tonal-secondary gap-1"
+    class="btn hover:preset-tonal gap-1"
     title="Choose a Color"
     onclick={() =>
-      modal.state.trigger({
+      modal.trigger({
         type: 'component',
         component: {
           ref: ChangeColor,

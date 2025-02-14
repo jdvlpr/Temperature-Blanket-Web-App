@@ -1,10 +1,9 @@
 <script lang="ts">
-  import { isDesktop } from '$lib/state';
-  import CloseButton from './CloseButton.svelte';
+  import { modal } from '$lib/state';
   import { onMount, type Snippet } from 'svelte';
+  import CloseButton from './CloseButton.svelte';
 
   interface Props {
-    parent: any;
     size?: 'large' | 'small';
     preventDefaultFocus?: boolean; // used when the yarn grid select component is inside the modal. Focusing on the first element (the default modal behavior) causes the yarn select element to render its' menu in the wrong position, because of the transition time.
     hideCloseButton?: boolean;
@@ -14,18 +13,12 @@
   }
 
   let {
-    parent,
-    size,
     preventDefaultFocus,
     hideCloseButton = false,
     preventScroll = false,
     children,
     stickyPart,
   }: Props = $props();
-
-  let width = $state(parent?.width);
-
-  const modalStore = getModalStore();
 
   let shellElement: HTMLElement;
 
@@ -34,13 +27,6 @@
     return () => {
       document.body.style.overflow = 'auto';
     };
-  });
-
-  $effect(() => {
-    if (!isDesktop.current) width = 'w-[100vw]';
-    else if (size === 'large') width = 'w-modal-wide';
-    else if (size === 'small') width = 'w-modal-slim';
-    else width = parent?.width || 'w-modal';
   });
 
   $effect(() => {
@@ -56,22 +42,14 @@
   tabindex="0"
   class={[
     'max-h-[97svh] overflow-auto focus:!outline-none cursor-default',
-    parent?.background,
-    parent?.rounded,
-    parent?.position,
-    parent?.height,
-    parent?.spacing,
-    parent?.shadow,
-    width,
-    !stickyPart && parent?.padding,
     preventScroll && 'overflow-hidden',
   ]}
 >
   <div class={stickyPart ? 'p-4' : ''}>
-    {#if !hideCloseButton && $modalStore[0] && !stickyPart}
+    {#if !hideCloseButton && !stickyPart}
       <CloseButton
         onClose={() => {
-          if ($modalStore[0]) modalStore.close();
+          modal.close();
         }}
       />
     {/if}

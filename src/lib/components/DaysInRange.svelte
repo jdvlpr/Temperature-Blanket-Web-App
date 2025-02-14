@@ -22,8 +22,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     GaugeSettingsType,
   } from '$lib/types';
   import { getDaysInRange, getDaysPercent, pluralize } from '$lib/utils';
-  const modalStore = getModalStore();
-  let isModal = $derived(!!$modalStore[0]);
+  let isModal = modal.opened;
 
   type Props = {
     range: GaugeRange;
@@ -59,9 +58,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <button
         type="button"
         disabled={!daysInRange?.length}
-        class="btn preset-tonal-secondary"
+        class="btn hover:preset-tonal"
         onclick={() =>
-          modal.state.trigger({
+          modal.trigger({
             type: 'component',
             component: {
               ref: WeatherTable,

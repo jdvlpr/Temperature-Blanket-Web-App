@@ -14,7 +14,13 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import { allGaugesAttributes, gauges, project, weather } from '$lib/state';
+  import {
+    allGaugesAttributes,
+    gauges,
+    modal,
+    project,
+    weather,
+  } from '$lib/state';
   import { downloadPDF } from '$lib/utils';
   import { onMount } from 'svelte';
   import Gauge from './Gauge.svelte';
@@ -65,7 +71,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       const id = e.target.value;
       if (!gauges.allCreated.map((gauge) => gauge.id).includes(id)) {
         // If the gauge is not created yet, then set it up
-        // modalStore.trigger({
+        // modal.trigger({
         //   type: 'confirm',
         //   title: `Add a ${label}?`,
         //   body: `This will add a new gauge to your project. You can delete it later.`,
@@ -108,7 +114,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <!-- If this is not the default temperature gauge and we're on the project planner page -->
     <div class="w-full flex justify-center mb-4 sm:mb-6">
       <button
-        class="btn preset-tonal-secondary justify-start gap-1 top-2 relative max-sm:mb-2"
+        class="btn hover:preset-tonal justify-start gap-1 top-2 relative max-sm:mb-2"
         title="Delete {gauges.activeGauge.label}"
         onclick={() => {
           gauges.remove(gauges.activeGauge.id);
@@ -148,7 +154,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   class="flex flex-wrap gap-2 justify-center mt-4 mb-2 lg:mb-4 px-4 py-2 shadow-inner rounded-container preset-tonal-surface"
 >
   <button
-    class="btn preset-tonal-secondary whitespace-pre-wrap"
+    class="btn hover:preset-tonal whitespace-pre-wrap"
     onclick={downloadPDF}
     title="Download PDF File"
   >

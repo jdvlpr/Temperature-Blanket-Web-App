@@ -516,7 +516,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                                   </div>
                                   {#if affiliate_variant_href}
                                     <a
-                                      class="btn preset-tonal-secondary flex flex-wrap justify-start items-center"
+                                      class="btn hover:preset-tonal flex flex-wrap justify-start items-center"
                                       href={affiliate_variant_href}
                                       target="_blank"
                                       rel="noreferrer nofollow"

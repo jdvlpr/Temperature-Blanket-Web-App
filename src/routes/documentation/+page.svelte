@@ -55,7 +55,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <AppLogo />
     </div>
     <button
-      class="btn preset-tonal-secondary flex items-center sm:hidden"
+      class="btn hover:preset-tonal flex items-center sm:hidden"
       title="Open Navigation Sidebar"
       onclick={() => {
         // drawerStore.open({

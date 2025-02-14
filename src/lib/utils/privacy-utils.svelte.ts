@@ -38,6 +38,8 @@ export const privacy = {
 
     const toast: ToastContext = getContext('toast');
 
+    console.log({ toast });
+
     // Event listener for when consent is given to Microsoft Clarity
     // If consent is given, it sets the `consentToMSClarityCookies` store to true
     window.addEventListener('consentToMSClarity', () => {
@@ -73,8 +75,8 @@ export const privacy = {
     // See https://learn.microsoft.com/en-us/clarity/setup-and-installation/cookie-list
     if (!this.get_cookie('_clck') || !this.get_cookie('_clsk')) {
       if (!preferences.value.disableToastAnalytics) {
-        toastStore.trigger({
-          message: `
+        toast.create({
+          description: `
       <div class="flex flex-col gap-2 justify-start items-start">
           <label class="relative inline-flex items-center cursor-pointer gap-2">
             <div class="relative">
@@ -96,33 +98,33 @@ export const privacy = {
           </label>
       </div>
       `,
-          hideDismiss: true,
-          classes: 'flex max-sm:flex-col max-sm:gap-2 max-sm:items-end',
-          background: 'bg-surface-50-950',
-          timeout: 31556952000, // one year
-          action: {
-            label: 'Save',
-            response: () => {},
-          },
-          callback: (response) => {
-            if (response.status !== 'closed') return;
-            const dontShowAgainElement = document.getElementById(
-              'cookies-dont-show-again',
-            );
-            if (dontShowAgainElement?.checked)
-              preferences.value.disableToastAnalytics = true;
-            else preferences.value.disableToastAnalytics = false;
+          // hideDismiss: true,
+          // classes: 'flex max-sm:flex-col max-sm:gap-2 max-sm:items-end',
+          // background: 'bg-surface-50-950',
+          // timeout: 31556952000, // one year
+          // action: {
+          //   label: 'Save',
+          //   response: () => {},
+          // },
+          // callback: (response) => {
+          //   if (response.status !== 'closed') return;
+          //   const dontShowAgainElement = document.getElementById(
+          //     'cookies-dont-show-again',
+          //   );
+          //   if (dontShowAgainElement?.checked)
+          //     preferences.value.disableToastAnalytics = true;
+          //   else preferences.value.disableToastAnalytics = false;
 
-            const consentToggleElement = document.getElementById(
-              'clarity-consent-toggle',
-            );
+          //   const consentToggleElement = document.getElementById(
+          //     'clarity-consent-toggle',
+          //   );
 
-            let consentEvent;
-            if (consentToggleElement?.checked)
-              consentEvent = new CustomEvent('consentToMSClarity');
-            else consentEvent = new CustomEvent('removeConsentToMSClarity');
-            window.dispatchEvent(consentEvent);
-          },
+          //   let consentEvent;
+          //   if (consentToggleElement?.checked)
+          //     consentEvent = new CustomEvent('consentToMSClarity');
+          //   else consentEvent = new CustomEvent('removeConsentToMSClarity');
+          //   window.dispatchEvent(consentEvent);
+          // },
         });
       }
     } else {

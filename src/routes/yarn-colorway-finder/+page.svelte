@@ -658,7 +658,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         {#if affiliate_variant_href}
                           <a
                             aria-label="Buy this yarn colorway"
-                            class="btn-icon preset-tonal-secondary"
+                            class="btn-icon hover:preset-tonal"
                             title="Buy this yarn colorway"
                             href={affiliate_variant_href}
                             target="_blank"
@@ -681,7 +681,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         {:else}
                           <a
                             aria-label="Open link to this yarn colorway"
-                            class="btn-icon preset-tonal-secondary"
+                            class="btn-icon hover:preset-tonal"
                             href={variant_href}
                             target="_blank"
                             rel="noopener noreferrer"

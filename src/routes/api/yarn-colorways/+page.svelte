@@ -47,7 +47,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <AppLogo />
     </div>
     <button
-      class="btn preset-tonal-secondary flex items-center sm:hidden"
+      class="btn hover:preset-tonal flex items-center sm:hidden"
       title="Open Navigation Sidebar"
       onclick={() => {
         // drawerStore.open({
@@ -86,7 +86,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               Yarn Colorways API
             </h2>
             <section
-              class="gap-2 flex flex-col mt-2 lg:mt-0 card preset-tonal-secondary p-4 rounded-container"
+              class="gap-2 flex flex-col mt-2 lg:mt-0 card hover:preset-tonal p-4 rounded-container"
             >
               <p>Find yarn colorways by HTML hex color code.</p>
 

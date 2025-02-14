@@ -19,6 +19,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import YarnGridSelect from '$lib/components/modals/YarnGridSelect.svelte';
   import chroma from 'chroma-js';
   import ModalShell from './ModalShell.svelte';
+  import { modal } from '$lib/state';
 
   interface Props {
     index?: any;
@@ -31,7 +32,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     variant_href: any;
     affiliate_variant_href: any;
     onChangeColor: any;
-    parent: any;
   }
 
   let {
@@ -45,14 +45,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     variant_href = $bindable(),
     affiliate_variant_href = $bindable(),
     onChangeColor,
-    parent,
   }: Props = $props();
 
-  const modalStore = getModalStore();
-
   let container: HTMLElement = $state();
-
-  if (parent) parent.width = 'w-modal-wide';
 
   let valid = $state(true);
   let inputTypeColorValue = $state(hex);
@@ -128,18 +123,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
         affiliate_variant_href,
       });
     else onChangeColor({ hex });
-    modalStore.close();
   }
 
   let currentColor = $derived({ hex });
 </script>
 
-<ModalShell {parent} size="large" preventDefaultFocus={true}>
+<ModalShell size="large" preventDefaultFocus={true}>
   <div class="" bind:this={container}>
     <p class="my-2 text-center text-xs">Color {title}</p>
     {#if affiliate_variant_href}
       <a
-        class="btn preset-tonal-secondary flex flex-wrap justify-center items-center gap-2 underline w-fit mx-auto"
+        class="btn hover:preset-tonal flex flex-wrap justify-center items-center gap-2 underline w-fit mx-auto"
         href={affiliate_variant_href}
         target="_blank"
         rel="noreferrer nofollow"
@@ -175,7 +169,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </a>
     {:else if variant_href}
       <a
-        class="btn preset-tonal-secondary flex flex-wrap justify-center items-center gap-2 underline w-fit mx-auto"
+        class="btn hover:preset-tonal flex flex-wrap justify-center items-center gap-2 underline w-fit mx-auto"
         href={variant_href}
         target="_blank"
         rel="noreferrer nofollow"
@@ -267,7 +261,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {/if}
         <SaveAndCloseButtons
           onSave={_onOkay}
-          onClose={modalStore.close}
+          onClose={modal.close}
           disabled={!valid}
         />
       </div>

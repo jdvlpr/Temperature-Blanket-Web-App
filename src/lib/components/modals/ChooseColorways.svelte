@@ -18,6 +18,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
   import StickyPart from '$lib/components/modals/StickyPart.svelte';
   import YarnGridSelect from '$lib/components/modals/YarnGridSelect.svelte';
+  import { modal } from '$lib/state';
   import { pluralize } from '$lib/utils';
   import ModalShell from './ModalShell.svelte';
 
@@ -27,8 +28,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 
   let { updateGauge, parent }: Props = $props();
-
-  const modalStore = getModalStore();
 
   let selectedColors: object[] = $state([]);
 
@@ -46,7 +45,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 </script>
 
-<ModalShell {parent} size="large" preventDefaultFocus={true}>
+<ModalShell size="large" preventDefaultFocus={true}>
   <div bind:this={container}>
     <YarnGridSelect
       bind:selectedColors
@@ -80,10 +79,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
             updateGauge({
               _colors: selectedColors,
             });
-            if ($modalStore[0]) modalStore.close();
+            modal.close();
           }}
           onClose={() => {
-            if ($modalStore[0]) modalStore.close();
+            modal.close();
           }}
           disabled={!selectedColors.length}
         />

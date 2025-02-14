@@ -66,18 +66,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </p>
         <div class="text-left flex flex-col gap-2">
           <p>
-            • I am submitting this project's location and dates, gauge and
-            yarn information, URL, preview image, and the current date to be
+            • I am submitting this project's location and dates, gauge and yarn
+            information, URL, preview image, and the current date to be
             displayed on a public gallery page. No personal information will be
             sent.
           </p>
           <p>
-            • This project's gallery page cannot be edited once it is
-            submitted.
+            • This project's gallery page cannot be edited once it is submitted.
           </p>
           <p>
-            • Submissions which appear to be spam or abuse of this service
-            may be removed.
+            • Submissions which appear to be spam or abuse of this service may
+            be removed.
           </p>
           <p>• Gallery pages are subject to change.</p>
         </div>
@@ -107,7 +106,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <a
         href={project.gallery.href}
         target="_blank"
-        class="link btn preset-tonal-secondary w-fit whitespace-pre-wrap"
+        class="link btn hover:preset-tonal w-fit whitespace-pre-wrap"
         rel="noreferrer">{project.gallery.title}</a
       >
     </p>

@@ -165,9 +165,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <WeatherGrouping />
 
     <button
-      class="btn preset-tonal-secondary w-fit"
+      class="btn hover:preset-tonal w-fit"
       onclick={() => {
-        modal.state.trigger({
+        modal.trigger({
           type: 'component',
           component: {
             ref: ChooseWeatherSource,
@@ -528,7 +528,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     <button
                       class="link"
                       onclick={() => {
-                        modal.state.trigger({
+                        modal.trigger({
                           type: 'component',
                           component: {
                             ref: ChooseWeatherSource,

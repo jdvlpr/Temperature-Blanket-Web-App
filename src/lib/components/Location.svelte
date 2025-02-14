@@ -284,7 +284,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {#if locations.all?.length > 1}
     <div class="justify-self-end">
       <Tooltip placement="bottom" minWidth="250px">
-        <div class="btn-icon preset-tonal-secondary">
+        <div class="btn-icon hover:preset-tonal">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -303,7 +303,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {#snippet tooltip()}
           <div class="flex items-center gap-2 justify-center">
             <button
-              class="btn preset-tonal-secondary"
+              class="btn hover:preset-tonal"
               onclick={() => {
                 locations.remove(location.uuid);
                 weather.rawData = [];

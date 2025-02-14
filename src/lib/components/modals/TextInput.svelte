@@ -15,6 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
+  import { modal } from '$lib/state';
   import ModalShell from './ModalShell.svelte';
 
   interface Props {
@@ -28,15 +29,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   const id = 'text-input-daytime';
 
-  const modalStore = getModalStore();
-
   function _onOkay() {
     onOkay(value);
-    modalStore.close();
+    modal.close();
   }
 </script>
 
-<ModalShell {parent} size="small">
+<ModalShell size="small">
   <div
     class="inline-flex flex-col items-center mx-auto justify-center w-full text-center"
   >
@@ -59,7 +58,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <div class="my-4">
         <SaveAndCloseButtons
           onSave={_onOkay}
-          onClose={modalStore.close}
+          onClose={modal.close}
           disabled={!value.includes(':')}
         />
       </div>

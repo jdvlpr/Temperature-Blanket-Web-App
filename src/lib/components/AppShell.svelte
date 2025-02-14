@@ -59,7 +59,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     >
       <div class="lg:hidden">
         <Modal
-          bind:open={modal.open.leftNavigationDrawer}
+          bind:open={modal.drawer.leftNavigation}
           triggerBase="{pageName ? 'btn' : 'btn-icon'} hover:preset-tonal my-2"
           contentBase="bg-surface-100-900 p-4 space-y-4 shadow-xl w-fit h-screen"
           positionerJustify="justify-start"
