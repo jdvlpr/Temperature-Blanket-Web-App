@@ -15,11 +15,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import { page } from '$app/state';
-  import { Accordion } from '@skeletonlabs/skeleton-svelte';
-  import AppLogo from '$lib/components/AppLogo.svelte';
-  import ThemeSwitcher from '$lib/components/ThemeSwitcher.svelte';
   import { PUBLIC_GITHUB_LINK } from '$env/static/public';
+  import ThemeSwitcher from '$lib/components/ThemeSwitcher.svelte';
   import { ICONS } from '$lib/constants';
+  import { Accordion } from '@skeletonlabs/skeleton-svelte';
 
   let value = $state();
 
