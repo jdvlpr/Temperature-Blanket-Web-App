@@ -19,6 +19,8 @@ import { writable } from 'svelte/store';
 
 export const modal = $state({ state: writable(null) });
 
+export const leftDrawerState = $state({ value: false });
+
 export const consentToMSClarityCookies = $state({ value: false });
 
 export const showNavigationSideBar = $state({ value: true });

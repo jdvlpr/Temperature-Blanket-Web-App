@@ -18,7 +18,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import AppLogo from '$lib/components/AppLogo.svelte';
   import AppShell from '$lib/components/AppShell.svelte';
   import { MAXIMUM_DAYS_PER_LOCATION, MAXIMUM_LOCATIONS } from '$lib/constants';
-  const drawerStore = getDrawerStore();
+  // const drawerStore = getDrawerStore();
 
   let checkIcon = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 inline text-success-800-100-token">
   <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -57,11 +57,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <button
       class="btn preset-tonal-secondary flex items-center sm:hidden"
       title="Open Navigation Sidebar"
-      onclick={() =>
-        drawerStore.open({
-          id: 'documentation',
-          position: 'right',
-        })}
+      onclick={() => {
+        // drawerStore.open({
+        //   id: 'documentation',
+        //   position: 'right',
+        // });
+      }}
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -502,35 +503,43 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   href="https://meteostat.net/"
                   target="_blank">Meteostat</a
                 >
-                – The <a
+                – The
+                <a
                   class="link"
                   rel="noreferrer noopener"
                   href="https://meteostat.net/"
                   target="_blank">Meteostat</a
-                > platform provides access to open data from thousands of
-                weather stations world-wide. Measurements from the nearest
-                stations are combined to produce an interpolated result. Weather
-                data from <a
+                >
+                platform provides access to open data from thousands of weather stations
+                world-wide. Measurements from the nearest stations are combined to
+                produce an interpolated result. Weather data from
+                <a
                   class="link"
                   rel="noreferrer noopener"
                   href="https://meteostat.net/"
                   target="_blank">Meteostat</a
-                > is licensed under <a
+                >
+                is licensed under
+                <a
                   class="link"
                   rel="noreferrer noopener"
                   href="https://creativecommons.org/licenses/by-nc/4.0/"
                   target="_blank">CC BY-NC 4.0</a
-                >, with raw data provided by <a
+                >, with raw data provided by
+                <a
                   class="link"
                   rel="noreferrer noopener"
                   href="https://www.noaa.gov/"
                   target="_blank">NOAA</a
-                >, <a
+                >,
+                <a
                   class="link"
                   rel="noreferrer noopener"
                   href="https://www.dwd.de/"
                   target="_blank">DWD</a
-                > and <a
+                >
+                and
+                <a
                   class="link"
                   rel="noreferrer noopener"
                   href="https://dev.meteostat.net/docs/sources.html"
@@ -544,28 +553,35 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   href="https://open-meteo.com/"
                   target="_blank">Open-Meteo</a
                 >
-                – The <a
+                – The
+                <a
                   class="link"
                   rel="noreferrer noopener"
                   href="https://open-meteo.com/"
                   target="_blank">Open-Meteo</a
-                > database contains more than 60 years of weather data from
-                a variety of open sources, including data from the <a
+                >
+                database contains more than 60 years of weather data from a variety
+                of open sources, including data from the
+                <a
                   class="link"
                   rel="noreferrer noopener"
                   href="https://cds.climate.copernicus.eu/cdsapp#!/dataset/reanalysis-era5-land?tab=overview"
                   target="_blank">Copernicus Program</a
-                >. Weather data from <a
+                >. Weather data from
+                <a
                   class="link"
                   rel="noreferrer noopener"
                   href="https://www.open-meteo.com/"
                   target="_blank">Open-Meteo</a
-                > is licensed under <a
+                >
+                is licensed under
+                <a
                   class="link"
                   rel="noreferrer noopener"
                   href="https://creativecommons.org/licenses/by/4.0/"
                   target="_blank">Attribution 4.0 International (CC BY 4.0)</a
-                >, and includes data from the <a
+                >, and includes data from the
+                <a
                   class="link"
                   rel="noreferrer noopener"
                   href="https://cds.climate.copernicus.eu/cdsapp#!/dataset/reanalysis-era5-land?tab=overview"
@@ -579,7 +595,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 rel="noreferrer noopener"
                 href="https://github.com/mourner/suncalc"
                 target="_blank">SunCalc</a
-              > licensed under <a
+              >
+              licensed under
+              <a
                 class="link"
                 rel="noreferrer noopener"
                 href="https://choosealicense.com/licenses/bsd-2-clause/"
@@ -1062,8 +1080,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   ><tr
                     ><td class="p-2"
                       >Include From, don’t include To (default)</td
-                    ><td class="p-2">From ≥ Range > To</td><td
-                      class="p-2">13 ✅<br />12.5 ✅<br />12 ❌</td
+                    ><td class="p-2">From ≥ Range > To</td><td class="p-2"
+                      >13 ✅<br />12.5 ✅<br />12 ❌</td
                     ></tr
                   ><tr
                     ><td class="p-2">Include To, don’t include From</td><td
@@ -1176,18 +1194,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
               </li>
               <li>
                 <span class="font-bold">Schemes</span>
-                – Color schemes based on <a
+                – Color schemes based on
+                <a
                   class="link"
                   rel="noreferrer noopener"
                   href="https://ColorBrewer2.org"
                   target="_blank">ColorBrewer2.org</a
-                > by Cynthia A. Brewer, Geography, Pennsylvania State
-                University, licenced under <a
+                >
+                by Cynthia A. Brewer, Geography, Pennsylvania State University, licenced
+                under
+                <a
                   class="link"
                   rel="noreferrer noopener"
                   href="https://www.apache.org/licenses/LICENSE-2.0"
                   target="_blank">Apache 2</a
-                >. 
+                >.
               </li>
             </ul>
           </section>
@@ -1360,10 +1381,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <li>
                 <span class="font-bold">Daytime Rows</span>
                 – Each row is split according to the duration of sunlight that day.
-                Daytime stitches = d × r ∕ 24. Night stitches = <strong
-                  >r</strong
-                > − Daytime stitches. d = Daytime (time from the day’s
-                sunrise to sunset in hours). r is the total stitches
+                Daytime stitches = d × r ∕ 24. Night stitches =
+                <strong>r</strong> − Daytime stitches. d = Daytime (time from
+                the day’s sunrise to sunset in hours). r is the total stitches
                 per row. 24 is the number of hours in a day.
               </li>
               <li>

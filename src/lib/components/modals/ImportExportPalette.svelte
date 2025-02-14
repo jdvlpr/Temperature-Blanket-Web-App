@@ -13,7 +13,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script>
+<script lang="ts">
   import { PUBLIC_COOLORS_LINK } from '$env/static/public';
   import ColorPalette from '$lib/components/ColorPalette.svelte';
   import Expand from '$lib/components/Expand.svelte';
@@ -35,7 +35,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   const toast: ToastContext = getContext('toast');
 
-  const modalStore = getModalStore();
+  // const modalStore = getModalStore();
 
   let inputValue = $state('');
 
@@ -57,7 +57,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let isExpanded = $state(false);
 
-  let showImport = $state(false);
+  let segmentValue = $state('export');
 
   let paletteCode = $derived(
     `${colorsToCode(colors, {
@@ -122,29 +122,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <ModalShell {parent}>
   <div class="flex flex-col text-left gap-1 w-full mb-4">
     <Segment
-      class="flex wrap gap-y-2 w-fit mx-auto"
-      active="preset-filled-secondary-500"
+      classes="flex wrap gap-y-2 w-fit mx-auto"
+      indicatorBg="preset-filled-secondary-500"
+      bind:value={segmentValue}
     >
-      <Segment.Item
-        bind:group={showImport}
-        value={false}
-        name="Show Export Options"
-        title="Show Export options"
-      >
-        Export
-      </Segment.Item>
-      <Segment.Item
-        bind:group={showImport}
-        value={true}
-        name="Show Import Options"
-        title="Show Import options"
-      >
-        Import
-      </Segment.Item>
+      <Segment.Item value={'export'}>Export</Segment.Item>
+      <Segment.Item value={'import'}>Import</Segment.Item>
     </Segment>
   </div>
 
-  {#if showImport}
+  {#if segmentValue === 'import'}
     <label for="palette-code" class="text-small"
       >Enter HTML colors, a palette code, or a project URL</label
     >
@@ -214,11 +201,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <SaveAndCloseButtons
             onSave={() => {
               updateGauge({ _colors: inputColors });
-              modalStore.close();
+              // modalStore.close();
             }}
             disabled={!inputColors.length}
             onClose={() => {
-              modalStore.close();
+              // modalStore.close();
             }}
           />
         </div>
@@ -272,9 +259,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
               window.navigator.clipboard.writeText(colorHexes);
               copiedHexes = true;
             } catch {
-              toastStore.trigger({
-                message: 'Unable to copy to clipboard',
-                background: 'bg-success-300 text-black',
+              toast.create({
+                description: 'Unable to copy to clipboard',
+                // background: 'bg-success-300 text-black',
               });
             }
           }}
@@ -321,9 +308,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
               window.navigator.clipboard.writeText(paletteCode);
               copiedPaletteCode = true;
             } catch {
-              toastStore.trigger({
-                message: 'Unable to copy to clipboard',
-                background: 'bg-success-300 text-black',
+              toast.create({
+                description: 'Unable to copy to clipboard',
+                // background: 'bg-success-300 text-black',
               });
             }
           }}
@@ -374,9 +361,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
               window.navigator.clipboard.writeText(colorNames);
               copiedNames = true;
             } catch {
-              toastStore.trigger({
-                message: 'Unable to copy to clipboard',
-                background: 'bg-success-300 text-black',
+              toast.create({
+                description: 'Unable to copy to clipboard',
+                // background: 'bg-success-300 text-black',
               });
             }
           }}

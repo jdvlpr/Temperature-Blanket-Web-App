@@ -19,7 +19,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import AppShell from '$lib/components/AppShell.svelte';
   import Card from '$lib/components/Card.svelte';
   import { ICONS } from '$lib/constants';
-  const drawerStore = getDrawerStore();
+  // const drawerStore = getDrawerStore();
 </script>
 
 <svelte:head>
@@ -53,11 +53,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <button
       class="btn preset-tonal-secondary flex items-center sm:hidden"
       title="Open Navigation Sidebar"
-      onclick={() =>
-        drawerStore.open({
-          id: 'documentation',
-          position: 'right',
-        })}
+      onclick={() => {
+        // drawerStore.open({
+        //   id: 'documentation',
+        //   position: 'right',
+        // });
+      }}
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"

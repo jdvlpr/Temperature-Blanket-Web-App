@@ -15,7 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import AppNavigation from '$lib/components/AppNavigation.svelte';
-  import { showNavigationSideBar } from '$lib/state';
+  import { leftDrawerState, showNavigationSideBar } from '$lib/state';
   import { slide } from 'svelte/transition';
   import { weatherChart } from './WeatherChart.svelte';
 
@@ -29,8 +29,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   /** @type {Props} */
   let { pageName = 'Menu', stickyHeader, main, footer } = $props();
-
-  const drawerStore = getDrawerStore();
 
   let sidebarWidth = $state(0);
 
@@ -48,20 +46,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 </script>
 
-<Drawer
-  position="left"
-  rounded="rounded-none"
-  height="h-auto"
-  width="w-fit"
-  regionDrawer="pb-4"
-  bgDrawer="bg-surface-50-950"
->
-  {#if $drawerStore.id === 'menu'}
-    <AppNavigation {drawerStore} />
-  {:else if $drawerStore.id === 'documentation'}
-    <TableOfContents class="p-4 max-w-[60vw]" />
-  {/if}
-</Drawer>
+<AppNavigation />
 
 <div data-vaul-drawer-wrapper="true">
   <div
@@ -76,7 +61,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         class="btn preset-tonal-secondary lg:hidden my-2 flex items-center"
         class:btn-icon={!pageName}
         title="Open Navigation Sidebar"
-        onclick={() => drawerStore.open({ id: 'menu' })}
+        onclick={() => (leftDrawerState.value = true)}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"

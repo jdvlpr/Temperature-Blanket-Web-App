@@ -83,26 +83,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { browser } from '$app/environment';
   import { THEMES } from '$lib/constants';
   import { preferences } from '$lib/state';
-  import { Segment } from '@skeletonlabs/skeleton-svelte';
+  import { Popover, Segment } from '@skeletonlabs/skeleton-svelte';
 
-  /**
-   * @typedef {Object} Props
-   * @property {boolean} [showText]
-   * @property {string} [target]
-   */
-
-  /** @type {Props} */
-  let { showText = false, target = 'popupTheme' } = $props();
-
-  const popupTheme = {
-    // Represents the type of event that opens/closed the popup
-    event: 'click',
-    // Matches the data-popup value on your popup element
-    target,
-    // Defines which side of your trigger the popup will appear
-    placement: 'bottom',
-    closeQuery: '.close',
-  };
+  let openState = $state(false);
 
   let activeTheme = $derived(
     THEMES.find((n) => n.id === preferences.value.theme.mode),
@@ -110,14 +93,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div class="w-fit text-left">
-  <button
-    class="btn preset-tonal-secondary"
-    id="menu-button"
-    title="Change Theme [t]"
-    use:popup={popupTheme}
+  <Popover
+    bind:open={openState}
+    triggerBase="btn preset-tonal"
+    contentBase="card bg-surface-200-800 p-4 space-y-4 max-w-[320px]"
+    arrow
+    arrowBackground="!bg-surface-200 dark:!bg-surface-800"
   >
-    {#key preferences.value?.theme.mode}
-      {#if showText}
+    {#snippet trigger()}
+      {#key preferences.value?.theme.mode}
         <span class="flex items-center">
           <span class="pr-2"
             >{#if browser}{@html activeTheme?.icon}{:else}{@html THEMES.find(
@@ -126,80 +110,72 @@ If not, see <https://www.gnu.org/licenses/>. -->
           >
           Theme
         </span>
-      {:else}
-        <span
-          >{#if browser}{@html activeTheme?.icon}{:else}{@html THEMES.find(
-              (t) => t.id === 'system',
-            ).icon}{/if}</span
+
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 20 20"
+          fill="currentColor"
+          class="w-5 h-5"
         >
-      {/if}
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 20 20"
-        fill="currentColor"
-        class="w-5 h-5"
-      >
-        <path
-          fill-rule="evenodd"
-          d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
-          clip-rule="evenodd"
-        />
-      </svg>
-    {/key}
-  </button>
+          <path
+            fill-rule="evenodd"
+            d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
+            clip-rule="evenodd"
+          />
+        </svg>
+      {/key}
+    {/snippet}
+    {#snippet content()}
+      <div class="flex flex-col gap-2">
+        <Segment
+          bind:value={preferences.value.theme.mode}
+          classes="flex wrap gap-y-2"
+        >
+          {#each THEMES as { name, id, icon, description }}
+            <Segment.Item value={id}>
+              <span class="flex gap-1 justify-center items-center">
+                {@html icon}
+                <span class="hidden min-[360px]:inline">{name}</span>
+              </span>
+            </Segment.Item>
+          {/each}
+        </Segment>
 
-  <div
-    data-popup={target}
-    class="bg-surface-300-700 rounded-container shadow-lg p-2 z-30"
-    aria-orientation="vertical"
-    aria-labelledby="menu-button"
-    tabindex="-1"
-  >
-    <div class="flex flex-col gap-2">
-      <Segment class="flex wrap gap-y-2" active="preset-filled-secondary-500">
-        {#each THEMES as { name, id, icon, description }}
-          <Segment.Item
-            bind:group={preferences.value.theme.mode}
-            name="theme-{id}"
-            value={id}
-            title={description}
-          >
-            <span class="flex gap-1 justify-center items-center">
-              {@html icon}
-              <span class="hidden min-[360px]:inline">{name}</span>
-            </span>
-          </Segment.Item>
-        {/each}
-      </Segment>
-
-      <div class="flex flex-col items-start gap-2">
-        {#each skeletonThemes as { name, id, colors, rounded }}
-          <button
-            onclick={() => {
-              preferences.value.theme.id = id;
-            }}
-            class={[
-              'btn preset-tonal-secondary flex items-center gap-2 w-full justify-start',
-              preferences.value.theme.id === id && 'preset-filled-secondary-500',
-            ]}
-          >
-            <div
-              class="flex w-16 h-6 overflow-hidden border-surface-50-950 border"
-              style="border-radius:{rounded}"
+        <div class="flex flex-col items-start gap-2">
+          {#each skeletonThemes as { name, id, colors, rounded }}
+            <button
+              onclick={() => {
+                preferences.value.theme.id = id;
+              }}
+              class={[
+                'btn preset-tonal-secondary flex items-center gap-2 w-full justify-start',
+                preferences.value.theme.id === id &&
+                  'preset-filled-secondary-500',
+              ]}
             >
-              <div class="flex-auto" style="background:{colors.surface}"></div>
-              <div class="flex-auto" style="background:{colors.primary}"></div>
               <div
-                class="flex-auto"
-                style="background:{colors.secondary}"
-              ></div>
-            </div>
-            {name}
-          </button>
-        {/each}
+                class="flex w-16 h-6 overflow-hidden border-surface-50-950 border"
+                style="border-radius:{rounded}"
+              >
+                <div
+                  class="flex-auto"
+                  style="background:{colors.surface}"
+                ></div>
+                <div
+                  class="flex-auto"
+                  style="background:{colors.primary}"
+                ></div>
+                <div
+                  class="flex-auto"
+                  style="background:{colors.secondary}"
+                ></div>
+              </div>
+              {name}
+            </button>
+          {/each}
+        </div>
+        <button class="close" aria-label="Close"></button>
       </div>
-      <button class="close" aria-label="Close"></button>
-    </div>
-    <div class="arrow bg-surface-300-700 shadow-lg"></div>
-  </div>
+    {/snippet}
+  </Popover>
 </div>

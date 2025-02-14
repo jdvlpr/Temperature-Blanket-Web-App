@@ -152,28 +152,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <div class="mt-4 w-full">
         <h2 class="mb-2 text-xl font-bold">Settings</h2>
         <div class="flex flex-col justify-center gap-x-2 gap-y-4 w-fit py-2">
-          <!-- <ThemeSwitcher showText={true} /> -->
           <div><UnitChanger /></div>
           <div
             class="flex flex-wrap items-center justify-center gap-4 p-2 bg-surface-100-900 rounded-container"
           >
             <div class="flex flex-wrap items-center justify-center gap-2">
               <Segment
-                class="flex-wrap gap-y-2"
-                active="preset-filled-secondary-500"
+                bind:value={weatherState.hour}
+                classes="flex-wrap gap-y-2"
               >
-                <Segment.Item
-                  bind:group={weatherState.hour}
-                  name="hour-format-12"
-                  value="12"
-                  title="Set hour format to 12">12hr</Segment.Item
-                >
-                <Segment.Item
-                  bind:group={weatherState.hour}
-                  name="hour-format-24"
-                  value="24"
-                  title="Set hour format to 24">24hr</Segment.Item
-                >
+                <Segment.Item value="12">12hr</Segment.Item>
+                <Segment.Item value="24">24hr</Segment.Item>
               </Segment>
               <p class="text-sm">
                 {new Date().toLocaleTimeString(navigator.language, {

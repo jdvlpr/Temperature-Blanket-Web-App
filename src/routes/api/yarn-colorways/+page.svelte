@@ -17,7 +17,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { PUBLIC_BASE_DOMAIN_NAME, PUBLIC_BASE_URL } from '$env/static/public';
   import AppLogo from '$lib/components/AppLogo.svelte';
   import AppShell from '$lib/components/AppShell.svelte';
-  const drawerStore = getDrawerStore();
 </script>
 
 <svelte:head>
@@ -50,11 +49,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <button
       class="btn preset-tonal-secondary flex items-center sm:hidden"
       title="Open Navigation Sidebar"
-      onclick={() =>
-        drawerStore.open({
-          id: 'documentation',
-          position: 'right',
-        })}
+      onclick={() => {
+        // drawerStore.open({
+        //   id: 'documentation',
+        //   position: 'right',
+        // });
+      }}
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -179,8 +179,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
               "yarn-colorways.p.rapidapi.com"
             </p>
             <p>
-              All requests should use the <span class="code base-font-color px-2"
-                >GET</span
+              All requests should use the <span
+                class="code base-font-color px-2">GET</span
               > method.
             </p>
           </section>
@@ -631,12 +631,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     <td
                       >The property to sort the results by. Accepted values are
                       <span class="code px-2 base-font-color">default</span>,
-                      <span class="code px-2 base-font-color">lightness</span>, or
+                      <span class="code px-2 base-font-color">lightness</span>,
+                      or
                       <span class="code px-2 base-font-color">name</span>.
                     </td>
                     <td>String</td>
                     <td>No</td>
-                    <td><span class="code px-2 base-font-color">default</span></td>
+                    <td
+                      ><span class="code px-2 base-font-color">default</span
+                      ></td
+                    >
                   </tr>
                   <tr>
                     <td>direction</td>
