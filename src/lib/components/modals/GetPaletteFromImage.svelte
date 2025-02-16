@@ -171,7 +171,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       cursorColor = color;
       coords = {
         x: e.pageX - rect.left,
-        y: e.pageY - rect.top - 115,
+        y: e.pageY - rect.top,
       };
     }, 0);
   }

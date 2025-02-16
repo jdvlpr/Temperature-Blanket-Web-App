@@ -13,7 +13,7 @@ type Preferences = {
 export const preferences = persistedState<Preferences>('preferences', {
   disableToastAnalytics: false,
   theme: {
-    id: 'crimson',
+    id: 'classic',
     mode: 'system',
   },
   layout: 'list',

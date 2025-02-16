@@ -27,7 +27,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import RangeOptionsButton from './buttons/RangeOptionsButton.svelte';
   import GaugeCustomizer from './GaugeCustomizer.svelte';
   import { ICONS } from '$lib/constants';
-  import { Segment } from '@skeletonlabs/skeleton-svelte';
+  import { Segment, Tabs } from '@skeletonlabs/skeleton-svelte';
 
   onMount(() => {
     setupAvailableGauges();
@@ -67,6 +67,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <div class="w-full overflow-auto relative mt-2">
   <Segment
     bind:value={gauges.activeGaugeId}
+    background="bg-surface-200-800"
+    width="w-full"
+    classes="justify-around overflow-scroll"
     onValueChange={(e) => {
       const id = e.target.value;
       if (!gauges.allCreated.map((gauge) => gauge.id).includes(id)) {

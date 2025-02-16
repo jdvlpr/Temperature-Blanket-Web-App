@@ -19,7 +19,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { Segment } from '@skeletonlabs/skeleton-svelte';
 </script>
 
-<Segment bind:value={project.units}>
+<Segment bind:value={project.units} background="bg-surface-100-900">
   <Segment.Item value={'metric'}>
     {`${UNIT_LABELS.temperature.metric} /
 	    ${UNIT_LABELS.height.metric}`}

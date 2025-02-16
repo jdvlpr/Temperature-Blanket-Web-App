@@ -96,10 +96,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <Popover
     bind:open={openState}
     triggerBase="btn hover:preset-tonal"
-    contentBase="card bg-surface-300-700 p-4 space-y-4 shadow-xl"
+    contentBase="card bg-surface-200-800 p-4 space-y-4 shadow-xl"
     zIndex="1000"
     arrow
-    arrowBackground="!bg-surface-300 dark:!bg-surface-700"
+    arrowBackground="!bg-surface-200 dark:!bg-surface-800"
     modal={true}
   >
     {#snippet trigger()}
@@ -119,6 +119,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <Segment
           bind:value={preferences.value.theme.mode}
           classes="flex wrap gap-y-2"
+          background="bg-surface-100-900"
         >
           {#each THEMES as { name, id, icon, description }}
             <Segment.Item value={id}>

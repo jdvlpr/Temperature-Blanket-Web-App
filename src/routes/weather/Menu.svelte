@@ -147,13 +147,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {#if page === 'settings'}
     <div class="mt-4 w-full">
       <h2 class="mb-2 text-xl font-bold">Settings</h2>
-      <div class="flex flex-col justify-center gap-x-2 gap-y-4 w-fit py-2">
+      <div
+        class="flex flex-col justify-center gap-2 w-fit bg-surface-50-950 rounded p-2"
+      >
         <div><UnitChanger /></div>
         <div
-          class="flex flex-wrap items-center justify-center gap-4 p-2 bg-surface-100-900 rounded-container"
+          class="flex flex-wrap items-center justify-center gap-4 p-2 rounded-container"
         >
           <div class="flex flex-wrap items-center justify-center gap-2">
-            <Segment bind:value={weatherState.hour} classes="flex-wrap gap-y-2">
+            <Segment
+              bind:value={weatherState.hour}
+              classes="flex-wrap gap-y-2"
+              background="bg-surface-100-900"
+            >
               <Segment.Item value="12">12hr</Segment.Item>
               <Segment.Item value="24">24hr</Segment.Item>
             </Segment>

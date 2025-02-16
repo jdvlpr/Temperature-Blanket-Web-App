@@ -35,7 +35,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let hasDetails = details !== '';
 </script>
 
-<div class="flex justify-between gap-4 w-full bg-surface-200-800 p-2 rounded">
+<div
+  class="flex justify-between gap-4 w-full bg-surface-200-800 py-2 px-4 rounded"
+>
   <div class="flex flex-col items-start">
     <span class:font-bold={hasDetails}>{@html label}</span>
     {#if hasDetails}

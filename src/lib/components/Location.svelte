@@ -333,7 +333,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {/if}
       </p>
       <div
-        class="input-group input-group-divider grid-cols-[auto_1fr_auto]"
+        class={['input-group input-group-divider grid-cols-[auto_1fr_auto]']}
         bind:this={locationGroup}
       >
         <div class="input-group-cell">

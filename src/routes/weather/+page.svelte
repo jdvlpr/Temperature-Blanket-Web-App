@@ -311,7 +311,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {#snippet stickyHeader()}
     <div class="hidden lg:inline-flex"><AppLogo /></div>
 
-    <div class="hidden sm:flex">
+    <div class="hidden lg:flex">
       <UnitChanger />
     </div>
     <div class="flex flex-wrap items-center gap-2">

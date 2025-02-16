@@ -210,7 +210,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
       <h2 class="mb-2 mt-8 text-xl font-bold">Settings</h2>
       <div class="flex flex-col items-start gap-2 w-full my-4">
-        <UnitChanger />
+        <div class=" rounded-container border border-surface-300-700">
+          <UnitChanger />
+        </div>
 
         <button
           class="btn hover:preset-tonal w-fit"

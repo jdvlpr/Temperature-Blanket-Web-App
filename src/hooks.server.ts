@@ -90,8 +90,8 @@ const themeCookies: Handle = async ({ event, resolve }) => {
   if (cookieTheme && skeletonThemes.map((n) => n.id).includes(cookieTheme)) {
     theme = cookieTheme;
   } else {
-    event.cookies.set('theme', 'crimson', { path: '/' });
-    theme = 'crimson';
+    event.cookies.set('theme', 'classic', { path: '/' });
+    theme = 'classic';
   }
 
   if (cookieThemeMode) {

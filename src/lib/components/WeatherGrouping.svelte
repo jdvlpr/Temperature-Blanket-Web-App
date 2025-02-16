@@ -20,7 +20,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <div class="flex flex-col items-start">
   <div class="flex gap-1 items-center">
-    <Segment bind:value={weather.grouping}>
+    <Segment bind:value={weather.grouping} background="bg-surface-100-900">
       <Segment.Item value={'day'}>Daily</Segment.Item>
       <Segment.Item value={'week'}>Weekly</Segment.Item>
     </Segment>

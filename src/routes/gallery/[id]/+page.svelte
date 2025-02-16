@@ -54,6 +54,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let gauges = $state();
   let flatColors = $state();
 
+  let aboutState = $state([]);
+
   onMount(async () => {
     const { project: streamedProject } = await data.stream;
 
@@ -230,10 +232,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 {/if}
               {/await}
               <div
-                class="text-left max-w-screen-sm mx-auto w-full preset-tonal-tertiary rounded-container mt-2"
+                class="text-left max-w-screen-sm mx-auto w-full preset-tonal-tertiary p-2 rounded-container mt-2"
               >
-                <Accordion>
-                  <Accordion.Item disabled={!project}>
+                <Accordion bind:value={aboutState} collapsible>
+                  <Accordion.Item disabled={!project} value="about">
                     {#snippet lead()}
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -250,10 +252,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         />
                       </svg>
                     {/snippet}
-                    {#snippet summary()}
+                    {#snippet control()}
                       <p class="">About this Project</p>
                     {/snippet}
-                    {#snippet content()}
+                    {#snippet panel()}
                       {#await data.stream then}
                         <div class="flex flex-col gap-2">
                           <p class="">

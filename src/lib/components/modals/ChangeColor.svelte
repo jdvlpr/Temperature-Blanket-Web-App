@@ -127,11 +127,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let currentColor = $derived({ hex });
 </script>
 
-<div class="p-4" bind:this={container}>
+<div class="p-4 text-center" bind:this={container}>
   <p class="my-2 text-center text-xs">Color {title}</p>
   {#if affiliate_variant_href}
     <a
-      class="btn hover:preset-tonal flex flex-wrap justify-center items-center gap-2 underline w-fit mx-auto"
+      class="flex flex-wrap justify-center items-center gap-2 underline w-fit mx-auto"
       href={affiliate_variant_href}
       target="_blank"
       rel="noreferrer nofollow"
@@ -167,7 +167,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </a>
   {:else if variant_href}
     <a
-      class="btn hover:preset-tonal flex flex-wrap justify-center items-center gap-2 underline w-fit mx-auto"
+      class="inline-flex flex-wrap justify-center items-center gap-2 underline w-fit mx-auto"
       href={variant_href}
       target="_blank"
       rel="noreferrer nofollow"

@@ -147,7 +147,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         viewBox="0 0 24 24"
         stroke-width="1.5"
         stroke="currentColor"
-        class={['size-6']}
+        class="size-6"
       >
         <path
           stroke-linecap="round"
@@ -186,7 +186,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         viewBox="0 0 24 24"
         stroke-width="1.5"
         stroke="currentColor"
-        class={['size-6', !fullscreen && 'mr-1']}
+        class="size-6"
       >
         <path
           stroke-linecap="round"
@@ -216,6 +216,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
               updateGauge,
             },
           },
+          options: {
+            size: 'large',
+          },
         })}
       ><svg
         xmlns="http://www.w3.org/2000/svg"
@@ -223,7 +226,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         viewBox="0 0 24 24"
         stroke-width="1.5"
         stroke="currentColor"
-        class={['size-6', !fullscreen && 'mr-1']}
+        class="size-6"
       >
         <path
           stroke-linecap="round"
@@ -254,10 +257,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           },
         })}
     >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        class={['size-6', !fullscreen && 'mr-1']}
-        viewBox="0 0 24 24"
+      <svg xmlns="http://www.w3.org/2000/svg" class="size-6" viewBox="0 0 24 24"
         ><path
           fill="none"
           stroke="currentColor"
@@ -290,10 +290,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           },
         })}
     >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        class={['size-6', !fullscreen && 'mr-1']}
-        viewBox="0 0 24 24"
+      <svg xmlns="http://www.w3.org/2000/svg" class="size-5" viewBox="0 0 24 24"
         ><path
           fill="none"
           stroke="currentColor"
@@ -327,10 +324,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           },
         })}
     >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        class={['size-6', !fullscreen && 'mr-1']}
-        viewBox="0 0 24 24"
+      <svg xmlns="http://www.w3.org/2000/svg" class="size-6" viewBox="0 0 24 24"
         ><path
           fill="none"
           stroke="currentColor"
@@ -358,7 +352,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           viewBox="0 0 24 24"
           stroke-width="1.5"
           stroke="currentColor"
-          class={['size-6', !fullscreen && 'mr-1']}
+          class="size-6"
         >
           <path
             stroke-linecap="round"
@@ -373,7 +367,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           viewBox="0 0 24 24"
           stroke-width="1.5"
           stroke="currentColor"
-          class={['size-6', !fullscreen && 'mr-1']}
+          class="size-6"
         >
           <path
             stroke-linecap="round"

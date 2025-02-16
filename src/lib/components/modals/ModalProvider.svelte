@@ -15,6 +15,8 @@
       : 'max-w-screen-sm'}"
   positionerPadding="p-0"
   backdropClasses="backdrop-blur-lg"
+  transitionsBackdropOut={{ duration: 0 }}
+  transitionsPositionerOut={{ duration: 0 }}
 >
   {#snippet content()}
     {#key modal.opened}

@@ -266,22 +266,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
               <span>Generate Ranges</span>
             </p>
+
             <Segment
-              class="flex-wrap gap-y-2"
-              active="preset-filled-secondary-500"
+              classes="flex-wrap gap-y-2"
+              background="bg-surface-200-800"
+              bind:value={incrementMode}
             >
-              <Segment.Item
-                bind:group={incrementMode}
-                name="auto-increment"
-                value={'auto'}
-                title="Set increment mode to Automatic">Automatic</Segment.Item
-              >
-              <Segment.Item
-                bind:group={incrementMode}
-                name="manual-increment"
-                value={'manual'}
-                title="Set increment mode to Manual">Manual</Segment.Item
-              >
+              <Segment.Item value="auto">Automatic</Segment.Item>
+              <Segment.Item value="manual">Manual</Segment.Item>
             </Segment>
 
             {#if !incrementMode}

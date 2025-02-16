@@ -121,7 +121,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <div class="flex flex-col text-left gap-1 w-full mb-4">
     <Segment
       classes="flex wrap gap-y-2 w-fit mx-auto"
-      indicatorBg="preset-filled-secondary-500"
+      background="bg-surface-200-800"
       bind:value={segmentValue}
     >
       <Segment.Item value={'export'}>Export</Segment.Item>

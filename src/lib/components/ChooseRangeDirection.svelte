@@ -36,21 +36,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </p>
 
 <Segment
-  class="flex-wrap gap-y-2 justify-start items-start"
-  active="preset-filled-secondary-500"
+  bind:value={direction}
+  classes="flex-wrap gap-y-2 justify-start items-start"
+  background="bg-surface-200-800"
+  onValueChange={onchange}
 >
-  <Segment.Item
-    bind:group={direction}
-    {onchange}
-    name="direction-high-to-low"
-    value={'high-to-low'}
-    title="Set gauge direction to High to Low">High to Low</Segment.Item
-  >
-  <Segment.Item
-    bind:group={direction}
-    {onchange}
-    name="direction-low-to-high"
-    value={'low-to-high'}
-    title="Set gauge direction to Low to High">Low to High</Segment.Item
-  >
+  <Segment.Item value="high-to-low">High to Low</Segment.Item>
+  <Segment.Item value="low-to-high">Low to High</Segment.Item>
 </Segment>

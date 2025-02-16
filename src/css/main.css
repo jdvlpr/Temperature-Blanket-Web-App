@@ -32,14 +32,14 @@
 
   /* AUTOCOMPLETE */
   .autocomplete {
-    @apply bg-surface-100-900 shadow-lg overflow-hidden border border-primary-500 rounded-container z-[1000];
+    @apply bg-surface-50-950 shadow-lg overflow-hidden border border-primary-500 rounded-container z-[1000];
   }
 
   .autocomplete > div {
-    @apply px-2 py-3 cursor-pointer bg-surface-100-900 border-y border-surface-300-700;
+    @apply px-2 py-3 cursor-pointer bg-surface-50-950 border-y border-surface-100-900;
   }
   .autocomplete > .group {
-    @apply bg-surface-100-900 hover:bg-primary-400/20;
+    @apply bg-surface-50-950 hover:bg-primary-400/20;
   }
 
   .autocomplete > div.selected,

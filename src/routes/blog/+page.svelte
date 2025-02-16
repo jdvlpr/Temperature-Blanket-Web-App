@@ -100,7 +100,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <main
       class="max-w-screen-xl m-auto px-2 gap-4 flex flex-col items-center mb-4"
     >
-      <Segment bind:value={selectedTag} classes="mt-4">
+      <Segment
+        bind:value={selectedTag}
+        classes="mt-4"
+        background="bg-surface-200-800"
+      >
         {#each tags as tag}
           <Segment.Item value={tag}>
             <span class="flex gap-1 justify-center items-center">
