@@ -17,7 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { KEYBOARD_SHORTCUTS } from '$lib/constants';
 </script>
 
-<div>
+<div class="p-4">
   <h2 class="font-bold my-2 text-2xl">Keyboard Shortcuts</h2>
 
   {#each KEYBOARD_SHORTCUTS as { group, items, details }}

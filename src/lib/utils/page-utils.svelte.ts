@@ -21,34 +21,34 @@ import { loadFromHistory } from '$lib/utils';
 import { get } from 'svelte/store';
 
 // Go to a section
-export const goToProjectSection = async (index) => {
+export const goToProjectSection = (index) => {
   if (index === 0) {
     if (typeof document.documentElement !== 'undefined')
       document.documentElement.scrollTop = 0;
     return;
   }
 
-  await setSections(index).then(() => {
-    const activeSection = pageSections.items.find(
-      (section) => section.active === true && section.index === index,
-    );
+  setSections(index);
 
-    const newScrollTop = activeSection?.scrollTop;
-    const currentScrollTop = document.documentElement.scrollTop;
-    const activeElement = document.getElementById(activeSection.id);
+  const activeSection = pageSections.items.find(
+    (section) => section.active === true && section.index === index,
+  );
 
-    if (currentScrollTop !== newScrollTop && newScrollTop !== 0) {
-      document.documentElement.scrollTop = newScrollTop;
-    } else {
-      activeElement?.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start',
-      });
-    }
-  });
+  const newScrollTop = activeSection?.scrollTop;
+  const currentScrollTop = document.documentElement.scrollTop;
+  const activeElement = document.getElementById(activeSection.id);
+
+  if (currentScrollTop !== newScrollTop && newScrollTop !== 0) {
+    document.documentElement.scrollTop = newScrollTop;
+  } else {
+    activeElement?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start',
+    });
+  }
 };
 
-const setSections = async (index) => {
+const setSections = (index) => {
   const currentScrollTop = document.documentElement.scrollTop;
 
   pageSections.items.forEach((section, i, sections) => {

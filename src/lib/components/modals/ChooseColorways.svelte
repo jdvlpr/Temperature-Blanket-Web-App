@@ -20,7 +20,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import YarnGridSelect from '$lib/components/modals/YarnGridSelect.svelte';
   import { modal } from '$lib/state';
   import { pluralize } from '$lib/utils';
-  import ModalShell from './ModalShell.svelte';
 
   interface Props {
     updateGauge: any;
@@ -45,48 +44,44 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 </script>
 
-<ModalShell size="large" preventDefaultFocus={true}>
-  <div bind:this={container}>
-    <YarnGridSelect
-      bind:selectedColors
-      onClickScrollToTop={() => {
-        container.scrollIntoView({
-          behavior: 'smooth',
-          block: 'start',
+<div bind:this={container} class="p-2">
+  <YarnGridSelect
+    bind:selectedColors
+    onClickScrollToTop={() => {
+      container.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
+    }}
+    scrollToTopButtonBottom={selectedColors.length ? '10rem' : '4rem'}
+  />
+</div>
+
+<StickyPart position="bottom">
+  <div class="p-2">
+    {#if selectedColors.length}
+      <div class="mb-2 sm:mb-4">
+        {#key selectedColors.length}
+          <ColorPaletteEditable
+            canUserEditColor={false}
+            schemeName={paletteTitleText}
+            bind:colors={selectedColors}
+          />
+        {/key}
+      </div>
+    {/if}
+
+    <SaveAndCloseButtons
+      onSave={() => {
+        updateGauge({
+          _colors: selectedColors,
         });
+        modal.close();
       }}
-      scrollToTopButtonBottom={selectedColors.length ? '10rem' : '4rem'}
+      onClose={() => {
+        modal.close();
+      }}
+      disabled={!selectedColors.length}
     />
   </div>
-
-  {#snippet stickyPart()}
-    <StickyPart position="bottom">
-      <div class="p-2 sm:px-4">
-        {#if selectedColors.length}
-          <div class="mb-2 sm:mb-4">
-            {#key selectedColors.length}
-              <ColorPaletteEditable
-                canUserEditColor={false}
-                schemeName={paletteTitleText}
-                bind:colors={selectedColors}
-              />
-            {/key}
-          </div>
-        {/if}
-
-        <SaveAndCloseButtons
-          onSave={() => {
-            updateGauge({
-              _colors: selectedColors,
-            });
-            modal.close();
-          }}
-          onClose={() => {
-            modal.close();
-          }}
-          disabled={!selectedColors.length}
-        />
-      </div>
-    </StickyPart>
-  {/snippet}
-</ModalShell>
+</StickyPart>

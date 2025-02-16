@@ -19,18 +19,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Expand from '$lib/components/Expand.svelte';
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
   import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
+  import { modal } from '$lib/state';
   import {
     colorsToCode,
     colorsToYarnDetails,
     getColorsFromInput,
     pluralize,
   } from '$lib/utils';
-  import { Segment } from '@skeletonlabs/skeleton-svelte';
-  import { slide } from 'svelte/transition';
-  import ModalShell from './ModalShell.svelte';
-  import { getContext } from 'svelte';
   import type { ToastContext } from '@skeletonlabs/skeleton-svelte';
-  import { modal } from '$lib/state';
+  import { Segment } from '@skeletonlabs/skeleton-svelte';
+  import { getContext } from 'svelte';
+  import { slide } from 'svelte/transition';
 
   let { colors, updateGauge, parent } = $props();
 
@@ -118,7 +117,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 </script>
 
-<ModalShell {parent}>
+<div class="p-4">
   <div class="flex flex-col text-left gap-1 w-full mb-4">
     <Segment
       classes="flex wrap gap-y-2 w-fit mx-auto"
@@ -388,4 +387,4 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/if}
 
   <p class="font-ornament text-4xl my-8 text-center">I</p>
-</ModalShell>
+</div>

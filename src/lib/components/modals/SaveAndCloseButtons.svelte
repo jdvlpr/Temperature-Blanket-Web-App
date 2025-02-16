@@ -32,23 +32,24 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div
-  class="flex flex-wrap items-center gap-x-2 gap-y-2 justify-center mx-auto w-full"
+  class="flex flex-wrap items-center gap-x-2 gap-y-2 justify-end mx-auto w-full"
 >
   <CloseButton {onClose} text="Cancel" />
 
   <button
-    class="btn preset-filled-primary-500 flex justify-center items-center"
+    class="btn preset-filled flex justify-center items-center gap-1"
     onclick={onSave}
     {disabled}
     title={saveText}
   >
+    <span class="font-bold"> {saveText}</span>
     <svg
       xmlns="http://www.w3.org/2000/svg"
       fill="none"
       viewBox="0 0 24 24"
       stroke-width="1.5"
       stroke="currentColor"
-      class="w-5 h-5"
+      class="size-5"
     >
       <path
         stroke-linecap="round"
@@ -56,6 +57,5 @@ If not, see <https://www.gnu.org/licenses/>. -->
         d="M4.5 12.75l6 6 9-13.5"
       />
     </svg>
-    <span class="font-bold pr-2"> {saveText}</span>
   </button>
 </div>

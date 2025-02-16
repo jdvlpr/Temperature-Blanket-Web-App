@@ -61,11 +61,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 </script>
 
-<div class="bg-surface-300-700 rounded-container my-2 mb-4 p-2">
+<div class="bg-surface-100-900 rounded-container my-2 mb-4 p-2">
   <div class="mb-2 flex flex-wrap justify-center items-center">
     <label class="label">
       <select
-        class="select w-fit"
+        class="select w-fit mx-auto"
         id="select-pattern-type"
         value={activePreviewSelectId}
         onchange={(e) => {

@@ -64,7 +64,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 </script>
 
-<div class="w-full overflow-scroll relative hide-scrollbar">
+<div class="w-full overflow-auto relative mt-2">
   <Segment
     bind:value={gauges.activeGaugeId}
     onValueChange={(e) => {
@@ -86,7 +86,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   >
     {#each gauges.allAvailable as { id, label }}
       <Segment.Item value={id}>
-        <span class="whitespace-nowrap">
+        <p class="">
           {#if !gauges.allCreated.map((gauge) => gauge.id).includes(id)}
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -103,8 +103,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
               />
             </svg>
           {/if}
-          {label}</span
-        >
+          {label}
+        </p>
       </Segment.Item>
     {/each}
   </Segment>

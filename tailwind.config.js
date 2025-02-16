@@ -8,8 +8,7 @@
  * See https://github.com/skeletonlabs/skeleton/discussions/2921 for info on how to migrate these yourself.
  */
 import { fontFamily } from 'tailwindcss/defaultTheme';
-import { join } from 'path';
-// import { classic } from './classic-theme';
+import classic from './classic-theme';
 import { contentPath, skeleton } from '@skeletonlabs/skeleton/plugin';
 import * as themes from '@skeletonlabs/skeleton/themes';
 
@@ -91,7 +90,7 @@ const config = {
     require('@tailwindcss/forms'),
     skeleton({
       themes: [
-        // classic,
+        classic,
         themes.crimson,
         themes.hamlindigo,
         themes.modern,

@@ -16,16 +16,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script module>
   // export const skeletonTheme = persistedState('skeletonTheme', 'classic');
   export const skeletonThemes = [
-    // {
-    //   id: 'classic',
-    //   name: 'Marble',
-    //   colors: {
-    //     primary: '#fcd34d',
-    //     secondary: '#075985',
-    //     surface: '#64748b',
-    //   },
-    //   rounded: '8px',
-    // },
+    {
+      id: 'classic',
+      name: 'Marble',
+      colors: {
+        primary: '#fcd34d',
+        secondary: '#075985',
+        surface: '#64748b',
+      },
+      rounded: '8px',
+    },
     {
       id: 'crimson',
       name: 'Garnet',

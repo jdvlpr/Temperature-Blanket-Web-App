@@ -224,7 +224,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       >
         <button
           disabled={loading}
-          class="btn preset-filled-primary-500 flex items-center font-bold w-full"
+          class="btn preset-filled-primary-500 flex items-center font-bold w-full gap-1"
           onclick={async () => {
             projectsList.scrollIntoView({
               behavior: 'smooth',
@@ -273,7 +273,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             viewBox="0 0 24 24"
             stroke-width="1.5"
             stroke="currentColor"
-            class="w-6 h-6"
+            class="size-5 flex-shrink-0"
           >
             <path
               stroke-linecap="round"

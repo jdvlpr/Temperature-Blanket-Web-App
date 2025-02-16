@@ -23,16 +23,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     weather,
   } from '$lib/state';
   // Note: the signal store is a weird necessity, investigate this
-  import Spinner from '$lib/components/Spinner.svelte';
   import { delay, getOpenMeteo, goToProjectSection } from '$lib/utils';
-  import ModalShell from './ModalShell.svelte';
   import { ProgressRing } from '@skeletonlabs/skeleton-svelte';
-
-  interface Props {
-    parent: any;
-  }
-
-  let { parent }: Props = $props();
 
   let title = $state('Searching...');
 
@@ -54,8 +46,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
         weather.isFromLocalStorage = false;
         // Add the default temperature gauge
         gauges.addById('temp');
-        modal.close();
         goToProjectSection(2);
+        modal.close();
       })
       .catch((e) => {
         controller.value = null;
@@ -182,30 +174,28 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 </script>
 
-<ModalShell {parent} size="small">
-  <div class="flex flex-col items-center text-center w-full">
-    {#if signal.value && !error}
-      <ProgressRing value={null} size="size-12" strokeWidth="8px" />
+<div class="flex flex-col items-center text-center w-full p-2">
+  {#if signal.value && !error}
+    <ProgressRing value={null} size="size-10" strokeWidth="6px" />
 
-      <p class="font-bold text-xl my-4">Searching for Weather Data</p>
+    <p class="font-bold text-xl my-4">Searching for Weather Data</p>
 
-      <p class="mb-4 flex flex-col items-center">
-        <span> {title}</span>
+    <p class="mb-4 flex flex-col items-center">
+      <span> {title}</span>
 
-        {#if locations.all.length > 1}
-          <span class="flex flex-col items-center mt-2 w-full gap-1">
-            <progress value={currentIndex + 1} max={locations.all.length}
-            ></progress>
-            <span class="text-xs">
-              {Math.round(((currentIndex + 1) / locations.all.length) * 100)}%
-            </span>
+      {#if locations.all.length > 1}
+        <span class="flex flex-col items-center mt-2 w-full gap-1">
+          <progress value={currentIndex + 1} max={locations.all.length}
+          ></progress>
+          <span class="text-xs">
+            {Math.round(((currentIndex + 1) / locations.all.length) * 100)}%
           </span>
-        {/if}
-      </p>
-    {/if}
+        </span>
+      {/if}
+    </p>
+  {/if}
 
-    {#if error}
-      <div class="mt-4">{@html error}</div>
-    {/if}
-  </div>
-</ModalShell>
+  {#if error}
+    <div class="mt-4">{@html error}</div>
+  {/if}
+</div>

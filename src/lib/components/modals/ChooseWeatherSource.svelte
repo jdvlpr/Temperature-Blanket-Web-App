@@ -19,7 +19,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ToggleSwitch from '../buttons/ToggleSwitch.svelte';
   import GettingWeather from './GettingWeather.svelte';
   import GettingWeatherWarnCustomWeather from './GettingWeatherWarnCustomWeather.svelte';
-  import ModalShell from './ModalShell.svelte';
 
   let warnSearchAgain = $state(false);
 
@@ -40,7 +39,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 </script>
 
-<div class="flex flex-col items-center text-left w-full">
+<div class="flex flex-col items-center text-left w-full p-2">
   <div class="flex flex-col gap-4 items-center">
     <div class="overflow-x-scroll relative mt-2">
       <table
@@ -246,7 +245,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
 
     {#if warnSearchAgain}
-      <div class="preset-tonal-warning card p-4">
+      <div
+        class="preset-tonal-warning card p-4 flex flex-col justify-center items-center"
+      >
         <p class="text-sm mb-4">
           Search again for weather data to apply weather source changes.
           {#if !locations.allValid}
@@ -254,7 +255,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {/if}
         </p>
         <button
-          class="btn preset-filled-primary-500 font-bold text-2xl"
+          class="btn preset-filled-primary-500 text-xl font-bold gap-2"
           onclick={() => {
             if (weather.isUserEdited) {
               modal.trigger({
@@ -279,7 +280,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             viewBox="0 0 24 24"
             stroke-width="1.5"
             stroke="currentColor"
-            class="w-6 h-6"
+            class="size-6"
           >
             <path
               stroke-linecap="round"

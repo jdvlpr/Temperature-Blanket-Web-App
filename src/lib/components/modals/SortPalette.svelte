@@ -19,9 +19,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import StickyPart from '$lib/components/modals/StickyPart.svelte';
   import { modal } from '$lib/state';
   import { getSortedPalette } from '$lib/utils';
-  import ModalShell from './ModalShell.svelte';
 
-  let { colors, updateGauge, parent } = $props();
+  let { colors, updateGauge } = $props();
 
   let _colors = $state(colors);
 
@@ -32,7 +31,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let allColorsHaveNames = $derived(_colors.every((color) => color?.name));
 </script>
 
-<ModalShell {parent}>
+<div class="p-4">
   <div class="flex flex-col gap-2 items-center mt-6 sm:mt-4">
     <div class="flex flex-wrap gap-2 justify-center items-end">
       <label class="label">
@@ -75,7 +74,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </label>
 
       <button
-        class="btn hover:preset-tonal"
+        class="btn hover:preset-tonal gap-1"
         onclick={() => {
           _colors.reverse();
           key = !key;
@@ -83,13 +82,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
         }}
         title="Reverse Colors' Positions"
       >
+        Reverse
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
           viewBox="0 0 24 24"
           stroke-width="1.5"
           stroke="currentColor"
-          class="w-6 h-6 mr-1"
+          class="size-5"
         >
           <path
             stroke-linecap="round"
@@ -97,7 +97,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
             d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5"
           />
         </svg>
-        Reverse
       </button>
     </div>
     <div class="w-full">
@@ -112,23 +111,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {/key}
     </div>
   </div>
-
-  {#snippet stickyPart()}
-    <StickyPart position="bottom">
-      <div class="p-2">
-        <SaveAndCloseButtons
-          onSave={() => {
-            updateGauge({
-              _colors: _colors.map((n) => {
-                delete n.id;
-                return n;
-              }),
-            });
-            modal.close();
-          }}
-          onClose={modal.close}
-        />
-      </div>
-    </StickyPart>
-  {/snippet}
-</ModalShell>
+</div>
+<StickyPart position="bottom">
+  <div class="p-2">
+    <SaveAndCloseButtons
+      onSave={() => {
+        updateGauge({
+          _colors: _colors.map((n) => {
+            delete n.id;
+            return n;
+          }),
+        });
+        modal.close();
+      }}
+      onClose={modal.close}
+    />
+  </div>
+</StickyPart>

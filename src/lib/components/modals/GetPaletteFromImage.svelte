@@ -26,14 +26,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import {
     getColorways,
     getTextColor,
-    pluralize,
     stringToBrandAndYarnDetails,
   } from '$lib/utils';
   import chroma from 'chroma-js';
   import { onMount } from 'svelte';
   import { fade } from 'svelte/transition';
   import SelectYarnWeight from '../SelectYarnWeight.svelte';
-  import ModalShell from './ModalShell.svelte';
 
   let { updateGauge, numberOfColors, parent } = $props();
 
@@ -55,7 +53,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let showCursor = $state(null);
   let ColorThief;
   let loading = $state(true);
-  let touching = $state(false);
   let selectedBrandId = $state();
   let selectedYarnId = $state();
   let selectedYarnWeightId = $state();
@@ -339,7 +336,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 </script>
 
-<ModalShell {parent} size="large" preventScroll={touching}>
+<div class="p-2">
   <div class="flex justify-center">
     <input
       type="file"
@@ -493,7 +490,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
         showCursor = false;
       }}
       ontouchstart={(e) => {
-        touching = true;
         showColorTouch(e);
         showCursor = false;
       }}
@@ -502,7 +498,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
         showCursor = true;
       }}
       ontouchend={(e) => {
-        touching = false;
         addColorTouch(e);
         showCursor = true;
       }}
@@ -641,41 +636,38 @@ If not, see <https://www.gnu.org/licenses/>. -->
       rel="nofollower noreferrer">unsplash.com</a
     >. All images are processed on your device.
   </p>
-
-  {#snippet stickyPart()}
-    <StickyPart position="bottom">
-      <div class="p-2 sm:px-4">
-        {#if matchingYarnColors.length && !loading}
-          <div class="mb-2">
-            {#key numberOfColors}
-              {#key key}
-                <ColorPaletteEditable
-                  canUserEditColor={false}
-                  bind:colors={matchingYarnColors}
-                  onchanged={() => {
-                    if (matchingYarnColors.length !== numberOfColors)
-                      numberOfColors = matchingYarnColors.length;
-                  }}
-                />
-              {/key}
-            {/key}
-          </div>
-        {/if}
-        <SaveAndCloseButtons
-          disabled={!ctx || loading || !matchingYarnColors.length}
-          onSave={() => {
-            updateGauge({
-              _colors: $state.snapshot(matchingYarnColors).map((n) => {
-                delete n.id;
-                delete n.locked;
-                return n;
-              }),
-            });
-            modal.close();
-          }}
-          onClose={modal.close}
-        />
+</div>
+<StickyPart position="bottom">
+  <div class="p-2">
+    {#if matchingYarnColors.length && !loading}
+      <div class="mb-2">
+        {#key numberOfColors}
+          {#key key}
+            <ColorPaletteEditable
+              canUserEditColor={false}
+              bind:colors={matchingYarnColors}
+              onchanged={() => {
+                if (matchingYarnColors.length !== numberOfColors)
+                  numberOfColors = matchingYarnColors.length;
+              }}
+            />
+          {/key}
+        {/key}
       </div>
-    </StickyPart>
-  {/snippet}
-</ModalShell>
+    {/if}
+    <SaveAndCloseButtons
+      disabled={!ctx || loading || !matchingYarnColors.length}
+      onSave={() => {
+        updateGauge({
+          _colors: $state.snapshot(matchingYarnColors).map((n) => {
+            delete n.id;
+            delete n.locked;
+            return n;
+          }),
+        });
+        modal.close();
+      }}
+      onClose={modal.close}
+    />
+  </div>
+</StickyPart>

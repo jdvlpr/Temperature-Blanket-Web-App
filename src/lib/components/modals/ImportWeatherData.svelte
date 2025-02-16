@@ -30,9 +30,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     stringToDate,
   } from '$lib/utils';
   import { FileUpload } from '@skeletonlabs/skeleton-svelte';
-  import ModalShell from './ModalShell.svelte';
-
-  let { parent } = $props();
 
   let imported = $state(false);
   let processing = $state(false);
@@ -183,83 +180,81 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 </script>
 
-<ModalShell {parent} size="small">
-  <div class="inline-flex flex-col justify-center items-center w-full">
-    <div class="mt-2">
-      <HelpIcon
-        href="/documentation/#import-weather-data-file-requirements"
-        title="Get more help"
-      >
-        {#snippet text()}
-          <p class="font-bold underline">CSV File Requirements</p>
-        {/snippet}
-      </HelpIcon>
-    </div>
+<div class="inline-flex flex-col justify-center items-center w-full p-4">
+  <div class="mt-2">
+    <HelpIcon
+      href="/documentation/#import-weather-data-file-requirements"
+      title="Get more help"
+    >
+      {#snippet text()}
+        <p class="font-bold underline">CSV File Requirements</p>
+      {/snippet}
+    </HelpIcon>
+  </div>
 
-    {#if !processing}
-      {#if !imported || errorMessages.length > 0}
-        <FileUpload
-          name="files"
-          class="mt-4"
-          bind:files={csvUpload}
-          slotLead="justify-center"
-          accept=".csv"
-          onchange={(event) => {
-            submitForm(event);
-          }}
-        >
-          {#snippet lead()}
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-              class="w-8 h-8 mx-auto mb-2"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m6.75 12l-3-3m0 0l-3 3m3-3v6m-1.5-15H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"
-              />
-            </svg>
-          {/snippet}
-          {#snippet message()}
-            <p>
-              <span class="font-bold">Upload a file</span>
-              or drag and drop
-            </p>
-          {/snippet}
-          {#snippet meta()}
-            Only CSV files allowed
-          {/snippet}
-        </FileUpload>
-        {#if errorMessages.length > 0}
-          <p>Import finished, but there were some issues (listed below).</p>
-          <p class="mb-2">
-            Close this and check the weather data, or edit your file and try
-            again.
-          </p>
-          {#each errorMessages as message}
-            <p class="text-sm">{message}</p>
-          {/each}
-        {/if}
-      {:else}
-        <div class="my-8">
-          <p class="font-bold text-lg">Done!</p>
+  {#if !processing}
+    {#if !imported || errorMessages.length > 0}
+      <FileUpload
+        name="files"
+        class="mt-4"
+        bind:files={csvUpload}
+        slotLead="justify-center"
+        accept=".csv"
+        onchange={(event) => {
+          submitForm(event);
+        }}
+      >
+        {#snippet lead()}
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            class="w-8 h-8 mx-auto mb-2"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m6.75 12l-3-3m0 0l-3 3m3-3v6m-1.5-15H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"
+            />
+          </svg>
+        {/snippet}
+        {#snippet message()}
           <p>
-            Close this to check the weather data and continue working on your
-            project.
+            <span class="font-bold">Upload a file</span>
+            or drag and drop
           </p>
-        </div>
+        {/snippet}
+        {#snippet meta()}
+          Only CSV files allowed
+        {/snippet}
+      </FileUpload>
+      {#if errorMessages.length > 0}
+        <p>Import finished, but there were some issues (listed below).</p>
+        <p class="mb-2">
+          Close this and check the weather data, or edit your file and try
+          again.
+        </p>
+        {#each errorMessages as message}
+          <p class="text-sm">{message}</p>
+        {/each}
       {/if}
     {:else}
       <div class="my-8">
-        <Spinner />
-        <p>Processing...</p>
+        <p class="font-bold text-lg">Done!</p>
+        <p>
+          Close this to check the weather data and continue working on your
+          project.
+        </p>
       </div>
     {/if}
+  {:else}
+    <div class="my-8">
+      <Spinner />
+      <p>Processing...</p>
+    </div>
+  {/if}
 
-    <p class="font-ornament text-4xl my-8">U</p>
-  </div>
-</ModalShell>
+  <p class="font-ornament text-4xl my-8">U</p>
+</div>

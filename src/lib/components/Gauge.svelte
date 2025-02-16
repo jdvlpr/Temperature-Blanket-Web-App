@@ -85,7 +85,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 />
 
 <div
-  class="w-full flex flex-col justify-center items-center bg-surface-300-700 {fullscreen
+  class="w-full flex flex-col justify-center items-center bg-surface-100-900 {fullscreen
     ? 'fixed w-full h-full left-0 top-0 bg-surface-50-950 overflow-scroll'
     : 'shadow-inner mt-2 pb-2 gap-2 rounded-container'}"
   bind:this={gaugeContainerElement}
@@ -123,7 +123,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
 
     <button
-      class="btn hover:preset-tonal"
+      class={[
+        'hover:preset-tonal gap-1',
+        fullscreen ? 'btn-icon' : 'btn justify-start',
+      ]}
       onclick={() =>
         modal.trigger({
           type: 'component',
@@ -135,6 +138,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               updateGauge,
             },
           },
+          options: { size: 'large' },
         })}
     >
       <svg
@@ -158,7 +162,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     <button
       class={[
-        'hover:preset-tonal',
+        'hover:preset-tonal gap-1',
         fullscreen ? 'btn-icon' : 'btn justify-start',
       ]}
       title="Choose Yarn Colorways, Filtered by Brand and Yarn"
@@ -170,6 +174,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
             props: {
               updateGauge,
             },
+          },
+          options: {
+            size: 'large',
           },
         })}
     >
@@ -195,7 +202,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     <button
       class={[
-        'hover:preset-tonal',
+        'hover:preset-tonal gap-1',
         fullscreen ? 'btn-icon' : 'btn justify-start',
       ]}
       title="Get Palette from Image"
@@ -231,7 +238,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     <button
       class={[
-        'hover:preset-tonal',
+        'hover:preset-tonal gap-1',
         fullscreen ? 'btn-icon' : 'btn justify-start',
       ]}
       title="Generate Random Colors"
@@ -267,7 +274,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     <button
       class={[
-        'hover:preset-tonal',
+        'hover:preset-tonal gap-1',
         fullscreen ? 'btn-icon' : 'btn justify-start',
       ]}
       title="Load Colors or Get a Palette Code to Share"
@@ -304,7 +311,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     <button
       class={[
-        'hover:preset-tonal',
+        'hover:preset-tonal gap-1',
         fullscreen ? 'btn-icon' : 'btn justify-start',
       ]}
       title="Sort Colors"
@@ -340,7 +347,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     <button
       aria-label="Fullscreen"
-      class="btn hover:preset-tonal flex gap-1 justify-start items-center"
+      class="btn hover:preset-tonal gap-1 flex gap-1 justify-start items-center"
       onclick={() => (fullscreen = !fullscreen)}
       title="Toggle Fullscreen Editing Mode (f)"
     >

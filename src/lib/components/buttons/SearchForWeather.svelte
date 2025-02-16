@@ -41,8 +41,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     buttonDisabled={disabled}
     title="Search for Weather Data"
     id="location-action-button"
-    fullWidth={true}
-    classNames="btn preset-filled-primary-500 text-2xl font-bold w-full sm:w-fit"
+    classNames="btn btn-lg preset-filled-primary-500  sm:w-fit gap-1"
   >
     {#if !!weather.isUserEdited}
       Reload Weather Data
@@ -69,7 +68,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </Tooltip>
 {:else}
   <button
-    class="btn preset-filled-primary-500 text-2xl font-bold w-full sm:w-fit"
+    class="btn btn-lg preset-filled-primary-500 sm:w-fit gap-1"
     onclick={() => {
       if (weather.isUserEdited) setWarnCustomWeatherModal();
       else setModal();
@@ -89,12 +88,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
       viewBox="0 0 24 24"
       stroke-width="1.5"
       stroke="currentColor"
-      class="w-6 h-6"
+      class="size-4"
     >
       <path
         stroke-linecap="round"
         stroke-linejoin="round"
-        d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75"
+        d="m8.25 4.5 7.5 7.5-7.5 7.5"
       />
     </svg>
   </button>

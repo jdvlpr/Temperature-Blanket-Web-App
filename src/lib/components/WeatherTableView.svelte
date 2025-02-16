@@ -57,7 +57,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 </script>
 
-<div class="mt-4">
+<div class="mt-4 w-fit mx-auto">
   <ToggleSwitch bind:checked={showColorDetails} label={'Show Color Details'} />
 </div>
 

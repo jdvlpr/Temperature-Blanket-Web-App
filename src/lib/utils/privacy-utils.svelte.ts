@@ -38,8 +38,6 @@ export const privacy = {
 
     const toast: ToastContext = getContext('toast');
 
-    console.log({ toast });
-
     // Event listener for when consent is given to Microsoft Clarity
     // If consent is given, it sets the `consentToMSClarityCookies` store to true
     window.addEventListener('consentToMSClarity', () => {
@@ -81,7 +79,7 @@ export const privacy = {
           <label class="relative inline-flex items-center cursor-pointer gap-2">
             <div class="relative">
               <input type="checkbox" id="clarity-consent-toggle" class="sr-only peer" checked> 
-              <div class="flex-shrink-0 w-11 h-6 bg-surface-300-600-token peer-disabled:bg-surface-500 dark:peer-disabled:bg-secondary-900 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-tertiary-200 dark:peer-focus:ring-tertiary-600 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-surface-50-900-token after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-surface-50 after:border-surface-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-surface-600 peer-checked:bg-primary-900 dark:peer-checked:bg-primary-600"></div> 
+              <div class="flex-shrink-0 w-11 h-6 bg-surface-300-600-token peer-disabled:bg-surface-500 dark:peer-disabled:bg-secondary-900 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-tertiary-200 dark:peer-focus:ring-tertiary-600 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-surface-50-950 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-surface-50 after:border-surface-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-surface-600 peer-checked:bg-primary-900 dark:peer-checked:bg-primary-600"></div> 
             </div>
             
             <span class="font-bold">Allow Analytics</span>

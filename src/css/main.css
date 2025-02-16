@@ -3,14 +3,14 @@
 @tailwind utilities;
 
 @layer base {
-  /* :root [data-theme='classic'], */
+  :root [data-theme='classic'],
   :root [data-theme='crimson'],
   :root [data-theme='hamlindigo'],
   :root [data-theme='modern'],
   :root [data-theme='rocket'],
-  :root [data-theme='skeleton'] {
-    --theme-font-family-base: 'apparat', sans-serif;
-    --theme-font-family-heading: 'apparat', sans-serif;
+  :root [data-theme='legacy'] {
+    --base-font-family: 'apparat', sans-serif;
+    --heading-font-family: 'apparat', sans-serif;
   }
 
   /* Disable double-tap to zoom */

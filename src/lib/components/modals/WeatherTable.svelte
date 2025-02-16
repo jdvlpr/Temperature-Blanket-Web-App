@@ -18,9 +18,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { allGaugesAttributes, project, weather } from '$lib/state';
   import { convertTime, dateToISO8601String } from '$lib/utils';
   import { TableHandler, ThSort } from '@vincjo/datatables';
-  import ModalShell from './ModalShell.svelte';
 
-  let { weatherData, parent } = $props();
+  let { weatherData } = $props();
 
   let weatherTargets = allGaugesAttributes.map((gauge) => gauge.targets).flat();
 
@@ -59,48 +58,46 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let dateHeader = $derived(weather.grouping === 'week' ? 'Week of' : 'Date');
 </script>
 
-<ModalShell {parent}>
-  <div
-    class="w-full inline-flex text-center justify-center items-center max-w-screen-sm"
-  >
-    <DataTable {table} search={false}>
-      <table class="border-separate border-spacing-0 w-fit mx-auto self-center">
-        <thead>
-          <tr>
-            <ThSort {table} field={'date'}>
+<div
+  class="w-full inline-flex text-center justify-center items-center max-w-screen-sm p-4"
+>
+  <DataTable {table} search={false}>
+    <table class="border-separate border-spacing-0 w-fit mx-auto self-center">
+      <thead>
+        <tr>
+          <ThSort {table} field={'date'}>
+            <span class="flex flex-col items-center"
+              >{dateHeader}
+              <span class="text-xs">(YYYY-MM-DD)</span></span
+            >
+          </ThSort>
+          {#each weatherTargets as { id, pdfHeader }}
+            {@const header = pdfHeader[project.units]}
+            {@const headerLabel = header.slice(0, header.indexOf('('))}
+            {@const headerUnits = header.slice(header.indexOf('('))}
+            <ThSort {table} field={id}>
               <span class="flex flex-col items-center"
-                >{dateHeader}
-                <span class="text-xs">(YYYY-MM-DD)</span></span
+                >{headerLabel}
+                <span class="text-xs">{headerUnits}</span></span
               >
             </ThSort>
-            {#each weatherTargets as { id, pdfHeader }}
-              {@const header = pdfHeader[project.units]}
-              {@const headerLabel = header.slice(0, header.indexOf('('))}
-              {@const headerUnits = header.slice(header.indexOf('('))}
-              <ThSort {table} field={id}>
-                <span class="flex flex-col items-center"
-                  >{headerLabel}
-                  <span class="text-xs">{headerUnits}</span></span
-                >
-              </ThSort>
-            {/each}
-          </tr>
-        </thead>
-        <tbody
-          class="[&>tr:nth-child(odd)]:bg-surface-100 [&>tr:nth-child(odd)]:dark:bg-surface-700"
-        >
-          {#if table.rows}
-            {#each table.rows as row}
-              <tr>
-                <td>{row.date}</td>
-                {#each weatherTargets as { id }}
-                  <td>{row[id]}</td>
-                {/each}
-              </tr>
-            {/each}
-          {/if}
-        </tbody>
-      </table>
-    </DataTable>
-  </div>
-</ModalShell>
+          {/each}
+        </tr>
+      </thead>
+      <tbody
+        class="[&>tr:nth-child(odd)]:bg-surface-100 [&>tr:nth-child(odd)]:dark:bg-surface-700"
+      >
+        {#if table.rows}
+          {#each table.rows as row}
+            <tr>
+              <td>{row.date}</td>
+              {#each weatherTargets as { id }}
+                <td>{row[id]}</td>
+              {/each}
+            </tr>
+          {/each}
+        {/if}
+      </tbody>
+    </table>
+  </DataTable>
+</div>

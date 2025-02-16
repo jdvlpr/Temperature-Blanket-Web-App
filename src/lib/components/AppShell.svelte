@@ -106,7 +106,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       bind:clientWidth={sidebarWidth}
     >
       <button
-        class="btn hover:preset-tonal mx-2 lg:flex justify-center hidden mt-2"
+        class="btn hover:preset-tonal mx-2 lg:flex justify-center hidden mt-2 gap-1"
         title={`${showNavigationSideBar.value ? 'Hide' : 'Show'} Sidebar`}
         onclick={async () => {
           showNavigationSideBar.value = !showNavigationSideBar.value;
@@ -115,8 +115,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {#if showNavigationSideBar.value}
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
+            class="size-6"
             viewBox="0 0 24 24"
             ><g
               fill="none"
@@ -133,8 +132,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {:else}
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
+            class="size-6"
             viewBox="0 0 24 24"
             ><g
               fill="none"

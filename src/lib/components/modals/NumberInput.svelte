@@ -15,15 +15,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
-  import ModalShell from './ModalShell.svelte';
-  import { displayNumber } from '$lib/utils';
   import { modal } from '$lib/state';
+  import { displayNumber } from '$lib/utils';
 
   interface Props {
     value: number;
     title: string;
     onOkay: any;
-    parent: any;
     min?: number;
     max: number;
     showSlider?: boolean;
@@ -34,7 +32,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     value = $bindable(),
     title,
     onOkay,
-    parent,
     min = 1,
     max,
     showSlider = true,
@@ -64,66 +61,64 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 </script>
 
-<ModalShell {parent} size="small">
-  <div class="text-center inline-flex flex-col items-center mx-auto w-full">
-    <label for="number-input" class="mb-2"><span>{@html title}</span></label>
+<div class="text-center inline-flex flex-col items-center mx-auto w-full p-4">
+  <label for="number-input" class="mb-2"><span>{@html title}</span></label>
 
-    <div class="flex flex-col gap-2 justify-center items-center my-2 w-fit">
+  <div class="flex flex-col gap-2 justify-center items-center my-2 w-fit">
+    <input
+      type="number"
+      class="input w-fit text-2xl"
+      id="number-input"
+      min={noMinMax ? '' : min}
+      max={noMinMax ? '' : max || getMaxValue(_value)}
+      {title}
+      bind:value
+    />
+    {#if showSlider}
       <input
-        type="number"
-        class="input w-fit text-2xl"
-        id="number-input"
-        min={noMinMax ? '' : min}
-        max={noMinMax ? '' : max || getMaxValue(_value)}
-        {title}
+        type="range"
+        class="w-full"
+        {min}
+        max={max || getMaxValue(_value)}
         bind:value
       />
-      {#if showSlider}
-        <input
-          type="range"
-          class="w-full"
-          {min}
-          max={max || getMaxValue(_value)}
-          bind:value
-        />
-      {/if}
-      <div class="flex flex-wrap gap-2 justify-center items-center">
-        <button
-          class="btn-icon hover:preset-tonal"
-          onclick={() => (value = displayNumber(value - 20))}
-          disabled={noMinMax ? false : value < min + 20}>-20</button
-        >
-        <button
-          class="btn-icon hover:preset-tonal"
-          onclick={() => (value = displayNumber(value - 5))}
-          disabled={noMinMax ? false : value < min + 5}>-5</button
-        >
-        <button
-          class="btn-icon hover:preset-tonal"
-          onclick={() => (value = displayNumber(value - 1))}
-          disabled={noMinMax ? false : value < min + 1}>-1</button
-        >
-        <button
-          class="btn-icon hover:preset-tonal"
-          onclick={() => (value = displayNumber(value + 1))}>+1</button
-        >
-        <button
-          class="btn-icon hover:preset-tonal"
-          onclick={() => (value = displayNumber(value + 5))}>+5</button
-        >
-        <button
-          class="btn-icon hover:preset-tonal"
-          onclick={() => (value = displayNumber(value + 20))}>+20</button
-        >
-      </div>
-    </div>
-
-    <div class="my-4">
-      <SaveAndCloseButtons
-        onSave={_onOkay}
-        disabled={isNaN(value) || noMinMax ? false : value < min}
-        onClose={modal.close}
-      />
+    {/if}
+    <div class="flex flex-wrap gap-2 justify-center items-center">
+      <button
+        class="btn-icon hover:preset-tonal"
+        onclick={() => (value = displayNumber(value - 20))}
+        disabled={noMinMax ? false : value < min + 20}>-20</button
+      >
+      <button
+        class="btn-icon hover:preset-tonal"
+        onclick={() => (value = displayNumber(value - 5))}
+        disabled={noMinMax ? false : value < min + 5}>-5</button
+      >
+      <button
+        class="btn-icon hover:preset-tonal"
+        onclick={() => (value = displayNumber(value - 1))}
+        disabled={noMinMax ? false : value < min + 1}>-1</button
+      >
+      <button
+        class="btn-icon hover:preset-tonal"
+        onclick={() => (value = displayNumber(value + 1))}>+1</button
+      >
+      <button
+        class="btn-icon hover:preset-tonal"
+        onclick={() => (value = displayNumber(value + 5))}>+5</button
+      >
+      <button
+        class="btn-icon hover:preset-tonal"
+        onclick={() => (value = displayNumber(value + 20))}>+20</button
+      >
     </div>
   </div>
-</ModalShell>
+
+  <div class="my-4">
+    <SaveAndCloseButtons
+      onSave={_onOkay}
+      disabled={isNaN(value) || noMinMax ? false : value < min}
+      onClose={modal.close}
+    />
+  </div>
+</div>

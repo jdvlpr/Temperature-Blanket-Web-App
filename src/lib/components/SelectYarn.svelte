@@ -42,6 +42,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }: Props = $props();
 
   let inputElement = $state();
+  let autocompleteContainer = $state();
   let inputGroup = $state();
   let forceDisplayAll = $state(false);
   let inputValue = $state('');
@@ -201,6 +202,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       disableAutoSelect: true,
       minLength: 0,
       showOnFocus: true,
+      container: autocompleteContainer,
       emptyMsg: 'No matching yarn',
       customize: function (input, inputRect, container, maxHeight) {
         const group = inputGroup?.getBoundingClientRect();
@@ -326,7 +328,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </span>
 
   <div class="flex flex-wrap items-center justify-center gap-1">
-    <div class="input-group input-group-divider flex grid-cols-[1fr_auto]">
+    <div
+      class="input-group input-group-divider flex grid-cols-[1fr_auto] w-full"
+    >
       <input
         bind:this={inputElement}
         class="input truncate"
@@ -388,7 +392,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <button
           aria-label="Show All Yarns"
           {disabled}
-          class="btn-icon !px-2 h-10"
+          class="btn-icon !px-2 h-10 flex-grow-0 flex-shrink-0 basis-0"
           onclick={() => {
             forceDisplayAll = true;
             inputElement.focus();
@@ -414,7 +418,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <button
           aria-label="Clear"
           {disabled}
-          class="btn-icon !px-2 h-10"
+          class="btn-icon !px-2 h-10 flex-grow-0 flex-shrink-0 basis-0"
           onclick={async () => {
             inputValue = '';
             selectedBrandId = '';
@@ -445,4 +449,5 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {/if}
     </div>
   </div>
+  <div bind:this={autocompleteContainer} class="text-left"></div>
 </div>

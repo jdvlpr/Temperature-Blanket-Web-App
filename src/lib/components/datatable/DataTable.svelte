@@ -56,7 +56,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <RowsPerPage {table} />
       {/if}
       {#if table.pageCount > 1}
-        <section class="flex flex-wrap items-end gap-2">
+        <section class="flex flex-wrap items-end justify-end gap-2">
           <button
             aria-label="Previous Page"
             class="btn-icon hover:preset-tonal"
@@ -78,6 +78,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               /></svg
             >
           </button>
+
           <label class="label flex flex-col items-start">
             <span class="text-sm">Page</span>
             <select

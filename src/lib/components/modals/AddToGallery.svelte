@@ -15,19 +15,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import Spinner from '$lib/components/Spinner.svelte';
-  import { locations, previews, project } from '$lib/state';
+  import { locations, modal, previews, project } from '$lib/state';
   import { sendToProjectGallery, svgToPNG } from '$lib/utils';
-  import ModalShell from './ModalShell.svelte';
   import StickyPart from './StickyPart.svelte';
-
-  interface Props {
-    parent: any;
-  }
-
-  let { parent }: Props = $props();
 
   let submitting = $state(false),
     message = $state();
+
+  modal.contentComponent = stickyPart;
 
   async function submit() {
     submitting = true;
@@ -57,7 +52,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 </script>
 
-<ModalShell {parent}>
+<div class="p-2">
   <div class="max-w-screen-sm grid grid-cols-1 sm:grid-cols-3 gap-4">
     {#if !message}
       <div class="flex flex-col gap-2 col-span-full sm:col-span-2">
@@ -111,18 +106,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
       >
     </p>
   {/if}
+</div>
 
-  {#snippet stickyPart()}
-    <StickyPart position="bottom">
-      {#if !submitting && !message}
-        <div class="p-2 text-center flex items-center justify-center">
-          <button
-            class="btn preset-filled-primary-500"
-            title="Add project to gallery"
-            onclick={submit}>Yes, Send to Gallery</button
-          >
-        </div>
-      {/if}
-    </StickyPart>
-  {/snippet}
-</ModalShell>
+<StickyPart position="bottom">
+  {#if !submitting && !message}
+    <div class="p-2 text-center flex items-center justify-center">
+      <button
+        class="btn preset-filled-primary-500"
+        title="Add project to gallery"
+        onclick={submit}>Yes, Send to Gallery</button
+      >
+    </div>
+  {/if}
+</StickyPart>

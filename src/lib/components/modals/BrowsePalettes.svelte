@@ -18,10 +18,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import GalleryPalettesPopular from '$lib/components/GalleryPalettesPopular.svelte';
   import PaletteSchemes from '$lib/components/PaletteSchemes.svelte';
   import ToTopButton from '$lib/components/buttons/ToTopButton.svelte';
-  import { Segment } from '@skeletonlabs/skeleton-svelte';
-  import ModalShell from './ModalShell.svelte';
-  import CloseButton from './CloseButton.svelte';
   import { modal } from '$lib/state';
+  import { Segment } from '@skeletonlabs/skeleton-svelte';
+  import CloseButton from './CloseButton.svelte';
 
   interface Props {
     schemeId?: string;
@@ -66,14 +65,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 </script>
 
-<div class="" bind:this={container}>
-  <div class="sticky pr-2 top-2">
-    <CloseButton
-      onClose={() => {
-        modal.close();
-      }}
-    />
-  </div>
+<div class="p-2" bind:this={container}>
   <div
     class="w-full flex flex-wrap justify-center items-end gap-2 px-2 pb-2 bg-surface-100-900"
     class:pt-4={context === 'drawer'}

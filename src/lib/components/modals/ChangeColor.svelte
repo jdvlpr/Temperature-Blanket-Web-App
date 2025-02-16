@@ -17,9 +17,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
   import StickyPart from '$lib/components/modals/StickyPart.svelte';
   import YarnGridSelect from '$lib/components/modals/YarnGridSelect.svelte';
-  import chroma from 'chroma-js';
-  import ModalShell from './ModalShell.svelte';
   import { modal } from '$lib/state';
+  import chroma from 'chroma-js';
 
   interface Props {
     index?: any;
@@ -128,143 +127,139 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let currentColor = $derived({ hex });
 </script>
 
-<ModalShell size="large" preventDefaultFocus={true}>
-  <div class="" bind:this={container}>
-    <p class="my-2 text-center text-xs">Color {title}</p>
-    {#if affiliate_variant_href}
-      <a
-        class="btn hover:preset-tonal flex flex-wrap justify-center items-center gap-2 underline w-fit mx-auto"
-        href={affiliate_variant_href}
-        target="_blank"
-        rel="noreferrer nofollow"
+<div class="p-4" bind:this={container}>
+  <p class="my-2 text-center text-xs">Color {title}</p>
+  {#if affiliate_variant_href}
+    <a
+      class="btn hover:preset-tonal flex flex-wrap justify-center items-center gap-2 underline w-fit mx-auto"
+      href={affiliate_variant_href}
+      target="_blank"
+      rel="noreferrer nofollow"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke-width="1.5"
+        stroke="currentColor"
+        class="w-6 h-6"
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke-width="1.5"
-          stroke="currentColor"
-          class="w-6 h-6"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
-          />
-        </svg>
-        <span class="flex flex-col items-start">
-          <p class="text-xs">
-            {#if brandName}
-              {brandName}
-              -
-            {/if}
-            {#if yarnName}
-              {yarnName}
-            {/if}
-          </p>
-          {#if name}
-            <p class="text-2xl">{name}</p>
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
+        />
+      </svg>
+      <span class="flex flex-col items-start">
+        <p class="text-xs">
+          {#if brandName}
+            {brandName}
+            -
           {/if}
-        </span>
-      </a>
-    {:else if variant_href}
-      <a
-        class="btn hover:preset-tonal flex flex-wrap justify-center items-center gap-2 underline w-fit mx-auto"
-        href={variant_href}
-        target="_blank"
-        rel="noreferrer nofollow"
+          {#if yarnName}
+            {yarnName}
+          {/if}
+        </p>
+        {#if name}
+          <p class="text-2xl">{name}</p>
+        {/if}
+      </span>
+    </a>
+  {:else if variant_href}
+    <a
+      class="btn hover:preset-tonal flex flex-wrap justify-center items-center gap-2 underline w-fit mx-auto"
+      href={variant_href}
+      target="_blank"
+      rel="noreferrer nofollow"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke-width="1.5"
+        stroke="currentColor"
+        class="w-6 h-6"
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke-width="1.5"
-          stroke="currentColor"
-          class="w-6 h-6"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"
-          />
-        </svg>
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"
+        />
+      </svg>
 
-        <span class="flex flex-col items-start">
-          <p class="text-xs">
-            {#if brandName}
-              {brandName}
-              -
-            {/if}
-            {#if yarnName}
-              {yarnName}
-            {/if}
-          </p>
-          {#if name}
-            <p class="text-2xl">{name}</p>
+      <span class="flex flex-col items-start">
+        <p class="text-xs">
+          {#if brandName}
+            {brandName}
+            -
           {/if}
-        </span>
-      </a>
-    {/if}
+          {#if yarnName}
+            {yarnName}
+          {/if}
+        </p>
+        {#if name}
+          <p class="text-2xl">{name}</p>
+        {/if}
+      </span>
+    </a>
+  {/if}
 
-    <div class="flex flex-wrap items-center justify-center gap-2 my-2 w-full">
-      <label class="color-select-label" title="Choose a Color">
-        <input
-          type="color"
-          class="input"
-          value={inputTypeColorValue}
-          onchange={(e) =>
-            inputTypeColorOnChange({
-              value: e.target.value,
-            })}
-        />
-      </label>
-      <label class="color-text-label flex-1" title="Enter a Color">
-        <input
-          type="text"
-          class="input mb-2 mt-1 grow w-full"
-          value={inputTypeTextValue}
-          onkeyup={(e) =>
-            inputTypeTextOnChange({
-              value: e.target.value,
-            })}
-        />
-      </label>
-    </div>
-
-    <YarnGridSelect
-      limit={true}
-      bind:selectedColors
-      selectedBrandId={_brandId}
-      selectedYarnId={_yarnId}
-      incomingColor={currentColor}
-      onClickScrollToTop={() => {
-        container.scrollIntoView({
-          behavior: 'smooth',
-          block: 'start',
-        });
-      }}
-      onSelection={(e) => {
-        const color = e[0];
-        inputTypeColorOnChange({ value: color.hex, color });
-      }}
-      scrollToTopButtonBottom="4rem"
-    />
+  <div class="flex flex-wrap items-center justify-center gap-2 my-2 w-full">
+    <label class="color-select-label" title="Choose a Color">
+      <input
+        type="color"
+        class="input"
+        value={inputTypeColorValue}
+        onchange={(e) =>
+          inputTypeColorOnChange({
+            value: e.target.value,
+          })}
+      />
+    </label>
+    <label class="color-text-label flex-1" title="Enter a Color">
+      <input
+        type="text"
+        class="input mb-2 mt-1 grow w-full"
+        value={inputTypeTextValue}
+        onkeyup={(e) =>
+          inputTypeTextOnChange({
+            value: e.target.value,
+          })}
+      />
+    </label>
   </div>
 
-  {#snippet stickyPart()}
-    <StickyPart position="bottom">
-      <div class="p-2 sm:px-4">
-        {#if !valid}
-          <p class="card preset-tonal-warning p-4 my-2">
-            Please enter a valid color
-          </p>
-        {/if}
-        <SaveAndCloseButtons
-          onSave={_onOkay}
-          onClose={modal.close}
-          disabled={!valid}
-        />
-      </div>
-    </StickyPart>
-  {/snippet}
-</ModalShell>
+  <YarnGridSelect
+    limit={true}
+    bind:selectedColors
+    selectedBrandId={_brandId}
+    selectedYarnId={_yarnId}
+    incomingColor={currentColor}
+    onClickScrollToTop={() => {
+      container.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
+    }}
+    onSelection={(e) => {
+      const color = e[0];
+      inputTypeColorOnChange({ value: color.hex, color });
+    }}
+    scrollToTopButtonBottom="4rem"
+  />
+</div>
+
+<StickyPart position="bottom">
+  <div class="p-2">
+    {#if !valid}
+      <p class="card preset-tonal-warning p-4 my-2">
+        Please enter a valid color
+      </p>
+    {/if}
+    <SaveAndCloseButtons
+      onSave={_onOkay}
+      onClose={modal.close}
+      disabled={!valid}
+    />
+  </div>
+</StickyPart>

@@ -25,7 +25,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <Tooltip
-  classNames="btn preset-filled-primary-500 font-bold text-xl gap-1 relative top-2 w-full sm:w-fit"
+  classNames="btn preset-filled-primary-500 font-bold gap-1 relative top-2 w-full sm:w-fit"
   title="Configure Ranges"
   fullWidth={true}
   onclick={() =>
@@ -37,6 +37,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
           onSave: onSaveRangeOptions,
         },
       },
+      options: {
+        showCloseButton: false,
+        size: 'large',
+      },
     })}
 >
   <svg
@@ -45,7 +49,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     viewBox="0 0 24 24"
     stroke-width="1.5"
     stroke="currentColor"
-    class="w-6 h-6"
+    class="size-5"
   >
     <path
       stroke-linecap="round"

@@ -48,9 +48,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     updateHistory,
     upToDate,
   } from '$lib/utils';
-  import { Modal, type ToastContext } from '@skeletonlabs/skeleton-svelte';
+  import { type ToastContext } from '@skeletonlabs/skeleton-svelte';
   import { getContext, onMount } from 'svelte';
-  import { fade } from 'svelte/transition';
 
   let debounceTimer: number;
 
@@ -154,9 +153,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     onclick={() =>
       modal.trigger({
         type: 'component',
-        component: { ref: GettingStarted, options: { showCloseButton: false } },
+        component: { ref: GettingStarted },
+        options: { showCloseButton: false },
       })}
-    class="btn preset-filled-primary-300-700 gap-2"
+    class="btn preset-filled-secondary-300-700 gap-2"
   >
     <svg xmlns="http://www.w3.org/2000/svg" class="size-6" viewBox="0 0 24 24"
       ><path
@@ -288,6 +288,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
           <p>
             <a
+              href="/blog/what-is-a-temperature-blanket"
+              class="link"
+              rel="noreferrer"
+            >
+              What is a Temperature Blanket?</a
+            >
+          </p>
+
+          <p>
+            <a
               href="/faq"
               rel="noopener noreferrer"
               title="View Frequently Asked Questions"
@@ -298,25 +308,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </p>
 
           <p>
-            <a
-              href="/blog/2024-02-09-how-to-plan-a-temperature-blanket"
-              rel="noopener noreferrer"
-              title="View Frequently Asked Questions"
-              class="link"
-            >
-              How to Plan a Temperature Blanket</a
+            <a href="/changelog" rel="noreferrer" class="link"
+              >Changelog - What's New?</a
             >
           </p>
 
           <p>
             <a href="/documentation" rel="noreferrer" class="link"
               >Documentation</a
-            >
-          </p>
-
-          <p>
-            <a href="/changelog" rel="noreferrer" class="link"
-              >Changelog - What's New?</a
             >
           </p>
 
@@ -334,15 +333,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     <button
       aria-label="menu"
-      class="btn hover:preset-tonal"
+      class="btn-icon hover:preset-tonal"
       onclick={() =>
         modal.trigger({
           type: 'component',
           component: {
             ref: Menu,
             props: { page: 'main' },
-            options: { showCloseButton: true },
           },
+          options: { showCloseButton: true },
         })}
     >
       <svg
@@ -377,18 +376,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
             style="background-image:url('/images/layout/tb-cover-image-winter-trees-sunset.webp');"
           >
             <div
-              class="max-w-screen-md w-full rounded-container bg-surface-50/85 dark:bg-surface-900/85 shadow px-4 py-4 inline-flex flex-col justify-center items-center gap-4"
+              class="max-w-screen-md w-full rounded-container bg-surface-50/85 dark:bg-surface-900/85 shadow p-4 inline-flex flex-col justify-center items-center gap-4"
             >
-              <div class="flex flex-col gap-2">
-                <h2 class="font-light text-lg uppercase tracking-widest">
-                  Weather Data + Art
-                </h2>
+              <div class="flex flex-col">
+                <h2 class="text-2xl">Weather Data + Art</h2>
                 <p>
                   Get historical weather data, choose yarn colors, and visualize
                   your crochet or knitting project.
                 </p>
 
-                <div
+                <!-- <div
                   class="flex flex-col gap-x-4 gap-y-2 text-sm space-around justify-center items-center"
                   data-sveltekit-preload-data="hover"
                 >
@@ -401,7 +398,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   >
                     What is a Temperature Blanket?</a
                   >
-                </div>
+                </div> -->
               </div>
             </div>
           </div>
@@ -420,7 +417,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <div
           id="page-section-weather-data"
           class="lg:my-4 scroll-mt-[58px] w-full"
-          in:fade
           class:hidden={pageSections.items[2].active === false}
         >
           <Card>
@@ -438,7 +434,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <div
           id="page-section-gauges"
           class="lg:my-4 scroll-mt-[58px] w-full"
-          in:fade
           class:hidden={pageSections.items[3].active === false}
         >
           <Card>
@@ -461,7 +456,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
         <div
           id="page-section-preview"
-          in:fade
           class="lg:my-4 scroll-mt-[58px] w-full"
           class:hidden={pageSections.items[4].active === false}
         >

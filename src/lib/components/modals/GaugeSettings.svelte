@@ -33,16 +33,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { Segment } from '@skeletonlabs/skeleton-svelte';
   import { onMount } from 'svelte';
   import { fade, slide } from 'svelte/transition';
-  import ModalShell from './ModalShell.svelte';
 
   interface Props {
     onSave: any;
     index?: any;
     focusOn?: any;
-    parent: any;
   }
 
-  let { onSave, index = null, focusOn = null, parent }: Props = $props();
+  let { onSave, index = null, focusOn = null }: Props = $props();
 
   let _gauge = $state(gauges.getSnapshot(gauges.activeGaugeId));
 
@@ -203,8 +201,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 </script>
 
-<ModalShell {parent} size="large">
-  <div class="flex max-lg:flex-col justify-center items-start gap-2">
+<div class="p-2">
+  <div class="flex max-lg:flex-col justify-center items-start gap-2 w-full">
     <div
       class="flex flex-col justify-start items-start lg:max-w-[500px]"
       bind:this={setupContainer}
@@ -821,12 +819,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </svg>
     </button>
   {/if}
-
-  {#snippet stickyPart()}
-    <StickyPart position="bottom">
-      <div class="p-2 sm:px-4">
-        <SaveAndCloseButtons onSave={_onSave} onClose={modal.close} />
-      </div>
-    </StickyPart>
-  {/snippet}
-</ModalShell>
+</div>
+<StickyPart position="bottom">
+  <div class="p-2">
+    <SaveAndCloseButtons onSave={_onSave} onClose={modal.close} />
+  </div>
+</StickyPart>

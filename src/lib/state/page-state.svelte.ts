@@ -17,15 +17,25 @@ import { ICONS } from '$lib/constants';
 import { MediaQuery } from 'svelte/reactivity';
 import { writable } from 'svelte/store';
 
+type ModalOptions = {
+  showCloseButton?: boolean;
+  size?: 'small' | 'medium' | 'large';
+};
 class ModalClass {
+  #defaultOptions: ModalOptions = {
+    showCloseButton: true,
+    size: 'small',
+  };
+
   opened = $state(false);
 
   drawer = $state({
     leftNavigation: false,
   });
 
-  options = $state({
-    showCloseButton: false,
+  options = $state<ModalOptions>({
+    showCloseButton: true,
+    size: 'small',
   });
 
   contentComponent = $state({
@@ -33,12 +43,20 @@ class ModalClass {
     props: null,
   });
 
-  trigger = async ({ type, component }) => {
+  trigger = async ({
+    type,
+    component,
+    options,
+  }: {
+    type: string;
+    component: any;
+    options?: ModalOptions;
+  }) => {
     if (type === 'component') {
-      const { ref, props, options } = component;
+      const { ref, props } = component;
 
       // close the modal
-      this.opened = false;
+      this.close();
 
       // Delay necessary for zag to transition
       await new Promise((resolve) => {
@@ -53,7 +71,7 @@ class ModalClass {
         props,
       };
 
-      this.options = { ...this.options, ...options };
+      this.options = { ...this.#defaultOptions, ...options };
 
       // Open the modal
       this.opened = true;
@@ -62,6 +80,11 @@ class ModalClass {
 
   close = () => {
     this.opened = false;
+
+    // close the drawer
+    for (const key in this.drawer) {
+      this.drawer[key] = false;
+    }
   };
 }
 

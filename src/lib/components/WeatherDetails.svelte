@@ -17,23 +17,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import WeatherItem from '$lib/components/WeatherItem.svelte';
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
   import { UNIT_LABELS } from '$lib/constants';
-  import { gauges, locations, modal, project, weather } from '$lib/state';
+  import { locations, project, weather } from '$lib/state';
   import {
     capitalizeFirstLetter,
     convertTime,
     exists,
     getColorInfo,
     getIsRecentDate,
-    getTargetParentGaugeId,
   } from '$lib/utils';
   import { getTextColor } from '$lib/utils/color-utils';
-  import ModalShell from './modals/ModalShell.svelte';
 
   let {
     data = weather.data || [],
     viewGaugeInfo = $bindable(true),
     weatherTargets,
-    parent = null,
   } = $props();
 
   let rangeInput = $state();
@@ -58,218 +55,204 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let isRecentDate = $derived(getIsRecentDate(day?.date));
 </script>
 
-{#if modal.opened}
-  <ModalShell>
-    {@render content()}
-  </ModalShell>
-{:else}
-  {@render content()}
-{/if}
+<div
+  class="overflow-x-hidden outline-none text-center inline-block w-full"
+  bind:this={navigatorElement}
+>
+  <div class="font-semibold text-lg">
+    {day?.date?.toLocaleDateString()}
+  </div>
 
-{#snippet content()}
-  <div
-    class="overflow-x-hidden outline-none text-center inline-block w-full"
-    bind:this={navigatorElement}
-  >
-    <div class="font-semibold text-lg">
-      {day?.date?.toLocaleDateString()}
-    </div>
+  <p class="italic mb-2">
+    {capitalizeFirstLetter(weather.grouping)}
+    {weather.currentIndex + 1} of {data?.length}
+  </p>
 
-    <p class="italic mb-2">
-      {capitalizeFirstLetter(weather.grouping)}
-      {weather.currentIndex + 1} of {data?.length}
-    </p>
+  <div class="range-select">
+    <button
+      aria-label="Show Previous {capitalizeFirstLetter(
+        weather.grouping,
+      )}'s Weather"
+      class="prev scale-125 btn-icon hover:preset-tonal"
+      onclick={() => weather.currentIndex--}
+      disabled={weather.currentIndex === 0}
+      title="Show Previous {capitalizeFirstLetter(weather.grouping)}'s Weather"
+      ><svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke-width="1.5"
+        stroke="currentColor"
+        class="w-6 h-6"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M11.25 9l-3 3m0 0l3 3m-3-3h7.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+        />
+      </svg>
+    </button>
+    <input
+      aria-label="Select {capitalizeFirstLetter(weather.grouping)}'s Weather"
+      type="range"
+      min="0"
+      max={data?.length - 1}
+      bind:this={rangeInput}
+      bind:value={weather.currentIndex}
+      onkeydown={(event) =>
+        event.code === 'ArrowRight' || event.code === 'ArrowLeft'
+          ? event.preventDefault()
+          : null}
+      class="range-slider-input"
+      data-vaul-no-drag
+    />
 
-    <div class="range-select">
-      <button
-        aria-label="Show Previous {capitalizeFirstLetter(
-          weather.grouping,
-        )}'s Weather"
-        class="prev scale-125 btn-icon hover:preset-tonal"
-        onclick={() => weather.currentIndex--}
-        disabled={weather.currentIndex === 0}
-        title="Show Previous {capitalizeFirstLetter(
-          weather.grouping,
-        )}'s Weather"
-        ><svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke-width="1.5"
-          stroke="currentColor"
-          class="w-6 h-6"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M11.25 9l-3 3m0 0l3 3m-3-3h7.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-          />
-        </svg>
-      </button>
-      <input
-        aria-label="Select {capitalizeFirstLetter(weather.grouping)}'s Weather"
-        type="range"
-        min="0"
-        max={data?.length - 1}
-        bind:this={rangeInput}
-        bind:value={weather.currentIndex}
-        onkeydown={(event) =>
-          event.code === 'ArrowRight' || event.code === 'ArrowLeft'
-            ? event.preventDefault()
-            : null}
-        class="range-slider-input"
-        data-vaul-no-drag
-      />
+    <button
+      aria-label="Show Next {capitalizeFirstLetter(weather.grouping)}'s Weather"
+      class="next scale-125 btn-icon hover:preset-tonal"
+      onclick={() => weather.currentIndex++}
+      disabled={weather.currentIndex === data?.length - 1}
+      title="Show Next {capitalizeFirstLetter(weather.grouping)}'s Weather"
+      ><svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke-width="1.5"
+        stroke="currentColor"
+        class="w-6 h-6"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M12.75 15l3-3m0 0l-3-3m3 3h-7.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+        />
+      </svg>
+    </button>
+  </div>
 
-      <button
-        aria-label="Show Next {capitalizeFirstLetter(
-          weather.grouping,
-        )}'s Weather"
-        class="next scale-125 btn-icon hover:preset-tonal"
-        onclick={() => weather.currentIndex++}
-        disabled={weather.currentIndex === data?.length - 1}
-        title="Show Next {capitalizeFirstLetter(weather.grouping)}'s Weather"
-        ><svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke-width="1.5"
-          stroke="currentColor"
-          class="w-6 h-6"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M12.75 15l3-3m0 0l-3-3m3 3h-7.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-          />
-        </svg>
-      </button>
-    </div>
+  <p class="font-bold text-lg my-2">
+    {@html day.result}
+  </p>
 
-    <p class="font-bold text-lg my-2">
-      {@html day.result}
-    </p>
-
-    <div class="weather-details">
-      <div class="flex flex-wrap gap-x-4 items-start justify-center my-2">
-        {#each weatherTargets as { id, label, icon, type }}
-          {@const { name, hex, index, gaugeLength, brandName, yarnName } =
-            colorInfo(id, day)}
-          {#if exists(day) && day[id][project.units] !== null}
-            {#if id === 'dayt'}
-              <WeatherItem
-                {id}
-                {label}
-                {icon}
-                value={convertTime(day[id][project.units])}
-              >
-                {#snippet details()}
-                  <span>
-                    {#if viewGaugeInfo !== false && day[id][project.units] !== null}
-                      {#if typeof index === 'number'}
-                        <div
-                          class="my-2 rounded-container py-2 px-4 text-center"
-                          style={viewGaugeInfo
-                            ? `background:${hex};color:${getTextColor(hex)};`
-                            : 'display:none'}
-                        >
-                          {#if brandName && yarnName}
-                            <p class="text-xs">
-                              {brandName}
-                              -
-                              {yarnName}
-                            </p>
-                          {/if}
-                          {#if name}
-                            <p class="text-lg">
-                              {name}
-                            </p>
-                          {/if}
+  <div class="weather-details">
+    <div class="flex flex-wrap gap-x-4 items-start justify-center my-2">
+      {#each weatherTargets as { id, label, icon, type }}
+        {@const { name, hex, index, gaugeLength, brandName, yarnName } =
+          colorInfo(id, day)}
+        {#if exists(day) && day[id][project.units] !== null}
+          {#if id === 'dayt'}
+            <WeatherItem
+              {id}
+              {label}
+              {icon}
+              value={convertTime(day[id][project.units])}
+            >
+              {#snippet details()}
+                <span>
+                  {#if viewGaugeInfo !== false && day[id][project.units] !== null}
+                    {#if typeof index === 'number'}
+                      <div
+                        class="my-2 rounded-container py-2 px-4 text-center"
+                        style={viewGaugeInfo
+                          ? `background:${hex};color:${getTextColor(hex)};`
+                          : 'display:none'}
+                      >
+                        {#if brandName && yarnName}
                           <p class="text-xs">
-                            Color
-                            {index + 1}
-                            of
-                            {gaugeLength}
+                            {brandName}
+                            -
+                            {yarnName}
                           </p>
-                        </div>
-                      {:else}
-                        <p
-                          class="text-sm italic my-2 py-2 px-4 border border-surface-500 rounded-container"
-                        >
-                          No Color Assigned
-                        </p>
-                      {/if}
-                    {/if}
-                  </span>
-                {/snippet}
-              </WeatherItem>
-            {:else}
-              <WeatherItem
-                {id}
-                {label}
-                {icon}
-                value={day[id][project.units]}
-                units={UNIT_LABELS[type][project.units]}
-                {isRecentDate}
-              >
-                {#snippet details()}
-                  <span>
-                    {#if viewGaugeInfo !== false && day[id][project.units] !== null}
-                      {#if typeof index === 'number'}
-                        <div
-                          class="my-2 rounded-container py-2 px-4 text-center"
-                          style={viewGaugeInfo
-                            ? `background:${hex};color:${getTextColor(hex)};`
-                            : 'display:none'}
-                        >
-                          {#if brandName && yarnName}
-                            <p class="text-xs">
-                              {brandName}
-                              -
-                              {yarnName}
-                            </p>
-                          {/if}
-                          {#if name}
-                            <p class="text-lg">
-                              {name}
-                            </p>
-                          {/if}
-                          <p class="text-xs">
-                            Color
-                            {index + 1}
-                            of
-                            {gaugeLength}
+                        {/if}
+                        {#if name}
+                          <p class="text-lg">
+                            {name}
                           </p>
-                        </div>
-                      {:else}
-                        <p
-                          class="text-sm italic my-2 py-2 px-4 border border-surface-500 rounded-container"
-                        >
-                          No Color Assigned
+                        {/if}
+                        <p class="text-xs">
+                          Color
+                          {index + 1}
+                          of
+                          {gaugeLength}
                         </p>
-                      {/if}
+                      </div>
+                    {:else}
+                      <p
+                        class="text-sm italic my-2 py-2 px-4 border border-surface-500 rounded-container"
+                      >
+                        No Color Assigned
+                      </p>
                     {/if}
-                  </span>
-                {/snippet}
-              </WeatherItem>
-            {/if}
+                  {/if}
+                </span>
+              {/snippet}
+            </WeatherItem>
           {:else}
             <WeatherItem
               {id}
               {label}
               {icon}
-              value="?"
+              value={day[id][project.units]}
               units={UNIT_LABELS[type][project.units]}
-            />
+              {isRecentDate}
+            >
+              {#snippet details()}
+                <span>
+                  {#if viewGaugeInfo !== false && day[id][project.units] !== null}
+                    {#if typeof index === 'number'}
+                      <div
+                        class="my-2 rounded-container py-2 px-4 text-center"
+                        style={viewGaugeInfo
+                          ? `background:${hex};color:${getTextColor(hex)};`
+                          : 'display:none'}
+                      >
+                        {#if brandName && yarnName}
+                          <p class="text-xs">
+                            {brandName}
+                            -
+                            {yarnName}
+                          </p>
+                        {/if}
+                        {#if name}
+                          <p class="text-lg">
+                            {name}
+                          </p>
+                        {/if}
+                        <p class="text-xs">
+                          Color
+                          {index + 1}
+                          of
+                          {gaugeLength}
+                        </p>
+                      </div>
+                    {:else}
+                      <p
+                        class="text-sm italic my-2 py-2 px-4 border border-surface-500 rounded-container"
+                      >
+                        No Color Assigned
+                      </p>
+                    {/if}
+                  {/if}
+                </span>
+              {/snippet}
+            </WeatherItem>
           {/if}
-        {/each}
-      </div>
-    </div>
-    <div class="my-2">
-      <ToggleSwitch bind:checked={viewGaugeInfo} label={'Show Color Details'} />
+        {:else}
+          <WeatherItem
+            {id}
+            {label}
+            {icon}
+            value="?"
+            units={UNIT_LABELS[type][project.units]}
+          />
+        {/if}
+      {/each}
     </div>
   </div>
-{/snippet}
+  <div class="my-2 w-fit mx-auto">
+    <ToggleSwitch bind:checked={viewGaugeInfo} label={'Show Color Details'} />
+  </div>
+</div>
 
 <style lang="scss">
   .range-select {

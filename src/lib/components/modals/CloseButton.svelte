@@ -29,16 +29,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
   aria-label="Close"
   class=" {text
     ? 'btn'
-    : 'btn-icon'} relative preset-tonal-secondary flex justify-center items-center float-right"
+    : 'btn-icon'} relative preset-tonal flex justify-center items-center float-right gap-1"
   onclick={onClose}
 >
+  {#if text}
+    <span class="font-bold">{text}</span>
+  {/if}
   <svg
     xmlns="http://www.w3.org/2000/svg"
     fill="none"
     viewBox="0 0 24 24"
     stroke-width="1.5"
     stroke="currentColor"
-    class="w-5 h-5"
+    class="size-5"
   >
     <path
       stroke-linecap="round"
@@ -46,7 +49,4 @@ If not, see <https://www.gnu.org/licenses/>. -->
       d="M6 18L18 6M6 6l12 12"
     />
   </svg>
-  {#if text}
-    <span class="font-bold">{text}</span>
-  {/if}
 </button>

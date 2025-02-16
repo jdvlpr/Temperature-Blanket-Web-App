@@ -35,19 +35,23 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let hasDetails = details !== '';
 </script>
 
-<label class="relative inline-flex items-start cursor-pointer gap-2">
-  <input
-    type="checkbox"
-    bind:checked
-    class="sr-only peer"
-    {disabled}
-    {onchange}
-  />
-  <div
-    class="flex-shrink-0 w-11 h-6 bg-surface-300-700 peer-disabled:bg-surface-500 dark:peer-disabled:bg-secondary-900 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-tertiary-200 dark:peer-focus:ring-tertiary-600 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-surface-50-950 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-surface-50 after:border-surface-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-surface-600 peer-checked:bg-primary-900 dark:peer-checked:bg-primary-600"
-  ></div>
-  <span class:font-bold={hasDetails}>{@html label}</span>
-</label>
-{#if hasDetails}
-  <span class="max-w-[{maxWidth}] text-xs">{details}</span>
-{/if}
+<div class="flex justify-between gap-4 w-full bg-surface-200-800 p-4 rounded">
+  <div class="flex flex-col items-start">
+    <span class:font-bold={hasDetails}>{@html label}</span>
+    {#if hasDetails}
+      <span class="max-w-[{maxWidth}] text-xs">{details}</span>
+    {/if}
+  </div>
+  <label class="relative inline-flex items-start cursor-pointer gap-2">
+    <input
+      type="checkbox"
+      bind:checked
+      class="sr-only peer"
+      {disabled}
+      {onchange}
+    />
+    <div
+      class="flex-shrink-0 w-11 h-6 bg-surface-300-700 peer-disabled:bg-surface-500 dark:peer-disabled:bg-secondary-900 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-tertiary-200 dark:peer-focus:ring-tertiary-600 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-surface-50-950 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-surface-50 after:border-surface-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-surface-600 peer-checked:bg-primary-900 dark:peer-checked:bg-primary-600"
+    ></div>
+  </label>
+</div>

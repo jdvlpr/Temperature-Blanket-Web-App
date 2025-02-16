@@ -56,8 +56,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 </script>
 
-<!-- <ModalShell hideCloseButton={true}> -->
-<div class="w-full">
+<div class="w-full p-4">
   <!-- Stepper -->
   <div
     class="space-y-8 flex flex-col justify-between items-between min-h-[85svh] sm:min-h-[530px]"
@@ -170,4 +169,3 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </nav>
   </div>
 </div>
-<!-- </ModalShell> -->

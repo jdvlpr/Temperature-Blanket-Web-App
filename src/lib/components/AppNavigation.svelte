@@ -64,7 +64,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <div class="flex flex-col w-full gap-2">
           <a
             href="/"
-            class="btn preset-tonal-secondary w-fit gap-0"
+            class="btn preset-tonal-secondary w-fit gap-1"
             onclick={() => onClickItem()}
             class:preset-tonal-secondary={page.url.pathname === '/'}
           >
@@ -83,7 +83,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
           <a
             href="/yarn-colorway-finder"
-            class="btn preset-tonal-secondary w-fit gap-0"
+            class="btn preset-tonal-secondary w-fit gap-1"
             onclick={() => onClickItem()}
             class:preset-tonal-secondary={page.url.pathname ===
               '/yarn-colorway-finder'}
@@ -105,7 +105,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </a>
           <a
             href="/yarn"
-            class="btn preset-tonal-secondary w-fit gap-0"
+            class="btn preset-tonal-secondary w-fit gap-1"
             onclick={() => onClickItem()}
             class:preset-tonal-secondary={page.url.pathname === '/yarn'}
           >
@@ -128,7 +128,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </a>
           <a
             href="/weather"
-            class="btn preset-tonal-secondary w-fit gap-0"
+            class="btn preset-tonal-secondary w-fit gap-1"
             onclick={() => onClickItem()}
             class:preset-tonal-secondary={page.url.pathname === '/weather'}
           >
@@ -155,7 +155,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <div class="flex flex-col w-full gap-2">
           <a
             href="/gallery"
-            class="btn preset-tonal-secondary w-fit gap-0"
+            class="btn preset-tonal-secondary w-fit gap-1"
             onclick={() => onClickItem()}
             class:preset-tonal-secondary={page.url.pathname === '/gallery'}
           >
@@ -173,7 +173,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </a>
           <a
             href="/yarn-palette-gallery"
-            class="btn preset-tonal-secondary w-fit gap-0"
+            class="btn preset-tonal-secondary w-fit gap-1"
             onclick={() => onClickItem()}
             class:preset-tonal-secondary={page.url.pathname ===
               '/yarn-palette-gallery'}
@@ -192,7 +192,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <div class="flex flex-col gap-2 mb-4 w-full">
           <a
             href="/faq"
-            class="btn preset-tonal-secondary w-fit gap-0"
+            class="btn preset-tonal-secondary w-fit gap-1"
             onclick={() => onClickItem()}
             class:preset-tonal-secondary={page.url.pathname === '/faq'}
           >
@@ -214,7 +214,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </a>
           <a
             href="/contact"
-            class="btn preset-tonal-secondary w-fit gap-0"
+            class="btn preset-tonal-secondary w-fit gap-1"
             onclick={() => onClickItem()}
             class:preset-tonal-secondary={page.url.pathname === '/contact'}
           >
@@ -237,7 +237,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
           <a
             href="/yarn-search-request"
-            class="btn preset-tonal-secondary w-fit gap-0"
+            class="btn preset-tonal-secondary w-fit gap-1"
             onclick={() => onClickItem()}
             class:preset-tonal-secondary={page.url.pathname ===
               '/yarn-search-request'}
@@ -262,7 +262,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
           <a
             href="/blog"
-            class="btn preset-tonal-secondary w-fit gap-0 text-left"
+            class="btn preset-tonal-secondary w-fit gap-1 text-left"
             onclick={() => onClickItem()}
             class:preset-tonal-secondary={page.url.pathname === '/blog' ||
               page.url.pathname.includes('/blog')}
@@ -284,7 +284,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
           <a
             href="/privacy"
-            class="btn preset-tonal-secondary w-fit gap-0"
+            class="btn preset-tonal-secondary w-fit gap-1"
             onclick={() => onClickItem()}
             class:preset-tonal-secondary={page.url.pathname === '/privacy'}
           >
@@ -310,7 +310,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
           <a
             href="/documentation"
-            class="btn preset-tonal-secondary w-fit gap-0"
+            class="btn preset-tonal-secondary w-fit gap-1"
             onclick={() => onClickItem()}
             class:preset-tonal-secondary={page.url.pathname ===
               '/documentation'}
@@ -334,7 +334,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
           <a
             href="/changelog"
-            class="btn preset-tonal-secondary w-fit gap-0"
+            class="btn preset-tonal-secondary w-fit gap-1"
             onclick={() => onClickItem()}
             class:preset-tonal-secondary={page.url.pathname === '/changelog'}
           >
@@ -357,7 +357,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
           <a
             href="/api/yarn-colorways"
-            class="btn preset-tonal-secondary w-fit gap-0"
+            class="btn preset-tonal-secondary w-fit gap-1"
             onclick={() => onClickItem()}
             class:preset-tonal-secondary={page.url.pathname ===
               '/api/yarn-colorways'}
@@ -383,7 +383,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {#if PUBLIC_GITHUB_LINK}
             <a
               href={PUBLIC_GITHUB_LINK}
-              class="btn preset-tonal-secondary w-fit gap-0"
+              class="btn preset-tonal-secondary w-fit gap-1"
               target="_blank"
             >
               <svg
@@ -406,7 +406,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   <a
     href="/supporters"
-    class="btn preset-tonal-secondary w-fit gap-0"
+    class="btn preset-tonal-secondary w-fit gap-1"
     onclick={() => onClickItem()}
     class:preset-tonal-secondary={page.url.pathname === '/supporters'}
   >

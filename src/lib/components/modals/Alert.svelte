@@ -14,17 +14,13 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import ModalShell from './ModalShell.svelte';
-
   let {
     message = 'Alert',
-    parent,
   }: {
     message?: string;
-    parent: any;
   } = $props();
 </script>
 
-<ModalShell {parent}>
+<div class="p-2">
   <div class="text-center w-full inline-block">{@html message}</div>
-</ModalShell>
+</div>

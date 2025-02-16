@@ -21,6 +21,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Tooltip from '$lib/components/Tooltip.svelte';
   import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
   import StickyPart from '$lib/components/modals/StickyPart.svelte';
+  import { modal } from '$lib/state';
   import {
     getColorways,
     getFilteredYarns,
@@ -28,10 +29,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     pickRandomFromArray,
   } from '$lib/utils';
   import SelectYarnWeight from '../SelectYarnWeight.svelte';
-  import ModalShell from './ModalShell.svelte';
-  import { isDesktop, modal } from '$lib/state';
 
-  let { numberOfColors, updateGauge, parent } = $props();
+  let { numberOfColors, updateGauge } = $props();
 
   let debounceTimer;
   const debounce = (callback, time) => {
@@ -136,7 +135,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }}
 />
 
-<ModalShell {parent}>
+<div class="px-4 py-8">
   <div class="grid grid-cols-12 gap-4 justify-center items-end w-full">
     <div
       class="w-full col-span-full md:col-span-9 order-1"
@@ -251,60 +250,58 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </label>
 
     <button
-      class="btn preset-filled-primary-500 col-span-full sm:col-span-4 sm:col-start-9 order-7"
+      class="btn preset-filled-primary-500 col-span-full sm:col-span-4 sm:col-start-9 order-7 gap-1"
       title="Generate Random Colors (r)"
       onclick={() => {
         getRandomColors();
       }}
     >
+      Randomize
       <svg
         xmlns="http://www.w3.org/2000/svg"
         fill="none"
         viewBox="0 0 24 24"
         stroke-width="1.5"
         stroke="currentColor"
-        class="w-6 h-6 mr-1"
+        class="size-5"
       >
         <path
           stroke-linecap="round"
           stroke-linejoin="round"
           d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"
         />
-      </svg> Randomize
+      </svg>
     </button>
   </div>
-
-  {#snippet stickyPart()}
-    <StickyPart position="bottom">
-      <div class="p-2 sm:p-4">
-        <div class="mb-2 sm:mb-4">
-          {#key randomPalette}
-            <ColorPaletteEditable
-              canUserEditColor={false}
-              typeId="randomPalette"
-              bind:colors={randomPalette}
-              onchanged={(eventColors) => {
-                if (eventColors) randomPalette = eventColors;
-                numberOfColors = randomPalette.length;
-              }}
-            />
-          {/key}
-        </div>
-
-        <SaveAndCloseButtons
-          onSave={() => {
-            updateGauge({
-              _colors: randomPalette.map((color) => {
-                delete color.locked;
-                delete color.id;
-                return color;
-              }),
-            });
-            modal.close();
+</div>
+<StickyPart position="bottom">
+  <div class="p-2 sm:p-4">
+    <div class="mb-2 sm:mb-4">
+      {#key randomPalette}
+        <ColorPaletteEditable
+          canUserEditColor={false}
+          typeId="randomPalette"
+          bind:colors={randomPalette}
+          onchanged={(eventColors) => {
+            if (eventColors) randomPalette = eventColors;
+            numberOfColors = randomPalette.length;
           }}
-          onClose={modal.close}
         />
-      </div>
-    </StickyPart>
-  {/snippet}
-</ModalShell>
+      {/key}
+    </div>
+
+    <SaveAndCloseButtons
+      onSave={() => {
+        updateGauge({
+          _colors: randomPalette.map((color) => {
+            delete color.locked;
+            delete color.id;
+            return color;
+          }),
+        });
+        modal.close();
+      }}
+      onClose={modal.close}
+    />
+  </div>
+</StickyPart>

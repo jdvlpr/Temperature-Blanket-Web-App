@@ -72,6 +72,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     });
 
     sortableColors = getSortableColors();
+    modal.close();
   }
 
   function handleConsider(e) {
@@ -158,7 +159,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <div class="grid grid-cols-12 gap-2 pt-2">
   {#if isProjectPlannerPage}
     <div
-      class="flex flex-col items-start text-left gap-1 col-span-full md:col-span-8"
+      class="flex flex-col items-start text-left gap-1 col-span-full md:col-span-8 w-fit"
     >
       <ToggleSwitch
         bind:checked={showDaysInRange.value}
@@ -232,7 +233,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </button>
 
       <button
-        class="btn hover:preset-tonal flex items-center justify-start"
+        class="btn hover:preset-tonal flex items-center justify-start p-2"
         title="Choose a Color"
         onclick={() =>
           modal.trigger({
