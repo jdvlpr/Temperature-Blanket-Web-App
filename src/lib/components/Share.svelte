@@ -51,7 +51,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <div class="w-fit text-left">
   <Popover
     bind:open={openState}
-    triggerBase="btn preset-tonal"
+    triggerBase="btn-icon hover:preset-tonal"
     contentBase="card bg-surface-200-800 p-4 space-y-4 max-w-[90vw]"
     arrow
     arrowBackground="!bg-surface-200 dark:!bg-surface-800"
@@ -63,7 +63,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         viewBox="0 0 24 24"
         stroke-width="1.5"
         stroke="currentColor"
-        class="w-6 h-6"
+        class="size-6"
       >
         <path
           stroke-linecap="round"

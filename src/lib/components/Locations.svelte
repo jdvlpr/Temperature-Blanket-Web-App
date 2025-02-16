@@ -174,13 +174,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 {#if locations.allValid}
   <div
-    class="flex flex-wrap gap-2 justify-center mt-4 mb-2 lg:mb-4 px-4 py-2 shadow-inner rounded-container preset-tonal-surface max-w-screen-md mx-auto"
+    class="flex flex-wrap gap-2 justify-center mt-4 mb-2 lg:mb-4 px-4 py-2 shadow-inner rounded-container preset-filled-surface-100-900 max-w-screen-md mx-auto"
     transition:slide
   >
     <div class:hidden={!locations.allValid || weather.isUserEdited}>
       {#if locations.all.length < MAXIMUM_LOCATIONS}
         <button
-          class="btn hover:preset-tonal gap-2"
+          class="btn hover:preset-tonal gap-1"
           id="add-location-button"
           disabled={project.status.loading}
           onclick={() => locations.add()}
@@ -208,7 +208,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
 
     <button
-      class="btn hover:preset-tonal text-left"
+      class="btn hover:preset-tonal text-left gap-1"
       disabled={project.status.loading}
       onclick={() => {
         modal.trigger({
@@ -223,7 +223,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         viewBox="0 0 24 24"
         stroke-width="1.5"
         stroke="currentColor"
-        class="w-6 h-6"
+        class="size-6"
       >
         <path
           stroke-linecap="round"

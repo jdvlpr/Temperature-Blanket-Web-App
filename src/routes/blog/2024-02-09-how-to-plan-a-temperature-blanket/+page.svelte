@@ -81,10 +81,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         >{@html ICONS.arrowBack} Blog</a
       >
       <div class="pb-4 text-left flex gap-4">
-        <div
-          use:tocCrawler={{ mode: 'generate' }}
-          class="w-full flex flex-col gap-8"
-        >
+        <div class="w-full flex flex-col gap-8">
           <Card>
             {#snippet header()}
               <div>
@@ -798,7 +795,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <div
           class="hidden self-start w-1/5 min-w-[200px] h-auto sm:inline-block sticky top-16"
         >
-          <TableOfContents class="overflow-y-scroll h-[90vh] px-2" />
+          <!-- <TableOfContents class="overflow-y-scroll h-[90vh] px-2" /> -->
         </div>
       </div>
     </main>

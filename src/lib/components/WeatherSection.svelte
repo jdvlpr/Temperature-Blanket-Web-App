@@ -159,13 +159,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div class="flex flex-col gap-4 justify-center w-full items-center mt-4">
-  <div class="flex flex-wrap gap-4 items-start justify-center w-full">
+  <div class="flex flex-wrap gap-4 items-center justify-center w-full">
     <UnitChanger />
 
     <WeatherGrouping />
 
     <button
-      class="btn hover:preset-tonal w-fit"
+      class="btn hover:preset-tonal w-fit gap-1"
       onclick={() => {
         modal.trigger({
           type: 'component',
@@ -181,7 +181,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         viewBox="0 0 24 24"
         stroke-width="1.5"
         stroke="currentColor"
-        class="w-6 h-6"
+        class="size-6"
       >
         <path
           stroke-linecap="round"
@@ -555,10 +555,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <div class="mt-2">
   {#if weather.data.length}
-    <!-- {#key []} -->
     {#if !gauges.activeGauge?.calculating}
       <WeatherNavigator />
     {/if}
-    <!-- {/key} -->
   {/if}
 </div>

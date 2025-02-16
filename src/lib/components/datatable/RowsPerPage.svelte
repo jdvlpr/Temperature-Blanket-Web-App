@@ -32,7 +32,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 </script>
 
-<label class="label flex flex-col items-start">
+<label class="label flex flex-col items-start w-24">
   <span class="text-sm">Rows Per Page</span>
   <select
     class="select"

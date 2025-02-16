@@ -29,8 +29,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <p class="font-bold text-2xl">{date}</p>
     {/if}
   </div>
-  <div class="flex flex-col gap-2 card p-2 bg-surface-300-700">
-    <div class="flex flex-wrap gap-2">
+  <div class="flex flex-col gap-2 card p-2 bg-surface-100-900">
+    <div class="flex flex-wrap gap-2 bg-surface-50-950 card">
       {#each notes as { icon, text, title, instructions }}
         <div class="card p-4 flex-auto">
           <p class="text-base flex items-center gap-2 sm:gap-4">

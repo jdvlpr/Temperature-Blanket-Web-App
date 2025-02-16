@@ -32,7 +32,7 @@
 
   /* AUTOCOMPLETE */
   .autocomplete {
-    @apply bg-surface-200-800 shadow-lg overflow-hidden border border-primary-500 rounded-container z-[1000];
+    @apply bg-surface-100-900 shadow-lg overflow-hidden border border-primary-500 rounded-container z-[1000];
   }
 
   .autocomplete > div {
@@ -44,7 +44,7 @@
 
   .autocomplete > div.selected,
   .autocomplete > div:hover:not(.group) {
-    @apply preset-tonal-primary;
+    @apply bg-primary-100/50 dark:bg-primary-900/50 base-font-color dark:base-font-color-dark;
   }
 
   .link {

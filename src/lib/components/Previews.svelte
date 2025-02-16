@@ -77,7 +77,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </div>
 
         <div
-          class="flex flex-wrap gap-2 justify-center my-2 lg:mb-4 px-4 py-2 shadow-inner rounded-container preset-tonal-surface w-full"
+          class="flex flex-wrap gap-2 justify-center my-2 lg:mb-4 px-4 py-2 shadow-inner rounded-container bg-surface-100-900 w-full"
         >
           <button
             class="btn hover:preset-tonal gap-1"

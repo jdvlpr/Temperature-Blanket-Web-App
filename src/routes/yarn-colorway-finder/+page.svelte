@@ -74,6 +74,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let layout = $state('grid');
 
+  let accordionState = $state([]);
+
   let debounceTimer;
   const debounce = (callback, time) => {
     if (!browser) return;
@@ -404,7 +406,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <Card>
         {#snippet header()}
           <div>
-            <div class="bg-surface-200-800 p-4">
+            <div class="bg-surface-100-900 p-4">
               <p class="text-center">
                 Browse a collection of yarn colorways. Filter by brand or yarn
                 name, and search by HTML hex color code to find matching yarn
@@ -441,11 +443,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 >
                 <div class="flex flex-wrap items-center justify-center gap-1">
                   <div
-                    class="input-group input-group-divider grid-cols-[auto_1fr_auto]"
+                    class="input-group grid-cols-[auto_1fr_auto] w-full divide-x divide-surface-50-950"
                   >
                     <input
                       type="color"
-                      class="input !rounded-none input-group-shim"
+                      class="input input-group-cell p-0 m-2 !rounded-full"
                       bind:this={yarnColorwayFinderState.inputTypeColorElement}
                       onchange={(e) =>
                         inputTypeColorOnChange({
@@ -467,6 +469,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     {#if (!!yarnColorwayFinderState.hex || !!yarnColorwayFinderState.inputTypeTextValue) && !!yarnColorwayFinderState.inputTypeColorElement?.value}
                       <button
                         aria-label="Clear Color"
+                        class="p-2"
                         onclick={() => {
                           yarnColorwayFinderState.hex = '';
                           yarnColorwayFinderState.inputTypeTextValue = '';
@@ -480,7 +483,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                           viewBox="0 0 24 24"
                           stroke-width="1.5"
                           stroke="currentColor"
-                          class="w-5 h-5"
+                          class="size-5"
                         >
                           <path
                             stroke-linecap="round"
@@ -543,9 +546,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   Colorway Name</span
                 >
                 <div class="flex flex-wrap items-center justify-center gap-1">
-                  <div
-                    class="input-group input-group-divider grid-cols-[1fr_auto]"
-                  >
+                  <div class="input-group grid-cols-[1fr_auto] w-full">
                     <input
                       id="yarn-select-search-input"
                       autocomplete="off"
@@ -769,8 +770,38 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <Footer>
       {#snippet about()}
         <span>
-          <Accordion>
-            <Accordion.Item>
+          <Accordion bind:value={accordionState} collapsible>
+            {#snippet iconOpen()}<svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="size-4"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="m4.5 15.75 7.5-7.5 7.5 7.5"
+                />
+              </svg>
+            {/snippet}
+            {#snippet iconClosed()}<svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="size-4"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="m19.5 8.25-7.5 7.5-7.5-7.5"
+                />
+              </svg>
+            {/snippet}
+            <Accordion.Item value="tools">
               {#snippet lead()}
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -787,10 +818,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   />
                 </svg>
               {/snippet}
-              {#snippet summary()}
+              {#snippet control()}
                 <p class="font-bold">Are the colors accurate?</p>
               {/snippet}
-              {#snippet content()}
+              {#snippet panel()}
                 Colors on a screen will always look different from actual yarn
                 colorways. The colors used for this site are meant to be an
                 approximation. They also might not be up-to-date; some colorways
@@ -821,12 +852,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   />
                 </svg>
               {/snippet}
-              {#snippet summary()}
+              {#snippet control()}
                 <p class="font-bold">
                   What if I can't find the yarn I'm looking for?
                 </p>
               {/snippet}
-              {#snippet content()}
+              {#snippet panel()}
                 Requests for yarn to be included in these results can be made by
                 anyone using <a
                   href="/yarn-search-request"

@@ -156,7 +156,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         component: { ref: GettingStarted },
         options: { showCloseButton: false },
       })}
-    class="btn preset-filled-secondary-300-700 gap-2"
+    class="btn preset-filled-secondary-200-800 gap-2"
   >
     <svg xmlns="http://www.w3.org/2000/svg" class="size-6" viewBox="0 0 24 24"
       ><path
@@ -378,14 +378,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <div
               class="max-w-screen-md w-full rounded-container bg-surface-50/85 dark:bg-surface-900/85 shadow p-4 inline-flex flex-col justify-center items-center gap-4"
             >
-              <div class="flex flex-col">
-                <h2 class="text-2xl">Weather Data + Art</h2>
+              <div class="flex flex-col gap-2">
+                <h2 class="text-xl">Weather Data + Art</h2>
                 <p>
                   Get historical weather data, choose yarn colors, and visualize
                   your crochet or knitting project.
                 </p>
 
-                <!-- <div
+                <div
                   class="flex flex-col gap-x-4 gap-y-2 text-sm space-around justify-center items-center"
                   data-sveltekit-preload-data="hover"
                 >
@@ -393,12 +393,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
                   <a
                     href="/blog/what-is-a-temperature-blanket"
-                    class="link whitespace-pre-wrap mt-2"
+                    class="link whitespace-pre-wrap"
                     rel="noreferrer"
                   >
                     What is a Temperature Blanket?</a
                   >
-                </div> -->
+                </div>
               </div>
             </div>
           </div>

@@ -77,16 +77,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
         alt="Yarn Colorways API"
       />
       <div class="pb-4 text-left flex gap-4">
-        <div
-          use:tocCrawler={{ mode: 'generate' }}
-          class="w-full flex flex-col gap-8"
-        >
+        <div class="w-full flex flex-col gap-8">
           <div class="flex flex-col gap-4">
             <h2 class="font-bold text-2xl scroll-mt-[58px]">
               Yarn Colorways API
             </h2>
             <section
-              class="gap-2 flex flex-col mt-2 lg:mt-0 card hover:preset-tonal p-4 rounded-container"
+              class="gap-2 flex flex-col mt-2 lg:mt-0 card preset-tonal p-4 rounded-container"
             >
               <p>Find yarn colorways by HTML hex color code.</p>
 
@@ -165,12 +162,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
           >
             <h3 class="font-bold text-xl">Making a Request</h3>
             <p>This is the base URL for all endpoints:</p>
-            <p class="break-all whitespace-pre-wrap codeblock code p-4 w-fit">
+            <p class="break-all !whitespace-pre-wrap codeblock code p-4 w-fit">
               https://yarn-colorways.p.rapidapi.com/v1
             </p>
 
             <p>Include the following headers:</p>
-            <p class="break-all whitespace-pre-wrap codeblock code p-4 w-fit">
+            <p class="break-all !whitespace-pre-wrap codeblock code p-4 w-fit">
               "X-RapidAPI-Key": 'your-rapidapi-key', <br />"X-RapidAPI-Host":
               "yarn-colorways.p.rapidapi.com"
             </p>
@@ -198,7 +195,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 class="link">/colorways</a
               > endpoint.
             </p>
-            <p class="break-all whitespace-pre-wrap codeblock code p-4 w-fit">
+            <p class="break-all !whitespace-pre-wrap codeblock code p-4 w-fit">
               {`{
       "meta": {
           "limit": 50, // the maxmimum number of results
@@ -370,7 +367,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <p class="font-bold">Examples</p>
 
-            <p class="break-all whitespace-pre-wrap codeblock code p-4 w-fit">
+            <p class="break-all !whitespace-pre-wrap code p-4 w-fit">
               {`// get colorways matching an HTML hex code without the # hash 
   GET https://yarn-colorways.p.rapidapi.com/v1/match/665e3f 
 
@@ -638,7 +635,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <p class="font-bold">Example</p>
 
-            <p class="break-all whitespace-pre-wrap codeblock code p-4 w-fit">
+            <p class="break-all !whitespace-pre-wrap codeblock code p-4 w-fit">
               {`// get all colorways 
   GET https://yarn-colorways.p.rapidapi.com/v1/colorways
 
@@ -753,7 +750,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <p class="font-bold">Example</p>
 
-            <p class="break-all whitespace-pre-wrap codeblock code p-4 w-fit">
+            <p class="break-all !whitespace-pre-wrap codeblock code p-4 w-fit">
               {`// get all brands 
   GET https://yarn-colorways.p.rapidapi.com/v1/brands 
   `}
@@ -868,7 +865,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <p class="font-bold">Example</p>
 
-            <p class="break-all whitespace-pre-wrap codeblock code p-4 w-fit">
+            <p class="break-all !whitespace-pre-wrap codeblock code p-4 w-fit">
               {`// get all yarns 
   GET https://yarn-colorways.p.rapidapi.com/v1/yarns
 
@@ -964,7 +961,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <p class="font-bold">Example</p>
 
-            <p class="break-all whitespace-pre-wrap codeblock code p-4 w-fit">
+            <p class="break-all !whitespace-pre-wrap codeblock code p-4 w-fit">
               {`// get all yarn weights 
   GET https://yarn-colorways.p.rapidapi.com/v1/weights
   `}
@@ -1140,7 +1137,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <div
           class="hidden self-start w-1/5 min-w-[200px] h-auto sm:inline-block sticky top-16"
         >
-          <TableOfContents class="overflow-y-scroll h-[90vh] px-2" />
+          <!-- <TableOfContents class="overflow-y-scroll h-[90vh] px-2" /> -->
         </div>
       </div>
     </main>

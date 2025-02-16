@@ -50,7 +50,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </p>
 
     <div
-      class="flex flex-wrap gap-4 items-end justify-between max-sm:w-full sm:justify-center"
+      class="flex flex-wrap gap-x-8 gap-y-2 items-end justify-between max-sm:w-full flex-auto sm:justify-center"
     >
       {#if table.pageCount > 1 || table.rowsPerPage !== 10}
         <RowsPerPage {table} />
@@ -79,7 +79,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             >
           </button>
 
-          <label class="label flex flex-col items-start">
+          <label class="label flex flex-col items-start w-14">
             <span class="text-sm">Page</span>
             <select
               class="select"

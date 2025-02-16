@@ -80,10 +80,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {#snippet main()}
     <main class="max-w-screen-xl m-auto mb-4 pt-2 px-2 lg:px-0">
       <div class="pb-4 text-left flex gap-4">
-        <div
-          use:tocCrawler={{ mode: 'generate' }}
-          class="w-full flex flex-col gap-8"
-        >
+        <div class="w-full flex flex-col gap-8">
           <div class="flex flex-col gap-4">
             <h2
               class="font-bold text-2xl scroll-mt-[58px] hidden lg:inline-block"
@@ -1520,7 +1517,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <div
           class="hidden self-start w-1/5 min-w-[200px] h-auto sm:inline-block sticky top-16"
         >
-          <TableOfContents class="overflow-y-scroll h-[90vh] px-2" />
+          <!-- <TableOfContents class="overflow-y-scroll h-[90vh] px-2" /> -->
         </div>
       </div>
     </main>
