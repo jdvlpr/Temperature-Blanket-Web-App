@@ -90,6 +90,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let activeTheme = $derived(
     THEMES.find((n) => n.id === (preferences.value.theme.mode || 'system')),
   );
+
+  $effect(() => {
+    console.log(preferences.value.theme, { activeTheme });
+  });
 </script>
 
 <div class="w-fit text-left">
