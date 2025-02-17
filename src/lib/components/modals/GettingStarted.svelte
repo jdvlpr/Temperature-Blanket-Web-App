@@ -56,7 +56,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 </script>
 
-<div class="w-full p-4">
+<div class="w-full p-4 pt-12">
   <!-- Stepper -->
   <div
     class="space-y-8 flex flex-col justify-between items-between min-h-[85svh] sm:min-h-[530px]"

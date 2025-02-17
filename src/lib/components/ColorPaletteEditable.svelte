@@ -108,6 +108,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         _colors.push(color);
       }
       colors = _colors;
+      modal.close();
     });
 
     sortableColors = getSortableColors();

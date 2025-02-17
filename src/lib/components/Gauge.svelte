@@ -26,7 +26,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { drawerState, modal, pageSections, pinAllSections } from '$lib/state';
   import type { Color, GaugeSettingsType } from '$lib/types';
   import { createGaugeColors } from '$lib/utils';
-  import { Modal } from '@skeletonlabs/skeleton-svelte';
   let { gauge = $bindable() } = $props();
 
   function updateGauge({

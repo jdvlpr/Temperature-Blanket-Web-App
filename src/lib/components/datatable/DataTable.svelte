@@ -125,7 +125,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         type="text"
         class="input w-full sm:max-w-[200px]"
         bind:value={searchInput.value}
-        placeholder="Search rows..."
+        placeholder="Search weather data..."
         oninput={() => searchInput.set()}
       />
     {/if}

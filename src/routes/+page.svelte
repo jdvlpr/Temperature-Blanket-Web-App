@@ -154,7 +154,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
       modal.trigger({
         type: 'component',
         component: { ref: GettingStarted },
-        options: { showCloseButton: false },
       })}
     class="btn preset-filled-secondary-200-800 gap-2"
   >
