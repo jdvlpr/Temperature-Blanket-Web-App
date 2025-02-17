@@ -62,6 +62,10 @@ export function initializeLocalStorage() {
     }
   }
 
+  preferences.value.theme.id = preferences.value.theme.id || 'classic';
+  preferences.value.theme.mode = preferences.value.theme.mode || 'system';
+  console.log(preferences.value.theme);
+
   // ****************
   // Setup Theme Listeners
   // ****************
@@ -82,6 +86,7 @@ export function initializeLocalStorage() {
 
       const theme = preferences.value.theme.id || 'classic';
       const mode = preferences.value.theme.mode || 'system';
+
       if (skeletonThemes.map((theme) => theme.id).includes(theme)) {
         document.body.setAttribute('data-theme', preferences.value.theme.id);
 
