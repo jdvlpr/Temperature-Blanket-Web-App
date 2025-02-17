@@ -226,7 +226,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <h2 class="font-bold text-2xl" id="using-the-api">Using the API</h2>
 
           <section id="sign-up" class="scroll-mt-[58px] gap-2 flex flex-col">
-            <h3 class="font-bold text-xl">Sign Up</h3>
+            <h3 class="font-bold text-xl" id="sign-up">Sign Up</h3>
             <p class="first-letter:capitalize">
               {PUBLIC_BASE_DOMAIN_NAME} uses
               <a
@@ -262,7 +262,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
             id="sending-requests"
             class="scroll-mt-[58px] gap-2 flex flex-col"
           >
-            <h3 class="font-bold text-xl">Making a Request</h3>
+            <h3 class="font-bold text-xl" id="making-a-request">
+              Making a Request
+            </h3>
             <p>This is the base URL for all endpoints:</p>
             <p class="break-all !whitespace-pre-wrap codeblock code p-4 w-fit">
               https://yarn-colorways.p.rapidapi.com/v1
@@ -282,7 +284,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
             id="reading-a-response"
             class="scroll-mt-[58px] gap-2 flex flex-col"
           >
-            <h3 class="font-bold text-xl">Reading a Response</h3>
+            <h3 class="font-bold text-xl" id="reading-a-response">
+              Reading a Response
+            </h3>
             <p>
               A successful response will return a JSON object that contains two
               properties: <span class="font-bold">meta</span>
@@ -335,7 +339,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
             id="find-yarn-by-color"
             class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
           >
-            <h3 class="font-bold text-xl">Find Yarn by Color</h3>
+            <h3 class="font-bold text-xl" id="find-yarn-by-color">
+              Find Yarn by Color
+            </h3>
             <p>Get best-matching yarn colorways for a specified color.</p>
 
             <p>
@@ -581,7 +587,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             id="colorways"
             class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
           >
-            <h3 class="font-bold text-xl">Colorways</h3>
+            <h3 class="font-bold text-xl" id="colorways">Colorways</h3>
             <p>Get yarn colorways.</p>
 
             <p>
@@ -828,7 +834,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             id="brands"
             class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
           >
-            <h3 class="font-bold text-xl">Brands</h3>
+            <h3 class="font-bold text-xl" id="brands">Brands</h3>
             <p>
               Get all brand IDs and names, useful to filter <a
                 href="#find-yarn-by-color"
@@ -908,7 +914,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             id="yarns"
             class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
           >
-            <h3 class="font-bold text-xl">Yarns</h3>
+            <h3 class="font-bold text-xl" id="yarns">Yarns</h3>
             <p>
               Get all yarn IDs and names, useful to filter <a
                 href="#find-yarn-by-color"
@@ -1039,7 +1045,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             id="yarn-weights"
             class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
           >
-            <h3 class="font-bold text-xl">Yarn Weights</h3>
+            <h3 class="font-bold text-xl" id="yarn-weight">Yarn Weights</h3>
             <p>
               Get all yarn weight IDs and names, useful to filter <a
                 href="#find-yarn-by-color"
