@@ -69,7 +69,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     bind:value={gauges.activeGaugeId}
     background="bg-surface-200-800"
     width="w-full"
-    classes="justify-around overflow-scroll"
+    classes="justify-around max-md:overflow-x-scroll"
     onValueChange={(e) => {
       const id = e.value;
       // gauges.activeGaugeId = id;
