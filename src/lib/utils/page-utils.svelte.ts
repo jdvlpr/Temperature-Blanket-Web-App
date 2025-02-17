@@ -183,6 +183,8 @@ const toggleTheme = () => {
       preferences.value.theme.mode = 'light';
       break;
     default:
+      preferences.value.theme.mode = 'system';
+
       break;
   }
 };

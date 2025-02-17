@@ -88,7 +88,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let openState = $state(false);
 
   let activeTheme = $derived(
-    THEMES.find((n) => n.id === preferences.value.theme.mode),
+    THEMES.find((n) => n.id === (preferences.value.theme.mode || 'system')),
   );
 </script>
 

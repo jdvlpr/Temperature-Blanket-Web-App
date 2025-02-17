@@ -40,7 +40,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   // Update theme when the system theme changes
   function handleColorSchemeChange() {
-    theme = getTheme(preferences.value.theme.mode);
+    theme = getTheme(preferences.value.theme.mode || 'system');
   }
 
   function getTheme(id) {
@@ -57,7 +57,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   // Update theme when user changes the theme mode
   $effect(() => {
-    theme = getTheme(preferences.value.theme.mode);
+    theme = getTheme(preferences.value.theme.mode || 'system');
   });
 </script>
 
