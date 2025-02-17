@@ -19,7 +19,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import AppShell from '$lib/components/AppShell.svelte';
   import Card from '$lib/components/Card.svelte';
   import { ICONS } from '$lib/constants';
-  // const drawerStore = getDrawerStore();
+  import { Modal } from '@skeletonlabs/skeleton-svelte';
+
+  let openTableOfContents = $state(false);
 </script>
 
 <svelte:head>
@@ -47,31 +49,106 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <meta property="og:image:height" content="768" />
 </svelte:head>
 
+<svelte:document
+  onclick={(event) => {
+    if (event.target.classList.contains('toc-anchor')) {
+      openTableOfContents = false;
+    }
+  }}
+/>
+
+{#snippet tableOfContents()}
+  <nav data-testid="toc" class="toc space-y-4 p-4 max-w-[60vw]">
+    <div class="font-bold">Table of Contents<!----></div>
+    <ul class="toc-list space-y-2">
+      <li class="toc-list-item block">
+        <a
+          href="#the-project-blanket-scarf-socks"
+          class="toc-anchor opacity-60 hover:opacity-100"
+          >The Project: Blanket? Scarf? Socks?</a
+        >
+      </li>
+      <li class="toc-list-item block">
+        <a
+          href="#the-place-location-location-location"
+          class="toc-anchor opacity-60 hover:opacity-100"
+          >The Place: Location, Location, Location</a
+        >
+      </li>
+      <li class="toc-list-item block">
+        <a
+          href="#the-time-this-year-last-year-50-years-ago"
+          class="toc-anchor opacity-60 hover:opacity-100"
+          >The Time: This Year? Last Year? 50 Years Ago?</a
+        >
+      </li>
+      <li class="toc-list-item block">
+        <a
+          href="#the-weather-whether-weather-matters"
+          class="toc-anchor opacity-60 hover:opacity-100"
+          >The Weather: Whether Weather Matters</a
+        >
+      </li>
+      <li class="toc-list-item block">
+        <a
+          href="#the-yarn-colors-galore"
+          class="toc-anchor opacity-60 hover:opacity-100"
+          >The Yarn: Colors Galore</a
+        >
+      </li>
+      <li class="toc-list-item block">
+        <a
+          href="#the-preview-a-sneak-peek"
+          class="toc-anchor opacity-60 hover:opacity-100"
+          >The Preview: A Sneak Peek</a
+        >
+      </li>
+      <li class="toc-list-item block">
+        <a
+          href="#the-end-get-started"
+          class="toc-anchor opacity-60 hover:opacity-100"
+          >The End: Get Started!</a
+        >
+      </li>
+    </ul>
+  </nav>
+{/snippet}
+
 <AppShell pageName="">
   {#snippet stickyHeader()}
     <div class="hidden lg:inline-flex mx-auto"><AppLogo /></div>
-    <button
-      class="btn hover:preset-tonal flex items-center sm:hidden"
-      title="Open Navigation Sidebar"
-      onclick={() => {
-        // drawerStore.open({
-        //   id: 'documentation',
-        //   position: 'right',
-        // });
-      }}
-    >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        class="w-6 h-6"
-        viewBox="0 0 24 24"
-        ><path
-          fill="currentColor"
-          d="M3 9h14V7H3zm0 4h14v-2H3zm0 4h14v-2H3zm16 0h2v-2h-2zm0-10v2h2V7zm0 6h2v-2h-2z"
-        /></svg
+    <div class="sm:hidden">
+      <Modal
+        bind:open={openTableOfContents}
+        triggerBase="hover:preset-tonal"
+        contentBase="bg-surface-50-950 p-4 space-y-4 shadow-xl w-fit h-screen overflow-auto"
+        positionerJustify="justify-end"
+        positionerAlign=""
+        positionerPadding=""
+        transitionsPositionerIn={{ x: 480, duration: 200 }}
+        transitionsPositionerOut={{ x: 480, duration: 200 }}
       >
+        {#snippet trigger()}
+          <div class="flex flex-wrap items-center gap-1">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="w-6 h-6"
+              viewBox="0 0 24 24"
+              ><path
+                fill="currentColor"
+                d="M3 9h14V7H3zm0 4h14v-2H3zm0 4h14v-2H3zm16 0h2v-2h-2zm0-10v2h2V7zm0 6h2v-2h-2z"
+              /></svg
+            >
 
-      <span class="">Content</span>
-    </button>
+            <span class="">Content</span>
+          </div>{/snippet}
+        {#snippet content()}
+          <div class="mb-20">
+            {@render tableOfContents()}
+          </div>
+        {/snippet}
+      </Modal>
+    </div>
   {/snippet}
   {#snippet main()}
     <main class="pb-8">
@@ -112,7 +189,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     you're thinking of starting, but you feel overwhelmed by
                     some of these questions:
                   </p>
-                  <p class="p-4 preset-tonal-surface rounded-container">
+                  <p
+                    class="p-4 preset-filled-surface-100-900 rounded-container"
+                  >
                     🤔
                     <span class="italic">Which colors should I pick?</span>
                     <span class="italic">How much yarn will I need?</span>
@@ -153,6 +232,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   </div>
 
                   <h2
+                    id="the-project-blanket-scarf-socks"
                     class="font-bold text-3xl scroll-mt-[70px] text-secondary-800-200"
                   >
                     The Project: Blanket? Scarf? Socks?
@@ -172,6 +252,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   </p>
 
                   <h2
+                    id="the-place-location-location-location"
                     class="font-bold text-3xl scroll-mt-[70px] text-secondary-800-200"
                   >
                     The Place: Location, Location, Location
@@ -193,7 +274,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       />
                     </div>
                     <div
-                      class="preset-tonal-surface p-4 rounded-container md:basis-1/3 h-fit"
+                      class="preset-filled-surface-100-900 p-4 rounded-container md:basis-1/3 h-fit"
                     >
                       <p>
                         🤔
@@ -230,6 +311,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   </p>
 
                   <h2
+                    id="the-time-this-year-last-year-50-years-ago"
                     class="font-bold text-3xl scroll-mt-[70px] text-secondary-800-200"
                   >
                     The Time: This Year? Last Year? 50 Years Ago?
@@ -264,7 +346,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       </p>
                     </div>
                     <div
-                      class="preset-tonal-surface p-4 rounded-container md:basis-1/3 h-fit w-fit"
+                      class="preset-filled-surface-100-900 p-4 rounded-container md:basis-1/3 h-fit w-fit"
                     >
                       <p>
                         🤔
@@ -293,6 +375,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
                   <div>
                     <h2
+                      id="the-weather-whether-weather-matters"
                       class="font-bold text-3xl scroll-mt-[70px] text-secondary-800-200"
                     >
                       The Weather: Whether Weather Matters
@@ -328,7 +411,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       </div>
                     </div>
                     <div
-                      class="preset-tonal-surface p-4 rounded-container md:basis-1/3 h-fit"
+                      class="preset-filled-surface-100-900 p-4 rounded-container md:basis-1/3 h-fit"
                     >
                       <p>
                         🤔
@@ -385,6 +468,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   </div>
 
                   <h2
+                    id="the-yarn-colors-galore"
                     class="font-bold text-3xl scroll-mt-[70px] text-secondary-800-200"
                   >
                     The Yarn: Colors Galore
@@ -566,7 +650,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       </p>
                     </div>
                     <div
-                      class="preset-tonal-surface p-4 rounded-container md:basis-1/2 h-fit"
+                      class="preset-filled-surface-100-900 p-4 rounded-container md:basis-1/2 h-fit"
                     >
                       <p>
                         🤔
@@ -635,6 +719,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   </div>
 
                   <h2
+                    id="the-preview-a-sneak-peek"
                     class="font-bold text-3xl scroll-mt-[70px] text-secondary-800-200"
                   >
                     The Preview: A Sneak Peek
@@ -713,7 +798,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       </p>
                     </div>
                     <div
-                      class="preset-tonal-surface p-4 rounded-container md:basis-1/2 h-fit"
+                      class="preset-filled-surface-100-900 p-4 rounded-container md:basis-1/2 h-fit"
                     >
                       <p>
                         🤔
@@ -732,6 +817,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   </div>
 
                   <h2
+                    id="the-end-get-started"
                     class="font-bold text-3xl scroll-mt-[70px] text-secondary-800-200"
                   >
                     The End: Get Started!
@@ -795,7 +881,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <div
           class="hidden self-start w-1/5 min-w-[200px] h-auto sm:inline-block sticky top-16"
         >
-          <!-- <TableOfContents class="overflow-y-scroll h-[90vh] px-2" /> -->
+          <div class="pb-20 max-h-[90svh] overflow-auto">
+            {@render tableOfContents()}
+          </div>
         </div>
       </div>
     </main>

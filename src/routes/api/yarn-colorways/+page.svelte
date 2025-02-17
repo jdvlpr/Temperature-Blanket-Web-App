@@ -17,6 +17,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { PUBLIC_BASE_DOMAIN_NAME, PUBLIC_BASE_URL } from '$env/static/public';
   import AppLogo from '$lib/components/AppLogo.svelte';
   import AppShell from '$lib/components/AppShell.svelte';
+  import { Modal } from '@skeletonlabs/skeleton-svelte';
+
+  let openTableOfContents = $state(false);
 </script>
 
 <svelte:head>
@@ -41,33 +44,129 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <meta property="og:image:height" content="768" />
 </svelte:head>
 
+<svelte:document
+  onclick={(event) => {
+    if (event.target.classList.contains('toc-anchor')) {
+      openTableOfContents = false;
+    }
+  }}
+/>
+
+{#snippet tableOfContents()}
+  <nav data-testid="toc" class="toc space-y-4 p-4 max-w-[60vw]">
+    <div class="font-bold">Table of Contents</div>
+    <ul class="toc-list space-y-2">
+      <li class="toc-list-item block">
+        <a
+          href="#yarn-colorways-api"
+          class="toc-anchor opacity-60 hover:opacity-100">Yarn Colorways API</a
+        >
+      </li>
+      <li class="toc-list-item block">
+        <a href="#using-the-api" class="toc-anchor opacity-60 hover:opacity-100"
+          >Using the API</a
+        >
+      </li>
+      <li class="toc-list-item block ml-4">
+        <a href="#sign-up" class="toc-anchor opacity-60 hover:opacity-100"
+          >Sign Up</a
+        >
+      </li>
+      <li class="toc-list-item block ml-4">
+        <a
+          href="#making-a-request"
+          class="toc-anchor opacity-60 hover:opacity-100">Making a Request</a
+        >
+      </li>
+      <li class="toc-list-item block ml-4">
+        <a
+          href="#reading-a-response"
+          class="toc-anchor opacity-60 hover:opacity-100">Reading a Response</a
+        >
+      </li>
+      <li class="toc-list-item block">
+        <a href="#endpoints" class="toc-anchor opacity-60 hover:opacity-100"
+          >Endpoints</a
+        >
+      </li>
+      <li class="toc-list-item block ml-4">
+        <a
+          href="#find-yarn-by-color"
+          class="toc-anchor opacity-60 hover:opacity-100">Find Yarn by Color</a
+        >
+      </li>
+      <li class="toc-list-item block ml-4">
+        <a href="#colorways" class="toc-anchor opacity-60 hover:opacity-100"
+          >Colorways</a
+        >
+      </li>
+      <li class="toc-list-item block ml-4">
+        <a href="#brands" class="toc-anchor opacity-60 hover:opacity-100"
+          >Brands</a
+        >
+      </li>
+      <li class="toc-list-item block ml-4">
+        <a href="#yarns" class="toc-anchor opacity-60 hover:opacity-100"
+          >Yarns</a
+        >
+      </li>
+      <li class="toc-list-item block ml-4">
+        <a href="#yarn-weights" class="toc-anchor opacity-60 hover:opacity-100"
+          >Yarn Weights</a
+        >
+      </li>
+      <li class="toc-list-item block">
+        <a href="#status-codes" class="toc-anchor opacity-60 hover:opacity-100"
+          >Status Codes</a
+        >
+      </li>
+      <li class="toc-list-item block">
+        <a
+          href="#terms-and-license"
+          class="toc-anchor opacity-60 hover:opacity-100">Terms &amp; License</a
+        >
+      </li>
+    </ul>
+  </nav>
+{/snippet}
+
 <AppShell pageName="API">
   {#snippet stickyHeader()}
     <div class="hidden lg:inline-flex mx-auto my-1">
       <AppLogo />
     </div>
-    <button
-      class="btn hover:preset-tonal flex items-center sm:hidden"
-      title="Open Navigation Sidebar"
-      onclick={() => {
-        // drawerStore.open({
-        //   id: 'documentation',
-        //   position: 'right',
-        // });
-      }}
-    >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        class="w-6 h-6"
-        viewBox="0 0 24 24"
-        ><path
-          fill="currentColor"
-          d="M3 9h14V7H3zm0 4h14v-2H3zm0 4h14v-2H3zm16 0h2v-2h-2zm0-10v2h2V7zm0 6h2v-2h-2z"
-        /></svg
+    <div class="sm:hidden">
+      <Modal
+        bind:open={openTableOfContents}
+        triggerBase="hover:preset-tonal"
+        contentBase="bg-surface-50-950 p-4 space-y-4 shadow-xl w-fit h-screen overflow-auto"
+        positionerJustify="justify-end"
+        positionerAlign=""
+        positionerPadding=""
+        transitionsPositionerIn={{ x: 480, duration: 200 }}
+        transitionsPositionerOut={{ x: 480, duration: 200 }}
       >
+        {#snippet trigger()}
+          <div class="flex flex-wrap items-center gap-1">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="w-6 h-6"
+              viewBox="0 0 24 24"
+              ><path
+                fill="currentColor"
+                d="M3 9h14V7H3zm0 4h14v-2H3zm0 4h14v-2H3zm16 0h2v-2h-2zm0-10v2h2V7zm0 6h2v-2h-2z"
+              /></svg
+            >
 
-      <span class="">Content</span>
-    </button>
+            <span class="">Content</span>
+          </div>{/snippet}
+        {#snippet content()}
+          <div class="mb-20">
+            {@render tableOfContents()}
+          </div>
+        {/snippet}
+      </Modal>
+    </div>
   {/snippet}
   {#snippet main()}
     <main class="max-w-screen-xl m-auto mb-4 pt-2 px-2 lg:px-0">
@@ -318,7 +417,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   <tr>
                     <td>weight</td>
                     <td
-                      >A <a href="#weights" class="link"
+                      >A <a href="#yarn-weights" class="link"
                         >yarn weight ID or name</a
                       >.</td
                     >
@@ -575,7 +674,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   <tr>
                     <td>weight</td>
                     <td
-                      >A <a href="#weights" class="link"
+                      >A <a href="#yarn-weights" class="link"
                         >yarn weight ID or name</a
                       >.</td
                     >
@@ -934,7 +1033,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </section>
 
           <section
-            id="weights"
+            id="yarn-weights"
             class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
           >
             <h3 class="font-bold text-xl">Yarn Weights</h3>
@@ -1137,7 +1236,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <div
           class="hidden self-start w-1/5 min-w-[200px] h-auto sm:inline-block sticky top-16"
         >
-          <!-- <TableOfContents class="overflow-y-scroll h-[90vh] px-2" /> -->
+          <div class=" pb-20 max-h-[90svh] overflow-auto">
+            {@render tableOfContents()}
+          </div>
         </div>
       </div>
     </main>

@@ -15,7 +15,6 @@
 
 import { ICONS } from '$lib/constants';
 import { MediaQuery } from 'svelte/reactivity';
-import { writable } from 'svelte/store';
 
 type ModalOptions = {
   showCloseButton?: boolean;

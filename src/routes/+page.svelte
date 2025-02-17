@@ -281,8 +281,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
         >
           {@render gettingStarted()}
 
-          <div class="flex-grow border-t border-surface-300-600-token"></div>
-
           <p>
             <a
               href="/blog/what-is-a-temperature-blanket"

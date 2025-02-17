@@ -69,12 +69,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
           Learn how this site uses cookies and manage your preferences below.
         </p>
 
-        <div
-          class="card p-2 rounded-container bg-surface-200-800 my-2 flex flex-col gap-2"
-        >
+        <div class="my-2 flex flex-col gap-2 max-w-screen-sm">
           <div class="flex flex-col">
             <ToggleSwitch
-              label="Analytics"
+              label="Analytics Cookies"
               onchange={() => {
                 let thisEvent;
                 if (consentToMSClarityCookies.value)
@@ -82,10 +80,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 else thisEvent = new CustomEvent('removeConsentToMSClarity');
                 window.dispatchEvent(thisEvent);
               }}
-              bind:checked={consentToMSClarityCookies.value}
-            />
-          </div>
-          <p>
+              detailsTextSize="text-normal"
+              details={`<p>
             If you choose to accept Analytics, this site uses Microsoft Clarity
             to capture nonpersonally identifiable information about how you
             interact with temperature-blanket.com. Website usage data is
@@ -105,23 +101,32 @@ If not, see <https://www.gnu.org/licenses/>. -->
               rel="noreferrer noopener"
               target="_blank">Microsoft Privacy Statement</a
             >.
-          </p>
+          </p>`}
+              bind:checked={consentToMSClarityCookies.value}
+            />
+          </div>
+
           {#if preferences.value.disableToastAnalytics}
-            <button
-              class="btn preset-filled-secondary-500 w-fit my-2 whitespace-pre-wrap"
-              onclick={() => {
-                preferences.value.disableToastAnalytics = false;
-                toast.trigger({
-                  message: 'The Analytics message can be shown again.',
-                  background: 'preset-filled-success-100-900',
-                });
-              }}
-              ><span
-                >Reset <span class="italic inline"
+            <div
+              class="flex flex-wrap gap-4 items-center p-2 rounded-container preset-filled-surface-200-800 w-fit"
+            >
+              <p>
+                Reset the <span class="italic inline"
                   >"Don't show this message again"</span
-                > for Analytics</span
-              >
-            </button>
+                > selection for analytics.
+              </p>
+              <button
+                class="btn preset-filled-secondary-500 w-fit my-2 whitespace-pre-wrap"
+                onclick={() => {
+                  preferences.value.disableToastAnalytics = false;
+                  toast.trigger({
+                    message: 'The Analytics message can be shown again.',
+                    background: 'preset-filled-success-100-900',
+                  });
+                }}
+                ><span>Reset</span>
+              </button>
+            </div>
           {/if}
         </div>
       </div>

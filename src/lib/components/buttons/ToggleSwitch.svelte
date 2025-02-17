@@ -19,6 +19,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     checked?: boolean;
     disabled?: boolean;
     details?: string;
+    detailsTextSize?: string;
     onchange?: (e: Event) => void;
     maxWidth?: string;
   }
@@ -28,6 +29,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     checked = $bindable(false),
     disabled = false,
     details = '',
+    detailsTextSize = 'text-xs',
     onchange,
     maxWidth = '450px',
   }: Props = $props();
@@ -36,12 +38,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div
-  class="flex justify-between gap-4 w-full bg-surface-200-800 py-2 px-4 rounded"
+  class="flex justify-between gap-4 w-full bg-surface-200-800 py-2 px-4 rounded-container"
 >
   <div class="flex flex-col items-start">
     <span class:font-bold={hasDetails}>{@html label}</span>
     {#if hasDetails}
-      <span class="max-w-[{maxWidth}] text-xs">{details}</span>
+      <span class="max-w-[{maxWidth}] {detailsTextSize}">{@html details}</span>
     {/if}
   </div>
   <label class="relative inline-flex items-start cursor-pointer gap-2">

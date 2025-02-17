@@ -18,7 +18,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import AppLogo from '$lib/components/AppLogo.svelte';
   import AppShell from '$lib/components/AppShell.svelte';
   import { MAXIMUM_DAYS_PER_LOCATION, MAXIMUM_LOCATIONS } from '$lib/constants';
-  // const drawerStore = getDrawerStore();
+  import { Modal } from '@skeletonlabs/skeleton-svelte';
 
   let checkIcon = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 inline text-success-900-100">
   <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -28,7 +28,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
 </svg>
 `;
+
+  let openTableOfContents = $state(false);
 </script>
+
+<svelte:document
+  onclick={(event) => {
+    if (event.target.classList.contains('toc-anchor')) {
+      openTableOfContents = false;
+    }
+  }}
+/>
 
 <svelte:head>
   <title>Documentation for temperature-blanket.com</title>
@@ -49,33 +59,311 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <meta property="og:type" content="website" />
 </svelte:head>
 
+{#snippet tableOfContents()}
+  <nav data-testid="toc" class="toc space-y-4 px-2">
+    <div class="font-bold">Table of Contents</div>
+    <ul class="toc-list space-y-2">
+      <li class="toc-list-item block ml-4">
+        <a href="#introduction" class="toc-anchor opacity-60 hover:opacity-100"
+          >Introduction</a
+        >
+      </li>
+      <li class="toc-list-item block ml-4">
+        <a
+          href="#about-the-project-planner"
+          class="toc-anchor opacity-60 hover:opacity-100"
+          >About the Project Planner</a
+        >
+      </li>
+      <li class="toc-list-item block">
+        <a href="#basics" class="toc-anchor opacity-60 hover:opacity-100"
+          >Basics</a
+        >
+      </li>
+      <li class="toc-list-item block ml-4">
+        <a href="#save-project" class="toc-anchor opacity-60 hover:opacity-100"
+          >Save Project</a
+        >
+      </li>
+      <li class="toc-list-item block ml-4">
+        <a href="#open-project" class="toc-anchor opacity-60 hover:opacity-100"
+          >Open Project</a
+        >
+      </li>
+      <li class="toc-list-item block ml-4">
+        <a href="#change-units" class="toc-anchor opacity-60 hover:opacity-100"
+          >Change Units</a
+        >
+      </li>
+      <li class="toc-list-item block ml-4">
+        <a href="#change-theme" class="toc-anchor opacity-60 hover:opacity-100"
+          >Change Theme</a
+        >
+      </li>
+      <li class="toc-list-item block ml-4">
+        <a href="#navigation" class="toc-anchor opacity-60 hover:opacity-100"
+          >Navigation</a
+        >
+      </li>
+      <li class="toc-list-item block ml-4">
+        <a href="#undoredo" class="toc-anchor opacity-60 hover:opacity-100"
+          >Undo/Redo</a
+        >
+      </li>
+      <li class="toc-list-item block">
+        <a href="#location" class="toc-anchor opacity-60 hover:opacity-100"
+          >Location</a
+        >
+      </li>
+      <li class="toc-list-item block ml-4">
+        <a
+          href="#choose-a-location"
+          class="toc-anchor opacity-60 hover:opacity-100">Choose a Location</a
+        >
+      </li>
+      <li class="toc-list-item block ml-4">
+        <a href="#select-dates" class="toc-anchor opacity-60 hover:opacity-100"
+          >Select Dates</a
+        >
+      </li>
+      <li class="toc-list-item block ml-4">
+        <a
+          href="#multiple-locations"
+          class="toc-anchor opacity-60 hover:opacity-100">Multiple Locations</a
+        >
+      </li>
+      <li class="toc-list-item block ml-4">
+        <a
+          href="#location-errors"
+          class="toc-anchor opacity-60 hover:opacity-100">Location Errors</a
+        >
+      </li>
+      <li class="toc-list-item block">
+        <a href="#weather" class="toc-anchor opacity-60 hover:opacity-100"
+          >Weather</a
+        >
+      </li>
+      <li class="toc-list-item block ml-4">
+        <a
+          href="#weather-sources"
+          class="toc-anchor opacity-60 hover:opacity-100">Weather Sources</a
+        >
+      </li>
+      <li class="toc-list-item block ml-4">
+        <a
+          href="#get-weather-data"
+          class="toc-anchor opacity-60 hover:opacity-100">Get Weather Data</a
+        >
+      </li>
+      <li class="toc-list-item block ml-4">
+        <a
+          href="#grouping-weather-data"
+          class="toc-anchor opacity-60 hover:opacity-100"
+          >Grouping Weather Data</a
+        >
+      </li>
+      <li class="toc-list-item block ml-4">
+        <a
+          href="#view-weather-data"
+          class="toc-anchor opacity-60 hover:opacity-100">View Weather Data</a
+        >
+      </li>
+      <li class="toc-list-item block ml-4">
+        <a
+          href="#edit-weather-data"
+          class="toc-anchor opacity-60 hover:opacity-100">Edit Weather Data</a
+        >
+      </li>
+      <li class="toc-list-item block ml-4">
+        <a
+          href="#import-weather-data"
+          class="toc-anchor opacity-60 hover:opacity-100">Import Weather Data</a
+        >
+      </li>
+      <li class="toc-list-item block ml-4">
+        <a
+          href="#weather-errors"
+          class="toc-anchor opacity-60 hover:opacity-100">Weather Errors</a
+        >
+      </li>
+      <li class="toc-list-item block ml-4">
+        <a
+          href="#mixed-snow-parameters"
+          class="toc-anchor opacity-60 hover:opacity-100"
+          >Mixed Snow Parameters</a
+        >
+      </li>
+      <li class="toc-list-item block">
+        <a href="#gauges" class="toc-anchor opacity-60 hover:opacity-100"
+          >Gauges</a
+        >
+      </li>
+      <li class="toc-list-item block ml-4">
+        <a href="#add-a-gauge" class="toc-anchor opacity-60 hover:opacity-100"
+          >Add a Gauge</a
+        >
+      </li>
+      <li class="toc-list-item block ml-4">
+        <a
+          href="#gauge-direction"
+          class="toc-anchor opacity-60 hover:opacity-100">Gauge Direction</a
+        >
+      </li>
+      <li class="toc-list-item block ml-4">
+        <a
+          href="#range-calculation-methods"
+          class="toc-anchor opacity-60 hover:opacity-100"
+          >Range Calculation Methods</a
+        >
+      </li>
+      <li class="toc-list-item block ml-4">
+        <a
+          href="#increment-modes"
+          class="toc-anchor opacity-60 hover:opacity-100">Increment Modes</a
+        >
+      </li>
+      <li class="toc-list-item block ml-4">
+        <a href="#adjust-ranges" class="toc-anchor opacity-60 hover:opacity-100"
+          >Adjust Ranges</a
+        >
+      </li>
+      <li class="toc-list-item block">
+        <a href="#colors" class="toc-anchor opacity-60 hover:opacity-100"
+          >Color Tools</a
+        >
+      </li>
+      <li class="toc-list-item block ml-4">
+        <a href="#preset-colors" class="toc-anchor opacity-60 hover:opacity-100"
+          >Preset Colors</a
+        >
+      </li>
+      <li class="toc-list-item block ml-4">
+        <a href="#image-palette" class="toc-anchor opacity-60 hover:opacity-100"
+          >Image Palette</a
+        >
+      </li>
+      <li class="toc-list-item block ml-4">
+        <a href="#importexport" class="toc-anchor opacity-60 hover:opacity-100"
+          >Import/Export</a
+        >
+      </li>
+      <li class="toc-list-item block ml-4">
+        <a href="#sort-colors" class="toc-anchor opacity-60 hover:opacity-100"
+          >Sort Colors</a
+        >
+      </li>
+      <li class="toc-list-item block">
+        <a href="#yarn" class="toc-anchor opacity-60 hover:opacity-100">Yarn</a>
+      </li>
+      <li class="toc-list-item block ml-4">
+        <a
+          href="#getting-yarn-colorway-data"
+          class="toc-anchor opacity-60 hover:opacity-100"
+          >Getting Yarn Colorway Data</a
+        >
+      </li>
+      <li class="toc-list-item block ml-4">
+        <a
+          href="#choose-yarn-colorways"
+          class="toc-anchor opacity-60 hover:opacity-100"
+          >Choose Yarn Colorways</a
+        >
+      </li>
+      <li class="toc-list-item block ml-4">
+        <a
+          href="#link-unavailable"
+          class="toc-anchor opacity-60 hover:opacity-100">Link Unavailable</a
+        >
+      </li>
+      <li class="toc-list-item block">
+        <a href="#preview" class="toc-anchor opacity-60 hover:opacity-100"
+          >Preview</a
+        >
+      </li>
+      <li class="toc-list-item block ml-4">
+        <a
+          href="#create-a-preview"
+          class="toc-anchor opacity-60 hover:opacity-100">Create a Preview</a
+        >
+      </li>
+      <li class="toc-list-item block">
+        <a href="#gallery" class="toc-anchor opacity-60 hover:opacity-100"
+          >Gallery</a
+        >
+      </li>
+      <li class="toc-list-item block ml-4">
+        <a
+          href="#share-to-gallery"
+          class="toc-anchor opacity-60 hover:opacity-100">Share to Gallery</a
+        >
+      </li>
+      <li class="toc-list-item block">
+        <a href="#download" class="toc-anchor opacity-60 hover:opacity-100"
+          >Download</a
+        >
+      </li>
+      <li class="toc-list-item block ml-4">
+        <a
+          href="#download-gauges-and-weather-data-pdf"
+          class="toc-anchor opacity-60 hover:opacity-100"
+          >Download Gauges and Weather Data (PDF)</a
+        >
+      </li>
+      <li class="toc-list-item block ml-4">
+        <a
+          href="#download-weather-data-csv"
+          class="toc-anchor opacity-60 hover:opacity-100"
+          >Download Weather Data (CSV)</a
+        >
+      </li>
+      <li class="toc-list-item block ml-4">
+        <a
+          href="#download-preview-image-png"
+          class="toc-anchor opacity-60 hover:opacity-100"
+          >Download Preview Image (PNG)</a
+        >
+      </li>
+    </ul>
+  </nav>
+{/snippet}
+
 <AppShell pageName="Documentation">
   {#snippet stickyHeader()}
     <div class="hidden lg:inline-flex mx-auto my-1">
       <AppLogo />
     </div>
-    <button
-      class="btn hover:preset-tonal flex items-center sm:hidden"
-      title="Open Navigation Sidebar"
-      onclick={() => {
-        // drawerStore.open({
-        //   id: 'documentation',
-        //   position: 'right',
-        // });
-      }}
-    >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        class="w-6 h-6"
-        viewBox="0 0 24 24"
-        ><path
-          fill="currentColor"
-          d="M3 9h14V7H3zm0 4h14v-2H3zm0 4h14v-2H3zm16 0h2v-2h-2zm0-10v2h2V7zm0 6h2v-2h-2z"
-        /></svg
+    <div class="sm:hidden">
+      <Modal
+        bind:open={openTableOfContents}
+        triggerBase="hover:preset-tonal"
+        contentBase="bg-surface-50-950 p-4 space-y-4 shadow-xl w-fit h-screen overflow-auto"
+        positionerJustify="justify-end"
+        positionerAlign=""
+        positionerPadding=""
+        transitionsPositionerIn={{ x: 480, duration: 200 }}
+        transitionsPositionerOut={{ x: 480, duration: 200 }}
       >
+        {#snippet trigger()}
+          <div class="flex flex-wrap items-center gap-1">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="w-6 h-6"
+              viewBox="0 0 24 24"
+              ><path
+                fill="currentColor"
+                d="M3 9h14V7H3zm0 4h14v-2H3zm0 4h14v-2H3zm16 0h2v-2h-2zm0-10v2h2V7zm0 6h2v-2h-2z"
+              /></svg
+            >
 
-      <span class="">Content</span>
-    </button>
+            <span class="">Content</span>
+          </div>{/snippet}
+        {#snippet content()}
+          <div class="mb-20">
+            {@render tableOfContents()}
+          </div>
+        {/snippet}
+      </Modal>
+    </div>
   {/snippet}
   {#snippet main()}
     <main class="max-w-screen-xl m-auto mb-4 pt-2 px-2 lg:px-0">
@@ -1517,7 +1805,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <div
           class="hidden self-start w-1/5 min-w-[200px] h-auto sm:inline-block sticky top-16"
         >
-          <!-- <TableOfContents class="overflow-y-scroll h-[90vh] px-2" /> -->
+          <div class="pb-20 max-h-[90svh] overflow-auto">
+            {@render tableOfContents()}
+          </div>
         </div>
       </div>
     </main>

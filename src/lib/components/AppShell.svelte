@@ -90,7 +90,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               </span>
             {/if}{/snippet}
           {#snippet content()}
-            <div class="mb-16">
+            <div class="mb-20">
               <AppLogo />
               <AppNavigation />
             </div>
