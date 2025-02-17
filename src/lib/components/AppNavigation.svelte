@@ -51,8 +51,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   class="flex justify-start flex-col items-start text-left gap-2 my-2 w-fit px-2"
   data-sveltekit-preload-data="hover"
 >
-  <!-- <div class="p-2"><AppLogo /></div> -->
-
   <div><ThemeSwitcher /></div>
 
   <Accordion {value} collapsible multiple>
