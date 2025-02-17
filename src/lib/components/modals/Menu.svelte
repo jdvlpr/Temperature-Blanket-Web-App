@@ -70,7 +70,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   function saveProject({ copy = true }) {
     // Copy window url to clipboard
-    console.log({ copy });
 
     if (copy) {
       try {
@@ -102,8 +101,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   $effect(() => {
     if (copiedMessage !== '') {
-      console.log(copiedMessage);
-
       toast.trigger({
         message: copiedMessage,
         background: 'preset-filled-success-100-900',

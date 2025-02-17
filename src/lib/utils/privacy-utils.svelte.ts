@@ -111,8 +111,6 @@ export const privacy = {
               preferences.value.disableToastAnalytics = true;
             else preferences.value.disableToastAnalytics = false;
 
-            console.log(preferences.value.disableToastAnalytics);
-
             const consentToggleElement = document.getElementById(
               'clarity-consent-toggle',
             );

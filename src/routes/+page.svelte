@@ -60,8 +60,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   };
 
   onMount(async () => {
-    // console.log({ toast });
-
     const hasProjectURLParam = new URL(window.location.href).searchParams.has(
       'project',
     );
