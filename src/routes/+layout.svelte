@@ -17,26 +17,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { onNavigate } from '$app/navigation';
   import { PUBLIC_MICROSOFT_CLARITY_ID } from '$env/static/public';
   import ModalProvider from '$lib/components/modals/ModalProvider.svelte';
-  import { consentToMSClarityCookies } from '$lib/state';
+  import { consentToMSClarityCookies, toast } from '$lib/state';
   import { handleKeyDown, initializeLocalStorage, privacy } from '$lib/utils';
-  import { ToastProvider } from '@skeletonlabs/skeleton-svelte';
   import { onMount, type Snippet } from 'svelte';
   import '../css/main.css';
+  import ToastProvider from '$lib/components/ToastProvider.svelte';
   interface Props {
     children?: Snippet;
   }
   let { children }: Props = $props();
 
-  // initializeStores();
-
-  // storePopup.set({
-  //   computePosition,
-  //   autoUpdate,
-  //   offset,
-  //   shift,
-  //   flip,
-  //   arrow,
-  // });
   onMount(async () => {
     initializeLocalStorage();
 
@@ -62,8 +52,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   onkeydown={handleKeyDown}
   onoffline={() => {
     // Alert if offline
-    toast.create({
-      description: `<div
+    toast.trigger({
+      message: `<div
     class="w-full p-2 m-auto flex flex-col items-start text-left"
   >
     <div class="flex items-center justify-start gap-2">
@@ -86,13 +76,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
     <p class="text-sm">Some features may not work as expected.</p>
   </div>`,
-      // background: 'bg-warning-200-800 ',
+      background: 'preset-filled-warning-200-800',
     });
   }}
   ononline={() => {
     // Alert if online connection restored
-    toast.create({
-      description: `<div
+    toast.trigger({
+      message: `<div
     class="w-full text-center p-2 m-auto flex flex-col items-start justify-center"
   >
     <div class="flex flex-wrap items-center justify-center gap-2">
@@ -100,7 +90,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
      You are online
     </div>
   </div>`,
-      // background: 'bg-success-200-800 ',
+      background: 'preset-filled-success-100-900',
     });
   }}
 />

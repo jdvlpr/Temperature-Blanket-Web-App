@@ -37,6 +37,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     pageSections,
     pinAllSections,
     project,
+    toast,
     wasProjectLoadedFromURL,
     weather,
   } from '$lib/state';
@@ -48,8 +49,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     updateHistory,
     upToDate,
   } from '$lib/utils';
-  import { type ToastContext } from '@skeletonlabs/skeleton-svelte';
-  import { getContext, onMount } from 'svelte';
+  import { onMount } from 'svelte';
 
   let debounceTimer: number;
 
@@ -58,8 +58,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     window.clearTimeout(debounceTimer);
     debounceTimer = window.setTimeout(callback, time);
   };
-
-  const toast: ToastContext = getContext('toast');
 
   onMount(async () => {
     // console.log({ toast });
@@ -102,9 +100,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   $effect(() => {
     if (project.history.updateMessage !== '') {
-      toast.create({
-        description: project.history.updateMessage,
-        // background: 'bg-success-300 text-black',
+      toast.trigger({
+        message: project.history.updateMessage,
+        background: 'preset-filled-success-100-900',
       });
     }
   });

@@ -19,21 +19,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Expand from '$lib/components/Expand.svelte';
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
   import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
-  import { modal } from '$lib/state';
+  import { modal, toast } from '$lib/state';
   import {
     colorsToCode,
     colorsToYarnDetails,
     getColorsFromInput,
     pluralize,
   } from '$lib/utils';
-  import type { ToastContext } from '@skeletonlabs/skeleton-svelte';
   import { Segment } from '@skeletonlabs/skeleton-svelte';
-  import { getContext } from 'svelte';
   import { slide } from 'svelte/transition';
 
-  let { colors, updateGauge, parent } = $props();
-
-  const toast: ToastContext = getContext('toast');
+  let { colors, updateGauge } = $props();
 
   let inputValue = $state('');
 
@@ -107,7 +103,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   $effect(() => {
     if (copiedPalette || copiedNames || copiedHexes || copiedPaletteCode) {
       toast.trigger({
-        description: copiedNotice,
+        message: copiedNotice,
       });
       copiedPalette = false;
       copiedNames = false;
@@ -257,9 +253,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
               window.navigator.clipboard.writeText(colorHexes);
               copiedHexes = true;
             } catch {
-              toast.create({
-                description: 'Unable to copy to clipboard',
-                // background: 'bg-success-300 text-black',
+              toast.trigger({
+                message: 'Unable to copy to clipboard',
+                background: 'preset-filled-error-100-900',
               });
             }
           }}
@@ -306,9 +302,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
               window.navigator.clipboard.writeText(paletteCode);
               copiedPaletteCode = true;
             } catch {
-              toast.create({
-                description: 'Unable to copy to clipboard',
-                // background: 'bg-success-300 text-black',
+              toast.trigger({
+                message: 'Unable to copy to clipboard',
+                background: 'preset-filled-error-100-900',
               });
             }
           }}
@@ -359,9 +355,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
               window.navigator.clipboard.writeText(colorNames);
               copiedNames = true;
             } catch {
-              toast.create({
-                description: 'Unable to copy to clipboard',
-                // background: 'bg-success-300 text-black',
+              toast.trigger({
+                message: 'Unable to copy to clipboard',
+                background: 'preset-filled-error-100-900',
               });
             }
           }}

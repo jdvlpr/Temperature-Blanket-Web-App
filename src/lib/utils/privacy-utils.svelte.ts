@@ -14,7 +14,7 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { browser } from '$app/environment';
-import { consentToMSClarityCookies, preferences } from '$lib/state';
+import { consentToMSClarityCookies, preferences, toast } from '$lib/state';
 import type { ToastContext } from '@skeletonlabs/skeleton-svelte';
 import { getContext } from 'svelte';
 export const privacy = {
@@ -33,7 +33,7 @@ export const privacy = {
         ';expires=Thu, 01 Jan 1970 00:00:01 GMT';
     }
   },
-  init: function (toast) {
+  init: function () {
     if (!browser) return;
 
     // Event listener for when consent is given to Microsoft Clarity
@@ -58,8 +58,8 @@ export const privacy = {
     window.addEventListener('analyticsUnableToLoad', () => {
       setTimeout(function () {
         // code to execute after 200 milliseconds
-        toast.create({
-          description:
+        toast.trigger({
+          message:
             'Unable to load analytics. Your browser or a plugin might be blocking it.',
           // background: 'preset-filled-error-500',
         });
@@ -71,8 +71,8 @@ export const privacy = {
     // See https://learn.microsoft.com/en-us/clarity/setup-and-installation/cookie-list
     if (!this.get_cookie('_clck') || !this.get_cookie('_clsk')) {
       if (!preferences.value.disableToastAnalytics) {
-        toast.create({
-          description: `
+        toast.trigger({
+          message: `
       <div class="flex flex-col gap-2 justify-start items-start">
           <label class="relative inline-flex items-center cursor-pointer gap-2">
             <div class="relative">
@@ -94,33 +94,35 @@ export const privacy = {
           </label>
       </div>
       `,
-          // hideDismiss: true,
-          // classes: 'flex max-sm:flex-col max-sm:gap-2 max-sm:items-end',
-          // background: 'bg-surface-50-950',
-          // timeout: 31556952000, // one year
-          // action: {
-          //   label: 'Save',
-          //   response: () => {},
-          // },
-          // callback: (response) => {
-          //   if (response.status !== 'closed') return;
-          //   const dontShowAgainElement = document.getElementById(
-          //     'cookies-dont-show-again',
-          //   );
-          //   if (dontShowAgainElement?.checked)
-          //     preferences.value.disableToastAnalytics = true;
-          //   else preferences.value.disableToastAnalytics = false;
+          hideDismiss: true,
+          classes: 'flex max-sm:flex-col max-sm:gap-2 max-sm:items-end',
+          background: 'bg-surface-50-950',
+          timeout: 31556952000, // one year
+          action: {
+            label: 'Save',
+            response: () => {},
+          },
+          callback: (response) => {
+            if (response.status !== 'closed') return;
+            const dontShowAgainElement = document.getElementById(
+              'cookies-dont-show-again',
+            );
+            if (dontShowAgainElement?.checked)
+              preferences.value.disableToastAnalytics = true;
+            else preferences.value.disableToastAnalytics = false;
 
-          //   const consentToggleElement = document.getElementById(
-          //     'clarity-consent-toggle',
-          //   );
+            console.log(preferences.value.disableToastAnalytics);
 
-          //   let consentEvent;
-          //   if (consentToggleElement?.checked)
-          //     consentEvent = new CustomEvent('consentToMSClarity');
-          //   else consentEvent = new CustomEvent('removeConsentToMSClarity');
-          //   window.dispatchEvent(consentEvent);
-          // },
+            const consentToggleElement = document.getElementById(
+              'clarity-consent-toggle',
+            );
+
+            let consentEvent;
+            if (consentToggleElement?.checked)
+              consentEvent = new CustomEvent('consentToMSClarity');
+            else consentEvent = new CustomEvent('removeConsentToMSClarity');
+            window.dispatchEvent(consentEvent);
+          },
         });
       }
     } else {

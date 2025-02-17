@@ -18,11 +18,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import AppLogo from '$lib/components/AppLogo.svelte';
   import AppShell from '$lib/components/AppShell.svelte';
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
-  import { consentToMSClarityCookies, preferences } from '$lib/state';
+  import { consentToMSClarityCookies, preferences, toast } from '$lib/state';
   import type { ToastContext } from '@skeletonlabs/skeleton-svelte';
   import { getContext } from 'svelte';
-
-  const toast: ToastContext = getContext('toast');
 
   let kofiUrl = new URL(PUBLIC_KOFI_LINK || 'https://ko-fi.com');
 
@@ -113,9 +111,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
               class="btn preset-filled-secondary-500 w-fit my-2 whitespace-pre-wrap"
               onclick={() => {
                 preferences.value.disableToastAnalytics = false;
-                toast.create({
-                  description: 'The Analytics message can be shown again.',
-                  // background: 'bg-success-300 text-black',
+                toast.trigger({
+                  message: 'The Analytics message can be shown again.',
+                  background: 'preset-filled-success-100-900',
                 });
               }}
               ><span

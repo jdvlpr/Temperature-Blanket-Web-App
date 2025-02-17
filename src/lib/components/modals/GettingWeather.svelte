@@ -175,7 +175,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 </script>
 
-<div class="flex flex-col items-center text-center w-full p-2">
+<div class="flex flex-col items-center text-center w-full p-4">
   {#if signal.value && !error}
     <Spinner size="36" />
 

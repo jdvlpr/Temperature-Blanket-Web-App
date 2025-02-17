@@ -30,6 +30,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     pinAllSections,
     previews,
     project,
+    toast,
     weather,
   } from '$lib/state';
   import {
@@ -38,10 +39,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     downloadWeatherCSV,
     setLocalStorageProject,
   } from '$lib/utils';
-  import type { ToastContext } from '@skeletonlabs/skeleton-svelte';
-  import { getContext } from 'svelte';
-
-  const toast: ToastContext = getContext('toast');
 
   interface Props {
     page?: string;
@@ -73,6 +70,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   function saveProject({ copy = true }) {
     // Copy window url to clipboard
+    console.log({ copy });
+
     if (copy) {
       try {
         window.navigator.clipboard.writeText(project.url.href);
@@ -103,9 +102,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   $effect(() => {
     if (copiedMessage !== '') {
-      toast.create({
-        description: copiedMessage,
-        // background: 'bg-success-300 text-black',
+      console.log(copiedMessage);
+
+      toast.trigger({
+        message: copiedMessage,
+        background: 'preset-filled-success-100-900',
       });
       copiedMessage = '';
     }
@@ -460,7 +461,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <button
           class="btn hover:preset-tonal gap-1"
           onclick={() => {
-            saveProject({ copy: false });
+            saveProject({ copy: true });
           }}
         >
           <svg

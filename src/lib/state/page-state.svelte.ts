@@ -90,6 +90,105 @@ class ModalClass {
 
 export const modal = new ModalClass();
 
+export interface ToastSettings {
+  /** Provide the toast message. Supports HTML. */
+  message: string;
+  /** Provide CSS classes to set the background color. */
+  background?: string;
+  /** Enables auto-hide after the timeout duration. */
+  autohide?: boolean;
+  /** Set the auto-hide timeout duration. */
+  timeout?: number;
+  /** Generate a custom action button UI. */
+  action?: {
+    /** The button label. Supports HTML. */
+    label: string;
+    /** The function triggered when the button is pressed. */
+    response: () => void;
+  };
+  /** Hide dismiss button */
+  hideDismiss?: boolean;
+  /** Remain visible on Hover */
+  hoverable?: boolean;
+  /** Provide arbitrary CSS classes to style the toast. */
+  classes?: string;
+  /** Callback function that fires on trigger and close. */
+  callback?: (response: { id: string; status: 'queued' | 'closed' }) => void;
+}
+
+export interface Toast extends ToastSettings {
+  /** A UUID will be auto-assigned on `.trigger()`. */
+  id: string;
+  /** The id of the `setTimeout` if `autohide` is enabled  */
+  timeoutId?: ReturnType<typeof setTimeout>;
+}
+
+class ToastService {
+  #toastDefaults: ToastSettings = {
+    message: 'Missing Toast Message',
+    autohide: true,
+    timeout: 5000,
+  };
+
+  // All Toasts
+  queue = $state([]);
+
+  /** Remove toast in queue*/
+  close = (id: string) => {
+    if (this.queue.length > 0) {
+      const index = this.queue.findIndex((t) => t.id === id);
+      const selectedToast = this.queue[index];
+      if (selectedToast) {
+        // Trigger Callback
+        if (selectedToast.callback)
+          selectedToast.callback({ id, status: 'closed' });
+        // Clear timeout
+        if (selectedToast.timeoutId) clearTimeout(selectedToast.timeoutId);
+        // Remove
+        this.queue.splice(index, 1);
+      }
+    }
+  };
+
+  // If toast should auto-hide, wait X time, then close by ID
+  handleAutoHide = (toast: Toast) => {
+    if (toast.autohide === true) {
+      return setTimeout(() => {
+        this.close(toast.id);
+      }, toast.timeout);
+    }
+  };
+
+  /** Add a new toast to the queue. */
+  trigger = (toast: ToastSettings) => {
+    const id: string = Number(Math.random()).toString(32);
+    // Trigger Callback
+    if (toast && toast.callback) toast.callback({ id, status: 'queued' });
+    // activate autohide when dismiss button is hidden.
+    if (toast.hideDismiss) toast.autohide = true;
+    // Merge with defaults
+    const tMerged: Toast = { ...this.#toastDefaults, ...toast, id };
+    // Handle auto-hide, if needed
+    tMerged.timeoutId = this.handleAutoHide(tMerged);
+    // Push into queue
+    this.queue.push(tMerged);
+  };
+
+  /** Remain visible on hover */
+  freeze = (index: number) => {
+    if (this.queue.length > 0) clearTimeout(this.queue[index].timeoutId);
+  };
+  /** Cancel remain visible on leave */
+  unfreeze = (index: number) => {
+    if (this.queue.length > 0)
+      this.queue[index].timeoutId = this.handleAutoHide(this.queue[index]);
+  };
+  /** Remove all toasts from queue */
+  clear = () => (this.queue = []);
+}
+
+export const toast = new ToastService();
+
 export const consentToMSClarityCookies = $state({ value: false });
 
 export const showNavigationSideBar = $state({ value: true });

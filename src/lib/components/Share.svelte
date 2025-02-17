@@ -14,10 +14,8 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { Popover, type ToastContext } from '@skeletonlabs/skeleton-svelte';
-  import { getContext } from 'svelte';
-
-  const toast: ToastContext = getContext('toast');
+  import { toast } from '$lib/state';
+  import { Popover } from '@skeletonlabs/skeleton-svelte';
 
   let { href } = $props();
 
@@ -39,9 +37,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   $effect(() => {
     if (copiedMessage !== '') {
-      toast.create({
-        description: copiedMessage,
-        // background: 'bg-success-300 text-black',
+      toast.trigger({
+        message: copiedMessage,
+        background: 'preset-filled-success-100-900',
       });
       copiedMessage = '';
     }

@@ -49,6 +49,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let defaultWeatherSourceCopy = $state();
   let wasDefaultWeatherSourceChanged = $state(false);
   let showWeatherChart = $state(true);
+  let warningAccordionState = $state([]);
+  let missingWeatherAccordionState = $state([]);
 
   let isAnyWeatherSourceDifferentFromDefault;
   onMount(() => {
@@ -237,7 +239,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <label class="label flex-col flex">
         <span>Weeks Start On</span>
         <select
-          class="select w-fit"
+          class="select w-fit mx-auto"
           bind:value={weather.monthGroupingStartDay}
           id="weather-weeks-start-week-on"
         >
@@ -250,11 +252,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/if}
 
   {#if projectHasRecentWeatherData}
-    <div
-      class="preset-tonal-warning border border-warning-500 rounded-container text-left w-fit max-w-screen-sm text-sm"
-    >
-      <Accordion>
-        <Accordion.Item>
+    <div class="text-left w-fit max-w-screen-sm text-sm">
+      <Accordion
+        value={warningAccordionState}
+        collapsible
+        rounded="rounded-container"
+        classes="preset-tonal-warning"
+      >
+        <Accordion.Item value="warning">
           {#snippet lead()}
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -271,14 +276,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
               />
             </svg>
           {/snippet}
-          {#snippet summary()}
+          {#snippet control()}
             Weather within the past {weather.defaultSource === 'Open-Meteo'
               ? OPEN_METEO_DELAY_DAYS
               : weather.defaultSource === 'Meteostat'
                 ? METEOSTAT_DELAY_DAYS
                 : 'few'} days may be revised as new data comes in.
           {/snippet}
-          {#snippet content()}
+          {#snippet panel()}
             Weather data comes from <a
               href="https://open-meteo.com/"
               target="_blank"
@@ -485,8 +490,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <div
       class="variant-outline-surface rounded-container flex flex-col gap-2 justify-center items-center text-left w-fit max-w-screen-sm text-sm"
     >
-      <Accordion>
-        <Accordion.Item>
+      <Accordion
+        value={missingWeatherAccordionState}
+        collapsible
+        rounded="rounded-container"
+        classes="preset-filled-surface-100-900"
+      >
+        <Accordion.Item value="missing">
           {#snippet lead()}
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -498,10 +508,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
               /></svg
             >
           {/snippet}
-          {#snippet summary()}
+          {#snippet control()}
             There's some missing data
           {/snippet}
-          {#snippet content()}
+          {#snippet panel()}
             {#each missingDataMerged as { count, type, label }}
               {#if count && count < weather.data?.length}
                 {count}
