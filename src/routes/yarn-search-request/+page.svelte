@@ -57,7 +57,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <Card>
         {#snippet header()}
           <div
-            class="bg-surface-300-700 p-4 text-left flex flex-wrap justify-center items-end gap-4"
+            class="bg-surface-200-800 p-4 text-left flex flex-wrap justify-center items-end gap-4"
           >
             <p>
               Making a request for a yarn to be included in the search results
