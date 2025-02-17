@@ -79,6 +79,8 @@ export function initializeLocalStorage() {
   $effect.root(() => {
     $effect(() => {
       // Update the body data-theme attribute when the user changes the skeleton theme or mode
+      console.log(preferences.value.theme);
+
       if (
         skeletonThemes
           .map((theme) => theme.id)

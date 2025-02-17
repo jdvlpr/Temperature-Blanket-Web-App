@@ -102,8 +102,6 @@ const themeCookies: Handle = async ({ event, resolve }) => {
     mode = 'system';
   }
 
-  console.log({ theme, mode });
-
   return await resolve(event, {
     transformPageChunk: ({ html }) =>
       html
