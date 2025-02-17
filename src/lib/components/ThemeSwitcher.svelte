@@ -101,7 +101,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     bind:open={openState}
     triggerBase="btn hover:preset-tonal"
     contentBase="card bg-surface-200-800 p-4 space-y-4 shadow-xl"
-    zIndex="1000"
+    zIndex="z-[1000]"
     arrow
     arrowBackground="!bg-surface-200 dark:!bg-surface-800"
     modal={true}
