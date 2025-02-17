@@ -15,6 +15,7 @@
 
 import { dev } from '$app/environment';
 import { skeletonThemes } from '$lib/components/ThemeSwitcher.svelte';
+import { THEMES } from '$lib/constants';
 import { redirect, type Handle } from '@sveltejs/kit';
 import { sequence } from '@sveltejs/kit/hooks';
 
@@ -94,12 +95,14 @@ const themeCookies: Handle = async ({ event, resolve }) => {
     theme = 'classic';
   }
 
-  if (cookieThemeMode) {
+  if (cookieThemeMode && THEMES.map((t) => t.id).includes(cookieThemeMode)) {
     mode = cookieThemeMode;
   } else {
     event.cookies.set('theme_mode', 'system', { path: '/' });
     mode = 'system';
   }
+
+  console.log({ theme, mode });
 
   return await resolve(event, {
     transformPageChunk: ({ html }) =>
