@@ -180,28 +180,30 @@ If not, see <https://www.gnu.org/licenses/>. -->
         // small delay to allow the modal to open
         // then scroll to and focus on the number input
         if (focusOn === 'to') {
-          document.getElementById(`range-${index}-to`)?.scrollIntoView({
-            behavior: 'smooth',
-          });
           document
-            .getElementById(`range-${index}-to`)
+            .getElementById(`settings-range-${index}-to`)
+            ?.scrollIntoView({
+              behavior: 'smooth',
+            });
+          document
+            .getElementById(`settings-range-${index}-to`)
             ?.getElementsByTagName('input')[0]
             .focus();
         } else {
           document
-            .getElementById(`range-${index}-from`)
+            .getElementById(`settings-range-${index}-from`)
             ?.scrollIntoView({ behavior: 'smooth' });
           document
-            .getElementById(`range-${index}-from`)
+            .getElementById(`settings-range-${index}-from`)
             ?.getElementsByTagName('input')[0]
             .focus();
         }
-      }, 300);
+      }, 0);
     }
   });
 </script>
 
-<div class="p-2">
+<div class="p-4">
   <div class="flex max-lg:flex-col justify-center items-start gap-2 w-full">
     <div
       class="flex flex-col justify-start items-start lg:max-w-[500px]"
@@ -211,9 +213,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         Setup Ranges
       </h2>
 
-      <div
-        class="rounded-container p-4 bg-surface-300-700 gap-2 flex flex-col w-full"
-      >
+      <div class="rounded-container gap-2 flex flex-col w-full">
         <div class="flex flex-col justify-start items-start gap-1">
           <ChooseRangeDirection
             bind:direction={_gauge.rangeOptions.direction}
@@ -240,7 +240,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </div>
 
         <div
-          class="flex flex-col justify-start items-start gap-2 card variant-outline-surface p-4"
+          class="flex flex-col justify-start items-start gap-2 card preset-filled-surface-300-700 p-4"
         >
           <div class="flex flex-col items-start justify-start gap-1">
             <p class="flex justify-start items-start gap-1">
@@ -329,7 +329,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         onchange={() => {
                           autoUpdateRanges();
                         }}
-                        class="select"
+                        class="select bg-surface-100-900"
                       >
                         <option value="ranges">Range Increments</option>
                         {#each _gauge.targets as { id, label, icon }}
@@ -441,7 +441,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       id="manual-increment"
                       type="number"
                       min="0"
-                      class="input w-fit"
+                      class="input w-fit bg-surface-100-900"
                       onchange={() => {
                         autoUpdateRanges();
                       }}
@@ -498,7 +498,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     <input
                       id="startFrom"
                       type="number"
-                      class="input w-fit"
+                      class="input w-fit bg-surface-100-900"
                       onfocus={() => {
                         _gauge.rangeOptions.mode = 'manual';
                         autoUpdateRanges();
@@ -588,7 +588,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 </span>
 
                 <select
-                  class="select max-w-[500px] truncate"
+                  class="select max-w-[500px] truncate bg-surface-200-800"
                   value={initialValueSelectRangeCalculationMethod}
                   onchange={(e) => {
                     switch (e.target.value) {
@@ -662,7 +662,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         Edit Ranges
       </h2>
 
-      <div class="p-4 bg-surface-300-700 rounded-container w-full">
+      <div class=" rounded-container w-full">
         <div class="rounded-container overflow-hidden flex flex-col">
           {#if _gauge.ranges}
             {#each _gauge.ranges as { from, to }, index}
@@ -679,8 +679,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   class="col-span-4 col-start-3 flex flex-wrap gap-2 min-w-[220px] max-xl:justify-center xl:justify-start items-start"
                 >
                   <label
-                    class="label flex flex-col justify-start items-start"
-                    id="range-{index}-from"
+                    class="label flex flex-col justify-start items-start w-fit"
+                    id="settings-range-{index}-from"
                   >
                     <span class="text-xs">From ({unitLabel})</span>
                     <input
@@ -711,8 +711,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     />
                   </label>
                   <label
-                    class="label flex flex-col justify-start items-start"
-                    id="range-{index}-to"
+                    class="label flex flex-col justify-start items-start w-fit"
+                    id="settings-range-{index}-to"
                   >
                     <span class="text-xs">To ({unitLabel})</span>
                     <input

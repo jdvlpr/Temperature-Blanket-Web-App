@@ -378,7 +378,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </h2>
             <section
               id="introduction"
-              class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col mt-2 lg:mt-0"
+              class="scroll-mt-[58px] card bg-surface-100-900 p-4 gap-2 flex flex-col mt-2 lg:mt-0"
             >
               <h3 class="font-bold text-xl">Introduction</h3>
               <p>
@@ -391,7 +391,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </div>
           <section
             id="about-the-project-planner"
-            class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
+            class="scroll-mt-[58px] card bg-surface-100-900 p-4 gap-2 flex flex-col"
           >
             <h3 class="font-bold text-xl">About the Project Planner</h3>
             <p>
@@ -460,7 +460,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
           <section
             id="save-project"
-            class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
+            class="scroll-mt-[58px] card bg-surface-100-900 p-4 gap-2 flex flex-col"
           >
             <h3 class="font-bold text-xl">Save Project</h3>
             <p>
@@ -520,7 +520,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </section>
           <section
             id="open-project"
-            class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
+            class="scroll-mt-[58px] card bg-surface-100-900 p-4 gap-2 flex flex-col"
           >
             <h3 class="font-bold text-xl">Open Project</h3>
             <p>
@@ -536,7 +536,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </section>
           <section
             id="change-units"
-            class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
+            class="scroll-mt-[58px] card bg-surface-100-900 p-4 gap-2 flex flex-col"
           >
             <h3 class="font-bold text-xl">Change Units</h3>
             <p>
@@ -559,7 +559,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </section>
           <section
             id="change-theme"
-            class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
+            class="scroll-mt-[58px] card bg-surface-100-900 p-4 gap-2 flex flex-col"
           >
             <h3 class="font-bold text-xl">Change Theme</h3>
             <p>
@@ -585,7 +585,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </section>
           <section
             id="navigation"
-            class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
+            class="scroll-mt-[58px] card bg-surface-100-900 p-4 gap-2 flex flex-col"
           >
             <h3 class="font-bold text-xl">Navigation</h3>
             <p>
@@ -621,7 +621,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
           <section
             id="undoredo"
-            class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
+            class="scroll-mt-[58px] card bg-surface-100-900 p-4 gap-2 flex flex-col"
           >
             <h3 class="font-bold text-xl">Undo/Redo</h3>
 
@@ -659,7 +659,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
           <section
             id="choose-a-location"
-            class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
+            class="scroll-mt-[58px] card bg-surface-100-900 p-4 gap-2 flex flex-col"
           >
             <h3 class="font-bold text-xl">Choose a Location</h3>
             <p>
@@ -683,7 +683,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </section>
           <section
             id="select-dates"
-            class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
+            class="scroll-mt-[58px] card bg-surface-100-900 p-4 gap-2 flex flex-col"
           >
             <h3 class="font-bold text-xl">Select Dates</h3>
             <p>
@@ -710,7 +710,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </section>
           <section
             id="multiple-locations"
-            class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
+            class="scroll-mt-[58px] card bg-surface-100-900 p-4 gap-2 flex flex-col"
           >
             <h3 class="font-bold text-xl">Multiple Locations</h3>
             <p>
@@ -726,7 +726,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </section>
           <section
             id="location-errors"
-            class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
+            class="scroll-mt-[58px] card bg-surface-100-900 p-4 gap-2 flex flex-col"
           >
             <h3 class="font-bold text-xl">Location Errors</h3>
 
@@ -761,7 +761,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </h2>
           <section
             id="weather-sources"
-            class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
+            class="scroll-mt-[58px] card bg-surface-100-900 p-4 gap-2 flex flex-col"
           >
             <h3 class="font-bold text-xl">Weather Sources</h3>
 
@@ -896,7 +896,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </section>
           <section
             id="get-weather-data"
-            class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
+            class="scroll-mt-[58px] card bg-surface-100-900 p-4 gap-2 flex flex-col"
           >
             <h3 class="font-bold text-xl">Get Weather Data</h3>
 
@@ -909,7 +909,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </section>
           <section
             id="grouping-weather-data"
-            class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
+            class="scroll-mt-[58px] card bg-surface-100-900 p-4 gap-2 flex flex-col"
           >
             <h3 class="font-bold text-xl">Grouping Weather Data</h3>
 
@@ -983,7 +983,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </section>
           <section
             id="view-weather-data"
-            class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
+            class="scroll-mt-[58px] card bg-surface-100-900 p-4 gap-2 flex flex-col"
           >
             <h3 class="font-bold text-xl">View Weather Data</h3>
 
@@ -1008,7 +1008,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </section>
           <section
             id="edit-weather-data"
-            class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
+            class="scroll-mt-[58px] card bg-surface-100-900 p-4 gap-2 flex flex-col"
           >
             <h3 class="font-bold text-xl">Edit Weather Data</h3>
 
@@ -1060,7 +1060,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </section>
           <section
             id="import-weather-data"
-            class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
+            class="scroll-mt-[58px] card bg-surface-100-900 p-4 gap-2 flex flex-col"
           >
             <h3 class="font-bold text-xl">Import Weather Data</h3>
 
@@ -1174,7 +1174,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </section>
           <section
             id="weather-errors"
-            class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
+            class="scroll-mt-[58px] card bg-surface-100-900 p-4 gap-2 flex flex-col"
           >
             <h3 class="font-bold text-xl">Weather Errors</h3>
 
@@ -1204,7 +1204,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </section>
           <section
             id="mixed-snow-parameters"
-            class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
+            class="scroll-mt-[58px] card bg-surface-100-900 p-4 gap-2 flex flex-col"
           >
             <h3 class="font-bold text-xl">Mixed Snow Parameters</h3>
 
@@ -1233,7 +1233,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </h2>
           <section
             id="add-a-gauge"
-            class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
+            class="scroll-mt-[58px] card bg-surface-100-900 p-4 gap-2 flex flex-col"
           >
             <h3 class="font-bold text-xl">Add a Gauge</h3>
 
@@ -1260,7 +1260,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </section>
           <section
             id="gauge-direction"
-            class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
+            class="scroll-mt-[58px] card bg-surface-100-900 p-4 gap-2 flex flex-col"
           >
             <h3 class="font-bold text-xl">Gauge Direction</h3>
 
@@ -1281,7 +1281,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </section>
           <section
             id="range-calculation-methods"
-            class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
+            class="scroll-mt-[58px] card bg-surface-100-900 p-4 gap-2 flex flex-col"
           >
             <h3 class="font-bold text-xl">Range Calculation Methods</h3>
 
@@ -1337,9 +1337,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
               Here’s a table showing which values would be included in an
               example range from 13 degrees to 12 degrees.
             </p>
-            <figure class=" ">
+            <figure class="">
               <table
-                class="table-autoborder-surface-950-50 border p-2 rounded-container"
+                class="table-autoborder-surface-950-50 bg-surface-200-800 border p-2 rounded-container"
               >
                 <thead>
                   <tr
@@ -1386,7 +1386,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </section>
           <section
             id="increment-modes"
-            class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
+            class="scroll-mt-[58px] card bg-surface-100-900 p-4 gap-2 flex flex-col"
           >
             <h3 class="font-bold text-xl scroll-mt-[58px]">Increment Modes</h3>
 
@@ -1426,7 +1426,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </section>
           <section
             id="adjust-ranges"
-            class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
+            class="scroll-mt-[58px] card bg-surface-100-900 p-4 gap-2 flex flex-col"
           >
             <h3 class="font-bold text-xl">Adjust Ranges</h3>
 
@@ -1441,7 +1441,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </h2>
           <section
             id="preset-colors"
-            class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
+            class="scroll-mt-[58px] card bg-surface-100-900 p-4 gap-2 flex flex-col"
           >
             <h3 class="font-bold text-xl">Preset Colors</h3>
 
@@ -1481,7 +1481,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </section>
           <section
             id="image-palette"
-            class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
+            class="scroll-mt-[58px] card bg-surface-100-900 p-4 gap-2 flex flex-col"
           >
             <h3 class="font-bold text-xl">Image Palette</h3>
 
@@ -1499,7 +1499,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </section>
           <section
             id="importexport"
-            class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
+            class="scroll-mt-[58px] card bg-surface-100-900 p-4 gap-2 flex flex-col"
           >
             <h3 class="font-bold text-xl">Import/Export</h3>
 
@@ -1515,7 +1515,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </section>
           <section
             id="sort-colors"
-            class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
+            class="scroll-mt-[58px] card bg-surface-100-900 p-4 gap-2 flex flex-col"
           >
             <h3 class="font-bold text-xl">Sort Colors</h3>
 
@@ -1545,7 +1545,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </div>
           <section
             id="getting-yarn-colorway-data"
-            class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
+            class="scroll-mt-[58px] card bg-surface-100-900 p-4 gap-2 flex flex-col"
           >
             <h3 class="font-bold text-xl">Getting Yarn Colorway Data</h3>
 
@@ -1579,7 +1579,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </section>
           <section
             id="choose-yarn-colorways"
-            class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
+            class="scroll-mt-[58px] card bg-surface-100-900 p-4 gap-2 flex flex-col"
           >
             <h3 class="font-bold text-xl">Choose Yarn Colorways</h3>
 
@@ -1592,7 +1592,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </section>
           <section
             id="link-unavailable"
-            class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
+            class="scroll-mt-[58px] card bg-surface-100-900 p-4 gap-2 flex flex-col"
           >
             <h3 class="font-bold text-xl">Link Unavailable</h3>
 
@@ -1617,7 +1617,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </h2>
           <section
             id="create-a-preview"
-            class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
+            class="scroll-mt-[58px] card bg-surface-100-900 p-4 gap-2 flex flex-col"
           >
             <h3 class="font-bold text-xl">Create a Preview</h3>
 
@@ -1692,7 +1692,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </h2>
           <section
             id="share-to-gallery"
-            class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
+            class="scroll-mt-[58px] card bg-surface-100-900 p-4 gap-2 flex flex-col"
           >
             <h3 class="font-bold text-xl">Share to Gallery</h3>
 
@@ -1734,7 +1734,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </h2>
           <section
             id="download-gauges-and-weather-data-pdf"
-            class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
+            class="scroll-mt-[58px] card bg-surface-100-900 p-4 gap-2 flex flex-col"
           >
             <h3 class="font-bold text-xl">
               Download Gauges and Weather Data (PDF)
@@ -1759,7 +1759,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </section>
           <section
             id="download-weather-data-csv"
-            class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
+            class="scroll-mt-[58px] card bg-surface-100-900 p-4 gap-2 flex flex-col"
           >
             <h3 class="font-bold text-xl">Download Weather Data (CSV)</h3>
             <p>
@@ -1781,7 +1781,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </section>
           <section
             id="download-preview-image-png"
-            class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
+            class="scroll-mt-[58px] card bg-surface-100-900 p-4 gap-2 flex flex-col"
           >
             <h3 class="font-bold text-xl">Download Preview Image (PNG)</h3>
             <p>

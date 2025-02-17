@@ -187,7 +187,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 </div>
 
                 <button
-                  class="btn preset-filled-primary-500 w-fit text-lg"
+                  class="btn preset-filled-primary-500 w-fit"
                   type="submit">Send Yarn Request</button
                 >
 

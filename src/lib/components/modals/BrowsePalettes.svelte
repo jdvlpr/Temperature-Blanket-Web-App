@@ -71,7 +71,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     class:pt-4={context === 'drawer'}
     bind:this={filtersContainer}
   >
-    <Segment bind:value={category} background="bg-surface-100-900">
+    <Segment bind:value={category} background="bg-surface-50-950">
       {#each categories as categoryItem}
         <Segment.Item value={categoryItem}>
           <span class="flex gap-1 justify-center items-center">

@@ -65,52 +65,51 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div class="w-full overflow-auto relative mt-2">
-  <Segment
-    bind:value={gauges.activeGaugeId}
-    background="bg-surface-200-800"
-    width="w-full"
-    classes="justify-around max-md:overflow-x-scroll"
-    onValueChange={(e) => {
-      const id = e.value;
-      // gauges.activeGaugeId = id;
-
-      // if (!gauges.allCreated.map((gauge) => gauge.id).includes(id)) {
-      //   // If the gauge is not created yet, then set it up
-      //   // modal.trigger({
-      //   //   type: 'confirm',
-      //   //   title: `Add a ${label}?`,
-      //   //   body: `This will add a new gauge to your project. You can delete it later.`,
-      //   //   response: (response) => {
-      //   //     if (response) gauges.addById(id);
-      //   //   },
-      //   // });
-      // }
-    }}
+  <div
+    class="justify-around max-md:overflow-x-scroll w-full flex gap-2 p-2 rounded-container"
   >
     {#each gauges.allAvailable as { id, label }}
-      <Segment.Item value={id} classes="w-full">
-        <p class="">
-          {#if !gauges.allCreated.map((gauge) => gauge.id).includes(id)}
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-              class="size-5 inline relative bottom-[2px]"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M12 4.5v15m7.5-7.5h-15"
-              />
-            </svg>
-          {/if}
-          {label}
-        </p>
-      </Segment.Item>
+      <button
+        class={[
+          'btn hover:preset-filled-primary-300-700 w-full gap-1',
+          gauges.activeGaugeId === id && 'preset-filled',
+        ]}
+        onclick={() => {
+          if (!gauges.allCreated.map((gauge) => gauge.id).includes(id)) {
+            // If the gauge is not created yet, then set it up
+            modal.trigger({
+              type: 'confirm',
+              title: `Add a ${label}?`,
+              body: `This will add a new gauge to your project. You can delete it later.`,
+              response: (response) => {
+                if (response) gauges.addById(id);
+              },
+            });
+          } else {
+            gauges.activeGaugeId = id;
+          }
+        }}
+      >
+        {#if !gauges.allCreated.map((gauge) => gauge.id).includes(id)}
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            class="size-6"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+            />
+          </svg>
+        {/if}
+        {label}
+      </button>
     {/each}
-  </Segment>
+  </div>
 </div>
 {#if gauges.activeGauge && !gauges.activeGauge?.calculating}
   {#if gauges.activeGauge.id !== 'temp'}

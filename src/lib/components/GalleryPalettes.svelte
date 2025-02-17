@@ -48,7 +48,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     getPalettesFromProjects,
     recordPageView,
   } from '$lib/utils';
-  import { ProgressRing } from '@skeletonlabs/skeleton-svelte';
   import { onMount } from 'svelte';
   import { slide } from 'svelte/transition';
 
@@ -317,7 +316,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {#if galleryPalettesState.palettes.length && hasNextPage}
     {#if isLoadingMore}
       <div class="h-28 flex items-center">
-        <ProgressRing value={null} size="size-6" />
+        <Spinner />
       </div>
     {/if}
     <button

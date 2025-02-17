@@ -14,14 +14,8 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { CHARACTERS_FOR_URL_HASH } from '$lib/constants';
-import { allGaugesAttributes, gauges } from '$lib/state';
-import type {
-  Color,
-  GaugeAttributes,
-  GaugeSettingsType,
-  GaugeStateInterface,
-  WeatherParam,
-} from '$lib/types';
+import { allGaugesAttributes } from '$lib/state';
+import type { Color, WeatherParam } from '$lib/types';
 import {
   capitalizeFirstLetter,
   getColorPropertiesFromYarnStringAndHex,

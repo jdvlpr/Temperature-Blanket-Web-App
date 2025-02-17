@@ -49,7 +49,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     updateHistory,
     upToDate,
   } from '$lib/utils';
-  import { onMount } from 'svelte';
+  import { onMount, untrack } from 'svelte';
 
   let debounceTimer: number;
 
@@ -98,9 +98,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   $effect(() => {
     if (project.history.updateMessage !== '') {
-      toast.trigger({
-        message: project.history.updateMessage,
-        background: 'preset-filled-success-100-900',
+      untrack(() => {
+        toast.trigger({
+          message: project.history.updateMessage,
+          background: 'preset-filled-success-100-900',
+        });
       });
     }
   });
@@ -433,7 +435,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
         >
           <Card>
             {#snippet content()}
-              <Gauges />
+              {#key project.history.length}
+                <Gauges />
+              {/key}
             {/snippet}
           </Card>
           {#if !pinAllSections.value && weather.data.length}

@@ -403,7 +403,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       : ''}"
                   >
                     <button
-                      class="btn preset-filled-primary-500 flex items-center font-bold w-full"
+                      class="btn preset-filled-primary-500 flex items-center w-full gap-1"
                       disabled={loading}
                       onclick={async () => {
                         yarnPaletteGalleryState.projects = [];

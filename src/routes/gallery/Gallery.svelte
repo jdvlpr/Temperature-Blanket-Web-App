@@ -356,7 +356,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             >
               <button
                 disabled={loading}
-                class="btn preset-filled-primary-500 flex items-center text-xl font-bold w-full h-fit"
+                class="btn preset-filled-primary-500 flex items-center w-full h-fit gap-1"
                 onclick={async () => {
                   projectsList.scrollIntoView({
                     behavior: 'smooth',

@@ -38,6 +38,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           `range-${index}-to`;
 
       const focusOn = wasToClicked ? 'to' : 'from';
+
       modal.trigger({
         type: 'component',
         component: {
@@ -47,6 +48,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
             focusOn,
             onSave: onSaveRangeOptinos,
           },
+        },
+        options: {
+          size: 'large',
         },
       });
     }}

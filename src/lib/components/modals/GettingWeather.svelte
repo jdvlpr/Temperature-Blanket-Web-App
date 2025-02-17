@@ -24,7 +24,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '$lib/state';
   // Note: the signal store is a weird necessity, investigate this
   import { delay, getOpenMeteo, goToProjectSection } from '$lib/utils';
-  import { ProgressRing } from '@skeletonlabs/skeleton-svelte';
   import Spinner from '../Spinner.svelte';
 
   let title = $state('Searching...');

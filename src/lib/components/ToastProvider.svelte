@@ -118,7 +118,7 @@
   // Filtered Toast Store
   let filteredToasts = $derived(Array.from(toast.queue).slice(0, max));
 
-  $effect(() => {
+  run(() => {
     if (filteredToasts.length) {
       wrapperVisible = true;
     }

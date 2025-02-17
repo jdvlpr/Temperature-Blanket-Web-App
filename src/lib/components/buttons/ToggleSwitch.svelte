@@ -29,7 +29,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     checked = $bindable(false),
     disabled = false,
     details = '',
-    detailsTextSize = 'text-xs',
+    detailsTextSize = 'text-sm',
     onchange,
     maxWidth = '450px',
   }: Props = $props();

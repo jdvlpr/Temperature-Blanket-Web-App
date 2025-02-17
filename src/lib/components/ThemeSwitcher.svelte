@@ -100,6 +100,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     positionerClasses="!z-[9999]"
     arrow
     arrowBackground="!bg-surface-200 dark:!bg-surface-800"
+    modal={true}
   >
     {#snippet trigger()}
       {#key preferences.value?.theme.mode}

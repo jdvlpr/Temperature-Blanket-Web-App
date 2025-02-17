@@ -64,7 +64,6 @@ export function initializeLocalStorage() {
 
   preferences.value.theme.id = preferences.value.theme.id || 'classic';
   preferences.value.theme.mode = preferences.value.theme.mode || 'system';
-  console.log(preferences.value.theme);
 
   // ****************
   // Setup Theme Listeners

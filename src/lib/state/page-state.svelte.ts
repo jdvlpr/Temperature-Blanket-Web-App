@@ -28,6 +28,14 @@ class ModalClass {
 
   opened = $state(false);
 
+  type = $state<'component' | 'confirm' | null>(null);
+
+  title = $state<string | null>('');
+
+  body = $state<string | null>('');
+
+  response = $state<any>(null);
+
   drawer = $state({
     leftNavigation: false,
   });
@@ -46,17 +54,24 @@ class ModalClass {
     type,
     component,
     options,
+    title,
+    body,
+    response,
   }: {
-    type: string;
-    component: any;
+    type: 'component' | 'confirm';
+    title?: string | null;
+    body?: string | null;
+    response?: any;
+    component?: any;
     options?: ModalOptions;
   }) => {
+    // close the modal
+    this.close();
+
+    this.type = type;
+
     if (type === 'component') {
       const { ref, props } = component;
-
-      // close the modal
-      this.close();
-
       // Delay necessary for zag to transition
       await new Promise((resolve) => {
         setTimeout(() => {
@@ -71,10 +86,13 @@ class ModalClass {
       };
 
       this.options = { ...this.#defaultOptions, ...options };
-
-      // Open the modal
-      this.opened = true;
+    } else if (type === 'confirm') {
+      this.title = title || null;
+      this.body = body || null;
+      this.response = response || null;
     }
+    // Open the modal
+    this.opened = true;
   };
 
   close = () => {

@@ -13,23 +13,22 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script>
-  /**
-   * @typedef {Object} Props
-   * @property {any} onClose
-   * @property {boolean} [absolute]
-   * @property {string} [text]
-   */
-
-  /** @type {Props} */
-  let { onClose, text = '' } = $props();
+<script lang="ts">
+  type Props = {
+    onClose: any;
+    text?: string;
+    size?: 'btn-sm' | '' | 'btn-lg';
+  };
+  let { onClose, text = '', size = '' }: Props = $props();
 </script>
 
 <button
   aria-label="Close"
-  class=" {text
-    ? 'btn'
-    : 'btn-icon'} relative preset-tonal flex justify-center items-center float-right gap-1"
+  class={[
+    text ? 'btn' : 'btn-icon',
+    size,
+    'relative preset-tonal flex justify-center items-center float-right gap-1',
+  ]}
   onclick={onClose}
 >
   {#if text}
