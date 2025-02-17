@@ -25,6 +25,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   // Note: the signal store is a weird necessity, investigate this
   import { delay, getOpenMeteo, goToProjectSection } from '$lib/utils';
   import { ProgressRing } from '@skeletonlabs/skeleton-svelte';
+  import Spinner from '../Spinner.svelte';
 
   let title = $state('Searching...');
 
@@ -176,7 +177,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <div class="flex flex-col items-center text-center w-full p-2">
   {#if signal.value && !error}
-    <ProgressRing value={null} size="size-10" strokeWidth="6px" />
+    <Spinner size="36" />
 
     <p class="font-bold text-xl my-4">Searching for Weather Data</p>
 

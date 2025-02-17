@@ -16,15 +16,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import { onNavigate } from '$app/navigation';
   import { PUBLIC_MICROSOFT_CLARITY_ID } from '$env/static/public';
+  import ModalProvider from '$lib/components/modals/ModalProvider.svelte';
   import { consentToMSClarityCookies } from '$lib/state';
   import { handleKeyDown, initializeLocalStorage, privacy } from '$lib/utils';
-  import {
-    ToastProvider,
-    type ToastContext,
-  } from '@skeletonlabs/skeleton-svelte';
-  import { getContext, onMount, type Snippet } from 'svelte';
+  import { ToastProvider } from '@skeletonlabs/skeleton-svelte';
+  import { onMount, type Snippet } from 'svelte';
   import '../css/main.css';
-  import ModalProvider from '$lib/components/modals/ModalProvider.svelte';
   interface Props {
     children?: Snippet;
   }
@@ -40,9 +37,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   //   flip,
   //   arrow,
   // });
-
-  const toast: ToastContext = getContext('toast');
-
   onMount(async () => {
     initializeLocalStorage();
 
@@ -162,9 +156,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </script>
   {/if}
 </svelte:head>
-
-<ToastProvider />
-
 <p
   class="sm:text-center px-4 py-8 bg-warning-50/50 dark:bg-warning-950/50 [view-transition-name:top-banner]"
 >
@@ -191,6 +182,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </p>
 
 {@render children?.()}
+
+<ToastProvider />
 
 <ModalProvider />
 

@@ -10,8 +10,8 @@ Built with:
 
 - [Svelte 5](https://svelte.dev/)
 - [Sveltekit 2](https://svelte.dev/)
-- [Skeleton](https://github.com/skeletonlabs/skeleton)
-- [Tailwind](https://github.com/tailwindlabs/tailwindcss)
+- [Skeleton 3](https://github.com/skeletonlabs/skeleton)
+- [Tailwind 3](https://github.com/tailwindlabs/tailwindcss)
 
 What's new in version 5?
 

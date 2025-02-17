@@ -62,6 +62,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   const toast: ToastContext = getContext('toast');
 
   onMount(async () => {
+    // console.log({ toast });
+
     const hasProjectURLParam = new URL(window.location.href).searchParams.has(
       'project',
     );

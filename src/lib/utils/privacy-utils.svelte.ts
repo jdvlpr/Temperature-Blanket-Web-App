@@ -33,10 +33,8 @@ export const privacy = {
         ';expires=Thu, 01 Jan 1970 00:00:01 GMT';
     }
   },
-  init: function () {
+  init: function (toast) {
     if (!browser) return;
-
-    const toast: ToastContext = getContext('toast');
 
     // Event listener for when consent is given to Microsoft Clarity
     // If consent is given, it sets the `consentToMSClarityCookies` store to true

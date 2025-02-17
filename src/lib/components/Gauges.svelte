@@ -71,24 +71,24 @@ If not, see <https://www.gnu.org/licenses/>. -->
     width="w-full"
     classes="justify-around overflow-scroll"
     onValueChange={(e) => {
-      const id = e.target.value;
-      if (!gauges.allCreated.map((gauge) => gauge.id).includes(id)) {
-        // If the gauge is not created yet, then set it up
-        // modal.trigger({
-        //   type: 'confirm',
-        //   title: `Add a ${label}?`,
-        //   body: `This will add a new gauge to your project. You can delete it later.`,
-        //   response: (response) => {
-        //     if (response) gauges.addById(id);
-        //   },
-        // });
-      } else {
-        gauges.activeGaugeId = id;
-      }
+      const id = e.value;
+      // gauges.activeGaugeId = id;
+
+      // if (!gauges.allCreated.map((gauge) => gauge.id).includes(id)) {
+      //   // If the gauge is not created yet, then set it up
+      //   // modal.trigger({
+      //   //   type: 'confirm',
+      //   //   title: `Add a ${label}?`,
+      //   //   body: `This will add a new gauge to your project. You can delete it later.`,
+      //   //   response: (response) => {
+      //   //     if (response) gauges.addById(id);
+      //   //   },
+      //   // });
+      // }
     }}
   >
     {#each gauges.allAvailable as { id, label }}
-      <Segment.Item value={id}>
+      <Segment.Item value={id} classes="w-full">
         <p class="">
           {#if !gauges.allCreated.map((gauge) => gauge.id).includes(id)}
             <svg

@@ -26,7 +26,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div
-  class="circle mx-auto border-y-surface-900 border-r-transparent border-l-surface-900 dark:border-y-surface-200 dark:border-l-surface-200"
+  class="circle mx-auto border-y-primary-500 border-r-transparent border-l-primary-500 dark:border-y-primary-500 dark:border-l-primary-500"
   style="--size: {size}{unit}; --duration: {duration}"
 ></div>
 

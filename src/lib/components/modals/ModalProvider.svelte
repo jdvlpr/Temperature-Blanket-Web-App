@@ -14,7 +14,7 @@
       ? 'max-w-screen-md'
       : 'max-w-screen-sm'}"
   positionerPadding="p-0"
-  backdropClasses="backdrop-blur-lg"
+  backdropClasses="backdrop-blur-md"
   transitionsBackdropOut={{ duration: 0 }}
   transitionsPositionerOut={{ duration: 0 }}
 >
