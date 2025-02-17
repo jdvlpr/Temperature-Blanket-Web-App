@@ -178,7 +178,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <div class="pb-4 text-left flex gap-4">
         <div class="w-full flex flex-col gap-8">
           <div class="flex flex-col gap-4">
-            <h2 class="font-bold text-2xl scroll-mt-[58px]">
+            <h2
+              class="font-bold text-2xl scroll-mt-[58px]"
+              id="yarn-colorways-api"
+            >
               Yarn Colorways API
             </h2>
             <section
