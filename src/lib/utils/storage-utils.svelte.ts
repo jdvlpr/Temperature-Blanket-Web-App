@@ -79,21 +79,18 @@ export function initializeLocalStorage() {
   $effect.root(() => {
     $effect(() => {
       // Update the body data-theme attribute when the user changes the skeleton theme or mode
-      console.log(preferences.value.theme);
 
-      if (
-        skeletonThemes
-          .map((theme) => theme.id)
-          .includes(preferences.value.theme.id)
-      ) {
+      const theme = preferences.value.theme.id || 'classic';
+      const mode = preferences.value.theme.mode || 'system';
+      if (skeletonThemes.map((theme) => theme.id).includes(theme)) {
         document.body.setAttribute('data-theme', preferences.value.theme.id);
 
         // Set theme cookies, in order to read them when loading the page (to avoid flash of content)
         fetch('/api/preferences/theme', {
           method: 'POST',
           body: JSON.stringify({
-            theme: preferences.value.theme.id,
-            mode: preferences.value.theme.mode,
+            theme,
+            mode,
           }),
         });
       }
