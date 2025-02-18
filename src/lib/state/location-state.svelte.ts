@@ -204,3 +204,5 @@ class SignalClass {
   value = $derived(controller.value?.signal || null);
 }
 export const signal = new SignalClass();
+
+export const gettingWeatherData = $state({ value: false });

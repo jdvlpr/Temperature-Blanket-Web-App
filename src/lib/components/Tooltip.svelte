@@ -16,7 +16,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import { arrow, createFloatingActions } from 'svelte-floating-ui';
   // import { autoPlacement } from 'svelte-floating-ui/core';
-  import { flip, shift, size, type Placement } from 'svelte-floating-ui/dom';
+  import {
+    flip,
+    offset,
+    shift,
+    size,
+    type Placement,
+  } from 'svelte-floating-ui/dom';
   import { writable } from 'svelte/store';
   import { scale } from 'svelte/transition';
 
@@ -79,6 +85,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     placement,
     middleware: [
       flip(),
+      offset(10),
       size({
         apply({ availableWidth, availableHeight, elements }) {
           // Do things with the data, e.g.
@@ -88,7 +95,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           });
         },
       }),
-      shift({ padding: 2 }),
+      shift((state) => ({
+        padding: state.rects.reference.width,
+      })),
       arrow({ element: arrowRef }),
     ],
     onComputed({ placement, middlewareData }) {

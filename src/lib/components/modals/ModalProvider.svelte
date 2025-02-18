@@ -20,44 +20,42 @@
   transitionsPositionerOut={{ duration: 0 }}
 >
   {#snippet content()}
-    {#key modal.opened}
-      {#if modal.type === 'component'}
-        {#if modal.options.showCloseButton}
-          <div class="sticky top-2 mr-2">
-            <CloseButton
-              onClose={() => {
-                modal.close();
-              }}
-            />
-          </div>
-        {/if}
-        <modal.contentComponent.ref {...modal.contentComponent.props} />
-      {:else if modal.type === 'confirm'}
-        <div
-          role="dialog"
-          aria-modal="true"
-          aria-label={modal.title ?? ''}
-          class="p-4 flex flex-col gap-4"
-        >
-          {#if modal.title}
-            <h4 class="h4">{modal.title}</h4>
-          {/if}
-          {#if modal.body}
-            <p>{modal.body}</p>
-          {/if}
-          <SaveAndCloseButtons
-            saveText="Yes"
-            onSave={() => {
-              modal.response(true);
-              modal.close();
-            }}
+    {#if modal.type === 'component'}
+      {#if modal.options.showCloseButton}
+        <div class="sticky top-2 mr-2">
+          <CloseButton
             onClose={() => {
-              modal.response(false);
               modal.close();
             }}
           />
         </div>
       {/if}
-    {/key}
+      <modal.contentComponent.ref {...modal.contentComponent.props} />
+    {:else if modal.type === 'confirm'}
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-label={modal.title ?? ''}
+        class="p-4 flex flex-col gap-4"
+      >
+        {#if modal.title}
+          <h4 class="h4">{modal.title}</h4>
+        {/if}
+        {#if modal.body}
+          <p>{modal.body}</p>
+        {/if}
+        <SaveAndCloseButtons
+          saveText="Yes"
+          onSave={() => {
+            modal.response(true);
+            modal.close();
+          }}
+          onClose={() => {
+            modal.response(false);
+            modal.close();
+          }}
+        />
+      </div>
+    {/if}
   {/snippet}
 </Modal>

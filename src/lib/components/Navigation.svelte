@@ -25,35 +25,28 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <div class="flex justify-around w-full">
     {#each pageSections.items as { title, icon, index, active, pinned, tooltipText }}
       {#if index !== 0}
-        <div class="flex-1">
-          <Tooltip
-            minWidth={'200px'}
-            disableTooltip={!!weather.data.length || index === 1}
-            fullWidth={true}
-            buttonDisabled={!weather.data.length && index !== 1}
-            onclick={() => goToProjectSection(index)}
-            dataPinned={pinned}
-            dataActive={active}
-            dataNoWeather={!weather.data}
-            classNames={[
-              `flex flex-col justify-center items-center disabled:opacity-30 p-2 pb-4 md:pb-2 w-full 
+        <button
+          title={tooltipText}
+          disabled={!weather.data.length && index !== 1}
+          onclick={() => goToProjectSection(index)}
+          data-pinned={pinned}
+          data-active={active}
+          data-no-weather={!weather.data}
+          class={[
+            `flex flex-col justify-center items-center disabled:opacity-30 p-2 pb-4 md:pb-2 w-full 
                                 data-[active=false]:data-[no-weather=true]:opacity-50 
                                 data-[pinned=false]:data-[active=true]:data-[no-weather=false]:dark:bg-primary-900
                                 data-[pinned=false]:data-[active=true]:data-[no-weather=false]:dark:!text-surface-50
                                 data-[pinned=false]:data-[active=true]:data-[no-weather=false]:bg-primary-300
                                 data-[pinned=false]:data-[active=true]:data-[no-weather=false]:!text-surface-900
                                 hover:data-[no-weather=false]:data-[active=false]:bg-primary-hover-token`,
-              !weather.data && 'bg-none backdrop-blur-none',
-            ]}
-          >
-            <span>
-              {@html icon}
-            </span><span class="text-xs flex gap-1 items-center">{title} </span>
-            {#snippet tooltip()}
-              <p>{tooltipText}</p>
-            {/snippet}
-          </Tooltip>
-        </div>
+            !weather.data && 'bg-none backdrop-blur-none',
+          ]}
+        >
+          <span>
+            {@html icon}
+          </span><span class="text-xs flex gap-1 items-center">{title} </span>
+        </button>
       {/if}
     {/each}
   </div>

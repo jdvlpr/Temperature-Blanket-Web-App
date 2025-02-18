@@ -24,6 +24,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '$lib/state';
   // Note: the signal store is a weird necessity, investigate this
   import { delay, getOpenMeteo, goToProjectSection } from '$lib/utils';
+  import { onMount } from 'svelte';
   import Spinner from '../Spinner.svelte';
 
   let title = $state('Searching...');
@@ -33,21 +34,23 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let error = $state(false);
 
-  getWeatherData();
+  onMount(() => {
+    getWeatherData();
+  });
 
   async function getWeatherData() {
     controller.value = new AbortController();
     weather.rawData = [];
     weather.currentIndex = 0;
     await fetchData()
-      .then(() => {
+      .then(async () => {
+        // Add the default temperature gauge
+        gauges.addById('temp');
+        await goToProjectSection(2);
+        modal.close();
         controller.value = null;
         weather.isUserEdited = false;
         weather.isFromLocalStorage = false;
-        // Add the default temperature gauge
-        gauges.addById('temp');
-        goToProjectSection(2);
-        modal.close();
       })
       .catch((e) => {
         controller.value = null;

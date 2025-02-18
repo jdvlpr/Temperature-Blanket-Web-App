@@ -20,14 +20,19 @@ import {
   signal,
   project,
   weather,
+  controller,
+  gauges,
+  modal,
 } from '$lib/state';
 import type { WeatherDay } from '$lib/types';
 import {
   celsiusToFahrenheit,
   dateToISO8601String,
+  delay,
   displayNumber,
   getAverage,
   getToday,
+  goToProjectSection,
   hoursToMinutes,
   millimetersToInches,
   numberOfDays,
@@ -35,6 +40,11 @@ import {
   stringToDate,
 } from '$lib/utils';
 import SunCalc from 'suncalc';
+// import GettingWeather, {
+//   title,
+//   currentIndex,
+//   error,
+// } from '$lib/components/modals/GettingWeather.svelte';
 
 /**
  * Calculates the sum of a specific parameter from the weather data.
@@ -95,6 +105,151 @@ export const missingDaysCount = () => {
  * @returns {Promise<Array<Object>>} - A promise that resolves to an array of weather data objects.
  * @throws {Error} - Throws an error if there is an issue with the API request or if the data is invalid.
  */
+
+// export async function getWeatherData() {
+//   modal.trigger({
+//     type: 'component',
+//     component: { ref: GettingWeather },
+//   });
+
+//   controller.value = new AbortController();
+//   weather.rawData = [];
+//   weather.currentIndex = 0;
+//   await fetchData()
+//     .then(async () => {
+//       controller.value = null;
+//       weather.isUserEdited = false;
+//       weather.isFromLocalStorage = false;
+//       // Add the default temperature gauge
+//       gauges.addById('temp');
+
+//       await goToProjectSection(2);
+//       console.count('fetched');
+//       modal.close();
+//     })
+//     .catch((e) => {
+//       controller.value = null;
+//       weather.rawData = [];
+//       weather.isUserEdited = false;
+//       weather.isFromLocalStorage = false;
+//       error.value = e?.message;
+//     });
+// }
+
+// async function fetchData() {
+//   let tempAllData = [];
+
+//   for (
+//     let thisLocation = 0;
+//     thisLocation < locations.all.length;
+//     thisLocation += 1
+//   ) {
+//     let location = locations.all[thisLocation];
+
+//     title.value = location.label;
+//     currentIndex.value = thisLocation;
+//     // Setup Weather Data Object
+
+//     if (!location.elevation) {
+//       // If not a loaded project, the location won't have elevation data
+
+//       // Get Location's Altitude
+//       try {
+//         const response = await fetch(
+//           `/api/location/elevation?lat=${location.lat}&lng=${location.lng}`,
+//         );
+//         const data = await response.json();
+
+//         if (!response.ok) throw new Error(data.message);
+
+//         if (data !== null) location.elevation = data;
+//       } catch (e) {
+//         // I don't have a nice way to handle these errors at the moment; but I don't think it's super important either.
+//         // Opening a modal would interfere with the Getting Weather modal
+//         console.log(e);
+//       }
+//     }
+
+//     // Get Weather Data
+//     const errors = [];
+//     let continueWhile = true;
+//     const numberOfWeatherSources = 2;
+//     while (
+//       errors.length < numberOfWeatherSources &&
+//       tempAllData.length === thisLocation &&
+//       continueWhile
+//     ) {
+//       if (weather.defaultSource === 'Meteostat' || errors.length > 0) {
+//         try {
+//           // Since location is a proxy state, and for some reason $state.snapshot doesn't include all the properties,
+//           // we have to manually get each property and make a new non-proxy object
+//           const { lat, lng, from, to, id, index } = location;
+
+//           const _location = { lat, lng, from, to, id, index };
+
+//           const response = await fetch('/api/weather/v1/meteostat/daily', {
+//             method: 'POST',
+//             headers: {
+//               'Content-Type': 'application/json',
+//             },
+//             body: JSON.stringify({
+//               location: _location,
+//             }),
+//             signal: signal.value,
+//           });
+
+//           let data = await response.json();
+
+//           if (data?.message) throw Error(data.message);
+
+//           data = data.map((day) => {
+//             return {
+//               ...day,
+//               date: new Date(day.date),
+//             };
+//           });
+
+//           tempAllData.push(data);
+
+//           location.source = 'Meteostat';
+//         } catch (error) {
+//           errors.push(error);
+//         }
+//       }
+
+//       if (
+//         (errors.length > 0 && !weather.useSecondarySources) ||
+//         (errors.length && weather.defaultSource === 'Open-Meteo')
+//       )
+//         continueWhile = false;
+
+//       if (
+//         (weather.defaultSource === 'Open-Meteo' || errors.length > 0) &&
+//         continueWhile
+//       ) {
+//         try {
+//           const data = await getOpenMeteo({ location });
+//           tempAllData.push(data);
+//           location.source = 'Open-Meteo';
+//         } catch (error) {
+//           errors.push(error);
+//         }
+//       }
+
+//       if (errors.length > 0 && !weather.useSecondarySources)
+//         continueWhile = false;
+//     }
+
+//     if (tempAllData.length === thisLocation && errors.length > 0)
+//       throw errors[0];
+
+//     await delay(502); // pauses before the next location request in order to avoid being blacklisted from the meteostat API
+//   }
+//   tempAllData = tempAllData.flat();
+//   tempAllData.sort((a, b) => a.date - b.date); // Sort by date, regardless of location
+//   weather.rawData = tempAllData;
+//   tempAllData = null;
+// }
 export const getOpenMeteo = async ({ location }) => {
   let allData: WeatherDay[] = [];
   let totalDaysInFuture = 0;

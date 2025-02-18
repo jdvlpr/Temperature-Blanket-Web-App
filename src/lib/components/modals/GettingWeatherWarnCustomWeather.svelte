@@ -17,10 +17,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import GettingWeather from '$lib/components/modals/GettingWeather.svelte';
   import { modal } from '$lib/state';
 
-  interface Props {
-    parent: any;
-  }
-
   function setModal() {
     modal.trigger({
       type: 'component',

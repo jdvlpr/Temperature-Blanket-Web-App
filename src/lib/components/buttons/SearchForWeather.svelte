@@ -19,19 +19,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import GettingWeatherWarnCustomWeather from '$lib/components/modals/GettingWeatherWarnCustomWeather.svelte';
   import { locations, modal, project, weather } from '$lib/state';
 
-  function setModal() {
-    modal.trigger({
-      type: 'component',
-      component: { ref: GettingWeather },
-    });
-  }
+  function setModal() {}
 
-  function setWarnCustomWeatherModal() {
-    modal.trigger({
-      type: 'component',
-      component: { ref: GettingWeatherWarnCustomWeather },
-    });
-  }
+  function setWarnCustomWeatherModal() {}
 
   let disabled = $derived(!locations.allValid || project.status.loading);
 </script>
@@ -70,8 +60,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <button
     class="btn btn-lg preset-filled-primary-500 sm:w-fit gap-1"
     onclick={() => {
-      if (weather.isUserEdited) setWarnCustomWeatherModal();
-      else setModal();
+      if (weather.isUserEdited)
+        modal.trigger({
+          type: 'component',
+          component: { ref: GettingWeatherWarnCustomWeather },
+        });
+      else
+        modal.trigger({
+          type: 'component',
+          component: { ref: GettingWeather },
+        });
     }}
     title="Search for Weather Data"
     id="location-action-button"
