@@ -372,11 +372,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
       >
         <div class="lg:rounded-container overflow-hidden lg:mb-4">
           <div
-            class="flex flex-wrap justify-center items-center p-4 text-center bg-cover bg-no-repeat bg-center"
+            class="flex flex-wrap justify-center items-center p-2 text-center bg-cover bg-no-repeat bg-center"
             style="background-image:url('/images/layout/tb-cover-image-winter-trees-sunset.webp');"
           >
             <div
-              class="max-w-screen-md w-full rounded-container bg-surface-50/85 dark:bg-surface-900/85 shadow p-4 inline-flex flex-col justify-center items-center gap-4"
+              class="max-w-screen-md w-full rounded-container bg-surface-50/85 dark:bg-surface-900/85 shadow p-2 inline-flex flex-col justify-center items-center gap-2"
             >
               <div class="flex flex-col gap-2">
                 <h2 class="text-xl">Weather Data + Art</h2>
