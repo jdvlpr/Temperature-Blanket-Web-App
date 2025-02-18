@@ -90,7 +90,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               'flex flex-col p-4 rounded-container justify-center gap-2 items-center snap-center',
               id === previews.activeId
                 ? 'bg-primary-300-700 selected shadow'
-                : 'preset-tonal-surface',
+                : '',
             ]}
             onclick={() => {
               previews.activeId = id;

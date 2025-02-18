@@ -53,7 +53,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <Drawer.Overlay class="fixed inset-0 bg-black/40 z-40" />
 
               <Drawer.Content
-                class="bg-surface-50-950  flex flex-col rounded-tl-container rounded-tr-container mt-24 fixed bottom-0 left-0 right-0 z-50"
+                class="bg-surface-50-950 flex flex-col rounded-tl-container rounded-tr-container mt-24 fixed bottom-0 left-0 right-0 z-50"
               >
                 <div
                   class="pt-4 rounded-tl-container rounded-tr-container overflow-auto"
