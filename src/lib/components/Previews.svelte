@@ -44,7 +44,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   <div class="flex flex-col gap-2 justify-center items-start">
     {#if gauges.activeGauge?.colors}
-      {#key [previews.activeId, gauges.activeGauge.colors, gauges.activeGauge?.ranges, weather.tableData]}
+      {#key [project.url.hash, weather.tableData]}
         <div class="flex w-full flex-col gap-4 justify-center items-center">
           <previews.active.previewComponent />
 
