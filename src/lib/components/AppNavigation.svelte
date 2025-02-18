@@ -25,25 +25,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   function onClickItem() {
     // modal.close();
   }
-
-  // Tools
-  //{page.url.pathname === '/yarn-colorway-finder' ||
-  // page.url.pathname === '/yarn' ||
-  // page.url.pathname === '/weather'}
-  // Gallery
-  // {page.url.pathname === '/gallery' ||
-  //       page.url.pathname === '/yarn-palette-gallery' ||
-  //       page.url.pathname.includes('/gallery')}
-  // Information
-  // {page.url.pathname === '/faq' ||
-  //       page.url.pathname === '/contact' ||
-  //       page.url.pathname === '/blog' ||
-  //       page.url.pathname === '/documentation' ||
-  //       page.url.pathname === '/changelog' ||
-  //       page.url.pathname === '/privacy' ||
-  //       page.url.pathname === '/yarn-search-request' ||
-  //       page.url.pathname.includes('/api') ||
-  //       page.url.pathname.includes('/blog')}
 </script>
 
 <div

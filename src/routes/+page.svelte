@@ -389,7 +389,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   class="flex flex-col gap-x-4 gap-y-2 text-sm space-around justify-center items-center"
                   data-sveltekit-preload-data="hover"
                 >
-                  {@render gettingStarted()}
+                  <!-- {@render gettingStarted()} -->
 
                   <a
                     href="/blog/what-is-a-temperature-blanket"

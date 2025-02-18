@@ -71,7 +71,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             class={[
               'btn-icon rounded-full',
               isCurrentStep(i)
-                ? 'preset-filled-primary-500 btn-icon-md flex-auto min-w-[36px]'
+                ? 'preset-filled-primary-500 btn-icon-md flex-auto min-w-[36px] max-w-[68px]'
                 : 'preset-filled-surface-200-800 btn-icon-sm flex-shrink min-w-[24px]',
             ]}
             onclick={() => setStep(i)}
@@ -80,7 +80,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <span class="font-bold">{i + 1}</span>
           </button>
           {#if i < steps.length - 1}
-            <div class="border-t border-surface-300 w-12"></div>
+            <div class="border-t border-surface-300 w-full"></div>
           {/if}
         {/each}
       </div>
