@@ -14,14 +14,14 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { onNavigate } from '$app/navigation';
+  import { beforeNavigate, onNavigate } from '$app/navigation';
   import { PUBLIC_MICROSOFT_CLARITY_ID } from '$env/static/public';
   import ModalProvider from '$lib/components/modals/ModalProvider.svelte';
-  import { consentToMSClarityCookies, toast } from '$lib/state';
+  import ToastProvider from '$lib/components/ToastProvider.svelte';
+  import { consentToMSClarityCookies, modal, toast } from '$lib/state';
   import { handleKeyDown, initializeLocalStorage, privacy } from '$lib/utils';
   import { onMount, type Snippet } from 'svelte';
   import '../css/main.css';
-  import ToastProvider from '$lib/components/ToastProvider.svelte';
 
   let bannerElement;
   interface Props {
@@ -36,6 +36,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     // See the script tag with id="clarity-script"
     window.MS_CLARITY_ID = PUBLIC_MICROSOFT_CLARITY_ID || null;
     privacy.init();
+  });
+
+  beforeNavigate(() => {
+    modal.close();
   });
 
   onNavigate((navigation) => {

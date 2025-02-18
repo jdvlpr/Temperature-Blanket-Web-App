@@ -18,13 +18,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { PUBLIC_GITHUB_LINK } from '$env/static/public';
   import ThemeSwitcher from '$lib/components/ThemeSwitcher.svelte';
   import { ICONS } from '$lib/constants';
-  import { modal } from '$lib/state';
   import { Accordion } from '@skeletonlabs/skeleton-svelte';
 
   let value = $state([]);
 
   function onClickItem() {
-    modal.close();
+    // modal.close();
   }
 
   // Tools
