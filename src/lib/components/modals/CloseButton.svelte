@@ -27,7 +27,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   class={[
     text ? 'btn' : 'btn-icon',
     size,
-    'relative preset-tonal flex justify-center items-center float-right gap-1',
+    'relative preset-tonal float-right gap-1',
   ]}
   onclick={onClose}
 >

@@ -67,11 +67,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <div class="p-2" bind:this={container}>
   <div
-    class="w-full flex flex-wrap justify-center items-end gap-2 px-2 pb-2 bg-surface-100-900"
+    class="w-full flex flex-wrap justify-center items-end gap-2 px-2 pb-2"
     class:pt-4={context === 'drawer'}
     bind:this={filtersContainer}
   >
-    <Segment bind:value={category} background="bg-surface-50-950">
+    <Segment
+      bind:value={category}
+      background="bg-surface-100 dark:bg-surface-950"
+    >
       {#each categories as categoryItem}
         <Segment.Item value={categoryItem}>
           <span class="flex gap-1 justify-center items-center">

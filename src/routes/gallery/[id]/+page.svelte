@@ -167,7 +167,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <main class="max-w-screen-xl m-auto flex flex-col justify-start gap-2">
         <a
           href="/gallery"
-          class="flex items-center btn preset-tonal-primary gap-1 w-fit mx-2 lg:mx-0 mt-2 lg:mt-0"
+          class="flex items-center btn hover:preset-tonal gap-1 w-fit mx-2 lg:mx-0 mt-2 lg:mt-0"
         >
           {@html ICONS.arrowBack}
           Project Gallery</a
@@ -190,44 +190,27 @@ If not, see <https://www.gnu.org/licenses/>. -->
               {#await data.stream then}
                 {#if projectURL}
                   <a
-                    class="btn preset-filled-primary-500 w-fit m-auto flex flex-wrap items-center gap-1"
+                    class="btn preset-filled-primary-500 w-fit m-auto items-center gap-1"
                     href={projectURL}
                     target={locations.allValid ? '_blank' : '_self'}
                   >
-                    {#if locations.allValid}
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke-width="1.5"
-                        stroke="currentColor"
-                        class="w-6 h-6"
-                      >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"
-                        />
-                      </svg>
-                    {:else}
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke-width="1.5"
-                        stroke="currentColor"
-                        class="w-6 h-6"
-                      >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z"
-                        />
-                      </svg>
-                    {/if}
                     Open in {#if locations.allValid}
                       New
                     {/if} Project Planner
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="1.5"
+                      stroke="currentColor"
+                      class="size-5"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="m8.25 4.5 7.5 7.5-7.5 7.5"
+                      />
+                    </svg>
                   </a>
                 {/if}
               {/await}
@@ -424,27 +407,27 @@ If not, see <https://www.gnu.org/licenses/>. -->
                             <div class="flex flex-col">
                               <ColorPalette {colors} schemeName={gaugeLabel} />
                               <a
-                                class="btn preset-tonal-primary border border-primary-500 w-fit m-auto mt-4 flex flex-wrap items-center gap-1"
+                                class="btn preset-tonal-primary border border-primary-500 w-fit m-auto mt-4 gap-1"
                                 onclick={() => {
                                   yarnPageState.gauge.colors = colors;
                                 }}
                                 href="/yarn"
                               >
+                                Open in Yarn Palette Creator
                                 <svg
                                   xmlns="http://www.w3.org/2000/svg"
                                   fill="none"
                                   viewBox="0 0 24 24"
                                   stroke-width="1.5"
                                   stroke="currentColor"
-                                  class="w-6 h-6"
+                                  class="size-5"
                                 >
                                   <path
                                     stroke-linecap="round"
                                     stroke-linejoin="round"
-                                    d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z"
+                                    d="m8.25 4.5 7.5 7.5-7.5 7.5"
                                   />
                                 </svg>
-                                Open in Yarn Palette Creator
                               </a>
                             </div>
                             {#if hasAffiliateLinks}

@@ -97,9 +97,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let endCursor = $derived(galleryPalettesState.gallery?.pageInfo?.endCursor);
 </script>
 
-<div
-  class="bg-surface-100-900 pb-2 text-center flex flex-wrap justify-center items-end gap-2"
->
+<div class=" pb-2 text-center flex flex-wrap justify-center items-end gap-2">
   <Expand
     bind:isExpanded={filtersExpanded}
     more="Show Filters"
@@ -110,7 +108,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   {#if filtersExpanded}
     <div
-      class="grid grid-cols-12 justify-center items-end gap-4 bg-surface-100-900 px-2 w-full"
+      class="grid grid-cols-12 justify-center items-end gap-4 px-2 w-full"
       transition:slide
     >
       <div class="w-full col-span-12 md:col-span-5">

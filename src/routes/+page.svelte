@@ -150,6 +150,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 {#snippet gettingStarted()}
   <button
+    aria-label="Getting Started Guide"
     onclick={() =>
       modal.trigger({
         type: 'component',
@@ -215,6 +216,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {#if weather.data.length}
         <div class="mx-auto sm:mx-0">
           <button
+            aria-label="Undo"
             class="btn hover:preset-tonal"
             title="Undo [Cmd ⌘]+[z] or [Ctrl]+[z]"
             id="undo"
@@ -234,6 +236,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </button>
 
           <button
+            aria-label="Redo"
             class="btn hover:preset-tonal"
             id="redo"
             title="Redo [Cmd ⌘]+[Shift ⇧]+[z] or [Ctrl]+[Shift ⇧]+[Z]"
@@ -278,7 +281,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <div
           class="p-2 flex flex-col gap-4"
           aria-orientation="vertical"
-          aria-labelledby="menu-button"
+          aria-label="Help Menu"
           tabindex="-1"
         >
           {@render gettingStarted()}
@@ -364,7 +367,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     >
       <div
         id="page-section-location"
-        class="scroll-mt-[58px]"
+        class="scroll-mt-[58px] pb-12"
         class:hidden={pageSections.items[1].active === false}
       >
         <div class="lg:rounded-container overflow-hidden lg:mb-4">

@@ -58,24 +58,30 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <div class="w-full p-4 pt-12">
   <!-- Stepper -->
-  <div
-    class="space-y-8 flex flex-col justify-between items-between min-h-[85svh] sm:min-h-[530px]"
-  >
+  <div class="space-y-4 flex flex-col justify-between items-between">
     <!-- Timeline -->
     <div class="relative">
       <!-- Numerals -->
-      <div class="flex justify-between items-center gap-4">
+      <div
+        class="flex justify-between items-center gap-2 h-12 bg-surface-100 dark:bg-surface-950 rounded-container px-2"
+      >
         {#each steps as step, i}
           <!-- Numeral Button -->
           <button
-            class="btn-icon btn-icon-sm rounded-full {isCurrentStep(i)
-              ? 'preset-filled-primary-500'
-              : 'preset-filled-surface-200-800'}"
+            class={[
+              'btn-icon rounded-full',
+              isCurrentStep(i)
+                ? 'preset-filled-primary-500 btn-icon-md flex-auto min-w-[36px]'
+                : 'preset-filled-surface-200-800 btn-icon-sm flex-shrink min-w-[24px]',
+            ]}
             onclick={() => setStep(i)}
             title={step.label}
           >
             <span class="font-bold">{i + 1}</span>
           </button>
+          {#if i < steps.length - 1}
+            <div class="border-t border-surface-300 w-12"></div>
+          {/if}
         {/each}
       </div>
       <!-- Line -->

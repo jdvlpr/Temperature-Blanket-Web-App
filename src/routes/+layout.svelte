@@ -22,6 +22,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { onMount, type Snippet } from 'svelte';
   import '../css/main.css';
   import ToastProvider from '$lib/components/ToastProvider.svelte';
+
+  let bannerElement;
   interface Props {
     children?: Snippet;
   }
@@ -147,7 +149,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/if}
 </svelte:head>
 <p
-  class="sm:text-center px-4 py-8 bg-warning-50/50 dark:bg-warning-950/50 [view-transition-name:top-banner]"
+  class="sm:text-center px-4 py-8 preset-filled-warning-100-900 [view-transition-name:top-banner]"
+  bind:this={bannerElement}
 >
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -169,6 +172,28 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <a href="https://temperature-blanket.com" class="link" target="_blank"
     >temperature-blanket.com</a
   >.
+
+  <button
+    aria-label="Close Banner"
+    onclick={() => {
+      bannerElement.remove();
+    }}
+    class="btn-icon hover:preset-tonal top-1 relative"
+    ><svg
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke-width="1.5"
+      stroke="currentColor"
+      class="size-6"
+    >
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        d="M6 18 18 6M6 6l12 12"
+      />
+    </svg>
+  </button>
 </p>
 
 {@render children?.()}

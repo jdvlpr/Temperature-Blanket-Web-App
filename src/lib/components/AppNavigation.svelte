@@ -86,7 +86,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {/snippet}
     <Accordion.Item value="tools">
       {#snippet control()}
-        <p>Tools</p>
+        Tools
       {/snippet}
       {#snippet panel()}
         <div class="flex flex-col w-full gap-2">
@@ -177,7 +177,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </Accordion.Item>
     <Accordion.Item value="gallery">
       {#snippet control()}
-        <p>Gallery</p>
+        Gallery
       {/snippet}
       {#snippet panel()}
         <div class="flex flex-col w-full gap-2">
@@ -214,7 +214,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </Accordion.Item>
     <Accordion.Item value="information">
       {#snippet control()}
-        <p>Information</p>
+        Information
       {/snippet}
       {#snippet panel()}
         <div class="flex flex-col gap-2 mb-4 w-full">

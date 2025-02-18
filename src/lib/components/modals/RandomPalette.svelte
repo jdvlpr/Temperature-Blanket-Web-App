@@ -135,7 +135,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }}
 />
 
-<div class="px-4 py-8">
+<div class="px-4 pt-8">
   <div class="grid grid-cols-12 gap-4 justify-center items-end w-full">
     <div
       class="w-full col-span-full md:col-span-9 order-1"
@@ -274,6 +274,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </button>
   </div>
 </div>
+
 <StickyPart position="bottom">
   <div class="p-2 sm:p-4">
     <div class="mb-2 sm:mb-4">

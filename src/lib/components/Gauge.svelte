@@ -321,6 +321,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
               updateGauge,
             },
           },
+          options: {
+            size: 'medium',
+          },
         })}
     >
       <svg xmlns="http://www.w3.org/2000/svg" class="size-6" viewBox="0 0 24 24"

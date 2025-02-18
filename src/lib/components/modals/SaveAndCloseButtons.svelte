@@ -37,7 +37,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <CloseButton {onClose} text="Cancel" />
 
   <button
-    class="btn preset-filled-primary-500 flex justify-center items-center gap-1"
+    class="btn preset-filled-primary-500 gap-1"
     onclick={onSave}
     {disabled}
     title={saveText}

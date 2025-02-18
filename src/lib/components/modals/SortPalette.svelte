@@ -31,7 +31,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let allColorsHaveNames = $derived(_colors.every((color) => color?.name));
 </script>
 
-<div class="p-4">
+<div class="p-4 sm:min-w-[600px]">
   <div class="flex flex-col gap-2 items-center mt-6 sm:mt-4">
     <div class="flex flex-wrap gap-2 justify-center items-end">
       <label class="label">
