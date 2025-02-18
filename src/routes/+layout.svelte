@@ -153,7 +153,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/if}
 </svelte:head>
 <div
-  class="sm:text-center p-4 flex flex-col justify-center items-center gap-2 preset-filled-warning-100-900 [view-transition-name:top-banner]"
+  class="text-center p-4 flex flex-col justify-center items-center gap-2 preset-filled-warning-100-900 [view-transition-name:top-banner]"
   bind:this={bannerElement}
 >
   <p>

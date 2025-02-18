@@ -292,7 +292,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               class="link"
               rel="noreferrer"
             >
-              What is a Temperature Blanket?</a
+              What's a Temperature Blanket?</a
             >
           </p>
 
@@ -361,6 +361,31 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </button>
   {/snippet}
 
+  {#snippet hero()}
+    <div class="flex flex-col gap-2">
+      <h2 class="text-3xl font-sans_light">Weather Data + Art</h2>
+      <p>
+        Get historical weather data, choose yarn colors, and visualize your
+        crochet or knitting project.
+      </p>
+
+      <div
+        class="flex flex-col gap-x-4 gap-y-2 text-sm space-around justify-center items-center"
+        data-sveltekit-preload-data="hover"
+      >
+        <!-- {@render gettingStarted()} -->
+
+        <a
+          href="/blog/what-is-a-temperature-blanket"
+          class="link whitespace-pre-wrap"
+          rel="noreferrer"
+        >
+          What's a Temperature Blanket?</a
+        >
+      </div>
+    </div>
+  {/snippet}
+
   {#snippet main()}
     <main
       class="text-center mx-auto max-md:min-h-[calc(100svh-123px)] md:min-h-[calc(100svh-115px)] lg:min-h-[calc(100svh-131px)]"
@@ -370,36 +395,23 @@ If not, see <https://www.gnu.org/licenses/>. -->
         class="scroll-mt-[58px] pb-12"
         class:hidden={pageSections.items[1].active === false}
       >
-        <div class="lg:rounded-container overflow-hidden lg:mb-4">
+        <div
+          class="sm:hidden bg-surface-100/90 dark:bg-surface-900/90 px-2 py-8 mb-2"
+        >
+          {@render hero()}
+          <div></div>
+        </div>
+        <div
+          class="lg:rounded-container overflow-hidden lg:mb-4 hidden sm:block"
+        >
           <div
-            class="flex flex-wrap justify-center items-center p-2 text-center bg-cover bg-no-repeat bg-center"
+            class="flex flex-wrap justify-center items-center p-2 sm:p-4 text-center bg-cover bg-no-repeat bg-center"
             style="background-image:url('/images/layout/tb-cover-image-winter-trees-sunset.webp');"
           >
             <div
               class="max-w-screen-md w-full rounded-container bg-surface-50/85 dark:bg-surface-900/85 shadow p-2 inline-flex flex-col justify-center items-center gap-2"
             >
-              <div class="flex flex-col gap-2">
-                <h2 class="text-xl">Weather Data + Art</h2>
-                <p>
-                  Get historical weather data, choose yarn colors, and visualize
-                  your crochet or knitting project.
-                </p>
-
-                <div
-                  class="flex flex-col gap-x-4 gap-y-2 text-sm space-around justify-center items-center"
-                  data-sveltekit-preload-data="hover"
-                >
-                  <!-- {@render gettingStarted()} -->
-
-                  <a
-                    href="/blog/what-is-a-temperature-blanket"
-                    class="link whitespace-pre-wrap"
-                    rel="noreferrer"
-                  >
-                    What is a Temperature Blanket?</a
-                  >
-                </div>
-              </div>
+              {@render hero()}
             </div>
           </div>
         </div>

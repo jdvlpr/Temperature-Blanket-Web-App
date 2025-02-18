@@ -79,7 +79,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             >
           </button>
 
-          <label class="label flex flex-col items-start w-14">
+          <label class="label flex flex-col items-start w-20">
             <span class="text-sm">Page</span>
             <select
               class="select"
