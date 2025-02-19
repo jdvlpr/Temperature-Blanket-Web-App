@@ -32,7 +32,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <AppShell pageName="Contact">
   {#snippet stickyHeader()}
-    <div class="hidden lg:inline-flex mx-auto"><AppLogo /></div>
+    <div class="hidden lg:inline-flex"><AppLogo /></div>
   {/snippet}
   {#snippet main()}
     <main class="max-w-screen-sm px-4 lg:px-0 flex flex-col gap-4 my-2 mx-auto">

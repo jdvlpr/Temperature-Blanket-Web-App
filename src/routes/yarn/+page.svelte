@@ -105,7 +105,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <AppShell pageName="Yarn Palette Creator">
   {#snippet stickyHeader()}
-    <div class="hidden lg:inline-flex mx-auto"><AppLogo /></div>
+    <div class="hidden lg:inline-flex"><AppLogo /></div>
     <Share href={shareableURL} />
   {/snippet}
   {#snippet main()}

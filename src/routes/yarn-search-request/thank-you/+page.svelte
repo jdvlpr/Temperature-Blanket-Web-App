@@ -38,15 +38,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <AppShell pageName="Received Yarn Suggestion">
   {#snippet stickyHeader()}
-    <div class="hidden lg:inline-flex mx-auto"><AppLogo /></div>
+    <div class="hidden lg:inline-flex"><AppLogo /></div>
   {/snippet}
   {#snippet main()}
     <main
       class="max-w-screen-xl m-auto text-left flex flex-col gap-4 mx-4 lg:mx-0 mt-4 mb-2"
     >
       <h2 class="text-3xl font-bold flex flex-wrap items-center gap-2">
-        <span class="text-success-700-300">{@html ICONS.checkCircle}</span
-        > Success!
+        <span class="text-success-700-300">{@html ICONS.checkCircle}</span> Success!
       </h2>
       <p class="">Your yarn search request has been received, thank you!</p>
       <p class="text-xs">

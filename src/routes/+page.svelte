@@ -170,9 +170,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <AppShell pageName="">
   {#snippet stickyHeader()}
-    <div
-      class="hidden lg:inline-flex mx-auto absolute translate-x-1/2 right-1/2"
-    >
+    <div class="hidden lg:inline-flex">
       <AppLogo />
     </div>
 
@@ -372,7 +370,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       >
         <div class="px-2 py-4 w-full">
           <div class="flex flex-col gap-2">
-            <h2 class="h2 text-gradient mb-0">Weather Data + Art</h2>
+            <h2 class="h1 text-gradient mb-0">Weather Data + Art</h2>
             <p>
               Get historical weather data, choose yarn colors, and visualize
               your crochet or knitting project.

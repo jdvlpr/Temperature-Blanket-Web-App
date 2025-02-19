@@ -398,7 +398,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <AppShell pageName="Yarn Colorway Finder">
   {#snippet stickyHeader()}
-    <div class="hidden lg:inline-flex mx-auto"><AppLogo /></div>
+    <div class="hidden lg:inline-flex"><AppLogo /></div>
     <Share href={shareableURL} />
   {/snippet}
   {#snippet main()}

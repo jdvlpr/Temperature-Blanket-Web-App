@@ -37,7 +37,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <AppShell pageName="Privacy Policy">
   {#snippet stickyHeader()}
-    <div class="hidden lg:inline-flex mx-auto"><AppLogo /></div>
+    <div class="hidden lg:inline-flex"><AppLogo /></div>
   {/snippet}
   {#snippet main()}
     <main class="max-w-screen-md px-2 xl:px-0 flex flex-col gap-4 my-2 mx-auto">

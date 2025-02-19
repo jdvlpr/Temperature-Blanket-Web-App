@@ -21,11 +21,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <AppShell pageName="Error">
   {#snippet stickyHeader()}
-    <div class="hidden lg:inline-flex mx-auto"><AppLogo /></div>
+    <div class="hidden lg:inline-flex"><AppLogo /></div>
   {/snippet}
   {#snippet main()}
     <main
-      class="max-w-screen-lg m-auto text-center flex flex-col gap-2 my-12 px-2"
+      class="max-w-screen-md m-auto text-center flex flex-col gap-2 my-12 px-2"
     >
       <p>{page.status} Error</p>
       <p>{page.error?.message}</p>

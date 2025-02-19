@@ -42,7 +42,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <AppShell pageName="Version 3 Update">
   {#snippet stickyHeader()}
-    <div class="hidden lg:inline-flex mx-auto"><AppLogo /></div>
+    <div class="hidden lg:inline-flex"><AppLogo /></div>
   {/snippet}
   {#snippet main()}
     <main class="pb-8">

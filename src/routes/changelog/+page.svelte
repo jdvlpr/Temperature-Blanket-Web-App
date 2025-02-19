@@ -73,7 +73,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <AppShell pageName="Changelog">
   {#snippet stickyHeader()}
-    <div class="hidden lg:inline-flex mx-auto"><AppLogo /></div>
+    <div class="hidden lg:inline-flex"><AppLogo /></div>
   {/snippet}
   {#snippet main()}
     <main class="max-w-screen-md m-auto text-center mb-6 mt-2 px-2 mx-auto">

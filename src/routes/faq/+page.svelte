@@ -34,7 +34,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <AppShell pageName="FAQ">
   {#snippet stickyHeader()}
-    <div class="hidden lg:inline-flex mx-auto"><AppLogo /></div>
+    <div class="hidden lg:inline-flex"><AppLogo /></div>
   {/snippet}
   {#snippet main()}
     <main class="max-w-screen-md px-2 lg:px-0 flex flex-col gap-4 mx-auto">
