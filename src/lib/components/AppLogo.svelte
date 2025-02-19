@@ -33,24 +33,26 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </div>
 
       <div
-        class="w-full flex-auto bg-secondary-600 dark:bg-secondary-100"
+        class="w-full flex-auto bg-secondary-700 dark:bg-secondary-100"
       ></div>
       <div
-        class="w-full flex-auto bg-secondary-500 dark:bg-secondary-200"
+        class="w-full flex-auto bg-secondary-600 dark:bg-secondary-200"
       ></div>
       <div
-        class="w-full flex-auto bg-secondary-400 dark:bg-secondary-300"
+        class="w-full flex-auto bg-secondary-500 dark:bg-secondary-300"
       ></div>
       <div
-        class="w-full flex-auto bg-secondary-300 dark:bg-secondary-400"
+        class="w-full flex-auto bg-secondary-400 dark:bg-secondary-400"
       ></div>
       <div
-        class="w-full flex-auto bg-secondary-200 dark:bg-secondary-500"
+        class="w-full flex-auto bg-secondary-300 dark:bg-secondary-500"
       ></div>
       <div
-        class="w-full flex-auto bg-secondary-100 dark:bg-secondary-600"
+        class="w-full flex-auto bg-secondary-200 dark:bg-secondary-600"
       ></div>
-      <div class="w-full flex-auto bg-secondary-50 dark:bg-secondary-700"></div>
+      <div
+        class="w-full flex-auto bg-secondary-100 dark:bg-secondary-700"
+      ></div>
     </div>
   </div>
   <h1 class="h5 text-secondary-500 site-title">
