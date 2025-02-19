@@ -85,7 +85,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <button
   class="btn hover:preset-tonal gap-1"
-  title="Choose a Color"
+  title="Choose a Color for Extra Rows"
   onclick={() =>
     modal.trigger({
       type: 'component',
@@ -93,8 +93,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
         ref: ChangeColor,
         props: {
           hex: monthRowsPreview.settings.extrasColor,
-          onChangeColor: ({ hex }) =>
-            (monthRowsPreview.settings.extrasColor = hex),
+          onChangeColor: ({ hex }) => {
+            monthRowsPreview.settings.extrasColor = hex;
+            modal.close();
+          },
         },
       },
     })}
@@ -125,7 +127,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 {#if monthRowsPreview.settings.borderStitches > 0}
   <button
     class="btn hover:preset-tonal gap-1"
-    title="Choose a Color"
+    title="Choose a Color for Border Stitches"
     onclick={() =>
       modal.trigger({
         type: 'component',
@@ -133,8 +135,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
           ref: ChangeColor,
           props: {
             hex: monthRowsPreview.settings.borderColor,
-            onChangeColor: ({ hex }) =>
-              (monthRowsPreview.settings.borderColor = hex),
+            onChangeColor: ({ hex }) => {
+              monthRowsPreview.settings.borderColor = hex;
+              modal.close();
+            },
           },
         },
       })}

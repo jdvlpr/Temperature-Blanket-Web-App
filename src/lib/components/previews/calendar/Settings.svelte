@@ -124,8 +124,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
         ref: ChangeColor,
         props: {
           hex: calendarPreview.settings.additionalSquaresColor,
-          onChangeColor: ({ hex }) =>
-            (calendarPreview.settings.additionalSquaresColor = hex),
+          onChangeColor: ({ hex }) => {
+            calendarPreview.settings.additionalSquaresColor = hex;
+            modal.close();
+          },
         },
       },
     })}

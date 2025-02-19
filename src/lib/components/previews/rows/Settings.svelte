@@ -91,7 +91,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 {#if rowsPreview.countOfAdditionalStitches}
   <button
     class="btn hover:preset-tonal gap-1"
-    title="Choose a Color"
+    title="Choose a color for any additional stitches"
     onclick={() =>
       modal.trigger({
         type: 'component',
@@ -99,8 +99,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
           ref: ChangeColor,
           props: {
             hex: rowsPreview.settings.extrasColor,
-            onChangeColor: ({ hex }) =>
-              (rowsPreview.settings.extrasColor = hex),
+            onChangeColor: ({ hex }) => {
+              rowsPreview.settings.extrasColor = hex;
+              modal.close();
+            },
           },
         },
       })}

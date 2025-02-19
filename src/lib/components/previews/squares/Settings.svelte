@@ -127,7 +127,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 {#if squaresPreview.details?.additionalSquares || squaresPreview.settings?.squaresBetweenMonthsCount}
   <button
     class="btn hover:preset-tonal gap-1"
-    title="Choose a Color"
+    title="Choose a color for any additional squares"
     onclick={() =>
       modal.trigger({
         type: 'component',
@@ -135,8 +135,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
           ref: ChangeColor,
           props: {
             hex: squaresPreview.settings.additionalSquaresColor,
-            onChangeColor: ({ hex }) =>
-              (squaresPreview.settings.additionalSquaresColor = hex),
+            onChangeColor: ({ hex }) => {
+              squaresPreview.settings.additionalSquaresColor = hex;
+              modal.close();
+            },
           },
         },
       })}

@@ -77,8 +77,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
             ref: ChangeColor,
             props: {
               hex: continuousSquarePreview.settings.extrasColor,
-              onChangeColor: ({ hex }) =>
-                (continuousSquarePreview.settings.extrasColor = hex),
+              onChangeColor: ({ hex }) => {
+                continuousSquarePreview.settings.extrasColor = hex;
+                modal.close();
+              },
             },
           },
         })}

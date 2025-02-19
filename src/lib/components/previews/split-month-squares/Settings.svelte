@@ -91,7 +91,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <button
   class="btn hover:preset-tonal gap-1"
-  title="Choose a Color"
+  title="Choose a color for any additional rounds"
   onclick={() =>
     modal.trigger({
       type: 'component',
@@ -99,8 +99,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
         ref: ChangeColor,
         props: {
           hex: splitMonthSquaresPreview.settings.additionalRoundsColor,
-          onChangeColor: ({ hex }) =>
-            (splitMonthSquaresPreview.settings.additionalRoundsColor = hex),
+          onChangeColor: ({ hex }) => {
+            splitMonthSquaresPreview.settings.additionalRoundsColor = hex;
+            modal.close();
+          },
         },
       },
     })}

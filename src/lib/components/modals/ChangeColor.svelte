@@ -35,14 +35,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let {
     index = null,
-    hex = $bindable(),
-    name = $bindable(),
-    brandId = $bindable(),
-    yarnId = $bindable(),
-    brandName = $bindable(),
-    yarnName = $bindable(),
-    variant_href = $bindable(),
-    affiliate_variant_href = $bindable(),
+    hex,
+    name,
+    brandId,
+    yarnId,
+    brandName,
+    yarnName,
+    variant_href,
+    affiliate_variant_href,
     onChangeColor,
   }: Props = $props();
 
