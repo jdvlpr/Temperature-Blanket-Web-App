@@ -373,8 +373,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       alt="Project Preivew"
                       class="max-h-[60vh] m-auto"
                     />
-                  {:else}
-                    <p class="font-ornament text-6xl my-20">;</p>
                   {/if}
                 {/await}
               </div>

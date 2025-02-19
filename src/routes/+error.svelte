@@ -27,7 +27,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <main
       class="max-w-screen-lg m-auto text-center flex flex-col gap-2 my-12 px-2"
     >
-      <p class="font-ornament text-6xl">E</p>
       <p>{page.status} Error</p>
       <p>{page.error?.message}</p>
     </main>

@@ -142,7 +142,7 @@
   {#snippet main()}
     <main class="max-w-screen-xl px-2 lg:px-0 text-left">
       {#if dev}
-        <h2 class="text-3xl my-2 font-cursive">Input</h2>
+        <h2 class="h2 text-gradient my-2">Input</h2>
 
         <div class="px-2 flex flex-col gap-4">
           <label class="text-sm"
@@ -223,7 +223,7 @@
             {/if}
           </div>
 
-          <h2 class="text-3xl my-2 font-cursive">Output</h2>
+          <h2 class="h2 text-gradient my-2">Output</h2>
 
           <div class="">
             <button
@@ -308,7 +308,6 @@
         </div>
       {:else}
         <div class="mb-4">
-          <p class="font-ornament text-8xl my-12">d</p>
           <p class="">This page is not available to you.</p>
         </div>
       {/if}

@@ -381,6 +381,4 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </div>
     {/if}
   {/if}
-
-  <p class="font-ornament text-4xl my-8 text-center">I</p>
 </div>

@@ -174,11 +174,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <div class="pb-4 px-2">
                 <div class="flex flex-col gap-4">
                   <div class="mt-4 flex flex-col gap-2">
-                    <h1
-                      class="font-bold font-cursive text-4xl text-secondary-800-200"
-                    >
+                    <h2 class="h2 text-gradient">
                       How to Plan a Temperature Blanket
-                    </h1>
+                    </h2>
                     <p class="text-secondary-800-200 font-bold">
                       With temperature-blanket.com
                     </p>

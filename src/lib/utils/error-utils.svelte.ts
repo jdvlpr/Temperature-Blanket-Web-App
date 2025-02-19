@@ -38,8 +38,6 @@ export const displayGeoNamesErrorMessage = (message) => {
     if (message) text += `<p class="my-4 italic text-xs">${message}</p>`;
   }
 
-  text += `<p class="text-5xl mt-2 font-ornament">J</p>`;
-
   modal.trigger({
     type: 'component',
     component: {

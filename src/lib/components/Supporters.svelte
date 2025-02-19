@@ -130,6 +130,4 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {/each}
     {/if}
   </div>
-{:else}
-  <p class="font-ornament my-40 text-8xl">8</p>
 {/if}

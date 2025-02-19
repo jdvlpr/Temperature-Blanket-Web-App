@@ -86,9 +86,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
         {#snippet content()}
           <div class="pb-4 px-2">
-            <h1 class="mx-auto py-4 font-bold text-3xl font-cursive">
+            <h2 class="mx-auto py-4 h2 text-gradient">
               What is a Temperature Blanket?
-            </h1>
+            </h2>
             <div class="flex flex-col gap-4">
               <p>
                 A temperature blanket is a crocheted or knit project which uses
@@ -120,13 +120,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 </div>
 
                 <p
-                  class="order-2 font-ornament hidden md:inline-block text-4xl md:text-5xl md:relative md:right-6 xl:right-0 md:-top-4 md:rotate-0 col-span-full text-center -rotate-90 md:col-span-1"
-                >
-                  1
-                </p>
-
-                <p
-                  class="order-1 md:order-3 text-xl font-sans_light font-bold col-span-full md:col-span-4 text-center md:-top-6 md:relative text-balance"
+                  class="order-1 md:order-3 text-xl font-light col-span-full md:col-span-4 text-center md:-top-6 md:relative text-balance"
                 >
                   These 366 rows of yarn represent the temperature in Göppingen,
                   Germany from May 15, 1943 to May 14, 1944!

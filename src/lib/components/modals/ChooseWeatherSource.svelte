@@ -296,6 +296,5 @@ If not, see <https://www.gnu.org/licenses/>. -->
       All weather data is subject to change if the provider updates their
       models.
     </p>
-    <p class="font-ornament text-6xl mb-2">u</p>
   </div>
 </div>

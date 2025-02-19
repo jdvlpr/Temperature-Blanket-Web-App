@@ -153,8 +153,7 @@ export const getOpenMeteo = async ({ location }) => {
         content += 'There may not be weather data for dates before 1940.';
       }
 
-      content += `<p class="italic text-sm mt-4">Error status code: ${response.status}</p>
-                  <p class="mt-4 text-5xl font-ornament">i</p>`;
+      content += `<p class="italic text-sm mt-4">Error status code: ${response.status}</p>`;
 
       throw new Error(content);
     }
@@ -168,8 +167,7 @@ export const getOpenMeteo = async ({ location }) => {
         location.label
       }</span> (${stringToDate(location.from).toLocaleDateString()} - ${stringToDate(location.to).toLocaleDateString()}) was sent to <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer" class="link">Open-Meteo.com</a>, but the response returned an error.</p>
                             <p class="my-4">Try again with a different location or dates.</p>
-                            <p class="italic text-sm">Error status code: ${response.status}</p>
-                            <p class="mt-4 text-5xl font-ornament">i</p>`,
+                            <p class="italic text-sm">Error status code: ${response.status}</p>`,
     );
   }
 

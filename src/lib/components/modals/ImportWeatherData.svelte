@@ -255,6 +255,4 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <p>Processing...</p>
     </div>
   {/if}
-
-  <p class="font-ornament text-4xl my-8">U</p>
 </div>

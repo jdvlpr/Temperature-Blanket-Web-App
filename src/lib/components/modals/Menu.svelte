@@ -550,6 +550,4 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </p>
     </div>
   {/if}
-
-  <p class="font-ornament text-5xl mt-8 mx-auto w-full text-center">T</p>
 </div>

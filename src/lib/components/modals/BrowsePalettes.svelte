@@ -106,5 +106,3 @@ If not, see <https://www.gnu.org/licenses/>. -->
     />
   {/if}
 </div>
-
-<p class="font-ornament text-3xl mb-4 text-center w-full inline-block">k</p>

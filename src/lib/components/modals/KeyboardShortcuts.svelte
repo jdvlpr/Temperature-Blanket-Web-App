@@ -51,5 +51,4 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </tbody>
     </table>
   {/each}
-  <p class="font-ornament text-5xl mt-8 text-center w-full">O</p>
 </div>

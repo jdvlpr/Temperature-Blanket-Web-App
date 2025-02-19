@@ -97,7 +97,7 @@
 
 <div class="flex flex-col gap-4">
   <div class="mt-4 flex flex-col gap-2">
-    <h1 class=" font-cursive text-3xl">Yarn Weights</h1>
+    <h2 class="h2 text-gradient text-3xl">Yarn Weights</h2>
     <p class="text-sm">
       Based on <a
         href="https://www.ravelry.com/help/yarn/weights"

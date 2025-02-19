@@ -63,7 +63,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             }}
           >
             <div class="flex flex-col gap-1 items-start justify-start">
-              <p class="font-sans_light text-4xl">
+              <p class="text-4xl">
                 {data?.current_weather.temperature}°
               </p>
               <p class="text-xs">
