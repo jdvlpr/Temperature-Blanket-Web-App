@@ -25,6 +25,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <div
       class="flex flex-col rounded-[0.2rem] overflow-hidden gap-[2px] size-8"
     >
+      <div class="flex flex-col items-center absolute translate-x-1/2">
+        <div class="h-4 w-2 bg-surface-50-950 rounded-sm"></div>
+        <div
+          class="size-4 bg-surface-50-950 rounded-full relative -top-1"
+        ></div>
+      </div>
+
       <div
         class="w-full flex-auto bg-secondary-600 dark:bg-secondary-100"
       ></div>
@@ -44,12 +51,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
         class="w-full flex-auto bg-secondary-100 dark:bg-secondary-600"
       ></div>
       <div class="w-full flex-auto bg-secondary-50 dark:bg-secondary-700"></div>
-    </div>
-    <div class="flex flex-col items-center absolute translate-x-1/2">
-      <div class="h-4 w-2 bg-surface-50 dark:bg-surface-800 rounded-sm"></div>
-      <div
-        class="size-4 bg-surface-50 dark:bg-surface-800 rounded-full relative -top-1"
-      ></div>
     </div>
   </div>
   <h1 class="h5 text-secondary-500">
