@@ -14,7 +14,10 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import { PUBLIC_SITE_TITLE } from '$env/static/public';
+  import {
+    PUBLIC_BASE_DOMAIN_NAME,
+    PUBLIC_SITE_TITLE,
+  } from '$env/static/public';
 </script>
 
 <div
@@ -32,32 +35,28 @@ If not, see <https://www.gnu.org/licenses/>. -->
         ></div>
       </div>
 
+      <div class="w-full flex-auto bg-surface-950 dark:bg-surface-50"></div>
       <div
-        class="w-full flex-auto bg-secondary-700 dark:bg-secondary-100"
+        class="w-full flex-auto bg-surface-950/90 dark:bg-surface-50/90"
       ></div>
       <div
-        class="w-full flex-auto bg-secondary-600 dark:bg-secondary-200"
+        class="w-full flex-auto bg-surface-950/80 dark:bg-surface-50/80"
       ></div>
       <div
-        class="w-full flex-auto bg-secondary-500 dark:bg-secondary-300"
+        class="w-full flex-auto bg-surface-950/70 dark:bg-surface-50/70"
       ></div>
       <div
-        class="w-full flex-auto bg-secondary-400 dark:bg-secondary-400"
+        class="w-full flex-auto bg-surface-950/60 dark:bg-surface-50/60"
       ></div>
       <div
-        class="w-full flex-auto bg-secondary-300 dark:bg-secondary-500"
+        class="w-full flex-auto bg-surface-950/50 dark:bg-surface-50/50"
       ></div>
       <div
-        class="w-full flex-auto bg-secondary-200 dark:bg-secondary-600"
-      ></div>
-      <div
-        class="w-full flex-auto bg-secondary-100 dark:bg-secondary-700"
+        class="w-full flex-auto bg-surface-950/40 dark:bg-surface-50/40"
       ></div>
     </div>
   </div>
-  <h1 class="h5 site-title text-gradient">
-    {PUBLIC_SITE_TITLE}
-  </h1>
+  <h1 class="h5 site-title">Temperature Blanket</h1>
 </div>
 
 <style>
