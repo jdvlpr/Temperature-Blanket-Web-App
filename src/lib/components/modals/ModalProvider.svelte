@@ -8,7 +8,7 @@
 <Modal
   bind:open={modal.opened}
   triggerBase="hidden"
-  contentBase="card bg-surface-50 dark:bg-surface-900 space-y-4 shadow-xl max-h-[100svh] lg:max-h-[80svh] overflow-auto {modal
+  contentBase="card bg-surface-50-950 space-y-4 shadow-xl max-h-[100svh] lg:max-h-[80svh] overflow-auto {modal
     .options.size === 'large'
     ? 'max-w-screen-lg'
     : modal.options.size === 'medium'

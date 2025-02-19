@@ -23,7 +23,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
   import ChooseWeatherSource from '$lib/components/modals/ChooseWeatherSource.svelte';
   import KeyboardShortcuts from '$lib/components/modals/KeyboardShortcuts.svelte';
-  import { ICONS } from '$lib/constants';
+  import { DAYS_OF_THE_WEEK, ICONS, MONTHS } from '$lib/constants';
   import {
     modal,
     pageSections,
@@ -34,17 +34,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
     weather,
   } from '$lib/state';
   import {
+    delay,
     downloadPDF,
     downloadPreviewPNG,
     downloadWeatherCSV,
+    pluralize,
     setLocalStorageProject,
   } from '$lib/utils';
+  import { onMount } from 'svelte';
+  import WeatherGrouping from '../WeatherGrouping.svelte';
 
   interface Props {
     page?: string;
+    highlight?: string;
   }
 
-  let { page = 'main' }: Props = $props();
+  let { page = 'main', highlight }: Props = $props();
 
   let copiedMessage = $state('');
 
@@ -55,6 +60,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 
   let currentSavedProject = $state(null);
+  let weatherSettingsElement: HTMLElement | null = $state(null);
 
   function goTo(page) {
     pages.download = false;
@@ -63,6 +69,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
     pages[page] = true;
     if (page === 'save') saveProject({ copy: false });
   }
+
+  onMount(async () => {
+    if (highlight === 'weather-settings') {
+      await delay(200);
+      weatherSettingsElement?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
+    }
+  });
 
   $effect(() => {
     if (page) goTo(page);
@@ -206,14 +222,59 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </button>
       </div>
 
-      <h2 class="mb-2 mt-8 text-xl font-bold">Settings</h2>
-      <div class="flex flex-col items-start gap-2 w-full my-4">
-        <div class=" rounded-container border border-surface-300-700">
-          <UnitChanger />
-        </div>
+      <h2
+        class="mb-2 mt-8 text-xl font-bold scroll-mt-[12px]"
+        bind:this={weatherSettingsElement}
+      >
+        Weather Settings
+      </h2>
+
+      <div class="flex flex-col items-start gap-4 w-full my-4">
+        <UnitChanger />
+
+        <WeatherGrouping />
+
+        {#if weather.grouping === 'week'}
+          <div
+            class="rounded-container flex flex-col gap-2 items-start justify-start w-full bg-surface-100-900 p-2"
+          >
+            <p class="">
+              Weekly weather grouping makes for a shorter project. <a
+                href="/documentation/#grouping-weather-data"
+                target="_blank"
+                class="link"
+                rel="noopener noreferrer">Read more details.</a
+              >
+              {#if weather.goupedByWeek}
+                Your project starts on {DAYS_OF_THE_WEEK.filter(
+                  (n) => n.value === weather.goupedByWeek[0].date.getDay(),
+                )[0].label},
+                {MONTHS.filter(
+                  (n) =>
+                    n.value - 1 === weather.goupedByWeek[0].date.getMonth(),
+                )[0]?.name}
+                {weather.goupedByWeek[0].date.getDate()},
+                {weather.goupedByWeek[0].date.getFullYear()}. It spans {length}
+                {pluralize('week', length)}.
+              {/if}
+            </p>
+            <label class="label flex-col flex">
+              <span>Weeks Start On</span>
+              <select
+                class="select w-fit mx-auto"
+                bind:value={weather.monthGroupingStartDay}
+                id="weather-weeks-start-week-on"
+              >
+                {#each DAYS_OF_THE_WEEK as { value, label }}
+                  <option {value}>{label}</option>
+                {/each}
+              </select>
+            </label>
+          </div>
+        {/if}
 
         <button
-          class="btn hover:preset-tonal w-fit"
+          class="btn hover:preset-tonal w-fit gap-1"
           onclick={async () => {
             modal.trigger({
               type: 'component',
@@ -246,23 +307,25 @@ If not, see <https://www.gnu.org/licenses/>. -->
               : weather.defaultSource}</span
           >
         </button>
+      </div>
 
-        <div class="flex flex-col gap-2 justify-start items-start w-full">
-          <ToggleSwitch
-            maxWidth="50px"
-            label="Always display all sections"
-            details="Keep the Location, Weather, Colors, and Preview sections visible on the same page."
-            bind:checked={pinAllSections.value}
-            onchange={() => {
-              pageSections.items.forEach((section) => {
-                section.pinned = pinAllSections.value;
-                section.active = pinAllSections.value;
-              });
-              if (!pinAllSections.value) pageSections.items[1].active = true;
-              pageSections.items = pageSections.items;
-            }}
-          />
-        </div>
+      <h2 class="mb-2 mt-8 text-xl font-bold">Page Settings</h2>
+
+      <div class="flex flex-col gap-2 justify-start items-start w-full">
+        <ToggleSwitch
+          maxWidth="50px"
+          label="Always display all sections"
+          details="Keep the Location, Weather, Colors, and Preview sections visible on the same page."
+          bind:checked={pinAllSections.value}
+          onchange={() => {
+            pageSections.items.forEach((section) => {
+              section.pinned = pinAllSections.value;
+              section.active = pinAllSections.value;
+            });
+            if (!pinAllSections.value) pageSections.items[1].active = true;
+            pageSections.items = pageSections.items;
+          }}
+        />
       </div>
 
       <LocalProjects />

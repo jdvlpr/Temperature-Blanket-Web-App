@@ -355,7 +355,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <input
           type="text"
           id="location-{location.uuid}"
-          class="truncate"
+          class="truncate bg-input"
           autocomplete="off"
           placeholder={project.status.loading ? 'Loading...' : 'Enter a place'}
           title="Enter a city, region, or landmark"

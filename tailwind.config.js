@@ -11,6 +11,7 @@ import { fontFamily } from 'tailwindcss/defaultTheme';
 import classic from './classic-theme';
 import { contentPath, skeleton } from '@skeletonlabs/skeleton/plugin';
 import * as themes from '@skeletonlabs/skeleton/themes';
+import forms from '@tailwindcss/forms';
 
 /** @type {import('tailwindcss').Config} */
 const config = {
@@ -87,7 +88,7 @@ const config = {
     },
   },
   plugins: [
-    require('@tailwindcss/forms'),
+    forms,
     skeleton({
       themes: [
         classic,

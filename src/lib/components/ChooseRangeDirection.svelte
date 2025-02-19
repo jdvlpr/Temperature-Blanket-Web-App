@@ -38,7 +38,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <Segment
   bind:value={direction}
   classes="flex-wrap gap-y-2 justify-start items-start"
-  background="bg-surface-200-800"
+  background="bg-surface-100-900"
   onValueChange={onchange}
 >
   <Segment.Item value="high-to-low">High to Low</Segment.Item>

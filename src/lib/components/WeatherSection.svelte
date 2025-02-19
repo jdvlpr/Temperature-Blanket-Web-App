@@ -14,12 +14,9 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { browser } from '$app/environment';
   import Spinner from '$lib/components/Spinner.svelte';
   import UnitChanger from '$lib/components/UnitChanger.svelte';
-  import WeatherChart, {
-    weatherChart,
-  } from '$lib/components/WeatherChart.svelte';
+  import WeatherChart from '$lib/components/WeatherChart.svelte';
   import WeatherGrouping from '$lib/components/WeatherGrouping.svelte';
   import WeatherItem from '$lib/components/WeatherItem.svelte';
   import WeatherNavigator from '$lib/components/WeatherNavigator.svelte';
@@ -44,6 +41,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '$lib/utils';
   import { Accordion } from '@skeletonlabs/skeleton-svelte';
   import { onMount } from 'svelte';
+  import Menu from './modals/Menu.svelte';
 
   let graph = $state();
   let defaultWeatherSourceCopy = $state();
@@ -160,50 +158,44 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let length = $derived([...new Set(data?.map((day) => day.weekId))].length);
 </script>
 
-<div class="flex flex-col gap-4 justify-center w-full items-center mt-4">
-  <div class="flex flex-wrap gap-4 items-center justify-center w-full">
-    <UnitChanger />
-
-    <WeatherGrouping />
-
-    <button
-      class="btn hover:preset-tonal w-fit gap-1"
-      onclick={() => {
-        modal.trigger({
-          type: 'component',
-          component: {
-            ref: ChooseWeatherSource,
+<div class="flex flex-col gap-2 justify-center w-full items-center mt-4">
+  <button
+    class="btn gap-1"
+    aria-label="settings"
+    onclick={() => {
+      modal.trigger({
+        type: 'component',
+        component: {
+          ref: Menu,
+          props: {
+            page: 'main',
+            highlight: 'weather-settings',
           },
-        });
-      }}
+        },
+      });
+    }}
+  >
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke-width="1.5"
+      stroke="currentColor"
+      class="size-6"
     >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke-width="1.5"
-        stroke="currentColor"
-        class="size-6"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="M10.343 3.94c.09-.542.56-.94 1.11-.94h1.093c.55 0 1.02.398 1.11.94l.149.894c.07.424.384.764.78.93.398.164.855.142 1.205-.108l.737-.527a1.125 1.125 0 011.45.12l.773.774c.39.389.44 1.002.12 1.45l-.527.737c-.25.35-.272.806-.107 1.204.165.397.505.71.93.78l.893.15c.543.09.94.56.94 1.109v1.094c0 .55-.397 1.02-.94 1.11l-.893.149c-.425.07-.765.383-.93.78-.165.398-.143.854.107 1.204l.527.738c.32.447.269 1.06-.12 1.45l-.774.773a1.125 1.125 0 01-1.449.12l-.738-.527c-.35-.25-.806-.272-1.203-.107-.397.165-.71.505-.781.929l-.149.894c-.09.542-.56.94-1.11.94h-1.094c-.55 0-1.019-.398-1.11-.94l-.148-.894c-.071-.424-.384-.764-.781-.93-.398-.164-.854-.142-1.204.108l-.738.527c-.447.32-1.06.269-1.45-.12l-.773-.774a1.125 1.125 0 01-.12-1.45l.527-.737c.25-.35.273-.806.108-1.204-.165-.397-.505-.71-.93-.78l-.894-.15c-.542-.09-.94-.56-.94-1.109v-1.094c0-.55.398-1.02.94-1.11l.894-.149c.424-.07.765-.383.93-.78.165-.398.143-.854-.107-1.204l-.527-.738a1.125 1.125 0 01.12-1.45l.773-.773a1.125 1.125 0 011.45-.12l.737.527c.35.25.807.272 1.204.107.397-.165.71-.505.78-.929l.15-.894z"
-        />
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-        />
-      </svg>
-
-      <span class="whitespace-pre-wrap text-left"
-        >Weather Source: {weather.isUserEdited
-          ? 'Custom'
-          : weather.defaultSource}</span
-      >
-    </button>
-  </div>
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28Z"
+      />
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+      />
+    </svg>
+    Weather Settings
+  </button>
 
   {#if wasDefaultWeatherSourceChanged}
     <p class="text-sm w-full">
@@ -211,44 +203,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
       so another source was used ({weather.defaultSource}) and the Weather
       Source setting was automatically updated.
     </p>
-  {/if}
-
-  {#if weather.grouping === 'week'}
-    <div
-      class="rounded-container flex flex-col gap-2 items-center justify-center w-full"
-    >
-      <p class="text-sm">
-        Weekly weather grouping makes for a shorter project. <a
-          href="/documentation/#grouping-weather-data"
-          target="_blank"
-          class="link"
-          rel="noopener noreferrer">Read more details.</a
-        >
-        {#if weather.goupedByWeek}
-          Your project starts on {DAYS_OF_THE_WEEK.filter(
-            (n) => n.value === weather.goupedByWeek[0].date.getDay(),
-          )[0].label},
-          {MONTHS.filter(
-            (n) => n.value - 1 === weather.goupedByWeek[0].date.getMonth(),
-          )[0]?.name}
-          {weather.goupedByWeek[0].date.getDate()},
-          {weather.goupedByWeek[0].date.getFullYear()}. It spans {length}
-          {pluralize('week', length)}.
-        {/if}
-      </p>
-      <label class="label flex-col flex">
-        <span>Weeks Start On</span>
-        <select
-          class="select w-fit mx-auto"
-          bind:value={weather.monthGroupingStartDay}
-          id="weather-weeks-start-week-on"
-        >
-          {#each DAYS_OF_THE_WEEK as { value, label }}
-            <option {value}>{label}</option>
-          {/each}
-        </select>
-      </label>
-    </div>
   {/if}
 
   {#if projectHasRecentWeatherData}

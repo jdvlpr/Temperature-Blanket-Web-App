@@ -401,6 +401,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {@render hero()}
           <div></div>
         </div>
+
         <div
           class="lg:rounded-container overflow-hidden lg:mb-4 hidden sm:block"
         >
@@ -415,6 +416,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </div>
           </div>
         </div>
+
         <Card>
           {#snippet content()}
             <Locations />

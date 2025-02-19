@@ -240,7 +240,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </div>
 
         <div
-          class="flex flex-col justify-start items-start gap-2 card preset-filled-surface-300-700 p-4"
+          class="flex flex-col justify-start items-start gap-2 card preset-filled-surface-200-800 p-4"
         >
           <div class="flex flex-col items-start justify-start gap-1">
             <p class="flex justify-start items-start gap-1">
@@ -271,7 +271,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <Segment
               classes="flex-wrap gap-y-2"
-              background="bg-surface-200-800"
+              background="bg-surface-100-900"
               bind:value={incrementMode}
             >
               <Segment.Item value="auto">Automatic</Segment.Item>
@@ -528,37 +528,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {#if showAdvancedControls}
           <div
             transition:slide
-            class="flex flex-col gap-2 justify-start items-start rounded-container bg-surface-200-800 p-4 text-left w-full"
+            class="flex flex-col gap-4 justify-start items-start rounded-container bg-surface-200-800 p-4 text-left w-full"
           >
             <ToggleSwitch
               bind:checked={_gauge.rangeOptions.linked}
               label="Linked Ranges"
               details="When editing an individual range's From or To value, update the next or previous range's corresponding value."
             />
-          </div>
-          <div class="">
-            <label class="label">
-              <span
-                class="flex flex-col justify-center items-center gap-2 my-2"
-              >
-                <span class="flex flex-wrap gap-1 justify-center items-center"
-                  ><svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke-width="1.5"
-                    stroke="currentColor"
-                    class="w-6 h-6"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M15.75 15.75V18m-7.5-6.75h.008v.008H8.25v-.008zm0 2.25h.008v.008H8.25V13.5zm0 2.25h.008v.008H8.25v-.008zm0 2.25h.008v.008H8.25V18zm2.498-6.75h.007v.008h-.007v-.008zm0 2.25h.007v.008h-.007V13.5zm0 2.25h.007v.008h-.007v-.008zm0 2.25h.007v.008h-.007V18zm2.504-6.75h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V13.5zm0 2.25h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V18zm2.498-6.75h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V13.5zM8.25 6h7.5v2.25h-7.5V6zM12 2.25c-1.892 0-3.758.11-5.593.322C5.307 2.7 4.5 3.65 4.5 4.757V19.5a2.25 2.25 0 002.25 2.25h10.5a2.25 2.25 0 002.25-2.25V4.757c0-1.108-.806-2.057-1.907-2.185A48.507 48.507 0 0012 2.25z"
-                    />
-                  </svg>
-                  Range Calculation Method:<span>{@html rangeExample}</span>
-                  <Tooltip>
-                    <svg
+            <div class="p-2 bg-surface-100-900 rounded-container">
+              <label class="label">
+                <span
+                  class="flex flex-col justify-center items-center gap-2 my-2"
+                >
+                  <span class="flex flex-wrap gap-1 justify-center items-center"
+                    ><svg
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
                       viewBox="0 0 24 24"
@@ -569,65 +552,84 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       <path
                         stroke-linecap="round"
                         stroke-linejoin="round"
-                        d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"
+                        d="M15.75 15.75V18m-7.5-6.75h.008v.008H8.25v-.008zm0 2.25h.008v.008H8.25V13.5zm0 2.25h.008v.008H8.25v-.008zm0 2.25h.008v.008H8.25V18zm2.498-6.75h.007v.008h-.007v-.008zm0 2.25h.007v.008h-.007V13.5zm0 2.25h.007v.008h-.007v-.008zm0 2.25h.007v.008h-.007V18zm2.504-6.75h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V13.5zm0 2.25h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V18zm2.498-6.75h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V13.5zM8.25 6h7.5v2.25h-7.5V6zM12 2.25c-1.892 0-3.758.11-5.593.322C5.307 2.7 4.5 3.65 4.5 4.757V19.5a2.25 2.25 0 002.25 2.25h10.5a2.25 2.25 0 002.25-2.25V4.757c0-1.108-.806-2.057-1.907-2.185A48.507 48.507 0 0012 2.25z"
                       />
                     </svg>
-                    {#snippet tooltip()}
-                      <div>
-                        If you change this setting,
-                        <a
-                          href="/documentation/#range-calculation-methods"
-                          target="_blank"
-                          class="link"
-                          rel="noopener noreferrer"
-                          >make sure your ranges are set up correctly.</a
-                        >
-                      </div>
-                    {/snippet}
-                  </Tooltip>
-                </span>
+                    Range Calculation Method:<span>{@html rangeExample}</span>
+                    <Tooltip>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke-width="1.5"
+                        stroke="currentColor"
+                        class="w-6 h-6"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"
+                        />
+                      </svg>
+                      {#snippet tooltip()}
+                        <div>
+                          If you change this setting,
+                          <a
+                            href="/documentation/#range-calculation-methods"
+                            target="_blank"
+                            class="link"
+                            rel="noopener noreferrer"
+                            >make sure your ranges are set up correctly.</a
+                          >
+                        </div>
+                      {/snippet}
+                    </Tooltip>
+                  </span>
 
-                <select
-                  class="select max-w-[500px] truncate bg-surface-200-800"
-                  value={initialValueSelectRangeCalculationMethod}
-                  onchange={(e) => {
-                    switch (e.target.value) {
-                      case 'true-false':
-                        _gauge.rangeOptions.includeFromValue = true;
-                        _gauge.rangeOptions.includeToValue = false;
-                        break;
-                      case 'false-true':
-                        _gauge.rangeOptions.includeFromValue = false;
-                        _gauge.rangeOptions.includeToValue = true;
-                        break;
-                      case 'true-true':
-                        _gauge.rangeOptions.includeFromValue = true;
-                        _gauge.rangeOptions.includeToValue = true;
-                        break;
-                      case 'false-false':
-                        _gauge.rangeOptions.includeFromValue = false;
-                        _gauge.rangeOptions.includeToValue = false;
-                        break;
+                  <select
+                    class="select max-w-[500px] truncate"
+                    value={initialValueSelectRangeCalculationMethod}
+                    onchange={(e) => {
+                      switch (e.target.value) {
+                        case 'true-false':
+                          _gauge.rangeOptions.includeFromValue = true;
+                          _gauge.rangeOptions.includeToValue = false;
+                          break;
+                        case 'false-true':
+                          _gauge.rangeOptions.includeFromValue = false;
+                          _gauge.rangeOptions.includeToValue = true;
+                          break;
+                        case 'true-true':
+                          _gauge.rangeOptions.includeFromValue = true;
+                          _gauge.rangeOptions.includeToValue = true;
+                          break;
+                        case 'false-false':
+                          _gauge.rangeOptions.includeFromValue = false;
+                          _gauge.rangeOptions.includeToValue = false;
+                          break;
 
-                      default:
-                        break;
-                    }
-                    autoUpdateRanges();
-                  }}
-                  title="Change Range Calculation Method"
-                  id="select-range-calculation-method"
-                >
-                  <option value="true-false"
-                    >Include From, don't include To (default)</option
+                        default:
+                          break;
+                      }
+                      autoUpdateRanges();
+                    }}
+                    title="Change Range Calculation Method"
+                    id="select-range-calculation-method"
                   >
-                  <option value="false-true"
-                    >Include To, don't include From
-                  </option>
-                  <option value="true-true">Include both From and To</option>
-                  <option value="false-false">Don't include From and To</option>
-                </select>
-              </span>
-            </label>
+                    <option value="true-false"
+                      >Include From, don't include To (default)</option
+                    >
+                    <option value="false-true"
+                      >Include To, don't include From
+                    </option>
+                    <option value="true-true">Include both From and To</option>
+                    <option value="false-false"
+                      >Don't include From and To</option
+                    >
+                  </select>
+                </span>
+              </label>
+            </div>
           </div>
         {/if}
         {#if isRangeCalculationUnavailable}
