@@ -14,6 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
+  import { page } from '$app/state';
   import {
     PUBLIC_BASE_DOMAIN_NAME,
     PUBLIC_BASE_URL,
@@ -56,7 +57,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <AppShell pageName="Now Open Source">
   {#snippet stickyHeader()}
-    <div class="hidden lg:inline-flex"><AppLogo /></div>
+    <div class="hidden lg:inline-flex mx-auto"><AppLogo /></div>
   {/snippet}
   {#snippet main()}
     <main class="pb-8">
@@ -80,7 +81,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <div class="pb-4 px-2">
             <div class="flex flex-col gap-4">
               <div class="mt-4 flex flex-col gap-2">
-                <h1 class=" font-bold text-3xl">Now Open Source</h1>
+                <h2 class="h2 text-gradient">Now Open Source</h2>
                 <p class="text-sm">September 03, 2024</p>
               </div>
 

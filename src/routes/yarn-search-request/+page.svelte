@@ -50,7 +50,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <AppShell pageName="Request Yarn Colorways">
   {#snippet stickyHeader()}
-    <div class="hidden lg:inline-flex"><AppLogo /></div>
+    <div class="hidden lg:inline-flex mx-auto"><AppLogo /></div>
   {/snippet}
   {#snippet main()}
     <main

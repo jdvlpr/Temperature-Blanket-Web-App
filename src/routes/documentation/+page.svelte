@@ -329,7 +329,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <AppShell pageName="Documentation">
   {#snippet stickyHeader()}
-    <div class="hidden lg:inline-flex mx-auto my-1">
+    <div class="hidden lg:inline-flex mx-auto">
       <AppLogo />
     </div>
     <div class="sm:hidden">
@@ -371,7 +371,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <div class="w-full flex flex-col gap-8">
           <div class="flex flex-col gap-4">
             <h2
-              class="font-bold text-2xl scroll-mt-[58px] hidden lg:inline-block"
+              class="h2 text-gradient scroll-mt-[58px] hidden lg:inline-block"
               data-toc-ignore
             >
               Documentation

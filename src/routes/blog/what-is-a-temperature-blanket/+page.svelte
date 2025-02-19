@@ -64,7 +64,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <AppShell pageName="What is a Temperature Blanket?">
   {#snippet stickyHeader()}
-    <div class="hidden lg:inline-flex"><AppLogo /></div>
+    <div class="hidden lg:inline-flex mx-auto"><AppLogo /></div>
   {/snippet}
   {#snippet main()}
     <main class="pb-8">
@@ -86,7 +86,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
         {#snippet content()}
           <div class="pb-4 px-2">
-            <h2 class="mx-auto py-4 h2 text-gradient">
+            <h2 class="py-4 h2 text-gradient">
               What is a Temperature Blanket?
             </h2>
             <div class="flex flex-col gap-4">

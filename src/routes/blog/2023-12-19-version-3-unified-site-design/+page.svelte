@@ -42,7 +42,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <AppShell pageName="Version 3 Update">
   {#snippet stickyHeader()}
-    <div class="hidden lg:inline-flex"><AppLogo /></div>
+    <div class="hidden lg:inline-flex mx-auto"><AppLogo /></div>
   {/snippet}
   {#snippet main()}
     <main class="pb-8">
@@ -66,9 +66,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <div class="pb-4 px-2">
             <div class="flex flex-col gap-4">
               <div class="mt-4 flex flex-col gap-2">
-                <h1 class=" font-bold text-3xl">
-                  Version 3: Unified Site Design
-                </h1>
+                <h2 class="h2 text-gradient">Version 3: Unified Site Design</h2>
                 <p class="text-sm">December 19, 2023</p>
               </div>
               <p>

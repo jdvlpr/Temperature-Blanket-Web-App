@@ -132,7 +132,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <AppShell pageName="API">
   {#snippet stickyHeader()}
-    <div class="hidden lg:inline-flex my-1">
+    <div class="hidden lg:inline-flex mx-auto">
       <AppLogo />
     </div>
     <div class="sm:hidden">
@@ -168,6 +168,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </Modal>
     </div>
   {/snippet}
+
   {#snippet main()}
     <main class="max-w-screen-xl m-auto mb-4 pt-2 px-2 lg:px-0">
       <img
@@ -179,7 +180,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <div class="w-full flex flex-col gap-8">
           <div class="flex flex-col gap-4">
             <h2
-              class="font-bold text-2xl scroll-mt-[58px]"
+              class="h2 text-gradient scroll-mt-[58px]"
               id="yarn-colorways-api"
             >
               Yarn Colorways API

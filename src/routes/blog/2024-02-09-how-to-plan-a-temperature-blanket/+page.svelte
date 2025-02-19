@@ -59,7 +59,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 {#snippet tableOfContents()}
   <nav data-testid="toc" class="toc space-y-4 p-4 max-w-[60vw]">
-    <div class="font-bold">Table of Contents<!----></div>
+    <div class="font-bold">Table of Contents</div>
     <ul class="toc-list space-y-2">
       <li class="toc-list-item block">
         <a
@@ -116,7 +116,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <AppShell pageName="">
   {#snippet stickyHeader()}
-    <div class="hidden lg:inline-flex"><AppLogo /></div>
+    <div class="hidden lg:inline-flex mx-auto"><AppLogo /></div>
     <div class="sm:hidden">
       <Modal
         bind:open={openTableOfContents}

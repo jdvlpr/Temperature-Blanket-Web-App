@@ -142,6 +142,10 @@
 }
 
 @layer utilities {
+  #preview-svg-image {
+    @apply shadow;
+  }
+
   #preview-svg-image > * {
     cursor: pointer;
   }

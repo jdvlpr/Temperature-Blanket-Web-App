@@ -30,9 +30,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {/if}
   </div>
   <div class="flex flex-col gap-2 card p-2 bg-surface-100-900">
-    <div class="flex flex-wrap gap-2 bg-surface-50-950 card">
+    <div class="flex flex-wrap gap-2 card">
       {#each notes as { icon, text, title, instructions }}
-        <div class="card p-4 flex-auto">
+        <div class="card p-4 flex-auto bg-surface-50-950">
           <p class="text-base flex items-center gap-2 sm:gap-4">
             {#if icon}
               <span class="flex-shrink-0">{@html icon}</span>
