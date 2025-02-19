@@ -266,12 +266,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
               Making a Request
             </h3>
             <p>This is the base URL for all endpoints:</p>
-            <p class="break-all !whitespace-pre-wrap codeblock code p-4 w-fit">
+            <p class="break-all !whitespace-pre-wrap codeblock code !p-4 w-fit">
               https://yarn-colorways.p.rapidapi.com/v1
             </p>
 
             <p>Include the following headers:</p>
-            <p class="break-all !whitespace-pre-wrap codeblock code p-4 w-fit">
+            <p class="break-all !whitespace-pre-wrap codeblock code !p-4 w-fit">
               "X-RapidAPI-Key": 'your-rapidapi-key', <br />"X-RapidAPI-Host":
               "yarn-colorways.p.rapidapi.com"
             </p>
@@ -301,7 +301,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 class="link">/colorways</a
               > endpoint.
             </p>
-            <p class="break-all !whitespace-pre-wrap codeblock code p-4 w-fit">
+            <p class="break-all !whitespace-pre-wrap codeblock code !p-4 w-fit">
               {`{
       "meta": {
           "limit": 50, // the maxmimum number of results
@@ -475,7 +475,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <p class="font-bold">Examples</p>
 
-            <p class="break-all !whitespace-pre-wrap code p-4 w-fit">
+            <p class="break-all !whitespace-pre-wrap code !p-4 w-fit">
               {`// get colorways matching an HTML hex code without the # hash 
   GET https://yarn-colorways.p.rapidapi.com/v1/match/665e3f 
 
@@ -743,7 +743,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <p class="font-bold">Example</p>
 
-            <p class="break-all !whitespace-pre-wrap codeblock code p-4 w-fit">
+            <p class="break-all !whitespace-pre-wrap codeblock code !p-4 w-fit">
               {`// get all colorways 
   GET https://yarn-colorways.p.rapidapi.com/v1/colorways
 
@@ -858,7 +858,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <p class="font-bold">Example</p>
 
-            <p class="break-all !whitespace-pre-wrap codeblock code p-4 w-fit">
+            <p class="break-all !whitespace-pre-wrap codeblock code !p-4 w-fit">
               {`// get all brands 
   GET https://yarn-colorways.p.rapidapi.com/v1/brands 
   `}
@@ -973,7 +973,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <p class="font-bold">Example</p>
 
-            <p class="break-all !whitespace-pre-wrap codeblock code p-4 w-fit">
+            <p class="break-all !whitespace-pre-wrap codeblock code !p-4 w-fit">
               {`// get all yarns 
   GET https://yarn-colorways.p.rapidapi.com/v1/yarns
 
@@ -1069,7 +1069,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <p class="font-bold">Example</p>
 
-            <p class="break-all !whitespace-pre-wrap codeblock code p-4 w-fit">
+            <p class="break-all !whitespace-pre-wrap codeblock code !p-4 w-fit">
               {`// get all yarn weights 
   GET https://yarn-colorways.p.rapidapi.com/v1/weights
   `}

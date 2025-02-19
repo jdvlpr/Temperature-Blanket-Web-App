@@ -31,7 +31,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import SearchForWeather from './buttons/SearchForWeather.svelte';
 </script>
 
-<div class="sm:mt-4 max-w-screen-md mx-auto">
+<div class="mt-2 max-w-screen-md mx-auto">
   {#if weather.isFromLocalStorage && weather.data}
     <p
       class="text-sm flex flex-wrap gap-1 items-center justify-center w-full text-center"

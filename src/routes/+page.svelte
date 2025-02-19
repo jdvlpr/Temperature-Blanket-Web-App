@@ -180,7 +180,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {#if weather.data.length && locations.allValid}
         <div class="hidden lg:inline-flex">
           <Tooltip
-            classNames="btn hover:preset-tonal"
+            classNames="btn hover:preset-tonal gap-1"
             title="Save Project [Cmd]+[s] or [Ctrl]+[s]"
             onclick={() =>
               modal.trigger({
@@ -217,7 +217,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <div class="mx-auto sm:mx-0">
           <button
             aria-label="Undo"
-            class="btn hover:preset-tonal"
+            class="btn hover:preset-tonal gap-1"
             title="Undo [Cmd ⌘]+[z] or [Ctrl]+[z]"
             id="undo"
             disabled={!weather.data.length ||
@@ -237,7 +237,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
           <button
             aria-label="Redo"
-            class="btn hover:preset-tonal"
+            class="btn hover:preset-tonal gap-1"
             id="redo"
             title="Redo [Cmd ⌘]+[Shift ⇧]+[z] or [Ctrl]+[Shift ⇧]+[Z]"
             disabled={!weather.data.length ||
@@ -361,67 +361,48 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </button>
   {/snippet}
 
-  {#snippet hero()}
-    <div class="flex flex-col gap-2">
-      <h2 class="text-3xl font-sans_light">Weather Data + Art</h2>
-      <p>
-        Get historical weather data, choose yarn colors, and visualize your
-        crochet or knitting project.
-      </p>
-
-      <div
-        class="flex flex-col gap-x-4 gap-y-2 text-sm space-around justify-center items-center"
-        data-sveltekit-preload-data="hover"
-      >
-        <!-- {@render gettingStarted()} -->
-
-        <a
-          href="/blog/what-is-a-temperature-blanket"
-          class="link whitespace-pre-wrap"
-          rel="noreferrer"
-        >
-          What's a Temperature Blanket?</a
-        >
-      </div>
-    </div>
-  {/snippet}
-
   {#snippet main()}
     <main
-      class="text-center mx-auto max-md:min-h-[calc(100svh-123px)] md:min-h-[calc(100svh-115px)] lg:min-h-[calc(100svh-131px)]"
+      class="text-center mx-auto max-md:min-h-[calc(100svh-116px)] md:min-h-[calc(100svh-108px)] lg:min-h-[calc(100svh-125px)] p-2"
     >
       <div
         id="page-section-location"
-        class="scroll-mt-[58px] pb-12"
+        class="scroll-mt-[58px] pb-12 max-w-screen-md mx-auto"
         class:hidden={pageSections.items[1].active === false}
       >
-        <div
-          class="sm:hidden bg-surface-100/90 dark:bg-surface-900/90 px-2 py-8 mb-2"
-        >
-          {@render hero()}
-          <div></div>
-        </div>
-
-        <div
-          class="lg:rounded-container overflow-hidden lg:mb-4 hidden sm:block"
-        >
-          <div
-            class="flex flex-wrap justify-center items-center p-2 sm:p-4 text-center bg-cover bg-no-repeat bg-center"
-            style="background-image:url('/images/layout/tb-cover-image-winter-trees-sunset.webp');"
-          >
-            <div
-              class="max-w-screen-md w-full rounded-container bg-surface-50/85 dark:bg-surface-900/85 shadow p-2 inline-flex flex-col justify-center items-center gap-2"
+        <div class="px-2 py-4 w-full">
+          <div class="flex flex-col gap-2">
+            <h3
+              class="h3 bg-gradient-to-br from-secondary-200 to-secondary-800 dark:from-secondary-50 dark:to-secondary-200 bg-clip-text text-transparent dark:text-transparent box-decoration-clone mb-0"
             >
-              {@render hero()}
+              Weather Data + Art
+            </h3>
+            <p>
+              Get historical weather data, choose yarn colors, and visualize
+              your crochet or knitting project.
+            </p>
+
+            <div
+              class="flex flex-col gap-x-4 gap-y-2 text-sm space-around justify-center items-center"
+              data-sveltekit-preload-data="hover"
+            >
+              <a
+                href="/blog/what-is-a-temperature-blanket"
+                class="link whitespace-pre-wrap"
+                rel="noreferrer"
+              >
+                What's a Temperature Blanket?</a
+              >
             </div>
           </div>
         </div>
 
-        <Card>
-          {#snippet content()}
-            <Locations />
-          {/snippet}
-        </Card>
+        <div
+          class="md:shadow-xl md:bg-surface-50-950 md:rounded-container md:p-4 mb-4"
+        >
+          <Locations />
+        </div>
+
         {#if !pinAllSections.value && weather.data.length}
           <SectionNavigationButtons thisSectionIndex={1} />
         {/if}
@@ -433,13 +414,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           class="lg:my-4 scroll-mt-[58px] w-full"
           class:hidden={pageSections.items[2].active === false}
         >
-          <Card>
-            {#snippet content()}
-              <div class="max-w-[90vw] mx-auto">
-                <WeatherSection />
-              </div>
-            {/snippet}
-          </Card>
+          <WeatherSection />
           {#if !pinAllSections.value && weather.data.length}
             <SectionNavigationButtons thisSectionIndex={2} />
           {/if}
@@ -450,13 +425,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           class="lg:my-4 scroll-mt-[58px] w-full"
           class:hidden={pageSections.items[3].active === false}
         >
-          <Card>
-            {#snippet content()}
-              {#key project.history.length}
-                <Gauges />
-              {/key}
-            {/snippet}
-          </Card>
+          {#key project.history.length}
+            <Gauges />
+          {/key}
           {#if !pinAllSections.value && weather.data.length}
             <SectionNavigationButtons thisSectionIndex={3} />
           {/if}
@@ -475,25 +446,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
           class="lg:my-4 scroll-mt-[58px] w-full"
           class:hidden={pageSections.items[4].active === false}
         >
-          <Card>
-            {#snippet content()}
-              <div>
-                <div class="p-4 my-2">
-                  <p class="max-w-screen-md mx-auto mb-2">
-                    Is this web app worth a cup of coffee to you? Your support
-                    enables ongoing development, keeps the site ad-free, and
-                    helps make this service available to craftspeople all around
-                    the world. Thanks!
-                  </p>
-                  <DonateButton />
-                </div>
+          <div
+            class="p-4 my-2 preset-tonal-primary !base-font-color dark:!base-font-color-dark card mx-auto"
+          >
+            <p class="mb-2">
+              Is this web app worth a cup of coffee to you? Your support enables
+              ongoing development, keeps the site ad-free, and helps make this
+              service available to craftspeople all around the world. Thanks!
+            </p>
+            <DonateButton />
+          </div>
 
-                {#key weather.grouping}
-                  <Previews />
-                {/key}
-              </div>
-            {/snippet}
-          </Card>
+          {#key weather.grouping}
+            <Previews />
+          {/key}
           {#if !pinAllSections.value && weather.data.length}
             <SectionNavigationButtons thisSectionIndex={4} />
           {/if}

@@ -64,15 +64,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 </script>
 
-<div class="w-full overflow-auto relative mt-2">
+<div class="w-full overflow-auto relative">
   <div
-    class="justify-around max-md:overflow-x-scroll w-full flex gap-2 p-2 rounded-container"
+    class="justify-around max-md:overflow-x-scroll w-full flex gap-2 py-2 rounded-container"
   >
     {#each gauges.allAvailable as { id, label }}
       <button
         class={[
-          'btn hover:preset-filled-primary-300-700 w-full gap-1',
-          gauges.activeGaugeId === id && 'preset-filled',
+          'btn  w-full gap-1',
+          gauges.activeGaugeId === id ? 'preset-filled' : 'hover:preset-tonal',
         ]}
         onclick={() => {
           if (!gauges.allCreated.map((gauge) => gauge.id).includes(id)) {

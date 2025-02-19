@@ -106,21 +106,27 @@ If not, see <https://www.gnu.org/licenses/>. -->
             />
           </div>
 
+          <div class="flex flex-col">
+            <ToggleSwitch
+              label="Preference Cookies (Required)"
+              disabled
+              detailsTextSize="text-normal"
+              details={`<p>Your settings for the site theme are stored as cookies.</p>`}
+              checked={true}
+            />
+          </div>
+
           {#if preferences.value.disableToastAnalytics}
             <div
-              class="flex flex-wrap gap-x-4 gap-y-2 items-center p-2 rounded-container preset-filled-surface-200-800 w-fit"
+              class="flex flex-wrap gap-x-4 gap-y-2 items-center px-4 py-2 rounded-container preset-filled-surface-100-900 w-fit"
             >
-              <p>
-                Reset the <span class="italic inline"
-                  >"Don't show this message again"</span
-                > selection for analytics.
-              </p>
+              <p>Allow the cookie popup message to appear.</p>
               <button
                 class="btn preset-filled-secondary-500 gap-1"
                 onclick={() => {
                   preferences.value.disableToastAnalytics = false;
                   toast.trigger({
-                    message: 'The analytics message can be shown again.',
+                    message: 'The cookie popup message can be shown again.',
                     background: 'preset-filled-success-100-900',
                   });
                 }}
@@ -140,7 +146,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   />
                 </svg>
 
-                Reset
+                Reset Cookie Popup
               </button>
             </div>
           {/if}
@@ -197,10 +203,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </p>
       </div>
 
-      <div class="flex flex-col">
+      <div class="flex flex-col mb-8">
         <p class="font-bold text-xl">Changes to this Privacy Policy</p>
-        <p>Any changes to this Privacy Policy will be made on this page.</p>
-        <p class="italic">Last updated April 13, 2024</p>
+        <p>
+          Any changes to this Privacy Policy will be made on this page and can
+          be viewed on <a
+            href="https://github.com/jdvlpr/Temperature-Blanket-Web-App/blame/main/src/routes/privacy/%2Bpage.svelte"
+            target="_blank"
+            class="link">GitHub</a
+          >.
+        </p>
+        <p class="italic">Last updated February 19, 2025</p>
       </div>
     </main>
   {/snippet}

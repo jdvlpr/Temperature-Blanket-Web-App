@@ -102,9 +102,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </div>
 
   <div
-    class="flex flex-wrap justify-center items-center gap-2 {fullscreen
-      ? 'p-2'
-      : ''}"
+    class={[
+      'flex flex-wrap justify-center items-center gap-2 px-2',
+      fullscreen && 'py-2',
+    ]}
   >
     <div class="">
       <SelectNumberOfColors
@@ -234,7 +235,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         />
       </svg>
       {#if !fullscreen}
-        Image
+        Image Palette
       {/if}</button
     >
 
@@ -301,7 +302,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       >
 
       {#if !fullscreen}
-        Codes
+        Export/Import
       {/if}
     </button>
 

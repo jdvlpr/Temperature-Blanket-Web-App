@@ -160,7 +160,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <div class="flex flex-col gap-2 justify-center w-full items-center mt-4">
   <button
-    class="btn gap-1"
+    class="btn gap-1 hover:preset-tonal"
     aria-label="settings"
     onclick={() => {
       modal.trigger({

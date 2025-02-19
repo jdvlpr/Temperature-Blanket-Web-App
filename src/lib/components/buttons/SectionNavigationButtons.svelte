@@ -36,11 +36,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div
-  class="flex flex-wrap justify-between items-center mb-4 mx-2 sm:mx-4 xl:mx-0 mt-2 lg:mt-4 gap-y-2"
+  class="flex flex-wrap justify-between items-center mb-4 mt-2 lg:mt-4 gap-y-2"
 >
   {#if previousSectionIndex}
     <button
-      class="btn preset-tonal-tertiary"
+      class="btn preset-tonal-tertiary gap-1 shadow"
       onclick={() => goToProjectSection(previousSectionIndex)}
     >
       <span class="flex gap-2 items-center">
@@ -66,7 +66,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/if}
   {#if nextSectionIndex}
     <button
-      class="btn preset-tonal-tertiary"
+      class="btn preset-tonal-tertiary gap-1 shadow"
       onclick={() => goToProjectSection(nextSectionIndex)}
     >
       <span class="flex gap-2 items-center">

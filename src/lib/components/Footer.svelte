@@ -29,14 +29,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
   class:dark:bg-transparent={subtleBackground}
 >
   {#if about}
-    <div class="card h-fit preset-tonal-surface p-4 col-span-full">
+    <div class="card h-fit preset-tonal-surface p-4 col-span-full shadow-xl">
       <h3 class="font-bold text-xl mb-2">About</h3>
       {@render about?.()}
     </div>
   {/if}
 
   {#if sources}
-    <div class="card preset-tonal-surface p-4 h-fit col-span-full">
+    <div class="card preset-tonal-surface p-4 h-fit col-span-full shadow-xl">
       <h3 class="font-bold text-xl mb-2">Sources</h3>
       {@render sources?.()}
     </div>

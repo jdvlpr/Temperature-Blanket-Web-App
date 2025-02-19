@@ -61,7 +61,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 </script>
 
-<div class="text-center inline-flex flex-col items-center mx-auto w-full p-4">
+<div class="text-center inline-flex flex-col items-center mx-auto w-full px-4">
   <label for="number-input" class="mb-2"><span>{@html title}</span></label>
 
   <div class="flex flex-col gap-2 justify-center items-center my-2 w-fit">

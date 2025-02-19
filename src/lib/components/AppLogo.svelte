@@ -20,6 +20,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <div
   class="flex items-center gap-2 mx-auto [view-transition-name:app-logo] min-h-[43px]"
 >
-  <img src="/images/icon.png" class="w-8 h-8" alt="Logo" />
-  <h1 class="font-cursive text-xl">{PUBLIC_SITE_TITLE}</h1>
+  <!-- <img src="/images/icon.png" class="size-8" alt="Logo" /> -->
+  <div class="flex flex-col rounded-[2px] overflow-hidden gap-[0.5px] h-6 w-3">
+    <div class="w-full flex-auto bg-secondary-600 dark:bg-secondary-100"></div>
+    <div class="w-full flex-auto bg-secondary-500 dark:bg-secondary-200"></div>
+    <div class="w-full flex-auto bg-secondary-400 dark:bg-secondary-300"></div>
+    <div class="w-full flex-auto bg-secondary-300 dark:bg-secondary-400"></div>
+    <div class="w-full flex-auto bg-secondary-200 dark:bg-secondary-500"></div>
+    <div class="w-full flex-auto bg-secondary-100 dark:bg-secondary-600"></div>
+    <div class="w-full flex-auto bg-secondary-50 dark:bg-secondary-700"></div>
+  </div>
+  <h1 class="font-cursive text-2xl text-secondary-600 dark:text-secondary-100">
+    {PUBLIC_SITE_TITLE}
+  </h1>
 </div>

@@ -61,23 +61,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 </script>
 
-<div class="bg-surface-100-900 rounded-container my-2 mb-4 p-2">
-  <div class="mb-2 flex flex-wrap justify-center items-center">
-    <label class="label">
-      <select
-        class="select w-fit mx-auto"
-        id="select-pattern-type"
-        value={activePreviewSelectId}
-        onchange={(e) => {
-          previews.activeId = e.target.value;
-        }}
-      >
-        {#each previews.all as { name, id }}
-          <option value={id}>{name}</option>
-        {/each}
-      </select>
-    </label>
-  </div>
+<div class="my-4 flex flex-col justify-center items-center gap-2">
+  <label class="label">
+    <select
+      class="select w-fit mx-auto"
+      id="select-pattern-type"
+      value={activePreviewSelectId}
+      onchange={(e) => {
+        previews.activeId = e.target.value;
+      }}
+    >
+      {#each previews.all as { name, id }}
+        <option value={id}>{name}</option>
+      {/each}
+    </select>
+  </label>
 
   <div
     class="preview-image-select flex flex-wrap gap-2 justify-center items-center"
@@ -90,7 +88,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               'flex flex-col p-4 rounded-container justify-center gap-2 items-center snap-center',
               id === previews.activeId
                 ? 'bg-primary-300-700 selected shadow'
-                : '',
+                : 'preset-tonal hover:preset-tonal-primary',
             ]}
             onclick={() => {
               previews.activeId = id;

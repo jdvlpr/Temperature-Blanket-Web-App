@@ -175,7 +175,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {/key}
     </div>
 
-    <Tooltip onclick={reset} classNames="btn hover:preset-tonal gap-2">
+    <Tooltip onclick={reset} classNames="btn hover:preset-tonal gap-2 mb-2">
       <svg
         xmlns="http://www.w3.org/2000/svg"
         fill="none"
@@ -197,16 +197,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </Tooltip>
   </div>
 
-  <div
-    class="flex flex-col gap-2 justify-start items-start bg-surface-100-900 rounde-container-token p-4 mt-2 mx-auto w-fit"
-  >
-    <ToggleSwitch
-      bind:checked={primaryTargetAsBackup}
-      label="Use Primary as Backup"
-      details="Use primary color if secondary color's value is not available, or if it's a height-type paramter with a value
+  <ToggleSwitch
+    bind:checked={primaryTargetAsBackup}
+    label="Use Primary as Backup"
+    details="Use primary color if secondary color's value is not available, or if it's a height-type paramter with a value
         of 0."
-    />
-  </div>
+  />
 </div>
 <StickyPart position="bottom">
   <div class="p-2">

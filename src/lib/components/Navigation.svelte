@@ -14,7 +14,6 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import Tooltip from '$lib/components/Tooltip.svelte';
   import { pageSections, weather } from '$lib/state';
   import { goToProjectSection } from '$lib/utils';
 </script>

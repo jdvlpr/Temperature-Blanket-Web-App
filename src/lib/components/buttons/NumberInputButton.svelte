@@ -47,7 +47,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           title,
           min,
           max,
-          onOkay: (_value) => (value = _value),
+          onOkay: (_value) => {
+            value = _value;
+          },
         },
       },
     })}
