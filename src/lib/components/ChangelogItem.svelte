@@ -26,7 +26,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <div class="flex flex-col gap-2">
   <div>
     {#if date}
-      <h2 class="h2">{date}</h2>
+      <h2 class="h2 text-gradient">{date}</h2>
     {/if}
   </div>
   <div class="flex flex-col gap-2 card p-2 bg-surface-100-900">

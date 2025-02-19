@@ -372,11 +372,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       >
         <div class="px-2 py-4 w-full">
           <div class="flex flex-col gap-2">
-            <h3
-              class="h3 bg-gradient-to-br from-secondary-200 to-secondary-800 dark:from-secondary-50 dark:to-secondary-200 bg-clip-text text-transparent dark:text-transparent box-decoration-clone mb-0"
-            >
-              Weather Data + Art
-            </h3>
+            <h2 class="h2 text-gradient mb-0">Weather Data + Art</h2>
             <p>
               Get historical weather data, choose yarn colors, and visualize
               your crochet or knitting project.

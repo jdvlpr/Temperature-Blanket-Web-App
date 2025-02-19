@@ -41,7 +41,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/snippet}
   {#snippet main()}
     <main class="max-w-screen-md px-2 xl:px-0 flex flex-col gap-4 my-2 mx-auto">
-      <p class="font-bold text-2xl hidden lg:inline-block">Privacy Policy</p>
+      <h2 class="h2 text-gradient">Privacy Policy</h2>
       <div class="flex flex-col">
         <p class="font-bold text-xl">Introduction</p>
         <p>

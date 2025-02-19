@@ -10,7 +10,92 @@
   :root [data-theme='rocket'],
   :root [data-theme='legacy'] {
     --base-font-family: 'apparat', sans-serif;
-    --heading-font-family: 'apparat', sans-serif;
+    --heading-font-family: 'fraunces-variable', sans-serif;
+  }
+
+  :root [data-theme='classic'] {
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      font-variation-settings:
+        'opsz' 68,
+        'wght' 600,
+        'SOFT' 50,
+        'WONK' 0;
+    }
+  }
+  :root [data-theme='crimson'] {
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      font-variation-settings:
+        'opsz' 48,
+        'wght' 400,
+        'SOFT' 90,
+        'WONK' 1;
+    }
+  }
+  :root [data-theme='hamlindigo'] {
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      font-variation-settings:
+        'opsz' 76,
+        'wght' 900,
+        'SOFT' 0,
+        'WONK' 0;
+    }
+  }
+  :root [data-theme='modern'] {
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      font-variation-settings:
+        'opsz' 12,
+        'wght' 900,
+        'SOFT' 100,
+        'WONK' 1;
+    }
+  }
+  :root [data-theme='rocket'] {
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      font-variation-settings:
+        'opsz' 24,
+        'wght' 300,
+        'SOFT' 10,
+        'WONK' 0;
+    }
+  }
+  :root [data-theme='legacy'] {
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      font-variation-settings:
+        'opsz' 64,
+        'wght' 500,
+        'SOFT' 60,
+        'WONK' 1;
+    }
   }
 
   /* Disable double-tap to zoom */
@@ -49,6 +134,10 @@
 
   .link {
     @apply underline text-secondary-800 dark:text-secondary-50;
+  }
+
+  .text-gradient {
+    @apply bg-gradient-to-br from-secondary-200 to-secondary-800 dark:from-secondary-50 dark:to-secondary-200 bg-clip-text text-transparent dark:text-transparent box-decoration-clone;
   }
 }
 

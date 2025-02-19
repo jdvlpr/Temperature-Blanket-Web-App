@@ -122,6 +122,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   />
   <link rel="shortcut icon" href="/favicon.ico" />
   <link rel="stylesheet" href="https://use.typekit.net/ixb2wbf.css" />
+  <link rel="stylesheet" href="https://use.typekit.net/ruh6vxg.css" />
 
   <meta name="theme-color" content="#f5f5f5" />
 

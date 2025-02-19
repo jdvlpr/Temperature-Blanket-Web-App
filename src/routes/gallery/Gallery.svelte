@@ -140,7 +140,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <div class="flex flex-col justify-center gap-8">
   <div class="inline-grid gap-2 text-center">
     <div class="my-2">
-      <h2 class="font-bold text-xl">Featured Projects</h2>
+      <h2 class="h2 text-gradient">Featured Projects</h2>
       <label>
         <span>Popular during the past</span>
         <select
@@ -198,7 +198,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       bind:this={scrollContainer}
       class="text-center flex flex-wrap justify-center items-end scroll-mt-[70px]"
     >
-      <h2 class="font-bold text-xl">All Projects</h2>
+      <h2 class="h2 text-gradient">All Projects</h2>
       <div class="w-full justify-center flex mb-2">
         {#if totalProjects === 0}
           <p class="animate-pulse text-xs">...</p>

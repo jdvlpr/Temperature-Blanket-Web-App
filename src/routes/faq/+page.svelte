@@ -39,7 +39,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {#snippet main()}
     <main class="max-w-screen-md px-2 lg:px-0 flex flex-col gap-4 mx-auto">
       <div>
-        <h2 class="h2 my-2">Frequently Asked Questions</h2>
+        <h2 class="h2 text-gradient my-2">Frequently Asked Questions</h2>
         <section id="faq" class="flex flex-col gap-4">
           <Accordion {value} multiple>
             <Accordion.Item value="weather-data-inaccurate">
