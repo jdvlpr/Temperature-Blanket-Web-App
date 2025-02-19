@@ -64,7 +64,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         />
       </svg>
     {/snippet}
-    <Accordion.Item value="tools">
+    <Accordion.Item value="tools" controlHover="hover:preset-tonal">
       {#snippet control()}
         Tools
       {/snippet}
@@ -155,7 +155,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </div>
       {/snippet}
     </Accordion.Item>
-    <Accordion.Item value="gallery">
+    <Accordion.Item value="gallery" controlHover="hover:preset-tonal">
       {#snippet control()}
         Gallery
       {/snippet}
@@ -192,7 +192,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </div>
       {/snippet}
     </Accordion.Item>
-    <Accordion.Item value="information">
+    <Accordion.Item value="information" controlHover="hover:preset-tonal">
       {#snippet control()}
         Information
       {/snippet}

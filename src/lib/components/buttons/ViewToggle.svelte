@@ -18,7 +18,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { Segment } from '@skeletonlabs/skeleton-svelte';
 </script>
 
-<Segment bind:value={preferences.value.layout} background="bg-surface-100-900">
+<Segment
+  bind:value={preferences.value.layout}
+  background="bg-surface-100-900"
+  classes="shadow"
+>
   <Segment.Item value="list">
     <div class="flex items-center justify-center gap-1">
       <svg

@@ -74,6 +74,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <Segment
       bind:value={category}
       background="bg-surface-100 dark:bg-surface-950"
+      classes="shadow"
     >
       {#each categories as categoryItem}
         <Segment.Item value={categoryItem}>

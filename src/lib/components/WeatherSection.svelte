@@ -158,7 +158,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let length = $derived([...new Set(data?.map((day) => day.weekId))].length);
 </script>
 
-<div class="flex flex-col gap-2 justify-center w-full items-center mt-4">
+<div class="flex flex-col gap-2 justify-center w-full items-center mt-2">
   <button
     class="btn gap-1 hover:preset-tonal"
     aria-label="settings"
@@ -261,7 +261,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
   {/if}
 
-  <div class="flex flex-wrap gap-x-2 items-start justify-center">
+  <div
+    class="flex flex-wrap gap-x-2 items-start justify-center bg-gradient-to-tr from-surface-600 to-surface-950 dark:from-surface-50 dark:to-surface-100 bg-clip-text text-transparent dark:text-transparent box-decoration-clone"
+  >
     {#if weather.table.showParameters.tmax}
       <WeatherItem
         id="tmax"

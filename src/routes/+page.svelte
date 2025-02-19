@@ -367,7 +367,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     >
       <div
         id="page-section-location"
-        class="scroll-mt-[58px] pb-12 max-w-screen-md mx-auto"
+        class="scroll-mt-[76px] pb-12 max-w-screen-md mx-auto"
         class:hidden={pageSections.items[1].active === false}
       >
         <div class="px-2 py-4 w-full">
@@ -411,7 +411,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {#if weather.data.length}
         <div
           id="page-section-weather-data"
-          class="lg:my-4 scroll-mt-[58px] w-full"
+          class="scroll-mt-[76px] w-full"
           class:hidden={pageSections.items[2].active === false}
         >
           <WeatherSection />
@@ -422,7 +422,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
         <div
           id="page-section-gauges"
-          class="lg:my-4 scroll-mt-[58px] w-full"
+          class="scroll-mt-[76px] w-full"
           class:hidden={pageSections.items[3].active === false}
         >
           {#key project.history.length}
@@ -443,7 +443,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
         <div
           id="page-section-preview"
-          class="lg:my-4 scroll-mt-[58px] w-full"
+          class="scroll-mt-[76px] w-full"
           class:hidden={pageSections.items[4].active === false}
         >
           <div

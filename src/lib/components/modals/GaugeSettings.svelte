@@ -270,7 +270,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </p>
 
             <Segment
-              classes="flex-wrap gap-y-2"
+              classes="flex-wrap gap-y-2 shadow"
               background="bg-surface-100-900"
               bind:value={incrementMode}
             >

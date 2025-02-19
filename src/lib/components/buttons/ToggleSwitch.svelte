@@ -38,7 +38,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div
-  class="flex justify-between gap-4 w-full bg-surface-100-900 py-2 px-4 rounded-container"
+  class="flex justify-between gap-4 w-full bg-surface-100-900 py-2 px-4 rounded-container shadow"
 >
   <div class="flex flex-col items-start">
     <span class:font-bold={hasDetails}>{@html label}</span>

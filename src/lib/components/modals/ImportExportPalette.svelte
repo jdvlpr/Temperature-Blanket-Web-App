@@ -116,7 +116,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <div class="p-4">
   <div class="flex flex-col text-left gap-1 w-full mb-4">
     <Segment
-      classes="flex wrap gap-y-2 w-fit mx-auto"
+      classes="flex wrap gap-y-2 w-fit mx-auto shadow"
       background="bg-surface-200-800"
       bind:value={segmentValue}
     >

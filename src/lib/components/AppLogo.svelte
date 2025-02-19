@@ -21,7 +21,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   class="flex items-center gap-2 mx-auto [view-transition-name:app-logo] min-h-[43px]"
 >
   <!-- <img src="/images/icon.png" class="size-8" alt="Logo" /> -->
-  <div class="flex flex-col rounded-[2px] overflow-hidden gap-[0.5px] h-6 w-3">
+  <div
+    class="flex flex-col rounded-[0.2rem] overflow-hidden gap-[0.5px] h-7 w-3"
+  >
     <div class="w-full flex-auto bg-secondary-600 dark:bg-secondary-100"></div>
     <div class="w-full flex-auto bg-secondary-500 dark:bg-secondary-200"></div>
     <div class="w-full flex-auto bg-secondary-400 dark:bg-secondary-300"></div>

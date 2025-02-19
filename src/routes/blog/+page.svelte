@@ -103,7 +103,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <Segment
         bind:value={selectedTag}
         classes="mt-4"
-        background="bg-surface-200-800"
+        background="bg-surface-200-800 shadow"
       >
         {#each tags as tag}
           <Segment.Item value={tag}>

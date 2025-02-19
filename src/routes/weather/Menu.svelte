@@ -158,7 +158,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <Segment
               bind:value={weatherState.hour}
               classes="flex-wrap gap-y-2"
-              background="bg-surface-100-900"
+              background="bg-surface-100-900 shadow"
             >
               <Segment.Item value="12">12hr</Segment.Item>
               <Segment.Item value="24">24hr</Segment.Item>

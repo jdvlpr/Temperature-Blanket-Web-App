@@ -260,6 +260,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 </script>
 
-<div class="bg-surface-50-950 mb-4 h-[300px]">
+<div class="mb-4 h-[250px]">
   <canvas id="weather-chart" bind:this={ctx}></canvas>
 </div>
