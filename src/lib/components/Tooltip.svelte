@@ -95,9 +95,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           });
         },
       }),
-      shift((state) => ({
-        padding: state.rects.reference.width,
-      })),
+      shift({
+        padding: 2,
+      }),
       arrow({ element: arrowRef }),
     ],
     onComputed({ placement, middlewareData }) {
