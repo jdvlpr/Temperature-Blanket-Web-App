@@ -53,167 +53,158 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <div class="hidden lg:inline-flex mx-auto"><AppLogo /></div>
   {/snippet}
   {#snippet main()}
-    <main class="max-w-screen-xl m-auto text-left flex flex-col gap-2 mb-4">
-      <Card>
-        {#snippet header()}
-          <div
-            class="bg-surface-200-800 p-4 text-left flex flex-wrap justify-center items-end gap-4"
-          >
+    <main
+      class="max-w-screen-md m-auto text-left flex flex-col gap-2 mb-4 mx-auto px-2"
+    >
+      <div
+        class="p-4 text-left flex flex-wrap justify-center items-end gap-4 rounded-container bg-surface-50-950"
+      >
+        <p>
+          Making a request for a yarn to be included in the search results does
+          not guarantee its inclusion. Requests will be processed based the
+          order the request was received, the availability of the yarn, and the
+          web app developer’s schedule.
+        </p>
+        <div class="flex flex-wrap gap-4">
+          <div class="flex flex-col gap-2 card p-4">
+            <p class="font-bold">Do Request</p>
             <p>
-              Making a request for a yarn to be included in the search results
-              does not guarantee its inclusion. Requests will be processed based
-              the order the request was received, the availability of the yarn,
-              and the web app developer’s schedule.
+              {@html checkIcon} Yarn with solid or single-color colorways
             </p>
-            <div class="flex flex-wrap gap-4">
-              <div class="flex flex-col gap-2 card p-4">
-                <p class="font-bold">Do Request</p>
-                <p>
-                  {@html checkIcon} Yarn with solid or single-color colorways
-                </p>
-                <p>
-                  {@html checkIcon} Yarn for which a public webpage featuring images
-                  and names of every colorway is available
-                </p>
-                <p>
-                  {@html checkIcon} A suggestion for correcting or updating existing
-                  yarn colorways on temperature-blanket.com
-                </p>
-              </div>
-              <div class="flex flex-col gap-2 card p-4">
-                <p class="font-bold">Do Not Request</p>
-                <p>
-                  {@html xIcon} Yarn with all variegated or multi-colored colorways*
-                </p>
-                <p>
-                  {@html xIcon} Custom-dyed yarn
-                </p>
-                <p>
-                  {@html xIcon} Yarn which is only available for a limited time or
-                  in limited quantities
-                </p>
-              </div>
-            </div>
-            <p class="text-sm">
-              *Variegated colorways cannot be processed; only yarn colorways of
-              a single color can be included in the search results. If a yarn
-              has variegated colorways as well as solid colorways, only solid
-              colorways will be considered.
+            <p>
+              {@html checkIcon} Yarn for which a public webpage featuring images
+              and names of every colorway is available
+            </p>
+            <p>
+              {@html checkIcon} A suggestion for correcting or updating existing
+              yarn colorways on temperature-blanket.com
             </p>
           </div>
-        {/snippet}
-
-        {#snippet content()}
-          <div>
-            {#if PUBLIC_YARN_SEARCH_REQUEST_FORM_LINK}
-              <form
-                action={PUBLIC_YARN_SEARCH_REQUEST_FORM_LINK}
-                method="POST"
-                class="flex flex-col gap-4 m-2 mb-4"
+          <div class="flex flex-col gap-2 card p-4">
+            <p class="font-bold">Do Not Request</p>
+            <p>
+              {@html xIcon} Yarn with all variegated or multi-colored colorways*
+            </p>
+            <p>
+              {@html xIcon} Custom-dyed yarn
+            </p>
+            <p>
+              {@html xIcon} Yarn which is only available for a limited time or in
+              limited quantities
+            </p>
+          </div>
+        </div>
+        <p class="text-sm">
+          *Variegated colorways cannot be processed; only yarn colorways of a
+          single color can be included in the search results. If a yarn has
+          variegated colorways as well as solid colorways, only solid colorways
+          will be considered.
+        </p>
+      </div>
+      <div>
+        {#if PUBLIC_YARN_SEARCH_REQUEST_FORM_LINK}
+          <form
+            action={PUBLIC_YARN_SEARCH_REQUEST_FORM_LINK}
+            method="POST"
+            class="flex flex-col gap-4 m-2 mb-4"
+          >
+            <div class="tex-left flex flex-col items-start gap-1">
+              <label for="brand-name" class="label flex items-center"
+                >Brand Name</label
               >
-                <div class="tex-left flex flex-col items-start gap-1">
-                  <label for="brand-name" class="label flex items-center"
-                    >Brand Name</label
-                  >
-                  <input
-                    id="brand-name"
-                    class="input"
-                    type="text"
-                    name="brandName"
-                    placeholder="Brand Name"
-                    required
-                  />
-                </div>
+              <input
+                id="brand-name"
+                class="input"
+                type="text"
+                name="brandName"
+                placeholder="Brand Name"
+                required
+              />
+            </div>
 
-                <div class="tex-left flex flex-col items-start gap-1">
-                  <label for="yarn-name" class="label flex items-center"
-                    >Yarn Name</label
-                  >
-                  <input
-                    id="yarn-name"
-                    class="input"
-                    type="text"
-                    name="yarnName"
-                    placeholder="Yarn Name"
-                    required
-                  />
-                </div>
+            <div class="tex-left flex flex-col items-start gap-1">
+              <label for="yarn-name" class="label flex items-center"
+                >Yarn Name</label
+              >
+              <input
+                id="yarn-name"
+                class="input"
+                type="text"
+                name="yarnName"
+                placeholder="Yarn Name"
+                required
+              />
+            </div>
 
-                <div class="tex-left flex flex-col items-start gap-1">
-                  <label
-                    for="web-address"
-                    class="label flex items-start flex-col max-w-screen-sm"
-                  >
-                    Web Address
-                    <span class="text-sm"
-                      >Please include a URL to the brand's own webpage for the
-                      yarn. The webpage should contain the yarn's details
-                      including images and names of its colorways.</span
-                    >
-                  </label>
-                  <input
-                    id="web-address"
-                    class="input"
-                    type="url"
-                    name="webAddress"
-                    placeholder="Web Address"
-                    required
-                  />
-                </div>
-
-                <div class="tex-left flex flex-col items-start gap-1">
-                  <label for="other-comments" class="label"
-                    >Other Comments
-                  </label>
-                  <textarea
-                    id="other-comments"
-                    class="textarea"
-                    name="otherComments"
-                    placeholder="Other Comments"
-                  ></textarea>
-                </div>
-
-                <div class="tex-left flex flex-col items-start gap-1">
-                  <label for="your-email" class="label flex items-center"
-                    >Your email (if you want a reply)</label
-                  >
-                  <input
-                    id="your-email"
-                    class="input"
-                    type="email"
-                    name="email"
-                    placeholder="Your Email"
-                  />
-                </div>
-
-                <button
-                  class="btn preset-filled-primary-500 w-fit"
-                  type="submit">Send Yarn Request</button
+            <div class="tex-left flex flex-col items-start gap-1">
+              <label
+                for="web-address"
+                class="label flex items-start flex-col max-w-screen-sm"
+              >
+                Web Address
+                <span class="text-sm"
+                  >Please include a URL to the brand's own webpage for the yarn.
+                  The webpage should contain the yarn's details including images
+                  and names of its colorways.</span
                 >
+              </label>
+              <input
+                id="web-address"
+                class="input"
+                type="url"
+                name="webAddress"
+                placeholder="Web Address"
+                required
+              />
+            </div>
 
-                <p>
-                  Expect up to a few weeks for your request to be processed.
-                </p>
+            <div class="tex-left flex flex-col items-start gap-1">
+              <label for="other-comments" class="label">Other Comments </label>
+              <textarea
+                id="other-comments"
+                class="textarea"
+                name="otherComments"
+                placeholder="Other Comments"
+              ></textarea>
+            </div>
 
-                <input
-                  type="hidden"
-                  name="_next"
-                  value="{PUBLIC_BASE_URL}/yarn-search-request/thank-you"
-                />
-                <input
-                  type="hidden"
-                  name="_subject"
-                  value="Yarn Search Request Response"
-                />
-              </form>
-            {:else}
-              <p class="italic">
-                Developer message: missing yarn search request form link.
-              </p>
-            {/if}
-          </div>
-        {/snippet}
-      </Card>
+            <div class="tex-left flex flex-col items-start gap-1">
+              <label for="your-email" class="label flex items-center"
+                >Your email (if you want a reply)</label
+              >
+              <input
+                id="your-email"
+                class="input"
+                type="email"
+                name="email"
+                placeholder="Your Email"
+              />
+            </div>
+
+            <button
+              class="btn preset-filled-primary-500 w-fit shadow"
+              type="submit">Send Yarn Request</button
+            >
+
+            <p>Expect up to a few weeks for your request to be processed.</p>
+
+            <input
+              type="hidden"
+              name="_next"
+              value="{PUBLIC_BASE_URL}/yarn-search-request/thank-you"
+            />
+            <input
+              type="hidden"
+              name="_subject"
+              value="Yarn Search Request Response"
+            />
+          </form>
+        {:else}
+          <p class="italic">
+            Developer message: missing yarn search request form link.
+          </p>
+        {/if}
+      </div>
     </main>
   {/snippet}
 </AppShell>

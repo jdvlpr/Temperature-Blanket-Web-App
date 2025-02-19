@@ -19,8 +19,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import AppShell from '$lib/components/AppShell.svelte';
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
   import { consentToMSClarityCookies, preferences, toast } from '$lib/state';
-  import type { ToastContext } from '@skeletonlabs/skeleton-svelte';
-  import { getContext } from 'svelte';
 
   let kofiUrl = new URL(PUBLIC_KOFI_LINK || 'https://ko-fi.com');
 
@@ -42,7 +40,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <div class="hidden lg:inline-flex mx-auto"><AppLogo /></div>
   {/snippet}
   {#snippet main()}
-    <main class="max-w-screen-xl px-2 xl:px-0 flex flex-col gap-4 my-2">
+    <main class="max-w-screen-md px-2 xl:px-0 flex flex-col gap-4 my-2 mx-auto">
       <p class="font-bold text-2xl hidden lg:inline-block">Privacy Policy</p>
       <div class="flex flex-col">
         <p class="font-bold text-xl">Introduction</p>
@@ -118,7 +116,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
           {#if preferences.value.disableToastAnalytics}
             <div
-              class="flex flex-wrap gap-x-4 gap-y-2 items-center px-4 py-2 rounded-container preset-filled-surface-100-900 w-fit"
+              class="flex flex-wrap gap-x-4 gap-y-2 items-center px-4 py-2 rounded-container preset-filled-surface-100-900 w-fit shadow"
             >
               <p>Allow the cookie popup message to appear.</p>
               <button

@@ -41,7 +41,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { PUBLIC_BASE_URL } from '$env/static/public';
   import AppLogo from '$lib/components/AppLogo.svelte';
   import AppShell from '$lib/components/AppShell.svelte';
-  import Card from '$lib/components/Card.svelte';
   import ColorPalette from '$lib/components/ColorPalette.svelte';
   import PlaceholderPalettes from '$lib/components/PlaceholderPalettes.svelte';
   import SelectYarn from '$lib/components/SelectYarn.svelte';
@@ -223,328 +222,304 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/snippet}
 
   {#snippet main()}
-    <main class="max-w-screen-xl m-auto flex flex-col justify-start gap-2">
+    <main class="m-auto flex flex-col justify-start gap-2 mx-2">
       <div class="flex flex-col justify-center gap-8">
         <div class="inline-grid gap-2 text-center">
-          <Card>
-            {#snippet header()}
-              <div class="bg-surface-50-950 py-4">
-                <h2 class="font-bold text-xl">Featured Yarn Palettes</h2>
-                <label>
-                  <span>From popular projects during the past</span>
-                  <select
-                    bind:value={yarnPaletteGalleryState.timePeriod}
-                    class="select w-fit mx-auto"
-                    onchange={() => {
-                      yarnPaletteGalleryState.popularPalettes = [];
-                      fetchPopularPalettes();
-                    }}
-                  >
-                    <option value={0.0357}>day</option>
-                    <option value={0.25}>week</option>
-                    <option value={1}>month</option>
-                    <option value={12}>year</option>
-                  </select>
-                </label>
-              </div>
-            {/snippet}
-            {#snippet content()}
-              <div
-                class="gap-4 my-2 flex flex-col items-start justify-start w-full"
+          <div class="my-2">
+            <h2 class="font-bold text-xl">Featured Yarn Palettes</h2>
+            <label>
+              <span>From popular projects during the past</span>
+              <select
+                bind:value={yarnPaletteGalleryState.timePeriod}
+                class="select w-fit mx-auto"
+                onchange={() => {
+                  yarnPaletteGalleryState.popularPalettes = [];
+                  fetchPopularPalettes();
+                }}
               >
-                {#if !yarnPaletteGalleryState.popularPalettes.length}
-                  <PlaceholderPalettes items={5} maxWFull={true} />
-                {:else}
-                  {#each yarnPaletteGalleryState.popularPalettes as { colors, schemeName, projectId }}
-                    <!-- {@const href = `/yarn?s=${colorsToCode(colors, {
+                <option value={0.0357}>day</option>
+                <option value={0.25}>week</option>
+                <option value={1}>month</option>
+                <option value={12}>year</option>
+              </select>
+            </label>
+          </div>
+          <div
+            class="gap-4 my-2 flex flex-col items-start justify-start w-full"
+          >
+            {#if !yarnPaletteGalleryState.popularPalettes.length}
+              <PlaceholderPalettes items={5} maxWFull={true} wFull={true} />
+            {:else}
+              {#each yarnPaletteGalleryState.popularPalettes as { colors, schemeName, projectId }}
+                <!-- {@const href = `/yarn?s=${colorsToCode(colors, {
                                 includePrefixes: false,
                             })}&f=${colorsToYarnDetails({ colors })}&v=${version}`} -->
-                    <a
-                      onclick={async () => {
-                        yarnPageState.gauge.colors = colors;
-                        await recordPageView(projectId);
-                      }}
-                      href="/yarn"
-                      class="w-full flex flex-col text-left gap-y-1"
-                    >
-                      <ColorPalette {colors} {schemeName} />
-                    </a>
-                  {/each}
-                {/if}
-              </div>
-            {/snippet}
-          </Card>
+                <a
+                  onclick={async () => {
+                    yarnPageState.gauge.colors = colors;
+                    await recordPageView(projectId);
+                  }}
+                  href="/yarn"
+                  class="w-full flex flex-col text-left gap-y-1"
+                >
+                  <ColorPalette {colors} {schemeName} />
+                </a>
+              {/each}
+            {/if}
+          </div>
         </div>
         <div class="inline-grid gap-2 text-center">
-          <Card>
-            {#snippet header()}
-              <div
-                bind:this={scrollContainer}
-                class="bg-surface-50-950 pt-4 text-center flex flex-col gap-2 justify-center items-center scroll-mt-[70px] pb-4 px-2"
-              >
-                <div class="flex flex-col">
-                  <h2 class="font-bold text-xl">All Yarn Palettes</h2>
-                  <p class="text-sm">Palettes from all user-created projects</p>
-                </div>
-                <div class="grid-cols-12 grid gap-4 items-end w-full lg:px-2">
-                  <div class="w-full col-span-12 md:col-span-5">
-                    <SelectYarn
-                      preselectDefaultYarn={false}
-                      disabled={loading}
-                      bind:selectedBrandId={
-                        yarnPaletteGalleryState.filteredBrandId
-                      }
-                      bind:selectedYarnId={
-                        yarnPaletteGalleryState.filteredYarnId
-                      }
-                    />
-                  </div>
+          <div
+            bind:this={scrollContainer}
+            class="text-center flex flex-col gap-2 justify-center items-center scroll-mt-[70px] pb-4 px-2"
+          >
+            <div class="flex flex-col">
+              <h2 class="font-bold text-xl">All Yarn Palettes</h2>
+              <p class="text-sm">Palettes from all user-created projects</p>
+            </div>
+            <div class="grid-cols-12 grid gap-4 items-end w-full lg:px-2">
+              <div class="w-full col-span-12 md:col-span-5">
+                <SelectYarn
+                  preselectDefaultYarn={false}
+                  disabled={loading}
+                  bind:selectedBrandId={yarnPaletteGalleryState.filteredBrandId}
+                  bind:selectedYarnId={yarnPaletteGalleryState.filteredYarnId}
+                />
+              </div>
 
-                  {#if yarnPaletteGalleryState.filteredBrandId || yarnPaletteGalleryState.filteredYarnId}
-                    <div
-                      class="w-full col-span-12 text-left md:col-span-4 flex flex-col items-start gap-0 top-[2px] relative"
-                    >
-                      <ToggleSwitch
-                        disabled={loading}
-                        bind:checked={
-                          yarnPaletteGalleryState.palettesContainOnlyFilteredYarn
-                        }
-                        label="Only This {yarnPaletteGalleryState.filteredBrandId &&
-                        yarnPaletteGalleryState.filteredYarnId
-                          ? 'Yarn'
-                          : 'Brand'}"
-                        details="All colorways in palette must be this {yarnPaletteGalleryState.filteredBrandId &&
-                        yarnPaletteGalleryState.filteredYarnId
-                          ? 'yarn'
-                          : 'brand'}"
-                      />
-                    </div>
-                  {/if}
-
-                  <div
-                    class="flex flex-col justify-start w-full col-span-12 md:col-span-3 gap-1"
-                  >
-                    <span class="flex items-center label gap-1">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke-width="1.5"
-                        stroke="currentColor"
-                        class="w-4 h-4 mr-1"
-                      >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
-                        />
-                      </svg>
-                      Search Projects
-                    </span>
-                    <div
-                      class="input-group input-group-divider grid-cols-[1fr_auto]"
-                    >
-                      <input
-                        type="text"
-                        class="truncate"
-                        autocomplete="off"
-                        placeholder="e.g., Kansas, 2003"
-                        disabled={loading}
-                        bind:value={yarnPaletteGalleryState.search}
-                      />
-
-                      {#if showSearchReset}
-                        <button
-                          disabled={loading}
-                          class=""
-                          title="Reset Search"
-                          onclick={() => {
-                            yarnPaletteGalleryState.search = '';
-                          }}
-                        >
-                          {@html ICONS.xMark}
-                        </button>
-                      {/if}
-                    </div>
-                  </div>
-
-                  <label class="label col-span-6 md:col-span-2 w-full">
-                    <span class="flex items-center">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke-width="1.5"
-                        stroke="currentColor"
-                        class="w-4 h-4 mr-1"
-                      >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          d="M3 7.5L7.5 3m0 0L12 7.5M7.5 3v13.5m13.5 0L16.5 21m0 0L12 16.5m4.5 4.5V7.5"
-                        />
-                      </svg>
-                      Order By
-                    </span>
-                    <select
-                      class="select truncate w-full"
-                      bind:value={yarnPaletteGalleryState.orderBy}
-                      disabled={loading}
-                    >
-                      <option value="DESC" selected>Newest First</option>
-                      <option value="ASC">Oldest First</option>
-                    </select>
-                  </label>
-
-                  <div
-                    class="justify-center flex col-span-6 md:col-span-2 {yarnPaletteGalleryState.filteredBrandId ||
+              {#if yarnPaletteGalleryState.filteredBrandId || yarnPaletteGalleryState.filteredYarnId}
+                <div
+                  class="w-full col-span-12 text-left md:col-span-4 flex flex-col items-start gap-0 top-[2px] relative"
+                >
+                  <ToggleSwitch
+                    disabled={loading}
+                    bind:checked={
+                      yarnPaletteGalleryState.palettesContainOnlyFilteredYarn
+                    }
+                    label="Only This {yarnPaletteGalleryState.filteredBrandId &&
                     yarnPaletteGalleryState.filteredYarnId
-                      ? 'md:col-start-11'
-                      : ''}"
+                      ? 'Yarn'
+                      : 'Brand'}"
+                    details="All colorways in palette must be this {yarnPaletteGalleryState.filteredBrandId &&
+                    yarnPaletteGalleryState.filteredYarnId
+                      ? 'yarn'
+                      : 'brand'}"
+                  />
+                </div>
+              {/if}
+
+              <div
+                class="flex flex-col justify-start w-full col-span-12 md:col-span-3 gap-1"
+              >
+                <span class="flex items-center label gap-1">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="currentColor"
+                    class="w-4 h-4 mr-1"
                   >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+                    />
+                  </svg>
+                  Search Projects
+                </span>
+                <div
+                  class="input-group input-group-divider grid-cols-[1fr_auto]"
+                >
+                  <input
+                    type="text"
+                    class="truncate"
+                    autocomplete="off"
+                    placeholder="e.g., Kansas, 2003"
+                    disabled={loading}
+                    bind:value={yarnPaletteGalleryState.search}
+                  />
+
+                  {#if showSearchReset}
                     <button
-                      class="btn preset-filled-primary-500 flex items-center w-full gap-1"
                       disabled={loading}
-                      onclick={async () => {
-                        yarnPaletteGalleryState.projects = [];
-                        yarnPaletteGalleryState.palettes = [];
-                        loading = true;
-                        const yarnSearch =
-                          yarnPaletteGalleryState.getYarnSearch({
-                            brandId: yarnPaletteGalleryState.filteredBrandId,
-                            yarnId: yarnPaletteGalleryState.filteredYarnId,
-                          });
-                        let results = await fetchProjects({
-                          first,
-                          search: yarnPaletteGalleryState.search,
-                          order: yarnPaletteGalleryState.orderBy,
-                          yarn: yarnSearch,
-                        });
-                        yarnPaletteGalleryState.gallery.pageInfo =
-                          results.pageInfo;
-                        if (yarnPaletteGalleryState.search)
-                          yarnPaletteGalleryState.projects =
-                            results.edges.flatMap((item) => item.node);
-                        else {
-                          yarnPaletteGalleryState.projects.push(
-                            ...results.edges.flatMap((item) => item.node),
-                          );
-                          yarnPaletteGalleryState.projects =
-                            yarnPaletteGalleryState.projects;
-                        }
-                        yarnPaletteGalleryState.palettes =
-                          getPalettesFromProjects({
-                            projects: yarnPaletteGalleryState.projects,
-                            selectedBrandId:
-                              yarnPaletteGalleryState.filteredBrandId,
-                            selectedYarnId:
-                              yarnPaletteGalleryState.filteredYarnId,
-                            palettesContainOnlyFilteredYarn:
-                              yarnPaletteGalleryState.palettesContainOnlyFilteredYarn,
-                          });
-                        loading = false;
+                      class=""
+                      title="Reset Search"
+                      onclick={() => {
+                        yarnPaletteGalleryState.search = '';
                       }}
                     >
-                      Search
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke-width="1.5"
-                        stroke="currentColor"
-                        class="w-6 h-6"
-                      >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75"
-                        />
-                      </svg>
+                      {@html ICONS.xMark}
                     </button>
-                  </div>
+                  {/if}
                 </div>
               </div>
-            {/snippet}
-            {#snippet content()}
-              <div
-                class="gap-4 my-2 flex flex-col items-start justify-start w-full"
-              >
-                {#each yarnPaletteGalleryState.palettes as { colors, schemeName, projectId }}
-                  <a
-                    onclick={async () => {
-                      yarnPageState.gauge.colors = colors;
-                      await recordPageView(projectId);
-                    }}
-                    href="/yarn"
-                    class="w-full flex flex-col text-left gap-y-1"
+
+              <label class="label col-span-6 md:col-span-2 w-full">
+                <span class="flex items-center">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="currentColor"
+                    class="w-4 h-4 mr-1"
                   >
-                    <ColorPalette {colors} {schemeName} />
-                  </a>
-                {/each}
-                {#if !yarnPaletteGalleryState.palettes.length && !loading}
-                  <p class="text-center my-8">
-                    No results. Try changing the filters above.
-                  </p>
-                {/if}
-                {#if loading}
-                  <PlaceholderPalettes items={20} maxWFull={true} />
-                {:else if yarnPaletteGalleryState.palettes.length && hasNextPage}
-                  <button
-                    class="btn preset-filled-primary-500 flex m-auto my-4"
-                    disabled={!hasNextPage}
-                    onclick={async () => {
-                      loading = true;
-                      const yarnSearch = yarnPaletteGalleryState.getYarnSearch({
-                        brandId: yarnPaletteGalleryState.filteredBrandId,
-                        yarnId: yarnPaletteGalleryState.filteredYarnId,
-                      });
-                      let results = await fetchProjects({
-                        first,
-                        after: endCursor,
-                        search: yarnPaletteGalleryState.search,
-                        order: yarnPaletteGalleryState.orderBy,
-                        yarn: yarnSearch,
-                      });
-                      yarnPaletteGalleryState.gallery.pageInfo =
-                        results.pageInfo;
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M3 7.5L7.5 3m0 0L12 7.5M7.5 3v13.5m13.5 0L16.5 21m0 0L12 16.5m4.5 4.5V7.5"
+                    />
+                  </svg>
+                  Order By
+                </span>
+                <select
+                  class="select truncate w-full"
+                  bind:value={yarnPaletteGalleryState.orderBy}
+                  disabled={loading}
+                >
+                  <option value="DESC" selected>Newest First</option>
+                  <option value="ASC">Oldest First</option>
+                </select>
+              </label>
+
+              <div
+                class="justify-center flex col-span-6 md:col-span-2 {yarnPaletteGalleryState.filteredBrandId ||
+                yarnPaletteGalleryState.filteredYarnId
+                  ? 'md:col-start-11'
+                  : ''}"
+              >
+                <button
+                  class="btn preset-filled-primary-500 flex items-center w-full gap-1 shadow"
+                  disabled={loading}
+                  onclick={async () => {
+                    yarnPaletteGalleryState.projects = [];
+                    yarnPaletteGalleryState.palettes = [];
+                    loading = true;
+                    const yarnSearch = yarnPaletteGalleryState.getYarnSearch({
+                      brandId: yarnPaletteGalleryState.filteredBrandId,
+                      yarnId: yarnPaletteGalleryState.filteredYarnId,
+                    });
+                    let results = await fetchProjects({
+                      first,
+                      search: yarnPaletteGalleryState.search,
+                      order: yarnPaletteGalleryState.orderBy,
+                      yarn: yarnSearch,
+                    });
+                    yarnPaletteGalleryState.gallery.pageInfo = results.pageInfo;
+                    if (yarnPaletteGalleryState.search)
+                      yarnPaletteGalleryState.projects = results.edges.flatMap(
+                        (item) => item.node,
+                      );
+                    else {
                       yarnPaletteGalleryState.projects.push(
                         ...results.edges.flatMap((item) => item.node),
                       );
                       yarnPaletteGalleryState.projects =
                         yarnPaletteGalleryState.projects;
-                      yarnPaletteGalleryState.palettes =
-                        getPalettesFromProjects({
-                          projects: yarnPaletteGalleryState.projects,
-                          selectedBrandId:
-                            yarnPaletteGalleryState.filteredBrandId,
-                          selectedYarnId:
-                            yarnPaletteGalleryState.filteredYarnId,
-                          palettesContainOnlyFilteredYarn:
-                            yarnPaletteGalleryState.palettesContainOnlyFilteredYarn,
-                        });
-                      loading = false;
-                    }}
+                    }
+                    yarnPaletteGalleryState.palettes = getPalettesFromProjects({
+                      projects: yarnPaletteGalleryState.projects,
+                      selectedBrandId: yarnPaletteGalleryState.filteredBrandId,
+                      selectedYarnId: yarnPaletteGalleryState.filteredYarnId,
+                      palettesContainOnlyFilteredYarn:
+                        yarnPaletteGalleryState.palettesContainOnlyFilteredYarn,
+                    });
+                    loading = false;
+                  }}
+                >
+                  Search
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="currentColor"
+                    class="w-6 h-6"
                   >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke-width="1.5"
-                      stroke="currentColor"
-                      class="w-6 h-6"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="M12 4.5v15m7.5-7.5h-15"
-                      />
-                    </svg>
-                    <span>Load More</span>
-                  </button>
-                {/if}
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75"
+                    />
+                  </svg>
+                </button>
               </div>
-            {/snippet}
-          </Card>
+            </div>
+          </div>
+          <div
+            class="gap-4 my-2 flex flex-col items-start justify-start w-full"
+          >
+            {#each yarnPaletteGalleryState.palettes as { colors, schemeName, projectId }}
+              <a
+                onclick={async () => {
+                  yarnPageState.gauge.colors = colors;
+                  await recordPageView(projectId);
+                }}
+                href="/yarn"
+                class="w-full flex flex-col text-left gap-y-1"
+              >
+                <ColorPalette {colors} {schemeName} />
+              </a>
+            {/each}
+            {#if !yarnPaletteGalleryState.palettes.length && !loading}
+              <p class="text-center my-8">
+                No results. Try changing the filters above.
+              </p>
+            {/if}
+            {#if loading}
+              <PlaceholderPalettes items={20} maxWFull={true} wFull={true} />
+            {:else if yarnPaletteGalleryState.palettes.length && hasNextPage}
+              <button
+                class="btn preset-filled-primary-500 flex m-auto my-4"
+                disabled={!hasNextPage}
+                onclick={async () => {
+                  loading = true;
+                  const yarnSearch = yarnPaletteGalleryState.getYarnSearch({
+                    brandId: yarnPaletteGalleryState.filteredBrandId,
+                    yarnId: yarnPaletteGalleryState.filteredYarnId,
+                  });
+                  let results = await fetchProjects({
+                    first,
+                    after: endCursor,
+                    search: yarnPaletteGalleryState.search,
+                    order: yarnPaletteGalleryState.orderBy,
+                    yarn: yarnSearch,
+                  });
+                  yarnPaletteGalleryState.gallery.pageInfo = results.pageInfo;
+                  yarnPaletteGalleryState.projects.push(
+                    ...results.edges.flatMap((item) => item.node),
+                  );
+                  yarnPaletteGalleryState.projects =
+                    yarnPaletteGalleryState.projects;
+                  yarnPaletteGalleryState.palettes = getPalettesFromProjects({
+                    projects: yarnPaletteGalleryState.projects,
+                    selectedBrandId: yarnPaletteGalleryState.filteredBrandId,
+                    selectedYarnId: yarnPaletteGalleryState.filteredYarnId,
+                    palettesContainOnlyFilteredYarn:
+                      yarnPaletteGalleryState.palettesContainOnlyFilteredYarn,
+                  });
+                  loading = false;
+                }}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="currentColor"
+                  class="w-6 h-6"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M12 4.5v15m7.5-7.5h-15"
+                  />
+                </svg>
+                <span>Load More</span>
+              </button>
+            {/if}
+          </div>
         </div>
       </div>
       {#if showScrollToTopButton && yarnPaletteGalleryState.projects.length}

@@ -37,13 +37,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <div class="hidden lg:inline-flex mx-auto"><AppLogo /></div>
   {/snippet}
   {#snippet main()}
-    <main class="max-w-screen-xl px-2 lg:px-0 flex flex-col gap-4">
+    <main class="max-w-screen-md px-2 lg:px-0 flex flex-col gap-4 mx-auto">
       <div>
-        <h2 class="font-bold text-2xl my-2">Frequently Asked Questions</h2>
-        <section
-          id="faq"
-          class="card preset-tonal-surface p-4 flex flex-col gap-4"
-        >
+        <h2 class="h2 my-2">Frequently Asked Questions</h2>
+        <section id="faq" class="flex flex-col gap-4">
           <Accordion {value} multiple>
             <Accordion.Item value="weather-data-inaccurate">
               {#snippet lead()}

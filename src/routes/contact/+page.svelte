@@ -35,9 +35,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <div class="hidden lg:inline-flex mx-auto"><AppLogo /></div>
   {/snippet}
   {#snippet main()}
-    <main class="max-w-screen-xl px-4 lg:px-0 flex flex-col gap-4 my-2">
+    <main class="max-w-screen-sm px-4 lg:px-0 flex flex-col gap-4 my-2 mx-auto">
       <div>
-        <h3 class="font-bold text-xl hidden lg:inline-block">Contact</h3>
+        <h2 class="h2">Contact</h2>
         <SocialIcons />
       </div>
       <div>

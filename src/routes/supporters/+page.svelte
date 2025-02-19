@@ -43,31 +43,25 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <div class="hidden lg:inline-flex mx-auto"><AppLogo /></div>
   {/snippet}
   {#snippet main()}
-    <main class="max-w-screen-xl m-auto text-center mb-4">
-      <Card>
-        {#snippet header()}
-          <div>
-            <div class="bg-surface-200-800 p-4">
-              <p class="text-center mt-2">
-                Thanks to <a
-                  href={PUBLIC_KOFI_LINK}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="link">generous one-time donors</a
-                >
-                for their contributions to this site, as well as to the following
-                monthly supporters:
-              </p>
-            </div>
-          </div>
-        {/snippet}
-        {#snippet content()}
-          <div class="pb-4">
-            <Supporters />
-            <div class="mt-4"><DonateButton /></div>
-          </div>
-        {/snippet}
-      </Card>
+    <main class="max-w-screen-md m-auto text-center mb-4 mx-auto px-2">
+      <div>
+        <div class="p-4">
+          <p class="text-center mt-2">
+            Thanks to <a
+              href={PUBLIC_KOFI_LINK}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="link">generous one-time donors</a
+            >
+            for their contributions to this site, as well as to the following monthly
+            supporters:
+          </p>
+        </div>
+      </div>
+      <div class="pb-4">
+        <Supporters />
+        <div class="mt-4"><DonateButton /></div>
+      </div>
     </main>
   {/snippet}
 </AppShell>

@@ -76,29 +76,23 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <div class="hidden lg:inline-flex mx-auto"><AppLogo /></div>
   {/snippet}
   {#snippet main()}
-    <main class="max-w-screen-xl m-auto text-center mb-6">
-      <Card>
-        {#snippet header()}
-          <div class="bg-surface-200-800 p-4" bind:this={container}>
-            <p class="text-left">
-              See what's new and review past changes from {PUBLIC_BASE_DOMAIN_NAME}.
-              This changelog includes only select milestones.
-              <a
-                href="{PUBLIC_GITHUB_LINK}/commits/main/"
-                class="link"
-                target="_blank">Visit the GitHub repository</a
-              > to see the full changelog since version 4.
-            </p>
-          </div>
-        {/snippet}
-        {#snippet content()}
-          <div class="flex flex-col gap-2 text-left items-start py-4">
-            {#each entries as { version, date, notes }}
-              <ChangelogItem {version} {date} {notes} />
-            {/each}
-          </div>
-        {/snippet}
-      </Card>
+    <main class="max-w-screen-md m-auto text-center mb-6 mt-2 px-2 mx-auto">
+      <div class="" bind:this={container}>
+        <p class="text-left">
+          See what's new and review past changes from {PUBLIC_BASE_DOMAIN_NAME}.
+          This changelog includes only select milestones.
+          <a
+            href="{PUBLIC_GITHUB_LINK}/commits/main/"
+            class="link"
+            target="_blank">Visit the GitHub repository</a
+          > to see the full changelog since version 4.
+        </p>
+      </div>
+      <div class="flex flex-col gap-2 text-left items-start py-4">
+        {#each entries as { version, date, notes }}
+          <ChangelogItem {version} {date} {notes} />
+        {/each}
+      </div>
     </main>
   {/snippet}
 </AppShell>
