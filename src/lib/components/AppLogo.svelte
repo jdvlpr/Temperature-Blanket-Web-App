@@ -53,7 +53,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <div class="w-full flex-auto bg-secondary-50 dark:bg-secondary-700"></div>
     </div>
   </div>
-  <h1 class="h5 text-secondary-500">
+  <h1 class="h5 text-secondary-500 site-title">
     {PUBLIC_SITE_TITLE}
   </h1>
 </div>
+
+<style>
+  .site-title {
+    font-variation-settings:
+      'opsz' 28,
+      'wght' 400,
+      'SOFT' 10,
+      'WONK' 0 !important;
+  }
+</style>
