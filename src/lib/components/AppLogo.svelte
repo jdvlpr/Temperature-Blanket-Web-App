@@ -55,7 +55,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       ></div>
     </div>
   </div>
-  <h1 class="h5 text-secondary-500 site-title">
+  <h1 class="h5 site-title text-gradient">
     {PUBLIC_SITE_TITLE}
   </h1>
 </div>

@@ -37,7 +37,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {#snippet main()}
     <main class="max-w-screen-sm px-4 lg:px-0 flex flex-col gap-4 my-2 mx-auto">
       <div>
-        <h2 class="h2">Contact</h2>
+        <h2 class="h2 text-gradient">Contact</h2>
         <SocialIcons />
       </div>
       <div>

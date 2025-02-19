@@ -101,6 +101,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     arrow
     arrowBackground="!bg-surface-200 dark:!bg-surface-800"
     modal={true}
+    autoFocus={false}
   >
     {#snippet trigger()}
       {#key preferences.value?.theme.mode}
