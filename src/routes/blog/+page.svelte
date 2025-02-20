@@ -103,7 +103,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <Segment
         bind:value={selectedTag}
         classes="mt-4"
-        background="bg-surface-200-800 shadow"
+        background="bg-surface-100-900 shadow"
       >
         {#each tags as tag}
           <Segment.Item value={tag}>
@@ -130,7 +130,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   class="h-36 object-cover w-full"
                   alt={imgAlt}
                 />
-                <span class="font-bold text-lg">{title}</span>
+                <h5 class="h5">{title}</h5>
 
                 {#if tags}
                   {#each tags as item}

@@ -15,11 +15,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import AppNavigation from '$lib/components/AppNavigation.svelte';
-  import { modal, showNavigationSideBar } from '$lib/state';
+  import { modal, pageSections, showNavigationSideBar } from '$lib/state';
   import { slide } from 'svelte/transition';
   import { weatherChart } from './WeatherChart.svelte';
   import { Modal } from '@skeletonlabs/skeleton-svelte';
   import AppLogo from './AppLogo.svelte';
+  import { page } from '$app/state';
 
   /**
    * @typedef {Object} Props
@@ -48,7 +49,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 </script>
 
-<div data-vaul-drawer-wrapper="true">
+<div
+  data-vaul-drawer-wrapper="true"
+  class={[
+    'min-h-[100svh]',
+    (page.route.id === '/' &&
+      Array(0, 1).includes(pageSections.items.find((p) => p.active)?.index)) ||
+    page.route.id !== '/'
+      ? 'gradient-background'
+      : '',
+  ]}
+>
   <div
     class="sticky top-0 bg-surface-50/90 dark:bg-surface-950/90 backdrop-blur-md z-20 [view-transition-name:sticky-header]"
     class:lg:py-2={stickyHeader}
@@ -167,3 +178,29 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
   </div>
 </div>
+
+<style>
+  .gradient-background {
+    background-size: cover;
+    background-image: radial-gradient(
+        at 0% 95%,
+        rgba(var(--color-tertiary-500) / 0.1) 0px,
+        transparent 50%
+      ),
+      radial-gradient(
+        at 53% 40%,
+        rgba(var(--color-surface-500) / 0.16) 0px,
+        transparent 60%
+      ),
+      radial-gradient(
+        at 85% 8%,
+        rgba(var(--color-primary-500) / 0.08) 0px,
+        transparent 50%
+      ),
+      radial-gradient(
+        at 100% 100%,
+        rgba(var(--color-surface-500) / 0.09) 0px,
+        transparent 50%
+      );
+  }
+</style>

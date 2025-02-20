@@ -22,33 +22,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     %sveltekit.head%
   </head>
 
-  <body data-theme="" class="scroll-smooth min-h-[100svh] gradient-background">
-    <div class="block">%sveltekit.body%</div>
+  <body data-theme="" class="scroll-smooth min-h-[100svh]">
+    %sveltekit.body%
   </body>
 </html>
-
-<style>
-  .gradient-background {
-    background-size: cover;
-    background-image: radial-gradient(
-        at 0% 95%,
-        rgba(var(--color-tertiary-500) / 0.1) 0px,
-        transparent 50%
-      ),
-      radial-gradient(
-        at 53% 40%,
-        rgba(var(--color-surface-500) / 0.16) 0px,
-        transparent 60%
-      ),
-      radial-gradient(
-        at 85% 8%,
-        rgba(var(--color-primary-500) / 0.08) 0px,
-        transparent 50%
-      ),
-      radial-gradient(
-        at 100% 100%,
-        rgba(var(--color-surface-500) / 0.09) 0px,
-        transparent 50%
-      );
-  }
-</style>

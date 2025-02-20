@@ -392,7 +392,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </div>
 
         <div
-          class="md:shadow-lg md:bg-surface-50-950 md:rounded-container md:p-4 mb-4"
+          class="md:shadow-lg md:bg-surface-50-950 md:rounded-container md:p-4 mb-2"
         >
           <Locations />
         </div>

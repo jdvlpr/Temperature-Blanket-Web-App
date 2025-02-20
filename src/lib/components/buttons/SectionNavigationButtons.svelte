@@ -35,9 +35,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   )?.title;
 </script>
 
-<div
-  class="flex flex-wrap justify-between items-center mb-4 mt-2 lg:mt-4 gap-y-2"
->
+<div class="flex flex-wrap justify-between items-center my-4 gap-y-2">
   {#if previousSectionIndex}
     <button
       class="btn preset-tonal-tertiary gap-1 shadow"
