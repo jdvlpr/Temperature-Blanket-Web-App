@@ -20,7 +20,7 @@ import { modal, pageSections, preferences, project, weather } from '$lib/state';
 import { delay, loadFromHistory } from '$lib/utils';
 
 // Go to a section
-export const goToProjectSection = async (index) => {
+export const goToProjectSection = async (index, animateFromBottom) => {
   if (index === 0) {
     if (typeof document.documentElement !== 'undefined')
       document.documentElement.scrollTop = 0;
@@ -35,6 +35,14 @@ export const goToProjectSection = async (index) => {
 
   const newScrollTop = activeSection?.scrollTop;
   const currentScrollTop = document.documentElement.scrollTop;
+
+  if (animateFromBottom) {
+    await delay(10);
+    document.documentElement.scrollTo({
+      top: document.documentElement.scrollHeight,
+      behavior: 'instant',
+    });
+  }
 
   if (currentScrollTop !== newScrollTop && newScrollTop !== 0) {
     document.documentElement.scrollTo({

@@ -46,11 +46,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
       .then(async () => {
         // Add the default temperature gauge
         gauges.addById('temp');
-        await goToProjectSection(2);
         modal.close();
         controller.value = null;
         weather.isUserEdited = false;
         weather.isFromLocalStorage = false;
+        await goToProjectSection(2, true);
       })
       .catch((e) => {
         controller.value = null;
