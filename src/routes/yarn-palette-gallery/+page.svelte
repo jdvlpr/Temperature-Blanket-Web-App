@@ -226,7 +226,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <div class="flex flex-col justify-center gap-8">
         <div class="inline-grid gap-2 text-center">
           <div class="my-2">
-            <h2 class="font-bold text-xl">Featured Yarn Palettes</h2>
+            <h2 class="h2 text-gradient">Featured Yarn Palettes</h2>
             <label>
               <span>From popular projects during the past</span>
               <select
@@ -274,7 +274,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             class="text-center flex flex-col gap-2 justify-center items-center scroll-mt-[70px] pb-4 px-2"
           >
             <div class="flex flex-col">
-              <h2 class="font-bold text-xl">All Yarn Palettes</h2>
+              <h2 class="h2 text-gradient">All Yarn Palettes</h2>
               <p class="text-sm">Palettes from all user-created projects</p>
             </div>
             <div class="grid-cols-12 grid gap-4 items-end w-full lg:px-2">
