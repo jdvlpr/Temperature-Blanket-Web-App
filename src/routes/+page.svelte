@@ -440,9 +440,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           class="scroll-mt-[76px] w-full"
           class:hidden={pageSections.items[4].active === false}
         >
-          <div
-            class="p-4 my-2 preset-tonal-primary !base-font-color dark:!base-font-color-dark card mx-auto"
-          >
+          <div class="max-w-screen-sm mx-auto">
             <p class="mb-2">
               Is this web app worth a cup of coffee to you? Your support enables
               ongoing development, keeps the site ad-free, and helps make this

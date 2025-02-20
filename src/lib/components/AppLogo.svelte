@@ -17,14 +17,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { PUBLIC_SITE_TITLE } from '$env/static/public';
 </script>
 
-<button
-  class="flex items-center gap-2 [view-transition-name:app-logo] min-h-[43px]"
-  onclick={() => {
-    document.documentElement.scrollIntoView({
-      behavior: 'smooth',
-      block: 'start',
-    });
-  }}
+<div
+  class="flex items-center gap-2 [view-transition-name:app-logo] min-h-[43px] mx-4"
 >
   <!-- <img src="/images/icon.png" class="size-8" alt="Logo" /> -->
   <div class="flex">
@@ -60,7 +54,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
   </div>
   <h1 class="h5 site-title">{PUBLIC_SITE_TITLE}</h1>
-</button>
+</div>
 
 <style>
   .site-title {
