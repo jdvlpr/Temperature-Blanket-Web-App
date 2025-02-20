@@ -159,4 +159,8 @@
   .label {
     width: auto;
   }
+
+  .btn {
+    height: auto !important;
+  }
 }

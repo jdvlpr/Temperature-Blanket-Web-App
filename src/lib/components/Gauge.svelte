@@ -26,6 +26,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { drawerState, modal, pageSections, pinAllSections } from '$lib/state';
   import type { Color, GaugeSettingsType } from '$lib/types';
   import { createGaugeColors } from '$lib/utils';
+  import CloseButton from './modals/CloseButton.svelte';
   let { gauge = $bindable() } = $props();
 
   function updateGauge({
@@ -82,6 +83,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
     }
   }}
 />
+
+{#if fullscreen}
+  <div class="absolute top-0 right-0 m-2 z-[9999]">
+    <CloseButton
+      onClose={() => {
+        fullscreen = false;
+      }}
+    />
+  </div>
+{/if}
 
 <div
   class="w-full flex flex-col justify-center items-center bg-surface-100-900 {fullscreen
@@ -156,7 +167,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         />
       </svg>
       {#if !fullscreen}
-        Palettes
+        Browse Palettes
       {/if}
     </button>
 
@@ -196,7 +207,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </svg>
 
       {#if !fullscreen}
-        Colorways
+        Choose Colorways
       {/if}
     </button>
 
@@ -290,16 +301,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
           },
         })}
     >
-      <svg xmlns="http://www.w3.org/2000/svg" class="size-5" viewBox="0 0 24 24"
-        ><path
-          fill="none"
-          stroke="currentColor"
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke-width="1.5"
+        stroke="currentColor"
+        class="size-6"
+      >
+        <path
           stroke-linecap="round"
           stroke-linejoin="round"
-          stroke-width="1.5"
-          d="M9.697 4L6.678 21M17.054 4l-3.019 17M21 8.781H3m18 7.438H3"
-        /></svg
-      >
+          d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 0 1-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 0 0-3.375-3.375h-1.5a1.125 1.125 0 0 1-1.125-1.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H9.75"
+        />
+      </svg>
 
       {#if !fullscreen}
         Export/Import
@@ -342,13 +357,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {/if}
     </button>
 
-    <button
-      aria-label="Fullscreen"
-      class="btn hover:preset-tonal gap-1 flex gap-1 justify-start items-center"
-      onclick={() => (fullscreen = !fullscreen)}
-      title="Toggle Fullscreen Editing Mode (f)"
-    >
-      {#if !fullscreen}
+    {#if !fullscreen}
+      <button
+        aria-label="Fullscreen"
+        class="btn hover:preset-tonal gap-1 flex gap-1 justify-start items-center"
+        onclick={() => (fullscreen = !fullscreen)}
+        title="Toggle Fullscreen Editing Mode (f)"
+      >
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
@@ -363,26 +378,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
             d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15"
           />
         </svg>
-      {:else}
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke-width="1.5"
-          stroke="currentColor"
-          class="size-6"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M9 9V4.5M9 9H4.5M9 9 3.75 3.75M9 15v4.5M9 15H4.5M9 15l-5.25 5.25M15 9h4.5M15 9V4.5M15 9l5.25-5.25M15 15h4.5M15 15v4.5m0-4.5 5.25 5.25"
-          />
-        </svg>
-      {/if}
-      {#if fullscreen}
-        Exit
-      {/if}
-      Fullscreen
-    </button>
+
+        Fullscreen
+      </button>
+    {/if}
   </div>
 </div>
