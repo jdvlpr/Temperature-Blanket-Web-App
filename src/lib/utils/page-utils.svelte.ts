@@ -18,7 +18,6 @@ import KeyboardShortcuts from '$lib/components/modals/KeyboardShortcuts.svelte';
 import Menu from '$lib/components/modals/Menu.svelte';
 import { modal, pageSections, preferences, project, weather } from '$lib/state';
 import { delay, loadFromHistory } from '$lib/utils';
-import { get } from 'svelte/store';
 
 // Go to a section
 export const goToProjectSection = async (index) => {
@@ -36,12 +35,15 @@ export const goToProjectSection = async (index) => {
 
   const newScrollTop = activeSection?.scrollTop;
   const currentScrollTop = document.documentElement.scrollTop;
-  const activeElement = document.getElementById(activeSection.id);
 
   if (currentScrollTop !== newScrollTop && newScrollTop !== 0) {
-    document.documentElement.scrollTop = newScrollTop;
+    document.documentElement.scrollTo({
+      top: newScrollTop,
+      behavior: 'smooth',
+    });
   } else {
     await delay(10);
+    const activeElement = document.getElementById(activeSection.id);
     activeElement?.scrollIntoView({
       behavior: 'smooth',
       block: 'start',

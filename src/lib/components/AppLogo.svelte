@@ -14,14 +14,17 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import {
-    PUBLIC_BASE_DOMAIN_NAME,
-    PUBLIC_SITE_TITLE,
-  } from '$env/static/public';
+  import { PUBLIC_SITE_TITLE } from '$env/static/public';
 </script>
 
-<div
-  class="flex items-center gap-2 mx-auto [view-transition-name:app-logo] min-h-[43px]"
+<button
+  class="flex items-center gap-2 [view-transition-name:app-logo] min-h-[43px]"
+  onclick={() => {
+    document.documentElement.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start',
+    });
+  }}
 >
   <!-- <img src="/images/icon.png" class="size-8" alt="Logo" /> -->
   <div class="flex">
@@ -56,8 +59,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
       ></div>
     </div>
   </div>
-  <h1 class="h5 site-title">Temperature Blanket</h1>
-</div>
+  <h1 class="h5 site-title">{PUBLIC_SITE_TITLE}</h1>
+</button>
 
 <style>
   .site-title {

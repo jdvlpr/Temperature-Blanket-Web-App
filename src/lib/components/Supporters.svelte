@@ -58,9 +58,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
             classes="mx-auto flex-shrink-0"
           />
           <div class="flex flex-col justify-center items-center">
-            <p class="text-xl font-bold">
+            <h5 class="h5">
               {name}
-            </p>
+            </h5>
             <a {href} target="_blank" class="link break-all">
               {linkText}
             </a>
@@ -94,7 +94,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <div
           class="h-fit bg-surface-50-950 p-4 rounded-container flex flex-col items-center"
         >
-          <p class="text-xl font-bold">{name}</p>
+          <h5 class="h5">{name}</h5>
           <a {href} target="_blank" class="link">{linkText}</a>
         </div>
       {/each}
@@ -125,7 +125,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <div
           class="h-fit bg-surface-50-950 p-4 rounded-container flex flex-col items-center"
         >
-          <p class="text-xl font-bold">{name}</p>
+          <h5 class="h5">{name}</h5>
         </div>
       {/each}
     {/if}
