@@ -76,12 +76,6 @@ const config = {
         md: 'calc(var(--radius) - 2px)',
         sm: 'calc(var(--radius) - 4px)',
       },
-      fontFamily: {
-        sans: [...fontFamily.sans],
-        sans_light: ['apparat-light', 'sans-serif'],
-        cursive: ['epicursive, cursive, sans-serif'],
-        ornament: ['beloved-ornaments,sans-serif'],
-      },
       transitionProperty: {
         width: 'width',
       },

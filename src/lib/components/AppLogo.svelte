@@ -41,7 +41,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </div>
       </div>
     </div>
-    <h1 class="h5 site-title">
+    <h1 class="site-title text-lg">
       {PUBLIC_SITE_TITLE}
     </h1>
   </div>
@@ -49,10 +49,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <style>
   .site-title {
+    font-family: 'inter-variable', sans-serif;
     font-variation-settings:
-      'opsz' 28,
-      'wght' 550,
-      'SOFT' 10,
-      'WONK' 0 !important;
+      'slnt' 0,
+      'wght' 700;
   }
 </style>
