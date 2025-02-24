@@ -35,8 +35,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </div>
       </div>
     </div>
-    <p class="font-medium">
+    <h5 class="h5 text-surface-700 dark:text-surface-100">
       {PUBLIC_SITE_TITLE}
-    </p>
+    </h5>
   </div>
 </div>
