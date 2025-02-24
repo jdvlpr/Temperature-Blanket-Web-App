@@ -13,12 +13,6 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script module>
-  export const currentLogo = $state({
-    index: 0,
-  });
-</script>
-
 <script>
   import { PUBLIC_SITE_TITLE } from '$env/static/public';
 </script>
@@ -41,17 +35,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </div>
       </div>
     </div>
-    <h1 class="site-title text-lg">
+    <p class="font-medium">
       {PUBLIC_SITE_TITLE}
-    </h1>
+    </p>
   </div>
 </div>
-
-<style>
-  .site-title {
-    font-family: 'inter-variable', sans-serif;
-    font-variation-settings:
-      'slnt' 0,
-      'wght' 700;
-  }
-</style>
