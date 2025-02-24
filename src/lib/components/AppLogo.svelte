@@ -35,9 +35,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
             ></div>
           </div>
 
-          <div class="w-full flex-auto bg-amber-500"></div>
-          <div class="w-full flex-auto bg-rose-500"></div>
-          <div class="w-full flex-auto bg-blue-500"></div>
+          <div class="w-full flex-auto bg-amber-400"></div>
+          <div class="w-full flex-auto bg-rose-400"></div>
+          <div class="w-full flex-auto bg-blue-400"></div>
         </div>
       </div>
     </div>
