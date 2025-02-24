@@ -19,23 +19,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <div class="[view-transition-name:app-logo]">
   <div class="flex items-center gap-2 mx-4">
-    <div>
-      <div class="flex rounded-[0.2rem] overflow-hidden">
-        <div class="flex flex-col items-center size-8 relative">
-          <div class="flex flex-col items-center absolute">
-            <div class="h-4 w-2 bg-surface-50-950 rounded-t-sm"></div>
-            <div
-              class="size-4 bg-surface-50-950 rounded-full relative -top-1"
-            ></div>
-          </div>
-
-          <div class="w-full flex-auto bg-amber-400"></div>
-          <div class="w-full flex-auto bg-rose-400"></div>
-          <div class="w-full flex-auto bg-blue-400"></div>
+    <div class="rounded-[0.2rem] overflow-hidden shrink-0">
+      <div class="flex flex-col items-center size-8 relative">
+        <div class="flex flex-col items-center absolute">
+          <div class="h-4 w-2 bg-surface-50-950 rounded-t-sm"></div>
+          <div
+            class="size-4 bg-surface-50-950 rounded-full relative -top-1"
+          ></div>
         </div>
+
+        <div class="w-full flex-auto bg-amber-400"></div>
+        <div class="w-full flex-auto bg-rose-400"></div>
+        <div class="w-full flex-auto bg-blue-400"></div>
       </div>
     </div>
-    <h5 class="h5 text-surface-700 dark:text-surface-100">
+    <h5 class="h5 text-surface-700 dark:text-surface-100 leading-tight">
       {PUBLIC_SITE_TITLE}
     </h5>
   </div>

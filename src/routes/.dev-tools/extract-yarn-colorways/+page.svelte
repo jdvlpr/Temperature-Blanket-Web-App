@@ -130,7 +130,7 @@
   <meta property="og:description" content="Extract Yarn Colorways" />
   <!-- <meta property="og:url" content="https://temperature-blanket.com" />
     <meta property="og:type" content="website" />
-    <meta property="og:image" content="https://temperature-blanket.com/images/temperature-blanket-og-image-1.748.jpg" />
+    <meta property="og:image" content="https://temperature-blanket.com/images/temperature-blanket-og-image-5.0.0.jpg" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" /> -->
 </svelte:head>
