@@ -85,7 +85,7 @@ export const privacy = {
           
           
           <p class="text-sm">
-            If you accept, cookies will be stored in your browser to help analyze and improve this site's performance and features, in addition the required site cookies. Learn more and change your selection on the <a href="/privacy" class="link">Privacy Policy</a> page.
+            If you accept, cookies will be stored in your browser to help analyze and improve this site's performance and features, in addition to the required site cookies. Learn more and change your selection on the <a href="/privacy" class="link">Privacy Policy</a> page.
           </p>
           
           <label class="flex justify-center items-center gap-1 text-sm w-fit">
