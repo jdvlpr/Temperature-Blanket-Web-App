@@ -369,6 +369,10 @@ const colorways: Colorway[] = [
         name: 'Daisy Yellow',
       },
       {
+        hex: '#635f4c',
+        name: 'Sparrow',
+      },
+      {
         hex: '#ad9f73',
         name: 'Chamomile',
       },
@@ -767,6 +771,50 @@ const colorways: Colorway[] = [
       {
         hex: '#898c9b',
         name: 'Indigo Frost Heather',
+      },
+      {
+        hex: '#2b3355',
+        name: 'Blueberry Heather',
+      },
+      {
+        hex: '#9b725c',
+        name: 'Blush Heather',
+      },
+      {
+        hex: '#313e1e',
+        name: 'Irelande',
+      },
+      {
+        hex: '#1b2f4a',
+        name: 'Lapis Heather',
+      },
+      {
+        hex: '#35313f',
+        name: 'Liberty Heather',
+      },
+      {
+        hex: '#b68c4a',
+        name: 'Wheat Heather',
+      },
+      {
+        hex: '#44362f',
+        name: 'Mocha Heather',
+      },
+      {
+        hex: '#888462',
+        name: 'Savannah Heather',
+      },
+      {
+        hex: '#84947b',
+        name: 'Fluorite Heather',
+      },
+      {
+        hex: '#4f7e35',
+        name: 'Fern Heather',
+      },
+      {
+        hex: '#1e312d',
+        name: 'Rainforest Heather',
       },
     ],
   },

@@ -23,6 +23,16 @@ export const entries: ChangelogItem[] = [
     notes: [
       {
         icon: ICONS.checkCircle,
+        text: `Added 12 new colorways`,
+        title: 'Updated Yarn: Cascade - 220 Superwash',
+      },
+    ],
+    version: '4.20.1',
+  },
+  {
+    notes: [
+      {
+        icon: ICONS.checkCircle,
         text: `60 colorways`,
         title: 'Added Yarn: Bendigo Woolen Mills - Classic 8 Ply',
       },
