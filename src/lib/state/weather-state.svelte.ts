@@ -178,12 +178,12 @@ class WeatherClass {
   });
 
   tableData = $derived.by(() => {
-    gauges.activeGauge?.colors;
-    gauges.activeGauge?.ranges;
-    gauges.activeGauge?.numberOfColors;
+    gauges.activeGauge?.colors,
+      gauges.activeGauge?.ranges,
+      gauges.activeGauge?.numberOfColors;
 
     return [
-      ...this.data.map((n, ind) => {
+      ...this.data.map((n) => {
         let weather = {};
         weather.color = {};
         this.tableWeatherTargets.forEach((target) => {
@@ -212,7 +212,6 @@ class WeatherClass {
             };
           }
         });
-        if (ind === 0) console.log(weather);
 
         return {
           date: dateToISO8601String(n.date),
