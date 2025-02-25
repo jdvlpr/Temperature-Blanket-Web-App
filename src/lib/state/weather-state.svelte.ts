@@ -183,7 +183,7 @@ class WeatherClass {
     gauges.activeGauge?.numberOfColors;
 
     return [
-      ...this.data.map((n) => {
+      ...this.data.map((n, ind) => {
         let weather = {};
         weather.color = {};
         this.tableWeatherTargets.forEach((target) => {
@@ -212,6 +212,8 @@ class WeatherClass {
             };
           }
         });
+        if (ind === 0) console.log(weather);
+
         return {
           date: dateToISO8601String(n.date),
           location: n.location,

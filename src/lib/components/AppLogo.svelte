@@ -14,10 +14,22 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
+  import { goto } from '$app/navigation';
+  import { page } from '$app/state';
   import { PUBLIC_SITE_TITLE } from '$env/static/public';
+  import { modal } from '$lib/state';
 </script>
 
-<div class="[view-transition-name:app-logo]">
+<button
+  class="[view-transition-name:app-logo]"
+  onclick={() => {
+    modal.close();
+    if (page.url.pathname !== '/') goto('/');
+    else {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }}
+>
   <div class="flex items-center gap-2 mx-4">
     <div class="rounded-[0.2rem] overflow-hidden shrink-0">
       <div class="flex flex-col items-center size-8 relative">
@@ -37,4 +49,4 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {PUBLIC_SITE_TITLE}
     </h5>
   </div>
-</div>
+</button>
