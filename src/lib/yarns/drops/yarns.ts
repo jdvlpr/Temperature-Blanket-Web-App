@@ -11,7 +11,7 @@ import { yarn as merinoExtraFine } from './merino-extra-fine/yarn';
 import { yarn as muskat } from './muskat/yarn';
 import { yarn as nepal } from './nepal/yarn';
 import { yarn as paris } from './paris/yarn';
-import { yarn as safron } from './safron/yarn';
+import { yarn as safran } from './safran/yarn';
 
 export const brand: Brand = {
   name: 'DROPS',
@@ -29,6 +29,6 @@ export const brand: Brand = {
     muskat,
     nepal,
     paris,
-    safron,
+    safran,
   ],
 };
