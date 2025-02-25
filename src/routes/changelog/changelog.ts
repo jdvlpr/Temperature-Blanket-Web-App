@@ -23,11 +23,16 @@ export const entries: ChangelogItem[] = [
     notes: [
       {
         icon: ICONS.checkCircle,
-        text: `Added 12 new colorways`,
+        text: `Added 46 colorways`,
+        title: 'Added Yarn: DROPS - Safron',
+      },
+      {
+        icon: ICONS.checkCircle,
+        text: `Added 12 colorways`,
         title: 'Updated Yarn: Cascade - 220 Superwash',
       },
     ],
-    version: '4.20.1',
+    version: '4.21.0',
   },
   {
     notes: [
