@@ -39,7 +39,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   {#snippet main()}
     <div
-      class="max-w-screen-xl m-auto flex flex-wrap justify-start gap-4 px-2 lg:px-0 my-4 lg:mt-0"
+      class="max-w-(--breakpoint-xl) m-auto flex flex-wrap justify-start gap-4 px-2 lg:px-0 my-4 lg:mt-0"
     >
       <div class="flex flex-col gap-4">
         <a

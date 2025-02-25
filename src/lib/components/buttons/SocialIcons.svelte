@@ -39,7 +39,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       viewBox="0 0 24 24"
       stroke-width="1.5"
       stroke="currentColor"
-      class="w-6 h-6 flex-shrink-0"
+      class="w-6 h-6 shrink-0"
     >
       <path
         stroke-linecap="round"
@@ -59,7 +59,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
-        class="size-6 flex-shrink-0"
+        class="size-6 shrink-0"
         viewBox="0 0 24 24"
         ><path
           fill="currentColor"

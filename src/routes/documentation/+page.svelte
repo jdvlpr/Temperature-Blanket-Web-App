@@ -366,7 +366,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
   {/snippet}
   {#snippet main()}
-    <main class="max-w-screen-xl m-auto mb-4 pt-2 px-2 lg:px-0">
+    <main class="max-w-(--breakpoint-xl) m-auto mb-4 pt-2 px-2 lg:px-0">
       <div class="pb-4 text-left flex gap-4">
         <div class="w-full flex flex-col gap-8">
           <div class="flex flex-col gap-4">

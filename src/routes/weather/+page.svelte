@@ -387,7 +387,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/snippet}
 
   {#snippet main()}
-    <main class="max-w-screen-xl m-auto text-center mb-8" in:fade>
+    <main class="max-w-(--breakpoint-xl) m-auto text-center mb-8" in:fade>
       <div class="xl:mb-4 xl:mt-2">
         <Card>
           {#snippet content()}

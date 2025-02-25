@@ -59,7 +59,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div
-  class="w-full inline-flex text-center justify-center items-center max-w-screen-sm p-4"
+  class="w-full inline-flex text-center justify-center items-center max-w-(--breakpoint-sm) p-4"
 >
   <DataTable {table} search={false}>
     <table class="border-separate border-spacing-0 w-fit mx-auto self-center">
@@ -85,7 +85,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </tr>
       </thead>
       <tbody
-        class="[&>tr:nth-child(odd)]:bg-surface-100 [&>tr:nth-child(odd)]:dark:bg-surface-700"
+        class="[&>tr:nth-child(odd)]:bg-surface-100 dark:[&>tr:nth-child(odd)]:bg-surface-700"
       >
         {#if table.rows}
           {#each table.rows as row}

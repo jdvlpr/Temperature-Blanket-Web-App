@@ -87,7 +87,10 @@ export function initializeLocalStorage() {
       const mode = preferences.value.theme.mode || 'system';
 
       if (skeletonThemes.map((theme) => theme.id).includes(theme)) {
-        document.body.setAttribute('data-theme', preferences.value.theme.id);
+        document.documentElement.setAttribute(
+          'data-theme',
+          preferences.value.theme.id,
+        );
 
         // Set theme cookies, in order to read them when loading the page (to avoid flash of content)
         fetch('/api/preferences/theme', {

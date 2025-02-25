@@ -53,7 +53,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div class="p-2">
-  <div class="max-w-screen-sm grid grid-cols-1 sm:grid-cols-3 gap-4">
+  <div class="max-w-(--breakpoint-sm) grid grid-cols-1 sm:grid-cols-3 gap-4">
     {#if !message}
       <div class="flex flex-col gap-2 col-span-full sm:col-span-2">
         <p class="font-bold text-left text-lg">

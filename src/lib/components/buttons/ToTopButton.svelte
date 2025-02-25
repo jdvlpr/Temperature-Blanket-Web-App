@@ -34,7 +34,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <button
     aria-label="Back to Top"
     transition:fade
-    class="btn-icon backdrop-blur-sm p-2 m-2 z-20 shadow preset-filled-primary-500 opacity-80 transition-all inline-flex justify-center items-center gap-1"
+    class="btn-icon backdrop-blur-xs p-2 m-2 z-20 shadow-sm preset-filled-primary-500 opacity-80 transition-all inline-flex justify-center items-center gap-1"
     onclick={onClick}
   >
     <svg

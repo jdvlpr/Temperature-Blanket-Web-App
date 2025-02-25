@@ -402,7 +402,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <Share href={shareableURL} />
   {/snippet}
   {#snippet main()}
-    <main class="max-w-screen-xl m-auto pb-6">
+    <main class="max-w-(--breakpoint-xl) m-auto pb-6">
       <Card>
         {#snippet header()}
           <div>
@@ -447,7 +447,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   >
                     <input
                       type="color"
-                      class="input input-group-cell p-0 m-2 !rounded-full"
+                      class="input input-group-cell p-0 m-2 rounded-full!"
                       bind:this={yarnColorwayFinderState.inputTypeColorElement}
                       onchange={(e) =>
                         inputTypeColorOnChange({

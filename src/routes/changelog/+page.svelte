@@ -76,7 +76,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <div class="hidden lg:inline-flex"><AppLogo /></div>
   {/snippet}
   {#snippet main()}
-    <main class="max-w-screen-md m-auto text-center mb-6 mt-2 px-2 mx-auto">
+    <main class="max-w-(--breakpoint-md) m-auto text-center mb-6 mt-2 px-2 mx-auto">
       <div class="" bind:this={container}>
         <p class="text-left">
           See what's new and review past changes from {PUBLIC_BASE_DOMAIN_NAME}.

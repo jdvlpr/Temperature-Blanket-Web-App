@@ -27,7 +27,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 {#if monthRowsPreview.details}
   <div class="w-full">
-    <p class="max-w-screen-sm mx-auto">
+    <p class="max-w-(--breakpoint-sm) mx-auto">
       Rows are grouped by month from <span class="italic"
         >{#if monthRowsPreview.settings?.direction === 'left-to-right'}left to
           right{:else if monthRowsPreview.settings.direction === 'top-to-bottom'}top

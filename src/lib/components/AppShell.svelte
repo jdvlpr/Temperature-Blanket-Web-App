@@ -66,7 +66,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     id="top-navbar"
   >
     <div
-      class="max-w-screen-xl flex justify-between items-center m-auto px-2 gap-2"
+      class="max-w-(--breakpoint-xl) flex justify-between items-center m-auto px-2 gap-2"
     >
       <div class="lg:hidden">
         <Modal
@@ -113,7 +113,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
   </div>
 
-  <div class="flex justify-start max-w-screen-xl mx-auto">
+  <div class="flex justify-start max-w-(--breakpoint-xl) mx-auto">
     <div
       class="flex flex-col justify-start items-start h-fit [view-transition-name:sidebar-navigation]"
       bind:clientWidth={sidebarWidth}
@@ -184,22 +184,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
     background-size: cover;
     background-image: radial-gradient(
         at 0% 95%,
-        rgba(var(--color-tertiary-500) / 0.1) 0px,
+        color-mix(in oklab, var(--color-tertiary-500) 10%, transparent) 0px,
         transparent 50%
       ),
       radial-gradient(
         at 53% 40%,
-        rgba(var(--color-surface-500) / 0.16) 0px,
+        color-mix(in oklab, var(--color-surface-500) 16%, transparent) 0px,
         transparent 60%
       ),
       radial-gradient(
         at 85% 8%,
-        rgba(var(--color-primary-500) / 0.08) 0px,
+        color-mix(in oklab, var(--color-primary-500) 8%, transparent) 0px,
         transparent 50%
       ),
       radial-gradient(
         at 100% 100%,
-        rgba(var(--color-surface-500) / 0.09) 0px,
+        color-mix(in oklab, var(--color-surface-500) 9%, transparent) 0px,
         transparent 50%
       );
   }

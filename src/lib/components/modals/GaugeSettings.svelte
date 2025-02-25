@@ -270,7 +270,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </p>
 
             <Segment
-              classes="flex-wrap gap-y-2 shadow"
+              classes="flex-wrap gap-y-2 shadow-sm"
               background="bg-surface-100-900"
               bind:value={incrementMode}
             >
@@ -659,7 +659,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </div>
     </div>
 
-    <div class="flex flex-col justify-start items-start w-full max-w-screen-md">
+    <div class="flex flex-col justify-start items-start w-full max-w-(--breakpoint-md)">
       <h2 class="font-bold text-xl flex flex-wrap items-start mb-2">
         Edit Ranges
       </h2>
@@ -775,7 +775,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {#if showScrollToTopButton}
     <button
       transition:fade
-      class="btn px-4 bottom-[7rem] sm:bottom-[5rem] fixed -translate-x-1/2 left-1/2 w-fit py-2 m-2 z-20 shadow preset-filled-surface-500 lg:hidden transition-all inline-flex justify-center items-center gap-1 right-0"
+      class="btn px-4 bottom-[7rem] sm:bottom-[5rem] fixed -translate-x-1/2 left-1/2 w-fit py-2 m-2 z-20 shadow-sm preset-filled-surface-500 lg:hidden transition-all inline-flex justify-center items-center gap-1 right-0"
       onclick={() =>
         setupContainer.scrollIntoView({
           behavior: 'smooth',

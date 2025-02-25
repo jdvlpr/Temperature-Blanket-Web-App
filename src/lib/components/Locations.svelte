@@ -31,7 +31,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import SearchForWeather from './buttons/SearchForWeather.svelte';
 </script>
 
-<div class="mt-2 max-w-screen-md mx-auto">
+<div class="mt-2 max-w-(--breakpoint-md) mx-auto">
   {#if weather.isFromLocalStorage && weather.data}
     <p
       class="text-sm flex flex-wrap gap-1 items-center justify-center w-full text-center"
@@ -174,7 +174,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 {#if locations.allValid}
   <div
-    class="flex flex-wrap gap-2 justify-center mt-4 mb-2 lg:mb-4 px-4 py-2 shadow-inner rounded-container preset-filled-surface-100-900 max-w-screen-md mx-auto"
+    class="flex flex-wrap gap-2 justify-center mt-4 mb-2 lg:mb-4 px-4 py-2 shadow-inner rounded-container preset-filled-surface-100-900 max-w-(--breakpoint-md) mx-auto"
     transition:slide
   >
     <div class:hidden={!locations.allValid || weather.isUserEdited}>

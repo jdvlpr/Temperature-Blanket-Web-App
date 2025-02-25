@@ -24,7 +24,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <footer
-  class="py-4 max-w-screen-xl m-auto px-2 xl:px-0 text-left grid grid-cols-12 justify-center gap-4"
+  class="py-4 max-w-(--breakpoint-xl) m-auto px-2 xl:px-0 text-left grid grid-cols-12 justify-center gap-4"
   class:bg-transparent={subtleBackground}
   class:dark:bg-transparent={subtleBackground}
 >

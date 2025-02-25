@@ -31,7 +31,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     buttonDisabled={disabled}
     title="Search for Weather Data"
     id="location-action-button"
-    classNames="btn btn-lg preset-filled-primary-500  sm:w-fit gap-1 shadow"
+    classNames="btn btn-lg preset-filled-primary-500  sm:w-fit gap-1 shadow-sm"
   >
     {#if !!weather.isUserEdited}
       Reload Weather Data
@@ -58,7 +58,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </Tooltip>
 {:else}
   <button
-    class="btn btn-lg preset-filled-primary-500 sm:w-fit gap-1 shadow"
+    class="btn btn-lg preset-filled-primary-500 sm:w-fit gap-1 shadow-sm"
     onclick={() => {
       if (weather.isUserEdited)
         modal.trigger({

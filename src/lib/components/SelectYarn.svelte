@@ -392,7 +392,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <button
           aria-label="Show All Yarns"
           {disabled}
-          class="btn-icon !px-2 h-10 flex-grow-0 flex-shrink-0 basis-0"
+          class="btn-icon px-2! h-10 grow-0 shrink-0 basis-0"
           onclick={() => {
             forceDisplayAll = true;
             inputElement.focus();
@@ -418,7 +418,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <button
           aria-label="Clear"
           {disabled}
-          class="btn-icon !px-2 h-10 flex-grow-0 flex-shrink-0 basis-0"
+          class="btn-icon px-2! h-10 grow-0 shrink-0 basis-0"
           onclick={async () => {
             inputValue = '';
             selectedBrandId = '';

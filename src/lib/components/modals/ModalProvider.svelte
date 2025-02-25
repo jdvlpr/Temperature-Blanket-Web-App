@@ -10,10 +10,10 @@
   triggerBase="hidden"
   contentBase="card bg-surface-50-950 space-y-4 shadow-xl max-h-[100svh] lg:max-h-[80svh] overflow-auto {modal
     .options.size === 'large'
-    ? 'max-w-screen-lg'
+    ? 'max-w-(--breakpoint-lg)'
     : modal.options.size === 'medium'
-      ? 'max-w-screen-md'
-      : 'max-w-screen-sm'}"
+      ? 'max-w-(--breakpoint-md)'
+      : 'max-w-(--breakpoint-sm)'}"
   positionerPadding="p-0"
   backdropClasses="backdrop-blur-md"
   transitionsBackdropOut={{ duration: 0 }}

@@ -63,7 +63,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     class="w-full p-2 m-auto flex flex-col items-start text-left"
   >
     <div class="flex items-center justify-start gap-2">
-      <svg xmlns="http://www.w3.org/2000/svg" class="size-4 flex-shrink-0" viewBox="0 0 36 36"
+      <svg xmlns="http://www.w3.org/2000/svg" class="size-4 shrink-0" viewBox="0 0 36 36"
         ><circle cx="18" cy="29.54" r="3" fill="currentColor" class="clr-i-solid clr-i-solid-path-1" /><path
           fill="currentColor"
           d="m29.18 17.71l.11-.17a1.51 1.51 0 0 0-.47-2.1A20.57 20.57 0 0 0 18 12.37c-.56 0-1.11 0-1.65.07l3.21 3.21a17.41 17.41 0 0 1 7.6 2.52a1.49 1.49 0 0 0 2.02-.46"

@@ -294,7 +294,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   index &&
                 !isDragging.value &&
                 !isLocked
-                  ? '!hidden'
+                  ? 'hidden!'
                   : 'inline-block'}"
                 class:hidden={sortableColors.length > 30}
                 class:sm:block={sortableColors.length > 30 &&
@@ -311,8 +311,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 index &&
               !isDragging.value &&
               !isLocked
-                ? '!inline-block'
-                : '!hidden'}"
+                ? 'inline-block!'
+                : 'hidden!'}"
               class:group-hover:inline-block={isDragging.value}
               style="color:{getTextColor(hex)}; {isDragging.value
                 ? 'cursor: grab'
@@ -417,7 +417,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     viewBox="0 0 24 24"
                     stroke-width="1.5"
                     stroke="currentColor"
-                    class="w-6 h-6 flex-shrink-0"
+                    class="w-6 h-6 shrink-0"
                   >
                     <path
                       stroke-linecap="round"

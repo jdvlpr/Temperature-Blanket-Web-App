@@ -42,7 +42,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/snippet}
   {#snippet main()}
     <main
-      class="max-w-screen-md mx-auto px-2 m-auto text-center flex flex-col gap-4 mt-4 mb-2 items-center"
+      class="max-w-(--breakpoint-md) mx-auto px-2 m-auto text-center flex flex-col gap-4 mt-4 mb-2 items-center"
     >
       <h2 class="h2 text-gradient flex flex-wrap items-center gap-2">
         <span class="text-success-700-300">{@html ICONS.checkCircle}</span> Success!

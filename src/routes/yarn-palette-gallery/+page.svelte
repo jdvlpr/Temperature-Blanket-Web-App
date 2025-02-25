@@ -390,7 +390,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   : ''}"
               >
                 <button
-                  class="btn preset-filled-primary-500 flex items-center w-full gap-1 shadow"
+                  class="btn preset-filled-primary-500 flex items-center w-full gap-1 shadow-sm"
                   disabled={loading}
                   onclick={async () => {
                     yarnPaletteGalleryState.projects = [];

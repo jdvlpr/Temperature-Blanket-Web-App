@@ -59,7 +59,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   class="pt-4 rounded-tl-container rounded-tr-container overflow-auto"
                 >
                   <div
-                    class="mx-auto w-12 h-1.5 flex-shrink-0 rounded-full mb-4 bg-surface-950-50"
+                    class="mx-auto w-12 h-1.5 shrink-0 rounded-full mb-4 bg-surface-950-50"
                   ></div>
                   <div class="mx-auto text-center">
                     <WeatherDetails

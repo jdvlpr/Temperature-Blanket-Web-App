@@ -426,7 +426,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {@const percentMatch = Math.floor(100 - delta)}
       <button
         type="button"
-        class="rounded-container shadow-sm cursor-pointer flex-1 min-w-fit p-1 sm:p-2 flex flex-col gap-2 items-start justify-start"
+        class="rounded-container shadow-xs cursor-pointer flex-1 min-w-fit p-1 sm:p-2 flex flex-col gap-2 items-start justify-start"
         style="background:{hex}; color:{getTextColor(hex)};"
         onclick={() =>
           toggleSelected({

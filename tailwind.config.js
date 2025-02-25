@@ -1,12 +1,3 @@
-/**
- * SKELETON MIGRATION NOTICE
- *
- * The following custom themes were detected and commented out due to them not being compatible with the V3 theme format:
- *
- * - classic
- *
- * See https://github.com/skeletonlabs/skeleton/discussions/2921 for info on how to migrate these yourself.
- */
 import { fontFamily } from 'tailwindcss/defaultTheme';
 import classic from './classic-theme';
 import { contentPath, skeleton } from '@skeletonlabs/skeleton/plugin';

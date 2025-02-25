@@ -42,7 +42,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/snippet}
 
   {#snippet main()}
-    <main class="max-w-screen-xl m-auto flex flex-col justify-start gap-2">
+    <main class="max-w-(--breakpoint-xl) m-auto flex flex-col justify-start gap-2">
       <Gallery />
     </main>
   {/snippet}

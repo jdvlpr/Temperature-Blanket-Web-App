@@ -53,7 +53,7 @@
     spacing = 'space-x-4',
     rounded = 'rounded-container',
     shadow = 'shadow-lg',
-    zIndex = 'z-[9999]',
+    zIndex = 'z-9999',
     buttonAction = 'btn preset-filled-primary-500',
     buttonDismiss = 'btn-icon hover:preset-tonal',
     buttonDismissLabel = '✕',
@@ -113,7 +113,7 @@
   let classesSnackbar = $derived(`${cSnackbar} ${cAlign} ${padding}`);
 
   let classesToast = $derived(
-    `${cToast} ${width} ${color} ${padding} ${spacing} ${rounded} ${shadow}`,
+    `${cToast} ${width} ${color} ${padding} ${spacing} ${rounded} ${shadow-sm}`,
   );
   // Filtered Toast Store
   let filteredToasts = $derived(Array.from(toast.queue).slice(0, max));

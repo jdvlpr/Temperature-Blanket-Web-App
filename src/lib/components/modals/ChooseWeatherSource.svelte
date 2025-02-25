@@ -56,7 +56,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 class="btn hover:preset-tonal gap-2"
                 onclick={() => (weather.defaultSource = 'Meteostat')}
               >
-                <span class="flex flex-shrink-0 gap-1">
+                <span class="flex shrink-0 gap-1">
                   {#if weather.defaultSource === 'Meteostat'}
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -90,7 +90,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 class="btn hover:preset-tonal gap-2"
                 onclick={() => (weather.defaultSource = 'Open-Meteo')}
               >
-                <span class="flex flex-shrink-0 gap-1">
+                <span class="flex shrink-0 gap-1">
                   {#if weather.defaultSource === 'Open-Meteo'}
                     <svg
                       xmlns="http://www.w3.org/2000/svg"

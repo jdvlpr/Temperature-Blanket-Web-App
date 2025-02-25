@@ -98,12 +98,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   {#snippet main()}
     <main
-      class="max-w-screen-xl m-auto px-2 gap-4 flex flex-col items-center mb-4"
+      class="max-w-(--breakpoint-xl) m-auto px-2 gap-4 flex flex-col items-center mb-4"
     >
       <Segment
         bind:value={selectedTag}
         classes="mt-4"
-        background="bg-surface-100-900 shadow"
+        background="bg-surface-100-900 shadow-sm"
       >
         {#each tags as tag}
           <Segment.Item value={tag}>
@@ -117,7 +117,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {#key selectedTag}
         <div
           in:fade
-          class="max-w-screen-xl m-auto grid grid-cols-1 md:grid-cols-3 gap-4 justify-start"
+          class="max-w-(--breakpoint-xl) m-auto grid grid-cols-1 md:grid-cols-3 gap-4 justify-start"
         >
           {#each filteredPosts as { href, imgSrc, imgAlt, title, tags }}
             <div class="flex flex-col gap-4">

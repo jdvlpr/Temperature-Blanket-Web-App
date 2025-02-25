@@ -56,7 +56,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div
-  class="overflow-x-hidden outline-none text-center inline-block w-full"
+  class="overflow-x-hidden outline-hidden text-center inline-block w-full"
   bind:this={navigatorElement}
 >
   <div class="font-semibold text-lg">

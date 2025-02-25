@@ -25,7 +25,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/snippet}
   {#snippet main()}
     <main
-      class="max-w-screen-md m-auto text-center flex flex-col gap-2 my-12 px-2"
+      class="max-w-(--breakpoint-md) m-auto text-center flex flex-col gap-2 my-12 px-2"
     >
       <p>{page.status} Error</p>
       <p>{page.error?.message}</p>

@@ -26,7 +26,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 {#if continuousSquarePreview.details?.rounds}
   <div class="w-full">
-    <div class="mx-auto max-w-screen-sm">
+    <div class="mx-auto max-w-(--breakpoint-sm)">
       <p class="mb-2">
         Starting from the center, stitches are added in a clockwise square
         pattern. Possible crochet patterns: Granny Square, Moss Stitch/Linen

@@ -54,7 +54,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/snippet}
   {#snippet main()}
     <main
-      class="max-w-screen-md m-auto text-left flex flex-col gap-2 mb-4 mx-auto px-2"
+      class="max-w-(--breakpoint-md) m-auto text-left flex flex-col gap-2 mb-4 mx-auto px-2"
     >
       <div
         class="p-4 text-left flex flex-wrap justify-center items-end gap-4 rounded-container bg-surface-50-950"
@@ -139,7 +139,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <div class="tex-left flex flex-col items-start gap-1">
               <label
                 for="web-address"
-                class="label flex items-start flex-col max-w-screen-sm"
+                class="label flex items-start flex-col max-w-(--breakpoint-sm)"
               >
                 Web Address
                 <span class="text-sm"
@@ -182,7 +182,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </div>
 
             <button
-              class="btn preset-filled-primary-500 w-fit shadow"
+              class="btn preset-filled-primary-500 w-fit shadow-sm"
               type="submit">Send Yarn Request</button
             >
 

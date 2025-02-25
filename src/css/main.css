@@ -1,6 +1,89 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+@plugin '@tailwindcss/forms';
+
+@import '@skeletonlabs/skeleton';
+@import '@skeletonlabs/skeleton/optional/presets';
+
+/* Preset Themes */
+@import '@skeletonlabs/skeleton/themes/crimson';
+@import '@skeletonlabs/skeleton/themes/hamlindigo';
+@import '@skeletonlabs/skeleton/themes/modern';
+@import '@skeletonlabs/skeleton/themes/rocket';
+@import '@skeletonlabs/skeleton/themes/legacy';
+
+/* Custom Theme */
+@import '../../classic-theme';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* @config '../../tailwind.config.js'; */
+
+/*
+  The default border color has changed to `currentColor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentColor);
+  }
+}
+
+@utility autocomplete {
+  /* AUTOCOMPLETE */
+  @apply bg-surface-50-950 shadow-lg overflow-hidden border border-primary-500 rounded-container z-1000;
+
+  & > div {
+    @apply px-2 py-3 cursor-pointer bg-surface-50-950 border-y border-surface-100-900;
+  }
+  & > .group {
+    @apply bg-surface-50-950 hover:bg-primary-400/20;
+  }
+
+  & > div.selected {
+    @apply bg-primary-100/50 dark:bg-primary-900/50 base-font-color dark:base-font-color-dark;
+  }
+
+  & > div:hover:not(.group) {
+    @apply bg-primary-100/50 dark:bg-primary-900/50 base-font-color dark:base-font-color-dark;
+  }
+}
+
+@utility group {
+  .autocomplete > & {
+    @apply bg-surface-50-950 hover:bg-primary-400/20;
+  }
+}
+
+@utility selected {
+  .autocomplete > &div {
+    @apply bg-primary-100/50 dark:bg-primary-900/50 base-font-color dark:base-font-color-dark;
+  }
+}
+
+@utility link {
+  @apply underline text-secondary-800 dark:text-secondary-50;
+}
+
+@utility text-gradient {
+  @apply bg-linear-to-br from-secondary-200 to-secondary-800 dark:from-secondary-50 dark:to-secondary-200 bg-clip-text text-transparent dark:text-transparent box-decoration-clone;
+}
+
+@utility label {
+  /* After updating from skeleton v2 to v3, the labels were not displaying like before...this seems to mostly fix it */
+  width: auto;
+}
+
+@utility btn {
+  height: auto !important;
+}
 
 @layer base {
   :root [data-theme='classic'],
@@ -104,46 +187,9 @@
     -webkit-touch-callout: none;
     touch-action: manipulation;
   }
-}
 
-@layer components {
-  @media (prefers-reduced-motion) {
-    ::view-transition-group(*),
-    ::view-transition-old(*),
-    ::view-transition-new(*) {
-      animation: none !important;
-    }
-  }
-
-  /* AUTOCOMPLETE */
-  .autocomplete {
-    @apply bg-surface-50-950 shadow-lg overflow-hidden border border-primary-500 rounded-container z-[1000];
-  }
-
-  .autocomplete > div {
-    @apply px-2 py-3 cursor-pointer bg-surface-50-950 border-y border-surface-100-900;
-  }
-  .autocomplete > .group {
-    @apply bg-surface-50-950 hover:bg-primary-400/20;
-  }
-
-  .autocomplete > div.selected,
-  .autocomplete > div:hover:not(.group) {
-    @apply bg-primary-100/50 dark:bg-primary-900/50 base-font-color dark:base-font-color-dark;
-  }
-
-  .link {
-    @apply underline text-secondary-800 dark:text-secondary-50;
-  }
-
-  .text-gradient {
-    @apply bg-gradient-to-br from-secondary-200 to-secondary-800 dark:from-secondary-50 dark:to-secondary-200 bg-clip-text text-transparent dark:text-transparent box-decoration-clone;
-  }
-}
-
-@layer utilities {
   #preview-svg-image {
-    @apply shadow;
+    @apply shadow-sm;
   }
 
   #preview-svg-image > * {
@@ -155,12 +201,11 @@
     justify-content: center !important;
   }
 
-  /* After updating from skeleton v2 to v3, the labels were not displaying like before...this seems to mostly fix it */
-  .label {
-    width: auto;
-  }
-
-  .btn {
-    height: auto !important;
+  @media (prefers-reduced-motion) {
+    ::view-transition-group(*),
+    ::view-transition-old(*),
+    ::view-transition-new(*) {
+      animation: none !important;
+    }
   }
 }

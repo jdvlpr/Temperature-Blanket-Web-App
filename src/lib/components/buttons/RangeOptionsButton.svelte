@@ -25,7 +25,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <Tooltip
-  classNames="btn preset-filled-primary-500 gap-1 relative top-2 w-full sm:w-fit shadow"
+  classNames="btn preset-filled-primary-500 gap-1 relative top-2 w-full sm:w-fit shadow-sm"
   title="Configure Ranges"
   fullWidth={true}
   onclick={() =>

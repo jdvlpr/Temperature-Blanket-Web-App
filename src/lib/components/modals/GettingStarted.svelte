@@ -72,7 +72,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               'btn-icon rounded-full',
               isCurrentStep(i)
                 ? 'preset-filled-primary-500 btn-icon-md flex-auto min-w-[36px] max-w-[68px]'
-                : 'preset-filled-surface-200-800 btn-icon-sm flex-shrink min-w-[24px]',
+                : 'preset-filled-surface-200-800 btn-icon-sm shrink min-w-[24px]',
             ]}
             onclick={() => setStep(i)}
             title={step.label}
@@ -86,7 +86,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </div>
       <!-- Line -->
       <hr
-        class="hr !border-surface-200-800 absolute top-[50%] left-0 right-0 z-[-1]"
+        class="hr border-surface-200-800! absolute top-[50%] left-0 right-0 z-[-1]"
       />
     </div>
     <!-- Loop all steps -->

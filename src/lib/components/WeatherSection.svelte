@@ -206,7 +206,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/if}
 
   {#if projectHasRecentWeatherData}
-    <div class="text-left w-fit max-w-screen-sm text-sm">
+    <div class="text-left w-fit max-w-(--breakpoint-sm) text-sm">
       <Accordion
         value={warningAccordionState}
         collapsible
@@ -262,7 +262,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/if}
 
   <div
-    class="flex flex-wrap gap-x-2 items-start justify-center bg-gradient-to-tr from-surface-600 to-surface-950 dark:from-surface-50 dark:to-surface-100 bg-clip-text text-transparent dark:text-transparent box-decoration-clone"
+    class="flex flex-wrap gap-x-2 items-start justify-center bg-linear-to-tr from-surface-600 to-surface-950 dark:from-surface-50 dark:to-surface-100 bg-clip-text text-transparent dark:text-transparent box-decoration-clone"
   >
     {#if weather.table.showParameters.tmax}
       <WeatherItem
@@ -444,7 +444,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   {#if isDataMissing}
     <div
-      class="variant-outline-surface rounded-container flex flex-col gap-2 justify-center items-center text-left w-fit max-w-screen-sm text-sm"
+      class="variant-outline-surface rounded-container flex flex-col gap-2 justify-center items-center text-left w-fit max-w-(--breakpoint-sm) text-sm"
     >
       <Accordion
         value={missingWeatherAccordionState}

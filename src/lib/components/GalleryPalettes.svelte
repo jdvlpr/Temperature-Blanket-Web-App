@@ -270,7 +270,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             viewBox="0 0 24 24"
             stroke-width="1.5"
             stroke="currentColor"
-            class="size-5 flex-shrink-0"
+            class="size-5 shrink-0"
           >
             <path
               stroke-linecap="round"

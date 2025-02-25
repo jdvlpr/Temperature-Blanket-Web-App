@@ -81,7 +81,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div class="w-full">
-  <div class="mx-auto max-w-screen-sm">
+  <div class="mx-auto max-w-(--breakpoint-sm)">
     <p class="">
       Each row is split according to the duration of sunlight that {weather.grouping}.
     </p>
@@ -250,7 +250,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </tr>
         </thead>
         <tbody
-          class="[&>tr:nth-child(odd)]:bg-surface-100 [&>tr:nth-child(odd)]:dark:bg-surface-800"
+          class="[&>tr:nth-child(odd)]:bg-surface-100 dark:[&>tr:nth-child(odd)]:bg-surface-800"
         >
           {#if table.rows}
             {#each table.rows as row}

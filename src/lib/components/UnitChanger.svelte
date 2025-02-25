@@ -22,7 +22,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <Segment
   bind:value={project.units}
   background="bg-surface-100-900"
-  classes="shadow"
+  classes="shadow-sm"
 >
   <Segment.Item value={'metric'}>
     {`${UNIT_LABELS.temperature.metric} /

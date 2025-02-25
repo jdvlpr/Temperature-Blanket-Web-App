@@ -52,7 +52,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     triggerBase="btn-icon hover:preset-tonal"
     contentBase="card bg-surface-200-800 p-4 space-y-4 max-w-[90vw]"
     arrow
-    arrowBackground="!bg-surface-200 dark:!bg-surface-800"
+    arrowBackground="bg-surface-200! dark:bg-surface-800!"
   >
     {#snippet trigger()}
       <svg

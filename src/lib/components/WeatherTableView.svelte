@@ -86,7 +86,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </tr>
       </thead>
       <tbody
-        class="[&>tr:nth-child(odd)]:bg-surface-100 [&>tr:nth-child(odd)]:dark:bg-surface-800"
+        class="[&>tr:nth-child(odd)]:bg-surface-100 dark:[&>tr:nth-child(odd)]:bg-surface-800"
       >
         {#each table.rows as row}
           {@const isRecentDate = getIsRecentDate(row.date)}

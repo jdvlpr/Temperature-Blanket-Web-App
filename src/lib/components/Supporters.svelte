@@ -26,8 +26,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   >
     {#if SUPPORTERS?.gold?.length}
       <div class="relative flex items-center w-full col-span-full">
-        <div class="flex-grow border-t border-surface-300-700"></div>
-        <div class="flex-shrink mx-4 flex items-center gap-2">
+        <div class="grow border-t border-surface-300-700"></div>
+        <div class="shrink mx-4 flex items-center gap-2">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             class="w-6 h-6"
@@ -43,7 +43,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <p class="text-xs">$6 per month</p>
           </div>
         </div>
-        <div class="flex-grow border-t border-surface-300-700"></div>
+        <div class="grow border-t border-surface-300-700"></div>
       </div>
       {#each SUPPORTERS?.gold as { name, href, linkText, imageSrc }}
         <div
@@ -55,7 +55,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             size="size-24"
             rounded="rounded-[5px]"
             background="bg-none"
-            classes="mx-auto flex-shrink-0"
+            classes="mx-auto shrink-0"
           />
           <div class="flex flex-col justify-center items-center">
             <h5 class="h5">
@@ -71,8 +71,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     {#if SUPPORTERS?.silver?.length}
       <div class="relative flex items-center w-full col-span-full">
-        <div class="flex-grow border-t border-surface-300-700"></div>
-        <div class="flex-shrink mx-4 flex items-center gap-2">
+        <div class="grow border-t border-surface-300-700"></div>
+        <div class="shrink mx-4 flex items-center gap-2">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             class="w-6 h-6"
@@ -88,7 +88,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <p class="text-xs">$4 per month</p>
           </div>
         </div>
-        <div class="flex-grow border-t border-surface-300-700"></div>
+        <div class="grow border-t border-surface-300-700"></div>
       </div>
       {#each SUPPORTERS.silver as { name, href, linkText }}
         <div
@@ -102,8 +102,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     {#if SUPPORTERS?.bronze?.length}
       <div class="relative flex items-center w-full col-span-full">
-        <div class="flex-grow border-t border-surface-300-700"></div>
-        <div class="flex-shrink mx-4 flex items-center gap-2">
+        <div class="grow border-t border-surface-300-700"></div>
+        <div class="shrink mx-4 flex items-center gap-2">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             class="w-6 h-6"
@@ -119,7 +119,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <p class="text-xs">$2 per month</p>
           </div>
         </div>
-        <div class="flex-grow border-t border-surface-300-700"></div>
+        <div class="grow border-t border-surface-300-700"></div>
       </div>
       {#each SUPPORTERS?.bronze as { name }}
         <div

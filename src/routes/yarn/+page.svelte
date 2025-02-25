@@ -110,7 +110,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/snippet}
   {#snippet main()}
     <div>
-      <main class="max-w-screen-xl m-auto text-center">
+      <main class="max-w-(--breakpoint-xl) m-auto text-center">
         <Card>
           {#snippet header()}
             <div class="bg-surface-200-800 p-4">

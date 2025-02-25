@@ -85,7 +85,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 />
 
 {#if fullscreen}
-  <div class="absolute top-0 right-0 m-2 z-[9999]">
+  <div class="absolute top-0 right-0 m-2 z-9999">
     <CloseButton
       onClose={() => {
         fullscreen = false;

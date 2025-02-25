@@ -35,7 +35,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <div class="card p-4 flex-auto bg-surface-50-950">
           <p class="text-base flex items-center gap-2 sm:gap-4">
             {#if icon}
-              <span class="flex-shrink-0">{@html icon}</span>
+              <span class="shrink-0">{@html icon}</span>
             {/if}
 
             <span class="flex flex-col">
@@ -51,7 +51,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 20 20"
                     fill="currentColor"
-                    class="w-4 h-4 align-text-top inline flex-shrink-0"
+                    class="w-4 h-4 align-text-top inline shrink-0"
                   >
                     <path
                       fill-rule="evenodd"

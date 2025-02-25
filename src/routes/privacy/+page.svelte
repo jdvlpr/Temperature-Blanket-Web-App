@@ -40,7 +40,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <div class="hidden lg:inline-flex mx-auto"><AppLogo /></div>
   {/snippet}
   {#snippet main()}
-    <main class="max-w-screen-md px-2 xl:px-0 flex flex-col gap-4 my-2 mx-auto">
+    <main class="max-w-(--breakpoint-md) px-2 xl:px-0 flex flex-col gap-4 my-2 mx-auto">
       <h2 class="h2 text-gradient">Privacy Policy</h2>
       <div class="flex flex-col">
         <p class="font-bold text-xl">Introduction</p>
@@ -67,7 +67,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           Learn how this site uses cookies and manage your preferences below.
         </p>
 
-        <div class="my-2 flex flex-col gap-2 max-w-screen-sm">
+        <div class="my-2 flex flex-col gap-2 max-w-(--breakpoint-sm)">
           <div class="flex flex-col">
             <ToggleSwitch
               label="Analytics Cookies"
@@ -116,7 +116,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
           {#if preferences.value.disableToastAnalytics}
             <div
-              class="flex flex-wrap gap-x-4 gap-y-2 items-center px-4 py-2 rounded-container preset-filled-surface-100-900 w-fit shadow"
+              class="flex flex-wrap gap-x-4 gap-y-2 items-center px-4 py-2 rounded-container preset-filled-surface-100-900 w-fit shadow-sm"
             >
               <p>Allow the cookie popup message to appear.</p>
               <button

@@ -143,7 +143,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {#key _secondaryTargets}
         {#each squares as { icon, label, targetId }, index (index)}
           <button
-            class="flex flex-col justify-center items-center select-none outline-none cursor-pointer rounded-container shadow aspect-square"
+            class="flex flex-col justify-center items-center select-none outline-hidden cursor-pointer rounded-container shadow-sm aspect-square"
             style="background-color: {colors[targetId]};color:{getTextColor(
               colors[targetId],
             )}"

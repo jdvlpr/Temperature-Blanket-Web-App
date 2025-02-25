@@ -97,9 +97,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     bind:open={openState}
     triggerBase="btn hover:preset-tonal"
     contentBase="card bg-surface-200-800 p-4 space-y-4 shadow-xl"
-    positionerClasses="!z-[9999]"
+    positionerClasses="z-9999!"
     arrow
-    arrowBackground="!bg-surface-200 dark:!bg-surface-800"
+    arrowBackground="bg-surface-200! dark:bg-surface-800!"
     modal={true}
     autoFocus={false}
   >
@@ -119,7 +119,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <div class="flex flex-col gap-2">
         <Segment
           bind:value={preferences.value.theme.mode}
-          classes="flex wrap gap-y-2 shadow"
+          classes="flex wrap gap-y-2 shadow-sm"
           background="bg-surface-100-900"
         >
           {#each THEMES as { name, id, icon, description }}

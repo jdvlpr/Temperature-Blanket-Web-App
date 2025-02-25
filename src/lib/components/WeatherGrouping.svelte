@@ -23,7 +23,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <Segment
       bind:value={weather.grouping}
       background="bg-surface-100-900"
-      classes="shadow"
+      classes="shadow-sm"
     >
       <Segment.Item value={'day'}>Daily</Segment.Item>
       <Segment.Item value={'week'}>Weekly</Segment.Item>

@@ -21,7 +21,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <Segment
   bind:value={preferences.value.layout}
   background="bg-surface-100-900"
-  classes="shadow"
+  classes="shadow-sm"
 >
   <Segment.Item value="list">
     <div class="flex items-center justify-center gap-1">

@@ -267,7 +267,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         viewBox="0 0 24 24"
         stroke-width="1.5"
         stroke="currentColor"
-        class="w-6 h-6 flex-shrink-0"
+        class="w-6 h-6 shrink-0"
       >
         <path
           stroke-linecap="round"
@@ -318,12 +318,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </p>
 
           <div class="flex items-center gap-2">
-            <div class="flex-grow border-t border-surface-300-700"></div>
+            <div class="grow border-t border-surface-300-700"></div>
 
-            <p class="flex-shrink text-xs">
+            <p class="shrink text-xs">
               Version {version}
             </p>
-            <div class="flex-grow border-t border-surface-300-700"></div>
+            <div class="grow border-t border-surface-300-700"></div>
           </div>
         </div>
       {/snippet}
@@ -365,7 +365,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     >
       <div
         id="page-section-location"
-        class="scroll-mt-[76px] pb-12 max-w-screen-md mx-auto"
+        class="scroll-mt-[76px] pb-12 max-w-(--breakpoint-md) mx-auto"
         class:hidden={pageSections.items[1].active === false}
       >
         <div class="px-2 py-4 w-full">
@@ -431,7 +431,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             companies.
           </p>
           {#if pinAllSections.value && weather.data.length}
-            <div class="flex-grow border-t border-surface-300-700"></div>
+            <div class="grow border-t border-surface-300-700"></div>
           {/if}
         </div>
 
@@ -440,7 +440,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           class="scroll-mt-[76px] w-full"
           class:hidden={pageSections.items[4].active === false}
         >
-          <div class="max-w-screen-sm mx-auto">
+          <div class="max-w-(--breakpoint-sm) mx-auto">
             <p class="mb-2">
               Is this web app worth a cup of coffee to you? Your support enables
               ongoing development, keeps the site ad-free, and helps make this

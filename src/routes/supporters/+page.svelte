@@ -43,7 +43,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <div class="hidden lg:inline-flex mx-auto"><AppLogo /></div>
   {/snippet}
   {#snippet main()}
-    <main class="max-w-screen-md m-auto text-center mb-4 mx-auto px-2">
+    <main class="max-w-(--breakpoint-md) m-auto text-center mb-4 mx-auto px-2">
       <div>
         <div class="p-4">
           <p class="text-center mt-2">
