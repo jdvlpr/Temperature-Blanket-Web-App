@@ -519,7 +519,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       }).icon}
                     </div>
                     <p
-                      class="text-8xl flex items-start justify-center font-light"
+                      class="text-8xl flex items-start justify-center font-bold"
                     >
                       {weatherData.current_weather.temperature}°
                     </p>
