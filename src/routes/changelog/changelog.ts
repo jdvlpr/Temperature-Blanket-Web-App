@@ -24,7 +24,7 @@ export const entries: ChangelogItem[] = [
       {
         icon: ICONS.checkCircle,
         text: `Added 46 colorways`,
-        title: 'Added Yarn: DROPS - Safron',
+        title: 'Added Yarn: DROPS - Safran',
       },
       {
         icon: ICONS.checkCircle,
