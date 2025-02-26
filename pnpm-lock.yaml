@@ -37,19 +37,11 @@ importers:
         specifier: ^1.50.0
         version: 1.50.0
       '@skeletonlabs/skeleton':
-<<<<<<< HEAD
         specifier: 3.0.0-next.11
         version: 3.0.0-next.11(tailwindcss@4.0.8)
       '@skeletonlabs/skeleton-svelte':
         specifier: 1.0.0-next.20
         version: 1.0.0-next.20(svelte@5.19.3)
-=======
-        specifier: 3.0.0-next.10
-        version: 3.0.0-next.10(postcss@8.5.1)(tailwindcss@3.4.17)
-      '@skeletonlabs/skeleton-svelte':
-        specifier: 1.0.0-next.19
-        version: 1.0.0-next.19(svelte@5.19.3)
->>>>>>> next
       '@sveltejs/adapter-cloudflare':
         specifier: ^5.0.1
         version: 5.0.1(@sveltejs/kit@2.16.1(@sveltejs/vite-plugin-svelte@5.0.3(svelte@5.19.3)(vite@6.0.11(@types/node@22.7.5)(jiti@2.4.2)(lightningcss@1.29.1)(sass@1.83.4)(yaml@2.5.1)))(svelte@5.19.3)(vite@6.0.11(@types/node@22.7.5)(jiti@2.4.2)(lightningcss@1.29.1)(sass@1.83.4)(yaml@2.5.1)))(wrangler@3.80.4(@cloudflare/workers-types@4.20250109.0))
@@ -62,9 +54,6 @@ importers:
       '@tailwindcss/forms':
         specifier: ^0.5.10
         version: 0.5.10(tailwindcss@4.0.8)
-      '@tailwindcss/postcss':
-        specifier: ^4.0.8
-        version: 4.0.8
       '@tailwindcss/vite':
         specifier: ^4.0.8
         version: 4.0.8(vite@6.0.11(@types/node@22.7.5)(jiti@2.4.2)(lightningcss@1.29.1)(sass@1.83.4)(yaml@2.5.1))
@@ -83,9 +72,6 @@ importers:
       eslint-config-prettier:
         specifier: ^10.0.1
         version: 10.0.1(eslint@9.19.0(jiti@2.4.2))
-      postcss:
-        specifier: ^8.5.1
-        version: 8.5.1
       prettier:
         specifier: ^3.4.2
         version: 3.4.2
@@ -127,10 +113,6 @@ importers:
         version: 3.0.4(@types/node@22.7.5)(jiti@2.4.2)(lightningcss@1.29.1)(sass@1.83.4)(yaml@2.5.1)
 
 packages:
-
-  '@alloc/quick-lru@5.2.0':
-    resolution: {integrity: sha512-UrcABB+4bUrFABwbluTIBErXwvbsU/V7TZWfmbgJfbkwiBuziS9gxdODUyuiecfdGQ85jglMW6juS3+z5TsKLw==}
-    engines: {node: '>=10'}
 
   '@ampproject/remapping@2.3.0':
     resolution: {integrity: sha512-30iZtAPgz+LTIYoeivqYo853f02jBYSd5uGnGpkFV0M3xOt9aN73erkgYAmZU43x4VfqcnLxW9Kpg3R5LC4YYw==}
@@ -873,9 +855,6 @@ packages:
   '@tailwindcss/oxide@4.0.8':
     resolution: {integrity: sha512-KfMcuAu/Iw+DcV1e8twrFyr2yN8/ZDC/odIGta4wuuJOGkrkHZbvJvRNIbQNhGh7erZTYV6Ie0IeD6WC9Y8Hcw==}
     engines: {node: '>= 10'}
-
-  '@tailwindcss/postcss@4.0.8':
-    resolution: {integrity: sha512-SUwlrXjn1ycmUbA0o0n3Y0LqlXqxN5R8HR+ti+OBbRS79wl2seDmiypEs3xJCuQXe07ol81s1AmRMitBmPveJA==}
 
   '@tailwindcss/vite@4.0.8':
     resolution: {integrity: sha512-+SAq44yLzYlzyrb7QTcFCdU8Xa7FOA0jp+Xby7fPMUie+MY9HhJysM7Vp+vL8qIp8ceQJfLD+FjgJuJ4lL6nyg==}
@@ -2439,8 +2418,6 @@ packages:
 
 snapshots:
 
-  '@alloc/quick-lru@5.2.0': {}
-
   '@ampproject/remapping@2.3.0':
     dependencies:
       '@jridgewell/gen-mapping': 0.3.5
@@ -2989,15 +2966,6 @@ snapshots:
       '@tailwindcss/oxide-linux-x64-musl': 4.0.8
       '@tailwindcss/oxide-win32-arm64-msvc': 4.0.8
       '@tailwindcss/oxide-win32-x64-msvc': 4.0.8
-
-  '@tailwindcss/postcss@4.0.8':
-    dependencies:
-      '@alloc/quick-lru': 5.2.0
-      '@tailwindcss/node': 4.0.8
-      '@tailwindcss/oxide': 4.0.8
-      lightningcss: 1.29.1
-      postcss: 8.5.1
-      tailwindcss: 4.0.8
 
   '@tailwindcss/vite@4.0.8(vite@6.0.11(@types/node@22.7.5)(jiti@2.4.2)(lightningcss@1.29.1)(sass@1.83.4)(yaml@2.5.1))':
     dependencies:

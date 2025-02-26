@@ -113,7 +113,7 @@
   let classesSnackbar = $derived(`${cSnackbar} ${cAlign} ${padding}`);
 
   let classesToast = $derived(
-    `${cToast} ${width} ${color} ${padding} ${spacing} ${rounded} ${shadow-sm}`,
+    `${cToast} ${width} ${color} ${padding} ${spacing} ${rounded} ${shadow}`,
   );
   // Filtered Toast Store
   let filteredToasts = $derived(Array.from(toast.queue).slice(0, max));
