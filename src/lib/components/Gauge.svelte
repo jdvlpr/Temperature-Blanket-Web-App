@@ -86,7 +86,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <div
   class="w-full flex flex-col items-center bg-surface-100-900 {fullscreen
-    ? 'justify-start fixed w-full h-full left-0 top-0 bg-surface-50-950 overflow-scroll'
+    ? 'justify-start fixed w-full h-full left-0 top-0 bg-surface-50-950 overflow-scroll max-sm:pb-2'
     : 'justify-center shadow-inner mt-2 pb-2 gap-2 rounded-container'}"
   bind:this={gaugeContainerElement}
 >
