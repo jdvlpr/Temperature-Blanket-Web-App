@@ -256,10 +256,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
         Please enter a valid color
       </p>
     {/if}
-    <SaveAndCloseButtons
-      onSave={_onOkay}
-      onClose={modal.close}
-      disabled={!valid}
-    />
+    <div class="max-sm:pb-2">
+      <SaveAndCloseButtons
+        onSave={_onOkay}
+        onClose={modal.close}
+        disabled={!valid}
+      />
+    </div>
   </div>
 </StickyPart>

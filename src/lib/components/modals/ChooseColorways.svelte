@@ -71,17 +71,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </div>
     {/if}
 
-    <SaveAndCloseButtons
-      onSave={() => {
-        updateGauge({
-          _colors: selectedColors,
-        });
-        modal.close();
-      }}
-      onClose={() => {
-        modal.close();
-      }}
-      disabled={!selectedColors.length}
-    />
+    <div class="max-sm:pb-2">
+      <SaveAndCloseButtons
+        onSave={() => {
+          updateGauge({
+            _colors: selectedColors,
+          });
+          modal.close();
+        }}
+        onClose={() => {
+          modal.close();
+        }}
+        disabled={!selectedColors.length}
+      />
+    </div>
   </div>
 </StickyPart>
