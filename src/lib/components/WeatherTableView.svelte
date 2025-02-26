@@ -13,6 +13,11 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
+<script module>
+  export let weatherDataUpdatedKey = $state({ value: false });
+  let showColorDetails = $state({ value: true });
+</script>
+
 <script>
   import { TableHandler, ThSort } from '@vincjo/datatables';
   import { UNIT_LABELS } from '$lib/constants';
@@ -28,39 +33,100 @@ If not, see <https://www.gnu.org/licenses/>. -->
     dateToISO8601String,
     getIsRecentDate,
     getTextColor,
+    getColorInfo,
+    convertTime,
   } from '$lib/utils';
   import ToggleSwitch from './buttons/ToggleSwitch.svelte';
   import DataTable from '$lib/components/datatable/DataTable.svelte';
   import NumberInput from '$lib/components/modals/NumberInput.svelte';
   import TextInput from '$lib/components/modals/TextInput.svelte';
 
-  let showColorDetails = $state(false);
+  let tableData = $state(getTableData());
 
-  let table = new TableHandler($state.snapshot(weather.tableData), {
-    rowsPerPage: $state.snapshot(weather.table.rowsPerPage),
-  });
+  const table = $derived(
+    new TableHandler(tableData, {
+      rowsPerPage: weather.table.rowsPerPage,
+    }),
+  );
 
   function updateTable() {
-    table.setRows($state.snapshot(weather.tableData));
-    table.setRowsPerPage($state.snapshot(weather.table.rowsPerPage));
-    table.setPage($state.snapshot(weather.table.page));
+    tableData = getTableData();
+    weatherDataUpdatedKey.value = true;
+    table.setRows(tableData);
+    table.setRowsPerPage(weather.table.rowsPerPage);
+    table.setPage(weather.table.page);
+    weatherDataUpdatedKey.value = false;
   }
 
+  function getTableData() {
+    return [
+      ...weather.data.map((n) => {
+        let _weather = {};
+        _weather.color = {};
+        weather.tableWeatherTargets.forEach((target) => {
+          const colorInfo = getColorInfo({
+            param: target.id,
+            value: n[target.id][project.units],
+          });
+          _weather.color[target.id] = colorInfo;
+          if (target.id === 'dayt') {
+            // make sure daytime is always in the same hr:mn format
+            _weather = {
+              ..._weather,
+              [target.id]: convertTime(n[target.id][project.units], {
+                displayUnits: false,
+                padStart: true,
+              }),
+            };
+          } else {
+            let value =
+              n[target.id][project.units] !== null
+                ? n[target.id][project.units]
+                : '-';
+            _weather = {
+              ..._weather,
+              [target.id]: value,
+            };
+          }
+        });
+
+        return {
+          date: dateToISO8601String(n.date),
+          location: n.location,
+          ..._weather,
+        };
+      }),
+    ];
+  }
+
+  // Using a debounce timer inside $effect instead of a $derived for tableData because there was an issue with the first row not updating.
+  // I'm wondering if this was some kind of timing issue, but I don't know. So this is a hack for now.
+  let debounceTimer;
+  const debounce = (callback, time) => {
+    window.clearTimeout(debounceTimer);
+    debounceTimer = window.setTimeout(callback, time);
+  };
+
   $effect(() => {
-    // project.units;
-    gauges.activeGauge?.colors;
-    // gauges.activeGauge?.ranges;
-    // weather.table.showParameters;
-    weather.tableData;
-    if (weather.tableData.length && !gauges.activeGauge?.calculating)
-      updateTable();
+    weather.data,
+      weather.tableWeatherTargets,
+      project.units,
+      gauges.activeGauge?.colors,
+      gauges.activeGauge?.ranges;
+    gauges.activeGauge?.numberOfColors;
+
+    debounce(() => {
+      tableData = getTableData();
+    }, 100);
   });
 </script>
 
 <div class="mt-4 w-fit mx-auto">
-  <ToggleSwitch bind:checked={showColorDetails} label={'Show Color Details'} />
+  <ToggleSwitch
+    bind:checked={showColorDetails.value}
+    label={'Show Color Details'}
+  />
 </div>
-
 <div class="w-full my-4 inline-block">
   <DataTable {table} search={true}>
     <table class={'border-separate border-spacing-0 w-full mx-auto'}>
@@ -95,7 +161,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             class:!preset-tonal-warning={isRecentDate}
             class={[
               '!',
-              showColorDetails &&
+              showColorDetails.value &&
                 'divide-x-2 divide-y-2 divide-surface-50 dark:divide-surface-900',
             ]}
           >
@@ -107,15 +173,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </td>
             {#each weather.tableWeatherTargets as { id, label, type }}
               <td
-                class={[showColorDetails && 'pb-2']}
-                style={row.color[id] && showColorDetails
+                class={[showColorDetails.value && 'pb-2']}
+                style={row.color[id] && showColorDetails.value
                   ? `background-color:${row.color[id].hex};color:${getTextColor(row.color[id].hex)}`
                   : ''}
               >
                 <button
                   class={[
                     weather.grouping === 'day' && 'hover:preset-tonal btn',
-                    showColorDetails && 'font-bold',
                   ]}
                   disabled={weather.grouping === 'week'}
                   onclick={() => {
@@ -211,7 +276,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 >
                   {row[id]}
                 </button>
-                {#if row.color[id] && showColorDetails}
+                {#if row.color[id] && showColorDetails.value}
                   {@const {
                     hex,
                     name,

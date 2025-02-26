@@ -97,6 +97,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 
   $effect(() => {
+    project.history.updateMessage;
     if (project.history.updateMessage !== '') {
       untrack(() => {
         toast.trigger({

@@ -16,11 +16,18 @@
 import { page } from '$app/state';
 import KeyboardShortcuts from '$lib/components/modals/KeyboardShortcuts.svelte';
 import Menu from '$lib/components/modals/Menu.svelte';
-import { modal, pageSections, preferences, project, weather } from '$lib/state';
+import {
+  modal,
+  pageSections,
+  preferences,
+  project,
+  toast,
+  weather,
+} from '$lib/state';
 import { delay, loadFromHistory } from '$lib/utils';
 
 // Go to a section
-export const goToProjectSection = async (index, animateFromBottom) => {
+export const goToProjectSection = async (index, animateFromBottom = false) => {
   if (index === 0) {
     if (typeof document.documentElement !== 'undefined')
       document.documentElement.scrollTop = 0;
@@ -106,8 +113,6 @@ const isRedo = (ev, style) => {
 };
 
 export const handleKeyDown = (ev) => {
-  // Only handle keyboard shortcuts on the main Project Planner page
-
   if (
     modal.opened ||
     ev.target.tagName === 'INPUT' ||
@@ -139,6 +144,10 @@ export const handleKeyDown = (ev) => {
         break;
       case 'u':
         project.toggleUnits();
+        toast.trigger({
+          message: 'Units changed to ' + project.units,
+          background: 'preset-filled-success-100-900',
+        });
         break;
     }
 

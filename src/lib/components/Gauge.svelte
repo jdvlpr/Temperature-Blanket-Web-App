@@ -84,23 +84,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }}
 />
 
-{#if fullscreen}
-  <div class="absolute top-0 right-0 m-2 z-9999">
-    <CloseButton
-      onClose={() => {
-        fullscreen = false;
-      }}
-    />
-  </div>
-{/if}
-
 <div
-  class="w-full flex flex-col justify-center items-center bg-surface-100-900 {fullscreen
-    ? 'fixed w-full h-full left-0 top-0 bg-surface-50-950 overflow-scroll'
-    : 'shadow-inner mt-2 pb-2 gap-2 rounded-container'}"
+  class="w-full flex flex-col items-center bg-surface-100-900 {fullscreen
+    ? 'justify-start fixed w-full h-full left-0 top-0 bg-surface-50-950 overflow-scroll max-sm:pb-2'
+    : 'justify-center shadow-inner mt-2 pb-2 gap-2 rounded-container'}"
   bind:this={gaugeContainerElement}
 >
-  <div class={['w-full', fullscreen && 'flex-auto']}>
+  <div class={['w-full', fullscreen && 'flex-auto order-2 ']}>
     {#key gauge.colors}
       <ColorPaletteEditable
         bind:fullscreen
@@ -115,7 +105,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <div
     class={[
       'flex flex-wrap justify-center items-center gap-2 px-2',
-      fullscreen && 'py-2',
+      fullscreen && 'py-2 order-1',
     ]}
   >
     <div class="">
@@ -357,13 +347,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {/if}
     </button>
 
-    {#if !fullscreen}
-      <button
-        aria-label="Fullscreen"
-        class="btn hover:preset-tonal gap-1 flex gap-1 justify-start items-center"
-        onclick={() => (fullscreen = !fullscreen)}
-        title="Toggle Fullscreen Editing Mode (f)"
-      >
+    <button
+      aria-label="Fullscreen"
+      class={[
+        'btn flex gap-1 justify-start items-center',
+        !fullscreen ? 'hover:preset-tonal' : 'preset-tonal',
+      ]}
+      onclick={() => (fullscreen = !fullscreen)}
+      title="Toggle Fullscreen Editing Mode (f)"
+    >
+      {#if !fullscreen}
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
@@ -380,7 +373,24 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </svg>
 
         Fullscreen
-      </button>
-    {/if}
+      {:else}
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="currentColor"
+          class="size-6"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M9 9V4.5M9 9H4.5M9 9 3.75 3.75M9 15v4.5M9 15H4.5M9 15l-5.25 5.25M15 9h4.5M15 9V4.5M15 9l5.25-5.25M15 15h4.5M15 15v4.5m0-4.5 5.25 5.25"
+          />
+        </svg>
+
+        Exit Fullscreen
+      {/if}
+    </button>
   </div>
 </div>

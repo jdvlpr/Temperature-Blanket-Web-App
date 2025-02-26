@@ -101,7 +101,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               </span>
             {/if}{/snippet}
           {#snippet content()}
-            <div class="mb-20 min-w-[265px]">
+            <div class="mb-20 min-w-[265px] gap-2 flex flex-col">
               <AppLogo />
               <AppNavigation />
             </div>
