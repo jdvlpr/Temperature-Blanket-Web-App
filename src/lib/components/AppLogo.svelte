@@ -42,7 +42,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
         <div class="w-full flex-auto bg-amber-400"></div>
         <div class="w-full flex-auto bg-rose-400"></div>
-        <div class="w-full flex-auto bg-blue-400"></div>
+        <div class="w-full flex-auto bg-blue-500"></div>
       </div>
     </div>
     <h5 class="h5 text-surface-700 dark:text-surface-100 leading-tight">
