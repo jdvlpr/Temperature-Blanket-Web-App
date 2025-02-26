@@ -8,7 +8,7 @@ export default defineConfig({
       'top-level-await': true, //browsers can handle top-level-await features
     },
   },
-  plugins: [sveltekit(), tailwindcss()],
+  plugins: [tailwindcss(), sveltekit()],
   test: {
     include: ['src/**/*.{test,spec}.{js,ts}'],
   },
