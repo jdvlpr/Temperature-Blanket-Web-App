@@ -171,55 +171,9 @@ class WeatherClass {
   });
 
   tableWeatherTargets = $derived.by(() => {
-    const weatherTargets = getWeatherTargets({
+    return getWeatherTargets({
       weatherParameters: this.table.showParameters,
     });
-    return weatherTargets;
-  });
-
-  tableData = $derived.by(() => {
-    gauges.activeGauge?.colors,
-      gauges.activeGauge?.ranges,
-      gauges.activeGauge?.numberOfColors;
-
-    return [
-      ...this.data.map((n) => {
-        let weather = {};
-        weather.color = {};
-        this.tableWeatherTargets.forEach((target) => {
-          const colorInfo = getColorInfo({
-            param: target.id,
-            value: n[target.id][project.units],
-          });
-          weather.color[target.id] = colorInfo;
-          if (target.id === 'dayt') {
-            // make sure daytime is always in the same hr:mn format
-            weather = {
-              ...weather,
-              [target.id]: convertTime(n[target.id][project.units], {
-                displayUnits: false,
-                padStart: true,
-              }),
-            };
-          } else {
-            let value =
-              n[target.id][project.units] !== null
-                ? n[target.id][project.units]
-                : '-';
-            weather = {
-              ...weather,
-              [target.id]: value,
-            };
-          }
-        });
-
-        return {
-          date: dateToISO8601String(n.date),
-          location: n.location,
-          ...weather,
-        };
-      }),
-    ];
   });
 
   params = $derived.by(() => {

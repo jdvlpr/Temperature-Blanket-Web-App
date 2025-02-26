@@ -32,6 +32,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     dateToISO8601String,
     getIsRecentDate,
     getTextColor,
+    getColorInfo,
+    convertTime,
   } from '$lib/utils';
   import ToggleSwitch from './buttons/ToggleSwitch.svelte';
   import DataTable from '$lib/components/datatable/DataTable.svelte';
@@ -39,30 +41,56 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import TextInput from '$lib/components/modals/TextInput.svelte';
   import { untrack } from 'svelte';
 
-  let table = new TableHandler(weather.tableData, {
-    rowsPerPage: weather.table.rowsPerPage,
-  });
+  let tableData = $derived([
+    ...weather.data.map((n) => {
+      let _weather = {};
+      _weather.color = {};
+      weather.tableWeatherTargets.forEach((target) => {
+        const colorInfo = getColorInfo({
+          param: target.id,
+          value: n[target.id][project.units],
+        });
+        _weather.color[target.id] = colorInfo;
+        if (target.id === 'dayt') {
+          // make sure daytime is always in the same hr:mn format
+          _weather = {
+            ..._weather,
+            [target.id]: convertTime(n[target.id][project.units], {
+              displayUnits: false,
+              padStart: true,
+            }),
+          };
+        } else {
+          let value =
+            n[target.id][project.units] !== null
+              ? n[target.id][project.units]
+              : '-';
+          _weather = {
+            ..._weather,
+            [target.id]: value,
+          };
+        }
+      });
+
+      return {
+        date: dateToISO8601String(n.date),
+        location: n.location,
+        ..._weather,
+      };
+    }),
+  ]);
+
+  const table = $derived(
+    new TableHandler(tableData, {
+      rowsPerPage: weather.table.rowsPerPage,
+    }),
+  );
 
   function updateTable() {
-    table.setRows(weather.tableData);
+    table.setRows(tableData);
     table.setRowsPerPage(weather.table.rowsPerPage);
     table.setPage(weather.table.page);
   }
-
-  let debounceTimer;
-  const debounce = (callback, time) => {
-    window.clearTimeout(debounceTimer);
-    debounceTimer = window.setTimeout(callback, time);
-  };
-
-  $effect(() => {
-    weather.tableData;
-
-    debounce(() => {
-      // prevent calling this many times
-      updateTable();
-    }, 40);
-  });
 </script>
 
 <div class="mt-4 w-fit mx-auto">
