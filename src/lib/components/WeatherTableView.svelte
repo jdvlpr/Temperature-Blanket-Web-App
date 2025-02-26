@@ -21,7 +21,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { TableHandler, ThSort } from '@vincjo/datatables';
   import { UNIT_LABELS } from '$lib/constants';
   import RecentWeatherDataTooltip from '$lib/components/RecentWeatherDataTooltip.svelte';
-  import { modal, project, weather } from '$lib/state';
+  import { modal, gauges, project, weather } from '$lib/state';
   import {
     millimetersToInches,
     inchesToMillimeters,
@@ -40,46 +40,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import NumberInput from '$lib/components/modals/NumberInput.svelte';
   import TextInput from '$lib/components/modals/TextInput.svelte';
 
-  let tableData = $derived([
-    ...weather.data.map((n) => {
-      let _weather = {};
-      _weather.color = {};
-      weather.tableWeatherTargets.forEach((target) => {
-        const colorInfo = getColorInfo({
-          param: target.id,
-          value: n[target.id][project.units],
-        });
-        _weather.color[target.id] = colorInfo;
-        if (target.id === 'dayt') {
-          // make sure daytime is always in the same hr:mn format
-          _weather = {
-            ..._weather,
-            [target.id]: convertTime(n[target.id][project.units], {
-              displayUnits: false,
-              padStart: true,
-            }),
-          };
-        } else {
-          let value =
-            n[target.id][project.units] !== null
-              ? n[target.id][project.units]
-              : '-';
-          _weather = {
-            ..._weather,
-            [target.id]: value,
-          };
-        }
-      });
-
-      return {
-        date: dateToISO8601String(n.date),
-        location: n.location,
-        ..._weather,
-      };
-    }),
-  ]);
-
-  $inspect(tableData, table);
+  let tableData = $state(getTableData());
 
   const table = $derived(
     new TableHandler(tableData, {
@@ -91,6 +52,66 @@ If not, see <https://www.gnu.org/licenses/>. -->
     table.setRows(tableData);
     table.setRowsPerPage(weather.table.rowsPerPage);
     table.setPage(weather.table.page);
+  }
+
+  let debounceTimer;
+  const debounce = (callback, time) => {
+    window.clearTimeout(debounceTimer);
+    debounceTimer = window.setTimeout(callback, time);
+  };
+
+  $effect(() => {
+    weather.data,
+      weather.tableWeatherTargets,
+      project.units,
+      gauges.activeGauge?.colors,
+      gauges.activeGauge?.ranges;
+    gauges.activeGauge?.numberOfColors;
+
+    debounce(() => {
+      tableData = getTableData();
+    }, 100);
+  });
+
+  function getTableData() {
+    return [
+      ...weather.data.map((n) => {
+        let _weather = {};
+        _weather.color = {};
+        weather.tableWeatherTargets.forEach((target) => {
+          const colorInfo = getColorInfo({
+            param: target.id,
+            value: n[target.id][project.units],
+          });
+          _weather.color[target.id] = colorInfo;
+          if (target.id === 'dayt') {
+            // make sure daytime is always in the same hr:mn format
+            _weather = {
+              ..._weather,
+              [target.id]: convertTime(n[target.id][project.units], {
+                displayUnits: false,
+                padStart: true,
+              }),
+            };
+          } else {
+            let value =
+              n[target.id][project.units] !== null
+                ? n[target.id][project.units]
+                : '-';
+            _weather = {
+              ..._weather,
+              [target.id]: value,
+            };
+          }
+        });
+
+        return {
+          date: dateToISO8601String(n.date),
+          location: n.location,
+          ..._weather,
+        };
+      }),
+    ];
   }
 </script>
 
