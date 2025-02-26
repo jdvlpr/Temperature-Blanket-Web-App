@@ -14,6 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script module>
+  export let weatherDataUpdatedKey = $state({ value: false });
   let showColorDetails = $state({ value: true });
 </script>
 
@@ -49,9 +50,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   );
 
   function updateTable() {
+    tableData = getTableData();
+    weatherDataUpdatedKey.value = true;
     table.setRows(tableData);
     table.setRowsPerPage(weather.table.rowsPerPage);
     table.setPage(weather.table.page);
+    weatherDataUpdatedKey.value = false;
   }
 
   let debounceTimer;

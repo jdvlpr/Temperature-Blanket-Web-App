@@ -31,6 +31,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { downloadPreviewPNG } from '$lib/utils';
   import { onMount } from 'svelte';
   import { Drawer } from 'vaul-svelte';
+  import { weatherDataUpdatedKey } from './WeatherTableView.svelte';
 
   onMount(() => {
     if (!previews.activeId) {
@@ -44,7 +45,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   <div class="flex flex-col gap-2 justify-center items-start">
     {#if gauges.activeGauge?.colors}
-      {#key [project.url.hash, weather.data]}
+      {#key [project.url.hash, weather.data, weatherDataUpdatedKey.value]}
         <div class="flex w-full flex-col gap-4 justify-center items-center">
           <previews.active.previewComponent />
 
