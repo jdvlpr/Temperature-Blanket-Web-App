@@ -21,7 +21,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { TableHandler, ThSort } from '@vincjo/datatables';
   import { UNIT_LABELS } from '$lib/constants';
   import RecentWeatherDataTooltip from '$lib/components/RecentWeatherDataTooltip.svelte';
-  import { modal, gauges, project, weather, toast } from '$lib/state';
+  import { modal, project, weather } from '$lib/state';
   import {
     millimetersToInches,
     inchesToMillimeters,
@@ -39,7 +39,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import DataTable from '$lib/components/datatable/DataTable.svelte';
   import NumberInput from '$lib/components/modals/NumberInput.svelte';
   import TextInput from '$lib/components/modals/TextInput.svelte';
-  import { untrack } from 'svelte';
 
   let tableData = $derived([
     ...weather.data.map((n) => {
@@ -79,6 +78,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
       };
     }),
   ]);
+
+  $inspect(tableData, table);
 
   const table = $derived(
     new TableHandler(tableData, {
