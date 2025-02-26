@@ -13,6 +13,10 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
+<script module>
+  let openedNavigationItems = $state([]);
+</script>
+
 <script>
   import { page } from '$app/state';
   import { PUBLIC_GITHUB_LINK } from '$env/static/public';
@@ -20,11 +24,32 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { ICONS } from '$lib/constants';
   import { Accordion } from '@skeletonlabs/skeleton-svelte';
 
-  let value = $state([]);
+  $effect(() => {
+    switch (page.route.id) {
+      case '/':
+      case '/yarn-colorway-finder':
+      case '/yarn':
+      case '/weather':
+        openedNavigationItems = ['tools'];
+        break;
+      case '/gallery':
+      case '/yarn-palette-gallery':
+        openedNavigationItems = ['gallery'];
+        break;
+      case '/faq':
+      case '/contact':
+      case '/yarn-search-request':
+      case '/privacy':
+      case '/documentation':
+      case '/changelog':
+        openedNavigationItems = ['information'];
+        break;
+    }
 
-  function onClickItem() {
-    // modal.close();
-  }
+    if (page.route.id?.includes('/blog') || page.route.id?.includes('/api')) {
+      openedNavigationItems = ['information'];
+    }
+  });
 </script>
 
 <div
@@ -33,7 +58,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 >
   <div><ThemeSwitcher /></div>
 
-  <Accordion {value} collapsible multiple>
+  <Accordion value={openedNavigationItems} collapsible multiple>
     {#snippet iconOpen()}<svg
         xmlns="http://www.w3.org/2000/svg"
         fill="none"
@@ -73,7 +98,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <a
             href="/"
             class="btn hover:preset-tonal w-fit gap-1"
-            onclick={() => onClickItem()}
             class:preset-tonal-secondary={page.url.pathname === '/'}
           >
             <svg
@@ -92,7 +116,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <a
             href="/yarn-colorway-finder"
             class="btn hover:preset-tonal w-fit gap-1"
-            onclick={() => onClickItem()}
             class:preset-tonal-secondary={page.url.pathname ===
               '/yarn-colorway-finder'}
           >
@@ -114,7 +137,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <a
             href="/yarn"
             class="btn hover:preset-tonal w-fit gap-1"
-            onclick={() => onClickItem()}
             class:preset-tonal-secondary={page.url.pathname === '/yarn'}
           >
             <svg
@@ -137,7 +159,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <a
             href="/weather"
             class="btn hover:preset-tonal w-fit gap-1"
-            onclick={() => onClickItem()}
             class:preset-tonal-secondary={page.url.pathname === '/weather'}
           >
             <svg
@@ -164,7 +185,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <a
             href="/gallery"
             class="btn hover:preset-tonal w-fit gap-1"
-            onclick={() => onClickItem()}
             class:preset-tonal-secondary={page.url.pathname === '/gallery'}
           >
             <svg
@@ -182,7 +202,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <a
             href="/yarn-palette-gallery"
             class="btn hover:preset-tonal w-fit gap-1"
-            onclick={() => onClickItem()}
             class:preset-tonal-secondary={page.url.pathname ===
               '/yarn-palette-gallery'}
           >
@@ -201,7 +220,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <a
             href="/faq"
             class="btn hover:preset-tonal w-fit gap-1"
-            onclick={() => onClickItem()}
             class:preset-tonal-secondary={page.url.pathname === '/faq'}
           >
             <svg
@@ -223,7 +241,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <a
             href="/contact"
             class="btn hover:preset-tonal w-fit gap-1"
-            onclick={() => onClickItem()}
             class:preset-tonal-secondary={page.url.pathname === '/contact'}
           >
             <svg
@@ -246,7 +263,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <a
             href="/yarn-search-request"
             class="btn hover:preset-tonal w-fit gap-1"
-            onclick={() => onClickItem()}
             class:preset-tonal-secondary={page.url.pathname ===
               '/yarn-search-request'}
           >
@@ -271,7 +287,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <a
             href="/blog"
             class="btn hover:preset-tonal w-fit gap-1 text-left"
-            onclick={() => onClickItem()}
             class:preset-tonal-secondary={page.url.pathname === '/blog' ||
               page.url.pathname.includes('/blog')}
           >
@@ -293,7 +308,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <a
             href="/privacy"
             class="btn hover:preset-tonal w-fit gap-1"
-            onclick={() => onClickItem()}
             class:preset-tonal-secondary={page.url.pathname === '/privacy'}
           >
             <svg
@@ -319,7 +333,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <a
             href="/documentation"
             class="btn hover:preset-tonal w-fit gap-1"
-            onclick={() => onClickItem()}
             class:preset-tonal-secondary={page.url.pathname ===
               '/documentation'}
           >
@@ -343,7 +356,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <a
             href="/changelog"
             class="btn hover:preset-tonal w-fit gap-1"
-            onclick={() => onClickItem()}
             class:preset-tonal-secondary={page.url.pathname === '/changelog'}
           >
             <svg
@@ -366,7 +378,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <a
             href="/api/yarn-colorways"
             class="btn hover:preset-tonal w-fit gap-1"
-            onclick={() => onClickItem()}
             class:preset-tonal-secondary={page.url.pathname ===
               '/api/yarn-colorways'}
           >
@@ -415,7 +426,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <a
     href="/supporters"
     class="btn hover:preset-tonal w-fit gap-1"
-    onclick={() => onClickItem()}
     class:preset-tonal-secondary={page.url.pathname === '/supporters'}
   >
     <svg

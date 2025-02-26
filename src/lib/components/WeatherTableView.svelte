@@ -58,25 +58,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     weatherDataUpdatedKey.value = false;
   }
 
-  let debounceTimer;
-  const debounce = (callback, time) => {
-    window.clearTimeout(debounceTimer);
-    debounceTimer = window.setTimeout(callback, time);
-  };
-
-  $effect(() => {
-    weather.data,
-      weather.tableWeatherTargets,
-      project.units,
-      gauges.activeGauge?.colors,
-      gauges.activeGauge?.ranges;
-    gauges.activeGauge?.numberOfColors;
-
-    debounce(() => {
-      tableData = getTableData();
-    }, 100);
-  });
-
   function getTableData() {
     return [
       ...weather.data.map((n) => {
@@ -117,6 +98,27 @@ If not, see <https://www.gnu.org/licenses/>. -->
       }),
     ];
   }
+
+  // Using a debounce timer inside $effect instead of a $derived for tableData because there was an issue with the first row not updating.
+  // I'm wondering if this was some kind of timing issue, but I don't know. So this is a hack for now.
+  let debounceTimer;
+  const debounce = (callback, time) => {
+    window.clearTimeout(debounceTimer);
+    debounceTimer = window.setTimeout(callback, time);
+  };
+
+  $effect(() => {
+    weather.data,
+      weather.tableWeatherTargets,
+      project.units,
+      gauges.activeGauge?.colors,
+      gauges.activeGauge?.ranges;
+    gauges.activeGauge?.numberOfColors;
+
+    debounce(() => {
+      tableData = getTableData();
+    }, 100);
+  });
 </script>
 
 <div class="mt-4 w-fit mx-auto">
