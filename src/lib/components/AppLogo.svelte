@@ -34,7 +34,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <div class="rounded-[0.2rem] overflow-hidden shrink-0">
       <div class="flex flex-col items-center size-8 relative">
         <div class="flex flex-col items-center absolute">
-          <div class="h-4 w-2 bg-surface-50-950 rounded-t-sm"></div>
+          <div class="h-4 w-2 bg-surface-50-950"></div>
           <div
             class="size-4 bg-surface-50-950 rounded-full relative -top-1"
           ></div>
