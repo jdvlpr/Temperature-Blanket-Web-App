@@ -301,7 +301,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
       {#if showReset}
         <button
-          class="ig-btn"
+          class="ig-btn hover:preset-tonal"
           title="Reset Location Search"
           onclick={async () => {
             weatherLocationState.inputLocation.value = '';

@@ -366,10 +366,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
           disabled={project.status.loading || weather.isUserEdited > 0}
         />
         {#if searching}
-          <div class="flex items-center justify-center">
+          <div class="flex items-center justify-center ig-cell">
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              class="size-6 mx-2 animate-spin"
+              class="size-6 animate-spin"
               viewBox="0 0 24 24"
             >
               <g fill="currentColor">
@@ -387,7 +387,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
         {#if showReset}
           <button
-            class="ig-btn p-2"
+            class="ig-btn hover:preset-tonal"
             title="Reset Location Search"
             disabled={!!weather.isUserEdited}
             onclick={() => {

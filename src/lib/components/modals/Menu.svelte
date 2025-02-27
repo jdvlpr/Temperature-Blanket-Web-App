@@ -445,7 +445,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/if}
 
   {#if pages.download}
-    <div>
+    <div class="mb-4">
       <h2 class="my-2 text-lg font-bold">Download</h2>
       <div class="flex flex-col gap-2 items-start text-left">
         <button
@@ -467,7 +467,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
         {#if previews.active?.previewComponent}
           <button
-            class="btn hover:preset-tonal gap-2"
+            class="btn hover:preset-tonal gap-2 h-auto"
             title="Download PNG File"
             onclick={() => {
               downloadPreviewPNG(
@@ -477,7 +477,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               );
             }}
           >
-            <span class="w-[50px] m-auto">
+            <span class="w-[50px] m-auto h-auto">
               <previews.active.previewComponent />
             </span>
 

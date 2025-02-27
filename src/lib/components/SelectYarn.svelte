@@ -390,7 +390,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <button
           aria-label="Show All Yarns"
           {disabled}
-          class="ig-btn"
+          class="ig-btn hover:preset-tonal"
           onclick={() => {
             forceDisplayAll = true;
             inputElement.focus();
@@ -416,7 +416,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <button
           aria-label="Clear"
           {disabled}
-          class="ig-btn"
+          class="ig-btn hover:preset-tonal"
           onclick={async () => {
             inputValue = '';
             selectedBrandId = '';

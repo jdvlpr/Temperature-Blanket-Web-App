@@ -173,7 +173,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {#if showSearchReset}
             <button
               disabled={loading}
-              class="ig-btn"
+              class="ig-btn hover:preset-tonal"
               title="Reset Search"
               onclick={() => {
                 galleryPalettesState.search = '';

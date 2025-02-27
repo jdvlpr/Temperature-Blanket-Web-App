@@ -559,7 +559,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     {#if yarnColorwayFinderState.search}
                       <button
                         aria-label="Clear Search"
-                        class="ig-btn"
+                        class="ig-btn hover:preset-tonal"
                         onclick={() => {
                           yarnColorwayFinderState.search = '';
                         }}

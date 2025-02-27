@@ -117,7 +117,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     debounce(() => {
       tableData = getTableData();
-    }, 100);
+    }, 90);
   });
 </script>
 

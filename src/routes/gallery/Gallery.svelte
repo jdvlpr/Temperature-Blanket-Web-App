@@ -270,7 +270,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             {#if showSearchReset}
               <button
                 disabled={loading}
-                class="ig-btn"
+                class="ig-btn hover:preset-tonal"
                 title="Reset Search"
                 onclick={() => {
                   galleryState.search = '';
@@ -349,7 +349,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         >
           <button
             disabled={loading}
-            class="btn preset-filled-primary-500 flex items-center w-full h-fit gap-1 shadow-sm"
+            class="btn preset-filled-primary-500 flex items-center w-full gap-1 shadow-sm"
             onclick={async () => {
               projectsList.scrollIntoView({
                 behavior: 'smooth',
