@@ -23,10 +23,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   interface Props {
     updateGauge: any;
-    parent: any;
   }
 
-  let { updateGauge, parent }: Props = $props();
+  let { updateGauge }: Props = $props();
 
   let selectedColors: object[] = $state([]);
 

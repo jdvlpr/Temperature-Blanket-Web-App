@@ -315,7 +315,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
       <div class="flex flex-col gap-2 justify-start items-start w-full">
         <ToggleSwitch
-          maxWidth="50px"
           label="Always display all sections"
           details="Keep the Location, Weather, Colors, and Preview sections visible on the same page."
           bind:checked={pinAllSections.value}

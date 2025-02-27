@@ -18,9 +18,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import GalleryPalettesPopular from '$lib/components/GalleryPalettesPopular.svelte';
   import PaletteSchemes from '$lib/components/PaletteSchemes.svelte';
   import ToTopButton from '$lib/components/buttons/ToTopButton.svelte';
-  import { modal } from '$lib/state';
   import { Segment } from '@skeletonlabs/skeleton-svelte';
-  import CloseButton from './CloseButton.svelte';
 
   interface Props {
     schemeId?: string;

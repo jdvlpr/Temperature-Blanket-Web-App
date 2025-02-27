@@ -19,10 +19,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import GettingWeatherWarnCustomWeather from '$lib/components/modals/GettingWeatherWarnCustomWeather.svelte';
   import { locations, modal, project, weather } from '$lib/state';
 
-  function setModal() {}
-
-  function setWarnCustomWeatherModal() {}
-
   let disabled = $derived(!locations.allValid || project.status.loading);
 </script>
 
@@ -31,7 +27,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     buttonDisabled={disabled}
     title="Search for Weather Data"
     id="location-action-button"
-    classNames="btn btn-lg preset-filled-primary-500  sm:w-fit gap-1 shadow-sm"
+    classNames="btn btn-lg preset-filled-primary-500 sm:w-fit gap-1 shadow-sm"
   >
     {#if !!weather.isUserEdited}
       Reload Weather Data

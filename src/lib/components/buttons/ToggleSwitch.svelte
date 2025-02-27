@@ -21,7 +21,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     details?: string;
     detailsTextSize?: string;
     onchange?: (e: Event) => void;
-    maxWidth?: string;
   }
 
   let {
@@ -31,7 +30,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     details = '',
     detailsTextSize = 'text-sm',
     onchange,
-    maxWidth = '450px',
   }: Props = $props();
 
   let hasDetails = details !== '';
@@ -43,7 +41,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <div class="flex flex-col items-start">
     <span class:font-bold={hasDetails}>{@html label}</span>
     {#if hasDetails}
-      <span class="max-w-[{maxWidth}] {detailsTextSize}">{@html details}</span>
+      <span class={detailsTextSize}>{@html details}</span>
     {/if}
   </div>
   <label class="relative inline-flex items-start cursor-pointer gap-2">

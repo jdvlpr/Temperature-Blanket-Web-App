@@ -395,7 +395,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         weather.table.showParameters.tmax = !weather.table.showParameters.tmax;
       }}
     >
-      <span class="border-b-2 border-tmax">High Temps</span>
+      <span class="border-b-2 border-(--tmax)">High Temps</span>
     </ToggleWeatherData>
 
     <ToggleWeatherData
@@ -404,7 +404,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         weather.table.showParameters.tavg = !weather.table.showParameters.tavg;
       }}
     >
-      <span class="border-b-2 border-tavg">Average Temps</span>
+      <span class="border-b-2 border-(--tavg)">Average Temps</span>
     </ToggleWeatherData>
 
     <ToggleWeatherData
@@ -413,7 +413,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         weather.table.showParameters.tmin = !weather.table.showParameters.tmin;
       }}
     >
-      <span class="border-b-2 border-tmin">Low Temps</span>
+      <span class="border-b-2 border-(--tmin)">Low Temps</span>
     </ToggleWeatherData>
 
     <ToggleWeatherData
@@ -422,7 +422,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         weather.table.showParameters.prcp = !weather.table.showParameters.prcp;
       }}
     >
-      <span class="border-b-2 border-prcp">Rain</span>
+      <span class="border-b-2 border-(--prcp)">Rain</span>
     </ToggleWeatherData>
     <ToggleWeatherData
       view={weather.table.showParameters.snow}
@@ -430,7 +430,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         weather.table.showParameters.snow = !weather.table.showParameters.snow;
       }}
     >
-      <span class="border-b-2 border-snow">Snow</span>
+      <span class="border-b-2 border-(--snow)">Snow</span>
     </ToggleWeatherData>
     <ToggleWeatherData
       view={weather.table.showParameters.dayt}
@@ -438,7 +438,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         weather.table.showParameters.dayt = !weather.table.showParameters.dayt;
       }}
     >
-      <span class="border-b-2 border-dayt">Daytime</span>
+      <span class="border-b-2 border-(--dayt)">Daytime</span>
     </ToggleWeatherData>
   </div>
 

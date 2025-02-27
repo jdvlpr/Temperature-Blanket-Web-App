@@ -1,5 +1,5 @@
 @import 'tailwindcss';
-/* @plugin '@tailwindcss/forms'; */
+@plugin '@tailwindcss/forms';
 
 @source '../../node_modules/@skeletonlabs/skeleton-svelte/dist';
 
@@ -36,15 +36,28 @@
   ::file-selector-button {
     border-color: var(--color-gray-200, currentColor);
   }
+  /* define variables for weather parameters */
+  :root {
+    --tmin: #38bdf8;
+    --tavg: #a3a3a3;
+    --tmax: #f87171;
+    --prcp: #818cf8;
+    --snow: #94a3b8;
+    --dayt: #facc15;
+  }
+
+  ::selection {
+    color: var(--base-font-color-dark);
+  }
 }
 
-@utility group {
+.group {
   .autocomplete > & {
     @apply bg-surface-50-950 hover:bg-primary-400/20;
   }
 }
 
-@utility selected {
+.selected {
   .autocomplete > &div {
     @apply bg-primary-100/50 dark:bg-primary-900/50;
     color: var(--base-font-color);
@@ -54,21 +67,17 @@
   }
 }
 
-@utility link {
+.link {
   @apply underline text-secondary-800 dark:text-secondary-50;
 }
 
-@utility text-gradient {
+.text-gradient {
   @apply bg-linear-to-br from-secondary-200 to-secondary-800 dark:from-secondary-50 dark:to-secondary-200 bg-clip-text text-transparent dark:text-transparent box-decoration-clone;
 }
 
-@utility label {
+.label {
   /* After updating from skeleton v2 to v3, the labels were not displaying like before...this seems to mostly fix it */
   width: auto;
-}
-
-@utility btn {
-  height: auto !important;
 }
 
 [data-theme='classic'],

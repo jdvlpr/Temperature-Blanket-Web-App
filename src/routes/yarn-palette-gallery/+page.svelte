@@ -328,12 +328,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   </svg>
                   Search Projects
                 </span>
-                <div
-                  class="input-group input-group-divider grid-cols-[1fr_auto]"
-                >
+                <div class="input-group grid-cols-[1fr_auto]">
                   <input
                     type="text"
-                    class="truncate"
+                    class="truncate ig-input w-full"
                     autocomplete="off"
                     placeholder="e.g., Kansas, 2003"
                     disabled={loading}
@@ -343,7 +341,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   {#if showSearchReset}
                     <button
                       disabled={loading}
-                      class=""
+                      class="ig-btn"
                       title="Reset Search"
                       onclick={() => {
                         yarnPaletteGalleryState.search = '';

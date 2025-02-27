@@ -219,7 +219,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <label class="color-text-label flex-1" title="Enter a Color">
       <input
         type="text"
-        class="input mb-2 mt-1 grow w-full"
+        class="input grow w-full"
         value={inputTypeTextValue}
         onkeyup={(e) =>
           inputTypeTextOnChange({

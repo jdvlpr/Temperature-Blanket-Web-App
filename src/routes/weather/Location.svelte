@@ -248,10 +248,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {/if}
     </p>
     <div
-      class="input-group input-group-divider grid-cols-[auto_1fr_auto]"
+      class="input-group grid-cols-[auto_1fr_auto]"
       bind:this={locationGroup}
     >
-      <div class="input-group-cell">
+      <div class="ig-cell">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
@@ -270,7 +270,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <input
         type="text"
         id="location-0"
-        class="truncate pl-0"
+        class="truncate ig-input"
         autocomplete="off"
         placeholder={project.status.loading ? 'Loading...' : 'Enter a place'}
         title="Enter a city, region, or landmark"
@@ -283,7 +283,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <div class="flex items-center justify-center">
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            class="w-8 h-8 animate-spin"
+            class="size-6 mx-2 animate-spin"
             viewBox="0 0 24 24"
           >
             <g fill="currentColor">
@@ -301,7 +301,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
       {#if showReset}
         <button
-          class=""
+          class="ig-btn"
           title="Reset Location Search"
           onclick={async () => {
             weatherLocationState.inputLocation.value = '';

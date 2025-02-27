@@ -328,12 +328,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </span>
 
   <div class="flex flex-wrap items-center justify-center gap-1">
-    <div
-      class="input-group input-group-divider flex grid-cols-[1fr_auto] w-full"
-    >
+    <div class="input-group grid-cols-[1fr_auto_auto] w-full">
       <input
         bind:this={inputElement}
-        class="input truncate"
+        class="truncate ig-input"
         {disabled}
         id="input-select-yarn"
         type="text"
@@ -392,7 +390,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <button
           aria-label="Show All Yarns"
           {disabled}
-          class="btn-icon px-2! h-10 grow-0 shrink-0 basis-0"
+          class="ig-btn"
           onclick={() => {
             forceDisplayAll = true;
             inputElement.focus();
@@ -418,7 +416,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <button
           aria-label="Clear"
           {disabled}
-          class="btn-icon px-2! h-10 grow-0 shrink-0 basis-0"
+          class="ig-btn"
           onclick={async () => {
             inputValue = '';
             selectedBrandId = '';

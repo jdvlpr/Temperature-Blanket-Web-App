@@ -61,8 +61,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   ]}
 >
   <div
-    class="sticky top-0 bg-surface-50/90 dark:bg-surface-950/90 backdrop-blur-md z-20 [view-transition-name:sticky-header]"
-    class:lg:py-2={stickyHeader}
+    class={[
+      'sticky top-0 bg-surface-50/90 dark:bg-surface-950/90 backdrop-blur-md z-20 [view-transition-name:sticky-header]',
+      stickyHeader && 'lg:py-2',
+    ]}
     id="top-navbar"
   >
     <div

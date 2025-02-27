@@ -659,7 +659,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </div>
     </div>
 
-    <div class="flex flex-col justify-start items-start w-full max-w-(--breakpoint-md)">
+    <div
+      class="flex flex-col justify-start items-start w-full max-w-(--breakpoint-md)"
+    >
       <h2 class="font-bold text-xl flex flex-wrap items-start mb-2">
         Edit Ranges
       </h2>

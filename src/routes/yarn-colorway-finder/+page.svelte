@@ -442,12 +442,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   Search by Color</span
                 >
                 <div class="flex flex-wrap items-center justify-center gap-1">
-                  <div
-                    class="input-group grid-cols-[auto_1fr_auto] w-full divide-x divide-surface-50-950"
-                  >
+                  <div class="input-group grid-cols-[auto_1fr_auto] w-full">
                     <input
                       type="color"
-                      class="input input-group-cell p-0 m-2 rounded-full!"
+                      class="input ig-cell p-0 m-2 rounded-full!"
                       bind:this={yarnColorwayFinderState.inputTypeColorElement}
                       onchange={(e) =>
                         inputTypeColorOnChange({
@@ -552,7 +550,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       autocomplete="off"
                       placeholder="e.g., Wisteria, Cream"
                       type="text"
-                      class="w-full input"
+                      class="ig-input w-full"
                       bind:value={yarnColorwayFinderState.search}
                       oninput={() => {
                         itemsToShow = YARN_COLORWAYS_PER_PAGE;
@@ -561,6 +559,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     {#if yarnColorwayFinderState.search}
                       <button
                         aria-label="Clear Search"
+                        class="ig-btn"
                         onclick={() => {
                           yarnColorwayFinderState.search = '';
                         }}

@@ -97,8 +97,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <div class="flex flex-col w-full gap-2">
           <a
             href="/"
-            class="btn hover:preset-tonal w-fit gap-1"
-            class:preset-tonal-secondary={page.url.pathname === '/'}
+            class={[
+              'btn hover:preset-tonal w-fit gap-1',
+              page.url.pathname === '/' && 'preset-tonal-secondary',
+            ]}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -115,9 +117,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
           <a
             href="/yarn-colorway-finder"
-            class="btn hover:preset-tonal w-fit gap-1"
-            class:preset-tonal-secondary={page.url.pathname ===
-              '/yarn-colorway-finder'}
+            class={[
+              'btn hover:preset-tonal w-fit gap-1',
+              page.url.pathname === '/yarn-colorway-finder' &&
+                'preset-tonal-secondary',
+            ]}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -136,8 +140,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </a>
           <a
             href="/yarn"
-            class="btn hover:preset-tonal w-fit gap-1"
-            class:preset-tonal-secondary={page.url.pathname === '/yarn'}
+            class={[
+              'btn hover:preset-tonal w-fit gap-1',
+              page.url.pathname === '/yarn' && 'preset-tonal-secondary',
+            ]}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -158,8 +164,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </a>
           <a
             href="/weather"
-            class="btn hover:preset-tonal w-fit gap-1"
-            class:preset-tonal-secondary={page.url.pathname === '/weather'}
+            class={[
+              'btn hover:preset-tonal w-fit gap-1',
+              page.url.pathname === '/weather' && 'preset-tonal-secondary',
+            ]}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -184,8 +192,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <div class="flex flex-col w-full gap-2">
           <a
             href="/gallery"
-            class="btn hover:preset-tonal w-fit gap-1"
-            class:preset-tonal-secondary={page.url.pathname === '/gallery'}
+            class={[
+              'btn hover:preset-tonal w-fit gap-1',
+              page.url.pathname === '/gallery' && 'preset-tonal-secondary',
+            ]}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -201,9 +211,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </a>
           <a
             href="/yarn-palette-gallery"
-            class="btn hover:preset-tonal w-fit gap-1"
-            class:preset-tonal-secondary={page.url.pathname ===
-              '/yarn-palette-gallery'}
+            class={[
+              'btn hover:preset-tonal w-fit gap-1',
+              page.url.pathname === '/yarn-palette-gallery' &&
+                'preset-tonal-secondary',
+            ]}
           >
             {@html ICONS.palette}
             <span>Yarn Palettes</span>
@@ -219,8 +231,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <div class="flex flex-col gap-2 mb-4 w-full">
           <a
             href="/faq"
-            class="btn hover:preset-tonal w-fit gap-1"
-            class:preset-tonal-secondary={page.url.pathname === '/faq'}
+            class={[
+              'btn hover:preset-tonal w-fit gap-1',
+              page.url.pathname === '/faq' && 'preset-tonal-secondary',
+            ]}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -240,8 +254,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </a>
           <a
             href="/contact"
-            class="btn hover:preset-tonal w-fit gap-1"
-            class:preset-tonal-secondary={page.url.pathname === '/contact'}
+            class={[
+              'btn hover:preset-tonal w-fit gap-1',
+              page.url.pathname === '/contact' && 'preset-tonal-secondary',
+            ]}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -262,9 +278,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
           <a
             href="/yarn-search-request"
-            class="btn hover:preset-tonal w-fit gap-1"
-            class:preset-tonal-secondary={page.url.pathname ===
-              '/yarn-search-request'}
+            class={[
+              'btn hover:preset-tonal w-fit gap-1',
+              page.url.pathname === '/yarn-search-request' &&
+                'preset-tonal-secondary',
+            ]}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -286,9 +304,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
           <a
             href="/blog"
-            class="btn hover:preset-tonal w-fit gap-1 text-left"
-            class:preset-tonal-secondary={page.url.pathname === '/blog' ||
-              page.url.pathname.includes('/blog')}
+            class={[
+              'btn hover:preset-tonal w-fit gap-1 text-left',
+              (page.url.pathname === '/blog' ||
+                page.url.pathname.includes('/blog')) &&
+                'preset-tonal-secondary',
+            ]}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -307,8 +328,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
           <a
             href="/privacy"
-            class="btn hover:preset-tonal w-fit gap-1"
-            class:preset-tonal-secondary={page.url.pathname === '/privacy'}
+            class={[
+              'btn hover:preset-tonal w-fit gap-1',
+              page.url.pathname === '/privacy' && 'preset-tonal-secondary',
+            ]}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -332,9 +355,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
           <a
             href="/documentation"
-            class="btn hover:preset-tonal w-fit gap-1"
-            class:preset-tonal-secondary={page.url.pathname ===
-              '/documentation'}
+            class={[
+              'btn hover:preset-tonal w-fit gap-1',
+              page.url.pathname === '/documentation' &&
+                'preset-tonal-secondary',
+            ]}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -355,8 +380,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
           <a
             href="/changelog"
-            class="btn hover:preset-tonal w-fit gap-1"
-            class:preset-tonal-secondary={page.url.pathname === '/changelog'}
+            class={[
+              'btn hover:preset-tonal w-fit gap-1',
+              page.url.pathname === '/changelog' && 'preset-tonal-secondary',
+            ]}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -377,9 +404,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
           <a
             href="/api/yarn-colorways"
-            class="btn hover:preset-tonal w-fit gap-1"
-            class:preset-tonal-secondary={page.url.pathname ===
-              '/api/yarn-colorways'}
+            class={[
+              'btn hover:preset-tonal w-fit gap-1',
+              page.url.pathname === '/api/yarn-colorways' &&
+                'preset-tonal-secondary',
+            ]}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -425,8 +454,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   <a
     href="/supporters"
-    class="btn hover:preset-tonal w-fit gap-1"
-    class:preset-tonal-secondary={page.url.pathname === '/supporters'}
+    class={[
+      'btn hover:preset-tonal w-fit gap-1',
+      page.url.pathname === '/supporters' && 'preset-tonal-secondary',
+    ]}
   >
     <svg
       xmlns="http://www.w3.org/2000/svg"
