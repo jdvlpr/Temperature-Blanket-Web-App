@@ -165,7 +165,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </p>
 
   <div class="flex flex-wrap gap-2 justify-center">
-    <a href="/contact" class="btn preset-filled-primary-500">Send Feedback </a>
+    <a href="/contact" class="btn preset-filled-secondary-700-300"
+      >Send Feedback
+    </a>
 
     <button
       aria-label="Close Banner"
