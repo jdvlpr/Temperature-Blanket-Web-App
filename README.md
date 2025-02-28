@@ -11,9 +11,9 @@ Built with:
 - [Svelte 5](https://svelte.dev/)
 - [Sveltekit 2](https://svelte.dev/)
 - [Skeleton 3](https://github.com/skeletonlabs/skeleton)
-- [Tailwind 3](https://github.com/tailwindlabs/tailwindcss)
+- [Tailwind 4](https://github.com/tailwindlabs/tailwindcss)
 
-What's new in version 5?
+What's new in the latest version?
 
 - Fullscreen color editor
 - Option to show color details in the weather table
