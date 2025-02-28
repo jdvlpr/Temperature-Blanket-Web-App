@@ -97,7 +97,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <meta property="og:type" content="website" />
   <meta
     property="og:image"
-    content="{PUBLIC_BASE_URL}/images/yarn-palette-creator-og-image-2.4.0.jpg"
+    content="{PUBLIC_BASE_URL}/images/temperature-blanket-og-image-5.0.0.jpg"
   />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
