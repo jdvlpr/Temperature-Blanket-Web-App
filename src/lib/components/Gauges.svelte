@@ -143,7 +143,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   <Gauge bind:gauge={gauges.activeGauge} />
 
-  <div class="my-4">
+  <div class="mt-4 mb-2">
     <RangeOptionsButton />
   </div>
 

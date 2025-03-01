@@ -13,6 +13,10 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
+<script module>
+  let fullscreen = $state({ value: false });
+</script>
+
 <script lang="ts">
   import { page } from '$app/state';
   import ColorPaletteEditable from '$lib/components/ColorPaletteEditable.svelte';
@@ -26,7 +30,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { drawerState, modal, pageSections, pinAllSections } from '$lib/state';
   import type { Color, GaugeSettingsType } from '$lib/types';
   import { createGaugeColors } from '$lib/utils';
+
   let { gauge = $bindable() } = $props();
+
+  let gaugeContainerElement = $state();
 
   function updateGauge({
     _colors,
@@ -42,15 +49,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     gauge.schemeId = _schemeId;
 
     drawerState.closeAll();
+
     modal.close();
   }
 
-  let fullscreen = $state(false);
-
-  let gaugeContainerElement = $state();
-
   $effect(() => {
-    if (fullscreen) {
+    if (fullscreen.value) {
       gaugeContainerElement.style.zIndex = '40';
       document.body.style.overflow = 'hidden';
     } else {
@@ -76,9 +80,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
         page.route.id === '/'
       )
         return;
-      fullscreen = !fullscreen;
+      fullscreen.value = !fullscreen.value;
     } else if (e.key === 'Escape') {
-      fullscreen = false;
+      fullscreen.value = false;
     }
   }}
 />
@@ -86,16 +90,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <div
   class={[
     'w-full flex flex-col items-center',
-    fullscreen
+    fullscreen.value
       ? 'justify-start fixed w-full h-full left-0 top-0 bg-surface-50-950 overflow-scroll max-sm:pb-2'
       : 'justify-center shadow-inner mt-2 pb-2 gap-2 rounded-container bg-surface-100-900',
   ]}
   bind:this={gaugeContainerElement}
 >
-  <div class={['w-full', fullscreen && 'flex-auto order-2 ']}>
+  <div class={['w-full', fullscreen.value && 'flex-auto order-2 ']}>
     {#key gauge.colors}
       <ColorPaletteEditable
-        bind:fullscreen
+        bind:fullscreen={fullscreen.value}
         bind:colors={gauge.colors}
         schemeName={gauge.schemeId}
         showSchemeName={false}
@@ -107,12 +111,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <div
     class={[
       'flex flex-wrap justify-center items-center gap-2 px-2',
-      fullscreen && 'py-2 order-1',
+      fullscreen.value && 'py-2 order-1',
     ]}
   >
     <div class="">
       <SelectNumberOfColors
-        hideText={fullscreen}
+        hideText={fullscreen.value}
         numberOfColors={gauge.colors.length}
         onchange={(e) => {
           const colors = createGaugeColors({
@@ -128,7 +132,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <button
       class={[
         'hover:preset-tonal gap-1',
-        fullscreen ? 'btn-icon' : 'btn justify-start',
+        fullscreen.value ? 'btn-icon' : 'btn justify-start',
       ]}
       onclick={() =>
         modal.trigger({
@@ -158,7 +162,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           d="M4.098 19.902a3.75 3.75 0 005.304 0l6.401-6.402M6.75 21A3.75 3.75 0 013 17.25V4.125C3 3.504 3.504 3 4.125 3h5.25c.621 0 1.125.504 1.125 1.125v4.072M6.75 21a3.75 3.75 0 003.75-3.75V8.197M6.75 21h13.125c.621 0 1.125-.504 1.125-1.125v-5.25c0-.621-.504-1.125-1.125-1.125h-4.072M10.5 8.197l2.88-2.88c.438-.439 1.15-.439 1.59 0l3.712 3.713c.44.44.44 1.152 0 1.59l-2.879 2.88M6.75 17.25h.008v.008H6.75v-.008z"
         />
       </svg>
-      {#if !fullscreen}
+      {#if !fullscreen.value}
         Browse Palettes
       {/if}
     </button>
@@ -166,7 +170,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <button
       class={[
         'hover:preset-tonal gap-1',
-        fullscreen ? 'btn-icon' : 'btn justify-start',
+        fullscreen.value ? 'btn-icon' : 'btn justify-start',
       ]}
       title="Choose Yarn Colorways, Filtered by Brand and Yarn"
       onclick={() =>
@@ -198,7 +202,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         />
       </svg>
 
-      {#if !fullscreen}
+      {#if !fullscreen.value}
         Choose Colorways
       {/if}
     </button>
@@ -206,7 +210,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <button
       class={[
         'hover:preset-tonal gap-1',
-        fullscreen ? 'btn-icon' : 'btn justify-start',
+        fullscreen.value ? 'btn-icon' : 'btn justify-start',
       ]}
       title="Get Palette from Image"
       onclick={() =>
@@ -237,7 +241,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
         />
       </svg>
-      {#if !fullscreen}
+      {#if !fullscreen.value}
         Image Palette
       {/if}</button
     >
@@ -245,7 +249,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <button
       class={[
         'hover:preset-tonal gap-1',
-        fullscreen ? 'btn-icon' : 'btn justify-start',
+        fullscreen.value ? 'btn-icon' : 'btn justify-start',
       ]}
       title="Generate Random Colors"
       onclick={() =>
@@ -273,7 +277,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           d="M3 17h2.735a4 4 0 0 0 3.43-1.942l3.67-6.116A4 4 0 0 1 16.265 7H21m0 0l-2-2m2 2l-2 2M3 7h2.735a4 4 0 0 1 2.871 1.215M21 17h-4.735a4 4 0 0 1-2.871-1.215M21 17l-2 2m2-2l-2-2"
         /></svg
       >
-      {#if !fullscreen}
+      {#if !fullscreen.value}
         Random
       {/if}
     </button>
@@ -281,7 +285,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <button
       class={[
         'hover:preset-tonal gap-1',
-        fullscreen ? 'btn-icon' : 'btn justify-start',
+        fullscreen.value ? 'btn-icon' : 'btn justify-start',
       ]}
       title="Load Colors or Get a Palette Code to Share"
       onclick={() =>
@@ -311,7 +315,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         />
       </svg>
 
-      {#if !fullscreen}
+      {#if !fullscreen.value}
         Export/Import
       {/if}
     </button>
@@ -319,7 +323,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <button
       class={[
         'hover:preset-tonal gap-1',
-        fullscreen ? 'btn-icon' : 'btn justify-start',
+        fullscreen.value ? 'btn-icon' : 'btn justify-start',
       ]}
       title="Sort Colors"
       onclick={() =>
@@ -347,7 +351,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           d="M10 14H2m6-4H2m4-4H2m10 12H2m17 2V4m0 16l3-3m-3 3l-3-3m3-13l3 3m-3-3l-3 3"
         /></svg
       >
-      {#if !fullscreen}
+      {#if !fullscreen.value}
         Sort
       {/if}
     </button>
@@ -356,12 +360,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
       aria-label="Fullscreen"
       class={[
         'btn flex gap-1 justify-start items-center',
-        !fullscreen ? 'hover:preset-tonal' : 'preset-tonal',
+        !fullscreen.value ? 'hover:preset-tonal' : 'preset-tonal',
       ]}
-      onclick={() => (fullscreen = !fullscreen)}
+      onclick={() => (fullscreen.value = !fullscreen.value)}
       title="Toggle Fullscreen Editing Mode (f)"
     >
-      {#if !fullscreen}
+      {#if !fullscreen.value}
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
