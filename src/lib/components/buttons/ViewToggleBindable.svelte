@@ -18,7 +18,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let { value = $bindable() } = $props();
 </script>
 
-<Segment bind:value background="bg-surface-100-900" classes="shadow-sm">
+<Segment
+  {value}
+  onValueChange={(e) => {
+    value = e.value;
+  }}
+  background="bg-surface-100-900"
+  classes="shadow-sm"
+>
   <Segment.Item value="list">
     <div class="flex items-center justify-center gap-1">
       <svg

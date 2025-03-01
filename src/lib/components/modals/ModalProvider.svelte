@@ -6,7 +6,10 @@
 </script>
 
 <Modal
-  bind:open={modal.opened}
+  open={modal.opened}
+  onOpenChange={(e) => {
+    modal.opened = e.open;
+  }}
   triggerBase="hidden"
   contentBase="card bg-surface-50-950 space-y-4 shadow-xl max-h-[100svh] lg:max-h-[80svh] overflow-auto {modal
     .options.size === 'large'

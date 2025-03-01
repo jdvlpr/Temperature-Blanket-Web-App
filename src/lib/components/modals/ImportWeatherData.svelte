@@ -196,13 +196,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {#if !imported || errorMessages.length > 0}
       <FileUpload
         name="files"
-        class="mt-4"
-        bind:files={csvUpload}
-        slotLead="justify-center"
-        accept=".csv"
-        onchange={(event) => {
-          submitForm(event);
+        classes="mt-4 justify-center"
+        onFileChange={(e) => {
+          csvUpload = e.acceptedFiles;
+          submitForm(e);
         }}
+        accept=".csv"
       >
         {#snippet lead()}
           <svg

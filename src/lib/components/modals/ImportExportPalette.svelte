@@ -118,7 +118,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <Segment
       classes="flex wrap gap-y-2 w-fit mx-auto shadow-sm"
       background="bg-surface-200-800"
-      bind:value={segmentValue}
+      value={segmentValue}
+      onValueChange={(e) => {
+        segmentValue = e.value;
+      }}
     >
       <Segment.Item value={'export'}>Export</Segment.Item>
       <Segment.Item value={'import'}>Import</Segment.Item>

@@ -769,7 +769,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <Footer>
       {#snippet about()}
         <span>
-          <Accordion bind:value={accordionState} collapsible>
+          <Accordion value={accordionState} collapsible multiple>
             {#snippet iconOpen()}<svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"

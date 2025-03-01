@@ -20,7 +20,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <Segment
-  bind:value={project.units}
+  value={project.units}
+  onValueChange={(e) => {
+    project.units = e.value;
+  }}
   background="bg-surface-100-900"
   classes="shadow-sm"
 >

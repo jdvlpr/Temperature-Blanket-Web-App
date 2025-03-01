@@ -48,7 +48,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <div class="w-fit text-left">
   <Popover
-    bind:open={openState}
+    open={openState}
+    onOpenChange={(e) => {
+      openState = e.open;
+    }}
     triggerBase="btn-icon hover:preset-tonal"
     contentBase="card bg-surface-200-800 p-4 space-y-4 max-w-[90vw]"
     arrow

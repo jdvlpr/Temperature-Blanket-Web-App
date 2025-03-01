@@ -70,7 +70,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     bind:this={filtersContainer}
   >
     <Segment
-      bind:value={category}
+      value={category}
+      onValueChange={(e) => {
+        category = e.value;
+      }}
       background="bg-surface-100 dark:bg-surface-950"
       classes="shadow-sm"
     >

@@ -16,7 +16,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script>
   import { Segment } from '@skeletonlabs/skeleton-svelte';
 
-  let { direction = $bindable(), onchange } = $props();
+  let { direction, onchange } = $props();
 </script>
 
 <p class="flex justify-start items-start gap-1">
@@ -36,7 +36,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </p>
 
 <Segment
-  bind:value={direction}
+  value={direction}
   classes="flex-wrap gap-y-2 justify-start items-start"
   background="bg-surface-100-900"
   onValueChange={onchange}

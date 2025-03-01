@@ -137,7 +137,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
     <div class="sm:hidden">
       <Modal
-        bind:open={openTableOfContents}
+        open={openTableOfContents}
+        onOpenChange={(e) => {
+          openTableOfContents = e.open;
+        }}
         triggerBase="hover:preset-tonal"
         contentBase="bg-surface-50-950 p-4 space-y-4 shadow-xl w-fit h-screen overflow-auto"
         positionerJustify="justify-end"

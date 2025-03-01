@@ -19,7 +19,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <Segment
-  bind:value={preferences.value.layout}
+  value={preferences.value.layout}
+  onValueChange={(e) => {
+    preferences.value.layout = e.value;
+  }}
   background="bg-surface-100-900"
   classes="shadow-sm"
 >

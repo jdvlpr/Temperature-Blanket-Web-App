@@ -216,7 +216,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <div class="rounded-container gap-2 flex flex-col w-full">
         <div class="flex flex-col justify-start items-start gap-1">
           <ChooseRangeDirection
-            bind:direction={_gauge.rangeOptions.direction}
+            direction={_gauge.rangeOptions.direction}
             onchange={(e) => {
               _gauge.rangeOptions.direction = e.value;
 
@@ -272,7 +272,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <Segment
               classes="flex-wrap gap-y-2 shadow-sm"
               background="bg-surface-100-900"
-              bind:value={incrementMode}
+              value={incrementMode}
+              onValueChange={(e) => {
+                incrementMode = e.value;
+              }}
             >
               <Segment.Item value="auto">Automatic</Segment.Item>
               <Segment.Item value="manual">Manual</Segment.Item>

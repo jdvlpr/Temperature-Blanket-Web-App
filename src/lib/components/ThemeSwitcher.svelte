@@ -94,7 +94,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <div class="w-fit text-left">
   <Popover
-    bind:open={openState}
+    open={openState}
+    onOpenChange={(e) => {
+      openState = e.open;
+    }}
     triggerBase="btn hover:preset-tonal"
     contentBase="card bg-surface-200-800 p-4 space-y-4 shadow-xl"
     positionerClasses="z-9999!"
@@ -118,7 +121,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {#snippet content()}
       <div class="flex flex-col gap-2">
         <Segment
-          bind:value={preferences.value.theme.mode}
+          value={preferences.value.theme.mode}
+          onValueChange={(e) => {
+            preferences.value.theme.mode = e.value;
+          }}
           classes="flex wrap gap-y-2 shadow-sm"
           background="bg-surface-100-900"
         >

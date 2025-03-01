@@ -156,7 +156,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
         >
           <div class="flex flex-wrap items-center justify-center gap-2">
             <Segment
-              bind:value={weatherState.hour}
+              value={weatherState.hour}
+              onValueChange={(e) => {
+                weatherState.hour = e.value;
+              }}
               classes="flex-wrap gap-y-2"
               background="bg-surface-100-900 shadow-sm"
             >

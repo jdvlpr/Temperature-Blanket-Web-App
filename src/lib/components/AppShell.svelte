@@ -72,7 +72,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     >
       <div class="lg:hidden">
         <Modal
-          bind:open={modal.drawer.leftNavigation}
+          onOpenChange={(e) => {
+            console.log({ e });
+            modal.drawer.leftNavigation = e.open;
+          }}
+          open={modal.drawer.leftNavigation}
           triggerBase="{pageName ? 'btn' : 'btn-icon'} hover:preset-tonal my-2"
           contentBase="bg-surface-50-950 p-4 space-y-4 shadow-xl w-fit h-screen overflow-auto"
           positionerJustify="justify-start"
@@ -184,7 +188,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <style>
   .gradient-background {
     background-size: cover;
-    background-image: radial-gradient(
+    background-image:
+      radial-gradient(
         at 0% 95%,
         color-mix(in oklab, var(--color-tertiary-500) 10%, transparent) 0px,
         transparent 50%

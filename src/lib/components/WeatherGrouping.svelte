@@ -21,7 +21,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <div class="flex flex-col items-start">
   <div class="flex gap-1 items-center">
     <Segment
-      bind:value={weather.grouping}
+      value={weather.grouping}
+      onValueChange={(e) => {
+        weather.grouping = e.value;
+      }}
       background="bg-surface-100-900"
       classes="shadow-sm"
     >

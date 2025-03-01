@@ -101,7 +101,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
       class="max-w-(--breakpoint-xl) m-auto px-2 gap-4 flex flex-col items-center mb-4"
     >
       <Segment
-        bind:value={selectedTag}
+        value={selectedTag}
+        onValueChange={(e) => {
+          selectedTag = e.value;
+        }}
         classes="mt-4"
         background="bg-surface-100-900 shadow-sm"
       >

@@ -164,7 +164,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/snippet}
   {#snippet main()}
     <div class="transition-opacity opacity-100">
-      <main class="max-w-(--breakpoint-xl) m-auto flex flex-col justify-start gap-2">
+      <main
+        class="max-w-(--breakpoint-xl) m-auto flex flex-col justify-start gap-2"
+      >
         <a
           href="/gallery"
           class="flex items-center btn hover:preset-tonal gap-1 w-fit mx-2 lg:mx-0 mt-2 lg:mt-0"
@@ -217,7 +219,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <div
                 class="text-left max-w-(--breakpoint-sm) mx-auto w-full preset-tonal-tertiary rounded-container mt-2"
               >
-                <Accordion bind:value={aboutState} collapsible>
+                <Accordion value={aboutState} collapsible>
                   <Accordion.Item disabled={!project} value="about">
                     {#snippet lead()}
                       <svg
