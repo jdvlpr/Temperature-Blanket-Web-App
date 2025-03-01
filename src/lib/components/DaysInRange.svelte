@@ -22,7 +22,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     GaugeSettingsType,
   } from '$lib/types';
   import { getDaysInRange, getDaysPercent, pluralize } from '$lib/utils';
-  let isModal = modal.opened;
+
+  let isModal = $derived(modal.opened);
 
   type Props = {
     range: GaugeRange;
