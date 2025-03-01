@@ -38,6 +38,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
       previews.activeId = 'rows';
     }
   });
+
+  $inspect(project.url.hash);
 </script>
 
 {#if previews.active && weather.data.length}
