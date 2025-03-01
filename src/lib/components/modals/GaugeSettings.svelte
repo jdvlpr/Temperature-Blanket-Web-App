@@ -781,7 +781,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {#if showScrollToTopButton}
     <button
       transition:fade
-      class="btn px-4 bottom-[4rem] fixed -translate-x-1/2 left-1/2 w-fit py-2 m-2 z-20 shadow-sm preset-filled-surface-500 lg:hidden transition-all inline-flex justify-center items-center gap-1 right-0"
+      class="btn px-4 bottom-[4rem] absolute -translate-x-1/2 left-1/2 w-fit py-2 m-2 z-20 shadow-sm preset-filled-surface-500 lg:hidden transition-all inline-flex justify-center items-center gap-1 right-0"
       onclick={() =>
         setupContainer.scrollIntoView({
           behavior: 'smooth',
