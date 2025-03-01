@@ -29,17 +29,23 @@ If not, see <https://www.gnu.org/licenses/>. -->
     weather,
   } from '$lib/state';
   import { downloadPreviewPNG } from '$lib/utils';
-  import { onMount } from 'svelte';
+  import { onMount, tick } from 'svelte';
   import { Drawer } from 'vaul-svelte';
   import { weatherDataUpdatedKey } from './WeatherTableView.svelte';
 
+  let refreshKey = $state(Date.now());
   onMount(() => {
     if (!previews.activeId) {
       previews.activeId = 'rows';
     }
   });
 
-  $inspect(project.url.hash);
+  $effect(() => {
+    project.url.hash, weather.data, weatherDataUpdatedKey.value;
+    tick().then(() => {
+      refreshKey = Date.now();
+    });
+  });
 </script>
 
 {#if previews.active && weather.data.length}
@@ -47,7 +53,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   <div class="flex flex-col gap-2 justify-center items-start">
     {#if gauges.activeGauge?.colors}
-      {#key [project.url.hash, weather.data, weatherDataUpdatedKey.value]}
+      {#key refreshKey}
         <div class="flex w-full flex-col gap-4 justify-center items-center">
           <previews.active.previewComponent />
 
