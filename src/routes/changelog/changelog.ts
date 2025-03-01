@@ -27,7 +27,7 @@ export const entries: ChangelogItem[] = [
         title: 'Added Yarn: Ice Yarns - Classic DK',
       },
     ],
-    version: '4.21.0',
+    version: '4.22.0',
   },
   {
     date: 'February, 2025',
