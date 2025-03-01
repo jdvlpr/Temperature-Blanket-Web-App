@@ -780,7 +780,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {#if showScrollToTopButton}
     <button
       transition:fade
-      class="btn px-4 bottom-[7rem] sm:bottom-[5rem] fixed -translate-x-1/2 left-1/2 w-fit py-2 m-2 z-20 shadow-sm preset-filled-surface-500 lg:hidden transition-all inline-flex justify-center items-center gap-1 right-0"
+      class="btn px-4 bottom-[4rem] fixed -translate-x-1/2 left-1/2 w-fit py-2 m-2 z-20 shadow-sm preset-filled-surface-500 lg:hidden transition-all inline-flex justify-center items-center gap-1 right-0"
       onclick={() =>
         setupContainer.scrollIntoView({
           behavior: 'smooth',
@@ -822,7 +822,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/if}
 </div>
 <StickyPart position="bottom">
-  <div class="p-2">
+  <div class="pt-2 pb-2 max-sm:pb-4">
     <SaveAndCloseButtons onSave={_onSave} onClose={modal.close} />
   </div>
 </StickyPart>

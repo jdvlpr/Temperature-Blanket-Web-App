@@ -58,7 +58,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <button
         type="button"
         disabled={!daysInRange?.length}
-        class="btn hover:preset-tonal m-2"
+        class="btn hover:preset-tonal h-auto"
         onclick={() =>
           modal.trigger({
             type: 'component',

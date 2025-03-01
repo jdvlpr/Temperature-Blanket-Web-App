@@ -348,7 +348,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       if (onchanged) onchanged();
                     }
                   }}
-                  class="btn hover:preset-tonal flex items-center"
+                  class="btn hover:preset-tonal h-auto"
                 >
                   <span class="text-xs">{index + 1}</span>
                   <svg
@@ -368,7 +368,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               {/if}
               {#if canUserEditColor}
                 <button
-                  class="btn hover:preset-tonal flex items-center justify-start"
+                  class="btn hover:preset-tonal h-auto"
                   onclick={() =>
                     modal.trigger({
                       type: 'component',
@@ -458,7 +458,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               {/if}
               {#if typeof color.locked !== 'undefined'}
                 <button
-                  class="btn btn-icon"
+                  class="btn-icon hover:preset-tonal"
                   onclick={(e) => {
                     e.preventDefault();
                     colors[index].locked = !colors[index].locked;

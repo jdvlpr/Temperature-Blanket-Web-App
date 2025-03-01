@@ -233,7 +233,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </button>
 
       <button
-        class="btn hover:preset-tonal flex items-center justify-start p-2"
+        class="btn hover:preset-tonal h-auto"
         title="Choose a Color"
         onclick={() =>
           modal.trigger({
@@ -290,7 +290,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
       {#if affiliate_variant_href}
         <a
-          class="btn hover:preset-tonal flex flex-wrap justify-center items-center"
+          class="btn hover:preset-tonal"
           href={affiliate_variant_href}
           target="_blank"
           rel="noreferrer nofollow"
@@ -322,7 +322,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
         {#if showDaysInRange.value}
           <div
-            class="flex flex-wrap w-fit justify-center items-center bg-surface-900/10 rounded-container shadow-inner"
+            class="flex flex-wrap w-fit justify-center items-center bg-surface-900/10 rounded-container shadow-inner overflow-hidden"
           >
             <DaysInRange
               range={gauge.ranges[index]}
