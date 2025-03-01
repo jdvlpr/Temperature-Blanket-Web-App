@@ -388,310 +388,290 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   {#snippet main()}
     <main class="max-w-(--breakpoint-xl) m-auto text-center mb-8" in:fade>
-      <div class="xl:mb-4 xl:mt-2">
-        <Card>
-          {#snippet content()}
-            <div class=" xl:pb-4">
-              <Location />
-            </div>
-          {/snippet}
-        </Card>
+      <div class="max-lg:px-2">
+        <Location />
       </div>
 
       {#if weatherData && !project.status.loading}
-        <Card>
-          {#snippet content()}
-            <div
-              class="xl:pt-2 pb-4 max-w-full"
-              id="weather-data"
-              bind:this={weatherState.weatherDataElement}
-            >
-              {#key project.status.loading || weatherState.activeLocationID}
-                <div class:opacity-50={project.status.loading} in:fade>
-                  <div
-                    class="mb-4 flex flex-col gap-2 items-center p-2 w-fit mx-auto"
-                  >
-                    <div
-                      class="flex flex-col justify-center items-center gap-2"
-                    >
-                      {#if !weatherState.weatherLocations.find((item) => item.id === weatherState.activeLocationID)?.saved}
-                        <button
-                          in:fade
-                          class="btn hover:preset-tonal"
-                          title="Add to Locations"
-                          onclick={async () => {
-                            weatherState.weatherLocations.map((item) => {
-                              if (item.id === weatherState.activeLocationID)
-                                item.saved = true;
-                              return item;
-                            });
-                            weatherState.weatherLocations =
-                              weatherState.weatherLocations;
-                            page.url.searchParams.set(
-                              'id',
-                              weatherState.activeLocationID,
-                            );
-                            page.url.searchParams.set(
-                              'h',
-                              weatherState.hour === '12' ? '0' : '1',
-                            );
-                            page.url.searchParams.set(
-                              'u',
-                              project.units === 'metric' ? 'm' : 'i',
-                            );
-                            // window.history.replaceState(
-                            //     { path: page.url.href },
-                            //     "",
-                            //     page.url.href,
-                            // );
-                          }}
-                          ><svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke-width="1.5"
-                            stroke="currentColor"
-                            class="w-6 h-6"
-                          >
-                            <path
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                              d="M12 4.5v15m7.5-7.5h-15"
-                            />
-                          </svg>
-                          Add
-                        </button>
-                      {:else if weatherState.weatherLocations.filter((item) => item?.saved)?.length}
-                        <button
-                          in:fade
-                          class="btn hover:preset-tonal"
-                          onclick={() =>
-                            modal.trigger({
-                              type: 'component',
-                              component: {
-                                ref: Menu,
-                                props: {
-                                  page: 'locations',
-                                },
-                              },
-                            })}
-                          ><svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke-width="1.5"
-                            stroke="currentColor"
-                            class="w-6 h-6"
-                          >
-                            <path
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                              d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zM3.75 12h.007v.008H3.75V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm-.375 5.25h.007v.008H3.75v-.008zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
-                            />
-                          </svg>
-                          Locations</button
-                        >
-                      {/if}
-                    </div>
-                    <p class="font-bold md:text-xl">
-                      {@html weatherState.weatherLocations.find(
-                        (item) => item.id === weatherState.activeLocationID,
-                      ).result}
-                    </p>
-
-                    <p>
-                      {currentTime}
-                    </p>
-                    <div class="flex gap-0 justify-center items-center">
-                      {@html getWeatherCodeDetails({
-                        weathercode: weatherData.current_weather.weathercode,
-                        is_day: weatherData.current_weather.is_day,
-                        precipitation_probability: hourlyData?.find(
-                          (item) => item.isNow === true,
-                        )?.precipitation_probability,
-                      }).description}
-                      {@html getWeatherCodeDetails({
-                        weathercode: weatherData.current_weather.weathercode,
-                        is_day: weatherData.current_weather.is_day,
-                        precipitation_probability: hourlyData?.find(
-                          (item) => item.isNow === true,
-                        )?.precipitation_probability,
-                      }).icon}
-                    </div>
-                    <p
-                      class="text-8xl flex items-start justify-center font-bold"
-                    >
-                      {weatherData.current_weather.temperature}°
-                    </p>
-                    <p class="text-xl">
-                      Feels Like {hourlyData?.find(
-                        (item) => item.isNow === true,
-                      )?.apparent_temperature}°
-                    </p>
-                    <div class="flex justify-center gap-2 text-xl">
-                      <p class="">
-                        <span class="" style="color: rgb(248, 113, 113);"
-                          >↑</span
-                        >
-                        {dailyWeatherData[0].temperature_2m_max}°
-                      </p>
-                      <p class="">
-                        <span class=" " style="color: rgb(56, 189, 248);"
-                          >↓</span
-                        >
-                        {dailyWeatherData[0].temperature_2m_min}°
-                      </p>
-                    </div>
-                  </div>
-                  <div
-                    class="p-2 rounded-container bg-surface-100-900 my-4 inline-grid"
-                  >
-                    <p class="text-sm flex gap-1 items-center justify-center">
-                      <svg
+        <div
+          class="pb-4 max-w-full max-lg:px-2"
+          id="weather-data"
+          bind:this={weatherState.weatherDataElement}
+        >
+          {#key project.status.loading || weatherState.activeLocationID}
+            <div class:opacity-50={project.status.loading} in:fade>
+              <div
+                class="mb-4 flex flex-col gap-2 items-center p-2 w-fit mx-auto"
+              >
+                <div class="flex flex-col justify-center items-center gap-2">
+                  {#if !weatherState.weatherLocations.find((item) => item.id === weatherState.activeLocationID)?.saved}
+                    <button
+                      in:fade
+                      class="btn hover:preset-tonal"
+                      title="Add to Locations"
+                      onclick={async () => {
+                        weatherState.weatherLocations.map((item) => {
+                          if (item.id === weatherState.activeLocationID)
+                            item.saved = true;
+                          return item;
+                        });
+                        weatherState.weatherLocations =
+                          weatherState.weatherLocations;
+                        page.url.searchParams.set(
+                          'id',
+                          weatherState.activeLocationID,
+                        );
+                        page.url.searchParams.set(
+                          'h',
+                          weatherState.hour === '12' ? '0' : '1',
+                        );
+                        page.url.searchParams.set(
+                          'u',
+                          project.units === 'metric' ? 'm' : 'i',
+                        );
+                        // window.history.replaceState(
+                        //     { path: page.url.href },
+                        //     "",
+                        //     page.url.href,
+                        // );
+                      }}
+                      ><svg
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke-width="1.5"
                         stroke="currentColor"
-                        class="w-5 h-5"
+                        class="w-6 h-6"
                       >
                         <path
                           stroke-linecap="round"
                           stroke-linejoin="round"
-                          d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"
+                          d="M12 4.5v15m7.5-7.5h-15"
                         />
                       </svg>
-                      Hourly Forcast
-                    </p>
-
-                    {#if showChart}
-                      {#key weatherState.hour}
-                        <div class="max-w-[90vw]">
-                          <Chart data={hourlyForcastData} />
-                        </div>
-                      {/key}
-                    {:else}
-                      <div class="my-28">
-                        <Spinner />
-                      </div>
-                    {/if}
-                    <div
-                      class="relative w-full flex items-start gap-4 md:gap-8 snap-x snap-mandatory overflow-x-auto mx-auto pb-4 mt-4"
-                    >
-                      {#each hourlyForcastData as { isNow, time, apparent_temperature, cloudcover, is_day, temperature_2m, precipitation_probability, weathercode }}
-                        {@const details = getWeatherCodeDetails({
-                          weathercode,
-                          is_day,
-                          precipitation_probability,
-                        })}
-                        <div
-                          class="snap-start shrink-0 flex flex-col justify-between min-h-[100px] gap-1 items-center"
-                        >
-                          <p class="text-sm">
-                            {isNow
-                              ? 'Now'
-                              : new Date(time).toLocaleTimeString(
-                                  navigator.language,
-                                  {
-                                    timeStyle: 'short',
-                                    hour12:
-                                      weatherState.hour === '12' ? true : false,
-                                  },
-                                )}
-                          </p>
-                          <p class="text-sm max-w-[100px]">
-                            {details.description}
-                          </p>
-                          <div
-                            class="flex flex-col items-center justify-between"
-                            title={details.description}
-                          >
-                            {@html details.icon}
-                          </div>
-                          <p>
-                            <span class="text-xl">{temperature_2m}°</span>
-                          </p>
-                        </div>
-                      {/each}
-                    </div>
-                  </div>
-                  <div class="mt-4">
-                    <p class="text-sm flex gap-1 justify-center items-center">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke-width="1.5"
-                        stroke="currentColor"
-                        class="w-5 h-5"
-                      >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5m-9-6h.008v.008H12v-.008zM12 15h.008v.008H12V15zm0 2.25h.008v.008H12v-.008zM9.75 15h.008v.008H9.75V15zm0 2.25h.008v.008H9.75v-.008zM7.5 15h.008v.008H7.5V15zm0 2.25h.008v.008H7.5v-.008zm6.75-4.5h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V15zm0 2.25h.008v.008h-.008v-.008zm2.25-4.5h.008v.008H16.5v-.008zm0 2.25h.008v.008H16.5V15z"
-                        />
-                      </svg>
-                      Daily Forcast
-                    </p>
-                    <div
-                      class="relative w-full flex flex-col justify-center gap-1 items-start mx-auto mt-4"
-                    >
-                      {#each dailyWeatherData as { time, temperature_2m_max, temperature_2m_min, precipitation_probability_max, weathercode }, index}
-                        {@const date = new Date(time).toLocaleString(
-                          window.navigator.language,
-                          {
-                            weekday: 'short',
+                      Add
+                    </button>
+                  {:else if weatherState.weatherLocations.filter((item) => item?.saved)?.length}
+                    <button
+                      in:fade
+                      class="btn hover:preset-tonal"
+                      onclick={() =>
+                        modal.trigger({
+                          type: 'component',
+                          component: {
+                            ref: Menu,
+                            props: {
+                              page: 'locations',
+                            },
                           },
-                        )}
-                        {@const details = getWeatherCodeDetails({
-                          weathercode,
-                          precipitation_probability:
-                            precipitation_probability_max,
                         })}
-                        <div
-                          class="grid grid-cols-3 flex-1 gap-2 items-center rounded-container p-2 bg-surface-100-900 w-full mx-auto"
-                        >
-                          <p class="">
-                            {index === 0 ? 'Today' : date}
-                          </p>
-                          <div
-                            class="flex gap-1 flex-wrap items-center justify-start"
-                          >
-                            <p class="text-left hidden sm:inline-block">
-                              {details.description}
-                            </p>
-                            <div
-                              class="flex items-center gap-1 justify-between"
-                              title={details.description}
-                            >
-                              {@html details.icon}
-                            </div>
-                          </div>
-                          <div
-                            class="flex flex-wrap items-center justify-start gap-2 text-xl"
-                          >
-                            <p class="">
-                              <span class="" style="color: rgb(248, 113, 113);"
-                                >↑</span
-                              >
-                              {temperature_2m_max}°
-                            </p>
-                            <p class="">
-                              <span class=" " style="color: rgb(56, 189, 248);"
-                                >↓</span
-                              >
-                              {temperature_2m_min}°
-                            </p>
-                          </div>
-                        </div>
-                      {/each}
-                    </div>
-                  </div>
+                      ><svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke-width="1.5"
+                        stroke="currentColor"
+                        class="w-6 h-6"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zM3.75 12h.007v.008H3.75V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm-.375 5.25h.007v.008H3.75v-.008zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
+                        />
+                      </svg>
+                      Locations</button
+                    >
+                  {/if}
                 </div>
-              {/key}
+                <p class="font-bold md:text-xl">
+                  {@html weatherState.weatherLocations.find(
+                    (item) => item.id === weatherState.activeLocationID,
+                  ).result}
+                </p>
+
+                <p>
+                  {currentTime}
+                </p>
+                <div class="flex gap-0 justify-center items-center">
+                  {@html getWeatherCodeDetails({
+                    weathercode: weatherData.current_weather.weathercode,
+                    is_day: weatherData.current_weather.is_day,
+                    precipitation_probability: hourlyData?.find(
+                      (item) => item.isNow === true,
+                    )?.precipitation_probability,
+                  }).description}
+                  {@html getWeatherCodeDetails({
+                    weathercode: weatherData.current_weather.weathercode,
+                    is_day: weatherData.current_weather.is_day,
+                    precipitation_probability: hourlyData?.find(
+                      (item) => item.isNow === true,
+                    )?.precipitation_probability,
+                  }).icon}
+                </div>
+                <p class="text-8xl flex items-start justify-center font-bold">
+                  {weatherData.current_weather.temperature}°
+                </p>
+                <p class="text-xl">
+                  Feels Like {hourlyData?.find((item) => item.isNow === true)
+                    ?.apparent_temperature}°
+                </p>
+                <div class="flex justify-center gap-2 text-xl">
+                  <p class="">
+                    <span class="" style="color: rgb(248, 113, 113);">↑</span>
+                    {dailyWeatherData[0].temperature_2m_max}°
+                  </p>
+                  <p class="">
+                    <span class=" " style="color: rgb(56, 189, 248);">↓</span>
+                    {dailyWeatherData[0].temperature_2m_min}°
+                  </p>
+                </div>
+              </div>
+              <div
+                class="p-2 rounded-container bg-surface-50-950 shadow my-4 inline-grid"
+              >
+                <p class="text-sm flex gap-1 items-center justify-center">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="currentColor"
+                    class="w-5 h-5"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                  Hourly Forcast
+                </p>
+
+                {#if showChart}
+                  {#key weatherState.hour}
+                    <div class="max-w-[90vw]">
+                      <Chart data={hourlyForcastData} />
+                    </div>
+                  {/key}
+                {:else}
+                  <div class="my-28">
+                    <Spinner />
+                  </div>
+                {/if}
+                <div
+                  class="relative w-full flex items-start gap-4 md:gap-8 snap-x snap-mandatory overflow-x-auto mx-auto pb-4 mt-4"
+                >
+                  {#each hourlyForcastData as { isNow, time, apparent_temperature, cloudcover, is_day, temperature_2m, precipitation_probability, weathercode }}
+                    {@const details = getWeatherCodeDetails({
+                      weathercode,
+                      is_day,
+                      precipitation_probability,
+                    })}
+                    <div
+                      class="snap-start shrink-0 flex flex-col justify-between min-h-[100px] gap-1 items-center"
+                    >
+                      <p class="text-sm">
+                        {isNow
+                          ? 'Now'
+                          : new Date(time).toLocaleTimeString(
+                              navigator.language,
+                              {
+                                timeStyle: 'short',
+                                hour12:
+                                  weatherState.hour === '12' ? true : false,
+                              },
+                            )}
+                      </p>
+                      <p class="text-sm max-w-[100px]">
+                        {details.description}
+                      </p>
+                      <div
+                        class="flex flex-col items-center justify-between"
+                        title={details.description}
+                      >
+                        {@html details.icon}
+                      </div>
+                      <p>
+                        <span class="text-xl">{temperature_2m}°</span>
+                      </p>
+                    </div>
+                  {/each}
+                </div>
+              </div>
+              <div class="mt-4">
+                <p class="text-sm flex gap-1 justify-center items-center">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="currentColor"
+                    class="w-5 h-5"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5m-9-6h.008v.008H12v-.008zM12 15h.008v.008H12V15zm0 2.25h.008v.008H12v-.008zM9.75 15h.008v.008H9.75V15zm0 2.25h.008v.008H9.75v-.008zM7.5 15h.008v.008H7.5V15zm0 2.25h.008v.008H7.5v-.008zm6.75-4.5h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V15zm0 2.25h.008v.008h-.008v-.008zm2.25-4.5h.008v.008H16.5v-.008zm0 2.25h.008v.008H16.5V15z"
+                    />
+                  </svg>
+                  Daily Forcast
+                </p>
+                <div
+                  class="relative w-full flex flex-col justify-center gap-2 items-start mx-auto mt-4"
+                >
+                  {#each dailyWeatherData as { time, temperature_2m_max, temperature_2m_min, precipitation_probability_max, weathercode }, index}
+                    {@const date = new Date(time).toLocaleString(
+                      window.navigator.language,
+                      {
+                        weekday: 'short',
+                      },
+                    )}
+                    {@const details = getWeatherCodeDetails({
+                      weathercode,
+                      precipitation_probability: precipitation_probability_max,
+                    })}
+                    <div
+                      class="grid grid-cols-3 flex-1 gap-2 items-center rounded-container p-2 bg-surface-50-950 shadow w-full mx-auto"
+                    >
+                      <p class="">
+                        {index === 0 ? 'Today' : date}
+                      </p>
+                      <div
+                        class="flex gap-1 flex-wrap items-center justify-start"
+                      >
+                        <p class="text-left hidden sm:inline-block">
+                          {details.description}
+                        </p>
+                        <div
+                          class="flex items-center gap-1 justify-between"
+                          title={details.description}
+                        >
+                          {@html details.icon}
+                        </div>
+                      </div>
+                      <div
+                        class="flex flex-wrap items-center justify-start gap-2 text-xl"
+                      >
+                        <p class="">
+                          <span class="" style="color: rgb(248, 113, 113);"
+                            >↑</span
+                          >
+                          {temperature_2m_max}°
+                        </p>
+                        <p class="">
+                          <span class=" " style="color: rgb(56, 189, 248);"
+                            >↓</span
+                          >
+                          {temperature_2m_min}°
+                        </p>
+                      </div>
+                    </div>
+                  {/each}
+                </div>
+              </div>
             </div>
-          {/snippet}
-        </Card>
+          {/key}
+        </div>
       {/if}
     </main>
   {/snippet}
