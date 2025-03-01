@@ -43,6 +43,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   $effect(() => {
     project.url.hash, weather.data, weatherDataUpdatedKey.value;
     tick().then(() => {
+      // Update after variables have a chance to update.
+      // Without the tick, sometimes it would not update the preview
       refreshKey = Date.now();
     });
   });

@@ -31,7 +31,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     getTextColor,
   } from '$lib/utils';
   import { Segment } from '@skeletonlabs/skeleton-svelte';
-  import { onMount } from 'svelte';
+  import { onMount, tick } from 'svelte';
   import { fade, slide } from 'svelte/transition';
 
   interface Props {
@@ -159,17 +159,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     if (mustUpdateCustomRanges) customRanges = ranges;
   }
 
-  let debounceTimer;
-  const debounce = (callback, time) => {
-    window.clearTimeout(debounceTimer);
-    debounceTimer = window.setTimeout(callback, time);
-  };
-
   $effect(() => {
     incrementMode;
-    debounce(() => {
+    tick().then(() => {
       onChangeIncrementMode();
-    }, 10);
+    });
   });
 
   onMount(() => {
