@@ -23,6 +23,16 @@ export const entries: ChangelogItem[] = [
     notes: [
       {
         icon: ICONS.checkCircle,
+        text: `Added 27 colorways`,
+        title: 'Added Yarn: Knit Picks - Heatherly Sport',
+      },
+    ],
+    version: '4.23.0',
+  },
+  {
+    notes: [
+      {
+        icon: ICONS.checkCircle,
         text: `Added 84 colorways`,
         title: 'Added Yarn: Ice Yarns - Classic DK',
       },
