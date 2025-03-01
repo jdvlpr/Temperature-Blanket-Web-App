@@ -821,7 +821,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </svg>
     </button>
   {/if}
-  <div class="p-2">
+  <div class="pb-2 pt-2 max-sm:p-4">
     <SaveAndCloseButtons onSave={_onSave} onClose={modal.close} />
   </div>
 </StickyPart>
