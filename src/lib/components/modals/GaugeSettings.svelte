@@ -776,7 +776,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </div>
     </div>
   </div>
-
+</div>
+<StickyPart position="bottom">
   {#if showScrollToTopButton}
     <button
       transition:fade
@@ -820,9 +821,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </svg>
     </button>
   {/if}
-</div>
-<StickyPart position="bottom">
-  <div class="pt-2 pb-2 max-sm:pb-4">
+  <div class="p-2">
     <SaveAndCloseButtons onSave={_onSave} onClose={modal.close} />
   </div>
 </StickyPart>
