@@ -11,7 +11,7 @@
     modal.opened = e.open;
   }}
   triggerBase="hidden"
-  contentBase="card bg-surface-50-950 space-y-4 shadow-xl max-h-[100svh] lg:max-h-[80svh] overflow-auto {modal
+  contentBase="card bg-surface-50-950 space-y-4 shadow-xl max-h-[100svh] lg:max-h-[80svh] overflow-auto max-sm:min-w-[100vw] {modal
     .options.size === 'large'
     ? 'max-w-(--breakpoint-lg)'
     : modal.options.size === 'medium'

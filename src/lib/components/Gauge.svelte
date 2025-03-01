@@ -26,7 +26,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { drawerState, modal, pageSections, pinAllSections } from '$lib/state';
   import type { Color, GaugeSettingsType } from '$lib/types';
   import { createGaugeColors } from '$lib/utils';
-  import CloseButton from './modals/CloseButton.svelte';
   let { gauge = $bindable() } = $props();
 
   function updateGauge({
@@ -258,6 +257,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
               numberOfColors: gauge.numberOfColors,
               updateGauge,
             },
+          },
+          options: {
+            size: 'medium',
           },
         })}
     >
