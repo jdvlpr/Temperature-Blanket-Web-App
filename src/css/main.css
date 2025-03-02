@@ -120,10 +120,6 @@ th div {
   justify-content: center !important;
 }
 
-#preview-svg-image {
-  @apply shadow-sm;
-}
-
 #preview-svg-image > * {
   cursor: pointer;
 }
