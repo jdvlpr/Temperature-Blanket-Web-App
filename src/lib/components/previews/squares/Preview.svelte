@@ -15,6 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import Spinner from '$lib/components/Spinner.svelte';
+  import { PREVIEW_UPDATE_DEBOUNCE_MS } from '$lib/constants';
   import { gauges, project, weather } from '$lib/state';
   import type { Color, WeatherDay, WeatherParam } from '$lib/types';
   import {
@@ -150,7 +151,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       width = squaresPreview.width;
       height = squaresPreview.height;
       squaresPreview.sections = sections;
-    }, 50);
+    }, PREVIEW_UPDATE_DEBOUNCE_MS);
   });
 </script>
 

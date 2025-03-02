@@ -16,6 +16,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script>
   import { calendarPreview } from '$lib/components/previews/calendar/state.svelte';
   import Spinner from '$lib/components/Spinner.svelte';
+  import { PREVIEW_UPDATE_DEBOUNCE_MS } from '$lib/constants';
   import { gauges, project, weather } from '$lib/state';
   import { getColorInfo, showPreviewImageWeatherDetails } from '$lib/utils';
 
@@ -155,7 +156,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       width = calendarPreview.width;
       height = calendarPreview.height;
       calendarPreview.sections = sections;
-    }, 50);
+    }, PREVIEW_UPDATE_DEBOUNCE_MS);
   });
 </script>
 
