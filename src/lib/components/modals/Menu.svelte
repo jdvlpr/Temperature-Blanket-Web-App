@@ -13,6 +13,14 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
+<script module>
+  let pages = $state({
+    download: false,
+    main: false,
+    save: false,
+  });
+</script>
+
 <script lang="ts">
   import { browser } from '$app/environment';
   import { replaceState } from '$app/navigation';
@@ -41,7 +49,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     pluralize,
     setLocalStorageProject,
   } from '$lib/utils';
-  import { onMount } from 'svelte';
+  import { onMount, tick } from 'svelte';
   import WeatherGrouping from '../WeatherGrouping.svelte';
 
   interface Props {
@@ -53,24 +61,27 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let copiedMessage = $state('');
 
-  let pages = $state({
-    download: false,
-    main: false,
-    save: false,
-  });
-
   let currentSavedProject = $state(null);
   let weatherSettingsElement: HTMLElement | null = $state(null);
 
-  function goTo(page) {
-    pages.download = false;
-    pages.main = false;
-    pages.save = false;
-    pages[page] = true;
+  async function goTo(page) {
+    let _pages = $state.snapshot(pages);
+    for (const key in pages) {
+      _pages[key] = page === key;
+    }
+
+    await delay(100); // on mobile it wasn't working without a delay...
+
+    pages = _pages;
+
     if (page === 'save') saveProject({ copy: false });
   }
 
+  $inspect(pages);
+
   onMount(async () => {
+    if (page) goTo(page);
+
     if (highlight === 'weather-settings') {
       await delay(200);
       weatherSettingsElement?.scrollIntoView({
@@ -80,13 +91,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     }
   });
 
-  $effect(() => {
-    if (page) goTo(page);
-  });
-
   function saveProject({ copy = true }) {
     // Copy window url to clipboard
-
     if (copy) {
       try {
         window.navigator.clipboard.writeText(project.url.href);
