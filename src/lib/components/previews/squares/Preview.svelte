@@ -150,7 +150,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       width = squaresPreview.width;
       height = squaresPreview.height;
       squaresPreview.sections = sections;
-    }, 10);
+    }, 50);
   });
 </script>
 
