@@ -34,6 +34,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     getIsRecentDate,
     getTextColor,
     getColorInfo,
+    getIsFutureDate,
     convertTime,
   } from '$lib/utils';
   import ToggleSwitch from './buttons/ToggleSwitch.svelte';
@@ -117,7 +118,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     debounce(() => {
       tableData = getTableData();
-    }, 90);
+    }, 480);
   });
 </script>
 
@@ -156,16 +157,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
       >
         {#each table.rows as row}
           {@const isRecentDate = getIsRecentDate(row.date)}
-
+          {@const isFutureDate = getIsFutureDate(row.date)}
           <tr
-            class:!preset-tonal-warning={isRecentDate}
             class={[
-              '!',
+              isRecentDate && '!preset-tonal-warning',
               showColorDetails.value &&
-                'divide-x-2 divide-y-2 divide-surface-50 dark:divide-surface-900',
+                'divide-x-2 divide-y-2 !divide-surface-50 dark:!divide-surface-900',
             ]}
           >
-            <td class="">
+            <td>
               {#if isRecentDate}
                 <RecentWeatherDataTooltip />
               {/if}
@@ -173,8 +173,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </td>
             {#each weather.tableWeatherTargets as { id, label, type }}
               <td
-                class={[showColorDetails.value && 'pb-2']}
-                style={row.color[id] && showColorDetails.value
+                class={[showColorDetails.value && !isFutureDate && 'pb-2 px-2']}
+                style={row.color[id] &&
+                showColorDetails.value &&
+                typeof row.color[id].index === 'number'
                   ? `background-color:${row.color[id].hex};color:${getTextColor(row.color[id].hex)}`
                   : ''}
               >
@@ -315,7 +317,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     </div>
                   {:else if typeof gaugeLength === 'number'}
                     <p class="text-xs">No Color Assigned</p>
-                  {:else}
+                  {:else if !isFutureDate}
                     <p class="text-xs">No Gauge Created</p>
                   {/if}
                 {/if}

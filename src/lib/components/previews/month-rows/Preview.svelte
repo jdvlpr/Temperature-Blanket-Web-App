@@ -15,6 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import Spinner from '$lib/components/Spinner.svelte';
+  import { PREVIEW_UPDATE_DEBOUNCE_MS } from '$lib/constants';
   import { gauges, project, weather } from '$lib/state';
   import { getColorInfo, showPreviewImageWeatherDetails } from '$lib/utils';
   import { monthRowsPreview } from './state.svelte';
@@ -199,7 +200,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       width = monthRowsPreview.width;
       height = monthRowsPreview.height;
       monthRowsPreview.months = months;
-    }, 10);
+    }, PREVIEW_UPDATE_DEBOUNCE_MS);
   });
 </script>
 

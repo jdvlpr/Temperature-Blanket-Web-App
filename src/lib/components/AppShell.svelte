@@ -73,7 +73,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <div class="lg:hidden">
         <Modal
           onOpenChange={(e) => {
-            console.log({ e });
             modal.drawer.leftNavigation = e.open;
           }}
           open={modal.drawer.leftNavigation}

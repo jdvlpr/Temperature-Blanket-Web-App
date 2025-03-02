@@ -34,12 +34,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
       d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"
     />
   </svg>
-  <p slot="tooltip" class="text-base">
-    Weather data may adjust as new information arrives. Consider working at
-    least {weather.defaultSource === 'Open-Meteo'
-      ? OPEN_METEO_DELAY_DAYS
-      : weather.defaultSource === 'Meteostat'
-        ? METEOSTAT_DELAY_DAYS
-        : 'a few'} days behind to account for possible changes.
-  </p>
+  {#snippet tooltip()}
+    <p class="text-base">
+      Weather data may adjust as new information arrives. Consider working at
+      least {weather.defaultSource === 'Open-Meteo'
+        ? OPEN_METEO_DELAY_DAYS
+        : weather.defaultSource === 'Meteostat'
+          ? METEOSTAT_DELAY_DAYS
+          : 'a few'} days behind to account for possible changes.
+    </p>
+  {/snippet}
 </Tooltip>

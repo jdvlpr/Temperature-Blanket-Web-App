@@ -45,6 +45,14 @@ export const getIsRecentDate = (date) => {
   return false;
 };
 
+export const getIsFutureDate = (date) => {
+  if (!date || weather.isUserEdited) return false;
+
+  return (
+    new Date(date) > new Date(new Date().getTime() - 1 * 24 * 60 * 60 * 1000)
+  );
+};
+
 /**
  * One year from the given date
  *
