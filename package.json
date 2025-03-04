@@ -27,8 +27,8 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.50.1",
-    "@skeletonlabs/skeleton": "3.0.0-next.11",
-    "@skeletonlabs/skeleton-svelte": "1.0.0-next.20",
+    "@skeletonlabs/skeleton": "3.0.0-next.12",
+    "@skeletonlabs/skeleton-svelte": "1.0.0-next.21",
     "@sveltejs/adapter-cloudflare": "^5.0.3",
     "@sveltejs/kit": "^2.17.3",
     "@sveltejs/vite-plugin-svelte": "^5.0.3",
