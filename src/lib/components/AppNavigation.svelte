@@ -44,6 +44,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
       case '/changelog':
         openedNavigationItems = ['information'];
         break;
+      case '/supporters':
+        openedNavigationItems = [''];
+        break;
     }
 
     if (page.route.id?.includes('/blog') || page.route.id?.includes('/api')) {
@@ -61,12 +64,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <Accordion
     value={openedNavigationItems}
     onValueChange={(e) => {
-      console.log(e);
-
       openedNavigationItems = e.value;
     }}
     collapsible
-    multiple
   >
     {#snippet iconOpen()}<svg
         xmlns="http://www.w3.org/2000/svg"

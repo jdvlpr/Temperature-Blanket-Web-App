@@ -141,7 +141,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <div class="flex flex-col items-start gap-2">
           {#each skeletonThemes as { name, id, colors, rounded }}
             <button
-              onclick={() => {
+              onclick={(e) => {
                 preferences.value.theme.id = id;
               }}
               class={[

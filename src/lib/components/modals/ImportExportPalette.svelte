@@ -104,6 +104,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     if (copiedPalette || copiedNames || copiedHexes || copiedPaletteCode) {
       toast.trigger({
         message: copiedNotice,
+        background: 'preset-filled-success-100-900',
       });
       copiedPalette = false;
       copiedNames = false;
@@ -337,8 +338,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           class="flex flex-col justify-start items-start text-left gap-2 w-full"
         >
           <div class="flex flex-col">
-            <p class="font-bold text-lg">Colorway Names</p>
-            <p class="text-xs">For yarn colorways</p>
+            <p class="font-bold text-lg">Yarn Colorway Names</p>
           </div>
           <p
             class="card preset-tonal-primary p-4 basis-full w-full break-all select-all"
