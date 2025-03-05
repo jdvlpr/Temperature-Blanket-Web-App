@@ -40,12 +40,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
           ></div>
         </div>
 
-        <!-- <div
-          class="w-full flex-auto bg-gradient-to-b from-amber-400 via-rose-400 to-blue-400 via-30%"
-        ></div> -->
-        <div class="w-full flex-auto bg-amber-400"></div>
-        <div class="w-full flex-auto bg-rose-400"></div>
-        <div class="w-full flex-auto bg-blue-400"></div>
+        <!-- These are yarn colorways from the year's most popular project as of March, 2025: /gallery/14729 -->
+        {#each ['#e77e79', '#eec066', '#789fb8', '#295d7d'] as color}
+          <div class="w-full flex-auto" style="background:{color}"></div>
+        {/each}
       </div>
     </div>
     <h5 class="h5 text-surface-700 dark:text-surface-100 leading-tight">
