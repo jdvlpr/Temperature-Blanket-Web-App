@@ -58,7 +58,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
 >
   <div><ThemeSwitcher /></div>
 
-  <Accordion value={openedNavigationItems} collapsible multiple>
+  <Accordion
+    value={openedNavigationItems}
+    onValueChange={(e) => {
+      console.log(e);
+
+      openedNavigationItems = e.value;
+    }}
+    collapsible
+    multiple
+  >
     {#snippet iconOpen()}<svg
         xmlns="http://www.w3.org/2000/svg"
         fill="none"

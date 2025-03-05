@@ -40,6 +40,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           ></div>
         </div>
 
+        <!-- <div
+          class="w-full flex-auto bg-gradient-to-b from-amber-400 via-rose-400 to-blue-400 via-30%"
+        ></div> -->
         <div class="w-full flex-auto bg-amber-400"></div>
         <div class="w-full flex-auto bg-rose-400"></div>
         <div class="w-full flex-auto bg-blue-400"></div>

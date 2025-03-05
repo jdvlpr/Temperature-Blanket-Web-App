@@ -210,6 +210,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 {#if showTooltip}
   <div
     role="dialog"
+    tabindex="-1"
     aria-labelledby="Tooltip or Menu"
     aria-describedby="A dialog box showing information or menu items."
     in:scale={{ duration: 175 }}
