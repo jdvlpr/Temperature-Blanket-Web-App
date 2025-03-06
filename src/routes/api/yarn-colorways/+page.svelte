@@ -375,7 +375,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   </tr>
                 </thead>
                 <tbody
-                  class="[&>tr:nth-child(odd)]:bg-surface-50 dark:bg-surface-950 [&>tr:nth-child(even)]:bg-surface-100 dark:bg-surface-900"
+                  class="[&>tr:nth-child(odd)]:bg-surface-50 [&>tr:nth-child(odd)]:dark:bg-surface-950 [&>tr:nth-child(even)]:bg-surface-100 [&>tr:nth-child(even)]:dark:bg-surface-900"
                 >
                   <tr>
                     <td>color</td>
@@ -515,7 +515,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   </tr>
                 </thead>
                 <tbody
-                  class="[&>tr:nth-child(odd)]:bg-surface-50 dark:bg-surface-950 [&>tr:nth-child(even)]:bg-surface-100 dark:bg-surface-900"
+                  class="[&>tr:nth-child(odd)]:bg-surface-50 [&>tr:nth-child(odd)]:dark:bg-surface-950 [&>tr:nth-child(even)]:bg-surface-100 [&>tr:nth-child(even)]:dark:bg-surface-900"
                 >
                   <tr>
                     <td>name</td>
@@ -621,7 +621,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   </tr>
                 </thead>
                 <tbody
-                  class="[&>tr:nth-child(odd)]:bg-surface-50 dark:bg-surface-950 [&>tr:nth-child(even)]:bg-surface-100 dark:bg-surface-900"
+                  class="[&>tr:nth-child(odd)]:bg-surface-50 [&>tr:nth-child(odd)]:dark:bg-surface-950 [&>tr:nth-child(even)]:bg-surface-100 [&>tr:nth-child(even)]:dark:bg-surface-900"
                 >
                   <tr>
                     <td>color</td>
@@ -779,7 +779,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   </tr>
                 </thead>
                 <tbody
-                  class="[&>tr:nth-child(odd)]:bg-surface-50 dark:bg-surface-950 [&>tr:nth-child(even)]:bg-surface-100 dark:bg-surface-900"
+                  class="[&>tr:nth-child(odd)]:bg-surface-50 [&>tr:nth-child(odd)]:dark:bg-surface-950 [&>tr:nth-child(even)]:bg-surface-100 [&>tr:nth-child(even)]:dark:bg-surface-900"
                 >
                   <tr>
                     <td>name</td>
@@ -887,7 +887,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   </tr>
                 </thead>
                 <tbody
-                  class="[&>tr:nth-child(odd)]:bg-surface-50 dark:bg-surface-950 [&>tr:nth-child(even)]:bg-surface-100 dark:bg-surface-900"
+                  class="[&>tr:nth-child(odd)]:bg-surface-50 [&>tr:nth-child(odd)]:dark:bg-surface-950 [&>tr:nth-child(even)]:bg-surface-100 [&>tr:nth-child(even)]:dark:bg-surface-900"
                 >
                   <tr>
                     <td>brandName</td>
@@ -955,7 +955,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   </tr>
                 </thead>
                 <tbody
-                  class="[&>tr:nth-child(odd)]:bg-surface-50 dark:bg-surface-950 [&>tr:nth-child(even)]:bg-surface-100 dark:bg-surface-900"
+                  class="[&>tr:nth-child(odd)]:bg-surface-50 [&>tr:nth-child(odd)]:dark:bg-surface-950 [&>tr:nth-child(even)]:bg-surface-100 [&>tr:nth-child(even)]:dark:bg-surface-900"
                 >
                   <tr>
                     <td>brand</td>
@@ -1008,7 +1008,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   </tr>
                 </thead>
                 <tbody
-                  class="[&>tr:nth-child(odd)]:bg-surface-50 dark:bg-surface-950 [&>tr:nth-child(even)]:bg-surface-100 dark:bg-surface-900"
+                  class="[&>tr:nth-child(odd)]:bg-surface-50 [&>tr:nth-child(odd)]:dark:bg-surface-950 [&>tr:nth-child(even)]:bg-surface-100 [&>tr:nth-child(even)]:dark:bg-surface-900"
                 >
                   <tr>
                     <td>brandName</td>
@@ -1098,7 +1098,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   </tr>
                 </thead>
                 <tbody
-                  class="[&>tr:nth-child(odd)]:bg-surface-50 dark:bg-surface-950 [&>tr:nth-child(even)]:bg-surface-100 dark:bg-surface-900"
+                  class="[&>tr:nth-child(odd)]:bg-surface-50 [&>tr:nth-child(odd)]:dark:bg-surface-950 [&>tr:nth-child(even)]:bg-surface-100 [&>tr:nth-child(even)]:dark:bg-surface-900"
                 >
                   <tr>
                     <td>id</td>
@@ -1137,7 +1137,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   </tr>
                 </thead>
                 <tbody
-                  class="[&>tr:nth-child(odd)]:bg-surface-50 dark:bg-surface-950 [&>tr:nth-child(even)]:bg-surface-100 dark:bg-surface-900"
+                  class="[&>tr:nth-child(odd)]:bg-surface-50 [&>tr:nth-child(odd)]:dark:bg-surface-950 [&>tr:nth-child(even)]:bg-surface-100 [&>tr:nth-child(even)]:dark:bg-surface-900"
                 >
                   <tr>
                     <td>200</td>
