@@ -138,14 +138,15 @@
         </tr>
       </thead>
       <tbody
-        class="[&>tr:nth-child(odd)]:bg-surface-50 dark:bg-surface-950 [&>tr:nth-child(even)]:bg-surface-100 dark:bg-surface-900"
+        class="[&>tr:nth-child(odd)]:bg-surface-50 [&>tr:nth-child(odd)]:dark:bg-surface-950 [&>tr:nth-child(even)]:bg-surface-100 [&>tr:nth-child(even)]:dark:bg-surface-900"
       >
         {#each yarnChart as { name, id, wpi, ply, standard_name, icon }}
           <tr
             id={name}
-            class=" scroll-mt-20"
-            class:!bg-primary-50
-            dark:bg-primary-950={highlight === name}
+            class={[
+              'scroll-mt-20',
+              highlight === name && '!bg-primary-50 dark:!bg-primary-950',
+            ]}
             onclick={() => {
               if (highlight !== name) {
                 highlight = name;
