@@ -74,7 +74,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
     {#if version}
       <p class="text-xs flex flex-wrap gap-2" id={version}>
-        <span class="inline bg-tertiary-200 dark:bg-tertiary-800 px-2 rounded">
+        <span class="inline bg-tertiary-100 dark:bg-tertiary-900 px-2 rounded">
           <span>Version {version}</span>
         </span>
       </p>
