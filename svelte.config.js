@@ -39,7 +39,6 @@ const config = {
           '/service-worker.js',
           '/',
           '/api',
-          '/api/preferences/theme',
           '/api/yarn-colorways',
           '/blog',
           '/blog/*',
