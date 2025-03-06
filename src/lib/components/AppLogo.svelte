@@ -39,7 +39,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
             class="size-4 bg-surface-50-950 rounded-full relative -top-1"
           ></div>
         </div>
-
         <!-- These are yarn colorways from the year's most popular project as of March, 2025: /gallery/14729 -->
         {#each ['#e77e79', '#eec066', '#789fb8', '#295d7d'] as color}
           <div class="w-full flex-auto" style="background:{color}"></div>
