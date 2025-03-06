@@ -23,7 +23,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   onValueChange={(e) => {
     value = e.value;
   }}
-  background="bg-surface-100-900"
+  background="bg-surface-100 dark:bg-surface-900"
   classes="shadow-sm"
 >
   <Segment.Item value="list">

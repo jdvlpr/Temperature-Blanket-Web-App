@@ -99,7 +99,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       openState = e.open;
     }}
     triggerBase="btn hover:preset-tonal"
-    contentBase="card bg-surface-200-800 p-4 space-y-4 shadow-xl"
+    contentBase="card bg-surface-200 dark:bg-surface-800 p-4 space-y-4 shadow-xl"
     positionerClasses="z-9999!"
     arrow
     arrowBackground="bg-surface-200! dark:bg-surface-800!"
@@ -126,7 +126,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             preferences.value.theme.mode = e.value;
           }}
           classes="flex wrap gap-y-2 shadow-sm"
-          background="bg-surface-100-900"
+          background="bg-surface-100 dark:bg-surface-900"
         >
           {#each THEMES as { name, id, icon, description }}
             <Segment.Item value={id}>

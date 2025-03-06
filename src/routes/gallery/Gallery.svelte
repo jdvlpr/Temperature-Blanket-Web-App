@@ -169,7 +169,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
         {#each Array(5)}
           <div
-            class="placeholder animate-pulse snap-center shrink-0 h-[324px] w-[245px] rounded-container bg-surface-100-900"
+            class="placeholder animate-pulse snap-center shrink-0 h-[324px] w-[245px] rounded-container bg-surface-100 dark:bg-surface-900"
           ></div>
         {/each}
       {:else}
@@ -454,7 +454,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         >
           {#each Array(20)}
             <div
-              class="placeholder animate-pulse text-center card bg-surface-100-900 rounded-container {layout ===
+              class="placeholder animate-pulse text-center card bg-surface-100 dark:bg-surface-900 rounded-container {layout ===
               'grid'
                 ? 'w-full h-[350px]'
                 : 'w-full h-[120px]'}"

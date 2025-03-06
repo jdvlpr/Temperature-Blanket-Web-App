@@ -120,20 +120,19 @@ th div {
   justify-content: center !important;
 }
 
-
 #preview-svg-image > * {
   cursor: pointer;
 }
 
 .autocomplete {
-  @apply bg-surface-50-950 shadow-lg overflow-hidden border border-primary-500 rounded-container z-1000;
+  @apply bg-surface-50 dark:bg-surface-950 shadow-lg overflow-hidden border border-primary-500 rounded-container z-1000;
 
   & > div {
-    @apply px-2 py-3 cursor-pointer bg-surface-50-950 border-y border-surface-100-900;
+    @apply px-2 py-3 cursor-pointer bg-surface-50 dark:bg-surface-950 border-y border-surface-100-900;
   }
 
   & > .group {
-    @apply bg-surface-50-950 hover:bg-primary-400/20;
+    @apply bg-surface-50 dark:bg-surface-950 hover:bg-primary-400/20;
   }
 
   & > div.selected {
@@ -154,7 +153,7 @@ th div {
 }
 
 .group .autocomplete > & {
-  @apply bg-surface-50-950 hover:bg-primary-400/20;
+  @apply bg-surface-50 dark:bg-surface-950 hover:bg-primary-400/20;
 }
 
 .selected .autocomplete > &div {

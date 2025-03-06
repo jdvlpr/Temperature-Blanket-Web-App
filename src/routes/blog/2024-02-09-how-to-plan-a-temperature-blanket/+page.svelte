@@ -124,7 +124,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           openTableOfContents = e.open;
         }}
         triggerBase="hover:preset-tonal"
-        contentBase="bg-surface-50-950 p-4 space-y-4 shadow-xl w-fit h-screen overflow-auto"
+        contentBase="bg-surface-50 dark:bg-surface-950 p-4 space-y-4 shadow-xl w-fit h-screen overflow-auto"
         positionerJustify="justify-end"
         positionerAlign=""
         positionerPadding=""

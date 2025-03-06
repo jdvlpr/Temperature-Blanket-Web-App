@@ -527,7 +527,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 </div>
               </div>
               <div
-                class="p-2 rounded-container bg-surface-50-950 shadow my-4 inline-grid"
+                class="p-2 rounded-container bg-surface-50 dark:bg-surface-950 shadow my-4 inline-grid"
               >
                 <p class="text-sm flex gap-1 items-center justify-center">
                   <svg
@@ -631,7 +631,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       precipitation_probability: precipitation_probability_max,
                     })}
                     <div
-                      class="grid grid-cols-3 flex-1 gap-2 items-center rounded-container p-2 bg-surface-50-950 shadow w-full mx-auto"
+                      class="grid grid-cols-3 flex-1 gap-2 items-center rounded-container p-2 bg-surface-50 dark:bg-surface-950 shadow w-full mx-auto"
                     >
                       <p class="">
                         {index === 0 ? 'Today' : date}

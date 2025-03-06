@@ -77,7 +77,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           }}
           open={modal.drawer.leftNavigation}
           triggerBase="{pageName ? 'btn' : 'btn-icon'} hover:preset-tonal my-2"
-          contentBase="bg-surface-50-950 p-4 space-y-4 shadow-xl w-fit h-screen overflow-auto"
+          contentBase="bg-surface-50 dark:bg-surface-950 p-4 space-y-4 shadow-xl w-fit h-screen overflow-auto"
           positionerJustify="justify-start"
           positionerAlign=""
           positionerPadding=""

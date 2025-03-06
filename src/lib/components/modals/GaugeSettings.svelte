@@ -265,7 +265,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <Segment
               classes="flex-wrap gap-y-2 shadow-sm"
-              background="bg-surface-100-900"
+              background="bg-surface-100 dark:bg-surface-900"
               value={incrementMode}
               onValueChange={(e) => {
                 incrementMode = e.value;
@@ -326,7 +326,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         onchange={() => {
                           autoUpdateRanges();
                         }}
-                        class="select bg-surface-100-900"
+                        class="select bg-surface-100 dark:bg-surface-900"
                       >
                         <option value="ranges">Range Increments</option>
                         {#each _gauge.targets as { id, label, icon }}
@@ -438,7 +438,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       id="manual-increment"
                       type="number"
                       min="0"
-                      class="input w-fit bg-surface-100-900"
+                      class="input w-fit bg-surface-100 dark:bg-surface-900"
                       onchange={() => {
                         autoUpdateRanges();
                       }}
@@ -495,7 +495,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     <input
                       id="startFrom"
                       type="number"
-                      class="input w-fit bg-surface-100-900"
+                      class="input w-fit bg-surface-100 dark:bg-surface-900"
                       onfocus={() => {
                         _gauge.rangeOptions.mode = 'manual';
                         autoUpdateRanges();
@@ -525,14 +525,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {#if showAdvancedControls}
           <div
             transition:slide
-            class="flex flex-col gap-4 justify-start items-start rounded-container bg-surface-200-800 p-4 text-left w-full"
+            class="flex flex-col gap-4 justify-start items-start rounded-container bg-surface-200 dark:bg-surface-800 p-4 text-left w-full"
           >
             <ToggleSwitch
               bind:checked={_gauge.rangeOptions.linked}
               label="Linked Ranges"
               details="When editing an individual range's From or To value, update the next or previous range's corresponding value."
             />
-            <div class="p-2 bg-surface-100-900 rounded-container">
+            <div
+              class="p-2 bg-surface-100 dark:bg-surface-900 rounded-container"
+            >
               <label class="label">
                 <span
                   class="flex flex-col justify-center items-center gap-2 my-2"
@@ -630,7 +632,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </div>
         {/if}
         {#if isRangeCalculationUnavailable}
-          <p class="card bg-warning-50-950 text-left py-4 px-4">
+          <p class="card bg-warning-50 dark:bg-warning-950 text-left py-4 px-4">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"

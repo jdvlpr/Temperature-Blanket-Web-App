@@ -45,7 +45,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             role="button"
             tabindex="0"
             data-active={id === weatherState.activeLocationID}
-            class="flex-1 w-full justify-center flex items-start gap-2 bg-surface-200-800 rounded-container p-2 shadow-sm max-w-(--breakpoint-lg) mx-auto data-[active=true]:bg-primary-200-800"
+            class="flex-1 w-full justify-center flex items-start gap-2 bg-surface-200 dark:bg-surface-800 rounded-container p-2 shadow-sm max-w-(--breakpoint-lg) mx-auto data-[active=true]:bg-primary-200-800"
             title="View this Location"
             onclick={async () => {
               weatherState.activeLocationID = id;
@@ -148,7 +148,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <div class="mt-4 w-full">
       <h2 class="mb-2 text-xl font-bold">Settings</h2>
       <div
-        class="flex flex-col justify-center gap-2 w-fit bg-surface-50-950 rounded p-2"
+        class="flex flex-col justify-center gap-2 w-fit bg-surface-50 dark:bg-surface-950 rounded p-2"
       >
         <div><UnitChanger /></div>
         <div
@@ -161,7 +161,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 weatherState.hour = e.value;
               }}
               classes="flex-wrap gap-y-2"
-              background="bg-surface-100-900 shadow-sm"
+              background="bg-surface-100 dark:bg-surface-900 shadow-sm"
             >
               <Segment.Item value="12">12hr</Segment.Item>
               <Segment.Item value="24">24hr</Segment.Item>

@@ -64,7 +64,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div
-  class="flex justify-start items-center gap-2 w-full bg-surface-100-900 rounded-container p-4"
+  class="flex justify-start items-center gap-2 w-full bg-surface-100 dark:bg-surface-900 rounded-container p-4"
 >
   <div class="flex flex-col w-full">
     <a

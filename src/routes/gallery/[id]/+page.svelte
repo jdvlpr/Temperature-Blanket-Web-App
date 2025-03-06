@@ -176,7 +176,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
         >
         <Card>
           {#snippet header()}
-            <div class="bg-surface-100-900 p-4 text-center flex flex-col gap-2">
+            <div
+              class="bg-surface-100 dark:bg-surface-900 p-4 text-center flex flex-col gap-2"
+            >
               <p class="text-xl">
                 {#await data.stream}
                   ...

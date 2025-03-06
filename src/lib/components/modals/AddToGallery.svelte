@@ -77,7 +77,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </div>
       </div>
       <div
-        class="w-full col-span-full sm:col-span-1 max-w-[250px] m-auto pointer-events-none flex flex-col gap-2 p-4 bg-surface-50-950 rounded-container mb-4"
+        class="w-full col-span-full sm:col-span-1 max-w-[250px] m-auto pointer-events-none flex flex-col gap-2 p-4 bg-surface-50 dark:bg-surface-950 rounded-container mb-4"
       >
         <span class="font-bold line-clamp-4">{locations.projectTitle}</span>
         <previews.active.previewComponent />

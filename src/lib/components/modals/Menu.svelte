@@ -243,7 +243,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
           {#if weather.grouping === 'week'}
             <div
-              class="rounded-container flex flex-col gap-2 items-start justify-start w-full bg-surface-100-900 p-2"
+              class="rounded-container flex flex-col gap-2 items-start justify-start w-full bg-surface-100 dark:bg-surface-900 p-2"
             >
               <p class="">
                 Weekly weather grouping makes for a shorter project. <a
@@ -521,7 +521,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {/if}
       {/if}
       <p class="text-sm mt-4 mb-2">Project URL</p>
-      <p class="select-all break-all card bg-primary-50-950 p-4 basis-full">
+      <p
+        class="select-all break-all card bg-primary-50 dark:bg-primary-950 p-4 basis-full"
+      >
         {project.url.href}
       </p>
       <div class="inline-flex flex-wrap my-2 gap-2 items-center">

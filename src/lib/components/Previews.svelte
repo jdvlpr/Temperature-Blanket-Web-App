@@ -64,7 +64,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <Drawer.Overlay class="fixed inset-0 bg-black/40 z-40" />
 
               <Drawer.Content
-                class="bg-surface-50-950 flex flex-col rounded-tl-container rounded-tr-container mt-24 fixed bottom-0 left-0 right-0 z-50"
+                class="bg-surface-50 dark:bg-surface-950 flex flex-col rounded-tl-container rounded-tr-container mt-24 fixed bottom-0 left-0 right-0 z-50"
               >
                 <div
                   class="pt-4 rounded-tl-container rounded-tr-container overflow-auto"
@@ -88,7 +88,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </div>
 
         <div
-          class="flex flex-wrap gap-2 justify-center mt-2 px-4 py-2 shadow-inner rounded-container bg-surface-100-900 w-full"
+          class="flex flex-wrap gap-2 justify-center mt-2 px-4 py-2 shadow-inner rounded-container bg-surface-100 dark:bg-surface-900 w-full"
         >
           <button
             class="btn hover:preset-tonal gap-1"

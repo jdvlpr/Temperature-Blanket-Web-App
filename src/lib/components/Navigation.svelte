@@ -19,7 +19,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div
-  class="sticky bottom-0 flex justify-center z-10 gap-2 w-full bg-surface-50-950 backdrop-blur-md lg:rounded-t-container overflow-hidden"
+  class="sticky bottom-0 flex justify-center z-10 gap-2 w-full bg-surface-50 dark:bg-surface-950 backdrop-blur-md lg:rounded-t-container overflow-hidden"
 >
   <div class="flex justify-around w-full">
     {#each pageSections.items as { title, icon, index, active, pinned, tooltipText }}

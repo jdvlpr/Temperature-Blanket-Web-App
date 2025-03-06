@@ -142,7 +142,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           openTableOfContents = e.open;
         }}
         triggerBase="hover:preset-tonal"
-        contentBase="bg-surface-50-950 p-4 space-y-4 shadow-xl w-fit h-screen overflow-auto"
+        contentBase="bg-surface-50 dark:bg-surface-950 p-4 space-y-4 shadow-xl w-fit h-screen overflow-auto"
         positionerJustify="justify-end"
         positionerAlign=""
         positionerPadding=""
@@ -341,7 +341,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
           <section
             id="find-yarn-by-color"
-            class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
+            class="scroll-mt-[58px] card bg-surface-200 dark:bg-surface-800 p-4 gap-2 flex flex-col"
           >
             <h3 class="font-bold text-xl" id="find-yarn-by-color">
               Find Yarn by Color
@@ -375,7 +375,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   </tr>
                 </thead>
                 <tbody
-                  class="[&>tr:nth-child(odd)]:bg-surface-50-950 [&>tr:nth-child(even)]:bg-surface-100-900"
+                  class="[&>tr:nth-child(odd)]:bg-surface-50 dark:bg-surface-950 [&>tr:nth-child(even)]:bg-surface-100 dark:bg-surface-900"
                 >
                   <tr>
                     <td>color</td>
@@ -515,7 +515,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   </tr>
                 </thead>
                 <tbody
-                  class="[&>tr:nth-child(odd)]:bg-surface-50-950 [&>tr:nth-child(even)]:bg-surface-100-900"
+                  class="[&>tr:nth-child(odd)]:bg-surface-50 dark:bg-surface-950 [&>tr:nth-child(even)]:bg-surface-100 dark:bg-surface-900"
                 >
                   <tr>
                     <td>name</td>
@@ -589,7 +589,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
           <section
             id="colorways"
-            class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
+            class="scroll-mt-[58px] card bg-surface-200 dark:bg-surface-800 p-4 gap-2 flex flex-col"
           >
             <h3 class="font-bold text-xl" id="colorways">Colorways</h3>
             <p>Get yarn colorways.</p>
@@ -621,7 +621,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   </tr>
                 </thead>
                 <tbody
-                  class="[&>tr:nth-child(odd)]:bg-surface-50-950 [&>tr:nth-child(even)]:bg-surface-100-900"
+                  class="[&>tr:nth-child(odd)]:bg-surface-50 dark:bg-surface-950 [&>tr:nth-child(even)]:bg-surface-100 dark:bg-surface-900"
                 >
                   <tr>
                     <td>color</td>
@@ -779,7 +779,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   </tr>
                 </thead>
                 <tbody
-                  class="[&>tr:nth-child(odd)]:bg-surface-50-950 [&>tr:nth-child(even)]:bg-surface-100-900"
+                  class="[&>tr:nth-child(odd)]:bg-surface-50 dark:bg-surface-950 [&>tr:nth-child(even)]:bg-surface-100 dark:bg-surface-900"
                 >
                   <tr>
                     <td>name</td>
@@ -836,7 +836,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
           <section
             id="brands"
-            class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
+            class="scroll-mt-[58px] card bg-surface-200 dark:bg-surface-800 p-4 gap-2 flex flex-col"
           >
             <h3 class="font-bold text-xl" id="brands">Brands</h3>
             <p>
@@ -887,7 +887,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   </tr>
                 </thead>
                 <tbody
-                  class="[&>tr:nth-child(odd)]:bg-surface-50-950 [&>tr:nth-child(even)]:bg-surface-100-900"
+                  class="[&>tr:nth-child(odd)]:bg-surface-50 dark:bg-surface-950 [&>tr:nth-child(even)]:bg-surface-100 dark:bg-surface-900"
                 >
                   <tr>
                     <td>brandName</td>
@@ -916,7 +916,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
           <section
             id="yarns"
-            class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
+            class="scroll-mt-[58px] card bg-surface-200 dark:bg-surface-800 p-4 gap-2 flex flex-col"
           >
             <h3 class="font-bold text-xl" id="yarns">Yarns</h3>
             <p>
@@ -955,7 +955,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   </tr>
                 </thead>
                 <tbody
-                  class="[&>tr:nth-child(odd)]:bg-surface-50-950 [&>tr:nth-child(even)]:bg-surface-100-900"
+                  class="[&>tr:nth-child(odd)]:bg-surface-50 dark:bg-surface-950 [&>tr:nth-child(even)]:bg-surface-100 dark:bg-surface-900"
                 >
                   <tr>
                     <td>brand</td>
@@ -1008,7 +1008,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   </tr>
                 </thead>
                 <tbody
-                  class="[&>tr:nth-child(odd)]:bg-surface-50-950 [&>tr:nth-child(even)]:bg-surface-100-900"
+                  class="[&>tr:nth-child(odd)]:bg-surface-50 dark:bg-surface-950 [&>tr:nth-child(even)]:bg-surface-100 dark:bg-surface-900"
                 >
                   <tr>
                     <td>brandName</td>
@@ -1047,7 +1047,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
           <section
             id="yarn-weights"
-            class="scroll-mt-[58px] card bg-surface-200-800 p-4 gap-2 flex flex-col"
+            class="scroll-mt-[58px] card bg-surface-200 dark:bg-surface-800 p-4 gap-2 flex flex-col"
           >
             <h3 class="font-bold text-xl" id="yarn-weight">Yarn Weights</h3>
             <p>
@@ -1098,7 +1098,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   </tr>
                 </thead>
                 <tbody
-                  class="[&>tr:nth-child(odd)]:bg-surface-50-950 [&>tr:nth-child(even)]:bg-surface-100-900"
+                  class="[&>tr:nth-child(odd)]:bg-surface-50 dark:bg-surface-950 [&>tr:nth-child(even)]:bg-surface-100 dark:bg-surface-900"
                 >
                   <tr>
                     <td>id</td>
@@ -1137,7 +1137,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   </tr>
                 </thead>
                 <tbody
-                  class="[&>tr:nth-child(odd)]:bg-surface-50-950 [&>tr:nth-child(even)]:bg-surface-100-900"
+                  class="[&>tr:nth-child(odd)]:bg-surface-50 dark:bg-surface-950 [&>tr:nth-child(even)]:bg-surface-100 dark:bg-surface-900"
                 >
                   <tr>
                     <td>200</td>

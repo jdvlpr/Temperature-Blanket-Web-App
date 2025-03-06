@@ -100,7 +100,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               </p>
 
               <div
-                class="grid grid-cols-1 md:grid-cols-12 md:items-center gap-4 md:gap-2 my-4 bg-surface-100-900 rounded-container p-4 shadow-inner"
+                class="grid grid-cols-1 md:grid-cols-12 md:items-center gap-4 md:gap-2 my-4 bg-surface-100 dark:bg-surface-900 rounded-container p-4 shadow-inner"
               >
                 <div
                   class="order-3 md:order-1 col-span-full md:col-span-7 flex flex-col"

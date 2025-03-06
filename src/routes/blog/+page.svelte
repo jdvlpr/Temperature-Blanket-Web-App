@@ -106,7 +106,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           selectedTag = e.value;
         }}
         classes="mt-4"
-        background="bg-surface-100-900 shadow-sm"
+        background="bg-surface-100 dark:bg-surface-900 shadow-sm"
       >
         {#each tags as tag}
           <Segment.Item value={tag}>
@@ -125,7 +125,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {#each filteredPosts as { href, imgSrc, imgAlt, title, tags }}
             <div class="flex flex-col gap-4">
               <a
-                class="w-full card bg-surface-50-950 hover:bg-surface-100-900 p-4 whitespace-pre-wrap text-center flex flex-col items-center justify-center gap-2"
+                class="w-full card bg-surface-50 dark:bg-surface-950 hover:bg-surface-100 dark:bg-surface-900 p-4 whitespace-pre-wrap text-center flex flex-col items-center justify-center gap-2"
                 {href}
               >
                 <img
@@ -137,7 +137,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
                 {#if tags}
                   {#each tags as item}
-                    <p class="text-sm inline bg-tertiary-200-800 px-2 rounded">
+                    <p
+                      class="text-sm inline bg-tertiary-200 dark:bg-tertiary-800 px-2 rounded"
+                    >
                       {item}
                     </p>
                   {/each}

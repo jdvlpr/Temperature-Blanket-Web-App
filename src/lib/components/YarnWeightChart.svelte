@@ -110,7 +110,7 @@
     <table
       class="border-separate border-spacing-0 w-full border-surface-300-700 border rounded-container overflow-hidden text-left"
     >
-      <thead class="bg-surface-200-800">
+      <thead class="bg-surface-200 dark:bg-surface-800">
         <tr class="">
           <th class="min-w-[160px]"
             ><p>Name</p>
@@ -138,13 +138,14 @@
         </tr>
       </thead>
       <tbody
-        class="[&>tr:nth-child(odd)]:bg-surface-50-950 [&>tr:nth-child(even)]:bg-surface-100-900"
+        class="[&>tr:nth-child(odd)]:bg-surface-50 dark:bg-surface-950 [&>tr:nth-child(even)]:bg-surface-100 dark:bg-surface-900"
       >
         {#each yarnChart as { name, id, wpi, ply, standard_name, icon }}
           <tr
             id={name}
             class=" scroll-mt-20"
-            class:!bg-primary-50-950={highlight === name}
+            class:!bg-primary-50
+            dark:bg-primary-950={highlight === name}
             onclick={() => {
               if (highlight !== name) {
                 highlight = name;

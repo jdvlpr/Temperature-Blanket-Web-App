@@ -29,10 +29,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <h2 class="h2 text-gradient">{date}</h2>
     {/if}
   </div>
-  <div class="flex flex-col gap-2 card p-2 bg-surface-100-900">
+  <div class="flex flex-col gap-2 card p-2 bg-surface-100 dark:bg-surface-900">
     <div class="flex flex-wrap gap-2 card">
       {#each notes as { icon, text, title, instructions }}
-        <div class="card p-4 flex-auto bg-surface-50-950">
+        <div class="card p-4 flex-auto bg-surface-50 dark:bg-surface-950">
           <p class="text-base flex items-center gap-2 sm:gap-4">
             {#if icon}
               <span class="shrink-0">{@html icon}</span>
@@ -74,7 +74,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
     {#if version}
       <p class="text-xs flex flex-wrap gap-2" id={version}>
-        <span class="inline bg-tertiary-200-800 px-2 rounded">
+        <span class="inline bg-tertiary-200 dark:bg-tertiary-800 px-2 rounded">
           <span>Version {version}</span>
         </span>
       </p>

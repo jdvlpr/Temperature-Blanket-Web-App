@@ -19,7 +19,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { weather } from '$lib/state';
 </script>
 
-<Tooltip minWidth="290px" tooltipBg="bg-warning-50-950">
+<Tooltip minWidth="290px" tooltipBg="bg-warning-50 dark:bg-warning-950">
   <svg
     xmlns="http://www.w3.org/2000/svg"
     fill="none"

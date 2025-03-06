@@ -34,12 +34,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <div class="rounded-[0.2rem] overflow-hidden shrink-0 shadow">
       <div class="flex flex-col items-center size-8 relative">
         <div class="flex flex-col items-center absolute">
-          <div class="h-4 w-[10px] bg-surface-50-950"></div>
+          <div class="h-4 w-[10px] bg-surface-50 dark:bg-surface-950"></div>
           <div
             class="h-4 w-[4.2px] bg-gradient-to-r shadow from-[#e77e79] to-[#a4435b] absolute z-10"
           ></div>
           <div
-            class="w-[18px] h-[18px] bg-surface-50-950 rounded-full relative -top-[4px]"
+            class="w-[18px] h-[18px] bg-surface-50 dark:bg-surface-950 rounded-full relative -top-[4px]"
           ></div>
           <div
             class="w-[12px] h-[12px] bg-gradient-to-r shadow from-[#e77e79] to-[#a4435b] z-10 rounded-full relative -top-[19px]"

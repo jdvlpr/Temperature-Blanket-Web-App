@@ -53,7 +53,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       openState = e.open;
     }}
     triggerBase="btn-icon hover:preset-tonal"
-    contentBase="card bg-surface-200-800 p-4 space-y-4 max-w-[90vw]"
+    contentBase="card bg-surface-200 dark:bg-surface-800 p-4 space-y-4 max-w-[90vw]"
     arrow
     arrowBackground="bg-surface-200! dark:bg-surface-800!"
   >
@@ -76,7 +76,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {#snippet content()}
       <div class="flex flex-col gap-2">
         <p class="text-sm">Shareable Page URL</p>
-        <p class="select-all break-all card bg-primary-50-950 p-4 basis-full">
+        <p
+          class="select-all break-all card bg-primary-50 dark:bg-primary-950 p-4 basis-full"
+        >
           {href}
         </p>
         <div class="inline-flex flex-wrap gap-4 items-center">

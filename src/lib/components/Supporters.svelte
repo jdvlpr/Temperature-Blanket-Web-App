@@ -47,7 +47,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </div>
       {#each SUPPORTERS?.gold as { name, href, linkText, imageSrc }}
         <div
-          class="bg-surface-50-950 px-2 py-4 rounded-container w-full flex flex-col justify-center"
+          class="bg-surface-50 dark:bg-surface-950 px-2 py-4 rounded-container w-full flex flex-col justify-center"
         >
           <Avatar
             src={imageSrc}
@@ -92,7 +92,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </div>
       {#each SUPPORTERS.silver as { name, href, linkText }}
         <div
-          class="h-fit bg-surface-50-950 p-4 rounded-container flex flex-col items-center"
+          class="h-fit bg-surface-50 dark:bg-surface-950 p-4 rounded-container flex flex-col items-center"
         >
           <h5 class="h5">{name}</h5>
           <a {href} target="_blank" class="link">{linkText}</a>
@@ -123,7 +123,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </div>
       {#each SUPPORTERS?.bronze as { name }}
         <div
-          class="h-fit bg-surface-50-950 p-4 rounded-container flex flex-col items-center"
+          class="h-fit bg-surface-50 dark:bg-surface-950 p-4 rounded-container flex flex-col items-center"
         >
           <h5 class="h5">{name}</h5>
         </div>

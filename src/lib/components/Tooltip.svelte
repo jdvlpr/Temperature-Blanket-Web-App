@@ -54,7 +54,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     fullWidth = false,
     buttonDisabled = false,
     tooltipClass = 'text-sm',
-    tooltipBg = 'bg-surface-100-900',
+    tooltipBg = 'bg-surface-100 dark:bg-surface-900',
     tooltipStyle = '',
     classNames = '',
     dataPinned,

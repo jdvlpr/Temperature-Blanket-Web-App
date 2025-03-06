@@ -113,7 +113,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <main class="max-w-(--breakpoint-xl) m-auto text-center">
         <Card>
           {#snippet header()}
-            <div class="bg-surface-100-900 p-4">
+            <div class="bg-surface-100 dark:bg-surface-900 p-4">
               <p class="text-center">
                 Create a yarn color palette from a collection of brands and
                 yarns. Find matching colorways from HTML hex color codes or from

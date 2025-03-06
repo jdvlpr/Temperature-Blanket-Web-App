@@ -18,7 +18,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let { groupLabel, targets, value = $bindable() } = $props();
 </script>
 
-<div class="p-4 rounded-container bg-surface-200-800">
+<div class="p-4 rounded-container bg-surface-200 dark:bg-surface-800">
   <div class="text-sm mb-2">{groupLabel}</div>
   <div class="flex flex-col gap-2">
     {#each targets as { id, label, icon }}

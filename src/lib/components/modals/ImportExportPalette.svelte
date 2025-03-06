@@ -118,7 +118,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <div class="flex flex-col text-left gap-1 w-full mb-4">
     <Segment
       classes="flex wrap gap-y-2 w-fit mx-auto shadow-sm"
-      background="bg-surface-200-800"
+      background="bg-surface-200 dark:bg-surface-800"
       value={segmentValue}
       onValueChange={(e) => {
         segmentValue = e.value;
