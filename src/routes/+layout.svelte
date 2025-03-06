@@ -165,7 +165,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </p>
 
   <div class="flex flex-wrap gap-2 justify-center">
-    <a href="/contact" class="btn bg-secondary-700 dark:bg-secondary-300"
+    <a
+      href="/contact"
+      class="btn bg-secondary-700 dark:bg-secondary-300 text-(--base-font-color-dark) dark:text-(--base-font-color)"
       >Send Feedback
     </a>
 
