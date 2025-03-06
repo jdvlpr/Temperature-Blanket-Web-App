@@ -44,13 +44,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
     weather.currentIndex = 0;
     await fetchData()
       .then(async () => {
+        controller.value = null;
         // Add the default temperature gauge
         gauges.addById('temp');
-        modal.close();
-        controller.value = null;
         weather.isUserEdited = false;
         weather.isFromLocalStorage = false;
         await goToProjectSection(2, true);
+        modal.close();
       })
       .catch((e) => {
         controller.value = null;

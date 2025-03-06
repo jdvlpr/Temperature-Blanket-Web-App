@@ -17,7 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import RowsPerPage from '$lib/components/datatable/RowsPerPage.svelte';
   import { weather } from '$lib/state';
   import type { TableHandler } from '@vincjo/datatables';
-  import type { Snippet } from 'svelte';
+  import { onMount, type Snippet } from 'svelte';
 
   interface Props {
     table: TableHandler;
@@ -28,7 +28,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let { table, search = true, children }: Props = $props();
 
-  const searchInput = table.createSearch();
+  let searchInput = $state(null);
+
+  $effect(() => {
+    table;
+    searchInput = table.createSearch();
+  });
+
+  $inspect(table);
 </script>
 
 <section class="relative w-full">
@@ -120,7 +127,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </section>
       {/if}
     </div>
-    {#if search}
+    {#if search && searchInput !== null}
       <input
         type="text"
         class="input w-full sm:max-w-[200px]"
