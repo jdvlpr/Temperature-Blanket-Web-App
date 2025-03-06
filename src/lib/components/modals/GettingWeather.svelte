@@ -188,7 +188,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
       {#if locations.all.length > 1}
         <span class="flex flex-col items-center mt-2 w-full gap-1">
-          <progress value={currentIndex + 1} max={locations.all.length}
+          <progress
+            class="progress"
+            value={currentIndex + 1}
+            max={locations.all.length}
           ></progress>
           <span class="text-xs">
             {Math.round(((currentIndex + 1) / locations.all.length) * 100)}%
