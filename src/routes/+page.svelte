@@ -157,7 +157,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         type: 'component',
         component: { ref: GettingStarted },
       })}
-    class="btn preset-filled-secondary-200-800 gap-2"
+    class="btn bg-secondary-200 dark:bg-secondary-800 gap-2"
   >
     <svg xmlns="http://www.w3.org/2000/svg" class="size-6" viewBox="0 0 24 24"
       ><path
