@@ -202,9 +202,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 
   function invalidate() {
-    delete location.id;
-    delete location.lat;
-    delete location.lng;
+    location.id = undefined;
+    location.lat = undefined;
+    location.lng = undefined;
   }
 
   function createYears() {
@@ -396,9 +396,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               inputLocation.value = '';
               inputLocation.focus();
               location.label = '';
-              delete location.id;
-              location.lat = '';
-              location.lng = '';
+              invalidate();
               location.result = '';
               if (document.querySelector('.autocomplete'))
                 document.querySelector('.autocomplete').remove();

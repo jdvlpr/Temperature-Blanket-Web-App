@@ -204,6 +204,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <div class="text-left w-fit max-w-(--breakpoint-sm) text-sm">
       <Accordion
         value={warningAccordionState}
+        onValueChange={(e) => (warningAccordionState = e.value)}
         collapsible
         rounded="rounded-container"
         classes="preset-tonal-warning"
@@ -443,6 +444,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     >
       <Accordion
         value={missingWeatherAccordionState}
+        onValueChange={(e) => (missingWeatherAccordionState = e.value)}
         collapsible
         rounded="rounded-container"
         classes="preset-filled-surface-100-900"

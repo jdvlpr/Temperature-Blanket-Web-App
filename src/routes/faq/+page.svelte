@@ -19,7 +19,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import AppShell from '$lib/components/AppShell.svelte';
   import { Accordion } from '@skeletonlabs/skeleton-svelte';
 
-  const value = $state(['club']);
+  let value = $state(['club']);
 </script>
 
 <svelte:head>
@@ -37,11 +37,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <div class="hidden lg:inline-flex"><AppLogo /></div>
   {/snippet}
   {#snippet main()}
-    <main class="max-w-(--breakpoint-md) px-2 lg:px-0 flex flex-col gap-4 mx-auto">
+    <main
+      class="max-w-(--breakpoint-md) px-2 lg:px-0 flex flex-col gap-4 mx-auto"
+    >
       <div>
         <h2 class="h2 text-gradient my-2">Frequently Asked Questions</h2>
         <section id="faq" class="flex flex-col gap-4">
-          <Accordion {value} multiple>
+          <Accordion {value} onValueChange={(e) => (value = e.value)} multiple>
             <Accordion.Item value="weather-data-inaccurate">
               {#snippet lead()}
                 <svg

@@ -221,7 +221,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <div
                 class="text-left max-w-(--breakpoint-sm) mx-auto w-full preset-tonal-tertiary rounded-container mt-2"
               >
-                <Accordion value={aboutState} collapsible>
+                <Accordion
+                  value={aboutState}
+                  onValueChange={(e) => (aboutState = e.value)}
+                  collapsible
+                >
                   <Accordion.Item disabled={!project} value="about">
                     {#snippet lead()}
                       <svg

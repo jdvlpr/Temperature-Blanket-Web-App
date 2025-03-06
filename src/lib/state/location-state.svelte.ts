@@ -53,8 +53,6 @@ export class LocationState extends LocationClass implements LocationStateType {
     this.#today = browser ? getToday() : null; // caused a build error without the browser check...
   }
 
-  isValid = $derived(!!this.id && this.#fromDate < this.#today);
-
   #fromDate = $derived.by(() => {
     if (!this.from) return null;
     return new Date(this.from.replace(/-/g, '/'));
@@ -87,6 +85,10 @@ export class LocationState extends LocationClass implements LocationStateType {
 
     return '';
   });
+
+  isValid = $derived(
+    typeof this.id !== 'undefined' && this.errorMessage === '',
+  );
 }
 
 export class LocationsState implements LocationsStateType {
