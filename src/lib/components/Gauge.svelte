@@ -27,7 +27,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ImportExportPalette from '$lib/components/modals/ImportExportPalette.svelte';
   import RandomPalette from '$lib/components/modals/RandomPalette.svelte';
   import SortPalette from '$lib/components/modals/SortPalette.svelte';
-  import { drawerState, modal, pageSections, pinAllSections } from '$lib/state';
+  import { drawerState, modal, pageSections } from '$lib/state';
   import type { Color, GaugeSettingsType } from '$lib/types';
   import { createGaugeColors } from '$lib/utils';
 
@@ -76,7 +76,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
       if (
         !pageSections.items.find((p) => p.id === 'page-section-gauges')
           ?.active &&
-        !pinAllSections.value &&
         page.route.id === '/'
       )
         return;

@@ -18,7 +18,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { PUBLIC_BASE_URL, PUBLIC_SITE_TITLE } from '$env/static/public';
   import AppLogo from '$lib/components/AppLogo.svelte';
   import AppShell from '$lib/components/AppShell.svelte';
-  import Card from '$lib/components/Card.svelte';
   import Gauges from '$lib/components/Gauges.svelte';
   import Locations from '$lib/components/Locations.svelte';
   import Navigation from '$lib/components/Navigation.svelte';
@@ -35,7 +34,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     locations,
     modal,
     pageSections,
-    pinAllSections,
     project,
     toast,
     wasProjectLoadedFromURL,
@@ -398,7 +396,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <Locations />
         </div>
 
-        {#if !pinAllSections.value && weather.data.length}
+        {#if weather.data.length}
           <SectionNavigationButtons thisSectionIndex={1} />
         {/if}
       </div>
@@ -410,7 +408,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           class:hidden={pageSections.items[2].active === false}
         >
           <WeatherSection />
-          {#if !pinAllSections.value && weather.data.length}
+          {#if weather.data.length}
             <SectionNavigationButtons thisSectionIndex={2} />
           {/if}
         </div>
@@ -423,7 +421,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {#key project.history.length}
             <Gauges />
           {/key}
-          {#if !pinAllSections.value && weather.data.length}
+          {#if weather.data.length}
             <SectionNavigationButtons thisSectionIndex={3} />
           {/if}
           <p class="max-lg:mx-2 text-center text-sm my-4">
@@ -431,9 +429,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
             trademarked yarn or colorway details are owned by their respective
             companies.
           </p>
-          {#if pinAllSections.value && weather.data.length}
-            <div class="grow border-t border-surface-300-700"></div>
-          {/if}
         </div>
 
         <div
@@ -453,7 +448,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {#key weather.grouping}
             <Previews />
           {/key}
-          {#if !pinAllSections.value && weather.data.length}
+          {#if weather.data.length}
             <SectionNavigationButtons thisSectionIndex={4} />
           {/if}
           <p class="text-sm max-lg:mx-2 text-center my-4">

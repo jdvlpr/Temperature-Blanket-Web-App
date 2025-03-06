@@ -210,8 +210,6 @@ export const consentToMSClarityCookies = $state({ value: false });
 
 export const showNavigationSideBar = $state({ value: true });
 
-export const pinAllSections = $state({ value: false });
-
 export const wasProjectLoadedFromURL = $state({ value: false });
 
 export const isDesktop = new MediaQuery('(min-width: 768px)');

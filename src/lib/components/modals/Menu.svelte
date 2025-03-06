@@ -28,19 +28,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ProjectDetails from '$lib/components/ProjectDetails.svelte';
   import UnitChanger from '$lib/components/UnitChanger.svelte';
   import YarnSources from '$lib/components/YarnSources.svelte';
-  import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
   import ChooseWeatherSource from '$lib/components/modals/ChooseWeatherSource.svelte';
   import KeyboardShortcuts from '$lib/components/modals/KeyboardShortcuts.svelte';
   import { DAYS_OF_THE_WEEK, ICONS, MONTHS } from '$lib/constants';
-  import {
-    modal,
-    pageSections,
-    pinAllSections,
-    previews,
-    project,
-    toast,
-    weather,
-  } from '$lib/state';
+  import { modal, previews, project, toast, weather } from '$lib/state';
   import {
     delay,
     downloadPDF,
@@ -49,7 +40,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     pluralize,
     setLocalStorageProject,
   } from '$lib/utils';
-  import { onMount, tick } from 'svelte';
+  import { onMount } from 'svelte';
   import WeatherGrouping from '../WeatherGrouping.svelte';
 
   interface Props {
@@ -315,24 +306,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
               : weather.defaultSource}</span
           >
         </button>
-      </div>
-
-      <h2 class="mb-2 mt-8 text-xl font-bold">Page Settings</h2>
-
-      <div class="flex flex-col gap-2 justify-start items-start w-full">
-        <ToggleSwitch
-          label="Always display all sections"
-          details="Keep the Location, Weather, Colors, and Preview sections visible on the same page."
-          bind:checked={pinAllSections.value}
-          onchange={() => {
-            pageSections.items.forEach((section) => {
-              section.pinned = pinAllSections.value;
-              section.active = pinAllSections.value;
-            });
-            if (!pinAllSections.value) pageSections.items[1].active = true;
-            pageSections.items = pageSections.items;
-          }}
-        />
       </div>
 
       <LocalProjects />
