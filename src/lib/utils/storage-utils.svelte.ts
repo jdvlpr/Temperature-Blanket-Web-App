@@ -93,12 +93,15 @@ export function initializeLocalStorage() {
         );
 
         // Set theme cookies, in order to read them when loading the page (to avoid flash of content)
-        fetch('/api/preferences/theme', {
+        const request = fetch('/api/preferences/theme', {
           method: 'POST',
           body: JSON.stringify({
             theme,
             mode,
           }),
+        });
+        request.then((e) => {
+          console.log(e);
         });
       }
     });

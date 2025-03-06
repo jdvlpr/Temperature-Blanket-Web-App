@@ -1,6 +1,6 @@
-import { json } from '@sveltejs/kit';
+import { json, type RequestHandler } from '@sveltejs/kit';
 
-export async function POST({ request, cookies }) {
+export const POST: RequestHandler = async ({ request, cookies }) => {
   const { theme, mode } = await request.json();
 
   cookies.set('theme', theme || 'classic', { path: '/' });
@@ -8,4 +8,4 @@ export async function POST({ request, cookies }) {
   cookies.set('theme_mode', mode || 'system', { path: '/' });
 
   return json({ status: 201 });
-}
+};
