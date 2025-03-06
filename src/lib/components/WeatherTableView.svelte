@@ -15,7 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script module>
   export let weatherDataUpdatedKey = $state({ value: false });
-  let showColorDetails = $state({ value: true });
+  let showColorDetails = $state({ value: false });
 </script>
 
 <script>
