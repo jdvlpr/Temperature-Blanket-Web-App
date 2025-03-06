@@ -26,6 +26,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import WeatherSection from '$lib/components/WeatherSection.svelte';
   import DonateButton from '$lib/components/buttons/DonateButton.svelte';
   import SectionNavigationButtons from '$lib/components/buttons/SectionNavigationButtons.svelte';
+  import ChooseWeatherSource from '$lib/components/modals/ChooseWeatherSource.svelte';
   import GettingStarted from '$lib/components/modals/GettingStarted.svelte';
   import LegacyNotification from '$lib/components/modals/LegacyNotification.svelte';
   import Menu from '$lib/components/modals/Menu.svelte';
@@ -410,6 +411,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <WeatherSection />
           {#if weather.data.length}
             <SectionNavigationButtons thisSectionIndex={2} />
+            {#if !weather.isUserEdited}
+              <p class="max-lg:mx-2 text-center text-sm my-4">
+                Weather data from <button
+                  class="underline"
+                  onclick={() => {
+                    modal.trigger({
+                      type: 'component',
+                      component: { ref: ChooseWeatherSource },
+                    });
+                  }}>{weather.defaultSource}</button
+                >.
+              </p>
+            {/if}
           {/if}
         </div>
 
@@ -423,12 +437,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {/key}
           {#if weather.data.length}
             <SectionNavigationButtons thisSectionIndex={3} />
+            <p class="max-lg:mx-2 text-center text-sm my-4">
+              Real yarn colors will look different than what's on the screen.
+              Any trademarked yarn or colorway details are owned by their
+              respective companies.
+            </p>
           {/if}
-          <p class="max-lg:mx-2 text-center text-sm my-4">
-            Real yarn colors will look different than what's on the screen. Any
-            trademarked yarn or colorway details are owned by their respective
-            companies.
-          </p>
         </div>
 
         <div

@@ -32,7 +32,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     href={PUBLIC_KOFI_LINK}
     target="_blank"
     rel="noopener noreferrer"
-    class="btn preset-tonal hover:preset-tonal-primary inline-flex gap-1 justify-center items-center"
+    class="btn preset-tonal hover:preset-tonal-primary inline-flex gap-1 justify-center items-center h-auto"
   >
     <span class="flex items-center justify-center gap-1">
       <svg

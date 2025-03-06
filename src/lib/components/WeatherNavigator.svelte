@@ -45,7 +45,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     class="flex flex-wrap gap-2 justify-center mt-4 mb-2 lg:mb-4 px-4 py-2 shadow-inner rounded-container bg-surface-100 dark:bg-surface-900"
   >
     <button
-      class="btn hover:preset-tonal whitespace-pre-wrap gap-1"
+      class="btn hover:preset-tonal whitespace-pre-wrap gap-1 h-auto text-left"
       onclick={downloadPDF}
       title="Download PDF File"
     >
@@ -53,7 +53,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </button>
 
     <button
-      class="btn hover:preset-tonal whitespace-pre-wrap gap-1"
+      class="btn hover:preset-tonal whitespace-pre-wrap gap-1 h-auto text-left"
       onclick={downloadWeatherCSV}
       title="Download CSV File"
     >
@@ -62,7 +62,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     {#if weather.grouping !== 'week'}
       <button
-        class="btn hover:preset-tonal whitespace-pre-wrap gap-1"
+        class="btn hover:preset-tonal whitespace-pre-wrap gap-1 h-auto text-left"
         onclick={() => {
           modal.trigger({
             type: 'component',

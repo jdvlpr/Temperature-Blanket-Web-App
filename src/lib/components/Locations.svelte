@@ -174,7 +174,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 {#if locations.allValid}
   <div
-    class="flex flex-wrap gap-2 justify-center mt-4 mb-2 lg:mb-4 px-4 py-2 shadow-inner rounded-container preset-filled-surface-100-900 max-w-(--breakpoint-md) mx-auto"
+    class="flex flex-wrap gap-2 justify-center mt-4 mb-2 lg:mb-4 px-4 py-2 shadow-inner rounded-container bg-surface-100 dark:bg-surface-900 max-w-(--breakpoint-md) mx-auto"
     transition:slide
   >
     <div class:hidden={!locations.allValid || weather.isUserEdited}>

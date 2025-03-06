@@ -106,7 +106,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </button>
 
           <button
-            class="btn preset-tonal-primary border border-primary-500 gap-2 items-center"
+            class="btn preset-tonal-primary border border-primary-500 gap-2 items-center h-auto text-left whitespace-pre-wrap"
             onclick={() =>
               modal.trigger({
                 type: 'component',
@@ -123,7 +123,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               viewBox="0 0 24 24"
               stroke-width="1.5"
               stroke="currentColor"
-              class="w-6 h-6"
+              class="w-6 h-6 shrink-0"
             >
               <path
                 stroke-linecap="round"

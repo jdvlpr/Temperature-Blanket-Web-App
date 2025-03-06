@@ -15,18 +15,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import Spinner from '$lib/components/Spinner.svelte';
-  import UnitChanger from '$lib/components/UnitChanger.svelte';
   import WeatherChart from '$lib/components/WeatherChart.svelte';
-  import WeatherGrouping from '$lib/components/WeatherGrouping.svelte';
   import WeatherItem from '$lib/components/WeatherItem.svelte';
   import WeatherNavigator from '$lib/components/WeatherNavigator.svelte';
   import HelpIcon from '$lib/components/buttons/HelpIcon.svelte';
   import ToggleWeatherData from '$lib/components/buttons/ToggleWeatherData.svelte';
   import ChooseWeatherSource from '$lib/components/modals/ChooseWeatherSource.svelte';
   import {
-    DAYS_OF_THE_WEEK,
     METEOSTAT_DELAY_DAYS,
-    MONTHS,
     OPEN_METEO_DELAY_DAYS,
     UNIT_LABELS,
   } from '$lib/constants';
@@ -155,7 +151,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
       dowOffset: weather.monthGroupingStartDay,
     }),
   );
-  let length = $derived([...new Set(data?.map((day) => day.weekId))].length);
 </script>
 
 <div class="flex flex-col gap-2 justify-center w-full items-center mt-2">

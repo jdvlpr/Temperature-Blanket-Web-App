@@ -292,7 +292,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </div>
     {/if}
 
-    <p class="text-sm text-center">
+    <p class="text-sm text-center pb-2">
       All weather data is subject to change if the provider updates their
       models.
     </p>
