@@ -31,11 +31,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }}
 >
   <div class="flex items-center gap-2 mx-6 lg:mx-4">
-    <img
-      src="/images/temperature-blanket-com-logo.png"
-      alt="Temperature Blanket Logo"
-      class="h-10"
-    />
+    <div class="rounded-[0.2rem] overflow-hidden shrink-0 shadow">
+      <div class="flex flex-col items-center size-8 relative">
+        <div class="flex flex-col items-center absolute">
+          <div class="h-4 w-2 bg-surface-50 dark:bg-surface-950"></div>
+          <div
+            class="size-4 bg-surface-50 dark:bg-surface-950 rounded-full relative -top-1"
+          ></div>
+        </div>
+        <!-- These are yarn colorways from the year's most popular project as of March, 2025: /gallery/14729 -->
+        {#each ['#e77e79', '#f3d488', '#789fb8', '#295d7d'] as color}
+          <div class="w-full flex-auto" style="background:{color}"></div>
+        {/each}
+      </div>
+    </div>
     <h5 class="h5 text-surface-700 dark:text-surface-100 leading-tight">
       {PUBLIC_SITE_TITLE}
     </h5>
