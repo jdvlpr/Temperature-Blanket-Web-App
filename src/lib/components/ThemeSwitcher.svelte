@@ -98,7 +98,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     onOpenChange={(e) => {
       openState = e.open;
     }}
-    triggerBase="btn hover:preset-tonal"
+    triggerBase="btn  hover:preset-tonal"
     contentBase="card bg-surface-200 dark:bg-surface-800 p-4 space-y-4 shadow-xl"
     positionerClasses="z-9999!"
     arrow
@@ -108,8 +108,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   >
     {#snippet trigger()}
       {#key preferences.value?.theme.mode}
-        <span class="flex items-center">
-          <span class="pr-2"
+        <span class="flex items-center gap-2">
+          <span
             >{#if browser}{@html activeTheme?.icon}{:else}{@html THEMES.find(
                 (t) => t.id === 'system',
               ).icon}{/if}</span
