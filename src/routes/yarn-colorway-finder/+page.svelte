@@ -455,7 +455,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     <input
                       type="text"
                       placeholder="e.g., pink, #c3f4d2"
-                      style="background:{yarnColorwayFinderState.hex} !important;color:{getTextColor(
+                      style="background:{yarnColorwayFinderState.hex ||
+                        'none'} !important;color:{getTextColor(
                         yarnColorwayFinderState.hex,
                       )}"
                       value={yarnColorwayFinderState.inputTypeTextValue}
