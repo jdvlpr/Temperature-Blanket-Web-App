@@ -57,7 +57,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       class="max-w-(--breakpoint-md) m-auto text-left flex flex-col gap-2 mb-4 mx-auto px-2"
     >
       <div
-        class="p-4 text-left flex flex-wrap justify-center items-end gap-4 rounded-container bg-surface-50 dark:bg-surface-950 max-lg:mt-2"
+        class="p-4 text-left flex flex-wrap justify-center items-end gap-4 rounded-container bg-surface-50-950 max-lg:mt-2"
       >
         <p>
           Making a request for a yarn to be included in the search results does

@@ -64,8 +64,10 @@
   "homepage": "https://github.com/jdvlpr/Temperature-Blanket-Web-App.git",
   "pnpm": {
     "onlyBuiltDependencies": [
+      "@parcel/watcher",
       "core-js",
       "esbuild",
+      "sharp",
       "workerd"
     ]
   }
