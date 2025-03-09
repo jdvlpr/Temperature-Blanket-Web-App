@@ -40,9 +40,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
           ></div>
         </div>
         <!-- These are yarn colorways from the year's most popular project as of March, 2025: /gallery/14729 -->
-        {#each ['#e77e79', '#f3d488', '#789fb8', '#295d7d'] as color}
-          <div class="w-full flex-auto" style="background:{color}"></div>
-        {/each}
+        <div
+          class="w-full flex-auto bg-gradient-to-r from-[#e77e79]/90 to-[#e77e79]"
+        ></div>
+
+        <div
+          class="w-full flex-auto bg-gradient-to-r from-[#f3d488]/90 to-[#f3d488]"
+        ></div>
+        <div
+          class="w-full flex-auto bg-gradient-to-r from-[#789fb8]/90 to-[#789fb8]"
+        ></div>
+        <div
+          class="w-full flex-auto bg-gradient-to-r from-[#295d7d]/90 to-[#295d7d]"
+        ></div>
       </div>
     </div>
     <h5 class="h5 text-surface-700 dark:text-surface-100 leading-tight">
