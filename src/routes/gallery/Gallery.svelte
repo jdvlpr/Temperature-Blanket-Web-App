@@ -145,7 +145,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <span>Popular during the past</span>
         <select
           bind:value={galleryState.timePeriod}
-          class="select w-fit mx-auto"
+          class="select w-fit min-w-[90px] mx-auto"
           onchange={() => {
             galleryState.popularProjects = [];
             fetchPopularProjectsWrapper();
