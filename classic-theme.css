@@ -27,7 +27,7 @@
   --anchor-text-decoration-hover: underline;
   --anchor-text-decoration-active: none;
   --anchor-text-decoration-focus: none;
-  --space-scale-factor: 1;
+  --text-scaling: 1;
   --radius-base: 6px;
   --radius-container: 12px;
   --default-border-width: 1px;

@@ -61,6 +61,7 @@
   --wght: 400;
   --SOFT: 90;
   --WONK: 1;
+  --spacing: 0.22rem;
 }
 [data-theme='hamlindigo'] {
   --opsz: 76;
@@ -73,6 +74,7 @@
   --wght: 900;
   --SOFT: 100;
   --WONK: 1;
+  --spacing: 0.28rem;
 }
 [data-theme='rocket'] {
   --opsz: 24;
