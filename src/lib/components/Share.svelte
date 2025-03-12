@@ -37,7 +37,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     if (copiedMessage !== '') {
       toast.trigger({
         message: copiedMessage,
-        category: 'success',
+        category:
+          copiedMessage === 'Copied to your clipboard' ? 'success' : null,
       });
       copiedMessage = '';
     }

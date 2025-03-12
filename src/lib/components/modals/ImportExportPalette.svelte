@@ -96,7 +96,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     if (copiedPalette || copiedNames || copiedHexes || copiedPaletteCode) {
       toast.trigger({
         message: copiedNotice,
-        category: 'success',
+        category:
+          copiedNotice === `Copied to your clipboard` ? 'success' : null,
       });
       copiedPalette = false;
       copiedNames = false;

@@ -26,9 +26,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <Tooltip
-  classNames="btn preset-filled-primary-500 btn-lg"
+  classNames="btn preset-filled-primary-500 btn-lg max-sm:w-full"
   title="Configure Ranges"
-  fullWidth={true}
   onclick={() =>
     modal.trigger({
       type: 'component',
@@ -44,9 +43,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
       },
     })}
 >
-  <CogIcon />
-
-  Configure Ranges
+  <div class="flex flex-wrap items-center justify-center gap-2">
+    <CogIcon />
+    Configure Ranges
+  </div>
   {#snippet tooltip()}
     <div>
       <p>Change the gauge direction, generate ranges, and more.</p>
