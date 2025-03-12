@@ -68,8 +68,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     if (page === 'save') saveProject({ copy: false });
   }
 
-  $inspect(pages);
-
   onMount(async () => {
     if (page) goTo(page);
 

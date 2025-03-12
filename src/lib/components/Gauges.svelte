@@ -14,6 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
+  import { ICONS } from '$lib/constants';
   import {
     allGaugesAttributes,
     gauges,
@@ -23,11 +24,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '$lib/state';
   import { downloadPDF } from '$lib/utils';
   import { onMount } from 'svelte';
-  import Gauge from './Gauge.svelte';
   import RangeOptionsButton from './buttons/RangeOptionsButton.svelte';
+  import Gauge from './Gauge.svelte';
   import GaugeCustomizer from './GaugeCustomizer.svelte';
-  import { ICONS } from '$lib/constants';
-  import { Segment, Tabs } from '@skeletonlabs/skeleton-svelte';
 
   onMount(() => {
     setupAvailableGauges();
@@ -56,11 +55,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
       gauges.activeGaugeId = gauges.allCreated[0]?.id;
   }
 
+  let debounceTimer;
+  const debounce = (callback, time) => {
+    window.clearTimeout(debounceTimer);
+    debounceTimer = window.setTimeout(callback, time);
+  };
   // If an initially empty weather parameter gets some user-created data, or if the user searches for a different location,
   // then add the available gauge to the options
   $effect(() => {
     weather.data;
-    setupAvailableGauges();
+    debounce(() => {
+      setupAvailableGauges();
+    }, 100);
   });
 </script>
 
