@@ -14,7 +14,7 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { SCHEMES } from '$lib/constants';
-import { gauges, project, weather } from '$lib/state';
+import { gauges, project, toast, weather } from '$lib/state';
 import type { Color, GaugeSettingsType } from '$lib/types';
 import {
   displayNumber,
@@ -36,11 +36,31 @@ export function getRanges({
 }) {
   let newRanges;
   let mustUpdateCustomRanges = false;
+  let mode = rangeOptions.mode;
+  let isCustomRanges = rangeOptions.isCustomRanges;
   if (rangeOptions.isCustomRanges) {
     // If 'manual' range calculations are used
     // newRanges = customRanges;
 
-    newRanges = ranges;
+    if (colors.length === ranges.length) newRanges = ranges;
+    else {
+      newRanges = getEvenlyDistributedRangeValuesWithEqualDayCount({
+        weatherData: weather.data,
+        numRanges: colors.length,
+        prop: rangeOptions.auto.optimization,
+        gaugeDirection: rangeOptions.direction,
+        roundIncrement: rangeOptions.auto.roundIncrement,
+        includeFrom: rangeOptions.includeFromValue,
+        includeTo: rangeOptions.includeToValue,
+      });
+      mode === 'auto';
+      isCustomRanges = false;
+      toast.trigger({
+        message: `Updated ranges automatically—custom ranges overridden`,
+        background: 'preset-filled-success-100-900',
+        timeout: 10000,
+      });
+    }
   } else if (
     rangeOptions.auto.optimization !== 'ranges' &&
     rangeOptions.mode === 'auto'
@@ -88,7 +108,7 @@ export function getRanges({
     mustUpdateCustomRanges = true;
   }
 
-  return { ranges: newRanges, mustUpdateCustomRanges };
+  return { ranges: newRanges, mustUpdateCustomRanges, mode, isCustomRanges };
 }
 
 export const createGaugeColors = ({

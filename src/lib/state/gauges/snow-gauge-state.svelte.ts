@@ -216,7 +216,7 @@ export class SnowGauge {
   updateColors({ colors }) {
     this.calculating = true;
     this.colors = colors;
-    const { ranges } = getRanges({
+    const { ranges, mode, isCustomRanges } = getRanges({
       rangeOptions: this.rangeOptions,
       ranges: this.ranges,
       start: this.#start,
@@ -227,6 +227,8 @@ export class SnowGauge {
     });
     this.ranges = ranges;
     this.rangeOptions = this.rangeOptions;
+    this.rangeOptions.mode = mode;
+    this.rangeOptions.isCustomRanges = isCustomRanges;
     this.numberOfColors = this.colors.length;
     this.calculating = false;
   }

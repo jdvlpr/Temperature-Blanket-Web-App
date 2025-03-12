@@ -667,9 +667,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
       <div class=" rounded-container w-full">
         <div class="rounded-container overflow-hidden flex flex-col">
-          {#if _gauge.ranges}
+          {#if _gauge.ranges.length && _gauge.colors.length}
             {#each _gauge.ranges as { from, to }, index}
-              {@const { hex, brandId, yarnId, name } = _gauge.colors[index]}
+              {@const { hex } = _gauge.colors[index]}
               <div
                 class="max-xl:flex max-xl:flex-col max-xl:justify-center items-center xl:grid xl:grid-cols-12 gap-2 p-2 w-full"
                 style="background:{hex};color:{getTextColor(hex)}"
