@@ -153,47 +153,36 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/if}
 </svelte:head>
 <div
-  class="text-center p-4 flex flex-col justify-center items-center gap-2 bg-warning-100 dark:bg-warning-900 [view-transition-name:top-banner]"
+  class="text-center p-2 flex flex-wrap justify-center items-center gap-2 bg-warning-100 dark:bg-warning-900 [view-transition-name:top-banner]"
   bind:this={bannerElement}
 >
   <p>
-    This version is for testing purposes and some features may be broken. For
-    the stable website, visit
-    <a href="https://temperature-blanket.com" class="link" target="_blank"
-      >temperature-blanket.com</a
-    >.
+    This is a beta version. If you encounter any issues, please
+    <a href="/contact" class="link">send feedback</a>.
   </p>
 
-  <div class="flex flex-wrap gap-2 justify-center">
-    <a
-      href="/contact"
-      class="btn bg-secondary-700 dark:bg-secondary-300 text-(--base-font-color-dark) dark:text-(--base-font-color)"
-      >Send Feedback
-    </a>
-
-    <button
-      aria-label="Close Banner"
-      onclick={() => {
-        bannerElement.remove();
-      }}
-      class="btn hover:preset-tonal gap-1 w-fit"
-      ><svg
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke-width="1.5"
-        stroke="currentColor"
-        class="size-6"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="M6 18 18 6M6 6l12 12"
-        />
-      </svg>
-      Close
-    </button>
-  </div>
+  <a
+    href="https://temperature-blanket.com"
+    class="btn preset-filled-secondary-500"
+    target="_blank"
+    >Main Version <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 20 20"
+      fill="currentColor"
+      class="size-4 inline"
+    >
+      <path
+        fill-rule="evenodd"
+        d="M4.25 5.5a.75.75 0 0 0-.75.75v8.5c0 .414.336.75.75.75h8.5a.75.75 0 0 0 .75-.75v-4a.75.75 0 0 1 1.5 0v4A2.25 2.25 0 0 1 12.75 17h-8.5A2.25 2.25 0 0 1 2 14.75v-8.5A2.25 2.25 0 0 1 4.25 4h5a.75.75 0 0 1 0 1.5h-5Z"
+        clip-rule="evenodd"
+      />
+      <path
+        fill-rule="evenodd"
+        d="M6.194 12.753a.75.75 0 0 0 1.06.053L16.5 4.44v2.81a.75.75 0 0 0 1.5 0v-4.5a.75.75 0 0 0-.75-.75h-4.5a.75.75 0 0 0 0 1.5h2.553l-9.056 8.194a.75.75 0 0 0-.053 1.06Z"
+        clip-rule="evenodd"
+      />
+    </svg>
+  </a>
 </div>
 
 {@render children?.()}
