@@ -28,6 +28,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     getSortedPalette,
     pickRandomFromArray,
   } from '$lib/utils';
+  import { ArrowDownWideNarrowIcon, ShuffleIcon } from '@lucide/svelte';
   import SelectYarnWeight from '../SelectYarnWeight.svelte';
 
   let { numberOfColors, updateGauge } = $props();
@@ -214,21 +215,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
 
     <label class="label w-full col-span-full sm:col-span-4 order-6">
-      <span class="flex items-center">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="size-5 mr-1"
-          viewBox="0 0 24 24"
-          ><path
-            fill="none"
-            stroke="currentColor"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="1.5"
-            d="M10 14H2m6-4H2m4-4H2m10 12H2m17 2V4m0 16l3-3m-3 3l-3-3m3-13l3 3m-3-3l-3 3"
-          /></svg
-        >
-        Sort By
+      <span class="flex items-center gap-1">
+        <ArrowDownWideNarrowIcon class="size-4" />
+        <span>Sort By</span>
       </span>
       <select
         class="select truncate"
@@ -250,27 +239,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </label>
 
     <button
-      class="btn preset-filled-primary-500 col-span-full sm:col-span-4 sm:col-start-9 order-7 gap-1"
+      class="btn preset-filled-primary-500 col-span-full sm:col-span-4 sm:col-start-9 order-7"
       title="Generate Random Colors (r)"
       onclick={() => {
         getRandomColors();
       }}
     >
       Randomize
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke-width="1.5"
-        stroke="currentColor"
-        class="size-5"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"
-        />
-      </svg>
+      <ShuffleIcon />
     </button>
   </div>
 </div>

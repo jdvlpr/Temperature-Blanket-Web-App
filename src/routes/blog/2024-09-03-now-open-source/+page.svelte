@@ -25,6 +25,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import AppShell from '$lib/components/AppShell.svelte';
   import Card from '$lib/components/Card.svelte';
   import { ICONS } from '$lib/constants';
+  import { ArrowLeftIcon } from '@lucide/svelte';
 
   const kofiURL = PUBLIC_KOFI_LINK ? new URL(PUBLIC_KOFI_LINK) : null;
   const kofiLink = kofiURL ? `${kofiURL.hostname}${kofiURL.pathname}` : '';
@@ -63,8 +64,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <main class="pb-8">
       <a
         href="/blog"
-        class="btn hover:preset-tonal gap-1 mb-2 max-lg:mx-2 max-lg:mt-2"
-        >{@html ICONS.arrowBack} Blog</a
+        class="btn hover:preset-tonal mb-2 max-lg:mx-2 max-lg:mt-2"
+        ><ArrowLeftIcon /> Blog</a
       >
       <Card>
         {#snippet header()}

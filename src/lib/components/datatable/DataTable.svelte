@@ -16,6 +16,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import RowsPerPage from '$lib/components/datatable/RowsPerPage.svelte';
   import { weather } from '$lib/state';
+  import { CircleArrowLeftIcon, CircleArrowRightIcon } from '@lucide/svelte';
   import type { TableHandler } from '@vincjo/datatables';
   import { onMount, type Snippet } from 'svelte';
 
@@ -69,19 +70,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             disabled={table.currentPage === 1}
             onclick={() => table.setPage('previous')}
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-              class="w-6 h-6"
-              ><path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M11.25 9l-3 3m0 0l3 3m-3-3h7.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              /></svg
-            >
+            <CircleArrowLeftIcon />
           </button>
 
           <label class="label flex flex-col items-start w-20">
@@ -108,19 +97,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             disabled={table.currentPage === table.pages.length}
             onclick={() => table.setPage('next')}
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-              class="w-6 h-6"
-              ><path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M12.75 15l3-3m0 0l-3-3m3 3h-7.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              /></svg
-            >
+            <CircleArrowRightIcon />
           </button>
         </section>
       {/if}

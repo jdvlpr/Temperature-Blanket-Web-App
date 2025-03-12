@@ -21,7 +21,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { Modal } from '@skeletonlabs/skeleton-svelte';
   import AppLogo from './AppLogo.svelte';
   import { page } from '$app/state';
-  import { MenuIcon, PanelLeftClose } from '@lucide/svelte';
+  import {
+    MenuIcon,
+    PanelLeftClose,
+    PanelRightCloseIcon,
+  } from '@lucide/svelte';
 
   /**
    * @typedef {Object} Props
@@ -112,7 +116,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       bind:clientWidth={sidebarWidth}
     >
       <button
-        class="btn hover:preset-tonal mx-2 lg:flex justify-center hidden mt-2 gap-1"
+        class="btn hover:preset-tonal mx-2 lg:flex justify-center hidden mt-2"
         title={`${showNavigationSideBar.value ? 'Hide' : 'Show'} Sidebar`}
         onclick={async () => {
           showNavigationSideBar.value = !showNavigationSideBar.value;
@@ -122,21 +126,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <PanelLeftClose />
           <span in:slide={{ axis: 'x', duration: 90 }}>Hide Sidebar</span>
         {:else}
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="size-6"
-            viewBox="0 0 24 24"
-            ><g
-              fill="none"
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              ><rect width="18" height="18" x="3" y="3" rx="2" ry="2" /><path
-                d="M9 3v18m5-12l3 3l-3 3"
-              /></g
-            ></svg
-          >
+          <PanelRightCloseIcon />
         {/if}
       </button>
       {#if showNavigationSideBar.value}

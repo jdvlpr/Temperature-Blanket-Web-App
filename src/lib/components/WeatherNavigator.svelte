@@ -19,6 +19,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { ICONS } from '$lib/constants';
   import { modal, weather } from '$lib/state';
   import { downloadPDF, downloadWeatherCSV } from '$lib/utils';
+  import { DownloadIcon, ImportIcon } from '@lucide/svelte';
   import { weatherChart } from './WeatherChart.svelte';
 
   let debounceTimer;
@@ -45,24 +46,24 @@ If not, see <https://www.gnu.org/licenses/>. -->
     class="flex flex-wrap gap-2 justify-center mt-4 mb-2 lg:mb-4 px-4 py-2 shadow-inner rounded-container bg-surface-100 dark:bg-surface-900"
   >
     <button
-      class="btn hover:preset-tonal whitespace-pre-wrap gap-1 h-auto text-left"
+      class="btn hover:preset-tonal whitespace-pre-wrap h-auto text-left"
       onclick={downloadPDF}
       title="Download PDF File"
     >
-      {@html ICONS.download} Download Gauges and Weather Data (PDF)
+      <DownloadIcon class="inline" /> Download Gauges and Weather Data (PDF)
     </button>
 
     <button
-      class="btn hover:preset-tonal whitespace-pre-wrap gap-1 h-auto text-left"
+      class="btn hover:preset-tonal whitespace-pre-wrap h-auto text-left"
       onclick={downloadWeatherCSV}
       title="Download CSV File"
     >
-      {@html ICONS.download} Download Weather Data (CSV)
+      <DownloadIcon class="inline" /> Download Weather Data (CSV)
     </button>
 
     {#if weather.grouping !== 'week'}
       <button
-        class="btn hover:preset-tonal whitespace-pre-wrap gap-1 h-auto text-left"
+        class="btn hover:preset-tonal whitespace-pre-wrap h-auto text-left"
         onclick={() => {
           modal.trigger({
             type: 'component',
@@ -73,22 +74,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         }}
         title="Import Weather Data"
       >
-        <span>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="1.5"
-            stroke="currentColor"
-            class="w-6 h-6 inline"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75"
-            />
-          </svg> Import Weather Data
-        </span>
+        <ImportIcon class="inline" /> Import Weather Data
       </button>
     {/if}
   </div>

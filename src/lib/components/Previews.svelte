@@ -32,6 +32,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { onMount, tick } from 'svelte';
   import { Drawer } from 'vaul-svelte';
   import { weatherDataUpdatedKey } from './WeatherTableView.svelte';
+  import { DownloadIcon, SendIcon } from '@lucide/svelte';
 
   let refreshKey = $state(Date.now());
   onMount(() => {
@@ -91,7 +92,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           class="flex flex-wrap gap-2 justify-center mt-2 px-4 py-2 shadow-inner rounded-container bg-surface-100 dark:bg-surface-900 w-full"
         >
           <button
-            class="btn hover:preset-tonal gap-1"
+            class="btn hover:preset-tonal"
             title="Download PNG"
             onclick={() => {
               downloadPreviewPNG(
@@ -101,12 +102,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
               );
             }}
           >
-            {@html ICONS.download}
+            <DownloadIcon />
             Download Image (PNG)
           </button>
 
           <button
-            class="btn preset-tonal-primary border border-primary-500 gap-2 items-center h-auto text-left whitespace-pre-wrap"
+            class="btn preset-tonal-primary border border-primary-500 items-center h-auto text-left whitespace-pre-wrap"
             onclick={() =>
               modal.trigger({
                 type: 'component',
@@ -117,20 +118,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             title="Show Send to Gallery Dialog"
             disabled
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-              class="w-6 h-6 shrink-0"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"
-              />
-            </svg>
+            <SendIcon />
             Send to Project Gallery (disabled)
           </button>
 

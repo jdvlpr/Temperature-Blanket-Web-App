@@ -14,10 +14,11 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { ALL_YARN_WEIGHTS, ICONS } from '$lib/constants';
+  import { ALL_YARN_WEIGHTS } from '$lib/constants';
   import { defaultYarn } from '$lib/state';
   import { delay, pluralize, stringToBrandAndYarnDetails } from '$lib/utils';
   import { brands } from '$lib/yarns/brands';
+  import { ChevronDownIcon, ListFilterIcon, XIcon } from '@lucide/svelte';
   import autocomplete from 'autocompleter';
   import { onMount, untrack } from 'svelte';
 
@@ -323,7 +324,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   bind:this={inputGroup}
 >
   <span class="flex items-center label gap-1">
-    {@html ICONS.filter}
+    <ListFilterIcon class="size-4" />
     Yarn Name
   </span>
 
@@ -396,20 +397,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             inputElement.focus();
           }}
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="1.5"
-            stroke="currentColor"
-            class="w-6 h-6"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="m19.5 8.25-7.5 7.5-7.5-7.5"
-            />
-          </svg>
+          <ChevronDownIcon />
         </button>
       {/if}
       {#if inputValue.length || showingAutocomplete}
@@ -429,20 +417,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
               selectedYarnId,
             });
           }}
-          ><svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="1.5"
-            stroke="currentColor"
-            class="w-6 h-6"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M6 18L18 6M6 6l12 12"
-            />
-          </svg>
+        >
+          <XIcon />
         </button>
       {/if}
     </div>

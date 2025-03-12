@@ -21,10 +21,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { browser } from '$app/environment';
   import Tooltip from '$lib/components/Tooltip.svelte';
   import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
-  import { ICONS } from '$lib/constants';
   import { modal } from '$lib/state';
   import type { Color } from '$lib/types';
   import { getTextColor } from '$lib/utils';
+  import {
+    LockKeyholeIcon,
+    LockOpenIcon,
+    MoveIcon,
+    SearchIcon,
+    Trash2Icon,
+  } from '@lucide/svelte';
   import {
     SOURCES,
     TRIGGERS,
@@ -276,18 +282,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             style="background:{hex};color:{getTextColor(hex)}"
           >
             {#if isLocked}
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 16 16"
-                fill="currentColor"
-                class="w-4 h-4 opacity-40 shrink-0"
-              >
-                <path
-                  fill-rule="evenodd"
-                  d="M8 1a3.5 3.5 0 0 0-3.5 3.5V7A1.5 1.5 0 0 0 3 8.5v5A1.5 1.5 0 0 0 4.5 15h7a1.5 1.5 0 0 0 1.5-1.5v-5A1.5 1.5 0 0 0 11.5 7V4.5A3.5 3.5 0 0 0 8 1Zm2 6V4.5a2 2 0 1 0-4 0V7h4Z"
-                  clip-rule="evenodd"
-                />
-              </svg>
+              <LockKeyholeIcon />
             {:else}
               <div
                 class="group-hover:hidden group-focus:hidden h-2 w-2 rounded-full opacity-20 {activeColorIndex ===
@@ -323,7 +318,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               ontouchstart={startDrag}
               onkeydown={handleKeyDown}
             >
-              {@html ICONS.arrowsPointingOut}
+              <MoveIcon />
             </div>
           </div>
 
@@ -351,19 +346,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   class="btn hover:preset-tonal h-auto"
                 >
                   <span class="text-xs">{index + 1}</span>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke-width="1.5"
-                    stroke="currentColor"
-                    class="size-6"
-                    ><path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
-                    /></svg
-                  >
+                  <Trash2Icon />
                 </button>
               {/if}
               {#if canUserEditColor}
@@ -411,20 +394,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     }
                   }}
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke-width="1.5"
-                    stroke="currentColor"
-                    class="w-6 h-6 shrink-0"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
-                    />
-                  </svg>
+                  <SearchIcon />
                   <span
                     class="flex flex-col items-start justify-start text-left text-wrap"
                   >
@@ -475,33 +445,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   }}
                 >
                   {#if color.locked}
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      fill="currentColor"
-                      class="w-6 h-6 shrink-0"
-                    >
-                      <path
-                        fill-rule="evenodd"
-                        d="M12 1.5a5.25 5.25 0 0 0-5.25 5.25v3a3 3 0 0 0-3 3v6.75a3 3 0 0 0 3 3h10.5a3 3 0 0 0 3-3v-6.75a3 3 0 0 0-3-3v-3c0-2.9-2.35-5.25-5.25-5.25Zm3.75 8.25v-3a3.75 3.75 0 1 0-7.5 0v3h7.5Z"
-                        clip-rule="evenodd"
-                      />
-                    </svg>
+                    <LockKeyholeIcon />
                   {:else}
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke-width="1.5"
-                      stroke="currentColor"
-                      class="w-6 h-6 shrink-0"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="M13.5 10.5V6.75a4.5 4.5 0 1 1 9 0v3.75M3.75 21.75h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H3.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z"
-                      />
-                    </svg>
+                    <LockOpenIcon />
                   {/if}
                 </button>
               {/if}

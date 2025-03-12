@@ -108,14 +108,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   >
     {#snippet trigger()}
       {#key preferences.value?.theme.mode}
-        <span class="flex items-center gap-2">
-          <span
-            >{#if browser}{@html activeTheme?.icon}{:else}{@html THEMES.find(
-                (t) => t.id === 'system',
-              ).icon}{/if}</span
-          >
-          Theme
-        </span>
+        <span
+          >{#if browser}{@html activeTheme?.icon}{:else}{@html THEMES.find(
+              (t) => t.id === 'system',
+            ).icon}{/if}</span
+        >
+        Theme
       {/key}
     {/snippet}
     {#snippet content()}

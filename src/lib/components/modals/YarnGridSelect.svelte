@@ -35,6 +35,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import chroma from 'chroma-js';
   import { onMount } from 'svelte';
   import SelectYarnWeight from '../SelectYarnWeight.svelte';
+  import { ArrowDownWideNarrowIcon, SearchIcon } from '@lucide/svelte';
 
   interface Props {
     selectedBrandId?: string;
@@ -340,23 +341,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <div
     class="tex-left flex flex-col items-start w-full col-span-full md:col-span-5 order-4 gap-1"
   >
-    <label for="yarn-select-search-input" class="label flex items-center"
-      ><svg
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke-width="1.5"
-        stroke="currentColor"
-        class="w-4 h-4 mr-1"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
-        />
-      </svg>
-      Colorway Name</label
-    >
+    <label for="yarn-select-search-input" class="label flex items-center gap-1">
+      <SearchIcon class="size-4" />
+      <span>Colorway Name</span>
+    </label>
     <input
       id="yarn-select-search-input"
       autocomplete="off"
@@ -371,21 +359,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </div>
 
   <label class="label w-full col-span-8 md:col-span-3 md:col-start-10 order-5">
-    <span class="flex items-center">
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        class="size-5 mr-1"
-        viewBox="0 0 24 24"
-        ><path
-          fill="none"
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="1.5"
-          d="M10 14H2m6-4H2m4-4H2m10 12H2m17 2V4m0 16l3-3m-3 3l-3-3m3-13l3 3m-3-3l-3 3"
-        /></svg
-      >
-      Sort By
+    <span class="flex items-center gap-1">
+      <ArrowDownWideNarrowIcon class="size-4" />
+      <span> Sort By</span>
     </span>
     <select
       class="select"

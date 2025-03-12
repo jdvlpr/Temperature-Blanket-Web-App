@@ -396,7 +396,7 @@ export const entries: ChangelogItem[] = [
   {
     notes: [
       {
-        icon: ICONS.wrenchScrewdriver,
+        icon: ICONS.wrench,
         text: `Project locations can now include future dates even when the weather source is Open-Meteo. Previously this was possible only when the weather source was Meteostat.`,
         title: 'Allow Future Dates in Open-Meteo Weather Data',
       },
@@ -554,7 +554,7 @@ export const entries: ChangelogItem[] = [
   {
     notes: [
       {
-        icon: ICONS.wrenchScrewdriver,
+        icon: ICONS.wrench,
         text: '',
         title: 'Fixed Issue with Daytime Data not Displaying',
       },
@@ -589,7 +589,7 @@ export const entries: ChangelogItem[] = [
   {
     notes: [
       {
-        icon: ICONS.wrenchScrewdriver,
+        icon: ICONS.wrench,
         instructions:
           'Go to the Colors tab and press the Configure Ranges button, or select the range from the color list.',
         text: 'One place for setting up and editing all color ranges. Instantly see how changing one range affects the others near it, without having to open a new modal for each color.',

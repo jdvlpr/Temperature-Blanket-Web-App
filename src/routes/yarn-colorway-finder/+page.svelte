@@ -47,6 +47,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     ALL_YARN_WEIGHTS,
     YARN_COLORWAYS_PER_PAGE,
   } from '$lib/constants';
+  import { toast } from '$lib/state';
   import type { YarnWeight } from '$lib/types';
   import {
     getTextColor,
@@ -57,6 +58,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     sortColorsLightToDark,
   } from '$lib/utils';
   import { brands } from '$lib/yarns/brands';
+  import {
+    ArrowDownWideNarrowIcon,
+    ExternalLinkIcon,
+    SearchIcon,
+    ShoppingBagIcon,
+  } from '@lucide/svelte';
   import { Accordion } from '@skeletonlabs/skeleton-svelte';
   import chroma from 'chroma-js';
   import { onMount } from 'svelte';
@@ -528,22 +535,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 class="flex flex-col justify-start w-full col-span-12 md:col-span-3 gap-1"
               >
                 <span class="flex items-center label gap-1">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke-width="1.5"
-                    stroke="currentColor"
-                    class="w-4 h-4"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
-                    />
-                  </svg>
-                  Colorway Name</span
-                >
+                  <SearchIcon class="size-4" />
+                  <span>Colorway Name</span>
+                </span>
                 <div class="flex flex-wrap items-center justify-center gap-1">
                   <div class="input-group grid-cols-[1fr_auto] w-full">
                     <input
@@ -585,21 +579,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
               </div>
 
               <label class="label w-full col-span-8 md:col-span-3">
-                <span class="flex items-center">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    class="size-5 mr-1"
-                    viewBox="0 0 24 24"
-                    ><path
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="1.5"
-                      d="M10 14H2m6-4H2m4-4H2m10 12H2m17 2V4m0 16l3-3m-3 3l-3-3m3-13l3 3m-3-3l-3 3"
-                    /></svg
-                  >
-                  Sort By
+                <span class="flex items-center gap-1">
+                  <ArrowDownWideNarrowIcon class="size-4" />
+                  <span>Sort By</span>
                 </span>
                 <select
                   class="select"
@@ -664,20 +646,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
                             href={affiliate_variant_href}
                             target="_blank"
                             rel="noopener noreferrer"
-                            ><svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              stroke-width="1.5"
-                              stroke="currentColor"
-                              class="w-5 h-5"
-                            >
-                              <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
-                              />
-                            </svg>
+                          >
+                            <ShoppingBagIcon />
                           </a>
                         {:else}
                           <a
@@ -687,30 +657,38 @@ If not, see <https://www.gnu.org/licenses/>. -->
                             target="_blank"
                             rel="noopener noreferrer"
                             title="Open link to this yarn colorway"
-                            ><svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              stroke-width="1.5"
-                              stroke="currentColor"
-                              class="w-5 h-5"
-                            >
-                              <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"
-                              />
-                            </svg>
+                          >
+                            <ExternalLinkIcon />
                           </a>
                         {/if}
                       {/if}
                     </div>
-                    <div class="flex flex-col items-start text-pretty">
+                    <div class="flex flex-col items-start text-pretty gap-1">
                       <span class="text-left text-xs">
                         {brandName} - {yarnName}
                       </span>
 
-                      <span class="text-lg leading-tight">{name}</span>
+                      <button
+                        class="text-lg leading-tight"
+                        onclick={() => {
+                          window.navigator.clipboard.writeText(name);
+                          toast.trigger({
+                            message: `<span class="font-bold">${name}</span> copied to clipboard`,
+                            background: 'preset-tonal-success',
+                          });
+                        }}>{name}</button
+                      >
+
+                      <button
+                        class="text-xs select-all"
+                        onclick={() => {
+                          window.navigator.clipboard.writeText(hex);
+                          toast.trigger({
+                            message: `<span class="font-bold">${hex}</span> copied to clipboard`,
+                            background: 'preset-tonal-success',
+                          });
+                        }}>{hex}</button
+                      >
 
                       {#if percentMatch}
                         <p class="text-xs">

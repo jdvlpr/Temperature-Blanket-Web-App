@@ -23,6 +23,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { TableHandler } from '@vincjo/datatables';
   import { slide } from 'svelte/transition';
   import { daytimeRowsPreview } from './state.svelte';
+  import { DownloadIcon } from '@lucide/svelte';
 
   let targets = $derived(gauges.allCreated.map((n) => n.targets).flat());
 
@@ -270,11 +271,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </DataTable>
     <div class="mt-4">
       <button
-        class="btn hover:preset-tonal gap-1"
+        class="btn hover:preset-tonal"
         onclick={downloadStitchesTableCSV}
         title="Download CSV File"
       >
-        {@html ICONS.download}
+        <DownloadIcon />
         Download Stitches Table (CSV File)</button
       >
     </div>

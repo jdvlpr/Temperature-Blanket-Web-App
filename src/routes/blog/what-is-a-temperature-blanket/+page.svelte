@@ -20,6 +20,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Card from '$lib/components/Card.svelte';
   import { ICONS } from '$lib/constants';
   import { getColorsFromInput, getTextColor } from '$lib/utils';
+  import { ArrowLeftIcon } from '@lucide/svelte';
 
   const colorsCode = `palette:ca2c29a4435b46203cea9d5deec06697b2dc5ea1de3271c51838971a2d46yarn:hobbii-amigo`;
   const colors = getColorsFromInput({ string: colorsCode });
@@ -70,8 +71,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <main class="pb-8">
       <a
         href="/blog"
-        class="btn hover:preset-tonal gap-1 mb-2 max-lg:mx-2 max-lg:mt-2"
-        >{@html ICONS.arrowBack} Blog</a
+        class="btn hover:preset-tonal mb-2 max-lg:mx-2 max-lg:mt-2"
+        ><ArrowLeftIcon />Blog</a
       >
       <Card>
         {#snippet header()}

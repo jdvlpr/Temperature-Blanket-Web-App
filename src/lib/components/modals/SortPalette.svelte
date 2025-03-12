@@ -19,6 +19,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import StickyPart from '$lib/components/modals/StickyPart.svelte';
   import { modal } from '$lib/state';
   import { getSortedPalette } from '$lib/utils';
+  import { ArrowDownWideNarrow, ArrowLeftRightIcon } from '@lucide/svelte';
 
   let { colors, updateGauge } = $props();
 
@@ -35,22 +36,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <div class="flex flex-col gap-2 items-center mt-6 sm:mt-4">
     <div class="flex flex-wrap gap-2 justify-center items-end">
       <label class="label">
-        <span class="flex items-center"
-          ><svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="size-5 mr-1"
-            viewBox="0 0 24 24"
-            ><path
-              fill="none"
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="1.5"
-              d="M10 14H2m6-4H2m4-4H2m10 12H2m17 2V4m0 16l3-3m-3 3l-3-3m3-13l3 3m-3-3l-3 3"
-            /></svg
-          >
-          Sort By</span
-        >
+        <span class="flex items-center gap-1">
+          <ArrowDownWideNarrow class="size-4" />
+          <span>Sort By</span>
+        </span>
         <select
           class="select truncate"
           id="sort-colors-by"
@@ -83,20 +72,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         title="Reverse Colors' Positions"
       >
         Reverse
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke-width="1.5"
-          stroke="currentColor"
-          class="size-5"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5"
-          />
-        </svg>
+        <ArrowLeftRightIcon />
       </button>
     </div>
     <div class="w-full">

@@ -29,6 +29,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '$lib/utils';
   import { onMount } from 'svelte';
   import { galleryState } from './state.svelte';
+  import {
+    ArrowUpDownIcon,
+    ChevronRightIcon,
+    SearchIcon,
+    XIcon,
+  } from '@lucide/svelte';
 
   let first = 40;
   let loading = $state(true);
@@ -240,20 +246,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           class="flex flex-col justify-start col-span-12 md:col-span-5 gap-1"
         >
           <span class="flex items-center label gap-1">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-              class="w-4 h-4 mr-1"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
-              />
-            </svg>
+            <SearchIcon class="size-4" />
             Search Projects
           </span>
           <div class="input-group grid-cols-[1fr_auto]">
@@ -275,7 +268,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   galleryState.search = '';
                 }}
               >
-                {@html ICONS.xMark}
+                <XIcon />
               </button>
             {/if}
           </div>
@@ -313,21 +306,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </label>
 
         <label class="label w-full col-span-6 md:col-span-3">
-          <span class="flex items-center">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-              class="w-4 h-4 mr-1"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M3 7.5L7.5 3m0 0L12 7.5M7.5 3v13.5m13.5 0L16.5 21m0 0L12 16.5m4.5 4.5V7.5"
-              />
-            </svg>
+          <span class="flex items-center gap-1">
+            <ArrowUpDownIcon class="size-4" />
             Order By
           </span>
           <select
@@ -386,20 +366,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             }}
           >
             Search
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-              class="w-6 h-6"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75"
-              />
-            </svg>
+            <ChevronRightIcon />
           </button>
         </div>
       </div>

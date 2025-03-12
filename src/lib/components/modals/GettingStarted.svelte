@@ -15,6 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import { modal } from '$lib/state';
+  import { ArrowLeftIcon, ArrowRightIcon } from '@lucide/svelte';
   import Step1 from './gettingStartedSteps/Step1.svelte';
   import Step2 from './gettingStartedSteps/Step2.svelte';
   import Step3 from './gettingStartedSteps/Step3.svelte';
@@ -106,22 +107,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
         onclick={prevStep}
         disabled={isFirstStep}
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke-width="1.5"
-          stroke="currentColor"
-          class="size-6"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"
-          />
-        </svg>
-
-        <span>Previous</span>
+        <ArrowLeftIcon />
+        Previous
       </button>
       {#if isLastStep}
         <button
@@ -155,21 +142,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
           onclick={nextStep}
           disabled={isLastStep}
         >
-          <span>Next</span>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="1.5"
-            stroke="currentColor"
-            class="size-6"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
-            />
-          </svg>
+          Next
+          <ArrowRightIcon />
         </button>
       {/if}
     </nav>

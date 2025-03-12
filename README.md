@@ -20,6 +20,8 @@ What's new in the latest version?
 - Fullscreen color editor
 - Option to show color details in the weather table
 - Move colors directly in the gauge editor
+- Hex codes shown for each colorway in the Yarn Colorway Finder
+- Updated icons
 
 ## 🚀 Getting Started
 

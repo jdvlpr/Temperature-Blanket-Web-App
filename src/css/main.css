@@ -61,6 +61,7 @@
   --wght: 400;
   --SOFT: 90;
   --WONK: 1;
+
   --spacing: 0.22rem;
 }
 [data-theme='hamlindigo'] {
@@ -68,12 +69,17 @@
   --wght: 900;
   --SOFT: 0;
   --WONK: 0;
+
+  .lucide {
+    stroke-width: 1px;
+  }
 }
 [data-theme='modern'] {
   --opsz: 12;
   --wght: 900;
   --SOFT: 100;
   --WONK: 1;
+
   --spacing: 0.28rem;
 }
 [data-theme='rocket'] {
@@ -81,6 +87,10 @@
   --wght: 300;
   --SOFT: 10;
   --WONK: 0;
+
+  .lucide {
+    stroke-width: 1px;
+  }
 }
 [data-theme='legacy'] {
   --opsz: 64;

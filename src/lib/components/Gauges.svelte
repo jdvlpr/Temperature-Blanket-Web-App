@@ -27,6 +27,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import RangeOptionsButton from './buttons/RangeOptionsButton.svelte';
   import Gauge from './Gauge.svelte';
   import GaugeCustomizer from './GaugeCustomizer.svelte';
+  import { DownloadIcon } from '@lucide/svelte';
 
   onMount(() => {
     setupAvailableGauges();
@@ -166,6 +167,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     onclick={downloadPDF}
     title="Download PDF File"
   >
-    {@html ICONS.download} Download Gauges and Weather Data (PDF)
+    <DownloadIcon /> Download Gauges and Weather Data (PDF)
   </button>
 </div>

@@ -38,6 +38,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { Accordion } from '@skeletonlabs/skeleton-svelte';
   import { onMount } from 'svelte';
   import { yarnPageState } from '../../yarn/state.svelte';
+  import { ArrowLeftIcon, ShoppingBagIcon } from '@lucide/svelte';
 
   let { data } = $props();
 
@@ -169,9 +170,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
       >
         <a
           href="/gallery"
-          class="flex items-center btn hover:preset-tonal gap-1 w-fit mx-2 lg:mx-0 mt-2 lg:mt-0"
+          class="flex items-center btn hover:preset-tonal w-fit mx-2 lg:mx-0 mt-2 lg:mt-0"
         >
-          {@html ICONS.arrowBack}
+          <ArrowLeftIcon />
           Project Gallery</a
         >
         <Card>
@@ -440,20 +441,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                               <p class="px-2 mt-4 text-sm">
                                 Items purchased through links with a shopping
                                 bag icon
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  fill="none"
-                                  viewBox="0 0 24 24"
-                                  stroke-width="1.5"
-                                  stroke="currentColor"
-                                  class="w-5 h-5 inline relative bottom-1"
-                                >
-                                  <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
-                                  />
-                                </svg>
+                                <ShoppingBagIcon class="size-4 inline" />
                                 help support this site by earning the developer a
                                 percentage of each sale, at no additional cost to
                                 you.
@@ -511,19 +499,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
                                       href={affiliate_variant_href}
                                       target="_blank"
                                       rel="noreferrer nofollow"
-                                      ><svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                        stroke-width="1.5"
-                                        stroke="currentColor"
-                                        class="w-6 h-6"
-                                        ><path
-                                          stroke-linecap="round"
-                                          stroke-linejoin="round"
-                                          d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
-                                        /></svg
-                                      >
+                                    >
+                                      <ShoppingBagIcon />
                                       <span class="underline">Buy</span></a
                                     >
                                   {/if}

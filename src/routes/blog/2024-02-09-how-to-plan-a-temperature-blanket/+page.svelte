@@ -19,6 +19,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import AppShell from '$lib/components/AppShell.svelte';
   import Card from '$lib/components/Card.svelte';
   import { ICONS } from '$lib/constants';
+  import { ArrowLeftIcon } from '@lucide/svelte';
   import { Modal } from '@skeletonlabs/skeleton-svelte';
 
   let openTableOfContents = $state(false);
@@ -158,7 +159,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <a
         href="/blog"
         class="btn hover:preset-tonal gap-1 mb-2 max-lg:mx-2 max-lg:mt-2"
-        >{@html ICONS.arrowBack} Blog</a
+        ><ArrowLeftIcon /> Blog</a
       >
       <div class="pb-4 text-left flex gap-4">
         <div class="w-full flex flex-col gap-8">
