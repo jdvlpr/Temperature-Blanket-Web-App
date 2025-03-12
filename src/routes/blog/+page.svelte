@@ -125,7 +125,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {#each filteredPosts as { href, imgSrc, imgAlt, title, tags }}
             <div class="flex flex-col gap-4">
               <a
-                class="w-full card bg-surface-50 dark:bg-surface-950 hover:bg-surface-100 dark:bg-surface-900 p-4 whitespace-pre-wrap text-center flex flex-col items-center justify-center gap-2"
+                class="w-full card bg-surface-50-950 hover:bg-surface-100-900 p-4 whitespace-pre-wrap text-center flex flex-col items-center justify-center gap-2"
                 {href}
               >
                 <img

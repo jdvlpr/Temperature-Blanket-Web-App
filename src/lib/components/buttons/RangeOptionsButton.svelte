@@ -26,7 +26,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <Tooltip
-  classNames="btn preset-filled-primary-500"
+  classNames="btn preset-filled-primary-500 btn-lg"
   title="Configure Ranges"
   fullWidth={true}
   onclick={() =>
