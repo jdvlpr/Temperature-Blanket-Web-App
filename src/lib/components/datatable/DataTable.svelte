@@ -87,7 +87,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <label class="label flex flex-col items-start w-20">
             <span class="text-sm">Page</span>
             <select
-              class="select"
+              class="select w-fit min-w-[60px] mx-auto"
               id="datatable-page"
               bind:value={table.currentPage}
               onchange={() => {

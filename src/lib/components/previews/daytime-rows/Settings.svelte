@@ -162,7 +162,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <label class="label">
   <span>Position of Daytime Stitches</span>
   <select
-    class="select w-fit"
+    class="select w-fit min-w-[150px]"
     id="rsun-daytime-position"
     bind:value={daytimeRowsPreview.settings.daytimePosition}
   >

@@ -106,7 +106,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <div class="flex flex-wrap gap-4 justify-center w-full">
       <label class="label">
         <span>Square Size</span>
-        <select class="select w-fit" id="square-size" bind:value={squareSize}>
+        <select
+          class="select min-w-[100px]"
+          id="square-size"
+          bind:value={squareSize}
+        >
           {#each Array(17) as _, i}
             {#if i > 0}
               <option value={i}>
@@ -120,7 +124,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <label class="label">
         <span>Primary (Background) Color Using the Day's</span>
         <select
-          class="select w-fit"
+          class="select w-fit truncate min-w-[220px]"
           id="primary-target"
           bind:value={primaryTarget}
         >

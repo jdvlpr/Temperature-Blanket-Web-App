@@ -80,7 +80,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <label class="label">
   <span>Number of Columns</span>
   <select
-    class="select w-fit"
+    class="select w-fit min-w-[60px]"
     id="sqrs-columns"
     bind:value={squaresPreview.settings.columns}
   >
@@ -97,7 +97,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <label class="label">
   <span>Squares at Beginning</span>
   <select
-    class="select w-fit"
+    class="select w-fit min-w-[60px]"
     id="sqrs-squares-at-beginning"
     bind:value={squaresPreview.settings.squaresAtBeginning}
   >
@@ -112,7 +112,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <label class="label">
   <span>Squares Between Months</span>
   <select
-    class="select w-fit"
+    class="select w-fit min-w-[60px]"
     id="sqrs-squares-between-months"
     bind:value={squaresPreview.settings.squaresBetweenMonthsCount}
   >

@@ -231,7 +231,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <span>From popular projects during the past</span>
               <select
                 bind:value={yarnPaletteGalleryState.timePeriod}
-                class="select w-fit mx-auto"
+                class="select w-fit min-w-[90px] mx-auto"
                 onchange={() => {
                   yarnPaletteGalleryState.popularPalettes = [];
                   fetchPopularPalettes();

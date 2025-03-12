@@ -131,7 +131,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <label class="label text-sm">
     <span>Popular during the past</span>
     <select
-      class="select truncate w-fit mx-auto"
+      class="select w-fit min-w-[90px] mx-auto"
       id="select-time-period"
       bind:value={galleryPalettesPopularState.months}
       onchange={async () => {

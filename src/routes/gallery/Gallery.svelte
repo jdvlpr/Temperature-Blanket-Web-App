@@ -15,7 +15,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import { PUBLIC_WORDPRESS_BASE_URL } from '$env/static/public';
-  import Card from '$lib/components/Card.svelte';
   import SelectYarn from '$lib/components/SelectYarn.svelte';
   import ToTopButton from '$lib/components/buttons/ToTopButton.svelte';
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';

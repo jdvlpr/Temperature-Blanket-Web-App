@@ -38,7 +38,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <label class="label">
   <span>
     <select
-      class="select w-fit"
+      class="select w-fit min-w-[120px] mx-auto"
       bind:this={numEl}
       id="number-of-colors"
       bind:value={numberOfColors}

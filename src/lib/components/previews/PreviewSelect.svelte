@@ -64,7 +64,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <div class="my-4 flex flex-col justify-center items-center gap-2">
   <label class="label">
     <select
-      class="select w-fit mx-auto"
+      class="select w-fit mx-auto min-w-[200px]"
       id="select-pattern-type"
       value={activePreviewSelectId}
       onchange={(e) => {

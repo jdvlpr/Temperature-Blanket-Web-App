@@ -47,7 +47,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <label class="label">
   <span>Dimensions (W x H)</span>
   <select
-    class="select w-fit"
+    class="select w-fit min-w-[80px]"
     id="mrws-dimensions"
     bind:value={monthRowsPreview.settings.dimensions}
   >
@@ -60,7 +60,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <label class="label">
   <span>Direction</span>
   <select
-    class="select w-fit"
+    class="select w-fit min-w-[160px]"
     id="mrws-direction"
     bind:value={monthRowsPreview.settings.direction}
   >

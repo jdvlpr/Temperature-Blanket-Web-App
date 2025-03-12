@@ -645,7 +645,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   : 'flex flex-col'}"
               >
                 {#each results as { hex, name, delta, brandName, yarnName, variant_href, affiliate_variant_href, unavailable }}
-                  {@const percentMatch = delta ? Math.floor(100 - delta) : null}
+                  {@const percentMatch = Math.floor(100 - delta)}
                   <div
                     class="shadow-sm flex-1 min-w-fit p-2 flex items-center gap-x-2 rounded-container {layout ===
                     'grid'
