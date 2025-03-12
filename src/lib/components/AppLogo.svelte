@@ -30,7 +30,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     }
   }}
 >
-  <div class="flex items-center gap-2 mx-6 lg:mx-4">
+  <div class="flex items-center gap-2 mx-4">
     <div class="rounded-[0.2rem] overflow-hidden shrink-0 shadow">
       <div class="flex flex-col items-center size-8 relative">
         <div class="flex flex-col items-center absolute">
