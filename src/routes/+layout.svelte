@@ -166,7 +166,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     href="https://temperature-blanket.com"
     class="btn preset-filled-secondary-500"
     target="_blank"
-    >Main Version <ExternalLinkIcon class="size-5" />
+    >Main Version <ExternalLinkIcon class="size-5 relative -top-[1px]" />
   </a>
 </div>
 

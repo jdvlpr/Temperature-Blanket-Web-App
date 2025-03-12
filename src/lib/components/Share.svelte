@@ -27,10 +27,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   function copyURL() {
     try {
       window.navigator.clipboard.writeText(href);
-      copiedMessage = `<span class="inline-flex items-center gap-1">
-						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">
-			<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" />
-			</svg>Copied to your clipboard</span>`;
+      copiedMessage = `Copied to your clipboard`;
     } catch {
       copiedMessage = 'Unable to share page.';
     }
@@ -40,7 +37,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     if (copiedMessage !== '') {
       toast.trigger({
         message: copiedMessage,
-        background: 'preset-filled-success-100-900',
+        category: 'success',
       });
       copiedMessage = '';
     }
@@ -57,6 +54,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     contentBase="card bg-surface-200 dark:bg-surface-800 p-4 space-y-4 max-w-[90vw]"
     arrow
     arrowBackground="bg-surface-200! dark:bg-surface-800!"
+    zIndex="100"
   >
     {#snippet trigger()}
       <Share2Icon />

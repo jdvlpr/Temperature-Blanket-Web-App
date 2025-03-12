@@ -26,10 +26,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
     BookOpenTextIcon,
     CircleHelpIcon,
     CloudIcon,
+    ExternalLinkIcon,
     FileClockIcon,
     GalleryHorizontalEndIcon,
     GalleryVerticalEndIcon,
     GithubIcon,
+    History,
+    HistoryIcon,
     Icon,
     MailIcon,
     MessageCirclePlusIcon,
@@ -132,6 +135,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
             Project Planner
           </a>
 
+          <div class="w-full border-t border-surface-300-700"></div>
+
           <a
             href="/yarn-colorway-finder"
             class={[
@@ -143,6 +148,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <Icon iconNode={yarnBall} />
             Yarn Colorway Finder
           </a>
+
+          <div class="w-full border-t border-surface-300-700"></div>
+
           <a
             href="/yarn"
             class={[
@@ -153,6 +161,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <SwatchBookIcon />
             Yarn Palette Creator
           </a>
+
+          <div class="w-full border-t border-surface-300-700"></div>
+
           <a
             href="/weather"
             class={[
@@ -182,6 +193,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <GalleryVerticalEndIcon />
             Projects
           </a>
+
           <a
             href="/yarn-palette-gallery"
             class={[
@@ -190,7 +202,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 'preset-tonal-secondary',
             ]}
           >
-            <GalleryHorizontalEndIcon />
+            <SwatchBookIcon />
             Yarn Palettes</a
           >
         </div>
@@ -212,6 +224,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <CircleHelpIcon />
             FAQ
           </a>
+
+          <div class="w-full border-t border-surface-300-700"></div>
+
           <a
             href="/contact"
             class={[
@@ -283,9 +298,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
               page.url.pathname === '/changelog' && 'preset-tonal-secondary',
             ]}
           >
-            <FileClockIcon />
+            <HistoryIcon />
             Changelog
           </a>
+
+          <div class="w-full border-t border-surface-300-700"></div>
 
           <a
             href="/api/yarn-colorways"
@@ -299,6 +316,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </a>
 
           {#if PUBLIC_GITHUB_LINK}
+            <div class="w-full border-t border-surface-300-700"></div>
             <a
               href={PUBLIC_GITHUB_LINK}
               class="btn hover:preset-tonal w-fit"
@@ -306,6 +324,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             >
               <GithubIcon />
               GitHub
+              <ExternalLinkIcon class="size-5 relative -top-[1px]" />
             </a>
           {/if}
         </div>

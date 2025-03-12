@@ -20,7 +20,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     PUBLIC_GITHUB_LINK,
     PUBLIC_SITE_TITLE,
   } from '$env/static/public';
-  import { FacebookIcon, GithubIcon, MailIcon } from '@lucide/svelte';
+  import {
+    ExternalLinkIcon,
+    FacebookIcon,
+    GithubIcon,
+    MailIcon,
+  } from '@lucide/svelte';
 
   let email = $state('Loading...');
 
@@ -30,10 +35,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div class="flex flex-col gap-4 mt-2">
-  <a
-    href="mailto:{email}"
-    class="flex text-left gap-2 underline break-all w-fit"
-  >
+  <a href="mailto:{email}" class="btn hover:preset-tonal w-fit">
     <MailIcon />
 
     {email}
@@ -43,11 +45,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
       href={PUBLIC_FACEBOOK_LINK}
       target="_blank"
       rel="noreferrer"
-      class="underline flex text-left gap-2 break-all w-fit"
+      class="btn hover:preset-tonal text-left w-fit"
     >
       <FacebookIcon />
-      {PUBLIC_SITE_TITLE}</a
-    >
+      {PUBLIC_SITE_TITLE}
+      <ExternalLinkIcon class="size-5 relative -top-[1px]" />
+    </a>
   {/if}
 
   {#if PUBLIC_GITHUB_LINK}
@@ -55,11 +58,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
       href={PUBLIC_GITHUB_LINK}
       target="_blank"
       rel="noreferrer"
-      class="underline flex text-left gap-2 break-all w-fit"
+      class="btn hover:preset-tonal text-left w-fit"
     >
       <GithubIcon />
-
-      <span>GitHub</span>
+      GitHub
+      <ExternalLinkIcon class="size-5 relative -top-[1px]" />
     </a>
   {/if}
 </div>

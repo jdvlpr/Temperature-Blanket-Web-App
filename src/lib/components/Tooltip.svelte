@@ -143,59 +143,24 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 </script>
 
-<div class="inline-block h-full" class:w-full={fullWidth}>
-  {#if !disableTooltip && buttonDisabled}
-    <div
-      role="button"
-      tabindex="0"
-      onmouseenter={() => {
-        debounce(() => (showTooltip = true), 50);
-      }}
-      onmouseleave={handelLeaveEvent}
-      onfocus={() => {
-        debounce(() => (showTooltip = true), 50);
-      }}
-      onblur={handelLeaveEvent}
-      use:floatingRef
-    >
-      <button
-        {onclick}
-        disabled
-        class={classNames}
-        data-pinned={dataPinned}
-        data-active={dataActive}
-        data-no-weather={dataNoWeather}
-        {title}
-        {id}
-      >
-        {@render children?.()}
-      </button>
-    </div>
-  {:else if !disableTooltip}
+{#if !disableTooltip && buttonDisabled}
+  <div
+    role="button"
+    tabindex="0"
+    onmouseenter={() => {
+      debounce(() => (showTooltip = true), 50);
+    }}
+    onmouseleave={handelLeaveEvent}
+    onfocus={() => {
+      debounce(() => (showTooltip = true), 50);
+    }}
+    onblur={handelLeaveEvent}
+    use:floatingRef
+  >
     <button
       {onclick}
-      class={classNames}
-      data-pinned={dataPinned}
-      data-active={dataActive}
-      data-no-weather={dataNoWeather}
-      {title}
-      {id}
-      onmouseenter={() => {
-        debounce(() => (showTooltip = true), 50);
-      }}
-      onmouseleave={handelLeaveEvent}
-      onfocus={() => {
-        debounce(() => (showTooltip = true), 50);
-      }}
-      onblur={handelLeaveEvent}
-      use:floatingRef
-    >
-      {@render children?.()}
-    </button>
-  {:else}
-    <button
-      {onclick}
-      class={classNames}
+      disabled
+      class={[classNames, fullWidth && 'w-full inline-block h-full']}
       data-pinned={dataPinned}
       data-active={dataActive}
       data-no-weather={dataNoWeather}
@@ -204,8 +169,41 @@ If not, see <https://www.gnu.org/licenses/>. -->
     >
       {@render children?.()}
     </button>
-  {/if}
-</div>
+  </div>
+{:else if !disableTooltip}
+  <button
+    {onclick}
+    class={[classNames, fullWidth && 'w-full inline-block h-full']}
+    data-pinned={dataPinned}
+    data-active={dataActive}
+    data-no-weather={dataNoWeather}
+    {title}
+    {id}
+    onmouseenter={() => {
+      debounce(() => (showTooltip = true), 50);
+    }}
+    onmouseleave={handelLeaveEvent}
+    onfocus={() => {
+      debounce(() => (showTooltip = true), 50);
+    }}
+    onblur={handelLeaveEvent}
+    use:floatingRef
+  >
+    {@render children?.()}
+  </button>
+{:else}
+  <button
+    {onclick}
+    class={[classNames, fullWidth && 'w-full inline-block h-full']}
+    data-pinned={dataPinned}
+    data-active={dataActive}
+    data-no-weather={dataNoWeather}
+    {title}
+    {id}
+  >
+    {@render children?.()}
+  </button>
+{/if}
 
 {#if showTooltip}
   <div

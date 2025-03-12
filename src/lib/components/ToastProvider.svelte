@@ -5,6 +5,7 @@
 
   import { toast } from '$lib/state';
   import { fade } from 'svelte/transition';
+  import { CircleCheckIcon } from '@lucide/svelte';
 
   // Props
 
@@ -146,11 +147,24 @@
         >
           <!-- Toast -->
           <div
-            class="toast {classesToast} {t.background ??
-              background} {t.classes ?? ''}"
+            class={[
+              'toast',
+              classesToast,
+              t.category === 'success'
+                ? 'preset-filled-success-200-800'
+                : t.background || background,
+              t.classes,
+            ]}
             data-testid="toast"
           >
-            <div class="text-base">{@html t.message}</div>
+            {#if t.category === 'success'}
+              <div class="text-base flex flex-wrap items-center gap-1">
+                <CircleCheckIcon class="inline" />
+                {@html t.message}
+              </div>
+            {:else}
+              <div class="text-base">{@html t.message}</div>
+            {/if}
             {#if t.action || !t.hideDismiss}
               <div class="toast-actions {cToastActions}">
                 {#if t.action}<button

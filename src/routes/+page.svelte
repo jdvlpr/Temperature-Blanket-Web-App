@@ -246,7 +246,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
 
     <Tooltip
-      classNames="btn-icon  hover:preset-tonal"
+      classNames="btn-icon hover:preset-tonal"
       minWidth="265px"
       title="Help"
     >

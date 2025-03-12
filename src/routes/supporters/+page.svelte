@@ -51,7 +51,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               href={PUBLIC_KOFI_LINK}
               target="_blank"
               rel="noopener noreferrer"
-              class="link">generous one-time donors</a
+              class="link">many generous one-time donors</a
             >
             for their contributions to this site, as well as to the following monthly
             supporters:

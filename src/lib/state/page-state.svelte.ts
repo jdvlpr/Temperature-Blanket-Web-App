@@ -129,6 +129,8 @@ export interface ToastSettings {
   hoverable?: boolean;
   /** Provide arbitrary CSS classes to style the toast. */
   classes?: string;
+  /** Category of the toast. */
+  category?: 'success';
   /** Callback function that fires on trigger and close. */
   callback?: (response: { id: string; status: 'queued' | 'closed' }) => void;
 }
