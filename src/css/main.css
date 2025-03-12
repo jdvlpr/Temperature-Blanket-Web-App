@@ -175,3 +175,7 @@ th div {
 .label {
   width: auto;
 }
+
+.btn-icon > * {
+  flex-shrink: 0 !important;
+}

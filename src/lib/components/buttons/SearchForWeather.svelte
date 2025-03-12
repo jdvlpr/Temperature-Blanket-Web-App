@@ -18,6 +18,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import GettingWeather from '$lib/components/modals/GettingWeather.svelte';
   import GettingWeatherWarnCustomWeather from '$lib/components/modals/GettingWeatherWarnCustomWeather.svelte';
   import { locations, modal, project, weather } from '$lib/state';
+  import { ChevronRightIcon } from '@lucide/svelte';
 
   let disabled = $derived(!locations.allValid || project.status.loading);
 </script>
@@ -34,20 +35,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {:else}
       Search {#if weather.data.length}Again{/if}
     {/if}
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke-width="1.5"
-      stroke="currentColor"
-      class="size-4"
-    >
-      <path
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        d="m8.25 4.5 7.5 7.5-7.5 7.5"
-      />
-    </svg>
+    <ChevronRightIcon />
     {#snippet tooltip()}
       <p>Choose a valid location and dates above.</p>
     {/snippet}
@@ -76,19 +64,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {:else}
       Search {#if weather.data.length}Again{/if}
     {/if}
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke-width="1.5"
-      stroke="currentColor"
-      class="size-4"
-    >
-      <path
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        d="m8.25 4.5 7.5 7.5-7.5 7.5"
-      />
-    </svg>
+    <ChevronRightIcon />
   </button>
 {/if}

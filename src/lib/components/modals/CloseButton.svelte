@@ -14,6 +14,8 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
+  import { XIcon } from '@lucide/svelte';
+
   type Props = {
     onClose: any;
     text?: string;
@@ -34,18 +36,5 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {#if text}
     <span class="font-bold">{text}</span>
   {/if}
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    stroke-width="1.5"
-    stroke="currentColor"
-    class="size-5"
-  >
-    <path
-      stroke-linecap="round"
-      stroke-linejoin="round"
-      d="M6 18L18 6M6 6l12 12"
-    />
-  </svg>
+  <XIcon />
 </button>

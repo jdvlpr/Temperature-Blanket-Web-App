@@ -21,6 +21,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { Modal } from '@skeletonlabs/skeleton-svelte';
   import AppLogo from './AppLogo.svelte';
   import { page } from '$app/state';
+  import { MenuIcon, PanelLeftClose } from '@lucide/svelte';
 
   /**
    * @typedef {Object} Props
@@ -85,20 +86,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           transitionsPositionerOut={{ x: -480, duration: 200 }}
         >
           {#snippet trigger()}
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-              class="size-6"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
-              />
-            </svg>
+            <MenuIcon />
 
             {#if pageName}
               <span class="max-[355px]:hidden">
@@ -131,21 +119,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         }}
       >
         {#if showNavigationSideBar.value}
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="size-6"
-            viewBox="0 0 24 24"
-            ><g
-              fill="none"
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              ><rect width="18" height="18" x="3" y="3" rx="2" ry="2" /><path
-                d="M9 3v18m7-6l-3-3l3-3"
-              /></g
-            ></svg
-          >
+          <PanelLeftClose />
           <span in:slide={{ axis: 'x', duration: 90 }}>Hide Sidebar</span>
         {:else}
           <svg

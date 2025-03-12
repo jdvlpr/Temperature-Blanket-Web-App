@@ -18,16 +18,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import AppLogo from '$lib/components/AppLogo.svelte';
   import AppShell from '$lib/components/AppShell.svelte';
   import { MAXIMUM_DAYS_PER_LOCATION, MAXIMUM_LOCATIONS } from '$lib/constants';
+  import { CircleCheckIcon, CircleMinusIcon } from '@lucide/svelte';
   import { Modal } from '@skeletonlabs/skeleton-svelte';
-
-  let checkIcon = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 inline text-success-900-100">
-  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-</svg>
-`;
-  let xIcon = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 inline text-error-900-100">
-  <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-</svg>
-`;
 
   let openTableOfContents = $state(false);
 </script>
@@ -415,23 +407,35 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <div class="flex flex-col gap-2 card p-4">
                 <p class="font-bold">Use the Project Planner</p>
                 <p>
-                  {@html checkIcon}
+                  <CircleCheckIcon
+                    class="inline"
+                    style="color:var(--color-success-500)"
+                  />
                   Before you start working on your project, to help choose your yarn
                   colors, plan your ranges, and preview your design
                 </p>
                 <p>
-                  {@html checkIcon}
+                  <CircleCheckIcon
+                    class="inline"
+                    style="color:var(--color-success-500)"
+                  />
                   As you pick dates for your project, to view aggregated historical
                   weather data or to get an idea what this year’s temperature ranges
                   might be based on past temperatures
                 </p>
                 <p>
-                  {@html checkIcon}
+                  <CircleCheckIcon
+                    class="inline"
+                    style="color:var(--color-success-500)"
+                  />
                   Before you buy your yarn, to estimate how many skeins of each colorway
                   you might need
                 </p>
                 <p>
-                  {@html checkIcon}
+                  <CircleCheckIcon
+                    class="inline"
+                    style="color:var(--color-success-500)"
+                  />
                   While you’re working on your project, to get historical weather
                   data and get yarn color details
                 </p>
@@ -439,11 +443,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <div class="flex flex-col gap-2 card p-4">
                 <p class="font-bold">Don’t use the Project Planner</p>
                 <p>
-                  {@html xIcon} If your project contains dates beyond the current
-                  date
+                  <CircleMinusIcon
+                    class="inline"
+                    style="color:var(--color-error-500)"
+                  /> If your project contains dates beyond the current date
                 </p>
                 <p>
-                  {@html xIcon} To view future weather forecasts. (For that use the
+                  <CircleMinusIcon
+                    class="inline"
+                    style="color:var(--color-error-500)"
+                  /> To view future weather forecasts. (For that use the
                   <a href="/weather" class="link">Weather Forecast</a> tool.)
                 </p>
               </div>
@@ -473,12 +482,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </p>
             <ul>
               <li>
-                {@html checkIcon} There’s no need to set up an account in order to
-                save your project
+                <CircleCheckIcon
+                  class="inline"
+                  style="color:var(--color-success-500)"
+                /> There’s no need to set up an account in order to save your project
               </li>
               <li>
-                {@html checkIcon} You must save the project’s URL somewhere if you
-                want to share the project or open it in a different browser.
+                <CircleCheckIcon
+                  class="inline"
+                  style="color:var(--color-success-500)"
+                /> You must save the project’s URL somewhere if you want to share
+                the project or open it in a different browser.
               </li>
             </ul>
             <p>

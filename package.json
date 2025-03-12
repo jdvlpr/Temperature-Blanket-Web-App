@@ -16,6 +16,8 @@
     "test:api": "vite dev --host localhost --port 5180 & vitest"
   },
   "dependencies": {
+    "@lucide/lab": "^0.1.2",
+    "@lucide/svelte": "^0.479.0",
     "autocompleter": "^9.3.2",
     "canvg": "^4.0.1",
     "chart.js": "^4.4.8",
