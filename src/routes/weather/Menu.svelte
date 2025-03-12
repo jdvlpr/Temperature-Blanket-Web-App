@@ -17,6 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import UnitChanger from '$lib/components/UnitChanger.svelte';
   import { modal } from '$lib/state';
   import { getWeatherCodeDetails } from '$lib/utils';
+  import { Trash2Icon } from '@lucide/svelte';
   import { Segment } from '@skeletonlabs/skeleton-svelte';
   import { weatherState } from './+page.svelte';
   import { fetchData } from './GetWeather.svelte';
@@ -124,20 +125,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   modal.close();
               }}
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="currentColor"
-                class="w-6 h-6"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
+              <Trash2Icon />
             </button>
           </div>
         {/each}

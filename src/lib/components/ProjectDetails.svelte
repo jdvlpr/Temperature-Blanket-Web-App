@@ -15,7 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import ColorPalette from '$lib/components/ColorPalette.svelte';
-  import { ICONS, MAXIMUM_YARN_DETAILS_DESCRIPTIONS } from '$lib/constants';
+  import { MAXIMUM_YARN_DETAILS_DESCRIPTIONS } from '$lib/constants';
   import { getColorsFromInput, pluralize } from '$lib/utils';
   import { Trash2Icon } from '@lucide/svelte';
 

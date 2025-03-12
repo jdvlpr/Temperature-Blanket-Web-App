@@ -144,7 +144,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <div
         class="flex flex-col w-full justify-start col-span-12 md:col-span-3 gap-1"
       >
-        <span class="flex items-center label gap-1">
+        <span class="flex items-center gap-1">
           <SearchIcon class="size-4" />
           Search Projects
         </span>

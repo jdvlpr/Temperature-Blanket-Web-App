@@ -191,3 +191,7 @@ th div {
 .btn-icon > * {
   flex-shrink: 0 !important;
 }
+
+.lucide {
+  flex-shrink: 0;
+}

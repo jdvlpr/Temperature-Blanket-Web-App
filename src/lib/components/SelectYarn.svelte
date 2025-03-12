@@ -323,7 +323,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   class="w-full flex flex-col justify-start md:col-span-2 gap-1"
   bind:this={inputGroup}
 >
-  <span class="flex items-center label gap-1">
+  <span class="flex items-center gap-1">
     <ListFilterIcon class="size-4" />
     Yarn Name
   </span>

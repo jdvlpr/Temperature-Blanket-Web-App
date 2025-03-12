@@ -14,6 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
+  import { ChevronUpIcon } from '@lucide/svelte';
   import { fade } from 'svelte/transition';
 
   /**
@@ -34,22 +35,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <button
     aria-label="Back to Top"
     transition:fade
-    class="btn-icon backdrop-blur-xs p-2 m-2 z-20 shadow-sm preset-filled-primary-500 opacity-80 transition-all inline-flex justify-center items-center gap-1"
+    class="btn-icon backdrop-blur-xs p-2 m-2 z-20 shadow-sm preset-filled-primary-500 opacity-80 transition-all inline-flex justify-center items-center"
     onclick={onClick}
   >
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke-width="1.5"
-      stroke="currentColor"
-      class="w-6 h-6"
-    >
-      <path
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        d="M4.5 15.75l7.5-7.5 7.5 7.5"
-      />
-    </svg>
+    <ChevronUpIcon />
   </button>
 </div>

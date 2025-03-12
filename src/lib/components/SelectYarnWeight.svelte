@@ -56,7 +56,7 @@
 </script>
 
 <label class="label text-left">
-  <span class="flex items-center label gap-1">
+  <span class="flex items-center gap-1">
     <WeightIcon class="size-4" />
     <span>Yarn Weight</span>
     <a

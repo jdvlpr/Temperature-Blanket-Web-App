@@ -28,7 +28,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { onMount } from 'svelte';
   import '../../css/flag-icons.css';
   import { browser } from '$app/environment';
-  import { SearchIcon, Trash2Icon, XIcon } from '@lucide/svelte';
+  import {
+    SearchIcon,
+    Trash2Icon,
+    TriangleAlertIcon,
+    XIcon,
+  } from '@lucide/svelte';
 
   interface Props {
     location: LocationType;
@@ -527,15 +532,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <p
             class="text-sm preset-tonal-warning border border-warning-500 rounded-container p-2 w-full my-2"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="w-4 h-4 inline mr-1"
-              viewBox="0 0 24 24"
-              ><path
-                fill="currentColor"
-                d="M7 20h4c0 1.1-.9 2-2 2s-2-.9-2-2m-2-1h8v-2H5zm11.5-9.5c0 3.82-2.66 5.86-3.77 6.5H5.27c-1.11-.64-3.77-2.68-3.77-6.5C1.5 5.36 4.86 2 9 2s7.5 3.36 7.5 7.5m-2 0C14.5 6.47 12.03 4 9 4S3.5 6.47 3.5 9.5c0 2.47 1.49 3.89 2.35 4.5h6.3c.86-.61 2.35-2.03 2.35-4.5m6.87-2.13L20 8l1.37.63L22 10l.63-1.37L24 8l-1.37-.63L22 6zM19 6l.94-2.06L22 3l-2.06-.94L19 0l-.94 2.06L16 3l2.06.94z"
-              /></svg
-            >
+            <TriangleAlertIcon class="inline size-4 -top-[1px] relative" />
 
             {#if !datesMustBeHistorical}
               For best results, don't include future dates.
@@ -558,20 +555,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <p
           class="preset-tonal-error border border-error-500 rounded-container p-2 text-sm w-full my-2"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="1.5"
-            stroke="currentColor"
-            class="w-4 h-4 inline"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"
-            />
-          </svg>
+          <TriangleAlertIcon class="inline size-4 -top-[1px] relative" />
           {location.errorMessage}
         </p>
       {:else if project.status.loading}

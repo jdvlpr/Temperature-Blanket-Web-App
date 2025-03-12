@@ -33,6 +33,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import {
     ArrowDownWideNarrowIcon,
     CircleCheckBigIcon,
+    CircleCheckIcon,
     ExpandIcon,
     ImageIcon,
     ShareIcon,
@@ -183,7 +184,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           },
         })}
     >
-      <CircleCheckBigIcon />
+      <CircleCheckIcon />
       {#if !fullscreen.value}
         Choose Colorways
       {/if}

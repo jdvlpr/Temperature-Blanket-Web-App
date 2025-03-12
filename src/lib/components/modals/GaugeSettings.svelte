@@ -30,10 +30,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
     getStart,
     getTextColor,
   } from '$lib/utils';
+  import { targetArrow } from '@lucide/lab';
+  import {
+    CalculatorIcon,
+    Icon,
+    InfoIcon,
+    ListStartIcon,
+    TriangleAlertIcon,
+    WandIcon,
+    WandSparklesIcon,
+  } from '@lucide/svelte';
   import { Segment } from '@skeletonlabs/skeleton-svelte';
   import { onMount, tick } from 'svelte';
   import { fade, slide } from 'svelte/transition';
-
   interface Props {
     onSave: any;
     index?: any;
@@ -237,29 +246,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
           class="flex flex-col justify-start items-start gap-2 card preset-filled-surface-200-800 p-4"
         >
           <div class="flex flex-col items-start justify-start gap-1">
-            <p class="flex justify-start items-start gap-1">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="w-6 h-6"
-                viewBox="0 0 24 24"
-                ><g
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  ><path
-                    d="M3 7V5c0-1.1.9-2 2-2h2m10 0h2c1.1 0 2 .9 2 2v2m0 10v2c0 1.1-.9 2-2 2h-2M7 21H5c-1.1 0-2-.9-2-2v-2"
-                  /><rect width="7" height="5" x="7" y="7" rx="1" /><rect
-                    width="7"
-                    height="5"
-                    x="10"
-                    y="12"
-                    rx="1"
-                  /></g
-                ></svg
-              >
-
+            <p class="flex justify-start items-center gap-1">
+              <WandIcon class="size-4" />
               <span>Generate Ranges</span>
             </p>
 
@@ -277,20 +265,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             {#if !incrementMode}
               <p class="card p-4 preset-tonal-warning text-left mt-2">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke-width="1.5"
-                  stroke="currentColor"
-                  class="w-6 h-6 inline"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"
-                  />
-                </svg>
+                <TriangleAlertIcon class="inline" />
 
                 Choosing Automatic or Manual will override the current ranges
                 with generated values.
@@ -304,23 +279,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 <div class="flex flex-col gap-2 justify-start items-start">
                   {#if _gauge.id === 'temp'}
                     <label class="label">
-                      <span class="flex flex-wrap gap-1">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          class="w-6 h-6"
-                          viewBox="0 0 256 256"
-                          ><g fill="currentColor"
-                            ><path
-                              d="M176 128a48 48 0 1 1-48-48a48 48 0 0 1 48 48Z"
-                              opacity=".2"
-                            /><path
-                              d="M221.87 83.16A104.1 104.1 0 1 1 195.67 49l22.67-22.68a8 8 0 0 1 11.32 11.32l-96 96a8 8 0 0 1-11.32-11.32l27.72-27.72a40 40 0 1 0 17.87 31.09a8 8 0 1 1 16-.9a56 56 0 1 1-22.38-41.65l22.75-22.75a87.88 87.88 0 1 0 23.13 29.67a8 8 0 0 1 14.44-6.9Z"
-                            /></g
-                          ></svg
-                        >
+                      <span class="flex flex-wrap items-center gap-1">
+                        <Icon iconNode={targetArrow} class="size-4" />
 
-                        <span>Balance Focus</span></span
-                      >
+                        <span>Balance Focus</span>
+                      </span>
                       <select
                         bind:value={_gauge.rangeOptions.auto.optimization}
                         onchange={() => {
@@ -341,15 +304,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     <p
                       class="card p-4 preset-tonal-success border border-success-500 text-left"
                     >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        class="size-6 inline"
-                        viewBox="0 0 24 24"
-                        ><path
-                          fill="currentColor"
-                          d="M7.5 5.6L5 7l1.4-2.5L5 2l2.5 1.4L10 2L8.6 4.5L10 7zm12 9.8L22 14l-1.4 2.5L22 19l-2.5-1.4L17 19l1.4-2.5L17 14zM22 2l-1.4 2.5L22 7l-2.5-1.4L17 7l1.4-2.5L17 2l2.5 1.4zm-8.66 10.78l2.44-2.44l-2.12-2.12l-2.44 2.44zm1.03-5.49l2.34 2.34c.39.37.39 1.02 0 1.41L5.04 22.71c-.39.39-1.04.39-1.41 0l-2.34-2.34c-.39-.37-.39-1.02 0-1.41L12.96 7.29c.39-.39 1.04-.39 1.41 0"
-                        /></svg
-                      >
+                      <WandSparklesIcon class="inline" />
 
                       {#if _gauge.rangeOptions.auto.optimization === 'ranges'}
                         Range increments are as even as possible.
@@ -387,20 +342,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         {/if}
 
                         <Tooltip>
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke-width="1.5"
-                            stroke="currentColor"
-                            class="w-6 h-6"
-                          >
-                            <path
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                              d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"
-                            />
-                          </svg>
+                          <InfoIcon class="size-4" />
                           {#snippet tooltip()}
                             <p>
                               This was calculated based on your weather data and
@@ -453,34 +395,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   <div class="tex-left flex flex-col items-start w-fit">
                     <label
                       for="startFrom"
-                      class="label flex flex-wrap items-start gap-2"
+                      class="label flex flex-wrap items-center gap-2"
                     >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                        class="w-5 h-5"
-                      >
-                        <path
-                          d="M2 4.5A2.5 2.5 0 014.5 2h11a2.5 2.5 0 010 5h-11A2.5 2.5 0 012 4.5zM2.75 9.083a.75.75 0 000 1.5h14.5a.75.75 0 000-1.5H2.75zM2.75 12.663a.75.75 0 000 1.5h14.5a.75.75 0 000-1.5H2.75zM2.75 16.25a.75.75 0 000 1.5h14.5a.75.75 0 100-1.5H2.75z"
-                        />
-                      </svg>
+                      <ListStartIcon class="size-4" />
                       Start From ({unitLabel})
                       <Tooltip>
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke-width="1.5"
-                          stroke="currentColor"
-                          class="w-6 h-6"
-                        >
-                          <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"
-                          />
-                        </svg>
+                        <InfoIcon class="size-4" />
                         {#snippet tooltip()}
                           <p>
                             This should usually be the
@@ -539,37 +459,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 <span
                   class="flex flex-col justify-center items-center gap-2 my-2"
                 >
-                  <span class="flex flex-wrap gap-1 justify-center items-center"
-                    ><svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke-width="1.5"
-                      stroke="currentColor"
-                      class="w-6 h-6"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="M15.75 15.75V18m-7.5-6.75h.008v.008H8.25v-.008zm0 2.25h.008v.008H8.25V13.5zm0 2.25h.008v.008H8.25v-.008zm0 2.25h.008v.008H8.25V18zm2.498-6.75h.007v.008h-.007v-.008zm0 2.25h.007v.008h-.007V13.5zm0 2.25h.007v.008h-.007v-.008zm0 2.25h.007v.008h-.007V18zm2.504-6.75h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V13.5zm0 2.25h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V18zm2.498-6.75h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V13.5zM8.25 6h7.5v2.25h-7.5V6zM12 2.25c-1.892 0-3.758.11-5.593.322C5.307 2.7 4.5 3.65 4.5 4.757V19.5a2.25 2.25 0 002.25 2.25h10.5a2.25 2.25 0 002.25-2.25V4.757c0-1.108-.806-2.057-1.907-2.185A48.507 48.507 0 0012 2.25z"
-                      />
-                    </svg>
+                  <span
+                    class="flex flex-wrap gap-1 justify-center items-center"
+                  >
+                    <CalculatorIcon class="size-4" />
                     Range Calculation Method:<span>{@html rangeExample}</span>
                     <Tooltip>
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke-width="1.5"
-                        stroke="currentColor"
-                        class="w-6 h-6"
-                      >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"
-                        />
-                      </svg>
+                      <InfoIcon class="size-4" />
                       {#snippet tooltip()}
                         <div>
                           If you change this setting,
@@ -633,20 +529,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {/if}
         {#if isRangeCalculationUnavailable}
           <p class="card bg-warning-50 dark:bg-warning-950 text-left py-4 px-4">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-              class="w-6 h-6 inline"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"
-              />
-            </svg>
+            <TriangleAlertIcon class="inline" />
             The Ranges Preview below doesn't yet auto-calculate optimal From and
             To values using these options and this range calculation method ({@html rangeExample}).
             To show the optimal From and To values, {#if isNotAutoIncrements}

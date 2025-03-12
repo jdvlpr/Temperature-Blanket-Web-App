@@ -61,6 +61,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import {
     ArrowDownWideNarrowIcon,
     ExternalLinkIcon,
+    PlusIcon,
     SearchIcon,
     ShoppingBagIcon,
   } from '@lucide/svelte';
@@ -431,7 +432,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <div
                 class="flex flex-col justify-start w-full col-span-full gap-1"
               >
-                <span class="flex items-center label gap-1"
+                <span class="flex items-center gap-1"
                   ><svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
@@ -534,7 +535,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <div
                 class="flex flex-col justify-start w-full col-span-12 md:col-span-3 gap-1"
               >
-                <span class="flex items-center label gap-1">
+                <span class="flex items-center gap-1">
                   <SearchIcon class="size-4" />
                   <span>Colorway Name</span>
                 </span>
@@ -714,27 +715,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
             {#if results.length === itemsToShow}
               <div class="w-full flex justify-center mx-auto">
                 <button
-                  class="btn rounded-container bg-primary-200-800 gap-1 mb-2 font-bold"
+                  class="btn rounded-container bg-primary-200-800 mb-2"
                   bind:this={loadMoreSpinner}
                   onclick={() => {
                     if (itemsToShow <= results.length)
                       itemsToShow += YARN_COLORWAYS_PER_PAGE;
                     getResults();
                   }}
-                  ><svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke-width="1.5"
-                    stroke="currentColor"
-                    class="w-6 h-6"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M12 4.5v15m7.5-7.5h-15"
-                    />
-                  </svg>
+                >
+                  <PlusIcon />
                   Show More</button
                 >
               </div>
@@ -784,7 +773,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 />
               </svg>
             {/snippet}
-            <Accordion.Item value="tools">
+            <Accordion.Item value="accurate">
               {#snippet lead()}
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -818,7 +807,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 hello@temperature-blanket.com.
               {/snippet}
             </Accordion.Item>
-            <Accordion.Item>
+            <Accordion.Item value="find">
               {#snippet lead()}
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
