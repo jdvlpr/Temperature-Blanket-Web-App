@@ -27,7 +27,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import RangeOptionsButton from './buttons/RangeOptionsButton.svelte';
   import Gauge from './Gauge.svelte';
   import GaugeCustomizer from './GaugeCustomizer.svelte';
-  import { DownloadIcon } from '@lucide/svelte';
+  import { CirclePlusIcon, DownloadIcon } from '@lucide/svelte';
 
   onMount(() => {
     setupAvailableGauges();
@@ -78,7 +78,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {#each gauges.allAvailable as { id, label }}
       <button
         class={[
-          'btn  w-full gap-1',
+          'btn ',
           gauges.activeGaugeId === id ? 'preset-filled' : 'hover:preset-tonal',
         ]}
         onclick={() => {
@@ -98,20 +98,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         }}
       >
         {#if !gauges.allCreated.map((gauge) => gauge.id).includes(id)}
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="1.5"
-            stroke="currentColor"
-            class="size-6"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-            />
-          </svg>
+          <CirclePlusIcon />
         {/if}
         {label}
       </button>
