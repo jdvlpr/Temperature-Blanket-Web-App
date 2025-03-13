@@ -45,49 +45,45 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 </script>
 
-<div class="w-fit text-left">
-  <Popover
-    open={openState}
-    onOpenChange={(e) => {
-      openState = e.open;
-    }}
-    triggerBase="btn-icon hover:preset-tonal"
-    contentBase="card bg-surface-200 dark:bg-surface-800 p-4 space-y-4 max-w-[90vw]"
-    arrow
-    arrowBackground="bg-surface-200! dark:bg-surface-800!"
-    zIndex="100"
-  >
-    {#snippet trigger()}
-      <Share2Icon />
-    {/snippet}
-    {#snippet content()}
-      <div class="flex flex-col gap-2">
-        <p class="text-sm">Shareable Page URL</p>
-        <p
-          class="card bg-primary-50 dark:bg-primary-950 basis-full p-4 break-all select-all"
+<Popover
+  open={openState}
+  onOpenChange={(e) => {
+    openState = e.open;
+  }}
+  base="btn-icon hover:preset-tonal"
+  triggerBase=""
+  contentBase="card bg-surface-200 dark:bg-surface-800 p-4 space-y-4 max-w-[90vw]"
+  arrow
+  arrowBackground="bg-surface-200! dark:bg-surface-800!"
+  zIndex="100"
+>
+  {#snippet trigger()}
+    <Share2Icon />
+  {/snippet}
+  {#snippet content()}
+    <div class="flex flex-col gap-2">
+      <p class="text-sm">Shareable Page URL</p>
+      <p
+        class="card bg-primary-50 dark:bg-primary-950 basis-full p-4 break-all select-all"
+      >
+        {href}
+      </p>
+      <div class="inline-flex flex-wrap items-center gap-4">
+        <button class="btn preset-filled-primary-500" onclick={() => copyURL()}>
+          <ClipboardCopyIcon />
+          Copy URL</button
         >
-          {href}
-        </p>
-        <div class="inline-flex flex-wrap items-center gap-4">
-          <button
-            class="btn preset-filled-primary-500"
-            onclick={() => copyURL()}
-          >
-            <ClipboardCopyIcon />
-            Copy URL</button
-          >
 
-          <button
-            class="btn preset-filled-surface-50-950"
-            onclick={() => {
-              openState = false;
-            }}
-          >
-            <XIcon />
-            Close
-          </button>
-        </div>
+        <button
+          class="btn preset-filled-surface-50-950"
+          onclick={() => {
+            openState = false;
+          }}
+        >
+          <XIcon />
+          Close
+        </button>
       </div>
-    {/snippet}
-  </Popover>
-</div>
+    </div>
+  {/snippet}
+</Popover>

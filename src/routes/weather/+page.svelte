@@ -317,6 +317,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
     <div class="flex flex-wrap items-center gap-2">
       <Share href={shareableURL} />
+
       <button
         aria-label="Open Settings"
         class="btn-icon hover:preset-tonal"
@@ -357,23 +358,23 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/snippet}
 
   {#snippet main()}
-    <main class="max-w-(--breakpoint-xl) m-auto text-center mb-8" in:fade>
+    <main class="m-auto mb-8 max-w-(--breakpoint-xl) text-center" in:fade>
       <div class="max-lg:px-2">
         <Location />
       </div>
 
       {#if weatherData && !project.status.loading}
         <div
-          class="pb-4 max-w-full max-lg:px-2"
+          class="max-w-full pb-4 max-lg:px-2"
           id="weather-data"
           bind:this={weatherState.weatherDataElement}
         >
           {#key project.status.loading || weatherState.activeLocationID}
             <div class:opacity-50={project.status.loading} in:fade>
               <div
-                class="mb-4 flex flex-col gap-2 items-center p-2 w-fit mx-auto"
+                class="mx-auto mb-4 flex w-fit flex-col items-center gap-2 p-2"
               >
-                <div class="flex flex-col justify-center items-center gap-2">
+                <div class="flex flex-col items-center justify-center gap-2">
                   {#if !weatherState.weatherLocations.find((item) => item.id === weatherState.activeLocationID)?.saved}
                     <button
                       in:fade
@@ -437,7 +438,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 <p>
                   {currentTime}
                 </p>
-                <div class="flex gap-0 justify-center items-center">
+                <div class="flex items-center justify-center gap-0">
                   {@html getWeatherCodeDetails({
                     weathercode: weatherData.current_weather.weathercode,
                     is_day: weatherData.current_weather.is_day,
@@ -453,7 +454,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     )?.precipitation_probability,
                   }).icon}
                 </div>
-                <p class="text-8xl flex items-start justify-center font-bold">
+                <p class="flex items-start justify-center text-8xl font-bold">
                   {weatherData.current_weather.temperature}°
                 </p>
                 <p class="text-xl">
@@ -472,16 +473,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 </div>
               </div>
               <div
-                class="p-2 rounded-container bg-surface-50 dark:bg-surface-950 shadow my-4 inline-grid"
+                class="rounded-container bg-surface-50 dark:bg-surface-950 my-4 inline-grid p-2 shadow"
               >
-                <p class="text-sm flex gap-1 items-center justify-center">
+                <p class="flex items-center justify-center gap-1 text-sm">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke-width="1.5"
                     stroke="currentColor"
-                    class="w-5 h-5"
+                    class="h-5 w-5"
                   >
                     <path
                       stroke-linecap="round"
@@ -504,7 +505,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   </div>
                 {/if}
                 <div
-                  class="relative w-full flex items-start gap-4 md:gap-8 snap-x snap-mandatory overflow-x-auto mx-auto pb-4 mt-4"
+                  class="relative mx-auto mt-4 flex w-full snap-x snap-mandatory items-start gap-4 overflow-x-auto pb-4 md:gap-8"
                 >
                   {#each hourlyForcastData as { isNow, time, apparent_temperature, cloudcover, is_day, temperature_2m, precipitation_probability, weathercode }}
                     {@const details = getWeatherCodeDetails({
@@ -513,7 +514,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       precipitation_probability,
                     })}
                     <div
-                      class="snap-start shrink-0 flex flex-col justify-between min-h-[100px] gap-1 items-center"
+                      class="flex min-h-[100px] shrink-0 snap-start flex-col items-center justify-between gap-1"
                     >
                       <p class="text-sm">
                         {isNow
@@ -527,7 +528,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                               },
                             )}
                       </p>
-                      <p class="text-sm max-w-[100px]">
+                      <p class="max-w-[100px] text-sm">
                         {details.description}
                       </p>
                       <div
@@ -544,14 +545,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 </div>
               </div>
               <div class="mt-4">
-                <p class="text-sm flex gap-1 justify-center items-center">
+                <p class="flex items-center justify-center gap-1 text-sm">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke-width="1.5"
                     stroke="currentColor"
-                    class="w-5 h-5"
+                    class="h-5 w-5"
                   >
                     <path
                       stroke-linecap="round"
@@ -562,7 +563,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   Daily Forcast
                 </p>
                 <div
-                  class="relative w-full flex flex-col justify-center gap-2 items-start mx-auto mt-4"
+                  class="relative mx-auto mt-4 flex w-full flex-col items-start justify-center gap-2"
                 >
                   {#each dailyWeatherData as { time, temperature_2m_max, temperature_2m_min, precipitation_probability_max, weathercode }, index}
                     {@const date = new Date(time).toLocaleString(
@@ -576,19 +577,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       precipitation_probability: precipitation_probability_max,
                     })}
                     <div
-                      class="grid grid-cols-3 flex-1 gap-2 items-center rounded-container p-2 bg-surface-50 dark:bg-surface-950 shadow w-full mx-auto"
+                      class="rounded-container bg-surface-50 dark:bg-surface-950 mx-auto grid w-full flex-1 grid-cols-3 items-center gap-2 p-2 shadow"
                     >
                       <p class="">
                         {index === 0 ? 'Today' : date}
                       </p>
                       <div
-                        class="flex gap-1 flex-wrap items-center justify-start"
+                        class="flex flex-wrap items-center justify-start gap-1"
                       >
-                        <p class="text-left hidden sm:inline-block">
+                        <p class="hidden text-left sm:inline-block">
                           {details.description}
                         </p>
                         <div
-                          class="flex items-center gap-1 justify-between"
+                          class="flex items-center justify-between gap-1"
                           title={details.description}
                         >
                           {@html details.icon}
