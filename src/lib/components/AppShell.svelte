@@ -67,13 +67,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 >
   <div
     class={[
-      'sticky top-0 bg-surface-50/90 dark:bg-surface-950/90 backdrop-blur-md z-20 [view-transition-name:sticky-header]',
+      'bg-surface-50/90 dark:bg-surface-950/90 sticky top-0 z-20 backdrop-blur-md [view-transition-name:sticky-header]',
       stickyHeader && 'lg:py-2',
     ]}
     id="top-navbar"
   >
     <div
-      class="max-w-(--breakpoint-xl) flex justify-between items-center m-auto px-2 gap-2"
+      class="m-auto flex max-w-(--breakpoint-xl) items-center justify-between gap-2 px-2"
     >
       <div class="lg:hidden">
         <Modal
@@ -98,7 +98,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               </span>
             {/if}{/snippet}
           {#snippet content()}
-            <div class="mb-20 min-w-[265px] gap-2 flex flex-col">
+            <div class="mb-20 flex min-w-[265px] flex-col gap-2">
               <AppLogo />
               <AppNavigation />
             </div>
@@ -110,13 +110,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
   </div>
 
-  <div class="flex justify-start max-w-(--breakpoint-xl) mx-auto">
+  <div class="mx-auto flex max-w-(--breakpoint-xl) justify-start">
     <div
-      class="flex flex-col justify-start items-start h-fit [view-transition-name:sidebar-navigation]"
+      class="flex h-fit flex-col items-start justify-start [view-transition-name:sidebar-navigation]"
       bind:clientWidth={sidebarWidth}
     >
       <button
-        class="btn hover:preset-tonal mx-2 lg:flex justify-center hidden mt-2"
+        class="btn hover:preset-tonal mx-2 mt-2 hidden justify-center lg:flex"
         title={`${showNavigationSideBar.value ? 'Hide' : 'Show'} Sidebar`}
         onclick={async () => {
           showNavigationSideBar.value = !showNavigationSideBar.value;
@@ -131,7 +131,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </button>
       {#if showNavigationSideBar.value}
         <div
-          class="hidden lg:flex flex-col w-fit"
+          class="hidden w-fit flex-col lg:flex"
           transition:slide={{ axis: 'x', duration: 100 }}
         >
           <div class="w-fit">

@@ -4,14 +4,13 @@
 
 Website: **[temperature-blanket.com](https://temperature-blanket.com)**
 
-**New:** Try out the next version of the website at **[next.temperature-blanket.com](https://next.temperature-blanket.com)**
+**New:** Try out the beta version at **[next.temperature-blanket.com](https://next.temperature-blanket.com)**
 
 Visualize your city's historical climate data, create color gauges, and preview your pattern for your crochet or knitting temperature project. Save your project in your browser and as a URL, and download project information in PDF, CSV, and PNG files.
 
 Built with:
 
-- [Svelte 5](https://svelte.dev/)
-- [Sveltekit 2](https://svelte.dev/)
+- [Svelte 5 & Sveltekit 2](https://svelte.dev/)
 - [Skeleton 3](https://github.com/skeletonlabs/skeleton)
 - [Tailwind 4](https://github.com/tailwindlabs/tailwindcss)
 
