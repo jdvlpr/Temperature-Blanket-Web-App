@@ -155,7 +155,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </svelte:head>
 
 <div
-  class="bg-primary-100 dark:bg-surface-800 flex flex-wrap items-center justify-center gap-2 p-2 text-center [view-transition-name:top-banner]"
+  class="bg-surface-100 dark:bg-surface-800 flex flex-wrap items-center justify-center gap-2 p-2 text-center [view-transition-name:top-banner]"
   bind:this={bannerElement}
 >
   <p>
@@ -168,7 +168,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   <a
     href="https://temperature-blanket.com"
-    class="btn preset-filled"
+    class="btn preset-tonal-secondary"
     target="_blank"
     >Main Version <ExternalLinkIcon class="relative -top-[1px] size-5" />
   </a>
