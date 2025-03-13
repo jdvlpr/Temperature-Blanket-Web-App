@@ -34,7 +34,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 </script>
 
-<div class="flex flex-col gap-4 mt-2">
+<div class="mt-2 flex flex-col gap-4">
   <a href="mailto:{email}" class="btn hover:preset-tonal w-fit">
     <MailIcon />
 
@@ -45,11 +45,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
       href={PUBLIC_FACEBOOK_LINK}
       target="_blank"
       rel="noreferrer"
-      class="btn hover:preset-tonal text-left w-fit"
+      class="btn hover:preset-tonal w-fit text-left"
     >
       <FacebookIcon />
       {PUBLIC_SITE_TITLE}
-      <ExternalLinkIcon class="size-5 relative -top-[1px]" />
+      <ExternalLinkIcon class="relative -top-[1px] size-5" />
     </a>
   {/if}
 
@@ -58,11 +58,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
       href={PUBLIC_GITHUB_LINK}
       target="_blank"
       rel="noreferrer"
-      class="btn hover:preset-tonal text-left w-fit"
+      class="btn hover:preset-tonal w-fit text-left"
     >
       <GithubIcon />
       GitHub
-      <ExternalLinkIcon class="size-5 relative -top-[1px]" />
+      <ExternalLinkIcon class="relative -top-[1px] size-5" />
     </a>
   {/if}
 </div>

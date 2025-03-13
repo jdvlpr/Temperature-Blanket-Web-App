@@ -39,7 +39,7 @@
         role="dialog"
         aria-modal="true"
         aria-label={modal.title ?? ''}
-        class="p-4 flex flex-col gap-4"
+        class="flex flex-col gap-4 p-4"
       >
         {#if modal.title}
           <h4 class="h4">{modal.title}</h4>

@@ -154,11 +154,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/if}
 </svelte:head>
 <div
-  class="text-center p-2 flex flex-wrap justify-center items-center gap-2 bg-warning-100 dark:bg-warning-900 [view-transition-name:top-banner]"
+  class="bg-warning-100 dark:bg-warning-900 flex flex-wrap items-center justify-center gap-2 p-2 text-center [view-transition-name:top-banner]"
   bind:this={bannerElement}
 >
   <p>
-    This is a <span class="font-bold text-secondary-600 dark:text-secondary-50"
+    This is a <span class="text-secondary-600 dark:text-secondary-50 font-bold"
       >beta</span
     >
     version. If you encounter any issues, please
@@ -169,7 +169,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     href="https://temperature-blanket.com"
     class="btn preset-filled"
     target="_blank"
-    >Main Version <ExternalLinkIcon class="size-5 relative -top-[1px]" />
+    >Main Version <ExternalLinkIcon class="relative -top-[1px] size-5" />
   </a>
 </div>
 

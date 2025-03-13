@@ -76,7 +76,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div
-  class="flex justify-start flex-col items-start text-left gap-2 my-2 w-fit lg:px-2"
+  class="my-2 flex w-fit flex-col items-start justify-start gap-2 text-left lg:px-2"
   data-sveltekit-preload-data="hover"
 >
   <div><ThemeSwitcher /></div>
@@ -123,7 +123,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         Tools
       {/snippet}
       {#snippet panel()}
-        <div class="flex flex-col w-full gap-2">
+        <div class="flex w-full flex-col gap-2">
           <a
             href="/"
             class={[
@@ -135,7 +135,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             Project Planner
           </a>
 
-          <div class="w-full border-t border-surface-300-700"></div>
+          <div class="border-surface-300-700 w-full border-t"></div>
 
           <a
             href="/yarn-colorway-finder"
@@ -149,7 +149,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             Yarn Colorway Finder
           </a>
 
-          <div class="w-full border-t border-surface-300-700"></div>
+          <div class="border-surface-300-700 w-full border-t"></div>
 
           <a
             href="/yarn"
@@ -162,7 +162,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             Yarn Palette Creator
           </a>
 
-          <div class="w-full border-t border-surface-300-700"></div>
+          <div class="border-surface-300-700 w-full border-t"></div>
 
           <a
             href="/weather"
@@ -182,7 +182,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         Gallery
       {/snippet}
       {#snippet panel()}
-        <div class="flex flex-col w-full gap-2">
+        <div class="flex w-full flex-col gap-2">
           <a
             href="/gallery"
             class={[
@@ -213,7 +213,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         Information
       {/snippet}
       {#snippet panel()}
-        <div class="flex flex-col gap-2 mb-4 w-full">
+        <div class="mb-4 flex w-full flex-col gap-2">
           <a
             href="/faq"
             class={[
@@ -225,7 +225,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             FAQ
           </a>
 
-          <div class="w-full border-t border-surface-300-700"></div>
+          <div class="border-surface-300-700 w-full border-t"></div>
 
           <a
             href="/contact"
@@ -250,7 +250,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             Request Yarn
           </a>
 
-          <div class="w-full border-t border-surface-300-700"></div>
+          <div class="border-surface-300-700 w-full border-t"></div>
 
           <a
             href="/blog"
@@ -264,7 +264,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <RssIcon /> Blog
           </a>
 
-          <div class="w-full border-t border-surface-300-700"></div>
+          <div class="border-surface-300-700 w-full border-t"></div>
 
           <a
             href="/privacy"
@@ -277,7 +277,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             Privacy
           </a>
 
-          <div class="w-full border-t border-surface-300-700"></div>
+          <div class="border-surface-300-700 w-full border-t"></div>
 
           <a
             href="/documentation"
@@ -302,7 +302,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             Changelog
           </a>
 
-          <div class="w-full border-t border-surface-300-700"></div>
+          <div class="border-surface-300-700 w-full border-t"></div>
 
           <a
             href="/api/yarn-colorways"
@@ -316,7 +316,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </a>
 
           {#if PUBLIC_GITHUB_LINK}
-            <div class="w-full border-t border-surface-300-700"></div>
+            <div class="border-surface-300-700 w-full border-t"></div>
             <a
               href={PUBLIC_GITHUB_LINK}
               class="btn hover:preset-tonal w-fit"
@@ -324,7 +324,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             >
               <GithubIcon />
               GitHub
-              <ExternalLinkIcon class="size-5 relative -top-[1px]" />
+              <ExternalLinkIcon class="relative -top-[1px] size-5" />
             </a>
           {/if}
         </div>
@@ -344,7 +344,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       viewBox="0 0 20 20"
       fill="currentColor"
       stroke="white"
-      class="size-8 transition-all text-red-400 shrink-0 group-hover:text-red-500 mr-1"
+      class="mr-1 size-8 shrink-0 text-red-400 transition-all group-hover:text-red-500"
     >
       <path
         d="M9.653 16.915l-.005-.003-.019-.01a20.759 20.759 0 01-1.162-.682 22.045 22.045 0 01-2.582-1.9C4.045 12.733 2 10.352 2 7.5a4.5 4.5 0 018-2.828A4.5 4.5 0 0118 7.5c0 2.852-2.044 5.233-3.885 6.82a22.049 22.049 0 01-3.744 2.582l-.019.01-.005.003h-.002a.739.739 0 01-.69.001l-.002-.001z"

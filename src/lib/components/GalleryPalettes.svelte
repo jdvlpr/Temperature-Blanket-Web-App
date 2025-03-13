@@ -104,7 +104,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let endCursor = $derived(galleryPalettesState.gallery?.pageInfo?.endCursor);
 </script>
 
-<div class=" pb-2 text-center flex flex-wrap justify-center items-end gap-2">
+<div class=" flex flex-wrap items-end justify-center gap-2 pb-2 text-center">
   <Expand
     bind:isExpanded={filtersExpanded}
     more="Show Filters"
@@ -115,10 +115,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   {#if filtersExpanded}
     <div
-      class="grid grid-cols-12 justify-center items-end gap-4 px-2 w-full"
+      class="grid w-full grid-cols-12 items-end justify-center gap-4 px-2"
       transition:slide
     >
-      <div class="w-full col-span-12 md:col-span-5">
+      <div class="col-span-12 w-full md:col-span-5">
         <SelectYarn
           preselectDefaultYarn={false}
           disabled={loading}
@@ -130,7 +130,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
       {#if galleryPalettesState.filteredBrandId || galleryPalettesState.filteredYarnId}
         <div
-          class="w-full col-span-12 text-left md:col-span-4 flex flex-col items-start gap-0 top-[2px] relative"
+          class="relative top-[2px] col-span-12 flex w-full flex-col items-start gap-0 text-left md:col-span-4"
         >
           <ToggleSwitch
             disabled={loading}
@@ -148,7 +148,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {/if}
 
       <div
-        class="flex flex-col w-full justify-start col-span-12 md:col-span-3 gap-1"
+        class="col-span-12 flex w-full flex-col justify-start gap-1 md:col-span-3"
       >
         <span class="flex items-center gap-1">
           <SearchIcon class="size-4" />
@@ -157,7 +157,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <div class="input-group grid-cols-[1fr_auto]">
           <input
             type="text"
-            class="truncate ig-input w-full"
+            class="ig-input w-full truncate"
             autocomplete="off"
             disabled={loading}
             placeholder="e.g., Kansas, 2003"
@@ -179,7 +179,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </div>
       </div>
 
-      <label class="label w-full col-span-6 md:col-span-2">
+      <label class="label col-span-6 w-full md:col-span-2">
         <span class="flex items-center gap-1">
           <ArrowUpDownIcon class="size-4" />
           Order By
@@ -195,14 +195,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </label>
 
       <div
-        class="w-full justify-center flex col-span-12 md:col-span-2 {galleryPalettesState.filteredBrandId ||
+        class="col-span-12 flex w-full justify-center md:col-span-2 {galleryPalettesState.filteredBrandId ||
         galleryPalettesState.filteredYarnId
           ? 'md:col-start-11'
           : ''}"
       >
         <button
           disabled={loading}
-          class="btn preset-filled flex items-center w-full"
+          class="btn preset-filled flex w-full items-center"
           onclick={async () => {
             projectsList.scrollIntoView({
               behavior: 'smooth',
@@ -256,11 +256,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <div class="my-1"></div>
     <PlaceholderPalettes items={20} maxWFull={true} />
   {:else}
-    <div class="gap-4 my-2 flex flex-col items-start justify-start w-full">
+    <div class="my-2 flex w-full flex-col items-start justify-start gap-4">
       {#each galleryPalettesState.palettes as { colors, schemeName, projectId }}
         <button
           type="button"
-          class="cursor-pointer w-full"
+          class="w-full cursor-pointer"
           onclick={() => {
             recordPageView(projectId);
             updateGauge({
@@ -276,17 +276,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
   {/if}
   {#if !galleryPalettesState.palettes.length && !loading}
-    <p class="text-center my-8">No results. Try changing the filters above.</p>
+    <p class="my-8 text-center">No results. Try changing the filters above.</p>
   {/if}
 
   {#if galleryPalettesState.palettes.length && hasNextPage}
     {#if isLoadingMore}
-      <div class="h-28 flex items-center">
+      <div class="flex h-28 items-center">
         <Spinner />
       </div>
     {/if}
     <button
-      class="btn preset-filled flex m-auto my-4"
+      class="btn preset-filled m-auto my-4 flex"
       disabled={!hasNextPage || isLoadingMore}
       onclick={async () => {
         isLoadingMore = true;

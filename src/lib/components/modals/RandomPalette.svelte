@@ -137,9 +137,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 />
 
 <div class="px-4 pt-8">
-  <div class="grid grid-cols-12 gap-4 justify-center items-end w-full">
+  <div class="grid w-full grid-cols-12 items-end justify-center gap-4">
     <div
-      class="w-full col-span-full md:col-span-9 order-1"
+      class="order-1 col-span-full w-full md:col-span-9"
       class:md:col-span-full={!!selectedBrandId && !!selectedYarnId}
     >
       <SelectYarn
@@ -151,14 +151,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
 
     {#if selectedBrandId && selectedYarnId}
-      <div class="w-full col-span-full order-2 md:order-3">
+      <div class="order-2 col-span-full w-full md:order-3">
         <DefaultYarnSet {selectedBrandId} {selectedYarnId} />
       </div>
     {/if}
 
     {#key selectedBrandId}
       <div
-        class="w-full col-span-full md:col-span-3 order-3 md:order-2"
+        class="order-3 col-span-full w-full md:order-2 md:col-span-3"
         class:hidden={!!selectedBrandId && !!selectedYarnId}
       >
         <SelectYarnWeight {selectedBrandId} bind:selectedYarnWeightId />
@@ -166,7 +166,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {/key}
 
     {#if isYarnUnavailable}
-      <div class="w-full col-span-full order-4">
+      <div class="order-4 col-span-full w-full">
         <Tooltip>
           Link Unavailable <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -174,7 +174,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             viewBox="0 0 24 24"
             stroke-width="1.5"
             stroke="currentColor"
-            class="w-6 h-6 inline"
+            class="inline h-6 w-6"
             ><path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -182,7 +182,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             ></path></svg
           >
           {#snippet tooltip()}
-            <div class="flex flex-col gap-2 justify-start text-left text-base">
+            <div class="flex flex-col justify-start gap-2 text-left text-base">
               <p>
                 A yarn that says Link Unavailable means the webpage from which
                 the colorways were accessed is no longer available. Yarns whose
@@ -206,7 +206,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </div>
     {/if}
 
-    <div class="col-span-full sm:col-span-3 justify-self-start order-5">
+    <div class="order-5 col-span-full justify-self-start sm:col-span-3">
       <SelectNumberOfColors
         {numberOfColors}
         max={99}
@@ -214,7 +214,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       />
     </div>
 
-    <label class="label w-full col-span-full sm:col-span-4 order-6">
+    <label class="label order-6 col-span-full w-full sm:col-span-4">
       <span class="flex items-center gap-1">
         <ArrowDownWideNarrowIcon class="size-4" />
         <span>Sort By</span>
@@ -239,7 +239,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </label>
 
     <button
-      class="btn preset-filled col-span-full sm:col-span-4 sm:col-start-9 order-7"
+      class="btn preset-filled order-7 col-span-full sm:col-span-4 sm:col-start-9"
       title="Generate Random Colors (r)"
       onclick={() => {
         getRandomColors();

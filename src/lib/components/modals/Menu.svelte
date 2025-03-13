@@ -142,7 +142,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         viewBox="0 0 24 24"
         stroke-width="1.5"
         stroke="currentColor"
-        class="w-6 h-6"
+        class="h-6 w-6"
       >
         <path
           stroke-linecap="round"
@@ -156,7 +156,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {#if pages.main}
     <div>
       <h2 class="mb-2 text-xl font-bold">Project</h2>
-      <div class="flex flex-col gap-2 w-full my-4">
+      <div class="my-4 flex w-full flex-col gap-2">
         <a
           href="/"
           target="_blank"
@@ -193,13 +193,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </div>
 
       <h2
-        class="mb-2 mt-8 text-xl font-bold scroll-mt-[12px]"
+        class="mt-8 mb-2 scroll-mt-[12px] text-xl font-bold"
         bind:this={weatherSettingsElement}
       >
         Weather Settings
       </h2>
 
-      <div class="flex flex-col items-start gap-4 w-full my-4">
+      <div class="my-4 flex w-full flex-col items-start gap-4">
         <UnitChanger />
 
         {#if weather.data.length}
@@ -207,7 +207,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
           {#if weather.grouping === 'week'}
             <div
-              class="rounded-container flex flex-col gap-2 items-start justify-start w-full bg-surface-100 dark:bg-surface-900 p-2"
+              class="rounded-container bg-surface-100 dark:bg-surface-900 flex w-full flex-col items-start justify-start gap-2 p-2"
             >
               <p class="">
                 Weekly weather grouping makes for a shorter project. <a
@@ -229,10 +229,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   {pluralize('week', length)}.
                 {/if}
               </p>
-              <label class="label flex-col flex">
+              <label class="label flex flex-col">
                 <span>Weeks Start On</span>
                 <select
-                  class="select w-fit mx-auto"
+                  class="select mx-auto w-fit"
                   bind:value={weather.monthGroupingStartDay}
                   id="weather-weeks-start-week-on"
                 >
@@ -255,7 +255,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           }}
         >
           <WrenchIcon />
-          <span class="whitespace-pre-wrap text-left"
+          <span class="text-left whitespace-pre-wrap"
             >Weather Source: {weather.isUserEdited
               ? 'Custom'
               : weather.defaultSource}</span
@@ -265,7 +265,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
       <LocalProjects />
 
-      <h2 class="mb-2 mt-8 text-xl font-bold">Page</h2>
+      <h2 class="mt-8 mb-2 text-xl font-bold">Page</h2>
       <button
         class="btn hover:preset-tonal w-fit"
         onclick={() => {
@@ -277,11 +277,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
         title="View Keyboard Shortcuts"
       >
         <KeyboardIcon />
-        <span class="whitespace-pre-wrap text-left">Keyboard Shortcuts</span>
+        <span class="text-left whitespace-pre-wrap">Keyboard Shortcuts</span>
       </button>
 
-      <h2 class="mb-2 mt-8 text-xl font-bold">Sources</h2>
-      <div class="flex flex-col items-start gap-2 w-full text-sm">
+      <h2 class="mt-8 mb-2 text-xl font-bold">Sources</h2>
+      <div class="flex w-full flex-col items-start gap-2 text-sm">
         <p>
           Location data is from <a
             href="https://www.geonames.org/"
@@ -396,7 +396,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {#if pages.download}
     <div class="mb-4">
       <h2 class="my-2 text-lg font-bold">Download</h2>
-      <div class="flex flex-col gap-2 items-start text-left">
+      <div class="flex flex-col items-start gap-2 text-left">
         <button
           class="btn hover:preset-tonal"
           onclick={downloadPDF}
@@ -426,7 +426,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               );
             }}
           >
-            <span class="w-[50px] m-auto h-auto">
+            <span class="m-auto h-auto w-[50px]">
               <previews.active.previewComponent />
             </span>
 
@@ -441,7 +441,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <div class="">
       <h2 class="my-2 text-lg font-bold">Save</h2>
       {#if browser && typeof window.localStorage !== 'undefined' && weather.data.length}
-        <p class="my-2 inline-flex justify-start items-center gap-2 w-full">
+        <p class="my-2 inline-flex w-full items-center justify-start gap-2">
           <CircleCheckIcon style="color:var(--color-success-500)" />
           Project and {#if weather.isUserEdited}custom weather{:else}weather{/if}
           data saved to this browser
@@ -453,7 +453,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             goTo('download');
           }}
         >
-          <DownloadIcon class="inline -top-[2px] relative mr-1" />
+          <DownloadIcon class="relative -top-[2px] mr-1 inline" />
           <span class="link">Download this project</span></button
         >
 
@@ -463,13 +463,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </div>
         {/if}
       {/if}
-      <p class="text-sm mt-4 mb-2">Project URL</p>
+      <p class="mt-4 mb-2 text-sm">Project URL</p>
       <p
-        class="select-all break-all card bg-primary-50 dark:bg-primary-950 p-4 basis-full"
+        class="card bg-primary-50 dark:bg-primary-950 basis-full p-4 break-all select-all"
       >
         {project.url.href}
       </p>
-      <div class="inline-flex flex-wrap my-2 gap-2 items-center">
+      <div class="my-2 inline-flex flex-wrap items-center gap-2">
         <button
           class="btn hover:preset-tonal gap-1"
           onclick={() => {

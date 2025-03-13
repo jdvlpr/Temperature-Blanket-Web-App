@@ -71,9 +71,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 </script>
 
-<div class="w-full overflow-auto relative">
+<div class="relative w-full overflow-auto">
   <div
-    class="justify-around max-md:overflow-x-scroll w-full flex gap-2 py-2 rounded-container"
+    class="rounded-container flex w-full justify-around gap-2 py-2 max-md:overflow-x-scroll"
   >
     {#each gauges.allAvailable as { id, label }}
       <button
@@ -108,9 +108,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 {#if gauges.activeGauge && !gauges.activeGauge?.calculating}
   {#if gauges.activeGauge.id !== 'temp'}
     <!-- If this is not the default temperature gauge and we're on the project planner page -->
-    <div class="w-full flex justify-center mb-4 sm:mb-6">
+    <div class="mb-4 flex w-full justify-center sm:mb-6">
       <button
-        class="btn hover:preset-tonal justify-start gap-1 top-2 relative max-sm:mb-2"
+        class="btn hover:preset-tonal relative top-2 justify-start gap-1 max-sm:mb-2"
         title="Delete {gauges.activeGauge.label}"
         onclick={() => {
           gauges.remove(gauges.activeGauge.id);
@@ -122,7 +122,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           viewBox="0 0 24 24"
           stroke-width="1.5"
           stroke="currentColor"
-          class="w-6 h-6 mr-1"
+          class="mr-1 h-6 w-6"
         >
           <path
             stroke-linecap="round"
@@ -147,10 +147,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 {/if}
 
 <div
-  class="flex flex-wrap gap-2 justify-center mt-4 px-4 py-2 shadow-inner rounded-container bg-surface-100 dark:bg-surface-900"
+  class="rounded-container bg-surface-100 dark:bg-surface-900 mt-4 flex flex-wrap justify-center gap-2 px-4 py-2 shadow-inner"
 >
   <button
-    class="btn hover:preset-tonal whitespace-pre-wrap h-auto text-left"
+    class="btn hover:preset-tonal h-auto text-left whitespace-pre-wrap"
     onclick={downloadPDF}
     title="Download PDF File"
   >

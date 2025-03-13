@@ -38,15 +38,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <AppShell pageName="Privacy Policy">
   {#snippet stickyHeader()}
-    <div class="hidden lg:inline-flex mx-auto"><AppLogo /></div>
+    <div class="mx-auto hidden lg:inline-flex"><AppLogo /></div>
   {/snippet}
   {#snippet main()}
     <main
-      class="max-w-(--breakpoint-md) px-2 xl:px-0 flex flex-col gap-4 my-2 mx-auto"
+      class="mx-auto my-2 flex max-w-(--breakpoint-md) flex-col gap-4 px-2 xl:px-0"
     >
       <h2 class="h2 text-gradient max-lg:hidden">Privacy Policy</h2>
       <div class="flex flex-col">
-        <p class="font-bold text-xl">Introduction</p>
+        <p class="text-xl font-bold">Introduction</p>
         <p>
           Temperature-blanket.com strives to handle user data in a minimal,
           secure, and responsible way. This Privacy Policy explains what data is
@@ -55,7 +55,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </div>
 
       <div class="flex flex-col">
-        <p class="font-bold text-xl">Who is responsible for data collection?</p>
+        <p class="text-xl font-bold">Who is responsible for data collection?</p>
         <p>
           The developer of temperature-blanket.com is responsible for and has
           access to the data collected by this site. The developer can be
@@ -64,13 +64,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </div>
 
       <div class="flex flex-col">
-        <p class="font-bold text-xl">Cookies and data privacy</p>
+        <p class="text-xl font-bold">Cookies and data privacy</p>
 
         <p>
           Learn how this site uses cookies and manage your preferences below.
         </p>
 
-        <div class="my-2 flex flex-col gap-2 max-w-(--breakpoint-sm)">
+        <div class="my-2 flex max-w-(--breakpoint-sm) flex-col gap-2">
           <div class="flex flex-col">
             <ToggleSwitch
               label="Analytics Cookies"
@@ -119,7 +119,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
           {#if preferences.value.disableToastAnalytics}
             <div
-              class="flex flex-wrap gap-x-4 gap-y-2 items-center px-4 py-2 rounded-container preset-filled-surface-100-900 w-fit shadow-sm"
+              class="rounded-container preset-filled-surface-100-900 flex w-fit flex-wrap items-center gap-x-4 gap-y-2 px-4 py-2 shadow-sm"
             >
               <p>Allow the cookie popup message to appear.</p>
               <button
@@ -143,7 +143,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
       {#if PUBLIC_KOFI_LINK}
         <div class="flex flex-col">
-          <p class="font-bold text-xl">Supporter details</p>
+          <p class="text-xl font-bold">Supporter details</p>
           <p>
             You can make a donation to the developer of temperature-blanket.com
             at <a href={PUBLIC_KOFI_LINK} target="_blank" class="link"
@@ -162,7 +162,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </div>
       {/if}
       <div class="flex flex-col">
-        <p class="font-bold text-xl">Contact information</p>
+        <p class="text-xl font-bold">Contact information</p>
         <p>
           If you <a href="/contact" class="link">contact</a> the developer, any personal
           information you provide will be used for communication between the developer
@@ -177,7 +177,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </div>
 
       <div class="flex flex-col">
-        <p class="font-bold text-xl">Website traffic and security</p>
+        <p class="text-xl font-bold">Website traffic and security</p>
         <p>
           Temperature-blanket.com uses Cloudflare to manage and protect traffic
           to this site. The data transfer between temperature-blanket.com and
@@ -191,8 +191,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </p>
       </div>
 
-      <div class="flex flex-col mb-8">
-        <p class="font-bold text-xl">Changes to this Privacy Policy</p>
+      <div class="mb-8 flex flex-col">
+        <p class="text-xl font-bold">Changes to this Privacy Policy</p>
         <p>
           Any changes to this Privacy Policy will be made on this page and can
           be viewed on <a

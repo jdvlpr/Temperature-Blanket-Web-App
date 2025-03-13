@@ -42,7 +42,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </Tooltip>
 {:else}
   <button
-    class="btn btn-lg preset-filled-primary-500 sm:w-fit gap-1 shadow-sm"
+    class="btn btn-lg preset-filled-primary-500 gap-1 shadow-sm sm:w-fit"
     onclick={() => {
       if (weather.isUserEdited)
         modal.trigger({

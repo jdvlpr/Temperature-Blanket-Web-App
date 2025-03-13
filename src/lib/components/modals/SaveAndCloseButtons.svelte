@@ -33,7 +33,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div
-  class="flex flex-wrap items-center gap-x-2 gap-y-2 justify-center mx-auto w-full"
+  class="mx-auto flex w-full flex-wrap items-center justify-center gap-x-2 gap-y-2"
 >
   <CloseButton {onClose} text="Cancel" />
 

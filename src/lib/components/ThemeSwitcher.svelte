@@ -128,7 +128,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         >
           {#each THEMES as { name, id, icon, description }}
             <Segment.Item value={id}>
-              <span class="flex gap-1 justify-center items-center">
+              <span class="flex items-center justify-center gap-1">
                 {@html icon}
                 <span class="hidden min-[360px]:inline">{name}</span>
               </span>
@@ -143,13 +143,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 preferences.value.theme.id = id;
               }}
               class={[
-                'btn hover:preset-tonal-secondary flex items-center gap-2 w-full justify-start',
+                'btn hover:preset-tonal-secondary flex w-full items-center justify-start gap-2',
                 preferences.value.theme.id === id &&
                   'preset-filled-secondary-500',
               ]}
             >
               <div
-                class="flex w-16 h-6 overflow-hidden border-surface-50-950 border"
+                class="border-surface-50-950 flex h-6 w-16 overflow-hidden border"
                 style="border-radius:{rounded}"
               >
                 <div

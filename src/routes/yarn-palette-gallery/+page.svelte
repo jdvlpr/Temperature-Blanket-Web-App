@@ -226,7 +226,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/snippet}
 
   {#snippet main()}
-    <main class="m-auto flex flex-col justify-start gap-2 mx-2">
+    <main class="m-auto mx-2 flex flex-col justify-start gap-2">
       <div class="flex flex-col justify-center gap-8">
         <div class="inline-grid gap-2 text-center">
           <div class="my-2">
@@ -235,7 +235,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <span>From popular projects during the past</span>
               <select
                 bind:value={yarnPaletteGalleryState.timePeriod}
-                class="select w-fit min-w-[90px] mx-auto"
+                class="select mx-auto w-fit min-w-[90px]"
                 onchange={() => {
                   yarnPaletteGalleryState.popularPalettes = [];
                   fetchPopularPalettes();
@@ -249,7 +249,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </label>
           </div>
           <div
-            class="gap-4 my-2 flex flex-col items-start justify-start w-full"
+            class="my-2 flex w-full flex-col items-start justify-start gap-4"
           >
             {#if !yarnPaletteGalleryState.popularPalettes.length}
               <PlaceholderPalettes items={5} maxWFull={true} wFull={true} />
@@ -264,7 +264,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     await recordPageView(projectId);
                   }}
                   href="/yarn"
-                  class="w-full flex flex-col text-left gap-y-1"
+                  class="flex w-full flex-col gap-y-1 text-left"
                 >
                   <ColorPalette {colors} {schemeName} />
                 </a>
@@ -275,14 +275,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <div class="inline-grid gap-2 text-center">
           <div
             bind:this={scrollContainer}
-            class="text-center flex flex-col gap-2 justify-center items-center scroll-mt-[70px] pb-4 px-2"
+            class="flex scroll-mt-[70px] flex-col items-center justify-center gap-2 px-2 pb-4 text-center"
           >
             <div class="flex flex-col">
               <h2 class="h2 text-gradient">All Yarn Palettes</h2>
               <p class="text-sm">Palettes from all user-created projects</p>
             </div>
-            <div class="grid-cols-12 grid gap-4 items-end w-full lg:px-2">
-              <div class="w-full col-span-12 md:col-span-5">
+            <div class="grid w-full grid-cols-12 items-end gap-4 lg:px-2">
+              <div class="col-span-12 w-full md:col-span-5">
                 <SelectYarn
                   preselectDefaultYarn={false}
                   disabled={loading}
@@ -293,7 +293,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
               {#if yarnPaletteGalleryState.filteredBrandId || yarnPaletteGalleryState.filteredYarnId}
                 <div
-                  class="w-full col-span-12 text-left md:col-span-4 flex flex-col items-start gap-0 top-[2px] relative"
+                  class="relative top-[2px] col-span-12 flex w-full flex-col items-start gap-0 text-left md:col-span-4"
                 >
                   <ToggleSwitch
                     disabled={loading}
@@ -313,7 +313,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               {/if}
 
               <div
-                class="flex flex-col justify-start w-full col-span-12 md:col-span-3 gap-1"
+                class="col-span-12 flex w-full flex-col justify-start gap-1 md:col-span-3"
               >
                 <span class="flex items-center gap-1">
                   <SearchIcon class="size-4" />
@@ -322,7 +322,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 <div class="input-group grid-cols-[1fr_auto]">
                   <input
                     type="text"
-                    class="truncate ig-input w-full"
+                    class="ig-input w-full truncate"
                     autocomplete="off"
                     placeholder="e.g., Kansas, 2003"
                     disabled={loading}
@@ -344,13 +344,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 </div>
               </div>
 
-              <label class="label col-span-6 md:col-span-2 w-full">
+              <label class="label col-span-6 w-full md:col-span-2">
                 <span class="flex items-center gap-1">
                   <ArrowUpDownIcon class="size-4" />
                   Order By
                 </span>
                 <select
-                  class="select truncate w-full"
+                  class="select w-full truncate"
                   bind:value={yarnPaletteGalleryState.orderBy}
                   disabled={loading}
                 >
@@ -360,13 +360,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
               </label>
 
               <div
-                class="justify-center flex col-span-6 md:col-span-2 {yarnPaletteGalleryState.filteredBrandId ||
+                class="col-span-6 flex justify-center md:col-span-2 {yarnPaletteGalleryState.filteredBrandId ||
                 yarnPaletteGalleryState.filteredYarnId
                   ? 'md:col-start-11'
                   : ''}"
               >
                 <button
-                  class="btn preset-filled flex items-center w-full"
+                  class="btn preset-filled flex w-full items-center"
                   disabled={loading}
                   onclick={async () => {
                     yarnPaletteGalleryState.projects = [];
@@ -411,7 +411,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </div>
           </div>
           <div
-            class="gap-4 my-2 flex flex-col items-start justify-start w-full"
+            class="my-2 flex w-full flex-col items-start justify-start gap-4"
           >
             {#each yarnPaletteGalleryState.palettes as { colors, schemeName, projectId }}
               <a
@@ -420,13 +420,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   await recordPageView(projectId);
                 }}
                 href="/yarn"
-                class="w-full flex flex-col text-left gap-y-1"
+                class="flex w-full flex-col gap-y-1 text-left"
               >
                 <ColorPalette {colors} {schemeName} />
               </a>
             {/each}
             {#if !yarnPaletteGalleryState.palettes.length && !loading}
-              <p class="text-center my-8">
+              <p class="my-8 text-center">
                 No results. Try changing the filters above.
               </p>
             {/if}
@@ -434,7 +434,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <PlaceholderPalettes items={20} maxWFull={true} wFull={true} />
             {:else if yarnPaletteGalleryState.palettes.length && hasNextPage}
               <button
-                class="btn preset-filled flex m-auto my-4"
+                class="btn preset-filled m-auto my-4 flex"
                 disabled={!hasNextPage}
                 onclick={async () => {
                   loading = true;

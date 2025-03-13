@@ -150,7 +150,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <span>Popular during the past</span>
         <select
           bind:value={galleryState.timePeriod}
-          class="select w-fit min-w-[90px] mx-auto"
+          class="select mx-auto w-fit min-w-[90px]"
           onchange={() => {
             galleryState.popularProjects = [];
             fetchPopularProjectsWrapper();
@@ -166,7 +166,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
 
     <div
-      class="w-full flex items-start gap-2 snap-x snap-mandatory overflow-x-scroll mx-auto"
+      class="mx-auto flex w-full snap-x snap-mandatory items-start gap-2 overflow-x-scroll"
       bind:this={featuredProjectsEl}
     >
       {#if !galleryState.popularProjects.length}
@@ -174,7 +174,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
         {#each Array(5)}
           <div
-            class="placeholder animate-pulse snap-center shrink-0 h-[324px] w-[245px] rounded-container bg-surface-100 dark:bg-surface-900"
+            class="placeholder rounded-container bg-surface-100 dark:bg-surface-900 h-[324px] w-[245px] shrink-0 animate-pulse snap-center"
           ></div>
         {/each}
       {:else}
@@ -182,14 +182,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {@const title = getTitleFromLocationsMeta(meta.locations)}
           <a
             href="/gallery/{id}"
-            class="snap-center shrink-0 min-h-[200px] max-w-[245px] lg:max-w-[350px] gap-1 text-center flex flex-col items-center justify-start flex-wrap mx-auto rounded-container p-2 group hover:preset-tonal"
+            class="rounded-container group hover:preset-tonal mx-auto flex min-h-[200px] max-w-[245px] shrink-0 snap-center flex-col flex-wrap items-center justify-start gap-1 p-2 text-center lg:max-w-[350px]"
           >
             <img
               src={featured_image_src}
               alt="Preview"
-              class="max-h-64 lg:max-h-[600px] max-w-[225px] lg:max-w-[370px]"
+              class="max-h-64 max-w-[225px] lg:max-h-[600px] lg:max-w-[370px]"
             />
-            <p class="text-xs line-clamp-4">
+            <p class="line-clamp-4 text-xs">
               {@html title || ''}
             </p>
           </a>
@@ -201,10 +201,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <div class=" flex flex-col gap-2 text-center">
     <div
       bind:this={scrollContainer}
-      class="text-center flex flex-wrap justify-center items-end scroll-mt-[70px]"
+      class="flex scroll-mt-[70px] flex-wrap items-end justify-center text-center"
     >
       <h2 class="h2 text-gradient">All Projects</h2>
-      <div class="w-full justify-center flex mb-2">
+      <div class="mb-2 flex w-full justify-center">
         {#if totalProjects === 0}
           <p class="animate-pulse text-xs">...</p>
         {:else if totalProjects !== undefined}
@@ -213,8 +213,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </p>
         {/if}
       </div>
-      <div class="grid grid-cols-12 w-full items-end gap-4 px-4">
-        <div class="w-full col-span-12 md:col-span-7">
+      <div class="grid w-full grid-cols-12 items-end gap-4 px-4">
+        <div class="col-span-12 w-full md:col-span-7">
           <SelectYarn
             preselectDefaultYarn={false}
             disabled={loading}
@@ -225,7 +225,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
         {#if galleryState.filteredBrandId || galleryState.filteredYarnId}
           <div
-            class="w-full col-span-12 text-left md:col-span-5 flex flex-col items-start gap-1"
+            class="col-span-12 flex w-full flex-col items-start gap-1 text-left md:col-span-5"
           >
             <ToggleSwitch
               disabled={loading}
@@ -243,7 +243,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {/if}
 
         <div
-          class="flex flex-col justify-start col-span-12 md:col-span-5 gap-1"
+          class="col-span-12 flex flex-col justify-start gap-1 md:col-span-5"
         >
           <span class="flex items-center gap-1">
             <SearchIcon class="size-4" />
@@ -253,7 +253,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <input
               disabled={loading}
               type="text"
-              class="truncate ig-input w-full"
+              class="ig-input w-full truncate"
               autocomplete="off"
               placeholder="e.g., Kansas, 2003"
               bind:value={galleryState.search}
@@ -274,7 +274,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </div>
         </div>
 
-        <label class="label w-full col-span-6 md:col-span-3">
+        <label class="label col-span-6 w-full md:col-span-3">
           <span class="flex items-center">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -282,7 +282,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               viewBox="0 0 24 24"
               stroke-width="1.5"
               stroke="currentColor"
-              class="w-4 h-4 mr-1"
+              class="mr-1 h-4 w-4"
             >
               <path
                 stroke-linecap="round"
@@ -305,7 +305,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </select>
         </label>
 
-        <label class="label w-full col-span-6 md:col-span-3">
+        <label class="label col-span-6 w-full md:col-span-3">
           <span class="flex items-center gap-1">
             <ArrowUpDownIcon class="size-4" />
             Order By
@@ -321,14 +321,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </label>
 
         <div
-          class="justify-center flex col-span-12 {galleryState.filteredBrandId ||
+          class="col-span-12 flex justify-center {galleryState.filteredBrandId ||
           galleryState.filteredYarnId
-            ? 'md:col-start-5 md:col-span-4'
-            : 'md:col-start-10 md:col-span-3'}"
+            ? 'md:col-span-4 md:col-start-5'
+            : 'md:col-span-3 md:col-start-10'}"
         >
           <button
             disabled={loading}
-            class="btn preset-filled flex items-center w-full"
+            class="btn preset-filled flex w-full items-center"
             onclick={async () => {
               projectsList.scrollIntoView({
                 behavior: 'smooth',
@@ -372,26 +372,26 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </div>
     </div>
     <div
-      class="flex flex-col items-center scroll-mt-[58px] lg:scroll-mt-[44px]"
+      class="flex scroll-mt-[58px] flex-col items-center lg:scroll-mt-[44px]"
       bind:this={projectsList}
     >
-      <div class="my-2 mx-auto">
+      <div class="mx-auto my-2">
         <ViewToggleBindable bind:value={layout} />
       </div>
 
       <div
-        class=" gap-2 my-2 w-full {layout === 'grid'
-          ? 'grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 justify-center items-start '
+        class=" my-2 w-full gap-2 {layout === 'grid'
+          ? 'grid grid-cols-2 items-start justify-center md:grid-cols-3 xl:grid-cols-4 '
           : 'flex flex-col items-start justify-start'}"
       >
         {#each galleryState.displayedProjects as { databaseId, featuredImage, locations }}
           {@const title = getTitleFromLocationsMeta(locations)}
           <a
             href="/gallery/{databaseId}"
-            class="text-center rounded-container p-2 flex gap-1 group hover:preset-tonal {layout ===
+            class="rounded-container group hover:preset-tonal flex gap-1 p-2 text-center {layout ===
             'grid'
               ? 'flex-col items-center justify-center'
-              : 'flex-col items-center justify-start w-full'}"
+              : 'w-full flex-col items-center justify-start'}"
           >
             <img
               src={featuredImage?.node?.mediaDetails.sizes?.[0].sourceUrl ||
@@ -399,37 +399,37 @@ If not, see <https://www.gnu.org/licenses/>. -->
               alt="Preview"
               class={layout === 'grid'
                 ? 'max-w-[130px] sm:max-w-[210px] md:max-w-[215px]'
-                : 'max-w-full max-h-[900px]'}
+                : 'max-h-[900px] max-w-full'}
             />
-            <p class="text-xs line-clamp-4">
+            <p class="line-clamp-4 text-xs">
               {@html title || ''}
             </p>
           </a>
         {/each}
       </div>
       {#if !galleryState.displayedProjects.length && !loading}
-        <p class="text-center my-8">
+        <p class="my-8 text-center">
           No results. Try changing the filters above.
         </p>
       {/if}
       {#if loading}
         <div
-          class=" gap-4 w-full {layout === 'grid'
-            ? 'grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 justify-center items-start '
+          class=" w-full gap-4 {layout === 'grid'
+            ? 'grid grid-cols-2 items-start justify-center md:grid-cols-3 xl:grid-cols-4 '
             : 'flex flex-col items-start justify-start'}"
         >
           {#each Array(20)}
             <div
-              class="placeholder animate-pulse text-center card bg-surface-100 dark:bg-surface-900 rounded-container {layout ===
+              class="placeholder card bg-surface-100 dark:bg-surface-900 rounded-container animate-pulse text-center {layout ===
               'grid'
-                ? 'w-full h-[350px]'
-                : 'w-full h-[120px]'}"
+                ? 'h-[350px] w-full'
+                : 'h-[120px] w-full'}"
             ></div>
           {/each}
         </div>
       {:else if galleryState.displayedProjects.length && hasNextPage}
         <button
-          class="btn preset-filled-primary-500 flex m-auto my-4"
+          class="btn preset-filled-primary-500 m-auto my-4 flex"
           disabled={!hasNextPage}
           onclick={async () => {
             loading = true;
@@ -460,7 +460,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             viewBox="0 0 24 24"
             stroke-width="1.5"
             stroke="currentColor"
-            class="w-6 h-6"
+            class="h-6 w-6"
           >
             <path
               stroke-linecap="round"

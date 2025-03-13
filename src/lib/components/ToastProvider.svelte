@@ -158,7 +158,7 @@
             data-testid="toast"
           >
             {#if t.category === 'success'}
-              <div class="text-base flex flex-wrap items-center gap-1">
+              <div class="flex flex-wrap items-center gap-1 text-base">
                 <CircleCheckIcon class="inline" />
                 {@html t.message}
               </div>

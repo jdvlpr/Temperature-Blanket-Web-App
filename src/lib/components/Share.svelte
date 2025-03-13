@@ -64,11 +64,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <div class="flex flex-col gap-2">
         <p class="text-sm">Shareable Page URL</p>
         <p
-          class="select-all break-all card bg-primary-50 dark:bg-primary-950 p-4 basis-full"
+          class="card bg-primary-50 dark:bg-primary-950 basis-full p-4 break-all select-all"
         >
           {href}
         </p>
-        <div class="inline-flex flex-wrap gap-4 items-center">
+        <div class="inline-flex flex-wrap items-center gap-4">
           <button
             class="btn preset-filled-primary-500"
             onclick={() => copyURL()}

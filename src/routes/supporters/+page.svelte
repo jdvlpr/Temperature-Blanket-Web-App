@@ -40,13 +40,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <AppShell pageName="Supporters">
   {#snippet stickyHeader()}
-    <div class="hidden lg:inline-flex mx-auto"><AppLogo /></div>
+    <div class="mx-auto hidden lg:inline-flex"><AppLogo /></div>
   {/snippet}
   {#snippet main()}
-    <main class="max-w-(--breakpoint-md) m-auto text-center mb-4 mx-auto px-2">
+    <main class="m-auto mx-auto mb-4 max-w-(--breakpoint-md) px-2 text-center">
       <div>
         <div class="p-4">
-          <p class="text-center mt-2">
+          <p class="mt-2 text-center">
             Thanks to <a
               href={PUBLIC_KOFI_LINK}
               target="_blank"

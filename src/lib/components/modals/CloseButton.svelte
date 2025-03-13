@@ -29,7 +29,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   class={[
     text ? 'btn' : 'btn-icon',
     size,
-    'relative preset-filled-surface-50-950 float-right',
+    'preset-filled-surface-50-950 relative float-right',
   ]}
   onclick={onClose}
 >

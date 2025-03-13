@@ -93,12 +93,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <AppShell pageName="Blog">
   {#snippet stickyHeader()}
-    <div class="hidden lg:inline-flex mx-auto"><AppLogo /></div>
+    <div class="mx-auto hidden lg:inline-flex"><AppLogo /></div>
   {/snippet}
 
   {#snippet main()}
     <main
-      class="max-w-(--breakpoint-xl) m-auto px-2 gap-4 flex flex-col items-center mb-4"
+      class="m-auto mb-4 flex max-w-(--breakpoint-xl) flex-col items-center gap-4 px-2"
     >
       <Segment
         value={selectedTag}
@@ -110,7 +110,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       >
         {#each tags as tag}
           <Segment.Item value={tag}>
-            <span class="flex gap-1 justify-center items-center">
+            <span class="flex items-center justify-center gap-1">
               {tag}
             </span>
           </Segment.Item>
@@ -120,17 +120,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {#key selectedTag}
         <div
           in:fade
-          class="max-w-(--breakpoint-xl) m-auto grid grid-cols-1 md:grid-cols-3 gap-4 justify-start"
+          class="m-auto grid max-w-(--breakpoint-xl) grid-cols-1 justify-start gap-4 md:grid-cols-3"
         >
           {#each filteredPosts as { href, imgSrc, imgAlt, title, tags }}
             <div class="flex flex-col gap-4">
               <a
-                class="w-full card bg-surface-50-950 hover:bg-surface-100-900 p-4 whitespace-pre-wrap text-center flex flex-col items-center justify-center gap-2"
+                class="card bg-surface-50-950 hover:bg-surface-100-900 flex w-full flex-col items-center justify-center gap-2 p-4 text-center whitespace-pre-wrap"
                 {href}
               >
                 <img
                   src={imgSrc}
-                  class="h-36 object-cover w-full"
+                  class="h-36 w-full object-cover"
                   alt={imgAlt}
                 />
                 <h5 class="h5">{title}</h5>
@@ -138,7 +138,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 {#if tags}
                   {#each tags as item}
                     <p
-                      class="text-sm inline bg-tertiary-200 dark:bg-tertiary-800 px-2 rounded"
+                      class="bg-tertiary-200 dark:bg-tertiary-800 inline rounded px-2 text-sm"
                     >
                       {item}
                     </p>

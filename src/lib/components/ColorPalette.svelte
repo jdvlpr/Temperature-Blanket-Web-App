@@ -33,9 +33,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 </script>
 
-<div class="flex flex-col text-left gap-y-1 w-full">
+<div class="flex w-full flex-col gap-y-1 text-left">
   <div
-    class="w-full flex rounded-container overflow-hidden"
+    class="rounded-container flex w-full overflow-hidden"
     style="height:{height}"
     in:fade
   >
@@ -52,16 +52,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
             minWidth="260px"
           >
             <div
-              class="flex-auto flex justify-center items-center h-full"
+              class="flex h-full flex-auto items-center justify-center"
               style="background:{hex}"
               title={brandName && yarnName && name
                 ? `${brandName} - ${yarnName}: ${name}`
                 : hex}
             ></div>
             {#snippet tooltip()}
-              <div style="background:{hex}" class="p-2 rounded-container">
+              <div style="background:{hex}" class="rounded-container p-2">
                 <div
-                  class="flex flex-col justify-center items-center text-wrap text-center"
+                  class="flex flex-col items-center justify-center text-center text-wrap"
                   style="color:{getTextColor(hex)}"
                 >
                   {#if brandName && yarnName && name}
@@ -86,5 +86,5 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {/each}
     {/if}
   </div>
-  <p class="text-xs line-clamp-2">{@html schemeName}</p>
+  <p class="line-clamp-2 text-xs">{@html schemeName}</p>
 </div>

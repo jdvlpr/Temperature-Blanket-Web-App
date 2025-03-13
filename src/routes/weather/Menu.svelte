@@ -36,7 +36,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   );
 </script>
 
-<div class="text-left p-4">
+<div class="p-4 text-left">
   {#if page === 'locations'}
     <div class="mt-4">
       <h2 class="mb-2 text-xl font-bold">Locations</h2>
@@ -46,7 +46,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             role="button"
             tabindex="0"
             data-active={id === weatherState.activeLocationID}
-            class="flex-1 w-full justify-center flex items-start gap-2 bg-surface-200 dark:bg-surface-800 rounded-container p-2 shadow-sm max-w-(--breakpoint-lg) mx-auto data-[active=true]:bg-primary-200-800"
+            class="bg-surface-200 dark:bg-surface-800 rounded-container data-[active=true]:bg-primary-200-800 mx-auto flex w-full max-w-(--breakpoint-lg) flex-1 items-start justify-center gap-2 p-2 shadow-sm"
             title="View this Location"
             onclick={async () => {
               weatherState.activeLocationID = id;
@@ -63,7 +63,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               }
             }}
           >
-            <div class="flex flex-col gap-1 items-start justify-start">
+            <div class="flex flex-col items-start justify-start gap-1">
               <p class="text-4xl">
                 {data?.current_weather.temperature}°
               </p>
@@ -79,12 +79,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </div>
 
             <div
-              class="flex flex-col sm:flex-wrap text-left items-start justify-start flex-1 basis-1/2"
+              class="flex flex-1 basis-1/2 flex-col items-start justify-start text-left sm:flex-wrap"
             >
               <p class="font-bold">
                 {@html label.slice(0, label.split(',', 2).join(',').length)}
               </p>
-              <div class="flex flex-wrap gap-x-1 items-center justify-center">
+              <div class="flex flex-wrap items-center justify-center gap-x-1">
                 <p>
                   {@html getWeatherCodeDetails({
                     weathercode: data?.current_weather.weathercode,
@@ -136,11 +136,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <div class="mt-4 w-full">
       <h2 class="mb-2 text-xl font-bold">Settings</h2>
       <div
-        class="flex flex-col justify-center gap-2 w-fit bg-surface-50 dark:bg-surface-950 rounded p-2"
+        class="bg-surface-50 dark:bg-surface-950 flex w-fit flex-col justify-center gap-2 rounded p-2"
       >
         <div><UnitChanger /></div>
         <div
-          class="flex flex-wrap items-center justify-center gap-4 p-2 rounded-container"
+          class="rounded-container flex flex-wrap items-center justify-center gap-4 p-2"
         >
           <div class="flex flex-wrap items-center justify-center gap-2">
             <Segment
