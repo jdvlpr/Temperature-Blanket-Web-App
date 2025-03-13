@@ -155,15 +155,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </svelte:head>
 
 <div
-  class="bg-warning-100 dark:bg-warning-900 flex flex-wrap items-center justify-center gap-2 p-2 text-center [view-transition-name:top-banner]"
+  class="bg-primary-100 dark:bg-surface-800 flex flex-wrap items-center justify-center gap-2 p-2 text-center [view-transition-name:top-banner]"
   bind:this={bannerElement}
 >
   <p>
-    This is a <span class="text-secondary-600 dark:text-secondary-50 font-bold"
-      >beta</span
-    >
-    version. If you encounter any issues, please
-    <a href="/contact" class="link">send feedback</a>.
+    This is a beta version. <a
+      href="https://github.com/jdvlpr/Temperature-Blanket-Web-App/discussions/5"
+      class="link"
+      target="_blank">Read the announcement</a
+    > for more info.
   </p>
 
   <a
