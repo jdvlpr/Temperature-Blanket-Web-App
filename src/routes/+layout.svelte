@@ -39,6 +39,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from 'svelte-floating-ui/dom';
   import { onlineStore } from 'svelte-legos';
   import '../css/main.css';
+  import { ICONS } from '$lib/constants';
 
   initializeStores();
 
@@ -75,6 +76,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
       });
     });
   });
+
+  let bannerElement = null;
 
   let networkChangeCount = 0;
   $: $isOnline, onChangeIsOnline();
@@ -178,6 +181,45 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </svelte:head>
 
 <Toast max={3} position="b" />
+
+<div
+  class="bg-primary-100 dark:bg-primary-900 flex flex-wrap items-center justify-center gap-2 p-2 text-center [view-transition-name:top-banner]"
+  bind:this={bannerElement}
+>
+  <p>
+    A new version of this site is coming! <a
+      href="https://github.com/jdvlpr/Temperature-Blanket-Web-App/discussions/5"
+      class="link"
+      target="_blank"
+    >
+      Read the announcement.
+    </a>
+  </p>
+
+  <a
+    href="https://next.temperature-blanket.com"
+    class="btn variant-soft-secondary text-token"
+    target="_blank"
+    >Preview the new version
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      class="lucide lucide-external-link relative -top-[1px] ml-1 inline size-5"
+      ><path d="M15 3h6v6" /><path d="M10 14 21 3" /><path
+        d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"
+      /></svg
+    >
+  </a>
+
+  <button on:click={() => bannerElement.remove()} class="btn hover:variant-soft"
+    >{@html ICONS.xMark} Close</button
+  >
+</div>
 
 <slot />
 
