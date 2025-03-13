@@ -63,6 +63,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import {
     ArrowUpDownIcon,
     ChevronRightIcon,
+    PlusIcon,
     SearchIcon,
     XIcon,
   } from '@lucide/svelte';
@@ -365,7 +366,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   : ''}"
               >
                 <button
-                  class="btn preset-filled-primary-500 flex items-center w-full gap-1 shadow-sm"
+                  class="btn preset-filled flex items-center w-full"
                   disabled={loading}
                   onclick={async () => {
                     yarnPaletteGalleryState.projects = [];
@@ -433,7 +434,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <PlaceholderPalettes items={20} maxWFull={true} wFull={true} />
             {:else if yarnPaletteGalleryState.palettes.length && hasNextPage}
               <button
-                class="btn preset-filled-primary-500 flex m-auto my-4"
+                class="btn preset-filled flex m-auto my-4"
                 disabled={!hasNextPage}
                 onclick={async () => {
                   loading = true;
@@ -464,21 +465,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   loading = false;
                 }}
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke-width="1.5"
-                  stroke="currentColor"
-                  class="w-6 h-6"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M12 4.5v15m7.5-7.5h-15"
-                  />
-                </svg>
-                <span>Load More</span>
+                <PlusIcon />
+                Load More
               </button>
             {/if}
           </div>

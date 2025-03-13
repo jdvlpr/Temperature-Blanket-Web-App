@@ -7,7 +7,7 @@ const config = {
   singleQuote: true,
   semi: true,
   printWidth: 80,
-  plugins: ['prettier-plugin-svelte'],
+  plugins: ['prettier-plugin-svelte', 'prettier-plugin-tailwindcss'],
   overrides: [
     {
       files: '*.svelte',

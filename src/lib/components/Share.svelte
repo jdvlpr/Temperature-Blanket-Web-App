@@ -78,7 +78,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           >
 
           <button
-            class="btn preset-filled-secondary-500"
+            class="btn preset-filled-surface-50-950"
             onclick={() => {
               openState = false;
             }}

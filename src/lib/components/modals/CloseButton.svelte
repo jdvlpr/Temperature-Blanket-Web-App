@@ -29,12 +29,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   class={[
     text ? 'btn' : 'btn-icon',
     size,
-    'relative preset-tonal float-right gap-1',
+    'relative preset-filled-surface-50-950 float-right',
   ]}
   onclick={onClose}
 >
-  {#if text}
-    <span class="font-bold">{text}</span>
-  {/if}
   <XIcon />
+  {#if text}
+    {text}
+  {/if}
 </button>

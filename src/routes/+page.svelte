@@ -49,6 +49,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '$lib/utils';
   import {
     BadgeHelpIcon,
+    ChevronRight,
+    EllipsisIcon,
     EllipsisVerticalIcon,
     LightbulbIcon,
     RedoIcon,
@@ -176,11 +178,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <AppLogo />
     </div>
 
-    <div class="flex gap-2 flex-1 justify-between sm:justify-end">
+    <div class="flex flex-1 justify-between gap-2 sm:justify-end">
       {#if weather.data.length && locations.allValid}
         <div class="hidden lg:inline-flex">
           <Tooltip
-            classNames="btn hover:preset-tonal gap-1"
+            classNames="btn hover:preset-tonal"
             title="Save Project [Cmd]+[s] or [Ctrl]+[s]"
             onclick={() =>
               modal.trigger({
@@ -190,8 +192,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           >
             <SaveIcon />
 
-            <span class="max-[700px]:hidden min-[700px]:inline-block text-sm"
-              >Save</span
+            <span class="max-[700px]:hidden min-[700px]:inline-block">Save</span
             >
             {#snippet tooltip()}
               <p>Save your project in this browser and as a URL.</p>
@@ -204,7 +205,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <div class="mx-auto sm:mx-0">
           <button
             aria-label="Undo"
-            class="btn hover:preset-tonal gap-1"
+            class="btn hover:preset-tonal"
             title="Undo [Cmd ⌘]+[z] or [Ctrl]+[z]"
             id="undo"
             disabled={!weather.data.length ||
@@ -217,14 +218,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
             }}
           >
             <UndoIcon />
-            <span class="text-sm max-[740px]:hidden min-[740px]:inline-block"
-              >Undo</span
+            <span class="max-[740px]:hidden min-[740px]:inline-block">Undo</span
             >
           </button>
 
           <button
             aria-label="Redo"
-            class="btn hover:preset-tonal gap-1"
+            class="btn hover:preset-tonal"
             id="redo"
             title="Redo [Cmd ⌘]+[Shift ⇧]+[z] or [Ctrl]+[Shift ⇧]+[Z]"
             disabled={!weather.data.length ||
@@ -237,7 +237,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             }}
           >
             <RedoIcon />
-            <span class="text-sm max-[740px]:hidden min-[740px]:inline-block"
+            <span class=" max-[740px]:hidden min-[740px]:inline-block"
               >Redo</span
             >
           </button>
@@ -246,14 +246,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
 
     <Tooltip
-      classNames="btn-icon hover:preset-tonal"
+      classNames="max-sm:btn-icon sm:btn hover:preset-tonal"
       minWidth="265px"
       title="Help"
     >
       <BadgeHelpIcon />
+      <span class="hidden sm:inline-block">Info</span>
       {#snippet tooltip()}
         <div
-          class="p-2 flex flex-col gap-4"
+          class="flex flex-col gap-4 p-2"
           aria-orientation="vertical"
           aria-label="Help Menu"
           tabindex="-1"
@@ -294,12 +295,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </p>
 
           <div class="flex items-center gap-2">
-            <div class="grow border-t border-surface-300-700"></div>
+            <div class="border-surface-300-700 grow border-t"></div>
 
             <p class="shrink text-xs">
               Version {version}
             </p>
-            <div class="grow border-t border-surface-300-700"></div>
+            <div class="border-surface-300-700 grow border-t"></div>
           </div>
         </div>
       {/snippet}
@@ -307,7 +308,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     <button
       aria-label="menu"
-      class="btn-icon hover:preset-tonal"
+      class="max-sm:btn-icon sm:btn hover:preset-tonal"
       onclick={() =>
         modal.trigger({
           type: 'component',
@@ -319,19 +320,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
         })}
     >
       <EllipsisVerticalIcon />
+      <span class="hidden sm:inline-block">Project</span>
     </button>
   {/snippet}
 
   {#snippet main()}
     <main
-      class="text-center mx-auto max-md:min-h-[calc(100svh-116px)] md:min-h-[calc(100svh-108px)] lg:min-h-[calc(100svh-125px)] p-2"
+      class="mx-auto p-2 text-center max-md:min-h-[calc(100svh-116px)] md:min-h-[calc(100svh-108px)] lg:min-h-[calc(100svh-125px)]"
     >
       <div
         id="page-section-location"
-        class="scroll-mt-[76px] pb-12 max-w-(--breakpoint-md) mx-auto"
+        class="mx-auto max-w-(--breakpoint-md) scroll-mt-[76px] pb-12"
         class:hidden={pageSections.items[1].active === false}
       >
-        <div class="px-2 py-4 w-full">
+        <div class="w-full px-2 py-4">
           <div class="flex flex-col gap-2">
             <h2 class="h1 text-gradient mb-0">Weather Data + Art</h2>
             <p>
@@ -340,7 +342,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </p>
 
             <div
-              class="flex flex-col gap-x-4 gap-y-2 text-sm space-around justify-center items-center"
+              class="space-around flex flex-col items-center justify-center gap-x-4 gap-y-2 text-sm"
               data-sveltekit-preload-data="hover"
             >
               <a
@@ -355,7 +357,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </div>
 
         <div
-          class="md:shadow-lg md:bg-surface-50 dark:md:bg-surface-950 md:rounded-container md:p-4 mb-2"
+          class="md:bg-surface-50 dark:md:bg-surface-950 md:rounded-container mb-2 md:p-4 md:shadow-lg"
         >
           <Locations />
         </div>
@@ -368,14 +370,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {#if weather.data.length}
         <div
           id="page-section-weather-data"
-          class="scroll-mt-[76px] w-full"
+          class="w-full scroll-mt-[76px]"
           class:hidden={pageSections.items[2].active === false}
         >
           <WeatherSection />
           {#if weather.data.length}
             <SectionNavigationButtons thisSectionIndex={2} />
             {#if !weather.isUserEdited}
-              <p class="max-lg:mx-2 text-center text-sm my-4">
+              <p class="my-4 text-center text-sm max-lg:mx-2">
                 Weather data from <button
                   class="underline"
                   onclick={() => {
@@ -392,7 +394,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
         <div
           id="page-section-gauges"
-          class="scroll-mt-[76px] w-full"
+          class="w-full scroll-mt-[76px]"
           class:hidden={pageSections.items[3].active === false}
         >
           {#key project.history.length}
@@ -400,7 +402,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {/key}
           {#if weather.data.length}
             <SectionNavigationButtons thisSectionIndex={3} />
-            <p class="max-lg:mx-2 text-center text-sm my-4">
+            <p class="my-4 text-center text-sm max-lg:mx-2">
               Real yarn colors will look different than what's on the screen.
               Any trademarked yarn or colorway details are owned by their
               respective companies.
@@ -410,10 +412,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
         <div
           id="page-section-preview"
-          class="scroll-mt-[76px] w-full"
+          class="w-full scroll-mt-[76px]"
           class:hidden={pageSections.items[4].active === false}
         >
-          <div class="max-w-(--breakpoint-sm) mx-auto">
+          <div class="mx-auto max-w-(--breakpoint-sm)">
             <p class="mb-2">
               Is this web app worth a cup of coffee to you? Your support enables
               ongoing development, keeps the site ad-free, and helps make this
@@ -428,7 +430,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {#if weather.data.length}
             <SectionNavigationButtons thisSectionIndex={4} />
           {/if}
-          <p class="text-sm max-lg:mx-2 text-center my-4">
+          <p class="my-4 text-center text-sm max-lg:mx-2">
             Real projects will look different than the preview. Patterns not
             provided.
           </p>

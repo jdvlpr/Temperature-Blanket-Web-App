@@ -239,14 +239,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </label>
 
     <button
-      class="btn preset-filled-primary-500 col-span-full sm:col-span-4 sm:col-start-9 order-7"
+      class="btn preset-filled col-span-full sm:col-span-4 sm:col-start-9 order-7"
       title="Generate Random Colors (r)"
       onclick={() => {
         getRandomColors();
       }}
     >
-      Randomize
       <ShuffleIcon />
+      Randomize
     </button>
   </div>
 </div>

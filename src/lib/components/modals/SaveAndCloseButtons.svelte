@@ -38,12 +38,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <CloseButton {onClose} text="Cancel" />
 
   <button
-    class="btn preset-filled-primary-500 gap-1"
+    class="btn preset-filled-primary-500"
     onclick={onSave}
     {disabled}
     title={saveText}
   >
-    <span class="font-bold"> {saveText}</span>
     <CheckIcon />
+    {saveText}
   </button>
 </div>

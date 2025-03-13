@@ -43,10 +43,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { onMount } from 'svelte';
   import WeatherGrouping from '../WeatherGrouping.svelte';
   import {
+    CircleCheckIcon,
     ClipboardCopyIcon,
     DownloadIcon,
     KeyboardIcon,
     SaveIcon,
+    SquarePlusIcon,
     WrenchIcon,
   } from '@lucide/svelte';
 
@@ -155,6 +157,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <div>
       <h2 class="mb-2 text-xl font-bold">Project</h2>
       <div class="flex flex-col gap-2 w-full my-4">
+        <a
+          href="/"
+          target="_blank"
+          class="btn hover:preset-tonal w-fit"
+          title="New Project"
+        >
+          <SquarePlusIcon />
+          New
+        </a>
+
         <button
           class="btn hover:preset-tonal w-fit"
           onclick={() => {
@@ -178,22 +190,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
             Download
           </button>
         {/if}
-
-        <button
-          class="btn hover:preset-tonal w-fit"
-          onclick={() => {
-            modal.trigger({
-              type: 'component',
-              component: { ref: KeyboardShortcuts },
-            });
-          }}
-          title="View Keyboard Shortcuts"
-        >
-          <KeyboardIcon />
-          <span class="whitespace-pre-wrap text-left"
-            >View Keyboard Shortcuts</span
-          >
-        </button>
       </div>
 
       <h2
@@ -268,6 +264,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </div>
 
       <LocalProjects />
+
+      <h2 class="mb-2 mt-8 text-xl font-bold">Page</h2>
+      <button
+        class="btn hover:preset-tonal w-fit"
+        onclick={() => {
+          modal.trigger({
+            type: 'component',
+            component: { ref: KeyboardShortcuts },
+          });
+        }}
+        title="View Keyboard Shortcuts"
+      >
+        <KeyboardIcon />
+        <span class="whitespace-pre-wrap text-left">Keyboard Shortcuts</span>
+      </button>
 
       <h2 class="mb-2 mt-8 text-xl font-bold">Sources</h2>
       <div class="flex flex-col items-start gap-2 w-full text-sm">
@@ -431,21 +442,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <h2 class="my-2 text-lg font-bold">Save</h2>
       {#if browser && typeof window.localStorage !== 'undefined' && weather.data.length}
         <p class="my-2 inline-flex justify-start items-center gap-2 w-full">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-            class="w-5 h-5 shrink-0"
-          >
-            <path
-              fill-rule="evenodd"
-              d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
-              clip-rule="evenodd"
-            />
-          </svg>
+          <CircleCheckIcon style="color:var(--color-success-500)" />
           Project and {#if weather.isUserEdited}custom weather{:else}weather{/if}
           data saved to this browser
         </p>
+
+        <button
+          class="mt-2 mb-4"
+          onclick={() => {
+            goTo('download');
+          }}
+        >
+          <DownloadIcon class="inline -top-[2px] relative mr-1" />
+          <span class="link">Download this project</span></button
+        >
+
         {#if currentSavedProject}
           <div class="">
             <ProjectDetails project={currentSavedProject} canRemove={false} />

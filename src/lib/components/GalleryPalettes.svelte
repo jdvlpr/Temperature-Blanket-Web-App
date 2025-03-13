@@ -48,7 +48,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
     getPalettesFromProjects,
     recordPageView,
   } from '$lib/utils';
-  import { ArrowUpDownIcon, SearchIcon, XIcon } from '@lucide/svelte';
+  import {
+    ArrowUpDownIcon,
+    ChevronRightIcon,
+    PlusIcon,
+    SearchIcon,
+    XIcon,
+  } from '@lucide/svelte';
   import { onMount } from 'svelte';
   import { slide } from 'svelte/transition';
 
@@ -196,7 +202,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       >
         <button
           disabled={loading}
-          class="btn preset-filled-primary-500 flex items-center font-bold w-full gap-1"
+          class="btn preset-filled flex items-center w-full"
           onclick={async () => {
             projectsList.scrollIntoView({
               behavior: 'smooth',
@@ -239,20 +245,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           }}
         >
           Search
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="1.5"
-            stroke="currentColor"
-            class="size-5 shrink-0"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75"
-            />
-          </svg>
+          <ChevronRightIcon />
         </button>
       </div>
     </div>
@@ -293,7 +286,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </div>
     {/if}
     <button
-      class="btn preset-filled-primary-500 flex m-auto my-4"
+      class="btn preset-filled flex m-auto my-4"
       disabled={!hasNextPage || isLoadingMore}
       onclick={async () => {
         isLoadingMore = true;
@@ -325,21 +318,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
         isLoadingMore = false;
       }}
     >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke-width="1.5"
-        stroke="currentColor"
-        class="w-6 h-6"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="M12 4.5v15m7.5-7.5h-15"
-        />
-      </svg>
-      <span>Load More</span>
+      <PlusIcon />
+      Load More
     </button>
   {/if}
 </div>

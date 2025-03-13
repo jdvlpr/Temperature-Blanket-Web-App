@@ -158,13 +158,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
   bind:this={bannerElement}
 >
   <p>
-    This is a beta version. If you encounter any issues, please
+    This is a <span class="font-bold text-secondary-600 dark:text-secondary-50"
+      >beta</span
+    >
+    version. If you encounter any issues, please
     <a href="/contact" class="link">send feedback</a>.
   </p>
 
   <a
     href="https://temperature-blanket.com"
-    class="btn preset-filled-secondary-500"
+    class="btn preset-filled"
     target="_blank"
     >Main Version <ExternalLinkIcon class="size-5 relative -top-[1px]" />
   </a>
