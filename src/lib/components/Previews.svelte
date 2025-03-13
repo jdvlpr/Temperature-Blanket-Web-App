@@ -54,24 +54,24 @@ If not, see <https://www.gnu.org/licenses/>. -->
 {#if previews.active && weather.data.length}
   <PreviewSelect />
 
-  <div class="flex flex-col gap-2 justify-center items-start">
+  <div class="flex flex-col items-start justify-center gap-2">
     {#if gauges.activeGauge?.colors}
       {#key refreshKey}
-        <div class="flex w-full flex-col gap-4 justify-center items-center">
+        <div class="flex w-full flex-col items-center justify-center gap-4">
           <previews.active.previewComponent />
 
           <Drawer.Root bind:open={drawerState.weatherDetails}>
             <Drawer.Portal>
-              <Drawer.Overlay class="fixed inset-0 bg-black/40 z-40" />
+              <Drawer.Overlay class="fixed inset-0 z-40 bg-black/40" />
 
               <Drawer.Content
-                class="bg-surface-50 dark:bg-surface-950 flex flex-col rounded-tl-container rounded-tr-container mt-24 fixed bottom-0 left-0 right-0 z-50"
+                class="bg-surface-50 dark:bg-surface-950 rounded-tl-container rounded-tr-container fixed right-0 bottom-0 left-0 z-50 mt-24 flex flex-col"
               >
                 <div
-                  class="pt-4 rounded-tl-container rounded-tr-container overflow-auto"
+                  class="rounded-tl-container rounded-tr-container overflow-auto pt-4"
                 >
                   <div
-                    class="mx-auto w-12 h-1.5 shrink-0 rounded-full mb-4 bg-surface-950-50"
+                    class="bg-surface-950-50 mx-auto mb-4 h-1.5 w-12 shrink-0 rounded-full"
                   ></div>
                   <div class="mx-auto text-center">
                     <WeatherDetails
@@ -89,7 +89,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </div>
 
         <div
-          class="flex flex-wrap gap-2 justify-center mt-2 px-4 py-2 shadow-inner rounded-container bg-surface-100 dark:bg-surface-900 w-full"
+          class="rounded-container bg-surface-100 dark:bg-surface-900 mt-2 flex w-full flex-wrap justify-center gap-2 px-4 py-2 shadow-inner"
         >
           <button
             class="btn hover:preset-tonal"
@@ -107,7 +107,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </button>
 
           <button
-            class="btn preset-tonal-primary border border-primary-500 items-center h-auto text-left whitespace-pre-wrap"
+            class="btn preset-tonal-primary border-primary-500 h-auto items-center border text-left whitespace-pre-wrap"
             onclick={() =>
               modal.trigger({
                 type: 'component',
@@ -116,20 +116,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 },
               })}
             title="Show Send to Gallery Dialog"
-            disabled
           >
             <SendIcon />
-            Send to Project Gallery (disabled)
+            Send to Project Gallery
           </button>
 
           {#if project.gallery.href && project.gallery.title && project.gallery.title === locations.projectTitle}
-            <div class="flex flex-col gap-1 justify-center w-full">
+            <div class="flex w-full flex-col justify-center gap-1">
               <p>View this project's gallery page:</p>
               <p>
                 <a
                   href={project.gallery.href}
                   target="_blank"
-                  class="underline btn hover:preset-tonal w-fit whitespace-pre-wrap"
+                  class="btn hover:preset-tonal w-fit whitespace-pre-wrap underline"
                   rel="noreferrer">{project.gallery.title}</a
                 >
               </p>
