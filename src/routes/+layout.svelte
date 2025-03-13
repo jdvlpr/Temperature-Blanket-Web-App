@@ -198,7 +198,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   <a
     href="https://next.temperature-blanket.com"
-    class="btn variant-soft-secondary text-token"
+    class="btn variant-soft-tertiary text-token"
     target="_blank"
     >Preview the new version
     <svg
