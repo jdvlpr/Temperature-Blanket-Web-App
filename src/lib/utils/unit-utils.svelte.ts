@@ -80,7 +80,10 @@ export const convertTime = (
  */
 export const setUnitsFromNavigator = () => {
   // if (loadFromURL()) return;
+
   // If the units are already set, don't change them
+  // localState.value.units may not be set if the user is visiting for the first time since version 5.0.0
+  // (that's why theres the '?' check)
   if (localState.value?.units && localState.value.units !== null) return;
   const language = window.navigator.language;
   if (exists(language)) {

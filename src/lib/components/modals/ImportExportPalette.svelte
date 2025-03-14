@@ -36,14 +36,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let inputColors = $state([]);
 
-  let copiedPalette = $state(false);
-
-  let copiedNames = $state(false);
-
-  let copiedHexes = $state(false);
-
-  let copiedPaletteCode = $state(false);
-
   let colorNamesAsArray = $state(false);
 
   let colorCodesAsArray = $state(false);
@@ -60,19 +52,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     })}${colorsToYarnDetails({ colors }) ? 'yarn:' + colorsToYarnDetails({ colors }) : ''}`,
   );
 
-  let copiedNotice = `Copied to your clipboard`;
-
-  function triggerChange() {
-    if (inputValue === null || inputValue === '') return;
-    inputColors = getColorsFromInput({ string: inputValue }) || inputColors;
-  }
-
-  function getColorHexes({ palette, asArray, withHashes }) {
-    if (!Array.isArray(palette)) return false;
-    if (!withHashes) palette = palette.map((n) => n.slice(1));
-    if (asArray) return JSON.stringify(palette);
-    return palette.join(', ');
-  }
   let palette = $derived(colors.map((n) => n?.hex));
 
   let colorNames = $derived(
@@ -92,19 +71,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
     }),
   );
 
-  $effect(() => {
-    if (copiedPalette || copiedNames || copiedHexes || copiedPaletteCode) {
-      toast.trigger({
-        message: copiedNotice,
-        category:
-          copiedNotice === `Copied to your clipboard` ? 'success' : null,
-      });
-      copiedPalette = false;
-      copiedNames = false;
-      copiedHexes = false;
-      copiedPaletteCode = false;
-    }
-  });
+  function triggerChange() {
+    if (inputValue === null || inputValue === '') return;
+    inputColors = getColorsFromInput({ string: inputValue }) || inputColors;
+  }
+
+  function getColorHexes({ palette, asArray, withHashes }) {
+    if (!Array.isArray(palette)) return false;
+    if (!withHashes) palette = palette.map((n) => n.slice(1));
+    if (asArray) return JSON.stringify(palette);
+    return palette.join(', ');
+  }
 </script>
 
 <div class="p-4">
@@ -248,8 +225,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
           onclick={() => {
             try {
               window.navigator.clipboard.writeText(colorHexes);
-
-              copiedHexes = true;
+              toast.trigger({
+                message: 'Copied to your clipboard',
+                category: 'success',
+              });
             } catch {
               toast.trigger({
                 message: 'Unable to copy to clipboard',
@@ -285,11 +264,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
           onclick={() => {
             try {
               window.navigator.clipboard.writeText(paletteCode);
-              copiedPaletteCode = true;
+              toast.trigger({
+                message: 'Copied to your clipboard',
+                category: 'success',
+              });
             } catch {
               toast.trigger({
                 message: 'Unable to copy to clipboard',
-                background: 'preset-filled-error-100-900',
+                category: 'error',
               });
             }
           }}
@@ -324,11 +306,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
           onclick={() => {
             try {
               window.navigator.clipboard.writeText(colorNames);
-              copiedNames = true;
+              toast.trigger({
+                message: 'Copied to your clipboard',
+                category: 'success',
+              });
             } catch {
               toast.trigger({
                 message: 'Unable to copy to clipboard',
-                background: 'preset-filled-error-100-900',
+                category: 'error',
               });
             }
           }}

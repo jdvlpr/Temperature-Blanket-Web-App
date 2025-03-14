@@ -25,13 +25,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import {
     BookOpenTextIcon,
     CircleHelpIcon,
-    CloudIcon,
+    CloudyIcon,
     ExternalLinkIcon,
-    FileClockIcon,
-    GalleryHorizontalEndIcon,
     GalleryVerticalEndIcon,
     GithubIcon,
-    History,
     HistoryIcon,
     Icon,
     MailIcon,
@@ -171,7 +168,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               page.url.pathname === '/weather' && 'preset-tonal-secondary',
             ]}
           >
-            <CloudIcon />
+            <CloudyIcon />
             Weather Forecast
           </a>
         </div>

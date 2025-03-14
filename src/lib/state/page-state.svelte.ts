@@ -130,7 +130,7 @@ export interface ToastSettings {
   /** Provide arbitrary CSS classes to style the toast. */
   classes?: string;
   /** Category of the toast. */
-  category?: 'success' | 'info' | null;
+  category?: 'success' | 'error' | 'info' | null;
   /** Callback function that fires on trigger and close. */
   callback?: (response: { id: string; status: 'queued' | 'closed' }) => void;
 }

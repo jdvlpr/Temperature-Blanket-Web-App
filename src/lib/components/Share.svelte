@@ -20,29 +20,26 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let { href } = $props();
 
-  let copiedMessage = $state('');
-
   let openState = $state(false);
 
   function copyURL() {
     try {
       window.navigator.clipboard.writeText(href);
-      copiedMessage = `Copied to your clipboard`;
-    } catch {
-      copiedMessage = 'Unable to share page.';
-    }
-  }
-
-  $effect(() => {
-    if (copiedMessage !== '') {
       toast.trigger({
-        message: copiedMessage,
-        category:
-          copiedMessage === 'Copied to your clipboard' ? 'success' : null,
+        message: 'Copied to your clipboard',
+        category: 'success',
       });
-      copiedMessage = '';
+    } catch {
+      toast.trigger({
+        message: 'Unable to copy to your clipboard',
+        category: 'error',
+      });
     }
-  });
+    toast.trigger({
+      message: 'Unable to copy to your clipboard',
+      category: 'error',
+    });
+  }
 </script>
 
 <Popover
