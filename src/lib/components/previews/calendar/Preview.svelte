@@ -17,7 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { calendarPreview } from '$lib/components/previews/calendar/state.svelte';
   import Spinner from '$lib/components/Spinner.svelte';
   import { PREVIEW_UPDATE_DEBOUNCE_MS } from '$lib/constants';
-  import { gauges, project, weather } from '$lib/state';
+  import { gauges, localState, project, weather } from '$lib/state';
   import { getColorInfo, showPreviewImageWeatherDetails } from '$lib/utils';
 
   let width = $state(calendarPreview.width);
@@ -117,7 +117,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           if (isWeatherSquare) {
             const day = weather.data[_dayIndex];
             let param = calendarPreview.squareSectionParams[squareSectionIndex];
-            let value = day[param][project.units];
+            let value = day[param][localState.value.units];
             if (
               (calendarPreview.settings.primaryTargetAsBackup === 1 &&
                 value === 0) ||
@@ -125,7 +125,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 value === null)
             ) {
               param = calendarPreview.settings.primaryTarget;
-              value = day[param][project.units];
+              value = day[param][localState.value.units];
             }
 
             // Get the color based on the gauge ID and value
@@ -161,13 +161,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 {#if !calendarPreview.sections.length}
-  <div class="w-full h-[80svh] inline-flex justify-center items-center">
+  <div class="inline-flex h-[80svh] w-full items-center justify-center">
     <Spinner />
   </div>
 {:else}
   <svg
     id="preview-svg-image"
-    class="max-h-[80svh] mx-auto"
+    class="mx-auto max-h-[80svh]"
     aria-hidden="true"
     viewBox="0 0 {width} {height}"
     bind:this={calendarPreview.svg}

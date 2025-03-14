@@ -14,7 +14,7 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { SCHEMES } from '$lib/constants';
-import { gauges, project, toast, weather } from '$lib/state';
+import { gauges, localState, toast, weather } from '$lib/state';
 import type { Color, GaugeSettingsType } from '$lib/types';
 import {
   displayNumber,
@@ -173,8 +173,9 @@ export const getWPGauge = (gauge) => {
     // details.reverse();
     content.push({
       color: color.hex,
-      from: gauge.ranges[i].from + ' ' + gauge.unit.label[project.units],
-      to: gauge.ranges[i].to + ' ' + gauge.unit.label[project.units],
+      from:
+        gauge.ranges[i].from + ' ' + gauge.unit.label[localState.value.units],
+      to: gauge.ranges[i].to + ' ' + gauge.unit.label[localState.value.units],
       details,
     });
   });

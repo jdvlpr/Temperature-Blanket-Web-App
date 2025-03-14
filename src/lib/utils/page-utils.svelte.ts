@@ -19,7 +19,7 @@ import Menu from '$lib/components/modals/Menu.svelte';
 import {
   modal,
   pageSections,
-  preferences,
+  localState,
   project,
   toast,
   weather,
@@ -145,7 +145,7 @@ export const handleKeyDown = (ev) => {
       case 'u':
         project.toggleUnits();
         toast.trigger({
-          message: 'Units changed to ' + project.units,
+          message: 'Units changed to ' + localState.value.units,
           background: 'preset-filled-success-100-900',
         });
         break;
@@ -190,20 +190,20 @@ export const handleKeyDown = (ev) => {
 
 // Function to toggle between light, dark, and system themes
 const toggleTheme = () => {
-  switch (preferences.value.theme.mode) {
+  switch (localState.value.theme.mode) {
     case 'light':
-      preferences.value.theme.mode = 'dark';
+      localState.value.theme.mode = 'dark';
       break;
     case 'dark':
       // setTheme('system');
-      preferences.value.theme.mode = 'system';
+      localState.value.theme.mode = 'system';
       break;
     case 'system':
       // setTheme('light');
-      preferences.value.theme.mode = 'light';
+      localState.value.theme.mode = 'light';
       break;
     default:
-      preferences.value.theme.mode = 'system';
+      localState.value.theme.mode = 'system';
 
       break;
   }

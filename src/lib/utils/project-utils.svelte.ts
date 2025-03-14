@@ -18,6 +18,7 @@ import pdfWeatherData from '$lib/pdf/sections/weather-data.svelte';
 import {
   allGaugesAttributes,
   gauges,
+  localState,
   locations,
   previews,
   project,
@@ -67,12 +68,14 @@ export const downloadWeatherCSV = () => {
       if (target?.id === 'dayt') {
         labels.push(`${target.label} (h:m)`);
       } else {
-        labels.push(`${target.label} (${gauge.unit.label[project.units]})`);
+        labels.push(
+          `${target.label} (${gauge.unit.label[localState.value.units]})`,
+        );
       }
     });
   });
   if (!weather.data) return;
-  const _units = project.units;
+  const _units = localState.value.units;
   const _weather = [...weather.data].map((day, index) => {
     const gaugeInfo = [];
     allGaugesAttributes?.forEach((gauge) => {

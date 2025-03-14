@@ -17,7 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import WeatherItem from '$lib/components/WeatherItem.svelte';
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
   import { UNIT_LABELS } from '$lib/constants';
-  import { locations, project, weather } from '$lib/state';
+  import { localState, locations, weather } from '$lib/state';
   import {
     capitalizeFirstLetter,
     convertTime,
@@ -35,6 +35,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } = $props();
 
   let rangeInput = $state();
+
   let navigatorElement = $state();
 
   let dayWeather = $derived(data[weather.currentIndex]);
@@ -49,7 +50,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     if (!exists(day)) return null;
     return getColorInfo({
       param: targetId,
-      value: day[targetId][project.units],
+      value: day[targetId][localState.value.units],
     });
   });
 
@@ -116,17 +117,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {#each weatherTargets as { id, label, icon, type }}
         {@const { name, hex, index, gaugeLength, brandName, yarnName } =
           colorInfo(id, day)}
-        {#if exists(day) && day[id][project.units] !== null}
+        {#if exists(day) && day[id][localState.value.units] !== null}
           {#if id === 'dayt'}
             <WeatherItem
               {id}
               {label}
               {icon}
-              value={convertTime(day[id][project.units])}
+              value={convertTime(day[id][localState.value.units])}
             >
               {#snippet details()}
                 <span>
-                  {#if viewGaugeInfo !== false && day[id][project.units] !== null}
+                  {#if viewGaugeInfo !== false && day[id][localState.value.units] !== null}
                     {#if typeof index === 'number'}
                       <div
                         class="rounded-container my-2 px-4 py-2 text-center"
@@ -169,13 +170,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
               {id}
               {label}
               {icon}
-              value={day[id][project.units]}
-              units={UNIT_LABELS[type][project.units]}
+              value={day[id][localState.value.units]}
+              units={UNIT_LABELS[type][localState.value.units]}
               {isRecentDate}
             >
               {#snippet details()}
                 <span>
-                  {#if viewGaugeInfo !== false && day[id][project.units] !== null}
+                  {#if viewGaugeInfo !== false && day[id][localState.value.units] !== null}
                     {#if typeof index === 'number'}
                       <div
                         class="rounded-container my-2 px-4 py-2 text-center"
@@ -220,7 +221,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             {label}
             {icon}
             value="?"
-            units={UNIT_LABELS[type][project.units]}
+            units={UNIT_LABELS[type][localState.value.units]}
           />
         {/if}
       {/each}

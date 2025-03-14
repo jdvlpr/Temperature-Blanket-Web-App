@@ -81,13 +81,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script>
   import { browser } from '$app/environment';
   import { THEMES } from '$lib/constants';
-  import { preferences } from '$lib/state';
+  import { localState } from '$lib/state';
   import { Popover, Segment } from '@skeletonlabs/skeleton-svelte';
 
   let openState = $state(false);
 
   let activeTheme = $derived(
-    THEMES.find((n) => n.id === (preferences.value.theme.mode || 'system')),
+    THEMES.find((n) => n.id === (localState.value.theme.mode || 'system')),
   );
 </script>
 
@@ -106,7 +106,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     autoFocus={false}
   >
     {#snippet trigger()}
-      {#key preferences.value?.theme.mode}
+      {#key localState.value?.theme.mode}
         <span
           >{#if browser}{@html activeTheme?.icon}{:else}{@html THEMES.find(
               (t) => t.id === 'system',
@@ -118,9 +118,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {#snippet content()}
       <div class="flex flex-col gap-2">
         <Segment
-          value={preferences.value.theme.mode}
+          value={localState.value.theme.mode}
           onValueChange={(e) => {
-            preferences.value.theme.mode = e.value;
+            localState.value.theme.mode = e.value;
           }}
           classes="flex wrap gap-y-2 shadow-sm"
           background="bg-surface-100 dark:bg-surface-900"
@@ -139,11 +139,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {#each skeletonThemes as { name, id, colors, rounded }}
             <button
               onclick={(e) => {
-                preferences.value.theme.id = id;
+                localState.value.theme.id = id;
               }}
               class={[
                 'btn hover:preset-tonal-secondary flex w-full items-center justify-start gap-2',
-                preferences.value.theme.id === id &&
+                localState.value.theme.id === id &&
                   'preset-filled-secondary-500',
               ]}
             >

@@ -16,7 +16,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import Spinner from '$lib/components/Spinner.svelte';
   import { PREVIEW_UPDATE_DEBOUNCE_MS } from '$lib/constants';
-  import { gauges, project, weather } from '$lib/state';
+  import { gauges, localState, project, weather } from '$lib/state';
   import type { Color, WeatherDay, WeatherParam } from '$lib/types';
   import {
     getColorInfo,
@@ -33,7 +33,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     window.clearTimeout(debounceTimer);
     debounceTimer = window.setTimeout(callback, time);
   };
-
   const squareSectionsCount = $derived(
     squaresPreview.settings.squareSize * squaresPreview.settings.squareSize,
   );
@@ -100,7 +99,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             const day: WeatherDay = weather.data[dayIndex];
             let targetId: WeatherParam['id'] =
               squareSectionTargetIds[squareSectionIndex];
-            let value = day[targetId][project.units];
+            let value = day[targetId][localState.value.units];
 
             // Check if the primary target value is 0 or null, use the primary target as a backup
             if (
@@ -110,7 +109,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 value === null)
             ) {
               targetId = squaresPreview.settings.primaryTarget;
-              value = day[targetId][project.units];
+              value = day[targetId][localState.value.units];
             }
 
             // Get the color based on the gauge ID and value
@@ -156,13 +155,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 {#if !squaresPreview.sections.length}
-  <div class="w-full h-[80svh] inline-flex justify-center items-center">
+  <div class="inline-flex h-[80svh] w-full items-center justify-center">
     <Spinner />
   </div>
 {:else}
   <svg
     id="preview-svg-image"
-    class="max-h-[80svh] mx-auto"
+    class="mx-auto max-h-[80svh]"
     aria-hidden="true"
     viewBox="0 0 {width} {height}"
     bind:this={squaresPreview.svg}

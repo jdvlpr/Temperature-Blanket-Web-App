@@ -14,7 +14,6 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import { project } from '$lib/state';
   import {
     BarController,
     BarElement,
@@ -35,6 +34,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from 'chart.js';
   import { onMount } from 'svelte';
   import { weatherState } from './+page.svelte';
+  import { localState } from '$lib/state';
 
   let { data } = $props();
 
@@ -204,7 +204,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             },
             title: {
               text:
-                project.units === 'metric'
+                localState.value.units === 'metric'
                   ? 'Degrees Celsius'
                   : 'Degrees Fahrenheit',
               display: true,

@@ -18,7 +18,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import AppLogo from '$lib/components/AppLogo.svelte';
   import AppShell from '$lib/components/AppShell.svelte';
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
-  import { consentToMSClarityCookies, preferences, toast } from '$lib/state';
+  import { consentToMSClarityCookies, localState, toast } from '$lib/state';
   import { RefreshCcwIcon } from '@lucide/svelte';
 
   let kofiUrl = new URL(PUBLIC_KOFI_LINK || 'https://ko-fi.com');
@@ -117,7 +117,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             />
           </div>
 
-          {#if preferences.value.disableToastAnalytics}
+          {#if localState.value.disableToastAnalytics}
             <div
               class="rounded-container preset-filled-surface-100-900 flex w-fit flex-wrap items-center gap-x-4 gap-y-2 px-4 py-2 shadow-sm"
             >
@@ -125,7 +125,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <button
                 class="btn preset-filled-secondary-500"
                 onclick={() => {
-                  preferences.value.disableToastAnalytics = false;
+                  localState.value.disableToastAnalytics = false;
                   toast.trigger({
                     message: 'The cookie popup message can be shown again.',
                     background: 'preset-filled-success-100-900',

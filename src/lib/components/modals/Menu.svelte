@@ -30,7 +30,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import YarnSources from '$lib/components/YarnSources.svelte';
   import ChooseWeatherSource from '$lib/components/modals/ChooseWeatherSource.svelte';
   import KeyboardShortcuts from '$lib/components/modals/KeyboardShortcuts.svelte';
-  import { DAYS_OF_THE_WEEK, ICONS, MONTHS } from '$lib/constants';
+  import { DAYS_OF_THE_WEEK, MONTHS } from '$lib/constants';
   import { modal, previews, project, toast, weather } from '$lib/state';
   import {
     delay,
@@ -40,8 +40,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     pluralize,
     setLocalStorageProject,
   } from '$lib/utils';
-  import { onMount } from 'svelte';
-  import WeatherGrouping from '../WeatherGrouping.svelte';
   import {
     CircleCheckIcon,
     ClipboardCopyIcon,
@@ -51,6 +49,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     SquarePlusIcon,
     WrenchIcon,
   } from '@lucide/svelte';
+  import { onMount } from 'svelte';
+  import WeatherGrouping from '../WeatherGrouping.svelte';
 
   interface Props {
     page?: string;

@@ -15,7 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import DataTable from '$lib/components/datatable/DataTable.svelte';
-  import { allGaugesAttributes, project, weather } from '$lib/state';
+  import { allGaugesAttributes, localState, weather } from '$lib/state';
   import { convertTime, dateToISO8601String } from '$lib/utils';
   import { TableHandler, ThSort } from '@vincjo/datatables';
 
@@ -30,15 +30,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
         if (target.id === 'dayt') {
           weather = {
             ...weather,
-            [target.id]: convertTime(n[target.id][project.units], {
+            [target.id]: convertTime(n[target.id][localState.value.units], {
               displayUnits: false,
               padStart: true,
             }),
           };
         } else {
           let value =
-            n[target.id][project.units] !== null
-              ? n[target.id][project.units]
+            n[target.id][localState.value.units] !== null
+              ? n[target.id][localState.value.units]
               : '-';
           weather = {
             ...weather,
@@ -59,10 +59,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div
-  class="w-full inline-flex text-center justify-center items-center max-w-(--breakpoint-sm) p-4"
+  class="inline-flex w-full max-w-(--breakpoint-sm) items-center justify-center p-4 text-center"
 >
   <DataTable {table} search={false}>
-    <table class="border-separate border-spacing-0 w-fit mx-auto self-center">
+    <table class="mx-auto w-fit border-separate border-spacing-0 self-center">
       <thead>
         <tr>
           <ThSort {table} field={'date'}>
@@ -72,7 +72,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             >
           </ThSort>
           {#each weatherTargets as { id, pdfHeader }}
-            {@const header = pdfHeader[project.units]}
+            {@const header = pdfHeader[localState.value.units]}
             {@const headerLabel = header.slice(0, header.indexOf('('))}
             {@const headerUnits = header.slice(header.indexOf('('))}
             <ThSort {table} field={id}>

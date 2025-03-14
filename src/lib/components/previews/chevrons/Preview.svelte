@@ -14,7 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import { gauges, project, weather } from '$lib/state';
+  import { gauges, localState, project, weather } from '$lib/state';
   import { getColorInfo, showPreviewImageWeatherDetails } from '$lib/utils';
   import { chevronsPreview } from './state.svelte';
 
@@ -61,7 +61,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             },${line} `;
           }
           const target = chevronsPreview.settings.selectedTargets[paramIndex];
-          let value = weather.data[dayIndex][target][project.units];
+          let value = weather.data[dayIndex][target][localState.value.units];
 
           // Get the color based on the gauge ID and value
           const color = getColorInfo({ param: target, value }).hex;
@@ -89,7 +89,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <svg
   id="preview-svg-image"
-  class="max-h-[80svh] mx-auto"
+  class="mx-auto max-h-[80svh]"
   aria-hidden="true"
   viewBox="0 0 {width} {height}"
   bind:this={chevronsPreview.svg}

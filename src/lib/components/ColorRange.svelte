@@ -15,7 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import GaugeSettings from '$lib/components/modals/GaugeSettings.svelte';
-  import { gauges, modal, project } from '$lib/state';
+  import { gauges, localState, modal } from '$lib/state';
 
   let { index } = $props();
 
@@ -60,7 +60,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <span class="flex items-start"
         ><span class="text-lg">{gauges.activeGauge.ranges[index]?.from}</span>
         <span class="text-xs"
-          >{gauges.activeGauge.unit.label[project.units]}</span
+          >{gauges.activeGauge.unit.label[localState.value.units]}</span
         ></span
       ></span
     >
@@ -69,7 +69,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <span class="flex items-start"
         ><span class="text-lg">{gauges.activeGauge.ranges[index]?.to}</span>
         <span class="text-xs"
-          >{gauges.activeGauge.unit.label[project.units]}</span
+          >{gauges.activeGauge.unit.label[localState.value.units]}</span
         ></span
       ></span
     ></button

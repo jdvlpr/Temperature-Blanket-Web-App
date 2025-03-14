@@ -16,11 +16,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script>
   import { browser } from '$app/environment';
   import { THEMES } from '$lib/constants';
-  import { preferences, previews } from '$lib/state';
+  import { localState, previews } from '$lib/state';
   import { onDestroy, onMount } from 'svelte';
 
   let theme = $state(
-    getTheme(THEMES.find((n) => n.id === preferences.value.theme.mode)),
+    getTheme(THEMES.find((n) => n.id === localState.value.theme.mode)),
   );
 
   let activePreviewSelectId = $state(previews.activeId);
@@ -40,7 +40,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   // Update theme when the system theme changes
   function handleColorSchemeChange() {
-    theme = getTheme(preferences.value.theme.mode || 'system');
+    theme = getTheme(localState.value.theme.mode || 'system');
   }
 
   function getTheme(id) {
@@ -57,14 +57,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   // Update theme when user changes the theme mode
   $effect(() => {
-    theme = getTheme(preferences.value.theme.mode || 'system');
+    theme = getTheme(localState.value.theme.mode || 'system');
   });
 </script>
 
-<div class="my-4 flex flex-col justify-center items-center gap-2">
+<div class="my-4 flex flex-col items-center justify-center gap-2">
   <label class="label">
     <select
-      class="select w-fit mx-auto min-w-[200px]"
+      class="select mx-auto w-fit min-w-[200px]"
       id="select-pattern-type"
       value={activePreviewSelectId}
       onchange={(e) => {
@@ -78,14 +78,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </label>
 
   <div
-    class="preview-image-select flex flex-wrap gap-2 justify-center items-center"
+    class="preview-image-select flex flex-wrap items-center justify-center gap-2"
   >
     {#each previews.all as { img, name, id }}
       {#if img}
         {#key theme}
           <button
             class={[
-              'flex flex-col p-4 rounded-container justify-center gap-2 items-center snap-center',
+              'rounded-container flex snap-center flex-col items-center justify-center gap-2 p-4',
               id === previews.activeId
                 ? 'bg-primary-300 dark:bg-primary-700 selected shadow-sm'
                 : 'preset-tonal hover:preset-tonal-primary',

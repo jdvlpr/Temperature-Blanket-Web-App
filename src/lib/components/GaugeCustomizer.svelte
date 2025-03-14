@@ -20,8 +20,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
   import ViewToggle from '$lib/components/buttons/ViewToggle.svelte';
   import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
-  import { ICONS } from '$lib/constants';
-  import { preferences, modal, showDaysInRange, weather } from '$lib/state';
+  import { localState, modal, showDaysInRange } from '$lib/state';
   import type { Color } from '$lib/types';
   import { getTextColor } from '$lib/utils';
   import {
@@ -141,9 +140,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 {#if hasAnyAffiliateURLs}
-  <p class="px-2 mt-4 text-sm">
+  <p class="mt-4 px-2 text-sm">
     Items purchased through links with a shopping bag icon
-    <ShoppingBagIcon class="size-4 inline" />
+    <ShoppingBagIcon class="inline size-4" />
     help support this site by earning the developer a percentage of each sale, at
     no additional cost to you.
   </p>
@@ -152,7 +151,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <div class="grid grid-cols-12 gap-2 pt-2">
   {#if isProjectPlannerPage}
     <div
-      class="flex flex-col items-start text-left gap-1 col-span-full md:col-span-8 w-fit"
+      class="col-span-full flex w-fit flex-col items-start gap-1 text-left md:col-span-8"
     >
       <ToggleSwitch
         bind:checked={showDaysInRange.value}
@@ -163,8 +162,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/if}
 
   <div
-    class="my-2 col-span-full flex flex-wrap justify-center {isProjectPlannerPage
-      ? 'md:justify-end md:col-span-4 md:cols-start-9'
+    class="col-span-full my-2 flex flex-wrap justify-center {isProjectPlannerPage
+      ? 'md:cols-start-9 md:col-span-4 md:justify-end'
       : ''}"
   >
     <ViewToggle />
@@ -172,9 +171,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </div>
 
 <div
-  class="rounded-container overflow-hidden mt-2 mb-2 lg:mb-4 {preferences.value
+  class="rounded-containelocalStatehidden mt-2 mb-2 lg:mb-4 {localState.value
     .layout === 'grid'
-    ? 'gap-1 grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4'
+    ? 'grid grid-cols-2 gap-1 md:grid-cols-3 xl:grid-cols-4'
     : 'flex flex-col'}"
   use:dragHandleZone={{
     items: sortableColors,
@@ -187,9 +186,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 >
   {#each sortableColors as { hex, name, brandId, yarnId, brandName, yarnName, variant_href, affiliate_variant_href, id }, index (id)}
     <div
-      class="color p-2 gap-2 flex flex-wrap items-center justify-around {preferences
+      class="color flex flex-wrap items-center justify-around gap-2 p-2 {localState
         .value.layout === 'grid'
-        ? 'rounded-container md:basis-1/5 sm:basis-1/4 basis-1/3 flex-auto'
+        ? 'rounded-container flex-auto basis-1/3 sm:basis-1/4 md:basis-1/5'
         : ''}"
       style="background:{hex};color:{getTextColor(hex)}"
       animate:flip={{ duration: flipDurationMs }}
@@ -197,7 +196,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {#if movable}
         <button
           title="Remove Color"
-          class="btn hover:preset-tonal flex flex-wrap justify-center items-center"
+          class="btn hover:preset-tonal flex flex-wrap items-center justify-center"
           onclick={() => {
             gauge.updateColors({
               colors: gauge.colors.filter((_, i) => i !== index),
@@ -289,7 +288,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
         {#if showDaysInRange.value}
           <div
-            class="flex flex-wrap w-fit justify-center items-center bg-surface-900/10 rounded-container shadow-inner overflow-hidden"
+            class="bg-surface-900/10 rounded-container flex w-fit flex-wrap items-center justify-center overflow-hidden shadow-inner"
           >
             <DaysInRange
               range={gauge.ranges[index]}

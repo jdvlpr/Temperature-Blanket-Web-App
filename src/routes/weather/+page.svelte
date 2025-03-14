@@ -30,17 +30,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { PUBLIC_BASE_URL } from '$env/static/public';
   import AppLogo from '$lib/components/AppLogo.svelte';
   import AppShell from '$lib/components/AppShell.svelte';
-  import Card from '$lib/components/Card.svelte';
   import Footer from '$lib/components/Footer.svelte';
   import Share from '$lib/components/Share.svelte';
   import Spinner from '$lib/components/Spinner.svelte';
   import UnitChanger from '$lib/components/UnitChanger.svelte';
-  import { modal, project, showNavigationSideBar } from '$lib/state';
+  import {
+    localState,
+    modal,
+    project,
+    showNavigationSideBar,
+  } from '$lib/state';
   import {
     delay,
     getWeatherCodeDetails,
     setUnitsFromNavigator,
   } from '$lib/utils';
+  import { ListIcon, PlusIcon, SettingsIcon } from '@lucide/svelte';
   import { onDestroy, onMount } from 'svelte';
   import { fade } from 'svelte/transition';
   import Chart from './Chart.svelte';
@@ -48,7 +53,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Location from './Location.svelte';
   import Menu from './Menu.svelte';
   import Symbols from './Symbols.svelte';
-  import { ListIcon, PlusIcon, SettingsIcon } from '@lucide/svelte';
 
   let showChart = $state(true);
   let shareableURL = $state(page.url.href);
@@ -64,10 +68,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   onMount(async () => {
     // units
     const paramUnits = page.url.searchParams.get('u');
-    if (paramUnits === 'i') project.units = 'imperial';
-    else if (paramUnits === 'm') project.units = 'metric';
+    if (paramUnits === 'i') localState.value.units = 'imperial';
+    else if (paramUnits === 'm') localState.value.units = 'metric';
     else if (localStorage.getItem('[/weather]units'))
-      project.units = localStorage.getItem('[/weather]units');
+      localState.value.units = localStorage.getItem('[/weather]units');
     else setUnitsFromNavigator();
 
     // hour12
@@ -76,7 +80,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     else if (hourFormat === '1') weatherState.hour = '24';
     else if (localStorage.getItem('[/weather]hour_format'))
       weatherState.hour = localStorage.getItem('[/weather]hour_format');
-    else weatherState.hour = project.units === 'metric' ? '24' : '12';
+    else weatherState.hour = localState.value.units === 'metric' ? '24' : '12';
 
     // saved weather locations
     if (localStorage.getItem('[/weather]locations')) {
@@ -264,20 +268,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   $effect(() => {
     weatherState.activeLocationID;
-    project.units;
+    localState.value.units;
     weatherState.hour;
     getShareableURL({
       id: weatherState.activeLocationID,
-      units: project.units,
+      units: localState.value.units,
       hourFormat: weatherState.hour,
     });
   });
 
   $effect(async () => {
-    localStorage.setItem('[/weather]units', project.units);
+    localStorage.setItem('[/weather]units', localState.value.units);
     if (
       weatherState.weatherLocations?.some(
-        (item) => item.units !== project.units,
+        (item) => item.units !== localState.value.units,
       )
     )
       await fetchData();
@@ -398,7 +402,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         );
                         page.url.searchParams.set(
                           'u',
-                          project.units === 'metric' ? 'm' : 'i',
+                          localState.value.units === 'metric' ? 'm' : 'i',
                         );
                         // window.history.replaceState(
                         //     { path: page.url.href },

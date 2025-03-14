@@ -22,7 +22,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { TableHandler, ThSort } from '@vincjo/datatables';
   import { UNIT_LABELS } from '$lib/constants';
   import RecentWeatherDataTooltip from '$lib/components/RecentWeatherDataTooltip.svelte';
-  import { modal, gauges, project, weather } from '$lib/state';
+  import { modal, gauges, localState, weather } from '$lib/state';
   import {
     millimetersToInches,
     inchesToMillimeters,
@@ -67,22 +67,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
         weather.tableWeatherTargets.forEach((target) => {
           const colorInfo = getColorInfo({
             param: target.id,
-            value: n[target.id][project.units],
+            value: n[target.id][localState.value.units],
           });
           _weather.color[target.id] = colorInfo;
           if (target.id === 'dayt') {
             // make sure daytime is always in the same hr:mn format
             _weather = {
               ..._weather,
-              [target.id]: convertTime(n[target.id][project.units], {
+              [target.id]: convertTime(n[target.id][localState.value.units], {
                 displayUnits: false,
                 padStart: true,
               }),
             };
           } else {
             let value =
-              n[target.id][project.units] !== null
-                ? n[target.id][project.units]
+              n[target.id][localState.value.units] !== null
+                ? n[target.id][localState.value.units]
                 : '-';
             _weather = {
               ..._weather,
@@ -111,7 +111,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   $effect(() => {
     weather.data,
       weather.tableWeatherTargets,
-      project.units,
+      localState.value.units,
       gauges.activeGauge?.colors,
       gauges.activeGauge?.ranges;
     gauges.activeGauge?.numberOfColors;
@@ -140,7 +140,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             >
           </ThSort>
           {#each weather.tableWeatherTargets as { id, pdfHeader }}
-            {@const header = pdfHeader[project.units]}
+            {@const header = pdfHeader[localState.value.units]}
             {@const headerLabel = header.slice(0, header.indexOf('('))}
             {@const headerUnits = header.slice(header.indexOf('('))}
             <ThSort {table} field={id}>
@@ -233,7 +233,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                           props: {
                             max: 1000,
                             value: row[id],
-                            title: `<div class="flex flex-col items-center justify-center"><span class="font-bold">${row.date}</span><span>${label} <span class="text-sm">(${UNIT_LABELS[type][project.units]})</span></span></div>`,
+                            title: `<div class="flex flex-col items-center justify-center"><span class="font-bold">${row.date}</span><span>${label} <span class="text-sm">(${UNIT_LABELS[type][localState.value.units]})</span></span></div>`,
                             noMinMax: true,
                             showSlider: false,
                             onOkay: (_value) => {
@@ -249,7 +249,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                               weather.table.rowsPerPage = table.rowsPerPage;
                               weather.table.page = table.currentPage;
 
-                              if (project.units === 'metric') {
+                              if (localState.value.units === 'metric') {
                                 weather.rawData[i][id].metric = _value;
                                 if (type === 'temperature')
                                   weather.rawData[i][id].imperial =
@@ -258,7 +258,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                                   weather.rawData[i][id].imperial =
                                     millimetersToInches(_value);
                               }
-                              if (project.units === 'imperial') {
+                              if (localState.value.units === 'imperial') {
                                 weather.rawData[i][id].imperial = _value;
                                 if (type === 'temperature')
                                   weather.rawData[i][id].metric =

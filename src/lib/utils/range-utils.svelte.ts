@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { project, weather } from '$lib/state';
+import { localState, weather } from '$lib/state';
 import { displayNumber } from '$lib/utils';
 
 export const getStart = (rangeOptions) => {
@@ -66,7 +66,7 @@ export const getEvenlyDistributedRangeValuesWithEqualDayCount = ({
 }) => {
   if (!weatherData) weatherData = weather.data;
 
-  const _units = project.units;
+  const _units = localState.value.units;
 
   let _weatherData = [...weatherData];
   _weatherData = _weatherData.filter((day) => day[prop][_units] !== null); // filter out any missing values
@@ -166,7 +166,7 @@ export const getDaysInRange = ({
     return [];
   const days = weather.data.filter((day) => {
     return isValueInRange({
-      value: day[id][project.units],
+      value: day[id][localState.value.units],
       range,
       direction,
       includeFromValue,

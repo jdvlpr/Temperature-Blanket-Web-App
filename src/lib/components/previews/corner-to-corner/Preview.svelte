@@ -15,7 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import Spinner from '$lib/components/Spinner.svelte';
-  import { gauges, project, weather } from '$lib/state';
+  import { gauges, localState, project, weather } from '$lib/state';
   import { getColorInfo, showPreviewImageWeatherDetails } from '$lib/utils';
   import { cornerToCornerPreview } from './state.svelte';
 
@@ -114,7 +114,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         let section = [];
         let day = weather.data[dayIndex];
         let target = cornerToCornerPreview.settings.selectedTarget;
-        let value = day[target][project.units];
+        let value = day[target][localState.value.units];
 
         // Get the color based on the gauge ID and value
         const color = getColorInfo({ param: target, value }).hex;
@@ -148,13 +148,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 {#if !cornerToCornerPreview.sections.length}
-  <div class="w-full h-[80svh] inline-flex justify-center items-center">
+  <div class="inline-flex h-[80svh] w-full items-center justify-center">
     <Spinner />
   </div>
 {:else}
   <svg
     id="preview-svg-image"
-    class="max-h-[80svh] mx-auto"
+    class="mx-auto max-h-[80svh]"
     aria-hidden="true"
     viewBox="0 0 {width} {height}"
     bind:this={cornerToCornerPreview.svg}

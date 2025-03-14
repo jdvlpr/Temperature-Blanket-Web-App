@@ -28,7 +28,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     OPEN_METEO_DELAY_DAYS,
     UNIT_LABELS,
   } from '$lib/constants';
-  import { gauges, locations, modal, project, weather } from '$lib/state';
+  import { gauges, localState, locations, modal, weather } from '$lib/state';
   import {
     convertTime,
     createWeeksProperty,
@@ -37,17 +37,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     isDateWithinLastSevenDays,
     pluralize,
   } from '$lib/utils';
+  import { TriangleAlertIcon, WrenchIcon } from '@lucide/svelte';
   import { Accordion } from '@skeletonlabs/skeleton-svelte';
   import { onMount } from 'svelte';
-  import Menu from './modals/Menu.svelte';
-  import {
-    Settings2Icon,
-    SettingsIcon,
-    TriangleAlertIcon,
-    WrenchIcon,
-  } from '@lucide/svelte';
-  import WeatherGrouping from './WeatherGrouping.svelte';
   import UnitChanger from './UnitChanger.svelte';
+  import WeatherGrouping from './WeatherGrouping.svelte';
 
   let graph = $state();
   let defaultWeatherSourceCopy = $state();
@@ -55,7 +49,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let showWeatherChart = $state(true);
   let warningAccordionState = $state([]);
   let missingWeatherAccordionState = $state([]);
-
   let isAnyWeatherSourceDifferentFromDefault;
   onMount(() => {
     isAnyWeatherSourceDifferentFromDefault = !locations.all?.some(
@@ -133,9 +126,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
       .map((day, index) => {
         return { ...day, index };
       })
-      .filter((day) => day.tmin[project.units] !== null)
+      .filter((day) => day.tmin[localState.value.units] !== null)
       .reduce((prev, curr) =>
-        prev.tmin[project.units] < curr.tmin[project.units] ? prev : curr,
+        prev.tmin[localState.value.units] < curr.tmin[localState.value.units]
+          ? prev
+          : curr,
       ) || null,
   );
   let tMaxDay = $derived(
@@ -143,9 +138,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
       .map((day, index) => {
         return { ...day, index };
       })
-      .filter((day) => day.tmax[project.units] !== null)
+      .filter((day) => day.tmax[localState.value.units] !== null)
       .reduce((prev, curr) =>
-        prev.tmax[project.units] > curr.tmax[project.units] ? prev : curr,
+        prev.tmax[localState.value.units] > curr.tmax[localState.value.units]
+          ? prev
+          : curr,
       ) || null,
   );
   let missingDataMerged = $derived(getMissingDataMerged(missingData));
@@ -289,7 +286,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         icon="↑"
         label="Highest Temperature"
         value={Math.max(...weather.params.tmax?.filter((n) => n !== null))}
-        units={UNIT_LABELS.temperature[project.units]}
+        units={UNIT_LABELS.temperature[localState.value.units]}
       >
         {#snippet date()}
           <p class="text-xs">
@@ -306,7 +303,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         icon="~"
         label="Average Temperature"
         value={getAverage(weather.params.tavg?.filter((n) => n !== null))}
-        units={UNIT_LABELS.temperature[project.units]}
+        units={UNIT_LABELS.temperature[localState.value.units]}
       />
     {/if}
 
@@ -316,7 +313,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         icon="↓"
         label="Lowest Temperature"
         value={Math.min(...weather.params.tmin?.filter((n) => n !== null))}
-        units={UNIT_LABELS.temperature[project.units]}
+        units={UNIT_LABELS.temperature[localState.value.units]}
       >
         {#snippet date()}
           <p class="text-xs">
@@ -339,7 +336,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 ?.filter((n) => n !== null)
                 ?.reduce((partialSum, a) => partialSum + a, 0),
             )}
-        units={UNIT_LABELS.height[project.units]}
+        units={UNIT_LABELS.height[localState.value.units]}
       />
     {/if}
 
@@ -359,7 +356,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   ?.filter((n) => n !== null)
                   ?.reduce((partialSum, a) => partialSum + a, 0),
               )}
-        units={UNIT_LABELS.height[project.units]}
+        units={UNIT_LABELS.height[localState.value.units]}
       >
         {#snippet button()}
           <div class="my-2 text-sm">
@@ -397,7 +394,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <div bind:this={graph} class="w-full scroll-m-[60px]">
   {#if showWeatherChart}
     {#if weather.data.length}
-      {#key project.units}
+      {#key localState.value.units}
         <WeatherChart />
       {/key}
     {/if}

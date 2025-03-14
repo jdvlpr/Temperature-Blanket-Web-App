@@ -21,7 +21,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
   import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
   import StickyPart from '$lib/components/modals/StickyPart.svelte';
-  import { gauges, modal, project } from '$lib/state';
+  import { gauges, modal, localState } from '$lib/state';
   import {
     displayNumber,
     getIncrement,
@@ -55,7 +55,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let _gauge = $state(gauges.getSnapshot(gauges.activeGaugeId));
 
-  let unitLabel = $derived(_gauge.unit.label[project.units]);
+  let unitLabel = $derived(_gauge.unit.label[localState.value.units]);
 
   let incrementMode = $state(
     _gauge.rangeOptions?.isCustomRanges ? null : _gauge.rangeOptions.mode,

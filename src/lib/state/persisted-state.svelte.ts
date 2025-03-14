@@ -1,24 +1,24 @@
-import type { LocationType, PageLayout, Unit } from '$lib/types';
+import type { PageLayout, Unit } from '$lib/types';
 
 // User preferences for the web app stored in local storage
-type Preferences = {
+type LocalStateType = {
   disableToastAnalytics: boolean;
   theme: {
     id: string; // `"classic"` or one of the presets in plugins.themes.presets in [tailwind.config.js])
     mode: 'light' | 'dark' | 'system';
   };
   layout: PageLayout;
-  units: Unit;
+  units: Unit | null;
 };
 
-export const preferences = persistedState<Preferences>('preferences', {
+export const localState = persistedState<LocalStateType>('preferences', {
   disableToastAnalytics: false,
   theme: {
     id: 'classic',
     mode: 'system',
   },
   layout: 'list',
-  units: 'imperial',
+  units: null,
 });
 
 // The following persisted state functionality was copied from: https://github.com/oMaN-Rod/svelte-persisted-state/blob/main/src/lib/index.svelte.ts

@@ -15,7 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script module>
   import { browser } from '$app/environment';
-  import { project, weather } from '$lib/state';
+  import { localState, weather } from '$lib/state';
   import {
     CategoryScale,
     Chart,
@@ -198,7 +198,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               },
               title: {
                 text:
-                  project.units === 'metric'
+                  localState.value.units === 'metric'
                     ? 'Degrees Celsius'
                     : 'Degrees Fahrenheit',
                 display: true,
@@ -218,7 +218,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               },
               title: {
                 text:
-                  project.units === 'metric'
+                  localState.value.units === 'metric'
                     ? 'Millimeters / Minutes'
                     : 'Inches / Hours',
                 display: true,

@@ -17,22 +17,17 @@ import { API_SERVICES } from '$lib/constants';
 import {
   allGaugesAttributes,
   locations,
+  localState,
   signal,
-  project,
   weather,
-  controller,
-  gauges,
-  modal,
 } from '$lib/state';
 import type { WeatherDay } from '$lib/types';
 import {
   celsiusToFahrenheit,
   dateToISO8601String,
-  delay,
   displayNumber,
   getAverage,
   getToday,
-  goToProjectSection,
   hoursToMinutes,
   millimetersToInches,
   numberOfDays,
@@ -54,7 +49,7 @@ export const sum = (param) => {
     .map((n) => {
       let value = n[param];
       if (typeof value !== 'undefined' && value !== null)
-        value = value[project.units];
+        value = value[localState.value.units];
       else {
         if (param === 'tmax') return getAverage(weather.params.tmax);
         if (param === 'tavg') return getAverage(weather.params.tavg);
@@ -77,7 +72,7 @@ export const sum = (param) => {
  * @returns {number} The count of missing days.
  */
 export const missingDaysCount = () => {
-  const _units = project.units;
+  const _units = localState.value.units;
   const missingDays = weather.data.filter(
     (day) =>
       day?.tavg[_units] === null &&

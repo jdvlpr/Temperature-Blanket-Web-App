@@ -14,20 +14,13 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import { ICONS } from '$lib/constants';
-  import {
-    allGaugesAttributes,
-    gauges,
-    modal,
-    project,
-    weather,
-  } from '$lib/state';
+  import { allGaugesAttributes, gauges, modal, weather } from '$lib/state';
   import { downloadPDF } from '$lib/utils';
+  import { CirclePlusIcon, DownloadIcon, Trash2Icon } from '@lucide/svelte';
   import { onMount } from 'svelte';
   import RangeOptionsButton from './buttons/RangeOptionsButton.svelte';
   import Gauge from './Gauge.svelte';
   import GaugeCustomizer from './GaugeCustomizer.svelte';
-  import { CirclePlusIcon, DownloadIcon, Trash2Icon } from '@lucide/svelte';
 
   onMount(() => {
     setupAvailableGauges();
@@ -37,7 +30,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     allGaugesAttributes.forEach((gauge) => {
       gauge.targets.forEach((target) => {
         if (
-          weather.data?.some((day) => day[target.id][project.units] !== null)
+          weather.data?.some(
+            (day) => day[target.id][localState.value.units] !== null,
+          )
         ) {
           // For each of the gauge's weather parameter targets, check to see if there is any data, and if so setup the default gauge
           gauges.addToAvailable({

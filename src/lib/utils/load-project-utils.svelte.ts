@@ -23,6 +23,7 @@ import {
   allGaugesAttributes,
   gauges,
   locations,
+  localState,
   previews,
   project,
   weather,
@@ -46,8 +47,8 @@ export const setProjectSettings = async (
 
   // Load Units
   if (exists(params.u)) {
-    if (params.u.value === 'i') project.units = 'imperial';
-    if (params.u.value === 'm') project.units = 'metric';
+    if (params.u.value === 'i') localState.value.units = 'imperial';
+    if (params.u.value === 'm') localState.value.units = 'metric';
   }
 
   // Load Locations
@@ -332,7 +333,7 @@ export const parseGaugeURLHash = (hashString: string, gauge) => {
     // Before version 1.700, all numbers were saved in metric
     // So convert the From and To values if needed
     if (!upToDate(project.loaded.version, '1.700')) {
-      if (project.units === 'imperial') {
+      if (localState.value.units === 'imperial') {
         switch (gauge.id) {
           case 'temp':
             from = celsiusToFahrenheit(from);
@@ -467,7 +468,7 @@ export const parseGaugeURLHash = (hashString: string, gauge) => {
     // So update them if needed
     if (
       !upToDate(project.loaded.version, '1.700') &&
-      project.units === 'imperial'
+      localState.value.units === 'imperial'
     ) {
       increment = celsiusToFahrenheit(increment);
       start = celsiusToFahrenheit(start);

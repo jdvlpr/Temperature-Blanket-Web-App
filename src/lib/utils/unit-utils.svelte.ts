@@ -14,7 +14,7 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { WEATHER_DATA_DECIMALS } from '$lib/constants';
-import { project, windowLanguage } from '$lib/state';
+import { localState, windowLanguage } from '$lib/state';
 import { displayNumber, exists, pluralize } from '$lib/utils';
 /**
  * [description]
@@ -49,7 +49,7 @@ export const convertTime = (
 ) => {
   let hours, minutes;
   const { displayUnits, padStart, forceUnits } = props;
-  const _units = forceUnits || project.units;
+  const _units = forceUnits || localState.value.units;
   if (_units === 'metric') {
     hours = Math.floor(value / 60);
     minutes = value % 60;
@@ -80,17 +80,19 @@ export const convertTime = (
  */
 export const setUnitsFromNavigator = () => {
   // if (loadFromURL()) return;
+  // If the units are already set, don't change them
+  if (localState.value.units !== null) return;
   const language = window.navigator.language;
   if (exists(language)) {
     const letters = language.slice(-2).toUpperCase();
     windowLanguage.value = letters;
     // Set imperial for United States, Myenmar, and Liberia
     if (letters === 'US' || letters === 'MY') {
-      project.units = 'imperial';
+      localState.value.units = 'imperial';
     } else {
-      project.units = 'metric';
+      localState.value.units = 'metric';
     }
   } else {
-    project.units = 'metric';
+    localState.value.units = 'metric';
   }
 };

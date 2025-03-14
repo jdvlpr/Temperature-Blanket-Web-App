@@ -16,7 +16,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script>
   import Spinner from '$lib/components/Spinner.svelte';
   import { HOURS_PER_DAY } from '$lib/constants';
-  import { gauges, project, weather } from '$lib/state';
+  import { gauges, localState, project, weather } from '$lib/state';
   import {
     displayNumber,
     getColorInfo,
@@ -116,7 +116,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               break;
           }
           let param = weatherParams[paramIndex];
-          let value = weather.data[dayIndex][param][project.units];
+          let value = weather.data[dayIndex][param][localState.value.units];
 
           // Get the color based on the gauge ID and value
           const color = getColorInfo({ param, value }).hex;
@@ -140,13 +140,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 {#if !daytimeRowsPreview.sections.length}
-  <div class="w-full h-[80svh] inline-flex justify-center items-center">
+  <div class="inline-flex h-[80svh] w-full items-center justify-center">
     <Spinner />
   </div>
 {:else}
   <svg
     id="preview-svg-image"
-    class="max-h-[80svh] mx-auto"
+    class="mx-auto max-h-[80svh]"
     aria-hidden="true"
     viewBox="0 0 {width} {height}"
     bind:this={daytimeRowsPreview.svg}

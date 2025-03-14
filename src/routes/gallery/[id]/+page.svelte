@@ -24,8 +24,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Spinner from '$lib/components/Spinner.svelte';
   import YarnSources from '$lib/components/YarnSources.svelte';
   import ViewToggle from '$lib/components/buttons/ViewToggle.svelte';
-  import { ALL_YARN_WEIGHTS, ICONS } from '$lib/constants';
-  import { allGaugesAttributes, locations, preferences } from '$lib/state';
+  import { ALL_YARN_WEIGHTS } from '$lib/constants';
+  import { allGaugesAttributes, localState, locations } from '$lib/state';
   import {
     exists,
     getProjectParametersFromURLHash,
@@ -35,10 +35,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     pluralize,
     stripHTMLTags,
   } from '$lib/utils';
+  import { ArrowLeftIcon, InfoIcon, ShoppingBagIcon } from '@lucide/svelte';
   import { Accordion } from '@skeletonlabs/skeleton-svelte';
   import { onMount } from 'svelte';
   import { yarnPageState } from '../../yarn/state.svelte';
-  import { ArrowLeftIcon, InfoIcon, ShoppingBagIcon } from '@lucide/svelte';
 
   let { data } = $props();
 
@@ -164,13 +164,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <div class="hidden lg:inline-flex"><AppLogo /></div>
   {/snippet}
   {#snippet main()}
-    <div class="transition-opacity opacity-100">
+    <div class="opacity-100 transition-opacity">
       <main
-        class="max-w-(--breakpoint-xl) m-auto flex flex-col justify-start gap-2"
+        class="m-auto flex max-w-(--breakpoint-xl) flex-col justify-start gap-2"
       >
         <a
           href="/gallery"
-          class="flex items-center btn hover:preset-tonal w-fit mx-2 lg:mx-0 mt-2 lg:mt-0"
+          class="btn hover:preset-tonal mx-2 mt-2 flex w-fit items-center lg:mx-0 lg:mt-0"
         >
           <ArrowLeftIcon />
           Project Gallery</a
@@ -178,7 +178,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <Card>
           {#snippet header()}
             <div
-              class="bg-surface-100 dark:bg-surface-900 p-4 text-center flex flex-col gap-2"
+              class="bg-surface-100 dark:bg-surface-900 flex flex-col gap-2 p-4 text-center"
             >
               <p class="text-xl">
                 {#await data.stream}
@@ -195,7 +195,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               {#await data.stream then}
                 {#if projectURL}
                   <a
-                    class="btn preset-filled-primary-500 w-fit m-auto items-center gap-1"
+                    class="btn preset-filled-primary-500 m-auto w-fit items-center gap-1"
                     href={projectURL}
                     target={locations.allValid ? '_blank' : '_self'}
                   >
@@ -220,7 +220,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 {/if}
               {/await}
               <div
-                class="text-left max-w-(--breakpoint-sm) mx-auto w-full preset-tonal-tertiary rounded-container mt-2"
+                class="preset-tonal-tertiary rounded-container mx-auto mt-2 w-full max-w-(--breakpoint-sm) text-left"
               >
                 <Accordion
                   value={aboutState}
@@ -246,7 +246,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                             {#if reshapedColors?.some((item) => item.brandName && item.yarnName)}
                               <span class="">
                                 <span class="font-bold">Yarn</span>:
-                                <div class="pl-4 flex flex-col gap-2">
+                                <div class="flex flex-col gap-2 pl-4">
                                   {#each reshapedColors as { brandName, yarnName, yarnWeightId, colors }}
                                     {@const yarnWeightName =
                                       ALL_YARN_WEIGHTS.find(
@@ -277,10 +277,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
                                         <div class="pl-4">
                                           {#each colors as { name, hex }, index}
                                             <div
-                                              class="flex gap-2 items-center"
+                                              class="flex items-center gap-2"
                                             >
                                               <div
-                                                class="w-4 h-4 rounded-full"
+                                                class="h-4 w-4 rounded-full"
                                                 style="background:{hex};"
                                               ></div>
                                               <p class="">
@@ -359,7 +359,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {/snippet}
           {#snippet content()}
             <div class="grid grid-cols-1 gap-2 py-2">
-              <div class="text-center mt-2">
+              <div class="mt-2 text-center">
                 {#await data.stream}
                   <div class="my-40"><Spinner /></div>
                 {:then}
@@ -367,14 +367,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     <img
                       src={project?.featuredImage?.node.mediaItemUrl}
                       alt="Project Preivew"
-                      class="max-h-[60vh] m-auto"
+                      class="m-auto max-h-[60vh]"
                     />
                   {/if}
                 {/await}
               </div>
 
               {#await data.stream then}
-                <div class="text-center flex flex-col gap-4 mt-2">
+                <div class="mt-2 flex flex-col gap-4 text-center">
                   <div class="flex flex-col gap-8">
                     {#if gauges?.length}
                       {#key gauges}
@@ -401,7 +401,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                             <div class="flex flex-col">
                               <ColorPalette {colors} schemeName={gaugeLabel} />
                               <a
-                                class="btn preset-tonal-primary border border-primary-500 w-fit m-auto mt-4 gap-1"
+                                class="btn preset-tonal-primary border-primary-500 m-auto mt-4 w-fit gap-1 border"
                                 onclick={() => {
                                   yarnPageState.gauge.colors = colors;
                                 }}
@@ -425,10 +425,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
                               </a>
                             </div>
                             {#if hasAffiliateLinks}
-                              <p class="px-2 mt-4 text-sm">
+                              <p class="mt-4 px-2 text-sm">
                                 Items purchased through links with a shopping
                                 bag icon
-                                <ShoppingBagIcon class="size-4 inline" />
+                                <ShoppingBagIcon class="inline size-4" />
                                 help support this site by earning the developer a
                                 percentage of each sale, at no additional cost to
                                 you.
@@ -438,16 +438,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
                               <ViewToggle />
                             </div>
                             <div
-                              class="rounded-container overflow-hidden mt-4 mb-2 xl:mb-4 {preferences
+                              class="rounded-container mt-4 mb-2 overflow-hidden xl:mb-4 {localState
                                 .value.layout === 'grid'
-                                ? 'gap-1 grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4'
+                                ? 'grid grid-cols-2 gap-1 md:grid-cols-3 xl:grid-cols-4'
                                 : 'flex flex-col'}"
                             >
                               {#each item as { from, to, hex, name, yarnName, brandName, affiliate_variant_href, variant_href }, i}
                                 <div
-                                  class="flex p-2 gap-2 items-center justify-around flex-wrap {preferences
+                                  class="flex flex-wrap items-center justify-around gap-2 p-2 {localState
                                     .value.layout === 'grid'
-                                    ? 'rounded-container md:basis-1/5 sm:basis-1/4 basis-1/3 flex-auto'
+                                    ? 'rounded-container flex-auto basis-1/3 sm:basis-1/4 md:basis-1/5'
                                     : ''}"
                                   style="background-color:{hex};color:{getTextColor(
                                     hex,
@@ -457,10 +457,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
                                     {i + 1}
                                   </p>
                                   <div
-                                    class="flex gap-2 justify-start items-center"
+                                    class="flex items-center justify-start gap-2"
                                   >
                                     <span
-                                      class="flex flex-col text-left items-start"
+                                      class="flex flex-col items-start text-left"
                                       id="range-0-from"
                                     >
                                       <span class="text-xs">From</span>
@@ -470,7 +470,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                                       </span>
                                     </span>
                                     <span
-                                      class="flex flex-col text-left items-start"
+                                      class="flex flex-col items-start text-left"
                                       id="range-0-to"
                                     >
                                       <span class="text-xs">To</span>
@@ -482,7 +482,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                                   </div>
                                   {#if affiliate_variant_href}
                                     <a
-                                      class="btn hover:preset-tonal flex flex-wrap justify-start items-center"
+                                      class="btn hover:preset-tonal flex flex-wrap items-center justify-start"
                                       href={affiliate_variant_href}
                                       target="_blank"
                                       rel="noreferrer nofollow"
@@ -493,7 +493,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                                   {/if}
                                   {#if brandName && yarnName}
                                     <div
-                                      class="flex flex-col items-start justify-start whitespace-normal text-left text-wrap"
+                                      class="flex flex-col items-start justify-start text-left text-wrap whitespace-normal"
                                     >
                                       <span class="text-xs"
                                         >{brandName}
@@ -501,7 +501,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                                         {yarnName}</span
                                       >
                                       <span
-                                        class="flex flex-wrap justify-start items-start text-lg leading-tight"
+                                        class="flex flex-wrap items-start justify-start text-lg leading-tight"
                                       >
                                         {name}
                                       </span>

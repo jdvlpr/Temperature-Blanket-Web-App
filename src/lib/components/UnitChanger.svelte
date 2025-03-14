@@ -15,14 +15,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import { UNIT_LABELS } from '$lib/constants';
-  import { project } from '$lib/state';
+  import { localState } from '$lib/state';
   import { Segment } from '@skeletonlabs/skeleton-svelte';
 </script>
 
 <Segment
-  value={project.units}
+  value={localState.value.units}
   onValueChange={(e) => {
-    project.units = e.value;
+    localState.value.units = e.value;
   }}
   background="bg-surface-100 dark:bg-surface-900"
   classes="shadow-sm"

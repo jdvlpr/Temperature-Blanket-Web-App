@@ -19,6 +19,7 @@ import {
   allGaugesAttributes,
   gauges,
   locations,
+  localState,
   previews,
   project,
   weather,
@@ -65,11 +66,11 @@ export const loadFromHistory = ({ action }: { action: 'Undo' | 'Redo' }) => {
   if (exists(newParams.u)) {
     if (!exists(oldParams.u) || oldParams.u.value !== newParams.u.value) {
       if (newParams.u.value === 'i') {
-        project.units = 'imperial';
+        localState.value.units = 'imperial';
         message = 'Units';
       }
       if (newParams.u.value === 'm') {
-        project.units = 'metric';
+        localState.value.units = 'metric';
         message = 'Units';
       }
     }

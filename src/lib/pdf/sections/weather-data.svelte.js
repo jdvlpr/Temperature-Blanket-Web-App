@@ -16,8 +16,8 @@
 import {
   allGaugesAttributes,
   gauges,
+  localState,
   locations,
-  project,
   weather,
 } from '$lib/state';
 import {
@@ -77,7 +77,7 @@ const pdfWeatherData = {
     // Low Avg High Temps
     doc.setFontSize(pdfConfig.font.p);
     doc.setFont(pdfConfig.font.paragraph, 'normal');
-    const tempSymbol = project.units === 'metric' ? 'C' : 'F';
+    const tempSymbol = localState.value.units === 'metric' ? 'C' : 'F';
     const average = `Lowest Temperature: ${Math.min(...weather.params.tmin.filter((n) => n !== null))} °${tempSymbol}`;
     doc.text(average, pdfConfig.leftMargin, pdfConfig.topMargin + 9);
     const high = `Average Temperature: ${getAverage(weather.params.tavg.filter((n) => n !== null))} °${tempSymbol}`;
@@ -201,7 +201,7 @@ const pdfWeatherData = {
     const targets = allGaugesAttributes.map((n) => n.targets).flat();
     targets.forEach((target, i) => {
       const x = this.weatherDataPositionX + this.weatherDataColumnWidth * i;
-      doc.text(target.pdfHeader[project.units], x, positionY);
+      doc.text(target.pdfHeader[localState.value.units], x, positionY);
       doc.line(
         x - this.linePadding,
         yBottomLine,
@@ -237,18 +237,18 @@ const pdfWeatherData = {
       const param = params[i].id;
       // Number
       let sValue;
-      if (day[param][project.units] === null) {
+      if (day[param][localState.value.units] === null) {
         sValue = '';
       } else {
         if (param === 'dayt') {
-          sValue = convertTime(day[param][project.units], {
+          sValue = convertTime(day[param][localState.value.units], {
             displayUnits: false,
           });
         } else {
-          sValue = String(day[param][project.units]); // gauge.unit.label[Project.units]
+          sValue = String(day[param][localState.value.units]); // gauge.unit.label[localState.value.units]
         }
       }
-      // const sValue = param.id.toString(); //gauge.unit.label[Project.units]
+      // const sValue = param.id.toString(); //gauge.unit.label[localState.value.units]
       doc.setFontSize(pdfConfig.font.p);
       doc.text(sValue, marginRight, line);
 
@@ -273,7 +273,7 @@ const pdfWeatherData = {
         // Color box
         const colorInfo = getColorInfo({
           param,
-          value: day[param][project.units],
+          value: day[param][localState.value.units],
         });
         doc.setFillColor(colorInfo.hex);
         doc.rect(marginRight + 15, line - 4, 5, 5, 'F');

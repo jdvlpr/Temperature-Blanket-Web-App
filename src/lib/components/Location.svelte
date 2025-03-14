@@ -14,8 +14,9 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
+  import { browser } from '$app/environment';
   import Tooltip from '$lib/components/Tooltip.svelte';
-  import { ICONS, MONTHS } from '$lib/constants';
+  import { MONTHS } from '$lib/constants';
   import { locations, project, weather } from '$lib/state';
   import type { LocationType } from '$lib/types/location-types';
   import {
@@ -24,10 +25,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     pluralize,
     yearFrom,
   } from '$lib/utils';
-  import autocomplete from 'autocompleter';
-  import { onMount } from 'svelte';
-  import '../../css/flag-icons.css';
-  import { browser } from '$app/environment';
   import {
     EllipsisVerticalIcon,
     SearchIcon,
@@ -35,6 +32,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     TriangleAlertIcon,
     XIcon,
   } from '@lucide/svelte';
+  import autocomplete from 'autocompleter';
+  import { onMount } from 'svelte';
+  import '../../css/flag-icons.css';
 
   interface Props {
     location: LocationType;

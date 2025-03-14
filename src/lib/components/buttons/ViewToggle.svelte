@@ -14,20 +14,15 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import { preferences } from '$lib/state';
-  import {
-    GridIcon,
-    LayoutGridIcon,
-    LayoutListIcon,
-    ListIcon,
-  } from '@lucide/svelte';
+  import { localState } from '$lib/state';
+  import { LayoutGridIcon, LayoutListIcon } from '@lucide/svelte';
   import { Segment } from '@skeletonlabs/skeleton-svelte';
 </script>
 
 <Segment
-  value={preferences.value.layout}
+  value={localState.value.layout}
   onValueChange={(e) => {
-    preferences.value.layout = e.value;
+    localState.value.layout = e.value;
   }}
   background="bg-surface-100 dark:bg-surface-900"
   classes="shadow-sm"

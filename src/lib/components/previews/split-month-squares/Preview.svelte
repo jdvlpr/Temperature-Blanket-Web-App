@@ -15,13 +15,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import Spinner from '$lib/components/Spinner.svelte';
-  import { gauges, project, weather } from '$lib/state';
+  import { gauges, localState, project, weather } from '$lib/state';
   import { getColorInfo, showPreviewImageWeatherDetails } from '$lib/utils';
   import { splitMonthSquaresPreview } from './state.svelte';
-
-  let width = $state(splitMonthSquaresPreview.width);
-
-  let height = $state(splitMonthSquaresPreview.height);
 
   function getPoints({ x, y, roundWidth, roundHeight }) {
     const right = `${x},${y + roundHeight} ${x + roundWidth},${y + roundHeight} ${x + roundWidth},${y}`;
@@ -107,7 +103,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           const leftValue =
             weather.data[_dayIndex][
               splitMonthSquaresPreview.settings.leftTarget
-            ][project.units];
+            ][localState.value.units];
 
           // Get the color based on the gauge ID and value
           color.left = getColorInfo({
@@ -118,7 +114,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           const rightValue =
             weather.data[_dayIndex][
               splitMonthSquaresPreview.settings.rightTarget
-            ][project.units];
+            ][localState.value.units];
 
           // Get the color based on the gauge ID and value
           color.right = getColorInfo({
@@ -173,13 +169,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 {#if !splitMonthSquaresPreview.sections.length}
-  <div class="w-full h-[80svh] inline-flex justify-center items-center">
+  <div class="inline-flex h-[80svh] w-full items-center justify-center">
     <Spinner />
   </div>
 {:else}
   <svg
     id="preview-svg-image"
-    class="max-h-[80svh] mx-auto"
+    class="mx-auto max-h-[80svh]"
     aria-hidden="true"
     viewBox="0 0 {width} {height}"
     bind:this={splitMonthSquaresPreview.svg}

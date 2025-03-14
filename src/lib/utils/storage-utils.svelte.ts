@@ -15,7 +15,7 @@
 
 import { browser } from '$app/environment';
 import { skeletonThemes } from '$lib/components/ThemeSwitcher.svelte';
-import { locations, preferences, project, weather } from '$lib/state';
+import { localState, locations, project, weather } from '$lib/state';
 import type {
   PageLayout,
   SavedProject,
@@ -31,39 +31,39 @@ export function initializeLocalStorage() {
   // Probably can remove these in version 6x
   // ****************
 
-  // 'layout' item has been incorporated into the 'preferences' object
+  // 'layout' item has been incorporated into the 'localState' object
   if (localStorage.getItem('layout')) {
-    preferences.value.layout = localStorage.getItem('layout') as PageLayout;
+    localState.value.layout = localStorage.getItem('layout') as PageLayout;
     localStorage.removeItem('layout');
   }
 
-  // 'disable_toast_analytics' item has been incorporated into the 'preferences' object
+  // 'disable_toast_analytics' item has been incorporated into the 'localState' object
   const disableToastAnalytics = localStorage.getItem('disable_toast_analytics');
   if (disableToastAnalytics === 'true' || disableToastAnalytics === 'false') {
     let value = JSON.parse(disableToastAnalytics);
-    preferences.value.disableToastAnalytics = value;
+    localState.value.disableToastAnalytics = value;
     localStorage.removeItem('disable_toast_analytics');
   }
 
-  // 'theme' item has been incorporated into the 'preferences' object
+  // 'theme' item has been incorporated into the 'localState' object
   const theme = localStorage.getItem('theme');
   if (theme === 'light' || theme === 'dark' || theme === 'system') {
-    preferences.value.theme.mode = theme;
+    localState.value.theme.mode = theme;
     localStorage.removeItem('theme');
   }
 
-  // 'skeletonTheme' item has been incorporated into the 'preferences' object
+  // 'skeletonTheme' item has been incorporated into the 'localState' object
   const skeletonTheme = localStorage.getItem('skeletonTheme');
   if (skeletonTheme) {
     const parsedSkeletonTheme = JSON.parse(skeletonTheme); // themes were stored as "example" (included the quotes), so we need to parse them
     if (skeletonThemes.map((theme) => theme.id).includes(parsedSkeletonTheme)) {
-      preferences.value.theme.id = parsedSkeletonTheme;
+      localState.value.theme.id = parsedSkeletonTheme;
       localStorage.removeItem('skeletonTheme');
     }
   }
 
-  preferences.value.theme.id = preferences.value.theme.id || 'classic';
-  preferences.value.theme.mode = preferences.value.theme.mode || 'system';
+  localState.value.theme.id = localState.value.theme.id || 'classic';
+  localState.value.theme.mode = localState.value.theme.mode || 'system';
 
   // ****************
   // Setup Theme Listeners
@@ -73,7 +73,7 @@ export function initializeLocalStorage() {
   window
     .matchMedia('(prefers-color-scheme: dark)')
     .addEventListener('change', (e) => {
-      if (preferences.value.theme.mode === 'system') {
+      if (localState.value.theme.mode === 'system') {
         if (e.matches) document.documentElement.classList.add('dark');
         else document.documentElement.classList.remove('dark');
       }
@@ -83,13 +83,13 @@ export function initializeLocalStorage() {
     $effect(() => {
       // Update the body data-theme attribute when the user changes the skeleton theme or mode
 
-      const theme = preferences.value.theme.id || 'classic';
-      const mode = preferences.value.theme.mode || 'system';
+      const theme = localState.value.theme.id || 'classic';
+      const mode = localState.value.theme.mode || 'system';
 
       if (skeletonThemes.map((theme) => theme.id).includes(theme)) {
         document.documentElement.setAttribute(
           'data-theme',
-          preferences.value.theme.id,
+          localState.value.theme.id,
         );
 
         // Set theme cookies, in order to read them when loading the page (to avoid flash of content)
@@ -107,8 +107,8 @@ export function initializeLocalStorage() {
       // Update the dark or light mode when the user changes the theme mode
       document.documentElement.classList.toggle(
         'dark',
-        preferences.value.theme.mode === 'dark' ||
-          (preferences.value.theme.mode === 'system' &&
+        localState.value.theme.mode === 'dark' ||
+          (localState.value.theme.mode === 'system' &&
             window.matchMedia('(prefers-color-scheme: dark)').matches),
       );
     });

@@ -16,7 +16,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import { rowsPreview } from '$lib/components/previews/rows/state.svelte';
   import Spinner from '$lib/components/Spinner.svelte';
-  import { gauges, project, weather } from '$lib/state';
+  import { gauges, localState, project, weather } from '$lib/state';
   import { getColorInfo, showPreviewImageWeatherDetails } from '$lib/utils';
 
   let width = $state(rowsPreview.width);
@@ -123,7 +123,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             if (isWeatherSection) {
               // If it's a weather section, determine the color based on the weather value and gauge ID
               let param = rowsPreview.settings.selectedTargets[paramIndex];
-              let value = weather.data[dayIndex][param][project.units];
+              let value = weather.data[dayIndex][param][localState.value.units];
 
               // Get the color based on the gauge ID and value
               color = getColorInfo({ param, value }).hex;
@@ -159,13 +159,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 {#if !rowsPreview.sections.length}
-  <div class="w-full h-[80svh] inline-flex justify-center items-center">
+  <div class="inline-flex h-[80svh] w-full items-center justify-center">
     <Spinner />
   </div>
 {:else}
   <svg
     id="preview-svg-image"
-    class="max-h-[80svh] mx-auto"
+    class="mx-auto max-h-[80svh]"
     aria-hidden="true"
     viewBox="0 0 {width} {height}"
     bind:this={rowsPreview.svg}

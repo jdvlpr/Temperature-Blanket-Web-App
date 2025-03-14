@@ -32,7 +32,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { createGaugeColors } from '$lib/utils';
   import {
     ArrowDownWideNarrowIcon,
-    CircleCheckBigIcon,
     CircleCheckIcon,
     ExpandIcon,
     ImageIcon,
