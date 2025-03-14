@@ -26,6 +26,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     getIsRecentDate,
   } from '$lib/utils';
   import { getTextColor } from '$lib/utils/color-utils';
+  import { CircleArrowLeftIcon, CircleArrowRightIcon } from '@lucide/svelte';
 
   let {
     data = weather.data || [],
@@ -56,14 +57,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div
-  class="overflow-x-hidden outline-hidden text-center inline-block w-full"
+  class="inline-block w-full overflow-x-hidden text-center outline-hidden"
   bind:this={navigatorElement}
 >
-  <div class="font-semibold text-lg">
+  <div class="text-lg font-semibold">
     {day?.date?.toLocaleDateString()}
   </div>
 
-  <p class="italic mb-2">
+  <p class="mb-2 italic">
     {capitalizeFirstLetter(weather.grouping)}
     {weather.currentIndex + 1} of {data?.length}
   </p>
@@ -73,24 +74,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
       aria-label="Show Previous {capitalizeFirstLetter(
         weather.grouping,
       )}'s Weather"
-      class="prev scale-125 btn-icon hover:preset-tonal"
+      class="prev btn-icon hover:preset-tonal scale-125"
       onclick={() => weather.currentIndex--}
       disabled={weather.currentIndex === 0}
       title="Show Previous {capitalizeFirstLetter(weather.grouping)}'s Weather"
-      ><svg
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke-width="1.5"
-        stroke="currentColor"
-        class="w-6 h-6"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="M11.25 9l-3 3m0 0l3 3m-3-3h7.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-        />
-      </svg>
+    >
+      <CircleArrowLeftIcon />
     </button>
     <input
       aria-label="Select {capitalizeFirstLetter(weather.grouping)}'s Weather"
@@ -109,33 +98,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     <button
       aria-label="Show Next {capitalizeFirstLetter(weather.grouping)}'s Weather"
-      class="next scale-125 btn-icon hover:preset-tonal"
+      class="next btn-icon hover:preset-tonal scale-125"
       onclick={() => weather.currentIndex++}
       disabled={weather.currentIndex === data?.length - 1}
       title="Show Next {capitalizeFirstLetter(weather.grouping)}'s Weather"
-      ><svg
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke-width="1.5"
-        stroke="currentColor"
-        class="w-6 h-6"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="M12.75 15l3-3m0 0l-3-3m3 3h-7.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-        />
-      </svg>
+    >
+      <CircleArrowRightIcon />
     </button>
   </div>
 
-  <p class="font-bold text-lg my-2">
+  <p class="my-2 text-lg font-bold">
     {@html day.result}
   </p>
 
   <div class="weather-details">
-    <div class="flex flex-wrap gap-x-4 items-start justify-center my-2">
+    <div class="my-2 flex flex-wrap items-start justify-center gap-x-4">
       {#each weatherTargets as { id, label, icon, type }}
         {@const { name, hex, index, gaugeLength, brandName, yarnName } =
           colorInfo(id, day)}
@@ -152,7 +129,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   {#if viewGaugeInfo !== false && day[id][project.units] !== null}
                     {#if typeof index === 'number'}
                       <div
-                        class="my-2 rounded-container py-2 px-4 text-center"
+                        class="rounded-container my-2 px-4 py-2 text-center"
                         style={viewGaugeInfo
                           ? `background:${hex};color:${getTextColor(hex)};`
                           : 'display:none'}
@@ -178,7 +155,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       </div>
                     {:else}
                       <p
-                        class="text-sm italic my-2 py-2 px-4 border border-surface-500 rounded-container"
+                        class="border-surface-500 rounded-container my-2 border px-4 py-2 text-sm italic"
                       >
                         No Color Assigned
                       </p>
@@ -201,7 +178,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   {#if viewGaugeInfo !== false && day[id][project.units] !== null}
                     {#if typeof index === 'number'}
                       <div
-                        class="my-2 rounded-container py-2 px-4 text-center"
+                        class="rounded-container my-2 px-4 py-2 text-center"
                         style={viewGaugeInfo
                           ? `background:${hex};color:${getTextColor(hex)};`
                           : 'display:none'}
@@ -227,7 +204,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       </div>
                     {:else}
                       <p
-                        class="text-sm italic my-2 py-2 px-4 border border-surface-500 rounded-container"
+                        class="border-surface-500 rounded-container my-2 border px-4 py-2 text-sm italic"
                       >
                         No Color Assigned
                       </p>
@@ -249,7 +226,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {/each}
     </div>
   </div>
-  <div class="my-2 w-fit mx-auto">
+  <div class="mx-auto my-2 w-fit">
     <ToggleSwitch bind:checked={viewGaugeInfo} label={'Show Color Details'} />
   </div>
 </div>

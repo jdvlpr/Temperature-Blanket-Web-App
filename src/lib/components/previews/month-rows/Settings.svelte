@@ -27,7 +27,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 {#if monthRowsPreview.details}
   <div class="w-full">
-    <p class="max-w-(--breakpoint-sm) mx-auto">
+    <p class="mx-auto max-w-(--breakpoint-sm)">
       Rows are grouped by month from <span class="italic"
         >{#if monthRowsPreview.settings?.direction === 'left-to-right'}left to
           right{:else if monthRowsPreview.settings.direction === 'top-to-bottom'}top
@@ -35,7 +35,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       >. Months with fewer days have extra rows added, so that each month
       section has the same number of rows.
     </p>
-    <p class="italic mt-2">
+    <p class="mt-2 italic">
       Each month section has {monthRowsPreview.details.rowsPerMonth} total {pluralize(
         'row',
         monthRowsPreview.details.rowsPerMonth,
@@ -80,7 +80,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <NumberInputButton
   bind:value={monthRowsPreview.settings.stitchesPerRow}
   title="Stitches Per Row"
-  icon={true}
+  icon={`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-ruler size-6"><path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z"/><path d="m14.5 12.5 2-2"/><path d="m11.5 9.5 2-2"/><path d="m8.5 6.5 2-2"/><path d="m17.5 15.5 2-2"/></svg>`}
 />
 
 <button
@@ -106,7 +106,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     viewBox="0 0 24 24"
     stroke-width="1.5"
     stroke="currentColor"
-    class="w-6 h-6"
+    class="h-6 w-6"
   >
     <path
       stroke-linecap="round"
@@ -121,7 +121,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   bind:value={monthRowsPreview.settings.borderStitches}
   min={0}
   title="Border Stitches"
-  icon={true}
+  icon={`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-square-dashed size-6"><path d="M5 3a2 2 0 0 0-2 2"/><path d="M19 3a2 2 0 0 1 2 2"/><path d="M21 19a2 2 0 0 1-2 2"/><path d="M5 21a2 2 0 0 1-2-2"/><path d="M9 3h1"/><path d="M9 21h1"/><path d="M14 3h1"/><path d="M14 21h1"/><path d="M3 9v1"/><path d="M21 9v1"/><path d="M3 14v1"/><path d="M21 14v1"/></svg>`}
 />
 
 {#if monthRowsPreview.settings.borderStitches > 0}
@@ -148,7 +148,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       viewBox="0 0 24 24"
       stroke-width="1.5"
       stroke="currentColor"
-      class="w-6 h-6"
+      class="h-6 w-6"
     >
       <path
         stroke-linecap="round"

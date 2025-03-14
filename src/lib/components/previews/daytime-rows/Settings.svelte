@@ -87,7 +87,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       Each row is split according to the duration of sunlight that {weather.grouping}.
     </p>
 
-    <div class="my-1 flex flex-col justify-center items-center italic">
+    <div class="my-1 flex flex-col items-center justify-center italic">
       {#if daytimeRowsPreview.settings.daytimePosition === 'left'}
         <p>
           Daytime stitches (left side) = d × {daytimeRowsPreview.settings
@@ -211,7 +211,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <NumberInputButton
   bind:value={daytimeRowsPreview.settings.stitchesPerRow}
   title="Stitches Per Row"
-  icon={true}
+  icon={`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-ruler size-6"><path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z"/><path d="m14.5 12.5 2-2"/><path d="m11.5 9.5 2-2"/><path d="m8.5 6.5 2-2"/><path d="m17.5 15.5 2-2"/></svg>`}
 />
 
 <div class="w-full">
@@ -222,9 +222,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   />
 </div>
 {#if isTableExpanded}
-  <div in:slide out:slide class="w-full max-w-[90vw] mx-auto relative">
+  <div in:slide out:slide class="relative mx-auto w-full max-w-[90vw]">
     <DataTable {table} search={false}>
-      <table class="border-separate border-spacing-0 w-full">
+      <table class="w-full border-separate border-spacing-0">
         <thead>
           <tr>
             <th>Row</th>

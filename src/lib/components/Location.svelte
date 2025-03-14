@@ -29,6 +29,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import '../../css/flag-icons.css';
   import { browser } from '$app/environment';
   import {
+    EllipsisVerticalIcon,
     SearchIcon,
     Trash2Icon,
     TriangleAlertIcon,
@@ -286,28 +287,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 </script>
 
-<div class="py-2 grid grid-cols-1 items-end gap-4 justify-center">
+<div class="grid grid-cols-1 items-end justify-center gap-4 py-2">
   {#if locations.all?.length > 1}
     <div class="justify-self-end">
       <Tooltip placement="bottom" minWidth="250px">
         <div class="btn-icon hover:preset-tonal">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="1.5"
-            stroke="currentColor"
-            class="w-6 h-6"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M12 6.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 12.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 18.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5Z"
-            />
-          </svg>
+          <EllipsisVerticalIcon />
         </div>
         {#snippet tooltip()}
-          <div class="flex items-center gap-2 justify-center">
+          <div class="flex items-center justify-center gap-2">
             <button
               class="btn hover:preset-tonal"
               onclick={() => {
@@ -328,7 +316,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
   {/if}
   <div class="grid grid-cols-1 gap-4">
-    <div class="flex flex-col w-full text-left gap-1">
+    <div class="flex w-full flex-col gap-1 text-left">
       <p>
         {#if showSelectLocationLabelMessage}
           <span class="text-error-900-100">Choose a result</span>
@@ -348,7 +336,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <input
           type="text"
           id="location-{location.uuid}"
-          class="truncate ig-input"
+          class="ig-input truncate"
           autocomplete="off"
           placeholder={project.status.loading ? 'Loading...' : 'Enter a place'}
           title="Enter a city, region, or landmark"
@@ -359,7 +347,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           disabled={project.status.loading || weather.isUserEdited > 0}
         />
         {#if searching}
-          <div class="flex items-center justify-center ig-cell">
+          <div class="ig-cell flex items-center justify-center">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               class="size-6 animate-spin"
@@ -402,11 +390,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
 
     <div
-      class="grid grid-cols-12 justify-between items-start gap-4 text-left w-full"
+      class="grid w-full grid-cols-12 items-start justify-between gap-4 text-left"
     >
       {#if location.duration != 'c'}
         <div
-          class="grid grid-cols-3 justify-between items-center gap-4 col-span-12 sm:col-span-6"
+          class="col-span-12 grid grid-cols-3 items-center justify-between gap-4 sm:col-span-6"
         >
           <label class="label">
             <span> Year </span>
@@ -463,7 +451,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {/if}
       {#if location?.duration === 'c'}
         <div
-          class="grid grid-cols-2 justify-between items-center gap-4 col-span-12 sm:col-span-6"
+          class="col-span-12 grid grid-cols-2 items-center justify-between gap-4 sm:col-span-6"
         >
           <label for="datepicker-from-{location.uuid}" class="">
             <span>From</span>
@@ -499,7 +487,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </div>
       {/if}
 
-      <label class="label w-full col-span-8 sm:col-span-4 sm:col-start-9">
+      <label class="label col-span-8 w-full sm:col-span-4 sm:col-start-9">
         <span>Duration</span>
         <select
           class="select w-full"
@@ -522,17 +510,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </label>
     </div>
 
-    <div class="w-full flex flex-col gap-2 justify-center items-center">
+    <div class="flex w-full flex-col items-center justify-center gap-2">
       {#if !location.errorMessage && location.days}
-        <p class="italic text-sm">
+        <p class="text-sm italic">
           {location.days}
           {pluralize('Day', location.days)}
         </p>
         {#if location.daysInFuture}
           <p
-            class="text-sm preset-tonal-warning border border-warning-500 rounded-container p-2 w-full my-2"
+            class="preset-tonal-warning border-warning-500 rounded-container my-2 w-full border p-2 text-sm"
           >
-            <TriangleAlertIcon class="inline size-4 -top-[1px] relative" />
+            <TriangleAlertIcon class="relative -top-[1px] inline size-4" />
 
             {#if !datesMustBeHistorical}
               For best results, don't include future dates.
@@ -553,13 +541,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {/if}
       {:else if location.errorMessage && browser}
         <p
-          class="preset-tonal-error border border-error-500 rounded-container p-2 text-sm w-full my-2"
+          class="preset-tonal-error border-error-500 rounded-container my-2 w-full border p-2 text-sm"
         >
-          <TriangleAlertIcon class="inline size-4 -top-[1px] relative" />
+          <TriangleAlertIcon class="relative -top-[1px] inline size-4" />
           {location.errorMessage}
         </p>
       {:else if project.status.loading}
-        <p class="italic text-sm">...</p>
+        <p class="text-sm italic">...</p>
       {/if}
     </div>
   </div>

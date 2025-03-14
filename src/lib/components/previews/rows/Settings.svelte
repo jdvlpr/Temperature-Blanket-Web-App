@@ -20,6 +20,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { rowsPreview } from '$lib/components/previews/rows/state.svelte';
   import { gauges, modal, weather } from '$lib/state';
   import { capitalizeFirstLetter, pluralize } from '$lib/utils';
+  import { PipetteIcon } from '@lucide/svelte';
 
   let targets = $derived(gauges.allCreated.map((n) => n.targets).flat());
 </script>
@@ -62,7 +63,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <NumberInputButton
   bind:value={rowsPreview.settings.stitchesPerRow}
   title="Stitches Per Row"
-  icon={true}
+  icon={`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-ruler size-6"><path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z"/><path d="m14.5 12.5 2-2"/><path d="m11.5 9.5 2-2"/><path d="m8.5 6.5 2-2"/><path d="m17.5 15.5 2-2"/></svg>`}
 />
 
 <label class="label">
@@ -106,20 +107,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
           },
         },
       })}
-    ><svg
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke-width="1.5"
-      stroke="currentColor"
-      class="w-6 h-6"
-    >
-      <path
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        d="M15 11.25l1.5 1.5.75-.75V8.758l2.276-.61a3 3 0 10-3.675-3.675l-.61 2.277H12l-.75.75 1.5 1.5M15 11.25l-8.47 8.47c-.34.34-.8.53-1.28.53s-.94.19-1.28.53l-.97.97-.75-.75.97-.97c.34-.34.53-.8.53-1.28s.19-.94.53-1.28L12.75 9M15 11.25L12.75 9"
-      />
-    </svg>
+  >
+    <PipetteIcon />
     Color of Additional Stitches
   </button>
 {/if}
