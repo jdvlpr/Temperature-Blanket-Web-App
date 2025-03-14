@@ -199,7 +199,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {/if}
         </p>
         <button
-          class="btn preset-filled-primary-500 gap-2 text-xl font-bold"
+          class="btn preset-filled-primary-500 gap-2"
           onclick={() => {
             if (weather.isUserEdited) {
               modal.trigger({

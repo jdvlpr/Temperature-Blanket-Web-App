@@ -14,7 +14,14 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { browser, version } from '$app/environment';
-import { gauges, locations, previews, weather } from '$lib/state';
+import {
+  gauges,
+  locations,
+  persistedState,
+  preferences,
+  previews,
+  weather,
+} from '$lib/state';
 import type { Unit } from '$lib/types';
 
 export class HistoryStateClass {
@@ -132,7 +139,8 @@ class ProjectClass {
   // Methods
   // *****************
   toggleUnits(): void {
-    this.units = this.units === 'imperial' ? 'metric' : 'imperial';
+    preferences.value.units =
+      preferences.value.units === 'imperial' ? 'metric' : 'imperial';
   }
 }
 

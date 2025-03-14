@@ -14,7 +14,6 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script module>
-  // export const skeletonTheme = persistedState('skeletonTheme', 'classic');
   export const skeletonThemes = [
     {
       id: 'classic',

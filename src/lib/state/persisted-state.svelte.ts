@@ -8,6 +8,7 @@ type Preferences = {
     mode: 'light' | 'dark' | 'system';
   };
   layout: PageLayout;
+  units: Unit;
 };
 
 export const preferences = persistedState<Preferences>('preferences', {
@@ -17,6 +18,7 @@ export const preferences = persistedState<Preferences>('preferences', {
     mode: 'system',
   },
   layout: 'list',
+  units: 'imperial',
 });
 
 // The following persisted state functionality was copied from: https://github.com/oMaN-Rod/svelte-persisted-state/blob/main/src/lib/index.svelte.ts

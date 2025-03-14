@@ -13,14 +13,11 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { gauges, locations, project } from '$lib/state';
+import { locations, project } from '$lib/state';
 import type { WeatherDay, WeatherSource } from '$lib/types';
 import {
-  convertTime,
   createWeeksProperty,
-  dateToISO8601String,
   displayNumber,
-  getColorInfo,
   getWeatherTargets,
 } from '$lib/utils';
 
