@@ -55,7 +55,7 @@
     rounded = 'rounded-container',
     shadow = 'shadow-lg',
     zIndex = 'z-9999',
-    buttonAction = 'btn preset-filled-primary-500',
+    buttonAction = 'btn preset-filled',
     buttonDismiss = 'btn-icon hover:preset-tonal',
     buttonDismissLabel = '✕',
   }: Props = $props();

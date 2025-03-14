@@ -21,6 +21,7 @@ What's new in the latest version?
 - Move colors directly in the gauge editor
 - Hex codes shown for each colorway in the Yarn Colorway Finder
 - Updated icons
+- Unit preference saved to local storage
 
 ## 🚀 Getting Started
 
