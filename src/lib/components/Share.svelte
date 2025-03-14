@@ -26,7 +26,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     try {
       window.navigator.clipboard.writeText(href);
       toast.trigger({
-        message: 'Copied to your clipboard',
+        message: 'Copied',
         category: 'success',
       });
     } catch {
@@ -35,10 +35,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
         category: 'error',
       });
     }
-    toast.trigger({
-      message: 'Unable to copy to your clipboard',
-      category: 'error',
-    });
   }
 </script>
 

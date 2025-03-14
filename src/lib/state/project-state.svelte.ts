@@ -44,8 +44,6 @@ export class HistoryStateClass {
 
   isUpdating = $state(false);
 
-  updateMessage = $state('');
-
   push(value: string) {
     // If it's the same as the previous value, don't add it, or if it's not on the last stack item
     if (this.previous === value || !this.isLast) return;

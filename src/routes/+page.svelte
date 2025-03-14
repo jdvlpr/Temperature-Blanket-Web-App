@@ -35,7 +35,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     modal,
     pageSections,
     project,
-    toast,
     wasProjectLoadedFromURL,
     weather,
   } from '$lib/state';
@@ -49,15 +48,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '$lib/utils';
   import {
     BadgeHelpIcon,
-    ChevronRight,
-    EllipsisIcon,
     EllipsisVerticalIcon,
     LightbulbIcon,
     RedoIcon,
     SaveIcon,
     UndoIcon,
   } from '@lucide/svelte';
-  import { onMount, untrack } from 'svelte';
+  import { onMount } from 'svelte';
 
   let debounceTimer: number;
 
@@ -102,18 +99,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   $effect(() => {
     if (project.url.hash) debounce(() => updateHistory(), 300);
-  });
-
-  $effect(() => {
-    project.history.updateMessage;
-    if (project.history.updateMessage !== '') {
-      untrack(() => {
-        toast.trigger({
-          message: project.history.updateMessage,
-          background: 'preset-filled-success-100-900',
-        });
-      });
-    }
   });
 </script>
 

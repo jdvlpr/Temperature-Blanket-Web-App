@@ -59,9 +59,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let { page = 'main', highlight }: Props = $props();
 
-  let copiedMessage = $state('');
-
   let currentSavedProject = $state(null);
+
   let weatherSettingsElement: HTMLElement | null = $state(null);
 
   async function goTo(page) {
@@ -94,12 +93,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
     if (copy) {
       try {
         window.navigator.clipboard.writeText(project.url.href);
-        copiedMessage = `Copied to your clipboard`;
+        toast.trigger({
+          message: 'Copied',
+          category: 'success',
+        });
       } catch {
-        copiedMessage = 'Unable to copy project URL.';
+        toast.trigger({
+          message: 'Unable to copy to your clipboard',
+          category: 'error',
+        });
       }
-    } else {
-      copiedMessage = '';
     }
 
     try {
@@ -115,17 +118,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
       console.log("Can't save project", { e });
     }
   }
-
-  $effect(() => {
-    if (copiedMessage !== '') {
-      toast.trigger({
-        message: copiedMessage,
-        category:
-          copiedMessage === 'Copied to your clipboard' ? 'success' : null,
-      });
-      copiedMessage = '';
-    }
-  });
 </script>
 
 <div class="p-4">
@@ -171,7 +163,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
           class="btn hover:preset-tonal w-fit"
           onclick={() => {
             goTo('save');
-            copiedMessage = '';
           }}
           title="Save Project"
         >

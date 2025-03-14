@@ -145,8 +145,8 @@ export const handleKeyDown = (ev) => {
       case 'u':
         project.toggleUnits();
         toast.trigger({
+          category: 'success',
           message: 'Units changed to ' + localState.value.units,
-          background: 'preset-filled-success-100-900',
         });
         break;
     }

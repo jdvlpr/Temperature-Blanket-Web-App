@@ -226,13 +226,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
             try {
               window.navigator.clipboard.writeText(colorHexes);
               toast.trigger({
-                message: 'Copied to your clipboard',
+                message: 'Copied',
                 category: 'success',
               });
             } catch {
               toast.trigger({
                 message: 'Unable to copy to clipboard',
-                background: 'preset-filled-error-100-900',
+                category: 'error',
               });
             }
           }}
@@ -265,7 +265,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             try {
               window.navigator.clipboard.writeText(paletteCode);
               toast.trigger({
-                message: 'Copied to your clipboard',
+                message: 'Copied',
                 category: 'success',
               });
             } catch {
@@ -307,7 +307,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             try {
               window.navigator.clipboard.writeText(colorNames);
               toast.trigger({
-                message: 'Copied to your clipboard',
+                message: 'Copied',
                 category: 'success',
               });
             } catch {

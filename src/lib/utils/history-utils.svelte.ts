@@ -22,6 +22,7 @@ import {
   locations,
   previews,
   project,
+  toast,
   weather,
 } from '$lib/state';
 import {
@@ -31,8 +32,6 @@ import {
 } from '$lib/utils';
 
 export const loadFromHistory = ({ action }: { action: 'Undo' | 'Redo' }) => {
-  project.history.updateMessage = '';
-
   let oldHistoryState = project.history.current;
   let newHistoryState;
   if (action === 'Undo') {
@@ -129,8 +128,12 @@ export const loadFromHistory = ({ action }: { action: 'Undo' | 'Redo' }) => {
     }
   });
 
-  if (message)
-    project.history.updateMessage = `<span class="flex flex-wrap items-start gap-2"><span class="">${action === 'Undo' ? ICONS.arrowUturnLeft : ICONS.arrowUturnRight}</span> <span>${action}: ${message}</span></span>`;
+  if (message) {
+    toast.trigger({
+      message: `<span class="flex flex-wrap items-start gap-2"><span class="">${action === 'Undo' ? ICONS.arrowUturnLeft : ICONS.arrowUturnRight}</span> <span>${action}: ${message}</span></span>`,
+      background: 'preset-filled-success-100-900',
+    });
+  }
 };
 export const updateHistory = () => {
   if (!weather.data || !project.url.hash || !locations.allValid || !browser)

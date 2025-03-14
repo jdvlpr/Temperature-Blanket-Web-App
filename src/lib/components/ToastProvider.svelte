@@ -4,7 +4,7 @@
   import { flip } from 'svelte/animate';
 
   import { toast } from '$lib/state';
-  import { fade } from 'svelte/transition';
+  import { fade, scale } from 'svelte/transition';
   import {
     CircleAlertIcon,
     CircleCheckIcon,
@@ -164,17 +164,17 @@
             data-testid="toast"
           >
             {#if t.category === 'success'}
-              <div class="flex flex-wrap items-center gap-1 text-base">
+              <div class="flex flex-wrap items-center gap-2 text-base">
                 <CircleCheckIcon class="inline" />
                 {@html t.message}
               </div>
             {:else if t.category === 'error'}
-              <div class="flex flex-wrap items-center gap-1 text-base">
+              <div class="flex flex-wrap items-center gap-2 text-base">
                 <CircleAlertIcon class="inline" />
                 {@html t.message}
               </div>
             {:else if t.category === 'info'}
-              <div class="flex flex-wrap items-center gap-1 text-base">
+              <div class="flex flex-wrap items-center gap-2 text-base">
                 <InfoIcon class="inline" />
                 {@html t.message}
               </div>

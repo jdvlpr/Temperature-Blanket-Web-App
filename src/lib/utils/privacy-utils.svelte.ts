@@ -60,7 +60,7 @@ export const privacy = {
         toast.trigger({
           message:
             'Unable to load analytics. Your browser or a plugin might be blocking it.',
-          // background: 'preset-filled-error-500',
+          category: 'error',
         });
       }, 1000);
     });

@@ -128,7 +128,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   localState.value.disableToastAnalytics = false;
                   toast.trigger({
                     message: 'The cookie popup message can be shown again.',
-                    background: 'preset-filled-success-100-900',
+                    category: 'success',
                   });
                 }}
               >

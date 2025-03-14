@@ -674,8 +674,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         onclick={() => {
                           window.navigator.clipboard.writeText(name);
                           toast.trigger({
-                            message: `<span class="font-bold">${name}</span> copied to clipboard`,
-                            background: 'preset-tonal-success',
+                            message: `<span class="font-bold">${name}</span> copied`,
+                            category: 'success',
                           });
                         }}>{name}</button
                       >
@@ -685,8 +685,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         onclick={() => {
                           window.navigator.clipboard.writeText(hex);
                           toast.trigger({
-                            message: `<span class="font-bold">${hex}</span> copied to clipboard`,
-                            background: 'preset-tonal-success',
+                            message: `<span class="font-bold">${hex}</span> copied`,
+                            category: 'success',
                           });
                         }}>{hex}</button
                       >

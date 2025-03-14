@@ -56,8 +56,8 @@ export function getRanges({
       mode === 'auto';
       isCustomRanges = false;
       toast.trigger({
-        message: `Updated ranges automatically—custom ranges overridden`,
-        background: 'preset-filled-success-100-900',
+        message: `Updated ranges automatically. Custom ranges overridden`,
+        category: 'success',
         timeout: 10000,
       });
     }
