@@ -164,10 +164,51 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div class="mt-2 flex w-full flex-col items-center justify-center gap-2">
-  <div class="my-4 flex w-full flex-wrap items-center justify-center gap-4">
-    <UnitChanger />
+  <div class="flex w-full flex-wrap items-center justify-center gap-x-4">
+    <div class="my-4 flex flex-wrap items-center justify-center gap-4">
+      <UnitChanger />
 
-    <WeatherGrouping />
+      <WeatherGrouping />
+    </div>
+
+    {#if weather.grouping === 'week'}
+      <div
+        class="rounded-container bg-surface-100 dark:bg-surface-900 mb-4 flex w-full max-w-screen-md flex-col items-start justify-start gap-2 p-2 text-left"
+      >
+        <p class="">
+          Weekly weather grouping makes for a shorter project. <a
+            href="/documentation/#grouping-weather-data"
+            target="_blank"
+            class="link"
+            rel="noopener noreferrer">Read more details.</a
+          >
+          {#if weather.goupedByWeek}
+            Your project starts on {DAYS_OF_THE_WEEK.filter(
+              (n) => n.value === weather.goupedByWeek[0].date.getDay(),
+            )[0].label},
+            {MONTHS.filter(
+              (n) => n.value - 1 === weather.goupedByWeek[0].date.getMonth(),
+            )[0]?.name}
+            {weather.goupedByWeek[0].date.getDate()},
+            {weather.goupedByWeek[0].date.getFullYear()}. It spans {weather
+              .goupedByWeek.length}
+            {pluralize('week', weather.goupedByWeek.length)}.
+          {/if}
+        </p>
+        <label class="label mx-auto flex flex-col">
+          <span>Weeks Start On</span>
+          <select
+            class="select mx-auto w-fit"
+            bind:value={weather.monthGroupingStartDay}
+            id="weather-weeks-start-week-on"
+          >
+            {#each DAYS_OF_THE_WEEK as { value, label }}
+              <option {value}>{label}</option>
+            {/each}
+          </select>
+        </label>
+      </div>
+    {/if}
 
     <button
       class="btn hover:preset-tonal w-fit"
@@ -186,45 +227,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
       >
     </button>
   </div>
-
-  {#if weather.grouping === 'week'}
-    <div
-      class="rounded-container bg-surface-100 dark:bg-surface-900 flex w-full max-w-screen-md flex-col items-start justify-start gap-2 p-2 text-left"
-    >
-      <p class="">
-        Weekly weather grouping makes for a shorter project. <a
-          href="/documentation/#grouping-weather-data"
-          target="_blank"
-          class="link"
-          rel="noopener noreferrer">Read more details.</a
-        >
-        {#if weather.goupedByWeek}
-          Your project starts on {DAYS_OF_THE_WEEK.filter(
-            (n) => n.value === weather.goupedByWeek[0].date.getDay(),
-          )[0].label},
-          {MONTHS.filter(
-            (n) => n.value - 1 === weather.goupedByWeek[0].date.getMonth(),
-          )[0]?.name}
-          {weather.goupedByWeek[0].date.getDate()},
-          {weather.goupedByWeek[0].date.getFullYear()}. It spans {weather
-            .goupedByWeek.length}
-          {pluralize('week', weather.goupedByWeek.length)}.
-        {/if}
-      </p>
-      <label class="label mx-auto flex flex-col">
-        <span>Weeks Start On</span>
-        <select
-          class="select mx-auto w-fit"
-          bind:value={weather.monthGroupingStartDay}
-          id="weather-weeks-start-week-on"
-        >
-          {#each DAYS_OF_THE_WEEK as { value, label }}
-            <option {value}>{label}</option>
-          {/each}
-        </select>
-      </label>
-    </div>
-  {/if}
 
   {#if wasDefaultWeatherSourceChanged}
     <p class="w-full text-sm">

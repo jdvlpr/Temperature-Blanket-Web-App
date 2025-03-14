@@ -77,8 +77,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <svelte:window
   onkeydown={(e) => {
-    console.log(e.target.tagName);
-
     if (
       e.target.tagName === 'INPUT' ||
       e.target.tagName === 'TEXTAREA' ||
