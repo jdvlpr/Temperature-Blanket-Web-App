@@ -5,7 +5,7 @@
 
   import { toast } from '$lib/state';
   import { fade } from 'svelte/transition';
-  import { CircleCheckIcon } from '@lucide/svelte';
+  import { CircleCheckIcon, InfoIcon, TriangleAlertIcon } from '@lucide/svelte';
 
   // Props
 
@@ -152,7 +152,9 @@
               classesToast,
               t.category === 'success'
                 ? 'preset-filled-success-200-800'
-                : t.background || background,
+                : t.category === 'info'
+                  ? 'preset-filled-secondary-100-900'
+                  : t.background || background,
               t.classes,
             ]}
             data-testid="toast"
@@ -160,6 +162,11 @@
             {#if t.category === 'success'}
               <div class="flex flex-wrap items-center gap-1 text-base">
                 <CircleCheckIcon class="inline" />
+                {@html t.message}
+              </div>
+            {:else if t.category === 'info'}
+              <div class="flex flex-wrap items-center gap-1 text-base">
+                <InfoIcon class="inline" />
                 {@html t.message}
               </div>
             {:else}

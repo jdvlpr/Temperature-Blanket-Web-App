@@ -18,6 +18,7 @@ import {
   CHARACTERS_FOR_URL_HASH,
   DAYS_OF_THE_WEEK,
   NO_DATA_SRTM3,
+  UNIT_LABELS,
 } from '$lib/constants';
 import {
   allGaugesAttributes,
@@ -26,6 +27,7 @@ import {
   locations,
   previews,
   project,
+  toast,
   weather,
 } from '$lib/state';
 import {
@@ -47,8 +49,22 @@ export const setProjectSettings = async (
 
   // Load Units
   if (exists(params.u)) {
+    const _units = $state.snapshot(localState.value.units);
     if (params.u.value === 'i') localState.value.units = 'imperial';
     if (params.u.value === 'm') localState.value.units = 'metric';
+    if (_units !== localState.value.units) {
+      const label =
+        localState.value.units === 'metric'
+          ? `${UNIT_LABELS.temperature.metric} /
+	    ${UNIT_LABELS.height.metric}`
+          : `${UNIT_LABELS.temperature.imperial} /
+      ${UNIT_LABELS.height.imperial}`;
+      toast.trigger({
+        category: 'info',
+        message: `Units set to ${label}`,
+        timeout: 15000,
+      });
+    }
   }
 
   // Load Locations
