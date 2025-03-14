@@ -81,7 +81,7 @@ export const convertTime = (
 export const setUnitsFromNavigator = () => {
   // if (loadFromURL()) return;
   // If the units are already set, don't change them
-  if (localState.value.units !== null) return;
+  if (localState.value?.units && localState.value.units !== null) return;
   const language = window.navigator.language;
   if (exists(language)) {
     const letters = language.slice(-2).toUpperCase();
