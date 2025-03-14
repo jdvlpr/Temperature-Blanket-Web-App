@@ -51,8 +51,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <span class="flex flex-col items-center justify-start p-2">
   <div
-    class="flex !"
-    class:!preset-tonal-warning={isRecentDate}
+    class={['flex', isRecentDate && '!bg-warning-500/20']}
     class:rounded-container={isRecentDate}
     class:p-1={isRecentDate}
   >
@@ -64,7 +63,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <RecentWeatherDataTooltip />
     {/if}
   </div>
-  <span class="text-sm ml-1">{label}</span>
+  <span class="ml-1 text-sm">{label}</span>
   {@render date?.()}
   {@render details?.()}
 </span>

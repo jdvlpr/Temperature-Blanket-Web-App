@@ -122,15 +122,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 </script>
 
-<div class="mt-4 w-fit mx-auto">
+<div class="mx-auto mt-4 w-fit">
   <ToggleSwitch
     bind:checked={showColorDetails.value}
     label={'Show Color Details'}
   />
 </div>
-<div class="w-full my-4 inline-block">
+<div class="my-4 inline-block w-full">
   <DataTable {table} search={true}>
-    <table class={'border-separate border-spacing-0 w-full mx-auto'}>
+    <table class={'mx-auto w-full border-separate border-spacing-0'}>
       <thead>
         <tr>
           <ThSort {table} field="date">
@@ -144,7 +144,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             {@const headerLabel = header.slice(0, header.indexOf('('))}
             {@const headerUnits = header.slice(header.indexOf('('))}
             <ThSort {table} field={id}>
-              <span class="flex flex-wrap gap-1 items-center justify-center"
+              <span class="flex flex-wrap items-center justify-center gap-1"
                 >{headerLabel}
                 <span class="text-xs">{headerUnits}</span></span
               >
@@ -160,9 +160,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {@const isFutureDate = getIsFutureDate(row.date)}
           <tr
             class={[
-              isRecentDate && '!preset-tonal-warning',
+              isRecentDate && '!bg-warning-500/20',
               showColorDetails.value &&
-                'divide-x-2 divide-y-2 !divide-surface-50 dark:!divide-surface-900',
+                '!divide-surface-50 dark:!divide-surface-900 divide-x-2 divide-y-2',
             ]}
           >
             <td>
@@ -173,7 +173,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </td>
             {#each weather.tableWeatherTargets as { id, label, type }}
               <td
-                class={[showColorDetails.value && !isFutureDate && 'pb-2 px-2']}
+                class={[showColorDetails.value && !isFutureDate && 'px-2 pb-2']}
                 style={row.color[id] &&
                 showColorDetails.value &&
                 typeof row.color[id].index === 'number'

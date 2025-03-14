@@ -518,7 +518,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </p>
         {#if location.daysInFuture}
           <p
-            class="preset-tonal-warning border-warning-500 rounded-container my-2 w-full border p-2 text-sm"
+            class="bg-warning-500/20 rounded-container my-2 w-full p-2 text-sm"
           >
             <TriangleAlertIcon class="relative -top-[1px] inline size-4" />
 
@@ -540,9 +540,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </p>
         {/if}
       {:else if location.errorMessage && browser}
-        <p
-          class="preset-tonal-error border-error-500 rounded-container my-2 w-full border p-2 text-sm"
-        >
+        <p class="bg-warning-500/20 rounded-container my-2 w-full p-2 text-sm">
           <TriangleAlertIcon class="relative -top-[1px] inline size-4" />
           {location.errorMessage}
         </p>

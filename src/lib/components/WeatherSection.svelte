@@ -22,7 +22,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ToggleWeatherData from '$lib/components/buttons/ToggleWeatherData.svelte';
   import ChooseWeatherSource from '$lib/components/modals/ChooseWeatherSource.svelte';
   import {
+    DAYS_OF_THE_WEEK,
     METEOSTAT_DELAY_DAYS,
+    MONTHS,
     OPEN_METEO_DELAY_DAYS,
     UNIT_LABELS,
   } from '$lib/constants';
@@ -42,7 +44,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     Settings2Icon,
     SettingsIcon,
     TriangleAlertIcon,
+    WrenchIcon,
   } from '@lucide/svelte';
+  import WeatherGrouping from './WeatherGrouping.svelte';
+  import UnitChanger from './UnitChanger.svelte';
 
   let graph = $state();
   let defaultWeatherSourceCopy = $state();
@@ -158,29 +163,71 @@ If not, see <https://www.gnu.org/licenses/>. -->
   );
 </script>
 
-<div class="flex flex-col gap-2 justify-center w-full items-center mt-2">
-  <button
-    class="btn gap-1 hover:preset-tonal"
-    aria-label="settings"
-    onclick={() => {
-      modal.trigger({
-        type: 'component',
-        component: {
-          ref: Menu,
-          props: {
-            page: 'main',
-            highlight: 'weather-settings',
-          },
-        },
-      });
-    }}
-  >
-    <SettingsIcon />
-    Weather Settings
-  </button>
+<div class="mt-2 flex w-full flex-col items-center justify-center gap-2">
+  <div class="my-4 flex w-full flex-wrap items-center justify-center gap-4">
+    <UnitChanger />
+
+    <WeatherGrouping />
+
+    <button
+      class="btn hover:preset-tonal w-fit"
+      onclick={async () => {
+        modal.trigger({
+          type: 'component',
+          component: { ref: ChooseWeatherSource },
+        });
+      }}
+    >
+      <WrenchIcon />
+      <span class="text-left whitespace-pre-wrap"
+        >Weather Source: {weather.isUserEdited
+          ? 'Custom'
+          : weather.defaultSource}</span
+      >
+    </button>
+  </div>
+
+  {#if weather.grouping === 'week'}
+    <div
+      class="rounded-container bg-surface-100 dark:bg-surface-900 flex w-full max-w-screen-md flex-col items-start justify-start gap-2 p-2 text-left"
+    >
+      <p class="">
+        Weekly weather grouping makes for a shorter project. <a
+          href="/documentation/#grouping-weather-data"
+          target="_blank"
+          class="link"
+          rel="noopener noreferrer">Read more details.</a
+        >
+        {#if weather.goupedByWeek}
+          Your project starts on {DAYS_OF_THE_WEEK.filter(
+            (n) => n.value === weather.goupedByWeek[0].date.getDay(),
+          )[0].label},
+          {MONTHS.filter(
+            (n) => n.value - 1 === weather.goupedByWeek[0].date.getMonth(),
+          )[0]?.name}
+          {weather.goupedByWeek[0].date.getDate()},
+          {weather.goupedByWeek[0].date.getFullYear()}. It spans {weather
+            .goupedByWeek.length}
+          {pluralize('week', weather.goupedByWeek.length)}.
+        {/if}
+      </p>
+      <label class="label mx-auto flex flex-col">
+        <span>Weeks Start On</span>
+        <select
+          class="select mx-auto w-fit"
+          bind:value={weather.monthGroupingStartDay}
+          id="weather-weeks-start-week-on"
+        >
+          {#each DAYS_OF_THE_WEEK as { value, label }}
+            <option {value}>{label}</option>
+          {/each}
+        </select>
+      </label>
+    </div>
+  {/if}
 
   {#if wasDefaultWeatherSourceChanged}
-    <p class="text-sm w-full">
+    <p class="w-full text-sm">
       No weather data was available from the default source ({defaultWeatherSourceCopy}),
       so another source was used ({weather.defaultSource}) and the Weather
       Source setting was automatically updated.
@@ -188,13 +235,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/if}
 
   {#if projectHasRecentWeatherData}
-    <div class="text-left w-fit max-w-(--breakpoint-sm) text-sm">
+    <div class="w-fit max-w-(--breakpoint-sm) text-left text-sm">
       <Accordion
         value={warningAccordionState}
         onValueChange={(e) => (warningAccordionState = e.value)}
         collapsible
         rounded="rounded-container"
-        classes="preset-tonal-warning"
+        classes="bg-warning-500/20"
       >
         <Accordion.Item value="warning">
           {#snippet lead()}
@@ -232,7 +279,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/if}
 
   <div
-    class="flex flex-wrap gap-x-2 items-start justify-center bg-linear-to-tr from-surface-600 to-surface-950 dark:from-surface-50 dark:to-surface-100 bg-clip-text text-transparent dark:text-transparent box-decoration-clone"
+    class="from-surface-600 to-surface-950 dark:from-surface-50 dark:to-surface-100 flex flex-wrap items-start justify-center gap-x-2 bg-linear-to-tr box-decoration-clone bg-clip-text text-transparent dark:text-transparent"
   >
     {#if weather.table.showParameters.tmax}
       <WeatherItem
@@ -345,7 +392,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </div>
 </div>
 
-<div bind:this={graph} class="scroll-m-[60px] w-full">
+<div bind:this={graph} class="w-full scroll-m-[60px]">
   {#if showWeatherChart}
     {#if weather.data.length}
       {#key project.units}
@@ -357,8 +404,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/if}
 </div>
 
-<div class="flex flex-col justify-center w-full items-center gap-4">
-  <div class="flex flex-wrap justify-center items-center">
+<div class="flex w-full flex-col items-center justify-center gap-4">
+  <div class="flex flex-wrap items-center justify-center">
     <ToggleWeatherData
       view={weather.table.showParameters.tmax}
       onclick={() => {
@@ -414,7 +461,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   {#if isDataMissing}
     <div
-      class="variant-outline-surface rounded-container flex flex-col gap-2 justify-center items-center text-left w-fit max-w-(--breakpoint-sm) text-sm"
+      class="variant-outline-surface rounded-container flex w-fit max-w-(--breakpoint-sm) flex-col items-center justify-center gap-2 text-left text-sm"
     >
       <Accordion
         value={missingWeatherAccordionState}
@@ -449,7 +496,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 {type} data.
               {/if}
             {/each}
-            <div class="flex flex-col gap-2 mt-2">
+            <div class="mt-2 flex flex-col gap-2">
               <div>
                 <p class="">
                   If you want, here are some ways you can try to fix missing

@@ -132,7 +132,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <p class="my-2 text-center text-xs">Color {title}</p>
   {#if affiliate_variant_href}
     <a
-      class="flex flex-wrap justify-center items-center gap-2 underline w-fit mx-auto"
+      class="mx-auto flex w-fit flex-wrap items-center justify-center gap-2 underline"
       href={affiliate_variant_href}
       target="_blank"
       rel="noreferrer nofollow"
@@ -155,7 +155,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </a>
   {:else if variant_href}
     <a
-      class="inline-flex flex-wrap justify-center items-center gap-2 underline w-fit mx-auto"
+      class="mx-auto inline-flex w-fit flex-wrap items-center justify-center gap-2 underline"
       href={variant_href}
       target="_blank"
       rel="noreferrer nofollow"
@@ -179,7 +179,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </a>
   {/if}
 
-  <div class="flex flex-wrap items-center justify-center gap-2 my-2 w-full">
+  <div class="my-2 flex w-full flex-wrap items-center justify-center gap-2">
     <label class="color-select-label" title="Choose a Color">
       <input
         type="color"
@@ -194,7 +194,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <label class="color-text-label flex-1" title="Enter a Color">
       <input
         type="text"
-        class="input grow w-full"
+        class="input w-full grow"
         value={inputTypeTextValue}
         onkeyup={(e) =>
           inputTypeTextOnChange({
@@ -227,9 +227,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <StickyPart position="bottom">
   <div class="p-2">
     {#if !valid}
-      <p class="card preset-tonal-warning p-4 my-2">
-        Please enter a valid color
-      </p>
+      <p class="card bg-warning-500/20 my-2 p-4">Please enter a valid color</p>
     {/if}
     <div class="max-sm:pb-2">
       <SaveAndCloseButtons

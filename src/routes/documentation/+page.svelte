@@ -55,12 +55,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <nav data-testid="toc" class="toc space-y-4 px-2">
     <div class="font-bold">Table of Contents</div>
     <ul class="toc-list space-y-2">
-      <li class="toc-list-item block ml-4">
+      <li class="toc-list-item ml-4 block">
         <a href="#introduction" class="toc-anchor opacity-60 hover:opacity-100"
           >Introduction</a
         >
       </li>
-      <li class="toc-list-item block ml-4">
+      <li class="toc-list-item ml-4 block">
         <a
           href="#about-the-project-planner"
           class="toc-anchor opacity-60 hover:opacity-100"
@@ -72,32 +72,32 @@ If not, see <https://www.gnu.org/licenses/>. -->
           >Basics</a
         >
       </li>
-      <li class="toc-list-item block ml-4">
+      <li class="toc-list-item ml-4 block">
         <a href="#save-project" class="toc-anchor opacity-60 hover:opacity-100"
           >Save Project</a
         >
       </li>
-      <li class="toc-list-item block ml-4">
+      <li class="toc-list-item ml-4 block">
         <a href="#open-project" class="toc-anchor opacity-60 hover:opacity-100"
           >Open Project</a
         >
       </li>
-      <li class="toc-list-item block ml-4">
+      <li class="toc-list-item ml-4 block">
         <a href="#change-units" class="toc-anchor opacity-60 hover:opacity-100"
           >Change Units</a
         >
       </li>
-      <li class="toc-list-item block ml-4">
+      <li class="toc-list-item ml-4 block">
         <a href="#change-theme" class="toc-anchor opacity-60 hover:opacity-100"
           >Change Theme</a
         >
       </li>
-      <li class="toc-list-item block ml-4">
+      <li class="toc-list-item ml-4 block">
         <a href="#navigation" class="toc-anchor opacity-60 hover:opacity-100"
           >Navigation</a
         >
       </li>
-      <li class="toc-list-item block ml-4">
+      <li class="toc-list-item ml-4 block">
         <a href="#undoredo" class="toc-anchor opacity-60 hover:opacity-100"
           >Undo/Redo</a
         >
@@ -107,24 +107,24 @@ If not, see <https://www.gnu.org/licenses/>. -->
           >Location</a
         >
       </li>
-      <li class="toc-list-item block ml-4">
+      <li class="toc-list-item ml-4 block">
         <a
           href="#choose-a-location"
           class="toc-anchor opacity-60 hover:opacity-100">Choose a Location</a
         >
       </li>
-      <li class="toc-list-item block ml-4">
+      <li class="toc-list-item ml-4 block">
         <a href="#select-dates" class="toc-anchor opacity-60 hover:opacity-100"
           >Select Dates</a
         >
       </li>
-      <li class="toc-list-item block ml-4">
+      <li class="toc-list-item ml-4 block">
         <a
           href="#multiple-locations"
           class="toc-anchor opacity-60 hover:opacity-100">Multiple Locations</a
         >
       </li>
-      <li class="toc-list-item block ml-4">
+      <li class="toc-list-item ml-4 block">
         <a
           href="#location-errors"
           class="toc-anchor opacity-60 hover:opacity-100">Location Errors</a
@@ -135,50 +135,50 @@ If not, see <https://www.gnu.org/licenses/>. -->
           >Weather</a
         >
       </li>
-      <li class="toc-list-item block ml-4">
+      <li class="toc-list-item ml-4 block">
         <a
           href="#weather-sources"
           class="toc-anchor opacity-60 hover:opacity-100">Weather Sources</a
         >
       </li>
-      <li class="toc-list-item block ml-4">
+      <li class="toc-list-item ml-4 block">
         <a
           href="#get-weather-data"
           class="toc-anchor opacity-60 hover:opacity-100">Get Weather Data</a
         >
       </li>
-      <li class="toc-list-item block ml-4">
+      <li class="toc-list-item ml-4 block">
         <a
           href="#grouping-weather-data"
           class="toc-anchor opacity-60 hover:opacity-100"
           >Grouping Weather Data</a
         >
       </li>
-      <li class="toc-list-item block ml-4">
+      <li class="toc-list-item ml-4 block">
         <a
           href="#view-weather-data"
           class="toc-anchor opacity-60 hover:opacity-100">View Weather Data</a
         >
       </li>
-      <li class="toc-list-item block ml-4">
+      <li class="toc-list-item ml-4 block">
         <a
           href="#edit-weather-data"
           class="toc-anchor opacity-60 hover:opacity-100">Edit Weather Data</a
         >
       </li>
-      <li class="toc-list-item block ml-4">
+      <li class="toc-list-item ml-4 block">
         <a
           href="#import-weather-data"
           class="toc-anchor opacity-60 hover:opacity-100">Import Weather Data</a
         >
       </li>
-      <li class="toc-list-item block ml-4">
+      <li class="toc-list-item ml-4 block">
         <a
           href="#weather-errors"
           class="toc-anchor opacity-60 hover:opacity-100">Weather Errors</a
         >
       </li>
-      <li class="toc-list-item block ml-4">
+      <li class="toc-list-item ml-4 block">
         <a
           href="#mixed-snow-parameters"
           class="toc-anchor opacity-60 hover:opacity-100"
@@ -190,31 +190,31 @@ If not, see <https://www.gnu.org/licenses/>. -->
           >Gauges</a
         >
       </li>
-      <li class="toc-list-item block ml-4">
+      <li class="toc-list-item ml-4 block">
         <a href="#add-a-gauge" class="toc-anchor opacity-60 hover:opacity-100"
           >Add a Gauge</a
         >
       </li>
-      <li class="toc-list-item block ml-4">
+      <li class="toc-list-item ml-4 block">
         <a
           href="#gauge-direction"
           class="toc-anchor opacity-60 hover:opacity-100">Gauge Direction</a
         >
       </li>
-      <li class="toc-list-item block ml-4">
+      <li class="toc-list-item ml-4 block">
         <a
           href="#range-calculation-methods"
           class="toc-anchor opacity-60 hover:opacity-100"
           >Range Calculation Methods</a
         >
       </li>
-      <li class="toc-list-item block ml-4">
+      <li class="toc-list-item ml-4 block">
         <a
           href="#increment-modes"
           class="toc-anchor opacity-60 hover:opacity-100">Increment Modes</a
         >
       </li>
-      <li class="toc-list-item block ml-4">
+      <li class="toc-list-item ml-4 block">
         <a href="#adjust-ranges" class="toc-anchor opacity-60 hover:opacity-100"
           >Adjust Ranges</a
         >
@@ -224,22 +224,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
           >Color Tools</a
         >
       </li>
-      <li class="toc-list-item block ml-4">
+      <li class="toc-list-item ml-4 block">
         <a href="#preset-colors" class="toc-anchor opacity-60 hover:opacity-100"
           >Preset Colors</a
         >
       </li>
-      <li class="toc-list-item block ml-4">
+      <li class="toc-list-item ml-4 block">
         <a href="#image-palette" class="toc-anchor opacity-60 hover:opacity-100"
           >Image Palette</a
         >
       </li>
-      <li class="toc-list-item block ml-4">
+      <li class="toc-list-item ml-4 block">
         <a href="#importexport" class="toc-anchor opacity-60 hover:opacity-100"
           >Import/Export</a
         >
       </li>
-      <li class="toc-list-item block ml-4">
+      <li class="toc-list-item ml-4 block">
         <a href="#sort-colors" class="toc-anchor opacity-60 hover:opacity-100"
           >Sort Colors</a
         >
@@ -247,21 +247,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <li class="toc-list-item block">
         <a href="#yarn" class="toc-anchor opacity-60 hover:opacity-100">Yarn</a>
       </li>
-      <li class="toc-list-item block ml-4">
+      <li class="toc-list-item ml-4 block">
         <a
           href="#getting-yarn-colorway-data"
           class="toc-anchor opacity-60 hover:opacity-100"
           >Getting Yarn Colorway Data</a
         >
       </li>
-      <li class="toc-list-item block ml-4">
+      <li class="toc-list-item ml-4 block">
         <a
           href="#choose-yarn-colorways"
           class="toc-anchor opacity-60 hover:opacity-100"
           >Choose Yarn Colorways</a
         >
       </li>
-      <li class="toc-list-item block ml-4">
+      <li class="toc-list-item ml-4 block">
         <a
           href="#link-unavailable"
           class="toc-anchor opacity-60 hover:opacity-100">Link Unavailable</a
@@ -272,7 +272,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           >Preview</a
         >
       </li>
-      <li class="toc-list-item block ml-4">
+      <li class="toc-list-item ml-4 block">
         <a
           href="#create-a-preview"
           class="toc-anchor opacity-60 hover:opacity-100">Create a Preview</a
@@ -283,7 +283,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           >Gallery</a
         >
       </li>
-      <li class="toc-list-item block ml-4">
+      <li class="toc-list-item ml-4 block">
         <a
           href="#share-to-gallery"
           class="toc-anchor opacity-60 hover:opacity-100">Share to Gallery</a
@@ -294,21 +294,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
           >Download</a
         >
       </li>
-      <li class="toc-list-item block ml-4">
+      <li class="toc-list-item ml-4 block">
         <a
           href="#download-gauges-and-weather-data-pdf"
           class="toc-anchor opacity-60 hover:opacity-100"
           >Download Gauges and Weather Data (PDF)</a
         >
       </li>
-      <li class="toc-list-item block ml-4">
+      <li class="toc-list-item ml-4 block">
         <a
           href="#download-weather-data-csv"
           class="toc-anchor opacity-60 hover:opacity-100"
           >Download Weather Data (CSV)</a
         >
       </li>
-      <li class="toc-list-item block ml-4">
+      <li class="toc-list-item ml-4 block">
         <a
           href="#download-preview-image-png"
           class="toc-anchor opacity-60 hover:opacity-100"
@@ -321,7 +321,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <AppShell pageName="Documentation">
   {#snippet stickyHeader()}
-    <div class="hidden lg:inline-flex mx-auto">
+    <div class="mx-auto hidden lg:inline-flex">
       <AppLogo />
     </div>
     <div class="sm:hidden">
@@ -342,7 +342,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <div class="flex flex-wrap items-center gap-1">
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              class="w-6 h-6"
+              class="h-6 w-6"
               viewBox="0 0 24 24"
               ><path
                 fill="currentColor"
@@ -361,21 +361,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
   {/snippet}
   {#snippet main()}
-    <main class="max-w-(--breakpoint-xl) m-auto mb-4 pt-2 px-2 lg:px-0">
-      <div class="pb-4 text-left flex gap-4">
-        <div class="w-full flex flex-col gap-8">
+    <main class="m-auto mb-4 max-w-(--breakpoint-xl) px-2 pt-2 lg:px-0">
+      <div class="flex gap-4 pb-4 text-left">
+        <div class="flex w-full flex-col gap-8">
           <div class="flex flex-col gap-4">
             <h2
-              class="h2 text-gradient scroll-mt-[58px] hidden lg:inline-block"
+              class="h2 text-gradient hidden scroll-mt-[58px] lg:inline-block"
               data-toc-ignore
             >
               Documentation
             </h2>
             <section
               id="introduction"
-              class="scroll-mt-[58px] card bg-surface-100 dark:bg-surface-900 p-4 gap-2 flex flex-col mt-2 lg:mt-0"
+              class="card bg-surface-100 dark:bg-surface-900 mt-2 flex scroll-mt-[58px] flex-col gap-2 p-4 lg:mt-0"
             >
-              <h3 class="font-bold text-xl">Introduction</h3>
+              <h3 class="text-xl font-bold">Introduction</h3>
               <p>
                 This documentation is meant to help you use the <a
                   href="/"
@@ -386,9 +386,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </div>
           <section
             id="about-the-project-planner"
-            class="scroll-mt-[58px] card bg-surface-100 dark:bg-surface-900 p-4 gap-2 flex flex-col"
+            class="card bg-surface-100 dark:bg-surface-900 flex scroll-mt-[58px] flex-col gap-2 p-4"
           >
-            <h3 class="font-bold text-xl">About the Project Planner</h3>
+            <h3 class="text-xl font-bold">About the Project Planner</h3>
             <p>
               The Project Planner at <a
                 class="link"
@@ -404,7 +404,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               >
             </p>
             <div class="flex flex-wrap gap-4">
-              <div class="flex flex-col gap-2 card p-4">
+              <div class="card flex flex-col gap-2 p-4">
                 <p class="font-bold">Use the Project Planner</p>
                 <p>
                   <CircleCheckIcon
@@ -440,7 +440,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   data and get yarn color details
                 </p>
               </div>
-              <div class="flex flex-col gap-2 card p-4">
+              <div class="card flex flex-col gap-2 p-4">
                 <p class="font-bold">Don’t use the Project Planner</p>
                 <p>
                   <CircleMinusIcon
@@ -468,13 +468,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </p>
           </section>
 
-          <h2 class="font-bold text-2xl" id="basics">Basics</h2>
+          <h2 class="text-2xl font-bold" id="basics">Basics</h2>
 
           <section
             id="save-project"
-            class="scroll-mt-[58px] card bg-surface-100 dark:bg-surface-900 p-4 gap-2 flex flex-col"
+            class="card bg-surface-100 dark:bg-surface-900 flex scroll-mt-[58px] flex-col gap-2 p-4"
           >
-            <h3 class="font-bold text-xl">Save Project</h3>
+            <h3 class="text-xl font-bold">Save Project</h3>
             <p>
               When you save a project, a shareable URL is created, and the
               project is saved in your browser's local storage. This web app
@@ -508,7 +508,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <table>
                 <tbody
                   ><tr
-                    class="flex flex-flow gap-2 justify-between items-center w-full font-bold border-surface-950-50 border p-2 rounded-container"
+                    class="flex-flow border-surface-950-50 rounded-container flex w-full items-center justify-between gap-2 border p-2 font-bold"
                     ><td
                       ><span class="kbd">Cmd ⌘ + s</span>
                       or
@@ -527,7 +527,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               >, your project <em>is</em> saved to a backend database, and you can
               re-open your project from its Project Gallery Page.
             </p>
-            <div class="card preset-tonal-warning p-4 gap-2 flex flex-col">
+            <div class="card bg-warning-500/20 flex flex-col gap-2 p-4">
               <p>
                 Your project must first have a valid location and dates in order
                 to be saved, and it must first have weather data in order to
@@ -537,9 +537,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </section>
           <section
             id="open-project"
-            class="scroll-mt-[58px] card bg-surface-100 dark:bg-surface-900 p-4 gap-2 flex flex-col"
+            class="card bg-surface-100 dark:bg-surface-900 flex scroll-mt-[58px] flex-col gap-2 p-4"
           >
-            <h3 class="font-bold text-xl">Open Project</h3>
+            <h3 class="text-xl font-bold">Open Project</h3>
             <p>
               Recently saved projects are stored in your browser’s local
               storage. Open the menu and select a project to load it’s settings
@@ -553,9 +553,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </section>
           <section
             id="change-units"
-            class="scroll-mt-[58px] card bg-surface-100 dark:bg-surface-900 p-4 gap-2 flex flex-col"
+            class="card bg-surface-100 dark:bg-surface-900 flex scroll-mt-[58px] flex-col gap-2 p-4"
           >
-            <h3 class="font-bold text-xl">Change Units</h3>
+            <h3 class="text-xl font-bold">Change Units</h3>
             <p>
               To change your project’s units between metric and imperial, from
               the top bar select °C / mm or °F / in. On smaller screens, press
@@ -566,7 +566,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <table>
                 <tbody
                   ><tr
-                    class="flex flex-flow gap-2 justify-between items-center w-full font-bold border-surface-950-50 border p-2 rounded-container"
+                    class="flex-flow border-surface-950-50 rounded-container flex w-full items-center justify-between gap-2 border p-2 font-bold"
                     ><td><span class="kbd">u</span></td><td>Change Units</td
                     ></tr
                   ></tbody
@@ -576,9 +576,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </section>
           <section
             id="change-theme"
-            class="scroll-mt-[58px] card bg-surface-100 dark:bg-surface-900 p-4 gap-2 flex flex-col"
+            class="card bg-surface-100 dark:bg-surface-900 flex scroll-mt-[58px] flex-col gap-2 p-4"
           >
-            <h3 class="font-bold text-xl">Change Theme</h3>
+            <h3 class="text-xl font-bold">Change Theme</h3>
             <p>
               To choose a theme for this site, press the Theme Switcher Icon at
               the top of the left menu, then select a theme in Light, Dark, or
@@ -591,7 +591,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <table>
                 <tbody
                   ><tr
-                    class="flex flex-flow gap-2 justify-between items-center w-full font-bold border-surface-950-50 border p-2 rounded-container"
+                    class="flex-flow border-surface-950-50 rounded-container flex w-full items-center justify-between gap-2 border p-2 font-bold"
                     ><td><span class="kbd">t</span></td><td
                       >Toggle Theme (Light, Dark, System)</td
                     ></tr
@@ -602,9 +602,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </section>
           <section
             id="navigation"
-            class="scroll-mt-[58px] card bg-surface-100 dark:bg-surface-900 p-4 gap-2 flex flex-col"
+            class="card bg-surface-100 dark:bg-surface-900 flex scroll-mt-[58px] flex-col gap-2 p-4"
           >
-            <h3 class="font-bold text-xl">Navigation</h3>
+            <h3 class="text-xl font-bold">Navigation</h3>
             <p>
               To quickly jump between different sections of the page, press the
               name of the section at the bottom of the page. You can also use
@@ -614,21 +614,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <table>
                 <tbody class="flex flex-col gap-2"
                   ><tr
-                    class="flex flex-flow gap-2 justify-between items-center w-full font-bold border-surface-950-50 border p-2 rounded-container"
+                    class="flex-flow border-surface-950-50 rounded-container flex w-full items-center justify-between gap-2 border p-2 font-bold"
                     ><td class="kbd">0</td><td>Go to the top of the page</td
                     ></tr
                   ><tr
-                    class="flex flex-flow gap-2 justify-between items-center w-full font-bold border-surface-950-50 border p-2 rounded-container"
+                    class="flex-flow border-surface-950-50 rounded-container flex w-full items-center justify-between gap-2 border p-2 font-bold"
                     ><td class="kbd">1</td><td>Go to Location section</td></tr
                   >
                   <tr
-                    class="flex flex-flow gap-2 justify-between items-center w-full font-bold border-surface-950-50 border p-2 rounded-container"
+                    class="flex-flow border-surface-950-50 rounded-container flex w-full items-center justify-between gap-2 border p-2 font-bold"
                     ><td class="kbd">2</td><td>Go to Weather section</td></tr
                   ><tr
-                    class="flex flex-flow gap-2 justify-between items-center w-full font-bold border-surface-950-50 border p-2 rounded-container"
+                    class="flex-flow border-surface-950-50 rounded-container flex w-full items-center justify-between gap-2 border p-2 font-bold"
                     ><td class="kbd">3</td><td>Go to Colors section</td></tr
                   ><tr
-                    class="flex flex-flow gap-2 justify-between items-center w-full font-bold border-surface-950-50 border p-2 rounded-container"
+                    class="flex-flow border-surface-950-50 rounded-container flex w-full items-center justify-between gap-2 border p-2 font-bold"
                     ><td class="kbd">4</td><td>Go to Preview section</td></tr
                   ></tbody
                 >
@@ -638,9 +638,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
           <section
             id="undoredo"
-            class="scroll-mt-[58px] card bg-surface-100 dark:bg-surface-900 p-4 gap-2 flex flex-col"
+            class="card bg-surface-100 dark:bg-surface-900 flex scroll-mt-[58px] flex-col gap-2 p-4"
           >
-            <h3 class="font-bold text-xl">Undo/Redo</h3>
+            <h3 class="text-xl font-bold">Undo/Redo</h3>
 
             <p>
               To undo or redo any previous edit to your project, press the Undo
@@ -651,14 +651,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <table>
                 <tbody class="flex flex-col gap-2"
                   ><tr
-                    class="flex flex-flow gap-2 justify-between items-center w-full font-bold border-surface-950-50 border p-2 rounded-container"
+                    class="flex-flow border-surface-950-50 rounded-container flex w-full items-center justify-between gap-2 border p-2 font-bold"
                     ><td
                       ><span class="kbd">Cmd ⌘ + z</span>
                       or
                       <span class="kbd">Ctrl + z</span></td
                     ><td>Undo</td></tr
                   ><tr
-                    class="flex flex-flow gap-2 justify-between items-center w-full font-bold border-surface-950-50 border p-2 rounded-container"
+                    class="flex-flow border-surface-950-50 rounded-container flex w-full items-center justify-between gap-2 border p-2 font-bold"
                     ><td
                       ><span class="kbd">Cmd ⌘ + Shift ⇧ + z</span>
                       or
@@ -670,20 +670,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </figure>
           </section>
 
-          <h2 class="font-bold text-2xl scroll-mt-[58px]" id="location">
+          <h2 class="scroll-mt-[58px] text-2xl font-bold" id="location">
             Location
           </h2>
 
           <section
             id="choose-a-location"
-            class="scroll-mt-[58px] card bg-surface-100 dark:bg-surface-900 p-4 gap-2 flex flex-col"
+            class="card bg-surface-100 dark:bg-surface-900 flex scroll-mt-[58px] flex-col gap-2 p-4"
           >
-            <h3 class="font-bold text-xl">Choose a Location</h3>
+            <h3 class="text-xl font-bold">Choose a Location</h3>
             <p>
               Type a city, place, region, or landmark in the Location search
               box, then select a result from the autocomplete list.
             </p>
-            <div class="card preset-tonal-warning p-4 gap-2 flex flex-col">
+            <div class="card bg-warning-500/20 flex flex-col gap-2 p-4">
               <p>
                 You must choose an item from the suggested results. The
                 suggested results come from <a
@@ -700,9 +700,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </section>
           <section
             id="select-dates"
-            class="scroll-mt-[58px] card bg-surface-100 dark:bg-surface-900 p-4 gap-2 flex flex-col"
+            class="card bg-surface-100 dark:bg-surface-900 flex scroll-mt-[58px] flex-col gap-2 p-4"
           >
-            <h3 class="font-bold text-xl">Select Dates</h3>
+            <h3 class="text-xl font-bold">Select Dates</h3>
             <p>
               For your location’s Duration, select either One Year or Custom.
             </p>
@@ -717,7 +717,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 for the location’s weather data.
               </li>
             </ul>
-            <div class="card preset-tonal-warning p-4 gap-2 flex flex-col">
+            <div class="card bg-warning-500/20 flex flex-col gap-2 p-4">
               <p>
                 Selected dates should be in the past, not the future. Dates in
                 the future will not contain any weather data. The maximum number
@@ -727,15 +727,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </section>
           <section
             id="multiple-locations"
-            class="scroll-mt-[58px] card bg-surface-100 dark:bg-surface-900 p-4 gap-2 flex flex-col"
+            class="card bg-surface-100 dark:bg-surface-900 flex scroll-mt-[58px] flex-col gap-2 p-4"
           >
-            <h3 class="font-bold text-xl">Multiple Locations</h3>
+            <h3 class="text-xl font-bold">Multiple Locations</h3>
             <p>
               If you want to include weather data from multiple locations, press
               the Add Location button.
             </p>
             <p>To remove a location, press the Remove Location icon.</p>
-            <div class="card preset-tonal-warning p-4 gap-2 flex flex-col">
+            <div class="card bg-warning-500/20 flex flex-col gap-2 p-4">
               <p>
                 The maximum number of locations per project is {MAXIMUM_LOCATIONS}.
               </p>
@@ -743,16 +743,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </section>
           <section
             id="location-errors"
-            class="scroll-mt-[58px] card bg-surface-100 dark:bg-surface-900 p-4 gap-2 flex flex-col"
+            class="card bg-surface-100 dark:bg-surface-900 flex scroll-mt-[58px] flex-col gap-2 p-4"
           >
-            <h3 class="font-bold text-xl">Location Errors</h3>
+            <h3 class="text-xl font-bold">Location Errors</h3>
 
             <p>
               When you type your location in the search box, you might get a
               message saying:
             </p>
             <blockquote class="wp-block-quote is-style-default">
-              <p class="card p-2 preset-tonal-surface">
+              <p class="card preset-tonal-surface p-2">
                 “<em
                   >Whoah! There’s been a problem. It appears the
                   location-fetching service is experiencing technical
@@ -773,14 +773,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
               try again later.
             </p>
           </section>
-          <h2 class="font-bold text-2xl scroll-mt-[58px]" id="weather">
+          <h2 class="scroll-mt-[58px] text-2xl font-bold" id="weather">
             Weather
           </h2>
           <section
             id="weather-sources"
-            class="scroll-mt-[58px] card bg-surface-100 dark:bg-surface-900 p-4 gap-2 flex flex-col"
+            class="card bg-surface-100 dark:bg-surface-900 flex scroll-mt-[58px] flex-col gap-2 p-4"
           >
-            <h3 class="font-bold text-xl">Weather Sources</h3>
+            <h3 class="text-xl font-bold">Weather Sources</h3>
 
             <p>
               Sometimes one weather service may not have data for your location.
@@ -904,7 +904,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 >edit the weather data</a
               >.
             </p>
-            <div class="card preset-tonal-warning p-4 gap-2 flex flex-col">
+            <div class="card bg-warning-500/20 flex flex-col gap-2 p-4">
               <p>
                 For any weather provider, recent weather data may be delayed by
                 a few days.
@@ -913,9 +913,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </section>
           <section
             id="get-weather-data"
-            class="scroll-mt-[58px] card bg-surface-100 dark:bg-surface-900 p-4 gap-2 flex flex-col"
+            class="card bg-surface-100 dark:bg-surface-900 flex scroll-mt-[58px] flex-col gap-2 p-4"
           >
-            <h3 class="font-bold text-xl">Get Weather Data</h3>
+            <h3 class="text-xl font-bold">Get Weather Data</h3>
 
             <p>
               Once you’ve selected a location and dates, press the Search button
@@ -926,9 +926,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </section>
           <section
             id="grouping-weather-data"
-            class="scroll-mt-[58px] card bg-surface-100 dark:bg-surface-900 p-4 gap-2 flex flex-col"
+            class="card bg-surface-100 dark:bg-surface-900 flex scroll-mt-[58px] flex-col gap-2 p-4"
           >
-            <h3 class="font-bold text-xl">Grouping Weather Data</h3>
+            <h3 class="text-xl font-bold">Grouping Weather Data</h3>
 
             <p>
               You can use daily weather data, or group it into weeks. Using
@@ -944,7 +944,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 – Days are grouped into weeks which start on the day set from the
                 Weeks Start On setting. The weather data for each week is calculated
                 according to the following:
-                <ul class="flex flex-col gap-2 ml-4 mt-2">
+                <ul class="mt-2 ml-4 flex flex-col gap-2">
                   <li>
                     <span class="font-bold">High Temperature</span> – The highest
                     temperature of the week
@@ -972,7 +972,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 </ul>
               </li>
             </ul>
-            <div class="card preset-tonal-warning p-4 gap-2 flex flex-col">
+            <div class="card bg-warning-500/20 flex flex-col gap-2 p-4">
               <p>
                 The Average Temperature and Average Daytime of all items in your
                 weather data (displayed above the weather chart) might be
@@ -1000,9 +1000,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </section>
           <section
             id="view-weather-data"
-            class="scroll-mt-[58px] card bg-surface-100 dark:bg-surface-900 p-4 gap-2 flex flex-col"
+            class="card bg-surface-100 dark:bg-surface-900 flex scroll-mt-[58px] flex-col gap-2 p-4"
           >
-            <h3 class="font-bold text-xl">View Weather Data</h3>
+            <h3 class="text-xl font-bold">View Weather Data</h3>
 
             <p>
               An overview of your project’s weather data is shown in a chart.
@@ -1025,9 +1025,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </section>
           <section
             id="edit-weather-data"
-            class="scroll-mt-[58px] card bg-surface-100 dark:bg-surface-900 p-4 gap-2 flex flex-col"
+            class="card bg-surface-100 dark:bg-surface-900 flex scroll-mt-[58px] flex-col gap-2 p-4"
           >
-            <h3 class="font-bold text-xl">Edit Weather Data</h3>
+            <h3 class="text-xl font-bold">Edit Weather Data</h3>
 
             <p>
               To edit weather data, your project’s <a
@@ -1041,7 +1041,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               If you want to edit many values, it may be easier to work with the
               data in a spreadsheet:
             </p>
-            <ul class="flex flex-col gap-2 ml-4">
+            <ul class="ml-4 flex flex-col gap-2">
               <li>
                 - <a class="link" href="#download-weather-data-csv">
                   Download your project’s weather data CSV file</a
@@ -1077,9 +1077,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </section>
           <section
             id="import-weather-data"
-            class="scroll-mt-[58px] card bg-surface-100 dark:bg-surface-900 p-4 gap-2 flex flex-col"
+            class="card bg-surface-100 dark:bg-surface-900 flex scroll-mt-[58px] flex-col gap-2 p-4"
           >
-            <h3 class="font-bold text-xl">Import Weather Data</h3>
+            <h3 class="text-xl font-bold">Import Weather Data</h3>
 
             <p>
               To import weather data, press the Import Weather Data button; a
@@ -1113,7 +1113,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <p>
               <em>Row 1 must contain the following two column headings:</em>
             </p>
-            <ul class="flex flex-col gap-2 ml-2">
+            <ul class="ml-2 flex flex-col gap-2">
               <li>
                 <span class="font-bold">Date</span>
                 – Values in the
@@ -1191,14 +1191,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </section>
           <section
             id="weather-errors"
-            class="scroll-mt-[58px] card bg-surface-100 dark:bg-surface-900 p-4 gap-2 flex flex-col"
+            class="card bg-surface-100 dark:bg-surface-900 flex scroll-mt-[58px] flex-col gap-2 p-4"
           >
-            <h3 class="font-bold text-xl">Weather Errors</h3>
+            <h3 class="text-xl font-bold">Weather Errors</h3>
 
             <p>
               When you press the Search button, you might get a message saying:
             </p>
-            <blockquote class="card p-2 preset-tonal-surface">
+            <blockquote class="card preset-tonal-surface p-2">
               <p>
                 Weather data not found. Please try a different location or
                 dates.
@@ -1221,9 +1221,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </section>
           <section
             id="mixed-snow-parameters"
-            class="scroll-mt-[58px] card bg-surface-100 dark:bg-surface-900 p-4 gap-2 flex flex-col"
+            class="card bg-surface-100 dark:bg-surface-900 flex scroll-mt-[58px] flex-col gap-2 p-4"
           >
-            <h3 class="font-bold text-xl">Mixed Snow Parameters</h3>
+            <h3 class="text-xl font-bold">Mixed Snow Parameters</h3>
 
             <p>
               Sometimes there might be a label below the <em>Total Snowfall</em>
@@ -1245,14 +1245,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
               consistent.
             </p>
           </section>
-          <h2 class="font-bold text-2xl scroll-mt-[58px]" id="gauges">
+          <h2 class="scroll-mt-[58px] text-2xl font-bold" id="gauges">
             Gauges
           </h2>
           <section
             id="add-a-gauge"
-            class="scroll-mt-[58px] card bg-surface-100 dark:bg-surface-900 p-4 gap-2 flex flex-col"
+            class="card bg-surface-100 dark:bg-surface-900 flex scroll-mt-[58px] flex-col gap-2 p-4"
           >
-            <h3 class="font-bold text-xl">Add a Gauge</h3>
+            <h3 class="text-xl font-bold">Add a Gauge</h3>
 
             <p>
               By default, every project has a Temperature Gauge, but you can
@@ -1261,13 +1261,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
               Select a Gauge, then select one of the available options.
             </p>
             <p>Gauges you can create are:</p>
-            <ul class="flex flex-col gap-2 ml-4">
+            <ul class="ml-4 flex flex-col gap-2">
               <li>Temperature gauge (required)</li>
               <li>Rain gauge</li>
               <li>Snow gauge</li>
               <li>Daytime gauge</li>
             </ul>
-            <div class="card preset-tonal-warning p-4 gap-2 flex flex-col">
+            <div class="card bg-warning-500/20 flex flex-col gap-2 p-4">
               <p>
                 You can only add a gauge if the weather data contains that
                 gauge’s information. For example, if there is no snow data, you
@@ -1277,9 +1277,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </section>
           <section
             id="gauge-direction"
-            class="scroll-mt-[58px] card bg-surface-100 dark:bg-surface-900 p-4 gap-2 flex flex-col"
+            class="card bg-surface-100 dark:bg-surface-900 flex scroll-mt-[58px] flex-col gap-2 p-4"
           >
-            <h3 class="font-bold text-xl">Gauge Direction</h3>
+            <h3 class="text-xl font-bold">Gauge Direction</h3>
 
             <p>
               To change the direction of a gauge, press the Settings button,
@@ -1298,9 +1298,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </section>
           <section
             id="range-calculation-methods"
-            class="scroll-mt-[58px] card bg-surface-100 dark:bg-surface-900 p-4 gap-2 flex flex-col"
+            class="card bg-surface-100 dark:bg-surface-900 flex scroll-mt-[58px] flex-col gap-2 p-4"
           >
-            <h3 class="font-bold text-xl">Range Calculation Methods</h3>
+            <h3 class="text-xl font-bold">Range Calculation Methods</h3>
 
             <p>
               There are four possible options used to determine which range a
@@ -1356,7 +1356,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </p>
             <figure class="">
               <table
-                class="table-autoborder-surface-950-50 bg-surface-200 dark:bg-surface-800 border p-2 rounded-container"
+                class="table-autoborder-surface-950-50 bg-surface-200 dark:bg-surface-800 rounded-container border p-2"
               >
                 <thead>
                   <tr
@@ -1387,7 +1387,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 >
               </table>
             </figure>
-            <div class="card preset-tonal-warning p-4 gap-2 flex flex-col">
+            <div class="card bg-warning-500/20 flex flex-col gap-2 p-4">
               <p>
                 If you choose the third or fourth Range Calculation Method but
                 don’t have Automatic Increments set or choose Round Increment
@@ -1403,15 +1403,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </section>
           <section
             id="increment-modes"
-            class="scroll-mt-[58px] card bg-surface-100 dark:bg-surface-900 p-4 gap-2 flex flex-col"
+            class="card bg-surface-100 dark:bg-surface-900 flex scroll-mt-[58px] flex-col gap-2 p-4"
           >
-            <h3 class="font-bold text-xl scroll-mt-[58px]">Increment Modes</h3>
+            <h3 class="scroll-mt-[58px] text-xl font-bold">Increment Modes</h3>
 
             <p>
               A range increment is the difference between the highest and lowest
               values in a range.
             </p>
-            <ul class="flex flex-col gap-2 ml-4">
+            <ul class="ml-4 flex flex-col gap-2">
               <li>
                 <span class="font-bold">Automatic</span>
                 – Each range’s increment is automatically chosen based on your weather
@@ -1431,7 +1431,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 your gauge, each range will be set using your increment value.
               </li>
             </ul>
-            <div class="card preset-tonal-warning p-4 gap-2 flex flex-col">
+            <div class="card bg-warning-500/20 flex flex-col gap-2 p-4">
               <p>
                 When using Automatic Increments on height-type gauges (Rain
                 Gauge, Snow Gauge), depending on the weather data, some ranges
@@ -1443,9 +1443,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </section>
           <section
             id="adjust-ranges"
-            class="scroll-mt-[58px] card bg-surface-100 dark:bg-surface-900 p-4 gap-2 flex flex-col"
+            class="card bg-surface-100 dark:bg-surface-900 flex scroll-mt-[58px] flex-col gap-2 p-4"
           >
-            <h3 class="font-bold text-xl">Adjust Ranges</h3>
+            <h3 class="text-xl font-bold">Adjust Ranges</h3>
 
             <p>
               To adjust an individual color’s range: select the Range; adjust
@@ -1453,14 +1453,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
               buttons, or the range sliders; then press Save Range.
             </p>
           </section>
-          <h2 class="font-bold text-2xl scroll-mt-[58px]" id="colors">
+          <h2 class="scroll-mt-[58px] text-2xl font-bold" id="colors">
             Color Tools
           </h2>
           <section
             id="preset-colors"
-            class="scroll-mt-[58px] card bg-surface-100 dark:bg-surface-900 p-4 gap-2 flex flex-col"
+            class="card bg-surface-100 dark:bg-surface-900 flex scroll-mt-[58px] flex-col gap-2 p-4"
           >
-            <h3 class="font-bold text-xl">Preset Colors</h3>
+            <h3 class="text-xl font-bold">Preset Colors</h3>
 
             <p>
               To browse collection of preset colors to use in your project,
@@ -1468,7 +1468,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               filters to see different color combinations. Select the palette to
               use it in your project. The categories are as follows:
             </p>
-            <ul class="flex flex-col gap-2 ml-4">
+            <ul class="ml-4 flex flex-col gap-2">
               <li>
                 <span class="font-bold">All</span> – User-made color palettes
               </li>
@@ -1498,9 +1498,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </section>
           <section
             id="image-palette"
-            class="scroll-mt-[58px] card bg-surface-100 dark:bg-surface-900 p-4 gap-2 flex flex-col"
+            class="card bg-surface-100 dark:bg-surface-900 flex scroll-mt-[58px] flex-col gap-2 p-4"
           >
-            <h3 class="font-bold text-xl">Image Palette</h3>
+            <h3 class="text-xl font-bold">Image Palette</h3>
 
             <p>
               To create a palette of colors from an image, press the Image
@@ -1516,9 +1516,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </section>
           <section
             id="importexport"
-            class="scroll-mt-[58px] card bg-surface-100 dark:bg-surface-900 p-4 gap-2 flex flex-col"
+            class="card bg-surface-100 dark:bg-surface-900 flex scroll-mt-[58px] flex-col gap-2 p-4"
           >
-            <h3 class="font-bold text-xl">Import/Export</h3>
+            <h3 class="text-xl font-bold">Import/Export</h3>
 
             <p>
               To import a color palette, press Import / Export, type color names
@@ -1532,9 +1532,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </section>
           <section
             id="sort-colors"
-            class="scroll-mt-[58px] card bg-surface-100 dark:bg-surface-900 p-4 gap-2 flex flex-col"
+            class="card bg-surface-100 dark:bg-surface-900 flex scroll-mt-[58px] flex-col gap-2 p-4"
           >
-            <h3 class="font-bold text-xl">Sort Colors</h3>
+            <h3 class="text-xl font-bold">Sort Colors</h3>
 
             <p>
               To move a color in a palette, press the drag icon on the color and
@@ -1544,8 +1544,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
               colors by pressing Reverse.
             </p>
           </section>
-          <h2 class="font-bold text-2xl scroll-mt-[58px]" id="yarn">Yarn</h2>
-          <div class="card preset-tonal-warning p-4 gap-2 flex flex-col">
+          <h2 class="scroll-mt-[58px] text-2xl font-bold" id="yarn">Yarn</h2>
+          <div class="card bg-warning-500/20 flex flex-col gap-2 p-4">
             <p>
               Real yarn colors will look different than what’s on the screen.
               Any trademarked yarn or colorway details are owned by their
@@ -1562,9 +1562,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </div>
           <section
             id="getting-yarn-colorway-data"
-            class="scroll-mt-[58px] card bg-surface-100 dark:bg-surface-900 p-4 gap-2 flex flex-col"
+            class="card bg-surface-100 dark:bg-surface-900 flex scroll-mt-[58px] flex-col gap-2 p-4"
           >
-            <h3 class="font-bold text-xl">Getting Yarn Colorway Data</h3>
+            <h3 class="text-xl font-bold">Getting Yarn Colorway Data</h3>
 
             <p>
               This web app uses color approximations of real yarn colorways in
@@ -1596,9 +1596,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </section>
           <section
             id="choose-yarn-colorways"
-            class="scroll-mt-[58px] card bg-surface-100 dark:bg-surface-900 p-4 gap-2 flex flex-col"
+            class="card bg-surface-100 dark:bg-surface-900 flex scroll-mt-[58px] flex-col gap-2 p-4"
           >
-            <h3 class="font-bold text-xl">Choose Yarn Colorways</h3>
+            <h3 class="text-xl font-bold">Choose Yarn Colorways</h3>
 
             <p>
               To pick yarn colorways to use in your project, press the Choose
@@ -1609,9 +1609,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </section>
           <section
             id="link-unavailable"
-            class="scroll-mt-[58px] card bg-surface-100 dark:bg-surface-900 p-4 gap-2 flex flex-col"
+            class="card bg-surface-100 dark:bg-surface-900 flex scroll-mt-[58px] flex-col gap-2 p-4"
           >
-            <h3 class="font-bold text-xl">Link Unavailable</h3>
+            <h3 class="text-xl font-bold">Link Unavailable</h3>
 
             <p>
               A yarn that says Link Unavailable means the webpage from which the
@@ -1629,21 +1629,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
               </li>
             </ul>
           </section>
-          <h2 class="font-bold text-2xl scroll-mt-[58px]" id="preview">
+          <h2 class="scroll-mt-[58px] text-2xl font-bold" id="preview">
             Preview
           </h2>
           <section
             id="create-a-preview"
-            class="scroll-mt-[58px] card bg-surface-100 dark:bg-surface-900 p-4 gap-2 flex flex-col"
+            class="card bg-surface-100 dark:bg-surface-900 flex scroll-mt-[58px] flex-col gap-2 p-4"
           >
-            <h3 class="font-bold text-xl">Create a Preview</h3>
+            <h3 class="text-xl font-bold">Create a Preview</h3>
 
             <p>
               To view and customize what your project might look like, select a
               Pattern Type and adjust the settings. These are the different
               pattern types which you can use to customize your preview:
             </p>
-            <ul class="flex flex-col gap-2 ml-4">
+            <ul class="ml-4 flex flex-col gap-2">
               <li>
                 <span class="font-bold">Calendar</span> – Squares are arranged in
                 a calendar-like grid, grouped by month.
@@ -1696,7 +1696,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 day.
               </li>
             </ul>
-            <div class="card preset-tonal-warning p-4 gap-2 flex flex-col">
+            <div class="card bg-warning-500/20 flex flex-col gap-2 p-4">
               <p>
                 The project preview might not look like a real crochet or
                 knitted item. It is only meant to give you an idea of using the
@@ -1704,14 +1704,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
               </p>
             </div>
           </section>
-          <h2 class="font-bold text-2xl scroll-mt-[58px]" id="gallery">
+          <h2 class="scroll-mt-[58px] text-2xl font-bold" id="gallery">
             Gallery
           </h2>
           <section
             id="share-to-gallery"
-            class="scroll-mt-[58px] card bg-surface-100 dark:bg-surface-900 p-4 gap-2 flex flex-col"
+            class="card bg-surface-100 dark:bg-surface-900 flex scroll-mt-[58px] flex-col gap-2 p-4"
           >
-            <h3 class="font-bold text-xl">Share to Gallery</h3>
+            <h3 class="text-xl font-bold">Share to Gallery</h3>
 
             <p>
               If you choose, you can share your project in the <a
@@ -1736,7 +1736,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 available for others to use
               </li>
             </ul>
-            <div class="card preset-tonal-warning p-4 gap-2 flex flex-col">
+            <div class="card bg-warning-500/20 flex flex-col gap-2 p-4">
               <p>
                 Project Gallery Pages can’t be edited once they are submitted to
                 the gallery. If you want to make a change to your Project
@@ -1746,14 +1746,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </div>
           </section>
 
-          <h2 class="font-bold text-2xl scroll-mt-[58px]" id="download">
+          <h2 class="scroll-mt-[58px] text-2xl font-bold" id="download">
             Download
           </h2>
           <section
             id="download-gauges-and-weather-data-pdf"
-            class="scroll-mt-[58px] card bg-surface-100 dark:bg-surface-900 p-4 gap-2 flex flex-col"
+            class="card bg-surface-100 dark:bg-surface-900 flex scroll-mt-[58px] flex-col gap-2 p-4"
           >
-            <h3 class="font-bold text-xl">
+            <h3 class="text-xl font-bold">
               Download Gauges and Weather Data (PDF)
             </h3>
 
@@ -1767,7 +1767,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <table>
                 <tbody
                   ><tr
-                    class="flex flex-flow gap-2 justify-between items-center w-full font-bold border-surface-950-50 border p-2 rounded-container"
+                    class="flex-flow border-surface-950-50 rounded-container flex w-full items-center justify-between gap-2 border p-2 font-bold"
                     ><td class="kbd">d</td><td>Open Download Menu</td></tr
                   ></tbody
                 >
@@ -1776,9 +1776,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </section>
           <section
             id="download-weather-data-csv"
-            class="scroll-mt-[58px] card bg-surface-100 dark:bg-surface-900 p-4 gap-2 flex flex-col"
+            class="card bg-surface-100 dark:bg-surface-900 flex scroll-mt-[58px] flex-col gap-2 p-4"
           >
-            <h3 class="font-bold text-xl">Download Weather Data (CSV)</h3>
+            <h3 class="text-xl font-bold">Download Weather Data (CSV)</h3>
             <p>
               To download a CSV file with your project’s weather data, press the
               three-dot menu icon, press Download, then press Weather Data
@@ -1789,7 +1789,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <table>
                 <tbody
                   ><tr
-                    class="flex flex-flow gap-2 justify-between items-center w-full font-bold border-surface-950-50 border p-2 rounded-container"
+                    class="flex-flow border-surface-950-50 rounded-container flex w-full items-center justify-between gap-2 border p-2 font-bold"
                     ><td class="kbd">d</td><td>Open Download Menu</td></tr
                   ></tbody
                 >
@@ -1798,9 +1798,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </section>
           <section
             id="download-preview-image-png"
-            class="scroll-mt-[58px] card bg-surface-100 dark:bg-surface-900 p-4 gap-2 flex flex-col"
+            class="card bg-surface-100 dark:bg-surface-900 flex scroll-mt-[58px] flex-col gap-2 p-4"
           >
-            <h3 class="font-bold text-xl">Download Preview Image (PNG)</h3>
+            <h3 class="text-xl font-bold">Download Preview Image (PNG)</h3>
             <p>
               To download a PNG file of your project’s preview image, press the
               three-dot menu icon, press Download, then press Preview Image
@@ -1811,7 +1811,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <table>
                 <tbody
                   ><tr
-                    class="flex flex-flow gap-2 justify-between items-center w-full font-bold border-surface-950-50 border p-2 rounded-container"
+                    class="flex-flow border-surface-950-50 rounded-container flex w-full items-center justify-between gap-2 border p-2 font-bold"
                     ><td class="kbd">d</td><td>Open Download Menu</td></tr
                   ></tbody
                 >
@@ -1820,9 +1820,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </section>
         </div>
         <div
-          class="hidden self-start w-1/5 min-w-[200px] h-auto sm:inline-block sticky top-16"
+          class="sticky top-16 hidden h-auto w-1/5 min-w-[200px] self-start sm:inline-block"
         >
-          <div class="pb-20 max-h-[90svh] overflow-auto">
+          <div class="max-h-[90svh] overflow-auto pb-20">
             {@render tableOfContents()}
           </div>
         </div>

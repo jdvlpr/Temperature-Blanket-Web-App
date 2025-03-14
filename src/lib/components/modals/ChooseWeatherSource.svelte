@@ -45,16 +45,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 </script>
 
-<div class="flex flex-col items-center text-left w-full p-2">
-  <div class="flex flex-col gap-4 items-center">
-    <div class="overflow-x-scroll relative mt-2">
+<div class="flex w-full flex-col items-center p-2 text-left">
+  <div class="flex flex-col items-center gap-4">
+    <div class="relative mt-2 overflow-x-scroll">
       <table
-        class="table-auto border-colapse max-w-[80vw] mx-auto inline-block"
+        class="border-colapse mx-auto inline-block max-w-[80vw] table-auto"
       >
         <thead>
           <tr>
             <th
-              class="border border-surface-500 p-2"
+              class="border-surface-500 border p-2"
               class:bg-surface-200={weather.defaultSource === 'Meteostat'}
               class:dark:bg-surface-700={weather.defaultSource === 'Meteostat'}
             >
@@ -73,7 +73,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               </button>
             </th>
             <th
-              class="border border-surface-500 p-2"
+              class="border-surface-500 border p-2"
               class:bg-surface-200={weather.defaultSource === 'Open-Meteo'}
               class:dark:bg-surface-700={weather.defaultSource === 'Open-Meteo'}
             >
@@ -95,7 +95,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </thead>
         <tbody class="text-sm">
           <tr>
-            <td class="border border-surface-500 p-2"
+            <td class="border-surface-500 border p-2"
               ><a
                 href="https://meteostat.net"
                 rel="noopener noreferrer"
@@ -107,7 +107,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 </span>
               </a></td
             >
-            <td class="border border-surface-500 p-2"
+            <td class="border-surface-500 border p-2"
               ><a
                 href="https://open-meteo.com/"
                 target="_blank"
@@ -121,12 +121,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
             >
           </tr>
           <tr>
-            <td class="border border-surface-500 p-2">1 to 7 day delay</td>
-            <td class="border border-surface-500 p-2">5 day delay</td>
+            <td class="border-surface-500 border p-2">1 to 7 day delay</td>
+            <td class="border-surface-500 border p-2">5 day delay</td>
           </tr>
 
           <tr>
-            <td class="border border-surface-500 p-2 max-w-[300px]">
+            <td class="border-surface-500 max-w-[300px] border p-2">
               Raw data provided by <a
                 href="https://www.noaa.gov/"
                 target="_blank"
@@ -154,7 +154,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 class="link">CC BY-NC 4.0.</a
               >
             </td>
-            <td class="border border-surface-500 p-2 max-w-[300px]"
+            <td class="border-surface-500 max-w-[300px] border p-2"
               >Includes data from the <a
                 href="https://cds.climate.copernicus.eu/cdsapp#!/dataset/reanalysis-era5-land?tab=overview"
                 rel="noopener noreferrer"
@@ -190,16 +190,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     {#if warnSearchAgain}
       <div
-        class="preset-tonal-warning card p-4 flex flex-col justify-center items-center"
+        class="bg-warning-500/20 card flex flex-col items-center justify-center p-4"
       >
-        <p class="text-sm mb-4">
+        <p class="mb-4 text-sm">
           Search again for weather data to apply weather source changes.
           {#if !locations.allValid}
             Close this modal, then choose a valid location and dates.
           {/if}
         </p>
         <button
-          class="btn preset-filled-primary-500 text-xl font-bold gap-2"
+          class="btn preset-filled-primary-500 gap-2 text-xl font-bold"
           onclick={() => {
             if (weather.isUserEdited) {
               modal.trigger({
@@ -223,7 +223,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </div>
     {/if}
 
-    <p class="text-sm text-center pb-2">
+    <p class="pb-2 text-center text-sm">
       All weather data is subject to change if the provider updates their
       models.
     </p>

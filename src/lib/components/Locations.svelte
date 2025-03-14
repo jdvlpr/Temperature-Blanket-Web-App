@@ -36,16 +36,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '@lucide/svelte';
 </script>
 
-<div class="mt-2 max-w-(--breakpoint-md) mx-auto">
+<div class="mx-auto mt-2 max-w-(--breakpoint-md)">
   {#if weather.isFromLocalStorage && weather.data}
     <p
-      class="text-sm flex flex-wrap gap-1 items-center justify-center w-full text-center"
+      class="flex w-full flex-wrap items-center justify-center gap-1 text-center text-sm"
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 20 20"
         fill="currentColor"
-        class="w-5 h-5"
+        class="h-5 w-5"
       >
         <path
           fill-rule="evenodd"
@@ -58,13 +58,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </p>
   {:else if wasProjectLoadedFromURL.value}
     <p
-      class="text-sm flex flex-wrap gap-1 items-center justify-center w-full text-center"
+      class="flex w-full flex-wrap items-center justify-center gap-1 text-center text-sm"
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 20 20"
         fill="currentColor"
-        class="w-5 h-5"
+        class="h-5 w-5"
       >
         <path
           fill-rule="evenodd"
@@ -77,9 +77,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/if}
 
   {#if !!weather.isUserEdited}
-    <div class="flex flex-col gap-2 my-4 items-center">
+    <div class="my-4 flex flex-col items-center gap-2">
       {#each locations.all as location}
-        <p class="flex flex-wrap gap-x-1 items-center justify-center">
+        <p class="flex flex-wrap items-center justify-center gap-x-1">
           <span class="font-bold">{@html location.result}</span>
           <span>
             {new Date(location.from).toLocaleDateString()} to {new Date(
@@ -93,7 +93,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               viewBox="0 0 24 24"
               stroke-width="1.5"
               stroke="currentColor"
-              class="w-6 h-6"
+              class="h-6 w-6"
             >
               <path
                 stroke-linecap="round"
@@ -108,7 +108,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     0,
                     project.url.hash.indexOf('l='),
                   )}${project.url.hash.substring(project.url.hash.indexOf('temp'))}`}
-                  class="underline cursor-pointer"
+                  class="cursor-pointer underline"
                   target="_blank"
                   rel="noreferrer">open a new project</a
                 >.
@@ -125,7 +125,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   <div
     class:hidden={!!weather.isUserEdited}
-    class="divide-y divide-solid divide-surface-300 dark:divide-surface-600"
+    class="divide-surface-300 dark:divide-surface-600 divide-y divide-solid"
   >
     {#each locations.all, index}
       <Location location={locations.all[index]} {index} />
@@ -133,7 +133,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </div>
 
   <div
-    class="flex flex-col gap-2 mb-4 w-full"
+    class="mb-4 flex w-full flex-col gap-2"
     class:border-t={locations.all.length > 1}
     class:border-surface-300={locations.all.length > 1}
     class:dark:border-surface-600={locations.all.length > 1}
@@ -143,16 +143,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <!-- The range calculation functionality expects there to be more than one day of weather data.
      So if there's only one day of weather data the color ranges will have some NaN values. 
      This notice discourages users from using only one day of weather data. -->
-      <p
-        class="text-sm my-2 p-2 rounded-container preset-tonal-warning border border-warning-500"
-      >
-        <TriangleAlertIcon class="size-4 inline" />
+      <p class="rounded-container bg-warning-500/20 my-2 p-2 text-sm">
+        <TriangleAlertIcon class="inline size-4" />
         For the best results, include multiple days in your project; otherwise, some
         features may not work as expected.
       </p>
     {/if}
 
-    <div class="flex flex-col items-center gap-4 w-full">
+    <div class="flex w-full flex-col items-center gap-4">
       <SearchForWeather />
     </div>
 
@@ -166,7 +164,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 {#if locations.allValid}
   <div
-    class="flex flex-wrap gap-2 justify-center mt-4 mb-2 lg:mb-4 px-4 py-2 shadow-inner rounded-container bg-surface-100 dark:bg-surface-900 max-w-(--breakpoint-md) mx-auto"
+    class="rounded-container bg-surface-100 dark:bg-surface-900 mx-auto mt-4 mb-2 flex max-w-(--breakpoint-md) flex-wrap justify-center gap-2 px-4 py-2 shadow-inner lg:mb-4"
     transition:slide
   >
     <div class:hidden={!locations.allValid || weather.isUserEdited}>

@@ -410,7 +410,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <Share href={shareableURL} />
   {/snippet}
   {#snippet main()}
-    <main class="max-w-(--breakpoint-xl) m-auto pb-6">
+    <main class="m-auto max-w-(--breakpoint-xl) pb-6">
       <Card>
         {#snippet header()}
           <div>
@@ -424,13 +424,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </div>
         {/snippet}
         {#snippet content()}
-          <div class=" flex-col flex items-center my-2">
+          <div class=" my-2 flex flex-col items-center">
             <div
               bind:this={filtersContainer}
-              class="grid grid-cols-12 gap-4 items-end scroll-mt-[66px] justify-between my-2 w-full"
+              class="my-2 grid w-full scroll-mt-[66px] grid-cols-12 items-end justify-between gap-4"
             >
               <div
-                class="flex flex-col justify-start w-full col-span-full gap-1"
+                class="col-span-full flex w-full flex-col justify-start gap-1"
               >
                 <span class="flex items-center gap-1"
                   ><svg
@@ -439,7 +439,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     viewBox="0 0 24 24"
                     stroke-width="1.5"
                     stroke="currentColor"
-                    class="w-4 h-4"
+                    class="h-4 w-4"
                   >
                     <path
                       stroke-linecap="round"
@@ -450,10 +450,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   Search by Color</span
                 >
                 <div class="flex flex-wrap items-center justify-center gap-1">
-                  <div class="input-group grid-cols-[auto_1fr_auto] w-full">
+                  <div class="input-group w-full grid-cols-[auto_1fr_auto]">
                     <input
                       type="color"
-                      class="input ig-cell p-0 m-2 rounded-full!"
+                      class="input ig-cell m-2 rounded-full! p-0"
                       bind:this={yarnColorwayFinderState.inputTypeColorElement}
                       onchange={(e) =>
                         inputTypeColorOnChange({
@@ -505,7 +505,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               </div>
 
               <div
-                class="w-full col-span-12 md:col-span-9"
+                class="col-span-12 w-full md:col-span-9"
                 class:md:col-span-full={!!yarnColorwayFinderState.selectedBrandId &&
                   !!yarnColorwayFinderState.selectedYarnId}
               >
@@ -519,7 +519,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
               {#key yarnColorwayFinderState.selectedBrandId || yarnColorwayFinderState.selectedYarnId}
                 <div
-                  class="w-full col-span-12 md:col-span-3"
+                  class="col-span-12 w-full md:col-span-3"
                   class:hidden={!!yarnColorwayFinderState.selectedBrandId &&
                     !!yarnColorwayFinderState.selectedYarnId}
                 >
@@ -533,14 +533,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
               {/key}
 
               <div
-                class="flex flex-col justify-start w-full col-span-12 md:col-span-3 gap-1"
+                class="col-span-12 flex w-full flex-col justify-start gap-1 md:col-span-3"
               >
                 <span class="flex items-center gap-1">
                   <SearchIcon class="size-4" />
                   <span>Colorway Name</span>
                 </span>
                 <div class="flex flex-wrap items-center justify-center gap-1">
-                  <div class="input-group grid-cols-[1fr_auto] w-full">
+                  <div class="input-group w-full grid-cols-[1fr_auto]">
                     <input
                       id="yarn-select-search-input"
                       autocomplete="off"
@@ -565,7 +565,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                           viewBox="0 0 24 24"
                           stroke-width="1.5"
                           stroke="currentColor"
-                          class="w-6 h-6"
+                          class="h-6 w-6"
                         >
                           <path
                             stroke-linecap="round"
@@ -579,7 +579,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 </div>
               </div>
 
-              <label class="label w-full col-span-8 md:col-span-3">
+              <label class="label col-span-8 w-full md:col-span-3">
                 <span class="flex items-center gap-1">
                   <ArrowDownWideNarrowIcon class="size-4" />
                   <span>Sort By</span>
@@ -600,7 +600,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </div>
 
             {#if areAnyResultsAffiliate}
-              <p class="text-sm text-center mt-2">
+              <p class="mt-2 text-center text-sm">
                 Items purchased through some links (marked with a shopping bag
                 icon) earn the developer of this site a percentage of the sale
                 at no additional cost to you.
@@ -622,7 +622,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             {#if results?.length && !loadingAllColors}
               <div
-                class="rounded-container overflow-hidden my-4 justify-center w-full gap-1 {layout ===
+                class="rounded-container my-4 w-full justify-center gap-1 overflow-hidden {layout ===
                 'grid'
                   ? 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5'
                   : 'flex flex-col'}"
@@ -630,14 +630,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 {#each results as { hex, name, delta, brandName, yarnName, variant_href, affiliate_variant_href, unavailable }}
                   {@const percentMatch = Math.floor(100 - delta)}
                   <div
-                    class="shadow-sm flex-1 min-w-fit p-2 flex items-center gap-x-2 rounded-container {layout ===
+                    class="rounded-container flex min-w-fit flex-1 items-center gap-x-2 p-2 shadow-sm {layout ===
                     'grid'
                       ? 'justify-center'
                       : ''}"
                     style="background:{hex}; color:{getTextColor(hex)};"
                   >
                     <!-- <div class={layout === "grid" ? "" : "md:w-2/5"}></div> -->
-                    <div class="min-w-[43px] min-h-[43px]">
+                    <div class="min-h-[43px] min-w-[43px]">
                       {#if !unavailable}
                         {#if affiliate_variant_href}
                           <a
@@ -664,7 +664,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         {/if}
                       {/if}
                     </div>
-                    <div class="flex flex-col items-start text-pretty gap-1">
+                    <div class="flex flex-col items-start gap-1 text-pretty">
                       <span class="text-left text-xs">
                         {brandName} - {yarnName}
                       </span>
@@ -701,19 +701,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 {/each}
               </div>
             {:else if gettingResults}
-              <div class="my-6 mx-auto">
+              <div class="mx-auto my-6">
                 <Spinner />
               </div>
             {:else}
-              <div
-                class="mx-auto preset-tonal-warning text-center card p-4 my-2"
-              >
+              <div class="bg-warning-500/20 card mx-auto my-2 p-4 text-center">
                 <p>No Matching Colorways</p>
                 <p class="text-sm">Try changing the filters above</p>
               </div>
             {/if}
             {#if results.length === itemsToShow}
-              <div class="w-full flex justify-center mx-auto">
+              <div class="mx-auto flex w-full justify-center">
                 <button
                   class="btn rounded-container bg-primary-200-800 mb-2"
                   bind:this={loadMoreSpinner}
@@ -781,7 +779,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   viewBox="0 0 24 24"
                   stroke-width="1.5"
                   stroke="currentColor"
-                  class="w-6 h-6"
+                  class="h-6 w-6"
                 >
                   <path
                     stroke-linecap="round"
@@ -815,7 +813,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   viewBox="0 0 24 24"
                   stroke-width="1.5"
                   stroke="currentColor"
-                  class="w-6 h-6"
+                  class="h-6 w-6"
                 >
                   <path
                     stroke-linecap="round"

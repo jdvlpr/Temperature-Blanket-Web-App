@@ -108,7 +108,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div class="p-4">
-  <div class="flex flex-col text-left gap-1 w-full mb-4">
+  <div class="mb-4 flex w-full flex-col gap-1 text-left">
     <Segment
       classes="flex wrap gap-y-2 w-fit mx-auto shadow-sm"
       background="bg-surface-200 dark:bg-surface-800"
@@ -128,14 +128,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
     >
     <textarea
       id="palette-code"
-      class="select-all textarea"
+      class="textarea select-all"
       placeholder="e.g. red, FFA500, #ADD8E6"
       bind:value={inputValue}
       onkeyup={triggerChange}
       onchange={triggerChange}
     ></textarea>
 
-    <div class="text-left flex flex-col gap-2 my-2">
+    <div class="my-2 flex flex-col gap-2 text-left">
       <div class="m-auto">
         <Expand
           bind:isExpanded
@@ -154,16 +154,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
               class="link">HTML color names</a
             > or hex values
           </p>
-          <div class="ml-2 flex flex-wrap gap-2 my-2">
+          <div class="my-2 ml-2 flex flex-wrap gap-2">
             <pre class="pre select-all">red, orange, lightblue</pre>
             <pre class="pre select-all">FF0000-FFA500-ADD8E6</pre>
             <pre class="pre select-all">#FF0000 #FFA500 #ADD8E6</pre>
             <pre class="pre select-all">red, FFA500, #ADD8E6</pre>
           </div>
           <p>• A palette code from this web app</p>
-          <div class="ml-2 flex flex-wrap gap-2 my-2">
+          <div class="my-2 ml-2 flex flex-wrap gap-2">
             <pre
-              class="break-all pre select-all">palette:40004bae8bbdf7f7f780c58100441b</pre>
+              class="pre break-all select-all">palette:40004bae8bbdf7f7f780c58100441b</pre>
           </div>
           <p>
             • The URL of a saved project or yarn search result from this web
@@ -182,13 +182,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
 
     {#if inputColors.length}
-      <div class="flex flex-col mt-4">
+      <div class="mt-4 flex flex-col">
         <ColorPalette
           colors={inputColors}
           schemeName={`${inputColors.length ? inputColors.length + ' ' + pluralize('Color', inputColors.length) : ''}`}
         />
 
-        <div class="inline-block my-4 w-full mx-auto">
+        <div class="mx-auto my-4 inline-block w-full">
           <SaveAndCloseButtons
             onSave={() => {
               updateGauge({ _colors: inputColors });
@@ -204,7 +204,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {/if}
 
     {#if !inputColors.length && inputValue.length}
-      <p class="preset-tonal-warning p-4 card">Code not valid</p>
+      <p class="preset-tonal-error card p-4 text-center">Code not valid</p>
     {/if}
   {:else}
     {#if colors}
@@ -216,29 +216,29 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {/if}
 
     {#if palette}
-      <div class="flex flex-wrap gap-2 justify-start items-center w-full my-4">
+      <div class="my-4 flex w-full flex-wrap items-center justify-start gap-2">
         <div
-          class="flex flex-col justify-start items-start text-left gap-2 w-full"
+          class="flex w-full flex-col items-start justify-start gap-2 text-left"
         >
           <div class="flex flex-col">
-            <p class="font-bold text-lg">HTML Color Codes</p>
+            <p class="text-lg font-bold">HTML Color Codes</p>
             <p class="text-xs">For web and design</p>
           </div>
           <p
-            class="card preset-tonal-primary p-4 basis-full w-full break-all select-all"
+            class="card preset-tonal-primary w-full basis-full p-4 break-all select-all"
           >
             {colorHexes}
           </p>
         </div>
 
         <div
-          class="flex flex-wrap gap-2 justify-center items-center cursor-pointer"
+          class="flex cursor-pointer flex-wrap items-center justify-center gap-2"
         >
           <ToggleSwitch bind:checked={colorCodesAsArray} label="Array" />
         </div>
 
         <div
-          class="flex flex-wrap gap-2 justify-center items-center cursor-pointer"
+          class="flex cursor-pointer flex-wrap items-center justify-center gap-2"
         >
           <ToggleSwitch bind:checked={colorHexesWithHashes} label="Hashes" />
         </div>
@@ -265,16 +265,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {/if}
 
     {#if paletteCode}
-      <div class="flex flex-wrap gap-2 justify-start items-center w-full my-4">
+      <div class="my-4 flex w-full flex-wrap items-center justify-start gap-2">
         <div
-          class="flex flex-col justify-start items-start text-left gap-2 w-full"
+          class="flex w-full flex-col items-start justify-start gap-2 text-left"
         >
           <div class="flex flex-col">
-            <p class="font-bold text-lg">Palette Code</p>
+            <p class="text-lg font-bold">Palette Code</p>
             <p class="text-xs">For sharing between projects on this site</p>
           </div>
           <p
-            class="card preset-tonal-primary p-4 basis-full w-full break-all select-all"
+            class="card preset-tonal-primary w-full basis-full p-4 break-all select-all"
           >
             {paletteCode}
           </p>
@@ -301,21 +301,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {/if}
 
     {#if colorNames}
-      <div class="flex flex-wrap gap-2 justify-start items-center w-full my-4">
+      <div class="my-4 flex w-full flex-wrap items-center justify-start gap-2">
         <div
-          class="flex flex-col justify-start items-start text-left gap-2 w-full"
+          class="flex w-full flex-col items-start justify-start gap-2 text-left"
         >
           <div class="flex flex-col">
-            <p class="font-bold text-lg">Yarn Colorway Names</p>
+            <p class="text-lg font-bold">Yarn Colorway Names</p>
           </div>
           <p
-            class="card preset-tonal-primary p-4 basis-full w-full break-all select-all"
+            class="card preset-tonal-primary w-full basis-full p-4 break-all select-all"
           >
             {colorNames}
           </p>
         </div>
         <div
-          class="flex flex-wrap gap-2 justify-center items-center cursor-pointer"
+          class="flex cursor-pointer flex-wrap items-center justify-center gap-2"
         >
           <ToggleSwitch bind:checked={colorNamesAsArray} label="Array" />
         </div>

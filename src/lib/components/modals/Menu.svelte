@@ -225,8 +225,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       n.value - 1 === weather.goupedByWeek[0].date.getMonth(),
                   )[0]?.name}
                   {weather.goupedByWeek[0].date.getDate()},
-                  {weather.goupedByWeek[0].date.getFullYear()}. It spans {length}
-                  {pluralize('week', length)}.
+                  {weather.goupedByWeek[0].date.getFullYear()}. It spans {weather
+                    .goupedByWeek.length}
+                  {pluralize('week', weather.goupedByWeek.length)}.
                 {/if}
               </p>
               <label class="label flex flex-col">

@@ -77,8 +77,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <svelte:window
   onkeydown={(e) => {
+    console.log(e.target.tagName);
+
     if (
       e.target.tagName === 'INPUT' ||
+      e.target.tagName === 'TEXTAREA' ||
       e.target.tagName === 'TD' ||
       e.target.tagName === 'SELECT'
     )
@@ -99,14 +102,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <div
   class={[
-    'w-full flex flex-col items-center',
+    'flex w-full flex-col items-center',
     fullscreen.value
-      ? 'justify-start fixed w-full h-full left-0 top-0 bg-surface-50 dark:bg-surface-950 overflow-scroll max-sm:pb-2'
-      : 'justify-center shadow-inner mt-2 pb-2 gap-2 rounded-container bg-surface-100 dark:bg-surface-900',
+      ? 'bg-surface-50 dark:bg-surface-950 fixed top-0 left-0 h-full w-full justify-start overflow-scroll max-sm:pb-2'
+      : 'rounded-container bg-surface-100 dark:bg-surface-900 mt-2 justify-center gap-2 pb-2 shadow-inner',
   ]}
   bind:this={gaugeContainerElement}
 >
-  <div class={['w-full', fullscreen.value && 'flex-auto order-2 ']}>
+  <div class={['w-full', fullscreen.value && 'order-2 flex-auto ']}>
     {#key gauge.colors}
       <ColorPaletteEditable
         bind:fullscreen={fullscreen.value}
@@ -120,8 +123,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   <div
     class={[
-      'flex flex-wrap justify-center items-center gap-2 px-2',
-      fullscreen.value && 'py-2 order-1',
+      'flex flex-wrap items-center justify-center gap-2 px-2',
+      fullscreen.value && 'order-1 py-2',
     ]}
   >
     <div class="">

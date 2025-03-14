@@ -20,10 +20,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { TriangleAlertIcon } from '@lucide/svelte';
 </script>
 
-<Tooltip minWidth="290px" tooltipBg="bg-warning-50 dark:bg-warning-950">
+<Tooltip minWidth="290px">
   <TriangleAlertIcon class="inline size-4" />
   {#snippet tooltip()}
-    <p class="text-base">
+    <p class="text-surface-950-50 text-base">
       Weather data may adjust as new information arrives. Consider working at
       least {weather.defaultSource === 'Open-Meteo'
         ? OPEN_METEO_DELAY_DAYS

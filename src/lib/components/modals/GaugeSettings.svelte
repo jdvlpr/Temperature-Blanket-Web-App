@@ -209,17 +209,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div class="p-4">
-  <div class="flex max-lg:flex-col justify-center items-start gap-2 w-full">
+  <div class="flex w-full items-start justify-center gap-2 max-lg:flex-col">
     <div
-      class="flex flex-col justify-start items-start lg:max-w-[500px]"
+      class="flex flex-col items-start justify-start lg:max-w-[500px]"
       bind:this={setupContainer}
     >
-      <h2 class="font-bold text-xl flex flex-wrap items-start mb-2">
+      <h2 class="mb-2 flex flex-wrap items-start text-xl font-bold">
         Setup Ranges
       </h2>
 
-      <div class="rounded-container gap-2 flex flex-col w-full">
-        <div class="flex flex-col justify-start items-start gap-1">
+      <div class="rounded-container flex w-full flex-col gap-2">
+        <div class="flex flex-col items-start justify-start gap-1">
           <ChooseRangeDirection
             direction={_gauge.rangeOptions.direction}
             onchange={(e) => {
@@ -245,10 +245,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </div>
 
         <div
-          class="flex flex-col justify-start items-start gap-2 card preset-filled-surface-200-800 p-4"
+          class="card preset-filled-surface-200-800 flex flex-col items-start justify-start gap-2 p-4"
         >
           <div class="flex flex-col items-start justify-start gap-1">
-            <p class="flex justify-start items-center gap-1">
+            <p class="flex items-center justify-start gap-1">
               <WandIcon class="size-4" />
               <span>Generate Ranges</span>
             </p>
@@ -266,7 +266,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </Segment>
 
             {#if !incrementMode}
-              <p class="card p-4 preset-tonal-warning text-left mt-2">
+              <p class="card bg-warning-300-700/80 mt-2 p-4 text-left">
                 <TriangleAlertIcon class="inline" />
 
                 Choosing Automatic or Manual will override the current ranges
@@ -276,9 +276,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </div>
 
           {#if _gauge.rangeOptions.isCustomRanges === false}
-            <div class="flex flex-col gap-2 justify-start items-start">
+            <div class="flex flex-col items-start justify-start gap-2">
               {#if _gauge.rangeOptions.mode === 'auto'}
-                <div class="flex flex-col gap-2 justify-start items-start">
+                <div class="flex flex-col items-start justify-start gap-2">
                   {#if _gauge.id === 'temp'}
                     <label class="label">
                       <span class="flex flex-wrap items-center gap-1">
@@ -304,7 +304,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       </select>
                     </label>
                     <p
-                      class="card p-4 preset-tonal-success border border-success-500 text-left"
+                      class="card preset-tonal-success border-success-500 border p-4 text-left"
                     >
                       <WandSparklesIcon class="inline" />
 
@@ -371,9 +371,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
               {/if}
 
               {#if _gauge.rangeOptions.mode === 'manual'}
-                <div class="flex flex-wrap gap-2 justify-start">
+                <div class="flex flex-wrap justify-start gap-2">
                   <div
-                    class="tex-left flex flex-col items-start justify-end w-fit"
+                    class="tex-left flex w-fit flex-col items-start justify-end"
                   >
                     <label for="manual-increment" class="label"
                       >Increment ({unitLabel})</label
@@ -382,7 +382,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       id="manual-increment"
                       type="number"
                       min="0"
-                      class="input w-fit bg-surface-100 dark:bg-surface-900"
+                      class="input bg-surface-100 dark:bg-surface-900 w-fit"
                       onchange={() => {
                         autoUpdateRanges();
                       }}
@@ -394,7 +394,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     />
                   </div>
 
-                  <div class="tex-left flex flex-col items-start w-fit">
+                  <div class="tex-left flex w-fit flex-col items-start">
                     <label
                       for="startFrom"
                       class="label flex flex-wrap items-center gap-2"
@@ -417,7 +417,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     <input
                       id="startFrom"
                       type="number"
-                      class="input w-fit bg-surface-100 dark:bg-surface-900"
+                      class="input bg-surface-100 dark:bg-surface-900 w-fit"
                       onfocus={() => {
                         _gauge.rangeOptions.mode = 'manual';
                         autoUpdateRanges();
@@ -447,7 +447,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {#if showAdvancedControls}
           <div
             transition:slide
-            class="flex flex-col gap-4 justify-start items-start rounded-container bg-surface-200 dark:bg-surface-800 p-4 text-left w-full"
+            class="rounded-container bg-surface-200 dark:bg-surface-800 flex w-full flex-col items-start justify-start gap-4 p-4 text-left"
           >
             <ToggleSwitch
               bind:checked={_gauge.rangeOptions.linked}
@@ -455,14 +455,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
               details="When editing an individual range's From or To value, update the next or previous range's corresponding value."
             />
             <div
-              class="p-2 bg-surface-100 dark:bg-surface-900 rounded-container"
+              class="bg-surface-100 dark:bg-surface-900 rounded-container p-2"
             >
               <label class="label">
                 <span
-                  class="flex flex-col justify-center items-center gap-2 my-2"
+                  class="my-2 flex flex-col items-center justify-center gap-2"
                 >
                   <span
-                    class="flex flex-wrap gap-1 justify-center items-center"
+                    class="flex flex-wrap items-center justify-center gap-1"
                   >
                     <CalculatorIcon class="size-4" />
                     Range Calculation Method:<span>{@html rangeExample}</span>
@@ -530,7 +530,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </div>
         {/if}
         {#if isRangeCalculationUnavailable}
-          <p class="card bg-warning-50 dark:bg-warning-950 text-left py-4 px-4">
+          <p class="card bg-warning-50 dark:bg-warning-950 px-4 py-4 text-left">
             <TriangleAlertIcon class="inline" />
             The Ranges Preview below doesn't yet auto-calculate optimal From and
             To values using these options and this range calculation method ({@html rangeExample}).
@@ -544,36 +544,36 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
 
     <div
-      class="flex flex-col justify-start items-start w-full max-w-(--breakpoint-md) max-lg:mb-10"
+      class="flex w-full max-w-(--breakpoint-md) flex-col items-start justify-start max-lg:mb-10"
     >
-      <h2 class="font-bold text-xl flex flex-wrap items-start mb-2">
+      <h2 class="mb-2 flex flex-wrap items-start text-xl font-bold">
         Edit Ranges
       </h2>
 
       <div class=" rounded-container w-full">
-        <div class="rounded-container overflow-hidden flex flex-col">
+        <div class="rounded-container flex flex-col overflow-hidden">
           {#if _gauge.ranges.length && _gauge.colors.length}
             {#each _gauge.ranges as { from, to }, index}
               {@const { hex } = _gauge.colors[index]}
               <div
-                class="max-xl:flex max-xl:flex-col max-xl:justify-center items-center xl:grid xl:grid-cols-12 gap-2 p-2 w-full"
+                class="w-full items-center gap-2 p-2 max-xl:flex max-xl:flex-col max-xl:justify-center xl:grid xl:grid-cols-12"
                 style="background:{hex};color:{getTextColor(hex)}"
               >
-                <p class="text-xs col-span-2">
+                <p class="col-span-2 text-xs">
                   Color {index + 1}
                 </p>
 
                 <div
-                  class="col-span-4 col-start-3 flex flex-wrap gap-2 min-w-[220px] max-xl:justify-center xl:justify-start items-start"
+                  class="col-span-4 col-start-3 flex min-w-[220px] flex-wrap items-start gap-2 max-xl:justify-center xl:justify-start"
                 >
                   <label
-                    class="label flex flex-col justify-start items-start w-fit"
+                    class="label flex w-fit flex-col items-start justify-start"
                     id="settings-range-{index}-from"
                   >
                     <span class="text-xs">From ({unitLabel})</span>
                     <input
                       type="number"
-                      class="input text-lg max-w-[75px]"
+                      class="input max-w-[75px] text-lg"
                       value={from}
                       onchange={(e) => {
                         const value = +e.target.value;
@@ -599,13 +599,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     />
                   </label>
                   <label
-                    class="label flex flex-col justify-start items-start w-fit"
+                    class="label flex w-fit flex-col items-start justify-start"
                     id="settings-range-{index}-to"
                   >
                     <span class="text-xs">To ({unitLabel})</span>
                     <input
                       type="number"
-                      class="input text-lg max-w-[75px]"
+                      class="input max-w-[75px] text-lg"
                       value={to}
                       onchange={(e) => {
                         const value = +e.target.value;
@@ -642,7 +642,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 </div>
 
                 <div
-                  class="col-span-6 col-start-7 flex flex-wrap gap-2 justify-center"
+                  class="col-span-6 col-start-7 flex flex-wrap justify-center gap-2"
                 >
                   <DaysInRange
                     range={_gauge.ranges[index]}
@@ -662,7 +662,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {#if showScrollToTopButton}
     <button
       transition:fade
-      class="btn px-4 bottom-[4rem] absolute -translate-x-1/2 left-1/2 w-fit py-2 m-2 z-20 shadow-sm preset-filled-surface-500 lg:hidden transition-all inline-flex justify-center items-center right-0"
+      class="btn preset-filled-surface-500 absolute right-0 bottom-[4rem] left-1/2 z-20 m-2 inline-flex w-fit -translate-x-1/2 items-center justify-center px-4 py-2 shadow-sm transition-all lg:hidden"
       onclick={() =>
         setupContainer.scrollIntoView({
           behavior: 'smooth',
@@ -674,7 +674,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <ChevronUpIcon />
     </button>
   {/if}
-  <div class="pb-2 pt-2 max-sm:p-4">
+  <div class="pt-2 pb-2 max-sm:p-4">
     <SaveAndCloseButtons onSave={_onSave} onClose={modal.close} />
   </div>
 </StickyPart>
