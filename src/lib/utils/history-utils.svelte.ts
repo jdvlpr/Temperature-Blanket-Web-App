@@ -18,8 +18,8 @@ import { ICONS } from '$lib/constants';
 import {
   allGaugesAttributes,
   gauges,
-  locations,
   localState,
+  locations,
   previews,
   project,
   weather,

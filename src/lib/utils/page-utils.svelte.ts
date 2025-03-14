@@ -17,9 +17,9 @@ import { page } from '$app/state';
 import KeyboardShortcuts from '$lib/components/modals/KeyboardShortcuts.svelte';
 import Menu from '$lib/components/modals/Menu.svelte';
 import {
+  localState,
   modal,
   pageSections,
-  localState,
   project,
   toast,
   weather,

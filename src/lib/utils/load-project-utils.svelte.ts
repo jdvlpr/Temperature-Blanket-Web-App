@@ -22,8 +22,8 @@ import {
 import {
   allGaugesAttributes,
   gauges,
-  locations,
   localState,
+  locations,
   previews,
   project,
   weather,

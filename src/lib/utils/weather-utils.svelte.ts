@@ -16,8 +16,8 @@
 import { API_SERVICES } from '$lib/constants';
 import {
   allGaugesAttributes,
-  locations,
   localState,
+  locations,
   signal,
   weather,
 } from '$lib/state';

@@ -15,8 +15,7 @@
 
 import { browser } from '$app/environment';
 import { consentToMSClarityCookies, localState, toast } from '$lib/state';
-import type { ToastContext } from '@skeletonlabs/skeleton-svelte';
-import { getContext } from 'svelte';
+
 export const privacy = {
   get_cookie: function (name) {
     return document.cookie.split(';').some((c) => {
