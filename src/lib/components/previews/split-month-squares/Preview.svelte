@@ -19,6 +19,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { getColorInfo, showPreviewImageWeatherDetails } from '$lib/utils';
   import { splitMonthSquaresPreview } from './state.svelte';
 
+  let width = $state(splitMonthSquaresPreview.width);
+  let height = $state(splitMonthSquaresPreview.height);
+
   function getPoints({ x, y, roundWidth, roundHeight }) {
     const right = `${x},${y + roundHeight} ${x + roundWidth},${y + roundHeight} ${x + roundWidth},${y}`;
     const left = `${x},${y + roundHeight + splitMonthSquaresPreview.STITCH_SIZE / 2} ${x},${y} ${x + roundWidth + splitMonthSquaresPreview.STITCH_SIZE / 2},${y}`;
