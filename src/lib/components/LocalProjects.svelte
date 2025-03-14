@@ -29,10 +29,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 {#key projects}
   {#if projects?.length}
-    <div class="my-2 flex flex-col justify-center items-start w-full">
+    <div class="mb-2 flex w-full flex-col items-start justify-center">
       <h2 class="mt-8 text-xl font-bold">Saved Projects</h2>
-      <p class="text-sm mb-2">Stored in this browser</p>
-      <div class="flex flex-col items-start justify-center gap-2 w-full">
+      <p class="mb-2 text-sm">Stored in this browser</p>
+      <div class="flex w-full flex-col items-start justify-center gap-2">
         {#each projects as project}
           {@const { href } = project}
           <ProjectDetails
