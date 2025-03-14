@@ -9,6 +9,7 @@ export const GET: RequestHandler = async ({ params, fetch }) => {
 
   let fetchURL = API_SERVICES.geonames.baseURL;
   fetchURL += '?q=' + encodeURIComponent(text);
+  fetchURL += '&name_startsWith=' + encodeURIComponent(text);
   // if ($windowLanguage) url += `&countryBias=${$windowLanguage}`;
   fetchURL += '&maxRows=10';
   fetchURL += '&fuzzy=0.8';
