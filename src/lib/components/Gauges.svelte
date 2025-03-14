@@ -14,7 +14,13 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import { allGaugesAttributes, gauges, modal, weather } from '$lib/state';
+  import {
+    allGaugesAttributes,
+    gauges,
+    localState,
+    modal,
+    weather,
+  } from '$lib/state';
   import { downloadPDF } from '$lib/utils';
   import { CirclePlusIcon, DownloadIcon, Trash2Icon } from '@lucide/svelte';
   import { onMount } from 'svelte';
