@@ -122,7 +122,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       // if (locationsState.locations.find((item) => item.id === value)?.saved) page.url.searchParams.set("id", value);
       // page.url.searchParams.set("id", value);
       // page.url.searchParams.set("h", weatherState.hour === "12" ? "0" : "1");
-      // page.url.searchParams.set("u", project.units === "metric" ? "m" : "i");
+      // page.url.searchParams.set("u", localState.units === "metric" ? "m" : "i");
       // window.history.replaceState({ path: page.url.href }, "", page.url.href);
     } else {
       // window.history.replaceState({ path: page.url.href }, "", page.url.href);

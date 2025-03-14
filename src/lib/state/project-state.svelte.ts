@@ -15,7 +15,6 @@
 
 import { browser, version } from '$app/environment';
 import { gauges, localState, locations, previews, weather } from '$lib/state';
-import type { Unit } from '$lib/types';
 
 export class HistoryStateClass {
   stack: string[] = $state([]);
@@ -100,7 +99,7 @@ class ProjectClass {
     else if (weather.useSecondarySources) hash += '1';
     if (weather.grouping === 'week')
       hash += `&w=${weather.monthGroupingStartDay}`; // Set Weather Grouping to Weeks with the starting Day of Week
-    hash += this.units === 'metric' ? '&u=m' : '&u=i'; // Units
+    hash += localState.value.units === 'metric' ? '&u=m' : '&u=i'; // Units
 
     let href = '';
     const base = browser ? window.location.origin + '/' : '';
@@ -122,11 +121,6 @@ class ProjectClass {
     href: '',
     title: '',
   });
-
-  // *****************
-  // Settings
-  // *****************
-  units: Unit = $state('imperial');
 
   // *****************
   // Methods

@@ -29,7 +29,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     if (rowsPreview.settings.lengthTarget === 'custom')
       return rowsPreview.settings.stitchesPerDay;
     let value = Math.abs(
-      weather.data[dayIndex][rowsPreview.settings.lengthTarget][project.units],
+      weather.data[dayIndex][rowsPreview.settings.lengthTarget][
+        localState.value.units
+      ],
     );
     if (isNaN(value)) value = rowsPreview.settings.stitchesPerDay;
     if (value === 0) value = 1;
