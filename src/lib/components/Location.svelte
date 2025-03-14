@@ -17,7 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { browser } from '$app/environment';
   import Tooltip from '$lib/components/Tooltip.svelte';
   import { MONTHS } from '$lib/constants';
-  import { locations, project, weather } from '$lib/state';
+  import { locations, modal, project, weather } from '$lib/state';
   import type { LocationType } from '$lib/types/location-types';
   import {
     dateToISO8601String,
@@ -27,6 +27,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '$lib/utils';
   import {
     EllipsisVerticalIcon,
+    GlobeIcon,
+    LocateIcon,
+    MapPinIcon,
     SearchIcon,
     Trash2Icon,
     TriangleAlertIcon,
@@ -132,13 +135,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
           if (!response.ok) throw new Error(data.message);
 
           const suggestions = data.geonames.map((item) => {
-            let labelText;
+            let labelText = item.name;
 
-            if (item.adminName1 === item.countryName) {
-              labelText = `${item.name}, ${item.adminName1}`;
-            } else {
-              labelText = `${item.name}, ${item.adminName1}, ${item.countryName}`;
+            if (
+              item.adminName1 !== '' &&
+              item?.countryName &&
+              item.adminName1 === item.countryName
+            ) {
+              labelText += `, ${item.adminName1}`;
+            } else if (item.adminName1 !== '' && item?.countryName) {
+              labelText += `, ${item.adminName1}, ${item.countryName}`;
             }
+
+            let icon = '';
+
+            if (item.countryCode)
+              icon = `<span class="fflag fflag-${item.countryCode.toUpperCase()}"></span>`;
 
             return {
               // adminName: item.adminName1,
@@ -147,7 +159,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               label: labelText,
               lng: item.lng,
               lat: item.lat,
-              result: `<span class="fflag fflag-${item.countryCode.toUpperCase()}"></span> ${labelText}`,
+              result: `${icon} ${labelText}`,
               // name: item.name,
               // value: result
             };
@@ -387,6 +399,29 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </button>
         {/if}
       </div>
+      {#if location.id && location.lat && location.lng}
+        <button
+          class="btn hover:preset-tonal mt-1 w-fit text-xs opacity-60 hover:opacity-100"
+          onclick={() => {
+            modal.trigger({
+              type: 'info',
+              title: location.label,
+              body: `
+              <div class="flex flex-col gap-4">
+                <a href="https://www.geonames.org/${location.id}" target="_blank" class="link">Geonames Info <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-external-link size-5 inline relative -top-[3px]"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg></a>
+                  <div class="flex flex-col gap-2">
+                    <p class="text-sm">Latitude, Longitude:</p>
+                    <p class="code select-all w-fit text-lg"> ${location.lat}, ${location.lng}</p>
+                  </div>
+              </div>
+              `,
+            });
+          }}
+        >
+          <GlobeIcon class="inline size-3" />
+          Details
+        </button>
+      {/if}
     </div>
 
     <div

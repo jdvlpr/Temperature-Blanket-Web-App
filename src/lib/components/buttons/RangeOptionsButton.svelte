@@ -26,7 +26,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <Tooltip
-  classNames="btn preset-filled max-sm:w-full"
+  classNames="btn preset-filled"
   title="Configure Ranges"
   onclick={() =>
     modal.trigger({

@@ -34,6 +34,29 @@
         </div>
       {/if}
       <modal.contentComponent.ref {...modal.contentComponent.props} />
+    {:else if modal.type === 'info'}
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-label={modal.title ?? ''}
+        class="flex flex-col gap-4 p-4"
+      >
+        {#if modal.options.showCloseButton}
+          <div class="sticky top-2">
+            <CloseButton
+              onClose={() => {
+                modal.close();
+              }}
+            />
+          </div>
+        {/if}
+        {#if modal.title}
+          <h4 class="h4">{modal.title}</h4>
+        {/if}
+        {#if modal.body}
+          <p>{@html modal.body}</p>
+        {/if}
+      </div>
     {:else if modal.type === 'confirm'}
       <div
         role="dialog"
