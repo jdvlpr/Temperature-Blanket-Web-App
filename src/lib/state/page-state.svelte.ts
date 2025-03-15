@@ -28,7 +28,7 @@ class ModalClass {
 
   opened = $state(false);
 
-  type = $state<'component' | 'confirm' | 'info' | null>(null);
+  type = $state<'component' | 'confirm' | null>(null);
 
   title = $state<string | null>('');
 
@@ -58,7 +58,7 @@ class ModalClass {
     body,
     response,
   }: {
-    type: 'component' | 'confirm' | 'info';
+    type: 'component' | 'confirm';
     title?: string | null;
     body?: string | null;
     response?: any;
@@ -86,9 +86,6 @@ class ModalClass {
       };
 
       this.options = { ...this.#defaultOptions, ...options };
-    } else if (type === 'info') {
-      this.title = title || null;
-      this.body = body || null;
     } else if (type === 'confirm') {
       this.title = title || null;
       this.body = body || null;
@@ -133,7 +130,7 @@ export interface ToastSettings {
   /** Provide arbitrary CSS classes to style the toast. */
   classes?: string;
   /** Category of the toast. */
-  category?: 'success' | 'error' | 'info' | null;
+  category?: 'success' | 'error' | null;
   /** Callback function that fires on trigger and close. */
   callback?: (response: { id: string; status: 'queued' | 'closed' }) => void;
 }

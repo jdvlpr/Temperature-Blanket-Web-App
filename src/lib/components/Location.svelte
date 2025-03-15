@@ -38,6 +38,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import autocomplete from 'autocompleter';
   import { onMount } from 'svelte';
   import '../../css/flag-icons.css';
+  import LocationDetails from './modals/LocationDetails.svelte';
 
   interface Props {
     location: LocationType;
@@ -404,17 +405,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
           class="btn hover:preset-tonal mt-1 w-fit text-xs opacity-60 hover:opacity-100"
           onclick={() => {
             modal.trigger({
-              type: 'info',
-              title: location.label,
-              body: `
-              <div class="flex flex-col gap-4">
-                <a href="https://www.geonames.org/${location.id}" target="_blank" class="link">Geonames Info <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-external-link size-5 inline relative -top-[3px]"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg></a>
-                  <div class="flex flex-col gap-2">
-                    <p class="text-sm">Latitude, Longitude:</p>
-                    <p class="code select-all w-fit text-lg"> ${location.lat}, ${location.lng}</p>
-                  </div>
-              </div>
-              `,
+              type: 'component',
+              component: {
+                ref: LocationDetails,
+                props: { location },
+              },
             });
           }}
         >

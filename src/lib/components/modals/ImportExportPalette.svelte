@@ -221,7 +221,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </div>
 
         <button
-          class="btn hover:preset-tonal gap-1"
+          class="btn hover:preset-tonal"
           onclick={() => {
             try {
               window.navigator.clipboard.writeText(colorHexes);
@@ -260,7 +260,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </div>
 
         <button
-          class="btn hover:preset-tonal gap-1"
+          class="btn hover:preset-tonal"
           onclick={() => {
             try {
               window.navigator.clipboard.writeText(paletteCode);
@@ -302,7 +302,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <ToggleSwitch bind:checked={colorNamesAsArray} label="Array" />
         </div>
         <button
-          class="btn hover:preset-tonal gap-1"
+          class="btn hover:preset-tonal"
           onclick={() => {
             try {
               window.navigator.clipboard.writeText(colorNames);
