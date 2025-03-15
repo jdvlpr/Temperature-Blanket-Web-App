@@ -236,7 +236,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       title="Help"
     >
       <BadgeHelpIcon />
-      <span class="hidden sm:inline-block">Info</span>
+      <span class="hidden sm:inline-block">About</span>
       {#snippet tooltip()}
         <div
           class="flex flex-col gap-4 p-2"
