@@ -40,7 +40,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { fade } from 'svelte/transition';
   import SelectYarnWeight from '../SelectYarnWeight.svelte';
 
-  let { updateGauge, numberOfColors, parent } = $props();
+  let { updateGauge, numberOfColors } = $props();
 
   let debounceTimer;
   const debounce = (callback, time) => {
@@ -178,7 +178,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       cursorColor = color;
       coords = {
         x: e.pageX - rect.left,
-        y: e.pageY - rect.top,
+        y: e.pageY - rect.top - window.scrollY,
       };
     }, 0);
   }
@@ -206,7 +206,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       cursorColor = color;
       coords = {
         x: e.touches[0].pageX - rect.left,
-        y: e.touches[0].pageY - rect.top,
+        y: e.touches[0].pageY - rect.top - window.scrollY,
       };
     }, 0);
   }
@@ -369,10 +369,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   {#if !loading}
     <div
-      class="grid grid-cols-12 gap-4 justify-center items-end w-full my-2 no-scroll"
+      class="no-scroll my-2 grid w-full grid-cols-12 items-end justify-center gap-4"
     >
       <div
-        class="w-full col-span-full md:col-span-9 order-1"
+        class="order-1 col-span-full w-full md:col-span-9"
         class:md:col-span-full={!!selectedBrandId && !!selectedYarnId}
       >
         <SelectYarn
@@ -385,14 +385,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </div>
 
       {#if selectedBrandId && selectedYarnId}
-        <div class="w-full col-span-full order-2 md:order-3">
+        <div class="order-2 col-span-full w-full md:order-3">
           <DefaultYarnSet {selectedBrandId} {selectedYarnId} />
         </div>
       {/if}
 
       {#key selectedBrandId}
         <div
-          class="w-full col-span-full md:col-span-3 order-3 md:order-2"
+          class="order-3 col-span-full w-full md:order-2 md:col-span-3"
           class:hidden={!!selectedBrandId && !!selectedYarnId}
         >
           <SelectYarnWeight
@@ -405,19 +405,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
   {/if}
 
-  <p class="text-sm my-2" class:hidden={!ctx || loading}>
+  <p class="my-2 text-sm" class:hidden={!ctx || loading}>
     Touch-and-drag or click on the image to choose colors.
   </p>
 
   <div
-    class="relative mx-12 sm:mx-16 lg:mx-44 mb-2 flex flex-col items-center"
+    class="relative mx-12 mb-2 flex flex-col items-center sm:mx-16 lg:mx-44"
     class:hidden={!ctx}
   >
     {#if showCursor === false}
       <div bind:this={hoverDiv} in:fade>
         <p
           bind:this={hoverName}
-          class="z-10 shadow-lg rounded-container min-w-[140px] max-w-[180px] absolute pointer-events-none box-border -translate-x-1/2 -translate-y-1/2 p-2 flex flex-col justify-center items-center"
+          class="rounded-container pointer-events-none absolute z-10 box-border flex max-w-[180px] min-w-[140px] -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center p-2 shadow-lg"
           style="left:{coords.x}px;top:{coords.y -
             70}px;background:{cursorColor.hex};color:{getTextColor(
             cursorColor.hex,
@@ -438,7 +438,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </p>
         <div
           bind:this={colorHoverDiv}
-          class="shadow-lg rounded-container w-10 h-10 absolute pointer-events-none box-border -translate-x-1/2 -translate-y-1/2 transition-transform"
+          class="rounded-container pointer-events-none absolute box-border h-10 w-10 -translate-x-1/2 -translate-y-1/2 shadow-lg transition-transform"
           style="left:{coords.x}px;top:{coords.y}px;background:{cursorColor.hex};border:2px solid {getTextColor(
             cursorColor.hex,
           )}"
@@ -447,7 +447,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {/if}
     <canvas
       bind:this={canvas}
-      class="w-full h-full cursor-crosshair select-none"
+      class="h-full w-full cursor-crosshair select-none"
       onmousedown={(e) => {
         e.preventDefault();
         addColor(e);
@@ -457,7 +457,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         showColor(e);
       }}
       ontouchmove={(e) => {
-        e.preventDefault();
+        // e.preventDefault();
         showColorTouch(e);
       }}
       onmouseenter={(e) => {
@@ -490,7 +490,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <p class="my-2">Loading Image...</p>
     </div>
   {:else}
-    <div class="mt-4 mb-2 flex flex-wrap gap-2 justify-center items-center">
+    <div class="mt-4 mb-2 flex flex-wrap items-center justify-center gap-2">
       {#key numberOfColorsKey}
         <SelectNumberOfColors
           {numberOfColors}
@@ -539,7 +539,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {/key}
 
       {#if warningMessage}
-        <div class="flex gap-2 text-warning-900-100">
+        <div class="text-warning-900-100 flex gap-2">
           <p>{warningMessage}</p>
           <button
             class="btn hover:preset-tonal"
@@ -582,7 +582,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
   {/if}
 
-  <p class="text-sm my-2 text-center">
+  <p class="my-2 text-center text-sm">
     Random images from <a
       href="https://unsplash.com"
       class="link"
