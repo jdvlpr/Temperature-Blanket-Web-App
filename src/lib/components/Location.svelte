@@ -402,7 +402,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </div>
       {#if location.id && location.lat && location.lng}
         <button
-          class="btn hover:preset-tonal mt-1 w-fit text-xs opacity-60 hover:opacity-100"
+          class="btn hover:preset-tonal w-fit text-xs opacity-50 hover:opacity-100"
           onclick={() => {
             modal.trigger({
               type: 'component',
@@ -413,8 +413,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
             });
           }}
         >
-          <GlobeIcon class="inline size-3" />
-          Details
+          <GlobeIcon class="inline size-4" />
+          {location.lat}, {location.lng}
         </button>
       {/if}
     </div>
