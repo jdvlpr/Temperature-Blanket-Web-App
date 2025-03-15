@@ -78,6 +78,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let warningMessage = $state<String | null>(null);
 
+  let containerElement = $state(null);
+
   onMount(async () => {
     const ct = await import(
       '../../../../node_modules/getimagepalette/dist/color-thief.mjs'
@@ -343,7 +345,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 </script>
 
-<div class="p-2">
+<div class="p-2" bind:this={containerElement}>
   <div class="flex justify-center">
     <input
       type="file"
@@ -457,7 +459,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
         showColor(e);
       }}
       ontouchmove={(e) => {
-        // e.preventDefault();
         showColorTouch(e);
       }}
       onmouseenter={(e) => {
@@ -466,6 +467,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         showCursor = false;
       }}
       ontouchstart={(e) => {
+        containerElement.parentElement.classList.add('touch-none');
         showColorTouch(e);
         showCursor = false;
       }}
@@ -474,6 +476,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
         showCursor = true;
       }}
       ontouchend={(e) => {
+        containerElement.parentElement.classList.remove('touch-none');
+
         addColorTouch(e);
         showCursor = true;
       }}
