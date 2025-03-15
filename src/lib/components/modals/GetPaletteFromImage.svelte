@@ -467,7 +467,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         showCursor = false;
       }}
       ontouchstart={(e) => {
-        containerElement.parentElement.classList.add('touch-none');
+        containerElement.parentElement.style.touchAction = 'none';
         showColorTouch(e);
         showCursor = false;
       }}
@@ -476,8 +476,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         showCursor = true;
       }}
       ontouchend={(e) => {
-        containerElement.parentElement.classList.remove('touch-none');
-
+        containerElement.parentElement.style.touchAction = '';
         addColorTouch(e);
         showCursor = true;
       }}
