@@ -41,7 +41,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     setLocalStorageProject,
   } from '$lib/utils';
   import {
-    CircleCheckIcon,
+    CircleCheckBigIcon,
     ClipboardCopyIcon,
     DownloadIcon,
     KeyboardIcon,
@@ -434,7 +434,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <h2 class="my-2 text-lg font-bold">Save</h2>
       {#if browser && typeof window.localStorage !== 'undefined' && weather.data.length}
         <p class="my-2 inline-flex w-full items-center justify-start gap-2">
-          <CircleCheckIcon style="color:var(--color-success-500)" />
+          <CircleCheckBigIcon style="size-4" />
           Project and {#if weather.isUserEdited}custom weather{:else}weather{/if}
           data saved to this browser
         </p>
