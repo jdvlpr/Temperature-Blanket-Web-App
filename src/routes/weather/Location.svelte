@@ -81,35 +81,75 @@ If not, see <https://www.gnu.org/licenses/>. -->
           if (!response.ok) throw new Error(data.message);
 
           const suggestions = data.geonames.map((item) => {
-            let labelText;
-            if (item.adminName1 === item.countryName) {
-              labelText = `${item.name}, ${item.adminName1}`;
-            } else {
-              labelText = `${item.name}, ${item.adminName1}, ${item.countryName}`;
+            let labelText = item.name;
+
+            if (
+              item.adminName1 !== '' &&
+              item?.countryName &&
+              item.adminName1 === item.countryName
+            ) {
+              labelText += `, ${item.adminName1}`;
+            } else if (item.adminName1 !== '' && item?.countryName) {
+              labelText += `, ${item.adminName1}, ${item.countryName}`;
             }
+
+            let icon = '';
+
+            if (item.countryCode)
+              icon = `<span class="fflag fflag-${item.countryCode.toUpperCase()}"></span>`;
+
+            function formatFeatureName(fclName) {
+              let _featureName = fclName;
+              // remove '...'
+              if (_featureName.includes('...')) {
+                _featureName = _featureName.replace(/\.../g, '');
+              }
+
+              // remove spaces
+              _featureName = _featureName.trim();
+
+              // remove last ','
+              if (_featureName.slice(-1) === ',') {
+                _featureName = _featureName.slice(0, -1);
+              }
+
+              // split and join
+              _featureName = _featureName
+                .split(',')
+                .map((n) => n.trim())
+                .join(', ');
+              return _featureName;
+            }
+
+            const featureName = formatFeatureName(item.fclName);
+
             return {
               // adminName: item.adminName1,
               // country: item.countryName,
-              id: +item.geonameId,
+              id: item.geonameId,
               label: labelText,
               lng: item.lng,
               lat: item.lat,
-              result: `<span class="fflag fflag-${item.countryCode.toUpperCase()}"></span> ${labelText}`,
+              result: `${icon} ${labelText}`,
+              fclName: featureName,
+              population: item.population,
               // name: item.name,
               // value: result
             };
           });
 
           update(suggestions);
-        } catch (e) {
-          displayGeoNamesErrorMessage(e);
+        } catch (error) {
+          displayGeoNamesErrorMessage(error);
         }
 
         searching = false;
       },
       render: function (item) {
         const div = document.createElement('div');
-        div.innerHTML = `${item.result}`;
+        div.innerHTML = `
+        <p>${item.result}</p>
+        <p class="text-xs opacity-60">${item.fclName}</p>`;
         return div;
       },
       onSelect: async function (item) {
@@ -237,8 +277,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   };
 </script>
 
-<div class="py-2 flex flex-wrap items-end gap-y-2 gap-x-4 justify-center">
-  <div class="flex flex-col w-full text-left gap-1">
+<div class="flex flex-wrap items-end justify-center gap-x-4 gap-y-2 py-2">
+  <div class="flex w-full flex-col gap-1 text-left">
     <p>
       {#if hasError}
         <span class="text-error-900-100">Choose a result</span>
@@ -258,7 +298,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <input
         type="text"
         id="location-0"
-        class="truncate ig-input"
+        class="ig-input truncate"
         autocomplete="off"
         placeholder={project.status.loading ? 'Loading...' : 'Enter a place'}
         title="Enter a city, region, or landmark"
@@ -271,7 +311,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <div class="flex items-center justify-center">
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            class="size-6 mx-2 animate-spin"
+            class="mx-2 size-6 animate-spin"
             viewBox="0 0 24 24"
           >
             <g fill="currentColor">
@@ -310,7 +350,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   {#if browser && navigator.geolocation}
     <button
-      class="btn hover:preset-tonal gap-1 flex items-center"
+      class="btn hover:preset-tonal flex items-center gap-1"
       title="Use My Location"
       onclick={async () => {
         weatherLocationState.inputLocation.value = 'Loading...';
