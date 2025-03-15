@@ -176,21 +176,14 @@ class GaugesState {
   // I think this is necessary because a simple $state.snapshot(gauge) does not include deeply reactive objects, only the top level ones.
   // So this "freezes" what I need from the whole gauge
   getSnapshot(id) {
-    const rangeOptions = $state.snapshot(
-      this.allCreated.find((gauge) => gauge.id === id)?.rangeOptions,
-    );
+    const rangeOptions = this.allCreated.find(
+      (gauge) => gauge.id === id,
+    )?.rangeOptions;
+    const ranges = this.allCreated.find((gauge) => gauge.id === id)?.ranges;
 
-    const ranges = $state.snapshot(
-      this.allCreated.find((gauge) => gauge.id === id)?.ranges,
-    );
+    const colors = this.allCreated.find((gauge) => gauge.id === id)?.colors;
 
-    const colors = $state.snapshot(
-      this.allCreated.find((gauge) => gauge.id === id)?.colors,
-    );
-
-    const gauge = $state.snapshot(
-      this.allCreated.find((gauge) => gauge.id === id),
-    );
+    const gauge = this.allCreated.find((gauge) => gauge.id === id);
 
     return { ...gauge, rangeOptions, ranges, colors };
   }

@@ -130,13 +130,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     });
     return _sortableColors;
   }
-
-  // $effect(() => {
-  //   sortableColors = colors.map((color, i) => {
-  //     color.id = i;
-  //     return color;
-  //   });
-  // });
 </script>
 
 {#if hasAnyAffiliateURLs}
