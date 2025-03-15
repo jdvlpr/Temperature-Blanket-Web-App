@@ -10,10 +10,13 @@
 </script>
 
 <div class="mt-8 mb-2 flex flex-col gap-4 p-2 lg:p-4">
-  <h4 class="h4">{location.label}</h4>
+  <div class="flex flex-col">
+    <h4 class="h4">{location.label}</h4>
+    <p class="text-sm">{location.fclName}</p>
+  </div>
   <div class="flex w-full flex-col gap-4">
     <div class="items-s flex flex-col gap-2">
-      <p class="text-sm">Latitude, Longitude:</p>
+      <p class="">Latitude, Longitude:</p>
       <p class="code w-fit !text-base select-all">
         {location.lat}, {location.lng}
       </p>

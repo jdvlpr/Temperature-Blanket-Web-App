@@ -153,6 +153,31 @@ If not, see <https://www.gnu.org/licenses/>. -->
             if (item.countryCode)
               icon = `<span class="fflag fflag-${item.countryCode.toUpperCase()}"></span>`;
 
+            function formatFeatureName(fclName) {
+              let _featureName = fclName;
+              // remove '...'
+              if (_featureName.includes('...')) {
+                _featureName = _featureName.replace(/\.../g, '');
+              }
+
+              // remove spaces
+              _featureName = _featureName.trim();
+
+              // remove last ','
+              if (_featureName.slice(-1) === ',') {
+                _featureName = _featureName.slice(0, -1);
+              }
+
+              // split and join
+              _featureName = _featureName
+                .split(',')
+                .map((n) => n.trim())
+                .join(', ');
+              return _featureName;
+            }
+
+            const featureName = formatFeatureName(item.fclName);
+
             return {
               // adminName: item.adminName1,
               // country: item.countryName,
@@ -161,6 +186,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
               lng: item.lng,
               lat: item.lat,
               result: `${icon} ${labelText}`,
+              fclName: featureName,
+              population: item.population,
               // name: item.name,
               // value: result
             };
@@ -174,7 +201,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
       },
       render: function (item) {
         const div = document.createElement('div');
-        div.innerHTML = `${item.result}`;
+        div.innerHTML = `
+        <p>${item.result}</p>
+        <p class="text-xs opacity-60">${item.fclName}</p>`;
         return div;
       },
       onSelect: function (item) {
@@ -183,7 +212,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
         location.id = item?.id;
         location.lat = item?.lat;
         location.lng = item?.lng;
+        location.lng = item?.lng;
         location.elevation = null;
+        location.fclName = item?.fclName;
+        location.population = item?.population;
       },
     });
   }); // End of onMount

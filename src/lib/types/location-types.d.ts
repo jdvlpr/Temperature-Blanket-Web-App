@@ -31,6 +31,9 @@ export interface LocationType {
   lat?: string;
   lng?: string;
   elevation?: number;
+  /** fclName codes from https://www.geonames.org/export/codes.html */
+  fclName?: string;
+  population?: number;
   stations?: null | any[]; // TODO: Change 'any[]' to a more specific type if possible. Stations are set when using Meteostat for a weather source.
   source?: WeatherSource;
   wasLoadedFromSavedProject?: boolean;
