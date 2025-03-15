@@ -13,10 +13,14 @@
     <h4 class="h4">{location.label}</h4>
   </div>
   <div class="flex w-full flex-col gap-4">
-    <p class="">
-      <MapPinnedIcon class="relative -top-[1px] mr-1 inline size-5" /> Class:
-      <span class="badge bg-surface-100-900 text-base">{location.fclName}</span>
-    </p>
+    {#if location.fclName}
+      <p>
+        <MapPinnedIcon class="relative -top-[1px] mr-1 inline size-5" /> Class:
+        <span class="badge bg-surface-100-900 text-base"
+          >{location.fclName}</span
+        >
+      </p>
+    {/if}
     {#if location.population}
       <p>
         <PersonStandingIcon class="relative -top-[1px] mr-1 inline size-5" /> Population:
