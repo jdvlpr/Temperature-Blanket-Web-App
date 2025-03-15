@@ -81,7 +81,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             modal.drawer.leftNavigation = e.open;
           }}
           open={modal.drawer.leftNavigation}
-          triggerBase="{pageName ? 'btn' : 'btn-icon'} hover:preset-tonal my-2"
+          triggerBase="btn hover:preset-tonal my-2"
           triggerAriaLabel="Open menu"
           contentBase="bg-surface-50 dark:bg-surface-950 p-4 space-y-4 shadow-xl w-fit h-screen overflow-auto"
           positionerJustify="justify-start"
@@ -93,11 +93,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {#snippet trigger()}
             <MenuIcon />
 
-            {#if pageName}
-              <span class="max-[355px]:hidden">
+            <span class="max-[355px]:hidden">
+              {#if pageName}
                 {pageName}
-              </span>
-            {/if}{/snippet}
+              {:else}
+                Menu
+              {/if}
+            </span>
+          {/snippet}
           {#snippet content()}
             <div class="mb-20 flex min-w-[265px] flex-col gap-2">
               <AppLogo />
