@@ -1,7 +1,6 @@
 <script lang="ts">
-  import { toast } from '$lib/state';
   import type { LocationType } from '$lib/types';
-  import { ClipboardCopyIcon } from '@lucide/svelte';
+  import { GlobeIcon, MapPinnedIcon, PersonStandingIcon } from '@lucide/svelte';
 
   interface Props {
     location: LocationType;
@@ -12,41 +11,33 @@
 <div class="mt-8 mb-2 flex flex-col gap-4 p-2 lg:p-4">
   <div class="flex flex-col">
     <h4 class="h4">{location.label}</h4>
-    <p class="text-sm">{location.fclName}</p>
   </div>
   <div class="flex w-full flex-col gap-4">
-    <div class="items-s flex flex-col gap-2">
-      <p class="">Latitude, Longitude:</p>
-      <p class="code w-fit !text-base select-all">
-        {location.lat}, {location.lng}
+    <p class="">
+      <MapPinnedIcon class="relative -top-[1px] mr-1 inline size-5" /> Class:
+      <span class="badge bg-surface-100-900 text-base">{location.fclName}</span>
+    </p>
+    {#if location.population}
+      <p>
+        <PersonStandingIcon class="relative -top-[1px] mr-1 inline size-5" /> Population:
+        <span class="badge bg-surface-100-900 text-base"
+          >{location.population}</span
+        >
       </p>
-      <button
-        class="btn hover:preset-tonal w-fit"
-        onclick={() => {
-          const latlng = `${location.lat}, ${location.lng}`;
-          try {
-            window.navigator.clipboard.writeText(latlng);
-            toast.trigger({
-              message: 'Copied',
-              category: 'success',
-            });
-          } catch {
-            toast.trigger({
-              message: 'Unable to copy to clipboard',
-              category: 'error',
-            });
-          }
-        }}
-      >
-        <ClipboardCopyIcon />
-        Copy Lat, Lng
-      </button>
+    {/if}
+    <div class="items-s flex flex-col gap-2">
+      <p class="">
+        <GlobeIcon class="relative -top-[1px] mr-1 inline size-5" /> Latitude, Longitude:
+        <span class=" badge bg-surface-100-900 text-base select-all">
+          {location.lat}, {location.lng}
+        </span>
+      </p>
     </div>
 
     <a
       href="https://www.geonames.org/{location.id}"
       target="_blank"
-      class="link"
+      class="link btn hover:preset-tonal w-fit"
       >More info from GeoNames <svg
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 24 24"

@@ -27,9 +27,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '$lib/utils';
   import {
     EllipsisVerticalIcon,
-    GlobeIcon,
-    LocateIcon,
-    MapPinIcon,
+    MapIcon,
     SearchIcon,
     Trash2Icon,
     TriangleAlertIcon,
@@ -445,8 +443,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
             });
           }}
         >
-          <GlobeIcon class="inline size-4" />
-          {location.lat}, {location.lng}
+          <MapIcon class="inline size-4" />
+          Details
         </button>
       {/if}
     </div>
