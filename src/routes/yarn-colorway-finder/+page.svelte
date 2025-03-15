@@ -121,14 +121,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
     const scrollObserver = new IntersectionObserver(
       (entries, observer) => {
         entries.forEach((entry) => {
-          if (entry.intersectionRatio === 0) {
+          if (entry.intersectionRatio != 1) {
             showScrollToTopButton = true;
           } else {
             showScrollToTopButton = false;
           }
         });
       },
-      { threshold: 0 },
+      { threshold: 1 },
     );
     scrollObserver.observe(filtersContainer);
     isLoaded = true;
@@ -392,17 +392,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
 </svelte:head>
-
-{#if showScrollToTopButton}
-  <ToTopButton
-    bottom="10px"
-    onClick={() =>
-      filtersContainer.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start',
-      })}
-  />
-{/if}
 
 <AppShell pageName="Yarn Colorway Finder">
   {#snippet stickyHeader()}
@@ -680,6 +669,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         }}>{name}</button
                       >
 
+                      {#if percentMatch}
+                        <p class="text-xs">
+                          {percentMatch}% Match
+                        </p>
+                      {/if}
+
                       <button
                         class="text-xs select-all"
                         onclick={() => {
@@ -690,12 +685,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
                           });
                         }}>{hex}</button
                       >
-
-                      {#if percentMatch}
-                        <p class="text-xs">
-                          {percentMatch}% Match
-                        </p>
-                      {/if}
                     </div>
                   </div>
                 {/each}
@@ -848,3 +837,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </Footer>
   {/snippet}
 </AppShell>
+{#if showScrollToTopButton}
+  <ToTopButton
+    bottom="10px"
+    onClick={() =>
+      filtersContainer.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      })}
+  />
+{/if}
