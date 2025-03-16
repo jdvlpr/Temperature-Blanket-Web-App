@@ -124,6 +124,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
         searching = true;
 
+        // remove whitespace
+        text = text.trim();
+
         try {
           const response = await fetch(
             `/api/location/search/${encodeURIComponent(text)}`,
@@ -171,6 +174,34 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 .split(',')
                 .map((n) => n.trim())
                 .join(', ');
+
+              if (_featureName.includes('city')) {
+                // 'city, village'
+                _featureName =
+                  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-building-2 size-4 inline -top-[2px] relative mr-1"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/></svg> ` +
+                  _featureName;
+              } else if (_featureName.includes('parks')) {
+                // 'parks, area'
+                _featureName =
+                  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-tree-pine size-4 inline -top-[2px] relative mr-1"><path d="m17 14 3 3.3a1 1 0 0 1-.7 1.7H4.7a1 1 0 0 1-.7-1.7L7 14h-.3a1 1 0 0 1-.7-1.7L9 9h-.2A1 1 0 0 1 8 7.3L12 3l4 4.3a1 1 0 0 1-.8 1.7H15l3 3.3a1 1 0 0 1-.7 1.7H17Z"/><path d="M12 22v-3"/></svg> ` +
+                  _featureName;
+              } else if (_featureName.includes('mountain')) {
+                // 'mountain, hill, rock'
+                _featureName =
+                  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-mountain size-4 inline -top-[2px] relative mr-1"><path d="m8 3 4 8 5-5 5 15H2L8 3z"/></svg> ` +
+                  _featureName;
+              } else if (_featureName.includes('spot')) {
+                // 'spot, building, farm'
+                _featureName =
+                  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map-pin-check-inside size-4 inline -top-[2px] relative mr-1"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><path d="m9 10 2 2 4-4"/></svg> ` +
+                  _featureName;
+              } else if (_featureName.includes('stream')) {
+                // 'stream, lake'
+                _featureName =
+                  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-waves size-4 inline -top-[2px] relative mr-1"><path d="M2 6c.6.5 1.2 1 2.5 1C7 7 7 5 9.5 5c2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/><path d="M2 12c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/><path d="M2 18c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/></svg> ` +
+                  _featureName;
+              }
+
               return _featureName;
             }
 
@@ -199,9 +230,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
       },
       render: function (item) {
         const div = document.createElement('div');
-        div.innerHTML = `
-        <p>${item.result}</p>
-        <p class="text-xs opacity-60">${item.fclName}</p>`;
+        div.innerHTML = `<p>${item.result}</p>`;
+        if (item.fclName)
+          div.innerHTML += `<p class="text-xs opacity-50 mt-1">${item.fclName}</p>`;
         return div;
       },
       onSelect: function (item) {

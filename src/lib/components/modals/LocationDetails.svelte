@@ -15,9 +15,10 @@
   <div class="flex w-full flex-col gap-4">
     {#if location.fclName}
       <p>
-        <MapPinnedIcon class="relative -top-[1px] mr-1 inline size-5" /> Class:
+        <MapPinnedIcon class="relative -top-[1px] mr-1 inline size-5" /> Location
+        Type:
         <span class="badge bg-surface-100-900 text-base"
-          >{location.fclName}</span
+          >{@html location.fclName}</span
         >
       </p>
     {/if}
