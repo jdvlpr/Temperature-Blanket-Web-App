@@ -467,7 +467,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
         showCursor = false;
       }}
       ontouchstart={(e) => {
-        containerElement.parentElement.style.touchAction = 'none';
+        e.preventDefault();
+        containerElement.parentElement.style.overflowY = 'hidden';
         showColorTouch(e);
         showCursor = false;
       }}
@@ -476,7 +477,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
         showCursor = true;
       }}
       ontouchend={(e) => {
-        containerElement.parentElement.style.touchAction = '';
+        e.preventDefault();
+        containerElement.parentElement.style.overflowY = '';
         addColorTouch(e);
         showCursor = true;
       }}
