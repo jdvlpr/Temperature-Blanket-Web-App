@@ -35,10 +35,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
     CircleCheckBigIcon,
     CircleCheckIcon,
     CirclePlusIcon,
+    CloudDownloadIcon,
+    DatabaseIcon,
     SquareCheckBigIcon,
     TriangleAlertIcon,
     WrenchIcon,
   } from '@lucide/svelte';
+  import WeatherSourceButton from './buttons/WeatherSourceButton.svelte';
 </script>
 
 <div class="mx-auto mt-2 max-w-(--breakpoint-md)">
@@ -166,22 +169,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {/if}
     </div>
 
-    <button
-      class="btn hover:preset-tonal text-left"
-      disabled={project.status.loading}
-      onclick={() => {
-        modal.trigger({
-          type: 'component',
-          component: { ref: ChooseWeatherSource },
-        });
-      }}
-    >
-      <WrenchIcon />
-      <span class="whitespace-pre-wrap"
-        >Weather Source: {weather.isUserEdited
-          ? 'Custom'
-          : weather.defaultSource}</span
-      >
-    </button>
+    <WeatherSourceButton />
   </div>
 {/if}

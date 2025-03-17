@@ -37,11 +37,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
     isDateWithinLastSevenDays,
     pluralize,
   } from '$lib/utils';
-  import { TriangleAlertIcon, WrenchIcon } from '@lucide/svelte';
+  import {
+    CloudDownloadIcon,
+    CloudLightningIcon,
+    DatabaseIcon,
+    TriangleAlertIcon,
+    WrenchIcon,
+  } from '@lucide/svelte';
   import { Accordion } from '@skeletonlabs/skeleton-svelte';
   import { onMount } from 'svelte';
   import UnitChanger from './UnitChanger.svelte';
   import WeatherGrouping from './WeatherGrouping.svelte';
+  import WeatherSourceButton from './buttons/WeatherSourceButton.svelte';
 
   let graph = $state();
   let defaultWeatherSourceCopy = $state();
@@ -207,22 +214,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </div>
     {/if}
 
-    <button
-      class="btn hover:preset-tonal w-fit"
-      onclick={async () => {
-        modal.trigger({
-          type: 'component',
-          component: { ref: ChooseWeatherSource },
-        });
-      }}
-    >
-      <WrenchIcon />
-      <span class="text-left whitespace-pre-wrap"
-        >Weather Source: {weather.isUserEdited
-          ? 'Custom'
-          : weather.defaultSource}</span
-      >
-    </button>
+    <WeatherSourceButton />
   </div>
 
   {#if wasDefaultWeatherSourceChanged}

@@ -164,7 +164,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </div>
 
 <div
-  class="rounded-containelocalStatehidden mt-2 mb-2 lg:mb-4 {localState.value
+  class="rounded-container mt-2 mb-2 overflow-hidden lg:mb-4 {localState.value
     .layout === 'grid'
     ? 'grid grid-cols-2 gap-1 md:grid-cols-3 xl:grid-cols-4'
     : 'flex flex-col'}"

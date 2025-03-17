@@ -34,6 +34,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import {
     CalculatorIcon,
     ChevronUpIcon,
+    CogIcon,
     Icon,
     InfoIcon,
     ListStartIcon,
@@ -669,7 +670,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           block: 'start',
         })}
     >
-      <Settings2Icon />
+      <CogIcon />
       Setup
       <ChevronUpIcon />
     </button>

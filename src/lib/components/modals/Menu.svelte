@@ -43,6 +43,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import {
     CircleCheckBigIcon,
     ClipboardCopyIcon,
+    CloudDownloadIcon,
+    DatabaseIcon,
     DownloadIcon,
     KeyboardIcon,
     SaveIcon,
@@ -51,6 +53,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '@lucide/svelte';
   import { onMount } from 'svelte';
   import WeatherGrouping from '../WeatherGrouping.svelte';
+  import WeatherSourceButton from '../buttons/WeatherSourceButton.svelte';
 
   interface Props {
     page?: string;
@@ -237,22 +240,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {/if}
         {/if}
 
-        <button
-          class="btn hover:preset-tonal w-fit"
-          onclick={async () => {
-            modal.trigger({
-              type: 'component',
-              component: { ref: ChooseWeatherSource },
-            });
-          }}
-        >
-          <WrenchIcon />
-          <span class="text-left whitespace-pre-wrap"
-            >Weather Source: {weather.isUserEdited
-              ? 'Custom'
-              : weather.defaultSource}</span
-          >
-        </button>
+        <WeatherSourceButton />
       </div>
 
       <LocalProjects />

@@ -17,7 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Tooltip from '$lib/components/Tooltip.svelte';
   import GaugeSettings from '$lib/components/modals/GaugeSettings.svelte';
   import { gauges, modal } from '$lib/state';
-  import { CogIcon } from '@lucide/svelte';
+  import { CogIcon, Settings2Icon } from '@lucide/svelte';
 
   function onSaveRangeOptions(e) {
     gauges.activeGauge.ranges = e.ranges;
@@ -44,7 +44,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     })}
 >
   <div class="flex flex-wrap items-center justify-center gap-2">
-    <CogIcon />
+    <Settings2Icon />
     Configure Ranges
   </div>
   {#snippet tooltip()}
