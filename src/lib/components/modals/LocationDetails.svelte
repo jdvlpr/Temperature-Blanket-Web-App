@@ -10,33 +10,36 @@
 
 <div class="mt-8 mb-2 flex flex-col gap-4 p-2 lg:p-4">
   <div class="flex flex-col">
-    <h4 class="h4">{location.label}</h4>
+    <h4 class="h4">
+      {#if location.flagIcon}
+        {@html location.flagIcon}
+      {/if}
+      {location.label}
+    </h4>
   </div>
   <div class="flex w-full flex-col gap-4">
     {#if location.fclName}
-      <p>
+      <div>
         <MapPinnedIcon class="relative -top-[1px] mr-1 inline size-5" /> Location
         Type:
-        <span class="badge bg-surface-100-900 text-base"
-          >{@html location.fclName}</span
-        >
-      </p>
+        <p class="badge bg-surface-100-900 text-base">
+          {@html location.fclName}
+        </p>
+      </div>
     {/if}
     {#if location.population}
-      <p>
+      <div>
         <PersonStandingIcon class="relative -top-[1px] mr-1 inline size-5" /> Population:
-        <span class="badge bg-surface-100-900 text-base"
-          >{location.population}</span
-        >
-      </p>
+        <p class="badge bg-surface-100-900 text-base">{location.population}</p>
+      </div>
     {/if}
     <div class="items-s flex flex-col gap-2">
-      <p class="">
+      <div class="">
         <GlobeIcon class="relative -top-[1px] mr-1 inline size-5" /> Latitude, Longitude:
-        <span class=" badge bg-surface-100-900 text-base select-all">
+        <p class=" badge bg-surface-100-900 text-base select-all">
           {location.lat}, {location.lng}
-        </span>
-      </p>
+        </p>
+      </div>
     </div>
 
     <a
