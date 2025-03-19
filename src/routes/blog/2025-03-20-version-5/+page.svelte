@@ -81,8 +81,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
               justify a new major release: version 5!
             </p>
 
-            <h2 class="text-2xl font-bold">Design</h2>
-            <p class="font-bold">New Logo</p>
+            <p>
+              Thanks to those of you who tested the version 5 beta (<a
+                class="link"
+                href="https://github.com/jdvlpr/Temperature-Blanket-Web-App/discussions/5"
+                target="_blank">see the announcement</a
+              >) and provided feedback before this update! Thanks as well to
+              generous
+              <a href="/supporters" class="link">supporters like you!</a>
+            </p>
+
+            <hr class="hr my-2" />
+
+            <h2 class="text-2xl font-bold">Updated Design</h2>
+            <p class="font-bold">Logo</p>
             <p>
               The first thing you might notice is a new logo, along with a new
               heading font:
@@ -106,7 +118,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               and yarn palette!
             </p>
 
-            <p class="font-bold">Updated Icons & Components</p>
+            <p class="font-bold">Icons & Components</p>
 
             <p>
               Along with a new logo, this update includes updated icons with
@@ -117,7 +129,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <hr class="hr my-2" />
 
-            <h2 class="text-2xl font-bold">Features</h2>
+            <h2 class="text-2xl font-bold">New Features</h2>
 
             <p class="font-bold">Move Gauge Colors</p>
 
@@ -203,7 +215,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 href="https://github.com/jdvlpr/Temperature-Blanket-Web-App/compare/main...next"
                 target="_blank"
                 class="link"
-                >282 changed files with 26,043 additions and 24,164 deletions</a
+                >more than 280 changed files with more than 26,000 additions and
+                24,100 deletions</a
               >. The web app benefits from improved performance that comes with
               Svelte 5. I've also found the developer experience improved, which
               will hopefully lead to easier maintenance and better features.

@@ -24,16 +24,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <svelte:head>
   <title>Supporters</title>
-  <meta
-    name="description"
-    content="Thanks to the supporters who help contribute to this site."
-  />
+  <meta name="description" content="Thanks to the supporters" />
 
   <meta property="og:title" content="Supporters" />
-  <meta
-    property="og:description"
-    content="Thanks to the supporters who help contribute to this site."
-  />
+  <meta property="og:description" content="Thanks to the supporters" />
   <meta property="og:url" content="{PUBLIC_BASE_URL}/supporters" />
   <meta property="og:type" content="website" />
 </svelte:head>
@@ -43,7 +37,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <div class="mx-auto hidden lg:inline-flex"><AppLogo /></div>
   {/snippet}
   {#snippet main()}
-    <main class="m-auto mx-auto mb-4 max-w-(--breakpoint-md) px-2 text-center">
+    <main class="m-auto mx-auto mb-4 max-w-screen-lg px-2 text-center">
       <div>
         <div class="p-4">
           <p class="mt-2 text-center">
@@ -51,10 +45,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
               href={PUBLIC_KOFI_LINK}
               target="_blank"
               rel="noopener noreferrer"
-              class="link">many generous one-time donors</a
+              class="link">generous one-time donors</a
             >
-            for their contributions to this site, as well as to the following monthly
-            supporters:
+            for their contributions, as well as to the following monthly supporters!
           </p>
         </div>
       </div>
