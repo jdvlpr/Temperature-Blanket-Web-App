@@ -14,15 +14,6 @@ Built with:
 - [Skeleton 3](https://github.com/skeletonlabs/skeleton)
 - [Tailwind 4](https://github.com/tailwindlabs/tailwindcss)
 
-What's new in the latest version?
-
-- Fullscreen color editor
-- Option to show color details in the weather table
-- Move colors directly in the gauge editor
-- Hex codes shown for each colorway in the Yarn Colorway Finder
-- Updated icons
-- Unit preference saved to local storage
-
 ## 🚀 Getting Started
 
 To run this site locally on your computer for development, [clone this repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) and create a `.env` file. Additionally, in order for certain features to work you'll need to register for some free API services.
@@ -40,13 +31,13 @@ To run this site locally on your computer for development, [clone this repositor
 Install dependencies:
 
 ```bash
-npm install
+pnpm install
 ```
 
 Start a development server:
 
 ```bash
-npm run dev
+pnpm dev
 ```
 
 ### ✅ Testing
@@ -54,19 +45,19 @@ npm run dev
 First build the app (to generate cloudflare \_routes.json file)
 
 ```bash
-npm run build
+pnpm build
 ```
 
 Test frontend pages and functions
 
 ```bash
-npm run test
+pnpm test
 ```
 
 Test internal api routes (for the Yarn Colorways API)
 
 ```bash
-npm run test:api
+pnpm test:api
 ```
 
 ## 🙌 Acknowledgments
@@ -98,9 +89,9 @@ Here are the steps for setting up the headless Wordpress site:
 - I use the following plugins
   - [EWWW Image Optimizer](https://wordpress.org/plugins/ewww-image-optimizer/) - To compress and optimize project preview images
   - [Redirection](https://wordpress.org/plugins/redirection/) - To redirect the headless Wordpress home page to the temperature-blanket.com site, and to redirect project pages to their corresponding gallery pages on temperature-blanket.com.
-  - Temperature Blanket Custom Plugin - I created a Wordpress plugin which handles the necessary setup and allows for creation of project gallery pages through a custom REST endpoint.
+  - Temperature Blanket Custom Plugin - I created a Wordpress plugin which handles the necessary setup and allows for creation of project gallery pages through a custom REST endpoint. The source code for this plugin is not public, but if you are interested you can reach out to me.
   - [Wordfence](https://wordpress.org/plugins/wordfence/) - For general site security
-  - [Wordpress Popular Posts](https://wordpress.org/plugins/wordpress-popular-posts/) - For tracking popular projects
+  - [Wordpress Popular Posts](https://wordpress.org/plugins/wordpress-popular-posts/) - For tracking popular project gallery pages
   - [WP-GraphQL](https://wordpress.org/plugins/wp-graphql/) - For interacting with the Wordpress backend
 - Add the following line to `wp-config.php`:
 

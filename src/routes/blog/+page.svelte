@@ -22,6 +22,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   const posts = [
     {
+      href: '/blog/2025-03-20-version-5',
+      imgSrc: '/images/blog-images/2025-03-20-version-5/featured-image.png',
+      imgAlt: 'Version 5: Svelte Update',
+      title: 'Version 5: Svelte Update',
+      tags: ['News'],
+    },
+    {
       href: '/blog/yarn-weights',
       imgSrc: '/images/blog-images/yarn-weights/banner.png',
       imgAlt: 'Yarn Weights',
@@ -32,7 +39,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       href: '/blog/2024-09-03-now-open-source',
       imgSrc: '/images/blog-images/2024-09-03-now-open-source/banner.jpeg',
       imgAlt: 'Open Source',
-      title: 'Now Open Source',
+      title: 'Version 4: Now Open Source',
       tags: ['News'],
     },
     {

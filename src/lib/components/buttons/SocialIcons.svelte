@@ -35,12 +35,32 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div class="mt-2 flex flex-col gap-4">
+  <p class="font-bold">General Communication</p>
+
   <a href="mailto:{email}" class="btn hover:preset-tonal w-fit">
     <MailIcon />
 
     {email}
   </a>
+
+  {#if PUBLIC_GITHUB_LINK}
+    <p class="font-bold">
+      Development Ideas, Feedback, Questions, and Discussions
+    </p>
+    <a
+      href="{PUBLIC_GITHUB_LINK}/discussions"
+      target="_blank"
+      rel="noreferrer"
+      class="btn hover:preset-tonal w-fit text-left"
+    >
+      <GithubIcon />
+      GitHub Discussions
+      <ExternalLinkIcon class="relative -top-[1px] size-5" />
+    </a>
+  {/if}
+
   {#if PUBLIC_FACEBOOK_LINK}
+    <p class="font-bold">Social Media</p>
     <a
       href={PUBLIC_FACEBOOK_LINK}
       target="_blank"
@@ -49,19 +69,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     >
       <FacebookIcon />
       {PUBLIC_SITE_TITLE}
-      <ExternalLinkIcon class="relative -top-[1px] size-5" />
-    </a>
-  {/if}
-
-  {#if PUBLIC_GITHUB_LINK}
-    <a
-      href={PUBLIC_GITHUB_LINK}
-      target="_blank"
-      rel="noreferrer"
-      class="btn hover:preset-tonal w-fit text-left"
-    >
-      <GithubIcon />
-      GitHub
       <ExternalLinkIcon class="relative -top-[1px] size-5" />
     </a>
   {/if}

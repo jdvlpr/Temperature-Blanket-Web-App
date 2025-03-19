@@ -53,7 +53,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 />
 
 {#snippet tableOfContents()}
-  <nav data-testid="toc" class="toc space-y-4 p-4 max-w-[60vw]">
+  <nav data-testid="toc" class="toc max-w-[60vw] space-y-4 p-4">
     <div class="font-bold">Table of Contents</div>
     <ul class="toc-list space-y-2">
       <li class="toc-list-item block">
@@ -67,18 +67,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
           >Using the API</a
         >
       </li>
-      <li class="toc-list-item block ml-4">
+      <li class="toc-list-item ml-4 block">
         <a href="#sign-up" class="toc-anchor opacity-60 hover:opacity-100"
           >Sign Up</a
         >
       </li>
-      <li class="toc-list-item block ml-4">
+      <li class="toc-list-item ml-4 block">
         <a
           href="#making-a-request"
           class="toc-anchor opacity-60 hover:opacity-100">Making a Request</a
         >
       </li>
-      <li class="toc-list-item block ml-4">
+      <li class="toc-list-item ml-4 block">
         <a
           href="#reading-a-response"
           class="toc-anchor opacity-60 hover:opacity-100">Reading a Response</a
@@ -89,28 +89,28 @@ If not, see <https://www.gnu.org/licenses/>. -->
           >Endpoints</a
         >
       </li>
-      <li class="toc-list-item block ml-4">
+      <li class="toc-list-item ml-4 block">
         <a
           href="#find-yarn-by-color"
           class="toc-anchor opacity-60 hover:opacity-100">Find Yarn by Color</a
         >
       </li>
-      <li class="toc-list-item block ml-4">
+      <li class="toc-list-item ml-4 block">
         <a href="#colorways" class="toc-anchor opacity-60 hover:opacity-100"
           >Colorways</a
         >
       </li>
-      <li class="toc-list-item block ml-4">
+      <li class="toc-list-item ml-4 block">
         <a href="#brands" class="toc-anchor opacity-60 hover:opacity-100"
           >Brands</a
         >
       </li>
-      <li class="toc-list-item block ml-4">
+      <li class="toc-list-item ml-4 block">
         <a href="#yarns" class="toc-anchor opacity-60 hover:opacity-100"
           >Yarns</a
         >
       </li>
-      <li class="toc-list-item block ml-4">
+      <li class="toc-list-item ml-4 block">
         <a href="#yarn-weights" class="toc-anchor opacity-60 hover:opacity-100"
           >Yarn Weights</a
         >
@@ -132,7 +132,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <AppShell pageName="API">
   {#snippet stickyHeader()}
-    <div class="hidden lg:inline-flex mx-auto">
+    <div class="mx-auto hidden lg:inline-flex">
       <AppLogo />
     </div>
     <div class="sm:hidden">
@@ -153,7 +153,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <div class="flex flex-wrap items-center gap-1">
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              class="w-6 h-6"
+              class="h-6 w-6"
               viewBox="0 0 24 24"
               ><path
                 fill="currentColor"
@@ -173,14 +173,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/snippet}
 
   {#snippet main()}
-    <main class="max-w-(--breakpoint-xl) m-auto mb-4 pt-2 px-2 lg:px-0">
+    <main class="m-auto mb-4 max-w-(--breakpoint-xl) px-2 pt-2 lg:px-0">
       <img
         src="/images/api-images/yarn-colorways-api.png"
-        class="h-56 object-cover w-full rounded-container mb-4"
+        class="rounded-container mb-4 h-56 w-full object-cover"
         alt="Yarn Colorways API"
       />
-      <div class="pb-4 text-left flex gap-4">
-        <div class="w-full flex flex-col gap-8">
+      <div class="flex gap-4 pb-4 text-left">
+        <div class="flex w-full flex-col gap-8">
           <div class="flex flex-col gap-4">
             <h2
               class="h2 text-gradient scroll-mt-[58px]"
@@ -189,7 +189,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               Yarn Colorways API
             </h2>
             <section
-              class="gap-2 flex flex-col mt-2 lg:mt-0 card preset-tonal p-4 rounded-container"
+              class="card preset-tonal rounded-container mt-2 flex flex-col gap-2 p-4 lg:mt-0"
             >
               <p>Find yarn colorways by HTML hex color code.</p>
 
@@ -227,10 +227,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </section>
           </div>
 
-          <h2 class="font-bold text-2xl" id="using-the-api">Using the API</h2>
+          <h2 class="text-2xl font-bold" id="using-the-api">Using the API</h2>
 
-          <section id="sign-up" class="scroll-mt-[58px] gap-2 flex flex-col">
-            <h3 class="font-bold text-xl" id="sign-up">Sign Up</h3>
+          <section id="sign-up" class="flex scroll-mt-[58px] flex-col gap-2">
+            <h3 class="text-xl font-bold" id="sign-up">Sign Up</h3>
             <p class="first-letter:capitalize">
               {PUBLIC_BASE_DOMAIN_NAME} uses
               <a
@@ -264,18 +264,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </section>
           <section
             id="sending-requests"
-            class="scroll-mt-[58px] gap-2 flex flex-col"
+            class="flex scroll-mt-[58px] flex-col gap-2"
           >
-            <h3 class="font-bold text-xl" id="making-a-request">
+            <h3 class="text-xl font-bold" id="making-a-request">
               Making a Request
             </h3>
             <p>This is the base URL for all endpoints:</p>
-            <p class="break-all whitespace-pre-wrap! codeblock code p-4! w-fit">
+            <p class="codeblock code w-fit p-4! break-all whitespace-pre-wrap!">
               https://yarn-colorways.p.rapidapi.com/v1
             </p>
 
             <p>Include the following headers:</p>
-            <p class="break-all whitespace-pre-wrap! codeblock code p-4! w-fit">
+            <p class="codeblock code w-fit p-4! break-all whitespace-pre-wrap!">
               "X-RapidAPI-Key": 'your-rapidapi-key', <br />"X-RapidAPI-Host":
               "yarn-colorways.p.rapidapi.com"
             </p>
@@ -286,9 +286,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
           <section
             id="reading-a-response"
-            class="scroll-mt-[58px] gap-2 flex flex-col"
+            class="flex scroll-mt-[58px] flex-col gap-2"
           >
-            <h3 class="font-bold text-xl" id="reading-a-response">
+            <h3 class="text-xl font-bold" id="reading-a-response">
               Reading a Response
             </h3>
             <p>
@@ -305,7 +305,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 class="link">/colorways</a
               > endpoint.
             </p>
-            <p class="break-all whitespace-pre-wrap! codeblock code p-4! w-fit">
+            <p class="codeblock code w-fit p-4! break-all whitespace-pre-wrap!">
               {`{
       "meta": {
           "limit": 50, // the maxmimum number of results
@@ -337,13 +337,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </p>
           </section>
 
-          <h2 class="font-bold text-2xl" id="endpoints">Endpoints</h2>
+          <h2 class="text-2xl font-bold" id="endpoints">Endpoints</h2>
 
           <section
             id="find-yarn-by-color"
-            class="scroll-mt-[58px] card bg-surface-200 dark:bg-surface-800 p-4 gap-2 flex flex-col"
+            class="card bg-surface-200 dark:bg-surface-800 flex scroll-mt-[58px] flex-col gap-2 p-4"
           >
-            <h3 class="font-bold text-xl" id="find-yarn-by-color">
+            <h3 class="text-xl font-bold" id="find-yarn-by-color">
               Find Yarn by Color
             </h3>
             <p>Get best-matching yarn colorways for a specified color.</p>
@@ -361,9 +361,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <p>
               When calling this endpoint, refer to the following parameters.
             </p>
-            <div class="overflow-scroll max-w-[80vw] sm:max-w-[90vw]">
+            <div class="max-w-[80vw] overflow-scroll sm:max-w-[90vw]">
               <table
-                class="border-separate border-spacing-0 w-full border-surface-300-700 border rounded-container overflow-hidden"
+                class="border-surface-300-700 rounded-container w-full border-separate border-spacing-0 overflow-hidden border"
               >
                 <thead>
                   <tr>
@@ -391,11 +391,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     >
                     <td>String</td>
                     <td><span class="">Yes</span></td>
-                    <td
-                      ><span class="preset-tonal-surface rounded-container px-2"
-                        >undefined</span
-                      ></td
-                    >
+                    <td><span class="italic">undefined</span></td>
                   </tr>
                   <tr>
                     <td>brand</td>
@@ -406,11 +402,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     >
                     <td>String</td>
                     <td>No</td>
-                    <td
-                      ><span class="preset-tonal-surface rounded-container px-2"
-                        >undefined</span
-                      ></td
-                    >
+                    <td><span class="italic">undefined</span></td>
                   </tr>
                   <tr>
                     <td>yarn</td>
@@ -421,11 +413,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     >
                     <td>String</td>
                     <td>No</td>
-                    <td
-                      ><span class="preset-tonal-surface rounded-container px-2"
-                        >undefined</span
-                      ></td
-                    >
+                    <td><span class="italic">undefined</span></td>
                   </tr>
                   <tr>
                     <td>weight</td>
@@ -436,11 +424,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     >
                     <td>String</td>
                     <td>No</td>
-                    <td
-                      ><span class="preset-tonal-surface rounded-container px-2"
-                        >undefined</span
-                      ></td
-                    >
+                    <td><span class="italic">undefined</span></td>
                   </tr>
                   <tr>
                     <td>limit</td>
@@ -479,7 +463,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <p class="font-bold">Examples</p>
 
-            <p class="break-all whitespace-pre-wrap! code p-4! w-fit">
+            <p class="code w-fit p-4! break-all whitespace-pre-wrap!">
               {`// get colorways matching an HTML hex code without the # hash 
   GET https://yarn-colorways.p.rapidapi.com/v1/match/665e3f 
 
@@ -503,9 +487,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
               will contain an array of colorway objects with the following properties:
             </p>
 
-            <div class="overflow-scroll max-w-[80vw] sm:max-w-[90vw]">
+            <div class="max-w-[80vw] overflow-scroll sm:max-w-[90vw]">
               <table
-                class="border-separate border-spacing-0 w-full border-surface-300-700 border rounded-container overflow-hidden"
+                class="border-surface-300-700 rounded-container w-full border-separate border-spacing-0 overflow-hidden border"
               >
                 <thead>
                   <tr>
@@ -589,9 +573,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
           <section
             id="colorways"
-            class="scroll-mt-[58px] card bg-surface-200 dark:bg-surface-800 p-4 gap-2 flex flex-col"
+            class="card bg-surface-200 dark:bg-surface-800 flex scroll-mt-[58px] flex-col gap-2 p-4"
           >
-            <h3 class="font-bold text-xl" id="colorways">Colorways</h3>
+            <h3 class="text-xl font-bold" id="colorways">Colorways</h3>
             <p>Get yarn colorways.</p>
 
             <p>
@@ -607,9 +591,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <p>
               When calling this endpoint, refer to the following parameters.
             </p>
-            <div class="overflow-scroll max-w-[80vw] sm:max-w-[90vw]">
+            <div class="max-w-[80vw] overflow-scroll sm:max-w-[90vw]">
               <table
-                class="border-separate border-spacing-0 w-full border-surface-300-700 border rounded-container overflow-hidden"
+                class="border-surface-300-700 rounded-container w-full border-separate border-spacing-0 overflow-hidden border"
               >
                 <thead>
                   <tr>
@@ -637,22 +621,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     >
                     <td>String</td>
                     <td>No</td>
-                    <td
-                      ><span class="preset-tonal-surface rounded-container px-2"
-                        >undefined</span
-                      ></td
-                    >
+                    <td><span class="italic">undefined</span></td>
                   </tr>
                   <tr>
                     <td>name</td>
                     <td>Any colorway name. Text case is ignored.</td>
                     <td>String</td>
                     <td>No</td>
-                    <td
-                      ><span class="preset-tonal-surface rounded-container px-2"
-                        >undefined</span
-                      ></td
-                    >
+                    <td><span class="italic">undefined</span></td>
                   </tr>
                   <tr>
                     <td>brand</td>
@@ -663,11 +639,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     >
                     <td>String</td>
                     <td>No</td>
-                    <td
-                      ><span class="preset-tonal-surface rounded-container px-2"
-                        >undefined</span
-                      ></td
-                    >
+                    <td><span class="italic">undefined</span></td>
                   </tr>
                   <tr>
                     <td>yarn</td>
@@ -678,11 +650,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     >
                     <td>String</td>
                     <td>No</td>
-                    <td
-                      ><span class="preset-tonal-surface rounded-container px-2"
-                        >undefined</span
-                      ></td
-                    >
+                    <td><span class="italic">undefined</span></td>
                   </tr>
                   <tr>
                     <td>weight</td>
@@ -693,11 +661,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     >
                     <td>String</td>
                     <td>No</td>
-                    <td
-                      ><span class="preset-tonal-surface rounded-container px-2"
-                        >undefined</span
-                      ></td
-                    >
+                    <td><span class="italic">undefined</span></td>
                   </tr>
                   <tr>
                     <td>limit</td>
@@ -747,7 +711,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <p class="font-bold">Example</p>
 
-            <p class="break-all whitespace-pre-wrap! codeblock code p-4! w-fit">
+            <p class="codeblock code w-fit p-4! break-all whitespace-pre-wrap!">
               {`// get all colorways 
   GET https://yarn-colorways.p.rapidapi.com/v1/colorways
 
@@ -767,9 +731,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
               will contain an array of colorway objects with the following properties:
             </p>
 
-            <div class="overflow-scroll max-w-[80vw] sm:max-w-[90vw]">
+            <div class="max-w-[80vw] overflow-scroll sm:max-w-[90vw]">
               <table
-                class="border-separate border-spacing-0 w-full border-surface-300-700 border rounded-container overflow-hidden"
+                class="border-surface-300-700 rounded-container w-full border-separate border-spacing-0 overflow-hidden border"
               >
                 <thead>
                   <tr>
@@ -836,9 +800,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
           <section
             id="brands"
-            class="scroll-mt-[58px] card bg-surface-200 dark:bg-surface-800 p-4 gap-2 flex flex-col"
+            class="card bg-surface-200 dark:bg-surface-800 flex scroll-mt-[58px] flex-col gap-2 p-4"
           >
-            <h3 class="font-bold text-xl" id="brands">Brands</h3>
+            <h3 class="text-xl font-bold" id="brands">Brands</h3>
             <p>
               Get all brand IDs and names, useful to filter <a
                 href="#find-yarn-by-color"
@@ -862,7 +826,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <p class="font-bold">Example</p>
 
-            <p class="break-all whitespace-pre-wrap! codeblock code p-4! w-fit">
+            <p class="codeblock code w-fit p-4! break-all whitespace-pre-wrap!">
               {`// get all brands 
   GET https://yarn-colorways.p.rapidapi.com/v1/brands 
   `}
@@ -875,9 +839,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
               will contain an array of brand objects with the following properties:
             </p>
 
-            <div class="overflow-scroll max-w-[80vw] sm:max-w-[90vw]">
+            <div class="max-w-[80vw] overflow-scroll sm:max-w-[90vw]">
               <table
-                class="border-separate border-spacing-0 w-full border-surface-300-700 border rounded-container overflow-hidden"
+                class="border-surface-300-700 rounded-container w-full border-separate border-spacing-0 overflow-hidden border"
               >
                 <thead>
                   <tr>
@@ -916,9 +880,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
           <section
             id="yarns"
-            class="scroll-mt-[58px] card bg-surface-200 dark:bg-surface-800 p-4 gap-2 flex flex-col"
+            class="card bg-surface-200 dark:bg-surface-800 flex scroll-mt-[58px] flex-col gap-2 p-4"
           >
-            <h3 class="font-bold text-xl" id="yarns">Yarns</h3>
+            <h3 class="text-xl font-bold" id="yarns">Yarns</h3>
             <p>
               Get all yarn IDs and names, useful to filter <a
                 href="#find-yarn-by-color"
@@ -941,9 +905,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <p>
               When calling this endpoint, refer to the following parameters.
             </p>
-            <div class="overflow-scroll max-w-[80vw] sm:max-w-[90vw]">
+            <div class="max-w-[80vw] overflow-scroll sm:max-w-[90vw]">
               <table
-                class="border-separate border-spacing-0 w-full border-surface-300-700 border rounded-container overflow-hidden"
+                class="border-surface-300-700 rounded-container w-full border-separate border-spacing-0 overflow-hidden border"
               >
                 <thead>
                   <tr>
@@ -965,11 +929,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     >
                     <td>String</td>
                     <td>No</td>
-                    <td
-                      ><span class="preset-tonal-surface rounded-container px-2"
-                        >undefined</span
-                      ></td
-                    >
+                    <td><span class="italic">undefined</span></td>
                   </tr>
                 </tbody>
               </table>
@@ -977,7 +937,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <p class="font-bold">Example</p>
 
-            <p class="break-all whitespace-pre-wrap! codeblock code p-4! w-fit">
+            <p class="codeblock code w-fit p-4! break-all whitespace-pre-wrap!">
               {`// get all yarns 
   GET https://yarn-colorways.p.rapidapi.com/v1/yarns
 
@@ -996,9 +956,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
               will contain an array of yarn objects with the following properties:
             </p>
 
-            <div class="overflow-scroll max-w-[80vw] sm:max-w-[90vw]">
+            <div class="max-w-[80vw] overflow-scroll sm:max-w-[90vw]">
               <table
-                class="border-separate border-spacing-0 w-full border-surface-300-700 border rounded-container overflow-hidden"
+                class="border-surface-300-700 rounded-container w-full border-separate border-spacing-0 overflow-hidden border"
               >
                 <thead>
                   <tr>
@@ -1047,9 +1007,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
           <section
             id="yarn-weights"
-            class="scroll-mt-[58px] card bg-surface-200 dark:bg-surface-800 p-4 gap-2 flex flex-col"
+            class="card bg-surface-200 dark:bg-surface-800 flex scroll-mt-[58px] flex-col gap-2 p-4"
           >
-            <h3 class="font-bold text-xl" id="yarn-weight">Yarn Weights</h3>
+            <h3 class="text-xl font-bold" id="yarn-weight">Yarn Weights</h3>
             <p>
               Get all yarn weight IDs and names, useful to filter <a
                 href="#find-yarn-by-color"
@@ -1073,7 +1033,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <p class="font-bold">Example</p>
 
-            <p class="break-all whitespace-pre-wrap! codeblock code p-4! w-fit">
+            <p class="codeblock code w-fit p-4! break-all whitespace-pre-wrap!">
               {`// get all yarn weights 
   GET https://yarn-colorways.p.rapidapi.com/v1/weights
   `}
@@ -1086,9 +1046,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
               will contain an array of yarn weight objects with the following properties:
             </p>
 
-            <div class="overflow-scroll max-w-[80vw] sm:max-w-[90vw]">
+            <div class="max-w-[80vw] overflow-scroll sm:max-w-[90vw]">
               <table
-                class="border-separate border-spacing-0 w-full border-surface-300-700 border rounded-container overflow-hidden"
+                class="border-surface-300-700 rounded-container w-full border-separate border-spacing-0 overflow-hidden border"
               >
                 <thead>
                   <tr>
@@ -1122,13 +1082,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
           <section
             id="status-codes"
-            class="scroll-mt-[58px] gap-2 flex flex-col"
+            class="flex scroll-mt-[58px] flex-col gap-2"
           >
-            <h2 class="font-bold text-xl">Status Codes</h2>
+            <h2 class="text-xl font-bold">Status Codes</h2>
             <p>Responses will have one of the following status codes:</p>
-            <div class="overflow-scroll max-w-[80vw] sm:max-w-[90vw]">
+            <div class="max-w-[80vw] overflow-scroll sm:max-w-[90vw]">
               <table
-                class="border-separate border-spacing-0 w-full border-surface-300-700 border rounded-container overflow-hidden"
+                class="border-surface-300-700 rounded-container w-full border-separate border-spacing-0 overflow-hidden border"
               >
                 <thead>
                   <tr>
@@ -1180,12 +1140,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
           <div class="flex flex-col gap-4">
             <h2
-              class="font-bold text-2xl scroll-mt-[58px]"
+              class="scroll-mt-[58px] text-2xl font-bold"
               id="terms-and-license"
             >
               Terms & License
             </h2>
-            <section class="gap-2 flex flex-col mt-2 lg:mt-0">
+            <section class="mt-2 flex flex-col gap-2 lg:mt-0">
               <p class="">
                 Data is provided under the terms of the <a
                   href="https://creativecommons.org/licenses/by/4.0/"
@@ -1220,7 +1180,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               </div>
               <p class="font-bold">Example Attribution:</p>
               <p
-                class=" w-fit p-4 preset-tonal-tertiary rounded-container break-all max-w-[90vw]"
+                class=" preset-tonal-tertiary rounded-container w-fit max-w-[90vw] p-4 break-all"
               >
                 Yarn colorways from
                 <a href={PUBLIC_BASE_URL} target="_blank" class="link"
@@ -1247,9 +1207,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </div>
         </div>
         <div
-          class="hidden self-start w-1/5 min-w-[200px] h-auto sm:inline-block sticky top-16"
+          class="sticky top-16 hidden h-auto w-1/5 min-w-[200px] self-start sm:inline-block"
         >
-          <div class=" pb-20 max-h-[90svh] overflow-auto">
+          <div class=" max-h-[90svh] overflow-auto pb-20">
             {@render tableOfContents()}
           </div>
         </div>

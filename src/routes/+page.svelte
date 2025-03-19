@@ -150,7 +150,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         type: 'component',
         component: { ref: GettingStarted },
       })}
-    class="btn bg-secondary-200 dark:bg-secondary-800 gap-2"
+    class="btn preset-filled-secondary-500 text-surface-contrast-500 gap-2"
   >
     <LightbulbIcon />
     Getting Started

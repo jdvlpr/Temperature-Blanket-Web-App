@@ -14,7 +14,6 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { page } from '$app/state';
   import {
     PUBLIC_BASE_DOMAIN_NAME,
     PUBLIC_BASE_URL,
@@ -24,7 +23,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import AppLogo from '$lib/components/AppLogo.svelte';
   import AppShell from '$lib/components/AppShell.svelte';
   import Card from '$lib/components/Card.svelte';
-  import { ICONS } from '$lib/constants';
   import { ArrowLeftIcon } from '@lucide/svelte';
 
   const kofiURL = PUBLIC_KOFI_LINK ? new URL(PUBLIC_KOFI_LINK) : null;
@@ -32,13 +30,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <svelte:head>
-  <title>Now Open Source</title>
+  <title>Version 4: Now Open Source</title>
   <meta
     name="description"
     content="Making the source code for {PUBLIC_BASE_DOMAIN_NAME} available on GitHub"
   />
 
-  <meta property="og:title" content="Now Open Source" />
+  <meta property="og:title" content="Version 4: Now Open Source" />
   <meta
     property="og:description"
     content="Making the source code for {PUBLIC_BASE_DOMAIN_NAME} available on GitHub"
@@ -56,9 +54,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <meta property="og:image:height" content="768" />
 </svelte:head>
 
-<AppShell pageName="Now Open Source">
+<AppShell pageName="Version 4: Now Open Source">
   {#snippet stickyHeader()}
-    <div class="hidden lg:inline-flex mx-auto"><AppLogo /></div>
+    <div class="mx-auto hidden lg:inline-flex"><AppLogo /></div>
   {/snippet}
   {#snippet main()}
     <main class="pb-8">
@@ -72,22 +70,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <div>
             <img
               src="/images/blog-images/2024-09-03-now-open-source/banner.jpeg"
-              class="h-36 object-cover w-full"
+              class="h-36 w-full object-cover"
               alt="Now Open Source"
             />
           </div>
         {/snippet}
 
         {#snippet content()}
-          <div class="pb-4 px-2">
+          <div class="px-2 pb-4">
             <div class="flex flex-col gap-4">
               <div class="mt-4 flex flex-col gap-2">
-                <h2 class="h2 text-gradient">Now Open Source</h2>
+                <h2 class="h2 text-gradient">Version 4: Now Open Source</h2>
                 <p class="text-sm">September 03, 2024</p>
               </div>
 
               <div
-                class="p-4 preset-tonal-surface rounded-container flex flex-col gap-2"
+                class="bg-surface-100-900/50 rounded-container flex flex-col gap-2 p-4"
               >
                 <p>
                   🎉 Temperature-blanket.com is reaching a new milestone! The
@@ -116,7 +114,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 </a>
               </div>
 
-              <h2 class="font-bold text-2xl">A Short History</h2>
+              <h2 class="text-2xl font-bold">A Short History</h2>
 
               <p>
                 From the beginning, the goal of temperature-blanket.com has been
@@ -132,7 +130,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 time is right to share the source code with the world.
               </p>
 
-              <h2 class="font-bold text-2xl">Why Open Source?</h2>
+              <h2 class="text-2xl font-bold">Why Open Source?</h2>
 
               <blockquote class="blockquote">
                 If you want to go fast, work alone. If you want to go far, work
@@ -170,7 +168,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 </li>
               </ul>
 
-              <h2 class="font-bold text-2xl">How to Get Involved?</h2>
+              <h2 class="text-2xl font-bold">How to Get Involved?</h2>
 
               <p>
                 If you discover a bug or want to suggest a new feature, <a
@@ -208,7 +206,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 </p>
               {/if}
 
-              <h2 class="font-bold text-2xl">What’s Next?</h2>
+              <h2 class="text-2xl font-bold">What’s Next?</h2>
 
               <p>
                 I plan to continue maintaining and improving

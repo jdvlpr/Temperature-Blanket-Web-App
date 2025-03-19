@@ -36,14 +36,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/snippet}
   {#snippet main()}
     <main
-      class="max-w-(--breakpoint-sm) px-4 lg:px-0 flex flex-col gap-4 mx-auto"
+      class="mx-auto flex max-w-(--breakpoint-sm) flex-col gap-4 px-4 lg:px-0"
     >
       <div>
         <h2 class="h2 text-gradient max-lg:hidden">Contact</h2>
         <SocialIcons />
       </div>
-      <div>
-        <h3 class="font-bold text-xl my-2">Have a Question?</h3>
+      <div class="rounded-container bg-surface-100-900 my-4 w-fit p-2">
         <p>
           See the <a href="/faq" class="link">Frequently Asked Questions</a> for
           answers to common questions.

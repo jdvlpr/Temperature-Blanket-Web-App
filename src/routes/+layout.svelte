@@ -20,9 +20,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ToastProvider from '$lib/components/ToastProvider.svelte';
   import { consentToMSClarityCookies, modal, toast } from '$lib/state';
   import { handleKeyDown, initializeLocalStorage, privacy } from '$lib/utils';
+  import { XIcon } from '@lucide/svelte';
   import { onMount, type Snippet } from 'svelte';
   import '../css/main.css';
-  import { ExternalLinkIcon } from '@lucide/svelte';
 
   let bannerElement: HTMLElement | undefined;
   interface Props {
@@ -155,23 +155,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </svelte:head>
 
 <div
-  class="bg-surface-100 dark:bg-surface-800 flex flex-wrap items-center justify-center gap-2 p-2 text-center [view-transition-name:top-banner]"
+  class="bg-surface-100-900 flex flex-wrap items-center justify-center gap-2 p-2 text-center [view-transition-name:top-banner]"
   bind:this={bannerElement}
 >
   <p>
-    This is a beta version. <a
-      href="https://github.com/jdvlpr/Temperature-Blanket-Web-App/discussions/5"
-      class="link"
-      target="_blank">Read the announcement</a
-    > for more info.
+    See what's new in the
+    <a href="/blog/2025-03-20-version-5" class="link">version 5 update!</a>
   </p>
-
-  <a
-    href="https://temperature-blanket.com"
-    class="btn preset-tonal-secondary"
-    target="_blank"
-    >Main Version <ExternalLinkIcon class="relative -top-[1px] size-5" />
-  </a>
+  <button class="btn hover:preset-tonal" onclick={() => bannerElement.remove()}
+    ><XIcon />Close</button
+  >
 </div>
 
 {@render children?.()}
