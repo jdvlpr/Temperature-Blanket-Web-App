@@ -1008,20 +1008,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
               An overview of your project’s weather data is shown in a chart.
             </p>
             <p>
-              To view an individual day’s weather data, select Table or Details
-              below the weather chart.
+              You can press the Show Color Details toggle to see color details
+              in the weather chart.
             </p>
-            <ul class="flex flex-col gap-2">
-              <li>
-                <span class="font-bold">Table</span> – Browse a table of weather
-                data. Press a header label to sort the results.
-              </li>
-              <li>
-                <span class="font-bold">Details</span> – Press the Previous or Next
-                arrow icons, move the range slider, or press a point on the weather
-                chart to navigate to a date and view its weather data and color details.
-              </li>
-            </ul>
           </section>
           <section
             id="edit-weather-data"
@@ -1470,7 +1459,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </p>
             <ul class="ml-4 flex flex-col gap-2">
               <li>
-                <span class="font-bold">All</span> – User-made color palettes
+                <span class="font-bold">Gallery</span> – All user-made color palettes
               </li>
               <li>
                 <span class="font-bold">Featured</span> – Popular user-made color
@@ -1518,16 +1507,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
             id="importexport"
             class="card bg-surface-100 dark:bg-surface-900 flex scroll-mt-[58px] flex-col gap-2 p-4"
           >
-            <h3 class="text-xl font-bold">Import/Export</h3>
+            <h3 class="text-xl font-bold">Export/Import</h3>
 
             <p>
-              To import a color palette, press Import / Export, type color names
-              or paste a valid code or URL, then press Use These Colors.
+              To export a color palette as HTML color codes or yarn names, press
+              Export/Import, then press Copy for whichever format you want.
+              Share or paste the copied text somewhere you can find it later.
             </p>
             <p>
-              To export a color palette, press Import / Export, then press Copy
-              Palette Code. Share or paste the copied text somewhere you can
-              find it later.
+              To import a color palette, press Export/Import, press the Import
+              button, then type color names or paste a valid code or URL. When
+              you're finished, press Save.
             </p>
           </section>
           <section
