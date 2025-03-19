@@ -31,7 +31,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { DownloadIcon, SendIcon } from '@lucide/svelte';
   import { onMount, untrack } from 'svelte';
   import { Drawer } from 'vaul-svelte';
-  import { weatherDataUpdatedKey } from './WeatherTableView.svelte';
+  import { weatherDataUpdatedKey } from './WeatherTableWrapper.svelte';
 
   let refreshKey = $state(Date.now());
 

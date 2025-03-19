@@ -14,9 +14,8 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import WeatherTableView from '$lib/components/WeatherTableView.svelte';
+  import WeatherTableWrapper from '$lib/components/WeatherTableWrapper.svelte';
   import ImportWeatherData from '$lib/components/modals/ImportWeatherData.svelte';
-  import { ICONS } from '$lib/constants';
   import { modal, weather } from '$lib/state';
   import { downloadPDF, downloadWeatherCSV } from '$lib/utils';
   import { DownloadIcon, ImportIcon } from '@lucide/svelte';
@@ -40,7 +39,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 />
 
 <div class="">
-  <WeatherTableView />
+  <WeatherTableWrapper />
 
   <div
     class="rounded-container bg-surface-100 dark:bg-surface-900 mt-4 mb-2 flex items-start justify-start gap-2 px-4 py-2 shadow-inner max-sm:flex-col sm:flex-wrap sm:items-center sm:justify-center lg:mb-4"

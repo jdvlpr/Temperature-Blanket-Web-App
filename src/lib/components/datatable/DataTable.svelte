@@ -27,7 +27,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     children: Snippet;
   }
 
-  let { table, search = true, children }: Props = $props();
+  let { table = $bindable(), search = true, children }: Props = $props();
 
   let searchInput = $state(null);
 
@@ -43,7 +43,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </article>
 
   <div
-    class="flex flex-wrap gap-4 justify-center sm:justify-between items-start mt-2 mb-4 w-full mx-auto"
+    class="mx-auto mt-2 mb-4 flex w-full flex-wrap items-start justify-center gap-4 sm:justify-between"
   >
     <p class="text-sm">
       {#if table.rowCount.total > 0}
@@ -56,7 +56,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </p>
 
     <div
-      class="flex flex-wrap gap-x-8 gap-y-2 items-end justify-between max-sm:w-full flex-auto sm:justify-center"
+      class="flex flex-auto flex-wrap items-end justify-between gap-x-8 gap-y-2 max-sm:w-full sm:justify-center"
     >
       {#if table.pageCount > 1 || table.rowsPerPage !== 10}
         <RowsPerPage {table} />
@@ -73,10 +73,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <CircleArrowLeftIcon />
           </button>
 
-          <label class="label flex flex-col items-start w-20">
+          <label class="label flex w-20 flex-col items-start">
             <span class="text-sm">Page</span>
             <select
-              class="select w-fit min-w-[60px] mx-auto"
+              class="select mx-auto w-fit min-w-[60px]"
               id="datatable-page"
               bind:value={table.currentPage}
               onchange={() => {
