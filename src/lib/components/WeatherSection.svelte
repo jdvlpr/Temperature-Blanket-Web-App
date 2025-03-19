@@ -159,12 +159,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
       return isDateWithinLastSevenDays(date?.date);
     }),
   );
-  let data = $derived(
-    createWeeksProperty({
-      weatherData: weather.rawData,
-      dowOffset: weather.monthGroupingStartDay,
-    }),
-  );
 </script>
 
 <div class="mt-2 flex w-full flex-col items-center justify-center gap-2">
