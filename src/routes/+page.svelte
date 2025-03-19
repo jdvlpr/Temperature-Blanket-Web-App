@@ -149,6 +149,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
       modal.trigger({
         type: 'component',
         component: { ref: GettingStarted },
+        options: {
+          size: 'large',
+        },
       })}
     class="btn preset-filled-secondary-500 text-surface-contrast-500 gap-2"
   >
