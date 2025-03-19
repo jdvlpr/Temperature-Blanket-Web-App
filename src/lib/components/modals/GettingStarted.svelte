@@ -59,12 +59,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <div class="w-full p-4 pt-12">
   <!-- Stepper -->
-  <div class="space-y-4 flex flex-col justify-between items-between">
+  <div class="items-between flex flex-col justify-between space-y-4">
     <!-- Timeline -->
     <div class="relative">
       <!-- Numerals -->
       <div
-        class="flex justify-between items-center gap-2 h-12 bg-surface-100 dark:bg-surface-950 rounded-container px-2"
+        class="bg-surface-100 dark:bg-surface-950 rounded-container flex h-12 items-center justify-between gap-2 px-2"
       >
         {#each steps as step, i}
           <!-- Numeral Button -->
@@ -72,8 +72,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
             class={[
               'btn-icon rounded-full',
               isCurrentStep(i)
-                ? 'preset-filled-primary-500 btn-icon-md flex-auto min-w-[36px] max-w-[68px]'
-                : 'preset-filled-surface-200-800 btn-icon-sm shrink min-w-[24px]',
+                ? 'preset-filled-primary-500 btn-icon-md max-w-[68px] min-w-[36px] flex-auto'
+                : 'preset-filled-surface-200-800 btn-icon-sm min-w-[24px] shrink',
             ]}
             onclick={() => setStep(i)}
             title={step.label}
@@ -81,13 +81,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <span class="font-bold">{i + 1}</span>
           </button>
           {#if i < steps.length - 1}
-            <div class="border-t border-surface-300 w-full"></div>
+            <div class="border-surface-300 w-full border-t"></div>
           {/if}
         {/each}
       </div>
       <!-- Line -->
       <hr
-        class="hr border-surface-200-800! absolute top-[50%] left-0 right-0 z-[-1]"
+        class="hr border-surface-200-800! absolute top-[50%] right-0 left-0 z-[-1]"
       />
     </div>
     <!-- Loop all steps -->
@@ -99,7 +99,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {/if}
     {/each}
     <!-- Navigation -->
-    <nav class="flex justify-between items-center gap-4">
+    <nav class="flex items-center justify-between gap-4">
       <!-- Back Button -->
       <button
         type="button"
