@@ -14,7 +14,7 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { SCHEMES } from '$lib/constants';
-import { gauges, localState, toast, weather } from '$lib/state';
+import { localState, toast, weather } from '$lib/state';
 import type { Color, GaugeSettingsType } from '$lib/types';
 import {
   displayNumber,
@@ -192,17 +192,4 @@ export const getSchemeName = (id) => {
   if (SCHEMES.some((n) => n.value === id))
     return SCHEMES.filter((scheme) => scheme.value === id)[0].label;
   return 'Custom';
-};
-
-// Used to hold a temporary snapshot of a gauge when getting color info.
-// This is a performance improvement; instead of having to get a new snapshot each time,
-// if the gaugeId is the same as the previous one, then return the current temporary gauge.
-let temporaryGaugeId = null;
-let temporaryGauge = null;
-export const getTemporaryGauge = (gaugeId) => {
-  if (temporaryGaugeId !== gaugeId || !temporaryGauge) {
-    temporaryGaugeId = gaugeId;
-    temporaryGauge = gauges.getSnapshot(temporaryGaugeId);
-  }
-  return temporaryGauge;
 };

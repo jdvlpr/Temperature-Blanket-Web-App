@@ -24,9 +24,11 @@ import {
 import type { WeatherDay } from '$lib/types';
 import {
   celsiusToFahrenheit,
+  convertTime,
   dateToISO8601String,
   displayNumber,
   getAverage,
+  getColorInfo,
   getToday,
   hoursToMinutes,
   millimetersToInches,
@@ -393,4 +395,45 @@ export const getDayTime = ({ date, lat, lng }) => {
       imperial: null,
     };
   }
+};
+
+export const getTableData = () => {
+  return [
+    ...weather.data.map((n) => {
+      let _weather = {};
+      _weather.color = {};
+      weather.tableWeatherTargets.forEach((target) => {
+        const colorInfo = getColorInfo({
+          param: target.id,
+          value: n[target.id][localState.value.units],
+        });
+        _weather.color[target.id] = colorInfo;
+        if (target.id === 'dayt') {
+          // make sure daytime is always in the same hr:mn format
+          _weather = {
+            ..._weather,
+            [target.id]: convertTime(n[target.id][localState.value.units], {
+              displayUnits: false,
+              padStart: true,
+            }),
+          };
+        } else {
+          let value =
+            n[target.id][localState.value.units] !== null
+              ? n[target.id][localState.value.units]
+              : '-';
+          _weather = {
+            ..._weather,
+            [target.id]: value,
+          };
+        }
+      });
+
+      return {
+        date: dateToISO8601String(n.date),
+        location: n.location,
+        ..._weather,
+      };
+    }),
+  ];
 };

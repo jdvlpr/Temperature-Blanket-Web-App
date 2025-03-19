@@ -14,14 +14,13 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { CHARACTERS_FOR_URL_HASH } from '$lib/constants';
-import { allGaugesAttributes } from '$lib/state';
+import { allGaugesAttributes, gauges } from '$lib/state';
 import type { Color, WeatherParam } from '$lib/types';
 import {
   capitalizeFirstLetter,
   getColorPropertiesFromYarnStringAndHex,
   getProjectParametersFromURLHash,
   getTargetParentGaugeId,
-  getTemporaryGauge,
   getTitleFromLocationsMeta,
   isValueInRange,
   pluralize,
@@ -226,7 +225,7 @@ export const getColorInfo = ({
 
   let gaugeId = getTargetParentGaugeId(param);
 
-  const gauge = getTemporaryGauge(gaugeId);
+  const gauge = gauges.getSnapshot(gaugeId);
 
   if (
     value === null ||

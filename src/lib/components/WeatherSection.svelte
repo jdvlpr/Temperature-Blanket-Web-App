@@ -31,19 +31,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { gauges, localState, locations, modal, weather } from '$lib/state';
   import {
     convertTime,
-    createWeeksProperty,
     displayNumber,
     getAverage,
     isDateWithinLastSevenDays,
     pluralize,
   } from '$lib/utils';
-  import {
-    CloudDownloadIcon,
-    CloudLightningIcon,
-    DatabaseIcon,
-    TriangleAlertIcon,
-    WrenchIcon,
-  } from '@lucide/svelte';
+  import { TriangleAlertIcon } from '@lucide/svelte';
   import { Accordion } from '@skeletonlabs/skeleton-svelte';
   import { onMount } from 'svelte';
   import UnitChanger from './UnitChanger.svelte';
