@@ -1,5 +1,6 @@
 import { CHARACTERS_FOR_URL_HASH } from '$lib/constants';
 import { gauges, previews, weather } from '$lib/state';
+import type { Color, WeatherParam } from '$lib/types';
 import {
   getMonthSepparatorIndexes,
   getSquareSectionTargetIds,
@@ -10,7 +11,6 @@ import {
 import chroma from 'chroma-js';
 import Preview from './Preview.svelte';
 import Settings from './Settings.svelte';
-import type { Color, WeatherParam } from '$lib/types';
 
 type SquaresPreviewSettings = {
   primaryTarget: WeatherParam['id'];
