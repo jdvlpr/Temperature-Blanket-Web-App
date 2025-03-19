@@ -187,12 +187,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   bind:this={bannerElement}
 >
   <p>
-    A new version of this site is coming! <a
-      href="https://github.com/jdvlpr/Temperature-Blanket-Web-App/discussions/5"
+    A new version of this site is <a
+      href="https://github.com/jdvlpr/Temperature-Blanket-Web-App/discussions/9"
       class="link"
       target="_blank"
     >
-      Read the announcement.
+      coming tomorrow, March 20th!
     </a>
   </p>
 
