@@ -4,8 +4,6 @@
 
 Website: **[temperature-blanket.com](https://temperature-blanket.com)**
 
-**New:** Try out the beta version at **[next.temperature-blanket.com](https://next.temperature-blanket.com)**
-
 Visualize your city's historical climate data, create color gauges, and preview your pattern for your crochet or knitting temperature project. Save your project in your browser and as a URL, and download project information in PDF, CSV, and PNG files.
 
 Built with:

@@ -16,10 +16,23 @@
 import { PUBLIC_GITHUB_LINK } from '$env/static/public';
 import { ICONS } from '$lib/constants';
 import type { ChangelogItem } from '$lib/types';
+import { RocketIcon } from '@lucide/svelte';
 
 export const entries: ChangelogItem[] = [
   {
     date: 'March, 2025',
+    notes: [
+      {
+        IconComponent: RocketIcon,
+        instructions:
+          "<a href='/blog/2025-03-20-version-5' class='link'>Learn more and read the update announcement.</a>",
+        text: `Updated design, new features, and rewritten with Svelte 5 and Skeleton 3`,
+        title: 'Version 5 Release',
+      },
+    ],
+    version: '5.0.0',
+  },
+  {
     notes: [
       {
         icon: ICONS.checkCircle,
@@ -567,7 +580,7 @@ export const entries: ChangelogItem[] = [
         icon: ICONS.design,
         instructions:
           "<a href='/blog/2023-12-19-version-3-unified-site-design' class='link'>Read the blog post about Version 3</a>",
-        text: 'New sidebar navigation, unified design accross all pages, and improved performance.',
+        text: 'New sidebar navigation, unified design across all pages, and improved performance.',
         title: 'Updated Site Design',
       },
     ],

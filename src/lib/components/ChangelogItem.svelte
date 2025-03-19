@@ -33,11 +33,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </div>
   <div class="card bg-surface-100 dark:bg-surface-900 flex flex-col gap-2 p-2">
     <div class="card flex flex-wrap gap-2">
-      {#each notes as { icon, text, title, instructions }}
+      {#each notes as { icon, text, title, instructions, IconComponent }}
         <div class="card bg-surface-50 dark:bg-surface-950 flex-auto p-4">
           <p class="flex items-center gap-2 text-base sm:gap-4">
             {#if icon}
               <span class="shrink-0">{@html icon}</span>
+            {:else if IconComponent}
+              <span class="shrink-0"><IconComponent /></span>
             {/if}
 
             <span class="flex flex-col">
