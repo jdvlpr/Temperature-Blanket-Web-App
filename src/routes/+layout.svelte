@@ -192,7 +192,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       class="link"
       target="_blank"
     >
-      coming tomorrow, March 20th!
+      coming Thursday, March 20th!
     </a>
   </p>
 
