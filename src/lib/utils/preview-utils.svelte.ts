@@ -321,11 +321,12 @@ export const setTargets = (data) => {
       .map((g) => g.id)
       .includes(getTargetParentGaugeId(data))
       ? data
-      : null;
+      : gauges.allCreated[0].targets[0].id;
   }
 
   if (typeof data === 'object') {
     // If a gauge gets removed and it contains the target weather param, reset the secondary weather param
+
     if (data.length === 0) return [];
 
     let _targets = data;
