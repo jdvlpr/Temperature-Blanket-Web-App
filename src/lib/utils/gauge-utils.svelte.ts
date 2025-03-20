@@ -78,8 +78,6 @@ export function getRanges({
     // customRanges = newRanges;
     mustUpdateCustomRanges = true;
   } else {
-    // console.log({ start, colors, ranges, increment, rangeOptions });
-
     // If 'auto' range calculations and 'equal ranges' is set
     let _start = start;
 

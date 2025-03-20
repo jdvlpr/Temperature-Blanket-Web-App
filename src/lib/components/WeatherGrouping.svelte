@@ -19,7 +19,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div class="flex flex-col items-start">
-  <div class="flex gap-1 items-center">
+  <div class="flex items-center gap-1">
     <Segment
       value={weather.grouping}
       onValueChange={(e) => {
@@ -28,8 +28,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
       background="bg-surface-100 dark:bg-surface-900"
       classes="shadow-sm"
     >
-      <Segment.Item value={'day'}>Daily</Segment.Item>
-      <Segment.Item value={'week'}>Weekly</Segment.Item>
+      <Segment.Item value="day">Daily</Segment.Item>
+      <Segment.Item value="week">Weekly</Segment.Item>
     </Segment>
   </div>
 </div>
