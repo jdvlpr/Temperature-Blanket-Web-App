@@ -22,11 +22,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <svelte:head>
-  <title>Version 5: Svelte Update</title>
-  <meta name="description" content="Version 5: Svelte Update" />
+  <title>Version 5: Refreshed & Rebuilt</title>
+  <meta name="description" content="Version 5: Refreshed & Rebuilt" />
 
-  <meta property="og:title" content="Version 5: Svelte Update" />
-  <meta property="og:description" content="Version 5: Svelte Update" />
+  <meta property="og:title" content="Version 5: Refreshed & Rebuilt" />
+  <meta property="og:description" content="Version 5: Refreshed & Rebuilt" />
   <meta
     property="og:url"
     content="{PUBLIC_BASE_URL}/blog/2025-03-20-version-5"
@@ -40,7 +40,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <meta property="og:image:height" content="768" />
 </svelte:head>
 
-<AppShell pageName="Version 5: Svelte Update">
+<AppShell pageName="Version 5: Refreshed & Rebuilt">
   {#snippet stickyHeader()}
     <div class="mx-auto hidden lg:inline-flex"><AppLogo /></div>
   {/snippet}
@@ -65,7 +65,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {#snippet content()}
           <div class="mb-8 flex flex-col gap-4 px-2 pb-4">
             <div class="mt-4 flex flex-col gap-2">
-              <h2 class="h2 text-gradient">Version 5: Svelte Update</h2>
+              <h2 class="h2 text-gradient">Version 5: Refreshed & Rebuilt</h2>
               <p class="text-sm">March 20, 2025</p>
             </div>
 

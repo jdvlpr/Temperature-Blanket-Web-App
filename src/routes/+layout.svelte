@@ -20,7 +20,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ToastProvider from '$lib/components/ToastProvider.svelte';
   import { consentToMSClarityCookies, modal, toast } from '$lib/state';
   import { handleKeyDown, initializeLocalStorage, privacy } from '$lib/utils';
-  import { XIcon } from '@lucide/svelte';
+  import { RocketIcon, StarIcon, XIcon } from '@lucide/svelte';
   import { onMount, type Snippet } from 'svelte';
   import '../css/main.css';
 
@@ -155,13 +155,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </svelte:head>
 
 <div
-  class="bg-surface-100-900 flex flex-wrap items-center justify-center gap-2 p-2 text-center [view-transition-name:top-banner]"
+  class="bg-surface-100-900 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 p-2 text-center [view-transition-name:top-banner]"
   bind:this={bannerElement}
 >
-  <p>
-    See what's new in the
-    <a href="/blog/2025-03-20-version-5" class="link">version 5 update!</a>
-  </p>
+  <p>Updated to version 5!</p>
+  <a
+    href="/blog/2025-03-20-version-5"
+    class="btn bg-primary-50-950 hover:preset-tonal"
+  >
+    <RocketIcon />
+    See what's new</a
+  >
   <button class="btn hover:preset-tonal" onclick={() => bannerElement.remove()}
     ><XIcon />Close</button
   >

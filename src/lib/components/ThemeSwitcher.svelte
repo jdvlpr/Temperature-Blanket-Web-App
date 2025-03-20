@@ -129,7 +129,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <Segment.Item value={id}>
               <span class="flex items-center justify-center gap-1">
                 {@html icon}
-                <span class="hidden min-[360px]:inline">{name}</span>
+                <span class="hidden min-[375px]:inline">{name}</span>
               </span>
             </Segment.Item>
           {/each}

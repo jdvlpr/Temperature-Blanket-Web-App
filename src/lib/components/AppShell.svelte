@@ -15,7 +15,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import AppNavigation from '$lib/components/AppNavigation.svelte';
-  import { modal, pageSections, showNavigationSideBar } from '$lib/state';
+  import {
+    modal,
+    pageSections,
+    showNavigationSideBar,
+    weather,
+  } from '$lib/state';
   import { slide } from 'svelte/transition';
   import { weatherChart } from './WeatherChart.svelte';
   import { Modal } from '@skeletonlabs/skeleton-svelte';
@@ -49,7 +54,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   $effect(() => {
     sidebarWidth;
     debounce(() => {
-      if (weatherChart.current) weatherChart.update();
+      if (weatherChart.current && weather.data.length) weatherChart.update();
     }, 101);
   });
 </script>

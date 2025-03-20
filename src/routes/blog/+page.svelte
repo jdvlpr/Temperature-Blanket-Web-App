@@ -24,8 +24,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {
       href: '/blog/2025-03-20-version-5',
       imgSrc: '/images/blog-images/2025-03-20-version-5/featured-image.png',
-      imgAlt: 'Version 5: Svelte Update',
-      title: 'Version 5: Svelte Update',
+      imgAlt: 'Version 5: Refreshed & Rebuilt',
+      title: 'Version 5: Refreshed & Rebuilt',
       tags: ['News'],
     },
     {
