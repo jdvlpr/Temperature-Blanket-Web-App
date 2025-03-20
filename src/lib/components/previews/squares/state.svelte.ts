@@ -53,7 +53,7 @@ export class SquaresPreviewClass {
     dark: './images/preview_icons/Squares White.png',
   });
 
-  wpTagId = 4;
+  wpTagId = 3;
 
   wpTagSlug = 'squares';
 

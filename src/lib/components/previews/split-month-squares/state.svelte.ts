@@ -5,7 +5,6 @@ import {
   getFactors,
   getMiddleValueOfArray,
   getPossibleDimensions,
-  getWeatherTargets,
   setTargets,
   weatherMonthsData,
 } from '$lib/utils';
