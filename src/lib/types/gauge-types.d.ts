@@ -64,6 +64,7 @@ export interface GaugeSettingsType {
   numberOfColors: number | undefined;
   ranges?: GaugeRange[] | undefined;
   rangeOptions: GaugeRangeOptions | undefined;
+  autoRangeOptions: GaugeRangeOptions | undefined;
   schemeId: string | undefined;
 }
 

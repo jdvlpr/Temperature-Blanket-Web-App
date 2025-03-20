@@ -24,11 +24,11 @@ export const getStart = (rangeOptions) => {
   } else return rangeOptions?.manual.start;
 };
 
-export const getIncrement = (rangeOptions) => {
+export const getIncrement = (rangeOptions, autoRangeOptions) => {
   if (rangeOptions?.mode === 'auto') {
     if (rangeOptions.direction === 'high-to-low')
-      return -rangeOptions?.auto.increment;
-    else return rangeOptions?.auto.increment;
+      return -autoRangeOptions?.auto.increment;
+    else return autoRangeOptions?.auto.increment;
   } else {
     if (rangeOptions.direction === 'high-to-low')
       return -rangeOptions.manual.increment;
