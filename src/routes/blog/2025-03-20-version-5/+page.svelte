@@ -212,11 +212,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
               >
               4 to 5. There are
               <a
-                href="https://github.com/jdvlpr/Temperature-Blanket-Web-App/compare/main...next"
+                href="https://github.com/jdvlpr/Temperature-Blanket-Web-App/compare/v4.23.0...v5.0.0"
                 target="_blank"
                 class="link"
-                >more than 280 changed files with more than 26,000 additions and
-                24,100 deletions</a
+                >more than 350 changed files with more than 26,400 additions and
+                24,300 deletions</a
               >. The web app benefits from improved performance that comes with
               Svelte 5. I've also found the developer experience improved, which
               will hopefully lead to easier maintenance and better features.
