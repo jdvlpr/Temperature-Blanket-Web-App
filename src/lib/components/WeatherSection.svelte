@@ -14,13 +14,8 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { browser } from '$app/environment';
   import Spinner from '$lib/components/Spinner.svelte';
-  import UnitChanger from '$lib/components/UnitChanger.svelte';
-  import WeatherChart, {
-    weatherChart,
-  } from '$lib/components/WeatherChart.svelte';
-  import WeatherGrouping from '$lib/components/WeatherGrouping.svelte';
+  import WeatherChart from '$lib/components/WeatherChart.svelte';
   import WeatherItem from '$lib/components/WeatherItem.svelte';
   import WeatherNavigator from '$lib/components/WeatherNavigator.svelte';
   import HelpIcon from '$lib/components/buttons/HelpIcon.svelte';
@@ -33,170 +28,44 @@ If not, see <https://www.gnu.org/licenses/>. -->
     OPEN_METEO_DELAY_DAYS,
     UNIT_LABELS,
   } from '$lib/constants';
-  import {
-    activeWeatherElementIndex,
-    dayt,
-    defaultWeatherSource,
-    isCustomWeather,
-    locations,
-    modal,
-    prcp,
-    showNavigationSideBar,
-    snow,
-    tavg,
-    tmax,
-    tmin,
-    units,
-    weather,
-    weatherGroupedByWeek,
-    weatherGrouping,
-    weatherMonthGroupingStartDay,
-    weatherParametersInView,
-    weatherUngrouped,
-  } from '$lib/stores';
+  import { gauges, localState, locations, modal, weather } from '$lib/state';
   import {
     convertTime,
-    createWeeksProperty,
-    delay,
     displayNumber,
     getAverage,
     isDateWithinLastSevenDays,
     pluralize,
   } from '$lib/utils';
-  import { Accordion, AccordionItem } from '@skeletonlabs/skeleton';
-  import { onDestroy, onMount } from 'svelte';
-  import { bind } from 'svelte-simple-modal';
+  import { TriangleAlertIcon } from '@lucide/svelte';
+  import { Accordion } from '@skeletonlabs/skeleton-svelte';
+  import { onMount } from 'svelte';
+  import UnitChanger from './UnitChanger.svelte';
+  import WeatherGrouping from './WeatherGrouping.svelte';
+  import WeatherSourceButton from './buttons/WeatherSourceButton.svelte';
 
-  let graph;
+  let graph = $state();
+  let defaultWeatherSourceCopy = $state();
+  let wasDefaultWeatherSourceChanged = $state(false);
+  let showWeatherChart = $state(true);
+  let warningAccordionState = $state([]);
+  let missingWeatherAccordionState = $state([]);
   let isAnyWeatherSourceDifferentFromDefault;
-  let defaultWeatherSourceCopy;
-  let wasDefaultWeatherSourceChanged = false;
-  let showWeatherChart = true;
-  let windowWidth;
-
-  let debounceTimer;
-  const debounce = (callback, time) => {
-    if (!browser) return;
-    window.clearTimeout(debounceTimer);
-    debounceTimer = window.setTimeout(callback, time);
-  };
-
   onMount(() => {
-    isAnyWeatherSourceDifferentFromDefault = !$locations?.some(
-      (n) => n.source === $defaultWeatherSource,
+    isAnyWeatherSourceDifferentFromDefault = !locations.all?.some(
+      (n) => n.source === weather.defaultSource,
     );
 
-    defaultWeatherSourceCopy = $defaultWeatherSource;
+    defaultWeatherSourceCopy = weather.defaultSource;
     if (isAnyWeatherSourceDifferentFromDefault) {
-      if ($locations?.every((n) => n.source === 'Meteostat')) {
-        $defaultWeatherSource = 'Meteostat';
+      if (locations.all?.every((n) => n.source === 'Meteostat')) {
+        weather.defaultSource = 'Meteostat';
         wasDefaultWeatherSourceChanged = true;
-      } else if ($locations?.every((n) => n.source === 'Open-Meteo')) {
-        $defaultWeatherSource = 'Open-Meteo';
+      } else if (locations.all?.every((n) => n.source === 'Open-Meteo')) {
+        weather.defaultSource = 'Open-Meteo';
         wasDefaultWeatherSourceChanged = true;
       }
     }
-
-    windowWidth = window.innerWidth;
-
-    window.addEventListener('resize', updateShowWeatherChart, {
-      passive: true,
-    });
   });
-
-  onDestroy(() => {
-    if (!browser) return;
-    window.removeEventListener('resize', updateShowWeatherChart);
-  });
-
-  $: if ($activeWeatherElementIndex) triggerHover($activeWeatherElementIndex);
-
-  $: missingTmin = $tmin.filter((n) => n === null);
-  $: missingTavg = $tavg.filter((n) => n === null);
-  $: missingTmax = $tmax.filter((n) => n === null);
-  $: missingPrcp = $prcp.filter((n) => n === null);
-  $: missingSnow = $snow.filter((n) => n === null);
-  $: missingData = [
-    {
-      count: missingTmin.length,
-      label: 'low',
-      type: 'temperature',
-    },
-    {
-      count: missingTavg.length,
-      label: 'average',
-      type: 'temperature',
-    },
-    {
-      count: missingTmax.length,
-      label: 'high',
-      type: 'temperature',
-    },
-    { count: missingPrcp.length, label: 'rain', type: 'height' },
-    { count: missingSnow.length, label: 'snow', type: 'height' },
-  ];
-
-  $: isDataMissing =
-    !!missingTmin.length || !!missingTavg.length || !!missingTmax.length;
-
-  $: tMinDay = $weather
-    ? $weather
-        .map((day, index) => {
-          return { ...day, index };
-        })
-        .filter((day) => day.tmin[$units] !== null)
-        .reduce((prev, curr) =>
-          prev.tmin[$units] < curr.tmin[$units] ? prev : curr,
-        )
-    : null;
-
-  $: tMaxDay = $weather
-    ? $weather
-        .map((day, index) => {
-          return { ...day, index };
-        })
-        .filter((day) => day.tmax[$units] !== null)
-        .reduce((prev, curr) =>
-          prev.tmax[$units] > curr.tmax[$units] ? prev : curr,
-        )
-    : null;
-
-  $: missingDataMerged = getMissingDataMerged(missingData);
-
-  $: $showNavigationSideBar, forceUpdateShowWeatherChart();
-
-  $: projectHasRecentWeatherData = $weather?.some((date) => {
-    return isDateWithinLastSevenDays(date?.date);
-  });
-
-  $: data = createWeeksProperty({
-    weatherData: $weatherUngrouped,
-    dowOffset: $weatherMonthGroupingStartDay,
-  });
-  $: length = [...new Set(data?.map((day) => day.weekId))].length;
-
-  async function updateShowWeatherChart() {
-    debounce(async () => {
-      // I think sometimes on scroll this would trigger a window width change
-      // So check if the window actually resized
-      if (window.innerWidth === windowWidth) return;
-      showWeatherChart = false;
-      // Delay in order to let the navigation bar finish it's animation.
-      await delay(400);
-      showWeatherChart = true;
-      windowWidth = window.innerWidth;
-    }, 450);
-  }
-
-  async function forceUpdateShowWeatherChart() {
-    debounce(async () => {
-      showWeatherChart = false;
-      // Delay in order to let the navigation bar finish it's animation.
-      await delay(400);
-      showWeatherChart = true;
-      windowWidth = window.innerWidth;
-    }, 450);
-  }
 
   function getMissingDataMerged(missingData) {
     let _countsofTMinTAvgTMax = [...missingData];
@@ -225,138 +94,145 @@ If not, see <https://www.gnu.org/licenses/>. -->
     } else return missingData;
   }
 
-  function triggerHover(index) {
-    const datasets = $weatherChart._metasets
-      .filter((item) => item.hidden !== true)
-      .map((item) => {
-        return {
-          datasetIndex: item.index,
-          index,
-        };
-      });
+  let missingTmin = $derived(weather.params.tmin.filter((n) => n === null));
+  let missingTavg = $derived(weather.params.tavg.filter((n) => n === null));
+  let missingTmax = $derived(weather.params.tmax.filter((n) => n === null));
+  let missingPrcp = $derived(weather.params.prcp.filter((n) => n === null));
+  let missingSnow = $derived(weather.params.snow.filter((n) => n === null));
+  let missingData = $derived([
+    {
+      count: missingTmin.length,
+      label: 'low',
+      type: 'temperature',
+    },
+    {
+      count: missingTavg.length,
+      label: 'average',
+      type: 'temperature',
+    },
+    {
+      count: missingTmax.length,
+      label: 'high',
+      type: 'temperature',
+    },
+    { count: missingPrcp.length, label: 'rain', type: 'height' },
+    { count: missingSnow.length, label: 'snow', type: 'height' },
+  ]);
+  let isDataMissing = $derived(
+    !!missingTmin.length || !!missingTavg.length || !!missingTmax.length,
+  );
+  let tMinDay = $derived(
+    weather.data
+      .map((day, index) => {
+        return { ...day, index };
+      })
+      .filter((day) => day.tmin[localState.value.units] !== null)
+      .reduce((prev, curr) =>
+        prev.tmin[localState.value.units] < curr.tmin[localState.value.units]
+          ? prev
+          : curr,
+      ) || null,
+  );
+  let tMaxDay = $derived(
+    weather.data
+      .map((day, index) => {
+        return { ...day, index };
+      })
+      .filter((day) => day.tmax[localState.value.units] !== null)
+      .reduce((prev, curr) =>
+        prev.tmax[localState.value.units] > curr.tmax[localState.value.units]
+          ? prev
+          : curr,
+      ) || null,
+  );
+  let missingDataMerged = $derived(getMissingDataMerged(missingData));
 
-    $weatherChart.setActiveElements(datasets);
-    $activeWeatherElementIndex = index;
-    $weatherChart.update();
-  }
+  let projectHasRecentWeatherData = $derived(
+    weather.data?.some((date) => {
+      return isDateWithinLastSevenDays(date?.date);
+    }),
+  );
 </script>
 
-<div class="flex flex-col gap-4 justify-center w-full items-center mt-4">
-  <div class="flex flex-wrap gap-4 items-start justify-center w-full">
-    <UnitChanger />
+<div class="mt-2 flex w-full flex-col items-center justify-center gap-2">
+  <div class="flex w-full flex-wrap items-center justify-center gap-x-4">
+    <div class="my-4 flex flex-wrap items-center justify-center gap-4">
+      <UnitChanger />
 
-    <WeatherGrouping />
+      <WeatherGrouping />
+    </div>
 
-    <button
-      class="btn bg-secondary-hover-token w-fit"
-      on:click={() => {
-        modal.set(bind(ChooseWeatherSource));
-      }}
-    >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke-width="1.5"
-        stroke="currentColor"
-        class="w-6 h-6"
+    {#if weather.grouping === 'week'}
+      <div
+        class="rounded-container bg-surface-100 dark:bg-surface-900 mb-4 flex w-full max-w-screen-md flex-col items-start justify-start gap-2 p-2 text-left"
       >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="M10.343 3.94c.09-.542.56-.94 1.11-.94h1.093c.55 0 1.02.398 1.11.94l.149.894c.07.424.384.764.78.93.398.164.855.142 1.205-.108l.737-.527a1.125 1.125 0 011.45.12l.773.774c.39.389.44 1.002.12 1.45l-.527.737c-.25.35-.272.806-.107 1.204.165.397.505.71.93.78l.893.15c.543.09.94.56.94 1.109v1.094c0 .55-.397 1.02-.94 1.11l-.893.149c-.425.07-.765.383-.93.78-.165.398-.143.854.107 1.204l.527.738c.32.447.269 1.06-.12 1.45l-.774.773a1.125 1.125 0 01-1.449.12l-.738-.527c-.35-.25-.806-.272-1.203-.107-.397.165-.71.505-.781.929l-.149.894c-.09.542-.56.94-1.11.94h-1.094c-.55 0-1.019-.398-1.11-.94l-.148-.894c-.071-.424-.384-.764-.781-.93-.398-.164-.854-.142-1.204.108l-.738.527c-.447.32-1.06.269-1.45-.12l-.773-.774a1.125 1.125 0 01-.12-1.45l.527-.737c.25-.35.273-.806.108-1.204-.165-.397-.505-.71-.93-.78l-.894-.15c-.542-.09-.94-.56-.94-1.109v-1.094c0-.55.398-1.02.94-1.11l.894-.149c.424-.07.765-.383.93-.78.165-.398.143-.854-.107-1.204l-.527-.738a1.125 1.125 0 01.12-1.45l.773-.773a1.125 1.125 0 011.45-.12l.737.527c.35.25.807.272 1.204.107.397-.165.71-.505.78-.929l.15-.894z"
-        />
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-        />
-      </svg>
+        <p class="">
+          Weekly weather grouping makes for a shorter project. <a
+            href="/documentation/#grouping-weather-data"
+            target="_blank"
+            class="link"
+            rel="noopener noreferrer">Read more details.</a
+          >
+          {#if weather.goupedByWeek}
+            Your project starts on {DAYS_OF_THE_WEEK.filter(
+              (n) => n.value === weather.goupedByWeek[0].date.getDay(),
+            )[0].label},
+            {MONTHS.filter(
+              (n) => n.value - 1 === weather.goupedByWeek[0].date.getMonth(),
+            )[0]?.name}
+            {weather.goupedByWeek[0].date.getDate()},
+            {weather.goupedByWeek[0].date.getFullYear()}. It spans {weather
+              .goupedByWeek.length}
+            {pluralize('week', weather.goupedByWeek.length)}.
+          {/if}
+        </p>
+        <label class="label mx-auto flex flex-col">
+          <span>Weeks Start On</span>
+          <select
+            class="select mx-auto w-fit"
+            bind:value={weather.monthGroupingStartDay}
+            id="weather-weeks-start-week-on"
+          >
+            {#each DAYS_OF_THE_WEEK as { value, label }}
+              <option {value}>{label}</option>
+            {/each}
+          </select>
+        </label>
+      </div>
+    {/if}
 
-      <span class="whitespace-pre-wrap text-left"
-        >Weather Source: {$isCustomWeather
-          ? 'Custom'
-          : $defaultWeatherSource}</span
-      >
-    </button>
+    <WeatherSourceButton />
   </div>
 
   {#if wasDefaultWeatherSourceChanged}
-    <p class="text-sm w-full">
+    <p class="w-full text-sm">
       No weather data was available from the default source ({defaultWeatherSourceCopy}),
-      so another source was used ({$defaultWeatherSource}) and the Weather
+      so another source was used ({weather.defaultSource}) and the Weather
       Source setting was automatically updated.
     </p>
   {/if}
 
-  {#if $weatherGrouping === 'week'}
-    <div
-      class="rounded-container-token flex flex-col gap-2 items-center justify-center w-full"
-    >
-      <p class="text-sm">
-        Weekly weather grouping makes for a shorter project. <a
-          href="/documentation/#grouping-weather-data"
-          target="_blank"
-          class="link"
-          rel="noopener noreferrer">Read more details.</a
-        >
-        {#if $weatherGroupedByWeek}
-          Your project starts on {DAYS_OF_THE_WEEK.filter(
-            (n) => n.value === $weatherGroupedByWeek[0].date.getDay(),
-          )[0].label},
-          {MONTHS.filter(
-            (n) => n.value - 1 === $weatherGroupedByWeek[0].date.getMonth(),
-          )[0]?.name}
-          {$weatherGroupedByWeek[0].date.getDate()},
-          {$weatherGroupedByWeek[0].date.getFullYear()}. It spans {length}
-          {pluralize('week', length)}.
-        {/if}
-      </p>
-      <label class="label flex-col flex">
-        <span>Weeks Start On</span>
-        <select
-          class="select w-fit"
-          bind:value={$weatherMonthGroupingStartDay}
-          id="weather-weeks-start-week-on"
-        >
-          {#each DAYS_OF_THE_WEEK as { value, label }}
-            <option {value}>{label}</option>
-          {/each}
-        </select>
-      </label>
-    </div>
-  {/if}
-
   {#if projectHasRecentWeatherData}
-    <div
-      class="variant-ghost-warning rounded-container-token text-token text-left w-fit max-w-screen-sm text-sm"
-    >
-      <Accordion>
-        <AccordionItem>
-          <svelte:fragment slot="lead">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-              class="size-6"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"
-              />
-            </svg>
-          </svelte:fragment>
-          <svelte:fragment slot="summary">
-            Weather within the past {$defaultWeatherSource === 'Open-Meteo'
+    <div class="w-fit max-w-(--breakpoint-sm) text-left text-sm">
+      <Accordion
+        value={warningAccordionState}
+        onValueChange={(e) => (warningAccordionState = e.value)}
+        collapsible
+        rounded="rounded-container"
+        classes="bg-warning-500/20"
+      >
+        <Accordion.Item value="warning">
+          {#snippet lead()}
+            <TriangleAlertIcon />
+          {/snippet}
+          {#snippet control()}
+            Weather within the past {weather.defaultSource === 'Open-Meteo'
               ? OPEN_METEO_DELAY_DAYS
-              : $defaultWeatherSource === 'Meteostat'
+              : weather.defaultSource === 'Meteostat'
                 ? METEOSTAT_DELAY_DAYS
                 : 'few'} days may be revised as new data comes in.
-          </svelte:fragment>
-          <svelte:fragment slot="content">
+          {/snippet}
+          {#snippet panel()}
             Weather data comes from <a
               href="https://open-meteo.com/"
               target="_blank"
@@ -367,141 +243,125 @@ If not, see <https://www.gnu.org/licenses/>. -->
               >Meteostat</a
             >, and for some locations their weather models may take up to a week
             to incorporate the latest information. Sometimes even older weather
-            data is updated. Consider working at least {$defaultWeatherSource ===
+            data is updated. Consider working at least {weather.defaultSource ===
             'Open-Meteo'
               ? OPEN_METEO_DELAY_DAYS
-              : $defaultWeatherSource === 'Meteostat'
+              : weather.defaultSource === 'Meteostat'
                 ? METEOSTAT_DELAY_DAYS
                 : 'a few'} days behind to account for possible changes. Sorry for
             any inconvenience.
-          </svelte:fragment>
-        </AccordionItem>
+          {/snippet}
+        </Accordion.Item>
       </Accordion>
     </div>
   {/if}
 
-  <div class="flex flex-wrap gap-x-2 items-start justify-center">
-    {#if $weatherParametersInView.tmax}
+  <div
+    class="from-surface-600 to-surface-950 dark:from-surface-50 dark:to-surface-100 flex flex-wrap items-start justify-center gap-x-2 bg-linear-to-tr box-decoration-clone bg-clip-text text-transparent dark:text-transparent"
+  >
+    {#if weather.table.showParameters.tmax}
       <WeatherItem
         id="tmax"
-        icon="&uarr;"
+        icon="↑"
         label="Highest Temperature"
-        value={Math.max(...$tmax?.filter((n) => n !== null))}
-        units={UNIT_LABELS.temperature[$units]}
+        value={Math.max(...weather.params.tmax?.filter((n) => n !== null))}
+        units={UNIT_LABELS.temperature[localState.value.units]}
       >
-        <div slot="button">
-          <button
-            class="btn text-sm bg-secondary-hover-token"
-            title="Go to Date"
-            on:click={(e) => {
-              e.stopPropagation();
-              triggerHover(tMaxDay.index);
-              graph.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start',
-              });
-            }}
-          >
-            {#if $weatherGrouping === 'week'}Week of{/if}
+        {#snippet date()}
+          <p class="text-xs">
+            {#if weather.grouping === 'week'}Week of{/if}
             {tMaxDay?.date.toLocaleDateString()}
-          </button>
-        </div>
+          </p>
+        {/snippet}
       </WeatherItem>
     {/if}
 
-    {#if $weatherParametersInView.tavg}
+    {#if weather.table.showParameters.tavg}
       <WeatherItem
         id="tavg"
         icon="~"
         label="Average Temperature"
-        value={getAverage($tavg?.filter((n) => n !== null))}
-        units={UNIT_LABELS.temperature[$units]}
+        value={getAverage(weather.params.tavg?.filter((n) => n !== null))}
+        units={UNIT_LABELS.temperature[localState.value.units]}
       />
     {/if}
 
-    {#if $weatherParametersInView.tmin}
+    {#if weather.table.showParameters.tmin}
       <WeatherItem
         id="tmin"
-        icon="&darr;"
+        icon="↓"
         label="Lowest Temperature"
-        value={Math.min(...$tmin?.filter((n) => n !== null))}
-        units={UNIT_LABELS.temperature[$units]}
+        value={Math.min(...weather.params.tmin?.filter((n) => n !== null))}
+        units={UNIT_LABELS.temperature[localState.value.units]}
       >
-        <div slot="button">
-          <button
-            class="btn text-sm bg-secondary-hover-token"
-            title="Go to Date"
-            on:click={(e) => {
-              e.stopPropagation();
-              triggerHover(tMinDay.index);
-              graph.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start',
-              });
-            }}
-          >
-            {#if $weatherGrouping === 'week'}Week of{/if}
+        {#snippet date()}
+          <p class="text-xs">
+            {#if weather.grouping === 'week'}Week of{/if}
             {tMinDay?.date.toLocaleDateString()}
-          </button>
-        </div>
+          </p>
+        {/snippet}
       </WeatherItem>
     {/if}
 
-    {#if $weatherParametersInView.prcp}
+    {#if weather.table.showParameters.prcp}
       <WeatherItem
         id="prcp"
         icon="∴"
         label="Total Rainfall"
-        value={$prcp?.every((n) => n === null)
+        value={weather.params.prcp?.every((n) => n === null)
           ? '-'
           : displayNumber(
-              $prcp
+              weather.params.prcp
                 ?.filter((n) => n !== null)
                 ?.reduce((partialSum, a) => partialSum + a, 0),
             )}
-        units={UNIT_LABELS.height[$units]}
+        units={UNIT_LABELS.height[localState.value.units]}
       />
     {/if}
 
-    {#if $weatherParametersInView.snow}
+    {#if weather.table.showParameters.snow}
       <WeatherItem
         id="snow"
         icon="∗"
-        label={$locations?.every((n) => n.source === 'Meteostat')
+        label={locations.all?.every((n) => n.source === 'Meteostat')
           ? 'Highest Snow Depth'
           : 'Total SnowFall'}
-        value={$snow?.every((n) => n === null)
+        value={weather.params.snow?.every((n) => n === null)
           ? '-'
-          : $locations?.every((n) => n.source === 'Meteostat')
-            ? Math.max(...$snow?.filter((n) => n !== null))
+          : locations.all?.every((n) => n.source === 'Meteostat')
+            ? Math.max(...weather.params.snow?.filter((n) => n !== null))
             : displayNumber(
-                $snow
+                weather.params.snow
                   ?.filter((n) => n !== null)
                   ?.reduce((partialSum, a) => partialSum + a, 0),
               )}
-        units={UNIT_LABELS.height[$units]}
+        units={UNIT_LABELS.height[localState.value.units]}
       >
-        <div slot="button" class="my-2 text-sm">
-          {#if $locations.some((n) => n.source === 'Meteostat') && $locations.some((n) => n.source === 'Open-Meteo')}
-            <HelpIcon
-              href="/documentation/#mixed-snow-parameters"
-              title="Read About Mixed Snow Parameters"
-            >
-              <span slot="text" class="link">Error: Mixed Parameters</span>
-            </HelpIcon>
-          {/if}
-        </div>
+        {#snippet button()}
+          <div class="my-2 text-sm">
+            {#if locations.all.some((n) => n.source === 'Meteostat') && locations.all.some((n) => n.source === 'Open-Meteo')}
+              <HelpIcon
+                href="/documentation/#mixed-snow-parameters"
+                title="Read About Mixed Snow Parameters"
+              >
+                {#snippet text()}
+                  <span class="link">Error: Mixed Parameters</span>
+                {/snippet}
+              </HelpIcon>
+            {/if}
+          </div>
+        {/snippet}
       </WeatherItem>
     {/if}
 
-    {#if $weatherParametersInView.dayt}
+    {#if weather.table.showParameters.dayt}
       <WeatherItem
         id="dayt"
         icon="☼"
         label="Average Daytime"
         value={convertTime(
           getAverage(
-            $dayt?.filter((n) => n !== null),
+            weather.params.dayt?.filter((n) => n !== null),
             { decimals: 6 },
           ),
         )}
@@ -510,87 +370,87 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </div>
 </div>
 
-<div bind:this={graph} class="scroll-m-[60px] w-full">
+<div bind:this={graph} class="w-full scroll-m-[60px]">
   {#if showWeatherChart}
-    {#key $weather}
-      {#key $units}
+    {#if weather.data.length}
+      {#key localState.value.units}
         <WeatherChart />
       {/key}
-    {/key}
+    {/if}
   {:else}
     <div class="my-36"><Spinner /></div>
   {/if}
 </div>
 
-<div class="flex flex-col justify-center w-full items-center gap-4">
-  <div class="flex flex-wrap justify-center items-center">
+<div class="flex w-full flex-col items-center justify-center gap-4">
+  <div class="flex flex-wrap items-center justify-center">
     <ToggleWeatherData
-      view={$weatherParametersInView.tmax}
-      on:click={() => {
-        $weatherParametersInView.tmax = !$weatherParametersInView.tmax;
-        $weatherParametersInView = $weatherParametersInView;
+      view={weather.table.showParameters.tmax}
+      onclick={() => {
+        weather.table.showParameters.tmax = !weather.table.showParameters.tmax;
       }}
     >
-      <span class="border-b-2 border-tmax">High Temps</span>
+      <span class="border-b-2 border-(--tmax)">High Temps</span>
     </ToggleWeatherData>
 
     <ToggleWeatherData
-      view={$weatherParametersInView.tavg}
-      on:click={() => {
-        $weatherParametersInView.tavg = !$weatherParametersInView.tavg;
-        $weatherParametersInView = $weatherParametersInView;
+      view={weather.table.showParameters.tavg}
+      onclick={() => {
+        weather.table.showParameters.tavg = !weather.table.showParameters.tavg;
       }}
     >
-      <span class="border-b-2 border-tavg">Average Temps</span>
+      <span class="border-b-2 border-(--tavg)">Average Temps</span>
     </ToggleWeatherData>
 
     <ToggleWeatherData
-      view={$weatherParametersInView.tmin}
-      on:click={() => {
-        $weatherParametersInView.tmin = !$weatherParametersInView.tmin;
-        $weatherParametersInView = $weatherParametersInView;
+      view={weather.table.showParameters.tmin}
+      onclick={() => {
+        weather.table.showParameters.tmin = !weather.table.showParameters.tmin;
       }}
     >
-      <span class="border-b-2 border-tmin">Low Temps</span>
+      <span class="border-b-2 border-(--tmin)">Low Temps</span>
     </ToggleWeatherData>
 
     <ToggleWeatherData
-      view={$weatherParametersInView.prcp}
-      on:click={() => {
-        $weatherParametersInView.prcp = !$weatherParametersInView.prcp;
-        $weatherParametersInView = $weatherParametersInView;
+      view={weather.table.showParameters.prcp}
+      onclick={() => {
+        weather.table.showParameters.prcp = !weather.table.showParameters.prcp;
       }}
     >
-      <span class="border-b-2 border-prcp">Rain</span>
+      <span class="border-b-2 border-(--prcp)">Rain</span>
     </ToggleWeatherData>
     <ToggleWeatherData
-      view={$weatherParametersInView.snow}
-      on:click={() => {
-        $weatherParametersInView.snow = !$weatherParametersInView.snow;
-        $weatherParametersInView = $weatherParametersInView;
+      view={weather.table.showParameters.snow}
+      onclick={() => {
+        weather.table.showParameters.snow = !weather.table.showParameters.snow;
       }}
     >
-      <span class="border-b-2 border-snow">Snow</span>
+      <span class="border-b-2 border-(--snow)">Snow</span>
     </ToggleWeatherData>
     <ToggleWeatherData
-      view={$weatherParametersInView.dayt}
-      on:click={() => {
-        $weatherParametersInView.dayt = !$weatherParametersInView.dayt;
-        $weatherParametersInView = $weatherParametersInView;
+      view={weather.table.showParameters.dayt}
+      onclick={() => {
+        weather.table.showParameters.dayt = !weather.table.showParameters.dayt;
       }}
     >
-      <span class="border-b-2 border-dayt">Daytime</span>
+      <span class="border-b-2 border-(--dayt)">Daytime</span>
     </ToggleWeatherData>
   </div>
 
   {#if isDataMissing}
     <div
-      class="variant-outline-surface rounded-container-token text-token flex flex-col gap-2 justify-center items-center text-left w-fit max-w-screen-sm text-sm"
+      class="variant-outline-surface rounded-container flex w-fit max-w-(--breakpoint-sm) flex-col items-center justify-center gap-2 text-left text-sm"
     >
-      <Accordion>
-        <AccordionItem>
-          <svelte:fragment slot="lead"
-            ><svg
+      <Accordion
+        value={missingWeatherAccordionState}
+        onValueChange={(e) => (missingWeatherAccordionState = e.value)}
+        collapsible
+        rounded="rounded-container"
+        classes="preset-filled-surface-100-900"
+      >
+        <Accordion.Item value="missing">
+          {#snippet lead()}
+            <svg
               xmlns="http://www.w3.org/2000/svg"
               class="size-6"
               viewBox="0 0 24 24"
@@ -598,23 +458,23 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 fill="currentColor"
                 d="M21.86 12.5A4.313 4.313 0 0 0 19 11c0-1.95-.68-3.6-2.04-4.96C15.6 4.68 13.95 4 12 4c-1.58 0-3 .47-4.25 1.43s-2.08 2.19-2.5 3.72c-1.25.28-2.29.93-3.08 1.95S1 13.28 1 14.58c0 1.51.54 2.8 1.61 3.85C3.69 19.5 5 20 6.5 20h12c1.25 0 2.31-.44 3.19-1.31c.87-.88 1.31-1.94 1.31-3.19c0-1.15-.38-2.15-1.14-3m-1.59 4.77c-.48.49-1.07.73-1.77.73h-12c-.97 0-1.79-.34-2.47-1C3.34 16.29 3 15.47 3 14.5s.34-1.79 1.03-2.47C4.71 11.34 5.53 11 6.5 11H7c0-1.38.5-2.56 1.46-3.54C9.44 6.5 10.62 6 12 6s2.56.5 3.54 1.46C16.5 8.44 17 9.62 17 11v2h1.5c.7 0 1.29.24 1.77.73S21 14.8 21 15.5s-.24 1.29-.73 1.77M11 15h2v2h-2zm3.43-6.32c.54.45.81 1.07.81 1.82c0 .5-.15.91-.44 1.32c-.3.39-.67.68-1.13.93c-.26.16-.43.32-.52.51A1.7 1.7 0 0 0 13 14h-2c0-.55.11-.92.3-1.18c.2-.26.55-.57 1.07-.91c.26-.16.47-.35.63-.59c.15-.23.23-.51.23-.82c0-.32-.09-.56-.27-.74c-.18-.2-.46-.29-.76-.29c-.27 0-.49.08-.7.23c-.15.15-.25.38-.25.69H9.28c-.05-.75.22-1.39.78-1.8C10.6 8.2 11.31 8 12.2 8c.94 0 1.69.23 2.23.68"
               /></svg
-            ></svelte:fragment
-          >
-          <svelte:fragment slot="summary"
-            >There's some missing data</svelte:fragment
-          >
-          <svelte:fragment slot="content">
+            >
+          {/snippet}
+          {#snippet control()}
+            There's some missing data
+          {/snippet}
+          {#snippet panel()}
             {#each missingDataMerged as { count, type, label }}
-              {#if count && count < $weather?.length}
+              {#if count && count < weather.data?.length}
                 {count}
-                {pluralize($weatherGrouping, count)} with missing {label}
-                {pluralize(type, count)}.&nbsp;
-              {:else if count && count === $weather?.length}
+                {pluralize(weather.grouping, count)} with missing {label}
+                {pluralize(type, count)}.
+              {:else if count && count === weather.data?.length}
                 No days have {label}
                 {type} data.
               {/if}
             {/each}
-            <div class="flex flex-col gap-2 mt-2">
+            <div class="mt-2 flex flex-col gap-2">
               <div>
                 <p class="">
                   If you want, here are some ways you can try to fix missing
@@ -629,8 +489,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     - Choose a different
                     <button
                       class="link"
-                      on:click={() => {
-                        modal.set(bind(ChooseWeatherSource));
+                      onclick={() => {
+                        modal.trigger({
+                          type: 'component',
+                          component: {
+                            ref: ChooseWeatherSource,
+                          },
+                        });
                       }}>Weather Source</button
                     >.
                   </p>
@@ -643,15 +508,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 missing weather data.
               </p>
             </div>
-          </svelte:fragment>
-        </AccordionItem>
+          {/snippet}
+        </Accordion.Item>
       </Accordion>
     </div>
   {/if}
 </div>
 
 <div class="mt-2">
-  {#if $weather}
-    <WeatherNavigator data={$weather ? $weather : []} />
+  {#if weather.data.length}
+    {#if !gauges.activeGauge?.calculating}
+      <WeatherNavigator />
+    {/if}
   {/if}
 </div>

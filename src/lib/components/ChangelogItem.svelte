@@ -13,25 +13,33 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script>
-  export let date = null,
-    version = null,
-    notes;
+<script lang="ts">
+  import { ChevronsRightIcon } from '@lucide/svelte';
+
+  interface Props {
+    date?: any;
+    version?: any;
+    notes: any;
+  }
+
+  let { date = null, version = null, notes }: Props = $props();
 </script>
 
 <div class="flex flex-col gap-2">
   <div>
     {#if date}
-      <p class="font-bold text-2xl">{date}</p>
+      <h2 class="h2 text-gradient">{date}</h2>
     {/if}
   </div>
-  <div class="flex flex-col gap-2 card p-2 bg-surface-300-600-token">
-    <div class="flex flex-wrap gap-2">
-      {#each notes as { icon, text, title, instructions }}
-        <div class="card p-4 flex-auto">
-          <p class="text-base flex items-center gap-2 sm:gap-4">
+  <div class="card bg-surface-100 dark:bg-surface-900 flex flex-col gap-2 p-2">
+    <div class="card flex flex-wrap gap-2">
+      {#each notes as { icon, text, title, instructions, IconComponent }}
+        <div class="card bg-surface-50 dark:bg-surface-950 flex-auto p-4">
+          <p class="flex items-center gap-2 text-base sm:gap-4">
             {#if icon}
-              <span class="flex-shrink-0">{@html icon}</span>
+              <span class="shrink-0">{@html icon}</span>
+            {:else if IconComponent}
+              <span class="shrink-0"><IconComponent /></span>
             {/if}
 
             <span class="flex flex-col">
@@ -42,24 +50,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 <span>{@html text}</span>
               {/if}
               {#if instructions}
-                <span class="text-sm pt-2"
-                  ><svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                    class="w-4 h-4 align-text-top inline flex-shrink-0"
-                  >
-                    <path
-                      fill-rule="evenodd"
-                      d="M10.21 14.77a.75.75 0 01.02-1.06L14.168 10 10.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z"
-                      clip-rule="evenodd"
-                    />
-                    <path
-                      fill-rule="evenodd"
-                      d="M4.21 14.77a.75.75 0 01.02-1.06L8.168 10 4.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z"
-                      clip-rule="evenodd"
-                    />
-                  </svg>
+                <span class="pt-2 text-sm">
+                  <ChevronsRightIcon
+                    class="relative -top-[1px] inline size-4"
+                  />
                   <span>{@html instructions}</span>
                 </span>
               {/if}
@@ -69,8 +63,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {/each}
     </div>
     {#if version}
-      <p class="text-xs flex flex-wrap gap-2" id={version}>
-        <span class="inline bg-tertiary-200-700-token px-2 rounded-token">
+      <p class="flex flex-wrap gap-2 text-xs" id={version}>
+        <span class="bg-tertiary-100 dark:bg-tertiary-900 inline rounded px-2">
           <span>Version {version}</span>
         </span>
       </p>

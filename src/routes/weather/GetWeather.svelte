@@ -14,14 +14,13 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script context="module">
-  import { isProjectLoading, signal, units } from '$lib/stores';
-  import { get } from 'svelte/store';
-  import { activeLocationID, locations } from './+page.svelte';
+  import { localState, project, signal } from '$lib/state';
+  import { weatherState } from './+page.svelte';
 
   export async function fetchData() {
-    isProjectLoading.set(true);
+    project.status.loading = true;
 
-    let _locations = get(locations);
+    let _locations = weatherState.weatherLocations;
 
     // Update All Locations
     let newWeatherForcastData = [];
@@ -32,13 +31,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
         date1: new Date(),
         date2: new Date(location.update_time),
       });
-      if (needsUpdate || location.units !== get(units)) {
+      if (needsUpdate || location.units !== localState.value.units) {
         try {
           const data = await getOpenMeteoForecast({ location });
           location.source = 'Open-Meteo';
           // savedLocation.current_weather = data.current_weather;
           location.update_time = new Date().toUTCString();
-          location.units = get(units);
+          location.units = localState.value.units;
           location.data = data;
         } catch (error) {
           throw error;
@@ -47,11 +46,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
       newWeatherForcastData.push(location);
     }
 
-    locations.set(newWeatherForcastData);
+    weatherState.weatherLocations = newWeatherForcastData;
 
-    isProjectLoading.set(false);
+    project.status.loading = false;
 
-    if (!get(activeLocationID)) activeLocationID.set(get(locations)[0]?.id);
+    if (!weatherState.activeLocationID)
+      weatherState.activeLocationID = weatherState.weatherLocations[0]?.id;
   }
 
   const getOpenMeteoForecast = async ({ location }) => {
@@ -62,7 +62,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     let windspeedUnit = 'kmh';
     let precipitationUnit = 'mm';
 
-    if (get(units) === 'imperial') {
+    if (localState.value.units === 'imperial') {
       temperatureUnit = 'fahrenheit';
       windspeedUnit = 'mph';
       precipitationUnit = 'inch';
@@ -70,7 +70,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     url += `&hourly=temperature_2m,precipitation_probability,cloudcover,apparent_temperature,weathercode,is_day&daily=temperature_2m_max,temperature_2m_min,apparent_temperature_max,apparent_temperature_min,rain_sum,snowfall_sum,precipitation_probability_max,weathercode&current_weather=true&temperature_unit=${temperatureUnit}&windspeed_unit=${windspeedUnit}&precipitation_unit=${precipitationUnit}&timezone=auto&forecast_days=7`;
 
-    const response = await fetch(url, { signal: get(signal) });
+    const response = await fetch(url, { signal: signal.value });
 
     if (response.status === 503) {
       // Service Temporarily Unavailable
@@ -91,8 +91,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         `<p class="font-bold text-xl my-4">Something Went Wrong</p>
       <p>A search request for weather data from <span class="font-bold">${location.label}</span> was sent to <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer" class="link">Open-Meteo.com</a>, but the response returned an error.</p>
                             <p class="my-4">Try again with a different location.</p>
-                            <p class="italic text-sm">Error status code: ${response.status}</p>
-                            <p class="mt-4 text-5xl font-ornament">i</p>`,
+                            <p class="italic text-sm">Error status code: ${response.status}</p>`,
       );
     }
 

@@ -1,12 +1,11 @@
 <script lang="ts">
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
   import { ALL_YARN_WEIGHTS, yarnWeightIcons } from '$lib/constants';
-  import { onMount } from 'svelte';
 
-  let highlight = null;
+  let highlight = $state(null);
 
-  onMount(() => {
-    highlight = $page.url.searchParams.get('highlight') || null;
+  $effect(() => {
+    highlight = page.url.searchParams.get('highlight') || null;
     if (highlight) {
       const el = document.getElementById(highlight);
       if (el) {
@@ -98,7 +97,7 @@
 
 <div class="flex flex-col gap-4">
   <div class="mt-4 flex flex-col gap-2">
-    <h1 class=" font-cursive text-3xl">Yarn Weights</h1>
+    <h2 class="h2 text-gradient">Yarn Weights</h2>
     <p class="text-sm">
       Based on <a
         href="https://www.ravelry.com/help/yarn/weights"
@@ -109,9 +108,9 @@
   </div>
   <div class="overflow-x-auto">
     <table
-      class="border-separate border-spacing-0 w-full border-surface-300-600-token border rounded-container-token overflow-hidden text-left"
+      class="border-separate border-spacing-0 w-full border-surface-300-700 border rounded-container overflow-hidden text-left"
     >
-      <thead class="bg-surface-200-700-token">
+      <thead class="bg-surface-200 dark:bg-surface-800">
         <tr class="">
           <th class="min-w-[160px]"
             ><p>Name</p>
@@ -139,22 +138,24 @@
         </tr>
       </thead>
       <tbody
-        class="[&>tr:nth-child(odd)]:bg-surface-50-900-token [&>tr:nth-child(even)]:bg-surface-100-800-token"
+        class="[&>tr:nth-child(odd)]:bg-surface-50 [&>tr:nth-child(odd)]:dark:bg-surface-950 [&>tr:nth-child(even)]:bg-surface-100 [&>tr:nth-child(even)]:dark:bg-surface-900"
       >
         {#each yarnChart as { name, id, wpi, ply, standard_name, icon }}
           <tr
             id={name}
-            class=" scroll-mt-20"
-            class:!bg-primary-50-900-token={highlight === name}
-            on:click={() => {
+            class={[
+              'scroll-mt-20',
+              highlight === name && '!bg-primary-50 dark:!bg-primary-950',
+            ]}
+            onclick={() => {
               if (highlight !== name) {
                 highlight = name;
-                $page.url.searchParams.set('highlight', name);
-                history.replaceState(history.state, '', $page.url);
+                page.url.searchParams.set('highlight', name);
+                history.replaceState(history.state, '', page.url);
               } else {
                 highlight = null;
-                $page.url.searchParams.delete('highlight');
-                history.replaceState(history.state, '', $page.url);
+                page.url.searchParams.delete('highlight');
+                history.replaceState(history.state, '', page.url);
               }
             }}
           >

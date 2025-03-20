@@ -4,18 +4,13 @@
 
 Website: **[temperature-blanket.com](https://temperature-blanket.com)**
 
-**New:** Try out the next version of the website at **[next.temperature-blanket.com](https://next.temperature-blanket.com)**
-
 Visualize your city's historical climate data, create color gauges, and preview your pattern for your crochet or knitting temperature project. Save your project in your browser and as a URL, and download project information in PDF, CSV, and PNG files.
 
 Built with:
 
-- [Sveltekit](https://github.com/sveltejs/kit)
-- [Tailwind](https://github.com/tailwindlabs/tailwindcss)
-- [Skeleton](https://github.com/skeletonlabs/skeleton)
-- And [more...](package.json)
-
-> 🚧 Note: Some of the codebase lacks documentation. I plan to update and refactor code as needed.
+- [Svelte 5 & Sveltekit 2](https://svelte.dev/)
+- [Skeleton 3](https://github.com/skeletonlabs/skeleton)
+- [Tailwind 4](https://github.com/tailwindlabs/tailwindcss)
 
 ## 🚀 Getting Started
 
@@ -34,13 +29,13 @@ To run this site locally on your computer for development, [clone this repositor
 Install dependencies:
 
 ```bash
-npm install
+pnpm install
 ```
 
 Start a development server:
 
 ```bash
-npm run dev
+pnpm dev
 ```
 
 ### ✅ Testing
@@ -48,19 +43,19 @@ npm run dev
 First build the app (to generate cloudflare \_routes.json file)
 
 ```bash
-npm run build
+pnpm build
 ```
 
 Test frontend pages and functions
 
 ```bash
-npm run test
+pnpm test
 ```
 
 Test internal api routes (for the Yarn Colorways API)
 
 ```bash
-npm run test:api
+pnpm test:api
 ```
 
 ## 🙌 Acknowledgments
@@ -92,9 +87,9 @@ Here are the steps for setting up the headless Wordpress site:
 - I use the following plugins
   - [EWWW Image Optimizer](https://wordpress.org/plugins/ewww-image-optimizer/) - To compress and optimize project preview images
   - [Redirection](https://wordpress.org/plugins/redirection/) - To redirect the headless Wordpress home page to the temperature-blanket.com site, and to redirect project pages to their corresponding gallery pages on temperature-blanket.com.
-  - Temperature Blanket Custom Plugin - I created a Wordpress plugin which handles the necessary setup and allows for creation of project gallery pages through a custom REST endpoint.
+  - Temperature Blanket Custom Plugin - I created a Wordpress plugin which handles the necessary setup and allows for creation of project gallery pages through a custom REST endpoint. The source code for this plugin is not public, but if you are interested you can reach out to me.
   - [Wordfence](https://wordpress.org/plugins/wordfence/) - For general site security
-  - [Wordpress Popular Posts](https://wordpress.org/plugins/wordpress-popular-posts/) - For tracking popular projects
+  - [Wordpress Popular Posts](https://wordpress.org/plugins/wordpress-popular-posts/) - For tracking popular project gallery pages
   - [WP-GraphQL](https://wordpress.org/plugins/wp-graphql/) - For interacting with the Wordpress backend
 - Add the following line to `wp-config.php`:
 
@@ -115,16 +110,13 @@ Various site settings and data are stored in the browser.
 <details>
 <summary>View Details</summary>
 
-| Key Name                | Description                                                                 | Default Value | Possible Values                                                                                         | Version Added\* |
-| ----------------------- | --------------------------------------------------------------------------- | ------------- | ------------------------------------------------------------------------------------------------------- | --------------- |
-| skeletonTheme           | The theme for the site                                                      | `"classic"`   | `"classic"` or one of the presets in plugins.themes.presets in [tailwind.config.js](tailwind.config.js) | < 3.28.3        |
-| theme                   | Whether to use the light or dark version of the theme, or follow the system | `"light"`     | `"light"`, `"dark"`, `"system"`                                                                         | < 3.28.3        |
-| layout                  | How to display groups of items                                              | `list`        | `list`, `grid`                                                                                          | < 3.28.3        |
-| projects                | Projects the user has saved                                                 | `[]`          | array of [`SavedProject`](src/lib/types/project-types.d.ts) objects                                     | < 3.28.3        |
-| disable_toast_analytics | Weather to always hide the notification about analytics                     | `false`       | `true`, `false`                                                                                         | 3.28.3          |
-| [/weather]units         | Units for the weather forecast page                                         | `imperial`    | `imperial`, `metric`                                                                                    | < 3.28.3        |
-| [/weather]hour_format   | Time format for the weather forecast page                                   | `12`          | `12`, `24`                                                                                              | < 3.28.3        |
-| [/weather]locations     | Locations the user has added for the weather forecast page                  | `[]`          | array of [`Location`](src/lib/types/location-types.d.ts) objects                                        | < 3.28.3        |
+| Key Name              | Description                                                | Default Value                                                                                                 | Possible Values                                                     | Version Added\* |
+| --------------------- | ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- | --------------- |
+| preferences           | User preferences object                                    | `{ disableToastAnalytics: false, theme: { id: 'classic', mode: 'system',},layout: 'list',} units: 'imperial'` | [`LocalStateType`](src/lib/state/persisted-state.svelte.ts)         | 5.0.0           |
+| projects              | Projects the user has saved                                | `[]`                                                                                                          | array of [`SavedProject`](src/lib/types/project-types.d.ts) objects | < 3.28.3        |
+| [/weather]units       | Units for the weather forecast page                        | `imperial`                                                                                                    | `imperial`, `metric`                                                | < 3.28.3        |
+| [/weather]hour_format | Time format for the weather forecast page                  | `12`                                                                                                          | `12`, `24`                                                          | < 3.28.3        |
+| [/weather]locations   | Locations the user has added for the weather forecast page | `[]`                                                                                                          | array of [`Location`](src/lib/types/location-types.d.ts) objects    | < 3.28.3        |
 
 _\*Items with a < before the version means sometime before that version, I'm not sure exactly when because I wasn't keeping track before version 3.28.3._
 

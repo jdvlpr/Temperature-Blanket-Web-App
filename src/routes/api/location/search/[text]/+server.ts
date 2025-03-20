@@ -9,9 +9,20 @@ export const GET: RequestHandler = async ({ params, fetch }) => {
 
   let fetchURL = API_SERVICES.geonames.baseURL;
   fetchURL += '?q=' + encodeURIComponent(text);
+  fetchURL += '&name_startsWith=' + encodeURIComponent(text);
+  // fetchURL += '&isNameRequired=true';
+  // fetchURL += '&orderby=relevance';
   // if ($windowLanguage) url += `&countryBias=${$windowLanguage}`;
+
+  // See https://www.geonames.org/export/codes.html for feature classes
+  fetchURL += '&featureClass=H'; // stream, lake, ...
+  fetchURL += '&featureClass=L'; //parks,area, ...
+  fetchURL += '&featureClass=P'; //city, village,...
+  fetchURL += '&featureClass=S'; //spot, building, farm
+  fetchURL += '&featureClass=T'; //T mountain,hill,rock,...
+
   fetchURL += '&maxRows=10';
-  fetchURL += '&fuzzy=0.8';
+  fetchURL += '&fuzzy=1';
   fetchURL += '&username=' + SECRET_GEONAMES_USERNAME;
 
   const response = await fetch(fetchURL);

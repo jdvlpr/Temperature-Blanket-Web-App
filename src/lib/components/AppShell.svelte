@@ -15,149 +15,133 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import AppNavigation from '$lib/components/AppNavigation.svelte';
-  import { controller, modal, showNavigationSideBar } from '$lib/stores';
   import {
-    Drawer,
-    TableOfContents,
-    getDrawerStore,
-  } from '@skeletonlabs/skeleton';
-  import { Modal } from 'svelte-simple-modal';
-  import { fade, slide } from 'svelte/transition';
+    modal,
+    pageSections,
+    showNavigationSideBar,
+    weather,
+  } from '$lib/state';
+  import { slide } from 'svelte/transition';
+  import { weatherChart } from './WeatherChart.svelte';
+  import { Modal } from '@skeletonlabs/skeleton-svelte';
+  import AppLogo from './AppLogo.svelte';
+  import { page } from '$app/state';
+  import {
+    MenuIcon,
+    PanelLeftClose,
+    PanelRightCloseIcon,
+  } from '@lucide/svelte';
 
-  export let pageName = 'Menu';
+  /**
+   * @typedef {Object} Props
+   * @property {string} [pageName]
+   * @property {import('svelte').Snippet} [stickyHeader]
+   * @property {import('svelte').Snippet} [main]
+   * @property {import('svelte').Snippet} [footer]
+   */
 
-  const drawerStore = getDrawerStore();
+  /** @type {Props} */
+  let { pageName = 'Menu', stickyHeader, main, footer } = $props();
+
+  let sidebarWidth = $state(0);
+
+  let debounceTimer;
+  const debounce = (callback, time) => {
+    window.clearTimeout(debounceTimer);
+    debounceTimer = window.setTimeout(callback, time);
+  };
+
+  $effect(() => {
+    sidebarWidth;
+    debounce(() => {
+      if (weatherChart.current && weather.data.length) weatherChart.update();
+    }, 101);
+  });
 </script>
 
-<Modal
-  show={$modal}
-  closeOnOuterClick={true}
-  closeButton={false}
-  transitionWindow={slide}
-  transitionWindowProps={{
-    duration: 200,
-  }}
-  transitionBg={fade}
-  transitionBgProps={{
-    duration: 200,
-  }}
-  classWindowWrap="!m-0 relative h-[100svh]"
-  classWindow="modal-window text-center !max-h-[calc(100svh)] !w-fit !max-w-screen-lg !m-0 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 max-md:!rounded-none md:!rounded-container-token !overflow-hidden !bg-surface-50-900-token"
-  classContent="text-token !p-0 !max-h-[calc(100svh)]"
-  classBg="backdrop-blur-md !justify-start sm:!justify-center !z-[300]"
-  on:close={(callback) => {
-    if ($controller) $controller.abort();
-    if (callback) callback;
-    $modal = false;
-  }}
-/>
-
-<Drawer
-  position="left"
-  rounded="rounded-none"
-  height="h-auto"
-  width="w-fit"
-  regionDrawer="pb-4"
-  bgDrawer="bg-surface-50-900-token"
+<div
+  data-vaul-drawer-wrapper="true"
+  class={[
+    'min-h-[100svh]',
+    (page.route.id === '/' &&
+      Array(0, 1).includes(pageSections.items.find((p) => p.active)?.index)) ||
+    page.route.id !== '/'
+      ? 'gradient-background'
+      : '',
+  ]}
 >
-  {#if $drawerStore.id === 'menu'}
-    <AppNavigation {drawerStore} />
-  {:else if $drawerStore.id === 'documentation'}
-    <TableOfContents class="p-4 max-w-[60vw]" />
-  {/if}
-</Drawer>
-
-<div data-vaul-drawer-wrapper="true">
   <div
-    class="sticky top-0 bg-surface-50/90 dark:bg-surface-800/90 backdrop-blur-md z-20 text-token [view-transition-name:sticky-header]"
-    class:lg:py-2={$$slots.stickyHeader}
+    class={[
+      'bg-surface-50/90 dark:bg-surface-950/90 sticky top-0 z-20 backdrop-blur-md [view-transition-name:sticky-header]',
+      stickyHeader && 'lg:py-2',
+    ]}
     id="top-navbar"
   >
     <div
-      class="max-w-screen-xl flex justify-between items-center m-auto px-2 gap-2"
+      class="m-auto flex max-w-(--breakpoint-xl) items-center justify-between gap-2 px-2"
     >
-      <button
-        class="btn bg-secondary-hover-token lg:hidden my-2 flex items-center"
-        class:btn-icon={!pageName}
-        title="Open Navigation Sidebar"
-        on:click={() => drawerStore.open({ id: 'menu' })}
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke-width="1.5"
-          stroke="currentColor"
-          class="w-6 h-6"
+      <div class="lg:hidden">
+        <Modal
+          onOpenChange={(e) => {
+            modal.drawer.leftNavigation = e.open;
+          }}
+          open={modal.drawer.leftNavigation}
+          triggerBase="btn hover:preset-tonal my-2"
+          triggerAriaLabel="Open menu"
+          contentBase="bg-surface-50 dark:bg-surface-950 p-4 space-y-4 shadow-xl w-fit h-screen overflow-auto"
+          positionerJustify="justify-start"
+          positionerAlign=""
+          positionerPadding=""
+          transitionsPositionerIn={{ x: -480, duration: 200 }}
+          transitionsPositionerOut={{ x: -480, duration: 200 }}
         >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
-          />
-        </svg>
-        <!-- <img src="/images/icon.png" class="w-6 h-6" alt="Logo" /> -->
+          {#snippet trigger()}
+            <MenuIcon />
 
-        {#if pageName}
-          <span class="max-[355px]:hidden">
-            {pageName}
-          </span>
-        {/if}
-      </button>
-      <slot name="stickyHeader" />
+            <span class="max-[355px]:hidden">
+              {#if pageName}
+                {pageName}
+              {:else}
+                Menu
+              {/if}
+            </span>
+          {/snippet}
+          {#snippet content()}
+            <div class="mb-20 flex min-w-[265px] flex-col gap-2">
+              <AppLogo />
+              <AppNavigation />
+            </div>
+          {/snippet}
+        </Modal>
+      </div>
+
+      {@render stickyHeader?.()}
     </div>
   </div>
 
-  <div class="flex justify-start max-w-screen-xl mx-auto">
+  <div class="mx-auto flex max-w-(--breakpoint-xl) justify-start">
     <div
-      class="flex flex-col justify-start items-start h-fit [view-transition-name:sidebar-navigation]"
+      class="flex h-fit flex-col items-start justify-start [view-transition-name:sidebar-navigation]"
+      bind:clientWidth={sidebarWidth}
     >
       <button
-        class="btn bg-surface-hover-token mx-2 lg:flex justify-center hidden mt-2"
-        title={`${$showNavigationSideBar ? 'Hide' : 'Show'} Sidebar`}
-        on:click={() => ($showNavigationSideBar = !$showNavigationSideBar)}
+        class="btn hover:preset-tonal mx-2 mt-2 hidden justify-center lg:flex"
+        title={`${showNavigationSideBar.value ? 'Hide' : 'Show'} Sidebar`}
+        onclick={async () => {
+          showNavigationSideBar.value = !showNavigationSideBar.value;
+        }}
       >
-        {#if $showNavigationSideBar}
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            ><g
-              fill="none"
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              ><rect width="18" height="18" x="3" y="3" rx="2" ry="2" /><path
-                d="M9 3v18m7-6l-3-3l3-3"
-              /></g
-            ></svg
-          >
-          <span in:slide={{ axis: 'x' }}>Hide Sidebar</span>
+        {#if showNavigationSideBar.value}
+          <PanelLeftClose />
+          <span in:slide={{ axis: 'x', duration: 90 }}>Hide Sidebar</span>
         {:else}
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            ><g
-              fill="none"
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              ><rect width="18" height="18" x="3" y="3" rx="2" ry="2" /><path
-                d="M9 3v18m5-12l3 3l-3 3"
-              /></g
-            ></svg
-          >
+          <PanelRightCloseIcon />
         {/if}
       </button>
-      {#if $showNavigationSideBar}
+      {#if showNavigationSideBar.value}
         <div
-          class="hidden lg:flex flex-col w-fit"
-          transition:slide={{ axis: 'x' }}
+          class="hidden w-fit flex-col lg:flex"
+          transition:slide={{ axis: 'x', duration: 100 }}
         >
           <div class="w-fit">
             <AppNavigation />
@@ -167,8 +151,35 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
 
     <div class="w-full">
-      <div class="lg:m-2 xl:mx-0"><slot name="main" /></div>
-      <slot name="footer" />
+      <div class="lg:m-2 xl:mx-0">{@render main?.()}</div>
+      {@render footer?.()}
     </div>
   </div>
 </div>
+
+<style>
+  .gradient-background {
+    background-size: cover;
+    background-image:
+      radial-gradient(
+        at 0% 95%,
+        color-mix(in oklab, var(--color-tertiary-500) 10%, transparent) 0px,
+        transparent 50%
+      ),
+      radial-gradient(
+        at 53% 40%,
+        color-mix(in oklab, var(--color-surface-500) 16%, transparent) 0px,
+        transparent 60%
+      ),
+      radial-gradient(
+        at 85% 8%,
+        color-mix(in oklab, var(--color-primary-500) 8%, transparent) 0px,
+        transparent 50%
+      ),
+      radial-gradient(
+        at 100% 100%,
+        color-mix(in oklab, var(--color-surface-500) 9%, transparent) 0px,
+        transparent 50%
+      );
+  }
+</style>

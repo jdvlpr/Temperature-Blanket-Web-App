@@ -17,10 +17,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { PUBLIC_BASE_DOMAIN_NAME, PUBLIC_BASE_URL } from '$env/static/public';
   import AppLogo from '$lib/components/AppLogo.svelte';
   import AppShell from '$lib/components/AppShell.svelte';
-  import { RadioGroup, RadioItem } from '@skeletonlabs/skeleton';
+  import { Segment } from '@skeletonlabs/skeleton-svelte';
   import { fade } from 'svelte/transition';
 
   const posts = [
+    {
+      href: '/blog/2025-03-20-version-5',
+      imgSrc: '/images/blog-images/2025-03-20-version-5/featured-image.png',
+      imgAlt: 'Version 5: Refreshed & Rebuilt',
+      title: 'Version 5: Refreshed & Rebuilt',
+      tags: ['News'],
+    },
     {
       href: '/blog/yarn-weights',
       imgSrc: '/images/blog-images/yarn-weights/banner.png',
@@ -32,7 +39,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       href: '/blog/2024-09-03-now-open-source',
       imgSrc: '/images/blog-images/2024-09-03-now-open-source/banner.jpeg',
       imgAlt: 'Open Source',
-      title: 'Now Open Source',
+      title: 'Version 4: Now Open Source',
       tags: ['News'],
     },
     {
@@ -66,12 +73,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
     ...new Set(posts.filter((post) => post?.tags).flatMap((post) => post.tags)),
   ];
 
-  let selectedTag = 'All';
+  let selectedTag = $state('All');
 
-  $: filteredPosts =
+  let filteredPosts = $derived(
     selectedTag === 'All'
       ? posts
-      : posts.filter((post) => post.tags?.includes(selectedTag));
+      : posts.filter((post) => post.tags?.includes(selectedTag)),
+  );
 </script>
 
 <svelte:head>
@@ -91,54 +99,63 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </svelte:head>
 
 <AppShell pageName="Blog">
-  <svelte:fragment slot="stickyHeader">
-    <div class="hidden lg:inline-flex mx-auto"><AppLogo /></div>
-  </svelte:fragment>
+  {#snippet stickyHeader()}
+    <div class="mx-auto hidden lg:inline-flex"><AppLogo /></div>
+  {/snippet}
 
-  <main
-    slot="main"
-    class="max-w-screen-xl m-auto px-2 gap-4 flex flex-col items-center mb-4"
-  >
-    <RadioGroup
-      class="flex wrap gap-y-2 max-lg:mt-4"
-      active="bg-secondary-active-token"
+  {#snippet main()}
+    <main
+      class="m-auto mb-4 flex max-w-(--breakpoint-xl) flex-col items-center gap-4 px-2"
     >
-      {#each tags as tag}
-        <RadioItem bind:group={selectedTag} name={tag} value={tag} title={tag}>
-          <span class="flex gap-1 justify-center items-center">
-            {tag}
-          </span>
-        </RadioItem>
-      {/each}
-    </RadioGroup>
-
-    {#key selectedTag}
-      <div
-        in:fade
-        class="max-w-screen-xl m-auto grid grid-cols-1 md:grid-cols-3 gap-4 justify-start"
+      <Segment
+        value={selectedTag}
+        onValueChange={(e) => {
+          selectedTag = e.value;
+        }}
+        classes="mt-4"
+        background="bg-surface-100 dark:bg-surface-900 shadow-sm"
       >
-        {#each filteredPosts as { href, imgSrc, imgAlt, title, tags }}
-          <div class="flex flex-col gap-4">
-            <a
-              class="w-full card bg-surface-200-700-token bg-primary-hover-token p-4 whitespace-pre-wrap text-center flex flex-col items-center justify-center gap-2"
-              {href}
-            >
-              <img src={imgSrc} class="h-36 object-cover w-full" alt={imgAlt} />
-              <span class="font-bold text-lg">{title}</span>
-
-              {#if tags}
-                {#each tags as item}
-                  <p
-                    class="text-sm inline bg-tertiary-200-700-token px-2 rounded-token"
-                  >
-                    {item}
-                  </p>
-                {/each}
-              {/if}
-            </a>
-          </div>
+        {#each tags as tag}
+          <Segment.Item value={tag}>
+            <span class="flex items-center justify-center gap-1">
+              {tag}
+            </span>
+          </Segment.Item>
         {/each}
-      </div>
-    {/key}
-  </main>
+      </Segment>
+
+      {#key selectedTag}
+        <div
+          in:fade
+          class="m-auto grid max-w-(--breakpoint-xl) grid-cols-1 justify-start gap-4 md:grid-cols-3"
+        >
+          {#each filteredPosts as { href, imgSrc, imgAlt, title, tags }}
+            <div class="flex flex-col gap-4">
+              <a
+                class="card bg-surface-50-950 hover:bg-surface-100-900 flex w-full flex-col items-center justify-center gap-2 p-4 text-center whitespace-pre-wrap"
+                {href}
+              >
+                <img
+                  src={imgSrc}
+                  class="h-36 w-full object-cover"
+                  alt={imgAlt}
+                />
+                <h5 class="h5">{title}</h5>
+
+                {#if tags}
+                  {#each tags as item}
+                    <p
+                      class="bg-tertiary-200 dark:bg-tertiary-800 inline rounded px-2 text-sm"
+                    >
+                      {item}
+                    </p>
+                  {/each}
+                {/if}
+              </a>
+            </div>
+          {/each}
+        </div>
+      {/key}
+    </main>
+  {/snippet}
 </AppShell>

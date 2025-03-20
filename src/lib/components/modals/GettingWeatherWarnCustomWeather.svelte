@@ -13,31 +13,27 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script>
-  import CloseButton from '$lib/components/modals/CloseButton.svelte';
+<script lang="ts">
   import GettingWeather from '$lib/components/modals/GettingWeather.svelte';
-  import { modal } from '$lib/stores';
-  import { getContext } from 'svelte';
-  import { bind } from 'svelte-simple-modal';
-
-  const { close } = getContext('simple-modal');
+  import { modal } from '$lib/state';
 
   function setModal() {
-    close(modal.set(bind(GettingWeather)));
+    modal.trigger({
+      type: 'component',
+      component: { ref: GettingWeather },
+    });
   }
 </script>
 
-<CloseButton onClose={close} />
-
-<div class="p-2 sm:p-4 mt-10">
+<div class="flex flex-col text-center p-2">
   <p class="text-lg font-bold">Are you sure?</p>
 
   <p class="my-4">This will overwrite your custom weather data.</p>
 
   <div class="mb-4">
     <button
-      class="btn variant-filled-primary"
-      on:click={() => {
+      class="btn preset-filled-primary-500"
+      onclick={() => {
         setModal();
       }}
       title="Search for Weather Data"

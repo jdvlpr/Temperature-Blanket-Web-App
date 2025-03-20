@@ -13,19 +13,6 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { browser, version } from '$app/environment';
-
-// Timestamp identifying when the app was initialized, used as a kind of unique ID for the project (though technically may not be unique if two users initialize at the exact same time). But it doesn't have any real meaning apart from an identifier for a project.
-export const PROJECT_TIMESTAMP_ID = browser
-  ? new URL(window.location).searchParams.get('project') ||
-    new Date().getTime()?.toString()
-  : '';
-
-// App Version
-export const LOADED_APP_VERSION = browser
-  ? new URL(window.location).searchParams.get('v') || version
-  : '';
-
 // Symbols used in a project's URL hash
 export const CHARACTERS_FOR_URL_HASH = {
   separator: "'",
@@ -116,5 +103,26 @@ export const KEYBOARD_SHORTCUTS = [
         keys: ['4'],
       },
     ],
+  },
+];
+
+export const THEMES = [
+  {
+    description: 'Set the theme to light mode.',
+    id: 'light',
+    name: 'Light',
+    icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sun size-6"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>`,
+  },
+  {
+    description: 'Set the theme to dark mode.',
+    id: 'dark',
+    name: 'Dark',
+    icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-moon size-6"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>`,
+  },
+  {
+    description: "Set the theme to match your system's mode.",
+    id: 'system',
+    name: 'System',
+    icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-monitor-cog size-6"><path d="M12 17v4"/><path d="m15.2 4.9-.9-.4"/><path d="m15.2 7.1-.9.4"/><path d="m16.9 3.2-.4-.9"/><path d="m16.9 8.8-.4.9"/><path d="m19.5 2.3-.4.9"/><path d="m19.5 9.7-.4-.9"/><path d="m21.7 4.5-.9.4"/><path d="m21.7 7.5-.9-.4"/><path d="M22 13v2a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7"/><path d="M8 21h8"/><circle cx="18" cy="6" r="3"/></svg>`,
   },
 ];

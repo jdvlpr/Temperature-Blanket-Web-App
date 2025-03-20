@@ -15,11 +15,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import ColorPalette from '$lib/components/ColorPalette.svelte';
-  import { ICONS, MAXIMUM_YARN_DETAILS_DESCRIPTIONS } from '$lib/constants';
+  import { MAXIMUM_YARN_DETAILS_DESCRIPTIONS } from '$lib/constants';
   import { getColorsFromInput, pluralize } from '$lib/utils';
+  import { Trash2Icon } from '@lucide/svelte';
 
-  export let project;
-  export let canRemove = true;
+  /**
+   * @typedef {Object} Props
+   * @property {any} project
+   * @property {boolean} [canRemove]
+   * @property {() => void} [onclick]
+   */
+
+  /** @type {Props} */
+  let { project, canRemove = true, onclick } = $props();
 
   const { href, title, date, isCustomWeatherData } = project;
   let colors = getColorsFromInput({ string: href });
@@ -57,7 +65,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div
-  class="flex justify-start items-center gap-2 w-full bg-surface-200-700-token rounded-container-token p-4"
+  class="flex justify-start items-center gap-2 w-full bg-surface-100 dark:bg-surface-900 rounded-container p-4"
 >
   <div class="flex flex-col w-full">
     <a
@@ -73,8 +81,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     />
   </div>
   {#if canRemove}
-    <button class="btn-icon bg-secondary-hover-token" on:click>
-      {@html ICONS.trash}
+    <button class="btn-icon hover:preset-tonal" {onclick}>
+      <Trash2Icon />
     </button>
   {/if}
 </div>

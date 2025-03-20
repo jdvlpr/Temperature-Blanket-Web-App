@@ -15,10 +15,9 @@
 
 import type { WeatherSource } from './weather-types';
 
-export interface Location {
-  index: number;
-  /** Are the dates and fetched location data valid? */
-  valid?: boolean;
+export interface LocationType {
+  uuid?: string;
+  index?: number;
   /** 'c' is for Custom, 'y' is for One Year */
   duration?: 'c' | 'y';
   /** ISO 8601 date string `YYYY-MM-DD` */
@@ -32,7 +31,30 @@ export interface Location {
   lat?: string;
   lng?: string;
   elevation?: number;
+  /** fclName codes from https://www.geonames.org/export/codes.html */
+  fclName?: string;
+  flagIcon?: string;
+  population?: number;
   stations?: null | any[]; // TODO: Change 'any[]' to a more specific type if possible. Stations are set when using Meteostat for a weather source.
   source?: WeatherSource;
   wasLoadedFromSavedProject?: boolean;
+}
+
+export interface LocationStateType {
+  isValid: boolean;
+  #fromDate: Date | null;
+  #toDate: Date | null;
+  days: number;
+  #today: Date;
+  daysInFuture: number;
+  errorMessage: string;
+}
+
+export interface LocationsStateType {
+  all: LocationStateType[];
+  totalDays: number;
+  allValid: boolean;
+  urlHash: string;
+  projectFileName: string;
+  projectTitle: string | undefined | null;
 }

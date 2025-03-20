@@ -13,6 +13,8 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
+import type { Component } from 'svelte';
+
 export type PageLayout = 'list' | 'grid';
 
 export interface ChangelogItem {
@@ -23,7 +25,8 @@ export interface ChangelogItem {
 }
 
 export interface ChangelogItemNote {
-  icon: string;
+  icon?: string;
+  IconComponent?: Component;
   /** Provide instructions to the user */
   instructions?: string;
   text: string;

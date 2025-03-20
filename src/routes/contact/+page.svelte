@@ -31,23 +31,23 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </svelte:head>
 
 <AppShell pageName="Contact">
-  <svelte:fragment slot="stickyHeader">
-    <div class="hidden lg:inline-flex mx-auto"><AppLogo /></div>
-  </svelte:fragment>
-  <main
-    slot="main"
-    class="max-w-screen-xl px-2 lg:px-0 flex flex-col gap-4 my-2"
-  >
-    <div>
-      <h3 class="font-bold text-xl hidden lg:inline-block">Contact</h3>
-      <SocialIcons />
-    </div>
-    <div>
-      <h3 class="font-bold text-xl my-2">Have a Question?</h3>
-      <p>
-        See the <a href="/faq" class="link">Frequently Asked Questions</a> for answers
-        to common questions.
-      </p>
-    </div>
-  </main>
+  {#snippet stickyHeader()}
+    <div class="hidden lg:inline-flex"><AppLogo /></div>
+  {/snippet}
+  {#snippet main()}
+    <main
+      class="mx-auto flex max-w-(--breakpoint-sm) flex-col gap-4 px-4 lg:px-0"
+    >
+      <div>
+        <h2 class="h2 text-gradient max-lg:hidden">Contact</h2>
+        <SocialIcons />
+      </div>
+      <div class="rounded-container bg-surface-100-900 my-4 w-fit p-2">
+        <p>
+          See the <a href="/faq" class="link">Frequently Asked Questions</a> for
+          answers to common questions.
+        </p>
+      </div>
+    </main>
+  {/snippet}
 </AppShell>

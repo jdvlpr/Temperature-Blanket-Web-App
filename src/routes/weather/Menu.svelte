@@ -15,158 +15,154 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import UnitChanger from '$lib/components/UnitChanger.svelte';
-  import CloseButton from '$lib/components/modals/CloseButton.svelte';
+  import { modal } from '$lib/state';
   import { getWeatherCodeDetails } from '$lib/utils';
-  import { RadioGroup, RadioItem } from '@skeletonlabs/skeleton';
-  import { getContext } from 'svelte';
-  import { activeLocationID, hour, locations } from './+page.svelte';
+  import { Trash2Icon } from '@lucide/svelte';
+  import { Segment } from '@skeletonlabs/skeleton-svelte';
+  import { weatherState } from './+page.svelte';
   import { fetchData } from './GetWeather.svelte';
-  import { validId } from './Location.svelte';
+  import { weatherLocationState } from './Location.svelte';
 
-  export let page = 'settings';
+  /**
+   * @typedef {Object} Props
+   * @property {string} [page]
+   */
 
-  const { close } = getContext('simple-modal');
+  /** @type {Props} */
+  let { page = 'settings' } = $props();
 
-  $: savedWeatherLocations = $locations.filter((item) => item.saved);
+  let savedWeatherLocations = $derived(
+    weatherState.weatherLocations.filter((item) => item.saved),
+  );
 </script>
 
-<CloseButton onClose={close} />
-
-<div class="w-full block sm:w-fit" />
-
-<div class="p-2 sm:p-4">
-  <div class="m-2 text-left">
-    {#if page === 'locations'}
-      <div class="mt-4">
-        <h2 class="mb-2 text-xl font-bold">Locations</h2>
-        <div class="flex flex-col gap-2">
-          {#each savedWeatherLocations as { id, data, label }}
-            <button
-              data-active={id === $activeLocationID}
-              class="flex-1 w-full justify-center flex items-start gap-2 bg-surface-200-700-token rounded-container-token p-2 shadow max-w-screen-lg mx-auto data-[active=true]:bg-primary-200-700-token"
-              title="View this Location"
-              on:click={async () => {
-                $activeLocationID = id;
-                await fetchData();
-                $validId = true;
-                close();
-              }}
-            >
-              <div class="flex flex-col gap-1 items-start justify-start">
-                <p class="font-sans_light text-4xl">
-                  {data?.current_weather.temperature}°
-                </p>
-                <p class="text-xs">
-                  {new Date(data?.current_weather.time).toLocaleTimeString(
-                    navigator.language,
-                    {
-                      timeStyle: 'short',
-                      hour12: $hour === '12' ? true : false,
-                    },
-                  )}
-                </p>
-              </div>
-
-              <div
-                class="flex flex-col sm:flex-wrap text-left items-start justify-start flex-1 basis-1/2"
-              >
-                <p class="font-bold">
-                  {@html label.slice(0, label.split(',', 2).join(',').length)}
-                </p>
-                <div class="flex flex-wrap gap-x-1 items-center justify-center">
-                  <p>
-                    {@html getWeatherCodeDetails({
-                      weathercode: data?.current_weather.weathercode,
-                      is_day: data?.current_weather.is_day,
-                    }).description}
-                  </p>
-                  <p>
-                    {@html getWeatherCodeDetails({
-                      weathercode: data?.current_weather.weathercode,
-                      is_day: data?.current_weather.is_day,
-                    }).icon}
-                  </p>
-                </div>
-              </div>
-              <button
-                class="btn-icon bg-secondary-hover-token"
-                title="Remove from Locations"
-                on:click={(e) => {
-                  e.stopPropagation();
-                  e.preventDefault();
-                  $locations.map((item) => {
-                    if (item.id === id) item.saved = false;
-                    return item;
-                  });
-                  $locations = $locations;
-                  // const _weatherForecastData = $locations.filter((item) => item.id !== id);
-                  // $locations = _weatherForecastData;
-
-                  if (id === $activeLocationID)
-                    $activeLocationID =
-                      $locations.find((item) => item.saved)?.id || null;
-
-                  if (!$locations.filter((item) => item?.saved)?.length)
-                    close();
-                }}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke-width="1.5"
-                  stroke="currentColor"
-                  class="w-6 h-6"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              </button>
-            </button>
-          {/each}
-        </div>
-      </div>
-    {/if}
-    {#if page === 'settings'}
-      <div class="mt-4 w-full">
-        <h2 class="mb-2 text-xl font-bold">Settings</h2>
-        <div class="flex flex-col justify-center gap-x-2 gap-y-4 w-fit py-2">
-          <!-- <ThemeSwitcher showText={true} /> -->
-          <div><UnitChanger /></div>
+<div class="p-4 text-left">
+  {#if page === 'locations'}
+    <div class="mt-4">
+      <h2 class="mb-2 text-xl font-bold">Locations</h2>
+      <div class="flex flex-col gap-2">
+        {#each savedWeatherLocations as { id, data, label }}
           <div
-            class="flex flex-wrap items-center justify-center gap-4 p-2 bg-surface-100-800-token rounded-container-token"
+            role="button"
+            tabindex="0"
+            data-active={id === weatherState.activeLocationID}
+            class="bg-surface-200 dark:bg-surface-800 rounded-container data-[active=true]:bg-primary-200-800 mx-auto flex w-full max-w-(--breakpoint-lg) flex-1 items-start justify-center gap-2 p-2 shadow-sm"
+            title="View this Location"
+            onclick={async () => {
+              weatherState.activeLocationID = id;
+              await fetchData();
+              weatherLocationState.validId = true;
+              modal.close();
+            }}
+            onkeydown={async (e) => {
+              if (e.key === 'Enter') {
+                weatherState.activeLocationID = id;
+                await fetchData();
+                weatherLocationState.validId = true;
+                modal.close();
+              }
+            }}
           >
-            <div class="flex flex-wrap items-center justify-center gap-2">
-              <RadioGroup
-                class="flex-wrap gap-y-2"
-                active="bg-secondary-active-token"
-              >
-                <RadioItem
-                  bind:group={$hour}
-                  name="hour-format-12"
-                  value="12"
-                  title="Set hour format to 12">12hr</RadioItem
-                >
-                <RadioItem
-                  bind:group={$hour}
-                  name="hour-format-24"
-                  value="24"
-                  title="Set hour format to 24">24hr</RadioItem
-                >
-              </RadioGroup>
-              <p class="text-sm">
-                {new Date().toLocaleTimeString(navigator.language, {
-                  timeStyle: 'short',
-                  hour12: $hour === '12' ? true : false,
-                })}
+            <div class="flex flex-col items-start justify-start gap-1">
+              <p class="text-4xl">
+                {data?.current_weather.temperature}°
+              </p>
+              <p class="text-xs">
+                {new Date(data?.current_weather.time).toLocaleTimeString(
+                  navigator.language,
+                  {
+                    timeStyle: 'short',
+                    hour12: weatherState.hour === '12' ? true : false,
+                  },
+                )}
               </p>
             </div>
+
+            <div
+              class="flex flex-1 basis-1/2 flex-col items-start justify-start text-left sm:flex-wrap"
+            >
+              <p class="font-bold">
+                {@html label.slice(0, label.split(',', 2).join(',').length)}
+              </p>
+              <div class="flex flex-wrap items-center justify-center gap-x-1">
+                <p>
+                  {@html getWeatherCodeDetails({
+                    weathercode: data?.current_weather.weathercode,
+                    is_day: data?.current_weather.is_day,
+                  }).description}
+                </p>
+                <p>
+                  {@html getWeatherCodeDetails({
+                    weathercode: data?.current_weather.weathercode,
+                    is_day: data?.current_weather.is_day,
+                  }).icon}
+                </p>
+              </div>
+            </div>
+            <button
+              aria-label="Remove from Locations"
+              class="btn-icon hover:preset-tonal"
+              title="Remove from Locations"
+              onclick={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                weatherState.weatherLocations.map((item) => {
+                  if (item.id === id) item.saved = false;
+                  return item;
+                });
+                // const _weatherForecastData = weatherState.weatherLocations.filter((item) => item.id !== id);
+                // weatherState.weatherLocations = _weatherForecastData;
+
+                if (id === weatherState.activeLocationID)
+                  weatherState.activeLocationID =
+                    weatherState.weatherLocations.find((item) => item.saved)
+                      ?.id || null;
+
+                if (
+                  !weatherState.weatherLocations.filter((item) => item?.saved)
+                    ?.length
+                )
+                  modal.close();
+              }}
+            >
+              <Trash2Icon />
+            </button>
+          </div>
+        {/each}
+      </div>
+    </div>
+  {/if}
+  {#if page === 'settings'}
+    <div class="mt-4 w-full">
+      <h2 class="mb-2 text-xl font-bold">Settings</h2>
+      <div
+        class="bg-surface-50 dark:bg-surface-950 flex w-fit flex-col justify-center gap-2 rounded p-2"
+      >
+        <div><UnitChanger /></div>
+        <div
+          class="rounded-container flex flex-wrap items-center justify-center gap-4 p-2"
+        >
+          <div class="flex flex-wrap items-center justify-center gap-2">
+            <Segment
+              value={weatherState.hour}
+              onValueChange={(e) => {
+                weatherState.hour = e.value;
+              }}
+              classes="flex-wrap gap-y-2"
+              background="bg-surface-100 dark:bg-surface-900 shadow-sm"
+            >
+              <Segment.Item value="12">12hr</Segment.Item>
+              <Segment.Item value="24">24hr</Segment.Item>
+            </Segment>
+            <p class="text-sm">
+              {new Date().toLocaleTimeString(navigator.language, {
+                timeStyle: 'short',
+                hour12: weatherState.hour === '12' ? true : false,
+              })}
+            </p>
           </div>
         </div>
       </div>
-    {/if}
-  </div>
+    </div>
+  {/if}
 </div>

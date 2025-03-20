@@ -13,27 +13,31 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script>
+<script lang="ts">
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
   import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
   import StickyPart from '$lib/components/modals/StickyPart.svelte';
   import Tooltip from '$lib/components/Tooltip.svelte';
+  import { modal } from '$lib/state';
   import {
     displayNumber,
     getSecondaryTargetIndexes,
     getTextColor,
     setSecondaryTargets,
   } from '$lib/utils';
-  import { getContext } from 'svelte';
 
-  export let targets,
+  let {
+    targets,
     squareSize,
     primaryTarget,
     secondaryTargets,
     primaryTargetAsBackup,
-    onOkay;
+    onOkay,
+    parent,
+  } = $props();
 
-  const { close } = getContext('simple-modal');
+  let _secondaryTargets = $state(secondaryTargets);
+
   const colors = {
     tmin: '#38bdf8',
     tavg: '#a3a3a3',
@@ -43,13 +47,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     dayt: '#facc15',
   };
 
-  $: secondaryTargetIndexes = getSecondaryTargetIndexes(secondaryTargets);
-
-  $: squares = createSquares(squareSize, secondaryTargetIndexes, primaryTarget);
-  $: maxGridItemWidth = displayNumber((1 / squareSize) * 800);
-
   function reset() {
-    secondaryTargets = [];
+    _secondaryTargets = [];
   }
 
   function createSquares(_squareSize, _secondaryTargetIndexes, _primaryTarget) {
@@ -77,27 +76,41 @@ If not, see <https://www.gnu.org/licenses/>. -->
     return _squares;
   }
 
+  let secondaryTargetIndexes = $derived(
+    getSecondaryTargetIndexes(_secondaryTargets),
+  );
+
+  let squares = $derived(
+    createSquares(squareSize, secondaryTargetIndexes, primaryTarget),
+  );
+
+  let maxGridItemWidth = $derived(displayNumber((1 / squareSize) * 800));
+
   function _onOkay() {
     onOkay({
       squareSize,
       primaryTarget,
-      secondaryTargets,
+      secondaryTargets: _secondaryTargets,
       primaryTargetAsBackup,
     });
-    close();
+    modal.close();
   }
 </script>
 
-<div class="p-2 sm:p-4 mt-8">
-  <p class="italic my-2">
-    Each sqaure in your layout will use the following properties.
+<div class="p-4">
+  <p class="italic my-2 text-center">
+    Each square in your layout will use the following properties.
   </p>
 
   <div class="flex flex-col gap-4 justify-center items-center">
     <div class="flex flex-wrap gap-4 justify-center w-full">
       <label class="label">
         <span>Square Size</span>
-        <select class="select w-fit" id="square-size" bind:value={squareSize}>
+        <select
+          class="select min-w-[100px]"
+          id="square-size"
+          bind:value={squareSize}
+        >
           {#each Array(17) as _, i}
             {#if i > 0}
               <option value={i}>
@@ -111,7 +124,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <label class="label">
         <span>Primary (Background) Color Using the Day's</span>
         <select
-          class="select w-fit"
+          class="select w-fit truncate min-w-[220px]"
           id="primary-target"
           bind:value={primaryTarget}
         >
@@ -131,16 +144,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
       class="grid gap-1 max-w-[500px] max-h-[500px] aspect-square my-2"
       style="grid-template-columns:repeat({squareSize},minmax(1rem,{maxGridItemWidth}px));"
     >
-      {#key secondaryTargets}
+      {#key _secondaryTargets}
         {#each squares as { icon, label, targetId }, index (index)}
           <button
-            class="flex flex-col justify-center items-center select-none outline-none cursor-pointer rounded-container-token shadow aspect-square"
+            class="flex flex-col justify-center items-center select-none outline-hidden cursor-pointer rounded-container shadow-sm aspect-square"
             style="background-color: {colors[targetId]};color:{getTextColor(
               colors[targetId],
             )}"
             data-param={targetId}
             type="button"
-            on:click={() => {
+            onclick={() => {
               const currentTarget = targets.filter(
                 (target) => target.id === targetId,
               )[0];
@@ -148,9 +161,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
               const nextTargetIndex =
                 targetIndex + 1 === targets.length ? 0 : targetIndex + 1;
               const nextTarget = targets[nextTargetIndex];
-              secondaryTargets = setSecondaryTargets(
+              _secondaryTargets = setSecondaryTargets(
                 [nextTarget.id, index],
-                secondaryTargets,
+                _secondaryTargets,
               );
             }}
           >
@@ -166,7 +179,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {/key}
     </div>
 
-    <Tooltip on:click={reset} class="btn bg-secondary-hover-token gap-2">
+    <Tooltip onclick={reset} classNames="btn hover:preset-tonal gap-2 mb-2">
       <svg
         xmlns="http://www.w3.org/2000/svg"
         fill="none"
@@ -182,26 +195,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
         />
       </svg>
       Reset Sections
-      <p slot="tooltip">
-        All square sections will be reset to the primary color.
-      </p>
+      {#snippet tooltip()}
+        <p>All square sections will be reset to the primary color.</p>
+      {/snippet}
     </Tooltip>
   </div>
 
-  <div
-    class="flex flex-col gap-2 justify-center items-center bg-surface-100-800-token rounde-container-token p-4 mt-2"
-  >
-    <ToggleSwitch
-      bind:checked={primaryTargetAsBackup}
-      label="Use Primary as Backup"
-      details="Use primary color if secondary color's value is not available, or if it's a height-type paramter with a value
-    of 0."
-    />
-  </div>
+  <ToggleSwitch
+    bind:checked={primaryTargetAsBackup}
+    label="Use Primary as Backup"
+    details="Use primary color if secondary color's value is not available, or if it's a height-type paramter with a value
+        of 0."
+  />
 </div>
-
 <StickyPart position="bottom">
-  <div class="p-2 sm:p-4">
-    <SaveAndCloseButtons onSave={_onOkay} onClose={close} />
+  <div class="p-2">
+    <SaveAndCloseButtons onSave={_onOkay} onClose={modal.close} />
   </div>
 </StickyPart>

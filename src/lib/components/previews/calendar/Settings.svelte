@@ -1,0 +1,126 @@
+<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+
+This file is part of Temperature-Blanket-Web-App.
+
+Temperature-Blanket-Web-App is free software: you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the Free Software Foundation, 
+either version 3 of the License, or (at your option) any later version.
+
+Temperature-Blanket-Web-App is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
+If not, see <https://www.gnu.org/licenses/>. -->
+
+<script>
+  import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
+  import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
+  import SquareDesigner from '$lib/components/modals/SquareDesigner.svelte';
+  import { calendarPreview } from '$lib/components/previews/calendar/state.svelte';
+  import { DAYS_OF_THE_WEEK } from '$lib/constants';
+  import { gauges, modal, weather } from '$lib/state';
+  import { PipetteIcon, SquareSquareIcon } from '@lucide/svelte';
+
+  let targets = $derived(gauges.allCreated.map((n) => n.targets).flat());
+
+  // let factors = $derived(getFactors({ length: calendarPreview.months.length }));
+
+  // let possibleDimensions = $derived(getPossibleDimensions({ factors }));
+
+  function handelOkaySquareDesigner(e) {
+    calendarPreview.settings.squareSize = e.squareSize;
+    calendarPreview.settings.primaryTarget = e.primaryTarget;
+    calendarPreview.settings.secondaryTargets = e.secondaryTargets;
+    calendarPreview.settings.primaryTargetAsBackup = e.primaryTargetAsBackup;
+  }
+</script>
+
+<p class="w-full">
+  Squares are arranged in a calendar-like grid, grouped by month.
+</p>
+
+<label class="label">
+  <span>Dimensions (W x H)</span>
+  <select
+    class="select w-fit min-w-[80px]"
+    id="clnr-dimensions"
+    bind:value={calendarPreview.settings.dimensions}
+  >
+    {#each calendarPreview.possibleDimensions as value}
+      <option {value}>{value}</option>
+    {/each}
+  </select>
+</label>
+
+<button
+  class="btn hover:preset-tonal gap-1"
+  title="Edit Square Design"
+  onclick={async () => {
+    modal.trigger({
+      type: 'component',
+      component: {
+        ref: SquareDesigner,
+        props: {
+          targets,
+          squareSize: calendarPreview.settings.squareSize,
+          primaryTarget: calendarPreview.settings.primaryTarget,
+          secondaryTargets: $state.snapshot(
+            calendarPreview.settings.secondaryTargets,
+          ),
+          primaryTargetAsBackup: calendarPreview.settings.primaryTargetAsBackup,
+          onOkay: handelOkaySquareDesigner,
+        },
+      },
+    });
+  }}
+>
+  <SquareSquareIcon />
+
+  Square Design</button
+>
+
+<label class="label">
+  <span>Weeks Start On</span>
+  <select
+    class="select w-fit"
+    bind:value={calendarPreview.settings.weekStartCode}
+    onchange={() => {
+      if (weather.grouping === 'week')
+        weather.monthGroupingStartDay = calendarPreview.settings.weekStartCode;
+    }}
+  >
+    {#each DAYS_OF_THE_WEEK as { value, label }}
+      <option {value}>{label}</option>
+    {/each}
+  </select>
+</label>
+
+<div class="flex items-center gap-2">
+  <ToggleSwitch
+    bind:checked={calendarPreview.settings.monthPadding}
+    label="Space around months"
+  />
+</div>
+
+<button
+  class="btn hover:preset-tonal gap-1"
+  title="Choose a Color"
+  onclick={() =>
+    modal.trigger({
+      type: 'component',
+      component: {
+        ref: ChangeColor,
+        props: {
+          hex: calendarPreview.settings.additionalSquaresColor,
+          onChangeColor: ({ hex }) => {
+            calendarPreview.settings.additionalSquaresColor = hex;
+            modal.close();
+          },
+        },
+      },
+    })}
+>
+  <PipetteIcon />
+  Color of Additional Squares
+</button>

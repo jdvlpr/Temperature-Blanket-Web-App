@@ -24,44 +24,37 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <svelte:head>
   <title>Supporters</title>
-  <meta
-    name="description"
-    content="Thanks to the supporters who help contribute to this site."
-  />
+  <meta name="description" content="Thanks to the supporters" />
 
   <meta property="og:title" content="Supporters" />
-  <meta
-    property="og:description"
-    content="Thanks to the supporters who help contribute to this site."
-  />
+  <meta property="og:description" content="Thanks to the supporters" />
   <meta property="og:url" content="{PUBLIC_BASE_URL}/supporters" />
   <meta property="og:type" content="website" />
 </svelte:head>
 
 <AppShell pageName="Supporters">
-  <svelte:fragment slot="stickyHeader">
-    <div class="hidden lg:inline-flex mx-auto"><AppLogo /></div>
-  </svelte:fragment>
-  <main slot="main" class="max-w-screen-xl m-auto text-center mb-4">
-    <Card>
-      <div slot="header">
-        <div class="bg-surface-200-700-token text-token p-4">
-          <p class="text-center mt-2">
+  {#snippet stickyHeader()}
+    <div class="mx-auto hidden lg:inline-flex"><AppLogo /></div>
+  {/snippet}
+  {#snippet main()}
+    <main class="m-auto mx-auto mb-4 max-w-screen-lg px-2 text-center">
+      <div>
+        <div class="p-4">
+          <p class="mt-2 text-center">
             Thanks to <a
               href={PUBLIC_KOFI_LINK}
               target="_blank"
               rel="noopener noreferrer"
               class="link">generous one-time donors</a
             >
-            for their contributions to this site, as well as to the following monthly
-            supporters:
+            for their contributions, as well as to the following monthly supporters!
           </p>
         </div>
       </div>
-      <div slot="content" class="pb-4">
+      <div class="pb-4">
         <Supporters />
         <div class="mt-4"><DonateButton /></div>
       </div>
-    </Card>
-  </main>
+    </main>
+  {/snippet}
 </AppShell>

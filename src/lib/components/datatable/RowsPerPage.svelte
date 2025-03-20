@@ -13,15 +13,17 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script>
-  export let handler;
+<script lang="ts">
+  import { weather } from '$lib/state';
+  import type { TableHandler } from '@vincjo/datatables';
 
-  const rowsPerPage = handler.getRowsPerPage();
-  const pages = handler.getPages({ ellipsis: false });
-  const pageNumber = handler.getPageNumber();
-  const rowCount = handler.getRowCount();
+  interface Props {
+    table: TableHandler;
+  }
 
-  const options = createOptions($rowCount.total);
+  let { table }: Props = $props();
+
+  const options = createOptions(table.rowCount.total);
   function createOptions(totalCount) {
     if (totalCount < 10) return [10];
     if (totalCount < 50) return [10, totalCount];
@@ -30,15 +32,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 </script>
 
-<label class="label flex flex-col items-start">
+<label class="label flex flex-col items-start w-24">
   <span class="text-sm">Rows Per Page</span>
   <select
     class="select"
-    bind:value={$rowsPerPage}
+    value={table.rowsPerPage}
     id="rows-per-page"
     title="Choose how many rows per page"
-    on:change={() => {
-      if ($pageNumber > $pages.length) handler.setPage(1);
+    onchange={(e) => {
+      weather.table.rowsPerPage = +e.target.value;
+      table.setRowsPerPage(+e.target.value);
+
+      if (table.currentPage > table.pages.length) {
+        weather.table.page = 1;
+        table.setPage(1);
+      }
     }}
   >
     {#each options as option}

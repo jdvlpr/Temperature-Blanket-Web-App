@@ -14,30 +14,42 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { ALL_YARN_WEIGHTS, ICONS } from '$lib/constants';
-  import { defaultYarn } from '$lib/stores';
+  import { ALL_YARN_WEIGHTS } from '$lib/constants';
+  import { defaultYarn } from '$lib/state';
   import { delay, pluralize, stringToBrandAndYarnDetails } from '$lib/utils';
   import { brands } from '$lib/yarns/brands';
+  import { ChevronDownIcon, ListFilterIcon, XIcon } from '@lucide/svelte';
   import autocomplete from 'autocompleter';
-  import { createEventDispatcher, onMount } from 'svelte';
+  import { onMount, untrack } from 'svelte';
 
-  export let selectedBrandId = '';
-  export let selectedYarnId = '';
-  export let selectedYarnWeightId = '';
-  export let context = '';
-  export let disabled = false;
-  export let preselectDefaultYarn = true;
+  interface Props {
+    selectedBrandId?: string;
+    selectedYarnId?: string;
+    selectedYarnWeightId?: string;
+    context?: string;
+    disabled?: boolean;
+    preselectDefaultYarn?: boolean;
+    onselectautocomplete?;
+  }
 
-  let inputElement, inputGroup;
-  let forceDisplayAll = false;
-  let inputValue = '';
-  let showingAutocomplete = false;
+  let {
+    selectedBrandId = $bindable(),
+    selectedYarnId = $bindable(),
+    selectedYarnWeightId = '',
+    context = '',
+    disabled = false,
+    preselectDefaultYarn = true,
+    onselectautocomplete = () => {},
+  }: Props = $props();
 
-  let allYarns = [];
+  let inputElement = $state();
+  let autocompleteContainer = $state();
+  let inputGroup = $state();
+  let forceDisplayAll = $state(false);
+  let inputValue = $state('');
+  let showingAutocomplete = $state(false);
 
-  $: selectedYarnWeightId, onSelectedYarnWeightIdChange();
-
-  $: allYarns = getAllYarns(selectedYarnWeightId);
+  let allYarns = $state(getAllYarns());
 
   function onSelectedYarnWeightIdChange() {
     if (selectedBrandId || selectedYarnId) {
@@ -104,13 +116,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     const regex = new RegExp(`(${searchText})`, 'gi'); // Case-insensitive search
     return string.replace(
       regex,
-      "<span class='font-bold text-primary-600-300-token'>$1</span>",
+      "<span class='font-bold text-primary-700-300'>$1</span>",
     );
   }
 
-  const dispatch = createEventDispatcher();
-
-  function getAllYarns(selectedYarnWeightId) {
+  function getAllYarns(selectedYarnWeightId = null) {
     return brands.flatMap((brand) => {
       return brand.yarns
         .filter((yarn) => {
@@ -163,8 +173,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
         yarnId: selectedYarnId,
       });
       forceDisplayAll = true;
-    } else if ($defaultYarn && preselectDefaultYarn) {
-      let { brandId, yarnId } = stringToBrandAndYarnDetails($defaultYarn);
+    } else if (defaultYarn.value && preselectDefaultYarn) {
+      let { brandId, yarnId } = stringToBrandAndYarnDetails(defaultYarn.value);
       if (brandId) selectedBrandId = brandId;
       if (yarnId) selectedYarnId = yarnId;
       inputValue = getYarnValue({
@@ -184,7 +194,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         selectedYarnId = item.meta.yarnId;
         showingAutocomplete = false;
         inputElement.blur();
-        dispatch('select', {
+        onselectautocomplete({
           selectedBrandId,
           selectedYarnId,
         });
@@ -193,6 +203,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       disableAutoSelect: true,
       minLength: 0,
       showOnFocus: true,
+      container: autocompleteContainer,
       emptyMsg: 'No matching yarn',
       customize: function (input, inputRect, container, maxHeight) {
         const group = inputGroup?.getBoundingClientRect();
@@ -200,10 +211,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
           container.style.width = `${group.width}px`;
           container.style.left = `${group.left}px`;
         }
-        container.style.zIndex = `400`;
+        container.style.zIndex = `12000`;
         if (maxHeight > 480) container.style.maxHeight = `480px`;
         container.style.overflowY = `scroll`;
-        if (context === 'modal') container.style.position = 'fixed';
+        if (context === 'modal') {
+          container.style.position = 'fixed';
+          container.style.top = `${inputRect.bottom}px`;
+        }
       },
       render: function (item, currentValue) {
         var div = document.createElement('div');
@@ -268,7 +282,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           selectedBrandId = brandId;
           selectedYarnId = '';
           forceDisplayAll = true;
-          dispatch('select', {
+          onselectautocomplete({
             selectedBrandId,
             selectedYarnId,
           });
@@ -295,41 +309,36 @@ If not, see <https://www.gnu.org/licenses/>. -->
       },
     });
   });
+
+  $effect(() => {
+    selectedYarnWeightId;
+    untrack(() => {
+      onSelectedYarnWeightIdChange();
+      allYarns = getAllYarns(selectedYarnWeightId);
+    });
+  });
 </script>
 
 <div
   class="w-full flex flex-col justify-start md:col-span-2 gap-1"
   bind:this={inputGroup}
 >
-  <span class="flex items-center label gap-1">
-    {@html ICONS.filter}
-    <!-- <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="1em"
-      height="1em"
-      viewBox="0 0 24 24"
-      ><path
-        fill="none"
-        stroke="currentColor"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        stroke-width="2"
-        d="M11 18H3m12 0l2 2l4-4m-5-4H3m13-6H3"
-      /></svg
-    > -->
+  <span class="flex items-center gap-1">
+    <ListFilterIcon class="size-4" />
     Yarn Name
   </span>
+
   <div class="flex flex-wrap items-center justify-center gap-1">
-    <div class="input-group input-group-divider flex grid-cols-[1fr_auto]">
+    <div class="input-group grid-cols-[1fr_auto_auto] w-full">
       <input
         bind:this={inputElement}
-        class="input truncate"
+        class="truncate ig-input"
         {disabled}
         id="input-select-yarn"
         type="text"
         name="yarn-filter-search"
         autocomplete="off"
-        on:focus={async () => {
+        onfocus={async () => {
           showingAutocomplete = true;
 
           if (selectedBrandId && selectedYarnId) {
@@ -367,7 +376,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             }
           }
         }}
-        on:blur={() => (showingAutocomplete = false)}
+        onblur={() => (showingAutocomplete = false)}
         bind:value={inputValue}
         placeholder="{allYarns.length} {pluralize(
           'Yarn',
@@ -380,62 +389,39 @@ If not, see <https://www.gnu.org/licenses/>. -->
       />
       {#if !showingAutocomplete}
         <button
+          aria-label="Show All Yarns"
           {disabled}
-          class="btn-icon !px-2 h-10"
-          on:click={() => {
+          class="ig-btn hover:preset-tonal"
+          onclick={() => {
             forceDisplayAll = true;
             inputElement.focus();
           }}
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="1.5"
-            stroke="currentColor"
-            class="w-6 h-6"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="m19.5 8.25-7.5 7.5-7.5-7.5"
-            />
-          </svg>
+          <ChevronDownIcon />
         </button>
       {/if}
       {#if inputValue.length || showingAutocomplete}
         <button
+          aria-label="Clear"
           {disabled}
-          class="btn-icon !px-2 h-10"
-          on:click={async () => {
-            // showingAutocomplete = false;
+          class="ig-btn hover:preset-tonal"
+          onclick={async () => {
             inputValue = '';
             selectedBrandId = '';
             selectedYarnId = '';
             await delay(10);
             if (!inputValue.length) showingAutocomplete = false;
             document.getElementById('input-select-yarn')?.focus();
-            dispatch('select', {
+            onselectautocomplete({
               selectedBrandId,
               selectedYarnId,
             });
           }}
-          ><svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="1.5"
-            stroke="currentColor"
-            class="w-6 h-6"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M6 18L18 6M6 6l12 12"
-            />
-          </svg>
+        >
+          <XIcon />
         </button>
       {/if}
     </div>
   </div>
+  <div bind:this={autocompleteContainer} class="text-left"></div>
 </div>

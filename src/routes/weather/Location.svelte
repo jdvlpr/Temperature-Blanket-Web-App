@@ -13,40 +13,57 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script context="module">
+<script module>
   // Validates location id
-  export let validId = writable(false);
-  export let inputLocation = writable(null);
+
+  class WeatherLocationState {
+    validId = $state(false);
+    inputLocation = $state(null);
+  }
+
+  export const weatherLocationState = new WeatherLocationState();
 </script>
 
 <script lang="ts">
   import { browser } from '$app/environment';
   import { goto } from '$app/navigation';
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
   import { ICONS, NO_DATA_SRTM3 } from '$lib/constants';
-  import { isProjectLoading } from '$lib/stores';
-  import { displayGeoNamesErrorMessage } from '$lib/utils';
+  import { project } from '$lib/state';
+  import {
+    displayGeoNamesErrorMessage,
+    formatFeatureName,
+    getSuggestions,
+    renderResult,
+  } from '$lib/utils';
   import autocomplete from 'autocompleter';
   import { onMount } from 'svelte';
-  import { writable } from 'svelte/store';
   import '../../css/flag-icons.css';
-  import { activeLocationID, locations } from './+page.svelte';
+  import { weatherState } from './+page.svelte';
   import { fetchData } from './GetWeather.svelte';
+  import { MapPinIcon, SearchIcon, XIcon } from '@lucide/svelte';
 
-  let searching = false; // Autocomplete searching status
-  let showReset = false;
-  let locationGroup;
+  let searching = $state(false); // Autocomplete searching status
+  let showReset = $state(false);
+  let locationGroup = $state();
 
-  $: if ($inputLocation) {
-    showReset = !searching && $inputLocation?.value?.length > 1;
-  }
+  $effect(() => {
+    if (weatherLocationState.inputLocation) {
+      showReset =
+        !searching && weatherLocationState.inputLocation?.value?.length > 1;
+    }
+  });
 
-  $: hasError = !$validId && $inputLocation?.value && !$isProjectLoading;
+  let hasError = $derived(
+    !weatherLocationState.validId &&
+      weatherLocationState.inputLocation?.value &&
+      !project.status.loading,
+  );
 
   onMount(async () => {
     // Setup the autocomplete location
     autocomplete({
-      input: $inputLocation,
+      input: weatherLocationState.inputLocation,
       minLength: 2,
       debounceWaitMs: 550,
       showOnFocus: false,
@@ -68,64 +85,54 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
           if (!response.ok) throw new Error(data.message);
 
-          const suggestions = data.geonames.map((item) => {
-            let labelText;
-            if (item.adminName1 === item.countryName) {
-              labelText = `${item.name}, ${item.adminName1}`;
-            } else {
-              labelText = `${item.name}, ${item.adminName1}, ${item.countryName}`;
-            }
-            return {
-              // adminName: item.adminName1,
-              // country: item.countryName,
-              id: +item.geonameId,
-              label: labelText,
-              lng: item.lng,
-              lat: item.lat,
-              result: `<span class="fflag fflag-${item.countryCode.toUpperCase()}"></span> ${labelText}`,
-              // name: item.name,
-              // value: result
-            };
-          });
+          const suggestions = getSuggestions(data.geonames);
 
           update(suggestions);
-        } catch (e) {
-          displayGeoNamesErrorMessage(e);
+        } catch (error) {
+          displayGeoNamesErrorMessage(error);
         }
 
         searching = false;
       },
       render: function (item) {
         const div = document.createElement('div');
-        div.innerHTML = `${item.result}`;
+        div.innerHTML = renderResult(item);
         return div;
       },
       onSelect: async function (item) {
-        if (!$locations.some((location) => location.id === +item.id)) {
-          $locations.unshift(item);
+        if (
+          !weatherState.weatherLocations.some(
+            (location) => location.id === +item.id,
+          )
+        ) {
+          weatherState.weatherLocations.unshift(item);
         }
         await fetchData();
-        $activeLocationID = item.id;
-        $inputLocation.value = '';
-        $validId = true;
+        weatherState.activeLocationID = item.id;
+        weatherLocationState.inputLocation.value = '';
+        weatherLocationState.validId = true;
       },
     });
-    const id = $page.url.searchParams.get('id');
+    const id = page.url.searchParams.get('id');
     if (id) {
       await setLocationFromId({ id });
     } else {
-      $validId = true;
-      $isProjectLoading = false;
+      weatherLocationState.validId = true;
+      project.status.loading = false;
     }
   }); // End of onMount
 
   function validate() {
-    if (!$locations?.find((item) => item.id === $activeLocationID)?.id) {
-      $validId = false;
+    if (
+      !weatherState.weatherLocations?.find(
+        (item) => item.id === weatherState.activeLocationID,
+      )?.id
+    ) {
+      weatherLocationState.validId = false;
       return;
     }
 
-    if ($inputLocation?.value?.length < 2) {
+    if (weatherLocationState.inputLocation?.value?.length < 2) {
       invalidate();
       return;
     }
@@ -133,7 +140,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   function validateKeyup(e) {
     if (!e) {
-      $validId = true;
+      weatherLocationState.validId = true;
       return;
     }
 
@@ -143,11 +150,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 
   function invalidate() {
-    $validId = false;
+    weatherLocationState.validId = false;
   }
 
   const setLocationFromId = async ({ id }) => {
-    $inputLocation.value = 'Loading...';
+    weatherLocationState.inputLocation.value = 'Loading...';
 
     // Get location information from GeoNames using the location's id
     try {
@@ -167,14 +174,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
       _location.label = label;
       _location.result = `<span class="fflag fflag-${data.countryCode?.toUpperCase()}"></span>${label}`;
-      $inputLocation.value = '';
+      weatherLocationState.inputLocation.value = '';
 
-      if (!$locations.map((item) => item.id).includes(+id))
-        $locations.unshift(_location);
+      if (!weatherState.weatherLocations.map((item) => item.id).includes(+id))
+        weatherState.weatherLocations.unshift(_location);
 
-      $activeLocationID = +id;
+      weatherState.activeLocationID = +id;
       await fetchData();
-      $validId = true;
+      weatherLocationState.validId = true;
     } catch (e) {
       throw displayGeoNamesErrorMessage(e);
     }
@@ -199,68 +206,59 @@ If not, see <https://www.gnu.org/licenses/>. -->
       _location.label = label;
       _location.result = `<span class="fflag fflag-${geonames.countryCode?.toUpperCase()}"></span>${label}`;
 
-      if (!$locations.map((item) => item.id).includes(+geonames.geonameId))
-        $locations.unshift(_location);
+      if (
+        !weatherState.weatherLocations
+          .map((item) => item.id)
+          .includes(+geonames.geonameId)
+      )
+        weatherState.weatherLocations.unshift(_location);
 
-      $activeLocationID = +geonames.geonameId;
+      weatherState.activeLocationID = +geonames.geonameId;
 
       await fetchData();
 
-      $validId = true;
+      weatherLocationState.validId = true;
     } catch (error) {
       displayGeoNamesErrorMessage(error);
     }
   };
 </script>
 
-<div class="py-2 flex flex-wrap items-end gap-y-2 gap-x-4 justify-center">
-  <div class="flex flex-col w-full text-left gap-1">
+<div class="flex flex-wrap items-end justify-center gap-x-4 gap-y-2 py-2">
+  <div class="flex w-full flex-col gap-1 text-left">
     <p>
       {#if hasError}
-        <span class="text-error-800-100-token">Choose a result</span>
-      {:else if $inputLocation?.value}
+        <span class="text-error-900-100">Choose a result</span>
+      {:else if weatherLocationState.inputLocation?.value}
         Location
       {:else}
         Search for a city, region, or landmark
       {/if}
     </p>
     <div
-      class="input-group input-group-divider grid-cols-[auto_1fr_auto]"
+      class="input-group grid-cols-[auto_1fr_auto]"
       bind:this={locationGroup}
     >
-      <div class="input-group-shim">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke-width="1.5"
-          stroke="currentColor"
-          class="w-6 h-6"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
-          />
-        </svg>
+      <div class="ig-cell">
+        <SearchIcon />
       </div>
       <input
         type="text"
         id="location-0"
-        class="truncate"
+        class="ig-input truncate"
         autocomplete="off"
-        placeholder={$isProjectLoading ? 'Loading...' : 'Enter a place'}
+        placeholder={project.status.loading ? 'Loading...' : 'Enter a place'}
         title="Enter a city, region, or landmark"
-        bind:this={$inputLocation}
-        on:input={validate}
-        on:keyup={validateKeyup}
-        disabled={$isProjectLoading}
+        bind:this={weatherLocationState.inputLocation}
+        oninput={validate}
+        onkeyup={validateKeyup}
+        disabled={project.status.loading}
       />
       {#if searching}
         <div class="flex items-center justify-center">
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            class="w-8 h-8 animate-spin"
+            class="mx-2 size-6 animate-spin"
             viewBox="0 0 24 24"
           >
             <g fill="currentColor">
@@ -278,21 +276,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
       {#if showReset}
         <button
-          class=""
+          class="ig-btn hover:preset-tonal"
           title="Reset Location Search"
-          on:click={async () => {
-            $inputLocation.value = '';
+          onclick={async () => {
+            weatherLocationState.inputLocation.value = '';
             // $location.label = "";
             // $location.id = null;
-            $validId = false;
+            weatherLocationState.validId = false;
             if (document.querySelector('.autocomplete'))
               document.querySelector('.autocomplete').remove();
-            // $weatherData = null;
             await goto('?');
-            $inputLocation.focus();
+            weatherLocationState.inputLocation.focus();
           }}
         >
-          {@html ICONS.xMark}
+          <XIcon />
         </button>
       {/if}
     </div>
@@ -300,41 +297,24 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   {#if browser && navigator.geolocation}
     <button
-      class="btn bg-secondary-hover-token gap-1 flex items-center"
+      class="btn hover:preset-tonal flex items-center gap-1"
       title="Use My Location"
-      on:click={async () => {
-        $inputLocation.value = 'Loading...';
+      onclick={async () => {
+        weatherLocationState.inputLocation.value = 'Loading...';
         navigator.geolocation.getCurrentPosition(
           async (response) => {
             await setLocationFromCoords({
               coords: response.coords,
             });
-            $inputLocation.value = '';
+            weatherLocationState.inputLocation.value = '';
           },
           (error) => {
-            $inputLocation.value = '';
+            weatherLocationState.inputLocation.value = '';
           },
         );
       }}
-      ><svg
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke-width="1.5"
-        stroke="currentColor"
-        class="w-6 h-6"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"
-        />
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"
-        />
-      </svg>
+    >
+      <MapPinIcon />
       Use My Location
     </button>
   {/if}

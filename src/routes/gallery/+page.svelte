@@ -17,7 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { PUBLIC_BASE_URL } from '$env/static/public';
   import AppLogo from '$lib/components/AppLogo.svelte';
   import AppShell from '$lib/components/AppShell.svelte';
-  import Gallery from '$lib/components/Gallery.svelte';
+  import Gallery from './Gallery.svelte';
 </script>
 
 <svelte:head>
@@ -37,14 +37,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </svelte:head>
 
 <AppShell pageName="Project Gallery">
-  <svelte:fragment slot="stickyHeader">
-    <div class="hidden lg:inline-flex mx-auto"><AppLogo /></div>
-  </svelte:fragment>
+  {#snippet stickyHeader()}
+    <div class="hidden lg:inline-flex"><AppLogo /></div>
+  {/snippet}
 
-  <main
-    slot="main"
-    class="max-w-screen-xl m-auto flex flex-col justify-start gap-2"
-  >
-    <Gallery />
-  </main>
+  {#snippet main()}
+    <main class="max-w-(--breakpoint-xl) m-auto flex flex-col justify-start gap-2">
+      <Gallery />
+    </main>
+  {/snippet}
 </AppShell>

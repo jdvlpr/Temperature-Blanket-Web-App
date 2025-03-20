@@ -15,41 +15,50 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
-  import { getContext } from 'svelte';
+  import { modal } from '$lib/state';
 
-  export let value: string, title: string, onOkay;
+  interface Props {
+    value: string;
+    title: string;
+    onOkay: any;
+    parent: any;
+  }
+
+  let { value = $bindable(), title, onOkay, parent }: Props = $props();
 
   const id = 'text-input-daytime';
 
-  const { close } = getContext('simple-modal');
-
   function _onOkay() {
     onOkay(value);
-    close();
+    modal.close();
   }
 </script>
 
-<div class="p-2 sm:p-4 mt-4">
-  <label for={id} class="my-2"><h3>{@html title}</h3></label>
-  <p class="text-sm my-2">Hours:Minutes</p>
+<div
+  class="inline-flex flex-col items-center mx-auto justify-center w-full text-center p-4"
+>
+  <div>
+    <label for={id} class="my-2"><h3>{@html title}</h3></label>
+    <p class="text-sm my-2">Hours:Minutes</p>
 
-  <div
-    class="flex flex-col gap-2 justify-center items-center my-2 w-fit mx-auto"
-  >
-    <input
-      type="text"
-      class="w-fit grow input text-xl"
-      {id}
-      {title}
-      bind:value
-    />
-  </div>
+    <div
+      class="flex flex-col gap-2 justify-center items-center my-2 w-fit mx-auto"
+    >
+      <input
+        type="text"
+        class="w-fit grow input text-xl"
+        {id}
+        {title}
+        bind:value
+      />
+    </div>
 
-  <div class="my-4">
-    <SaveAndCloseButtons
-      onSave={_onOkay}
-      onClose={close}
-      disabled={!value.includes(':')}
-    />
+    <div class="my-4">
+      <SaveAndCloseButtons
+        onSave={_onOkay}
+        onClose={modal.close}
+        disabled={!value.includes(':')}
+      />
+    </div>
   </div>
 </div>

@@ -20,6 +20,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Card from '$lib/components/Card.svelte';
   import YarnWeightChart from '$lib/components/YarnWeightChart.svelte';
   import { ICONS } from '$lib/constants';
+  import { ArrowLeftIcon } from '@lucide/svelte';
 </script>
 
 <svelte:head>
@@ -45,19 +46,23 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </svelte:head>
 
 <AppShell pageName="Yarn Weights">
-  <svelte:fragment slot="stickyHeader">
+  {#snippet stickyHeader()}
     <div class="hidden lg:inline-flex mx-auto"><AppLogo /></div>
-  </svelte:fragment>
-  <main slot="main" class="pb-8">
-    <a
-      href="/blog"
-      class="btn bg-secondary-hover-token gap-1 mb-2 max-lg:mx-2 max-lg:mt-2"
-      >{@html ICONS.arrowBack} Blog</a
-    >
-    <Card>
-      <div slot="content" class="pb-4 px-2">
-        <YarnWeightChart />
-      </div>
-    </Card>
-  </main>
+  {/snippet}
+  {#snippet main()}
+    <main class="pb-8">
+      <a
+        href="/blog"
+        class="btn hover:preset-tonal mb-2 max-lg:mx-2 max-lg:mt-2"
+        ><ArrowLeftIcon /> Blog</a
+      >
+      <Card>
+        {#snippet content()}
+          <div class="pb-4 px-2">
+            <YarnWeightChart />
+          </div>
+        {/snippet}
+      </Card>
+    </main>
+  {/snippet}
 </AppShell>

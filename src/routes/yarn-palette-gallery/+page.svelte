@@ -13,96 +13,106 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script context="module">
-  export let search = writable('');
-  export let filteredBrandId = writable('');
-  export let filteredYarnId = writable('');
-  export let palettesContainOnlyFilteredYarn = writable(false);
-  export let orderBy = writable('DESC');
-  export let projects = writable([]);
-  export let palettes = writable([]);
-  export let popularPalettes = writable([]);
-  export let gallery = writable({});
-  export let timePeriod = writable(0.25);
+<script module>
+  class YarnPaletteGalleryState {
+    search = $state('');
+    filteredBrandId = $state('');
+    filteredYarnId = $state('');
+    palettesContainOnlyFilteredYarn = $state(false);
+    orderBy = $state('DESC');
+    projects = $state([]);
+    palettes = $state([]);
+    popularPalettes = $state([]);
+    gallery = $state({});
+    timePeriod = $state(0.25);
 
-  export const getYarnSearch = ({ brandId, yarnId }) => {
-    if (brandId && yarnId) return `${brandId}-${yarnId}`;
-    else if (brandId) return brandId;
-    else if (yarnId) return yarnId;
-    return '';
-  };
+    getYarnSearch = ({ brandId, yarnId }) => {
+      if (brandId && yarnId) return `${brandId}-${yarnId}`;
+      else if (brandId) return brandId;
+      else if (yarnId) return yarnId;
+      return '';
+    };
+  }
+
+  export const yarnPaletteGalleryState = new YarnPaletteGalleryState();
 </script>
 
 <script>
   import { PUBLIC_BASE_URL } from '$env/static/public';
   import AppLogo from '$lib/components/AppLogo.svelte';
   import AppShell from '$lib/components/AppShell.svelte';
-  import Card from '$lib/components/Card.svelte';
   import ColorPalette from '$lib/components/ColorPalette.svelte';
   import PlaceholderPalettes from '$lib/components/PlaceholderPalettes.svelte';
   import SelectYarn from '$lib/components/SelectYarn.svelte';
   import ToTopButton from '$lib/components/buttons/ToTopButton.svelte';
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
   import { ICONS } from '$lib/constants';
-  import { gaugeProperties } from '$lib/stores';
+  import { allGaugesAttributes } from '$lib/state';
   import {
     fetchPopularProjects,
     fetchProjects,
     getColorsFromInput,
-    getProjectParametersFromURLHash,
     getPalettesFromProjects,
+    getProjectParametersFromURLHash,
+    getTitleFromLocationsMeta,
     pluralize,
     recordPageView,
-    getTitleFromLocationsMeta,
   } from '$lib/utils';
   import { onMount } from 'svelte';
-  import { writable } from 'svelte/store';
-  import { colors as yarnPalleteCreatorPageColors } from './../yarn/+page.svelte';
+  import { yarnPageState } from '../yarn/state.svelte';
+  import {
+    ArrowUpDownIcon,
+    ChevronRightIcon,
+    PlusIcon,
+    SearchIcon,
+    XIcon,
+  } from '@lucide/svelte';
 
   let first = 40;
-  let loading = true;
-  let scrollContainer;
-  let showScrollToTopButton;
+  let loading = $state(true);
+  let scrollContainer = $state();
+  let showScrollToTopButton = $state(false);
 
   onMount(async () => {
-    if (!$projects.length) {
+    if (!yarnPaletteGalleryState.projects.length) {
       loading = true;
       let results = await fetchProjects({
         first,
         after: endCursor,
-        search: $search,
-        order: $orderBy,
+        search: yarnPaletteGalleryState.search,
+        order: yarnPaletteGalleryState.orderBy,
       });
-      $gallery.pageInfo = results.pageInfo;
-      $projects.push(...results.edges.flatMap((item) => item.node));
-      $projects = $projects;
-      $palettes = getPalettesFromProjects({
-        projects: $projects,
-        selectedBrandId: $filteredBrandId,
-        selectedYarnId: $filteredYarnId,
-        palettesContainOnlyFilteredYarn: $palettesContainOnlyFilteredYarn,
+      yarnPaletteGalleryState.gallery.pageInfo = results.pageInfo;
+      yarnPaletteGalleryState.projects.push(
+        ...results.edges.flatMap((item) => item.node),
+      );
+      yarnPaletteGalleryState.projects = yarnPaletteGalleryState.projects;
+      yarnPaletteGalleryState.palettes = getPalettesFromProjects({
+        projects: yarnPaletteGalleryState.projects,
+        selectedBrandId: yarnPaletteGalleryState.filteredBrandId,
+        selectedYarnId: yarnPaletteGalleryState.filteredYarnId,
+        palettesContainOnlyFilteredYarn:
+          yarnPaletteGalleryState.palettesContainOnlyFilteredYarn,
       });
       loading = false;
     } else {
-      $palettes = getPalettesFromProjects({
-        projects: $projects,
-        selectedBrandId: $filteredBrandId,
-        selectedYarnId: $filteredYarnId,
-        palettesContainOnlyFilteredYarn: $palettesContainOnlyFilteredYarn,
+      yarnPaletteGalleryState.palettes = getPalettesFromProjects({
+        projects: yarnPaletteGalleryState.projects,
+        selectedBrandId: yarnPaletteGalleryState.filteredBrandId,
+        selectedYarnId: yarnPaletteGalleryState.filteredYarnId,
+        palettesContainOnlyFilteredYarn:
+          yarnPaletteGalleryState.palettesContainOnlyFilteredYarn,
       });
     }
-    if (!$popularPalettes.length) {
+    if (!yarnPaletteGalleryState.popularPalettes.length) {
       await fetchPopularPalettes();
     }
     loading = false;
     const scrollObserver = new IntersectionObserver(
       (entries, observer) => {
         entries.forEach((entry) => {
-          if (entry.intersectionRatio === 0) {
-            showScrollToTopButton = true;
-          } else {
-            showScrollToTopButton = false;
-          }
+          showScrollToTopButton =
+            !entry.isIntersecting && entry.boundingClientRect.top < 0;
         });
       },
       { threshold: 0 },
@@ -110,17 +120,23 @@ If not, see <https://www.gnu.org/licenses/>. -->
     if (scrollContainer) scrollObserver.observe(scrollContainer);
   });
 
-  $: hasNextPage = $gallery?.pageInfo?.hasNextPage;
-  $: endCursor = $gallery?.pageInfo?.endCursor;
+  let hasNextPage = $derived(
+    yarnPaletteGalleryState.gallery?.pageInfo?.hasNextPage,
+  );
+  let endCursor = $derived(
+    yarnPaletteGalleryState.gallery?.pageInfo?.endCursor,
+  );
 
-  $: showSearchReset = !!$search.length;
+  let showSearchReset = $derived(!!yarnPaletteGalleryState.search.length);
 
   async function fetchPopularPalettes() {
     let promisePopularPalettes = await fetchPopularProjects({
-      months: $timePeriod,
+      months: yarnPaletteGalleryState.timePeriod,
       limit: 5,
     });
-    $popularPalettes = getPalettesFromPopularProjects(promisePopularPalettes);
+    yarnPaletteGalleryState.popularPalettes = getPalettesFromPopularProjects(
+      promisePopularPalettes,
+    );
   }
 
   function getPalettesFromPopularProjects(projects) {
@@ -132,7 +148,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       );
 
       JSON.parse(project.meta.yarn_urls).forEach((yarn_url, i) => {
-        const isNotPresetScheme = $gaugeProperties.every(
+        const isNotPresetScheme = allGaugesAttributes.every(
           (p) => !params?.[p.id]?.value?.includes('~'),
         );
         const colors = getColorsFromInput({
@@ -167,10 +183,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
           schemeName += `<a href="/gallery/${
             project.id
-          }" target="_blank" rel="noreferrer" class="underline line-clamp-1" title="Open Project Preview Page" onclick="event.stopPropagation()"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-4 inline">
-  <path fill-rule="evenodd" d="M4.25 5.5a.75.75 0 00-.75.75v8.5c0 .414.336.75.75.75h8.5a.75.75 0 00.75-.75v-4a.75.75 0 011.5 0v4A2.25 2.25 0 0112.75 17h-8.5A2.25 2.25 0 012 14.75v-8.5A2.25 2.25 0 014.25 4h5a.75.75 0 010 1.5h-5z" clip-rule="evenodd" />
-  <path fill-rule="evenodd" d="M6.194 12.753a.75.75 0 001.06.053L16.5 4.44v2.81a.75.75 0 001.5 0v-4.5a.75.75 0 00-.75-.75h-4.5a.75.75 0 000 1.5h2.553l-9.056 8.194a.75.75 0 00-.053 1.06z" clip-rule="evenodd" />
-</svg>
+          }" target="_blank" rel="noreferrer" class="underline line-clamp-1" title="Open Project Preview Page" onclick="event.stopPropagation()"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-external-link size-4 inline"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
 <span class="whitespace-pre-wrap">${title} ${i > 0 ? ` - ${i + 1}` : ''}</span></a>`;
           // schemeName += `<span class="">${new Date(project.date).toLocaleDateString()}</span>`;
           schemeName += '</div>';
@@ -208,38 +221,23 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </svelte:head>
 
 <AppShell pageName="Yarn Palette Gallery">
-  <svelte:fragment slot="stickyHeader">
-    <div class="hidden lg:inline-flex mx-auto"><AppLogo /></div>
-  </svelte:fragment>
+  {#snippet stickyHeader()}
+    <div class="hidden lg:inline-flex"><AppLogo /></div>
+  {/snippet}
 
-  <main
-    slot="main"
-    class="max-w-screen-xl m-auto flex flex-col justify-start gap-2"
-  >
-    {#if showScrollToTopButton && $projects.length}
-      <ToTopButton
-        bottom="1rem"
-        onClick={() => {
-          scrollContainer.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start',
-          });
-        }}
-      />
-    {/if}
-
-    <div class="flex flex-col justify-center gap-8">
-      <div class="inline-grid gap-2 text-center">
-        <Card>
-          <div slot="header" class="bg-surface-50-900-token py-4">
-            <h2 class="font-bold text-xl">Featured Yarn Palettes</h2>
+  {#snippet main()}
+    <main class="m-auto mx-2 flex flex-col justify-start gap-2">
+      <div class="flex flex-col justify-center gap-8">
+        <div class="inline-grid gap-2 text-center">
+          <div class="my-2">
+            <h2 class="h2 text-gradient">Featured Yarn Palettes</h2>
             <label>
               <span>From popular projects during the past</span>
               <select
-                bind:value={$timePeriod}
-                class="select w-fit"
-                on:change={() => {
-                  $popularPalettes = [];
+                bind:value={yarnPaletteGalleryState.timePeriod}
+                class="select mx-auto w-fit min-w-[90px]"
+                onchange={() => {
+                  yarnPaletteGalleryState.popularPalettes = [];
                   fetchPopularPalettes();
                 }}
               >
@@ -251,64 +249,63 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </label>
           </div>
           <div
-            slot="content"
-            class="gap-4 my-2 flex flex-col items-start justify-start w-full"
+            class="my-2 flex w-full flex-col items-start justify-start gap-4"
           >
-            {#if !$popularPalettes.length}
-              <PlaceholderPalettes items={5} maxWFull={true} />
+            {#if !yarnPaletteGalleryState.popularPalettes.length}
+              <PlaceholderPalettes items={5} maxWFull={true} wFull={true} />
             {:else}
-              {#each $popularPalettes as { colors, schemeName, projectId }}
+              {#each yarnPaletteGalleryState.popularPalettes as { colors, schemeName, projectId }}
                 <!-- {@const href = `/yarn?s=${colorsToCode(colors, {
-                            includePrefixes: false,
-                        })}&f=${colorsToYarnDetails({ colors })}&v=${version}`} -->
+                                includePrefixes: false,
+                            })}&f=${colorsToYarnDetails({ colors })}&v=${version}`} -->
                 <a
-                  on:click={async () => {
-                    $yarnPalleteCreatorPageColors = colors;
+                  onclick={async () => {
+                    yarnPageState.gauge.colors = colors;
                     await recordPageView(projectId);
                   }}
                   href="/yarn"
-                  class="w-full flex flex-col text-left gap-y-1"
+                  class="flex w-full flex-col gap-y-1 text-left"
                 >
                   <ColorPalette {colors} {schemeName} />
                 </a>
               {/each}
             {/if}
           </div>
-        </Card>
-      </div>
-      <div class="inline-grid gap-2 text-center">
-        <Card>
+        </div>
+        <div class="inline-grid gap-2 text-center">
           <div
-            slot="header"
             bind:this={scrollContainer}
-            class="bg-surface-50-900-token text-token pt-4 text-center flex flex-col gap-2 justify-center items-center scroll-mt-[70px] pb-4 px-2"
+            class="flex scroll-mt-[70px] flex-col items-center justify-center gap-2 px-2 pb-4 text-center"
           >
             <div class="flex flex-col">
-              <h2 class="font-bold text-xl">All Yarn Palettes</h2>
+              <h2 class="h2 text-gradient">All Yarn Palettes</h2>
               <p class="text-sm">Palettes from all user-created projects</p>
             </div>
-            <div class="grid-cols-12 grid gap-4 items-end w-full lg:px-2">
-              <div class="w-full col-span-12 md:col-span-5">
+            <div class="grid w-full grid-cols-12 items-end gap-4 lg:px-2">
+              <div class="col-span-12 w-full md:col-span-5">
                 <SelectYarn
                   preselectDefaultYarn={false}
                   disabled={loading}
-                  bind:selectedBrandId={$filteredBrandId}
-                  bind:selectedYarnId={$filteredYarnId}
+                  bind:selectedBrandId={yarnPaletteGalleryState.filteredBrandId}
+                  bind:selectedYarnId={yarnPaletteGalleryState.filteredYarnId}
                 />
               </div>
 
-              {#if $filteredBrandId || $filteredYarnId}
+              {#if yarnPaletteGalleryState.filteredBrandId || yarnPaletteGalleryState.filteredYarnId}
                 <div
-                  class="w-full col-span-12 text-left md:col-span-4 flex flex-col items-start gap-0 top-[2px] relative"
+                  class="relative top-[2px] col-span-12 flex w-full flex-col items-start gap-0 text-left md:col-span-4"
                 >
                   <ToggleSwitch
                     disabled={loading}
-                    bind:checked={$palettesContainOnlyFilteredYarn}
-                    label="Only This {$filteredBrandId && $filteredYarnId
+                    bind:checked={
+                      yarnPaletteGalleryState.palettesContainOnlyFilteredYarn
+                    }
+                    label="Only This {yarnPaletteGalleryState.filteredBrandId &&
+                    yarnPaletteGalleryState.filteredYarnId
                       ? 'Yarn'
                       : 'Brand'}"
-                    details="All colorways in palette must be this {$filteredBrandId &&
-                    $filteredYarnId
+                    details="All colorways in palette must be this {yarnPaletteGalleryState.filteredBrandId &&
+                    yarnPaletteGalleryState.filteredYarnId
                       ? 'yarn'
                       : 'brand'}"
                   />
@@ -316,73 +313,45 @@ If not, see <https://www.gnu.org/licenses/>. -->
               {/if}
 
               <div
-                class="flex flex-col justify-start w-full col-span-12 md:col-span-3 gap-1"
+                class="col-span-12 flex w-full flex-col justify-start gap-1 md:col-span-3"
               >
-                <span class="flex items-center label gap-1">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke-width="1.5"
-                    stroke="currentColor"
-                    class="w-4 h-4 mr-1"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
-                    />
-                  </svg>
+                <span class="flex items-center gap-1">
+                  <SearchIcon class="size-4" />
                   Search Projects
                 </span>
-                <div
-                  class="input-group input-group-divider grid-cols-[1fr_auto]"
-                >
+                <div class="input-group grid-cols-[1fr_auto]">
                   <input
                     type="text"
-                    class="truncate"
+                    class="ig-input w-full truncate"
                     autocomplete="off"
                     placeholder="e.g., Kansas, 2003"
                     disabled={loading}
-                    bind:value={$search}
+                    bind:value={yarnPaletteGalleryState.search}
                   />
 
                   {#if showSearchReset}
                     <button
                       disabled={loading}
-                      class=""
+                      class="ig-btn hover:preset-tonal"
                       title="Reset Search"
-                      on:click={() => {
-                        $search = '';
+                      onclick={() => {
+                        yarnPaletteGalleryState.search = '';
                       }}
                     >
-                      {@html ICONS.xMark}
+                      <XIcon />
                     </button>
                   {/if}
                 </div>
               </div>
 
-              <label class="label col-span-6 md:col-span-2 w-full">
-                <span class="flex items-center">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke-width="1.5"
-                    stroke="currentColor"
-                    class="w-4 h-4 mr-1"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M3 7.5L7.5 3m0 0L12 7.5M7.5 3v13.5m13.5 0L16.5 21m0 0L12 16.5m4.5 4.5V7.5"
-                    />
-                  </svg>
+              <label class="label col-span-6 w-full md:col-span-2">
+                <span class="flex items-center gap-1">
+                  <ArrowUpDownIcon class="size-4" />
                   Order By
                 </span>
                 <select
-                  class="select truncate w-full"
-                  bind:value={$orderBy}
+                  class="select w-full truncate"
+                  bind:value={yarnPaletteGalleryState.orderBy}
                   disabled={loading}
                 >
                   <option value="DESC" selected>Newest First</option>
@@ -391,139 +360,129 @@ If not, see <https://www.gnu.org/licenses/>. -->
               </label>
 
               <div
-                class="justify-center flex col-span-6 md:col-span-2 {$filteredBrandId ||
-                $filteredYarnId
+                class="col-span-6 flex justify-center md:col-span-2 {yarnPaletteGalleryState.filteredBrandId ||
+                yarnPaletteGalleryState.filteredYarnId
                   ? 'md:col-start-11'
                   : ''}"
               >
                 <button
-                  class="btn variant-filled-primary flex items-center font-bold w-full"
+                  class="btn preset-filled flex w-full items-center"
                   disabled={loading}
-                  on:click={async () => {
-                    $projects = [];
-                    $palettes = [];
+                  onclick={async () => {
+                    yarnPaletteGalleryState.projects = [];
+                    yarnPaletteGalleryState.palettes = [];
                     loading = true;
-                    const yarnSearch = getYarnSearch({
-                      brandId: $filteredBrandId,
-                      yarnId: $filteredYarnId,
+                    const yarnSearch = yarnPaletteGalleryState.getYarnSearch({
+                      brandId: yarnPaletteGalleryState.filteredBrandId,
+                      yarnId: yarnPaletteGalleryState.filteredYarnId,
                     });
                     let results = await fetchProjects({
                       first,
-                      search: $search,
-                      order: $orderBy,
+                      search: yarnPaletteGalleryState.search,
+                      order: yarnPaletteGalleryState.orderBy,
                       yarn: yarnSearch,
                     });
-                    $gallery.pageInfo = results.pageInfo;
-                    if ($search)
-                      $projects = results.edges.flatMap((item) => item.node);
+                    yarnPaletteGalleryState.gallery.pageInfo = results.pageInfo;
+                    if (yarnPaletteGalleryState.search)
+                      yarnPaletteGalleryState.projects = results.edges.flatMap(
+                        (item) => item.node,
+                      );
                     else {
-                      $projects.push(
+                      yarnPaletteGalleryState.projects.push(
                         ...results.edges.flatMap((item) => item.node),
                       );
-                      $projects = $projects;
+                      yarnPaletteGalleryState.projects =
+                        yarnPaletteGalleryState.projects;
                     }
-                    $palettes = getPalettesFromProjects({
-                      projects: $projects,
-                      selectedBrandId: $filteredBrandId,
-                      selectedYarnId: $filteredYarnId,
+                    yarnPaletteGalleryState.palettes = getPalettesFromProjects({
+                      projects: yarnPaletteGalleryState.projects,
+                      selectedBrandId: yarnPaletteGalleryState.filteredBrandId,
+                      selectedYarnId: yarnPaletteGalleryState.filteredYarnId,
                       palettesContainOnlyFilteredYarn:
-                        $palettesContainOnlyFilteredYarn,
+                        yarnPaletteGalleryState.palettesContainOnlyFilteredYarn,
                     });
                     loading = false;
                   }}
                 >
                   Search
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke-width="1.5"
-                    stroke="currentColor"
-                    class="w-6 h-6"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75"
-                    />
-                  </svg>
+                  <ChevronRightIcon />
                 </button>
               </div>
             </div>
           </div>
           <div
-            slot="content"
-            class="gap-4 my-2 flex flex-col items-start justify-start w-full"
+            class="my-2 flex w-full flex-col items-start justify-start gap-4"
           >
-            {#each $palettes as { colors, schemeName, projectId }}
+            {#each yarnPaletteGalleryState.palettes as { colors, schemeName, projectId }}
               <a
-                on:click={async () => {
-                  $yarnPalleteCreatorPageColors = colors;
+                onclick={async () => {
+                  yarnPageState.gauge.colors = colors;
                   await recordPageView(projectId);
                 }}
                 href="/yarn"
-                class="w-full flex flex-col text-left gap-y-1"
+                class="flex w-full flex-col gap-y-1 text-left"
               >
                 <ColorPalette {colors} {schemeName} />
               </a>
             {/each}
-            {#if !$palettes.length && !loading}
-              <p class="text-center my-8">
+            {#if !yarnPaletteGalleryState.palettes.length && !loading}
+              <p class="my-8 text-center">
                 No results. Try changing the filters above.
               </p>
             {/if}
             {#if loading}
-              <PlaceholderPalettes items={20} maxWFull={true} />
-            {:else if $palettes.length && hasNextPage}
+              <PlaceholderPalettes items={20} maxWFull={true} wFull={true} />
+            {:else if yarnPaletteGalleryState.palettes.length && hasNextPage}
               <button
-                class="btn variant-filled-primary flex m-auto my-4"
+                class="btn preset-filled m-auto my-4 flex"
                 disabled={!hasNextPage}
-                on:click={async () => {
+                onclick={async () => {
                   loading = true;
-                  const yarnSearch = getYarnSearch({
-                    brandId: $filteredBrandId,
-                    yarnId: $filteredYarnId,
+                  const yarnSearch = yarnPaletteGalleryState.getYarnSearch({
+                    brandId: yarnPaletteGalleryState.filteredBrandId,
+                    yarnId: yarnPaletteGalleryState.filteredYarnId,
                   });
                   let results = await fetchProjects({
                     first,
                     after: endCursor,
-                    search: $search,
-                    order: $orderBy,
+                    search: yarnPaletteGalleryState.search,
+                    order: yarnPaletteGalleryState.orderBy,
                     yarn: yarnSearch,
                   });
-                  $gallery.pageInfo = results.pageInfo;
-                  $projects.push(...results.edges.flatMap((item) => item.node));
-                  $projects = $projects;
-                  $palettes = getPalettesFromProjects({
-                    projects: $projects,
-                    selectedBrandId: $filteredBrandId,
-                    selectedYarnId: $filteredYarnId,
+                  yarnPaletteGalleryState.gallery.pageInfo = results.pageInfo;
+                  yarnPaletteGalleryState.projects.push(
+                    ...results.edges.flatMap((item) => item.node),
+                  );
+                  yarnPaletteGalleryState.projects =
+                    yarnPaletteGalleryState.projects;
+                  yarnPaletteGalleryState.palettes = getPalettesFromProjects({
+                    projects: yarnPaletteGalleryState.projects,
+                    selectedBrandId: yarnPaletteGalleryState.filteredBrandId,
+                    selectedYarnId: yarnPaletteGalleryState.filteredYarnId,
                     palettesContainOnlyFilteredYarn:
-                      $palettesContainOnlyFilteredYarn,
+                      yarnPaletteGalleryState.palettesContainOnlyFilteredYarn,
                   });
                   loading = false;
                 }}
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke-width="1.5"
-                  stroke="currentColor"
-                  class="w-6 h-6"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M12 4.5v15m7.5-7.5h-15"
-                  />
-                </svg>
-                <span>Load More</span>
+                <PlusIcon />
+                Load More
               </button>
             {/if}
           </div>
-        </Card>
+        </div>
       </div>
-    </div>
-  </main>
+      {#if showScrollToTopButton && yarnPaletteGalleryState.projects.length}
+        <ToTopButton
+          bottom="1rem"
+          onClick={() => {
+            scrollContainer.scrollIntoView({
+              behavior: 'smooth',
+              block: 'start',
+            });
+          }}
+        />
+      {/if}
+    </main>
+  {/snippet}
 </AppShell>

@@ -13,38 +13,40 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script context="module">
-  export const hour = writable('24');
-  export const locations = writable([]);
-  export const activeLocationID = writable(null);
-  export const weatherDataElement = writable(null);
+<script module>
+  class WeatherState {
+    hour = $state('24');
+    weatherLocations = $state([]);
+    activeLocationID = $state(null);
+    weatherDataElement = $state(null);
+  }
+
+  export const weatherState = new WeatherState();
 </script>
 
 <script lang="ts">
   import { browser } from '$app/environment';
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
   import { PUBLIC_BASE_URL } from '$env/static/public';
   import AppLogo from '$lib/components/AppLogo.svelte';
   import AppShell from '$lib/components/AppShell.svelte';
-  import Card from '$lib/components/Card.svelte';
   import Footer from '$lib/components/Footer.svelte';
   import Share from '$lib/components/Share.svelte';
   import Spinner from '$lib/components/Spinner.svelte';
   import UnitChanger from '$lib/components/UnitChanger.svelte';
   import {
-    isProjectLoading,
+    localState,
     modal,
+    project,
     showNavigationSideBar,
-    units,
-  } from '$lib/stores';
+  } from '$lib/state';
   import {
     delay,
     getWeatherCodeDetails,
     setUnitsFromNavigator,
   } from '$lib/utils';
+  import { ListIcon, PlusIcon, SettingsIcon } from '@lucide/svelte';
   import { onDestroy, onMount } from 'svelte';
-  import { bind } from 'svelte-simple-modal';
-  import { writable } from 'svelte/store';
   import { fade } from 'svelte/transition';
   import Chart from './Chart.svelte';
   import { fetchData } from './GetWeather.svelte';
@@ -52,9 +54,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Menu from './Menu.svelte';
   import Symbols from './Symbols.svelte';
 
-  let showChart = true;
-  let isFinishedOnMount = false;
-  let shareableURL = $page.url.href;
+  let showChart = $state(true);
+  let shareableURL = $state(page.url.href);
   let windowWidth;
 
   let debounceTimer;
@@ -66,65 +67,66 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   onMount(async () => {
     // units
-    const paramUnits = $page.url.searchParams.get('u');
-    if (paramUnits === 'i') $units = 'imperial';
-    else if (paramUnits === 'm') $units = 'metric';
+    const paramUnits = page.url.searchParams.get('u');
+    if (paramUnits === 'i') localState.value.units = 'imperial';
+    else if (paramUnits === 'm') localState.value.units = 'metric';
     else if (localStorage.getItem('[/weather]units'))
-      $units = localStorage.getItem('[/weather]units');
+      localState.value.units = localStorage.getItem('[/weather]units');
     else setUnitsFromNavigator();
-    units.subscribe(async (value) => {
-      localStorage.setItem('[/weather]units', value);
-      // $page.url.searchParams.set("u", value === "metric" ? "m" : "i");
-      // if (isMounted) window.history.replaceState({ path: $page.url.href }, "", $page.url.href);
-      if ($locations?.some((item) => item.units !== $units)) await fetchData();
-    });
 
     // hour12
-    const hourFormat = $page.url.searchParams.get('h');
-    if (hourFormat === '0') $hour = '12';
-    else if (hourFormat === '1') $hour = '24';
+    const hourFormat = page.url.searchParams.get('h');
+    if (hourFormat === '0') weatherState.hour = '12';
+    else if (hourFormat === '1') weatherState.hour = '24';
     else if (localStorage.getItem('[/weather]hour_format'))
-      $hour = localStorage.getItem('[/weather]hour_format');
-    else $hour = $units === 'metric' ? '24' : '12';
-    hour.subscribe(async (value) => {
-      localStorage.setItem('[/weather]hour_format', value);
-      // $page.url.searchParams.set("h", value === "12" ? "0" : "1");
-      // if (isMounted) window.history.replaceState({ path: $page.url.href }, "", $page.url.href);
-    });
+      weatherState.hour = localStorage.getItem('[/weather]hour_format');
+    else weatherState.hour = localState.value.units === 'metric' ? '24' : '12';
 
     // saved weather locations
     if (localStorage.getItem('[/weather]locations')) {
-      $locations = JSON.parse(localStorage.getItem('[/weather]locations')).map(
-        (item) => {
-          return { ...item, id: +item.id };
-        },
-      );
+      weatherState.weatherLocations = JSON.parse(
+        localStorage.getItem('[/weather]locations'),
+      ).map((item) => {
+        return { ...item, id: +item.id };
+      });
 
-      $activeLocationID = $locations[0]?.id || null;
+      weatherState.activeLocationID =
+        weatherState.weatherLocations[0]?.id || null;
       await fetchData();
     }
-    locations.subscribe(async (value) => {
-      localStorage.setItem(
-        '[/weather]locations',
-        JSON.stringify(value.filter((value) => value.saved === true)),
-      );
-    });
-
-    activeLocationID.subscribe(async (value) => {
-      if (value && $locations.find((item) => item.id === value)?.saved) {
-        // if ($locations.find((item) => item.id === value)?.saved) $page.url.searchParams.set("id", value);
-        // $page.url.searchParams.set("id", value);
-        // $page.url.searchParams.set("h", $hour === "12" ? "0" : "1");
-        // $page.url.searchParams.set("u", $units === "metric" ? "m" : "i");
-        // window.history.replaceState({ path: $page.url.href }, "", $page.url.href);
-      } else {
-        // window.history.replaceState({ path: $page.url.href }, "", $page.url.href);
-      }
-    });
-    isFinishedOnMount = true;
 
     windowWidth = window.innerWidth;
     window.addEventListener('resize', updateShowChart, { passive: true });
+  });
+
+  $effect(() => {
+    localStorage.setItem('[/weather]hour_format', weatherState.hour);
+  });
+
+  $effect(() => {
+    localStorage.setItem(
+      '[/weather]locations',
+      JSON.stringify(
+        weatherState.weatherLocations.filter((value) => value.saved === true),
+      ),
+    );
+  });
+
+  $effect(() => {
+    if (
+      weatherState.activeLocationID &&
+      weatherState.weatherLocations.find(
+        (item) => item.id === weatherState.activeLocationID,
+      )?.saved
+    ) {
+      // if (locationsState.locations.find((item) => item.id === value)?.saved) page.url.searchParams.set("id", value);
+      // page.url.searchParams.set("id", value);
+      // page.url.searchParams.set("h", weatherState.hour === "12" ? "0" : "1");
+      // page.url.searchParams.set("u", localState.units === "metric" ? "m" : "i");
+      // window.history.replaceState({ path: page.url.href }, "", page.url.href);
+    } else {
+      // window.history.replaceState({ path: page.url.href }, "", page.url.href);
+    }
   });
 
   onDestroy(() => {
@@ -132,73 +134,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     window.removeEventListener('resize', updateShowChart);
   });
 
-  $: weatherData =
-    $locations?.find((item) => item.id === $activeLocationID)?.data || null;
-
-  $: hourlyData = weatherData?.hourly.time.map((item, index) => {
-    const date = new Date(item);
-
-    const tzItemOffsetHr = weatherData.utc_offset_seconds / 60 / 60;
-
-    const localDateInTimeZone = timezoneOffsetToLocalDate(tzItemOffsetHr);
-
-    const isNow =
-      date.getUTCFullYear() === localDateInTimeZone.getUTCFullYear() &&
-      date.getUTCDate() === localDateInTimeZone.getUTCDate() &&
-      date.getUTCHours() === localDateInTimeZone.getUTCHours();
-
-    return {
-      isNow,
-      time: item,
-      apparent_temperature: weatherData?.hourly.apparent_temperature[index],
-      cloudcover: weatherData?.hourly.cloudcover[index],
-      is_day: weatherData?.hourly.is_day[index],
-      precipitation_probability:
-        weatherData?.hourly.precipitation_probability[index],
-      temperature_2m: weatherData?.hourly.temperature_2m[index],
-      weathercode: weatherData?.hourly.weathercode[index],
-    };
-  });
-
-  $: dailyWeatherData = weatherData?.daily.time.map((item, index) => {
-    return {
-      time: item,
-      temperature_2m_max: weatherData?.daily.temperature_2m_max[index],
-      temperature_2m_min: weatherData?.daily.temperature_2m_min[index],
-      precipitation_probability_max:
-        weatherData?.daily.precipitation_probability_max[index],
-      weathercode: weatherData?.daily.weathercode[index],
-    };
-  });
-
-  $: hourlyForcastData = hourlyData?.slice(
-    hourlyData.map((item) => item.isNow).indexOf(true),
-    hourlyData.map((item) => item.isNow).indexOf(true) + 24,
-  );
-
-  $: currentTime = getCurrentTime({
-    weatherData: weatherData,
-    hourFormat: $hour,
-  });
-
-  // Update the weather chart when the sidebar is closed or opened
-  $: $showNavigationSideBar, forceUpdateShowChart();
-
-  $: $activeLocationID,
-    $units,
-    $hour,
-    getShareableURL({
-      id: $activeLocationID,
-      units: $units,
-      hourFormat: $hour,
-    });
-
   function getShareableURL({ id, units, hourFormat }) {
     if (!id || !units || !hourFormat) return; // prevents from running durring mount, I think ?
-    $page.url.searchParams.set('id', id);
-    $page.url.searchParams.set('h', hourFormat === '12' ? '0' : '1');
-    $page.url.searchParams.set('u', units === 'metric' ? 'm' : 'i');
-    shareableURL = $page.url.href;
+    page.url.searchParams.set('id', id);
+    page.url.searchParams.set('h', hourFormat === '12' ? '0' : '1');
+    page.url.searchParams.set('u', units === 'metric' ? 'm' : 'i');
+    shareableURL = page.url.href;
   }
 
   async function updateShowChart() {
@@ -264,6 +205,87 @@ If not, see <https://www.gnu.org/licenses/>. -->
     // return time as a string
     return nd;
   }
+  let weatherData = $derived(
+    weatherState.weatherLocations?.find(
+      (item) => item.id === weatherState.activeLocationID,
+    )?.data || null,
+  );
+  let hourlyData = $derived(
+    weatherData?.hourly.time.map((item, index) => {
+      const date = new Date(item);
+
+      const tzItemOffsetHr = weatherData.utc_offset_seconds / 60 / 60;
+
+      const localDateInTimeZone = timezoneOffsetToLocalDate(tzItemOffsetHr);
+
+      const isNow =
+        date.getUTCFullYear() === localDateInTimeZone.getUTCFullYear() &&
+        date.getUTCDate() === localDateInTimeZone.getUTCDate() &&
+        date.getUTCHours() === localDateInTimeZone.getUTCHours();
+
+      return {
+        isNow,
+        time: item,
+        apparent_temperature: weatherData?.hourly.apparent_temperature[index],
+        cloudcover: weatherData?.hourly.cloudcover[index],
+        is_day: weatherData?.hourly.is_day[index],
+        precipitation_probability:
+          weatherData?.hourly.precipitation_probability[index],
+        temperature_2m: weatherData?.hourly.temperature_2m[index],
+        weathercode: weatherData?.hourly.weathercode[index],
+      };
+    }),
+  );
+  let dailyWeatherData = $derived(
+    weatherData?.daily.time.map((item, index) => {
+      return {
+        time: item,
+        temperature_2m_max: weatherData?.daily.temperature_2m_max[index],
+        temperature_2m_min: weatherData?.daily.temperature_2m_min[index],
+        precipitation_probability_max:
+          weatherData?.daily.precipitation_probability_max[index],
+        weathercode: weatherData?.daily.weathercode[index],
+      };
+    }),
+  );
+  let hourlyForcastData = $derived(
+    hourlyData?.slice(
+      hourlyData.map((item) => item.isNow).indexOf(true),
+      hourlyData.map((item) => item.isNow).indexOf(true) + 24,
+    ),
+  );
+  let currentTime = $derived(
+    getCurrentTime({
+      weatherData: weatherData,
+      hourFormat: weatherState.hour,
+    }),
+  );
+  // Update the weather chart when the sidebar is closed or opened
+  $effect(() => {
+    showNavigationSideBar.value;
+    forceUpdateShowChart();
+  });
+
+  $effect(() => {
+    weatherState.activeLocationID;
+    localState.value.units;
+    weatherState.hour;
+    getShareableURL({
+      id: weatherState.activeLocationID,
+      units: localState.value.units,
+      hourFormat: weatherState.hour,
+    });
+  });
+
+  $effect(async () => {
+    localStorage.setItem('[/weather]units', localState.value.units);
+    if (
+      weatherState.weatherLocations?.some(
+        (item) => item.units !== localState.value.units,
+      )
+    )
+      await fetchData();
+  });
 </script>
 
 <svelte:head>
@@ -282,7 +304,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <meta property="og:type" content="website" />
   <meta
     property="og:image"
-    content="{PUBLIC_BASE_URL}/images/weather-forecast-og-image-2.2.0.jpg"
+    content="{PUBLIC_BASE_URL}/images/temperature-blanket-og-image-5.0.0.jpg"
   />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
@@ -291,177 +313,136 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <Symbols />
 
 <AppShell pageName="Weather Forecast">
-  <svelte:fragment slot="stickyHeader">
+  {#snippet stickyHeader()}
     <div class="hidden lg:inline-flex"><AppLogo /></div>
 
-    <div class="hidden sm:flex">
+    <div class="hidden lg:flex">
       <UnitChanger />
     </div>
-    <div class="flex flex-wrap items-center">
+    <div class="flex flex-wrap items-center gap-2">
       <Share href={shareableURL} />
+
       <button
-        class="btn-icon bg-secondary-hover-token"
+        aria-label="Open Settings"
+        class="btn-icon hover:preset-tonal"
         title="Open Settings"
-        on:click={() =>
-          modal.set(
-            bind(Menu, {
-              page: 'settings',
-            }),
-          )}
+        onclick={() =>
+          modal.trigger({
+            type: 'component',
+            component: {
+              ref: Menu,
+              props: {
+                page: 'settings',
+              },
+            },
+          })}
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke-width="1.5"
-          stroke="currentColor"
-          class="w-6 h-6"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z"
-          />
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-          />
-        </svg>
+        <SettingsIcon />
       </button>
-      {#if $locations.filter((item) => item?.saved).length}
+      {#if weatherState.weatherLocations.filter((item) => item?.saved).length}
         <button
-          class="btn-icon bg-secondary-hover-token"
+          aria-label="Open Locations"
+          class="btn-icon hover:preset-tonal"
           title="Open Locations"
-          on:click={() =>
-            modal.set(
-              bind(Menu, {
-                page: 'locations',
-              }),
-            )}
+          onclick={() =>
+            modal.trigger({
+              type: 'component',
+              component: {
+                ref: Menu,
+                props: {
+                  page: 'locations',
+                },
+              },
+            })}
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="1.5"
-            stroke="currentColor"
-            class="w-6 h-6"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zM3.75 12h.007v.008H3.75V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm-.375 5.25h.007v.008H3.75v-.008zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
-            />
-          </svg>
+          <ListIcon />
         </button>
       {/if}
     </div>
-  </svelte:fragment>
+  {/snippet}
 
-  <main slot="main" class="max-w-screen-xl m-auto text-center mb-8" in:fade>
-    <div class="xl:mb-4 xl:mt-2">
-      <Card>
-        <div class=" xl:pb-4" slot="content">
-          <Location />
-        </div>
-      </Card>
-    </div>
+  {#snippet main()}
+    <main class="m-auto mb-8 max-w-(--breakpoint-xl) text-center" in:fade>
+      <div class="max-lg:px-2">
+        <Location />
+      </div>
 
-    {#if weatherData && !$isProjectLoading}
-      <Card>
+      {#if weatherData && !project.status.loading}
         <div
-          class="xl:pt-2 pb-4 max-w-full"
+          class="max-w-full pb-4 max-lg:px-2"
           id="weather-data"
-          bind:this={$weatherDataElement}
-          slot="content"
+          bind:this={weatherState.weatherDataElement}
         >
-          {#key $isProjectLoading || $activeLocationID}
-            <div class:opacity-50={$isProjectLoading} in:fade>
+          {#key project.status.loading || weatherState.activeLocationID}
+            <div class:opacity-50={project.status.loading} in:fade>
               <div
-                class="mb-4 flex flex-col gap-2 items-center p-2 w-fit mx-auto"
+                class="mx-auto mb-4 flex w-fit flex-col items-center gap-2 p-2"
               >
-                <div class="flex flex-col justify-center items-center gap-2">
-                  {#if !$locations.find((item) => item.id === $activeLocationID)?.saved}
+                <div class="flex flex-col items-center justify-center gap-2">
+                  {#if !weatherState.weatherLocations.find((item) => item.id === weatherState.activeLocationID)?.saved}
                     <button
                       in:fade
-                      class="btn bg-secondary-hover-token"
+                      class="btn hover:preset-tonal"
                       title="Add to Locations"
-                      on:click={async () => {
-                        $locations.map((item) => {
-                          if (item.id === $activeLocationID) item.saved = true;
+                      onclick={async () => {
+                        weatherState.weatherLocations.map((item) => {
+                          if (item.id === weatherState.activeLocationID)
+                            item.saved = true;
                           return item;
                         });
-                        $locations = $locations;
-                        $page.url.searchParams.set('id', $activeLocationID);
-                        $page.url.searchParams.set(
-                          'h',
-                          $hour === '12' ? '0' : '1',
+                        weatherState.weatherLocations =
+                          weatherState.weatherLocations;
+                        page.url.searchParams.set(
+                          'id',
+                          weatherState.activeLocationID,
                         );
-                        $page.url.searchParams.set(
+                        page.url.searchParams.set(
+                          'h',
+                          weatherState.hour === '12' ? '0' : '1',
+                        );
+                        page.url.searchParams.set(
                           'u',
-                          $units === 'metric' ? 'm' : 'i',
+                          localState.value.units === 'metric' ? 'm' : 'i',
                         );
                         // window.history.replaceState(
-                        //     { path: $page.url.href },
+                        //     { path: page.url.href },
                         //     "",
-                        //     $page.url.href,
+                        //     page.url.href,
                         // );
                       }}
-                      ><svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke-width="1.5"
-                        stroke="currentColor"
-                        class="w-6 h-6"
-                      >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          d="M12 4.5v15m7.5-7.5h-15"
-                        />
-                      </svg>
+                    >
+                      <PlusIcon />
                       Add
                     </button>
-                  {:else if $locations.filter((item) => item?.saved)?.length}
+                  {:else if weatherState.weatherLocations.filter((item) => item?.saved)?.length}
                     <button
                       in:fade
-                      class="btn bg-secondary-hover-token"
-                      on:click={() =>
-                        modal.set(
-                          bind(Menu, {
-                            page: 'locations',
-                          }),
-                        )}
-                      ><svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke-width="1.5"
-                        stroke="currentColor"
-                        class="w-6 h-6"
-                      >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zM3.75 12h.007v.008H3.75V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm-.375 5.25h.007v.008H3.75v-.008zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
-                        />
-                      </svg>
+                      class="btn hover:preset-tonal"
+                      onclick={() =>
+                        modal.trigger({
+                          type: 'component',
+                          component: {
+                            ref: Menu,
+                            props: {
+                              page: 'locations',
+                            },
+                          },
+                        })}
+                      ><ListIcon />
                       Locations</button
                     >
                   {/if}
                 </div>
                 <p class="font-bold md:text-xl">
-                  {@html $locations.find(
-                    (item) => item.id === $activeLocationID,
+                  {@html weatherState.weatherLocations.find(
+                    (item) => item.id === weatherState.activeLocationID,
                   ).result}
                 </p>
 
                 <p>
                   {currentTime}
                 </p>
-                <div class="flex gap-0 justify-center items-center">
+                <div class="flex items-center justify-center gap-0">
                   {@html getWeatherCodeDetails({
                     weathercode: weatherData.current_weather.weathercode,
                     is_day: weatherData.current_weather.is_day,
@@ -477,9 +458,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     )?.precipitation_probability,
                   }).icon}
                 </div>
-                <p
-                  class="text-8xl flex items-start justify-center font-extralight font-sans_light"
-                >
+                <p class="flex items-start justify-center text-8xl font-bold">
                   {weatherData.current_weather.temperature}°
                 </p>
                 <p class="text-xl">
@@ -498,16 +477,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 </div>
               </div>
               <div
-                class="p-2 rounded-container-token bg-surface-100-800-token my-4 inline-grid"
+                class="rounded-container bg-surface-50 dark:bg-surface-950 my-4 inline-grid p-2 shadow"
               >
-                <p class="text-sm flex gap-1 items-center justify-center">
+                <p class="flex items-center justify-center gap-1 text-sm">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke-width="1.5"
                     stroke="currentColor"
-                    class="w-5 h-5"
+                    class="h-5 w-5"
                   >
                     <path
                       stroke-linecap="round"
@@ -519,7 +498,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 </p>
 
                 {#if showChart}
-                  {#key $hour}
+                  {#key weatherState.hour}
                     <div class="max-w-[90vw]">
                       <Chart data={hourlyForcastData} />
                     </div>
@@ -530,7 +509,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   </div>
                 {/if}
                 <div
-                  class="relative w-full flex items-start gap-4 md:gap-8 snap-x snap-mandatory overflow-x-auto mx-auto pb-4 mt-4"
+                  class="relative mx-auto mt-4 flex w-full snap-x snap-mandatory items-start gap-4 overflow-x-auto pb-4 md:gap-8"
                 >
                   {#each hourlyForcastData as { isNow, time, apparent_temperature, cloudcover, is_day, temperature_2m, precipitation_probability, weathercode }}
                     {@const details = getWeatherCodeDetails({
@@ -539,7 +518,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       precipitation_probability,
                     })}
                     <div
-                      class="snap-start shrink-0 flex flex-col justify-between min-h-[100px] gap-1 items-center"
+                      class="flex min-h-[100px] shrink-0 snap-start flex-col items-center justify-between gap-1"
                     >
                       <p class="text-sm">
                         {isNow
@@ -548,11 +527,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
                               navigator.language,
                               {
                                 timeStyle: 'short',
-                                hour12: $hour === '12' ? true : false,
+                                hour12:
+                                  weatherState.hour === '12' ? true : false,
                               },
                             )}
                       </p>
-                      <p class="text-sm max-w-[100px]">
+                      <p class="max-w-[100px] text-sm">
                         {details.description}
                       </p>
                       <div
@@ -569,14 +549,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 </div>
               </div>
               <div class="mt-4">
-                <p class="text-sm flex gap-1 justify-center items-center">
+                <p class="flex items-center justify-center gap-1 text-sm">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke-width="1.5"
                     stroke="currentColor"
-                    class="w-5 h-5"
+                    class="h-5 w-5"
                   >
                     <path
                       stroke-linecap="round"
@@ -587,7 +567,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   Daily Forcast
                 </p>
                 <div
-                  class="relative w-full flex flex-col justify-center gap-1 items-start mx-auto mt-4"
+                  class="relative mx-auto mt-4 flex w-full flex-col items-start justify-center gap-2"
                 >
                   {#each dailyWeatherData as { time, temperature_2m_max, temperature_2m_min, precipitation_probability_max, weathercode }, index}
                     {@const date = new Date(time).toLocaleString(
@@ -601,19 +581,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       precipitation_probability: precipitation_probability_max,
                     })}
                     <div
-                      class="grid grid-cols-3 flex-1 gap-2 items-center rounded-container-token p-2 bg-surface-100-800-token w-full mx-auto"
+                      class="rounded-container bg-surface-50 dark:bg-surface-950 mx-auto grid w-full flex-1 grid-cols-3 items-center gap-2 p-2 shadow"
                     >
                       <p class="">
                         {index === 0 ? 'Today' : date}
                       </p>
                       <div
-                        class="flex gap-1 flex-wrap items-center justify-start"
+                        class="flex flex-wrap items-center justify-start gap-1"
                       >
-                        <p class="text-left hidden sm:inline-block">
+                        <p class="hidden text-left sm:inline-block">
                           {details.description}
                         </p>
                         <div
-                          class="flex items-center gap-1 justify-between"
+                          class="flex items-center justify-between gap-1"
                           title={details.description}
                         >
                           {@html details.icon}
@@ -642,41 +622,46 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </div>
           {/key}
         </div>
-      </Card>
-    {/if}
-  </main>
+      {/if}
+    </main>
+  {/snippet}
 
-  <Footer slot="footer" subtleBackground={true}>
-    <div slot="sources" class="text-sm">
-      <p>
-        Weather data from
-        <a
-          href="https://www.open-meteo.com"
-          rel="noopener noreferrer"
-          class="link"
-          target="_blank">Open-Meteo</a
-        >
-        is licenced under
-        <a
-          href="https://creativecommons.org/licenses/by/4.0/"
-          target="_blank"
-          class="link"
-          rel="noreferrer noopener">Attribution 4.0 International (CC BY 4.0)</a
-        >. Location data is from
-        <a
-          href="https://www.geonames.org/"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="link">Geonames</a
-        >
-        licensed under
-        <a
-          href="https://creativecommons.org/licenses/by/2.0/"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="link">CC BY 2.0</a
-        >.
-      </p>
-    </div>
-  </Footer>
+  {#snippet footer()}
+    <Footer subtleBackground={true}>
+      {#snippet sources()}
+        <div class="text-sm">
+          <p>
+            Weather data from
+            <a
+              href="https://www.open-meteo.com"
+              rel="noopener noreferrer"
+              class="link"
+              target="_blank">Open-Meteo</a
+            >
+            is licenced under
+            <a
+              href="https://creativecommons.org/licenses/by/4.0/"
+              target="_blank"
+              class="link"
+              rel="noreferrer noopener"
+              >Attribution 4.0 International (CC BY 4.0)</a
+            >. Location data is from
+            <a
+              href="https://www.geonames.org/"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="link">Geonames</a
+            >
+            licensed under
+            <a
+              href="https://creativecommons.org/licenses/by/2.0/"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="link">CC BY 2.0</a
+            >.
+          </p>
+        </div>
+      {/snippet}
+    </Footer>
+  {/snippet}
 </AppShell>

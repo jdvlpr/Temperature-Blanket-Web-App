@@ -13,14 +13,29 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script>
+<script lang="ts">
   import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
   import StickyPart from '$lib/components/modals/StickyPart.svelte';
   import YarnGridSelect from '$lib/components/modals/YarnGridSelect.svelte';
+  import { modal } from '$lib/state';
+  import { ExternalLinkIcon, ShoppingBagIcon } from '@lucide/svelte';
   import chroma from 'chroma-js';
-  import { getContext } from 'svelte';
 
-  export let index = null,
+  interface Props {
+    index?: any;
+    hex: any;
+    name: any;
+    brandId: any;
+    yarnId: any;
+    brandName: any;
+    yarnName: any;
+    variant_href: any;
+    affiliate_variant_href: any;
+    onChangeColor: any;
+  }
+
+  let {
+    index = null,
     hex,
     name,
     brandId,
@@ -30,14 +45,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
     variant_href,
     affiliate_variant_href,
     onChangeColor,
-    container;
+  }: Props = $props();
 
-  const { close } = getContext('simple-modal');
+  let container: HTMLElement = $state();
 
-  let valid = true;
-  let inputTypeColorValue = hex;
-  let inputTypeTextValue = hex;
-  let selectedColors = [
+  let valid = $state(true);
+  let inputTypeColorValue = $state(hex);
+  let inputTypeTextValue = $state(hex);
+  let selectedColors = $state([
     {
       hex,
       name,
@@ -48,20 +63,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
       variant_href,
       affiliate_variant_href,
     },
-  ];
+  ]);
   let title = index !== null ? `${index + 1}` : '';
   let _brandId = brandId;
   let _yarnId = yarnId;
-
-  $: if (selectedColors?.length) {
-    const color = selectedColors[0];
-    inputTypeColorOnChange({ value: color.hex, color });
-  }
-
-  $: currentColor = {
-    hex,
-    name,
-  };
 
   function inputTypeColorOnChange({ value, color }) {
     name = color?.name;
@@ -73,6 +78,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     affiliate_variant_href = color?.affiliate_variant_href;
 
     let __color = value;
+
     if (!chroma.valid(__color)) {
       valid = false;
       return;
@@ -117,33 +123,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
         affiliate_variant_href,
       });
     else onChangeColor({ hex });
-    close();
   }
+
+  let currentColor = $derived({ hex });
 </script>
 
-<div class="p-2 sm:p-4 mt-4" bind:this={container}>
-  <p class="my-2">Color {title}</p>
+<div class="p-4 text-center" bind:this={container}>
+  <p class="my-2 text-center text-xs">Color {title}</p>
   {#if affiliate_variant_href}
     <a
-      class="btn bg-secondary-hover-token flex flex-wrap justify-center items-center gap-2 underline w-fit mx-auto"
+      class="mx-auto flex w-fit flex-wrap items-center justify-center gap-2 underline"
       href={affiliate_variant_href}
       target="_blank"
       rel="noreferrer nofollow"
     >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke-width="1.5"
-        stroke="currentColor"
-        class="w-6 h-6"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
-        />
-      </svg>
+      <ShoppingBagIcon />
       <span class="flex flex-col items-start">
         <p class="text-xs">
           {#if brandName}
@@ -161,25 +155,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </a>
   {:else if variant_href}
     <a
-      class="btn bg-secondary-hover-token flex flex-wrap justify-center items-center gap-2 underline w-fit mx-auto"
+      class="mx-auto inline-flex w-fit flex-wrap items-center justify-center gap-2 underline"
       href={variant_href}
       target="_blank"
       rel="noreferrer nofollow"
     >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke-width="1.5"
-        stroke="currentColor"
-        class="w-6 h-6"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"
-        />
-      </svg>
+      <ExternalLinkIcon />
 
       <span class="flex flex-col items-start">
         <p class="text-xs">
@@ -198,13 +179,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </a>
   {/if}
 
-  <div class="flex flex-wrap items-center justify-center gap-2 my-2 w-full">
+  <div class="my-2 flex w-full flex-wrap items-center justify-center gap-2">
     <label class="color-select-label" title="Choose a Color">
       <input
         type="color"
         class="input"
         value={inputTypeColorValue}
-        on:change={(e) =>
+        onchange={(e) =>
           inputTypeColorOnChange({
             value: e.target.value,
           })}
@@ -213,9 +194,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <label class="color-text-label flex-1" title="Enter a Color">
       <input
         type="text"
-        class="input mb-2 mt-1 grow w-full"
+        class="input w-full grow"
         value={inputTypeTextValue}
-        on:keyup={(e) =>
+        onkeyup={(e) =>
           inputTypeTextOnChange({
             value: e.target.value,
           })}
@@ -228,23 +209,32 @@ If not, see <https://www.gnu.org/licenses/>. -->
     bind:selectedColors
     selectedBrandId={_brandId}
     selectedYarnId={_yarnId}
-    bind:currentColor
+    incomingColor={currentColor}
     onClickScrollToTop={() => {
       container.scrollIntoView({
         behavior: 'smooth',
         block: 'start',
       });
     }}
+    onSelection={(e) => {
+      const color = e[0];
+      inputTypeColorOnChange({ value: color.hex, color });
+    }}
     scrollToTopButtonBottom="4rem"
   />
 </div>
 
 <StickyPart position="bottom">
-  <div class="p-2 sm:px-4">
-    <SaveAndCloseButtons onSave={_onOkay} onClose={close} disabled={!valid} />
-
+  <div class="p-2">
     {#if !valid}
-      <p class="card variant-soft-warning p-4">Please enter a valid color</p>
+      <p class="card bg-warning-500/20 my-2 p-4">Please enter a valid color</p>
     {/if}
+    <div class="max-sm:pb-2">
+      <SaveAndCloseButtons
+        onSave={_onOkay}
+        onClose={modal.close}
+        disabled={!valid}
+      />
+    </div>
   </div>
 </StickyPart>

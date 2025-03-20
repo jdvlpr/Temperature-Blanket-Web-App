@@ -14,41 +14,55 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { getContext, onMount } from 'svelte';
   import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
-  const { close } = getContext('simple-modal');
+  import { modal } from '$lib/state';
+  import { displayNumber } from '$lib/utils';
 
-  export let value: number,
-    title: string,
+  interface Props {
+    value: number;
+    title: string;
+    onOkay: any;
+    min?: number;
+    max: number;
+    showSlider?: boolean;
+    noMinMax?: boolean;
+  }
+
+  let {
+    value = $bindable(),
+    title,
     onOkay,
-    min: number = 1,
-    max: number,
-    showSlider: boolean = true,
-    noMinMax: boolean = false;
+    min = 1,
+    max,
+    showSlider = true,
+    noMinMax = false,
+  }: Props = $props();
 
-  onMount(() => {
-    // Weather values which are not available are represented by a string '-'. Modify them to a number 0;
-    if (typeof value !== 'number') value = 0;
-  });
-
-  let _value = value;
+  let _value = $state(value);
 
   function _onOkay() {
     onOkay(value);
-    close();
+    modal.close();
   }
-
-  $: if (value > getMaxValue(_value)) _value = value;
 
   function getMaxValue(value: number) {
     if (value < 1) return 20;
     if (value < 5) return value * 10;
     return value * 2;
   }
+
+  $effect(() => {
+    // Weather values which are not available are represented by a string '-'. Modify them to a number 0;
+    if (typeof value !== 'number') value = 0;
+  });
+
+  $effect(() => {
+    if (value > getMaxValue(_value)) _value = value;
+  });
 </script>
 
-<div class="p-2 sm:p-4 mt-4">
-  <label for="number-input" class="my-2"><span>{@html title}</span></label>
+<div class="text-center inline-flex flex-col items-center mx-auto w-full px-4">
+  <label for="number-input" class="mb-2"><span>{@html title}</span></label>
 
   <div class="flex flex-col gap-2 justify-center items-center my-2 w-fit">
     <input
@@ -71,31 +85,31 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {/if}
     <div class="flex flex-wrap gap-2 justify-center items-center">
       <button
-        class="btn-icon bg-secondary-hover-token"
-        on:click={() => (value -= 20)}
+        class="btn-icon hover:preset-tonal"
+        onclick={() => (value = displayNumber(value - 20))}
         disabled={noMinMax ? false : value < min + 20}>-20</button
       >
       <button
-        class="btn-icon bg-secondary-hover-token"
-        on:click={() => (value -= 5)}
+        class="btn-icon hover:preset-tonal"
+        onclick={() => (value = displayNumber(value - 5))}
         disabled={noMinMax ? false : value < min + 5}>-5</button
       >
       <button
-        class="btn-icon bg-secondary-hover-token"
-        on:click={() => (value -= 1)}
+        class="btn-icon hover:preset-tonal"
+        onclick={() => (value = displayNumber(value - 1))}
         disabled={noMinMax ? false : value < min + 1}>-1</button
       >
       <button
-        class="btn-icon bg-secondary-hover-token"
-        on:click={() => (value += 1)}>+1</button
+        class="btn-icon hover:preset-tonal"
+        onclick={() => (value = displayNumber(value + 1))}>+1</button
       >
       <button
-        class="btn-icon bg-secondary-hover-token"
-        on:click={() => (value += 5)}>+5</button
+        class="btn-icon hover:preset-tonal"
+        onclick={() => (value = displayNumber(value + 5))}>+5</button
       >
       <button
-        class="btn-icon bg-secondary-hover-token"
-        on:click={() => (value += 20)}>+20</button
+        class="btn-icon hover:preset-tonal"
+        onclick={() => (value = displayNumber(value + 20))}>+20</button
       >
     </div>
   </div>
@@ -104,7 +118,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <SaveAndCloseButtons
       onSave={_onOkay}
       disabled={isNaN(value) || noMinMax ? false : value < min}
-      onClose={close}
+      onClose={modal.close}
     />
   </div>
 </div>

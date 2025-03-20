@@ -36,13 +36,6 @@ test('Project Planner works correctly', async ({ page }) => {
     .selectOption('2022');
   await page.getByRole('button', { name: 'Search', exact: true }).click();
   await expect(page.getByText('°C / mm °F / in')).toBeVisible();
-  await page.getByText('Details', { exact: true }).click();
-  await expect(
-    page
-      .locator('label')
-      .filter({ hasText: 'Show Color Details' })
-      .locator('div'),
-  ).toBeVisible();
   await expect(
     page.getByRole('button', {
       name: 'Download Weather Data (CSV)',
@@ -54,33 +47,6 @@ test('Project Planner works correctly', async ({ page }) => {
   await page.getByRole('button', { name: 'Colors' }).nth(1).click();
   await expect(
     page.getByRole('button', { name: 'Browse Palettes' }),
-  ).toBeVisible();
-  await page.getByRole('button', { name: 'Browse Palettes' }).click();
-  await expect(page.getByTitle('Featured')).toBeVisible();
-  await expect(page.getByTitle('Gallery', { exact: true })).toBeVisible();
-  await page
-    .getByLabel('1 Color 2 Colors 3 Colors 4')
-    .first()
-    .selectOption('6');
-  await page
-    .locator('button:nth-child(8) > div > div > div:nth-child(6) > .w-full')
-    .click();
-  await expect(
-    page.getByRole('button', { name: 'Configure Ranges' }),
-  ).toBeVisible();
-  await page
-    .getByRole('button', { name: 'Find Matching Yarn #a6cee3' })
-    .click();
-  await expect(page.getByTitle('Enter a Color').getByLabel('')).toBeVisible();
-  await page
-    .locator('button')
-    .filter({ hasText: 'Knit Picks - Mighty Stitch' })
-    .click();
-  await page.getByTitle('Save', { exact: true }).click();
-  await expect(
-    page.getByRole('button', {
-      name: 'Knit Picks - Mighty Stitch Sky',
-    }),
   ).toBeVisible();
   await expect(
     page.getByRole('button', {

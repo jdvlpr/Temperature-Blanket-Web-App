@@ -14,56 +14,33 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { onNavigate } from '$app/navigation';
+  import { beforeNavigate, onNavigate } from '$app/navigation';
   import { PUBLIC_MICROSOFT_CLARITY_ID } from '$env/static/public';
-  import { consentToMSClarityCookies } from '$lib/stores';
-  import {
-    privacy,
-    setupLocalStorageLayout,
-    setupLocalStorageTheme,
-  } from '$lib/utils';
-  import {
-    Toast,
-    getToastStore,
-    initializeStores,
-    storePopup,
-  } from '@skeletonlabs/skeleton';
-  import { onMount } from 'svelte';
-  import {
-    arrow,
-    autoUpdate,
-    computePosition,
-    flip,
-    offset,
-    shift,
-  } from 'svelte-floating-ui/dom';
-  import { onlineStore } from 'svelte-legos';
+  import ModalProvider from '$lib/components/modals/ModalProvider.svelte';
+  import ToastProvider from '$lib/components/ToastProvider.svelte';
+  import { consentToMSClarityCookies, modal, toast } from '$lib/state';
+  import { handleKeyDown, initializeLocalStorage, privacy } from '$lib/utils';
+  import { RocketIcon, XIcon } from '@lucide/svelte';
+  import { onMount, type Snippet } from 'svelte';
   import '../css/main.css';
-  import { ICONS } from '$lib/constants';
 
-  initializeStores();
-
-  storePopup.set({
-    computePosition,
-    autoUpdate,
-    offset,
-    shift,
-    flip,
-    arrow,
-  });
-
-  const isOnline = onlineStore();
-  const toastStore = getToastStore();
-
-  privacy.init();
+  let bannerElement: HTMLElement | undefined;
+  interface Props {
+    children?: Snippet;
+  }
+  let { children }: Props = $props();
 
   onMount(async () => {
-    setupLocalStorageTheme();
-    setupLocalStorageLayout();
+    initializeLocalStorage();
 
     // NOTE: Set window variable in order to access it inside the MS clarity function
     // See the script tag with id="clarity-script"
     window.MS_CLARITY_ID = PUBLIC_MICROSOFT_CLARITY_ID || null;
+    privacy.init();
+  });
+
+  beforeNavigate(() => {
+    modal.close();
   });
 
   onNavigate((navigation) => {
@@ -76,33 +53,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
       });
     });
   });
+</script>
 
-  let bannerElement = null;
-
-  let networkChangeCount = 0;
-  $: $isOnline, onChangeIsOnline();
-
-  function onChangeIsOnline() {
-    if ($isOnline && networkChangeCount > 0) {
-      // Alert if online connection restored
-      toastStore.trigger({
-        message: `<div
-    class="w-full text-center p-2 m-auto flex flex-col items-start justify-center"
-  >
-    <div class="flex flex-wrap items-center justify-center gap-2">
-      <svg xmlns="http://www.w3.org/2000/svg"class="size-4" viewBox="0 0 24 24"><path fill="currentColor" d="M12 21q-1.05 0-1.775-.725T9.5 18.5t.725-1.775T12 16t1.775.725t.725 1.775t-.725 1.775T12 21m-5.65-5.65l-2.1-2.15q1.475-1.475 3.463-2.337T12 10t4.288.875t3.462 2.375l-2.1 2.1q-1.1-1.1-2.55-1.725T12 13t-3.1.625t-2.55 1.725M2.1 11.1L0 9q2.3-2.35 5.375-3.675T12 4t6.625 1.325T24 9l-2.1 2.1q-1.925-1.925-4.462-3.012T12 7T6.563 8.088T2.1 11.1"/></svg>
-     You are online
-    </div>
-  </div>`,
-        background: 'bg-success-200-700-token text-token',
-      });
-    } else if (!$isOnline) {
-      toastStore.trigger({
-        message: `<div
+<svelte:window
+  onkeydown={handleKeyDown}
+  onoffline={() => {
+    // Alert if offline
+    toast.trigger({
+      message: `<div
     class="w-full p-2 m-auto flex flex-col items-start text-left"
   >
     <div class="flex items-center justify-start gap-2">
-      <svg xmlns="http://www.w3.org/2000/svg" class="size-4 flex-shrink-0" viewBox="0 0 36 36"
+      <svg xmlns="http://www.w3.org/2000/svg" class="size-4 shrink-0" viewBox="0 0 36 36"
         ><circle cx="18" cy="29.54" r="3" fill="currentColor" class="clr-i-solid clr-i-solid-path-1" /><path
           fill="currentColor"
           d="m29.18 17.71l.11-.17a1.51 1.51 0 0 0-.47-2.1A20.57 20.57 0 0 0 18 12.37c-.56 0-1.11 0-1.65.07l3.21 3.21a17.41 17.41 0 0 1 7.6 2.52a1.49 1.49 0 0 0 2.02-.46"
@@ -121,12 +83,24 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
     <p class="text-sm">Some features may not work as expected.</p>
   </div>`,
-        background: 'bg-warning-200-700-token text-token',
-      });
-    }
-    networkChangeCount++;
-  }
-</script>
+      background: 'preset-filled-warning-200-800',
+    });
+  }}
+  ononline={() => {
+    // Alert if online connection restored
+    toast.trigger({
+      message: `<div
+    class="w-full text-center p-2 m-auto flex flex-col items-start justify-center"
+  >
+    <div class="flex flex-wrap items-center justify-center gap-2">
+      <svg xmlns="http://www.w3.org/2000/svg"class="size-4" viewBox="0 0 24 24"><path fill="currentColor" d="M12 21q-1.05 0-1.775-.725T9.5 18.5t.725-1.775T12 16t1.775.725t.725 1.775t-.725 1.775T12 21m-5.65-5.65l-2.1-2.15q1.475-1.475 3.463-2.337T12 10t4.288.875t3.462 2.375l-2.1 2.1q-1.1-1.1-2.55-1.725T12 13t-3.1.625t-2.55 1.725M2.1 11.1L0 9q2.3-2.35 5.375-3.675T12 4t6.625 1.325T24 9l-2.1 2.1q-1.925-1.925-4.462-3.012T12 7T6.563 8.088T2.1 11.1"/></svg>
+     You are online
+    </div>
+  </div>`,
+      background: 'preset-filled-success-100-900',
+    });
+  }}
+/>
 
 <svelte:head>
   <link rel="manifest" href="/manifest.json" />
@@ -148,11 +122,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     href="/images/favicon-16x16.png"
   />
   <link rel="shortcut icon" href="/favicon.ico" />
-  <link rel="stylesheet" href="https://use.typekit.net/ixb2wbf.css" />
+  <link rel="stylesheet" href="https://use.typekit.net/obw5vhr.css" />
 
   <meta name="theme-color" content="#f5f5f5" />
 
-  {#if $consentToMSClarityCookies && PUBLIC_MICROSOFT_CLARITY_ID}
+  {#if consentToMSClarityCookies.value && PUBLIC_MICROSOFT_CLARITY_ID}
     <script type="text/javascript" async id="clarity-script">
       (function (c, l, a, r, i, t, y) {
         c[a] =
@@ -180,48 +154,28 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/if}
 </svelte:head>
 
-<Toast max={3} position="b" />
-
 <div
-  class="bg-primary-100 dark:bg-primary-900 flex flex-wrap items-center justify-center gap-2 p-2 text-center [view-transition-name:top-banner]"
+  class="bg-surface-100-900 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 p-2 text-center [view-transition-name:top-banner]"
   bind:this={bannerElement}
 >
-  <p>
-    A new version of this site is <a
-      href="https://github.com/jdvlpr/Temperature-Blanket-Web-App/discussions/9"
-      class="link"
-      target="_blank"
-    >
-      coming Thursday, March 20th!
-    </a>
-  </p>
-
+  <p>Updated to version 5!</p>
   <a
-    href="https://next.temperature-blanket.com"
-    class="btn variant-soft-tertiary text-token"
-    target="_blank"
-    >Preview the new version
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      stroke-width="2"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-      class="lucide lucide-external-link relative -top-[1px] ml-1 inline size-5"
-      ><path d="M15 3h6v6" /><path d="M10 14 21 3" /><path
-        d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"
-      /></svg
-    >
-  </a>
-
-  <button on:click={() => bannerElement.remove()} class="btn hover:variant-soft"
-    >{@html ICONS.xMark} Close</button
+    href="/blog/2025-03-20-version-5"
+    class="btn bg-primary-50-950 hover:preset-tonal"
+  >
+    <RocketIcon />
+    See what's new</a
+  >
+  <button class="btn hover:preset-tonal" onclick={() => bannerElement.remove()}
+    ><XIcon />Close</button
   >
 </div>
 
-<slot />
+{@render children?.()}
+
+<ToastProvider />
+
+<ModalProvider />
 
 <style>
   @keyframes fade-in {

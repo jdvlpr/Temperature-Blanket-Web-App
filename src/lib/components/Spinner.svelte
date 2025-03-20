@@ -14,15 +14,21 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  export let unit = 'px';
-  export let duration = '0.7s';
-  export let size = '30';
+  /**
+   * @typedef {Object} Props
+   * @property {string} [unit]
+   * @property {string} [duration]
+   * @property {string} [size]
+   */
+
+  /** @type {Props} */
+  let { unit = 'px', duration = '0.7s', size = '30' } = $props();
 </script>
 
 <div
-  class="circle mx-auto border-y-surface-900 border-r-transparent border-l-surface-900 dark:border-y-surface-200 dark:border-l-surface-200"
+  class="circle mx-auto border-y-primary-500 border-r-transparent border-l-primary-500 dark:border-y-primary-500 dark:border-l-primary-500"
   style="--size: {size}{unit}; --duration: {duration}"
-/>
+></div>
 
 <style>
   .circle {

@@ -18,119 +18,132 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import PreviewSelect from '$lib/components/previews/PreviewSelect.svelte';
   import WeatherDetails from '$lib/components/WeatherDetails.svelte';
   import {
-    activePreview,
+    drawerState,
+    gauges,
+    locations,
     modal,
-    openDrawerWeatherDetails,
+    previews,
     previewWeatherTargets,
-    projectGalleryLink,
-    projectGalleryTitle,
-    projectTitle,
-  } from '$lib/stores';
+    project,
+    weather,
+  } from '$lib/state';
   import { downloadPreviewPNG } from '$lib/utils';
-  import { bind } from 'svelte-simple-modal';
+  import { DownloadIcon, SendIcon } from '@lucide/svelte';
+  import { onMount, untrack } from 'svelte';
   import { Drawer } from 'vaul-svelte';
+  import { weatherDataUpdatedKey } from './WeatherTableWrapper.svelte';
+
+  let refreshKey = $state(Date.now());
+
+  onMount(() => {
+    if (!previews.activeId) {
+      previews.activeId = 'rows';
+    }
+  });
+
+  let debounceTimer;
+  const debounce = (callback, time) => {
+    window.clearTimeout(debounceTimer);
+    debounceTimer = window.setTimeout(callback, time);
+  };
+
+  $effect(() => {
+    project.url.hash, weather.data, weatherDataUpdatedKey.value;
+    debounce(() => {
+      // Update after variables have a chance to update.
+      // Without the tick, sometimes it would not update the preview
+      untrack(() => {
+        refreshKey = Date.now();
+      });
+    }, 400);
+  });
 </script>
 
-<PreviewSelect />
+{#if previews.active && weather.data.length}
+  <PreviewSelect />
 
-{#key $activePreview.id}
-  <div class="flex flex-col gap-2 justify-center items-start">
-    <div class="flex w-full flex-col gap-4 justify-center items-center">
-      <svelte:component this={$activePreview.preview} />
-      <Drawer.Root bind:open={$openDrawerWeatherDetails}>
-        <Drawer.Portal>
-          <Drawer.Overlay class="fixed inset-0 bg-black/40 z-40" />
+  <div class="flex flex-col items-start justify-center gap-2">
+    {#if gauges.activeGauge?.colors}
+      <div class="flex w-full flex-col items-center justify-center gap-4">
+        {#key refreshKey}
+          <previews.active.previewComponent />
+        {/key}
 
-          <Drawer.Content
-            class="bg-surface-50-900-token text-token flex flex-col rounded-tl-container-token rounded-tr-container-token mt-24 fixed bottom-0 left-0 right-0 z-50"
-          >
-            <div
-              class="pt-4 rounded-tl-container-token rounded-tr-container-token overflow-auto"
+        <Drawer.Root bind:open={drawerState.weatherDetails}>
+          <Drawer.Portal>
+            <Drawer.Overlay class="fixed inset-0 z-40 bg-black/40" />
+
+            <Drawer.Content
+              class="bg-surface-50 dark:bg-surface-950 rounded-tl-container rounded-tr-container fixed right-0 bottom-0 left-0 z-50 mt-24 flex flex-col"
             >
               <div
-                class="mx-auto w-12 h-1.5 flex-shrink-0 rounded-full mb-4 bg-surface-900-50-token"
-              />
-              <div class="mx-auto text-center">
-                <WeatherDetails
-                  weatherTargets={$previewWeatherTargets}
-                  context="modal"
-                />
+                class="rounded-tl-container rounded-tr-container overflow-auto pt-4"
+              >
+                <div
+                  class="bg-surface-950-50 mx-auto mb-4 h-1.5 w-12 shrink-0 rounded-full"
+                ></div>
+                <div class="mx-auto text-center">
+                  <WeatherDetails
+                    weatherTargets={previewWeatherTargets.value}
+                  />
+                </div>
               </div>
-            </div>
-          </Drawer.Content>
-        </Drawer.Portal>
-      </Drawer.Root>
-    </div>
+            </Drawer.Content>
+          </Drawer.Portal>
+        </Drawer.Root>
+      </div>
 
-    <div class="flex w-full flex-wrap items-end justify-center gap-4">
-      <svelte:component this={$activePreview.settings} />
-    </div>
+      <div class="flex w-full flex-wrap items-end justify-center gap-4">
+        <previews.active.settingsComponent />
+      </div>
 
-    <div
-      class="flex flex-wrap gap-2 justify-center my-2 lg:mb-4 px-4 py-2 shadow-inner rounded-container-token variant-soft-surface w-full"
-    >
-      <button
-        class="btn bg-secondary-hover-token gap-1 text-token"
-        title="Download PNG"
-        on:click={() => {
-          downloadPreviewPNG(
-            $activePreview.width,
-            $activePreview.height,
-            $activePreview.svg,
-          );
-        }}
-        ><svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke-width="1.5"
-          stroke="currentColor"
-          class="w-6 h-6"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M9 8.25H7.5a2.25 2.25 0 00-2.25 2.25v9a2.25 2.25 0 002.25 2.25h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25H15M9 12l3 3m0 0l3-3m-3 3V2.25"
-          />
-        </svg>
-        Download Image (PNG)
-      </button>
-
-      <button
-        class="btn variant-ghost-primary text-token gap-2 items-center"
-        on:click={() => modal.set(bind(AddToGallery))}
-        title="Show Send to Gallery Dialog"
+      <div
+        class="rounded-container bg-surface-100 dark:bg-surface-900 mt-2 flex w-full flex-wrap justify-center gap-2 px-4 py-2 shadow-inner"
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke-width="1.5"
-          stroke="currentColor"
-          class="w-6 h-6"
+        <button
+          class="btn hover:preset-tonal"
+          title="Download PNG"
+          onclick={() => {
+            downloadPreviewPNG(
+              previews.active.width,
+              previews.active.height,
+              previews.active.svg,
+            );
+          }}
         >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"
-          />
-        </svg>
-        Send to Project Gallery
-      </button>
+          <DownloadIcon />
+          Download Image (PNG)
+        </button>
 
-      {#if $projectGalleryLink && $projectGalleryTitle && $projectGalleryTitle === $projectTitle}
-        <div class="flex flex-col gap-1 justify-center w-full">
-          <p>View this project's gallery page:</p>
-          <p>
-            <a
-              href={$projectGalleryLink}
-              target="_blank"
-              class="underline btn bg-secondary-hover-token w-fit whitespace-pre-wrap"
-              rel="noreferrer">{$projectGalleryTitle}</a
-            >
-          </p>
-        </div>
-      {/if}
-    </div>
+        <button
+          class="btn preset-tonal-primary border-primary-500 h-auto items-center border text-left whitespace-pre-wrap"
+          onclick={() =>
+            modal.trigger({
+              type: 'component',
+              component: {
+                ref: AddToGallery,
+              },
+            })}
+          title="Show Send to Gallery Dialog"
+        >
+          <SendIcon />
+          Send to Project Gallery
+        </button>
+
+        {#if project.gallery.href && project.gallery.title && project.gallery.title === locations.projectTitle}
+          <div class="flex w-full flex-col justify-center gap-1">
+            <p>View this project's gallery page:</p>
+            <p>
+              <a
+                href={project.gallery.href}
+                target="_blank"
+                class="btn hover:preset-tonal w-fit whitespace-pre-wrap underline"
+                rel="noreferrer">{project.gallery.title}</a
+              >
+            </p>
+          </div>
+        {/if}
+      </div>
+    {/if}
   </div>
-{/key}
+{/if}

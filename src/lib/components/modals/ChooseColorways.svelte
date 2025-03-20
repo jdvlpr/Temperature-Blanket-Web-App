@@ -18,18 +18,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
   import StickyPart from '$lib/components/modals/StickyPart.svelte';
   import YarnGridSelect from '$lib/components/modals/YarnGridSelect.svelte';
+  import { modal } from '$lib/state';
   import { pluralize } from '$lib/utils';
-  import { getContext, hasContext } from 'svelte';
 
-  let close = null;
-  if (hasContext('simple-modal')) close = getContext('simple-modal')?.close;
+  interface Props {
+    updateGauge: any;
+  }
 
-  export let updateGauge;
+  let { updateGauge }: Props = $props();
 
-  let selectedColors: object[] = [];
-  let container;
+  let selectedColors: object[] = $state([]);
 
-  $: paletteTitleText = getPaletteTitleText(selectedColors);
+  let paletteTitleText = $derived(getPaletteTitleText(selectedColors));
+
+  let container = null;
 
   function getPaletteTitleText(colors) {
     if (colors.length) {
@@ -41,7 +43,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 </script>
 
-<div class="p-2 sm:p-4 mt-4 relative" bind:this={container}>
+<div bind:this={container} class="p-2">
   <YarnGridSelect
     bind:selectedColors
     onClickScrollToTop={() => {
@@ -50,36 +52,37 @@ If not, see <https://www.gnu.org/licenses/>. -->
         block: 'start',
       });
     }}
-    scrollToTopButtonBottom={selectedColors.length ? '11rem' : '5rem'}
+    scrollToTopButtonBottom={selectedColors.length ? '10rem' : '4rem'}
   />
-  <!-- <YarnSources /> -->
 </div>
 
 <StickyPart position="bottom">
-  <div class="p-2 sm:px-4">
+  <div class="p-2">
     {#if selectedColors.length}
       <div class="mb-2 sm:mb-4">
-        <div>
+        {#key selectedColors.length}
           <ColorPaletteEditable
             canUserEditColor={false}
             schemeName={paletteTitleText}
             bind:colors={selectedColors}
           />
-        </div>
+        {/key}
       </div>
     {/if}
 
-    <SaveAndCloseButtons
-      onSave={() => {
-        updateGauge({
-          _colors: selectedColors,
-        });
-        if (close) close();
-      }}
-      onClose={() => {
-        if (close) close();
-      }}
-      disabled={!selectedColors.length}
-    />
+    <div class="max-sm:pb-2">
+      <SaveAndCloseButtons
+        onSave={() => {
+          updateGauge({
+            _colors: selectedColors,
+          });
+          modal.close();
+        }}
+        onClose={() => {
+          modal.close();
+        }}
+        disabled={!selectedColors.length}
+      />
+    </div>
   </div>
 </StickyPart>

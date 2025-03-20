@@ -14,24 +14,65 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { hideTooltips } from '$lib/components/ColorPaletteEditable.svelte';
   import { arrow, createFloatingActions } from 'svelte-floating-ui';
-  import { flip, offset, shift, size } from 'svelte-floating-ui/dom';
+  // import { autoPlacement } from 'svelte-floating-ui/core';
+  import {
+    flip,
+    offset,
+    shift,
+    size,
+    type Placement,
+  } from 'svelte-floating-ui/dom';
   import { writable } from 'svelte/store';
   import { scale } from 'svelte/transition';
 
-  export let placement = 'top';
-  export let minWidth = '110px';
-  export let disableTooltip = false;
-  export let fullWidth = false;
-  export let buttonDisabled = false;
-  export let tooltipClass = 'text-sm';
-  export let tooltipBg = 'bg-surface-200-700-token';
-  export let tooltipStyle = '';
+  interface Props {
+    placement?: Placement;
+    minWidth?: string;
+    disableTooltip?: boolean;
+    fullWidth?: boolean;
+    buttonDisabled?: boolean;
+    tooltipClass?: string;
+    tooltipBg?: string;
+    tooltipStyle?: string;
+    classNames?: string;
+    dataPinned?: boolean;
+    dataActive?: boolean;
+    dataNoWeather?: boolean;
+    title?: string;
+    id?: string;
+    showTooltip?: boolean;
+    onclick?: (event: MouseEvent) => void;
+    children?: import('svelte').Snippet;
+    tooltip?: import('svelte').Snippet;
+  }
+
+  let {
+    placement = 'top',
+    minWidth = '110px',
+    disableTooltip = false,
+    fullWidth = false,
+    buttonDisabled = false,
+    tooltipClass = 'text-sm',
+    tooltipBg = 'bg-surface-100 dark:bg-surface-900',
+    tooltipStyle = '',
+    classNames = '',
+    dataPinned,
+    dataActive,
+    dataNoWeather,
+    title = '',
+    id = '',
+    showTooltip = false,
+    onclick,
+    children,
+    tooltip,
+  }: Props = $props();
 
   const arrowRef = writable(null);
-  let showTooltip: boolean = false;
-  let isTooltipActive = false;
+
+  let isTooltipActive = $state(false);
+
+  let tooltipElement = $state();
 
   let debounceTimer;
   const debounce = (callback, time) => {
@@ -43,8 +84,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     strategy: 'absolute',
     placement,
     middleware: [
-      offset(12),
       flip(),
+      offset(10),
       size({
         apply({ availableWidth, availableHeight, elements }) {
           // Do things with the data, e.g.
@@ -54,7 +95,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           });
         },
       }),
-      shift({ padding: 2 }),
+      shift({
+        padding: 2,
+      }),
       arrow({ element: arrowRef }),
     ],
     onComputed({ placement, middlewareData }) {
@@ -92,79 +135,109 @@ If not, see <https://www.gnu.org/licenses/>. -->
       } else clearTimeout(timeout);
     }, duration);
   }
+
+  $effect(() => {
+    if (showTooltip) {
+      tooltipElement.style.zIndex = '100';
+    }
+  });
 </script>
 
-<div class="inline-block h-full" class:w-full={fullWidth}>
-  {#if !disableTooltip && buttonDisabled}
-    <div
-      role="button"
-      tabindex="0"
-      on:mouseenter={() => {
-        debounce(() => (showTooltip = true), 50);
-      }}
-      on:mouseleave={handelLeaveEvent}
-      on:focus={() => {
-        debounce(() => (showTooltip = true), 50);
-      }}
-      on:blur={handelLeaveEvent}
-      use:floatingRef
-    >
-      <button on:click {...$$props} disabled>
-        <slot />
-      </button>
-    </div>
-  {:else if !disableTooltip}
+{#if !disableTooltip && buttonDisabled}
+  <div
+    role="button"
+    tabindex="0"
+    onmouseenter={() => {
+      debounce(() => (showTooltip = true), 50);
+    }}
+    onmouseleave={handelLeaveEvent}
+    onfocus={() => {
+      debounce(() => (showTooltip = true), 50);
+    }}
+    onblur={handelLeaveEvent}
+    use:floatingRef
+  >
     <button
-      on:click
-      {...$$props}
-      on:mouseenter={() => {
-        debounce(() => (showTooltip = true), 50);
-      }}
-      on:mouseleave={handelLeaveEvent}
-      on:focus={() => {
-        debounce(() => (showTooltip = true), 50);
-      }}
-      on:blur={handelLeaveEvent}
-      use:floatingRef
+      {onclick}
+      disabled
+      class={[classNames, fullWidth && 'w-full inline-block h-full']}
+      data-pinned={dataPinned}
+      data-active={dataActive}
+      data-no-weather={dataNoWeather}
+      {title}
+      {id}
     >
-      <slot />
+      {@render children?.()}
     </button>
-  {:else}
-    <button on:click {...$$props}>
-      <slot />
-    </button>
-  {/if}
-</div>
-{#if showTooltip && !$hideTooltips}
+  </div>
+{:else if !disableTooltip}
+  <button
+    {onclick}
+    class={[classNames, fullWidth && 'w-full inline-block h-full']}
+    data-pinned={dataPinned}
+    data-active={dataActive}
+    data-no-weather={dataNoWeather}
+    {title}
+    {id}
+    onmouseenter={() => {
+      debounce(() => (showTooltip = true), 50);
+    }}
+    onmouseleave={handelLeaveEvent}
+    onfocus={() => {
+      debounce(() => (showTooltip = true), 50);
+    }}
+    onblur={handelLeaveEvent}
+    use:floatingRef
+  >
+    {@render children?.()}
+  </button>
+{:else}
+  <button
+    {onclick}
+    class={[classNames, fullWidth && 'w-full inline-block h-full']}
+    data-pinned={dataPinned}
+    data-active={dataActive}
+    data-no-weather={dataNoWeather}
+    {title}
+    {id}
+  >
+    {@render children?.()}
+  </button>
+{/if}
+
+{#if showTooltip}
   <div
     role="dialog"
+    tabindex="-1"
     aria-labelledby="Tooltip or Menu"
     aria-describedby="A dialog box showing information or menu items."
     in:scale={{ duration: 175 }}
-    class="absolute shadow-lg text-token cursor-text z-40 rounded-container-token"
+    class="absolute shadow-lg cursor-text z-200 rounded-container tooltip block"
     style="min-width:{minWidth}"
     use:floatingContent
-    on:mouseenter={() => (isTooltipActive = true)}
-    on:mouseleave={(event) => {
+    onmouseenter={() => (isTooltipActive = true)}
+    onmouseleave={(event) => {
       isTooltipActive = false;
       handelLeaveEvent(event);
     }}
-    on:focus={() => (isTooltipActive = true)}
-    on:blur={(event) => {
+    onfocus={() => (isTooltipActive = true)}
+    onblur={(event) => {
       isTooltipActive = false;
       handelLeaveEvent(event);
     }}
+    bind:this={tooltipElement}
   >
     <div
-      class="p-2 rounded-container-token {tooltipBg} {tooltipClass}"
+      class="p-2 rounded-container {tooltipBg} {tooltipClass}"
       style={tooltipStyle}
     >
-      <slot name="tooltip" />
+      {@render tooltip?.()}
     </div>
+
     <div
       style="position:absolute; {tooltipStyle}"
       class="w-4 h-4 {tooltipBg} z-40"
       bind:this={$arrowRef}
-    />
+    ></div>
   </div>
 {/if}

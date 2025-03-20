@@ -28,8 +28,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { onMount } from 'svelte';
   import { entries } from './changelog';
 
-  let container;
-  let showScrollToTopButton = false;
+  let container = $state();
+  let showScrollToTopButton = $state(false);
   let scrollObserver = browser
     ? new IntersectionObserver((entries, observer) => {
         if (!entries[0].isIntersecting) {
@@ -72,16 +72,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
 {/if}
 
 <AppShell pageName="Changelog">
-  <svelte:fragment slot="stickyHeader">
-    <div class="hidden lg:inline-flex mx-auto"><AppLogo /></div>
-  </svelte:fragment>
-  <main slot="main" class="max-w-screen-xl m-auto text-center mb-6">
-    <Card>
-      <div
-        slot="header"
-        class="bg-surface-200-700-token text-token p-4"
-        bind:this={container}
-      >
+  {#snippet stickyHeader()}
+    <div class="hidden lg:inline-flex"><AppLogo /></div>
+  {/snippet}
+  {#snippet main()}
+    <main class="max-w-(--breakpoint-md) m-auto text-center mb-6 mt-2 px-2 mx-auto">
+      <div class="" bind:this={container}>
         <p class="text-left">
           See what's new and review past changes from {PUBLIC_BASE_DOMAIN_NAME}.
           This changelog includes only select milestones.
@@ -92,14 +88,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
           > to see the full changelog since version 4.
         </p>
       </div>
-      <div
-        slot="content"
-        class="flex flex-col gap-2 text-left items-start py-4"
-      >
+      <div class="flex flex-col gap-2 text-left items-start py-4">
         {#each entries as { version, date, notes }}
           <ChangelogItem {version} {date} {notes} />
         {/each}
       </div>
-    </Card>
-  </main>
+    </main>
+  {/snippet}
 </AppShell>

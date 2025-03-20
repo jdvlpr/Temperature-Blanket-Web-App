@@ -14,25 +14,22 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import { weatherGrouping } from '$lib/stores';
-  import { RadioGroup, RadioItem } from '@skeletonlabs/skeleton';
+  import { weather } from '$lib/state';
+  import { Segment } from '@skeletonlabs/skeleton-svelte';
 </script>
 
 <div class="flex flex-col items-start">
-  <div class="flex gap-1 items-center">
-    <RadioGroup class="flex-wrap gap-y-2" active="bg-secondary-active-token">
-      <RadioItem
-        bind:group={$weatherGrouping}
-        name="weatherGrouping"
-        value={'day'}
-        title="Set weather grouping to days">Daily</RadioItem
-      >
-      <RadioItem
-        bind:group={$weatherGrouping}
-        name="weatherGrouping"
-        value={'week'}
-        title="Set weather grouping to weeks">Weekly</RadioItem
-      >
-    </RadioGroup>
+  <div class="flex items-center gap-1">
+    <Segment
+      value={weather.grouping}
+      onValueChange={(e) => {
+        weather.grouping = e.value;
+      }}
+      background="bg-surface-100 dark:bg-surface-900"
+      classes="shadow-sm"
+    >
+      <Segment.Item value="day">Daily</Segment.Item>
+      <Segment.Item value="week">Weekly</Segment.Item>
+    </Segment>
   </div>
 </div>

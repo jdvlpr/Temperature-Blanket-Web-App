@@ -13,9 +13,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script context="module">
-  import { localStorageStore } from '@skeletonlabs/skeleton';
-  export const skeletonTheme = localStorageStore('skeletonTheme', 'classic');
+<script module>
   export const skeletonThemes = [
     {
       id: 'classic',
@@ -68,7 +66,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       rounded: '0px',
     },
     {
-      id: 'skeleton',
+      id: 'legacy',
       name: 'Tufa',
       colors: {
         surface: '#495a8f',
@@ -81,125 +79,97 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <script>
-  import { activeTheme, theme, themes } from '$lib/stores';
-  import { setTheme } from '$lib/utils';
-  import {
-    ListBox,
-    ListBoxItem,
-    RadioGroup,
-    RadioItem,
-    popup,
-  } from '@skeletonlabs/skeleton';
+  import { browser } from '$app/environment';
+  import { THEMES } from '$lib/constants';
+  import { localState } from '$lib/state';
+  import { Popover, Segment } from '@skeletonlabs/skeleton-svelte';
 
-  export let showText = false;
-  export let target = 'popupTheme';
+  let openState = $state(false);
 
-  const popupTheme = {
-    // Represents the type of event that opens/closed the popup
-    event: 'click',
-    // Matches the data-popup value on your popup element
-    target,
-    // Defines which side of your trigger the popup will appear
-    placement: 'bottom',
-    closeQuery: '.close',
-  };
-
-  $: skeletonThemeName = skeletonThemes.find(
-    (theme) => theme.id === $skeletonTheme,
-  )?.name;
+  let activeTheme = $derived(
+    THEMES.find((n) => n.id === (localState.value.theme.mode || 'system')),
+  );
 </script>
 
 <div class="w-fit text-left">
-  <button
-    class="btn bg-secondary-hover-token"
-    id="menu-button"
-    title="Change Theme [t]"
-    use:popup={popupTheme}
+  <Popover
+    open={openState}
+    onOpenChange={(e) => {
+      openState = e.open;
+    }}
+    triggerBase="btn  hover:preset-tonal"
+    contentBase="card bg-surface-200 dark:bg-surface-800 p-4 space-y-4 shadow-xl"
+    positionerClasses="z-9999!"
+    arrow
+    arrowBackground="bg-surface-200! dark:bg-surface-800!"
+    modal={true}
+    autoFocus={false}
   >
-    {#key $theme}
-      {#if showText}
-        <span class="flex items-center">
-          <span class="pr-2">{@html $activeTheme.icon}</span>
-          Theme
-        </span>
-      {:else}
-        <span>{@html $activeTheme.icon}</span>
-      {/if}
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 20 20"
-        fill="currentColor"
-        class="w-5 h-5"
-      >
-        <path
-          fill-rule="evenodd"
-          d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
-          clip-rule="evenodd"
-        />
-      </svg>
-    {/key}
-  </button>
+    {#snippet trigger()}
+      {#key localState.value?.theme.mode}
+        <span
+          >{#if browser}{@html activeTheme?.icon}{:else}{@html THEMES.find(
+              (t) => t.id === 'system',
+            ).icon}{/if}</span
+        >
+        Theme
+      {/key}
+    {/snippet}
+    {#snippet content()}
+      <div class="flex flex-col gap-2">
+        <Segment
+          value={localState.value.theme.mode}
+          onValueChange={(e) => {
+            localState.value.theme.mode = e.value;
+          }}
+          classes="flex wrap gap-y-2 shadow-sm"
+          background="bg-surface-100 dark:bg-surface-900"
+        >
+          {#each THEMES as { name, id, icon, description }}
+            <Segment.Item value={id}>
+              <span class="flex items-center justify-center gap-1">
+                {@html icon}
+                <span class="hidden min-[375px]:inline">{name}</span>
+              </span>
+            </Segment.Item>
+          {/each}
+        </Segment>
 
-  <!--
-          Dropdown menu, show/hide based on menu state.
-      
-          Entering: "transition ease-out duration-100"
-            From: "transform opacity-0 scale-95"
-            To: "transform opacity-100 scale-100"
-          Leaving: "transition ease-in duration-75"
-            From: "transform opacity-100 scale-100"
-            To: "transform opacity-0 scale-95"
-        -->
-  <div
-    data-popup={target}
-    class="bg-surface-300-600-token rounded-container-token shadow-lg p-2 z-30"
-    aria-orientation="vertical"
-    aria-labelledby="menu-button"
-    tabindex="-1"
-  >
-    <div class="flex flex-col gap-2">
-      <RadioGroup class="flex wrap gap-y-2" active="bg-secondary-active-token">
-        {#each $themes as { name, id, icon, description }}
-          <RadioItem
-            bind:group={$theme}
-            on:click={() => setTheme(id)}
-            name="theme-{id}"
-            value={id}
-            title={description}
-          >
-            <span class="flex gap-1 justify-center items-center">
-              {@html icon}
-              <span class="hidden min-[360px]:inline">{name}</span>
-            </span>
-          </RadioItem>
-        {/each}
-      </RadioGroup>
-
-      <ListBox active="bg-secondary-active-token">
-        {#each skeletonThemes as { name, id, colors, rounded }}
-          <ListBoxItem
-            bind:group={$skeletonTheme}
-            name="medium"
-            value={id}
-            regionLead="w-16"
-          >
-            <svelte:fragment slot="lead">
+        <div class="flex flex-col items-start gap-2">
+          {#each skeletonThemes as { name, id, colors, rounded }}
+            <button
+              onclick={(e) => {
+                localState.value.theme.id = id;
+              }}
+              class={[
+                'btn hover:preset-tonal-secondary flex w-full items-center justify-start gap-2',
+                localState.value.theme.id === id &&
+                  'preset-filled-secondary-500',
+              ]}
+            >
               <div
-                class="flex w-full h-6 overflow-hidden border-surface-50-900-token border"
+                class="border-surface-50-950 flex h-6 w-16 overflow-hidden border"
                 style="border-radius:{rounded}"
               >
-                <div class="flex-auto" style="background:{colors.surface}" />
-                <div class="flex-auto" style="background:{colors.primary}" />
-                <div class="flex-auto" style="background:{colors.secondary}" />
-                <!-- <div class="flex-auto" style="background:{colors.tertiary}" /> -->
+                <div
+                  class="flex-auto"
+                  style="background:{colors.surface}"
+                ></div>
+                <div
+                  class="flex-auto"
+                  style="background:{colors.primary}"
+                ></div>
+                <div
+                  class="flex-auto"
+                  style="background:{colors.secondary}"
+                ></div>
               </div>
-            </svelte:fragment>
-            {name}
-          </ListBoxItem>
-        {/each}
-      </ListBox>
-      <button class="close" />
-    </div>
-    <div class="arrow bg-surface-300-600-token shadow-lg" />
-  </div>
+              {name}
+            </button>
+          {/each}
+        </div>
+        <button class="close" aria-label="Close"></button>
+      </div>
+    {/snippet}
+  </Popover>
 </div>

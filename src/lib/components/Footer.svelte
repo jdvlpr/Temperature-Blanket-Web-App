@@ -13,26 +13,32 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script>
-  export let subtleBackground = true;
+<script lang="ts">
+  interface Props {
+    subtleBackground?: boolean;
+    about?: import('svelte').Snippet;
+    sources?: import('svelte').Snippet;
+  }
+
+  let { subtleBackground = true, about, sources }: Props = $props();
 </script>
 
 <footer
-  class="text-token py-4 max-w-screen-xl m-auto px-2 xl:px-0 text-left grid grid-cols-12 justify-center gap-4"
+  class="py-4 max-w-(--breakpoint-xl) m-auto px-2 xl:px-0 text-left grid grid-cols-12 justify-center gap-4"
   class:bg-transparent={subtleBackground}
   class:dark:bg-transparent={subtleBackground}
 >
-  {#if $$slots.about}
-    <div class="card h-fit variant-soft-surface p-4 text-token col-span-full">
+  {#if about}
+    <div class="card h-fit preset-tonal-surface p-4 col-span-full shadow-xl">
       <h3 class="font-bold text-xl mb-2">About</h3>
-      <slot name="about" />
+      {@render about?.()}
     </div>
   {/if}
 
-  {#if $$slots.sources}
-    <div class="card variant-soft-surface p-4 h-fit text-token col-span-full">
+  {#if sources}
+    <div class="card preset-tonal-surface p-4 h-fit col-span-full shadow-xl">
       <h3 class="font-bold text-xl mb-2">Sources</h3>
-      <slot name="sources" />
+      {@render sources?.()}
     </div>
   {/if}
 </footer>

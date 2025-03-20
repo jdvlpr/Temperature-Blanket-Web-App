@@ -13,19 +13,27 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script>
+<script lang="ts">
   import WeatherTable from '$lib/components/modals/WeatherTable.svelte';
-  import { modal, weatherGrouping } from '$lib/stores';
+  import { modal, weather } from '$lib/state';
+  import type {
+    GaugeAttributes,
+    GaugeRange,
+    GaugeSettingsType,
+  } from '$lib/types';
   import { getDaysInRange, getDaysPercent, pluralize } from '$lib/utils';
-  import { getContext } from 'svelte';
-  import { bind } from 'svelte-simple-modal';
 
-  const isModal = typeof getContext('simple-modal') !== 'undefined';
+  let isModal = $derived(modal.opened);
 
-  export let range, rangeOptions, props;
+  type Props = {
+    range: GaugeRange;
+    rangeOptions: GaugeSettingsType['rangeOptions'];
+    targets: GaugeAttributes['targets'];
+  };
+  let { range, rangeOptions, targets }: Props = $props();
 
-  $: noDaysInRange = () =>
-    props.targets.every(
+  let noDaysInRange = $derived(() =>
+    targets.every(
       (n) =>
         !getDaysInRange({
           id: n.id,
@@ -34,11 +42,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
           includeFromValue: rangeOptions?.includeFromValue,
           includeToValue: rangeOptions?.includeToValue,
         })?.length,
-    );
+    ),
+  );
 </script>
 
 {#if !noDaysInRange()}
-  {#each props.targets as { id, icon, gaugeLabel }}
+  {#each targets as { id, icon, gaugeLabel }}
     {@const daysInRange = getDaysInRange({
       id,
       range,
@@ -50,13 +59,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <button
         type="button"
         disabled={!daysInRange?.length}
-        class="btn bg-secondary-hover-token"
-        on:click={() =>
-          modal.set(
-            bind(WeatherTable, {
-              weatherData: daysInRange,
-            }),
-          )}
+        class="btn hover:preset-tonal h-auto"
+        onclick={() =>
+          modal.trigger({
+            type: 'component',
+            component: {
+              ref: WeatherTable,
+              props: {
+                weatherData: daysInRange,
+              },
+            },
+          })}
       >
         <span class="flex flex-col items-start justify-center">
           <span class="text-xs">
@@ -65,7 +78,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </span>
           <span>
             {daysInRange.length}
-            {pluralize($weatherGrouping, daysInRange.length)} ({getDaysPercent(
+            {pluralize(weather.grouping, daysInRange.length)} ({getDaysPercent(
               daysInRange.length,
             )}%)
           </span>
@@ -79,7 +92,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </span>
         <span>
           {daysInRange.length}
-          {pluralize($weatherGrouping, daysInRange.length)} ({getDaysPercent(
+          {pluralize(weather.grouping, daysInRange.length)} ({getDaysPercent(
             daysInRange.length,
           )}%)
         </span>

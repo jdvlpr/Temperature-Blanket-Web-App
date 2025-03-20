@@ -16,10 +16,23 @@
 import { PUBLIC_GITHUB_LINK } from '$env/static/public';
 import { ICONS } from '$lib/constants';
 import type { ChangelogItem } from '$lib/types';
+import { RocketIcon } from '@lucide/svelte';
 
 export const entries: ChangelogItem[] = [
   {
     date: 'March, 2025',
+    notes: [
+      {
+        IconComponent: RocketIcon,
+        instructions:
+          "<a href='/blog/2025-03-20-version-5' class='link'>Learn more and read the update announcement.</a>",
+        text: `Updated design, new features, and rewritten with Svelte 5 and Skeleton 3`,
+        title: 'Version 5 Release',
+      },
+    ],
+    version: '5.0.0',
+  },
+  {
     notes: [
       {
         icon: ICONS.checkCircle,
@@ -396,7 +409,7 @@ export const entries: ChangelogItem[] = [
   {
     notes: [
       {
-        icon: ICONS.wrenchScrewdriver,
+        icon: ICONS.wrench,
         text: `Project locations can now include future dates even when the weather source is Open-Meteo. Previously this was possible only when the weather source was Meteostat.`,
         title: 'Allow Future Dates in Open-Meteo Weather Data',
       },
@@ -554,7 +567,7 @@ export const entries: ChangelogItem[] = [
   {
     notes: [
       {
-        icon: ICONS.wrenchScrewdriver,
+        icon: ICONS.wrench,
         text: '',
         title: 'Fixed Issue with Daytime Data not Displaying',
       },
@@ -567,7 +580,7 @@ export const entries: ChangelogItem[] = [
         icon: ICONS.design,
         instructions:
           "<a href='/blog/2023-12-19-version-3-unified-site-design' class='link'>Read the blog post about Version 3</a>",
-        text: 'New sidebar navigation, unified design accross all pages, and improved performance.',
+        text: 'New sidebar navigation, unified design across all pages, and improved performance.',
         title: 'Updated Site Design',
       },
     ],
@@ -589,14 +602,14 @@ export const entries: ChangelogItem[] = [
   {
     notes: [
       {
-        icon: ICONS.wrenchScrewdriver,
+        icon: ICONS.wrench,
         instructions:
           'Go to the Colors tab and press the Configure Ranges button, or select the range from the color list.',
         text: 'One place for setting up and editing all color ranges. Instantly see how changing one range affects the others near it, without having to open a new modal for each color.',
         title: 'Range Configuration',
       },
       {
-        icon: `<svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 flex-shrink-0" viewBox="0 0 256 256"
+        icon: `<svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 shrink-0" viewBox="0 0 256 256"
                             ><g fill="currentColor"
                                 ><path d="M176 128a48 48 0 1 1-48-48a48 48 0 0 1 48 48Z" opacity=".2" /><path
                                     d="M221.87 83.16A104.1 104.1 0 1 1 195.67 49l22.67-22.68a8 8 0 0 1 11.32 11.32l-96 96a8 8 0 0 1-11.32-11.32l27.72-27.72a40 40 0 1 0 17.87 31.09a8 8 0 1 1 16-.9a56 56 0 1 1-22.38-41.65l22.75-22.75a87.88 87.88 0 1 0 23.13 29.67a8 8 0 0 1 14.44-6.9Z"
@@ -783,7 +796,8 @@ export const entries: ChangelogItem[] = [
         icon: `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
   <path stroke-linecap="round" stroke-linejoin="round" d="M12.75 3.03v.568c0 .334.148.65.405.864l1.068.89c.442.369.535 1.01.216 1.49l-.51.766a2.25 2.25 0 01-1.161.886l-.143.048a1.107 1.107 0 00-.57 1.664c.369.555.169 1.307-.427 1.605L9 13.125l.423 1.059a.956.956 0 01-1.652.928l-.679-.906a1.125 1.125 0 00-1.906.172L4.5 15.75l-.612.153M12.75 3.031a9 9 0 00-8.862 12.872M12.75 3.031a9 9 0 016.69 14.036m0 0l-.177-.529A2.25 2.25 0 0017.128 15H16.5l-.324-.324a1.453 1.453 0 00-2.328.377l-.036.073a1.586 1.586 0 01-.982.816l-.99.282c-.55.157-.894.702-.8 1.267l.073.438c.08.474.49.821.97.821.846 0 1.598.542 1.865 1.345l.215.643m5.276-3.67a9.012 9.012 0 01-5.276 3.67m0 0a9 9 0 01-10.275-4.835M15.75 9c0 .896-.393 1.7-1.016 2.25" />
 </svg>`,
-        instructions: 'In the Preview tab, press the Share to Gallery Button',
+        instructions:
+          'In the Preview tab, press the Share to Gallery button to add your project to the gallery.',
         text: 'Created the <a href="/gallery" class="link">project gallery</a> to showcase user-created projects.',
         title: 'Project Gallery',
       },

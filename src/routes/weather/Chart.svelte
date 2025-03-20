@@ -14,7 +14,6 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import { units } from '$lib/stores';
   import {
     BarController,
     BarElement,
@@ -34,9 +33,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     Tooltip,
   } from 'chart.js';
   import { onMount } from 'svelte';
-  import { hour } from './+page.svelte';
+  import { weatherState } from './+page.svelte';
+  import { localState } from '$lib/state';
 
-  export let data;
+  let { data } = $props();
 
   Chart.register(
     LineElement,
@@ -141,7 +141,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               ' ' +
               new Date(item.time).toLocaleTimeString(locale, {
                 timeStyle: 'short',
-                hour12: $hour === '12' ? true : false,
+                hour12: weatherState.hour === '12' ? true : false,
               });
           }
           return time;
@@ -204,7 +204,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
             },
             title: {
               text:
-                $units === 'metric' ? 'Degrees Celsius' : 'Degrees Fahrenheit',
+                localState.value.units === 'metric'
+                  ? 'Degrees Celsius'
+                  : 'Degrees Fahrenheit',
               display: true,
               color: '#94a3b8',
             },
@@ -235,9 +237,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     }));
   });
 
-  let ctx;
+  let ctx = $state();
 </script>
 
-<div class="rounded-container-token my-2 h-[240px]">
-  <canvas id="weather-chart" bind:this={ctx} />
+<div class="rounded-container my-2 h-[240px]">
+  <canvas id="weather-chart" bind:this={ctx}></canvas>
 </div>

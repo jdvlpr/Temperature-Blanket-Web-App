@@ -14,8 +14,15 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  export let href,
-    title = 'Get Help';
+  /**
+   * @typedef {Object} Props
+   * @property {any} href
+   * @property {string} [title]
+   * @property {import('svelte').Snippet} [text]
+   */
+
+  /** @type {Props} */
+  let { href, title = 'Get Help', text } = $props();
 </script>
 
 <a
@@ -23,8 +30,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   rel="noopener noreferrer"
   target="_blank"
   {title}
-  class="text-token inline-flex gap-1 justify-start items-end relative underline"
-  class:top-[5px]={!$$slots.text}
+  class="inline-flex gap-1 justify-start items-end relative underline"
+  class:top-[5px]={!text}
 >
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -41,5 +48,5 @@ If not, see <https://www.gnu.org/licenses/>. -->
     />
   </svg>
 
-  <slot name="text" />
+  {@render text?.()}
 </a>

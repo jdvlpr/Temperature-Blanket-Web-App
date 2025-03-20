@@ -16,12 +16,27 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import RecentWeatherDataTooltip from '$lib/components/RecentWeatherDataTooltip.svelte';
 
-  export let id;
-  export let icon;
-  export let label;
-  export let value;
-  export let units: string | undefined = undefined;
-  export let isRecentDate = false;
+  interface Props {
+    id: any;
+    icon: any;
+    label: any;
+    value: any;
+    units?: string | undefined;
+    isRecentDate?: boolean;
+    date?: import('svelte').Snippet;
+    details?: import('svelte').Snippet;
+  }
+
+  let {
+    id,
+    icon,
+    label,
+    value,
+    units = undefined,
+    isRecentDate = false,
+    date,
+    details,
+  }: Props = $props();
 
   // Colors from tailwind.config.js
   const colors = {
@@ -36,9 +51,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <span class="flex flex-col items-center justify-start p-2">
   <div
-    class="flex !text-token"
-    class:!variant-soft-warning={isRecentDate}
-    class:rounded-container-token={isRecentDate}
+    class={['flex', isRecentDate && '!bg-warning-500/20']}
+    class:rounded-container={isRecentDate}
     class:p-1={isRecentDate}
   >
     <span class="text-xl font-semibold tracking-wide"
@@ -49,7 +63,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <RecentWeatherDataTooltip />
     {/if}
   </div>
-  <span class="text-sm ml-1">{label}</span>
-  <slot name="button" />
-  <slot name="details" />
+  <span class="ml-1 text-sm">{label}</span>
+  {@render date?.()}
+  {@render details?.()}
 </span>

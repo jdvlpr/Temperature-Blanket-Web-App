@@ -21,18 +21,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Tooltip from '$lib/components/Tooltip.svelte';
   import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
   import StickyPart from '$lib/components/modals/StickyPart.svelte';
+  import { modal } from '$lib/state';
   import {
     getColorways,
     getFilteredYarns,
     getSortedPalette,
     pickRandomFromArray,
   } from '$lib/utils';
-  import { getContext } from 'svelte';
+  import { ArrowDownWideNarrowIcon, ShuffleIcon } from '@lucide/svelte';
   import SelectYarnWeight from '../SelectYarnWeight.svelte';
 
-  export let numberOfColors, updateGauge;
-
-  const { close } = getContext('simple-modal');
+  let { numberOfColors, updateGauge } = $props();
 
   let debounceTimer;
   const debounce = (callback, time) => {
@@ -40,32 +39,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     debounceTimer = window.setTimeout(callback, time);
   };
 
-  let _yarnColorwaysPalette = [];
-  let selectedBrandId;
-  let selectedYarnId;
-  let selectedYarnWeightId = '';
-  let sortColors = 'light-to-dark';
-  let key = 0;
-
-  $: filteredYarnsList = getFilteredYarns({
-    selectedBrandId,
-  });
-
-  $: colorways = getColorways({
-    selectedBrandId,
-    selectedYarnId,
-    selectedYarnWeightId,
-  });
-
-  $: isYarnUnavailable = filteredYarnsList
-    ?.filter((n) => n.id === selectedYarnId)[0]
-    ?.colorways.some((colorway) => !!colorway.source?.unavailable);
-
-  $: selectedBrandId,
-    selectedYarnId,
-    selectedYarnWeightId,
-    numberOfColors,
-    getRandomColors();
+  let randomPalette = $state([getRandomColors()]);
+  let selectedBrandId = $state();
+  let selectedYarnId = $state();
+  let selectedYarnWeightId = $state('');
+  let sortColors = $state('light-to-dark');
 
   function getRandomColors() {
     debounce(() => {
@@ -81,9 +59,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
         // Check if the current index has a locked color
         const currentIndex = tempYarnColorways.length;
         let color;
-        if (_yarnColorwaysPalette[currentIndex]?.locked) {
+        if (randomPalette[currentIndex]?.locked) {
           // Use the locked color instead of a random one
-          color = _yarnColorwaysPalette[currentIndex];
+          color = randomPalette[currentIndex];
           const colorId = `${color.hex}-${color.name}-${color.brandId}-${color.yarnId}`;
           tempYarnColorways.push(color);
           existingColorways.add(colorId);
@@ -110,18 +88,58 @@ If not, see <https://www.gnu.org/licenses/>. -->
           }
         }
       }
-      _yarnColorwaysPalette = getSortedPalette({
+      randomPalette = getSortedPalette({
         palette: tempYarnColorways,
         sortColors,
       });
-    }, 0);
+    }, 10);
   }
+  let filteredYarnsList = $derived(
+    getFilteredYarns({
+      selectedBrandId,
+    }),
+  );
+  let colorways = $derived(
+    getColorways({
+      selectedBrandId,
+      selectedYarnId,
+      selectedYarnWeightId,
+    }),
+  );
+  let isYarnUnavailable = $derived(
+    filteredYarnsList
+      ?.filter((n) => n.id === selectedYarnId)[0]
+      ?.colorways.some((colorway) => !!colorway.source?.unavailable),
+  );
+
+  $effect(() => {
+    selectedBrandId;
+    selectedYarnId;
+    selectedYarnWeightId;
+    numberOfColors;
+    getRandomColors();
+  });
 </script>
 
-<div class="p-2 sm:p-4 w-[98vw] md:w-[760px] lg:w-[1000px]">
-  <div class="grid grid-cols-12 gap-4 justify-center items-end w-full">
+<svelte:window
+  onkeydown={(e) => {
+    if (
+      e.target.tagName === 'INPUT' ||
+      e.target.tagName === 'TD' ||
+      e.target.tagName === 'SELECT' ||
+      e.target.tagName === 'BUTTON'
+    )
+      return;
+    if (e.key === 'r') {
+      getRandomColors();
+    }
+  }}
+/>
+
+<div class="px-4 pt-8">
+  <div class="grid w-full grid-cols-12 items-end justify-center gap-4">
     <div
-      class="w-full col-span-full md:col-span-9 order-1"
+      class="order-1 col-span-full w-full md:col-span-9"
       class:md:col-span-full={!!selectedBrandId && !!selectedYarnId}
     >
       <SelectYarn
@@ -133,14 +151,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
 
     {#if selectedBrandId && selectedYarnId}
-      <div class="w-full col-span-full order-2 md:order-3">
+      <div class="order-2 col-span-full w-full md:order-3">
         <DefaultYarnSet {selectedBrandId} {selectedYarnId} />
       </div>
     {/if}
 
     {#key selectedBrandId}
       <div
-        class="w-full col-span-full md:col-span-3 order-3 md:order-2"
+        class="order-3 col-span-full w-full md:order-2 md:col-span-3"
         class:hidden={!!selectedBrandId && !!selectedYarnId}
       >
         <SelectYarnWeight {selectedBrandId} bind:selectedYarnWeightId />
@@ -148,7 +166,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {/key}
 
     {#if isYarnUnavailable}
-      <div class="w-full col-span-full order-4">
+      <div class="order-4 col-span-full w-full">
         <Tooltip>
           Link Unavailable <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -156,72 +174,58 @@ If not, see <https://www.gnu.org/licenses/>. -->
             viewBox="0 0 24 24"
             stroke-width="1.5"
             stroke="currentColor"
-            class="w-6 h-6 inline"
+            class="inline h-6 w-6"
             ><path
               stroke-linecap="round"
               stroke-linejoin="round"
               d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"
             ></path></svg
           >
-          <div
-            slot="tooltip"
-            class="flex flex-col gap-2 justify-start text-left text-base"
-          >
-            <p>
-              A yarn that says Link Unavailable means the webpage from which the
-              colorways were accessed is no longer available. Yarns whose links
-              are unavailable will remain on this web app for legacy purposes,
-              but links to the yarn and its colorways will not work.
-            </p>
-
-            <p>A yarn with unavailable links could mean:</p>
-
-            <div class="ml-4">
-              <p>- The yarn has been discontinued</p>
-              <p>- The yarn has been renamed</p>
+          {#snippet tooltip()}
+            <div class="flex flex-col justify-start gap-2 text-left text-base">
               <p>
-                - The yarn’s website has been re-designed and old links no
-                longer exist
+                A yarn that says Link Unavailable means the webpage from which
+                the colorways were accessed is no longer available. Yarns whose
+                links are unavailable will remain on this web app for legacy
+                purposes, but links to the yarn and its colorways will not work.
               </p>
+
+              <p>A yarn with unavailable links could mean:</p>
+
+              <div class="ml-4">
+                <p>- The yarn has been discontinued</p>
+                <p>- The yarn has been renamed</p>
+                <p>
+                  - The yarn’s website has been re-designed and old links no
+                  longer exist
+                </p>
+              </div>
             </div>
-          </div>
+          {/snippet}
         </Tooltip>
       </div>
     {/if}
 
-    <div class="col-span-full sm:col-span-3 justify-self-start order-5">
+    <div class="order-5 col-span-full justify-self-start sm:col-span-3">
       <SelectNumberOfColors
         {numberOfColors}
         max={99}
-        on:change={(e) => (numberOfColors = +e.target.value)}
+        onchange={(e) => (numberOfColors = +e.target.value)}
       />
     </div>
 
-    <label class="label w-full col-span-full sm:col-span-4 order-6">
-      <span class="flex items-center">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke-width="1.5"
-          stroke="currentColor"
-          class="w-4 h-4 mr-1"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M3 7.5L7.5 3m0 0L12 7.5M7.5 3v13.5m13.5 0L16.5 21m0 0L12 16.5m4.5 4.5V7.5"
-          />
-        </svg>
-        Sort By
+    <label class="label order-6 col-span-full w-full sm:col-span-4">
+      <span class="flex items-center gap-1">
+        <ArrowDownWideNarrowIcon class="size-4" />
+        <span>Sort By</span>
       </span>
       <select
         class="select truncate"
         id="sort-colors-by"
         bind:value={sortColors}
-        on:change={() => {
-          _yarnColorwaysPalette = getSortedPalette({
-            palette: _yarnColorwaysPalette,
+        onchange={() => {
+          randomPalette = getSortedPalette({
+            palette: randomPalette,
             sortColors,
           });
         }}
@@ -235,58 +239,46 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </label>
 
     <button
-      class="btn variant-filled-primary col-span-full sm:col-span-4 sm:col-start-9 order-7"
-      title="Generate Random Colors"
-      on:click={() => {
+      class="btn preset-filled order-7 col-span-full sm:col-span-4 sm:col-start-9"
+      title="Generate Random Colors (r)"
+      onclick={() => {
         getRandomColors();
       }}
     >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke-width="1.5"
-        stroke="currentColor"
-        class="w-6 h-6 mr-1"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"
-        />
-      </svg> Randomize
+      <ShuffleIcon />
+      Randomize
     </button>
   </div>
 </div>
 
 <StickyPart position="bottom">
   <div class="p-2 sm:p-4">
-    {#if _yarnColorwaysPalette.length}
-      <div class="mb-2 sm:mb-4">
-        {#key key}
-          <ColorPaletteEditable
-            canUserEditColor={false}
-            bind:colors={_yarnColorwaysPalette}
-            on:changed={() => {
-              numberOfColors = _yarnColorwaysPalette.length;
-              key++;
-            }}
-          />
-        {/key}
-      </div>
-    {/if}
+    <div class="mb-2 sm:mb-4">
+      {#key randomPalette}
+        <ColorPaletteEditable
+          canUserEditColor={false}
+          typeId="randomPalette"
+          bind:colors={randomPalette}
+          onchanged={(eventColors) => {
+            if (eventColors) randomPalette = eventColors;
+            numberOfColors = randomPalette.length;
+          }}
+        />
+      {/key}
+    </div>
 
     <SaveAndCloseButtons
       onSave={() => {
         updateGauge({
-          _colors: _yarnColorwaysPalette.map((color) => {
+          _colors: randomPalette.map((color) => {
             delete color.locked;
+            delete color.id;
             return color;
           }),
         });
-        close();
+        modal.close();
       }}
-      onClose={close}
+      onClose={modal.close}
     />
   </div>
 </StickyPart>

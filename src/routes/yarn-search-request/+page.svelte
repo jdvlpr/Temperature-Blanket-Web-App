@@ -20,16 +20,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '$env/static/public';
   import AppLogo from '$lib/components/AppLogo.svelte';
   import AppShell from '$lib/components/AppShell.svelte';
-  import Card from '$lib/components/Card.svelte';
-
-  let checkIcon = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 inline text-success-500-400-token">
-  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-</svg>
-`;
-  let xIcon = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 inline text-error-500-400-token">
-  <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-</svg>
-`;
+  import { CircleCheckIcon, CircleMinusIcon } from '@lucide/svelte';
 </script>
 
 <svelte:head>
@@ -49,17 +40,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </svelte:head>
 
 <AppShell pageName="Request Yarn Colorways">
-  <svelte:fragment slot="stickyHeader">
+  {#snippet stickyHeader()}
     <div class="hidden lg:inline-flex mx-auto"><AppLogo /></div>
-  </svelte:fragment>
-  <main
-    slot="main"
-    class="max-w-screen-xl m-auto text-left flex flex-col gap-2 mb-4"
-  >
-    <Card>
+  {/snippet}
+  {#snippet main()}
+    <main
+      class="max-w-(--breakpoint-md) m-auto text-left flex flex-col gap-2 mb-4 mx-auto px-2"
+    >
       <div
-        slot="header"
-        class="bg-surface-300-600-token text-token p-4 text-left flex flex-wrap justify-center items-end gap-4"
+        class="p-4 text-left flex flex-wrap justify-center items-end gap-4 rounded-container bg-surface-50-950 max-lg:mt-2"
       >
         <p>
           Making a request for a yarn to be included in the search results does
@@ -71,28 +60,45 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <div class="flex flex-col gap-2 card p-4">
             <p class="font-bold">Do Request</p>
             <p>
-              {@html checkIcon} Yarn with solid or single-color colorways
+              <CircleCheckIcon
+                class="inline"
+                style="color:var(--color-success-500)"
+              /> Yarn with solid or single-color colorways
             </p>
             <p>
-              {@html checkIcon} Yarn for which a public webpage featuring images
-              and names of every colorway is available
+              <CircleCheckIcon
+                class="inline"
+                style="color:var(--color-success-500)"
+              /> Yarn for which a public webpage featuring images and names of every
+              colorway is available
             </p>
             <p>
-              {@html checkIcon} A suggestion for correcting or updating existing
-              yarn colorways on temperature-blanket.com
+              <CircleCheckIcon
+                class="inline"
+                style="color:var(--color-success-500)"
+              /> A suggestion for correcting or updating existing yarn colorways
+              on temperature-blanket.com
             </p>
           </div>
           <div class="flex flex-col gap-2 card p-4">
             <p class="font-bold">Do Not Request</p>
             <p>
-              {@html xIcon} Yarn with all variegated or multi-colored colorways*
+              <CircleMinusIcon
+                class="inline"
+                style="color:var(--color-error-500)"
+              /> Yarn with all variegated or multi-colored colorways*
             </p>
             <p>
-              {@html xIcon} Custom-dyed yarn
+              <CircleMinusIcon
+                class="inline"
+                style="color:var(--color-error-500)"
+              /> Custom-dyed yarn
             </p>
             <p>
-              {@html xIcon} Yarn which is only available for a limited time or in
-              limited quantities
+              <CircleMinusIcon
+                class="inline"
+                style="color:var(--color-error-500)"
+              /> Yarn which is only available for a limited time or in limited quantities
             </p>
           </div>
         </div>
@@ -103,8 +109,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           will be considered.
         </p>
       </div>
-
-      <div slot="content">
+      <div>
         {#if PUBLIC_YARN_SEARCH_REQUEST_FORM_LINK}
           <form
             action={PUBLIC_YARN_SEARCH_REQUEST_FORM_LINK}
@@ -142,7 +147,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <div class="tex-left flex flex-col items-start gap-1">
               <label
                 for="web-address"
-                class="label flex items-start flex-col max-w-screen-sm"
+                class="label flex items-start flex-col max-w-(--breakpoint-sm)"
               >
                 Web Address
                 <span class="text-sm"
@@ -168,7 +173,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 class="textarea"
                 name="otherComments"
                 placeholder="Other Comments"
-              />
+              ></textarea>
             </div>
 
             <div class="tex-left flex flex-col items-start gap-1">
@@ -185,7 +190,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </div>
 
             <button
-              class="btn variant-filled-primary w-fit text-lg"
+              class="btn preset-filled-primary-500 w-fit shadow-sm"
               type="submit">Send Yarn Request</button
             >
 
@@ -208,6 +213,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </p>
         {/if}
       </div>
-    </Card>
-  </main>
+    </main>
+  {/snippet}
 </AppShell>

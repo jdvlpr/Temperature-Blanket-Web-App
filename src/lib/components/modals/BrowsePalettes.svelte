@@ -13,25 +13,32 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script>
+<script lang="ts">
   import GalleryPalettes from '$lib/components/GalleryPalettes.svelte';
   import GalleryPalettesPopular from '$lib/components/GalleryPalettesPopular.svelte';
   import PaletteSchemes from '$lib/components/PaletteSchemes.svelte';
   import ToTopButton from '$lib/components/buttons/ToTopButton.svelte';
-  import CloseButton from '$lib/components/modals/CloseButton.svelte';
-  import { RadioGroup, RadioItem } from '@skeletonlabs/skeleton';
-  import { getContext, onMount } from 'svelte';
+  import { Segment } from '@skeletonlabs/skeleton-svelte';
 
-  export let schemeId = 'Custom',
-    numberOfColors,
+  interface Props {
+    schemeId?: string;
+    numberOfColors: any;
+    updateGauge: any;
+    context?: string;
+  }
+
+  let {
+    schemeId = 'Custom',
+    numberOfColors = $bindable(),
     updateGauge,
-    context = '';
+    context = '',
+  }: Props = $props();
 
-  let category = getParentCategory(schemeId);
-  let container;
-  let showScrollToTopButton = false;
+  let category = $state(getParentCategory(schemeId));
+  let container = $state();
+  let showScrollToTopButton = $state(false);
 
-  let filtersContainer;
+  let filtersContainer: HTMLElement;
   let scrollObserver = new IntersectionObserver(
     (entries, observer) => {
       entries.forEach((entry) => {
@@ -46,57 +53,38 @@ If not, see <https://www.gnu.org/licenses/>. -->
   );
   const categories = ['Gallery', 'Featured', 'Schemes'];
 
-  let close = null;
-  if (typeof getContext === 'function')
-    close = getContext('simple-modal')?.close;
-
-  onMount(() => {
-    scrollObserver.observe(filtersContainer);
-  });
-
   function getParentCategory(schemeId) {
     if (schemeId === 'Custom') return 'Gallery';
     else return 'Schemes';
   }
+
+  $effect(() => {
+    scrollObserver.observe(filtersContainer);
+  });
 </script>
 
-{#if showScrollToTopButton}
-  <ToTopButton
-    onClick={() => {
-      container.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start',
-      });
-    }}
-    bottom="1rem"
-  />
-{/if}
-
-{#if context !== 'drawer'}
-  <CloseButton onClose={close} />
-{/if}
-
-<div class="sm:pb-4" bind:this={container}>
+<div class="p-2" bind:this={container}>
   <div
-    class="w-full flex flex-wrap justify-center items-end gap-2 sm:pt-4 px-2 pb-2 bg-surface-100-800-token"
-    class:pt-14={context !== 'drawer'}
+    class="w-full flex flex-wrap justify-center items-end gap-2 px-2 pb-2"
     class:pt-4={context === 'drawer'}
     bind:this={filtersContainer}
   >
-    <RadioGroup class="flex wrap gap-y-2" active="bg-secondary-active-token">
+    <Segment
+      value={category}
+      onValueChange={(e) => {
+        category = e.value;
+      }}
+      background="bg-surface-100 dark:bg-surface-950"
+      classes="shadow-sm"
+    >
       {#each categories as categoryItem}
-        <RadioItem
-          bind:group={category}
-          name="category-{categoryItem}"
-          value={categoryItem}
-          title={categoryItem}
-        >
+        <Segment.Item value={categoryItem}>
           <span class="flex gap-1 justify-center items-center">
             {categoryItem}
           </span>
-        </RadioItem>
+        </Segment.Item>
       {/each}
-    </RadioGroup>
+    </Segment>
   </div>
 
   {#if category === 'Gallery'}
@@ -106,6 +94,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {:else if category === 'Schemes'}
     <PaletteSchemes {updateGauge} bind:numberOfColors />
   {/if}
-</div>
 
-<p class="font-ornament text-3xl mb-4">k</p>
+  {#if showScrollToTopButton}
+    <ToTopButton
+      onClick={() => {
+        container.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+        });
+      }}
+      bottom="1rem"
+    />
+  {/if}
+</div>

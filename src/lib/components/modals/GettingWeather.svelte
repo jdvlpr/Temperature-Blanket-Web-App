@@ -15,65 +15,48 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import {
-    activeWeatherElementIndex,
     controller,
-    defaultWeatherSource,
-    gettingLocationWeather,
-    gettingLocationWeatherIndex,
-    isCustomWeather,
+    gauges,
     locations,
+    modal,
     signal,
-    useSecondaryWeatherSources,
-    wasWeatherLoadedFromLocalStorage,
-    weatherUngrouped,
-  } from '$lib/stores';
-  import { getContext, onMount } from 'svelte';
+    weather,
+  } from '$lib/state';
   // Note: the signal store is a weird necessity, investigate this
-  import Spinner from '$lib/components/Spinner.svelte';
-  import CloseButton from '$lib/components/modals/CloseButton.svelte';
   import { delay, getOpenMeteo, goToProjectSection } from '$lib/utils';
+  import { onMount } from 'svelte';
+  import Spinner from '../Spinner.svelte';
 
-  let container: HTMLDivElement;
+  let title = $state('Searching...');
+
+  // Index of the location which is currently getting weather data
+  let currentIndex = $state(0);
+
+  let error = $state(false);
 
   onMount(() => {
-    container.focus();
     getWeatherData();
   });
 
-  const { close } = getContext('simple-modal');
-
-  let error = false;
-
-  $: allLocations = getAllLocations($locations);
-
-  function getAllLocations(_locations) {
-    let _allLocations = [];
-
-    for (let index = 0; index < _locations.length; index++) {
-      let location = _locations[index];
-      _allLocations.push(location);
-    }
-
-    return _allLocations;
-  }
-
   async function getWeatherData() {
-    $controller = new AbortController();
-    $weatherUngrouped = null;
-    $activeWeatherElementIndex = 0;
+    controller.value = new AbortController();
+    weather.rawData = [];
+    weather.currentIndex = 0;
     await fetchData()
-      .then(() => {
-        $controller = null;
-        $isCustomWeather = false;
-        $wasWeatherLoadedFromLocalStorage = false;
-        close();
-        goToProjectSection(2);
+      .then(async () => {
+        controller.value = null;
+        // Add the default temperature gauge
+        gauges.addById('temp');
+        weather.isUserEdited = false;
+        weather.isFromLocalStorage = false;
+        await goToProjectSection(2, true);
+        modal.close();
       })
       .catch((e) => {
-        $controller = null;
-        $weatherUngrouped = null;
-        $isCustomWeather = false;
-        $wasWeatherLoadedFromLocalStorage = false;
+        controller.value = null;
+        weather.rawData = [];
+        weather.isUserEdited = false;
+        weather.isFromLocalStorage = false;
         error = e?.message;
       });
   }
@@ -83,13 +66,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     for (
       let thisLocation = 0;
-      thisLocation < allLocations.length;
+      thisLocation < locations.all.length;
       thisLocation += 1
     ) {
-      let location = allLocations[thisLocation];
+      let location = locations.all[thisLocation];
 
-      $gettingLocationWeather = location.label;
-      $gettingLocationWeatherIndex = thisLocation;
+      title = location.label;
+      currentIndex = thisLocation;
       // Setup Weather Data Object
 
       if (!location.elevation) {
@@ -121,17 +104,23 @@ If not, see <https://www.gnu.org/licenses/>. -->
         tempAllData.length === thisLocation &&
         continueWhile
       ) {
-        if ($defaultWeatherSource === 'Meteostat' || errors.length > 0) {
+        if (weather.defaultSource === 'Meteostat' || errors.length > 0) {
           try {
+            // Since location is a proxy state, and for some reason $state.snapshot doesn't include all the properties,
+            // we have to manually get each property and make a new non-proxy object
+            const { lat, lng, from, to, id, index } = location;
+
+            const _location = { lat, lng, from, to, id, index };
+
             const response = await fetch('/api/weather/v1/meteostat/daily', {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
               },
               body: JSON.stringify({
-                location,
+                location: _location,
               }),
-              signal: $signal,
+              signal: signal.value,
             });
 
             let data = await response.json();
@@ -147,32 +136,32 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             tempAllData.push(data);
 
-            $locations[thisLocation].source = 'Meteostat';
+            location.source = 'Meteostat';
           } catch (error) {
             errors.push(error);
           }
         }
 
         if (
-          (errors.length > 0 && !$useSecondaryWeatherSources) ||
-          (errors.length && $defaultWeatherSource === 'Open-Meteo')
+          (errors.length > 0 && !weather.useSecondarySources) ||
+          (errors.length && weather.defaultSource === 'Open-Meteo')
         )
           continueWhile = false;
 
         if (
-          ($defaultWeatherSource === 'Open-Meteo' || errors.length > 0) &&
+          (weather.defaultSource === 'Open-Meteo' || errors.length > 0) &&
           continueWhile
         ) {
           try {
             const data = await getOpenMeteo({ location });
             tempAllData.push(data);
-            $locations[thisLocation].source = 'Open-Meteo';
+            location.source = 'Open-Meteo';
           } catch (error) {
             errors.push(error);
           }
         }
 
-        if (errors.length > 0 && !$useSecondaryWeatherSources)
+        if (errors.length > 0 && !weather.useSecondarySources)
           continueWhile = false;
       }
 
@@ -183,29 +172,29 @@ If not, see <https://www.gnu.org/licenses/>. -->
     }
     tempAllData = tempAllData.flat();
     tempAllData.sort((a, b) => a.date - b.date); // Sort by date, regardless of location
-    $weatherUngrouped = tempAllData;
+    weather.rawData = tempAllData;
     tempAllData = null;
   }
 </script>
 
-<CloseButton onClose={close} />
+<div class="flex flex-col items-center text-center w-full p-4">
+  {#if signal.value && !error}
+    <Spinner size="36" />
 
-<div bind:this={container} class="px-2 pt-10 pb-6 sm:px-10">
-  {#if $signal && !error}
-    <Spinner />
     <p class="font-bold text-xl my-4">Searching for Weather Data</p>
-    <p class="my-4 flex flex-col items-center">
-      <span> {@html $gettingLocationWeather}</span>
-      {#if allLocations?.length > 1}
+
+    <p class="mb-4 flex flex-col items-center">
+      <span> {title}</span>
+
+      {#if locations.all.length > 1}
         <span class="flex flex-col items-center mt-2 w-full gap-1">
           <progress
-            value={$gettingLocationWeatherIndex + 1}
-            max={allLocations.length}
-          />
+            class="progress"
+            value={currentIndex + 1}
+            max={locations.all.length}
+          ></progress>
           <span class="text-xs">
-            {Math.round(
-              (($gettingLocationWeatherIndex + 1) / allLocations.length) * 100,
-            )}%
+            {Math.round(((currentIndex + 1) / locations.all.length) * 100)}%
           </span>
         </span>
       {/if}

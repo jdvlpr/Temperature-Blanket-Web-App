@@ -13,35 +13,28 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script>
-  // This property is used by Modal.svelte to pass down the close function
-  export let onClose;
-  export let absolute = true;
+<script lang="ts">
+  import { XIcon } from '@lucide/svelte';
+
+  type Props = {
+    onClose: any;
+    text?: string;
+    size?: 'btn-sm' | '' | 'btn-lg';
+  };
+  let { onClose, text = '', size = '' }: Props = $props();
 </script>
 
 <button
-  class="btn z-20 variant-glass-secondary flex justify-center items-center flex-auto"
-  class:btn-icon={absolute}
-  class:m-2={absolute}
-  class:fixed={absolute}
-  class:right-2={absolute}
-  on:click={onClose}
+  aria-label="Close"
+  class={[
+    text ? 'btn' : 'btn-icon',
+    size,
+    'preset-filled-surface-50-950 relative float-right',
+  ]}
+  onclick={onClose}
 >
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    stroke-width="1.5"
-    stroke="currentColor"
-    class="w-5 h-5"
-  >
-    <path
-      stroke-linecap="round"
-      stroke-linejoin="round"
-      d="M6 18L18 6M6 6l12 12"
-    />
-  </svg>
-  {#if !absolute}
-    <span class="font-bold pr-2">Cancel</span>
+  <XIcon />
+  {#if text}
+    {text}
   {/if}
 </button>

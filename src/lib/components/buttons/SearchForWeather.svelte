@@ -17,83 +17,53 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Tooltip from '$lib/components/Tooltip.svelte';
   import GettingWeather from '$lib/components/modals/GettingWeather.svelte';
   import GettingWeatherWarnCustomWeather from '$lib/components/modals/GettingWeatherWarnCustomWeather.svelte';
-  import {
-    isCustomWeather,
-    isProjectLoading,
-    modal,
-    weather,
-  } from '$lib/stores';
-  import { bind } from 'svelte-simple-modal';
+  import { locations, modal, project, weather } from '$lib/state';
+  import { ChevronRightIcon } from '@lucide/svelte';
 
-  export let disabled = true;
-
-  function setModal() {
-    modal.set(bind(GettingWeather));
-  }
-
-  function setWarnCustomWeatherModal() {
-    modal.set(bind(GettingWeatherWarnCustomWeather));
-  }
+  let disabled = $derived(!locations.allValid || project.status.loading);
 </script>
 
-{#if disabled && !$isProjectLoading}
+{#if disabled && !project.status.loading}
   <Tooltip
     buttonDisabled={disabled}
     title="Search for Weather Data"
     id="location-action-button"
-    fullWidth={true}
-    class="btn variant-filled-primary text-2xl font-bold w-full sm:w-fit"
+    classNames="btn btn-lg preset-filled-primary-500 sm:w-fit gap-1 shadow-sm"
   >
-    {#if !!$isCustomWeather}
+    {#if !!weather.isUserEdited}
       Reload Weather Data
     {:else}
-      Search {#if $weather}Again{/if}
+      Search {#if weather.data.length}Again{/if}
     {/if}
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke-width="1.5"
-      stroke="currentColor"
-      class="w-6 h-6"
-    >
-      <path
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75"
-      />
-    </svg>
-    <p slot="tooltip">Choose a valid location and dates above.</p>
+    <ChevronRightIcon />
+    {#snippet tooltip()}
+      <p>Choose a valid location and dates above.</p>
+    {/snippet}
   </Tooltip>
 {:else}
   <button
-    class="btn variant-filled-primary text-2xl font-bold w-full sm:w-fit"
-    on:click={() => {
-      if ($isCustomWeather) setWarnCustomWeatherModal();
-      else setModal();
+    class="btn btn-lg preset-filled-primary-500 gap-1 shadow-sm sm:w-fit"
+    onclick={() => {
+      if (weather.isUserEdited)
+        modal.trigger({
+          type: 'component',
+          component: { ref: GettingWeatherWarnCustomWeather },
+        });
+      else
+        modal.trigger({
+          type: 'component',
+          component: { ref: GettingWeather },
+        });
     }}
     title="Search for Weather Data"
     id="location-action-button"
     {disabled}
   >
-    {#if !!$isCustomWeather}
+    {#if !!weather.isUserEdited}
       Reload Weather Data
     {:else}
-      Search {#if $weather}Again{/if}
+      Search {#if weather.data.length}Again{/if}
     {/if}
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke-width="1.5"
-      stroke="currentColor"
-      class="w-6 h-6"
-    >
-      <path
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75"
-      />
-    </svg>
+    <ChevronRightIcon />
   </button>
 {/if}

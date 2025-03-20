@@ -13,39 +13,37 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script>
+<script lang="ts">
   import CloseButton from '$lib/components/modals/CloseButton.svelte';
+  import { CheckIcon } from '@lucide/svelte';
 
-  export let onSave;
-  export let onClose;
-  export let saveText = 'Save';
-  export let disabled = false;
+  interface Props {
+    onSave: any;
+    onClose: any;
+    saveText?: string;
+    disabled?: boolean;
+  }
+
+  let {
+    onSave,
+    onClose,
+    saveText = 'Save',
+    disabled = false,
+  }: Props = $props();
 </script>
 
 <div
-  class="flex flex-wrap items-center gap-x-2 gap-y-2 justify-between mx-auto"
+  class="mx-auto flex w-full flex-wrap items-center justify-center gap-x-2 gap-y-2"
 >
-  <CloseButton {onClose} absolute={false} />
+  <CloseButton {onClose} text="Cancel" />
+
   <button
-    class="btn variant-filled-primary flex justify-center items-center flex-auto"
-    on:click={onSave}
+    class="btn preset-filled-primary-500"
+    onclick={onSave}
     {disabled}
     title={saveText}
   >
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke-width="1.5"
-      stroke="currentColor"
-      class="w-5 h-5"
-    >
-      <path
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        d="M4.5 12.75l6 6 9-13.5"
-      />
-    </svg>
-    <span class="font-bold pr-2"> {saveText}</span>
+    <CheckIcon />
+    {saveText}
   </button>
 </div>

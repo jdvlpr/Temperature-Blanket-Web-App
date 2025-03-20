@@ -14,10 +14,16 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import { activePreview, activeTheme } from '$lib/stores';
-  import { onDestroy, onMount } from 'svelte';
-  import { previews } from './previews';
   import { browser } from '$app/environment';
+  import { THEMES } from '$lib/constants';
+  import { localState, previews } from '$lib/state';
+  import { onDestroy, onMount } from 'svelte';
+
+  let theme = $state(
+    getTheme(THEMES.find((n) => n.id === localState.value.theme.mode)),
+  );
+
+  let activePreviewSelectId = $state(previews.activeId);
 
   onMount(() => {
     window
@@ -32,60 +38,60 @@ If not, see <https://www.gnu.org/licenses/>. -->
       .removeEventListener('change', handleColorSchemeChange);
   });
 
+  // Update theme when the system theme changes
   function handleColorSchemeChange() {
-    theme = getTheme($activeTheme);
+    theme = getTheme(localState.value.theme.mode || 'system');
   }
 
-  let activePreviewSelectId = $activePreview.id;
-
-  $: theme = getTheme($activeTheme);
-
-  $: if ($activePreview.id !== activePreviewSelectId)
-    activePreviewSelectId = $activePreview.id;
-
-  function getTheme(_theme) {
-    if (_theme.id !== 'system') return _theme.id;
+  function getTheme(id) {
+    if (id !== 'system') return id;
     if (window.matchMedia('(prefers-color-scheme: dark)').matches)
       return 'dark';
     return 'light';
   }
+
+  $effect(() => {
+    if (previews.activeId !== activePreviewSelectId)
+      activePreviewSelectId = previews.activeId;
+  });
+
+  // Update theme when user changes the theme mode
+  $effect(() => {
+    theme = getTheme(localState.value.theme.mode || 'system');
+  });
 </script>
 
-<div class="bg-surface-300-600-token rounded-container-token my-2 mb-4 p-2">
-  <div class="mb-2 flex flex-wrap justify-center items-center">
-    <label class="label">
-      <span />
-      <select
-        class="select w-fit"
-        id="select-pattern-type"
-        value={activePreviewSelectId}
-        on:change={(e) => {
-          activePreview.setId(e.target.value);
-        }}
-      >
-        {#each previews as { name, id }}
-          <option value={id}>{name}</option>
-        {/each}
-      </select>
-    </label>
-  </div>
+<div class="my-4 flex flex-col items-center justify-center gap-2">
+  <label class="label">
+    <select
+      class="select mx-auto w-fit min-w-[200px]"
+      id="select-pattern-type"
+      value={activePreviewSelectId}
+      onchange={(e) => {
+        previews.activeId = e.target.value;
+      }}
+    >
+      {#each previews.all as { name, id }}
+        <option value={id}>{name}</option>
+      {/each}
+    </select>
+  </label>
 
   <div
-    class="preview-image-select flex flex-wrap gap-2 justify-center items-center"
+    class="preview-image-select flex flex-wrap items-center justify-center gap-2"
   >
-    {#each previews as { img, name, id }}
+    {#each previews.all as { img, name, id }}
       {#if img}
         {#key theme}
           <button
-            class="flex flex-col p-4 rounded-container-token justify-center gap-2 items-center snap-center {id ===
-            $activePreview.id
-              ? ''
-              : 'bg-surface-hover-token'}"
-            class:bg-primary-300-600-token={id === $activePreview.id}
-            class:selected={id === $activePreview.id}
-            class:shadow={id === $activePreview.id}
-            on:click={() => {
-              activePreview.setId(id);
+            class={[
+              'rounded-container flex snap-center flex-col items-center justify-center gap-2 p-4',
+              id === previews.activeId
+                ? 'bg-primary-300 dark:bg-primary-700 selected shadow-sm'
+                : 'preset-tonal hover:preset-tonal-primary',
+            ]}
+            onclick={() => {
+              previews.activeId = id;
             }}
             title="Preview {name} Design"
           >
@@ -93,7 +99,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               src={img[theme]}
               alt={name}
               class="size-[48px] opacity-40"
-              class:!opacity-100={id === $activePreview.id}
+              class:!opacity-100={id === previews.activeId}
             />
           </button>
         {/key}

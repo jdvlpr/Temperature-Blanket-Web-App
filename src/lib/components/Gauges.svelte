@@ -14,100 +14,134 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import DaytimeGauge from '$lib/components/gauges/DaytimeGauge.svelte';
-  import RainGauge from '$lib/components/gauges/RainGauge.svelte';
-  import SnowGauge from '$lib/components/gauges/SnowGauge.svelte';
-  import TemperatureGauge from '$lib/components/gauges/TemperatureGauge.svelte';
-  import { gaugeProperties, gaugesState, units, weather } from '$lib/stores';
+  import {
+    allGaugesAttributes,
+    gauges,
+    localState,
+    modal,
+    weather,
+  } from '$lib/state';
   import { downloadPDF } from '$lib/utils';
+  import { CirclePlusIcon, DownloadIcon, Trash2Icon } from '@lucide/svelte';
   import { onMount } from 'svelte';
+  import RangeOptionsButton from './buttons/RangeOptionsButton.svelte';
+  import Gauge from './Gauge.svelte';
+  import GaugeCustomizer from './GaugeCustomizer.svelte';
 
   onMount(() => {
     setupAvailableGauges();
   });
 
-  // If an initially empty weather parameter gets some user-created data, add the available gauge to the options
-  $: $weather, setupAvailableGauges();
-
-  $: gaugesToAdd = $gaugesState.available.filter(
-    (gauge) =>
-      gauge !== $gaugesState.active && !$gaugesState.created.includes(gauge),
-  );
-
   function setupAvailableGauges() {
-    $gaugeProperties.forEach((gauge) => {
+    allGaugesAttributes.forEach((gauge) => {
       gauge.targets.forEach((target) => {
-        if ($weather?.some((day) => day[target.id][$units] !== null)) {
-          gaugesState.addAvailable(gauge.id);
-          $gaugesState.active ||= gauge.id;
-        } else gaugesState.removeAvailable(gauge.id);
+        if (
+          weather.data?.some(
+            (day) => day[target.id][localState.value.units] !== null,
+          )
+        ) {
+          // For each of the gauge's weather parameter targets, check to see if there is any data, and if so setup the default gauge
+          gauges.addToAvailable({
+            id: gauge.id,
+            label: gauge.label,
+          });
+        } else {
+          // Otherwise remove the gauge. Weather data may no longer be available for a certain gauge if, for example, the user changes the location
+          gauges.removeFromAvailable(gauge.id);
+        }
       });
     });
+
+    // If the active gauge is no longer available, set it to the first available
+    if (!gauges.allCreated.find((gauge) => gauge.id === gauges.activeGaugeId))
+      gauges.activeGaugeId = gauges.allCreated[0]?.id;
   }
 
-  function getGaugeLabel(id) {
-    return $gaugeProperties.find((gauge) => gauge.id === id)?.label;
-  }
+  let debounceTimer;
+  const debounce = (callback, time) => {
+    window.clearTimeout(debounceTimer);
+    debounceTimer = window.setTimeout(callback, time);
+  };
+  // If an initially empty weather parameter gets some user-created data, or if the user searches for a different location,
+  // then add the available gauge to the options
+  $effect(() => {
+    weather.data;
+    debounce(() => {
+      setupAvailableGauges();
+    }, 100);
+  });
 </script>
 
-<div class="inline-flex justify-center items-center gap-2 mb-2 mt-3">
-  {#key $gaugesState}
-    <label class="label">
-      <span />
-      <select
-        class="select w-fit"
-        id="gauges-select"
-        value={$gaugesState.active}
-        on:change={(e) => {
-          gaugesState.addCreated(e.target.value);
+<div class="relative w-full overflow-auto">
+  <div
+    class="rounded-container flex w-full justify-around gap-2 py-2 max-md:overflow-x-scroll"
+  >
+    {#each gauges.allAvailable as { id, label }}
+      <button
+        class={[
+          'btn ',
+          gauges.activeGaugeId === id ? 'preset-filled' : 'hover:preset-tonal',
+        ]}
+        onclick={() => {
+          if (!gauges.allCreated.map((gauge) => gauge.id).includes(id)) {
+            // If the gauge is not created yet, then set it up
+            modal.trigger({
+              type: 'confirm',
+              title: `Add a ${label}?`,
+              body: `This will add a new gauge to your project. You can delete it later.`,
+              response: (response) => {
+                if (response) gauges.addById(id);
+              },
+            });
+          } else {
+            gauges.activeGaugeId = id;
+          }
         }}
       >
-        {#each $gaugesState.created as id}
-          <option value={id} selected={$gaugesState.active === id}
-            >{getGaugeLabel(id)}</option
-          >
-        {/each}
-        {#each gaugesToAdd as id}
-          <option value={id}>New {getGaugeLabel(id)}</option>
-        {/each}
-      </select>
-    </label>
-  {/key}
+        {#if !gauges.allCreated.map((gauge) => gauge.id).includes(id)}
+          <CirclePlusIcon />
+        {/if}
+        {label}
+      </button>
+    {/each}
+  </div>
 </div>
+{#if gauges.activeGauge && !gauges.activeGauge?.calculating}
+  {#if gauges.activeGauge.id !== 'temp'}
+    <!-- If this is not the default temperature gauge and we're on the project planner page -->
+    <div class="mb-4 flex w-full justify-center sm:mb-6">
+      <button
+        class="btn hover:preset-tonal relative top-2 justify-start max-sm:mb-2"
+        title="Delete {gauges.activeGauge.label}"
+        onclick={() => {
+          gauges.remove(gauges.activeGauge.id);
+        }}
+      >
+        <Trash2Icon />
+        Delete {gauges.activeGauge.label}
+      </button>
+    </div>
+  {/if}
 
-{#if $gaugesState.active === 'temp'}
-  <TemperatureGauge />
-{:else if $gaugesState.active === 'prcp'}
-  <RainGauge />
-{:else if $gaugesState.active === 'snow'}
-  <SnowGauge />
-{:else if $gaugesState.active === 'dayt'}
-  <DaytimeGauge />
+  <Gauge bind:gauge={gauges.activeGauge} />
+
+  <div class="mt-4 mb-2">
+    <RangeOptionsButton />
+  </div>
+
+  {#key gauges.activeGauge.colors}
+    <GaugeCustomizer bind:gauge={gauges.activeGauge} />
+  {/key}
 {/if}
 
 <div
-  class="flex flex-wrap gap-2 justify-center mt-4 mb-2 lg:mb-4 px-4 py-2 shadow-inner rounded-container-token variant-soft-surface"
+  class="rounded-container bg-surface-100 dark:bg-surface-900 mt-4 flex flex-wrap justify-center gap-2 px-4 py-2 shadow-inner"
 >
   <button
-    class="btn bg-secondary-hover-token whitespace-pre-wrap"
-    on:click={downloadPDF}
+    class="btn hover:preset-tonal h-auto text-left whitespace-pre-wrap"
+    onclick={downloadPDF}
     title="Download PDF File"
   >
-    <span class="">
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke-width="1.5"
-        stroke="currentColor"
-        class="w-6 h-6 inline bottom-1 relative"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="M9 8.25H7.5a2.25 2.25 0 00-2.25 2.25v9a2.25 2.25 0 002.25 2.25h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25H15M9 12l3 3m0 0l3-3m-3 3V2.25"
-        />
-      </svg> Download Gauges and Weather Data (PDF)
-    </span>
+    <DownloadIcon /> Download Gauges and Weather Data (PDF)
   </button>
 </div>

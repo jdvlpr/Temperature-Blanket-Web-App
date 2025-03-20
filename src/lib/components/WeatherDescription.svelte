@@ -14,56 +14,52 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import {
-    defaultWeatherSource,
-    locations,
-    prcp,
-    snow,
-    weatherParametersInView,
-  } from '$lib/stores';
+  import { locations, weather } from '$lib/state';
   import { exists, pluralize } from '$lib/utils';
   import { onMount } from 'svelte';
 
   let isAnyWeatherSourceDifferentFromDefault;
-  let stations;
+
+  let stations = $derived(
+    locations.all
+      ?.filter((location) => exists(location.stations))
+      ?.map((location) =>
+        location.stations.map(
+          (station) =>
+            `<a href="https://meteostat.net/en/station/${station}?t=${location.from}/${location.to}" target="_blank" rel="noreferrer" class="link">#${station}</a>`,
+        ),
+      )
+      ?.flat(),
+  );
 
   onMount(() => {
-    isAnyWeatherSourceDifferentFromDefault = !$locations?.some(
-      (n) => n.source === $defaultWeatherSource,
+    isAnyWeatherSourceDifferentFromDefault = !locations.all?.some(
+      (n) => n.source === weather.defaultSource,
     );
 
-    if ($prcp.every((n) => n === null)) $weatherParametersInView.prcp = false;
-    else $weatherParametersInView.prcp = true;
-    if ($snow.every((n) => n === null)) $weatherParametersInView.snow = false;
-    else $weatherParametersInView.snow = true;
-    $weatherParametersInView = $weatherParametersInView;
+    if (weather.params.prcp.every((n) => n === null))
+      weather.table.showParameters.prcp = false;
+    else weather.table.showParameters.prcp = true;
+    if (weather.params.snow.every((n) => n === null))
+      weather.table.showParameters.snow = false;
+    else weather.table.showParameters.snow = true;
   });
-
-  $: stations = $locations
-    ?.filter((location) => exists(location.stations))
-    ?.map((location) =>
-      location.stations.map(
-        (station) =>
-          `<a href="https://meteostat.net/en/station/${station}?t=${location.from}/${location.to}" target="_blank" rel="noreferrer" class="link">#${station}</a>`,
-      ),
-    )
-    ?.flat();
 </script>
 
 <p class="my-2 text-sm">
-  {#if $locations?.some((n) => n.source === 'Meteostat') && stations?.length}
+  {#if locations.all?.some((n) => n.source === 'Meteostat') && stations?.length}
     Includes aggregated data from <a
       href="https://meteostat.net/"
       target="_blank"
       rel="noopener noreferrer"
       class="link">Meteostat</a
     >
-    {$locations?.length > 1 &&
-    $locations?.some((n) => n.source === 'Meteostat') &&
-    $locations?.some((n) => n.source === 'Open-Meteo')
+    {locations.all?.length > 1 &&
+    locations.all?.some((n) => n.source === 'Meteostat') &&
+    locations.all?.some((n) => n.source === 'Open-Meteo')
       ? `for ${new Intl.ListFormat().format([
           ...new Set(
-            $locations
+            locations.all
               .filter((n) => n.source === 'Meteostat')
               .map((n) => n.label),
           ),
@@ -80,18 +76,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
     around—not directly in—your location. The accuracy of the results will vary.
   {/if}
 
-  {#if $locations?.some((n) => n.source === 'Open-Meteo')}
+  {#if locations.all?.some((n) => n.source === 'Open-Meteo')}
     Includes weather data from <a
       href="https://open-meteo.com/"
       rel="noopener noreferrer"
       class="link"
       target="_blank">Open-Meteo</a
-    >{$locations?.length > 1 &&
-    $locations?.some((n) => n.source === 'Meteostat') &&
-    $locations?.some((n) => n.source === 'Open-Meteo')
+    >{locations.all?.length > 1 &&
+    locations.all?.some((n) => n.source === 'Meteostat') &&
+    locations.all?.some((n) => n.source === 'Open-Meteo')
       ? ` for ${new Intl.ListFormat().format([
           ...new Set(
-            $locations
+            locations.all
               .filter((n) => n.source === 'Open-Meteo')
               .map((n) => n.label),
           ),

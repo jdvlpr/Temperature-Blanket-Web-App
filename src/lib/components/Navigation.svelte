@@ -14,41 +14,38 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import Tooltip from '$lib/components/Tooltip.svelte';
-  import { pageSections, weather } from '$lib/stores';
+  import { pageSections, weather } from '$lib/state';
   import { goToProjectSection } from '$lib/utils';
 </script>
 
 <div
-  class="sticky bottom-0 flex justify-center z-10 gap-2 w-full bg-surface-100-800-token backdrop-blur-md"
+  class="sticky bottom-0 flex justify-center z-10 gap-2 w-full bg-surface-50 dark:bg-surface-950 backdrop-blur-md lg:rounded-t-container overflow-hidden"
 >
   <div class="flex justify-around w-full">
-    {#each $pageSections as { title, icon, index, active, pinned, tooltip }}
+    {#each pageSections.items as { title, icon, index, active, pinned, tooltipText }}
       {#if index !== 0}
-        <div class="flex-1">
-          <Tooltip
-            minWidth={'200px'}
-            disableTooltip={!!$weather || index === 1}
-            fullWidth={true}
-            buttonDisabled={!$weather && index !== 1}
-            on:click={() => goToProjectSection(index)}
-            data-pinned={pinned}
-            data-active={active}
-            data-no-weather={!$weather}
-            class={`
-                                flex flex-col justify-center items-center disabled:opacity-30 p-2 pb-4 md:pb-2 w-full
-                                text-token
+        <button
+          title={tooltipText}
+          disabled={!weather.data.length && index !== 1}
+          onclick={() => goToProjectSection(index)}
+          data-pinned={pinned}
+          data-active={active}
+          data-no-weather={!weather.data}
+          class={[
+            `flex flex-col justify-center items-center disabled:opacity-30 p-2 pb-4 md:pb-2 w-full 
                                 data-[active=false]:data-[no-weather=true]:opacity-50 
-                                data-[pinned=false]:data-[active=true]:data-[no-weather=false]:variant-filled-primary
-                                hover:data-[no-weather=false]:data-[active=false]:bg-primary-hover-token
-                                ${$weather ? '' : 'bg-none backdrop-blur-none'}`}
-          >
-            <span>
-              {@html icon}
-            </span><span class="text-xs flex gap-1 items-center">{title} </span>
-            <p slot="tooltip">{tooltip}</p>
-          </Tooltip>
-        </div>
+                                dark:data-[pinned=false]:data-[active=true]:data-[no-weather=false]:bg-primary-900
+                                dark:data-[pinned=false]:data-[active=true]:data-[no-weather=false]:text-surface-50!
+                                data-[pinned=false]:data-[active=true]:data-[no-weather=false]:bg-primary-300
+                                data-[pinned=false]:data-[active=true]:data-[no-weather=false]:!text-surface-900
+                                hover:data-[no-weather=false]:data-[active=false]:bg-primary-hover-token`,
+            !weather.data && 'bg-none backdrop-blur-none',
+          ]}
+        >
+          <span>
+            {@html icon}
+          </span><span class="text-xs flex gap-1 items-center">{title} </span>
+        </button>
       {/if}
     {/each}
   </div>

@@ -1,64 +1,197 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+@plugin '@tailwindcss/forms';
 
+@source '../../node_modules/@skeletonlabs/skeleton-svelte/dist';
+
+@import '@skeletonlabs/skeleton';
+@import '@skeletonlabs/skeleton/optional/presets';
+
+/* Preset Themes */
+@import '@skeletonlabs/skeleton/themes/crimson';
+@import '@skeletonlabs/skeleton/themes/hamlindigo';
+@import '@skeletonlabs/skeleton/themes/modern';
+@import '@skeletonlabs/skeleton/themes/rocket';
+@import '@skeletonlabs/skeleton/themes/legacy';
+
+/* Custom Theme */
+@import '../../classic-theme';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Define variables for weather parameters */
+:root {
+  --tmin: #38bdf8;
+  --tavg: #a3a3a3;
+  --tmax: #f87171;
+  --prcp: #818cf8;
+  --snow: #94a3b8;
+  --dayt: #facc15;
+}
+
+/* Compatibility styles for Tailwind CSS v4 */
 @layer base {
-  :root [data-theme='classic'],
-  :root [data-theme='crimson'],
-  :root [data-theme='hamlindigo'],
-  :root [data-theme='modern'],
-  :root [data-theme='rocket'],
-  :root [data-theme='skeleton'] {
-    --theme-font-family-base: 'apparat', sans-serif;
-    --theme-font-family-heading: 'apparat', sans-serif;
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentColor);
   }
 
-  /* Disable double-tap to zoom */
-  * {
-    -webkit-tap-highlight-color: transparent;
-    -webkit-touch-callout: none;
-    touch-action: manipulation;
+  ::selection {
+    color: var(--base-font-color-dark);
   }
 }
 
-@layer components {
-  @media (prefers-reduced-motion) {
-    ::view-transition-group(*),
-    ::view-transition-old(*),
-    ::view-transition-new(*) {
-      animation: none !important;
+/* Override default theme font families */
+[data-theme] {
+  --base-font-family: 'apparat', sans-serif;
+  --heading-font-family: 'fraunces-variable', sans-serif;
+}
+
+/* Set custom font variation variables for each theme's headings */
+[data-theme='classic'] {
+  --opsz: 68;
+  --wght: 600;
+  --SOFT: 50;
+  --WONK: 0;
+}
+[data-theme='crimson'] {
+  --opsz: 48;
+  --wght: 400;
+  --SOFT: 90;
+  --WONK: 1;
+
+  --spacing: 0.22rem;
+}
+[data-theme='hamlindigo'] {
+  --opsz: 76;
+  --wght: 900;
+  --SOFT: 0;
+  --WONK: 0;
+
+  .lucide {
+    stroke-width: 1px;
+  }
+}
+[data-theme='modern'] {
+  --opsz: 12;
+  --wght: 900;
+  --SOFT: 100;
+  --WONK: 1;
+
+  --spacing: 0.28rem;
+}
+[data-theme='rocket'] {
+  --opsz: 24;
+  --wght: 300;
+  --SOFT: 10;
+  --WONK: 0;
+
+  .lucide {
+    stroke-width: 1px;
+  }
+}
+[data-theme='legacy'] {
+  --opsz: 64;
+  --wght: 500;
+  --SOFT: 60;
+  --WONK: 1;
+}
+
+@media (prefers-reduced-motion) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-variation-settings:
+    'opsz' var(--opsz),
+    'wght' var(--wght),
+    'SOFT' var(--SOFT),
+    'WONK' var(--WONK);
+}
+
+/* Disable double-tap to zoom */
+* {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  touch-action: manipulation;
+}
+
+/* Center data table headers */
+th div {
+  justify-content: center !important;
+}
+
+#preview-svg-image > * {
+  cursor: pointer;
+}
+
+.autocomplete {
+  @apply bg-surface-50 dark:bg-surface-950 shadow-lg overflow-hidden border border-primary-500 rounded-container z-1000;
+
+  & > div {
+    @apply px-2 py-3 cursor-pointer bg-surface-50 dark:bg-surface-950 border-y border-surface-100-900;
+  }
+
+  & > .group {
+    @apply bg-surface-50 dark:bg-surface-950 hover:bg-primary-400/20;
+  }
+
+  & > div.selected {
+    @apply bg-primary-100/50 dark:bg-primary-900/50;
+    color: var(--base-font-color);
+    @variant dark {
+      color: var(--base-font-color-dark);
     }
   }
 
-  /* AUTOCOMPLETE */
-  .autocomplete {
-    @apply text-token bg-surface-200-700-token shadow-lg overflow-hidden border-token border-primary-500 rounded-container-token z-[400];
-  }
-
-  .autocomplete > div {
-    @apply px-2 py-3 cursor-pointer bg-surface-100-800-token border-y border-surface-300-600-token;
-  }
-  .autocomplete > .group {
-    @apply bg-surface-100-800-token hover:bg-primary-400/20;
-  }
-
-  .autocomplete > div.selected,
-  .autocomplete > div:hover:not(.group) {
-    @apply variant-soft-primary text-token;
-  }
-
-  .link {
-    @apply underline text-secondary-800 dark:text-secondary-50;
+  & > div:hover:not(.group) {
+    @apply bg-primary-100/50 dark:bg-primary-900/50;
+    color: var(--base-font-color);
+    @variant dark {
+      color: var(--base-font-color-dark);
+    }
   }
 }
 
-@layer utilities {
-  #preview-svg-image > * {
-    cursor: pointer;
-  }
+.group .autocomplete > & {
+  @apply bg-surface-50 dark:bg-surface-950 hover:bg-primary-400/20;
+}
 
-  /* This is to center data table headers... */
-  th div {
-    justify-content: center !important;
+.selected .autocomplete > &div {
+  @apply bg-primary-100/50 dark:bg-primary-900/50;
+  color: var(--base-font-color);
+  @variant dark {
+    color: var(--base-font-color-dark);
   }
+}
+
+.link {
+  @apply underline text-secondary-800 dark:text-secondary-50;
+}
+
+.text-gradient {
+  @apply bg-linear-to-br from-secondary-200 to-secondary-800 dark:from-secondary-50 dark:to-secondary-200 bg-clip-text text-transparent dark:text-transparent box-decoration-clone;
+}
+
+.label {
+  width: auto;
+}
+
+.btn-icon > * {
+  flex-shrink: 0 !important;
+}
+
+.lucide {
+  flex-shrink: 0;
 }

@@ -15,12 +15,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
-  export let groupLabel;
-  export let targets;
-  export let value;
+  let { groupLabel, targets, value = $bindable() } = $props();
 </script>
 
-<div class="p-4 rounded-container-token bg-surface-200-700-token">
+<div class="p-4 rounded-container bg-surface-200 dark:bg-surface-800">
   <div class="text-sm mb-2">{groupLabel}</div>
   <div class="flex flex-col gap-2">
     {#each targets as { id, label, icon }}
@@ -29,7 +27,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         label={`${icon} ${label}`}
         checked={value.includes(id)}
         disabled={containsId && value.length === 1}
-        on:change={() => {
+        onchange={() => {
           if (value.includes(id)) {
             value.splice(value.indexOf(id), 1);
             value = value;

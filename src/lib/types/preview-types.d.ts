@@ -23,7 +23,6 @@ export type PreviewCategories =
   | 'Daylight Rows'
   | 'Month Rows'
   | 'Month Squares'
-  | 'Rows'
   | 'Split Month Squares'
   | 'Squares';
 

@@ -14,18 +14,18 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { CHARACTERS_FOR_URL_HASH } from '$lib/constants';
-import { gaugeProperties, gaugeSettings } from '$lib/stores';
-import type { Color } from '$lib/types';
+import { allGaugesAttributes, gauges } from '$lib/state';
+import type { Color, WeatherParam } from '$lib/types';
 import {
   capitalizeFirstLetter,
   getColorPropertiesFromYarnStringAndHex,
   getProjectParametersFromURLHash,
+  getTargetParentGaugeId,
   getTitleFromLocationsMeta,
   isValueInRange,
   pluralize,
 } from '$lib/utils';
 import chroma from 'chroma-js';
-import { get } from 'svelte/store';
 
 /**
  * Returns the appropriate text color based on the given color.
@@ -211,15 +211,21 @@ export const getColorsFromInput = ({
   return colors;
 };
 
-/**
- * Retrieves the color information based on the gauge ID and value, for use in the project preview image or PDF
- * @param {string} gaugeId - The ID of the gauge. (e.g. "temp" or "prcp")
- * @param {number} value - The value to determine the color for.
- * @returns {object} - The color information object with the hexadecimal color value, index, and gauge length.
- */
-export const getColorInfo = (gaugeId, value) => {
-  const gauge = get(gaugeSettings).find((n) => n.id === gaugeId);
-  const color = { hex: '#ffffff' };
+export const getColorInfo = ({
+  param,
+  value,
+}: {
+  param: WeatherParam['id'];
+  value: number | null;
+}) => {
+  let color: { hex: Color['hex']; gaugeLength: undefined | number } = {
+    hex: '#ffffff',
+    gaugeLength: undefined,
+  }; // default white color will show on the preview if the weather value has no range associated with it
+
+  let gaugeId = getTargetParentGaugeId(param);
+
+  const gauge = gauges.getSnapshot(gaugeId);
 
   if (
     value === null ||
@@ -244,13 +250,15 @@ export const getColorInfo = (gaugeId, value) => {
         includeToValue: gauge.rangeOptions.includeToValue,
       })
     ) {
-      return {
+      color = {
         ...gauge.colors[i],
         index: i,
         gaugeLength,
       };
     }
   }
+
+  color = { ...color, gaugeLength };
 
   return color;
 };
@@ -284,7 +292,7 @@ const getColorsFromProjectURL = (string: string): string[] | false => {
   }, {});
 
   let colors = [];
-  get(gaugeProperties).forEach((gauge) => {
+  allGaugesAttributes.forEach((gauge) => {
     if (gauge.id in params === true) {
       let text = params[gauge.id].value;
 
@@ -544,7 +552,7 @@ export const getPalettesFromProjects = ({
     );
 
     JSON.parse(project.yarnUrls).forEach((yarn_url, i) => {
-      const isNotPresetScheme = get(gaugeProperties).every(
+      const isNotPresetScheme = allGaugesAttributes.every(
         (p) => !params?.[p.id]?.value?.includes('~'),
       );
       let colors = getColorsFromInput({ string: yarn_url });
@@ -607,10 +615,7 @@ export const getPalettesFromProjects = ({
 
         schemeName += `<a href="/gallery/${
           project.databaseId
-        }" target="_blank" rel="noreferrer" class="underline line-clamp-1" title="Open Project Preview Page" onclick="event.stopPropagation()"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-4 inline">
-  <path fill-rule="evenodd" d="M4.25 5.5a.75.75 0 00-.75.75v8.5c0 .414.336.75.75.75h8.5a.75.75 0 00.75-.75v-4a.75.75 0 011.5 0v4A2.25 2.25 0 0112.75 17h-8.5A2.25 2.25 0 012 14.75v-8.5A2.25 2.25 0 014.25 4h5a.75.75 0 010 1.5h-5z" clip-rule="evenodd" />
-  <path fill-rule="evenodd" d="M6.194 12.753a.75.75 0 001.06.053L16.5 4.44v2.81a.75.75 0 001.5 0v-4.5a.75.75 0 00-.75-.75h-4.5a.75.75 0 000 1.5h2.553l-9.056 8.194a.75.75 0 00-.053 1.06z" clip-rule="evenodd" />
-</svg>
+        }" target="_blank" rel="noreferrer" class="underline line-clamp-1" title="Open Project Preview Page" onclick="event.stopPropagation()"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-external-link size-4 inline"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
 <span class="whitespace-pre-wrap">${title} ${i > 0 ? ` - ${i + 1}` : ''}</span></a>`;
         schemeName += '</div>';
 

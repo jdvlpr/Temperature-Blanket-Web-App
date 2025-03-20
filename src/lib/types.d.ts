@@ -13,10 +13,11 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-export * from '$lib/types/color-types';
+export * from '$lib/types/yarn-types';
 export * from '$lib/types/location-types';
 export * from '$lib/types/page-types';
 export * from '$lib/types/preview-types';
 export * from '$lib/types/project-types';
 export * from '$lib/types/supporter-types';
 export * from '$lib/types/weather-types';
+export * from '$lib/types/gauge-types';

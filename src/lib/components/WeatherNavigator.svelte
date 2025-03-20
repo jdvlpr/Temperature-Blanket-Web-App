@@ -14,104 +14,66 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import WeatherDetails from '$lib/components/WeatherDetails.svelte';
-  import WeatherTableView from '$lib/components/WeatherTableView.svelte';
+  import WeatherTableWrapper from '$lib/components/WeatherTableWrapper.svelte';
   import ImportWeatherData from '$lib/components/modals/ImportWeatherData.svelte';
-  import {
-    modal,
-    weather,
-    weatherGrouping,
-    weatherParametersInView,
-    weatherView,
-  } from '$lib/stores';
-  import { downloadWeatherCSV, getWeatherTargets } from '$lib/utils';
-  import { RadioGroup, RadioItem } from '@skeletonlabs/skeleton';
-  import { bind } from 'svelte-simple-modal';
+  import { modal, weather } from '$lib/state';
+  import { downloadPDF, downloadWeatherCSV } from '$lib/utils';
+  import { DownloadIcon, ImportIcon } from '@lucide/svelte';
+  import { weatherChart } from './WeatherChart.svelte';
 
-  export let data = $weather ? $weather : [];
-  export let context = 'body';
-
-  $: weatherTargets = getWeatherTargets({
-    weatherParameters: $weatherParametersInView,
-  });
+  let debounceTimer;
+  const debounce = (callback, time) => {
+    window.clearTimeout(debounceTimer);
+    debounceTimer = window.setTimeout(callback, time);
+  };
 </script>
 
-<div class="relative">
-  {#if context === 'body'}
-    <RadioGroup class="flex-wrap gap-y-2" active="bg-secondary-active-token">
-      <RadioItem
-        title="Set Daily Weather Display to Table"
-        bind:group={$weatherView}
-        name="weatherDisplay"
-        value={'table'}
-      >
-        Table</RadioItem
-      >
-      <RadioItem
-        title="Set Daily Weather Display to Details"
-        bind:group={$weatherView}
-        name="weatherDisplay"
-        value={'range'}>Details</RadioItem
-      >
-    </RadioGroup>
-  {/if}
+<svelte:window
+  onresize={() => {
+    debounce(() => {
+      // when resizing the window, at certain widths the chart does not automatically resize
+      // so force it to update
+      if (weatherChart.current) weatherChart?.update();
+    }, 101);
+  }}
+/>
 
-  {#if $weatherView === 'range' || context !== 'body'}
-    <WeatherDetails {data} {context} {weatherTargets} />
-  {:else if $weatherView === 'table'}
-    <WeatherTableView {data} {weatherTargets} />
-  {/if}
+<div class="">
+  <WeatherTableWrapper />
 
   <div
-    class="flex flex-wrap gap-2 justify-center mt-4 mb-2 lg:mb-4 px-4 py-2 shadow-inner rounded-container-token variant-soft-surface"
+    class="rounded-container bg-surface-100 dark:bg-surface-900 mt-4 mb-2 flex items-start justify-start gap-2 px-4 py-2 shadow-inner max-sm:flex-col sm:flex-wrap sm:items-center sm:justify-center lg:mb-4"
   >
     <button
-      class="btn bg-secondary-hover-token whitespace-pre-wrap"
-      on:click={downloadWeatherCSV}
-      title="Download CSV File"
+      class="btn hover:preset-tonal h-auto text-left whitespace-pre-wrap"
+      onclick={downloadPDF}
+      title="Download PDF File"
     >
-      <span>
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke-width="1.5"
-          stroke="currentColor"
-          class="w-6 h-6 inline bottom-1 relative"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M9 8.25H7.5a2.25 2.25 0 00-2.25 2.25v9a2.25 2.25 0 002.25 2.25h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25H15M9 12l3 3m0 0l3-3m-3 3V2.25"
-          />
-        </svg> Download Weather Data (CSV)
-      </span>
+      <DownloadIcon class="inline" /> Download Gauges and Weather Data (PDF)
     </button>
 
-    {#if $weatherGrouping !== 'week' && context === 'body'}
+    <button
+      class="btn hover:preset-tonal h-auto text-left whitespace-pre-wrap"
+      onclick={downloadWeatherCSV}
+      title="Download CSV File"
+    >
+      <DownloadIcon class="inline" /> Download Weather Data (CSV)
+    </button>
+
+    {#if weather.grouping !== 'week'}
       <button
-        class="btn bg-secondary-hover-token whitespace-pre-wrap"
-        on:click={() => {
-          modal.set(bind(ImportWeatherData));
+        class="btn hover:preset-tonal h-auto text-left whitespace-pre-wrap"
+        onclick={() => {
+          modal.trigger({
+            type: 'component',
+            component: {
+              ref: ImportWeatherData,
+            },
+          });
         }}
         title="Import Weather Data"
       >
-        <span>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="1.5"
-            stroke="currentColor"
-            class="w-6 h-6 inline"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75"
-            />
-          </svg> Import Weather Data
-        </span>
+        <ImportIcon class="inline" /> Import Weather Data
       </button>
     {/if}
   </div>

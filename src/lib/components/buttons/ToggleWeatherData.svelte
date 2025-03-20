@@ -14,13 +14,12 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  export let view;
+  let { view, onclick, children } = $props();
 
   const visibleIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">
   <path d="M10 12.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5z" />
   <path fill-rule="evenodd" d="M.664 10.59a1.651 1.651 0 010-1.186A10.004 10.004 0 0110 3c4.257 0 7.893 2.66 9.336 6.41.147.381.146.804 0 1.186A10.004 10.004 0 0110 17c-4.257 0-7.893-2.66-9.336-6.41zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" />
-</svg>
-`;
+</svg>`;
 
   const hiddenIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">
   <path fill-rule="evenodd" d="M3.28 2.22a.75.75 0 00-1.06 1.06l14.5 14.5a.75.75 0 101.06-1.06l-1.745-1.745a10.029 10.029 0 003.3-4.38 1.651 1.651 0 000-1.185A10.004 10.004 0 009.999 3a9.956 9.956 0 00-4.744 1.194L3.28 2.22zM7.752 6.69l1.092 1.092a2.5 2.5 0 013.374 3.373l1.091 1.092a4 4 0 00-5.557-5.557z" clip-rule="evenodd" />
@@ -31,14 +30,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <button
   type="button"
   class="flex w-fit p-2 gap-2 items-center justify-center cursor-pointer"
-  on:click
+  {onclick}
   title="Toggle Visibility"
 >
   {#if view}
     <span class="">{@html visibleIcon}</span>
-    <p class="text-sm"><slot /></p>
+    <p class="text-sm">{@render children?.()}</p>
   {:else}
     <span class="">{@html hiddenIcon}</span>
-    <p class="text-sm"><s><slot /></s></p>
+    <p class="text-sm"><s>{@render children?.()}</s></p>
   {/if}
 </button>

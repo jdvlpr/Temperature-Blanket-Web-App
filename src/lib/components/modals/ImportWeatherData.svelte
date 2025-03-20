@@ -16,29 +16,25 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script>
   import Spinner from '$lib/components/Spinner.svelte';
   import HelpIcon from '$lib/components/buttons/HelpIcon.svelte';
-  import CloseButton from '$lib/components/modals/CloseButton.svelte';
-  import { weatherUngrouped } from '$lib/stores';
+  import { weather } from '$lib/state';
   import {
     CSVtoArray,
     celsiusToFahrenheit,
     convertTime,
+    dateToISO8601String,
     displayNumber,
     fahrenheitToCelsius,
-    stringToDate,
     hoursToMinutes,
     inchesToMillimeters,
     millimetersToInches,
-    dateToISO8601String,
+    stringToDate,
   } from '$lib/utils';
-  import { FileDropzone } from '@skeletonlabs/skeleton';
-  import { getContext } from 'svelte';
+  import { FileUpload } from '@skeletonlabs/skeleton-svelte';
 
-  const { close } = getContext('simple-modal');
-
-  let imported = false;
-  let processing = false;
-  let errorMessages = [];
-  let csvUpload;
+  let imported = $state(false);
+  let processing = $state(false);
+  let errorMessages = $state([]);
+  let csvUpload = $state();
 
   function submitForm(event) {
     event.preventDefault();
@@ -51,8 +47,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
       errorMessages = [];
       const text = e.target.result;
       const data = CSVtoArray({ str: text });
-      if (!$weatherUngrouped) return;
-      const weatherToMatch = $weatherUngrouped.map(
+      if (!weather.rawData.length) return;
+      const weatherToMatch = weather.rawData.map(
         (n) => `${dateToISO8601String(n.date)}-${n.location}`,
       );
 
@@ -90,7 +86,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             );
           continue;
         }
-        let day = $weatherUngrouped[index];
+        let day = weather.rawData[index];
 
         const highF = +row?.['High Temperature (°F)'];
         if (!isNaN(highF)) {
@@ -174,9 +170,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
             day.dayt.metric = hoursToMinutes(hours, 4);
           }
         }
-        $weatherUngrouped[index] = day;
+        weather.rawData[index] = day;
       }
-      $weatherUngrouped = $weatherUngrouped;
       imported = true;
       processing = false;
     };
@@ -185,32 +180,31 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 </script>
 
-<CloseButton onClose={close} />
-
-<div class="p-2 sm:p-4 mt-10">
+<div class="inline-flex flex-col justify-center items-center w-full p-4">
   <div class="mt-2">
     <HelpIcon
       href="/documentation/#import-weather-data-file-requirements"
       title="Get more help"
     >
-      <p class="font-bold underline" slot="text">CSV File Requirements</p>
+      {#snippet text()}
+        <p class="font-bold underline">CSV File Requirements</p>
+      {/snippet}
     </HelpIcon>
   </div>
 
   {#if !processing}
     {#if !imported || errorMessages.length > 0}
-      <FileDropzone
+      <FileUpload
         name="files"
-        class="mt-4"
-        bind:files={csvUpload}
-        slotLead="justify-center"
-        accept=".csv"
-        on:change={(event) => {
-          submitForm(event);
+        classes="mt-4 justify-center"
+        onFileChange={(e) => {
+          csvUpload = e.acceptedFiles;
+          submitForm(e);
         }}
+        accept=".csv"
       >
-        <svelte:fragment slot="lead"
-          ><svg
+        {#snippet lead()}
+          <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
@@ -224,15 +218,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
               d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m6.75 12l-3-3m0 0l-3 3m3-3v6m-1.5-15H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"
             />
           </svg>
-        </svelte:fragment>
-        <svelte:fragment slot="message">
+        {/snippet}
+        {#snippet message()}
           <p>
             <span class="font-bold">Upload a file</span>
             or drag and drop
           </p>
-        </svelte:fragment>
-        <svelte:fragment slot="meta">Only CSV files allowed</svelte:fragment>
-      </FileDropzone>
+        {/snippet}
+        {#snippet meta()}
+          Only CSV files allowed
+        {/snippet}
+      </FileUpload>
       {#if errorMessages.length > 0}
         <p>Import finished, but there were some issues (listed below).</p>
         <p class="mb-2">
@@ -258,6 +254,4 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <p>Processing...</p>
     </div>
   {/if}
-
-  <p class="font-ornament text-4xl my-8">U</p>
 </div>

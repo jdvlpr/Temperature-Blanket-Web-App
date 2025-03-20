@@ -13,139 +13,103 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script>
+<script lang="ts">
   import RowsPerPage from '$lib/components/datatable/RowsPerPage.svelte';
-  import Search from '$lib/components/datatable/Search.svelte';
-  import { weather, weatherGrouping } from '$lib/stores';
-  import { dateToISO8601String } from '$lib/utils';
+  import { weather } from '$lib/state';
+  import { CircleArrowLeftIcon, CircleArrowRightIcon } from '@lucide/svelte';
+  import type { TableHandler } from '@vincjo/datatables';
+  import { onMount, type Snippet } from 'svelte';
 
-  export let handler,
-    search = true,
-    hidePageLabel = false;
-
-  let element;
-
-  const triggerChange = handler.getTriggerChange();
-
-  const scrollTop = () => {
-    if (typeof element !== 'undefined') element.scrollTop = 0;
-  };
-
-  const rowCount = handler.getRowCount();
-  const pageNumber = handler.getPageNumber();
-  const pageCount = handler.getPageCount();
-  const rowsPerPage = handler.getRowsPerPage();
-  const pages = handler.getPages({ ellipsis: false });
-  const sorted = handler.getSorted();
-
-  $: $triggerChange, scrollTop();
-
-  function getFrom({ page }) {
-    let from = '';
-    if (
-      $sorted.identifier === 'date' ||
-      $sorted.identifier === 'row' ||
-      $sorted.identifier === null
-    ) {
-      if ($sorted.direction === 'asc' || $sorted.direction === null)
-        from = `(${dateToISO8601String($weather[page * $rowsPerPage - $rowsPerPage].date)})`;
-      else
-        from = `(${dateToISO8601String($weather[$weather?.length - 1 - (page * $rowsPerPage - $rowsPerPage)].date)})`;
-    }
-    return from;
+  interface Props {
+    table: TableHandler;
+    search?: boolean;
+    hidePageLabel?: boolean;
+    children: Snippet;
   }
+
+  let { table = $bindable(), search = true, children }: Props = $props();
+
+  let searchInput = $state(null);
+
+  $effect(() => {
+    table;
+    searchInput = table.createSearch();
+  });
 </script>
 
 <section class="relative w-full">
-  <article class="relative overflow-x-scroll" bind:this={element}>
-    <slot />
+  <article class="relative overflow-x-scroll">
+    {@render children?.()}
   </article>
+
   <div
-    class="flex flex-wrap gap-x-8 gap-y-4 justify-center sm:justify-between items-start mt-2 mb-4 w-full mx-auto"
+    class="mx-auto mt-2 mb-4 flex w-full flex-wrap items-start justify-center gap-4 sm:justify-between"
   >
     <p class="text-sm">
-      {#if $rowCount.total > 0}
-        Showing {$rowCount.start} to {$rowCount.end} of {$rowCount.total}
-        {$weatherGrouping}s
+      {#if table.rowCount.total > 0}
+        Showing {table.rowCount.start} to {table.rowCount.end} of {table
+          .rowCount.total}
+        {weather.grouping}s
       {:else}
-        No {$weatherGrouping}s found
+        No {weather.grouping}s found
       {/if}
     </p>
-    <div class="flex flex-wrap gap-4 items-end justify-center">
-      {#if $pageCount > 1 || $rowsPerPage !== 10}
-        <RowsPerPage {handler} />
+
+    <div
+      class="flex flex-auto flex-wrap items-end justify-between gap-x-8 gap-y-2 max-sm:w-full sm:justify-center"
+    >
+      {#if table.pageCount > 1 || table.rowsPerPage !== 10}
+        <RowsPerPage {table} />
       {/if}
-      {#if $pageCount > 1}
-        <section class="flex flex-wrap items-end gap-2">
+      {#if table.pageCount > 1}
+        <section class="flex flex-wrap items-end justify-end gap-2">
           <button
-            class="btn-icon bg-secondary-hover-token"
+            aria-label="Previous Page"
+            class="btn-icon hover:preset-tonal"
             title="Previous Page"
-            disabled={$pageNumber === 1}
-            on:click={() => handler.setPage('previous')}
+            disabled={table.currentPage === 1}
+            onclick={() => table.setPage('previous')}
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-              class="w-6 h-6"
-              ><path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M11.25 9l-3 3m0 0l3 3m-3-3h7.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              /></svg
-            >
+            <CircleArrowLeftIcon />
           </button>
-          <label class="label flex flex-col items-start">
+
+          <label class="label flex w-20 flex-col items-start">
             <span class="text-sm">Page</span>
             <select
-              class="select"
+              class="select mx-auto w-fit min-w-[60px]"
               id="datatable-page"
-              bind:value={$pageNumber}
-              on:change={() => {
-                handler.setPage($pageNumber);
+              bind:value={table.currentPage}
+              onchange={() => {
+                table.setPage(table.currentPage);
+                weather.table.page = table.currentPage;
               }}
             >
-              {#each $pages as page}
-                {@const from = getFrom({
-                  page,
-                })}
-                <option value={page}
-                  >{page}
-                  {#if !hidePageLabel}
-                    {from}
-                  {/if}
-                </option>
+              {#each table.pages as page}
+                <option value={page}>{page} </option>
               {/each}
             </select>
           </label>
 
           <button
-            class="btn-icon bg-secondary-hover-token"
+            aria-label="Next Page"
+            class="btn-icon hover:preset-tonal"
             title="Next Page"
-            disabled={$pageNumber === $pageCount}
-            on:click={() => handler.setPage('next')}
+            disabled={table.currentPage === table.pages.length}
+            onclick={() => table.setPage('next')}
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-              class="w-6 h-6"
-              ><path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M12.75 15l3-3m0 0l-3-3m3 3h-7.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              /></svg
-            >
+            <CircleArrowRightIcon />
           </button>
         </section>
       {/if}
     </div>
-    {#if search}
-      <Search {handler} />
+    {#if search && searchInput !== null}
+      <input
+        type="text"
+        class="input w-full sm:max-w-[200px]"
+        bind:value={searchInput.value}
+        placeholder="Search weather data..."
+        oninput={() => searchInput.set()}
+      />
     {/if}
   </div>
 </section>

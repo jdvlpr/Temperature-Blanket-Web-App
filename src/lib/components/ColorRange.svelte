@@ -15,22 +15,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import GaugeSettings from '$lib/components/modals/GaugeSettings.svelte';
-  import { modal, units } from '$lib/stores';
-  import { bind } from 'svelte-simple-modal';
+  import { gauges, localState, modal } from '$lib/state';
 
-  export let index, colors, ranges, rangeOptions, props;
+  let { index } = $props();
 
   function onSaveRangeOptinos(e) {
-    ranges = e.ranges;
-    rangeOptions = e.rangeOptions;
+    gauges.activeGauge.ranges = e.ranges;
+    gauges.activeGauge.rangeOptions = e.rangeOptions;
   }
 </script>
 
 <span class="range-input-container">
   <button
-    class="btn bg-secondary-hover-token flex gap-2 justify-start items-center"
+    class="btn hover:preset-tonal h-auto"
     title="Adjust Range"
-    on:click={(e) => {
+    onclick={(e) => {
       const wasToClicked =
         e.target.id === `range-${index}-to` ||
         e.target.parentElement.id === `range-${index}-to` ||
@@ -39,31 +38,39 @@ If not, see <https://www.gnu.org/licenses/>. -->
           `range-${index}-to`;
 
       const focusOn = wasToClicked ? 'to' : 'from';
-      modal.set(
-        bind(GaugeSettings, {
-          index,
-          focusOn,
-          props,
-          ranges,
-          colors,
-          rangeOptions,
-          onSave: onSaveRangeOptinos,
-        }),
-      );
+
+      modal.trigger({
+        type: 'component',
+        component: {
+          ref: GaugeSettings,
+          props: {
+            index,
+            focusOn,
+            onSave: onSaveRangeOptinos,
+          },
+        },
+        options: {
+          size: 'large',
+        },
+      });
     }}
   >
     <span class="flex flex-col text-left" id="range-{index}-from"
       ><span class="text-xs">From</span>
       <span class="flex items-start"
-        ><span class="text-lg">{ranges[index]?.from}</span>
-        <span class="text-xs">{props.unit.label[$units]}</span></span
+        ><span class="text-lg">{gauges.activeGauge.ranges[index]?.from}</span>
+        <span class="text-xs"
+          >{gauges.activeGauge.unit.label[localState.value.units]}</span
+        ></span
       ></span
     >
     <span class="flex flex-col text-left" id="range-{index}-to"
       ><span class="text-xs">To</span>
       <span class="flex items-start"
-        ><span class="text-lg">{ranges[index]?.to}</span>
-        <span class="text-xs">{props.unit.label[$units]}</span></span
+        ><span class="text-lg">{gauges.activeGauge.ranges[index]?.to}</span>
+        <span class="text-xs"
+          >{gauges.activeGauge.unit.label[localState.value.units]}</span
+        ></span
       ></span
     ></button
   >

@@ -13,16 +13,19 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script context="module">
-  export let projects = writable([]);
-  export let gallery = writable({});
-  export let months = writable(0.25);
+<script module>
+  class GalleryPalettesPopularState {
+    projects = $state([]);
+    months = $state(0.25);
+  }
+
+  export const galleryPalettesPopularState = new GalleryPalettesPopularState();
 </script>
 
 <script>
   import ColorPalette from '$lib/components/ColorPalette.svelte';
   import PlaceholderPalettes from '$lib/components/PlaceholderPalettes.svelte';
-  import { gaugeProperties } from '$lib/stores';
+  import { allGaugesAttributes } from '$lib/state';
   import {
     fetchPopularProjects,
     getColorsFromInput,
@@ -32,29 +35,26 @@ If not, see <https://www.gnu.org/licenses/>. -->
     recordPageView,
   } from '$lib/utils';
   import { getContext, onMount } from 'svelte';
-  import { writable } from 'svelte/store';
 
-  let close = null;
+  let close = $state(null);
   if (typeof getContext === 'function')
     close = getContext('simple-modal')?.close;
 
-  export let updateGauge;
+  let { updateGauge } = $props();
 
-  let palettes = [];
-  let loading = true;
+  let palettes = $state([]);
+  let loading = $state(true);
 
   onMount(async () => {
-    if (!$projects.length) {
+    if (!galleryPalettesPopularState.projects.length) {
       loading = true;
       let results = await fetchPopularProjects({
-        months: $months,
+        months: galleryPalettesPopularState.months,
       });
-      $projects = results;
+      galleryPalettesPopularState.projects = results;
       loading = false;
     } else loading = false;
   });
-
-  $: palettes = getPalettesFromPopularProjects($projects);
 
   function getPalettesFromPopularProjects(projects) {
     let _palettes = [];
@@ -65,7 +65,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       );
 
       JSON.parse(project.meta.yarn_urls).forEach((yarn_url, i) => {
-        const isNotPresetScheme = $gaugeProperties.every(
+        const isNotPresetScheme = allGaugesAttributes.every(
           (p) => !params?.[p.id]?.value?.includes('~'),
         );
         const colors = getColorsFromInput({
@@ -102,10 +102,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
           schemeName += `<a href="/gallery/${
             project.id
-          }" target="_blank" rel="noreferrer" class="underline line-clamp-1" title="Open Project Preview Page" onclick="event.stopPropagation()"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-4 inline">
-  <path fill-rule="evenodd" d="M4.25 5.5a.75.75 0 00-.75.75v8.5c0 .414.336.75.75.75h8.5a.75.75 0 00.75-.75v-4a.75.75 0 011.5 0v4A2.25 2.25 0 0112.75 17h-8.5A2.25 2.25 0 012 14.75v-8.5A2.25 2.25 0 014.25 4h5a.75.75 0 010 1.5h-5z" clip-rule="evenodd" />
-  <path fill-rule="evenodd" d="M6.194 12.753a.75.75 0 001.06.053L16.5 4.44v2.81a.75.75 0 001.5 0v-4.5a.75.75 0 00-.75-.75h-4.5a.75.75 0 000 1.5h2.553l-9.056 8.194a.75.75 0 00-.053 1.06z" clip-rule="evenodd" />
-</svg>
+          }" target="_blank" rel="noreferrer" class="underline line-clamp-1" title="Open Project Preview Page" onclick="event.stopPropagation()"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-external-link size-4 inline"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
 <span class="whitespace-pre-wrap">${title} ${i > 0 ? ` - ${i + 1}` : ''}</span></a>`;
           schemeName += '</div>';
 
@@ -119,25 +116,29 @@ If not, see <https://www.gnu.org/licenses/>. -->
     });
     return _palettes;
   }
+
+  $effect(() => {
+    palettes = getPalettesFromPopularProjects(
+      galleryPalettesPopularState.projects,
+    );
+  });
 </script>
 
-<div
-  class="text-center flex flex-wrap justify-center items-end bg-surface-100-800-token pb-4 gap-2"
->
+<div class="text-center flex flex-wrap justify-center items-end pb-4 gap-2">
   <label class="label text-sm">
     <span>Popular during the past</span>
     <select
-      class="select truncate w-fit"
+      class="select w-fit min-w-[90px] mx-auto"
       id="select-time-period"
-      bind:value={$months}
-      on:change={async () => {
+      bind:value={galleryPalettesPopularState.months}
+      onchange={async () => {
         loading = true;
-        $projects = [];
+        galleryPalettesPopularState.projects = [];
         let results = await fetchPopularProjects({
-          months: $months,
+          months: galleryPalettesPopularState.months,
         });
 
-        $projects = results;
+        galleryPalettesPopularState.projects = results;
 
         loading = false;
 
@@ -165,7 +166,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <button
           type="button"
           class="cursor-pointer w-full"
-          on:click={() => {
+          onclick={() => {
             recordPageView(projectId);
             updateGauge({
               _colors: colors,
@@ -181,7 +182,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
   {/if}
 
-  {#if !$projects.length && !loading}
+  {#if !galleryPalettesPopularState.projects.length && !loading}
     <p class="text-center my-8">No Results</p>
   {/if}
 </div>

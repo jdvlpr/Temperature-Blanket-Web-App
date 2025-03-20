@@ -14,31 +14,30 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
+  import { ChevronUpIcon } from '@lucide/svelte';
   import { fade } from 'svelte/transition';
 
-  export let onClick; // This property is used by Modal.svelte to pass down the close function
-  export let bottom = '0px';
-  export let position = 'fixed';
+  /**
+   * @typedef {Object} Props
+   * @property {any} onClick
+   * @property {string} [bottom]
+   * @property {string} [position]
+   */
+
+  /** @type {Props} */
+  let { onClick, bottom = '0px', position = 'sticky' } = $props();
 </script>
 
-<button
-  transition:fade
-  class="btn-icon backdrop-blur-sm p-2 m-2 z-20 shadow variant-filled-primary opacity-80 text-token transition-all inline-flex justify-center items-center gap-1 right-0"
+<div
+  class="w-full flex justify-end"
   style="bottom:{bottom};position:{position}"
-  on:click={onClick}
 >
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    stroke-width="1.5"
-    stroke="currentColor"
-    class="w-6 h-6"
+  <button
+    aria-label="Back to Top"
+    transition:fade
+    class="btn-icon backdrop-blur-xs p-2 m-2 z-20 shadow-sm preset-filled-primary-500 opacity-80 transition-all inline-flex justify-center items-center"
+    onclick={onClick}
   >
-    <path
-      stroke-linecap="round"
-      stroke-linejoin="round"
-      d="M4.5 15.75l7.5-7.5 7.5 7.5"
-    />
-  </svg>
-</button>
+    <ChevronUpIcon />
+  </button>
+</div>
