@@ -140,27 +140,27 @@
     <div class="hidden lg:inline-flex"><AppLogo /></div>
   {/snippet}
   {#snippet main()}
-    <main class="max-w-screen-xl px-2 lg:px-0 text-left">
+    <main class="max-w-screen-xl px-2 text-left lg:px-0">
       {#if dev}
         <h2 class="h2 text-gradient my-2">Input</h2>
 
-        <div class="px-2 flex flex-col gap-4">
+        <div class="flex max-w-screen-sm flex-col gap-4 px-2">
           <label class="text-sm"
             >Paste HTML Here
             <textarea
-              class="w-full grow textarea shadow-inner border-none"
+              class="textarea w-full grow border-none shadow-inner"
               bind:value={content}
               rows="5"
             ></textarea>
           </label>
 
           <div class="tex-left flex flex-col items-start">
-            <label class="text-sm pl-[12px]">
+            <label class="w-full text-sm">
               Element Query Selector
               <input
                 type="text"
                 placeholder="e.g., a, .description"
-                class="w-full grow bg-surface-50 placeholder-surface-400 dark:placeholder-surface-500 rounded-full cursor-text text-surface-800 dark:text-surface-50 shadow-inner dark:bg-surface-800 border-none"
+                class="input w-full"
                 bind:value={querySelector}
               />
             </label>
@@ -178,12 +178,12 @@
 
             {#if useElementAttribute}
               <div class="tex-left flex flex-col items-start">
-                <label class="text-sm pl-[12px]">
+                <label class="w-full text-sm">
                   Element Attribute
                   <input
                     type="text"
                     placeholder="e.g., title, data-name"
-                    class="w-full grow bg-surface-50 placeholder-surface-400 dark:placeholder-surface-500 rounded-full cursor-text text-surface-800 dark:text-surface-50 shadow-inner dark:bg-surface-800 border-none"
+                    class="input w-full"
                     bind:value={querySelectorAttribute}
                   />
                 </label>
@@ -195,11 +195,11 @@
             <ToggleSwitch bind:checked={excludeBefore} label="Exclude Before" />
             {#if excludeBefore}
               <div class="tex-left flex flex-col items-start">
-                <label class="text-sm pl-[12px]">
+                <label class="w-full text-sm">
                   Exclude Before
                   <input
                     type="text"
-                    class="w-full grow bg-surface-50 placeholder-surface-800 dark:placeholder-white rounded-full cursor-text text-surface-800 dark:text-surface-50 shadow-inner dark:bg-surface-800 border-none"
+                    class="input w-full"
                     bind:value={excludeBeforeString}
                   />
                 </label>
@@ -211,11 +211,11 @@
             <ToggleSwitch bind:checked={excludeAfter} label="Exclude After" />
             {#if excludeAfter}
               <div class="tex-left flex flex-col items-start">
-                <label class="text-sm pl-[12px]">
+                <label class="w-full text-sm">
                   Exclude After
                   <input
                     type="text"
-                    class="w-full grow bg-surface-50 placeholder-surface-800 dark:placeholder-white rounded-full cursor-text text-surface-800 dark:text-surface-50 shadow-inner dark:bg-surface-800 border-none"
+                    class="input w-full"
                     bind:value={excludeAfterString}
                   />
                 </label>
@@ -227,7 +227,7 @@
 
           <div class="">
             <button
-              class="btn variant-filled-primary"
+              class="btn preset-filled-primary-500"
               onclick={async () => await getNames()}
               disabled={querySelector === '' || content === ''}
               >Get Colorway Names</button
@@ -239,7 +239,7 @@
             />
             {#if showClearButton}
               <button
-                class="btn variant-filled-primary"
+                class="btn preset-filled-primary-500"
                 onclick={() => (names = [])}>Clear</button
               >
             {/if}
@@ -257,10 +257,10 @@
 
           {#if names?.length}
             <p>{names.length} Colorways</p>
-            <div class="flex justify-start flex-wrap">
+            <div class="flex flex-wrap justify-start">
               {#each names as { name, hex }, index}
                 <div
-                  class="p-2 flex flex-col gap-1"
+                  class="flex flex-col gap-1 p-2"
                   style="background:{hex};color:{getTextColor(
                     hex,
                   )};width:{columnWidth}px"
@@ -285,7 +285,7 @@
             </div>
             <div>
               <button
-                class="btn variant-filled-primary"
+                class="btn preset-filled-primary-500"
                 onclick={() => {
                   let namesToCopy = names.map((n) => {
                     return {

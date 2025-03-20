@@ -42,6 +42,7 @@ import { brand as patons } from './patons/yarns';
 import { brand as pingouin } from './pingouin/yarns';
 import { brand as plymouthYarn } from './plymouth-yarn/yarns';
 import { brand as premier } from './premier/yarns';
+import { brand as purlSoho } from './purl-soho/yarns';
 import { brand as rauma } from './rauma/yarns';
 import { brand as redHeart } from './red-heart/yarns';
 import { brand as rosarios4 } from './rosarios-4/yarns';
@@ -57,6 +58,7 @@ import { brand as svartaFaret } from './svarta-faret/yarns';
 import { brand as tessiland } from './tessiland/yarns';
 import { brand as theWomensInstitute } from './the-womens-institute/yarns';
 import { brand as tricotCafe } from './tricot-cafe/yarns';
+import { brand as tuftingEurope } from './tufting-europe/yarns';
 import { brand as valleyYarns } from './valley-yarns/yarns';
 import { brand as weLoveYarn } from './we-love-yarn/yarns';
 import { brand as westYorkshireSpinners } from './west-yorkshire-spinners/yarns';
@@ -110,6 +112,7 @@ export const brands: Brand[] = [
   plymouthYarn,
   rauma,
   premier,
+  purlSoho,
   redHeart,
   rosarios4,
   rowan,
@@ -124,6 +127,7 @@ export const brands: Brand[] = [
   tessiland,
   theWomensInstitute,
   tricotCafe,
+  tuftingEurope,
   valleyYarns,
   weLoveYarn,
   westYorkshireSpinners,

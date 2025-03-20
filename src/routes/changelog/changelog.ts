@@ -23,6 +23,21 @@ export const entries: ChangelogItem[] = [
     date: 'March, 2025',
     notes: [
       {
+        icon: ICONS.checkCircle,
+        text: `Added 70 colorways`,
+        title: 'Added Yarn: Purl Soho - Linen Quill',
+      },
+      {
+        icon: ICONS.checkCircle,
+        text: `Added 53 colorways`,
+        title: 'Added Yarn: Tufting Europe - New Zealand Wool',
+      },
+    ],
+    version: '5.1.0',
+  },
+  {
+    notes: [
+      {
         IconComponent: RocketIcon,
         instructions:
           "<a href='/blog/2025-03-20-version-5' class='link'>Learn more and read the update announcement.</a>",

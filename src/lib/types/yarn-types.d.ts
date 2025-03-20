@@ -69,7 +69,7 @@ export interface Yarn {
   Jumbo = j
   
   */
-  weightId: YarnWeight['id'];
+  weightId?: YarnWeight['id'];
 }
 
 export interface Colorway {
