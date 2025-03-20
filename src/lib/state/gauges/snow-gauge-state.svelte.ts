@@ -1,5 +1,9 @@
 import { weather } from '$lib/state';
-import type { GaugeAttributes, GaugeStateInterface } from '$lib/types';
+import type {
+  GaugeAttributes,
+  GaugeSettingsType,
+  GaugeStateInterface,
+} from '$lib/types';
 import {
   displayNumber,
   getEvenlyDistributedRangeValuesWithEqualDayCount,
@@ -182,7 +186,7 @@ export class SnowGauge {
     this.rangeOptions?.direction;
     this.rangeOptions?.isCustomRanges;
     this.rangeOptions.manual.increment;
-    return getIncrement(this.rangeOptions);
+    return getIncrement(this.rangeOptions, this.autoRangeOptions);
   });
 
   #dontIncludeFromAndTo = $derived(
@@ -230,6 +234,16 @@ export class SnowGauge {
     this.rangeOptions.mode = mode;
     this.rangeOptions.isCustomRanges = isCustomRanges;
     this.numberOfColors = this.colors.length;
+    this.calculating = false;
+  }
+
+  updateSettings({ settings }: { settings: GaugeSettingsType }) {
+    this.calculating = true;
+    this.colors = settings.colors;
+    this.numberOfColors = settings.numberOfColors;
+    this.rangeOptions = { ...this.rangeOptions, ...settings.rangeOptions };
+    this.ranges = settings.ranges;
+    this.schemeId = settings.schemeId;
     this.calculating = false;
   }
 }

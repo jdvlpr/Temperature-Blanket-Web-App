@@ -83,7 +83,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     _gauge.rangeOptions?.isCustomRanges;
     _gauge.rangeOptions.manual.increment;
 
-    return getIncrement(_gauge.rangeOptions);
+    return getIncrement(_gauge.rangeOptions, _gauge.autoRangeOptions);
   });
 
   let dontIncludeFromAndTo = $derived(

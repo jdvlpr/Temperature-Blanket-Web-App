@@ -1,5 +1,5 @@
 import { weather } from '$lib/state';
-import type { GaugeAttributes } from '$lib/types';
+import type { GaugeAttributes, GaugeSettingsType } from '$lib/types';
 import { displayNumber, getIncrement, getRanges, getStart } from '$lib/utils';
 import chroma from 'chroma-js';
 
@@ -176,7 +176,7 @@ export class RainGauge {
     this.rangeOptions?.direction;
     this.rangeOptions?.isCustomRanges;
     this.rangeOptions.manual.increment;
-    return getIncrement(this.rangeOptions);
+    return getIncrement(this.rangeOptions, this.autoRangeOptions);
   });
 
   #dontIncludeFromAndTo = $derived(
@@ -224,6 +224,16 @@ export class RainGauge {
     this.rangeOptions.mode = mode;
     this.rangeOptions.isCustomRanges = isCustomRanges;
     this.numberOfColors = this.colors.length;
+    this.calculating = false;
+  }
+
+  updateSettings({ settings }: { settings: GaugeSettingsType }) {
+    this.calculating = true;
+    this.colors = settings.colors;
+    this.numberOfColors = settings.numberOfColors;
+    this.rangeOptions = { ...this.rangeOptions, ...settings.rangeOptions };
+    this.ranges = settings.ranges;
+    this.schemeId = settings.schemeId;
     this.calculating = false;
   }
 }

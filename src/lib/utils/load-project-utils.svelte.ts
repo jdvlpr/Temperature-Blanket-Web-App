@@ -79,10 +79,11 @@ export const setProjectSettings = async (
       gauges.getSnapshot(gauge.id),
     );
 
-    Object.assign(
-      gauges.allCreated.find((g) => g.id === gauge.id),
-      settings,
-    );
+    gauges.allCreated
+      .find((g) => g.id === gauge.id)
+      .updateSettings({ settings });
+
+    // Object.assign(_gauge, { ...settings });
   });
 
   // Load Preview
