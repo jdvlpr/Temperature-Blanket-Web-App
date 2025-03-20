@@ -33,6 +33,8 @@ class WeatherClass {
   goupedByWeek: WeatherDay[] | null = $derived.by(() => {
     if (!this.rawData.length) return [];
 
+    const _rawData = $state.snapshot(this.rawData);
+
     // Check if every location is from Meteostat as the data source
     // Used because Meteostat handle's snow data differently than Open-Meteo
     const isEveryDayFromMeteostat = locations.all?.every(
@@ -41,7 +43,7 @@ class WeatherClass {
 
     // Create weeks property for the weather data
     const _weatherWithWeek = createWeeksProperty({
-      weatherData: this.rawData,
+      weatherData: _rawData,
     });
 
     // Get unique week IDs
@@ -149,22 +151,11 @@ class WeatherClass {
 
   // The currently used weather data
   data: WeatherDay[] = $derived.by(() => {
-    switch (this.grouping) {
-      case 'day':
-        this.currentIndex = 0;
-        return this.rawData;
+    this.currentIndex = 0;
 
-      case 'week':
-        this.currentIndex = 0;
-        if (!this.goupedByWeek) {
-          return [];
-        }
-
-        return this.goupedByWeek;
-
-      default:
-        return this.rawData;
-    }
+    if (this.grouping === 'week' && this.goupedByWeek.length)
+      return this.goupedByWeek;
+    else return this.rawData;
   });
 
   tableWeatherTargets = $derived.by(() => {
