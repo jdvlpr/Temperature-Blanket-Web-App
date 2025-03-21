@@ -158,13 +158,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   class="bg-surface-100-900 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 p-2 text-center [view-transition-name:top-banner]"
   bind:this={bannerElement}
 >
-  <p>Updated to version 5!</p>
   <a
     href="/blog/2025-03-20-version-5"
     class="btn bg-primary-50-950 hover:preset-tonal"
   >
     <RocketIcon />
-    See what's new</a
+    Version 5 - What's New?</a
   >
   <button class="btn hover:preset-tonal" onclick={() => bannerElement.remove()}
     ><XIcon />Close</button
