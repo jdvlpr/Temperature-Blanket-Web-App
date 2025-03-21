@@ -74,12 +74,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let tooltipElement = $state();
 
-  let debounceTimer;
-  const debounce = (callback, time) => {
-    window.clearTimeout(debounceTimer);
-    debounceTimer = window.setTimeout(callback, time);
-  };
-
   const [floatingRef, floatingContent, update] = createFloatingActions({
     strategy: 'absolute',
     placement,
@@ -128,7 +122,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   function handelLeaveEvent(event, duration = 100) {
     event.preventDefault();
-    window.clearTimeout(debounceTimer);
     let timeout = setTimeout(() => {
       if (!isTooltipActive) {
         showTooltip = false;
@@ -148,11 +141,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     role="button"
     tabindex="0"
     onmouseenter={() => {
-      debounce(() => (showTooltip = true), 50);
+      showTooltip = true;
     }}
     onmouseleave={handelLeaveEvent}
     onfocus={() => {
-      debounce(() => (showTooltip = true), 50);
+      showTooltip = true;
     }}
     onblur={handelLeaveEvent}
     use:floatingRef
@@ -160,7 +153,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <button
       {onclick}
       disabled
-      class={[classNames, fullWidth && 'w-full inline-block h-full']}
+      class={[classNames, fullWidth && 'inline-block h-full w-full']}
       data-pinned={dataPinned}
       data-active={dataActive}
       data-no-weather={dataNoWeather}
@@ -173,18 +166,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
 {:else if !disableTooltip}
   <button
     {onclick}
-    class={[classNames, fullWidth && 'w-full inline-block h-full']}
+    class={[classNames, fullWidth && 'inline-block h-full w-full']}
     data-pinned={dataPinned}
     data-active={dataActive}
     data-no-weather={dataNoWeather}
     {title}
     {id}
     onmouseenter={() => {
-      debounce(() => (showTooltip = true), 50);
+      showTooltip = true;
     }}
     onmouseleave={handelLeaveEvent}
     onfocus={() => {
-      debounce(() => (showTooltip = true), 50);
+      showTooltip = true;
     }}
     onblur={handelLeaveEvent}
     use:floatingRef
@@ -194,7 +187,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 {:else}
   <button
     {onclick}
-    class={[classNames, fullWidth && 'w-full inline-block h-full']}
+    class={[classNames, fullWidth && 'inline-block h-full w-full']}
     data-pinned={dataPinned}
     data-active={dataActive}
     data-no-weather={dataNoWeather}
@@ -212,7 +205,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     aria-labelledby="Tooltip or Menu"
     aria-describedby="A dialog box showing information or menu items."
     in:scale={{ duration: 175 }}
-    class="absolute shadow-lg cursor-text z-200 rounded-container tooltip block"
+    class="rounded-container tooltip absolute z-200 block cursor-text shadow-lg"
     style="min-width:{minWidth}"
     use:floatingContent
     onmouseenter={() => (isTooltipActive = true)}
@@ -228,7 +221,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     bind:this={tooltipElement}
   >
     <div
-      class="p-2 rounded-container {tooltipBg} {tooltipClass}"
+      class="rounded-container p-2 {tooltipBg} {tooltipClass}"
       style={tooltipStyle}
     >
       {@render tooltip?.()}
@@ -236,7 +229,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     <div
       style="position:absolute; {tooltipStyle}"
-      class="w-4 h-4 {tooltipBg} z-40"
+      class="h-4 w-4 {tooltipBg} z-40"
       bind:this={$arrowRef}
     ></div>
   </div>

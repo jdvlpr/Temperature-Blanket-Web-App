@@ -29,33 +29,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '$lib/state';
   import { downloadPreviewPNG } from '$lib/utils';
   import { DownloadIcon, SendIcon } from '@lucide/svelte';
-  import { onMount, untrack } from 'svelte';
+  import { onMount } from 'svelte';
   import { Drawer } from 'vaul-svelte';
   import { weatherDataUpdatedKey } from './WeatherTableWrapper.svelte';
-
-  let refreshKey = $state(Date.now());
 
   onMount(() => {
     if (!previews.activeId) {
       previews.activeId = 'rows';
     }
-  });
-
-  let debounceTimer;
-  const debounce = (callback, time) => {
-    window.clearTimeout(debounceTimer);
-    debounceTimer = window.setTimeout(callback, time);
-  };
-
-  $effect(() => {
-    project.url.hash, weather.data, weatherDataUpdatedKey.value;
-    debounce(() => {
-      // Update after variables have a chance to update.
-      // Without the tick, sometimes it would not update the preview
-      untrack(() => {
-        refreshKey = Date.now();
-      });
-    }, 400);
   });
 </script>
 
@@ -65,7 +46,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <div class="flex flex-col items-start justify-center gap-2">
     {#if gauges.activeGauge?.colors}
       <div class="flex w-full flex-col items-center justify-center gap-4">
-        {#key refreshKey}
+        {#key weatherDataUpdatedKey.value}
+          <!-- Update the preview if user manually edits the weather data -->
           <previews.active.previewComponent />
         {/key}
 
