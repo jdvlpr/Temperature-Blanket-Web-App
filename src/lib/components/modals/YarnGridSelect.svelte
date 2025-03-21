@@ -40,6 +40,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '@lucide/svelte';
   import chroma from 'chroma-js';
   import SelectYarnWeight from '../SelectYarnWeight.svelte';
+  import { tick } from 'svelte';
 
   interface Props {
     selectedBrandId?: string;
@@ -122,74 +123,62 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let gettingResults = $state(true);
   let loadingAllColors = $state(false);
 
-  let debounceTimer;
-  const debounce = (callback, time) => {
-    window.clearTimeout(debounceTimer);
-    debounceTimer = window.setTimeout(callback, time);
-  };
-
   function getResults() {
-    // debounce is because it sometimes got called more than once at a time
-
     gettingResults = true;
-    debounce(() => {
-      let _results = getColorways({
-        selectedBrandId,
-        selectedYarnId,
-        selectedYarnWeightId,
+    let _results = getColorways({
+      selectedBrandId,
+      selectedYarnId,
+      selectedYarnWeightId,
+    });
+
+    // filter by search text
+    if (search !== '') {
+      _results = _results.filter((color) => {
+        let find = search.toLowerCase();
+        return color.name.toLowerCase().includes(find);
       });
+    }
 
-      // filter by search text
-      if (search !== '') {
-        _results = _results.filter((color) => {
-          let find = search.toLowerCase();
-          return color.name.toLowerCase().includes(find);
+    switch (sortColors) {
+      case 'best-match':
+        _results = _results
+          .map((color) => {
+            return {
+              ...color,
+              delta: chroma.deltaE(incomingColor.hex, color.hex),
+            };
+          })
+          .sort((a, b) => (a.delta > b.delta ? 1 : b.delta > a.delta ? -1 : 0));
+        break;
+      case 'light-to-dark':
+        _results = sortColorsLightToDark({
+          colors: _results,
         });
-      }
+        break;
+      case 'dark-to-light':
+        _results = sortColorsDarktoLight({
+          colors: _results,
+        });
+        break;
+      case 'name':
+        _results = sortColorsByName({
+          colors: _results,
+        });
+        break;
+      case 'name-z-to-a':
+        _results = sortColorsByNameZtoA({
+          colors: _results,
+        });
+        break;
+      default:
+        break;
+    }
 
-      switch (sortColors) {
-        case 'best-match':
-          _results = _results
-            .map((color) => {
-              return {
-                ...color,
-                delta: chroma.deltaE(incomingColor.hex, color.hex),
-              };
-            })
-            .sort((a, b) =>
-              a.delta > b.delta ? 1 : b.delta > a.delta ? -1 : 0,
-            );
-          break;
-        case 'light-to-dark':
-          _results = sortColorsLightToDark({
-            colors: _results,
-          });
-          break;
-        case 'dark-to-light':
-          _results = sortColorsDarktoLight({
-            colors: _results,
-          });
-          break;
-        case 'name':
-          _results = sortColorsByName({
-            colors: _results,
-          });
-          break;
-        case 'name-z-to-a':
-          _results = sortColorsByNameZtoA({
-            colors: _results,
-          });
-          break;
-        default:
-          break;
-      }
+    if (_results.length > itemsToShow) _results.length = itemsToShow;
 
-      if (_results.length > itemsToShow) _results.length = itemsToShow;
-
-      results = _results;
-      gettingResults = false;
-      loadingAllColors = false;
-    }, 0);
+    results = _results;
+    gettingResults = false;
+    loadingAllColors = false;
   }
 
   function toggleSelected({
@@ -303,7 +292,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     sortColors;
     incomingColor;
     itemsToShow;
-    getResults();
+    tick().then(() => {
+      getResults();
+    });
   });
 
   let selectedIds = $derived(
@@ -312,11 +303,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div
-  class="w-full grid grid-cols-12 items-end gap-2 my-2"
+  class="my-2 grid w-full grid-cols-12 items-end gap-2"
   bind:this={filtersContainer}
 >
   <div
-    class="w-full col-span-full md:col-span-9 order-1"
+    class="order-1 col-span-full w-full md:col-span-9"
     class:md:col-span-full={!!selectedBrandId && !!selectedYarnId}
   >
     <SelectYarn
@@ -328,14 +319,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </div>
 
   {#if selectedBrandId && selectedYarnId}
-    <div class="w-full col-span-full order-2 md:order-3">
+    <div class="order-2 col-span-full w-full md:order-3">
       <DefaultYarnSet {selectedBrandId} {selectedYarnId} />
     </div>
   {/if}
 
   {#key selectedBrandId}
     <div
-      class="w-full col-span-full md:col-span-3 order-3 md:order-2"
+      class="order-3 col-span-full w-full md:order-2 md:col-span-3"
       class:hidden={!!selectedBrandId && !!selectedYarnId}
     >
       <SelectYarnWeight {selectedBrandId} bind:selectedYarnWeightId />
@@ -343,7 +334,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/key}
 
   <div
-    class="tex-left flex flex-col items-start w-full col-span-full md:col-span-5 order-4 gap-1"
+    class="tex-left order-4 col-span-full flex w-full flex-col items-start gap-1 md:col-span-5"
   >
     <label for="yarn-select-search-input" class="label flex items-center gap-1">
       <SearchIcon class="size-4" />
@@ -354,7 +345,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       autocomplete="off"
       placeholder="e.g., Wisteria, Cream"
       type="text"
-      class="w-full input"
+      class="input w-full"
       bind:value={search}
       oninput={() => {
         itemsToShow = YARN_COLORWAYS_PER_PAGE;
@@ -362,7 +353,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     />
   </div>
 
-  <label class="label w-full col-span-8 md:col-span-3 md:col-start-10 order-5">
+  <label class="label order-5 col-span-8 w-full md:col-span-3 md:col-start-10">
     <span class="flex items-center gap-1">
       <ArrowDownWideNarrowIcon class="size-4" />
       <span> Sort By</span>
@@ -386,7 +377,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </div>
 
 {#if results?.length && !loadingAllColors}
-  <p class="text-sm mt-2">
+  <p class="mt-2 text-sm">
     {#if totalResults === results.length}
       {totalResults}
     {:else}
@@ -396,7 +387,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </p>
 {/if}
 
-<div class="flex flex-wrap gap-1 my-4 justify-center">
+<div class="my-4 flex flex-wrap justify-center gap-1">
   {#if results?.length && !loadingAllColors}
     {#each results as { hex, name, delta, brandName, yarnName, brandId, yarnId, variant_href, affiliate_variant_href }}
       {@const isSelected =
@@ -406,7 +397,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {@const percentMatch = Math.floor(100 - delta)}
       <button
         type="button"
-        class="rounded-container shadow-xs cursor-pointer flex-1 min-w-fit p-1 sm:p-2 flex flex-col gap-2 items-start justify-start"
+        class="rounded-container flex min-w-fit flex-1 cursor-pointer flex-col items-start justify-start gap-2 p-1 shadow-xs sm:p-2"
         style="background:{hex}; color:{getTextColor(hex)};"
         onclick={() =>
           toggleSelected({
@@ -420,7 +411,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             affiliate_variant_href,
           })}
       >
-        <div class="flex gap-2 items-center">
+        <div class="flex items-center gap-2">
           {#if isSelected}
             <CircleCheckIcon />
           {:else}

@@ -67,7 +67,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '@lucide/svelte';
   import { Accordion } from '@skeletonlabs/skeleton-svelte';
   import chroma from 'chroma-js';
-  import { onMount } from 'svelte';
+  import { onMount, tick } from 'svelte';
 
   let loadMoreSpinner = $state();
   let urlParams;
@@ -83,13 +83,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let layout = $state('grid');
 
   let accordionState = $state([]);
-
-  let debounceTimer;
-  const debounce = (callback, time) => {
-    if (!browser) return;
-    window.clearTimeout(debounceTimer);
-    debounceTimer = window.setTimeout(callback, time);
-  };
 
   onMount(() => {
     urlParams = new URLSearchParams(window.location.search);
@@ -194,75 +187,72 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   function getResults() {
     if (!isLoaded || !browser) return;
-    // debounce is because it sometimes got called more than once at a time
     gettingResults = true;
-    debounce(() => {
-      let _results = ALL_COLORWAYS_WITH_AFFILIATE_LINKS.filter((colorway) =>
-        yarnColorwayFinderState.selectedBrandId
-          ? colorway.brandId === yarnColorwayFinderState.selectedBrandId
+    let _results = ALL_COLORWAYS_WITH_AFFILIATE_LINKS.filter((colorway) =>
+      yarnColorwayFinderState.selectedBrandId
+        ? colorway.brandId === yarnColorwayFinderState.selectedBrandId
+        : true,
+    )
+      .filter((colorway) =>
+        yarnColorwayFinderState.selectedYarnId
+          ? colorway.yarnId === yarnColorwayFinderState.selectedYarnId
           : true,
       )
-        .filter((colorway) =>
-          yarnColorwayFinderState.selectedYarnId
-            ? colorway.yarnId === yarnColorwayFinderState.selectedYarnId
-            : true,
-        )
-        .filter((colorway) =>
-          yarnColorwayFinderState.selectedYarnWeightId
-            ? colorway.yarnWeightId ===
-              yarnColorwayFinderState.selectedYarnWeightId
-            : true,
-        );
+      .filter((colorway) =>
+        yarnColorwayFinderState.selectedYarnWeightId
+          ? colorway.yarnWeightId ===
+            yarnColorwayFinderState.selectedYarnWeightId
+          : true,
+      );
 
-      // filter by search text
-      if (yarnColorwayFinderState.search !== '') {
-        _results = _results.filter((color) => {
-          let find = yarnColorwayFinderState.search.toLowerCase();
-          return color.name.toLowerCase().includes(find);
+    // filter by search text
+    if (yarnColorwayFinderState.search !== '') {
+      _results = _results.filter((color) => {
+        let find = yarnColorwayFinderState.search.toLowerCase();
+        return color.name.toLowerCase().includes(find);
+      });
+    }
+
+    if (yarnColorwayFinderState.hex)
+      _results = _results
+        .map((color) => {
+          return {
+            ...color,
+            delta: chroma.deltaE(yarnColorwayFinderState.hex, color.hex),
+          };
+        })
+        .sort((a, b) => (a.delta > b.delta ? 1 : b.delta > a.delta ? -1 : 0))
+        .filter((color) => color.delta < 40);
+
+    switch (yarnColorwayFinderState.sortColors) {
+      case 'light-to-dark':
+        _results = sortColorsLightToDark({
+          colors: _results,
         });
-      }
+        break;
+      case 'dark-to-light':
+        _results = sortColorsDarktoLight({
+          colors: _results,
+        });
+        break;
+      case 'name':
+        _results = sortColorsByName({
+          colors: _results,
+        });
+        break;
+      case 'name-z-to-a':
+        _results = sortColorsByNameZtoA({
+          colors: _results,
+        });
+        break;
+      default:
+        break;
+    }
 
-      if (yarnColorwayFinderState.hex)
-        _results = _results
-          .map((color) => {
-            return {
-              ...color,
-              delta: chroma.deltaE(yarnColorwayFinderState.hex, color.hex),
-            };
-          })
-          .sort((a, b) => (a.delta > b.delta ? 1 : b.delta > a.delta ? -1 : 0))
-          .filter((color) => color.delta < 40);
-
-      switch (yarnColorwayFinderState.sortColors) {
-        case 'light-to-dark':
-          _results = sortColorsLightToDark({
-            colors: _results,
-          });
-          break;
-        case 'dark-to-light':
-          _results = sortColorsDarktoLight({
-            colors: _results,
-          });
-          break;
-        case 'name':
-          _results = sortColorsByName({
-            colors: _results,
-          });
-          break;
-        case 'name-z-to-a':
-          _results = sortColorsByNameZtoA({
-            colors: _results,
-          });
-          break;
-        default:
-          break;
-      }
-
-      if (_results.length > itemsToShow) _results.length = itemsToShow;
-      results = _results;
-      gettingResults = false;
-      loadingAllColors = false;
-    }, 200);
+    if (_results.length > itemsToShow) _results.length = itemsToShow;
+    results = _results;
+    gettingResults = false;
+    loadingAllColors = false;
   }
 
   function inputTypeColorOnChange({ value }) {
@@ -353,8 +343,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
       yarns,
       yarnColorwayFinderState.sortColors,
       itemsToShow,
-      yarnColorwayFinderState.hex,
+      yarnColorwayFinderState.hex;
+
+    tick().then(() => {
       getResults();
+    });
   });
 
   let areAnyResultsAffiliate = $derived(

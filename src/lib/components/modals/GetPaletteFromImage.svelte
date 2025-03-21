@@ -36,7 +36,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     XIcon,
   } from '@lucide/svelte';
   import chroma from 'chroma-js';
-  import { onMount } from 'svelte';
+  import { onMount, tick } from 'svelte';
   import { fade } from 'svelte/transition';
   import SelectYarnWeight from '../SelectYarnWeight.svelte';
 
@@ -127,14 +127,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
   function addColor(e) {
     if (matchingYarnColors.length === MAXIMUM_COLORWAYS_MATCHES_FOR_IMAGES)
       return;
-    debounce(() => {
+    tick().then(() => {
+      // Allows for animation
       if (colorHoverDiv) {
         colorHoverDiv?.classList.add('scale-0');
         setTimeout(() => {
           colorHoverDiv?.classList.remove('scale-0');
         }, 70); // time in milliseconds
       }
-    }, 0);
+    });
     rect = canvas.getBoundingClientRect();
     let ratio = rect.width / canvas.width;
     let x = (e.clientX - rect.left) / ratio;
@@ -167,8 +168,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 
   function showColor(e) {
+    if (!ctx) return;
     debounce(() => {
-      if (!ctx) return;
       rect = canvas.getBoundingClientRect();
       let ratio = rect.width / canvas.width;
       let x = (e.clientX - rect.left) / ratio;
@@ -186,8 +187,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 
   function showColorTouch(e) {
+    if (!ctx) return;
     debounce(() => {
-      if (!ctx) return;
       if (hoverName && hoverName.classList?.contains('hidden'))
         hoverName.classList.remove('hidden');
       rect = canvas.getBoundingClientRect();
