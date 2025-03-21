@@ -160,7 +160,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
       weather.currentIndex = +group.dataset.dayindex;
 
-      showPreviewImageWeatherDetails(targets);
+      showPreviewImageWeatherDetails(cornerToCornerPreview.targets);
     }}
   >
     {#each cornerToCornerPreview.sections as section}

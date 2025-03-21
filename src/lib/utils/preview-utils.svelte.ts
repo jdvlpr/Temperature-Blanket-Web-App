@@ -25,7 +25,6 @@ import {
 } from '$lib/state';
 import type { WeatherParam } from '$lib/types';
 import { exists, getTargetParentGaugeId } from '$lib/utils';
-import { get } from 'svelte/store';
 
 export const showPreviewImageWeatherDetails = (targets) => {
   previewWeatherTargets.value = targets;
