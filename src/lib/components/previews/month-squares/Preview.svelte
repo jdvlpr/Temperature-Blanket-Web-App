@@ -17,22 +17,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Spinner from '$lib/components/Spinner.svelte';
   import { gauges, localState, project, weather } from '$lib/state';
   import { getColorInfo, showPreviewImageWeatherDetails } from '$lib/utils';
+  import { tick } from 'svelte';
   import { monthSquaresPreview } from './state.svelte';
 
   let width = $state(monthSquaresPreview.width);
 
   let height = $state(monthSquaresPreview.height);
 
-  let debounceTimer;
-  const debounce = (callback, time) => {
-    window.clearTimeout(debounceTimer);
-    debounceTimer = window.setTimeout(callback, time);
-  };
-
   $effect(() => {
     project.url.href;
     if (!weather.data.length || !gauges.allCreated.length) return;
-    debounce(() => {
+    tick().then(() => {
       const sections = [];
       let squareIndex = 0;
       let x = monthSquaresPreview.squareSize / 2;

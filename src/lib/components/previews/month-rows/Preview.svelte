@@ -15,25 +15,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import Spinner from '$lib/components/Spinner.svelte';
-  import { PREVIEW_UPDATE_DEBOUNCE_MS } from '$lib/constants';
   import { gauges, localState, project, weather } from '$lib/state';
   import { getColorInfo, showPreviewImageWeatherDetails } from '$lib/utils';
+  import { tick } from 'svelte';
   import { monthRowsPreview } from './state.svelte';
 
   let width = $state(monthRowsPreview.width);
 
   let height = $state(monthRowsPreview.height);
 
-  let debounceTimer;
-  const debounce = (callback, time) => {
-    window.clearTimeout(debounceTimer);
-    debounceTimer = window.setTimeout(callback, time);
-  };
-
   $effect(() => {
     project.url.href;
     if (!weather.data.length || !gauges.allCreated.length) return;
-    debounce(() => {
+    tick().then(() => {
       const months = [];
       const borders = [
         {
@@ -200,7 +194,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       width = monthRowsPreview.width;
       height = monthRowsPreview.height;
       monthRowsPreview.months = months;
-    }, PREVIEW_UPDATE_DEBOUNCE_MS);
+    });
   });
 </script>
 

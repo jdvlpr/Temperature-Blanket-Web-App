@@ -15,20 +15,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import Spinner from '$lib/components/Spinner.svelte';
-  import { PREVIEW_UPDATE_DEBOUNCE_MS } from '$lib/constants';
   import { gauges, localState, project, weather } from '$lib/state';
   import { getColorInfo, showPreviewImageWeatherDetails } from '$lib/utils';
+  import { tick } from 'svelte';
   import { continuousSquarePreview } from './state.svelte';
 
   let width = $state(continuousSquarePreview.width);
 
   let height = $state(continuousSquarePreview.height);
-
-  let debounceTimer;
-  const debounce = (callback, time) => {
-    window.clearTimeout(debounceTimer);
-    debounceTimer = window.setTimeout(callback, time);
-  };
 
   let unit = $derived(continuousSquarePreview.STITCH_SIZE * 2);
   let doubleUnit = $derived(unit * 2);
@@ -89,7 +83,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   $effect(() => {
     project.url.href;
     if (!weather.data.length || !gauges.allCreated.length) return;
-    debounce(() => {
+    tick().then(() => {
       let x =
         continuousSquarePreview.width / 2 -
         continuousSquarePreview.STITCH_SIZE * 2;
@@ -144,7 +138,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       width = continuousSquarePreview.width;
       height = continuousSquarePreview.height;
       continuousSquarePreview.sections = sections;
-    }, PREVIEW_UPDATE_DEBOUNCE_MS);
+    });
   });
 </script>
 

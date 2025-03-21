@@ -22,22 +22,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
     getColorInfo,
     showPreviewImageWeatherDetails,
   } from '$lib/utils';
+  import { tick } from 'svelte';
   import { daytimeRowsPreview } from './state.svelte';
 
   let width = $state(daytimeRowsPreview.width);
 
   let height = $state(daytimeRowsPreview.height);
 
-  let debounceTimer;
-  const debounce = (callback, time) => {
-    window.clearTimeout(debounceTimer);
-    debounceTimer = window.setTimeout(callback, time);
-  };
-
   $effect(() => {
     project.url.href;
     if (!weather.data.length || !gauges.allCreated.length) return;
-    debounce(() => {
+    tick().then(() => {
       const sections = [];
       let weatherParams = [];
       switch (daytimeRowsPreview.settings.daytimePosition) {

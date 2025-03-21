@@ -82,8 +82,6 @@ export const setProjectSettings = async (
     gauges.allCreated
       .find((g) => g.id === gauge.id)
       .updateSettings({ settings });
-
-    // Object.assign(_gauge, { ...settings });
   });
 
   // Load Preview

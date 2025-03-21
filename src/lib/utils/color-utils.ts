@@ -223,7 +223,7 @@ export const getColorInfo = ({
     gaugeLength: undefined,
   }; // default white color will show on the preview if the weather value has no range associated with it
 
-  let gaugeId = getTargetParentGaugeId(param);
+  const gaugeId = getTargetParentGaugeId(param);
 
   const gauge = gauges.getSnapshot(gaugeId);
 

@@ -15,7 +15,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import Spinner from '$lib/components/Spinner.svelte';
-  import { PREVIEW_UPDATE_DEBOUNCE_MS } from '$lib/constants';
   import { gauges, localState, project, weather } from '$lib/state';
   import type { Color, WeatherDay, WeatherParam } from '$lib/types';
   import {
@@ -23,16 +22,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     getSquareSectionTargetIds,
     showPreviewImageWeatherDetails,
   } from '$lib/utils';
+  import { tick } from 'svelte';
   import { squaresPreview } from './state.svelte';
 
   let width = $state(squaresPreview.width);
   let height = $state(squaresPreview.height);
 
-  let debounceTimer;
-  const debounce = (callback, time) => {
-    window.clearTimeout(debounceTimer);
-    debounceTimer = window.setTimeout(callback, time);
-  };
   const squareSectionsCount = $derived(
     squaresPreview.settings.squareSize * squaresPreview.settings.squareSize,
   );
@@ -47,7 +42,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   $effect(() => {
     project.url.href;
-    debounce(async () => {
+    tick().then(async () => {
       if (!weather.data.length || !gauges.allCreated.length) return;
       // Get the target IDs for each square section
       let row = 0;
@@ -150,7 +145,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       width = squaresPreview.width;
       height = squaresPreview.height;
       squaresPreview.sections = sections;
-    }, PREVIEW_UPDATE_DEBOUNCE_MS);
+    });
   });
 </script>
 

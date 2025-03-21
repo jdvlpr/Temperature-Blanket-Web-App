@@ -64,12 +64,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     fullscreen = $bindable(),
   }: Props = $props();
 
-  let debounceTimer;
-  const debounce = (callback, time) => {
-    window.clearTimeout(debounceTimer);
-    debounceTimer = window.setTimeout(callback, time);
-  };
-
   const flipDurationMs = 200;
 
   const uniqueId =
@@ -203,10 +197,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 />
 
 <div
-  class="flex flex-col text-left gap-y-1 w-full {fullscreen ? 'h-full' : ''}"
+  class="flex w-full flex-col gap-y-1 text-left {fullscreen ? 'h-full' : ''}"
 >
   <div
-    class="w-full inline-flex {fullscreen ? 'h-full flex-col' : 'h-[70px]'}"
+    class="inline-flex w-full {fullscreen ? 'h-full flex-col' : 'h-[70px]'}"
     use:dragHandleZone={{
       items: sortableColors,
       flipDurationMs,
@@ -233,7 +227,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <div
         class=" w-full {fullscreen
           ? 'h-full'
-          : 'h-[70px] first:rounded-tl-container first:overflow-hidden last:rounded-tr-container last:overflow-hidden'} group palette-item-{uniqueId} {roundedBottom &&
+          : 'first:rounded-tl-container last:rounded-tr-container h-[70px] first:overflow-hidden last:overflow-hidden'} group palette-item-{uniqueId} {roundedBottom &&
         !fullscreen
           ? 'first:rounded-bl-container last:rounded-br-container'
           : ''}"
@@ -254,14 +248,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
           }
         }}
         onmouseenter={() => {
-          debounce(() => {
-            activeColorIndex = index;
-          }, 50);
+          activeColorIndex = index;
         }}
         onmouseleave={() => {
-          debounce(() => {
-            activeColorIndex = null;
-          }, 50);
+          activeColorIndex = null;
         }}
       >
         <Tooltip
@@ -273,7 +263,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           showTooltip={activeColorIndex === index && !isDragging.value}
         >
           <div
-            class="flex-auto flex flex-col justify-center items-center {fullscreen
+            class="flex flex-auto flex-col items-center justify-center {fullscreen
               ? 'h-full'
               : 'h-[70px]'}"
             title={brandName && yarnName && name
@@ -285,7 +275,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <LockKeyholeIcon />
             {:else}
               <div
-                class="group-hover:hidden group-focus:hidden h-2 w-2 rounded-full opacity-20 {activeColorIndex ===
+                class="h-2 w-2 rounded-full opacity-20 group-hover:hidden group-focus:hidden {activeColorIndex ===
                   index &&
                 !isDragging.value &&
                 !isLocked
@@ -302,7 +292,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               role="button"
               tabindex={isDragging.value ? 0 : -1}
               aria-label="drag-handle"
-              class="w-fit dragicon hidden group-hover:block group-focus:block {activeColorIndex ===
+              class="dragicon hidden w-fit group-hover:block group-focus:block {activeColorIndex ===
                 index &&
               !isDragging.value &&
               !isLocked
@@ -325,7 +315,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {#snippet tooltip()}
             <div
               style="background:{hex};color:{getTextColor(hex)};"
-              class="w-full rounded-container text-center break-all flex flex-wrap items-center justify-center gap-4 z-30"
+              class="rounded-container z-30 flex w-full flex-wrap items-center justify-center gap-4 text-center break-all"
             >
               {#if canUserDeleteColor && sortableColors.length > 1}
                 <button

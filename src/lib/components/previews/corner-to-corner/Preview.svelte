@@ -17,17 +17,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Spinner from '$lib/components/Spinner.svelte';
   import { gauges, localState, project, weather } from '$lib/state';
   import { getColorInfo, showPreviewImageWeatherDetails } from '$lib/utils';
+  import { tick } from 'svelte';
   import { cornerToCornerPreview } from './state.svelte';
 
   let width = $state(cornerToCornerPreview.width);
 
   let height = $state(cornerToCornerPreview.height);
-
-  let debounceTimer;
-  const debounce = (callback, time) => {
-    window.clearTimeout(debounceTimer);
-    debounceTimer = window.setTimeout(callback, time);
-  };
 
   const getX = (props) => {
     if (reachedTop(props)) return props.x - cornerToCornerPreview.STITCH_SIZE;
@@ -99,7 +94,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   $effect(() => {
     project.url.href;
     if (!weather.data.length || !gauges.allCreated.length) return;
-    debounce(() => {
+    tick().then(() => {
       let row = 0,
         x = 0,
         y = 0,

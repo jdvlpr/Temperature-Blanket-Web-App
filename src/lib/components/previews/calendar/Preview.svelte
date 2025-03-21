@@ -16,24 +16,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script>
   import { calendarPreview } from '$lib/components/previews/calendar/state.svelte';
   import Spinner from '$lib/components/Spinner.svelte';
-  import { PREVIEW_UPDATE_DEBOUNCE_MS } from '$lib/constants';
   import { gauges, localState, project, weather } from '$lib/state';
   import { getColorInfo, showPreviewImageWeatherDetails } from '$lib/utils';
+  import { tick } from 'svelte';
 
   let width = $state(calendarPreview.width);
 
   let height = $state(calendarPreview.height);
 
-  let debounceTimer;
-  const debounce = (callback, time) => {
-    window.clearTimeout(debounceTimer);
-    debounceTimer = window.setTimeout(callback, time);
-  };
-
   $effect(() => {
     project.url.href;
     if (!weather.data.length || !gauges.allCreated.length) return;
-    debounce(() => {
+    tick().then(() => {
       let row = 0;
       let additionalSquaresAddedCount = 0;
       let monthColumnIndex = 0;
@@ -156,7 +150,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       width = calendarPreview.width;
       height = calendarPreview.height;
       calendarPreview.sections = sections;
-    }, PREVIEW_UPDATE_DEBOUNCE_MS);
+    });
   });
 </script>
 

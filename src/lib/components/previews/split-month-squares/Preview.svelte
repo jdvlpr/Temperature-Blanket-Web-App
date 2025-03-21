@@ -17,6 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Spinner from '$lib/components/Spinner.svelte';
   import { gauges, localState, project, weather } from '$lib/state';
   import { getColorInfo, showPreviewImageWeatherDetails } from '$lib/utils';
+  import { tick } from 'svelte';
   import { splitMonthSquaresPreview } from './state.svelte';
 
   let width = $state(splitMonthSquaresPreview.width);
@@ -28,16 +29,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     return { left, right };
   }
 
-  let debounceTimer;
-  const debounce = (callback, time) => {
-    window.clearTimeout(debounceTimer);
-    debounceTimer = window.setTimeout(callback, time);
-  };
-
   $effect(() => {
     project.url.href;
     if (!weather.data.length || !gauges.allCreated.length) return;
-    debounce(() => {
+    tick().then(() => {
       const sections = [];
       let squareIndex = 0;
       let x = splitMonthSquaresPreview.squareSize / 2;
@@ -167,7 +162,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       height = splitMonthSquaresPreview.height;
 
       splitMonthSquaresPreview.sections = sections;
-    }, 10);
+    });
   });
 </script>
 

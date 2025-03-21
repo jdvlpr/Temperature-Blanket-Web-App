@@ -18,6 +18,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Spinner from '$lib/components/Spinner.svelte';
   import { gauges, localState, project, weather } from '$lib/state';
   import { getColorInfo, showPreviewImageWeatherDetails } from '$lib/utils';
+  import { tick } from 'svelte';
 
   let width = $state(rowsPreview.width);
 
@@ -38,16 +39,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     return value;
   }
 
-  let debounceTimer;
-  const debounce = (callback, time) => {
-    window.clearTimeout(debounceTimer);
-    debounceTimer = window.setTimeout(callback, time);
-  };
-
   $effect(() => {
     project.url.href;
     if (!weather.data.length || !gauges.allCreated.length) return;
-    debounce(() => {
+    tick().then(() => {
       // Setup constants
       let columnIndex = 0; // Current column index
       let stitchYRow = 0; // Current row position
@@ -156,7 +151,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         height = rowsPreview.height;
         rowsPreview.sections = sections;
       }
-    }, 10);
+    });
   });
 </script>
 

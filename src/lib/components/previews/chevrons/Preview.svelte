@@ -16,6 +16,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script>
   import { gauges, localState, project, weather } from '$lib/state';
   import { getColorInfo, showPreviewImageWeatherDetails } from '$lib/utils';
+  import { tick } from 'svelte';
   import { chevronsPreview } from './state.svelte';
 
   let width = $state(chevronsPreview.width);
@@ -24,16 +25,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let sections = [];
 
-  let debounceTimer;
-  const debounce = (callback, time) => {
-    window.clearTimeout(debounceTimer);
-    debounceTimer = window.setTimeout(callback, time);
-  };
-
   $effect(() => {
     project.url.href;
     if (!weather.data.length || !gauges.allCreated.length) return;
-    debounce(() => {
+    tick().then(() => {
       let total = weather.data?.length;
       sections = [];
       for (

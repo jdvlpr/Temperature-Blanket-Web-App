@@ -103,10 +103,11 @@ export const loadFromHistory = ({ action }: { action: 'Undo' | 'Redo' }) => {
           newParams[gauge.id].value,
           gauges.getSnapshot(gauge.id),
         );
-        Object.assign(
-          gauges.allCreated.find((g) => g.id === gauge.id),
-          settings,
-        );
+
+        gauges.allCreated
+          .find((g) => g.id === gauge.id)
+          .updateSettings({ settings });
+
         message = 'Colors';
       }
     } else if (exists(oldParams[gauge.id])) {
