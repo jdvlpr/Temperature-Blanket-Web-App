@@ -22,7 +22,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import {
     dateToISO8601String,
     displayGeoNamesErrorMessage,
-    formatFeatureName,
     getSuggestions,
     pluralize,
     renderResult,
@@ -85,6 +84,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   $effect(() => {
     if (day > days) day = 1;
+  });
+
+  $effect(() => {
+    console.log($state.snapshot(location));
   });
 
   // If the location was loaded from a saved project, then this gets run to setup initial variables.

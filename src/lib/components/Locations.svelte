@@ -16,31 +16,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import { version } from '$app/environment';
   import Location from '$lib/components/Location.svelte';
-  import ChooseWeatherSource from '$lib/components/modals/ChooseWeatherSource.svelte';
   import Tooltip from '$lib/components/Tooltip.svelte';
   import { MAXIMUM_LOCATIONS } from '$lib/constants';
   import {
     locations,
-    modal,
     project,
     wasProjectLoadedFromURL,
     weather,
   } from '$lib/state';
   import { pluralize } from '$lib/utils';
+  import {
+    CircleCheckBigIcon,
+    CirclePlusIcon,
+    TriangleAlertIcon,
+  } from '@lucide/svelte';
   import { slide } from 'svelte/transition';
   import SearchForWeather from './buttons/SearchForWeather.svelte';
-  import {
-    CheckCheckIcon,
-    CheckIcon,
-    CircleCheckBigIcon,
-    CircleCheckIcon,
-    CirclePlusIcon,
-    CloudDownloadIcon,
-    DatabaseIcon,
-    SquareCheckBigIcon,
-    TriangleAlertIcon,
-    WrenchIcon,
-  } from '@lucide/svelte';
   import WeatherSourceButton from './buttons/WeatherSourceButton.svelte';
 </script>
 

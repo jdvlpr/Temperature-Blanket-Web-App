@@ -28,24 +28,25 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { browser } from '$app/environment';
   import { goto } from '$app/navigation';
   import { page } from '$app/state';
-  import { ICONS, NO_DATA_SRTM3 } from '$lib/constants';
+  import { NO_DATA_SRTM3 } from '$lib/constants';
   import { project } from '$lib/state';
   import {
     displayGeoNamesErrorMessage,
-    formatFeatureName,
     getSuggestions,
     renderResult,
   } from '$lib/utils';
+  import { MapPinIcon, SearchIcon, XIcon } from '@lucide/svelte';
   import autocomplete from 'autocompleter';
   import { onMount } from 'svelte';
   import '../../css/flag-icons.css';
   import { weatherState } from './+page.svelte';
   import { fetchData } from './GetWeather.svelte';
-  import { MapPinIcon, SearchIcon, XIcon } from '@lucide/svelte';
 
   let searching = $state(false); // Autocomplete searching status
   let showReset = $state(false);
   let locationGroup = $state();
+
+  let navigatorAvailable = $state(true);
 
   $effect(() => {
     if (weatherLocationState.inputLocation) {
@@ -61,6 +62,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   );
 
   onMount(async () => {
+    if (!navigator.geolocation) {
+      navigatorAvailable = false;
+    }
     // Setup the autocomplete location
     autocomplete({
       input: weatherLocationState.inputLocation,
@@ -225,7 +229,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div class="flex flex-wrap items-end justify-center gap-x-4 gap-y-2 py-2">
-  <div class="flex w-full flex-col gap-1 text-left">
+  <div class="flex w-full max-w-screen-sm flex-col gap-1 text-left">
     <p>
       {#if hasError}
         <span class="text-error-900-100">Choose a result</span>
@@ -295,9 +299,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
   </div>
 
-  {#if browser && navigator.geolocation}
+  {#if navigatorAvailable}
     <button
-      class="btn hover:preset-tonal flex items-center gap-1"
+      class="btn hover:preset-tonal relative flex items-center gap-1 lg:-top-1"
       title="Use My Location"
       onclick={async () => {
         weatherLocationState.inputLocation.value = 'Loading...';

@@ -36,6 +36,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import UnitChanger from '$lib/components/UnitChanger.svelte';
   import {
     localState,
+    locations,
     modal,
     project,
     showNavigationSideBar,
@@ -46,7 +47,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     setUnitsFromNavigator,
   } from '$lib/utils';
   import { ListIcon, PlusIcon, SettingsIcon } from '@lucide/svelte';
-  import { onDestroy, onMount } from 'svelte';
+  import { onDestroy, onMount, tick } from 'svelte';
   import { fade } from 'svelte/transition';
   import Chart from './Chart.svelte';
   import { fetchData } from './GetWeather.svelte';
@@ -55,7 +56,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Symbols from './Symbols.svelte';
 
   let showChart = $state(true);
+
   let shareableURL = $state(page.url.href);
+
+  let mounted = $state(true);
+
   let windowWidth;
 
   let debounceTimer;
@@ -64,75 +69,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     window.clearTimeout(debounceTimer);
     debounceTimer = window.setTimeout(callback, time);
   };
-
-  onMount(async () => {
-    // units
-    const paramUnits = page.url.searchParams.get('u');
-    if (paramUnits === 'i') localState.value.units = 'imperial';
-    else if (paramUnits === 'm') localState.value.units = 'metric';
-    else if (localStorage.getItem('[/weather]units'))
-      localState.value.units = localStorage.getItem('[/weather]units');
-    else setUnitsFromNavigator();
-
-    // hour12
-    const hourFormat = page.url.searchParams.get('h');
-    if (hourFormat === '0') weatherState.hour = '12';
-    else if (hourFormat === '1') weatherState.hour = '24';
-    else if (localStorage.getItem('[/weather]hour_format'))
-      weatherState.hour = localStorage.getItem('[/weather]hour_format');
-    else weatherState.hour = localState.value.units === 'metric' ? '24' : '12';
-
-    // saved weather locations
-    if (localStorage.getItem('[/weather]locations')) {
-      weatherState.weatherLocations = JSON.parse(
-        localStorage.getItem('[/weather]locations'),
-      ).map((item) => {
-        return { ...item, id: +item.id };
-      });
-
-      weatherState.activeLocationID =
-        weatherState.weatherLocations[0]?.id || null;
-      await fetchData();
-    }
-
-    windowWidth = window.innerWidth;
-    window.addEventListener('resize', updateShowChart, { passive: true });
-  });
-
-  $effect(() => {
-    localStorage.setItem('[/weather]hour_format', weatherState.hour);
-  });
-
-  $effect(() => {
-    localStorage.setItem(
-      '[/weather]locations',
-      JSON.stringify(
-        weatherState.weatherLocations.filter((value) => value.saved === true),
-      ),
-    );
-  });
-
-  $effect(() => {
-    if (
-      weatherState.activeLocationID &&
-      weatherState.weatherLocations.find(
-        (item) => item.id === weatherState.activeLocationID,
-      )?.saved
-    ) {
-      // if (locationsState.locations.find((item) => item.id === value)?.saved) page.url.searchParams.set("id", value);
-      // page.url.searchParams.set("id", value);
-      // page.url.searchParams.set("h", weatherState.hour === "12" ? "0" : "1");
-      // page.url.searchParams.set("u", localState.units === "metric" ? "m" : "i");
-      // window.history.replaceState({ path: page.url.href }, "", page.url.href);
-    } else {
-      // window.history.replaceState({ path: page.url.href }, "", page.url.href);
-    }
-  });
-
-  onDestroy(() => {
-    if (!browser) return;
-    window.removeEventListener('resize', updateShowChart);
-  });
 
   function getShareableURL({ id, units, hourFormat }) {
     if (!id || !units || !hourFormat) return; // prevents from running durring mount, I think ?
@@ -205,11 +141,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
     // return time as a string
     return nd;
   }
+
   let weatherData = $derived(
     weatherState.weatherLocations?.find(
       (item) => item.id === weatherState.activeLocationID,
     )?.data || null,
   );
+
   let hourlyData = $derived(
     weatherData?.hourly.time.map((item, index) => {
       const date = new Date(item);
@@ -236,6 +174,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       };
     }),
   );
+
   let dailyWeatherData = $derived(
     weatherData?.daily.time.map((item, index) => {
       return {
@@ -248,18 +187,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
       };
     }),
   );
+
   let hourlyForcastData = $derived(
     hourlyData?.slice(
       hourlyData.map((item) => item.isNow).indexOf(true),
       hourlyData.map((item) => item.isNow).indexOf(true) + 24,
     ),
   );
+
   let currentTime = $derived(
     getCurrentTime({
       weatherData: weatherData,
       hourFormat: weatherState.hour,
     }),
   );
+
   // Update the weather chart when the sidebar is closed or opened
   $effect(() => {
     showNavigationSideBar.value;
@@ -285,6 +227,80 @@ If not, see <https://www.gnu.org/licenses/>. -->
       )
     )
       await fetchData();
+  });
+
+  onMount(async () => {
+    // units
+    const paramUnits = page.url.searchParams.get('u');
+    if (paramUnits === 'i') localState.value.units = 'imperial';
+    else if (paramUnits === 'm') localState.value.units = 'metric';
+    else if (localStorage.getItem('[/weather]units'))
+      localState.value.units = localStorage.getItem('[/weather]units');
+    else setUnitsFromNavigator();
+
+    // hour12
+    const hourFormat = page.url.searchParams.get('h');
+    if (hourFormat === '0') weatherState.hour = '12';
+    else if (hourFormat === '1') weatherState.hour = '24';
+    else if (localStorage.getItem('[/weather]hour_format'))
+      weatherState.hour = localStorage.getItem('[/weather]hour_format');
+    else weatherState.hour = localState.value.units === 'metric' ? '24' : '12';
+
+    // saved weather locations
+    if (localStorage.getItem('[/weather]locations')) {
+      weatherState.weatherLocations = JSON.parse(
+        localStorage.getItem('[/weather]locations'),
+      ).map((item) => {
+        return { ...item, id: +item.id };
+      });
+
+      weatherState.activeLocationID =
+        weatherState.weatherLocations[0]?.id || null;
+
+      if (weatherState.activeLocationID) await fetchData();
+    }
+
+    if (
+      !weatherState.activeLocationID &&
+      locations.all.length > 0 &&
+      locations.all[0].id
+    ) {
+      weatherState.weatherLocations.push({
+        id: $state.snapshot(locations.all[0].id),
+        elevation: $state.snapshot(locations.all[0].elevation),
+        label: $state.snapshot(locations.all[0].label),
+        lat: $state.snapshot(locations.all[0].lat),
+        lng: $state.snapshot(locations.all[0].lng),
+        result: $state.snapshot(locations.all[0].result),
+      });
+      weatherState.activeLocationID = $state.snapshot(locations.all[0].id);
+    }
+
+    windowWidth = window.innerWidth;
+    window.addEventListener('resize', updateShowChart, { passive: true });
+
+    mounted = false;
+    tick().then(() => {
+      mounted = true;
+    });
+  });
+
+  $effect(() => {
+    localStorage.setItem('[/weather]hour_format', weatherState.hour);
+  });
+
+  $effect(() => {
+    localStorage.setItem(
+      '[/weather]locations',
+      JSON.stringify(
+        weatherState.weatherLocations.filter((value) => value.saved === true),
+      ),
+    );
+  });
+
+  onDestroy(() => {
+    if (!browser) return;
+    window.removeEventListener('resize', updateShowChart);
   });
 </script>
 
@@ -317,8 +333,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <div class="hidden lg:inline-flex"><AppLogo /></div>
 
     <div class="hidden lg:flex">
-      <UnitChanger />
+      {#if mounted}
+        <UnitChanger />
+      {/if}
     </div>
+
     <div class="flex flex-wrap items-center gap-2">
       <Share href={shareableURL} />
 
@@ -390,8 +409,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
                             item.saved = true;
                           return item;
                         });
-                        weatherState.weatherLocations =
-                          weatherState.weatherLocations;
                         page.url.searchParams.set(
                           'id',
                           weatherState.activeLocationID,
@@ -404,11 +421,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
                           'u',
                           localState.value.units === 'metric' ? 'm' : 'i',
                         );
-                        // window.history.replaceState(
-                        //     { path: page.url.href },
-                        //     "",
-                        //     page.url.href,
-                        // );
                       }}
                     >
                       <PlusIcon />
@@ -564,7 +576,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5m-9-6h.008v.008H12v-.008zM12 15h.008v.008H12V15zm0 2.25h.008v.008H12v-.008zM9.75 15h.008v.008H9.75V15zm0 2.25h.008v.008H9.75v-.008zM7.5 15h.008v.008H7.5V15zm0 2.25h.008v.008H7.5v-.008zm6.75-4.5h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V15zm0 2.25h.008v.008h-.008v-.008zm2.25-4.5h.008v.008H16.5v-.008zm0 2.25h.008v.008H16.5V15z"
                     />
                   </svg>
-                  Daily Forcast
+                  Daily Forecast
                 </p>
                 <div
                   class="relative mx-auto mt-4 flex w-full flex-col items-start justify-center gap-2"

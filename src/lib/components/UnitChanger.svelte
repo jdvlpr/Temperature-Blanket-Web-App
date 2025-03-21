@@ -29,10 +29,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 >
   <Segment.Item value={'metric'}>
     {`${UNIT_LABELS.temperature.metric} /
-	    ${UNIT_LABELS.height.metric}`}
+  	    ${UNIT_LABELS.height.metric}`}
   </Segment.Item>
   <Segment.Item value={'imperial'}>
     {`${UNIT_LABELS.temperature.imperial} /
-	    ${UNIT_LABELS.height.imperial}`}
+  	    ${UNIT_LABELS.height.imperial}`}
   </Segment.Item>
 </Segment>
