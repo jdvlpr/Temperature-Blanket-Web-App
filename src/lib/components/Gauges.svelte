@@ -23,7 +23,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '$lib/state';
   import { downloadPDF } from '$lib/utils';
   import { CirclePlusIcon, DownloadIcon, Trash2Icon } from '@lucide/svelte';
-  import { onMount } from 'svelte';
+  import { onMount, tick } from 'svelte';
   import RangeOptionsButton from './buttons/RangeOptionsButton.svelte';
   import Gauge from './Gauge.svelte';
   import GaugeCustomizer from './GaugeCustomizer.svelte';
@@ -57,18 +57,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
       gauges.activeGaugeId = gauges.allCreated[0]?.id;
   }
 
-  let debounceTimer;
-  const debounce = (callback, time) => {
-    window.clearTimeout(debounceTimer);
-    debounceTimer = window.setTimeout(callback, time);
-  };
   // If an initially empty weather parameter gets some user-created data, or if the user searches for a different location,
   // then add the available gauge to the options
   $effect(() => {
     weather.data;
-    debounce(() => {
+    tick().then(() => {
       setupAvailableGauges();
-    }, 100);
+    });
   });
 </script>
 
