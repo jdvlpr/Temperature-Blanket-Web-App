@@ -19,6 +19,8 @@ type SquaresPreviewSettings = {
   secondaryTargets: { indexes: number; targetId: WeatherParam['id'] }[];
   squaresAtBeginning: number;
   squaresBetweenMonthsCount: number;
+  joinStitches: number;
+  joinColor: Color['hex'];
   additionalSquaresColor: Color['hex'];
   primaryTargetAsBackup: boolean;
 };
@@ -78,6 +80,8 @@ export class SquaresPreviewClass {
     squaresBetweenMonthsCount: 0,
     additionalSquaresColor: '#f0f3f3',
     primaryTargetAsBackup: true,
+    joinStitches: 0,
+    joinColor: '#e8e3e2',
   });
 
   // *******************
@@ -137,12 +141,27 @@ export class SquaresPreviewClass {
       .concat(this.additionalSquaresAtEndIndexes),
   );
 
+  joinWidth = $derived(
+    this.settings.joinStitches *
+      2 *
+      this.SQUARE_SECTION_SIZE *
+      this.settings.columns,
+  );
+
   width = $derived(
-    this.settings.columns * this.SQUARE_SECTION_SIZE * this.settings.squareSize,
+    this.settings.columns *
+      this.SQUARE_SECTION_SIZE *
+      this.settings.squareSize +
+      this.joinWidth,
+  );
+
+  joinHeight = $derived(
+    this.settings.joinStitches * 2 * this.SQUARE_SECTION_SIZE * this.rows,
   );
 
   height = $derived(
-    this.rows * this.SQUARE_SECTION_SIZE * this.settings.squareSize,
+    this.rows * this.SQUARE_SECTION_SIZE * this.settings.squareSize +
+      this.joinHeight,
   );
 
   details = $derived({
@@ -172,7 +191,6 @@ export class SquaresPreviewClass {
   // *******************
   // URL hash derived from settings
   // *******************
-
   hash = $derived.by(() => {
     let hash = '&';
     hash += `${this.id}=`;
@@ -193,6 +211,14 @@ export class SquaresPreviewClass {
       this.settings.secondaryTargets.forEach((item) => {
         hash += `${item.targetId}(${item.indexes.join(CHARACTERS_FOR_URL_HASH.separator)})`;
       });
+    }
+
+    if (this.settings.joinStitches > 0) {
+      hash += `!${this.settings.joinStitches}${CHARACTERS_FOR_URL_HASH.separator}${chroma(
+        this.settings.joinColor,
+      )
+        .hex()
+        .substring(1)}`;
     }
     return hash;
   });
@@ -291,6 +317,37 @@ export class SquaresPreviewClass {
             [targetId, +value],
             this.settings.secondaryTargets,
           );
+        }
+      }
+    }
+
+    // Stitches around each square (join stitches and join color)
+    if (exclamationIndex.length > 1) {
+      let currentIndex = exclamationIndex[1] + 1;
+
+      // look for the divider
+      let dividerIndex = hash.indexOf(
+        CHARACTERS_FOR_URL_HASH.separator,
+        currentIndex,
+      );
+
+      if (dividerIndex === -1) {
+        // if no divider, look for the alt divider
+        dividerIndex = hash.indexOf(
+          CHARACTERS_FOR_URL_HASH.separator_alt,
+          currentIndex,
+        );
+      }
+
+      if (dividerIndex) {
+        const joinStitches = +hash.substring(currentIndex, dividerIndex);
+        if (typeof joinStitches === 'number') {
+          this.settings.joinStitches = joinStitches;
+        }
+
+        let joinColor = chroma(hash.substring(dividerIndex + 1)).hex();
+        if (chroma.valid(joinColor)) {
+          this.settings.joinColor = joinColor;
         }
       }
     }

@@ -24,8 +24,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '$lib/utils';
   import { tick } from 'svelte';
   import { squaresPreview } from './state.svelte';
+  import { Settings } from '@lucide/svelte';
 
   let width = $state(squaresPreview.width);
+
   let height = $state(squaresPreview.height);
 
   const squareSectionsCount = $derived(
@@ -46,8 +48,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
       if (!weather.data.length || !gauges.allCreated.length) return;
       // Get the target IDs for each square section
       let row = 0;
-      let y = 0,
-        x = 0;
       const sections = [];
       let isWeatherSquare: boolean;
       let dayIndex = 0;
@@ -73,15 +73,33 @@ If not, see <https://www.gnu.org/licenses/>. -->
           !squaresPreview.additionalSquaresIndexes.includes(squareIndex);
 
         // Calculate the starting coordinates of the square
+        const xJoinOffset =
+          squaresPreview.settings.joinStitches *
+            2 *
+            squaresPreview.SQUARE_SECTION_SIZE *
+            column +
+          squaresPreview.settings.joinStitches *
+            squaresPreview.SQUARE_SECTION_SIZE;
+
         const xStart =
           column *
-          (squaresPreview.settings.squareSize *
-            squaresPreview.SQUARE_SECTION_SIZE);
+            (squaresPreview.settings.squareSize *
+              squaresPreview.SQUARE_SECTION_SIZE) +
+          xJoinOffset;
+
+        const yJoinOffset =
+          squaresPreview.settings.joinStitches *
+            2 *
+            squaresPreview.SQUARE_SECTION_SIZE *
+            row +
+          squaresPreview.settings.joinStitches *
+            squaresPreview.SQUARE_SECTION_SIZE;
+
         const yStart =
           row *
-          (squaresPreview.settings.squareSize *
-            squaresPreview.SQUARE_SECTION_SIZE);
-
+            (squaresPreview.settings.squareSize *
+              squaresPreview.SQUARE_SECTION_SIZE) +
+          yJoinOffset;
         // Loop through each square section
         for (
           let squareSectionIndex = 0, x = xStart, y = yStart;
@@ -89,6 +107,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           squareSectionIndex++
         ) {
           let color: Color['hex'];
+
           if (isWeatherSquare) {
             // Get the weather data for the current day
             const day: WeatherDay = weather.data[dayIndex];
@@ -185,6 +204,30 @@ If not, see <https://www.gnu.org/licenses/>. -->
             {y}
           />
         {/each}
+        {#if squaresPreview.settings.joinStitches > 0}
+          <rect
+            width={squaresPreview.SQUARE_SECTION_SIZE *
+              squaresPreview.settings.squareSize +
+              squaresPreview.settings.joinStitches *
+                squaresPreview.SQUARE_SECTION_SIZE}
+            height={squaresPreview.SQUARE_SECTION_SIZE *
+              squaresPreview.settings.squareSize +
+              squaresPreview.settings.joinStitches *
+                squaresPreview.SQUARE_SECTION_SIZE}
+            stroke-width={squaresPreview.SQUARE_SECTION_SIZE *
+              squaresPreview.settings.joinStitches}
+            stroke={squaresPreview.settings.joinColor}
+            fill="none"
+            x={square[0].x -
+              (squaresPreview.SQUARE_SECTION_SIZE *
+                squaresPreview.settings.joinStitches) /
+                2}
+            y={square[0].y -
+              (squaresPreview.SQUARE_SECTION_SIZE *
+                squaresPreview.settings.joinStitches) /
+                2}
+          />
+        {/if}
       </g>
     {/each}
   </svg>

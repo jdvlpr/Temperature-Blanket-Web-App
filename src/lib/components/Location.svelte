@@ -86,10 +86,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     if (day > days) day = 1;
   });
 
-  $effect(() => {
-    console.log($state.snapshot(location));
-  });
-
   // If the location was loaded from a saved project, then this gets run to setup initial variables.
   // 'hasLoaded' gets checked so that the initial setup function doesn't run again. This is important because otherwise it would get called on every keystroke.
   // NOTE: This is a bit of a hack, but it works.

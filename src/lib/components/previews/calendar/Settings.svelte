@@ -29,10 +29,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
   // let possibleDimensions = $derived(getPossibleDimensions({ factors }));
 
   function handelOkaySquareDesigner(e) {
-    calendarPreview.settings.squareSize = e.squareSize;
-    calendarPreview.settings.primaryTarget = e.primaryTarget;
-    calendarPreview.settings.secondaryTargets = e.secondaryTargets;
-    calendarPreview.settings.primaryTargetAsBackup = e.primaryTargetAsBackup;
+    calendarPreview.settings = {
+      ...calendarPreview.settings,
+      squareSize: e.squareSize,
+      primaryTarget: e.primaryTarget,
+      secondaryTargets: e.secondaryTargets,
+      primaryTargetAsBackup: e.primaryTargetAsBackup,
+    };
   }
 </script>
 

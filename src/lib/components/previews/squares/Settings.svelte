@@ -24,10 +24,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let targets = $derived(gauges.allCreated.map((n) => n.targets).flat());
 
   function handelOkaySquareDesigner(e) {
-    squaresPreview.settings.squareSize = e.squareSize;
-    squaresPreview.settings.primaryTarget = e.primaryTarget;
-    squaresPreview.settings.secondaryTargets = e.secondaryTargets;
-    squaresPreview.settings.primaryTargetAsBackup = e.primaryTargetAsBackup;
+    squaresPreview.settings = {
+      ...squaresPreview.settings,
+      squareSize: e.squareSize,
+      primaryTarget: e.primaryTarget,
+      secondaryTargets: e.secondaryTargets,
+      primaryTargetAsBackup: e.primaryTargetAsBackup,
+    };
   }
 </script>
 
@@ -42,7 +45,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 {/if}
 
 <button
-  class="btn hover:preset-tonal gap-1"
+  class="btn hover:preset-tonal"
   title="Edit Square Design"
   onclick={() =>
     modal.trigger({
@@ -63,7 +66,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     })}
 >
   <SquareSquareIcon />
-
   Square Design
 </button>
 
@@ -116,7 +118,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 {#if squaresPreview.details?.additionalSquares || squaresPreview.settings?.squaresBetweenMonthsCount}
   <button
-    class="btn hover:preset-tonal gap-1"
+    class="btn hover:preset-tonal"
     title="Choose a color for any additional squares"
     onclick={() =>
       modal.trigger({
@@ -135,5 +137,49 @@ If not, see <https://www.gnu.org/licenses/>. -->
   >
     <PipetteIcon />
     Color of Additional Squares
+  </button>
+{/if}
+
+<label class="label">
+  <span> Border Around Each Square</span>
+  <select
+    class="select w-fit min-w-[110px]"
+    id="sqrs-squares-between-months"
+    bind:value={squaresPreview.settings.joinStitches}
+  >
+    {#each Array(11) as _, i}
+      <option value={i}>
+        {#if i === 0}
+          None
+        {:else}
+          {i}
+          {pluralize('round', i)}
+        {/if}
+      </option>
+    {/each}
+  </select>
+</label>
+
+{#if squaresPreview.settings.joinStitches > 0}
+  <button
+    class="btn hover:preset-tonal text-left whitespace-pre-wrap"
+    title="Choose a color for join stitches"
+    onclick={() =>
+      modal.trigger({
+        type: 'component',
+        component: {
+          ref: ChangeColor,
+          props: {
+            hex: squaresPreview.settings.joinColor,
+            onChangeColor: ({ hex }) => {
+              squaresPreview.settings.joinColor = hex;
+              modal.close();
+            },
+          },
+        },
+      })}
+  >
+    <PipetteIcon />
+    Border Color
   </button>
 {/if}

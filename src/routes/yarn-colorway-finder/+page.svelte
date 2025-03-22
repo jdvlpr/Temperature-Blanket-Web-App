@@ -652,7 +652,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       </span>
 
                       <button
-                        class="text-lg leading-tight"
+                        class="text-left text-lg leading-tight"
                         onclick={() => {
                           window.navigator.clipboard.writeText(name);
                           toast.trigger({
