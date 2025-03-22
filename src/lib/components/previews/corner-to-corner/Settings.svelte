@@ -16,7 +16,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import NumberInputButton from '$lib/components/buttons/NumberInputButton.svelte';
   import { gauges, weather } from '$lib/state';
-  import { capitalizeFirstLetter } from '$lib/utils/other-utils';
+  import { capitalizeFirstLetter } from '$lib/utils';
   import { cornerToCornerPreview } from './state.svelte';
 
   let targets = $derived(gauges.allCreated.map((n) => n.targets).flat());
@@ -29,36 +29,44 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </p>
 </div>
 
-<label class="label">
-  <span>Color Using the {capitalizeFirstLetter(weather.grouping)}'s</span>
-  <select
-    class="select w-fit"
-    id="crnr-param"
-    bind:value={cornerToCornerPreview.settings.selectedTarget}
-  >
-    {#each targets as { id, label, icon }}
-      <option value={id}>{icon} {label} </option>
-    {/each}
-  </select>
-</label>
+<div
+  class="preset-outlined-surface-300-700 card flex flex-col items-start gap-4 p-4"
+>
+  <p class="text-2xl font-bold">Settings</p>
 
-<NumberInputButton
-  bind:value={cornerToCornerPreview.settings.lineLength}
-  title="Line Length"
-  icon={true}
-/>
-
-{#if cornerToCornerPreview.dimensionsOptions}
   <label class="label">
-    <span>Dimensions (W x H)</span>
-    <select
-      class="select w-fit min-w-[100px]"
-      id="crnr-dimensions"
-      bind:value={cornerToCornerPreview.settings.dimensions}
+    <span
+      >Color Lines Using the {capitalizeFirstLetter(weather.grouping)}'s</span
     >
-      {#each cornerToCornerPreview.dimensionsOptions as value}
-        <option {value}>{value}</option>
+    <select
+      class="select w-fit"
+      id="crnr-param"
+      bind:value={cornerToCornerPreview.settings.selectedTarget}
+    >
+      {#each targets as { id, label, icon }}
+        <option value={id}>{icon} {label} </option>
       {/each}
     </select>
   </label>
-{/if}
+
+  <NumberInputButton
+    bind:value={cornerToCornerPreview.settings.lineLength}
+    title="Line Length"
+    icon={true}
+  />
+
+  {#if cornerToCornerPreview.dimensionsOptions}
+    <label class="label">
+      <span>Size (width x height)</span>
+      <select
+        class="select w-fit min-w-[100px]"
+        id="crnr-dimensions"
+        bind:value={cornerToCornerPreview.settings.dimensions}
+      >
+        {#each cornerToCornerPreview.dimensionsOptions as value}
+          <option {value}>{value}</option>
+        {/each}
+      </select>
+    </label>
+  {/if}
+</div>

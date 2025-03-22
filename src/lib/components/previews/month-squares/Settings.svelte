@@ -17,7 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import NumberInputButton from '$lib/components/buttons/NumberInputButton.svelte';
   import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
   import { gauges, modal, weather } from '$lib/state';
-  import { capitalizeFirstLetter } from '$lib/utils/other-utils';
+  import { capitalizeFirstLetter, pluralize } from '$lib/utils';
   import { PipetteIcon } from '@lucide/svelte';
   import { monthSquaresPreview } from './state.svelte';
 
@@ -37,57 +37,83 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </p>
 {/if}
 
-<label class="label">
-  <span>Dimensions (W x H)</span>
-  <select
-    class="select w-fit min-w-[80px]"
-    id="msqs-dimensions"
-    bind:value={monthSquaresPreview.settings.dimensions}
-  >
-    {#each monthSquaresPreview.possibleDimensions as value}
-      <option {value}>{value}</option>
-    {/each}
-  </select>
-</label>
+<div
+  class="preset-outlined-surface-300-700 card flex flex-col items-start gap-4 p-4"
+>
+  <p class="text-2xl font-bold">Layout Settings</p>
 
-<label class="label">
-  <span>Color Using the {capitalizeFirstLetter(weather.grouping)}'s</span>
-  <select
-    class="select w-fit"
-    id="msqs-param"
-    bind:value={monthSquaresPreview.settings.selectedTarget}
-  >
-    {#each targets as { id, label, icon }}
-      <option value={id}>{icon} {label} </option>
-    {/each}
-  </select>
-</label>
+  <label class="label">
+    <span>Size (width x height)</span>
+    <select
+      class="select w-fit min-w-[210px]"
+      id="msqs-dimensions"
+      bind:value={monthSquaresPreview.settings.dimensions}
+    >
+      {#each monthSquaresPreview.possibleDimensions as value}
+        {@const [width, height] = value.split('x')}
+        <option {value}
+          >{width}
+          {pluralize('month', +width)} x {height}
+          {pluralize('month', +height)}</option
+        >
+      {/each}
+    </select>
+  </label>
+</div>
 
-<NumberInputButton
-  bind:value={monthSquaresPreview.settings.additionalRoundsPerSquare}
-  title="Additional Rounds Per Square"
-  min={0}
-  icon={`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-square-dashed size-6"><path d="M5 3a2 2 0 0 0-2 2"/><path d="M19 3a2 2 0 0 1 2 2"/><path d="M21 19a2 2 0 0 1-2 2"/><path d="M5 21a2 2 0 0 1-2-2"/><path d="M9 3h1"/><path d="M9 21h1"/><path d="M14 3h1"/><path d="M14 21h1"/><path d="M3 9v1"/><path d="M21 9v1"/><path d="M3 14v1"/><path d="M21 14v1"/></svg>`}
-/>
+<div
+  class="preset-outlined-surface-300-700 card flex flex-col items-start gap-4 p-4"
+>
+  <p class="text-2xl font-bold">Square Settings</p>
 
-<button
-  class="btn hover:preset-tonal gap-1"
-  title="Choose a Color"
-  onclick={() =>
-    modal.trigger({
-      type: 'component',
-      component: {
-        ref: ChangeColor,
-        props: {
-          hex: monthSquaresPreview.settings.additionalRoundsColor,
-          onChangeColor: ({ hex }) => {
-            monthSquaresPreview.settings.additionalRoundsColor = hex;
-            modal.close();
+  <NumberInputButton
+    bind:value={monthSquaresPreview.settings.additionalRoundsPerSquare}
+    title="Additional Rounds Per Square"
+    min={0}
+    icon={`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-square-dashed size-6"><path d="M5 3a2 2 0 0 0-2 2"/><path d="M19 3a2 2 0 0 1 2 2"/><path d="M21 19a2 2 0 0 1-2 2"/><path d="M5 21a2 2 0 0 1-2-2"/><path d="M9 3h1"/><path d="M9 21h1"/><path d="M14 3h1"/><path d="M14 21h1"/><path d="M3 9v1"/><path d="M21 9v1"/><path d="M3 14v1"/><path d="M21 14v1"/></svg>`}
+  />
+  <button
+    class="btn hover:preset-tonal"
+    title="Choose a Color"
+    onclick={() =>
+      modal.trigger({
+        type: 'component',
+        component: {
+          ref: ChangeColor,
+          props: {
+            hex: monthSquaresPreview.settings.additionalRoundsColor,
+            onChangeColor: ({ hex }) => {
+              monthSquaresPreview.settings.additionalRoundsColor = hex;
+              modal.close();
+            },
           },
         },
-      },
-    })}
+      })}
+  >
+    <PipetteIcon />
+    Color of Additional Rounds
+  </button>
+</div>
+
+<div
+  class="preset-outlined-surface-300-700 card flex flex-col items-start gap-4 p-4"
 >
-  <PipetteIcon />
-  Color of Additional Rounds
-</button>
+  <p class="text-2xl font-bold">Round Settings</p>
+
+  <label class="label">
+    <span
+      >Color Each Round Using the {capitalizeFirstLetter(
+        weather.grouping,
+      )}'s</span
+    >
+    <select
+      class="select w-fit"
+      id="msqs-param"
+      bind:value={monthSquaresPreview.settings.selectedTarget}
+    >
+      {#each targets as { id, label, icon }}
+        <option value={id}>{icon} {label} </option>
+      {/each}
+    </select>
+  </label>
+</div>

@@ -86,7 +86,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </Drawer.Root>
       </div>
 
-      <div class="flex w-full flex-wrap items-end justify-center gap-4">
+      <div class="flex w-full flex-wrap items-start justify-center gap-4">
         <previews.active.settingsComponent />
       </div>
 

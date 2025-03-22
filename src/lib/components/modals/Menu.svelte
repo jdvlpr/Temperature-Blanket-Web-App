@@ -451,7 +451,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </p>
       <div class="my-2 inline-flex flex-wrap items-center gap-2">
         <button
-          class="btn hover:preset-tonal gap-1"
+          class="btn hover:preset-tonal"
           onclick={() => {
             saveProject({ copy: true });
           }}

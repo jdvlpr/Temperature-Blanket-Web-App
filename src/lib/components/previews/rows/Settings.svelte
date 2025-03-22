@@ -52,63 +52,67 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/if}
 </div>
 
-<div class="text-left">
+<div
+  class="preset-outlined-surface-300-700 card flex flex-col items-start gap-4 p-4"
+>
+  <p class="text-2xl font-bold">Settings</p>
+
   <ToggleSwitchGroup
-    groupLabel={`Color Using the ${capitalizeFirstLetter(weather.grouping)}'s`}
+    groupLabel={`Color Each Row Using the ${capitalizeFirstLetter(weather.grouping)}'s`}
     {targets}
     bind:value={rowsPreview.settings.selectedTargets}
   />
-</div>
 
-<NumberInputButton
-  bind:value={rowsPreview.settings.stitchesPerRow}
-  title="Stitches Per Row"
-  icon={`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-ruler size-6"><path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z"/><path d="m14.5 12.5 2-2"/><path d="m11.5 9.5 2-2"/><path d="m8.5 6.5 2-2"/><path d="m17.5 15.5 2-2"/></svg>`}
-/>
-
-<label class="label">
-  <span>Stitches Per {capitalizeFirstLetter(weather.grouping)} Using</span>
-  <select
-    class="select w-fit"
-    id="rows-length-param"
-    bind:value={rowsPreview.settings.lengthTarget}
-  >
-    <option value="none">Entire Row Length</option>
-    {#each targets as { id, label, icon }}
-      <option value={id}>{icon} {label}</option>
-    {/each}
-    <option value="custom">Custom Length</option>
-  </select>
-</label>
-
-{#if rowsPreview.settings.lengthTarget === 'custom'}
   <NumberInputButton
-    bind:value={rowsPreview.settings.stitchesPerDay}
-    title="Stitches Per {capitalizeFirstLetter(weather.grouping)}"
-    icon={true}
+    bind:value={rowsPreview.settings.stitchesPerRow}
+    title="Stitches Per Row"
+    icon={`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-ruler size-6"><path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z"/><path d="m14.5 12.5 2-2"/><path d="m11.5 9.5 2-2"/><path d="m8.5 6.5 2-2"/><path d="m17.5 15.5 2-2"/></svg>`}
   />
-{/if}
 
-{#if rowsPreview.countOfAdditionalStitches}
-  <button
-    class="btn hover:preset-tonal gap-1"
-    title="Choose a color for any additional stitches"
-    onclick={() =>
-      modal.trigger({
-        type: 'component',
-        component: {
-          ref: ChangeColor,
-          props: {
-            hex: rowsPreview.settings.extrasColor,
-            onChangeColor: ({ hex }) => {
-              rowsPreview.settings.extrasColor = hex;
-              modal.close();
+  <label class="label">
+    <span>Stitches Per {capitalizeFirstLetter(weather.grouping)} Using</span>
+    <select
+      class="select w-fit"
+      id="rows-length-param"
+      bind:value={rowsPreview.settings.lengthTarget}
+    >
+      <option value="none">Entire Row Length</option>
+      {#each targets as { id, label, icon }}
+        <option value={id}>{icon} {label}</option>
+      {/each}
+      <option value="custom">Custom Length</option>
+    </select>
+  </label>
+
+  {#if rowsPreview.settings.lengthTarget === 'custom'}
+    <NumberInputButton
+      bind:value={rowsPreview.settings.stitchesPerDay}
+      title="Stitches Per {capitalizeFirstLetter(weather.grouping)}"
+      icon={true}
+    />
+  {/if}
+
+  {#if rowsPreview.countOfAdditionalStitches}
+    <button
+      class="btn hover:preset-tonal"
+      title="Choose a color for any additional stitches"
+      onclick={() =>
+        modal.trigger({
+          type: 'component',
+          component: {
+            ref: ChangeColor,
+            props: {
+              hex: rowsPreview.settings.extrasColor,
+              onChangeColor: ({ hex }) => {
+                rowsPreview.settings.extrasColor = hex;
+                modal.close();
+              },
             },
           },
-        },
-      })}
-  >
-    <PipetteIcon />
-    Color of Additional Stitches
-  </button>
-{/if}
+        })}
+    >
+      <PipetteIcon />
+      Color of Additional Stitches
+    </button>
+  {/if}
+</div>

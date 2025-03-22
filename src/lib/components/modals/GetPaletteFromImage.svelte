@@ -573,7 +573,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </button>
 
       <button
-        class="btn hover:preset-tonal gap-1"
+        class="btn hover:preset-tonal"
         onclick={() => {
           matchingYarnColors = matchingYarnColors.filter(
             (color) => color.locked,

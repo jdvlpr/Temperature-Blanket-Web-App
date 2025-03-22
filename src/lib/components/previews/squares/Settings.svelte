@@ -18,7 +18,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import SquareDesigner from '$lib/components/modals/SquareDesigner.svelte';
   import { gauges, modal } from '$lib/state';
   import { pluralize } from '$lib/utils';
-  import { PipetteIcon, SquareSquareIcon } from '@lucide/svelte';
+  import {
+    PipetteIcon,
+    SquareDashedIcon,
+    SquareSquareIcon,
+  } from '@lucide/svelte';
   import { squaresPreview } from './state.svelte';
 
   let targets = $derived(gauges.allCreated.map((n) => n.targets).flat());
@@ -44,142 +48,154 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </div>
 {/if}
 
-<button
-  class="btn hover:preset-tonal"
-  title="Edit Square Design"
-  onclick={() =>
-    modal.trigger({
-      type: 'component',
-      component: {
-        ref: SquareDesigner,
-        props: {
-          targets,
-          squareSize: squaresPreview.settings.squareSize,
-          primaryTarget: squaresPreview.settings.primaryTarget,
-          secondaryTargets: $state.snapshot(
-            squaresPreview.settings.secondaryTargets,
-          ),
-          primaryTargetAsBackup: squaresPreview.settings.primaryTargetAsBackup,
-          onOkay: handelOkaySquareDesigner,
-        },
-      },
-    })}
+<div
+  class="preset-outlined-surface-300-700 card flex flex-col items-start gap-4 p-4"
 >
-  <SquareSquareIcon />
-  Square Design
-</button>
+  <p class="text-2xl font-bold">Layout Settings</p>
 
-<label class="label">
-  <span>Number of Columns</span>
-  <select
-    class="select w-fit min-w-[60px]"
-    id="sqrs-columns"
-    bind:value={squaresPreview.settings.columns}
-  >
-    {#each Array(300) as _, i}
-      {#if i > 0}
+  <label class="label">
+    Number of Columns
+    <select
+      class="select w-fit min-w-[60px]"
+      id="sqrs-columns"
+      bind:value={squaresPreview.settings.columns}
+    >
+      {#each Array(300) as _, i}
+        {#if i > 0}
+          <option value={i}>
+            {i}
+          </option>
+        {/if}
+      {/each}
+    </select>
+  </label>
+
+  <label class="label">
+    <span>Squares at Beginning</span>
+    <select
+      class="select w-fit min-w-[60px]"
+      id="sqrs-squares-at-beginning"
+      bind:value={squaresPreview.settings.squaresAtBeginning}
+    >
+      {#each Array(51) as _, i}
         <option value={i}>
           {i}
         </option>
-      {/if}
-    {/each}
-  </select>
-</label>
+      {/each}
+    </select>
+  </label>
 
-<label class="label">
-  <span>Squares at Beginning</span>
-  <select
-    class="select w-fit min-w-[60px]"
-    id="sqrs-squares-at-beginning"
-    bind:value={squaresPreview.settings.squaresAtBeginning}
-  >
-    {#each Array(51) as _, i}
-      <option value={i}>
-        {i}
-      </option>
-    {/each}
-  </select>
-</label>
+  <label class="label">
+    <span>Squares Between Months</span>
+    <select
+      class="select w-fit min-w-[60px]"
+      id="sqrs-squares-between-months"
+      bind:value={squaresPreview.settings.squaresBetweenMonthsCount}
+    >
+      {#each Array(51) as _, i}
+        <option value={i}>
+          {i}
+        </option>
+      {/each}
+    </select>
+  </label>
+</div>
 
-<label class="label">
-  <span>Squares Between Months</span>
-  <select
-    class="select w-fit min-w-[60px]"
-    id="sqrs-squares-between-months"
-    bind:value={squaresPreview.settings.squaresBetweenMonthsCount}
-  >
-    {#each Array(51) as _, i}
-      <option value={i}>
-        {i}
-      </option>
-    {/each}
-  </select>
-</label>
+<div
+  class="preset-outlined-surface-300-700 card flex flex-col items-start gap-4 p-4"
+>
+  <p class="text-2xl font-bold">Square Settings</p>
 
-{#if squaresPreview.details?.additionalSquares || squaresPreview.settings?.squaresBetweenMonthsCount}
   <button
     class="btn hover:preset-tonal"
-    title="Choose a color for any additional squares"
+    title="Edit Square Design"
     onclick={() =>
       modal.trigger({
         type: 'component',
         component: {
-          ref: ChangeColor,
+          ref: SquareDesigner,
           props: {
-            hex: squaresPreview.settings.additionalSquaresColor,
-            onChangeColor: ({ hex }) => {
-              squaresPreview.settings.additionalSquaresColor = hex;
-              modal.close();
-            },
+            targets,
+            squareSize: squaresPreview.settings.squareSize,
+            primaryTarget: squaresPreview.settings.primaryTarget,
+            secondaryTargets: $state.snapshot(
+              squaresPreview.settings.secondaryTargets,
+            ),
+            primaryTargetAsBackup:
+              squaresPreview.settings.primaryTargetAsBackup,
+            onOkay: handelOkaySquareDesigner,
           },
         },
       })}
   >
-    <PipetteIcon />
-    Color of Additional Squares
+    <SquareSquareIcon />
+    Customize Square Design
   </button>
-{/if}
 
-<label class="label">
-  <span> Border Around Each Square</span>
-  <select
-    class="select w-fit min-w-[110px]"
-    id="sqrs-squares-between-months"
-    bind:value={squaresPreview.settings.joinStitches}
-  >
-    {#each Array(11) as _, i}
-      <option value={i}>
-        {#if i === 0}
-          None
-        {:else}
-          {i}
-          {pluralize('round', i)}
-        {/if}
-      </option>
-    {/each}
-  </select>
-</label>
-
-{#if squaresPreview.settings.joinStitches > 0}
-  <button
-    class="btn hover:preset-tonal text-left whitespace-pre-wrap"
-    title="Choose a color for join stitches"
-    onclick={() =>
-      modal.trigger({
-        type: 'component',
-        component: {
-          ref: ChangeColor,
-          props: {
-            hex: squaresPreview.settings.joinColor,
-            onChangeColor: ({ hex }) => {
-              squaresPreview.settings.joinColor = hex;
-              modal.close();
+  {#if squaresPreview.details?.additionalSquares || squaresPreview.settings?.squaresBetweenMonthsCount}
+    <button
+      class="btn hover:preset-tonal"
+      title="Choose a color for any additional squares"
+      onclick={() =>
+        modal.trigger({
+          type: 'component',
+          component: {
+            ref: ChangeColor,
+            props: {
+              hex: squaresPreview.settings.additionalSquaresColor,
+              onChangeColor: ({ hex }) => {
+                squaresPreview.settings.additionalSquaresColor = hex;
+                modal.close();
+              },
             },
           },
-        },
-      })}
-  >
-    <PipetteIcon />
-    Border Color
-  </button>
-{/if}
+        })}
+    >
+      <PipetteIcon />
+      Color of Additional Squares
+    </button>
+  {/if}
+
+  <label class="label">
+    Border Size
+    <select
+      class="select w-fit min-w-[110px]"
+      bind:value={squaresPreview.settings.joinStitches}
+    >
+      {#each Array(11) as _, i}
+        <option value={i}>
+          {#if i === 0}
+            None
+          {:else}
+            {i}
+            {pluralize('round', i)}
+          {/if}
+        </option>
+      {/each}
+    </select>
+  </label>
+
+  {#if squaresPreview.settings.joinStitches > 0}
+    <button
+      class="btn hover:preset-tonal text-left whitespace-pre-wrap"
+      title="Choose a color for the border stitches around each square"
+      onclick={() =>
+        modal.trigger({
+          type: 'component',
+          component: {
+            ref: ChangeColor,
+            props: {
+              hex: squaresPreview.settings.joinColor,
+              onChangeColor: ({ hex }) => {
+                squaresPreview.settings.joinColor = hex;
+                modal.close();
+              },
+            },
+          },
+        })}
+    >
+      <SquareDashedIcon />
+      Border Color
+    </button>
+  {/if}
+</div>

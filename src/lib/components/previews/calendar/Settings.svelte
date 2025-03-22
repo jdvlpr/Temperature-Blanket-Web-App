@@ -21,7 +21,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { DAYS_OF_THE_WEEK } from '$lib/constants';
   import { gauges, modal, weather } from '$lib/state';
   import { pluralize } from '$lib/utils';
-  import { PipetteIcon, SquareSquareIcon } from '@lucide/svelte';
+  import {
+    Grid2x2CheckIcon,
+    PipetteIcon,
+    SquareDashedIcon,
+    SquareSquareIcon,
+  } from '@lucide/svelte';
 
   let targets = $derived(gauges.allCreated.map((n) => n.targets).flat());
 
@@ -44,124 +49,94 @@ If not, see <https://www.gnu.org/licenses/>. -->
   Squares are arranged in a calendar-like grid, grouped by month.
 </p>
 
-<label class="label">
-  <span>Dimensions (W x H)</span>
-  <select
-    class="select w-fit min-w-[80px]"
-    id="clnr-dimensions"
-    bind:value={calendarPreview.settings.dimensions}
-  >
-    {#each calendarPreview.possibleDimensions as value}
-      <option {value}>{value}</option>
-    {/each}
-  </select>
-</label>
-
-<button
-  class="btn hover:preset-tonal gap-1"
-  title="Edit Square Design"
-  onclick={async () => {
-    modal.trigger({
-      type: 'component',
-      component: {
-        ref: SquareDesigner,
-        props: {
-          targets,
-          squareSize: calendarPreview.settings.squareSize,
-          primaryTarget: calendarPreview.settings.primaryTarget,
-          secondaryTargets: $state.snapshot(
-            calendarPreview.settings.secondaryTargets,
-          ),
-          primaryTargetAsBackup: calendarPreview.settings.primaryTargetAsBackup,
-          onOkay: handelOkaySquareDesigner,
-        },
-      },
-    });
-  }}
+<div
+  class="preset-outlined-surface-300-700 card flex flex-col items-start gap-4 p-4"
 >
-  <SquareSquareIcon />
+  <p class="text-2xl font-bold">Layout Settings</p>
 
-  Square Design</button
->
+  <label class="label">
+    Size (width x height)
+    <select
+      class="select w-fit min-w-[210px]"
+      bind:value={calendarPreview.settings.dimensions}
+    >
+      {#each calendarPreview.possibleDimensions as value}
+        {@const [width, height] = value.split('x')}
+        <option {value}
+          >{width}
+          {pluralize('month', +width)} x {height}
+          {pluralize('month', +height)}</option
+        >
+      {/each}
+    </select>
+  </label>
 
-<label class="label">
-  <span>Weeks Start On</span>
-  <select
-    class="select w-fit"
-    bind:value={calendarPreview.settings.weekStartCode}
-    onchange={() => {
-      if (weather.grouping === 'week')
-        weather.monthGroupingStartDay = calendarPreview.settings.weekStartCode;
-    }}
-  >
-    {#each DAYS_OF_THE_WEEK as { value, label }}
-      <option {value}>{label}</option>
-    {/each}
-  </select>
-</label>
-
-<div class="flex items-center gap-2">
   <ToggleSwitch
     bind:checked={calendarPreview.settings.monthPadding}
     label="Space around months"
   />
-</div>
 
-<button
-  class="btn hover:preset-tonal gap-1"
-  title="Choose a Color"
-  onclick={() =>
-    modal.trigger({
-      type: 'component',
-      component: {
-        ref: ChangeColor,
-        props: {
-          hex: calendarPreview.settings.additionalSquaresColor,
-          onChangeColor: ({ hex }) => {
-            calendarPreview.settings.additionalSquaresColor = hex;
-            modal.close();
+  <label class="label">
+    <span>Weeks Start On</span>
+    <select
+      class="select w-fit"
+      bind:value={calendarPreview.settings.weekStartCode}
+      onchange={() => {
+        if (weather.grouping === 'week')
+          weather.monthGroupingStartDay =
+            calendarPreview.settings.weekStartCode;
+      }}
+    >
+      {#each DAYS_OF_THE_WEEK as { value, label }}
+        <option {value}>{label}</option>
+      {/each}
+    </select>
+  </label>
+</div>
+<div
+  class="preset-outlined-surface-300-700 card flex flex-col items-start gap-4 p-4"
+>
+  <p class="text-2xl font-bold">Square Settings</p>
+
+  <button
+    class="btn hover:preset-tonal"
+    title="Edit Square Design"
+    onclick={async () => {
+      modal.trigger({
+        type: 'component',
+        component: {
+          ref: SquareDesigner,
+          props: {
+            targets,
+            squareSize: calendarPreview.settings.squareSize,
+            primaryTarget: calendarPreview.settings.primaryTarget,
+            secondaryTargets: $state.snapshot(
+              calendarPreview.settings.secondaryTargets,
+            ),
+            primaryTargetAsBackup:
+              calendarPreview.settings.primaryTargetAsBackup,
+            onOkay: handelOkaySquareDesigner,
           },
         },
-      },
-    })}
->
-  <PipetteIcon />
-  Color of Additional Squares
-</button>
-
-<label class="label">
-  <span> Border Around Each Square</span>
-  <select
-    class="select w-fit min-w-[110px]"
-    id="sqrs-squares-between-months"
-    bind:value={calendarPreview.settings.joinStitches}
+      });
+    }}
   >
-    {#each Array(11) as _, i}
-      <option value={i}>
-        {#if i === 0}
-          None
-        {:else}
-          {i}
-          {pluralize('round', i)}
-        {/if}
-      </option>
-    {/each}
-  </select>
-</label>
+    <SquareSquareIcon />
+    Customize Square Design</button
+  >
 
-{#if calendarPreview.settings.joinStitches > 0}
   <button
-    class="btn hover:preset-tonal text-left whitespace-pre-wrap"
-    title="Choose a color for join stitches"
+    class="btn hover:preset-tonal"
+    title="Choose a Color"
     onclick={() =>
       modal.trigger({
         type: 'component',
         component: {
           ref: ChangeColor,
           props: {
-            hex: calendarPreview.settings.joinColor,
+            hex: calendarPreview.settings.additionalSquaresColor,
             onChangeColor: ({ hex }) => {
-              calendarPreview.settings.joinColor = hex;
+              calendarPreview.settings.additionalSquaresColor = hex;
               modal.close();
             },
           },
@@ -169,6 +144,49 @@ If not, see <https://www.gnu.org/licenses/>. -->
       })}
   >
     <PipetteIcon />
-    Border Color
+    Color of Additional Squares
   </button>
-{/if}
+
+  <label class="label">
+    Border Size
+    <select
+      class="select w-fit min-w-[110px]"
+      bind:value={calendarPreview.settings.joinStitches}
+    >
+      {#each Array(11) as _, i}
+        <option value={i}>
+          {#if i === 0}
+            None
+          {:else}
+            {i}
+            {pluralize('round', i)}
+          {/if}
+        </option>
+      {/each}
+    </select>
+  </label>
+
+  {#if calendarPreview.settings.joinStitches > 0}
+    <button
+      class="btn hover:preset-tonal"
+      title="Choose a color for the border stitches around each square"
+      onclick={() =>
+        modal.trigger({
+          type: 'component',
+          component: {
+            ref: ChangeColor,
+            props: {
+              hex: calendarPreview.settings.joinColor,
+              onChangeColor: ({ hex }) => {
+                calendarPreview.settings.joinColor = hex;
+                modal.close();
+              },
+            },
+          },
+        })}
+    >
+      <SquareDashedIcon />
+      Border Color
+    </button>
+  {/if}
+</div>

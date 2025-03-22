@@ -47,47 +47,57 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </div>
 {/if}
 
-<label class="label">
-  <span>Color Using the {capitalizeFirstLetter(weather.grouping)}'s</span>
-  <select
-    class="select w-fit"
-    id="cosq-param"
-    bind:value={continuousSquarePreview.settings.selectedTarget}
-  >
-    {#each targets as { id, label, icon }}
-      <option value={id}>{icon} {label} </option>
-    {/each}
-  </select>
-</label>
+<div
+  class="preset-outlined-surface-300-700 card flex flex-col items-start gap-4 p-4"
+>
+  <p class="text-2xl font-bold">Settings</p>
 
-<NumberInputButton
-  bind:value={continuousSquarePreview.settings.stitchesPerDay}
-  title="Stitches Per {capitalizeFirstLetter(weather.grouping)}"
-  icon={true}
-/>
+  <label class="label">
+    <span
+      >Color Stitches Using the {capitalizeFirstLetter(
+        weather.grouping,
+      )}'s</span
+    >
+    <select
+      class="select w-fit"
+      id="cosq-param"
+      bind:value={continuousSquarePreview.settings.selectedTarget}
+    >
+      {#each targets as { id, label, icon }}
+        <option value={id}>{icon} {label} </option>
+      {/each}
+    </select>
+  </label>
 
-{#if continuousSquarePreview.details}
-  {#if continuousSquarePreview.details.countOfAdditionalStitches}
-    <button
-      class="btn hover:preset-tonal gap-1"
-      title="Choose a Color"
-      onclick={() =>
-        modal.trigger({
-          type: 'component',
-          component: {
-            ref: ChangeColor,
-            props: {
-              hex: continuousSquarePreview.settings.extrasColor,
-              onChangeColor: ({ hex }) => {
-                continuousSquarePreview.settings.extrasColor = hex;
-                modal.close();
+  <NumberInputButton
+    bind:value={continuousSquarePreview.settings.stitchesPerDay}
+    title="Stitches Per {capitalizeFirstLetter(weather.grouping)}"
+    icon={true}
+  />
+
+  {#if continuousSquarePreview.details}
+    {#if continuousSquarePreview.details.countOfAdditionalStitches}
+      <button
+        class="btn hover:preset-tonal"
+        title="Choose a Color"
+        onclick={() =>
+          modal.trigger({
+            type: 'component',
+            component: {
+              ref: ChangeColor,
+              props: {
+                hex: continuousSquarePreview.settings.extrasColor,
+                onChangeColor: ({ hex }) => {
+                  continuousSquarePreview.settings.extrasColor = hex;
+                  modal.close();
+                },
               },
             },
-          },
-        })}
-    >
-      <PipetteIcon />
-      Color of Additional Stitches
-    </button>
+          })}
+      >
+        <PipetteIcon />
+        Color of Additional Stitches
+      </button>
+    {/if}
   {/if}
-{/if}
+</div>

@@ -33,8 +33,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div class="p-4 sm:min-w-[600px]">
-  <div class="flex flex-col gap-2 items-center mt-6 sm:mt-4">
-    <div class="flex flex-wrap gap-2 justify-center items-end">
+  <div class="mt-6 flex flex-col items-center gap-2 sm:mt-4">
+    <div class="flex flex-wrap items-end justify-center gap-2">
       <label class="label">
         <span class="flex items-center gap-1">
           <ArrowDownWideNarrow class="size-4" />
@@ -63,7 +63,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </label>
 
       <button
-        class="btn hover:preset-tonal gap-1"
+        class="btn hover:preset-tonal"
         onclick={() => {
           _colors.reverse();
           key = !key;

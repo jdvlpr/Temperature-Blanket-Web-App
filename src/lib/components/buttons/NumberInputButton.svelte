@@ -33,7 +33,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <button
-  class="btn hover:preset-tonal gap-1"
+  class="btn hover:preset-tonal"
   title="Set {title}"
   onclick={() =>
     modal.trigger({

@@ -44,99 +44,119 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </div>
 {/if}
 
-<label class="label">
-  <span>Dimensions (W x H)</span>
-  <select
-    class="select w-fit min-w-[80px]"
-    id="mrws-dimensions"
-    bind:value={monthRowsPreview.settings.dimensions}
-  >
-    {#each monthRowsPreview.possibleDimensions as value}
-      <option {value}>{value}</option>
-    {/each}
-  </select>
-</label>
+<div
+  class="preset-outlined-surface-300-700 card flex flex-col items-start gap-4 p-4"
+>
+  <p class="text-2xl font-bold">Layout Settings</p>
 
-<label class="label">
-  <span>Direction</span>
-  <select
-    class="select w-fit min-w-[160px]"
-    id="mrws-direction"
-    bind:value={monthRowsPreview.settings.direction}
-  >
-    <option value="left-to-right">Left to Right</option>
-    <option value="top-to-bottom">Top to Bottom</option>
-  </select>
-</label>
+  <label class="label">
+    <span>Size (width x height)</span>
+    <select
+      class="select w-fit min-w-[210px]"
+      id="mrws-dimensions"
+      bind:value={monthRowsPreview.settings.dimensions}
+    >
+      {#each monthRowsPreview.possibleDimensions as value}
+        {@const [width, height] = value.split('x')}
+        <option {value}
+          >{width}
+          {pluralize('month', +width)} x {height}
+          {pluralize('month', +height)}</option
+        >
+      {/each}
+    </select>
+  </label>
 
-<div class="text-left">
+  <label class="label">
+    <span>Direction</span>
+    <select
+      class="select w-fit min-w-[210px]"
+      id="mrws-direction"
+      bind:value={monthRowsPreview.settings.direction}
+    >
+      <option value="left-to-right">→ Left to Right</option>
+      <option value="top-to-bottom">↓ Top to Bottom</option>
+    </select>
+  </label>
+</div>
+
+<div
+  class="preset-outlined-surface-300-700 card flex flex-col items-start gap-4 p-4"
+>
+  <p class="text-2xl font-bold">Month Settings</p>
+  <NumberInputButton
+    bind:value={monthRowsPreview.settings.borderStitches}
+    min={0}
+    title="Border Size"
+    icon={`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-square-dashed size-6"><path d="M5 3a2 2 0 0 0-2 2"/><path d="M19 3a2 2 0 0 1 2 2"/><path d="M21 19a2 2 0 0 1-2 2"/><path d="M5 21a2 2 0 0 1-2-2"/><path d="M9 3h1"/><path d="M9 21h1"/><path d="M14 3h1"/><path d="M14 21h1"/><path d="M3 9v1"/><path d="M21 9v1"/><path d="M3 14v1"/><path d="M21 14v1"/></svg>`}
+  />
+
+  {#if monthRowsPreview.settings.borderStitches > 0}
+    <button
+      class="btn hover:preset-tonal"
+      title="Choose a Color for Border Stitches"
+      onclick={() =>
+        modal.trigger({
+          type: 'component',
+          component: {
+            ref: ChangeColor,
+            props: {
+              hex: monthRowsPreview.settings.borderColor,
+              onChangeColor: ({ hex }) => {
+                monthRowsPreview.settings.borderColor = hex;
+                modal.close();
+              },
+            },
+          },
+        })}
+      ><svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke-width="1.5"
+        stroke="currentColor"
+        class="h-6 w-6"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M15 11.25l1.5 1.5.75-.75V8.758l2.276-.61a3 3 0 10-3.675-3.675l-.61 2.277H12l-.75.75 1.5 1.5M15 11.25l-8.47 8.47c-.34.34-.8.53-1.28.53s-.94.19-1.28.53l-.97.97-.75-.75.97-.97c.34-.34.53-.8.53-1.28s.19-.94.53-1.28L12.75 9M15 11.25L12.75 9"
+        />
+      </svg>
+      Color of Border Stitches</button
+    >
+  {/if}
+</div>
+
+<div
+  class="preset-outlined-surface-300-700 card flex flex-col items-start gap-4 p-4"
+>
+  <p class="text-2xl font-bold">Row Settings</p>
+
   <ToggleSwitchGroup
-    groupLabel={`Color Using the ${capitalizeFirstLetter(weather.grouping)}'s`}
+    groupLabel={`Color Each Row Using the ${capitalizeFirstLetter(weather.grouping)}'s`}
     {targets}
     bind:value={monthRowsPreview.settings.selectedTargets}
   />
-</div>
 
-<NumberInputButton
-  bind:value={monthRowsPreview.settings.stitchesPerRow}
-  title="Stitches Per Row"
-  icon={`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-ruler size-6"><path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z"/><path d="m14.5 12.5 2-2"/><path d="m11.5 9.5 2-2"/><path d="m8.5 6.5 2-2"/><path d="m17.5 15.5 2-2"/></svg>`}
-/>
+  <NumberInputButton
+    bind:value={monthRowsPreview.settings.stitchesPerRow}
+    title="Stitches Per Row"
+    icon={`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-ruler size-6"><path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z"/><path d="m14.5 12.5 2-2"/><path d="m11.5 9.5 2-2"/><path d="m8.5 6.5 2-2"/><path d="m17.5 15.5 2-2"/></svg>`}
+  />
 
-<button
-  class="btn hover:preset-tonal gap-1"
-  title="Choose a Color for Extra Rows"
-  onclick={() =>
-    modal.trigger({
-      type: 'component',
-      component: {
-        ref: ChangeColor,
-        props: {
-          hex: monthRowsPreview.settings.extrasColor,
-          onChangeColor: ({ hex }) => {
-            monthRowsPreview.settings.extrasColor = hex;
-            modal.close();
-          },
-        },
-      },
-    })}
-  ><svg
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    stroke-width="1.5"
-    stroke="currentColor"
-    class="h-6 w-6"
-  >
-    <path
-      stroke-linecap="round"
-      stroke-linejoin="round"
-      d="M15 11.25l1.5 1.5.75-.75V8.758l2.276-.61a3 3 0 10-3.675-3.675l-.61 2.277H12l-.75.75 1.5 1.5M15 11.25l-8.47 8.47c-.34.34-.8.53-1.28.53s-.94.19-1.28.53l-.97.97-.75-.75.97-.97c.34-.34.53-.8.53-1.28s.19-.94.53-1.28L12.75 9M15 11.25L12.75 9"
-    />
-  </svg>
-  Color of Extra Rows</button
->
-
-<NumberInputButton
-  bind:value={monthRowsPreview.settings.borderStitches}
-  min={0}
-  title="Border Stitches"
-  icon={`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-square-dashed size-6"><path d="M5 3a2 2 0 0 0-2 2"/><path d="M19 3a2 2 0 0 1 2 2"/><path d="M21 19a2 2 0 0 1-2 2"/><path d="M5 21a2 2 0 0 1-2-2"/><path d="M9 3h1"/><path d="M9 21h1"/><path d="M14 3h1"/><path d="M14 21h1"/><path d="M3 9v1"/><path d="M21 9v1"/><path d="M3 14v1"/><path d="M21 14v1"/></svg>`}
-/>
-
-{#if monthRowsPreview.settings.borderStitches > 0}
   <button
-    class="btn hover:preset-tonal gap-1"
-    title="Choose a Color for Border Stitches"
+    class="btn hover:preset-tonal"
+    title="Choose a Color for Extra Rows"
     onclick={() =>
       modal.trigger({
         type: 'component',
         component: {
           ref: ChangeColor,
           props: {
-            hex: monthRowsPreview.settings.borderColor,
+            hex: monthRowsPreview.settings.extrasColor,
             onChangeColor: ({ hex }) => {
-              monthRowsPreview.settings.borderColor = hex;
+              monthRowsPreview.settings.extrasColor = hex;
               modal.close();
             },
           },
@@ -156,6 +176,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
         d="M15 11.25l1.5 1.5.75-.75V8.758l2.276-.61a3 3 0 10-3.675-3.675l-.61 2.277H12l-.75.75 1.5 1.5M15 11.25l-8.47 8.47c-.34.34-.8.53-1.28.53s-.94.19-1.28.53l-.97.97-.75-.75.97-.97c.34-.34.53-.8.53-1.28s.19-.94.53-1.28L12.75 9M15 11.25L12.75 9"
       />
     </svg>
-    Color of Border Stitches</button
+    Color of Extra Rows</button
   >
-{/if}
+</div>

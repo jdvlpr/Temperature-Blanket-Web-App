@@ -59,7 +59,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 />
 
 {#snippet tableOfContents()}
-  <nav data-testid="toc" class="toc space-y-4 p-4 max-w-[60vw]">
+  <nav data-testid="toc" class="toc max-w-[60vw] space-y-4 p-4">
     <div class="font-bold">Table of Contents</div>
     <ul class="toc-list space-y-2">
       <li class="toc-list-item block">
@@ -117,7 +117,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <AppShell pageName="">
   {#snippet stickyHeader()}
-    <div class="hidden lg:inline-flex mx-auto"><AppLogo /></div>
+    <div class="mx-auto hidden lg:inline-flex"><AppLogo /></div>
     <div class="sm:hidden">
       <Modal
         open={openTableOfContents}
@@ -136,7 +136,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <div class="flex flex-wrap items-center gap-1">
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              class="w-6 h-6"
+              class="h-6 w-6"
               viewBox="0 0 24 24"
               ><path
                 fill="currentColor"
@@ -158,24 +158,24 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <main class="pb-8">
       <a
         href="/blog"
-        class="btn hover:preset-tonal gap-1 mb-2 max-lg:mx-2 max-lg:mt-2"
+        class="btn hover:preset-tonal mb-2 max-lg:mx-2 max-lg:mt-2"
         ><ArrowLeftIcon /> Blog</a
       >
-      <div class="pb-4 text-left flex gap-4">
-        <div class="w-full flex flex-col gap-8">
+      <div class="flex gap-4 pb-4 text-left">
+        <div class="flex w-full flex-col gap-8">
           <Card>
             {#snippet header()}
               <div>
                 <img
                   src="/images/blog-images/2024-02-09-how-to-plan-a-temperature-blanket/cover.jpg"
-                  class="h-36 object-cover w-full"
+                  class="h-36 w-full object-cover"
                   alt="How to Plan a Temperature Blanket"
                 />
               </div>
             {/snippet}
 
             {#snippet content()}
-              <div class="pb-4 px-2">
+              <div class="px-2 pb-4">
                 <div class="flex flex-col gap-4">
                   <div class="mt-4 flex flex-col gap-2">
                     <h2 class="h2 text-gradient">
@@ -192,7 +192,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     some of these questions:
                   </p>
                   <p
-                    class="p-4 preset-filled-surface-100-900 rounded-container"
+                    class="preset-filled-surface-100-900 rounded-container p-4"
                   >
                     🤔
                     <span class="italic">Which colors should I pick?</span>
@@ -207,18 +207,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     >
                     <a
                       href="/blog/what-is-a-temperature-blanket"
-                      class="underline italic"
+                      class="italic underline"
                       title="What is a Temperature Blanket?"
                       >What even is a temperature blanket?</a
                     >
                   </p>
 
                   <div
-                    class="flex flex-wrap gap-4 items-center justify-center variant-outline-warning p-4 rounded-container"
+                    class="variant-outline-warning rounded-container flex flex-wrap items-center justify-center gap-4 p-4"
                   >
                     <img
                       src="/images/blog-images/2024-02-09-how-to-plan-a-temperature-blanket/profile.webp"
-                      class="rounded-full h-24 w-24"
+                      class="h-24 w-24 rounded-full"
                       alt="profile"
                     />
                     <p class="sm:flex-1">
@@ -235,7 +235,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
                   <h2
                     id="the-project-blanket-scarf-socks"
-                    class="font-bold text-3xl scroll-mt-[70px] text-secondary-800-200"
+                    class="text-secondary-800-200 scroll-mt-[70px] text-3xl font-bold"
                   >
                     The Project: Blanket? Scarf? Socks?
                   </h2>
@@ -255,7 +255,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
                   <h2
                     id="the-place-location-location-location"
-                    class="font-bold text-3xl scroll-mt-[70px] text-secondary-800-200"
+                    class="text-secondary-800-200 scroll-mt-[70px] text-3xl font-bold"
                   >
                     The Place: Location, Location, Location
                   </h2>
@@ -270,13 +270,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         under that a section called Location:
                       </p>
                       <img
-                        class="my-2 w-full h-auto max-h-fit"
+                        class="my-2 h-auto max-h-fit w-full"
                         src="/images/blog-images/2024-02-09-how-to-plan-a-temperature-blanket/location-temperature-blanket.png"
                         alt="Location Section"
                       />
                     </div>
                     <div
-                      class="preset-filled-surface-100-900 p-4 rounded-container md:basis-1/3 h-fit"
+                      class="preset-filled-surface-100-900 rounded-container h-fit p-4 md:basis-1/3"
                     >
                       <p>
                         🤔
@@ -314,7 +314,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
                   <h2
                     id="the-time-this-year-last-year-50-years-ago"
-                    class="font-bold text-3xl scroll-mt-[70px] text-secondary-800-200"
+                    class="text-secondary-800-200 scroll-mt-[70px] text-3xl font-bold"
                   >
                     The Time: This Year? Last Year? 50 Years Ago?
                   </h2>
@@ -330,7 +330,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     approach.
                   </p>
                   <div class="flex flex-wrap gap-4">
-                    <div class="flex-1 flex flex-col gap-4">
+                    <div class="flex flex-1 flex-col gap-4">
                       <p>
                         I recommend selecting last year or an older year—at
                         least in the beginning when you're planning your
@@ -348,7 +348,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       </p>
                     </div>
                     <div
-                      class="preset-filled-surface-100-900 p-4 rounded-container md:basis-1/3 h-fit w-fit"
+                      class="preset-filled-surface-100-900 rounded-container h-fit w-fit p-4 md:basis-1/3"
                     >
                       <p>
                         🤔
@@ -362,7 +362,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   </div>
 
                   <div
-                    class="variant-outline-primary p-4 rounded-container w-fit"
+                    class="variant-outline-primary rounded-container w-fit p-4"
                   >
                     <p class="font-bold">💡 Handy Hints</p>
                     <div class="ml-4">
@@ -378,7 +378,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   <div>
                     <h2
                       id="the-weather-whether-weather-matters"
-                      class="font-bold text-3xl scroll-mt-[70px] text-secondary-800-200"
+                      class="text-secondary-800-200 scroll-mt-[70px] text-3xl font-bold"
                     >
                       The Weather: Whether Weather Matters
                     </h2>
@@ -397,7 +397,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   <div class="flex flex-wrap gap-4">
                     <div class="flex-1">
                       <img
-                        class="mb-2 w-full h-auto max-h-fit"
+                        class="mb-2 h-auto max-h-fit w-full"
                         src="/images/blog-images/2024-02-09-how-to-plan-a-temperature-blanket/weather-section.png"
                         alt="Weather Section"
                       />
@@ -413,7 +413,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       </div>
                     </div>
                     <div
-                      class="preset-filled-surface-100-900 p-4 rounded-container md:basis-1/3 h-fit"
+                      class="preset-filled-surface-100-900 rounded-container h-fit p-4 md:basis-1/3"
                     >
                       <p>
                         🤔
@@ -450,7 +450,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   </p>
 
                   <div
-                    class="variant-outline-primary p-4 rounded-container w-fit"
+                    class="variant-outline-primary rounded-container w-fit p-4"
                   >
                     <p class="font-bold">💡 Handy Hints</p>
                     <div class="ml-4">
@@ -471,7 +471,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
                   <h2
                     id="the-yarn-colors-galore"
-                    class="font-bold text-3xl scroll-mt-[70px] text-secondary-800-200"
+                    class="text-secondary-800-200 scroll-mt-[70px] text-3xl font-bold"
                   >
                     The Yarn: Colors Galore
                   </h2>
@@ -513,7 +513,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       in the toolbar to choose how many and which colorways to use.
                     </p>
                     <img
-                      class="w-full max-w-[400px] h-auto max-h-fit"
+                      class="h-auto max-h-fit w-full max-w-[400px]"
                       src="/images/blog-images/2024-02-09-how-to-plan-a-temperature-blanket/colors-toolbar.png"
                       alt="Colors Toolbar"
                     />
@@ -525,12 +525,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     </p>
                     <div class="flex flex-wrap gap-4">
                       <img
-                        class="max-w-64 w-full h-auto max-h-fit"
+                        class="h-auto max-h-fit w-full max-w-64"
                         src="/images/blog-images/2024-02-09-how-to-plan-a-temperature-blanket/find-matching-yarn.png"
                         alt="Find Matching Yarn"
                       />
                       <img
-                        class="max-w-64 w-full h-auto max-h-fit"
+                        class="h-auto max-h-fit w-full max-w-64"
                         src="/images/blog-images/2024-02-09-how-to-plan-a-temperature-blanket/individual-color-tools.png"
                         alt="Find Matching Yarn"
                       />
@@ -573,7 +573,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   </div>
 
                   <div
-                    class="variant-outline-primary p-4 rounded-container w-fit"
+                    class="variant-outline-primary rounded-container w-fit p-4"
                   >
                     <p class="font-bold">💡 Handy Hints</p>
                     <div class="ml-4">
@@ -585,7 +585,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                           open other tools in the Project Planner.
                         </p>
                         <img
-                          class="max-w-64 w-full h-auto max-h-fit"
+                          class="h-auto max-h-fit w-full max-w-64"
                           src="/images/blog-images/2024-02-09-how-to-plan-a-temperature-blanket/default-yarn.png"
                           alt="Default Yarn"
                         />
@@ -615,7 +615,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     started.
                   </p>
                   <img
-                    class="w-full h-auto max-h-fit"
+                    class="h-auto max-h-fit w-full"
                     src="/images/blog-images/2024-02-09-how-to-plan-a-temperature-blanket/ranges-configuration.png"
                     alt="Ranges Configuration"
                   />
@@ -627,7 +627,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   </p>
 
                   <div class="flex flex-wrap gap-4">
-                    <div class="flex-1 flex flex-col gap-4">
+                    <div class="flex flex-1 flex-col gap-4">
                       <p>
                         By default, the Project Planner assumes a couple things,
                         but you can change these if you want:
@@ -652,7 +652,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       </p>
                     </div>
                     <div
-                      class="preset-filled-surface-100-900 p-4 rounded-container md:basis-1/2 h-fit"
+                      class="preset-filled-surface-100-900 rounded-container h-fit p-4 md:basis-1/2"
                     >
                       <p>
                         🤔
@@ -691,7 +691,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   </p>
 
                   <div
-                    class="variant-outline-primary p-4 rounded-container w-fit"
+                    class="variant-outline-primary rounded-container w-fit p-4"
                   >
                     <p class="font-bold">💡 Handy Hints</p>
                     <div class="ml-4">
@@ -700,7 +700,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         also want to adjust the preview to use the same weather
                         parameter in the Preview section.
                       </p>
-                      <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                      <div class="grid grid-cols-1 gap-2 md:grid-cols-2">
                         <img
                           class="w-full max-w-[280px]"
                           src="/images/blog-images/2024-02-09-how-to-plan-a-temperature-blanket/balance-focus.png"
@@ -722,7 +722,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
                   <h2
                     id="the-preview-a-sneak-peek"
-                    class="font-bold text-3xl scroll-mt-[70px] text-secondary-800-200"
+                    class="text-secondary-800-200 scroll-mt-[70px] text-3xl font-bold"
                   >
                     The Preview: A Sneak Peek
                   </h2>
@@ -736,16 +736,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     These are the options for the different kinds of layouts the
                     Project Planner can show you.
                   </p>
-                  <div class="flex flex-wrap gap-4 justify-center items-center">
+                  <div class="flex flex-wrap items-center justify-center gap-4">
                     <img
-                      class="max-w-sm h-auto max-h-fit w-full"
+                      class="h-auto max-h-fit w-full max-w-sm"
                       src="/images/blog-images/2024-02-09-how-to-plan-a-temperature-blanket/previews.png"
                       alt="Preview Layout Options"
                     />
                   </div>
-                  <div class="flex flex-wrap gap-4 justify-center items-center">
+                  <div class="flex flex-wrap items-center justify-center gap-4">
                     <img
-                      class="max-w-sm w-full h-auto max-h-fit"
+                      class="h-auto max-h-fit w-full max-w-sm"
                       src="/images/blog-images/2024-02-09-how-to-plan-a-temperature-blanket/preview.png"
                       alt="Preview"
                     />
@@ -759,7 +759,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   </p>
 
                   <div
-                    class="variant-outline-primary p-4 rounded-container w-fit"
+                    class="variant-outline-primary rounded-container w-fit p-4"
                   >
                     <p class="font-bold">💡 Handy Hints</p>
                     <div class="ml-4">
@@ -781,7 +781,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   </div>
 
                   <div class="flex flex-wrap gap-4">
-                    <div class="flex-1 flex flex-col gap-4">
+                    <div class="flex flex-1 flex-col gap-4">
                       <p>
                         Seeing and adjusting the preview can help you make
                         decisions before you start your project. You may decide
@@ -800,7 +800,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       </p>
                     </div>
                     <div
-                      class="preset-filled-surface-100-900 p-4 rounded-container md:basis-1/2 h-fit"
+                      class="preset-filled-surface-100-900 rounded-container h-fit p-4 md:basis-1/2"
                     >
                       <p>
                         🤔
@@ -820,7 +820,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
                   <h2
                     id="the-end-get-started"
-                    class="font-bold text-3xl scroll-mt-[70px] text-secondary-800-200"
+                    class="text-secondary-800-200 scroll-mt-[70px] text-3xl font-bold"
                   >
                     The End: Get Started!
                   </h2>
@@ -833,7 +833,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   </p>
 
                   <div
-                    class="variant-outline-primary p-4 rounded-container w-fit"
+                    class="variant-outline-primary rounded-container w-fit p-4"
                   >
                     <p class="font-bold">💡 Handy Hint</p>
                     <div class="">
@@ -863,7 +863,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   </p>
 
                   <div
-                    class="p-4 rounded-container preset-tonal-tertiary border border-tertiary-500 flex flex-col gap-4"
+                    class="rounded-container preset-tonal-tertiary border-tertiary-500 flex flex-col gap-4 border p-4"
                   >
                     <p>
                       🎥 Are you a video creator? Let's collaborate! Make a
@@ -881,9 +881,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </Card>
         </div>
         <div
-          class="hidden self-start w-1/5 min-w-[200px] h-auto sm:inline-block sticky top-16"
+          class="sticky top-16 hidden h-auto w-1/5 min-w-[200px] self-start sm:inline-block"
         >
-          <div class="pb-20 max-h-[90svh] overflow-auto">
+          <div class="max-h-[90svh] overflow-auto pb-20">
             {@render tableOfContents()}
           </div>
         </div>

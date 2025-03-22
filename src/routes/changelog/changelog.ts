@@ -24,7 +24,7 @@ export const entries: ChangelogItem[] = [
     notes: [
       {
         icon: ICONS.design,
-        text: 'Option to add borders around each square for the squares Preview type',
+        text: 'Option to add borders around each square for the Squares and Calendar preview type',
         title: 'Added Feature: Border Around Squares',
       },
     ],

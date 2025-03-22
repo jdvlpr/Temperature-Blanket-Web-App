@@ -29,7 +29,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     if (!weather.data.length || !gauges.allCreated.length) return;
     tick().then(() => {
       const months = [];
-      const borders = [
+      monthRowsPreview.borders = [
         {
           x:
             (monthRowsPreview.settings.borderStitches *
@@ -116,7 +116,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 monthRowsPreview.STITCH_SIZE;
             }
           }
-          borders.push({
+          monthRowsPreview.borders.push({
             x:
               x -
               (monthRowsPreview.settings.borderStitches *

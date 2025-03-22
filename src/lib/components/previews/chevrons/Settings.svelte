@@ -25,29 +25,35 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 {#if chevronsPreview.details.rows}
-  <p class="italic w-full">
+  <p class="w-full italic">
     {chevronsPreview.details.rows} rows. The length of the side of a chevron is {chevronsPreview
       .settings.chevronSideLength}
     {pluralize('stitch', chevronsPreview.settings.chevronSideLength, 'es')}.
   </p>
 {/if}
 
-<div class="text-left">
-  <ToggleSwitchGroup
-    groupLabel={`Color Using the ${capitalizeFirstLetter(weather.grouping)}'s`}
-    {targets}
-    bind:value={chevronsPreview.settings.selectedTargets}
+<div
+  class="preset-outlined-surface-300-700 card flex flex-col items-start gap-4 p-4"
+>
+  <p class="text-2xl font-bold">Settings</p>
+
+  <div class="text-left">
+    <ToggleSwitchGroup
+      groupLabel={`Color Each Row Using the ${capitalizeFirstLetter(weather.grouping)}'s`}
+      {targets}
+      bind:value={chevronsPreview.settings.selectedTargets}
+    />
+  </div>
+
+  <NumberInputButton
+    bind:value={chevronsPreview.settings.chevronsPerRow}
+    title="Chevrons Per Row"
+    icon={true}
+  />
+
+  <NumberInputButton
+    bind:value={chevronsPreview.settings.chevronSideLength}
+    title="Chevron Side Length"
+    icon={true}
   />
 </div>
-
-<NumberInputButton
-  bind:value={chevronsPreview.settings.chevronsPerRow}
-  title="Chevrons Per Row"
-  icon={true}
-/>
-
-<NumberInputButton
-  bind:value={chevronsPreview.settings.chevronSideLength}
-  title="Chevron Side Length"
-  icon={true}
-/>

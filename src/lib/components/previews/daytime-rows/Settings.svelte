@@ -17,19 +17,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import NumberInputButton from '$lib/components/buttons/NumberInputButton.svelte';
   import DataTable from '$lib/components/datatable/DataTable.svelte';
   import Expand from '$lib/components/Expand.svelte';
-  import { ICONS } from '$lib/constants';
   import { gauges, locations, weather } from '$lib/state';
   import { capitalizeFirstLetter } from '$lib/utils/other-utils';
+  import { DownloadIcon } from '@lucide/svelte';
   import { TableHandler } from '@vincjo/datatables';
   import { slide } from 'svelte/transition';
   import { daytimeRowsPreview } from './state.svelte';
-  import { DownloadIcon } from '@lucide/svelte';
 
   let targets = $derived(gauges.allCreated.map((n) => n.targets).flat());
 
   let isTableExpanded = $state(false);
 
   let table = $state();
+
+  let tableIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-table inline size-6"><path d="M12 3v18"/><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/></svg>`;
 
   $effect(() => {
     daytimeRowsPreview.tableData;
@@ -160,65 +161,71 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </div>
 </div>
 
-<label class="label">
-  <span>Position of Daytime Stitches</span>
-  <select
-    class="select w-fit min-w-[150px]"
-    id="rsun-daytime-position"
-    bind:value={daytimeRowsPreview.settings.daytimePosition}
-  >
-    <option value={'left'}>← Left Side</option>
-    <option value={'right'}>→ Right Side</option>
-    <option value={'center'}>→← Center</option>
-    <option value={'sides'}>←→ Sides</option>
-  </select>
-</label>
+<div
+  class="preset-outlined-surface-300-700 card flex flex-col items-start gap-4 p-4"
+>
+  <p class="text-2xl font-bold">Settings</p>
 
-<label class="label">
-  <span
-    >Color Daytime ({daytimeRowsPreview.daytimeLabel}) Using the {capitalizeFirstLetter(
-      weather.grouping,
-    )}'s</span
-  >
-  <select
-    class="select w-fit"
-    id="rsun-left-params"
-    bind:value={daytimeRowsPreview.settings.daytimeTarget}
-  >
-    {#each targets as { id, label, icon }}
-      <option value={id}>{icon} {label}</option>
-    {/each}
-  </select>
-</label>
+  <label class="label">
+    <span>Position of Daytime Stitches</span>
+    <select
+      class="select w-fit min-w-[150px]"
+      id="rsun-daytime-position"
+      bind:value={daytimeRowsPreview.settings.daytimePosition}
+    >
+      <option value={'left'}>← Left Side</option>
+      <option value={'right'}>→ Right Side</option>
+      <option value={'center'}>→← Center</option>
+      <option value={'sides'}>←→ Sides</option>
+    </select>
+  </label>
 
-<label class="label">
-  <span
-    >Color Night ({daytimeRowsPreview.nightLabel}) Using the {capitalizeFirstLetter(
-      weather.grouping,
-    )}'s</span
-  >
-  <select
-    class="select w-fit"
-    id="rsun-right-params"
-    bind:value={daytimeRowsPreview.settings.nightTarget}
-  >
-    {#each targets as { id, label, icon }}
-      <option value={id}>{icon} {label}</option>
-    {/each}
-  </select>
-</label>
+  <label class="label">
+    <span
+      >Color Daytime ({daytimeRowsPreview.daytimeLabel}) Using the {capitalizeFirstLetter(
+        weather.grouping,
+      )}'s</span
+    >
+    <select
+      class="select w-fit"
+      id="rsun-left-params"
+      bind:value={daytimeRowsPreview.settings.daytimeTarget}
+    >
+      {#each targets as { id, label, icon }}
+        <option value={id}>{icon} {label}</option>
+      {/each}
+    </select>
+  </label>
 
-<NumberInputButton
-  bind:value={daytimeRowsPreview.settings.stitchesPerRow}
-  title="Stitches Per Row"
-  icon={`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-ruler size-6"><path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z"/><path d="m14.5 12.5 2-2"/><path d="m11.5 9.5 2-2"/><path d="m8.5 6.5 2-2"/><path d="m17.5 15.5 2-2"/></svg>`}
-/>
+  <label class="label">
+    <span
+      >Color Night ({daytimeRowsPreview.nightLabel}) Using the {capitalizeFirstLetter(
+        weather.grouping,
+      )}'s</span
+    >
+    <select
+      class="select w-fit"
+      id="rsun-right-params"
+      bind:value={daytimeRowsPreview.settings.nightTarget}
+    >
+      {#each targets as { id, label, icon }}
+        <option value={id}>{icon} {label}</option>
+      {/each}
+    </select>
+  </label>
+
+  <NumberInputButton
+    bind:value={daytimeRowsPreview.settings.stitchesPerRow}
+    title="Stitches Per Row"
+    icon={`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-ruler size-6"><path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z"/><path d="m14.5 12.5 2-2"/><path d="m11.5 9.5 2-2"/><path d="m8.5 6.5 2-2"/><path d="m17.5 15.5 2-2"/></svg>`}
+  />
+</div>
 
 <div class="w-full">
   <Expand
     bind:isExpanded={isTableExpanded}
-    more="Show Stitches Table"
-    less="Hide Stitches Table"
+    more="{tableIcon} Show Stitches Table"
+    less="{tableIcon} Hide Stitches Table"
   />
 </div>
 {#if isTableExpanded}

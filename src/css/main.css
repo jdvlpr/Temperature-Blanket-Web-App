@@ -137,10 +137,10 @@ th div {
 }
 
 .autocomplete {
-  @apply bg-surface-50 dark:bg-surface-950 shadow-lg overflow-hidden border border-primary-500 rounded-container z-1000;
+  @apply bg-surface-50 dark:bg-surface-950 border-primary-500 rounded-container z-1000 overflow-hidden border shadow-lg;
 
   & > div {
-    @apply px-2 py-3 cursor-pointer bg-surface-50 dark:bg-surface-950 border-y border-surface-100-900;
+    @apply bg-surface-50 dark:bg-surface-950 border-surface-100-900 cursor-pointer border-y px-2 py-3;
   }
 
   & > .group {
@@ -177,15 +177,16 @@ th div {
 }
 
 .link {
-  @apply underline text-secondary-800 dark:text-secondary-50;
+  @apply text-secondary-800 dark:text-secondary-50 underline;
 }
 
 .text-gradient {
-  @apply bg-linear-to-br from-secondary-200 to-secondary-800 dark:from-secondary-50 dark:to-secondary-200 bg-clip-text text-transparent dark:text-transparent box-decoration-clone;
+  @apply from-secondary-200 to-secondary-800 dark:from-secondary-50 dark:to-secondary-200 bg-linear-to-br box-decoration-clone bg-clip-text text-transparent dark:text-transparent;
 }
 
 .label {
   width: auto;
+  text-align: left;
 }
 
 .btn-icon > * {
