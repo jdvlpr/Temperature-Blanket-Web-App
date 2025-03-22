@@ -72,7 +72,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
         isWeatherSquare =
           !squaresPreview.additionalSquaresIndexes.includes(squareIndex);
 
-        // Calculate the starting coordinates of the square
+        // ***
+        //  Calculate the starting coordinates of the square
+        // ***
+
+        //  offset the square x position if it has a border
         const xJoinOffset =
           squaresPreview.settings.joinStitches *
             2 *
@@ -87,6 +91,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               squaresPreview.SQUARE_SECTION_SIZE) +
           xJoinOffset;
 
+        //  offset the square y position if it has a border
         const yJoinOffset =
           squaresPreview.settings.joinStitches *
             2 *
@@ -100,6 +105,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             (squaresPreview.settings.squareSize *
               squaresPreview.SQUARE_SECTION_SIZE) +
           yJoinOffset;
+
         // Loop through each square section
         for (
           let squareSectionIndex = 0, x = xStart, y = yStart;

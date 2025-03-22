@@ -220,6 +220,7 @@ export class SquaresPreviewClass {
         .hex()
         .substring(1)}`;
     }
+
     return hash;
   });
 
@@ -345,12 +346,15 @@ export class SquaresPreviewClass {
           this.settings.joinStitches = joinStitches;
         }
 
+        // Get the color
+        // The characters are from the divider position 'till the end of the hash
         let joinColor = chroma(hash.substring(dividerIndex + 1)).hex();
         if (chroma.valid(joinColor)) {
           this.settings.joinColor = joinColor;
         }
       }
     }
+
     previews.activeId = this.id;
   }
 }

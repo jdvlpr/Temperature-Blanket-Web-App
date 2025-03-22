@@ -20,6 +20,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { calendarPreview } from '$lib/components/previews/calendar/state.svelte';
   import { DAYS_OF_THE_WEEK } from '$lib/constants';
   import { gauges, modal, weather } from '$lib/state';
+  import { pluralize } from '$lib/utils';
   import { PipetteIcon, SquareSquareIcon } from '@lucide/svelte';
 
   let targets = $derived(gauges.allCreated.map((n) => n.targets).flat());
@@ -127,3 +128,47 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <PipetteIcon />
   Color of Additional Squares
 </button>
+
+<label class="label">
+  <span> Border Around Each Square</span>
+  <select
+    class="select w-fit min-w-[110px]"
+    id="sqrs-squares-between-months"
+    bind:value={calendarPreview.settings.joinStitches}
+  >
+    {#each Array(11) as _, i}
+      <option value={i}>
+        {#if i === 0}
+          None
+        {:else}
+          {i}
+          {pluralize('round', i)}
+        {/if}
+      </option>
+    {/each}
+  </select>
+</label>
+
+{#if calendarPreview.settings.joinStitches > 0}
+  <button
+    class="btn hover:preset-tonal text-left whitespace-pre-wrap"
+    title="Choose a color for join stitches"
+    onclick={() =>
+      modal.trigger({
+        type: 'component',
+        component: {
+          ref: ChangeColor,
+          props: {
+            hex: calendarPreview.settings.joinColor,
+            onChangeColor: ({ hex }) => {
+              calendarPreview.settings.joinColor = hex;
+              modal.close();
+            },
+          },
+        },
+      })}
+  >
+    <PipetteIcon />
+    Border Color
+  </button>
+{/if}

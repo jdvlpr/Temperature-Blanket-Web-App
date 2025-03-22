@@ -87,12 +87,37 @@ If not, see <https://www.gnu.org/licenses/>. -->
           isWeatherSquare = true;
         }
 
+        // ***
+        //  Calculate the starting coordinates of the square
+        // ***
+
+        //  offset the square x position if it has a border
+        const xJoinOffset =
+          calendarPreview.settings.joinStitches *
+            2 *
+            calendarPreview.squareSectionSize *
+            column +
+          calendarPreview.settings.joinStitches *
+            calendarPreview.squareSectionSize;
+
         const xStart =
+          xJoinOffset +
           column *
             (calendarPreview.settings.squareSize *
               calendarPreview.squareSectionSize) +
           columnPadding;
+
+        //  offset the square y position if it has a border
+        const yJoinOffset =
+          calendarPreview.settings.joinStitches *
+            2 *
+            calendarPreview.squareSectionSize *
+            row +
+          calendarPreview.settings.joinStitches *
+            calendarPreview.squareSectionSize;
+
         const yStart =
+          yJoinOffset +
           row *
             (calendarPreview.settings.squareSize *
               calendarPreview.squareSectionSize) +
@@ -192,6 +217,30 @@ If not, see <https://www.gnu.org/licenses/>. -->
             {y}
           />
         {/each}
+        {#if calendarPreview.settings.joinStitches > 0}
+          <rect
+            width={calendarPreview.squareSectionSize *
+              calendarPreview.settings.squareSize +
+              calendarPreview.settings.joinStitches *
+                calendarPreview.squareSectionSize}
+            height={calendarPreview.squareSectionSize *
+              calendarPreview.settings.squareSize +
+              calendarPreview.settings.joinStitches *
+                calendarPreview.squareSectionSize}
+            stroke-width={calendarPreview.squareSectionSize *
+              calendarPreview.settings.joinStitches}
+            stroke={calendarPreview.settings.joinColor}
+            fill="none"
+            x={square[0].x -
+              (calendarPreview.squareSectionSize *
+                calendarPreview.settings.joinStitches) /
+                2}
+            y={square[0].y -
+              (calendarPreview.squareSectionSize *
+                calendarPreview.settings.joinStitches) /
+                2}
+          />
+        {/if}
       </g>
     {/each}
   </svg>

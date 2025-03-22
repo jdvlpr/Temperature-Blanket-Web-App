@@ -89,6 +89,8 @@ export class CalendarPreviewClass {
     monthPadding: 0,
     additionalSquaresColor: '#f0f3f3',
     primaryTargetAsBackup: 1,
+    joinStitches: 0,
+    joinColor: '#e8e3e2',
   });
 
   // *******************
@@ -187,27 +189,44 @@ export class CalendarPreviewClass {
     }),
   );
 
+  joinWidth = $derived(
+    this.settings.joinStitches *
+      2 *
+      this.squareSectionSize *
+      this.dimensionsWidth *
+      this.weekLength,
+  );
+
   width = $derived(
     this.dimensionsWidth *
       this.weekLength *
       this.settings.squareSize *
       this.squareSectionSize +
-      this.dimensionsWidth * this.monthPadding,
+      this.dimensionsWidth * this.monthPadding +
+      this.joinWidth,
   );
 
-  height = $derived.by(() => {
-    let extra = this.needsExtraWeek ? 1 : 0;
-    let height =
+  extraWeekHeight = $derived(this.needsExtraWeek ? 1 : 0);
+
+  joinHeight = $derived(
+    this.settings.joinStitches *
+      2 *
+      this.squareSectionSize *
       this.dimensionsHeight *
-        (this.weeksInLongestMonth + extra) *
+      (this.weeksInLongestMonth + this.extraWeekHeight),
+  );
+
+  height = $derived(
+    this.joinHeight +
+      this.dimensionsHeight *
+        (this.weeksInLongestMonth + this.extraWeekHeight) *
         this.settings.squareSize *
         calendarPreview.squareSectionSize +
       (this.dimensionsHeight - 1) * this.monthPadding -
       this.dimensionsHeight *
         this.settings.squareSize *
-        calendarPreview.squareSectionSize; // I don't understand the minus bit at the end but it works
-    return height;
-  });
+        calendarPreview.squareSectionSize,
+  ); // I don't understand the minus bit at the end but it works
 
   // *******************
   // URL hash derived from settings
@@ -216,17 +235,31 @@ export class CalendarPreviewClass {
   hash = $derived.by(() => {
     let hash = '&';
     hash += `${this.id}=`;
+
     hash += `${this.settings.primaryTarget}(${this.settings.squareSize}${CHARACTERS_FOR_URL_HASH.separator}${this.settings.dimensions}${
       CHARACTERS_FOR_URL_HASH.separator
     }${this.settings.weekStartCode}${CHARACTERS_FOR_URL_HASH.separator}${this.settings.monthPadding ? 1 : 0}${
       CHARACTERS_FOR_URL_HASH.separator
     }${chroma(this.settings.additionalSquaresColor).hex().substring(1)})`;
+
     hash += `${this.settings.primaryTargetAsBackup}`;
+
     if (this.settings.secondaryTargets) {
       this.settings.secondaryTargets.forEach((item) => {
         hash += `${item.targetId}(${item.indexes.join(CHARACTERS_FOR_URL_HASH.separator)})`;
       });
     }
+
+    // Border around each square
+    // e.g. `!3ff0000`
+    if (this.settings.joinStitches > 0) {
+      hash += `!${this.settings.joinStitches}${CHARACTERS_FOR_URL_HASH.separator}${chroma(
+        this.settings.joinColor,
+      )
+        .hex()
+        .substring(1)}`;
+    }
+
     return hash;
   });
 
@@ -235,7 +268,8 @@ export class CalendarPreviewClass {
   // *******************
   load(hash) {
     let startIndex = [],
-      endIndex = [];
+      endIndex = [],
+      exclamationIndex = [];
     const separatorIndex = [];
     for (let i = 0; i < hash.length; i++) {
       if (hash[i] === '(') startIndex.push(i);
@@ -245,6 +279,7 @@ export class CalendarPreviewClass {
       )
         separatorIndex.push(i);
       if (hash[i] === ')') endIndex.push(i);
+      if (hash[i] === '!') exclamationIndex.push(i);
     }
     if (!startIndex || !separatorIndex || !endIndex) return; // format of hash was wrong, so stop processing
 
@@ -300,6 +335,41 @@ export class CalendarPreviewClass {
         }
       }
     }
+
+    // Stitches around each square (join stitches and join color)
+    if (exclamationIndex.length) {
+      // This is the first exclamation mark
+      let currentIndex = exclamationIndex[0] + 1;
+
+      // look for the divider
+      let dividerIndex = hash.indexOf(
+        CHARACTERS_FOR_URL_HASH.separator,
+        currentIndex,
+      );
+
+      if (dividerIndex === -1) {
+        // if no divider, look for the alt divider
+        dividerIndex = hash.indexOf(
+          CHARACTERS_FOR_URL_HASH.separator_alt,
+          currentIndex,
+        );
+      }
+
+      if (dividerIndex) {
+        const joinStitches = +hash.substring(currentIndex, dividerIndex);
+        if (typeof joinStitches === 'number') {
+          this.settings.joinStitches = joinStitches;
+        }
+
+        // Get the color
+        // The characters are from the divider position 'till the end of the hash
+        let joinColor = chroma(hash.substring(dividerIndex + 1)).hex();
+        if (chroma.valid(joinColor)) {
+          this.settings.joinColor = joinColor;
+        }
+      }
+    }
+
     previews.activeId = this.id;
   }
 }
