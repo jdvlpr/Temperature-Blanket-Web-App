@@ -23,6 +23,17 @@ export const entries: ChangelogItem[] = [
     date: 'March, 2025',
     notes: [
       {
+        icon: ICONS.design,
+        text: 'Option to add borders around each square for the squares Preview type',
+        title: 'Added Feature: Border Around Squares',
+      },
+    ],
+    version: '5.2.0',
+  },
+  {
+    date: 'March, 2025',
+    notes: [
+      {
         icon: ICONS.checkCircle,
         text: `Added 70 colorways`,
         title: 'Added Yarn: Purl Soho - Linen Quill',
