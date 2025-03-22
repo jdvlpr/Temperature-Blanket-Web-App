@@ -52,7 +52,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 </script>
 
-{#if previews.active && weather.data.length}
+{#if previews.active}
   <PreviewSelect />
 
   <div class="flex flex-col items-start justify-center gap-2">

@@ -415,9 +415,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {#key weather.grouping}
             <Previews />
           {/key}
-          {#if weather.data.length}
-            <SectionNavigationButtons thisSectionIndex={4} />
-          {/if}
+
+          <SectionNavigationButtons thisSectionIndex={4} />
+
           <p class="my-4 text-center text-sm max-lg:mx-2">
             Real projects will look different than the preview. Patterns not
             provided.
