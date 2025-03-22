@@ -31,7 +31,6 @@ export const entries: ChangelogItem[] = [
     version: '5.2.0',
   },
   {
-    date: 'March, 2025',
     notes: [
       {
         icon: ICONS.checkCircle,
