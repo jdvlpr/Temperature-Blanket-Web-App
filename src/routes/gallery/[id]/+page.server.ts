@@ -17,6 +17,8 @@ import { PUBLIC_WORDPRESS_BASE_URL } from '$env/static/public';
 import { recordPageView } from '$lib/utils';
 import type { PageServerLoad } from './$types';
 
+export const prerender = true;
+
 export const load: PageServerLoad = async (event) => {
   return { stream: getProject(event) };
 };
