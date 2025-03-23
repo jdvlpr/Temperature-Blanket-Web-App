@@ -20,7 +20,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ToastProvider from '$lib/components/ToastProvider.svelte';
   import { consentToMSClarityCookies, modal, toast } from '$lib/state';
   import { handleKeyDown, initializeLocalStorage, privacy } from '$lib/utils';
-  import { RocketIcon, XIcon } from '@lucide/svelte';
+  import { RocketIcon, RssIcon, XIcon } from '@lucide/svelte';
   import { onMount, type Snippet } from 'svelte';
   import '../css/main.css';
 
@@ -162,8 +162,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     href="/blog/2025-03-20-version-5"
     class="btn bg-primary-50-950 hover:preset-tonal"
   >
-    <RocketIcon />
-    Version 5 - What's New?</a
+    <RssIcon />
+    Version 5 | See what's new</a
   >
   <button class="btn hover:preset-tonal" onclick={() => bannerElement.remove()}
     ><XIcon />Close</button
