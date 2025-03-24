@@ -45,10 +45,13 @@ export function getRanges({
     if (colors.length === ranges.length) newRanges = ranges;
     else {
       let prop = rangeOptions.auto.optimization;
-      if (gauges.activeGauge?.id !== 'temp') {
+      if (prop === 'ranges') {
         // Only temp gauges have multiple props (tmax, tavg, tmin)
         // So if it's not a temp gauge, use the gauge id (e.g. prcp, snow)
-        prop = gauges.activeGauge?.id;
+        if (gauges.activeGauge?.id !== 'temp') prop = gauges.activeGauge?.id;
+        // Otherwise if it is a temp gauge, use tmax as default
+        // I don't think the following condition should ever be reached, but it's here just in case
+        else prop = 'tmax';
       }
 
       newRanges = getEvenlyDistributedRangeValuesWithEqualDayCount({
