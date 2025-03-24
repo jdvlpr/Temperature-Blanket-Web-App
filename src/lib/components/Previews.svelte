@@ -44,9 +44,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <div class="flex flex-col items-start justify-center gap-2">
     {#if gauges.activeGauge?.colors}
       <div class="flex w-full flex-col items-center justify-center gap-4">
-        <!-- {#key previewUpdateKey} -->
         <previews.active.previewComponent />
-        <!-- {/key} -->
 
         <Drawer.Root bind:open={drawerState.weatherDetails}>
           <Drawer.Portal>
