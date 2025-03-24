@@ -23,6 +23,16 @@ export const entries: ChangelogItem[] = [
     date: 'March, 2025',
     notes: [
       {
+        icon: ICONS.wrench,
+        text: `An issue was introduced in v5.0.0 where weather data from Meteostat was slightly different than previous versions. This happened because the location's elevation was not being included in the weather data request. This update fixes the issue by including the location's elevation in the weather request, so weather data from Meteostat should be the same as before the v5.0.0 update.`,
+        title: 'Fixed Meteostat Weather Data Issue',
+      },
+    ],
+    version: '5.2.2',
+  },
+  {
+    notes: [
+      {
         icon: ICONS.design,
         text: 'Option to add borders around each square for the Squares and Calendar preview type',
         title: 'Added Feature: Border Around Squares',

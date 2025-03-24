@@ -18,7 +18,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { weather } from '$lib/state';
   import { CircleArrowLeftIcon, CircleArrowRightIcon } from '@lucide/svelte';
   import type { TableHandler } from '@vincjo/datatables';
-  import { onMount, type Snippet } from 'svelte';
+  import { type Snippet } from 'svelte';
 
   interface Props {
     table: TableHandler;

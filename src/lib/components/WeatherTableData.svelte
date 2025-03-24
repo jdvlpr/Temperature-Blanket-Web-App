@@ -84,7 +84,10 @@
                 : ''}
             >
               <button
-                class={[weather.grouping === 'day' && 'hover:preset-tonal btn']}
+                class={[
+                  weather.grouping === 'day' && 'hover:preset-tonal btn',
+                  weather.grouping === 'week' && 'disabled:opacity-100',
+                ]}
                 disabled={weather.grouping === 'week'}
                 onclick={() => {
                   if (id === 'dayt') {
