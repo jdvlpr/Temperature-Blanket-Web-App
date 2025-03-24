@@ -138,7 +138,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       width = cornerToCornerPreview.width;
       height = cornerToCornerPreview.height;
       cornerToCornerPreview.sections = sections;
-    }, 10);
+    });
   });
 </script>
 
