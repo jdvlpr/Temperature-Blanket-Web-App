@@ -199,8 +199,7 @@ export const getOpenMeteo = async ({ location }) => {
     const snow = snows[index];
     const prcp = prcps[index];
 
-    const date = stringToDate(location.from);
-    date.setDate(date.getDate() + index);
+    const date = stringToDate(times[index]);
 
     const dayTime = getDayTime({ date, lat: location.lat, lng: location.lng });
 

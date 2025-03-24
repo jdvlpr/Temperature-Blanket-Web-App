@@ -23,11 +23,11 @@ import {
   celsiusToFahrenheit,
   displayNumber,
   getAvgOfThree,
-  stringToDate,
   getMaxOfThree,
   getMinOfThree,
   hoursToMinutes,
   millimetersToInches,
+  stringToDate,
 } from '$lib/utils.js';
 import { error, json } from '@sveltejs/kit';
 import SunCalc from 'suncalc';
@@ -74,13 +74,12 @@ export async function POST({ request }) {
   if (!response.ok) {
     // Request Failed with HTTP code ${response.status}
     throw error(400, {
-      message: `
-                            <p class="font-bold text-xl my-4">Something Went Wrong</p>
-                            <p>A search request for weather data from <span class="font-bold">${
-                              location.label
-                            }</span> (${stringToDate(location.from).toLocaleDateString()} - ${stringToDate(location.to).toLocaleDateString()}) was sent to <a href="https://meteostat.net/" target="_blank" rel="noopener noreferrer" class="link">Meteostat.net</a>, but the response returned an error.</p>
-                            <p class="my-4">Try again with a different location or dates, or change the Weather Source setting.</p>
-                            <p class="italic text-sm">Error status code: ${response.status}</p>`,
+      message: `<p class="font-bold text-xl my-4">Something Went Wrong</p>
+        <p>A search request for weather data from <span class="font-bold">${
+          location.label
+        }</span> (${stringToDate(location.from).toLocaleDateString()} - ${stringToDate(location.to).toLocaleDateString()}) was sent to <a href="https://meteostat.net/" target="_blank" rel="noopener noreferrer" class="link">Meteostat.net</a>, but the response returned an error.</p>
+        <p class="my-4">Try again with a different location or dates, or change the Weather Source setting.</p>
+        <p class="italic text-sm">Error status code: ${response.status}</p>`,
     });
   }
 
@@ -98,7 +97,9 @@ export async function POST({ request }) {
   }
 
   location.stations = data.meta.stations;
+
   const today = new Date();
+
   for (let index = 0; index < data.data.length; index += 1) {
     const day = data.data[index];
 
@@ -114,14 +115,12 @@ export async function POST({ request }) {
     let prcp = day.prcp;
     let snow = day.snow;
 
-    const date = stringToDate(location.from);
-    date.setDate(date.getDate() + index);
-    const thisDate = date;
+    const dayDate = stringToDate(day.date);
 
     // With the Meteostat API, if the "model" param is set to "true" (which is the default), it will include future weather predictions.
     //Our application does not want this, so make null any weather parameters which are for days in the future.
-    const isDateInPast =
-      thisDate.setHours(0, 0, 0, 0) < today.setHours(0, 0, 0, 0);
+    const isDateInPast = dayDate < today.setHours(0, 0, 0, 0);
+
     if (!isDateInPast) {
       tmin = null;
       tavg = null;
@@ -132,7 +131,7 @@ export async function POST({ request }) {
 
     const dayData = {};
     dayData.location = location.index;
-    dayData.date = date;
+    dayData.date = dayDate;
     dayData.tavg = {
       metric: tavg,
       imperial: celsiusToFahrenheit(tavg),
@@ -160,7 +159,7 @@ export async function POST({ request }) {
     // dayData.tsun = day.tsun; // The daily sunshine total in minutes (m) (unused)
     // End of meteostat data
 
-    const times = SunCalc.getTimes(thisDate, location.lat, location.lng);
+    const times = SunCalc.getTimes(dayDate, location.lat, location.lng);
     // dayData.sunrise = times.sunrise;
     // dayData.sunset = times.sunset;
     const isValidSunset =
