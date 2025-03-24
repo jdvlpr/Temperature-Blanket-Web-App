@@ -15,9 +15,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import Spinner from '$lib/components/Spinner.svelte';
-  import { gauges, localState, project, weather } from '$lib/state';
-  import { getColorInfo, showPreviewImageWeatherDetails } from '$lib/utils';
-  import { tick } from 'svelte';
+  import { localState, weather } from '$lib/state';
+  import {
+    getColorInfo,
+    runPreview,
+    showPreviewImageWeatherDetails,
+  } from '$lib/utils';
   import { cornerToCornerPreview } from './state.svelte';
 
   let width = $state(cornerToCornerPreview.width);
@@ -91,54 +94,50 @@ If not, see <https://www.gnu.org/licenses/>. -->
     return row % 2 === 0;
   };
 
-  $effect(() => {
-    project.url.href;
-    if (!weather.data.length || !gauges.allCreated.length) return;
-    tick().then(() => {
-      let row = 0,
-        x = 0,
-        y = 0,
-        dayIndex = 0;
-      const sections = [];
-      for (
-        let x = cornerToCornerPreview.width - cornerToCornerPreview.STITCH_SIZE,
-          y = cornerToCornerPreview.height - cornerToCornerPreview.STITCH_SIZE;
-        dayIndex < weather.data?.length;
-        dayIndex++
-      ) {
-        let section = [];
-        let day = weather.data[dayIndex];
-        let target = cornerToCornerPreview.settings.selectedTarget;
-        let value = day[target][localState.value.units];
+  runPreview(() => {
+    let row = 0,
+      x = 0,
+      y = 0,
+      dayIndex = 0;
+    const sections = [];
+    for (
+      let x = cornerToCornerPreview.width - cornerToCornerPreview.STITCH_SIZE,
+        y = cornerToCornerPreview.height - cornerToCornerPreview.STITCH_SIZE;
+      dayIndex < weather.data?.length;
+      dayIndex++
+    ) {
+      let section = [];
+      let day = weather.data[dayIndex];
+      let target = cornerToCornerPreview.settings.selectedTarget;
+      let value = day[target][localState.value.units];
 
-        // Get the color based on the gauge ID and value
-        const color = getColorInfo({ param: target, value }).hex;
-        for (
-          let squareIndex = 0;
-          squareIndex < cornerToCornerPreview.settings.lineLength;
-          squareIndex++
-        ) {
-          y -= cornerToCornerPreview.STITCH_SIZE;
-          section.push({
-            x,
-            y,
-            width: cornerToCornerPreview.STITCH_SIZE,
-            height: cornerToCornerPreview.STITCH_SIZE,
-            color,
-            dayIndex,
-          });
-          y += cornerToCornerPreview.STITCH_SIZE;
-          const props = { x, y, row };
-          x = getX(props);
-          y = getY(props);
-          row = getRow(props);
-        }
-        sections.push(section);
+      // Get the color based on the gauge ID and value
+      const color = getColorInfo({ param: target, value }).hex;
+      for (
+        let squareIndex = 0;
+        squareIndex < cornerToCornerPreview.settings.lineLength;
+        squareIndex++
+      ) {
+        y -= cornerToCornerPreview.STITCH_SIZE;
+        section.push({
+          x,
+          y,
+          width: cornerToCornerPreview.STITCH_SIZE,
+          height: cornerToCornerPreview.STITCH_SIZE,
+          color,
+          dayIndex,
+        });
+        y += cornerToCornerPreview.STITCH_SIZE;
+        const props = { x, y, row };
+        x = getX(props);
+        y = getY(props);
+        row = getRow(props);
       }
-      width = cornerToCornerPreview.width;
-      height = cornerToCornerPreview.height;
-      cornerToCornerPreview.sections = sections;
-    }, 10);
+      sections.push(section);
+    }
+    width = cornerToCornerPreview.width;
+    height = cornerToCornerPreview.height;
+    cornerToCornerPreview.sections = sections;
   });
 </script>
 

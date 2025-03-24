@@ -15,16 +15,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import Spinner from '$lib/components/Spinner.svelte';
-  import { gauges, localState, project, weather } from '$lib/state';
+  import { localState, weather } from '$lib/state';
   import type { Color, WeatherDay, WeatherParam } from '$lib/types';
   import {
     getColorInfo,
     getSquareSectionTargetIds,
+    runPreview,
     showPreviewImageWeatherDetails,
   } from '$lib/utils';
-  import { tick } from 'svelte';
   import { squaresPreview } from './state.svelte';
-  import { Settings } from '@lucide/svelte';
 
   let width = $state(squaresPreview.width);
 
@@ -42,135 +41,130 @@ If not, see <https://www.gnu.org/licenses/>. -->
     ),
   );
 
-  $effect(() => {
-    project.url.href;
-    tick().then(async () => {
-      if (!weather.data.length || !gauges.allCreated.length) return;
-      // Get the target IDs for each square section
-      let row = 0;
-      const sections = [];
-      let isWeatherSquare: boolean;
-      let dayIndex = 0;
+  runPreview(() => {
+    // Get the target IDs for each square section
+    let row = 0;
+    const sections = [];
+    let isWeatherSquare: boolean;
+    let dayIndex = 0;
 
-      // Loop through each square
-      for (
-        let squareIndex = 0, column = 0;
-        squareIndex < squaresPreview.squaresTotalCount;
-        squareIndex++, column++
+    // Loop through each square
+    for (
+      let squareIndex = 0, column = 0;
+      squareIndex < squaresPreview.squaresTotalCount;
+      squareIndex++, column++
+    ) {
+      if (
+        squareIndex % squaresPreview.settings.columns === 0 &&
+        squareIndex !== 0
       ) {
-        if (
-          squareIndex % squaresPreview.settings.columns === 0 &&
-          squareIndex !== 0
-        ) {
-          // Start a new row
-          column = 0;
-          row++;
-        }
-        let square: object[] = [];
-
-        // Check if the square is a weather square or an additional square
-        isWeatherSquare =
-          !squaresPreview.additionalSquaresIndexes.includes(squareIndex);
-
-        // ***
-        //  Calculate the starting coordinates of the square
-        // ***
-
-        //  offset the square x position if it has a border
-        const xJoinOffset =
-          squaresPreview.settings.joinStitches *
-            2 *
-            squaresPreview.SQUARE_SECTION_SIZE *
-            column +
-          squaresPreview.settings.joinStitches *
-            squaresPreview.SQUARE_SECTION_SIZE;
-
-        const xStart =
-          column *
-            (squaresPreview.settings.squareSize *
-              squaresPreview.SQUARE_SECTION_SIZE) +
-          xJoinOffset;
-
-        //  offset the square y position if it has a border
-        const yJoinOffset =
-          squaresPreview.settings.joinStitches *
-            2 *
-            squaresPreview.SQUARE_SECTION_SIZE *
-            row +
-          squaresPreview.settings.joinStitches *
-            squaresPreview.SQUARE_SECTION_SIZE;
-
-        const yStart =
-          row *
-            (squaresPreview.settings.squareSize *
-              squaresPreview.SQUARE_SECTION_SIZE) +
-          yJoinOffset;
-
-        // Loop through each square section
-        for (
-          let squareSectionIndex = 0, x = xStart, y = yStart;
-          squareSectionIndex < squareSectionsCount;
-          squareSectionIndex++
-        ) {
-          let color: Color['hex'];
-
-          if (isWeatherSquare) {
-            // Get the weather data for the current day
-            const day: WeatherDay = weather.data[dayIndex];
-            let targetId: WeatherParam['id'] =
-              squareSectionTargetIds[squareSectionIndex];
-            let value = day[targetId][localState.value.units];
-
-            // Check if the primary target value is 0 or null, use the primary target as a backup
-            if (
-              (squaresPreview.settings.primaryTargetAsBackup === 1 &&
-                value === 0) ||
-              (squaresPreview.settings.primaryTargetAsBackup === 1 &&
-                value === null)
-            ) {
-              targetId = squaresPreview.settings.primaryTarget;
-              value = day[targetId][localState.value.units];
-            }
-
-            // Get the color based on the gauge ID and value
-            color = getColorInfo({ param: targetId, value }).hex;
-          } else {
-            // Use the additional squares color
-            color = squaresPreview.settings.additionalSquaresColor;
-          }
-
-          // Add the square section to the square array
-          square.push({
-            isWeatherSquare,
-            dayIndex,
-            color,
-            x,
-            y,
-          });
-
-          // Calculate the coordinates for the next square section
-          if (
-            (squareSectionIndex + 1) % squaresPreview.settings.squareSize ===
-              0 &&
-            squareSectionIndex !== 0
-          ) {
-            x = xStart;
-            y += squaresPreview.SQUARE_SECTION_SIZE;
-          } else {
-            x += squaresPreview.SQUARE_SECTION_SIZE;
-          }
-        }
-
-        // Add the square to the sections array
-        sections.push(square);
-
-        // Increment the day index if it's a weather square
-        if (isWeatherSquare) dayIndex++;
+        // Start a new row
+        column = 0;
+        row++;
       }
-      width = squaresPreview.width;
-      height = squaresPreview.height;
-      squaresPreview.sections = sections;
-    });
+      let square: object[] = [];
+
+      // Check if the square is a weather square or an additional square
+      isWeatherSquare =
+        !squaresPreview.additionalSquaresIndexes.includes(squareIndex);
+
+      // ***
+      //  Calculate the starting coordinates of the square
+      // ***
+
+      //  offset the square x position if it has a border
+      const xJoinOffset =
+        squaresPreview.settings.joinStitches *
+          2 *
+          squaresPreview.SQUARE_SECTION_SIZE *
+          column +
+        squaresPreview.settings.joinStitches *
+          squaresPreview.SQUARE_SECTION_SIZE;
+
+      const xStart =
+        column *
+          (squaresPreview.settings.squareSize *
+            squaresPreview.SQUARE_SECTION_SIZE) +
+        xJoinOffset;
+
+      //  offset the square y position if it has a border
+      const yJoinOffset =
+        squaresPreview.settings.joinStitches *
+          2 *
+          squaresPreview.SQUARE_SECTION_SIZE *
+          row +
+        squaresPreview.settings.joinStitches *
+          squaresPreview.SQUARE_SECTION_SIZE;
+
+      const yStart =
+        row *
+          (squaresPreview.settings.squareSize *
+            squaresPreview.SQUARE_SECTION_SIZE) +
+        yJoinOffset;
+
+      // Loop through each square section
+      for (
+        let squareSectionIndex = 0, x = xStart, y = yStart;
+        squareSectionIndex < squareSectionsCount;
+        squareSectionIndex++
+      ) {
+        let color: Color['hex'];
+
+        if (isWeatherSquare) {
+          // Get the weather data for the current day
+          const day: WeatherDay = weather.data[dayIndex];
+          let targetId: WeatherParam['id'] =
+            squareSectionTargetIds[squareSectionIndex];
+          let value = day[targetId][localState.value.units];
+
+          // Check if the primary target value is 0 or null, use the primary target as a backup
+          if (
+            (squaresPreview.settings.primaryTargetAsBackup === 1 &&
+              value === 0) ||
+            (squaresPreview.settings.primaryTargetAsBackup === 1 &&
+              value === null)
+          ) {
+            targetId = squaresPreview.settings.primaryTarget;
+            value = day[targetId][localState.value.units];
+          }
+
+          // Get the color based on the gauge ID and value
+          color = getColorInfo({ param: targetId, value }).hex;
+        } else {
+          // Use the additional squares color
+          color = squaresPreview.settings.additionalSquaresColor;
+        }
+
+        // Add the square section to the square array
+        square.push({
+          isWeatherSquare,
+          dayIndex,
+          color,
+          x,
+          y,
+        });
+
+        // Calculate the coordinates for the next square section
+        if (
+          (squareSectionIndex + 1) % squaresPreview.settings.squareSize === 0 &&
+          squareSectionIndex !== 0
+        ) {
+          x = xStart;
+          y += squaresPreview.SQUARE_SECTION_SIZE;
+        } else {
+          x += squaresPreview.SQUARE_SECTION_SIZE;
+        }
+      }
+
+      // Add the square to the sections array
+      sections.push(square);
+
+      // Increment the day index if it's a weather square
+      if (isWeatherSquare) dayIndex++;
+    }
+    width = squaresPreview.width;
+    height = squaresPreview.height;
+    squaresPreview.sections = sections;
   });
 </script>
 

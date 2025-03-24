@@ -16,166 +16,165 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script>
   import { calendarPreview } from '$lib/components/previews/calendar/state.svelte';
   import Spinner from '$lib/components/Spinner.svelte';
-  import { gauges, localState, project, weather } from '$lib/state';
-  import { getColorInfo, showPreviewImageWeatherDetails } from '$lib/utils';
-  import { tick } from 'svelte';
+  import { localState, weather } from '$lib/state';
+  import {
+    getColorInfo,
+    runPreview,
+    showPreviewImageWeatherDetails,
+  } from '$lib/utils';
 
   let width = $state(calendarPreview.width);
 
   let height = $state(calendarPreview.height);
 
-  $effect(() => {
-    project.url.href;
-    if (!weather.data.length || !gauges.allCreated.length) return;
-    tick().then(() => {
-      let row = 0;
-      let additionalSquaresAddedCount = 0;
-      let monthColumnIndex = 0;
-      let monthIndex = 0;
-      let monthRowIndex = 0;
-      let total = weather.rawData?.length + calendarPreview.extraSquares.length;
-      let weekIndex = 0;
-      let rowPadding = 0;
-      let columnPadding = 0;
-      let x = 0,
-        y = 0; // Yes, these are necessary.
-      const sections = [];
-      for (
-        let squareIndex = 0, column = 0, isWeatherSquare = true;
-        squareIndex < total;
-        squareIndex++, column++
+  runPreview(() => {
+    let row = 0;
+    let additionalSquaresAddedCount = 0;
+    let monthColumnIndex = 0;
+    let monthIndex = 0;
+    let monthRowIndex = 0;
+    let total = weather.rawData?.length + calendarPreview.extraSquares.length;
+    let weekIndex = 0;
+    let rowPadding = 0;
+    let columnPadding = 0;
+    let x = 0,
+      y = 0; // Yes, these are necessary.
+    const sections = [];
+    for (
+      let squareIndex = 0, column = 0, isWeatherSquare = true;
+      squareIndex < total;
+      squareIndex++, column++
+    ) {
+      if (
+        squareIndex % calendarPreview.squaresPerMonth === 0 &&
+        weekIndex + 1 === calendarPreview.weeksInLongestMonth &&
+        squareIndex !== 0
       ) {
-        if (
-          squareIndex % calendarPreview.squaresPerMonth === 0 &&
-          weekIndex + 1 === calendarPreview.weeksInLongestMonth &&
-          squareIndex !== 0
-        ) {
-          // finished month
-          monthIndex += 1;
-          weekIndex = 0;
-          if (monthIndex % calendarPreview.dimensionsWidth === 0) {
-            // finished month row
-            monthRowIndex += calendarPreview.weeksInLongestMonth;
-            monthColumnIndex = 0;
-            rowPadding += calendarPreview.monthPadding;
-            columnPadding = 0;
-          } else {
-            // continue in the same row
-            monthColumnIndex += calendarPreview.weekLength;
-            columnPadding += calendarPreview.monthPadding;
-          }
-          row = monthRowIndex;
-          column = monthColumnIndex;
-        }
-        if (
-          squareIndex % calendarPreview.weekLength === 0 &&
-          squareIndex !== 0 &&
-          squareIndex % calendarPreview.squaresPerMonth !== 0
-        ) {
-          // Finished week
-          column = monthColumnIndex;
-          row += 1;
-          weekIndex += 1;
-        }
-        const square = [];
-        let dayIndex = squareIndex - additionalSquaresAddedCount;
-
-        if (calendarPreview.extraSquares.includes(squareIndex)) {
-          isWeatherSquare = false;
-          additionalSquaresAddedCount += 1;
+        // finished month
+        monthIndex += 1;
+        weekIndex = 0;
+        if (monthIndex % calendarPreview.dimensionsWidth === 0) {
+          // finished month row
+          monthRowIndex += calendarPreview.weeksInLongestMonth;
+          monthColumnIndex = 0;
+          rowPadding += calendarPreview.monthPadding;
+          columnPadding = 0;
         } else {
-          isWeatherSquare = true;
+          // continue in the same row
+          monthColumnIndex += calendarPreview.weekLength;
+          columnPadding += calendarPreview.monthPadding;
         }
-
-        // ***
-        //  Calculate the starting coordinates of the square
-        // ***
-
-        //  offset the square x position if it has a border
-        const xJoinOffset =
-          calendarPreview.settings.joinStitches *
-            2 *
-            calendarPreview.squareSectionSize *
-            column +
-          calendarPreview.settings.joinStitches *
-            calendarPreview.squareSectionSize;
-
-        const xStart =
-          xJoinOffset +
-          column *
-            (calendarPreview.settings.squareSize *
-              calendarPreview.squareSectionSize) +
-          columnPadding;
-
-        //  offset the square y position if it has a border
-        const yJoinOffset =
-          calendarPreview.settings.joinStitches *
-            2 *
-            calendarPreview.squareSectionSize *
-            row +
-          calendarPreview.settings.joinStitches *
-            calendarPreview.squareSectionSize;
-
-        const yStart =
-          yJoinOffset +
-          row *
-            (calendarPreview.settings.squareSize *
-              calendarPreview.squareSectionSize) +
-          rowPadding;
-
-        let _dayIndex = dayIndex;
-        if (weather.grouping === 'week') {
-          _dayIndex = Math.ceil((dayIndex - weather.monthGroupingStartDay) / 7);
-        }
-        for (
-          let squareSectionIndex = 0, x = xStart, y = yStart;
-          squareSectionIndex < calendarPreview.squareSectionsCount;
-          squareSectionIndex++
-        ) {
-          let color;
-          if (isWeatherSquare) {
-            const day = weather.data[_dayIndex];
-            let param = calendarPreview.squareSectionParams[squareSectionIndex];
-            let value = day[param][localState.value.units];
-            if (
-              (calendarPreview.settings.primaryTargetAsBackup === 1 &&
-                value === 0) ||
-              (calendarPreview.settings.primaryTargetAsBackup === 1 &&
-                value === null)
-            ) {
-              param = calendarPreview.settings.primaryTarget;
-              value = day[param][localState.value.units];
-            }
-
-            // Get the color based on the gauge ID and value
-            color = getColorInfo({ param, value }).hex;
-          } else {
-            color = calendarPreview.settings.additionalSquaresColor;
-          }
-          square.push({
-            color,
-            x,
-            y,
-            isWeatherSquare,
-            dayIndex: _dayIndex,
-          });
-          if (
-            (squareSectionIndex + 1) % calendarPreview.settings.squareSize ===
-              0 &&
-            squareSectionIndex !== 0
-          ) {
-            x = xStart;
-            y += calendarPreview.squareSectionSize;
-          } else {
-            x += calendarPreview.squareSectionSize;
-          }
-        }
-        sections.push(square);
+        row = monthRowIndex;
+        column = monthColumnIndex;
       }
-      width = calendarPreview.width;
-      height = calendarPreview.height;
-      calendarPreview.sections = sections;
-    });
+      if (
+        squareIndex % calendarPreview.weekLength === 0 &&
+        squareIndex !== 0 &&
+        squareIndex % calendarPreview.squaresPerMonth !== 0
+      ) {
+        // Finished week
+        column = monthColumnIndex;
+        row += 1;
+        weekIndex += 1;
+      }
+      const square = [];
+      let dayIndex = squareIndex - additionalSquaresAddedCount;
+
+      if (calendarPreview.extraSquares.includes(squareIndex)) {
+        isWeatherSquare = false;
+        additionalSquaresAddedCount += 1;
+      } else {
+        isWeatherSquare = true;
+      }
+
+      // ***
+      //  Calculate the starting coordinates of the square
+      // ***
+
+      //  offset the square x position if it has a border
+      const xJoinOffset =
+        calendarPreview.settings.joinStitches *
+          2 *
+          calendarPreview.squareSectionSize *
+          column +
+        calendarPreview.settings.joinStitches *
+          calendarPreview.squareSectionSize;
+
+      const xStart =
+        xJoinOffset +
+        column *
+          (calendarPreview.settings.squareSize *
+            calendarPreview.squareSectionSize) +
+        columnPadding;
+
+      //  offset the square y position if it has a border
+      const yJoinOffset =
+        calendarPreview.settings.joinStitches *
+          2 *
+          calendarPreview.squareSectionSize *
+          row +
+        calendarPreview.settings.joinStitches *
+          calendarPreview.squareSectionSize;
+
+      const yStart =
+        yJoinOffset +
+        row *
+          (calendarPreview.settings.squareSize *
+            calendarPreview.squareSectionSize) +
+        rowPadding;
+
+      let _dayIndex = dayIndex;
+      if (weather.grouping === 'week') {
+        _dayIndex = Math.ceil((dayIndex - weather.monthGroupingStartDay) / 7);
+      }
+      for (
+        let squareSectionIndex = 0, x = xStart, y = yStart;
+        squareSectionIndex < calendarPreview.squareSectionsCount;
+        squareSectionIndex++
+      ) {
+        let color;
+        if (isWeatherSquare) {
+          const day = weather.data[_dayIndex];
+          let param = calendarPreview.squareSectionParams[squareSectionIndex];
+          let value = day[param][localState.value.units];
+          if (
+            (calendarPreview.settings.primaryTargetAsBackup === 1 &&
+              value === 0) ||
+            (calendarPreview.settings.primaryTargetAsBackup === 1 &&
+              value === null)
+          ) {
+            param = calendarPreview.settings.primaryTarget;
+            value = day[param][localState.value.units];
+          }
+
+          // Get the color based on the gauge ID and value
+          color = getColorInfo({ param, value }).hex;
+        } else {
+          color = calendarPreview.settings.additionalSquaresColor;
+        }
+        square.push({
+          color,
+          x,
+          y,
+          isWeatherSquare,
+          dayIndex: _dayIndex,
+        });
+        if (
+          (squareSectionIndex + 1) % calendarPreview.settings.squareSize ===
+            0 &&
+          squareSectionIndex !== 0
+        ) {
+          x = xStart;
+          y += calendarPreview.squareSectionSize;
+        } else {
+          x += calendarPreview.squareSectionSize;
+        }
+      }
+      sections.push(square);
+    }
+    width = calendarPreview.width;
+    height = calendarPreview.height;
+    calendarPreview.sections = sections;
   });
 </script>
 

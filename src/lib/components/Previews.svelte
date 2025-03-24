@@ -25,25 +25,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     previews,
     previewWeatherTargets,
     project,
-    weather,
   } from '$lib/state';
   import { downloadPreviewPNG } from '$lib/utils';
   import { DownloadIcon, SendIcon } from '@lucide/svelte';
-  import { onMount, tick } from 'svelte';
+  import { onMount } from 'svelte';
   import { Drawer } from 'vaul-svelte';
-  import { weatherDataUpdatedKey } from './WeatherTableWrapper.svelte';
-
-  let previewUpdateKey = $state(false);
-
-  $effect(() => {
-    weatherDataUpdatedKey.value; // Update the preview if user manually edits the weather data
-    previews.activeId;
-
-    previewUpdateKey = true;
-    tick().then(() => {
-      previewUpdateKey = false;
-    });
-  });
 
   onMount(() => {
     if (!previews.activeId) {
@@ -52,15 +38,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 </script>
 
-{#if previews.active}
+{#key previews.active}
   <PreviewSelect />
 
   <div class="flex flex-col items-start justify-center gap-2">
     {#if gauges.activeGauge?.colors}
       <div class="flex w-full flex-col items-center justify-center gap-4">
-        {#key previewUpdateKey}
-          <previews.active.previewComponent />
-        {/key}
+        <!-- {#key previewUpdateKey} -->
+        <previews.active.previewComponent />
+        <!-- {/key} -->
 
         <Drawer.Root bind:open={drawerState.weatherDetails}>
           <Drawer.Portal>
@@ -139,4 +125,4 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </div>
     {/if}
   </div>
-{/if}
+{/key}

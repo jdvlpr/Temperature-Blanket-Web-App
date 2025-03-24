@@ -14,9 +14,12 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import { gauges, localState, project, weather } from '$lib/state';
-  import { getColorInfo, showPreviewImageWeatherDetails } from '$lib/utils';
-  import { tick } from 'svelte';
+  import { localState, weather } from '$lib/state';
+  import {
+    getColorInfo,
+    runPreview,
+    showPreviewImageWeatherDetails,
+  } from '$lib/utils';
   import { chevronsPreview } from './state.svelte';
 
   let width = $state(chevronsPreview.width);
@@ -25,60 +28,56 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let sections = [];
 
-  $effect(() => {
-    project.url.href;
-    if (!weather.data.length || !gauges.allCreated.length) return;
-    tick().then(() => {
-      let total = weather.data?.length;
-      sections = [];
+  runPreview(() => {
+    let total = weather.data?.length;
+    sections = [];
+    for (
+      let dayIndex = 0, line = chevronsPreview.ROW_HEIGHT;
+      dayIndex < total;
+      dayIndex++
+    ) {
+      let section = [];
       for (
-        let dayIndex = 0, line = chevronsPreview.ROW_HEIGHT;
-        dayIndex < total;
-        dayIndex++
+        let paramIndex = 0;
+        paramIndex < chevronsPreview.settings.selectedTargets.length;
+        paramIndex++,
+          line +=
+            chevronsPreview.ROW_HEIGHT /
+            chevronsPreview.settings.selectedTargets.length
       ) {
-        let section = [];
+        let points = '';
         for (
-          let paramIndex = 0;
-          paramIndex < chevronsPreview.settings.selectedTargets.length;
-          paramIndex++,
-            line +=
-              chevronsPreview.ROW_HEIGHT /
-              chevronsPreview.settings.selectedTargets.length
+          let i2 = 0, x = 0;
+          i2 < chevronsPreview.width / chevronsPreview.chevronSideLength;
+          i2++, x += chevronsPreview.chevronSideLength
         ) {
-          let points = '';
-          for (
-            let i2 = 0, x = 0;
-            i2 < chevronsPreview.width / chevronsPreview.chevronSideLength;
-            i2++, x += chevronsPreview.chevronSideLength
-          ) {
-            points += `${x},${line} ${x + chevronsPreview.chevronHeight},${line + chevronsPreview.chevronHeight} ${
-              x + chevronsPreview.chevronSideLength
-            },${line} `;
-          }
-          const target = chevronsPreview.settings.selectedTargets[paramIndex];
-          let value = weather.data[dayIndex][target][localState.value.units];
-
-          // Get the color based on the gauge ID and value
-          const color = getColorInfo({ param: target, value }).hex;
-          section.push({ color, p: points, dayIndex });
-          // elPolyline.setAttributeNS(null, "points", points);
-          // elPolyline.setAttributeNS(null, "stroke", color);
-          // elPolyline.setAttributeNS(null, "stroke-width", this._CHEV_chevronsPreview.ROW_HEIGHT / this.activeParams.length);
-          // elPolyline.setAttributeNS(null, "fill", "none");
-          // daySection.appendChild(elPolyline);
+          points += `${x},${line} ${x + chevronsPreview.chevronHeight},${line + chevronsPreview.chevronHeight} ${
+            x + chevronsPreview.chevronSideLength
+          },${line} `;
         }
-        // daySection.classList = "pattern-group";
-        // daySection.dataset.index = dayIndex;
-        // daySection.dataset.total = total;
-        // daySection.dataset.dayIndex = dayIndex;
-        // svg.appendChild(daySection);
-        // daySection = null;
-        sections.push(section);
+        const target = chevronsPreview.settings.selectedTargets[paramIndex];
+        let value = weather.data[dayIndex][target][localState.value.units];
+
+        // Get the color based on the gauge ID and value
+        const color = getColorInfo({ param: target, value }).hex;
+        section.push({ color, p: points, dayIndex });
+        // elPolyline.setAttributeNS(null, "points", points);
+        // elPolyline.setAttributeNS(null, "stroke", color);
+        // elPolyline.setAttributeNS(null, "stroke-width", this._CHEV_chevronsPreview.ROW_HEIGHT / this.activeParams.length);
+        // elPolyline.setAttributeNS(null, "fill", "none");
+        // daySection.appendChild(elPolyline);
       }
-      width = chevronsPreview.width;
-      height = chevronsPreview.height;
-      chevronsPreview.sections = sections;
-    }, 10);
+      // daySection.classList = "pattern-group";
+      // daySection.dataset.index = dayIndex;
+      // daySection.dataset.total = total;
+      // daySection.dataset.dayIndex = dayIndex;
+      // svg.appendChild(daySection);
+      // daySection = null;
+      sections.push(section);
+    }
+    width = chevronsPreview.width;
+    height = chevronsPreview.height;
+    chevronsPreview.sections = sections;
   });
 </script>
 

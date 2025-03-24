@@ -15,9 +15,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import Spinner from '$lib/components/Spinner.svelte';
-  import { gauges, localState, project, weather } from '$lib/state';
-  import { getColorInfo, showPreviewImageWeatherDetails } from '$lib/utils';
-  import { tick } from 'svelte';
+  import { localState, weather } from '$lib/state';
+  import {
+    getColorInfo,
+    runPreview,
+    showPreviewImageWeatherDetails,
+  } from '$lib/utils';
   import { splitMonthSquaresPreview } from './state.svelte';
 
   let width = $state(splitMonthSquaresPreview.width);
@@ -29,140 +32,136 @@ If not, see <https://www.gnu.org/licenses/>. -->
     return { left, right };
   }
 
-  $effect(() => {
-    project.url.href;
-    if (!weather.data.length || !gauges.allCreated.length) return;
-    tick().then(() => {
-      const sections = [];
-      let squareIndex = 0;
-      let x = splitMonthSquaresPreview.squareSize / 2;
-      let y = splitMonthSquaresPreview.squareSize / 2;
-      let roundWidth = splitMonthSquaresPreview.STITCH_SIZE;
-      let roundHeight = splitMonthSquaresPreview.STITCH_SIZE;
-      let points = getPoints({ x, y, roundWidth, roundHeight });
-      let dayIndex = 0;
-      let roundInSquare = 1;
-      let isWeather = true;
-      let daysInSquare = weather.rawData?.filter(
-        (n) =>
-          n.date.getFullYear() ===
-            splitMonthSquaresPreview.weatherMonths[squareIndex].year &&
-          n.date.getMonth() ===
-            splitMonthSquaresPreview.weatherMonths[squareIndex].month,
-      );
-      for (
-        let roundsIndex = 0;
-        roundsIndex < splitMonthSquaresPreview.totalRounds;
-        roundsIndex += 1
+  runPreview(() => {
+    const sections = [];
+    let squareIndex = 0;
+    let x = splitMonthSquaresPreview.squareSize / 2;
+    let y = splitMonthSquaresPreview.squareSize / 2;
+    let roundWidth = splitMonthSquaresPreview.STITCH_SIZE;
+    let roundHeight = splitMonthSquaresPreview.STITCH_SIZE;
+    let points = getPoints({ x, y, roundWidth, roundHeight });
+    let dayIndex = 0;
+    let roundInSquare = 1;
+    let isWeather = true;
+    let daysInSquare = weather.rawData?.filter(
+      (n) =>
+        n.date.getFullYear() ===
+          splitMonthSquaresPreview.weatherMonths[squareIndex].year &&
+        n.date.getMonth() ===
+          splitMonthSquaresPreview.weatherMonths[squareIndex].month,
+    );
+    for (
+      let roundsIndex = 0;
+      roundsIndex < splitMonthSquaresPreview.totalRounds;
+      roundsIndex += 1
+    ) {
+      if (
+        roundsIndex % splitMonthSquaresPreview.roundsPerSquare === 0 &&
+        roundsIndex !== 0
       ) {
-        if (
-          roundsIndex % splitMonthSquaresPreview.roundsPerSquare === 0 &&
-          roundsIndex !== 0
-        ) {
-          // New Square
-          squareIndex += 1;
-          daysInSquare = weather.rawData?.filter(
-            (n) =>
-              n.date.getFullYear() ===
-                splitMonthSquaresPreview.weatherMonths[squareIndex].year &&
-              n.date.getMonth() ===
-                splitMonthSquaresPreview.weatherMonths[squareIndex].month,
-          );
-          roundInSquare = 1;
-          roundWidth = splitMonthSquaresPreview.STITCH_SIZE;
-          roundHeight = splitMonthSquaresPreview.STITCH_SIZE;
-          if (squareIndex % splitMonthSquaresPreview.dimensionsWidth === 0) {
-            // Start new Row
-            x = splitMonthSquaresPreview.squareSize / 2;
-            y +=
-              splitMonthSquaresPreview.squareSize +
-              splitMonthSquaresPreview.squareSize / 2;
-          } else {
-            // Add to the right
-            x +=
-              splitMonthSquaresPreview.squareSize +
-              splitMonthSquaresPreview.squareSize / 2;
-            y += splitMonthSquaresPreview.squareSize / 2;
-          }
-        }
-
-        let square;
-        const day = daysInSquare?.filter(
-          (n) => n.date.getDate() === roundInSquare,
+        // New Square
+        squareIndex += 1;
+        daysInSquare = weather.rawData?.filter(
+          (n) =>
+            n.date.getFullYear() ===
+              splitMonthSquaresPreview.weatherMonths[squareIndex].year &&
+            n.date.getMonth() ===
+              splitMonthSquaresPreview.weatherMonths[squareIndex].month,
         );
-
-        let _dayIndex = dayIndex;
-        if (weather.grouping === 'week') {
-          _dayIndex = Math.ceil((dayIndex - weather.monthGroupingStartDay) / 7);
-        }
-
-        let color = { left: '', right: '' };
-        if (day.length) {
-          const leftValue =
-            weather.data[_dayIndex][
-              splitMonthSquaresPreview.settings.leftTarget
-            ][localState.value.units];
-
-          // Get the color based on the gauge ID and value
-          color.left = getColorInfo({
-            param: splitMonthSquaresPreview.settings.leftTarget,
-            value: leftValue,
-          }).hex;
-
-          const rightValue =
-            weather.data[_dayIndex][
-              splitMonthSquaresPreview.settings.rightTarget
-            ][localState.value.units];
-
-          // Get the color based on the gauge ID and value
-          color.right = getColorInfo({
-            param: splitMonthSquaresPreview.settings.rightTarget,
-            value: rightValue,
-          }).hex;
-
-          isWeather = true;
+        roundInSquare = 1;
+        roundWidth = splitMonthSquaresPreview.STITCH_SIZE;
+        roundHeight = splitMonthSquaresPreview.STITCH_SIZE;
+        if (squareIndex % splitMonthSquaresPreview.dimensionsWidth === 0) {
+          // Start new Row
+          x = splitMonthSquaresPreview.squareSize / 2;
+          y +=
+            splitMonthSquaresPreview.squareSize +
+            splitMonthSquaresPreview.squareSize / 2;
         } else {
-          color.left = splitMonthSquaresPreview.settings.additionalRoundsColor;
-          color.right = splitMonthSquaresPreview.settings.additionalRoundsColor;
-          isWeather = false;
+          // Add to the right
+          x +=
+            splitMonthSquaresPreview.squareSize +
+            splitMonthSquaresPreview.squareSize / 2;
+          y += splitMonthSquaresPreview.squareSize / 2;
         }
-
-        points = getPoints({ x, y, roundWidth, roundHeight });
-
-        square = {
-          isWeather,
-          dayIndex: _dayIndex,
-          sides: [
-            {
-              color: color.left,
-              points: points.left,
-            },
-            {
-              color: color.right,
-              points: points.right,
-            },
-          ],
-        };
-
-        sections.push(square);
-
-        if (day.length) {
-          dayIndex += 1;
-        }
-
-        roundInSquare += 1;
-        roundWidth += splitMonthSquaresPreview.STITCH_SIZE * 2;
-        roundHeight += splitMonthSquaresPreview.STITCH_SIZE * 2;
-        x -= splitMonthSquaresPreview.STITCH_SIZE;
-        y -= splitMonthSquaresPreview.STITCH_SIZE;
       }
 
-      width = splitMonthSquaresPreview.width;
+      let square;
+      const day = daysInSquare?.filter(
+        (n) => n.date.getDate() === roundInSquare,
+      );
 
-      height = splitMonthSquaresPreview.height;
+      let _dayIndex = dayIndex;
+      if (weather.grouping === 'week') {
+        _dayIndex = Math.ceil((dayIndex - weather.monthGroupingStartDay) / 7);
+      }
 
-      splitMonthSquaresPreview.sections = sections;
-    });
+      let color = { left: '', right: '' };
+      if (day.length) {
+        const leftValue =
+          weather.data[_dayIndex][splitMonthSquaresPreview.settings.leftTarget][
+            localState.value.units
+          ];
+
+        // Get the color based on the gauge ID and value
+        color.left = getColorInfo({
+          param: splitMonthSquaresPreview.settings.leftTarget,
+          value: leftValue,
+        }).hex;
+
+        const rightValue =
+          weather.data[_dayIndex][
+            splitMonthSquaresPreview.settings.rightTarget
+          ][localState.value.units];
+
+        // Get the color based on the gauge ID and value
+        color.right = getColorInfo({
+          param: splitMonthSquaresPreview.settings.rightTarget,
+          value: rightValue,
+        }).hex;
+
+        isWeather = true;
+      } else {
+        color.left = splitMonthSquaresPreview.settings.additionalRoundsColor;
+        color.right = splitMonthSquaresPreview.settings.additionalRoundsColor;
+        isWeather = false;
+      }
+
+      points = getPoints({ x, y, roundWidth, roundHeight });
+
+      square = {
+        isWeather,
+        dayIndex: _dayIndex,
+        sides: [
+          {
+            color: color.left,
+            points: points.left,
+          },
+          {
+            color: color.right,
+            points: points.right,
+          },
+        ],
+      };
+
+      sections.push(square);
+
+      if (day.length) {
+        dayIndex += 1;
+      }
+
+      roundInSquare += 1;
+      roundWidth += splitMonthSquaresPreview.STITCH_SIZE * 2;
+      roundHeight += splitMonthSquaresPreview.STITCH_SIZE * 2;
+      x -= splitMonthSquaresPreview.STITCH_SIZE;
+      y -= splitMonthSquaresPreview.STITCH_SIZE;
+    }
+
+    width = splitMonthSquaresPreview.width;
+
+    height = splitMonthSquaresPreview.height;
+
+    splitMonthSquaresPreview.sections = sections;
   });
 </script>
 

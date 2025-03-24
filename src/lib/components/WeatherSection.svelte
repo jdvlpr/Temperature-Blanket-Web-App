@@ -157,6 +157,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <div class="mt-2 flex w-full flex-col items-center justify-center gap-2">
   <div class="flex w-full flex-wrap items-center justify-center gap-x-4">
     <div class="my-4 flex flex-wrap items-center justify-center gap-4">
+      <WeatherSourceButton />
+
       <UnitChanger />
 
       <WeatherGrouping />
@@ -200,8 +202,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </label>
       </div>
     {/if}
-
-    <WeatherSourceButton />
   </div>
 
   {#if wasDefaultWeatherSourceChanged}
