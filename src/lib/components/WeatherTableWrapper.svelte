@@ -78,8 +78,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <div class="card bg-warning-50-950/50 mt-4 p-2">
   <p>
-    There's a known issue for some locations where weather data has changed or
-    shifted by one day. If the data below looks wrong to you, <a
+    There's a known issue for some locations where weather data has shifted by
+    one day. If the data below looks wrong to you, <a
       class="link font-bold"
       href="mailto:hello@temperature-blanket.com?subject=Weather Data Issue Report&body=This is a report for a weather data issue on temperature-blanket.com. %0D%0A%0D%0A [--optionally include any other comments here--] %0D%0A%0D%0A Include the following information to help debug the issue: %0D%0A%0D%0A Project URL: {encodeURIComponent(
         project.url.href,
