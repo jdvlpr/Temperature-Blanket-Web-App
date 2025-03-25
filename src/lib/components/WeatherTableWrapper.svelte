@@ -19,7 +19,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <script>
-  import { gauges, localState, project, weather } from '$lib/state';
+  import { gauges, localState, locations, project, weather } from '$lib/state';
   import { getTableData } from '$lib/utils';
   import { tick } from 'svelte';
   import ToggleSwitch from './buttons/ToggleSwitch.svelte';
@@ -85,13 +85,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
         project.url.href,
       )} %0D%0A Timezone: {encodeURIComponent(
         Intl.DateTimeFormat().resolvedOptions().timeZone,
+      )} %0D%0A Loaded: {encodeURIComponent(
+        JSON.stringify(
+          $state.snapshot(
+            locations.all.map((n) => n.wasLoadedFromSavedProject),
+          ),
+        ),
       )} %0D%0A Data (first 3 days): {encodeURIComponent(
         JSON.stringify(weather.data.slice(0, 3)),
       )} %0D%0A Data (last 3 days): {encodeURIComponent(
         JSON.stringify(weather.data.slice(-3)),
       )}">send an issue report</a
     >. I'm looking into the problem and hope to have it fixed soon. Sorry for
-    any inconvenience!
+    any inconvenience! - Thomas
   </p>
 </div>
 
