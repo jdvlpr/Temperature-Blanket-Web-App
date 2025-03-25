@@ -91,26 +91,10 @@ export const dateToISO8601String = (date) => {
  * @return  {Date} The UTC date
  */
 export const stringToDate = (str) => {
-  let _datePart = str;
-
-  const [datePart, timePart] = str.split(' ');
-  if (datePart && timePart) _datePart = datePart;
-
-  let splitDatePart;
-  if (_datePart.includes('-')) splitDatePart = _datePart.split('-').map(Number);
-  else if (_datePart.includes('.'))
-    splitDatePart = _datePart.split('.').map(Number);
-  else if (_datePart.includes('/'))
-    splitDatePart = _datePart.split('/').map(Number);
-
-  const [year, month, day] = splitDatePart;
-
-  if (timePart && timePart.includes(':')) {
-    const [hour, minute, second] = timePart.split(':').map(Number);
-    return new Date(Date.UTC(year, month - 1, day, hour, minute, second));
-  }
-
-  return new Date(Date.UTC(year, month - 1, day));
+  if (str.includes('-')) return new Date(str.replace(/-/g, '/'));
+  else if (str.includes('.')) return new Date(str.replace(/./g, '/'));
+  else if (str.includes('/')) return new Date(str);
+  else return new Date(str);
 };
 
 /**
