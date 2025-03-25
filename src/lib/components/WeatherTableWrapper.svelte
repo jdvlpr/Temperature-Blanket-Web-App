@@ -20,7 +20,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import { gauges, localState, locations, project, weather } from '$lib/state';
-  import { getTableData } from '$lib/utils';
+  import { getTableData, stringToDate, stringToDateVersion2 } from '$lib/utils';
   import { tick } from 'svelte';
   import ToggleSwitch from './buttons/ToggleSwitch.svelte';
   import WeatherTableData from './WeatherTableData.svelte';
@@ -95,6 +95,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
         JSON.stringify(weather.data.slice(0, 3)),
       )} %0D%0A Data (last 3 days): {encodeURIComponent(
         JSON.stringify(weather.data.slice(-3)),
+      )} %0D%0A stringToDate('2025-01-01'): {encodeURIComponent(
+        JSON.stringify(stringToDate('2025-01-01')),
+      )} %0D%0A stringToDateVersion2('2025-01-01'): {encodeURIComponent(
+        JSON.stringify(stringToDateVersion2('2025-01-01')),
       )}">send an issue report</a
     >. I'm looking into the problem and hope to have it fixed soon. Sorry for
     any inconvenience! - Thomas
