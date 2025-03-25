@@ -38,11 +38,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 </script>
 
-{#key previews.active}
-  <PreviewSelect />
+<PreviewSelect />
 
-  <div class="flex flex-col items-start justify-center gap-2">
-    {#if gauges.activeGauge?.colors}
+<div class="flex flex-col items-start justify-center gap-2">
+  {#if gauges.activeGauge?.colors}
+    {#key previews.active}
       <div class="flex w-full flex-col items-center justify-center gap-4">
         <previews.active.previewComponent />
 
@@ -73,54 +73,54 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <div class="flex w-full flex-wrap items-start justify-center gap-4">
         <previews.active.settingsComponent />
       </div>
+    {/key}
 
-      <div
-        class="rounded-container bg-surface-100 dark:bg-surface-900 mt-2 flex w-full flex-wrap justify-center gap-2 px-4 py-2 shadow-inner"
+    <div
+      class="rounded-container bg-surface-100 dark:bg-surface-900 mt-2 flex w-full flex-wrap justify-center gap-2 px-4 py-2 shadow-inner"
+    >
+      <button
+        class="btn hover:preset-tonal"
+        title="Download PNG"
+        onclick={() => {
+          downloadPreviewPNG(
+            previews.active.width,
+            previews.active.height,
+            previews.active.svg,
+          );
+        }}
       >
-        <button
-          class="btn hover:preset-tonal"
-          title="Download PNG"
-          onclick={() => {
-            downloadPreviewPNG(
-              previews.active.width,
-              previews.active.height,
-              previews.active.svg,
-            );
-          }}
-        >
-          <DownloadIcon />
-          Download Image (PNG)
-        </button>
+        <DownloadIcon />
+        Download Image (PNG)
+      </button>
 
-        <button
-          class="btn preset-tonal-primary border-primary-500 h-auto items-center border text-left whitespace-pre-wrap"
-          onclick={() =>
-            modal.trigger({
-              type: 'component',
-              component: {
-                ref: AddToGallery,
-              },
-            })}
-          title="Show Send to Gallery Dialog"
-        >
-          <SendIcon />
-          Send to Project Gallery
-        </button>
+      <button
+        class="btn preset-tonal-primary border-primary-500 h-auto items-center border text-left whitespace-pre-wrap"
+        onclick={() =>
+          modal.trigger({
+            type: 'component',
+            component: {
+              ref: AddToGallery,
+            },
+          })}
+        title="Show Send to Gallery Dialog"
+      >
+        <SendIcon />
+        Send to Project Gallery
+      </button>
 
-        {#if project.gallery.href && project.gallery.title && project.gallery.title === locations.projectTitle}
-          <div class="flex w-full flex-col justify-center gap-1">
-            <p>View this project's gallery page:</p>
-            <p>
-              <a
-                href={project.gallery.href}
-                target="_blank"
-                class="btn hover:preset-tonal w-fit whitespace-pre-wrap underline"
-                rel="noreferrer">{project.gallery.title}</a
-              >
-            </p>
-          </div>
-        {/if}
-      </div>
-    {/if}
-  </div>
-{/key}
+      {#if project.gallery.href && project.gallery.title && project.gallery.title === locations.projectTitle}
+        <div class="flex w-full flex-col justify-center gap-1">
+          <p>View this project's gallery page:</p>
+          <p>
+            <a
+              href={project.gallery.href}
+              target="_blank"
+              class="btn hover:preset-tonal w-fit whitespace-pre-wrap underline"
+              rel="noreferrer">{project.gallery.title}</a
+            >
+          </p>
+        </div>
+      {/if}
+    </div>
+  {/if}
+</div>
