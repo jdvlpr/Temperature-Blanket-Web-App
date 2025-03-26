@@ -184,23 +184,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <div
   class="bg-primary-100 dark:bg-primary-900 flex flex-wrap items-center justify-center gap-2 p-2 text-center [view-transition-name:top-banner]"
-  bind:this={bannerElement}
 >
-  <p>
-    A new version of this site is coming! <a
-      href="https://github.com/jdvlpr/Temperature-Blanket-Web-App/discussions/5"
-      class="link"
-      target="_blank"
-    >
-      Read the announcement.
-    </a>
-  </p>
+  <p>This is an archived version of this site.</p>
 
   <a
-    href="https://next.temperature-blanket.com"
+    href="https://temperature-blanket.com"
     class="btn variant-soft-tertiary text-token"
     target="_blank"
-    >Preview the new version
+    >Main Version
     <svg
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 24 24"
@@ -215,10 +206,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
       /></svg
     >
   </a>
-
-  <button on:click={() => bannerElement.remove()} class="btn hover:variant-soft"
-    >{@html ICONS.xMark} Close</button
-  >
 </div>
 
 <slot />
