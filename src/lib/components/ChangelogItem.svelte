@@ -31,7 +31,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <h2 class="h2 text-gradient">{date}</h2>
     {/if}
   </div>
-  <div class="card bg-surface-100 dark:bg-surface-900 flex flex-col gap-2 p-2">
+  <div
+    class="card bg-surface-100 dark:bg-surface-900 flex flex-col gap-2 p-2"
+    id={version}
+  >
     <div class="card flex flex-wrap gap-2">
       {#each notes as { icon, text, title, instructions, IconComponent }}
         <div class="card bg-surface-50 dark:bg-surface-950 flex-auto p-4">
@@ -63,7 +66,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {/each}
     </div>
     {#if version}
-      <p class="flex flex-wrap gap-2 text-xs" id={version}>
+      <p class="flex flex-wrap gap-2 text-xs">
         <span class="bg-tertiary-100 dark:bg-tertiary-900 inline rounded px-2">
           <span>Version {version}</span>
         </span>

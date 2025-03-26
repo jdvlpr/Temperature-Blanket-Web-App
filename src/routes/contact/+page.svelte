@@ -107,6 +107,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <ExternalLinkIcon class="relative -top-[1px] size-5" />
             </a>
           {/if}
+
+          <p class="font-bold">Forms</p>
+          <a href="/contact/forms/2025-03-weather-data" class="link">
+            Weather Data Feedback Form
+          </a>
         </div>
       </div>
       <div class="rounded-container bg-surface-100-900 my-4 w-fit p-2">
