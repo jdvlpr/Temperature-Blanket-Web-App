@@ -270,7 +270,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <label for="frequencyShifted" class="label">
             How often does this happen?
             <select
-              class="select"
+              class="select whitespace-pre-wrap"
               id="frequencyShifted"
               name="frequencyShifted"
             >
