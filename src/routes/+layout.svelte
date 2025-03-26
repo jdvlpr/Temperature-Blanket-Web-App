@@ -20,7 +20,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ToastProvider from '$lib/components/ToastProvider.svelte';
   import { consentToMSClarityCookies, modal, toast } from '$lib/state';
   import { handleKeyDown, initializeLocalStorage, privacy } from '$lib/utils';
-  import { RocketIcon, RssIcon, XIcon } from '@lucide/svelte';
+  import { RssIcon, XIcon } from '@lucide/svelte';
   import { onMount, type Snippet } from 'svelte';
   import '../css/main.css';
 
