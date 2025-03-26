@@ -419,6 +419,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
         />
 
         {#if includeDebugInfo}
+          <input
+            type="hidden"
+            name="timezone"
+            value={Intl.DateTimeFormat().resolvedOptions().timeZone}
+          />
           <input type="hidden" name="version" value={version} />
           <input type="hidden" name="projectURL" value={project.url.href} />
           <input
