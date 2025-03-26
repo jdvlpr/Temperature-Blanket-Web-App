@@ -116,6 +116,7 @@ export const handleKeyDown = (ev) => {
   if (
     modal.opened ||
     ev.target.tagName === 'INPUT' ||
+    ev.target.tagName === 'TEXTAREA' ||
     ev.target.tagName === 'TD' ||
     ev.target.tagName === 'SELECT' ||
     ev.target.tagName === 'BUTTON'
