@@ -473,7 +473,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           />
           <input
             type="hidden"
-            name="stringToDate2"
+            name="stringToDateVersion2"
             value={encodeURIComponent(
               JSON.stringify(stringToDateVersion2('2025-01-01')),
             )}
@@ -487,7 +487,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           />
           <input
             type="hidden"
-            name="dateToISO8601String_stringToDate2"
+            name="dateToISO8601String_stringToDateVersion2"
             value={encodeURIComponent(
               JSON.stringify(
                 dateToISO8601String(stringToDateVersion2('2025-01-01')),
