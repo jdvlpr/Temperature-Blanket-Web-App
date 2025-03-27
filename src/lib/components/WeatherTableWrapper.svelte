@@ -33,6 +33,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { onMount, tick } from 'svelte';
   import ToggleSwitch from './buttons/ToggleSwitch.svelte';
   import WeatherTableData from './WeatherTableData.svelte';
+  import { page } from '$app/state';
 
   let tableData = $state(getTableData());
 
@@ -83,7 +84,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     dev,
     version,
     details: {
-      href: project.url.href,
+      href: page.url.href,
+      projectHref: project.url.href,
       weatherTable: {
         a_dataDate: weather.data[0].date,
         b_tableDataDate: tableData[0].date,
