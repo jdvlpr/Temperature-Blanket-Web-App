@@ -13,7 +13,6 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { dev, version } from '$app/environment';
 import { API_SERVICES } from '$lib/constants';
 import {
   allGaugesAttributes,
@@ -22,13 +21,11 @@ import {
   signal,
   weather,
 } from '$lib/state';
-import { supabase } from '$lib/supabaseClient';
 import type { WeatherDay } from '$lib/types';
 import {
   celsiusToFahrenheit,
   convertTime,
   dateToISO8601String,
-  dateToISO8601StringVersion2,
   displayNumber,
   getAverage,
   getColorInfo,
@@ -38,7 +35,6 @@ import {
   numberOfDays,
   pluralize,
   stringToDate,
-  stringToDateVersion2,
 } from '$lib/utils';
 import SunCalc from 'suncalc';
 
@@ -193,58 +189,6 @@ export const getOpenMeteo = async ({ location }) => {
   const tmins = data.daily.temperature_2m_min;
   const prcps = data.daily.rain_sum;
   const snows = data.daily.snowfall_sum;
-
-  const currentMismatch =
-    times[0] !== dateToISO8601String(stringToDate(times[0]));
-  const v2Mismatch =
-    times[0] !== dateToISO8601StringVersion2(stringToDateVersion2(times[0]));
-
-  // temporary diagnostics
-  await supabase.from('Weather Data Feedback').insert({
-    dev,
-    version,
-    flag: currentMismatch || v2Mismatch,
-    details: {
-      analysis: {
-        currentMismatch,
-        v2Mismatch,
-      },
-      getOpenMeteo: {
-        a_times: {
-          0: times[0],
-          1: times[1],
-        },
-        b_stringToDate: {
-          0: stringToDate(times[0]),
-          1: stringToDate(times[1]),
-        },
-        c_stringToDateVersion2: {
-          0: stringToDateVersion2(times[0]),
-          1: stringToDateVersion2(times[1]),
-        },
-        d_dateToISO8601String: {
-          stringToDate: {
-            0: dateToISO8601String(stringToDate(times[0])),
-            1: dateToISO8601String(stringToDate(times[1])),
-          },
-          stringToDateVersion2: {
-            0: dateToISO8601String(stringToDateVersion2(times[0])),
-            1: dateToISO8601String(stringToDateVersion2(times[1])),
-          },
-        },
-        e_dateToISO8601StringVersion2: {
-          stringToDate: {
-            0: dateToISO8601StringVersion2(stringToDate(times[0])),
-            1: dateToISO8601StringVersion2(stringToDate(times[1])),
-          },
-          stringToDateVersion2: {
-            0: dateToISO8601StringVersion2(stringToDateVersion2(times[0])),
-            1: dateToISO8601StringVersion2(stringToDateVersion2(times[1])),
-          },
-        },
-      },
-    },
-  });
 
   for (let index = 0; index < times.length; index += 1) {
     // const day = data.data[index];
