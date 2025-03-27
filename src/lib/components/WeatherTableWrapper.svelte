@@ -77,22 +77,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </div>
 
 <div
-  class="card bg-warning-50-950/50 mx-auto mt-4 flex max-w-screen-sm flex-col p-4 text-left"
+  class="card bg-warning-50-950/50 mx-auto mt-4 flex max-w-screen-md flex-col p-2 text-left"
 >
   <p>
-    There's a known issue for some locations where weather data has shifted by
+    There may be an issue for some locations where weather data has shifted by
     one day. If the data below looks wrong to you, <a
       href="/contact/forms/2025-03-weather-data?projectURL={encodeURIComponent(
         project.url.href,
       )}"
       target="_blank"
-      class="link"
-      >learn more and report an issue using this new feedback form</a
-    >. I'm still looking into what's going on and hope to have it fixed soon.
-    Sorry for any inconvenience!
+      class="link">report an issue using this feedback form</a
+    >. -Thomas
   </p>
-  <p>-Thomas</p>
-  <p class="text-xs opacity-80">Updated March 26, 2025</p>
+  <div class="flex w-full justify-end">
+    <p class="text-xs opacity-80">Updated March 27, 2025</p>
+  </div>
 </div>
 
 <div class="my-4 inline-block w-full">
