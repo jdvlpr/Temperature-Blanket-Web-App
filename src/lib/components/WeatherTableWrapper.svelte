@@ -27,6 +27,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     dateToISO8601StringVersion2,
     getTableData,
     stringToDate,
+    stringToDateVersion2,
   } from '$lib/utils';
   import { CheckIcon, ExternalLinkIcon } from '@lucide/svelte';
   import { onMount, tick } from 'svelte';
@@ -88,6 +89,24 @@ If not, see <https://www.gnu.org/licenses/>. -->
         weatherTable: {
           a_dataDate: weather.data[0].date,
           b_tableDataDate: tableData[0].date,
+        },
+        dateTest: {
+          a_stringToDate: stringToDate('2025-01-01'),
+          b_stringToDateVersion2: stringToDateVersion2('2025-01-01'),
+          c_dateToISO8601String: {
+            stringToDate: dateToISO8601String(stringToDate('2025-01-01')),
+            stringToDateVersion2: dateToISO8601String(
+              stringToDateVersion2('2025-01-01'),
+            ),
+          },
+          e_dateToISO8601StringVersion2: {
+            stringToDate: dateToISO8601StringVersion2(
+              stringToDate('2025-01-01'),
+            ),
+            stringToDateVersion2: dateToISO8601StringVersion2(
+              stringToDateVersion2('2025-01-01'),
+            ),
+          },
         },
       },
     });

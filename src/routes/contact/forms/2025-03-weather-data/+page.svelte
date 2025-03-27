@@ -40,7 +40,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { Accordion } from '@skeletonlabs/skeleton-svelte';
   import { onMount } from 'svelte';
 
-  let accordionValue = $state(['info', 'what']);
+  let accordionValue = $state(['mar27']);
 
   let includeDebugInfo = $state(true);
 
@@ -130,10 +130,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
       >
       <div class="">
         <h2 class="h2">Weather Data Feedback Form</h2>
-        <p class="text-sm">March 26, 2025</p>
+        <p class="text-sm">Updated March 27, 2025</p>
       </div>
-
-      <p>Hello, this is Thomas, the developer of temperature-blanket.com</p>
 
       <p>
         Fill out the form below if you've noticed something wrong with weather
@@ -151,6 +149,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
         rounded="rounded-container"
         classes="bg-warning-50-950/50"
       >
+        <Accordion.Item value="mar27" controlClasses="font-bold">
+          {#snippet lead()}
+            <InfoIcon />
+          {/snippet}
+          {#snippet control()}
+            March 27 Update
+          {/snippet}
+          {#snippet panel()}
+            An update was applied that hopefully fixes the dates-shifting issue.
+            If you are still seeing issues, please fill out the form below.
+          {/snippet}
+        </Accordion.Item>
         <Accordion.Item value="info" controlClasses="font-bold">
           {#snippet lead()}
             <InfoIcon />
