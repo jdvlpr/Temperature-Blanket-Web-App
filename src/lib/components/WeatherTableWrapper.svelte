@@ -79,38 +79,38 @@ If not, see <https://www.gnu.org/licenses/>. -->
     });
   });
 
+  let diagnostics = $derived({
+    dev,
+    version,
+    details: {
+      href: project.url.href,
+      weatherTable: {
+        a_dataDate: weather.data[0].date,
+        b_tableDataDate: tableData[0].date,
+      },
+      dateTest: {
+        a_stringToDate: stringToDate('2025-01-01'),
+        b_stringToDateVersion2: stringToDateVersion2('2025-01-01'),
+        c_dateToISO8601String: {
+          stringToDate: dateToISO8601String(stringToDate('2025-01-01')),
+          stringToDateVersion2: dateToISO8601String(
+            stringToDateVersion2('2025-01-01'),
+          ),
+        },
+        e_dateToISO8601StringVersion2: {
+          stringToDate: dateToISO8601StringVersion2(stringToDate('2025-01-01')),
+          stringToDateVersion2: dateToISO8601StringVersion2(
+            stringToDateVersion2('2025-01-01'),
+          ),
+        },
+      },
+    },
+  });
+
   onMount(async () => {
     tick().then(async () => {
       // diagnostics
-      await supabase.from('Weather Data Feedback').insert({
-        dev,
-        version,
-        details: {
-          href: project.url.href,
-          weatherTable: {
-            a_dataDate: weather.data[0].date,
-            b_tableDataDate: tableData[0].date,
-          },
-          dateTest: {
-            a_stringToDate: stringToDate('2025-01-01'),
-            b_stringToDateVersion2: stringToDateVersion2('2025-01-01'),
-            c_dateToISO8601String: {
-              stringToDate: dateToISO8601String(stringToDate('2025-01-01')),
-              stringToDateVersion2: dateToISO8601String(
-                stringToDateVersion2('2025-01-01'),
-              ),
-            },
-            e_dateToISO8601StringVersion2: {
-              stringToDate: dateToISO8601StringVersion2(
-                stringToDate('2025-01-01'),
-              ),
-              stringToDateVersion2: dateToISO8601StringVersion2(
-                stringToDateVersion2('2025-01-01'),
-              ),
-            },
-          },
-        },
-      });
+      await supabase.from('Weather Data Feedback').insert(diagnostics);
     });
   });
 </script>
@@ -135,7 +135,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       onclick={async () => {
         await supabase
           .from('Weather Data Feedback')
-          .insert({ is_data_ok: false });
+          .insert({ is_data_ok: false, ...diagnostics });
       }}
       target="_blank"
       class="link"
@@ -156,7 +156,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         issueNotificationElement.style.display = 'none';
         await supabase
           .from('Weather Data Feedback')
-          .insert({ is_data_ok: true });
+          .insert({ is_data_ok: true, ...diagnostics });
       }}><CheckIcon /> The dates look ok, close this notification</button
     >
   </div>
