@@ -20,8 +20,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import { gauges, localState, project, weather, toast } from '$lib/state';
-  import { getTableData } from '$lib/utils';
-  import { tick } from 'svelte';
+  import {
+    dateToISO8601String,
+    getTableData,
+    stringToDate,
+    stringToDateVersion2,
+  } from '$lib/utils';
+  import { onMount, tick } from 'svelte';
   import ToggleSwitch from './buttons/ToggleSwitch.svelte';
   import WeatherTableData from './WeatherTableData.svelte';
   import { supabase } from '$lib/supabaseClient';
@@ -69,6 +74,28 @@ If not, see <https://www.gnu.org/licenses/>. -->
     gauges.activeGauge?.ranges;
     tick().then(() => {
       updateTable();
+    });
+  });
+
+  onMount(async () => {
+    // diagnostics
+    await supabase.from('Weather Data Feedback').insert({
+      details: {
+        weatherTable: {
+          dataDate: {
+            0: weather.data[0].date,
+            1: weather.data[1].date,
+          },
+          tableDataDate: {
+            0: tableData[0].date,
+            1: tableData[1].date,
+          },
+          dateToISO8601String: {
+            0: dateToISO8601String(weather.data[0].date),
+            1: dateToISO8601String(weather.data[1].date),
+          },
+        },
+      },
     });
   });
 </script>

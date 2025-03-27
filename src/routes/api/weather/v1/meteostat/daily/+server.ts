@@ -19,8 +19,10 @@ import {
   SECRET_METEOSTAT_DEV_API_KEY,
 } from '$env/static/private';
 import { API_SERVICES, NO_DATA_SRTM3 } from '$lib/constants';
+import { supabase } from '$lib/supabaseClient.js';
 import {
   celsiusToFahrenheit,
+  dateToISO8601String,
   displayNumber,
   getAvgOfThree,
   getMaxOfThree,
@@ -28,6 +30,7 @@ import {
   hoursToMinutes,
   millimetersToInches,
   stringToDate,
+  stringToDateVersion2,
 } from '$lib/utils.js';
 import { error, json } from '@sveltejs/kit';
 import SunCalc from 'suncalc';
@@ -99,6 +102,36 @@ export async function POST({ request }) {
   location.stations = data.meta.stations;
 
   const today = new Date();
+
+  // temporary diagnostics
+  await supabase.from('Weather Data Feedback').insert({
+    details: {
+      postMeteostat: {
+        a_dataDate: {
+          0: data.data[0].date,
+          1: data.data[1].date,
+        },
+        b_stringToDate: {
+          0: stringToDate(data.data[0].date),
+          1: stringToDate(data.data[1].date),
+        },
+        c_stringToDateVersion2: {
+          0: stringToDateVersion2(data.data[0].date),
+          1: stringToDateVersion2(data.data[1].date),
+        },
+        d_dateToISO8601String: {
+          stringToDate: {
+            0: dateToISO8601String(stringToDate(data.data[0].date)),
+            1: dateToISO8601String(stringToDate(data.data[1].date)),
+          },
+          stringToDateVersion2: {
+            0: dateToISO8601String(stringToDateVersion2(data.data[0].date)),
+            1: dateToISO8601String(stringToDateVersion2(data.data[1].date)),
+          },
+        },
+      },
+    },
+  });
 
   for (let index = 0; index < data.data.length; index += 1) {
     const day = data.data[index];
