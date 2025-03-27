@@ -89,14 +89,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
             0: tableData[0].date,
             1: tableData[1].date,
           },
-          dateToISO8601String: {
-            0: dateToISO8601String(weather.data[0].date),
-            1: dateToISO8601String(weather.data[1].date),
-          },
-          e_dateToISO8601StringVersion2: {
-            0: dateToISO8601StringVersion2(weather.data[0].date),
-            1: dateToISO8601StringVersion2(weather.data[1].date),
-          },
         },
       },
     });

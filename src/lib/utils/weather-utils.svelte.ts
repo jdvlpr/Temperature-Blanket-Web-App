@@ -196,6 +196,13 @@ export const getOpenMeteo = async ({ location }) => {
   // temporary diagnostics
   await supabase.from('Weather Data Feedback').insert({
     details: {
+      analysis: {
+        currentMismatch:
+          times[0] !== dateToISO8601String(stringToDate(times[0])),
+        v2Mismatch:
+          times[0] !==
+          dateToISO8601StringVersion2(stringToDateVersion2(times[0])),
+      },
       getOpenMeteo: {
         a_times: {
           0: times[0],
