@@ -23,6 +23,7 @@ import { supabase } from '$lib/supabaseClient.js';
 import {
   celsiusToFahrenheit,
   dateToISO8601String,
+  dateToISO8601StringVersion2,
   displayNumber,
   getAvgOfThree,
   getMaxOfThree,
@@ -127,6 +128,20 @@ export async function POST({ request }) {
           stringToDateVersion2: {
             0: dateToISO8601String(stringToDateVersion2(data.data[0].date)),
             1: dateToISO8601String(stringToDateVersion2(data.data[1].date)),
+          },
+        },
+        e_dateToISO8601StringVersion2: {
+          stringToDate: {
+            0: dateToISO8601StringVersion2(stringToDate(data.data[0].date)),
+            1: dateToISO8601StringVersion2(stringToDate(data.data[1].date)),
+          },
+          stringToDateVersion2: {
+            0: dateToISO8601StringVersion2(
+              stringToDateVersion2(data.data[0].date),
+            ),
+            1: dateToISO8601StringVersion2(
+              stringToDateVersion2(data.data[1].date),
+            ),
           },
         },
       },

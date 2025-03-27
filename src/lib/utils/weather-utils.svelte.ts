@@ -27,6 +27,7 @@ import {
   celsiusToFahrenheit,
   convertTime,
   dateToISO8601String,
+  dateToISO8601StringVersion2,
   displayNumber,
   getAverage,
   getColorInfo,
@@ -216,6 +217,16 @@ export const getOpenMeteo = async ({ location }) => {
           stringToDateVersion2: {
             0: dateToISO8601String(stringToDateVersion2(times[0])),
             1: dateToISO8601String(stringToDateVersion2(times[1])),
+          },
+        },
+        e_dateToISO8601StringVersion2: {
+          stringToDate: {
+            0: dateToISO8601StringVersion2(stringToDate(times[0])),
+            1: dateToISO8601StringVersion2(stringToDate(times[1])),
+          },
+          stringToDateVersion2: {
+            0: dateToISO8601StringVersion2(stringToDateVersion2(times[0])),
+            1: dateToISO8601StringVersion2(stringToDateVersion2(times[1])),
           },
         },
       },

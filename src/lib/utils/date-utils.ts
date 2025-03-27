@@ -84,6 +84,16 @@ export const dateToISO8601String = (date) => {
 };
 
 /**
+ * Converts a date to a ISO 8601 strong
+ * @param {Date} date - The date to be converted.
+ * @returns {string} The ISO 8601 formatted date string `YYYY-MM-DD`.
+ */
+export const dateToISO8601StringVersion2 = (date) => {
+  const str = new Date(date).toISOString().split('T')[0];
+  return str;
+};
+
+/**
  * Converts a string in the format "YYYY-MM-DD",  "YYYY.MM.DD", or  "YYYY/MM/DD" to a date.
  *
  * @param   {string}  str  The string to be converted.

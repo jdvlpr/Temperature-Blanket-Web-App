@@ -19,18 +19,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <script>
-  import { gauges, localState, project, weather, toast } from '$lib/state';
+  import { gauges, localState, project, weather } from '$lib/state';
+  import { supabase } from '$lib/supabaseClient';
   import {
     dateToISO8601String,
+    dateToISO8601StringVersion2,
     getTableData,
-    stringToDate,
-    stringToDateVersion2,
   } from '$lib/utils';
+  import { CheckIcon, ExternalLinkIcon } from '@lucide/svelte';
   import { onMount, tick } from 'svelte';
   import ToggleSwitch from './buttons/ToggleSwitch.svelte';
   import WeatherTableData from './WeatherTableData.svelte';
-  import { supabase } from '$lib/supabaseClient';
-  import { CheckIcon, ExternalLinkIcon, XIcon } from '@lucide/svelte';
 
   let tableData = $state(getTableData());
 
@@ -93,6 +92,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
           dateToISO8601String: {
             0: dateToISO8601String(weather.data[0].date),
             1: dateToISO8601String(weather.data[1].date),
+          },
+          e_dateToISO8601StringVersion2: {
+            0: dateToISO8601StringVersion2(weather.data[0].date),
+            1: dateToISO8601StringVersion2(weather.data[1].date),
           },
         },
       },
