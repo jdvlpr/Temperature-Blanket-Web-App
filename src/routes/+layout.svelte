@@ -14,12 +14,23 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
+  import { dev, version } from '$app/environment';
   import { beforeNavigate, onNavigate } from '$app/navigation';
+  import { page } from '$app/state';
   import { PUBLIC_MICROSOFT_CLARITY_ID } from '$env/static/public';
   import ModalProvider from '$lib/components/modals/ModalProvider.svelte';
   import ToastProvider from '$lib/components/ToastProvider.svelte';
   import { consentToMSClarityCookies, modal, toast } from '$lib/state';
-  import { handleKeyDown, initializeLocalStorage, privacy } from '$lib/utils';
+  import { supabase } from '$lib/supabaseClient';
+  import {
+    dateToISO8601String,
+    dateToISO8601StringVersion2,
+    handleKeyDown,
+    initializeLocalStorage,
+    privacy,
+    stringToDate,
+    stringToDateVersion2,
+  } from '$lib/utils';
   import { RssIcon, XIcon } from '@lucide/svelte';
   import { onMount, type Snippet } from 'svelte';
   import '../css/main.css';
@@ -37,6 +48,32 @@ If not, see <https://www.gnu.org/licenses/>. -->
     // See the script tag with id="clarity-script"
     window.MS_CLARITY_ID = PUBLIC_MICROSOFT_CLARITY_ID || null;
     privacy.init();
+
+    // temporary diagnostics
+    const a_stringToDate = stringToDate('2025-01-01');
+    const b_stringToDateVersion2 = stringToDateVersion2('2025-01-01');
+    const c_dateToISO8601String = dateToISO8601String(a_stringToDate);
+    const d_dateToISO8601String2 = dateToISO8601StringVersion2(
+      b_stringToDateVersion2,
+    );
+
+    const currentError = c_dateToISO8601String !== '2025-01-01';
+    const v2Error = d_dateToISO8601String2 !== '2025-01-01';
+    if (currentError || v2Error) {
+      await supabase.from('Weather Data Feedback').insert({
+        dev,
+        version,
+        flag: true,
+        details: {
+          [page.route.id || 'layout']: {
+            a_stringToDate,
+            b_stringToDateVersion2,
+            c_dateToISO8601String,
+            d_dateToISO8601String2,
+          },
+        },
+      });
+    }
   });
 
   beforeNavigate(() => {
