@@ -18,6 +18,7 @@
   "dependencies": {
     "@lucide/lab": "^0.1.2",
     "@lucide/svelte": "^0.479.0",
+    "@supabase/supabase-js": "^2.49.3",
     "autocompleter": "^9.3.2",
     "canvg": "^4.0.1",
     "chart.js": "^4.4.8",

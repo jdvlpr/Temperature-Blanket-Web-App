@@ -109,6 +109,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
         address questions you might have, here's also some relevant information:
       </p>
 
+      <div id="info" class="scroll-mt-[58px]"></div>
+
       <Accordion
         value={accordionValue}
         onValueChange={(e) => (accordionValue = e.value)}

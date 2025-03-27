@@ -19,13 +19,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <script>
-  import { gauges, localState, project, weather } from '$lib/state';
+  import { gauges, localState, project, weather, toast } from '$lib/state';
   import { getTableData } from '$lib/utils';
   import { tick } from 'svelte';
   import ToggleSwitch from './buttons/ToggleSwitch.svelte';
   import WeatherTableData from './WeatherTableData.svelte';
+  import { supabase } from '$lib/supabaseClient';
+  import { CheckIcon, ExternalLinkIcon, XIcon } from '@lucide/svelte';
 
   let tableData = $state(getTableData());
+
+  let issueNotificationElement = $state();
 
   function updateTable() {
     weatherDataUpdatedKey.value = true;
@@ -77,20 +81,42 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </div>
 
 <div
-  class="card bg-warning-50-950/50 mx-auto mt-4 flex max-w-screen-md flex-col p-2 text-left"
+  class="card border-warning-500 mx-auto mt-4 flex max-w-screen-md flex-col gap-4 border p-2 text-center"
+  bind:this={issueNotificationElement}
 >
   <p>
     There may be an issue for some locations where weather data has shifted by
-    one day. If the data below looks wrong to you, <a
+    one day. If something looks wrong to you, <a
       href="/contact/forms/2025-03-weather-data?projectURL={encodeURIComponent(
         project.url.href,
       )}"
+      onclick={async () => {
+        await supabase
+          .from('Weather Data Feedback')
+          .insert({ is_data_ok: false });
+      }}
       target="_blank"
-      class="link">report an issue using this feedback form</a
-    >. -Thomas
+      class="link"
+      >report an issue <ExternalLinkIcon
+        class="relative -top-[2px] inline size-4"
+      /></a
+    >.
+    <a
+      href="/contact/forms/2025-03-weather-data#info"
+      class="link"
+      target="_blank">More details.</a
+    >
   </p>
-  <div class="flex w-full justify-end">
-    <p class="text-xs opacity-80">Updated March 27, 2025</p>
+  <div class="flex flex-wrap justify-center gap-4">
+    <button
+      class="btn preset-filled-success-50-950 text-success-contrast-50-950 text-left whitespace-pre-wrap"
+      onclick={async () => {
+        issueNotificationElement.style.display = 'none';
+        await supabase
+          .from('Weather Data Feedback')
+          .insert({ is_data_ok: true });
+      }}><CheckIcon /> The dates look ok, close this notification</button
+    >
   </div>
 </div>
 
