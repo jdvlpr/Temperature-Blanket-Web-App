@@ -198,6 +198,7 @@ export const getOpenMeteo = async ({ location }) => {
     times[0] !== dateToISO8601String(stringToDate(times[0]));
   const v2Mismatch =
     times[0] !== dateToISO8601StringVersion2(stringToDateVersion2(times[0]));
+
   // temporary diagnostics
   await supabase.from('Weather Data Feedback').insert({
     dev,

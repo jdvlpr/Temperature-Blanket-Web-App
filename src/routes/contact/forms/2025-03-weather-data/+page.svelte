@@ -14,7 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import { version } from '$app/environment';
+  import { dev, version } from '$app/environment';
   import { page } from '$app/state';
   import {
     PUBLIC_BASE_URL,
@@ -24,6 +24,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import AppShell from '$lib/components/AppShell.svelte';
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
   import { locations, project, weather } from '$lib/state';
+  import { supabase } from '$lib/supabaseClient';
   import {
     dateToISO8601String,
     dateToISO8601StringVersion2,
@@ -37,6 +38,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     XIcon,
   } from '@lucide/svelte';
   import { Accordion } from '@skeletonlabs/skeleton-svelte';
+  import { onMount } from 'svelte';
 
   let accordionValue = $state(['info', 'what']);
 
@@ -56,6 +58,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
       : null,
   );
 
+  function getProjectLinkURL(projectLink) {
+    try {
+      return new URL(projectLink);
+    } catch (error) {
+      return null;
+    }
+  }
+
   $effect(() => {
     if (locations.allValid && locations.all.length && project.url.hash)
       projectLink = project.url.href;
@@ -64,13 +74,34 @@ If not, see <https://www.gnu.org/licenses/>. -->
     }
   });
 
-  function getProjectLinkURL(projectLink) {
-    try {
-      return new URL(projectLink);
-    } catch (error) {
-      return null;
-    }
-  }
+  onMount(async () => {
+    // temporary diagnostics
+    await supabase.from('Weather Data Feedback').insert({
+      dev,
+      version,
+      flag: true,
+      details: {
+        form: {
+          a_stringToDate: stringToDate('2025-01-01'),
+          b_stringToDateVersion2: stringToDateVersion2('2025-01-01'),
+          c_dateToISO8601String: {
+            stringToDate: dateToISO8601String(stringToDate('2025-01-01')),
+            stringToDateVersion2: dateToISO8601String(
+              stringToDateVersion2('2025-01-01'),
+            ),
+          },
+          e_dateToISO8601StringVersion2: {
+            stringToDate: dateToISO8601StringVersion2(
+              stringToDate('2025-01-01'),
+            ),
+            stringToDateVersion2: dateToISO8601StringVersion2(
+              stringToDateVersion2('2025-01-01'),
+            ),
+          },
+        },
+      },
+    });
+  });
 </script>
 
 <svelte:head>

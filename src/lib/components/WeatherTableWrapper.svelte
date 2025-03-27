@@ -19,19 +19,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <script>
+  import { dev, version } from '$app/environment';
   import { gauges, localState, project, weather } from '$lib/state';
   import { supabase } from '$lib/supabaseClient';
   import {
     dateToISO8601String,
     dateToISO8601StringVersion2,
     getTableData,
-    stringToDate,
   } from '$lib/utils';
   import { CheckIcon, ExternalLinkIcon } from '@lucide/svelte';
   import { onMount, tick } from 'svelte';
   import ToggleSwitch from './buttons/ToggleSwitch.svelte';
   import WeatherTableData from './WeatherTableData.svelte';
-  import { dev, version } from '$app/environment';
 
   let tableData = $state(getTableData());
 
