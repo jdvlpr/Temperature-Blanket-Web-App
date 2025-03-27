@@ -73,6 +73,12 @@ export const yearFrom = (date) => {
  * @returns {string} The ISO 8601 formatted date string `YYYY-MM-DD`.
  */
 export const dateToISO8601String = (date) => {
+  const str = new Date(date).toISOString().split('T')[0];
+  return str;
+};
+
+// Archived function
+export const dateToISO8601StringVersion2 = (date) => {
   // Note: don't use .toIsoString, because it sometimes returns the previous date
   // I'm not exactly sure why it doesn't work as expected
   // For example don't do this: const str = new Date(date).toISOString().split('T')[0];
@@ -84,16 +90,6 @@ export const dateToISO8601String = (date) => {
 };
 
 /**
- * Converts a date to a ISO 8601 strong
- * @param {Date} date - The date to be converted.
- * @returns {string} The ISO 8601 formatted date string `YYYY-MM-DD`.
- */
-export const dateToISO8601StringVersion2 = (date) => {
-  const str = new Date(date).toISOString().split('T')[0];
-  return str;
-};
-
-/**
  * Converts a string in the format "YYYY-MM-DD",  "YYYY.MM.DD", or  "YYYY/MM/DD" to a date.
  *
  * @param   {string}  str  The string to be converted.
@@ -101,15 +97,6 @@ export const dateToISO8601StringVersion2 = (date) => {
  * @return  {Date} The UTC date
  */
 export const stringToDate = (str) => {
-  if (str.includes('-')) return new Date(str.replace(/-/g, '/'));
-  else if (str.includes('.')) return new Date(str.replace(/./g, '/'));
-  else if (str.includes('/')) return new Date(str);
-  else return new Date(str);
-};
-
-// Testing this new string to date function, to see if it can replace the one above
-// This is only currently used in a weather data issue report sent by the user
-export const stringToDateVersion2 = (str) => {
   let _datePart = str;
 
   const [datePart, timePart] = str.split(' ');
@@ -130,6 +117,14 @@ export const stringToDateVersion2 = (str) => {
   }
 
   return new Date(Date.UTC(year, month - 1, day));
+};
+
+// Archived function
+export const stringToDateVersion2 = (str) => {
+  if (str.includes('-')) return new Date(str.replace(/-/g, '/'));
+  else if (str.includes('.')) return new Date(str.replace(/./g, '/'));
+  else if (str.includes('/')) return new Date(str);
+  else return new Date(str);
 };
 
 /**
