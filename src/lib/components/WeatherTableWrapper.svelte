@@ -25,6 +25,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     dateToISO8601String,
     dateToISO8601StringVersion2,
     getTableData,
+    stringToDate,
   } from '$lib/utils';
   import { CheckIcon, ExternalLinkIcon } from '@lucide/svelte';
   import { onMount, tick } from 'svelte';
@@ -80,10 +81,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
     // diagnostics
     await supabase.from('Weather Data Feedback').insert({
       details: {
+        href: project.url.href,
         weatherTable: {
           dataDate: {
             0: weather.data[0].date,
             1: weather.data[1].date,
+          },
+          dateToISO8601String: {
+            0: dateToISO8601String(weather.data[0].date),
+            1: dateToISO8601String(weather.data[1].date),
+          },
+          e_dateToISO8601StringVersion2: {
+            0: dateToISO8601StringVersion2(weather.data[0].date),
+            1: dateToISO8601StringVersion2(weather.data[1].date),
           },
           tableDataDate: {
             0: tableData[0].date,
