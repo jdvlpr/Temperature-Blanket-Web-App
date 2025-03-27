@@ -26,6 +26,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { locations, project, weather } from '$lib/state';
   import {
     dateToISO8601String,
+    dateToISO8601StringVersion2,
     stringToDate,
     stringToDateVersion2,
   } from '$lib/utils';
@@ -490,6 +491,24 @@ If not, see <https://www.gnu.org/licenses/>. -->
             value={encodeURIComponent(
               JSON.stringify(
                 dateToISO8601String(stringToDateVersion2('2025-01-01')),
+              ),
+            )}
+          />
+          <input
+            type="hidden"
+            name="dateToISO8601StringVersion2_stringToDate"
+            value={encodeURIComponent(
+              JSON.stringify(
+                dateToISO8601StringVersion2(stringToDate('2025-01-01')),
+              ),
+            )}
+          />
+          <input
+            type="hidden"
+            name="dateToISO8601StringVersion2_stringToDate2"
+            value={encodeURIComponent(
+              JSON.stringify(
+                dateToISO8601StringVersion2(stringToDateVersion2('2025-01-01')),
               ),
             )}
           />
