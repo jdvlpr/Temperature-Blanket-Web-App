@@ -19,8 +19,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <script>
-  import { gauges, localState, locations, project, weather } from '$lib/state';
-  import { getTableData, stringToDate, stringToDateVersion2 } from '$lib/utils';
+  import { gauges, localState, project, weather } from '$lib/state';
+  import { getTableData } from '$lib/utils';
   import { tick } from 'svelte';
   import ToggleSwitch from './buttons/ToggleSwitch.svelte';
   import WeatherTableData from './WeatherTableData.svelte';

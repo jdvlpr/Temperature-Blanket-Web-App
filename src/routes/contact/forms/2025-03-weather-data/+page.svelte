@@ -24,7 +24,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import AppShell from '$lib/components/AppShell.svelte';
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
   import { locations, project, weather } from '$lib/state';
-  import { stringToDate, stringToDateVersion2 } from '$lib/utils';
+  import {
+    dateToISO8601String,
+    stringToDate,
+    stringToDateVersion2,
+  } from '$lib/utils';
   import {
     ArrowLeftIcon,
     ExternalLinkIcon,
@@ -286,6 +290,26 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </select>
           </label>
 
+          <label for="sameDates" class="label">
+            <p>Are the following two dates the same?</p>
+            <div class="grid grid-cols-2 items-center gap-2 text-center">
+              <p class="bg-surface-50-950 rounded-container p-2">
+                {dateToISO8601String(stringToDate('2025-01-01'))}
+              </p>
+              <p class="bg-surface-50-950 rounded-container p-2">
+                {dateToISO8601String(stringToDateVersion2('2025-01-01'))}
+              </p>
+            </div>
+            <select
+              class="select whitespace-pre-wrap"
+              id="sameDates"
+              name="sameDates"
+            >
+              <option value="yes">Yes, they are the same date</option>
+              <option value="no">No, they are different dates</option>
+            </select>
+          </label>
+
           <div
             class="card rounded-container bg-surface-100-900 flex flex-col gap-4 p-4"
           >
@@ -449,6 +473,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
             name="stringToDate2"
             value={encodeURIComponent(
               JSON.stringify(stringToDateVersion2('2025-01-01')),
+            )}
+          />
+          <input
+            type="hidden"
+            name="dateToISO8601String_stringToDate"
+            value={encodeURIComponent(
+              JSON.stringify(dateToISO8601String(stringToDate('2025-01-01'))),
+            )}
+          />
+          <input
+            type="hidden"
+            name="dateToISO8601String_stringToDate2"
+            value={encodeURIComponent(
+              JSON.stringify(
+                dateToISO8601String(stringToDateVersion2('2025-01-01')),
+              ),
             )}
           />
           {#if weather.data.length}
