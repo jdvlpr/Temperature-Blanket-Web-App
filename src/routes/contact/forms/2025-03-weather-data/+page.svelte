@@ -38,7 +38,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     XIcon,
   } from '@lucide/svelte';
   import { Accordion } from '@skeletonlabs/skeleton-svelte';
-  import { onMount } from 'svelte';
+  import { onMount, tick } from 'svelte';
 
   let accordionValue = $state(['mar27']);
 
@@ -75,31 +75,33 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 
   onMount(async () => {
-    // temporary diagnostics
-    await supabase.from('Weather Data Feedback').insert({
-      dev,
-      version,
-      flag: true,
-      details: {
-        form: {
-          a_stringToDate: stringToDate('2025-01-01'),
-          b_stringToDateVersion2: stringToDateVersion2('2025-01-01'),
-          c_dateToISO8601String: {
-            stringToDate: dateToISO8601String(stringToDate('2025-01-01')),
-            stringToDateVersion2: dateToISO8601String(
-              stringToDateVersion2('2025-01-01'),
-            ),
-          },
-          e_dateToISO8601StringVersion2: {
-            stringToDate: dateToISO8601StringVersion2(
-              stringToDate('2025-01-01'),
-            ),
-            stringToDateVersion2: dateToISO8601StringVersion2(
-              stringToDateVersion2('2025-01-01'),
-            ),
+    tick().then(async () => {
+      // temporary diagnostics
+      await supabase.from('Weather Data Feedback').insert({
+        dev,
+        version,
+        flag: true,
+        details: {
+          form: {
+            a_stringToDate: stringToDate('2025-01-01'),
+            b_stringToDateVersion2: stringToDateVersion2('2025-01-01'),
+            c_dateToISO8601String: {
+              stringToDate: dateToISO8601String(stringToDate('2025-01-01')),
+              stringToDateVersion2: dateToISO8601String(
+                stringToDateVersion2('2025-01-01'),
+              ),
+            },
+            e_dateToISO8601StringVersion2: {
+              stringToDate: dateToISO8601StringVersion2(
+                stringToDate('2025-01-01'),
+              ),
+              stringToDateVersion2: dateToISO8601StringVersion2(
+                stringToDateVersion2('2025-01-01'),
+              ),
+            },
           },
         },
-      },
+      });
     });
   });
 </script>

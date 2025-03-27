@@ -80,35 +80,37 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 
   onMount(async () => {
-    // diagnostics
-    await supabase.from('Weather Data Feedback').insert({
-      dev,
-      version,
-      details: {
-        href: project.url.href,
-        weatherTable: {
-          a_dataDate: weather.data[0].date,
-          b_tableDataDate: tableData[0].date,
-        },
-        dateTest: {
-          a_stringToDate: stringToDate('2025-01-01'),
-          b_stringToDateVersion2: stringToDateVersion2('2025-01-01'),
-          c_dateToISO8601String: {
-            stringToDate: dateToISO8601String(stringToDate('2025-01-01')),
-            stringToDateVersion2: dateToISO8601String(
-              stringToDateVersion2('2025-01-01'),
-            ),
+    tick().then(async () => {
+      // diagnostics
+      await supabase.from('Weather Data Feedback').insert({
+        dev,
+        version,
+        details: {
+          href: project.url.href,
+          weatherTable: {
+            a_dataDate: weather.data[0].date,
+            b_tableDataDate: tableData[0].date,
           },
-          e_dateToISO8601StringVersion2: {
-            stringToDate: dateToISO8601StringVersion2(
-              stringToDate('2025-01-01'),
-            ),
-            stringToDateVersion2: dateToISO8601StringVersion2(
-              stringToDateVersion2('2025-01-01'),
-            ),
+          dateTest: {
+            a_stringToDate: stringToDate('2025-01-01'),
+            b_stringToDateVersion2: stringToDateVersion2('2025-01-01'),
+            c_dateToISO8601String: {
+              stringToDate: dateToISO8601String(stringToDate('2025-01-01')),
+              stringToDateVersion2: dateToISO8601String(
+                stringToDateVersion2('2025-01-01'),
+              ),
+            },
+            e_dateToISO8601StringVersion2: {
+              stringToDate: dateToISO8601StringVersion2(
+                stringToDate('2025-01-01'),
+              ),
+              stringToDateVersion2: dateToISO8601StringVersion2(
+                stringToDateVersion2('2025-01-01'),
+              ),
+            },
           },
         },
-      },
+      });
     });
   });
 </script>
