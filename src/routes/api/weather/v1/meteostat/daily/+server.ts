@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { dev } from '$app/environment';
+import { dev, version } from '$app/environment';
 import {
   SECRET_METEOSTAT_API_KEY,
   SECRET_METEOSTAT_DEV_API_KEY,
@@ -106,6 +106,8 @@ export async function POST({ request }) {
 
   // temporary diagnostics
   await supabase.from('Weather Data Feedback').insert({
+    dev,
+    version,
     details: {
       postMeteostat: {
         a_dataDate: {

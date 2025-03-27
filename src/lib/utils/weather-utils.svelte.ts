@@ -13,6 +13,7 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
+import { dev, version } from '$app/environment';
 import { API_SERVICES } from '$lib/constants';
 import {
   allGaugesAttributes,
@@ -193,15 +194,19 @@ export const getOpenMeteo = async ({ location }) => {
   const prcps = data.daily.rain_sum;
   const snows = data.daily.snowfall_sum;
 
+  const currentMismatch =
+    times[0] !== dateToISO8601String(stringToDate(times[0]));
+  const v2Mismatch =
+    times[0] !== dateToISO8601StringVersion2(stringToDateVersion2(times[0]));
   // temporary diagnostics
   await supabase.from('Weather Data Feedback').insert({
+    dev,
+    version,
+    flag: currentMismatch || v2Mismatch,
     details: {
       analysis: {
-        currentMismatch:
-          times[0] !== dateToISO8601String(stringToDate(times[0])),
-        v2Mismatch:
-          times[0] !==
-          dateToISO8601StringVersion2(stringToDateVersion2(times[0])),
+        currentMismatch,
+        v2Mismatch,
       },
       getOpenMeteo: {
         a_times: {

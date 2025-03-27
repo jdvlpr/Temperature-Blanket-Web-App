@@ -31,6 +31,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { onMount, tick } from 'svelte';
   import ToggleSwitch from './buttons/ToggleSwitch.svelte';
   import WeatherTableData from './WeatherTableData.svelte';
+  import { dev, version } from '$app/environment';
 
   let tableData = $state(getTableData());
 
@@ -80,6 +81,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   onMount(async () => {
     // diagnostics
     await supabase.from('Weather Data Feedback').insert({
+      dev,
+      version,
       details: {
         href: project.url.href,
         weatherTable: {
