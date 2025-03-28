@@ -39,6 +39,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '@lucide/svelte';
   import { Accordion } from '@skeletonlabs/skeleton-svelte';
   import { onMount, tick } from 'svelte';
+  import { SvelteURL, SvelteURLSearchParams } from 'svelte/reactivity';
 
   let accordionValue = $state(['mar27']);
 
@@ -51,6 +52,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let projectLink = $state('');
 
   let projectLinkURL = $derived(getProjectLinkURL(projectLink));
+
+  let params = $derived(page.url.searchParams);
 
   let projectLinkURLPart = $derived(
     projectLinkURL?.searchParams.has('project')
@@ -556,21 +559,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
             )}
           />
 
-          {#if page.url.searchParams.has('data0')}
-            <input
-              type="hidden"
-              name="data0"
-              value={page.url.searchParams.get('data0')}
-            />
-          {/if}
+          <input type="hidden" name="data0" value={params.get('data0')} />
 
-          {#if page.url.searchParams.has('table0')}
-            <input
-              type="hidden"
-              name="table0"
-              value={page.url.searchParams.get('table0')}
-            />
-          {/if}
+          <input type="hidden" name="table0" value={params.get('table0')} />
 
           {#if weather.data.length}
             <input
