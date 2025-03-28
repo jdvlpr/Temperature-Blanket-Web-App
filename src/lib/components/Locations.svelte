@@ -30,7 +30,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     CirclePlusIcon,
     TriangleAlertIcon,
   } from '@lucide/svelte';
-  import { slide } from 'svelte/transition';
   import SearchForWeather from './buttons/SearchForWeather.svelte';
   import WeatherSourceButton from './buttons/WeatherSourceButton.svelte';
 </script>

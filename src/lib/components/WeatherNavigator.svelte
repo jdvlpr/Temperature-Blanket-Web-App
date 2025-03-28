@@ -18,7 +18,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ImportWeatherData from '$lib/components/modals/ImportWeatherData.svelte';
   import { modal, weather } from '$lib/state';
   import { downloadPDF, downloadWeatherCSV } from '$lib/utils';
-  import { DownloadIcon, ImportIcon } from '@lucide/svelte';
+  import { DownloadIcon, FilePlus2Icon } from '@lucide/svelte';
   import { weatherChart } from './WeatherChart.svelte';
 
   let debounceTimer;
@@ -73,7 +73,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         }}
         title="Import Weather Data"
       >
-        <ImportIcon class="inline" /> Import Weather Data
+        <FilePlus2Icon class="inline" /> Import Weather Data
       </button>
     {/if}
   </div>

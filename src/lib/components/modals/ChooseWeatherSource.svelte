@@ -15,16 +15,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import { locations, modal, weather } from '$lib/state';
-  import { onMount } from 'svelte';
-  import ToggleSwitch from '../buttons/ToggleSwitch.svelte';
-  import GettingWeather from './GettingWeather.svelte';
-  import GettingWeatherWarnCustomWeather from './GettingWeatherWarnCustomWeather.svelte';
   import {
     ChevronRightIcon,
     CircleCheckIcon,
     CircleIcon,
     ExternalLinkIcon,
   } from '@lucide/svelte';
+  import { onMount } from 'svelte';
+  import ToggleSwitch from '../buttons/ToggleSwitch.svelte';
+  import GettingWeather from './GettingWeather.svelte';
+  import GettingWeatherWarnCustomWeather from './GettingWeatherWarnCustomWeather.svelte';
 
   let warnSearchAgain = $state(false);
 

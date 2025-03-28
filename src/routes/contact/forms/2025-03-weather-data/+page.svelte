@@ -39,7 +39,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '@lucide/svelte';
   import { Accordion } from '@skeletonlabs/skeleton-svelte';
   import { onMount, tick } from 'svelte';
-  import { SvelteURL, SvelteURLSearchParams } from 'svelte/reactivity';
 
   let accordionValue = $state(['mar27']);
 
