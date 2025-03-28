@@ -314,7 +314,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   {#snippet main()}
     <main
-      class="mx-auto p-2 text-center max-md:min-h-[calc(100svh-116px)] md:min-h-[calc(100svh-108px)] lg:min-h-[calc(100svh-125px)]"
+      class="mx-auto p-2 text-center max-md:min-h-[calc(100svh-112px)] md:min-h-[calc(100svh-104px)] lg:min-h-[calc(100svh-120px)]"
     >
       <div
         id="page-section-location"

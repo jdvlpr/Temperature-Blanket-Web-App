@@ -29,6 +29,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     millimetersToInches,
     stringToDate,
   } from '$lib/utils';
+  import { CircleXIcon, FileIcon, FilePlusIcon } from '@lucide/svelte';
   import { FileUpload } from '@skeletonlabs/skeleton-svelte';
 
   let imported = $state(false);
@@ -37,7 +38,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let csvUpload = $state();
 
   function submitForm(event) {
-    event.preventDefault();
     if (!csvUpload[0]) return;
     const input = csvUpload[0];
     const reader = new FileReader();
@@ -51,6 +51,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
       const weatherToMatch = weather.rawData.map(
         (n) => `${dateToISO8601String(n.date)}-${n.location}`,
       );
+
+      let _rawData = $state.snapshot(weather.rawData);
 
       for (var i = 0; i < data.length; i++) {
         const row = data[i];
@@ -86,7 +88,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             );
           continue;
         }
-        let day = weather.rawData[index];
+        let day = _rawData[index];
 
         const highF = +row?.['High Temperature (°F)'];
         if (!isNaN(highF)) {
@@ -170,8 +172,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
             day.dayt.metric = hoursToMinutes(hours, 4);
           }
         }
-        weather.rawData[index] = day;
+        _rawData[index] = day;
       }
+
+      weather.rawData = _rawData;
+
       imported = true;
       processing = false;
     };
@@ -180,7 +185,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 </script>
 
-<div class="inline-flex flex-col justify-center items-center w-full p-4">
+<div
+  class="inline-flex w-full flex-col items-center justify-center p-4 text-center"
+>
   <div class="mt-2">
     <HelpIcon
       href="/documentation/#import-weather-data-file-requirements"
@@ -197,37 +204,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <FileUpload
         name="files"
         classes="mt-4 justify-center"
-        onFileChange={(e) => {
-          csvUpload = e.acceptedFiles;
+        onFileAccept={(e) => {
+          csvUpload = e.files;
           submitForm(e);
         }}
         accept=".csv"
+        subtext="Only CSV files allowed"
       >
-        {#snippet lead()}
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="1.5"
-            stroke="currentColor"
-            class="w-8 h-8 mx-auto mb-2"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m6.75 12l-3-3m0 0l-3 3m3-3v6m-1.5-15H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"
-            />
-          </svg>
-        {/snippet}
-        {#snippet message()}
-          <p>
-            <span class="font-bold">Upload a file</span>
-            or drag and drop
-          </p>
-        {/snippet}
-        {#snippet meta()}
-          Only CSV files allowed
-        {/snippet}
+        {#snippet iconInterface()}<FilePlusIcon class="size-8" />{/snippet}
+        {#snippet iconFile()}<FileIcon class="size-4" />{/snippet}
+        {#snippet iconFileRemove()}<CircleXIcon class="size-4" />{/snippet}
       </FileUpload>
       {#if errorMessages.length > 0}
         <p>Import finished, but there were some issues (listed below).</p>
@@ -241,7 +227,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {/if}
     {:else}
       <div class="my-8">
-        <p class="font-bold text-lg">Done!</p>
+        <p class="text-lg font-bold">Done!</p>
         <p>
           Close this to check the weather data and continue working on your
           project.
