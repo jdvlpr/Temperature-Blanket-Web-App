@@ -555,6 +555,23 @@ If not, see <https://www.gnu.org/licenses/>. -->
               ),
             )}
           />
+
+          {#if page.url.searchParams.has('data0')}
+            <input
+              type="hidden"
+              name="data0"
+              value={page.url.searchParams.get('data0')}
+            />
+          {/if}
+
+          {#if page.url.searchParams.has('table0')}
+            <input
+              type="hidden"
+              name="table0"
+              value={page.url.searchParams.get('table0')}
+            />
+          {/if}
+
           {#if weather.data.length}
             <input
               type="hidden"

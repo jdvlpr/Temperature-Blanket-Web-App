@@ -16,10 +16,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script module>
   export let weatherDataUpdatedKey = $state({ value: false });
   export let showColorDetails = $state({ value: false });
+  let showIssueNotification = $state(true);
 </script>
 
 <script>
   import { dev, version } from '$app/environment';
+  import { page } from '$app/state';
   import { gauges, localState, project, weather } from '$lib/state';
   import { supabase } from '$lib/supabaseClient';
   import {
@@ -29,15 +31,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     stringToDate,
     stringToDateVersion2,
   } from '$lib/utils';
-  import { CheckIcon, ExternalLinkIcon } from '@lucide/svelte';
+  import { CheckIcon, ExternalLinkIcon, InfoIcon } from '@lucide/svelte';
   import { onMount, tick } from 'svelte';
   import ToggleSwitch from './buttons/ToggleSwitch.svelte';
   import WeatherTableData from './WeatherTableData.svelte';
-  import { page } from '$app/state';
 
   let tableData = $state(getTableData());
-
-  let issueNotificationElement = $state();
 
   function updateTable() {
     weatherDataUpdatedKey.value = true;
@@ -124,45 +123,54 @@ If not, see <https://www.gnu.org/licenses/>. -->
   />
 </div>
 
-<div
-  class="card border-warning-500 mx-auto mt-4 flex max-w-screen-md flex-col gap-4 border p-2 text-center"
-  bind:this={issueNotificationElement}
->
-  <p>
-    There may be an issue for some locations where weather data has shifted by
-    one day. If something looks wrong to you, <a
-      href="/contact/forms/2025-03-weather-data?projectURL={encodeURIComponent(
-        project.url.href,
-      )}"
-      onclick={async () => {
-        await supabase
-          .from('Weather Data Feedback')
-          .insert({ is_data_ok: false, ...diagnostics });
-      }}
-      target="_blank"
-      class="link"
-      >report an issue <ExternalLinkIcon
-        class="relative -top-[2px] inline size-4"
-      /></a
-    >.
-    <a
-      href="/contact/forms/2025-03-weather-data#info"
-      class="link"
-      target="_blank">More details.</a
-    >
-  </p>
-  <div class="flex flex-wrap justify-center gap-4">
-    <button
-      class="btn preset-filled-success-50-950 text-success-contrast-50-950 text-left whitespace-pre-wrap"
-      onclick={async () => {
-        issueNotificationElement.style.display = 'none';
-        await supabase
-          .from('Weather Data Feedback')
-          .insert({ is_data_ok: true, ...diagnostics });
-      }}><CheckIcon /> The dates look ok, close this notification</button
-    >
+{#if showIssueNotification}
+  <div class="mx-auto mt-4 flex flex-col gap-4 text-center">
+    <p>
+      There may be an issue for some locations where weather data has shifted by
+      one day. <a
+        href="/contact/forms/2025-03-weather-data#info"
+        onclick={async () => {
+          await supabase
+            .from('Weather Data Feedback')
+            .insert({ is_data_ok: false, ...diagnostics });
+        }}
+        target="_blank"
+        class="link"
+        ><InfoIcon class="relative -top-[2px] inline size-4" /> More details.</a
+      >
+    </p>
+    <div class="flex flex-wrap justify-center gap-4">
+      <button
+        class="btn preset-filled-success-50-950 text-success-contrast-50-950 text-left whitespace-pre-wrap shadow"
+        onclick={async () => {
+          showIssueNotification = false;
+          await supabase
+            .from('Weather Data Feedback')
+            .insert({ is_data_ok: true, ...diagnostics });
+        }}><CheckIcon /> The dates look ok</button
+      >
+      <a
+        href="/contact/forms/2025-03-weather-data?projectURL={encodeURIComponent(
+          project.url.href,
+        )}&data0={weather.data[0].date}&table0={tableData[0].date}"
+        class="btn hover:preset-filled"
+        target="_blank"
+      >
+        <ExternalLinkIcon /> Report an issue
+      </a>
+    </div>
   </div>
-</div>
+{:else}
+  <a
+    href="/contact/forms/2025-03-weather-data?projectURL={encodeURIComponent(
+      project.url.href,
+    )}"
+    class="link mt-4 inline-block text-sm"
+    target="_blank"
+  >
+    <ExternalLinkIcon class="relative -top-[2px] inline size-4" /> Weather Data Feedback
+  </a>
+{/if}
 
 <div class="my-4 inline-block w-full">
   {#key weatherDataUpdatedKey.value}
