@@ -21,7 +21,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
   import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
   import StickyPart from '$lib/components/modals/StickyPart.svelte';
-  import { gauges, modal, localState, weather } from '$lib/state';
+  import { gauges, localState, modal, weather } from '$lib/state';
   import {
     displayNumber,
     getIncrement,
@@ -38,7 +38,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     Icon,
     InfoIcon,
     ListStartIcon,
-    Settings2Icon,
     TriangleAlertIcon,
     WandIcon,
     WandSparklesIcon,

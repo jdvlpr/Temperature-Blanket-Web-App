@@ -114,6 +114,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
         schemeName={gauge.schemeId}
         showSchemeName={false}
         roundedBottom={false}
+        onchanged={() => {
+          updateGauge({ _colors: gauge.colors });
+        }}
       />
     {/key}
   </div>
