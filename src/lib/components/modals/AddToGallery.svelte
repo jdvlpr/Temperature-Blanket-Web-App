@@ -17,6 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Spinner from '$lib/components/Spinner.svelte';
   import { locations, previews, project } from '$lib/state';
   import { sendToProjectGallery, svgToPNG } from '$lib/utils';
+  import { ExternalLinkIcon } from '@lucide/svelte';
   import StickyPart from './StickyPart.svelte';
 
   let submitting = $state(false),
@@ -50,7 +51,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 </script>
 
-<div class="p-2">
+<div class="p-2 text-center">
   {#if project.gallery.href && project.gallery.title && project.gallery.title === locations.projectTitle}
     <div class="card preset-filled-surface-100-900 mt-4 p-4 text-center">
       <p class="my-2">
@@ -59,7 +60,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           href={project.gallery.href}
           target="_blank"
           class="link btn hover:preset-tonal w-fit whitespace-pre-wrap"
-          rel="noreferrer">{project.gallery.title}</a
+          rel="noreferrer"><ExternalLinkIcon />{project.gallery.title}</a
         >
       </p>
     </div>
@@ -111,7 +112,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <StickyPart position="bottom">
   {#if !submitting && !message}
-    <div class="flex items-center justify-center p-2 text-center">
+    <div class="flex items-center justify-center p-2 py-4 text-center">
       <button
         class="btn preset-filled-primary-500"
         title="Add project to gallery"
