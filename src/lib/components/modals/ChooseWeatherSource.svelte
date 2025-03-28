@@ -93,7 +93,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </th>
           </tr>
         </thead>
-        <tbody class="text-sm">
+        <tbody class="">
           <tr>
             <td class="border-surface-500 border p-2"
               ><a
@@ -192,14 +192,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <div
         class="bg-warning-500/20 card flex flex-col items-center justify-center p-4"
       >
-        <p class="mb-4 text-sm">
+        <p class="mb-4">
           Search again for weather data to apply weather source changes.
           {#if !locations.allValid}
             Close this modal, then choose a valid location and dates.
           {/if}
         </p>
         <button
-          class="btn preset-filled-primary-500 gap-2"
+          class="btn btn-lg preset-filled-primary-500 gap-2"
           onclick={() => {
             if (weather.isUserEdited) {
               modal.trigger({
@@ -223,7 +223,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </div>
     {/if}
 
-    <p class="pb-2 text-center text-sm">
+    <p class="pb-2 text-center">
       All weather data is subject to change if the provider updates their
       models.
     </p>

@@ -139,27 +139,24 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </div>
 </div>
 
-{#if locations.allValid}
-  <div
-    class="rounded-container bg-surface-100 dark:bg-surface-900 mx-auto mt-4 mb-2 flex max-w-(--breakpoint-md) flex-wrap justify-center gap-2 px-4 py-2 shadow-inner lg:mb-4"
-    transition:slide
-  >
-    <div class:hidden={!locations.allValid || weather.isUserEdited}>
-      {#if locations.all.length < MAXIMUM_LOCATIONS}
-        <button
-          class="btn hover:preset-tonal"
-          id="add-location-button"
-          disabled={project.status.loading}
-          onclick={() => locations.add()}
-          title="Add a New Location"
-        >
-          <CirclePlusIcon /> Add Location
-        </button>
-      {:else}
-        <p>You've added the maximum allowed number of locations</p>
-      {/if}
-    </div>
-
-    <WeatherSourceButton />
+<div
+  class="rounded-container bg-surface-100 dark:bg-surface-900 mx-auto mt-4 mb-2 flex max-w-(--breakpoint-md) flex-wrap justify-center gap-2 px-4 py-2 shadow-inner lg:mb-4"
+>
+  <div class:hidden={weather.isUserEdited}>
+    {#if locations.all.length < MAXIMUM_LOCATIONS}
+      <button
+        class="btn hover:preset-tonal"
+        id="add-location-button"
+        disabled={project.status.loading}
+        onclick={() => locations.add()}
+        title="Add a New Location"
+      >
+        <CirclePlusIcon /> Add Location
+      </button>
+    {:else}
+      <p>You've added the maximum allowed number of locations</p>
+    {/if}
   </div>
-{/if}
+
+  <WeatherSourceButton />
+</div>

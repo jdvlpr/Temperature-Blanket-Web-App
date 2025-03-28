@@ -111,7 +111,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   onMount(async () => {
     tick().then(async () => {
       // diagnostics
-      await supabase.from('Weather Data Feedback').insert(diagnostics);
+      if (!dev)
+        await supabase.from('Weather Data Feedback').insert(diagnostics);
     });
   });
 </script>
@@ -125,15 +126,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 {#if showIssueNotification}
   <div class="mx-auto mt-4 flex flex-col gap-4 text-center">
-    <p>
+    <p class="text-sm">
       There may be an issue for some locations where weather data has shifted by
       one day. <a
         href="/contact/forms/2025-03-weather-data#info"
-        onclick={async () => {
-          await supabase
-            .from('Weather Data Feedback')
-            .insert({ is_data_ok: false, ...diagnostics });
-        }}
         target="_blank"
         class="link"
         ><InfoIcon class="relative -top-[2px] inline size-4" /> More details.</a
@@ -141,7 +137,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </p>
     <div class="flex flex-wrap justify-center gap-4">
       <button
-        class="btn preset-filled-success-50-950 text-success-contrast-50-950 text-left whitespace-pre-wrap shadow"
+        class="btn bg-success-50-950/30 hover:preset-tonal whitespace-pre-wrap"
         onclick={async () => {
           showIssueNotification = false;
           await supabase
@@ -153,7 +149,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
         href="/contact/forms/2025-03-weather-data?projectURL={encodeURIComponent(
           project.url.href,
         )}&data0={weather.data[0].date}&table0={tableData[0].date}"
-        class="btn hover:preset-filled"
+        class="btn hover:preset-tonal"
+        onclick={async () => {
+          await supabase
+            .from('Weather Data Feedback')
+            .insert({ is_data_ok: false, flag: true, ...diagnostics });
+        }}
         target="_blank"
       >
         <ExternalLinkIcon /> Report an issue
