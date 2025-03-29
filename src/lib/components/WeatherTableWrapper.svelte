@@ -16,7 +16,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script module>
   export let weatherDataUpdatedKey = $state({ value: false });
   export let showColorDetails = $state({ value: false });
-  let showIssueNotification = $state(true);
 </script>
 
 <script>
@@ -31,7 +30,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     stringToDate,
     stringToDateVersion2,
   } from '$lib/utils';
-  import { CheckIcon, ExternalLinkIcon, InfoIcon } from '@lucide/svelte';
+  import { ExternalLinkIcon } from '@lucide/svelte';
   import { onMount, tick } from 'svelte';
   import ToggleSwitch from './buttons/ToggleSwitch.svelte';
   import WeatherTableData from './WeatherTableData.svelte';
@@ -124,57 +123,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
   />
 </div>
 
-{#if showIssueNotification}
-  <div class="mx-auto mt-4 flex flex-col gap-4 text-center">
-    <p class="text-sm">
-      There may be an issue for some locations where weather data has shifted by
-      one day. <a
-        href="/contact/forms/2025-03-weather-data#info"
-        target="_blank"
-        class="link"
-        ><InfoIcon class="relative -top-[2px] inline size-4" /> More details.</a
-      >
-    </p>
-    <div class="flex flex-wrap justify-center gap-4">
-      <button
-        class="btn bg-success-50-950/30 hover:preset-tonal whitespace-pre-wrap"
-        onclick={async () => {
-          showIssueNotification = false;
-          await supabase
-            .from('Weather Data Feedback')
-            .insert({ is_data_ok: true, ...diagnostics });
-        }}><CheckIcon /> The dates look ok</button
-      >
-      <a
-        href="/contact/forms/2025-03-weather-data?projectURL={encodeURIComponent(
-          project.url.href,
-        )}&data0={weather.data[0].date}&table0={tableData[0].date}"
-        class="btn hover:preset-tonal"
-        onclick={async () => {
-          await supabase
-            .from('Weather Data Feedback')
-            .insert({ is_data_ok: false, flag: true, ...diagnostics });
-        }}
-        target="_blank"
-      >
-        <ExternalLinkIcon /> Report an issue
-      </a>
-    </div>
-  </div>
-{:else}
-  <a
-    href="/contact/forms/2025-03-weather-data?projectURL={encodeURIComponent(
-      project.url.href,
-    )}"
-    class="link mt-4 inline-block text-sm"
-    target="_blank"
-  >
-    <ExternalLinkIcon class="relative -top-[2px] inline size-4" /> Weather Data Feedback
-  </a>
-{/if}
-
 <div class="my-4 inline-block w-full">
   {#key weatherDataUpdatedKey.value}
     <WeatherTableData {tableData} {updateTable} />
   {/key}
 </div>
+
+<a
+  href="/contact/forms/2025-03-weather-data?projectURL={encodeURIComponent(
+    project.url.href,
+  )}"
+  class="link mb-4 inline-block text-sm"
+  target="_blank"
+>
+  <ExternalLinkIcon class="relative -top-[2px] inline size-4" /> Weather Data Feedback
+</a>

@@ -40,7 +40,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { Accordion } from '@skeletonlabs/skeleton-svelte';
   import { onMount, tick } from 'svelte';
 
-  let accordionValue = $state(['mar27']);
+  let accordionValue = $state(['mar28']);
 
   let includeDebugInfo = $state(true);
 
@@ -134,7 +134,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       >
       <div class="">
         <h2 class="h2">Weather Data Feedback Form</h2>
-        <p class="text-sm">Updated March 27, 2025</p>
+        <p class="text-sm">Updated March 28, 2025</p>
       </div>
 
       <p>
@@ -153,6 +153,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
         rounded="rounded-container"
         classes="bg-warning-50-950/50"
       >
+        <Accordion.Item value="mar28" controlClasses="font-bold">
+          {#snippet lead()}
+            <InfoIcon />
+          {/snippet}
+          {#snippet control()}
+            March 28 Update
+          {/snippet}
+          {#snippet panel()}
+            The notice above the weather table about possible dates shifting has
+            been taken down, since I believe the issue has been resolved. If you
+            are still seeing a problem with the weather data, please fill out
+            the form below.
+          {/snippet}
+        </Accordion.Item>
         <Accordion.Item value="mar27" controlClasses="font-bold">
           {#snippet lead()}
             <InfoIcon />
