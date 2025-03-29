@@ -64,22 +64,27 @@ export const formatFeatureName = (fclName) => {
   return _featureName;
 };
 
+export const formatLocationLabel = (item) => {
+  let labelText = item.name;
+
+  if (
+    item.adminName1 !== '' &&
+    item?.countryName &&
+    item.adminName1 === item.countryName
+  ) {
+    labelText += `, ${item.adminName1}`;
+  } else if (item.adminName1 !== '' && item?.countryName) {
+    labelText += `, ${item.adminName1}, ${item.countryName}`;
+  }
+
+  return labelText;
+};
+
 export const getSuggestions = (data) => {
   return data.map((item) => {
-    let labelText = item.name;
-
-    if (
-      item.adminName1 !== '' &&
-      item?.countryName &&
-      item.adminName1 === item.countryName
-    ) {
-      labelText += `, ${item.adminName1}`;
-    } else if (item.adminName1 !== '' && item?.countryName) {
-      labelText += `, ${item.adminName1}, ${item.countryName}`;
-    }
+    let labelText = formatLocationLabel(item);
 
     let icon = '';
-
     if (item.countryCode)
       icon = `<span class="fflag fflag-${item.countryCode.toUpperCase()} shrink-0"></span>`;
 
