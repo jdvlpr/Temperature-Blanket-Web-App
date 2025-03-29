@@ -132,7 +132,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <a
   href="/contact/forms/2025-03-weather-data?projectURL={encodeURIComponent(
     project.url.href,
-  )}"
+  )}&data0={weather.data[0].date}&table0={tableData[0].date}"
   class="link mb-4 inline-block text-sm"
   target="_blank"
 >
