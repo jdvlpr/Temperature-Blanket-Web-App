@@ -14,7 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import { dev, version } from '$app/environment';
+  import { browser, dev, version } from '$app/environment';
   import { page } from '$app/state';
   import {
     PUBLIC_BASE_URL,
@@ -52,7 +52,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let projectLinkURL = $derived(getProjectLinkURL(projectLink));
 
-  let params = $derived(page.url.searchParams);
+  let params = $derived(browser ? page.url.searchParams : null);
 
   let projectLinkURLPart = $derived(
     projectLinkURL?.searchParams.has('project')
@@ -69,6 +69,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 
   $effect(() => {
+    if (!browser) return;
     if (locations.allValid && locations.all.length && project.url.hash)
       projectLink = project.url.href;
     else if (page.url.searchParams.has('projectURL')) {
@@ -572,9 +573,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
             )}
           />
 
-          <input type="hidden" name="data0" value={params.get('data0')} />
+          {#if browser}
+            <input type="hidden" name="data0" value={params.get('data0')} />
 
-          <input type="hidden" name="table0" value={params.get('table0')} />
+            <input type="hidden" name="table0" value={params.get('table0')} />
+          {/if}
 
           {#if weather.data.length}
             <input
