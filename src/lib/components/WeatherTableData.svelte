@@ -87,6 +87,7 @@
                 class={[
                   weather.grouping === 'day' && 'hover:preset-tonal btn',
                   weather.grouping === 'week' && 'disabled:opacity-100',
+                  isRecentDate && 'opacity-65',
                 ]}
                 disabled={weather.grouping === 'week'}
                 onclick={() => {
