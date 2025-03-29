@@ -270,7 +270,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         under that a section called Location:
                       </p>
                       <img
-                        class="my-2 h-auto max-h-fit w-full"
+                        class="rounded-container border-surface-100-900 my-2 h-auto max-h-fit w-full border-6 shadow-lg"
                         src="/images/blog-images/2024-02-09-how-to-plan-a-temperature-blanket/location-temperature-blanket.png"
                         alt="Location Section"
                       />
@@ -362,7 +362,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   </div>
 
                   <div
-                    class="variant-outline-primary rounded-container w-fit p-4"
+                    class="preset-outlined-primary-500 rounded-container w-fit p-4"
                   >
                     <p class="font-bold">💡 Handy Hints</p>
                     <div class="ml-4">
@@ -397,7 +397,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   <div class="flex flex-wrap gap-4">
                     <div class="flex-1">
                       <img
-                        class="mb-2 h-auto max-h-fit w-full"
+                        class="rounded-container border-surface-100-900 mb-2 h-auto max-h-fit w-full border-6 shadow-lg"
                         src="/images/blog-images/2024-02-09-how-to-plan-a-temperature-blanket/weather-section.png"
                         alt="Weather Section"
                       />
@@ -450,7 +450,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   </p>
 
                   <div
-                    class="variant-outline-primary rounded-container w-fit p-4"
+                    class="preset-outlined-primary-500 rounded-container w-fit p-4"
                   >
                     <p class="font-bold">💡 Handy Hints</p>
                     <div class="ml-4">
@@ -513,7 +513,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       in the toolbar to choose how many and which colorways to use.
                     </p>
                     <img
-                      class="h-auto max-h-fit w-full max-w-[400px]"
+                      class="rounded-container border-surface-100-900 my-2 h-auto max-h-fit w-full max-w-[540px] border-6 shadow-lg"
                       src="/images/blog-images/2024-02-09-how-to-plan-a-temperature-blanket/colors-toolbar.png"
                       alt="Colors Toolbar"
                     />
@@ -525,12 +525,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     </p>
                     <div class="flex flex-wrap gap-4">
                       <img
-                        class="h-auto max-h-fit w-full max-w-64"
+                        class="rounded-container border-surface-100-900 my-2 h-auto max-h-fit w-full max-w-64 border-6 shadow-lg"
                         src="/images/blog-images/2024-02-09-how-to-plan-a-temperature-blanket/find-matching-yarn.png"
                         alt="Find Matching Yarn"
                       />
                       <img
-                        class="h-auto max-h-fit w-full max-w-64"
+                        class="rounded-container border-surface-100-900 my-2 h-auto max-h-fit w-full max-w-64 border-6 shadow-lg"
                         src="/images/blog-images/2024-02-09-how-to-plan-a-temperature-blanket/individual-color-tools.png"
                         alt="Find Matching Yarn"
                       />
@@ -573,7 +573,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   </div>
 
                   <div
-                    class="variant-outline-primary rounded-container w-fit p-4"
+                    class="preset-outlined-primary-500 rounded-container w-fit p-4"
                   >
                     <p class="font-bold">💡 Handy Hints</p>
                     <div class="ml-4">
@@ -585,7 +585,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                           open other tools in the Project Planner.
                         </p>
                         <img
-                          class="h-auto max-h-fit w-full max-w-64"
+                          class="rounded-container border-surface-100-900 my-2 h-auto max-h-fit w-full max-w-96 border-6 shadow-lg"
                           src="/images/blog-images/2024-02-09-how-to-plan-a-temperature-blanket/default-yarn.png"
                           alt="Default Yarn"
                         />
@@ -615,7 +615,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     started.
                   </p>
                   <img
-                    class="h-auto max-h-fit w-full"
+                    class="rounded-container border-surface-100-900 my-2 h-auto max-h-fit w-full border-6 shadow-lg"
                     src="/images/blog-images/2024-02-09-how-to-plan-a-temperature-blanket/ranges-configuration.png"
                     alt="Ranges Configuration"
                   />
@@ -691,7 +691,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   </p>
 
                   <div
-                    class="variant-outline-primary rounded-container w-fit p-4"
+                    class="preset-outlined-primary-500 rounded-container w-fit p-4"
                   >
                     <p class="font-bold">💡 Handy Hints</p>
                     <div class="ml-4">
@@ -700,18 +700,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         also want to adjust the preview to use the same weather
                         parameter in the Preview section.
                       </p>
-                      <div class="grid grid-cols-1 gap-2 md:grid-cols-2">
-                        <img
-                          class="w-full max-w-[280px]"
-                          src="/images/blog-images/2024-02-09-how-to-plan-a-temperature-blanket/balance-focus.png"
-                          alt="Balance Focus"
-                        />
-                        <img
-                          class="w-full max-w-[280px]"
-                          src="/images/blog-images/2024-02-09-how-to-plan-a-temperature-blanket/preview-parameter.png"
-                          alt="Preview Parameter"
-                        />
-                      </div>
+
                       <p>
                         - Want to represent more than just temperatures in your
                         project? Try making a gauge for rainfall, snowfall, or
@@ -736,20 +725,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     These are the options for the different kinds of layouts the
                     Project Planner can show you.
                   </p>
-                  <div class="flex flex-wrap items-center justify-center gap-4">
-                    <img
-                      class="h-auto max-h-fit w-full max-w-sm"
-                      src="/images/blog-images/2024-02-09-how-to-plan-a-temperature-blanket/previews.png"
-                      alt="Preview Layout Options"
-                    />
-                  </div>
-                  <div class="flex flex-wrap items-center justify-center gap-4">
-                    <img
-                      class="h-auto max-h-fit w-full max-w-sm"
-                      src="/images/blog-images/2024-02-09-how-to-plan-a-temperature-blanket/preview.png"
-                      alt="Preview"
-                    />
-                  </div>
+                  <img
+                    class="rounded-container border-surface-100-900 my-2 h-auto max-h-fit w-full max-w-md border-6 shadow-lg"
+                    src="/images/blog-images/2024-02-09-how-to-plan-a-temperature-blanket/preview.png"
+                    alt="Preview"
+                  />
                   <p>
                     Each layout is unique and customizable. Select a different
                     one at any time to change the preview. Some layouts can be
@@ -759,7 +739,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   </p>
 
                   <div
-                    class="variant-outline-primary rounded-container w-fit p-4"
+                    class="preset-outlined-primary-500 rounded-container w-fit p-4"
                   >
                     <p class="font-bold">💡 Handy Hints</p>
                     <div class="ml-4">
@@ -833,7 +813,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   </p>
 
                   <div
-                    class="variant-outline-primary rounded-container w-fit p-4"
+                    class="preset-outlined-primary-500 rounded-container w-fit p-4"
                   >
                     <p class="font-bold">💡 Handy Hint</p>
                     <div class="">
