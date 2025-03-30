@@ -67,16 +67,6 @@ export const yearFrom = (date) => {
   return new Date(yearFromDate.setDate(new Date(yearFromDate).getDate() - 1));
 };
 
-/**
- * Converts a date to a ISO 8601 strong
- * @param {Date} date - The date to be converted.
- * @returns {string} The ISO 8601 formatted date string `YYYY-MM-DD`.
- */
-export const dateToISO8601String = (date) => {
-  const str = new Date(date).toISOString().split('T')[0];
-  return str;
-};
-
 // Archived function
 export const dateToISO8601StringVersion2 = (date) => {
   // Note: don't use .toIsoString, because it sometimes returns the previous date
@@ -90,33 +80,40 @@ export const dateToISO8601StringVersion2 = (date) => {
 };
 
 /**
- * Converts a string in the format "YYYY-MM-DD",  "YYYY.MM.DD", or  "YYYY/MM/DD" to a date.
+ * Converts a Date object to a "YYYY-MM-DD" string using local time.
  *
- * @param   {string}  str  The string to be converted.
+ * @param {Date} date
+ * @returns {string}
+ */
+export const dateToISO8601String = (date) => {
+  const year = date.getFullYear();
+  const month = `${date.getMonth() + 1}`.padStart(2, '0');
+  const day = `${date.getDate()}`.padStart(2, '0');
+
+  return `${year}-${month}-${day}`;
+};
+
+/**
+ * Converts a string in the format "YYYY-MM-DD", "YYYY.MM.DD", or "YYYY/MM/DD" to a Date.
+ * Keeps the date parts exactly as entered (no timezone shifting).
  *
- * @return  {Date} The UTC date
+ * @param {string} str
+ * @returns {Date}
  */
 export const stringToDate = (str) => {
-  let _datePart = str;
-
   const [datePart, timePart] = str.split(' ');
-  if (datePart && timePart) _datePart = datePart;
 
-  let splitDatePart;
-  if (_datePart.includes('-')) splitDatePart = _datePart.split('-').map(Number);
-  else if (_datePart.includes('.'))
-    splitDatePart = _datePart.split('.').map(Number);
-  else if (_datePart.includes('/'))
-    splitDatePart = _datePart.split('/').map(Number);
+  let [year, month, day] = datePart.split(/[-./]/).map(Number);
 
-  const [year, month, day] = splitDatePart;
-
-  if (timePart && timePart.includes(':')) {
-    const [hour, minute, second] = timePart.split(':').map(Number);
-    return new Date(Date.UTC(year, month - 1, day, hour, minute, second));
+  let hours = 0,
+    minutes = 0,
+    seconds = 0;
+  if (timePart) {
+    [hours, minutes, seconds] = timePart.split(':').map(Number);
   }
 
-  return new Date(Date.UTC(year, month - 1, day));
+  // Create a date using local time (prevents UTC shifting)
+  return new Date(year, month - 1, day, hours, minutes, seconds);
 };
 
 // Archived function
