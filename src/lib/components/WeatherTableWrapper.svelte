@@ -130,10 +130,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </div>
 
 <a
-  href="/contact/forms/2025-03-weather-data?projectURL={encodeURIComponent(
-    project.url.href,
-  )}&data0={weather.data[0].date}&table0={tableData[0].date}"
+  href="/contact/forms/2025-03-weather-data?pageURL={encodeURIComponent(
+    page.url.href,
+  )}&projectURL={encodeURIComponent(project.url.href)}&data0={weather.data[0]
+    .date}&table0={tableData[0].date}"
   class="link mb-4 inline-block text-sm"
+  onclick={async () => {
+    if (!dev)
+      await supabase
+        .from('Weather Data Feedback')
+        .insert({ is_data_ok: false, flag: true, ...diagnostics });
+  }}
   target="_blank"
 >
   <ExternalLinkIcon class="relative -top-[2px] inline size-4" /> Weather Data Feedback

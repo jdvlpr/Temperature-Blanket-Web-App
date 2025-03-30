@@ -512,7 +512,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
             value={Intl.DateTimeFormat().resolvedOptions().timeZone}
           />
           <input type="hidden" name="version" value={version} />
+
           <input type="hidden" name="projectURL" value={project.url.href} />
+
           <input
             type="hidden"
             name="loaded"
@@ -574,6 +576,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
           />
 
           {#if browser}
+            <input type="hidden" name="pageURL" value={params.get('pageURL')} />
+
             <input type="hidden" name="data0" value={params.get('data0')} />
 
             <input type="hidden" name="table0" value={params.get('table0')} />
