@@ -89,6 +89,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
       },
     });
 
+    submitting = false;
+
     if (res.ok) {
       toast.trigger({
         message: 'Thanks, feedback sent successfully!',
@@ -100,7 +102,35 @@ If not, see <https://www.gnu.org/licenses/>. -->
         category: 'error',
       });
     }
-    submitting = false;
+
+    // temporary diagnostics
+    if (!dev)
+      await supabase.from('Weather Data Feedback').insert({
+        dev,
+        version,
+        flag: true,
+        details: {
+          form: {
+            a_stringToDate: stringToDate('2025-01-01'),
+            b_stringToDateVersion2: stringToDateVersion2('2025-01-01'),
+            c_dateToISO8601String: {
+              stringToDate: dateToISO8601String(stringToDate('2025-01-01')),
+              stringToDateVersion2: dateToISO8601String(
+                stringToDateVersion2('2025-01-01'),
+              ),
+            },
+            e_dateToISO8601StringVersion2: {
+              stringToDate: dateToISO8601StringVersion2(
+                stringToDate('2025-01-01'),
+              ),
+              stringToDateVersion2: dateToISO8601StringVersion2(
+                stringToDateVersion2('2025-01-01'),
+              ),
+            },
+            jsonObject,
+          },
+        },
+      });
   }
 
   $effect(() => {
@@ -110,38 +140,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     else if (page.url.searchParams.has('projectURL')) {
       projectLink = page.url.searchParams.get('projectURL');
     }
-  });
-
-  onMount(async () => {
-    tick().then(async () => {
-      // temporary diagnostics
-      if (!dev)
-        await supabase.from('Weather Data Feedback').insert({
-          dev,
-          version,
-          flag: true,
-          details: {
-            form: {
-              a_stringToDate: stringToDate('2025-01-01'),
-              b_stringToDateVersion2: stringToDateVersion2('2025-01-01'),
-              c_dateToISO8601String: {
-                stringToDate: dateToISO8601String(stringToDate('2025-01-01')),
-                stringToDateVersion2: dateToISO8601String(
-                  stringToDateVersion2('2025-01-01'),
-                ),
-              },
-              e_dateToISO8601StringVersion2: {
-                stringToDate: dateToISO8601StringVersion2(
-                  stringToDate('2025-01-01'),
-                ),
-                stringToDateVersion2: dateToISO8601StringVersion2(
-                  stringToDateVersion2('2025-01-01'),
-                ),
-              },
-            },
-          },
-        });
-    });
   });
 </script>
 
