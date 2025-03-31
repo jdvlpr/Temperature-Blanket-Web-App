@@ -13,7 +13,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script>
+<script lang="ts">
   import { browser, dev, version } from '$app/environment';
   import { page } from '$app/state';
   import {
@@ -23,7 +23,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import AppLogo from '$lib/components/AppLogo.svelte';
   import AppShell from '$lib/components/AppShell.svelte';
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
-  import { locations, project, weather } from '$lib/state';
+  import Spinner from '$lib/components/Spinner.svelte';
+  import { locations, project, toast, weather } from '$lib/state';
   import { supabase } from '$lib/supabaseClient';
   import {
     dateToISO8601String,
@@ -60,12 +61,46 @@ If not, see <https://www.gnu.org/licenses/>. -->
       : null,
   );
 
+  let submitting = $state(false);
+
   function getProjectLinkURL(projectLink) {
     try {
       return new URL(projectLink);
     } catch (error) {
       return null;
     }
+  }
+
+  async function submitForm(event) {
+    event.preventDefault();
+    submitting = true;
+
+    const formData = new FormData(event.target);
+
+    // Convert FormData to a JSON object
+    const jsonObject = Object.fromEntries(formData.entries());
+
+    const res = await fetch(PUBLIC_YARN_SEARCH_REQUEST_FORM_LINK, {
+      method: 'POST',
+      body: JSON.stringify(jsonObject),
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      },
+    });
+
+    if (res.ok) {
+      toast.trigger({
+        message: 'Thanks, feedback sent successfully!',
+        category: 'success',
+      });
+    } else {
+      toast.trigger({
+        message: 'Sending failed, please try again later.',
+        category: 'error',
+      });
+    }
+    submitting = false;
   }
 
   $effect(() => {
@@ -292,8 +327,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         you are willing to provide.
       </p>
       <form
-        action={PUBLIC_YARN_SEARCH_REQUEST_FORM_LINK}
-        method="POST"
+        onsubmit={submitForm}
         enctype="multipart/form-data"
         class="m-2 mb-4 flex flex-col gap-6"
       >
@@ -307,7 +341,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
               type="text"
               name="projectLink"
               placeholder="Your Project URL"
-              required
             />
             <button
               class="ig-btn preset-filled"
@@ -497,15 +530,25 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </label>
 
         <button
-          class="btn btn-lg preset-filled-primary-500 w-fit shadow-sm"
-          type="submit">Send Report</button
+          disabled={submitting}
+          class={[
+            'btn btn-lg w-fit shadow-sm',
+            submitting
+              ? 'preset-filled-primary-50-950'
+              : 'preset-filled-primary-500',
+          ]}
+          type="submit"
         >
+          {#if submitting}
+            <Spinner size="24" /> Sending Report
+          {:else}
+            Send Report
+          {/if}
+        </button>
 
-        <input
-          type="hidden"
-          name="_next"
-          value="{PUBLIC_BASE_URL}/contact/forms/thank-you"
-        />
+        <input type="hidden" name="_captcha" value="false" />
+
+        <input type="text" name="_honey" style="display:none" />
 
         {#if includeDebugInfo}
           <input
