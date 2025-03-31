@@ -18,6 +18,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
   import { UNIT_LABELS } from '$lib/constants';
   import { localState, locations, weather } from '$lib/state';
+  import type { WeatherDay } from '$lib/types';
   import {
     capitalizeFirstLetter,
     convertTime,
@@ -27,6 +28,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '$lib/utils';
   import { getTextColor } from '$lib/utils/color-utils';
   import { CircleArrowLeftIcon, CircleArrowRightIcon } from '@lucide/svelte';
+  import type { Location } from '@playwright/test';
 
   let {
     data = weather.data || [],
@@ -38,8 +40,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let navigatorElement = $state();
 
-  let dayWeather = $derived(data[weather.currentIndex]);
-  let dayLocation = $derived(
+  let dayWeather: WeatherDay = $derived(data[weather.currentIndex]);
+
+  let dayLocation: Location = $derived(
     locations.all.filter(
       (location) => location.index === dayWeather?.location,
     )[0],

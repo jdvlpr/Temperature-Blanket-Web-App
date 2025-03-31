@@ -23,7 +23,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     weather,
   } from '$lib/state';
   // Note: the signal store is a weird necessity, investigate this
-  import { delay, getOpenMeteo, goToProjectSection } from '$lib/utils';
+  import {
+    delay,
+    getOpenMeteo,
+    goToProjectSection,
+    stringToDate,
+  } from '$lib/utils';
   import { onMount } from 'svelte';
   import Spinner from '../Spinner.svelte';
 
@@ -130,7 +135,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             data = data.map((day) => {
               return {
                 ...day,
-                date: new Date(day.date),
+                date: stringToDate(day.date),
               };
             });
 

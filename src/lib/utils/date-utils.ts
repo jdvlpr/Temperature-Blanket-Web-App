@@ -19,28 +19,48 @@ import type { WeatherDay } from '$lib/types';
 
 /**
  * Checks if a given date is recent based on the weather source.
- * @param {string} date - The ISO 8601 `YYYY-MM-DD` date to check.
+ * @param {string | Date} date - The ISO 8601 `YYYY-MM-DD` or Date date to check
  * @returns {boolean} - True if the date is recent, false otherwise.
  */
 export const getIsRecentDate = (date) => {
+  if (typeof date === 'string') date = stringToDate(date);
   if (!date || weather.isUserEdited) return false;
   const weatherSource = weather.defaultSource;
+
+  console.log({
+    date,
+    newD: new Date(
+      new Date().getTime() - OPEN_METEO_DELAY_DAYS * 24 * 60 * 60 * 1000,
+    ),
+  });
+
+  const now = new Date();
+  const msPerDay = 24 * 60 * 60 * 1000;
+  const oneDayAgo = new Date(now.getTime() - 1 * 24 * 60 * 60 * 1000);
+
   if (weatherSource === 'Open-Meteo') {
-    return (
-      new Date(date) >
-        new Date(
-          new Date().getTime() - OPEN_METEO_DELAY_DAYS * 24 * 60 * 60 * 1000,
-        ) &&
-      new Date(date) < new Date(new Date().getTime() - 1 * 24 * 60 * 60 * 1000)
+    const daysAgo = new Date(now.getTime() - OPEN_METEO_DELAY_DAYS * msPerDay);
+
+    const utcMidnightDaysAgo = new Date(
+      Date.UTC(
+        daysAgo.getUTCFullYear(),
+        daysAgo.getUTCMonth(),
+        daysAgo.getUTCDate(),
+      ),
     );
+    return date > utcMidnightDaysAgo && date < oneDayAgo;
   } else if (weatherSource === 'Meteostat') {
-    return (
-      new Date(date) >
-        new Date(
-          new Date().getTime() - METEOSTAT_DELAY_DAYS * 24 * 60 * 60 * 1000,
-        ) &&
-      new Date(date) < new Date(new Date().getTime() - 1 * 24 * 60 * 60 * 1000)
+    const daysAgo = new Date(now.getTime() - METEOSTAT_DELAY_DAYS * msPerDay);
+
+    const utcMidnightDaysAgo = new Date(
+      Date.UTC(
+        daysAgo.getUTCFullYear(),
+        daysAgo.getUTCMonth(),
+        daysAgo.getUTCDate(),
+      ),
     );
+
+    return date > utcMidnightDaysAgo && date < oneDayAgo;
   }
   return false;
 };
@@ -49,21 +69,22 @@ export const getIsFutureDate = (date) => {
   if (!date || weather.isUserEdited) return false;
 
   return (
-    new Date(date) > new Date(new Date().getTime() - 1 * 24 * 60 * 60 * 1000)
+    stringToDate(date) >
+    new Date(Date.UTC(new Date().getTime() - 1 * 24 * 60 * 60 * 1000))
   );
 };
 
 /**
  * One year from the given date
  *
- * @param   {string}  date  ISO 8601 `YYYY-MM-DD` date string
+ * @param   {string | Date}  date  ISO 8601 `YYYY-MM-DD` date string or Date
  *
  * @return  {Date} one year from the given date
  */
 export const yearFrom = (date) => {
-  const yearFromDate = new Date(
-    new Date(date).setFullYear(new Date(date).getFullYear() + 1),
-  );
+  let _date = date;
+  if (typeof date === 'string') _date = stringToDate(date);
+  const yearFromDate = new Date(_date.setFullYear(_date.getFullYear() + 1));
   return new Date(yearFromDate.setDate(new Date(yearFromDate).getDate() - 1));
 };
 
@@ -73,8 +94,13 @@ export const yearFrom = (date) => {
  * @returns {string} The ISO 8601 formatted date string `YYYY-MM-DD`.
  */
 export const dateToISO8601String = (date) => {
-  const str = new Date(date).toISOString().split('T')[0];
-  return str;
+  console.log({ date });
+
+  const year = date.getFullYear();
+  const month = `${date.getMonth() + 1}`.padStart(2, '0');
+  const day = `${date.getDate()}`.padStart(2, '0');
+
+  return `${year}-${month}-${day}`;
 };
 
 // Archived function
@@ -97,10 +123,10 @@ export const dateToISO8601StringVersion2 = (date) => {
  * @return  {Date} The UTC date
  */
 export const stringToDate = (str) => {
-  let _datePart = str;
+  console.log({ str });
 
-  const [datePart, timePart] = str.split(' ');
-  if (datePart && timePart) _datePart = datePart;
+  let _datePart = str;
+  if (str.includes(' ')) _datePart = str.split(' ')[0];
 
   let splitDatePart;
   if (_datePart.includes('-')) splitDatePart = _datePart.split('-').map(Number);
@@ -111,10 +137,11 @@ export const stringToDate = (str) => {
 
   const [year, month, day] = splitDatePart;
 
-  if (timePart && timePart.includes(':')) {
-    const [hour, minute, second] = timePart.split(':').map(Number);
-    return new Date(Date.UTC(year, month - 1, day, hour, minute, second));
-  }
+  // disregard the time part
+  // if (timePart && timePart.includes(':')) {
+  //   const [hour, minute, second] = timePart.split(':').map(Number);
+  //   return new Date(Date.UTC(year, month - 1, day, hour, minute, second));
+  // }
 
   return new Date(Date.UTC(year, month - 1, day));
 };
@@ -192,13 +219,13 @@ export const isDateWithinLastSevenDays = (date) => {
 
   // Convert the input date to a Date object for comparison
   // const inputDate = new Date(date);
-  const inputDate = typeof date === 'string' ? new Date(date) : date;
+  const inputDate = typeof date === 'string' ? stringToDate(date) : date;
 
   // Check if the input date is within the last seven days
   return inputDate >= sevenDaysAgo && inputDate <= currentDate;
 };
 
-export const getToday = () => {
+export const getToday = (): Date => {
   let dateToday = new Date(new Date().setHours(24, 0, 0, 0));
   let today = dateToday.setDate(dateToday.getDate() - 1); // why this way??
   return today;

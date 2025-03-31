@@ -146,7 +146,7 @@ export const getOpenMeteo = async ({ location }) => {
         content += ' Change the dates so that all days are in the past.';
       }
 
-      if (from < new Date('1940-01-01')) {
+      if (from < stringToDate('1940-01-01')) {
         content += 'There may not be weather data for dates before 1940.';
       }
 

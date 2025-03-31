@@ -131,7 +131,7 @@ export async function POST({ request }) {
 
     const dayData = {};
     dayData.location = location.index;
-    dayData.date = dayDate;
+    dayData.date = day.date;
     dayData.tavg = {
       metric: tavg,
       imperial: celsiusToFahrenheit(tavg),

@@ -25,6 +25,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     getSuggestions,
     pluralize,
     renderResult,
+    stringToDate,
     yearFrom,
   } from '$lib/utils';
   import {
@@ -94,7 +95,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       location.duration = location?.duration || 'c';
 
       if (location?.from) {
-        const from = new Date(location.from.replace(/-/g, '/'));
+        const from = stringToDate(location.from);
         year = from.getFullYear();
         month = from.getMonth() + 1;
         day = from.getDate();
@@ -234,9 +235,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     location.to = to;
   }
 
-  // Get's the date of yesterday to set the max date
+  // Get's the date of yesterday 'YYYY-MM-DD' to set the max date
   function getYesterday() {
-    const yesterday = new Date().setDate(new Date().getDate() - 1);
+    const yesterday = new Date(new Date().setDate(new Date().getDate() - 1));
+    console.log(dateToISO8601String(yesterday));
     return dateToISO8601String(yesterday);
   }
 
@@ -504,9 +506,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           disabled={!!weather.isUserEdited || project.status.loading}
           onchange={() => {
             if (location?.duration === 'y') {
-              year = new Date(location.from.replace(/-/g, '/')).getFullYear();
-              month = new Date(location.from.replace(/-/g, '/')).getMonth() + 1;
-              day = new Date(location.from.replace(/-/g, '/')).getDate();
+              year = stringToDate(location.from).getFullYear();
+              month = stringToDate(location.from).getMonth() + 1;
+              day = stringToDate(location.from).getDate();
               setDates({});
             }
           }}

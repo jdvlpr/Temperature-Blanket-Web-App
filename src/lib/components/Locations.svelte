@@ -24,7 +24,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     wasProjectLoadedFromURL,
     weather,
   } from '$lib/state';
-  import { pluralize } from '$lib/utils';
+  import { pluralize, stringToDate } from '$lib/utils';
   import {
     CircleCheckBigIcon,
     CirclePlusIcon,
@@ -58,7 +58,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <p class="flex flex-wrap items-center justify-center gap-x-1">
           <span class="font-bold">{@html location.result}</span>
           <span>
-            {new Date(location.from).toLocaleDateString()} to {new Date(
+            {stringToDate(location.from).toLocaleDateString()} to {stringToDate(
               location.to,
             ).toLocaleDateString()}
           </span>
