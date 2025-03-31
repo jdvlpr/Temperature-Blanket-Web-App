@@ -37,6 +37,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let tableData = $state(getTableData());
 
+  const uid = $props.id();
+
   function updateTable() {
     weatherDataUpdatedKey.value = true;
     tick().then(() => {
@@ -125,7 +127,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <div class="my-4 inline-block w-full">
   {#key weatherDataUpdatedKey.value}
-    <WeatherTableData {tableData} {updateTable} />
+    <WeatherTableData {tableData} {updateTable} {uid} />
   {/key}
 </div>
 

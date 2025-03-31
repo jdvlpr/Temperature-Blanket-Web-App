@@ -21,7 +21,7 @@
   import { UNIT_LABELS } from '$lib/constants';
   import { onMount } from 'svelte';
 
-  let { tableData, updateTable } = $props();
+  let { tableData, updateTable, uid } = $props();
 
   let table = new TableHandler(tableData, {
     rowsPerPage: weather.table.rowsPerPage,
@@ -32,7 +32,7 @@
   });
 </script>
 
-<DataTable {table} search={true}>
+<DataTable {table} search={true} {uid}>
   <table class={'mx-auto w-full border-separate border-spacing-0'}>
     <thead>
       <tr>
@@ -59,6 +59,7 @@
       class="[&>tr:nth-child(odd)]:bg-surface-100 dark:[&>tr:nth-child(odd)]:bg-surface-800"
     >
       {#each table.rows as row}
+        {@const index = table.allRows.findIndex((r) => r.date === row.date)}
         {@const isRecentDate = getIsRecentDate(row.date)}
         {@const isFutureDate = getIsFutureDate(row.date)}
         <tr
@@ -66,7 +67,9 @@
             isRecentDate && '!bg-warning-500/20',
             showColorDetails.value &&
               '!divide-surface-50 dark:!divide-surface-900 divide-x-2 divide-y-2',
+            'scroll-mt-[78px] transition-colors duration-300 ease-in-out',
           ]}
+          id="{uid}-{index}"
         >
           <td>
             {#if isRecentDate}

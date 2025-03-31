@@ -16,20 +16,68 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import RowsPerPage from '$lib/components/datatable/RowsPerPage.svelte';
   import { weather } from '$lib/state';
-  import { CircleArrowLeftIcon, CircleArrowRightIcon } from '@lucide/svelte';
+  import {
+    CalendarIcon,
+    CircleArrowLeftIcon,
+    CircleArrowRightIcon,
+  } from '@lucide/svelte';
   import type { TableHandler } from '@vincjo/datatables';
-  import { type Snippet } from 'svelte';
+  import { tick, type Snippet } from 'svelte';
 
   interface Props {
     table: TableHandler;
     search?: boolean;
     hidePageLabel?: boolean;
+    uid: string;
     children: Snippet;
   }
 
-  let { table = $bindable(), search = true, children }: Props = $props();
+  let {
+    table = $bindable(),
+    search = true,
+    children,
+    uid = '',
+  }: Props = $props();
 
   let searchInput = $state(null);
+
+  let includesToday = $derived.by(() => {
+    if (uid === '' || weather.grouping === 'week') return false;
+    return table.allRows.some(
+      (row) => row.date === new Date().toISOString().split('T')[0],
+    );
+  });
+
+  function goToToday() {
+    const today = new Date().toISOString().split('T')[0]; // Format as YYYY-MM-DD
+
+    const todayRowIndex = table.allRows.findIndex((row) => row.date === today); // Find matching row index
+
+    if (todayRowIndex > 0) {
+      const todayPage = Math.ceil((todayRowIndex + 1) / table.rowsPerPage);
+
+      table.setPage(todayPage);
+      weather.table.page = todayPage;
+
+      tick().then(() => {
+        const rowElement = document.getElementById(`${uid}-${todayRowIndex}`);
+
+        if (rowElement) {
+          rowElement.scrollIntoView({
+            behavior: 'smooth',
+          });
+          setTimeout(() => {
+            rowElement.classList.add('bg-primary-300-700');
+
+            setTimeout(
+              () => rowElement.classList.remove('bg-primary-300-700'),
+              400,
+            );
+          }, 100);
+        }
+      });
+    }
+  }
 
   $effect(() => {
     table;
@@ -68,7 +116,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
             class="btn-icon hover:preset-tonal"
             title="Previous Page"
             disabled={table.currentPage === 1}
-            onclick={() => table.setPage('previous')}
+            onclick={() => {
+              table.setPage('previous');
+              weather.table.page = table.currentPage;
+            }}
           >
             <CircleArrowLeftIcon />
           </button>
@@ -95,13 +146,29 @@ If not, see <https://www.gnu.org/licenses/>. -->
             class="btn-icon hover:preset-tonal"
             title="Next Page"
             disabled={table.currentPage === table.pages.length}
-            onclick={() => table.setPage('next')}
+            onclick={() => {
+              table.setPage('next');
+              weather.table.page = table.currentPage;
+            }}
           >
             <CircleArrowRightIcon />
           </button>
         </section>
       {/if}
     </div>
+
+    {#if includesToday}
+      <button
+        aria-label="Today"
+        class="btn hover:preset-tonal"
+        title="Go to Today"
+        onclick={() => goToToday()}
+      >
+        <CalendarIcon />
+        Today
+      </button>
+    {/if}
+
     {#if search && searchInput !== null}
       <input
         type="text"
