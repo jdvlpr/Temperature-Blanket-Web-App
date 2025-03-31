@@ -80,31 +80,32 @@ If not, see <https://www.gnu.org/licenses/>. -->
   onMount(async () => {
     tick().then(async () => {
       // temporary diagnostics
-      await supabase.from('Weather Data Feedback').insert({
-        dev,
-        version,
-        flag: true,
-        details: {
-          form: {
-            a_stringToDate: stringToDate('2025-01-01'),
-            b_stringToDateVersion2: stringToDateVersion2('2025-01-01'),
-            c_dateToISO8601String: {
-              stringToDate: dateToISO8601String(stringToDate('2025-01-01')),
-              stringToDateVersion2: dateToISO8601String(
-                stringToDateVersion2('2025-01-01'),
-              ),
-            },
-            e_dateToISO8601StringVersion2: {
-              stringToDate: dateToISO8601StringVersion2(
-                stringToDate('2025-01-01'),
-              ),
-              stringToDateVersion2: dateToISO8601StringVersion2(
-                stringToDateVersion2('2025-01-01'),
-              ),
+      if (!dev)
+        await supabase.from('Weather Data Feedback').insert({
+          dev,
+          version,
+          flag: true,
+          details: {
+            form: {
+              a_stringToDate: stringToDate('2025-01-01'),
+              b_stringToDateVersion2: stringToDateVersion2('2025-01-01'),
+              c_dateToISO8601String: {
+                stringToDate: dateToISO8601String(stringToDate('2025-01-01')),
+                stringToDateVersion2: dateToISO8601String(
+                  stringToDateVersion2('2025-01-01'),
+                ),
+              },
+              e_dateToISO8601StringVersion2: {
+                stringToDate: dateToISO8601StringVersion2(
+                  stringToDate('2025-01-01'),
+                ),
+                stringToDateVersion2: dateToISO8601StringVersion2(
+                  stringToDateVersion2('2025-01-01'),
+                ),
+              },
             },
           },
-        },
-      });
+        });
     });
   });
 </script>
@@ -297,7 +298,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         class="m-2 mb-4 flex flex-col gap-6"
       >
         <div>
-          <label for="projectLink" class="label"> Link to your project </label>
+          <label for="projectLink" class="label">Link to your project </label>
           <div class="input-group grid-cols-[1fr_auto]">
             <input
               id="projectLink"
@@ -306,6 +307,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               type="text"
               name="projectLink"
               placeholder="Your Project URL"
+              required
             />
             <button
               class="ig-btn preset-filled"
