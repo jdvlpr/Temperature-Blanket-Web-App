@@ -17,7 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { browser } from '$app/environment';
   import Tooltip from '$lib/components/Tooltip.svelte';
   import { MONTHS } from '$lib/constants';
-  import { locations, modal, project, weather } from '$lib/state';
+  import { locations, modal, project, toast, weather } from '$lib/state';
   import type { LocationType } from '$lib/types/location-types';
   import {
     dateToISO8601String,
@@ -380,6 +380,83 @@ If not, see <https://www.gnu.org/licenses/>. -->
             }}
           >
             <XIcon />
+          </button>
+        {:else if project.geolocationAvailable}
+          <button
+            class="ig-btn hover:preset-tonal"
+            title="Use My Location"
+            disabled={!!weather.isUserEdited}
+            onclick={async () => {
+              searching = true;
+              inputLocation.placeholder = 'Loading...';
+
+              async function success(position) {
+                const latitude = position.coords.latitude;
+                const longitude = position.coords.longitude;
+
+                const response = await fetch(
+                  `/api/location/near?lat=${encodeURIComponent(latitude)}&lng=${encodeURIComponent(longitude)}`,
+                );
+
+                const data = await response.json();
+
+                if (!response.ok || !data.geonames || !data.geonames[0]) {
+                  toast.trigger({
+                    category: 'error',
+                    message: data.message,
+                  });
+                  searching = false;
+                  inputLocation.placeholder = 'Enter a place';
+                  return;
+                }
+
+                const suggestions = getSuggestions(data.geonames);
+
+                const first = suggestions[0];
+
+                inputLocation.value = first.label;
+
+                location.elevation = first.elevation;
+                location.fclName = first.fclName;
+                location.flagIcon = first.flagIcon;
+                location.population = first.population;
+                location.lat = first.lat;
+                location.lng = first.lng;
+                location.id = first.id;
+                location.result = first.result;
+                location.label = first.label;
+
+                searching = false;
+                inputLocation.placeholder = 'Enter a place';
+              }
+
+              async function error() {
+                let message = 'Unable to retrieve your location';
+                if (navigator.permissions && navigator.permissions.query) {
+                  const result = await navigator.permissions.query({
+                    name: 'geolocation',
+                  });
+
+                  if (result.state === 'denied')
+                    message =
+                      'Unable to retrieve your location. Location services are disabled for this site in your browser.';
+
+                  if (result.state === 'prompt')
+                    message =
+                      'Unable to retrieve your location. Location services were not granted for this site in your browser.';
+                }
+                toast.trigger({
+                  category: 'error',
+                  message,
+                });
+                searching = false;
+                inputLocation.placeholder = 'Enter a place';
+              }
+
+              navigator.geolocation.getCurrentPosition(success, error);
+            }}
+          >
+            <MapPinIcon /> <span class="hidden sm:inline">My Location</span>
           </button>
         {/if}
       </div>
