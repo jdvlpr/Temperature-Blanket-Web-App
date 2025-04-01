@@ -60,11 +60,17 @@ export const getIsFutureDate = (date) => {
  *
  * @return  {Date} one year from the given date
  */
-export const yearFrom = (date) => {
-  const yearFromDate = new Date(
-    new Date(date).setFullYear(new Date(date).getFullYear() + 1),
-  );
-  return new Date(yearFromDate.setDate(new Date(yearFromDate).getDate() - 1));
+export const yearFrom = (date: string): Date => {
+  // Ensure the input is a Date object
+  let _date = typeof date === 'string' ? stringToDate(date) : date;
+
+  // Add one year
+  _date.setFullYear(_date.getFullYear() + 1);
+
+  // Subtract one day
+  _date.setDate(_date.getDate() - 1);
+
+  return _date;
 };
 
 /**
@@ -73,8 +79,11 @@ export const yearFrom = (date) => {
  * @returns {string} The ISO 8601 formatted date string `YYYY-MM-DD`.
  */
 export const dateToISO8601String = (date) => {
-  const str = new Date(date).toISOString().split('T')[0];
-  return str;
+  const year = date.getFullYear();
+  const month = `${date.getMonth() + 1}`.padStart(2, '0');
+  const day = `${date.getDate()}`.padStart(2, '0');
+
+  return `${year}-${month}-${day}`;
 };
 
 // Archived function
@@ -97,26 +106,18 @@ export const dateToISO8601StringVersion2 = (date) => {
  * @return  {Date} The UTC date
  */
 export const stringToDate = (str) => {
-  let _datePart = str;
-
   const [datePart, timePart] = str.split(' ');
-  if (datePart && timePart) _datePart = datePart;
+  let [year, month, day] = datePart.split(/[-./]/).map(Number);
 
-  let splitDatePart;
-  if (_datePart.includes('-')) splitDatePart = _datePart.split('-').map(Number);
-  else if (_datePart.includes('.'))
-    splitDatePart = _datePart.split('.').map(Number);
-  else if (_datePart.includes('/'))
-    splitDatePart = _datePart.split('/').map(Number);
-
-  const [year, month, day] = splitDatePart;
-
-  if (timePart && timePart.includes(':')) {
-    const [hour, minute, second] = timePart.split(':').map(Number);
-    return new Date(Date.UTC(year, month - 1, day, hour, minute, second));
+  let hours = 0,
+    minutes = 0,
+    seconds = 0;
+  if (timePart) {
+    [hours, minutes, seconds] = timePart.split(':').map(Number);
   }
 
-  return new Date(Date.UTC(year, month - 1, day));
+  // Create a date using local time (prevents UTC shifting)
+  return new Date(year, month - 1, day, hours, minutes, seconds);
 };
 
 // Archived function
@@ -135,6 +136,7 @@ export const stringToDateVersion2 = (str) => {
  * @returns {number} The number of days between the start and end dates.
  */
 export const numberOfDays = (startDate, endDate) => {
+  if (!startDate || !endDate) return 0;
   return Math.round((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1; // changed from ceil to round in v1.741 seems to have fixed a rounding bug
 };
 

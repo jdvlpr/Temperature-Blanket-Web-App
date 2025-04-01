@@ -55,12 +55,12 @@ export class LocationState extends LocationClass implements LocationStateType {
 
   #fromDate = $derived.by(() => {
     if (!this.from) return null;
-    return new Date(this.from.replace(/-/g, '/'));
+    return stringToDate(this.from);
   });
 
   #toDate = $derived.by(() => {
     if (!this.to) return null;
-    return new Date(this.to.replace(/-/g, '/'));
+    return stringToDate(this.to);
   });
 
   days = $derived(numberOfDays(this.#fromDate, this.#toDate));
@@ -103,8 +103,9 @@ export class LocationsState implements LocationsStateType {
   totalDays = $derived.by(() => {
     const arrayOfDayCount = this.all.map((n) => {
       if (!n.from || !n.to) return null;
-      const from = new Date(n.from.replace(/-/g, '/'));
-      const to = new Date(n.to.replace(/-/g, '/'));
+      const from = stringToDate(n.from);
+      const to = stringToDate(n.to);
+
       if (!from || !to) return null;
       return numberOfDays(from, to);
     });

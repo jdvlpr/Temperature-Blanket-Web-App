@@ -236,7 +236,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   // Get's the date of yesterday to set the max date
   function getYesterday() {
-    const yesterday = new Date().setDate(new Date().getDate() - 1);
+    const yesterday = new Date(new Date().setDate(new Date().getDate() - 1));
     return dateToISO8601String(yesterday);
   }
 
