@@ -439,11 +439,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
                   if (result.state === 'denied')
                     message =
-                      'Unable to retrieve your location. Location services are disabled for this site in your browser.';
+                      '<div class="flex flex-col">Unable to retrieve your location. <span class="text-xs">Location services may disabled for this site in your browser, or there was some other problem.</span></div>';
 
                   if (result.state === 'prompt')
                     message =
-                      'Unable to retrieve your location. Location services were not granted for this site in your browser.';
+                      '<div class="flex flex-col">Unable to retrieve your location.<span class="text-xs">Location permission may not have been granted for this site in your browser, or there was some other problem.</span></div>';
                 }
                 toast.trigger({
                   category: 'error',
