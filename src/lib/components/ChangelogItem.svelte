@@ -32,7 +32,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {/if}
   </div>
   <div
-    class="card bg-surface-100 dark:bg-surface-900 flex flex-col gap-2 p-2"
+    class="card bg-surface-100 dark:bg-surface-900 flex scroll-mt-[58px] flex-col gap-2 p-2"
     id={version}
   >
     <div class="card flex flex-wrap gap-2">
