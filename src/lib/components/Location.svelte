@@ -30,6 +30,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import {
     EllipsisVerticalIcon,
     MapIcon,
+    MapPinIcon,
     SearchIcon,
     Trash2Icon,
     TriangleAlertIcon,
@@ -61,10 +62,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let searching = $state(false); // Are the autocomplete results fetching?
   let hasLoaded = $state(false); // If the location was loaded from a saved project, then this gets set to true. It gets checked so that the initial setup function doesn't run again.
 
-  let showReset = $derived(
-    (!searching && inputLocation?.value?.length > 1) ||
-      (!searching && location?.label),
-  ); // Should the clear input button appear?
+  let showResetKey = $state(false);
+  // Weather or not the clear input text button should appear
+  let showReset = $derived.by(() => {
+    showResetKey;
+    return (
+      (!searching && inputLocation?.value?.length > 1) ||
+      (!searching && location?.label)
+    );
+  });
 
   onMount(() => {
     if (!location?.from && !location?.to) setDates({});
@@ -355,15 +361,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
               </g>
             </svg>
           </div>
-        {/if}
-
-        {#if showReset}
+        {:else if showReset}
           <button
             class="ig-btn hover:preset-tonal"
             title="Reset Location Search"
             disabled={!!weather.isUserEdited}
             onclick={() => {
               if (weather.isUserEdited) return;
+              showResetKey = !showResetKey;
               weather.rawData = [];
               inputLocation.value = '';
               inputLocation.focus();
