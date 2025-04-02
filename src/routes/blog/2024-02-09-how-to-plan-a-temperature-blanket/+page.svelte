@@ -525,12 +525,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     </p>
                     <div class="flex flex-wrap gap-4">
                       <img
-                        class="rounded-container border-surface-100-900 my-2 h-auto max-h-fit w-full max-w-64 border-6 shadow-lg"
+                        class="rounded-container border-surface-100-900 my-2 h-full max-h-fit w-full max-w-64 border-6 shadow-lg"
                         src="/images/blog-images/2024-02-09-how-to-plan-a-temperature-blanket/find-matching-yarn.png"
                         alt="Find Matching Yarn"
                       />
                       <img
-                        class="rounded-container border-surface-100-900 my-2 h-auto max-h-fit w-full max-w-64 border-6 shadow-lg"
+                        class="rounded-container border-surface-100-900 my-2 h-full max-h-fit w-full max-w-64 border-6 shadow-lg"
                         src="/images/blog-images/2024-02-09-how-to-plan-a-temperature-blanket/individual-color-tools.png"
                         alt="Find Matching Yarn"
                       />
@@ -614,11 +614,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     range if you want. Press the Customize Ranges button to get
                     started.
                   </p>
-                  <img
-                    class="rounded-container border-surface-100-900 my-2 h-auto max-h-fit w-full border-6 shadow-lg"
-                    src="/images/blog-images/2024-02-09-how-to-plan-a-temperature-blanket/ranges-configuration.png"
-                    alt="Ranges Configuration"
-                  />
+                  <div class="max-w-screen-md">
+                    <img
+                      class="rounded-container border-surface-100-900 my-2 border-6 shadow-lg"
+                      src="/images/blog-images/2024-02-09-how-to-plan-a-temperature-blanket/ranges-configuration.png"
+                      alt="Ranges Configuration"
+                    />
+                  </div>
                   <p>
                     On the right inside each colorway are little groups of
                     numbers. Keep an eye on those if you adjust range settings.
