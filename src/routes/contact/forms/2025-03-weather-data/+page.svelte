@@ -40,7 +40,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '@lucide/svelte';
   import { Accordion } from '@skeletonlabs/skeleton-svelte';
 
-  let accordionValue = $state(['apr1']);
+  let accordionValue = $state(['apr2']);
 
   let includeDebugInfo = $state(true);
 
@@ -168,7 +168,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       >
       <div class="">
         <h2 class="h2">Weather Data Feedback Form</h2>
-        <p class="text-sm">Updated April 1, 2025</p>
+        <p class="text-sm">Updated April 2, 2025</p>
       </div>
 
       <p>
@@ -187,6 +187,35 @@ If not, see <https://www.gnu.org/licenses/>. -->
         rounded="rounded-container"
         classes="bg-warning-50-950/50"
       >
+        <Accordion.Item value="apr2" controlClasses="font-bold">
+          {#snippet lead()}
+            <InfoIcon />
+          {/snippet}
+          {#snippet control()}
+            April 2 Update
+          {/snippet}
+          {#snippet panel()}
+            After the April 1 update, there was another report of off-by-one
+            weather data date issues. The issue was identified and fixed (<a
+              href="/changelog#5.2.35"
+              target="_blank"
+              class="link">see the changelog for details</a
+            >).
+            <br />
+            <br />
+            I'm sorry for all these recent changes. Fixing one issue has seemed to
+            cause other issues for other users. I believe the source of the issues
+            is how the web app handles dates in relation to the user's timezone (and
+            I can't test every timezone). So in the latest update I've switch back
+            to using UTC time for dates (which is timezone independent), and implemented
+            different fixes for issues that the first implementation of using UTC
+            had (in v5.2.2, I believe).
+            <br />
+            <br />
+            If you are still seeing a problem with the weather data, please fill
+            out the form below. It really helps!
+          {/snippet}
+        </Accordion.Item>
         <Accordion.Item value="apr1" controlClasses="font-bold">
           {#snippet lead()}
             <InfoIcon />

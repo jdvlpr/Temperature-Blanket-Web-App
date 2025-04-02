@@ -177,13 +177,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
           >
           {#if weather.goupedByWeek}
             Your project starts on {DAYS_OF_THE_WEEK.filter(
-              (n) => n.value === weather.goupedByWeek[0].date.getDay(),
+              (n) => n.value === weather.goupedByWeek[0].date.getUTCDay(),
             )[0].label},
             {MONTHS.filter(
-              (n) => n.value - 1 === weather.goupedByWeek[0].date.getMonth(),
+              (n) => n.value - 1 === weather.goupedByWeek[0].date.getUTCMonth(),
             )[0]?.name}
-            {weather.goupedByWeek[0].date.getDate()},
-            {weather.goupedByWeek[0].date.getFullYear()}. It spans {weather
+            {weather.goupedByWeek[0].date.getUTCDate()},
+            {weather.goupedByWeek[0].date.getUTCFullYear()}. It spans {weather
               .goupedByWeek.length}
             {pluralize('week', weather.goupedByWeek.length)}.
           {/if}
@@ -270,7 +270,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {#snippet date()}
           <p class="text-xs">
             {#if weather.grouping === 'week'}Week of{/if}
-            {tMaxDay?.date.toLocaleDateString()}
+            {tMaxDay?.date.toLocaleDateString(undefined, {
+              timeZone: 'UTC',
+            })}
           </p>
         {/snippet}
       </WeatherItem>
@@ -297,7 +299,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {#snippet date()}
           <p class="text-xs">
             {#if weather.grouping === 'week'}Week of{/if}
-            {tMinDay?.date.toLocaleDateString()}
+            {tMinDay?.date.toLocaleDateString(undefined, {
+              timeZone: 'UTC',
+            })}
           </p>
         {/snippet}
       </WeatherItem>

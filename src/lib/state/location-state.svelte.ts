@@ -162,8 +162,12 @@ export class LocationsState implements LocationsStateType {
     let titles = [];
     this.all.forEach((location) => {
       if (location?.from && location?.to) {
-        let from = stringToDate(location.from).toLocaleDateString();
-        let to = stringToDate(location.to).toLocaleDateString();
+        let from = stringToDate(location.from).toLocaleDateString(undefined, {
+          timeZone: 'UTC',
+        });
+        let to = stringToDate(location.to).toLocaleDateString(undefined, {
+          timeZone: 'UTC',
+        });
         let title = `${location.label} from ${from} to ${to}`;
         titles.push(title);
       }

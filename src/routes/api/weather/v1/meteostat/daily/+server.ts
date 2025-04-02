@@ -77,7 +77,11 @@ export async function POST({ request }) {
       message: `<p class="font-bold text-xl my-4">Something Went Wrong</p>
         <p>A search request for weather data from <span class="font-bold">${
           location.label
-        }</span> (${stringToDate(location.from).toLocaleDateString()} - ${stringToDate(location.to).toLocaleDateString()}) was sent to <a href="https://meteostat.net/" target="_blank" rel="noopener noreferrer" class="link">Meteostat.net</a>, but the response returned an error.</p>
+        }</span> (${stringToDate(location.from).toLocaleDateString(undefined, {
+          timeZone: 'UTC',
+        })} - ${stringToDate(location.to).toLocaleDateString(undefined, {
+          timeZone: 'UTC',
+        })}) was sent to <a href="https://meteostat.net/" target="_blank" rel="noopener noreferrer" class="link">Meteostat.net</a>, but the response returned an error.</p>
         <p class="my-4">Try again with a different location or dates, or change the Weather Source setting.</p>
         <p class="italic text-sm">Error status code: ${response.status}</p>`,
     });

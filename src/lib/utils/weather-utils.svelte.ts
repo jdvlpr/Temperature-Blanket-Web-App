@@ -162,7 +162,11 @@ export const getOpenMeteo = async ({ location }) => {
       `<p class="font-bold text-xl my-4">Something Went Wrong</p>
       <p>A search request for weather data from <span class="font-bold">${
         location.label
-      }</span> (${stringToDate(location.from).toLocaleDateString()} - ${stringToDate(location.to).toLocaleDateString()}) was sent to <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer" class="link">Open-Meteo.com</a>, but the response returned an error.</p>
+      }</span> (${stringToDate(location.from).toLocaleDateString(undefined, {
+        timeZone: 'UTC',
+      })} - ${stringToDate(location.to).toLocaleDateString(undefined, {
+        timeZone: 'UTC',
+      })}) was sent to <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer" class="link">Open-Meteo.com</a>, but the response returned an error.</p>
                             <p class="my-4">Try again with a different location or dates.</p>
                             <p class="italic text-sm">Error status code: ${response.status}</p>`,
     );
@@ -245,7 +249,7 @@ export const getOpenMeteo = async ({ location }) => {
   if (totalDaysInFuture > 0) {
     for (let index = 0; index < totalDaysInFuture; index += 1) {
       const _date = stringToDate(_to);
-      _date.setDate(_date.getDate() + index + 1);
+      _date.setUTCDate(_date.getUTCDate() + index + 1);
       const _dayTime = getDayTime({
         date: _date,
         lat: location.lat,

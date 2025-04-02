@@ -167,7 +167,7 @@ export const getMonthSepparatorIndexes = (): number[] => {
       current: new Date(day.date),
       previous: new Date(all[index - 1].date),
     };
-    if (date.current.getMonth() !== date.previous.getMonth()) {
+    if (date.current.getUTCMonth() !== date.previous.getUTCMonth()) {
       spaceIndexes.push(index);
     }
   });
@@ -236,10 +236,10 @@ export const weatherMonthsData = ({
 
   weatherData.forEach((n) => {
     const date = n.date;
-    const year = date.getFullYear();
-    const month = date.getMonth();
-    const day = new Date(year, month, 1).getDay();
-    const days = new Date(year, month + 1, 0).getDate();
+    const year = date.getUTCFullYear();
+    const month = date.getUTCMonth();
+    const day = new Date(year, month, 1).getUTCDay();
+    const days = new Date(year, month + 1, 0).getUTCDate();
     const id = `${year}${month}`;
 
     // Check if the id is already present in the Set

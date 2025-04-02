@@ -39,12 +39,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     let isWeather = true;
     let daysInSquare = weather.rawData?.filter(
       (n) =>
-        n.date.getFullYear() ===
+        n.date.getUTCFullYear() ===
           monthSquaresPreview.weatherMonths[squareIndex].year &&
-        n.date.getMonth() ===
+        n.date.getUTCMonth() ===
           monthSquaresPreview.weatherMonths[squareIndex].month,
     );
-    let dateInMonth = daysInSquare?.[0].date.getDate();
+    let dateInMonth = daysInSquare?.[0].date.getUTCDate();
     for (
       let roundsIndex = 0;
       roundsIndex < monthSquaresPreview.totalRounds;
@@ -58,13 +58,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
         squareIndex += 1;
         daysInSquare = weather.rawData?.filter(
           (n) =>
-            n.date.getFullYear() ===
+            n.date.getUTCFullYear() ===
               monthSquaresPreview.weatherMonths[squareIndex].year &&
-            n.date.getMonth() ===
+            n.date.getUTCMonth() ===
               monthSquaresPreview.weatherMonths[squareIndex].month,
         );
         roundInSquare = 1;
-        dateInMonth = daysInSquare[0].date.getDate();
+        dateInMonth = daysInSquare[0].date.getUTCDate();
         roundWidth = monthSquaresPreview.STITCH_SIZE;
         roundHeight = monthSquaresPreview.STITCH_SIZE;
         if (squareIndex % monthSquaresPreview.dimensionsWidth === 0) {
@@ -87,7 +87,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         height: roundHeight,
       };
       const day = daysInSquare?.filter(
-        (n) => n.date.getDate() === roundInSquare,
+        (n) => n.date.getUTCDate() === roundInSquare,
       );
 
       let _dayIndex = dayIndex;

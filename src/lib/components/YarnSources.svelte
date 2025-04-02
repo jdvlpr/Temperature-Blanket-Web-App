@@ -28,7 +28,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let { viewSources = $bindable(false) }: Props = $props();
 </script>
 
-<div class="flex flex-wrap gap-2 justify-center my-4">
+<div class="my-4 flex flex-wrap justify-center gap-2">
   <p class="text-sm">
     Real yarn colors will look different than what's on the screen. Any
     trademarked yarn or colorway details are owned by their respective
@@ -50,7 +50,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {#if viewSources}
     <div
       transition:slide
-      class="flex items-start flex-wrap gap-2 justify-start text-sm"
+      class="flex flex-wrap items-start justify-start gap-2 text-sm"
     >
       {#each brands as brand}
         {#each brand.yarns as yarn}
@@ -61,9 +61,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
             (n) => n.id === yarn.weightId,
           )?.name}
           <div
-            class="flex text-left flex-1 basis-[270px] items-center flex-wrap gap-x-2"
+            class="flex flex-1 basis-[270px] flex-wrap items-center gap-x-2 text-left"
           >
-            <p class="font-bold w-full">
+            <p class="w-full font-bold">
               {brand.name} - {yarn.name}
               {#if yarnWeightName}
                 <span class="font-normal">
@@ -87,7 +87,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               {#each yarn.colorways as { source, colors }}
                 <a
                   href={source.href}
-                  class="flex flex-wrap gap-2 justify-start items-center cursor-pointer"
+                  class="flex cursor-pointer flex-wrap items-center justify-start gap-2"
                   class:cursor-not-allowed={source.unavailable}
                   class:pointer-events-none={source.unavailable}
                   class:link={!source.unavailable}
@@ -97,11 +97,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   {colors.length}
                   colorways from {source.name}
                 </a>
-                accessed on {stringToDate(source.accessed).toLocaleDateString()}
+                accessed on {stringToDate(source.accessed).toLocaleDateString(
+                  undefined,
+                  {
+                    timeZone: 'UTC',
+                  },
+                )}
                 {#if source.unavailable}
                   (Unavailable from {stringToDate(
                     source.unavailable,
-                  ).toLocaleDateString()})
+                  ).toLocaleDateString(undefined, {
+                    timeZone: 'UTC',
+                  })})
                 {/if}
               {/each}
             </p>

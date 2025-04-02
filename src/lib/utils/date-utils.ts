@@ -13,7 +13,11 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { METEOSTAT_DELAY_DAYS, OPEN_METEO_DELAY_DAYS } from '$lib/constants';
+import {
+  DAYS_OF_THE_WEEK,
+  METEOSTAT_DELAY_DAYS,
+  OPEN_METEO_DELAY_DAYS,
+} from '$lib/constants';
 import { weather } from '$lib/state';
 import type { WeatherDay } from '$lib/types';
 
@@ -65,10 +69,10 @@ export const yearFrom = (date: string): Date => {
   let _date = typeof date === 'string' ? stringToDate(date) : date;
 
   // Add one year
-  _date.setFullYear(_date.getFullYear() + 1);
+  _date.setUTCFullYear(_date.getUTCFullYear() + 1);
 
   // Subtract one day
-  _date.setDate(_date.getDate() - 1);
+  _date.setUTCDate(_date.getUTCDate() - 1);
 
   return _date;
 };
@@ -79,9 +83,9 @@ export const yearFrom = (date: string): Date => {
  * @returns {string} The ISO 8601 formatted date string `YYYY-MM-DD`.
  */
 export const dateToISO8601String = (date) => {
-  const year = date.getFullYear();
-  const month = `${date.getMonth() + 1}`.padStart(2, '0');
-  const day = `${date.getDate()}`.padStart(2, '0');
+  const year = date.getUTCFullYear();
+  const month = `${date.getUTCMonth() + 1}`.padStart(2, '0');
+  const day = `${date.getUTCDate()}`.padStart(2, '0');
 
   return `${year}-${month}-${day}`;
 };
@@ -115,9 +119,10 @@ export const stringToDate = (str) => {
   if (timePart) {
     [hours, minutes, seconds] = timePart.split(':').map(Number);
   }
+  // Create a date using UTC time (prevents local time shifting)
+  const date = new Date(Date.UTC(year, month - 1, day));
 
-  // Create a date using local time (prevents UTC shifting)
-  return new Date(year, month - 1, day, hours, minutes, seconds);
+  return date;
 };
 
 // Archived function
@@ -140,30 +145,52 @@ export const numberOfDays = (startDate, endDate) => {
   return Math.round((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1; // changed from ceil to round in v1.741 seems to have fixed a rounding bug
 };
 
-/**
- * Returns the week number for this date.  dowOffset is the day of week the week
- * "starts" on for your locale - it can be from 0 to 6. If dowOffset is 1 (Monday),
- * the week returned is the ISO 8601 week number.
- * @param int dowOffset
- * @return int
- */
-export const getWeek = ({ date, dowOffset }) => {
-  /* getWeek() was developed by Nick Baicoianu at MeanFreePath: http://www.meanfreepath.com */
-  dowOffset = typeof dowOffset === 'number' ? dowOffset : 0; // default dowOffset to zero, Sunday
-  const newYear = new Date(date.getFullYear(), 0, 1);
-  let day = newYear.getDay() - dowOffset; // the day of week the year begins on
-  day = day >= 0 ? day : day + 7;
-  const daynum =
-    Math.floor(
-      (date.getTime() -
-        newYear.getTime() -
-        (date.getTimezoneOffset() - newYear.getTimezoneOffset()) * 60000) /
-        86400000,
-    ) + 1;
-  // if the year starts before the middle of a week
-  const weeknum = Math.floor((daynum + day - 1) / 7) + 1;
-  return weeknum;
-};
+function getWeekNumber(d, dowOffset) {
+  // --- 1. Parameter Handling & Validation ---
+  // Set default offset to Sunday (ISO 8601) if not provided or invalid type
+  dowOffset = typeof dowOffset === 'number' ? dowOffset : 0;
+
+  // Validate the offset value
+  if (dowOffset < 0 || dowOffset > 6) {
+    throw new Error(
+      'dowOffset must be an integer between 0 (Sunday) and 6 (Saturday).',
+    );
+  }
+
+  // --- 2. Date Preparation ---
+  // Copy date so we don't modify the original. Use UTC to avoid timezone issues.
+  var date = new Date(
+    Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()),
+  );
+
+  // --- 3. Adjust Date to the "Reference Day" of the Week ---
+  // Calculate the day of the week relative to the specified offset.
+  // getUTCDay() returns 0 for Sunday, 1 for Monday, etc.
+  // We want a 1-7 representation where 1 is the start day defined by dowOffset.
+  // Example: if dowOffset = 1 (Monday), then Mon=1, Tue=2, ..., Sun=7
+  // Example: if dowOffset = 0 (Sunday), then Sun=1, Mon=2, ..., Sat=7
+  var dayOfWeek = ((date.getUTCDay() - dowOffset + 7) % 7) + 1;
+
+  // Adjust the date to the 4th day (e.g., Thursday if week starts Monday) of the *current* week.
+  // Why the 4th day? Because the week belongs to the year containing the majority (>=4) of its days.
+  // Shifting to the 4th day ensures that date.getUTCFullYear() below gives the correct year for the week number.
+  date.setUTCDate(date.getUTCDate() + 4 - dayOfWeek);
+
+  // --- 4. Calculate Week Number ---
+  // Get the first day of the year for the potentially adjusted date's year.
+  var yearStart = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
+
+  // Calculate the number of days between the start of the year and the adjusted date (the 4th day of the week).
+  var days = (date - yearStart) / 86400000; // 86400000 = ms per day
+
+  // Calculate the week number. Add 1 because days is zero-based, divide by 7, and round up.
+  var weekNo = Math.ceil((days + 1) / 7);
+
+  // --- 5. Return Result ---
+  // Return array of the year the week belongs to and the calculated week number.
+
+  return [date.getUTCFullYear(), weekNo];
+}
 
 export const createWeeksProperty = ({
   weatherData,
@@ -174,8 +201,8 @@ export const createWeeksProperty = ({
 }) => {
   if (!weatherData.length) return weatherData;
   const data = weatherData.map((day, i) => {
-    const week = getWeek({ date: day.date, dowOffset });
-    const year = day.date.getFullYear();
+    const [year, week] = getWeekNumber(day.date, dowOffset);
+
     return { ...day, weekId: `${year}-${week}` };
   });
   return data;
@@ -186,11 +213,11 @@ export const isDateWithinLastSevenDays = (date) => {
   const currentDate = new Date();
 
   // Set the current date to midnight for accurate comparison
-  currentDate.setHours(0, 0, 0, 0);
+  currentDate.setUTCHours(0, 0, 0, 0);
 
   // Calculate the date seven days ago
   const sevenDaysAgo = new Date(currentDate);
-  sevenDaysAgo.setDate(currentDate.getDate() - 7);
+  sevenDaysAgo.setUTCDate(currentDate.getUTCDate() - 7);
 
   // Convert the input date to a Date object for comparison
   // const inputDate = new Date(date);
@@ -201,7 +228,7 @@ export const isDateWithinLastSevenDays = (date) => {
 };
 
 export const getToday = () => {
-  let dateToday = new Date(new Date().setHours(24, 0, 0, 0));
-  let today = dateToday.setDate(dateToday.getDate() - 1); // why this way??
+  let dateToday = new Date(new Date().setUTCHours(24, 0, 0, 0));
+  let today = dateToday.setUTCDate(dateToday.getUTCDate() - 1); // why this way??
   return today;
 };

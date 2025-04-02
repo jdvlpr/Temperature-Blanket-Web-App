@@ -25,6 +25,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     getSuggestions,
     pluralize,
     renderResult,
+    stringToDate,
     yearFrom,
   } from '$lib/utils';
   import {
@@ -100,10 +101,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
       location.duration = location?.duration || 'c';
 
       if (location?.from) {
-        const from = new Date(location.from.replace(/-/g, '/'));
-        year = from.getFullYear();
-        month = from.getMonth() + 1;
-        day = from.getDate();
+        const from = stringToDate(location.from);
+        year = from.getUTCFullYear();
+        month = from.getUTCMonth() + 1;
+        day = from.getUTCDate();
       }
 
       hasLoaded = true;
@@ -214,26 +215,27 @@ If not, see <https://www.gnu.org/licenses/>. -->
   function createYears() {
     const min = 1920 - 1;
     const _years = [];
-    for (let i = new Date().getFullYear(); i > min; i--) _years.push(i);
+    for (let i = new Date().getUTCFullYear(); i > min; i--) _years.push(i);
     return _years;
   }
 
   function setDates({ from = null, to = null, unsetWeather = true }) {
     if (unsetWeather) weather.rawData = [];
     let setDate = new Date(year, month - 1, day, 1);
-    const _padFromMonth = String(setDate.getMonth() + 1).padStart(2, '0');
-    const _padFromDate = String(setDate.getDate()).padStart(2, '0');
+    const _padFromMonth = String(setDate.getUTCMonth() + 1).padStart(2, '0');
+    const _padFromDate = String(setDate.getUTCDate()).padStart(2, '0');
     from = from || `${year}-${_padFromMonth}-${_padFromDate}`;
 
     if (location.duration === 'y') {
       let yearFromSetDate = yearFrom(setDate);
-      const _padToMonth = String(yearFromSetDate.getMonth() + 1).padStart(
+      const _padToMonth = String(yearFromSetDate.getUTCMonth() + 1).padStart(
         2,
         '0',
       );
-      const _padToDate = String(yearFromSetDate.getDate()).padStart(2, '0');
+      const _padToDate = String(yearFromSetDate.getUTCDate()).padStart(2, '0');
       to =
-        to || `${yearFromSetDate.getFullYear()}-${_padToMonth}-${_padToDate}`;
+        to ||
+        `${yearFromSetDate.getUTCFullYear()}-${_padToMonth}-${_padToDate}`;
     }
 
     location.from = from;
@@ -242,12 +244,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   // Get's the date of yesterday to set the max date
   function getYesterday() {
-    const yesterday = new Date(new Date().setDate(new Date().getDate() - 1));
+    const yesterday = new Date(
+      new Date().setUTCDate(new Date().getUTCDate() - 1),
+    );
     return dateToISO8601String(yesterday);
   }
 
   function getLastYear() {
-    const currentYear = new Date().getFullYear(); // 2020
+    const currentYear = new Date().getUTCFullYear(); // 2020
     const previousYear = currentYear - 1;
     return previousYear;
   }
@@ -445,10 +449,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     message =
                       '<div class="flex flex-col">Unable to retrieve your location.<span class="text-xs">Location permission may not have been granted for this site in your browser, or there was some other problem.</span></div>';
                 }
+
                 toast.trigger({
                   category: 'error',
                   message,
                 });
+
                 searching = false;
                 inputLocation.placeholder = 'Enter a place';
               }
@@ -586,9 +592,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           disabled={!!weather.isUserEdited || project.status.loading}
           onchange={() => {
             if (location?.duration === 'y') {
-              year = new Date(location.from.replace(/-/g, '/')).getFullYear();
-              month = new Date(location.from.replace(/-/g, '/')).getMonth() + 1;
-              day = new Date(location.from.replace(/-/g, '/')).getDate();
+              year = stringToDate(location.from).getUTCFullYear();
+              month = stringToDate(location.from).getUTCMonth() + 1;
+              day = stringToDate(location.from).getUTCDate();
               setDates({});
             }
           }}

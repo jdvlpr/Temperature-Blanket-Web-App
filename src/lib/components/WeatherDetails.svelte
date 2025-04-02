@@ -62,7 +62,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   bind:this={navigatorElement}
 >
   <div class="text-lg font-semibold">
-    {day?.date?.toLocaleDateString()}
+    {day?.date.toLocaleDateString(undefined, {
+      timeZone: 'UTC',
+    })}
   </div>
 
   <p class="mb-2 italic">

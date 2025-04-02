@@ -53,7 +53,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   class WeatherChartClass {
     #labels = $derived(
-      weather.data?.map((day) => day.date?.toLocaleDateString()),
+      weather.data?.map((day) =>
+        day.date?.toLocaleDateString(undefined, {
+          timeZone: 'UTC',
+        }),
+      ),
     );
 
     #dataSets = $derived([

@@ -39,12 +39,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   const uid = $props.id();
 
+  let debounceTimer;
+  const debounce = (callback, time) => {
+    window.clearTimeout(debounceTimer);
+    debounceTimer = window.setTimeout(callback, time);
+  };
+
   function updateTable() {
     weatherDataUpdatedKey.value = true;
-    tick().then(() => {
+    debounce(() => {
       tableData = getTableData();
       weatherDataUpdatedKey.value = false;
-    });
+    }, 10);
   }
 
   // I don't think these $effect() blocks are ideal

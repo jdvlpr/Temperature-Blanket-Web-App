@@ -185,16 +185,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
             project.id
           }" target="_blank" rel="noreferrer" class="underline line-clamp-1" title="Open Project Preview Page" onclick="event.stopPropagation()"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-external-link size-4 inline"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
 <span class="whitespace-pre-wrap">${title} ${i > 0 ? ` - ${i + 1}` : ''}</span></a>`;
-          // schemeName += `<span class="">${new Date(project.date).toLocaleDateString()}</span>`;
           schemeName += '</div>';
 
           _palettes.push({
-            // date: new Date(project.date),
-            // dateLabel,
             colors,
             projectId: project.id,
-            // value: "Custom",
-            // link: project.projectUrl,
             schemeName,
           });
         }

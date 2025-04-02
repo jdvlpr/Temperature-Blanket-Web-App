@@ -24,6 +24,17 @@ export const entries: ChangelogItem[] = [
     notes: [
       {
         icon: ICONS.wrench,
+        text: `The fix introduced in v5.2.33 didn't completely solve the issue of dates shifting; some locations were still experiencing the issue. This update addresses the issue by using Universal Time Coordinated (UTC) throughout the application when converting dates, with added fixes to keep the v5.2.33 functionality in the cases where that update solved the problem.`,
+        instructions: `If you notice any issues regarding weather data, please <a href="/contact/forms/2025-03-weather-data" target="_blank" class="link">let me know</a>.`,
+        title: 'Fixed Weather Data Dates Issue #2',
+      },
+    ],
+    version: '5.2.35',
+  },
+  {
+    notes: [
+      {
+        icon: ICONS.wrench,
         text: `An issue for some locations (I believe it was introduced in v5.2.2) caused weather data dates to be off by one in the weather table and/or the preview image. I believe the issue was caused by how dates were converted throughout the application between ISO 8601 strings ('YYYY-MM-DD') and Date objects in Universal Time Coordinated (UTC). This update addresses the issue by converting ISO 8601 dates to Date objects using the local timezone instead of UTC.`,
         instructions: `If you notice any issues regarding weather data, please <a href="/contact/forms/2025-03-weather-data" target="_blank" class="link">let me know</a>.`,
         title: 'Fixed Weather Data Dates Issue',

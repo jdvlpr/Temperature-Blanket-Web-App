@@ -45,9 +45,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     let isWeather = true;
     let daysInSquare = weather.rawData?.filter(
       (n) =>
-        n.date.getFullYear() ===
+        n.date.getUTCFullYear() ===
           splitMonthSquaresPreview.weatherMonths[squareIndex].year &&
-        n.date.getMonth() ===
+        n.date.getUTCMonth() ===
           splitMonthSquaresPreview.weatherMonths[squareIndex].month,
     );
     for (
@@ -63,9 +63,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
         squareIndex += 1;
         daysInSquare = weather.rawData?.filter(
           (n) =>
-            n.date.getFullYear() ===
+            n.date.getUTCFullYear() ===
               splitMonthSquaresPreview.weatherMonths[squareIndex].year &&
-            n.date.getMonth() ===
+            n.date.getUTCMonth() ===
               splitMonthSquaresPreview.weatherMonths[squareIndex].month,
         );
         roundInSquare = 1;
@@ -88,7 +88,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
       let square;
       const day = daysInSquare?.filter(
-        (n) => n.date.getDate() === roundInSquare,
+        (n) => n.date.getUTCDate() === roundInSquare,
       );
 
       let _dayIndex = dayIndex;
