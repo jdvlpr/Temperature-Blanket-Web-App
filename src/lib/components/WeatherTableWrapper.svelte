@@ -89,6 +89,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let diagnostics = $derived({
     dev,
     version,
+    pid: +project.timeStampId || 0,
     details: {
       href: page.url.href,
       projectHref: project.url.href,

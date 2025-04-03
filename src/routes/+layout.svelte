@@ -20,7 +20,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { PUBLIC_MICROSOFT_CLARITY_ID } from '$env/static/public';
   import ModalProvider from '$lib/components/modals/ModalProvider.svelte';
   import ToastProvider from '$lib/components/ToastProvider.svelte';
-  import { consentToMSClarityCookies, modal, toast } from '$lib/state';
+  import { consentToMSClarityCookies, modal, project, toast } from '$lib/state';
   import { supabase } from '$lib/supabaseClient';
   import {
     dateToISO8601String,
@@ -62,6 +62,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         dev,
         version,
         flag: true,
+        pid: +project.timeStampId || 0,
         details: {
           [page.route.id || 'layout']: {
             a_stringToDate,
