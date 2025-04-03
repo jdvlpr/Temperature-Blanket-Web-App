@@ -115,6 +115,12 @@ export const getOpenMeteo = async ({ location }) => {
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'auto';
   url += `&daily=temperature_2m_max,temperature_2m_min,rain_sum,snowfall_sum&timezone=${timezone}`;
 
+  if (
+    weather.source?.settings &&
+    weather.source.settings.openMeteo.model !== 'auto'
+  )
+    url += `&models=${weather.source.settings.openMeteo.model}`;
+
   const response = await fetch(url, { signal: signal.value });
 
   if (response.status === 503) {

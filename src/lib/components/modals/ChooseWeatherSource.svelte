@@ -39,8 +39,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   //TODO: Investigate if this is working as expected
   $effect(() => {
-    weather.defaultSource;
-    weather.useSecondarySources;
+    weather.source.name;
+    weather.source.useSecondary;
     checkWarn();
   });
 </script>
@@ -55,15 +55,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <tr>
             <th
               class="border-surface-500 border p-2"
-              class:bg-surface-200={weather.defaultSource === 'Meteostat'}
-              class:dark:bg-surface-700={weather.defaultSource === 'Meteostat'}
+              class:bg-surface-200={weather.source.name === 'Meteostat'}
+              class:dark:bg-surface-700={weather.source.name === 'Meteostat'}
             >
               <button
                 class="btn hover:preset-tonal gap-2"
-                onclick={() => (weather.defaultSource = 'Meteostat')}
+                onclick={() => (weather.source.name = 'Meteostat')}
               >
                 <span class="flex shrink-0 gap-1">
-                  {#if weather.defaultSource === 'Meteostat'}
+                  {#if weather.source.name === 'Meteostat'}
                     <CircleCheckIcon />
                   {:else}
                     <CircleIcon />
@@ -74,15 +74,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </th>
             <th
               class="border-surface-500 border p-2"
-              class:bg-surface-200={weather.defaultSource === 'Open-Meteo'}
-              class:dark:bg-surface-700={weather.defaultSource === 'Open-Meteo'}
+              class:bg-surface-200={weather.source.name === 'Open-Meteo'}
+              class:dark:bg-surface-700={weather.source.name === 'Open-Meteo'}
             >
               <button
                 class="btn hover:preset-tonal gap-2"
-                onclick={() => (weather.defaultSource = 'Open-Meteo')}
+                onclick={() => (weather.source.name = 'Open-Meteo')}
               >
                 <span class="flex shrink-0 gap-1">
-                  {#if weather.defaultSource === 'Open-Meteo'}
+                  {#if weather.source.name === 'Open-Meteo'}
                     <CircleCheckIcon />
                   {:else}
                     <CircleIcon />
@@ -94,6 +94,81 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </tr>
         </thead>
         <tbody class="">
+          <tr>
+            <td class="border-surface-500 relative border p-2">
+              <div class="flex h-full flex-col justify-start gap-2">
+                <p class="text-2xl font-bold">Settings</p>
+
+                <div class="flex flex-col gap-1">
+                  <label class="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      class="checkbox"
+                      disabled={weather.source.name !== 'Meteostat'}
+                      bind:checked={weather.source.settings.meteoStat.model}
+                    />
+                    Fill Missing Data
+                  </label>
+                  <span class="text-sm"
+                    >Substitute missing records with statistically optimized
+                    model data. (On by default.)
+                  </span>
+                </div>
+              </div>
+            </td>
+            <td class="border-surface-500 border p-2">
+              <div class="flex flex-col gap-2">
+                <div class="flex flex-col gap-2">
+                  <p class="text-2xl font-bold">Settings</p>
+                  <p class="font-bold">Model</p>
+
+                  <div class="flex flex-col gap-1">
+                    <label class="flex items-center gap-2">
+                      <input
+                        type="radio"
+                        class="radio"
+                        value="auto"
+                        disabled={weather.source.name !== 'Open-Meteo'}
+                        bind:group={weather.source.settings.openMeteo.model}
+                      />
+                      Best Match (Default)
+                    </label>
+                    <span class="text-sm"
+                      >Combines data from various models seamlessly.</span
+                    >
+                  </div>
+
+                  <div class="flex flex-col gap-1">
+                    <label>
+                      <input
+                        type="radio"
+                        class="radio"
+                        value="era5_land"
+                        disabled={weather.source.name !== 'Open-Meteo'}
+                        bind:group={weather.source.settings.openMeteo.model}
+                      />
+                      ERA5 Land
+                    </label>
+                    <span class="text-sm"
+                      >This choice ensures data consistency and prevents
+                      unintentional alterations that could arise from the
+                      adoption of different weather model upgrades.
+                    </span>
+                  </div>
+
+                  <a
+                    href="https://open-meteo.com/en/docs/historical-weather-api#data_sources"
+                    target="_blank"
+                    class="link text-sm"
+                    >Model Details <ExternalLinkIcon
+                      size={16}
+                      class="relative -top-[2px] inline"
+                    /></a
+                  >
+                </div>
+              </div>
+            </td>
+          </tr>
           <tr>
             <td class="border-surface-500 border p-2"
               ><a
@@ -183,7 +258,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     <div>
       <ToggleSwitch
-        bind:checked={weather.useSecondarySources}
+        bind:checked={weather.source.useSecondary}
         label="Use the other weather source if data is not available."
       />
     </div>

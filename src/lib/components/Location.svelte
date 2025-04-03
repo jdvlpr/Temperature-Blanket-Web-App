@@ -84,9 +84,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let days = $derived(getDays(month, year));
 
   let datesMustBeHistorical = $derived(
-    weather.defaultSource === 'Open-Meteo' &&
+    weather.source.name === 'Open-Meteo' &&
       location.daysInFuture >= 1 &&
-      !weather.useSecondarySources,
+      !weather.source.useSecondary,
   );
 
   $effect(() => {

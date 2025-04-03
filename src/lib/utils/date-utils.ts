@@ -28,7 +28,7 @@ import type { WeatherDay } from '$lib/types';
  */
 export const getIsRecentDate = (date) => {
   if (!date || weather.isUserEdited) return false;
-  const weatherSource = weather.defaultSource;
+  const weatherSource = weather.source.name;
   if (weatherSource === 'Open-Meteo') {
     return (
       new Date(date) >

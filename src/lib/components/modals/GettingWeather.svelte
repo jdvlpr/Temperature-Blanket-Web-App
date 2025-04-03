@@ -104,7 +104,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         tempAllData.length === thisLocation &&
         continueWhile
       ) {
-        if (weather.defaultSource === 'Meteostat' || errors.length > 0) {
+        if (weather.source.name === 'Meteostat' || errors.length > 0) {
           try {
             // Since location is a proxy state, and for some reason $state.snapshot doesn't include all the properties,
             // we have to manually copy each property to a new non-proxy object
@@ -143,13 +143,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
         }
 
         if (
-          (errors.length > 0 && !weather.useSecondarySources) ||
-          (errors.length && weather.defaultSource === 'Open-Meteo')
+          (errors.length > 0 && !weather.source.useSecondary) ||
+          (errors.length && weather.source.name === 'Open-Meteo')
         )
           continueWhile = false;
 
         if (
-          (weather.defaultSource === 'Open-Meteo' || errors.length > 0) &&
+          (weather.source.name === 'Open-Meteo' || errors.length > 0) &&
           continueWhile
         ) {
           try {
@@ -161,7 +161,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           }
         }
 
-        if (errors.length > 0 && !weather.useSecondarySources)
+        if (errors.length > 0 && !weather.source.useSecondary)
           continueWhile = false;
       }
 

@@ -373,7 +373,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       type: 'component',
                       component: { ref: ChooseWeatherSource },
                     });
-                  }}>{weather.defaultSource}</button
+                  }}>{weather.source.name}</button
                 >.
               </p>
             {/if}

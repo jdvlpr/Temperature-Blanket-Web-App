@@ -94,16 +94,23 @@ export const setProjectSettings = async (
   // Load Weather Source (added in v1.823)
   if (exists(params.s)) {
     const sourceCode = params.s.value.substring(0, 1);
-    if (sourceCode === '0') weather.defaultSource = 'Meteostat';
-    else if (sourceCode === '1') weather.defaultSource = 'Open-Meteo';
+    if (sourceCode === '0') weather.source.name = 'Meteostat';
+    else if (sourceCode === '1') weather.source.name = 'Open-Meteo';
 
     const secondaryCode = params.s.value.substring(1, 2);
-    if (secondaryCode === '0') weather.useSecondarySources = false;
-    else if (secondaryCode === '1') weather.useSecondarySources = true;
+    if (secondaryCode === '0') weather.source.useSecondary = false;
+    else if (secondaryCode === '1') weather.source.useSecondary = true;
+
+    const lastSubstring = params.s.value.substring(2);
+    if (lastSubstring && weather.source?.settings) {
+      if (+lastSubstring === 0) weather.source.settings.meteoStat.model = false;
+      else if (lastSubstring === 'l')
+        weather.source.settings.openMeteo.model = 'era5_land';
+    }
   } else {
     // Projects before v1.823 didn't have this param, and only used Meteostat as a weather source
-    weather.defaultSource = 'Meteostat';
-    weather.useSecondarySources = true;
+    weather.source.name = 'Meteostat';
+    weather.source.useSecondary = true;
   }
 
   // Load Weather Grouping Setting if present

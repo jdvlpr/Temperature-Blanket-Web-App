@@ -14,7 +14,11 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { locations, localState } from '$lib/state';
-import type { WeatherDay, WeatherSource } from '$lib/types';
+import type {
+  WeatherDay,
+  WeatherSource,
+  WeatherSourceOptions,
+} from '$lib/types';
 import {
   createWeeksProperty,
   displayNumber,
@@ -197,10 +201,20 @@ class WeatherClass {
   // ***************
   //    User Settings
   // ***************
-  defaultSource: WeatherSource = $state('Open-Meteo');
 
-  /* In the project URL hash, this is '0' for 'false' or '1' for 'true' */
-  useSecondarySources: boolean = $state(true);
+  source: WeatherSourceOptions = $state({
+    name: 'Open-Meteo',
+    /* In the project URL hash, this is '0' for 'false' or '1' for 'true' */
+    useSecondary: true,
+    settings: {
+      openMeteo: {
+        model: 'auto',
+      },
+      meteoStat: {
+        model: true,
+      },
+    },
+  });
 
   grouping: 'day' | 'week' = $state('day');
 

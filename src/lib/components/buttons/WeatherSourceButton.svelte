@@ -17,6 +17,6 @@
   <span class="text-left whitespace-pre-wrap"
     >Weather Source: {weather.isUserEdited
       ? 'Custom'
-      : weather.defaultSource}</span
+      : weather.source.name}</span
   >
 </button>

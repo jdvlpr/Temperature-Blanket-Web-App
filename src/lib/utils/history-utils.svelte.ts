@@ -80,12 +80,12 @@ export const loadFromHistory = ({ action }: { action: 'Undo' | 'Redo' }) => {
   if (exists(newParams.s)) {
     if (!exists(oldParams.s) || oldParams.s?.value !== newParams.s?.value) {
       const sourceCode = newParams.s.value.substring(0, 1);
-      if (sourceCode === '0') weather.defaultSource = 'Meteostat';
-      else if (sourceCode === '1') weather.defaultSource = 'Open-Meteo';
+      if (sourceCode === '0') weather.source.name = 'Meteostat';
+      else if (sourceCode === '1') weather.source.name = 'Open-Meteo';
 
       const secondaryCode = newParams.s.value.substring(1, 2);
-      if (secondaryCode === '0') weather.useSecondarySources = false;
-      else if (secondaryCode === '1') weather.useSecondarySources = true;
+      if (secondaryCode === '0') weather.source.useSecondary = false;
+      else if (secondaryCode === '1') weather.source.useSecondary = true;
     }
   }
 
