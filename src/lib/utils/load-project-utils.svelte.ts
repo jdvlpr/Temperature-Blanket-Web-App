@@ -35,6 +35,8 @@ import {
   dateToISO8601String,
   displayGeoNamesErrorMessage,
   exists,
+  formatFeatureName,
+  formatLocationLabel,
   getColorsFromInput,
   getProjectParametersFromURLHash,
   millimetersToInches,
@@ -234,13 +236,24 @@ const parseLocationURLHash = async (hashString) => {
       // Set the location's elevation
       if (data.srtm3 !== NO_DATA_SRTM3) _locations[i].elevation = data.srtm3;
 
+      if (data.fclName) _locations[i].fclName = formatFeatureName(data.fclName);
+
+      if (data.population) _locations[i].population = data.population;
+
       // Set the location's label
-      const label = `${data.name}, ${data.adminName1}, ${data.countryName}`;
-      _locations[i].label = label;
+      const labelText = formatLocationLabel(data);
+
+      _locations[i].label = labelText;
+
+      let icon = '';
+      if (data.countryCode)
+        icon = `<span class="fflag fflag-${data.countryCode.toUpperCase()} shrink-0"></span>`;
+
+      _locations[i].flagIcon = icon;
 
       // Set the location's result (used for displaying the location with country flag icon in various places)
-      _locations[i].result =
-        `<span class="fflag fflag-${data.countryCode?.toUpperCase()}"></span>${label}`;
+      const result = `${icon} ${labelText}`;
+      _locations[i].result = result;
     } catch (e) {
       throw displayGeoNamesErrorMessage(e);
     }

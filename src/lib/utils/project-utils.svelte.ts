@@ -247,8 +247,12 @@ export const getTitleFromLocationsMeta = (locations) => {
           // which means different project's displayed other locale's formats, not always the user's locale formate.
           // So if possible, we convert non-user locale dates into the user's locale format.
           if (isValidDate(from) && isValidDate(to)) {
-            from = new Date(from).toLocaleDateString();
-            to = new Date(to).toLocaleDateString();
+            from = new Date(from).toLocaleDateString(undefined, {
+              timeZone: 'UTC',
+            });
+            to = new Date(to).toLocaleDateString(undefined, {
+              timeZone: 'UTC',
+            });
           }
 
           return `<span class="font-bold">${label}</span> from ${from} to ${to}`;

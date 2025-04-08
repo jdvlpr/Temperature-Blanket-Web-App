@@ -21,7 +21,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
   import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
   import StickyPart from '$lib/components/modals/StickyPart.svelte';
-  import { gauges, modal, localState, weather } from '$lib/state';
+  import { gauges, localState, modal, weather } from '$lib/state';
   import {
     displayNumber,
     getIncrement,
@@ -38,7 +38,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     Icon,
     InfoIcon,
     ListStartIcon,
-    Settings2Icon,
     TriangleAlertIcon,
     WandIcon,
     WandSparklesIcon,
@@ -663,7 +662,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {#if showScrollToTopButton}
     <button
       transition:fade
-      class="btn preset-filled-surface-500 absolute right-0 bottom-[4rem] left-1/2 z-20 m-2 inline-flex w-fit -translate-x-1/2 items-center justify-center px-4 py-2 shadow-sm transition-all lg:hidden"
+      class="btn bg-surface-50-950/70 absolute right-2 bottom-[5.4rem] z-20 m-2 inline-flex w-fit items-center justify-center px-4 py-2 shadow-sm backdrop-blur transition-all lg:hidden"
       onclick={() =>
         setupContainer.scrollIntoView({
           behavior: 'smooth',

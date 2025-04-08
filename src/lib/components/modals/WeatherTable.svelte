@@ -61,7 +61,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <div
   class="inline-flex w-full max-w-(--breakpoint-sm) items-center justify-center p-4 text-center"
 >
-  <DataTable {table} search={false}>
+  <DataTable {table} search={false} uid="">
     <table class="mx-auto w-fit border-separate border-spacing-0 self-center">
       <thead>
         <tr>

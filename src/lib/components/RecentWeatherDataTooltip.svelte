@@ -20,8 +20,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { TriangleAlertIcon } from '@lucide/svelte';
 </script>
 
-<Tooltip minWidth="290px">
-  <TriangleAlertIcon class="inline size-4" />
+<Tooltip minWidth="290px" placement="bottom">
+  <TriangleAlertIcon class="relative -top-[2px] inline size-4" />
   {#snippet tooltip()}
     <p class="text-surface-950-50 text-base">
       Weather data may adjust as new information arrives. Consider working at

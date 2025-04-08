@@ -141,8 +141,8 @@ export class CalendarPreviewClass {
       let days = [
         ...weather.rawData.filter(
           (day) =>
-            day.date.getFullYear() === month.year &&
-            day.date.getMonth() === month.month,
+            day.date.getUTCFullYear() === month.year &&
+            day.date.getUTCMonth() === month.month,
         ),
       ];
       let start =
@@ -152,7 +152,8 @@ export class CalendarPreviewClass {
           : month.start - this.settings.weekStartCode;
       let day = new Date(days[0].date);
       let startDay = new Date(month.year, month.month, month.start + 1);
-      if (day.getDate() > startDay.getDate()) start = day.getDate() - 1 + start;
+      if (day.getUTCDate() > startDay.getUTCDate())
+        start = day.getUTCDate() - 1 + start;
       let extra = max - days.length;
       for (let i = 0; i < extra; i += 1) {
         let value = i;

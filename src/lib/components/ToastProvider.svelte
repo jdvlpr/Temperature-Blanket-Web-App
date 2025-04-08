@@ -164,17 +164,17 @@
             data-testid="toast"
           >
             {#if t.category === 'success'}
-              <div class="flex flex-wrap items-center gap-2 text-base">
+              <div class="flex items-center justify-between gap-4 text-base">
                 <CircleCheckIcon class="inline" />
                 {@html t.message}
               </div>
             {:else if t.category === 'error'}
-              <div class="flex flex-wrap items-center gap-2 text-base">
+              <div class="flex items-center justify-between gap-4 text-base">
                 <CircleAlertIcon class="inline" />
                 {@html t.message}
               </div>
             {:else if t.category === 'info'}
-              <div class="flex flex-wrap items-center gap-2 text-base">
+              <div class="flex items-center justify-between gap-4 text-base">
                 <InfoIcon class="inline" />
                 {@html t.message}
               </div>

@@ -17,7 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { browser } from '$app/environment';
   import Tooltip from '$lib/components/Tooltip.svelte';
   import { MONTHS } from '$lib/constants';
-  import { locations, modal, project, weather } from '$lib/state';
+  import { locations, modal, project, toast, weather } from '$lib/state';
   import type { LocationType } from '$lib/types/location-types';
   import {
     dateToISO8601String,
@@ -25,11 +25,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
     getSuggestions,
     pluralize,
     renderResult,
+    stringToDate,
     yearFrom,
   } from '$lib/utils';
   import {
     EllipsisVerticalIcon,
     MapIcon,
+    MapPinIcon,
     SearchIcon,
     Trash2Icon,
     TriangleAlertIcon,
@@ -61,10 +63,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let searching = $state(false); // Are the autocomplete results fetching?
   let hasLoaded = $state(false); // If the location was loaded from a saved project, then this gets set to true. It gets checked so that the initial setup function doesn't run again.
 
-  let showReset = $derived(
-    (!searching && inputLocation?.value?.length > 1) ||
-      (!searching && location?.label),
-  ); // Should the clear input button appear?
+  let showResetKey = $state(false);
+  // Weather or not the clear input text button should appear
+  let showReset = $derived.by(() => {
+    showResetKey;
+    return (
+      (!searching && inputLocation?.value?.length > 1) ||
+      (!searching && location?.label)
+    );
+  });
 
   onMount(() => {
     if (!location?.from && !location?.to) setDates({});
@@ -94,10 +101,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
       location.duration = location?.duration || 'c';
 
       if (location?.from) {
-        const from = new Date(location.from.replace(/-/g, '/'));
-        year = from.getFullYear();
-        month = from.getMonth() + 1;
-        day = from.getDate();
+        const from = stringToDate(location.from);
+        year = from.getUTCFullYear();
+        month = from.getUTCMonth() + 1;
+        day = from.getUTCDate();
       }
 
       hasLoaded = true;
@@ -208,26 +215,27 @@ If not, see <https://www.gnu.org/licenses/>. -->
   function createYears() {
     const min = 1920 - 1;
     const _years = [];
-    for (let i = new Date().getFullYear(); i > min; i--) _years.push(i);
+    for (let i = new Date().getUTCFullYear(); i > min; i--) _years.push(i);
     return _years;
   }
 
   function setDates({ from = null, to = null, unsetWeather = true }) {
     if (unsetWeather) weather.rawData = [];
     let setDate = new Date(year, month - 1, day, 1);
-    const _padFromMonth = String(setDate.getMonth() + 1).padStart(2, '0');
-    const _padFromDate = String(setDate.getDate()).padStart(2, '0');
+    const _padFromMonth = String(setDate.getUTCMonth() + 1).padStart(2, '0');
+    const _padFromDate = String(setDate.getUTCDate()).padStart(2, '0');
     from = from || `${year}-${_padFromMonth}-${_padFromDate}`;
 
     if (location.duration === 'y') {
       let yearFromSetDate = yearFrom(setDate);
-      const _padToMonth = String(yearFromSetDate.getMonth() + 1).padStart(
+      const _padToMonth = String(yearFromSetDate.getUTCMonth() + 1).padStart(
         2,
         '0',
       );
-      const _padToDate = String(yearFromSetDate.getDate()).padStart(2, '0');
+      const _padToDate = String(yearFromSetDate.getUTCDate()).padStart(2, '0');
       to =
-        to || `${yearFromSetDate.getFullYear()}-${_padToMonth}-${_padToDate}`;
+        to ||
+        `${yearFromSetDate.getUTCFullYear()}-${_padToMonth}-${_padToDate}`;
     }
 
     location.from = from;
@@ -236,12 +244,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   // Get's the date of yesterday to set the max date
   function getYesterday() {
-    const yesterday = new Date().setDate(new Date().getDate() - 1);
+    const yesterday = new Date(
+      new Date().setUTCDate(new Date().getUTCDate() - 1),
+    );
     return dateToISO8601String(yesterday);
   }
 
   function getLastYear() {
-    const currentYear = new Date().getFullYear(); // 2020
+    const currentYear = new Date().getUTCFullYear(); // 2020
     const previousYear = currentYear - 1;
     return previousYear;
   }
@@ -355,15 +365,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
               </g>
             </svg>
           </div>
-        {/if}
-
-        {#if showReset}
+        {:else if showReset}
           <button
             class="ig-btn hover:preset-tonal"
             title="Reset Location Search"
             disabled={!!weather.isUserEdited}
             onclick={() => {
               if (weather.isUserEdited) return;
+              showResetKey = !showResetKey;
               weather.rawData = [];
               inputLocation.value = '';
               inputLocation.focus();
@@ -375,6 +384,85 @@ If not, see <https://www.gnu.org/licenses/>. -->
             }}
           >
             <XIcon />
+          </button>
+        {:else if project.geolocationAvailable}
+          <button
+            class="ig-btn hover:preset-tonal"
+            title="Use My Location"
+            disabled={!!weather.isUserEdited}
+            onclick={async () => {
+              searching = true;
+              inputLocation.placeholder = 'Loading...';
+
+              async function success(position) {
+                const latitude = position.coords.latitude;
+                const longitude = position.coords.longitude;
+
+                const response = await fetch(
+                  `/api/location/near?lat=${encodeURIComponent(latitude)}&lng=${encodeURIComponent(longitude)}`,
+                );
+
+                const data = await response.json();
+
+                if (!response.ok || !data.geonames || !data.geonames[0]) {
+                  toast.trigger({
+                    category: 'error',
+                    message: data.message,
+                  });
+                  searching = false;
+                  inputLocation.placeholder = 'Enter a place';
+                  return;
+                }
+
+                const suggestions = getSuggestions(data.geonames);
+
+                const first = suggestions[0];
+
+                inputLocation.value = first.label;
+
+                location.elevation = first.elevation;
+                location.fclName = first.fclName;
+                location.flagIcon = first.flagIcon;
+                location.population = first.population;
+                location.lat = first.lat;
+                location.lng = first.lng;
+                location.id = first.id;
+                location.result = first.result;
+                location.label = first.label;
+
+                searching = false;
+                inputLocation.placeholder = 'Enter a place';
+              }
+
+              async function error() {
+                let message = 'Unable to retrieve your location';
+                if (navigator.permissions && navigator.permissions.query) {
+                  const result = await navigator.permissions.query({
+                    name: 'geolocation',
+                  });
+
+                  if (result.state === 'denied')
+                    message =
+                      '<div class="flex flex-col">Unable to retrieve your location. <span class="text-xs">Location services may disabled for this site in your browser, or there was some other problem.</span></div>';
+
+                  if (result.state === 'prompt')
+                    message =
+                      '<div class="flex flex-col">Unable to retrieve your location.<span class="text-xs">Location permission may not have been granted for this site in your browser, or there was some other problem.</span></div>';
+                }
+
+                toast.trigger({
+                  category: 'error',
+                  message,
+                });
+
+                searching = false;
+                inputLocation.placeholder = 'Enter a place';
+              }
+
+              navigator.geolocation.getCurrentPosition(success, error);
+            }}
+          >
+            <MapPinIcon /> <span class="hidden sm:inline">My Location</span>
           </button>
         {/if}
       </div>
@@ -504,9 +592,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           disabled={!!weather.isUserEdited || project.status.loading}
           onchange={() => {
             if (location?.duration === 'y') {
-              year = new Date(location.from.replace(/-/g, '/')).getFullYear();
-              month = new Date(location.from.replace(/-/g, '/')).getMonth() + 1;
-              day = new Date(location.from.replace(/-/g, '/')).getDate();
+              year = stringToDate(location.from).getUTCFullYear();
+              month = stringToDate(location.from).getUTCMonth() + 1;
+              day = stringToDate(location.from).getUTCDate();
               setDates({});
             }
           }}

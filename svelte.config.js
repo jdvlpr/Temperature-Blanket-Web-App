@@ -46,6 +46,7 @@ const config = {
           '/documentation',
           '/privacy',
           '/contact',
+          '/contact/*',
           '/faq',
           '/gallery',
           '/supporters',

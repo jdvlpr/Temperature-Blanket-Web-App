@@ -239,6 +239,7 @@ export class TemperatureGauge {
       includeFromAndTo: this.#includeFromAndTo,
       dontIncludeFromAndTo: this.#dontIncludeFromAndTo,
     });
+
     this.ranges = ranges;
     this.rangeOptions = this.rangeOptions;
     this.rangeOptions.mode = mode;

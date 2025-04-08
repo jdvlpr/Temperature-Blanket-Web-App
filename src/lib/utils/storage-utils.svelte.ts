@@ -149,6 +149,7 @@ export const checkForProjectInLocalStorage = async () => {
 
   // Set weather data and convert dates to Date objects
   const weatherLocalStorage = matchedProject.weatherData;
+
   if (!weatherLocalStorage) return;
   const newWeatherUngrouped = weatherLocalStorage.map((n) => {
     return {
@@ -159,15 +160,18 @@ export const checkForProjectInLocalStorage = async () => {
 
   // Check if there are any days in the project past the day the project was created
   let url = new URL(matchedProject.href);
-  const timestamp = new URLSearchParams(url.search).get('project');
+  let timestamp: string | number = new URLSearchParams(url.search).get(
+    'project',
+  );
   if (timestamp === null || typeof +timestamp !== 'number') return;
-  const dateCreated = new Date(+timestamp).getTime();
+  timestamp = +timestamp;
   const latestDay = new Date(
     Math.max(...newWeatherUngrouped.map((n) => n.date)),
   ).getTime();
+
   let daysInFuture = 0;
-  if (latestDay >= dateCreated)
-    daysInFuture = numberOfDays(dateCreated, latestDay);
+  if (latestDay >= +timestamp)
+    daysInFuture = numberOfDays(timestamp, latestDay);
   // If there are days in the future and the weather is not custom, do not load weather from local storage
   if (daysInFuture > 0 && !matchedProject.isCustomWeatherData) return;
 
@@ -214,7 +218,9 @@ const createProjectLocalStorageProjectObject = () => {
   const _date = new Date();
 
   const date =
-    _date.toLocaleDateString() +
+    _date.toLocaleDateString(undefined, {
+      timeZone: 'UTC',
+    }) +
     ' at ' +
     _date.toLocaleTimeString([], {
       hour: 'numeric',

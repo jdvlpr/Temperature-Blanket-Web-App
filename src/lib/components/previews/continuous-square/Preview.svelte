@@ -15,9 +15,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import Spinner from '$lib/components/Spinner.svelte';
-  import { gauges, localState, project, weather } from '$lib/state';
-  import { getColorInfo, showPreviewImageWeatherDetails } from '$lib/utils';
-  import { tick } from 'svelte';
+  import { localState, weather } from '$lib/state';
+  import {
+    getColorInfo,
+    runPreview,
+    showPreviewImageWeatherDetails,
+  } from '$lib/utils';
   import { continuousSquarePreview } from './state.svelte';
 
   let width = $state(continuousSquarePreview.width);
@@ -80,65 +83,61 @@ If not, see <https://www.gnu.org/licenses/>. -->
     return 4 * round + getEndOfRoundStitch(round - 1);
   }
 
-  $effect(() => {
-    project.url.href;
-    if (!weather.data.length || !gauges.allCreated.length) return;
-    tick().then(() => {
-      let x =
-        continuousSquarePreview.width / 2 -
-        continuousSquarePreview.STITCH_SIZE * 2;
-      let y =
-        continuousSquarePreview.height / 2 -
-        continuousSquarePreview.STITCH_SIZE * 4;
-      let round = 1;
-      let dayIndex = 0;
-      let value, color;
-      let isExtraStitch = false;
-      const sections = [];
+  runPreview(() => {
+    let x =
+      continuousSquarePreview.width / 2 -
+      continuousSquarePreview.STITCH_SIZE * 2;
+    let y =
+      continuousSquarePreview.height / 2 -
+      continuousSquarePreview.STITCH_SIZE * 4;
+    let round = 1;
+    let dayIndex = 0;
+    let value, color;
+    let isExtraStitch = false;
+    const sections = [];
 
-      for (
-        let stitch = 1;
-        stitch <= continuousSquarePreview.totalStitches;
-        stitch += 1
-      ) {
-        if (dayIndex < weather.data?.length) {
-          value =
-            weather.data[dayIndex][
-              continuousSquarePreview.settings.selectedTarget
-            ][localState.value.units];
+    for (
+      let stitch = 1;
+      stitch <= continuousSquarePreview.totalStitches;
+      stitch += 1
+    ) {
+      if (dayIndex < weather.data?.length) {
+        value =
+          weather.data[dayIndex][
+            continuousSquarePreview.settings.selectedTarget
+          ][localState.value.units];
 
-          // Get the color based on the gauge ID and value
-          color = getColorInfo({
-            param: continuousSquarePreview.settings.selectedTarget,
-            value,
-          }).hex;
-          isExtraStitch = false;
-        } else {
-          color = continuousSquarePreview.settings.extrasColor;
-          isExtraStitch = true;
-        }
-        sections.push({
-          color,
-          x,
-          y,
-          isExtraStitch,
-          dayIndex,
-        });
-        let nextStitch = getNextStitch({ x, y, stitch, round });
-        x = nextStitch.x;
-        y = nextStitch.y;
-        if (nextStitch.isEndOfRound) round += 1;
-        if (
-          stitch % continuousSquarePreview.settings.stitchesPerDay === 0 ||
-          stitch === 1
-        ) {
-          dayIndex += 1;
-        }
+        // Get the color based on the gauge ID and value
+        color = getColorInfo({
+          param: continuousSquarePreview.settings.selectedTarget,
+          value,
+        }).hex;
+        isExtraStitch = false;
+      } else {
+        color = continuousSquarePreview.settings.extrasColor;
+        isExtraStitch = true;
       }
-      width = continuousSquarePreview.width;
-      height = continuousSquarePreview.height;
-      continuousSquarePreview.sections = sections;
-    });
+      sections.push({
+        color,
+        x,
+        y,
+        isExtraStitch,
+        dayIndex,
+      });
+      let nextStitch = getNextStitch({ x, y, stitch, round });
+      x = nextStitch.x;
+      y = nextStitch.y;
+      if (nextStitch.isEndOfRound) round += 1;
+      if (
+        stitch % continuousSquarePreview.settings.stitchesPerDay === 0 ||
+        stitch === 1
+      ) {
+        dayIndex += 1;
+      }
+    }
+    width = continuousSquarePreview.width;
+    height = continuousSquarePreview.height;
+    continuousSquarePreview.sections = sections;
   });
 </script>
 

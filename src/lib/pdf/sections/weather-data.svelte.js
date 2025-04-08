@@ -127,7 +127,12 @@ const pdfWeatherData = {
       doc.setFontSize(pdfConfig.font.p);
       doc.setFont(pdfConfig.font.paragraph, 'normal');
       // Date
-      const heading = `${i + 1}) ${weather.data[i]?.date.toLocaleDateString()}`;
+      const heading = `${i + 1}) ${weather.data[i]?.date.toLocaleDateString(
+        undefined,
+        {
+          timeZone: 'UTC',
+        },
+      )}`;
       doc.text(heading, this.headings[0].positionX, line);
       // Location
       let location = String(

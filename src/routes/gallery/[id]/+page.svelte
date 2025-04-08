@@ -239,7 +239,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         <div class="flex flex-col gap-2">
                           <p class="">
                             <span class="font-bold">Date Created:</span>
-                            {new Date(project?.date).toLocaleDateString()}
+                            {new Date(project?.date).toLocaleDateString(
+                              undefined,
+                              {
+                                timeZone: 'UTC',
+                              },
+                            )}
                           </p>
 
                           {#if JSON.stringify(reshapedColors) !== '{}'}

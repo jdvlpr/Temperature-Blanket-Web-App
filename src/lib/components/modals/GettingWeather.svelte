@@ -26,6 +26,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { delay, getOpenMeteo, goToProjectSection } from '$lib/utils';
   import { onMount } from 'svelte';
   import Spinner from '../Spinner.svelte';
+  import type { LocationType } from '$lib/types';
 
   let title = $state('Searching...');
 
@@ -69,9 +70,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
       thisLocation < locations.all.length;
       thisLocation += 1
     ) {
-      let location = locations.all[thisLocation];
+      let location: LocationType = locations.all[thisLocation];
 
-      title = location.label;
+      title = location.label || '';
       currentIndex = thisLocation;
       // Setup Weather Data Object
 
@@ -107,10 +108,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
         if (weather.defaultSource === 'Meteostat' || errors.length > 0) {
           try {
             // Since location is a proxy state, and for some reason $state.snapshot doesn't include all the properties,
-            // we have to manually get each property and make a new non-proxy object
-            const { lat, lng, from, to, id, index } = location;
+            // we have to manually copy each property to a new non-proxy object
+            const { lat, lng, from, to, id, index, elevation } = location;
 
-            const _location = { lat, lng, from, to, id, index };
+            const _location = { lat, lng, from, to, id, index, elevation };
 
             const response = await fetch('/api/weather/v1/meteostat/daily', {
               method: 'POST',
@@ -172,22 +173,23 @@ If not, see <https://www.gnu.org/licenses/>. -->
     }
     tempAllData = tempAllData.flat();
     tempAllData.sort((a, b) => a.date - b.date); // Sort by date, regardless of location
+
     weather.rawData = tempAllData;
     tempAllData = null;
   }
 </script>
 
-<div class="flex flex-col items-center text-center w-full p-4">
+<div class="flex w-full flex-col items-center p-4 text-center">
   {#if signal.value && !error}
     <Spinner size="36" />
 
-    <p class="font-bold text-xl my-4">Searching for Weather Data</p>
+    <p class="my-4 text-xl font-bold">Searching for Weather Data</p>
 
     <p class="mb-4 flex flex-col items-center">
       <span> {title}</span>
 
       {#if locations.all.length > 1}
-        <span class="flex flex-col items-center mt-2 w-full gap-1">
+        <span class="mt-2 flex w-full flex-col items-center gap-1">
           <progress
             class="progress"
             value={currentIndex + 1}

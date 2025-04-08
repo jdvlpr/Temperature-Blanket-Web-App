@@ -13,6 +13,9 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
+import { weatherDataUpdatedKey } from '$lib/components/WeatherTableWrapper.svelte';
+import { gauges, project, weather } from '$lib/state';
+
 export const delay = (delayInms) => {
   return new Promise((resolve) => setTimeout(resolve, delayInms));
 };
@@ -26,4 +29,25 @@ export const hasParentWithClass = (event, className) => {
     element = element.parentElement;
   }
   return false;
+};
+
+let debounceTimerPreviewEffect;
+const debouncePreviewEffect = (callback, time) => {
+  if (!window) return;
+  window.clearTimeout(debounceTimerPreviewEffect);
+  debounceTimerPreviewEffect = window.setTimeout(callback, time);
+};
+
+export const runPreview = (callback) => {
+  if (!window) return;
+  $effect.root(() => {
+    $effect(() => {
+      project.url.href;
+      weatherDataUpdatedKey.value;
+      if (!weather.data.length || !gauges.allCreated.length) return;
+      debouncePreviewEffect(() => {
+        callback();
+      }, 0);
+    });
+  });
 };

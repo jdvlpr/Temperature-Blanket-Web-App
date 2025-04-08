@@ -54,7 +54,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   $effect(() => {
     sidebarWidth;
     debounce(() => {
-      if (weatherChart.current && weather.data.length) weatherChart.update();
+      if (weatherChart?.current && weather.data.length) weatherChart.update();
     }, 101);
   });
 </script>

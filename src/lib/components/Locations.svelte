@@ -24,13 +24,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     wasProjectLoadedFromURL,
     weather,
   } from '$lib/state';
-  import { pluralize } from '$lib/utils';
+  import { pluralize, stringToDate } from '$lib/utils';
   import {
     CircleCheckBigIcon,
     CirclePlusIcon,
     TriangleAlertIcon,
   } from '@lucide/svelte';
-  import { slide } from 'svelte/transition';
   import SearchForWeather from './buttons/SearchForWeather.svelte';
   import WeatherSourceButton from './buttons/WeatherSourceButton.svelte';
 </script>
@@ -59,9 +58,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <p class="flex flex-wrap items-center justify-center gap-x-1">
           <span class="font-bold">{@html location.result}</span>
           <span>
-            {new Date(location.from).toLocaleDateString()} to {new Date(
-              location.to,
-            ).toLocaleDateString()}
+            {stringToDate(location.from).toLocaleDateString(undefined, {
+              timeZone: 'UTC',
+            })} to {stringToDate(location.to).toLocaleDateString(undefined, {
+              timeZone: 'UTC',
+            })}
           </span>
           <Tooltip>
             <svg
@@ -139,27 +140,24 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </div>
 </div>
 
-{#if locations.allValid}
-  <div
-    class="rounded-container bg-surface-100 dark:bg-surface-900 mx-auto mt-4 mb-2 flex max-w-(--breakpoint-md) flex-wrap justify-center gap-2 px-4 py-2 shadow-inner lg:mb-4"
-    transition:slide
-  >
-    <div class:hidden={!locations.allValid || weather.isUserEdited}>
-      {#if locations.all.length < MAXIMUM_LOCATIONS}
-        <button
-          class="btn hover:preset-tonal"
-          id="add-location-button"
-          disabled={project.status.loading}
-          onclick={() => locations.add()}
-          title="Add a New Location"
-        >
-          <CirclePlusIcon /> Add Location
-        </button>
-      {:else}
-        <p>You've added the maximum allowed number of locations</p>
-      {/if}
-    </div>
+<div
+  class="rounded-container bg-surface-100 dark:bg-surface-900 mx-auto mt-4 mb-2 flex max-w-(--breakpoint-md) flex-wrap justify-center gap-2 px-4 py-2 shadow-inner lg:mb-4"
+>
+  {#if locations.all.length < MAXIMUM_LOCATIONS}
+    <button
+      class={['btn hover:preset-tonal', weather.isUserEdited && 'hidden']}
+      id="add-location-button"
+      disabled={project.status.loading}
+      onclick={() => locations.add()}
+      title="Add a New Location"
+    >
+      <CirclePlusIcon /> Add Location
+    </button>
+  {:else}
+    <p class={['py-2 text-sm', weather.isUserEdited && 'hidden']}>
+      You've added the maximum allowed number of locations
+    </p>
+  {/if}
 
-    <WeatherSourceButton />
-  </div>
-{/if}
+  <WeatherSourceButton />
+</div>

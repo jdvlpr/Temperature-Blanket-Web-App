@@ -78,6 +78,10 @@ class ProjectClass {
       new Date().getTime()?.toString()
     : '';
 
+  geolocationAvailable = $state(
+    browser ? (!navigator.geolocation ? false : true) : false,
+  );
+
   // *****************
   // History State Property
   // *****************

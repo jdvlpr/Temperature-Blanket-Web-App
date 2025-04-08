@@ -14,7 +14,7 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { SCHEMES } from '$lib/constants';
-import { localState, toast, weather } from '$lib/state';
+import { gauges, localState, toast, weather } from '$lib/state';
 import type { Color, GaugeSettingsType } from '$lib/types';
 import {
   displayNumber,
@@ -44,10 +44,20 @@ export function getRanges({
 
     if (colors.length === ranges.length) newRanges = ranges;
     else {
+      let prop = rangeOptions.auto.optimization;
+      if (prop === 'ranges') {
+        // Only temp gauges have multiple props (tmax, tavg, tmin)
+        // So if it's not a temp gauge, use the gauge id (e.g. prcp, snow)
+        if (gauges.activeGauge?.id !== 'temp') prop = gauges.activeGauge?.id;
+        // Otherwise if it is a temp gauge, use tmax as default
+        // I don't think the following condition should ever be reached, but it's here just in case
+        else prop = 'tmax';
+      }
+
       newRanges = getEvenlyDistributedRangeValuesWithEqualDayCount({
         weatherData: weather.data,
         numRanges: colors.length,
-        prop: rangeOptions.auto.optimization,
+        prop,
         gaugeDirection: rangeOptions.direction,
         roundIncrement: rangeOptions.auto.roundIncrement,
         includeFrom: rangeOptions.includeFromValue,

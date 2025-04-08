@@ -14,17 +14,26 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
+  import { dev, version } from '$app/environment';
   import { beforeNavigate, onNavigate } from '$app/navigation';
+  import { page } from '$app/state';
   import { PUBLIC_MICROSOFT_CLARITY_ID } from '$env/static/public';
   import ModalProvider from '$lib/components/modals/ModalProvider.svelte';
   import ToastProvider from '$lib/components/ToastProvider.svelte';
-  import { consentToMSClarityCookies, modal, toast } from '$lib/state';
-  import { handleKeyDown, initializeLocalStorage, privacy } from '$lib/utils';
-  import { RocketIcon, RssIcon, XIcon } from '@lucide/svelte';
+  import { consentToMSClarityCookies, modal, project, toast } from '$lib/state';
+  import { supabase } from '$lib/supabaseClient';
+  import {
+    dateToISO8601String,
+    dateToISO8601StringVersion2,
+    handleKeyDown,
+    initializeLocalStorage,
+    privacy,
+    stringToDate,
+    stringToDateVersion2,
+  } from '$lib/utils';
   import { onMount, type Snippet } from 'svelte';
   import '../css/main.css';
 
-  let bannerElement: HTMLElement | undefined;
   interface Props {
     children?: Snippet;
   }
@@ -37,6 +46,33 @@ If not, see <https://www.gnu.org/licenses/>. -->
     // See the script tag with id="clarity-script"
     window.MS_CLARITY_ID = PUBLIC_MICROSOFT_CLARITY_ID || null;
     privacy.init();
+
+    // temporary diagnostics
+    const a_stringToDate = stringToDate('2025-01-01');
+    const b_stringToDateVersion2 = stringToDateVersion2('2025-01-01');
+    const c_dateToISO8601String = dateToISO8601String(a_stringToDate);
+    const d_dateToISO8601String2 = dateToISO8601StringVersion2(
+      b_stringToDateVersion2,
+    );
+
+    const currentError = c_dateToISO8601String !== '2025-01-01';
+    const v2Error = d_dateToISO8601String2 !== '2025-01-01';
+    if (currentError || v2Error) {
+      await supabase.from('Weather Data Feedback').insert({
+        dev,
+        version,
+        flag: true,
+        pid: +project.timeStampId || 0,
+        details: {
+          [page.route.id || 'layout']: {
+            a_stringToDate,
+            b_stringToDateVersion2,
+            c_dateToISO8601String,
+            d_dateToISO8601String2,
+          },
+        },
+      });
+    }
   });
 
   beforeNavigate(() => {
@@ -153,22 +189,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </script>
   {/if}
 </svelte:head>
-
-<div
-  class="bg-surface-100-900 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 p-2 text-center [view-transition-name:top-banner]"
-  bind:this={bannerElement}
->
-  <a
-    href="/blog/2025-03-20-version-5"
-    class="btn bg-primary-50-950 hover:preset-tonal"
-  >
-    <RssIcon />
-    Version 5 | See what's new</a
-  >
-  <button class="btn hover:preset-tonal" onclick={() => bannerElement.remove()}
-    ><XIcon />Close</button
-  >
-</div>
 
 {@render children?.()}
 

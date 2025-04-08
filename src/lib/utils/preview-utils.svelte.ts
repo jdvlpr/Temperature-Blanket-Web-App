@@ -23,7 +23,7 @@ import {
   previewWeatherTargets,
   weather,
 } from '$lib/state';
-import type { WeatherParam } from '$lib/types';
+import type { WeatherDay, WeatherParam } from '$lib/types';
 import { exists, getTargetParentGaugeId } from '$lib/utils';
 
 export const showPreviewImageWeatherDetails = (targets) => {
@@ -155,10 +155,9 @@ export const getSecondaryTargetIndexes = (secondaryTargets) => {
 /**
  * Returns an array of indexes where month separators should be placed.
  *
- * @returns {number[]} An array of indexes indicating where month separators should be placed. [1,31,52,68...]
  */
-export const getMonthSepparatorIndexes = () => {
-  const spaceIndexes = [];
+export const getMonthSepparatorIndexes = (): number[] => {
+  const spaceIndexes: number[] = [];
   weather.data.forEach((day, index, all) => {
     if (index === 0) {
       spaceIndexes.push(0);
@@ -168,7 +167,7 @@ export const getMonthSepparatorIndexes = () => {
       current: new Date(day.date),
       previous: new Date(all[index - 1].date),
     };
-    if (date.current.getMonth() !== date.previous.getMonth()) {
+    if (date.current.getUTCMonth() !== date.previous.getUTCMonth()) {
       spaceIndexes.push(index);
     }
   });
@@ -218,24 +217,29 @@ export const getSquareSectionTargetIds = (
   return params;
 };
 
-/**
- * Generates weather months data based on the provided weather data.
- * @param {Object} options - The options object.
- * @param {Array<object>} options.weatherData - The weather data array.
- * @returns {Array<object>} - The generated weather months data.
- */
-export const weatherMonthsData = ({ weatherData }) => {
+type WeatherMonthsDataType = {
+  location: WeatherDay['location'];
+  year: number;
+  month: number;
+  days: number;
+  start: number;
+};
+export const weatherMonthsData = ({
+  weatherData,
+}: {
+  weatherData: WeatherDay[];
+}): WeatherMonthsDataType[] => {
   if (!weatherData) return [];
 
   const unique = new Set(); // Use a Set instead of an array for faster lookup
-  const data = [];
+  const data: WeatherMonthsDataType[] = [];
 
   weatherData.forEach((n) => {
-    const date = new Date(n.date);
-    const year = date.getFullYear();
-    const month = date.getMonth();
-    const day = new Date(year, month, 1).getDay();
-    const days = new Date(year, month + 1, 0).getDate();
+    const date = n.date;
+    const year = date.getUTCFullYear();
+    const month = date.getUTCMonth();
+    const day = new Date(year, month, 1).getUTCDay();
+    const days = new Date(year, month + 1, 0).getUTCDate();
     const id = `${year}${month}`;
 
     // Check if the id is already present in the Set
