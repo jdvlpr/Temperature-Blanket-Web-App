@@ -34,6 +34,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let { gauge = $bindable() } = $props();
 
+  let isStaticGauge = $state(gauge.unit.type === 'static');
+
   let dragDisabled = $state(false);
 
   const flipDurationMs = 90;
@@ -186,7 +188,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       style="background:{hex};color:{getTextColor(hex)}"
       animate:flip={{ duration: flipDurationMs }}
     >
-      {#if movable}
+      {#if movable && !isStaticGauge}
         <button
           title="Remove Color"
           class="btn hover:preset-tonal flex flex-wrap items-center justify-center"

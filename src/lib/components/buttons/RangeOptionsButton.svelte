@@ -17,7 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Tooltip from '$lib/components/Tooltip.svelte';
   import GaugeSettings from '$lib/components/modals/GaugeSettings.svelte';
   import { gauges, modal } from '$lib/state';
-  import { CogIcon, Settings2Icon } from '@lucide/svelte';
+  import { Settings2Icon } from '@lucide/svelte';
 
   function onSaveRangeOptions(e) {
     gauges.activeGauge.ranges = e.ranges;

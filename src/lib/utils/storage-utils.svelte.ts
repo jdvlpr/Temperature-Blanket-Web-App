@@ -21,7 +21,12 @@ import type {
   SavedProject,
   WeatherSourceOptions,
 } from '$lib/types';
-import { dateToISO8601String, numberOfDays, stringToDate } from '$lib/utils';
+import {
+  dateToISO8601String,
+  getMoonPhase,
+  numberOfDays,
+  stringToDate,
+} from '$lib/utils';
 
 export function initializeLocalStorage() {
   // ****************
@@ -152,9 +157,12 @@ export const checkForProjectInLocalStorage = async () => {
 
   if (!weatherLocalStorage) return;
   const newWeatherUngrouped = weatherLocalStorage.map((n) => {
+    const moon = n.moon || getMoonPhase(n.date);
+
     return {
       ...n,
       date: stringToDate(n.date),
+      moon,
     };
   });
 

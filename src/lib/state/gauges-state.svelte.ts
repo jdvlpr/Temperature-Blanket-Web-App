@@ -32,6 +32,10 @@ import {
 } from '$lib/state/gauges/daytime-gauge-state.svelte';
 import type { GaugeAttributes, GaugeStateInterface } from '$lib/types';
 import { colorsToYarnDetails, displayNumber } from '$lib/utils';
+import {
+  MoonPhaseGauge,
+  gaugeAttributes as moonGaugeAttributes,
+} from './gauges/moon-phase-gauge-state.svelte';
 
 export const showDaysInRange: { value: boolean } = $state({ value: true });
 
@@ -138,6 +142,7 @@ class GaugesState {
     if (id === 'prcp') newGauge = new RainGauge();
     if (id === 'snow') newGauge = new SnowGauge();
     if (id === 'dayt') newGauge = new DayTimeGauge();
+    if (id === 'moon') newGauge = new MoonPhaseGauge();
 
     // if (id === 'prcp') newGauge = new RainGauge();
     // else newGauge = new GaugeState({ attributes, settings });
@@ -200,4 +205,5 @@ export const allGaugesAttributes = [
   rainGaugeAttributes,
   snowGaugeAttributes,
   daytGaugeAttributes,
+  moonGaugeAttributes,
 ];

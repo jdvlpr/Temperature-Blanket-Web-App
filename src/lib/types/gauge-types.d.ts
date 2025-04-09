@@ -69,13 +69,18 @@ export interface GaugeSettingsType {
 }
 
 export interface GaugeAttributes {
-  id: 'temp' | 'prcp' | 'snow' | 'dayt';
-  label: 'Temperature Gauge' | 'Rain Gauge' | 'Snow Gauge' | 'Daytime Gauge';
+  id: 'temp' | 'prcp' | 'snow' | 'dayt' | 'moon';
+  label:
+    | 'Temperature Gauge'
+    | 'Rain Gauge'
+    | 'Snow Gauge'
+    | 'Daytime Gauge'
+    | 'Moon Phase Gauge';
   unit: {
-    type: 'temperature' | 'height' | 'time';
+    type: 'temperature' | 'height' | 'time' | 'static';
     label: {
-      metric: '°C' | 'mm' | 'min';
-      imperial: '°F' | 'in' | 'hr';
+      metric: '°C' | 'mm' | 'min' | '';
+      imperial: '°F' | 'in' | 'hr' | '';
     };
   };
   targets: WeatherParam[];
@@ -86,23 +91,32 @@ export interface GaugeStateInterface
     GaugeAttributes {}
 
 export type WeatherParam = {
-  id: 'tmax' | 'tavg' | 'tmin' | 'prcp' | 'snow' | 'dayt';
+  id: 'tmax' | 'tavg' | 'tmin' | 'prcp' | 'snow' | 'dayt' | 'moon';
   label:
     | 'High Temperature'
     | 'Average Temperature'
     | 'Low Temperature'
     | 'Rain'
     | 'Snow'
-    | 'Daytime';
-  type: 'temperature' | 'height' | 'time';
-  gaugeLabel: 'High' | 'Average' | 'Low' | 'Rain' | 'Snow' | 'Daytime';
+    | 'Daytime'
+    | 'Moon Phase';
+  type: GaugeAttributes['unit']['type'];
+  gaugeLabel:
+    | 'High'
+    | 'Average'
+    | 'Low'
+    | 'Rain'
+    | 'Snow'
+    | 'Daytime'
+    | 'Moon Phase';
   shortLabel:
     | 'High Temp'
     | 'Average Temp'
     | 'Low Temp'
     | 'Rain'
     | 'Snow'
-    | 'Daytime';
+    | 'Daytime'
+    | 'Moon Phase';
   pdfHeader: {
     metric:
       | 'High (°C)'
@@ -110,14 +124,15 @@ export type WeatherParam = {
       | 'Low (°C)'
       | 'Rain (mm)'
       | 'Snow (mm)'
-      | 'Sun (h:m)';
+      | 'Sun (h:m)'
+      | 'Moon Phase';
     imperial:
       | 'High (°F)'
       | 'Avg (°F)'
       | 'Low (°F)'
       | 'Rain (in)'
       | 'Snow (in)'
-      | 'Sun (h:m)';
+      | 'Moon Phase';
   };
-  icon: '↑' | '~' | '↓' | '∴' | '∗' | '☼'; // TODO: try using different icons: '☔' '☀'
+  icon: '↑' | '~' | '↓' | '∴' | '∗' | '☼' | '●'; // TODO: try using different icons: '☔' '☀'
 };

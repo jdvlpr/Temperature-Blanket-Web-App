@@ -18,6 +18,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { localState, weather } from '$lib/state';
   import {
     getColorInfo,
+    getWeatherValue,
     runPreview,
     showPreviewImageWeatherDetails,
   } from '$lib/utils';
@@ -97,10 +98,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
       let color;
       if (day.length) {
-        const value =
-          weather.data[_dayIndex][monthSquaresPreview.settings.selectedTarget][
-            localState.value.units
-          ];
+        const value = getWeatherValue({
+          dayIndex: _dayIndex,
+          param: monthSquaresPreview.settings.selectedTarget,
+        });
 
         // Get the color based on the gauge ID and value
         color = getColorInfo({

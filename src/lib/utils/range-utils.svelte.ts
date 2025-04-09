@@ -165,8 +165,9 @@ export const getDaysInRange = ({
   )
     return [];
   const days = weather.data.filter((day) => {
+    const value = id === 'moon' ? day[id] : day[id][localState.value.units];
     return isValueInRange({
-      value: day[id][localState.value.units],
+      value,
       range,
       direction,
       includeFromValue,

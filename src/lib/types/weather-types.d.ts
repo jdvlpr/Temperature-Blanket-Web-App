@@ -23,6 +23,17 @@ export interface WeatherSourceOptions {
   useSecondary: boolean;
 }
 
+export type MoonPhasesIds = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7;
+export type MoonPhasesNames =
+  | 'New Moon'
+  | 'Waxing Crescent'
+  | 'First Quarter'
+  | 'Waxing Gibbous'
+  | 'Full Moon'
+  | 'Waning Gibbous'
+  | 'Third Quarter'
+  | 'Waning Crescent';
+
 export interface WeatherDay {
   /** 0-based index of which location the weather day is for */
   location: number;
@@ -51,4 +62,5 @@ export interface WeatherDay {
     metric: number | null;
     imperial: number | null;
   };
+  moon: MoonPhasesIds | null;
 }

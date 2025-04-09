@@ -114,6 +114,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         schemeName={gauge.schemeId}
         showSchemeName={false}
         roundedBottom={false}
+        isStaticGauge={gauge.unit.type === 'static'}
         onchanged={() => {
           updateGauge({ _colors: gauge.colors });
         }}
@@ -127,7 +128,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       fullscreen.value && 'order-1 py-2',
     ]}
   >
-    <div class="">
+    <div class={[gauge.unit.type === 'static' && 'hidden']}>
       <SelectNumberOfColors
         hideText={fullscreen.value}
         numberOfColors={gauge.colors.length}

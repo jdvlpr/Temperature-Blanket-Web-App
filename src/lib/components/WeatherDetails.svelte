@@ -39,18 +39,24 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let navigatorElement = $state();
 
   let dayWeather = $derived(data[weather.currentIndex]);
+
   let dayLocation = $derived(
     locations.all.filter(
       (location) => location.index === dayWeather?.location,
     )[0],
   );
+
   let day = $derived({ ...dayWeather, ...dayLocation });
 
   let colorInfo = $derived((targetId, day) => {
     if (!exists(day)) return null;
+    const value =
+      targetId === 'moon'
+        ? day[targetId]
+        : day[targetId][localState.value.units];
     return getColorInfo({
       param: targetId,
-      value: day[targetId][localState.value.units],
+      value,
     });
   });
 
@@ -119,17 +125,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {#each weatherTargets as { id, label, icon, type }}
         {@const { name, hex, index, gaugeLength, brandName, yarnName } =
           colorInfo(id, day)}
-        {#if exists(day) && day[id][localState.value.units] !== null}
+        {@const value =
+          id === 'moon' ? day[id] : day[id][localState.value.units]}
+        {#if exists(day) && value !== null}
           {#if id === 'dayt'}
-            <WeatherItem
-              {id}
-              {label}
-              {icon}
-              value={convertTime(day[id][localState.value.units])}
-            >
+            <WeatherItem {id} {label} {icon} value={convertTime(value)}>
               {#snippet details()}
                 <span>
-                  {#if viewGaugeInfo !== false && day[id][localState.value.units] !== null}
+                  {#if viewGaugeInfo !== false && value !== null}
                     {#if typeof index === 'number'}
                       <div
                         class="rounded-container my-2 px-4 py-2 text-center"
@@ -172,13 +175,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
               {id}
               {label}
               {icon}
-              value={day[id][localState.value.units]}
+              {value}
               units={UNIT_LABELS[type][localState.value.units]}
               {isRecentDate}
             >
               {#snippet details()}
                 <span>
-                  {#if viewGaugeInfo !== false && day[id][localState.value.units] !== null}
+                  {#if viewGaugeInfo !== false && value !== null}
                     {#if typeof index === 'number'}
                       <div
                         class="rounded-container my-2 px-4 py-2 text-center"

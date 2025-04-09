@@ -36,9 +36,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     allGaugesAttributes.forEach((gauge) => {
       gauge.targets.forEach((target) => {
         if (
-          weather.data?.some(
-            (day) => day[target.id][localState.value.units] !== null,
-          )
+          weather.data?.some((day) => {
+            if (target.type === 'static') return day[target.id] !== null;
+            else return day[target.id][localState.value.units] !== null;
+          })
         ) {
           // For each of the gauge's weather parameter targets, check to see if there is any data, and if so setup the default gauge
           gauges.addToAvailable({
@@ -120,7 +121,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   <Gauge bind:gauge={gauges.activeGauge} />
 
-  <div class="mt-4 mb-2">
+  <div
+    class={[
+      'mt-4 mb-2',
+      gauges.activeGauge?.unit.type === 'static' && 'hidden',
+    ]}
+  >
     <RangeOptionsButton />
   </div>
 

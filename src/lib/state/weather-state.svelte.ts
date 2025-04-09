@@ -165,7 +165,7 @@ class WeatherClass {
   });
 
   params = $derived.by(() => {
-    let tmin, tavg, tmax, prcp, snow, dayt;
+    let tmin, tavg, tmax, prcp, snow, dayt, moon;
 
     if (!this.data)
       return {
@@ -175,6 +175,7 @@ class WeatherClass {
         prcp,
         snow,
         dayt,
+        moon,
       };
 
     tmin = this.data.map((day) => day.tmin[localState.value.units]);
@@ -183,6 +184,7 @@ class WeatherClass {
     prcp = this.data.map((day) => day.prcp[localState.value.units]);
     snow = this.data.map((day) => day.snow[localState.value.units]);
     dayt = this.data.map((day) => day.dayt[localState.value.units]);
+    moon = this.data.map((day) => day.moon);
 
     return {
       tmin,
@@ -191,6 +193,7 @@ class WeatherClass {
       prcp,
       snow,
       dayt,
+      moon,
     };
   });
 
