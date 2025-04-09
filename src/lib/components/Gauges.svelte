@@ -98,6 +98,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <CirclePlusIcon />
         {/if}
         {label}
+        {#if id === 'moon'}
+          <div class="badge preset-filled-tertiary-500">BETA</div>
+        {/if}
       </button>
     {/each}
   </div>
@@ -117,6 +120,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
         Delete {gauges.activeGauge.label}
       </button>
     </div>
+  {/if}
+
+  {#if gauges.activeGauge?.unit.type === 'static'}
+    <p class="text-sm">
+      This gauge has a fixed number of colors for the eight phases of the moon.
+      You can only edit the colors individually, for now.
+    </p>
   {/if}
 
   <Gauge bind:gauge={gauges.activeGauge} />

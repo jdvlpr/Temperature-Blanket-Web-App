@@ -431,6 +431,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     >
       <span class="border-b-2 border-(--snow)">Snow</span>
     </ToggleWeatherData>
+
     <ToggleWeatherData
       view={weather.table.showParameters.dayt}
       onclick={() => {
@@ -438,6 +439,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
       }}
     >
       <span class="border-b-2 border-(--dayt)">Daytime</span>
+    </ToggleWeatherData>
+
+    <ToggleWeatherData
+      view={weather.table.showParameters.moon}
+      onclick={() => {
+        weather.table.showParameters.moon = !weather.table.showParameters.moon;
+      }}
+    >
+      <span class="border-b-2 border-(--moon)">Moon Phase</span>
     </ToggleWeatherData>
   </div>
 

@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { API_SERVICES } from '$lib/constants';
+import { API_SERVICES, MOON_PHASE_NAMES } from '$lib/constants';
 import {
   allGaugesAttributes,
   localState,
@@ -421,6 +421,13 @@ export const getTableData = () => {
               displayUnits: false,
               padStart: true,
             }),
+          };
+        } else if (target.id === 'moon') {
+          let value =
+            n[target.id] !== null ? MOON_PHASE_NAMES[n[target.id]] : '-';
+          _weather = {
+            ..._weather,
+            [target.id]: value,
           };
         } else {
           let value =

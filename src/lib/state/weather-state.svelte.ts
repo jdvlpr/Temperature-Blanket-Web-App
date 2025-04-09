@@ -240,6 +240,7 @@ class WeatherClass {
       prcp: true,
       snow: true,
       dayt: true,
+      moon: false,
     },
   });
 }

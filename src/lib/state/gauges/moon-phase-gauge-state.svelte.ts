@@ -93,7 +93,7 @@ export class MoonPhaseGauge {
 
   colors = $state(
     chroma
-      .scale('Greys')
+      .scale('BrBG')
       .colors(8)
       .map((n) => {
         return { hex: n };
@@ -163,7 +163,7 @@ export class MoonPhaseGauge {
 
   numberOfColors = $state(8);
 
-  schemeId = $state('Greys');
+  schemeId = $state('BrBG');
 
   ranges = $state(
     getFirstRanges({
