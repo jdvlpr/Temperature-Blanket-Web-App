@@ -23,6 +23,17 @@ export const entries: ChangelogItem[] = [
     date: 'April, 2025',
     notes: [
       {
+        icon: ICONS.design,
+        text: 'Add colors for phases of the moon into your preview designs. This is a beta feature—it may have issues and may not be completely accurate.',
+        title:
+          'Added Feature: Moon Phase Gauge <span class="badge bg-tertiary-50-950">Beta</span>',
+      },
+    ],
+    version: '5.3.0',
+  },
+  {
+    notes: [
+      {
         icon: ICONS.wrench,
         text: `The fix introduced in v5.2.33 didn't completely solve the issue of dates shifting; some locations were still experiencing the issue. This update addresses the issue by using Universal Time Coordinated (UTC) throughout the application when converting dates, with added fixes to keep the v5.2.33 functionality in the cases where that update solved the problem.`,
         instructions: `If you notice any issues regarding weather data, please <a href="/contact/forms/2025-03-weather-data" target="_blank" class="link">let me know</a>.`,
