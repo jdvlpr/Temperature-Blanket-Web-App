@@ -7,8 +7,8 @@ export interface GaugeRange {
 }
 
 export type GaugeRangeCategory = {
-  id: number;
-  value: string;
+  value: number;
+  label: string;
 };
 
 export interface GaugeRangeOptions {

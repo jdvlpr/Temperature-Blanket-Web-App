@@ -195,9 +195,9 @@ const pdfGauge = {
       doc.setFontSize(pdfConfig.font.p);
 
       if (gauge?.unit.type === 'category') {
-        const value = gauge.ranges[i].value;
+        const label = gauge.ranges[i].label;
         doc.text(
-          value,
+          label,
           pdfConfig.leftMargin + pdfGauge.headerItems.from.position,
           l,
         );

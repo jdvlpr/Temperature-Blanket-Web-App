@@ -181,7 +181,7 @@ export const getDaysInRange = ({
     const days = weather.data.filter((day, i) => {
       const value = getWeatherValue({ dayIndex: i, param: id });
       if (value === 'null') return false;
-      return 'id' in range && range.id === value;
+      return 'value' in range && range.value === value;
     });
 
     return days;

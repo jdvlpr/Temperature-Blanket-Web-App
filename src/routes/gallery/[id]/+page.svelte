@@ -384,9 +384,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     {#if gauges?.length}
                       {#key gauges}
                         {#each gauges as { colors, ranges, id }, gaugeIndex}
+                          {@const gaugeType = gauges[gaugeIndex].unit.type}
                           {@const item = ranges.map((range, index) => {
                             return {
-                              ...range,
+                              range,
                               ...colors[index],
                             };
                           })}
@@ -448,7 +449,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                                 ? 'grid grid-cols-2 gap-1 md:grid-cols-3 xl:grid-cols-4'
                                 : 'flex flex-col'}"
                             >
-                              {#each item as { from, to, hex, name, yarnName, brandName, affiliate_variant_href, variant_href }, i}
+                              {#each item as { range, hex, name, yarnName, brandName, affiliate_variant_href, variant_href }, i}
                                 <div
                                   class="flex flex-wrap items-center justify-around gap-2 p-2 {localState
                                     .value.layout === 'grid'
@@ -464,26 +465,37 @@ If not, see <https://www.gnu.org/licenses/>. -->
                                   <div
                                     class="flex items-center justify-start gap-2"
                                   >
-                                    <span
-                                      class="flex flex-col items-start text-left"
-                                      id="range-0-from"
-                                    >
-                                      <span class="text-xs">From</span>
-                                      <span class="flex items-start">
-                                        <span class="text-lg">{from}</span>
-                                        <span class="text-xs">{unitLabel}</span>
+                                    {#if gaugeType === 'category'}
+                                      <p id="range-{i}-value">{range.label}</p>
+                                    {:else}
+                                      <span
+                                        class="flex flex-col items-start text-left"
+                                        id="range-{i}-from"
+                                      >
+                                        <span class="text-xs">From</span>
+                                        <span class="flex items-start">
+                                          <span class="text-lg"
+                                            >{range.from}</span
+                                          >
+                                          <span class="text-xs"
+                                            >{unitLabel}</span
+                                          >
+                                        </span>
                                       </span>
-                                    </span>
-                                    <span
-                                      class="flex flex-col items-start text-left"
-                                      id="range-0-to"
-                                    >
-                                      <span class="text-xs">To</span>
-                                      <span class="flex items-start">
-                                        <span class="text-lg">{to}</span>
-                                        <span class="text-xs">{unitLabel}</span>
+                                      <span
+                                        class="flex flex-col items-start text-left"
+                                        id="range-{i}-to"
+                                      >
+                                        <span class="text-xs">To</span>
+                                        <span class="flex items-start">
+                                          <span class="text-lg">{range.to}</span
+                                          >
+                                          <span class="text-xs"
+                                            >{unitLabel}</span
+                                          >
+                                        </span>
                                       </span>
-                                    </span>
+                                    {/if}
                                   </div>
                                   {#if affiliate_variant_href}
                                     <a

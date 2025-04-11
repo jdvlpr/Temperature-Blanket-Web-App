@@ -47,7 +47,7 @@ export class MoonPhaseGauge {
 
   // All the values of the gauge
   ranges: GaugeRangeCategory[] = MOON_PHASE_NAMES.map((n, i) => {
-    return { id: i, value: n };
+    return { value: i, label: n };
   });
 
   colors = $state(

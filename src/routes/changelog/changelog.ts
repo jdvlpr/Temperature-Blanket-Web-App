@@ -16,14 +16,14 @@
 import { PUBLIC_GITHUB_LINK } from '$env/static/public';
 import { ICONS } from '$lib/constants';
 import type { ChangelogItem } from '$lib/types';
-import { RocketIcon } from '@lucide/svelte';
+import { MoonStarIcon, RocketIcon } from '@lucide/svelte';
 
 export const entries: ChangelogItem[] = [
   {
     date: 'April, 2025',
     notes: [
       {
-        icon: ICONS.design,
+        IconComponent: MoonStarIcon,
         text: 'Add colors for phases of the moon into your preview designs. This is a beta feature—it may have issues and may not be completely accurate.',
         title:
           'Added Feature: Moon Phase Gauge <span class="badge bg-tertiary-50-950">Beta</span>',

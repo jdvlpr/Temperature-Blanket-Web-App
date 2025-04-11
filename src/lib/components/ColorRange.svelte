@@ -27,7 +27,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <span class="range-input-container">
   {#if gauges.activeGauge?.unit.type === 'category'}
-    <p class="p-2">{gauges.activeGauge.ranges[index].value}</p>
+    <p class="p-2">{gauges.activeGauge.ranges[index].label}</p>
   {:else}
     <button
       class="btn hover:preset-tonal h-auto"

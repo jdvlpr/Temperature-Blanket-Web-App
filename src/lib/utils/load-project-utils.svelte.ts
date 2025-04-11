@@ -30,6 +30,7 @@ import {
   toast,
   weather,
 } from '$lib/state';
+import { MoonPhaseGauge } from '$lib/state/gauges/moon-phase-gauge-state.svelte';
 import {
   celsiusToFahrenheit,
   dateToISO8601String,
@@ -346,6 +347,8 @@ export const parseGaugeURLHash = (hashString: string, gauge) => {
 
   // If it's a moon gauge, this is enough, so return the gauge and don't process any further
   if (gauge.id === 'moon') {
+    const _moonGauge = new MoonPhaseGauge();
+    gauge.ranges = _moonGauge.ranges;
     return gauge;
   }
 

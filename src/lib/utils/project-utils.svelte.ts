@@ -209,7 +209,7 @@ export const sendToProjectGallery = async (img) => {
 
     if (response.code === 200) {
       // success
-      message = `<p class="font-bold text-xl my-2">${response.message}</p><p>The project gallery webpage has been created:</p>`;
+      message = `<p class="font-bold text-xl my-2">${response.message}</p><p>The project gallery webpage has been created.</p>`;
       project.gallery.href = response.link;
       project.gallery.title = response.title;
       // reloadRecentGalleryProjects();

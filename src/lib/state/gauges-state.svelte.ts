@@ -136,7 +136,7 @@ class GaugesState {
         gauge.colors.forEach((color, index) => {
           const code = color.hex.substring(color.hex.indexOf('#') + 1);
 
-          hash += encodeURIComponent(`${code}(${gauge.ranges[index].id})`);
+          hash += encodeURIComponent(`${code}(${gauge.ranges[index].value})`);
         });
         hash += '!';
       }
