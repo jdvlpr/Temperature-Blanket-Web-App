@@ -13,6 +13,7 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
+import { MOON_PHASE_NAMES } from '$lib/constants';
 import pdfGauges from '$lib/pdf/sections/gauges.svelte';
 import pdfWeatherData from '$lib/pdf/sections/weather-data.svelte';
 import {
@@ -67,6 +68,8 @@ export const downloadWeatherCSV = () => {
     gauge.targets.forEach((target) => {
       if (target?.id === 'dayt') {
         labels.push(`${target.label} (h:m)`);
+      } else if (target?.id === 'moon') {
+        labels.push(`${target.label}`);
       } else {
         labels.push(
           `${target.label} (${gauge.unit.label[localState.value.units]})`,
@@ -87,6 +90,8 @@ export const downloadWeatherCSV = () => {
               padStart: true,
             }),
           );
+        } else if (target?.id === 'moon') {
+          gaugeInfo.push(MOON_PHASE_NAMES[day[target?.id]]);
         } else {
           gaugeInfo.push(day[target?.id][_units]);
         }

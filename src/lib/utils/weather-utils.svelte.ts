@@ -21,7 +21,7 @@ import {
   signal,
   weather,
 } from '$lib/state';
-import type { WeatherDay, WeatherParam } from '$lib/types';
+import type { MoonPhasesId, WeatherDay, WeatherParam } from '$lib/types';
 import {
   celsiusToFahrenheit,
   convertTime,
@@ -234,7 +234,7 @@ export const getOpenMeteo = async ({ location }) => {
         metric: dayTime.metric,
         imperial: dayTime.imperial,
       },
-      moon: getMoonPhase(times[index]),
+      moon: getMoonPhase(date),
     };
 
     // Other possible parameters from Open-Meteo, not used
@@ -404,15 +404,17 @@ export const getDayTime = ({ date, lat, lng }) => {
 
 export const getTableData = () => {
   return [
-    ...weather.data.map((n) => {
+    ...weather.data.map((n, i) => {
       let _weather = {};
       _weather.color = {};
       weather.tableWeatherTargets.forEach((target) => {
+        const value = getWeatherValue({ dayIndex: i, param: target.id });
         const colorInfo = getColorInfo({
           param: target.id,
-          value: n[target.id][localState.value.units],
+          value,
         });
         _weather.color[target.id] = colorInfo;
+
         if (target.id === 'dayt') {
           // make sure daytime is always in the same hr:mn format
           _weather = {
@@ -450,107 +452,59 @@ export const getTableData = () => {
   ];
 };
 
-export const getMoonPhase = (dateInput: Date | string) => {
-  // Constants
-  const LUNAR_CYCLE_DAYS = 29.530588853; // Average synodic period
-
-  // Known New Moon: January 6, 2000, 18:14 UTC
-  // We use Date.UTC to ensure calculations are timezone-independent
-  const knownNewMoonUTC = Date.UTC(2000, 0, 6, 18, 14, 0); // Month is 0-indexed (Jan=0)
-
-  let targetDate;
-
-  // Handle Date object or string input
-  if (dateInput instanceof Date) {
-    targetDate = dateInput;
-  } else if (
-    typeof dateInput === 'string' &&
-    dateInput.match(/^\d{4}-\d{2}-\d{2}$/)
-  ) {
-    const [year, month, day] = dateInput.split('-').map(Number);
-    // Create Date object using UTC to avoid timezone issues with just YYYY-MM-DD
-    targetDate = new Date(Date.UTC(year, month - 1, day)); // Month is 0-indexed
-  } else {
-    // Default to today if input is invalid or missing
-    console.warn(
-      "Invalid dateInput provided to getMoonPhase. Using today's date (UTC).",
-    );
-    targetDate = new Date(); // Gets current local time, we need UTC day start
-    targetDate = new Date(
-      Date.UTC(
-        targetDate.getUTCFullYear(),
-        targetDate.getUTCMonth(),
-        targetDate.getUTCDate(),
-      ),
-    );
+/**
+ * Calculates the moon phase name for a given date.
+ * Reasonably accurate for dates from ~1940 onwards.
+ * Based on simple approximation using average synodic period.
+ *
+ * @param {Date} date The date for which to calculate the moon phase.
+ * @returns {MoonPhasesId} The index id of the moon phase (e.g., "0" for "New Moon", "1" for "Waxing Crescent").
+ */
+export const getMoonPhase = (date: Date): MoonPhasesId => {
+  // Ensure input is a Date object
+  if (!(date instanceof Date) || isNaN(date)) {
+    throw new Error('Invalid Date object provided.');
   }
 
-  // Get the UTC timestamp for the target date (start of the day)
-  const targetDateUTC = Date.UTC(
-    targetDate.getUTCFullYear(),
-    targetDate.getUTCMonth(),
-    targetDate.getUTCDate(),
-  );
+  // Known New Moon: January 6, 2000, 18:14:00 UTC
+  // We use milliseconds since Unix epoch (Jan 1, 1970)
+  const knownNewMoonMs = 947182440000;
 
-  // Calculate the difference in days between the target date and the known New Moon
-  const daysSinceKnownNewMoon =
-    (targetDateUTC - knownNewMoonUTC) / (1000 * 60 * 60 * 24);
+  // Average Synodic Period (days between new moons)
+  const synodicPeriodDays = 29.530588853;
+  const synodicPeriodMs = synodicPeriodDays * 24 * 60 * 60 * 1000;
 
-  // Calculate the position in the current lunar cycle
-  // Normalize the days into a value between 0 and 1 (fraction of the cycle)
-  let phase = (daysSinceKnownNewMoon / LUNAR_CYCLE_DAYS) % 1;
+  // Get the time difference in milliseconds from the known new moon (UTC)
+  const dateMs = date.getTime();
+  const diffMs = dateMs - knownNewMoonMs;
 
-  // Ensure phase is positive (handles dates before the known New Moon)
-  if (phase < 0) {
-    phase += 1;
-  }
+  // Calculate the position in the cycle (0 to 1)
+  // (diffMs % synodicPeriodMs) gives remainder in ms
+  // Add synodicPeriodMs and take modulo again to handle negative diffMs correctly
+  const cyclePosMs =
+    ((diffMs % synodicPeriodMs) + synodicPeriodMs) % synodicPeriodMs;
+  const normalizedPhase = cyclePosMs / synodicPeriodMs; // Value between 0 and 1
 
-  // --- Determine the phase name based on the fraction ---
-  // This uses 8 common phase divisions. Boundaries can be slightly adjusted.
-  // Each primary phase (New, First Q, Full, Third Q) gets about 1/16th of the cycle (~1.8 days)
-  // centered around its theoretical point (0, 0.25, 0.5, 0.75).
-  const phaseWindow = 1 / (8 * 2); // Half the size of an equal 8-segment division
+  // Determine phase name based on normalized value (0=New, 0.25=First Q, 0.5=Full, 0.75=Third Q)
+  // We divide the cycle into 8 parts
+  // const phaseNames = [
+  //   0, //'New Moon', // 0
+  //   1, //'Waxing Crescent', // (0, 0.25)
+  //   2, // 'First Quarter', // 0.25
+  //   3, //'Waxing Gibbous', // (0.25, 0.5)
+  //   4, //'Full Moon', // 0.5
+  //   5, // 'Waning Gibbous', // (0.5, 0.75)
+  //   6, //'Third Quarter', // 0.75
+  //   7, //'Waning Crescent', // (0.75, 1)
+  // ];
 
-  if (phase <= phaseWindow || phase > 1 - phaseWindow) {
-    return 0; // "New Moon"; // Centered at 0
-  } else if (phase > phaseWindow && phase <= 0.25 - phaseWindow) {
-    return 1; // "Waxing Crescent";
-  } else if (phase > 0.25 - phaseWindow && phase <= 0.25 + phaseWindow) {
-    return 2; //"First Quarter"; // Centered at 0.25
-  } else if (phase > 0.25 + phaseWindow && phase <= 0.5 - phaseWindow) {
-    return 3; // "Waxing Gibbous";
-  } else if (phase > 0.5 - phaseWindow && phase <= 0.5 + phaseWindow) {
-    return 4; // "Full Moon"; // Centered at 0.5
-  } else if (phase > 0.5 + phaseWindow && phase <= 0.75 - phaseWindow) {
-    return 5; // "Waning Gibbous";
-  } else if (phase > 0.75 - phaseWindow && phase <= 0.75 + phaseWindow) {
-    return 6; //"Third Quarter"; // Centered at 0.75
-  } else {
-    // phase > (0.75 + phaseWindow) && phase <= (1 - phaseWindow)
-    return 7; //"Waning Crescent";
-  }
+  // Calculate an index from 0 to 7, slightly offset to center phases
+  // Multiplying by 8 gives a value from 0 to 8.
+  // Adding 0.5 and flooring effectively rounds to the nearest phase segment boundary.
+  const phaseIndex = Math.floor((normalizedPhase * 8 + 0.5) % 8);
 
-  /* --- Alternative division (simpler 8 equal segments) ---
-       Uncomment this block and comment out the one above if you prefer equal segments.
-
-    if (phase < 0.0625 || phase >= 0.9375) { // ~0 New Moon
-        return "New Moon";
-    } else if (phase < 0.1875) { // Waxing Crescent
-        return "Waxing Crescent";
-    } else if (phase < 0.3125) { // ~0.25 First Quarter
-        return "First Quarter";
-    } else if (phase < 0.4375) { // Waxing Gibbous
-        return "Waxing Gibbous";
-    } else if (phase < 0.5625) { // ~0.5 Full Moon
-        return "Full Moon";
-    } else if (phase < 0.6875) { // Waning Gibbous
-        return "Waning Gibbous";
-    } else if (phase < 0.8125) { // ~0.75 Third Quarter
-        return "Third Quarter";
-    } else { // Waning Crescent
-        return "Waning Crescent";
-    }
-    */
+  return phaseIndex;
+  // return phaseNames[phaseIndex];
 };
 
 export const getWeatherValue = ({

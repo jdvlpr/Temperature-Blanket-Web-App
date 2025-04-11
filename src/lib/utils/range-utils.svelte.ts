@@ -14,7 +14,7 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { localState, weather } from '$lib/state';
-import { displayNumber } from '$lib/utils';
+import { displayNumber, getWeatherValue } from '$lib/utils';
 
 export const getStart = (rangeOptions) => {
   if (rangeOptions?.mode === 'auto') {
@@ -164,8 +164,8 @@ export const getDaysInRange = ({
     typeof includeToValue === 'undefined'
   )
     return [];
-  const days = weather.data.filter((day) => {
-    const value = id === 'moon' ? day[id] : day[id][localState.value.units];
+  const days = weather.data.filter((day, i) => {
+    const value = getWeatherValue({ dayIndex: i, param: id });
     return isValueInRange({
       value,
       range,

@@ -23,8 +23,8 @@ export interface WeatherSourceOptions {
   useSecondary: boolean;
 }
 
-export type MoonPhasesIds = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7;
-export type MoonPhasesNames =
+export type MoonPhasesId = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7;
+export type MoonPhasesName =
   | 'New Moon'
   | 'Waxing Crescent'
   | 'First Quarter'
@@ -62,5 +62,5 @@ export interface WeatherDay {
     metric: number | null;
     imperial: number | null;
   };
-  moon: MoonPhasesIds | null;
+  moon: MoonPhasesId | null;
 }

@@ -157,11 +157,13 @@ export const checkForProjectInLocalStorage = async () => {
 
   if (!weatherLocalStorage) return;
   const newWeatherUngrouped = weatherLocalStorage.map((n) => {
-    const moon = n.moon || getMoonPhase(n.date);
+    const date = stringToDate(n.date);
+
+    const moon = n.moon || getMoonPhase(date);
 
     return {
       ...n,
-      date: stringToDate(n.date),
+      date,
       moon,
     };
   });

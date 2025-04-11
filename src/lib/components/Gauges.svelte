@@ -99,7 +99,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {/if}
         {label}
         {#if id === 'moon'}
-          <div class="badge preset-filled-tertiary-500">BETA</div>
+          <div class="badge bg-tertiary-50-950">Beta</div>
         {/if}
       </button>
     {/each}

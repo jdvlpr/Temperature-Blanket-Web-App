@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import type { MoonPhasesNames } from '$lib/types';
+import type { MoonPhasesName } from '$lib/types';
 
 export const OPEN_METEO_DELAY_DAYS = 6;
 
@@ -137,7 +137,7 @@ export const UNIT_LABELS = {
   },
 };
 
-export const MOON_PHASE_NAMES: MoonPhasesNames[] = [
+export const MOON_PHASE_NAMES: MoonPhasesName[] = [
   'New Moon',
   'Waxing Crescent',
   'First Quarter',
