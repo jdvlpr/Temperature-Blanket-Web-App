@@ -28,7 +28,7 @@ class ModalClass {
 
   opened = $state(false);
 
-  type = $state<'component' | 'confirm' | null>(null);
+  type = $state<'component' | 'confirm' | 'choose-weather-params' | null>(null);
 
   title = $state<string | null>('');
 
@@ -58,7 +58,7 @@ class ModalClass {
     body,
     response,
   }: {
-    type: 'component' | 'confirm';
+    type: 'component' | 'confirm' | 'choose-weather-params';
     title?: string | null;
     body?: string | null;
     response?: any;
@@ -86,6 +86,8 @@ class ModalClass {
       };
 
       this.options = { ...this.#defaultOptions, ...options };
+    } else if (type === 'choose-weather-params') {
+      this.response = response || null;
     } else if (type === 'confirm') {
       this.title = title || null;
       this.body = body || null;

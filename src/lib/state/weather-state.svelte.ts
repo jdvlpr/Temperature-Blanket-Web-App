@@ -14,7 +14,12 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { locations, localState } from '$lib/state';
-import type { WeatherDay, WeatherSource } from '$lib/types';
+import type {
+  GaugeAttributes,
+  WeatherDay,
+  WeatherParam,
+  WeatherSource,
+} from '$lib/types';
 import {
   createWeeksProperty,
   displayNumber,
@@ -222,6 +227,14 @@ class WeatherClass {
   isUserEdited: boolean = $state(false);
 
   isFromLocalStorage: boolean = $state(false);
+
+  pdfOptions: {
+    gauges: GaugeAttributes['id'][];
+    weatherDataParams: WeatherParam['id'][];
+  } = $state({
+    gauges: ['temp'],
+    weatherDataParams: ['tmax', 'tavg', 'tmin'],
+  });
 
   // ***************
   // Table

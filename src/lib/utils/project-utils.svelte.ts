@@ -21,8 +21,10 @@ import {
   gauges,
   localState,
   locations,
+  modal,
   previews,
   project,
+  toast,
   weather,
 } from '$lib/state';
 import {
@@ -47,19 +49,26 @@ export const getProjectParametersFromURLHash = (hash) => {
 };
 
 export const downloadPDF = async () => {
-  await import('jspdf')
-    .then((module) => {
-      const JsPDF = module.default;
-      const doc = new JsPDF();
-      pdfGauges.create(doc);
-      pdfWeatherData.create(doc);
-      // Remove blank first page, ugly hack
-      doc.deletePage(1);
-      doc.save(`Temperature-Blanket-${locations.projectFilename}.pdf`);
-    })
-    .catch((error) => {
-      throw new Error(error);
-    });
+  modal.trigger({
+    type: 'choose-weather-params',
+    response: async (response) => {
+      if (response) {
+        await import('jspdf')
+          .then((module) => {
+            const JsPDF = module.default;
+            const doc = new JsPDF();
+            pdfGauges.create(doc);
+            pdfWeatherData.create(doc);
+            // Remove blank first page, ugly hack
+            doc.deletePage(1);
+            doc.save(`Temperature-Blanket-${locations.projectFilename}.pdf`);
+          })
+          .catch((error) => {
+            throw new Error(error);
+          });
+      }
+    },
+  });
 };
 
 export const downloadWeatherCSV = () => {

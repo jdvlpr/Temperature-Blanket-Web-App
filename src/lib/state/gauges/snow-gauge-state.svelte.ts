@@ -5,6 +5,7 @@ import chroma from 'chroma-js';
 
 export const gaugeAttributes: GaugeAttributes = {
   id: 'snow',
+  isStatic: false,
   label: 'Snow Gauge',
   unit: {
     type: 'height',

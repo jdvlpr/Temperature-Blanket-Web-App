@@ -6,6 +6,11 @@ export interface GaugeRange {
   to: number;
 }
 
+export type GaugeRangeCategory = {
+  id: number;
+  value: string;
+};
+
 export interface GaugeRangeOptions {
   auto: {
     /** In the gauge settings URL hash string, for temperature gauges, '_h' is for 'tmax', '_a' is for 'tavg', '_l' is for 'tmin'. For all gauges, '_r' or nothing is for 'ranges'. The position should be at the end of the settings string, but it's found via pattern matching rather than by position in the string. TODO: can the position be reliably predicted? */
@@ -62,7 +67,7 @@ export interface GaugeRangeOptions {
 export interface GaugeSettingsType {
   colors: Color[] | undefined;
   numberOfColors: number | undefined;
-  ranges?: GaugeRange[] | undefined;
+  ranges?: GaugeRange[] | GaugeRangeCategory[] | undefined;
   rangeOptions: GaugeRangeOptions | undefined;
   autoRangeOptions: GaugeRangeOptions | undefined;
   schemeId: string | undefined;
@@ -70,6 +75,7 @@ export interface GaugeSettingsType {
 
 export interface GaugeAttributes {
   id: 'temp' | 'prcp' | 'snow' | 'dayt' | 'moon';
+  isStatic: boolean;
   label:
     | 'Temperature Gauge'
     | 'Rain Gauge'
@@ -77,7 +83,7 @@ export interface GaugeAttributes {
     | 'Daytime Gauge'
     | 'Moon Phase Gauge';
   unit: {
-    type: 'temperature' | 'height' | 'time' | 'static';
+    type: 'temperature' | 'height' | 'time' | 'category';
     label: {
       metric: '°C' | 'mm' | 'min' | '';
       imperial: '°F' | 'in' | 'hr' | '';
@@ -125,14 +131,14 @@ export type WeatherParam = {
       | 'Rain (mm)'
       | 'Snow (mm)'
       | 'Sun (h:m)'
-      | 'Moon Phase';
+      | 'Moon';
     imperial:
       | 'High (°F)'
       | 'Avg (°F)'
       | 'Low (°F)'
       | 'Rain (in)'
       | 'Snow (in)'
-      | 'Moon Phase';
+      | 'Moon';
   };
   icon: '↑' | '~' | '↓' | '∴' | '∗' | '☼' | '●'; // TODO: try using different icons: '☔' '☀'
 };

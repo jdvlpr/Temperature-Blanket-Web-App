@@ -11,6 +11,7 @@ import chroma from 'chroma-js';
 
 export const gaugeAttributes: GaugeAttributes = {
   id: 'temp',
+  isStatic: false,
   label: 'Temperature Gauge',
   unit: {
     type: 'temperature',

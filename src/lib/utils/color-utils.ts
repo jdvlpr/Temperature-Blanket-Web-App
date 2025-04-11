@@ -191,6 +191,7 @@ export const getColorsFromInput = ({
   // project checker
   let colors =
     getColorsFromProjectURL(string) || getColorsFromYarnSearchURL(string);
+
   if (colors) return colors;
 
   if (string.includes('coolors.co/'))
@@ -239,22 +240,30 @@ export const getColorInfo = ({
 
   const gaugeLength = gauge.ranges.length;
 
-  for (let i = 0; i < gaugeLength; i++) {
-    const { from, to } = gauge.ranges[i];
-    if (
-      isValueInRange({
-        value,
-        range: { from, to },
-        direction: gauge.rangeOptions.direction,
-        includeFromValue: gauge.rangeOptions.includeFromValue,
-        includeToValue: gauge.rangeOptions.includeToValue,
-      })
-    ) {
-      color = {
-        ...gauge.colors[i],
-        index: i,
-        gaugeLength,
-      };
+  if (gauge.unit.type === 'category') {
+    color = {
+      ...gauge.colors[value],
+      index: value,
+      gaugeLength,
+    };
+  } else {
+    for (let i = 0; i < gaugeLength; i++) {
+      const { from, to } = gauge.ranges[i];
+      if (
+        isValueInRange({
+          value,
+          range: { from, to },
+          direction: gauge.rangeOptions.direction,
+          includeFromValue: gauge.rangeOptions.includeFromValue,
+          includeToValue: gauge.rangeOptions.includeToValue,
+        })
+      ) {
+        color = {
+          ...gauge.colors[i],
+          index: i,
+          gaugeLength,
+        };
+      }
     }
   }
 
@@ -306,6 +315,7 @@ const getColorsFromProjectURL = (string: string): string[] | false => {
           string: colorsString,
         });
         let extraText = text.substring(text.indexOf('!') + 1);
+
         if (extraText.includes('!')) {
           // if has yarn details too
           let yarnDetails = extraText.substring(extraText.lastIndexOf('!') + 1);
@@ -327,6 +337,7 @@ const getColorsFromProjectURL = (string: string): string[] | false => {
       }
     }
   });
+
   return colors;
 };
 

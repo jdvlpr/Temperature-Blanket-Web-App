@@ -103,7 +103,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     fullscreen.value
       ? 'bg-surface-50 dark:bg-surface-950 fixed top-0 left-0 h-full w-full justify-start overflow-scroll max-sm:pb-2'
       : 'rounded-container bg-surface-100 dark:bg-surface-900 mt-2 justify-center gap-2 shadow-inner',
-    gauge.unit.type !== 'static' ? 'pb-2' : 'overflow-hidden',
+    gauge.unit.type !== 'category' ? 'pb-2' : 'overflow-hidden',
   ]}
   bind:this={gaugeContainerElement}
 >
@@ -115,7 +115,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         schemeName={gauge.schemeId}
         showSchemeName={false}
         roundedBottom={false}
-        isStaticGauge={gauge.unit.type === 'static'}
+        isStaticGauge={gauge.isStatic}
         onchanged={() => {
           updateGauge({ _colors: gauge.colors });
         }}
@@ -127,7 +127,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     class={[
       'flex flex-wrap items-center justify-center gap-2 px-2',
       fullscreen.value && 'order-1 py-2',
-      gauge.unit.type === 'static' && 'hidden',
+      gauge.unit.type === 'category' && 'hidden',
     ]}
   >
     <SelectNumberOfColors

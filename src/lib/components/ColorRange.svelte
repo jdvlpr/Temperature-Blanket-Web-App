@@ -15,7 +15,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import GaugeSettings from '$lib/components/modals/GaugeSettings.svelte';
-  import { MOON_PHASE_NAMES } from '$lib/constants';
   import { gauges, localState, modal } from '$lib/state';
 
   let { index } = $props();
@@ -27,8 +26,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <span class="range-input-container">
-  {#if gauges.activeGauge?.unit.type === 'static'}
-    <p class="p-2">{MOON_PHASE_NAMES[gauges.activeGauge.ranges[index].to]}</p>
+  {#if gauges.activeGauge?.unit.type === 'category'}
+    <p class="p-2">{gauges.activeGauge.ranges[index].value}</p>
   {:else}
     <button
       class="btn hover:preset-tonal h-auto"

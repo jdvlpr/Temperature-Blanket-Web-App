@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { modal } from '$lib/state';
+  import { allGaugesAttributes, gauges, modal, weather } from '$lib/state';
   import { Modal } from '@skeletonlabs/skeleton-svelte';
   import CloseButton from './CloseButton.svelte';
   import SaveAndCloseButtons from './SaveAndCloseButtons.svelte';
@@ -34,6 +34,66 @@
         </div>
       {/if}
       <modal.contentComponent.ref {...modal.contentComponent.props} />
+    {:else if modal.type === 'choose-weather-params'}
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-label={modal.title ?? ''}
+        class="flex flex-col gap-4 p-4"
+      >
+        <h2 class="h2">Download PDF</h2>
+
+        <div class="flex flex-col gap-2">
+          <p class="font-bold">Gauges</p>
+          <div class="flex flex-col gap-1">
+            {#each gauges.allCreated as { id, label }}
+              <label class="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  name="id"
+                  class="checkbox"
+                  value={id}
+                  bind:group={weather.pdfOptions.gauges}
+                />
+                <p>{label}</p>
+              </label>
+            {/each}
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-2">
+          <p class="font-bold">Weather Data</p>
+          <div class="flex flex-col gap-1">
+            {#each allGaugesAttributes as { targets }}
+              {#each targets as { id, label }}
+                <label class="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    name="id"
+                    class="checkbox"
+                    value={id}
+                    bind:group={weather.pdfOptions.weatherDataParams}
+                  />
+
+                  <p>{label}</p>
+                </label>
+              {/each}
+            {/each}
+          </div>
+        </div>
+
+        <SaveAndCloseButtons
+          saveText="Download"
+          onSave={() => {
+            modal.response(true);
+            modal.close();
+          }}
+          onClose={() => {
+            modal.response(false);
+            modal.close();
+          }}
+        />
+      </div>
     {:else if modal.type === 'confirm'}
       <div
         role="dialog"

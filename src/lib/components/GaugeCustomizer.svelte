@@ -34,7 +34,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let { gauge = $bindable() } = $props();
 
-  let isStaticGauge = $state(gauge.unit.type === 'static');
+  let isStaticGauge = $state(gauge.isStatic);
 
   let dragDisabled = $state(false);
 
@@ -287,8 +287,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           >
             <DaysInRange
               range={gauge.ranges[index]}
-              rangeOptions={gauge.rangeOptions}
+              rangeOptions={gauge?.rangeOptions}
               targets={gauge.targets}
+              gaugeUnitType={gauge.unit.type}
             />
           </div>
         {/if}

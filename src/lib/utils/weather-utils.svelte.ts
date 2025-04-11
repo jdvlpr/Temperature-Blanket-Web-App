@@ -284,6 +284,7 @@ export const getOpenMeteo = async ({ location }) => {
           metric: _dayTime.metric,
           imperial: _dayTime.imperial,
         },
+        moon: getMoonPhase(_date),
       };
 
       allData = [...allData, _day];

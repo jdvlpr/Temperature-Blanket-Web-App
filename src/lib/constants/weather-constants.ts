@@ -131,7 +131,7 @@ export const UNIT_LABELS = {
     metric: 'minutes',
     imperial: 'hours',
   },
-  text: {
+  category: {
     metric: '',
     imperial: '',
   },
