@@ -17,6 +17,7 @@ import { calendarPreview } from '$lib/components/previews/calendar/state.svelte'
 import { chevronsPreview } from '$lib/components/previews/chevrons/state.svelte';
 import { continuousSquarePreview } from '$lib/components/previews/continuous-square/state.svelte';
 import { cornerToCornerPreview } from '$lib/components/previews/corner-to-corner/state.svelte';
+import { dailySquaresPreview } from '$lib/components/previews/daily-squares/state.svelte';
 import { daytimeRowsPreview } from '$lib/components/previews/daytime-rows/state.svelte';
 import { monthRowsPreview } from '$lib/components/previews/month-rows/state.svelte';
 import { monthSquaresPreview } from '$lib/components/previews/month-squares/state.svelte';
@@ -32,6 +33,7 @@ class PreviewsState {
     chevronsPreview,
     continuousSquarePreview,
     cornerToCornerPreview,
+    dailySquaresPreview,
     daytimeRowsPreview,
     monthRowsPreview,
     monthSquaresPreview,
