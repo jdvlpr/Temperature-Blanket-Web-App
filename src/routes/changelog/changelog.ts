@@ -23,6 +23,16 @@ export const entries: ChangelogItem[] = [
     date: 'April, 2025',
     notes: [
       {
+        icon: ICONS.checkCircle,
+        text: `37 colorways`,
+        title: 'Added New Yarn: Purl Soho - Good Wool',
+      },
+    ],
+    version: '5.4.0',
+  },
+  {
+    notes: [
+      {
         IconComponent: MoonStarIcon,
         text: 'Add colors for phases of the moon into your preview designs. This is a beta feature—it may have issues and may not be completely accurate.',
         title:
