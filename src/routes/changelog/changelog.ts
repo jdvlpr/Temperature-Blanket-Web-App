@@ -29,6 +29,11 @@ export const entries: ChangelogItem[] = [
       },
       {
         icon: ICONS.checkCircle,
+        text: `23 colorways`,
+        title: 'Added New Yarn: 4 Seasons - Flinders Cotton 8 Ply',
+      },
+      {
+        icon: ICONS.checkCircle,
         text: `37 colorways`,
         title: 'Added New Yarn: Purl Soho - Good Wool',
       },
