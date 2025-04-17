@@ -518,3 +518,12 @@ export const getWeatherValue = ({
   if (param === 'moon') return weather.data[dayIndex][param];
   return weather.data[dayIndex][param][localState.value.units];
 };
+
+export const chunkArray = (array, chunkSize) => {
+  const chunks = [];
+  for (let i = 0; i < array.length; i += chunkSize) {
+    const chunk = array.slice(i, i + chunkSize);
+    chunks.push(chunk);
+  }
+  return chunks;
+};

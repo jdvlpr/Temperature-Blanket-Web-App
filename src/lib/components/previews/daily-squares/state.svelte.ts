@@ -1,6 +1,13 @@
-import { CHARACTERS_FOR_URL_HASH, HOURS_PER_DAY } from '$lib/constants';
+import { CHARACTERS_FOR_URL_HASH } from '$lib/constants';
 import { gauges, previews, weather } from '$lib/state';
-import { dateToISO8601String, displayNumber, setTargets } from '$lib/utils';
+import {
+  chunkArray,
+  getFactors,
+  getMiddleValueOfArray,
+  getPossibleDimensions,
+  setTargets,
+} from '$lib/utils';
+import chroma from 'chroma-js';
 import Preview from './Preview.svelte';
 import Settings from './Settings.svelte';
 
@@ -10,8 +17,8 @@ export class DailySquaresPreviewClass {
       // If a gauge is created or deleted, handle updating the available weather parameter targets
       $effect(() => {
         if (gauges.allCreated.length) {
-          this.settings.selectedTargets = setTargets(
-            this.settings.selectedTargets,
+          this.settings.selectedTarget = setTargets(
+            this.settings.selectedTarget,
           );
         }
       });
@@ -48,36 +55,73 @@ export class DailySquaresPreviewClass {
   // User settings properties
   // *******************
   settings = $state({
-    selectedTargets: ['tmax'],
+    selectedTarget: 'tmax',
     daysPerSquare: 13,
-    columns: 9,
+    columns: 6,
+    additionalRoundsColor: '#f0f3f3',
+    squareBorder: 0,
+    layoutBorder: 1,
   });
 
   // *******************
   // Derived properties
   // *******************
 
-  #squareSize = $derived(this.settings.daysPerSquare * this.STITCH_SIZE * 2);
+  weatherDataInUse = $derived.by(() => {
+    if (this.settings.layoutBorder > 0)
+      return weather.data.slice(0, -this.settings.layoutBorder);
 
-  width = $derived(this.#squareSize * this.settings.columns);
+    return weather.data;
+  });
+
+  weatherSquares = $derived(
+    chunkArray(this.weatherDataInUse, this.settings.daysPerSquare),
+  );
+
+  squareSize = $derived(
+    (this.settings.daysPerSquare + this.settings.squareBorder) *
+      this.STITCH_SIZE *
+      2,
+  );
 
   numberOfSquaresWithWeatherData = $derived(
-    Math.ceil(weather.data.length / this.settings.daysPerSquare),
+    Math.ceil(this.weatherDataInUse.length / this.settings.daysPerSquare),
   );
 
   rows = $derived(
     Math.ceil(this.numberOfSquaresWithWeatherData / this.settings.columns),
   );
 
-  height = $derived(this.#squareSize * this.rows);
-
   totalSquares = $derived(this.rows * this.settings.columns);
+
+  extraSquares = $derived(
+    this.totalSquares - this.numberOfSquaresWithWeatherData,
+  );
+
+  layoutBorderWidth = $derived(this.settings.layoutBorder * this.STITCH_SIZE);
+
+  width = $derived(
+    this.settings.columns * this.squareSize +
+      this.STITCH_SIZE / 2 +
+      this.layoutBorderWidth * 2,
+  );
+
+  height = $derived(
+    this.rows * this.squareSize +
+      this.STITCH_SIZE / 2 +
+      this.layoutBorderWidth * 2,
+  );
+
+  totalRounds = $derived(
+    this.totalSquares *
+      (this.settings.daysPerSquare + this.settings.squareBorder),
+  );
 
   targets = $derived(
     gauges.allCreated
       .map((n) => n.targets)
       .flat()
-      .filter((n) => this.settings.selectedTargets.includes(n.id)),
+      .filter((n) => this.settings.selectedTarget.includes(n.id)),
   );
 
   // *******************
@@ -86,9 +130,9 @@ export class DailySquaresPreviewClass {
   hash = $derived.by(() => {
     let hash = '&';
     hash += `${this.id}=`;
-    hash += `${this.settings.selectedTargets.join('')}`;
+    hash += `${this.settings.selectedTarget}`;
     hash += '(';
-    hash += `${this.settings.daysPerSquare}${CHARACTERS_FOR_URL_HASH.separator}${this.settings.columns}`;
+    hash += `${this.settings.daysPerSquare}${CHARACTERS_FOR_URL_HASH.separator}${this.settings.columns}${CHARACTERS_FOR_URL_HASH.separator}${this.settings.squareBorder}${CHARACTERS_FOR_URL_HASH.separator}${this.settings.layoutBorder}${CHARACTERS_FOR_URL_HASH.separator}${chroma(this.settings.additionalRoundsColor).hex().substring(1)}`;
     hash += ')';
     return hash;
   });
@@ -111,22 +155,51 @@ export class DailySquaresPreviewClass {
     }
 
     if (!startIndex || !endIndex) return; // format of hash was wrong, so stop processing
+
+    previews.activeId = this.id;
+
     // targets
     // Extract the targets from the hash and update the settings
     let targets = hash.substring(0, startIndex);
-    targets = targets.match(/.{1,4}/g);
-    this.settings.selectedTargets = targets;
+    // targets = targets.match(/.{1,4}/g);
+    this.settings.selectedTarget = targets;
+
+    let currentSeparatorIndex = 0;
 
     // days per square
     this.settings.daysPerSquare = +hash.substring(
       startIndex + 1,
-      separatorIndexes[0],
+      separatorIndexes[currentSeparatorIndex],
     );
 
     // columns
-    this.settings.columns = +hash.substring(separatorIndexes[0] + 1, endIndex);
+    this.settings.columns = +hash.substring(
+      separatorIndexes[currentSeparatorIndex] + 1,
+      separatorIndexes[currentSeparatorIndex + 1],
+    );
 
-    previews.activeId = this.id;
+    currentSeparatorIndex++;
+    if (separatorIndexes.length < currentSeparatorIndex + 1) return; // Check to make sure the next separator index exists
+
+    this.settings.squareBorder = +hash.substring(
+      separatorIndexes[currentSeparatorIndex] + 1,
+      separatorIndexes[currentSeparatorIndex + 1],
+    );
+
+    currentSeparatorIndex++;
+    if (separatorIndexes.length < currentSeparatorIndex + 1) return; // Check to make sure the next separator index exists
+
+    this.settings.layoutBorder = +hash.substring(
+      separatorIndexes[currentSeparatorIndex] + 1,
+      separatorIndexes[currentSeparatorIndex + 1],
+    );
+
+    currentSeparatorIndex++;
+    if (separatorIndexes.length < currentSeparatorIndex + 1) return; // Check to make sure the next separator index exists
+
+    this.settings.additionalRoundsColor = chroma(
+      hash.substring(separatorIndexes[currentSeparatorIndex] + 1, endIndex),
+    ).hex();
   }
 }
 

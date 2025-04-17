@@ -72,7 +72,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
       }}
     >
       {#each previews.all as { name, id }}
-        <option value={id}>{name}</option>
+        {@const isBeta = name === 'Daily Squares'}
+        <option value={id}>{name} {isBeta ? '(Beta)' : ''}</option>
       {/each}
     </select>
   </label>
@@ -81,11 +82,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     class="preview-image-select flex flex-wrap items-center justify-center gap-2"
   >
     {#each previews.all as { img, name, id }}
+      {@const isBeta = name === 'Daily Squares'}
       {#if img}
         {#key theme}
           <button
             class={[
-              'rounded-container flex snap-center flex-col items-center justify-center gap-2 p-4',
+              'rounded-container relative flex snap-center flex-col items-center justify-center gap-1 p-4',
               id === previews.activeId
                 ? 'bg-primary-300 dark:bg-primary-700 selected shadow-sm'
                 : 'preset-tonal hover:preset-tonal-primary',
@@ -101,6 +103,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
               class="size-[48px] opacity-40"
               class:!opacity-100={id === previews.activeId}
             />
+            {#if isBeta}
+              <span
+                class="bg-tertiary-50-950 absolute -top-1 -right-1 rounded-md p-1 text-xs shadow"
+                >Beta</span
+              >
+            {/if}
           </button>
         {/key}
       {/if}

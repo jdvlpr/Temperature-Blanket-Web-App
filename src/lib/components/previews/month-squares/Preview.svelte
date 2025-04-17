@@ -15,7 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import Spinner from '$lib/components/Spinner.svelte';
-  import { localState, weather } from '$lib/state';
+  import { weather } from '$lib/state';
   import {
     getColorInfo,
     getWeatherValue,
@@ -108,7 +108,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           param: monthSquaresPreview.settings.selectedTarget,
           value,
         }).hex;
+
         isWeather = true;
+
         square = {
           ...square,
           isWeather,
@@ -119,7 +121,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
         dateInMonth += 1;
       } else {
         color = monthSquaresPreview.settings.additionalRoundsColor;
+
         isWeather = false;
+
         square = {
           ...square,
           isWeather,
