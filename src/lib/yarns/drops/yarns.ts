@@ -12,6 +12,7 @@ import { yarn as muskat } from './muskat/yarn';
 import { yarn as nepal } from './nepal/yarn';
 import { yarn as paris } from './paris/yarn';
 import { yarn as safran } from './safran/yarn';
+import { yarn as sky } from './sky/yarn';
 
 export const brand: Brand = {
   name: 'DROPS',
@@ -30,5 +31,6 @@ export const brand: Brand = {
     nepal,
     paris,
     safran,
+    sky,
   ],
 };
