@@ -140,65 +140,63 @@ export class DailySquaresPreviewClass {
   // Method for loading settings from a url hash string
   // *******************
   load(hash) {
-    let startIndex, endIndex;
-    const separatorIndexes = [];
+    const openParen = hash.indexOf('(');
+    const closeParen = hash.indexOf(')');
 
-    for (let i = 0; i < hash.length; i++) {
-      if (hash[i] === '(') startIndex = i;
-      if (
-        hash[i] === CHARACTERS_FOR_URL_HASH.separator ||
-        hash[i] == CHARACTERS_FOR_URL_HASH.separator_alt
-      )
-        separatorIndexes.push(i);
-      if (hash[i] === ')') endIndex = i;
-    }
+    // If either parenthesis is missing or in the wrong order, stop
+    if (openParen === -1 || closeParen === -1 || closeParen < openParen) return;
 
-    if (!startIndex || !endIndex) return; // format of hash was wrong, so stop processing
-
-    previews.activeId = this.id;
-
-    // targets
-    // Extract the targets from the hash and update the settings
-    let targets = hash.substring(0, startIndex);
-    // targets = targets.match(/.{1,4}/g);
+    // Extract the part before the parentheses as targets
+    const targets = hash.substring(0, openParen);
     this.settings.selectedTarget = targets;
 
-    let currentSeparatorIndex = 0;
+    // Set the current active id to this
+    previews.activeId = this.id;
 
-    // days per square
-    this.settings.daysPerSquare = +hash.substring(
-      startIndex + 1,
-      separatorIndexes[currentSeparatorIndex],
-    );
+    // Extract the content inside the parentheses
+    const innerContent = hash.substring(openParen + 1, closeParen);
 
-    // columns
-    this.settings.columns = +hash.substring(
-      separatorIndexes[currentSeparatorIndex] + 1,
-      separatorIndexes[currentSeparatorIndex + 1],
-    );
+    // Split the content by known separators
+    const separators = [
+      CHARACTERS_FOR_URL_HASH.separator,
+      CHARACTERS_FOR_URL_HASH.separator_alt,
+    ];
 
-    currentSeparatorIndex++;
-    if (separatorIndexes.length < currentSeparatorIndex + 1) return; // Check to make sure the next separator index exists
+    let parts = null;
 
-    this.settings.squareBorder = +hash.substring(
-      separatorIndexes[currentSeparatorIndex] + 1,
-      separatorIndexes[currentSeparatorIndex + 1],
-    );
+    for (const sep of separators) {
+      if (innerContent.includes(sep)) {
+        parts = innerContent.split(sep);
+        break;
+      }
+    }
 
-    currentSeparatorIndex++;
-    if (separatorIndexes.length < currentSeparatorIndex + 1) return; // Check to make sure the next separator index exists
+    // If no valid separator found or not enough parts, stop
+    if (!parts || parts.length < 5) return;
 
-    this.settings.layoutBorder = +hash.substring(
-      separatorIndexes[currentSeparatorIndex] + 1,
-      separatorIndexes[currentSeparatorIndex + 1],
-    );
+    // Destructure parts into named settings
+    const [
+      daysPerSquare,
+      columns,
+      squareBorder,
+      layoutBorder,
+      additionalRoundsColor,
+    ] = parts;
 
-    currentSeparatorIndex++;
-    if (separatorIndexes.length < currentSeparatorIndex + 1) return; // Check to make sure the next separator index exists
+    // Try parsing each setting safely
+    if (Number.isFinite(+daysPerSquare))
+      this.settings.daysPerSquare = +daysPerSquare;
+    if (Number.isFinite(+columns)) this.settings.columns = +columns;
+    if (Number.isFinite(+squareBorder))
+      this.settings.squareBorder = +squareBorder;
+    if (Number.isFinite(+layoutBorder))
+      this.settings.layoutBorder = +layoutBorder;
 
-    this.settings.additionalRoundsColor = chroma(
-      hash.substring(separatorIndexes[currentSeparatorIndex] + 1, endIndex),
-    ).hex();
+    try {
+      this.settings.additionalRoundsColor = chroma(additionalRoundsColor).hex();
+    } catch (e) {
+      console.warn('Invalid color value in hash:', additionalRoundsColor);
+    }
   }
 }
 
