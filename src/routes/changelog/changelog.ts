@@ -23,6 +23,17 @@ export const entries: ChangelogItem[] = [
     date: 'April, 2025',
     notes: [
       {
+        icon: ICONS.design,
+        instructions: 'Try it out in the Preview tab of the Project Planner',
+        text: `Each round in a square represents one day`,
+        title: 'Added New Preview Type: Square Rounds (Beta)',
+      },
+    ],
+    version: '5.5.0',
+  },
+  {
+    notes: [
+      {
         icon: ICONS.checkCircle,
         text: `30 colorways`,
         title: 'Added New Yarn: DROPS - Sky',

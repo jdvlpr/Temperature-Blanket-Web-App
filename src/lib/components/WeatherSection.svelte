@@ -169,7 +169,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         class="rounded-container bg-surface-100 dark:bg-surface-900 mb-4 flex w-full max-w-screen-md flex-col items-start justify-start gap-2 p-2 text-left"
       >
         <p class="">
-          Weekly weather grouping makes for a shorter project. <a
+          Weekly weather grouping can result in a shorter project. <a
             href="/documentation/#grouping-weather-data"
             target="_blank"
             class="link"

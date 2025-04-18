@@ -40,7 +40,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     >
     <select
       class="select w-fit"
-      id="crnr-param"
       bind:value={cornerToCornerPreview.settings.selectedTarget}
     >
       {#each targets as { id, label, icon }}
@@ -60,7 +59,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <span>Size (width x height)</span>
       <select
         class="select w-fit min-w-[100px]"
-        id="crnr-dimensions"
         bind:value={cornerToCornerPreview.settings.dimensions}
       >
         {#each cornerToCornerPreview.dimensionsOptions as value}

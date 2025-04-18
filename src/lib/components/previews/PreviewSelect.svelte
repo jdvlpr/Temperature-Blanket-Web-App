@@ -72,22 +72,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
       }}
     >
       {#each previews.all as { name, id }}
-        {@const isBeta = name === 'Daily Squares'}
+        {@const isBeta = name === 'Square Rounds'}
         <option value={id}>{name} {isBeta ? '(Beta)' : ''}</option>
       {/each}
     </select>
   </label>
 
   <div
-    class="preview-image-select flex flex-wrap items-center justify-center gap-2"
+    class="preview-image-select my-2 flex flex-wrap items-center justify-center gap-4"
   >
     {#each previews.all as { img, name, id }}
-      {@const isBeta = name === 'Daily Squares'}
+      {@const isBeta = name === 'Square Rounds'}
       {#if img}
         {#key theme}
           <button
             class={[
-              'rounded-container relative flex snap-center flex-col items-center justify-center gap-1 p-4',
+              'relative flex snap-center flex-col items-center justify-center gap-1 rounded p-2',
               id === previews.activeId
                 ? 'bg-primary-300 dark:bg-primary-700 selected shadow-sm'
                 : 'preset-tonal hover:preset-tonal-primary',
@@ -100,12 +100,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <img
               src={img[theme]}
               alt={name}
-              class="size-[48px] opacity-40"
+              class="size-[52px] opacity-40"
               class:!opacity-100={id === previews.activeId}
             />
             {#if isBeta}
               <span
-                class="bg-tertiary-50-950 absolute -top-1 -right-1 rounded-md p-1 text-xs shadow"
+                class="bg-tertiary-50-950 absolute -top-2 -right-2 rounded-md p-1 text-xs shadow"
                 >Beta</span
               >
             {/if}
