@@ -84,9 +84,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
       const day = daysInSquare ? daysInSquare[roundInSquare - 1] : undefined;
 
       let _dayIndex = dayIndex;
-      if (weather.grouping === 'week') {
-        _dayIndex = Math.ceil((dayIndex - weather.monthGroupingStartDay) / 7);
-      }
 
       let color;
       if (day) {

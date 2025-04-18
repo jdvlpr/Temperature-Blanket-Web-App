@@ -41,7 +41,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 </script>
 
-<p class="w-full">Each round in a square represents one day.</p>
+<p class="w-full">Each round in a square represents one {weather.grouping}.</p>
 
 {#if squareRoundsPreview.rows}
   <div class="flex w-full flex-col italic">
@@ -74,7 +74,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
               or
               <span class="inline font-bold">Square Settings</span>
               <ArrowRightIcon class="relative -top-[2px] inline size-4" />
-              <span class="inline font-bold">Days Per Square</span>
+              <span class="inline font-bold"
+                >{capitalizeFirstLetter(weather.grouping)}s Per Square</span
+              >
               below to avoid rounds of no weather data.
             </p>
           {/snippet}
@@ -118,8 +120,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </option>
         {/each}
       </select>
-      {pluralize('Day', squareRoundsPreview.settings.layoutBorder)} of Weather Data
-      as {pluralize(
+      {pluralize(
+        capitalizeFirstLetter(weather.grouping),
+        squareRoundsPreview.settings.layoutBorder,
+      )} of Weather Data as {pluralize(
         { singular: 'a', plural: '' },
         squareRoundsPreview.settings.layoutBorder,
       )} Border {pluralize('Round', squareRoundsPreview.settings.layoutBorder)}
@@ -133,7 +137,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <p class="text-2xl font-bold">Square Settings</p>
 
   <label class="label">
-    Days Per Square
+    {capitalizeFirstLetter(weather.grouping)}s Per Square
     <select
       class="select w-fit min-w-[60px]"
       bind:value={squareRoundsPreview.settings.daysPerSquare}

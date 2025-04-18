@@ -74,9 +74,9 @@ export class DailySquaresPreviewClass {
 
   weatherDataInUse = $derived.by(() => {
     if (this.settings.layoutBorder > 0)
-      return weather.rawData.slice(0, -this.settings.layoutBorder);
+      return weather.data.slice(0, -this.settings.layoutBorder);
 
-    return weather.rawData;
+    return weather.data;
   });
 
   weatherSquares = $derived(
