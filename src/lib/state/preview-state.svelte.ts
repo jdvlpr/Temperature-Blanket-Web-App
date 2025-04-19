@@ -22,6 +22,7 @@ import { monthRowsPreview } from '$lib/components/previews/month-rows/state.svel
 import { monthSquaresPreview } from '$lib/components/previews/month-squares/state.svelte';
 import { rowsPreview } from '$lib/components/previews/rows/state.svelte';
 import { splitMonthSquaresPreview } from '$lib/components/previews/split-month-squares/state.svelte';
+import { squareRoundsPreview } from '$lib/components/previews/square-rounds/state.svelte';
 import { squaresPreview } from '$lib/components/previews/squares/state.svelte';
 
 export const previewWeatherTargets = $state({ value: [] });
@@ -37,6 +38,7 @@ class PreviewsState {
     monthSquaresPreview,
     rowsPreview,
     splitMonthSquaresPreview,
+    squareRoundsPreview,
     squaresPreview,
   ]);
 

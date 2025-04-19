@@ -26,54 +26,58 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <span class="range-input-container">
-  <button
-    class="btn hover:preset-tonal h-auto"
-    title="Adjust Range"
-    onclick={(e) => {
-      const wasToClicked =
-        e.target.id === `range-${index}-to` ||
-        e.target.parentElement.id === `range-${index}-to` ||
-        e.target.parentElement.parentElement.id === `range-${index}-to` ||
-        e.target.parentElement.parentElement.parentElement.id ===
-          `range-${index}-to`;
+  {#if gauges.activeGauge?.unit.type === 'category'}
+    <p class="p-2">{gauges.activeGauge.ranges[index].label}</p>
+  {:else}
+    <button
+      class="btn hover:preset-tonal h-auto"
+      title="Adjust Range"
+      onclick={(e) => {
+        const wasToClicked =
+          e.target.id === `range-${index}-to` ||
+          e.target.parentElement.id === `range-${index}-to` ||
+          e.target.parentElement.parentElement.id === `range-${index}-to` ||
+          e.target.parentElement.parentElement.parentElement.id ===
+            `range-${index}-to`;
 
-      const focusOn = wasToClicked ? 'to' : 'from';
+        const focusOn = wasToClicked ? 'to' : 'from';
 
-      modal.trigger({
-        type: 'component',
-        component: {
-          ref: GaugeSettings,
-          props: {
-            index,
-            focusOn,
-            onSave: onSaveRangeOptinos,
+        modal.trigger({
+          type: 'component',
+          component: {
+            ref: GaugeSettings,
+            props: {
+              index,
+              focusOn,
+              onSave: onSaveRangeOptinos,
+            },
           },
-        },
-        options: {
-          size: 'large',
-        },
-      });
-    }}
-  >
-    <span class="flex flex-col text-left" id="range-{index}-from"
-      ><span class="text-xs">From</span>
-      <span class="flex items-start"
-        ><span class="text-lg">{gauges.activeGauge.ranges[index]?.from}</span>
-        <span class="text-xs"
-          >{gauges.activeGauge.unit.label[localState.value.units]}</span
-        ></span
-      ></span
+          options: {
+            size: 'large',
+          },
+        });
+      }}
     >
-    <span class="flex flex-col text-left" id="range-{index}-to"
-      ><span class="text-xs">To</span>
-      <span class="flex items-start"
-        ><span class="text-lg">{gauges.activeGauge.ranges[index]?.to}</span>
-        <span class="text-xs"
-          >{gauges.activeGauge.unit.label[localState.value.units]}</span
+      <span class="flex flex-col text-left" id="range-{index}-from"
+        ><span class="text-xs">From</span>
+        <span class="flex items-start"
+          ><span class="text-lg">{gauges.activeGauge.ranges[index]?.from}</span>
+          <span class="text-xs"
+            >{gauges.activeGauge.unit.label[localState.value.units]}</span
+          ></span
         ></span
-      ></span
-    ></button
-  >
+      >
+      <span class="flex flex-col text-left" id="range-{index}-to"
+        ><span class="text-xs">To</span>
+        <span class="flex items-start"
+          ><span class="text-lg">{gauges.activeGauge.ranges[index]?.to}</span>
+          <span class="text-xs"
+            >{gauges.activeGauge.unit.label[localState.value.units]}</span
+          ></span
+        ></span
+      ></button
+    >
+  {/if}
 </span>
 
 <style>

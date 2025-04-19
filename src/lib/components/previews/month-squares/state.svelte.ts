@@ -69,7 +69,7 @@ export class MonthSquaresPreviewClass {
   // *******************
   settings = $state({
     selectedTarget: 'tmax',
-    dimensions: '3x4',
+    dimensions: '6x6',
     additionalRoundsColor: '#f0f3f3',
     additionalRoundsPerSquare: 1,
   });
@@ -152,10 +152,12 @@ export class MonthSquaresPreviewClass {
       separatorIndex[0],
     );
     this.settings.dimensions = this.settings.dimensions.replace('×', 'x'); // sometimes firefox formatted this as multiplication sign
+
     this.settings.additionalRoundsPerSquare = +hash.substring(
       separatorIndex[0] + 1,
       separatorIndex[1],
     );
+
     this.settings.additionalRoundsColor = chroma(
       hash.substring(separatorIndex[1] + 1, endIndex[0]),
     ).hex();

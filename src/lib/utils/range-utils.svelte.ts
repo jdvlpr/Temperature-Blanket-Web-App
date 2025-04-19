@@ -14,7 +14,14 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { localState, weather } from '$lib/state';
-import { displayNumber } from '$lib/utils';
+import type {
+  GaugeAttributes,
+  GaugeRange,
+  GaugeRangeCategory,
+  GaugeRangeOptions,
+  WeatherDay,
+} from '$lib/types';
+import { displayNumber, getWeatherValue } from '$lib/utils';
 
 export const getStart = (rangeOptions) => {
   if (rangeOptions?.mode === 'auto') {
@@ -156,17 +163,41 @@ export const getDaysInRange = ({
   direction,
   includeFromValue,
   includeToValue,
-}) => {
+  gaugeUnitType,
+}: {
+  id: keyof Pick<
+    WeatherDay,
+    'tmax' | 'tavg' | 'tmin' | 'prcp' | 'snow' | 'dayt' | 'moon'
+  >;
+  range: GaugeRange | GaugeRangeCategory;
+  direction: GaugeRangeOptions['direction'] | undefined;
+  includeFromValue: boolean | undefined;
+  includeToValue: boolean | undefined;
+  gaugeUnitType: GaugeAttributes['unit']['type'];
+}): WeatherDay[] => {
+  if (!weather.data) return [];
+
+  if (gaugeUnitType === 'category') {
+    const days = weather.data.filter((day, i) => {
+      const value = getWeatherValue({ dayIndex: i, param: id });
+      if (value === 'null') return false;
+      return 'value' in range && range.value === value;
+    });
+
+    return days;
+  }
+
   if (
     !direction ||
-    !weather.data ||
     typeof includeFromValue === 'undefined' ||
     typeof includeToValue === 'undefined'
   )
     return [];
-  const days = weather.data.filter((day) => {
+
+  const days = weather.data.filter((day, i) => {
+    const value = getWeatherValue({ dayIndex: i, param: id });
     return isValueInRange({
-      value: day[id][localState.value.units],
+      value,
       range,
       direction,
       includeFromValue,

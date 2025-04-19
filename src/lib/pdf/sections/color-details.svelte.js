@@ -71,9 +71,10 @@ const pdfColorDetails = {
       const count = getDaysInRange({
         id: item.id,
         range: gauge.ranges[colorIndex],
-        direction: gauge.rangeOptions.direction,
-        includeFromValue: gauge.rangeOptions.includeFromValue,
-        includeToValue: gauge.rangeOptions.includeToValue,
+        direction: gauge?.rangeOptions?.direction,
+        includeFromValue: gauge?.rangeOptions?.includeFromValue,
+        includeToValue: gauge?.rangeOptions?.includeToValue,
+        gaugeUnitType: gauge.unit.type,
       }).length;
       const percentage = `(${getDaysPercent(count)}%)`;
       return `${count} ${percentage}`;

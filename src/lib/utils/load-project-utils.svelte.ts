@@ -30,6 +30,7 @@ import {
   toast,
   weather,
 } from '$lib/state';
+import { MoonPhaseGauge } from '$lib/state/gauges/moon-phase-gauge-state.svelte';
 import {
   celsiusToFahrenheit,
   dateToISO8601String,
@@ -76,14 +77,14 @@ export const setProjectSettings = async (
   allGaugesAttributes.forEach((gauge) => {
     if (!exists(params[gauge.id])) return;
     gauges.addById(gauge.id);
+
     const settings = parseGaugeURLHash(
       params[gauge.id].value,
       gauges.getSnapshot(gauge.id),
     );
 
-    gauges.allCreated
-      .find((g) => g.id === gauge.id)
-      .updateSettings({ settings });
+    const _gauge = gauges.allCreated.find((g) => g.id === gauge.id);
+    if (_gauge) _gauge.updateSettings({ settings });
   });
 
   // Load Preview
@@ -319,7 +320,7 @@ export const parseGaugeURLHash = (hashString: string, gauge) => {
 
   // If the colors aren't formatted correctly, stop parsing the gauge's hashString.
   // All the default colors and settings will be used
-  if (!isValidColorsString) return;
+  if (!isValidColorsString && gauge.id !== 'moon') return;
 
   // If the gauge uses a scheme instead of individual colors, set the scheme Id
   // Otherwise the schemeId is 'Custom'
@@ -349,6 +350,13 @@ export const parseGaugeURLHash = (hashString: string, gauge) => {
   if (typeof colors !== 'boolean') {
     gauge.colors = colors;
     gauge.numberOfColors = colors.length;
+  }
+
+  // If it's a moon gauge, this is enough, so return the gauge and don't process any further
+  if (gauge.id === 'moon') {
+    const _moonGauge = new MoonPhaseGauge();
+    gauge.ranges = _moonGauge.ranges;
+    return gauge;
   }
 
   const ranges = [];

@@ -25,6 +25,7 @@ import {
   getAvgOfThree,
   getMaxOfThree,
   getMinOfThree,
+  getMoonPhase,
   hoursToMinutes,
   millimetersToInches,
   stringToDate,
@@ -182,6 +183,9 @@ export async function POST({ request }) {
     } else {
       dayData.dayt = { metric: null, imperial: null };
     }
+
+    dayData.moon = getMoonPhase(dayDate);
+
     allData = [...allData, dayData];
   }
 

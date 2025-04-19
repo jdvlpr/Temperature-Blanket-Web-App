@@ -15,6 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import DataTable from '$lib/components/datatable/DataTable.svelte';
+  import { MOON_PHASE_NAMES } from '$lib/constants';
   import { allGaugesAttributes, localState, weather } from '$lib/state';
   import { convertTime, dateToISO8601String } from '$lib/utils';
   import { TableHandler, ThSort } from '@vincjo/datatables';
@@ -34,6 +35,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
               displayUnits: false,
               padStart: true,
             }),
+          };
+        } else if (target.id === 'moon') {
+          let value =
+            n[target.id] !== null ? MOON_PHASE_NAMES[n[target.id]] : '-';
+          weather = {
+            ...weather,
+            [target.id]: value,
           };
         } else {
           let value =
@@ -68,18 +76,23 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <ThSort {table} field={'date'}>
             <span class="flex flex-col items-center"
               >{dateHeader}
-              <span class="text-xs">(YYYY-MM-DD)</span></span
+              <span class="text-xs whitespace-nowrap">(YYYY-MM-DD)</span></span
             >
           </ThSort>
           {#each weatherTargets as { id, pdfHeader }}
             {@const header = pdfHeader[localState.value.units]}
+            {@const hasHeaderUnits = header.includes('(')}
             {@const headerLabel = header.slice(0, header.indexOf('('))}
             {@const headerUnits = header.slice(header.indexOf('('))}
             <ThSort {table} field={id}>
-              <span class="flex flex-col items-center"
-                >{headerLabel}
-                <span class="text-xs">{headerUnits}</span></span
-              >
+              <span class="flex flex-col items-center">
+                {#if hasHeaderUnits}
+                  {headerLabel}
+                  <span class="text-xs">{headerUnits}</span>
+                {:else}
+                  {header}
+                {/if}
+              </span>
             </ThSort>
           {/each}
         </tr>

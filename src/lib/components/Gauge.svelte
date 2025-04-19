@@ -102,7 +102,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     'flex w-full flex-col items-center',
     fullscreen.value
       ? 'bg-surface-50 dark:bg-surface-950 fixed top-0 left-0 h-full w-full justify-start overflow-scroll max-sm:pb-2'
-      : 'rounded-container bg-surface-100 dark:bg-surface-900 mt-2 justify-center gap-2 pb-2 shadow-inner',
+      : 'rounded-container bg-surface-100 dark:bg-surface-900 mt-2 justify-center gap-2 shadow-inner',
+    gauge.unit.type !== 'category' ? 'pb-2' : 'overflow-hidden',
   ]}
   bind:this={gaugeContainerElement}
 >
@@ -114,6 +115,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         schemeName={gauge.schemeId}
         showSchemeName={false}
         roundedBottom={false}
+        isStaticGauge={gauge.isStatic}
         onchanged={() => {
           updateGauge({ _colors: gauge.colors });
         }}
@@ -125,22 +127,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
     class={[
       'flex flex-wrap items-center justify-center gap-2 px-2',
       fullscreen.value && 'order-1 py-2',
+      gauge.unit.type === 'category' && 'hidden',
     ]}
   >
-    <div class="">
-      <SelectNumberOfColors
-        hideText={fullscreen.value}
-        numberOfColors={gauge.colors.length}
-        onchange={(e) => {
-          const colors = createGaugeColors({
-            schemeId: gauge.schemeId,
-            numberOfColors: +e.target.value,
-            colors: $state.snapshot(gauge.colors),
-          });
-          gauge.updateColors({ colors });
-        }}
-      />
-    </div>
+    <SelectNumberOfColors
+      hideText={fullscreen.value}
+      numberOfColors={gauge.colors.length}
+      onchange={(e) => {
+        const colors = createGaugeColors({
+          schemeId: gauge.schemeId,
+          numberOfColors: +e.target.value,
+          colors: $state.snapshot(gauge.colors),
+        });
+        gauge.updateColors({ colors });
+      }}
+    />
 
     <button
       class={[

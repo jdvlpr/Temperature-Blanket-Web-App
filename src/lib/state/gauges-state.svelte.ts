@@ -32,6 +32,10 @@ import {
 } from '$lib/state/gauges/daytime-gauge-state.svelte';
 import type { GaugeAttributes, GaugeStateInterface } from '$lib/types';
 import { colorsToYarnDetails, displayNumber } from '$lib/utils';
+import {
+  MoonPhaseGauge,
+  gaugeAttributes as moonGaugeAttributes,
+} from './gauges/moon-phase-gauge-state.svelte';
 
 export const showDaysInRange: { value: boolean } = $state({ value: true });
 
@@ -52,65 +56,89 @@ class GaugesState {
   urlHash = $derived.by(() => {
     let hash = '';
     this.allCreated.forEach((gauge) => {
-      if (!gauge.rangeOptions || !gauge.colors || !gauge.ranges) return hash;
+      if (
+        (!gauge.rangeOptions || !gauge.colors || !gauge.ranges) &&
+        gauge.unit.type !== 'category'
+      )
+        return hash;
+
       if (gauge.ranges?.length !== gauge.colors?.length) return hash;
+
       hash += '&';
       hash += `${gauge.id}=`;
       hash += gauge.schemeId === 'Custom' ? '' : `${gauge.schemeId}~`;
-      gauge.colors.forEach((color, index) => {
-        const code = color.hex.substring(color.hex.indexOf('#') + 1);
-        hash += encodeURIComponent(
-          `${code}(${gauge.ranges[index].from + CHARACTERS_FOR_URL_HASH.separator + gauge.ranges[index].to})`,
-        );
-      });
-      hash += '!';
-      hash += gauge.rangeOptions.mode === 'auto' ? 'a' : 'm'; // Manual or auto ranges
-      hash += gauge.rangeOptions.linked === true ? 'l' : 'u'; // linked or unlinked ranges
-      hash += gauge.rangeOptions.direction === 'high-to-low' ? 'h' : 'l'; // high-to-low or low-to-high direction
 
-      // Include From or To values included in v1.808
-      if (
-        gauge.rangeOptions.includeFromValue &&
-        !gauge.rangeOptions.includeToValue
-      )
-        hash += '0';
-      else if (
-        !gauge.rangeOptions.includeFromValue &&
-        gauge.rangeOptions.includeToValue
-      )
-        hash += '1';
-      else if (
-        gauge.rangeOptions.includeFromValue &&
-        gauge.rangeOptions.includeToValue
-      )
-        hash += '2';
-      else if (
-        !gauge.rangeOptions.includeFromValue &&
-        !gauge.rangeOptions.includeToValue
-      )
-        hash += '3';
+      if (gauge.unit.type !== 'category') {
+        gauge.colors.forEach((color, index) => {
+          const code = color.hex.substring(color.hex.indexOf('#') + 1);
+          hash += encodeURIComponent(
+            `${code}(${gauge.ranges[index].from + CHARACTERS_FOR_URL_HASH.separator + gauge.ranges[index].to})`,
+          );
+        });
 
-      hash += gauge.rangeOptions.isCustomRanges === true ? 't' : 'f'; // Save custom ranges setting
+        hash += '!';
+        hash += gauge.rangeOptions.mode === 'auto' ? 'a' : 'm'; // Manual or auto ranges
+        hash += gauge.rangeOptions.linked === true ? 'l' : 'u'; // linked or unlinked ranges
+        hash += gauge.rangeOptions.direction === 'high-to-low' ? 'h' : 'l'; // high-to-low or low-to-high direction
 
-      if (
-        gauge.rangeOptions.mode === 'manual' &&
-        gauge.rangeOptions.isCustomRanges === false
-      ) {
-        // If manual ranges, include integer and starting value '10'100'
-        hash += `${displayNumber(gauge.rangeOptions.manual.increment)}${CHARACTERS_FOR_URL_HASH.separator}${displayNumber(gauge.rangeOptions.manual.start)}`;
-      }
+        // Include From or To values included in v1.808
+        if (
+          gauge.rangeOptions.includeFromValue &&
+          !gauge.rangeOptions.includeToValue
+        )
+          hash += '0';
+        else if (
+          !gauge.rangeOptions.includeFromValue &&
+          gauge.rangeOptions.includeToValue
+        )
+          hash += '1';
+        else if (
+          gauge.rangeOptions.includeFromValue &&
+          gauge.rangeOptions.includeToValue
+        )
+          hash += '2';
+        else if (
+          !gauge.rangeOptions.includeFromValue &&
+          !gauge.rangeOptions.includeToValue
+        )
+          hash += '3';
 
-      // Save range Balance Auto Focus mode for temperature gauges
-      // Added in version 2.5.0
-      if (
-        gauge.id === 'temp' &&
-        gauge.rangeOptions.mode === 'auto' &&
-        !gauge.rangeOptions.isCustomRanges
-      ) {
-        if (gauge.rangeOptions.auto.optimization === 'ranges') hash += '_r';
-        if (gauge.rangeOptions.auto.optimization === 'tmax') hash += '_h';
-        else if (gauge.rangeOptions.auto.optimization === 'tavg') hash += '_a';
-        else if (gauge.rangeOptions.auto.optimization === 'tmin') hash += '_l';
+        hash += gauge.rangeOptions.isCustomRanges === true ? 't' : 'f'; // Save custom ranges setting
+
+        if (
+          gauge.rangeOptions.mode === 'manual' &&
+          gauge.rangeOptions.isCustomRanges === false
+        ) {
+          // If manual ranges, include integer and starting value '10'100'
+          hash += `${displayNumber(gauge.rangeOptions.manual.increment)}${CHARACTERS_FOR_URL_HASH.separator}${displayNumber(gauge.rangeOptions.manual.start)}`;
+        }
+
+        // Save range Balance Auto Focus mode for temperature gauges
+        // Added in version 2.5.0
+        if (
+          gauge.id === 'temp' &&
+          gauge.rangeOptions.mode === 'auto' &&
+          !gauge.rangeOptions.isCustomRanges
+        ) {
+          if (gauge.rangeOptions.auto.optimization === 'ranges') hash += '_r';
+          if (gauge.rangeOptions.auto.optimization === 'tmax') hash += '_h';
+          else if (gauge.rangeOptions.auto.optimization === 'tavg')
+            hash += '_a';
+          else if (gauge.rangeOptions.auto.optimization === 'tmin')
+            hash += '_l';
+        }
+      } else {
+        // if the gauge is a 'category' type
+
+        // must include the settings `!` for parsing purposes, but doesn't need to have real data following the '!'
+        // so only include the '!'
+
+        gauge.colors.forEach((color, index) => {
+          const code = color.hex.substring(color.hex.indexOf('#') + 1);
+
+          hash += encodeURIComponent(`${code}(${gauge.ranges[index].value})`);
+        });
+        hash += '!';
       }
 
       if (gauge.colors.some((color) => color?.brandId && color?.yarnId)) {
@@ -138,6 +166,7 @@ class GaugesState {
     if (id === 'prcp') newGauge = new RainGauge();
     if (id === 'snow') newGauge = new SnowGauge();
     if (id === 'dayt') newGauge = new DayTimeGauge();
+    if (id === 'moon') newGauge = new MoonPhaseGauge();
 
     // if (id === 'prcp') newGauge = new RainGauge();
     // else newGauge = new GaugeState({ attributes, settings });
@@ -178,13 +207,15 @@ class GaugesState {
   getSnapshot(id) {
     const _gauge = this.allCreated.find((gauge) => gauge.id === id);
 
+    const colors = _gauge?.colors;
+
+    if (_gauge?.unit.type === 'category') return { ..._gauge, colors };
+
     const rangeOptions = _gauge?.rangeOptions;
 
     const autoRangeOptions = _gauge?.autoRangeOptions;
 
     const ranges = _gauge?.ranges;
-
-    const colors = _gauge?.colors;
 
     const gauge = _gauge;
 
@@ -200,4 +231,5 @@ export const allGaugesAttributes = [
   rainGaugeAttributes,
   snowGaugeAttributes,
   daytGaugeAttributes,
+  moonGaugeAttributes,
 ];

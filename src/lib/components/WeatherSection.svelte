@@ -169,7 +169,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         class="rounded-container bg-surface-100 dark:bg-surface-900 mb-4 flex w-full max-w-screen-md flex-col items-start justify-start gap-2 p-2 text-left"
       >
         <p class="">
-          Weekly weather grouping makes for a shorter project. <a
+          Weekly weather grouping can result in a shorter project. <a
             href="/documentation/#grouping-weather-data"
             target="_blank"
             class="link"
@@ -431,6 +431,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     >
       <span class="border-b-2 border-(--snow)">Snow</span>
     </ToggleWeatherData>
+
     <ToggleWeatherData
       view={weather.table.showParameters.dayt}
       onclick={() => {
@@ -438,6 +439,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
       }}
     >
       <span class="border-b-2 border-(--dayt)">Daytime</span>
+    </ToggleWeatherData>
+
+    <ToggleWeatherData
+      view={weather.table.showParameters.moon}
+      onclick={() => {
+        weather.table.showParameters.moon = !weather.table.showParameters.moon;
+      }}
+    >
+      <span class="border-b-2 border-(--moon)">Moon Phase </span>
+      <span class="badge bg-tertiary-50-950">Beta</span>
     </ToggleWeatherData>
   </div>
 

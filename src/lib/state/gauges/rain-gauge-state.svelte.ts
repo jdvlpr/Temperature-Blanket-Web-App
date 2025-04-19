@@ -5,6 +5,7 @@ import chroma from 'chroma-js';
 
 export const gaugeAttributes: GaugeAttributes = {
   id: 'prcp',
+  isStatic: false,
   label: 'Rain Gauge',
   unit: {
     type: 'height',

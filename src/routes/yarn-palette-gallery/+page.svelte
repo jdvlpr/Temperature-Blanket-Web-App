@@ -46,7 +46,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import SelectYarn from '$lib/components/SelectYarn.svelte';
   import ToTopButton from '$lib/components/buttons/ToTopButton.svelte';
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
-  import { ICONS } from '$lib/constants';
   import { allGaugesAttributes } from '$lib/state';
   import {
     fetchPopularProjects,
@@ -58,8 +57,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     pluralize,
     recordPageView,
   } from '$lib/utils';
-  import { onMount } from 'svelte';
-  import { yarnPageState } from '../yarn/state.svelte';
   import {
     ArrowUpDownIcon,
     ChevronRightIcon,
@@ -67,6 +64,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     SearchIcon,
     XIcon,
   } from '@lucide/svelte';
+  import { onMount } from 'svelte';
+  import { yarnPageState } from '../yarn/state.svelte';
 
   let first = 40;
   let loading = $state(true);

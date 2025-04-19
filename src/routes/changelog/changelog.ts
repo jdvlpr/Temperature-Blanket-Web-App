@@ -16,11 +16,53 @@
 import { PUBLIC_GITHUB_LINK } from '$env/static/public';
 import { ICONS } from '$lib/constants';
 import type { ChangelogItem } from '$lib/types';
-import { RocketIcon } from '@lucide/svelte';
+import { MoonStarIcon, RocketIcon } from '@lucide/svelte';
 
 export const entries: ChangelogItem[] = [
   {
     date: 'April, 2025',
+    notes: [
+      {
+        icon: ICONS.design,
+        instructions: 'Try it out in the Preview tab of the Project Planner',
+        text: `Each round in a square represents one day`,
+        title: 'Added New Preview Type: Square Rounds (Beta)',
+      },
+    ],
+    version: '5.5.0',
+  },
+  {
+    notes: [
+      {
+        icon: ICONS.checkCircle,
+        text: `30 colorways`,
+        title: 'Added New Yarn: DROPS - Sky',
+      },
+      {
+        icon: ICONS.checkCircle,
+        text: `23 colorways`,
+        title: 'Added New Yarn: 4 Seasons - Flinders Cotton 8 Ply',
+      },
+      {
+        icon: ICONS.checkCircle,
+        text: `37 colorways`,
+        title: 'Added New Yarn: Purl Soho - Good Wool',
+      },
+    ],
+    version: '5.4.0',
+  },
+  {
+    notes: [
+      {
+        IconComponent: MoonStarIcon,
+        text: 'Add colors for phases of the moon into your preview designs. This is a beta feature—it may have issues and may not be completely accurate.',
+        title:
+          'Added Feature: Moon Phase Gauge <span class="badge bg-tertiary-50-950">Beta</span>',
+      },
+    ],
+    version: '5.3.0',
+  },
+  {
     notes: [
       {
         icon: ICONS.wrench,

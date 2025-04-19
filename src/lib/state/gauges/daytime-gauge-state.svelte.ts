@@ -5,6 +5,7 @@ import chroma from 'chroma-js';
 
 export const gaugeAttributes: GaugeAttributes = {
   id: 'dayt',
+  isStatic: false,
   label: 'Daytime Gauge',
   unit: {
     type: 'time',

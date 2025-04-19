@@ -21,7 +21,7 @@ export type WeatherSource = 'Open-Meteo' | 'Meteostat';
 export interface WeatherSourceOptions {
   name: WeatherSource;
   useSecondary: boolean;
-  settings?: {
+  settings: {
     /* In the project URL hash, 'l' is for 'era5_land' ('auto' is the default so no need to explicitly set it)	*/
     openMeteo: { model: 'auto' | 'era5_land' };
     meteoStat: {
@@ -31,6 +31,17 @@ export interface WeatherSourceOptions {
     };
   };
 }
+
+export type MoonPhasesId = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7;
+export type MoonPhasesName =
+  | 'New Moon'
+  | 'Waxing Crescent'
+  | 'First Quarter'
+  | 'Waxing Gibbous'
+  | 'Full Moon'
+  | 'Waning Gibbous'
+  | 'Third Quarter'
+  | 'Waning Crescent';
 
 export interface WeatherDay {
   /** 0-based index of which location the weather day is for */
@@ -60,4 +71,5 @@ export interface WeatherDay {
     metric: number | null;
     imperial: number | null;
   };
+  moon: MoonPhasesId | null;
 }

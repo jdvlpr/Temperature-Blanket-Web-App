@@ -167,9 +167,10 @@ export const getWPGauge = (gauge) => {
       const count = getDaysInRange({
         id: item.id,
         range: gauge.ranges[i],
-        direction: gauge.rangeOptions.direction,
-        includeFromValue: gauge.rangeOptions.includeFromValue,
-        includeToValue: gauge.rangeOptions.includeToValue,
+        direction: gauge?.rangeOptions?.direction,
+        includeFromValue: gauge?.rangeOptions?.includeFromValue,
+        includeToValue: gauge?.rangeOptions?.includeToValue,
+        gaugeUnitType: gauge.unit.type,
       }).length;
       const percentage = `(${getDaysPercent(count)}%)`;
       let label = '';
@@ -181,11 +182,22 @@ export const getWPGauge = (gauge) => {
       return `${count} ${pluralize(weather.grouping, count)} ${percentage} ${label}`;
     });
     // details.reverse();
+    let range;
+    if (gauge.unit.type === 'category') {
+      range = {
+        value: gauge.ranges[i].value,
+        label: gauge.ranges[i].label,
+      };
+    } else {
+      range = {
+        from:
+          gauge.ranges[i].from + ' ' + gauge.unit.label[localState.value.units],
+        to: gauge.ranges[i].to + ' ' + gauge.unit.label[localState.value.units],
+      };
+    }
     content.push({
       color: color.hex,
-      from:
-        gauge.ranges[i].from + ' ' + gauge.unit.label[localState.value.units],
-      to: gauge.ranges[i].to + ' ' + gauge.unit.label[localState.value.units],
+      ...range,
       details,
     });
   });

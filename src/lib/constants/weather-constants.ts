@@ -13,6 +13,8 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
+import type { MoonPhasesName } from '$lib/types';
+
 export const OPEN_METEO_DELAY_DAYS = 6;
 
 export const METEOSTAT_DELAY_DAYS = 8;
@@ -129,4 +131,19 @@ export const UNIT_LABELS = {
     metric: 'minutes',
     imperial: 'hours',
   },
+  category: {
+    metric: '',
+    imperial: '',
+  },
 };
+
+export const MOON_PHASE_NAMES: MoonPhasesName[] = [
+  'New Moon',
+  'Waxing Crescent',
+  'First Quarter',
+  'Waxing Gibbous',
+  'Full Moon',
+  'Waning Gibbous',
+  'Third Quarter',
+  'Waning Crescent',
+];

@@ -36,9 +36,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     allGaugesAttributes.forEach((gauge) => {
       gauge.targets.forEach((target) => {
         if (
-          weather.data?.some(
-            (day) => day[target.id][localState.value.units] !== null,
-          )
+          weather.data?.some((day) => {
+            if (target.type === 'category') return day[target.id] !== null;
+            else return day[target.id][localState.value.units] !== null;
+          })
         ) {
           // For each of the gauge's weather parameter targets, check to see if there is any data, and if so setup the default gauge
           gauges.addToAvailable({
@@ -97,6 +98,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <CirclePlusIcon />
         {/if}
         {label}
+
+        {#if id === 'moon'}
+          <div
+            class={[
+              'badge bg-tertiary-50-950',
+              gauges.activeGaugeId === id && 'text-tertiary-contrast-50-950',
+            ]}
+          >
+            Beta
+          </div>
+        {/if}
       </button>
     {/each}
   </div>
@@ -118,9 +130,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
   {/if}
 
+  {#if gauges.activeGauge?.isStatic}
+    <p class="text-sm">
+      This gauge has a fixed number of colors for the eight phases of the moon.
+      You can only edit the colors individually.
+    </p>
+  {/if}
+
   <Gauge bind:gauge={gauges.activeGauge} />
 
-  <div class="mt-4 mb-2">
+  <div class={['mt-4 mb-2', gauges.activeGauge?.isStatic && 'hidden']}>
     <RangeOptionsButton />
   </div>
 

@@ -54,18 +54,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <p class="text-2xl font-bold">Layout Settings</p>
 
   <label class="label">
-    Number of Columns
+    Size (width)
     <select
-      class="select w-fit min-w-[60px]"
-      id="sqrs-columns"
+      class="select w-fit min-w-[120px]"
       bind:value={squaresPreview.settings.columns}
     >
       {#each Array(300) as _, i}
-        {#if i > 0}
-          <option value={i}>
-            {i}
-          </option>
-        {/if}
+        {@const number = i + 1}
+        <option value={number}>
+          {number}
+          {pluralize('square', number)}
+        </option>
       {/each}
     </select>
   </label>
@@ -74,7 +73,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <span>Squares at Beginning</span>
     <select
       class="select w-fit min-w-[60px]"
-      id="sqrs-squares-at-beginning"
       bind:value={squaresPreview.settings.squaresAtBeginning}
     >
       {#each Array(51) as _, i}
@@ -89,7 +87,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <span>Squares Between Months</span>
     <select
       class="select w-fit min-w-[60px]"
-      id="sqrs-squares-between-months"
       bind:value={squaresPreview.settings.squaresBetweenMonthsCount}
     >
       {#each Array(51) as _, i}
