@@ -943,8 +943,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </p>
             <div class="card bg-warning-500/20 flex flex-col gap-2 p-4">
               <p>
-                For any weather provider, recent weather data may be delayed by
-                a few days.
+                All weather data is subject to change if the provider updates
+                their models.
               </p>
             </div>
           </section>

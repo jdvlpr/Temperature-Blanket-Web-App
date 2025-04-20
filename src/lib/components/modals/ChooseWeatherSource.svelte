@@ -89,6 +89,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </a> to learn more about the new settings.
   </p>
 
+  <div>
+    <ToggleSwitch
+      bind:checked={useSecondary}
+      label="Use the other weather source if data is not available from the selected one."
+    />
+  </div>
+
+  <p class=" text-center text-sm">
+    All weather data is subject to change if the provider updates their models.
+  </p>
+
   <div
     class="relative my-2 grid auto-cols-auto grid-flow-row gap-4 md:grid-flow-col"
   >
@@ -309,17 +320,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </p>
     </div>
   </div>
-
-  <div>
-    <ToggleSwitch
-      bind:checked={useSecondary}
-      label="Use the other weather source if data is not available from the selected one."
-    />
-  </div>
-
-  <p class=" text-center">
-    All weather data is subject to change if the provider updates their models.
-  </p>
 </div>
 
 <StickyPart position="bottom">

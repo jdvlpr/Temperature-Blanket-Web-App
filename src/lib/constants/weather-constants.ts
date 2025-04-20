@@ -160,20 +160,20 @@ export const OPEN_METEO_MODELS: {
     title: `Best Match <span class="badge bg-surface-200-800">Default</span>`,
     timespan: '1940 to present',
     resolution: '~11 km, ~25 km, or 5 km resolution',
-    details: `Combines multiple models including ERA5 Land, ERA5, and CERRA (once real-time updates become available). Weather data may be altered by model upgrades. <a href="https://open-meteo.com/en/docs/historical-weather-api#data_sources" target="_blank" class="link">More details.</a>`,
+    details: `Combines multiple models including ERA5 Land, ERA5, and CERRA (once real-time updates become available). Weather data may be altered by model upgrades. <a href="https://open-meteo.com/en/docs/historical-weather-api#data_sources" target="_blank" class="link">Model overview</a>.`,
   },
   {
     value: 'era5_land',
     title: `ERA5 Land <span class="badge bg-tertiary-50-950">Beta</span>`,
     timespan: '1950 to present',
     resolution: '~11 km resolution',
-    details: `Weather data is less likely to be altered. <a href="https://cds.climate.copernicus.eu/datasets/reanalysis-era5-land?tab=overview" target="_blank" rel="noopener noreferrer" class="link">More details.</a>`,
+    details: `Weather data is less likely to be altered. <a href="https://cds.climate.copernicus.eu/datasets/reanalysis-era5-land?tab=overview" target="_blank" rel="noopener noreferrer" class="link">Model overview</a>.`,
   },
   {
     value: 'era5',
     title: `ERA5 <span class="badge bg-tertiary-50-950">Beta</span>`,
     timespan: '1940 to present',
     resolution: '~25 km resolution',
-    details: `Weather data is less likely to be altered. <a href="https://cds.climate.copernicus.eu/datasets/reanalysis-era5-single-levels?tab=overview" target="_blank" rel="noopener noreferrer" class="link">More details.</a>`,
+    details: `Weather data is less likely to be altered. <a href="https://cds.climate.copernicus.eu/datasets/reanalysis-era5-single-levels?tab=overview" target="_blank" rel="noopener noreferrer" class="link">Model overview</a>.`,
   },
 ];
