@@ -40,7 +40,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '@lucide/svelte';
   import { Accordion } from '@skeletonlabs/skeleton-svelte';
 
-  let accordionValue = $state(['apr2']);
+  let accordionValue = $state(['apr20']);
 
   let includeDebugInfo = $state(true);
 
@@ -169,7 +169,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       >
       <div class="">
         <h2 class="h2">Weather Data Feedback Form</h2>
-        <p class="text-sm">Updated April 2, 2025</p>
+        <p class="text-sm">Updated April 20, 2025</p>
       </div>
 
       <p>
@@ -188,6 +188,34 @@ If not, see <https://www.gnu.org/licenses/>. -->
         rounded="rounded-container"
         classes="bg-warning-50-950/50"
       >
+        <Accordion.Item value="apr20" controlClasses="font-bold">
+          {#snippet lead()}
+            <InfoIcon />
+          {/snippet}
+          {#snippet control()}
+            April 20 Update
+          {/snippet}
+          {#snippet panel()}
+            Addressing the issue of historical weather data occasionally being
+            adjusted because of model upgrades, an option has been added to the
+            Weather Source settings to choose a more stable weather data model.
+            This is only possible when using Open-Meteo as the weather source.
+            More details about the new options can be found in the <a
+              href="/documentation#weather-sources"
+              target="_blank"
+              class="link">documentation</a
+            >.
+
+            <br />
+            <br />
+            Using the new models (ERA5 Land and ERA5) is in beta status—you can use
+            them, and weather data theoretically should not be adjusted over time,
+            but they have not been thoroughly tested on this site. I'd love to hear
+            your feedback about the new weather models, especially if the new ERA5
+            Land and ERA5 models provide any weather data that gets adjusted over
+            time.
+          {/snippet}
+        </Accordion.Item>
         <Accordion.Item value="apr2" controlClasses="font-bold">
           {#snippet lead()}
             <InfoIcon />
@@ -303,56 +331,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
             temperature-blanket.com doesn't have any way of detecting or
             notifying users when the models get updated. This is known issue
             that has been present from the beginning in 2021.
-          {/snippet}
-        </Accordion.Item>
-        <Accordion.Item value="what" controlClasses="font-bold">
-          {#snippet lead()}
-            <InfoIcon />
-          {/snippet}
-          {#snippet control()}
-            What is being done?
-          {/snippet}
-          {#snippet panel()}
-            I am diagnosing the problem where users are seeing weather data
-            shifted. <span class="font-bold"
-              >I have a few ideas for fixes, but a tough barrier I'm facing is
-              that I haven't been able to recreate the issue people are
-              reporting in order to test solutions. In other words, I haven't
-              been able to recreate a project where the weather data has
-              shifted, so I don't know if what I change is fixing the issue or
-              not.
-            </span>
-            That's why I'm trying to gather information from users who are experiencing
-            the issue, so that hopefully I can figure out what is causing weather
-            data to shift for some people, and how to fix it. This is the primary
-            issue I'm currently trying to fix.
-            <br />
-            <br />
-            Additionally, I'm considering how to address the long-standing issue
-            of historical weather data occasionally changing. Specifically, while
-            looking more into the details about the weather models offered by Open-Meteo,
-            I came across this
-            <a
-              href="https://open-meteo.com/en/docs/historical-weather-api#data_sources"
-              target="_blank"
-              class="link">from their documentation</a
-            >: "
-            <span class="italic"
-              >...when studying climate change over decades, it is advisable to
-              exclusively utilize ERA5 or ERA5-Land. This choice ensures data
-              consistency and prevents unintentional alterations that could
-              arise from the adoption of different weather model upgrades.</span
-            >" So I'm wondering if allowing users of temperature-blanket.com to
-            choose to use only these models would be beneficial (instead of the
-            default currently used, which is that the model is automatically
-            selected by Open-Meteo). This is an issue that will take more
-            research and development. My primary concern at the moment is the
-            first issue of weather data shifting for some users.
-            <br />
-            <br />
-            Hopefully the dates-shifting issue can be fixed soon. I'll update this
-            form, as well as the notice above the weather chart, with further developments.
-            Thanks for your patience, and sorry for the inconvenience.
           {/snippet}
         </Accordion.Item>
       </Accordion>

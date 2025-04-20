@@ -105,6 +105,7 @@ class ProjectClass {
     ) {
       // If openMeteo model is anything but 'auto' (the default), set the model id here
       if (weather.source.settings?.openMeteo.model === 'era5_land') hash += 'l';
+      if (weather.source.settings?.openMeteo.model === 'era5') hash += 'e';
     }
 
     if (

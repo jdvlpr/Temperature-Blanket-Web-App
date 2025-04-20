@@ -13,14 +13,21 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script>
+<script lang="ts">
   import { PUBLIC_BASE_DOMAIN_NAME, PUBLIC_BASE_URL } from '$env/static/public';
   import AppLogo from '$lib/components/AppLogo.svelte';
   import AppShell from '$lib/components/AppShell.svelte';
   import { Segment } from '@skeletonlabs/skeleton-svelte';
   import { fade } from 'svelte/transition';
 
-  const posts = [
+  type BlogPostType = {
+    href: string;
+    imgSrc: string;
+    imgAlt: string;
+    title: string;
+    tags: ('Help' | 'News')[];
+  };
+  const posts: BlogPostType[] = [
     {
       href: '/blog/2025-03-20-version-5',
       imgSrc: '/images/blog-images/2025-03-20-version-5/featured-image.png',

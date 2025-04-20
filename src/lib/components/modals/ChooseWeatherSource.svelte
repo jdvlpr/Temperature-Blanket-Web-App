@@ -15,12 +15,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import { locations, modal, weather } from '$lib/state';
-  import { ExternalLinkIcon } from '@lucide/svelte';
+  import {
+    CircleCheckIcon,
+    CircleIcon,
+    ClockIcon,
+    ExternalLinkIcon,
+    Grid3X3Icon,
+    InfoIcon,
+  } from '@lucide/svelte';
   import ToggleSwitch from '../buttons/ToggleSwitch.svelte';
   import GettingWeather from './GettingWeather.svelte';
   import GettingWeatherWarnCustomWeather from './GettingWeatherWarnCustomWeather.svelte';
   import SaveAndCloseButtons from './SaveAndCloseButtons.svelte';
   import StickyPart from './StickyPart.svelte';
+  import { OPEN_METEO_MODELS } from '$lib/constants';
+  import { onMount } from 'svelte';
 
   let warnSearchAgain = $derived.by(() => {
     if (!weather.data.length) return false;
@@ -73,241 +82,262 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 </script>
 
-<div class="flex w-full flex-col items-center p-2 text-left">
-  <div class="flex flex-col items-center gap-4">
+<div class="flex w-full flex-col items-center gap-4 p-2 text-left">
+  <p class="text-center">
+    <a href="/changelog#5.6.0" class="link" target="_blank"
+      >See the changelog
+    </a> to learn more about the new settings.
+  </p>
+
+  <div
+    class="relative my-2 grid auto-cols-auto grid-flow-row gap-4 md:grid-flow-col"
+  >
     <div
-      class="relative mt-2 grid auto-cols-auto grid-flow-row gap-4 overflow-x-scroll sm:grid-flow-col"
+      class={[
+        'card rounded-container grid grid-flow-row auto-rows-max place-items-center gap-2 border p-2',
+        sourceName === 'Open-Meteo'
+          ? 'border-primary-500 bg-primary-50/50 dark:bg-primary-950/10'
+          : 'border-surface-200-800',
+      ]}
     >
-      <div
-        class={[
-          'card rounded-container grid grid-flow-row auto-rows-max place-items-center gap-2 border p-2',
-          sourceName === 'Open-Meteo'
-            ? 'border-primary-500 bg-primary-50/50 dark:bg-primary-950/10'
-            : 'border-surface-200-800',
-        ]}
-      >
-        <div>
-          <p class="text-2xl font-bold">Open-Meteo</p>
+      <div>
+        <p class="text-2xl font-bold">Open-Meteo</p>
 
-          <a
-            href="https://open-meteo.com/"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="link text-sm"
-          >
-            <span class="inline-flex gap-1 underline">
-              open-meteo.com <ExternalLinkIcon
-                class="relative top-0.5 inline size-4"
-              />
-            </span>
-          </a>
-        </div>
-
-        <p class="">5 day delay</p>
-
-        <button
-          class={[
-            'btn  w-fit',
-            sourceName === 'Open-Meteo'
-              ? 'preset-filled'
-              : 'preset-filled-secondary-500',
-          ]}
-          onclick={() => {
-            sourceName = 'Open-Meteo';
-          }}
+        <a
+          href="https://open-meteo.com/"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="link text-sm"
         >
-          Select this Source
-        </button>
-
-        <div class="mt-2 min-sm:h-[285px]">
-          <p class="font-bold">Settings</p>
-
-          <p class="">
-            Select a Model <a
-              href="https://open-meteo.com/en/docs/historical-weather-api#data_sources"
-              target="_blank"
-              class="btn preset-tonal-surface hover:preset-tonal mx-2"
-              >Source Details <ExternalLinkIcon
-                size={16}
-                class="relative -top-[2px] inline"
-              /></a
-            >
-          </p>
-
-          <div class="mt-2 flex flex-col gap-1">
-            <label class="flex items-center gap-2">
-              <input
-                type="radio"
-                class="radio"
-                value="auto"
-                disabled={sourceName !== 'Open-Meteo'}
-                bind:group={openMeteoModel}
-              />
-              Best Match (Default)
-            </label>
-            <span class="text-sm"
-              >Combines data from ERA5, ERA5 Land, and CERRA (once real-time
-              updates become available).</span
-            >
-          </div>
-
-          <div class="mt-2 flex flex-col gap-1">
-            <label class="flex items-center gap-2">
-              <input
-                type="radio"
-                class="radio"
-                value="era5_land"
-                disabled={sourceName !== 'Open-Meteo'}
-                bind:group={openMeteoModel}
-              />
-              Consistent <span class="badge bg-tertiary-50-950">Beta</span>
-            </label>
-
-            <span class="text-sm"
-              >By using only the ERA5 Land model, this choice is more likely to
-              prevent historical data from changing.
-            </span>
-          </div>
-        </div>
-
-        <p class="text-sm">
-          Includes data from the <a
-            href="https://cds.climate.copernicus.eu/cdsapp#!/dataset/reanalysis-era5-land?tab=overview"
-            rel="noopener noreferrer"
-            target="_blank"
-            class="link"
-            data-svelte-h="svelte-exm2vv">Copernicus Program</a
-          >
-          and
-          <a
-            href="https://open-meteo.com/en/license"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="link">others</a
-          >. Licenced under
-          <a
-            href="https://creativecommons.org/licenses/by/4.0/"
-            target="_blank"
-            class="link"
-            rel="noreferrer noopener">CC BY 4.0</a
-          >.
-        </p>
+          <span class="inline-flex gap-1 underline">
+            open-meteo.com <ExternalLinkIcon
+              class="relative top-0.5 inline size-4"
+            />
+          </span>
+        </a>
       </div>
 
-      <div
+      <p class="">5 day delay</p>
+
+      <button
         class={[
-          'card rounded-container grid grid-flow-row auto-rows-max place-items-center gap-2 border p-2',
-          sourceName === 'Meteostat'
-            ? 'border-primary-500 bg-primary-50/50 dark:bg-primary-950/10'
-            : 'border-surface-200-800',
+          'btn  w-fit',
+          sourceName === 'Open-Meteo'
+            ? 'bg-surface-100 dark:bg-surface-900'
+            : 'preset-filled-secondary-500',
         ]}
+        onclick={() => {
+          sourceName = 'Open-Meteo';
+        }}
       >
-        <div class="">
-          <p class="text-2xl font-bold">Meteostat</p>
+        {#if sourceName === 'Open-Meteo'}
+          <CircleCheckIcon class="inline" />
+        {:else}
+          <CircleIcon class="inline" />
+        {/if}
+        Select this Source
+      </button>
 
-          <a
-            href="https://meteostat.net"
-            rel="noopener noreferrer"
-            class="link text-sm"
-            target="_blank"
+      <div class="mt-4 flex flex-col gap-2 min-md:h-[570px]">
+        <p class="font-bold">Choose a Model</p>
+
+        {#each OPEN_METEO_MODELS as { value, title, timespan, resolution, details }}
+          <div
+            class={[
+              'rounded-container flex flex-col gap-1 border p-2',
+              openMeteoModel === value && sourceName === 'Open-Meteo'
+                ? 'border-primary-500 bg-primary-100/50 dark:bg-primary-950/30'
+                : 'border-transparent',
+            ]}
           >
-            <span class="inline-flex gap-1 underline">
-              meteostat.net <ExternalLinkIcon
-                class="relative top-0.5 inline size-4"
-              />
-            </span>
-          </a>
-        </div>
-
-        <p class="">1 to 7 day delay</p>
-
-        <button
-          class={[
-            'btn w-fit',
-            sourceName === 'Meteostat'
-              ? 'preset-filled'
-              : 'preset-filled-secondary-500',
-          ]}
-          onclick={() => {
-            sourceName = 'Meteostat';
-          }}
-        >
-          Select this Source
-        </button>
-
-        <div class="mt-2 min-sm:h-[285px]">
-          <p class="font-bold">Settings</p>
-
-          <div class="mt-2 flex flex-col gap-1">
-            <label class="flex items-center gap-2">
+            <label class="flex items-center gap-2 font-bold">
               <input
-                type="checkbox"
-                class="checkbox"
-                disabled={sourceName !== 'Meteostat'}
-                bind:checked={meteostatModel}
+                type="radio"
+                class="radio"
+                {value}
+                disabled={sourceName !== 'Open-Meteo'}
+                bind:group={openMeteoModel}
               />
-              Fill Missing Data
+              {@html title}
             </label>
-            <span class="text-sm"
-              >Substitute missing records with statistically optimized model
-              data. (On by default.)
-            </span>
+            <div class="ml-4 flex flex-col gap-1">
+              <p class="">
+                <ClockIcon class="relative -top-[2px] mr-1 inline size-4" />
+                {timespan}
+              </p>
+              <p class="">
+                <Grid3X3Icon class="relative -top-[2px] mr-1 inline size-4" />
+                {resolution}
+              </p>
+              <p class="">
+                <InfoIcon class="relative -top-[2px] mr-1 inline size-4" />
+                {@html details}
+              </p>
+            </div>
           </div>
+        {/each}
+      </div>
+
+      <p class="text-sm">
+        Includes data from the <a
+          href="https://cds.climate.copernicus.eu/cdsapp#!/dataset/reanalysis-era5-land?tab=overview"
+          rel="noopener noreferrer"
+          target="_blank"
+          class="link"
+          data-svelte-h="svelte-exm2vv">Copernicus Program</a
+        >
+        and
+        <a
+          href="https://open-meteo.com/en/license"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="link">others</a
+        >. Licenced under
+        <a
+          href="https://creativecommons.org/licenses/by/4.0/"
+          target="_blank"
+          class="link"
+          rel="noreferrer noopener">CC BY 4.0</a
+        >.
+      </p>
+    </div>
+
+    <div
+      class={[
+        'card rounded-container grid grid-flow-row auto-rows-max place-items-center gap-2 border p-2',
+        sourceName === 'Meteostat'
+          ? 'border-primary-500 bg-primary-50/50 dark:bg-primary-950/10'
+          : 'border-surface-200-800',
+      ]}
+    >
+      <div class="">
+        <p class="text-2xl font-bold">Meteostat</p>
+
+        <a
+          href="https://meteostat.net"
+          rel="noopener noreferrer"
+          class="link text-sm"
+          target="_blank"
+        >
+          <span class="inline-flex gap-1 underline">
+            meteostat.net <ExternalLinkIcon
+              class="relative top-0.5 inline size-4"
+            />
+          </span>
+        </a>
+      </div>
+
+      <p class="">1 to 7 day delay</p>
+
+      <button
+        class={[
+          'btn w-fit',
+          sourceName === 'Meteostat'
+            ? 'bg-surface-100 dark:bg-surface-900'
+            : 'preset-filled-secondary-500',
+        ]}
+        onclick={() => {
+          sourceName = 'Meteostat';
+        }}
+      >
+        {#if sourceName === 'Meteostat'}
+          <CircleCheckIcon class="inline" />
+        {:else}
+          <CircleIcon class="inline" />
+        {/if}
+        Select this Source
+      </button>
+
+      <div class="mt-4 min-md:h-[570px]">
+        <div class="mt-2 flex flex-col gap-1">
+          <label class="flex items-center gap-2 pb-1 font-bold">
+            <input
+              type="checkbox"
+              class="checkbox"
+              disabled={sourceName !== 'Meteostat'}
+              bind:checked={meteostatModel}
+            />
+            Fill Missing Data
+            <span class="badge bg-surface-200-800">On by Default</span>
+          </label>
+          <span class=""
+            >Substitute missing records with statistically optimized model data.
+          </span>
         </div>
 
-        <p class="text-sm">
-          Raw data provided by <a
-            href="https://www.noaa.gov/"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="link"
-            data-svelte-h="svelte-1wlhtuj">NOAA</a
-          >,
+        <div class="mt-2 flex flex-col gap-2">
           <a
-            href="https://www.dwd.de/"
+            href="https://dev.meteostat.net/quality.html"
             target="_blank"
-            rel="noopener noreferrer"
-            class="link">DWD</a
+            class="link w-fit">Data Quality</a
           >
-          and
           <a
             href="https://dev.meteostat.net/sources.html"
             target="_blank"
-            rel="noopener noreferrer"
-            class="link">others</a
-          >. Licensed under
-          <a
-            href="https://creativecommons.org/licenses/by-nc/4.0/"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="link">CC BY-NC 4.0.</a
+            class="link w-fit">Data Sources</a
           >
-        </p>
+        </div>
       </div>
-    </div>
 
-    <div>
-      <ToggleSwitch
-        bind:checked={useSecondary}
-        label="Use the other weather source if data is not available."
-      />
+      <p class="text-sm">
+        Raw data provided by <a
+          href="https://www.noaa.gov/"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="link"
+          data-svelte-h="svelte-1wlhtuj">NOAA</a
+        >,
+        <a
+          href="https://www.dwd.de/"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="link">DWD</a
+        >
+        and
+        <a
+          href="https://dev.meteostat.net/sources.html"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="link">others</a
+        >. Licensed under
+        <a
+          href="https://creativecommons.org/licenses/by-nc/4.0/"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="link">CC BY-NC 4.0.</a
+        >
+      </p>
     </div>
-
-    <p class="pb-2 text-center">
-      All weather data is subject to change if the provider updates their
-      models.
-    </p>
   </div>
+
+  <div>
+    <ToggleSwitch
+      bind:checked={useSecondary}
+      label="Use the other weather source if data is not available from the selected one."
+    />
+  </div>
+
+  <p class=" text-center">
+    All weather data is subject to change if the provider updates their models.
+  </p>
 </div>
 
 <StickyPart position="bottom">
   <div class="pb-2 sm:pb-0">
     {#if warnSearchAgain}
-      <p class="text-warning-800-200 mx-auto pt-2 text-center">
+      <p class="text-warning-800-200 mx-auto px-2 pt-2 text-center">
         Search again for weather data to apply weather source changes.
         {#if !locations.allValid}
           First, choose a valid location and dates.
         {/if}
+      </p>
+    {/if}
+
+    {#if (sourceName === 'Open-Meteo' && openMeteoModel === 'era5') || openMeteoModel === 'era5_land'}
+      <p class="text-warning-800-200 mx-auto px-2 pt-2 text-center">
+        Beta models are not well tested - you can still use them, and weather
+        data should theoretically not be adjusted over time, but they have not
+        been thoroughly tested on this site.
       </p>
     {/if}
 

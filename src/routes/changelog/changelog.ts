@@ -24,9 +24,10 @@ export const entries: ChangelogItem[] = [
     notes: [
       {
         IconComponent: CloudCogIcon,
-        instructions: `Press the Weather Source button in the Project Planner to see the new settings. If you notice any issues or have feedback, please <a href="/contact" target="_blank" class="link">contact me</a>.`,
-        text: 'Added a setting to choose a more consistent historical model when using Open-Meteo as a weather data source. This is a beta feature—it should prevent historical data from changing as much, but results may vary. Also added an optional setting to not fill missing data when using Meteostat as a weather source.',
-        title: 'New Weather Source Settings (Beta)',
+        instructions: `To see the new settings, press the Weather Source button in the Project Planner. If you notice any issues or have feedback about the new model settings, please <a href="/contact" target="_blank" class="link">contact me</a>.`,
+        text: 'Choose a more consistent weather data model when using Open-Meteo as a weather data source. See more details in the <a href="/documentation#weather-sources" class="link" target="_blank">documentation</a>. This is a beta feature—it should prevent historical data from being altered, but it has not been thoroughly tested. An option has also been added to not fill missing data when using Meteostat as a weather source.',
+        title:
+          'New Weather Source Settings <span class="badge bg-tertiary-50-950 ml-2">Beta</span>',
       },
     ],
     version: '5.6.0',
@@ -37,7 +38,7 @@ export const entries: ChangelogItem[] = [
         icon: ICONS.design,
         instructions: 'Try it out in the Preview tab of the Project Planner',
         text: `Each round in a square represents one day`,
-        title: 'Added New Preview Type: Square Rounds (Beta)',
+        title: 'Added New Preview Type: Square Rounds',
       },
     ],
     version: '5.5.0',
@@ -68,7 +69,7 @@ export const entries: ChangelogItem[] = [
         IconComponent: MoonStarIcon,
         text: 'Add colors for phases of the moon into your preview designs. This is a beta feature—it may have issues and may not be completely accurate.',
         title:
-          'Added Feature: Moon Phase Gauge <span class="badge bg-tertiary-50-950">Beta</span>',
+          'Added Feature: Moon Phase Gauge <span class="badge bg-tertiary-50-950 ml-2">Beta</span>',
       },
     ],
     version: '5.3.0',

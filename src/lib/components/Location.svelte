@@ -392,7 +392,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             disabled={!!weather.isUserEdited}
             onclick={async () => {
               searching = true;
-              inputLocation.placeholder = 'Loading...';
+              inputLocation.placeholder = 'Requesting your location...';
 
               async function success(position) {
                 const latitude = position.coords.latitude;

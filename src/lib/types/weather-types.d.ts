@@ -22,8 +22,8 @@ export interface WeatherSourceOptions {
   name: WeatherSource;
   useSecondary: boolean;
   settings: {
-    /* In the project URL hash, 'l' is for 'era5_land' ('auto' is the default so no need to explicitly set it)	*/
-    openMeteo: { model: 'auto' | 'era5_land' };
+    /* In the project URL hash, 'l' is for 'era5_land', 'e' is for 'era5' ('auto' is the default so no need to explicitly set it)	*/
+    openMeteo: { model: 'auto' | 'era5_land' | 'era5' };
     meteoStat: {
       /* Substitute missing records with statistically optimized model data (see https://dev.meteostat.net/api/point/daily.html#parameters)
       In the project URL hash, '0' is for 'false' ('true' is the default so no need to explicitly set it) */

@@ -107,6 +107,8 @@ export const setProjectSettings = async (
       if (+lastSubstring === 0) weather.source.settings.meteoStat.model = false;
       else if (lastSubstring === 'l')
         weather.source.settings.openMeteo.model = 'era5_land';
+      else if (lastSubstring === 'e')
+        weather.source.settings.openMeteo.model = 'era5';
     }
   } else {
     // Projects before v1.823 didn't have this param, and only used Meteostat as a weather source
