@@ -466,17 +466,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </div>
         </div>
       </div>
-      {#if showScrollToTopButton && yarnPaletteGalleryState.projects.length}
-        <ToTopButton
-          bottom="1rem"
-          onClick={() => {
-            scrollContainer.scrollIntoView({
-              behavior: 'smooth',
-              block: 'start',
-            });
-          }}
-        />
-      {/if}
     </main>
   {/snippet}
 </AppShell>
+
+{#if showScrollToTopButton && yarnPaletteGalleryState.projects.length}
+  <ToTopButton
+    onClick={() => {
+      scrollContainer.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
+    }}
+  />
+{/if}

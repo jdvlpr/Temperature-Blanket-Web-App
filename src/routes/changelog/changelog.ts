@@ -16,11 +16,22 @@
 import { PUBLIC_GITHUB_LINK } from '$env/static/public';
 import { ICONS } from '$lib/constants';
 import type { ChangelogItem } from '$lib/types';
-import { MoonStarIcon, RocketIcon } from '@lucide/svelte';
+import { CloudCogIcon, MoonStarIcon, RocketIcon } from '@lucide/svelte';
 
 export const entries: ChangelogItem[] = [
   {
     date: 'April, 2025',
+    notes: [
+      {
+        IconComponent: CloudCogIcon,
+        instructions: `Press the Weather Source button in the Project Planner to see the new settings. If you notice any issues or have feedback, please <a href="/contact" target="_blank" class="link">contact me</a>.`,
+        text: 'Added a setting to choose a more consistent historical model when using Open-Meteo as a weather data source. This is a beta feature—it should prevent historical data from changing as much, but results may vary. Also added an optional setting to not fill missing data when using Meteostat as a weather source.',
+        title: 'New Weather Source Settings (Beta)',
+      },
+    ],
+    version: '5.6.0',
+  },
+  {
     notes: [
       {
         icon: ICONS.design,

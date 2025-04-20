@@ -1682,6 +1682,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 has the same number of rounds.
               </li>
               <li>
+                <span class="font-bold">Square Rounds</span> – Each round in a square
+                represents one day.
+              </li>
+              <li>
                 <span class="font-bold">Squares</span> – Each square represents one
                 day.
               </li>
