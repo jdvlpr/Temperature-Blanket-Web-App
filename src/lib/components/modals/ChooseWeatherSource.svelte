@@ -15,17 +15,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import { locations, modal, weather } from '$lib/state';
-  import {
-    CircleCheckIcon,
-    CircleIcon,
-    ExternalLinkIcon,
-  } from '@lucide/svelte';
+  import { ExternalLinkIcon } from '@lucide/svelte';
   import ToggleSwitch from '../buttons/ToggleSwitch.svelte';
   import GettingWeather from './GettingWeather.svelte';
   import GettingWeatherWarnCustomWeather from './GettingWeatherWarnCustomWeather.svelte';
   import SaveAndCloseButtons from './SaveAndCloseButtons.svelte';
   import StickyPart from './StickyPart.svelte';
-  import { goToProjectSection } from '$lib/utils';
 
   let warnSearchAgain = $derived.by(() => {
     if (!weather.data.length) return false;
@@ -87,7 +82,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         class={[
           'card rounded-container grid grid-flow-row auto-rows-max place-items-center gap-2 border p-2',
           sourceName === 'Open-Meteo'
-            ? 'border-primary-500 bg-primary-50/40 dark:bg-primary-950/10'
+            ? 'border-primary-500 bg-primary-50/50 dark:bg-primary-950/10'
             : 'border-surface-200-800',
         ]}
       >
@@ -115,38 +110,31 @@ If not, see <https://www.gnu.org/licenses/>. -->
             'btn  w-fit',
             sourceName === 'Open-Meteo'
               ? 'preset-filled'
-              : 'hover:preset-tonal',
+              : 'preset-filled-secondary-500',
           ]}
           onclick={() => {
             sourceName = 'Open-Meteo';
           }}
         >
-          <span class="flex shrink-0 gap-1">
-            {#if sourceName === 'Open-Meteo'}
-              <CircleCheckIcon />
-            {:else}
-              <CircleIcon />
-            {/if}
-          </span>
           Select this Source
         </button>
 
-        <div class="flex flex-col gap-2 min-sm:h-[266px]">
-          <p class=" font-bold">Settings</p>
+        <div class="mt-2 min-sm:h-[285px]">
+          <p class="font-bold">Settings</p>
 
           <p class="">
             Select a Model <a
               href="https://open-meteo.com/en/docs/historical-weather-api#data_sources"
               target="_blank"
-              class="link"
-              >More info <ExternalLinkIcon
+              class="btn preset-tonal-surface hover:preset-tonal mx-2"
+              >Source Details <ExternalLinkIcon
                 size={16}
                 class="relative -top-[2px] inline"
               /></a
             >
           </p>
 
-          <div class="flex flex-col gap-1">
+          <div class="mt-2 flex flex-col gap-1">
             <label class="flex items-center gap-2">
               <input
                 type="radio"
@@ -158,11 +146,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
               Best Match (Default)
             </label>
             <span class="text-sm"
-              >Combines data from various models seamlessly.</span
+              >Combines data from ERA5, ERA5 Land, and CERRA (once real-time
+              updates become available).</span
             >
           </div>
 
-          <div class="flex flex-col gap-1">
+          <div class="mt-2 flex flex-col gap-1">
             <label class="flex items-center gap-2">
               <input
                 type="radio"
@@ -171,14 +160,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 disabled={sourceName !== 'Open-Meteo'}
                 bind:group={openMeteoModel}
               />
-              ERA5 Land
-              <span class="badge bg-tertiary-50-950">Beta</span>
+              Consistent <span class="badge bg-tertiary-50-950">Beta</span>
             </label>
 
             <span class="text-sm"
-              >More likely to ensure data consistency, preventing unintentional
-              alterations that could arise from the adoption of different
-              weather model upgrades.
+              >By using only the ERA5 Land model, this choice is more likely to
+              prevent historical data from changing.
             </span>
           </div>
         </div>
@@ -211,7 +198,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         class={[
           'card rounded-container grid grid-flow-row auto-rows-max place-items-center gap-2 border p-2',
           sourceName === 'Meteostat'
-            ? 'border-primary-500 bg-primary-50/40 dark:bg-primary-950/10'
+            ? 'border-primary-500 bg-primary-50/50 dark:bg-primary-950/10'
             : 'border-surface-200-800',
         ]}
       >
@@ -237,26 +224,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <button
           class={[
             'btn w-fit',
-            sourceName === 'Meteostat' ? 'preset-filled' : 'hover:preset-tonal',
+            sourceName === 'Meteostat'
+              ? 'preset-filled'
+              : 'preset-filled-secondary-500',
           ]}
           onclick={() => {
             sourceName = 'Meteostat';
           }}
         >
-          <span class="flex shrink-0 gap-1">
-            {#if sourceName === 'Meteostat'}
-              <CircleCheckIcon />
-            {:else}
-              <CircleIcon />
-            {/if}
-          </span>
           Select this Source
         </button>
 
-        <div class="flex flex-col justify-start gap-2 min-sm:h-[266px]">
+        <div class="mt-2 min-sm:h-[285px]">
           <p class="font-bold">Settings</p>
 
-          <div class="flex flex-col gap-1">
+          <div class="mt-2 flex flex-col gap-1">
             <label class="flex items-center gap-2">
               <input
                 type="checkbox"
@@ -321,7 +303,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <StickyPart position="bottom">
   <div class="pb-2 sm:pb-0">
     {#if warnSearchAgain}
-      <p class="text-warning-800-200 mx-auto py-2 text-center">
+      <p class="text-warning-800-200 mx-auto pt-2 text-center">
         Search again for weather data to apply weather source changes.
         {#if !locations.allValid}
           First, choose a valid location and dates.
@@ -333,7 +315,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       onSave={_onOkay}
       onClose={modal.close}
       saveText={warnSearchAgain && locations.allValid
-        ? 'Save & Search'
+        ? 'Save and Search'
         : 'Save'}
     />
   </div>

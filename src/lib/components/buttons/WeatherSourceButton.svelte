@@ -1,11 +1,12 @@
 <script>
-  import { modal, weather } from '$lib/state';
-  import { CloudCogIcon, CloudLightningIcon } from '@lucide/svelte';
+  import { modal, project, weather } from '$lib/state';
+  import { CloudCogIcon } from '@lucide/svelte';
   import ChooseWeatherSource from '../modals/ChooseWeatherSource.svelte';
 </script>
 
 <button
   class="btn hover:preset-tonal w-fit"
+  disabled={project.status.loading}
   onclick={async () => {
     modal.trigger({
       type: 'component',
