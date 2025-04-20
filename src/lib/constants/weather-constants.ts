@@ -167,13 +167,13 @@ export const OPEN_METEO_MODELS: {
     title: `ERA5 Land <span class="badge bg-tertiary-50-950">Beta</span>`,
     timespan: '1950 to present',
     resolution: '~11 km resolution',
-    details: `Weather data is less likely to be altered. <a href="https://cds.climate.copernicus.eu/datasets/reanalysis-era5-land?tab=overview" target="_blank" rel="noopener noreferrer" class="link">Model overview</a>.`,
+    details: `Weather data is less likely to be altered, but there may be more missing weather data. <a href="https://cds.climate.copernicus.eu/datasets/reanalysis-era5-land?tab=overview" target="_blank" rel="noopener noreferrer" class="link">Model overview</a>.`,
   },
   {
     value: 'era5',
     title: `ERA5 <span class="badge bg-tertiary-50-950">Beta</span>`,
     timespan: '1940 to present',
     resolution: '~25 km resolution',
-    details: `Weather data is less likely to be altered. <a href="https://cds.climate.copernicus.eu/datasets/reanalysis-era5-single-levels?tab=overview" target="_blank" rel="noopener noreferrer" class="link">Model overview</a>.`,
+    details: `Weather data is less likely to be altered, but there may be more missing weather data. <a href="https://cds.climate.copernicus.eu/datasets/reanalysis-era5-single-levels?tab=overview" target="_blank" rel="noopener noreferrer" class="link">Model overview</a>.`,
   },
 ];
