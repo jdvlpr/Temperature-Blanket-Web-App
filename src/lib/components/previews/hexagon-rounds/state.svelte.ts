@@ -6,7 +6,7 @@ import Preview from './Preview.svelte';
 import Settings from './Settings.svelte';
 import { untrack } from 'svelte';
 
-export class SquareRoundsPreviewClass {
+export class HexagonRoundsPreviewClass {
   constructor() {
     $effect.root(() => {
       // If a gauge is created or deleted, handle updating the available weather parameter targets
@@ -33,20 +33,20 @@ export class SquareRoundsPreviewClass {
   // *******************
   // Constant properties
   // *******************
-  name = 'Square Rounds';
+  name = 'Hexagon Rounds';
 
-  id = 'sqrd';
+  id = 'hxrd';
 
   svg = $state();
 
   img = {
-    light: './images/preview_icons/Square Rounds.png',
-    dark: './images/preview_icons/Square Rounds White.png',
+    light: './images/preview_icons/Hexagon Rounds.png',
+    dark: './images/preview_icons/Hexagon Rounds White.png',
   };
 
-  wpTagId = 14;
+  wpTagId = 15;
 
-  wpTagSlug = 'square-rounds';
+  wpTagSlug = 'hexagon-rounds';
 
   settingsComponent = Settings;
 
@@ -61,10 +61,10 @@ export class SquareRoundsPreviewClass {
   // *******************
   settings = $state({
     selectedTarget: 'tmax',
-    daysPerSquare: 13,
+    roundsPerHexagon: 13,
     columns: 4,
     additionalRoundsColor: '#f0f3f3',
-    squareBorder: 0,
+    hexagonBorder: 0,
     layoutBorder: 2,
   });
 
@@ -79,41 +79,49 @@ export class SquareRoundsPreviewClass {
     return weather.data;
   });
 
-  weatherSquares = $derived(
-    chunkArray(this.weatherDataInUse, this.settings.daysPerSquare),
+  weatherHexagons = $derived(
+    chunkArray(this.weatherDataInUse, this.settings.roundsPerHexagon),
   );
 
-  squareSize = $derived(
-    (this.settings.daysPerSquare + this.settings.squareBorder) *
+  hexagonWidth = $derived(
+    (this.settings.roundsPerHexagon + this.settings.hexagonBorder) *
       this.STITCH_SIZE *
       2,
   );
 
-  numberOfSquaresWithWeatherData = $derived(
-    Math.ceil(this.weatherDataInUse.length / this.settings.daysPerSquare),
+  hexagonHeight = $derived(
+    (this.settings.roundsPerHexagon + this.settings.hexagonBorder) *
+      this.STITCH_SIZE *
+      Math.sqrt(3),
+  );
+
+  numberOfHexagonsWithWeatherData = $derived(
+    Math.ceil(this.weatherDataInUse.length / this.settings.roundsPerHexagon),
   );
 
   rows = $derived(
-    Math.ceil(this.numberOfSquaresWithWeatherData / this.settings.columns),
+    Math.ceil(this.numberOfHexagonsWithWeatherData / this.settings.columns),
   );
 
-  totalSquares = $derived(this.rows * this.settings.columns);
+  totalHexagons = $derived(this.rows * this.settings.columns);
 
-  extraSquares = $derived(
-    this.totalSquares - this.numberOfSquaresWithWeatherData,
+  extraHexagons = $derived(
+    this.totalHexagons - this.numberOfHexagonsWithWeatherData,
   );
 
   layoutBorderWidth = $derived(this.settings.layoutBorder * this.STITCH_SIZE);
 
   width = $derived(
-    this.settings.columns * this.squareSize + this.layoutBorderWidth * 2,
+    this.settings.columns * this.hexagonWidth + this.layoutBorderWidth * 2,
   );
 
-  height = $derived(this.rows * this.squareSize + this.layoutBorderWidth * 2);
+  height = $derived(
+    this.rows * this.hexagonHeight + this.layoutBorderWidth * 2,
+  );
 
   totalRounds = $derived(
-    this.totalSquares *
-      (this.settings.daysPerSquare + this.settings.squareBorder),
+    this.totalHexagons *
+      (this.settings.roundsPerHexagon + this.settings.hexagonBorder),
   );
 
   targets = $derived(
@@ -131,7 +139,7 @@ export class SquareRoundsPreviewClass {
     hash += `${this.id}=`;
     hash += `${this.settings.selectedTarget}`;
     hash += '(';
-    hash += `${this.settings.daysPerSquare}${CHARACTERS_FOR_URL_HASH.separator}${this.settings.columns}${CHARACTERS_FOR_URL_HASH.separator}${this.settings.squareBorder}${CHARACTERS_FOR_URL_HASH.separator}${this.settings.layoutBorder}${CHARACTERS_FOR_URL_HASH.separator}${chroma(this.settings.additionalRoundsColor).hex().substring(1)}`;
+    hash += `${this.settings.roundsPerHexagon}${CHARACTERS_FOR_URL_HASH.separator}${this.settings.columns}${CHARACTERS_FOR_URL_HASH.separator}${this.settings.hexagonBorder}${CHARACTERS_FOR_URL_HASH.separator}${this.settings.layoutBorder}${CHARACTERS_FOR_URL_HASH.separator}${chroma(this.settings.additionalRoundsColor).hex().substring(1)}`;
     hash += ')';
     return hash;
   });
@@ -176,19 +184,19 @@ export class SquareRoundsPreviewClass {
 
     // Destructure parts into named settings
     const [
-      daysPerSquare,
+      roundsPerHexagon,
       columns,
-      squareBorder,
+      hexagonBorder,
       layoutBorder,
       additionalRoundsColor,
     ] = parts;
 
     // Try parsing each setting safely
-    if (Number.isFinite(+daysPerSquare))
-      this.settings.daysPerSquare = +daysPerSquare;
+    if (Number.isFinite(+roundsPerHexagon))
+      this.settings.roundsPerHexagon = +roundsPerHexagon;
     if (Number.isFinite(+columns)) this.settings.columns = +columns;
-    if (Number.isFinite(+squareBorder))
-      this.settings.squareBorder = +squareBorder;
+    if (Number.isFinite(+hexagonBorder))
+      this.settings.hexagonBorder = +hexagonBorder;
     if (Number.isFinite(+layoutBorder))
       this.settings.layoutBorder = +layoutBorder;
 
@@ -200,4 +208,4 @@ export class SquareRoundsPreviewClass {
   }
 }
 
-export const squareRoundsPreview = new SquareRoundsPreviewClass();
+export const hexagonRoundsPreview = new HexagonRoundsPreviewClass();
