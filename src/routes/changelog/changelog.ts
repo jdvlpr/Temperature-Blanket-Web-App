@@ -23,6 +23,16 @@ export const entries: ChangelogItem[] = [
     date: 'April, 2025',
     notes: [
       {
+        icon: ICONS.checkCircle,
+        text: `62 colorways`,
+        title: 'Added New Yarn: Premier - Parfait Chunky',
+      },
+    ],
+    version: '5.7.0',
+  },
+  {
+    notes: [
+      {
         IconComponent: CloudCogIcon,
         instructions: `To see the new settings, press the Weather Source button in the Project Planner. If you notice any issues or have feedback about the new model settings, please <a href="/contact" target="_blank" class="link">contact me</a>.`,
         text: 'Choose a more consistent weather data model when using Open-Meteo as a weather data source. See more details in the <a href="/documentation#weather-sources" class="link" target="_blank">documentation</a>. This is a beta feature—it should prevent historical data from being altered, but it has not been thoroughly tested. An option has also been added to not fill missing data when using Meteostat as a weather source.',

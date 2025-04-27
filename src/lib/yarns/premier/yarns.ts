@@ -5,6 +5,7 @@ import { yarn as antiPillingEverydayWorsted } from './anti-pilling-everyday-wors
 import { yarn as basixDK } from './basix-dk/yarn';
 import { yarn as basixWorsted } from './basix-worsted/yarn';
 import { yarn as homeCottonSolids } from './home-cotton-solids/yarn';
+import { yarn as parfaitChunky } from './parfait-chunky/yarn';
 import { yarn as retroVelvet } from './retro-velvet/yarn';
 import { yarn as stitchPlease } from './stitch-please-superwash-worsted/yarn';
 
@@ -18,6 +19,7 @@ export const brand: Brand = {
     basixDK,
     basixWorsted,
     homeCottonSolids,
+    parfaitChunky,
     retroVelvet,
     stitchPlease,
   ],
