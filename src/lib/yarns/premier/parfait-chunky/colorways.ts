@@ -4,7 +4,7 @@ const colorways: Colorway[] = [
   {
     source: {
       name: 'premieryarns.com',
-      href: 'https://www.premieryarns.com/collections/polyester/products/parfchunky',
+      href: 'https://www.premieryarns.com/products/parfchunky',
       accessed: '2025-04-27',
     },
     colors: [
