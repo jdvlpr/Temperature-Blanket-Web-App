@@ -77,9 +77,8 @@ export const entries: ChangelogItem[] = [
     notes: [
       {
         IconComponent: MoonStarIcon,
-        text: 'Add colors for phases of the moon into your preview designs. This is a beta feature—it may have issues and may not be completely accurate.',
-        title:
-          'Added Feature: Moon Phase Gauge <span class="badge bg-tertiary-50-950 ml-2">Beta</span>',
+        text: 'Add colors for phases of the moon into your preview designs.',
+        title: 'Added Feature: Moon Phase Gauge',
       },
     ],
     version: '5.3.0',

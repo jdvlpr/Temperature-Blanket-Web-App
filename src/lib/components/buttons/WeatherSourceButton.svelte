@@ -20,6 +20,5 @@
   <CloudCogIcon />
   <span class="text-left whitespace-pre-wrap"
     >Weather Source: {weather.isUserEdited ? 'Custom' : weather.source.name}
-    <span class="badge bg-tertiary-100-900 ml-2">New Settings</span></span
-  >
+  </span>
 </button>

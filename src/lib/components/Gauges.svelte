@@ -98,17 +98,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <CirclePlusIcon />
         {/if}
         {label}
-
-        {#if id === 'moon'}
-          <div
-            class={[
-              'badge bg-tertiary-50-950',
-              gauges.activeGaugeId === id && 'text-tertiary-contrast-50-950',
-            ]}
-          >
-            Beta
-          </div>
-        {/if}
       </button>
     {/each}
   </div>
