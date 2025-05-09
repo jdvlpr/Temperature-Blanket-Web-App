@@ -19,16 +19,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <script>
-  import { dev, version } from '$app/environment';
   import { page } from '$app/state';
   import { gauges, localState, project, weather } from '$lib/state';
-  import {
-    dateToISO8601String,
-    dateToISO8601StringVersion2,
-    getTableData,
-    stringToDate,
-    stringToDateVersion2,
-  } from '$lib/utils';
+  import { getTableData } from '$lib/utils';
   import { ExternalLinkIcon } from '@lucide/svelte';
   import { tick } from 'svelte';
   import ToggleSwitch from './buttons/ToggleSwitch.svelte';
@@ -83,36 +76,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     tick().then(() => {
       updateTable();
     });
-  });
-
-  let diagnostics = $derived({
-    dev,
-    version,
-    pid: +project.timeStampId || 0,
-    details: {
-      href: page.url.href,
-      projectHref: project.url.href,
-      weatherTable: {
-        a_dataDate: weather.data[0].date,
-        b_tableDataDate: tableData[0].date,
-      },
-      dateTest: {
-        a_stringToDate: stringToDate('2025-01-01'),
-        b_stringToDateVersion2: stringToDateVersion2('2025-01-01'),
-        c_dateToISO8601String: {
-          stringToDate: dateToISO8601String(stringToDate('2025-01-01')),
-          stringToDateVersion2: dateToISO8601String(
-            stringToDateVersion2('2025-01-01'),
-          ),
-        },
-        e_dateToISO8601StringVersion2: {
-          stringToDate: dateToISO8601StringVersion2(stringToDate('2025-01-01')),
-          stringToDateVersion2: dateToISO8601StringVersion2(
-            stringToDateVersion2('2025-01-01'),
-          ),
-        },
-      },
-    },
   });
 </script>
 
