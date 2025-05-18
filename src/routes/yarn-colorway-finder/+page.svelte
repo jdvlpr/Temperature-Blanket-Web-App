@@ -624,8 +624,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         {#if affiliate_variant_href}
                           <a
                             aria-label="Buy this yarn colorway"
-                            class="btn-icon hover:preset-tonal"
                             title="Buy this yarn colorway"
+                            class="btn-icon hover:preset-tonal"
                             href={affiliate_variant_href}
                             target="_blank"
                             rel="noopener noreferrer"
@@ -653,6 +653,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
                       <button
                         class="text-left text-lg leading-tight"
+                        aria-label="Copy {name} to clipboard"
+                        title="Copy {name} to clipboard"
                         onclick={() => {
                           window.navigator.clipboard.writeText(name);
                           toast.trigger({
@@ -670,6 +672,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
                       <button
                         class="text-xs select-all"
+                        aria-label="Copy {hex} to clipboard"
+                        title="Copy {hex} to clipboard"
                         onclick={() => {
                           window.navigator.clipboard.writeText(hex);
                           toast.trigger({

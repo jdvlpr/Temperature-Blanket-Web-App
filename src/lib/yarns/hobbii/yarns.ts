@@ -4,6 +4,7 @@ import { yarn as amigo } from './amigo/yarn';
 import { yarn as amigoChunky } from './amigo-chunky/yarn';
 import { yarn as amigoXl } from './amigo-xl/yarn';
 import { yarn as dailyStitchAcrylicXl } from './daily-stitch-acrylic-xl/yarn';
+import { yarn as embroideryYarn } from './embroidery-yarn/yarn';
 import { yarn as friendsCottonEightFour } from './friends-cotton-8-4/yarn';
 import { yarn as friendsCottonEightEight } from './friends-cotton-8-8/yarn';
 import { yarn as friendsCottonSilk } from './friends-cotton-silk/yarn';
@@ -15,6 +16,7 @@ import { yarn as honeyBunny } from './honey-bunny/yarn';
 import { yarn as kindFeather } from './kind-feather/yarn';
 import { yarn as rainbowCottonEightFour } from './rainbow-cotton-8-4/yarn';
 import { yarn as rainbowCottonEightEight } from './rainbow-cotton-8-8/yarn';
+import { yarn as rainbowDeluxeEightFour } from './rainbow-deluxe-8-4/yarn';
 import { yarn as tweedDreams } from './tweed-dreams/yarn';
 import { yarn as twisterSolid } from './twister-solid/yarn';
 import { yarn as udon } from './udon/yarn';
@@ -30,6 +32,7 @@ export const brand: Brand = {
     amigoXl,
     amigo,
     dailyStitchAcrylicXl,
+    embroideryYarn,
     friendsCottonEightFour,
     friendsCottonEightEight,
     friendsCottonSilk,
@@ -41,6 +44,7 @@ export const brand: Brand = {
     kindFeather,
     rainbowCottonEightFour,
     rainbowCottonEightEight,
+    rainbowDeluxeEightFour,
     tweedDreams,
     twisterSolid,
     udon,

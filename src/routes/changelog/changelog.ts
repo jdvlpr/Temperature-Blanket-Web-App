@@ -20,6 +20,22 @@ import { CloudCogIcon, MoonStarIcon, RocketIcon } from '@lucide/svelte';
 
 export const entries: ChangelogItem[] = [
   {
+    date: 'May, 2025',
+    notes: [
+      {
+        icon: ICONS.checkCircle,
+        text: `100 colorways`,
+        title: 'Added New Yarn: Hobbii - Embroidery Yarn',
+      },
+      {
+        icon: ICONS.checkCircle,
+        text: `62 colorways`,
+        title: 'Added New Yarn: Hobbii - Rainbow Deluxe',
+      },
+    ],
+    version: '5.8.0',
+  },
+  {
     date: 'April, 2025',
     notes: [
       {
