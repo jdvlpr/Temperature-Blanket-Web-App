@@ -78,7 +78,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let activeColorIndex: number | null = $state(null);
 
   function getTypeId() {
-    return crypto && typeof crypto.randomUUID === 'function'
+    return browser && crypto && typeof crypto.randomUUID === 'function'
       ? crypto.randomUUID()
       : `${Math.random() * 100}-${Math.random() * 100}-${Math.random() * 100}`;
   }
