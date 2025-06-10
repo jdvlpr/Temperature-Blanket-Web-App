@@ -5,6 +5,8 @@
 .svelte-kit
 .vscode
 .dev
+.wrangler
+dist
 build
 node_modules
 test-results
