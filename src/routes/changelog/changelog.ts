@@ -20,6 +20,22 @@ import { CloudCogIcon, MoonStarIcon, RocketIcon } from '@lucide/svelte';
 
 export const entries: ChangelogItem[] = [
   {
+    date: 'June, 2025',
+    notes: [
+      {
+        icon: ICONS.checkCircle,
+        text: `85 colorways`,
+        title: 'Added New Yarn: Knitting for Olive - Merino',
+      },
+      {
+        icon: ICONS.checkCircle,
+        text: `120 colorways`,
+        title: 'Added New Yarn: Yarnsmiths - Cotton DK',
+      },
+    ],
+    version: '5.9.0',
+  },
+  {
     date: 'May, 2025',
     notes: [
       {
