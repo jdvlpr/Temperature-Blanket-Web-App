@@ -24,6 +24,16 @@ export const entries: ChangelogItem[] = [
     notes: [
       {
         icon: ICONS.checkCircle,
+        text: `108 colorways`,
+        title: 'Added New Yarn: LindeHobby - Cotton 8/8',
+      },
+    ],
+    version: '5.10.0',
+  },
+  {
+    notes: [
+      {
+        icon: ICONS.checkCircle,
         text: `85 colorways`,
         title: 'Added New Yarn: Knitting for Olive - Merino',
       },
@@ -342,7 +352,7 @@ export const entries: ChangelogItem[] = [
       {
         icon: ICONS.checkCircle,
         text: `41 colorways`,
-        title: 'Added Yarn: Lindehobby - Velvet Lux',
+        title: 'Added Yarn: LindeHobby - Velvet Lux',
       },
       {
         icon: ICONS.checkCircle,

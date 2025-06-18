@@ -140,7 +140,7 @@
     <div class="hidden lg:inline-flex"><AppLogo /></div>
   {/snippet}
   {#snippet main()}
-    <main class="max-w-screen-xl px-2 text-left lg:px-0">
+    <main class="mb-[100vh] max-w-screen-xl px-2 text-left lg:px-0">
       {#if dev}
         <h2 class="h2 text-gradient my-2">Input</h2>
 

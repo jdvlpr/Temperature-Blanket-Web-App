@@ -3,7 +3,7 @@ import type { Colorway } from '$lib/types';
 const colorways: Colorway[] = [
   {
     source: {
-      name: 'yarnspirations.com',
+      name: 'lindehobby.fr',
       href: 'https://lindehobby.fr/lindehobby-1999/lindehobby-velvet-lux-p6135',
       accessed: '2025-01-13',
     },
