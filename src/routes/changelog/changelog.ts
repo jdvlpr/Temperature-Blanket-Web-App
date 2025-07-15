@@ -20,6 +20,17 @@ import { CloudCogIcon, MoonStarIcon, RocketIcon } from '@lucide/svelte';
 
 export const entries: ChangelogItem[] = [
   {
+    date: 'July, 2025',
+    notes: [
+      {
+        icon: ICONS.checkCircle,
+        text: `62 colorways`,
+        title: 'Added New Yarn: Circulo - Amigurumi Soft',
+      },
+    ],
+    version: '5.11.0',
+  },
+  {
     date: 'June, 2025',
     notes: [
       {
