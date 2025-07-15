@@ -9,6 +9,7 @@ import { brand as berroco } from './berroco/yarns';
 import { brand as bigTwist } from './big-twist/yarns';
 import { brand as caron } from './caron/yarns';
 import { brand as cascade } from './cascade/yarns';
+import { brand as circulo } from './circulo/yarns';
 import { brand as coopKnits } from './coop-knits/yarns';
 import { brand as dmc } from './dmc/yarns';
 import { brand as drops } from './drops/yarns';
@@ -50,6 +51,7 @@ import { brand as rowan } from './rowan/yarns';
 import { brand as sandnes } from './sandnes/yarns';
 import { brand as schachenmayr } from './schachenmayr/yarns';
 import { brand as scheepjes } from './scheepjes/yarns';
+import { brand as silkCityFibers } from './silk-city-fibers/yarns';
 import { brand as sirdar } from './sirdar/yarns';
 import { brand as skeinz } from './skeinz/yarns';
 import { brand as sourceOfFibre } from './source-of-fibre/yarns';
@@ -64,6 +66,7 @@ import { brand as weLoveYarn } from './we-love-yarn/yarns';
 import { brand as westYorkshireSpinners } from './west-yorkshire-spinners/yarns';
 import { brand as willowYarns } from './willow-yarns/yarns';
 import { brand as yarnAndColors } from './yarn-and-colors/yarns';
+import { brand as yarnalia } from './yarnalia/yarns';
 import { brand as yarnart } from './yarnart/yarns';
 import { brand as yarnsmiths } from './yarnsmiths/yarns';
 
@@ -78,6 +81,7 @@ export const brands: Brand[] = [
   bigTwist,
   caron,
   cascade,
+  circulo,
   coopKnits,
   dmc,
   drops,
@@ -119,6 +123,7 @@ export const brands: Brand[] = [
   sandnes,
   schachenmayr,
   scheepjes,
+  silkCityFibers,
   sirdar,
   skeinz,
   sourceOfFibre,
@@ -133,6 +138,7 @@ export const brands: Brand[] = [
   westYorkshireSpinners,
   willowYarns,
   yarnAndColors,
+  yarnalia,
   yarnart,
   yarnsmiths,
 ];

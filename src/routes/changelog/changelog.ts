@@ -25,7 +25,7 @@ export const entries: ChangelogItem[] = [
       {
         icon: ICONS.checkCircle,
         text: `62 colorways`,
-        title: 'Added New Yarn: Circulo - Amigurumi Soft',
+        title: 'Added New Yarn: Círculo - Amigurumi Soft',
       },
       {
         icon: ICONS.checkCircle,
