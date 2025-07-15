@@ -29,6 +29,11 @@ export const entries: ChangelogItem[] = [
       },
       {
         icon: ICONS.checkCircle,
+        text: `37 colorways`,
+        title: 'Added New Yarn: Knitting for Olive - Pure Silk',
+      },
+      {
+        icon: ICONS.checkCircle,
         text: `93 colorways`,
         title: 'Added New Yarn: Silk City Fibers - Bambu 7',
       },
