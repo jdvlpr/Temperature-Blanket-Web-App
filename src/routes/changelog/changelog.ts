@@ -32,6 +32,11 @@ export const entries: ChangelogItem[] = [
         text: `93 colorways`,
         title: 'Added New Yarn: Silk City Fibers - Bambu 7',
       },
+      {
+        icon: ICONS.checkCircle,
+        text: `12 colorways`,
+        title: 'Added New Yarn: Yarnalia - Marvel',
+      },
     ],
     version: '5.11.0',
   },
