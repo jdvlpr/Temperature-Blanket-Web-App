@@ -27,6 +27,11 @@ export const entries: ChangelogItem[] = [
         text: `62 colorways`,
         title: 'Added New Yarn: Circulo - Amigurumi Soft',
       },
+      {
+        icon: ICONS.checkCircle,
+        text: `93 colorways`,
+        title: 'Added New Yarn: Silk City Fibers - Bambu 7',
+      },
     ],
     version: '5.11.0',
   },
