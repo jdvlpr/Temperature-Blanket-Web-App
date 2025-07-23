@@ -144,7 +144,7 @@
       {#if dev}
         <h2 class="h2 text-gradient my-2">Input</h2>
 
-        <div class="flex max-w-screen-sm flex-col gap-4 px-2">
+        <div class="flex flex-col gap-4 px-2">
           <label class="text-sm"
             >Paste HTML Here
             <textarea

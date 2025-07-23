@@ -24,6 +24,16 @@ export const entries: ChangelogItem[] = [
     notes: [
       {
         icon: ICONS.checkCircle,
+        text: `52 colorways`,
+        title: 'Added New Yarn: King Cole - Cottonsoft DK',
+      },
+      {
+        icon: ICONS.checkCircle,
+        text: `27 colorways`,
+        title: 'Added New Yarn: Sandnes - Duo',
+      },
+      {
+        icon: ICONS.checkCircle,
         text: `26 colorways`,
         title: 'Added New Yarn: The Fibre Co. - Cirro',
       },
