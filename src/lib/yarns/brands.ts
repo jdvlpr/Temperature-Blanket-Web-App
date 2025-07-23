@@ -58,6 +58,7 @@ import { brand as sourceOfFibre } from './source-of-fibre/yarns';
 import { brand as stylecraft } from './stylecraft/yarns';
 import { brand as svartaFaret } from './svarta-faret/yarns';
 import { brand as tessiland } from './tessiland/yarns';
+import { brand as theFibreCo } from './the-fibre-co/yarns';
 import { brand as theWomensInstitute } from './the-womens-institute/yarns';
 import { brand as tricotCafe } from './tricot-cafe/yarns';
 import { brand as tuftingEurope } from './tufting-europe/yarns';
@@ -130,6 +131,7 @@ export const brands: Brand[] = [
   stylecraft,
   svartaFaret,
   tessiland,
+  theFibreCo,
   theWomensInstitute,
   tricotCafe,
   tuftingEurope,

@@ -24,6 +24,16 @@ export const entries: ChangelogItem[] = [
     notes: [
       {
         icon: ICONS.checkCircle,
+        text: `26 colorways`,
+        title: 'Added New Yarn: The Fibre Co. - Cirro',
+      },
+    ],
+    version: '5.12.0',
+  },
+  {
+    notes: [
+      {
+        icon: ICONS.checkCircle,
         text: `62 colorways`,
         title: 'Added New Yarn: Círculo - Amigurumi Soft',
       },
