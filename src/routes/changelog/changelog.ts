@@ -37,6 +37,11 @@ export const entries: ChangelogItem[] = [
         text: `27 colorways`,
         title: 'Added New Yarn: Blue Sky Fibers - Woolstok Light',
       },
+      {
+        icon: ICONS.checkCircle,
+        text: `48 colorways`,
+        title: 'Added New Yarn: Sirdar - Stories',
+      },
     ],
     version: '5.13.0',
   },
