@@ -20,6 +20,17 @@ import { CloudCogIcon, MoonStarIcon, RocketIcon } from '@lucide/svelte';
 
 export const entries: ChangelogItem[] = [
   {
+    date: 'August, 2025',
+    notes: [
+      {
+        icon: ICONS.checkCircle,
+        text: `38 colorways`,
+        title: 'Added New Yarn: Blue Sky Fibers - Organic Cotton Worsted',
+      },
+    ],
+    version: '5.13.0',
+  },
+  {
     date: 'July, 2025',
     notes: [
       {

@@ -7,6 +7,7 @@ import { brand as bendigoWoolenMills } from './bendigo-woollen-mills/yarns';
 import { brand as bernat } from './bernat/yarns';
 import { brand as berroco } from './berroco/yarns';
 import { brand as bigTwist } from './big-twist/yarns';
+import { brand as blueSkyFibers } from './blue-sky-fibers/yarns';
 import { brand as caron } from './caron/yarns';
 import { brand as cascade } from './cascade/yarns';
 import { brand as circulo } from './circulo/yarns';
@@ -81,6 +82,7 @@ export const brands: Brand[] = [
   bernat,
   berroco,
   bigTwist,
+  blueSkyFibers,
   caron,
   cascade,
   circulo,
