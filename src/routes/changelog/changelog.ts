@@ -27,6 +27,11 @@ export const entries: ChangelogItem[] = [
         text: `38 colorways`,
         title: 'Added New Yarn: Blue Sky Fibers - Organic Cotton Worsted',
       },
+      {
+        icon: ICONS.checkCircle,
+        text: `30 colorways`,
+        title: 'Added New Yarn: Blue Sky Fibers - Sweater',
+      },
     ],
     version: '5.13.0',
   },
