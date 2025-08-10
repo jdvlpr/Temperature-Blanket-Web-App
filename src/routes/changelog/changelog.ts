@@ -24,6 +24,16 @@ export const entries: ChangelogItem[] = [
     notes: [
       {
         icon: ICONS.checkCircle,
+        text: `34 colorways`,
+        title: 'Added New Yarn: Hobbii - Baby Cotton Organic',
+      },
+    ],
+    version: '5.14.0',
+  },
+  {
+    notes: [
+      {
+        icon: ICONS.checkCircle,
         text: `38 colorways`,
         title: 'Added New Yarn: Blue Sky Fibers - Organic Cotton Worsted',
       },
