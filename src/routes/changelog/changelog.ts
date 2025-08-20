@@ -32,6 +32,11 @@ export const entries: ChangelogItem[] = [
         text: `34 colorways`,
         title: 'Added New Yarn: Hobbii - Baby Cotton Organic',
       },
+      {
+        icon: ICONS.checkCircle,
+        text: `21 colorways`,
+        title: 'Added New Yarn: Knitting for Olive - Compatible Cashmere',
+      },
     ],
     version: '5.14.0',
   },
