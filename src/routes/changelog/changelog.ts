@@ -24,6 +24,11 @@ export const entries: ChangelogItem[] = [
     notes: [
       {
         icon: ICONS.checkCircle,
+        text: `63 colorways`,
+        title: 'Added New Yarn: DROPS - Kid Silk',
+      },
+      {
+        icon: ICONS.checkCircle,
         text: `34 colorways`,
         title: 'Added New Yarn: Hobbii - Baby Cotton Organic',
       },

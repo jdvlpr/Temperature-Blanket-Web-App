@@ -5,6 +5,7 @@
   import Expand from '$lib/components/Expand.svelte';
   import Footer from '$lib/components/Footer.svelte';
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
+  import { toast } from '$lib/state';
   import { getTextColor } from '$lib/utils';
   import chroma from 'chroma-js';
   import { onMount } from 'svelte';
@@ -298,6 +299,10 @@
                   window.navigator.clipboard.writeText(
                     JSON.stringify(namesToCopy),
                   );
+                  toast.trigger({
+                    message: 'Copied',
+                    category: 'success',
+                  });
                   console.log(namesToCopy);
                 }}
               >
