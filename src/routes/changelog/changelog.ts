@@ -27,6 +27,11 @@ export const entries: ChangelogItem[] = [
         text: `22 colorways`,
         title: 'Added New Yarn: Kelbourne Woolens - Skipper',
       },
+      {
+        icon: ICONS.checkCircle,
+        text: `28 colorways`,
+        title: 'Added New Yarn: Rowan - Cotton Glacé',
+      },
     ],
     version: '5.15.0',
   },
