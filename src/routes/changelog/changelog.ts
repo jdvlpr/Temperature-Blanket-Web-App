@@ -24,6 +24,16 @@ export const entries: ChangelogItem[] = [
     notes: [
       {
         icon: ICONS.checkCircle,
+        text: `22 colorways`,
+        title: 'Added New Yarn: Kelbourne Woolens - Skipper',
+      },
+    ],
+    version: '5.15.0',
+  },
+  {
+    notes: [
+      {
+        icon: ICONS.checkCircle,
         text: `63 colorways`,
         title: 'Added New Yarn: DROPS - Kid Silk',
       },
