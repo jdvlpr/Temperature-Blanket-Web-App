@@ -24,6 +24,16 @@ export const entries: ChangelogItem[] = [
     notes: [
       {
         icon: ICONS.checkCircle,
+        text: `58 colorways`,
+        title: 'Added New Yarn: Katia - Merino Baby',
+      },
+    ],
+    version: '5.16.0',
+  },
+  {
+    notes: [
+      {
+        icon: ICONS.checkCircle,
         text: `22 colorways`,
         title: 'Added New Yarn: Kelbourne Woolens - Skipper',
       },
