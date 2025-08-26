@@ -24,6 +24,11 @@ export const entries: ChangelogItem[] = [
     notes: [
       {
         icon: ICONS.checkCircle,
+        text: `82 colorways`,
+        title: 'Added New Yarn: Cascade - Pacific',
+      },
+      {
+        icon: ICONS.checkCircle,
         text: `58 colorways`,
         title: 'Added New Yarn: Katia - Merino Baby',
       },
@@ -187,16 +192,6 @@ export const entries: ChangelogItem[] = [
     date: 'April, 2025',
     notes: [
       {
-        icon: ICONS.checkCircle,
-        text: `62 colorways`,
-        title: 'Added New Yarn: Premier - Parfait Chunky',
-      },
-    ],
-    version: '5.7.0',
-  },
-  {
-    notes: [
-      {
         IconComponent: CloudCogIcon,
         instructions: `To see the new settings, press the Weather Source button in the Project Planner. If you notice any issues or have feedback about the new model settings, please <a href="/contact" target="_blank" class="link">contact me</a>.`,
         text: 'Choose a more consistent weather data model when using Open-Meteo as a weather data source. See more details in the <a href="/documentation#weather-sources" class="link" target="_blank">documentation</a>. This is a beta feature—it should prevent historical data from being altered, but it has not been thoroughly tested. An option has also been added to not fill missing data when using Meteostat as a weather source.',
@@ -216,26 +211,6 @@ export const entries: ChangelogItem[] = [
       },
     ],
     version: '5.5.0',
-  },
-  {
-    notes: [
-      {
-        icon: ICONS.checkCircle,
-        text: `30 colorways`,
-        title: 'Added New Yarn: DROPS - Sky',
-      },
-      {
-        icon: ICONS.checkCircle,
-        text: `23 colorways`,
-        title: 'Added New Yarn: 4 Seasons - Flinders Cotton 8 Ply',
-      },
-      {
-        icon: ICONS.checkCircle,
-        text: `37 colorways`,
-        title: 'Added New Yarn: Purl Soho - Good Wool',
-      },
-    ],
-    version: '5.4.0',
   },
   {
     notes: [
@@ -293,21 +268,6 @@ export const entries: ChangelogItem[] = [
   {
     notes: [
       {
-        icon: ICONS.checkCircle,
-        text: `Added 70 colorways`,
-        title: 'Added Yarn: Purl Soho - Linen Quill',
-      },
-      {
-        icon: ICONS.checkCircle,
-        text: `Added 53 colorways`,
-        title: 'Added Yarn: Tufting Europe - New Zealand Wool',
-      },
-    ],
-    version: '5.1.0',
-  },
-  {
-    notes: [
-      {
         IconComponent: RocketIcon,
         instructions:
           "<a href='/blog/2025-03-20-version-5' class='link'>Learn more and read the update announcement.</a>",
@@ -341,57 +301,12 @@ export const entries: ChangelogItem[] = [
     date: 'February, 2025',
     notes: [
       {
-        icon: ICONS.checkCircle,
-        text: `Added 46 colorways`,
-        title: 'Added Yarn: DROPS - Safran',
-      },
-      {
-        icon: ICONS.checkCircle,
-        text: `Added 12 colorways`,
-        title: 'Updated Yarn: Cascade - 220 Superwash',
-      },
-    ],
-    version: '4.21.0',
-  },
-  {
-    notes: [
-      {
-        icon: ICONS.checkCircle,
-        text: `60 colorways`,
-        title: 'Added Yarn: Bendigo Woolen Mills - Classic 8 Ply',
-      },
-    ],
-    version: '4.20.0',
-  },
-  {
-    notes: [
-      {
         icon: ICONS.wrench,
         text: `The Daytime Rows preview image was inaccurately representing the number of daytime and night stitches in each row. This update uses the actual daytime and night stitches values to generate the preview image, ensuring that it accurately reflects the values in the stitches table. Consequently, the apparent line between the daytime and night sections in the preview image may appear more jagged (less of a smooth curve). However, it provides a more precise representation of the final project's appearance. Only the Daytime Rows preview image in the Project Planner is affected by this update; preview images on Project Gallery pages created before this update remain unchanged.`,
         title: 'Fixed Daytime Rows Preview Image',
       },
     ],
     version: '4.19.1',
-  },
-  {
-    notes: [
-      {
-        icon: ICONS.checkCircle,
-        text: `35 colorways`,
-        title: 'Added Yarn: Sandnes - Line',
-      },
-    ],
-    version: '4.19.0',
-  },
-  {
-    notes: [
-      {
-        icon: ICONS.checkCircle,
-        text: `21 colorways`,
-        title: 'Added Yarn: Knit Picks - Woolen Cotton',
-      },
-    ],
-    version: '4.18.0',
   },
   {
     date: 'January, 2025',
@@ -594,26 +509,6 @@ export const entries: ChangelogItem[] = [
     version: '4.9.0',
   },
   {
-    notes: [
-      {
-        icon: ICONS.checkCircle,
-        text: `75 colorways`,
-        title: 'Added Yarn: Hobbii - Friends Cotton 8/8',
-      },
-      {
-        icon: ICONS.checkCircle,
-        text: `22 colorways`,
-        title: 'Added Yarn: Source of Fibre - Dirty DK',
-      },
-      {
-        icon: ICONS.checkCircle,
-        text: `Added 34 new colorways`,
-        title: 'Updated Yarn: Knit Picks - Swish Worsted',
-      },
-    ],
-    version: '4.8.0',
-  },
-  {
     date: 'November, 2024',
     notes: [
       {
@@ -643,31 +538,6 @@ export const entries: ChangelogItem[] = [
       },
     ],
     version: '4.6.0',
-  },
-  {
-    notes: [
-      {
-        icon: ICONS.checkCircle,
-        text: `13 new colorways`,
-        title: 'Added New Yarn Colorways: Caron - One Pound',
-      },
-      {
-        icon: ICONS.checkCircle,
-        text: `50 colorways`,
-        title: 'Added Yarn: Hobbii - Friends Wheel',
-      },
-      {
-        icon: ICONS.checkCircle,
-        text: `50 colorways`,
-        title: 'Added Yarn: Hobbii - Twister Solid',
-      },
-      {
-        icon: ICONS.checkCircle,
-        text: `39 colorways`,
-        title: 'Added Yarn: Hobbii - Winter Glow Solid',
-      },
-    ],
-    version: '4.5.0',
   },
   {
     date: 'September, 2024',
