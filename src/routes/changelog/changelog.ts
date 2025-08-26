@@ -27,6 +27,11 @@ export const entries: ChangelogItem[] = [
         text: `58 colorways`,
         title: 'Added New Yarn: Katia - Merino Baby',
       },
+      {
+        icon: ICONS.checkCircle,
+        text: `31 colorways`,
+        title: 'Added New Yarn: Rowan - Handknit Cotton',
+      },
     ],
     version: '5.16.0',
   },
