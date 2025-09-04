@@ -139,7 +139,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         Select this Source
       </button>
 
-      <div class="mt-4 flex flex-col gap-2 min-md:h-[630px]">
+      <div class="mt-4 flex flex-col gap-2 min-md:h-[730px]">
         <p class="font-bold">Choose a Model</p>
 
         {#each OPEN_METEO_MODELS as { value, title, timespan, resolution, details }}
@@ -249,7 +249,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         Select this Source
       </button>
 
-      <div class="mt-4 min-md:h-[630px]">
+      <div class="mt-4 min-md:h-[730px]">
         <div class="mt-2 flex flex-col gap-1">
           <label class="flex items-center gap-2 pb-1 font-bold">
             <input
