@@ -20,6 +20,17 @@ import { CloudCogIcon, MoonStarIcon, RocketIcon } from '@lucide/svelte';
 
 export const entries: ChangelogItem[] = [
   {
+    date: 'September, 2025',
+    notes: [
+      {
+        icon: ICONS.checkCircle,
+        text: `73 colorways`,
+        title: 'Added New Yarn: Cascade - 220 Sport',
+      },
+    ],
+    version: '5.17.0',
+  },
+  {
     date: 'August, 2025',
     notes: [
       {

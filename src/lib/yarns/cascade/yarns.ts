@@ -1,5 +1,6 @@
 import type { Brand } from '$lib/types';
 import { yarn as twotwozeroSolidsAndHeathers } from './220-solids-and-heathers/yarn';
+import { yarn as twotwozeroSport } from './220-sport/yarn';
 import { yarn as twotwozeroSuperwash } from './220-superwash/yarn';
 import { yarn as twotwozeroSuperwashMerino } from './220-superwash-merino/yarn';
 import { yarn as aegeanTweed } from './aegean-tweed/yarn';
@@ -13,6 +14,7 @@ export const brand: Brand = {
   id: 'cascade',
   yarns: [
     twotwozeroSolidsAndHeathers,
+    twotwozeroSport,
     twotwozeroSuperwash,
     twotwozeroSuperwashMerino,
     aegeanTweed,
