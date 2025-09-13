@@ -24,6 +24,16 @@ export const entries: ChangelogItem[] = [
     notes: [
       {
         icon: ICONS.checkCircle,
+        text: `80 colorways`,
+        title: 'Added New Yarn: Cascade - Noble Cotton',
+      },
+    ],
+    version: '5.18.0',
+  },
+  {
+    notes: [
+      {
+        icon: ICONS.checkCircle,
         text: `73 colorways`,
         title: 'Added New Yarn: Cascade - 220 Sport',
       },

@@ -6,6 +6,7 @@ import { yarn as twotwozeroSuperwashMerino } from './220-superwash-merino/yarn';
 import { yarn as aegeanTweed } from './aegean-tweed/yarn';
 import { yarn as anchorBay } from './anchor-bay/yarn';
 import { yarn as heritage } from './heritage/yarn';
+import { yarn as nobleCotton } from './noble-cotton/yarn';
 import { yarn as pacific } from './pacific/yarn';
 import { yarn as ultraPima } from './ultra-pima/yarn';
 
@@ -20,6 +21,7 @@ export const brand: Brand = {
     aegeanTweed,
     anchorBay,
     heritage,
+    nobleCotton,
     pacific,
     ultraPima,
   ],
