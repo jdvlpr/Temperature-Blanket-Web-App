@@ -24,6 +24,16 @@ export const entries: ChangelogItem[] = [
     notes: [
       {
         icon: ICONS.checkCircle,
+        text: `38 colorways`,
+        title: 'Added New Yarn: DROPS - Brushed Alpaca Silk',
+      },
+    ],
+    version: '5.19.0',
+  },
+  {
+    notes: [
+      {
+        icon: ICONS.checkCircle,
         text: `80 colorways`,
         title: 'Added New Yarn: Cascade - Noble Cotton',
       },
