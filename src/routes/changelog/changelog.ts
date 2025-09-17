@@ -24,6 +24,16 @@ export const entries: ChangelogItem[] = [
     notes: [
       {
         icon: ICONS.checkCircle,
+        text: `1 colorway`,
+        title: 'Added Colorway for DROPS Nepal: Soft Mint',
+      },
+    ],
+    version: '5.20.0',
+  },
+  {
+    notes: [
+      {
+        icon: ICONS.checkCircle,
         text: `38 colorways`,
         title: 'Added New Yarn: DROPS - Brushed Alpaca Silk',
       },
