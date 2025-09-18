@@ -16,11 +16,28 @@
 import { PUBLIC_GITHUB_LINK } from '$env/static/public';
 import { ICONS } from '$lib/constants';
 import type { ChangelogItem } from '$lib/types';
-import { CloudCogIcon, MoonStarIcon, RocketIcon } from '@lucide/svelte';
+import {
+  CloudCogIcon,
+  ImageIcon,
+  MoonStarIcon,
+  RocketIcon,
+} from '@lucide/svelte';
 
 export const entries: ChangelogItem[] = [
   {
     date: 'September, 2025',
+    notes: [
+      {
+        IconComponent: ImageIcon,
+        instructions:
+          'When editing a palette in the <a href="/" class="link">Project Planner</a> or with the <a href="/yarn" class="link">Yarn Palette Creator</a>, select the Export/Import tool, then choose Image.',
+        text: `Export your yarn palette as a PNG image to share on social media, or save it for future reference.`,
+        title: 'New Feature: Save Yarn Palette as Image',
+      },
+    ],
+    version: '5.21.0',
+  },
+  {
     notes: [
       {
         icon: ICONS.checkCircle,
