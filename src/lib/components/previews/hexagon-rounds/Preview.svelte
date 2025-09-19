@@ -52,6 +52,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     let roundInSquare = 1;
     let isWeather = true;
     let daysInSquare = hexagonRoundsPreview.weatherHexagons[squareIndex];
+    let rowIndex = 0;
+    let hexagonsInRow = hexagonRoundsPreview.settings.columns;
+    let hexagonRowIndex = 1;
 
     for (
       let roundsIndex = 0;
@@ -70,13 +73,32 @@ If not, see <https://www.gnu.org/licenses/>. -->
         daysInSquare = hexagonRoundsPreview.weatherHexagons[squareIndex];
         roundInSquare = 1;
         roundSize = hexagonRoundsPreview.STITCH_SIZE / 1.68;
-        if (squareIndex % hexagonRoundsPreview.settings.columns === 0) {
+
+        hexagonsInRow =
+          rowIndex === 0
+            ? hexagonsInRow
+            : rowIndex % 2 === 0
+              ? hexagonRoundsPreview.settings.columns
+              : hexagonRoundsPreview.settings.columns + 1;
+
+        console.log({ squareIndex, hexagonsInRow, rowIndex, hexagonRowIndex });
+
+        if (hexagonRowIndex % hexagonsInRow === 0) {
+          hexagonRowIndex = 1;
           // Start new Row
-          x = hexagonRoundsPreview.hexagonWidth / 2 + layoutBorderOffset;
+          if (rowIndex % 2 === 0) {
+            // New row is even
+            x = layoutBorderOffset;
+          } else {
+            // New row is odd
+            x = hexagonRoundsPreview.hexagonWidth / 2 + layoutBorderOffset;
+          }
           y += hexagonRoundsPreview.hexagonHeight;
+          rowIndex += 1;
         } else {
           // Add to the right
           x += hexagonRoundsPreview.hexagonWidth;
+          hexagonRowIndex += 1;
           // y += hexagonRoundsPreview.hexagonSize / 2;
         }
       }

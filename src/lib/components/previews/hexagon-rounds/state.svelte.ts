@@ -83,16 +83,16 @@ export class HexagonRoundsPreviewClass {
     chunkArray(this.weatherDataInUse, this.settings.roundsPerHexagon),
   );
 
+  // Calculate the width of a hexagon (point to point)
   hexagonWidth = $derived(
     (this.settings.roundsPerHexagon + this.settings.hexagonBorder) *
       this.STITCH_SIZE *
       2,
   );
 
+  // Calculate the height of a hexagon (flat to flat)
   hexagonHeight = $derived(
-    (this.settings.roundsPerHexagon + this.settings.hexagonBorder) *
-      this.STITCH_SIZE *
-      Math.sqrt(3),
+    (this.hexagonWidth * Math.sqrt(3)) / 2, // This gives us the proper height for tessellation
   );
 
   numberOfHexagonsWithWeatherData = $derived(
