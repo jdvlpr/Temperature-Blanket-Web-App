@@ -5,6 +5,7 @@
   import Expand from '$lib/components/Expand.svelte';
   import Footer from '$lib/components/Footer.svelte';
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
+  import { toast } from '$lib/state';
   import { getTextColor } from '$lib/utils';
   import chroma from 'chroma-js';
   import { onMount } from 'svelte';
@@ -140,11 +141,11 @@
     <div class="hidden lg:inline-flex"><AppLogo /></div>
   {/snippet}
   {#snippet main()}
-    <main class="max-w-screen-xl px-2 text-left lg:px-0">
+    <main class="mb-[100vh] max-w-screen-xl px-2 text-left lg:px-0">
       {#if dev}
         <h2 class="h2 text-gradient my-2">Input</h2>
 
-        <div class="flex max-w-screen-sm flex-col gap-4 px-2">
+        <div class="flex flex-col gap-4 px-2">
           <label class="text-sm"
             >Paste HTML Here
             <textarea
@@ -298,6 +299,10 @@
                   window.navigator.clipboard.writeText(
                     JSON.stringify(namesToCopy),
                   );
+                  toast.trigger({
+                    message: 'Copied',
+                    category: 'success',
+                  });
                   console.log(namesToCopy);
                 }}
               >

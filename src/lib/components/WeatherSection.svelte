@@ -448,7 +448,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
       }}
     >
       <span class="border-b-2 border-(--moon)">Moon Phase </span>
-      <span class="badge bg-tertiary-50-950">Beta</span>
     </ToggleWeatherData>
   </div>
 

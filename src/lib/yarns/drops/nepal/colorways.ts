@@ -153,6 +153,10 @@ const colorways: Colorway[] = [
         name: 'Aqua Blue',
       },
       {
+        hex: '#b3c1b7',
+        name: 'Soft Mint',
+      },
+      {
         hex: '#72a8b2',
         name: 'Sea Blue',
       },

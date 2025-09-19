@@ -83,22 +83,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div class="flex w-full flex-col items-center gap-4 p-2 text-left">
-  <p class="text-center">
-    <a href="/changelog#5.6.0" class="link" target="_blank"
-      >See the changelog
-    </a> to learn more about the new settings.
-  </p>
-
   <div>
     <ToggleSwitch
       bind:checked={useSecondary}
       label="Use the other weather source if data is not available from the selected one."
     />
   </div>
-
-  <p class=" text-center text-sm">
-    All weather data is subject to change if the provider updates their models.
-  </p>
 
   <div
     class="relative my-2 grid auto-cols-auto grid-flow-row gap-4 md:grid-flow-col"
@@ -149,7 +139,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         Select this Source
       </button>
 
-      <div class="mt-4 flex flex-col gap-2 min-md:h-[630px]">
+      <div class="mt-4 flex flex-col gap-2 min-md:h-[730px]">
         <p class="font-bold">Choose a Model</p>
 
         {#each OPEN_METEO_MODELS as { value, title, timespan, resolution, details }}
@@ -259,7 +249,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         Select this Source
       </button>
 
-      <div class="mt-4 min-md:h-[630px]">
+      <div class="mt-4 min-md:h-[730px]">
         <div class="mt-2 flex flex-col gap-1">
           <label class="flex items-center gap-2 pb-1 font-bold">
             <input
@@ -320,6 +310,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </p>
     </div>
   </div>
+
+  <p class=" text-center text-sm">
+    All weather data is subject to change if the provider updates their models.
+  </p>
 </div>
 
 <StickyPart position="bottom">
@@ -330,14 +324,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {#if !locations.allValid}
           First, choose a valid location and dates.
         {/if}
-      </p>
-    {/if}
-
-    {#if (sourceName === 'Open-Meteo' && openMeteoModel === 'era5') || openMeteoModel === 'era5_land'}
-      <p class="text-warning-800-200 mx-auto px-2 pt-2 text-center">
-        Beta models are not well tested - you can still use them, and weather
-        data should theoretically not be adjusted over time, but they have not
-        been thoroughly tested on this site.
       </p>
     {/if}
 
