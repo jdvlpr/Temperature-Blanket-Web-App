@@ -99,24 +99,76 @@ export class HexagonRoundsPreviewClass {
     Math.ceil(this.weatherDataInUse.length / this.settings.roundsPerHexagon),
   );
 
-  rows = $derived(
-    Math.ceil(this.numberOfHexagonsWithWeatherData / this.settings.columns),
+  hexagonsPerTwoRows = $derived(this.settings.columns * 2 + 1);
+
+  pairsOfFullRows = $derived(
+    Math.floor(this.numberOfHexagonsWithWeatherData / this.hexagonsPerTwoRows),
   );
 
-  totalHexagons = $derived(this.rows * this.settings.columns);
+  // Helper constants for clarity
+  longRowSize = $derived(this.settings.columns + 1);
+  shortRowSize = $derived(this.settings.columns);
 
-  extraHexagons = $derived(
-    this.totalHexagons - this.numberOfHexagonsWithWeatherData,
+  // The number of hexagons with weather data left over after filling full pairs of rows.
+  remainder = $derived(
+    this.numberOfHexagonsWithWeatherData % this.hexagonsPerTwoRows,
+  );
+
+  // The total number of rows.
+  rows = $derived(
+    this.pairsOfFullRows * 2 +
+      (this.remainder === 0 ? 0 : this.remainder <= this.longRowSize ? 1 : 2),
+  );
+
+  // Determine the size of the very last row based on the total row count.
+  hexagonsInLastRow = $derived(
+    this.rows === 0
+      ? 0
+      : this.rows % 2 === 0
+        ? this.longRowSize
+        : this.shortRowSize,
+  );
+
+  // Find how many hexagons with weather data are actually in that last row.
+  hexagonsInLastRowWithWeatherData = $derived.by(() => {
+    if (this.remainder === 0) {
+      // If no remainder, the last row is a full, short row (unless there's no data).
+      return this.numberOfHexagonsWithWeatherData > 0
+        ? this.hexagonsInLastRow
+        : 0;
+    }
+    // If remainder fits in the first new row (a long one).
+    if (this.remainder <= this.hexagonsInLastRow) {
+      return this.remainder;
+    }
+    // If remainder spills over into the second new row (a short one).
+    return this.remainder - this.hexagonsPerTwoRows + this.hexagonsInLastRow;
+  });
+
+  // The empty hexagons are now a simple subtraction.
+  hexagonsWithNoWeatherData = $derived(
+    this.hexagonsInLastRow - this.hexagonsInLastRowWithWeatherData,
+  );
+
+  // 5. Finally, calculate the total hexagon slots with the corrected logic for odd rows.
+  totalHexagons = $derived(
+    this.rows % 2 === 0
+      ? (this.rows / 2) * this.hexagonsPerTwoRows
+      : Math.floor(this.rows / 2) * this.hexagonsPerTwoRows +
+          this.hexagonsInLastRow,
   );
 
   layoutBorderWidth = $derived(this.settings.layoutBorder * this.STITCH_SIZE);
 
   width = $derived(
-    this.settings.columns * this.hexagonWidth + this.layoutBorderWidth * 2,
+    (this.settings.columns + 1) * this.hexagonWidth +
+      this.layoutBorderWidth * 2,
   );
 
   height = $derived(
-    this.rows * this.hexagonHeight + this.layoutBorderWidth * 2,
+    this.rows * this.hexagonHeight +
+      this.layoutBorderWidth * 2 +
+      this.hexagonHeight / 2,
   );
 
   totalRounds = $derived(
@@ -147,7 +199,7 @@ export class HexagonRoundsPreviewClass {
   // *******************
   // Method for loading settings from a url hash string
   // *******************
-  load(hash) {
+  load(hash: string) {
     const openParen = hash.indexOf('(');
     const closeParen = hash.indexOf(')');
 

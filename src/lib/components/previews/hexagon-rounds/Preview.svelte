@@ -39,6 +39,28 @@ If not, see <https://www.gnu.org/licenses/>. -->
     return points.join(' ');
   }
 
+  $inspect({
+    numberOfHexagonsWithWeatherData:
+      hexagonRoundsPreview.numberOfHexagonsWithWeatherData,
+  });
+  $inspect({
+    hexagonsInLastRowWithWeatherData:
+      hexagonRoundsPreview.hexagonsInLastRowWithWeatherData,
+  });
+  $inspect({
+    hexagonsInLastRow: hexagonRoundsPreview.hexagonsInLastRow,
+  });
+  $inspect({ pairsOfFullRows: hexagonRoundsPreview.pairsOfFullRows });
+  $inspect({
+    remainder: hexagonRoundsPreview.remainder,
+  });
+  $inspect({ hexagonsPerTwoRows: hexagonRoundsPreview.hexagonsPerTwoRows });
+  $inspect({ totalHexagons: hexagonRoundsPreview.totalHexagons });
+  $inspect({ rows: hexagonRoundsPreview.rows });
+  $inspect({
+    hexagonsWithNoWeatherData: hexagonRoundsPreview.hexagonsWithNoWeatherData,
+  });
+
   runPreview(() => {
     const sections = [];
     let squareIndex = 0;
@@ -81,7 +103,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               ? hexagonRoundsPreview.settings.columns
               : hexagonRoundsPreview.settings.columns + 1;
 
-        console.log({ squareIndex, hexagonsInRow, rowIndex, hexagonRowIndex });
+        // console.log({ squareIndex, hexagonsInRow, rowIndex, hexagonRowIndex });
 
         if (hexagonRowIndex % hexagonsInRow === 0) {
           hexagonRowIndex = 1;
@@ -158,7 +180,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     id="preview-svg-image"
     class="mx-auto max-h-[80svh]"
     aria-hidden="true"
-    viewBox="0 0 {width} {height}"
+    viewBox="-{hexagonRoundsPreview.hexagonWidth / 2 +
+      hexagonRoundsPreview.STITCH_SIZE / 2} -{(hexagonRoundsPreview.settings
+      .roundsPerHexagon *
+      hexagonRoundsPreview.STITCH_SIZE) /
+      2 +
+      hexagonRoundsPreview.STITCH_SIZE / 2} {width} {height}"
     bind:this={hexagonRoundsPreview.svg}
     onclick={(e) => {
       if (e.target.tagName !== 'polygon') return;

@@ -47,8 +47,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <div class="flex w-full flex-col italic">
     <p class="w-full">
       {hexagonRoundsPreview.settings.columns}
-      {pluralize('column', hexagonRoundsPreview.settings.columns)} x {hexagonRoundsPreview.rows}
-      {pluralize('row', hexagonRoundsPreview.rows)} = {hexagonRoundsPreview.totalHexagons}
+      {pluralize('column', hexagonRoundsPreview.settings.columns)}, {hexagonRoundsPreview.rows}
+      {pluralize('row', hexagonRoundsPreview.rows)}, {hexagonRoundsPreview.totalHexagons}
       total {pluralize('hexagon', hexagonRoundsPreview.totalHexagons)}
 
       {#if extraRounds}
@@ -56,16 +56,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {pluralize('round', weatherRoundsPerHexagon)} of weather data
       {/if}
 
-      {#if hexagonRoundsPreview.extraHexagons}
-        , {hexagonRoundsPreview.extraHexagons}
-        {pluralize('hexagon', hexagonRoundsPreview.extraHexagons)}
+      {#if hexagonRoundsPreview.hexagonsWithNoWeatherData}
+        , {hexagonRoundsPreview.hexagonsWithNoWeatherData}
+        {pluralize('hexagon', hexagonRoundsPreview.hexagonsWithNoWeatherData)}
         {pluralize(
           { singular: 'has', plural: 'have' },
-          hexagonRoundsPreview.extraHexagons,
+          hexagonRoundsPreview.hexagonsWithNoWeatherData,
         )} no weather data
       {/if}
 
-      {#if extraRounds || hexagonRoundsPreview.extraHexagons}
+      {#if extraRounds || hexagonRoundsPreview.hexagonsWithNoWeatherData}
         <Tooltip tooltipClass="">
           <InfoIcon class="-top[1px] relative inline size-5" />
           {#snippet tooltip()}
