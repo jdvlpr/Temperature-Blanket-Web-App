@@ -39,36 +39,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
     return points.join(' ');
   }
 
-  $inspect({
-    numberOfHexagonsWithWeatherData:
-      hexagonRoundsPreview.numberOfHexagonsWithWeatherData,
-  });
-  $inspect({
-    hexagonsInLastRowWithWeatherData:
-      hexagonRoundsPreview.hexagonsInLastRowWithWeatherData,
-  });
-  $inspect({
-    hexagonsInLastRow: hexagonRoundsPreview.hexagonsInLastRow,
-  });
-  $inspect({ pairsOfFullRows: hexagonRoundsPreview.pairsOfFullRows });
-  $inspect({
-    remainder: hexagonRoundsPreview.remainder,
-  });
-  $inspect({ hexagonsPerTwoRows: hexagonRoundsPreview.hexagonsPerTwoRows });
-  $inspect({ totalHexagons: hexagonRoundsPreview.totalHexagons });
-  $inspect({ rows: hexagonRoundsPreview.rows });
-  $inspect({
-    hexagonsWithNoWeatherData: hexagonRoundsPreview.hexagonsWithNoWeatherData,
-  });
+  $inspect(hexagonRoundsPreview);
 
   runPreview(() => {
     const sections = [];
     let squareIndex = 0;
-    const layoutBorderOffset =
-      hexagonRoundsPreview.layoutBorderWidth -
-      hexagonRoundsPreview.STITCH_SIZE / 2;
-    let x = hexagonRoundsPreview.hexagonWidth / 2 + layoutBorderOffset;
-    let y = hexagonRoundsPreview.hexagonHeight / 2 + layoutBorderOffset;
+    let x = hexagonRoundsPreview.hexagonWidth / 2;
+    let y = hexagonRoundsPreview.hexagonHeight / 2;
     let roundSize = hexagonRoundsPreview.STITCH_SIZE / 1.68;
     let dayIndex = 0;
     let roundInSquare = 1;
@@ -110,10 +87,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
           // Start new Row
           if (rowIndex % 2 === 0) {
             // New row is even
-            x = layoutBorderOffset;
+            x = 0;
           } else {
             // New row is odd
-            x = hexagonRoundsPreview.hexagonWidth / 2 + layoutBorderOffset;
+            x = hexagonRoundsPreview.hexagonWidth / 2;
           }
           y += hexagonRoundsPreview.hexagonHeight;
           rowIndex += 1;
@@ -177,20 +154,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </div>
 {:else}
   <!-- NOTE: The viewBox is a somewhat arbitrary set of values to center the hexagons. 
- For now, I've manually adjusted the viewBox by trial and error o that I think it fits all settings, with some extra padding for good measure.
+ For now, I've manually adjusted the viewBox by trial and error so that I think it fits all settings, with some extra padding on the top and bottom for good measure.
  I'm not sure why the x and y offsets (the first two values) are what they are, but they seem to work for now. 
- I've also added to the height value (the last number) in order to better center the preview image.
- TODO: improve the viewBox values so that the preview exactly fills the SVG. -->
+ TODO: research the viewBox values or polygon coordinates so that the preview exactly fills the SVG. -->
   <svg
     id="preview-svg-image"
     class="mx-auto max-h-[80svh]"
     aria-hidden="true"
-    viewBox="-{hexagonRoundsPreview.hexagonWidth / 2 +
-      hexagonRoundsPreview.STITCH_SIZE /
-        2} -{hexagonRoundsPreview.hexagonHeight / 2 +
-      hexagonRoundsPreview.STITCH_SIZE / 2} {width} {height +
-      hexagonRoundsPreview.hexagonHeight / 2 +
-      hexagonRoundsPreview.STITCH_SIZE / 2}"
+    viewBox="-{hexagonRoundsPreview.hexagonWidth /
+      2} -{hexagonRoundsPreview.hexagonHeight / 4} {width} {height}"
     bind:this={hexagonRoundsPreview.svg}
     onclick={(e) => {
       if (e.target.tagName !== 'polygon') return;
@@ -209,10 +181,5 @@ If not, see <https://www.gnu.org/licenses/>. -->
         data-dayindex={dayIndex}
       />
     {/each}
-    {#if hexagonRoundsPreview.settings.layoutBorder > 0}
-      {#key hexagonRoundsPreview.settings.layoutBorder}
-        <!-- TODO: layout border here-->
-      {/key}
-    {/if}
   </svg>
 {/if}

@@ -47,17 +47,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
 {#if hexagonRoundsPreview.rows}
   <div class="flex w-full flex-col italic">
     <p class="w-full">
-      {hexagonRoundsPreview.settings.columns}
-      {pluralize('column', hexagonRoundsPreview.settings.columns)}, {hexagonRoundsPreview.rows}
-      {pluralize('row', hexagonRoundsPreview.rows)}, {hexagonRoundsPreview.totalHexagons}
-      total {pluralize('hexagon', hexagonRoundsPreview.totalHexagons)}
-
-      {#if extraRounds}
+      {hexagonRoundsPreview.totalHexagons}
+      total {pluralize('hexagon', hexagonRoundsPreview.totalHexagons)} in {hexagonRoundsPreview.rows}
+      {pluralize('row', hexagonRoundsPreview.rows)}{#if extraRounds}
         , 1 hexagon has {extraRounds} of {weatherRoundsPerHexagon}
         {pluralize('round', weatherRoundsPerHexagon)} of weather data
-      {/if}
-
-      {#if hexagonRoundsPreview.hexagonsWithNoWeatherData}
+      {/if}{#if hexagonRoundsPreview.hexagonsWithNoWeatherData}
         , {hexagonRoundsPreview.hexagonsWithNoWeatherData}
         {pluralize('hexagon', hexagonRoundsPreview.hexagonsWithNoWeatherData)}
         {pluralize(
@@ -71,14 +66,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <InfoIcon class="-top[1px] relative inline size-5" />
           {#snippet tooltip()}
             <p class="text-warning-800-200 not-italic">
-              Adjust the <span class="inline font-bold">Layout Settings</span>
+              To potentially avoid rounds with no weather data, adjust the <span
+                class="inline font-bold">Layout Settings</span
+              >
               or
               <span class="inline font-bold">Hexagon Settings</span>
               <ArrowRightIcon class="relative -top-[2px] inline size-4" />
               <span class="inline font-bold"
                 >{capitalizeFirstLetter(weather.grouping)}s Per Hexagon</span
               >
-              below to avoid rounds of no weather data.
+              below.
             </p>
           {/snippet}
         </Tooltip>
@@ -92,43 +89,27 @@ If not, see <https://www.gnu.org/licenses/>. -->
 >
   <p class="text-2xl font-bold">Layout Settings</p>
 
-  <label class="label">
-    Size (width)
-    <select
-      class="select w-fit min-w-[120px]"
-      bind:value={hexagonRoundsPreview.settings.columns}
-    >
-      {#each Array(weather.data.length), i}
-        {@const number = i + 1}
-        <option value={number}>
-          {number}
-          {pluralize('hexagon', number)}
-        </option>
-      {/each}
-    </select>
-  </label>
-
-  <div class="flex flex-col items-start">
-    <p class="font-bold">Border</p>
-    <label class="label max-w-[250px]">
-      Use the Last <select
-        class="select inline w-fit min-w-[60px]"
-        bind:value={hexagonRoundsPreview.settings.layoutBorder}
+  <div class="flex flex-col gap-2">
+    <label class="label">
+      Size (width)
+      <select
+        class="select w-fit min-w-[120px]"
+        bind:value={hexagonRoundsPreview.settings.columns}
       >
         {#each Array(weather.data.length), i}
-          <option value={i}>
-            {i}
+          {@const number = i + 1}
+          <option value={number}>
+            {number}
+            {pluralize('hexagon', number)}
           </option>
         {/each}
       </select>
-      {pluralize(
-        capitalizeFirstLetter(weather.grouping),
-        hexagonRoundsPreview.settings.layoutBorder,
-      )} of Weather Data as {pluralize(
-        { singular: 'a', plural: '' },
-        hexagonRoundsPreview.settings.layoutBorder,
-      )} Border {pluralize('Round', hexagonRoundsPreview.settings.layoutBorder)}
     </label>
+    <p class="max-w-sm text-left text-sm italic">
+      This is the number of hexagons in the top row and subsequent even-numbered
+      rows. Because of the staggered layout, odd-numbered rows will have one
+      more hexagon than the width set above.
+    </p>
   </div>
 </div>
 
