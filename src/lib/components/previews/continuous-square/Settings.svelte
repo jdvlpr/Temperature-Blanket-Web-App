@@ -16,10 +16,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import NumberInputButton from '$lib/components/buttons/NumberInputButton.svelte';
   import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
+  import SpanYarnColorSelectIcon from '$lib/components/SpanYarnColorSelectIcon.svelte';
   import { gauges, modal, weather } from '$lib/state';
   import { capitalizeFirstLetter } from '$lib/utils/other-utils';
   import { pluralize } from '$lib/utils/string-utils';
-  import { PipetteIcon } from '@lucide/svelte';
   import { continuousSquarePreview } from './state.svelte';
 
   let targets = $derived(gauges.allCreated.map((n) => n.targets).flat());
@@ -95,7 +95,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
             },
           })}
       >
-        <PipetteIcon />
+        <SpanYarnColorSelectIcon
+          color={continuousSquarePreview.settings.extrasColor}
+        />
         Color of Additional Stitches
       </button>
     {/if}

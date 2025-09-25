@@ -16,13 +16,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script>
   import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
   import SquareDesigner from '$lib/components/modals/SquareDesigner.svelte';
+  import SpanYarnColorSelectIcon from '$lib/components/SpanYarnColorSelectIcon.svelte';
   import { gauges, modal } from '$lib/state';
   import { pluralize } from '$lib/utils';
-  import {
-    PipetteIcon,
-    SquareDashedIcon,
-    SquareSquareIcon,
-  } from '@lucide/svelte';
+  import { SquareDashedIcon, SquareSquareIcon } from '@lucide/svelte';
   import { squaresPreview } from './state.svelte';
 
   let targets = $derived(gauges.allCreated.map((n) => n.targets).flat());
@@ -148,7 +145,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           },
         })}
     >
-      <PipetteIcon />
+      <SpanYarnColorSelectIcon
+        color={squaresPreview.settings.additionalSquaresColor}
+      />
       Color of Additional Squares
     </button>
   {/if}

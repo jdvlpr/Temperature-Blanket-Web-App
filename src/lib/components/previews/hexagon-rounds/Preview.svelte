@@ -176,16 +176,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <Spinner />
   </div>
 {:else}
+  <!-- NOTE: The viewBox is a somewhat arbitrary set of values to center the hexagons. 
+ For now, I've manually adjusted the viewBox by trial and error o that I think it fits all settings, with some extra padding for good measure.
+ I'm not sure why the x and y offsets (the first two values) are what they are, but they seem to work for now. 
+ I've also added to the height value (the last number) in order to better center the preview image.
+ TODO: improve the viewBox values so that the preview exactly fills the SVG. -->
   <svg
     id="preview-svg-image"
     class="mx-auto max-h-[80svh]"
     aria-hidden="true"
     viewBox="-{hexagonRoundsPreview.hexagonWidth / 2 +
-      hexagonRoundsPreview.STITCH_SIZE / 2} -{(hexagonRoundsPreview.settings
-      .roundsPerHexagon *
-      hexagonRoundsPreview.STITCH_SIZE) /
-      2 +
-      hexagonRoundsPreview.STITCH_SIZE / 2} {width} {height}"
+      hexagonRoundsPreview.STITCH_SIZE /
+        2} -{hexagonRoundsPreview.hexagonHeight / 2 +
+      hexagonRoundsPreview.STITCH_SIZE / 2} {width} {height +
+      hexagonRoundsPreview.hexagonHeight / 2 +
+      hexagonRoundsPreview.STITCH_SIZE / 2}"
     bind:this={hexagonRoundsPreview.svg}
     onclick={(e) => {
       if (e.target.tagName !== 'polygon') return;
@@ -205,7 +210,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
       />
     {/each}
     {#if hexagonRoundsPreview.settings.layoutBorder > 0}
-      <!-- Optionally, add border hexagons here if desired -->
+      {#key hexagonRoundsPreview.settings.layoutBorder}
+        <!-- TODO: layout border here-->
+      {/key}
     {/if}
   </svg>
 {/if}

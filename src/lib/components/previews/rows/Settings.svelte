@@ -18,9 +18,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ToggleSwitchGroup from '$lib/components/buttons/ToggleSwitchGroup.svelte';
   import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
   import { rowsPreview } from '$lib/components/previews/rows/state.svelte';
+  import SpanYarnColorSelectIcon from '$lib/components/SpanYarnColorSelectIcon.svelte';
   import { gauges, modal, weather } from '$lib/state';
   import { capitalizeFirstLetter, pluralize } from '$lib/utils';
-  import { PipetteIcon } from '@lucide/svelte';
 
   let targets = $derived(gauges.allCreated.map((n) => n.targets).flat());
 </script>
@@ -111,7 +111,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           },
         })}
     >
-      <PipetteIcon />
+      <SpanYarnColorSelectIcon color={rowsPreview.settings.extrasColor} />
       Color of Additional Stitches
     </button>
   {/if}

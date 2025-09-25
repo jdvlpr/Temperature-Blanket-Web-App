@@ -15,12 +15,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
+  import SpanYarnColorSelectIcon from '$lib/components/SpanYarnColorSelectIcon.svelte';
+  import Tooltip from '$lib/components/Tooltip.svelte';
   import { gauges, modal, weather } from '$lib/state';
   import { pluralize } from '$lib/utils';
   import { capitalizeFirstLetter } from '$lib/utils/other-utils';
-  import { ArrowRightIcon, InfoIcon, PipetteIcon } from '@lucide/svelte';
+  import { ArrowRightIcon, InfoIcon } from '@lucide/svelte';
   import { hexagonRoundsPreview } from './state.svelte';
-  import Tooltip from '$lib/components/Tooltip.svelte';
 
   let targets = $derived(gauges.allCreated.map((n) => n.targets).flat());
 
@@ -183,7 +184,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
         },
       })}
   >
-    <PipetteIcon />
+    <SpanYarnColorSelectIcon
+      color={hexagonRoundsPreview.settings.additionalRoundsColor}
+    />
     Color of Hexagon Border and Additional Rounds
   </button>
 </div>

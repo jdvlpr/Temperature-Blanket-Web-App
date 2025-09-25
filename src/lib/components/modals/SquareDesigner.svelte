@@ -102,8 +102,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     Each square in your layout will use the following properties.
   </p>
 
-  <div class="flex flex-col items-center justify-center gap-4">
-    <div class="flex w-full flex-wrap justify-center gap-4">
+  <div class="mb-4 flex flex-col items-center justify-center gap-4">
+    <div class="flex w-full flex-wrap items-end justify-center gap-4">
       <label class="label">
         <span>Square Size</span>
         <select
@@ -133,6 +133,32 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {/each}
         </select>
       </label>
+
+      <div class="">
+        <Tooltip onclick={reset} classNames="btn preset-tonal-primary gap-2">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            class="h-6 w-6"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3"
+            />
+          </svg>
+          Reset
+          {#snippet tooltip()}
+            <p>
+              This will replace any secondary colors you have set below with the
+              primary color.
+            </p>
+          {/snippet}
+        </Tooltip>
+      </div>
     </div>
 
     <p class="italic">
@@ -141,7 +167,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </p>
 
     <div
-      class="my-2 grid aspect-square max-h-[500px] max-w-[500px] gap-1"
+      class="my-2 grid aspect-square max-h-[400px] max-w-[400px] gap-1"
       style="grid-template-columns:repeat({squareSize},minmax(1rem,{maxGridItemWidth}px));"
     >
       {#key _secondaryTargets}
@@ -178,27 +204,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {/each}
       {/key}
     </div>
-
-    <Tooltip onclick={reset} classNames="btn hover:preset-tonal gap-2 mb-2">
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke-width="1.5"
-        stroke="currentColor"
-        class="h-6 w-6"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3"
-        />
-      </svg>
-      Reset Sections
-      {#snippet tooltip()}
-        <p>All square sections will be reset to the primary color.</p>
-      {/snippet}
-    </Tooltip>
   </div>
 
   <ToggleSwitch
