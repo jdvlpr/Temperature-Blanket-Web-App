@@ -101,6 +101,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
               class="size-[52px] opacity-40"
               class:!opacity-100={id === previews.activeId}
             />
+            {#if id === 'hxrd'}
+              <span
+                class="bg-primary-50 dark:bg-primary-950 absolute top-0 left-1/2 -translate-x-1/2 rounded px-1 text-xs font-semibold shadow-sm"
+                >New</span
+              >
+            {/if}
           </button>
         {/key}
       {/if}

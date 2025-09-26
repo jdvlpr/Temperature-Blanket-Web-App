@@ -39,8 +39,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     return points.join(' ');
   }
 
-  $inspect(hexagonRoundsPreview);
-
   runPreview(() => {
     const sections = [];
     let squareIndex = 0;
@@ -153,10 +151,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <Spinner />
   </div>
 {:else}
-  <!-- NOTE: The viewBox is a somewhat arbitrary set of values to center the hexagons. 
- For now, I've manually adjusted the viewBox by trial and error so that I think it fits all settings, with some extra padding on the top and bottom for good measure.
- I'm not sure why the x and y offsets (the first two values) are what they are, but they seem to work for now. 
- TODO: research the viewBox values or polygon coordinates so that the preview exactly fills the SVG. -->
   <svg
     id="preview-svg-image"
     class="mx-auto max-h-[80svh]"
