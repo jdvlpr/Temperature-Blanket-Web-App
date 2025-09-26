@@ -59,16 +59,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <span class="font-semibold"
         >{hexagonRoundsPreview.rows}
         {pluralize('row', hexagonRoundsPreview.rows)}</span
-      >{#if extraRounds}
-        , <span class="font-semibold">1</span> hexagon has
+      >{#if extraRounds}, <span class="font-semibold">1</span> hexagon has
         <span class="font-semibold">{extraRounds}</span>
         of
         <span class="font-semibold"
           >{weatherRoundsPerHexagon}
           {pluralize('round', weatherRoundsPerHexagon)}
         </span> of weather data
-      {/if}{#if hexagonRoundsPreview.hexagonsWithNoWeatherData}
-        , and <span class="font-semibold"
+      {/if}{#if hexagonRoundsPreview.hexagonsWithNoWeatherData}, and <span
+          class="font-semibold"
           >{hexagonRoundsPreview.hexagonsWithNoWeatherData}
           {pluralize(
             'hexagon',
@@ -79,9 +78,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           { singular: 'has', plural: 'have' },
           hexagonRoundsPreview.hexagonsWithNoWeatherData,
         )} no weather data
-      {/if}
-
-      {#if extraRounds || hexagonRoundsPreview.hexagonsWithNoWeatherData}
+      {/if}{#if extraRounds || hexagonRoundsPreview.hexagonsWithNoWeatherData}
         <Tooltip tooltipClass="">
           <InfoIcon class="-top[1px] relative inline size-5" />
           {#snippet tooltip()}

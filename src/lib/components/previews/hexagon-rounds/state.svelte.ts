@@ -125,14 +125,21 @@ export class HexagonRoundsPreviewClass {
     if (this.remainder < this.hexagonsInLastRow) {
       return this.remainder;
     }
+
     // If remainder spills over into the second new row (a short one).
-    return this.remainder - this.hexagonsPerTwoRows + this.hexagonsInLastRow;
+    const remainder =
+      this.remainder - this.hexagonsPerTwoRows + this.hexagonsInLastRow;
+    if (remainder < 0) return this.longRowSize + remainder;
+    return remainder;
   });
 
   // The empty hexagons are now a simple subtraction.
-  hexagonsWithNoWeatherData = $derived(
-    this.hexagonsInLastRow - this.hexagonsInLastRowWithWeatherData,
-  );
+  hexagonsWithNoWeatherData = $derived.by(() => {
+    const emptyHexagons =
+      this.hexagonsInLastRow - this.hexagonsInLastRowWithWeatherData;
+    if (emptyHexagons === this.longRowSize) return 0;
+    return emptyHexagons;
+  });
 
   // 5. Finally, calculate the total hexagon slots with the corrected logic for odd rows.
   totalHexagons = $derived(
