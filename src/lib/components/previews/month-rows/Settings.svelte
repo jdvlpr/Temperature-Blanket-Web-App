@@ -17,6 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import NumberInputButton from '$lib/components/buttons/NumberInputButton.svelte';
   import ToggleSwitchGroup from '$lib/components/buttons/ToggleSwitchGroup.svelte';
   import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
+  import PreviewInfo from '$lib/components/PreviewInfo.svelte';
   import SpanYarnColorSelectIcon from '$lib/components/SpanYarnColorSelectIcon.svelte';
   import { gauges, modal, weather } from '$lib/state';
   import { pluralize } from '$lib/utils';
@@ -27,22 +28,28 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 {#if monthRowsPreview.details}
-  <div class="w-full">
-    <p class="mx-auto max-w-(--breakpoint-sm)">
-      Rows are grouped by month from <span class="italic"
+  <PreviewInfo previewTitle={monthRowsPreview.name}>
+    {#snippet description()}
+      Rows are grouped by month from <span class="font-semibold"
         >{#if monthRowsPreview.settings?.direction === 'left-to-right'}left to
           right{:else if monthRowsPreview.settings.direction === 'top-to-bottom'}top
           to bottom{/if}</span
       >. Months with fewer days have extra rows added, so that each month
       section has the same number of rows.
-    </p>
-    <p class="mt-2 italic">
-      Each month section has {monthRowsPreview.details.rowsPerMonth} total {pluralize(
-        'row',
-        monthRowsPreview.details.rowsPerMonth,
-      )}.
-    </p>
-  </div>
+    {/snippet}
+    {#snippet details()}
+      There are <span class="font-semibold"
+        >{monthRowsPreview.monthsInData.length} month
+        {pluralize('section', monthRowsPreview.monthsInData.length)}</span
+      >. Each month section has
+      <span class="font-semibold"
+        >{monthRowsPreview.details.rowsPerMonth} total {pluralize(
+          'row',
+          monthRowsPreview.details.rowsPerMonth,
+        )}</span
+      >.
+    {/snippet}
+  </PreviewInfo>
 {/if}
 
 <div

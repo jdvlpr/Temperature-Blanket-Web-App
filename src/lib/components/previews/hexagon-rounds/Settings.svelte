@@ -22,6 +22,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { capitalizeFirstLetter } from '$lib/utils/other-utils';
   import { ArrowRightIcon, InfoIcon } from '@lucide/svelte';
   import { hexagonRoundsPreview } from './state.svelte';
+  import PreviewInfo from '$lib/components/PreviewInfo.svelte';
 
   let targets = $derived(gauges.allCreated.map((n) => n.targets).flat());
 
@@ -42,19 +43,38 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 </script>
 
-<p class="w-full">Each round in a hexagon represents one {weather.grouping}.</p>
+<PreviewInfo previewTitle={hexagonRoundsPreview.name}>
+  {#snippet description()}
+    Each round in a hexagon represents one {weather.grouping}. Hexagons are
+    added from left to right, top to bottom.
+  {/snippet}
 
-{#if hexagonRoundsPreview.rows}
-  <div class="flex w-full flex-col italic">
-    <p class="w-full">
-      {hexagonRoundsPreview.totalHexagons}
-      total {pluralize('hexagon', hexagonRoundsPreview.totalHexagons)} in {hexagonRoundsPreview.rows}
-      {pluralize('row', hexagonRoundsPreview.rows)}{#if extraRounds}
-        , 1 hexagon has {extraRounds} of {weatherRoundsPerHexagon}
-        {pluralize('round', weatherRoundsPerHexagon)} of weather data
+  {#snippet details()}
+    {#if hexagonRoundsPreview.rows}
+      There are <span class="font-semibold"
+        >{hexagonRoundsPreview.totalHexagons}
+        total {pluralize('hexagon', hexagonRoundsPreview.totalHexagons)}</span
+      >
+      in
+      <span class="font-semibold"
+        >{hexagonRoundsPreview.rows}
+        {pluralize('row', hexagonRoundsPreview.rows)}</span
+      >{#if extraRounds}
+        , <span class="font-semibold">1</span> hexagon has
+        <span class="font-semibold">{extraRounds}</span>
+        of
+        <span class="font-semibold"
+          >{weatherRoundsPerHexagon}
+          {pluralize('round', weatherRoundsPerHexagon)}
+        </span> of weather data
       {/if}{#if hexagonRoundsPreview.hexagonsWithNoWeatherData}
-        , {hexagonRoundsPreview.hexagonsWithNoWeatherData}
-        {pluralize('hexagon', hexagonRoundsPreview.hexagonsWithNoWeatherData)}
+        , and <span class="font-semibold"
+          >{hexagonRoundsPreview.hexagonsWithNoWeatherData}
+          {pluralize(
+            'hexagon',
+            hexagonRoundsPreview.hexagonsWithNoWeatherData,
+          )}</span
+        >
         {pluralize(
           { singular: 'has', plural: 'have' },
           hexagonRoundsPreview.hexagonsWithNoWeatherData,
@@ -79,10 +99,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </p>
           {/snippet}
         </Tooltip>
-      {/if}
-    </p>
-  </div>
-{/if}
+      {/if}.
+    {/if}
+  {/snippet}
+</PreviewInfo>
 
 <div
   class="preset-outlined-surface-300-700 card flex flex-col items-start gap-4 p-4"

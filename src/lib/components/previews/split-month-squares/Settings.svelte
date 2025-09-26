@@ -16,6 +16,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import NumberInputButton from '$lib/components/buttons/NumberInputButton.svelte';
   import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
+  import PreviewInfo from '$lib/components/PreviewInfo.svelte';
   import SpanYarnColorSelectIcon from '$lib/components/SpanYarnColorSelectIcon.svelte';
   import { gauges, modal, weather } from '$lib/state';
   import { pluralize } from '$lib/utils';
@@ -25,19 +26,29 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let targets = $derived(gauges.allCreated.flatMap((n) => n.targets));
 </script>
 
-<p class="w-full">
-  Each square represents one month. Each round in a square represents one day,
-  starting with the first of the month in the center of the square. Each round
-  is split in half to represent two different weather parameters. Months with
-  fewer days have extra rounds added, so that each square has the same number of
-  rounds.
-</p>
-
-{#if splitMonthSquaresPreview.details}
-  <p class="w-full italic">
-    Each square has {splitMonthSquaresPreview.details.roundsPerSquare} total rounds.
-  </p>
-{/if}
+<PreviewInfo previewTitle={splitMonthSquaresPreview.name}>
+  {#snippet description()}
+    Each square represents one month. Months are added from left to right, top
+    to bottom. Each round in a square represents one day, starting with the
+    first of the month in the center of the square. Each round is split in half
+    to represent two different weather parameters. Months with fewer days have
+    extra rounds added, so that each square has the same number of rounds.
+  {/snippet}
+  {#snippet details()}
+    {#if splitMonthSquaresPreview.details}
+      There are <span class="font-semibold"
+        >{splitMonthSquaresPreview.weatherMonths.length} month
+        {pluralize(
+          'square',
+          splitMonthSquaresPreview.weatherMonths.length,
+        )}</span
+      >. Each month square has
+      <span class="font-semibold"
+        >{splitMonthSquaresPreview.details.roundsPerSquare} total rounds</span
+      >.
+    {/if}
+  {/snippet}
+</PreviewInfo>
 
 <div
   class="preset-outlined-surface-300-700 card flex flex-col items-start gap-4 p-4"

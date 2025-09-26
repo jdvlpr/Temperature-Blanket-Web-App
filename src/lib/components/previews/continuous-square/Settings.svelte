@@ -16,6 +16,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import NumberInputButton from '$lib/components/buttons/NumberInputButton.svelte';
   import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
+  import PreviewInfo from '$lib/components/PreviewInfo.svelte';
   import SpanYarnColorSelectIcon from '$lib/components/SpanYarnColorSelectIcon.svelte';
   import { gauges, modal, weather } from '$lib/state';
   import { capitalizeFirstLetter } from '$lib/utils/other-utils';
@@ -26,25 +27,27 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 {#if continuousSquarePreview.details?.rounds}
-  <div class="w-full">
-    <div class="mx-auto max-w-(--breakpoint-sm)">
-      <p class="mb-2">
-        Starting from the center, stitches are added in a clockwise square
-        pattern. Possible crochet patterns: Granny Square, Moss Stitch/Linen
-        Stitch Square.
-      </p>
-      <p class="italic">
-        {continuousSquarePreview.details.rounds} rounds with {continuousSquarePreview
-          .details.countOfAdditionalStitches}
-        additional
-        {pluralize(
+  <PreviewInfo previewTitle={continuousSquarePreview.name}>
+    {#snippet description()}
+      Starting from the center, stitches are added in a clockwise square
+      pattern. Possible crochet patterns: Granny Square, Moss Stitch/Linen
+      Stitch Square.
+    {/snippet}
+    {#snippet details()}
+      There are <span class="font-semibold"
+        >{continuousSquarePreview.details.rounds}
+        rounds</span
+      >
+      with
+      <span class="font-semibold"
+        >{continuousSquarePreview.details.countOfAdditionalStitches} additional {pluralize(
           'stitch',
           continuousSquarePreview.details.countOfAdditionalStitches,
           'es',
-        )}.
-      </p>
-    </div>
-  </div>
+        )}</span
+      >.
+    {/snippet}
+  </PreviewInfo>
 {/if}
 
 <div

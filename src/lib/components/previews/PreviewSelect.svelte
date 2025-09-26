@@ -93,7 +93,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             onclick={() => {
               previews.activeId = id;
             }}
-            title="Preview {name} Design"
+            title="Preview {name} Layout"
           >
             <img
               src={img[theme]}

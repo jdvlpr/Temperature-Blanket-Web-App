@@ -17,10 +17,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
   import SquareDesigner from '$lib/components/modals/SquareDesigner.svelte';
   import SpanYarnColorSelectIcon from '$lib/components/SpanYarnColorSelectIcon.svelte';
-  import { gauges, modal } from '$lib/state';
+  import { gauges, modal, weather } from '$lib/state';
   import { pluralize } from '$lib/utils';
   import { SquareDashedIcon, SquareSquareIcon } from '@lucide/svelte';
   import { squaresPreview } from './state.svelte';
+  import PreviewInfo from '$lib/components/PreviewInfo.svelte';
 
   let targets = $derived(gauges.allCreated.map((n) => n.targets).flat());
 
@@ -35,15 +36,32 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 </script>
 
-{#if squaresPreview.details}
-  <div class="w-full">
-    <p class="italic">
-      {squaresPreview.details.rows} rows with {squaresPreview.details
-        .additionalSquares} additional
-      {pluralize('square', squaresPreview.details.additionalSquares)}.
-    </p>
-  </div>
-{/if}
+<PreviewInfo previewTitle={squaresPreview.name}>
+  {#snippet description()}
+    Each square represents one {weather.grouping}. Squares are added from left
+    to right, top to bottom.
+  {/snippet}
+  {#snippet details()}
+    {#if squaresPreview.details}
+      There are <span class="font-semibold"
+        >{squaresPreview.squaresTotalCount} total {pluralize(
+          'square',
+          squaresPreview.squaresTotalCount,
+        )}</span
+      >
+      in
+      <span class="font-semibold"
+        >{squaresPreview.details.rows}
+        {pluralize('row', squaresPreview.details.rows)}</span
+      >{#if squaresPreview.details.additionalSquares}.
+        <span class="font-semibold"
+          >{squaresPreview.details.additionalSquares}
+          {pluralize('square', squaresPreview.details.additionalSquares)}</span
+        > have no weather data
+      {/if}.
+    {/if}
+  {/snippet}
+</PreviewInfo>
 
 <div
   class="preset-outlined-surface-300-700 card flex flex-col items-start gap-4 p-4"

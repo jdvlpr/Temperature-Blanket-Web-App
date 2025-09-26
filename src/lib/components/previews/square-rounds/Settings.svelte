@@ -22,6 +22,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { capitalizeFirstLetter } from '$lib/utils/other-utils';
   import { ArrowRightIcon, InfoIcon } from '@lucide/svelte';
   import { squareRoundsPreview } from './state.svelte';
+  import PreviewInfo from '$lib/components/PreviewInfo.svelte';
 
   let targets = $derived(gauges.allCreated.map((n) => n.targets).flat());
 
@@ -42,24 +43,38 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 </script>
 
-<p class="w-full">Each round in a square represents one {weather.grouping}.</p>
-
-{#if squareRoundsPreview.rows}
-  <div class="flex w-full flex-col italic">
-    <p class="w-full">
-      {squareRoundsPreview.settings.columns}
-      {pluralize('column', squareRoundsPreview.settings.columns)} x {squareRoundsPreview.rows}
-      {pluralize('row', squareRoundsPreview.rows)} = {squareRoundsPreview.totalSquares}
-      total {pluralize('square', squareRoundsPreview.totalSquares)}
-
+<PreviewInfo previewTitle={squareRoundsPreview.name}>
+  {#snippet description()}
+    Each round in a square represents one {weather.grouping}. Squares are added
+    from left to right, top to bottom.
+  {/snippet}
+  {#snippet details()}
+    {#if squareRoundsPreview.rows}
+      There are <span class="font-semibold"
+        >{squareRoundsPreview.totalSquares}
+        total {pluralize('square', squareRoundsPreview.totalSquares)}</span
+      >
+      (<span class="font-semibold"
+        >{squareRoundsPreview.settings.columns}
+        {pluralize('column', squareRoundsPreview.settings.columns)}</span
+      >
+      and
+      <span class="font-semibold">
+        {pluralize('row', squareRoundsPreview.rows)}</span
+      >)
       {#if extraRounds}
-        , 1 square has {extraRounds} of {weatherRoundsPerSquare}
-        {pluralize('round', weatherRoundsPerSquare)} of weather data
+        , 1 square has <span class="font-semibold">{extraRounds}</span> of
+        <span class="font-semibold"
+          >{weatherRoundsPerSquare}
+          {pluralize('round', weatherRoundsPerSquare)}</span
+        > of weather data
       {/if}
 
       {#if squareRoundsPreview.extraSquares}
-        , {squareRoundsPreview.extraSquares}
-        {pluralize('square', squareRoundsPreview.extraSquares)}
+        , <span class="font-semibold"
+          >{squareRoundsPreview.extraSquares}
+          {pluralize('square', squareRoundsPreview.extraSquares)}</span
+        >
         {pluralize(
           { singular: 'has', plural: 'have' },
           squareRoundsPreview.extraSquares,
@@ -82,10 +97,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </p>
           {/snippet}
         </Tooltip>
-      {/if}
-    </p>
-  </div>
-{/if}
+      {/if}.
+    {/if}
+  {/snippet}
+</PreviewInfo>
 
 <div
   class="preset-outlined-surface-300-700 card flex flex-col items-start gap-4 p-4"

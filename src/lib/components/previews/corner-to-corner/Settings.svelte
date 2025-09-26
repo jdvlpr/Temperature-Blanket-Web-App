@@ -15,6 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import NumberInputButton from '$lib/components/buttons/NumberInputButton.svelte';
+  import PreviewInfo from '$lib/components/PreviewInfo.svelte';
   import { gauges, weather } from '$lib/state';
   import { capitalizeFirstLetter } from '$lib/utils';
   import { cornerToCornerPreview } from './state.svelte';
@@ -22,12 +23,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let targets = $derived(gauges.allCreated.map((n) => n.targets).flat());
 </script>
 
-<div class="w-full">
-  <p class="">
+<PreviewInfo previewTitle={cornerToCornerPreview.name}>
+  {#snippet description()}
     Days are represented by lines added in a back-and-forth pattern starting
     from the bottom right.
-  </p>
-</div>
+  {/snippet}
+</PreviewInfo>
 
 <div
   class="preset-outlined-surface-300-700 card flex flex-col items-start gap-4 p-4"

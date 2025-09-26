@@ -17,6 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import NumberInputButton from '$lib/components/buttons/NumberInputButton.svelte';
   import ToggleSwitchGroup from '$lib/components/buttons/ToggleSwitchGroup.svelte';
   import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
+  import PreviewInfo from '$lib/components/PreviewInfo.svelte';
   import { rowsPreview } from '$lib/components/previews/rows/state.svelte';
   import SpanYarnColorSelectIcon from '$lib/components/SpanYarnColorSelectIcon.svelte';
   import { gauges, modal, weather } from '$lib/state';
@@ -25,32 +26,40 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let targets = $derived(gauges.allCreated.map((n) => n.targets).flat());
 </script>
 
-<div class="w-full italic">
-  <p>
-    {rowsPreview.totalRows}
-    {pluralize('row', rowsPreview.totalRows)}.
+<PreviewInfo previewTitle={rowsPreview.name}>
+  {#snippet description()}
+    Each {weather.grouping} is represented by a row of stitches, added from {#if rowsPreview.countOfAdditionalStitches}
+      left to right and ‎{/if}top to bottom.
+  {/snippet}
+  {#snippet details()}
+    There are <span class="font-semibold"
+      >{rowsPreview.totalRows}
+      {pluralize('row', rowsPreview.totalRows)}</span
+    >{#if rowsPreview.countOfAdditionalStitches}
+      ‎ and <span class="font-semibold">
+        {Number.isInteger(rowsPreview.countOfAdditionalStitches)
+          ? rowsPreview.countOfAdditionalStitches
+          : ` ${Math.round(rowsPreview.countOfAdditionalStitches)}`}
+        additional {pluralize(
+          {
+            singular: 'stitch',
+            plural: 'stitches',
+          },
+          Math.round(rowsPreview.countOfAdditionalStitches),
+        )}
+      </span>
+    {/if}.
+
     {#if rowsPreview.countOfAdditionalStitches}
-      {Number.isInteger(rowsPreview.countOfAdditionalStitches)
-        ? rowsPreview.countOfAdditionalStitches
-        : `~ ${Math.round(rowsPreview.countOfAdditionalStitches)}`}
-      additional {pluralize(
-        {
-          singular: 'stitch',
-          plural: 'stitches',
-        },
-        Math.round(rowsPreview.countOfAdditionalStitches),
-      )}.
+      <span class="mt-1 inline-block text-sm">
+        Stitches are counted using the parameter's absolute value rounded to the
+        nearest non-zero integer. A temperature or height of zero is rounded up
+        to one. Any missing values use the custom stitches per {weather.grouping}
+        value.
+      </span>
     {/if}
-  </p>
-  {#if rowsPreview.countOfAdditionalStitches}
-    <p>
-      Stitches are counted using the parameter's absolute value rounded to the
-      nearest non-zero integer. A temperature or hieght of zero is rounded up to
-      one. Any missing values use the custom stitches per {weather.grouping}
-      value.
-    </p>
-  {/if}
-</div>
+  {/snippet}
+</PreviewInfo>
 
 <div
   class="preset-outlined-surface-300-700 card flex flex-col items-start gap-4 p-4"
