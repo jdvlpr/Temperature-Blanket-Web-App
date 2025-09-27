@@ -175,8 +175,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     id="preview-svg-image"
     class="mx-auto max-h-[80svh]"
     aria-hidden="true"
-    viewBox="-{hexagonRoundsPreview.hexagonWidth /
-      2} -{hexagonRoundsPreview.hexagonHeight / 4} {width} {height}"
+    viewBox="-{hexagonRoundsPreview.hexagonWidth / 2 +
+      hexagonRoundsPreview.STITCH_SIZE /
+        2} -{hexagonRoundsPreview.hexagonHeight / 4 +
+      hexagonRoundsPreview.STITCH_SIZE / 2} {width} {height}"
     bind:this={hexagonRoundsPreview.svg}
     onclick={(e) => {
       if (e.target.tagName !== 'polygon') return;

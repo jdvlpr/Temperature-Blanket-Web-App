@@ -63,8 +63,8 @@ export class HexagonRoundsPreviewClass {
   // *******************
   settings = $state({
     selectedTarget: 'tmax',
-    roundsPerHexagon: 13,
-    columns: 4,
+    roundsPerHexagon: 7,
+    columns: 6,
     additionalRoundsColor: '#f0f3f3',
     hexagonBorder: 0,
     layoutBorder: 2,
@@ -177,7 +177,7 @@ export class HexagonRoundsPreviewClass {
   height = $derived(
     this.rows * this.hexagonHeight +
       this.hexagonHeight / 2 +
-      +this.layoutBorderWidth * 2,
+      this.layoutBorderWidth * 2,
   );
 
   totalRounds = $derived(
