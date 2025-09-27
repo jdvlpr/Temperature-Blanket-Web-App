@@ -41,9 +41,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   runPreview(() => {
     const sections = [];
+    const borderHexagons = [];
     let squareIndex = 0;
-    let x = hexagonRoundsPreview.hexagonWidth / 2;
-    let y = hexagonRoundsPreview.hexagonHeight / 2;
+    const layoutBorderOffset =
+      hexagonRoundsPreview.layoutBorderWidth -
+      hexagonRoundsPreview.STITCH_SIZE / 2;
+    let x = hexagonRoundsPreview.hexagonWidth / 2 + layoutBorderOffset;
+    let y = hexagonRoundsPreview.hexagonHeight / 2 + layoutBorderOffset;
     let roundSize = hexagonRoundsPreview.STITCH_SIZE / 1.68;
     let dayIndex = 0;
     let roundInSquare = 1;
@@ -85,10 +89,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
           // Start new Row
           if (rowIndex % 2 === 0) {
             // New row is even
-            x = 0;
+            x = layoutBorderOffset;
           } else {
             // New row is odd
-            x = hexagonRoundsPreview.hexagonWidth / 2;
+            x = hexagonRoundsPreview.hexagonWidth / 2 + layoutBorderOffset;
           }
           y += hexagonRoundsPreview.hexagonHeight;
           rowIndex += 1;
@@ -136,13 +140,29 @@ If not, see <https://www.gnu.org/licenses/>. -->
           color,
         };
       }
-      roundInSquare += 1;
       sections.push(hex);
+
+      const isLastRoundInHexagon =
+        roundInSquare === hexagonRoundsPreview.settings.roundsPerHexagon;
+
+      const isBorderHexagon =
+        hexagonRowIndex === 1 ||
+        hexagonRowIndex === hexagonsInRow ||
+        rowIndex === 0 ||
+        rowIndex === hexagonRoundsPreview.rows - 1;
+
+      if (isLastRoundInHexagon && isBorderHexagon) {
+        borderHexagons.push(hex);
+      }
+
+      roundInSquare += 1;
       roundSize += hexagonRoundsPreview.STITCH_SIZE * 1.15;
     }
     width = hexagonRoundsPreview.width;
     height = hexagonRoundsPreview.height;
+
     hexagonRoundsPreview.sections = sections;
+    hexagonRoundsPreview.borderHexagons = borderHexagons;
   });
 </script>
 
@@ -165,12 +185,49 @@ If not, see <https://www.gnu.org/licenses/>. -->
       showPreviewImageWeatherDetails(hexagonRoundsPreview.targets);
     }}
   >
+    {#if hexagonRoundsPreview.borderHexagons.length}
+      {#each Array(hexagonRoundsPreview.settings.layoutBorder) as _, i}
+        {@const reverseI = hexagonRoundsPreview.settings.layoutBorder - 1 - i}
+        {#each hexagonRoundsPreview.borderHexagons as { size, x, y }}
+          {@const roundSize =
+            size +
+            (reverseI + 1) * hexagonRoundsPreview.STITCH_SIZE +
+            hexagonRoundsPreview.settings.hexagonBorder *
+              1.15 *
+              hexagonRoundsPreview.STITCH_SIZE}
+
+          {@const dayIndex =
+            weather.data.length -
+            hexagonRoundsPreview.settings.layoutBorder +
+            reverseI}
+
+          {@const value = getWeatherValue({
+            dayIndex,
+            param: hexagonRoundsPreview.settings.selectedTarget,
+          })}
+
+          {@const color = getColorInfo({
+            param: hexagonRoundsPreview.settings.selectedTarget,
+            value,
+          }).hex}
+
+          <polygon
+            points={getHexagonPoints(x, y, roundSize)}
+            stroke={color}
+            stroke-width={hexagonRoundsPreview.STITCH_SIZE}
+            fill="none"
+            data-isweather={true}
+            data-dayindex={dayIndex}
+          />
+        {/each}
+      {/each}
+    {/if}
     {#each hexagonRoundsPreview.sections as { size, color, x, y, isWeather, dayIndex }}
       <polygon
         points={getHexagonPoints(x, y, size)}
         stroke={color}
         stroke-width={hexagonRoundsPreview.STITCH_SIZE}
-        fill={'none'}
+        fill="none"
         data-isweather={isWeather}
         data-dayindex={dayIndex}
       />

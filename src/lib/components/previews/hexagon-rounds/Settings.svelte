@@ -128,6 +128,29 @@ If not, see <https://www.gnu.org/licenses/>. -->
       more hexagon than the width set above.
     </p>
   </div>
+
+  <div class="flex flex-col items-start">
+    <p class="font-bold">Border</p>
+    <label class="label max-w-[250px]">
+      Use the Last <select
+        class="select inline w-fit min-w-[60px]"
+        bind:value={hexagonRoundsPreview.settings.layoutBorder}
+      >
+        {#each Array(weather.data.length), i}
+          <option value={i}>
+            {i}
+          </option>
+        {/each}
+      </select>
+      {pluralize(
+        capitalizeFirstLetter(weather.grouping),
+        hexagonRoundsPreview.settings.layoutBorder,
+      )} of Weather Data as {pluralize(
+        { singular: 'a', plural: '' },
+        hexagonRoundsPreview.settings.layoutBorder,
+      )} Border {pluralize('Round', hexagonRoundsPreview.settings.layoutBorder)}
+    </label>
+  </div>
 </div>
 
 <div

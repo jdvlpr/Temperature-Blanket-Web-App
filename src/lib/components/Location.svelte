@@ -608,7 +608,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     <div class="flex w-full flex-col items-center justify-center gap-2">
       {#if !location.errorMessage && location.days}
-        <p class="text-sm italic">
+        <p class="text-sm">
           {location.days}
           {pluralize('Day', location.days)}
         </p>
@@ -641,7 +641,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {location.errorMessage}
         </p>
       {:else if project.status.loading}
-        <p class="text-sm italic">...</p>
+        <p class="text-sm">...</p>
       {/if}
     </div>
   </div>

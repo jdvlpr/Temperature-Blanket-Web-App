@@ -103,7 +103,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             />
             {#if id === 'hxrd'}
               <span
-                class="bg-primary-50 dark:bg-primary-950 absolute top-0 left-1/2 -translate-x-1/2 rounded px-1 text-xs font-semibold shadow-sm"
+                class="bg-secondary-100 dark:bg-secondary-900 absolute top-0 left-1/2 -translate-x-1/2 rounded px-1 text-xs font-semibold shadow-sm"
                 >New</span
               >
             {/if}

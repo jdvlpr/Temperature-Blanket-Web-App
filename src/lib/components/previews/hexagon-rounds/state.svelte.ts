@@ -17,6 +17,16 @@ export class HexagonRoundsPreviewClass {
           );
         }
       });
+
+      $effect(() => {
+        weather.data.length;
+        // When weather data is loaded or changed, set the default layout border based on 365 or 366 days of weather data, if not the active preview
+        untrack(() => {
+          if (previews.activeId === this.id) return;
+          if (weather.data.length === 365) this.settings.layoutBorder = 1;
+          else if (weather.data.length === 366) this.settings.layoutBorder = 2;
+        });
+      });
     });
   }
 
@@ -44,6 +54,8 @@ export class HexagonRoundsPreviewClass {
 
   sections = $state([]);
 
+  borderHexagons = $state([]);
+
   STITCH_SIZE = 10;
 
   // *******************
@@ -55,13 +67,19 @@ export class HexagonRoundsPreviewClass {
     columns: 4,
     additionalRoundsColor: '#f0f3f3',
     hexagonBorder: 0,
+    layoutBorder: 2,
   });
 
   // *******************
   // Derived properties
   // *******************
 
-  weatherDataInUse = $derived(weather.data);
+  weatherDataInUse = $derived.by(() => {
+    if (this.settings.layoutBorder > 0)
+      return weather.data.slice(0, -this.settings.layoutBorder);
+
+    return weather.data;
+  });
 
   weatherHexagons = $derived(
     chunkArray(this.weatherDataInUse, this.settings.roundsPerHexagon),
@@ -71,13 +89,15 @@ export class HexagonRoundsPreviewClass {
   hexagonWidth = $derived(
     (this.settings.roundsPerHexagon + this.settings.hexagonBorder) *
       this.STITCH_SIZE *
-      2,
+      1.99, // Slightly less than 2 to prevent gaps due to... anti-aliasing?
   );
 
   // Calculate the height of a hexagon (flat to flat)
   hexagonHeight = $derived(
     (this.hexagonWidth * Math.sqrt(3)) / 2, // This gives us the proper height for tessellation
   );
+
+  layoutBorderWidth = $derived(this.settings.layoutBorder * this.STITCH_SIZE);
 
   numberOfHexagonsWithWeatherData = $derived(
     Math.ceil(this.weatherDataInUse.length / this.settings.roundsPerHexagon),
@@ -149,9 +169,16 @@ export class HexagonRoundsPreviewClass {
           this.hexagonsInLastRow,
   );
 
-  width = $derived((this.settings.columns + 1) * this.hexagonWidth);
+  width = $derived(
+    (this.settings.columns + 1) * this.hexagonWidth +
+      this.layoutBorderWidth * 2,
+  );
 
-  height = $derived(this.rows * this.hexagonHeight + this.hexagonHeight / 2);
+  height = $derived(
+    this.rows * this.hexagonHeight +
+      this.hexagonHeight / 2 +
+      +this.layoutBorderWidth * 2,
+  );
 
   totalRounds = $derived(
     this.totalHexagons *
@@ -173,7 +200,7 @@ export class HexagonRoundsPreviewClass {
     hash += `${this.id}=`;
     hash += `${this.settings.selectedTarget}`;
     hash += '(';
-    hash += `${this.settings.roundsPerHexagon}${CHARACTERS_FOR_URL_HASH.separator}${this.settings.columns}${CHARACTERS_FOR_URL_HASH.separator}${this.settings.hexagonBorder}${CHARACTERS_FOR_URL_HASH.separator}${chroma(this.settings.additionalRoundsColor).hex().substring(1)}`;
+    hash += `${this.settings.roundsPerHexagon}${CHARACTERS_FOR_URL_HASH.separator}${this.settings.columns}${CHARACTERS_FOR_URL_HASH.separator}${this.settings.hexagonBorder}${CHARACTERS_FOR_URL_HASH.separator}${this.settings.layoutBorder}${CHARACTERS_FOR_URL_HASH.separator}${chroma(this.settings.additionalRoundsColor).hex().substring(1)}`;
     hash += ')';
     return hash;
   });
@@ -217,8 +244,13 @@ export class HexagonRoundsPreviewClass {
     if (!parts || !parts.length) return;
 
     // Destructure parts into named settings
-    const [roundsPerHexagon, columns, hexagonBorder, additionalRoundsColor] =
-      parts;
+    const [
+      roundsPerHexagon,
+      columns,
+      hexagonBorder,
+      layoutBorder,
+      additionalRoundsColor,
+    ] = parts;
 
     // Try parsing each setting safely
     if (Number.isFinite(+roundsPerHexagon))
@@ -226,7 +258,10 @@ export class HexagonRoundsPreviewClass {
     if (Number.isFinite(+columns)) this.settings.columns = +columns;
     if (Number.isFinite(+hexagonBorder))
       this.settings.hexagonBorder = +hexagonBorder;
+    if (Number.isFinite(+layoutBorder))
+      this.settings.layoutBorder = +layoutBorder;
 
+    // For color, ensure it's a valid string and try to parse it with chroma
     if (
       typeof additionalRoundsColor !== 'undefined' &&
       additionalRoundsColor !== null &&
