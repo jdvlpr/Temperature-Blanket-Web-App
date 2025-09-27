@@ -28,6 +28,17 @@ export const entries: ChangelogItem[] = [
     date: 'September, 2025',
     notes: [
       {
+        icon: ICONS.design,
+        instructions: 'Try it in the Preview tab of the Project Planner',
+        text: `Each round in a hexagon represents one day`,
+        title: 'Added New Preview Layout: Hexagon Rounds',
+      },
+    ],
+    version: '5.22.0',
+  },
+  {
+    notes: [
+      {
         IconComponent: ImageIcon,
         instructions:
           'When editing a palette in the <a href="/" class="link">Project Planner</a> or with the <a href="/yarn" class="link">Yarn Palette Creator</a>, select the Export/Import tool, then choose Image.',
@@ -265,7 +276,7 @@ export const entries: ChangelogItem[] = [
         icon: ICONS.design,
         instructions: 'Try it out in the Preview tab of the Project Planner',
         text: `Each round in a square represents one day`,
-        title: 'Added New Preview Type: Square Rounds',
+        title: 'Added New Preview Layout: Square Rounds',
       },
     ],
     version: '5.5.0',
@@ -317,7 +328,7 @@ export const entries: ChangelogItem[] = [
     notes: [
       {
         icon: ICONS.design,
-        text: 'Option to add borders around each square for the Squares and Calendar preview type',
+        text: 'Option to add borders around each square for the Squares and Calendar preview layouts',
         title: 'Added Feature: Border Around Squares',
       },
     ],
