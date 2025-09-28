@@ -14,7 +14,13 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { locations, localState } from '$lib/state';
-import type { WeatherDay, WeatherSource } from '$lib/types';
+import type {
+  GaugeAttributes,
+  WeatherDay,
+  WeatherParam,
+  WeatherSource,
+  WeatherSourceOptions,
+} from '$lib/types';
 import {
   createWeeksProperty,
   displayNumber,
@@ -165,7 +171,7 @@ class WeatherClass {
   });
 
   params = $derived.by(() => {
-    let tmin, tavg, tmax, prcp, snow, dayt;
+    let tmin, tavg, tmax, prcp, snow, dayt, moon;
 
     if (!this.data)
       return {
@@ -175,6 +181,7 @@ class WeatherClass {
         prcp,
         snow,
         dayt,
+        moon,
       };
 
     tmin = this.data.map((day) => day.tmin[localState.value.units]);
@@ -183,6 +190,7 @@ class WeatherClass {
     prcp = this.data.map((day) => day.prcp[localState.value.units]);
     snow = this.data.map((day) => day.snow[localState.value.units]);
     dayt = this.data.map((day) => day.dayt[localState.value.units]);
+    moon = this.data.map((day) => day.moon);
 
     return {
       tmin,
@@ -191,16 +199,27 @@ class WeatherClass {
       prcp,
       snow,
       dayt,
+      moon,
     };
   });
 
   // ***************
   //    User Settings
   // ***************
-  defaultSource: WeatherSource = $state('Open-Meteo');
 
-  /* In the project URL hash, this is '0' for 'false' or '1' for 'true' */
-  useSecondarySources: boolean = $state(true);
+  source: WeatherSourceOptions = $state({
+    name: 'Open-Meteo',
+    /* In the project URL hash, this is '0' for 'false' or '1' for 'true' */
+    useSecondary: true,
+    settings: {
+      openMeteo: {
+        model: 'auto',
+      },
+      meteoStat: {
+        model: true,
+      },
+    },
+  });
 
   grouping: 'day' | 'week' = $state('day');
 
@@ -220,6 +239,14 @@ class WeatherClass {
 
   isFromLocalStorage: boolean = $state(false);
 
+  pdfOptions: {
+    gauges: GaugeAttributes['id'][];
+    weatherDataParams: WeatherParam['id'][];
+  } = $state({
+    gauges: ['temp'],
+    weatherDataParams: ['tmax', 'tavg', 'tmin'],
+  });
+
   // ***************
   // Table
   // ***************
@@ -237,6 +264,7 @@ class WeatherClass {
       prcp: true,
       snow: true,
       dayt: true,
+      moon: false,
     },
   });
 }

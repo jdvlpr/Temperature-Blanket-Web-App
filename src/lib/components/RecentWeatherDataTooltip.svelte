@@ -25,9 +25,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {#snippet tooltip()}
     <p class="text-surface-950-50 text-base">
       Weather data may adjust as new information arrives. Consider working at
-      least {weather.defaultSource === 'Open-Meteo'
+      least {weather.source.name === 'Open-Meteo'
         ? OPEN_METEO_DELAY_DAYS
-        : weather.defaultSource === 'Meteostat'
+        : weather.source.name === 'Meteostat'
           ? METEOSTAT_DELAY_DAYS
           : 'a few'} days behind to account for possible changes.
     </p>

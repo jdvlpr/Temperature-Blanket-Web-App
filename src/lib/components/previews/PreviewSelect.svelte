@@ -78,14 +78,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </label>
 
   <div
-    class="preview-image-select flex flex-wrap items-center justify-center gap-2"
+    class="preview-image-select my-2 flex flex-wrap items-center justify-center gap-4"
   >
     {#each previews.all as { img, name, id }}
       {#if img}
         {#key theme}
           <button
             class={[
-              'rounded-container flex snap-center flex-col items-center justify-center gap-2 p-4',
+              'relative flex snap-center flex-col items-center justify-center gap-1 rounded p-2',
               id === previews.activeId
                 ? 'bg-primary-300 dark:bg-primary-700 selected shadow-sm'
                 : 'preset-tonal hover:preset-tonal-primary',
@@ -93,14 +93,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
             onclick={() => {
               previews.activeId = id;
             }}
-            title="Preview {name} Design"
+            title="Preview {name} Layout"
           >
             <img
               src={img[theme]}
               alt={name}
-              class="size-[48px] opacity-40"
+              class="size-[52px] opacity-40"
               class:!opacity-100={id === previews.activeId}
             />
+            {#if id === 'hxrd'}
+              <span
+                class="bg-secondary-100 dark:bg-secondary-900 absolute top-0 left-1/2 -translate-x-1/2 rounded px-1 text-xs font-semibold shadow-sm"
+                >New</span
+              >
+            {/if}
           </button>
         {/key}
       {/if}

@@ -21,7 +21,12 @@ import type {
   SavedProject,
   WeatherSourceOptions,
 } from '$lib/types';
-import { dateToISO8601String, numberOfDays, stringToDate } from '$lib/utils';
+import {
+  dateToISO8601String,
+  getMoonPhase,
+  numberOfDays,
+  stringToDate,
+} from '$lib/utils';
 
 export function initializeLocalStorage() {
   // ****************
@@ -135,11 +140,13 @@ export const checkForProjectInLocalStorage = async () => {
   if (!matchedProject) return;
 
   // Set weather source
-  const weatherSource = matchedProject.weatherSource;
+  const weatherSource: WeatherSourceOptions = matchedProject.weatherSource;
   if (weatherSource) {
     const { name, useSecondary } = weatherSource;
-    if (name) weather.defaultSource = name;
-    weather.useSecondarySources = useSecondary;
+    if (name) weather.source.name = name;
+    weather.source.useSecondary = useSecondary;
+    if (weatherSource?.settings)
+      weather.source.settings = weatherSource.settings;
   }
 
   // Set isCustomWeather
@@ -152,9 +159,14 @@ export const checkForProjectInLocalStorage = async () => {
 
   if (!weatherLocalStorage) return;
   const newWeatherUngrouped = weatherLocalStorage.map((n) => {
+    const date = stringToDate(n.date);
+
+    const moon = n.moon || getMoonPhase(date);
+
     return {
       ...n,
-      date: stringToDate(n.date),
+      date,
+      moon,
     };
   });
 
@@ -241,10 +253,7 @@ const createProjectLocalStorageProjectObject = () => {
       };
     }) || [];
 
-  const weatherSource: WeatherSourceOptions = {
-    name: weather.defaultSource,
-    useSecondary: weather.useSecondarySources,
-  };
+  const weatherSource: WeatherSourceOptions = weather.source;
 
   const localProject: SavedProject = {
     date,

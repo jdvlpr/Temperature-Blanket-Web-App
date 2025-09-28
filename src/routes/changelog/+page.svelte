@@ -22,7 +22,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '$env/static/public';
   import AppLogo from '$lib/components/AppLogo.svelte';
   import AppShell from '$lib/components/AppShell.svelte';
-  import Card from '$lib/components/Card.svelte';
   import ChangelogItem from '$lib/components/ChangelogItem.svelte';
   import ToTopButton from '$lib/components/buttons/ToTopButton.svelte';
   import { onMount } from 'svelte';
@@ -61,22 +60,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <meta property="og:type" content="website" />
 </svelte:head>
 
-{#if showScrollToTopButton}
-  <ToTopButton
-    onClick={() =>
-      container.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start',
-      })}
-  />
-{/if}
-
 <AppShell pageName="Changelog">
   {#snippet stickyHeader()}
     <div class="hidden lg:inline-flex"><AppLogo /></div>
   {/snippet}
   {#snippet main()}
-    <main class="max-w-(--breakpoint-md) m-auto text-center mb-6 mt-2 px-2 mx-auto">
+    <main
+      class="m-auto mx-auto mt-2 mb-6 max-w-(--breakpoint-md) px-2 text-center"
+    >
       <div class="" bind:this={container}>
         <p class="text-left">
           See what's new and review past changes from {PUBLIC_BASE_DOMAIN_NAME}.
@@ -88,7 +79,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           > to see the full changelog since version 4.
         </p>
       </div>
-      <div class="flex flex-col gap-2 text-left items-start py-4">
+      <div class="flex flex-col items-start gap-2 py-4 text-left">
         {#each entries as { version, date, notes }}
           <ChangelogItem {version} {date} {notes} />
         {/each}
@@ -96,3 +87,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </main>
   {/snippet}
 </AppShell>
+
+{#if showScrollToTopButton}
+  <ToTopButton
+    onClick={() =>
+      container.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      })}
+  />
+{/if}

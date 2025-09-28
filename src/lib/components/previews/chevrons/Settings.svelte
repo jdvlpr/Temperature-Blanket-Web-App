@@ -16,6 +16,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import NumberInputButton from '$lib/components/buttons/NumberInputButton.svelte';
   import ToggleSwitchGroup from '$lib/components/buttons/ToggleSwitchGroup.svelte';
+  import PreviewInfo from '$lib/components/PreviewInfo.svelte';
   import { gauges, weather } from '$lib/state';
   import { capitalizeFirstLetter } from '$lib/utils/other-utils';
   import { pluralize } from '$lib/utils/string-utils';
@@ -24,13 +25,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let targets = $derived(gauges.allCreated.map((n) => n.targets).flat());
 </script>
 
-{#if chevronsPreview.details.rows}
-  <p class="w-full italic">
-    {chevronsPreview.details.rows} rows. The length of the side of a chevron is {chevronsPreview
-      .settings.chevronSideLength}
-    {pluralize('stitch', chevronsPreview.settings.chevronSideLength, 'es')}.
-  </p>
-{/if}
+<PreviewInfo previewTitle={chevronsPreview.name}>
+  {#snippet description()}
+    Each {weather.grouping} is represented by a row of chevrons, added from top to
+    bottom.
+  {/snippet}
+  {#snippet details()}
+    {#if chevronsPreview.details.rows}
+      There are <span class="font-semibold"
+        >{chevronsPreview.details.rows}
+        {pluralize('row', chevronsPreview.details.rows)}</span
+      >.
+    {/if}
+  {/snippet}
+</PreviewInfo>
 
 <div
   class="preset-outlined-surface-300-700 card flex flex-col items-start gap-4 p-4"

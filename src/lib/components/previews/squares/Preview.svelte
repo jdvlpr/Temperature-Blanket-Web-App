@@ -20,6 +20,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import {
     getColorInfo,
     getSquareSectionTargetIds,
+    getWeatherValue,
     runPreview,
     showPreviewImageWeatherDetails,
   } from '$lib/utils';
@@ -112,10 +113,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
         if (isWeatherSquare) {
           // Get the weather data for the current day
-          const day: WeatherDay = weather.data[dayIndex];
           let targetId: WeatherParam['id'] =
             squareSectionTargetIds[squareSectionIndex];
-          let value = day[targetId][localState.value.units];
+          let value = getWeatherValue({ dayIndex, param: targetId });
 
           // Check if the primary target value is 0 or null, use the primary target as a backup
           if (
@@ -125,7 +125,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               value === null)
           ) {
             targetId = squaresPreview.settings.primaryTarget;
-            value = day[targetId][localState.value.units];
+            value = getWeatherValue({ dayIndex, param: targetId });
           }
 
           // Get the color based on the gauge ID and value

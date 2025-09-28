@@ -20,6 +20,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import {
     displayNumber,
     getColorInfo,
+    getWeatherValue,
     runPreview,
     showPreviewImageWeatherDetails,
   } from '$lib/utils';
@@ -108,7 +109,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             break;
         }
         let param = weatherParams[paramIndex];
-        let value = weather.data[dayIndex][param][localState.value.units];
+        let value = getWeatherValue({ dayIndex, param });
 
         // Get the color based on the gauge ID and value
         const color = getColorInfo({ param, value }).hex;

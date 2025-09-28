@@ -95,10 +95,26 @@ class ProjectClass {
     hash += locations.urlHash;
     hash += gauges.urlHash;
     hash += previews.hash;
-    if (weather.defaultSource === 'Meteostat') hash += '&s=0';
-    else if (weather.defaultSource === 'Open-Meteo') hash += '&s=1';
-    if (!weather.useSecondarySources) hash += '0';
-    else if (weather.useSecondarySources) hash += '1';
+    if (weather.source.name === 'Meteostat') hash += '&s=0';
+    else if (weather.source.name === 'Open-Meteo') hash += '&s=1';
+    if (!weather.source.useSecondary) hash += '0';
+    else if (weather.source.useSecondary) hash += '1';
+    if (
+      weather.source.name === 'Open-Meteo' &&
+      weather.source.settings?.openMeteo.model !== 'auto'
+    ) {
+      // If openMeteo model is anything but 'auto' (the default), set the model id here
+      if (weather.source.settings?.openMeteo.model === 'era5_land') hash += 'l';
+      if (weather.source.settings?.openMeteo.model === 'era5') hash += 'e';
+    }
+
+    if (
+      weather.source.name === 'Meteostat' &&
+      !weather.source.settings?.meteoStat.model
+    )
+      // If Meteostat model setting is not the default `true`, set `0` here
+      hash += '0';
+
     if (weather.grouping === 'week')
       hash += `&w=${weather.monthGroupingStartDay}`; // Set Weather Grouping to Weeks with the starting Day of Week
     hash += localState.value.units === 'metric' ? '&u=m' : '&u=i'; // Units

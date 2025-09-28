@@ -125,7 +125,32 @@ export const handleKeyDown = (ev) => {
 
   const routeId = page.route.id;
 
-  if (ev.key === 't') toggleTheme();
+  if (ev.key === 't') {
+    // Toggle between light, dark, and system themes on 't' key press
+    switch (localState.value.theme.mode) {
+      case 'light':
+        localState.value.theme.mode = 'dark';
+        break;
+      case 'dark':
+        localState.value.theme.mode = 'system';
+        break;
+      case 'system':
+        localState.value.theme.mode = 'light';
+        break;
+      default:
+        localState.value.theme.mode = 'system';
+        break;
+    }
+
+    const themeTitle =
+      localState.value.theme.mode.charAt(0).toUpperCase() +
+      localState.value.theme.mode.slice(1);
+
+    toast.trigger({
+      category: 'success',
+      message: `${themeTitle} theme enabled`,
+    });
+  }
 
   // Shortcuts only for the main Project Planner page
   if (routeId === '/') {
@@ -186,26 +211,5 @@ export const handleKeyDown = (ev) => {
           break;
       }
     }
-  }
-};
-
-// Function to toggle between light, dark, and system themes
-const toggleTheme = () => {
-  switch (localState.value.theme.mode) {
-    case 'light':
-      localState.value.theme.mode = 'dark';
-      break;
-    case 'dark':
-      // setTheme('system');
-      localState.value.theme.mode = 'system';
-      break;
-    case 'system':
-      // setTheme('light');
-      localState.value.theme.mode = 'light';
-      break;
-    default:
-      localState.value.theme.mode = 'system';
-
-      break;
   }
 };

@@ -15,6 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import RecentWeatherDataTooltip from '$lib/components/RecentWeatherDataTooltip.svelte';
+  import { MOON_PHASE_NAMES } from '$lib/constants';
 
   interface Props {
     id: any;
@@ -47,6 +48,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     snow: '#94a3b8',
     dayt: '#facc15',
   };
+
+  let displayValue = id === 'moon' ? MOON_PHASE_NAMES[value] : value;
 </script>
 
 <span class="flex flex-col items-center justify-start p-2">
@@ -56,7 +59,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     class:p-1={isRecentDate}
   >
     <span class="text-xl font-semibold tracking-wide"
-      ><span style="color:{colors[id]}" class="mr-1">{icon}</span>{value}</span
+      ><span style="color:{colors[id]}" class="mr-1">{icon}</span
+      >{displayValue}</span
     >
     {#if units}<span class="">{units}</span>{/if}
     {#if isRecentDate}

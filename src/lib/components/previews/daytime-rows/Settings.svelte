@@ -23,6 +23,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { TableHandler } from '@vincjo/datatables';
   import { slide } from 'svelte/transition';
   import { daytimeRowsPreview } from './state.svelte';
+  import PreviewInfo from '$lib/components/PreviewInfo.svelte';
 
   let targets = $derived(gauges.allCreated.map((n) => n.targets).flat());
 
@@ -82,84 +83,165 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 </script>
 
-<div class="w-full">
-  <div class="mx-auto max-w-(--breakpoint-sm)">
-    <p class="">
-      Each row is split according to the duration of sunlight that {weather.grouping}.
-    </p>
+<PreviewInfo previewTitle={daytimeRowsPreview.name}>
+  {#snippet description()}
+    Each row is split according to the duration of sunlight that {weather.grouping}.
+  {/snippet}
+  {#snippet details()}
+    {#if daytimeRowsPreview.settings.daytimePosition === 'left'}
+      <p>
+        Daytime stitches (left side) = d × <span class="font-semibold"
+          >{daytimeRowsPreview.settings.stitchesPerRow}</span
+        >
+        ∕ 24
+      </p>
+      <p>
+        Night stitches (right side) = <span class="font-semibold"
+          >{daytimeRowsPreview.settings.stitchesPerRow}</span
+        >
+        − Daytime stitches
+      </p>
+    {:else if daytimeRowsPreview.settings.daytimePosition === 'right'}
+      <p>
+        Daytime stitches (right side) = d × <span class="font-semibold"
+          >{daytimeRowsPreview.settings.stitchesPerRow}</span
+        >
+        ∕ 24
+      </p>
+      <p>
+        Night stitches (left side) = <span class="font-semibold"
+          >{daytimeRowsPreview.settings.stitchesPerRow}</span
+        >
+        − Daytime stitches
+      </p>
+    {:else if daytimeRowsPreview.settings.daytimePosition === 'center'}
+      <p>
+        Daytime stitches = d × <span class="font-semibold"
+          >{daytimeRowsPreview.settings.stitchesPerRow}
+        </span>∕ 24
+      </p>
+      <p>
+        Night stitches = <span class="font-semibold"
+          >{daytimeRowsPreview.settings.stitchesPerRow}
+        </span>− Daytime stitches
+      </p>
+      <div class="my-1">
+        <p>
+          Left and Right side stitches = Night stitches / 2 (rounded up if not
+          an integer)
+        </p>
+        <p>
+          Center stitches = Daytime stitches (minus one stitch if the left and
+          right sides' stitches were rounded up)
+        </p>
+      </div>
+    {:else if daytimeRowsPreview.settings.daytimePosition === 'sides'}
+      <p>
+        Daytime stitches = d × <span class="font-semibold"
+          >{daytimeRowsPreview.settings.stitchesPerRow}
+        </span>∕ 24
+      </p>
+      <p>
+        Night stitches = <span class="font-semibold"
+          >{daytimeRowsPreview.settings.stitchesPerRow}
+        </span>− Daytime stitches
+      </p>
+      <div class="my-1">
+        <p>
+          Left and Right side stitches = Daytime stitches / 2 (rounded up if not
+          an integer)
+        </p>
+        <p>
+          Center stitches = Night stitches (minus one stitch if the left and
+          right sides' stitches were rounded up)
+        </p>
+      </div>
+    {/if}
 
-    <div class="my-1 flex flex-col items-center justify-center italic">
-      {#if daytimeRowsPreview.settings.daytimePosition === 'left'}
-        <p>
-          Daytime stitches (left side) = d × {daytimeRowsPreview.settings
-            .stitchesPerRow}
-          ∕ 24
-        </p>
-        <p>
-          Night stitches (right side) = {daytimeRowsPreview.settings
-            .stitchesPerRow}
-          − Daytime stitches
-        </p>
-      {:else if daytimeRowsPreview.settings.daytimePosition === 'right'}
-        <p>
-          Daytime stitches (right side) = d × {daytimeRowsPreview.settings
-            .stitchesPerRow}
-          ∕ 24
-        </p>
-        <p>
-          Night stitches (left side) = {daytimeRowsPreview.settings
-            .stitchesPerRow}
-          − Daytime stitches
-        </p>
-      {:else if daytimeRowsPreview.settings.daytimePosition === 'center'}
-        <p>
-          Daytime stitches = d × {daytimeRowsPreview.settings.stitchesPerRow}
-          ∕ 24
-        </p>
-        <p>
-          Night stitches = {daytimeRowsPreview.settings.stitchesPerRow}
-          − Daytime stitches
-        </p>
-        <div class="my-1">
-          <p>
-            Left and Right side stitches = Night stitches / 2 (rounded up if not
-            an integer)
-          </p>
-          <p>
-            Center stitches = Daytime stitches (minus one stitch if the left and
-            right sides' stitches were rounded up)
-          </p>
-        </div>
-      {:else if daytimeRowsPreview.settings.daytimePosition === 'sides'}
-        <p>
-          Daytime stitches = d × {daytimeRowsPreview.settings.stitchesPerRow}
-          ∕ 24
-        </p>
-        <p>
-          Night stitches = {daytimeRowsPreview.settings.stitchesPerRow}
-          − Daytime stitches
-        </p>
-        <div class="my-1">
-          <p>
-            Left and Right side stitches = Daytime stitches / 2 (rounded up if
-            not an integer)
-          </p>
-          <p>
-            Center stitches = Night stitches (minus one stitch if the left and
-            right sides' stitches were rounded up)
-          </p>
-        </div>
-      {/if}
-    </div>
-
-    <p class="text-sm italic">
+    <span class="mt-1 inline-block text-sm">
       d = Daytime (time from the {weather.grouping}'s sunrise to sunset in
-      hours). {daytimeRowsPreview.settings.stitchesPerRow}
+      hours).
+      <span class="font-semibold"
+        >{daytimeRowsPreview.settings.stitchesPerRow}</span
+      >
       is the total stitches per row. 24 is the number of hours in a day. Stitches
       are rounded to the nearest integer.
-    </p>
-  </div>
-</div>
+    </span>
+
+    <div class="mt-2 w-full">
+      <Expand
+        bind:isExpanded={isTableExpanded}
+        more="{tableIcon} Show Stitches Table"
+        less="{tableIcon} Hide Stitches Table"
+      />
+    </div>
+    {#if isTableExpanded}
+      <div in:slide out:slide class="relative mx-auto w-full max-w-[90vw]">
+        <DataTable {table} search={false}>
+          <table class="w-full border-separate border-spacing-0">
+            <thead>
+              <tr>
+                <th>Row</th>
+                <th
+                  >{weather.groupingHeading}
+                  <span class="text-xs">(YYYY-MM-DD)</span></th
+                >
+                {#if daytimeRowsPreview.settings.daytimePosition === 'left'}
+                  <th
+                    >Daytime stitches <br
+                    />({daytimeRowsPreview.daytimeLabel})</th
+                  >
+                  <th>Night stitches<br />({daytimeRowsPreview.nightLabel})</th>
+                {:else if daytimeRowsPreview.settings.daytimePosition === 'right'}
+                  <th>Night stitches<br />({daytimeRowsPreview.nightLabel})</th>
+                  <th
+                    >Daytime stitches<br
+                    />({daytimeRowsPreview.daytimeLabel})</th
+                  >
+                {:else if daytimeRowsPreview.settings.daytimePosition === 'center'}
+                  <th>Night stitches<br />(left side)</th>
+                  <th>Daytime stitches<br />(center)</th>
+                  <th>Night stitches<br />(right side)</th>
+                {:else if daytimeRowsPreview.settings.daytimePosition === 'sides'}
+                  <th>Daytime stitches<br />(left side)</th>
+                  <th>Night stitches<br />(center)</th>
+                  <th>Daytime stitches<br />(right side)</th>
+                {/if}
+              </tr>
+            </thead>
+            <tbody
+              class="[&>tr:nth-child(odd)]:bg-surface-100 dark:[&>tr:nth-child(odd)]:bg-surface-800"
+            >
+              {#if table.rows}
+                {#each table.rows as row}
+                  <tr>
+                    <td>{row.row}</td>
+                    <td>{row.date}</td>
+                    <td>{row.left}</td>
+                    {#if row.center}
+                      <td>{row.center}</td>
+                    {/if}
+                    <td>{row.right}</td>
+                  </tr>
+                {/each}
+              {/if}
+            </tbody>
+          </table>
+        </DataTable>
+        <div class="mt-4">
+          <button
+            class="btn hover:preset-tonal"
+            onclick={downloadStitchesTableCSV}
+            title="Download CSV File"
+          >
+            <DownloadIcon />
+            Download Stitches Table (CSV File)</button
+          >
+        </div>
+      </div>
+    {/if}
+  {/snippet}
+</PreviewInfo>
 
 <div
   class="preset-outlined-surface-300-700 card flex flex-col items-start gap-4 p-4"
@@ -220,71 +302,3 @@ If not, see <https://www.gnu.org/licenses/>. -->
     icon={`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-ruler size-6"><path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z"/><path d="m14.5 12.5 2-2"/><path d="m11.5 9.5 2-2"/><path d="m8.5 6.5 2-2"/><path d="m17.5 15.5 2-2"/></svg>`}
   />
 </div>
-
-<div class="w-full">
-  <Expand
-    bind:isExpanded={isTableExpanded}
-    more="{tableIcon} Show Stitches Table"
-    less="{tableIcon} Hide Stitches Table"
-  />
-</div>
-{#if isTableExpanded}
-  <div in:slide out:slide class="relative mx-auto w-full max-w-[90vw]">
-    <DataTable {table} search={false}>
-      <table class="w-full border-separate border-spacing-0">
-        <thead>
-          <tr>
-            <th>Row</th>
-            <th
-              >{weather.groupingHeading}
-              <span class="text-xs">(YYYY-MM-DD)</span></th
-            >
-            {#if daytimeRowsPreview.settings.daytimePosition === 'left'}
-              <th>Daytime stitches <br />({daytimeRowsPreview.daytimeLabel})</th
-              >
-              <th>Night stitches<br />({daytimeRowsPreview.nightLabel})</th>
-            {:else if daytimeRowsPreview.settings.daytimePosition === 'right'}
-              <th>Night stitches<br />({daytimeRowsPreview.nightLabel})</th>
-              <th>Daytime stitches<br />({daytimeRowsPreview.daytimeLabel})</th>
-            {:else if daytimeRowsPreview.settings.daytimePosition === 'center'}
-              <th>Night stitches<br />(left side)</th>
-              <th>Daytime stitches<br />(center)</th>
-              <th>Night stitches<br />(right side)</th>
-            {:else if daytimeRowsPreview.settings.daytimePosition === 'sides'}
-              <th>Daytime stitches<br />(left side)</th>
-              <th>Night stitches<br />(center)</th>
-              <th>Daytime stitches<br />(right side)</th>
-            {/if}
-          </tr>
-        </thead>
-        <tbody
-          class="[&>tr:nth-child(odd)]:bg-surface-100 dark:[&>tr:nth-child(odd)]:bg-surface-800"
-        >
-          {#if table.rows}
-            {#each table.rows as row}
-              <tr>
-                <td>{row.row}</td>
-                <td>{row.date}</td>
-                <td>{row.left}</td>
-                {#if row.center}
-                  <td>{row.center}</td>
-                {/if}
-                <td>{row.right}</td>
-              </tr>
-            {/each}
-          {/if}
-        </tbody>
-      </table>
-    </DataTable>
-    <div class="mt-4">
-      <button
-        class="btn hover:preset-tonal"
-        onclick={downloadStitchesTableCSV}
-        title="Download CSV File"
-      >
-        <DownloadIcon />
-        Download Stitches Table (CSV File)</button
-      >
-    </div>
-  </div>
-{/if}

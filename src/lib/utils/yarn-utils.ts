@@ -16,6 +16,7 @@
 import { ALL_COLORWAYS_WITH_AFFILIATE_LINKS } from '$lib/constants';
 import { getColorName } from '$lib/utils';
 import { brands } from '$lib/yarns/brands';
+import { getTextColor } from '$lib/utils/color-utils';
 
 /**
  * [getColorPropertiesFromYarnStringAndHex description]
@@ -125,3 +126,211 @@ export const getColorways = ({
       return colorway.yarnWeightId === selectedYarnWeightId;
     });
 };
+
+type PaletteImageOptions = {
+  colors: Array<{ hex: string; name?: string; brandName?: string }>;
+  includeColorway?: boolean;
+  includeHex?: boolean;
+  includeBrand?: boolean;
+  includeSpacing?: boolean;
+};
+
+export function generatePaletteImage({
+  colors,
+  includeColorway = false,
+  includeHex = false,
+  includeBrand = false,
+  includeSpacing = true,
+}: PaletteImageOptions): string {
+  // Create high-resolution canvas
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+  if (!ctx) throw new Error('Could not get canvas context');
+
+  // Use device pixel ratio for better resolution (default to 2 if not available)
+  const dpr = window.devicePixelRatio || 2;
+
+  // Configuration
+  const padding = 20;
+  const rowHeight = 60;
+  const spacing = includeSpacing ? 12 : 0;
+  const normalFontSize = 14;
+  const smallFontSize = 10;
+  const textPadding = 10;
+
+  // Footer configuration
+  const footerFontSize = 10;
+  const footerMargin = 20;
+  const footerHeight = footerMargin;
+  const minWidth = 325; // Minimum width to accommodate footer text
+
+  // Calculate dimensions
+  const logicalHeight =
+    colors.length * (rowHeight + spacing) +
+    padding * 2 -
+    spacing +
+    footerHeight;
+
+  const logicalWidth = Math.max(minWidth, padding * 2);
+
+  // Setup canvas
+  canvas.width = logicalWidth * dpr;
+  canvas.height = logicalHeight * dpr;
+  ctx.scale(dpr, dpr);
+  canvas.style.width = `${logicalWidth}px`;
+  canvas.style.height = `${logicalHeight}px`;
+
+  // Fill background
+  ctx.fillStyle = '#FFFFFF';
+  ctx.fillRect(0, 0, logicalWidth, logicalHeight);
+
+  // Draw each color row
+  colors.forEach((color, index) => {
+    const y = padding + index * (rowHeight + spacing);
+    const rowWidth = logicalWidth - padding * 2;
+
+    // Draw color background with appropriate rounded corners
+    ctx.fillStyle = color.hex;
+    ctx.beginPath();
+    const radius = 8;
+
+    if (includeSpacing) {
+      // All boxes have rounded corners when spacing is enabled
+      ctx.moveTo(padding, y + radius);
+      ctx.lineTo(padding, y + rowHeight - radius);
+      ctx.quadraticCurveTo(
+        padding,
+        y + rowHeight,
+        padding + radius,
+        y + rowHeight,
+      );
+      ctx.lineTo(padding + rowWidth - radius, y + rowHeight);
+      ctx.quadraticCurveTo(
+        padding + rowWidth,
+        y + rowHeight,
+        padding + rowWidth,
+        y + rowHeight - radius,
+      );
+      ctx.lineTo(padding + rowWidth, y + radius);
+      ctx.quadraticCurveTo(
+        padding + rowWidth,
+        y,
+        padding + rowWidth - radius,
+        y,
+      );
+      ctx.lineTo(padding + radius, y);
+      ctx.quadraticCurveTo(padding, y, padding, y + radius);
+    } else {
+      // When spacing is disabled, only round the top and bottom boxes
+      if (index === 0) {
+        // Top box with rounded top corners
+        ctx.moveTo(padding, y + radius);
+        ctx.lineTo(padding, y + rowHeight);
+        ctx.lineTo(padding + rowWidth, y + rowHeight);
+        ctx.lineTo(padding + rowWidth, y + radius);
+        ctx.quadraticCurveTo(
+          padding + rowWidth,
+          y,
+          padding + rowWidth - radius,
+          y,
+        );
+        ctx.lineTo(padding + radius, y);
+        ctx.quadraticCurveTo(padding, y, padding, y + radius);
+      } else if (index === colors.length - 1) {
+        // Bottom box with rounded bottom corners
+        ctx.moveTo(padding, y);
+        ctx.lineTo(padding, y + rowHeight - radius);
+        ctx.quadraticCurveTo(
+          padding,
+          y + rowHeight,
+          padding + radius,
+          y + rowHeight,
+        );
+        ctx.lineTo(padding + rowWidth - radius, y + rowHeight);
+        ctx.quadraticCurveTo(
+          padding + rowWidth,
+          y + rowHeight,
+          padding + rowWidth,
+          y + rowHeight - radius,
+        );
+        ctx.lineTo(padding + rowWidth, y);
+        ctx.lineTo(padding, y);
+      } else {
+        // Middle boxes with no rounded corners
+        ctx.rect(padding, y, rowWidth, rowHeight);
+      }
+    }
+    ctx.fill();
+
+    // Prepare text with appropriate size based on content
+    const useSmallFont =
+      includeColorway && color.name && (includeBrand || includeHex);
+    const textInfo = [];
+
+    if (includeBrand && color.brandName) {
+      textInfo.push({
+        text: color.brandName,
+        fontSize: useSmallFont ? smallFontSize : normalFontSize,
+      });
+    }
+    if (includeColorway && color.name) {
+      textInfo.push({
+        text: color.name,
+        fontSize: normalFontSize,
+      });
+    }
+    if (includeHex) {
+      textInfo.push({
+        text: color.hex,
+        fontSize: useSmallFont ? smallFontSize : normalFontSize,
+      });
+    }
+
+    // Draw text if we have any
+    if (textInfo.length > 0) {
+      const textColor = getTextColor(color.hex);
+      ctx.fillStyle = textColor;
+      ctx.textAlign = 'left';
+
+      // Calculate total text block height
+      const totalTextHeight = textInfo.reduce(
+        (acc, { fontSize }) => acc + fontSize * 1.2,
+        0,
+      );
+
+      // Center text block vertically
+      let textY = y + (rowHeight - totalTextHeight) / 2;
+
+      // Draw each line of text
+      textInfo.forEach(({ text, fontSize }) => {
+        ctx.font = `${fontSize}px Arial`;
+        textY += fontSize;
+        ctx.fillText(text, padding + textPadding, textY);
+        textY += fontSize * 0.2; // Add small spacing between lines
+      });
+    }
+  });
+
+  // Draw footer text
+  ctx.fillStyle = '#666666';
+  ctx.textAlign = 'center';
+
+  // Split text into regular and bold parts
+  const prefix = 'Create your own yarn palette at ';
+  const urlPart = 'temperature-blanket.com/yarn';
+
+  // Center the footer text
+  const textY = logicalHeight - footerMargin;
+
+  // Draw regular text
+  ctx.font = `${footerFontSize}px Arial`;
+  const prefixWidth = ctx.measureText(prefix).width;
+  ctx.fillText(prefix, logicalWidth / 2 - prefixWidth / 2, textY);
+
+  // Draw URL in bold
+  ctx.font = `bold ${footerFontSize}px Arial`;
+  ctx.fillText(urlPart, logicalWidth / 2 + prefixWidth / 2, textY);
+
+  // Return as high-quality PNG data URL
+  return canvas.toDataURL('image/png', 1.0);
+}

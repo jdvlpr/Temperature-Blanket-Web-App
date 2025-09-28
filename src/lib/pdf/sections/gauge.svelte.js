@@ -52,6 +52,7 @@ const pdfGauge = {
     y = pdfConfig.topMargin + pdfGauge.itemHeight + pdfGauge.linePadding;
     doc.line(x1, y, pdfConfig.leftMargin + x2, y);
   },
+
   createHeaderItems: (doc, items, gauge) => {
     for (let index = 0; index < Object.entries(items).length; index += 1) {
       doc.setFontSize(pdfConfig.font.p);
@@ -59,9 +60,16 @@ const pdfGauge = {
 
       let title = Object.values(items)[index].name;
 
-      if (
-        (title === 'From' && !gauge.rangeOptions.includeFromValue) ||
-        (title === 'To' && !gauge.rangeOptions.includeToValue)
+      if (gauge?.unit.type === 'category' && title === 'From') {
+        doc.text(
+          'Title',
+          pdfConfig.leftMargin + Object.values(items)[index].position,
+          pdfConfig.topMargin + pdfGauge.itemHeight,
+        );
+      } else if (
+        gauge?.unit.type !== 'category' &&
+        ((title === 'From' && !gauge?.rangeOptions?.includeFromValue) ||
+          (title === 'To' && !gauge?.rangeOptions?.includeToValue))
       ) {
         doc.text(
           title,
@@ -75,7 +83,11 @@ const pdfGauge = {
           pdfConfig.topMargin + pdfGauge.itemHeight + 1,
         );
         doc.setFontSize(pdfConfig.font.p);
-      } else {
+      } else if (
+        !gauge ||
+        (gauge?.unit.type === 'category' && title !== 'To') ||
+        gauge?.unit.type !== 'category'
+      ) {
         doc.text(
           title,
           pdfConfig.leftMargin + Object.values(items)[index].position,
@@ -121,9 +133,15 @@ const pdfGauge = {
         0,
         pdfGauge.headerItems.name.position - pdfGauge.linePadding,
         pdfGauge.headerItems.from.position - pdfGauge.linePadding,
-        pdfGauge.headerItems.to.position - pdfGauge.linePadding,
-        pdfColorDetails.positionX - pdfGauge.linePadding,
       ];
+
+      if (gauge?.unit.type !== 'category')
+        vLinePositions.push(
+          pdfGauge.headerItems.to.position - pdfGauge.linePadding,
+        );
+
+      vLinePositions.push(pdfColorDetails.positionX - pdfGauge.linePadding);
+
       vLinePositions.forEach((item) => {
         doc.line(
           pdfConfig.leftMargin + item,
@@ -173,22 +191,38 @@ const pdfGauge = {
         );
         doc.setFontSize(pdfConfig.font.p);
       }
-      // Item From & To Values
-      const from =
-        String(gauge.ranges[i].from) +
-        ' ' +
-        gauge.unit.label[localState.value.units];
-      const to =
-        String(gauge.ranges[i].to) +
-        ' ' +
-        gauge.unit.label[localState.value.units];
+      // Range Values
       doc.setFontSize(pdfConfig.font.p);
-      doc.text(
-        from,
-        pdfConfig.leftMargin + pdfGauge.headerItems.from.position,
-        l,
-      );
-      doc.text(to, pdfConfig.leftMargin + pdfGauge.headerItems.to.position, l);
+
+      if (gauge?.unit.type === 'category') {
+        const label = gauge.ranges[i].label;
+        doc.text(
+          label,
+          pdfConfig.leftMargin + pdfGauge.headerItems.from.position,
+          l,
+        );
+      } else {
+        // Item From & To Values
+        const from =
+          String(gauge.ranges[i].from) +
+          ' ' +
+          gauge.unit.label[localState.value.units];
+        const to =
+          String(gauge.ranges[i].to) +
+          ' ' +
+          gauge.unit.label[localState.value.units];
+        doc.text(
+          from,
+          pdfConfig.leftMargin + pdfGauge.headerItems.from.position,
+          l,
+        );
+        doc.text(
+          to,
+          pdfConfig.leftMargin + pdfGauge.headerItems.to.position,
+          l,
+        );
+      }
+
       // Underline
       doc.line(
         pdfConfig.leftMargin,
@@ -196,6 +230,7 @@ const pdfGauge = {
         pdfConfig.leftMargin + pdfColorDetails.positionX - pdfGauge.linePadding,
         l + 5,
       );
+
       // Color Details
       if (showDaysInRange.value) pdfColorDetails.create(doc, gauge, i, l);
     }

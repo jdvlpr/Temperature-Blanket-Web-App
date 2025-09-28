@@ -33,7 +33,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     secondaryTargets,
     primaryTargetAsBackup,
     onOkay,
-    parent,
   } = $props();
 
   let _secondaryTargets = $state(secondaryTargets);
@@ -45,6 +44,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     prcp: '#818cf8',
     snow: '#94a3b8',
     dayt: '#facc15',
+    moon: '#282828',
   };
 
   function reset() {
@@ -98,12 +98,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div class="p-4">
-  <p class="italic my-2 text-center">
+  <p class="my-2 text-center italic">
     Each square in your layout will use the following properties.
   </p>
 
-  <div class="flex flex-col gap-4 justify-center items-center">
-    <div class="flex flex-wrap gap-4 justify-center w-full">
+  <div class="mb-4 flex flex-col items-center justify-center gap-4">
+    <div class="flex w-full flex-wrap items-end justify-center gap-4">
       <label class="label">
         <span>Square Size</span>
         <select
@@ -124,7 +124,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <label class="label">
         <span>Primary (Background) Color Using the Day's</span>
         <select
-          class="select w-fit truncate min-w-[220px]"
+          class="select w-fit min-w-[220px] truncate"
           id="primary-target"
           bind:value={primaryTarget}
         >
@@ -133,6 +133,32 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {/each}
         </select>
       </label>
+
+      <div class="">
+        <Tooltip onclick={reset} classNames="btn preset-tonal-primary gap-2">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            class="h-6 w-6"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3"
+            />
+          </svg>
+          Reset
+          {#snippet tooltip()}
+            <p>
+              This will replace any secondary colors you have set below with the
+              primary color.
+            </p>
+          {/snippet}
+        </Tooltip>
+      </div>
     </div>
 
     <p class="italic">
@@ -141,13 +167,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </p>
 
     <div
-      class="grid gap-1 max-w-[500px] max-h-[500px] aspect-square my-2"
+      class="my-2 grid aspect-square max-h-[400px] max-w-[400px] gap-1"
       style="grid-template-columns:repeat({squareSize},minmax(1rem,{maxGridItemWidth}px));"
     >
       {#key _secondaryTargets}
         {#each squares as { icon, label, targetId }, index (index)}
           <button
-            class="flex flex-col justify-center items-center select-none outline-hidden cursor-pointer rounded-container shadow-sm aspect-square"
+            class="rounded-container flex aspect-square cursor-pointer flex-col items-center justify-center shadow-sm outline-hidden select-none"
             style="background-color: {colors[targetId]};color:{getTextColor(
               colors[targetId],
             )}"
@@ -168,7 +194,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             }}
           >
             <p
-              class="text-lg sm:text-3xl aspect-square"
+              class="aspect-square text-lg sm:text-3xl"
               class:!text-sm={squareSize > 10}
               class:!text-xs={squareSize > 14}
             >
@@ -178,27 +204,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {/each}
       {/key}
     </div>
-
-    <Tooltip onclick={reset} classNames="btn hover:preset-tonal gap-2 mb-2">
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke-width="1.5"
-        stroke="currentColor"
-        class="w-6 h-6"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3"
-        />
-      </svg>
-      Reset Sections
-      {#snippet tooltip()}
-        <p>All square sections will be reset to the primary color.</p>
-      {/snippet}
-    </Tooltip>
   </div>
 
   <ToggleSwitch

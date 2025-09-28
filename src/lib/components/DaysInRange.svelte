@@ -29,8 +29,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     range: GaugeRange;
     rangeOptions: GaugeSettingsType['rangeOptions'];
     targets: GaugeAttributes['targets'];
+    gaugeUnitType: GaugeAttributes['unit']['type'];
   };
-  let { range, rangeOptions, targets }: Props = $props();
+  let { range, rangeOptions, targets, gaugeUnitType }: Props = $props();
 
   let noDaysInRange = $derived(() =>
     targets.every(
@@ -41,6 +42,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           direction: rangeOptions?.direction,
           includeFromValue: rangeOptions?.includeFromValue,
           includeToValue: rangeOptions?.includeToValue,
+          gaugeUnitType,
         })?.length,
     ),
   );
@@ -51,9 +53,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {@const daysInRange = getDaysInRange({
       id,
       range,
-      direction: rangeOptions.direction,
-      includeFromValue: rangeOptions.includeFromValue,
-      includeToValue: rangeOptions.includeToValue,
+      direction: rangeOptions?.direction,
+      includeFromValue: rangeOptions?.includeFromValue,
+      includeToValue: rangeOptions?.includeToValue,
+      gaugeUnitType,
     })}
     {#if !isModal}
       <button
@@ -100,5 +103,5 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {/if}
   {/each}
 {:else}
-  <p class="italic py-2 px-4">No days in range</p>
+  <p class="px-4 py-2 italic">No days in range</p>
 {/if}

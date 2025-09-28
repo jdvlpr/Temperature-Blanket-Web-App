@@ -13,6 +13,7 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
+import { MOON_PHASE_NAMES } from '$lib/constants';
 import pdfGauges from '$lib/pdf/sections/gauges.svelte';
 import pdfWeatherData from '$lib/pdf/sections/weather-data.svelte';
 import {
@@ -20,8 +21,10 @@ import {
   gauges,
   localState,
   locations,
+  modal,
   previews,
   project,
+  toast,
   weather,
 } from '$lib/state';
 import {
@@ -46,19 +49,26 @@ export const getProjectParametersFromURLHash = (hash) => {
 };
 
 export const downloadPDF = async () => {
-  await import('jspdf')
-    .then((module) => {
-      const JsPDF = module.default;
-      const doc = new JsPDF();
-      pdfGauges.create(doc);
-      pdfWeatherData.create(doc);
-      // Remove blank first page, ugly hack
-      doc.deletePage(1);
-      doc.save(`Temperature-Blanket-${locations.projectFilename}.pdf`);
-    })
-    .catch((error) => {
-      throw new Error(error);
-    });
+  modal.trigger({
+    type: 'choose-weather-params',
+    response: async (response) => {
+      if (response) {
+        await import('jspdf')
+          .then((module) => {
+            const JsPDF = module.default;
+            const doc = new JsPDF();
+            pdfGauges.create(doc);
+            pdfWeatherData.create(doc);
+            // Remove blank first page, ugly hack
+            doc.deletePage(1);
+            doc.save(`Temperature-Blanket-${locations.projectFilename}.pdf`);
+          })
+          .catch((error) => {
+            throw new Error(error);
+          });
+      }
+    },
+  });
 };
 
 export const downloadWeatherCSV = () => {
@@ -67,6 +77,8 @@ export const downloadWeatherCSV = () => {
     gauge.targets.forEach((target) => {
       if (target?.id === 'dayt') {
         labels.push(`${target.label} (h:m)`);
+      } else if (target?.id === 'moon') {
+        labels.push(`${target.label}`);
       } else {
         labels.push(
           `${target.label} (${gauge.unit.label[localState.value.units]})`,
@@ -87,6 +99,8 @@ export const downloadWeatherCSV = () => {
               padStart: true,
             }),
           );
+        } else if (target?.id === 'moon') {
+          gaugeInfo.push(MOON_PHASE_NAMES[day[target?.id]]);
         } else {
           gaugeInfo.push(day[target?.id][_units]);
         }
@@ -195,7 +209,7 @@ export const sendToProjectGallery = async (img) => {
 
     if (response.code === 200) {
       // success
-      message = `<p class="font-bold text-xl my-2">${response.message}</p><p>The project gallery webpage has been created:</p>`;
+      message = `<p class="font-bold text-xl my-2">${response.message}</p><p>The project gallery webpage has been created.</p>`;
       project.gallery.href = response.link;
       project.gallery.title = response.title;
       // reloadRecentGalleryProjects();

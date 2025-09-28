@@ -7,8 +7,10 @@ import { brand as bendigoWoolenMills } from './bendigo-woollen-mills/yarns';
 import { brand as bernat } from './bernat/yarns';
 import { brand as berroco } from './berroco/yarns';
 import { brand as bigTwist } from './big-twist/yarns';
+import { brand as blueSkyFibers } from './blue-sky-fibers/yarns';
 import { brand as caron } from './caron/yarns';
 import { brand as cascade } from './cascade/yarns';
+import { brand as circulo } from './circulo/yarns';
 import { brand as coopKnits } from './coop-knits/yarns';
 import { brand as dmc } from './dmc/yarns';
 import { brand as drops } from './drops/yarns';
@@ -27,6 +29,8 @@ import { brand as hobbyStore } from './hobby-store/yarns';
 import { brand as holst } from './holst/yarns';
 import { brand as iceYarns } from './ice-yarns/yarns';
 import { brand as katia } from './katia/yarns';
+import { brand as kelbourneWoolens } from './kelbourne-woolens/yarns';
+import { brand as kingCole } from './king-cole/yarns';
 import { brand as knitPicks } from './knit-picks/yarns';
 import { brand as knittingForOlive } from './knitting-for-olive/yarns';
 import { brand as lilySugarNCream } from './lily-sugar-n-cream/yarns';
@@ -50,12 +54,14 @@ import { brand as rowan } from './rowan/yarns';
 import { brand as sandnes } from './sandnes/yarns';
 import { brand as schachenmayr } from './schachenmayr/yarns';
 import { brand as scheepjes } from './scheepjes/yarns';
+import { brand as silkCityFibers } from './silk-city-fibers/yarns';
 import { brand as sirdar } from './sirdar/yarns';
 import { brand as skeinz } from './skeinz/yarns';
 import { brand as sourceOfFibre } from './source-of-fibre/yarns';
 import { brand as stylecraft } from './stylecraft/yarns';
 import { brand as svartaFaret } from './svarta-faret/yarns';
 import { brand as tessiland } from './tessiland/yarns';
+import { brand as theFibreCo } from './the-fibre-co/yarns';
 import { brand as theWomensInstitute } from './the-womens-institute/yarns';
 import { brand as tricotCafe } from './tricot-cafe/yarns';
 import { brand as tuftingEurope } from './tufting-europe/yarns';
@@ -64,6 +70,7 @@ import { brand as weLoveYarn } from './we-love-yarn/yarns';
 import { brand as westYorkshireSpinners } from './west-yorkshire-spinners/yarns';
 import { brand as willowYarns } from './willow-yarns/yarns';
 import { brand as yarnAndColors } from './yarn-and-colors/yarns';
+import { brand as yarnalia } from './yarnalia/yarns';
 import { brand as yarnart } from './yarnart/yarns';
 import { brand as yarnsmiths } from './yarnsmiths/yarns';
 
@@ -76,8 +83,10 @@ export const brands: Brand[] = [
   bernat,
   berroco,
   bigTwist,
+  blueSkyFibers,
   caron,
   cascade,
+  circulo,
   coopKnits,
   dmc,
   drops,
@@ -96,6 +105,8 @@ export const brands: Brand[] = [
   holst,
   iceYarns,
   katia,
+  kelbourneWoolens,
+  kingCole,
   knitPicks,
   knittingForOlive,
   lilySugarNCream,
@@ -119,12 +130,14 @@ export const brands: Brand[] = [
   sandnes,
   schachenmayr,
   scheepjes,
+  silkCityFibers,
   sirdar,
   skeinz,
   sourceOfFibre,
   stylecraft,
   svartaFaret,
   tessiland,
+  theFibreCo,
   theWomensInstitute,
   tricotCafe,
   tuftingEurope,
@@ -133,6 +146,7 @@ export const brands: Brand[] = [
   westYorkshireSpinners,
   willowYarns,
   yarnAndColors,
+  yarnalia,
   yarnart,
   yarnsmiths,
 ];

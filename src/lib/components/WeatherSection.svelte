@@ -52,16 +52,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let isAnyWeatherSourceDifferentFromDefault;
   onMount(() => {
     isAnyWeatherSourceDifferentFromDefault = !locations.all?.some(
-      (n) => n.source === weather.defaultSource,
+      (n) => n.source === weather.source.name,
     );
 
-    defaultWeatherSourceCopy = weather.defaultSource;
+    defaultWeatherSourceCopy = weather.source.name;
     if (isAnyWeatherSourceDifferentFromDefault) {
       if (locations.all?.every((n) => n.source === 'Meteostat')) {
-        weather.defaultSource = 'Meteostat';
+        weather.source.name = 'Meteostat';
         wasDefaultWeatherSourceChanged = true;
       } else if (locations.all?.every((n) => n.source === 'Open-Meteo')) {
-        weather.defaultSource = 'Open-Meteo';
+        weather.source.name = 'Open-Meteo';
         wasDefaultWeatherSourceChanged = true;
       }
     }
@@ -169,7 +169,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         class="rounded-container bg-surface-100 dark:bg-surface-900 mb-4 flex w-full max-w-screen-md flex-col items-start justify-start gap-2 p-2 text-left"
       >
         <p class="">
-          Weekly weather grouping makes for a shorter project. <a
+          Weekly weather grouping can result in a shorter project. <a
             href="/documentation/#grouping-weather-data"
             target="_blank"
             class="link"
@@ -207,8 +207,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {#if wasDefaultWeatherSourceChanged}
     <p class="w-full text-sm">
       No weather data was available from the default source ({defaultWeatherSourceCopy}),
-      so another source was used ({weather.defaultSource}) and the Weather
-      Source setting was automatically updated.
+      so another source was used ({weather.source.name}) and the Weather Source
+      setting was automatically updated.
     </p>
   {/if}
 
@@ -226,9 +226,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <TriangleAlertIcon />
           {/snippet}
           {#snippet control()}
-            Weather within the past {weather.defaultSource === 'Open-Meteo'
+            Weather within the past {weather.source.name === 'Open-Meteo'
               ? OPEN_METEO_DELAY_DAYS
-              : weather.defaultSource === 'Meteostat'
+              : weather.source.name === 'Meteostat'
                 ? METEOSTAT_DELAY_DAYS
                 : 'few'} days may be revised as new data comes in.
           {/snippet}
@@ -243,10 +243,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
               >Meteostat</a
             >, and for some locations their weather models may take up to a week
             to incorporate the latest information. Sometimes even older weather
-            data is updated. Consider working at least {weather.defaultSource ===
+            data is updated. Consider working at least {weather.source.name ===
             'Open-Meteo'
               ? OPEN_METEO_DELAY_DAYS
-              : weather.defaultSource === 'Meteostat'
+              : weather.source.name === 'Meteostat'
                 ? METEOSTAT_DELAY_DAYS
                 : 'a few'} days behind to account for possible changes. Sorry for
             any inconvenience.
@@ -431,6 +431,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     >
       <span class="border-b-2 border-(--snow)">Snow</span>
     </ToggleWeatherData>
+
     <ToggleWeatherData
       view={weather.table.showParameters.dayt}
       onclick={() => {
@@ -438,6 +439,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
       }}
     >
       <span class="border-b-2 border-(--dayt)">Daytime</span>
+    </ToggleWeatherData>
+
+    <ToggleWeatherData
+      view={weather.table.showParameters.moon}
+      onclick={() => {
+        weather.table.showParameters.moon = !weather.table.showParameters.moon;
+      }}
+    >
+      <span class="border-b-2 border-(--moon)">Moon Phase </span>
     </ToggleWeatherData>
   </div>
 

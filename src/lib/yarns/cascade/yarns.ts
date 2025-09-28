@@ -1,10 +1,13 @@
 import type { Brand } from '$lib/types';
 import { yarn as twotwozeroSolidsAndHeathers } from './220-solids-and-heathers/yarn';
+import { yarn as twotwozeroSport } from './220-sport/yarn';
 import { yarn as twotwozeroSuperwash } from './220-superwash/yarn';
 import { yarn as twotwozeroSuperwashMerino } from './220-superwash-merino/yarn';
 import { yarn as aegeanTweed } from './aegean-tweed/yarn';
 import { yarn as anchorBay } from './anchor-bay/yarn';
 import { yarn as heritage } from './heritage/yarn';
+import { yarn as nobleCotton } from './noble-cotton/yarn';
+import { yarn as pacific } from './pacific/yarn';
 import { yarn as ultraPima } from './ultra-pima/yarn';
 
 export const brand: Brand = {
@@ -12,11 +15,14 @@ export const brand: Brand = {
   id: 'cascade',
   yarns: [
     twotwozeroSolidsAndHeathers,
+    twotwozeroSport,
     twotwozeroSuperwash,
     twotwozeroSuperwashMerino,
     aegeanTweed,
     anchorBay,
     heritage,
+    nobleCotton,
+    pacific,
     ultraPima,
   ],
 };

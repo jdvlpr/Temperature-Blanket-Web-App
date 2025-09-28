@@ -18,6 +18,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { localState, weather } from '$lib/state';
   import {
     getColorInfo,
+    getWeatherValue,
     runPreview,
     showPreviewImageWeatherDetails,
   } from '$lib/utils';
@@ -107,9 +108,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
       dayIndex++
     ) {
       let section = [];
-      let day = weather.data[dayIndex];
       let target = cornerToCornerPreview.settings.selectedTarget;
-      let value = day[target][localState.value.units];
+      let value = getWeatherValue({ dayIndex, param: target });
 
       // Get the color based on the gauge ID and value
       const color = getColorInfo({ param: target, value }).hex;

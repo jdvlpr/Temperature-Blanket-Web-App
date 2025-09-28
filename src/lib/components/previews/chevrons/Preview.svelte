@@ -17,6 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { localState, weather } from '$lib/state';
   import {
     getColorInfo,
+    getWeatherValue,
     runPreview,
     showPreviewImageWeatherDetails,
   } from '$lib/utils';
@@ -56,7 +57,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           },${line} `;
         }
         const target = chevronsPreview.settings.selectedTargets[paramIndex];
-        let value = weather.data[dayIndex][target][localState.value.units];
+        let value = getWeatherValue({ dayIndex, param: target });
 
         // Get the color based on the gauge ID and value
         const color = getColorInfo({ param: target, value }).hex;

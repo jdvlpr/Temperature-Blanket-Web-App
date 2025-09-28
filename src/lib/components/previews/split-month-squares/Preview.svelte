@@ -15,9 +15,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import Spinner from '$lib/components/Spinner.svelte';
-  import { localState, weather } from '$lib/state';
+  import { weather } from '$lib/state';
   import {
     getColorInfo,
+    getWeatherValue,
     runPreview,
     showPreviewImageWeatherDetails,
   } from '$lib/utils';
@@ -98,10 +99,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
       let color = { left: '', right: '' };
       if (day.length) {
-        const leftValue =
-          weather.data[_dayIndex][splitMonthSquaresPreview.settings.leftTarget][
-            localState.value.units
-          ];
+        const leftValue = getWeatherValue({
+          dayIndex: _dayIndex,
+          param: splitMonthSquaresPreview.settings.leftTarget,
+        });
 
         // Get the color based on the gauge ID and value
         color.left = getColorInfo({
@@ -109,10 +110,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
           value: leftValue,
         }).hex;
 
-        const rightValue =
-          weather.data[_dayIndex][
-            splitMonthSquaresPreview.settings.rightTarget
-          ][localState.value.units];
+        const rightValue = getWeatherValue({
+          dayIndex: _dayIndex,
+          param: splitMonthSquaresPreview.settings.rightTarget,
+        });
 
         // Get the color based on the gauge ID and value
         color.right = getColorInfo({

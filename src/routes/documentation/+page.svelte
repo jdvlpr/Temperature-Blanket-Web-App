@@ -17,8 +17,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { PUBLIC_BASE_URL } from '$env/static/public';
   import AppLogo from '$lib/components/AppLogo.svelte';
   import AppShell from '$lib/components/AppShell.svelte';
-  import { MAXIMUM_DAYS_PER_LOCATION, MAXIMUM_LOCATIONS } from '$lib/constants';
-  import { CircleCheckIcon, CircleMinusIcon } from '@lucide/svelte';
+  import {
+    MAXIMUM_DAYS_PER_LOCATION,
+    MAXIMUM_LOCATIONS,
+    OPEN_METEO_MODELS,
+  } from '$lib/constants';
+  import {
+    CircleCheckIcon,
+    CircleMinusIcon,
+    ClockIcon,
+    Grid3X3Icon,
+    InfoIcon,
+  } from '@lucide/svelte';
   import { Modal } from '@skeletonlabs/skeleton-svelte';
 
   let openTableOfContents = $state(false);
@@ -783,106 +793,134 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <h3 class="text-xl font-bold">Weather Sources</h3>
 
             <p>
-              Sometimes one weather service may not have data for your location.
-              Changing weather sources can let you see different weather data.
-              Often the differences are minimal, but because of the particular
-              ways weather services collect and interpret data, sometimes there
-              are significant differences.
+              Temperature-blanket.com provides several options from where to get
+              weather data. To change the weather source settings, press the
+              Weather Source button in the Location tab, Weather tab, or in the
+              Project Menu.
             </p>
-            <ul>
-              <li>
-                <a
-                  class="link"
-                  rel="noreferrer noopener"
-                  href="https://meteostat.net/"
-                  target="_blank">Meteostat</a
-                >
-                – The
-                <a
-                  class="link"
-                  rel="noreferrer noopener"
-                  href="https://meteostat.net/"
-                  target="_blank">Meteostat</a
-                >
-                platform provides access to open data from thousands of weather stations
-                world-wide. Measurements from the nearest stations are combined to
-                produce an interpolated result. Weather data from
-                <a
-                  class="link"
-                  rel="noreferrer noopener"
-                  href="https://meteostat.net/"
-                  target="_blank">Meteostat</a
-                >
-                is licensed under
-                <a
-                  class="link"
-                  rel="noreferrer noopener"
-                  href="https://creativecommons.org/licenses/by-nc/4.0/"
-                  target="_blank">CC BY-NC 4.0</a
-                >, with raw data provided by
-                <a
-                  class="link"
-                  rel="noreferrer noopener"
-                  href="https://www.noaa.gov/"
-                  target="_blank">NOAA</a
-                >,
-                <a
-                  class="link"
-                  rel="noreferrer noopener"
-                  href="https://www.dwd.de/"
-                  target="_blank">DWD</a
-                >
-                and
-                <a
-                  class="link"
-                  rel="noreferrer noopener"
-                  href="https://dev.meteostat.net/docs/sources.html"
-                  target="_blank">others</a
-                >.
+            <ul class="flex flex-col gap-4">
+              <li class="flex flex-col gap-1">
+                <p class="text-lg font-bold">Open-Meteo</p>
+                <p>
+                  The
+                  <a
+                    class="link"
+                    rel="noreferrer noopener"
+                    href="https://open-meteo.com/"
+                    target="_blank">Open-Meteo</a
+                  >
+                  database contains more than 60 years of weather data from a variety
+                  of open sources.
+                </p>
+                <p>
+                  You can choose from the following Open-Meteo weather data
+                  models:
+                </p>
+                {#each OPEN_METEO_MODELS as { title, timespan, resolution, details }}
+                  <div class="ml-4 flex flex-col gap-1">
+                    <p class="font-bold">
+                      {@html title}
+                    </p>
+                    <div class="ml-4 flex flex-col gap-1">
+                      <p class="">
+                        <ClockIcon
+                          class="relative -top-[2px] mr-1 inline size-4"
+                        />
+                        {timespan}
+                      </p>
+                      <p class="">
+                        <Grid3X3Icon
+                          class="relative -top-[2px] mr-1 inline size-4"
+                        />
+                        {resolution}
+                      </p>
+                      <p class="">
+                        <InfoIcon
+                          class="relative -top-[2px] mr-1 inline size-4"
+                        />
+                        {@html details}
+                      </p>
+                    </div>
+                  </div>
+                {/each}
+
+                <p class="">
+                  Weather data from
+                  <a
+                    class="link"
+                    rel="noreferrer noopener"
+                    href="https://www.open-meteo.com/"
+                    target="_blank">Open-Meteo</a
+                  >
+                  is licensed under
+                  <a
+                    class="link"
+                    rel="noreferrer noopener"
+                    href="https://creativecommons.org/licenses/by/4.0/"
+                    target="_blank">Attribution 4.0 International (CC BY 4.0)</a
+                  >, and includes data from the
+                  <a
+                    class="link"
+                    rel="noreferrer noopener"
+                    href="https://cds.climate.copernicus.eu/cdsapp#!/dataset/reanalysis-era5-land?tab=overview"
+                    target="_blank">Copernicus Program</a
+                  >.
+                </p>
               </li>
-              <li>
-                <a
-                  class="link"
-                  rel="noreferrer noopener"
-                  href="https://open-meteo.com/"
-                  target="_blank">Open-Meteo</a
-                >
-                – The
-                <a
-                  class="link"
-                  rel="noreferrer noopener"
-                  href="https://open-meteo.com/"
-                  target="_blank">Open-Meteo</a
-                >
-                database contains more than 60 years of weather data from a variety
-                of open sources, including data from the
-                <a
-                  class="link"
-                  rel="noreferrer noopener"
-                  href="https://cds.climate.copernicus.eu/cdsapp#!/dataset/reanalysis-era5-land?tab=overview"
-                  target="_blank">Copernicus Program</a
-                >. Weather data from
-                <a
-                  class="link"
-                  rel="noreferrer noopener"
-                  href="https://www.open-meteo.com/"
-                  target="_blank">Open-Meteo</a
-                >
-                is licensed under
-                <a
-                  class="link"
-                  rel="noreferrer noopener"
-                  href="https://creativecommons.org/licenses/by/4.0/"
-                  target="_blank">Attribution 4.0 International (CC BY 4.0)</a
-                >, and includes data from the
-                <a
-                  class="link"
-                  rel="noreferrer noopener"
-                  href="https://cds.climate.copernicus.eu/cdsapp#!/dataset/reanalysis-era5-land?tab=overview"
-                  target="_blank">Copernicus Program</a
-                >.
+              <li class="flex flex-col gap-2">
+                <p class="text-lg font-bold">Meteostat</p>
+                <p>
+                  The
+                  <a
+                    class="link"
+                    rel="noreferrer noopener"
+                    href="https://meteostat.net/"
+                    target="_blank">Meteostat</a
+                  >
+                  platform provides access to open data from thousands of weather
+                  stations world-wide. Measurements from the nearest stations are
+                  combined to produce an interpolated result. You can optionally
+                  choose to not fill missing weather with statistically optimized
+                  model data. (Filling missing weather data is on by default.)
+                </p>
+                <p class="">
+                  Weather data from
+                  <a
+                    class="link"
+                    rel="noreferrer noopener"
+                    href="https://meteostat.net/"
+                    target="_blank">Meteostat</a
+                  >
+                  is licensed under
+                  <a
+                    class="link"
+                    rel="noreferrer noopener"
+                    href="https://creativecommons.org/licenses/by-nc/4.0/"
+                    target="_blank">CC BY-NC 4.0</a
+                  >, with raw data provided by
+                  <a
+                    class="link"
+                    rel="noreferrer noopener"
+                    href="https://www.noaa.gov/"
+                    target="_blank">NOAA</a
+                  >,
+                  <a
+                    class="link"
+                    rel="noreferrer noopener"
+                    href="https://www.dwd.de/"
+                    target="_blank">DWD</a
+                  >
+                  and
+                  <a
+                    class="link"
+                    rel="noreferrer noopener"
+                    href="https://dev.meteostat.net/docs/sources.html"
+                    target="_blank">others</a
+                  >.
+                </p>
               </li>
             </ul>
+            <hr class="hr my-2" />
             <p>
               Daytime length calculations are by <a
                 class="link"
@@ -900,14 +938,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </p>
             <p>
               If your project has missing or incorrect weather data, you can
-              also <a class="link" href="#edit-weather-data"
-                >edit the weather data</a
-              >.
+              also <a class="link" href="#import-weather-data">import</a> or
+              <a class="link" href="#edit-weather-data">edit</a> weather data.
             </p>
             <div class="card bg-warning-500/20 flex flex-col gap-2 p-4">
               <p>
-                For any weather provider, recent weather data may be delayed by
-                a few days.
+                All weather data is subject to change if the provider updates
+                their models.
               </p>
             </div>
           </section>
@@ -1680,6 +1717,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 Each round is split in half to represent two different weather parameters.
                 Months with fewer days have extra rounds added, so that each square
                 has the same number of rounds.
+              </li>
+              <li>
+                <span class="font-bold">Square Rounds</span> – Each round in a square
+                represents one day.
               </li>
               <li>
                 <span class="font-bold">Squares</span> – Each square represents one

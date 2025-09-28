@@ -48,6 +48,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     showSchemeName?: boolean;
     roundedBottom?: boolean;
     typeId?: string;
+    isStaticGauge?: boolean;
     onchanged?: any;
     fullscreen?: boolean;
   }
@@ -60,6 +61,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     showSchemeName = true,
     roundedBottom = true,
     typeId = getTypeId(),
+    isStaticGauge = false,
     onchanged = null,
     fullscreen = $bindable(),
   }: Props = $props();
@@ -76,7 +78,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let activeColorIndex: number | null = $state(null);
 
   function getTypeId() {
-    return crypto && typeof crypto.randomUUID === 'function'
+    return browser && crypto && typeof crypto.randomUUID === 'function'
       ? crypto.randomUUID()
       : `${Math.random() * 100}-${Math.random() * 100}-${Math.random() * 100}`;
   }
@@ -317,7 +319,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               style="background:{hex};color:{getTextColor(hex)};"
               class="rounded-container z-30 flex w-full flex-wrap items-center justify-center gap-4 text-center break-all"
             >
-              {#if canUserDeleteColor && sortableColors.length > 1}
+              {#if canUserDeleteColor && sortableColors.length > 1 && !isStaticGauge}
                 <button
                   onclick={() => {
                     colors = colors.filter((_, i) => i !== index);

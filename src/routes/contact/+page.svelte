@@ -109,8 +109,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {/if}
 
           <p class="font-bold">Forms</p>
+
           <a href="/contact/forms/2025-03-weather-data" class="link">
             Weather Data Feedback Form
+          </a>
+
+          <a href="/yarn-search-request" class="link">
+            Yarn Search Request Form
           </a>
         </div>
       </div>

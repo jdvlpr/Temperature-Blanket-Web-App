@@ -95,7 +95,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </Tooltip>
         </p>
       {/each}
-      <p class="w-full text-sm italic">
+      <p class="w-full text-sm">
         {locations.totalDays} Total {pluralize('Day', locations.totalDays)}
       </p>
     </div>
@@ -133,7 +133,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
 
     {#if locations.all.length > 1 && locations.totalDays && locations.allValid && !weather.isUserEdited}
-      <p class="w-full text-sm italic">
+      <p class="w-full text-sm">
         {locations.totalDays} Total {pluralize('Day', locations.totalDays)}
       </p>
     {/if}
@@ -146,7 +146,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {#if locations.all.length < MAXIMUM_LOCATIONS}
     <button
       class={['btn hover:preset-tonal', weather.isUserEdited && 'hidden']}
-      id="add-location-button"
       disabled={project.status.loading}
       onclick={() => locations.add()}
       title="Add a New Location"

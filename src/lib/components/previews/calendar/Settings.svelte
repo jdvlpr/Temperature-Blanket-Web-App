@@ -17,16 +17,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
   import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
   import SquareDesigner from '$lib/components/modals/SquareDesigner.svelte';
+  import PreviewInfo from '$lib/components/PreviewInfo.svelte';
   import { calendarPreview } from '$lib/components/previews/calendar/state.svelte';
+  import SpanYarnColorSelectIcon from '$lib/components/SpanYarnColorSelectIcon.svelte';
   import { DAYS_OF_THE_WEEK } from '$lib/constants';
   import { gauges, modal, weather } from '$lib/state';
   import { pluralize } from '$lib/utils';
-  import {
-    Grid2x2CheckIcon,
-    PipetteIcon,
-    SquareDashedIcon,
-    SquareSquareIcon,
-  } from '@lucide/svelte';
+  import { SquareSquareIcon } from '@lucide/svelte';
 
   let targets = $derived(gauges.allCreated.map((n) => n.targets).flat());
 
@@ -45,9 +42,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 </script>
 
-<p class="w-full">
-  Squares are arranged in a calendar-like grid, grouped by month.
-</p>
+<PreviewInfo previewTitle={calendarPreview.name}>
+  {#snippet description()}
+    Squares are arranged in a calendar-like grid, grouped by month.
+  {/snippet}
+</PreviewInfo>
 
 <div
   class="preset-outlined-surface-300-700 card flex flex-col items-start gap-4 p-4"
@@ -143,7 +142,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
         },
       })}
   >
-    <PipetteIcon />
+    <SpanYarnColorSelectIcon
+      color={calendarPreview.settings.additionalSquaresColor}
+    />
     Color of Additional Squares
   </button>
 
@@ -185,7 +186,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           },
         })}
     >
-      <SquareDashedIcon />
+      <SpanYarnColorSelectIcon color={calendarPreview.settings.joinColor} />
       Border Color
     </button>
   {/if}

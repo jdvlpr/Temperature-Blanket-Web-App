@@ -44,13 +44,18 @@
         </ThSort>
         {#each weather.tableWeatherTargets as { id, pdfHeader }}
           {@const header = pdfHeader[localState.value.units]}
+          {@const hasHeaderUnits = header.includes('(')}
           {@const headerLabel = header.slice(0, header.indexOf('('))}
           {@const headerUnits = header.slice(header.indexOf('('))}
           <ThSort {table} field={id}>
-            <span class="flex flex-wrap items-center justify-center gap-1"
-              >{headerLabel}
-              <span class="text-xs">{headerUnits}</span></span
-            >
+            <span class="flex flex-wrap items-center justify-center gap-1">
+              {#if hasHeaderUnits}
+                {headerLabel}
+                <span class="text-xs">{headerUnits}</span>
+              {:else}
+                {header}
+              {/if}
+            </span>
           </ThSort>
         {/each}
       </tr>
@@ -89,10 +94,11 @@
               <button
                 class={[
                   weather.grouping === 'day' && 'hover:preset-tonal btn',
-                  weather.grouping === 'week' && 'disabled:opacity-100',
+                  (weather.grouping === 'week' || id === 'moon') &&
+                    'disabled:opacity-100',
                   isRecentDate && 'opacity-65',
                 ]}
-                disabled={weather.grouping === 'week'}
+                disabled={weather.grouping === 'week' || id === 'moon'}
                 onclick={() => {
                   if (id === 'dayt') {
                     modal.trigger({

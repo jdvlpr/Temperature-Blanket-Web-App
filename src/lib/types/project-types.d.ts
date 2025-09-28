@@ -13,11 +13,7 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import type {
-  WeatherDay,
-  WeatherSource,
-  WeatherSourceOptions,
-} from './weather-types';
+import type { WeatherDay, WeatherSourceOptions } from './weather-types';
 
 export interface SavedProject {
   date: string;

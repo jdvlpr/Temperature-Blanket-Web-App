@@ -19,6 +19,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { localState, weather } from '$lib/state';
   import {
     getColorInfo,
+    getWeatherValue,
     runPreview,
     showPreviewImageWeatherDetails,
   } from '$lib/utils';
@@ -119,7 +120,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           if (isWeatherSection) {
             // If it's a weather section, determine the color based on the weather value and gauge ID
             let param = rowsPreview.settings.selectedTargets[paramIndex];
-            let value = weather.data[dayIndex][param][localState.value.units];
+            let value = getWeatherValue({ dayIndex, param });
 
             // Get the color based on the gauge ID and value
             color = getColorInfo({ param, value }).hex;

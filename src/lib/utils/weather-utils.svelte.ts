@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { API_SERVICES } from '$lib/constants';
+import { API_SERVICES, MOON_PHASE_NAMES } from '$lib/constants';
 import {
   allGaugesAttributes,
   localState,
@@ -21,7 +21,7 @@ import {
   signal,
   weather,
 } from '$lib/state';
-import type { WeatherDay } from '$lib/types';
+import type { MoonPhasesId, WeatherDay, WeatherParam } from '$lib/types';
 import {
   celsiusToFahrenheit,
   convertTime,
@@ -114,6 +114,12 @@ export const getOpenMeteo = async ({ location }) => {
   url += `&end_date=${_to}`;
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'auto';
   url += `&daily=temperature_2m_max,temperature_2m_min,rain_sum,snowfall_sum&timezone=${timezone}`;
+
+  if (
+    weather.source?.settings &&
+    weather.source.settings.openMeteo.model !== 'auto'
+  )
+    url += `&models=${weather.source.settings.openMeteo.model}`;
 
   const response = await fetch(url, { signal: signal.value });
 
@@ -234,6 +240,7 @@ export const getOpenMeteo = async ({ location }) => {
         metric: dayTime.metric,
         imperial: dayTime.imperial,
       },
+      moon: getMoonPhase(date),
     };
 
     // Other possible parameters from Open-Meteo, not used
@@ -283,7 +290,9 @@ export const getOpenMeteo = async ({ location }) => {
           metric: _dayTime.metric,
           imperial: _dayTime.imperial,
         },
+        moon: getMoonPhase(_date),
       };
+
       allData = [...allData, _day];
     }
   }
@@ -402,15 +411,17 @@ export const getDayTime = ({ date, lat, lng }) => {
 
 export const getTableData = () => {
   return [
-    ...weather.data.map((n) => {
+    ...weather.data.map((n, i) => {
       let _weather = {};
       _weather.color = {};
       weather.tableWeatherTargets.forEach((target) => {
+        const value = getWeatherValue({ dayIndex: i, param: target.id });
         const colorInfo = getColorInfo({
           param: target.id,
-          value: n[target.id][localState.value.units],
+          value,
         });
         _weather.color[target.id] = colorInfo;
+
         if (target.id === 'dayt') {
           // make sure daytime is always in the same hr:mn format
           _weather = {
@@ -419,6 +430,13 @@ export const getTableData = () => {
               displayUnits: false,
               padStart: true,
             }),
+          };
+        } else if (target.id === 'moon') {
+          let value =
+            n[target.id] !== null ? MOON_PHASE_NAMES[n[target.id]] : '-';
+          _weather = {
+            ..._weather,
+            [target.id]: value,
           };
         } else {
           let value =
@@ -439,4 +457,79 @@ export const getTableData = () => {
       };
     }),
   ];
+};
+
+/**
+ * Calculates the moon phase name for a given date.
+ * Reasonably accurate for dates from ~1940 onwards.
+ * Based on simple approximation using average synodic period.
+ *
+ * @param {Date} date The date for which to calculate the moon phase.
+ * @returns {MoonPhasesId} The index id of the moon phase (e.g., "0" for "New Moon", "1" for "Waxing Crescent").
+ */
+export const getMoonPhase = (date: Date): MoonPhasesId => {
+  // Ensure input is a Date object
+  if (!(date instanceof Date) || isNaN(date)) {
+    throw new Error('Invalid Date object provided.');
+  }
+
+  // Known New Moon: January 6, 2000, 18:14:00 UTC
+  // We use milliseconds since Unix epoch (Jan 1, 1970)
+  const knownNewMoonMs = 947182440000;
+
+  // Average Synodic Period (days between new moons)
+  const synodicPeriodDays = 29.530588853;
+  const synodicPeriodMs = synodicPeriodDays * 24 * 60 * 60 * 1000;
+
+  // Get the time difference in milliseconds from the known new moon (UTC)
+  const dateMs = date.getTime();
+  const diffMs = dateMs - knownNewMoonMs;
+
+  // Calculate the position in the cycle (0 to 1)
+  // (diffMs % synodicPeriodMs) gives remainder in ms
+  // Add synodicPeriodMs and take modulo again to handle negative diffMs correctly
+  const cyclePosMs =
+    ((diffMs % synodicPeriodMs) + synodicPeriodMs) % synodicPeriodMs;
+  const normalizedPhase = cyclePosMs / synodicPeriodMs; // Value between 0 and 1
+
+  // Determine phase name based on normalized value (0=New, 0.25=First Q, 0.5=Full, 0.75=Third Q)
+  // We divide the cycle into 8 parts
+  // const phaseNames = [
+  //   0, //'New Moon', // 0
+  //   1, //'Waxing Crescent', // (0, 0.25)
+  //   2, // 'First Quarter', // 0.25
+  //   3, //'Waxing Gibbous', // (0.25, 0.5)
+  //   4, //'Full Moon', // 0.5
+  //   5, // 'Waning Gibbous', // (0.5, 0.75)
+  //   6, //'Third Quarter', // 0.75
+  //   7, //'Waning Crescent', // (0.75, 1)
+  // ];
+
+  // Calculate an index from 0 to 7, slightly offset to center phases
+  // Multiplying by 8 gives a value from 0 to 8.
+  // Adding 0.5 and flooring effectively rounds to the nearest phase segment boundary.
+  const phaseIndex = Math.floor((normalizedPhase * 8 + 0.5) % 8);
+
+  return phaseIndex;
+  // return phaseNames[phaseIndex];
+};
+
+export const getWeatherValue = ({
+  dayIndex,
+  param,
+}: {
+  dayIndex: number;
+  param: WeatherParam['id'];
+}) => {
+  if (param === 'moon') return weather.data[dayIndex][param];
+  return weather.data[dayIndex][param][localState.value.units];
+};
+
+export const chunkArray = (array, chunkSize) => {
+  const chunks = [];
+  for (let i = 0; i < array.length; i += chunkSize) {
+    const chunk = array.slice(i, i + chunkSize);
+    chunks.push(chunk);
+  }
+  return chunks;
 };

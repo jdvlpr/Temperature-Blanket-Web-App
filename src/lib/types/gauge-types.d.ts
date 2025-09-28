@@ -6,6 +6,11 @@ export interface GaugeRange {
   to: number;
 }
 
+export type GaugeRangeCategory = {
+  value: number;
+  label: string;
+};
+
 export interface GaugeRangeOptions {
   auto: {
     /** In the gauge settings URL hash string, for temperature gauges, '_h' is for 'tmax', '_a' is for 'tavg', '_l' is for 'tmin'. For all gauges, '_r' or nothing is for 'ranges'. The position should be at the end of the settings string, but it's found via pattern matching rather than by position in the string. TODO: can the position be reliably predicted? */
@@ -62,20 +67,26 @@ export interface GaugeRangeOptions {
 export interface GaugeSettingsType {
   colors: Color[] | undefined;
   numberOfColors: number | undefined;
-  ranges?: GaugeRange[] | undefined;
+  ranges?: GaugeRange[] | GaugeRangeCategory[] | undefined;
   rangeOptions: GaugeRangeOptions | undefined;
   autoRangeOptions: GaugeRangeOptions | undefined;
   schemeId: string | undefined;
 }
 
 export interface GaugeAttributes {
-  id: 'temp' | 'prcp' | 'snow' | 'dayt';
-  label: 'Temperature Gauge' | 'Rain Gauge' | 'Snow Gauge' | 'Daytime Gauge';
+  id: 'temp' | 'prcp' | 'snow' | 'dayt' | 'moon';
+  isStatic: boolean;
+  label:
+    | 'Temperature Gauge'
+    | 'Rain Gauge'
+    | 'Snow Gauge'
+    | 'Daytime Gauge'
+    | 'Moon Phase Gauge';
   unit: {
-    type: 'temperature' | 'height' | 'time';
+    type: 'temperature' | 'height' | 'time' | 'category';
     label: {
-      metric: '°C' | 'mm' | 'min';
-      imperial: '°F' | 'in' | 'hr';
+      metric: '°C' | 'mm' | 'min' | '';
+      imperial: '°F' | 'in' | 'hr' | '';
     };
   };
   targets: WeatherParam[];
@@ -86,23 +97,32 @@ export interface GaugeStateInterface
     GaugeAttributes {}
 
 export type WeatherParam = {
-  id: 'tmax' | 'tavg' | 'tmin' | 'prcp' | 'snow' | 'dayt';
+  id: 'tmax' | 'tavg' | 'tmin' | 'prcp' | 'snow' | 'dayt' | 'moon';
   label:
     | 'High Temperature'
     | 'Average Temperature'
     | 'Low Temperature'
     | 'Rain'
     | 'Snow'
-    | 'Daytime';
-  type: 'temperature' | 'height' | 'time';
-  gaugeLabel: 'High' | 'Average' | 'Low' | 'Rain' | 'Snow' | 'Daytime';
+    | 'Daytime'
+    | 'Moon Phase';
+  type: GaugeAttributes['unit']['type'];
+  gaugeLabel:
+    | 'High'
+    | 'Average'
+    | 'Low'
+    | 'Rain'
+    | 'Snow'
+    | 'Daytime'
+    | 'Moon Phase';
   shortLabel:
     | 'High Temp'
     | 'Average Temp'
     | 'Low Temp'
     | 'Rain'
     | 'Snow'
-    | 'Daytime';
+    | 'Daytime'
+    | 'Moon Phase';
   pdfHeader: {
     metric:
       | 'High (°C)'
@@ -110,14 +130,15 @@ export type WeatherParam = {
       | 'Low (°C)'
       | 'Rain (mm)'
       | 'Snow (mm)'
-      | 'Sun (h:m)';
+      | 'Sun (h:m)'
+      | 'Moon';
     imperial:
       | 'High (°F)'
       | 'Avg (°F)'
       | 'Low (°F)'
       | 'Rain (in)'
       | 'Snow (in)'
-      | 'Sun (h:m)';
+      | 'Moon';
   };
-  icon: '↑' | '~' | '↓' | '∴' | '∗' | '☼'; // TODO: try using different icons: '☔' '☀'
+  icon: '↑' | '~' | '↓' | '∴' | '∗' | '☼' | '●'; // TODO: try using different icons: '☔' '☀'
 };

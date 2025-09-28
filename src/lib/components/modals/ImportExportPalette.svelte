@@ -23,10 +23,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import {
     colorsToCode,
     colorsToYarnDetails,
+    generatePaletteImage,
     getColorsFromInput,
     pluralize,
   } from '$lib/utils';
-  import { ClipboardCopyIcon } from '@lucide/svelte';
+  import {
+    ArrowLeftIcon,
+    ClipboardCopyIcon,
+    CodeIcon,
+    DownloadIcon,
+    FileCodeIcon,
+    ImageIcon,
+  } from '@lucide/svelte';
   import { Segment } from '@skeletonlabs/skeleton-svelte';
   import { slide } from 'svelte/transition';
 
@@ -42,9 +50,29 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let colorHexesWithHashes = $state(true);
 
+  let includeBrandInImage = $derived(colors.some((n) => n.brandName));
+  let includeColorwayInImage = $derived(colors.some((n) => n.name));
+  let includeHexInImage = $state(
+    !includeBrandInImage && !includeColorwayInImage,
+  );
+  let includeSpacingInImage = $state(false);
+
   let isExpanded = $state(false);
 
   let segmentValue = $state('export');
+  let selectedExportType = $state('main'); // Can be: 'main', 'image', 'html', 'palette', 'colorway'
+
+  let previewImageUrl = $derived(
+    colors
+      ? generatePaletteImage({
+          colors,
+          includeColorway: includeColorwayInImage,
+          includeHex: includeHexInImage,
+          includeBrand: includeBrandInImage,
+          includeSpacing: includeSpacingInImage,
+        })
+      : null,
+  );
 
   let paletteCode = $derived(
     `${colorsToCode(colors, {
@@ -81,6 +109,28 @@ If not, see <https://www.gnu.org/licenses/>. -->
     if (!withHashes) palette = palette.map((n) => n.slice(1));
     if (asArray) return JSON.stringify(palette);
     return palette.join(', ');
+  }
+
+  function downloadImage() {
+    try {
+      // Create a temporary link element using the preview URL
+      const link = document.createElement('a');
+      link.download = 'Yarn Palette.png';
+      link.href = previewImageUrl;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      toast.trigger({
+        message: 'Image downloaded',
+        category: 'success',
+      });
+    } catch (error) {
+      toast.trigger({
+        message: 'Unable to download image',
+        category: 'error',
+      });
+    }
   }
 </script>
 
@@ -183,145 +233,269 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {#if !inputColors.length && inputValue.length}
       <p class="preset-tonal-error card p-4 text-center">Code not valid</p>
     {/if}
-  {:else}
-    {#if colors}
-      <ColorPalette
-        {colors}
-        schemeName={`${colors.length ? colors.length + ' ' + pluralize('Color', colors.length) : ''}`}
-        height="24px"
-      />
-    {/if}
+  {:else if colors}
+    <ColorPalette
+      {colors}
+      schemeName={`${colors.length ? colors.length + ' ' + pluralize('Color', colors.length) : ''}`}
+      height="24px"
+    />
 
-    {#if palette}
-      <div class="my-4 flex w-full flex-wrap items-center justify-start gap-2">
-        <div
-          class="flex w-full flex-col items-start justify-start gap-2 text-left"
-        >
-          <div class="flex flex-col">
-            <p class="text-lg font-bold">HTML Color Codes</p>
-            <p class="text-xs">For web and design</p>
-          </div>
-          <p
-            class="card preset-tonal-primary w-full basis-full p-4 break-all select-all"
-          >
-            {colorHexes}
-          </p>
-        </div>
-
-        <div
-          class="flex cursor-pointer flex-wrap items-center justify-center gap-2"
-        >
-          <ToggleSwitch bind:checked={colorCodesAsArray} label="Array" />
-        </div>
-
-        <div
-          class="flex cursor-pointer flex-wrap items-center justify-center gap-2"
-        >
-          <ToggleSwitch bind:checked={colorHexesWithHashes} label="Hashes" />
-        </div>
-
+    {#if selectedExportType === 'main'}
+      <div class="my-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <!-- HTML Color Codes Button -->
         <button
-          class="btn hover:preset-tonal"
-          onclick={() => {
-            try {
-              window.navigator.clipboard.writeText(colorHexes);
-              toast.trigger({
-                message: 'Copied',
-                category: 'success',
-              });
-            } catch {
-              toast.trigger({
-                message: 'Unable to copy to clipboard',
-                category: 'error',
-              });
-            }
-          }}
+          class="card hover:preset-tonal p-4 text-left"
+          onclick={() => (selectedExportType = 'html')}
         >
-          <ClipboardCopyIcon />
-          Copy HTML Color Codes
-        </button>
-      </div>
-    {/if}
-
-    {#if paletteCode}
-      <div class="my-4 flex w-full flex-wrap items-center justify-start gap-2">
-        <div
-          class="flex w-full flex-col items-start justify-start gap-2 text-left"
-        >
-          <div class="flex flex-col">
-            <p class="text-lg font-bold">Palette Code</p>
-            <p class="text-xs">For sharing between projects on this site</p>
+          <div class="flex items-center gap-2">
+            <CodeIcon />
+            <div>
+              <p class="text-lg font-bold">HTML Color Codes</p>
+              <p class="text-xs">Copy codes for web and design</p>
+            </div>
           </div>
-          <p
-            class="card preset-tonal-primary w-full basis-full p-4 break-all select-all"
-          >
-            {paletteCode}
-          </p>
-        </div>
-
-        <button
-          class="btn hover:preset-tonal"
-          onclick={() => {
-            try {
-              window.navigator.clipboard.writeText(paletteCode);
-              toast.trigger({
-                message: 'Copied',
-                category: 'success',
-              });
-            } catch {
-              toast.trigger({
-                message: 'Unable to copy to clipboard',
-                category: 'error',
-              });
-            }
-          }}
-        >
-          <ClipboardCopyIcon />
-          Copy Palette Code
         </button>
-      </div>
-    {/if}
 
-    {#if colorNames}
-      <div class="my-4 flex w-full flex-wrap items-center justify-start gap-2">
-        <div
-          class="flex w-full flex-col items-start justify-start gap-2 text-left"
+        <!-- Image Export Button -->
+        <button
+          class="card hover:preset-tonal p-4 text-left"
+          onclick={() => (selectedExportType = 'image')}
         >
-          <div class="flex flex-col">
-            <p class="text-lg font-bold">Yarn Colorway Names</p>
+          <div class="flex items-center gap-2">
+            <ImageIcon />
+            <div>
+              <p class="text-lg font-bold">Image</p>
+              <p class="text-xs">Download a PNG image</p>
+            </div>
           </div>
-          <p
-            class="card preset-tonal-primary w-full basis-full p-4 break-all select-all"
-          >
-            {colorNames}
-          </p>
-        </div>
-        <div
-          class="flex cursor-pointer flex-wrap items-center justify-center gap-2"
-        >
-          <ToggleSwitch bind:checked={colorNamesAsArray} label="Array" />
-        </div>
-        <button
-          class="btn hover:preset-tonal"
-          onclick={() => {
-            try {
-              window.navigator.clipboard.writeText(colorNames);
-              toast.trigger({
-                message: 'Copied',
-                category: 'success',
-              });
-            } catch {
-              toast.trigger({
-                message: 'Unable to copy to clipboard',
-                category: 'error',
-              });
-            }
-          }}
-        >
-          <ClipboardCopyIcon />
-          Copy Colorway Names
         </button>
+
+        <!-- Palette Code Button -->
+        <button
+          class="card hover:preset-tonal p-4 text-left"
+          onclick={() => (selectedExportType = 'palette')}
+        >
+          <div class="flex items-center gap-2">
+            <FileCodeIcon />
+            <div>
+              <p class="text-lg font-bold">Palette Code</p>
+              <p class="text-xs">Share between palettes on this site</p>
+            </div>
+          </div>
+        </button>
+
+        <!-- Yarn Colorway Names Button -->
+        {#if colorNames}
+          <button
+            class="card hover:preset-tonal p-4 text-left"
+            onclick={() => (selectedExportType = 'colorway')}
+          >
+            <div class="flex items-center gap-2">
+              <ClipboardCopyIcon />
+              <div>
+                <p class="text-lg font-bold">Yarn Colorway Names</p>
+                <p class="text-xs">Copy colorway names</p>
+              </div>
+            </div>
+          </button>
+        {/if}
       </div>
+    {:else}
+      <!-- Back Button -->
+      <button
+        class="btn hover:preset-tonal mt-4"
+        onclick={() => (selectedExportType = 'main')}
+      >
+        <ArrowLeftIcon />
+        All Export Options
+      </button>
+
+      <!-- Image Export Section -->
+      {#if selectedExportType === 'image'}
+        <div class="my-4 flex w-full flex-wrap items-start gap-4">
+          <div class="flex w-full flex-col gap-4">
+            <div
+              class="preset-outlined-surface-300-700 card flex flex-col items-start gap-4 p-4"
+            >
+              <p class="text-2xl font-bold">Image Settings</p>
+              <p class="">Choose what to include for each colorway</p>
+              <div class="flex flex-wrap gap-4">
+                {#if colors.some((n) => n.brandName)}
+                  <div class="flex cursor-pointer items-center gap-2">
+                    <ToggleSwitch
+                      bind:checked={includeBrandInImage}
+                      label="Yarn Brand"
+                    />
+                  </div>
+                {/if}
+                {#if colors.some((n) => n.name)}
+                  <div class="flex cursor-pointer items-center gap-2">
+                    <ToggleSwitch
+                      bind:checked={includeColorwayInImage}
+                      label="Colorway Name"
+                    />
+                  </div>
+                {/if}
+                <div class="flex cursor-pointer items-center gap-2">
+                  <ToggleSwitch
+                    bind:checked={includeHexInImage}
+                    label="HTML Color Code"
+                  />
+                </div>
+                <div class="flex cursor-pointer items-center gap-2">
+                  <ToggleSwitch
+                    bind:checked={includeSpacingInImage}
+                    label="Spacing"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div class="flex flex-wrap items-start gap-4">
+              {#if previewImageUrl}
+                <div class="card preset-tonal-primary w-fit overflow-auto p-4">
+                  <img
+                    src={previewImageUrl}
+                    alt="Color palette preview"
+                    class="shadow-md sm:h-[60vh]"
+                    style="image-rendering: crisp-edges;"
+                  />
+                </div>
+              {/if}
+
+              <button
+                class="btn hover:preset-tonal mb-8 w-fit"
+                onclick={downloadImage}
+              >
+                <DownloadIcon />
+                Download Image
+              </button>
+            </div>
+          </div>
+        </div>
+      {/if}
+
+      <!-- HTML Color Codes Section -->
+      {#if selectedExportType === 'html' && palette}
+        <div class="my-4 flex w-full flex-wrap items-start gap-4">
+          <div class="w-full">
+            <p
+              class="card preset-tonal-primary w-full p-4 break-all select-all"
+            >
+              {colorHexes}
+            </p>
+
+            <div class="mt-4 flex flex-wrap items-center gap-4">
+              <div class="flex cursor-pointer items-center gap-2">
+                <ToggleSwitch bind:checked={colorCodesAsArray} label="Array" />
+              </div>
+              <div class="flex cursor-pointer items-center gap-2">
+                <ToggleSwitch
+                  bind:checked={colorHexesWithHashes}
+                  label="Hashes"
+                />
+              </div>
+            </div>
+
+            <button
+              class="btn hover:preset-tonal mt-4"
+              onclick={() => {
+                try {
+                  window.navigator.clipboard.writeText(colorHexes);
+                  toast.trigger({
+                    message: 'Copied',
+                    category: 'success',
+                  });
+                } catch {
+                  toast.trigger({
+                    message: 'Unable to copy to clipboard',
+                    category: 'error',
+                  });
+                }
+              }}
+            >
+              <ClipboardCopyIcon />
+              Copy HTML Color Codes
+            </button>
+          </div>
+        </div>
+      {/if}
+
+      <!-- Palette Code Section -->
+      {#if selectedExportType === 'palette' && paletteCode}
+        <div class="my-4 flex w-full flex-wrap items-start gap-4">
+          <p class="text-sm">
+            Copy this Palette Code, then import it into another palette on this
+            site.
+          </p>
+          <div class="w-full">
+            <p
+              class="card preset-tonal-primary w-full p-4 break-all select-all"
+            >
+              {paletteCode}
+            </p>
+
+            <button
+              class="btn hover:preset-tonal mt-4"
+              onclick={() => {
+                try {
+                  window.navigator.clipboard.writeText(paletteCode);
+                  toast.trigger({
+                    message: 'Copied',
+                    category: 'success',
+                  });
+                } catch {
+                  toast.trigger({
+                    message: 'Unable to copy to clipboard',
+                    category: 'error',
+                  });
+                }
+              }}
+            >
+              <ClipboardCopyIcon />
+              Copy Palette Code
+            </button>
+          </div>
+        </div>
+      {/if}
+
+      <!-- Yarn Colorway Names Section -->
+      {#if selectedExportType === 'colorway' && colorNames}
+        <div class="my-4 flex w-full flex-wrap items-start gap-4">
+          <div class="w-full">
+            <p
+              class="card preset-tonal-primary w-full p-4 break-all select-all"
+            >
+              {colorNames}
+            </p>
+
+            <div class="mt-4 flex w-fit cursor-pointer items-center gap-2">
+              <ToggleSwitch bind:checked={colorNamesAsArray} label="Array" />
+            </div>
+
+            <button
+              class="btn hover:preset-tonal mt-4"
+              onclick={() => {
+                try {
+                  window.navigator.clipboard.writeText(colorNames);
+                  toast.trigger({
+                    message: 'Copied',
+                    category: 'success',
+                  });
+                } catch {
+                  toast.trigger({
+                    message: 'Unable to copy to clipboard',
+                    category: 'error',
+                  });
+                }
+              }}
+            >
+              <ClipboardCopyIcon />
+              Copy Colorway Names
+            </button>
+          </div>
+        </div>
+      {/if}
     {/if}
   {/if}
 </div>

@@ -16,11 +16,282 @@
 import { PUBLIC_GITHUB_LINK } from '$env/static/public';
 import { ICONS } from '$lib/constants';
 import type { ChangelogItem } from '$lib/types';
-import { RocketIcon } from '@lucide/svelte';
+import {
+  CloudCogIcon,
+  ImageIcon,
+  MoonStarIcon,
+  RocketIcon,
+} from '@lucide/svelte';
 
 export const entries: ChangelogItem[] = [
   {
+    date: 'September, 2025',
+    notes: [
+      {
+        icon: ICONS.design,
+        instructions: 'Try it in the Preview tab of the Project Planner',
+        text: `Each round in a hexagon represents one day`,
+        title: 'Added New Preview Layout: Hexagon Rounds',
+      },
+    ],
+    version: '5.22.0',
+  },
+  {
+    notes: [
+      {
+        IconComponent: ImageIcon,
+        instructions:
+          'When editing a palette in the <a href="/" class="link">Project Planner</a> or with the <a href="/yarn" class="link">Yarn Palette Creator</a>, select the Export/Import tool, then choose Image.',
+        text: `Export your yarn palette as a PNG image to share on social media, or save it for future reference.`,
+        title: 'New Feature: Save Yarn Palette as Image',
+      },
+    ],
+    version: '5.21.0',
+  },
+  {
+    notes: [
+      {
+        icon: ICONS.checkCircle,
+        text: `1 colorway`,
+        title: 'Added Colorway for DROPS Nepal: Soft Mint',
+      },
+    ],
+    version: '5.20.0',
+  },
+  {
+    notes: [
+      {
+        icon: ICONS.checkCircle,
+        text: `38 colorways`,
+        title: 'Added New Yarn: DROPS - Brushed Alpaca Silk',
+      },
+    ],
+    version: '5.19.0',
+  },
+  {
+    notes: [
+      {
+        icon: ICONS.checkCircle,
+        text: `80 colorways`,
+        title: 'Added New Yarn: Cascade - Noble Cotton',
+      },
+    ],
+    version: '5.18.0',
+  },
+  {
+    notes: [
+      {
+        icon: ICONS.checkCircle,
+        text: `73 colorways`,
+        title: 'Added New Yarn: Cascade - 220 Sport',
+      },
+    ],
+    version: '5.17.0',
+  },
+  {
+    date: 'August, 2025',
+    notes: [
+      {
+        icon: ICONS.checkCircle,
+        text: `82 colorways`,
+        title: 'Added New Yarn: Cascade - Pacific',
+      },
+      {
+        icon: ICONS.checkCircle,
+        text: `58 colorways`,
+        title: 'Added New Yarn: Katia - Merino Baby',
+      },
+      {
+        icon: ICONS.checkCircle,
+        text: `31 colorways`,
+        title: 'Added New Yarn: Rowan - Handknit Cotton',
+      },
+    ],
+    version: '5.16.0',
+  },
+  {
+    notes: [
+      {
+        icon: ICONS.checkCircle,
+        text: `22 colorways`,
+        title: 'Added New Yarn: Kelbourne Woolens - Skipper',
+      },
+      {
+        icon: ICONS.checkCircle,
+        text: `28 colorways`,
+        title: 'Added New Yarn: Rowan - Cotton Glacé',
+      },
+    ],
+    version: '5.15.0',
+  },
+  {
+    notes: [
+      {
+        icon: ICONS.checkCircle,
+        text: `63 colorways`,
+        title: 'Added New Yarn: DROPS - Kid Silk',
+      },
+      {
+        icon: ICONS.checkCircle,
+        text: `34 colorways`,
+        title: 'Added New Yarn: Hobbii - Baby Cotton Organic',
+      },
+      {
+        icon: ICONS.checkCircle,
+        text: `21 colorways`,
+        title: 'Added New Yarn: Knitting for Olive - Compatible Cashmere',
+      },
+    ],
+    version: '5.14.0',
+  },
+  {
+    notes: [
+      {
+        icon: ICONS.checkCircle,
+        text: `38 colorways`,
+        title: 'Added New Yarn: Blue Sky Fibers - Organic Cotton Worsted',
+      },
+      {
+        icon: ICONS.checkCircle,
+        text: `30 colorways`,
+        title: 'Added New Yarn: Blue Sky Fibers - Sweater',
+      },
+      {
+        icon: ICONS.checkCircle,
+        text: `27 colorways`,
+        title: 'Added New Yarn: Blue Sky Fibers - Woolstok Light',
+      },
+      {
+        icon: ICONS.checkCircle,
+        text: `48 colorways`,
+        title: 'Added New Yarn: Sirdar - Stories',
+      },
+    ],
+    version: '5.13.0',
+  },
+  {
+    date: 'July, 2025',
+    notes: [
+      {
+        icon: ICONS.checkCircle,
+        text: `52 colorways`,
+        title: 'Added New Yarn: King Cole - Cottonsoft DK',
+      },
+      {
+        icon: ICONS.checkCircle,
+        text: `27 colorways`,
+        title: 'Added New Yarn: Sandnes - Duo',
+      },
+      {
+        icon: ICONS.checkCircle,
+        text: `26 colorways`,
+        title: 'Added New Yarn: The Fibre Co. - Cirro',
+      },
+    ],
+    version: '5.12.0',
+  },
+  {
+    notes: [
+      {
+        icon: ICONS.checkCircle,
+        text: `62 colorways`,
+        title: 'Added New Yarn: Círculo - Amigurumi Soft',
+      },
+      {
+        icon: ICONS.checkCircle,
+        text: `37 colorways`,
+        title: 'Added New Yarn: Knitting for Olive - Pure Silk',
+      },
+      {
+        icon: ICONS.checkCircle,
+        text: `93 colorways`,
+        title: 'Added New Yarn: Silk City Fibers - Bambu 7',
+      },
+      {
+        icon: ICONS.checkCircle,
+        text: `12 colorways`,
+        title: 'Added New Yarn: Yarnalia - Marvel',
+      },
+    ],
+    version: '5.11.0',
+  },
+  {
+    date: 'June, 2025',
+    notes: [
+      {
+        icon: ICONS.checkCircle,
+        text: `108 colorways`,
+        title: 'Added New Yarn: LindeHobby - Cotton 8/8',
+      },
+    ],
+    version: '5.10.0',
+  },
+  {
+    notes: [
+      {
+        icon: ICONS.checkCircle,
+        text: `85 colorways`,
+        title: 'Added New Yarn: Knitting for Olive - Merino',
+      },
+      {
+        icon: ICONS.checkCircle,
+        text: `120 colorways`,
+        title: 'Added New Yarn: Yarnsmiths - Cotton DK',
+      },
+    ],
+    version: '5.9.0',
+  },
+  {
+    date: 'May, 2025',
+    notes: [
+      {
+        icon: ICONS.checkCircle,
+        text: `100 colorways`,
+        title: 'Added New Yarn: Hobbii - Embroidery Yarn',
+      },
+      {
+        icon: ICONS.checkCircle,
+        text: `62 colorways`,
+        title: 'Added New Yarn: Hobbii - Rainbow Deluxe',
+      },
+    ],
+    version: '5.8.0',
+  },
+  {
     date: 'April, 2025',
+    notes: [
+      {
+        IconComponent: CloudCogIcon,
+        instructions: `To see the new settings, press the Weather Source button in the Project Planner. If you notice any issues or have feedback about the new model settings, please <a href="/contact" target="_blank" class="link">contact me</a>.`,
+        text: 'Choose a more consistent weather data model when using Open-Meteo as a weather data source. See more details in the <a href="/documentation#weather-sources" class="link" target="_blank">documentation</a>. This is a beta feature—it should prevent historical data from being altered, but it has not been thoroughly tested. An option has also been added to not fill missing data when using Meteostat as a weather source.',
+        title:
+          'New Weather Source Settings <span class="badge bg-tertiary-50-950 ml-2">Beta</span>',
+      },
+    ],
+    version: '5.6.0',
+  },
+  {
+    notes: [
+      {
+        icon: ICONS.design,
+        instructions: 'Try it out in the Preview tab of the Project Planner',
+        text: `Each round in a square represents one day`,
+        title: 'Added New Preview Layout: Square Rounds',
+      },
+    ],
+    version: '5.5.0',
+  },
+  {
+    notes: [
+      {
+        IconComponent: MoonStarIcon,
+        text: 'Add colors for phases of the moon into your preview designs.',
+        title: 'Added Feature: Moon Phase Gauge',
+      },
+    ],
+    version: '5.3.0',
+  },
+  {
     notes: [
       {
         icon: ICONS.wrench,
@@ -57,26 +328,11 @@ export const entries: ChangelogItem[] = [
     notes: [
       {
         icon: ICONS.design,
-        text: 'Option to add borders around each square for the Squares and Calendar preview type',
+        text: 'Option to add borders around each square for the Squares and Calendar preview layouts',
         title: 'Added Feature: Border Around Squares',
       },
     ],
     version: '5.2.0',
-  },
-  {
-    notes: [
-      {
-        icon: ICONS.checkCircle,
-        text: `Added 70 colorways`,
-        title: 'Added Yarn: Purl Soho - Linen Quill',
-      },
-      {
-        icon: ICONS.checkCircle,
-        text: `Added 53 colorways`,
-        title: 'Added Yarn: Tufting Europe - New Zealand Wool',
-      },
-    ],
-    version: '5.1.0',
   },
   {
     notes: [
@@ -114,57 +370,12 @@ export const entries: ChangelogItem[] = [
     date: 'February, 2025',
     notes: [
       {
-        icon: ICONS.checkCircle,
-        text: `Added 46 colorways`,
-        title: 'Added Yarn: DROPS - Safran',
-      },
-      {
-        icon: ICONS.checkCircle,
-        text: `Added 12 colorways`,
-        title: 'Updated Yarn: Cascade - 220 Superwash',
-      },
-    ],
-    version: '4.21.0',
-  },
-  {
-    notes: [
-      {
-        icon: ICONS.checkCircle,
-        text: `60 colorways`,
-        title: 'Added Yarn: Bendigo Woolen Mills - Classic 8 Ply',
-      },
-    ],
-    version: '4.20.0',
-  },
-  {
-    notes: [
-      {
         icon: ICONS.wrench,
         text: `The Daytime Rows preview image was inaccurately representing the number of daytime and night stitches in each row. This update uses the actual daytime and night stitches values to generate the preview image, ensuring that it accurately reflects the values in the stitches table. Consequently, the apparent line between the daytime and night sections in the preview image may appear more jagged (less of a smooth curve). However, it provides a more precise representation of the final project's appearance. Only the Daytime Rows preview image in the Project Planner is affected by this update; preview images on Project Gallery pages created before this update remain unchanged.`,
         title: 'Fixed Daytime Rows Preview Image',
       },
     ],
     version: '4.19.1',
-  },
-  {
-    notes: [
-      {
-        icon: ICONS.checkCircle,
-        text: `35 colorways`,
-        title: 'Added Yarn: Sandnes - Line',
-      },
-    ],
-    version: '4.19.0',
-  },
-  {
-    notes: [
-      {
-        icon: ICONS.checkCircle,
-        text: `21 colorways`,
-        title: 'Added Yarn: Knit Picks - Woolen Cotton',
-      },
-    ],
-    version: '4.18.0',
   },
   {
     date: 'January, 2025',
@@ -247,7 +458,7 @@ export const entries: ChangelogItem[] = [
       {
         icon: ICONS.checkCircle,
         text: `41 colorways`,
-        title: 'Added Yarn: Lindehobby - Velvet Lux',
+        title: 'Added Yarn: LindeHobby - Velvet Lux',
       },
       {
         icon: ICONS.checkCircle,
@@ -367,26 +578,6 @@ export const entries: ChangelogItem[] = [
     version: '4.9.0',
   },
   {
-    notes: [
-      {
-        icon: ICONS.checkCircle,
-        text: `75 colorways`,
-        title: 'Added Yarn: Hobbii - Friends Cotton 8/8',
-      },
-      {
-        icon: ICONS.checkCircle,
-        text: `22 colorways`,
-        title: 'Added Yarn: Source of Fibre - Dirty DK',
-      },
-      {
-        icon: ICONS.checkCircle,
-        text: `Added 34 new colorways`,
-        title: 'Updated Yarn: Knit Picks - Swish Worsted',
-      },
-    ],
-    version: '4.8.0',
-  },
-  {
     date: 'November, 2024',
     notes: [
       {
@@ -416,31 +607,6 @@ export const entries: ChangelogItem[] = [
       },
     ],
     version: '4.6.0',
-  },
-  {
-    notes: [
-      {
-        icon: ICONS.checkCircle,
-        text: `13 new colorways`,
-        title: 'Added New Yarn Colorways: Caron - One Pound',
-      },
-      {
-        icon: ICONS.checkCircle,
-        text: `50 colorways`,
-        title: 'Added Yarn: Hobbii - Friends Wheel',
-      },
-      {
-        icon: ICONS.checkCircle,
-        text: `50 colorways`,
-        title: 'Added Yarn: Hobbii - Twister Solid',
-      },
-      {
-        icon: ICONS.checkCircle,
-        text: `39 colorways`,
-        title: 'Added Yarn: Hobbii - Winter Glow Solid',
-      },
-    ],
-    version: '4.5.0',
   },
   {
     date: 'September, 2024',

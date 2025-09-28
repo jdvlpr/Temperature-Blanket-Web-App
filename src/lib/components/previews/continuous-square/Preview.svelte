@@ -18,6 +18,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { localState, weather } from '$lib/state';
   import {
     getColorInfo,
+    getWeatherValue,
     runPreview,
     showPreviewImageWeatherDetails,
   } from '$lib/utils';
@@ -102,10 +103,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
       stitch += 1
     ) {
       if (dayIndex < weather.data?.length) {
-        value =
-          weather.data[dayIndex][
-            continuousSquarePreview.settings.selectedTarget
-          ][localState.value.units];
+        value = getWeatherValue({
+          dayIndex,
+          param: continuousSquarePreview.settings.selectedTarget,
+        });
 
         // Get the color based on the gauge ID and value
         color = getColorInfo({
