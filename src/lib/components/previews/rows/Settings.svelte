@@ -23,12 +23,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import SpanYarnColorSelectIcon from '$lib/components/SpanYarnColorSelectIcon.svelte';
   import { gauges, modal, weather } from '$lib/state';
   import { capitalizeFirstLetter, pluralize } from '$lib/utils';
-  import {
-    Calendar1Icon,
-    Edit2Icon,
-    EditIcon,
-    PipetteIcon,
-  } from '@lucide/svelte';
+  import { PencilIcon } from '@lucide/svelte';
 
   let targets = $derived(gauges.allCreated.map((n) => n.targets).flat());
 </script>
@@ -73,56 +68,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
 >
   <p class="text-2xl font-bold">Settings</p>
 
-  <div>
-    <ToggleSwitch
-      label="Seasons"
-      details="Use different weather parameters for different seasons"
-      checked={true}
-    />
-  </div>
-
-  <button
-    class="btn hover:preset-tonal"
-    title="Choose a color for any additional stitches"
-  >
-    <EditIcon />
-    Edit Seasons
-  </button>
-
-  <div class="flex max-w-screen-md flex-wrap gap-4 text-left">
-    <div>
-      <p class="font-bold">Spring (March 1 to May 31)</p>
-      <ToggleSwitchGroup
-        groupLabel={`Color Each Row Using the ${capitalizeFirstLetter(weather.grouping)}'s`}
-        {targets}
-        bind:value={rowsPreview.settings.selectedTargets}
-      />
-    </div>
-    <div>
-      <p class="font-bold">Summer (June 1 to August 31)</p>
-      <ToggleSwitchGroup
-        groupLabel={`Color Each Row Using the ${capitalizeFirstLetter(weather.grouping)}'s`}
-        {targets}
-        bind:value={rowsPreview.settings.selectedTargets}
-      />
-    </div>
-    <div>
-      <p class="font-bold">Fall (September 1 to November 30)</p>
-      <ToggleSwitchGroup
-        groupLabel={`Color Each Row Using the ${capitalizeFirstLetter(weather.grouping)}'s`}
-        {targets}
-        bind:value={rowsPreview.settings.selectedTargets}
-      />
-    </div>
-    <div>
-      <p class="font-bold">Winter (December 1 to February 28)</p>
-      <ToggleSwitchGroup
-        groupLabel={`Color Each Row Using the ${capitalizeFirstLetter(weather.grouping)}'s`}
-        {targets}
-        bind:value={rowsPreview.settings.selectedTargets}
-      />
-    </div>
-  </div>
+  <ToggleSwitchGroup
+    groupLabel={`Color Each Row Using the ${capitalizeFirstLetter(weather.grouping)}'s`}
+    {targets}
+    bind:value={rowsPreview.settings.selectedTargets}
+  />
 
   <NumberInputButton
     bind:value={rowsPreview.settings.stitchesPerRow}
@@ -176,4 +126,57 @@ If not, see <https://www.gnu.org/licenses/>. -->
       Color of Additional Stitches
     </button>
   {/if}
+</div>
+
+<div class="flex w-full flex-col gap-2">
+  <div class="w-fit">
+    <ToggleSwitch
+      label="Seasons"
+      details="Use different weather parameters for different seasons"
+      checked={true}
+    />
+  </div>
+
+  <button
+    class="btn hover:preset-tonal"
+    title="Choose a color for any additional stitches"
+  >
+    <PencilIcon />
+    Edit Seasons
+  </button>
+
+  <div class="flex max-w-screen-md flex-wrap gap-4 text-left">
+    <div>
+      <p class="font-bold">Spring (March 1 to May 31)</p>
+      <ToggleSwitchGroup
+        groupLabel={`Color Each Row Using the ${capitalizeFirstLetter(weather.grouping)}'s`}
+        {targets}
+        bind:value={rowsPreview.settings.selectedTargets}
+      />
+    </div>
+    <div>
+      <p class="font-bold">Summer (June 1 to August 31)</p>
+      <ToggleSwitchGroup
+        groupLabel={`Color Each Row Using the ${capitalizeFirstLetter(weather.grouping)}'s`}
+        {targets}
+        bind:value={rowsPreview.settings.selectedTargets}
+      />
+    </div>
+    <div>
+      <p class="font-bold">Fall (September 1 to November 30)</p>
+      <ToggleSwitchGroup
+        groupLabel={`Color Each Row Using the ${capitalizeFirstLetter(weather.grouping)}'s`}
+        {targets}
+        bind:value={rowsPreview.settings.selectedTargets}
+      />
+    </div>
+    <div>
+      <p class="font-bold">Winter (December 1 to February 28)</p>
+      <ToggleSwitchGroup
+        groupLabel={`Color Each Row Using the ${capitalizeFirstLetter(weather.grouping)}'s`}
+        {targets}
+        bind:value={rowsPreview.settings.selectedTargets}
+      />
+    </div>
+  </div>
 </div>
