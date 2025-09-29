@@ -16,7 +16,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script>
   import { calendarPreview } from '$lib/components/previews/calendar/state.svelte';
   import Spinner from '$lib/components/Spinner.svelte';
-  import { localState, weather } from '$lib/state';
+  import { weather } from '$lib/state';
   import {
     getColorInfo,
     getWeatherValue,

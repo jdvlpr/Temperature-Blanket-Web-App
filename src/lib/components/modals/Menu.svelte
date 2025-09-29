@@ -210,19 +210,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   class="link"
                   rel="noopener noreferrer">Read more details.</a
                 >
-                {#if weather.goupedByWeek}
+                {#if weather.groupedByWeek}
                   Your project starts on {DAYS_OF_THE_WEEK.filter(
-                    (n) => n.value === weather.goupedByWeek[0].date.getUTCDay(),
+                    (n) =>
+                      n.value === weather.groupedByWeek[0].date.getUTCDay(),
                   )[0].label},
                   {MONTHS.filter(
                     (n) =>
                       n.value - 1 ===
-                      weather.goupedByWeek[0].date.getUTCMonth(),
+                      weather.groupedByWeek[0].date.getUTCMonth(),
                   )[0]?.name}
-                  {weather.goupedByWeek[0].date.getUTCDate()},
-                  {weather.goupedByWeek[0].date.getUTCFullYear()}. It spans {weather
-                    .goupedByWeek.length}
-                  {pluralize('week', weather.goupedByWeek.length)}.
+                  {weather.groupedByWeek[0].date.getUTCDate()},
+                  {weather.groupedByWeek[0].date.getUTCFullYear()}. It spans {weather
+                    .groupedByWeek.length}
+                  {pluralize('week', weather.groupedByWeek.length)}.
                 {/if}
               </p>
               <label class="label flex flex-col">

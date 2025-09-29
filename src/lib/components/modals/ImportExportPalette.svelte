@@ -36,6 +36,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     ImageIcon,
   } from '@lucide/svelte';
   import { Segment } from '@skeletonlabs/skeleton-svelte';
+  import { onMount } from 'svelte';
   import { slide } from 'svelte/transition';
 
   let { colors, updateGauge } = $props();
@@ -52,9 +53,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let includeBrandInImage = $derived(colors.some((n) => n.brandName));
   let includeColorwayInImage = $derived(colors.some((n) => n.name));
-  let includeHexInImage = $state(
-    !includeBrandInImage && !includeColorwayInImage,
-  );
+  let includeHexInImage = $state(false);
   let includeSpacingInImage = $state(false);
 
   let isExpanded = $state(false);
@@ -132,6 +131,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
       });
     }
   }
+
+  onMount(() => {
+    includeBrandInImage = !includeBrandInImage && !includeColorwayInImage;
+  });
 </script>
 
 <div class="p-4">
@@ -357,7 +360,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   <img
                     src={previewImageUrl}
                     alt="Color palette preview"
-                    class="shadow-md sm:h-[60vh]"
+                    class="shadow-md sm:max-h-[60vh]"
                     style="image-rendering: crisp-edges;"
                   />
                 </div>

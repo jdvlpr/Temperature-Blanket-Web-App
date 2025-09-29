@@ -165,7 +165,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <div class="hidden lg:inline-flex">
       <AppLogo />
     </div>
-
     <div class="flex flex-1 justify-between gap-2 sm:justify-end">
       {#if weather.data.length && locations.allValid}
         <div class="hidden lg:inline-flex">
