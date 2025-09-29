@@ -133,7 +133,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 
   onMount(() => {
-    includeBrandInImage = !includeBrandInImage && !includeColorwayInImage;
+    includeHexInImage = !includeBrandInImage && !includeColorwayInImage;
   });
 </script>
 
