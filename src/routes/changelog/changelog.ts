@@ -25,6 +25,17 @@ import {
 
 export const entries: ChangelogItem[] = [
   {
+    date: 'October, 2025',
+    notes: [
+      {
+        icon: ICONS.checkCircle,
+        text: `82 colorways`,
+        title: 'Added New Yarn: Knitting for Olive - Soft Silk Mohair',
+      },
+    ],
+    version: '5.23.0',
+  },
+  {
     date: 'September, 2025',
     notes: [
       {
