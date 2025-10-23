@@ -82,7 +82,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { browser } from '$app/environment';
   import { THEMES } from '$lib/constants';
   import { localState } from '$lib/state';
-  import { Popover, Segment } from '@skeletonlabs/skeleton-svelte';
+  import { Popover, SegmentedControl } from '@skeletonlabs/skeleton-svelte';
 
   let openState = $state(false);
 
@@ -117,7 +117,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {/snippet}
     {#snippet content()}
       <div class="flex flex-col gap-2">
-        <Segment
+        <SegmentedControl
           value={localState.value.theme.mode}
           onValueChange={(e) => {
             localState.value.theme.mode = e.value;
@@ -133,7 +133,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               </span>
             </Segment.Item>
           {/each}
-        </Segment>
+        </SegmentedControl>
 
         <div class="flex flex-col items-start gap-2">
           {#each skeletonThemes as { name, id, colors, rounded }}

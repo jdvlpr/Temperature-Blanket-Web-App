@@ -16,10 +16,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script>
   import { UNIT_LABELS } from '$lib/constants';
   import { localState } from '$lib/state';
-  import { Segment } from '@skeletonlabs/skeleton-svelte';
+  import { SegmentedControl } from '@skeletonlabs/skeleton-svelte';
 </script>
 
-<Segment
+<SegmentedControl
   value={localState.value.units}
   onValueChange={(e) => {
     localState.value.units = e.value;
@@ -35,4 +35,4 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {`${UNIT_LABELS.temperature.imperial} /
   	    ${UNIT_LABELS.height.imperial}`}
   </Segment.Item>
-</Segment>
+</SegmentedControl>

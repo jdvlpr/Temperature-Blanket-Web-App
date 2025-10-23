@@ -42,7 +42,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     WandIcon,
     WandSparklesIcon,
   } from '@lucide/svelte';
-  import { Segment } from '@skeletonlabs/skeleton-svelte';
+  import { SegmentedControl } from '@skeletonlabs/skeleton-svelte';
   import { onMount, tick } from 'svelte';
   import { fade, slide } from 'svelte/transition';
   interface Props {
@@ -253,7 +253,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <span>Generate Ranges</span>
             </p>
 
-            <Segment
+            <SegmentedControl
               classes="flex-wrap gap-y-2 shadow-sm"
               background="bg-surface-100 dark:bg-surface-900"
               value={incrementMode}
@@ -263,7 +263,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             >
               <Segment.Item value="auto">Automatic</Segment.Item>
               <Segment.Item value="manual">Manual</Segment.Item>
-            </Segment>
+            </SegmentedControl>
 
             {#if !incrementMode}
               <p class="card bg-warning-300-700/80 mt-2 p-4 text-left">

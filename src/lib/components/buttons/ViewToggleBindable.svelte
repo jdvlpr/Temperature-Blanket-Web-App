@@ -15,11 +15,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import { LayoutGridIcon, LayoutListIcon } from '@lucide/svelte';
-  import { Segment } from '@skeletonlabs/skeleton-svelte';
+  import { SegmentedControl } from '@skeletonlabs/skeleton-svelte';
   let { value = $bindable() } = $props();
 </script>
 
-<Segment
+<SegmentedControl
   {value}
   onValueChange={(e) => {
     value = e.value;
@@ -39,4 +39,4 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <span class="">Grid</span>
     </div>
   </Segment.Item>
-</Segment>
+</SegmentedControl>

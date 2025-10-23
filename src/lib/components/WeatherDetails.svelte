@@ -284,7 +284,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       &::-webkit-slider-thumb {
         -webkit-appearance: none; /* Override default look */
         appearance: none;
-        // margin-top: -15px; /* Centers thumb on the track */
+        /* margin-top: -15px; Centers thumb on the track */
         background-color: #94a3b8;
         height: 20px;
         width: 20px;
@@ -293,14 +293,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
       }
       /******** Firefox ********/
       &::-moz-range-thumb {
-        // border: none; /*Removes extra border that FF applies*/
-        // border: 12px solid rgba(255, 255, 255, 0.6);
+        /* border: none; /*Removes extra border that FF applies*/
+        /* border: 12px solid rgba(255, 255, 255, 0.6); */
         border-radius: 0; /*Removes default border-radius that FF applies*/
         background-color: #94a3b8;
         height: 20px;
         width: 20px;
         border-radius: 10px;
-        // box-shadow: var(--box-shadow);
+        /* box-shadow: var(--box-shadow);*/
       }
     }
   }

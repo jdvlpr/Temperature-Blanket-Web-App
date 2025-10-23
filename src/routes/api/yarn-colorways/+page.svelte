@@ -17,7 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { PUBLIC_BASE_DOMAIN_NAME, PUBLIC_BASE_URL } from '$env/static/public';
   import AppLogo from '$lib/components/AppLogo.svelte';
   import AppShell from '$lib/components/AppShell.svelte';
-  import { Modal } from '@skeletonlabs/skeleton-svelte';
+  import { Dialog } from '@skeletonlabs/skeleton-svelte';
 
   let openTableOfContents = $state(false);
 </script>
@@ -136,7 +136,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <AppLogo />
     </div>
     <div class="sm:hidden">
-      <Modal
+      <Dialog
         open={openTableOfContents}
         onOpenChange={(e) => {
           openTableOfContents = e.open;
@@ -168,7 +168,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             {@render tableOfContents()}
           </div>
         {/snippet}
-      </Modal>
+      </Dialog>
     </div>
   {/snippet}
 

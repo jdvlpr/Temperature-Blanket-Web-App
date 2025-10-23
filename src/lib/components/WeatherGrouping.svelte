@@ -15,12 +15,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import { weather } from '$lib/state';
-  import { Segment } from '@skeletonlabs/skeleton-svelte';
+  import { SegmentedControl } from '@skeletonlabs/skeleton-svelte';
 </script>
 
 <div class="flex flex-col items-start">
   <div class="flex items-center gap-1">
-    <Segment
+    <SegmentedControl
       value={weather.grouping}
       onValueChange={(e) => {
         weather.grouping = e.value;
@@ -30,6 +30,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     >
       <Segment.Item value="day">Daily</Segment.Item>
       <Segment.Item value="week">Weekly</Segment.Item>
-    </Segment>
+    </SegmentedControl>
   </div>
 </div>

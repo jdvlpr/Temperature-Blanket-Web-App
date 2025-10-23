@@ -17,7 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { PUBLIC_BASE_DOMAIN_NAME, PUBLIC_BASE_URL } from '$env/static/public';
   import AppLogo from '$lib/components/AppLogo.svelte';
   import AppShell from '$lib/components/AppShell.svelte';
-  import { Segment } from '@skeletonlabs/skeleton-svelte';
+  import { SegmentedControl } from '@skeletonlabs/skeleton-svelte';
   import { fade } from 'svelte/transition';
 
   type BlogPostType = {
@@ -114,7 +114,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <main
       class="m-auto mb-4 flex max-w-(--breakpoint-xl) flex-col items-center gap-4 px-2"
     >
-      <Segment
+      <SegmentedControl
         value={selectedTag}
         onValueChange={(e) => {
           selectedTag = e.value;
@@ -129,7 +129,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </span>
           </Segment.Item>
         {/each}
-      </Segment>
+      </SegmentedControl>
 
       {#key selectedTag}
         <div

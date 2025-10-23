@@ -35,7 +35,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     FileCodeIcon,
     ImageIcon,
   } from '@lucide/svelte';
-  import { Segment } from '@skeletonlabs/skeleton-svelte';
+  import { SegmentedControl } from '@skeletonlabs/skeleton-svelte';
   import { onMount } from 'svelte';
   import { slide } from 'svelte/transition';
 
@@ -139,7 +139,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <div class="p-4">
   <div class="mb-4 flex w-full flex-col gap-1 text-left">
-    <Segment
+    <SegmentedControl
       classes="flex wrap gap-y-2 w-fit mx-auto shadow-sm"
       background="bg-surface-200 dark:bg-surface-800"
       value={segmentValue}
@@ -149,7 +149,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     >
       <Segment.Item value={'export'}>Export</Segment.Item>
       <Segment.Item value={'import'}>Import</Segment.Item>
-    </Segment>
+    </SegmentedControl>
   </div>
 
   {#if segmentValue === 'import'}

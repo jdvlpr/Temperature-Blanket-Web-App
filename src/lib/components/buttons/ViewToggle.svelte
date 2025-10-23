@@ -16,10 +16,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script>
   import { localState } from '$lib/state';
   import { LayoutGridIcon, LayoutListIcon } from '@lucide/svelte';
-  import { Segment } from '@skeletonlabs/skeleton-svelte';
+  import { SegmentedControl } from '@skeletonlabs/skeleton-svelte';
 </script>
 
-<Segment
+<SegmentedControl
   value={localState.value.layout}
   onValueChange={(e) => {
     localState.value.layout = e.value;
@@ -39,4 +39,4 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <span class="">Grid</span>
     </div>
   </Segment.Item>
-</Segment>
+</SegmentedControl>

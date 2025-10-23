@@ -1,11 +1,11 @@
 <script lang="ts">
   import { allGaugesAttributes, gauges, modal, weather } from '$lib/state';
-  import { Modal } from '@skeletonlabs/skeleton-svelte';
+  import { Dialog } from '@skeletonlabs/skeleton-svelte';
   import CloseButton from './CloseButton.svelte';
   import SaveAndCloseButtons from './SaveAndCloseButtons.svelte';
 </script>
 
-<Modal
+<Dialog
   open={modal.opened}
   onOpenChange={(e) => {
     modal.opened = e.open;
@@ -121,4 +121,4 @@
       </div>
     {/if}
   {/snippet}
-</Modal>
+</Dialog>

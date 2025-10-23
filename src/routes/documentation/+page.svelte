@@ -29,7 +29,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     Grid3X3Icon,
     InfoIcon,
   } from '@lucide/svelte';
-  import { Modal } from '@skeletonlabs/skeleton-svelte';
+  import { Dialog } from '@skeletonlabs/skeleton-svelte';
 
   let openTableOfContents = $state(false);
 </script>
@@ -335,7 +335,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <AppLogo />
     </div>
     <div class="sm:hidden">
-      <Modal
+      <Dialog
         open={openTableOfContents}
         onOpenChange={(e) => {
           openTableOfContents = e.open;
@@ -367,7 +367,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             {@render tableOfContents()}
           </div>
         {/snippet}
-      </Modal>
+      </Dialog>
     </div>
   {/snippet}
   {#snippet main()}

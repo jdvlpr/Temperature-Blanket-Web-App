@@ -23,7 +23,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '$lib/state';
   import { slide } from 'svelte/transition';
   import { weatherChart } from './WeatherChart.svelte';
-  import { Modal } from '@skeletonlabs/skeleton-svelte';
+  import { Dialog } from '@skeletonlabs/skeleton-svelte';
   import AppLogo from './AppLogo.svelte';
   import { page } from '$app/state';
   import {
@@ -81,7 +81,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       class="m-auto flex max-w-(--breakpoint-xl) items-center justify-between gap-2 px-2"
     >
       <div class="lg:hidden">
-        <Modal
+        <Dialog
           onOpenChange={(e) => {
             modal.drawer.leftNavigation = e.open;
           }}
@@ -112,7 +112,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <AppNavigation />
             </div>
           {/snippet}
-        </Modal>
+        </Dialog>
       </div>
 
       {@render stickyHeader?.()}

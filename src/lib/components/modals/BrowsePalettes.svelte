@@ -18,7 +18,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import GalleryPalettesPopular from '$lib/components/GalleryPalettesPopular.svelte';
   import PaletteSchemes from '$lib/components/PaletteSchemes.svelte';
   import ToTopButton from '$lib/components/buttons/ToTopButton.svelte';
-  import { Segment } from '@skeletonlabs/skeleton-svelte';
+  import { SegmentedControl } from '@skeletonlabs/skeleton-svelte';
 
   interface Props {
     schemeId?: string;
@@ -69,7 +69,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     class:pt-4={context === 'drawer'}
     bind:this={filtersContainer}
   >
-    <Segment
+    <SegmentedControl
       value={category}
       onValueChange={(e) => {
         category = e.value;
@@ -84,7 +84,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </span>
         </Segment.Item>
       {/each}
-    </Segment>
+    </SegmentedControl>
   </div>
 
   {#if category === 'Gallery'}

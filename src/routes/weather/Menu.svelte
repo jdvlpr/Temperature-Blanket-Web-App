@@ -18,7 +18,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { modal } from '$lib/state';
   import { getWeatherCodeDetails } from '$lib/utils';
   import { Trash2Icon } from '@lucide/svelte';
-  import { Segment } from '@skeletonlabs/skeleton-svelte';
+  import { SegmentedControl } from '@skeletonlabs/skeleton-svelte';
   import { weatherState } from './+page.svelte';
   import { fetchData } from './GetWeather.svelte';
   import { weatherLocationState } from './Location.svelte';
@@ -143,7 +143,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           class="rounded-container flex flex-wrap items-center justify-center gap-4 p-2"
         >
           <div class="flex flex-wrap items-center justify-center gap-2">
-            <Segment
+            <SegmentedControl
               value={weatherState.hour}
               onValueChange={(e) => {
                 weatherState.hour = e.value;
@@ -153,7 +153,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             >
               <Segment.Item value="12">12hr</Segment.Item>
               <Segment.Item value="24">24hr</Segment.Item>
-            </Segment>
+            </SegmentedControl>
             <p class="text-sm">
               {new Date().toLocaleTimeString(navigator.language, {
                 timeStyle: 'short',

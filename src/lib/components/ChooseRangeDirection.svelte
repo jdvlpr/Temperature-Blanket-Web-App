@@ -15,7 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import { ArrowUpDownIcon } from '@lucide/svelte';
-  import { Segment } from '@skeletonlabs/skeleton-svelte';
+  import { SegmentedControl } from '@skeletonlabs/skeleton-svelte';
 
   let { direction, onchange } = $props();
 </script>
@@ -25,7 +25,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <span>Direction</span>
 </p>
 
-<Segment
+<SegmentedControl
   value={direction}
   classes="flex-wrap gap-y-2 justify-start items-start"
   background="bg-surface-100 dark:bg-surface-900"
@@ -33,4 +33,4 @@ If not, see <https://www.gnu.org/licenses/>. -->
 >
   <Segment.Item value="high-to-low">High to Low</Segment.Item>
   <Segment.Item value="low-to-high">Low to High</Segment.Item>
-</Segment>
+</SegmentedControl>
