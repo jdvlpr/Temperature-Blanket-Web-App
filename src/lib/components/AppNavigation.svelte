@@ -24,7 +24,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { yarnBall } from '@lucide/lab';
   import {
     BookOpenTextIcon,
-    CircleHelpIcon,
+    CircleQuestionMarkIcon,
     CloudyIcon,
     ExternalLinkIcon,
     GalleryVerticalEndIcon,
@@ -218,7 +218,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               page.url.pathname === '/faq' && 'preset-tonal-secondary',
             ]}
           >
-            <CircleHelpIcon />
+            <CircleQuestionMarkIcon />
             FAQ
           </a>
 

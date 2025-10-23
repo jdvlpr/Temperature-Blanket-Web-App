@@ -82,7 +82,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { browser } from '$app/environment';
   import { THEMES } from '$lib/constants';
   import { localState } from '$lib/state';
-  import { Popover, SegmentedControl } from '@skeletonlabs/skeleton-svelte';
+  import {
+    Popover,
+    Portal,
+    SegmentedControl,
+  } from '@skeletonlabs/skeleton-svelte';
 
   let openState = $state(false);
 
@@ -97,15 +101,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     onOpenChange={(e) => {
       openState = e.open;
     }}
-    triggerBase="btn  hover:preset-tonal"
-    contentBase="card bg-surface-200 dark:bg-surface-800 p-4 space-y-4 shadow-xl"
-    positionerClasses="z-9999!"
-    arrow
-    arrowBackground="bg-surface-200! dark:bg-surface-800!"
     modal={true}
     autoFocus={false}
   >
-    {#snippet trigger()}
+    <Popover.Trigger class="btn hover:preset-tonal">
       {#key localState.value?.theme.mode}
         <span
           >{#if browser}{@html activeTheme?.icon}{:else}{@html THEMES.find(
@@ -114,62 +113,77 @@ If not, see <https://www.gnu.org/licenses/>. -->
         >
         Theme
       {/key}
-    {/snippet}
-    {#snippet content()}
-      <div class="flex flex-col gap-2">
-        <SegmentedControl
-          value={localState.value.theme.mode}
-          onValueChange={(e) => {
-            localState.value.theme.mode = e.value;
-          }}
-          classes="flex wrap gap-y-2 shadow-sm"
-          background="bg-surface-100 dark:bg-surface-900"
+    </Popover.Trigger>
+    <Portal>
+      <Popover.Positioner class="z-9999!">
+        <Popover.Content
+          class="card bg-surface-200 dark:bg-surface-800 space-y-4 p-4 shadow-xl"
         >
-          {#each THEMES as { name, id, icon, description }}
-            <Segment.Item value={id}>
-              <span class="flex items-center justify-center gap-1">
-                {@html icon}
-                <span class="hidden min-[375px]:inline">{name}</span>
-              </span>
-            </Segment.Item>
-          {/each}
-        </SegmentedControl>
-
-        <div class="flex flex-col items-start gap-2">
-          {#each skeletonThemes as { name, id, colors, rounded }}
-            <button
-              onclick={(e) => {
-                localState.value.theme.id = id;
+          <div class="flex flex-col gap-2">
+            <SegmentedControl
+              value={localState.value.theme.mode}
+              onValueChange={(e) => {
+                localState.value.theme.mode = e.value;
               }}
-              class={[
-                'btn hover:preset-tonal-secondary flex w-full items-center justify-start gap-2',
-                localState.value.theme.id === id &&
-                  'preset-filled-secondary-500',
-              ]}
+              class="bg-surface-100 dark:bg-surface-900 card"
             >
-              <div
-                class="border-surface-50-950 flex h-6 w-16 overflow-hidden border"
-                style="border-radius:{rounded}"
-              >
-                <div
-                  class="flex-auto"
-                  style="background:{colors.surface}"
-                ></div>
-                <div
-                  class="flex-auto"
-                  style="background:{colors.primary}"
-                ></div>
-                <div
-                  class="flex-auto"
-                  style="background:{colors.secondary}"
-                ></div>
-              </div>
-              {name}
-            </button>
-          {/each}
-        </div>
-        <button class="close" aria-label="Close"></button>
-      </div>
-    {/snippet}
+              <SegmentedControl.Control>
+                <SegmentedControl.Indicator />
+                {#each THEMES as { name, id, icon, description }}
+                  <SegmentedControl.Item value={id}>
+                    <SegmentedControl.ItemText>
+                      <span class="flex items-center justify-center gap-1">
+                        {@html icon}
+                        <span class="hidden min-[375px]:inline">{name}</span>
+                      </span>
+                    </SegmentedControl.ItemText>
+                    <SegmentedControl.ItemHiddenInput />
+                  </SegmentedControl.Item>
+                {/each}
+              </SegmentedControl.Control>
+            </SegmentedControl>
+
+            <div class="flex flex-col items-start gap-2">
+              {#each skeletonThemes as { name, id, colors, rounded }}
+                <button
+                  onclick={(e) => {
+                    localState.value.theme.id = id;
+                  }}
+                  class={[
+                    'btn hover:preset-tonal-secondary flex w-full items-center justify-start gap-2',
+                    localState.value.theme.id === id &&
+                      'preset-filled-secondary-500',
+                  ]}
+                >
+                  <div
+                    class="border-surface-50-950 flex h-6 w-16 overflow-hidden border"
+                    style="border-radius:{rounded}"
+                  >
+                    <div
+                      class="flex-auto"
+                      style="background:{colors.surface}"
+                    ></div>
+                    <div
+                      class="flex-auto"
+                      style="background:{colors.primary}"
+                    ></div>
+                    <div
+                      class="flex-auto"
+                      style="background:{colors.secondary}"
+                    ></div>
+                  </div>
+                  {name}
+                </button>
+              {/each}
+            </div>
+          </div>
+          <Popover.Arrow
+            style="--arrow-background: var(--color-surface-200-800)"
+          >
+            <Popover.ArrowTip />
+          </Popover.Arrow>
+        </Popover.Content>
+      </Popover.Positioner>
+    </Portal>
   </Popover>
 </div>
