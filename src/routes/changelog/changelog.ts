@@ -29,8 +29,8 @@ export const entries: ChangelogItem[] = [
     notes: [
       {
         icon: ICONS.checkCircle,
-        text: `26 new colorways`,
-        title: 'Updated Colorways: Bernat - Blanket',
+        text: `28 colorways`,
+        title: 'Added New Yarn: Loops & Threads - Classic Cotton',
       },
       {
         icon: ICONS.checkCircle,
@@ -41,6 +41,11 @@ export const entries: ChangelogItem[] = [
         icon: ICONS.checkCircle,
         text: `58 colorways`,
         title: 'Added New Yarn: Sandnes - Tynn Silk Mohair',
+      },
+      {
+        icon: ICONS.checkCircle,
+        text: `26 new colorways`,
+        title: 'Updated Colorways: Bernat - Blanket',
       },
     ],
     version: '5.24.0',
