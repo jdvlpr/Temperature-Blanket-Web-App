@@ -29,6 +29,21 @@ export const entries: ChangelogItem[] = [
     notes: [
       {
         icon: ICONS.checkCircle,
+        text: `58 colorways`,
+        title: 'Added New Yarn: Sandnes - Tynn Silk Mohair',
+      },
+    ],
+    version: '5.24.0',
+  },
+  {
+    notes: [
+      {
+        icon: ICONS.checkCircle,
+        text: `19 colorways`,
+        title: 'Added New Yarn: Sandnes - Tynn Silk Mohair',
+      },
+      {
+        icon: ICONS.checkCircle,
         text: `82 colorways`,
         title: 'Added New Yarn: Knitting for Olive - Soft Silk Mohair',
       },
