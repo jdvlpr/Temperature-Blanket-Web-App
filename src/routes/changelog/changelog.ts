@@ -29,6 +29,11 @@ export const entries: ChangelogItem[] = [
     notes: [
       {
         icon: ICONS.checkCircle,
+        text: `26 new colorways`,
+        title: 'Updated Colorways: Bernat - Blanket',
+      },
+      {
+        icon: ICONS.checkCircle,
         text: `58 colorways`,
         title: 'Added New Yarn: Sandnes - Tynn Silk Mohair',
       },
@@ -37,11 +42,6 @@ export const entries: ChangelogItem[] = [
   },
   {
     notes: [
-      {
-        icon: ICONS.checkCircle,
-        text: `19 colorways`,
-        title: 'Added New Yarn: Sandnes - Tynn Silk Mohair',
-      },
       {
         icon: ICONS.checkCircle,
         text: `82 colorways`,

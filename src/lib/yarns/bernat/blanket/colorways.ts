@@ -5,7 +5,7 @@ const colorways: Colorway[] = [
     source: {
       name: 'yarnspirations.com',
       href: 'https://www.yarnspirations.com/products/bernat-blanket-yarn-300g-10-5oz-1',
-      accessed: '2024-01-19',
+      accessed: '2025-10-23',
     },
     colors: [
       {
@@ -119,6 +119,110 @@ const colorways: Colorway[] = [
       {
         name: 'Red Rust',
         hex: '#8c4f42',
+      },
+      {
+        name: 'Almond',
+        hex: '#b6aca0',
+      },
+      {
+        name: 'Light Teal',
+        hex: '#6d9aa2',
+      },
+      {
+        name: 'Dark Gray',
+        hex: '#827b7c',
+      },
+      {
+        name: 'Coal',
+        hex: '#171717',
+      },
+      {
+        name: 'Gold',
+        hex: '#b88c52',
+      },
+      {
+        name: 'Birch',
+        hex: '#dbd2c7',
+      },
+      {
+        name: 'Crimson',
+        hex: '#793642',
+      },
+      {
+        name: 'Blush Pink',
+        hex: '#ede3e3',
+      },
+      {
+        name: 'Burgundy Plum',
+        hex: '#542239',
+      },
+      {
+        name: 'Frosted Blue',
+        hex: '#878d93',
+      },
+      {
+        name: 'Country Blue',
+        hex: '#445377',
+      },
+      {
+        name: 'Dark Teal',
+        hex: '#2e474f',
+      },
+      {
+        name: 'Cornflower',
+        hex: '#8d92a9',
+      },
+      {
+        name: 'Aubergine',
+        hex: '#50485c',
+      },
+      {
+        name: 'Deep Fuchsia',
+        hex: '#773552',
+      },
+      {
+        name: 'Bright Sage',
+        hex: '#b8c8c2',
+      },
+      {
+        name: 'Lead',
+        hex: '#47474d',
+      },
+      {
+        name: 'Lapis',
+        hex: '#17203e',
+      },
+      {
+        name: 'Malachite',
+        hex: '#21493c',
+      },
+      {
+        name: 'Aquatic',
+        hex: '#367173',
+      },
+      {
+        name: 'Deep Sea',
+        hex: '#3c504b',
+      },
+      {
+        name: 'Lagoon',
+        hex: '#4c6065',
+      },
+      {
+        name: 'Gray Blue',
+        hex: '#748092',
+      },
+      {
+        name: 'Burnt Mustard',
+        hex: '#bc8846',
+      },
+      {
+        name: 'Ashen Titanium',
+        hex: '#8d868e',
+      },
+      {
+        name: 'Beach Foam',
+        hex: '#dad2d1',
       },
     ],
   },
