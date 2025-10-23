@@ -336,14 +336,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
   );
 
   $effect(() => {
-    yarnColorwayFinderState.selectedBrandId,
+    (yarnColorwayFinderState.selectedBrandId,
       yarnColorwayFinderState.selectedYarnId,
       yarnColorwayFinderState.selectedYarnWeightId,
       yarnColorwayFinderState.search,
       yarns,
       yarnColorwayFinderState.sortColors,
       itemsToShow,
-      yarnColorwayFinderState.hex;
+      yarnColorwayFinderState.hex);
 
     tick().then(() => {
       getResults();
@@ -818,7 +818,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 anyone using <a
                   href="/yarn-search-request"
                   rel="noreferrer"
-                  class="link">this request form.</a
+                  class="link">this request form</a
                 >.
               {/snippet}
             </Accordion.Item>

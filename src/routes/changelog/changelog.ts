@@ -34,6 +34,11 @@ export const entries: ChangelogItem[] = [
       },
       {
         icon: ICONS.checkCircle,
+        text: `44 colorways`,
+        title: 'Added New Yarn: Premier - Bamboo Fair',
+      },
+      {
+        icon: ICONS.checkCircle,
         text: `58 colorways`,
         title: 'Added New Yarn: Sandnes - Tynn Silk Mohair',
       },
