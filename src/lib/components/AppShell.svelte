@@ -23,7 +23,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '$lib/state';
   import { slide } from 'svelte/transition';
   import { weatherChart } from './WeatherChart.svelte';
-  import { Dialog } from '@skeletonlabs/skeleton-svelte';
+  import { Dialog, Portal } from '@skeletonlabs/skeleton-svelte';
   import AppLogo from './AppLogo.svelte';
   import { page } from '$app/state';
   import {
@@ -86,18 +86,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
             modal.drawer.leftNavigation = e.open;
           }}
           open={modal.drawer.leftNavigation}
-          triggerBase="btn hover:preset-tonal my-2"
-          triggerAriaLabel="Open menu"
-          contentBase="bg-surface-50 dark:bg-surface-950 p-4 space-y-4 shadow-xl w-fit h-screen overflow-auto"
-          positionerJustify="justify-start"
-          positionerAlign=""
-          positionerPadding=""
-          transitionsPositionerIn={{ x: -480, duration: 200 }}
-          transitionsPositionerOut={{ x: -480, duration: 200 }}
         >
-          {#snippet trigger()}
+          <Dialog.Trigger
+            class="btn hover:preset-tonal my-2"
+            aria-label="Open menu"
+          >
             <MenuIcon />
-
             <span class="max-[355px]:hidden">
               {#if pageName}
                 {pageName}
@@ -105,13 +99,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 Menu
               {/if}
             </span>
-          {/snippet}
-          {#snippet content()}
-            <div class="mb-20 flex min-w-[265px] flex-col gap-2">
-              <AppLogo />
-              <AppNavigation />
-            </div>
-          {/snippet}
+          </Dialog.Trigger>
+          <Portal>
+            <Dialog.Backdrop
+              class="bg-surface-50-950/50 fixed inset-0 z-50 opacity-0 transition transition-discrete data-[state=open]:opacity-100 starting:data-[state=open]:opacity-0"
+            />
+            <Dialog.Positioner class="fixed inset-0 z-50 flex justify-start">
+              <Dialog.Content
+                class="bg-surface-50 dark:bg-surface-950 relative h-screen w-fit -translate-x-full space-y-4 overflow-auto p-4 opacity-0 transition transition-discrete data-[state=open]:translate-x-0 data-[state=open]:opacity-100 starting:data-[state=open]:-translate-x-full starting:data-[state=open]:opacity-0"
+              >
+                <div class="mb-20 flex min-w-[265px] flex-col gap-2">
+                  <AppLogo />
+                  <AppNavigation />
+                </div>
+              </Dialog.Content>
+            </Dialog.Positioner>
+          </Portal>
         </Dialog>
       </div>
 

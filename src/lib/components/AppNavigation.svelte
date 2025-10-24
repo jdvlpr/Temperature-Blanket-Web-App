@@ -24,6 +24,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { yarnBall } from '@lucide/lab';
   import {
     BookOpenTextIcon,
+    ChevronDownIcon,
+    ChevronUpIcon,
     CircleQuestionMarkIcon,
     CloudyIcon,
     ExternalLinkIcon,
@@ -41,6 +43,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '@lucide/svelte';
   import { Accordion } from '@skeletonlabs/skeleton-svelte';
 
+  let skipAccordionTransitions = $state(true); // Skip accordion transitions on initial load and between page loads
+
+  // Set opened navigation items based on current page
   $effect(() => {
     switch (page.route.id) {
       case '/':
@@ -70,6 +75,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
       openedNavigationItems = ['information'];
     }
   });
+
+  // Allow accordion transitions after initial load
+  $effect(() => {
+    skipAccordionTransitions = false;
+  });
 </script>
 
 <div
@@ -85,41 +95,26 @@ If not, see <https://www.gnu.org/licenses/>. -->
     }}
     collapsible
   >
-    {#snippet iconOpen()}<svg
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke-width="1.5"
-        stroke="currentColor"
-        class="size-4"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="m4.5 15.75 7.5-7.5 7.5 7.5"
-        />
-      </svg>
+    {#snippet indicator()}
+      <Accordion.ItemIndicator class="group">
+        <ChevronUpIcon class="hidden size-4 group-data-[state=open]:block" />
+        <ChevronDownIcon class="block size-4 group-data-[state=open]:hidden" />
+      </Accordion.ItemIndicator>
     {/snippet}
-    {#snippet iconClosed()}<svg
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke-width="1.5"
-        stroke="currentColor"
-        class="size-4"
+
+    <Accordion.Item value="tools" class="group gap-0">
+      <h3>
+        <Accordion.ItemTrigger class="flex items-center justify-between">
+          Tools
+          {@render indicator()}
+        </Accordion.ItemTrigger>
+      </h3>
+
+      <Accordion.ItemContent
+        class="h-0 origin-top scale-y-0 opacity-0 transition-discrete group-data-[state=open]:h-auto group-data-[state=open]:scale-y-100 group-data-[state=open]:opacity-100 starting:group-data-[state=open]:h-0 starting:group-data-[state=open]:scale-y-0 starting:group-data-[state=open]:opacity-0 {skipAccordionTransitions
+          ? 'transtion-none'
+          : 'transition-all'}"
       >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="m19.5 8.25-7.5 7.5-7.5-7.5"
-        />
-      </svg>
-    {/snippet}
-    <Accordion.Item value="tools" controlHover="hover:preset-tonal">
-      {#snippet control()}
-        Tools
-      {/snippet}
-      {#snippet panel()}
         <div class="flex w-full flex-col gap-2">
           <a
             href="/"
@@ -172,13 +167,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
             Weather Forecast
           </a>
         </div>
-      {/snippet}
+      </Accordion.ItemContent>
     </Accordion.Item>
-    <Accordion.Item value="gallery" controlHover="hover:preset-tonal">
-      {#snippet control()}
-        Gallery
-      {/snippet}
-      {#snippet panel()}
+    <Accordion.Item value="gallery" class="group gap-0">
+      <h3>
+        <Accordion.ItemTrigger class="flex items-center justify-between">
+          Gallery
+          {@render indicator()}
+        </Accordion.ItemTrigger>
+      </h3>
+      <Accordion.ItemContent
+        class="h-0 origin-top scale-y-0 opacity-0 transition-discrete group-data-[state=open]:h-auto group-data-[state=open]:scale-y-100 group-data-[state=open]:opacity-100 starting:group-data-[state=open]:h-0 starting:group-data-[state=open]:scale-y-0 starting:group-data-[state=open]:opacity-0 {skipAccordionTransitions
+          ? 'transtion-none'
+          : 'transition-all'}"
+      >
         <div class="flex w-full flex-col gap-2">
           <a
             href="/gallery"
@@ -203,13 +205,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
             Yarn Palettes</a
           >
         </div>
-      {/snippet}
+      </Accordion.ItemContent>
     </Accordion.Item>
-    <Accordion.Item value="information" controlHover="hover:preset-tonal">
-      {#snippet control()}
-        Information
-      {/snippet}
-      {#snippet panel()}
+    <Accordion.Item value="information" class="group gap-0">
+      <h3>
+        <Accordion.ItemTrigger class="flex items-center justify-between">
+          Information
+          {@render indicator()}
+        </Accordion.ItemTrigger>
+      </h3>
+      <Accordion.ItemContent
+        class="h-0 origin-top scale-y-0 opacity-0 transition-discrete group-data-[state=open]:h-auto group-data-[state=open]:scale-y-100 group-data-[state=open]:opacity-100 starting:group-data-[state=open]:h-0 starting:group-data-[state=open]:scale-y-0 starting:group-data-[state=open]:opacity-0 {skipAccordionTransitions
+          ? 'transtion-none'
+          : 'transition-all'}"
+      >
         <div class="mb-4 flex w-full flex-col gap-2">
           <a
             href="/faq"
@@ -325,7 +334,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </a>
           {/if}
         </div>
-      {/snippet}
+      </Accordion.ItemContent>
     </Accordion.Item>
   </Accordion>
 

@@ -219,21 +219,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
         value={warningAccordionState}
         onValueChange={(e) => (warningAccordionState = e.value)}
         collapsible
-        rounded="rounded-container"
-        classes="bg-warning-500/20"
+        class="bg-warning-500/20 rounded-container"
       >
         <Accordion.Item value="warning">
-          {#snippet lead()}
+          <Accordion.ItemTrigger>
             <TriangleAlertIcon />
-          {/snippet}
-          {#snippet control()}
+
             Weather within the past {weather.source.name === 'Open-Meteo'
               ? OPEN_METEO_DELAY_DAYS
               : weather.source.name === 'Meteostat'
                 ? METEOSTAT_DELAY_DAYS
                 : 'few'} days may be revised as new data comes in.
-          {/snippet}
-          {#snippet panel()}
+          </Accordion.ItemTrigger>
+          <Accordion.ItemContent>
             Weather data comes from <a
               href="https://open-meteo.com/"
               target="_blank"
@@ -251,7 +249,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 ? METEOSTAT_DELAY_DAYS
                 : 'a few'} days behind to account for possible changes. Sorry for
             any inconvenience.
-          {/snippet}
+          </Accordion.ItemContent>
         </Accordion.Item>
       </Accordion>
     </div>
