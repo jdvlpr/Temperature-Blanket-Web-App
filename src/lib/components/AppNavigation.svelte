@@ -42,48 +42,50 @@ If not, see <https://www.gnu.org/licenses/>. -->
     SwatchBookIcon,
   } from '@lucide/svelte';
   import { Accordion } from '@skeletonlabs/skeleton-svelte';
-
-  let skipAccordionTransitions = $state(true); // Skip accordion transitions on initial load and between page loads
+  import { untrack } from 'svelte';
 
   // Set opened navigation items based on current page
   $effect(() => {
-    switch (page.route.id) {
-      case '/':
-      case '/yarn-colorway-finder':
-      case '/yarn':
-      case '/weather':
-        openedNavigationItems = ['tools'];
-        break;
-      case '/gallery':
-      case '/yarn-palette-gallery':
-        openedNavigationItems = ['gallery'];
-        break;
-      case '/faq':
-      case '/contact':
-      case '/yarn-search-request':
-      case '/privacy':
-      case '/documentation':
-      case '/changelog':
-        openedNavigationItems = ['information'];
-        break;
-      case '/supporters':
-        openedNavigationItems = [''];
-        break;
-    }
+    page.route.id;
+    untrack(() => {
+      switch (page.route.id) {
+        case '/':
+        case '/yarn-colorway-finder':
+        case '/yarn':
+        case '/weather':
+          if (!openedNavigationItems.includes('tools'))
+            openedNavigationItems = [...openedNavigationItems, 'tools'];
+          break;
+        case '/gallery':
+        case '/yarn-palette-gallery':
+          if (!openedNavigationItems.includes('gallery'))
+            openedNavigationItems = [...openedNavigationItems, 'gallery'];
+          break;
+        case '/faq':
+        case '/contact':
+        case '/yarn-search-request':
+        case '/privacy':
+        case '/documentation':
+        case '/changelog':
+          if (!openedNavigationItems.includes('information'))
+            openedNavigationItems = [...openedNavigationItems, 'information'];
+          break;
+        case '/supporters':
+          if (!openedNavigationItems.includes(''))
+            openedNavigationItems = [...openedNavigationItems, ''];
+          break;
+      }
 
-    if (page.route.id?.includes('/blog') || page.route.id?.includes('/api')) {
-      openedNavigationItems = ['information'];
-    }
-  });
-
-  // Allow accordion transitions after initial load
-  $effect(() => {
-    skipAccordionTransitions = false;
+      if (page.route.id?.includes('/blog') || page.route.id?.includes('/api')) {
+        if (!openedNavigationItems.includes('information'))
+          openedNavigationItems = [...openedNavigationItems, 'information'];
+      }
+    });
   });
 </script>
 
 <div
-  class="my-2 flex w-fit flex-col items-start justify-start gap-2 text-left lg:px-2"
+  class="my-2 flex w-fit min-w-[268px] flex-col items-start justify-start gap-2 text-left lg:px-2"
   data-sveltekit-preload-data="hover"
 >
   <div><ThemeSwitcher /></div>
@@ -94,6 +96,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       openedNavigationItems = e.value;
     }}
     collapsible
+    multiple
   >
     {#snippet indicator()}
       <Accordion.ItemIndicator class="group">
@@ -110,11 +113,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </Accordion.ItemTrigger>
       </h3>
 
-      <Accordion.ItemContent
-        class="h-0 origin-top scale-y-0 opacity-0 transition-discrete group-data-[state=open]:h-auto group-data-[state=open]:scale-y-100 group-data-[state=open]:opacity-100 starting:group-data-[state=open]:h-0 starting:group-data-[state=open]:scale-y-0 starting:group-data-[state=open]:opacity-0 {skipAccordionTransitions
-          ? 'transtion-none'
-          : 'transition-all'}"
-      >
+      <Accordion.ItemContent class="">
         <div class="flex w-full flex-col gap-2">
           <a
             href="/"
@@ -176,11 +175,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {@render indicator()}
         </Accordion.ItemTrigger>
       </h3>
-      <Accordion.ItemContent
-        class="h-0 origin-top scale-y-0 opacity-0 transition-discrete group-data-[state=open]:h-auto group-data-[state=open]:scale-y-100 group-data-[state=open]:opacity-100 starting:group-data-[state=open]:h-0 starting:group-data-[state=open]:scale-y-0 starting:group-data-[state=open]:opacity-0 {skipAccordionTransitions
-          ? 'transtion-none'
-          : 'transition-all'}"
-      >
+      <Accordion.ItemContent class="">
         <div class="flex w-full flex-col gap-2">
           <a
             href="/gallery"
@@ -214,11 +209,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {@render indicator()}
         </Accordion.ItemTrigger>
       </h3>
-      <Accordion.ItemContent
-        class="h-0 origin-top scale-y-0 opacity-0 transition-discrete group-data-[state=open]:h-auto group-data-[state=open]:scale-y-100 group-data-[state=open]:opacity-100 starting:group-data-[state=open]:h-0 starting:group-data-[state=open]:scale-y-0 starting:group-data-[state=open]:opacity-0 {skipAccordionTransitions
-          ? 'transtion-none'
-          : 'transition-all'}"
-      >
+      <Accordion.ItemContent class="">
         <div class="mb-4 flex w-full flex-col gap-2">
           <a
             href="/faq"

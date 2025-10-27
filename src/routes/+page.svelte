@@ -47,13 +47,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
     upToDate,
   } from '$lib/utils';
   import {
-    BadgeHelpIcon,
+    BadgeQuestionMarkIcon,
     EllipsisVerticalIcon,
     LightbulbIcon,
     RedoIcon,
     SaveIcon,
     UndoIcon,
   } from '@lucide/svelte';
+  import { Popover, Portal } from '@skeletonlabs/skeleton-svelte';
   import { onMount } from 'svelte';
 
   let debounceTimer: number;
@@ -232,66 +233,73 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {/if}
     </div>
 
-    <Tooltip
-      classNames="max-sm:btn-icon sm:btn hover:preset-tonal"
-      minWidth="265px"
-      title="Help"
-    >
-      <BadgeHelpIcon />
-      <span class="hidden sm:inline-block">About</span>
-      {#snippet tooltip()}
-        <div
-          class="flex flex-col gap-4 p-2"
-          aria-orientation="vertical"
-          aria-label="Help Menu"
-          tabindex="-1"
-        >
-          {@render gettingStarted()}
+    <Popover>
+      <Popover.Trigger>
+        <BadgeQuestionMarkIcon />
+        <span class="hidden sm:inline-block">About</span>
+      </Popover.Trigger>
+      <Portal>
+        <Popover.Positioner>
+          <Popover.Content>
+            <Popover.Description>
+              <div
+                class="flex flex-col gap-4 p-2"
+                aria-orientation="vertical"
+                aria-label="Help Menu"
+              >
+                {@render gettingStarted()}
+                <p>
+                  <a
+                    href="/blog/what-is-a-temperature-blanket"
+                    class="link"
+                    rel="noreferrer"
+                  >
+                    What's a Temperature Blanket?</a
+                  >
+                </p>
 
-          <p>
-            <a
-              href="/blog/what-is-a-temperature-blanket"
-              class="link"
-              rel="noreferrer"
-            >
-              What's a Temperature Blanket?</a
-            >
-          </p>
+                <p>
+                  <a
+                    href="/faq"
+                    rel="noopener noreferrer"
+                    title="View Frequently Asked Questions"
+                    class="link"
+                  >
+                    Frequently Asked Questions</a
+                  >
+                </p>
 
-          <p>
-            <a
-              href="/faq"
-              rel="noopener noreferrer"
-              title="View Frequently Asked Questions"
-              class="link"
-            >
-              Frequently Asked Questions</a
-            >
-          </p>
+                <p>
+                  <a href="/changelog" rel="noreferrer" class="link"
+                    >Changelog - What's New?</a
+                  >
+                </p>
 
-          <p>
-            <a href="/changelog" rel="noreferrer" class="link"
-              >Changelog - What's New?</a
+                <p>
+                  <a href="/documentation" rel="noreferrer" class="link"
+                    >Documentation</a
+                  >
+                </p>
+
+                <div class="flex items-center gap-2">
+                  <div class="border-surface-300-700 grow border-t"></div>
+
+                  <p class="shrink text-xs">
+                    Version {version}
+                  </p>
+                  <div class="border-surface-300-700 grow border-t"></div>
+                </div>
+              </div>
+            </Popover.Description>
+            <Popover.Arrow
+              style="--arrow-size: calc(var(--spacing) * 2); --arrow-background: var(--color-surface-100-900);"
             >
-          </p>
-
-          <p>
-            <a href="/documentation" rel="noreferrer" class="link"
-              >Documentation</a
-            >
-          </p>
-
-          <div class="flex items-center gap-2">
-            <div class="border-surface-300-700 grow border-t"></div>
-
-            <p class="shrink text-xs">
-              Version {version}
-            </p>
-            <div class="border-surface-300-700 grow border-t"></div>
-          </div>
-        </div>
-      {/snippet}
-    </Tooltip>
+              <Popover.ArrowTip />
+            </Popover.Arrow>
+          </Popover.Content>
+        </Popover.Positioner>
+      </Portal>
+    </Popover>
 
     <button
       aria-label="menu"

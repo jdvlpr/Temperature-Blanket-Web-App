@@ -14,6 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
+  // TODO: REMOVE THIS COMPONENT
   import { arrow, createFloatingActions } from 'svelte-floating-ui';
   // import { autoPlacement } from 'svelte-floating-ui/core';
   import {

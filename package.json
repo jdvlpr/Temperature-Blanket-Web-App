@@ -16,6 +16,7 @@
     "test:api": "vite dev --host localhost --port 5180 & vitest"
   },
   "dependencies": {
+    "@floating-ui/dom": "^1.7.4",
     "@lucide/lab": "^0.1.2",
     "@lucide/svelte": "^0.546.0",
     "@supabase/supabase-js": "^2.58.0",

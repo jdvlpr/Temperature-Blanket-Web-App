@@ -119,64 +119,66 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <Popover.Content
           class="card bg-surface-200 dark:bg-surface-800 space-y-4 p-4 shadow-xl"
         >
-          <div class="flex flex-col gap-2">
-            <SegmentedControl
-              value={localState.value.theme.mode}
-              onValueChange={(e) => {
-                localState.value.theme.mode = e.value;
-              }}
-              class="bg-surface-100 dark:bg-surface-900 card"
-            >
-              <SegmentedControl.Control>
-                <SegmentedControl.Indicator />
-                {#each THEMES as { name, id, icon, description }}
-                  <SegmentedControl.Item value={id}>
-                    <SegmentedControl.ItemText>
-                      <span class="flex items-center justify-center gap-1">
-                        {@html icon}
-                        <span class="hidden min-[375px]:inline">{name}</span>
-                      </span>
-                    </SegmentedControl.ItemText>
-                    <SegmentedControl.ItemHiddenInput />
-                  </SegmentedControl.Item>
-                {/each}
-              </SegmentedControl.Control>
-            </SegmentedControl>
+          <Popover.Description>
+            <div class="flex flex-col gap-2">
+              <SegmentedControl
+                value={localState.value.theme.mode}
+                onValueChange={(e) => {
+                  localState.value.theme.mode = e.value;
+                }}
+                class="bg-surface-100 dark:bg-surface-900 card"
+              >
+                <SegmentedControl.Control>
+                  <SegmentedControl.Indicator />
+                  {#each THEMES as { name, id, icon, description }}
+                    <SegmentedControl.Item value={id}>
+                      <SegmentedControl.ItemText>
+                        <span class="flex items-center justify-center gap-1">
+                          {@html icon}
+                          <span class="hidden min-[375px]:inline">{name}</span>
+                        </span>
+                      </SegmentedControl.ItemText>
+                      <SegmentedControl.ItemHiddenInput />
+                    </SegmentedControl.Item>
+                  {/each}
+                </SegmentedControl.Control>
+              </SegmentedControl>
 
-            <div class="flex flex-col items-start gap-2">
-              {#each skeletonThemes as { name, id, colors, rounded }}
-                <button
-                  onclick={(e) => {
-                    localState.value.theme.id = id;
-                  }}
-                  class={[
-                    'btn hover:preset-tonal-secondary flex w-full items-center justify-start gap-2',
-                    localState.value.theme.id === id &&
-                      'preset-filled-secondary-500',
-                  ]}
-                >
-                  <div
-                    class="border-surface-50-950 flex h-6 w-16 overflow-hidden border"
-                    style="border-radius:{rounded}"
+              <div class="flex flex-col items-start gap-2">
+                {#each skeletonThemes as { name, id, colors, rounded }}
+                  <button
+                    onclick={(e) => {
+                      localState.value.theme.id = id;
+                    }}
+                    class={[
+                      'btn hover:preset-tonal-secondary flex w-full items-center justify-start gap-2',
+                      localState.value.theme.id === id &&
+                        'preset-filled-secondary-500',
+                    ]}
                   >
                     <div
-                      class="flex-auto"
-                      style="background:{colors.surface}"
-                    ></div>
-                    <div
-                      class="flex-auto"
-                      style="background:{colors.primary}"
-                    ></div>
-                    <div
-                      class="flex-auto"
-                      style="background:{colors.secondary}"
-                    ></div>
-                  </div>
-                  {name}
-                </button>
-              {/each}
+                      class="border-surface-50-950 flex h-6 w-16 overflow-hidden border"
+                      style="border-radius:{rounded}"
+                    >
+                      <div
+                        class="flex-auto"
+                        style="background:{colors.surface}"
+                      ></div>
+                      <div
+                        class="flex-auto"
+                        style="background:{colors.primary}"
+                      ></div>
+                      <div
+                        class="flex-auto"
+                        style="background:{colors.secondary}"
+                      ></div>
+                    </div>
+                    {name}
+                  </button>
+                {/each}
+              </div>
             </div>
-          </div>
+          </Popover.Description>
           <Popover.Arrow
             style="--arrow-background: var(--color-surface-200-800)"
           >

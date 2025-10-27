@@ -13,6 +13,7 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
+export * from '$lib/state/attachments/floating-state.svelte';
 export * from '$lib/state/gauges-state.svelte';
 export * from '$lib/state/location-state.svelte';
 export * from '$lib/state/page-state.svelte';

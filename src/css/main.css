@@ -99,6 +99,14 @@
   --WONK: 1;
 }
 
+// Floating element styles
+[data-floating] {
+  width: max-content;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
 @media (prefers-reduced-motion) {
   ::view-transition-group(*),
   ::view-transition-old(*),
