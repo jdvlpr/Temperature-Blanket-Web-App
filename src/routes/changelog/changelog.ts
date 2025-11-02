@@ -25,6 +25,17 @@ import {
 
 export const entries: ChangelogItem[] = [
   {
+    date: 'November, 2025',
+    notes: [
+      {
+        icon: ICONS.checkCircle,
+        text: `6 new colorways`,
+        title: 'Updated Colorways: Lion Brand - Color Theory',
+      },
+    ],
+    version: '5.25.0',
+  },
+  {
     date: 'October, 2025',
     notes: [
       {
