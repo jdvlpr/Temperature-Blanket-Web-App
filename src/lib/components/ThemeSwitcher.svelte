@@ -115,9 +115,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {/key}
     </Popover.Trigger>
     <Portal>
-      <Popover.Positioner class="z-9999!">
+      <Popover.Positioner class="z-999">
         <Popover.Content
-          class="card bg-surface-200 dark:bg-surface-800 space-y-4 p-4 shadow-xl"
+          class="card bg-surface-200-800 space-y-4 p-4 shadow-xl"
         >
           <Popover.Description>
             <div class="flex flex-col gap-2">
@@ -180,7 +180,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </div>
           </Popover.Description>
           <Popover.Arrow
-            style="--arrow-background: var(--color-surface-200-800)"
+            style="--arrow-size: calc(var(--spacing) * 4); --arrow-background: var(--color-surface-200-800);"
           >
             <Popover.ArrowTip />
           </Popover.Arrow>

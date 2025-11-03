@@ -28,7 +28,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ProjectDetails from '$lib/components/ProjectDetails.svelte';
   import UnitChanger from '$lib/components/UnitChanger.svelte';
   import YarnSources from '$lib/components/YarnSources.svelte';
-  import ChooseWeatherSource from '$lib/components/modals/ChooseWeatherSource.svelte';
   import KeyboardShortcuts from '$lib/components/modals/KeyboardShortcuts.svelte';
   import { DAYS_OF_THE_WEEK, MONTHS } from '$lib/constants';
   import { modal, previews, project, toast, weather } from '$lib/state';
@@ -43,13 +42,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import {
     CircleCheckBigIcon,
     ClipboardCopyIcon,
-    CloudDownloadIcon,
-    DatabaseIcon,
     DownloadIcon,
     KeyboardIcon,
     SaveIcon,
     SquarePlusIcon,
-    WrenchIcon,
   } from '@lucide/svelte';
   import { onMount } from 'svelte';
   import WeatherGrouping from '../WeatherGrouping.svelte';

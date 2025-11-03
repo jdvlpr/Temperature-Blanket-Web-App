@@ -13,7 +13,6 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { ICONS } from '$lib/constants';
 import { MediaQuery } from 'svelte/reactivity';
 
 type ModalOptions = {

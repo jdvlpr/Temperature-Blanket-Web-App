@@ -235,12 +235,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     <Popover>
       <Popover.Trigger>
-        <BadgeQuestionMarkIcon />
-        <span class="hidden sm:inline-block">About</span>
+        <button class="btn hover:preset-tonal" aria-label="About Menu">
+          <BadgeQuestionMarkIcon />
+          <span class="hidden sm:inline-block">About</span>
+        </button>
       </Popover.Trigger>
       <Portal>
-        <Popover.Positioner>
-          <Popover.Content>
+        <Popover.Positioner class="z-999">
+          <Popover.Content
+            class="rounded-container bg-surface-100-900 w-72 max-w-(--breakpoint-sm) p-2 shadow-lg"
+          >
             <Popover.Description>
               <div
                 class="flex flex-col gap-4 p-2"
@@ -292,7 +296,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               </div>
             </Popover.Description>
             <Popover.Arrow
-              style="--arrow-size: calc(var(--spacing) * 2); --arrow-background: var(--color-surface-100-900);"
+              style="--arrow-size: calc(var(--spacing) * 4); --arrow-background: var(--color-surface-100-900);"
             >
               <Popover.ArrowTip />
             </Popover.Arrow>
