@@ -29,6 +29,16 @@ export const entries: ChangelogItem[] = [
     notes: [
       {
         icon: ICONS.checkCircle,
+        text: `51 colorways`,
+        title: 'Added New Yarn: Alize - Superlana Midi',
+      },
+    ],
+    version: '5.26.0',
+  },
+  {
+    notes: [
+      {
+        icon: ICONS.checkCircle,
         text: `6 new colorways`,
         title: 'Updated Colorways: Lion Brand - Color Theory',
       },
