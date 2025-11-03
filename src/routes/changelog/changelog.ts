@@ -25,6 +25,32 @@ import {
 
 export const entries: ChangelogItem[] = [
   {
+    date: 'November, 2025',
+    notes: [
+      {
+        icon: ICONS.checkCircle,
+        text: `51 colorways`,
+        title: 'Added New Yarn: Alize - Superlana Midi',
+      },
+      {
+        icon: ICONS.checkCircle,
+        text: `22 new colorways`,
+        title: 'Updated Colorways: Hobbii - Happy Place Solid',
+      },
+    ],
+    version: '5.26.0',
+  },
+  {
+    notes: [
+      {
+        icon: ICONS.checkCircle,
+        text: `6 new colorways`,
+        title: 'Updated Colorways: Lion Brand - Color Theory',
+      },
+    ],
+    version: '5.25.0',
+  },
+  {
     date: 'October, 2025',
     notes: [
       {
