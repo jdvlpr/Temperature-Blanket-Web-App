@@ -9,84 +9,180 @@ const colorways: Colorway[] = [
     },
     colors: [
       {
-        name: 'Sand',
         hex: '#f5e4c6',
+        name: 'Sand',
       },
       {
-        name: 'Sunshine',
         hex: '#f6e59d',
+        name: 'Sunshine',
       },
       {
-        name: 'Ochre',
         hex: '#efc048',
+        name: 'Ochre',
       },
       {
-        name: 'Peach',
         hex: '#eeb997',
+        name: 'Peach',
       },
       {
-        name: 'Pumpkin',
         hex: '#ea8635',
+        name: 'Pumpkin',
       },
       {
-        name: 'Red Delicious',
         hex: '#dc5144',
+        name: 'Red Delicious',
       },
       {
-        name: 'Hunter Green',
         hex: '#bcb75d',
+        name: 'Hunter Green',
       },
       {
-        name: 'Foggy',
         hex: '#dfdfd3',
+        name: 'Foggy',
       },
       {
-        name: 'Salty Licorice',
         hex: '#e6a59a',
+        name: 'Salty Licorice',
       },
       {
-        name: 'Almond',
         hex: '#eadccb',
+        name: 'Almond',
       },
       {
-        name: 'Blossom',
         hex: '#e9aa9a',
+        name: 'Blossom',
       },
       {
-        name: 'Lollipop',
         hex: '#e292a3',
+        name: 'Lollipop',
       },
       {
-        name: 'Aubergine',
         hex: '#986864',
+        name: 'Aubergine',
       },
       {
-        name: 'Blueberry',
         hex: '#454159',
+        name: 'Blueberry',
       },
       {
-        name: 'Sky Blue ',
         hex: '#d2e2ea',
+        name: 'Sky Blue ',
       },
       {
-        name: 'Petrol',
         hex: '#789fa6',
+        name: 'Petrol',
       },
       {
-        name: 'Aqua',
         hex: '#90d3bd',
+        name: 'Aqua',
       },
       {
-        name: 'Clay',
         hex: '#d19976',
+        name: 'Clay',
       },
       {
-        name: 'Cinnamon',
         hex: '#976b3b',
+        name: 'Cinnamon',
       },
       {
-        name: 'Maple Sirup',
         hex: '#e27c4e',
+        name: 'Maple Sirup',
+      },
+      {
+        hex: '#d04f45',
+        name: 'Brick',
+      },
+      {
+        hex: '#e65c45',
+        name: 'Scarlet',
+      },
+      {
+        hex: '#e8753e',
+        name: 'Tangerine',
+      },
+      {
+        hex: '#f7e570',
+        name: 'Lemon',
+      },
+      {
+        hex: '#e3e373',
+        name: 'Light Lime',
+      },
+      {
+        hex: '#aeb588',
+        name: 'Herb',
+      },
+      {
+        hex: '#d4e1c6',
+        name: 'Matcha',
+      },
+      {
+        hex: '#56794c',
+        name: 'Eden',
+      },
+      {
+        hex: '#304162',
+        name: 'Navy',
+      },
+      {
+        hex: '#5389d1',
+        name: 'Cobalt',
+      },
+      {
+        hex: '#a8d0de',
+        name: 'Dreamy',
+      },
+      {
+        hex: '#496f85',
+        name: 'Harbor',
+      },
+      {
+        hex: '#6a4e80',
+        name: 'Grape',
+      },
+      {
+        hex: '#c9bed3',
+        name: 'Lilac',
+      },
+      {
+        hex: '#da9bbe',
+        name: 'Orchid',
+      },
+      {
+        hex: '#eed2d0',
+        name: 'Crystal',
+      },
+      {
+        hex: '#e6968b',
+        name: 'Rose',
+      },
+      {
+        hex: '#373936',
+        name: 'Black',
+      },
+      {
+        hex: '#565855',
+        name: 'Iron',
+      },
+      {
+        hex: '#cbc9c0',
+        name: 'Stormy',
+      },
+      {
+        hex: '#dadbdb',
+        name: 'Glacier',
+      },
+      {
+        hex: '#4c3e39',
+        name: 'Espresso',
+      },
+      {
+        hex: '#b38a68',
+        name: 'Cocoa',
+      },
+      {
+        hex: '#d9ba89',
+        name: 'Mousse',
       },
     ],
   },

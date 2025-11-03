@@ -32,6 +32,11 @@ export const entries: ChangelogItem[] = [
         text: `51 colorways`,
         title: 'Added New Yarn: Alize - Superlana Midi',
       },
+      {
+        icon: ICONS.checkCircle,
+        text: `22 new colorways`,
+        title: 'Updated Colorways: Hobbii - Happy Place Solid',
+      },
     ],
     version: '5.26.0',
   },
