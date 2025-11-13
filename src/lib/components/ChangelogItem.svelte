@@ -17,60 +17,52 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { ChevronsRightIcon } from '@lucide/svelte';
 
   interface Props {
-    date?: any;
     version?: any;
     notes: any;
   }
 
-  let { date = null, version = null, notes }: Props = $props();
+  let { version = null, notes }: Props = $props();
 </script>
 
-<div class="flex flex-col gap-2">
-  <div>
-    {#if date}
-      <h2 class="h2 text-gradient">{date}</h2>
+<div
+  class="card bg-surface-100 dark:bg-surface-900 flex scroll-mt-[58px] flex-col gap-2 p-2"
+  id={version}
+>
+  <div class="flex flex-wrap gap-2 text-xs">
+    {#if version}
+      <div
+        class="bg-tertiary-100 dark:bg-tertiary-900 inline-flex items-center gap-2 rounded px-2"
+      >
+        <p class="">Version {version}</p>
+      </div>
     {/if}
   </div>
-  <div
-    class="card bg-surface-100 dark:bg-surface-900 flex scroll-mt-[58px] flex-col gap-2 p-2"
-    id={version}
-  >
-    <div class="card flex flex-wrap gap-2">
-      {#each notes as { icon, text, title, instructions, IconComponent }}
-        <div class="card bg-surface-50 dark:bg-surface-950 flex-auto p-4">
-          <p class="flex items-center gap-2 text-base sm:gap-4">
-            {#if icon}
-              <span class="shrink-0">{@html icon}</span>
-            {:else if IconComponent}
-              <span class="shrink-0"><IconComponent /></span>
-            {/if}
+  <div class="card flex flex-wrap gap-2">
+    {#each notes as { icon, text, title, instructions, IconComponent }}
+      <div class="card bg-surface-50 dark:bg-surface-950 flex-auto p-4">
+        <p class="flex items-center gap-2 text-base sm:gap-4">
+          {#if icon}
+            <span class="shrink-0">{@html icon}</span>
+          {:else if IconComponent}
+            <span class="shrink-0"><IconComponent /></span>
+          {/if}
 
-            <span class="flex flex-col">
-              {#if title}
-                <span class="font-bold">{@html title}</span>
-              {/if}
-              {#if text}
-                <span>{@html text}</span>
-              {/if}
-              {#if instructions}
-                <span class="pt-2 text-sm">
-                  <ChevronsRightIcon
-                    class="relative -top-[1px] inline size-4"
-                  />
-                  <span>{@html instructions}</span>
-                </span>
-              {/if}
-            </span>
-          </p>
-        </div>
-      {/each}
-    </div>
-    {#if version}
-      <p class="flex flex-wrap gap-2 text-xs">
-        <span class="bg-tertiary-100 dark:bg-tertiary-900 inline rounded px-2">
-          <span>Version {version}</span>
-        </span>
-      </p>
-    {/if}
+          <span class="flex flex-col">
+            {#if title}
+              <span class="font-bold">{@html title}</span>
+            {/if}
+            {#if text}
+              <span>{@html text}</span>
+            {/if}
+            {#if instructions}
+              <span class="pt-2 text-sm">
+                <ChevronsRightIcon class="relative -top-[1px] inline size-4" />
+                <span>{@html instructions}</span>
+              </span>
+            {/if}
+          </span>
+        </p>
+      </div>
+    {/each}
   </div>
 </div>

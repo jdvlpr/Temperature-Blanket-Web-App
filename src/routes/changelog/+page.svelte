@@ -26,6 +26,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ToTopButton from '$lib/components/buttons/ToTopButton.svelte';
   import { onMount } from 'svelte';
   import { entries } from './changelog';
+  import { CalendarIcon } from '@lucide/svelte';
 
   let container = $state();
   let showScrollToTopButton = $state(false);
@@ -80,9 +81,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </p>
       </div>
       <div class="flex flex-col items-start gap-2 py-4 text-left">
-        {#each entries as { version, date, notes }}
-          <ChangelogItem {version} {date} {notes} />
-        {/each}
+        <div class="flex flex-col gap-4">
+          {#each entries as { year, months }}
+            {#each months as { month, items }}
+              <h2 class="h2 text-gradient">{month}, {year}</h2>
+              <div class="flex w-full flex-col gap-4">
+                {#each items as { version, notes }}
+                  <ChangelogItem {version} {notes} />
+                {/each}
+              </div>
+            {/each}
+          {/each}
+        </div>
       </div>
     </main>
   {/snippet}
