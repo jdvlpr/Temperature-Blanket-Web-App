@@ -373,7 +373,7 @@ const colorways: Colorway[] = [
         name: 'Kiwi',
       },
       {
-        hex: '#9bb637',
+        hex: '#81996a',
         name: 'Sage Green',
       },
       {
