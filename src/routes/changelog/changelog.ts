@@ -34,6 +34,16 @@ export const entries: ChangelogItemGroup[] = [
           {
             notes: [
               {
+                icon: ICONS.checkCircle,
+                text: `22 colorways`,
+                title: 'Added New Yarn: Woll Butt - Innsbruck Uni',
+              },
+            ],
+            version: '5.28.0',
+          },
+          {
+            notes: [
+              {
                 IconComponent: WrenchIcon,
                 text: `There was an error with the Sage Green colorway from Scheepjes - Catona (it was the same color as the Kiwi colorway). This update fixes the Sage Green colorway so that it is no longer the same color as the Kiwi colorway.`,
                 title: 'Modified Colorway: Sage Green (Scheepjes - Catona)',
