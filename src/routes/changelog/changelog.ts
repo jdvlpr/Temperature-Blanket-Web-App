@@ -35,7 +35,7 @@ export const entries: ChangelogItemGroup[] = [
             notes: [
               {
                 icon: ICONS.checkCircle,
-                text: `22 colorways`,
+                text: `26 colorways`,
                 title: 'Added New Yarn: Woll Butt - Innsbruck Uni',
               },
             ],
