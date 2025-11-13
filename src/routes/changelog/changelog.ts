@@ -21,7 +21,6 @@ import {
   ImageIcon,
   MoonStarIcon,
   RocketIcon,
-  ToolCaseIcon,
   WrenchIcon,
 } from '@lucide/svelte';
 
