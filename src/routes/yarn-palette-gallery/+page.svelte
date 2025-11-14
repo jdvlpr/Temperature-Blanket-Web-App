@@ -141,6 +141,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   function getPalettesFromPopularProjects(projects) {
     if (!projects.length) return [];
     let _palettes = [];
+
+    const MIN_COLORS = 3;
     projects.forEach((project) => {
       const params = getProjectParametersFromURLHash(
         new URL(project.meta.project_url).hash.substring(1),
@@ -160,7 +162,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
           .map((palette) => JSON.stringify(palette.colors))
           .includes(JSON.stringify(colors));
 
-        if (isNotPresetScheme && someColorsAreYarn && isUniquePalette) {
+        const hasEnoughColors = colors?.length > MIN_COLORS;
+
+        if (
+          isNotPresetScheme &&
+          someColorsAreYarn &&
+          isUniquePalette &&
+          hasEnoughColors
+        ) {
           const title = getTitleFromLocationsMeta(project.meta.locations);
           let schemeName =
             "<div class='flex flex-wrap justify-start items-center gap-x-4 text-xs'>";

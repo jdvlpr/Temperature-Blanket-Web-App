@@ -126,9 +126,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 onValueChange={(e) => {
                   localState.value.theme.mode = e.value;
                 }}
-                class="bg-surface-100 dark:bg-surface-900 card"
               >
-                <SegmentedControl.Control>
+                <SegmentedControl.Control
+                  class="bg-surface-100 dark:bg-surface-900 card"
+                >
                   <SegmentedControl.Indicator />
                   {#each THEMES as { name, id, icon, description }}
                     <SegmentedControl.Item value={id}>

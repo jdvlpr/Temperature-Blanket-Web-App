@@ -150,7 +150,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               }}
             >
               <SegmentedControl.Control
-                class="bg-surface-100 dark:bg-surface-900 flex-wrap gap-y-2 shadow-sm"
+                class="bg-surface-100 dark:bg-surface-900 rounded-container flex-wrap gap-y-2 border-none shadow-sm"
               >
                 <SegmentedControl.Indicator />
                 <SegmentedControl.Item value="12">

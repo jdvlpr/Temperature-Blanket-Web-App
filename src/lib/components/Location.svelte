@@ -15,7 +15,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import { browser } from '$app/environment';
-  import Tooltip from '$lib/components/Tooltip.svelte';
   import { MONTHS } from '$lib/constants';
   import { locations, modal, project, toast, weather } from '$lib/state';
   import type { LocationType } from '$lib/types/location-types';
@@ -41,6 +40,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { onMount } from 'svelte';
   import '../../css/flag-icons.css';
   import LocationDetails from './modals/LocationDetails.svelte';
+  import {
+    Popover,
+    Portal,
+    Tooltip,
+    useTooltip,
+  } from '@skeletonlabs/skeleton-svelte';
+
+  const id = $props.id();
+  const tooltip = useTooltip({ id });
 
   interface Props {
     location: LocationType;
@@ -291,29 +299,43 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <div class="grid grid-cols-1 items-end justify-center gap-4 py-2">
   {#if locations.all?.length > 1}
     <div class="justify-self-end">
-      <Tooltip placement="bottom" minWidth="250px">
-        <div class="btn-icon hover:preset-tonal">
+      <Popover>
+        <Popover.Trigger
+          class="btn-icon hover:preset-tonal"
+          title="Location Options"
+        >
           <EllipsisVerticalIcon />
-        </div>
-        {#snippet tooltip()}
-          <div class="flex items-center justify-center gap-2">
-            <button
-              class="btn hover:preset-tonal"
-              onclick={() => {
-                locations.remove(location.uuid);
-                weather.rawData = [];
-              }}
-              disabled={weather.isUserEdited > 0 || project.status.loading}
-              title="Remove Location"
+        </Popover.Trigger>
+        <Portal>
+          <Popover.Positioner>
+            <Popover.Content
+              class="bg-surface-100 dark:bg-surface-900 rounded-container z-50 flex items-center justify-center gap-2 p-2 shadow-lg"
             >
-              <Trash2Icon />
-              <p>
-                Remove Location {index + 1}
-              </p>
-            </button>
-          </div>
-        {/snippet}
-      </Tooltip>
+              <Popover.Description>
+                <button
+                  class="btn hover:preset-tonal"
+                  onclick={() => {
+                    locations.remove(location.uuid);
+                    weather.rawData = [];
+                  }}
+                  disabled={weather.isUserEdited > 0 || project.status.loading}
+                  title="Remove Location"
+                >
+                  <Trash2Icon />
+                  <p>
+                    Remove Location {index + 1}
+                  </p>
+                </button>
+              </Popover.Description>
+              <Popover.Arrow
+                style="--arrow-size: calc(var(--spacing) * 4); --arrow-background: var(--color-surface-100-900);"
+              >
+                <Popover.ArrowTip />
+              </Popover.Arrow>
+            </Popover.Content>
+          </Popover.Positioner>
+        </Portal>
+      </Popover>
     </div>
   {/if}
   <div class="grid grid-cols-1 gap-4">

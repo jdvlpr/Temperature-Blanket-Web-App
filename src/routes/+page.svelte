@@ -235,14 +235,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
 
     <Popover>
-      <Popover.Trigger class="btn hover:preset-tonal" aria-label="About Menu">
+      <Popover.Trigger
+        class="btn hover:preset-tonal"
+        aria-label="About"
+        title="About"
+      >
         <BadgeQuestionMarkIcon />
         <span class="hidden sm:inline-block">About</span>
       </Popover.Trigger>
       <Portal>
-        <Popover.Positioner class="z-999">
+        <Popover.Positioner>
           <Popover.Content
-            class="rounded-container bg-surface-100-900 w-72 max-w-(--breakpoint-sm) p-2 shadow-lg"
+            class="rounded-container bg-surface-100-900 z-49 w-72 max-w-(--breakpoint-sm) p-2 shadow-lg"
           >
             <Popover.Description>
               <div
@@ -305,7 +309,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </Popover>
 
     <button
-      aria-label="menu"
+      aria-label="Project Options"
+      title="Project Options"
       class="max-sm:btn-icon sm:btn hover:preset-tonal"
       onclick={() =>
         modal.trigger({

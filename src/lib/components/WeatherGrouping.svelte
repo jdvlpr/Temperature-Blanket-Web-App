@@ -27,7 +27,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       }}
     >
       <SegmentedControl.Control
-        class="bg-surface-100 dark:bg-surface-900 shadow-sm"
+        class="bg-surface-100 dark:bg-surface-900 rounded-container border-none shadow-sm"
       >
         <SegmentedControl.Indicator />
         <SegmentedControl.Item value="day"

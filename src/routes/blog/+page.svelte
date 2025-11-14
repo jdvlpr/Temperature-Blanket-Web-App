@@ -121,7 +121,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         }}
       >
         <SegmentedControl.Control
-          class="bg-surface-100 dark:bg-surface-900 mt-4 shadow-sm"
+          class="bg-surface-100 dark:bg-surface-900 rounded-container mt-4 border-none shadow-sm"
         >
           <SegmentedControl.Indicator />
           {#each tags as tag}

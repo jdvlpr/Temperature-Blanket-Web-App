@@ -28,7 +28,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </p></SegmentedControl.Label
   >
   <SegmentedControl.Control
-    class="bg-surface-100 dark:bg-surface-900 flex-wrap items-start justify-start gap-y-2"
+    class="bg-surface-100 dark:bg-surface-900 rounded-container flex-wrap items-start justify-start gap-y-2 border-none shadow-sm"
   >
     <SegmentedControl.Indicator />
     <SegmentedControl.Item value="high-to-low">
