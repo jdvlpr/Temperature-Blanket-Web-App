@@ -203,7 +203,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {#if !imported || errorMessages.length > 0}
       <FileUpload
         name="files"
-        classes="mt-4 justify-center"
+        class="mt-4 justify-center"
         onFileAccept={(e) => {
           csvUpload = e.files;
           submitForm(e);
@@ -211,10 +211,29 @@ If not, see <https://www.gnu.org/licenses/>. -->
         accept=".csv"
         subtext="Only CSV files allowed"
       >
-        {#snippet iconInterface()}<FilePlusIcon class="size-8" />{/snippet}
-        {#snippet iconFile()}<FileIcon class="size-4" />{/snippet}
-        {#snippet iconFileRemove()}<CircleXIcon class="size-4" />{/snippet}
+        <FileUpload.Dropzone>
+          <FileIcon class="size-10" />
+          <span>Select a CSV file or drag here.</span>
+          <FileUpload.Trigger>Browse Files</FileUpload.Trigger>
+          <FileUpload.HiddenInput />
+        </FileUpload.Dropzone>
+        <FileUpload.ItemGroup>
+          <FileUpload.Context>
+            {#snippet children(fileUpload)}
+              {#each fileUpload().acceptedFiles as file (file.name)}
+                <FileUpload.Item {file}>
+                  <FileUpload.ItemName>{file.name}</FileUpload.ItemName>
+                  <FileUpload.ItemSizeText
+                    >{file.size} bytes</FileUpload.ItemSizeText
+                  >
+                  <FileUpload.ItemDeleteTrigger />
+                </FileUpload.Item>
+              {/each}
+            {/snippet}
+          </FileUpload.Context>
+        </FileUpload.ItemGroup>
       </FileUpload>
+
       {#if errorMessages.length > 0}
         <p>Import finished, but there were some issues (listed below).</p>
         <p class="mb-2">
