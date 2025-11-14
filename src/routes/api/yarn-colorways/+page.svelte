@@ -17,9 +17,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { PUBLIC_BASE_DOMAIN_NAME, PUBLIC_BASE_URL } from '$env/static/public';
   import AppLogo from '$lib/components/AppLogo.svelte';
   import AppShell from '$lib/components/AppShell.svelte';
-  import { Dialog } from '@skeletonlabs/skeleton-svelte';
+  import { Dialog, Portal } from '@skeletonlabs/skeleton-svelte';
 
   let openTableOfContents = $state(false);
+
+  // The following animations are optional.
+  // These may also be included inline.
+  const animBackdrop =
+    'transition transition-discrete opacity-0 starting:data-[state=open]:opacity-0 data-[state=open]:opacity-100';
+  const animModal =
+    'transition transition-discrete opacity-0 translate-x-full starting:data-[state=open]:opacity-0 starting:data-[state=open]:translate-x-full data-[state=open]:opacity-100 data-[state=open]:translate-x-0';
 </script>
 
 <svelte:head>
@@ -141,15 +148,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
         onOpenChange={(e) => {
           openTableOfContents = e.open;
         }}
-        triggerBase="hover:preset-tonal"
-        contentBase="bg-surface-50 dark:bg-surface-950 p-4 space-y-4 shadow-xl w-fit h-screen overflow-auto"
-        positionerJustify="justify-end"
-        positionerAlign=""
-        positionerPadding=""
-        transitionsPositionerIn={{ x: 480, duration: 200 }}
-        transitionsPositionerOut={{ x: 480, duration: 200 }}
       >
-        {#snippet trigger()}
+        <Dialog.Trigger
+          class="btn hover:preset-tonal my-2"
+          aria-label="Content Menu"
+        >
           <div class="flex flex-wrap items-center gap-1">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -162,12 +165,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
             >
 
             <span class="">Content</span>
-          </div>{/snippet}
-        {#snippet content()}
-          <div class="mb-20">
-            {@render tableOfContents()}
           </div>
-        {/snippet}
+        </Dialog.Trigger>
+        <Portal>
+          <Dialog.Backdrop
+            class="bg-surface-50-950/50 fixed inset-0 z-50 {animBackdrop}"
+          />
+          <Dialog.Positioner class="fixed inset-0 z-50 flex justify-end">
+            <Dialog.Content
+              class="bg-surface-50 dark:bg-surface-950 h-screen w-fit space-y-4 overflow-auto p-4 shadow-xl {animModal}"
+            >
+              <div class="mb-20">
+                {@render tableOfContents()}
+              </div>
+            </Dialog.Content>
+          </Dialog.Positioner>
+        </Portal>
       </Dialog>
     </div>
   {/snippet}

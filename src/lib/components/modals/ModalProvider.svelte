@@ -12,7 +12,6 @@
 </script>
 
 <Dialog open={modal.opened} onOpenChange={(e) => (modal.opened = e.open)}>
-  <!-- <Dialog.Trigger class="hidden">Trigger</Dialog.Trigger> -->
   <Portal>
     <Dialog.Backdrop
       class="bg-surface-50-950/50 fixed inset-0 z-50 backdrop-blur-md"
