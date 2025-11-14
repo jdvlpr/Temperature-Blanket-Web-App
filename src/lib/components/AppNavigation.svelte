@@ -43,6 +43,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '@lucide/svelte';
   import { Accordion } from '@skeletonlabs/skeleton-svelte';
   import { untrack } from 'svelte';
+  import { slide } from 'svelte/transition';
 
   // Set opened navigation items based on current page
   $effect(() => {
@@ -100,8 +101,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   >
     {#snippet indicator()}
       <Accordion.ItemIndicator class="group">
-        <ChevronUpIcon class="hidden size-4 group-data-[state=open]:block" />
-        <ChevronDownIcon class="block size-4 group-data-[state=open]:hidden" />
+        <ChevronDownIcon
+          class="h-5 w-5 transition group-data-[state=open]:rotate-180"
+        />
       </Accordion.ItemIndicator>
     {/snippet}
 
@@ -113,59 +115,63 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </Accordion.ItemTrigger>
       </h3>
 
-      <Accordion.ItemContent class="">
-        <div class="flex w-full flex-col gap-2">
-          <a
-            href="/"
-            class={[
-              'btn hover:preset-tonal w-fit',
-              page.url.pathname === '/' && 'preset-tonal-secondary',
-            ]}
-          >
-            <NotebookPenIcon />
-            Project Planner
-          </a>
+      <Accordion.ItemContent class="flex w-full flex-col gap-2">
+        {#snippet element(attributes)}
+          {#if !attributes.hidden}
+            <div {...attributes} transition:slide={{ duration: 150 }}>
+              <a
+                href="/"
+                class={[
+                  'btn hover:preset-tonal w-fit',
+                  page.url.pathname === '/' && 'preset-tonal-secondary',
+                ]}
+              >
+                <NotebookPenIcon />
+                Project Planner
+              </a>
 
-          <div class="border-surface-300-700 w-full border-t"></div>
+              <div class="border-surface-300-700 w-full border-t"></div>
 
-          <a
-            href="/yarn-colorway-finder"
-            class={[
-              'btn hover:preset-tonal w-fit',
-              page.url.pathname === '/yarn-colorway-finder' &&
-                'preset-tonal-secondary',
-            ]}
-          >
-            <Icon iconNode={yarnBall} />
-            Yarn Colorway Finder
-          </a>
+              <a
+                href="/yarn-colorway-finder"
+                class={[
+                  'btn hover:preset-tonal w-fit',
+                  page.url.pathname === '/yarn-colorway-finder' &&
+                    'preset-tonal-secondary',
+                ]}
+              >
+                <Icon iconNode={yarnBall} />
+                Yarn Colorway Finder
+              </a>
 
-          <div class="border-surface-300-700 w-full border-t"></div>
+              <div class="border-surface-300-700 w-full border-t"></div>
 
-          <a
-            href="/yarn"
-            class={[
-              'btn hover:preset-tonal w-fit',
-              page.url.pathname === '/yarn' && 'preset-tonal-secondary',
-            ]}
-          >
-            <SwatchBookIcon />
-            Yarn Palette Creator
-          </a>
+              <a
+                href="/yarn"
+                class={[
+                  'btn hover:preset-tonal w-fit',
+                  page.url.pathname === '/yarn' && 'preset-tonal-secondary',
+                ]}
+              >
+                <SwatchBookIcon />
+                Yarn Palette Creator
+              </a>
 
-          <div class="border-surface-300-700 w-full border-t"></div>
+              <div class="border-surface-300-700 w-full border-t"></div>
 
-          <a
-            href="/weather"
-            class={[
-              'btn hover:preset-tonal w-fit',
-              page.url.pathname === '/weather' && 'preset-tonal-secondary',
-            ]}
-          >
-            <CloudyIcon />
-            Weather Forecast
-          </a>
-        </div>
+              <a
+                href="/weather"
+                class={[
+                  'btn hover:preset-tonal w-fit',
+                  page.url.pathname === '/weather' && 'preset-tonal-secondary',
+                ]}
+              >
+                <CloudyIcon />
+                Weather Forecast
+              </a>
+            </div>
+          {/if}
+        {/snippet}
       </Accordion.ItemContent>
     </Accordion.Item>
     <Accordion.Item value="gallery" class="group gap-0">
@@ -175,31 +181,35 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {@render indicator()}
         </Accordion.ItemTrigger>
       </h3>
-      <Accordion.ItemContent class="">
-        <div class="flex w-full flex-col gap-2">
-          <a
-            href="/gallery"
-            class={[
-              'btn hover:preset-tonal w-fit',
-              page.url.pathname === '/gallery' && 'preset-tonal-secondary',
-            ]}
-          >
-            <GalleryVerticalEndIcon />
-            Projects
-          </a>
+      <Accordion.ItemContent class="flex w-full flex-col gap-2">
+        {#snippet element(attributes)}
+          {#if !attributes.hidden}
+            <div {...attributes} transition:slide={{ duration: 150 }}>
+              <a
+                href="/gallery"
+                class={[
+                  'btn hover:preset-tonal w-fit',
+                  page.url.pathname === '/gallery' && 'preset-tonal-secondary',
+                ]}
+              >
+                <GalleryVerticalEndIcon />
+                Projects
+              </a>
 
-          <a
-            href="/yarn-palette-gallery"
-            class={[
-              'btn hover:preset-tonal w-fit',
-              page.url.pathname === '/yarn-palette-gallery' &&
-                'preset-tonal-secondary',
-            ]}
-          >
-            <SwatchBookIcon />
-            Yarn Palettes</a
-          >
-        </div>
+              <a
+                href="/yarn-palette-gallery"
+                class={[
+                  'btn hover:preset-tonal w-fit',
+                  page.url.pathname === '/yarn-palette-gallery' &&
+                    'preset-tonal-secondary',
+                ]}
+              >
+                <SwatchBookIcon />
+                Yarn Palettes</a
+              >
+            </div>
+          {/if}
+        {/snippet}
       </Accordion.ItemContent>
     </Accordion.Item>
     <Accordion.Item value="information" class="group gap-0">
@@ -209,122 +219,127 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {@render indicator()}
         </Accordion.ItemTrigger>
       </h3>
-      <Accordion.ItemContent class="">
-        <div class="mb-4 flex w-full flex-col gap-2">
-          <a
-            href="/faq"
-            class={[
-              'btn hover:preset-tonal w-fit',
-              page.url.pathname === '/faq' && 'preset-tonal-secondary',
-            ]}
-          >
-            <CircleQuestionMarkIcon />
-            FAQ
-          </a>
+      <Accordion.ItemContent class="mb-4 flex w-full flex-col gap-2">
+        {#snippet element(attributes)}
+          {#if !attributes.hidden}
+            <div {...attributes} transition:slide={{ duration: 150 }}>
+              <a
+                href="/faq"
+                class={[
+                  'btn hover:preset-tonal w-fit',
+                  page.url.pathname === '/faq' && 'preset-tonal-secondary',
+                ]}
+              >
+                <CircleQuestionMarkIcon />
+                FAQ
+              </a>
 
-          <div class="border-surface-300-700 w-full border-t"></div>
+              <div class="border-surface-300-700 w-full border-t"></div>
 
-          <a
-            href="/contact"
-            class={[
-              'btn hover:preset-tonal w-fit',
-              page.url.pathname === '/contact' && 'preset-tonal-secondary',
-            ]}
-          >
-            <MailIcon />
-            Contact
-          </a>
+              <a
+                href="/contact"
+                class={[
+                  'btn hover:preset-tonal w-fit',
+                  page.url.pathname === '/contact' && 'preset-tonal-secondary',
+                ]}
+              >
+                <MailIcon />
+                Contact
+              </a>
 
-          <a
-            href="/yarn-search-request"
-            class={[
-              'btn hover:preset-tonal w-fit',
-              page.url.pathname === '/yarn-search-request' &&
-                'preset-tonal-secondary',
-            ]}
-          >
-            <MessageCirclePlusIcon />
-            Request Yarn
-          </a>
+              <a
+                href="/yarn-search-request"
+                class={[
+                  'btn hover:preset-tonal w-fit',
+                  page.url.pathname === '/yarn-search-request' &&
+                    'preset-tonal-secondary',
+                ]}
+              >
+                <MessageCirclePlusIcon />
+                Request Yarn
+              </a>
 
-          <div class="border-surface-300-700 w-full border-t"></div>
+              <div class="border-surface-300-700 w-full border-t"></div>
 
-          <a
-            href="/blog"
-            class={[
-              'btn hover:preset-tonal w-fit text-left',
-              (page.url.pathname === '/blog' ||
-                page.url.pathname.includes('/blog')) &&
-                'preset-tonal-secondary',
-            ]}
-          >
-            <RssIcon /> Blog
-          </a>
+              <a
+                href="/blog"
+                class={[
+                  'btn hover:preset-tonal w-fit text-left',
+                  (page.url.pathname === '/blog' ||
+                    page.url.pathname.includes('/blog')) &&
+                    'preset-tonal-secondary',
+                ]}
+              >
+                <RssIcon /> Blog
+              </a>
 
-          <div class="border-surface-300-700 w-full border-t"></div>
+              <div class="border-surface-300-700 w-full border-t"></div>
 
-          <a
-            href="/privacy"
-            class={[
-              'btn hover:preset-tonal w-fit',
-              page.url.pathname === '/privacy' && 'preset-tonal-secondary',
-            ]}
-          >
-            <ShieldAlertIcon />
-            Privacy
-          </a>
+              <a
+                href="/privacy"
+                class={[
+                  'btn hover:preset-tonal w-fit',
+                  page.url.pathname === '/privacy' && 'preset-tonal-secondary',
+                ]}
+              >
+                <ShieldAlertIcon />
+                Privacy
+              </a>
 
-          <div class="border-surface-300-700 w-full border-t"></div>
+              <div class="border-surface-300-700 w-full border-t"></div>
 
-          <a
-            href="/documentation"
-            class={[
-              'btn hover:preset-tonal w-fit',
-              page.url.pathname === '/documentation' &&
-                'preset-tonal-secondary',
-            ]}
-          >
-            <BookOpenTextIcon />
-            Documentation
-          </a>
+              <a
+                href="/documentation"
+                class={[
+                  'btn hover:preset-tonal w-fit',
+                  page.url.pathname === '/documentation' &&
+                    'preset-tonal-secondary',
+                ]}
+              >
+                <BookOpenTextIcon />
+                Documentation
+              </a>
 
-          <a
-            href="/changelog"
-            class={[
-              'btn hover:preset-tonal w-fit',
-              page.url.pathname === '/changelog' && 'preset-tonal-secondary',
-            ]}
-          >
-            <HistoryIcon />
-            Changelog
-          </a>
+              <a
+                href="/changelog"
+                class={[
+                  'btn hover:preset-tonal w-fit',
+                  page.url.pathname === '/changelog' &&
+                    'preset-tonal-secondary',
+                ]}
+              >
+                <HistoryIcon />
+                Changelog
+              </a>
 
-          <div class="border-surface-300-700 w-full border-t"></div>
+              <div class="border-surface-300-700 w-full border-t"></div>
 
-          <a
-            href="/api/yarn-colorways"
-            class={[
-              'btn hover:preset-tonal w-fit',
-              page.url.pathname === '/api/yarn-colorways' &&
-                'preset-tonal-secondary',
-            ]}
-          >
-            <SquareTerminalIcon /> API
-          </a>
+              <a
+                href="/api/yarn-colorways"
+                class={[
+                  'btn hover:preset-tonal w-fit',
+                  page.url.pathname === '/api/yarn-colorways' &&
+                    'preset-tonal-secondary',
+                ]}
+              >
+                <SquareTerminalIcon /> API
+              </a>
 
-          {#if PUBLIC_GITHUB_LINK}
-            <div class="border-surface-300-700 w-full border-t"></div>
-            <a
-              href={PUBLIC_GITHUB_LINK}
-              class="btn hover:preset-tonal w-fit"
-              target="_blank"
-            >
-              <GithubIcon />
-              GitHub
-              <ExternalLinkIcon class="relative -top-[1px] size-5" />
-            </a>
+              {#if PUBLIC_GITHUB_LINK}
+                <div class="border-surface-300-700 w-full border-t"></div>
+                <a
+                  href={PUBLIC_GITHUB_LINK}
+                  class="btn hover:preset-tonal w-fit"
+                  target="_blank"
+                >
+                  <GithubIcon />
+                  GitHub
+                  <ExternalLinkIcon class="relative -top-[1px] size-5" />
+                </a>
+              {/if}
+            </div>
           {/if}
-        </div>
+        {/snippet}
       </Accordion.ItemContent>
     </Accordion.Item>
   </Accordion>

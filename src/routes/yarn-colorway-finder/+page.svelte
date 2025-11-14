@@ -60,6 +60,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { brands } from '$lib/yarns/brands';
   import {
     ArrowDownWideNarrowIcon,
+    ChevronDownIcon,
+    CircleQuestionMarkIcon,
     ExternalLinkIcon,
     PlusIcon,
     SearchIcon,
@@ -68,6 +70,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { Accordion } from '@skeletonlabs/skeleton-svelte';
   import chroma from 'chroma-js';
   import { onMount, tick } from 'svelte';
+  import { slide } from 'svelte/transition';
 
   let loadMoreSpinner = $state();
   let urlParams;
@@ -727,100 +730,73 @@ If not, see <https://www.gnu.org/licenses/>. -->
             collapsible
             multiple
           >
-            {#snippet iconOpen()}<svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="currentColor"
-                class="size-4"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="m4.5 15.75 7.5-7.5 7.5 7.5"
-                />
-              </svg>
-            {/snippet}
-            {#snippet iconClosed()}<svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="currentColor"
-                class="size-4"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="m19.5 8.25-7.5 7.5-7.5-7.5"
-                />
-              </svg>
-            {/snippet}
             <Accordion.Item value="accurate">
-              {#snippet lead()}
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke-width="1.5"
-                  stroke="currentColor"
-                  class="h-6 w-6"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z"
+              <Accordion.ItemTrigger
+                class="flex items-center justify-between gap-2"
+              >
+                <div class="flex items-center gap-2">
+                  <CircleQuestionMarkIcon />
+
+                  <p class="font-bold">Are the colors accurate?</p>
+                </div>
+
+                <Accordion.ItemIndicator class="group">
+                  <ChevronDownIcon
+                    class="h-5 w-5 transition group-data-[state=open]:rotate-180"
                   />
-                </svg>
-              {/snippet}
-              {#snippet control()}
-                <p class="font-bold">Are the colors accurate?</p>
-              {/snippet}
-              {#snippet panel()}
-                Colors on a screen will always look different from actual yarn
-                colorways. The colors used for this site are meant to be an
-                approximation. They also might not be up-to-date; some colorways
-                might have changed or not be available. These results do not
-                represent official colorway information from their respective
-                companies. The process used to obtain colorway information is
-                described here: <a
-                  href="/documentation/#getting-yarn-colorway-data"
-                  class="link">Getting Yarn Colorway Data</a
-                >. If you find an inaccuracy, send an email to
-                hello@temperature-blanket.com.
-              {/snippet}
+                </Accordion.ItemIndicator>
+              </Accordion.ItemTrigger>
+              <Accordion.ItemContent>
+                {#snippet element(attributes)}
+                  {#if !attributes.hidden}
+                    <div {...attributes} transition:slide={{ duration: 150 }}>
+                      Colors on a screen will always look different from actual
+                      yarn colorways. The colors used for this site are meant to
+                      be an approximation. They also might not be up-to-date;
+                      some colorways might have changed or not be available.
+                      These results do not represent official colorway
+                      information from their respective companies. The process
+                      used to obtain colorway information is described here: <a
+                        href="/documentation/#getting-yarn-colorway-data"
+                        class="link">Getting Yarn Colorway Data</a
+                      >. If you find an inaccuracy, send an email to
+                      hello@temperature-blanket.com.
+                    </div>
+                  {/if}
+                {/snippet}
+              </Accordion.ItemContent>
             </Accordion.Item>
             <Accordion.Item value="find">
-              {#snippet lead()}
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke-width="1.5"
-                  stroke="currentColor"
-                  class="h-6 w-6"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z"
+              <Accordion.ItemTrigger
+                class="flex items-center justify-between gap-2"
+              >
+                <div class="flex items-center gap-2">
+                  <CircleQuestionMarkIcon />
+                  <p class="font-bold">
+                    What if I can't find the yarn I'm looking for?
+                  </p>
+                </div>
+
+                <Accordion.ItemIndicator class="group">
+                  <ChevronDownIcon
+                    class="h-5 w-5 transition group-data-[state=open]:rotate-180"
                   />
-                </svg>
-              {/snippet}
-              {#snippet control()}
-                <p class="font-bold">
-                  What if I can't find the yarn I'm looking for?
-                </p>
-              {/snippet}
-              {#snippet panel()}
-                Requests for yarn to be included in these results can be made by
-                anyone using <a
-                  href="/yarn-search-request"
-                  rel="noreferrer"
-                  class="link">this request form</a
-                >.
-              {/snippet}
+                </Accordion.ItemIndicator>
+              </Accordion.ItemTrigger>
+              <Accordion.ItemContent>
+                {#snippet element(attributes)}
+                  {#if !attributes.hidden}
+                    <div {...attributes} transition:slide={{ duration: 150 }}>
+                      Requests for yarn to be included in these results can be
+                      made by anyone using <a
+                        href="/yarn-search-request"
+                        rel="noreferrer"
+                        class="link">this request form</a
+                      >.
+                    </div>
+                  {/if}
+                {/snippet}
+              </Accordion.ItemContent>
             </Accordion.Item>
           </Accordion>
         </span>

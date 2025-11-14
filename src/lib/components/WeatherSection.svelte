@@ -36,12 +36,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
     isDateWithinLastSevenDays,
     pluralize,
   } from '$lib/utils';
-  import { TriangleAlertIcon } from '@lucide/svelte';
+  import {
+    ChevronDownIcon,
+    ChevronUpIcon,
+    TriangleAlertIcon,
+  } from '@lucide/svelte';
   import { Accordion } from '@skeletonlabs/skeleton-svelte';
   import { onMount } from 'svelte';
   import UnitChanger from './UnitChanger.svelte';
   import WeatherGrouping from './WeatherGrouping.svelte';
   import WeatherSourceButton from './buttons/WeatherSourceButton.svelte';
+  import { slide } from 'svelte/transition';
 
   let graph = $state();
   let defaultWeatherSourceCopy = $state();
@@ -222,7 +227,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
         class="bg-warning-500/20 rounded-container"
       >
         <Accordion.Item value="warning">
-          <Accordion.ItemTrigger>
+          <Accordion.ItemTrigger
+            class="flex items-center justify-between gap-2"
+          >
             <TriangleAlertIcon />
 
             Weather within the past {weather.source.name === 'Open-Meteo'
@@ -230,25 +237,37 @@ If not, see <https://www.gnu.org/licenses/>. -->
               : weather.source.name === 'Meteostat'
                 ? METEOSTAT_DELAY_DAYS
                 : 'few'} days may be revised as new data comes in.
+
+            <Accordion.ItemIndicator class="group">
+              <ChevronDownIcon
+                class="h-5 w-5 transition group-data-[state=open]:rotate-180"
+              />
+            </Accordion.ItemIndicator>
           </Accordion.ItemTrigger>
           <Accordion.ItemContent>
-            Weather data comes from <a
-              href="https://open-meteo.com/"
-              target="_blank"
-              class="link">Open-Meteo</a
-            >
-            or
-            <a href="https://meteostat.net" target="_blank" class="link"
-              >Meteostat</a
-            >, and for some locations their weather models may take up to a week
-            to incorporate the latest information. Sometimes even older weather
-            data is updated. Consider working at least {weather.source.name ===
-            'Open-Meteo'
-              ? OPEN_METEO_DELAY_DAYS
-              : weather.source.name === 'Meteostat'
-                ? METEOSTAT_DELAY_DAYS
-                : 'a few'} days behind to account for possible changes. Sorry for
-            any inconvenience.
+            {#snippet element(attributes)}
+              {#if !attributes.hidden}
+                <div {...attributes} transition:slide={{ duration: 150 }}>
+                  Weather data comes from <a
+                    href="https://open-meteo.com/"
+                    target="_blank"
+                    class="link">Open-Meteo</a
+                  >
+                  or
+                  <a href="https://meteostat.net" target="_blank" class="link"
+                    >Meteostat</a
+                  >, and for some locations their weather models may take up to
+                  a week to incorporate the latest information. Sometimes even
+                  older weather data is updated. Consider working at least {weather
+                    .source.name === 'Open-Meteo'
+                    ? OPEN_METEO_DELAY_DAYS
+                    : weather.source.name === 'Meteostat'
+                      ? METEOSTAT_DELAY_DAYS
+                      : 'a few'} days behind to account for possible changes. Sorry
+                  for any inconvenience.
+                </div>
+              {/if}
+            {/snippet}
           </Accordion.ItemContent>
         </Accordion.Item>
       </Accordion>
