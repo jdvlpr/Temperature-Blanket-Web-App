@@ -36,17 +36,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
     isDateWithinLastSevenDays,
     pluralize,
   } from '$lib/utils';
-  import {
-    ChevronDownIcon,
-    ChevronUpIcon,
-    TriangleAlertIcon,
-  } from '@lucide/svelte';
+  import { ChevronDownIcon, TriangleAlertIcon } from '@lucide/svelte';
   import { Accordion } from '@skeletonlabs/skeleton-svelte';
   import { onMount } from 'svelte';
+  import { slide } from 'svelte/transition';
   import UnitChanger from './UnitChanger.svelte';
   import WeatherGrouping from './WeatherGrouping.svelte';
   import WeatherSourceButton from './buttons/WeatherSourceButton.svelte';
-  import { slide } from 'svelte/transition';
 
   let graph = $state();
   let defaultWeatherSourceCopy = $state();

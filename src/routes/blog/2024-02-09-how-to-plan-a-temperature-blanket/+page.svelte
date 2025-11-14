@@ -18,7 +18,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import AppLogo from '$lib/components/AppLogo.svelte';
   import AppShell from '$lib/components/AppShell.svelte';
   import Card from '$lib/components/Card.svelte';
-  import { ICONS } from '$lib/constants';
   import { ArrowLeftIcon } from '@lucide/svelte';
   import { Dialog } from '@skeletonlabs/skeleton-svelte';
 

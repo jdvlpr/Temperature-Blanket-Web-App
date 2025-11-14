@@ -14,7 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { browser, dev, version } from '$app/environment';
+  import { browser, version } from '$app/environment';
   import { page } from '$app/state';
   import {
     PUBLIC_BASE_URL,
@@ -37,7 +37,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import {
     ArrowLeftIcon,
     ChevronDownIcon,
-    ChevronUpIcon,
     ExternalLinkIcon,
     InfoIcon,
     XIcon,

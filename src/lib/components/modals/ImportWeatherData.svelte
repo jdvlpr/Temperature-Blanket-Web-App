@@ -29,7 +29,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     millimetersToInches,
     stringToDate,
   } from '$lib/utils';
-  import { CircleXIcon, FileIcon, FilePlusIcon } from '@lucide/svelte';
+  import { FileIcon } from '@lucide/svelte';
   import { FileUpload } from '@skeletonlabs/skeleton-svelte';
 
   let imported = $state(false);

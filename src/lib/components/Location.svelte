@@ -36,16 +36,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     TriangleAlertIcon,
     XIcon,
   } from '@lucide/svelte';
+  import { Popover, Portal, useTooltip } from '@skeletonlabs/skeleton-svelte';
   import autocomplete from 'autocompleter';
   import { onMount } from 'svelte';
   import '../../css/flag-icons.css';
   import LocationDetails from './modals/LocationDetails.svelte';
-  import {
-    Popover,
-    Portal,
-    Tooltip,
-    useTooltip,
-  } from '@skeletonlabs/skeleton-svelte';
 
   const id = $props.id();
   const tooltip = useTooltip({ id });
