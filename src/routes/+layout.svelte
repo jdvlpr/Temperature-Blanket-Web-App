@@ -16,9 +16,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import { beforeNavigate, onNavigate } from '$app/navigation';
   import { PUBLIC_MICROSOFT_CLARITY_ID } from '$env/static/public';
-  import ModalProvider from '$lib/components/modals/ModalProvider.svelte';
+  import DialogProvider from '$lib/components/modals/DialogProvider.svelte';
   import ToastProvider from '$lib/components/ToastProvider.svelte';
-  import { consentToMSClarityCookies, modal, toast } from '$lib/state';
+  import { consentToMSClarityCookies, dialog, toast } from '$lib/state';
   import { handleKeyDown, initializeLocalStorage, privacy } from '$lib/utils';
   import { onMount, type Snippet } from 'svelte';
   import '../css/main.css';
@@ -38,7 +38,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 
   beforeNavigate(() => {
-    modal.close();
+    dialog.close();
   });
 
   onNavigate((navigation) => {
@@ -156,7 +156,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <ToastProvider />
 
-<ModalProvider />
+<DialogProvider />
 
 <style>
   @keyframes fade-in {

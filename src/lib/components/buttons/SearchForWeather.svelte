@@ -17,7 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Tooltip from '$lib/components/Tooltip.svelte';
   import GettingWeather from '$lib/components/modals/GettingWeather.svelte';
   import GettingWeatherWarnCustomWeather from '$lib/components/modals/GettingWeatherWarnCustomWeather.svelte';
-  import { locations, modal, project, weather } from '$lib/state';
+  import { locations, dialog, project, weather } from '$lib/state';
   import { ChevronRightIcon } from '@lucide/svelte';
 
   let disabled = $derived(!locations.allValid || project.status.loading);
@@ -45,12 +45,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     class="btn btn-lg preset-filled-primary-500 gap-1 shadow-sm sm:w-fit"
     onclick={() => {
       if (weather.isUserEdited)
-        modal.trigger({
+        dialog.trigger({
           type: 'component',
           component: { ref: GettingWeatherWarnCustomWeather },
         });
       else
-        modal.trigger({
+        dialog.trigger({
           type: 'component',
           component: { ref: GettingWeather },
         });

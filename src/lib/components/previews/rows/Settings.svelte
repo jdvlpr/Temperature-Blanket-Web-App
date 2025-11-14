@@ -20,7 +20,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import PreviewInfo from '$lib/components/PreviewInfo.svelte';
   import { rowsPreview } from '$lib/components/previews/rows/state.svelte';
   import SpanYarnColorSelectIcon from '$lib/components/SpanYarnColorSelectIcon.svelte';
-  import { gauges, modal, weather } from '$lib/state';
+  import { gauges, dialog, weather } from '$lib/state';
   import { capitalizeFirstLetter, pluralize } from '$lib/utils';
 
   let targets = $derived(gauges.allCreated.map((n) => n.targets).flat());
@@ -106,7 +106,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       class="btn hover:preset-tonal"
       title="Choose a color for any additional stitches"
       onclick={() =>
-        modal.trigger({
+        dialog.trigger({
           type: 'component',
           component: {
             ref: ChangeColor,
@@ -114,7 +114,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               hex: rowsPreview.settings.extrasColor,
               onChangeColor: ({ hex }) => {
                 rowsPreview.settings.extrasColor = hex;
-                modal.close();
+                dialog.close();
               },
             },
           },

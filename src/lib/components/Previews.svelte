@@ -21,7 +21,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     drawerState,
     gauges,
     locations,
-    modal,
+    dialog,
     previews,
     previewWeatherTargets,
     project,
@@ -96,7 +96,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <button
         class="btn preset-tonal-primary border-primary-500 h-auto items-center border text-left whitespace-pre-wrap"
         onclick={() =>
-          modal.trigger({
+          dialog.trigger({
             type: 'component',
             component: {
               ref: AddToGallery,

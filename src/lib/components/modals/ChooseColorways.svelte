@@ -18,7 +18,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
   import StickyPart from '$lib/components/modals/StickyPart.svelte';
   import YarnGridSelect from '$lib/components/modals/YarnGridSelect.svelte';
-  import { modal } from '$lib/state';
+  import { dialog } from '$lib/state';
   import { pluralize } from '$lib/utils';
 
   interface Props {
@@ -76,10 +76,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
           updateGauge({
             _colors: selectedColors,
           });
-          modal.close();
+          dialog.close();
         }}
         onClose={() => {
-          modal.close();
+          dialog.close();
         }}
         disabled={!selectedColors.length}
       />

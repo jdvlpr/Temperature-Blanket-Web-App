@@ -14,7 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import { locations, modal, weather } from '$lib/state';
+  import { locations, dialog, weather } from '$lib/state';
   import {
     CircleCheckIcon,
     CircleIcon,
@@ -60,18 +60,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
     weather.source.settings.meteoStat.model = meteostatModel;
     weather.source.settings.openMeteo.model = openMeteoModel;
 
-    modal.close();
+    dialog.close();
 
     if (_warnSearchAgain) {
       if (weather.isUserEdited) {
-        modal.trigger({
+        dialog.trigger({
           type: 'component',
           component: {
             ref: GettingWeatherWarnCustomWeather,
           },
         });
       } else {
-        modal.trigger({
+        dialog.trigger({
           type: 'component',
           component: {
             ref: GettingWeather,
@@ -329,7 +329,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     <SaveAndCloseButtons
       onSave={_onOkay}
-      onClose={modal.close}
+      onClose={dialog.close}
       saveText={warnSearchAgain && locations.allValid
         ? 'Save and Search'
         : 'Save'}

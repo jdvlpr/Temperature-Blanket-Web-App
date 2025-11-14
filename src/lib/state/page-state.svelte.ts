@@ -15,12 +15,12 @@
 
 import { MediaQuery } from 'svelte/reactivity';
 
-type ModalOptions = {
+type DialogOptions = {
   showCloseButton?: boolean;
   size?: 'small' | 'medium' | 'large';
 };
-class ModalClass {
-  #defaultOptions: ModalOptions = {
+class DialogClass {
+  #defaultOptions: DialogOptions = {
     showCloseButton: true,
     size: 'small',
   };
@@ -39,7 +39,7 @@ class ModalClass {
     leftNavigation: false,
   });
 
-  options = $state<ModalOptions>({
+  options = $state<DialogOptions>({
     showCloseButton: true,
     size: 'small',
   });
@@ -62,9 +62,9 @@ class ModalClass {
     body?: string | null;
     response?: any;
     component?: any;
-    options?: ModalOptions;
+    options?: DialogOptions;
   }) => {
-    // close the modal
+    // close the dialog
     this.close();
 
     this.type = type;
@@ -79,7 +79,7 @@ class ModalClass {
         }, 0);
       });
 
-      // Set the the modal component and props
+      // Set the the dialog component and props
       this.contentComponent = {
         ref,
         props,
@@ -107,7 +107,7 @@ class ModalClass {
   };
 }
 
-export const modal = new ModalClass();
+export const dialog = new DialogClass();
 
 export interface ToastSettings {
   /** Provide the toast message. Supports HTML. */

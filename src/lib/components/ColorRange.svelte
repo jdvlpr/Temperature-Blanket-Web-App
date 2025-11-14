@@ -15,7 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import GaugeSettings from '$lib/components/modals/GaugeSettings.svelte';
-  import { gauges, localState, modal } from '$lib/state';
+  import { gauges, localState, dialog } from '$lib/state';
 
   let { index } = $props();
 
@@ -42,7 +42,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
         const focusOn = wasToClicked ? 'to' : 'from';
 
-        modal.trigger({
+        dialog.trigger({
           type: 'component',
           component: {
             ref: GaugeSettings,

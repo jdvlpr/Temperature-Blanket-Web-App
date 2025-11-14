@@ -32,7 +32,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Menu from '$lib/components/modals/Menu.svelte';
   import {
     locations,
-    modal,
+    dialog,
     pageSections,
     project,
     wasProjectLoadedFromURL,
@@ -86,7 +86,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     // Check if the project needs to show a legacy notification
     // Use this to display warnings about backwards compatibility if the project is incompatible
     if (!upToDate(project.loaded.version, '0.98'))
-      modal.trigger({
+      dialog.trigger({
         type: 'component',
         component: { ref: LegacyNotification, props: { v: 'v0.98' } },
       });
@@ -147,7 +147,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <button
     aria-label="Getting Started Guide"
     onclick={() => {
-      modal.trigger({
+      dialog.trigger({
         type: 'component',
         component: { ref: GettingStarted },
         options: {
@@ -174,7 +174,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             classNames="btn hover:preset-tonal"
             title="Save Project [Cmd]+[s] or [Ctrl]+[s]"
             onclick={() =>
-              modal.trigger({
+              dialog.trigger({
                 type: 'component',
                 component: { ref: Menu, props: { page: 'save' } },
               })}
@@ -313,7 +313,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       title="Project Options"
       class="max-sm:btn-icon sm:btn hover:preset-tonal"
       onclick={() =>
-        modal.trigger({
+        dialog.trigger({
           type: 'component',
           component: {
             ref: Menu,
@@ -384,7 +384,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 Weather data from <button
                   class="underline"
                   onclick={() => {
-                    modal.trigger({
+                    dialog.trigger({
                       type: 'component',
                       component: { ref: ChooseWeatherSource },
                     });

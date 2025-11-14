@@ -21,7 +21,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { calendarPreview } from '$lib/components/previews/calendar/state.svelte';
   import SpanYarnColorSelectIcon from '$lib/components/SpanYarnColorSelectIcon.svelte';
   import { DAYS_OF_THE_WEEK } from '$lib/constants';
-  import { gauges, modal, weather } from '$lib/state';
+  import { gauges, dialog, weather } from '$lib/state';
   import { pluralize } from '$lib/utils';
   import { SquareSquareIcon } from '@lucide/svelte';
 
@@ -101,7 +101,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     class="btn hover:preset-tonal"
     title="Edit Square Design"
     onclick={async () => {
-      modal.trigger({
+      dialog.trigger({
         type: 'component',
         component: {
           ref: SquareDesigner,
@@ -128,7 +128,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     class="btn hover:preset-tonal"
     title="Choose a Color"
     onclick={() =>
-      modal.trigger({
+      dialog.trigger({
         type: 'component',
         component: {
           ref: ChangeColor,
@@ -136,7 +136,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             hex: calendarPreview.settings.additionalSquaresColor,
             onChangeColor: ({ hex }) => {
               calendarPreview.settings.additionalSquaresColor = hex;
-              modal.close();
+              dialog.close();
             },
           },
         },
@@ -172,7 +172,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       class="btn hover:preset-tonal"
       title="Choose a color for the border stitches around each square"
       onclick={() =>
-        modal.trigger({
+        dialog.trigger({
           type: 'component',
           component: {
             ref: ChangeColor,
@@ -180,7 +180,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               hex: calendarPreview.settings.joinColor,
               onChangeColor: ({ hex }) => {
                 calendarPreview.settings.joinColor = hex;
-                modal.close();
+                dialog.close();
               },
             },
           },

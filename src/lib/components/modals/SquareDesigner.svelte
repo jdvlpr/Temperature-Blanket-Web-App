@@ -18,7 +18,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
   import StickyPart from '$lib/components/modals/StickyPart.svelte';
   import Tooltip from '$lib/components/Tooltip.svelte';
-  import { modal } from '$lib/state';
+  import { dialog } from '$lib/state';
   import {
     displayNumber,
     getSecondaryTargetIndexes,
@@ -93,7 +93,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       secondaryTargets: _secondaryTargets,
       primaryTargetAsBackup,
     });
-    modal.close();
+    dialog.close();
   }
 </script>
 
@@ -215,6 +215,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </div>
 <StickyPart position="bottom">
   <div class="p-2">
-    <SaveAndCloseButtons onSave={_onOkay} onClose={modal.close} />
+    <SaveAndCloseButtons onSave={_onOkay} onClose={dialog.close} />
   </div>
 </StickyPart>

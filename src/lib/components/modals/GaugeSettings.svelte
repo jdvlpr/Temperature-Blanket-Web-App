@@ -21,7 +21,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
   import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
   import StickyPart from '$lib/components/modals/StickyPart.svelte';
-  import { gauges, localState, modal, weather } from '$lib/state';
+  import { gauges, localState, dialog, weather } from '$lib/state';
   import {
     displayNumber,
     getIncrement,
@@ -153,7 +153,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       ranges: _gauge.ranges,
       rangeOptions: _gauge.rangeOptions,
     });
-    modal.close();
+    dialog.close();
   }
 
   function autoUpdateRanges() {
@@ -686,6 +686,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </button>
   {/if}
   <div class="pt-2 pb-2 max-sm:p-4">
-    <SaveAndCloseButtons onSave={_onSave} onClose={modal.close} />
+    <SaveAndCloseButtons onSave={_onSave} onClose={dialog.close} />
   </div>
 </StickyPart>

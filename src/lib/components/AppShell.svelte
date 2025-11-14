@@ -16,7 +16,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script>
   import AppNavigation from '$lib/components/AppNavigation.svelte';
   import {
-    modal,
+    dialog,
     pageSections,
     showNavigationSideBar,
     weather,
@@ -83,9 +83,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <div class="lg:hidden">
         <Dialog
           onOpenChange={(e) => {
-            modal.drawer.leftNavigation = e.open;
+            dialog.drawer.leftNavigation = e.open;
           }}
-          open={modal.drawer.leftNavigation}
+          open={dialog.drawer.leftNavigation}
         >
           <Dialog.Trigger
             class="btn hover:preset-tonal my-2"

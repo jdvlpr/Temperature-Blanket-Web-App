@@ -20,7 +20,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
   import ViewToggle from '$lib/components/buttons/ViewToggle.svelte';
   import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
-  import { localState, modal, showDaysInRange } from '$lib/state';
+  import { localState, dialog, showDaysInRange } from '$lib/state';
   import type { Color } from '$lib/types';
   import { getTextColor } from '$lib/utils';
   import {
@@ -79,7 +79,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     });
 
     sortableColors = getSortableColors();
-    modal.close();
+    dialog.close();
   }
 
   function handleConsider(e) {
@@ -223,7 +223,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         class="btn hover:preset-tonal h-auto"
         title="Choose a Color"
         onclick={() =>
-          modal.trigger({
+          dialog.trigger({
             type: 'component',
             component: {
               ref: ChangeColor,

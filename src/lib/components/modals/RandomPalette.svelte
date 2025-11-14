@@ -21,7 +21,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Tooltip from '$lib/components/Tooltip.svelte';
   import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
   import StickyPart from '$lib/components/modals/StickyPart.svelte';
-  import { modal } from '$lib/state';
+  import { dialog } from '$lib/state';
   import {
     getColorways,
     getFilteredYarns,
@@ -276,9 +276,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
             return color;
           }),
         });
-        modal.close();
+        dialog.close();
       }}
-      onClose={modal.close}
+      onClose={dialog.close}
     />
   </div>
 </StickyPart>

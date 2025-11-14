@@ -28,7 +28,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     OPEN_METEO_DELAY_DAYS,
     UNIT_LABELS,
   } from '$lib/constants';
-  import { gauges, localState, locations, modal, weather } from '$lib/state';
+  import { gauges, localState, locations, dialog, weather } from '$lib/state';
   import {
     convertTime,
     displayNumber,
@@ -518,7 +518,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     <button
                       class="link"
                       onclick={() => {
-                        modal.trigger({
+                        dialog.trigger({
                           type: 'component',
                           component: {
                             ref: ChooseWeatherSource,

@@ -15,17 +15,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import GettingWeather from '$lib/components/modals/GettingWeather.svelte';
-  import { modal } from '$lib/state';
+  import { dialog } from '$lib/state';
 
   function setModal() {
-    modal.trigger({
+    dialog.trigger({
       type: 'component',
       component: { ref: GettingWeather },
     });
   }
 </script>
 
-<div class="flex flex-col text-center p-2">
+<div class="flex flex-col p-2 text-center">
   <p class="text-lg font-bold">Are you sure?</p>
 
   <p class="my-4">This will overwrite your custom weather data.</p>
@@ -45,7 +45,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         viewBox="0 0 24 24"
         stroke-width="1.5"
         stroke="currentColor"
-        class="w-6 h-6"
+        class="h-6 w-6"
       >
         <path
           stroke-linecap="round"

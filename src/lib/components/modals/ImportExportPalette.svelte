@@ -19,7 +19,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Expand from '$lib/components/Expand.svelte';
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
   import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
-  import { modal, toast } from '$lib/state';
+  import { dialog, toast } from '$lib/state';
   import {
     colorsToCode,
     colorsToYarnDetails,
@@ -231,11 +231,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <SaveAndCloseButtons
             onSave={() => {
               updateGauge({ _colors: inputColors });
-              modal.close();
+              dialog.close();
             }}
             disabled={!inputColors.length}
             onClose={() => {
-              modal.close();
+              dialog.close();
             }}
           />
         </div>

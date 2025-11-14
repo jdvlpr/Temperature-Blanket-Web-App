@@ -15,7 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import UnitChanger from '$lib/components/UnitChanger.svelte';
-  import { modal } from '$lib/state';
+  import { dialog } from '$lib/state';
   import { getWeatherCodeDetails } from '$lib/utils';
   import { Trash2Icon } from '@lucide/svelte';
   import { SegmentedControl } from '@skeletonlabs/skeleton-svelte';
@@ -52,14 +52,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
               weatherState.activeLocationID = id;
               await fetchData();
               weatherLocationState.validId = true;
-              modal.close();
+              dialog.close();
             }}
             onkeydown={async (e) => {
               if (e.key === 'Enter') {
                 weatherState.activeLocationID = id;
                 await fetchData();
                 weatherLocationState.validId = true;
-                modal.close();
+                dialog.close();
               }
             }}
           >
@@ -122,7 +122,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   !weatherState.weatherLocations.filter((item) => item?.saved)
                     ?.length
                 )
-                  modal.close();
+                  dialog.close();
               }}
             >
               <Trash2Icon />

@@ -16,7 +16,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import { browser } from '$app/environment';
   import { MONTHS } from '$lib/constants';
-  import { locations, modal, project, toast, weather } from '$lib/state';
+  import { locations, dialog, project, toast, weather } from '$lib/state';
   import type { LocationType } from '$lib/types/location-types';
   import {
     dateToISO8601String,
@@ -487,7 +487,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <button
           class="btn hover:preset-tonal w-fit text-xs opacity-50 hover:opacity-100"
           onclick={() => {
-            modal.trigger({
+            dialog.trigger({
               type: 'component',
               component: {
                 ref: LocationDetails,

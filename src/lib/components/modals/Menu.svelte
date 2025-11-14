@@ -30,7 +30,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import YarnSources from '$lib/components/YarnSources.svelte';
   import KeyboardShortcuts from '$lib/components/modals/KeyboardShortcuts.svelte';
   import { DAYS_OF_THE_WEEK, MONTHS } from '$lib/constants';
-  import { modal, previews, project, toast, weather } from '$lib/state';
+  import { dialog, previews, project, toast, weather } from '$lib/state';
   import {
     delay,
     downloadPDF,
@@ -247,7 +247,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <button
         class="btn hover:preset-tonal w-fit"
         onclick={() => {
-          modal.trigger({
+          dialog.trigger({
             type: 'component',
             component: { ref: KeyboardShortcuts },
           });

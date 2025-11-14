@@ -16,7 +16,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script>
   import WeatherTableWrapper from '$lib/components/WeatherTableWrapper.svelte';
   import ImportWeatherData from '$lib/components/modals/ImportWeatherData.svelte';
-  import { modal, weather } from '$lib/state';
+  import { dialog, weather } from '$lib/state';
   import { downloadPDF, downloadWeatherCSV } from '$lib/utils';
   import { DownloadIcon, FilePlus2Icon } from '@lucide/svelte';
   import { weatherChart } from './WeatherChart.svelte';
@@ -64,7 +64,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <button
         class="btn hover:preset-tonal h-auto text-left whitespace-pre-wrap"
         onclick={() => {
-          modal.trigger({
+          dialog.trigger({
             type: 'component',
             component: {
               ref: ImportWeatherData,

@@ -16,7 +16,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import Tooltip from '$lib/components/Tooltip.svelte';
   import GaugeSettings from '$lib/components/modals/GaugeSettings.svelte';
-  import { gauges, modal } from '$lib/state';
+  import { gauges, dialog } from '$lib/state';
   import { Settings2Icon } from '@lucide/svelte';
 
   function onSaveRangeOptions(e) {
@@ -29,7 +29,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   classNames="btn preset-filled"
   title="Configure Ranges"
   onclick={() =>
-    modal.trigger({
+    dialog.trigger({
       type: 'component',
       component: {
         ref: GaugeSettings,

@@ -21,7 +21,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { browser } from '$app/environment';
   import Tooltip from '$lib/components/Tooltip.svelte';
   import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
-  import { modal } from '$lib/state';
+  import { dialog } from '$lib/state';
   import type { Color } from '$lib/types';
   import { getTextColor } from '$lib/utils';
   import {
@@ -110,7 +110,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         _colors.push(color);
       }
       colors = _colors;
-      modal.close();
+      dialog.close();
     });
 
     sortableColors = getSortableColors();
@@ -345,7 +345,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 <button
                   class="btn hover:preset-tonal h-auto"
                   onclick={() =>
-                    modal.trigger({
+                    dialog.trigger({
                       type: 'component',
                       component: {
                         ref: ChangeColor,
@@ -365,7 +365,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     })}
                   onkeydown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
-                      modal.trigger({
+                      dialog.trigger({
                         type: 'component',
                         component: {
                           ref: ChangeColor,

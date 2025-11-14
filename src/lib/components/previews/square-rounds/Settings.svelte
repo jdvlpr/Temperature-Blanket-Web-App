@@ -17,7 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
   import SpanYarnColorSelectIcon from '$lib/components/SpanYarnColorSelectIcon.svelte';
   import Tooltip from '$lib/components/Tooltip.svelte';
-  import { gauges, modal, weather } from '$lib/state';
+  import { gauges, dialog, weather } from '$lib/state';
   import { pluralize } from '$lib/utils';
   import { capitalizeFirstLetter } from '$lib/utils/other-utils';
   import { ArrowRightIcon, InfoIcon } from '@lucide/svelte';
@@ -185,7 +185,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     class="btn hover:preset-tonal text-left whitespace-pre-wrap"
     title="Choose a Color"
     onclick={() =>
-      modal.trigger({
+      dialog.trigger({
         type: 'component',
         component: {
           ref: ChangeColor,
@@ -193,7 +193,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             hex: squareRoundsPreview.settings.additionalRoundsColor,
             onChangeColor: ({ hex }) => {
               squareRoundsPreview.settings.additionalRoundsColor = hex;
-              modal.close();
+              dialog.close();
             },
           },
         },

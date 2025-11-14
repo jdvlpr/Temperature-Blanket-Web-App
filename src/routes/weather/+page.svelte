@@ -37,7 +37,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import {
     localState,
     locations,
-    modal,
+    dialog,
     project,
     showNavigationSideBar,
   } from '$lib/state';
@@ -346,7 +346,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         class="btn-icon hover:preset-tonal"
         title="Open Settings"
         onclick={() =>
-          modal.trigger({
+          dialog.trigger({
             type: 'component',
             component: {
               ref: Menu,
@@ -364,7 +364,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           class="btn-icon hover:preset-tonal"
           title="Open Locations"
           onclick={() =>
-            modal.trigger({
+            dialog.trigger({
               type: 'component',
               component: {
                 ref: Menu,
@@ -431,7 +431,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       in:fade
                       class="btn hover:preset-tonal"
                       onclick={() =>
-                        modal.trigger({
+                        dialog.trigger({
                           type: 'component',
                           component: {
                             ref: Menu,

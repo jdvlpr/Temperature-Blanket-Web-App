@@ -27,7 +27,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ImportExportPalette from '$lib/components/modals/ImportExportPalette.svelte';
   import RandomPalette from '$lib/components/modals/RandomPalette.svelte';
   import SortPalette from '$lib/components/modals/SortPalette.svelte';
-  import { drawerState, modal, pageSections } from '$lib/state';
+  import { drawerState, dialog, pageSections } from '$lib/state';
   import type { Color, GaugeSettingsType } from '$lib/types';
   import { createGaugeColors } from '$lib/utils';
   import {
@@ -60,7 +60,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     drawerState.closeAll();
 
-    modal.close();
+    dialog.close();
   }
 
   $effect(() => {
@@ -149,7 +149,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         fullscreen.value ? 'btn-icon' : 'btn justify-start',
       ]}
       onclick={() =>
-        modal.trigger({
+        dialog.trigger({
           type: 'component',
           component: {
             ref: BrowsePalettes,
@@ -175,7 +175,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       ]}
       title="Choose Yarn Colorways, Filtered by Brand and Yarn"
       onclick={() =>
-        modal.trigger({
+        dialog.trigger({
           type: 'component',
           component: {
             ref: ChooseColorways,
@@ -201,7 +201,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       ]}
       title="Get Palette from Image"
       onclick={() =>
-        modal.trigger({
+        dialog.trigger({
           type: 'component',
           component: {
             ref: GetPaletteFromImage,
@@ -228,7 +228,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       ]}
       title="Generate Random Colors"
       onclick={() =>
-        modal.trigger({
+        dialog.trigger({
           type: 'component',
           component: {
             ref: RandomPalette,
@@ -255,7 +255,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       ]}
       title="Load Colors or Get a Palette Code to Share"
       onclick={() =>
-        modal.trigger({
+        dialog.trigger({
           type: 'component',
           component: {
             ref: ImportExportPalette,
@@ -280,7 +280,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       ]}
       title="Sort Colors"
       onclick={() =>
-        modal.trigger({
+        dialog.trigger({
           type: 'component',
           component: {
             ref: SortPalette,

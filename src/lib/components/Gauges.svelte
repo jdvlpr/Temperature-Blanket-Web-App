@@ -18,7 +18,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     allGaugesAttributes,
     gauges,
     localState,
-    modal,
+    dialog,
     weather,
   } from '$lib/state';
   import { downloadPDF } from '$lib/utils';
@@ -81,7 +81,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         onclick={() => {
           if (!gauges.allCreated.map((gauge) => gauge.id).includes(id)) {
             // If the gauge is not created yet, then set it up
-            modal.trigger({
+            dialog.trigger({
               type: 'confirm',
               title: `Add a ${label}?`,
               body: `This will add a new gauge to your project. You can delete it later.`,
