@@ -140,15 +140,24 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <div class="p-4">
   <div class="mb-4 flex w-full flex-col gap-1 text-left">
     <SegmentedControl
-      classes="flex wrap gap-y-2 w-fit mx-auto shadow-sm"
-      background="bg-surface-200 dark:bg-surface-800"
       value={segmentValue}
       onValueChange={(e) => {
         segmentValue = e.value;
       }}
     >
-      <Segment.Item value={'export'}>Export</Segment.Item>
-      <Segment.Item value={'import'}>Import</Segment.Item>
+      <SegmentedControl.Control
+        class="wrap bg-surface-200 dark:bg-surface-800 mx-auto flex w-fit gap-y-2 shadow-sm"
+      >
+        <SegmentedControl.Indicator />
+        <SegmentedControl.Item value={'export'}
+          ><SegmentedControl.ItemText>Export</SegmentedControl.ItemText>
+          <SegmentedControl.ItemHiddenInput /></SegmentedControl.Item
+        >
+        <SegmentedControl.Item value={'import'}>
+          <SegmentedControl.ItemText>Import</SegmentedControl.ItemText>
+          <SegmentedControl.ItemHiddenInput />
+        </SegmentedControl.Item>
+      </SegmentedControl.Control>
     </SegmentedControl>
   </div>
 

@@ -25,11 +25,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
       onValueChange={(e) => {
         weather.grouping = e.value;
       }}
-      background="bg-surface-100 dark:bg-surface-900"
-      classes="shadow-sm"
     >
-      <Segment.Item value="day">Daily</Segment.Item>
-      <Segment.Item value="week">Weekly</Segment.Item>
+      <SegmentedControl.Control
+        class="bg-surface-100 dark:bg-surface-900 shadow-sm"
+      >
+        <SegmentedControl.Indicator />
+        <SegmentedControl.Item value="day"
+          ><SegmentedControl.ItemText>Daily</SegmentedControl.ItemText>
+          <SegmentedControl.ItemHiddenInput /></SegmentedControl.Item
+        >
+        <SegmentedControl.Item value="week"
+          ><SegmentedControl.ItemText>Weekly</SegmentedControl.ItemText>
+          <SegmentedControl.ItemHiddenInput /></SegmentedControl.Item
+        >
+      </SegmentedControl.Control>
     </SegmentedControl>
   </div>
 </div>

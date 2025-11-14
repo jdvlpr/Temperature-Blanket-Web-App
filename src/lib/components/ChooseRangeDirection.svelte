@@ -20,17 +20,24 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let { direction, onchange } = $props();
 </script>
 
-<p class="flex justify-start items-center gap-1">
-  <ArrowUpDownIcon class="size-4" />
-  <span>Direction</span>
-</p>
-
-<SegmentedControl
-  value={direction}
-  classes="flex-wrap gap-y-2 justify-start items-start"
-  background="bg-surface-100 dark:bg-surface-900"
-  onValueChange={onchange}
->
-  <Segment.Item value="high-to-low">High to Low</Segment.Item>
-  <Segment.Item value="low-to-high">Low to High</Segment.Item>
+<SegmentedControl value={direction} onValueChange={onchange}>
+  <SegmentedControl.Label
+    ><p class="flex items-center justify-start gap-1">
+      <ArrowUpDownIcon class="size-4" />
+      <span>Direction</span>
+    </p></SegmentedControl.Label
+  >
+  <SegmentedControl.Control
+    class="bg-surface-100 dark:bg-surface-900 flex-wrap items-start justify-start gap-y-2"
+  >
+    <SegmentedControl.Indicator />
+    <SegmentedControl.Item value="high-to-low">
+      <SegmentedControl.ItemText>High to Low</SegmentedControl.ItemText>
+      <SegmentedControl.ItemHiddenInput />
+    </SegmentedControl.Item>
+    <SegmentedControl.Item value="low-to-high">
+      <SegmentedControl.ItemText>Low to High</SegmentedControl.ItemText>
+      <SegmentedControl.ItemHiddenInput />
+    </SegmentedControl.Item>
+  </SegmentedControl.Control>
 </SegmentedControl>

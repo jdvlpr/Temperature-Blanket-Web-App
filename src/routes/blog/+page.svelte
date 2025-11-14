@@ -119,16 +119,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
         onValueChange={(e) => {
           selectedTag = e.value;
         }}
-        classes="mt-4"
-        background="bg-surface-100 dark:bg-surface-900 shadow-sm"
       >
-        {#each tags as tag}
-          <Segment.Item value={tag}>
-            <span class="flex items-center justify-center gap-1">
-              {tag}
-            </span>
-          </Segment.Item>
-        {/each}
+        <SegmentedControl.Control
+          class="bg-surface-100 dark:bg-surface-900 mt-4 shadow-sm"
+        >
+          <SegmentedControl.Indicator />
+          {#each tags as tag}
+            <SegmentedControl.Item value={tag}>
+              <SegmentedControl.ItemText>
+                <span class="flex items-center justify-center gap-1">
+                  {tag}
+                </span></SegmentedControl.ItemText
+              >
+              <SegmentedControl.ItemHiddenInput />
+            </SegmentedControl.Item>
+          {/each}
+        </SegmentedControl.Control>
       </SegmentedControl>
 
       {#key selectedTag}

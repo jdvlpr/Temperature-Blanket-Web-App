@@ -148,11 +148,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
               onValueChange={(e) => {
                 weatherState.hour = e.value;
               }}
-              classes="flex-wrap gap-y-2"
-              background="bg-surface-100 dark:bg-surface-900 shadow-sm"
             >
-              <Segment.Item value="12">12hr</Segment.Item>
-              <Segment.Item value="24">24hr</Segment.Item>
+              <SegmentedControl.Control
+                class="bg-surface-100 dark:bg-surface-900 flex-wrap gap-y-2 shadow-sm"
+              >
+                <SegmentedControl.Indicator />
+                <SegmentedControl.Item value="12">
+                  <SegmentedControl.ItemText>12hr</SegmentedControl.ItemText>
+                  <SegmentedControl.ItemHiddenInput />
+                </SegmentedControl.Item>
+                <SegmentedControl.Item value="24">
+                  <SegmentedControl.ItemText>24hr</SegmentedControl.ItemText>
+                  <SegmentedControl.ItemHiddenInput />
+                </SegmentedControl.Item>
+              </SegmentedControl.Control>
             </SegmentedControl>
             <p class="text-sm">
               {new Date().toLocaleTimeString(navigator.language, {

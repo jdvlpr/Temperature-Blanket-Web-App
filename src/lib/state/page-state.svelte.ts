@@ -71,6 +71,7 @@ class ModalClass {
 
     if (type === 'component') {
       const { ref, props } = component;
+
       // Delay necessary for zag to transition
       await new Promise((resolve) => {
         setTimeout(() => {

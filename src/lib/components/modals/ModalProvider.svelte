@@ -3,15 +3,15 @@
   import { Dialog, Portal } from '@skeletonlabs/skeleton-svelte';
   import CloseButton from './CloseButton.svelte';
   import SaveAndCloseButtons from './SaveAndCloseButtons.svelte';
+
+  // The following animation is optional.
+  // This may also be included inline.
+  const animation =
+    'transition transition-discrete opacity-0 translate-y-[100px] starting:data-[state=open]:opacity-0 starting:data-[state=open]:translate-y-[100px] data-[state=open]:opacity-100 data-[state=open]:translate-y-0';
 </script>
 
-<Dialog
-  open={modal.opened}
-  onOpenChange={(e) => {
-    modal.opened = e.open;
-  }}
->
-  <Dialog.Trigger class="hidden">Trigger</Dialog.Trigger>
+<Dialog bind:open={modal.opened}>
+  <!-- <Dialog.Trigger class="hidden">Trigger</Dialog.Trigger> -->
   <Portal>
     <Dialog.Backdrop
       class="bg-surface-50-950/50 fixed inset-0 z-50 backdrop-blur-md"
@@ -20,7 +20,7 @@
       class="fixed inset-0 z-50 flex items-center justify-center"
     >
       <Dialog.Content
-        class="card bg-surface-50 dark:bg-surface-950 max-h-[100svh] space-y-4 overflow-auto shadow-xl max-sm:min-w-[100vw] lg:max-h-[80svh] {modal
+        class="card bg-surface-50 dark:bg-surface-950 max-h-[100svh] space-y-4 overflow-auto shadow-xl max-sm:min-w-[100vw] lg:max-h-[80svh] {animation} {modal
           .options.size === 'large'
           ? 'max-w-(--breakpoint-lg)'
           : modal.options.size === 'medium'
@@ -39,7 +39,11 @@
               >
             </div>
           {/if}
-          <modal.contentComponent.ref {...modal.contentComponent.props} />
+          {#key modal.contentComponent.ref}
+            {#if modal.contentComponent.ref}
+              <modal.contentComponent.ref {...modal.contentComponent.props} />
+            {/if}
+          {/key}
         {:else if modal.type === 'choose-weather-params'}
           <div
             role="dialog"

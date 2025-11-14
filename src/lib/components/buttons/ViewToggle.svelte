@@ -27,16 +27,25 @@ If not, see <https://www.gnu.org/licenses/>. -->
   background="bg-surface-100 dark:bg-surface-900"
   classes="shadow-sm"
 >
-  <Segment.Item value="list">
-    <div class="flex items-center justify-center gap-1">
-      <LayoutListIcon />
-      <span class="">List</span>
-    </div>
-  </Segment.Item>
-  <Segment.Item value="grid">
-    <div class="flex items-center justify-center gap-1">
-      <LayoutGridIcon />
-      <span class="">Grid</span>
-    </div>
-  </Segment.Item>
+  <SegmentedControl.Control>
+    <SegmentedControl.Indicator />
+    <SegmentedControl.Item value="list">
+      <SegmentedControl.ItemText
+        ><div class="flex items-center justify-center gap-1">
+          <LayoutListIcon />
+          <span class="">List</span>
+        </div></SegmentedControl.ItemText
+      >
+      <SegmentedControl.ItemHiddenInput />
+    </SegmentedControl.Item>
+    <SegmentedControl.Item value="grid">
+      <SegmentedControl.ItemText
+        ><div class="flex items-center justify-center gap-1">
+          <LayoutGridIcon />
+          <span class="">Grid</span>
+        </div></SegmentedControl.ItemText
+      >
+      <SegmentedControl.ItemHiddenInput />
+    </SegmentedControl.Item>
+  </SegmentedControl.Control>
 </SegmentedControl>

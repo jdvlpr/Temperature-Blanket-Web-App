@@ -254,15 +254,26 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </p>
 
             <SegmentedControl
-              classes="flex-wrap gap-y-2 shadow-sm"
-              background="bg-surface-100 dark:bg-surface-900"
               value={incrementMode}
               onValueChange={(e) => {
                 incrementMode = e.value;
               }}
             >
-              <Segment.Item value="auto">Automatic</Segment.Item>
-              <Segment.Item value="manual">Manual</Segment.Item>
+              <SegmentedControl.Control
+                class="bg-surface-100 dark:bg-surface-900 flex-wrap gap-y-2 shadow-sm"
+              >
+                <SegmentedControl.Indicator />
+                <SegmentedControl.Item value="auto">
+                  <SegmentedControl.ItemText
+                    >Automatic
+                  </SegmentedControl.ItemText>
+                  <SegmentedControl.ItemHiddenInput />
+                </SegmentedControl.Item>
+                <SegmentedControl.Item value="manual">
+                  <SegmentedControl.ItemText>Manual</SegmentedControl.ItemText>
+                  <SegmentedControl.ItemHiddenInput />
+                </SegmentedControl.Item>
+              </SegmentedControl.Control>
             </SegmentedControl>
 
             {#if !incrementMode}

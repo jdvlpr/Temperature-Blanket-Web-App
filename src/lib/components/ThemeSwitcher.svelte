@@ -115,9 +115,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {/key}
     </Popover.Trigger>
     <Portal>
-      <Popover.Positioner class="z-999">
+      <Popover.Positioner>
         <Popover.Content
-          class="card bg-surface-200-800 space-y-4 p-4 shadow-xl"
+          class="card bg-surface-200-800 z-999 space-y-4 p-4 shadow-xl"
         >
           <Popover.Description>
             <div class="flex flex-col gap-2">

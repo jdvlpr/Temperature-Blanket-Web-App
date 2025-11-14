@@ -146,14 +146,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
 {#snippet gettingStarted()}
   <button
     aria-label="Getting Started Guide"
-    onclick={() =>
+    onclick={() => {
       modal.trigger({
         type: 'component',
         component: { ref: GettingStarted },
         options: {
           size: 'large',
         },
-      })}
+      });
+    }}
     class="btn preset-filled-secondary-500 text-surface-contrast-500 gap-2"
   >
     <LightbulbIcon />
@@ -234,11 +235,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
 
     <Popover>
-      <Popover.Trigger>
-        <button class="btn hover:preset-tonal" aria-label="About Menu">
-          <BadgeQuestionMarkIcon />
-          <span class="hidden sm:inline-block">About</span>
-        </button>
+      <Popover.Trigger class="btn hover:preset-tonal" aria-label="About Menu">
+        <BadgeQuestionMarkIcon />
+        <span class="hidden sm:inline-block">About</span>
       </Popover.Trigger>
       <Portal>
         <Popover.Positioner class="z-999">

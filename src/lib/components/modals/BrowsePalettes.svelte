@@ -65,7 +65,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <div class="p-2" bind:this={container}>
   <div
-    class="w-full flex flex-wrap justify-center items-end gap-2 px-2 pb-2"
+    class="flex w-full flex-wrap items-end justify-center gap-2 px-2 pb-2"
     class:pt-4={context === 'drawer'}
     bind:this={filtersContainer}
   >
@@ -77,13 +77,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
       background="bg-surface-100 dark:bg-surface-950"
       classes="shadow-sm"
     >
-      {#each categories as categoryItem}
-        <Segment.Item value={categoryItem}>
-          <span class="flex gap-1 justify-center items-center">
-            {categoryItem}
-          </span>
-        </Segment.Item>
-      {/each}
+      <SegmentedControl.Control>
+        <SegmentedControl.Indicator />
+        {#each categories as categoryItem}
+          <SegmentedControl.Item value={categoryItem}>
+            <SegmentedControl.ItemText
+              ><span class="flex items-center justify-center gap-1">
+                {categoryItem}
+              </span></SegmentedControl.ItemText
+            >
+            <SegmentedControl.ItemHiddenInput />
+          </SegmentedControl.Item>
+        {/each}
+      </SegmentedControl.Control>
     </SegmentedControl>
   </div>
 
