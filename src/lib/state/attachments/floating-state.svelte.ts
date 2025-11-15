@@ -18,7 +18,7 @@ interface PopoverOptions {
 
 // InteractivePopover: a variant that keeps the floating/popover interactive
 // while providing delayed-close logic so users can move from trigger -> popover
-export class InteractivePopover {
+export class InteractivePopoverInstance {
   private options: PopoverOptions = {
     interaction: 'hover',
     placement: 'bottom',

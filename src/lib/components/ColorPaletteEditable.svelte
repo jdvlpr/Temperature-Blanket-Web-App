@@ -21,7 +21,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { browser } from '$app/environment';
   import Tooltip from '$lib/components/Tooltip.svelte';
   import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
-  import { dialog, InteractivePopover, PopoverInstance } from '$lib/state';
+  import {
+    dialog,
+    InteractivePopoverInstance,
+    PopoverInstance,
+  } from '$lib/state';
   import type { Color } from '$lib/types';
   import { getTextColor } from '$lib/utils';
   import {
@@ -38,7 +42,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     dragHandleZone,
   } from 'svelte-dnd-action';
   import { flip } from 'svelte/animate';
-  import { fade, slide } from 'svelte/transition';
+  import { fade, scale, slide } from 'svelte/transition';
 
   interface Props {
     colors?: Color[];
@@ -225,7 +229,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         affiliate_variant_href,
       } = color}
       {@const isLocked = typeof color.locked !== undefined && color?.locked}
-      {@const popover = new InteractivePopover({
+      {@const popover = new InteractivePopoverInstance({
         interaction: ['hover', 'click'],
         placement: 'top',
       })}
@@ -285,9 +289,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {#if popover.isOpen() && !isDragging.value}
           <div
             {...popover.floating()}
-            in:slide={{ duration: 150, delay: 150 }}
+            in:scale={{ duration: 100, delay: 150 }}
             style="background:{hex};color:{getTextColor(hex)};"
-            class="tooltip rounded-container z-30 flex w-full flex-wrap items-center justify-center gap-4 p-2 text-center break-all"
+            class="tooltip rounded-container z-30 flex w-full max-w-screen flex-wrap items-center justify-center gap-4 p-2 text-center break-all"
             data-floating
           >
             {#if canUserDeleteColor && sortableColors.length > 1 && !isStaticGauge}

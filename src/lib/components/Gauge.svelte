@@ -130,18 +130,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
       gauge.unit.type === 'category' && 'hidden',
     ]}
   >
-    <SelectNumberOfColors
-      hideText={fullscreen.value}
-      numberOfColors={gauge.colors.length}
-      onchange={(e) => {
-        const colors = createGaugeColors({
-          schemeId: gauge.schemeId,
-          numberOfColors: +e.target.value,
-          colors: $state.snapshot(gauge.colors),
-        });
-        gauge.updateColors({ colors });
-      }}
-    />
+    {#key fullscreen.value}
+      <SelectNumberOfColors
+        hideText={fullscreen.value}
+        numberOfColors={gauge.colors.length}
+        onchange={(e) => {
+          const colors = createGaugeColors({
+            schemeId: gauge.schemeId,
+            numberOfColors: +e.target.value,
+            colors: $state.snapshot(gauge.colors),
+          });
+          gauge.updateColors({ colors });
+        }}
+      />
+    {/key}
 
     <button
       class={[

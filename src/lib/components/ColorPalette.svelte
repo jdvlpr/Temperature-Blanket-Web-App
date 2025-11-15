@@ -16,7 +16,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script>
   import { PopoverInstance } from '$lib/state';
   import { getTextColor } from '$lib/utils';
-  import { fade, slide } from 'svelte/transition';
+  import { fade, scale, slide } from 'svelte/transition';
 
   /**
    * @typedef {Object} Props
@@ -48,7 +48,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {#key hex}
           <div
             {...popover.reference()}
-            class="h-full w-full items-center justify-center"
+            class="flex h-full w-full max-w-screen flex-wrap items-center justify-center"
             style="background:{hex}"
             title={brandName && yarnName && name
               ? `${brandName} - ${yarnName}: ${name}`
@@ -59,7 +59,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               style="background:{hex}"
               class="rounded-container z-10 min-w-[260px] p-4"
               {...popover.floating()}
-              transition:slide={{ duration: 150 }}
+              in:scale={{ duration: 150, delay: 150 }}
               data-floating
               tabindex="-1"
             >

@@ -138,7 +138,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div class="p-4">
-  <div class="mb-4 flex w-full flex-col gap-1 text-left">
+  <div class="mx-auto mb-4 flex w-fit flex-col gap-1 text-left">
     <SegmentedControl
       value={segmentValue}
       onValueChange={(e) => {

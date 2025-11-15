@@ -189,7 +189,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <div class="bg-warning-50-950/50 rounded-container">
           <Expand
             bind:isExpanded={statusExpanded}
-            more="See Status Updates (last updated April 20, 2025)"
+            more="See Status Updates"
             less="Hide Status Updates"
           />
         </div>
