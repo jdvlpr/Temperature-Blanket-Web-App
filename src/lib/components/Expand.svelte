@@ -14,6 +14,8 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
+  import { ChevronDownIcon } from '@lucide/svelte';
+
   interface Props {
     isExpanded?: boolean;
     less?: string;
@@ -27,8 +29,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     isExpanded = $bindable(false),
     less = 'Show Less',
     more = 'Show All',
-    iconLess = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-up"><path d="m18 15-6-6-6 6"/></svg>`,
-    iconMore = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down"><path d="m6 9 6 6 6-6"/></svg>`,
+    iconLess = '',
+    iconMore = '',
     disabled = false,
   }: Props = $props();
 </script>
@@ -40,9 +42,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
 >
   {#if isExpanded}
     {@html less}
-    {@html iconLess}
+    {#if iconLess}
+      {@html iconLess}
+    {/if}
   {:else}
     {@html more}
-    {@html iconMore}
+    {#if iconMore}
+      {@html iconMore}
+    {/if}
+  {/if}
+  {#if !iconMore && !iconLess}
+    <ChevronDownIcon class={['transition', isExpanded && 'rotate-180']} />
   {/if}
 </button>

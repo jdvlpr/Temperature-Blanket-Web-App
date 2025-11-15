@@ -21,7 +21,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { browser } from '$app/environment';
   import Tooltip from '$lib/components/Tooltip.svelte';
   import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
-  import { dialog } from '$lib/state';
+  import { dialog, InteractivePopover, PopoverInstance } from '$lib/state';
   import type { Color } from '$lib/types';
   import { getTextColor } from '$lib/utils';
   import {
@@ -38,7 +38,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     dragHandleZone,
   } from 'svelte-dnd-action';
   import { flip } from 'svelte/animate';
-  import { fade } from 'svelte/transition';
+  import { fade, slide } from 'svelte/transition';
 
   interface Props {
     colors?: Color[];
@@ -179,7 +179,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     if (tooltipElement) tooltipElement.style.display = 'none';
 
     draggedEl.style.zIndex = '30000';
-    // draggedEl.querySelector('.dragicon').style.display = 'block';
   }
 
   $effect(() => {
@@ -226,7 +225,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
         affiliate_variant_href,
       } = color}
       {@const isLocked = typeof color.locked !== undefined && color?.locked}
+      {@const popover = new InteractivePopover({
+        interaction: ['hover', 'click'],
+        placement: 'top',
+      })}
       <div
+        {...popover.reference()}
         class=" w-full {fullscreen
           ? 'h-full'
           : 'first:rounded-tl-container last:rounded-tr-container h-[70px] first:overflow-hidden last:overflow-hidden'} group palette-item-{uniqueId} {roundedBottom &&
@@ -256,95 +260,83 @@ If not, see <https://www.gnu.org/licenses/>. -->
           activeColorIndex = null;
         }}
       >
-        <Tooltip
-          tooltipStyle="background:{hex};"
-          tooltipBg=""
-          fullWidth={true}
-          classNames="w-full {fullscreen ? 'h-full' : 'h-[70px]'}"
-          minWidth="260px"
-          showTooltip={activeColorIndex === index && !isDragging.value}
+        <div
+          class="flex h-full w-full flex-auto flex-col items-center justify-center {fullscreen
+            ? 'h-full'
+            : 'h-[70px]'}"
+          style="background:{hex};color:{getTextColor(hex)}"
+          title={brandName && yarnName && name
+            ? `${brandName} - ${yarnName}: ${name}`
+            : hex}
         >
           <div
-            class="flex flex-auto flex-col items-center justify-center {fullscreen
-              ? 'h-full'
-              : 'h-[70px]'}"
-            title={brandName && yarnName && name
-              ? `${brandName} - ${yarnName}: ${name}`
-              : hex}
-            style="background:{hex};color:{getTextColor(hex)}"
-          >
-            {#if isLocked}
-              <LockKeyholeIcon />
-            {:else}
-              <div
-                class="h-2 w-2 rounded-full opacity-20 group-hover:hidden group-focus:hidden {activeColorIndex ===
-                  index &&
-                !isDragging.value &&
-                !isLocked
-                  ? 'hidden!'
-                  : 'inline-block'}"
-                class:hidden={sortableColors.length > 30}
-                class:sm:block={sortableColors.length > 30 &&
-                  sortableColors.length <= 50}
-                class:xl:block={sortableColors.length > 50}
-                style="background:{getTextColor(hex)}"
-              ></div>
-            {/if}
-            <div
-              role="button"
-              tabindex={isDragging.value ? 0 : -1}
-              aria-label="drag-handle"
-              class="dragicon hidden w-fit group-hover:block group-focus:block {activeColorIndex ===
-                index &&
-              !isDragging.value &&
-              !isLocked
-                ? 'inline-block!'
-                : 'hidden!'}"
-              class:group-hover:inline-block={isDragging.value}
-              style="color:{getTextColor(hex)}; {isDragging.value
-                ? 'cursor: grab'
-                : 'cursor: grabbing'}"
-              onmousedown={startDrag}
-              in:fade
-              use:dragHandle
-              ontouchstart={startDrag}
-              onkeydown={handleKeyDown}
-            >
-              <MoveIcon />
-            </div>
-          </div>
+            class="my-2 size-2 rounded-full opacity-30 group-hover:opacity-100 group-focus:opacity-100"
+            class:hidden={sortableColors.length > 30}
+            class:sm:block={sortableColors.length > 30 &&
+              sortableColors.length <= 50}
+            class:xl:block={sortableColors.length > 50}
+            style="background:{getTextColor(hex)}"
+          ></div>
+          {#if isLocked}
+            <LockKeyholeIcon size="20" class="opacity-30" />
+          {/if}
+        </div>
 
-          {#snippet tooltip()}
-            <div
-              style="background:{hex};color:{getTextColor(hex)};"
-              class="rounded-container z-30 flex w-full flex-wrap items-center justify-center gap-4 text-center break-all"
-            >
-              {#if canUserDeleteColor && sortableColors.length > 1 && !isStaticGauge}
-                <button
-                  onclick={() => {
+        {#if popover.isOpen() && !isDragging.value}
+          <div
+            {...popover.floating()}
+            in:slide={{ duration: 150, delay: 150 }}
+            style="background:{hex};color:{getTextColor(hex)};"
+            class="tooltip rounded-container z-30 flex w-full flex-wrap items-center justify-center gap-4 p-2 text-center break-all"
+            data-floating
+          >
+            {#if canUserDeleteColor && sortableColors.length > 1 && !isStaticGauge}
+              <button
+                onclick={() => {
+                  colors = colors.filter((_, i) => i !== index);
+
+                  sortableColors = getSortableColors();
+                  if (onchanged) onchanged();
+                }}
+                onkeydown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
                     colors = colors.filter((_, i) => i !== index);
 
                     sortableColors = getSortableColors();
                     if (onchanged) onchanged();
-                  }}
-                  onkeydown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      colors = colors.filter((_, i) => i !== index);
+                  }
+                }}
+                class="btn hover:preset-tonal h-auto"
+              >
+                <span class="text-xs">{index + 1}</span>
+                <Trash2Icon />
+              </button>
+            {/if}
 
-                      sortableColors = getSortableColors();
-                      if (onchanged) onchanged();
-                    }
-                  }}
-                  class="btn hover:preset-tonal h-auto"
-                >
-                  <span class="text-xs">{index + 1}</span>
-                  <Trash2Icon />
-                </button>
-              {/if}
-              {#if canUserEditColor}
-                <button
-                  class="btn hover:preset-tonal h-auto"
-                  onclick={() =>
+            {#if canUserEditColor}
+              <button
+                class="btn hover:preset-tonal h-auto"
+                onclick={() =>
+                  dialog.trigger({
+                    type: 'component',
+                    component: {
+                      ref: ChangeColor,
+                      props: {
+                        index,
+                        hex,
+                        name,
+                        brandId,
+                        yarnId,
+                        brandName,
+                        yarnName,
+                        variant_href,
+                        affiliate_variant_href,
+                        onChangeColor,
+                      },
+                    },
+                  })}
+                onkeydown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
                     dialog.trigger({
                       type: 'component',
                       component: {
@@ -362,48 +354,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
                           onChangeColor,
                         },
                       },
-                    })}
-                  onkeydown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      dialog.trigger({
-                        type: 'component',
-                        component: {
-                          ref: ChangeColor,
-                          props: {
-                            index,
-                            hex,
-                            name,
-                            brandId,
-                            yarnId,
-                            brandName,
-                            yarnName,
-                            variant_href,
-                            affiliate_variant_href,
-                            onChangeColor,
-                          },
-                        },
-                      });
-                    }
-                  }}
-                >
-                  <SearchIcon />
-                  <span
-                    class="flex flex-col items-start justify-start text-left text-wrap"
-                  >
-                    <span class="text-xs">
-                      {#if brandName && yarnName}
-                        {brandName}
-                        -
-                        {yarnName}
-                      {:else}
-                        Find Matching Yarn
-                      {/if}
-                    </span>
-                    <span class="text-lg leading-tight"> {name || hex}</span>
-                  </span>
-                </button>
-              {:else}
-                <div
+                    });
+                  }
+                }}
+              >
+                <SearchIcon />
+                <span
                   class="flex flex-col items-start justify-start text-left text-wrap"
                 >
                   <span class="text-xs">
@@ -411,41 +367,99 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       {brandName}
                       -
                       {yarnName}
+                    {:else}
+                      Find Matching Yarn
                     {/if}
                   </span>
-                  <span class="text-lg leading-tight">
-                    {name || hex}
-                  </span>
-                </div>
-              {/if}
-              {#if typeof color.locked !== 'undefined'}
-                <button
-                  class="btn-icon hover:preset-tonal"
-                  onclick={(e) => {
+                  <span class="text-lg leading-tight"> {name || hex}</span>
+                </span>
+              </button>
+            {:else}
+              <div
+                class="flex flex-col items-start justify-start text-left text-wrap"
+              >
+                <span class="text-xs">
+                  {#if brandName && yarnName}
+                    {brandName}
+                    -
+                    {yarnName}
+                  {/if}
+                </span>
+                <span class="text-lg leading-tight">
+                  {name || hex}
+                </span>
+              </div>
+            {/if}
+
+            {#if typeof color.locked !== 'undefined'}
+              <button
+                class="btn-icon hover:preset-tonal"
+                onclick={(e) => {
+                  e.preventDefault();
+                  colors[index].locked = !colors[index].locked;
+                  color.locked = colors[index].locked;
+                  if (onchanged) onchanged($state.snapshot(colors));
+                }}
+                onkeydown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault();
                     colors[index].locked = !colors[index].locked;
                     color.locked = colors[index].locked;
                     if (onchanged) onchanged($state.snapshot(colors));
-                  }}
-                  onkeydown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault();
-                      colors[index].locked = !colors[index].locked;
-                      color.locked = colors[index].locked;
-                      if (onchanged) onchanged($state.snapshot(colors));
-                    }
-                  }}
-                >
-                  {#if color.locked}
-                    <LockKeyholeIcon />
-                  {:else}
-                    <LockOpenIcon />
-                  {/if}
-                </button>
-              {/if}
+                  }
+                }}
+              >
+                {#if color.locked}
+                  <LockKeyholeIcon />
+                {:else}
+                  <LockOpenIcon />
+                {/if}
+              </button>
+            {/if}
+
+            <div
+              role="button"
+              tabindex={isDragging.value ? 0 : -1}
+              aria-label="drag-handle"
+              class="dragicon w-fit"
+              style="color:{getTextColor(hex)}; {isDragging.value
+                ? 'cursor: grab'
+                : 'cursor: grabbing'}"
+              onmousedown={startDrag}
+              use:dragHandle
+              ontouchstart={startDrag}
+              onkeydown={handleKeyDown}
+            >
+              <MoveIcon />
             </div>
+
+            <div
+              class="popover-arrow"
+              style="background:{hex}"
+              {...popover.arrow()}
+            ></div>
+          </div>
+        {/if}
+
+        <!-- <Tooltip
+          tooltipStyle="background:{hex};"
+          tooltipBg=""
+          fullWidth={true}
+          classNames="w-full {fullscreen ? 'h-full' : 'h-[70px]'}"
+          minWidth="260px"
+          showTooltip={activeColorIndex === index && !isDragging.value}
+        >
+          <div
+            
+            
+          >
+            
+          </div>
+
+          {#snippet tooltip()}
+            
           {/snippet}
-        </Tooltip>
+        </Tooltip> -->
       </div>
     {/each}
   </div>

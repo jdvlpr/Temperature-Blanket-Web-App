@@ -56,6 +56,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '@lucide/svelte';
   import { Popover, Portal } from '@skeletonlabs/skeleton-svelte';
   import { onMount } from 'svelte';
+  import { slide } from 'svelte/transition';
+  import { PopoverInstance } from '$lib/state';
+
+  const popover = new PopoverInstance({
+    interaction: 'hover',
+  });
 
   let debounceTimer: number;
 
@@ -170,9 +176,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <div class="flex flex-1 justify-between gap-2 sm:justify-end">
       {#if weather.data.length && locations.allValid}
         <div class="hidden lg:inline-flex">
-          <Tooltip
-            classNames="btn hover:preset-tonal"
-            title="Save Project [Cmd]+[s] or [Ctrl]+[s]"
+          <button
+            {...popover.reference()}
+            class="btn hover:preset-tonal"
             onclick={() =>
               dialog.trigger({
                 type: 'component',
@@ -181,12 +187,28 @@ If not, see <https://www.gnu.org/licenses/>. -->
           >
             <SaveIcon />
 
-            <span class="max-[700px]:hidden min-[700px]:inline-block">Save</span
+            <span class="max-[700px]:hidden min-[700px]:inline-block">
+              Save
+            </span>
+          </button>
+          {#if popover.isOpen()}
+            <div
+              {...popover.floating()}
+              transition:slide={{ duration: 150 }}
+              data-floating
+              class="card preset-filled-surface-100-900 tooltip z-10 p-4"
+              role="dialog"
+              tabindex="-1"
+              aria-labelledby="Tooltip or Menu"
+              aria-describedby="A dialog box showing information or menu items."
             >
-            {#snippet tooltip()}
               <p>Save your project in this browser and as a URL.</p>
-            {/snippet}
-          </Tooltip>
+              <div
+                {...popover.arrow()}
+                class="preset-filled-surface-100-900"
+              ></div>
+            </div>
+          {/if}
         </div>
       {/if}
 

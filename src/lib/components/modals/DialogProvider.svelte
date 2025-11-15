@@ -52,13 +52,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     />
                   </Dialog.CloseTrigger>
                 {/if}
-                {#key dialog.contentComponent.ref}
-                  {#if dialog.contentComponent.ref}
+
+                {#if dialog.contentComponent.ref}
+                  {#key dialog.contentComponent.ref}
                     <dialog.contentComponent.ref
                       {...dialog.contentComponent.props}
                     />
-                  {/if}
-                {/key}
+                  {/key}
+                {/if}
               {:else if dialog.type === 'choose-weather-params'}
                 <div
                   role="dialog"

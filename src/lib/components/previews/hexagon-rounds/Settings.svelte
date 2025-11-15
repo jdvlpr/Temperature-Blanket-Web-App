@@ -81,6 +81,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {/if}{#if extraRounds || hexagonRoundsPreview.hexagonsWithNoWeatherData}
         <Tooltip tooltipClass="">
           <InfoIcon class="-top[1px] relative inline size-5" />
+
           {#snippet tooltip()}
             <p class="text-warning-800-200 not-italic">
               To potentially avoid rounds with no weather data, adjust the <span

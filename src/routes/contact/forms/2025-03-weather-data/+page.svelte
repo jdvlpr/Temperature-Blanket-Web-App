@@ -186,11 +186,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <div id="info" class="scroll-mt-[58px]"></div>
 
       <div class="mb-4 flex flex-col items-start justify-between gap-4">
-        <Expand
-          bind:isExpanded={statusExpanded}
-          more="See Status Updates (last updated April 20, 2025)"
-          less="Hide Status Updates"
-        />
+        <div class="bg-warning-50-950/50 rounded-container">
+          <Expand
+            bind:isExpanded={statusExpanded}
+            more="See Status Updates (last updated April 20, 2025)"
+            less="Hide Status Updates"
+          />
+        </div>
 
         {#if statusExpanded}
           <Accordion
