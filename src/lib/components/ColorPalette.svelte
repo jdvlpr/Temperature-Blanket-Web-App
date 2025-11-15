@@ -48,7 +48,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {#key hex}
           <div
             {...popover.reference()}
-            class="flex h-full w-full max-w-screen flex-wrap items-center justify-center"
+            class="flex h-full w-full max-w-[90vw] cursor-pointer flex-wrap items-center justify-center"
             style="background:{hex}"
             title={brandName && yarnName && name
               ? `${brandName} - ${yarnName}: ${name}`

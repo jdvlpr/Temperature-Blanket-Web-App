@@ -178,7 +178,7 @@ export class InteractivePopoverInstance {
 export class PopoverInstance {
   private options: PopoverOptions = {
     interaction: 'hover',
-    placement: 'bottom',
+    placement: 'top',
   };
   private open = $state(false);
   private referenceElement: HTMLElement | undefined = $state();

@@ -33,7 +33,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div class="px-4 pt-8 sm:min-w-[600px]">
-  <div class="mt-6 flex flex-col items-center gap-2 sm:mt-4">
+  <div class="mt-6 flex w-full flex-col items-center gap-2 sm:mt-4">
     <div class="flex flex-wrap items-end justify-center gap-2">
       <label class="label">
         <span class="flex items-center gap-1">

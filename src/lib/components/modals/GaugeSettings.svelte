@@ -17,11 +17,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ChooseRangeDirection from '$lib/components/ChooseRangeDirection.svelte';
   import DaysInRange from '$lib/components/DaysInRange.svelte';
   import Expand from '$lib/components/Expand.svelte';
-  import Tooltip from '$lib/components/Tooltip.svelte';
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
   import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
   import StickyPart from '$lib/components/modals/StickyPart.svelte';
-  import { gauges, localState, dialog, weather } from '$lib/state';
+  import { dialog, gauges, localState, weather } from '$lib/state';
   import {
     displayNumber,
     getIncrement,
@@ -36,7 +35,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     ChevronUpIcon,
     CogIcon,
     Icon,
-    InfoIcon,
     ListStartIcon,
     TriangleAlertIcon,
     WandIcon,
@@ -314,57 +312,54 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         {/each}
                       </select>
                     </label>
-                    <p
+                    <div
                       class="card preset-tonal-success border-success-500 border p-4 text-left"
                     >
-                      <WandSparklesIcon class="inline" />
+                      <p>
+                        <WandSparklesIcon class="inline" />
 
-                      {#if _gauge.rangeOptions.auto.optimization === 'ranges'}
-                        Range increments are as even as possible.
-                      {:else}
-                        Ranges contain a similar number of days, based on the
-                        <span class="font-bold">
-                          {#if _gauge.rangeOptions.auto.optimization === 'tmax'}
-                            high
-                          {:else if _gauge.rangeOptions.auto.optimization === 'tavg'}
-                            average
-                          {:else if _gauge.rangeOptions.auto.optimization === 'tmin'}
-                            low
-                          {/if}
-                        </span>
-                        temperature of each {weather.grouping}.
-                      {/if}
-                      {#if _gauge.rangeOptions.auto.optimization === 'ranges'}
-                        Increment:
-                        {#if _gauge.rangeOptions.auto.roundIncrement && Math.floor(displayedIncrement) !== Math.ceil(displayedIncrement)}
-                          <span class="font-bold">
-                            {Math.floor(displayedIncrement)}</span
-                          >
-                          or
-                          <span class="font-bold"
-                            >{Math.ceil(displayedIncrement)}</span
-                          >
-                          {unitLabel}
+                        {#if _gauge.rangeOptions.auto.optimization === 'ranges'}
+                          Range increments are as even as possible.
                         {:else}
+                          Ranges contain a similar number of days, based on the
                           <span class="font-bold">
-                            {_gauge.rangeOptions.auto.roundIncrement
-                              ? Math.round(displayedIncrement)
-                              : displayNumber(displayedIncrement)}
+                            {#if _gauge.rangeOptions.auto.optimization === 'tmax'}
+                              high
+                            {:else if _gauge.rangeOptions.auto.optimization === 'tavg'}
+                              average
+                            {:else if _gauge.rangeOptions.auto.optimization === 'tmin'}
+                              low
+                            {/if}
                           </span>
-                          {unitLabel}
+                          temperature of each {weather.grouping}.
                         {/if}
+                        {#if _gauge.rangeOptions.auto.optimization === 'ranges'}
+                          Increment:
+                          {#if _gauge.rangeOptions.auto.roundIncrement && Math.floor(displayedIncrement) !== Math.ceil(displayedIncrement)}
+                            <span class="font-bold">
+                              {Math.floor(displayedIncrement)}</span
+                            >
+                            or
+                            <span class="font-bold"
+                              >{Math.ceil(displayedIncrement)}</span
+                            >
+                            {unitLabel}
+                          {:else}
+                            <span class="font-bold">
+                              {_gauge.rangeOptions.auto.roundIncrement
+                                ? Math.round(displayedIncrement)
+                                : displayNumber(displayedIncrement)}
+                            </span>
+                            {unitLabel}
+                          {/if}
 
-                        <Tooltip>
-                          <InfoIcon class="size-4" />
-                          {#snippet tooltip()}
-                            <p>
-                              This was calculated based on your weather data and
-                              the number of colors in this activeGauge.
-                            </p>
-                          {/snippet}
-                        </Tooltip>
-                      {/if}
-                    </p>
+                          <span class="block text-sm">
+                            This was calculated based on your weather data and
+                            the number of colors in this gauge.
+                          </span>
+                        {/if}
+                      </p>
+                    </div>
                   {/if}
 
                   {#if Math.floor(_gauge.rangeOptions.auto.increment) !== Math.ceil(_gauge.rangeOptions.auto.increment) && _gauge.rangeOptions.mode === 'auto'}
@@ -408,22 +403,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   <div class="tex-left flex w-fit flex-col items-start">
                     <label
                       for="startFrom"
-                      class="label flex flex-wrap items-center gap-2"
+                      class="label flex flex-wrap items-center"
                     >
                       <ListStartIcon class="size-4" />
                       Start From ({unitLabel})
-                      <Tooltip>
-                        <InfoIcon class="size-4" />
-                        {#snippet tooltip()}
-                          <p>
-                            This should usually be the
-                            {_gauge.rangeOptions.direction === 'high-to-low'
-                              ? 'highest'
-                              : 'lowest'}
-                            possible value from your weather data.
-                          </p>
-                        {/snippet}
-                      </Tooltip>
+                      <p class="text-sm">
+                        This should usually be the
+                        {_gauge.rangeOptions.direction === 'high-to-low'
+                          ? 'highest'
+                          : 'lowest'}
+                        possible value from your weather data.
+                      </p>
                     </label>
                     <input
                       id="startFrom"
@@ -477,21 +467,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   >
                     <CalculatorIcon class="size-4" />
                     Range Calculation Method:<span>{@html rangeExample}</span>
-                    <Tooltip>
-                      <InfoIcon class="size-4" />
-                      {#snippet tooltip()}
-                        <div>
-                          If you change this setting,
-                          <a
-                            href="/documentation/#range-calculation-methods"
-                            target="_blank"
-                            class="link"
-                            rel="noopener noreferrer"
-                            >make sure your ranges are set up correctly.</a
-                          >
-                        </div>
-                      {/snippet}
-                    </Tooltip>
+                    <p class="text-sm">
+                      If you change this setting,
+                      <a
+                        href="/documentation/#range-calculation-methods"
+                        target="_blank"
+                        class="link"
+                        rel="noopener noreferrer"
+                        >make sure your ranges are set up correctly.</a
+                      >
+                    </p>
                   </span>
 
                   <select

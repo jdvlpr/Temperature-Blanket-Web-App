@@ -24,46 +24,32 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 {#if disabled && !project.status.loading}
-  <Tooltip
-    buttonDisabled={disabled}
-    title="Search for Weather Data"
-    id="location-action-button"
-    classNames="btn btn-lg preset-filled-primary-500 sm:w-fit gap-1 shadow-sm"
-  >
-    {#if !!weather.isUserEdited}
-      Reload Weather Data
-    {:else}
-      Search {#if weather.data.length}Again{/if}
-    {/if}
-    <ChevronRightIcon />
-    {#snippet tooltip()}
-      <p>Choose a valid location and dates above.</p>
-    {/snippet}
-  </Tooltip>
-{:else}
-  <button
-    class="btn btn-lg preset-filled-primary-500 gap-1 shadow-sm sm:w-fit"
-    onclick={() => {
-      if (weather.isUserEdited)
-        dialog.trigger({
-          type: 'component',
-          component: { ref: GettingWeatherWarnCustomWeather },
-        });
-      else
-        dialog.trigger({
-          type: 'component',
-          component: { ref: GettingWeather },
-        });
-    }}
-    title="Search for Weather Data"
-    id="location-action-button"
-    {disabled}
-  >
-    {#if !!weather.isUserEdited}
-      Reload Weather Data
-    {:else}
-      Search {#if weather.data.length}Again{/if}
-    {/if}
-    <ChevronRightIcon />
-  </button>
+  <p class="text-error-800-200 -mb-2 text-sm">
+    Choose a valid location and dates above.
+  </p>
 {/if}
+<button
+  class="btn btn-lg preset-filled-primary-500 gap-1 shadow-sm sm:w-fit"
+  onclick={() => {
+    if (weather.isUserEdited)
+      dialog.trigger({
+        type: 'component',
+        component: { ref: GettingWeatherWarnCustomWeather },
+      });
+    else
+      dialog.trigger({
+        type: 'component',
+        component: { ref: GettingWeather },
+      });
+  }}
+  title="Search for Weather Data"
+  id="location-action-button"
+  {disabled}
+>
+  {#if !!weather.isUserEdited}
+    Reload Weather Data
+  {:else}
+    Search {#if weather.data.length}Again{/if}
+  {/if}
+  <ChevronRightIcon />
+</button>

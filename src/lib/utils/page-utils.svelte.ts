@@ -141,7 +141,6 @@ export const handleKeyDown = (ev) => {
         localState.value.theme.mode = 'system';
         break;
     }
-
     const themeTitle =
       localState.value.theme.mode.charAt(0).toUpperCase() +
       localState.value.theme.mode.slice(1);

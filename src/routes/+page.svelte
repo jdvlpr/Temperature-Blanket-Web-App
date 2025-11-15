@@ -22,7 +22,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Locations from '$lib/components/Locations.svelte';
   import Navigation from '$lib/components/Navigation.svelte';
   import Previews from '$lib/components/Previews.svelte';
-  import Tooltip from '$lib/components/Tooltip.svelte';
   import WeatherSection from '$lib/components/WeatherSection.svelte';
   import DonateButton from '$lib/components/buttons/DonateButton.svelte';
   import SectionNavigationButtons from '$lib/components/buttons/SectionNavigationButtons.svelte';
@@ -31,8 +30,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import LegacyNotification from '$lib/components/modals/LegacyNotification.svelte';
   import Menu from '$lib/components/modals/Menu.svelte';
   import {
-    locations,
     dialog,
+    locations,
     pageSections,
     project,
     wasProjectLoadedFromURL,
@@ -56,12 +55,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '@lucide/svelte';
   import { Popover, Portal } from '@skeletonlabs/skeleton-svelte';
   import { onMount } from 'svelte';
-  import { slide } from 'svelte/transition';
-  import { PopoverInstance } from '$lib/state';
-
-  const popover = new PopoverInstance({
-    interaction: 'hover',
-  });
 
   let debounceTimer: number;
 
@@ -177,8 +170,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {#if weather.data.length && locations.allValid}
         <div class="hidden lg:inline-flex">
           <button
-            {...popover.reference()}
             class="btn hover:preset-tonal"
+            title="Save your project in this browser and as a URL."
             onclick={() =>
               dialog.trigger({
                 type: 'component',
@@ -191,24 +184,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
               Save
             </span>
           </button>
-          {#if popover.isOpen()}
-            <div
-              {...popover.floating()}
-              transition:slide={{ duration: 150 }}
-              data-floating
-              class="card preset-filled-surface-100-900 tooltip z-10 p-4"
-              role="dialog"
-              tabindex="-1"
-              aria-labelledby="Tooltip or Menu"
-              aria-describedby="A dialog box showing information or menu items."
-            >
-              <p>Save your project in this browser and as a URL.</p>
-              <div
-                {...popover.arrow()}
-                class="preset-filled-surface-100-900"
-              ></div>
-            </div>
-          {/if}
         </div>
       {/if}
 

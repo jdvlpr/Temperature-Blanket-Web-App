@@ -19,13 +19,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import { browser } from '$app/environment';
-  import Tooltip from '$lib/components/Tooltip.svelte';
   import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
-  import {
-    dialog,
-    InteractivePopoverInstance,
-    PopoverInstance,
-  } from '$lib/state';
+  import { dialog, InteractivePopoverInstance } from '$lib/state';
   import type { Color } from '$lib/types';
   import { getTextColor } from '$lib/utils';
   import {
@@ -36,13 +31,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
     Trash2Icon,
   } from '@lucide/svelte';
   import {
-    SOURCES,
-    TRIGGERS,
     dragHandle,
     dragHandleZone,
+    SOURCES,
+    TRIGGERS,
   } from 'svelte-dnd-action';
   import { flip } from 'svelte/animate';
-  import { fade, scale, slide } from 'svelte/transition';
+  import { scale } from 'svelte/transition';
 
   interface Props {
     colors?: Color[];
@@ -444,26 +439,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
             ></div>
           </div>
         {/if}
-
-        <!-- <Tooltip
-          tooltipStyle="background:{hex};"
-          tooltipBg=""
-          fullWidth={true}
-          classNames="w-full {fullscreen ? 'h-full' : 'h-[70px]'}"
-          minWidth="260px"
-          showTooltip={activeColorIndex === index && !isDragging.value}
-        >
-          <div
-            
-            
-          >
-            
-          </div>
-
-          {#snippet tooltip()}
-            
-          {/snippet}
-        </Tooltip> -->
       </div>
     {/each}
   </div>

@@ -88,22 +88,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
     SegmentedControl,
   } from '@skeletonlabs/skeleton-svelte';
 
-  let openState = $state(false);
-
   let activeTheme = $derived(
     THEMES.find((n) => n.id === (localState.value.theme.mode || 'system')),
   );
 </script>
 
 <div class="w-fit text-left">
-  <Popover
-    open={openState}
-    onOpenChange={(e) => {
-      openState = e.open;
-    }}
-    modal={true}
-    autoFocus={false}
-  >
+  <Popover modal={true} autoFocus={true}>
     <Popover.Trigger class="btn hover:preset-tonal">
       {#key localState.value?.theme.mode}
         <span
@@ -124,7 +115,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <SegmentedControl
                 value={localState.value.theme.mode}
                 onValueChange={(e) => {
-                  localState.value.theme.mode = e.value;
+                  if (localState.value?.theme.mode) {
+                    localState.value.theme.mode = e.value;
+                  }
                 }}
               >
                 <SegmentedControl.Control
@@ -136,7 +129,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       <SegmentedControl.ItemText>
                         <span class="flex items-center justify-center gap-1">
                           {@html icon}
-                          <span class="hidden min-[375px]:inline">{name}</span>
+                          <span class="hidden min-[425px]:inline">{name}</span>
                         </span>
                       </SegmentedControl.ItemText>
                       <SegmentedControl.ItemHiddenInput />
@@ -181,7 +174,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </div>
           </Popover.Description>
           <Popover.Arrow
-            style="--arrow-size: calc(var(--spacing) * 4); --arrow-background: var(--color-surface-200-800);"
+            style="--arrow-size: calc(var(--spacing) * 2); --arrow-background: var(--color-surface-200-800);"
           >
             <Popover.ArrowTip />
           </Popover.Arrow>

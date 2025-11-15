@@ -14,16 +14,24 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import Tooltip from '$lib/components/Tooltip.svelte';
   import { METEOSTAT_DELAY_DAYS, OPEN_METEO_DELAY_DAYS } from '$lib/constants';
-  import { weather } from '$lib/state';
+  import { PopoverInstance, weather } from '$lib/state';
   import { TriangleAlertIcon } from '@lucide/svelte';
+
+  let popover = new PopoverInstance();
 </script>
 
-<Tooltip minWidth="290px" placement="bottom">
+<button class="btn-icon" {...popover.reference()}>
   <TriangleAlertIcon class="relative -top-[2px] inline size-4" />
-  {#snippet tooltip()}
-    <p class="text-surface-950-50 text-base">
+</button>
+
+{#if popover.isOpen()}
+  <div
+    data-floating
+    {...popover.floating()}
+    class="preset-filled-warning-200-800 rounded-container max-w-[290px] p-2"
+  >
+    <p class="text-left">
       Weather data may adjust as new information arrives. Consider working at
       least {weather.source.name === 'Open-Meteo'
         ? OPEN_METEO_DELAY_DAYS
@@ -31,5 +39,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
           ? METEOSTAT_DELAY_DAYS
           : 'a few'} days behind to account for possible changes.
     </p>
-  {/snippet}
-</Tooltip>
+    <div {...popover.arrow()}></div>
+  </div>
+{/if}

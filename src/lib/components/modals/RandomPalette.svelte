@@ -18,7 +18,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import DefaultYarnSet from '$lib/components/DefaultYarnSet.svelte';
   import SelectNumberOfColors from '$lib/components/SelectNumberOfColors.svelte';
   import SelectYarn from '$lib/components/SelectYarn.svelte';
-  import Tooltip from '$lib/components/Tooltip.svelte';
   import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
   import StickyPart from '$lib/components/modals/StickyPart.svelte';
   import { dialog } from '$lib/state';
@@ -28,7 +27,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     getSortedPalette,
     pickRandomFromArray,
   } from '$lib/utils';
-  import { ArrowDownWideNarrowIcon, ShuffleIcon } from '@lucide/svelte';
+  import {
+    ArrowDownWideNarrowIcon,
+    ExternalLinkIcon,
+    ShuffleIcon,
+  } from '@lucide/svelte';
   import SelectYarnWeight from '../SelectYarnWeight.svelte';
 
   let { numberOfColors, updateGauge } = $props();
@@ -167,42 +170,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     {#if isYarnUnavailable}
       <div class="order-4 col-span-full w-full">
-        <Tooltip>
-          Link Unavailable <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="1.5"
-            stroke="currentColor"
-            class="inline h-6 w-6"
-            ><path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"
-            ></path></svg
-          >
-          {#snippet tooltip()}
-            <div class="flex flex-col justify-start gap-2 text-left text-base">
-              <p>
-                A yarn that says Link Unavailable means the webpage from which
-                the colorways were accessed is no longer available. Yarns whose
-                links are unavailable will remain on this web app for legacy
-                purposes, but links to the yarn and its colorways will not work.
-              </p>
-
-              <p>A yarn with unavailable links could mean:</p>
-
-              <div class="ml-4">
-                <p>- The yarn has been discontinued</p>
-                <p>- The yarn has been renamed</p>
-                <p>
-                  - The yarn’s website has been re-designed and old links no
-                  longer exist
-                </p>
-              </div>
-            </div>
-          {/snippet}
-        </Tooltip>
+        <a href="/documentation#link-unavailable" target="_blank" class="link">
+          Link Unavailable <ExternalLinkIcon
+            size="18"
+            class="relative -top-[2px] inline"
+          />
+        </a>
       </div>
     {/if}
 
