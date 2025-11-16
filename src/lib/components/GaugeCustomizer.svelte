@@ -42,6 +42,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   const isProjectPlannerPage = page.route.id === '/';
 
+  let movable = $derived(gauge.colors?.length > 1);
+
+  let hasAnyAffiliateURLs = $derived(
+    checkForAffiliateURLs({ colors: gauge.colors }),
+  );
+
+  let sortableColors: Color[] = $state(getSortableColors());
+
+  let numberOfColumns = $derived.by(() => {
+    let cols = 4;
+    if (hasAnyAffiliateURLs) cols++;
+    if (showDaysInRange.value) cols++;
+    if (sortableColors.length < 2) cols--;
+    return cols;
+  });
+
   function checkForAffiliateURLs({ colors }) {
     return colors?.some((n) => n?.affiliate_variant_href);
   }
@@ -117,14 +133,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     dragDisabled = false;
   }
 
-  let movable = $derived(gauge.colors?.length > 1);
-
-  let hasAnyAffiliateURLs = $derived(
-    checkForAffiliateURLs({ colors: gauge.colors }),
-  );
-
-  let sortableColors: Color[] = $state(getSortableColors());
-
   function getSortableColors() {
     const _sortableColors = [];
     gauge.colors.forEach((color, i) => {
@@ -181,86 +189,100 @@ If not, see <https://www.gnu.org/licenses/>. -->
 >
   {#each sortableColors as { hex, name, brandId, yarnId, brandName, yarnName, variant_href, affiliate_variant_href, id }, index (id)}
     <div
-      class="color flex flex-wrap items-center justify-around gap-2 p-2 {localState
-        .value.layout === 'grid'
-        ? 'rounded-container flex-auto basis-1/3 sm:basis-1/4 md:basis-1/5'
-        : ''}"
+      class="color flex flex-wrap items-center gap-2 p-2 {localState.value
+        .layout === 'grid'
+        ? 'rounded-container flex-auto basis-1/3 justify-around sm:basis-1/4 md:basis-1/5'
+        : 'justify-around'}"
       style="background:{hex};color:{getTextColor(hex)}"
       animate:flip={{ duration: flipDurationMs }}
     >
-      {#if movable && !isStaticGauge}
+      <div class="flex flex-wrap items-center gap-2">
+        {#if movable && !isStaticGauge}
+          <button
+            title="Remove Color"
+            class="btn hover:preset-tonal flex flex-wrap items-center justify-center"
+            onclick={() => {
+              gauge.updateColors({
+                colors: gauge.colors.filter((_, i) => i !== index),
+              });
+              sortableColors = getSortableColors();
+              gauge.schemeId = 'Custom';
+            }}
+          >
+            <span class="text-xs">{index + 1}</span>
+            <Trash2Icon />
+          </button>
+        {/if}
+
         <button
-          title="Remove Color"
-          class="btn hover:preset-tonal flex flex-wrap items-center justify-center"
-          onclick={() => {
-            gauge.updateColors({
-              colors: gauge.colors.filter((_, i) => i !== index),
-            });
-            sortableColors = getSortableColors();
-            gauge.schemeId = 'Custom';
-          }}
+          title="Move Color"
+          tabindex="-1"
+          aria-label="Crag handle for color {index + 1}"
+          class="btn-icon hover:preset-tonal handle p-2 {dragDisabled
+            ? 'cursor-grabbing'
+            : 'cursor-grab'}"
+          onmousedown={startDrag}
+          ontouchstart={startDrag}
+          use:dragHandle
         >
-          <span class="text-xs">{index + 1}</span>
-          <Trash2Icon />
+          <MoveIcon />
         </button>
+      </div>
+
+      {#if isProjectPlannerPage}
+        <div
+          class={['flex gap-2', localState.value.layout === 'grid' ? '' : '']}
+        >
+          {#key index}
+            <ColorRange {index} />
+          {/key}
+        </div>
       {/if}
 
-      <button
-        title="Move Color"
-        tabindex="-1"
-        aria-label="Crag handle for color {index + 1}"
-        class="btn-icon hover:preset-tonal handle p-2 {dragDisabled
-          ? 'cursor-grabbing'
-          : 'cursor-grab'}"
-        onmousedown={startDrag}
-        ontouchstart={startDrag}
-        use:dragHandle
-      >
-        <MoveIcon />
-      </button>
-
-      <button
-        class="btn hover:preset-tonal h-auto"
-        title="Choose a Color"
-        onclick={() =>
-          dialog.trigger({
-            type: 'component',
-            component: {
-              ref: ChangeColor,
-              props: {
-                index,
-                hex,
-                name,
-                brandId,
-                yarnId,
-                brandName,
-                yarnName,
-                variant_href,
-                affiliate_variant_href,
-                onChangeColor,
+      <div class={localState.value.layout === 'grid' ? '' : 'flex-auto'}>
+        <button
+          class={['btn hover:preset-tonal flex h-auto justify-start']}
+          title="Choose a Color"
+          onclick={() =>
+            dialog.trigger({
+              type: 'component',
+              component: {
+                ref: ChangeColor,
+                props: {
+                  index,
+                  hex,
+                  name,
+                  brandId,
+                  yarnId,
+                  brandName,
+                  yarnName,
+                  variant_href,
+                  affiliate_variant_href,
+                  onChangeColor,
+                },
               },
-            },
-            options: {
-              size: 'medium',
-            },
-          })}
-      >
-        <SearchIcon />
-        <span
-          class="flex flex-col items-start justify-start text-left text-wrap"
+              options: {
+                size: 'medium',
+              },
+            })}
         >
-          <span class="text-xs">
-            {#if brandName && yarnName}
-              {brandName}
-              -
-              {yarnName}
-            {:else}
-              Find Matching Yarn
-            {/if}
+          <SearchIcon />
+          <span
+            class="flex flex-col items-start justify-start text-left text-wrap"
+          >
+            <span class="text-xs">
+              {#if brandName && yarnName}
+                {brandName}
+                -
+                {yarnName}
+              {:else}
+                Find Matching Yarn
+              {/if}
+            </span>
+            <span class="text-lg leading-tight"> {name || hex}</span>
           </span>
-          <span class="text-lg leading-tight"> {name || hex}</span>
-        </span>
-      </button>
+        </button>
+      </div>
 
       {#if affiliate_variant_href}
         <a
@@ -275,12 +297,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {/if}
 
       {#if isProjectPlannerPage}
-        <div class="flex gap-2">
-          {#key index}
-            <ColorRange {index} />
-          {/key}
-        </div>
-
         {#if showDaysInRange.value}
           <div
             class="bg-surface-900/10 rounded-container flex w-fit flex-wrap items-center justify-center overflow-hidden shadow-inner"

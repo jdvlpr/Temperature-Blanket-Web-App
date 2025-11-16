@@ -16,39 +16,69 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script>
   import GettingWeather from '$lib/components/modals/GettingWeather.svelte';
   import GettingWeatherWarnCustomWeather from '$lib/components/modals/GettingWeatherWarnCustomWeather.svelte';
-  import { dialog, locations, project, weather } from '$lib/state';
+  import {
+    dialog,
+    locations,
+    project,
+    weather,
+    PopoverInstance,
+  } from '$lib/state';
   import { ChevronRightIcon } from '@lucide/svelte';
+  import { scale } from 'svelte/transition';
+
+  let popover = new PopoverInstance();
 
   let disabled = $derived(!locations.allValid || project.status.loading);
 </script>
 
-{#if disabled && !project.status.loading}
-  <p class="text-error-800-200 -mb-2 text-sm">
-    Choose a valid location and dates above.
-  </p>
-{/if}
-<button
-  class="btn btn-lg preset-filled-primary-500 gap-1 shadow-sm sm:w-fit"
-  onclick={() => {
-    if (weather.isUserEdited)
-      dialog.trigger({
-        type: 'component',
-        component: { ref: GettingWeatherWarnCustomWeather },
-      });
-    else
-      dialog.trigger({
-        type: 'component',
-        component: { ref: GettingWeather },
-      });
-  }}
-  title="Search for Weather Data"
-  id="location-action-button"
-  {disabled}
->
+{#snippet buttonContent()}
   {#if !!weather.isUserEdited}
     Reload Weather Data
   {:else}
     Search {#if weather.data.length}Again{/if}
   {/if}
   <ChevronRightIcon />
-</button>
+{/snippet}
+
+{#if disabled && !project.status.loading}
+  <button
+    {...popover.reference()}
+    class="btn btn-lg preset-filled-primary-500 gap-1 shadow-sm sm:w-fit"
+    {disabled}
+  >
+    {@render buttonContent()}
+  </button>
+
+  {#if popover.isOpen()}
+    <div
+      data-floating
+      {...popover.floating()}
+      class="preset-filled-surface-100-900 card p-2"
+      in:scale={{ duration: 150, delay: 150 }}
+    >
+      <p class="">Choose a valid location and dates above.</p>
+      <div {...popover.arrow()}></div>
+    </div>
+  {/if}
+{:else}
+  <button
+    class="btn btn-lg preset-filled-primary-500 gap-1 shadow-sm sm:w-fit"
+    onclick={() => {
+      if (weather.isUserEdited)
+        dialog.trigger({
+          type: 'component',
+          component: { ref: GettingWeatherWarnCustomWeather },
+        });
+      else
+        dialog.trigger({
+          type: 'component',
+          component: { ref: GettingWeather },
+        });
+    }}
+    title="Search for Weather Data"
+    id="location-action-button"
+    {disabled}
+  >
+    {@render buttonContent()}
+  </button>
+{/if}

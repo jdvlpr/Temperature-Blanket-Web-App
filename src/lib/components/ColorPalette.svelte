@@ -89,11 +89,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   </p>
                 {/if}
               </div>
-              <div
-                class="popover-arrow"
-                style="background:{hex}"
-                {...popover.arrow()}
-              ></div>
+              <div style="background:{hex}" {...popover.arrow()}></div>
             </div>
           {/if}
         {/key}

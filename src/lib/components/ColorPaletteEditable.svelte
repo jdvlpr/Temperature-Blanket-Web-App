@@ -172,6 +172,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       isDragging.value = true;
   }
 
+  // Hide the tooltip when dragging a color
   function transformDraggedElement(draggedEl, data, index) {
     const tooltipElement = draggedEl.querySelector('.tooltip');
 
@@ -252,7 +253,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
         }}
         aria-label="Color {index + 1}: {name || hex}"
         aria-pressed={activeColorIndex === index}
-        aria-describedby="palette-item-description-{uniqueId}-{index}"
         onmouseenter={() => {
           activeColorIndex = index;
         }}
