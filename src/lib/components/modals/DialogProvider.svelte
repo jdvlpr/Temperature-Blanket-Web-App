@@ -14,9 +14,9 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { allGaugesAttributes, gauges, dialog, weather } from '$lib/state';
+  import { allGaugesAttributes, dialog, gauges, weather } from '$lib/state';
   import { Dialog, Portal } from '@skeletonlabs/skeleton-svelte';
-  import { fly } from 'svelte/transition';
+  import { scale } from 'svelte/transition';
   import CloseButton from './CloseButton.svelte';
   import SaveAndCloseButtons from './SaveAndCloseButtons.svelte';
 </script>
@@ -39,7 +39,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       >
         {#snippet element(attributes)}
           {#if !attributes.hidden}
-            <div {...attributes} in:fly={{ y: 200, duration: 150 }}>
+            <div {...attributes} in:scale={{ duration: 150 }}>
               {#if dialog.type === 'component'}
                 {#if dialog.options.showCloseButton}
                   <Dialog.CloseTrigger
