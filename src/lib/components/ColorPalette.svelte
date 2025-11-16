@@ -46,16 +46,23 @@ If not, see <https://www.gnu.org/licenses/>. -->
           placement: 'top',
         })}
         {#key hex}
-          <div
+          <button
             {...popover.reference()}
             class="flex h-full w-full max-w-[90vw] cursor-pointer flex-wrap items-center justify-center"
             style="background:{hex}"
             title={brandName && yarnName && name
               ? `${brandName} - ${yarnName}: ${name}`
               : hex}
-          ></div>
+            aria-label={brandName && yarnName && name
+              ? `${brandName} - ${yarnName}: ${name}`
+              : hex}
+            aria-haspopup="dialog"
+            aria-expanded={popover.isOpen()}
+          ></button>
           {#if popover.isOpen()}
             <div
+              role="dialog"
+              aria-label="Color details"
               style="background:{hex}"
               class="rounded-container z-10 min-w-[260px] p-4"
               {...popover.floating()}

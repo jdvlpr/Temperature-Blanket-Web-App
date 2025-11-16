@@ -1,5 +1,3 @@
-//TODO: This is unnecessary at the moment--consider removing it.
-
 import {
   computePosition,
   autoUpdate,

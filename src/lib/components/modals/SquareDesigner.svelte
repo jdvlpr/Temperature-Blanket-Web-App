@@ -17,7 +17,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
   import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
   import StickyPart from '$lib/components/modals/StickyPart.svelte';
-  import Tooltip from '$lib/components/Tooltip.svelte';
   import { dialog } from '$lib/state';
   import {
     displayNumber,
@@ -25,6 +24,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     getTextColor,
     setSecondaryTargets,
   } from '$lib/utils';
+  import { RefreshCwIcon } from '@lucide/svelte';
 
   let {
     targets,
@@ -133,32 +133,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {/each}
         </select>
       </label>
-
-      <div class="">
-        <Tooltip onclick={reset} classNames="btn preset-tonal-primary gap-2">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="1.5"
-            stroke="currentColor"
-            class="h-6 w-6"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3"
-            />
-          </svg>
-          Reset
-          {#snippet tooltip()}
-            <p>
-              This will replace any secondary colors you have set below with the
-              primary color.
-            </p>
-          {/snippet}
-        </Tooltip>
-      </div>
     </div>
 
     <p class="italic">
@@ -204,6 +178,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {/each}
       {/key}
     </div>
+  </div>
+
+  <div
+    class="card preset-filled-surface-100-900 my-2 grid items-center gap-2 p-2"
+    style="grid-template-columns: auto 1fr;"
+  >
+    <button onclick={reset} class="btn preset-tonal-primary h-fit w-fit gap-2">
+      <RefreshCwIcon />
+      Reset
+    </button>
+    <p class=" text-sm">
+      Replace any secondary colors you have set with the primary color.
+    </p>
   </div>
 
   <ToggleSwitch

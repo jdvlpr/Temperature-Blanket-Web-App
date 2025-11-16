@@ -21,15 +21,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let popover = new PopoverInstance();
 </script>
 
-<button class="btn-icon" {...popover.reference()}>
+<button
+  class="btn-icon"
+  {...popover.reference()}
+  aria-label="Weather data delay information"
+  aria-describedby="weather-delay-tooltip"
+>
   <TriangleAlertIcon class="relative -top-[2px] inline size-4" />
 </button>
 
 {#if popover.isOpen()}
   <div
+    id="weather-delay-tooltip"
     data-floating
     {...popover.floating()}
     class="preset-filled-warning-200-800 rounded-container max-w-[290px] p-2"
+    role="tooltip"
   >
     <p class="text-left">
       Weather data may adjust as new information arrives. Consider working at

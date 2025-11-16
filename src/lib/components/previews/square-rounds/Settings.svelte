@@ -15,14 +15,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
+  import PreviewInfo from '$lib/components/PreviewInfo.svelte';
   import SpanYarnColorSelectIcon from '$lib/components/SpanYarnColorSelectIcon.svelte';
-  import Tooltip from '$lib/components/Tooltip.svelte';
-  import { gauges, dialog, weather } from '$lib/state';
+  import { dialog, gauges, weather } from '$lib/state';
   import { pluralize } from '$lib/utils';
   import { capitalizeFirstLetter } from '$lib/utils/other-utils';
-  import { ArrowRightIcon, InfoIcon } from '@lucide/svelte';
+  import { ArrowRightIcon } from '@lucide/svelte';
   import { squareRoundsPreview } from './state.svelte';
-  import PreviewInfo from '$lib/components/PreviewInfo.svelte';
 
   let targets = $derived(gauges.allCreated.map((n) => n.targets).flat());
 
@@ -78,26 +77,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {pluralize(
           { singular: 'has', plural: 'have' },
           squareRoundsPreview.extraSquares,
-        )} no weather data
+        )} no weather data.
+      {/if}{#if extraRounds || squareRoundsPreview.extraSquares}
+        <p class="italic">
+          Adjust the <span class="inline font-bold">Layout Settings</span>
+          or
+          <span class="inline font-bold">Square Settings</span>
+          <ArrowRightIcon class="relative -top-[2px] inline size-4" />
+          <span class="inline font-bold"
+            >{capitalizeFirstLetter(weather.grouping)}s Per Square</span
+          >
+          below to avoid rounds of no weather data.
+        </p>
       {/if}
-
-      {#if extraRounds || squareRoundsPreview.extraSquares}
-        <Tooltip tooltipClass="">
-          <InfoIcon class="-top[1px] relative inline size-5" />
-          {#snippet tooltip()}
-            <p class="text-warning-800-200 not-italic">
-              Adjust the <span class="inline font-bold">Layout Settings</span>
-              or
-              <span class="inline font-bold">Square Settings</span>
-              <ArrowRightIcon class="relative -top-[2px] inline size-4" />
-              <span class="inline font-bold"
-                >{capitalizeFirstLetter(weather.grouping)}s Per Square</span
-              >
-              below to avoid rounds of no weather data.
-            </p>
-          {/snippet}
-        </Tooltip>
-      {/if}.
     {/if}
   {/snippet}
 </PreviewInfo>

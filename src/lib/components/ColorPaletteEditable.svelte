@@ -240,18 +240,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
         animate:flip={{ duration: flipDurationMs }}
         role="button"
         tabindex="0"
+        id="palette-item-description-{uniqueId}-{index}"
         onclick={() => {
-          if (activeColorIndex !== index) activeColorIndex = index;
-          else if (activeColorIndex === index) activeColorIndex = null;
-          else activeColorIndex = index;
+          activeColorIndex = activeColorIndex === index ? null : index;
         }}
         onkeydown={(e) => {
           if (e.key === 'Enter' || e.key === ' ') {
-            if (activeColorIndex !== index) activeColorIndex = index;
-            else if (activeColorIndex === index) activeColorIndex = null;
-            else activeColorIndex = index;
+            e.preventDefault();
+            activeColorIndex = activeColorIndex === index ? null : index;
           }
         }}
+        aria-label="Color {index + 1}: {name || hex}"
+        aria-pressed={activeColorIndex === index}
+        aria-describedby="palette-item-description-{uniqueId}-{index}"
         onmouseenter={() => {
           activeColorIndex = index;
         }}
@@ -299,6 +300,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 }}
                 onkeydown={(e) => {
                   if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
                     colors = colors.filter((_, i) => i !== index);
 
                     sortableColors = getSortableColors();
@@ -306,9 +308,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   }
                 }}
                 class="btn hover:preset-tonal h-auto"
+                aria-label="Delete color {index + 1}"
               >
-                <span class="text-xs">{index + 1}</span>
-                <Trash2Icon />
+                <span class="text-xs" aria-hidden="true">{index + 1}</span>
+                <Trash2Icon aria-hidden="true" />
               </button>
             {/if}
 
@@ -336,6 +339,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   })}
                 onkeydown={(e) => {
                   if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
                     dialog.trigger({
                       type: 'component',
                       component: {
@@ -356,8 +360,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     });
                   }
                 }}
+                aria-label="Edit color {index + 1}: {brandName && yarnName
+                  ? `${brandName} - ${yarnName}`
+                  : 'Find Matching Yarn'}"
               >
-                <SearchIcon />
+                <SearchIcon aria-hidden="true" />
                 <span
                   class="flex flex-col items-start justify-start text-left text-wrap"
                 >
@@ -407,11 +414,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     if (onchanged) onchanged($state.snapshot(colors));
                   }
                 }}
+                aria-label="{color.locked ? 'Unlock' : 'Lock'} color {index +
+                  1}"
+                aria-pressed={color.locked}
               >
                 {#if color.locked}
-                  <LockKeyholeIcon />
+                  <LockKeyholeIcon aria-hidden="true" />
                 {:else}
-                  <LockOpenIcon />
+                  <LockOpenIcon aria-hidden="true" />
                 {/if}
               </button>
             {/if}
@@ -419,7 +429,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <div
               role="button"
               tabindex={isDragging.value ? 0 : -1}
-              aria-label="drag-handle"
+              aria-label="Drag handle to reorder color {index + 1}"
+              aria-pressed={isDragging.value}
               class="dragicon w-fit"
               style="color:{getTextColor(hex)}; {isDragging.value
                 ? 'cursor: grab'
@@ -429,7 +440,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               ontouchstart={startDrag}
               onkeydown={handleKeyDown}
             >
-              <MoveIcon />
+              <MoveIcon aria-hidden="true" />
             </div>
 
             <div

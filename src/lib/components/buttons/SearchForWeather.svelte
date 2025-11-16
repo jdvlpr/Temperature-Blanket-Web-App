@@ -14,10 +14,9 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import Tooltip from '$lib/components/Tooltip.svelte';
   import GettingWeather from '$lib/components/modals/GettingWeather.svelte';
   import GettingWeatherWarnCustomWeather from '$lib/components/modals/GettingWeatherWarnCustomWeather.svelte';
-  import { locations, dialog, project, weather } from '$lib/state';
+  import { dialog, locations, project, weather } from '$lib/state';
   import { ChevronRightIcon } from '@lucide/svelte';
 
   let disabled = $derived(!locations.allValid || project.status.loading);

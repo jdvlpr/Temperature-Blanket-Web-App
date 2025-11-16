@@ -50,7 +50,6 @@
     "svelte": "^5.41.2",
     "svelte-check": "^4.3.3",
     "svelte-dnd-action": "^0.9.65",
-    "svelte-floating-ui": "^1.6.2",
     "tailwindcss": "^4.1.13",
     "tslib": "^2.8.1",
     "typescript": "^5.9.2",
