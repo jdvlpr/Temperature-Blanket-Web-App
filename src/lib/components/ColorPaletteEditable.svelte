@@ -269,16 +269,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
             ? `${brandName} - ${yarnName}: ${name}`
             : hex}
         >
-          <div
-            class="my-2 size-2 rounded-full opacity-30 group-hover:opacity-100 group-focus:opacity-100"
-            class:hidden={sortableColors.length > 30}
-            class:sm:block={sortableColors.length > 30 &&
-              sortableColors.length <= 50}
-            class:xl:block={sortableColors.length > 50}
-            style="background:{getTextColor(hex)}"
-          ></div>
           {#if isLocked}
             <LockKeyholeIcon size="20" class="opacity-30" />
+          {:else}
+            <div
+              class="my-2 size-2 rounded-full opacity-30 group-hover:opacity-100 group-focus:opacity-100"
+              class:hidden={sortableColors.length > 30}
+              class:sm:block={sortableColors.length > 30 &&
+                sortableColors.length <= 50}
+              class:xl:block={sortableColors.length > 50}
+              style="background:{getTextColor(hex)}"
+            ></div>
           {/if}
         </div>
 
