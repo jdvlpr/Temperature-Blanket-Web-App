@@ -45,7 +45,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let movable = $derived(gauge.colors?.length > 1);
 
   let hasAnyAffiliateURLs = $derived(
-    checkForAffiliateURLs({ colors: gauge.colors }),
+    gauge.colors?.some((color: Color) => color?.affiliate_variant_href),
   );
 
   let sortableColors: Color[] = $state(getSortableColors());
@@ -61,10 +61,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     if (showDaysInRange.value) cols++;
     return cols;
   });
-
-  function checkForAffiliateURLs({ colors }) {
-    return colors?.some((n) => n?.affiliate_variant_href);
-  }
 
   function onChangeColor({
     index,
@@ -102,19 +98,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     dialog.close();
   }
 
-  $inspect(numberOfColumns);
-
-  function handleConsider(e) {
+  function handleConsider(e: any) {
     dragDisabled = true;
-    const {
-      items: newItems,
-      info: { source, trigger, id },
-    } = e.detail;
-
-    sortableColors = newItems;
+    sortableColors = e.detail.items;
   }
 
-  function handleFinalize(e) {
+  function handleFinalize(e: any) {
     const {
       items: newItems,
       info: { source },
@@ -122,7 +111,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     sortableColors = newItems;
 
-    gauge.colors = sortableColors.map((color) => {
+    gauge.colors = sortableColors.map((color: Color) => {
       delete color.id;
       return color;
     });
@@ -133,7 +122,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       dragDisabled = false;
     }
   }
-  function startDrag(e) {
+  function startDrag(e: any) {
     // preventing default to prevent lag on touch devices (because of the browser checking for screen scrolling)
     e.preventDefault();
     dragDisabled = false;
@@ -222,7 +211,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
               class="btn hover:preset-tonal flex flex-wrap items-center justify-center"
               onclick={() => {
                 gauge.updateColors({
-                  colors: gauge.colors.filter((_, i) => i !== index),
+                  colors: gauge.colors.filter(
+                    (_: Color, i: number) => i !== index,
+                  ),
                 });
                 sortableColors = getSortableColors();
                 gauge.schemeId = 'Custom';

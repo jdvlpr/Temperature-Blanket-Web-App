@@ -416,17 +416,45 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/if}
 
   {#if pages.save}
-    <div class="">
+    <div class="mb-4 flex flex-col items-start justify-center gap-2">
       <h2 class="my-2 text-lg font-bold">Save</h2>
       {#if browser && typeof window.localStorage !== 'undefined' && weather.data.length}
-        <p class="my-2 inline-flex w-full items-center justify-start gap-2">
+        <p
+          class="preset-filled-success-100-900 rounded-container inline-flex w-full items-center justify-start gap-2 p-2"
+        >
           <CircleCheckBigIcon style="size-4" />
           Project and {#if weather.isUserEdited}custom weather{:else}weather{/if}
-          data saved to this browser
+          data saved to this web browser
+        </p>
+
+        <p class="">
+          Access this project from any web browser by using the URL below:
         </p>
 
         <button
-          class="mt-2 mb-4"
+          class="btn preset-filled hover:preset-filled-surface-900-100 inline-flex w-fit flex-wrap items-center gap-2"
+          onclick={() => {
+            saveProject({ copy: true });
+          }}
+        >
+          <ClipboardCopyIcon />
+          Copy Project URL
+        </button>
+
+        <p
+          class="card bg-primary-50 dark:bg-primary-950 basis-full p-4 break-all select-all"
+        >
+          {project.url.href}
+        </p>
+
+        {#if currentSavedProject}
+          <div class="">
+            <ProjectDetails project={currentSavedProject} canRemove={false} />
+          </div>
+        {/if}
+
+        <button
+          class="btn hover:preset-tonal"
           onclick={() => {
             goTo('download');
           }}
@@ -434,35 +462,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <DownloadIcon class="relative -top-[2px] mr-1 inline" />
           <span class="link">Download this project</span></button
         >
-
-        {#if currentSavedProject}
-          <div class="">
-            <ProjectDetails project={currentSavedProject} canRemove={false} />
-          </div>
-        {/if}
       {/if}
-      <p class="mt-4 mb-2 text-sm">Project URL</p>
-      <p
-        class="card bg-primary-50 dark:bg-primary-950 basis-full p-4 break-all select-all"
-      >
-        {project.url.href}
-      </p>
-      <div class="my-2 inline-flex flex-wrap items-center gap-2">
-        <button
-          class="btn hover:preset-tonal"
-          onclick={() => {
-            saveProject({ copy: true });
-          }}
-        >
-          <ClipboardCopyIcon />
-          Copy URL
-        </button>
-      </div>
-      <p class="mt-2">
-        This is your project's web address. To open your project again, paste
-        this URL into your browser's address bar. Save the web address so you
-        can access your project later.
-      </p>
     </div>
   {/if}
 </div>
