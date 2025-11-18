@@ -1629,7 +1629,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               </li>
               <li>
                 - The HTML color code, colorway name, and link to the colorway’s
-                webpage is saved in a database which this web apps uses to
+                webpage is saved in a database which this web app uses to
                 display the colorway data.
               </li>
             </ol>

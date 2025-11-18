@@ -428,11 +428,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </p>
 
         <p class="">
-          Access this project from any web browser by using the URL below:
+          To access this project from any web browser, use the URL below:
         </p>
 
         <button
-          class="btn preset-filled hover:preset-filled-surface-900-100 inline-flex w-fit flex-wrap items-center gap-2"
+          class="btn preset-filled inline-flex w-fit flex-wrap items-center gap-2"
           onclick={() => {
             saveProject({ copy: true });
           }}
@@ -448,7 +448,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </p>
 
         {#if currentSavedProject}
-          <div class="">
+          <div class="w-full">
             <ProjectDetails project={currentSavedProject} canRemove={false} />
           </div>
         {/if}
@@ -462,6 +462,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <DownloadIcon class="relative -top-[2px] mr-1 inline" />
           <span class="link">Download this project</span></button
         >
+      {:else}
+        <p>To save a project, you first need to get weather data.</p>
       {/if}
     </div>
   {/if}

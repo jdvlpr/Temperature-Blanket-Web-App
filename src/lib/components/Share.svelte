@@ -17,6 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { toast } from '$lib/state';
   import { ClipboardCopyIcon, Share2Icon, XIcon } from '@lucide/svelte';
   import { Popover } from '@skeletonlabs/skeleton-svelte';
+  import { slide } from 'svelte/transition';
 
   let { href } = $props();
 
@@ -43,40 +44,52 @@ If not, see <https://www.gnu.org/licenses/>. -->
   onOpenChange={(e) => {
     openState = e.open;
   }}
-  base="btn-icon hover:preset-tonal"
-  triggerBase=""
-  contentBase="card bg-surface-200 dark:bg-surface-800 p-4 space-y-4 max-w-[90vw]"
-  arrow
-  arrowBackground="bg-surface-200! dark:bg-surface-800!"
-  zIndex="100"
 >
-  {#snippet trigger()}
+  <Popover.Trigger class="btn-icon hover:preset-tonal">
     <Share2Icon />
-  {/snippet}
-  {#snippet content()}
-    <div class="flex flex-col gap-2">
-      <p class="text-sm">Shareable Page URL</p>
-      <p
-        class="card bg-primary-50 dark:bg-primary-950 basis-full p-4 break-all select-all"
-      >
-        {href}
-      </p>
-      <div class="inline-flex flex-wrap items-center gap-4">
-        <button class="btn preset-filled-primary-500" onclick={() => copyURL()}>
-          <ClipboardCopyIcon />
-          Copy URL</button
-        >
+  </Popover.Trigger>
+  <Popover.Positioner>
+    <Popover.Content class="card bg-surface-200-800 max-w-[90vw] space-y-4">
+      {#snippet element(attributes)}
+        {#if !attributes.hidden}
+          <div {...attributes} transition:slide={{ duration: 150 }}>
+            <div class="flex flex-col gap-2 p-4">
+              <p class="text-sm">Shareable Page URL</p>
 
-        <button
-          class="btn preset-filled-surface-50-950"
-          onclick={() => {
-            openState = false;
-          }}
-        >
-          <XIcon />
-          Close
-        </button>
-      </div>
-    </div>
-  {/snippet}
+              <p
+                class="card bg-primary-50 dark:bg-primary-950 basis-full p-4 break-all select-all"
+              >
+                {href}
+              </p>
+
+              <div class="inline-flex flex-wrap items-center gap-4">
+                <button
+                  class="btn preset-filled-primary-500"
+                  onclick={() => copyURL()}
+                >
+                  <ClipboardCopyIcon />
+                  Copy URL</button
+                >
+
+                <button
+                  class="btn preset-filled-surface-50-950"
+                  onclick={() => {
+                    openState = false;
+                  }}
+                >
+                  <XIcon />
+                  Close
+                </button>
+              </div>
+            </div>
+            <Popover.Arrow
+              style="--arrow-size: calc(var(--spacing) * 2); --arrow-background: var(--color-surface-200-800);"
+            >
+              <Popover.ArrowTip />
+            </Popover.Arrow>
+          </div>
+        {/if}
+      {/snippet}
+    </Popover.Content>
+  </Popover.Positioner>
 </Popover>

@@ -41,6 +41,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { onMount } from 'svelte';
   import '../../css/flag-icons.css';
   import LocationDetails from './modals/LocationDetails.svelte';
+  import { slide } from 'svelte/transition';
 
   const id = $props.id();
   const tooltip = useTooltip({ id });
@@ -306,27 +307,34 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <Popover.Content
               class="bg-surface-100 dark:bg-surface-900 rounded-container z-50 flex items-center justify-center gap-2 p-2 shadow-lg"
             >
-              <Popover.Description>
-                <button
-                  class="btn hover:preset-tonal"
-                  onclick={() => {
-                    locations.remove(location.uuid);
-                    weather.rawData = [];
-                  }}
-                  disabled={weather.isUserEdited > 0 || project.status.loading}
-                  title="Remove Location"
-                >
-                  <Trash2Icon />
-                  <p>
-                    Remove Location {index + 1}
-                  </p>
-                </button>
-              </Popover.Description>
-              <Popover.Arrow
-                style="--arrow-size: calc(var(--spacing) * 4); --arrow-background: var(--color-surface-100-900);"
-              >
-                <Popover.ArrowTip />
-              </Popover.Arrow>
+              {#snippet element(attributes)}
+                {#if !attributes.hidden}
+                  <div {...attributes} transition:slide={{ duration: 150 }}>
+                    <Popover.Description>
+                      <button
+                        class="btn hover:preset-tonal"
+                        onclick={() => {
+                          locations.remove(location.uuid);
+                          weather.rawData = [];
+                        }}
+                        disabled={weather.isUserEdited > 0 ||
+                          project.status.loading}
+                        title="Remove Location"
+                      >
+                        <Trash2Icon />
+                        <p>
+                          Remove Location {index + 1}
+                        </p>
+                      </button>
+                    </Popover.Description>
+                    <Popover.Arrow
+                      style="--arrow-size: calc(var(--spacing) * 4); --arrow-background: var(--color-surface-100-900);"
+                    >
+                      <Popover.ArrowTip />
+                    </Popover.Arrow>
+                  </div>
+                {/if}
+              {/snippet}
             </Popover.Content>
           </Popover.Positioner>
         </Portal>

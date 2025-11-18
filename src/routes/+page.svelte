@@ -55,6 +55,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '@lucide/svelte';
   import { Popover, Portal } from '@skeletonlabs/skeleton-svelte';
   import { onMount } from 'svelte';
+  import { slide } from 'svelte/transition';
 
   let debounceTimer: number;
 
@@ -245,61 +246,67 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <Popover.Content
             class="rounded-container bg-surface-100-900 z-49 w-72 max-w-(--breakpoint-sm) p-2 shadow-lg"
           >
-            <Popover.Description>
-              <div
-                class="flex flex-col gap-4 p-2"
-                aria-orientation="vertical"
-                aria-label="Help Menu"
-              >
-                {@render gettingStarted()}
-                <p>
-                  <a
-                    href="/blog/what-is-a-temperature-blanket"
-                    class="link"
-                    rel="noreferrer"
-                  >
-                    What's a Temperature Blanket?</a
-                  >
-                </p>
+            {#snippet element(attributes)}
+              {#if !attributes.hidden}
+                <div {...attributes} transition:slide={{ duration: 150 }}>
+                  <Popover.Description>
+                    <div
+                      class="flex flex-col gap-4 p-2"
+                      aria-orientation="vertical"
+                      aria-label="Help Menu"
+                    >
+                      {@render gettingStarted()}
+                      <p>
+                        <a
+                          href="/blog/what-is-a-temperature-blanket"
+                          class="link"
+                          rel="noreferrer"
+                        >
+                          What's a Temperature Blanket?</a
+                        >
+                      </p>
 
-                <p>
-                  <a
-                    href="/faq"
-                    rel="noopener noreferrer"
-                    title="View Frequently Asked Questions"
-                    class="link"
-                  >
-                    Frequently Asked Questions</a
-                  >
-                </p>
+                      <p>
+                        <a
+                          href="/faq"
+                          rel="noopener noreferrer"
+                          title="View Frequently Asked Questions"
+                          class="link"
+                        >
+                          Frequently Asked Questions</a
+                        >
+                      </p>
 
-                <p>
-                  <a href="/changelog" rel="noreferrer" class="link"
-                    >Changelog - What's New?</a
+                      <p>
+                        <a href="/changelog" rel="noreferrer" class="link"
+                          >Changelog - What's New?</a
+                        >
+                      </p>
+
+                      <p>
+                        <a href="/documentation" rel="noreferrer" class="link"
+                          >Documentation</a
+                        >
+                      </p>
+
+                      <div class="flex items-center gap-2">
+                        <div class="border-surface-300-700 grow border-t"></div>
+
+                        <p class="shrink text-xs">
+                          Version {version}
+                        </p>
+                        <div class="border-surface-300-700 grow border-t"></div>
+                      </div>
+                    </div>
+                  </Popover.Description>
+                  <Popover.Arrow
+                    style="--arrow-size: calc(var(--spacing) * 4); --arrow-background: var(--color-surface-100-900);"
                   >
-                </p>
-
-                <p>
-                  <a href="/documentation" rel="noreferrer" class="link"
-                    >Documentation</a
-                  >
-                </p>
-
-                <div class="flex items-center gap-2">
-                  <div class="border-surface-300-700 grow border-t"></div>
-
-                  <p class="shrink text-xs">
-                    Version {version}
-                  </p>
-                  <div class="border-surface-300-700 grow border-t"></div>
+                    <Popover.ArrowTip />
+                  </Popover.Arrow>
                 </div>
-              </div>
-            </Popover.Description>
-            <Popover.Arrow
-              style="--arrow-size: calc(var(--spacing) * 4); --arrow-background: var(--color-surface-100-900);"
-            >
-              <Popover.ArrowTip />
-            </Popover.Arrow>
+              {/if}
+            {/snippet}
           </Popover.Content>
         </Popover.Positioner>
       </Portal>
