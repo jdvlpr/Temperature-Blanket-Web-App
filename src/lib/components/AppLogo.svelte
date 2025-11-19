@@ -32,7 +32,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 >
   <div class="flex items-center gap-2 mx-4">
     <div class="rounded-[0.2rem] overflow-hidden shrink-0 shadow">
-      <div class="flex flex-col items-center size-8 relative">
+      <div class="flex flex-col items-center size-8 relative" aria-hidden="true">
         <div class="flex flex-col items-center absolute">
           <div class="h-4 w-2 bg-surface-50 dark:bg-surface-950"></div>
           <div
@@ -55,8 +55,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
         ></div>
       </div>
     </div>
-    <h5 class="h5 text-surface-700 dark:text-surface-100 leading-tight">
+    <span class="h5 text-surface-700 dark:text-surface-100 leading-tight">
       {PUBLIC_SITE_TITLE}
-    </h5>
+    </span>
   </div>
 </button>

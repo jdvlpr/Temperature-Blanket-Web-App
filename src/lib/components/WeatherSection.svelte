@@ -224,7 +224,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       >
         <Accordion.Item value="warning">
           {#snippet lead()}
-            <TriangleAlertIcon />
+            <TriangleAlertIcon aria-hidden="true" />
           {/snippet}
           {#snippet control()}
             Weather within the past {weather.source.name === 'Open-Meteo'
