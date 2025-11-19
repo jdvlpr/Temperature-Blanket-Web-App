@@ -244,7 +244,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <Portal>
         <Popover.Positioner>
           <Popover.Content
-            class="rounded-container bg-surface-100-900 z-49 w-72 max-w-(--breakpoint-sm) p-2 shadow-lg"
+            class="rounded-container bg-surface-200-800 z-49 w-72 max-w-(--breakpoint-sm) p-2 shadow-xl"
           >
             {#snippet element(attributes)}
               {#if !attributes.hidden}
@@ -300,7 +300,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     </div>
                   </Popover.Description>
                   <Popover.Arrow
-                    style="--arrow-size: calc(var(--spacing) * 4); --arrow-background: var(--color-surface-100-900);"
+                    style="--arrow-size: calc(var(--spacing) * 4); --arrow-background: var(--color-surface-200-800);"
                   >
                     <Popover.ArrowTip />
                   </Popover.Arrow>

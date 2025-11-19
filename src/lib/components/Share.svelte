@@ -49,7 +49,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <Share2Icon />
   </Popover.Trigger>
   <Popover.Positioner>
-    <Popover.Content class="card bg-surface-200-800 max-w-[90vw] space-y-4">
+    <Popover.Content
+      class="card bg-surface-200-800 max-w-[90vw] space-y-4 shadow-xl"
+    >
       {#snippet element(attributes)}
         {#if !attributes.hidden}
           <div {...attributes} transition:slide={{ duration: 150 }}>

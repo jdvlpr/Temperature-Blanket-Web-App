@@ -400,7 +400,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <Card>
         {#snippet header()}
           <div>
-            <div class="bg-surface-200 dark:bg-surface-800 p-4">
+            <div class="bg-surface-100-900 p-4">
               <p class="text-center">
                 Browse a collection of yarn colorways. Filter by brand or yarn
                 name, and search by HTML hex color code to find matching yarn
