@@ -42,16 +42,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { fetchData } from './GetWeather.svelte';
 
   let searching = $state(false); // Autocomplete searching status
-  let showReset = $state(false);
+
   let locationGroup = $state();
 
   let navigatorAvailable = $state(true);
 
-  $effect(() => {
-    if (weatherLocationState.inputLocation) {
-      showReset =
-        !searching && weatherLocationState.inputLocation?.value?.length > 1;
-    }
+  let showResetKey = $state(false);
+  // Weather or not the clear input text button should appear
+  let showReset = $derived.by(() => {
+    showResetKey;
+    return (
+      !searching &&
+      weatherLocationState.inputLocation?.value &&
+      weatherLocationState.inputLocation?.value?.length > 1
+    );
   });
 
   let hasError = $derived(
@@ -113,6 +117,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         await fetchData();
         weatherState.activeLocationID = item.id;
         weatherLocationState.inputLocation.value = '';
+        showResetKey = !showResetKey;
         weatherLocationState.validId = true;
       },
     });
@@ -247,7 +252,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </div>
       <input
         type="text"
-        id="location-0"
+        id="location-weather"
         class="ig-input truncate"
         autocomplete="off"
         placeholder={project.status.loading ? 'Loading...' : 'Enter a place'}
@@ -275,9 +280,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </g>
           </svg>
         </div>
-      {/if}
-
-      {#if showReset}
+      {:else if showReset}
         <button
           class="ig-btn hover:preset-tonal"
           title="Reset Location Search"
@@ -285,40 +288,39 @@ If not, see <https://www.gnu.org/licenses/>. -->
             weatherLocationState.inputLocation.value = '';
             // $location.label = "";
             // $location.id = null;
+            showResetKey = !showResetKey;
             weatherLocationState.validId = false;
             if (document.querySelector('.autocomplete'))
               document.querySelector('.autocomplete').remove();
-            await goto('?');
+            // await goto('?');
+            // showReset = false;
             weatherLocationState.inputLocation.focus();
           }}
         >
           <XIcon />
         </button>
+      {:else if navigatorAvailable}
+        <button
+          class="ig-btn hover:preset-tonal"
+          title="Use My Location"
+          onclick={async () => {
+            weatherLocationState.inputLocation.value = 'Loading...';
+            navigator.geolocation.getCurrentPosition(
+              async (response) => {
+                await setLocationFromCoords({
+                  coords: response.coords,
+                });
+                weatherLocationState.inputLocation.value = '';
+              },
+              (error) => {
+                weatherLocationState.inputLocation.value = '';
+              },
+            );
+          }}
+        >
+          <MapPinIcon /> <span class="hidden sm:inline">My Location</span>
+        </button>
       {/if}
     </div>
   </div>
-
-  {#if navigatorAvailable}
-    <button
-      class="btn hover:preset-tonal relative flex items-center gap-1 lg:-top-1"
-      title="Use My Location"
-      onclick={async () => {
-        weatherLocationState.inputLocation.value = 'Loading...';
-        navigator.geolocation.getCurrentPosition(
-          async (response) => {
-            await setLocationFromCoords({
-              coords: response.coords,
-            });
-            weatherLocationState.inputLocation.value = '';
-          },
-          (error) => {
-            weatherLocationState.inputLocation.value = '';
-          },
-        );
-      }}
-    >
-      <MapPinIcon />
-      Use My Location
-    </button>
-  {/if}
 </div>
