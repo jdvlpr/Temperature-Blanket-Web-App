@@ -43,6 +43,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let inputValue = $state('');
 
+  let textAreaInputElement = $state();
+
   let inputColors = $state([]);
 
   let colorNamesAsArray = $state(false);
@@ -98,9 +100,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     }),
   );
 
-  function triggerChange() {
-    if (inputValue === null || inputValue === '') return;
-    inputColors = getColorsFromInput({ string: inputValue }) || inputColors;
+  async function triggerChange() {
+    if (inputValue === null || inputValue === '') {
+      inputColors = [];
+      return;
+    }
+    inputColors = getColorsFromInput({ string: inputValue }) || [];
   }
 
   function getColorHexes({ palette, asArray, withHashes }) {
@@ -166,12 +171,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
       >Enter HTML colors, a palette code, or a project URL</label
     >
     <textarea
+      bind:this={textAreaInputElement}
       id="palette-code"
       class="textarea select-all"
       placeholder="e.g. red, FFA500, #ADD8E6"
       bind:value={inputValue}
       onkeyup={triggerChange}
       onchange={triggerChange}
+      onpaste={(e) => {
+        e.preventDefault();
+        const _tempInputValue = e.clipboardData?.getData('text');
+        inputValue = _tempInputValue || '';
+        triggerChange();
+        // textAreaInputElement.blur();
+      }}
     ></textarea>
 
     <div class="my-2 flex flex-col gap-2 text-left">
@@ -243,7 +256,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {/if}
 
     {#if !inputColors.length && inputValue.length}
-      <p class="preset-tonal-error card p-4 text-center">Code not valid</p>
+      <div class="mt-4 h-[170px]">
+        <div
+          class="preset-tonal-error card flex h-[70px] items-center justify-center p-4 text-center"
+        >
+          <p>Code not valid</p>
+        </div>
+      </div>
     {/if}
   {:else if colors}
     <ColorPalette
