@@ -15,7 +15,7 @@
 
 import { WEATHER_DATA_DECIMALS } from '$lib/constants';
 
-export const getRandomNumber = (min, max) => {
+export const getRandomNumber = (min: number, max: number): number => {
   // min and max included
   return Math.floor(Math.random() * (max - min + 1) + min);
 };
@@ -29,11 +29,11 @@ export const getRandomNumber = (min, max) => {
  * @returns {number} - The average of the array.
  */
 export const getAverage = (
-  array,
-  props = { decimals: WEATHER_DATA_DECIMALS },
-) => {
+  array: number[],
+  props: { decimals?: number } = { decimals: WEATHER_DATA_DECIMALS },
+): number => {
   const { decimals } = props;
-  const reducer = (total, currentValue) => total + currentValue;
+  const reducer = (total: number, currentValue: number) => total + currentValue;
   const sum = array.reduce(reducer);
   return displayNumber(sum / array.length, decimals);
 };
@@ -46,7 +46,11 @@ export const getAverage = (
  * @param {number|null} max - The maximum value or null.
  * @returns {number|null} - The minimum value among the three numbers, or null if all values are null.
  */
-export const getMinOfThree = (min, avg, max) => {
+export const getMinOfThree = (
+  min: number | null,
+  avg: number | null,
+  max: number | null,
+): number | null => {
   if (min === null) return min;
   if (avg === null && max === null) return min;
   if (avg === null && max !== null) {
@@ -55,7 +59,7 @@ export const getMinOfThree = (min, avg, max) => {
   if (avg !== null && max === null) {
     return min > avg ? avg : min;
   }
-  const nextLowest = Math.min(avg, max);
+  const nextLowest = Math.min(avg!, max!);
   if (min > nextLowest) return nextLowest;
   return min;
 };
@@ -68,7 +72,11 @@ export const getMinOfThree = (min, avg, max) => {
  * @param {number|null} max - The maximum value (optional).
  * @returns {number|null} - The calculated average, or null if the average is null or both the minimum and maximum are null.
  */
-export const getAvgOfThree = (min, avg, max) => {
+export const getAvgOfThree = (
+  min: number | null,
+  avg: number | null,
+  max: number | null,
+): number | null => {
   if (avg === null) return avg;
   if (min === null && max === null) return avg;
   if (min === null && max !== null) {
@@ -77,8 +85,8 @@ export const getAvgOfThree = (min, avg, max) => {
   if (min !== null && max === null) {
     return avg < min ? min : avg;
   }
-  const nextLowest = Math.min(min, max);
-  const nextHighest = Math.max(min, max);
+  const nextLowest = Math.min(min!, max!);
+  const nextHighest = Math.max(min!, max!);
   if (avg < nextLowest) return nextLowest;
   if (avg > nextHighest) return nextHighest;
   return avg;
@@ -92,7 +100,11 @@ export const getAvgOfThree = (min, avg, max) => {
  * @param {number|null} max - The maximum value.
  * @returns {number|null} - The maximum value among the three numbers, or null if all values are null
  */
-export const getMaxOfThree = (min, avg, max) => {
+export const getMaxOfThree = (
+  min: number | null,
+  avg: number | null,
+  max: number | null,
+): number | null => {
   if (max === null) return max;
   if (avg === null && min === null) return max;
   if (avg === null && min !== null) {
@@ -101,7 +113,7 @@ export const getMaxOfThree = (min, avg, max) => {
   if (avg !== null && min === null) {
     return max < avg ? avg : max;
   }
-  const nextHighest = Math.max(min, max);
+  const nextHighest = Math.max(min!, max!);
   if (max < nextHighest) return nextHighest;
   return max;
 };
@@ -114,7 +126,10 @@ export const getMaxOfThree = (min, avg, max) => {
  * @param {number} [decimals=decimalsOfWeatherNumbers] - The number of decimal places to display. Defaults to the value of `decimalsOfWeatherNumbers`.
  * @returns {number} - The formatted number.
  */
-export const displayNumber = (number, decimals = WEATHER_DATA_DECIMALS) => {
+export const displayNumber = (
+  number: number,
+  decimals: number = WEATHER_DATA_DECIMALS,
+): number => {
   if (typeof number !== 'number') {
     console.error('NaN', number);
     number = 0;
@@ -128,7 +143,7 @@ export const displayNumber = (number, decimals = WEATHER_DATA_DECIMALS) => {
  * @param {{ array: any[] }} options - The options object.
  * @returns {object | undefined} The randomly selected element from the array.
  */
-export const pickRandomFromArray = ({ array }) => {
+export const pickRandomFromArray = ({ array }: { array: any[] }) => {
   if (!array || !array.length) {
     return;
   }
@@ -144,6 +159,6 @@ export const pickRandomFromArray = ({ array }) => {
   return array[index];
 };
 
-export const getMiddleValueOfArray = (arr) => {
+export const getMiddleValueOfArray = (arr: any[]) => {
   return arr[Math.ceil((arr.length - 1) / 2)];
 };

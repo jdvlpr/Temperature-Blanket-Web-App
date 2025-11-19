@@ -44,13 +44,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import WeatherGrouping from './WeatherGrouping.svelte';
   import WeatherSourceButton from './buttons/WeatherSourceButton.svelte';
 
-  let graph = $state();
-  let defaultWeatherSourceCopy = $state();
+  let graph = $state<HTMLDivElement>();
+  let defaultWeatherSourceCopy = $state<string>();
   let wasDefaultWeatherSourceChanged = $state(false);
   let showWeatherChart = $state(true);
-  let warningAccordionState = $state([]);
-  let missingWeatherAccordionState = $state([]);
-  let isAnyWeatherSourceDifferentFromDefault;
+  let warningAccordionState = $state<string[]>([]);
+  let missingWeatherAccordionState = $state<string[]>([]);
+  let isAnyWeatherSourceDifferentFromDefault: boolean;
   onMount(() => {
     isAnyWeatherSourceDifferentFromDefault = !locations.all?.some(
       (n) => n.source === weather.source.name,
@@ -68,7 +68,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     }
   });
 
-  function getMissingDataMerged(missingData) {
+  function getMissingDataMerged(missingData: any[]) {
     let _countsofTMinTAvgTMax = [...missingData];
     _countsofTMinTAvgTMax.length = 3;
     const areAllTempsTheSame = _countsofTMinTAvgTMax.every(
@@ -278,7 +278,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
         id="tmax"
         icon="↑"
         label="Highest Temperature"
-        value={Math.max(...weather.params.tmax?.filter((n) => n !== null))}
+        value={Math.max(
+          ...(weather.params.tmax?.filter((n) => n !== null) as number[]),
+        )}
         units={UNIT_LABELS.temperature[localState.value.units]}
       >
         {#snippet date()}
@@ -297,7 +299,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
         id="tavg"
         icon="~"
         label="Average Temperature"
-        value={getAverage(weather.params.tavg?.filter((n) => n !== null))}
+        value={getAverage(
+          weather.params.tavg?.filter((n) => n !== null) as number[],
+        )}
         units={UNIT_LABELS.temperature[localState.value.units]}
       />
     {/if}
@@ -307,7 +311,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
         id="tmin"
         icon="↓"
         label="Lowest Temperature"
-        value={Math.min(...weather.params.tmin?.filter((n) => n !== null))}
+        value={Math.min(
+          ...(weather.params.tmin?.filter((n) => n !== null) as number[]),
+        )}
         units={UNIT_LABELS.temperature[localState.value.units]}
       >
         {#snippet date()}
@@ -331,7 +337,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           : displayNumber(
               weather.params.prcp
                 ?.filter((n) => n !== null)
-                ?.reduce((partialSum, a) => partialSum + a, 0),
+                ?.reduce((partialSum: number, a: any) => partialSum + a, 0),
             )}
         units={UNIT_LABELS.height[localState.value.units]}
       />
@@ -347,11 +353,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
         value={weather.params.snow?.every((n) => n === null)
           ? '-'
           : locations.all?.every((n) => n.source === 'Meteostat')
-            ? Math.max(...weather.params.snow?.filter((n) => n !== null))
+            ? Math.max(
+                ...(weather.params.snow?.filter((n) => n !== null) as number[]),
+              )
             : displayNumber(
                 weather.params.snow
                   ?.filter((n) => n !== null)
-                  ?.reduce((partialSum, a) => partialSum + a, 0),
+                  ?.reduce((partialSum: number, a: any) => partialSum + a, 0),
               )}
         units={UNIT_LABELS.height[localState.value.units]}
       >
@@ -379,7 +387,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         label="Average Daytime"
         value={convertTime(
           getAverage(
-            weather.params.dayt?.filter((n) => n !== null),
+            weather.params.dayt?.filter((n) => n !== null) as number[],
             { decimals: 6 },
           ),
         )}
