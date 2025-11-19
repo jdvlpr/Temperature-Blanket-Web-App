@@ -18,7 +18,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <script lang="ts">
-  import { browser } from '$app/environment';
   import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
   import { dialog, InteractivePopoverInstance } from '$lib/state';
   import type { Color } from '$lib/types';
@@ -46,7 +45,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     canUserDeleteColor?: boolean;
     showSchemeName?: boolean;
     roundedBottom?: boolean;
-    typeId?: string;
     isStaticGauge?: boolean;
     onchanged?: any;
     fullscreen?: boolean;
@@ -59,7 +57,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     canUserDeleteColor = true,
     showSchemeName = true,
     roundedBottom = true,
-    typeId = getTypeId(),
     isStaticGauge = false,
     onchanged = null,
     fullscreen = $bindable(),
@@ -67,18 +64,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   const flipDurationMs = 200;
 
-  const uniqueId =
-    browser && crypto && typeof crypto.randomUUID === 'function'
-      ? crypto.randomUUID()
-      : `${Math.random() * 100}-${Math.random() * 100}-${Math.random() * 100}`;
-
   let sortableColors = $state(getSortableColors());
 
-  function getTypeId() {
-    return browser && crypto && typeof crypto.randomUUID === 'function'
-      ? crypto.randomUUID()
-      : `${Math.random() * 100}-${Math.random() * 100}-${Math.random() * 100}`;
-  }
+  let uuid = $props.id();
+
   function onChangeColor({
     index,
     hex,
@@ -180,6 +169,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   $effect(() => {
     if (schemeName === 'Custom') schemeName = 'Color Palette';
   });
+
 </script>
 
 <div
@@ -190,11 +180,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     use:dragHandleZone={{
       items: sortableColors,
       flipDurationMs,
-      type: typeId,
+      type: uuid,
       centreDraggedOnCursor: true,
       dropFromOthersDisabled: true,
-      zoneTabIndex: 0,
-      zoneItemTabIndex: 0,
       transformDraggedElement,
     }}
     onconsider={handleConsider}
@@ -216,21 +204,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
         interaction: ['hover', 'click'],
         placement: 'top',
       })}
-      <div
-        {...popover.reference()}
-        class=" w-full {fullscreen
-          ? 'h-full'
-          : 'first:rounded-tl-container last:rounded-tr-container h-[70px] first:overflow-hidden last:overflow-hidden'} group palette-item-{uniqueId} {roundedBottom &&
-        !fullscreen
-          ? 'first:rounded-bl-container last:rounded-br-container'
-          : ''}"
-        animate:flip={{ duration: flipDurationMs }}
-        id="palette-item-description-{uniqueId}-{index}"
-        aria-haspopup="dialog"
-        aria-expanded={popover.isOpen()}
-        aria-label="Color {index + 1}: {name || hex}"
-        aria-pressed={popover.isOpen()}
-      >
+        <div
+          class="dnd-zone-item w-full {fullscreen
+            ? 'h-full'
+            : 'first:rounded-tl-container last:rounded-tr-container h-[70px] first:overflow-hidden last:overflow-hidden'} group palette-item-{uuid} {roundedBottom &&
+          !fullscreen
+            ? 'first:rounded-bl-container last:rounded-br-container'
+            : ''}"
+          animate:flip={{ duration: flipDurationMs }}
+          id="palette-item-description-{uuid}-{index}"
+          aria-haspopup="dialog"
+          aria-expanded={popover.isOpen()}
+          aria-label="Color {index + 1}: {name || hex}"
+          aria-pressed={popover.isOpen()}
+          {...popover.reference()}
+          role="button"
+        >
         <div
           class="flex h-full w-full flex-auto flex-col items-center justify-center {fullscreen
             ? 'h-full'
@@ -400,10 +389,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <div
               role="button"
-              tabindex={isDragging.value ? 0 : -1}
+              tabindex="0"
               aria-label="Drag handle to reorder color {index + 1}"
               aria-pressed={isDragging.value}
-              class="dragicon w-fit"
+              class="w-fit"
               style="color:{getTextColor(hex)}; {isDragging.value
                 ? 'cursor: grab'
                 : 'cursor: grabbing'}"
