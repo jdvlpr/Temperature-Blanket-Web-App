@@ -74,8 +74,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let sortableColors = $state(getSortableColors());
 
-  let activeColorIndex: number | null = $state(null);
-
   function getTypeId() {
     return browser && crypto && typeof crypto.randomUUID === 'function'
       ? crypto.randomUUID()
@@ -113,8 +111,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     });
 
     sortableColors = getSortableColors();
-
-    activeColorIndex = null;
   }
 
   function getSortableColors() {
@@ -186,17 +182,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 </script>
 
-<svelte:window
-  onclick={(e) => {
-    if (!(e.target as Element).closest(`.palette-item-${uniqueId}`))
-      activeColorIndex = null;
-    else
-      activeColorIndex = +(e.target as Element).closest(
-        `.palette-item-${uniqueId}`,
-      )?.dataset.index;
-  }}
-/>
-
 <div
   class="flex w-full flex-col gap-y-1 text-left {fullscreen ? 'h-full' : ''}"
 >
@@ -208,6 +193,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
       type: typeId,
       centreDraggedOnCursor: true,
       dropFromOthersDisabled: true,
+      zoneTabIndex: 0,
+      zoneItemTabIndex: 0,
       transformDraggedElement,
     }}
     onconsider={handleConsider}
@@ -237,28 +224,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
         !fullscreen
           ? 'first:rounded-bl-container last:rounded-br-container'
           : ''}"
-        data-index={index}
         animate:flip={{ duration: flipDurationMs }}
-        role="button"
-        tabindex="0"
         id="palette-item-description-{uniqueId}-{index}"
-        onclick={() => {
-          activeColorIndex = activeColorIndex === index ? null : index;
-        }}
-        onkeydown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            activeColorIndex = activeColorIndex === index ? null : index;
-          }
-        }}
+        aria-haspopup="dialog"
+        aria-expanded={popover.isOpen()}
         aria-label="Color {index + 1}: {name || hex}"
-        aria-pressed={activeColorIndex === index}
-        onmouseenter={() => {
-          activeColorIndex = index;
-        }}
-        onmouseleave={() => {
-          activeColorIndex = null;
-        }}
+        aria-pressed={popover.isOpen()}
       >
         <div
           class="flex h-full w-full flex-auto flex-col items-center justify-center {fullscreen

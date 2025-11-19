@@ -47,6 +47,8 @@ export class InteractivePopoverInstance {
       onclick: () => {},
       onmouseover: () => {},
       onmouseout: () => {},
+      onfocus: () => {},
+      onblur: () => {},
     };
 
     const interactions = Array.isArray(this.options.interaction)
@@ -75,6 +77,17 @@ export class InteractivePopoverInstance {
         }, 150);
       };
     }
+
+    attrs['onfocus'] = () => {
+      this.open = true;
+      if (this.closeTimeout) clearTimeout(this.closeTimeout);
+    };
+    attrs['onblur'] = () => {
+      // Delay closing to allow quick movements into the floating element
+      this.closeTimeout = setTimeout(() => {
+        this.open = false;
+      }, 150);
+    };
 
     return attrs;
   }
@@ -203,6 +216,8 @@ export class PopoverInstance {
       onclick: () => {},
       onmouseover: () => {},
       onmouseout: () => {},
+      onfocus: () => {},
+      onblur: () => {},
     };
     // Normalize interaction to an array so `.includes` is safe
     const interactions = Array.isArray(this.options.interaction)
@@ -224,6 +239,14 @@ export class PopoverInstance {
         this.open = false;
       };
     }
+
+    attrs['onfocus'] = () => {
+      this.open = true;
+    };
+    attrs['onblur'] = () => {
+      this.open = false;
+    };
+
     return attrs;
   }
 
