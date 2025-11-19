@@ -74,7 +74,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let loadMoreSpinner = $state();
   let urlParams;
-  let isLoaded = false;
+  let isLoaded = $state(false);
   let filtersContainer = $state();
   let showScrollToTopButton = $state(false);
   let itemsToShow = $state(YARN_COLORWAYS_PER_PAGE);
@@ -178,6 +178,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       return;
     }
     const [brandId, yarnId] = paramString.split('-');
+
     // check if brandId exists
     if (brands.find((brand) => brand.id === brandId))
       yarnColorwayFinderState.selectedBrandId = brandId;
@@ -489,18 +490,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 </div>
               </div>
 
-              <div
-                class="col-span-12 w-full md:col-span-9"
-                class:md:col-span-full={!!yarnColorwayFinderState.selectedBrandId &&
-                  !!yarnColorwayFinderState.selectedYarnId}
-              >
-                <SelectYarn
-                  preselectDefaultYarn={false}
-                  bind:selectedBrandId={yarnColorwayFinderState.selectedBrandId}
-                  bind:selectedYarnId={yarnColorwayFinderState.selectedYarnId}
-                  selectedYarnWeightId={yarnColorwayFinderState.selectedYarnWeightId}
-                />
-              </div>
+              {#key isLoaded}
+                <div
+                  class="col-span-12 w-full md:col-span-9"
+                  class:md:col-span-full={!!yarnColorwayFinderState.selectedBrandId &&
+                    !!yarnColorwayFinderState.selectedYarnId}
+                >
+                  <SelectYarn
+                    preselectDefaultYarn={false}
+                    bind:selectedBrandId={
+                      yarnColorwayFinderState.selectedBrandId
+                    }
+                    bind:selectedYarnId={yarnColorwayFinderState.selectedYarnId}
+                    selectedYarnWeightId={yarnColorwayFinderState.selectedYarnWeightId}
+                  />
+                </div>
+              {/key}
 
               {#key yarnColorwayFinderState.selectedBrandId || yarnColorwayFinderState.selectedYarnId}
                 <div
