@@ -13,15 +13,14 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script>
+<script lang="ts">
   import { CircleQuestionMarkIcon } from '@lucide/svelte';
 
-  /**
-   * @typedef {Object} Props
-   * @property {any} href
-   * @property {string} [title]
-   * @property {import('svelte').Snippet} [text]
-   */
+  interface Props {
+    href: any;
+    title?: string;
+    text?: import('svelte').Snippet;
+  }
 
   /** @type {Props} */
   let { href, title = 'Get Help', text } = $props();

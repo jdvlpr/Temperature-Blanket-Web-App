@@ -165,7 +165,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/key}
 </svelte:head>
 
-<AppShell pageName="Project Preivew">
+<AppShell pageName="Project Preview">
   {#snippet stickyHeader()}
     <div class="hidden lg:inline-flex"><AppLogo /></div>
   {/snippet}
@@ -400,7 +400,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   {#if project}
                     <img
                       src={project?.featuredImage?.node.mediaItemUrl}
-                      alt="Project Preivew"
+                      alt="Project Preview"
                       class="m-auto max-h-[60vh]"
                     />
                   {/if}
