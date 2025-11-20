@@ -244,7 +244,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <Portal>
         <Popover.Positioner>
           <Popover.Content
-            class="rounded-container bg-surface-200-800 z-49 w-72 max-w-(--breakpoint-sm) p-2 shadow-xl"
+            class="card bg-surface-200-800 z-49 w-72 max-w-(--breakpoint-sm) p-2 shadow-xl"
           >
             {#snippet element(attributes)}
               {#if !attributes.hidden}

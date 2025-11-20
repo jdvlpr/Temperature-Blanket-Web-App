@@ -32,6 +32,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     MapIcon,
     MapPinIcon,
     SearchIcon,
+    SplinePointerIcon,
     Trash2Icon,
     TriangleAlertIcon,
     XIcon,
@@ -639,7 +640,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </p>
         {#if location.daysInFuture}
           <p
-            class="bg-warning-500/20 rounded-container my-2 w-full p-2 text-sm"
+            class="text-warning-800-200 rounded-container my-2 w-full p-2 text-sm"
           >
             <TriangleAlertIcon class="relative -top-[1px] inline size-4" />
 
@@ -661,12 +662,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </p>
         {/if}
       {:else if location.errorMessage && browser}
-        <p class="bg-warning-500/20 rounded-container my-2 w-full p-2 text-sm">
+        <p
+          class="text-warning-800-200 rounded-container my-2 w-full p-2 text-sm"
+        >
           <TriangleAlertIcon class="relative -top-[1px] inline size-4" />
           {location.errorMessage}
         </p>
       {:else if project.status.loading}
-        <p class="text-sm">...</p>
+        <p class="animate-pulse text-sm">...</p>
       {/if}
     </div>
   </div>

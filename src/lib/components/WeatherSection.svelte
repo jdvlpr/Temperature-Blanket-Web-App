@@ -36,20 +36,23 @@ If not, see <https://www.gnu.org/licenses/>. -->
     isDateWithinLastSevenDays,
     pluralize,
   } from '$lib/utils';
-  import { ChevronDownIcon, TriangleAlertIcon } from '@lucide/svelte';
-  import { Accordion } from '@skeletonlabs/skeleton-svelte';
+  import {
+    ChevronDownIcon,
+    CloudAlert,
+    TriangleAlertIcon,
+  } from '@lucide/svelte';
+  import { Accordion, Popover, Portal } from '@skeletonlabs/skeleton-svelte';
   import { onMount } from 'svelte';
   import { slide } from 'svelte/transition';
   import UnitChanger from './UnitChanger.svelte';
   import WeatherGrouping from './WeatherGrouping.svelte';
   import WeatherSourceButton from './buttons/WeatherSourceButton.svelte';
+  import WeatherDescription from './WeatherDescription.svelte';
 
   let graph = $state<HTMLDivElement>();
   let defaultWeatherSourceCopy = $state<string>();
   let wasDefaultWeatherSourceChanged = $state(false);
   let showWeatherChart = $state(true);
-  let warningAccordionState = $state<string[]>([]);
-  let missingWeatherAccordionState = $state<string[]>([]);
   let isAnyWeatherSourceDifferentFromDefault: boolean;
   onMount(() => {
     isAnyWeatherSourceDifferentFromDefault = !locations.all?.some(
@@ -216,57 +219,61 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   {#if projectHasRecentWeatherData}
     <div class="w-fit max-w-(--breakpoint-sm) text-left text-sm">
-      <Accordion
-        value={warningAccordionState}
-        onValueChange={(e) => (warningAccordionState = e.value)}
-        collapsible
-        class="bg-warning-500/20 rounded-container"
-      >
-        <Accordion.Item value="warning">
-          <Accordion.ItemTrigger
-            class="flex items-center justify-between gap-2"
-          >
-            <TriangleAlertIcon />
-
+      <Popover>
+        <Popover.Trigger
+          class="btn hover:preset-tonal text-warning-800-200 text-left text-sm whitespace-pre-wrap"
+        >
+          <TriangleAlertIcon size="18" />
+          <p>
             Weather within the past {weather.source.name === 'Open-Meteo'
               ? OPEN_METEO_DELAY_DAYS
               : weather.source.name === 'Meteostat'
                 ? METEOSTAT_DELAY_DAYS
                 : 'few'} days may be revised as new data comes in.
+          </p>
+        </Popover.Trigger>
+        <Portal>
+          <Popover.Positioner>
+            <Popover.Content
+              class="card bg-surface-200-800 z-49 w-[90vw] max-w-screen-md p-4 shadow-xl"
+            >
+              {#snippet element(attributes)}
+                {#if !attributes.hidden}
+                  <div {...attributes} transition:slide={{ duration: 150 }}>
+                    <Popover.Description>
+                      Weather data comes from <a
+                        href="https://open-meteo.com/"
+                        target="_blank"
+                        class="link">Open-Meteo</a
+                      >
+                      or
+                      <a
+                        href="https://meteostat.net"
+                        target="_blank"
+                        class="link">Meteostat</a
+                      >, and for some locations their weather models may take up
+                      to a week to incorporate the latest information. Sometimes
+                      even older weather data is updated. Consider working at
+                      least {weather.source.name === 'Open-Meteo'
+                        ? OPEN_METEO_DELAY_DAYS
+                        : weather.source.name === 'Meteostat'
+                          ? METEOSTAT_DELAY_DAYS
+                          : 'a few'} days behind to account for possible changes.
+                      Sorry for any inconvenience.
+                    </Popover.Description>
 
-            <Accordion.ItemIndicator class="group">
-              <ChevronDownIcon
-                class="h-5 w-5 transition group-data-[state=open]:rotate-180"
-              />
-            </Accordion.ItemIndicator>
-          </Accordion.ItemTrigger>
-          <Accordion.ItemContent>
-            {#snippet element(attributes)}
-              {#if !attributes.hidden}
-                <div {...attributes} transition:slide={{ duration: 150 }}>
-                  Weather data comes from <a
-                    href="https://open-meteo.com/"
-                    target="_blank"
-                    class="link">Open-Meteo</a
-                  >
-                  or
-                  <a href="https://meteostat.net" target="_blank" class="link"
-                    >Meteostat</a
-                  >, and for some locations their weather models may take up to
-                  a week to incorporate the latest information. Sometimes even
-                  older weather data is updated. Consider working at least {weather
-                    .source.name === 'Open-Meteo'
-                    ? OPEN_METEO_DELAY_DAYS
-                    : weather.source.name === 'Meteostat'
-                      ? METEOSTAT_DELAY_DAYS
-                      : 'a few'} days behind to account for possible changes. Sorry
-                  for any inconvenience.
-                </div>
-              {/if}
-            {/snippet}
-          </Accordion.ItemContent>
-        </Accordion.Item>
-      </Accordion>
+                    <Popover.Arrow
+                      style="--arrow-size: calc(var(--spacing) * 4); --arrow-background: var(--color-surface-200-800);"
+                    >
+                      <Popover.ArrowTip />
+                    </Popover.Arrow>
+                  </div>
+                {/if}
+              {/snippet}
+            </Popover.Content>
+          </Popover.Positioner>
+        </Portal>
+      </Popover>
     </div>
   {/if}
 
@@ -477,76 +484,81 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <div
       class="variant-outline-surface rounded-container flex w-fit max-w-(--breakpoint-sm) flex-col items-center justify-center gap-2 text-left text-sm"
     >
-      <Accordion
-        value={missingWeatherAccordionState}
-        onValueChange={(e) => (missingWeatherAccordionState = e.value)}
-        collapsible
-        rounded="rounded-container"
-        classes="preset-filled-surface-100-900"
-      >
-        <Accordion.Item value="missing">
-          {#snippet lead()}
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="size-6"
-              viewBox="0 0 24 24"
-              ><path
-                fill="currentColor"
-                d="M21.86 12.5A4.313 4.313 0 0 0 19 11c0-1.95-.68-3.6-2.04-4.96C15.6 4.68 13.95 4 12 4c-1.58 0-3 .47-4.25 1.43s-2.08 2.19-2.5 3.72c-1.25.28-2.29.93-3.08 1.95S1 13.28 1 14.58c0 1.51.54 2.8 1.61 3.85C3.69 19.5 5 20 6.5 20h12c1.25 0 2.31-.44 3.19-1.31c.87-.88 1.31-1.94 1.31-3.19c0-1.15-.38-2.15-1.14-3m-1.59 4.77c-.48.49-1.07.73-1.77.73h-12c-.97 0-1.79-.34-2.47-1C3.34 16.29 3 15.47 3 14.5s.34-1.79 1.03-2.47C4.71 11.34 5.53 11 6.5 11H7c0-1.38.5-2.56 1.46-3.54C9.44 6.5 10.62 6 12 6s2.56.5 3.54 1.46C16.5 8.44 17 9.62 17 11v2h1.5c.7 0 1.29.24 1.77.73S21 14.8 21 15.5s-.24 1.29-.73 1.77M11 15h2v2h-2zm3.43-6.32c.54.45.81 1.07.81 1.82c0 .5-.15.91-.44 1.32c-.3.39-.67.68-1.13.93c-.26.16-.43.32-.52.51A1.7 1.7 0 0 0 13 14h-2c0-.55.11-.92.3-1.18c.2-.26.55-.57 1.07-.91c.26-.16.47-.35.63-.59c.15-.23.23-.51.23-.82c0-.32-.09-.56-.27-.74c-.18-.2-.46-.29-.76-.29c-.27 0-.49.08-.7.23c-.15.15-.25.38-.25.69H9.28c-.05-.75.22-1.39.78-1.8C10.6 8.2 11.31 8 12.2 8c.94 0 1.69.23 2.23.68"
-              /></svg
+      <Popover>
+        <Popover.Trigger
+          class="btn hover:preset-tonal text-warning-800-200 text-left text-sm whitespace-pre-wrap"
+        >
+          <CloudAlert size="18" />
+          There's some missing data
+        </Popover.Trigger>
+        <Portal>
+          <Popover.Positioner>
+            <Popover.Content
+              class="card bg-surface-200-800 z-49 w-[90vw] max-w-screen-md p-4 shadow-xl"
             >
-          {/snippet}
-          {#snippet control()}
-            There's some missing data
-          {/snippet}
-          {#snippet panel()}
-            {#each missingDataMerged as { count, type, label }}
-              {#if count && count < weather.data?.length}
-                {count}
-                {pluralize(weather.grouping, count)} with missing {label}
-                {pluralize(type, count)}.
-              {:else if count && count === weather.data?.length}
-                No days have {label}
-                {type} data.
-              {/if}
-            {/each}
-            <div class="mt-2 flex flex-col gap-2">
-              <div>
-                <p class="">
-                  If you want, here are some ways you can try to fix missing
-                  data:
-                </p>
-                <div class="ml-4 flex flex-col">
-                  <p>
-                    - Search for a different location or dates. Use only dates
-                    that are in the past.
-                  </p>
-                  <p>
-                    - Choose a different
-                    <button
-                      class="link"
-                      onclick={() => {
-                        dialog.trigger({
-                          type: 'component',
-                          component: {
-                            ref: ChooseWeatherSource,
-                          },
-                        });
-                      }}>Weather Source</button
-                    >.
-                  </p>
-                  <p>- Edit the table below to fill in missing values.</p>
-                </div>
-              </div>
-              <p class="">
-                You can also continue using the Project Planner, but some
-                features may not be as useful—especially if there's a lot of
-                missing weather data.
-              </p>
-            </div>
-          {/snippet}
-        </Accordion.Item>
-      </Accordion>
+              {#snippet element(attributes)}
+                {#if !attributes.hidden}
+                  <div {...attributes} transition:slide={{ duration: 150 }}>
+                    <Popover.Description>
+                      {#each missingDataMerged as { count, type, label }}
+                        {#if count && count < weather.data?.length}
+                          {count}
+                          {pluralize(weather.grouping, count)} with missing {label}
+                          {pluralize(type, count)}.
+                        {:else if count && count === weather.data?.length}
+                          No days have {label}
+                          {type} data.
+                        {/if}
+                      {/each}
+                      <div class="mt-2 flex flex-col gap-2">
+                        <div>
+                          <p class="">
+                            If you want, here are some ways you can try to fix
+                            missing data:
+                          </p>
+                          <div class="ml-4 flex flex-col">
+                            <p>
+                              - Search for a different location or dates. Use
+                              only dates that are in the past.
+                            </p>
+                            <p>
+                              - Choose a different
+                              <button
+                                class="link"
+                                onclick={() => {
+                                  dialog.trigger({
+                                    type: 'component',
+                                    component: {
+                                      ref: ChooseWeatherSource,
+                                    },
+                                  });
+                                }}>Weather Source</button
+                              >.
+                            </p>
+                            <p>
+                              - Edit the table below to fill in missing values.
+                            </p>
+                          </div>
+                        </div>
+                        <p class="">
+                          You can also continue using the Project Planner, but
+                          some features may not be as useful—especially if
+                          there's a lot of missing weather data.
+                        </p>
+                      </div>
+                    </Popover.Description>
+                    <Popover.Arrow
+                      style="--arrow-size: calc(var(--spacing) * 4); --arrow-background: var(--color-surface-200-800);"
+                    >
+                      <Popover.ArrowTip />
+                    </Popover.Arrow>
+                  </div>
+                {/if}
+              {/snippet}
+            </Popover.Content>
+          </Popover.Positioner>
+        </Portal>
+      </Popover>
     </div>
   {/if}
 </div>
