@@ -26,9 +26,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <span class="range-input-container">
-  {#if gauges.activeGauge?.unit.type === 'category'}
-    <p class="p-2">{gauges.activeGauge.ranges[index].label}</p>
-  {:else}
     <button
       class="btn hover:preset-tonal h-auto"
       title="Adjust Range"
@@ -77,7 +74,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
         ></span
       ></button
     >
-  {/if}
 </span>
 
 <style>

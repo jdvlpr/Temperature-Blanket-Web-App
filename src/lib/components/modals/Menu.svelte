@@ -442,7 +442,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </button>
 
         <p
-          class="card bg-primary-50 dark:bg-primary-950 basis-full p-4 break-all select-all"
+          class="card bg-primary-50 dark:bg-primary-950 basis-full p-4 break-all select-all text-sm"
         >
           {project.url.href}
         </p>

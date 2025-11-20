@@ -187,7 +187,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       class="color flex flex-wrap items-center justify-around gap-2 p-2 {localState
         .value.layout === 'grid'
         ? 'rounded-container flex-auto basis-1/3  sm:basis-1/4 md:basis-1/5'
-        : `${isProjectPlannerPage ? numberOfColumns < 6 && 'lg:grid lg:grid-cols-[1fr_3fr_1fr]' : numberOfColumns === 4 ? 'lg:grid lg:grid-cols-[1fr_3fr_1fr]' : 'lg:grid lg:grid-cols-[1fr_1.4fr_1fr]'}`}"
+        : `${isProjectPlannerPage ? numberOfColumns < 5 && 'lg:grid lg:grid-cols-[1fr_3fr_1fr]' : 'lg:grid lg:grid-cols-[1fr_1.4fr_1fr]'}`}"
       style="background:{hex};color:{getTextColor(hex)}"
       animate:flip={{ duration: flipDurationMs }}
     >
@@ -198,11 +198,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
             'lg:block lg:h-full lg:w-full lg:flex-auto',
         ]}
       ></div>
+      
       <div
-        class={[
-          localState.value.layout === 'list' &&
-            'flex flex-auto flex-wrap items-center justify-around gap-2',
-        ]}
+        class="flex flex-auto flex-wrap items-center justify-around gap-2"
       >
         <div class="flex flex-wrap items-center gap-2">
           {#if movable && !isStaticGauge}
@@ -240,13 +238,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </div>
 
         {#if isProjectPlannerPage}
-          <div
-            class={['flex gap-2', localState.value.layout === 'grid' ? '' : '']}
-          >
-            {#key index}
-              <ColorRange {index} />
-            {/key}
-          </div>
+          {#if gauge?.unit.type === 'category'}
+            <p class="p-2 min-w-[140px] text-left">{gauge.ranges[index].label}</p>
+          {:else}
+            <div
+              class={['flex gap-2', localState.value.layout === 'grid' ? '' : '']}
+            >
+              {#key index}
+                <ColorRange {index} />
+              {/key}
+            </div>
+          {/if}
         {/if}
 
         <div class={[localState.value.layout === 'list' && 'flex-auto']}>

@@ -14,23 +14,23 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
+  import { page } from '$app/state';
   import AppNavigation from '$lib/components/AppNavigation.svelte';
   import {
-    dialog,
+    drawerState,
     pageSections,
     showNavigationSideBar,
-    weather,
+    weather
   } from '$lib/state';
-  import { slide } from 'svelte/transition';
-  import { weatherChart } from './WeatherChart.svelte';
-  import { Dialog, Portal } from '@skeletonlabs/skeleton-svelte';
-  import AppLogo from './AppLogo.svelte';
-  import { page } from '$app/state';
   import {
     MenuIcon,
     PanelLeftClose,
     PanelRightCloseIcon,
   } from '@lucide/svelte';
+  import { Dialog, Portal } from '@skeletonlabs/skeleton-svelte';
+  import { slide } from 'svelte/transition';
+  import AppLogo from './AppLogo.svelte';
+  import { weatherChart } from './WeatherChart.svelte';
 
   /**
    * @typedef {Object} Props
@@ -83,9 +83,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <div class="lg:hidden">
         <Dialog
           onOpenChange={(e) => {
-            dialog.drawer.leftNavigation = e.open;
+            drawerState.appNavigation = e.open;
           }}
-          open={dialog.drawer.leftNavigation}
+          open={drawerState.appNavigation}
         >
           <Dialog.Trigger
             class="btn hover:preset-tonal my-2"

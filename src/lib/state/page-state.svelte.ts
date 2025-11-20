@@ -35,10 +35,6 @@ class DialogClass {
 
   response = $state<any>(null);
 
-  drawer = $state({
-    leftNavigation: false,
-  });
-
   options = $state<DialogOptions>({
     showCloseButton: true,
     size: 'small',
@@ -63,7 +59,7 @@ class DialogClass {
     response?: any;
     component?: any;
     options?: DialogOptions;
-  }) => {
+  }) => {    
     // close the dialog
     this.close();
 
@@ -71,13 +67,6 @@ class DialogClass {
 
     if (type === 'component') {
       const { ref, props } = component;
-
-      // Delay necessary for zag to transition
-      await new Promise((resolve) => {
-        setTimeout(() => {
-          resolve(true);
-        }, 0);
-      });
 
       // Set the the dialog component and props
       this.contentComponent = {
@@ -99,11 +88,6 @@ class DialogClass {
 
   close = () => {
     this.opened = false;
-
-    // close the drawer
-    for (const key in this.drawer) {
-      this.drawer[key] = false;
-    }
   };
 }
 
@@ -222,8 +206,10 @@ export const windowLanguage = $state({ value: null });
 
 class DrawerStateClass {
   weatherDetails = $state(false);
+  appNavigation = $state(false);
   closeAll = () => {
     this.weatherDetails = false;
+    this.appNavigation = false;
   };
 }
 
