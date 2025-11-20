@@ -18,7 +18,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { PUBLIC_MICROSOFT_CLARITY_ID } from '$env/static/public';
   import DialogProvider from '$lib/components/modals/DialogProvider.svelte';
   import ToastProvider from '$lib/components/ToastProvider.svelte';
-  import { consentToMSClarityCookies, dialog, toast } from '$lib/state';
+  import {
+    consentToMSClarityCookies,
+    dialog,
+    drawerState,
+    toast,
+  } from '$lib/state';
   import { handleKeyDown, initializeLocalStorage, privacy } from '$lib/utils';
   import { onMount, type Snippet } from 'svelte';
   import '../css/main.css';
@@ -39,6 +44,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   beforeNavigate(() => {
     dialog.close();
+    drawerState.closeAll();
   });
 
   onNavigate((navigation) => {

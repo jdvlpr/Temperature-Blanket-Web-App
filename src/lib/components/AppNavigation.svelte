@@ -25,7 +25,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import {
     BookOpenTextIcon,
     ChevronDownIcon,
-    ChevronUpIcon,
     CircleQuestionMarkIcon,
     CloudyIcon,
     ExternalLinkIcon,
@@ -91,6 +90,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
 >
   <div><ThemeSwitcher /></div>
 
+  {#snippet indicator()}
+    <Accordion.ItemIndicator class="group">
+      <ChevronDownIcon
+        class="h-5 w-5 transition group-data-[state=open]:rotate-180"
+      />
+    </Accordion.ItemIndicator>
+  {/snippet}
+
   <Accordion
     value={openedNavigationItems}
     onValueChange={(e) => {
@@ -99,14 +106,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     collapsible
     multiple
   >
-    {#snippet indicator()}
-      <Accordion.ItemIndicator class="group">
-        <ChevronDownIcon
-          class="h-5 w-5 transition group-data-[state=open]:rotate-180"
-        />
-      </Accordion.ItemIndicator>
-    {/snippet}
-
     <Accordion.Item value="tools" class="group gap-0">
       <h3>
         <Accordion.ItemTrigger class="flex items-center justify-between">
