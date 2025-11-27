@@ -198,15 +198,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
             'lg:block lg:h-full lg:w-full lg:flex-auto',
         ]}
       ></div>
-      
-      <div
-        class="flex flex-auto flex-wrap items-center justify-around gap-2"
-      >
+
+      <div class="flex flex-auto flex-wrap items-center justify-around gap-2">
         <div class="flex flex-wrap items-center gap-2">
           {#if movable && !isStaticGauge}
             <button
               title="Remove Color"
-              class="btn hover:preset-tonal flex flex-wrap items-center justify-center"
+              class="btn hover:preset-tonal flex flex-wrap items-center justify-center gap-1"
               onclick={() => {
                 gauge.updateColors({
                   colors: gauge.colors.filter(
@@ -218,7 +216,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               }}
             >
               <span class="text-xs">{index + 1}</span>
-              <Trash2Icon />
+              <Trash2Icon size="18" />
             </button>
           {/if}
 
@@ -239,10 +237,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
         {#if isProjectPlannerPage}
           {#if gauge?.unit.type === 'category'}
-            <p class="p-2 min-w-[140px] text-left">{gauge.ranges[index].label}</p>
+            <p class="min-w-[140px] p-2 text-left">
+              {gauge.ranges[index].label}
+            </p>
           {:else}
             <div
-              class={['flex gap-2', localState.value.layout === 'grid' ? '' : '']}
+              class={[
+                'flex gap-2',
+                localState.value.layout === 'grid' ? '' : '',
+              ]}
             >
               {#key index}
                 <ColorRange {index} />

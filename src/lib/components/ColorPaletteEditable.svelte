@@ -169,7 +169,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   $effect(() => {
     if (schemeName === 'Custom') schemeName = 'Color Palette';
   });
-
 </script>
 
 <div
@@ -204,22 +203,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
         interaction: ['hover', 'click'],
         placement: 'top',
       })}
-        <div
-          class="dnd-zone-item w-full {fullscreen
-            ? 'h-full'
-            : 'first:rounded-tl-container last:rounded-tr-container h-[70px] first:overflow-hidden last:overflow-hidden'} group palette-item-{uuid} {roundedBottom &&
-          !fullscreen
-            ? 'first:rounded-bl-container last:rounded-br-container'
-            : ''}"
-          animate:flip={{ duration: flipDurationMs }}
-          id="palette-item-description-{uuid}-{index}"
-          aria-haspopup="dialog"
-          aria-expanded={popover.isOpen()}
-          aria-label="Color {index + 1}: {name || hex}"
-          aria-pressed={popover.isOpen()}
-          {...popover.reference()}
-          role="button"
-        >
+      <div
+        class="dnd-zone-item w-full {fullscreen
+          ? 'h-full'
+          : 'first:rounded-tl-container last:rounded-tr-container h-[70px] first:overflow-hidden last:overflow-hidden'} group palette-item-{uuid} {roundedBottom &&
+        !fullscreen
+          ? 'first:rounded-bl-container last:rounded-br-container'
+          : ''}"
+        animate:flip={{ duration: flipDurationMs }}
+        id="palette-item-description-{uuid}-{index}"
+        aria-haspopup="dialog"
+        aria-expanded={popover.isOpen()}
+        aria-label="Color {index + 1}: {name || hex}"
+        aria-pressed={popover.isOpen()}
+        {...popover.reference()}
+        role="button"
+      >
         <div
           class="flex h-full w-full flex-auto flex-col items-center justify-center {fullscreen
             ? 'h-full'
@@ -268,11 +267,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     if (onchanged) onchanged();
                   }
                 }}
-                class="btn hover:preset-tonal h-auto"
+                class="btn hover:preset-tonal h-auto gap-1"
                 aria-label="Delete color {index + 1}"
               >
                 <span class="text-xs" aria-hidden="true">{index + 1}</span>
-                <Trash2Icon aria-hidden="true" />
+                <Trash2Icon aria-hidden="true" size="18" />
               </button>
             {/if}
 

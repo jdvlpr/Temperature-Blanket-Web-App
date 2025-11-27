@@ -50,7 +50,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </Popover.Trigger>
   <Popover.Positioner>
     <Popover.Content
-      class="card bg-surface-200-800 max-w-[90vw] space-y-4 shadow-xl"
+      class="card bg-surface-200-800 max-w-[90vw] space-y-4 shadow-xl md:max-w-screen-sm"
     >
       {#snippet element(attributes)}
         {#if !attributes.hidden}
