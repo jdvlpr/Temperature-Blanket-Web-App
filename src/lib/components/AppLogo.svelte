@@ -55,8 +55,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
         ></div>
       </div>
     </div>
-    <h5 class="h5 text-surface-700 dark:text-surface-100 leading-tight">
+    <span class="h5 text-surface-700 dark:text-surface-100 leading-tight">
       {PUBLIC_SITE_TITLE}
-    </h5>
+    </span>
   </div>
 </button>

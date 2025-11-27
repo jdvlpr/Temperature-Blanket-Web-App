@@ -35,6 +35,16 @@ export const entries: ChangelogItemGroup[] = [
             notes: [
               {
                 icon: ICONS.checkCircle,
+                text: `74 colorways`,
+                title: 'Added New Yarn: Lion Brand - Wool-Ease Thick & Quick',
+              },
+            ],
+            version: '5.29.0',
+          },
+          {
+            notes: [
+              {
+                icon: ICONS.checkCircle,
                 text: `26 colorways`,
                 title: 'Added New Yarn: Woll Butt - Innsbruck Uni',
               },
