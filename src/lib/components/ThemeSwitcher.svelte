@@ -129,13 +129,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       >
                         <SegmentedControl.Indicator />
                         {#each THEMES as { name, id, icon, description }}
-                          <SegmentedControl.Item value={id}>
+                          <SegmentedControl.Item value={id} title={description}>
                             <SegmentedControl.ItemText>
                               <span
                                 class="flex items-center justify-center gap-1"
                               >
                                 {@html icon}
-                                <span class="hidden min-[425px]:inline"
+                                <span
+                                  class="hidden text-sm min-[400px]:inline md:text-base"
                                   >{name}</span
                                 >
                               </span>
