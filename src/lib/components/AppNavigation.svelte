@@ -247,18 +247,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
               </a>
 
               <a
-                href="/documentation"
-                class={[
-                  'btn hover:preset-tonal w-fit',
-                  page.url.pathname === '/documentation' &&
-                    'preset-tonal-secondary',
-                ]}
-              >
-                <BookOpenTextIcon />
-                Documentation
-              </a>
-
-              <a
                 href="/changelog"
                 class={[
                   'btn hover:preset-tonal w-fit',
@@ -303,6 +291,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 ]}
               >
                 <RssIcon /> Blog
+              </a>
+
+              <a
+                href="/documentation"
+                class={[
+                  'btn hover:preset-tonal w-fit',
+                  page.url.pathname === '/documentation' &&
+                    'preset-tonal-secondary',
+                ]}
+              >
+                <BookOpenTextIcon />
+                Documentation
               </a>
 
               <a

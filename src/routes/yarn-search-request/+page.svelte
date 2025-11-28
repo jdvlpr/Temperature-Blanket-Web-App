@@ -41,14 +41,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <AppShell pageName="Request Yarn Colorways">
   {#snippet stickyHeader()}
-    <div class="hidden lg:inline-flex mx-auto"><AppLogo /></div>
+    <div class="mx-auto hidden lg:inline-flex"><AppLogo /></div>
   {/snippet}
   {#snippet main()}
     <main
-      class="max-w-(--breakpoint-md) m-auto text-left flex flex-col gap-2 mb-4 mx-auto px-2"
+      class="m-auto mx-auto mb-4 flex max-w-(--breakpoint-md) flex-col gap-2 px-2 text-left"
     >
       <div
-        class="p-4 text-left flex flex-wrap justify-center items-end gap-4 rounded-container bg-surface-50-950 max-lg:mt-2"
+        class="rounded-container bg-surface-50-950 flex flex-wrap items-end justify-center gap-2 p-4 text-left max-lg:mt-2"
       >
         <p>
           Making a request for a yarn to be included in the search results does
@@ -56,8 +56,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
           order the request was received, the availability of the yarn, and the
           web app developer’s schedule.
         </p>
-        <div class="flex flex-wrap gap-4">
-          <div class="flex flex-col gap-2 card p-4">
+        <div class="flex flex-wrap gap-2">
+          <div class="card flex flex-col gap-2 p-4">
             <p class="font-bold">Do Request</p>
             <p>
               <CircleCheckIcon
@@ -80,7 +80,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               on temperature-blanket.com
             </p>
           </div>
-          <div class="flex flex-col gap-2 card p-4">
+          <div class="card flex flex-col gap-2 p-4">
             <p class="font-bold">Do Not Request</p>
             <p>
               <CircleMinusIcon
@@ -114,7 +114,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <form
             action={PUBLIC_YARN_SEARCH_REQUEST_FORM_LINK}
             method="POST"
-            class="flex flex-col gap-4 m-2 mb-4"
+            class="m-2 mb-4 flex flex-col gap-4"
           >
             <div class="tex-left flex flex-col items-start gap-1">
               <label for="brand-name" class="label flex items-center"
@@ -147,7 +147,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <div class="tex-left flex flex-col items-start gap-1">
               <label
                 for="web-address"
-                class="label flex items-start flex-col max-w-(--breakpoint-sm)"
+                class="label flex max-w-(--breakpoint-sm) flex-col items-start"
               >
                 Web Address
                 <span class="text-sm"
