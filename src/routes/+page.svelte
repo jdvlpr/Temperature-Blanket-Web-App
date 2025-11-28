@@ -279,7 +279,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
                       <p>
                         <a href="/changelog" rel="noreferrer" class="link"
-                          >Changelog - What's New?</a
+                          >What's New?</a
                         >
                       </p>
 
@@ -288,15 +288,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
                           >Documentation</a
                         >
                       </p>
-
-                      <div class="flex items-center gap-2">
-                        <div class="border-surface-300-700 grow border-t"></div>
-
-                        <p class="shrink text-xs">
-                          Version {version}
-                        </p>
-                        <div class="border-surface-300-700 grow border-t"></div>
-                      </div>
                     </div>
                   </Popover.Description>
                   <Popover.Arrow

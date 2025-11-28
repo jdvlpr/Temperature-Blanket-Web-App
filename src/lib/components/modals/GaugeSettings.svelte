@@ -263,12 +263,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 <SegmentedControl.Indicator />
                 <SegmentedControl.Item value="auto">
                   <SegmentedControl.ItemText
+                    title="Automatically Set the Gauge Values"
                     >Automatic
                   </SegmentedControl.ItemText>
                   <SegmentedControl.ItemHiddenInput />
                 </SegmentedControl.Item>
                 <SegmentedControl.Item value="manual">
-                  <SegmentedControl.ItemText>Manual</SegmentedControl.ItemText>
+                  <SegmentedControl.ItemText
+                    title="Manually Set the Gauge Values"
+                    >Manual</SegmentedControl.ItemText
+                  >
                   <SegmentedControl.ItemHiddenInput />
                 </SegmentedControl.Item>
               </SegmentedControl.Control>

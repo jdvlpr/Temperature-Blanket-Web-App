@@ -150,6 +150,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         'hover:preset-tonal',
         fullscreen.value ? 'btn-icon' : 'btn justify-start',
       ]}
+      title="Select Premade Colorway Palettes"
       onclick={() =>
         dialog.trigger({
           type: 'component',

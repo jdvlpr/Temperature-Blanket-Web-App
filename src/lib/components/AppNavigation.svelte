@@ -29,6 +29,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     CloudyIcon,
     ExternalLinkIcon,
     GalleryVerticalEndIcon,
+    GiftIcon,
     GithubIcon,
     HistoryIcon,
     Icon,
@@ -42,6 +43,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '@lucide/svelte';
   import { Accordion } from '@skeletonlabs/skeleton-svelte';
   import { untrack } from 'svelte';
+  import { VERSION } from 'svelte/compiler';
   import { slide } from 'svelte/transition';
 
   // Set opened navigation items based on current page
@@ -67,8 +69,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
         case '/privacy':
         case '/documentation':
         case '/changelog':
-          if (!openedNavigationItems.includes('information'))
-            openedNavigationItems = [...openedNavigationItems, 'information'];
+          if (!openedNavigationItems.includes('about'))
+            openedNavigationItems = [...openedNavigationItems, 'about'];
           break;
         case '/supporters':
           if (!openedNavigationItems.includes(''))
@@ -76,9 +78,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
           break;
       }
 
-      if (page.route.id?.includes('/blog') || page.route.id?.includes('/api')) {
-        if (!openedNavigationItems.includes('information'))
-          openedNavigationItems = [...openedNavigationItems, 'information'];
+      if (page.route.id?.includes('api')) {
+        openedNavigationItems = [...openedNavigationItems, 'developers'];
+      }
+
+      if (page.route.id?.includes('/blog')) {
+        if (!openedNavigationItems.includes('about'))
+          openedNavigationItems = [...openedNavigationItems, 'about'];
       }
     });
   });
@@ -129,8 +135,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 Project Planner
               </a>
 
-              <div class="border-surface-300-700 w-full border-t"></div>
-
               <a
                 href="/yarn-colorway-finder"
                 class={[
@@ -143,8 +147,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 Yarn Colorway Finder
               </a>
 
-              <div class="border-surface-300-700 w-full border-t"></div>
-
               <a
                 href="/yarn"
                 class={[
@@ -155,8 +157,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 <SwatchBookIcon />
                 Yarn Palette Creator
               </a>
-
-              <div class="border-surface-300-700 w-full border-t"></div>
 
               <a
                 href="/weather"
@@ -211,14 +211,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {/snippet}
       </Accordion.ItemContent>
     </Accordion.Item>
-    <Accordion.Item value="information" class="group gap-0">
+    <Accordion.Item value="about" class="group gap-0">
       <h3>
         <Accordion.ItemTrigger class="flex items-center justify-between">
-          Information
+          About
           {@render indicator()}
         </Accordion.ItemTrigger>
       </h3>
-      <Accordion.ItemContent class="mb-4 flex w-full flex-col gap-2">
+      <Accordion.ItemContent class="flex w-full flex-col gap-2">
         {#snippet element(attributes)}
           {#if !attributes.hidden}
             <div {...attributes} transition:slide={{ duration: 150 }}>
@@ -233,7 +233,29 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 FAQ
               </a>
 
-              <div class="border-surface-300-700 w-full border-t"></div>
+              <a
+                href="/documentation"
+                class={[
+                  'btn hover:preset-tonal w-fit',
+                  page.url.pathname === '/documentation' &&
+                    'preset-tonal-secondary',
+                ]}
+              >
+                <BookOpenTextIcon />
+                Documentation
+              </a>
+
+              <a
+                href="/changelog"
+                class={[
+                  'btn hover:preset-tonal w-fit',
+                  page.url.pathname === '/changelog' &&
+                    'preset-tonal-secondary',
+                ]}
+              >
+                <GiftIcon />
+                What's New
+              </a>
 
               <a
                 href="/contact"
@@ -258,8 +280,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 Request Yarn
               </a>
 
-              <div class="border-surface-300-700 w-full border-t"></div>
-
               <a
                 href="/blog"
                 class={[
@@ -272,8 +292,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 <RssIcon /> Blog
               </a>
 
-              <div class="border-surface-300-700 w-full border-t"></div>
-
               <a
                 href="/privacy"
                 class={[
@@ -284,35 +302,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 <ShieldAlertIcon />
                 Privacy
               </a>
-
-              <div class="border-surface-300-700 w-full border-t"></div>
-
-              <a
-                href="/documentation"
-                class={[
-                  'btn hover:preset-tonal w-fit',
-                  page.url.pathname === '/documentation' &&
-                    'preset-tonal-secondary',
-                ]}
-              >
-                <BookOpenTextIcon />
-                Documentation
-              </a>
-
-              <a
-                href="/changelog"
-                class={[
-                  'btn hover:preset-tonal w-fit',
-                  page.url.pathname === '/changelog' &&
-                    'preset-tonal-secondary',
-                ]}
-              >
-                <HistoryIcon />
-                Changelog
-              </a>
-
-              <div class="border-surface-300-700 w-full border-t"></div>
-
+            </div>
+          {/if}
+        {/snippet}
+      </Accordion.ItemContent>
+    </Accordion.Item>
+    <Accordion.Item value="developers" class="group gap-0">
+      <h3>
+        <Accordion.ItemTrigger class="flex items-center justify-between">
+          Developers
+          {@render indicator()}
+        </Accordion.ItemTrigger>
+      </h3>
+      <Accordion.ItemContent class="flex w-full flex-col gap-2">
+        {#snippet element(attributes)}
+          {#if !attributes.hidden}
+            <div {...attributes} transition:slide={{ duration: 150 }}>
               <a
                 href="/api/yarn-colorways"
                 class={[
@@ -325,7 +330,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
               </a>
 
               {#if PUBLIC_GITHUB_LINK}
-                <div class="border-surface-300-700 w-full border-t"></div>
                 <a
                   href={PUBLIC_GITHUB_LINK}
                   class="btn hover:preset-tonal w-fit"
@@ -364,4 +368,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     <span>Supporters</span>
   </a>
+
+  <a
+    class="btn hover:preset-tonal mt-2 w-fit opacity-50 hover:opacity-100"
+    href="/changelog">v{VERSION}</a
+  >
 </div>

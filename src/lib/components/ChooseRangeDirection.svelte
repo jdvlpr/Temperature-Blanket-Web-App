@@ -32,11 +32,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
   >
     <SegmentedControl.Indicator />
     <SegmentedControl.Item value="high-to-low">
-      <SegmentedControl.ItemText>High to Low</SegmentedControl.ItemText>
+      <SegmentedControl.ItemText title="Set Gauge Direction to High to Low"
+        >High to Low</SegmentedControl.ItemText
+      >
       <SegmentedControl.ItemHiddenInput />
     </SegmentedControl.Item>
     <SegmentedControl.Item value="low-to-high">
-      <SegmentedControl.ItemText>Low to High</SegmentedControl.ItemText>
+      <SegmentedControl.ItemText title="Set Gauge Direction to Low to High"
+        >Low to High</SegmentedControl.ItemText
+      >
       <SegmentedControl.ItemHiddenInput />
     </SegmentedControl.Item>
   </SegmentedControl.Control>
