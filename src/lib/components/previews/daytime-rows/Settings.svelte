@@ -171,8 +171,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <div class="mt-2 w-full">
       <Expand
         bind:isExpanded={isTableExpanded}
-        more="{tableIcon} Show Stitches Table"
-        less="{tableIcon} Hide Stitches Table"
+        label="{tableIcon} Stitches Table"
       />
     </div>
     {#if isTableExpanded}

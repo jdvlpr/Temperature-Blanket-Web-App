@@ -189,11 +189,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     <div class="my-2 flex flex-col gap-2 text-left">
       <div class="m-auto">
-        <Expand
-          bind:isExpanded
-          more={'What can I enter above?'}
-          less={'What can I enter above?'}
-        />
+        <Expand bind:isExpanded label="What can I enter above?" />
       </div>
 
       {#if isExpanded}

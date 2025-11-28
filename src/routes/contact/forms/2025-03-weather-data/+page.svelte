@@ -187,11 +187,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
       <div class="mb-4 flex flex-col items-start justify-between gap-4">
         <div class="bg-warning-50-950/50 rounded-container">
-          <Expand
-            bind:isExpanded={statusExpanded}
-            more="See Status Updates"
-            less="Hide Status Updates"
-          />
+          <Expand bind:isExpanded={statusExpanded} label="Status Updates" />
         </div>
 
         {#if statusExpanded}

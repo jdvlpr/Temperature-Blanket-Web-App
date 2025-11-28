@@ -41,11 +41,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     >
   </p>
 
-  <Expand
-    bind:isExpanded={viewSources}
-    more="View Yarn Sources"
-    less="Hide Yarn Sources"
-  />
+  <Expand bind:isExpanded={viewSources} label="Yarn Sources" />
 
   {#if viewSources}
     <div

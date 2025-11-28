@@ -105,12 +105,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div class=" flex flex-wrap items-end justify-center gap-2 pb-2 text-center">
-  <Expand
-    bind:isExpanded={filtersExpanded}
-    more="Show Filters"
-    less="Hide Filters"
-    iconLess={ICONS.filter}
-    iconMore={ICONS.filter}
+  <Expand bind:isExpanded={filtersExpanded} label="{ICONS.filter} Filters"
   ></Expand>
 
   {#if filtersExpanded}

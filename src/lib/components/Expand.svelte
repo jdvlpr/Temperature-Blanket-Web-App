@@ -18,8 +18,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   interface Props {
     isExpanded?: boolean;
-    less?: string;
-    more?: string;
+    /** text to show regardless of whether expanded or collapsed. */
+    label?: string;
     iconLess?: any;
     iconMore?: any;
     disabled?: boolean;
@@ -27,8 +27,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let {
     isExpanded = $bindable(false),
-    less = 'Show Less',
-    more = 'Show All',
+    label = '',
     iconLess = '',
     iconMore = '',
     disabled = false,
@@ -40,16 +39,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
   onclick={() => (isExpanded = !isExpanded)}
   {disabled}
 >
+  {@html label}
   {#if isExpanded}
-    {@html less}
     {#if iconLess}
       {@html iconLess}
     {/if}
-  {:else}
-    {@html more}
-    {#if iconMore}
-      {@html iconMore}
-    {/if}
+  {:else if iconMore}
+    {@html iconMore}
   {/if}
   {#if !iconMore && !iconLess}
     <ChevronDownIcon class={['transition', isExpanded && 'rotate-180']} />

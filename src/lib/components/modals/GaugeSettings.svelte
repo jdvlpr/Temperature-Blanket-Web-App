@@ -441,8 +441,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <div class="mx-auto">
           <Expand
             bind:isExpanded={showAdvancedControls}
-            more="Advanced Controls"
-            less="Advanced Controls"
+            label="Advanced Controls"
           />
         </div>
         {#if showAdvancedControls}
