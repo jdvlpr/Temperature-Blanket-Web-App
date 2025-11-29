@@ -236,6 +236,18 @@ const colorways: Colorway[] = [
         hex: '#f4e8d8',
         name: 'Almond',
       },
+      {
+        hex: '#e9b07c',
+        name: 'Neon Orange',
+      },
+      {
+        hex: '#d96194',
+        name: 'Neon Pink',
+      },
+      {
+        hex: '#f4f6a9',
+        name: 'Neon Yellow',
+      },
     ],
   },
 ];

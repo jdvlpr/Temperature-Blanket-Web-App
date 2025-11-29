@@ -35,8 +35,18 @@ export const entries: ChangelogItemGroup[] = [
             notes: [
               {
                 icon: ICONS.checkCircle,
+                text: `19 colorways`,
+                title: 'Added New Yarn: 4 Seasons - Marvel 12 Ply Bulky',
+              },
+              {
+                icon: ICONS.checkCircle,
                 text: `50 colorways`,
                 title: 'Added New Yarn: Knit Picks - Cotlin',
+              },
+              {
+                icon: ICONS.checkCircle,
+                text: `3 new colorways`,
+                title: 'Updated Colorways: 4 Seasons - Marvel 8 Ply',
               },
             ],
             version: '5.30.0',
