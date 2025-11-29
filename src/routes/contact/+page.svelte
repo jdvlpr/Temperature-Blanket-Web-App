@@ -24,10 +24,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import AppLogo from '$lib/components/AppLogo.svelte';
   import AppShell from '$lib/components/AppShell.svelte';
   import {
+  CloudAlertIcon,
     ExternalLinkIcon,
     FacebookIcon,
     GithubIcon,
     MailIcon,
+    MessageCirclePlusIcon,
   } from '@lucide/svelte';
 
   let email = $state('Loading...');
@@ -62,8 +64,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
           <a href="mailto:{email}" class="btn hover:preset-tonal w-fit">
             <MailIcon />
-
             {email}
+          </a>
+
+           <p class="font-bold">Forms</p>
+
+          <a href="/yarn-search-request" class="btn hover:preset-tonal w-fit">
+            <MessageCirclePlusIcon />
+            Request Yarn
+          </a>
+
+           <a href="/contact/forms/2025-03-weather-data" class="btn hover:preset-tonal w-fit">
+            <CloudAlertIcon />
+            Weather Data Feedback
           </a>
 
           {#if PUBLIC_GITHUB_LINK}
@@ -108,15 +121,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </a>
           {/if}
 
-          <p class="font-bold">Forms</p>
-
-          <a href="/contact/forms/2025-03-weather-data" class="link">
-            Weather Data Feedback Form
-          </a>
-
-          <a href="/yarn-search-request" class="link">
-            Yarn Search Request Form
-          </a>
+         
         </div>
       </div>
       <div class="rounded-container bg-surface-100-900 my-4 w-fit p-2">

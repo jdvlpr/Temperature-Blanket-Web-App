@@ -174,9 +174,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <a href="/contact" class="btn hover:preset-tonal w-fit"
         ><ArrowLeftIcon /> Contact</a
       >
-      <div class="">
-        <h2 class="h2">Weather Data Feedback Form</h2>
-      </div>
+
+      <h2 class="h2 text-gradient">Weather Data Feedback Form</h2>
 
       <p>
         Fill out the form below if you've noticed something wrong with weather
