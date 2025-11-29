@@ -1,8 +1,6 @@
 <script lang="ts">
   import { run } from 'svelte/legacy';
-
   import { flip } from 'svelte/animate';
-
   import { toast } from '$lib/state';
   import { CircleAlertIcon, CircleCheckIcon, InfoIcon } from '@lucide/svelte';
   import { fade } from 'svelte/transition';
@@ -45,7 +43,7 @@
   }
 
   let {
-    position = 'b',
+    position = 't',
     max = 3,
     background = 'preset-filled-surface-100-900',
     width = 'max-w-[640px]',
