@@ -82,12 +82,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { browser } from '$app/environment';
   import { THEMES } from '$lib/constants';
   import { localState } from '$lib/state';
+  import { safeSlide } from '$lib/transitions/safeSlide';
   import {
     Popover,
     Portal,
     SegmentedControl,
   } from '@skeletonlabs/skeleton-svelte';
-  import { scale, slide } from 'svelte/transition';
 
   let activeTheme = $derived(
     THEMES.find((n) => n.id === (localState.value.theme.mode || 'system')),
@@ -113,7 +113,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         >
           {#snippet element(attributes)}
             {#if !attributes.hidden}
-              <div {...attributes} transition:slide={{ duration: 150 }}>
+              <div {...attributes} transition:safeSlide>
                 <Popover.Description>
                   <div class="flex flex-col gap-2">
                     <SegmentedControl

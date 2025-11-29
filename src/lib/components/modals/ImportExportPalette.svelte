@@ -20,6 +20,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
   import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
   import { dialog, toast } from '$lib/state';
+  import { safeSlide } from '$lib/transitions/safeSlide';
   import {
     colorsToCode,
     colorsToYarnDetails,
@@ -37,7 +38,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '@lucide/svelte';
   import { SegmentedControl } from '@skeletonlabs/skeleton-svelte';
   import { onMount } from 'svelte';
-  import { slide } from 'svelte/transition';
 
   let { colors, updateGauge } = $props();
 
@@ -193,7 +193,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </div>
 
       {#if isExpanded}
-        <div in:slide out:slide>
+        <div transition:safeSlide>
           <p>
             • <a
               href="https://htmlcolorcodes.com/color-names/"

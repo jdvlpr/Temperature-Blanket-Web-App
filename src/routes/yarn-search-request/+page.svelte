@@ -47,6 +47,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <main
       class="m-auto mx-auto mb-4 flex max-w-(--breakpoint-md) flex-col gap-2 px-2 text-left"
     >
+    <h2 class="h2 text-gradient max-lg:hidden mt-2">Request Yarn Colorways</h2>
       <div
         class="rounded-container bg-surface-50-950 flex flex-wrap items-end justify-center gap-2 p-4 text-left max-lg:mt-2"
       >

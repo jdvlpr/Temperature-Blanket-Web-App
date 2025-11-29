@@ -15,9 +15,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import { toast } from '$lib/state';
+  import { safeSlide } from '$lib/transitions/safeSlide';
   import { ClipboardCopyIcon, Share2Icon, XIcon } from '@lucide/svelte';
   import { Popover } from '@skeletonlabs/skeleton-svelte';
-  import { slide } from 'svelte/transition';
 
   let { href } = $props();
 
@@ -54,7 +54,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     >
       {#snippet element(attributes)}
         {#if !attributes.hidden}
-          <div {...attributes} transition:slide={{ duration: 150 }}>
+          <div {...attributes} transition:safeSlide>
             <div class="flex flex-col gap-2 p-4">
               <p class="text-sm">Shareable Page URL</p>
 

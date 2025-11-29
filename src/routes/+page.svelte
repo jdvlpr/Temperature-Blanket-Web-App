@@ -14,7 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { browser, version } from '$app/environment';
+  import { browser } from '$app/environment';
   import { PUBLIC_BASE_URL, PUBLIC_SITE_TITLE } from '$env/static/public';
   import AppLogo from '$lib/components/AppLogo.svelte';
   import AppShell from '$lib/components/AppShell.svelte';
@@ -37,6 +37,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     wasProjectLoadedFromURL,
     weather,
   } from '$lib/state';
+  import { safeSlide } from '$lib/transitions/safeSlide';
   import {
     checkForProjectInLocalStorage,
     loadFromHistory,
@@ -55,7 +56,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '@lucide/svelte';
   import { Popover, Portal } from '@skeletonlabs/skeleton-svelte';
   import { onMount } from 'svelte';
-  import { slide } from 'svelte/transition';
 
   let debounceTimer: number;
 
@@ -248,7 +248,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           >
             {#snippet element(attributes)}
               {#if !attributes.hidden}
-                <div {...attributes} transition:slide={{ duration: 150 }}>
+                <div {...attributes} transition:safeSlide>
                   <Popover.Description>
                     <div
                       class="flex flex-col gap-4 p-2"

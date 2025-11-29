@@ -17,9 +17,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { PUBLIC_BASE_DOMAIN_NAME, PUBLIC_BASE_URL } from '$env/static/public';
   import AppLogo from '$lib/components/AppLogo.svelte';
   import AppShell from '$lib/components/AppShell.svelte';
+  import { safeSlide } from '$lib/transitions/safeSlide';
   import { ChevronDownIcon, CircleQuestionMarkIcon } from '@lucide/svelte';
   import { Accordion } from '@skeletonlabs/skeleton-svelte';
-  import { slide } from 'svelte/transition';
 
   let value = $state(['club']);
 </script>
@@ -73,7 +73,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <Accordion.ItemContent>
                 {#snippet element(attributes)}
                   {#if !attributes.hidden}
-                    <div {...attributes} transition:slide={{ duration: 150 }}>
+                    <div {...attributes} transition:safeSlide>
                       <p>
                         For recent weather data, it may take up to a week for
                         all the latest data to be available. Older weather data
@@ -135,7 +135,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <Accordion.ItemContent>
                 {#snippet element(attributes)}
                   {#if !attributes.hidden}
-                    <div {...attributes} transition:slide={{ duration: 150 }}>
+                    <div {...attributes} transition:safeSlide>
                       <p>
                         The website is the app. It's not in the Apple or Google
                         app store, but you can
@@ -173,7 +173,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <Accordion.ItemContent>
                 {#snippet element(attributes)}
                   {#if !attributes.hidden}
-                    <div {...attributes} transition:slide={{ duration: 150 }}>
+                    <div {...attributes} transition:safeSlide>
                       <p>Yep!</p>
                     </div>
                   {/if}
@@ -204,7 +204,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <Accordion.ItemContent>
                 {#snippet element(attributes)}
                   {#if !attributes.hidden}
-                    <div {...attributes} transition:slide={{ duration: 150 }}>
+                    <div {...attributes} transition:safeSlide>
                       <p>
                         The default setting will include the first number up to
                         but not including the second number, so there’s not
@@ -258,7 +258,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <Accordion.ItemContent>
                 {#snippet element(attributes)}
                   {#if !attributes.hidden}
-                    <div {...attributes} transition:slide={{ duration: 150 }}>
+                    <div {...attributes} transition:safeSlide>
                       <p>
                         Probably because nobody requested it yet!
                         <a
@@ -298,7 +298,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <Accordion.ItemContent>
                 {#snippet element(attributes)}
                   {#if !attributes.hidden}
-                    <div {...attributes} transition:slide={{ duration: 150 }}>
+                    <div {...attributes} transition:safeSlide>
                       If your location doesn’t have weather data, it means one
                       of the
                       <a

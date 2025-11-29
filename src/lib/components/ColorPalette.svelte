@@ -16,7 +16,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script>
   import { PopoverInstance } from '$lib/state';
   import { getTextColor } from '$lib/utils';
-  import { fade, scale, slide } from 'svelte/transition';
+  import { fade, scale } from 'svelte/transition';
 
   /**
    * @typedef {Object} Props

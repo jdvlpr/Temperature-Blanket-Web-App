@@ -70,7 +70,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       class="m-auto mx-auto mt-2 mb-6 max-w-(--breakpoint-md) px-2 text-center"
     >
       <div class="flex flex-col items-start gap-2" bind:this={container}>
-        <h2 class="h2 text-gradient max-lg:hidden">What's New?</h2>
+        <h2 class="h2 text-gradient max-lg:hidden mt-2">What's New?</h2>
         <p class="text-left">
           See what's new and review past changes from {PUBLIC_BASE_DOMAIN_NAME}.
           This changelog includes only select milestones.

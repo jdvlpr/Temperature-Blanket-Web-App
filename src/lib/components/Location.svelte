@@ -16,7 +16,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import { browser } from '$app/environment';
   import { MONTHS } from '$lib/constants';
-  import { locations, dialog, project, toast, weather } from '$lib/state';
+  import { dialog, locations, project, toast, weather } from '$lib/state';
+  import { safeSlide } from '$lib/transitions/safeSlide';
   import type { LocationType } from '$lib/types/location-types';
   import {
     dateToISO8601String,
@@ -32,17 +33,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
     MapIcon,
     MapPinIcon,
     SearchIcon,
-    SplinePointerIcon,
     Trash2Icon,
     TriangleAlertIcon,
-    XIcon,
+    XIcon
   } from '@lucide/svelte';
   import { Popover, Portal, useTooltip } from '@skeletonlabs/skeleton-svelte';
   import autocomplete from 'autocompleter';
   import { onMount } from 'svelte';
   import '../../css/flag-icons.css';
   import LocationDetails from './modals/LocationDetails.svelte';
-  import { slide } from 'svelte/transition';
 
   const id = $props.id();
   const tooltip = useTooltip({ id });
@@ -310,7 +309,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             >
               {#snippet element(attributes)}
                 {#if !attributes.hidden}
-                  <div {...attributes} transition:slide={{ duration: 150 }}>
+                  <div {...attributes} transition:safeSlide>
                     <Popover.Description>
                       <button
                         class="btn hover:preset-tonal"

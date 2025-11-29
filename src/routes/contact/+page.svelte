@@ -56,7 +56,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       class="mx-auto flex max-w-(--breakpoint-sm) flex-col gap-4 px-4 lg:px-0"
     >
       <div>
-        <h2 class="h2 text-gradient max-lg:hidden">Contact</h2>
+        <h2 class="h2 text-gradient max-lg:hidden mt-2">Contact</h2>
         <div class="mt-2 flex flex-col gap-4">
           <p class="font-bold">General Communication</p>
 

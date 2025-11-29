@@ -42,7 +42,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     XIcon,
   } from '@lucide/svelte';
   import { Accordion } from '@skeletonlabs/skeleton-svelte';
-  import { slide } from 'svelte/transition';
+  import { safeSlide } from '$lib/transitions/safeSlide';
 
   let accordionValue = $state(['apr20']);
 
@@ -216,7 +216,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <Accordion.ItemContent class="font-normal">
                 {#snippet element(attributes)}
                   {#if !attributes.hidden}
-                    <div {...attributes} transition:slide={{ duration: 150 }}>
+                    <div {...attributes} transition:safeSlide={{ duration: 150 }}>
                       Addressing the issue of historical weather data
                       occasionally being adjusted because of model upgrades, an
                       option has been added to the Weather Source settings to
@@ -260,7 +260,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <Accordion.ItemContent class="font-normal">
                 {#snippet element(attributes)}
                   {#if !attributes.hidden}
-                    <div {...attributes} transition:slide={{ duration: 150 }}>
+                    <div {...attributes} transition:safeSlide={{ duration: 150 }}>
                       After the April 1 update, there was another report of
                       off-by-one weather data date issues. The issue was
                       identified and fixed (<a
@@ -305,7 +305,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <Accordion.ItemContent class="font-normal">
                 {#snippet element(attributes)}
                   {#if !attributes.hidden}
-                    <div {...attributes} transition:slide={{ duration: 150 }}>
+                    <div {...attributes} transition:safeSlide={{ duration: 150 }}>
                       Between March 28 and April 1, there were several more
                       reports of off-by-one weather data date issues. With the
                       help of a supporter, I believe we identified and fixed the
@@ -338,7 +338,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <Accordion.ItemContent class="font-normal">
                 {#snippet element(attributes)}
                   {#if !attributes.hidden}
-                    <div {...attributes} transition:slide={{ duration: 150 }}>
+                    <div {...attributes} transition:safeSlide={{ duration: 150 }}>
                       The notice above the weather table about possible dates
                       shifting has been taken down, since I believe the issue
                       has been resolved. If you are still seeing a problem with
@@ -366,7 +366,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <Accordion.ItemContent class="font-normal">
                 {#snippet element(attributes)}
                   {#if !attributes.hidden}
-                    <div {...attributes} transition:slide={{ duration: 150 }}>
+                    <div {...attributes} transition:safeSlide={{ duration: 150 }}>
                       An update was applied that hopefully fixes the
                       dates-shifting issue. If you are still seeing issues,
                       please fill out the form below.
@@ -393,7 +393,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <Accordion.ItemContent class="font-normal">
                 {#snippet element(attributes)}
                   {#if !attributes.hidden}
-                    <div {...attributes} transition:slide={{ duration: 150 }}>
+                    <div {...attributes} transition:safeSlide={{ duration: 150 }}>
                       On March 20, 2025, temperature-blanket.com was updated to
                       a new version (<a
                         href="/blog/2025-03-20-version-5"

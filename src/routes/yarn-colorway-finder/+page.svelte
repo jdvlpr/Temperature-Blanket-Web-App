@@ -48,6 +48,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     YARN_COLORWAYS_PER_PAGE,
   } from '$lib/constants';
   import { toast } from '$lib/state';
+  import { safeSlide } from '$lib/transitions/safeSlide';
   import type { YarnWeight } from '$lib/types';
   import {
     getTextColor,
@@ -70,7 +71,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { Accordion } from '@skeletonlabs/skeleton-svelte';
   import chroma from 'chroma-js';
   import { onMount, tick } from 'svelte';
-  import { slide } from 'svelte/transition';
 
   let loadMoreSpinner = $state();
   let urlParams;
@@ -754,7 +754,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <Accordion.ItemContent>
                 {#snippet element(attributes)}
                   {#if !attributes.hidden}
-                    <div {...attributes} transition:slide={{ duration: 150 }}>
+                    <div {...attributes} transition:safeSlide>
                       Colors on a screen will always look different from actual
                       yarn colorways. The colors used for this site are meant to
                       be an approximation. They also might not be up-to-date;
@@ -791,7 +791,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <Accordion.ItemContent>
                 {#snippet element(attributes)}
                   {#if !attributes.hidden}
-                    <div {...attributes} transition:slide={{ duration: 150 }}>
+                    <div {...attributes} transition:safeSlide>
                       Requests for yarn to be included in these results can be
                       made by anyone using <a
                         href="/yarn-search-request"

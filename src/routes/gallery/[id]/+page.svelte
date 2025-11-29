@@ -26,6 +26,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ViewToggle from '$lib/components/buttons/ViewToggle.svelte';
   import { ALL_YARN_WEIGHTS } from '$lib/constants';
   import { allGaugesAttributes, localState, locations } from '$lib/state';
+  import { safeSlide } from '$lib/transitions/safeSlide';
   import {
     exists,
     getProjectParametersFromURLHash,
@@ -43,7 +44,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '@lucide/svelte';
   import { Accordion } from '@skeletonlabs/skeleton-svelte';
   import { onMount } from 'svelte';
-  import { slide } from 'svelte/transition';
   import { yarnPageState } from '../../yarn/state.svelte';
 
   let { data } = $props();
@@ -252,7 +252,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         {#if !attributes.hidden}
                           <div
                             {...attributes}
-                            transition:slide={{ duration: 150 }}
+                            transition:safeSlide
                           >
                             {#await data.stream then}
                               <div class="flex flex-col gap-2">

@@ -21,6 +21,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
   import StickyPart from '$lib/components/modals/StickyPart.svelte';
   import { dialog, gauges, localState, weather } from '$lib/state';
+  import { safeSlide } from '$lib/transitions/safeSlide';
   import {
     displayNumber,
     getIncrement,
@@ -42,7 +43,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '@lucide/svelte';
   import { SegmentedControl } from '@skeletonlabs/skeleton-svelte';
   import { onMount, tick } from 'svelte';
-  import { fade, slide } from 'svelte/transition';
+  import { fade } from 'svelte/transition';
   interface Props {
     onSave: any;
     index?: any;
@@ -450,7 +451,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </div>
         {#if showAdvancedControls}
           <div
-            transition:slide
+            transition:safeSlide
             class="rounded-container bg-surface-200 dark:bg-surface-800 flex w-full flex-col items-start justify-start gap-4 p-4 text-left"
           >
             <ToggleSwitch

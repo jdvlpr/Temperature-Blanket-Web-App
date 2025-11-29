@@ -43,7 +43,7 @@
   }
 
   let {
-    position = 't',
+    position = 'b',
     max = 3,
     background = 'preset-filled-surface-100-900',
     width = 'max-w-[640px]',

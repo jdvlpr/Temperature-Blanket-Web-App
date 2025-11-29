@@ -28,7 +28,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     OPEN_METEO_DELAY_DAYS,
     UNIT_LABELS,
   } from '$lib/constants';
-  import { gauges, localState, locations, dialog, weather } from '$lib/state';
+  import { dialog, gauges, localState, locations, weather } from '$lib/state';
+  import { safeSlide } from '$lib/transitions/safeSlide';
   import {
     convertTime,
     displayNumber,
@@ -37,17 +38,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
     pluralize,
   } from '$lib/utils';
   import {
-    ChevronDownIcon,
     CloudAlert,
-    TriangleAlertIcon,
+    TriangleAlertIcon
   } from '@lucide/svelte';
-  import { Accordion, Popover, Portal } from '@skeletonlabs/skeleton-svelte';
+  import { Popover, Portal } from '@skeletonlabs/skeleton-svelte';
   import { onMount } from 'svelte';
-  import { slide } from 'svelte/transition';
   import UnitChanger from './UnitChanger.svelte';
   import WeatherGrouping from './WeatherGrouping.svelte';
   import WeatherSourceButton from './buttons/WeatherSourceButton.svelte';
-  import WeatherDescription from './WeatherDescription.svelte';
 
   let graph = $state<HTMLDivElement>();
   let defaultWeatherSourceCopy = $state<string>();
@@ -239,7 +237,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             >
               {#snippet element(attributes)}
                 {#if !attributes.hidden}
-                  <div {...attributes} transition:slide={{ duration: 150 }}>
+                  <div {...attributes} transition:safeSlide>
                     <Popover.Description>
                       Weather data comes from <a
                         href="https://open-meteo.com/"
@@ -498,7 +496,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             >
               {#snippet element(attributes)}
                 {#if !attributes.hidden}
-                  <div {...attributes} transition:slide={{ duration: 150 }}>
+                  <div {...attributes} transition:safeSlide>
                     <Popover.Description>
                       {#each missingDataMerged as { count, type, label }}
                         {#if count && count < weather.data?.length}

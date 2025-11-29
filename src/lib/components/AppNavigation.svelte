@@ -22,6 +22,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { page } from '$app/state';
   import { PUBLIC_GITHUB_LINK } from '$env/static/public';
   import ThemeSwitcher from '$lib/components/ThemeSwitcher.svelte';
+  import { safeSlide } from '$lib/transitions/safeSlide';
   import { yarnBall } from '@lucide/lab';
   import {
     BookOpenTextIcon,
@@ -44,7 +45,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '@lucide/svelte';
   import { Accordion } from '@skeletonlabs/skeleton-svelte';
   import { untrack } from 'svelte';
-  import { slide } from 'svelte/transition';
 
   // Set opened navigation items based on current page
   $effect(() => {
@@ -108,7 +108,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </a>
 
   {#snippet indicator()}
-    <Accordion.ItemIndicator class="group">
+    <Accordion.ItemIndicator class="">
       <ChevronDownIcon
         class="h-5 w-5 transition group-data-[state=open]:rotate-180"
       />
@@ -134,7 +134,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <Accordion.ItemContent class="flex w-full flex-col gap-2">
         {#snippet element(attributes)}
           {#if !attributes.hidden}
-            <div {...attributes} transition:slide={{ duration: 150 }}>
+            <div {...attributes} transition:safeSlide>
               <a
                 href="/"
                 class={[
@@ -194,7 +194,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <Accordion.ItemContent class="flex w-full flex-col gap-2">
         {#snippet element(attributes)}
           {#if !attributes.hidden}
-            <div {...attributes} transition:slide={{ duration: 150 }}>
+            <div {...attributes} transition:safeSlide>
               <a
                 href="/gallery"
                 class={[
@@ -233,7 +233,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <Accordion.ItemContent class="flex w-full flex-col gap-2">
         {#snippet element(attributes)}
           {#if !attributes.hidden}
-            <div {...attributes} transition:slide={{ duration: 150 }}>
+            <div {...attributes} transition:safeSlide>
               <a
                 href="/faq"
                 class={[
@@ -329,7 +329,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <Accordion.ItemContent class="flex w-full flex-col gap-2">
         {#snippet element(attributes)}
           {#if !attributes.hidden}
-            <div {...attributes} transition:slide={{ duration: 150 }}>
+            <div {...attributes} transition:safeSlide>
               <a
                 href="/api/yarn-colorways"
                 class={[

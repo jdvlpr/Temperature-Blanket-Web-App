@@ -22,13 +22,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
     showNavigationSideBar,
     weather
   } from '$lib/state';
+  import { safeSlide } from '$lib/transitions/safeSlide';
   import {
     MenuIcon,
     PanelLeftClose,
     PanelRightCloseIcon,
   } from '@lucide/svelte';
   import { Dialog, Portal } from '@skeletonlabs/skeleton-svelte';
-  import { slide } from 'svelte/transition';
   import AppLogo from './AppLogo.svelte';
   import { weatherChart } from './WeatherChart.svelte';
 
@@ -136,7 +136,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       >
         {#if showNavigationSideBar.value}
           <PanelLeftClose />
-          <span in:slide={{ axis: 'x', duration: 90 }}>Hide Sidebar</span>
+          <span in:safeSlide={{ axis: 'x'}}>Hide Sidebar</span>
         {:else}
           <PanelRightCloseIcon />
         {/if}
@@ -144,7 +144,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {#if showNavigationSideBar.value}
         <div
           class="hidden w-fit flex-col lg:flex"
-          transition:slide={{ axis: 'x', duration: 100 }}
+          transition:safeSlide={{ axis: 'x' }}
         >
           <div class="w-fit">
             <AppNavigation />

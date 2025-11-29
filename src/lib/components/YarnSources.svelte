@@ -17,9 +17,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import HelpIcon from '$lib/components/buttons/HelpIcon.svelte';
   import Expand from '$lib/components/Expand.svelte';
   import { ALL_YARN_WEIGHTS } from '$lib/constants';
+  import { safeSlide } from '$lib/transitions/safeSlide';
   import { pluralize, stringToDate } from '$lib/utils';
   import { brands } from '$lib/yarns/brands';
-  import { slide } from 'svelte/transition';
 
   interface Props {
     viewSources?: boolean;
@@ -45,7 +45,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   {#if viewSources}
     <div
-      transition:slide
+      transition:safeSlide
       class="flex flex-wrap items-start justify-start gap-2 text-sm"
     >
       {#each brands as brand}
