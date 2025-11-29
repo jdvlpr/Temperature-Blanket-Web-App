@@ -39,7 +39,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       >
         {#snippet element(attributes)}
           {#if !attributes.hidden}
-            <div {...attributes} in:fly={{ y: 50, duration: 150 }}>
+            <div {...attributes} in:fly={{ y: 50, duration: 400 }}>
               {#if dialog.type === 'component'}
                 {#if dialog.options.showCloseButton}
                   <Dialog.CloseTrigger
