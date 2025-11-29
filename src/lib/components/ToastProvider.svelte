@@ -131,7 +131,7 @@
     <div class="snackbar {classesSnackbar}">
       {#each filteredToasts as t, i (t)}
         <div
-          animate:flip={{ duration: 250 }}
+          animate:flip={{ duration: 400 }}
           transition:fade
           onoutroend={() => {
             const outroFinishedForLastToastOnQueue =

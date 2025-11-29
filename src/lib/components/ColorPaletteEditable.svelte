@@ -62,7 +62,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     fullscreen = $bindable(),
   }: Props = $props();
 
-  const flipDurationMs = 200;
+  const flipDurationMs = 150;
 
   let sortableColors = $state(getSortableColors());
 
@@ -245,7 +245,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {#if popover.isOpen() && !isDragging.value}
           <div
             {...popover.floating()}
-            in:scale={{ duration: 100, delay: 150 }}
+            in:scale={{ duration: 150, delay: 150 }}
             style="background:{hex};color:{getTextColor(hex)};"
             class="tooltip rounded-container z-30 flex w-full max-w-screen flex-wrap items-center justify-center gap-4 p-2 text-center break-all"
             data-floating

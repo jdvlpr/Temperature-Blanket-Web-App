@@ -20,6 +20,7 @@
   import NumberInput from './modals/NumberInput.svelte';
   import { UNIT_LABELS } from '$lib/constants';
   import { onMount } from 'svelte';
+  import { Inspect } from '@lucide/svelte';
 
   let { tableData, updateTable, uid } = $props();
 

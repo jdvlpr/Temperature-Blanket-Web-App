@@ -38,7 +38,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let dragDisabled = $state(false);
 
-  const flipDurationMs = 90;
+  const flipDurationMs = 150;
 
   const isProjectPlannerPage = page.route.id === '/';
 
