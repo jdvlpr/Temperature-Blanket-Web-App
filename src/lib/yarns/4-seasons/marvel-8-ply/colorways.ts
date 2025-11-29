@@ -5,7 +5,7 @@ const colorways: Colorway[] = [
     source: {
       name: 'spotlightstores.com',
       href: 'https://www.spotlightstores.com/nz/art-craft/yarn-needle-art/yarn/acrylic-yarn/4-seasons-marvel-8-ply-acrylic-yarn/BP80256541-1001-white',
-      accessed: '2025-01-08',
+      accessed: '2025-11-29',
     },
     colors: [
       {
