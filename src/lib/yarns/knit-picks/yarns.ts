@@ -1,6 +1,7 @@
 import type { Brand } from '$lib/types';
 import { yarn as bravaTweed } from './brava-tweed/yarn';
 import { yarn as bravaWorsted } from './brava-worsted/yarn';
+import { yarn as cotlin } from './cotlin/yarn';
 import { yarn as heatherlySport } from './heatherly-sport/yarn';
 import { yarn as mightyStitch } from './mighty-stitch/yarn';
 import { yarn as palette } from './palette/yarn';
@@ -18,6 +19,7 @@ export const brand: Brand = {
   yarns: [
     bravaTweed,
     bravaWorsted,
+    cotlin,
     heatherlySport,
     mightyStitch,
     palette,

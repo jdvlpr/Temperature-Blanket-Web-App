@@ -35,6 +35,16 @@ export const entries: ChangelogItemGroup[] = [
             notes: [
               {
                 icon: ICONS.checkCircle,
+                text: `50 colorways`,
+                title: 'Added New Yarn: Knit Picks - Cotlin',
+              },
+            ],
+            version: '5.30.0',
+          },
+          {
+            notes: [
+              {
+                icon: ICONS.checkCircle,
                 text: `74 colorways`,
                 title: 'Added New Yarn: Lion Brand - Wool-Ease Thick & Quick',
               },
