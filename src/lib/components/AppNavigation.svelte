@@ -65,7 +65,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
           break;
         case '/faq':
         case '/contact':
-        case '/yarn-search-request':
         case '/privacy':
         case '/documentation':
         case '/changelog':
@@ -266,18 +265,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
               >
                 <MailIcon />
                 Contact
-              </a>
-
-              <a
-                href="/yarn-search-request"
-                class={[
-                  'btn hover:preset-tonal w-fit',
-                  page.url.pathname === '/yarn-search-request' &&
-                    'preset-tonal-secondary',
-                ]}
-              >
-                <MessageCirclePlusIcon />
-                Request Yarn
               </a>
 
               <a
