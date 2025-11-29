@@ -413,7 +413,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           class="w-full scroll-mt-[76px]"
           class:hidden={pageSections.items[4].active === false}
         >
-          <div class="mx-auto max-w-(--breakpoint-sm)">
+          <div class="mx-auto max-w-screen-md">
             <p class="mb-2">
               Is this web app worth a cup of coffee to you? Your support enables
               ongoing development, keeps the site ad-free, and helps make this
