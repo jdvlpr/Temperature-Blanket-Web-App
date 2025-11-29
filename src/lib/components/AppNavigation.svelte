@@ -18,6 +18,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <script>
+  import { version } from '$app/environment';
   import { page } from '$app/state';
   import { PUBLIC_GITHUB_LINK } from '$env/static/public';
   import ThemeSwitcher from '$lib/components/ThemeSwitcher.svelte';
@@ -32,7 +33,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     GiftIcon,
     GithubIcon,
     HeartIcon,
-    HistoryIcon,
     Icon,
     MailIcon,
     MessageCirclePlusIcon,
@@ -40,11 +40,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     RssIcon,
     ShieldAlertIcon,
     SquareTerminalIcon,
-    SwatchBookIcon,
+    SwatchBookIcon
   } from '@lucide/svelte';
   import { Accordion } from '@skeletonlabs/skeleton-svelte';
   import { untrack } from 'svelte';
-  import { VERSION } from 'svelte/compiler';
   import { slide } from 'svelte/transition';
 
   // Set opened navigation items based on current page
@@ -80,7 +79,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       }
 
       if (page.route.id?.includes('api')) {
-        openedNavigationItems = [...openedNavigationItems, 'developers'];
+        openedNavigationItems = [...openedNavigationItems, 'developer'];
       }
 
       if (page.route.id?.includes('/blog')) {
@@ -320,10 +319,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {/snippet}
       </Accordion.ItemContent>
     </Accordion.Item>
-    <Accordion.Item value="developers" class="group gap-0">
+    <Accordion.Item value="developer" class="group gap-0">
       <h3>
         <Accordion.ItemTrigger class="flex items-center justify-between">
-          Developers
+          Developer
           {@render indicator()}
         </Accordion.ItemTrigger>
       </h3>
@@ -362,6 +361,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   <a
     class="btn hover:preset-tonal w-fit opacity-50 hover:opacity-100"
-    href="/changelog">v{VERSION}</a
+    href="/changelog">v{version}</a
   >
 </div>
