@@ -21,7 +21,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import AppShell from '$lib/components/AppShell.svelte';
   import Card from '$lib/components/Card.svelte';
   import ColorPalette from '$lib/components/ColorPalette.svelte';
-  import Spinner from '$lib/components/Spinner.svelte';
   import YarnSources from '$lib/components/YarnSources.svelte';
   import ViewToggle from '$lib/components/buttons/ViewToggle.svelte';
   import { ALL_YARN_WEIGHTS } from '$lib/constants';
@@ -43,41 +42,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
     ShoppingBagIcon,
   } from '@lucide/svelte';
   import { Accordion } from '@skeletonlabs/skeleton-svelte';
-  import { onMount } from 'svelte';
   import { yarnPageState } from '../../yarn/state.svelte';
+  import { getProject } from './data.remote';
 
-  let { data } = $props();
-
-  let imageWidth = $state();
-  let imageHeight = $state();
-
-  let project = $state();
-  let projectURL = $state();
-  let projectTitle = $state();
-  let projectTitleNoHTML = $state('');
-  let weatherSources = $state();
-  let hash;
-  let params = $state();
-  let gauges = $state();
-  let flatColors = $state();
-
-  let aboutState = $state([]);
-
-  onMount(async () => {
-    const { project: streamedProject } = await data.stream;
-
-    project = streamedProject;
-    projectURL = project?.projectUrl;
-    projectTitle = getTitleFromLocationsMeta(project.locations);
-    projectTitleNoHTML = stripHTMLTags(projectTitle);
-    weatherSources = project?.weatherSources
-      ? JSON.parse(project?.weatherSources)
-      : null;
-    hash = projectURL ? new URL(projectURL).hash.substring(1) : '';
-    params = getProjectParametersFromURLHash(hash);
-    gauges = getGauges(params);
-    flatColors = gauges.flatMap((item) => item.colors);
-  });
+  let project = $derived(await getProject(+page.params.id));
+  let projectTitle = $derived(getTitleFromLocationsMeta(project.locations));
+  let projectTitleNoHTML = $derived(stripHTMLTags(projectTitle));
+  let weatherSources = $derived(project.weatherSources
+            ? JSON.parse(project.weatherSources)
+            : null);
+  let hash = $derived(new URL(project.projectUrl).hash.substring(1) || '');
+  let params = $derived(getProjectParametersFromURLHash(hash));
+  let gauges = $derived(getGauges(params));
+  let flatColors = $derived(gauges.flatMap((item) => item.colors));
 
   let yarns = [];
 
@@ -121,22 +98,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     return _gauges;
   }
 
-  const preloadImage = (src) => {
-    if (!browser) return;
-    return new Promise(async (resolve) => {
-      let img = new Image();
-      img.onload = resolve();
-      img.src = src;
-      imageWidth = img.width;
-      imageHeight = img.height;
-    });
-  };
-
-  // This triggers after the project is loaded
-  // It sets to image width and height value for the og:image meta property in head
-  let preloadedImage = $derived(
-    preloadImage(project?.featuredImage?.node.mediaItemUrl),
-  );
+  $effect(() => {   
+      document.querySelector('meta[property="og:image"]').content = project?.featuredImage?.node.mediaItemUrl;
+      document.querySelector('meta[property="og:image:width"]').content = project?.featuredImage?.node.mediaDetails?.width;
+      document.querySelector('meta[property="og:image:height"]').content = project?.featuredImage?.node.mediaDetails?.height;
+  })
 </script>
 
 <svelte:head>
@@ -155,14 +121,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <meta property="og:type" content="website" />
   <meta
     property="og:image"
-    content={project?.featuredImage?.node.mediaItemUrl}
   />
-  {#key imageWidth}
-    <meta property="og:image:width" content={imageWidth} />
-  {/key}
-  {#key imageHeight}
-    <meta property="og:image:height" content={imageHeight} />
-  {/key}
+  <meta
+    property="og:image:width"
+  />
+  <meta
+    property="og:image:height"
+  />
 </svelte:head>
 
 <AppShell pageName="Project Preview">
@@ -187,50 +152,38 @@ If not, see <https://www.gnu.org/licenses/>. -->
               class="bg-surface-100 dark:bg-surface-900 flex flex-col gap-2 p-4 text-center"
             >
               <p class="text-xl">
-                {#await data.stream}
-                  ...
-                {:then}
-                  {#if project}
-                    {@html projectTitle}
-                  {:else}
-                    This project gallery page cannot be found.
-                  {/if}
-                {/await}
+                  {@html projectTitle || 'This project gallery page cannot be found.'}
               </p>
 
-              {#await data.stream then}
-                {#if projectURL}
-                  <a
-                    class="btn preset-filled-primary-500 m-auto w-fit items-center gap-1"
-                    href={projectURL}
-                    target={locations.allValid ? '_blank' : '_self'}
+              {#if project.projectUrl}
+                <a
+                  class="btn preset-filled-primary-500 m-auto w-fit items-center gap-1"
+                  href={project.projectUrl}
+                  target={locations.allValid ? '_blank' : '_self'}
+                >
+                  Open in {#if locations.allValid}
+                    New
+                  {/if} Project Planner
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="currentColor"
+                    class="size-5"
                   >
-                    Open in {#if locations.allValid}
-                      New
-                    {/if} Project Planner
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke-width="1.5"
-                      stroke="currentColor"
-                      class="size-5"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="m8.25 4.5 7.5 7.5-7.5 7.5"
-                      />
-                    </svg>
-                  </a>
-                {/if}
-              {/await}
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="m8.25 4.5 7.5 7.5-7.5 7.5"
+                    />
+                  </svg>
+                </a>
+              {/if}
               <div
                 class="preset-tonal-tertiary rounded-container mx-auto mt-2 w-full max-w-(--breakpoint-sm) text-left"
               >
                 <Accordion
-                  value={aboutState}
-                  onValueChange={(e) => (aboutState = e.value)}
                   collapsible
                 >
                   <Accordion.Item value="weather-data-inaccurate">
@@ -254,7 +207,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
                             {...attributes}
                             transition:safeSlide
                           >
-                            {#await data.stream then}
                               <div class="flex flex-col gap-2">
                                 <p class="">
                                   <span class="font-bold">Date Created:</span>
@@ -381,9 +333,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
                                   updates.
                                 </p>
                               </div>
-                            {/await}
-                          </div>
-                        {/if}
+                            </div>
+                          {/if}
                       {/snippet}
                     </Accordion.ItemContent>
                   </Accordion.Item>
@@ -394,177 +345,167 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {#snippet content()}
             <div class="grid grid-cols-1 gap-2 py-2">
               <div class="mt-2 text-center">
-                {#await data.stream}
-                  <div class="my-40"><Spinner /></div>
-                {:then}
                   {#if project}
                     <img
                       src={project?.featuredImage?.node.mediaItemUrl}
                       alt="Project Preview"
                       class="m-auto max-h-[60vh]"
                     />
-                  {/if}
-                {/await}
+                {/if}
               </div>
 
-              {#await data.stream then}
                 <div class="mt-2 flex flex-col gap-4 text-center">
                   <div class="flex flex-col gap-8">
-                    {#if gauges?.length}
-                      {#key gauges}
-                        {#each gauges as { colors, ranges, id }, gaugeIndex}
-                          {@const gaugeType = gauges[gaugeIndex].unit.type}
-                          {@const item = ranges.map((range, index) => {
-                            return {
-                              range,
-                              ...colors[index],
-                            };
-                          })}
-                          {@const unitLabel = allGaugesAttributes.find(
-                            (item) => item.id === id,
-                          )?.unit.label[projectUnits]}
-                          {@const gaugeLabel = `${
-                            allGaugesAttributes.find((item) => item.id === id)
-                              ?.label
-                          } Yarn Palette`}
-                          {@const hasAffiliateLinks = colors
-                            ? colors?.some(
-                                (color) => !!color.affiliate_variant_href,
-                              )
-                            : false}
-                          <div class="flex flex-col">
-                            <div class="flex flex-col">
-                              <ColorPalette {colors} schemeName={gaugeLabel} />
-                              <a
-                                class="btn preset-tonal-primary border-primary-500 m-auto mt-4 w-fit gap-1 border"
-                                onclick={() => {
-                                  yarnPageState.gauge.colors = colors;
-                                }}
-                                href="/yarn"
-                              >
-                                Open in Yarn Palette Creator
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  fill="none"
-                                  viewBox="0 0 24 24"
-                                  stroke-width="1.5"
-                                  stroke="currentColor"
-                                  class="size-5"
-                                >
-                                  <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    d="m8.25 4.5 7.5 7.5-7.5 7.5"
-                                  />
-                                </svg>
-                              </a>
-                            </div>
-                            {#if hasAffiliateLinks}
-                              <p class="mt-4 px-2 text-sm">
-                                Items purchased through links with a shopping
-                                bag icon
-                                <ShoppingBagIcon class="inline size-4" />
-                                help support this site by earning the developer a
-                                percentage of each sale, at no additional cost to
-                                you.
-                              </p>
-                            {/if}
-                            <div class="mx-auto mt-4 w-fit">
-                              <ViewToggle />
-                            </div>
-                            <div
-                              class="rounded-container mt-4 mb-2 overflow-hidden xl:mb-4 {localState
-                                .value.layout === 'grid'
-                                ? 'grid grid-cols-2 gap-1 md:grid-cols-3 xl:grid-cols-4'
-                                : 'flex flex-col'}"
+                    {#each gauges as { colors, ranges, id }, gaugeIndex}
+                      {@const gaugeType = gauges[gaugeIndex].unit.type}
+                      {@const item = ranges.map((range, index) => {
+                        return {
+                          range,
+                          ...colors[index],
+                        };
+                      })}
+                      {@const unitLabel = allGaugesAttributes.find(
+                        (item) => item.id === id,
+                      )?.unit.label[projectUnits]}
+                      {@const gaugeLabel = `${
+                        allGaugesAttributes.find((item) => item.id === id)
+                          ?.label
+                      } Yarn Palette`}
+                      {@const hasAffiliateLinks = colors
+                        ? colors?.some(
+                            (color) => !!color.affiliate_variant_href,
+                          )
+                        : false}
+                      <div class="flex flex-col">
+                        <div class="flex flex-col">
+                          <ColorPalette {colors} schemeName={gaugeLabel} />
+                          <a
+                            class="btn preset-tonal-primary border-primary-500 m-auto mt-4 w-fit gap-1 border"
+                            onclick={() => {
+                              yarnPageState.gauge.colors = colors;
+                            }}
+                            href="/yarn"
+                          >
+                            Open in Yarn Palette Creator
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke-width="1.5"
+                              stroke="currentColor"
+                              class="size-5"
                             >
-                              {#each item as { range, hex, name, yarnName, brandName, affiliate_variant_href, variant_href }, i}
-                                <div
-                                  class="flex flex-wrap items-center justify-around gap-2 p-2 {localState
-                                    .value.layout === 'grid'
-                                    ? 'rounded-container flex-auto basis-1/3 sm:basis-1/4 md:basis-1/5'
-                                    : ''}"
-                                  style="background-color:{hex};color:{getTextColor(
-                                    hex,
-                                  )}"
-                                >
-                                  <p class="text-xs">
-                                    {i + 1}
-                                  </p>
-                                  <div
-                                    class="flex items-center justify-start gap-2"
+                              <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="m8.25 4.5 7.5 7.5-7.5 7.5"
+                              />
+                            </svg>
+                          </a>
+                        </div>
+                        {#if hasAffiliateLinks}
+                          <p class="mt-4 px-2 text-sm">
+                            Items purchased through links with a shopping
+                            bag icon
+                            <ShoppingBagIcon class="inline size-4" />
+                            help support this site by earning the developer a
+                            percentage of each sale, at no additional cost to
+                            you.
+                          </p>
+                        {/if}
+                        <div class="mx-auto mt-4 w-fit">
+                          <ViewToggle />
+                        </div>
+                        <div
+                          class="rounded-container mt-4 mb-2 overflow-hidden xl:mb-4 {localState
+                            .value.layout === 'grid'
+                            ? 'grid grid-cols-2 gap-1 md:grid-cols-3 xl:grid-cols-4'
+                            : 'flex flex-col'}"
+                        >
+                          {#each item as { range, hex, name, yarnName, brandName, affiliate_variant_href, variant_href }, i}
+                            <div
+                              class="flex flex-wrap items-center justify-around gap-2 p-2 {localState
+                                .value.layout === 'grid'
+                                ? 'rounded-container flex-auto basis-1/3 sm:basis-1/4 md:basis-1/5'
+                                : ''}"
+                              style="background-color:{hex};color:{getTextColor(
+                                hex,
+                              )}"
+                            >
+                              <p class="text-xs">
+                                {i + 1}
+                              </p>
+                              <div
+                                class="flex items-center justify-start gap-2"
+                              >
+                                {#if gaugeType === 'category'}
+                                  <p id="range-{i}-value">{range.label}</p>
+                                {:else}
+                                  <span
+                                    class="flex flex-col items-start text-left"
+                                    id="range-{i}-from"
                                   >
-                                    {#if gaugeType === 'category'}
-                                      <p id="range-{i}-value">{range.label}</p>
-                                    {:else}
-                                      <span
-                                        class="flex flex-col items-start text-left"
-                                        id="range-{i}-from"
+                                    <span class="text-xs">From</span>
+                                    <span class="flex items-start">
+                                      <span class="text-lg"
+                                        >{range.from}</span
                                       >
-                                        <span class="text-xs">From</span>
-                                        <span class="flex items-start">
-                                          <span class="text-lg"
-                                            >{range.from}</span
-                                          >
-                                          <span class="text-xs"
-                                            >{unitLabel}</span
-                                          >
-                                        </span>
-                                      </span>
-                                      <span
-                                        class="flex flex-col items-start text-left"
-                                        id="range-{i}-to"
-                                      >
-                                        <span class="text-xs">To</span>
-                                        <span class="flex items-start">
-                                          <span class="text-lg">{range.to}</span
-                                          >
-                                          <span class="text-xs"
-                                            >{unitLabel}</span
-                                          >
-                                        </span>
-                                      </span>
-                                    {/if}
-                                  </div>
-                                  {#if affiliate_variant_href}
-                                    <a
-                                      class="btn hover:preset-tonal flex flex-wrap items-center justify-start"
-                                      href={affiliate_variant_href}
-                                      target="_blank"
-                                      rel="noreferrer nofollow"
-                                    >
-                                      <ShoppingBagIcon />
-                                      <span class="underline">Buy</span></a
-                                    >
-                                  {/if}
-                                  {#if brandName && yarnName}
-                                    <div
-                                      class="flex flex-col items-start justify-start text-left text-wrap whitespace-normal"
-                                    >
                                       <span class="text-xs"
-                                        >{brandName}
-                                        -
-                                        {yarnName}</span
+                                        >{unitLabel}</span
                                       >
-                                      <span
-                                        class="flex flex-wrap items-start justify-start text-lg leading-tight"
+                                    </span>
+                                  </span>
+                                  <span
+                                    class="flex flex-col items-start text-left"
+                                    id="range-{i}-to"
+                                  >
+                                    <span class="text-xs">To</span>
+                                    <span class="flex items-start">
+                                      <span class="text-lg">{range.to}</span
                                       >
-                                        {name}
-                                      </span>
-                                    </div>
-                                  {:else}
-                                    {hex}
-                                  {/if}
+                                      <span class="text-xs"
+                                        >{unitLabel}</span
+                                      >
+                                    </span>
+                                  </span>
+                                {/if}
+                              </div>
+                              {#if affiliate_variant_href}
+                                <a
+                                  class="btn hover:preset-tonal flex flex-wrap items-center justify-start"
+                                  href={affiliate_variant_href}
+                                  target="_blank"
+                                  rel="noreferrer nofollow"
+                                >
+                                  <ShoppingBagIcon />
+                                  <span class="underline">Buy</span></a
+                                >
+                              {/if}
+                              {#if brandName && yarnName}
+                                <div
+                                  class="flex flex-col items-start justify-start text-left text-wrap whitespace-normal"
+                                >
+                                  <span class="text-xs"
+                                    >{brandName}
+                                    -
+                                    {yarnName}</span
+                                  >
+                                  <span
+                                    class="flex flex-wrap items-start justify-start text-lg leading-tight"
+                                  >
+                                    {name}
+                                  </span>
                                 </div>
-                              {/each}
+                              {:else}
+                                {hex}
+                              {/if}
                             </div>
-                          </div>
-                        {/each}
-                      {/key}
-                    {/if}
+                          {/each}
+                        </div>
+                      </div>
+                    {/each}
                   </div>
                 </div>
-              {/await}
             </div>
           {/snippet}
         </Card>

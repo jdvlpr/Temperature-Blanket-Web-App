@@ -10,3 +10,6 @@ node_modules
 test-results
 .wrangler
 dist
+GEMINI.md
+pnpm-workspace.yaml
+.gemini

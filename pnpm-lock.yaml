@@ -44,6 +44,9 @@ importers:
       suncalc:
         specifier: ^1.9.0
         version: 1.9.0
+      valibot:
+        specifier: ^1.2.0
+        version: 1.2.0(typescript@5.9.2)
     devDependencies:
       '@playwright/test':
         specifier: ^1.55.1
@@ -2567,6 +2570,14 @@ packages:
     resolution: {integrity: sha512-HjSDRw6gZE5JMggctHBcjVak08+KEVhSIiDzFnT9S9aegmp85S/bReBVTb4QTFaRNptJ9kuYaNhnbNEOkbKb/A==}
     deprecated: Please upgrade  to version 7 or higher.  Older versions may use Math.random() in certain circumstances, which is known to be problematic.  See https://v8.dev/blog/math-random for details.
     hasBin: true
+
+  valibot@1.2.0:
+    resolution: {integrity: sha512-mm1rxUsmOxzrwnX5arGS+U4T25RdvpPjPN4yR0u9pUBov9+zGVtO84tif1eY4r6zWxVxu3KzIyknJy3rxfRZZg==}
+    peerDependencies:
+      typescript: '>=5'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
 
   vaul-svelte@1.0.0-next.3:
     resolution: {integrity: sha512-bqlCc28z1I6f23Sjv5W6UlNJdAPeX8tZbYZ3+ycOn/4hTvv2fo/5Le4bAX26RyFkpT6n5FXXCZN1/uNs8biyrQ==}
@@ -5131,6 +5142,10 @@ snapshots:
     optional: true
 
   uuid@3.4.0: {}
+
+  valibot@1.2.0(typescript@5.9.2):
+    optionalDependencies:
+      typescript: 5.9.2
 
   vaul-svelte@1.0.0-next.3(svelte@5.41.2):
     dependencies:

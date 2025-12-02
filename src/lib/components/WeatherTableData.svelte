@@ -1,7 +1,6 @@
 <script lang="ts">
-  import { localState, dialog, weather } from '$lib/state';
-  import { TableHandler, ThSort } from '@vincjo/datatables';
-  import DataTable from './datatable/DataTable.svelte';
+  import { UNIT_LABELS } from '$lib/constants';
+  import { dialog, localState, weather } from '$lib/state';
   import {
     celsiusToFahrenheit,
     dateToISO8601String,
@@ -14,13 +13,13 @@
     inchesToMillimeters,
     millimetersToInches,
   } from '$lib/utils';
-  import { showColorDetails } from './WeatherTableWrapper.svelte';
-  import RecentWeatherDataTooltip from './RecentWeatherDataTooltip.svelte';
-  import TextInput from './modals/TextInput.svelte';
-  import NumberInput from './modals/NumberInput.svelte';
-  import { UNIT_LABELS } from '$lib/constants';
+  import { TableHandler, ThSort } from '@vincjo/datatables';
   import { onMount } from 'svelte';
-  import { Inspect } from '@lucide/svelte';
+  import RecentWeatherDataTooltip from './RecentWeatherDataTooltip.svelte';
+  import { showColorDetails } from './WeatherTableWrapper.svelte';
+  import DataTable from './datatable/DataTable.svelte';
+  import NumberInput from './modals/NumberInput.svelte';
+  import TextInput from './modals/TextInput.svelte';
 
   let { tableData, updateTable, uid } = $props();
 
