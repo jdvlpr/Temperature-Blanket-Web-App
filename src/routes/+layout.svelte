@@ -27,6 +27,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { handleKeyDown, initializeLocalStorage, privacy } from '$lib/utils';
   import { onMount, type Snippet } from 'svelte';
   import '../css/main.css';
+  import { YoutubeIcon } from '@lucide/svelte';
 
   interface Props {
     children?: Snippet;
@@ -160,6 +161,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </script>
   {/if}
 </svelte:head>
+
+<div class="w-full p-2 bg-primary-50-950 text-left flex justify-center items-center [view-transition-name:top-banner]">
+  <a href="https://www.youtube.com/watch?v=7NRLrpZb0Lo" target="_blank" rel="noopener" class="btn hover:preset-tonal whitespace-pre-wrap">
+   <YoutubeIcon/>Watch: Plan a Temperature Blanket the Easy Way</a>
+</div>
 
 {@render children?.()}
 

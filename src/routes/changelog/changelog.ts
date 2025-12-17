@@ -22,12 +22,28 @@ import {
   MoonStarIcon,
   RocketIcon,
   WrenchIcon,
+  YoutubeIcon,
 } from '@lucide/svelte';
 
 export const entries: ChangelogItemGroup[] = [
   {
     year: 2025,
     months: [
+      {
+        month: 'November',
+        items: [
+          {
+            notes: [
+              {
+                IconComponent: YoutubeIcon,
+                text: `<a href="https://www.youtube.com/watch?v=7NRLrpZb0Lo" target="_blank" class="link">Click here to watch</a>`,
+                title: 'New Video: Plan a Temperature Blanket the Easy Way',
+              },
+            ],
+            version: '5.30.1',
+          },
+        ],
+      },
       {
         month: 'November',
         items: [

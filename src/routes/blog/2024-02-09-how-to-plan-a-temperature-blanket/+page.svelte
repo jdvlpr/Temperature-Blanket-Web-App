@@ -198,6 +198,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     </p>
                     <p class="text-sm">February 9, 2024</p>
                   </div>
+
+                    <div class="w-full">
+                    <iframe width="560" height="315" src="https://www.youtube.com/embed/7NRLrpZb0Lo?si=6FfsQcYDxXaqJ-aa" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen class="w-full h-auto aspect-video"></iframe>
+                    </div>
+
                   <p>
                     Starting a temperature blanket can be a daunting task. Maybe
                     you're thinking of starting, but you feel overwhelmed by
@@ -855,20 +860,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     like to see more details about in this guide, send me an
                     email at hello@temperature-blanket.com.
                   </p>
-
-                  <div
-                    class="rounded-container preset-tonal-tertiary border-tertiary-500 flex flex-col gap-4 border p-4"
-                  >
-                    <p>
-                      🎥 Are you a video creator? Let's collaborate! Make a
-                      video tutorial based on this post and I'd love to feature
-                      it. Contact me at hello@temperature-blanket.com or at <a
-                        href="https://facebook.com/temperatureblanket"
-                        class="link"
-                        target="_blank">facebook.com/temperatureblanket</a
-                      >.
-                    </p>
-                  </div>
                 </div>
               </div>
             {/snippet}
