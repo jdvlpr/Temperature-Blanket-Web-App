@@ -30,6 +30,26 @@ export const entries: ChangelogItemGroup[] = [
     year: 2025,
     months: [
       {
+        month: 'December',
+        items: [
+          {
+            notes: [
+              {
+                icon: ICONS.checkCircle,
+                text: `31 colorways`,
+                title: 'Added New Yarn: Euroroma - Ecoamigurumi',
+              },
+              {
+                icon: ICONS.checkCircle,
+                text: `50 colorways`,
+                title: 'Added New Yarn: Hobby Store - Aran AcryCot',
+              },
+            ],
+            version: '5.31.0',
+          },
+        ],
+      },
+      {
         month: 'November',
         items: [
           {
