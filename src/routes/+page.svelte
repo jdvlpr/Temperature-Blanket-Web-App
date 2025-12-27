@@ -14,7 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { browser, version } from '$app/environment';
+  import { browser } from '$app/environment';
   import { PUBLIC_BASE_URL, PUBLIC_SITE_TITLE } from '$env/static/public';
   import AppLogo from '$lib/components/AppLogo.svelte';
   import AppShell from '$lib/components/AppShell.svelte';
@@ -22,7 +22,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Locations from '$lib/components/Locations.svelte';
   import Navigation from '$lib/components/Navigation.svelte';
   import Previews from '$lib/components/Previews.svelte';
-  import Tooltip from '$lib/components/Tooltip.svelte';
   import WeatherSection from '$lib/components/WeatherSection.svelte';
   import DonateButton from '$lib/components/buttons/DonateButton.svelte';
   import SectionNavigationButtons from '$lib/components/buttons/SectionNavigationButtons.svelte';
@@ -31,13 +30,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import LegacyNotification from '$lib/components/modals/LegacyNotification.svelte';
   import Menu from '$lib/components/modals/Menu.svelte';
   import {
+    dialog,
     locations,
-    modal,
     pageSections,
     project,
     wasProjectLoadedFromURL,
     weather,
   } from '$lib/state';
+  import { safeSlide } from '$lib/transitions/safeSlide';
   import {
     checkForProjectInLocalStorage,
     loadFromHistory,
@@ -47,13 +47,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
     upToDate,
   } from '$lib/utils';
   import {
-    BadgeHelpIcon,
+    BadgeQuestionMarkIcon,
     EllipsisVerticalIcon,
     LightbulbIcon,
     RedoIcon,
     SaveIcon,
     UndoIcon,
   } from '@lucide/svelte';
+  import { Popover, Portal } from '@skeletonlabs/skeleton-svelte';
   import { onMount } from 'svelte';
 
   let debounceTimer: number;
@@ -85,7 +86,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     // Check if the project needs to show a legacy notification
     // Use this to display warnings about backwards compatibility if the project is incompatible
     if (!upToDate(project.loaded.version, '0.98'))
-      modal.trigger({
+      dialog.trigger({
         type: 'component',
         component: { ref: LegacyNotification, props: { v: 'v0.98' } },
       });
@@ -145,14 +146,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
 {#snippet gettingStarted()}
   <button
     aria-label="Getting Started Guide"
-    onclick={() =>
-      modal.trigger({
+    onclick={() => {
+      dialog.trigger({
         type: 'component',
         component: { ref: GettingStarted },
         options: {
           size: 'large',
         },
-      })}
+      });
+    }}
     class="btn preset-filled-secondary-500 text-surface-contrast-500 gap-2"
   >
     <LightbulbIcon />
@@ -165,27 +167,24 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <div class="hidden lg:inline-flex">
       <AppLogo />
     </div>
-
     <div class="flex flex-1 justify-between gap-2 sm:justify-end">
       {#if weather.data.length && locations.allValid}
         <div class="hidden lg:inline-flex">
-          <Tooltip
-            classNames="btn hover:preset-tonal"
-            title="Save Project [Cmd]+[s] or [Ctrl]+[s]"
+          <button
+            class="btn hover:preset-tonal"
+            title="Save your project in this browser and as a URL."
             onclick={() =>
-              modal.trigger({
+              dialog.trigger({
                 type: 'component',
                 component: { ref: Menu, props: { page: 'save' } },
               })}
           >
             <SaveIcon />
 
-            <span class="max-[700px]:hidden min-[700px]:inline-block">Save</span
-            >
-            {#snippet tooltip()}
-              <p>Save your project in this browser and as a URL.</p>
-            {/snippet}
-          </Tooltip>
+            <span class="max-[700px]:hidden min-[700px]:inline-block">
+              Save
+            </span>
+          </button>
         </div>
       {/if}
 
@@ -233,72 +232,83 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {/if}
     </div>
 
-    <Tooltip
-      classNames="max-sm:btn-icon sm:btn hover:preset-tonal"
-      minWidth="265px"
-      title="Help"
-    >
-      <BadgeHelpIcon />
-      <span class="hidden sm:inline-block">About</span>
-      {#snippet tooltip()}
-        <div
-          class="flex flex-col gap-4 p-2"
-          aria-orientation="vertical"
-          aria-label="Help Menu"
-          tabindex="-1"
-        >
-          {@render gettingStarted()}
+    <Popover>
+      <Popover.Trigger
+        class="btn hover:preset-tonal"
+        aria-label="About"
+        title="About"
+      >
+        <BadgeQuestionMarkIcon />
+        <span class="hidden sm:inline-block">About</span>
+      </Popover.Trigger>
+      <Portal>
+        <Popover.Positioner>
+          <Popover.Content
+            class="card bg-surface-200-800 z-49 w-72 max-w-(--breakpoint-sm) p-2 shadow-xl"
+          >
+            {#snippet element(attributes)}
+              {#if !attributes.hidden}
+                <div {...attributes} transition:safeSlide>
+                  <Popover.Description>
+                    <div
+                      class="flex flex-col gap-4 p-2"
+                      aria-orientation="vertical"
+                      aria-label="Help Menu"
+                    >
+                      {@render gettingStarted()}
+                      <p>
+                        <a
+                          href="/blog/what-is-a-temperature-blanket"
+                          class="link"
+                          rel="noreferrer"
+                        >
+                          What's a Temperature Blanket?</a
+                        >
+                      </p>
 
-          <p>
-            <a
-              href="/blog/what-is-a-temperature-blanket"
-              class="link"
-              rel="noreferrer"
-            >
-              What's a Temperature Blanket?</a
-            >
-          </p>
+                      <p>
+                        <a
+                          href="/faq"
+                          rel="noopener noreferrer"
+                          title="View Frequently Asked Questions"
+                          class="link"
+                        >
+                          Frequently Asked Questions</a
+                        >
+                      </p>
 
-          <p>
-            <a
-              href="/faq"
-              rel="noopener noreferrer"
-              title="View Frequently Asked Questions"
-              class="link"
-            >
-              Frequently Asked Questions</a
-            >
-          </p>
+                      <p>
+                        <a href="/changelog" rel="noreferrer" class="link"
+                          >What's New?</a
+                        >
+                      </p>
 
-          <p>
-            <a href="/changelog" rel="noreferrer" class="link"
-              >Changelog - What's New?</a
-            >
-          </p>
-
-          <p>
-            <a href="/documentation" rel="noreferrer" class="link"
-              >Documentation</a
-            >
-          </p>
-
-          <div class="flex items-center gap-2">
-            <div class="border-surface-300-700 grow border-t"></div>
-
-            <p class="shrink text-xs">
-              Version {version}
-            </p>
-            <div class="border-surface-300-700 grow border-t"></div>
-          </div>
-        </div>
-      {/snippet}
-    </Tooltip>
+                      <p>
+                        <a href="/documentation" rel="noreferrer" class="link"
+                          >Documentation</a
+                        >
+                      </p>
+                    </div>
+                  </Popover.Description>
+                  <Popover.Arrow
+                    style="--arrow-size: calc(var(--spacing) * 4); --arrow-background: var(--color-surface-200-800);"
+                  >
+                    <Popover.ArrowTip />
+                  </Popover.Arrow>
+                </div>
+              {/if}
+            {/snippet}
+          </Popover.Content>
+        </Popover.Positioner>
+      </Portal>
+    </Popover>
 
     <button
-      aria-label="menu"
+      aria-label="Project Options"
+      title="Project Options"
       class="max-sm:btn-icon sm:btn hover:preset-tonal"
       onclick={() =>
-        modal.trigger({
+        dialog.trigger({
           type: 'component',
           component: {
             ref: Menu,
@@ -369,7 +379,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 Weather data from <button
                   class="underline"
                   onclick={() => {
-                    modal.trigger({
+                    dialog.trigger({
                       type: 'component',
                       component: { ref: ChooseWeatherSource },
                     });
@@ -403,7 +413,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           class="w-full scroll-mt-[76px]"
           class:hidden={pageSections.items[4].active === false}
         >
-          <div class="mx-auto max-w-(--breakpoint-sm)">
+          <div class="mx-auto max-w-screen-md">
             <p class="mb-2">
               Is this web app worth a cup of coffee to you? Your support enables
               ongoing development, keeps the site ad-free, and helps make this

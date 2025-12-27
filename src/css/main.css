@@ -1,10 +1,9 @@
 @import 'tailwindcss';
 @plugin '@tailwindcss/forms';
 
-@source '../../node_modules/@skeletonlabs/skeleton-svelte/dist';
+@import '@skeletonlabs/skeleton-svelte';
 
 @import '@skeletonlabs/skeleton';
-@import '@skeletonlabs/skeleton/optional/presets';
 
 /* Preset Themes */
 @import '@skeletonlabs/skeleton/themes/crimson';
@@ -42,6 +41,27 @@
   ::selection {
     color: var(--base-font-color-dark);
   }
+}
+
+/* Floating element styles */
+[data-floating] {
+  width: max-content;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 50;
+}
+
+/* Arrow styling for floating elements. The JS sets `data-placement` on the
+   floating element and positions the arrow's inline axis with left/top. */
+[data-floating] .popover-arrow {
+  position: absolute;
+  background: inherit;
+  width: 8px;
+  height: 8px;
+  transform: rotate(45deg);
+  pointer-events: none;
+  z-index: 10;
 }
 
 /* Override default theme font families */

@@ -18,7 +18,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     controller,
     gauges,
     locations,
-    modal,
+    dialog,
     signal,
     weather,
   } from '$lib/state';
@@ -50,7 +50,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         weather.isUserEdited = false;
         weather.isFromLocalStorage = false;
         await goToProjectSection(2, true);
-        modal.close();
+        dialog.close();
       })
       .catch((e) => {
         controller.value = null;

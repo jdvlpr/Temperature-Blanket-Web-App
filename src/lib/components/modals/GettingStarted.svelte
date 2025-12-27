@@ -14,7 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { modal } from '$lib/state';
+  import { dialog } from '$lib/state';
   import { ArrowLeftIcon, ArrowRightIcon } from '@lucide/svelte';
   import Step1 from './gettingStartedSteps/Step1.svelte';
   import Step2 from './gettingStartedSteps/Step2.svelte';
@@ -115,7 +115,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           type="button"
           class="btn preset-tonal hover:preset-filled"
           onclick={() => {
-            modal.close();
+            dialog.close();
           }}
         >
           <span>Let's Go!</span>

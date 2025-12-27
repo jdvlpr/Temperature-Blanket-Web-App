@@ -21,7 +21,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import PreviewInfo from '$lib/components/PreviewInfo.svelte';
   import { rowsPreview } from '$lib/components/previews/rows/state.svelte';
   import SpanYarnColorSelectIcon from '$lib/components/SpanYarnColorSelectIcon.svelte';
-  import { gauges, modal, weather } from '$lib/state';
+  import { gauges, dialog, weather } from '$lib/state';
   import { capitalizeFirstLetter, pluralize } from '$lib/utils';
   import { PencilIcon } from '@lucide/svelte';
 
@@ -108,7 +108,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       class="btn hover:preset-tonal"
       title="Choose a color for any additional stitches"
       onclick={() =>
-        modal.trigger({
+        dialog.trigger({
           type: 'component',
           component: {
             ref: ChangeColor,
@@ -116,7 +116,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               hex: rowsPreview.settings.extrasColor,
               onChangeColor: ({ hex }) => {
                 rowsPreview.settings.extrasColor = hex;
-                modal.close();
+                dialog.close();
               },
             },
           },
@@ -139,7 +139,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   <button
     class="btn hover:preset-tonal"
-    title="Choose a color for any additional stitches"
+    title="Edit which dates are which seasons"
   >
     <PencilIcon />
     Edit Seasons
@@ -147,7 +147,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   <div class="flex max-w-screen-md flex-wrap gap-4 text-left">
     <div>
-      <p class="font-bold">Spring (March 1 to May 31)</p>
+      <p class="font-bold">Spring (March, April, May)</p>
       <ToggleSwitchGroup
         groupLabel={`Color Each Row Using the ${capitalizeFirstLetter(weather.grouping)}'s`}
         {targets}
@@ -155,7 +155,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       />
     </div>
     <div>
-      <p class="font-bold">Summer (June 1 to August 31)</p>
+      <p class="font-bold">Summer (June, July, August)</p>
       <ToggleSwitchGroup
         groupLabel={`Color Each Row Using the ${capitalizeFirstLetter(weather.grouping)}'s`}
         {targets}
@@ -163,7 +163,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       />
     </div>
     <div>
-      <p class="font-bold">Fall (September 1 to November 30)</p>
+      <p class="font-bold">Fall (September, October, November)</p>
       <ToggleSwitchGroup
         groupLabel={`Color Each Row Using the ${capitalizeFirstLetter(weather.grouping)}'s`}
         {targets}
@@ -171,7 +171,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       />
     </div>
     <div>
-      <p class="font-bold">Winter (December 1 to February 28)</p>
+      <p class="font-bold">Winter (December, January, February)</p>
       <ToggleSwitchGroup
         groupLabel={`Color Each Row Using the ${capitalizeFirstLetter(weather.grouping)}'s`}
         {targets}

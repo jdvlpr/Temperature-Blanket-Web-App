@@ -14,9 +14,8 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import Tooltip from '$lib/components/Tooltip.svelte';
   import GaugeSettings from '$lib/components/modals/GaugeSettings.svelte';
-  import { gauges, modal } from '$lib/state';
+  import { gauges, dialog, PopoverInstance } from '$lib/state';
   import { Settings2Icon } from '@lucide/svelte';
 
   function onSaveRangeOptions(e) {
@@ -25,11 +24,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 </script>
 
-<Tooltip
-  classNames="btn preset-filled"
-  title="Configure Ranges"
+<button
+  class="btn preset-filled mx-auto flex flex-wrap items-center justify-center gap-2"
+  title="Change the gauge direction, generate ranges, and more."
   onclick={() =>
-    modal.trigger({
+    dialog.trigger({
       type: 'component',
       component: {
         ref: GaugeSettings,
@@ -43,13 +42,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
       },
     })}
 >
-  <div class="flex flex-wrap items-center justify-center gap-2">
-    <Settings2Icon />
-    Configure Ranges
-  </div>
-  {#snippet tooltip()}
-    <div>
-      <p>Change the gauge direction, generate ranges, and more.</p>
-    </div>
-  {/snippet}
-</Tooltip>
+  <Settings2Icon />
+  Configure Ranges
+</button>

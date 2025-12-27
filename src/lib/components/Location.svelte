@@ -15,9 +15,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import { browser } from '$app/environment';
-  import Tooltip from '$lib/components/Tooltip.svelte';
   import { MONTHS } from '$lib/constants';
-  import { locations, modal, project, toast, weather } from '$lib/state';
+  import { dialog, locations, project, toast, weather } from '$lib/state';
+  import { safeSlide } from '$lib/transitions/safeSlide';
   import type { LocationType } from '$lib/types/location-types';
   import {
     dateToISO8601String,
@@ -35,12 +35,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
     SearchIcon,
     Trash2Icon,
     TriangleAlertIcon,
-    XIcon,
+    XIcon
   } from '@lucide/svelte';
+  import { Popover, Portal, useTooltip } from '@skeletonlabs/skeleton-svelte';
   import autocomplete from 'autocompleter';
   import { onMount } from 'svelte';
   import '../../css/flag-icons.css';
   import LocationDetails from './modals/LocationDetails.svelte';
+
+  const id = $props.id();
+  const tooltip = useTooltip({ id });
 
   interface Props {
     location: LocationType;
@@ -291,29 +295,50 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <div class="grid grid-cols-1 items-end justify-center gap-4 py-2">
   {#if locations.all?.length > 1}
     <div class="justify-self-end">
-      <Tooltip placement="bottom" minWidth="250px">
-        <div class="btn-icon hover:preset-tonal">
+      <Popover>
+        <Popover.Trigger
+          class="btn-icon hover:preset-tonal"
+          title="Location Options"
+        >
           <EllipsisVerticalIcon />
-        </div>
-        {#snippet tooltip()}
-          <div class="flex items-center justify-center gap-2">
-            <button
-              class="btn hover:preset-tonal"
-              onclick={() => {
-                locations.remove(location.uuid);
-                weather.rawData = [];
-              }}
-              disabled={weather.isUserEdited > 0 || project.status.loading}
-              title="Remove Location"
+        </Popover.Trigger>
+        <Portal>
+          <Popover.Positioner>
+            <Popover.Content
+              class="bg-surface-200-800 rounded-container z-50 flex items-center justify-center gap-2 p-2 shadow-xl"
             >
-              <Trash2Icon />
-              <p>
-                Remove Location {index + 1}
-              </p>
-            </button>
-          </div>
-        {/snippet}
-      </Tooltip>
+              {#snippet element(attributes)}
+                {#if !attributes.hidden}
+                  <div {...attributes} transition:safeSlide>
+                    <Popover.Description>
+                      <button
+                        class="btn hover:preset-tonal"
+                        onclick={() => {
+                          locations.remove(location.uuid);
+                          weather.rawData = [];
+                        }}
+                        disabled={weather.isUserEdited > 0 ||
+                          project.status.loading}
+                        title="Remove Location"
+                      >
+                        <Trash2Icon />
+                        <p>
+                          Remove Location {index + 1}
+                        </p>
+                      </button>
+                    </Popover.Description>
+                    <Popover.Arrow
+                      style="--arrow-size: calc(var(--spacing) * 4); --arrow-background: var(--color-surface-200-800);"
+                    >
+                      <Popover.ArrowTip />
+                    </Popover.Arrow>
+                  </div>
+                {/if}
+              {/snippet}
+            </Popover.Content>
+          </Popover.Positioner>
+        </Portal>
+      </Popover>
     </div>
   {/if}
   <div class="grid grid-cols-1 gap-4">
@@ -470,7 +495,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <button
           class="btn hover:preset-tonal w-fit text-xs opacity-50 hover:opacity-100"
           onclick={() => {
-            modal.trigger({
+            dialog.trigger({
               type: 'component',
               component: {
                 ref: LocationDetails,
@@ -614,7 +639,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </p>
         {#if location.daysInFuture}
           <p
-            class="bg-warning-500/20 rounded-container my-2 w-full p-2 text-sm"
+            class="text-warning-800-200 rounded-container my-2 w-full p-2 text-sm"
           >
             <TriangleAlertIcon class="relative -top-[1px] inline size-4" />
 
@@ -636,12 +661,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </p>
         {/if}
       {:else if location.errorMessage && browser}
-        <p class="bg-warning-500/20 rounded-container my-2 w-full p-2 text-sm">
+        <p
+          class="text-warning-800-200 rounded-container my-2 w-full p-2 text-sm"
+        >
           <TriangleAlertIcon class="relative -top-[1px] inline size-4" />
           {location.errorMessage}
         </p>
       {:else if project.status.loading}
-        <p class="text-sm">...</p>
+        <p class="animate-pulse text-sm">...</p>
       {/if}
     </div>
   </div>

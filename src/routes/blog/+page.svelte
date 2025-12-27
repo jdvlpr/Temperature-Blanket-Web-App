@@ -17,7 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { PUBLIC_BASE_DOMAIN_NAME, PUBLIC_BASE_URL } from '$env/static/public';
   import AppLogo from '$lib/components/AppLogo.svelte';
   import AppShell from '$lib/components/AppShell.svelte';
-  import { Segment } from '@skeletonlabs/skeleton-svelte';
+  import { SegmentedControl } from '@skeletonlabs/skeleton-svelte';
   import { fade } from 'svelte/transition';
 
   type BlogPostType = {
@@ -114,22 +114,28 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <main
       class="m-auto mb-4 flex max-w-(--breakpoint-xl) flex-col items-center gap-4 px-2"
     >
-      <Segment
+      <SegmentedControl
         value={selectedTag}
         onValueChange={(e) => {
           selectedTag = e.value;
         }}
-        classes="mt-4"
-        background="bg-surface-100 dark:bg-surface-900 shadow-sm"
       >
-        {#each tags as tag}
-          <Segment.Item value={tag}>
-            <span class="flex items-center justify-center gap-1">
-              {tag}
-            </span>
-          </Segment.Item>
-        {/each}
-      </Segment>
+        <SegmentedControl.Control
+          class="bg-surface-100 dark:bg-surface-900 rounded-container mt-4 border-none shadow-sm"
+        >
+          <SegmentedControl.Indicator />
+          {#each tags as tag}
+            <SegmentedControl.Item value={tag}>
+              <SegmentedControl.ItemText>
+                <span class="flex items-center justify-center gap-1">
+                  {tag}
+                </span></SegmentedControl.ItemText
+              >
+              <SegmentedControl.ItemHiddenInput />
+            </SegmentedControl.Item>
+          {/each}
+        </SegmentedControl.Control>
+      </SegmentedControl>
 
       {#key selectedTag}
         <div

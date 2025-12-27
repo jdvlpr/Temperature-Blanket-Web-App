@@ -5,7 +5,7 @@ const colorways: Colorway[] = [
     source: {
       name: 'spotlightstores.com',
       href: 'https://www.spotlightstores.com/nz/art-craft/yarn-needle-art/yarn/acrylic-yarn/4-seasons-marvel-8-ply-acrylic-yarn/BP80256541-1001-white',
-      accessed: '2025-01-08',
+      accessed: '2025-11-29',
     },
     colors: [
       {
@@ -235,6 +235,18 @@ const colorways: Colorway[] = [
       {
         hex: '#f4e8d8',
         name: 'Almond',
+      },
+      {
+        hex: '#e9b07c',
+        name: 'Neon Orange',
+      },
+      {
+        hex: '#d96194',
+        name: 'Neon Pink',
+      },
+      {
+        hex: '#f4f6a9',
+        name: 'Neon Yellow',
       },
     ],
   },

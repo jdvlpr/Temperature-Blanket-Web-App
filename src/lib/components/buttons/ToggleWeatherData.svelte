@@ -32,12 +32,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
   class="flex w-fit p-2 gap-2 items-center justify-center cursor-pointer"
   {onclick}
   title="Toggle Visibility"
+  aria-pressed={view}
 >
   {#if view}
-    <span class="">{@html visibleIcon}</span>
+    <span class="" aria-hidden="true">{@html visibleIcon}</span>
     <p class="text-sm">{@render children?.()}</p>
   {:else}
-    <span class="">{@html hiddenIcon}</span>
+    <span class="" aria-hidden="true">{@html hiddenIcon}</span>
     <p class="text-sm"><s>{@render children?.()}</s></p>
   {/if}
 </button>

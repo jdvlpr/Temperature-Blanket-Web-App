@@ -17,7 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
   import StickyPart from '$lib/components/modals/StickyPart.svelte';
   import YarnGridSelect from '$lib/components/modals/YarnGridSelect.svelte';
-  import { modal } from '$lib/state';
+  import { dialog } from '$lib/state';
   import { ExternalLinkIcon, ShoppingBagIcon } from '@lucide/svelte';
   import chroma from 'chroma-js';
 
@@ -232,7 +232,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <div class="max-sm:pb-2">
       <SaveAndCloseButtons
         onSave={_onOkay}
-        onClose={modal.close}
+        onClose={dialog.close}
         disabled={!valid}
       />
     </div>

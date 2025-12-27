@@ -15,7 +15,20 @@
 
 import { expect, test } from '@playwright/test';
 
-test('Project Gallery Page loads', async ({ page }) => {
-  await page.goto('/gallery/12423');
-  await page.waitForSelector('#top-navbar', { timeout: 5000 });
+test.describe('Project Gallery Pages', () => {
+  test('Project Gallery Page loads', async ({ page }) => {
+    await page.goto('/gallery/12423');
+    await page.waitForSelector('#top-navbar', { timeout: 5000 });
+    
+    // Check for the presence of the main image
+    await expect(page.getByAltText('Project Preview')).toBeVisible();
+    
+    // Check for "About this Project" section
+    await expect(page.getByText('About this Project')).toBeVisible();
+    
+    // Check for the share/open buttons or similar. 
+    // The "Open in Project Planner" button is a good candidate if valid.
+    // Or just check for the back link.
+    await expect(page.getByRole('link', { name: 'Project Gallery' })).toBeVisible();
+  });
 });

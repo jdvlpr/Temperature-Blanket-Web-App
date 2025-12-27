@@ -25,30 +25,26 @@ If not, see <https://www.gnu.org/licenses/>. -->
     class="my-4 grid grid-cols-1 gap-4 rounded-none lg:grid-cols-2 2xl:grid-cols-3"
   >
     {#if SUPPORTERS?.gold?.length}
-      <div class="relative flex items-center w-full col-span-full">
-        <div class="grow border-t border-surface-300-700"></div>
-        <div class="shrink mx-4 flex items-center gap-2">
+      <div class="relative col-span-full flex w-full items-center">
+        <div class="border-surface-300-700 grow border-t"></div>
+        <div class="mx-4 flex shrink items-center gap-2">
           <AwardIcon />
           <div class="">
             <p class="">Gold Tier</p>
             <p class="text-xs">$6 per month</p>
           </div>
         </div>
-        <div class="grow border-t border-surface-300-700"></div>
+        <div class="border-surface-300-700 grow border-t"></div>
       </div>
       {#each SUPPORTERS?.gold as { name, href, linkText, imageSrc }}
         <div
-          class="bg-surface-50 dark:bg-surface-950 px-2 py-4 rounded-container w-full flex flex-col justify-center"
+          class="bg-surface-50 dark:bg-surface-950 rounded-container flex w-full flex-col justify-center px-2 py-4"
         >
-          <Avatar
-            src={imageSrc}
-            {name}
-            size="size-24"
-            rounded="rounded-[5px]"
-            background="bg-none"
-            classes="mx-auto shrink-0"
-          />
-          <div class="flex flex-col justify-center items-center">
+          <Avatar class="mx-auto size-24 shrink-0 rounded-[5px] bg-transparent">
+            <Avatar.Image src={imageSrc} alt="Jane Doe" {name} />
+            <Avatar.Fallback>{name}</Avatar.Fallback>
+          </Avatar>
+          <div class="flex flex-col items-center justify-center">
             <h5 class="h5">
               {name}
             </h5>
@@ -61,9 +57,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {/if}
 
     {#if SUPPORTERS?.silver?.length}
-      <div class="relative flex items-center w-full col-span-full">
-        <div class="grow border-t border-surface-300-700"></div>
-        <div class="shrink mx-4 flex items-center gap-2">
+      <div class="relative col-span-full flex w-full items-center">
+        <div class="border-surface-300-700 grow border-t"></div>
+        <div class="mx-4 flex shrink items-center gap-2">
           <AwardIcon />
 
           <div class="">
@@ -71,11 +67,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <p class="text-xs">$4 per month</p>
           </div>
         </div>
-        <div class="grow border-t border-surface-300-700"></div>
+        <div class="border-surface-300-700 grow border-t"></div>
       </div>
       {#each SUPPORTERS.silver as { name, href, linkText }}
         <div
-          class="h-fit bg-surface-50 dark:bg-surface-950 p-4 rounded-container flex flex-col items-center"
+          class="bg-surface-50 dark:bg-surface-950 rounded-container flex h-fit flex-col items-center p-4"
         >
           <h5 class="h5">{name}</h5>
           <a {href} target="_blank" class="link">{linkText}</a>
@@ -84,9 +80,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {/if}
 
     {#if SUPPORTERS?.bronze?.length}
-      <div class="relative flex items-center w-full col-span-full">
-        <div class="grow border-t border-surface-300-700"></div>
-        <div class="shrink mx-4 flex items-center gap-2">
+      <div class="relative col-span-full flex w-full items-center">
+        <div class="border-surface-300-700 grow border-t"></div>
+        <div class="mx-4 flex shrink items-center gap-2">
           <AwardIcon />
 
           <div class="">
@@ -94,11 +90,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <p class="text-xs">$2 per month</p>
           </div>
         </div>
-        <div class="grow border-t border-surface-300-700"></div>
+        <div class="border-surface-300-700 grow border-t"></div>
       </div>
       {#each SUPPORTERS?.bronze as { name }}
         <div
-          class="h-fit bg-surface-50 dark:bg-surface-950 p-4 rounded-container flex flex-col items-center"
+          class="bg-surface-50 dark:bg-surface-950 rounded-container flex h-fit flex-col items-center p-4"
         >
           <h5 class="h5">{name}</h5>
         </div>

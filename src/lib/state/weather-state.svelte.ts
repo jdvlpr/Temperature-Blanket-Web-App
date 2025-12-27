@@ -36,7 +36,7 @@ class WeatherClass {
   // ***************
   //    Derived Weather Data
   // ***************
-  goupedByWeek: WeatherDay[] | null = $derived.by(() => {
+  groupedByWeek: WeatherDay[] | null = $derived.by(() => {
     if (!this.rawData.length) return [];
 
     const _rawData = $state.snapshot(this.rawData);
@@ -159,8 +159,8 @@ class WeatherClass {
   data: WeatherDay[] = $derived.by(() => {
     this.currentIndex = 0;
 
-    if (this.grouping === 'week' && this.goupedByWeek.length)
-      return this.goupedByWeek;
+    if (this.grouping === 'week' && this.groupedByWeek.length)
+      return this.groupedByWeek;
     else return this.rawData;
   });
 

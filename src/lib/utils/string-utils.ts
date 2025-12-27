@@ -24,7 +24,11 @@ import { browser } from '$app/environment';
  *
  * @return  {String}          [return description]
  */
-export const pluralize = (noun, count, suffix = 's') => {
+export const pluralize = (
+  noun: string | { singular: string; plural: string },
+  count: number,
+  suffix: string = 's',
+): string | undefined => {
   if (typeof noun === 'string') {
     return `${noun}${count !== 1 ? suffix : ''}`;
   } else if (typeof noun === 'object') {
@@ -40,13 +44,14 @@ export const pluralize = (noun, count, suffix = 's') => {
  *
  * @return  {String}            [return description]
  */
-export const decodeEntity = (inputStr) => {
+export const decodeEntity = (inputStr: string): string => {
   if (!browser) return 'inputStr';
-  let textarea = document.createElement('textarea');
+  let textarea: HTMLTextAreaElement | null = document.createElement('textarea');
   textarea.innerHTML = inputStr;
   const value = textarea.value;
   textarea = null;
   return value;
 };
 
-export const stripHTMLTags = (str) => str.replace(/<[^>]*>/g, '');
+export const stripHTMLTags = (str: string): string =>
+  str.replace(/<[^>]*>/g, '');

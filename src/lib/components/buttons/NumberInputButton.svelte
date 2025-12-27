@@ -15,7 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import NumberInput from '$lib/components/modals/NumberInput.svelte';
-  import { modal } from '$lib/state';
+  import { dialog } from '$lib/state';
 
   interface Props {
     value: number;
@@ -36,7 +36,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   class="btn hover:preset-tonal"
   title="Set {title}"
   onclick={() =>
-    modal.trigger({
+    dialog.trigger({
       type: 'component',
       component: {
         ref: NumberInput,

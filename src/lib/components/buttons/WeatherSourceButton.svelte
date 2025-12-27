@@ -1,5 +1,5 @@
 <script>
-  import { modal, project, weather } from '$lib/state';
+  import { dialog, project, weather } from '$lib/state';
   import { CloudCogIcon } from '@lucide/svelte';
   import ChooseWeatherSource from '../modals/ChooseWeatherSource.svelte';
 </script>
@@ -8,7 +8,7 @@
   class="btn hover:preset-tonal w-fit"
   disabled={project.status.loading}
   onclick={async () => {
-    modal.trigger({
+    dialog.trigger({
       type: 'component',
       component: { ref: ChooseWeatherSource },
       options: {

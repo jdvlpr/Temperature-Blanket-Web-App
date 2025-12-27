@@ -14,7 +14,7 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import Alert from '$lib/components/modals/Alert.svelte';
-import { modal } from '$lib/state';
+import { dialog } from '$lib/state';
 import { online } from 'svelte/reactivity/window';
 
 /**
@@ -38,7 +38,7 @@ export const displayGeoNamesErrorMessage = (message) => {
     if (message) text += `<p class="my-4 italic text-xs">${message}</p>`;
   }
 
-  modal.trigger({
+  dialog.trigger({
     type: 'component',
     component: {
       ref: Alert,

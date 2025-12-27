@@ -16,23 +16,32 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script>
   import { UNIT_LABELS } from '$lib/constants';
   import { localState } from '$lib/state';
-  import { Segment } from '@skeletonlabs/skeleton-svelte';
+  import { SegmentedControl } from '@skeletonlabs/skeleton-svelte';
 </script>
 
-<Segment
+<SegmentedControl
   value={localState.value.units}
   onValueChange={(e) => {
     localState.value.units = e.value;
   }}
-  background="bg-surface-100 dark:bg-surface-900"
-  classes="shadow-sm"
 >
-  <Segment.Item value={'metric'}>
-    {`${UNIT_LABELS.temperature.metric} /
-  	    ${UNIT_LABELS.height.metric}`}
-  </Segment.Item>
-  <Segment.Item value={'imperial'}>
-    {`${UNIT_LABELS.temperature.imperial} /
-  	    ${UNIT_LABELS.height.imperial}`}
-  </Segment.Item>
-</Segment>
+  <SegmentedControl.Control
+    class="bg-surface-100 dark:bg-surface-900 shadown-sm rounded-container border-0"
+  >
+    <SegmentedControl.Indicator />
+    <SegmentedControl.Item value={'metric'}>
+      <SegmentedControl.ItemText
+        >{`${UNIT_LABELS.temperature.metric} /
+  	    ${UNIT_LABELS.height.metric}`}</SegmentedControl.ItemText
+      >
+      <SegmentedControl.ItemHiddenInput />
+    </SegmentedControl.Item>
+    <SegmentedControl.Item value={'imperial'}>
+      <SegmentedControl.ItemText
+        >{`${UNIT_LABELS.temperature.imperial} /
+  	    ${UNIT_LABELS.height.imperial}`}</SegmentedControl.ItemText
+      >
+      <SegmentedControl.ItemHiddenInput />
+    </SegmentedControl.Item>
+  </SegmentedControl.Control>
+</SegmentedControl>

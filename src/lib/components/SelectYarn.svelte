@@ -213,7 +213,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
         }
         container.style.zIndex = `12000`;
         if (maxHeight > 480) container.style.maxHeight = `480px`;
+
         container.style.overflowY = `scroll`;
+
         if (context === 'modal') {
           container.style.position = 'fixed';
           container.style.top = `${inputRect.bottom}px`;
@@ -320,7 +322,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div
-  class="w-full flex flex-col justify-start md:col-span-2 gap-1"
+  class="flex w-full flex-col justify-start gap-1 md:col-span-2"
   bind:this={inputGroup}
 >
   <span class="flex items-center gap-1">
@@ -329,10 +331,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </span>
 
   <div class="flex flex-wrap items-center justify-center gap-1">
-    <div class="input-group grid-cols-[1fr_auto_auto] w-full">
+    <div class="input-group w-full grid-cols-[1fr_auto_auto]">
       <input
         bind:this={inputElement}
-        class="truncate ig-input"
+        class="ig-input truncate"
         {disabled}
         id="input-select-yarn"
         type="text"

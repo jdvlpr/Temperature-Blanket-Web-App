@@ -22,7 +22,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
   import StickyPart from '$lib/components/modals/StickyPart.svelte';
   import { MAXIMUM_COLORWAYS_MATCHES_FOR_IMAGES } from '$lib/constants';
-  import { defaultYarn, modal } from '$lib/state';
+  import { defaultYarn, dialog } from '$lib/state';
   import {
     getColorways,
     getTextColor,
@@ -625,9 +625,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
             return n;
           }),
         });
-        modal.close();
+        dialog.close();
       }}
-      onClose={modal.close}
+      onClose={dialog.close}
     />
   </div>
 </StickyPart>

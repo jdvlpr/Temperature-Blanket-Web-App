@@ -17,7 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
   import SquareDesigner from '$lib/components/modals/SquareDesigner.svelte';
   import SpanYarnColorSelectIcon from '$lib/components/SpanYarnColorSelectIcon.svelte';
-  import { gauges, modal, weather } from '$lib/state';
+  import { gauges, dialog, weather } from '$lib/state';
   import { pluralize } from '$lib/utils';
   import { SquareDashedIcon, SquareSquareIcon } from '@lucide/svelte';
   import { squaresPreview } from './state.svelte';
@@ -122,7 +122,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     class="btn hover:preset-tonal"
     title="Edit Square Design"
     onclick={() =>
-      modal.trigger({
+      dialog.trigger({
         type: 'component',
         component: {
           ref: SquareDesigner,
@@ -149,7 +149,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       class="btn hover:preset-tonal"
       title="Choose a color for any additional squares"
       onclick={() =>
-        modal.trigger({
+        dialog.trigger({
           type: 'component',
           component: {
             ref: ChangeColor,
@@ -157,7 +157,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               hex: squaresPreview.settings.additionalSquaresColor,
               onChangeColor: ({ hex }) => {
                 squaresPreview.settings.additionalSquaresColor = hex;
-                modal.close();
+                dialog.close();
               },
             },
           },
@@ -194,7 +194,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       class="btn hover:preset-tonal text-left whitespace-pre-wrap"
       title="Choose a color for the border stitches around each square"
       onclick={() =>
-        modal.trigger({
+        dialog.trigger({
           type: 'component',
           component: {
             ref: ChangeColor,
@@ -202,7 +202,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               hex: squaresPreview.settings.joinColor,
               onChangeColor: ({ hex }) => {
                 squaresPreview.settings.joinColor = hex;
-                modal.close();
+                dialog.close();
               },
             },
           },

@@ -124,11 +124,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 </script>
 
-<div class="text-center flex flex-wrap justify-center items-end pb-4 gap-2">
+<div class="flex flex-wrap items-end justify-center gap-2 pb-4 text-center">
   <label class="label text-sm">
     <span>Popular during the past</span>
     <select
-      class="select w-fit min-w-[90px] mx-auto"
+      class="select mx-auto w-fit min-w-[90px]"
       id="select-time-period"
       bind:value={galleryPalettesPopularState.months}
       onchange={async () => {
@@ -155,17 +155,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </div>
 
 <div
-  class="flex flex-col items-center scroll-mt-[58px] lg:scroll-mt-[44px] px-2"
+  class="flex scroll-mt-[58px] flex-col items-center px-2 lg:scroll-mt-[44px]"
 >
   {#if loading}
     <div class="my-1"></div>
     <PlaceholderPalettes items={20} maxWFull={true} />
   {:else}
-    <div class="gap-4 my-2 flex flex-col items-start justify-start w-full">
+    <div class="my-2 flex w-full flex-col items-start justify-start gap-4">
       {#each palettes as { colors, schemeName, projectId }}
         <button
           type="button"
-          class="cursor-pointer w-full"
+          class="w-full cursor-pointer"
           onclick={() => {
             recordPageView(projectId);
             updateGauge({
@@ -183,6 +183,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/if}
 
   {#if !galleryPalettesPopularState.projects.length && !loading}
-    <p class="text-center my-8">No Results</p>
+    <p class="my-8 text-center">No Results</p>
   {/if}
 </div>

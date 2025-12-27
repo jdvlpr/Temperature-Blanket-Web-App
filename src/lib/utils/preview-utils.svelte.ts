@@ -19,7 +19,7 @@ import {
   gauges,
   isDesktop,
   locations,
-  modal,
+  dialog,
   previewWeatherTargets,
   weather,
 } from '$lib/state';
@@ -30,7 +30,7 @@ export const showPreviewImageWeatherDetails = (targets) => {
   previewWeatherTargets.value = targets;
 
   if (isDesktop.current) {
-    modal.trigger({
+    dialog.trigger({
       type: 'component',
       component: {
         ref: WeatherDetails,

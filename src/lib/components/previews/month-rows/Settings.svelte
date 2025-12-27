@@ -19,7 +19,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
   import PreviewInfo from '$lib/components/PreviewInfo.svelte';
   import SpanYarnColorSelectIcon from '$lib/components/SpanYarnColorSelectIcon.svelte';
-  import { gauges, modal, weather } from '$lib/state';
+  import { gauges, dialog, weather } from '$lib/state';
   import { pluralize } from '$lib/utils';
   import { capitalizeFirstLetter } from '$lib/utils/other-utils';
   import { monthRowsPreview } from './state.svelte';
@@ -104,7 +104,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       class="btn hover:preset-tonal"
       title="Choose a Color for Border Stitches"
       onclick={() =>
-        modal.trigger({
+        dialog.trigger({
           type: 'component',
           component: {
             ref: ChangeColor,
@@ -112,7 +112,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               hex: monthRowsPreview.settings.borderColor,
               onChangeColor: ({ hex }) => {
                 monthRowsPreview.settings.borderColor = hex;
-                modal.close();
+                dialog.close();
               },
             },
           },
@@ -145,7 +145,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     class="btn hover:preset-tonal"
     title="Choose a Color for Extra Rows"
     onclick={() =>
-      modal.trigger({
+      dialog.trigger({
         type: 'component',
         component: {
           ref: ChangeColor,
@@ -153,7 +153,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             hex: monthRowsPreview.settings.extrasColor,
             onChangeColor: ({ hex }) => {
               monthRowsPreview.settings.extrasColor = hex;
-              modal.close();
+              dialog.close();
             },
           },
         },

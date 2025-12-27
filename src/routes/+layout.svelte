@@ -14,14 +14,20 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { beforeNavigate, onNavigate } from '$app/navigation';
+  import { afterNavigate, beforeNavigate, onNavigate } from '$app/navigation';
   import { PUBLIC_MICROSOFT_CLARITY_ID } from '$env/static/public';
-  import ModalProvider from '$lib/components/modals/ModalProvider.svelte';
+  import DialogProvider from '$lib/components/modals/DialogProvider.svelte';
   import ToastProvider from '$lib/components/ToastProvider.svelte';
-  import { consentToMSClarityCookies, modal, toast } from '$lib/state';
+  import {
+    consentToMSClarityCookies,
+    dialog,
+    drawerState,
+    toast,
+  } from '$lib/state';
   import { handleKeyDown, initializeLocalStorage, privacy } from '$lib/utils';
   import { onMount, type Snippet } from 'svelte';
   import '../css/main.css';
+  import { YoutubeIcon } from '@lucide/svelte';
 
   interface Props {
     children?: Snippet;
@@ -38,7 +44,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 
   beforeNavigate(() => {
-    modal.close();
+    dialog.close();
+  });
+
+  afterNavigate(() => {
+    drawerState.closeAll();
   });
 
   onNavigate((navigation) => {
@@ -152,11 +162,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/if}
 </svelte:head>
 
+<div class="w-full p-2 bg-primary-50-950 text-center [view-transition-name:top-banner]">
+  <a href="https://www.youtube.com/watch?v=7NRLrpZb0Lo" target="_blank" rel="noopener" class="btn hover:preset-tonal whitespace-pre-wrap ">
+   <YoutubeIcon/>Watch: Plan a Temperature Blanket the Easy Way</a>
+</div>
+
 {@render children?.()}
 
 <ToastProvider />
 
-<ModalProvider />
+<DialogProvider />
 
 <style>
   @keyframes fade-in {
@@ -192,6 +207,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   :root::view-transition-new(root) {
     animation:
       210ms cubic-bezier(0, 0, 0.2, 1) 90ms both fade-in,
-      300ms cubic-bezier(0.4, 0, 0.2, 1) both slide-from-right;
+      400ms cubic-bezier(0.4, 0, 0.2, 1) both slide-from-right;
   }
 </style>

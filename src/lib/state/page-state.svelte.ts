@@ -13,15 +13,14 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { ICONS } from '$lib/constants';
 import { MediaQuery } from 'svelte/reactivity';
 
-type ModalOptions = {
+type DialogOptions = {
   showCloseButton?: boolean;
   size?: 'small' | 'medium' | 'large';
 };
-class ModalClass {
-  #defaultOptions: ModalOptions = {
+class DialogClass {
+  #defaultOptions: DialogOptions = {
     showCloseButton: true,
     size: 'small',
   };
@@ -36,11 +35,7 @@ class ModalClass {
 
   response = $state<any>(null);
 
-  drawer = $state({
-    leftNavigation: false,
-  });
-
-  options = $state<ModalOptions>({
+  options = $state<DialogOptions>({
     showCloseButton: true,
     size: 'small',
   });
@@ -63,23 +58,17 @@ class ModalClass {
     body?: string | null;
     response?: any;
     component?: any;
-    options?: ModalOptions;
-  }) => {
-    // close the modal
+    options?: DialogOptions;
+  }) => {    
+    // close the dialog
     this.close();
 
     this.type = type;
 
     if (type === 'component') {
       const { ref, props } = component;
-      // Delay necessary for zag to transition
-      await new Promise((resolve) => {
-        setTimeout(() => {
-          resolve(true);
-        }, 0);
-      });
 
-      // Set the the modal component and props
+      // Set the the dialog component and props
       this.contentComponent = {
         ref,
         props,
@@ -99,15 +88,10 @@ class ModalClass {
 
   close = () => {
     this.opened = false;
-
-    // close the drawer
-    for (const key in this.drawer) {
-      this.drawer[key] = false;
-    }
   };
 }
 
-export const modal = new ModalClass();
+export const dialog = new DialogClass();
 
 export interface ToastSettings {
   /** Provide the toast message. Supports HTML. */
@@ -187,6 +171,7 @@ class ToastService {
     if (toast && toast.callback) toast.callback({ id, status: 'queued' });
     // activate autohide when dismiss button is hidden.
     if (toast.hideDismiss) toast.autohide = true;
+    
     // Merge with defaults
     const tMerged: Toast = { ...this.#toastDefaults, ...toast, id };
     // Handle auto-hide, if needed
@@ -222,8 +207,10 @@ export const windowLanguage = $state({ value: null });
 
 class DrawerStateClass {
   weatherDetails = $state(false);
+  appNavigation = $state(false);
   closeAll = () => {
     this.weatherDetails = false;
+    this.appNavigation = false;
   };
 }
 

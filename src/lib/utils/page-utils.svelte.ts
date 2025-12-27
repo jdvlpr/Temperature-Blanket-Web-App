@@ -18,7 +18,7 @@ import KeyboardShortcuts from '$lib/components/modals/KeyboardShortcuts.svelte';
 import Menu from '$lib/components/modals/Menu.svelte';
 import {
   localState,
-  modal,
+  dialog,
   pageSections,
   project,
   toast,
@@ -114,7 +114,7 @@ const isRedo = (ev, style) => {
 
 export const handleKeyDown = (ev) => {
   if (
-    modal.opened ||
+    dialog.opened ||
     ev.target.tagName === 'INPUT' ||
     ev.target.tagName === 'TEXTAREA' ||
     ev.target.tagName === 'TD' ||
@@ -141,7 +141,6 @@ export const handleKeyDown = (ev) => {
         localState.value.theme.mode = 'system';
         break;
     }
-
     const themeTitle =
       localState.value.theme.mode.charAt(0).toUpperCase() +
       localState.value.theme.mode.slice(1);
@@ -157,13 +156,13 @@ export const handleKeyDown = (ev) => {
     // Check for global shortcuts
     switch (ev.key) {
       case 'k':
-        modal.trigger({
+        dialog.trigger({
           type: 'component',
           component: { ref: KeyboardShortcuts },
         });
         break;
       case '.':
-        modal.trigger({
+        dialog.trigger({
           type: 'component',
           component: { ref: Menu, props: { page: 'main' } },
         });
@@ -187,7 +186,7 @@ export const handleKeyDown = (ev) => {
         loadFromHistory({ action: 'Redo' });
       } else if ((ev.metaKey || ev.ctrlKey) && ev.key === 's') {
         ev.preventDefault();
-        modal.trigger({
+        dialog.trigger({
           type: 'component',
           component: { ref: Menu, props: { page: 'save' } },
         });
@@ -195,7 +194,7 @@ export const handleKeyDown = (ev) => {
       // Check for section navigation shortcuts
       switch (ev.key) {
         case 'd':
-          modal.trigger({
+          dialog.trigger({
             type: 'component',
             component: { ref: Menu, props: { page: 'download' } },
           });

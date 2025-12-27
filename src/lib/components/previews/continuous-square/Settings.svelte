@@ -18,7 +18,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
   import PreviewInfo from '$lib/components/PreviewInfo.svelte';
   import SpanYarnColorSelectIcon from '$lib/components/SpanYarnColorSelectIcon.svelte';
-  import { gauges, modal, weather } from '$lib/state';
+  import { gauges, dialog, weather } from '$lib/state';
   import { capitalizeFirstLetter } from '$lib/utils/other-utils';
   import { pluralize } from '$lib/utils/string-utils';
   import { continuousSquarePreview } from './state.svelte';
@@ -84,7 +84,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         class="btn hover:preset-tonal"
         title="Choose a Color"
         onclick={() =>
-          modal.trigger({
+          dialog.trigger({
             type: 'component',
             component: {
               ref: ChangeColor,
@@ -92,7 +92,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 hex: continuousSquarePreview.settings.extrasColor,
                 onChangeColor: ({ hex }) => {
                   continuousSquarePreview.settings.extrasColor = hex;
-                  modal.close();
+                  dialog.close();
                 },
               },
             },

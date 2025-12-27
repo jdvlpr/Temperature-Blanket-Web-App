@@ -17,13 +17,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import NumberInputButton from '$lib/components/buttons/NumberInputButton.svelte';
   import DataTable from '$lib/components/datatable/DataTable.svelte';
   import Expand from '$lib/components/Expand.svelte';
+  import PreviewInfo from '$lib/components/PreviewInfo.svelte';
   import { gauges, locations, weather } from '$lib/state';
+  import { safeSlide } from '$lib/transitions/safeSlide';
   import { capitalizeFirstLetter } from '$lib/utils/other-utils';
   import { DownloadIcon } from '@lucide/svelte';
   import { TableHandler } from '@vincjo/datatables';
-  import { slide } from 'svelte/transition';
   import { daytimeRowsPreview } from './state.svelte';
-  import PreviewInfo from '$lib/components/PreviewInfo.svelte';
 
   let targets = $derived(gauges.allCreated.map((n) => n.targets).flat());
 
@@ -171,12 +171,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <div class="mt-2 w-full">
       <Expand
         bind:isExpanded={isTableExpanded}
-        more="{tableIcon} Show Stitches Table"
-        less="{tableIcon} Hide Stitches Table"
+        label="{tableIcon} Stitches Table"
       />
     </div>
     {#if isTableExpanded}
-      <div in:slide out:slide class="relative mx-auto w-full max-w-[90vw]">
+      <div transition:safeSlide class="relative mx-auto w-full max-w-[90vw]">
         <DataTable {table} search={false}>
           <table class="w-full border-separate border-spacing-0">
             <thead>

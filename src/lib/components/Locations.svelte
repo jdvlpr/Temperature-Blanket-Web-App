@@ -16,7 +16,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import { version } from '$app/environment';
   import Location from '$lib/components/Location.svelte';
-  import Tooltip from '$lib/components/Tooltip.svelte';
   import { MAXIMUM_LOCATIONS } from '$lib/constants';
   import {
     locations,
@@ -28,6 +27,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import {
     CircleCheckBigIcon,
     CirclePlusIcon,
+    ExternalLinkIcon,
     TriangleAlertIcon,
   } from '@lucide/svelte';
   import SearchForWeather from './buttons/SearchForWeather.svelte';
@@ -64,35 +64,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
               timeZone: 'UTC',
             })}
           </span>
-          <Tooltip>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-              class="h-6 w-6"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"
-              />
-            </svg>
-            {#snippet tooltip()}
-              <span>
-                To edit location details, reload weather data or <a
-                  href={`/?project=${new Date().getTime()?.toString()}&v=${version}#${project.url.hash.substring(
-                    0,
-                    project.url.hash.indexOf('l='),
-                  )}${project.url.hash.substring(project.url.hash.indexOf('temp'))}`}
-                  class="cursor-pointer underline"
-                  target="_blank"
-                  rel="noreferrer">open a new project</a
-                >.
-              </span>
-            {/snippet}
-          </Tooltip>
+
+          <span class="p-2 text-sm">
+            To edit location details, reload weather data below or <a
+              href={`/?project=${new Date().getTime()?.toString()}&v=${version}#${project.url.hash.substring(
+                0,
+                project.url.hash.indexOf('l='),
+              )}${project.url.hash.substring(project.url.hash.indexOf('temp'))}`}
+              class="cursor-pointer underline"
+              target="_blank"
+              rel="noreferrer"
+              >open a new project <ExternalLinkIcon
+                size="12"
+                class="relative -top-[2px] inline"
+              /></a
+            >.
+          </span>
         </p>
       {/each}
       <p class="w-full text-sm">

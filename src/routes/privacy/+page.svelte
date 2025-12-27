@@ -44,7 +44,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <main
       class="mx-auto my-2 flex max-w-(--breakpoint-md) flex-col gap-4 px-2 xl:px-0"
     >
-      <h2 class="h2 text-gradient max-lg:hidden">Privacy Policy</h2>
+      <h2 class="h2 text-gradient max-lg:hidden mt-2">Privacy Policy</h2>
       <div class="flex flex-col">
         <p class="text-xl font-bold">Introduction</p>
         <p>

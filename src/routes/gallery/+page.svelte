@@ -38,7 +38,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <AppShell pageName="Project Gallery">
   {#snippet stickyHeader()}
-    <div class="hidden lg:inline-flex"><AppLogo /></div>
+    <div class="mx-auto hidden lg:inline-flex"><AppLogo /></div>
   {/snippet}
 
   {#snippet main()}

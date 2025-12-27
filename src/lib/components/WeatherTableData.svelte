@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { localState, modal, weather } from '$lib/state';
+  import { localState, dialog, weather } from '$lib/state';
   import { TableHandler, ThSort } from '@vincjo/datatables';
   import DataTable from './datatable/DataTable.svelte';
   import {
@@ -20,6 +20,7 @@
   import NumberInput from './modals/NumberInput.svelte';
   import { UNIT_LABELS } from '$lib/constants';
   import { onMount } from 'svelte';
+  import { Inspect } from '@lucide/svelte';
 
   let { tableData, updateTable, uid } = $props();
 
@@ -101,7 +102,7 @@
                 disabled={weather.grouping === 'week' || id === 'moon'}
                 onclick={() => {
                   if (id === 'dayt') {
-                    modal.trigger({
+                    dialog.trigger({
                       type: 'component',
                       component: {
                         ref: TextInput,
@@ -140,7 +141,7 @@
                       },
                     });
                   } else {
-                    modal.trigger({
+                    dialog.trigger({
                       type: 'component',
                       component: {
                         ref: NumberInput,

@@ -26,6 +26,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ToTopButton from '$lib/components/buttons/ToTopButton.svelte';
   import { onMount } from 'svelte';
   import { entries } from './changelog';
+  import { CalendarIcon } from '@lucide/svelte';
 
   let container = $state();
   let showScrollToTopButton = $state(false);
@@ -45,13 +46,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <svelte:head>
-  <title>Changelog</title>
+  <title>What's New?</title>
   <meta
     name="description"
     content="See what's new and review past changes from {PUBLIC_BASE_DOMAIN_NAME}."
   />
 
-  <meta property="og:title" content="Changelog" />
+  <meta property="og:title" content="What's New?" />
   <meta
     property="og:description"
     content="See what's new and review past changes from {PUBLIC_BASE_DOMAIN_NAME}."
@@ -60,15 +61,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <meta property="og:type" content="website" />
 </svelte:head>
 
-<AppShell pageName="Changelog">
+<AppShell pageName="What's New?">
   {#snippet stickyHeader()}
-    <div class="hidden lg:inline-flex"><AppLogo /></div>
+    <div class="mx-auto hidden lg:inline-flex"><AppLogo /></div>
   {/snippet}
   {#snippet main()}
     <main
       class="m-auto mx-auto mt-2 mb-6 max-w-(--breakpoint-md) px-2 text-center"
     >
-      <div class="" bind:this={container}>
+      <div class="flex flex-col items-start gap-2" bind:this={container}>
+        <h2 class="h2 text-gradient max-lg:hidden mt-2">What's New?</h2>
         <p class="text-left">
           See what's new and review past changes from {PUBLIC_BASE_DOMAIN_NAME}.
           This changelog includes only select milestones.
@@ -80,9 +82,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </p>
       </div>
       <div class="flex flex-col items-start gap-2 py-4 text-left">
-        {#each entries as { version, date, notes }}
-          <ChangelogItem {version} {date} {notes} />
-        {/each}
+        <div class="flex flex-col gap-2">
+          {#each entries as { year, months }}
+            {#each months as { month, items }}
+              <p class="font-bold text-xl">{month}, {year}</p>
+              <div class="flex w-full flex-col gap-4">
+                {#each items as { version, notes }}
+                  <ChangelogItem {version} {notes} />
+                {/each}
+              </div>
+            {/each}
+          {/each}
+        </div>
       </div>
     </main>
   {/snippet}

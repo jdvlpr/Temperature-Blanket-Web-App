@@ -4,7 +4,7 @@ const colorways: Colorway[] = [
   {
     source: {
       name: 'michaels.com',
-      href: 'https://www.michaels.com/product/color-craft-by-loops-threads-10299751?michaelsStore=9166&inv=3',
+      href: 'https://www.michaels.com/product/color-craft-by-loops-threads-10299751',
       accessed: '2025-01-13',
     },
     colors: [

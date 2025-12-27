@@ -14,9 +14,9 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import Tooltip from '$lib/components/Tooltip.svelte';
+  import { PopoverInstance } from '$lib/state';
   import { getTextColor } from '$lib/utils';
-  import { fade } from 'svelte/transition';
+  import { fade, scale } from 'svelte/transition';
 
   /**
    * @typedef {Object} Props
@@ -41,47 +41,57 @@ If not, see <https://www.gnu.org/licenses/>. -->
   >
     {#if colors}
       {#each colors as { hex, brandName, yarnName, name }}
+        {@const popover = new PopoverInstance({
+          interaction: 'hover',
+          placement: 'top',
+        })}
         {#key hex}
-          <!-- <div class="flex-1" style="background:{hex}" in:fade /> -->
-          <Tooltip
-            tooltipStyle="background:{hex};"
-            tooltipClass=""
-            tooltipBg=""
-            fullWidth={true}
-            classNames="w-full h-full"
-            minWidth="260px"
-          >
+          <button
+            {...popover.reference()}
+            class="flex h-full w-full max-w-[90vw] cursor-pointer flex-wrap items-center justify-center"
+            style="background:{hex}"
+            title={brandName && yarnName && name
+              ? `${brandName} - ${yarnName}: ${name}`
+              : hex}
+            aria-label={brandName && yarnName && name
+              ? `${brandName} - ${yarnName}: ${name}`
+              : hex}
+            aria-haspopup="dialog"
+            aria-expanded={popover.isOpen()}
+          ></button>
+          {#if popover.isOpen()}
             <div
-              class="flex h-full flex-auto items-center justify-center"
+              role="dialog"
+              aria-label="Color details"
               style="background:{hex}"
-              title={brandName && yarnName && name
-                ? `${brandName} - ${yarnName}: ${name}`
-                : hex}
-            ></div>
-            {#snippet tooltip()}
-              <div style="background:{hex}" class="rounded-container p-2">
-                <div
-                  class="flex flex-col items-center justify-center text-center text-wrap"
-                  style="color:{getTextColor(hex)}"
-                >
-                  {#if brandName && yarnName && name}
-                    <p class="text-xs">
-                      {brandName}
-                      -
-                      {yarnName}
-                    </p>
-                    <p class="text-lg leading-tight">
-                      {name}
-                    </p>
-                  {:else}
-                    <p class="text-lg">
-                      {hex}
-                    </p>
-                  {/if}
-                </div>
+              class="rounded-container z-10 min-w-[260px] p-4"
+              {...popover.floating()}
+              in:scale={{ duration: 150, delay: 150 }}
+              data-floating
+              tabindex="-1"
+            >
+              <div
+                class="flex flex-col items-center justify-center text-center text-wrap"
+                style="color:{getTextColor(hex)}"
+              >
+                {#if brandName && yarnName && name}
+                  <p class="text-xs">
+                    {brandName}
+                    -
+                    {yarnName}
+                  </p>
+                  <p class="text-lg leading-tight">
+                    {name}
+                  </p>
+                {:else}
+                  <p class="text-lg">
+                    {hex}
+                  </p>
+                {/if}
               </div>
-            {/snippet}
-          </Tooltip>
+              <div style="background:{hex}" {...popover.arrow()}></div>
+            </div>
+          {/if}
         {/key}
       {/each}
     {/if}

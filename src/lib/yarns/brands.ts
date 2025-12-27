@@ -16,6 +16,7 @@ import { brand as dmc } from './dmc/yarns';
 import { brand as drops } from './drops/yarns';
 import { brand as ellaRae } from './ella-rae/yarns';
 import { brand as elle } from './elle/yarns';
+import { brand as euroroma } from './euroroma/yarns';
 import { brand as fiddlesticks } from './fiddlesticks/yarns';
 import { brand as filaturaDiCrosa } from './filatura-di-crosa/yarns';
 import { brand as garnmanufaktur } from './garnmanufaktur/yarns';
@@ -69,6 +70,7 @@ import { brand as valleyYarns } from './valley-yarns/yarns';
 import { brand as weLoveYarn } from './we-love-yarn/yarns';
 import { brand as westYorkshireSpinners } from './west-yorkshire-spinners/yarns';
 import { brand as willowYarns } from './willow-yarns/yarns';
+import { brand as wollButt } from './woll-butt/yarns';
 import { brand as yarnAndColors } from './yarn-and-colors/yarns';
 import { brand as yarnalia } from './yarnalia/yarns';
 import { brand as yarnart } from './yarnart/yarns';
@@ -92,6 +94,7 @@ export const brands: Brand[] = [
   drops,
   ellaRae,
   elle,
+  euroroma,
   fiddlesticks,
   filaturaDiCrosa,
   garnmanufaktur,
@@ -145,6 +148,7 @@ export const brands: Brand[] = [
   weLoveYarn,
   westYorkshireSpinners,
   willowYarns,
+  wollButt,
   yarnAndColors,
   yarnalia,
   yarnart,

@@ -14,23 +14,23 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
+  import { page } from '$app/state';
   import AppNavigation from '$lib/components/AppNavigation.svelte';
   import {
-    modal,
+    drawerState,
     pageSections,
     showNavigationSideBar,
-    weather,
+    weather
   } from '$lib/state';
-  import { slide } from 'svelte/transition';
-  import { weatherChart } from './WeatherChart.svelte';
-  import { Modal } from '@skeletonlabs/skeleton-svelte';
-  import AppLogo from './AppLogo.svelte';
-  import { page } from '$app/state';
+  import { safeSlide } from '$lib/transitions/safeSlide';
   import {
     MenuIcon,
     PanelLeftClose,
     PanelRightCloseIcon,
   } from '@lucide/svelte';
+  import { Dialog, Portal } from '@skeletonlabs/skeleton-svelte';
+  import AppLogo from './AppLogo.svelte';
+  import { weatherChart } from './WeatherChart.svelte';
 
   /**
    * @typedef {Object} Props
@@ -81,23 +81,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
       class="m-auto flex max-w-(--breakpoint-xl) items-center justify-between gap-2 px-2"
     >
       <div class="lg:hidden">
-        <Modal
+        <Dialog
           onOpenChange={(e) => {
-            modal.drawer.leftNavigation = e.open;
+            drawerState.appNavigation = e.open;
           }}
-          open={modal.drawer.leftNavigation}
-          triggerBase="btn hover:preset-tonal my-2"
-          triggerAriaLabel="Open menu"
-          contentBase="bg-surface-50 dark:bg-surface-950 p-4 space-y-4 shadow-xl w-fit h-screen overflow-auto"
-          positionerJustify="justify-start"
-          positionerAlign=""
-          positionerPadding=""
-          transitionsPositionerIn={{ x: -480, duration: 200 }}
-          transitionsPositionerOut={{ x: -480, duration: 200 }}
+          open={drawerState.appNavigation}
         >
-          {#snippet trigger()}
+          <Dialog.Trigger
+            class="btn hover:preset-tonal my-2"
+            aria-label="Open menu"
+          >
             <MenuIcon />
-
             <span class="max-[355px]:hidden">
               {#if pageName}
                 {pageName}
@@ -105,14 +99,23 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 Menu
               {/if}
             </span>
-          {/snippet}
-          {#snippet content()}
-            <div class="mb-20 flex min-w-[265px] flex-col gap-2">
-              <AppLogo />
-              <AppNavigation />
-            </div>
-          {/snippet}
-        </Modal>
+          </Dialog.Trigger>
+          <Portal>
+            <Dialog.Backdrop
+              class="bg-surface-50-950/50 fixed inset-0 z-50 opacity-0 transition transition-discrete data-[state=open]:opacity-100 starting:data-[state=open]:opacity-0"
+            />
+            <Dialog.Positioner class="fixed inset-0 z-50 flex justify-start">
+              <Dialog.Content
+                class="bg-surface-50 dark:bg-surface-950 relative h-screen w-fit -translate-x-full space-y-4 overflow-auto p-4 opacity-0 transition transition-discrete data-[state=open]:translate-x-0 data-[state=open]:opacity-100 starting:data-[state=open]:-translate-x-full starting:data-[state=open]:opacity-0"
+              >
+                <div class="mb-20 flex min-w-[265px] flex-col gap-2">
+                  <AppLogo />
+                  <AppNavigation />
+                </div>
+              </Dialog.Content>
+            </Dialog.Positioner>
+          </Portal>
+        </Dialog>
       </div>
 
       {@render stickyHeader?.()}
@@ -133,7 +136,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       >
         {#if showNavigationSideBar.value}
           <PanelLeftClose />
-          <span in:slide={{ axis: 'x', duration: 90 }}>Hide Sidebar</span>
+          <span in:safeSlide={{ axis: 'x'}}>Hide Sidebar</span>
         {:else}
           <PanelRightCloseIcon />
         {/if}
@@ -141,7 +144,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {#if showNavigationSideBar.value}
         <div
           class="hidden w-fit flex-col lg:flex"
-          transition:slide={{ axis: 'x', duration: 100 }}
+          transition:safeSlide={{ axis: 'x' }}
         >
           <div class="w-fit">
             <AppNavigation />

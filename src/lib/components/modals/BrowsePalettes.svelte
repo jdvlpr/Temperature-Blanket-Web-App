@@ -18,7 +18,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import GalleryPalettesPopular from '$lib/components/GalleryPalettesPopular.svelte';
   import PaletteSchemes from '$lib/components/PaletteSchemes.svelte';
   import ToTopButton from '$lib/components/buttons/ToTopButton.svelte';
-  import { Segment } from '@skeletonlabs/skeleton-svelte';
+  import { SegmentedControl } from '@skeletonlabs/skeleton-svelte';
 
   interface Props {
     schemeId?: string;
@@ -65,26 +65,32 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <div class="p-2" bind:this={container}>
   <div
-    class="w-full flex flex-wrap justify-center items-end gap-2 px-2 pb-2"
+    class="flex w-full flex-wrap items-end justify-center gap-2 px-2 pb-2"
     class:pt-4={context === 'drawer'}
     bind:this={filtersContainer}
   >
-    <Segment
+    <SegmentedControl
       value={category}
       onValueChange={(e) => {
         category = e.value;
       }}
-      background="bg-surface-100 dark:bg-surface-950"
-      classes="shadow-sm"
     >
-      {#each categories as categoryItem}
-        <Segment.Item value={categoryItem}>
-          <span class="flex gap-1 justify-center items-center">
-            {categoryItem}
-          </span>
-        </Segment.Item>
-      {/each}
-    </Segment>
+      <SegmentedControl.Control
+        class="bg-surface-100 dark:bg-surface-950 rounded-container border-none shadow-sm"
+      >
+        <SegmentedControl.Indicator />
+        {#each categories as categoryItem}
+          <SegmentedControl.Item value={categoryItem}>
+            <SegmentedControl.ItemText
+              ><span class="flex items-center justify-center gap-1">
+                {categoryItem}
+              </span></SegmentedControl.ItemText
+            >
+            <SegmentedControl.ItemHiddenInput />
+          </SegmentedControl.Item>
+        {/each}
+      </SegmentedControl.Control>
+    </SegmentedControl>
   </div>
 
   {#if category === 'Gallery'}

@@ -1,16 +1,9 @@
 <script lang="ts">
   import { run } from 'svelte/legacy';
-
   import { flip } from 'svelte/animate';
-
   import { toast } from '$lib/state';
-  import { fade, scale } from 'svelte/transition';
-  import {
-    CircleAlertIcon,
-    CircleCheckIcon,
-    InfoIcon,
-    TriangleAlertIcon,
-  } from '@lucide/svelte';
+  import { CircleAlertIcon, CircleCheckIcon, InfoIcon } from '@lucide/svelte';
+  import { fade } from 'svelte/transition';
 
   // Props
 
@@ -138,7 +131,7 @@
     <div class="snackbar {classesSnackbar}">
       {#each filteredToasts as t, i (t)}
         <div
-          animate:flip={{ duration: 250 }}
+          animate:flip={{ duration: 400 }}
           transition:fade
           onoutroend={() => {
             const outroFinishedForLastToastOnQueue =

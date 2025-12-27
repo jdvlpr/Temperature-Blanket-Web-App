@@ -17,9 +17,15 @@ import type { Component } from 'svelte';
 
 export type PageLayout = 'list' | 'grid';
 
+export interface ChangelogItemGroup {
+  year: number;
+  months: {
+    month: string;
+    items: ChangelogItem[];
+  }[];
+}
+
 export interface ChangelogItem {
-  /** Only necessary for new months, in the format of Month, Year. For example: August, 2024 */
-  date?: string;
   notes: ChangelogItemNote[];
   version?: string;
 }

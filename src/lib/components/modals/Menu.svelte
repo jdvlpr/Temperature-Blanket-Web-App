@@ -28,10 +28,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ProjectDetails from '$lib/components/ProjectDetails.svelte';
   import UnitChanger from '$lib/components/UnitChanger.svelte';
   import YarnSources from '$lib/components/YarnSources.svelte';
-  import ChooseWeatherSource from '$lib/components/modals/ChooseWeatherSource.svelte';
   import KeyboardShortcuts from '$lib/components/modals/KeyboardShortcuts.svelte';
   import { DAYS_OF_THE_WEEK, MONTHS } from '$lib/constants';
-  import { modal, previews, project, toast, weather } from '$lib/state';
+  import { dialog, previews, project, toast, weather } from '$lib/state';
   import {
     delay,
     downloadPDF,
@@ -43,13 +42,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import {
     CircleCheckBigIcon,
     ClipboardCopyIcon,
-    CloudDownloadIcon,
-    DatabaseIcon,
     DownloadIcon,
     KeyboardIcon,
     SaveIcon,
     SquarePlusIcon,
-    WrenchIcon,
   } from '@lucide/svelte';
   import { onMount } from 'svelte';
   import WeatherGrouping from '../WeatherGrouping.svelte';
@@ -210,19 +206,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   class="link"
                   rel="noopener noreferrer">Read more details.</a
                 >
-                {#if weather.goupedByWeek}
+                {#if weather.groupedByWeek}
                   Your project starts on {DAYS_OF_THE_WEEK.filter(
-                    (n) => n.value === weather.goupedByWeek[0].date.getUTCDay(),
+                    (n) =>
+                      n.value === weather.groupedByWeek[0].date.getUTCDay(),
                   )[0].label},
                   {MONTHS.filter(
                     (n) =>
                       n.value - 1 ===
-                      weather.goupedByWeek[0].date.getUTCMonth(),
+                      weather.groupedByWeek[0].date.getUTCMonth(),
                   )[0]?.name}
-                  {weather.goupedByWeek[0].date.getUTCDate()},
-                  {weather.goupedByWeek[0].date.getUTCFullYear()}. It spans {weather
-                    .goupedByWeek.length}
-                  {pluralize('week', weather.goupedByWeek.length)}.
+                  {weather.groupedByWeek[0].date.getUTCDate()},
+                  {weather.groupedByWeek[0].date.getUTCFullYear()}. It spans {weather
+                    .groupedByWeek.length}
+                  {pluralize('week', weather.groupedByWeek.length)}.
                 {/if}
               </p>
               <label class="label flex flex-col">
@@ -250,7 +247,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <button
         class="btn hover:preset-tonal w-fit"
         onclick={() => {
-          modal.trigger({
+          dialog.trigger({
             type: 'component',
             component: { ref: KeyboardShortcuts },
           });
@@ -419,17 +416,45 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/if}
 
   {#if pages.save}
-    <div class="">
+    <div class="mb-4 flex flex-col items-start justify-center gap-2">
       <h2 class="my-2 text-lg font-bold">Save</h2>
       {#if browser && typeof window.localStorage !== 'undefined' && weather.data.length}
-        <p class="my-2 inline-flex w-full items-center justify-start gap-2">
+        <p
+          class="preset-filled-success-100-900 rounded-container inline-flex w-full items-center justify-start gap-2 p-2"
+        >
           <CircleCheckBigIcon style="size-4" />
           Project and {#if weather.isUserEdited}custom weather{:else}weather{/if}
-          data saved to this browser
+          data saved to this web browser
+        </p>
+
+        <p class="">
+          To access this project from any web browser, use the URL below:
         </p>
 
         <button
-          class="mt-2 mb-4"
+          class="btn preset-filled inline-flex w-fit flex-wrap items-center gap-2"
+          onclick={() => {
+            saveProject({ copy: true });
+          }}
+        >
+          <ClipboardCopyIcon />
+          Copy Project URL
+        </button>
+
+        <p
+          class="card bg-primary-50 dark:bg-primary-950 basis-full p-4 break-all select-all text-sm"
+        >
+          {project.url.href}
+        </p>
+
+        {#if currentSavedProject}
+          <div class="w-full">
+            <ProjectDetails project={currentSavedProject} canRemove={false} />
+          </div>
+        {/if}
+
+        <button
+          class="btn hover:preset-tonal"
           onclick={() => {
             goTo('download');
           }}
@@ -437,35 +462,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <DownloadIcon class="relative -top-[2px] mr-1 inline" />
           <span class="link">Download this project</span></button
         >
-
-        {#if currentSavedProject}
-          <div class="">
-            <ProjectDetails project={currentSavedProject} canRemove={false} />
-          </div>
-        {/if}
+      {:else}
+        <p>To save a project, you first need to get weather data.</p>
       {/if}
-      <p class="mt-4 mb-2 text-sm">Project URL</p>
-      <p
-        class="card bg-primary-50 dark:bg-primary-950 basis-full p-4 break-all select-all"
-      >
-        {project.url.href}
-      </p>
-      <div class="my-2 inline-flex flex-wrap items-center gap-2">
-        <button
-          class="btn hover:preset-tonal"
-          onclick={() => {
-            saveProject({ copy: true });
-          }}
-        >
-          <ClipboardCopyIcon />
-          Copy URL
-        </button>
-      </div>
-      <p class="mt-2">
-        This is your project's web address. To open your project again, paste
-        this URL into your browser's address bar. Save the web address so you
-        can access your project later.
-      </p>
     </div>
   {/if}
 </div>

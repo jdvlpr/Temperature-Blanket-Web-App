@@ -15,14 +15,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
+  import PreviewInfo from '$lib/components/PreviewInfo.svelte';
   import SpanYarnColorSelectIcon from '$lib/components/SpanYarnColorSelectIcon.svelte';
-  import Tooltip from '$lib/components/Tooltip.svelte';
-  import { gauges, modal, weather } from '$lib/state';
+  import { dialog, gauges, weather } from '$lib/state';
   import { pluralize } from '$lib/utils';
   import { capitalizeFirstLetter } from '$lib/utils/other-utils';
-  import { ArrowRightIcon, InfoIcon } from '@lucide/svelte';
+  import { ArrowRightIcon } from '@lucide/svelte';
   import { hexagonRoundsPreview } from './state.svelte';
-  import PreviewInfo from '$lib/components/PreviewInfo.svelte';
 
   let targets = $derived(gauges.allCreated.map((n) => n.targets).flat());
 
@@ -66,7 +65,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
           >{weatherRoundsPerHexagon}
           {pluralize('round', weatherRoundsPerHexagon)}
         </span> of weather data
-      {/if}{#if hexagonRoundsPreview.hexagonsWithNoWeatherData}, and <span
+      {/if}
+      {#if hexagonRoundsPreview.hexagonsWithNoWeatherData}, and <span
           class="font-semibold"
           >{hexagonRoundsPreview.hexagonsWithNoWeatherData}
           {pluralize(
@@ -77,26 +77,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {pluralize(
           { singular: 'has', plural: 'have' },
           hexagonRoundsPreview.hexagonsWithNoWeatherData,
-        )} no weather data
-      {/if}{#if extraRounds || hexagonRoundsPreview.hexagonsWithNoWeatherData}
-        <Tooltip tooltipClass="">
-          <InfoIcon class="-top[1px] relative inline size-5" />
-          {#snippet tooltip()}
-            <p class="text-warning-800-200 not-italic">
-              To potentially avoid rounds with no weather data, adjust the <span
-                class="inline font-bold">Layout Settings</span
-              >
-              or
-              <span class="inline font-bold">Hexagon Settings</span>
-              <ArrowRightIcon class="relative -top-[2px] inline size-4" />
-              <span class="inline font-bold"
-                >{capitalizeFirstLetter(weather.grouping)}s Per Hexagon</span
-              >
-              below.
-            </p>
-          {/snippet}
-        </Tooltip>
-      {/if}.
+        )} no weather data.
+      {/if}
+      {#if extraRounds || hexagonRoundsPreview.hexagonsWithNoWeatherData}
+        <p class="italic">
+          To potentially avoid rounds with no weather data, adjust the <span
+            class="inline font-bold">Layout Settings</span
+          >
+          or
+          <span class="inline font-bold">Hexagon Settings</span>
+          <ArrowRightIcon class="relative -top-[2px] inline size-4" />
+          <span class="inline font-bold"
+            >{capitalizeFirstLetter(weather.grouping)}s Per Hexagon</span
+          >
+          below.
+        </p>
+      {/if}
     {/if}
   {/snippet}
 </PreviewInfo>
@@ -191,7 +187,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     class="btn hover:preset-tonal text-left whitespace-pre-wrap"
     title="Choose a Color"
     onclick={() =>
-      modal.trigger({
+      dialog.trigger({
         type: 'component',
         component: {
           ref: ChangeColor,
@@ -199,7 +195,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             hex: hexagonRoundsPreview.settings.additionalRoundsColor,
             onChangeColor: ({ hex }) => {
               hexagonRoundsPreview.settings.additionalRoundsColor = hex;
-              modal.close();
+              dialog.close();
             },
           },
         },

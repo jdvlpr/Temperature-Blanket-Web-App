@@ -14,10 +14,9 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import { locations, modal, weather } from '$lib/state';
+  import { OPEN_METEO_MODELS } from '$lib/constants';
+  import { dialog, locations, weather } from '$lib/state';
   import {
-    CircleCheckIcon,
-    CircleIcon,
     ClockIcon,
     ExternalLinkIcon,
     Grid3X3Icon,
@@ -28,8 +27,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import GettingWeatherWarnCustomWeather from './GettingWeatherWarnCustomWeather.svelte';
   import SaveAndCloseButtons from './SaveAndCloseButtons.svelte';
   import StickyPart from './StickyPart.svelte';
-  import { OPEN_METEO_MODELS } from '$lib/constants';
-  import { onMount } from 'svelte';
 
   let warnSearchAgain = $derived.by(() => {
     if (!weather.data.length) return false;
@@ -52,6 +49,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let openMeteoModel = $state(weather.source.settings.openMeteo.model);
 
+  function handleWeatherSourceChange() {
+    sourceName === 'Meteostat'
+      ? (sourceName = 'Open-Meteo')
+      : (sourceName = 'Meteostat');
+  }
+
   async function _onOkay() {
     const _warnSearchAgain = warnSearchAgain; // save a copy of the current derived value
 
@@ -60,18 +63,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
     weather.source.settings.meteoStat.model = meteostatModel;
     weather.source.settings.openMeteo.model = openMeteoModel;
 
-    modal.close();
+    dialog.close();
 
     if (_warnSearchAgain) {
       if (weather.isUserEdited) {
-        modal.trigger({
+        dialog.trigger({
           type: 'component',
           component: {
             ref: GettingWeatherWarnCustomWeather,
           },
         });
       } else {
-        modal.trigger({
+        dialog.trigger({
           type: 'component',
           component: {
             ref: GettingWeather,
@@ -82,14 +85,26 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 </script>
 
-<div class="flex w-full flex-col items-center gap-4 p-2 text-left">
-  <div>
-    <ToggleSwitch
-      bind:checked={useSecondary}
-      label="Use the other weather source if data is not available from the selected one."
-    />
+{#snippet toggleWeatherSource(name)}
+  <div
+    class="bg-surface-100 dark:bg-surface-900 rounded-container flex w-full items-center justify-between gap-4 px-4 py-2 shadow-sm"
+  >
+    <p class="text-2xl font-bold">{name}</p>
+    <label class="relative inline-flex cursor-pointer items-start gap-2">
+      <input
+        type="checkbox"
+        checked={sourceName === name}
+        class="peer sr-only"
+        onchange={handleWeatherSourceChange}
+      />
+      <div
+        class="bg-surface-300 dark:bg-surface-700 peer-disabled:bg-surface-500 dark:peer-disabled:bg-secondary-900 peer-focus:ring-tertiary-200 dark:peer-focus:ring-tertiary-600 peer peer-checked:after:border-surface-50-950 after:bg-surface-50 after:border-surface-300 dark:border-surface-600 peer-checked:bg-primary-900 dark:peer-checked:bg-primary-600 h-6 w-11 shrink-0 rounded-full peer-focus:ring-4 peer-focus:outline-hidden after:absolute after:top-[2px] after:left-[2px] after:h-5 after:w-5 after:rounded-full after:border after:transition-all after:content-[''] peer-checked:after:translate-x-full"
+      ></div>
+    </label>
   </div>
+{/snippet}
 
+<div class="flex w-full flex-col items-center gap-4 p-2 text-left">
   <div
     class="relative my-2 grid auto-cols-auto grid-flow-row gap-4 md:grid-flow-col"
   >
@@ -101,8 +116,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
           : 'border-surface-200-800',
       ]}
     >
-      <div>
-        <p class="text-2xl font-bold">Open-Meteo</p>
+      <div class="flex flex-col items-center justify-center gap-2">
+        {@render toggleWeatherSource('Open-Meteo')}
 
         <a
           href="https://open-meteo.com/"
@@ -118,28 +133,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </a>
       </div>
 
-      <p class="">5 day delay</p>
+      <p class="text-sm">5 day delay</p>
 
-      <button
-        class={[
-          'btn  w-fit',
-          sourceName === 'Open-Meteo'
-            ? 'bg-surface-100 dark:bg-surface-900'
-            : 'preset-filled-secondary-500',
-        ]}
-        onclick={() => {
-          sourceName = 'Open-Meteo';
-        }}
-      >
-        {#if sourceName === 'Open-Meteo'}
-          <CircleCheckIcon class="inline" />
-        {:else}
-          <CircleIcon class="inline" />
-        {/if}
-        Select this Source
-      </button>
-
-      <div class="mt-4 flex flex-col gap-2 min-md:h-[730px]">
+      <div class="flex flex-col gap-2 min-md:h-[600px]">
         <p class="font-bold">Choose a Model</p>
 
         {#each OPEN_METEO_MODELS as { value, title, timespan, resolution, details }}
@@ -161,7 +157,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               />
               {@html title}
             </label>
-            <div class="ml-4 flex flex-col gap-1">
+            <div class="ml-4 flex flex-col gap-1 text-sm">
               <p class="">
                 <ClockIcon class="relative -top-[2px] mr-1 inline size-4" />
                 {timespan}
@@ -211,8 +207,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
           : 'border-surface-200-800',
       ]}
     >
-      <div class="">
-        <p class="text-2xl font-bold">Meteostat</p>
+      <div class="flex flex-col items-center justify-center gap-2">
+        {@render toggleWeatherSource('Meteostat')}
 
         <a
           href="https://meteostat.net"
@@ -228,28 +224,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </a>
       </div>
 
-      <p class="">1 to 7 day delay</p>
+      <p class="text-sm">1 to 7 day delay</p>
 
-      <button
-        class={[
-          'btn w-fit',
-          sourceName === 'Meteostat'
-            ? 'bg-surface-100 dark:bg-surface-900'
-            : 'preset-filled-secondary-500',
-        ]}
-        onclick={() => {
-          sourceName = 'Meteostat';
-        }}
-      >
-        {#if sourceName === 'Meteostat'}
-          <CircleCheckIcon class="inline" />
-        {:else}
-          <CircleIcon class="inline" />
-        {/if}
-        Select this Source
-      </button>
-
-      <div class="mt-4 min-md:h-[730px]">
+      <div class="min-md:h-[600px]">
         <div class="mt-2 flex flex-col gap-1">
           <label class="flex items-center gap-2 pb-1 font-bold">
             <input
@@ -261,7 +238,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             Fill Missing Data
             <span class="badge bg-surface-200-800">On by Default</span>
           </label>
-          <span class=""
+          <span class="text-sm"
             >Substitute missing records with statistically optimized model data.
           </span>
         </div>
@@ -311,6 +288,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
   </div>
 
+  <div>
+    <ToggleSwitch
+      bind:checked={useSecondary}
+      label="Use the other weather source if data is not available from the selected one."
+    />
+  </div>
+
   <p class=" text-center text-sm">
     All weather data is subject to change if the provider updates their models.
   </p>
@@ -329,7 +313,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     <SaveAndCloseButtons
       onSave={_onOkay}
-      onClose={modal.close}
+      onClose={dialog.close}
       saveText={warnSearchAgain && locations.allValid
         ? 'Save and Search'
         : 'Save'}

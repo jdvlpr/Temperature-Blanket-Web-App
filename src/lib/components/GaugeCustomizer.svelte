@@ -20,7 +20,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
   import ViewToggle from '$lib/components/buttons/ViewToggle.svelte';
   import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
-  import { localState, modal, showDaysInRange } from '$lib/state';
+  import { localState, dialog, showDaysInRange } from '$lib/state';
   import type { Color } from '$lib/types';
   import { getTextColor } from '$lib/utils';
   import {
@@ -38,13 +38,29 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let dragDisabled = $state(false);
 
-  const flipDurationMs = 90;
+  const flipDurationMs = 150;
 
   const isProjectPlannerPage = page.route.id === '/';
 
-  function checkForAffiliateURLs({ colors }) {
-    return colors?.some((n) => n?.affiliate_variant_href);
-  }
+  let movable = $derived(gauge.colors?.length > 1);
+
+  let hasAnyAffiliateURLs = $derived(
+    gauge.colors?.some((color: Color) => color?.affiliate_variant_href),
+  );
+
+  let sortableColors: Color[] = $state(getSortableColors());
+
+  let numberOfColumns = $derived.by(() => {
+    let cols = 4;
+    if (hasAnyAffiliateURLs) cols++;
+    if (sortableColors.length < 2) cols--;
+    if (!isProjectPlannerPage) {
+      cols--;
+      return cols;
+    }
+    if (showDaysInRange.value) cols++;
+    return cols;
+  });
 
   function onChangeColor({
     index,
@@ -79,20 +95,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
     });
 
     sortableColors = getSortableColors();
-    modal.close();
+    dialog.close();
   }
 
-  function handleConsider(e) {
+  function handleConsider(e: any) {
     dragDisabled = true;
-    const {
-      items: newItems,
-      info: { source, trigger, id },
-    } = e.detail;
-
-    sortableColors = newItems;
+    sortableColors = e.detail.items;
   }
 
-  function handleFinalize(e) {
+  function handleFinalize(e: any) {
     const {
       items: newItems,
       info: { source },
@@ -100,7 +111,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     sortableColors = newItems;
 
-    gauge.colors = sortableColors.map((color) => {
+    gauge.colors = sortableColors.map((color: Color) => {
       delete color.id;
       return color;
     });
@@ -111,19 +122,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
       dragDisabled = false;
     }
   }
-  function startDrag(e) {
+  function startDrag(e: any) {
     // preventing default to prevent lag on touch devices (because of the browser checking for screen scrolling)
     e.preventDefault();
     dragDisabled = false;
   }
-
-  let movable = $derived(gauge.colors?.length > 1);
-
-  let hasAnyAffiliateURLs = $derived(
-    checkForAffiliateURLs({ colors: gauge.colors }),
-  );
-
-  let sortableColors: Color[] = $state(getSortableColors());
 
   function getSortableColors() {
     const _sortableColors = [];
@@ -146,7 +149,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <div class="grid grid-cols-12 gap-2 pt-2">
   {#if isProjectPlannerPage}
     <div
-      class="col-span-full flex w-fit flex-col items-start gap-1 text-left md:col-span-8"
+      class="col-span-full flex w-fit flex-col items-start gap-1 text-left lg:col-span-8"
     >
       <ToggleSwitch
         bind:checked={showDaysInRange.value}
@@ -158,7 +161,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   <div
     class="col-span-full my-2 flex flex-wrap justify-center {isProjectPlannerPage
-      ? 'md:cols-start-9 md:col-span-4 md:justify-end'
+      ? 'lg:cols-start-9 lg:col-span-4 lg:justify-end'
       : ''}"
   >
     <ViewToggle />
@@ -168,7 +171,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <div
   class="rounded-container mt-2 mb-2 overflow-hidden lg:mb-4 {localState.value
     .layout === 'grid'
-    ? 'grid grid-cols-2 gap-1 md:grid-cols-3 xl:grid-cols-4'
+    ? 'grid grid-cols-2 gap-1 lg:grid-cols-3 xl:grid-cols-4'
     : 'flex flex-col'}"
   use:dragHandleZone={{
     items: sortableColors,
@@ -183,117 +186,153 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <div
       class="color flex flex-wrap items-center justify-around gap-2 p-2 {localState
         .value.layout === 'grid'
-        ? 'rounded-container flex-auto basis-1/3 sm:basis-1/4 md:basis-1/5'
-        : ''}"
+        ? 'rounded-container flex-auto basis-1/3  sm:basis-1/4 md:basis-1/5'
+        : `${isProjectPlannerPage ? numberOfColumns < 5 && 'lg:grid lg:grid-cols-[1fr_3fr_1fr]' : 'lg:grid lg:grid-cols-[1fr_1.4fr_1fr]'}`}"
       style="background:{hex};color:{getTextColor(hex)}"
       animate:flip={{ duration: flipDurationMs }}
     >
-      {#if movable && !isStaticGauge}
-        <button
-          title="Remove Color"
-          class="btn hover:preset-tonal flex flex-wrap items-center justify-center"
-          onclick={() => {
-            gauge.updateColors({
-              colors: gauge.colors.filter((_, i) => i !== index),
-            });
-            sortableColors = getSortableColors();
-            gauge.schemeId = 'Custom';
-          }}
-        >
-          <span class="text-xs">{index + 1}</span>
-          <Trash2Icon />
-        </button>
-      {/if}
+      <div
+        class={[
+          'hidden',
+          localState.value.layout === 'list' &&
+            'lg:block lg:h-full lg:w-full lg:flex-auto',
+        ]}
+      ></div>
 
-      <button
-        title="Move Color"
-        tabindex="-1"
-        aria-label="Crag handle for color {index + 1}"
-        class="btn-icon hover:preset-tonal handle p-2 {dragDisabled
-          ? 'cursor-grabbing'
-          : 'cursor-grab'}"
-        onmousedown={startDrag}
-        ontouchstart={startDrag}
-        use:dragHandle
-      >
-        <MoveIcon />
-      </button>
+      <div class="flex flex-auto flex-wrap items-center justify-around gap-2">
+        <div class="flex flex-wrap items-center gap-2">
+          {#if movable && !isStaticGauge}
+            <button
+              title="Remove Color"
+              class="btn hover:preset-tonal flex flex-wrap items-center justify-center gap-1"
+              onclick={() => {
+                gauge.updateColors({
+                  colors: gauge.colors.filter(
+                    (_: Color, i: number) => i !== index,
+                  ),
+                });
+                sortableColors = getSortableColors();
+                gauge.schemeId = 'Custom';
+              }}
+            >
+              <span class="text-xs">{index + 1}</span>
+              <Trash2Icon size="18" />
+            </button>
+          {/if}
 
-      <button
-        class="btn hover:preset-tonal h-auto"
-        title="Choose a Color"
-        onclick={() =>
-          modal.trigger({
-            type: 'component',
-            component: {
-              ref: ChangeColor,
-              props: {
-                index,
-                hex,
-                name,
-                brandId,
-                yarnId,
-                brandName,
-                yarnName,
-                variant_href,
-                affiliate_variant_href,
-                onChangeColor,
-              },
-            },
-            options: {
-              size: 'medium',
-            },
-          })}
-      >
-        <SearchIcon />
-        <span
-          class="flex flex-col items-start justify-start text-left text-wrap"
-        >
-          <span class="text-xs">
-            {#if brandName && yarnName}
-              {brandName}
-              -
-              {yarnName}
-            {:else}
-              Find Matching Yarn
-            {/if}
-          </span>
-          <span class="text-lg leading-tight"> {name || hex}</span>
-        </span>
-      </button>
-
-      {#if affiliate_variant_href}
-        <a
-          class="btn hover:preset-tonal"
-          href={affiliate_variant_href}
-          target="_blank"
-          rel="noreferrer nofollow"
-        >
-          <ShoppingBagIcon />
-          <span class="underline">Buy</span>
-        </a>
-      {/if}
-
-      {#if isProjectPlannerPage}
-        <div class="flex gap-2">
-          {#key index}
-            <ColorRange {index} />
-          {/key}
+          <button
+            title="Move Color"
+            tabindex="-1"
+            aria-label="Crag handle for color {index + 1}"
+            class="btn-icon hover:preset-tonal handle p-2 {dragDisabled
+              ? 'cursor-grabbing'
+              : 'cursor-grab'}"
+            onmousedown={startDrag}
+            ontouchstart={startDrag}
+            use:dragHandle
+          >
+            <MoveIcon />
+          </button>
         </div>
 
-        {#if showDaysInRange.value}
-          <div
-            class="bg-surface-900/10 rounded-container flex w-fit flex-wrap items-center justify-center overflow-hidden shadow-inner"
-          >
-            <DaysInRange
-              range={gauge.ranges[index]}
-              rangeOptions={gauge?.rangeOptions}
-              targets={gauge.targets}
-              gaugeUnitType={gauge.unit.type}
-            />
-          </div>
+        {#if isProjectPlannerPage}
+          {#if gauge?.unit.type === 'category'}
+            <p class="min-w-[140px] p-2 text-left">
+              {gauge.ranges[index].label}
+            </p>
+          {:else}
+            <div
+              class={[
+                'flex gap-2',
+                localState.value.layout === 'grid' ? '' : '',
+              ]}
+            >
+              {#key index}
+                <ColorRange {index} />
+              {/key}
+            </div>
+          {/if}
         {/if}
-      {/if}
+
+        <div class={[localState.value.layout === 'list' && 'flex-auto']}>
+          <button
+            class={['btn hover:preset-tonal flex h-auto justify-start']}
+            title="Choose a Color"
+            onclick={() =>
+              dialog.trigger({
+                type: 'component',
+                component: {
+                  ref: ChangeColor,
+                  props: {
+                    index,
+                    hex,
+                    name,
+                    brandId,
+                    yarnId,
+                    brandName,
+                    yarnName,
+                    variant_href,
+                    affiliate_variant_href,
+                    onChangeColor,
+                  },
+                },
+                options: {
+                  size: 'medium',
+                },
+              })}
+          >
+            <SearchIcon />
+            <span
+              class="flex flex-col items-start justify-start text-left text-wrap"
+            >
+              <span class="text-xs">
+                {#if brandName && yarnName}
+                  {brandName}
+                  -
+                  {yarnName}
+                {:else}
+                  Find Matching Yarn
+                {/if}
+              </span>
+              <span class="text-lg leading-tight"> {name || hex}</span>
+            </span>
+          </button>
+        </div>
+
+        {#if affiliate_variant_href}
+          <a
+            class="btn hover:preset-tonal"
+            href={affiliate_variant_href}
+            target="_blank"
+            rel="noreferrer nofollow"
+          >
+            <ShoppingBagIcon />
+            <span class="underline">Buy</span>
+          </a>
+        {/if}
+
+        {#if isProjectPlannerPage}
+          {#if showDaysInRange.value}
+            <div
+              class="bg-surface-900/10 rounded-container flex w-fit flex-wrap items-center justify-center overflow-hidden shadow-inner"
+            >
+              <DaysInRange
+                range={gauge.ranges[index]}
+                rangeOptions={gauge?.rangeOptions}
+                targets={gauge.targets}
+                gaugeUnitType={gauge.unit.type}
+              />
+            </div>
+          {/if}
+        {/if}
+      </div>
+      <div
+        class={[
+          'hidden',
+          localState.value.layout === 'list' &&
+            'lg:block lg:h-full lg:w-full lg:flex-auto',
+        ]}
+      ></div>
     </div>
   {/each}
 </div>

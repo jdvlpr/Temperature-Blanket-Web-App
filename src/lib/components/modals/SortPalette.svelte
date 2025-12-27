@@ -17,7 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ColorPaletteEditable from '$lib/components/ColorPaletteEditable.svelte';
   import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
   import StickyPart from '$lib/components/modals/StickyPart.svelte';
-  import { modal } from '$lib/state';
+  import { dialog } from '$lib/state';
   import { getSortedPalette } from '$lib/utils';
   import { ArrowDownWideNarrow, ArrowLeftRightIcon } from '@lucide/svelte';
 
@@ -32,8 +32,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let allColorsHaveNames = $derived(_colors.every((color) => color?.name));
 </script>
 
-<div class="p-4 sm:min-w-[600px]">
-  <div class="mt-6 flex flex-col items-center gap-2 sm:mt-4">
+<div class="px-4 pt-8 sm:min-w-[600px]">
+  <div class="mt-6 flex w-full flex-col items-center gap-2 sm:mt-4">
     <div class="flex flex-wrap items-end justify-center gap-2">
       <label class="label">
         <span class="flex items-center gap-1">
@@ -98,9 +98,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
             return n;
           }),
         });
-        modal.close();
+        dialog.close();
       }}
-      onClose={modal.close}
+      onClose={dialog.close}
     />
   </div>
 </StickyPart>

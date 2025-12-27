@@ -15,7 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
-  import { modal } from '$lib/state';
+  import { dialog } from '$lib/state';
   import { displayNumber } from '$lib/utils';
 
   interface Props {
@@ -42,7 +42,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   function _onOkay() {
     onOkay(value);
-    modal.close();
+    dialog.close();
   }
 
   function getMaxValue(value: number) {
@@ -61,10 +61,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 </script>
 
-<div class="text-center inline-flex flex-col items-center mx-auto w-full px-4">
+<div class="mx-auto inline-flex w-full flex-col items-center px-4 text-center">
   <label for="number-input" class="mb-2"><span>{@html title}</span></label>
 
-  <div class="flex flex-col gap-2 justify-center items-center my-2 w-fit">
+  <div class="my-2 flex w-fit flex-col items-center justify-center gap-2">
     <input
       type="number"
       class="input w-fit text-2xl"
@@ -83,7 +83,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         bind:value
       />
     {/if}
-    <div class="flex flex-wrap gap-2 justify-center items-center">
+    <div class="flex flex-wrap items-center justify-center gap-2">
       <button
         class="btn-icon hover:preset-tonal"
         onclick={() => (value = displayNumber(value - 20))}
@@ -118,7 +118,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <SaveAndCloseButtons
       onSave={_onOkay}
       disabled={isNaN(value) || noMinMax ? false : value < min}
-      onClose={modal.close}
+      onClose={dialog.close}
     />
   </div>
 </div>

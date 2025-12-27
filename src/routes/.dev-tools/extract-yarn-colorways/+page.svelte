@@ -233,11 +233,7 @@
               disabled={querySelector === '' || content === ''}
               >Get Colorway Names</button
             >
-            <Expand
-              bind:isExpanded={showClearButton}
-              less="Hide Clear Button"
-              more="Show Clear Button"
-            />
+            <Expand bind:isExpanded={showClearButton} label="Clear Button" />
             {#if showClearButton}
               <button
                 class="btn preset-filled-primary-500"

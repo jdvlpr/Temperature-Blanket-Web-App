@@ -15,22 +15,33 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import { ArrowUpDownIcon } from '@lucide/svelte';
-  import { Segment } from '@skeletonlabs/skeleton-svelte';
+  import { SegmentedControl } from '@skeletonlabs/skeleton-svelte';
 
   let { direction, onchange } = $props();
 </script>
 
-<p class="flex justify-start items-center gap-1">
-  <ArrowUpDownIcon class="size-4" />
-  <span>Direction</span>
-</p>
-
-<Segment
-  value={direction}
-  classes="flex-wrap gap-y-2 justify-start items-start"
-  background="bg-surface-100 dark:bg-surface-900"
-  onValueChange={onchange}
->
-  <Segment.Item value="high-to-low">High to Low</Segment.Item>
-  <Segment.Item value="low-to-high">Low to High</Segment.Item>
-</Segment>
+<SegmentedControl value={direction} onValueChange={onchange}>
+  <SegmentedControl.Label
+    ><p class="flex items-center justify-start gap-1">
+      <ArrowUpDownIcon class="size-4" />
+      <span>Direction</span>
+    </p></SegmentedControl.Label
+  >
+  <SegmentedControl.Control
+    class="bg-surface-100 dark:bg-surface-900 rounded-container flex-wrap items-start justify-start gap-y-2 border-none shadow-sm"
+  >
+    <SegmentedControl.Indicator />
+    <SegmentedControl.Item value="high-to-low">
+      <SegmentedControl.ItemText title="Set Gauge Direction to High to Low"
+        >High to Low</SegmentedControl.ItemText
+      >
+      <SegmentedControl.ItemHiddenInput />
+    </SegmentedControl.Item>
+    <SegmentedControl.Item value="low-to-high">
+      <SegmentedControl.ItemText title="Set Gauge Direction to Low to High"
+        >Low to High</SegmentedControl.ItemText
+      >
+      <SegmentedControl.ItemHiddenInput />
+    </SegmentedControl.Item>
+  </SegmentedControl.Control>
+</SegmentedControl>

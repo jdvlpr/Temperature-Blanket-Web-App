@@ -43,6 +43,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Spinner from '$lib/components/Spinner.svelte';
   import { ICONS } from '$lib/constants';
   import { isDesktop } from '$lib/state';
+  import { safeSlide } from '$lib/transitions/safeSlide';
   import {
     fetchProjects,
     getPalettesFromProjects,
@@ -56,7 +57,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     XIcon,
   } from '@lucide/svelte';
   import { onMount } from 'svelte';
-  import { slide } from 'svelte/transition';
 
   interface Props {
     updateGauge?: any;
@@ -105,18 +105,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div class=" flex flex-wrap items-end justify-center gap-2 pb-2 text-center">
-  <Expand
-    bind:isExpanded={filtersExpanded}
-    more="Show Filters"
-    less="Hide Filters"
-    iconLess={ICONS.filter}
-    iconMore={ICONS.filter}
+  <Expand bind:isExpanded={filtersExpanded} label="{ICONS.filter} Filters"
   ></Expand>
 
   {#if filtersExpanded}
     <div
       class="grid w-full grid-cols-12 items-end justify-center gap-4 px-2"
-      transition:slide
+      transition:safeSlide
     >
       <div class="col-span-12 w-full md:col-span-5">
         <SelectYarn

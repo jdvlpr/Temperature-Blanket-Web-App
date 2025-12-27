@@ -21,7 +21,7 @@ import {
   gauges,
   localState,
   locations,
-  modal,
+  dialog,
   previews,
   project,
   toast,
@@ -49,7 +49,7 @@ export const getProjectParametersFromURLHash = (hash) => {
 };
 
 export const downloadPDF = async () => {
-  modal.trigger({
+  dialog.trigger({
     type: 'choose-weather-params',
     response: async (response) => {
       if (response) {

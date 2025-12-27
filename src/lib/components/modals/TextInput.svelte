@@ -15,7 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
-  import { modal } from '$lib/state';
+  import { dialog } from '$lib/state';
 
   interface Props {
     value: string;
@@ -30,23 +30,23 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   function _onOkay() {
     onOkay(value);
-    modal.close();
+    dialog.close();
   }
 </script>
 
 <div
-  class="inline-flex flex-col items-center mx-auto justify-center w-full text-center p-4"
+  class="mx-auto inline-flex w-full flex-col items-center justify-center p-4 text-center"
 >
   <div>
     <label for={id} class="my-2"><h3>{@html title}</h3></label>
-    <p class="text-sm my-2">Hours:Minutes</p>
+    <p class="my-2 text-sm">Hours:Minutes</p>
 
     <div
-      class="flex flex-col gap-2 justify-center items-center my-2 w-fit mx-auto"
+      class="mx-auto my-2 flex w-fit flex-col items-center justify-center gap-2"
     >
       <input
         type="text"
-        class="w-fit grow input text-xl"
+        class="input w-fit grow text-xl"
         {id}
         {title}
         bind:value
@@ -56,7 +56,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <div class="my-4">
       <SaveAndCloseButtons
         onSave={_onOkay}
-        onClose={modal.close}
+        onClose={dialog.close}
         disabled={!value.includes(':')}
       />
     </div>

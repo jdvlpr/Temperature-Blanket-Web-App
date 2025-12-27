@@ -17,11 +17,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ChooseRangeDirection from '$lib/components/ChooseRangeDirection.svelte';
   import DaysInRange from '$lib/components/DaysInRange.svelte';
   import Expand from '$lib/components/Expand.svelte';
-  import Tooltip from '$lib/components/Tooltip.svelte';
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
   import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
   import StickyPart from '$lib/components/modals/StickyPart.svelte';
-  import { gauges, localState, modal, weather } from '$lib/state';
+  import { dialog, gauges, localState, weather } from '$lib/state';
+  import { safeSlide } from '$lib/transitions/safeSlide';
   import {
     displayNumber,
     getIncrement,
@@ -36,15 +36,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
     ChevronUpIcon,
     CogIcon,
     Icon,
-    InfoIcon,
     ListStartIcon,
     TriangleAlertIcon,
     WandIcon,
     WandSparklesIcon,
   } from '@lucide/svelte';
-  import { Segment } from '@skeletonlabs/skeleton-svelte';
+  import { SegmentedControl } from '@skeletonlabs/skeleton-svelte';
   import { onMount, tick } from 'svelte';
-  import { fade, slide } from 'svelte/transition';
+  import { fade } from 'svelte/transition';
   interface Props {
     onSave: any;
     index?: any;
@@ -153,7 +152,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       ranges: _gauge.ranges,
       rangeOptions: _gauge.rangeOptions,
     });
-    modal.close();
+    dialog.close();
   }
 
   function autoUpdateRanges() {
@@ -253,17 +252,32 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <span>Generate Ranges</span>
             </p>
 
-            <Segment
-              classes="flex-wrap gap-y-2 shadow-sm"
-              background="bg-surface-100 dark:bg-surface-900"
+            <SegmentedControl
               value={incrementMode}
               onValueChange={(e) => {
                 incrementMode = e.value;
               }}
             >
-              <Segment.Item value="auto">Automatic</Segment.Item>
-              <Segment.Item value="manual">Manual</Segment.Item>
-            </Segment>
+              <SegmentedControl.Control
+                class="bg-surface-100 dark:bg-surface-900 rounded-container bordern-none flex-wrap gap-y-2 shadow-sm"
+              >
+                <SegmentedControl.Indicator />
+                <SegmentedControl.Item value="auto">
+                  <SegmentedControl.ItemText
+                    title="Automatically Set the Gauge Values"
+                    >Automatic
+                  </SegmentedControl.ItemText>
+                  <SegmentedControl.ItemHiddenInput />
+                </SegmentedControl.Item>
+                <SegmentedControl.Item value="manual">
+                  <SegmentedControl.ItemText
+                    title="Manually Set the Gauge Values"
+                    >Manual</SegmentedControl.ItemText
+                  >
+                  <SegmentedControl.ItemHiddenInput />
+                </SegmentedControl.Item>
+              </SegmentedControl.Control>
+            </SegmentedControl>
 
             {#if !incrementMode}
               <p class="card bg-warning-300-700/80 mt-2 p-4 text-left">
@@ -303,57 +317,54 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         {/each}
                       </select>
                     </label>
-                    <p
+                    <div
                       class="card preset-tonal-success border-success-500 border p-4 text-left"
                     >
-                      <WandSparklesIcon class="inline" />
+                      <p>
+                        <WandSparklesIcon class="inline" />
 
-                      {#if _gauge.rangeOptions.auto.optimization === 'ranges'}
-                        Range increments are as even as possible.
-                      {:else}
-                        Ranges contain a similar number of days, based on the
-                        <span class="font-bold">
-                          {#if _gauge.rangeOptions.auto.optimization === 'tmax'}
-                            high
-                          {:else if _gauge.rangeOptions.auto.optimization === 'tavg'}
-                            average
-                          {:else if _gauge.rangeOptions.auto.optimization === 'tmin'}
-                            low
-                          {/if}
-                        </span>
-                        temperature of each {weather.grouping}.
-                      {/if}
-                      {#if _gauge.rangeOptions.auto.optimization === 'ranges'}
-                        Increment:
-                        {#if _gauge.rangeOptions.auto.roundIncrement && Math.floor(displayedIncrement) !== Math.ceil(displayedIncrement)}
-                          <span class="font-bold">
-                            {Math.floor(displayedIncrement)}</span
-                          >
-                          or
-                          <span class="font-bold"
-                            >{Math.ceil(displayedIncrement)}</span
-                          >
-                          {unitLabel}
+                        {#if _gauge.rangeOptions.auto.optimization === 'ranges'}
+                          Range increments are as even as possible.
                         {:else}
+                          Ranges contain a similar number of days, based on the
                           <span class="font-bold">
-                            {_gauge.rangeOptions.auto.roundIncrement
-                              ? Math.round(displayedIncrement)
-                              : displayNumber(displayedIncrement)}
+                            {#if _gauge.rangeOptions.auto.optimization === 'tmax'}
+                              high
+                            {:else if _gauge.rangeOptions.auto.optimization === 'tavg'}
+                              average
+                            {:else if _gauge.rangeOptions.auto.optimization === 'tmin'}
+                              low
+                            {/if}
                           </span>
-                          {unitLabel}
+                          temperature of each {weather.grouping}.
                         {/if}
+                        {#if _gauge.rangeOptions.auto.optimization === 'ranges'}
+                          Increment:
+                          {#if _gauge.rangeOptions.auto.roundIncrement && Math.floor(displayedIncrement) !== Math.ceil(displayedIncrement)}
+                            <span class="font-bold">
+                              {Math.floor(displayedIncrement)}</span
+                            >
+                            or
+                            <span class="font-bold"
+                              >{Math.ceil(displayedIncrement)}</span
+                            >
+                            {unitLabel}
+                          {:else}
+                            <span class="font-bold">
+                              {_gauge.rangeOptions.auto.roundIncrement
+                                ? Math.round(displayedIncrement)
+                                : displayNumber(displayedIncrement)}
+                            </span>
+                            {unitLabel}
+                          {/if}
 
-                        <Tooltip>
-                          <InfoIcon class="size-4" />
-                          {#snippet tooltip()}
-                            <p>
-                              This was calculated based on your weather data and
-                              the number of colors in this activeGauge.
-                            </p>
-                          {/snippet}
-                        </Tooltip>
-                      {/if}
-                    </p>
+                          <span class="block text-sm">
+                            This was calculated based on your weather data and
+                            the number of colors in this gauge.
+                          </span>
+                        {/if}
+                      </p>
+                    </div>
                   {/if}
 
                   {#if Math.floor(_gauge.rangeOptions.auto.increment) !== Math.ceil(_gauge.rangeOptions.auto.increment) && _gauge.rangeOptions.mode === 'auto'}
@@ -397,22 +408,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   <div class="tex-left flex w-fit flex-col items-start">
                     <label
                       for="startFrom"
-                      class="label flex flex-wrap items-center gap-2"
+                      class="label flex flex-wrap items-center"
                     >
                       <ListStartIcon class="size-4" />
                       Start From ({unitLabel})
-                      <Tooltip>
-                        <InfoIcon class="size-4" />
-                        {#snippet tooltip()}
-                          <p>
-                            This should usually be the
-                            {_gauge.rangeOptions.direction === 'high-to-low'
-                              ? 'highest'
-                              : 'lowest'}
-                            possible value from your weather data.
-                          </p>
-                        {/snippet}
-                      </Tooltip>
+                      <p class="text-sm">
+                        This should usually be the
+                        {_gauge.rangeOptions.direction === 'high-to-low'
+                          ? 'highest'
+                          : 'lowest'}
+                        possible value from your weather data.
+                      </p>
                     </label>
                     <input
                       id="startFrom"
@@ -440,13 +446,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <div class="mx-auto">
           <Expand
             bind:isExpanded={showAdvancedControls}
-            more="Advanced Controls"
-            less="Advanced Controls"
+            label="Advanced Controls"
           />
         </div>
         {#if showAdvancedControls}
           <div
-            transition:slide
+            transition:safeSlide
             class="rounded-container bg-surface-200 dark:bg-surface-800 flex w-full flex-col items-start justify-start gap-4 p-4 text-left"
           >
             <ToggleSwitch
@@ -466,21 +471,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   >
                     <CalculatorIcon class="size-4" />
                     Range Calculation Method:<span>{@html rangeExample}</span>
-                    <Tooltip>
-                      <InfoIcon class="size-4" />
-                      {#snippet tooltip()}
-                        <div>
-                          If you change this setting,
-                          <a
-                            href="/documentation/#range-calculation-methods"
-                            target="_blank"
-                            class="link"
-                            rel="noopener noreferrer"
-                            >make sure your ranges are set up correctly.</a
-                          >
-                        </div>
-                      {/snippet}
-                    </Tooltip>
+                    <p class="text-sm">
+                      If you change this setting,
+                      <a
+                        href="/documentation/#range-calculation-methods"
+                        target="_blank"
+                        class="link"
+                        rel="noopener noreferrer"
+                        >make sure your ranges are set up correctly.</a
+                      >
+                    </p>
                   </span>
 
                   <select
@@ -675,6 +675,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </button>
   {/if}
   <div class="pt-2 pb-2 max-sm:p-4">
-    <SaveAndCloseButtons onSave={_onSave} onClose={modal.close} />
+    <SaveAndCloseButtons onSave={_onSave} onClose={dialog.close} />
   </div>
 </StickyPart>

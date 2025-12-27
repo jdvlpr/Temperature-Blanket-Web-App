@@ -15,7 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import WeatherTable from '$lib/components/modals/WeatherTable.svelte';
-  import { modal, weather } from '$lib/state';
+  import { dialog, weather } from '$lib/state';
   import type {
     GaugeAttributes,
     GaugeRange,
@@ -23,7 +23,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '$lib/types';
   import { getDaysInRange, getDaysPercent, pluralize } from '$lib/utils';
 
-  let isModal = $derived(modal.opened);
+  let isModal = $derived(dialog.opened);
 
   type Props = {
     range: GaugeRange;
@@ -64,7 +64,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         disabled={!daysInRange?.length}
         class="btn hover:preset-tonal h-auto"
         onclick={() =>
-          modal.trigger({
+          dialog.trigger({
             type: 'component',
             component: {
               ref: WeatherTable,

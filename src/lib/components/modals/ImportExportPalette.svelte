@@ -19,7 +19,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Expand from '$lib/components/Expand.svelte';
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
   import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
-  import { modal, toast } from '$lib/state';
+  import { dialog, toast } from '$lib/state';
+  import { safeSlide } from '$lib/transitions/safeSlide';
   import {
     colorsToCode,
     colorsToYarnDetails,
@@ -35,13 +36,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
     FileCodeIcon,
     ImageIcon,
   } from '@lucide/svelte';
-  import { Segment } from '@skeletonlabs/skeleton-svelte';
+  import { SegmentedControl } from '@skeletonlabs/skeleton-svelte';
   import { onMount } from 'svelte';
-  import { slide } from 'svelte/transition';
 
   let { colors, updateGauge } = $props();
 
   let inputValue = $state('');
+
+  let textAreaInputElement = $state();
 
   let inputColors = $state([]);
 
@@ -102,9 +104,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     }),
   );
 
-  function triggerChange() {
-    if (inputValue === null || inputValue === '') return;
-    inputColors = getColorsFromInput({ string: inputValue }) || inputColors;
+  async function triggerChange() {
+    if (inputValue === null || inputValue === '') {
+      inputColors = [];
+      return;
+    }
+    inputColors = getColorsFromInput({ string: inputValue }) || [];
   }
 
   function getColorHexes({ palette, asArray, withHashes }) {
@@ -135,21 +140,34 @@ If not, see <https://www.gnu.org/licenses/>. -->
       });
     }
   }
+
+  onMount(() => {
+    includeHexInImage = !includeBrandInImage && !includeColorwayInImage;
+  });
 </script>
 
 <div class="p-4">
-  <div class="mb-4 flex w-full flex-col gap-1 text-left">
-    <Segment
-      classes="flex wrap gap-y-2 w-fit mx-auto shadow-sm"
-      background="bg-surface-200 dark:bg-surface-800"
+  <div class="mx-auto mb-4 flex w-fit flex-col gap-1 text-left">
+    <SegmentedControl
       value={segmentValue}
       onValueChange={(e) => {
         segmentValue = e.value;
       }}
     >
-      <Segment.Item value={'export'}>Export</Segment.Item>
-      <Segment.Item value={'import'}>Import</Segment.Item>
-    </Segment>
+      <SegmentedControl.Control
+        class="wrap bg-surface-200 dark:bg-surface-800 rounded-container mx-auto flex w-fit gap-y-2 border-none shadow-sm"
+      >
+        <SegmentedControl.Indicator />
+        <SegmentedControl.Item value={'export'}
+          ><SegmentedControl.ItemText>Export</SegmentedControl.ItemText>
+          <SegmentedControl.ItemHiddenInput /></SegmentedControl.Item
+        >
+        <SegmentedControl.Item value={'import'}>
+          <SegmentedControl.ItemText>Import</SegmentedControl.ItemText>
+          <SegmentedControl.ItemHiddenInput />
+        </SegmentedControl.Item>
+      </SegmentedControl.Control>
+    </SegmentedControl>
   </div>
 
   {#if segmentValue === 'import'}
@@ -157,25 +175,29 @@ If not, see <https://www.gnu.org/licenses/>. -->
       >Enter HTML colors, a palette code, or a project URL</label
     >
     <textarea
+      bind:this={textAreaInputElement}
       id="palette-code"
       class="textarea select-all"
       placeholder="e.g. red, FFA500, #ADD8E6"
       bind:value={inputValue}
       onkeyup={triggerChange}
       onchange={triggerChange}
+      onpaste={(e) => {
+        e.preventDefault();
+        const _tempInputValue = e.clipboardData?.getData('text');
+        inputValue = _tempInputValue || '';
+        triggerChange();
+        // textAreaInputElement.blur();
+      }}
     ></textarea>
 
     <div class="my-2 flex flex-col gap-2 text-left">
       <div class="m-auto">
-        <Expand
-          bind:isExpanded
-          more={'What can I enter above?'}
-          less={'What can I enter above?'}
-        />
+        <Expand bind:isExpanded label="What can I enter above?" />
       </div>
 
       {#if isExpanded}
-        <div in:slide out:slide>
+        <div transition:safeSlide>
           <p>
             • <a
               href="https://htmlcolorcodes.com/color-names/"
@@ -222,11 +244,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <SaveAndCloseButtons
             onSave={() => {
               updateGauge({ _colors: inputColors });
-              modal.close();
+              dialog.close();
             }}
             disabled={!inputColors.length}
             onClose={() => {
-              modal.close();
+              dialog.close();
             }}
           />
         </div>
@@ -234,7 +256,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {/if}
 
     {#if !inputColors.length && inputValue.length}
-      <p class="preset-tonal-error card p-4 text-center">Code not valid</p>
+      <div class="mt-4 h-[170px]">
+        <div
+          class="preset-tonal-error card flex h-[70px] items-center justify-center p-4 text-center"
+        >
+          <p>Code not valid</p>
+        </div>
+      </div>
     {/if}
   {:else if colors}
     <ColorPalette

@@ -154,6 +154,7 @@ const pdfWeatherData = {
       }
 
       doc.setFontSize(pdfConfig.font.micro);
+
       if (location.length > this.MINI_FONT_LOCATION_LENGTH) {
         if (location.length > this.MICRO_FONT_LOCATION_LENGTH) {
           location = location.slice(0, this.MICRO_FONT_LOCATION_LENGTH + 6);
@@ -162,7 +163,6 @@ const pdfWeatherData = {
 
       doc.text(location, this.headings[0].positionX + 10, line + 1);
 
-      // doc.text(location, this.headings[1].positionX, line);
       doc.setFontSize(pdfConfig.font.p);
 
       // Data
@@ -184,13 +184,7 @@ const pdfWeatherData = {
         pdfConfig.leftMargin - this.linePadding,
         line - this.LINE_HEIGHT - 2,
       );
-      // // Location
-      // doc.line(
-      //   this.headings[1].positionX - this.linePadding,
-      //   line + this.linePadding,
-      //   this.headings[1].positionX - this.linePadding,
-      //   line - this.LINE_HEIGHT - 2,
-      // );
+
       // End
       doc.line(
         this.xEnd,
@@ -229,7 +223,23 @@ const pdfWeatherData = {
 
     targets.forEach((target, i) => {
       const x = this.weatherDataPositionX + this.weatherDataColumnWidth * i;
-      doc.text(target.pdfHeader[localState.value.units], x, positionY);
+      let heading = target.pdfHeader[localState.value.units];
+      let unitLabel = '';
+      if (heading.includes('(')) {
+        const [title, label] = heading.split('(')
+        heading = title;
+        unitLabel = label.replace(')', '');
+      }
+      
+      doc.text(heading, x, positionY);
+      
+      if (unitLabel) {
+        doc.setFontSize(pdfConfig.font.micro);
+        const distance = 2 + (heading.length * 2);
+        doc.text(`(${unitLabel})`, x + distance, positionY);
+        doc.setFontSize(pdfConfig.font.p);
+      }
+
       doc.line(
         x - this.linePadding,
         yBottomLine,
