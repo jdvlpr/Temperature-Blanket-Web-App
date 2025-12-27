@@ -13,19 +13,22 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script>
+<script lang="ts">
   import NumberInputButton from '$lib/components/buttons/NumberInputButton.svelte';
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
   import ToggleSwitchGroup from '$lib/components/buttons/ToggleSwitchGroup.svelte';
   import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
   import PreviewInfo from '$lib/components/PreviewInfo.svelte';
-  import { rowsPreview } from '$lib/components/previews/rows/state.svelte';
+  import SeasonEditor from '$lib/components/previews/rows/SeasonEditor.svelte';
   import SpanYarnColorSelectIcon from '$lib/components/SpanYarnColorSelectIcon.svelte';
-  import { gauges, dialog, weather } from '$lib/state';
+  import { MONTH_NAMES } from '$lib/constants/seasons-constants';
+  import { dialog, gauges, localState, weather } from '$lib/state';
   import { capitalizeFirstLetter, pluralize } from '$lib/utils';
   import { PencilIcon } from '@lucide/svelte';
+  import { rowsPreview } from './state.svelte';
 
   let targets = $derived(gauges.allCreated.map((n) => n.targets).flat());
+  let seasons = $derived(localState.value.seasons);
 </script>
 
 <PreviewInfo previewTitle={rowsPreview.name}>
@@ -114,7 +117,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             ref: ChangeColor,
             props: {
               hex: rowsPreview.settings.extrasColor,
-              onChangeColor: ({ hex }) => {
+              onChangeColor: ({ hex }: any) => {
                 rowsPreview.settings.extrasColor = hex;
                 dialog.close();
               },
@@ -133,50 +136,48 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <ToggleSwitch
       label="Seasons"
       details="Use different weather parameters for different seasons"
-      checked={true}
+      checked={rowsPreview.settings.useSeasonTargets}
+      onchange={(e: Event) => {
+        const target = e.target as HTMLInputElement;
+        rowsPreview.settings.useSeasonTargets = target.checked;
+      }}
     />
   </div>
 
-  <button
-    class="btn hover:preset-tonal"
-    title="Edit which dates are which seasons"
-  >
-    <PencilIcon />
-    Edit Seasons
-  </button>
+  {#if rowsPreview.settings.useSeasonTargets}
+    <button
+      class="btn hover:preset-tonal"
+      title="Edit which dates are which seasons"
+      onclick={() => {
+        dialog.trigger({
+          type: 'component',
+          component: {
+            ref: SeasonEditor,
+            props: {
+              onClose: () => dialog.close(),
+            },
+          },
+        });
+      }}
+    >
+      <PencilIcon />
+      Edit Seasons
+    </button>
 
-  <div class="flex max-w-screen-md flex-wrap gap-4 text-left">
-    <div>
-      <p class="font-bold">Spring (March, April, May)</p>
-      <ToggleSwitchGroup
-        groupLabel={`Color Each Row Using the ${capitalizeFirstLetter(weather.grouping)}'s`}
-        {targets}
-        bind:value={rowsPreview.settings.selectedTargets}
-      />
+    <div class="flex max-w-screen-md flex-wrap gap-4 text-left">
+      {#each seasons as season, seasonIndex}
+        <div>
+          <p class="font-bold">
+            {season.label}
+            <span class="text-sm font-normal">({season.months.map((m) => MONTH_NAMES[m - 1]).join(', ')})</span>
+          </p>
+          <ToggleSwitchGroup
+            groupLabel={`Color Each Row Using the ${capitalizeFirstLetter(weather.grouping)}'s`}
+            {targets}
+            bind:value={rowsPreview.settings.seasonTargets[seasonIndex]}
+          />
+        </div>
+      {/each}
     </div>
-    <div>
-      <p class="font-bold">Summer (June, July, August)</p>
-      <ToggleSwitchGroup
-        groupLabel={`Color Each Row Using the ${capitalizeFirstLetter(weather.grouping)}'s`}
-        {targets}
-        bind:value={rowsPreview.settings.selectedTargets}
-      />
-    </div>
-    <div>
-      <p class="font-bold">Fall (September, October, November)</p>
-      <ToggleSwitchGroup
-        groupLabel={`Color Each Row Using the ${capitalizeFirstLetter(weather.grouping)}'s`}
-        {targets}
-        bind:value={rowsPreview.settings.selectedTargets}
-      />
-    </div>
-    <div>
-      <p class="font-bold">Winter (December, January, February)</p>
-      <ToggleSwitchGroup
-        groupLabel={`Color Each Row Using the ${capitalizeFirstLetter(weather.grouping)}'s`}
-        {targets}
-        bind:value={rowsPreview.settings.selectedTargets}
-      />
-    </div>
-  </div>
+  {/if}
 </div>

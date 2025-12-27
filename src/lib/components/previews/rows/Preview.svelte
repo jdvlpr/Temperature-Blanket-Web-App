@@ -14,7 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { rowsPreview } from '$lib/components/previews/rows/state.svelte';
+  import { rowsPreview } from './state.svelte';
   import Spinner from '$lib/components/Spinner.svelte';
   import { localState, weather } from '$lib/state';
   import {
@@ -34,8 +34,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     if (rowsPreview.settings.lengthTarget === 'custom')
       return rowsPreview.settings.stitchesPerDay;
     let value = Math.abs(
-      weather.data[dayIndex][rowsPreview.settings.lengthTarget][
-        localState.value.units
+      (weather.data[dayIndex] as any)[rowsPreview.settings.lengthTarget][
+        localState.value.units as any
       ],
     );
     if (isNaN(value)) value = rowsPreview.settings.stitchesPerDay;
@@ -49,9 +49,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     let stitchYRow = 0; // Current row position
     let isWeatherSection: boolean; // Flag indicating if it's a weather section
     let lineWidth: number; // Width of the current line
-    let remainderLineCount: number; // Count of remaining stitches in the line
+    let remainderLineCount = 0; // Count of remaining stitches in the line
     // Loop through each section
-    const sections = [];
+    const sections: any[] = [];
 
     for (
       let sectionIndex = 0, dayIndex = 0;
@@ -112,18 +112,27 @@ If not, see <https://www.gnu.org/licenses/>. -->
           let paramIndex = 0,
             y2 = stitchYRow,
             x = columnIndex * rowsPreview.stitchSize;
-          paramIndex < rowsPreview.settings.selectedTargets.length;
+          paramIndex < rowsPreview.activeSelectedTargets.length;
           paramIndex++, y2 += rowsPreview.stitchSize
         ) {
           let color: string;
 
           if (isWeatherSection) {
             // If it's a weather section, determine the color based on the weather value and gauge ID
-            let param = rowsPreview.settings.selectedTargets[paramIndex];
+            let param: any;
+            if (rowsPreview.settings.useSeasonTargets) {
+              // Use season-based targets for this day
+              const seasonTargets = rowsPreview.getTargetsForDay(dayIndex);
+              param = seasonTargets[paramIndex];
+            } else {
+              param = rowsPreview.activeSelectedTargets[paramIndex];
+            }
+            console.log({param});
             let value = getWeatherValue({ dayIndex, param });
 
             // Get the color based on the gauge ID and value
-            color = getColorInfo({ param, value }).hex;
+            const colorInfo = getColorInfo({ param, value });
+            color = colorInfo.hex || '#cccccc';
           } else {
             // If it's an additional stitches section, use the specified color
             color = rowsPreview.settings.extrasColor;
@@ -166,11 +175,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     viewBox="0 0 {width} {height}"
     bind:this={rowsPreview.svg}
     onclick={async (e) => {
-      if (e.target.tagName !== 'rect') return;
-      const group = e.target.parentElement;
-      if (group.tagName !== 'g') return;
+      const target = e.target as SVGRectElement | null;
+      if (!target || target.tagName !== 'rect') return;
+      const group = target.parentElement as SVGGElement | null;
+      if (!group || group.tagName !== 'g') return;
 
-      if (group.dataset.isweathersection === 'true') {
+      if (group.dataset.isweathersection === 'true' && group.dataset.dayindex !== undefined) {
         weather.currentIndex = +group.dataset.dayindex;
         showPreviewImageWeatherDetails(rowsPreview.targets);
       }

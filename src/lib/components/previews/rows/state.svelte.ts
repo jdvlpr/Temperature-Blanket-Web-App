@@ -1,5 +1,9 @@
 import { CHARACTERS_FOR_URL_HASH } from '$lib/constants';
-import { gauges, previews, weather } from '$lib/state';
+import {
+  DEFAULT_SEASONS,
+  getSeasonForMonth,
+} from '$lib/constants/seasons-constants';
+import { gauges, previews, weather, localState } from '$lib/state';
 import { displayNumber, setTargets, sum } from '$lib/utils';
 import chroma from 'chroma-js';
 import Preview from './Preview.svelte';
@@ -14,6 +18,12 @@ export class RowsPreviewClass {
           this.settings.selectedTargets = setTargets(
             this.settings.selectedTargets,
           );
+          // Also validate season targets
+          if (this.settings.useSeasonTargets) {
+            this.settings.seasonTargets = this.settings.seasonTargets.map(
+              (target) => setTargets(target) || target,
+            );
+          }
         }
       });
     });
@@ -28,9 +38,9 @@ export class RowsPreviewClass {
 
   name = 'Rows';
 
-  sections = $state([]);
+  sections = $state<any[]>([]);
 
-  svg = $state(null);
+  svg = $state<SVGSVGElement | null>(null);
 
   img = $state({
     light: './images/preview_icons/Rows.png',
@@ -54,6 +64,8 @@ export class RowsPreviewClass {
     stitchesPerDay: 300,
     lengthTarget: 'none',
     extrasColor: '#f0f3f3',
+    useSeasonTargets: false,
+    seasonTargets: [['tmax'], ['tmax'], ['tmax'], ['tmax']], // [spring, summer, fall, winter]
   });
 
   // *******************
@@ -69,10 +81,17 @@ export class RowsPreviewClass {
 
   rows = $derived(Math.ceil(this.totalStitches / this.settings.stitchesPerRow));
 
+  // Get the target IDs to use for rendering
+  activeSelectedTargets = $derived(
+    this.settings.useSeasonTargets
+      ? this.settings.seasonTargets.flat()
+      : this.settings.selectedTargets,
+  );
+
   width = $derived(this.settings.stitchesPerRow * this.stitchSize);
 
   height = $derived(
-    this.rows * this.stitchSize * this.settings.selectedTargets.length,
+    this.rows * this.stitchSize * this.activeSelectedTargets.length,
   );
 
   countOfAdditionalStitches = $derived(
@@ -91,10 +110,10 @@ export class RowsPreviewClass {
   targets = $derived(
     gauges.allCreated
       .flatMap((n) => n.targets)
-      .filter((n) => this.settings.selectedTargets.includes(n.id)),
+      .filter((n) => this.activeSelectedTargets.includes(n.id)),
   );
 
-  totalRows = $derived(this.rows * this.settings.selectedTargets.length);
+  totalRows = $derived(this.rows * this.activeSelectedTargets.length);
 
   // *******************
   // URL hash derived from settings
@@ -102,9 +121,13 @@ export class RowsPreviewClass {
   hash = $derived.by(() => {
     let hash = '&';
     hash += `${this.id}=`;
-    hash += `${this.settings.selectedTargets.join('')}`;
+    hash += `${this.activeSelectedTargets.join('')}`;
     hash += '(';
     hash += this.settings.stitchesPerRow;
+    // Add season targets if enabled
+    if (this.settings.useSeasonTargets) {
+      hash += `${CHARACTERS_FOR_URL_HASH.separator}${this.settings.seasonTargets.map((t) => t.join('')).join(CHARACTERS_FOR_URL_HASH.separator)}`;
+    }
     // here's the rub...
     if (
       this.countOfAdditionalStitches > 0 &&
@@ -122,9 +145,12 @@ export class RowsPreviewClass {
   // *******************
   // Method for loading settings from a url hash string
   // *******************
-  load(hash) {
+  load(hash: string) {
     // Initialize variables
-    let startIndex, separatorIndex, exclamationIndex, lengthEndIndex;
+    let startIndex: number | undefined,
+      separatorIndex: number | undefined,
+      exclamationIndex: number | undefined,
+      lengthEndIndex: number | undefined;
 
     // Iterate through the hash string to find the indices of specific characters
     for (let i = 0; i < hash.length; i++) {
@@ -139,15 +165,17 @@ export class RowsPreviewClass {
     }
 
     // If the format of the hash is incorrect, stop processing
-    if (!startIndex || !lengthEndIndex) return;
+    if (startIndex === undefined || lengthEndIndex === undefined) return;
 
     // Extract the targets from the hash and update the settings
-    let targets = hash.substring(0, startIndex);
-    targets = targets.match(/.{1,4}/g);
-    this.settings.selectedTargets = targets;
+    let targetsStr = hash.substring(0, startIndex);
+    const targetsMatch = targetsStr.match(/.{1,4}/g);
+    if (targetsMatch) {
+      this.settings.selectedTargets = targetsMatch;
+    }
 
     // Extract the stitches per row from the hash and update the settings
-    let stitchesPerRow;
+    let stitchesPerRow: number | undefined;
     if (separatorIndex) {
       stitchesPerRow = +hash.substring(startIndex + 1, separatorIndex);
     } else if (exclamationIndex) {
@@ -155,7 +183,45 @@ export class RowsPreviewClass {
     } else if (lengthEndIndex) {
       stitchesPerRow = +hash.substring(startIndex + 1, lengthEndIndex);
     }
-    this.settings.stitchesPerRow = stitchesPerRow;
+    if (stitchesPerRow !== undefined)
+      this.settings.stitchesPerRow = stitchesPerRow;
+
+    // Extract season targets if they exist (between first and potential second separator)
+    let secondSeparatorIndex = -1;
+    let firstSeparatorAfterParen = separatorIndex;
+    if (separatorIndex !== undefined) {
+      for (let i = separatorIndex + 1; i < hash.length; i++) {
+        if (
+          hash[i] === CHARACTERS_FOR_URL_HASH.separator ||
+          hash[i] == CHARACTERS_FOR_URL_HASH.separator_alt
+        ) {
+          secondSeparatorIndex = i;
+          break;
+        }
+      }
+    }
+
+    // Check if we have season targets
+    if (
+      firstSeparatorAfterParen !== undefined &&
+      secondSeparatorIndex > firstSeparatorAfterParen
+    ) {
+      const seasonTargetsStr = hash.substring(
+        firstSeparatorAfterParen + 1,
+        secondSeparatorIndex,
+      );
+      const seasonTargets = seasonTargetsStr.split(
+        CHARACTERS_FOR_URL_HASH.separator,
+      );
+      if (seasonTargets && seasonTargets.length === 4) {
+        this.settings.useSeasonTargets = true;
+        this.settings.seasonTargets = seasonTargets.map(
+          (t) => t.match(/.{1,4}/g) || [],
+        );
+        // Update separator index to the second one for color extraction
+        separatorIndex = secondSeparatorIndex;
+      }
+    }
 
     // Extract the color from the hash and update the settings
     let color = '';
@@ -178,6 +244,45 @@ export class RowsPreviewClass {
 
     // Update active preview
     previews.activeId = this.id;
+  }
+
+  /**
+   * Get the target for a specific day index based on season
+   */
+  getTargetsForDay(dayIndex: number): string[] {
+    if (!this.settings.useSeasonTargets) {
+      return this.settings.selectedTargets;
+    }
+
+    const date = weather.data?.[dayIndex]?.date;
+    if (!date) return this.settings.selectedTargets;
+
+    const month = new Date(date).getMonth() + 1; // getMonth returns 0-11
+    const season = getSeasonForMonth(month, localState.value.seasons);
+
+    if (!season) return this.settings.selectedTargets;
+
+    // Find the index by matching against DEFAULT_SEASONS
+    // Use a simple index approach - the order is always: spring (0), summer (1), fall (2), winter (3)
+    let seasonIndex = 0;
+    const userSeasons = localState.value.seasons;
+    for (let i = 0; i < userSeasons.length; i++) {
+      const userSeason = userSeasons[i];
+      const defaultSeason = DEFAULT_SEASONS[i];
+      // Match by comparing the month arrays
+      if (
+        userSeason &&
+        defaultSeason &&
+        JSON.stringify(userSeason['months']) ===
+          JSON.stringify(defaultSeason['months'])
+      ) {
+        seasonIndex = i;
+        break;
+      }
+    }
+    return (
+      this.settings.seasonTargets[seasonIndex] || this.settings.selectedTargets
+    );
   }
 }
 

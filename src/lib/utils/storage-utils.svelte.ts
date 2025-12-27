@@ -15,6 +15,7 @@
 
 import { browser } from '$app/environment';
 import { skeletonThemes } from '$lib/components/ThemeSwitcher.svelte';
+import { DEFAULT_SEASONS } from '$lib/constants/seasons-constants';
 import { localState, locations, project, weather } from '$lib/state';
 import type {
   PageLayout,
@@ -69,6 +70,10 @@ export function initializeLocalStorage() {
 
   localState.value.theme.id = localState.value.theme.id || 'classic';
   localState.value.theme.mode = localState.value.theme.mode || 'system';
+
+  localState.value.seasons = localState.value.seasons || DEFAULT_SEASONS;
+
+  console.log(localState.value.seasons);
 
   // ****************
   // Setup Theme Listeners

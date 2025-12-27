@@ -1,4 +1,12 @@
 import type { PageLayout, Unit } from '$lib/types';
+import { DEFAULT_SEASONS } from '$lib/constants/seasons-constants';
+
+// Season configuration type
+type SeasonConfig = {
+  id: string;
+  label: string;
+  months: number[];
+};
 
 // User preferences for the web app stored in local storage
 type LocalStateType = {
@@ -9,6 +17,7 @@ type LocalStateType = {
   };
   layout: PageLayout;
   units: Unit | null;
+  seasons: SeasonConfig[];
 };
 
 export const localState = persistedState<LocalStateType>('preferences', {
@@ -19,6 +28,7 @@ export const localState = persistedState<LocalStateType>('preferences', {
   },
   layout: 'list',
   units: null,
+  seasons: DEFAULT_SEASONS,
 });
 
 // The following persisted state functionality was copied from: https://github.com/oMaN-Rod/svelte-persisted-state/blob/main/src/lib/index.svelte.ts
