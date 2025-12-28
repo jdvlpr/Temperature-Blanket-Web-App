@@ -14,8 +14,11 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { localState } from '$lib/state';
+  import CloseButton from '$lib/components/modals/CloseButton.svelte';
+  import StickyPart from '$lib/components/modals/StickyPart.svelte';
   import { DEFAULT_SEASONS, MONTH_NAMES } from '$lib/constants/seasons-constants';
+  import { localState } from '$lib/state';
+  import { CheckIcon, RotateCwIcon } from '@lucide/svelte';
 
   let { onClose } = $props();
 
@@ -29,6 +32,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
     if (season['months'].includes(month)) {
       season['months'] = season['months'].filter((m: number) => m !== month);
     } else {
+      // Remove from other seasons
+      editingSeasons.forEach((s: any, index: number) => {
+        if (index !== seasonIndex && s['months'].includes(month)) {
+          s['months'] = s['months'].filter((m: number) => m !== month);
+        }
+      });
+
       season['months'].push(month);
       season['months'].sort((a: number, b: number) => a - b);
     }
@@ -44,19 +54,28 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 </script>
 
-<div class="flex flex-col gap-4 p-6">
-  <h2 class="text-2xl font-bold">Edit Seasons</h2>
-  <p class="text-sm">Click months to toggle them between seasons</p>
+<div class="flex flex-col gap-4 p-2 sm:p-4 w-full items-start sm:min-w-[39rem]">
+  <div class="">
+    <h2 class="text-2xl font-bold">Edit Seasons</h2>
+    <p class="text-sm">Click months to toggle them between seasons</p>
+  </div>
 
-  <div class="space-y-6">
+  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 w-full">
     {#each editingSeasons as season, seasonIndex (seasonIndex)}
       <div class="space-y-2">
-        <h3 class="font-semibold">{season['label']}</h3>
+        <div>
+          <p class="font-semibold">{season['label']}</p>
+          <p class="text-xs">
+            {season['months'].length > 0
+              ? season['months'].map((m: number) => MONTH_NAMES[m - 1]).join(', ')
+              : 'No months selected'}
+          </p>
+        </div>
         <div class="grid grid-cols-3 gap-2">
           {#each Array.from({ length: 12 }, (_, i) => i + 1) as month}
             <button
               class="rounded px-3 py-2 text-sm transition-colors"
-              class:preset-tonal={season['months'].includes(month)}
+              class:preset-filled-secondary-400-600={season['months'].includes(month)}
               class:preset-outlined-surface-300-700={!season['months'].includes(
                 month,
               )}
@@ -69,19 +88,25 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </button>
           {/each}
         </div>
-        <p class="text-xs">
-          {season['months'].length > 0
-            ? season['months'].map((m: number) => MONTH_NAMES[m - 1]).join(', ')
-            : 'No months selected'}
-        </p>
       </div>
     {/each}
   </div>
 
-  <div class="mt-4 flex gap-2">
-    <button class="btn hover:preset-tonal" onclick={resetToDefaults}>
-      Reset to Defaults
-    </button>
-    <button class="btn preset-filled" onclick={saveChanges}>Save Changes</button>
-  </div>
+  <button class="btn hover:preset-tonal mx-auto w-fit" onclick={resetToDefaults}>
+    <RotateCwIcon />
+    Reset to Defaults
+  </button>
 </div>
+
+<StickyPart position="bottom">
+  <div class="flex gap-2 p-2 py-4 w-full flex-wrap items-center justify-center">
+    <CloseButton {onClose} text="Cancel" />
+    <button
+      class="btn preset-filled-primary-500"
+      onclick={saveChanges}
+    >
+      <CheckIcon />
+      Save Changes
+    </button>
+  </div>
+</StickyPart>

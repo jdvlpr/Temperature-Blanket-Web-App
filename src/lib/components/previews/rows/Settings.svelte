@@ -71,11 +71,60 @@ If not, see <https://www.gnu.org/licenses/>. -->
 >
   <p class="text-2xl font-bold">Settings</p>
 
-  <ToggleSwitchGroup
-    groupLabel={`Color Each Row Using the ${capitalizeFirstLetter(weather.grouping)}'s`}
-    {targets}
-    bind:value={rowsPreview.settings.selectedTargets}
+  <ToggleSwitch
+    label="Seasons <span class='badge variant-filled-surface ml-2'>Beta</span>"
+    details="Use different weather parameters for different seasons"
+    checked={rowsPreview.settings.useSeasonTargets}
+    onchange={(e: Event) => {
+      const target = e.target as HTMLInputElement;
+      rowsPreview.settings.useSeasonTargets = target.checked;
+    }}
   />
+
+  {#if !rowsPreview.settings.useSeasonTargets}
+    <ToggleSwitchGroup
+      groupLabel={`Color Each Row Using the ${capitalizeFirstLetter(weather.grouping)}'s`}
+      {targets}
+      bind:value={rowsPreview.settings.selectedTargets}
+    />
+  {:else}
+
+
+    <div class="flex max-w-screen-md flex-wrap gap-4 text-left">
+      {#each seasons as season, seasonIndex}
+        <div class="flex flex-col gap-2 items-start">
+          <button
+            class="btn hover:preset-tonal font-bold"
+            title="Edit Seasons"
+            onclick={() => {
+              dialog.trigger({
+                type: 'component',
+                component: {
+                  ref: SeasonEditor,
+                  props: {
+                    onClose: () => dialog.close(),
+                  },
+                },
+              });
+            }}
+          >
+            {season.label}
+            <span class="text-sm font-normal">
+              {#if season.months.length > 0}
+                ({season.months.map((m) => MONTH_NAMES[m - 1]).join(', ')})
+              {/if}
+            </span>
+            <PencilIcon size={16} />
+          </button>
+          <ToggleSwitchGroup
+            groupLabel={`Color Each Row Using the ${capitalizeFirstLetter(weather.grouping)}'s`}
+            {targets}
+            bind:value={rowsPreview.settings.seasonTargets[seasonIndex]}
+          />
+        </div>
+      {/each}
+    </div>
+  {/if}
 
   <NumberInputButton
     bind:value={rowsPreview.settings.stitchesPerRow}
@@ -128,56 +177,5 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <SpanYarnColorSelectIcon color={rowsPreview.settings.extrasColor} />
       Color of Additional Stitches
     </button>
-  {/if}
-</div>
-
-<div class="flex w-full flex-col gap-2">
-  <div class="w-fit">
-    <ToggleSwitch
-      label="Seasons"
-      details="Use different weather parameters for different seasons"
-      checked={rowsPreview.settings.useSeasonTargets}
-      onchange={(e: Event) => {
-        const target = e.target as HTMLInputElement;
-        rowsPreview.settings.useSeasonTargets = target.checked;
-      }}
-    />
-  </div>
-
-  {#if rowsPreview.settings.useSeasonTargets}
-    <button
-      class="btn hover:preset-tonal"
-      title="Edit which dates are which seasons"
-      onclick={() => {
-        dialog.trigger({
-          type: 'component',
-          component: {
-            ref: SeasonEditor,
-            props: {
-              onClose: () => dialog.close(),
-            },
-          },
-        });
-      }}
-    >
-      <PencilIcon />
-      Edit Seasons
-    </button>
-
-    <div class="flex max-w-screen-md flex-wrap gap-4 text-left">
-      {#each seasons as season, seasonIndex}
-        <div>
-          <p class="font-bold">
-            {season.label}
-            <span class="text-sm font-normal">({season.months.map((m) => MONTH_NAMES[m - 1]).join(', ')})</span>
-          </p>
-          <ToggleSwitchGroup
-            groupLabel={`Color Each Row Using the ${capitalizeFirstLetter(weather.grouping)}'s`}
-            {targets}
-            bind:value={rowsPreview.settings.seasonTargets[seasonIndex]}
-          />
-        </div>
-      {/each}
-    </div>
   {/if}
 </div>
