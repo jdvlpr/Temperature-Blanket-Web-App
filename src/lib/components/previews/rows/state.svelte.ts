@@ -265,26 +265,16 @@ export class RowsPreviewClass {
   );
 
   totalRows = $derived.by(() => {
-    if (!weather.data) return 0;
-
-    // If not using season targets, we can use the simpler calculation
-    // But to be safe and consistent with "stitches per day" logic, iteration is robust
-    // optimizing for the common case:
-    if (
-      !this.settings.useSeasonTargets &&
-      this.settings.lengthTarget === 'none'
-    ) {
-      return (weather.data.length || 0) * this.settings.selectedTargets.length;
-    }
-
-    let count = 0;
+    if (!this.settings.useSeasonTargets)
+      return this.rows * this.settings.selectedTargets.length;
+    let rowCount = 0;
     for (let i = 0; i < weather.data.length; i++) {
       const targets = this.getTargetsForDay(i);
       const dayStitches = this.getSectionStitchesCount(i);
       const dayRows = Math.ceil(dayStitches / this.settings.stitchesPerRow);
-      count += dayRows * targets.length;
+      rowCount += dayRows * targets.length;
     }
-    return count;
+    return rowCount;
   });
 
   // *******************
@@ -293,14 +283,18 @@ export class RowsPreviewClass {
   hash = $derived.by(() => {
     let hash = '&';
     hash += `${this.id}=`;
-    hash += `${this.settings.selectedTargets.join('')}`;
+    // Add the targets to the hash
+    if (!this.settings.useSeasonTargets)
+      hash += `${this.settings.selectedTargets.join('')}`;
+    // Or add the season targets if used
+    else
+      hash += this.settings.seasonTargets
+        .map((t) => t.join(''))
+        .join(CHARACTERS_FOR_URL_HASH.separator);
     hash += '(';
     hash += this.settings.stitchesPerRow;
-    // Add season targets if enabled
-    if (this.settings.useSeasonTargets) {
-      hash += `${CHARACTERS_FOR_URL_HASH.separator}${this.settings.seasonTargets.map((t) => t.join('')).join(CHARACTERS_FOR_URL_HASH.separator)}`;
-    }
-    // here's the rub...
+
+    // Add the other settings to the hash
     if (
       this.countOfAdditionalStitches > 0 &&
       this.settings.lengthTarget !== 'none'
@@ -327,11 +321,15 @@ export class RowsPreviewClass {
     // Iterate through the hash string to find the indices of specific characters
     for (let i = 0; i < hash.length; i++) {
       if (hash[i] === '(') startIndex = i;
-      if (
-        hash[i] === CHARACTERS_FOR_URL_HASH.separator ||
-        hash[i] == CHARACTERS_FOR_URL_HASH.separator_alt
-      )
-        separatorIndex = i;
+      if (startIndex && startIndex > i) {
+        // Only look for separators after the opening parenthesis
+        // Separators may be present before if using season targets
+        if (
+          hash[i] === CHARACTERS_FOR_URL_HASH.separator ||
+          hash[i] == CHARACTERS_FOR_URL_HASH.separator_alt
+        )
+          separatorIndex = i;
+      }
       if (hash[i] === '!') exclamationIndex = i;
       if (hash[i] === ')') lengthEndIndex = i;
     }
@@ -339,11 +337,39 @@ export class RowsPreviewClass {
     // If the format of the hash is incorrect, stop processing
     if (startIndex === undefined || lengthEndIndex === undefined) return;
 
-    // Extract the targets from the hash and update the settings
+    // Extract the targets from the hash
     let targetsStr = hash.substring(0, startIndex);
-    const targetsMatch = targetsStr.match(/.{1,4}/g);
-    if (targetsMatch) {
-      this.settings.selectedTargets = targetsMatch;
+
+    if (
+      targetsStr.includes(CHARACTERS_FOR_URL_HASH.separator) ||
+      targetsStr.includes(CHARACTERS_FOR_URL_HASH.separator_alt)
+    ) {
+      // Season targets are being used
+      let seasonsTargets: string[] | string[][] = [];
+      if (targetsStr.includes(CHARACTERS_FOR_URL_HASH.separator))
+        seasonsTargets = targetsStr.split(CHARACTERS_FOR_URL_HASH.separator);
+      if (targetsStr.includes(CHARACTERS_FOR_URL_HASH.separator_alt))
+        seasonsTargets = targetsStr.split(
+          CHARACTERS_FOR_URL_HASH.separator_alt,
+        );
+
+      seasonsTargets = seasonsTargets.map((seasonTargetStr) => {
+        const targetsMatch = seasonTargetStr.match(/.{1,4}/g);
+        if (targetsMatch) return targetsMatch;
+        return [];
+      });
+
+      if (seasonsTargets && seasonsTargets.length === DEFAULT_SEASONS.length) {
+        // if there are valid season targets, update the settings
+        this.settings.useSeasonTargets = true;
+        this.settings.seasonTargets = seasonsTargets as string[][];
+      }
+    } else {
+      // Season targets are not being used, so extract targets every four characters
+      const targetsMatch = targetsStr.match(/.{1,4}/g);
+      if (targetsMatch) {
+        this.settings.selectedTargets = targetsMatch;
+      }
     }
 
     // Extract the stitches per row from the hash and update the settings
@@ -357,43 +383,6 @@ export class RowsPreviewClass {
     }
     if (stitchesPerRow !== undefined)
       this.settings.stitchesPerRow = stitchesPerRow;
-
-    // Extract season targets if they exist (between first and potential second separator)
-    let secondSeparatorIndex = -1;
-    let firstSeparatorAfterParen = separatorIndex;
-    if (separatorIndex !== undefined) {
-      for (let i = separatorIndex + 1; i < hash.length; i++) {
-        if (
-          hash[i] === CHARACTERS_FOR_URL_HASH.separator ||
-          hash[i] == CHARACTERS_FOR_URL_HASH.separator_alt
-        ) {
-          secondSeparatorIndex = i;
-          break;
-        }
-      }
-    }
-
-    // Check if we have season targets
-    if (
-      firstSeparatorAfterParen !== undefined &&
-      secondSeparatorIndex > firstSeparatorAfterParen
-    ) {
-      const seasonTargetsStr = hash.substring(
-        firstSeparatorAfterParen + 1,
-        secondSeparatorIndex,
-      );
-      const seasonTargets = seasonTargetsStr.split(
-        CHARACTERS_FOR_URL_HASH.separator,
-      );
-      if (seasonTargets && seasonTargets.length === 4) {
-        this.settings.useSeasonTargets = true;
-        this.settings.seasonTargets = seasonTargets.map(
-          (t) => t.match(/.{1,4}/g) || [],
-        );
-        // Update separator index to the second one for color extraction
-        separatorIndex = secondSeparatorIndex;
-      }
-    }
 
     // Extract the color from the hash and update the settings
     let color = '';
