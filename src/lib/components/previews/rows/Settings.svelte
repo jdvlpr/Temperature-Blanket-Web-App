@@ -71,15 +71,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
 >
   <p class="text-2xl font-bold">Settings</p>
 
-  <ToggleSwitch
-    label="Seasons <span class='badge variant-filled-surface ml-2'>Beta</span>"
-    details="Use different weather parameters for different seasons"
-    checked={rowsPreview.settings.useSeasonTargets}
-    onchange={(e: Event) => {
-      const target = e.target as HTMLInputElement;
-      rowsPreview.settings.useSeasonTargets = target.checked;
-    }}
-  />
+  <div class="w-fit">
+    <ToggleSwitch
+      label="Seasons <span class='badge bg-tertiary-100-900'>Beta</span>"
+      details="Use different weather parameters for different months"
+      checked={rowsPreview.settings.useSeasonTargets}
+      onchange={(e: Event) => {
+        const target = e.target as HTMLInputElement;
+        rowsPreview.settings.useSeasonTargets = target.checked;
+      }}
+    />
+  </div>
 
   {#if !rowsPreview.settings.useSeasonTargets}
     <ToggleSwitchGroup
@@ -88,42 +90,42 @@ If not, see <https://www.gnu.org/licenses/>. -->
       bind:value={rowsPreview.settings.selectedTargets}
     />
   {:else}
-
-
-    <div class="flex max-w-screen-md flex-wrap gap-4 text-left">
-      {#each seasons as season, seasonIndex}
-        <div class="flex flex-col gap-2 items-start">
-          <button
-            class="btn hover:preset-tonal font-bold"
-            title="Edit Seasons"
-            onclick={() => {
-              dialog.trigger({
-                type: 'component',
-                component: {
-                  ref: SeasonEditor,
-                  props: {
-                    onClose: () => dialog.close(),
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
+        {#each seasons as season, seasonIndex}
+          <div class="flex flex-col gap-2 items-start max-w-sm">
+            <button
+              class="btn hover:preset-tonal font-bold w-fit whitespace-pre-wrap gap-1" 
+              title="Edit Seasons"
+              onclick={() => {
+                dialog.trigger({
+                  type: 'component',
+                  component: {
+                    ref: SeasonEditor,
+                    props: {
+                      onClose: () => dialog.close(),
+                    },
                   },
-                },
-              });
-            }}
-          >
-            {season.label}
-            <span class="text-sm font-normal">
-              {#if season.months.length > 0}
-                ({season.months.map((m) => MONTH_NAMES[m - 1]).join(', ')})
-              {/if}
-            </span>
-            <PencilIcon size={16} />
-          </button>
-          <ToggleSwitchGroup
-            groupLabel={`Color Each Row Using the ${capitalizeFirstLetter(weather.grouping)}'s`}
-            {targets}
-            bind:value={rowsPreview.settings.seasonTargets[seasonIndex]}
-          />
-        </div>
-      {/each}
-    </div>
+                });
+              }}
+            >
+              {season.label}
+              <span class="text-sm font-normal">
+                ({#if season.months.length > 0}
+                  {season.months.map((m) => MONTH_NAMES[m - 1]).join(', ')}
+                {:else}
+                  No months assigned
+                {/if})
+              </span>
+              <PencilIcon size={16} />
+            </button>
+            <ToggleSwitchGroup
+              groupLabel={`Color Each Row Using the ${capitalizeFirstLetter(weather.grouping)}'s`}
+              {targets}
+              bind:value={rowsPreview.settings.seasonTargets[seasonIndex]}
+            />
+          </div>
+        {/each}
+      </div>
   {/if}
 
   <NumberInputButton

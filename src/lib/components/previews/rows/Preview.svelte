@@ -14,12 +14,12 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { rowsPreview } from './state.svelte';
   import Spinner from '$lib/components/Spinner.svelte';
-  import { localState, weather } from '$lib/state';
+  import { weather } from '$lib/state';
   import {
     showPreviewImageWeatherDetails,
   } from '$lib/utils';
+  import { rowsPreview } from './state.svelte';
 
 </script>
 

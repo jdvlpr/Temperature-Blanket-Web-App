@@ -73,19 +73,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </div>
         <div class="grid grid-cols-3 gap-2">
           {#each Array.from({ length: 12 }, (_, i) => i + 1) as month}
-            <button
-              class="rounded px-3 py-2 text-sm transition-colors"
-              class:preset-filled-secondary-400-600={season['months'].includes(month)}
-              class:preset-outlined-surface-300-700={!season['months'].includes(
-                month,
-              )}
-              onclick={() => toggleMonth(seasonIndex, month)}
-              title={season['months'].includes(month)
-                ? `Remove ${MONTH_NAMES[month - 1]} from ${season['label']}`
-                : `Add ${MONTH_NAMES[month - 1]} to ${season['label']}`}
-            >
-              {MONTH_NAMES[month - 1].substring(0, 3)}
-            </button>
+              <button
+                class={[
+                  "rounded px-3 py-2 text-sm transition-colors",
+                  season['months'].includes(month)
+                    ? "preset-filled-secondary-400-600 base-font-color-dark"
+                    : (!editingSeasons.some((s: any) => s['months'].includes(month))
+                        ? "preset-outlined-warning-300-700"
+                        : "preset-outlined-surface-300-700"),
+                ]}
+                onclick={() => toggleMonth(seasonIndex, month)}
+                title={season['months'].includes(month)
+                  ? `Remove ${MONTH_NAMES[month - 1]} from ${season['label']}`
+                  : `Add ${MONTH_NAMES[month - 1]} to ${season['label']}`}
+              >
+                {MONTH_NAMES[month - 1].substring(0, 3)}
+              </button>
           {/each}
         </div>
       </div>
