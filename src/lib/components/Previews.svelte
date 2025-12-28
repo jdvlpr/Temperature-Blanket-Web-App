@@ -62,6 +62,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 <div class="mx-auto text-center">
                   <WeatherDetails
                     weatherTargets={previewWeatherTargets.value}
+                    getTargets={previewWeatherTargets.getter}
                   />
                 </div>
               </div>

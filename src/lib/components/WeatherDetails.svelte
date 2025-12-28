@@ -25,6 +25,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     getColorInfo,
     getIsRecentDate,
   } from '$lib/utils';
+  import type { WeatherParam } from '$lib/types';
   import { getTextColor } from '$lib/utils/color-utils';
   import { CircleArrowLeftIcon, CircleArrowRightIcon } from '@lucide/svelte';
 
@@ -32,6 +33,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     data = weather.data || [],
     viewGaugeInfo = $bindable(true),
     weatherTargets,
+    getTargets,
+  }: {
+    data?: any[];
+    viewGaugeInfo?: boolean;
+    weatherTargets: WeatherParam[];
+    getTargets?: (index: number) => WeatherParam[];
   } = $props();
 
   let rangeInput = $state();
@@ -61,10 +68,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 
   let isRecentDate = $derived(getIsRecentDate(day?.date));
+
+  let currentWeatherTargets = $derived(
+    getTargets ? getTargets(weather.currentIndex) : weatherTargets,
+  );
 </script>
 
 <div
-  class="inline-block w-full overflow-x-hidden text-center outline-hidden"
+  class="inline-block w-full overflow-x-hidden text-center outline-hidden sm:w-[38rem]"
   bind:this={navigatorElement}
 >
   <div class="text-lg font-semibold">
@@ -123,7 +134,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {#key weather.currentIndex}
     <div class="weather-details">
       <div class="my-2 flex flex-wrap items-start justify-center gap-x-4">
-        {#each weatherTargets as { id, label, icon, type }}
+        {#each currentWeatherTargets as { id, label, icon, type }}
           {@const { name, hex, index, gaugeLength, brandName, yarnName } =
             colorInfo(id, day)}
           {@const value =

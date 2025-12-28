@@ -26,8 +26,12 @@ import {
 import type { WeatherDay, WeatherParam } from '$lib/types';
 import { exists, getTargetParentGaugeId } from '$lib/utils';
 
-export const showPreviewImageWeatherDetails = (targets) => {
+export const showPreviewImageWeatherDetails = (
+  targets: WeatherParam[],
+  getTargets?: (index: number) => WeatherParam[],
+) => {
   previewWeatherTargets.value = targets;
+  previewWeatherTargets.getter = getTargets;
 
   if (isDesktop.current) {
     dialog.trigger({
@@ -36,6 +40,7 @@ export const showPreviewImageWeatherDetails = (targets) => {
         ref: WeatherDetails,
         props: {
           weatherTargets: targets,
+          getTargets,
         },
       },
     });

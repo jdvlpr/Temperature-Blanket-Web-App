@@ -14,6 +14,7 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { calendarPreview } from '$lib/components/previews/calendar/state.svelte';
+import type { WeatherParam } from '$lib/types';
 import { chevronsPreview } from '$lib/components/previews/chevrons/state.svelte';
 import { continuousSquarePreview } from '$lib/components/previews/continuous-square/state.svelte';
 import { cornerToCornerPreview } from '$lib/components/previews/corner-to-corner/state.svelte';
@@ -26,7 +27,10 @@ import { splitMonthSquaresPreview } from '$lib/components/previews/split-month-s
 import { squareRoundsPreview } from '$lib/components/previews/square-rounds/state.svelte';
 import { squaresPreview } from '$lib/components/previews/squares/state.svelte';
 
-export const previewWeatherTargets = $state({ value: [] });
+export const previewWeatherTargets = $state({
+  value: [] as WeatherParam[],
+  getter: undefined as ((index: number) => WeatherParam[]) | undefined,
+});
 
 class PreviewsState {
   all = $state([

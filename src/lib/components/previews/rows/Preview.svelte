@@ -41,8 +41,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
       if (!group || group.tagName !== 'g') return;
 
       if (group.dataset.isweathersection === 'true' && group.dataset.dayindex !== undefined) {
-        weather.currentIndex = +group.dataset.dayindex;
-        showPreviewImageWeatherDetails(rowsPreview.targets);
+        const dayIndex = +group.dataset.dayindex;
+        weather.currentIndex = dayIndex;
+
+        const getTargets = (index: number) => {
+          const ids = rowsPreview.getTargetsForDay(index);
+          return rowsPreview.targets.filter((t) => ids.includes(t.id));
+        };
+
+        showPreviewImageWeatherDetails(getTargets(dayIndex), getTargets);
       }
     }}
   >
