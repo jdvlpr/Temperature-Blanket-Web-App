@@ -4,7 +4,13 @@ import {
   getSeasonForMonth,
 } from '$lib/constants/seasons-constants';
 import { gauges, previews, weather, localState } from '$lib/state';
-import { displayNumber, setTargets, sum } from '$lib/utils';
+import {
+  displayNumber,
+  setTargets,
+  sum,
+  getColorInfo,
+  getWeatherValue,
+} from '$lib/utils';
 import chroma from 'chroma-js';
 import Preview from './Preview.svelte';
 import Settings from './Settings.svelte';
@@ -38,8 +44,6 @@ export class RowsPreviewClass {
 
   name = 'Rows';
 
-  sections = $state<any[]>([]);
-
   svg = $state<SVGSVGElement | null>(null);
 
   img = $state({
@@ -68,9 +72,26 @@ export class RowsPreviewClass {
     seasonTargets: [['tmax'], ['tmax'], ['tmax'], ['tmax']], // [spring, summer, fall, winter]
   });
 
+  getSectionStitchesCount(dayIndex: number) {
+    if (this.settings.lengthTarget === 'none')
+      return this.settings.stitchesPerRow;
+    if (this.settings.lengthTarget === 'custom')
+      return this.settings.stitchesPerDay;
+    let value = Math.abs(
+      (weather.data[dayIndex] as any)[this.settings.lengthTarget][
+        localState.value.units as any
+      ],
+    );
+    if (isNaN(value)) value = this.settings.stitchesPerDay;
+    if (value === 0) value = 1;
+    return value;
+  }
+
   // *******************
   // Derived properties
   // *******************
+  previewIndex = $state(0);
+
   totalStitches = $derived.by(() => {
     if (this.settings.lengthTarget === 'none')
       return this.settings.stitchesPerRow * weather.data?.length;
@@ -82,17 +103,147 @@ export class RowsPreviewClass {
   rows = $derived(Math.ceil(this.totalStitches / this.settings.stitchesPerRow));
 
   // Get the target IDs to use for rendering
+
   activeSelectedTargets = $derived(
     this.settings.useSeasonTargets
-      ? this.settings.seasonTargets.flat()
+      ? [...new Set(this.settings.seasonTargets.flat())]
       : this.settings.selectedTargets,
   );
 
   width = $derived(this.settings.stitchesPerRow * this.stitchSize);
 
-  height = $derived(
-    this.rows * this.stitchSize * this.activeSelectedTargets.length,
-  );
+  layout = $derived.by(() => {
+    // Check if we have data
+    if (!weather?.data?.length) return { sections: [], height: 0 };
+
+    // Setup constants
+    let columnIndex = 0; // Current column index
+    let stitchYRow = 0; // Current row position
+    let isWeatherSection: boolean; // Flag indicating if it's a weather section
+    let lineWidth: number; // Width of the current line
+    let remainderLineCount = 0; // Count of remaining stitches in the line
+    let currentVisualRowHeight = 0; // Track the max height of the current row being rendered
+
+    // Loop through each section
+    const sections: any[] = [];
+
+    for (
+      let sectionIndex = 0, dayIndex = 0;
+      sectionIndex < this.totalSections;
+      sectionIndex++, dayIndex++
+    ) {
+      let section = []; // Array to store stitches in the section
+      let sectionStitchesCount: number; // Count of stitches in the section
+
+      // Check if the current section index is greater than or equal to the total number of days
+      if (sectionIndex >= weather.data.length) {
+        // If so, it means we are in the additional stitches section
+        isWeatherSection = false;
+        // Set the section stitches count to the number of additional stitches needed
+        sectionStitchesCount = this.countOfAdditionalStitches;
+      } else {
+        // Otherwise, we are in the weather section
+        isWeatherSection = true;
+        // Get the section stitches count based on the day index using the getSectionStitchesCount function
+        sectionStitchesCount = this.getSectionStitchesCount(dayIndex);
+      }
+
+      // Loop through each stitch in the section
+      for (
+        let sectionStitchIndex = 0;
+        sectionStitchIndex < sectionStitchesCount;
+
+      ) {
+        if (remainderLineCount > 0) {
+          // If there are remaining stitches from the previous line, reset the stitch index and adjust the stitch count
+          sectionStitchIndex = 0;
+          sectionStitchesCount = remainderLineCount;
+        }
+
+        if (columnIndex === this.width / this.stitchSize) {
+          // If the current column index reaches the width limit, reset the column index and move to the next row
+          columnIndex = 0;
+          stitchYRow += currentVisualRowHeight;
+          currentVisualRowHeight = 0;
+        }
+
+        if (
+          sectionStitchesCount <=
+          this.width / this.stitchSize - columnIndex
+        ) {
+          // If the remaining stitches fit within the current row, set the line width and reset the remainder count
+          lineWidth = sectionStitchesCount;
+          remainderLineCount = 0;
+        } else {
+          // If the remaining stitches exceed the current row, set the line width to the remaining space and update the remainder count
+          lineWidth = this.width / this.stitchSize - columnIndex;
+          remainderLineCount = sectionStitchesCount - lineWidth;
+        }
+
+        // Loop through each target parameter
+        const activeTargets = isWeatherSection
+          ? this.getTargetsForDay(dayIndex)
+          : this.activeSelectedTargets;
+
+        for (
+          let paramIndex = 0,
+            y2 = stitchYRow,
+            x = columnIndex * this.stitchSize;
+          paramIndex < activeTargets.length;
+          paramIndex++, y2 += this.stitchSize
+        ) {
+          let color: string;
+
+          if (isWeatherSection) {
+            let param = activeTargets[paramIndex] as any;
+            let value = getWeatherValue({ dayIndex, param });
+            const colorInfo = getColorInfo({ param, value });
+            color = colorInfo.hex || '#cccccc';
+          } else {
+            color = this.settings.extrasColor;
+          }
+
+          // Push the stitch object to the section array
+          section.push({
+            width: lineWidth * this.stitchSize,
+            height: this.stitchSize,
+            color,
+            x,
+            y: y2,
+            isWeatherSection,
+            dayIndex,
+          });
+        }
+
+        // Handling row wrapping and height increment:
+        const currentBlockHeight = activeTargets.length * this.stitchSize;
+        if (currentBlockHeight > currentVisualRowHeight) {
+          currentVisualRowHeight = currentBlockHeight;
+        }
+
+        columnIndex += lineWidth;
+        sectionStitchIndex += lineWidth;
+
+        // If row is full
+        if (columnIndex >= this.width / this.stitchSize) {
+          columnIndex = 0;
+          stitchYRow += currentVisualRowHeight;
+          currentVisualRowHeight = 0; // Reset for next row
+        }
+
+        sections.push(section);
+      }
+    }
+
+    return {
+      sections,
+      height: stitchYRow + currentVisualRowHeight,
+    };
+  });
+
+  sections = $derived(this.layout.sections);
+
+  height = $derived(this.layout.height);
 
   countOfAdditionalStitches = $derived(
     displayNumber(
@@ -113,7 +264,28 @@ export class RowsPreviewClass {
       .filter((n) => this.activeSelectedTargets.includes(n.id)),
   );
 
-  totalRows = $derived(this.rows * this.activeSelectedTargets.length);
+  totalRows = $derived.by(() => {
+    if (!weather.data) return 0;
+
+    // If not using season targets, we can use the simpler calculation
+    // But to be safe and consistent with "stitches per day" logic, iteration is robust
+    // optimizing for the common case:
+    if (
+      !this.settings.useSeasonTargets &&
+      this.settings.lengthTarget === 'none'
+    ) {
+      return (weather.data.length || 0) * this.settings.selectedTargets.length;
+    }
+
+    let count = 0;
+    for (let i = 0; i < weather.data.length; i++) {
+      const targets = this.getTargetsForDay(i);
+      const dayStitches = this.getSectionStitchesCount(i);
+      const dayRows = Math.ceil(dayStitches / this.settings.stitchesPerRow);
+      count += dayRows * targets.length;
+    }
+    return count;
+  });
 
   // *******************
   // URL hash derived from settings
@@ -121,7 +293,7 @@ export class RowsPreviewClass {
   hash = $derived.by(() => {
     let hash = '&';
     hash += `${this.id}=`;
-    hash += `${this.activeSelectedTargets.join('')}`;
+    hash += `${this.settings.selectedTargets.join('')}`;
     hash += '(';
     hash += this.settings.stitchesPerRow;
     // Add season targets if enabled
@@ -258,28 +430,28 @@ export class RowsPreviewClass {
     if (!date) return this.settings.selectedTargets;
 
     const month = new Date(date).getMonth() + 1; // getMonth returns 0-11
-    const season = getSeasonForMonth(month, localState.value.seasons);
+    const season = getSeasonForMonth(month, localState.value.seasons) as any;
 
     if (!season) return this.settings.selectedTargets;
 
-    // Find the index by matching against DEFAULT_SEASONS
-    // Use a simple index approach - the order is always: spring (0), summer (1), fall (2), winter (3)
-    let seasonIndex = 0;
-    const userSeasons = localState.value.seasons;
-    for (let i = 0; i < userSeasons.length; i++) {
-      const userSeason = userSeasons[i];
-      const defaultSeason = DEFAULT_SEASONS[i];
-      // Match by comparing the month arrays
-      if (
-        userSeason &&
-        defaultSeason &&
-        JSON.stringify(userSeason['months']) ===
-          JSON.stringify(defaultSeason['months'])
-      ) {
-        seasonIndex = i;
-        break;
+    // Find the index of the season in the user's seasons list
+    const seasonIndex = localState.value.seasons.indexOf(season);
+
+    // If matching by reference fails (indexOf -1), fall back to checking months equality
+    if (seasonIndex === -1) {
+      for (let i = 0; i < localState.value.seasons.length; i++) {
+        if (
+          JSON.stringify(localState.value.seasons[i].months) ===
+          JSON.stringify(season.months)
+        ) {
+          return (
+            this.settings.seasonTargets[i] || this.settings.selectedTargets
+          );
+        }
       }
+      return this.settings.selectedTargets;
     }
+
     return (
       this.settings.seasonTargets[seasonIndex] || this.settings.selectedTargets
     );

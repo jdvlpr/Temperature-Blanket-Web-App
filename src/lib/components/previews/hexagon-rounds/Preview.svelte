@@ -82,8 +82,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
               ? hexagonRoundsPreview.settings.columns
               : hexagonRoundsPreview.settings.columns + 1;
 
-        // console.log({ squareIndex, hexagonsInRow, rowIndex, hexagonRowIndex });
-
         if (hexagonRowIndex % hexagonsInRow === 0) {
           hexagonRowIndex = 1;
           // Start new Row

@@ -69,11 +69,10 @@ export function initializeLocalStorage() {
   }
 
   localState.value.theme.id = localState.value.theme.id || 'classic';
+
   localState.value.theme.mode = localState.value.theme.mode || 'system';
 
   localState.value.seasons = localState.value.seasons || DEFAULT_SEASONS;
-
-  console.log(localState.value.seasons);
 
   // ****************
   // Setup Theme Listeners
