@@ -21,9 +21,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import PreviewInfo from '$lib/components/PreviewInfo.svelte';
   import SeasonEditor from '$lib/components/previews/rows/SeasonEditor.svelte';
   import SpanYarnColorSelectIcon from '$lib/components/SpanYarnColorSelectIcon.svelte';
-  import { formatDateRange } from '$lib/utils/seasons-utils';
   import { dialog, gauges, localState, project, weather } from '$lib/state';
-  import { capitalizeFirstLetter, pluralize } from '$lib/utils';
+  import { capitalizeFirstLetter, pluralize, formatDateRange } from '$lib/utils';
   import { PencilIcon } from '@lucide/svelte';
   import { rowsPreview } from './state.svelte';
 
@@ -111,10 +110,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
               }}
             >
               {season.label}
+              <PencilIcon size={16} />
               <span class="text-sm font-normal">
                 ({formatDateRange(season.startDate, season.endDate)})
               </span>
-              <PencilIcon size={16} />
             </button>
             <ToggleSwitchGroup
               groupLabel={`Color Each Row Using the ${capitalizeFirstLetter(weather.grouping)}'s`}

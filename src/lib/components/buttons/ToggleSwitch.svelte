@@ -41,10 +41,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   class={["flex justify-between gap-4 w-full bg-surface-100 dark:bg-surface-900 py-2 px-4 rounded-container shadow-sm", !disabled && 'cursor-pointer']}
 >
     <div class="flex flex-col items-start">
-    <span class:font-bold={hasDetails}>{@html label}</span>
-    {#if hasDetails}
-      <span class={detailsTextSize}>{@html details}</span>
-    {/if}
+      <span class={["flex gap-2 items-center", hasDetails && 'font-bold']}>{@html label}</span>
+      {#if hasDetails}
+        <span class="{detailsTextSize} text-left">{@html details}</span>
+      {/if}
     </div>
   <div class="relative inline-flex items-start gap-2">
     <input

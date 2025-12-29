@@ -295,6 +295,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
           class="toc-anchor opacity-60 hover:opacity-100">Create a Preview</a
         >
       </li>
+      <li class="toc-list-item ml-4 block">
+        <a
+          href="#assigning-seasons"
+          class="toc-anchor opacity-60 hover:opacity-100">Assigning Seasons</a
+        >
+      </li>
       <li class="toc-list-item block">
         <a href="#gallery" class="toc-anchor opacity-60 hover:opacity-100"
           >Gallery</a
@@ -831,7 +837,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 </p>
                 {#each OPEN_METEO_MODELS as { title, timespan, resolution, details }}
                   <div class="ml-4 flex flex-col gap-1">
-                    <p class="font-bold">
+                    <p class="font-bold flex items-center gap-2">
                       {@html title}
                     </p>
                     <div class="ml-4 flex flex-col gap-1">
@@ -1709,6 +1715,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 per row. 24 is the number of hours in a day.
               </li>
               <li>
+                <span class="font-bold">Hexagon Rounds</span>
+                Each round in a hexagon represents one day. Hexagons are added from left to right, top to bottom.
+              </li>
+              <li>
                 <span class="font-bold">Month Rows</span> – Rows are grouped by month from
                 top to bottom or left to right. Months with fewer days have extra
                 rows added, so that each month has the same number of rows.
@@ -1748,6 +1758,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
               </p>
             </div>
           </section>
+
+          <section
+            id="seasons"
+            class="card bg-surface-100 dark:bg-surface-900 flex scroll-mt-[58px] flex-col gap-2 p-4"
+          >
+            <h3 class="text-xl font-bold flex items-center gap-2">Assigning Seasons<span class="badge bg-tertiary-100-900">Beta</span></h3>
+
+            <p>
+             Assigning seasons to your preview layout will allow you to use the season-specific color palettes.
+            </p>
+          
+          </section>
+
           <h2 class="scroll-mt-[58px] text-2xl font-bold" id="gallery">
             Gallery
           </h2>

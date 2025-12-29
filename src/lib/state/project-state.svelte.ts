@@ -127,12 +127,14 @@ class ProjectClass {
 
     if (weather.grouping === 'week')
       hash += `&w=${weather.monthGroupingStartDay}`; // Set Weather Grouping to Weeks with the starting Day of Week
-    hash += localState.value.units === 'metric' ? '&u=m' : '&u=i'; // Units
 
     // Add seasons hash if seasons are enabled
     if (this.useSeasons) {
       hash += `&n=${seasonsToUrlHash(localState.value.seasons)}`;
     }
+
+    // Add units hash
+    hash += localState.value.units === 'metric' ? '&u=m' : '&u=i';
 
     let href = '';
     const base = browser ? window.location.origin + '/' : '';

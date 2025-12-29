@@ -150,7 +150,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <label class="flex items-center gap-2 font-bold">
               <input
                 type="radio"
-                class="radio"
+                class="radio flex items-center gap-2"
                 {value}
                 disabled={sourceName !== 'Open-Meteo'}
                 bind:group={openMeteoModel}

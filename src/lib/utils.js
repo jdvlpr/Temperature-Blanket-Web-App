@@ -29,6 +29,7 @@ export * from '$lib/utils/preview-utils.svelte';
 export * from '$lib/utils/privacy-utils.svelte';
 export * from '$lib/utils/project-utils.svelte';
 export * from '$lib/utils/range-utils.svelte';
+export * from '$lib/utils/seasons-utils';
 export * from '$lib/utils/storage-utils.svelte';
 export * from '$lib/utils/string-utils';
 export * from '$lib/utils/unit-utils.svelte';

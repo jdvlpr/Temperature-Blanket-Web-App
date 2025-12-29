@@ -102,13 +102,6 @@ export function formatDateRange(startDate: string, endDate: string): string {
 }
 
 /**
- * Get all seasons
- */
-export function getAllSeasons(): Season[] {
-  return DEFAULT_SEASONS;
-}
-
-/**
  * Array of presets in order for URL encoding
  * Index 0 = Northern Meteorological, 1 = Northern Astronomical,
  * 2 = Southern Meteorological, 3 = Southern Astronomical
