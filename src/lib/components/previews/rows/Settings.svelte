@@ -21,8 +21,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import PreviewInfo from '$lib/components/PreviewInfo.svelte';
   import SeasonEditor from '$lib/components/previews/rows/SeasonEditor.svelte';
   import SpanYarnColorSelectIcon from '$lib/components/SpanYarnColorSelectIcon.svelte';
-  import { formatDateRange } from '$lib/constants/seasons-constants';
-  import { dialog, gauges, localState, weather } from '$lib/state';
+  import { formatDateRange } from '$lib/utils/seasons-utils';
+  import { dialog, gauges, localState, project, weather } from '$lib/state';
   import { capitalizeFirstLetter, pluralize } from '$lib/utils';
   import { PencilIcon } from '@lucide/svelte';
   import { rowsPreview } from './state.svelte';
@@ -79,6 +79,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
       onchange={(e: Event) => {
         const target = e.target as HTMLInputElement;
         rowsPreview.settings.useSeasonTargets = target.checked;
+        // Sync with global project state
+        project.useSeasons = target.checked;
       }}
     />
   </div>

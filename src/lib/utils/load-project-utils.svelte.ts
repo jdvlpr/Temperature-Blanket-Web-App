@@ -20,6 +20,7 @@ import {
   NO_DATA_SRTM3,
   UNIT_LABELS,
 } from '$lib/constants';
+import { seasonsFromUrlHash } from '$lib/utils/seasons-utils';
 import {
   allGaugesAttributes,
   gauges,
@@ -125,6 +126,15 @@ export const setProjectSettings = async (
   } else {
     // Otherwise set to the default 'day'
     weather.grouping = 'day';
+  }
+
+  // Load Seasons from URL (n parameter)
+  if (exists(params.n)) {
+    const decoded = seasonsFromUrlHash(params.n.value);
+    if (decoded) {
+      localState.value.seasons = decoded;
+      project.useSeasons = true;
+    }
   }
 };
 

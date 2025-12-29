@@ -14,6 +14,7 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { browser, version } from '$app/environment';
+import { seasonsToUrlHash } from '$lib/utils/seasons-utils';
 import { gauges, localState, locations, previews, weather } from '$lib/state';
 
 export class HistoryStateClass {
@@ -83,6 +84,15 @@ class ProjectClass {
   );
 
   // *****************
+  // Seasons State Property
+  // *****************
+  /**
+   * Whether seasons are enabled for this project.
+   * When true, the project uses season-specific weather parameter targets.
+   */
+  useSeasons = $state(false);
+
+  // *****************
   // History State Property
   // *****************
   history = new HistoryStateClass();
@@ -118,6 +128,11 @@ class ProjectClass {
     if (weather.grouping === 'week')
       hash += `&w=${weather.monthGroupingStartDay}`; // Set Weather Grouping to Weeks with the starting Day of Week
     hash += localState.value.units === 'metric' ? '&u=m' : '&u=i'; // Units
+
+    // Add seasons hash if seasons are enabled
+    if (this.useSeasons) {
+      hash += `&n=${seasonsToUrlHash(localState.value.seasons)}`;
+    }
 
     let href = '';
     const base = browser ? window.location.origin + '/' : '';

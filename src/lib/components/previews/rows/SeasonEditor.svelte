@@ -16,7 +16,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import CloseButton from '$lib/components/modals/CloseButton.svelte';
   import StickyPart from '$lib/components/modals/StickyPart.svelte';
-  import { MONTH_NAMES, SEASON_PRESETS, formatDateRange } from '$lib/constants/seasons-constants';
+  import { MONTH_NAMES, SEASON_PRESETS } from '$lib/constants/seasons-constants';
+  import { formatDateRange } from '$lib/utils/seasons-utils';
   import { localState } from '$lib/state';
   import { CheckIcon } from '@lucide/svelte';
 

@@ -1,8 +1,6 @@
 import { CHARACTERS_FOR_URL_HASH } from '$lib/constants';
-import {
-  DEFAULT_SEASONS,
-  getSeasonForDate,
-} from '$lib/constants/seasons-constants';
+import { DEFAULT_SEASONS } from '$lib/constants/seasons-constants';
+import { getSeasonForDate } from '$lib/utils/seasons-utils';
 import { gauges, previews, weather, localState } from '$lib/state';
 import {
   displayNumber,
