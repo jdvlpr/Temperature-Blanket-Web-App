@@ -75,7 +75,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <NumberInputButton
     bind:value={continuousSquarePreview.settings.stitchesPerDay}
     title="Stitches Per {capitalizeFirstLetter(weather.grouping)}"
-    icon={true}
   />
 
   {#if continuousSquarePreview.details}

@@ -52,7 +52,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <NumberInputButton
     bind:value={cornerToCornerPreview.settings.lineLength}
     title="Line Length"
-    icon={true}
   />
 
   {#if cornerToCornerPreview.dimensionsOptions}

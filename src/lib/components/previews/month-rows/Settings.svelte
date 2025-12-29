@@ -22,6 +22,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { gauges, dialog, weather } from '$lib/state';
   import { pluralize } from '$lib/utils';
   import { capitalizeFirstLetter } from '$lib/utils/other-utils';
+  import { SquareDashedIcon } from '@lucide/svelte';
   import { monthRowsPreview } from './state.svelte';
 
   let targets = $derived(gauges.allCreated.flatMap((n) => n.targets));
@@ -96,7 +97,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     bind:value={monthRowsPreview.settings.borderStitches}
     min={0}
     title="Border Size"
-    icon={`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-square-dashed size-6"><path d="M5 3a2 2 0 0 0-2 2"/><path d="M19 3a2 2 0 0 1 2 2"/><path d="M21 19a2 2 0 0 1-2 2"/><path d="M5 21a2 2 0 0 1-2-2"/><path d="M9 3h1"/><path d="M9 21h1"/><path d="M14 3h1"/><path d="M14 21h1"/><path d="M3 9v1"/><path d="M21 9v1"/><path d="M3 14v1"/><path d="M21 14v1"/></svg>`}
+    icon={SquareDashedIcon}
   />
 
   {#if monthRowsPreview.settings.borderStitches > 0}
@@ -138,7 +139,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <NumberInputButton
     bind:value={monthRowsPreview.settings.stitchesPerRow}
     title="Stitches Per Row"
-    icon={`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-ruler size-6"><path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z"/><path d="m14.5 12.5 2-2"/><path d="m11.5 9.5 2-2"/><path d="m8.5 6.5 2-2"/><path d="m17.5 15.5 2-2"/></svg>`}
   />
 
   <button

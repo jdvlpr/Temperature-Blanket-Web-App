@@ -56,12 +56,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <NumberInputButton
     bind:value={chevronsPreview.settings.chevronsPerRow}
     title="Chevrons Per Row"
-    icon={true}
   />
 
   <NumberInputButton
     bind:value={chevronsPreview.settings.chevronSideLength}
     title="Chevron Side Length"
-    icon={true}
   />
 </div>
