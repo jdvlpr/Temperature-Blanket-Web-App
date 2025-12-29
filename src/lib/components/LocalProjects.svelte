@@ -23,6 +23,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   $effect(() => {
     projects = browser ? getProjectsListForDisplay() : [];
   });
+
+  $inspect(projects);
 </script>
 
 {#key projects}
@@ -32,11 +34,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <p class="mb-2 text-sm">Stored in this browser</p>
       <div class="flex w-full flex-col items-start justify-center gap-2">
         {#each projects as project}
-          {@const { href } = project}
+          {@const { meta } = project}
           <ProjectDetails
-            {project}
+            project={meta}
             onclick={() => {
-              removeProjectByHref(href);
+              removeProjectByHref(meta.href);
               projects = browser ? getProjectsListForDisplay() : [];
             }}
           />

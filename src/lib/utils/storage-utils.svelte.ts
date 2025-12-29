@@ -277,10 +277,7 @@ export const checkForProjectInLocalStorage = async () => {
   if (daysInFuture > 0 && !matchedProject.isCustomWeatherData) return;
 
   // Set the weather data and indicate that it was loaded from local storage
-  console.log({ newWeatherUngrouped });
-
   weather.rawData = newWeatherUngrouped;
-
   weather.isFromLocalStorage = true;
 };
 
