@@ -29,7 +29,8 @@ import {
   stringToDate,
 } from '$lib/utils';
 
-const PROJECT_INDEX_KEY = 'projects';
+const LEGACY_PROJECTS_KEY = 'projects';
+const PROJECT_INDEX_KEY = 'projects_index';
 const PROJECT_PREFIX = 'p_';
 
 function parseProjectIdFromHref(href: string | null) {
@@ -76,7 +77,10 @@ function removeProjectById(id: string | null) {
 // New in version 5.32.0
 // The old single-key ran up against quota limits if too many projects were stored (more than 40 projects with weather data)
 function migrateProjectsToPerKey() {
-  const raw = localStorage.getItem(PROJECT_INDEX_KEY);
+  const projectsIndex = getProjectsIndex();
+  if (projectsIndex.length > 0) return; // Already migrated
+
+  const raw = localStorage.getItem(LEGACY_PROJECTS_KEY);
 
   if (!raw) return;
 
@@ -88,7 +92,7 @@ function migrateProjectsToPerKey() {
   }
 
   // If entries look like full projects, migrate them
-  if (Array.isArray(parsed) && parsed.length && parsed[0] && !parsed[0].meta) {
+  if (Array.isArray(parsed) && parsed.length && parsed[0]) {
     const migratedIndex: any[] = [];
     parsed.forEach((project: any) => {
       const id =
