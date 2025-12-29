@@ -78,7 +78,13 @@ function removeProjectById(id: string | null) {
 // The old single-key ran up against quota limits if too many projects were stored (more than 40 projects with weather data)
 function migrateProjectsToPerKey() {
   const projectsIndex = getProjectsIndex();
-  if (projectsIndex.length > 0) return; // Already migrated
+  if (projectsIndex.length > 0) {
+    // Already migrated
+    console.log('migrated');
+
+    localStorage.removeItem(LEGACY_PROJECTS_KEY);
+    return;
+  }
 
   const raw = localStorage.getItem(LEGACY_PROJECTS_KEY);
 

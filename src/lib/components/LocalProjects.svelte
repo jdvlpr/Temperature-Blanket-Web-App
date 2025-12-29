@@ -23,8 +23,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   $effect(() => {
     projects = browser ? getProjectsListForDisplay() : [];
   });
-
-  $inspect(projects);
 </script>
 
 {#key projects}
