@@ -34,7 +34,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     context = '',
   }: Props = $props();
 
-  let category = $state(getParentCategory(schemeId));
+  let category = $state(getParentCategory(() =>schemeId));
   let container = $state();
   let showScrollToTopButton = $state(false);
 

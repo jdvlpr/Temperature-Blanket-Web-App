@@ -23,13 +23,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let { colors, updateGauge } = $props();
 
-  let _colors = $state(colors);
-
   let sortColors = $state('custom');
 
   let key = $state(false);
 
-  let allColorsHaveNames = $derived(_colors.every((color) => color?.name));
+  let allColorsHaveNames = $derived(colors.every((color) => color?.name));
 </script>
 
 <div class="px-4 pt-8 sm:min-w-[600px]">
@@ -45,8 +43,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
           id="sort-colors-by"
           bind:value={sortColors}
           onchange={() => {
-            _colors = getSortedPalette({
-              palette: $state.snapshot(_colors),
+            colors = getSortedPalette({
+              palette: $state.snapshot(colors),
               sortColors,
             });
             key = !key;
@@ -65,7 +63,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <button
         class="btn hover:preset-tonal"
         onclick={() => {
-          _colors.reverse();
+          colors.reverse();
           key = !key;
           sortColors = 'custom';
         }}
@@ -82,7 +80,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             sortColors = 'custom';
           }}
           canUserEditColor={false}
-          bind:colors={_colors}
+          bind:colors
         />
       {/key}
     </div>
@@ -93,7 +91,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <SaveAndCloseButtons
       onSave={() => {
         updateGauge({
-          _colors: _colors.map((n) => {
+          colors: colors.map((n) => {
             delete n.id;
             return n;
           }),
