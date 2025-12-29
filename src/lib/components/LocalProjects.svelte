@@ -16,14 +16,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script>
   import { browser } from '$app/environment';
   import ProjectDetails from '$lib/components/ProjectDetails.svelte';
+  import { getProjectsListForDisplay, removeProjectByHref } from '$lib/utils';
 
   let projects = $state([]);
 
   $effect(() => {
-    projects =
-      browser && localStorage.getItem('projects')
-        ? JSON.parse(localStorage.getItem('projects'))?.reverse()
-        : [];
+    projects = browser ? getProjectsListForDisplay() : [];
   });
 </script>
 
@@ -38,11 +36,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <ProjectDetails
             {project}
             onclick={() => {
-              const newProjects = projects.filter(
-                (_project) => _project.href !== href,
-              );
-              localStorage.setItem('projects', JSON.stringify(newProjects));
-              projects = newProjects;
+              removeProjectByHref(href);
+              projects = browser ? getProjectsListForDisplay() : [];
             }}
           />
         {/each}

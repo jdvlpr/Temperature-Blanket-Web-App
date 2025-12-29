@@ -29,7 +29,91 @@ import {
   stringToDate,
 } from '$lib/utils';
 
+const PROJECT_INDEX_KEY = 'projects';
+const PROJECT_PREFIX = 'p_';
+
+function parseProjectIdFromHref(href: string | null) {
+  if (!href) return null;
+  try {
+    return new URL(href).searchParams.get('project');
+  } catch {
+    return null;
+  }
+}
+
+function getProjectsIndex() {
+  try {
+    const raw = localStorage.getItem(PROJECT_INDEX_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+function setProjectsIndex(index: any[]) {
+  localStorage.setItem(PROJECT_INDEX_KEY, JSON.stringify(index));
+}
+
+function getFullProjectById(id: string | null) {
+  if (!id) return null;
+  try {
+    const raw = localStorage.getItem(`${PROJECT_PREFIX}${id}`);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
+function removeProjectById(id: string | null) {
+  if (!id) return;
+  localStorage.removeItem(`${PROJECT_PREFIX}${id}`);
+  const index = getProjectsIndex();
+  const newIndex = index.filter((i: any) => i.id !== id);
+  setProjectsIndex(newIndex);
+}
+
+// Migrate old projects stored as an array under 'projects' key to per-key storage
+// New in version 5.32.0
+// The old single-key ran up against quota limits if too many projects were stored (more than 40 projects with weather data)
+function migrateProjectsToPerKey() {
+  const raw = localStorage.getItem(PROJECT_INDEX_KEY);
+
+  if (!raw) return;
+
+  let parsed;
+  try {
+    parsed = JSON.parse(raw);
+  } catch {
+    return;
+  }
+
+  // If entries look like full projects, migrate them
+  if (Array.isArray(parsed) && parsed.length && parsed[0]) {
+    const migratedIndex: any[] = [];
+    parsed.forEach((project: any) => {
+      const id =
+        parseProjectIdFromHref(project.href) || new Date().getTime().toString();
+      try {
+        console.count('here');
+        localStorage.setItem(`${PROJECT_PREFIX}${id}`, JSON.stringify(project));
+      } catch {
+        // Ignore
+        console.count('nope');
+      }
+      migratedIndex.push({
+        id,
+        date: project.date,
+        href: project.href,
+        title: project.title || '',
+        isCustomWeatherData: project.isCustomWeatherData || false,
+      });
+    });
+    setProjectsIndex(migratedIndex);
+  }
+}
+
 export function initializeLocalStorage() {
+  migrateProjectsToPerKey();
   // ****************
   // Handle Legacy Local Storage Items
   // Clean up old local storage items which are no longer used
@@ -135,11 +219,9 @@ export function initializeLocalStorage() {
 export const checkForProjectInLocalStorage = async () => {
   // Retrieve project data from local storage based on the current URL
   if (typeof window.localStorage === 'undefined') return;
-  const localProjects = JSON.parse(localStorage.getItem('projects'));
-  if (!localProjects) return;
-  const matchedProject = localProjects.find((localProject) => {
-    return localProject.href === window.location.href;
-  });
+  const id = new URL(window.location).searchParams.get('project');
+  if (!id) return;
+  const matchedProject = getFullProjectById(id);
 
   if (!matchedProject) return;
 
@@ -200,11 +282,9 @@ export const checkForProjectInLocalStorage = async () => {
 export const setLocalStorageProject = () => {
   if (!browser || typeof window.localStorage === 'undefined') return;
 
-  const localProjects = JSON.parse(localStorage.getItem('projects')) || [];
+  const localProjectsIndex = getProjectsIndex();
 
-  const projectIDs = localProjects?.map((_project) =>
-    new URL(_project.href).searchParams.get('project'),
-  );
+  const projectIDs = localProjectsIndex?.map((_project) => _project.id);
 
   const thisID = new URL(project.url.href).searchParams.get('project');
 
@@ -213,15 +293,32 @@ export const setLocalStorageProject = () => {
   const index = projectIDs?.indexOf(thisID);
 
   if (index > -1) {
-    // project is already in the storage, so delete it
-    localProjects.splice(index, 1);
+    // project is already in the index, so delete the existing index entry
+    localProjectsIndex.splice(index, 1);
+    // Optionally remove old full project key - we'll overwrite it below
+    localStorage.removeItem(`${PROJECT_PREFIX}${thisID}`);
   }
 
   const localProject = createProjectLocalStorageProjectObject();
 
-  localProjects.push(localProject);
+  // Store the full project under its own key
+  localStorage.setItem(
+    `${PROJECT_PREFIX}${thisID}`,
+    JSON.stringify(localProject),
+  );
 
-  localStorage.setItem('projects', JSON.stringify(localProjects));
+  // Save minimal metadata in the projects index
+  const meta = {
+    id: thisID,
+    date: localProject.date,
+    href: localProject.href,
+    title: localProject.title || '',
+    isCustomWeatherData: localProject.isCustomWeatherData || false,
+  };
+
+  localProjectsIndex.push(meta);
+
+  setProjectsIndex(localProjectsIndex);
 };
 
 /**
@@ -270,3 +367,28 @@ const createProjectLocalStorageProjectObject = () => {
 
   return localProject;
 };
+
+// ----------------------
+// Helper functions for per-key project storage
+// ----------------------
+export function getSavedProjectMetaByHref(href: string) {
+  const index = getProjectsIndex();
+  return index.find((i: any) => i.href === href) || null;
+}
+
+export function getSavedProjectByHref(href: string) {
+  const meta = getSavedProjectMetaByHref(href);
+  if (!meta) return null;
+  return getFullProjectById(meta.id);
+}
+
+export function getProjectsListForDisplay() {
+  // Return reversed index (most recent last -> first for display)
+  return getProjectsIndex().slice().reverse();
+}
+
+export function removeProjectByHref(href: string) {
+  const meta = getSavedProjectMetaByHref(href);
+  if (!meta) return;
+  removeProjectById(meta.id);
+}

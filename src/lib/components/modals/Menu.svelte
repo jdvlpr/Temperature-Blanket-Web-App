@@ -38,6 +38,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     downloadWeatherCSV,
     pluralize,
     setLocalStorageProject,
+    getSavedProjectMetaByHref,
   } from '$lib/utils';
   import {
     CircleCheckBigIcon,
@@ -108,9 +109,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       const newURL = new URL(project.url.href);
       replaceState(newURL, '');
       setLocalStorageProject();
-      currentSavedProject = JSON.parse(localStorage.getItem('projects'))?.find(
-        (_project) => _project.href === project.url.href,
-      );
+      currentSavedProject = getSavedProjectMetaByHref(project.url.href);
       project.status.saved = true;
     } catch (e) {
       currentSavedProject = null;
