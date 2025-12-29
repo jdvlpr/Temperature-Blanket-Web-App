@@ -80,9 +80,8 @@ function migrateProjectsToPerKey() {
   const projectsIndex = getProjectsIndex();
   if (projectsIndex.length > 0) {
     // Already migrated
-    console.log('migrated');
-
-    localStorage.removeItem(LEGACY_PROJECTS_KEY);
+    // TODO: Uncomment the line below after confirming successful deployment of the project key migration. Keep commented out for now to be safe, since this contains users' projects, in case there is a need to revert.
+    // localStorage.removeItem(LEGACY_PROJECTS_KEY);
     return;
   }
 
