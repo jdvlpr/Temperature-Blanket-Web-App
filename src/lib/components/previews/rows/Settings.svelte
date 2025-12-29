@@ -21,7 +21,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import PreviewInfo from '$lib/components/PreviewInfo.svelte';
   import SeasonEditor from '$lib/components/previews/rows/SeasonEditor.svelte';
   import SpanYarnColorSelectIcon from '$lib/components/SpanYarnColorSelectIcon.svelte';
-  import { MONTH_NAMES } from '$lib/constants/seasons-constants';
+  import { formatDateRange } from '$lib/constants/seasons-constants';
   import { dialog, gauges, localState, weather } from '$lib/state';
   import { capitalizeFirstLetter, pluralize } from '$lib/utils';
   import { PencilIcon } from '@lucide/svelte';
@@ -110,11 +110,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             >
               {season.label}
               <span class="text-sm font-normal">
-                ({#if season.months.length > 0}
-                  {season.months.map((m) => MONTH_NAMES[m - 1]).join(', ')}
-                {:else}
-                  No months assigned
-                {/if})
+                ({formatDateRange(season.startDate, season.endDate)})
               </span>
               <PencilIcon size={16} />
             </button>

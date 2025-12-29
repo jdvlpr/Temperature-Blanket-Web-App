@@ -1,7 +1,7 @@
 import { CHARACTERS_FOR_URL_HASH } from '$lib/constants';
 import {
   DEFAULT_SEASONS,
-  getSeasonForMonth,
+  getSeasonForDate,
 } from '$lib/constants/seasons-constants';
 import { gauges, previews, weather, localState } from '$lib/state';
 import {
@@ -418,20 +418,20 @@ export class RowsPreviewClass {
     const date = weather.data?.[dayIndex]?.date;
     if (!date) return this.settings.selectedTargets;
 
-    const month = new Date(date).getMonth() + 1; // getMonth returns 0-11
-    const season = getSeasonForMonth(month, localState.value.seasons) as any;
+    const dateObj = new Date(date);
+    const season = getSeasonForDate(dateObj, localState.value.seasons) as any;
 
     if (!season) return this.settings.selectedTargets;
 
     // Find the index of the season in the user's seasons list
     const seasonIndex = localState.value.seasons.indexOf(season);
 
-    // If matching by reference fails (indexOf -1), fall back to checking months equality
+    // If matching by reference fails (indexOf -1), fall back to checking date range equality
     if (seasonIndex === -1) {
       for (let i = 0; i < localState.value.seasons.length; i++) {
         if (
-          JSON.stringify(localState.value.seasons[i].months) ===
-          JSON.stringify(season.months)
+          localState.value.seasons[i].startDate === season.startDate &&
+          localState.value.seasons[i].endDate === season.endDate
         ) {
           return (
             this.settings.seasonTargets[i] || this.settings.selectedTargets

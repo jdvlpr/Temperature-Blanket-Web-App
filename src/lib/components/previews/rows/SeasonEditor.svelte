@@ -16,36 +16,56 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import CloseButton from '$lib/components/modals/CloseButton.svelte';
   import StickyPart from '$lib/components/modals/StickyPart.svelte';
-  import { DEFAULT_SEASONS, MONTH_NAMES } from '$lib/constants/seasons-constants';
+  import { MONTH_NAMES, SEASON_PRESETS, formatDateRange } from '$lib/constants/seasons-constants';
   import { localState } from '$lib/state';
-  import { CheckIcon, RotateCwIcon } from '@lucide/svelte';
+  import { CheckIcon } from '@lucide/svelte';
 
   let { onClose } = $props();
+
+  // Convert presets object to array for iteration
+  const presetsList =  Object.values(SEASON_PRESETS);
 
   // Create a working copy of seasons
   let editingSeasons = $state(
     JSON.parse(JSON.stringify(localState.value.seasons)),
   );
 
-  function toggleMonth(seasonIndex: number, month: number) {
-    const season = editingSeasons[seasonIndex];
-    if (season['months'].includes(month)) {
-      season['months'] = season['months'].filter((m: number) => m !== month);
-    } else {
-      // Remove from other seasons
-      editingSeasons.forEach((s: any, index: number) => {
-        if (index !== seasonIndex && s['months'].includes(month)) {
-          s['months'] = s['months'].filter((m: number) => m !== month);
-        }
-      });
-
-      season['months'].push(month);
-      season['months'].sort((a: number, b: number) => a - b);
-    }
+  // Check if a preset matches the current editing seasons
+  function isPresetSelected(preset: typeof presetsList[0]): boolean {
+    if (editingSeasons.length !== preset.seasons.length) return false;
+    return editingSeasons.every((season: { startDate: string; endDate: string }, index: number) => 
+      season.startDate === preset.seasons[index].startDate &&
+      season.endDate === preset.seasons[index].endDate
+    );
   }
 
-  function resetToDefaults() {
-    editingSeasons = JSON.parse(JSON.stringify(DEFAULT_SEASONS));
+  // Parse MM-DD date string into month and day
+  function parseDateString(dateStr: string): { month: number; day: number } {
+    const [month, day] = dateStr.split('-').map(Number);
+    return { month, day };
+  }
+
+  // Format month and day to MM-DD string
+  function toDateString(month: number, day: number): string {
+    return `${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+  }
+
+  // Get days in a month (using leap year for max days)
+  function getDaysInMonth(month: number): number {
+    // Use a leap year (2000) to get max possible days
+    return new Date(2000, month, 0).getDate();
+  }
+
+  // Handler for month/day changes
+  function updateSeasonDate(seasonIndex: number, field: 'startDate' | 'endDate', month: number, day: number) {
+    const maxDays = getDaysInMonth(month);
+    const clampedDay = Math.min(day, maxDays);
+    editingSeasons[seasonIndex][field] = toDateString(month, clampedDay);
+  }
+
+  // Apply a preset
+  function applyPreset(preset: typeof presetsList[0]) {
+    editingSeasons = JSON.parse(JSON.stringify(preset.seasons));
   }
 
   function saveChanges() {
@@ -54,51 +74,118 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 </script>
 
-<div class="flex flex-col gap-4 p-2 sm:p-4 w-full items-start sm:min-w-[39rem]">
+<div class="flex flex-col gap-4 p-2 sm:p-4 w-full items-start">
   <div class="">
     <h2 class="text-2xl font-bold">Edit Seasons</h2>
-    <p class="text-sm">Click months to toggle them between seasons</p>
+    <p class="text-sm">Choose a preset or customize the start and end dates for each season</p>
   </div>
 
-  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 w-full">
-    {#each editingSeasons as season, seasonIndex (seasonIndex)}
-      <div class="space-y-2">
-        <div>
-          <p class="font-semibold">{season['label']}</p>
-          <p class="text-xs">
-            {season['months'].length > 0
-              ? season['months'].map((m: number) => MONTH_NAMES[m - 1]).join(', ')
-              : 'No months selected'}
-          </p>
-        </div>
-        <div class="grid grid-cols-3 gap-2">
-          {#each Array.from({ length: 12 }, (_, i) => i + 1) as month}
-              <button
-                class={[
-                  "rounded px-3 py-2 text-sm transition-colors",
-                  season['months'].includes(month)
-                    ? "preset-filled-secondary-400-600 base-font-color-dark"
-                    : (!editingSeasons.some((s: any) => s['months'].includes(month))
-                        ? "preset-outlined-warning-300-700"
-                        : "preset-outlined-surface-300-700"),
-                ]}
-                onclick={() => toggleMonth(seasonIndex, month)}
-                title={season['months'].includes(month)
-                  ? `Remove ${MONTH_NAMES[month - 1]} from ${season['label']}`
-                  : `Add ${MONTH_NAMES[month - 1]} to ${season['label']}`}
-              >
-                {MONTH_NAMES[month - 1].substring(0, 3)}
-              </button>
-          {/each}
-        </div>
+  <!-- Presets -->
+  <div class="w-full">
+    <p class="font-medium mb-2 text-sm">Select a preset to apply</p>
+      <div class="flex flex-col gap-2">
+        {#each presetsList as preset}
+          {@const selected = isPresetSelected(preset)}
+          <button
+            class={["btn text-left flex gap-2 py-2 h-auto", selected ? 'preset-filled-secondary-500' : 'preset-outlined-surface-300-700']}
+            onclick={() => applyPreset(preset)}
+            >
+            <div class="flex-1 flex flex-col items-start gap-0">
+              <span class="font-medium whitespace-pre-wrap">{preset.label}</span>
+              <span class="text-xs opacity-70 whitespace-pre-wrap">{preset.description}</span>
+            </div>
+            {#if selected}
+              <span class="flex items-center gap-1 text-xs">
+                <CheckIcon class="size-4" />
+              </span>
+            {/if}
+        </button>
+        {/each}
       </div>
-    {/each}
   </div>
 
-  <button class="btn hover:preset-tonal mx-auto w-fit" onclick={resetToDefaults}>
-    <RotateCwIcon />
-    Reset to Defaults
-  </button>
+  <hr class="w-full border-surface-300-700" />
+
+  <!-- Custom Date Ranges -->
+  <div class="w-full">
+    <p class="text-sm font-medium mb-2">Custom Date Ranges</p>
+    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 w-full">
+      {#each editingSeasons as season, seasonIndex (seasonIndex)}
+        {@const startParsed = parseDateString(season.startDate)}
+        {@const endParsed = parseDateString(season.endDate)}
+        <div class="space-y-3 p-4 preset-outlined-surface-300-700 rounded-lg">
+          <div>
+            <p class="font-semibold text-lg">{season.label}</p>
+            <p class="text-xs text-surface-500">
+              {formatDateRange(season.startDate, season.endDate)}
+            </p>
+          </div>
+
+          <!-- Start Date -->
+          <div class="flex flex-col gap-1">
+            <span class="text-sm font-medium">Start Date</span>
+            <div class="flex gap-2">
+              <select
+                class="select w-fit"
+                value={startParsed.month}
+                onchange={(e) => {
+                  const newMonth = parseInt((e.target as HTMLSelectElement).value);
+                  updateSeasonDate(seasonIndex, 'startDate', newMonth, startParsed.day);
+                }}
+              >
+                {#each MONTH_NAMES as monthName, i}
+                  <option value={i + 1}>{monthName}</option>
+                {/each}
+              </select>
+              <select
+                class="select w-fit"
+                value={startParsed.day}
+                onchange={(e) => {
+                  const newDay = parseInt((e.target as HTMLSelectElement).value);
+                  updateSeasonDate(seasonIndex, 'startDate', startParsed.month, newDay);
+                }}
+              >
+                {#each Array.from({ length: getDaysInMonth(startParsed.month) }, (_, i) => i + 1) as day}
+                  <option value={day}>{day}</option>
+                {/each}
+              </select>
+            </div>
+          </div>
+
+          <!-- End Date -->
+          <div class="flex flex-col gap-1">
+            <span class="text-sm font-medium">End Date</span>
+            <div class="flex gap-2">
+              <select
+                class="select w-fit"
+                value={endParsed.month}
+                onchange={(e) => {
+                  const newMonth = parseInt((e.target as HTMLSelectElement).value);
+                  updateSeasonDate(seasonIndex, 'endDate', newMonth, endParsed.day);
+                }}
+              >
+                {#each MONTH_NAMES as monthName, i}
+                  <option value={i + 1}>{monthName}</option>
+                {/each}
+              </select>
+              <select
+                class="select w-fit"
+                value={endParsed.day}
+                onchange={(e) => {
+                  const newDay = parseInt((e.target as HTMLSelectElement).value);
+                  updateSeasonDate(seasonIndex, 'endDate', endParsed.month, newDay);
+                }}
+              >
+                {#each Array.from({ length: getDaysInMonth(endParsed.month) }, (_, i) => i + 1) as day}
+                  <option value={day}>{day}</option>
+                {/each}
+              </select>
+            </div>
+          </div>
+        </div>
+      {/each}
+    </div>
+  </div>
 </div>
 
 <StickyPart position="bottom">

@@ -5,7 +5,8 @@ import { DEFAULT_SEASONS } from '$lib/constants/seasons-constants';
 type SeasonConfig = {
   id: string;
   label: string;
-  months: number[];
+  startDate: string; // MM-DD format
+  endDate: string; // MM-DD format
 };
 
 // User preferences for the web app stored in local storage
