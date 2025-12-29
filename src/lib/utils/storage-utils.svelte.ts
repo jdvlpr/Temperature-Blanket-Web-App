@@ -88,24 +88,24 @@ function migrateProjectsToPerKey() {
   }
 
   // If entries look like full projects, migrate them
-  if (Array.isArray(parsed) && parsed.length && parsed[0]) {
+  if (Array.isArray(parsed) && parsed.length && parsed[0] && !parsed[0].meta) {
     const migratedIndex: any[] = [];
     parsed.forEach((project: any) => {
       const id =
         parseProjectIdFromHref(project.href) || new Date().getTime().toString();
-      try {
-        console.count('here');
+
+      // Store the full project under its own key, if it doesn't already exist
+      if (!localStorage.getItem(`${PROJECT_PREFIX}${id}`))
         localStorage.setItem(`${PROJECT_PREFIX}${id}`, JSON.stringify(project));
-      } catch {
-        // Ignore
-        console.count('nope');
-      }
+
       migratedIndex.push({
         id,
-        date: project.date,
-        href: project.href,
-        title: project.title || '',
-        isCustomWeatherData: project.isCustomWeatherData || false,
+        meta: {
+          date: project.date,
+          href: project.href,
+          title: project.title || '',
+          isCustomWeatherData: project.isCustomWeatherData || false,
+        },
       });
     });
     setProjectsIndex(migratedIndex);
@@ -262,7 +262,9 @@ export const checkForProjectInLocalStorage = async () => {
     'project',
   );
   if (timestamp === null || typeof +timestamp !== 'number') return;
+
   timestamp = +timestamp;
+
   const latestDay = new Date(
     Math.max(...newWeatherUngrouped.map((n) => n.date)),
   ).getTime();
@@ -270,10 +272,13 @@ export const checkForProjectInLocalStorage = async () => {
   let daysInFuture = 0;
   if (latestDay >= +timestamp)
     daysInFuture = numberOfDays(timestamp, latestDay);
+
   // If there are days in the future and the weather is not custom, do not load weather from local storage
   if (daysInFuture > 0 && !matchedProject.isCustomWeatherData) return;
 
   // Set the weather data and indicate that it was loaded from local storage
+  console.log({ newWeatherUngrouped });
+
   weather.rawData = newWeatherUngrouped;
 
   weather.isFromLocalStorage = true;
@@ -295,7 +300,7 @@ export const setLocalStorageProject = () => {
   if (index > -1) {
     // project is already in the index, so delete the existing index entry
     localProjectsIndex.splice(index, 1);
-    // Optionally remove old full project key - we'll overwrite it below
+    // Remove old full project key (we'll overwrite it below)
     localStorage.removeItem(`${PROJECT_PREFIX}${thisID}`);
   }
 
@@ -308,15 +313,17 @@ export const setLocalStorageProject = () => {
   );
 
   // Save minimal metadata in the projects index
-  const meta = {
+  const projectIndex = {
     id: thisID,
-    date: localProject.date,
-    href: localProject.href,
-    title: localProject.title || '',
-    isCustomWeatherData: localProject.isCustomWeatherData || false,
+    meta: {
+      date: localProject.date,
+      href: localProject.href,
+      title: localProject.title || '',
+      isCustomWeatherData: localProject.isCustomWeatherData || false,
+    },
   };
 
-  localProjectsIndex.push(meta);
+  localProjectsIndex.push(projectIndex);
 
   setProjectsIndex(localProjectsIndex);
 };
@@ -373,7 +380,7 @@ const createProjectLocalStorageProjectObject = () => {
 // ----------------------
 export function getSavedProjectMetaByHref(href: string) {
   const index = getProjectsIndex();
-  return index.find((i: any) => i.href === href) || null;
+  return index.find((i: any) => i.meta.href === href) || null;
 }
 
 export function getSavedProjectByHref(href: string) {
