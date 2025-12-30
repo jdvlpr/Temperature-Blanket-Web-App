@@ -20,7 +20,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     showPreviewImageWeatherDetails,
   } from '$lib/utils';
   import { rowsPreview } from './state.svelte';
-
 </script>
 
 {#if !rowsPreview.sections.length}

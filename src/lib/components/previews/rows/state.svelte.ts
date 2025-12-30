@@ -1,17 +1,20 @@
 import { CHARACTERS_FOR_URL_HASH } from '$lib/constants';
 import { DEFAULT_SEASONS } from '$lib/constants/seasons-constants';
 import { getSeasonForDate } from '$lib/utils/seasons-utils';
-import { gauges, previews, weather, localState } from '$lib/state';
+import { gauges, previews, weather, localState, project } from '$lib/state';
 import {
   displayNumber,
   setTargets,
   sum,
   getColorInfo,
   getWeatherValue,
+  runPreview,
 } from '$lib/utils';
 import chroma from 'chroma-js';
 import Preview from './Preview.svelte';
 import Settings from './Settings.svelte';
+import { untrack } from 'svelte';
+import { weatherDataUpdatedKey } from '$lib/components/WeatherTableWrapper.svelte';
 
 export class RowsPreviewClass {
   constructor() {
@@ -111,8 +114,9 @@ export class RowsPreviewClass {
   width = $derived(this.settings.stitchesPerRow * this.stitchSize);
 
   layout = $derived.by(() => {
-    // Check if we have data
-    if (!weather?.data?.length) return { sections: [], height: 0 };
+    // Early return if no data is available
+    if (!window || !weather.data.length || !gauges.allCreated.length)
+      return { sections: [], height: 0 };
 
     // Setup constants
     let columnIndex = 0; // Current column index
