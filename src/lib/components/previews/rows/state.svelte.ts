@@ -114,6 +114,9 @@ export class RowsPreviewClass {
   width = $derived(this.settings.stitchesPerRow * this.stitchSize);
 
   layout = $derived.by(() => {
+    // Ensure reactivity to project changes
+    project.url.href;
+    weatherDataUpdatedKey.value;
     // Early return if no data is available
     if (!window || !weather.data.length || !gauges.allCreated.length)
       return { sections: [], height: 0 };

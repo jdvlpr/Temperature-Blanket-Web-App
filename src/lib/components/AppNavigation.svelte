@@ -36,7 +36,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     HeartIcon,
     Icon,
     MailIcon,
-    MessageCirclePlusIcon,
     NotebookPenIcon,
     RssIcon,
     ShieldAlertIcon,
