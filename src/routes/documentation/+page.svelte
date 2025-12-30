@@ -1760,7 +1760,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </section>
 
           <section
-            id="seasons"
+            id="assigning-seasons"
             class="card bg-surface-100 dark:bg-surface-900 flex scroll-mt-[58px] flex-col gap-2 p-4"
           >
             <h3 class="text-xl font-bold flex items-center gap-2">Assigning Seasons<span class="badge bg-tertiary-100-900">Beta</span></h3>
