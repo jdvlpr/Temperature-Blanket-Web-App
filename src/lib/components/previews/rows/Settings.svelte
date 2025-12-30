@@ -70,10 +70,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
 >
   <p class="text-2xl font-bold">Settings</p>
 
+  {#if !rowsPreview.settings.useSeasonTargets}
+    <ToggleSwitchGroup
+      groupLabel={`Color Each Row Using the ${capitalizeFirstLetter(weather.grouping)}'s`}
+      {targets}
+      bind:value={rowsPreview.settings.selectedTargets}
+    />
+  {/if}
+
   <div class="w-fit">
     <ToggleSwitch
       label="Seasons <span class='badge bg-tertiary-100-900'>Beta</span>"
-      details="Use different weather parameters for different months"
+      details="Use different weather parameters for different months. <a href='/documentation#assigning-seasons' target='_blank' class='link text-xs'>Learn more...</a>"
       checked={rowsPreview.settings.useSeasonTargets}
       onchange={(e: Event) => {
         const target = e.target as HTMLInputElement;
@@ -84,45 +92,39 @@ If not, see <https://www.gnu.org/licenses/>. -->
     />
   </div>
 
-  {#if !rowsPreview.settings.useSeasonTargets}
-    <ToggleSwitchGroup
-      groupLabel={`Color Each Row Using the ${capitalizeFirstLetter(weather.grouping)}'s`}
-      {targets}
-      bind:value={rowsPreview.settings.selectedTargets}
-    />
-  {:else}
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
-        {#each seasons as season, seasonIndex}
-          <div class="flex flex-col gap-2 items-start max-w-sm">
-            <button
-              class="btn hover:preset-tonal font-bold w-fit whitespace-pre-wrap gap-1" 
-              title="Edit Seasons"
-              onclick={() => {
-                dialog.trigger({
-                  type: 'component',
-                  component: {
-                    ref: SeasonEditor,
-                    props: {
-                      onClose: () => dialog.close(),
-                    },
+  {#if rowsPreview.settings.useSeasonTargets}
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
+      {#each seasons as season, seasonIndex}
+        <div class="flex flex-col gap-2 items-start max-w-sm">
+          <button
+            class="btn hover:preset-tonal font-bold w-fit whitespace-pre-wrap gap-1" 
+            title="Edit Seasons"
+            onclick={() => {
+              dialog.trigger({
+                type: 'component',
+                component: {
+                  ref: SeasonEditor,
+                  props: {
+                    onClose: () => dialog.close(),
                   },
-                });
-              }}
-            >
-              {season.label}
-              <PencilIcon size={16} />
-              <span class="text-sm font-normal">
-                ({formatDateRange(season.startDate, season.endDate)})
-              </span>
-            </button>
-            <ToggleSwitchGroup
-              groupLabel={`Color Each Row Using the ${capitalizeFirstLetter(weather.grouping)}'s`}
-              {targets}
-              bind:value={rowsPreview.settings.seasonTargets[seasonIndex]}
-            />
-          </div>
-        {/each}
-      </div>
+                },
+              });
+            }}
+          >
+            {season.label}
+            <PencilIcon size={16} />
+            <span class="text-sm font-normal">
+              ({formatDateRange(season.startDate, season.endDate)})
+            </span>
+          </button>
+          <ToggleSwitchGroup
+            groupLabel={`Color Each Row Using the ${capitalizeFirstLetter(weather.grouping)}'s`}
+            {targets}
+            bind:value={rowsPreview.settings.seasonTargets[seasonIndex]}
+          />
+        </div>
+      {/each}
+    </div>
   {/if}
 
   <NumberInputButton

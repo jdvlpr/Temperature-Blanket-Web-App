@@ -78,7 +78,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <div class="flex flex-col gap-4 p-2 sm:p-4 w-full items-start">
   <div class="">
     <h2 class="text-2xl font-bold">Edit Seasons</h2>
-    <p class="text-sm">Choose a preset or customize the start and end dates for each season</p>
+    <p class="text-sm">Choose a preset or customize the start and end dates for each season.</p>
   </div>
 
   <!-- Presets -->

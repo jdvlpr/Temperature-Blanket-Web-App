@@ -26,7 +26,12 @@ export const SEASON_PRESETS = {
     seasons: [
       { id: 'spring', label: 'Spring', startDate: '03-01', endDate: '05-31' },
       { id: 'summer', label: 'Summer', startDate: '06-01', endDate: '08-31' },
-      { id: 'fall', label: 'Fall', startDate: '09-01', endDate: '11-30' },
+      {
+        id: 'fall',
+        label: 'Fall (Autumn)',
+        startDate: '09-01',
+        endDate: '11-30',
+      },
       { id: 'winter', label: 'Winter', startDate: '12-01', endDate: '02-28' },
     ],
   },
@@ -37,7 +42,12 @@ export const SEASON_PRESETS = {
     seasons: [
       { id: 'spring', label: 'Spring', startDate: '03-20', endDate: '06-20' },
       { id: 'summer', label: 'Summer', startDate: '06-21', endDate: '09-21' },
-      { id: 'fall', label: 'Fall', startDate: '09-22', endDate: '12-20' },
+      {
+        id: 'fall',
+        label: 'Fall (Autumn)',
+        startDate: '09-22',
+        endDate: '12-20',
+      },
       { id: 'winter', label: 'Winter', startDate: '12-21', endDate: '03-19' },
     ],
   },
@@ -48,7 +58,12 @@ export const SEASON_PRESETS = {
     seasons: [
       { id: 'spring', label: 'Spring', startDate: '09-01', endDate: '11-30' },
       { id: 'summer', label: 'Summer', startDate: '12-01', endDate: '02-28' },
-      { id: 'fall', label: 'Fall', startDate: '03-01', endDate: '05-31' },
+      {
+        id: 'fall',
+        label: 'Fall (Autumn)',
+        startDate: '03-01',
+        endDate: '05-31',
+      },
       { id: 'winter', label: 'Winter', startDate: '06-01', endDate: '08-31' },
     ],
   },
@@ -59,7 +74,12 @@ export const SEASON_PRESETS = {
     seasons: [
       { id: 'spring', label: 'Spring', startDate: '09-22', endDate: '12-20' },
       { id: 'summer', label: 'Summer', startDate: '12-21', endDate: '03-19' },
-      { id: 'fall', label: 'Fall', startDate: '03-20', endDate: '06-20' },
+      {
+        id: 'fall',
+        label: 'Fall (Autumn)',
+        startDate: '03-20',
+        endDate: '06-20',
+      },
       { id: 'winter', label: 'Winter', startDate: '06-21', endDate: '09-21' },
     ],
   },

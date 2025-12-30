@@ -14,6 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
+  import { version } from '$app/environment';
   import { PUBLIC_BASE_URL } from '$env/static/public';
   import AppLogo from '$lib/components/AppLogo.svelte';
   import AppShell from '$lib/components/AppShell.svelte';
@@ -30,6 +31,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     InfoIcon,
   } from '@lucide/svelte';
   import { Dialog, Portal } from '@skeletonlabs/skeleton-svelte';
+  import { VERSION } from 'svelte/compiler';
 
   let openTableOfContents = $state(false);
 
@@ -1766,8 +1768,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <h3 class="text-xl font-bold flex items-center gap-2">Assigning Seasons<span class="badge bg-tertiary-100-900">Beta</span></h3>
 
             <p>
-             Assigning seasons to your preview layout will allow you to use the season-specific color palettes.
+             Assigning seasons to your preview allows you to use different weather parameters for different times of the year. For example, you could use high temperatures for spring and summer, and low temperatures for fall (autumn) and winter.
             </p>
+
+            <p>
+             To assign seasons, toggle the Seasons switch in the settings of the Preview tab. Note that not all pattern types support seasons.
+            </p>
+
+            <div class="card bg-warning-500/20 flex flex-col gap-2 p-4">
+              <p>
+                As of the current version ({version}) only the Rows pattern type supports assigning seasons. Support for more pattern types may be added in future updates.
+              </p>
+            </div>
           
           </section>
 
