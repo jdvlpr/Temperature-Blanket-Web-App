@@ -30,8 +30,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let { project, canRemove = true, onclick } = $props();
 
   const { href, title, date, isCustomWeatherData } = project;
+  
   let colors = getColorsFromInput({ string: href });
-
+  
   function getProjectDescription({ colors, date }) {
     let schemeName =
       "<p class='flex flex-wrap justify-start items-center gap-x-4'>";

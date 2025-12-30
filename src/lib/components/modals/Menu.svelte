@@ -51,14 +51,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { onMount } from 'svelte';
   import WeatherGrouping from '../WeatherGrouping.svelte';
   import WeatherSourceButton from '../buttons/WeatherSourceButton.svelte';
-
   interface Props {
     page?: string;
     highlight?: string;
   }
-
+  
   let { page = 'main', highlight }: Props = $props();
-
+  
   let currentSavedProject = $state(null);
 
   let weatherSettingsElement: HTMLElement | null = $state(null);
@@ -446,9 +445,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {project.url.href}
         </p>
 
-        {#if currentSavedProject}
+        {#if currentSavedProject && currentSavedProject?.meta}
           <div class="w-full">
-            <ProjectDetails project={currentSavedProject} canRemove={false} />
+            <ProjectDetails project={currentSavedProject.meta} canRemove={false} />
           </div>
         {/if}
 
