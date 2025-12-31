@@ -100,7 +100,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <SpanYarnColorSelectIcon
           color={continuousSquarePreview.settings.extrasColor}
         />
-        Color of Additional Stitches
+        Accent Color (for additional stitches)
       </button>
     {/if}
   {/if}

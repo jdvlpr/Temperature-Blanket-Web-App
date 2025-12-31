@@ -166,7 +166,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <SpanYarnColorSelectIcon
         color={squaresPreview.settings.additionalSquaresColor}
       />
-      Color of Additional Squares
+      Accent Color (for additional squares)
     </button>
   {/if}
 

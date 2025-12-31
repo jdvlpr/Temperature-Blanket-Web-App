@@ -120,7 +120,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         })}
     >
       <SpanYarnColorSelectIcon color={monthRowsPreview.settings.borderColor} />
-      Color of Border Stitches</button
+      Accent Color (for borders)</button
     >
   {/if}
 </div>

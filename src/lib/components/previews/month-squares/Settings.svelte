@@ -105,7 +105,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <SpanYarnColorSelectIcon
       color={monthSquaresPreview.settings.additionalRoundsColor}
     />
-    Color of Additional Rounds
+    Accent Color (for additional rounds)
   </button>
 </div>
 

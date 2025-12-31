@@ -1768,16 +1768,24 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <h3 class="text-xl font-bold flex items-center gap-2">Assigning Seasons<span class="badge bg-tertiary-100-900">Beta</span></h3>
 
             <p>
-             Assigning seasons to your preview allows you to use different weather parameters for different times of the year. For example, you could use high temperatures for spring and summer, and low temperatures for fall (autumn) and winter.
+             Assigning seasons to the preview allows you to use different weather parameters for different times of the year. For example, you could use high temperatures to assign the colors for spring and summer, and low temperatures to assign the colors for fall (autumn) and winter.
             </p>
 
             <p>
              To assign seasons, toggle the Seasons switch in the settings of the Preview tab. Note that not all pattern types support seasons.
             </p>
 
+            <p>
+             To edit which dates are in which seasons, press the name of a season. You can choose from several preset options, or customize the start and end dates for each season.
+            </p>
+
+            <p>
+             If a date falls outside of the custom defined seasons' ranges, the preview will show that date using the preview's Accent Color.
+            </p>
+
             <div class="card bg-warning-500/20 flex flex-col gap-2 p-4">
               <p>
-                As of the current version ({version}) only the Rows pattern type supports assigning seasons. Support for more pattern types may be added in future updates.
+                For now, only the Rows pattern type supports assigning seasons. Support for more pattern types may be added in future updates.
               </p>
             </div>
           

@@ -81,7 +81,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <div class="w-fit">
     <ToggleSwitch
       label="Seasons <span class='badge bg-tertiary-100-900'>Beta</span>"
-      details="Use different weather parameters for different months. <a href='/documentation#assigning-seasons' target='_blank' class='link text-xs'>Learn more...</a>"
+      details="Use different weather parameters for different times of the year. <a href='/documentation#assigning-seasons' target='_blank' class='link text-xs'>Learn more...</a>"
       checked={rowsPreview.settings.useSeasonTargets}
       onchange={(e: Event) => {
         const target = e.target as HTMLInputElement;
@@ -154,7 +154,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     />
   {/if}
 
-  {#if rowsPreview.countOfAdditionalStitches}
+  {#if rowsPreview.countOfAdditionalStitches || rowsPreview.hasDatesOutOfSeasonsRanges}
     <button
       class="btn hover:preset-tonal"
       title="Choose a color for any additional stitches"
@@ -174,7 +174,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         })}
     >
       <SpanYarnColorSelectIcon color={rowsPreview.settings.extrasColor} />
-      Color of Additional Stitches
+      Accent Color (for additional stitches)
     </button>
   {/if}
 </div>

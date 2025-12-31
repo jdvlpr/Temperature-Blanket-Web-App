@@ -145,7 +145,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <SpanYarnColorSelectIcon
       color={calendarPreview.settings.additionalSquaresColor}
     />
-    Color of Additional Squares
+    Accent Color (for additional squares)
   </button>
 
   <label class="label">

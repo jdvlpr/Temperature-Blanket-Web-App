@@ -32,7 +32,7 @@ export const SEASON_PRESETS = {
         startDate: '09-01',
         endDate: '11-30',
       },
-      { id: 'winter', label: 'Winter', startDate: '12-01', endDate: '02-28' },
+      { id: 'winter', label: 'Winter', startDate: '12-01', endDate: '02-29' },
     ],
   },
   northernAstronomical: {
@@ -57,7 +57,7 @@ export const SEASON_PRESETS = {
     description: 'Sep-Nov, Dec-Feb, Mar-May, Jun-Aug',
     seasons: [
       { id: 'spring', label: 'Spring', startDate: '09-01', endDate: '11-30' },
-      { id: 'summer', label: 'Summer', startDate: '12-01', endDate: '02-28' },
+      { id: 'summer', label: 'Summer', startDate: '12-01', endDate: '02-29' },
       {
         id: 'fall',
         label: 'Fall (Autumn)',

@@ -278,6 +278,16 @@ export class RowsPreviewClass {
     };
   });
 
+  hasDatesOutOfSeasonsRanges = $derived.by(() => {
+    if (!this.settings.useSeasonTargets) return false;
+    for (let i = 0; i < weather.data.length; i++) {
+      const date = weather.data?.[i]?.date;
+      const season = getSeasonForDate(date, localState.value.seasons) as any;
+      if (!season) return true;
+    }
+    return false;
+  });
+
   sections = $derived(this.layout.sections);
 
   height = $derived(this.layout.height);

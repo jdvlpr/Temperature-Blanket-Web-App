@@ -194,7 +194,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <SpanYarnColorSelectIcon
       color={squareRoundsPreview.settings.additionalRoundsColor}
     />
-    Color of Square Border and Additional Rounds
+    Accent Color (for borders and additional rounds)
   </button>
 </div>
 

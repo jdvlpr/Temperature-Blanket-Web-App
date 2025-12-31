@@ -246,8 +246,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {/each}
         {#if dateOutOfSeasonsRanges}
           <div class="text-center italic p-4">
-            It looks like this date doesn't fall within any of your assigned seasons. Please
-            adjust your seasons' ranges.
+            It looks like this date doesn't fall within any of your assigned seasons. Please adjust the seasons' ranges.
           </div>
         {/if}
       </div>
