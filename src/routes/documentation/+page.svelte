@@ -300,7 +300,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <li class="toc-list-item ml-4 block">
         <a
           href="#assigning-seasons"
-          class="toc-anchor opacity-60 hover:opacity-100">Assigning Seasons</a
+          class="toc-anchor opacity-60 hover:opacity-100 flex items-center gap-2">Assigning Seasons <span class="badge bg-tertiary-100-900">Beta</span></a
         >
       </li>
       <li class="toc-list-item block">
@@ -1767,6 +1767,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
           >
             <h3 class="text-xl font-bold flex items-center gap-2">Assigning Seasons<span class="badge bg-tertiary-100-900">Beta</span></h3>
 
+            <p class="bg-tertiary-100-900 p-2 rounded-container">
+                This feature is in beta, which means there may be changes to it in the future. If you encounter any issues or have feedback, please use the <a href="/contact" class="link" target="_blank">contact page</a>.
+              </p>
+
             <p>
              Assigning seasons allows you to color each day's section of the preview using a different weather parameter depending on the season. For example, you could use high temperatures to assign the colors for spring and summer, and low temperatures to assign the colors for fall (autumn) and winter.
             </p>
@@ -1907,7 +1911,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </section>
         </div>
         <div
-          class="sticky top-16 hidden h-auto w-1/5 min-w-[200px] self-start sm:inline-block"
+          class="sticky top-16 hidden h-auto w-1/5 min-w-[240px] self-start sm:inline-block"
         >
           <div class="max-h-[90svh] overflow-auto pb-20">
             {@render tableOfContents()}
