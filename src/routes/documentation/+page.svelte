@@ -1787,6 +1787,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
              If a date falls outside of a custom defined seasons' ranges, that date will use the Accent Color as a fallback.
             </p>
 
+            <p>
+             If two season's date ranges overlap, the first season in the list—Spring, Summer, Fall (Autumn), Winter—that includes that date will be used.
+            </p>
+
             <div class="card bg-warning-500/20 flex flex-col gap-2 p-4">
               <p>
                 For now, only the Rows pattern type supports assigning seasons. Support for more pattern types may be added in future updates.
