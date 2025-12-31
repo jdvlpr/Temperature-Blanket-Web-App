@@ -78,10 +78,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     />
   {/if}
 
-  <div class="w-fit">
+  <div class="w-fit max-w-sm">
     <ToggleSwitch
       label="Seasons <span class='badge bg-tertiary-100-900'>Beta</span>"
-      details="Use different weather parameters for different times of the year. <a href='/documentation#assigning-seasons' target='_blank' class='link text-xs'>Learn more...</a>"
+      details="Color each row using different weather parameters depending on the season. <br/><a href='/documentation#assigning-seasons' target='_blank' class='link'>Learn more...</a>"
       checked={rowsPreview.settings.useSeasonTargets}
       onchange={(e: Event) => {
         const target = e.target as HTMLInputElement;

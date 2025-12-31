@@ -1768,7 +1768,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <h3 class="text-xl font-bold flex items-center gap-2">Assigning Seasons<span class="badge bg-tertiary-100-900">Beta</span></h3>
 
             <p>
-             Assigning seasons to the preview allows you to use different weather parameters for different times of the year. For example, you could use high temperatures to assign the colors for spring and summer, and low temperatures to assign the colors for fall (autumn) and winter.
+             Assigning seasons allows you to color each day's section of the preview using a different weather parameter depending on the season. For example, you could use high temperatures to assign the colors for spring and summer, and low temperatures to assign the colors for fall (autumn) and winter.
             </p>
 
             <p>
@@ -1780,7 +1780,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </p>
 
             <p>
-             If a date falls outside of the custom defined seasons' ranges, the preview will show that date using the preview's Accent Color.
+             If a date falls outside of a custom defined seasons' ranges, that date will use the Accent Color as a fallback.
             </p>
 
             <div class="card bg-warning-500/20 flex flex-col gap-2 p-4">
