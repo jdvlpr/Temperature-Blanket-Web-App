@@ -19,7 +19,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ToggleSwitchGroup from '$lib/components/buttons/ToggleSwitchGroup.svelte';
   import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
   import PreviewInfo from '$lib/components/PreviewInfo.svelte';
-  import SeasonEditor from '$lib/components/previews/rows/SeasonEditor.svelte';
+  import SeasonEditor from '$lib/components/SeasonEditor.svelte';
   import SpanYarnColorSelectIcon from '$lib/components/SpanYarnColorSelectIcon.svelte';
   import { dialog, gauges, localState, project, weather } from '$lib/state';
   import { capitalizeFirstLetter, pluralize, formatDateRange } from '$lib/utils';

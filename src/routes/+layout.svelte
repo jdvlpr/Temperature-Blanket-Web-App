@@ -22,6 +22,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     consentToMSClarityCookies,
     dialog,
     drawerState,
+    project,
     toast,
   } from '$lib/state';
   import { handleKeyDown, initializeLocalStorage, privacy } from '$lib/utils';

@@ -17,7 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import WeatherItem from '$lib/components/WeatherItem.svelte';
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
   import { UNIT_LABELS } from '$lib/constants';
-  import { localState, locations, weather } from '$lib/state';
+  import { localState, locations, project, weather } from '$lib/state';
   import {
     capitalizeFirstLetter,
     convertTime,
@@ -72,6 +72,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let currentWeatherTargets = $derived(
     getTargets ? getTargets(weather.currentIndex) : weatherTargets,
   );
+
+  let dateOutOfSeasonsRanges = $derived(currentWeatherTargets.length === 0 && project.useSeasons);
 </script>
 
 <div
@@ -242,12 +244,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
             />
           {/if}
         {/each}
+        {#if dateOutOfSeasonsRanges}
+          <div class="text-center italic p-4">
+            It looks like this date doesn't fall within any of your assigned seasons. Please
+            adjust your seasons' ranges.
+          </div>
+        {/if}
       </div>
     </div>
   {/key}
+  {#if !dateOutOfSeasonsRanges}
   <div class="mx-auto my-2 w-fit">
     <ToggleSwitch bind:checked={viewGaugeInfo} label={'Show Color Details'} />
   </div>
+  {/if}
 </div>
 
 <style lang="scss">

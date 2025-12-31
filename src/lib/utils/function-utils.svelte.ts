@@ -45,6 +45,7 @@ export const runPreview = (callback) => {
       project.url.href;
       weatherDataUpdatedKey.value;
       if (!weather.data.length || !gauges.allCreated.length) return;
+
       debouncePreviewEffect(() => {
         callback();
       }, 0);

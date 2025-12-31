@@ -16,6 +16,9 @@ import Settings from './Settings.svelte';
 import { untrack } from 'svelte';
 import { weatherDataUpdatedKey } from '$lib/components/WeatherTableWrapper.svelte';
 
+// Special marker used to indicate an "extras" row for days outside all seasons
+const EXTRAS_TARGET = '__extras__';
+
 export class RowsPreviewClass {
   constructor() {
     $effect.root(() => {
@@ -118,8 +121,14 @@ export class RowsPreviewClass {
     project.url.href;
     weatherDataUpdatedKey.value;
     // Early return if no data is available
-    if (!window || !weather.data.length || !gauges.allCreated.length)
+    if (
+      !window ||
+      !weather.data.length ||
+      !gauges.allCreated.length ||
+      project.status.loading
+    ) {
       return { sections: [], height: 0 };
+    }
 
     // Setup constants
     let columnIndex = 0; // Current column index
@@ -185,10 +194,29 @@ export class RowsPreviewClass {
           remainderLineCount = sectionStitchesCount - lineWidth;
         }
 
-        // Loop through each target parameter
-        const activeTargets = isWeatherSection
-          ? this.getTargetsForDay(dayIndex)
-          : this.activeSelectedTargets;
+        // Determine active targets depending on section type and season usage
+        let activeTargets: string[];
+        if (isWeatherSection) {
+          activeTargets = this.getTargetsForDay(dayIndex);
+          // If using season targets, a missing/empty target list should render as a single extras row.
+          if (
+            this.settings.useSeasonTargets &&
+            (!activeTargets || activeTargets.length === 0)
+          ) {
+            activeTargets = [EXTRAS_TARGET];
+          }
+        } else {
+          // For filler (non-weather) sections:
+          // - If using seasons, make the filler a single extras row so it matches the expected fallback style.
+          // - If not using seasons, use the activeSelectedTargets (or selectedTargets) so the filler matches normal stacks.
+          activeTargets = this.settings.useSeasonTargets
+            ? [EXTRAS_TARGET]
+            : this.activeSelectedTargets;
+
+          // Defensive fallback: ensure at least one row is rendered.
+          if (!activeTargets || activeTargets.length === 0)
+            activeTargets = [EXTRAS_TARGET];
+        }
 
         for (
           let paramIndex = 0,
@@ -201,9 +229,13 @@ export class RowsPreviewClass {
 
           if (isWeatherSection) {
             let param = activeTargets[paramIndex] as any;
-            let value = getWeatherValue({ dayIndex, param });
-            const colorInfo = getColorInfo({ param, value });
-            color = colorInfo.hex || '#cccccc';
+            if (param === EXTRAS_TARGET) {
+              color = this.settings.extrasColor;
+            } else {
+              let value = getWeatherValue({ dayIndex, param });
+              const colorInfo = getColorInfo({ param, value });
+              color = colorInfo.hex || '#cccccc';
+            }
           } else {
             color = this.settings.extrasColor;
           }
@@ -326,7 +358,7 @@ export class RowsPreviewClass {
     // Iterate through the hash string to find the indices of specific characters
     for (let i = 0; i < hash.length; i++) {
       if (hash[i] === '(') startIndex = i;
-      if (startIndex && startIndex > i) {
+      if (startIndex && i > startIndex) {
         // Only look for separators after the opening parenthesis
         // Separators may be present before if using season targets
         if (
@@ -421,12 +453,12 @@ export class RowsPreviewClass {
     }
 
     const date = weather.data?.[dayIndex]?.date;
-    if (!date) return this.settings.selectedTargets;
+    if (!date) return [EXTRAS_TARGET];
 
     const dateObj = new Date(date);
     const season = getSeasonForDate(dateObj, localState.value.seasons) as any;
 
-    if (!season) return this.settings.selectedTargets;
+    if (!season) return [EXTRAS_TARGET];
 
     // Find the index of the season in the user's seasons list
     const seasonIndex = localState.value.seasons.indexOf(season);
@@ -438,17 +470,15 @@ export class RowsPreviewClass {
           localState.value.seasons[i].startDate === season.startDate &&
           localState.value.seasons[i].endDate === season.endDate
         ) {
-          return (
-            this.settings.seasonTargets[i] || this.settings.selectedTargets
-          );
+          const st = this.settings.seasonTargets[i];
+          return st && st.length ? st : [EXTRAS_TARGET];
         }
       }
-      return this.settings.selectedTargets;
+      return [EXTRAS_TARGET];
     }
 
-    return (
-      this.settings.seasonTargets[seasonIndex] || this.settings.selectedTargets
-    );
+    const st = this.settings.seasonTargets[seasonIndex];
+    return st && st.length ? st : [EXTRAS_TARGET];
   }
 }
 
