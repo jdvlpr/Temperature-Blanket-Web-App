@@ -1768,7 +1768,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <h3 class="text-xl font-bold flex items-center gap-2">Assigning Seasons<span class="badge bg-tertiary-100-900">Beta</span></h3>
 
             <p class="bg-tertiary-100-900 p-2 rounded-container">
-                This feature is in beta, which means there may be changes to it in the future. If you encounter any issues or have feedback, please use the <a href="/contact" class="link" target="_blank">contact page</a>.
+                This feature is in beta, which means it may have unexpected issues or may have breaking changes in the future. If you encounter any issues or have feedback, please use the <a href="/contact" class="link" target="_blank">contact page</a>.
               </p>
 
             <p>
