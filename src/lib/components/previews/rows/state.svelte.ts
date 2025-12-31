@@ -1,6 +1,6 @@
 import { CHARACTERS_FOR_URL_HASH } from '$lib/constants';
 import { DEFAULT_SEASONS } from '$lib/constants/seasons-constants';
-import { getSeasonForDate } from '$lib/utils/seasons-utils';
+import { getSeasonForDate } from '$lib/utils/seasons-utils.svelte';
 import { gauges, previews, weather, localState, project } from '$lib/state';
 import {
   displayNumber,

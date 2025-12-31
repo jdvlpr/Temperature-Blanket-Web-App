@@ -18,6 +18,8 @@ import {
   MONTH_NAMES,
   SEASON_PRESETS,
 } from '$lib/constants/seasons-constants';
+import { localState, project } from '$lib/state';
+import type { LocationType } from '$lib/types';
 
 /**
  * Parse a MM-DD string into month and day numbers
@@ -184,4 +186,34 @@ export function seasonsFromUrlHash(hash: string): Season[] | null {
   }
 
   return null;
+}
+
+export function setSeasonsByLocation(location: LocationType) {
+  // Don't override if seasons are already being used (set via URL or by user)
+  if (project.useSeasons) return;
+
+  try {
+    // Check that the current seasons are still the default before auto-assigning
+    const currentSeasons = localState.value.seasons;
+
+    const isDefaultSeasons = PRESETS_ARRAY.some((preset) =>
+      seasonsMatchDates(currentSeasons, preset.seasons),
+    );
+
+    let firstLat = Number($state.snapshot(location.lat));
+
+    // Auto-assign seasons preset based on the location's hemisphere
+    if (isDefaultSeasons && typeof firstLat === 'number') {
+      // Latitude >= 0 => Northern Hemisphere, else Southern
+      if (firstLat >= 0)
+        localState.value.seasons =
+          SEASON_PRESETS.northernMeteorological.seasons;
+      else
+        localState.value.seasons =
+          SEASON_PRESETS.southernMeteorological.seasons;
+    }
+  } catch (e) {
+    // Defensive: don't block UX if something unexpected happens
+    // console.warn('Auto-assign seasons failed', e);
+  }
 }

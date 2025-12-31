@@ -20,7 +20,7 @@ import {
   NO_DATA_SRTM3,
   UNIT_LABELS,
 } from '$lib/constants';
-import { seasonsFromUrlHash } from '$lib/utils/seasons-utils';
+import { seasonsFromUrlHash } from '$lib/utils/seasons-utils.svelte';
 import {
   allGaugesAttributes,
   gauges,

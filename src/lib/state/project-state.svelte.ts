@@ -14,7 +14,7 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { browser, version } from '$app/environment';
-import { seasonsToUrlHash } from '$lib/utils/seasons-utils';
+import { seasonsToUrlHash } from '$lib/utils/seasons-utils.svelte';
 import { gauges, localState, locations, previews, weather } from '$lib/state';
 
 export class HistoryStateClass {
