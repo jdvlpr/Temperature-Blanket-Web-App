@@ -1768,29 +1768,30 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <h3 class="text-xl font-bold flex items-center gap-2">Assigning Seasons<span class="badge bg-tertiary-100-900">Beta</span></h3>
 
             <p class="bg-tertiary-100-900 p-2 rounded-container">
-                This feature is in beta, which means it may have unexpected issues or may have breaking changes in the future. If you encounter any issues or have feedback, please use the <a href="/contact" class="link" target="_blank">contact page</a>.
+                This feature is in beta, which means it may have unexpected issues or may have breaking changes in the future. If you encounter any issues or have feedback, please let the developer know. <a href="/contact" class="link" target="_blank">Here is the contact page</a>.
               </p>
 
             <p>
-             Assigning seasons allows you to color each day's section of the preview using a different weather parameter depending on the season. For example, you could use high temperatures to assign the colors for spring and summer, and low temperatures to assign the colors for fall (autumn) and winter.
+              Assigning seasons allows you to use different weather parameters for different times of the year. For example, you could use High Temperatures for Spring and Summer, and Low Temperatures for Fall (Autumn) and Winter.
             </p>
 
             <p>
-             To assign seasons, toggle the Seasons switch in the settings of the Preview tab. Note that not all pattern types support seasons.
+             To assign seasons, select the Seasons toggle in the settings of the Preview tab. Note that not all pattern types support seasons, so if you don't see the Seasons toggle, select a different pattern type.
             </p>
 
             <p>
              To edit which dates are in which seasons, press the name of a season. You can choose from several preset options, or customize the start and end dates for each season.
             </p>
 
-            <p>
-             If a date falls outside of a custom defined seasons' ranges, that date will use the Accent Color as a fallback.
-            </p>
-
-            <p>
-             If two season's date ranges overlap, the first season in the list—Spring, Summer, Fall (Autumn), Winter—that includes that date will be used.
-            </p>
-
+            <p>Notes:</p>
+            <ul class="ml-4">
+              <li>
+                - If a date falls outside of a custom defined seasons' ranges, that date will use the Accent Color as a fallback.
+              </li>
+              <li>- If two season's date ranges overlap, the first season which includes that date will be used. The order of the seasons is as follows: 1) Spring, 2) Summer, 3) Fall (Autumn), 4) Winter.
+              </li>
+            </ul>
+            
             <div class="card bg-warning-500/20 flex flex-col gap-2 p-4">
               <p>
                 For now, only the Rows pattern type supports assigning seasons. Support for more pattern types may be added in future updates.
