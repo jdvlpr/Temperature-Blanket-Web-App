@@ -1,6 +1,6 @@
 import { CHARACTERS_FOR_URL_HASH } from '$lib/constants';
 import { gauges, previews, weather } from '$lib/state';
-import type { Color, WeatherParam } from '$lib/types';
+import type { BasePreviewSettings, Color, WeatherParam } from '$lib/types';
 import {
   getMonthSepparatorIndexes,
   getSquareSectionTargetIds,
@@ -12,7 +12,7 @@ import chroma from 'chroma-js';
 import Preview from './Preview.svelte';
 import Settings from './Settings.svelte';
 
-type SquaresPreviewSettings = {
+interface SquaresPreviewSettings extends BasePreviewSettings {
   primaryTarget: WeatherParam['id'];
   squareSize: number;
   columns: number;
@@ -23,7 +23,7 @@ type SquaresPreviewSettings = {
   joinColor: Color['hex'];
   additionalSquaresColor: Color['hex'];
   primaryTargetAsBackup: boolean;
-};
+}
 
 export class SquaresPreviewClass {
   constructor() {

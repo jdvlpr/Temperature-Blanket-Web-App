@@ -1,5 +1,6 @@
 import { CHARACTERS_FOR_URL_HASH } from '$lib/constants';
 import { gauges, previews, weather } from '$lib/state';
+import type { BasePreviewSettings, Color, WeatherParam } from '$lib/types';
 import {
   getDaysInLongestMonth,
   getFactors,
@@ -11,6 +12,14 @@ import {
 import chroma from 'chroma-js';
 import Preview from './Preview.svelte';
 import Settings from './Settings.svelte';
+
+interface SplitMonthSquaresPreviewSettings extends BasePreviewSettings {
+  leftTarget: WeatherParam['id'];
+  rightTarget: WeatherParam['id'];
+  dimensions: string;
+  additionalRoundsColor: Color['hex'];
+  additionalRoundsPerSquare: number;
+}
 
 export class SplitMonthSquaresPreviewClass {
   constructor() {
@@ -65,7 +74,7 @@ export class SplitMonthSquaresPreviewClass {
   // *******************
   // User settings properties
   // *******************
-  settings = $state({
+  settings = $state<SplitMonthSquaresPreviewSettings>({
     leftTarget: 'tmin',
     rightTarget: 'tmax',
     dimensions: '3x4',

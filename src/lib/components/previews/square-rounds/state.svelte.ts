@@ -1,10 +1,20 @@
 import { CHARACTERS_FOR_URL_HASH } from '$lib/constants';
 import { gauges, previews, weather } from '$lib/state';
+import type { BasePreviewSettings, Color, WeatherParam } from '$lib/types';
 import { chunkArray, setTargets } from '$lib/utils';
 import chroma from 'chroma-js';
+import { untrack } from 'svelte';
 import Preview from './Preview.svelte';
 import Settings from './Settings.svelte';
-import { untrack } from 'svelte';
+
+interface SquareRoundsPreviewSettings extends BasePreviewSettings {
+  selectedTarget: WeatherParam['id'];
+  daysPerSquare: number;
+  columns: number;
+  additionalRoundsColor: Color['hex'];
+  squareBorder: number;
+  layoutBorder: number;
+}
 
 export class SquareRoundsPreviewClass {
   constructor() {
@@ -59,7 +69,7 @@ export class SquareRoundsPreviewClass {
   // *******************
   // User settings properties
   // *******************
-  settings = $state({
+  settings = $state<SquareRoundsPreviewSettings>({
     selectedTarget: 'tmax',
     daysPerSquare: 13,
     columns: 4,

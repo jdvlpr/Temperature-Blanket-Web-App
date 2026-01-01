@@ -1,8 +1,15 @@
 import { CHARACTERS_FOR_URL_HASH } from '$lib/constants';
 import { gauges, previews, weather } from '$lib/state';
+import type { BasePreviewSettings, WeatherParam } from '$lib/types';
 import { setTargets } from '$lib/utils';
 import Preview from './Preview.svelte';
 import Settings from './Settings.svelte';
+
+interface CornerToCornerPreviewSettings extends BasePreviewSettings {
+  selectedTarget: WeatherParam['id'];
+  lineLength: number;
+  dimensions: string;
+}
 
 export class CornerToCornerPreviewClass {
   constructor() {
@@ -47,7 +54,7 @@ export class CornerToCornerPreviewClass {
   // *******************
   // User settings properties
   // *******************
-  settings = $state({
+  settings = $state<CornerToCornerPreviewSettings>({
     selectedTarget: 'tmax',
     lineLength: 15,
     dimensions: '100x100',

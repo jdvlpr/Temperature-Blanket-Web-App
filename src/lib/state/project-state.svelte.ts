@@ -84,15 +84,6 @@ class ProjectClass {
   );
 
   // *****************
-  // Seasons State Property
-  // *****************
-  /**
-   * Whether seasons are enabled for this project.
-   * When true, the project uses season-specific weather parameter targets.
-   */
-  useSeasons = $state(false);
-
-  // *****************
   // History State Property
   // *****************
   history = new HistoryStateClass();
@@ -129,7 +120,7 @@ class ProjectClass {
       hash += `&w=${weather.monthGroupingStartDay}`; // Set Weather Grouping to Weeks with the starting Day of Week
 
     // Add seasons hash if seasons are enabled
-    if (this.useSeasons) {
+    if (previews.active && previews.active.settings.useSeasonTargets) {
       hash += `&n=${seasonsToUrlHash(localState.value.seasons)}`;
     }
 

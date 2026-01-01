@@ -1,8 +1,16 @@
-import { CHARACTERS_FOR_URL_HASH, HOURS_PER_DAY } from '$lib/constants';
+import { HOURS_PER_DAY } from '$lib/constants';
 import { gauges, previews, weather } from '$lib/state';
+import type { BasePreviewSettings, WeatherParam } from '$lib/types';
 import { dateToISO8601String, displayNumber, setTargets } from '$lib/utils';
 import Preview from './Preview.svelte';
 import Settings from './Settings.svelte';
+
+interface DaytimeRowsPreviewSettings extends BasePreviewSettings {
+  daytimeTarget: WeatherParam['id'];
+  nightTarget: WeatherParam['id'];
+  stitchesPerRow: number;
+  daytimePosition: 'left' | 'right' | 'center' | 'sides';
+}
 
 export class DaytimeRowsPreviewClass {
   constructor() {
@@ -46,7 +54,7 @@ export class DaytimeRowsPreviewClass {
   // *******************
   // User settings properties
   // *******************
-  settings = $state({
+  settings = $state<DaytimeRowsPreviewSettings>({
     daytimeTarget: 'tmax',
     nightTarget: 'tmin',
     stitchesPerRow: 300,

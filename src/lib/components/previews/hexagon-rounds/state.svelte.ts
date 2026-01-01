@@ -1,10 +1,20 @@
 import { CHARACTERS_FOR_URL_HASH } from '$lib/constants';
 import { gauges, previews, weather } from '$lib/state';
-import { chunkArray, exists, setTargets } from '$lib/utils';
+import type { BasePreviewSettings, Color, WeatherParam } from '$lib/types';
+import { chunkArray, setTargets } from '$lib/utils';
 import chroma from 'chroma-js';
+import { untrack } from 'svelte';
 import Preview from './Preview.svelte';
 import Settings from './Settings.svelte';
-import { untrack } from 'svelte';
+
+interface HexagonRoundsPreviewSettings extends BasePreviewSettings {
+  selectedTarget: WeatherParam['id'];
+  roundsPerHexagon: number;
+  columns: number;
+  additionalRoundsColor: Color['hex'];
+  hexagonBorder: number;
+  layoutBorder: number;
+}
 
 export class HexagonRoundsPreviewClass {
   constructor() {
@@ -61,7 +71,7 @@ export class HexagonRoundsPreviewClass {
   // *******************
   // User settings properties
   // *******************
-  settings = $state({
+  settings = $state<HexagonRoundsPreviewSettings>({
     selectedTarget: 'tmax',
     roundsPerHexagon: 7,
     columns: 6,

@@ -1,23 +1,36 @@
+import { weatherDataUpdatedKey } from '$lib/components/WeatherTableWrapper.svelte';
 import { CHARACTERS_FOR_URL_HASH } from '$lib/constants';
 import { DEFAULT_SEASONS } from '$lib/constants/seasons-constants';
-import { getSeasonForDate } from '$lib/utils/seasons-utils.svelte';
-import { gauges, previews, weather, localState, project } from '$lib/state';
+import { gauges, localState, previews, project, weather } from '$lib/state';
+import type { BasePreviewSettings, Color, WeatherParam } from '$lib/types';
 import {
   displayNumber,
-  setTargets,
-  sum,
   getColorInfo,
   getWeatherValue,
-  runPreview,
+  setTargets,
+  sum,
 } from '$lib/utils';
+import { getSeasonForDate } from '$lib/utils/seasons-utils.svelte';
 import chroma from 'chroma-js';
 import Preview from './Preview.svelte';
 import Settings from './Settings.svelte';
-import { untrack } from 'svelte';
-import { weatherDataUpdatedKey } from '$lib/components/WeatherTableWrapper.svelte';
 
 // Special marker used to indicate an "extras" row for days outside all seasons
 const EXTRAS_TARGET = '__extras__';
+
+interface RowsPreviewSettings extends BasePreviewSettings {
+  selectedTargets: WeatherParam['id'][];
+  stitchesPerRow: number;
+  stitchesPerDay: number;
+  lengthTarget: 'none' | 'custom' | WeatherParam['id'];
+  extrasColor: Color['hex'];
+  seasonTargets: [
+    WeatherParam['id'][],
+    WeatherParam['id'][],
+    WeatherParam['id'][],
+    WeatherParam['id'][],
+  ];
+}
 
 export class RowsPreviewClass {
   constructor() {
@@ -66,14 +79,14 @@ export class RowsPreviewClass {
   // *******************
   // User settings properties
   // *******************
-  settings = $state({
+  settings = $state<RowsPreviewSettings>({
     selectedTargets: ['tmax'],
     stitchesPerRow: 300,
     stitchesPerDay: 300,
     lengthTarget: 'none',
     extrasColor: '#f0f3f3',
     useSeasonTargets: false,
-    seasonTargets: [['tmax'], ['tmax'], ['tmax'], ['tmax']], // [spring, summer, fall, winter]
+    seasonTargets: [['tmax'], ['tmax'], ['tmax'], ['tmax']], // [spring, summer, fall, winter] (must be an array of length 4)
   });
 
   getSectionStitchesCount(dayIndex: number) {

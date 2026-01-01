@@ -2,6 +2,7 @@ import Preview from '$lib/components/previews/calendar/Preview.svelte';
 import Settings from '$lib/components/previews/calendar/Settings.svelte';
 import { CHARACTERS_FOR_URL_HASH } from '$lib/constants';
 import { gauges, previews, weather } from '$lib/state';
+import type { BasePreviewSettings, Color, WeatherParam } from '$lib/types';
 import {
   getDaysInLongestMonth,
   getFactors,
@@ -14,6 +15,19 @@ import {
   weatherMonthsData,
 } from '$lib/utils';
 import chroma from 'chroma-js';
+
+interface CalendarPreviewSettings extends BasePreviewSettings {
+  primaryTarget: WeatherParam['id'];
+  squareSize: number;
+  secondaryTargets: { indexes: number; targetId: WeatherParam['id'] }[];
+  dimensions: string;
+  weekStartCode: number;
+  monthPadding: number;
+  additionalSquaresColor: Color['hex'];
+  primaryTargetAsBackup: number;
+  joinStitches: number;
+  joinColor: Color['hex'];
+}
 
 export class CalendarPreviewClass {
   constructor() {
@@ -80,7 +94,7 @@ export class CalendarPreviewClass {
   // User settings properties
   // *******************
 
-  settings = $state({
+  settings = $state<CalendarPreviewSettings>({
     primaryTarget: 'tmax',
     squareSize: 3,
     secondaryTargets: [],

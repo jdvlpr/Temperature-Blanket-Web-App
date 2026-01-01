@@ -1,5 +1,6 @@
 import { CHARACTERS_FOR_URL_HASH } from '$lib/constants';
 import { gauges, previews, weather } from '$lib/state';
+import type { BasePreviewSettings, Color, WeatherParam } from '$lib/types';
 import {
   getDaysInLongestMonth,
   getFactors,
@@ -12,6 +13,13 @@ import {
 import chroma from 'chroma-js';
 import Preview from './Preview.svelte';
 import Settings from './Settings.svelte';
+
+interface MonthSquaresPreviewSettings extends BasePreviewSettings {
+  selectedTarget: WeatherParam['id'];
+  dimensions: string;
+  additionalRoundsColor: Color['hex'];
+  additionalRoundsPerSquare: number;
+}
 
 export class MonthSquaresPreviewClass {
   constructor() {
@@ -67,7 +75,7 @@ export class MonthSquaresPreviewClass {
   // *******************
   // User settings properties
   // *******************
-  settings = $state({
+  settings = $state<MonthSquaresPreviewSettings>({
     selectedTarget: 'tmax',
     dimensions: '6x6',
     additionalRoundsColor: '#f0f3f3',

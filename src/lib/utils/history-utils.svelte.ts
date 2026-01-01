@@ -29,6 +29,7 @@ import {
   exists,
   getProjectParametersFromURLHash,
   parseGaugeURLHash,
+  seasonsFromUrlHash,
 } from '$lib/utils';
 
 export const loadFromHistory = ({ action }: { action: 'Undo' | 'Redo' }) => {
@@ -114,6 +115,21 @@ export const loadFromHistory = ({ action }: { action: 'Undo' | 'Redo' }) => {
       gauges.remove(gauge.id);
       message = 'Colors';
     }
+  }
+
+  // Change Seasons
+  if (exists(newParams.n)) {
+    if (!exists(oldParams.n) || oldParams.n?.value !== newParams.n?.value) {
+      const seasons = seasonsFromUrlHash(newParams.n.value);
+      if (seasons && seasons.length > 0) {
+        localState.value.seasons = seasons;
+        if (previews.active) previews.active.settings.useSeasonTargets = true;
+        message = 'Seasons';
+      }
+    }
+  } else if (exists(oldParams.n)) {
+    if (previews.active) previews.active.settings.useSeasonTargets = false;
+    message = 'Preview';
   }
 
   // Change Preview

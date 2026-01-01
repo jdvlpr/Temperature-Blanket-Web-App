@@ -1,5 +1,6 @@
 import { CHARACTERS_FOR_URL_HASH } from '$lib/constants';
 import { gauges, previews, weather } from '$lib/state';
+import type { BasePreviewSettings, Color, WeatherParam } from '$lib/types';
 import {
   getDaysInLongestMonth,
   getFactors,
@@ -11,6 +12,16 @@ import {
 import chroma from 'chroma-js';
 import Preview from './Preview.svelte';
 import Settings from './Settings.svelte';
+
+interface MonthRowsPreviewSettings extends BasePreviewSettings {
+  selectedTargets: WeatherParam['id'][];
+  dimensions: string;
+  direction: 'top-to-bottom' | 'left-to-right';
+  stitchesPerRow: number;
+  extrasColor: Color['hex'];
+  borderStitches: number;
+  borderColor: Color['hex'];
+}
 
 export class MonthRowsPreviewClass {
   constructor() {
@@ -68,7 +79,7 @@ export class MonthRowsPreviewClass {
   // *******************
   // User settings properties
   // *******************
-  settings = $state({
+  settings = $state<MonthRowsPreviewSettings>({
     selectedTargets: ['tmax'],
     dimensions: '2x6',
     direction: 'top-to-bottom',

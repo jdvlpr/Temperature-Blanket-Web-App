@@ -17,7 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import WeatherItem from '$lib/components/WeatherItem.svelte';
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
   import { UNIT_LABELS } from '$lib/constants';
-  import { localState, locations, project, weather } from '$lib/state';
+  import { localState, locations, previews, project, weather } from '$lib/state';
   import {
     capitalizeFirstLetter,
     convertTime,
@@ -73,7 +73,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     getTargets ? getTargets(weather.currentIndex) : weatherTargets,
   );
 
-  let dateOutOfSeasonsRanges = $derived(currentWeatherTargets.length === 0 && project.useSeasons);
+  let dateOutOfSeasonsRanges = $derived(currentWeatherTargets.length === 0 && previews?.active?.settings?.useSeasonTargets);
 </script>
 
 <div

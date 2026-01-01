@@ -21,7 +21,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import PreviewInfo from '$lib/components/PreviewInfo.svelte';
   import SeasonEditor from '$lib/components/SeasonEditor.svelte';
   import SpanYarnColorSelectIcon from '$lib/components/SpanYarnColorSelectIcon.svelte';
-  import { dialog, gauges, localState, project, weather } from '$lib/state';
+  import { dialog, gauges, localState, previews, project, weather } from '$lib/state';
   import { capitalizeFirstLetter, pluralize, formatDateRange } from '$lib/utils';
   import { PencilIcon } from '@lucide/svelte';
   import { rowsPreview } from './state.svelte';
@@ -70,7 +70,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 >
   <p class="text-2xl font-bold">Settings</p>
 
-  {#if !rowsPreview.settings.useSeasonTargets}
+  {#if previews.active && !previews.active.settings.useSeasonTargets}
     <ToggleSwitchGroup
       groupLabel={`Color Each Row Using the ${capitalizeFirstLetter(weather.grouping)}'s`}
       {targets}
@@ -85,14 +85,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
       checked={rowsPreview.settings.useSeasonTargets}
       onchange={(e: Event) => {
         const target = e.target as HTMLInputElement;
-        rowsPreview.settings.useSeasonTargets = target.checked;
-        // Sync with global project state
-        project.useSeasons = target.checked;
+       if (previews.active) previews.active.settings.useSeasonTargets = target.checked;
       }}
     />
   </div>
 
-  {#if rowsPreview.settings.useSeasonTargets}
+  {#if previews.active && previews.active.settings.useSeasonTargets}
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
       {#each seasons as season, seasonIndex}
         <div class="flex flex-col gap-2 items-start max-w-sm">

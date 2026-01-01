@@ -39,12 +39,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   function onChangePattern(newId) {    
     previews.activeId = newId;
-    updateProjectUseSeasons();
-  }
-
-  function updateProjectUseSeasons() {
-    project.useSeasons =
-      previews.active.settings?.useSeasonTargets === true;
   }
 
   onMount(() => {

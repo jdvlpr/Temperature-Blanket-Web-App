@@ -133,7 +133,7 @@ export const setProjectSettings = async (
     const decoded = seasonsFromUrlHash(params.n.value);
     if (decoded) {
       localState.value.seasons = decoded;
-      project.useSeasons = true;
+      if (previews.active) previews.active.settings.useSeasonTargets = true;
     }
   }
 };

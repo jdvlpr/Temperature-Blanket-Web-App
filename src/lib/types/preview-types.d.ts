@@ -41,3 +41,7 @@ export interface Preview {
   settings: ComponentType;
   preview: ComponentType;
 }
+
+export interface BasePreviewSettings {
+  useSeasonTargets: boolean;
+}

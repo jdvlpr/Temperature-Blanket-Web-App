@@ -1,8 +1,15 @@
 import { CHARACTERS_FOR_URL_HASH } from '$lib/constants';
 import { gauges, previews, project, weather } from '$lib/state';
+import type { BasePreviewSettings, WeatherParam } from '$lib/types';
 import { setTargets, upToDate } from '$lib/utils';
 import Preview from './Preview.svelte';
 import Settings from './Settings.svelte';
+
+interface ChevronsPreviewSettings extends BasePreviewSettings {
+  selectedTargets: WeatherParam['id'][];
+  chevronsPerRow: number;
+  chevronSideLength: number;
+}
 
 export class ChevronsPreviewClass {
   constructor() {
@@ -47,7 +54,7 @@ export class ChevronsPreviewClass {
   // *******************
   // User settings properties
   // *******************
-  settings = $state({
+  settings = $state<ChevronsPreviewSettings>({
     selectedTargets: ['tmax'],
     chevronsPerRow: 30,
     chevronSideLength: 32,

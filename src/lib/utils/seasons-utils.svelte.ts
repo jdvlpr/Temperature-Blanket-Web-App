@@ -18,7 +18,7 @@ import {
   MONTH_NAMES,
   SEASON_PRESETS,
 } from '$lib/constants/seasons-constants';
-import { localState, project } from '$lib/state';
+import { localState, previews, project } from '$lib/state';
 import type { LocationType } from '$lib/types';
 
 /**
@@ -190,7 +190,7 @@ export function seasonsFromUrlHash(hash: string): Season[] | null {
 
 export function setSeasonsByLocation(location: LocationType) {
   // Don't override if seasons are already being used (set via URL or by user)
-  if (project.useSeasons) return;
+  if (previews.active && previews.active.settings.useSeasonTargets) return;
 
   try {
     // Check that the current seasons are still the default before auto-assigning
@@ -214,6 +214,6 @@ export function setSeasonsByLocation(location: LocationType) {
     }
   } catch (e) {
     // Defensive: don't block UX if something unexpected happens
-    // console.warn('Auto-assign seasons failed', e);
+    console.warn('Auto-assign seasons failed', e);
   }
 }
