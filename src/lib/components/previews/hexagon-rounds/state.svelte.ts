@@ -68,6 +68,7 @@ export class HexagonRoundsPreviewClass {
     additionalRoundsColor: '#f0f3f3',
     hexagonBorder: 0,
     layoutBorder: 2,
+    useSeasonTargets: false,
   });
 
   // *******************

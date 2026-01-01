@@ -76,6 +76,7 @@ export class MonthRowsPreviewClass {
     extrasColor: '#f0f3f3',
     borderStitches: 1,
     borderColor: '#f0f3f3',
+    useSeasonTargets: false,
   });
 
   // *******************

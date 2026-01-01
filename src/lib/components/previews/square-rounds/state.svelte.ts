@@ -66,6 +66,7 @@ export class SquareRoundsPreviewClass {
     additionalRoundsColor: '#f0f3f3',
     squareBorder: 0,
     layoutBorder: 2,
+    useSeasonTargets: false,
   });
 
   // *******************

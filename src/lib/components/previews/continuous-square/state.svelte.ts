@@ -61,6 +61,7 @@ export class ContinuousSquarePreviewClass {
     selectedTarget: 'tmax',
     stitchesPerDay: 28,
     extrasColor: '#f0f3f3',
+    useSeasonTargets: false,
   });
 
   // *******************

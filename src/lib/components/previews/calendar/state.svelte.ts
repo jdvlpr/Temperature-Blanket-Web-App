@@ -91,6 +91,7 @@ export class CalendarPreviewClass {
     primaryTargetAsBackup: 1,
     joinStitches: 0,
     joinColor: '#e8e3e2',
+    useSeasonTargets: false,
   });
 
   // *******************

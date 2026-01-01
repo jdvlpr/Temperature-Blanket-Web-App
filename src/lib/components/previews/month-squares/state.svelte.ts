@@ -72,6 +72,7 @@ export class MonthSquaresPreviewClass {
     dimensions: '6x6',
     additionalRoundsColor: '#f0f3f3',
     additionalRoundsPerSquare: 1,
+    useSeasonTargets: false,
   });
 
   // *******************

@@ -82,6 +82,7 @@ export class SquaresPreviewClass {
     primaryTargetAsBackup: true,
     joinStitches: 0,
     joinColor: '#e8e3e2',
+    useSeasonTargets: false,
   });
 
   // *******************

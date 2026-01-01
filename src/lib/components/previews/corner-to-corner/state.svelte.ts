@@ -51,6 +51,7 @@ export class CornerToCornerPreviewClass {
     selectedTarget: 'tmax',
     lineLength: 15,
     dimensions: '100x100',
+    useSeasonTargets: false,
   });
 
   // *******************

@@ -51,6 +51,7 @@ export class ChevronsPreviewClass {
     selectedTargets: ['tmax'],
     chevronsPerRow: 30,
     chevronSideLength: 32,
+    useSeasonTargets: false,
   });
 
   // *******************

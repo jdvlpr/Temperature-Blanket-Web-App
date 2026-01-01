@@ -71,6 +71,7 @@ export class SplitMonthSquaresPreviewClass {
     dimensions: '3x4',
     additionalRoundsColor: '#f0f3f3',
     additionalRoundsPerSquare: 1,
+    useSeasonTargets: false,
   });
 
   // *******************

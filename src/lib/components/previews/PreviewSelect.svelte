@@ -16,7 +16,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script>
   import { browser } from '$app/environment';
   import { THEMES } from '$lib/constants';
-  import { localState, previews } from '$lib/state';
+  import { localState, previews, project } from '$lib/state';
   import { onDestroy, onMount } from 'svelte';
 
   let theme = $state(
@@ -24,6 +24,28 @@ If not, see <https://www.gnu.org/licenses/>. -->
   );
 
   let activePreviewSelectId = $state(previews.activeId);
+
+  // Update theme when the system theme changes
+  function handleColorSchemeChange() {
+    theme = getTheme(localState.value.theme.mode || 'system');
+  }
+
+  function getTheme(id) {
+    if (id !== 'system') return id;
+    if (window.matchMedia('(prefers-color-scheme: dark)').matches)
+      return 'dark';
+    return 'light';
+  }
+
+  function onChangePattern(newId) {    
+    previews.activeId = newId;
+    updateProjectUseSeasons();
+  }
+
+  function updateProjectUseSeasons() {
+    project.useSeasons =
+      previews.active.settings?.useSeasonTargets === true;
+  }
 
   onMount(() => {
     window
@@ -38,19 +60,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       .removeEventListener('change', handleColorSchemeChange);
   });
 
-  // Update theme when the system theme changes
-  function handleColorSchemeChange() {
-    theme = getTheme(localState.value.theme.mode || 'system');
-  }
-
-  function getTheme(id) {
-    if (id !== 'system') return id;
-    if (window.matchMedia('(prefers-color-scheme: dark)').matches)
-      return 'dark';
-    return 'light';
-  }
-
-  $effect(() => {
+    $effect(() => {
     if (previews.activeId !== activePreviewSelectId)
       activePreviewSelectId = previews.activeId;
   });
@@ -68,7 +78,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       id="select-pattern-type"
       value={activePreviewSelectId}
       onchange={(e) => {
-        previews.activeId = e.target.value;
+        onChangePattern(e.target.value);
       }}
     >
       {#each previews.all as { name, id }}
@@ -91,7 +101,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 : 'preset-tonal hover:preset-tonal-primary',
             ]}
             onclick={() => {
-              previews.activeId = id;
+              onChangePattern(id);
             }}
             title="Preview {name} Layout"
           >

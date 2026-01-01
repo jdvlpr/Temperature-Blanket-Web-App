@@ -51,6 +51,7 @@ export class DaytimeRowsPreviewClass {
     nightTarget: 'tmin',
     stitchesPerRow: 300,
     daytimePosition: 'left', // 'left' || 'right' || 'center' || 'sides'
+    useSeasonTargets: false,
   });
 
   // *******************
