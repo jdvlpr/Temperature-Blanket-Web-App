@@ -36,6 +36,19 @@ export const entries: ChangelogItemGroup[] = [
             notes: [
               {
                 icon: ICONS.checkCircle,
+                instructions:
+                  'In the Preview tab, select Seasons in the settings to try it out. Note that not all preview pattern types support seasons, but more may be added later. This is a beta feature, and may have unexpected issues. <a href="/documentation#assigning-seasons" class="link">Learn more in the documentation</a>.',
+                text: `Assign different weather parameters for different seasons when previewing your project's colors.`,
+                title:
+                  'New Feature: Seasons <span class="badge bg-tertiary-100-900">Beta</span>',
+              },
+            ],
+            version: '5.33.0',
+          },
+          {
+            notes: [
+              {
+                icon: ICONS.checkCircle,
                 text: `34 colorways`,
                 title: 'Added New Yarn: Bendigo Woollen Mills - Cotton 10 Ply',
               },
@@ -57,19 +70,6 @@ export const entries: ChangelogItemGroup[] = [
       {
         month: 'December',
         items: [
-          {
-            notes: [
-              {
-                icon: ICONS.checkCircle,
-                instructions:
-                  'In the Preview tab, select Seasons in the settings to try it out. Note that not all preview pattern types support seasons, but more may be added later. This is a beta feature, and may have unexpected issues. <a href="/documentation#assigning-seasons" class="link">Learn more in the documentation</a>.',
-                text: `Assign different weather parameters for different seasons when previewing your project's colors.`,
-                title:
-                  'New Feature: Seasons <span class="badge bg-tertiary-100-900">Beta</span>',
-              },
-            ],
-            version: '5.33.0',
-          },
           {
             notes: [
               {
