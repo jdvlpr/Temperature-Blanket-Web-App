@@ -97,7 +97,7 @@ function removeProjectById(id: string | null) {
 // ***********
 // The 'projects' localStorage key is now split into multiple keys, one for each project
 // The old single-key ran up against quota limits if too many projects were stored (for example more than 40 projects with weather data)
-// Added in version 5.32.0
+// Added in version 5.33.0
 // ***********
 function migrateProjectsToPerKey() {
   const LEGACY_PROJECTS_KEY = 'projects';

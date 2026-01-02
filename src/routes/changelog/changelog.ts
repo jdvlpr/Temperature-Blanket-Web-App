@@ -43,7 +43,7 @@ export const entries: ChangelogItemGroup[] = [
                   'New Feature: Seasons <span class="badge bg-tertiary-100-900">Beta</span>',
               },
             ],
-            version: '5.32.0',
+            version: '5.33.0',
           },
           {
             notes: [
