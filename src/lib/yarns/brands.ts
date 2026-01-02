@@ -55,6 +55,7 @@ import { brand as rowan } from './rowan/yarns';
 import { brand as sandnes } from './sandnes/yarns';
 import { brand as schachenmayr } from './schachenmayr/yarns';
 import { brand as scheepjes } from './scheepjes/yarns';
+import { brand as semco } from './semco/yarns';
 import { brand as silkCityFibers } from './silk-city-fibers/yarns';
 import { brand as sirdar } from './sirdar/yarns';
 import { brand as skeinz } from './skeinz/yarns';
@@ -133,6 +134,7 @@ export const brands: Brand[] = [
   sandnes,
   schachenmayr,
   scheepjes,
+  semco,
   silkCityFibers,
   sirdar,
   skeinz,
