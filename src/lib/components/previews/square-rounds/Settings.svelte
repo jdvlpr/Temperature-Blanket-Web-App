@@ -58,7 +58,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {pluralize('column', squareRoundsPreview.settings.columns)}</span
       >
       and
-      <span class="font-semibold">
+      <span class="font-semibold">{squareRoundsPreview.rows}
         {pluralize('row', squareRoundsPreview.rows)}</span
       >)
       {#if extraRounds}
