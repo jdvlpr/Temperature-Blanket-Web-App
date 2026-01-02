@@ -23,9 +23,11 @@ test.describe('Project Planner', () => {
     // but usually it's better to handle it conditionally or ignore if not blocking.
     // Assuming the toast click was to dismiss a "welcome" or "update" message.
     // We'll try to be robust.
-    const toastClose = page.getByTestId('toast').locator('button[aria-label="Close"]');
+    const toastClose = page
+      .getByTestId('toast')
+      .locator('button[aria-label="Close"]');
     if (await toastClose.isVisible()) {
-        await toastClose.click();
+      await toastClose.click();
     }
   });
 
@@ -41,7 +43,7 @@ test.describe('Project Planner', () => {
     await page
       .getByRole('option', { name: 'Austin, Texas, United States' })
       .click();
-    
+
     // 2. Verify "Add Location" appears (confirming selection)
     await expect(
       page.getByRole('button', { name: 'Add Location' }),
@@ -50,7 +52,7 @@ test.describe('Project Planner', () => {
     // 3. Select Year
     await page
       .getByLabel(
-        'Year 2025202420232022202120202019201820172016201520142013201220112010200920082007200620052004200320022001200019991998199719961995199419931992199119901989198819871986198519841983198219811980197919781977197619751974197319721971197019691968196719661965196419631962196119601959195819571956195519541953195219511950194919481947194619451944194319421941194019391938193719361935193419331932193119301929192819271926192519241923192219211920',
+        'Year 20262025202420232022202120202019201820172016201520142013201220112010200920082007200620052004200320022001200019991998199719961995199419931992199119901989198819871986198519841983198219811980197919781977197619751974197319721971197019691968196719661965196419631962196119601959195819571956195519541953195219511950194919481947194619451944194319421941194019391938193719361935193419331932193119301929192819271926192519241923192219211920',
         { exact: true },
       )
       .selectOption('2022');
@@ -71,7 +73,9 @@ test.describe('Project Planner', () => {
     // Perform a search first to populate tabs (needed for Colors/Preview to be meaningful usually)
     await page.getByPlaceholder('Enter a place').click();
     await page.getByPlaceholder('Enter a place').fill('Austin');
-    const option = page.getByRole('option', { name: 'Austin, Texas, United States' });
+    const option = page.getByRole('option', {
+      name: 'Austin, Texas, United States',
+    });
     await expect(option).toBeVisible();
     await option.click();
     await page.getByRole('button', { name: 'Search', exact: true }).click();

@@ -27,6 +27,31 @@ import {
 
 export const entries: ChangelogItemGroup[] = [
   {
+    year: 2026,
+    months: [
+      {
+        month: 'January',
+        items: [
+          {
+            notes: [
+              {
+                icon: ICONS.checkCircle,
+                text: `34 colorways`,
+                title: 'Added New Yarn: Bendigo Woollen Mills - Cotton 10 Ply',
+              },
+              {
+                icon: ICONS.checkCircle,
+                text: `21 colorways`,
+                title: 'Added New Yarn: Semco - Stallion 8 Ply',
+              },
+            ],
+            version: '5.32.0',
+          },
+        ],
+      },
+    ],
+  },
+  {
     year: 2025,
     months: [
       {
