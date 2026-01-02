@@ -89,21 +89,3 @@ export const SEASON_PRESETS = {
  * Default season definitions (Northern Hemisphere Meteorological)
  */
 export const DEFAULT_SEASONS = SEASON_PRESETS.northernMeteorological.seasons;
-
-/**
- * Month names for display purposes
- */
-export const MONTH_NAMES = [
-  'January',
-  'February',
-  'March',
-  'April',
-  'May',
-  'June',
-  'July',
-  'August',
-  'September',
-  'October',
-  'November',
-  'December',
-];

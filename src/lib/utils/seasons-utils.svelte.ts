@@ -13,12 +13,8 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import {
-  DEFAULT_SEASONS,
-  MONTH_NAMES,
-  SEASON_PRESETS,
-} from '$lib/constants/seasons-constants';
-import { localState, previews, project } from '$lib/state';
+import { DEFAULT_SEASONS, MONTHS, SEASON_PRESETS } from '$lib/constants';
+import { localState, previews } from '$lib/state';
 import type { LocationType } from '$lib/types';
 
 /**
@@ -97,8 +93,8 @@ export function formatDateRange(startDate: string, endDate: string): string {
   const start = parseDateString(startDate);
   const end = parseDateString(endDate);
 
-  const startMonthName = MONTH_NAMES[start.month - 1].substring(0, 3);
-  const endMonthName = MONTH_NAMES[end.month - 1].substring(0, 3);
+  const startMonthName = MONTHS[start.month - 1].shortName;
+  const endMonthName = MONTHS[end.month - 1].shortName;
 
   return `${startMonthName} ${start.day} - ${endMonthName} ${end.day}`;
 }

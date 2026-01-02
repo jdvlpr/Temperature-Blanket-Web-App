@@ -16,9 +16,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import CloseButton from '$lib/components/modals/CloseButton.svelte';
   import StickyPart from '$lib/components/modals/StickyPart.svelte';
-  import { MONTH_NAMES, SEASON_PRESETS } from '$lib/constants/seasons-constants';
-  import { formatDateRange } from '$lib/utils/seasons-utils.svelte';
+  import { MONTHS } from '$lib/constants';
+  import { SEASON_PRESETS } from '$lib/constants/seasons-constants';
   import { localState } from '$lib/state';
+  import { formatDateRange } from '$lib/utils/seasons-utils.svelte';
   import { CheckIcon } from '@lucide/svelte';
 
   let { onClose } = $props();
@@ -134,8 +135,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   updateSeasonDate(seasonIndex, 'startDate', newMonth, startParsed.day);
                 }}
               >
-                {#each MONTH_NAMES as monthName, i}
-                  <option value={i + 1}>{monthName}</option>
+                {#each MONTHS as {name, value}}
+                  <option {value}>{name}</option>
                 {/each}
               </select>
               <select
@@ -165,8 +166,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   updateSeasonDate(seasonIndex, 'endDate', newMonth, endParsed.day);
                 }}
               >
-                {#each MONTH_NAMES as monthName, i}
-                  <option value={i + 1}>{monthName}</option>
+                {#each MONTHS as {name, value}}
+                  <option {value}>{name}</option>
                 {/each}
               </select>
               <select

@@ -19,5 +19,6 @@ export * from '$lib/constants/icon-constants';
 export * from '$lib/constants/location-constants';
 export * from '$lib/constants/page-constants';
 export * from '$lib/constants/supporter-constants';
+export * from '$lib/constants/seasons-constants';
 export * from '$lib/constants/weather-constants';
 export * from '$lib/constants/yarn-weight-icon-constants';
