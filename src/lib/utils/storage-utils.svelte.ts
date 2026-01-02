@@ -20,6 +20,7 @@ import { localState, locations, project, weather } from '$lib/state';
 import type {
   PageLayout,
   SavedProject,
+  WeatherDay,
   WeatherSourceOptions,
 } from '$lib/types';
 import {
@@ -29,7 +30,25 @@ import {
   stringToDate,
 } from '$lib/utils';
 
-const LEGACY_PROJECTS_KEY = 'projects';
+type LocalStorageProjectIndexItem = {
+  id: string;
+  meta: {
+    date: string;
+    href: string;
+    title: string;
+    isCustomWeatherData: boolean;
+  };
+};
+
+type LocalStorageProject = {
+  date: string;
+  href: string;
+  isCustomWeatherData: boolean;
+  title: string;
+  weatherData: WeatherDay[];
+  weatherSource: WeatherSourceOptions;
+};
+
 const PROJECT_INDEX_KEY = 'projects_index';
 const PROJECT_PREFIX = 'p_';
 
@@ -51,7 +70,7 @@ function getProjectsIndex() {
   }
 }
 
-function setProjectsIndex(index: any[]) {
+function setProjectsIndex(index: LocalStorageProjectIndexItem[]) {
   localStorage.setItem(PROJECT_INDEX_KEY, JSON.stringify(index));
 }
 
@@ -69,18 +88,24 @@ function removeProjectById(id: string | null) {
   if (!id) return;
   localStorage.removeItem(`${PROJECT_PREFIX}${id}`);
   const index = getProjectsIndex();
-  const newIndex = index.filter((i: any) => i.id !== id);
+  const newIndex: LocalStorageProjectIndexItem[] = index.filter(
+    (i: LocalStorageProjectIndexItem) => i.id !== id,
+  );
   setProjectsIndex(newIndex);
 }
 
-// Migrate old projects stored as an array under 'projects' key to per-key storage
-// New in version 5.32.0
-// The old single-key ran up against quota limits if too many projects were stored (more than 40 projects with weather data)
+// ***********
+// The 'projects' localStorage key is now split into multiple keys, one for each project
+// The old single-key ran up against quota limits if too many projects were stored (for example more than 40 projects with weather data)
+// Added in version 5.32.0
+// ***********
 function migrateProjectsToPerKey() {
+  const LEGACY_PROJECTS_KEY = 'projects';
+
   const projectsIndex = getProjectsIndex();
   if (projectsIndex.length > 0) {
-    // Already migrated
-    // TODO: Uncomment the line below after confirming successful deployment of the project key migration. Keep commented out for now to be safe, since this contains users' projects, in case there is a need to revert.
+    // Migration has already occurred, since the 'projects_index' key exists
+    // TODO: Uncomment the line below after confirming successful deployment of the project key migration. Keep commented out for now to be safe, since this contains users' projects.
     // localStorage.removeItem(LEGACY_PROJECTS_KEY);
     return;
   }
@@ -96,10 +121,10 @@ function migrateProjectsToPerKey() {
     return;
   }
 
-  // If entries look like full projects, migrate them
+  // Migrate the projects, if there are any
   if (Array.isArray(parsed) && parsed.length && parsed[0]) {
-    const migratedIndex: any[] = [];
-    parsed.forEach((project: any) => {
+    const newIndex: LocalStorageProjectIndexItem[] = [];
+    parsed.forEach((project: LocalStorageProject) => {
       const id =
         parseProjectIdFromHref(project.href) || new Date().getTime().toString();
 
@@ -107,36 +132,36 @@ function migrateProjectsToPerKey() {
       if (!localStorage.getItem(`${PROJECT_PREFIX}${id}`))
         localStorage.setItem(`${PROJECT_PREFIX}${id}`, JSON.stringify(project));
 
-      migratedIndex.push({
-        id,
-        meta: {
-          date: project.date,
-          href: project.href,
-          title: project.title || '',
-          isCustomWeatherData: project.isCustomWeatherData || false,
-        },
-      });
+      // Add the project to the index, if it doesn't already exist
+      if (!newIndex.find((i: LocalStorageProjectIndexItem) => i.id === id))
+        newIndex.push({
+          id,
+          meta: {
+            date: project.date,
+            href: project.href,
+            title: project.title || '',
+            isCustomWeatherData: project.isCustomWeatherData || false,
+          },
+        });
     });
-    setProjectsIndex(migratedIndex);
+    setProjectsIndex(newIndex);
   }
 }
 
-export function initializeLocalStorage() {
+// ****************
+// Cleans up old local storage keys which are no longer used or which have been migrated to different locations
+// Added in version 5.0.0
+// ****************
+function handleLegacyLocalStorageKeys() {
   migrateProjectsToPerKey();
-  // ****************
-  // Handle Legacy Local Storage Items
-  // Clean up old local storage items which are no longer used
-  // New in version 5.0.0
-  // Probably can remove these in version 6x
-  // ****************
 
-  // 'layout' item has been incorporated into the 'localState' object
+  // 'layout' is now 'preferences.layout'
   if (localStorage.getItem('layout')) {
     localState.value.layout = localStorage.getItem('layout') as PageLayout;
     localStorage.removeItem('layout');
   }
 
-  // 'disable_toast_analytics' item has been incorporated into the 'localState' object
+  // 'disable_toast_analytics' is now 'preferences.disableToastAnalytics'
   const disableToastAnalytics = localStorage.getItem('disable_toast_analytics');
   if (disableToastAnalytics === 'true' || disableToastAnalytics === 'false') {
     let value = JSON.parse(disableToastAnalytics);
@@ -144,14 +169,14 @@ export function initializeLocalStorage() {
     localStorage.removeItem('disable_toast_analytics');
   }
 
-  // 'theme' item has been incorporated into the 'localState' object
+  // 'theme' is now 'preferences.theme.mode'
   const theme = localStorage.getItem('theme');
   if (theme === 'light' || theme === 'dark' || theme === 'system') {
     localState.value.theme.mode = theme;
     localStorage.removeItem('theme');
   }
 
-  // 'skeletonTheme' item has been incorporated into the 'localState' object
+  // 'skeletonTheme' is now 'preferences.theme.id'
   const skeletonTheme = localStorage.getItem('skeletonTheme');
   if (skeletonTheme) {
     const parsedSkeletonTheme = JSON.parse(skeletonTheme); // themes were stored as "example" (included the quotes), so we need to parse them
@@ -160,6 +185,10 @@ export function initializeLocalStorage() {
       localStorage.removeItem('skeletonTheme');
     }
   }
+}
+
+export function initializeLocalStorage() {
+  handleLegacyLocalStorageKeys();
 
   localState.value.theme.id = localState.value.theme.id || 'classic';
 
