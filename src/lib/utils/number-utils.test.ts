@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import {
   getRandomNumber,
   getAverage,
@@ -110,12 +110,21 @@ describe('number-utils', () => {
     });
 
     it('should handle non-numbers gracefully', () => {
+      const consoleSpy = vi
+        .spyOn(console, 'error')
+        .mockImplementation(() => {});
       expect(displayNumber('not a number' as any)).toBe(0);
-      expect(displayNumber(NaN)).toBe(NaN); // typeof NaN is 'number', so it bypasses the "typeof number !== 'number'" check but parseFloat(NaN.toFixed()) -> "NaN"
-      // Actually, the code says: if (typeof number !== 'number') ...
-      // NaN is typeof 'number'.
-      // number.toFixed on NaN returns "NaN". parseFloat("NaN") is NaN.
+
+      // typeof NaN is 'number', so it checks logic internally.
+      // displayNumber(NaN) -> parseFloat("NaN") -> NaN.
       expect(displayNumber(NaN)).toBeNaN();
+
+      expect(consoleSpy).toHaveBeenCalledWith('NaN', 'not a number');
+      // NaN itself is number type, so it doesn't trigger log if validation is strictly `typeof !== 'number'`
+      // But let's check the code: "if (typeof number !== 'number')"
+      // NaN is typeof 'number'. So no log for NaN input.
+
+      consoleSpy.mockRestore();
     });
   });
 

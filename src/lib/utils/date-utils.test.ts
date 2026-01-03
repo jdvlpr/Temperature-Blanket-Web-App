@@ -10,6 +10,13 @@ import {
   getToday,
 } from './date-utils';
 
+vi.mock('$lib/state', () => ({
+  weather: {
+    isUserEdited: false,
+    source: { name: 'Meteostat' },
+  },
+}));
+
 describe('date-utils', () => {
   describe('dateToISO8601String', () => {
     it('should convert a Date object to YYYY-MM-DD string using UTC', () => {

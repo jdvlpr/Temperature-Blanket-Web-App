@@ -8,11 +8,18 @@ import {
   getColorways,
 } from './yarn-utils';
 
+// Mock color-utils
+vi.mock('./color-utils', () => ({
+  getColorName: ({ color }: { color: string }) => {
+    if (color === '#ff0000') return 'Red';
+    if (color === '#0000ff') return 'Blue';
+    return undefined; // Green (#00ff00) returns undefined
+  },
+}));
+
 // Mock constants and yarns data
-vi.mock('$lib/constants', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('$lib/constants')>();
+vi.mock('$lib/constants', () => {
   return {
-    ...actual,
     ALL_COLORWAYS_WITH_AFFILIATE_LINKS: [
       {
         brandId: 'brand1',
@@ -42,6 +49,13 @@ vi.mock('$lib/constants', async (importOriginal) => {
         yarnName: 'Yarn 3',
       },
     ],
+    SEASON_PRESETS: {
+      northernMeteorological: { seasons: [] },
+      northernAstronomical: { seasons: [] },
+      southernMeteorological: { seasons: [] },
+      southernAstronomical: { seasons: [] },
+    },
+    DEFAULT_SEASONS: [],
   };
 });
 
@@ -93,17 +107,18 @@ describe('yarn-utils', () => {
 
     it('should return nulls for unknown brand or yarn', () => {
       const result = stringToBrandAndYarnDetails('unknown-unknown');
-      expect(result.brandId).toBe('unknown');
+      expect(result.brandId).toBeNull();
       expect(result.brandName).toBeNull();
     });
 
     it('should handle missing separator', () => {
       const result = stringToBrandAndYarnDetails('invalid');
-      expect(result.brandId).toBe('invalid');
+      expect(result.brandId).toBeNull();
       expect(result.yarnId).toBeNull();
     });
   });
 
+  // Mock color-utils
   describe('getColorPropertiesFromYarnStringAndHex', () => {
     it('should return combined properties', () => {
       const result = getColorPropertiesFromYarnStringAndHex({

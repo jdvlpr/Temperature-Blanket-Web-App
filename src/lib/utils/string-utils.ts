@@ -45,7 +45,7 @@ export const pluralize = (
  * @return  {String}            [return description]
  */
 export const decodeEntity = (inputStr: string): string => {
-  if (!browser) return 'inputStr';
+  if (!browser) return inputStr;
   let textarea: HTMLTextAreaElement | null = document.createElement('textarea');
   textarea.innerHTML = inputStr;
   const value = textarea.value;

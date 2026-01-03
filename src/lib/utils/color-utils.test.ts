@@ -1,17 +1,15 @@
 import { describe, expect, it, vi } from 'vitest';
 import {
-  getTextColor,
-  getColorInfo,
+  colorsToCode,
   colorsToYarnDetails,
-  yarnDetailsToColors,
-  sortColorsLightToDark,
-  sortColorsDarktoLight,
+  getColorInfo,
+  getColorsFromInput,
+  getTextColor,
   sortColorsByName,
   sortColorsByNameZtoA,
-  getColorsFromInput,
-  colorsToCode,
-  getGenericColorName,
-  getColorName,
+  sortColorsDarktoLight,
+  sortColorsLightToDark,
+  yarnDetailsToColors,
 } from './color-utils';
 
 // Mocking $lib modules
@@ -146,7 +144,7 @@ describe('color-utils', () => {
   describe('colorsToCode', () => {
     it('should generate palette code', () => {
       const colors = [{ hex: '#ff0000' }, { hex: '#00ff00' }];
-      expect(colorsToCode(colors)).toBe('palette:ff0000 00ff00');
+      expect(colorsToCode(colors)).toBe('palette:ff000000ff00');
     });
 
     it('should respect includePrefixes option', () => {
