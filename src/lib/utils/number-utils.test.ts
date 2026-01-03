@@ -1,13 +1,13 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import {
-  getRandomNumber,
+  displayNumber,
   getAverage,
-  getMinOfThree,
   getAvgOfThree,
   getMaxOfThree,
-  displayNumber,
-  pickRandomFromArray,
   getMiddleValueOfArray,
+  getMinOfThree,
+  getRandomNumber,
+  pickRandomFromArray,
 } from './number-utils';
 
 describe('number-utils', () => {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { exists, upToDate, capitalizeFirstLetter } from './other-utils';
+import { capitalizeFirstLetter, exists, upToDate } from './other-utils';
 
 describe('other-utils', () => {
   describe('exists', () => {

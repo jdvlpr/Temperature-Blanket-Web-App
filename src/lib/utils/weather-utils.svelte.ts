@@ -29,7 +29,6 @@ import {
   displayNumber,
   getAverage,
   getColorInfo,
-  getToday,
   hoursToMinutes,
   millimetersToInches,
   numberOfDays,

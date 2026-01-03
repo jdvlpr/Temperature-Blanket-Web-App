@@ -13,11 +13,7 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import {
-  DAYS_OF_THE_WEEK,
-  METEOSTAT_DELAY_DAYS,
-  OPEN_METEO_DELAY_DAYS,
-} from '$lib/constants';
+import { METEOSTAT_DELAY_DAYS, OPEN_METEO_DELAY_DAYS } from '$lib/constants';
 import { weather } from '$lib/state';
 import type { WeatherDay } from '$lib/types';
 

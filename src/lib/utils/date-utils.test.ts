@@ -1,13 +1,12 @@
-import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   dateToISO8601String,
-  stringToDate,
-  numberOfDays,
-  getIsRecentDate,
   getIsFutureDate,
+  getToday,
   getWeekNumber,
   isDateWithinLastSevenDays,
-  getToday,
+  numberOfDays,
+  stringToDate,
 } from './date-utils';
 
 vi.mock('$lib/state', () => ({

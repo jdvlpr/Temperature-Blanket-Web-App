@@ -1,12 +1,12 @@
+import { DEFAULT_SEASONS, SEASON_PRESETS } from '$lib/constants';
 import { describe, expect, it, vi } from 'vitest';
 import {
-  isDateInRange,
-  getSeasonForDate,
   formatDateRange,
-  seasonsToUrlHash,
+  getSeasonForDate,
+  isDateInRange,
   seasonsFromUrlHash,
+  seasonsToUrlHash,
 } from './seasons-utils.svelte';
-import { DEFAULT_SEASONS, SEASON_PRESETS } from '$lib/constants';
 
 // Mock state since it's imported in seasons-utils
 vi.mock('$lib/state', () => ({

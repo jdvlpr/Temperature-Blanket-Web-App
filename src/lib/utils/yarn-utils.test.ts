@@ -1,11 +1,11 @@
 import { describe, expect, it, vi } from 'vitest';
 import {
-  stringToBrandAndYarnDetails,
   getColorPropertiesFromYarnStringAndHex,
-  paletteContiansSomeNamedColorways,
-  paletteContiansAllNamedColorways,
-  getFilteredYarns,
   getColorways,
+  getFilteredYarns,
+  paletteContiansAllNamedColorways,
+  paletteContiansSomeNamedColorways,
+  stringToBrandAndYarnDetails,
 } from './yarn-utils';
 
 // Mock color-utils

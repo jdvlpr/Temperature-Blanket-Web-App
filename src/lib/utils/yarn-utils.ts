@@ -15,8 +15,8 @@
 
 import { ALL_COLORWAYS_WITH_AFFILIATE_LINKS } from '$lib/constants';
 import { getColorName } from '$lib/utils';
-import { brands } from '$lib/yarns/brands';
 import { getTextColor } from '$lib/utils/color-utils';
+import { brands } from '$lib/yarns/brands';
 
 /**
  * [getColorPropertiesFromYarnStringAndHex description]
