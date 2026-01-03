@@ -10,6 +10,10 @@ export default defineConfig({
   },
   plugins: [tailwindcss(), sveltekit()],
   test: {
-    include: ['src/**/*.{test,spec}.{js,ts}'],
+    include: [
+      'src/**/*.{test,spec}.{js,ts}',
+      'tests/integration/**/*.{test,spec}.{js,ts}',
+    ],
+    exclude: ['tests/end-to-end/**/*.{test,spec}.{js,ts}'],
   },
 });

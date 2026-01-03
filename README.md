@@ -46,16 +46,28 @@ First build the app (to generate cloudflare \_routes.json file)
 pnpm build
 ```
 
-Test frontend pages and functions
+Unit tests (for functions)
+
+```bash
+pnpm test:unit
+```
+
+Integration tests (for the yarn colorway api route)
+
+```bash
+pnpm test:integration
+```
+
+End-to-end tests (for pages and ui flows)
+
+```bash
+pnpm test:e2e
+```
+
+Run all tests (unit, integration, and end-to-end)
 
 ```bash
 pnpm test
-```
-
-Test internal api routes (for the Yarn Colorways API)
-
-```bash
-pnpm test:api
 ```
 
 ## 🙌 Acknowledgments

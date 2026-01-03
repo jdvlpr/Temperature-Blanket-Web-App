@@ -8,12 +8,14 @@
     "dev": "vite dev",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "playwright test",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
     "lint": "prettier --plugin-search-dir . --check . && eslint .",
     "format": "prettier --plugin-search-dir . --write .",
-    "test:api": "vite dev --host localhost --port 5180 & vitest"
+    "test": "pnpm test:unit && pnpm test:integration && pnpm test:e2e",
+    "test:unit": "vitest run src",
+    "test:integration": "start-server-and-test 'vite dev --host localhost --port 5180' http://localhost:5180 'vitest run tests/integration'",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@floating-ui/dom": "^1.7.4",
@@ -47,6 +49,7 @@
     "prettier-plugin-svelte": "^3.4.0",
     "prettier-plugin-tailwindcss": "^0.7.2",
     "sass": "^1.97.1",
+    "start-server-and-test": "^2.1.3",
     "svelte": "^5.46.1",
     "svelte-check": "^4.3.5",
     "svelte-dnd-action": "^0.9.69",
