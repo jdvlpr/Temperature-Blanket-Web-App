@@ -43,6 +43,16 @@ export const entries: ChangelogItemGroup[] = [
                   'New Feature: Seasons <span class="badge bg-tertiary-100-900">Beta</span>',
               },
             ],
+            version: '5.34.0',
+          },
+          {
+            notes: [
+              {
+                icon: ICONS.checkCircle,
+                text: `24 colorways added`,
+                title: 'Added Colorways: Hobby Store - Aran Anti-Pill',
+              },
+            ],
             version: '5.33.0',
           },
           {
