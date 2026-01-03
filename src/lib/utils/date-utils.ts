@@ -145,7 +145,7 @@ export const numberOfDays = (startDate, endDate) => {
   return Math.round((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1; // changed from ceil to round in v1.741 seems to have fixed a rounding bug
 };
 
-function getWeekNumber(d, dowOffset) {
+export function getWeekNumber(d, dowOffset) {
   // --- 1. Parameter Handling & Validation ---
   // Set default offset to Sunday (ISO 8601) if not provided or invalid type
   dowOffset = typeof dowOffset === 'number' ? dowOffset : 0;

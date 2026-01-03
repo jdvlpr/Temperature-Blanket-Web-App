@@ -1,17 +1,22 @@
-import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
+import SunCalc from 'suncalc';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
-  getMoonPhase,
   chunkArray,
   CSVtoArray,
-  sum,
-  missingDaysCount,
   getDayTime,
+  getMoonPhase,
   getOpenMeteo,
+  getTableData,
+  getWeatherSourceDetails,
+  getWeatherTargets,
+  getWeatherValue,
+  missingDaysCount,
+  sum,
 } from './weather-utils.svelte';
-import SunCalc from 'suncalc';
 
 // Mocking $lib modules
-vi.mock('$lib/constants', () => ({
+vi.mock('$lib/constants', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('$lib/constants')>()),
   API_SERVICES: {
     openMeteo: { baseURL: 'https://archive-api.open-meteo.com/v1/archive' },
   },
@@ -40,31 +45,38 @@ vi.mock('suncalc', () => ({
   })),
 }));
 
-const { mockWeather, mockLocalState } = vi.hoisted(() => ({
-  mockWeather: {
-    data: [] as any[],
-    params: {
-      tmax: [10, 20],
-      tavg: [15],
-      tmin: [5],
-      prcp: [0],
-      snow: [0],
-      dayt: [12],
+const { mockWeather, mockLocalState, mockLocations, mockAllGaugesAttributes } =
+  vi.hoisted(() => ({
+    mockWeather: {
+      data: [] as any[],
+      params: {
+        tmax: [10, 20],
+        tavg: [15],
+        tmin: [5],
+        prcp: [0],
+        snow: [0],
+        dayt: [12],
+      },
+      isUserEdited: false,
+      tableWeatherTargets: [] as any[],
     },
-  },
-  mockLocalState: {
-    value: {
-      units: 'metric',
+    mockLocalState: {
+      value: {
+        units: 'metric',
+      },
     },
-  },
-}));
+    mockLocations: {
+      all: [] as any[],
+    },
+    mockAllGaugesAttributes: [] as any[],
+  }));
 
 vi.mock('$lib/state', () => ({
   weather: mockWeather,
   localState: mockLocalState,
-  locations: { all: [] },
+  locations: mockLocations,
   signal: { value: null },
-  allGaugesAttributes: [],
+  allGaugesAttributes: mockAllGaugesAttributes,
 }));
 
 // Mock utils that are used within weather-utils
@@ -93,6 +105,8 @@ vi.mock('$lib/utils', async (importOriginal) => {
     },
     numberOfDays: (d1: Date, d2: Date) =>
       Math.ceil((d2.getTime() - d1.getTime()) / (1000 * 60 * 60 * 24)),
+    getColorInfo: vi.fn(() => ({ color: '#ffffff', textColor: '#000000' })),
+    convertTime: vi.fn((t) => t),
   };
 });
 
@@ -345,6 +359,108 @@ describe('weather-utils', () => {
       await expect(getOpenMeteo({ location: mockLocation })).rejects.toThrow(
         'Service Temporarily Unavailable',
       );
+    });
+  });
+
+  describe('getWeatherSourceDetails', () => {
+    it('should return sources based on location sources', () => {
+      mockLocations.all = [{ source: 'Meteostat' }, { source: 'Open-Meteo' }];
+      mockWeather.isUserEdited = false;
+      const result = getWeatherSourceDetails();
+      expect(result).toHaveLength(2);
+      expect(result).toContainEqual({
+        name: 'Meteostat',
+        url: 'https://meteostat.net',
+      });
+      expect(result).toContainEqual({
+        name: 'Open-Meteo',
+        url: 'https://open-meteo.com',
+      });
+    });
+
+    it('should include custom weather data if isUserEdited is true', () => {
+      mockLocations.all = [];
+      mockWeather.isUserEdited = true;
+      const result = getWeatherSourceDetails();
+      expect(result).toContainEqual({ name: 'custom weather data' });
+    });
+
+    it('should return undefined if locations.all is not available', () => {
+      // @ts-expect-error testing missing data
+      mockLocations.all = undefined;
+      expect(getWeatherSourceDetails()).toBeUndefined();
+    });
+  });
+
+  describe('getWeatherTargets', () => {
+    it('should filter targets based on weatherParameters', () => {
+      mockAllGaugesAttributes.push({
+        targets: [{ id: 'tmax' }, { id: 'tmin' }],
+      });
+      const weatherParameters = { tmax: true, tmin: false };
+      const result = getWeatherTargets({ weatherParameters });
+      expect(result).toHaveLength(1);
+      expect(result[0].id).toBe('tmax');
+    });
+  });
+
+  describe('getWeatherValue', () => {
+    beforeEach(() => {
+      mockWeather.data = [
+        {
+          tmax: { metric: 20, imperial: 68 },
+          moon: 4,
+        },
+      ];
+      mockLocalState.value.units = 'metric';
+    });
+
+    it('should return moon phase directly', () => {
+      expect(getWeatherValue({ dayIndex: 0, param: 'moon' })).toBe(4);
+    });
+
+    it('should return metric value for other parameters', () => {
+      expect(getWeatherValue({ dayIndex: 0, param: 'tmax' })).toBe(20);
+    });
+
+    it('should return imperial value if units are imperial', () => {
+      mockLocalState.value.units = 'imperial';
+      expect(getWeatherValue({ dayIndex: 0, param: 'tmax' })).toBe(68);
+    });
+  });
+
+  describe('getTableData', () => {
+    beforeEach(() => {
+      mockWeather.data = [
+        {
+          date: new Date('2024-01-01T00:00:00Z'),
+          location: 'Test',
+          tmax: { metric: 20, imperial: 68 },
+          moon: 0,
+          dayt: { metric: 720, imperial: 12 },
+        },
+      ];
+      mockWeather.tableWeatherTargets = [
+        { id: 'tmax' },
+        { id: 'moon' },
+        { id: 'dayt' },
+      ];
+      mockLocalState.value.units = 'metric';
+    });
+
+    it('should format data for table display', () => {
+      const result = getTableData();
+      expect(result).toHaveLength(1);
+      expect(result[0].date).toBe('2024-01-01');
+      expect(result[0].tmax).toBe(20);
+      expect(result[0].moon).toBe('New Moon');
+      expect(result[0].color.tmax).toBeDefined();
+    });
+
+    it('should handle null values in table data', () => {
+      mockWeather.data[0].tmax.metric = null;
+      const result = getTableData();
+      expect(result[0].tmax).toBe('-');
     });
   });
 });

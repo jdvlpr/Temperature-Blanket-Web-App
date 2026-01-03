@@ -25,6 +25,7 @@ import {
   isValueInRange,
   pluralize,
 } from '$lib/utils';
+import { brands } from '$lib/yarns/brands';
 import chroma from 'chroma-js';
 
 /**
@@ -387,7 +388,9 @@ export const getColorName = ({
       showGenericName,
       showNamedHexCodes,
     });
-  const yarn = getYarn({ brandId, yarnId });
+  const yarn = brands
+    .find((brand) => brand.id === brandId)
+    ?.yarns.find((yarn) => yarn.id === yarnId);
   if (!yarn)
     return getGenericColorName({
       color,
