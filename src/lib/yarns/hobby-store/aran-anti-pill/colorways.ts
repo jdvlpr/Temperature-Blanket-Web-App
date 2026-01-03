@@ -4,8 +4,8 @@ const colorways: Colorway[] = [
   {
     source: {
       name: 'magicneedles.in',
-      href: 'https://magicneedles.in/products/hobby-store-aran-anti-pill-yarn-white-2002',
-      accessed: '2024-01-02',
+      href: 'https://magicneedles.in/collections/hobby-store-aran-solids',
+      accessed: '2026-01-03',
     },
     colors: [
       {
@@ -61,11 +61,11 @@ const colorways: Colorway[] = [
         hex: '#971e1f',
       },
       {
-        name: 'Roof Title',
+        name: 'Roof Tile',
         hex: '#6e1c15',
       },
       {
-        name: 'Chilli Petter Red',
+        name: 'Chilli Pepper Red',
         hex: '#5f120f',
       },
       {
@@ -211,6 +211,102 @@ const colorways: Colorway[] = [
       {
         name: 'White',
         hex: '#f5f6ed',
+      },
+      {
+        hex: '#85907e',
+        name: 'Almond',
+      },
+      {
+        hex: '#251f3d',
+        name: 'Blue Violet',
+      },
+      {
+        hex: '#1b3026',
+        name: 'Bottle Green',
+      },
+      {
+        hex: '#5f3d26',
+        name: 'Brown',
+      },
+      {
+        hex: '#f4db6d',
+        name: 'Dandelion',
+      },
+      {
+        hex: '#2d402a',
+        name: 'Dark Green',
+      },
+      {
+        hex: '#5c6064',
+        name: 'Dark Grey',
+      },
+      {
+        hex: '#b48749',
+        name: 'Gold',
+      },
+      {
+        hex: '#607958',
+        name: 'Just Green',
+      },
+      {
+        hex: '#c5b0d5',
+        name: 'Lavender',
+      },
+      {
+        hex: '#1f4a1f',
+        name: 'Leaf Green',
+      },
+      {
+        hex: '#b2e591',
+        name: 'Lime Green',
+      },
+      {
+        hex: '#aa8e7d',
+        name: 'Mocha',
+      },
+      {
+        hex: '#614733',
+        name: 'Mud Brown',
+      },
+      {
+        hex: '#a88a34',
+        name: 'Mustard',
+      },
+      {
+        hex: '#929c6b',
+        name: 'Pale Green',
+      },
+      {
+        hex: '#544ea2',
+        name: 'Periwinkle',
+      },
+      {
+        hex: '#d3a8b0',
+        name: 'Pretty Pink',
+      },
+      {
+        hex: '#6e5f85',
+        name: 'Purple',
+      },
+      {
+        hex: '#837084',
+        name: 'Purple Haze',
+      },
+      {
+        hex: '#e46d34',
+        name: 'Spice',
+      },
+      {
+        hex: '#3e4c59',
+        name: 'Storm',
+      },
+      {
+        hex: '#24545c',
+        name: 'Waterfall',
+      },
+      {
+        hex: '#2b1419',
+        name: 'Wine',
       },
     ],
   },

@@ -36,6 +36,16 @@ export const entries: ChangelogItemGroup[] = [
             notes: [
               {
                 icon: ICONS.checkCircle,
+                text: `24 colorways added`,
+                title: 'Added Colorways: Hobby Store - Aran Anti-Pill',
+              },
+            ],
+            version: '5.33.0',
+          },
+          {
+            notes: [
+              {
+                icon: ICONS.checkCircle,
                 text: `34 colorways`,
                 title: 'Added New Yarn: Bendigo Woollen Mills - Cotton 10 Ply',
               },
