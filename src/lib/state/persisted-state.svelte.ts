@@ -10,27 +10,30 @@ type SeasonConfig = {
 };
 
 // User preferences for the web app stored in local storage
-type LocalStateType = {
+type LocalStatePreferencesType = {
   disableToastAnalytics: boolean;
+  layout: PageLayout;
+  seasons: SeasonConfig[];
   theme: {
     id: string; // `"classic"` or one of the presets in plugins.themes.presets in [tailwind.config.js])
     mode: 'light' | 'dark' | 'system';
   };
-  layout: PageLayout;
   units: Unit | null;
-  seasons: SeasonConfig[];
 };
 
-export const localState = persistedState<LocalStateType>('preferences', {
-  disableToastAnalytics: false,
-  theme: {
-    id: 'classic',
-    mode: 'system',
+export const localState = persistedState<LocalStatePreferencesType>(
+  'preferences',
+  {
+    disableToastAnalytics: false,
+    layout: 'list',
+    seasons: DEFAULT_SEASONS,
+    theme: {
+      id: 'classic',
+      mode: 'system',
+    },
+    units: null,
   },
-  layout: 'list',
-  units: null,
-  seasons: DEFAULT_SEASONS,
-});
+);
 
 // The following persisted state functionality was copied from: https://github.com/oMaN-Rod/svelte-persisted-state/blob/main/src/lib/index.svelte.ts
 type Serializer<T> = {

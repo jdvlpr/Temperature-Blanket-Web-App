@@ -17,12 +17,7 @@ import { browser } from '$app/environment';
 import { skeletonThemes } from '$lib/components/ThemeSwitcher.svelte';
 import { DEFAULT_SEASONS } from '$lib/constants/seasons-constants';
 import { localState, locations, project, weather } from '$lib/state';
-import type {
-  PageLayout,
-  SavedProject,
-  WeatherDay,
-  WeatherSourceOptions,
-} from '$lib/types';
+import type { PageLayout, WeatherDay, WeatherSourceOptions } from '$lib/types';
 import {
   dateToISO8601String,
   getMoonPhase,
@@ -366,7 +361,7 @@ export const setLocalStorageProject = () => {
 /**
  * Creates a project object to store the current project in local storage.
  *
- * @return {SavedProject} The project object containing the date, weather data, weather source,
+ * @return {LocalStorageProject} The project object containing the date, weather data, weather source,
  *                       and other project details.
  */
 const createProjectLocalStorageProjectObject = () => {
@@ -398,7 +393,7 @@ const createProjectLocalStorageProjectObject = () => {
 
   const weatherSource: WeatherSourceOptions = weather.source;
 
-  const localProject: SavedProject = {
+  const localProject: LocalStorageProject = {
     date,
     isCustomWeatherData,
     href,
