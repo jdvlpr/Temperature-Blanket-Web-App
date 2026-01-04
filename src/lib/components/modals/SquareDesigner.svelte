@@ -35,7 +35,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     onOkay,
   } = $props();
 
-  let _secondaryTargets = $state(secondaryTargets);
+  let _secondaryTargets = $derived(secondaryTargets);
 
   const colors = {
     tmin: '#38bdf8',

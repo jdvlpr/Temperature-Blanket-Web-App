@@ -23,8 +23,10 @@
 
   let { tableData, updateTable, uid } = $props();
 
-  let table = new TableHandler(tableData, {
-    rowsPerPage: weather.table.rowsPerPage,
+  let table =$derived.by(() => {
+    return new TableHandler(tableData, {
+      rowsPerPage: weather.table.rowsPerPage,
+    })
   });
 
   onMount(() => {

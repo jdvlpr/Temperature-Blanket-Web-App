@@ -30,7 +30,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     onchange,
   }: Props = $props();
 
-  let start = allowZero ? -1 : 0;
+  let start = $derived(allowZero ? -1 : 0);
 
   let numEl = $state();
 </script>
