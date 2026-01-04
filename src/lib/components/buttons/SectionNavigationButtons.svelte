@@ -26,14 +26,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
   /** @type {Props} */
   let { thisSectionIndex = 1 } = $props();
 
-  let previousSectionIndex = thisSectionIndex > 1 ? thisSectionIndex - 1 : null;
-  let previousSectionTitle = pageSections.items.find(
+  let previousSectionIndex = $derived(thisSectionIndex > 1 ? thisSectionIndex - 1 : null);
+  let previousSectionTitle = $derived(pageSections.items.find(
     (section) => section.index === previousSectionIndex,
-  )?.title;
-  let nextSectionIndex = thisSectionIndex < 4 ? thisSectionIndex + 1 : null;
-  let nextSectionTitle = pageSections.items.find(
+  )?.title);
+  let nextSectionIndex = $derived(thisSectionIndex < 4 ? thisSectionIndex + 1 : null);
+  let nextSectionTitle = $derived(pageSections.items.find(
     (section) => section.index === nextSectionIndex,
-  )?.title;
+  )?.title);
 </script>
 
 <div class="flex flex-wrap justify-between items-center my-4 gap-y-2">

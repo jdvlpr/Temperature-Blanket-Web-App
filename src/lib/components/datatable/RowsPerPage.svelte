@@ -23,13 +23,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let { table }: Props = $props();
 
-  const options = createOptions(table.rowCount.total);
-  function createOptions(totalCount) {
-    if (totalCount < 10) return [10];
+  const options = $derived.by(() => {
+    const totalCount = table.rowCount.total;
+     if (totalCount < 10) return [10];
     if (totalCount < 50) return [10, totalCount];
     if (totalCount < 190) return [10, 50, totalCount];
     return [10, 50, 190, totalCount];
-  }
+  });
+  
 </script>
 
 <label class="label flex flex-col items-start w-24">

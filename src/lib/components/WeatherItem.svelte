@@ -49,7 +49,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     dayt: '#facc15',
   };
 
-  let displayValue = id === 'moon' ? MOON_PHASE_NAMES[value] : value;
+  let displayValue = $derived( id === 'moon' ? MOON_PHASE_NAMES[value] : value);
 </script>
 
 <span class="flex flex-col items-center justify-start p-2">

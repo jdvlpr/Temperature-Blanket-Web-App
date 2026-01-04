@@ -29,9 +29,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   /** @type {Props} */
   let { project, canRemove = true, onclick } = $props();
 
-  const { href, title, date, isCustomWeatherData } = project;
+  const href = $derived(project.href);
+  const title = $derived(project.title);
+  const date = $derived(project.date);
+  const isCustomWeatherData = $derived(project.isCustomWeatherData);
   
-  let colors = getColorsFromInput({ string: href });
+  let colors = $derived(getColorsFromInput({ string: href }));
   
   function getProjectDescription({ colors, date }) {
     let schemeName =

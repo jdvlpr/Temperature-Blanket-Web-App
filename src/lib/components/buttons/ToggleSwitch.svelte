@@ -32,7 +32,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     onchange,
   }: Props = $props();
 
-  let hasDetails = details !== '';
+  let hasDetails = $derived(details !== '');
   let uid = $props.id();
 </script>
 

@@ -50,9 +50,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let container: HTMLElement = $state();
 
   let valid = $state(true);
-  let inputTypeColorValue = $state(hex);
-  let inputTypeTextValue = $state(hex);
-  let selectedColors = $state([
+  
+  let inputTypeColorValue = $derived(hex);
+  
+  let inputTypeTextValue = $derived(hex);
+  
+  let selectedColors = $derived([
     {
       hex,
       name,
@@ -64,9 +67,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
       affiliate_variant_href,
     },
   ]);
-  let title = index !== null ? `${index + 1}` : '';
-  let _brandId = brandId;
-  let _yarnId = yarnId;
+
+  let title = $derived(index !== null ? `${index + 1}` : '');
+
+  let currentColor = $derived({ hex });
+
 
   function inputTypeColorOnChange({ value, color }) {
     name = color?.name;
@@ -125,7 +130,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     else onChangeColor({ hex });
   }
 
-  let currentColor = $derived({ hex });
 </script>
 
 <div class="p-4 text-center" bind:this={container}>
@@ -207,8 +211,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <YarnGridSelect
     limit={true}
     bind:selectedColors
-    selectedBrandId={_brandId}
-    selectedYarnId={_yarnId}
+    selectedBrandId={brandId}
+    selectedYarnId={yarnId}
     incomingColor={currentColor}
     onClickScrollToTop={() => {
       container.scrollIntoView({
