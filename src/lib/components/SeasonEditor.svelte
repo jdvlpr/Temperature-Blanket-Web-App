@@ -198,7 +198,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       onclick={saveChanges}
     >
       <CheckIcon />
-      Save Changes
+      Save
     </button>
   </div>
 </StickyPart>
