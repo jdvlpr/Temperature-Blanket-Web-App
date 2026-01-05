@@ -39,6 +39,11 @@ export const entries: ChangelogItemGroup[] = [
                 text: `84 colorways`,
                 title: 'Added New Yarn: Lion Brand - Hometown',
               },
+              {
+                icon: ICONS.checkCircle,
+                text: `12 colorways added`,
+                title: 'Added Colorways: Lion Brand - Hue + Me',
+              },
             ],
             version: '5.34.0',
           },

@@ -128,6 +128,54 @@ const colorways: Colorway[] = [
         name: 'Agave',
         hex: '#86a2a2',
       },
+      {
+        hex: '#7a6e64',
+        name: 'Warm Stone',
+      },
+      {
+        hex: '#605d66',
+        name: 'Iris',
+      },
+      {
+        hex: '#2d382b',
+        name: 'Night Forest',
+      },
+      {
+        hex: '#4b4e34',
+        name: 'Moss',
+      },
+      {
+        hex: '#9f9648',
+        name: 'Dirty Chartreuse',
+      },
+      {
+        hex: '#966d6a',
+        name: 'Pink Earth',
+      },
+      {
+        hex: '#18364f',
+        name: 'Deep Sea',
+      },
+      {
+        hex: '#3e1114',
+        name: 'Gamay',
+      },
+      {
+        hex: '#6f1c1a',
+        name: 'Framboise',
+      },
+      {
+        hex: '#8b7787',
+        name: 'Hyacinth',
+      },
+      {
+        hex: '#40253e',
+        name: 'Aubergine',
+      },
+      {
+        hex: '#ddac45',
+        name: 'Sunflower',
+      },
     ],
   },
 ];
