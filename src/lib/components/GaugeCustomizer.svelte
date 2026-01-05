@@ -32,15 +32,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { dragHandle, dragHandleZone, SOURCES } from 'svelte-dnd-action';
   import { flip } from 'svelte/animate';
 
+  const flipDurationMs = 150;
+
+  const isProjectPlannerPage = page.route.id === '/';
+
   let { gauge = $bindable() } = $props();
 
   let isStaticGauge = $state(gauge.isStatic);
 
   let dragDisabled = $state(false);
-
-  const flipDurationMs = 150;
-
-  const isProjectPlannerPage = page.route.id === '/';
 
   let movable = $derived(gauge.colors?.length > 1);
 
@@ -62,6 +62,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     return cols;
   });
 
+  // Handle color change from ChangeColor modal
   function onChangeColor({
     index,
     hex,
@@ -98,11 +99,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
     dialog.close();
   }
 
+  // Handle drag and drop events
   function handleConsider(e: any) {
     dragDisabled = true;
     sortableColors = e.detail.items;
   }
 
+  // On drag end, update the gauge colors
   function handleFinalize(e: any) {
     const {
       items: newItems,
@@ -122,12 +125,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
       dragDisabled = false;
     }
   }
+
   function startDrag(e: any) {
     // preventing default to prevent lag on touch devices (because of the browser checking for screen scrolling)
     e.preventDefault();
     dragDisabled = false;
   }
 
+  // Prepare sortable colors with IDs for svelte-dnd-action
   function getSortableColors() {
     const _sortableColors = [];
     gauge.colors.forEach((color, i) => {
