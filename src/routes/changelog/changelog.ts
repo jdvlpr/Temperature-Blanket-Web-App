@@ -43,6 +43,21 @@ export const entries: ChangelogItemGroup[] = [
                   'New Feature: Seasons <span class="badge bg-tertiary-100-900">Beta</span>',
               },
             ],
+            version: '5.35.0',
+          },
+          {
+            notes: [
+              {
+                icon: ICONS.checkCircle,
+                text: `84 colorways`,
+                title: 'Added New Yarn: Lion Brand - Hometown',
+              },
+              {
+                icon: ICONS.checkCircle,
+                text: `12 colorways added`,
+                title: 'Added Colorways: Lion Brand - Hue + Me',
+              },
+            ],
             version: '5.34.0',
           },
           {
