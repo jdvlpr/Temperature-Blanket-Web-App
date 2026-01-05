@@ -196,13 +196,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
       style="background:{hex};color:{getTextColor(hex)}"
       animate:flip={{ duration: flipDurationMs }}
     >
-      <div
-        class={[
-          'hidden',
-          localState.value.layout === 'list' &&
-            'lg:block lg:h-full lg:w-full lg:flex-auto',
-        ]}
-      ></div>
+      <!-- The following empty div is necessary to center content in list view -->
+      <div></div>
 
       <div class="flex flex-auto flex-wrap items-center justify-around gap-2">
         <div class="flex flex-wrap items-center gap-2">
@@ -319,7 +314,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {#if isProjectPlannerPage}
           {#if showDaysInRange.value}
             <div
-              class="bg-surface-900/10 rounded-container flex w-fit flex-wrap items-center justify-center overflow-hidden shadow-inner"
+              class="bg-surface-900/10 rounded-container flex w-fit flex-wrap items-center justify-center overflow-hidden shadow-inner number-of-days-in-range"
             >
               <DaysInRange
                 range={gauge.ranges[index]}
@@ -331,13 +326,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {/if}
         {/if}
       </div>
-      <div
-        class={[
-          'hidden',
-          localState.value.layout === 'list' &&
-            'lg:block lg:h-full lg:w-full lg:flex-auto',
-        ]}
-      ></div>
+      
+      <!-- The following empty div is necessary to center content in list view -->
+      <div></div>
     </div>
   {/each}
 </div>
