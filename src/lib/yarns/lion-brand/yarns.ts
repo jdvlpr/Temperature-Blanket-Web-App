@@ -6,6 +6,7 @@ import { yarn as coboo } from './coboo/yarn';
 import { yarn as colorTheory } from './color-theory/yarn';
 import { yarn as feelsLikeButta } from './feels-like-butta/yarn';
 import { yarn as heartland } from './heartland/yarn';
+import { yarn as hometown } from './hometown/yarn';
 import { yarn as hueMe } from './hue-me/yarn';
 import { yarn as lbCollectionSuperwashMerino } from './lb-collection-superwash-merino/yarn';
 import { yarn as poundOfLove } from './pound-of-love/yarn';
@@ -29,6 +30,7 @@ export const brand: Brand = {
     colorTheory,
     feelsLikeButta,
     heartland,
+    hometown,
     hueMe,
     lbCollectionSuperwashMerino,
     poundOfLove,

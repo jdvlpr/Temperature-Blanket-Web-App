@@ -36,6 +36,16 @@ export const entries: ChangelogItemGroup[] = [
             notes: [
               {
                 icon: ICONS.checkCircle,
+                text: `84 colorways`,
+                title: 'Added New Yarn: Lion Brand - Hometown',
+              },
+            ],
+            version: '5.34.0',
+          },
+          {
+            notes: [
+              {
+                icon: ICONS.checkCircle,
                 text: `24 colorways added`,
                 title: 'Added Colorways: Hobby Store - Aran Anti-Pill',
               },
