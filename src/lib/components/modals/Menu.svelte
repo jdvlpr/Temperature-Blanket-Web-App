@@ -104,15 +104,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
       }
     }
 
+    const newURL = new URL(project.url.href);
+    replaceState(newURL, '');
+
     try {
-      const newURL = new URL(project.url.href);
-      replaceState(newURL, '');
       setLocalStorageProject();
       currentSavedProject = getSavedProjectMetaByHref(project.url.href);
       project.status.saved = true;
     } catch (e) {
       currentSavedProject = null;
-      console.log("Can't save project", { e });
+      project.status.saved = false;
+      project.status.error = {
+        code: 1,
+        message: 'Unable to save project to local storage',
+      };
+      console.warn("Can't save project", { e });
     }
   }
 </script>
@@ -417,13 +423,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <div class="mb-4 flex flex-col items-start justify-center gap-2">
       <h2 class="my-2 text-lg font-bold">Save</h2>
       {#if browser && typeof window.localStorage !== 'undefined' && weather.data.length}
-        <p
-          class="preset-filled-success-100-900 rounded-container inline-flex w-full items-center justify-start gap-2 p-2"
-        >
-          <CircleCheckBigIcon style="size-4" />
-          Project and {#if weather.isUserEdited}custom weather{:else}weather{/if}
-          data saved to this web browser
-        </p>
+        {#if project.status.saved}
+          <p
+            class="preset-filled-success-100-900 rounded-container inline-flex w-full items-center justify-start gap-2 p-2"
+          >
+            <CircleCheckBigIcon style="size-4" />
+            Project and {#if weather.isUserEdited}custom weather{:else}weather{/if}
+            data saved to this web browser
+          </p>
+        {:else if project.status.error.code === 1}
+          <div class="text-warning-500 flex flex-col gap-2">
+            <p>It looks like there was a problem saving your project to this browser, but it can still be accessed using the URL below.</p>
+              
+            <p>The storage space in this browser for saved projects might be full. If you have other saved projects, you can remove some and try to save this one again.</p>
+          </div>
+        {/if}
 
         <p class="">
           To access this project from any web browser, use the URL below:

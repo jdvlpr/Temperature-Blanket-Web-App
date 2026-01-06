@@ -15,7 +15,7 @@
 
 import { browser } from '$app/environment';
 import { skeletonThemes } from '$lib/components/ThemeSwitcher.svelte';
-import { DEFAULT_SEASONS } from '$lib/constants/seasons-constants';
+import { DEFAULT_SEASONS } from '$lib/constants';
 import { localState, locations, project, weather } from '$lib/state';
 import type { PageLayout, WeatherDay, WeatherSourceOptions } from '$lib/types';
 import {
@@ -66,7 +66,12 @@ function getProjectsIndex() {
 }
 
 function setProjectsIndex(index: LocalStorageProjectIndexItem[]) {
-  localStorage.setItem(PROJECT_INDEX_KEY, JSON.stringify(index));
+  try {
+    localStorage.setItem(PROJECT_INDEX_KEY, JSON.stringify(index));
+  } catch {
+    // Unable to set projects index (probably quota exceeded)
+    throw new Error('Local storage quota exceeded when setting projects index');
+  }
 }
 
 function getFullProjectById(id: string | null) {
@@ -94,7 +99,7 @@ function removeProjectById(id: string | null) {
 // The old single-key ran up against quota limits if too many projects were stored (for example more than 40 projects with weather data)
 // Added in version 5.33.0
 // ***********
-function migrateProjectsToPerKey() {
+function migrateProjectsToPerKey({ deleteLegacyKey = false }) {
   const LEGACY_PROJECTS_KEY = 'projects';
 
   const projectsIndex = getProjectsIndex();
@@ -106,9 +111,7 @@ function migrateProjectsToPerKey() {
   }
 
   const raw = localStorage.getItem(LEGACY_PROJECTS_KEY);
-
   if (!raw) return;
-
   let parsed;
   try {
     parsed = JSON.parse(raw);
@@ -116,30 +119,51 @@ function migrateProjectsToPerKey() {
     return;
   }
 
+  if (!Array.isArray(parsed) || !parsed.length || !parsed[0]) return;
+
+  // Remove the legacy key, if requested, to free up storage space
+  if (deleteLegacyKey) {
+    project.status.temporaryProjectsBackup = parsed;
+    localStorage.removeItem(LEGACY_PROJECTS_KEY);
+  }
+
   // Migrate the projects, if there are any
-  if (Array.isArray(parsed) && parsed.length && parsed[0]) {
-    const newIndex: LocalStorageProjectIndexItem[] = [];
-    parsed.forEach((project: LocalStorageProject) => {
-      const id =
-        parseProjectIdFromHref(project.href) || new Date().getTime().toString();
+  const newIndex: LocalStorageProjectIndexItem[] = [];
+  parsed.forEach((project: LocalStorageProject, index) => {
+    const id =
+      parseProjectIdFromHref(project.href) || new Date().getTime().toString();
 
-      // Store the full project under its own key, if it doesn't already exist
-      if (!localStorage.getItem(`${PROJECT_PREFIX}${id}`))
+    // Store the full project under its own key, if it doesn't already exist
+    if (!localStorage.getItem(`${PROJECT_PREFIX}${id}`)) {
+      try {
         localStorage.setItem(`${PROJECT_PREFIX}${id}`, JSON.stringify(project));
+      } catch {
+        // If we hit quota limits, run the migration again, but this time delete the legacy key to free up space
+        throw new Error(
+          `Local storage quota exceeded when setting project key ${PROJECT_PREFIX}${id}`,
+        );
+      }
+    }
 
-      // Add the project to the index, if it doesn't already exist
-      if (!newIndex.find((i: LocalStorageProjectIndexItem) => i.id === id))
-        newIndex.push({
-          id,
-          meta: {
-            date: project.date,
-            href: project.href,
-            title: project.title || '',
-            isCustomWeatherData: project.isCustomWeatherData || false,
-          },
-        });
-    });
+    // Add the project to the index, if it doesn't already exist
+    if (!newIndex.find((i: LocalStorageProjectIndexItem) => i.id === id))
+      newIndex.push({
+        id,
+        meta: {
+          date: project.date,
+          href: project.href,
+          title: project.title || '',
+          isCustomWeatherData: project.isCustomWeatherData || false,
+        },
+      });
+  });
+
+  try {
     setProjectsIndex(newIndex);
+  } catch {
+    throw new Error(
+      'Local storage quota exceeded when setting projects_index key',
+    );
   }
 }
 
@@ -148,7 +172,24 @@ function migrateProjectsToPerKey() {
 // Added in version 5.0.0
 // ****************
 function handleLegacyLocalStorageKeys() {
-  migrateProjectsToPerKey();
+  try {
+    // migrate projects to per-key storage, keeping the legacy key for now as an emergency backup
+    migrateProjectsToPerKey({ deleteLegacyKey: false });
+  } catch {
+    console.warn(
+      'migration to per-key project storage failed, trying again with deleteLegacyKey=true',
+    );
+    try {
+      // try again, but this time delete the legacy key first to free up space
+      migrateProjectsToPerKey({ deleteLegacyKey: true });
+    } catch (e) {
+      console.error(
+        'something went catastrophically wrong during project migration, throwing an error to log it',
+      );
+      // something went unexpectedly wrong, throw the error to log it in +layout.svelte
+      throw e;
+    }
+  }
 
   // 'layout' is now 'preferences.layout'
   if (localStorage.getItem('layout')) {
@@ -183,7 +224,11 @@ function handleLegacyLocalStorageKeys() {
 }
 
 export function initializeLocalStorage() {
-  handleLegacyLocalStorageKeys();
+  try {
+    handleLegacyLocalStorageKeys();
+  } catch (e) {
+    throw e;
+  }
 
   localState.value.theme.id = localState.value.theme.id || 'classic';
 

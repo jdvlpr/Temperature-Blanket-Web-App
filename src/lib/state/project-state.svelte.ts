@@ -61,6 +61,16 @@ export class HistoryStateClass {
   }
 }
 
+type ProjectStatusType = {
+  saved: boolean;
+  loading: boolean;
+  error: {
+    code: 1 | null; // 1 = unable to save to local storage
+    message: string;
+  };
+  temporaryProjectsBackup: any[]; // A temporary backup of projects in case migration fails
+};
+
 class ProjectClass {
   // *****************
   // Constant Properties
@@ -138,9 +148,14 @@ class ProjectClass {
     };
   });
 
-  status = $state({
+  status = $state<ProjectStatusType>({
     saved: false,
     loading: true,
+    error: {
+      code: null,
+      message: '',
+    },
+    temporaryProjectsBackup: [],
   });
 
   gallery = $state({

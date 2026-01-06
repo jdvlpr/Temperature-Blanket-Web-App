@@ -14,6 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
+  import { dev, version } from '$app/environment';
   import { afterNavigate, beforeNavigate, onNavigate } from '$app/navigation';
   import { PUBLIC_MICROSOFT_CLARITY_ID } from '$env/static/public';
   import DialogProvider from '$lib/components/modals/DialogProvider.svelte';
@@ -25,18 +26,42 @@ If not, see <https://www.gnu.org/licenses/>. -->
     project,
     toast,
   } from '$lib/state';
+  import { supabase } from '$lib/supabaseClient';
   import { handleKeyDown, initializeLocalStorage, privacy } from '$lib/utils';
+  import { YoutubeIcon } from '@lucide/svelte';
   import { onMount, type Snippet } from 'svelte';
   import '../css/main.css';
-  import { YoutubeIcon } from '@lucide/svelte';
+  import LegacyMigrationError from '$lib/components/modals/LegacyMigrationError.svelte';
 
   interface Props {
     children?: Snippet;
   }
   let { children }: Props = $props();
 
+  async function logMigrationError({ uid }) {
+    const projects = project.status.temporaryProjectsBackup;
+    const { error } = await supabase.from('project_migration').insert({
+      dev,
+      version,
+      uid,
+      projects_length: projects.length,
+      projects,
+    });
+    return { error };
+  }
+
   onMount(async () => {
-    initializeLocalStorage();
+    try {
+      initializeLocalStorage();
+    } catch (e) {
+      const uid = crypto.randomUUID();
+      const { error } = await logMigrationError({ uid });
+      dialog.trigger({
+        type: 'component',
+        component: { ref: LegacyMigrationError, props: { uid, error } },
+      });
+      console.warn({ e });
+    }
 
     // NOTE: Set window variable in order to access it inside the MS clarity function
     // See the script tag with id="clarity-script"
@@ -163,9 +188,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/if}
 </svelte:head>
 
-<div class="w-full p-2 bg-primary-50-950 text-center [view-transition-name:top-banner]">
-  <a href="https://www.youtube.com/watch?v=7NRLrpZb0Lo" target="_blank" rel="noopener" class="btn hover:preset-tonal whitespace-pre-wrap ">
-   <YoutubeIcon/>Watch: Plan a Temperature Blanket the Easy Way</a>
+<div
+  class="bg-primary-50-950 w-full p-2 text-center [view-transition-name:top-banner]"
+>
+  <a
+    href="https://www.youtube.com/watch?v=7NRLrpZb0Lo"
+    target="_blank"
+    rel="noopener"
+    class="btn hover:preset-tonal whitespace-pre-wrap"
+  >
+    <YoutubeIcon />Watch: Plan a Temperature Blanket the Easy Way</a
+  >
 </div>
 
 {@render children?.()}
