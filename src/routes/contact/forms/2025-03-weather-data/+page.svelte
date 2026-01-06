@@ -77,7 +77,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 
   async function submitForm(event) {
-    event.preventDefault();
+    if (event.cancelable) event.preventDefault();
     submitting = true;
 
     const formData = new FormData(event.target);

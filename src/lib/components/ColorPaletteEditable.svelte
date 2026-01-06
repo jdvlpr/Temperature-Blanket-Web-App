@@ -148,7 +148,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
   function startDrag(e) {
     // preventing default to prevent lag on touch devices (because of the browser checking for screen scrolling)
-    e.preventDefault();
+    if (e.cancelable) e.preventDefault();
     isDragging.value = true;
   }
 

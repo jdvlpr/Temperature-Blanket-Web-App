@@ -452,33 +452,33 @@ If not, see <https://www.gnu.org/licenses/>. -->
       bind:this={canvas}
       class="h-full w-full cursor-crosshair select-none"
       onmousedown={(e) => {
-        e.preventDefault();
+        if (e.cancelable) e.preventDefault();
         addColor(e);
       }}
       onmousemove={(e) => {
-        e.preventDefault();
+        if (e.cancelable) e.preventDefault();
         showColor(e);
       }}
       ontouchmove={(e) => {
         showColorTouch(e);
       }}
       onmouseenter={(e) => {
-        e.preventDefault();
+        if (e.cancelable) e.preventDefault();
         showColor(e);
         showCursor = false;
       }}
       ontouchstart={(e) => {
-        e.preventDefault();
+        if (e.cancelable) e.preventDefault();
         containerElement.parentElement.style.overflowY = 'hidden';
         showColorTouch(e);
         showCursor = false;
       }}
       onmouseleave={(e) => {
-        e.preventDefault();
+        if (e.cancelable) e.preventDefault();
         showCursor = true;
       }}
       ontouchend={(e) => {
-        e.preventDefault();
+        if (e.cancelable) e.preventDefault();
         containerElement.parentElement.style.overflowY = '';
         addColorTouch(e);
         showCursor = true;
@@ -503,7 +503,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           max={MAXIMUM_COLORWAYS_MATCHES_FOR_IMAGES}
           allowZero={true}
           onchange={(e) => {
-            e.preventDefault();
+            if (e.cancelable) e.preventDefault();
 
             const value = parseInt(e.target.value);
             const lastLockedIndex = matchingYarnColors.findLastIndex(

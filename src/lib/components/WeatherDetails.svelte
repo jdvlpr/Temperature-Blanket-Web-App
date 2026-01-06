@@ -110,10 +110,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
       max={data?.length - 1}
       bind:this={rangeInput}
       bind:value={weather.currentIndex}
-      onkeydown={(event) =>
-        event.code === 'ArrowRight' || event.code === 'ArrowLeft'
-          ? event.preventDefault()
-          : null}
+      onkeydown={(event) => {
+        if (!event.cancelable) return;
+        if(event.code === 'ArrowRight' || event.code === 'ArrowLeft')
+          event.preventDefault();
+      }}
       class="range-slider-input"
       data-vaul-no-drag
     />

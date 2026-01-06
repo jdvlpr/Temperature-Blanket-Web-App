@@ -40,8 +40,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let isStaticGauge = $state(gauge.isStatic);
 
-  let dragDisabled = $state(false);
-
   let movable = $derived(gauge.colors?.length > 1);
 
   let hasAnyAffiliateURLs = $derived(
@@ -101,7 +99,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   // Handle drag and drop events
   function handleConsider(e: any) {
-    dragDisabled = true;
     sortableColors = e.detail.items;
   }
 
@@ -120,16 +117,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     });
 
     gauge.schemeId = 'Custom';
-    // Ensure dragging is stopped on drag finish via pointer (mouse, touch)
-    if (source === SOURCES.POINTER) {
-      dragDisabled = false;
-    }
-  }
-
-  function startDrag(e: any) {
-    // preventing default to prevent lag on touch devices (because of the browser checking for screen scrolling)
-    e.preventDefault();
-    dragDisabled = false;
   }
 
   // Prepare sortable colors with IDs for svelte-dnd-action
@@ -182,7 +169,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     items: sortableColors,
     flipDurationMs,
     type: 'gaugeCustomizer',
-    dragDisabled,
   }}
   onconsider={handleConsider}
   onfinalize={handleFinalize}
@@ -224,11 +210,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             title="Move Color"
             tabindex="-1"
             aria-label="Crag handle for color {index + 1}"
-            class="btn-icon hover:preset-tonal handle p-2 {dragDisabled
-              ? 'cursor-grabbing'
-              : 'cursor-grab'}"
-            onmousedown={startDrag}
-            ontouchstart={startDrag}
+            class="btn-icon hover:preset-tonal handle p-2"
             use:dragHandle
           >
             <MoveIcon />

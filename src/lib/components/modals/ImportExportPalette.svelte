@@ -183,7 +183,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       onkeyup={triggerChange}
       onchange={triggerChange}
       onpaste={(e) => {
-        e.preventDefault();
+        if (e.cancelable) e.preventDefault();
         const _tempInputValue = e.clipboardData?.getData('text');
         inputValue = _tempInputValue || '';
         triggerChange();

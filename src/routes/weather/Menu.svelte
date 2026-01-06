@@ -105,13 +105,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
               title="Remove from Locations"
               onclick={(e) => {
                 e.stopPropagation();
-                e.preventDefault();
+                if (e.cancelable) e.preventDefault();
                 weatherState.weatherLocations.map((item) => {
                   if (item.id === id) item.saved = false;
                   return item;
                 });
-                // const _weatherForecastData = weatherState.weatherLocations.filter((item) => item.id !== id);
-                // weatherState.weatherLocations = _weatherForecastData;
 
                 if (id === weatherState.activeLocationID)
                   weatherState.activeLocationID =
