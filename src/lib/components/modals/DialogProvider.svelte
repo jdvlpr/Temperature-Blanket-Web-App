@@ -85,7 +85,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         </label>
                       {/each}
                     </div>
+                    {#if weather.pdfOptions.gauges.length > 0}
+                     <label class="flex items-center space-x-2 ml-4">
+                          <input
+                            type="checkbox"
+                            name="showDaysInRange"
+                            class="checkbox"
+                            bind:checked={weather.pdfOptions.showDaysInRange}
+                          />
+                          <p class="">Show number of days in ranges</p>
+                        </label>
+                    {/if}
                   </div>
+
 
                   <div class="flex flex-col gap-2">
                     <p class="font-bold">Weather Data</p>

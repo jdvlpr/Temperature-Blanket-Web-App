@@ -13,12 +13,11 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { locations, localState } from '$lib/state';
+import { localState, locations, showDaysInRange } from '$lib/state';
 import type {
   GaugeAttributes,
   WeatherDay,
   WeatherParam,
-  WeatherSource,
   WeatherSourceOptions,
 } from '$lib/types';
 import {
@@ -241,9 +240,11 @@ class WeatherClass {
 
   pdfOptions: {
     gauges: GaugeAttributes['id'][];
+    showDaysInRange: boolean;
     weatherDataParams: WeatherParam['id'][];
-  } = $state({
+  } = $derived({
     gauges: ['temp'],
+    showDaysInRange: showDaysInRange.value,
     weatherDataParams: ['tmax', 'tavg', 'tmin'],
   });
 

@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { gauges, localState, showDaysInRange } from '$lib/state';
+import { gauges, localState, weather } from '$lib/state';
 import pdfConfig from '../pdf-config';
 import pdfColorDetails from './color-details.svelte';
 import pdfFooter from './footer.svelte';
@@ -120,7 +120,7 @@ const pdfGauge = {
         doc.addPage();
         // pdfHeader.create(doc);
         pdfGauge.createHeader(doc, gauge);
-        if (showDaysInRange.value)
+        if (weather.pdfOptions.showDaysInRange)
           pdfColorDetails.createColorDetailsHeader(doc, gauge);
         l =
           pdfConfig.topMargin +
@@ -232,7 +232,8 @@ const pdfGauge = {
       );
 
       // Color Details
-      if (showDaysInRange.value) pdfColorDetails.create(doc, gauge, i, l);
+      if (weather.pdfOptions.showDaysInRange)
+        pdfColorDetails.create(doc, gauge, i, l);
     }
   },
 };

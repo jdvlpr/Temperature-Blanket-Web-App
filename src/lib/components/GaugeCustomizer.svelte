@@ -20,7 +20,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
   import ViewToggle from '$lib/components/buttons/ViewToggle.svelte';
   import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
-  import { localState, dialog, showDaysInRange } from '$lib/state';
+  import { dialog, localState, showDaysInRange } from '$lib/state';
   import type { Color } from '$lib/types';
   import { getTextColor } from '$lib/utils';
   import {
@@ -29,7 +29,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     ShoppingBagIcon,
     Trash2Icon,
   } from '@lucide/svelte';
-  import { dragHandle, dragHandleZone, SOURCES } from 'svelte-dnd-action';
+  import { dragHandle, dragHandleZone } from 'svelte-dnd-action';
   import { flip } from 'svelte/animate';
 
   const flipDurationMs = 150;
@@ -138,26 +138,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </p>
 {/if}
 
-<div class="grid grid-cols-12 gap-2 pt-2">
+<div class="flex flex-wrap gap-2 pt-2 items-center justify-center sm:justify-between">
   {#if isProjectPlannerPage}
-    <div
-      class="col-span-full flex w-fit flex-col items-start gap-1 text-left lg:col-span-8"
-    >
-      <ToggleSwitch
-        bind:checked={showDaysInRange.value}
-        label={`Show number of days in ranges`}
-        details="Applies to the view below and PDF file"
-      />
-    </div>
+      <div>
+        <ToggleSwitch
+          bind:checked={showDaysInRange.value}
+          label={`Show number of days in ranges`}
+        />
+      </div>
   {/if}
 
-  <div
-    class="col-span-full my-2 flex flex-wrap justify-center {isProjectPlannerPage
-      ? 'lg:cols-start-9 lg:col-span-4 lg:justify-end'
-      : ''}"
-  >
     <ViewToggle />
-  </div>
 </div>
 
 <div

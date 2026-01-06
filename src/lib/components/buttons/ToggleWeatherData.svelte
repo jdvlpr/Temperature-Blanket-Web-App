@@ -14,6 +14,8 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
+  import { EyeIcon, EyeOffIcon } from "@lucide/svelte";
+
   let { view, onclick, children } = $props();
 
   const visibleIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">
@@ -35,10 +37,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   aria-pressed={view}
 >
   {#if view}
-    <span class="" aria-hidden="true">{@html visibleIcon}</span>
+      <EyeIcon class="size-5" aria-hidden="true"/>
     <p class="text-sm">{@render children?.()}</p>
   {:else}
-    <span class="" aria-hidden="true">{@html hiddenIcon}</span>
+      <EyeOffIcon class="size-5" aria-hidden="true"/>
     <p class="text-sm"><s>{@render children?.()}</s></p>
   {/if}
 </button>
