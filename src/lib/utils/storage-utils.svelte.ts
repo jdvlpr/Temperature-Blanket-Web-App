@@ -299,6 +299,7 @@ export const checkForProjectInLocalStorage = async () => {
   if (typeof window.localStorage === 'undefined') return;
   const id = new URL(window.location).searchParams.get('project');
   if (!id) return;
+
   const matchedProject = getFullProjectById(id);
 
   if (!matchedProject) return;
@@ -322,6 +323,7 @@ export const checkForProjectInLocalStorage = async () => {
   const weatherLocalStorage = matchedProject.weatherData;
 
   if (!weatherLocalStorage) return;
+
   const newWeatherUngrouped = weatherLocalStorage.map((n) => {
     const date = stringToDate(n.date);
 
@@ -339,6 +341,7 @@ export const checkForProjectInLocalStorage = async () => {
   let timestamp: string | number = new URLSearchParams(url.search).get(
     'project',
   );
+
   if (timestamp === null || typeof +timestamp !== 'number') return;
 
   timestamp = +timestamp;
@@ -381,11 +384,17 @@ export const setLocalStorageProject = () => {
 
   const localProject = createProjectLocalStorageProjectObject();
 
-  // Store the full project under its own key
-  localStorage.setItem(
-    `${PROJECT_PREFIX}${thisID}`,
-    JSON.stringify(localProject),
-  );
+  try {
+    // Store the full project under its own key
+    localStorage.setItem(
+      `${PROJECT_PREFIX}${thisID}`,
+      JSON.stringify(localProject),
+    );
+  } catch {
+    throw new Error(
+      'Local storage quota exceeded when trying to store project',
+    );
+  }
 
   // Save minimal metadata in the projects index
   const projectIndex = {
