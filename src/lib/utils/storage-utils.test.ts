@@ -23,6 +23,14 @@ vi.mock('$lib/state', () => ({
   project: {
     url: { href: 'http://localhost/?project=123' },
     gallery: { href: '', title: '' },
+    status: {
+      temporaryProjectsBackup: [],
+      temporaryUid: null,
+      temporaryError: null,
+      saved: false,
+      error: null,
+      loading: false,
+    },
   },
   locations: {
     projectTitle: 'Test Project',
@@ -208,6 +216,140 @@ describe('storage-utils', () => {
       expect(list).toHaveLength(2);
       expect(list[0].meta.title).toBe('Second');
       expect(list[1].meta.title).toBe('First');
+    });
+  });
+
+  describe('Edge Cases', () => {
+    it('migrates legacy projects to per-key storage and generates unique ids', () => {
+      const legacyProjects = [
+        {
+          href: 'http://localhost/',
+          date: '2024-01-01',
+          title: 'Legacy A',
+          isCustomWeatherData: false,
+          weatherData: [],
+          weatherSource: { name: 'Meteostat' },
+        },
+        {
+          href: 'http://localhost/',
+          date: '2024-01-02',
+          title: 'Legacy B',
+          isCustomWeatherData: false,
+          weatherData: [],
+          weatherSource: { name: 'Meteostat' },
+        },
+      ];
+      localStorageMock['projects'] = JSON.stringify(legacyProjects);
+
+      // stub $effect so initializeLocalStorage can run without svelte runtime
+      const effectFn = (cb) => cb();
+      effectFn.root = (cb) => cb();
+      vi.stubGlobal('$effect', effectFn);
+
+      // Act
+      storageUtils.initializeLocalStorage();
+
+      // Assert
+      const index = JSON.parse(localStorageMock['projects_index'] || '[]');
+      expect(index).toHaveLength(2);
+
+      const projectKeys = Object.keys(localStorageMock).filter((k) =>
+        k.startsWith('p_'),
+      );
+      expect(projectKeys).toHaveLength(2);
+    });
+
+    it('does not load project when project href has non-numeric timestamp', async () => {
+      const id = 'abc123';
+      const href = 'http://localhost/?project=abc';
+      const projectData = {
+        date: '2024-01-01',
+        title: 'Bad Timestamp',
+        href: href,
+        isCustomWeatherData: false,
+        weatherData: [{ date: '2024-01-01', temp: 10 }],
+        weatherSource: { name: 'Meteostat' },
+      };
+      localStorageMock[`p_${id}`] = JSON.stringify(projectData);
+      localStorageMock['projects_index'] = JSON.stringify([
+        {
+          id,
+          meta: {
+            href,
+            title: 'Bad Timestamp',
+            date: '2024-01-01',
+            isCustomWeatherData: false,
+          },
+        },
+      ]);
+
+      // Set current URL to load project by id
+      window.location.href = `http://localhost/?project=${id}`;
+      // Make window.location toString-able for URL constructor used in tests
+      // @ts-ignore
+      window.location = {
+        toString: () => window.location.href,
+        href: window.location.href,
+      };
+
+      // Act
+      await storageUtils.checkForProjectInLocalStorage();
+
+      // Assert
+      const { weather } = await import('$lib/state');
+      expect(weather.isFromLocalStorage).toBe(false);
+      expect(weather.rawData).toHaveLength(0);
+    });
+
+    it('does not load project when weatherData is empty', async () => {
+      const id = 'empty';
+      const href = 'http://localhost/?project=123';
+      const projectData = {
+        date: '2024-01-01',
+        title: 'Empty Weather',
+        href: href,
+        isCustomWeatherData: true,
+        weatherData: [],
+        weatherSource: { name: 'Meteostat' },
+      };
+      localStorageMock[`p_${id}`] = JSON.stringify(projectData);
+      localStorageMock['projects_index'] = JSON.stringify([
+        {
+          id,
+          meta: {
+            href,
+            title: 'Empty Weather',
+            date: '2024-01-01',
+            isCustomWeatherData: true,
+          },
+        },
+      ]);
+
+      window.location.href = `http://localhost/?project=${id}`;
+      // Make window.location toString-able for URL constructor used in tests
+      // @ts-ignore
+      window.location = {
+        toString: () => window.location.href,
+        href: window.location.href,
+      };
+
+      await storageUtils.checkForProjectInLocalStorage();
+
+      const { weather } = await import('$lib/state');
+      expect(weather.isFromLocalStorage).toBe(false);
+      expect(weather.rawData).toHaveLength(0);
+    });
+
+    it('does not throw on malformed skeletonTheme', async () => {
+      localStorageMock['skeletonTheme'] = 'not-json';
+      const effectFn = (cb) => cb();
+      effectFn.root = (cb) => cb();
+      vi.stubGlobal('$effect', effectFn);
+
+      expect(() => storageUtils.initializeLocalStorage()).not.toThrow();
+
+      const { localState } = await import('$lib/state');
+      expect(localState.value.theme.id).toBe('classic');
     });
   });
 });
