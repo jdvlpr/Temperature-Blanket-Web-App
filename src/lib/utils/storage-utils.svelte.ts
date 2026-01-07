@@ -129,14 +129,17 @@ function migrateProjectsToPerKey({ deleteLegacyKey = false }) {
 
   // Migrate the projects, if there are any
   const newIndex: LocalStorageProjectIndexItem[] = [];
-  parsed.forEach((project: LocalStorageProject, index) => {
+  parsed.forEach((legacyProject: LocalStorageProject, index) => {
     const id =
-      parseProjectIdFromHref(project.href) || new Date().getTime().toString();
+      parseProjectIdFromHref(legacyProject.href) || `${Date.now()}_${index}`;
 
     // Store the full project under its own key, if it doesn't already exist
     if (!localStorage.getItem(`${PROJECT_PREFIX}${id}`)) {
       try {
-        localStorage.setItem(`${PROJECT_PREFIX}${id}`, JSON.stringify(project));
+        localStorage.setItem(
+          `${PROJECT_PREFIX}${id}`,
+          JSON.stringify(legacyProject),
+        );
       } catch {
         // If we hit quota limits, run the migration again, but this time delete the legacy key to free up space
         throw new Error(
@@ -150,10 +153,10 @@ function migrateProjectsToPerKey({ deleteLegacyKey = false }) {
       newIndex.push({
         id,
         meta: {
-          date: project.date,
-          href: project.href,
-          title: project.title || '',
-          isCustomWeatherData: project.isCustomWeatherData || false,
+          date: legacyProject.date,
+          href: legacyProject.href,
+          title: legacyProject.title || '',
+          isCustomWeatherData: legacyProject.isCustomWeatherData || false,
         },
       });
   });
@@ -215,8 +218,16 @@ function handleLegacyLocalStorageKeys() {
   // 'skeletonTheme' is now 'preferences.theme.id'
   const skeletonTheme = localStorage.getItem('skeletonTheme');
   if (skeletonTheme) {
-    const parsedSkeletonTheme = JSON.parse(skeletonTheme); // themes were stored as "example" (included the quotes), so we need to parse them
-    if (skeletonThemes.map((theme) => theme.id).includes(parsedSkeletonTheme)) {
+    let parsedSkeletonTheme;
+    try {
+      parsedSkeletonTheme = JSON.parse(skeletonTheme); // themes were stored as "example" (included the quotes), so we need to parse them
+    } catch {
+      parsedSkeletonTheme = null;
+    }
+    if (
+      parsedSkeletonTheme &&
+      skeletonThemes.some((theme) => theme.id === parsedSkeletonTheme)
+    ) {
       localState.value.theme.id = parsedSkeletonTheme;
       localStorage.removeItem('skeletonTheme');
     }
@@ -322,7 +333,7 @@ export const checkForProjectInLocalStorage = async () => {
   // Set weather data and convert dates to Date objects
   const weatherLocalStorage = matchedProject.weatherData;
 
-  if (!weatherLocalStorage) return;
+  if (!weatherLocalStorage || !weatherLocalStorage.length) return;
 
   const newWeatherUngrouped = weatherLocalStorage.map((n) => {
     const date = stringToDate(n.date);
@@ -342,9 +353,9 @@ export const checkForProjectInLocalStorage = async () => {
     'project',
   );
 
-  if (timestamp === null || typeof +timestamp !== 'number') return;
+  if (timestamp === null || !Number.isFinite(+timestamp)) return;
 
-  timestamp = +timestamp;
+  timestamp = Number(timestamp);
 
   const latestDay = new Date(
     Math.max(...newWeatherUngrouped.map((n) => n.date)),
