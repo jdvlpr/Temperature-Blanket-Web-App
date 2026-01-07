@@ -45,7 +45,7 @@ export type LocalStorageProject = {
   weatherSource: WeatherSourceOptions;
 };
 
-const PROJECT_INDEX_KEY = 'projects_index';
+const PROJECTS_INDEX_KEY = 'projects_index';
 const PROJECT_PREFIX = 'p_';
 
 /**
@@ -77,7 +77,7 @@ async function getProjectsIndex(): Promise<LocalStorageProjectIndexItem[]> {
     throw new Error('IndexedDB is not available');
   }
   try {
-    const index = await get<LocalStorageProjectIndexItem[]>(PROJECT_INDEX_KEY);
+    const index = await get<LocalStorageProjectIndexItem[]>(PROJECTS_INDEX_KEY);
     return index || [];
   } catch {
     return [];
@@ -93,7 +93,7 @@ async function setProjectsIndex(
   if (!isIndexedDBAvailable()) {
     throw new Error('IndexedDB is not available');
   }
-  await set(PROJECT_INDEX_KEY, index);
+  await set(PROJECTS_INDEX_KEY, index);
 }
 
 /**
@@ -154,8 +154,8 @@ async function migrateProjectsFromLocalStorageToIndexedDB(): Promise<void> {
     }
     keysToRemove.forEach((key) => localStorage.removeItem(key));
     // Remove old projects_index from localStorage if it exists
-    if (localStorage.getItem(PROJECT_INDEX_KEY)) {
-      localStorage.removeItem(PROJECT_INDEX_KEY);
+    if (localStorage.getItem(PROJECTS_INDEX_KEY)) {
+      localStorage.removeItem(PROJECTS_INDEX_KEY);
     }
     return;
   }
@@ -229,8 +229,8 @@ async function migrateProjectsFromLocalStorageToIndexedDB(): Promise<void> {
   }
   keysToRemove.forEach((key) => localStorage.removeItem(key));
   // Remove old projects_index from localStorage if it exists
-  if (localStorage.getItem(PROJECT_INDEX_KEY)) {
-    localStorage.removeItem(PROJECT_INDEX_KEY);
+  if (localStorage.getItem(PROJECTS_INDEX_KEY)) {
+    localStorage.removeItem(PROJECTS_INDEX_KEY);
   }
 }
 
@@ -470,7 +470,7 @@ export const setProjectInStorage = async () => {
     await del(`${PROJECT_PREFIX}${thisID}`);
   }
 
-  const localProject = createProjectLocalStorageProjectObject();
+  const localProject = createProjectLocalStorageProjectObject();  
 
   // Store the full project in IndexedDB
   await set(`${PROJECT_PREFIX}${thisID}`, localProject);
@@ -522,14 +522,16 @@ const createProjectLocalStorageProjectObject = () => {
 
   const href = project.url.href;
 
-  const weatherData = weather.rawData.map((day) => {
+  // Create a plain serializable copy of weather data
+  const weatherData = $state.snapshot(weather.rawData).map((day) => {
     return {
       ...day,
       date: dateToISO8601String(day.date),
     };
   });
 
-  const weatherSource: WeatherSourceOptions = weather.source;
+  // Create a plain serializable copy of weather source (avoid reactive state objects)
+  const weatherSource: WeatherSourceOptions = $state.snapshot(weather.source);
 
   const localProject: LocalStorageProject = {
     date,
@@ -537,7 +539,7 @@ const createProjectLocalStorageProjectObject = () => {
     href,
     title: _title,
     weatherData: weatherData as unknown as WeatherDay[],
-    weatherSource,
+    weatherSource: weatherSource as unknown as WeatherSourceOptions,
   };
 
   return localProject;
