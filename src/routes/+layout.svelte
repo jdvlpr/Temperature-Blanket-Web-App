@@ -55,6 +55,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     try {
       await initializeLocalStorage();
     } catch (e) {
+      if (!project.status.temporaryProjectsBackup.length) return;
       const uid = crypto.randomUUID();
       const { error } = await logMigrationError({ uid });
       project.status.temporaryUid = uid;

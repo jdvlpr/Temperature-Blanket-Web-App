@@ -130,46 +130,17 @@ async function removeProjectById(id: string | null): Promise<void> {
 // Added in version 5.36.0
 // ***********
 async function migrateProjectsFromLocalStorageToIndexedDB(): Promise<void> {
-  if (!isIndexedDBAvailable()) {
-    throw new Error('IndexedDB is not available. Cannot migrate projects.');
-  }
-
   const LEGACY_PROJECTS_KEY = 'projects';
-
-  // Check if migration has already occurred
-  const existingIndex = await getProjectsIndex();
-  if (existingIndex.length > 0) {
-    // Migration has already occurred, clean up legacy localStorage keys
-    // Remove the legacy 'projects' key
-    if (localStorage.getItem(LEGACY_PROJECTS_KEY)) {
-      localStorage.removeItem(LEGACY_PROJECTS_KEY);
-    }
-    // Remove any old per-key project storage (p_* keys)
-    const keysToRemove: string[] = [];
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key && key.startsWith(PROJECT_PREFIX)) {
-        keysToRemove.push(key);
-      }
-    }
-    keysToRemove.forEach((key) => localStorage.removeItem(key));
-    // Remove old projects_index from localStorage if it exists
-    if (localStorage.getItem(PROJECTS_INDEX_KEY)) {
-      localStorage.removeItem(PROJECTS_INDEX_KEY);
-    }
-    return;
-  }
-
+  
   // Check for legacy 'projects' key in localStorage
-  const raw = localStorage.getItem(LEGACY_PROJECTS_KEY);
-  if (!raw) {
-    // No legacy data to migrate
-    return;
-  }
+  const legacyProjects = localStorage.getItem(LEGACY_PROJECTS_KEY);
 
+  // No legacy data to migrate
+  if (!legacyProjects) return;
+  
   let parsed: LocalStorageProject[];
   try {
-    parsed = JSON.parse(raw);
+    parsed = JSON.parse(legacyProjects);
   } catch {
     // Invalid JSON, skip migration
     return;
@@ -181,9 +152,15 @@ async function migrateProjectsFromLocalStorageToIndexedDB(): Promise<void> {
     return;
   }
 
-  // Backup projects for error recovery
-  if (!project.status.temporaryProjectsBackup.length) {
+  // Backup projects for potential error recovery
+  if (!project.status.temporaryProjectsBackup.length) 
     project.status.temporaryProjectsBackup = parsed;
+
+  // Clean up localStorage 'projects' key
+  localStorage.removeItem(LEGACY_PROJECTS_KEY);
+  
+  if (!isIndexedDBAvailable()) {
+    throw new Error('IndexedDB is not available. Cannot migrate projects.');
   }
 
   // Migrate projects to IndexedDB
@@ -216,48 +193,13 @@ async function migrateProjectsFromLocalStorageToIndexedDB(): Promise<void> {
 
   // Save the index to IndexedDB
   await setProjectsIndex(newIndex);
-
-  // Clean up localStorage after successful migration
-  localStorage.removeItem(LEGACY_PROJECTS_KEY);
-  // Remove any old per-key project storage (p_* keys)
-  const keysToRemove: string[] = [];
-  for (let i = 0; i < localStorage.length; i++) {
-    const key = localStorage.key(i);
-    if (key && key.startsWith(PROJECT_PREFIX)) {
-      keysToRemove.push(key);
-    }
-  }
-  keysToRemove.forEach((key) => localStorage.removeItem(key));
-  // Remove old projects_index from localStorage if it exists
-  if (localStorage.getItem(PROJECTS_INDEX_KEY)) {
-    localStorage.removeItem(PROJECTS_INDEX_KEY);
-  }
 }
 
 // ****************
 // Cleans up old local storage keys which are no longer used or which have been migrated to different locations
 // Added in version 5.0.0
-// Updated in version 5.36.0 to migrate projects to IndexedDB
 // ****************
 async function handleLegacyLocalStorageKeys() {
-  // Migrate projects from localStorage to IndexedDB
-  try {
-    await migrateProjectsFromLocalStorageToIndexedDB();
-  } catch (e) {
-    console.error(
-      'Failed to migrate projects from localStorage to IndexedDB',
-      e,
-    );
-    // If IndexedDB is not available, throw error to trigger LegacyMigrationError dialog
-    if (!isIndexedDBAvailable()) {
-      throw new Error(
-        'IndexedDB is not available. Projects cannot be stored in this browser.',
-      );
-    }
-    // For other errors, rethrow to trigger error handling in +layout.svelte
-    throw e;
-  }
-
   // 'layout' is now 'preferences.layout'
   if (localStorage.getItem('layout')) {
     localState.value.layout = localStorage.getItem('layout') as PageLayout;
@@ -296,14 +238,17 @@ async function handleLegacyLocalStorageKeys() {
       localStorage.removeItem('skeletonTheme');
     }
   }
-}
 
-export async function initializeLocalStorage() {
+  // Migrate projects from localStorage to IndexedDB
+  // Added in version 5.35.0
   try {
-    await handleLegacyLocalStorageKeys();
+    await migrateProjectsFromLocalStorageToIndexedDB();
   } catch (e) {
     throw e;
   }
+}
+
+export async function initializeLocalStorage() {
 
   localState.value.theme.id = localState.value.theme.id || 'classic';
 
@@ -311,6 +256,12 @@ export async function initializeLocalStorage() {
 
   localState.value.seasons = localState.value.seasons || DEFAULT_SEASONS;
 
+  try {
+    await handleLegacyLocalStorageKeys();
+  } catch (e) {
+    throw e;
+  }
+  
   // ****************
   // Setup Theme Listeners
   // ****************
