@@ -142,7 +142,8 @@ async function migrateProjectsFromLocalStorageToIndexedDB(): Promise<void> {
   try {
     parsed = JSON.parse(legacyProjects);
   } catch {
-    // Invalid JSON, skip migration
+    // Invalid JSON, skip migration and clean up
+    localStorage.removeItem(LEGACY_PROJECTS_KEY);
     return;
   }
 
@@ -152,47 +153,72 @@ async function migrateProjectsFromLocalStorageToIndexedDB(): Promise<void> {
     return;
   }
 
-  // Backup projects for potential error recovery
-  if (!project.status.temporaryProjectsBackup.length) 
+  // Backup projects for potential error recovery (BEFORE any checks or destructive operations)
+  if (!project.status.temporaryProjectsBackup.length) {
     project.status.temporaryProjectsBackup = parsed;
+  }
 
-  // Clean up localStorage 'projects' key
-  localStorage.removeItem(LEGACY_PROJECTS_KEY);
-  
+  // Check IndexedDB availability AFTER backup is created
   if (!isIndexedDBAvailable()) {
     throw new Error('IndexedDB is not available. Cannot migrate projects.');
   }
 
-  // Migrate projects to IndexedDB
+  // Migrate projects to IndexedDB with error handling
   const newIndex: LocalStorageProjectIndexItem[] = [];
-  for (const legacyProject of parsed) {
-    const id =
-      parseProjectIdFromHref(legacyProject.href) ||
-      `${Date.now()}_${Math.random()}`;
+  const migratedProjects: string[] = []; // Track successfully migrated projects
+  
+  try {
+    for (const legacyProject of parsed) {
+      try {
+        const id =
+          parseProjectIdFromHref(legacyProject.href) ||
+          `${Date.now()}_${Math.random()}`;
 
-    // Check if project already exists in IndexedDB
-    const existingProject = await getFullProjectById(id);
-    if (!existingProject) {
-      // Store the full project in IndexedDB
-      await set(`${PROJECT_PREFIX}${id}`, legacyProject);
+        // Check if project already exists in IndexedDB
+        const existingProject = await getFullProjectById(id);
+        if (!existingProject) {
+          // Store the full project in IndexedDB
+          await set(`${PROJECT_PREFIX}${id}`, legacyProject);
+        }
+
+        // Add the project to the index, if it doesn't already exist
+        if (!newIndex.find((i: LocalStorageProjectIndexItem) => i.id === id)) {
+          newIndex.push({
+            id,
+            meta: {
+              date: legacyProject.date,
+              href: legacyProject.href,
+              title: legacyProject.title || '',
+              isCustomWeatherData: legacyProject.isCustomWeatherData || false,
+            },
+          });
+          migratedProjects.push(id);
+        }
+      } catch (projectError) {
+        // Log error for individual project but continue with others
+        console.error('Failed to migrate individual project:', projectError);
+        // Continue migrating other projects
+      }
     }
 
-    // Add the project to the index, if it doesn't already exist
-    if (!newIndex.find((i: LocalStorageProjectIndexItem) => i.id === id)) {
-      newIndex.push({
-        id,
-        meta: {
-          date: legacyProject.date,
-          href: legacyProject.href,
-          title: legacyProject.title || '',
-          isCustomWeatherData: legacyProject.isCustomWeatherData || false,
-        },
-      });
+    // Save the index to IndexedDB (only if we have projects to save)
+    if (newIndex.length > 0) {
+      await setProjectsIndex(newIndex);
     }
+
+    // Only remove localStorage AFTER successful migration
+    // If migration failed, localStorage data is preserved for retry
+    if (migratedProjects.length > 0 || newIndex.length > 0) {
+      localStorage.removeItem(LEGACY_PROJECTS_KEY);
+    } else {
+      // No projects were successfully migrated, throw error to trigger recovery
+      throw new Error('No projects could be migrated to IndexedDB.');
+    }
+  } catch (error) {
+    // If migration fails, localStorage data is still intact (not removed yet)
+    // Re-throw to trigger error handling in initializeLocalStorage
+    throw error;
   }
-
-  // Save the index to IndexedDB
-  await setProjectsIndex(newIndex);
 }
 
 // ****************

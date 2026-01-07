@@ -66,9 +66,15 @@ vi.mock('$lib/components/ThemeSwitcher.svelte', () => ({
 describe('storage-utils', () => {
   let localStorageMock: Record<string, string> = {};
 
-  beforeEach(() => {
+  beforeEach(async () => {
     localStorageMock = {};
     idbStore.clear();
+    
+    // Reset project state backup
+    const { project } = await import('$lib/state');
+    project.status.temporaryProjectsBackup = [];
+    project.status.temporaryUid = '';
+    project.status.temporaryError = null;
 
     const localStorageShim = {
       getItem: vi.fn((key: string) => localStorageMock[key] || null),
@@ -373,6 +379,245 @@ describe('storage-utils', () => {
 
       const { localState } = await import('$lib/state');
       expect(localState.value.theme.id).toBe('classic');
+    });
+
+    it('preserves localStorage data when IndexedDB is unavailable', async () => {
+      const legacyProjects = [
+        {
+          href: 'http://localhost/?project=123',
+          date: '2024-01-01',
+          title: 'Legacy Project',
+          isCustomWeatherData: false,
+          weatherData: [],
+          weatherSource: { name: 'Meteostat' },
+        },
+      ];
+      localStorageMock['projects'] = JSON.stringify(legacyProjects);
+
+      // Make IndexedDB unavailable
+      vi.stubGlobal('indexedDB', undefined);
+
+      const effectFn = (cb) => cb();
+      effectFn.root = (cb) => cb();
+      vi.stubGlobal('$effect', effectFn);
+
+      // Act - should throw
+      await expect(storageUtils.initializeLocalStorage()).rejects.toThrow();
+
+      // Assert - localStorage data should still be present (not removed)
+      expect(localStorageMock['projects']).toBeDefined();
+      
+      // Assert - backup should be created
+      const { project } = await import('$lib/state');
+      expect(project.status.temporaryProjectsBackup.length).toBe(1);
+    });
+
+    it('preserves localStorage data when setProjectsIndex fails', async () => {
+      const legacyProjects = [
+        {
+          href: 'http://localhost/?project=123',
+          date: '2024-01-01',
+          title: 'Project 1',
+          isCustomWeatherData: false,
+          weatherData: [],
+          weatherSource: { name: 'Meteostat' },
+        },
+        {
+          href: 'http://localhost/?project=456',
+          date: '2024-01-02',
+          title: 'Project 2',
+          isCustomWeatherData: false,
+          weatherData: [],
+          weatherSource: { name: 'Meteostat' },
+        },
+      ];
+      localStorageMock['projects'] = JSON.stringify(legacyProjects);
+
+      // Make setProjectsIndex fail (critical operation that should preserve localStorage)
+      const { set } = await import('idb-keyval');
+      let indexCallCount = 0;
+      vi.mocked(set).mockImplementation((key: string, value: any) => {
+        if (key === 'projects_index') {
+          indexCallCount++;
+          if (indexCallCount === 1) {
+            // Fail when trying to save the index
+            return Promise.reject(new Error('QuotaExceededError'));
+          }
+        }
+        idbStore.set(key, value);
+        return Promise.resolve();
+      });
+
+      const effectFn = (cb) => cb();
+      effectFn.root = (cb) => cb();
+      vi.stubGlobal('$effect', effectFn);
+
+      // Act - should throw
+      await expect(storageUtils.initializeLocalStorage()).rejects.toThrow();
+
+      // Assert - localStorage data should still be present (not removed)
+      expect(localStorageMock['projects']).toBeDefined();
+      
+      // Assert - backup should be created
+      const { project } = await import('$lib/state');
+      expect(project.status.temporaryProjectsBackup.length).toBe(2);
+    });
+
+    it('handles partial migration failures gracefully', async () => {
+      const legacyProjects = [
+        {
+          href: 'http://localhost/?project=123',
+          date: '2024-01-01',
+          title: 'Project 1',
+          isCustomWeatherData: false,
+          weatherData: [],
+          weatherSource: { name: 'Meteostat' },
+        },
+        {
+          href: 'http://localhost/?project=456',
+          date: '2024-01-02',
+          title: 'Project 2',
+          isCustomWeatherData: false,
+          weatherData: [],
+          weatherSource: { name: 'Meteostat' },
+        },
+        {
+          href: 'http://localhost/?project=789',
+          date: '2024-01-03',
+          title: 'Project 3',
+          isCustomWeatherData: false,
+          weatherData: [],
+          weatherSource: { name: 'Meteostat' },
+        },
+      ];
+      localStorageMock['projects'] = JSON.stringify(legacyProjects);
+
+      // Make set() fail on second project but succeed on others
+      const { set } = await import('idb-keyval');
+      let callCount = 0;
+      vi.mocked(set).mockImplementation((key: string, value: any) => {
+        callCount++;
+        if (key.startsWith('p_') && callCount === 2) {
+          // Fail on second project only
+          return Promise.reject(new Error('Individual project error'));
+        }
+        idbStore.set(key, value);
+        return Promise.resolve();
+      });
+
+      const effectFn = (cb) => cb();
+      effectFn.root = (cb) => cb();
+      vi.stubGlobal('$effect', effectFn);
+
+      // Act - should complete (individual errors are caught)
+      await storageUtils.initializeLocalStorage();
+
+      // Assert - localStorage should be removed (migration succeeded overall)
+      expect(localStorageMock['projects']).toBeUndefined();
+      
+      // Assert - at least some projects should be migrated
+      const index = idbStore.get('projects_index') || [];
+      expect(index.length).toBeGreaterThan(0);
+    });
+
+    it('creates backup before any destructive operations', async () => {
+      const legacyProjects = [
+        {
+          href: 'http://localhost/?project=123',
+          date: '2024-01-01',
+          title: 'Legacy Project',
+          isCustomWeatherData: false,
+          weatherData: [],
+          weatherSource: { name: 'Meteostat' },
+        },
+      ];
+      localStorageMock['projects'] = JSON.stringify(legacyProjects);
+
+      // Make IndexedDB unavailable AFTER backup should be created
+      const effectFn = (cb) => cb();
+      effectFn.root = (cb) => cb();
+      vi.stubGlobal('$effect', effectFn);
+
+      // Temporarily make IndexedDB unavailable
+      const originalIndexedDB = global.indexedDB;
+      vi.stubGlobal('indexedDB', undefined);
+
+      try {
+        await storageUtils.initializeLocalStorage();
+      } catch {
+        // Expected to throw
+      }
+
+      // Assert - backup should exist even though migration failed
+      const { project } = await import('$lib/state');
+      // Backup should be created (may be 1 or more if other tests ran, but should contain our project)
+      expect(project.status.temporaryProjectsBackup.length).toBeGreaterThanOrEqual(1);
+      const hasLegacyProject = project.status.temporaryProjectsBackup.some(
+        (p: any) => p.title === 'Legacy Project'
+      );
+      expect(hasLegacyProject).toBe(true);
+
+      // Assert - localStorage should still be present (not removed)
+      expect(localStorageMock['projects']).toBeDefined();
+
+      // Restore IndexedDB
+      vi.stubGlobal('indexedDB', originalIndexedDB);
+    });
+
+    it('removes localStorage only after successful migration', async () => {
+      const legacyProjects = [
+        {
+          href: 'http://localhost/?project=123',
+          date: '2024-01-01',
+          title: 'Legacy Project',
+          isCustomWeatherData: false,
+          weatherData: [],
+          weatherSource: { name: 'Meteostat' },
+        },
+      ];
+      localStorageMock['projects'] = JSON.stringify(legacyProjects);
+
+      const effectFn = (cb) => cb();
+      effectFn.root = (cb) => cb();
+      vi.stubGlobal('$effect', effectFn);
+
+      // Act
+      await storageUtils.initializeLocalStorage();
+
+      // Assert - localStorage should be removed after successful migration
+      expect(localStorageMock['projects']).toBeUndefined();
+      
+      // Assert - projects should be in IndexedDB
+      const index = idbStore.get('projects_index') || [];
+      expect(index.length).toBe(1);
+    });
+
+    it('handles invalid JSON in legacy projects gracefully', async () => {
+      localStorageMock['projects'] = 'invalid json {';
+
+      const effectFn = (cb) => cb();
+      effectFn.root = (cb) => cb();
+      vi.stubGlobal('$effect', effectFn);
+
+      // Act - should not throw
+      await expect(storageUtils.initializeLocalStorage()).resolves.not.toThrow();
+
+      // Assert - invalid data should be cleaned up
+      expect(localStorageMock['projects']).toBeUndefined();
+    });
+
+    it('handles empty projects array', async () => {
+      localStorageMock['projects'] = JSON.stringify([]);
+
+      const effectFn = (cb) => cb();
+      effectFn.root = (cb) => cb();
+      vi.stubGlobal('$effect', effectFn);
+
+      // Act - should not throw
+      await expect(storageUtils.initializeLocalStorage()).resolves.not.toThrow();
+
+      // Assert - empty data should be cleaned up
+      expect(localStorageMock['projects']).toBeUndefined();
     });
   });
 });
