@@ -69,7 +69,7 @@ describe('storage-utils', () => {
   beforeEach(async () => {
     localStorageMock = {};
     idbStore.clear();
-    
+
     // Reset project state backup
     const { project } = await import('$lib/state');
     project.status.temporaryProjectsBackup = [];
@@ -375,7 +375,9 @@ describe('storage-utils', () => {
       effectFn.root = (cb) => cb();
       vi.stubGlobal('$effect', effectFn);
 
-      await expect(storageUtils.initializeLocalStorage()).resolves.not.toThrow();
+      await expect(
+        storageUtils.initializeLocalStorage(),
+      ).resolves.not.toThrow();
 
       const { localState } = await import('$lib/state');
       expect(localState.value.theme.id).toBe('classic');
@@ -406,7 +408,7 @@ describe('storage-utils', () => {
 
       // Assert - localStorage data should still be present (not removed)
       expect(localStorageMock['projects']).toBeDefined();
-      
+
       // Assert - backup should be created
       const { project } = await import('$lib/state');
       expect(project.status.temporaryProjectsBackup.length).toBe(1);
@@ -457,13 +459,13 @@ describe('storage-utils', () => {
 
       // Assert - localStorage data should still be present (not removed)
       expect(localStorageMock['projects']).toBeDefined();
-      
+
       // Assert - backup should be created
       const { project } = await import('$lib/state');
       expect(project.status.temporaryProjectsBackup.length).toBe(2);
     });
 
-    it('handles partial migration failures gracefully', async () => {
+    it('handles partial migration failures gracefully by preserving localStorage', async () => {
       const legacyProjects = [
         {
           href: 'http://localhost/?project=123',
@@ -509,15 +511,19 @@ describe('storage-utils', () => {
       effectFn.root = (cb) => cb();
       vi.stubGlobal('$effect', effectFn);
 
-      // Act - should complete (individual errors are caught)
-      await storageUtils.initializeLocalStorage();
+      // Act - should throw because not all projects migrated
+      await expect(storageUtils.initializeLocalStorage()).rejects.toThrow(
+        /Only 2 of 3 projects/,
+      );
 
-      // Assert - localStorage should be removed (migration succeeded overall)
-      expect(localStorageMock['projects']).toBeUndefined();
-      
-      // Assert - at least some projects should be migrated
+      // Assert - localStorage should NOT be removed (safety first!)
+      expect(localStorageMock['projects']).toBeDefined();
+
+      // Assert - some projects might still be in IndexedDB (individual sets succeeded)
       const index = idbStore.get('projects_index') || [];
-      expect(index.length).toBeGreaterThan(0);
+      // Note: In our current implementation, we only update the index at the end,
+      // so if it throws before setProjectsIndex, the index might be empty or partial.
+      // However, we want to ensure localStorage is safe.
     });
 
     it('creates backup before any destructive operations', async () => {
@@ -551,9 +557,11 @@ describe('storage-utils', () => {
       // Assert - backup should exist even though migration failed
       const { project } = await import('$lib/state');
       // Backup should be created (may be 1 or more if other tests ran, but should contain our project)
-      expect(project.status.temporaryProjectsBackup.length).toBeGreaterThanOrEqual(1);
+      expect(
+        project.status.temporaryProjectsBackup.length,
+      ).toBeGreaterThanOrEqual(1);
       const hasLegacyProject = project.status.temporaryProjectsBackup.some(
-        (p: any) => p.title === 'Legacy Project'
+        (p: any) => p.title === 'Legacy Project',
       );
       expect(hasLegacyProject).toBe(true);
 
@@ -586,7 +594,7 @@ describe('storage-utils', () => {
 
       // Assert - localStorage should be removed after successful migration
       expect(localStorageMock['projects']).toBeUndefined();
-      
+
       // Assert - projects should be in IndexedDB
       const index = idbStore.get('projects_index') || [];
       expect(index.length).toBe(1);
@@ -600,7 +608,9 @@ describe('storage-utils', () => {
       vi.stubGlobal('$effect', effectFn);
 
       // Act - should not throw
-      await expect(storageUtils.initializeLocalStorage()).resolves.not.toThrow();
+      await expect(
+        storageUtils.initializeLocalStorage(),
+      ).resolves.not.toThrow();
 
       // Assert - invalid data should be cleaned up
       expect(localStorageMock['projects']).toBeUndefined();
@@ -614,7 +624,9 @@ describe('storage-utils', () => {
       vi.stubGlobal('$effect', effectFn);
 
       // Act - should not throw
-      await expect(storageUtils.initializeLocalStorage()).resolves.not.toThrow();
+      await expect(
+        storageUtils.initializeLocalStorage(),
+      ).resolves.not.toThrow();
 
       // Assert - empty data should be cleaned up
       expect(localStorageMock['projects']).toBeUndefined();

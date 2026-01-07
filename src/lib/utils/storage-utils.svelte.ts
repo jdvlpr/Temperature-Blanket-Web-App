@@ -24,7 +24,7 @@ import {
   numberOfDays,
   stringToDate,
 } from '$lib/utils';
-import { get, set, del, entries } from 'idb-keyval';
+import { del, get, set } from 'idb-keyval';
 
 type LocalStorageProjectIndexItem = {
   id: string;
@@ -131,13 +131,13 @@ async function removeProjectById(id: string | null): Promise<void> {
 // ***********
 async function migrateProjectsFromLocalStorageToIndexedDB(): Promise<void> {
   const LEGACY_PROJECTS_KEY = 'projects';
-  
+
   // Check for legacy 'projects' key in localStorage
   const legacyProjects = localStorage.getItem(LEGACY_PROJECTS_KEY);
 
   // No legacy data to migrate
   if (!legacyProjects) return;
-  
+
   let parsed: LocalStorageProject[];
   try {
     parsed = JSON.parse(legacyProjects);
@@ -166,13 +166,12 @@ async function migrateProjectsFromLocalStorageToIndexedDB(): Promise<void> {
   // Migrate projects to IndexedDB with error handling
   const newIndex: LocalStorageProjectIndexItem[] = [];
   const migratedProjects: string[] = []; // Track successfully migrated projects
-  
+
   try {
     for (const legacyProject of parsed) {
       try {
         const id =
-          parseProjectIdFromHref(legacyProject.href) ||
-          `${Date.now()}_${Math.random()}`;
+          parseProjectIdFromHref(legacyProject.href) || crypto.randomUUID();
 
         // Check if project already exists in IndexedDB
         const existingProject = await getFullProjectById(id);
@@ -206,13 +205,15 @@ async function migrateProjectsFromLocalStorageToIndexedDB(): Promise<void> {
       await setProjectsIndex(newIndex);
     }
 
-    // Only remove localStorage AFTER successful migration
-    // If migration failed, localStorage data is preserved for retry
-    if (migratedProjects.length > 0 || newIndex.length > 0) {
+    // Only remove localStorage AFTER successful migration of ALL projects
+    // If ANY migration failed, localStorage data is preserved for retry
+    if (migratedProjects.length === parsed.length && newIndex.length > 0) {
       localStorage.removeItem(LEGACY_PROJECTS_KEY);
     } else {
-      // No projects were successfully migrated, throw error to trigger recovery
-      throw new Error('No projects could be migrated to IndexedDB.');
+      // Not all projects were successfully migrated, throw error to trigger recovery
+      throw new Error(
+        `Only ${migratedProjects.length} of ${parsed.length} projects could be migrated to IndexedDB.`,
+      );
     }
   } catch (error) {
     // If migration fails, localStorage data is still intact (not removed yet)
@@ -275,7 +276,6 @@ async function handleLegacyLocalStorageKeys() {
 }
 
 export async function initializeLocalStorage() {
-
   localState.value.theme.id = localState.value.theme.id || 'classic';
 
   localState.value.theme.mode = localState.value.theme.mode || 'system';
@@ -287,7 +287,7 @@ export async function initializeLocalStorage() {
   } catch (e) {
     throw e;
   }
-  
+
   // ****************
   // Setup Theme Listeners
   // ****************
@@ -403,8 +403,7 @@ export const checkForProjectInStorage = async () => {
   ).getTime();
 
   let daysInFuture = 0;
-  if (latestDay >= timestamp)
-    daysInFuture = numberOfDays(timestamp, latestDay);
+  if (latestDay >= timestamp) daysInFuture = numberOfDays(timestamp, latestDay);
 
   // If there are days in the future and the weather is not custom, do not load weather from local storage
   if (daysInFuture > 0 && !matchedProject.isCustomWeatherData) return;
@@ -413,7 +412,6 @@ export const checkForProjectInStorage = async () => {
   weather.rawData = newWeatherUngrouped;
   weather.isFromLocalStorage = true;
 };
-
 
 export const setProjectInStorage = async () => {
   if (!browser || !isIndexedDBAvailable()) {
