@@ -437,11 +437,6 @@ export const checkForProjectInStorage = async () => {
   weather.isFromLocalStorage = true;
 };
 
-/**
- * Legacy export name for backwards compatibility
- * @deprecated Use checkForProjectInStorage instead
- */
-export const checkForProjectInLocalStorage = checkForProjectInStorage;
 
 export const setProjectInStorage = async () => {
   if (!browser || !isIndexedDBAvailable()) {
@@ -470,7 +465,7 @@ export const setProjectInStorage = async () => {
     await del(`${PROJECT_PREFIX}${thisID}`);
   }
 
-  const localProject = createProjectLocalStorageProjectObject();  
+  const localProject = createProjectLocalStorageProjectObject();
 
   // Store the full project in IndexedDB
   await set(`${PROJECT_PREFIX}${thisID}`, localProject);
