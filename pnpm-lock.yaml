@@ -35,6 +35,9 @@ importers:
       getimagepalette:
         specifier: ^2.4.0
         version: 2.4.0
+      idb-keyval:
+        specifier: ^6.2.2
+        version: 6.2.2
       jspdf:
         specifier: ^4.0.0
         version: 4.0.0
@@ -1926,6 +1929,9 @@ packages:
   iceberg-js@0.8.1:
     resolution: {integrity: sha512-1dhVQZXhcHje7798IVM+xoo/1ZdVfzOMIc8/rgVSijRK38EDqOJoGula9N/8ZI5RD8QTxNQtK/Gozpr+qUqRRA==}
     engines: {node: '>=20.0.0'}
+
+  idb-keyval@6.2.2:
+    resolution: {integrity: sha512-yjD9nARJ/jb1g+CvD0tlhUHOrJ9Sy0P8T9MF3YaLlHnSRpwPfpTX0XIvpmw3gAJUmEu3FiICLBDPXVwyEvrleg==}
 
   ignore@5.3.2:
     resolution: {integrity: sha512-hsBTNUqQTDwkWtcdYI2i06Y/nUBEsNEDJKjWdigLvegy8kDuJAS8uRlpkkcQpyEXL0Z/pjDy5HBmMjRCJ2gq+g==}
@@ -4723,6 +4729,8 @@ snapshots:
   human-signals@2.1.0: {}
 
   iceberg-js@0.8.1: {}
+
+  idb-keyval@6.2.2: {}
 
   ignore@5.3.2: {}
 

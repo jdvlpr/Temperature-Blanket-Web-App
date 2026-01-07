@@ -20,8 +20,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let projects = $state([]);
 
+  async function loadProjects() {
+    if (browser) {
+      projects = await getProjectsListForDisplay();
+    } else {
+      projects = [];
+    }
+  }
+
   $effect(() => {
-    projects = browser ? getProjectsListForDisplay() : [];
+    loadProjects();
   });
 </script>
 
@@ -35,9 +43,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {@const { meta } = project}
           <ProjectDetails
             project={meta}
-            onclick={() => {
-              removeProjectByHref(meta.href);
-              projects = browser ? getProjectsListForDisplay() : [];
+            onclick={async () => {
+              await removeProjectByHref(meta.href);
+              await loadProjects();
             }}
           />
         {/each}

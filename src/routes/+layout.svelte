@@ -53,7 +53,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   onMount(async () => {
     try {
-      initializeLocalStorage();
+      await initializeLocalStorage();
     } catch (e) {
       const uid = crypto.randomUUID();
       const { error } = await logMigrationError({ uid });

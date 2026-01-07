@@ -24,6 +24,7 @@ import {
   numberOfDays,
   stringToDate,
 } from '$lib/utils';
+import { get, set, del, entries } from 'idb-keyval';
 
 type LocalStorageProjectIndexItem = {
   id: string;
@@ -47,6 +48,18 @@ export type LocalStorageProject = {
 const PROJECT_INDEX_KEY = 'projects_index';
 const PROJECT_PREFIX = 'p_';
 
+/**
+ * Check if IndexedDB is available in the current browser environment
+ */
+function isIndexedDBAvailable(): boolean {
+  if (!browser) return false;
+  try {
+    return typeof indexedDB !== 'undefined';
+  } catch {
+    return false;
+  }
+}
+
 function parseProjectIdFromHref(href: string | null) {
   if (!href) return null;
   try {
@@ -56,100 +69,139 @@ function parseProjectIdFromHref(href: string | null) {
   }
 }
 
-function getProjectsIndex() {
+/**
+ * Get projects index from IndexedDB
+ */
+async function getProjectsIndex(): Promise<LocalStorageProjectIndexItem[]> {
+  if (!isIndexedDBAvailable()) {
+    throw new Error('IndexedDB is not available');
+  }
   try {
-    const raw = localStorage.getItem(PROJECT_INDEX_KEY);
-    return raw ? JSON.parse(raw) : [];
+    const index = await get<LocalStorageProjectIndexItem[]>(PROJECT_INDEX_KEY);
+    return index || [];
   } catch {
     return [];
   }
 }
 
-function setProjectsIndex(index: LocalStorageProjectIndexItem[]) {
-  try {
-    localStorage.setItem(PROJECT_INDEX_KEY, JSON.stringify(index));
-  } catch {
-    // Unable to set projects index (probably quota exceeded)
-    throw new Error('Local storage quota exceeded when setting projects index');
+/**
+ * Set projects index in IndexedDB
+ */
+async function setProjectsIndex(
+  index: LocalStorageProjectIndexItem[],
+): Promise<void> {
+  if (!isIndexedDBAvailable()) {
+    throw new Error('IndexedDB is not available');
   }
+  await set(PROJECT_INDEX_KEY, index);
 }
 
-function getFullProjectById(id: string | null) {
-  if (!id) return null;
+/**
+ * Get full project by ID from IndexedDB
+ */
+async function getFullProjectById(
+  id: string | null,
+): Promise<LocalStorageProject | null> {
+  if (!id || !isIndexedDBAvailable()) return null;
   try {
-    const raw = localStorage.getItem(`${PROJECT_PREFIX}${id}`);
-    return raw ? JSON.parse(raw) : null;
+    const project = await get<LocalStorageProject>(`${PROJECT_PREFIX}${id}`);
+    return project || null;
   } catch {
     return null;
   }
 }
 
-function removeProjectById(id: string | null) {
-  if (!id) return;
-  localStorage.removeItem(`${PROJECT_PREFIX}${id}`);
-  const index = getProjectsIndex();
+/**
+ * Remove project by ID from IndexedDB
+ */
+async function removeProjectById(id: string | null): Promise<void> {
+  if (!id || !isIndexedDBAvailable()) return;
+  await del(`${PROJECT_PREFIX}${id}`);
+  const index = await getProjectsIndex();
   const newIndex: LocalStorageProjectIndexItem[] = index.filter(
     (i: LocalStorageProjectIndexItem) => i.id !== id,
   );
-  setProjectsIndex(newIndex);
+  await setProjectsIndex(newIndex);
 }
 
 // ***********
-// The 'projects' localStorage key is now split into multiple keys, one for each project
-// The old single-key ran up against quota limits if too many projects were stored (for example more than 40 projects with weather data)
-// Added in version 5.35.0
+// Migrate projects from localStorage to IndexedDB
+// This migrates from the legacy 'projects' localStorage key to IndexedDB
+// Added in version 5.36.0
 // ***********
-function migrateProjectsToPerKey({ deleteLegacyKey = false }) {
+async function migrateProjectsFromLocalStorageToIndexedDB(): Promise<void> {
+  if (!isIndexedDBAvailable()) {
+    throw new Error('IndexedDB is not available. Cannot migrate projects.');
+  }
+
   const LEGACY_PROJECTS_KEY = 'projects';
 
-  const projectsIndex = getProjectsIndex();
-  if (projectsIndex.length > 0) {
-    // Migration has already occurred, since the 'projects_index' key exists
-    // TODO: Uncomment the line below after confirming successful deployment of the project key migration. Keep commented out for now to be safe, since this contains users' projects.
-    // localStorage.removeItem(LEGACY_PROJECTS_KEY);
+  // Check if migration has already occurred
+  const existingIndex = await getProjectsIndex();
+  if (existingIndex.length > 0) {
+    // Migration has already occurred, clean up legacy localStorage keys
+    // Remove the legacy 'projects' key
+    if (localStorage.getItem(LEGACY_PROJECTS_KEY)) {
+      localStorage.removeItem(LEGACY_PROJECTS_KEY);
+    }
+    // Remove any old per-key project storage (p_* keys)
+    const keysToRemove: string[] = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith(PROJECT_PREFIX)) {
+        keysToRemove.push(key);
+      }
+    }
+    keysToRemove.forEach((key) => localStorage.removeItem(key));
+    // Remove old projects_index from localStorage if it exists
+    if (localStorage.getItem(PROJECT_INDEX_KEY)) {
+      localStorage.removeItem(PROJECT_INDEX_KEY);
+    }
     return;
   }
 
+  // Check for legacy 'projects' key in localStorage
   const raw = localStorage.getItem(LEGACY_PROJECTS_KEY);
-  if (!raw) return;
-  let parsed;
+  if (!raw) {
+    // No legacy data to migrate
+    return;
+  }
+
+  let parsed: LocalStorageProject[];
   try {
     parsed = JSON.parse(raw);
   } catch {
+    // Invalid JSON, skip migration
     return;
   }
 
-  if (!Array.isArray(parsed) || !parsed.length || !parsed[0]) return;
+  if (!Array.isArray(parsed) || !parsed.length || !parsed[0]) {
+    // Empty or invalid data, clean up and return
+    localStorage.removeItem(LEGACY_PROJECTS_KEY);
+    return;
+  }
 
-  // Remove the legacy key, if requested, to free up storage space
-  if (!project.status.temporaryProjectsBackup.length)
+  // Backup projects for error recovery
+  if (!project.status.temporaryProjectsBackup.length) {
     project.status.temporaryProjectsBackup = parsed;
+  }
 
-  if (deleteLegacyKey) localStorage.removeItem(LEGACY_PROJECTS_KEY);
-
-  // Migrate the projects, if there are any
+  // Migrate projects to IndexedDB
   const newIndex: LocalStorageProjectIndexItem[] = [];
-  parsed.forEach((legacyProject: LocalStorageProject, index) => {
+  for (const legacyProject of parsed) {
     const id =
-      parseProjectIdFromHref(legacyProject.href) || `${Date.now()}_${index}`;
+      parseProjectIdFromHref(legacyProject.href) ||
+      `${Date.now()}_${Math.random()}`;
 
-    // Store the full project under its own key, if it doesn't already exist
-    if (!localStorage.getItem(`${PROJECT_PREFIX}${id}`)) {
-      try {
-        localStorage.setItem(
-          `${PROJECT_PREFIX}${id}`,
-          JSON.stringify(legacyProject),
-        );
-      } catch {
-        // If we hit quota limits, run the migration again, but this time delete the legacy key to free up space
-        throw new Error(
-          `Local storage quota exceeded when setting project key ${PROJECT_PREFIX}${id}`,
-        );
-      }
+    // Check if project already exists in IndexedDB
+    const existingProject = await getFullProjectById(id);
+    if (!existingProject) {
+      // Store the full project in IndexedDB
+      await set(`${PROJECT_PREFIX}${id}`, legacyProject);
     }
 
     // Add the project to the index, if it doesn't already exist
-    if (!newIndex.find((i: LocalStorageProjectIndexItem) => i.id === id))
+    if (!newIndex.find((i: LocalStorageProjectIndexItem) => i.id === id)) {
       newIndex.push({
         id,
         meta: {
@@ -159,39 +211,51 @@ function migrateProjectsToPerKey({ deleteLegacyKey = false }) {
           isCustomWeatherData: legacyProject.isCustomWeatherData || false,
         },
       });
-  });
+    }
+  }
 
-  try {
-    setProjectsIndex(newIndex);
-  } catch {
-    throw new Error(
-      'Local storage quota exceeded when setting projects_index key',
-    );
+  // Save the index to IndexedDB
+  await setProjectsIndex(newIndex);
+
+  // Clean up localStorage after successful migration
+  localStorage.removeItem(LEGACY_PROJECTS_KEY);
+  // Remove any old per-key project storage (p_* keys)
+  const keysToRemove: string[] = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key && key.startsWith(PROJECT_PREFIX)) {
+      keysToRemove.push(key);
+    }
+  }
+  keysToRemove.forEach((key) => localStorage.removeItem(key));
+  // Remove old projects_index from localStorage if it exists
+  if (localStorage.getItem(PROJECT_INDEX_KEY)) {
+    localStorage.removeItem(PROJECT_INDEX_KEY);
   }
 }
 
 // ****************
 // Cleans up old local storage keys which are no longer used or which have been migrated to different locations
 // Added in version 5.0.0
+// Updated in version 5.36.0 to migrate projects to IndexedDB
 // ****************
-function handleLegacyLocalStorageKeys() {
+async function handleLegacyLocalStorageKeys() {
+  // Migrate projects from localStorage to IndexedDB
   try {
-    // migrate projects to per-key storage, keeping the legacy key for now as an emergency backup
-    migrateProjectsToPerKey({ deleteLegacyKey: false });
-  } catch {
-    console.warn(
-      'migration to per-key project storage failed, trying again with deleteLegacyKey=true',
+    await migrateProjectsFromLocalStorageToIndexedDB();
+  } catch (e) {
+    console.error(
+      'Failed to migrate projects from localStorage to IndexedDB',
+      e,
     );
-    try {
-      // try again, but this time delete the legacy key first to free up space
-      migrateProjectsToPerKey({ deleteLegacyKey: true });
-    } catch (e) {
-      console.error(
-        'something went catastrophically wrong during project migration, throwing an error to log it',
+    // If IndexedDB is not available, throw error to trigger LegacyMigrationError dialog
+    if (!isIndexedDBAvailable()) {
+      throw new Error(
+        'IndexedDB is not available. Projects cannot be stored in this browser.',
       );
-      // something went unexpectedly wrong, throw the error to log it in +layout.svelte
-      throw e;
     }
+    // For other errors, rethrow to trigger error handling in +layout.svelte
+    throw e;
   }
 
   // 'layout' is now 'preferences.layout'
@@ -234,9 +298,9 @@ function handleLegacyLocalStorageKeys() {
   }
 }
 
-export function initializeLocalStorage() {
+export async function initializeLocalStorage() {
   try {
-    handleLegacyLocalStorageKeys();
+    await handleLegacyLocalStorageKeys();
   } catch (e) {
     throw e;
   }
@@ -298,20 +362,20 @@ export function initializeLocalStorage() {
 }
 
 /**
- * Retrieves the project data from local storage and sets the necessary values.
+ * Retrieves the project data from storage and sets the necessary values.
  * - Retrieves the project data based on the current URL.
  * - Sets the weather source, isCustomWeather, and weather data based on the retrieved project data.
  * - Converts the weather data dates from strings to Date objects.
  * - Checks if there are any days in the project past the day the project was created.
- * - Sets the weather data and indicates that it was loaded from local storage.
+ * - Sets the weather data and indicates that it was loaded from storage.
  */
-export const checkForProjectInLocalStorage = async () => {
-  // Retrieve project data from local storage based on the current URL
-  if (typeof window.localStorage === 'undefined') return;
-  const id = new URL(window.location).searchParams.get('project');
+export const checkForProjectInStorage = async () => {
+  // Retrieve project data from IndexedDB based on the current URL
+  if (!isIndexedDBAvailable()) return;
+  const id = new URL(window.location.href).searchParams.get('project');
   if (!id) return;
 
-  const matchedProject = getFullProjectById(id);
+  const matchedProject = await getFullProjectById(id);
 
   if (!matchedProject) return;
 
@@ -349,7 +413,7 @@ export const checkForProjectInLocalStorage = async () => {
 
   // Check if there are any days in the project past the day the project was created
   let url = new URL(matchedProject.href);
-  let timestamp: string | number = new URLSearchParams(url.search).get(
+  let timestamp: string | number | null = new URLSearchParams(url.search).get(
     'project',
   );
 
@@ -358,25 +422,38 @@ export const checkForProjectInLocalStorage = async () => {
   timestamp = Number(timestamp);
 
   const latestDay = new Date(
-    Math.max(...newWeatherUngrouped.map((n) => n.date)),
+    Math.max(...newWeatherUngrouped.map((n) => n.date.getTime())),
   ).getTime();
 
   let daysInFuture = 0;
-  if (latestDay >= +timestamp)
+  if (latestDay >= timestamp)
     daysInFuture = numberOfDays(timestamp, latestDay);
 
   // If there are days in the future and the weather is not custom, do not load weather from local storage
   if (daysInFuture > 0 && !matchedProject.isCustomWeatherData) return;
 
-  // Set the weather data and indicate that it was loaded from local storage
+  // Set the weather data and indicate that it was loaded from storage
   weather.rawData = newWeatherUngrouped;
   weather.isFromLocalStorage = true;
 };
 
-export const setLocalStorageProject = () => {
-  if (!browser || typeof window.localStorage === 'undefined') return;
+/**
+ * Legacy export name for backwards compatibility
+ * @deprecated Use checkForProjectInStorage instead
+ */
+export const checkForProjectInLocalStorage = checkForProjectInStorage;
 
-  const localProjectsIndex = getProjectsIndex();
+export const setProjectInStorage = async () => {
+  if (!browser || !isIndexedDBAvailable()) {
+    if (!isIndexedDBAvailable()) {
+      throw new Error(
+        'IndexedDB is not available. Projects cannot be stored in this browser.',
+      );
+    }
+    return;
+  }
+
+  const localProjectsIndex = await getProjectsIndex();
 
   const projectIDs = localProjectsIndex?.map((_project) => _project.id);
 
@@ -390,22 +467,13 @@ export const setLocalStorageProject = () => {
     // project is already in the index, so delete the existing index entry
     localProjectsIndex.splice(index, 1);
     // Remove old full project key (we'll overwrite it below)
-    localStorage.removeItem(`${PROJECT_PREFIX}${thisID}`);
+    await del(`${PROJECT_PREFIX}${thisID}`);
   }
 
   const localProject = createProjectLocalStorageProjectObject();
 
-  try {
-    // Store the full project under its own key
-    localStorage.setItem(
-      `${PROJECT_PREFIX}${thisID}`,
-      JSON.stringify(localProject),
-    );
-  } catch {
-    throw new Error(
-      'Local storage quota exceeded when trying to store project',
-    );
-  }
+  // Store the full project in IndexedDB
+  await set(`${PROJECT_PREFIX}${thisID}`, localProject);
 
   // Save minimal metadata in the projects index
   const projectIndex = {
@@ -420,8 +488,14 @@ export const setLocalStorageProject = () => {
 
   localProjectsIndex.push(projectIndex);
 
-  setProjectsIndex(localProjectsIndex);
+  await setProjectsIndex(localProjectsIndex);
 };
+
+/**
+ * Legacy export name for backwards compatibility
+ * @deprecated Use setProjectInStorage instead
+ */
+export const setLocalStorageProject = setProjectInStorage;
 
 /**
  * Creates a project object to store the current project in local storage.
@@ -448,13 +522,12 @@ const createProjectLocalStorageProjectObject = () => {
 
   const href = project.url.href;
 
-  const weatherData =
-    weather.rawData.map((day) => {
-      return {
-        ...day,
-        date: dateToISO8601String(day.date),
-      };
-    }) || [];
+  const weatherData = weather.rawData.map((day) => {
+    return {
+      ...day,
+      date: dateToISO8601String(day.date),
+    };
+  });
 
   const weatherSource: WeatherSourceOptions = weather.source;
 
@@ -463,7 +536,7 @@ const createProjectLocalStorageProjectObject = () => {
     isCustomWeatherData,
     href,
     title: _title,
-    weatherData,
+    weatherData: weatherData as unknown as WeatherDay[],
     weatherSource,
   };
 
@@ -471,26 +544,37 @@ const createProjectLocalStorageProjectObject = () => {
 };
 
 // ----------------------
-// Helper functions for per-key project storage
+// Helper functions for IndexedDB project storage
 // ----------------------
-export function getSavedProjectMetaByHref(href: string) {
-  const index = getProjectsIndex();
+export async function getSavedProjectMetaByHref(
+  href: string,
+): Promise<LocalStorageProjectIndexItem | null> {
+  if (!isIndexedDBAvailable()) return null;
+  const index = await getProjectsIndex();
   return index.find((i: any) => i.meta.href === href) || null;
 }
 
-export function getSavedProjectByHref(href: string) {
-  const meta = getSavedProjectMetaByHref(href);
+export async function getSavedProjectByHref(
+  href: string,
+): Promise<LocalStorageProject | null> {
+  if (!isIndexedDBAvailable()) return null;
+  const meta = await getSavedProjectMetaByHref(href);
   if (!meta) return null;
-  return getFullProjectById(meta.id);
+  return await getFullProjectById(meta.id);
 }
 
-export function getProjectsListForDisplay() {
+export async function getProjectsListForDisplay(): Promise<
+  LocalStorageProjectIndexItem[]
+> {
+  if (!isIndexedDBAvailable()) return [];
   // Return reversed index (most recent last -> first for display)
-  return getProjectsIndex().slice().reverse();
+  const index = await getProjectsIndex();
+  return index.slice().reverse();
 }
 
-export function removeProjectByHref(href: string) {
-  const meta = getSavedProjectMetaByHref(href);
+export async function removeProjectByHref(href: string): Promise<void> {
+  if (!isIndexedDBAvailable()) return;
+  const meta = await getSavedProjectMetaByHref(href);
   if (!meta) return;
-  removeProjectById(meta.id);
+  await removeProjectById(meta.id);
 }

@@ -39,7 +39,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '$lib/state';
   import { safeSlide } from '$lib/transitions/safeSlide';
   import {
-    checkForProjectInLocalStorage,
+    checkForProjectInStorage,
     loadFromHistory,
     setProjectSettings,
     setUnitsFromNavigator,
@@ -93,7 +93,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     await setProjectSettings();
 
-    await checkForProjectInLocalStorage();
+    await checkForProjectInStorage();
 
     wasProjectLoadedFromURL.value = true;
   }

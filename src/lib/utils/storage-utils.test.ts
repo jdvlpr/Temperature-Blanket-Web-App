@@ -1,6 +1,21 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
 import * as storageUtils from './storage-utils.svelte';
 
+// Mock idb-keyval
+const idbStore = new Map<string, any>();
+vi.mock('idb-keyval', () => ({
+  get: vi.fn((key: string) => Promise.resolve(idbStore.get(key) || null)),
+  set: vi.fn((key: string, value: any) => {
+    idbStore.set(key, value);
+    return Promise.resolve();
+  }),
+  del: vi.fn((key: string) => {
+    idbStore.delete(key);
+    return Promise.resolve();
+  }),
+  entries: vi.fn(() => Promise.resolve(Array.from(idbStore.entries()))),
+}));
+
 // Mock $lib/state
 vi.mock('$lib/state', () => ({
   localState: {
@@ -53,6 +68,7 @@ describe('storage-utils', () => {
 
   beforeEach(() => {
     localStorageMock = {};
+    idbStore.clear();
 
     const localStorageShim = {
       getItem: vi.fn((key: string) => localStorageMock[key] || null),
@@ -83,6 +99,11 @@ describe('storage-utils', () => {
       localStorage: localStorageShim,
       matchMedia: matchMediaShim,
       location: { search: '', href: 'http://localhost/' },
+    });
+
+    // Mock indexedDB
+    vi.stubGlobal('indexedDB', {
+      open: vi.fn(),
     });
 
     // Mock document
@@ -138,25 +159,25 @@ describe('storage-utils', () => {
   });
 
   describe('Project Storage', () => {
-    it('should save and retrieve a project', () => {
-      // Setup initial state for setLocalStorageProject
+    it('should save and retrieve a project', async () => {
+      // Setup initial state for setProjectInStorage
       // We mocked $lib/state above.
 
       // Act
-      storageUtils.setLocalStorageProject();
+      await storageUtils.setProjectInStorage();
 
-      // Assert
-      expect(window.localStorage.setItem).toHaveBeenCalled();
-      const index = JSON.parse(localStorageMock['projects_index'] || '[]');
+      // Assert - check IndexedDB store
+      const index = idbStore.get('projects_index') || [];
       expect(index).toHaveLength(1);
       expect(index[0].id).toBe('123');
       expect(index[0].meta.title).toBe('Test Project');
 
-      const savedProject = JSON.parse(localStorageMock['p_123'] || '{}');
+      const savedProject = idbStore.get('p_123');
+      expect(savedProject).toBeDefined();
       expect(savedProject.title).toBe('Test Project');
     });
 
-    it('should retrieve saved project by href', () => {
+    it('should retrieve saved project by href', async () => {
       // Setup
       const href = 'http://localhost/?project=456';
       const projectData = {
@@ -167,8 +188,8 @@ describe('storage-utils', () => {
         weatherData: [],
         weatherSource: { name: 'Meteostat' },
       };
-      localStorageMock['p_456'] = JSON.stringify(projectData);
-      localStorageMock['projects_index'] = JSON.stringify([
+      idbStore.set('p_456', projectData);
+      idbStore.set('projects_index', [
         {
           id: '456',
           meta: {
@@ -181,38 +202,36 @@ describe('storage-utils', () => {
       ]);
 
       // Act
-      const result = storageUtils.getSavedProjectByHref(href);
+      const result = await storageUtils.getSavedProjectByHref(href);
 
       // Assert
       expect(result).not.toBeNull();
-      expect(result.title).toBe('Retrieved Project');
+      expect(result?.title).toBe('Retrieved Project');
     });
 
-    it('should remove project by href', () => {
+    it('should remove project by href', async () => {
       // Setup
       const href = 'http://localhost/?project=789';
-      localStorageMock['p_789'] = JSON.stringify({});
-      localStorageMock['projects_index'] = JSON.stringify([
-        { id: '789', meta: { href } },
-      ]);
+      idbStore.set('p_789', {});
+      idbStore.set('projects_index', [{ id: '789', meta: { href } }]);
 
       // Act
-      storageUtils.removeProjectByHref(href);
+      await storageUtils.removeProjectByHref(href);
 
       // Assert
-      expect(localStorageMock['p_789']).toBeUndefined();
-      const index = JSON.parse(localStorageMock['projects_index'] || '[]');
+      expect(idbStore.has('p_789')).toBe(false);
+      const index = idbStore.get('projects_index') || [];
       expect(index).toHaveLength(0);
     });
 
-    it('should return projects list for display in reverse order', () => {
+    it('should return projects list for display in reverse order', async () => {
       // Setup
-      localStorageMock['projects_index'] = JSON.stringify([
+      idbStore.set('projects_index', [
         { id: '1', meta: { title: 'First' } },
         { id: '2', meta: { title: 'Second' } },
       ]);
 
-      const list = storageUtils.getProjectsListForDisplay();
+      const list = await storageUtils.getProjectsListForDisplay();
       expect(list).toHaveLength(2);
       expect(list[0].meta.title).toBe('Second');
       expect(list[1].meta.title).toBe('First');
@@ -220,7 +239,7 @@ describe('storage-utils', () => {
   });
 
   describe('Edge Cases', () => {
-    it('migrates legacy projects to per-key storage and generates unique ids', () => {
+    it('migrates legacy projects from localStorage to IndexedDB and generates unique ids', async () => {
       const legacyProjects = [
         {
           href: 'http://localhost/',
@@ -247,16 +266,20 @@ describe('storage-utils', () => {
       vi.stubGlobal('$effect', effectFn);
 
       // Act
-      storageUtils.initializeLocalStorage();
+      await storageUtils.initializeLocalStorage();
 
-      // Assert
-      const index = JSON.parse(localStorageMock['projects_index'] || '[]');
+      // Assert - check IndexedDB store
+      const index = idbStore.get('projects_index') || [];
       expect(index).toHaveLength(2);
 
-      const projectKeys = Object.keys(localStorageMock).filter((k) =>
+      // Check that projects were migrated to IndexedDB
+      const projectKeys = Array.from(idbStore.keys()).filter((k) =>
         k.startsWith('p_'),
       );
-      expect(projectKeys).toHaveLength(2);
+      expect(projectKeys.length).toBeGreaterThanOrEqual(2);
+
+      // Check that legacy localStorage key was removed
+      expect(localStorageMock['projects']).toBeUndefined();
     });
 
     it('does not load project when project href has non-numeric timestamp', async () => {
@@ -270,8 +293,8 @@ describe('storage-utils', () => {
         weatherData: [{ date: '2024-01-01', temp: 10 }],
         weatherSource: { name: 'Meteostat' },
       };
-      localStorageMock[`p_${id}`] = JSON.stringify(projectData);
-      localStorageMock['projects_index'] = JSON.stringify([
+      idbStore.set(`p_${id}`, projectData);
+      idbStore.set('projects_index', [
         {
           id,
           meta: {
@@ -293,7 +316,7 @@ describe('storage-utils', () => {
       };
 
       // Act
-      await storageUtils.checkForProjectInLocalStorage();
+      await storageUtils.checkForProjectInStorage();
 
       // Assert
       const { weather } = await import('$lib/state');
@@ -312,8 +335,8 @@ describe('storage-utils', () => {
         weatherData: [],
         weatherSource: { name: 'Meteostat' },
       };
-      localStorageMock[`p_${id}`] = JSON.stringify(projectData);
-      localStorageMock['projects_index'] = JSON.stringify([
+      idbStore.set(`p_${id}`, projectData);
+      idbStore.set('projects_index', [
         {
           id,
           meta: {
@@ -333,7 +356,7 @@ describe('storage-utils', () => {
         href: window.location.href,
       };
 
-      await storageUtils.checkForProjectInLocalStorage();
+      await storageUtils.checkForProjectInStorage();
 
       const { weather } = await import('$lib/state');
       expect(weather.isFromLocalStorage).toBe(false);
@@ -346,7 +369,7 @@ describe('storage-utils', () => {
       effectFn.root = (cb) => cb();
       vi.stubGlobal('$effect', effectFn);
 
-      expect(() => storageUtils.initializeLocalStorage()).not.toThrow();
+      await expect(storageUtils.initializeLocalStorage()).resolves.not.toThrow();
 
       const { localState } = await import('$lib/state');
       expect(localState.value.theme.id).toBe('classic');

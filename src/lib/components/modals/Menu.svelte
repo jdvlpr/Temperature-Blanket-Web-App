@@ -37,7 +37,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     downloadPreviewPNG,
     downloadWeatherCSV,
     pluralize,
-    setLocalStorageProject,
+    setProjectInStorage,
     getSavedProjectMetaByHref,
   } from '$lib/utils';
   import {
@@ -87,7 +87,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     }
   });
 
-  function saveProject({ copy = true }) {
+  async function saveProject({ copy = true }) {
     // Copy window url to clipboard
     if (copy) {
       try {
@@ -108,15 +108,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
     replaceState(newURL, '');
 
     try {
-      setLocalStorageProject();
-      currentSavedProject = getSavedProjectMetaByHref(project.url.href);
+      await setProjectInStorage();
+      currentSavedProject = await getSavedProjectMetaByHref(project.url.href);
       project.status.saved = true;
     } catch (e) {
       currentSavedProject = null;
       project.status.saved = false;
       project.status.error = {
         code: 1,
-        message: 'Unable to save project to local storage',
+        message: 'Unable to save project to storage',
       };
       console.warn("Can't save project", { e });
     }
