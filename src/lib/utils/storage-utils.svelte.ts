@@ -35,7 +35,7 @@ type LocalStorageProjectIndexItem = {
   };
 };
 
-type LocalStorageProject = {
+export type LocalStorageProject = {
   date: string;
   href: string;
   isCustomWeatherData: boolean;
@@ -122,10 +122,10 @@ function migrateProjectsToPerKey({ deleteLegacyKey = false }) {
   if (!Array.isArray(parsed) || !parsed.length || !parsed[0]) return;
 
   // Remove the legacy key, if requested, to free up storage space
-  if (deleteLegacyKey) {
+  if (!project.status.temporaryProjectsBackup.length)
     project.status.temporaryProjectsBackup = parsed;
-    localStorage.removeItem(LEGACY_PROJECTS_KEY);
-  }
+
+  if (deleteLegacyKey) localStorage.removeItem(LEGACY_PROJECTS_KEY);
 
   // Migrate the projects, if there are any
   const newIndex: LocalStorageProjectIndexItem[] = [];

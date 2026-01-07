@@ -55,12 +55,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
       initializeLocalStorage();
     } catch (e) {
       const uid = crypto.randomUUID();
+      project.status.temporaryUid = uid;
       const { error } = await logMigrationError({ uid });
+      project.status.temporaryError = error;
       dialog.trigger({
         type: 'component',
         component: { ref: LegacyMigrationError, props: { uid, error } },
+        options: {
+          size: 'large',
+        },
       });
-      console.warn({ e });
     }
 
     // NOTE: Set window variable in order to access it inside the MS clarity function

@@ -14,62 +14,192 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { project, toast } from '$lib/state';
-  import { pluralize } from '$lib/utils';
-  import { ClipboardCopyIcon, TriangleAlertIcon } from '@lucide/svelte';
+  import { MOON_PHASE_NAMES } from '$lib/constants';
+  import { allGaugesAttributes, project, toast } from '$lib/state';
+  import {
+    convertTime,
+    exists,
+    getProjectParametersFromURLHash,
+    pluralize,
+    type LocalStorageProject,
+  } from '$lib/utils';
+  import {
+    ClipboardCopyIcon,
+    DownloadIcon,
+    TriangleAlertIcon,
+  } from '@lucide/svelte';
+  import { onMount } from 'svelte';
 
   let { uid, error } = $props();
 
-  let projects = $state(project.status.temporaryProjectsBackup);
-  let projectHrefs = $derived(projects.map((p) => p.href).join('\r\n\r\n'));
+  let _projects = $derived(project.status.temporaryProjectsBackup);
+  let projects = $derived.by(() => {
+    return _projects.slice().reverse();
+  });
+
+  function getUnits(href: string) {
+    const url = new URL(href);
+    const hash = url.hash;
+    const params = getProjectParametersFromURLHash(hash);
+    if (exists(params.u)) {
+      return params.u.value === 'i' ? 'imperial' : 'metric';
+    }
+    return 'metric';
+  }
+
+  function getWeatherGrouping(href: string) {
+    const url = new URL(href);
+    const hash = url.hash;
+    const params = getProjectParametersFromURLHash(hash);
+    // Load Weather Grouping Setting if present
+    if (exists(params.w)) {
+      return 'Week Of';
+    } else {
+      // Otherwise set to the default 'day'
+      return 'Date';
+    }
+  }
+
+  function downloadWeatherCSV(project: LocalStorageProject) {
+    const weatherData = project.weatherData;
+    const units = getUnits(project.href);
+
+    const weatherGrouping = getWeatherGrouping(project.href);
+
+    const labels = [];
+    allGaugesAttributes.forEach((gauge) => {
+      gauge.targets.forEach((target) => {
+        if (target?.id === 'dayt') {
+          labels.push(`${target.label} (h:m)`);
+        } else if (target?.id === 'moon') {
+          labels.push(`${target.label}`);
+        } else {
+          labels.push(`${target.label} (${gauge.unit.label[units]})`);
+        }
+      });
+    });
+
+    const _weather = [...weatherData].map((day, index) => {
+      const gaugeInfo = [];
+      allGaugesAttributes?.forEach((gauge) => {
+        gauge.targets?.forEach((target) => {
+          if (target?.id === 'dayt') {
+            gaugeInfo.push(
+              convertTime(day[target?.id][units], {
+                displayUnits: false,
+                padStart: true,
+              }),
+            );
+          } else if (target?.id === 'moon') {
+            gaugeInfo.push(MOON_PHASE_NAMES[day[target?.id]]);
+          } else {
+            gaugeInfo.push(day[target?.id][units]);
+          }
+        });
+      });
+      return [index + 1, day.date, day.location, gaugeInfo];
+    });
+
+    const data = [
+      ['Item Number', weatherGrouping, 'Location Index', ...labels],
+      ..._weather,
+    ];
+    const csvContent = `data:text/csv;charset=utf-8,\uFEFF${data?.map((e) => e.join(',')).join('\n')}`;
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', `Weather-Data-${project.title}`);
+    link.className = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
+  onMount(() => {
+    localStorage.removeItem('projects');
+    var arr = []; // Array to hold the keys
+    // Iterate over localStorage and insert the keys that meet the condition into arr
+    for (var i = 0; i < localStorage.length; i++) {
+      if (localStorage.key(i).substring(0, 2) == 'p_') {
+        arr.push(localStorage.key(i));
+      }
+    }
+
+    // Iterate over arr and remove the items by key
+    for (var i = 0; i < arr.length; i++) {
+      localStorage.removeItem(arr[i]);
+    }
+  });
 </script>
 
-<div class="flex flex-col items-start gap-2 p-4">
+<div class="flex w-full flex-col items-start gap-2 p-4">
   <h2 class="my-2 flex items-center gap-2 text-xl font-bold">
-    <TriangleAlertIcon /> Copy the text below to save your {pluralize(
-      'project',
-      projects.length,
-    )}
+    <TriangleAlertIcon /> Save Your {pluralize('Project', projects.length)}
   </h2>
   <p class="text-warning-800-200">
     During an update to this site, there was an issue accessing your saved
     {pluralize('project', projects.length)}. To make sure your data is not lost,
     please copy the {pluralize('URL', projects.length)} below to a safe place like
-    a note or document.
+    a note or document, and download the weather data for each project.
   </p>
   <p class="text-warning-800-200">
-    Once you have saved the text below somewhere where you can access it again
-    later, you can close this and continue using the site. You can open a
-    project using its URL. Sorry for any inconvenience.
+    <span class="font-bold"
+      >If you don't save the URL and weather data for a project now, it may not
+      be possible to access it later, and you'll have to start creating your
+      project from scratch.</span
+    >
+    Once you have saved the link and downloaded the weather data for each project
+    below, you can close this notification and continue using the site. You can open
+    a project using its URL, and import the weather data from the CSV file, if necessary.
+    Sorry for any inconvenience.
   </p>
-  <p
-    class="card bg-primary-50 dark:bg-primary-950 w-full basis-full overflow-x-scroll p-4 text-sm break-all whitespace-pre select-all"
-  >
-    {projectHrefs}
-  </p>
-  <button
-    class="btn preset-filled-primary-500 w-fit"
-    onclick={() => {
-      navigator.clipboard.writeText(projectHrefs);
-      toast.trigger({
-        category: 'success',
-        message: 'Copied to clipboard!',
-      });
-    }}
-  >
-    <ClipboardCopyIcon />
-    Copy Project {pluralize('URL', projects.length)} to Clipboard
-  </button>
-
-  <p>
+  <p class="opacity-60">
     {#if !error}This issue has been logged so the developer can review it.{/if} Your
-    unique ID is: <span class="opacity-60 select-all">{uid}</span>
-  </p>
-
-  <p>
-    For more information or questions, please send an email to <a
+    unique ID is: <span class="font-semibold select-all">{uid}</span>. For more
+    information or questions, please send an email to
+    <a
       href="mailto:hello@temperature-blanket.com?subject=Project Issue&body=Include this ID: {uid}"
       class="link">hello@temperature-blanket.com</a
-    >, and include the above ID.
+    >, and include the ID.
   </p>
+  <div class="flex flex-col gap-6">
+    {#each projects as project}
+      <div class="card bg-surface-100-900 flex flex-col gap-2 p-2">
+        <div class="">
+          <h3 class="text-lg font-semibold">{project.title}</h3>
+          <p class=" text-sm">Created {project.date}</p>
+        </div>
+        <p
+          class="card bg-primary-50 dark:bg-primary-950 w-full basis-full p-4 text-sm break-all whitespace-pre-wrap select-all"
+        >
+          {project.href}
+        </p>
+        <div class="flex w-full flex-wrap items-center gap-2">
+          <button
+            class="btn preset-filled-primary-500 w-fit"
+            onclick={() => {
+              navigator.clipboard.writeText(project.href);
+              toast.trigger({
+                category: 'success',
+                message: 'Copied to clipboard!',
+              });
+            }}
+          >
+            <ClipboardCopyIcon />
+            Copy Project URL to Clipboard
+          </button>
+
+          {#if project.weatherData && project.weatherData.length}
+            <button
+              class="btn preset-filled-secondary-500 w-fit"
+              onclick={() => downloadWeatherCSV(project)}
+            >
+              <DownloadIcon />
+              Download Weather Data (CSV)
+            </button>
+          {/if}
+        </div>
+      </div>
+    {/each}
+  </div>
 </div>

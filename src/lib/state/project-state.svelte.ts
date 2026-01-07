@@ -69,6 +69,8 @@ type ProjectStatusType = {
     message: string;
   };
   temporaryProjectsBackup: any[]; // A temporary backup of projects in case migration fails
+  temporaryUid: string;
+  temporaryError: any;
 };
 
 class ProjectClass {
@@ -156,6 +158,8 @@ class ProjectClass {
       message: '',
     },
     temporaryProjectsBackup: [],
+    temporaryUid: '',
+    temporaryError: null,
   });
 
   gallery = $state({

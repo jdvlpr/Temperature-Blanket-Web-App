@@ -22,6 +22,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { page } from '$app/state';
   import { PUBLIC_GITHUB_LINK } from '$env/static/public';
   import ThemeSwitcher from '$lib/components/ThemeSwitcher.svelte';
+  import { dialog, project } from '$lib/state';
   import { safeSlide } from '$lib/transitions/safeSlide';
   import { yarnBall } from '@lucide/lab';
   import {
@@ -40,10 +41,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     RssIcon,
     ShieldAlertIcon,
     SquareTerminalIcon,
-    SwatchBookIcon
+    SwatchBookIcon,
+    TriangleAlertIcon,
   } from '@lucide/svelte';
   import { Accordion } from '@skeletonlabs/skeleton-svelte';
   import { untrack } from 'svelte';
+  import LegacyMigrationError from './modals/LegacyMigrationError.svelte';
 
   // Set opened navigation items based on current page
   $effect(() => {
@@ -92,6 +95,26 @@ If not, see <https://www.gnu.org/licenses/>. -->
   class="my-2 flex w-fit min-w-[268px] flex-col items-start justify-start gap-2 text-left lg:px-2"
   data-sveltekit-preload-data="hover"
 >
+  {#if project.status.temporaryProjectsBackup && project.status.temporaryUid}
+    <button
+      class="btn preset-filled-error-500"
+      onclick={() => {
+        dialog.trigger({
+          type: 'component',
+          component: {
+            ref: LegacyMigrationError,
+            props: {
+              uid: project.status.temporaryUid,
+              error: project.status.temporaryError,
+            },
+          },
+          options: {
+            size: 'large',
+          },
+        });
+      }}><TriangleAlertIcon /> Save Your Projects</button
+    >
+  {/if}
   <div><ThemeSwitcher /></div>
 
   <a
