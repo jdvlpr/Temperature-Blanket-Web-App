@@ -13,7 +13,8 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { gauges, localState, weather } from '$lib/state';
+import { gauges, weather } from '$lib/state';
+import { preferences } from '$lib/storage/preferences.svelte';
 import pdfConfig from '../pdf-config';
 import pdfColorDetails from './color-details.svelte';
 import pdfFooter from './footer.svelte';
@@ -206,11 +207,11 @@ const pdfGauge = {
         const from =
           String(gauge.ranges[i].from) +
           ' ' +
-          gauge.unit.label[localState.value.units];
+          gauge.unit.label[preferences.value.units];
         const to =
           String(gauge.ranges[i].to) +
           ' ' +
-          gauge.unit.label[localState.value.units];
+          gauge.unit.label[preferences.value.units];
         doc.text(
           from,
           pdfConfig.leftMargin + pdfGauge.headerItems.from.position,

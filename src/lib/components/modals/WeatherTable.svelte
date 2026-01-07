@@ -16,7 +16,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import DataTable from '$lib/components/datatable/DataTable.svelte';
   import { MOON_PHASE_NAMES } from '$lib/constants';
-  import { allGaugesAttributes, localState, weather } from '$lib/state';
+  import { allGaugesAttributes, weather } from '$lib/state';
+  import { preferences } from '$lib/storage/preferences.svelte';
   import { convertTime, dateToISO8601String } from '$lib/utils';
   import { TableHandler, ThSort } from '@vincjo/datatables';
 
@@ -31,7 +32,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         if (target.id === 'dayt') {
           weather = {
             ...weather,
-            [target.id]: convertTime(n[target.id][localState.value.units], {
+            [target.id]: convertTime(n[target.id][preferences.value.units], {
               displayUnits: false,
               padStart: true,
             }),
@@ -45,8 +46,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
           };
         } else {
           let value =
-            n[target.id][localState.value.units] !== null
-              ? n[target.id][localState.value.units]
+            n[target.id][preferences.value.units] !== null
+              ? n[target.id][preferences.value.units]
               : '-';
           weather = {
             ...weather,
@@ -80,7 +81,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             >
           </ThSort>
           {#each weatherTargets as { id, pdfHeader }}
-            {@const header = pdfHeader[localState.value.units]}
+            {@const header = pdfHeader[preferences.value.units]}
             {@const hasHeaderUnits = header.includes('(')}
             {@const headerLabel = header.slice(0, header.indexOf('('))}
             {@const headerUnits = header.slice(header.indexOf('('))}

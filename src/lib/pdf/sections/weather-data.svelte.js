@@ -14,13 +14,8 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { MOON_PHASE_NAMES } from '$lib/constants';
-import {
-  allGaugesAttributes,
-  gauges,
-  localState,
-  locations,
-  weather,
-} from '$lib/state';
+import { allGaugesAttributes, gauges, locations, weather } from '$lib/state';
+import { preferences } from '$lib/storage/preferences.svelte';
 import {
   capitalizeFirstLetter,
   convertTime,
@@ -83,7 +78,7 @@ const pdfWeatherData = {
     // Lowest, Average, & Highest Temps
     doc.setFontSize(pdfConfig.font.p);
     doc.setFont(pdfConfig.font.paragraph, 'normal');
-    const tempSymbol = localState.value.units === 'metric' ? 'C' : 'F';
+    const tempSymbol = preferences.value.units === 'metric' ? 'C' : 'F';
     const average = `Lowest Temperature: ${Math.min(...weather.params.tmin.filter((n) => n !== null))} °${tempSymbol}`;
     doc.text(average, pdfConfig.leftMargin, pdfConfig.topMargin + 9);
     const high = `Average Temperature: ${getAverage(weather.params.tavg.filter((n) => n !== null))} °${tempSymbol}`;
@@ -223,19 +218,19 @@ const pdfWeatherData = {
 
     targets.forEach((target, i) => {
       const x = this.weatherDataPositionX + this.weatherDataColumnWidth * i;
-      let heading = target.pdfHeader[localState.value.units];
+      let heading = target.pdfHeader[preferences.value.units];
       let unitLabel = '';
       if (heading.includes('(')) {
-        const [title, label] = heading.split('(')
+        const [title, label] = heading.split('(');
         heading = title;
         unitLabel = label.replace(')', '');
       }
-      
+
       doc.text(heading, x, positionY);
-      
+
       if (unitLabel) {
         doc.setFontSize(pdfConfig.font.micro);
-        const distance = 2 + (heading.length * 2);
+        const distance = 2 + heading.length * 2;
         doc.text(`(${unitLabel})`, x + distance, positionY);
         doc.setFontSize(pdfConfig.font.p);
       }
@@ -284,15 +279,15 @@ const pdfWeatherData = {
       let sValue;
       if (param === 'moon') {
         sValue = MOON_PHASE_NAMES[day[param]];
-      } else if (day[param][localState.value.units] === null) {
+      } else if (day[param][preferences.value.units] === null) {
         sValue = '';
       } else {
         if (param === 'dayt') {
-          sValue = convertTime(day[param][localState.value.units], {
+          sValue = convertTime(day[param][preferences.value.units], {
             displayUnits: false,
           });
         } else {
-          sValue = String(day[param][localState.value.units]); // gauge.unit.label[localState.value.units]
+          sValue = String(day[param][preferences.value.units]); // gauge.unit.label[localState.value.units]
         }
       }
 
@@ -322,7 +317,7 @@ const pdfWeatherData = {
       if (hasGauge) {
         // Color box
         const value =
-          param === 'moon' ? day[param] : day[param][localState.value.units];
+          param === 'moon' ? day[param] : day[param][preferences.value.units];
         const colorInfo = getColorInfo({
           param,
           value,

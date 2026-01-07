@@ -16,7 +16,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script>
   import Spinner from '$lib/components/Spinner.svelte';
   import { HOURS_PER_DAY } from '$lib/constants';
-  import { localState, weather } from '$lib/state';
+  import { weather } from '$lib/state';
   import {
     displayNumber,
     getColorInfo,

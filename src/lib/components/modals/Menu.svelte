@@ -37,9 +37,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     downloadPreviewPNG,
     downloadWeatherCSV,
     pluralize,
-    setProjectInStorage,
-    getSavedProjectMetaByHref,
   } from '$lib/utils';
+  import { ProjectStorage } from '$lib/storage/projects';
   import {
     CircleCheckBigIcon,
     ClipboardCopyIcon,
@@ -51,14 +50,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { onMount } from 'svelte';
   import WeatherGrouping from '../WeatherGrouping.svelte';
   import WeatherSourceButton from '../buttons/WeatherSourceButton.svelte';
+  import { setProjectInStorage } from '$lib/storage/storage-utils.svelte';
   interface Props {
     page?: string;
     highlight?: string;
   }
-  
+
   let { page = 'main', highlight }: Props = $props();
-  
-  let currentSavedProject = $state(null);
+
+  let currentProjectIndex = $state(null);
 
   let weatherSettingsElement: HTMLElement | null = $state(null);
 
@@ -109,10 +109,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     try {
       await setProjectInStorage();
-      currentSavedProject = await getSavedProjectMetaByHref(project.url.href);
+      currentProjectIndex = await ProjectStorage.getIndexItemByHref(
+        project.url.href,
+      );
       project.status.saved = true;
     } catch (e) {
-      currentSavedProject = null;
+      currentProjectIndex = null;
       project.status.saved = false;
       project.status.error = {
         code: 1,
@@ -433,9 +435,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </p>
         {:else if project.status.error.code === 1}
           <div class="text-warning-500 flex flex-col gap-2">
-            <p>It looks like there was a problem saving your project to this browser, but it can still be accessed using the URL below.</p>
-              
-            <p>The storage space in this browser for saved projects might be full. If you have other saved projects, you can remove some and try to save this one again.</p>
+            <p>
+              It looks like there was a problem saving your project to this
+              browser, but it can still be accessed using the URL below.
+            </p>
+
+            <p>
+              The storage space in this browser for saved projects might be
+              full. If you have other saved projects, you can remove some and
+              try to save this one again.
+            </p>
           </div>
         {/if}
 
@@ -454,14 +463,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </button>
 
         <p
-          class="card bg-primary-50 dark:bg-primary-950 basis-full p-4 break-all select-all text-sm"
+          class="card bg-primary-50 dark:bg-primary-950 basis-full p-4 text-sm break-all select-all"
         >
           {project.url.href}
         </p>
 
-        {#if currentSavedProject && currentSavedProject?.meta}
+        {#if currentProjectIndex && currentProjectIndex?.meta}
           <div class="w-full">
-            <ProjectDetails project={currentSavedProject.meta} canRemove={false} />
+            <ProjectDetails
+              project={currentProjectIndex.meta}
+              canRemove={false}
+            />
           </div>
         {/if}
 

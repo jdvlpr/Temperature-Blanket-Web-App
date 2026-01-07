@@ -14,13 +14,8 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { API_SERVICES, MOON_PHASE_NAMES } from '$lib/constants';
-import {
-  allGaugesAttributes,
-  localState,
-  locations,
-  signal,
-  weather,
-} from '$lib/state';
+import { allGaugesAttributes, locations, signal, weather } from '$lib/state';
+import { preferences } from '$lib/storage/preferences.svelte';
 import type { MoonPhasesId, WeatherDay, WeatherParam } from '$lib/types';
 import {
   celsiusToFahrenheit,
@@ -50,7 +45,7 @@ export const sum = (param) => {
     .map((n) => {
       let value = n[param];
       if (typeof value !== 'undefined' && value !== null)
-        value = value[localState.value.units];
+        value = value[preferences.value.units];
       else {
         if (param === 'tmax') return getAverage(weather.params.tmax);
         if (param === 'tavg') return getAverage(weather.params.tavg);
@@ -73,7 +68,7 @@ export const sum = (param) => {
  * @returns {number} The count of missing days.
  */
 export const missingDaysCount = () => {
-  const _units = localState.value.units;
+  const _units = preferences.value.units;
   const missingDays = weather.data.filter(
     (day) =>
       day?.tavg[_units] === null &&
@@ -471,7 +466,7 @@ export const getTableData = () => {
           // make sure daytime is always in the same hr:mn format
           _weather = {
             ..._weather,
-            [target.id]: convertTime(n[target.id][localState.value.units], {
+            [target.id]: convertTime(n[target.id][preferences.value.units], {
               displayUnits: false,
               padStart: true,
             }),
@@ -485,8 +480,8 @@ export const getTableData = () => {
           };
         } else {
           let value =
-            n[target.id][localState.value.units] !== null
-              ? n[target.id][localState.value.units]
+            n[target.id][preferences.value.units] !== null
+              ? n[target.id][preferences.value.units]
               : '-';
           _weather = {
             ..._weather,
@@ -567,7 +562,7 @@ export const getWeatherValue = ({
   param: WeatherParam['id'];
 }) => {
   if (param === 'moon') return weather.data[dayIndex][param];
-  return weather.data[dayIndex][param][localState.value.units];
+  return weather.data[dayIndex][param][preferences.value.units];
 };
 
 export const chunkArray = (array, chunkSize) => {

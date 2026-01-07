@@ -21,7 +21,7 @@ type LocalStatePreferencesType = {
   units: Unit | null;
 };
 
-export const localState = persistedState<LocalStatePreferencesType>(
+export const preferences = persistedState<LocalStatePreferencesType>(
   'preferences',
   {
     disableToastAnalytics: false,

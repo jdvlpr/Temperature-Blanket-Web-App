@@ -21,13 +21,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import PreviewInfo from '$lib/components/PreviewInfo.svelte';
   import SeasonEditor from '$lib/components/SeasonEditor.svelte';
   import SpanYarnColorSelectIcon from '$lib/components/SpanYarnColorSelectIcon.svelte';
-  import { dialog, gauges, localState, previews, project, weather } from '$lib/state';
-  import { capitalizeFirstLetter, pluralize, formatDateRange } from '$lib/utils';
+  import { dialog, gauges, previews, weather } from '$lib/state';
+  import { preferences } from '$lib/storage/preferences.svelte';
+  import {
+    capitalizeFirstLetter,
+    formatDateRange,
+    pluralize,
+  } from '$lib/utils';
   import { PencilIcon } from '@lucide/svelte';
   import { rowsPreview } from './state.svelte';
 
   let targets = $derived(gauges.allCreated.map((n) => n.targets).flat());
-  let seasons = $derived(localState.value.seasons);
+  let seasons = $derived(preferences.value.seasons);
 </script>
 
 <PreviewInfo previewTitle={rowsPreview.name}>
@@ -85,17 +90,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
       checked={rowsPreview.settings.useSeasonTargets}
       onchange={(e: Event) => {
         const target = e.target as HTMLInputElement;
-       if (previews.active) previews.active.settings.useSeasonTargets = target.checked;
+        if (previews.active)
+          previews.active.settings.useSeasonTargets = target.checked;
       }}
     />
   </div>
 
   {#if previews.active && previews.active.settings.useSeasonTargets}
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
+    <div class="grid w-full grid-cols-1 gap-4 sm:grid-cols-2">
       {#each seasons as season, seasonIndex}
-        <div class="flex flex-col gap-2 items-start max-w-sm">
+        <div class="flex max-w-sm flex-col items-start gap-2">
           <button
-            class="btn hover:preset-tonal font-bold w-fit whitespace-pre-wrap gap-1" 
+            class="btn hover:preset-tonal w-fit gap-1 font-bold whitespace-pre-wrap"
             title="Edit Seasons"
             onclick={() => {
               dialog.trigger({

@@ -20,11 +20,9 @@ import {
   NO_DATA_SRTM3,
   UNIT_LABELS,
 } from '$lib/constants';
-import { seasonsFromUrlHash } from '$lib/utils/seasons-utils.svelte';
 import {
   allGaugesAttributes,
   gauges,
-  localState,
   locations,
   previews,
   project,
@@ -32,6 +30,7 @@ import {
   weather,
 } from '$lib/state';
 import { MoonPhaseGauge } from '$lib/state/gauges/moon-phase-gauge-state.svelte';
+import { preferences } from '$lib/storage/preferences.svelte';
 import {
   celsiusToFahrenheit,
   dateToISO8601String,
@@ -45,6 +44,7 @@ import {
   upToDate,
   yearFrom,
 } from '$lib/utils';
+import { seasonsFromUrlHash } from '$lib/utils/seasons-utils.svelte';
 
 export const setProjectSettings = async (
   hash = window.location.hash.substring(1),
@@ -53,12 +53,12 @@ export const setProjectSettings = async (
 
   // Load Units
   if (exists(params.u)) {
-    const _units = $state.snapshot(localState.value.units);
-    if (params.u.value === 'i') localState.value.units = 'imperial';
-    if (params.u.value === 'm') localState.value.units = 'metric';
-    if (_units !== localState.value.units) {
+    const _units = $state.snapshot(preferences.value.units);
+    if (params.u.value === 'i') preferences.value.units = 'imperial';
+    if (params.u.value === 'm') preferences.value.units = 'metric';
+    if (_units !== preferences.value.units) {
       const label =
-        localState.value.units === 'metric'
+        preferences.value.units === 'metric'
           ? `${UNIT_LABELS.temperature.metric} /
 	    ${UNIT_LABELS.height.metric}`
           : `${UNIT_LABELS.temperature.imperial} /
@@ -132,7 +132,7 @@ export const setProjectSettings = async (
   if (exists(params.n)) {
     const decoded = seasonsFromUrlHash(params.n.value);
     if (decoded) {
-      localState.value.seasons = decoded;
+      preferences.value.seasons = decoded;
       if (previews.active) previews.active.settings.useSeasonTargets = true;
     }
   }
@@ -388,7 +388,7 @@ export const parseGaugeURLHash = (hashString: string, gauge) => {
     // Before version 1.700, all numbers were saved in metric
     // So convert the From and To values if needed
     if (!upToDate(project.loaded.version, '1.700')) {
-      if (localState.value.units === 'imperial') {
+      if (preferences.value.units === 'imperial') {
         switch (gauge.id) {
           case 'temp':
             from = celsiusToFahrenheit(from);
@@ -523,7 +523,7 @@ export const parseGaugeURLHash = (hashString: string, gauge) => {
     // So update them if needed
     if (
       !upToDate(project.loaded.version, '1.700') &&
-      localState.value.units === 'imperial'
+      preferences.value.units === 'imperial'
     ) {
       increment = celsiusToFahrenheit(increment);
       start = celsiusToFahrenheit(start);

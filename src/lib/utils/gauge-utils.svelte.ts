@@ -14,7 +14,8 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { SCHEMES } from '$lib/constants';
-import { gauges, localState, toast, weather } from '$lib/state';
+import { gauges, toast, weather } from '$lib/state';
+import { preferences } from '$lib/storage/preferences.svelte';
 import type { Color, GaugeSettingsType } from '$lib/types';
 import {
   displayNumber,
@@ -191,8 +192,11 @@ export const getWPGauge = (gauge) => {
     } else {
       range = {
         from:
-          gauge.ranges[i].from + ' ' + gauge.unit.label[localState.value.units],
-        to: gauge.ranges[i].to + ' ' + gauge.unit.label[localState.value.units],
+          gauge.ranges[i].from +
+          ' ' +
+          gauge.unit.label[preferences.value.units],
+        to:
+          gauge.ranges[i].to + ' ' + gauge.unit.label[preferences.value.units],
       };
     }
     content.push({

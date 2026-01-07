@@ -16,18 +16,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script>
   import { browser } from '$app/environment';
   import { THEMES } from '$lib/constants';
-  import { localState, previews, project } from '$lib/state';
+  import { previews } from '$lib/state';
+  import { preferences } from '$lib/storage/preferences.svelte';
   import { onDestroy, onMount } from 'svelte';
 
   let theme = $state(
-    getTheme(THEMES.find((n) => n.id === localState.value.theme.mode)),
+    getTheme(THEMES.find((n) => n.id === preferences.value.theme.mode)),
   );
 
   let activePreviewSelectId = $state(previews.activeId);
 
   // Update theme when the system theme changes
   function handleColorSchemeChange() {
-    theme = getTheme(localState.value.theme.mode || 'system');
+    theme = getTheme(preferences.value.theme.mode || 'system');
   }
 
   function getTheme(id) {
@@ -37,7 +38,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     return 'light';
   }
 
-  function onChangePattern(newId) {    
+  function onChangePattern(newId) {
     previews.activeId = newId;
   }
 
@@ -54,14 +55,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
       .removeEventListener('change', handleColorSchemeChange);
   });
 
-    $effect(() => {
+  $effect(() => {
     if (previews.activeId !== activePreviewSelectId)
       activePreviewSelectId = previews.activeId;
   });
 
   // Update theme when user changes the theme mode
   $effect(() => {
-    theme = getTheme(localState.value.theme.mode || 'system');
+    theme = getTheme(preferences.value.theme.mode || 'system');
   });
 </script>
 

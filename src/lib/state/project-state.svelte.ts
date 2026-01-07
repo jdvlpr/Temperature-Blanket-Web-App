@@ -14,8 +14,9 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { browser, version } from '$app/environment';
+import { gauges, locations, previews, weather } from '$lib/state';
+import { preferences } from '$lib/storage/preferences.svelte';
 import { seasonsToUrlHash } from '$lib/utils/seasons-utils.svelte';
-import { gauges, localState, locations, previews, weather } from '$lib/state';
 
 export class HistoryStateClass {
   stack: string[] = $state([]);
@@ -133,11 +134,11 @@ class ProjectClass {
 
     // Add seasons hash if seasons are enabled
     if (previews.active && previews.active.settings.useSeasonTargets) {
-      hash += `&n=${seasonsToUrlHash(localState.value.seasons)}`;
+      hash += `&n=${seasonsToUrlHash(preferences.value.seasons)}`;
     }
 
     // Add units hash
-    hash += localState.value.units === 'metric' ? '&u=m' : '&u=i';
+    hash += preferences.value.units === 'metric' ? '&u=m' : '&u=i';
 
     let href = '';
     const base = browser ? window.location.origin + '/' : '';
@@ -171,8 +172,8 @@ class ProjectClass {
   // Methods
   // *****************
   toggleUnits(): void {
-    localState.value.units =
-      localState.value.units === 'imperial' ? 'metric' : 'imperial';
+    preferences.value.units =
+      preferences.value.units === 'imperial' ? 'metric' : 'imperial';
   }
 }
 

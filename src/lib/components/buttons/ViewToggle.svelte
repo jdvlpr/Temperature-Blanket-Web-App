@@ -14,15 +14,15 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import { localState } from '$lib/state';
+  import { preferences } from '$lib/storage/preferences.svelte';
   import { LayoutGridIcon, LayoutListIcon } from '@lucide/svelte';
   import { SegmentedControl } from '@skeletonlabs/skeleton-svelte';
 </script>
 
 <SegmentedControl
-  value={localState.value.layout}
+  value={preferences.value.layout}
   onValueChange={(e) => {
-    localState.value.layout = e.value;
+    preferences.value.layout = e.value;
   }}
 >
   <SegmentedControl.Control

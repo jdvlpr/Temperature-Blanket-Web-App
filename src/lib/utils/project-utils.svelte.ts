@@ -18,15 +18,14 @@ import pdfGauges from '$lib/pdf/sections/gauges.svelte';
 import pdfWeatherData from '$lib/pdf/sections/weather-data.svelte';
 import {
   allGaugesAttributes,
-  gauges,
-  localState,
-  locations,
   dialog,
+  gauges,
+  locations,
   previews,
   project,
-  toast,
   weather,
 } from '$lib/state';
+import { preferences } from '$lib/storage/preferences.svelte';
 import {
   colorsToCode,
   colorsToYarnDetails,
@@ -81,13 +80,13 @@ export const downloadWeatherCSV = () => {
         labels.push(`${target.label}`);
       } else {
         labels.push(
-          `${target.label} (${gauge.unit.label[localState.value.units]})`,
+          `${target.label} (${gauge.unit.label[preferences.value.units]})`,
         );
       }
     });
   });
   if (!weather.data) return;
-  const _units = localState.value.units;
+  const _units = preferences.value.units;
   const _weather = [...weather.data].map((day, index) => {
     const gaugeInfo = [];
     allGaugesAttributes?.forEach((gauge) => {

@@ -20,7 +20,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
   import ViewToggle from '$lib/components/buttons/ViewToggle.svelte';
   import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
-  import { dialog, localState, showDaysInRange } from '$lib/state';
+  import { dialog, showDaysInRange } from '$lib/state';
+  import { preferences } from '$lib/storage/preferences.svelte';
   import type { Color } from '$lib/types';
   import { getTextColor } from '$lib/utils';
   import {
@@ -138,21 +139,23 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </p>
 {/if}
 
-<div class="flex flex-wrap gap-2 pt-2 items-center justify-center sm:justify-between">
+<div
+  class="flex flex-wrap items-center justify-center gap-2 pt-2 sm:justify-between"
+>
   {#if isProjectPlannerPage}
-      <div>
-        <ToggleSwitch
-          bind:checked={showDaysInRange.value}
-          label={`Show number of days in ranges`}
-        />
-      </div>
+    <div>
+      <ToggleSwitch
+        bind:checked={showDaysInRange.value}
+        label={`Show number of days in ranges`}
+      />
+    </div>
   {/if}
 
-    <ViewToggle />
+  <ViewToggle />
 </div>
 
 <div
-  class="rounded-container mt-2 mb-2 overflow-hidden lg:mb-4 {localState.value
+  class="rounded-container mt-2 mb-2 overflow-hidden lg:mb-4 {preferences.value
     .layout === 'grid'
     ? 'grid grid-cols-2 gap-1 lg:grid-cols-3 xl:grid-cols-4'
     : 'flex flex-col'}"
@@ -166,7 +169,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 >
   {#each sortableColors as { hex, name, brandId, yarnId, brandName, yarnName, variant_href, affiliate_variant_href, id }, index (id)}
     <div
-      class="color flex flex-wrap items-center justify-around gap-2 p-2 {localState
+      class="color flex flex-wrap items-center justify-around gap-2 p-2 {preferences
         .value.layout === 'grid'
         ? 'rounded-container flex-auto basis-1/3  sm:basis-1/4 md:basis-1/5'
         : `${isProjectPlannerPage ? numberOfColumns < 5 && 'lg:grid lg:grid-cols-[1fr_3fr_1fr]' : 'lg:grid lg:grid-cols-[1fr_1.4fr_1fr]'}`}"
@@ -217,7 +220,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <div
               class={[
                 'flex gap-2',
-                localState.value.layout === 'grid' ? '' : '',
+                preferences.value.layout === 'grid' ? '' : '',
               ]}
             >
               {#key index}
@@ -227,7 +230,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {/if}
         {/if}
 
-        <div class={[localState.value.layout === 'list' && 'flex-auto']}>
+        <div class={[preferences.value.layout === 'list' && 'flex-auto']}>
           <button
             class={['btn hover:preset-tonal flex h-auto justify-start']}
             title="Choose a Color"
@@ -287,7 +290,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {#if isProjectPlannerPage}
           {#if showDaysInRange.value}
             <div
-              class="bg-surface-900/10 rounded-container flex w-fit flex-wrap items-center justify-center overflow-hidden shadow-inner number-of-days-in-range"
+              class="bg-surface-900/10 rounded-container number-of-days-in-range flex w-fit flex-wrap items-center justify-center overflow-hidden shadow-inner"
             >
               <DaysInRange
                 range={gauge.ranges[index]}
@@ -299,7 +302,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {/if}
         {/if}
       </div>
-      
+
       <!-- The following empty div is necessary to center content in list view -->
       <div></div>
     </div>

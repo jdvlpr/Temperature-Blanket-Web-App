@@ -14,7 +14,8 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { DEFAULT_SEASONS, MONTHS, SEASON_PRESETS } from '$lib/constants';
-import { localState, previews } from '$lib/state';
+import { previews } from '$lib/state';
+import { preferences } from '$lib/storage/preferences.svelte';
 import type { LocationType } from '$lib/types';
 
 /**
@@ -190,7 +191,7 @@ export function setSeasonsByLocation(location: LocationType) {
 
   try {
     // Check that the current seasons are still the default before auto-assigning
-    const currentSeasons = localState.value.seasons;
+    const currentSeasons = preferences.value.seasons;
 
     const isDefaultSeasons = PRESETS_ARRAY.some((preset) =>
       seasonsMatchDates(currentSeasons, preset.seasons),
@@ -202,10 +203,10 @@ export function setSeasonsByLocation(location: LocationType) {
     if (isDefaultSeasons && typeof firstLat === 'number') {
       // Latitude >= 0 => Northern Hemisphere, else Southern
       if (firstLat >= 0)
-        localState.value.seasons =
+        preferences.value.seasons =
           SEASON_PRESETS.northernMeteorological.seasons;
       else
-        localState.value.seasons =
+        preferences.value.seasons =
           SEASON_PRESETS.southernMeteorological.seasons;
     }
   } catch (e) {

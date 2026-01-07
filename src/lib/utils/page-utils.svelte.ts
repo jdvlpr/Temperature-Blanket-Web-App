@@ -16,14 +16,8 @@
 import { page } from '$app/state';
 import KeyboardShortcuts from '$lib/components/modals/KeyboardShortcuts.svelte';
 import Menu from '$lib/components/modals/Menu.svelte';
-import {
-  localState,
-  dialog,
-  pageSections,
-  project,
-  toast,
-  weather,
-} from '$lib/state';
+import { dialog, pageSections, project, toast, weather } from '$lib/state';
+import { preferences } from '$lib/storage/preferences.svelte';
 import { delay, loadFromHistory } from '$lib/utils';
 
 // Go to a section
@@ -127,23 +121,23 @@ export const handleKeyDown = (ev) => {
 
   if (ev.key === 't') {
     // Toggle between light, dark, and system themes on 't' key press
-    switch (localState.value.theme.mode) {
+    switch (preferences.value.theme.mode) {
       case 'light':
-        localState.value.theme.mode = 'dark';
+        preferences.value.theme.mode = 'dark';
         break;
       case 'dark':
-        localState.value.theme.mode = 'system';
+        preferences.value.theme.mode = 'system';
         break;
       case 'system':
-        localState.value.theme.mode = 'light';
+        preferences.value.theme.mode = 'light';
         break;
       default:
-        localState.value.theme.mode = 'system';
+        preferences.value.theme.mode = 'system';
         break;
     }
     const themeTitle =
-      localState.value.theme.mode.charAt(0).toUpperCase() +
-      localState.value.theme.mode.slice(1);
+      preferences.value.theme.mode.charAt(0).toUpperCase() +
+      preferences.value.theme.mode.slice(1);
 
     toast.trigger({
       category: 'success',
@@ -171,7 +165,7 @@ export const handleKeyDown = (ev) => {
         project.toggleUnits();
         toast.trigger({
           category: 'success',
-          message: 'Units changed to ' + localState.value.units,
+          message: 'Units changed to ' + preferences.value.units,
         });
         break;
     }

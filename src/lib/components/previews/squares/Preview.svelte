@@ -15,8 +15,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import Spinner from '$lib/components/Spinner.svelte';
-  import { localState, weather } from '$lib/state';
-  import type { Color, WeatherDay, WeatherParam } from '$lib/types';
+  import { weather } from '$lib/state';
+  import type { Color, WeatherParam } from '$lib/types';
   import {
     getColorInfo,
     getSquareSectionTargetIds,

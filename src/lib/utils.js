@@ -30,7 +30,6 @@ export * from '$lib/utils/privacy-utils.svelte';
 export * from '$lib/utils/project-utils.svelte';
 export * from '$lib/utils/range-utils.svelte';
 export * from '$lib/utils/seasons-utils.svelte';
-export * from '$lib/utils/storage-utils.svelte';
 export * from '$lib/utils/string-utils';
 export * from '$lib/utils/unit-utils.svelte';
 export * from '$lib/utils/weather-forecast-utils';

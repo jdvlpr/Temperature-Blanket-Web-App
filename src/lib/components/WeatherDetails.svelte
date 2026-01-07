@@ -17,7 +17,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import WeatherItem from '$lib/components/WeatherItem.svelte';
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
   import { UNIT_LABELS } from '$lib/constants';
-  import { localState, locations, previews, project, weather } from '$lib/state';
+  import { locations, previews, weather } from '$lib/state';
+  import { preferences } from '$lib/storage/preferences.svelte';
+  import type { WeatherParam } from '$lib/types';
   import {
     capitalizeFirstLetter,
     convertTime,
@@ -25,7 +27,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     getColorInfo,
     getIsRecentDate,
   } from '$lib/utils';
-  import type { WeatherParam } from '$lib/types';
   import { getTextColor } from '$lib/utils/color-utils';
   import { CircleArrowLeftIcon, CircleArrowRightIcon } from '@lucide/svelte';
 
@@ -60,7 +61,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     const value =
       targetId === 'moon'
         ? day[targetId]
-        : day[targetId][localState.value.units];
+        : day[targetId][preferences.value.units];
     return getColorInfo({
       param: targetId,
       value,
@@ -73,7 +74,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     getTargets ? getTargets(weather.currentIndex) : weatherTargets,
   );
 
-  let dateOutOfSeasonsRanges = $derived(currentWeatherTargets.length === 0 && previews?.active?.settings?.useSeasonTargets);
+  let dateOutOfSeasonsRanges = $derived(
+    currentWeatherTargets.length === 0 &&
+      previews?.active?.settings?.useSeasonTargets,
+  );
 </script>
 
 <div
@@ -112,7 +116,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       bind:value={weather.currentIndex}
       onkeydown={(event) => {
         if (!event.cancelable) return;
-        if(event.code === 'ArrowRight' || event.code === 'ArrowLeft')
+        if (event.code === 'ArrowRight' || event.code === 'ArrowLeft')
           event.preventDefault();
       }}
       class="range-slider-input"
@@ -141,7 +145,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {@const { name, hex, index, gaugeLength, brandName, yarnName } =
             colorInfo(id, day)}
           {@const value =
-            id === 'moon' ? day[id] : day[id][localState.value.units]}
+            id === 'moon' ? day[id] : day[id][preferences.value.units]}
           {#if exists(day) && value !== null}
             {#if id === 'dayt'}
               <WeatherItem {id} {label} {icon} value={convertTime(value)}>
@@ -191,7 +195,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 {label}
                 {icon}
                 {value}
-                units={UNIT_LABELS[type][localState.value.units]}
+                units={UNIT_LABELS[type][preferences.value.units]}
                 {isRecentDate}
               >
                 {#snippet details()}
@@ -241,22 +245,23 @@ If not, see <https://www.gnu.org/licenses/>. -->
               {label}
               {icon}
               value="?"
-              units={UNIT_LABELS[type][localState.value.units]}
+              units={UNIT_LABELS[type][preferences.value.units]}
             />
           {/if}
         {/each}
         {#if dateOutOfSeasonsRanges}
-          <div class="text-center italic p-4">
-            It looks like this date doesn't fall within any of your assigned seasons. Please adjust the seasons' ranges.
+          <div class="p-4 text-center italic">
+            It looks like this date doesn't fall within any of your assigned
+            seasons. Please adjust the seasons' ranges.
           </div>
         {/if}
       </div>
     </div>
   {/key}
   {#if !dateOutOfSeasonsRanges}
-  <div class="mx-auto my-2 w-fit">
-    <ToggleSwitch bind:checked={viewGaugeInfo} label={'Show Color Details'} />
-  </div>
+    <div class="mx-auto my-2 w-fit">
+      <ToggleSwitch bind:checked={viewGaugeInfo} label={'Show Color Details'} />
+    </div>
   {/if}
 </div>
 

@@ -13,7 +13,8 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { localState, weather } from '$lib/state';
+import { weather } from '$lib/state';
+import { preferences } from '$lib/storage/preferences.svelte';
 import type {
   GaugeAttributes,
   GaugeRange,
@@ -73,7 +74,7 @@ export const getEvenlyDistributedRangeValuesWithEqualDayCount = ({
 }) => {
   if (!weatherData) weatherData = weather.data;
 
-  const _units = localState.value.units;
+  const _units = preferences.value.units;
 
   let _weatherData = [...weatherData];
   _weatherData = _weatherData.filter((day) => day[prop][_units] !== null); // filter out any missing values

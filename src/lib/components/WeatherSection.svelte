@@ -28,7 +28,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     OPEN_METEO_DELAY_DAYS,
     UNIT_LABELS,
   } from '$lib/constants';
-  import { dialog, gauges, localState, locations, weather } from '$lib/state';
+  import { dialog, gauges, locations, weather } from '$lib/state';
+  import { preferences } from '$lib/storage/preferences.svelte';
   import { safeSlide } from '$lib/transitions/safeSlide';
   import {
     convertTime,
@@ -37,10 +38,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     isDateWithinLastSevenDays,
     pluralize,
   } from '$lib/utils';
-  import {
-    CloudAlert,
-    TriangleAlertIcon
-  } from '@lucide/svelte';
+  import { CloudAlert, TriangleAlertIcon } from '@lucide/svelte';
   import { Popover, Portal } from '@skeletonlabs/skeleton-svelte';
   import { onMount } from 'svelte';
   import UnitChanger from './UnitChanger.svelte';
@@ -128,9 +126,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
       .map((day, index) => {
         return { ...day, index };
       })
-      .filter((day) => day.tmin[localState.value.units] !== null)
+      .filter((day) => day.tmin[preferences.value.units] !== null)
       .reduce((prev, curr) =>
-        prev.tmin[localState.value.units] < curr.tmin[localState.value.units]
+        prev.tmin[preferences.value.units] < curr.tmin[preferences.value.units]
           ? prev
           : curr,
       ) || null,
@@ -140,9 +138,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
       .map((day, index) => {
         return { ...day, index };
       })
-      .filter((day) => day.tmax[localState.value.units] !== null)
+      .filter((day) => day.tmax[preferences.value.units] !== null)
       .reduce((prev, curr) =>
-        prev.tmax[localState.value.units] > curr.tmax[localState.value.units]
+        prev.tmax[preferences.value.units] > curr.tmax[preferences.value.units]
           ? prev
           : curr,
       ) || null,
@@ -286,7 +284,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         value={Math.max(
           ...(weather.params.tmax?.filter((n) => n !== null) as number[]),
         )}
-        units={UNIT_LABELS.temperature[localState.value.units]}
+        units={UNIT_LABELS.temperature[preferences.value.units]}
       >
         {#snippet date()}
           <p class="text-xs">
@@ -307,7 +305,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         value={getAverage(
           weather.params.tavg?.filter((n) => n !== null) as number[],
         )}
-        units={UNIT_LABELS.temperature[localState.value.units]}
+        units={UNIT_LABELS.temperature[preferences.value.units]}
       />
     {/if}
 
@@ -319,7 +317,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         value={Math.min(
           ...(weather.params.tmin?.filter((n) => n !== null) as number[]),
         )}
-        units={UNIT_LABELS.temperature[localState.value.units]}
+        units={UNIT_LABELS.temperature[preferences.value.units]}
       >
         {#snippet date()}
           <p class="text-xs">
@@ -344,7 +342,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 ?.filter((n) => n !== null)
                 ?.reduce((partialSum: number, a: any) => partialSum + a, 0),
             )}
-        units={UNIT_LABELS.height[localState.value.units]}
+        units={UNIT_LABELS.height[preferences.value.units]}
       />
     {/if}
 
@@ -366,7 +364,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   ?.filter((n) => n !== null)
                   ?.reduce((partialSum: number, a: any) => partialSum + a, 0),
               )}
-        units={UNIT_LABELS.height[localState.value.units]}
+        units={UNIT_LABELS.height[preferences.value.units]}
       >
         {#snippet button()}
           <div class="my-2 text-sm">
@@ -404,7 +402,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <div bind:this={graph} class="w-full scroll-m-[60px]">
   {#if showWeatherChart}
     {#if weather.data.length}
-      {#key localState.value.units}
+      {#key preferences.value.units}
         <WeatherChart />
       {/key}
     {/if}

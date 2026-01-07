@@ -18,13 +18,13 @@ import { ICONS } from '$lib/constants';
 import {
   allGaugesAttributes,
   gauges,
-  localState,
   locations,
   previews,
   project,
   toast,
   weather,
 } from '$lib/state';
+import { preferences } from '$lib/storage/preferences.svelte';
 import {
   exists,
   getProjectParametersFromURLHash,
@@ -66,11 +66,11 @@ export const loadFromHistory = ({ action }: { action: 'Undo' | 'Redo' }) => {
   if (exists(newParams.u)) {
     if (!exists(oldParams.u) || oldParams.u.value !== newParams.u.value) {
       if (newParams.u.value === 'i') {
-        localState.value.units = 'imperial';
+        preferences.value.units = 'imperial';
         message = 'Units';
       }
       if (newParams.u.value === 'm') {
-        localState.value.units = 'metric';
+        preferences.value.units = 'metric';
         message = 'Units';
       }
     }
@@ -122,7 +122,7 @@ export const loadFromHistory = ({ action }: { action: 'Undo' | 'Redo' }) => {
     if (!exists(oldParams.n) || oldParams.n?.value !== newParams.n?.value) {
       const seasons = seasonsFromUrlHash(newParams.n.value);
       if (seasons && seasons.length > 0) {
-        localState.value.seasons = seasons;
+        preferences.value.seasons = seasons;
         if (previews.active) previews.active.settings.useSeasonTargets = true;
         message = 'Seasons';
       }

@@ -35,12 +35,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Spinner from '$lib/components/Spinner.svelte';
   import UnitChanger from '$lib/components/UnitChanger.svelte';
   import {
-    localState,
-    locations,
     dialog,
+    locations,
     project,
     showNavigationSideBar,
   } from '$lib/state';
+  import { preferences } from '$lib/storage/preferences.svelte';
   import {
     delay,
     getWeatherCodeDetails,
@@ -210,20 +210,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   $effect(() => {
     weatherState.activeLocationID;
-    localState.value.units;
+    preferences.value.units;
     weatherState.hour;
     getShareableURL({
       id: weatherState.activeLocationID,
-      units: localState.value.units,
+      units: preferences.value.units,
       hourFormat: weatherState.hour,
     });
   });
 
   $effect(async () => {
-    localStorage.setItem('[/weather]units', localState.value.units);
+    localStorage.setItem('[/weather]units', preferences.value.units);
     if (
       weatherState.weatherLocations?.some(
-        (item) => item.units !== localState.value.units,
+        (item) => item.units !== preferences.value.units,
       )
     )
       await fetchData();
@@ -232,10 +232,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   onMount(async () => {
     // units
     const paramUnits = page.url.searchParams.get('u');
-    if (paramUnits === 'i') localState.value.units = 'imperial';
-    else if (paramUnits === 'm') localState.value.units = 'metric';
+    if (paramUnits === 'i') preferences.value.units = 'imperial';
+    else if (paramUnits === 'm') preferences.value.units = 'metric';
     else if (localStorage.getItem('[/weather]units'))
-      localState.value.units = localStorage.getItem('[/weather]units');
+      preferences.value.units = localStorage.getItem('[/weather]units');
     else setUnitsFromNavigator();
 
     // hour12
@@ -244,7 +244,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     else if (hourFormat === '1') weatherState.hour = '24';
     else if (localStorage.getItem('[/weather]hour_format'))
       weatherState.hour = localStorage.getItem('[/weather]hour_format');
-    else weatherState.hour = localState.value.units === 'metric' ? '24' : '12';
+    else weatherState.hour = preferences.value.units === 'metric' ? '24' : '12';
 
     // saved weather locations
     if (localStorage.getItem('[/weather]locations')) {
@@ -419,7 +419,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         );
                         page.url.searchParams.set(
                           'u',
-                          localState.value.units === 'metric' ? 'm' : 'i',
+                          preferences.value.units === 'metric' ? 'm' : 'i',
                         );
                       }}
                     >

@@ -18,26 +18,27 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import StickyPart from '$lib/components/modals/StickyPart.svelte';
   import { MONTHS } from '$lib/constants';
   import { SEASON_PRESETS } from '$lib/constants/seasons-constants';
-  import { localState } from '$lib/state';
+  import { preferences } from '$lib/storage/preferences.svelte';
   import { formatDateRange } from '$lib/utils/seasons-utils.svelte';
   import { CheckIcon } from '@lucide/svelte';
 
   let { onClose } = $props();
 
   // Convert presets object to array for iteration
-  const presetsList =  Object.values(SEASON_PRESETS);
+  const presetsList = Object.values(SEASON_PRESETS);
 
   // Create a working copy of seasons
   let editingSeasons = $state(
-    JSON.parse(JSON.stringify(localState.value.seasons)),
+    JSON.parse(JSON.stringify(preferences.value.seasons)),
   );
 
   // Check if a preset matches the current editing seasons
-  function isPresetSelected(preset: typeof presetsList[0]): boolean {
+  function isPresetSelected(preset: (typeof presetsList)[0]): boolean {
     if (editingSeasons.length !== preset.seasons.length) return false;
-    return editingSeasons.every((season: { startDate: string; endDate: string }, index: number) => 
-      season.startDate === preset.seasons[index].startDate &&
-      season.endDate === preset.seasons[index].endDate
+    return editingSeasons.every(
+      (season: { startDate: string; endDate: string }, index: number) =>
+        season.startDate === preset.seasons[index].startDate &&
+        season.endDate === preset.seasons[index].endDate,
     );
   }
 
@@ -59,66 +60,80 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 
   // Handler for month/day changes
-  function updateSeasonDate(seasonIndex: number, field: 'startDate' | 'endDate', month: number, day: number) {
+  function updateSeasonDate(
+    seasonIndex: number,
+    field: 'startDate' | 'endDate',
+    month: number,
+    day: number,
+  ) {
     const maxDays = getDaysInMonth(month);
     const clampedDay = Math.min(day, maxDays);
     editingSeasons[seasonIndex][field] = toDateString(month, clampedDay);
   }
 
   // Apply a preset
-  function applyPreset(preset: typeof presetsList[0]) {
+  function applyPreset(preset: (typeof presetsList)[0]) {
     editingSeasons = JSON.parse(JSON.stringify(preset.seasons));
   }
 
   function saveChanges() {
-    localState.value.seasons = JSON.parse(JSON.stringify(editingSeasons));
+    preferences.value.seasons = JSON.parse(JSON.stringify(editingSeasons));
     onClose();
   }
 </script>
 
-<div class="flex flex-col gap-4 p-2 sm:p-4 w-full items-start">
+<div class="flex w-full flex-col items-start gap-4 p-2 sm:p-4">
   <div class="">
     <h2 class="text-2xl font-bold">Edit Seasons</h2>
-    <p class="text-sm">Choose a preset or customize the start and end dates for each season.</p>
+    <p class="text-sm">
+      Choose a preset or customize the start and end dates for each season.
+    </p>
   </div>
 
   <!-- Presets -->
   <div class="w-full">
-    <p class="font-medium mb-2 text-sm">Select a preset to apply</p>
-      <div class="flex flex-col gap-2">
-        {#each presetsList as preset}
-          {@const selected = isPresetSelected(preset)}
-          <button
-            class={["btn text-left flex gap-2 py-2 h-auto", selected ? 'preset-filled-secondary-500' : 'preset-outlined-surface-300-700']}
-            onclick={() => applyPreset(preset)}
+    <p class="mb-2 text-sm font-medium">Select a preset to apply</p>
+    <div class="flex flex-col gap-2">
+      {#each presetsList as preset}
+        {@const selected = isPresetSelected(preset)}
+        <button
+          class={[
+            'btn flex h-auto gap-2 py-2 text-left',
+            selected
+              ? 'preset-filled-secondary-500'
+              : 'preset-outlined-surface-300-700',
+          ]}
+          onclick={() => applyPreset(preset)}
+        >
+          <div class="flex flex-1 flex-col items-start gap-0">
+            <span class="font-medium whitespace-pre-wrap">{preset.label}</span>
+            <span class="text-xs whitespace-pre-wrap opacity-70"
+              >{preset.description}</span
             >
-            <div class="flex-1 flex flex-col items-start gap-0">
-              <span class="font-medium whitespace-pre-wrap">{preset.label}</span>
-              <span class="text-xs opacity-70 whitespace-pre-wrap">{preset.description}</span>
-            </div>
-            {#if selected}
-              <span class="flex items-center gap-1 text-xs">
-                <CheckIcon class="size-4" />
-              </span>
-            {/if}
+          </div>
+          {#if selected}
+            <span class="flex items-center gap-1 text-xs">
+              <CheckIcon class="size-4" />
+            </span>
+          {/if}
         </button>
-        {/each}
-      </div>
+      {/each}
+    </div>
   </div>
 
-  <hr class="w-full border-surface-300-700" />
+  <hr class="border-surface-300-700 w-full" />
 
   <!-- Custom Date Ranges -->
   <div class="w-full">
-    <p class="text-sm font-medium mb-2">Custom Date Ranges</p>
-    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 w-full">
+    <p class="mb-2 text-sm font-medium">Custom Date Ranges</p>
+    <div class="grid w-full grid-cols-1 gap-6 sm:grid-cols-2">
       {#each editingSeasons as season, seasonIndex (seasonIndex)}
         {@const startParsed = parseDateString(season.startDate)}
         {@const endParsed = parseDateString(season.endDate)}
-        <div class="space-y-3 p-4 preset-outlined-surface-300-700 rounded-lg">
+        <div class="preset-outlined-surface-300-700 space-y-3 rounded-lg p-4">
           <div>
-            <p class="font-semibold text-lg">{season.label}</p>
-            <p class="text-xs text-surface-500">
+            <p class="text-lg font-semibold">{season.label}</p>
+            <p class="text-surface-500 text-xs">
               {formatDateRange(season.startDate, season.endDate)}
             </p>
           </div>
@@ -131,11 +146,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 class="select w-fit"
                 value={startParsed.month}
                 onchange={(e) => {
-                  const newMonth = parseInt((e.target as HTMLSelectElement).value);
-                  updateSeasonDate(seasonIndex, 'startDate', newMonth, startParsed.day);
+                  const newMonth = parseInt(
+                    (e.target as HTMLSelectElement).value,
+                  );
+                  updateSeasonDate(
+                    seasonIndex,
+                    'startDate',
+                    newMonth,
+                    startParsed.day,
+                  );
                 }}
               >
-                {#each MONTHS as {name, value}}
+                {#each MONTHS as { name, value }}
                   <option {value}>{name}</option>
                 {/each}
               </select>
@@ -143,8 +165,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 class="select w-fit"
                 value={startParsed.day}
                 onchange={(e) => {
-                  const newDay = parseInt((e.target as HTMLSelectElement).value);
-                  updateSeasonDate(seasonIndex, 'startDate', startParsed.month, newDay);
+                  const newDay = parseInt(
+                    (e.target as HTMLSelectElement).value,
+                  );
+                  updateSeasonDate(
+                    seasonIndex,
+                    'startDate',
+                    startParsed.month,
+                    newDay,
+                  );
                 }}
               >
                 {#each Array.from({ length: getDaysInMonth(startParsed.month) }, (_, i) => i + 1) as day}
@@ -162,11 +191,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 class="select w-fit"
                 value={endParsed.month}
                 onchange={(e) => {
-                  const newMonth = parseInt((e.target as HTMLSelectElement).value);
-                  updateSeasonDate(seasonIndex, 'endDate', newMonth, endParsed.day);
+                  const newMonth = parseInt(
+                    (e.target as HTMLSelectElement).value,
+                  );
+                  updateSeasonDate(
+                    seasonIndex,
+                    'endDate',
+                    newMonth,
+                    endParsed.day,
+                  );
                 }}
               >
-                {#each MONTHS as {name, value}}
+                {#each MONTHS as { name, value }}
                   <option {value}>{name}</option>
                 {/each}
               </select>
@@ -174,8 +210,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 class="select w-fit"
                 value={endParsed.day}
                 onchange={(e) => {
-                  const newDay = parseInt((e.target as HTMLSelectElement).value);
-                  updateSeasonDate(seasonIndex, 'endDate', endParsed.month, newDay);
+                  const newDay = parseInt(
+                    (e.target as HTMLSelectElement).value,
+                  );
+                  updateSeasonDate(
+                    seasonIndex,
+                    'endDate',
+                    endParsed.month,
+                    newDay,
+                  );
                 }}
               >
                 {#each Array.from({ length: getDaysInMonth(endParsed.month) }, (_, i) => i + 1) as day}
@@ -191,12 +234,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </div>
 
 <StickyPart position="bottom">
-  <div class="flex gap-2 p-2 py-4 w-full flex-wrap items-center justify-center">
+  <div class="flex w-full flex-wrap items-center justify-center gap-2 p-2 py-4">
     <CloseButton {onClose} text="Cancel" />
-    <button
-      class="btn preset-filled-primary-500"
-      onclick={saveChanges}
-    >
+    <button class="btn preset-filled-primary-500" onclick={saveChanges}>
       <CheckIcon />
       Save
     </button>

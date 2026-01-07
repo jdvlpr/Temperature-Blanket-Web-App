@@ -20,7 +20,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
   import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
   import StickyPart from '$lib/components/modals/StickyPart.svelte';
-  import { dialog, gauges, localState, weather } from '$lib/state';
+  import { dialog, gauges, weather } from '$lib/state';
+  import { preferences } from '$lib/storage/preferences.svelte';
   import { safeSlide } from '$lib/transitions/safeSlide';
   import {
     displayNumber,
@@ -54,7 +55,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let _gauge = $state(gauges.getSnapshot(gauges.activeGaugeId));
 
-  let unitLabel = $derived(_gauge.unit.label[localState.value.units]);
+  let unitLabel = $derived(_gauge.unit.label[preferences.value.units]);
 
   let incrementMode = $state(
     _gauge.rangeOptions?.isCustomRanges ? null : _gauge.rangeOptions.mode,
@@ -532,8 +533,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {#if isRangeCalculationUnavailable}
           <p class="card bg-warning-50 dark:bg-warning-950 px-4 py-4 text-left">
             <TriangleAlertIcon class="inline" />
-            The Ranges Preview below doesn't yet auto-calculate optimal From and
-            To values using these options and this range calculation method ({@html rangeExample}).
+            The Ranges Preview below doesn't yet auto-calculate optimal From and To
+            values using these options and this range calculation method ({@html rangeExample}).
             To show the optimal From and To values, {#if isNotAutoIncrements}
               set Automatic Ranges above, then
             {/if} uncheck Round Numbers{#if !isNotAutoIncrements}

@@ -81,7 +81,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script>
   import { browser } from '$app/environment';
   import { THEMES } from '$lib/constants';
-  import { localState } from '$lib/state';
+  import { preferences } from '$lib/storage/preferences.svelte';
   import { safeSlide } from '$lib/transitions/safeSlide';
   import {
     Popover,
@@ -90,14 +90,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '@skeletonlabs/skeleton-svelte';
 
   let activeTheme = $derived(
-    THEMES.find((n) => n.id === (localState.value.theme.mode || 'system')),
+    THEMES.find((n) => n.id === (preferences.value.theme.mode || 'system')),
   );
 </script>
 
 <div class="w-fit text-left">
   <Popover modal={true} autoFocus={true}>
     <Popover.Trigger class="btn hover:preset-tonal">
-      {#key localState.value?.theme.mode}
+      {#key preferences.value?.theme.mode}
         <span
           >{#if browser}{@html activeTheme?.icon}{:else}{@html THEMES.find(
               (t) => t.id === 'system',
@@ -117,10 +117,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 <Popover.Description>
                   <div class="flex flex-col gap-2">
                     <SegmentedControl
-                      value={localState.value.theme.mode}
+                      value={preferences.value.theme.mode}
                       onValueChange={(e) => {
-                        if (localState.value?.theme.mode) {
-                          localState.value.theme.mode = e.value;
+                        if (preferences.value?.theme.mode) {
+                          preferences.value.theme.mode = e.value;
                         }
                       }}
                     >
@@ -151,11 +151,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       {#each skeletonThemes as { name, id, colors, rounded }}
                         <button
                           onclick={(e) => {
-                            localState.value.theme.id = id;
+                            preferences.value.theme.id = id;
                           }}
                           class={[
                             'btn hover:preset-tonal-secondary flex w-full items-center justify-start gap-2',
-                            localState.value.theme.id === id &&
+                            preferences.value.theme.id === id &&
                               'preset-filled-secondary-500',
                           ]}
                         >

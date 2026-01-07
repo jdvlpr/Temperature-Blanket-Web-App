@@ -14,7 +14,8 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { WEATHER_DATA_DECIMALS } from '$lib/constants';
-import { localState, windowLanguage } from '$lib/state';
+import { windowLanguage } from '$lib/state';
+import { preferences } from '$lib/storage/preferences.svelte';
 import { displayNumber, exists, pluralize } from '$lib/utils';
 /**
  * [description]
@@ -49,7 +50,7 @@ export const convertTime = (
 ) => {
   let hours, minutes;
   const { displayUnits, padStart, forceUnits } = props;
-  const _units = forceUnits || localState.value.units;
+  const _units = forceUnits || preferences.value.units;
   if (_units === 'metric') {
     hours = Math.floor(value / 60);
     minutes = value % 60;
@@ -84,18 +85,18 @@ export const setUnitsFromNavigator = () => {
   // If the units are already set, don't change them
   // localState.value.units may not be set if the user is visiting for the first time since version 5.0.0
   // (that's why theres the '?' check)
-  if (localState.value?.units && localState.value.units !== null) return;
+  if (preferences.value?.units && preferences.value.units !== null) return;
   const language = window.navigator.language;
   if (exists(language)) {
     const letters = language.slice(-2).toUpperCase();
     windowLanguage.value = letters;
     // Set imperial for United States, Myenmar, and Liberia
     if (letters === 'US' || letters === 'MY') {
-      localState.value.units = 'imperial';
+      preferences.value.units = 'imperial';
     } else {
-      localState.value.units = 'metric';
+      preferences.value.units = 'metric';
     }
   } else {
-    localState.value.units = 'metric';
+    preferences.value.units = 'metric';
   }
 };

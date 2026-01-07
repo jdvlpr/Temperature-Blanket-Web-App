@@ -14,13 +14,8 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import {
-    allGaugesAttributes,
-    gauges,
-    localState,
-    dialog,
-    weather,
-  } from '$lib/state';
+  import { allGaugesAttributes, dialog, gauges, weather } from '$lib/state';
+  import { preferences } from '$lib/storage/preferences.svelte';
   import { downloadPDF } from '$lib/utils';
   import { CirclePlusIcon, DownloadIcon, Trash2Icon } from '@lucide/svelte';
   import { onMount, tick } from 'svelte';
@@ -38,7 +33,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         if (
           weather.data?.some((day) => {
             if (target.type === 'category') return day[target.id] !== null;
-            else return day[target.id][localState.value.units] !== null;
+            else return day[target.id][preferences.value.units] !== null;
           })
         ) {
           // For each of the gauge's weather parameter targets, check to see if there is any data, and if so setup the default gauge

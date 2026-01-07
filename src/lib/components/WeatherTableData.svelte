@@ -1,6 +1,7 @@
 <script lang="ts">
   import { UNIT_LABELS } from '$lib/constants';
-  import { dialog, localState, weather } from '$lib/state';
+  import { dialog, weather } from '$lib/state';
+  import { preferences } from '$lib/storage/preferences.svelte';
   import {
     celsiusToFahrenheit,
     dateToISO8601String,
@@ -23,10 +24,10 @@
 
   let { tableData, updateTable, uid } = $props();
 
-  let table =$derived.by(() => {
+  let table = $derived.by(() => {
     return new TableHandler(tableData, {
       rowsPerPage: weather.table.rowsPerPage,
-    })
+    });
   });
 
   onMount(() => {
@@ -45,7 +46,7 @@
           >
         </ThSort>
         {#each weather.tableWeatherTargets as { id, pdfHeader }}
-          {@const header = pdfHeader[localState.value.units]}
+          {@const header = pdfHeader[preferences.value.units]}
           {@const hasHeaderUnits = header.includes('(')}
           {@const headerLabel = header.slice(0, header.indexOf('('))}
           {@const headerUnits = header.slice(header.indexOf('('))}
@@ -149,7 +150,7 @@
                         props: {
                           max: 1000,
                           value: row[id],
-                          title: `<div class="flex flex-col items-center justify-center"><span class="font-bold">${row.date}</span><span>${label} <span class="text-sm">(${UNIT_LABELS[type][localState.value.units]})</span></span></div>`,
+                          title: `<div class="flex flex-col items-center justify-center"><span class="font-bold">${row.date}</span><span>${label} <span class="text-sm">(${UNIT_LABELS[type][preferences.value.units]})</span></span></div>`,
                           noMinMax: true,
                           showSlider: false,
                           onOkay: async (_value) => {
@@ -165,7 +166,7 @@
                             weather.table.rowsPerPage = table.rowsPerPage;
                             weather.table.page = table.currentPage;
 
-                            if (localState.value.units === 'metric') {
+                            if (preferences.value.units === 'metric') {
                               weather.rawData[i][id].metric = _value;
                               if (type === 'temperature')
                                 weather.rawData[i][id].imperial =
@@ -174,7 +175,7 @@
                                 weather.rawData[i][id].imperial =
                                   millimetersToInches(_value);
                             }
-                            if (localState.value.units === 'imperial') {
+                            if (preferences.value.units === 'imperial') {
                               weather.rawData[i][id].imperial = _value;
                               if (type === 'temperature')
                                 weather.rawData[i][id].metric =

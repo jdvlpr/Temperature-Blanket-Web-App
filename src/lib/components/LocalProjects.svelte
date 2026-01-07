@@ -16,13 +16,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script>
   import { browser } from '$app/environment';
   import ProjectDetails from '$lib/components/ProjectDetails.svelte';
-  import { getProjectsListForDisplay, removeProjectByHref } from '$lib/utils';
+  import { ProjectStorage } from '$lib/storage/projects';
 
   let projects = $state([]);
 
   async function loadProjects() {
     if (browser) {
-      projects = await getProjectsListForDisplay();
+      projects = await ProjectStorage.getProjectsForDisplay();
     } else {
       projects = [];
     }
@@ -44,7 +44,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <ProjectDetails
             project={meta}
             onclick={async () => {
-              await removeProjectByHref(meta.href);
+              await ProjectStorage.removeByHref(meta.href);
               await loadProjects();
             }}
           />

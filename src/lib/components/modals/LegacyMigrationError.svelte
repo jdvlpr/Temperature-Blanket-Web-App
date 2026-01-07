@@ -16,19 +16,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import { MOON_PHASE_NAMES } from '$lib/constants';
   import { allGaugesAttributes, project, toast } from '$lib/state';
+  import type { LocalStorageProject } from '$lib/storage/projects';
   import {
     convertTime,
     exists,
     getProjectParametersFromURLHash,
     pluralize,
-    type LocalStorageProject,
   } from '$lib/utils';
   import {
     ClipboardCopyIcon,
     DownloadIcon,
     TriangleAlertIcon,
   } from '@lucide/svelte';
-  import { onMount } from 'svelte';
 
   let { uid, error } = $props();
 

@@ -1,7 +1,8 @@
 import { weatherDataUpdatedKey } from '$lib/components/WeatherTableWrapper.svelte';
 import { CHARACTERS_FOR_URL_HASH } from '$lib/constants';
 import { DEFAULT_SEASONS } from '$lib/constants/seasons-constants';
-import { gauges, localState, previews, project, weather } from '$lib/state';
+import { gauges, previews, project, weather } from '$lib/state';
+import { preferences } from '$lib/storage/preferences.svelte';
 import type { BasePreviewSettings, Color, WeatherParam } from '$lib/types';
 import {
   displayNumber,
@@ -96,7 +97,7 @@ export class RowsPreviewClass {
       return this.settings.stitchesPerDay;
     let value = Math.abs(
       (weather.data[dayIndex] as any)[this.settings.lengthTarget][
-        localState.value.units as any
+        preferences.value.units as any
       ],
     );
     if (isNaN(value)) value = this.settings.stitchesPerDay;
@@ -179,7 +180,6 @@ export class RowsPreviewClass {
       for (
         let sectionStitchIndex = 0;
         sectionStitchIndex < sectionStitchesCount;
-
       ) {
         if (remainderLineCount > 0) {
           // If there are remaining stitches from the previous line, reset the stitch index and adjust the stitch count
@@ -295,7 +295,7 @@ export class RowsPreviewClass {
     if (!this.settings.useSeasonTargets) return false;
     for (let i = 0; i < weather.data.length; i++) {
       const date = weather.data?.[i]?.date;
-      const season = getSeasonForDate(date, localState.value.seasons) as any;
+      const season = getSeasonForDate(date, preferences.value.seasons) as any;
       if (!season) return true;
     }
     return false;
@@ -479,19 +479,19 @@ export class RowsPreviewClass {
     if (!date) return [EXTRAS_TARGET];
 
     const dateObj = new Date(date);
-    const season = getSeasonForDate(dateObj, localState.value.seasons) as any;
+    const season = getSeasonForDate(dateObj, preferences.value.seasons) as any;
 
     if (!season) return [EXTRAS_TARGET];
 
     // Find the index of the season in the user's seasons list
-    const seasonIndex = localState.value.seasons.indexOf(season);
+    const seasonIndex = preferences.value.seasons.indexOf(season);
 
     // If matching by reference fails (indexOf -1), fall back to checking date range equality
     if (seasonIndex === -1) {
-      for (let i = 0; i < localState.value.seasons.length; i++) {
+      for (let i = 0; i < preferences.value.seasons.length; i++) {
         if (
-          localState.value.seasons[i].startDate === season.startDate &&
-          localState.value.seasons[i].endDate === season.endDate
+          preferences.value.seasons[i].startDate === season.startDate &&
+          preferences.value.seasons[i].endDate === season.endDate
         ) {
           const st = this.settings.seasonTargets[i];
           return st && st.length ? st : [EXTRAS_TARGET];

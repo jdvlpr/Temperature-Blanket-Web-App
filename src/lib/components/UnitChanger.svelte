@@ -15,14 +15,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import { UNIT_LABELS } from '$lib/constants';
-  import { localState } from '$lib/state';
+  import { preferences } from '$lib/storage/preferences.svelte';
   import { SegmentedControl } from '@skeletonlabs/skeleton-svelte';
 </script>
 
 <SegmentedControl
-  value={localState.value.units}
+  value={preferences.value.units}
   onValueChange={(e) => {
-    localState.value.units = e.value;
+    preferences.value.units = e.value;
   }}
 >
   <SegmentedControl.Control

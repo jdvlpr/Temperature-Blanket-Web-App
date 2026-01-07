@@ -20,7 +20,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import { page } from '$app/state';
-  import { gauges, localState, project, weather } from '$lib/state';
+  import { gauges, project, weather } from '$lib/state';
+  import { preferences } from '$lib/storage/preferences.svelte';
   import { getTableData } from '$lib/utils';
   import { ExternalLinkIcon } from '@lucide/svelte';
   import { tick } from 'svelte';
@@ -50,7 +51,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   $effect(() => {
     // These three can be together because they don't all change near the same moment, unlike the next three $effect() blocks
     weather.data;
-    localState.value.units;
+    preferences.value.units;
     weather.tableWeatherTargets;
     tick().then(() => {
       updateTable();

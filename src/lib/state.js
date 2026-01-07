@@ -17,7 +17,6 @@ export * from '$lib/state/attachments/floating-state.svelte';
 export * from '$lib/state/gauges-state.svelte';
 export * from '$lib/state/location-state.svelte';
 export * from '$lib/state/page-state.svelte';
-export * from '$lib/state/persisted-state.svelte';
 export * from '$lib/state/preview-state.svelte';
 export * from '$lib/state/project-state.svelte';
 export * from '$lib/state/weather-state.svelte';

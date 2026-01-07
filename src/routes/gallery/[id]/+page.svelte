@@ -25,7 +25,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import YarnSources from '$lib/components/YarnSources.svelte';
   import ViewToggle from '$lib/components/buttons/ViewToggle.svelte';
   import { ALL_YARN_WEIGHTS } from '$lib/constants';
-  import { allGaugesAttributes, localState, locations } from '$lib/state';
+  import { allGaugesAttributes, locations } from '$lib/state';
+  import { preferences } from '$lib/storage/preferences.svelte';
   import { safeSlide } from '$lib/transitions/safeSlide';
   import {
     exists,
@@ -250,10 +251,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     <Accordion.ItemContent>
                       {#snippet element(attributes)}
                         {#if !attributes.hidden}
-                          <div
-                            {...attributes}
-                            transition:safeSlide
-                          >
+                          <div {...attributes} transition:safeSlide>
                             {#await data.stream then}
                               <div class="flex flex-col gap-2">
                                 <p class="">
@@ -473,14 +471,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
                               <ViewToggle />
                             </div>
                             <div
-                              class="rounded-container mt-4 mb-2 overflow-hidden xl:mb-4 {localState
+                              class="rounded-container mt-4 mb-2 overflow-hidden xl:mb-4 {preferences
                                 .value.layout === 'grid'
                                 ? 'grid grid-cols-2 gap-1 md:grid-cols-3 xl:grid-cols-4'
                                 : 'flex flex-col'}"
                             >
                               {#each item as { range, hex, name, yarnName, brandName, affiliate_variant_href, variant_href }, i}
                                 <div
-                                  class="flex flex-wrap items-center justify-around gap-2 p-2 {localState
+                                  class="flex flex-wrap items-center justify-around gap-2 p-2 {preferences
                                     .value.layout === 'grid'
                                     ? 'rounded-container flex-auto basis-1/3 sm:basis-1/4 md:basis-1/5'
                                     : ''}"
