@@ -18,6 +18,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { afterNavigate, beforeNavigate, onNavigate } from '$app/navigation';
   import { PUBLIC_MICROSOFT_CLARITY_ID } from '$env/static/public';
   import DialogProvider from '$lib/components/modals/DialogProvider.svelte';
+  import LegacyMigrationError from '$lib/components/modals/LegacyMigrationError.svelte';
   import ToastProvider from '$lib/components/ToastProvider.svelte';
   import {
     consentToMSClarityCookies,
@@ -31,13 +32,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { YoutubeIcon } from '@lucide/svelte';
   import { onMount, type Snippet } from 'svelte';
   import '../css/main.css';
-  import LegacyMigrationError from '$lib/components/modals/LegacyMigrationError.svelte';
 
   interface Props {
     children?: Snippet;
   }
   let { children }: Props = $props();
 
+  // In extreme cases where a user's localstorage space has filled up, there is a possibility for an error when migrating the projects to a new storage system in localstorage. In that case, supabase is used to collect diagnostic data in case a user needs help recovering projects. This is meant as a temporary solution unit it can be confirmed that the migration is successful; This is a worst-case fallback, and the normal migration path should handle most (all, hopefully) issues.
   async function logMigrationError({ uid }) {
     const projects = project.status.temporaryProjectsBackup;
     const { error } = await supabase.from('project_migration').insert({
