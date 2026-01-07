@@ -3,9 +3,6 @@ import * as projectUtils from './project-utils.svelte';
 
 // Mock dependencies
 vi.mock('$lib/state', () => ({
-  localState: {
-    value: { units: 'imperial' },
-  },
   weather: {
     data: [],
     grouping: 'month',
@@ -33,6 +30,13 @@ vi.mock('$lib/state', () => ({
     elements: [],
   },
   allGaugesAttributes: [],
+}));
+
+// Mock preferences
+vi.mock('$lib/storage/preferences.svelte', () => ({
+  preferences: {
+    value: { units: 'imperial' },
+  },
 }));
 
 vi.mock('$lib/pdf/sections/gauges.svelte', () => ({

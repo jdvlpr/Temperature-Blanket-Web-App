@@ -287,11 +287,11 @@ const pdfWeatherData = {
             displayUnits: false,
           });
         } else {
-          sValue = String(day[param][preferences.value.units]); // gauge.unit.label[localState.value.units]
+          sValue = String(day[param][preferences.value.units]); // gauge.unit.label[preferences.value.units]
         }
       }
 
-      // const sValue = param.id.toString(); //gauge.unit.label[localState.value.units]
+      // const sValue = param.id.toString(); //gauge.unit.label[preferences.value.units]
       if (param === 'moon') doc.setFontSize(pdfConfig.font.micro);
       else doc.setFontSize(pdfConfig.font.p);
 

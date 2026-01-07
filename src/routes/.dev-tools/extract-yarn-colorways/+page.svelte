@@ -1,25 +1,26 @@
 <script module lang="ts">
-  import { persistedState } from '$lib/state';
+  import { persistedState } from '$lib/storage/preferences.svelte';
 
   const options = persistedState('[/.dev-tools]options', {
     content: '',
-    columnWidth:200,
+    columnWidth: 200,
     querySelector: '',
-    useElementAttribute:false,
-    querySelectorAttribute:'',
-    excludeBefore:false,
-    excludeBeforeString:'',
-    excludeAfter:false,
-    excludeAfterString:'',
-    removeNumbers:true,
+    useElementAttribute: false,
+    querySelectorAttribute: '',
+    excludeBefore: false,
+    excludeBeforeString: '',
+    excludeAfter: false,
+    excludeAfterString: '',
+    removeNumbers: true,
     mergeWithExistingColors: false,
     selectedYarn: {
       brandId: '',
       yarnId: '',
     },
-    names: []
+    names: [],
   });
 </script>
+
 <script lang="ts">
   import { browser, dev } from '$app/environment';
   import AppLogo from '$lib/components/AppLogo.svelte';
@@ -37,30 +38,35 @@
   let showClearButton = $state(false);
 
   let existingColorways: Color[] = $derived.by(() => {
-    if (!browser || !options.value.selectedYarn?.brandId || !options.value.selectedYarn?.yarnId)
+    if (
+      !browser ||
+      !options.value.selectedYarn?.brandId ||
+      !options.value.selectedYarn?.yarnId
+    )
       return [];
     // Fetch existing colorways based on selected brand and yarn
-    return brands.find(
-      (b) => b.id === options.value.selectedYarn.brandId,
-    )?.yarns.find((y) => y.id === options.value.selectedYarn.yarnId)?.colorways.flatMap((colorway) => colorway.colors) || [];
+    return (
+      brands
+        .find((b) => b.id === options.value.selectedYarn.brandId)
+        ?.yarns.find((y) => y.id === options.value.selectedYarn.yarnId)
+        ?.colorways.flatMap((colorway) => colorway.colors) || []
+    );
   });
 
-  let onlyNewColors = $derived(options.value.names
-                      .map((n) => {
-                        return {
-                          hex: chroma.valid(n.hex)
-                            ? chroma(n.hex).hex().toLowerCase()
-                            : '',
-                          name: n.name,
-                        };
-                      })
-                      .filter(
-                        (n) => {
-                          return !existingColorways
-                            .map((ec) => ec.name.toLowerCase())
-                            .includes(n.name.toLowerCase());
-                        }
-                      ));
+  let onlyNewColors = $derived(
+    options.value.names
+      .map((n) => {
+        return {
+          hex: chroma.valid(n.hex) ? chroma(n.hex).hex().toLowerCase() : '',
+          name: n.name,
+        };
+      })
+      .filter((n) => {
+        return !existingColorways
+          .map((ec) => ec.name.toLowerCase())
+          .includes(n.name.toLowerCase());
+      }),
+  );
 
   function createHTMLObject(content: string) {
     if (!browser) return;
@@ -72,16 +78,22 @@
   async function getNames() {
     options.value.names = [];
     let i = 1;
-    for (const element of [...htmlObject.querySelectorAll(options.value.querySelector)]) {
+    for (const element of [
+      ...htmlObject.querySelectorAll(options.value.querySelector),
+    ]) {
       let name = options.value.useElementAttribute
         ? element.getAttribute(options.value.querySelectorAttribute)
         : element.innerText;
       if (options.value.excludeBefore)
         name = name.substring(
-          name.indexOf(options.value.excludeBeforeString) + options.value.excludeBeforeString?.length,
+          name.indexOf(options.value.excludeBeforeString) +
+            options.value.excludeBeforeString?.length,
         );
       if (options.value.excludeAfter)
-        name = name.substring(0, name.indexOf(options.value.excludeAfterString));
+        name = name.substring(
+          0,
+          name.indexOf(options.value.excludeAfterString),
+        );
       name = name.toLowerCase(); // lowercase everything
       name = name.replaceAll('\n', ' '); // remove new lines
       name = name.replaceAll('  ', ''); // remove multiple spaces
@@ -96,7 +108,7 @@
       name = name.join(' '); // join words into one string
 
       let colorHex = '';
-      
+
       options.value.names.push({ name, hex: colorHex });
       i = Number(i);
       i++;
@@ -132,8 +144,8 @@
             ></textarea>
           </label>
 
-          <div class="flex flex-col gap-4 max-w-md">
-            <div class="text-left flex flex-col items-start">
+          <div class="flex max-w-md flex-col gap-4">
+            <div class="flex flex-col items-start text-left">
               <label class="w-full text-sm">
                 Element Query Selector
                 <input
@@ -144,19 +156,22 @@
                 />
               </label>
             </div>
-  
+
             <div>
-              <ToggleSwitch bind:checked={options.value.removeNumbers} label="Remove Numbers" />
+              <ToggleSwitch
+                bind:checked={options.value.removeNumbers}
+                label="Remove Numbers"
+              />
             </div>
-  
+
             <div class="flex flex-col gap-2">
               <ToggleSwitch
                 bind:checked={options.value.useElementAttribute}
                 label="Use Element Attribute"
               />
-  
+
               {#if options.value.useElementAttribute}
-                <div class="text-left flex flex-col items-start">
+                <div class="flex flex-col items-start text-left">
                   <label class="w-full text-sm">
                     Element Attribute
                     <input
@@ -169,11 +184,14 @@
                 </div>
               {/if}
             </div>
-  
+
             <div class="flex flex-col gap-2">
-              <ToggleSwitch bind:checked={options.value.excludeBefore} label="Exclude Before" />
+              <ToggleSwitch
+                bind:checked={options.value.excludeBefore}
+                label="Exclude Before"
+              />
               {#if options.value.excludeBefore}
-                <div class="text-left flex flex-col items-start">
+                <div class="flex flex-col items-start text-left">
                   <label class="w-full text-sm">
                     Exclude Before
                     <input
@@ -185,11 +203,14 @@
                 </div>
               {/if}
             </div>
-  
+
             <div class="flex flex-col gap-2">
-              <ToggleSwitch bind:checked={options.value.excludeAfter} label="Exclude After" />
+              <ToggleSwitch
+                bind:checked={options.value.excludeAfter}
+                label="Exclude After"
+              />
               {#if options.value.excludeAfter}
-                <div class="text-left flex flex-col items-start">
+                <div class="flex flex-col items-start text-left">
                   <label class="w-full text-sm">
                     Exclude After
                     <input
@@ -201,18 +222,19 @@
                 </div>
               {/if}
             </div>
-  
+
             <div class="flex flex-col gap-2">
-              <ToggleSwitch bind:checked={options.value.mergeWithExistingColors} label="Merge With Existing Yarn Colorways" />
+              <ToggleSwitch
+                bind:checked={options.value.mergeWithExistingColors}
+                label="Merge With Existing Yarn Colorways"
+              />
               {#if options.value.mergeWithExistingColors}
-                <div class="text-left flex flex-col items-start mt-2">
+                <div class="mt-2 flex flex-col items-start text-left">
                   <SelectYarn
-                      preselectDefaultYarn={false}
-                      bind:selectedBrandId={
-                        options.value.selectedYarn.brandId
-                      }
-                      bind:selectedYarnId={options.value.selectedYarn.yarnId}
-                    />
+                    preselectDefaultYarn={false}
+                    bind:selectedBrandId={options.value.selectedYarn.brandId}
+                    bind:selectedYarnId={options.value.selectedYarn.yarnId}
+                  />
                 </div>
               {/if}
             </div>
@@ -224,8 +246,8 @@
             <button
               class="btn preset-filled-primary-500"
               onclick={async () => await getNames()}
-              disabled={options.value.querySelector === '' || options.value.content === ''}
-              >Get Colorway Names</button
+              disabled={options.value.querySelector === '' ||
+                options.value.content === ''}>Get Colorway Names</button
             >
             <Expand bind:isExpanded={showClearButton} label="Clear Button" />
             {#if showClearButton}
@@ -286,9 +308,7 @@
                       name: n.name,
                     };
                   });
-                  window.navigator.clipboard.writeText(
-                    JSON.stringify(colors),
-                  );
+                  window.navigator.clipboard.writeText(JSON.stringify(colors));
                   toast.trigger({
                     message: `Copied (${colors.length})`,
                     category: 'success',
@@ -313,7 +333,8 @@
                     console.log(onlyNewColors);
                   }}
                 >
-                  Copy Only New Colorways ({onlyNewColors.length}) to Clipboard As Array
+                  Copy Only New Colorways ({onlyNewColors.length}) to Clipboard
+                  As Array
                 </button>
               {/if}
             </div>

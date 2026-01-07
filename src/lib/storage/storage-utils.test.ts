@@ -1,7 +1,7 @@
-import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
-import * as storageUtils from './storage-utils.svelte';
-import { ProjectStorage } from './projects';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { MigrationManager } from './migration-manager';
+import { ProjectStorage } from './projects';
+import * as storageUtils from './storage-utils.svelte';
 
 // Mock idb-keyval
 const idbStore = new Map<string, any>();
@@ -19,15 +19,6 @@ vi.mock('idb-keyval', () => ({
 
 // Mock $lib/state
 vi.mock('$lib/state', () => ({
-  localState: {
-    value: {
-      theme: { id: 'classic', mode: 'system' },
-      seasons: [],
-      layout: 'default',
-      disableToastAnalytics: false,
-      units: 'imperial',
-    },
-  },
   weather: {
     source: { name: 'Meteostat', useSecondary: false, settings: {} },
     isUserEdited: false,
@@ -43,6 +34,19 @@ vi.mock('$lib/state', () => ({
   },
   locations: {
     projectTitle: 'Test Project',
+  },
+}));
+
+// Mock preferences
+vi.mock('$lib/storage/preferences.svelte', () => ({
+  preferences: {
+    value: {
+      theme: { id: 'classic', mode: 'system' },
+      seasons: [],
+      layout: 'default',
+      disableToastAnalytics: false,
+      units: 'imperial',
+    },
   },
 }));
 

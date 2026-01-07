@@ -10,8 +10,12 @@ import {
 
 // Mock state since it's imported in seasons-utils
 vi.mock('$lib/state', () => ({
-  localState: { value: { seasons: [] } },
   previews: { active: null },
+}));
+
+// Mock preferences
+vi.mock('$lib/storage/preferences.svelte', () => ({
+  preferences: { value: { seasons: [] } },
 }));
 
 describe('seasons-utils', () => {

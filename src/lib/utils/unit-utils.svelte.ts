@@ -83,7 +83,7 @@ export const setUnitsFromNavigator = () => {
   // if (loadFromURL()) return;
 
   // If the units are already set, don't change them
-  // localState.value.units may not be set if the user is visiting for the first time since version 5.0.0
+  // preferences.value.units may not be set if the user is visiting for the first time since version 5.0.0
   // (that's why theres the '?' check)
   if (preferences.value?.units && preferences.value.units !== null) return;
   const language = window.navigator.language;

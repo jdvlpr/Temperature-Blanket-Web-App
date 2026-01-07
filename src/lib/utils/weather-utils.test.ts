@@ -13,6 +13,7 @@ import {
   missingDaysCount,
   sum,
 } from './weather-utils.svelte';
+import { preferences } from '$lib/storage/preferences.svelte';
 
 // Mocking $lib modules
 vi.mock('$lib/constants', async (importOriginal) => ({
@@ -45,7 +46,7 @@ vi.mock('suncalc', () => ({
   })),
 }));
 
-const { mockWeather, mockLocalState, mockLocations, mockAllGaugesAttributes } =
+const { mockWeather, mockPreferences, mockLocations, mockAllGaugesAttributes } =
   vi.hoisted(() => ({
     mockWeather: {
       data: [] as any[],
@@ -60,7 +61,7 @@ const { mockWeather, mockLocalState, mockLocations, mockAllGaugesAttributes } =
       isUserEdited: false,
       tableWeatherTargets: [] as any[],
     },
-    mockLocalState: {
+    mockPreferences: {
       value: {
         units: 'metric',
       },
@@ -71,9 +72,12 @@ const { mockWeather, mockLocalState, mockLocations, mockAllGaugesAttributes } =
     mockAllGaugesAttributes: [] as any[],
   }));
 
+vi.mock('$lib/storage/preferences.svelte', () => ({
+  preferences: mockPreferences,
+}));
+
 vi.mock('$lib/state', () => ({
   weather: mockWeather,
-  localState: mockLocalState,
   locations: mockLocations,
   signal: { value: null },
   allGaugesAttributes: mockAllGaugesAttributes,
@@ -200,7 +204,7 @@ describe('weather-utils', () => {
           tavg: { metric: 15, imperial: 59 },
         },
       ];
-      mockLocalState.value.units = 'metric';
+      mockPreferences.value.units = 'metric';
     });
 
     it('should calculate the sum of a parameter across all days', () => {
@@ -412,7 +416,7 @@ describe('weather-utils', () => {
           moon: 4,
         },
       ];
-      mockLocalState.value.units = 'metric';
+      mockPreferences.value.units = 'metric';
     });
 
     it('should return moon phase directly', () => {
@@ -424,7 +428,7 @@ describe('weather-utils', () => {
     });
 
     it('should return imperial value if units are imperial', () => {
-      mockLocalState.value.units = 'imperial';
+      mockPreferences.value.units = 'imperial';
       expect(getWeatherValue({ dayIndex: 0, param: 'tmax' })).toBe(68);
     });
   });
@@ -445,7 +449,7 @@ describe('weather-utils', () => {
         { id: 'moon' },
         { id: 'dayt' },
       ];
-      mockLocalState.value.units = 'metric';
+      mockPreferences.value.units = 'metric';
     });
 
     it('should format data for table display', () => {

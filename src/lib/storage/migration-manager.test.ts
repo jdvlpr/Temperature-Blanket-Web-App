@@ -3,7 +3,7 @@ import { MigrationManager } from '../storage/migration-manager';
 import { ProjectStorage } from './projects';
 
 // Mock ProjectStorage
-vi.mock('./project-storage', () => ({
+vi.mock('./projects', () => ({
   ProjectStorage: {
     isAvailable: vi.fn(() => true),
     getById: vi.fn(),

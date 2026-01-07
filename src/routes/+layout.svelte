@@ -27,8 +27,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     project,
     toast,
   } from '$lib/state';
+  import { initializeLocalStorage } from '$lib/storage/storage-utils.svelte.ts';
   import { supabase } from '$lib/supabaseClient';
-  import { handleKeyDown, initializeLocalStorage, privacy } from '$lib/utils';
+  import { handleKeyDown, privacy } from '$lib/utils';
   import { YoutubeIcon } from '@lucide/svelte';
   import { onMount, type Snippet } from 'svelte';
   import '../css/main.css';

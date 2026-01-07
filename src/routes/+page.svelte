@@ -37,9 +37,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     wasProjectLoadedFromURL,
     weather,
   } from '$lib/state';
+  import { checkForProjectInStorage } from '$lib/storage/storage-utils.svelte';
   import { safeSlide } from '$lib/transitions/safeSlide';
   import {
-    checkForProjectInStorage,
     loadFromHistory,
     setProjectSettings,
     setUnitsFromNavigator,
