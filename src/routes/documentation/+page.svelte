@@ -14,7 +14,6 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import { version } from '$app/environment';
   import { PUBLIC_BASE_URL } from '$env/static/public';
   import AppLogo from '$lib/components/AppLogo.svelte';
   import AppShell from '$lib/components/AppShell.svelte';
@@ -31,7 +30,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     InfoIcon,
   } from '@lucide/svelte';
   import { Dialog, Portal } from '@skeletonlabs/skeleton-svelte';
-  import { VERSION } from 'svelte/compiler';
 
   let openTableOfContents = $state(false);
 
@@ -300,7 +298,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <li class="toc-list-item ml-4 block">
         <a
           href="#assigning-seasons"
-          class="toc-anchor opacity-60 hover:opacity-100 flex items-center gap-2">Assigning Seasons <span class="badge bg-tertiary-100-900">Beta</span></a
+          class="toc-anchor flex items-center gap-2 opacity-60 hover:opacity-100"
+          >Assigning Seasons <span class="badge bg-tertiary-100-900">Beta</span
+          ></a
         >
       </li>
       <li class="toc-list-item block">
@@ -839,7 +839,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 </p>
                 {#each OPEN_METEO_MODELS as { title, timespan, resolution, details }}
                   <div class="ml-4 flex flex-col gap-1">
-                    <p class="font-bold flex items-center gap-2">
+                    <p class="flex items-center gap-2 font-bold">
                       {@html title}
                     </p>
                     <div class="ml-4 flex flex-col gap-1">
@@ -1718,7 +1718,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
               </li>
               <li>
                 <span class="font-bold">Hexagon Rounds</span>
-                Each round in a hexagon represents one day. Hexagons are added from left to right, top to bottom.
+                Each round in a hexagon represents one day. Hexagons are added from
+                left to right, top to bottom.
               </li>
               <li>
                 <span class="font-bold">Month Rows</span> – Rows are grouped by month from
@@ -1765,39 +1766,61 @@ If not, see <https://www.gnu.org/licenses/>. -->
             id="assigning-seasons"
             class="card bg-surface-100 dark:bg-surface-900 flex scroll-mt-[58px] flex-col gap-2 p-4"
           >
-            <h3 class="text-xl font-bold flex items-center gap-2">Assigning Seasons<span class="badge bg-tertiary-100-900">Beta</span></h3>
+            <h3 class="flex items-center gap-2 text-xl font-bold">
+              Assigning Seasons<span class="badge bg-tertiary-100-900"
+                >Beta</span
+              >
+            </h3>
 
-            <p class="bg-tertiary-100-900 p-2 rounded-container">
-                This feature is in beta, which means it may have unexpected issues or may have breaking changes in the future. If you encounter any issues or have feedback, please let the developer know. <a href="/contact" class="link" target="_blank">Here is the contact page</a>.
-              </p>
-
-            <p>
-              Assigning seasons allows you to use different weather parameters for different times of the year. For example, you could use High Temperatures for Spring and Summer, and Low Temperatures for Fall (Autumn) and Winter.
+            <p class="bg-tertiary-100-900 rounded-container p-2">
+              This feature is in beta, which means it may have unexpected issues
+              or may have breaking changes in the future. If you encounter any
+              issues or have feedback, please let the developer know. <a
+                href="/contact"
+                class="link"
+                target="_blank">Here is the contact page</a
+              >.
             </p>
 
             <p>
-             To assign seasons, select the Seasons toggle in the settings of the Preview tab. Note that not all pattern types support seasons, so if you don't see the Seasons toggle, select a different pattern type.
+              Assigning seasons allows you to use different weather parameters
+              for different times of the year. For example, you could use High
+              Temperatures for Spring and Summer, and Low Temperatures for Fall
+              (Autumn) and Winter.
             </p>
 
             <p>
-             To edit which dates are in which seasons, press the name of a season. You can choose from several preset options, or customize the start and end dates for each season.
+              To assign seasons, select the Seasons toggle in the settings of
+              the Preview tab. Note that not all pattern types support seasons,
+              so if you don't see the Seasons toggle, select a different pattern
+              type.
+            </p>
+
+            <p>
+              To edit which dates are in which seasons, press the name of a
+              season. You can choose from several preset options, or customize
+              the start and end dates for each season.
             </p>
 
             <p>Notes:</p>
             <ul class="ml-4">
               <li>
-                - If a date falls outside of a custom defined seasons' ranges, that date will use the Accent Color as a fallback.
+                - If a date falls outside of a custom defined seasons' ranges,
+                that date will use the Accent Color as a fallback.
               </li>
-              <li>- If two season's date ranges overlap, the first season which includes that date will be used. The order of the seasons is as follows: 1) Spring, 2) Summer, 3) Fall (Autumn), 4) Winter.
+              <li>
+                - If two season's date ranges overlap, the first season which
+                includes that date will be used. The order of the seasons is as
+                follows: 1) Spring, 2) Summer, 3) Fall (Autumn), 4) Winter.
               </li>
             </ul>
-            
+
             <div class="card bg-warning-500/20 flex flex-col gap-2 p-4">
               <p>
-                For now, only the Rows pattern type supports assigning seasons. Support for more pattern types may be added in future updates.
+                For now, only the Rows pattern type supports assigning seasons.
+                Support for more pattern types may be added in future updates.
               </p>
             </div>
-          
           </section>
 
           <h2 class="scroll-mt-[58px] text-2xl font-bold" id="gallery">

@@ -56,8 +56,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
       initializeLocalStorage();
     } catch (e) {
       const uid = crypto.randomUUID();
-      project.status.temporaryUid = uid;
       const { error } = await logMigrationError({ uid });
+      project.status.temporaryUid = uid;
       project.status.temporaryError = error;
       dialog.trigger({
         type: 'component',

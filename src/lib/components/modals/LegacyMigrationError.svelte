@@ -137,7 +137,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <TriangleAlertIcon /> Save Your {pluralize('Project', projects.length)}
   </h2>
   <p class="text-warning-800-200">
-    During an update to this site, there was an issue accessing your saved
+    There was a technical issue accessing your saved
     {pluralize('project', projects.length)}. To make sure your data is not lost,
     please copy the {pluralize('URL', projects.length)} below to a safe place like
     a note or document, and download the weather data for each project.
@@ -150,8 +150,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     >
     Once you have saved the link and downloaded the weather data for each project
     below, you can close this notification and continue using the site. You can open
-    a project using its URL, and import the weather data from the CSV file, if necessary.
-    Sorry for any inconvenience.
+    a project using its URL, and
+    <a href="/documentation#import-weather-data" class="link" target="_blank"
+      >import the weather data from the CSV file</a
+    >, if necessary. Sorry for any inconvenience.
   </p>
   <p class="opacity-60">
     {#if !error}This issue has been logged so the developer can review it.{/if} Your

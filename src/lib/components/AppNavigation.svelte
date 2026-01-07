@@ -47,6 +47,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { Accordion } from '@skeletonlabs/skeleton-svelte';
   import { untrack } from 'svelte';
   import LegacyMigrationError from './modals/LegacyMigrationError.svelte';
+  import ArrowUp_0_1 from '@lucide/svelte/icons/arrow-up-0-1';
 
   // Set opened navigation items based on current page
   $effect(() => {
@@ -96,6 +97,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   data-sveltekit-preload-data="hover"
 >
   {#if project.status.temporaryProjectsBackup && project.status.temporaryUid}
+    <!--Access backups for project storage migration error, added in version 5.35.0 -->
     <button
       class="btn preset-filled-error-500"
       onclick={() => {
@@ -115,6 +117,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       }}><TriangleAlertIcon /> Save Your Projects</button
     >
   {/if}
+
   <div><ThemeSwitcher /></div>
 
   <a
