@@ -142,7 +142,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <div
   class={[
-    'mt-2 flex flex-wrap items-center justify-center gap-x-4 gap-y-2',
+    'mt-4 flex flex-wrap items-center justify-center gap-4',
     isProjectPlannerPage && 'md:justify-between',
   ]}
 >
@@ -162,7 +162,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </div>
 
 <div
-  class="rounded-container mt-2 mb-2 overflow-hidden lg:mb-4 {preferences.value
+  class="rounded-container mt-4 mb-2 overflow-hidden lg:mb-4 {preferences.value
     .layout === 'grid'
     ? 'grid grid-cols-2 gap-1 lg:grid-cols-3 xl:grid-cols-4'
     : 'flex flex-col'}"
