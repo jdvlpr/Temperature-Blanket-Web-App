@@ -196,7 +196,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </svelte:head>
 
 <div
-  class="bg-primary-50-950 w-full p-2 text-center [view-transition-name:top-banner]"
+  class="bg-primary-100-900 w-full p-2 text-center [view-transition-name:top-banner]"
 >
   <a
     href="https://www.youtube.com/watch?v=7NRLrpZb0Lo"
@@ -204,8 +204,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     rel="noopener"
     class="btn hover:preset-tonal whitespace-pre-wrap"
   >
-    <YoutubeIcon />Watch: Plan a Temperature Blanket the Easy Way</a
-  >
+    <YoutubeIcon />
+    <span>
+      Watch: Plan a Temperature Blanket
+      <span class="max-sm:hidden">the Easy Way</span>
+    </span>
+  </a>
 </div>
 
 {@render children?.()}
