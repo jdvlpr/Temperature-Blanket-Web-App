@@ -15,24 +15,31 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import { page } from '$app/state';
-  import ColorRange from '$lib/components/ColorRange.svelte';
-  import DaysInRange from '$lib/components/DaysInRange.svelte';
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
   import ViewToggle from '$lib/components/buttons/ViewToggle.svelte';
+  import ColorRange from '$lib/components/ColorRange.svelte';
+  import DaysInRange from '$lib/components/DaysInRange.svelte';
   import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
   import { dialog, gauges, showDaysInRange } from '$lib/state';
   import { preferences } from '$lib/storage/preferences.svelte';
+  import { safeSlide } from '$lib/features/transitions/safeSlide';
   import type { Color } from '$lib/types';
   import { getTextColor } from '$lib/utils';
   import {
+    CogIcon,
+    GridIcon,
+    LayoutGridIcon,
+    LayoutListIcon,
     MoveIcon,
     SearchIcon,
     ShoppingBagIcon,
     Trash2Icon,
   } from '@lucide/svelte';
+  import { Popover, Portal } from '@skeletonlabs/skeleton-svelte';
   import { dragHandle, dragHandleZone } from 'svelte-dnd-action';
   import { flip } from 'svelte/animate';
   import RangeOptionsButton from './buttons/RangeOptionsButton.svelte';
+  import { fade } from 'svelte/transition';
 
   const flipDurationMs = 150;
 
@@ -140,25 +147,56 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </p>
 {/if}
 
-<div
-  class={[
-    'mt-4 flex flex-wrap items-center justify-center gap-4',
-    isProjectPlannerPage && 'md:justify-between',
-  ]}
->
+<div class={['mt-4 flex flex-wrap justify-center gap-4']}>
   {#if isProjectPlannerPage}
     <div class={[gauges.activeGauge?.isStatic && 'hidden']}>
       <RangeOptionsButton />
     </div>
-    <div>
-      <ToggleSwitch
-        bind:checked={showDaysInRange.value}
-        label={`Show number of days in ranges`}
-      />
-    </div>
+    <Popover>
+      <Popover.Trigger
+        class="btn hover:preset-tonal"
+        aria-label="Display Options"
+        title="Display Options"
+      >
+        {#if preferences.value.layout === 'grid'}
+          <LayoutGridIcon /> Grid
+        {:else}
+          <LayoutListIcon /> List
+        {/if}
+        View
+      </Popover.Trigger>
+      <Portal>
+        <Popover.Positioner>
+          <Popover.Content
+            class="card bg-surface-200-800 z-49 w-72 max-w-(--breakpoint-sm) p-2 shadow-xl"
+          >
+            {#snippet element(attributes)}
+              {#if !attributes.hidden}
+                <div {...attributes} in:safeSlide>
+                  <Popover.Description class="flex flex-col gap-4 p-2">
+                    <div class="w-fit"><ViewToggle /></div>
+                    <div class="w-fit">
+                      <ToggleSwitch
+                        bind:checked={showDaysInRange.value}
+                        label={`Show number of days in ranges`}
+                      />
+                    </div>
+                  </Popover.Description>
+                  <Popover.Arrow
+                    style="--arrow-size: calc(var(--spacing) * 4); --arrow-background: var(--color-surface-200-800);"
+                  >
+                    <Popover.ArrowTip />
+                  </Popover.Arrow>
+                </div>
+              {/if}
+            {/snippet}
+          </Popover.Content>
+        </Popover.Positioner>
+      </Portal>
+    </Popover>
+  {:else}
+    <ViewToggle />
   {/if}
-
-  <ViewToggle />
 </div>
 
 <div

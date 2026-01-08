@@ -32,27 +32,32 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '@lucide/svelte';
   import SearchForWeather from './buttons/SearchForWeather.svelte';
   import WeatherSourceButton from './buttons/WeatherSourceButton.svelte';
+
+  const loading = $derived(locations.allValid && project.status.loading);
+  const validLoadedProject = $derived(
+    (weather.isFromLocalStorage && weather.data) ||
+      wasProjectLoadedFromURL.value,
+  );
 </script>
 
 <div class="mx-auto mt-2 max-w-(--breakpoint-md)">
-  {#if weather.isFromLocalStorage && weather.data}
+  {#if loading}
+    <p class="h-auto animate-pulse text-sm">Loading project...</p>
+  {:else if validLoadedProject}
     <p
       class="flex w-full flex-wrap items-center justify-center gap-1 text-center text-sm"
     >
       <CircleCheckBigIcon class=" size-4" />
-      Loaded project and {#if weather.isUserEdited}custom weather{:else}weather{/if}
-      data
-    </p>
-  {:else if wasProjectLoadedFromURL.value}
-    <p
-      class="flex w-full flex-wrap items-center justify-center gap-1 text-center text-sm"
-    >
-      <CircleCheckBigIcon class=" size-4" />
-      Loaded project
+      {#if weather.isFromLocalStorage && weather.data}
+        Loaded project and {#if weather.isUserEdited}custom weather{:else}weather{/if}
+        data
+      {:else if wasProjectLoadedFromURL.value}
+        Loaded project
+      {/if}
     </p>
   {/if}
 
-  {#if !!weather.isUserEdited}
+  {#if weather.isUserEdited}
     <div class="my-4 flex flex-col items-center gap-2">
       {#each locations.all as location}
         <p class="flex flex-wrap items-center justify-center gap-x-1">
@@ -89,7 +94,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/if}
 
   <div
-    class:hidden={!!weather.isUserEdited}
+    class:hidden={weather.isUserEdited}
     class="divide-surface-300 dark:divide-surface-600 divide-y divide-solid"
   >
     {#each locations.all, index}

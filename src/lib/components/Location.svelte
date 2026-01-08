@@ -16,7 +16,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import { browser } from '$app/environment';
   import { MONTHS } from '$lib/constants';
-  import { dialog, locations, project, toast, weather } from '$lib/state';
+  import {
+    dialog,
+    locations,
+    project,
+    toast,
+    wasProjectLoadedFromURL,
+    weather,
+  } from '$lib/state';
   import { safeSlide } from '$lib/features/transitions/safeSlide';
   import type { LocationType } from '$lib/types/location-types';
   import {
@@ -178,7 +185,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }); // End of onMount
 
   function validate() {
-    if (weather.isUserEdited > 0) return;
+    if (weather.isUserEdited) return;
 
     weather.rawData = [];
 
@@ -317,7 +324,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                           locations.remove(location.uuid);
                           weather.rawData = [];
                         }}
-                        disabled={weather.isUserEdited > 0 ||
+                        disabled={weather.isUserEdited ||
                           project.status.loading}
                         title="Remove Location"
                       >
@@ -370,7 +377,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           bind:this={inputLocation}
           oninput={validate}
           onkeyup={validateKeyup}
-          disabled={project.status.loading || weather.isUserEdited > 0}
+          disabled={project.status.loading || weather.isUserEdited}
         />
         {#if searching}
           <div class="ig-cell flex items-center justify-center">
@@ -394,7 +401,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <button
             class="ig-btn hover:preset-tonal"
             title="Reset Location Search"
-            disabled={!!weather.isUserEdited}
+            disabled={weather.isUserEdited || project.status.loading}
             onclick={() => {
               if (weather.isUserEdited) return;
               showResetKey = !showResetKey;
@@ -414,7 +421,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <button
             class="ig-btn hover:preset-tonal"
             title="Use My Location"
-            disabled={!!weather.isUserEdited}
+            disabled={weather.isUserEdited || project.status.loading}
             onclick={async () => {
               searching = true;
               inputLocation.placeholder = 'Requesting your location...';
@@ -524,7 +531,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               bind:value={year}
               id={`choose-year-${location.uuid}`}
               title="Choose a Year"
-              disabled={!!weather.isUserEdited || project.status.loading}
+              disabled={weather.isUserEdited || project.status.loading}
               onchange={() => {
                 setDates({});
               }}
@@ -542,7 +549,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               bind:value={month}
               id={`choose-month-${location.uuid}`}
               title="Choose a Month"
-              disabled={!!weather.isUserEdited || project.status.loading}
+              disabled={weather.isUserEdited || project.status.loading}
               onchange={() => {
                 setDates({});
               }}
@@ -560,7 +567,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               bind:value={day}
               id={`choose-day-${location.uuid}`}
               title="Choose a Day"
-              disabled={!!weather.isUserEdited || project.status.loading}
+              disabled={weather.isUserEdited || project.status.loading}
               onchange={() => setDates({})}
             >
               {#each Array(days) as _, i}
@@ -586,7 +593,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               bind:value={location.from}
               bind:this={inputStart}
               onchange={() => (weather.rawData = [])}
-              disabled={project.status.loading || !!weather.isUserEdited}
+              disabled={project.status.loading || weather.isUserEdited}
             />
           </label>
           <label for="datepicker-to-{location.uuid}" class="">
@@ -602,7 +609,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               bind:value={location.to}
               bind:this={inputEnd}
               onchange={() => (weather.rawData = [])}
-              disabled={project.status.loading || !!weather.isUserEdited}
+              disabled={project.status.loading || weather.isUserEdited}
             />
           </label>
         </div>
@@ -614,7 +621,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           class="select w-full"
           id={`duration-${location.uuid}`}
           bind:value={location.duration}
-          disabled={!!weather.isUserEdited || project.status.loading}
+          disabled={weather.isUserEdited || project.status.loading}
           onchange={() => {
             if (location?.duration === 'y') {
               year = stringToDate(location.from).getUTCFullYear();

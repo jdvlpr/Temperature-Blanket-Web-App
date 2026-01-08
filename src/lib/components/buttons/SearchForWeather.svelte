@@ -32,10 +32,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 {#snippet buttonContent()}
-  {#if !!weather.isUserEdited}
+  {#if weather.isUserEdited}
     Reload Weather Data
   {:else}
-    Search {#if weather.data.length}Again{/if}
+    Search {#if weather.data.length && !project.status.loading}Again{/if}
   {/if}
   <ChevronRightIcon />
 {/snippet}

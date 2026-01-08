@@ -94,8 +94,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     await setProjectSettings();
 
     await checkForProjectInStorage();
-
-    wasProjectLoadedFromURL.value = true;
+    if (locations.allValid) wasProjectLoadedFromURL.value = true;
   }
 
   $effect(() => {
