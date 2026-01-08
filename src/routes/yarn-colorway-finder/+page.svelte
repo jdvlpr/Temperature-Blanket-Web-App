@@ -441,10 +441,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       type="color"
                       class="input ig-cell m-2 rounded-full! p-0"
                       bind:this={yarnColorwayFinderState.inputTypeColorElement}
-                      onchange={(e) =>
+                      onchange={(e) => {
                         inputTypeColorOnChange({
                           value: e.target.value,
-                        })}
+                        });
+                      }}
                     />
                     <input
                       type="text"
@@ -458,6 +459,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         inputTypeTextOnChange({
                           value: e.target.value,
                         })}
+                      onpaste={(e) => {
+                        if (e.cancelable) e.preventDefault();
+                        const _tempInputValue =
+                          e.clipboardData?.getData('text') || '';
+                        inputTypeColorOnChange({
+                          value: _tempInputValue,
+                        });
+                      }}
                     />
                     {#if (!!yarnColorwayFinderState.hex || !!yarnColorwayFinderState.inputTypeTextValue) && !!yarnColorwayFinderState.inputTypeColorElement?.value}
                       <button
