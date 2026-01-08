@@ -2,7 +2,7 @@
   import { ALL_YARN_WEIGHTS } from '$lib/constants';
   import type { YarnWeight } from '$lib/types';
   import { pluralize } from '$lib/utils';
-  import { brands } from '$lib/yarns/brands';
+  import { brands } from '$lib/data/yarns/brands';
   import { CircleHelpIcon, WeightIcon } from '@lucide/svelte';
 
   interface Props {

@@ -16,7 +16,7 @@
 import { dev } from '$app/environment';
 import { SECRET_RAPID_API_PROXY_HEADER_KEY } from '$env/static/private';
 import { ALL_YARN_WEIGHTS } from '$lib/constants.js';
-import { brands } from '$lib/yarns/brands.js';
+import { brands } from '$lib/data/yarns/brands.js';
 import { error, json } from '@sveltejs/kit';
 
 export async function GET({ url, request }) {

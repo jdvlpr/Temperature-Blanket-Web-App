@@ -17,7 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { ALL_YARN_WEIGHTS } from '$lib/constants';
   import { defaultYarn } from '$lib/state';
   import { delay, pluralize, stringToBrandAndYarnDetails } from '$lib/utils';
-  import { brands } from '$lib/yarns/brands';
+  import { brands } from '$lib/data/yarns/brands';
   import { ChevronDownIcon, ListFilterIcon, XIcon } from '@lucide/svelte';
   import autocomplete from 'autocompleter';
   import { onMount, untrack } from 'svelte';

@@ -15,7 +15,7 @@
 
 import { PUBLIC_AFFILIATE_YARNS } from '$env/static/public';
 import type { AffiliateYarn, Color, YarnWeight } from '$lib/types';
-import { brands } from '$lib/yarns/brands';
+import { brands } from '$lib/data/yarns/brands';
 import chroma from 'chroma-js';
 
 export const YARN_COLORWAYS_PER_PAGE = 100;

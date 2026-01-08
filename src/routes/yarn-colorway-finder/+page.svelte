@@ -58,7 +58,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     sortColorsDarktoLight,
     sortColorsLightToDark,
   } from '$lib/utils';
-  import { brands } from '$lib/yarns/brands';
+  import { brands } from '$lib/data/yarns/brands';
   import {
     ArrowDownWideNarrowIcon,
     ChevronDownIcon,

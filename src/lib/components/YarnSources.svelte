@@ -19,7 +19,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { ALL_YARN_WEIGHTS } from '$lib/constants';
   import { safeSlide } from '$lib/transitions/safeSlide';
   import { pluralize, stringToDate } from '$lib/utils';
-  import { brands } from '$lib/yarns/brands';
+  import { brands } from '$lib/data/yarns/brands';
 
   interface Props {
     viewSources?: boolean;

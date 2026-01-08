@@ -25,7 +25,7 @@ import {
   isValueInRange,
   pluralize,
 } from '$lib/utils';
-import { brands } from '$lib/yarns/brands';
+import { brands } from '$lib/data/yarns/brands';
 import chroma from 'chroma-js';
 
 /**
