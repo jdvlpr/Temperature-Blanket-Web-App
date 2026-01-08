@@ -78,9 +78,6 @@ export class MigrationManager {
 
     // Success condition: All projects were migrated (or already existed)
     if (migratedIds.length === parsed.length) {
-      console.log(
-        `Migration: Successfully migrated ${migratedIds.length} projects.`,
-      );
       localStorage.removeItem(LEGACY_PROJECTS_KEY);
     } else {
       const errorMsg = `Migration: Only ${migratedIds.length} of ${parsed.length} projects were migrated. Errors: ${failedProjects.map((f) => f.title).join(', ')}`;
