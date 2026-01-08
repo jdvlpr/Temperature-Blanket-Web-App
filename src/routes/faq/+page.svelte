@@ -153,6 +153,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                           referrerpolicy="strict-origin-when-cross-origin"
                           allowfullscreen
+                          class="aspect-video h-auto w-full"
                         ></iframe>
                       </div>
 

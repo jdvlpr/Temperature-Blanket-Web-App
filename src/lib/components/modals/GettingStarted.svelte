@@ -28,7 +28,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     information.
   </p>
 
-  <div class="w-fit">
+  <div class="w-full">
     <iframe
       width="560"
       height="315"
@@ -38,6 +38,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
       referrerpolicy="strict-origin-when-cross-origin"
       allowfullscreen
+      class="aspect-video h-auto w-full"
     ></iframe>
   </div>
 </div>
