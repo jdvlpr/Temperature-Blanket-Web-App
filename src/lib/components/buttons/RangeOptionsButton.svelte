@@ -25,7 +25,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <button
-  class="btn hover:preset-tonal mx-auto flex flex-wrap items-center justify-center gap-2"
+  class="btn hover:preset-tonal"
   title="Change the gauge direction, generate ranges, and more."
   onclick={() =>
     dialog.trigger({
