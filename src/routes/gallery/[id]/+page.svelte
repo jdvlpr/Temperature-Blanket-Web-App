@@ -27,7 +27,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { ALL_YARN_WEIGHTS } from '$lib/constants';
   import { allGaugesAttributes, locations } from '$lib/state';
   import { preferences } from '$lib/storage/preferences.svelte';
-  import { safeSlide } from '$lib/transitions/safeSlide';
+  import { safeSlide } from '$lib/features/transitions/safeSlide';
   import {
     exists,
     getProjectParametersFromURLHash,

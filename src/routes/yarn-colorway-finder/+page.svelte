@@ -48,7 +48,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     YARN_COLORWAYS_PER_PAGE,
   } from '$lib/constants';
   import { toast } from '$lib/state';
-  import { safeSlide } from '$lib/transitions/safeSlide';
+  import { safeSlide } from '$lib/features/transitions/safeSlide';
   import type { YarnWeight } from '$lib/types';
   import {
     getTextColor,

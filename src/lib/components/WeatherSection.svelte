@@ -30,7 +30,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '$lib/constants';
   import { dialog, gauges, locations, weather } from '$lib/state';
   import { preferences } from '$lib/storage/preferences.svelte';
-  import { safeSlide } from '$lib/transitions/safeSlide';
+  import { safeSlide } from '$lib/features/transitions/safeSlide';
   import {
     convertTime,
     displayNumber,

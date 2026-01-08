@@ -17,7 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { PUBLIC_BASE_DOMAIN_NAME, PUBLIC_BASE_URL } from '$env/static/public';
   import AppLogo from '$lib/components/AppLogo.svelte';
   import AppShell from '$lib/components/AppShell.svelte';
-  import { safeSlide } from '$lib/transitions/safeSlide';
+  import { safeSlide } from '$lib/features/transitions/safeSlide';
   import { ChevronDownIcon, CircleQuestionMarkIcon } from '@lucide/svelte';
   import { Accordion } from '@skeletonlabs/skeleton-svelte';
 
@@ -36,7 +36,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <AppShell pageName="FAQ">
   {#snippet stickyHeader()}
-      <div class="mx-auto hidden lg:inline-flex"><AppLogo /></div>
+    <div class="mx-auto hidden lg:inline-flex"><AppLogo /></div>
   {/snippet}
   {#snippet main()}
     <main
@@ -307,8 +307,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         data-id="#weather-sources">weather sources</a
                       > wasn’t able to provide data for the days or place you requested.
                       You can try changing the dates: select a different year, or
-                      make sure no days are in the future. If that doesn’t work,
-                      try searching for a different nearby location.
+                      make sure no days are in the future. If that doesn’t work, try
+                      searching for a different nearby location.
                     </div>
                   {/if}
                 {/snippet}

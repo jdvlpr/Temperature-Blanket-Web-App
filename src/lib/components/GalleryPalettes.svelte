@@ -43,7 +43,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Spinner from '$lib/components/Spinner.svelte';
   import { ICONS } from '$lib/constants';
   import { isDesktop } from '$lib/state';
-  import { safeSlide } from '$lib/transitions/safeSlide';
+  import { safeSlide } from '$lib/features/transitions/safeSlide';
   import {
     fetchProjects,
     getPalettesFromProjects,

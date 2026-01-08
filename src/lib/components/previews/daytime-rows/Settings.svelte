@@ -19,7 +19,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Expand from '$lib/components/Expand.svelte';
   import PreviewInfo from '$lib/components/PreviewInfo.svelte';
   import { gauges, locations, weather } from '$lib/state';
-  import { safeSlide } from '$lib/transitions/safeSlide';
+  import { safeSlide } from '$lib/features/transitions/safeSlide';
   import { capitalizeFirstLetter } from '$lib/utils/other-utils';
   import { DownloadIcon } from '@lucide/svelte';
   import { TableHandler } from '@vincjo/datatables';

@@ -14,8 +14,8 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { MOON_PHASE_NAMES } from '$lib/constants';
-import pdfGauges from '$lib/pdf/sections/gauges.svelte';
-import pdfWeatherData from '$lib/pdf/sections/weather-data.svelte';
+import pdfGauges from '$lib/features/pdf/sections/gauges.svelte';
+import pdfWeatherData from '$lib/features/pdf/sections/weather-data.svelte';
 import {
   allGaugesAttributes,
   dialog,

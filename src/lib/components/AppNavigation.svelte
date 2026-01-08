@@ -23,7 +23,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { PUBLIC_GITHUB_LINK } from '$env/static/public';
   import ThemeSwitcher from '$lib/components/ThemeSwitcher.svelte';
   import { dialog, project } from '$lib/state';
-  import { safeSlide } from '$lib/transitions/safeSlide';
+  import { safeSlide } from '$lib/features/transitions/safeSlide';
   import { yarnBall } from '@lucide/lab';
   import {
     BookOpenTextIcon,

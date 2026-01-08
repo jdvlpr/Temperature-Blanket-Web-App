@@ -20,9 +20,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     drawerState,
     pageSections,
     showNavigationSideBar,
-    weather
+    weather,
   } from '$lib/state';
-  import { safeSlide } from '$lib/transitions/safeSlide';
+  import { safeSlide } from '$lib/features/transitions/safeSlide';
   import {
     MenuIcon,
     PanelLeftClose,
@@ -136,7 +136,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       >
         {#if showNavigationSideBar.value}
           <PanelLeftClose />
-          <span in:safeSlide={{ axis: 'x'}}>Hide Sidebar</span>
+          <span in:safeSlide={{ axis: 'x' }}>Hide Sidebar</span>
         {:else}
           <PanelRightCloseIcon />
         {/if}

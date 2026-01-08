@@ -42,7 +42,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     XIcon,
   } from '@lucide/svelte';
   import { Accordion } from '@skeletonlabs/skeleton-svelte';
-  import { safeSlide } from '$lib/transitions/safeSlide';
+  import { safeSlide } from '$lib/features/transitions/safeSlide';
 
   let accordionValue = $state(['apr20']);
 
@@ -230,11 +230,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       <br />
                       <br />
                       Using the new models (ERA5 Land and ERA5) is in beta status—you
-                      can use them, and weather data theoretically should not be
-                      adjusted over time, but they have not been thoroughly tested
-                      on this site. I'd love to hear your feedback about the new
-                      weather models, especially if the new ERA5 Land and ERA5 models
-                      provide any weather data that gets adjusted over time.
+                      can use them, and weather data theoretically should not be adjusted
+                      over time, but they have not been thoroughly tested on this
+                      site. I'd love to hear your feedback about the new weather models,
+                      especially if the new ERA5 Land and ERA5 models provide any
+                      weather data that gets adjusted over time.
                     </div>
                   {/if}
                 {/snippet}
@@ -404,8 +404,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       day. This issue appears to be ongoing for some users.
                       <br />
                       <br />
-                      A separate but possibly related issue also occurred during
-                      the site update on March 20, where weather data for some projects
+                      A separate but possibly related issue also occurred during the
+                      site update on March 20, where weather data for some projects
                       changed—different temperatures were reported. I believe this
                       issue was fixed on March 24, 2025 (<a
                         href="/changelog#5.2.2"
@@ -446,8 +446,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <a href="https://temperature-blanket.com" target="_blank" class="link"
           >temperature-blanket.com</a
         >
-        by refreshing the page for your project. The latest version is currently
-        v{version}.
+        by refreshing the page for your project. The latest version is currently v{version}.
       </div>
 
       <p>

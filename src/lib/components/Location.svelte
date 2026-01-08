@@ -17,7 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { browser } from '$app/environment';
   import { MONTHS } from '$lib/constants';
   import { dialog, locations, project, toast, weather } from '$lib/state';
-  import { safeSlide } from '$lib/transitions/safeSlide';
+  import { safeSlide } from '$lib/features/transitions/safeSlide';
   import type { LocationType } from '$lib/types/location-types';
   import {
     dateToISO8601String,
@@ -35,7 +35,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     SearchIcon,
     Trash2Icon,
     TriangleAlertIcon,
-    XIcon
+    XIcon,
   } from '@lucide/svelte';
   import { Popover, Portal, useTooltip } from '@skeletonlabs/skeleton-svelte';
   import autocomplete from 'autocompleter';

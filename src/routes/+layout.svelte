@@ -28,7 +28,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     toast,
   } from '$lib/state';
   import { initializeLocalStorage } from '$lib/storage/storage-utils.svelte.ts';
-  import { supabase } from '$lib/supabaseClient';
+  import { supabase } from '$lib/features/diagnostics/supabaseClient';
   import { handleKeyDown, privacy } from '$lib/utils';
   import { YoutubeIcon } from '@lucide/svelte';
   import { onMount, type Snippet } from 'svelte';

@@ -38,7 +38,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     weather,
   } from '$lib/state';
   import { checkForProjectInStorage } from '$lib/storage/storage-utils.svelte';
-  import { safeSlide } from '$lib/transitions/safeSlide';
+  import { safeSlide } from '$lib/features/transitions/safeSlide';
   import {
     loadFromHistory,
     setProjectSettings,

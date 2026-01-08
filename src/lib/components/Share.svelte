@@ -15,7 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import { toast } from '$lib/state';
-  import { safeSlide } from '$lib/transitions/safeSlide';
+  import { safeSlide } from '$lib/features/transitions/safeSlide';
   import { ClipboardCopyIcon, Share2Icon, XIcon } from '@lucide/svelte';
   import { Popover } from '@skeletonlabs/skeleton-svelte';
 
