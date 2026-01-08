@@ -59,7 +59,7 @@ vi.mock('$lib/constants', () => {
   };
 });
 
-vi.mock('$lib/yarns/brands', () => ({
+vi.mock('$lib/data/yarns/brands', () => ({
   brands: [
     {
       id: 'brand1',

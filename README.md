@@ -117,7 +117,7 @@ define('PROJECT_CREATION_AUTH_KEY', 'auth_key');
 
 ### 💾 Local Storage
 
-Various site settings and data are stored in the browser.
+Settings and user preferences are stored in the browser's Local Storage.
 
 <details>
 <summary>View Details</summary>
@@ -125,11 +125,24 @@ Various site settings and data are stored in the browser.
 | Key Name              | Description                                                | Default Value                                                                                                                                 | Possible Values                                                                          | Version Added\* |
 | --------------------- | ---------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- | --------------- |
 | preferences           | User preferences object                                    | `{ disableToastAnalytics: false, layout: 'list', seasons: [...DEFAULT_SEASONS], theme: { id: 'classic', mode: 'system',}, units: 'imperial'}` | [`LocalStatePreferencesType`](src/lib/state/persisted-state.svelte.ts)                   | 5.0.0           |
-| projects_index        | An index of projects the user has saved                    | `[]`                                                                                                                                          | array of [`LocalStorageProjectIndexItem`](src/lib/utils/storage-utils.svelte.ts) objects | 5.35.0          |
 | [/weather]units       | Units for the weather forecast page                        | `imperial`                                                                                                                                    | `imperial`, `metric`                                                                     | < 3.28.3        |
 | [/weather]hour_format | Time format for the weather forecast page                  | `12`                                                                                                                                          | `12`, `24`                                                                               | < 3.28.3        |
 | [/weather]locations   | Locations the user has added for the weather forecast page | `[]`                                                                                                                                          | array of [`Location`](src/lib/types/location-types.d.ts) objects                         | < 3.28.3        |
 
 _\*Items with a < before the version means sometime before that version, I'm not sure exactly when because I wasn't keeping track before version 3.28.3._
+
+</details>
+
+### 🗃️ IndexedDB Storage
+
+User's saved projects are stored in the browser's IndexedDB.
+
+<details>
+<summary>View Details</summary>
+
+| Key Name       | Description                                    | Default Value | Possible Values                                                                    | Version Added |
+| -------------- | ---------------------------------------------- | ------------- | ---------------------------------------------------------------------------------- | ------------- |
+| projects_index | An index of projects the user has saved        | `[]`          | array of [`LocalStorageProjectIndexItem`](src/lib/storage/projects.ts) objects     | 5.35.0        |
+| p_{id}         | An individual saved project                    | _not set_     | [`LocalStorageProject`](src/lib/storage/projects.ts) objects, keyed by project id | 5.35.0        |
 
 </details>

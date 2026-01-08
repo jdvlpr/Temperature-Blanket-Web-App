@@ -29,10 +29,10 @@
   import Footer from '$lib/components/Footer.svelte';
   import SelectYarn from '$lib/components/SelectYarn.svelte';
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
+  import { brands } from '$lib/data/yarns/brands';
   import { toast } from '$lib/state';
   import type { Color } from '$lib/types';
   import { getTextColor } from '$lib/utils';
-  import { brands } from '$lib/yarns/brands';
   import chroma from 'chroma-js';
 
   let showClearButton = $state(false);
