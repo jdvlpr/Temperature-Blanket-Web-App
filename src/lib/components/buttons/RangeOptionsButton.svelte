@@ -25,7 +25,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <button
-  class="btn preset-filled mx-auto flex flex-wrap items-center justify-center gap-2"
+  class="btn preset-filled-primary-500 mx-auto flex flex-wrap items-center justify-center gap-2"
   title="Change the gauge direction, generate ranges, and more."
   onclick={() =>
     dialog.trigger({

@@ -19,6 +19,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { fly } from 'svelte/transition';
   import CloseButton from './CloseButton.svelte';
   import SaveAndCloseButtons from './SaveAndCloseButtons.svelte';
+  import { EyeIcon } from '@lucide/svelte';
 </script>
 
 <Dialog open={dialog.opened} onOpenChange={(e) => (dialog.opened = e.open)}>
@@ -85,8 +86,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         </label>
                       {/each}
                     </div>
-                    {#if weather.pdfOptions.gauges.length > 0}
-                     <label class="flex items-center space-x-2 ml-4">
+                  </div>
+
+                  {#if weather.pdfOptions.gauges.length > 0}
+                    <div class="flex flex-col gap-2">
+                      <p class="font-bold">Gauge Options</p>
+                      <div class="flex flex-col gap-1">
+                        <label class="flex items-center space-x-2">
                           <input
                             type="checkbox"
                             name="showDaysInRange"
@@ -95,9 +101,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
                           />
                           <p class="">Show number of days in ranges</p>
                         </label>
-                    {/if}
-                  </div>
-
+                      </div>
+                    </div>
+                  {/if}
 
                   <div class="flex flex-col gap-2">
                     <p class="font-bold">Weather Data</p>

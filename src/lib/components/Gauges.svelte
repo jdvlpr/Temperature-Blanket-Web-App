@@ -123,10 +123,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   <Gauge bind:gauge={gauges.activeGauge} />
 
-  <div class={['mt-4 mb-2', gauges.activeGauge?.isStatic && 'hidden']}>
-    <RangeOptionsButton />
-  </div>
-
   {#key gauges.activeGauge.colors}
     <GaugeCustomizer bind:gauge={gauges.activeGauge} />
   {/key}

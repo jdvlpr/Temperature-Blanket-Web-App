@@ -20,7 +20,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
   import ViewToggle from '$lib/components/buttons/ViewToggle.svelte';
   import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
-  import { dialog, showDaysInRange } from '$lib/state';
+  import { dialog, gauges, showDaysInRange } from '$lib/state';
   import { preferences } from '$lib/storage/preferences.svelte';
   import type { Color } from '$lib/types';
   import { getTextColor } from '$lib/utils';
@@ -32,6 +32,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '@lucide/svelte';
   import { dragHandle, dragHandleZone } from 'svelte-dnd-action';
   import { flip } from 'svelte/animate';
+  import RangeOptionsButton from './buttons/RangeOptionsButton.svelte';
 
   const flipDurationMs = 150;
 
@@ -140,9 +141,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
 {/if}
 
 <div
-  class="flex flex-wrap items-center justify-center gap-2 pt-2 sm:justify-between"
+  class={[
+    'mt-2 flex flex-wrap items-center justify-center gap-x-4 gap-y-2',
+    isProjectPlannerPage && 'md:justify-between',
+  ]}
 >
   {#if isProjectPlannerPage}
+    <div class={[gauges.activeGauge?.isStatic && 'hidden']}>
+      <RangeOptionsButton />
+    </div>
     <div>
       <ToggleSwitch
         bind:checked={showDaysInRange.value}
