@@ -265,69 +265,72 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/if}
 </div>
 
-<style lang="scss">
+<style>
   .range-select {
     display: flex;
     width: 100%;
     margin: 0 auto;
     align-items: center;
-    button {
-      transition: all 200ms;
-      &.prev {
-        margin: 0 10px 0 30px;
-      }
-      &.next {
-        margin: 0 30px 0 10px;
-      }
-    }
-    button:disabled {
-      opacity: 0.08;
-      cursor: inherit;
-    }
-    .range-slider-input {
-      flex: 1;
-      -webkit-appearance: none;
-      appearance: none;
-      cursor: pointer;
-      border-radius: 25px;
-      border: 1px solid #94a3b8;
-      height: 20px;
-      padding: 0;
-      background: transparent;
-      overflow: hidden;
-      /***** Chrome, Safari, Opera, and Edge Chromium *****/
-      &::-webkit-slider-runnable-track {
-        background: transparent;
-        height: 20px;
-      }
+  }
 
-      /******** Firefox ********/
-      &::-moz-range-track {
-        background: transparent;
-        height: 20px;
-      }
-      /***** Chrome, Safari, Opera, and Edge Chromium *****/
-      &::-webkit-slider-thumb {
-        -webkit-appearance: none; /* Override default look */
-        appearance: none;
-        /* margin-top: -15px; Centers thumb on the track */
-        background-color: #94a3b8;
-        height: 20px;
-        width: 20px;
-        border-radius: 10px;
-        box-shadow: var(--box-shadow);
-      }
-      /******** Firefox ********/
-      &::-moz-range-thumb {
-        /* border: none; /*Removes extra border that FF applies*/
-        /* border: 12px solid rgba(255, 255, 255, 0.6); */
-        border-radius: 0; /*Removes default border-radius that FF applies*/
-        background-color: #94a3b8;
-        height: 20px;
-        width: 20px;
-        border-radius: 10px;
-        /* box-shadow: var(--box-shadow);*/
-      }
-    }
+  .range-select button {
+    transition: all 200ms;
+  }
+
+  .range-select button.prev {
+    margin: 0 10px 0 30px;
+  }
+
+  .range-select button.next {
+    margin: 0 30px 0 10px;
+  }
+
+  .range-select button:disabled {
+    opacity: 0.08;
+    cursor: inherit;
+  }
+
+  .range-select .range-slider-input {
+    flex: 1;
+    -webkit-appearance: none;
+    appearance: none;
+    cursor: pointer;
+    border-radius: 25px;
+    border: 1px solid #94a3b8;
+    height: 20px;
+    padding: 0;
+    background: transparent;
+    overflow: hidden;
+  }
+
+  /* Chrome, Safari, Opera, and Edge Chromium */
+  .range-select .range-slider-input::-webkit-slider-runnable-track {
+    background: transparent;
+    height: 20px;
+  }
+
+  /* Firefox */
+  .range-select .range-slider-input::-moz-range-track {
+    background: transparent;
+    height: 20px;
+  }
+
+  /* Chrome, Safari, Opera, and Edge Chromium */
+  .range-select .range-slider-input::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    background-color: #94a3b8;
+    height: 20px;
+    width: 20px;
+    border-radius: 10px;
+    box-shadow: var(--box-shadow);
+  }
+
+  /* Firefox */
+  .range-select .range-slider-input::-moz-range-thumb {
+    background-color: #94a3b8;
+    height: 20px;
+    width: 20px;
+    border-radius: 10px;
   }
 </style>
