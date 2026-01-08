@@ -20,17 +20,6 @@ export const delay = (delayInms) => {
   return new Promise((resolve) => setTimeout(resolve, delayInms));
 };
 
-export const hasParentWithClass = (event, className) => {
-  let element = event.target;
-  while (element.parentElement) {
-    if (element.parentElement.classList.contains(className)) {
-      return true;
-    }
-    element = element.parentElement;
-  }
-  return false;
-};
-
 let debounceTimerPreviewEffect;
 const debouncePreviewEffect = (callback, time) => {
   if (!window) return;
