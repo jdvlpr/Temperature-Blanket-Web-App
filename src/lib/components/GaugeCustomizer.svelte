@@ -30,6 +30,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     GridIcon,
     LayoutGridIcon,
     LayoutListIcon,
+    LayoutPanelTopIcon,
     MoveIcon,
     SearchIcon,
     ShoppingBagIcon,
@@ -155,14 +156,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <Popover>
       <Popover.Trigger
         class="btn hover:preset-tonal"
-        aria-label="Display Options"
-        title="Display Options"
+        aria-label="View Options"
+        title="View Options"
       >
-        {#if preferences.value.layout === 'grid'}
-          <LayoutGridIcon /> Grid
-        {:else}
-          <LayoutListIcon /> List
-        {/if}
+        <LayoutPanelTopIcon />
         View
       </Popover.Trigger>
       <Portal>
