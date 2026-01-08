@@ -115,6 +115,78 @@ If not, see <https://www.gnu.org/licenses/>. -->
               </Accordion.ItemContent>
             </Accordion.Item>
 
+            <Accordion.Item value="how-do-the-range-values-work">
+              <Accordion.ItemTrigger
+                class="flex items-center justify-between gap-2"
+              >
+                <div class="flex items-center gap-2">
+                  <CircleQuestionMarkIcon />
+
+                  <p class="font-bold">
+                    Why do the range values repeat (0 to 10, 10 to 20…), and how
+                    can I make them not overlap (0 to 9, 10 to 19…)?
+                  </p>
+                </div>
+
+                <Accordion.ItemIndicator class="group">
+                  <ChevronDownIcon
+                    class="h-5 w-5 transition group-data-[state=open]:rotate-180"
+                  />
+                </Accordion.ItemIndicator>
+              </Accordion.ItemTrigger>
+
+              <Accordion.ItemContent>
+                {#snippet element(attributes)}
+                  {#if !attributes.hidden}
+                    <div {...attributes} transition:safeSlide>
+                      <p class="">
+                        Watch an explanation in the video below (it will start
+                        at 8:49).
+                      </p>
+                      <div class="my-2 w-full">
+                        <iframe
+                          width="560"
+                          height="315"
+                          src="https://www.youtube.com/embed/7NRLrpZb0Lo?si=n4fmzlt9_0GKGNad&amp;start=529"
+                          title="YouTube video player"
+                          frameborder="0"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                          referrerpolicy="strict-origin-when-cross-origin"
+                          allowfullscreen
+                        ></iframe>
+                      </div>
+
+                      <p>
+                        The default setting will include the first number up to
+                        but not including the second number, so there’s not
+                        actually any weather value that would be in two ranges
+                        at once. To make the range values not overlap, you will
+                        need to change the
+                        <a
+                          class="link"
+                          href="/documentation#range-calculation-methods"
+                          data-type="internal"
+                          data-id="#range-calculation-methods"
+                          >range calculation method</a
+                        >. If you do, be careful to cover all weather values in
+                        your ranges. For example, you might need to use decimals
+                        (0 to 9.99, 10 to 19.99, 20 to 29.99…). You can read
+                        this
+                        <a
+                          class="link"
+                          rel="noreferrer noopener"
+                          href="https://www.reddit.com/r/temperatureblanket/comments/10mliw0/if_a_gauge_says_1115_red_then_1620_blue_which/"
+                          target="_blank"
+                          >survey and discussion about this on reddit</a
+                        > if you want to learn more about what led to the default
+                        range behavior.
+                      </p>
+                    </div>
+                  {/if}
+                {/snippet}
+              </Accordion.ItemContent>
+            </Accordion.Item>
+
             <Accordion.Item value="is-there-an-app">
               <Accordion.ItemTrigger
                 class="flex items-center justify-between gap-2"
@@ -175,61 +247,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   {#if !attributes.hidden}
                     <div {...attributes} transition:safeSlide>
                       <p>Yep!</p>
-                    </div>
-                  {/if}
-                {/snippet}
-              </Accordion.ItemContent>
-            </Accordion.Item>
-
-            <Accordion.Item value="how-do-the-range-values-work">
-              <Accordion.ItemTrigger
-                class="flex items-center justify-between gap-2"
-              >
-                <div class="flex items-center gap-2">
-                  <CircleQuestionMarkIcon />
-
-                  <p class="font-bold">
-                    Why do the range values repeat (0 to 10, 10 to 20…), and how
-                    can I make them not overlap (0 to 9, 10 to 19…)?
-                  </p>
-                </div>
-
-                <Accordion.ItemIndicator class="group">
-                  <ChevronDownIcon
-                    class="h-5 w-5 transition group-data-[state=open]:rotate-180"
-                  />
-                </Accordion.ItemIndicator>
-              </Accordion.ItemTrigger>
-
-              <Accordion.ItemContent>
-                {#snippet element(attributes)}
-                  {#if !attributes.hidden}
-                    <div {...attributes} transition:safeSlide>
-                      <p>
-                        The default setting will include the first number up to
-                        but not including the second number, so there’s not
-                        actually any weather value that would be in two ranges
-                        at once. To make the range values not overlap, you will
-                        need to change the
-                        <a
-                          class="link"
-                          href="/documentation#range-calculation-methods"
-                          data-type="internal"
-                          data-id="#range-calculation-methods"
-                          >range calculation method</a
-                        >. If you do, be careful to cover all weather values in
-                        your ranges. For example, you might need to use decimals
-                        (0 to 9.99, 10 to 19.99, 20 to 29.99…). You can read
-                        this
-                        <a
-                          class="link"
-                          rel="noreferrer noopener"
-                          href="https://www.reddit.com/r/temperatureblanket/comments/10mliw0/if_a_gauge_says_1115_red_then_1620_blue_which/"
-                          target="_blank"
-                          >survey and discussion about this on reddit</a
-                        > if you want to learn more about what led to the default
-                        range behavior.
-                      </p>
                     </div>
                   {/if}
                 {/snippet}

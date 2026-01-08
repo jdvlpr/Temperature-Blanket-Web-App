@@ -199,9 +199,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     <p class="text-sm">February 9, 2024</p>
                   </div>
 
-                    <div class="w-full">
-                    <iframe width="560" height="315" src="https://www.youtube.com/embed/7NRLrpZb0Lo?si=6FfsQcYDxXaqJ-aa" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen class="w-full h-auto aspect-video"></iframe>
-                    </div>
+                  <div class="w-full">
+                    <iframe
+                      width="560"
+                      height="315"
+                      src="https://www.youtube.com/embed/7NRLrpZb0Lo?si=6FfsQcYDxXaqJ-aa"
+                      title="YouTube video player"
+                      frameborder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                      referrerpolicy="strict-origin-when-cross-origin"
+                      allowfullscreen
+                      class="aspect-video h-auto w-full"
+                    ></iframe>
+                  </div>
 
                   <p>
                     Starting a temperature blanket can be a daunting task. Maybe
@@ -520,14 +530,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     and
                     <span class="font-bold">which</span> colors to use. A typical
                     project uses between 7 and 15 colors (from now on I'll call them
-                    colorways, since we're talking about yarn). But you are free
-                    to use more or less colorways if you want. In the Project Planner,
+                    colorways, since we're talking about yarn). But you are free to
+                    use more or less colorways if you want. In the Project Planner,
                     there are several ways you can pick colorways:
                   </p>
                   <div class="ml-4">
                     <p>
-                      <span class="font-bold">All at once</span> - use the tools
-                      in the toolbar to choose how many and which colorways to use.
+                      <span class="font-bold">All at once</span> - use the tools in
+                      the toolbar to choose how many and which colorways to use.
                     </p>
                     <img
                       class="rounded-container border-surface-100-900 my-2 h-auto max-h-fit w-full max-w-[540px] border-6 shadow-lg"
@@ -843,8 +853,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         >
                         to follow along with as you make your project. It contains
                         a temperature gauge with your colorways and ranges, the daily
-                        weather data, and it tells you which colorways to use on
-                        which days.
+                        weather data, and it tells you which colorways to use on which
+                        days.
                       </p>
                     </div>
                   </div>
