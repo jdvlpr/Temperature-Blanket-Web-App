@@ -1,5 +1,5 @@
-import { ProjectStorage, type LocalStorageProject } from './projects';
 import { project } from '$lib/state';
+import { ProjectStorage, type LocalStorageProject } from './projects';
 
 const LEGACY_PROJECTS_KEY = 'projects';
 
