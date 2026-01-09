@@ -50,11 +50,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let container: HTMLElement = $state();
 
   let valid = $state(true);
-  
+
+  // A copy is necessary so that selecting a yarn colorway doesn't update the results
+  let brandIdCopy = $state(getInitialValue('brandId'));
+
+  // A copy is necessary so that selecting a yarn colorway doesn't update the results
+  let yarnIdCopy = $state(getInitialValue('yarnId'));
+
   let inputTypeColorValue = $derived(hex);
-  
+
   let inputTypeTextValue = $derived(hex);
-  
+
+  let title = $derived(index !== null ? `${index + 1}` : '');
+
+  let currentColor = $derived({ hex });
+
   let selectedColors = $derived([
     {
       hex,
@@ -68,10 +78,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     },
   ]);
 
-  let title = $derived(index !== null ? `${index + 1}` : '');
+  let href = $derived(affiliate_variant_href || variant_href);
 
-  let currentColor = $derived({ hex });
-
+  function getInitialValue(prop: string) {
+    if (prop === 'brandId') return brandId;
+    if (prop === 'yarnId') return yarnId;
+  }
 
   function inputTypeColorOnChange({ value, color }) {
     name = color?.name;
@@ -129,43 +141,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
       });
     else onChangeColor({ hex });
   }
-
 </script>
 
 <div class="p-4 text-center" bind:this={container}>
   <p class="my-2 text-center text-xs">Color {title}</p>
-  {#if affiliate_variant_href}
+  {#if href}
     <a
       class="mx-auto flex w-fit flex-wrap items-center justify-center gap-2 underline"
-      href={affiliate_variant_href}
+      {href}
       target="_blank"
       rel="noreferrer nofollow"
     >
-      <ShoppingBagIcon />
-      <span class="flex flex-col items-start">
-        <p class="text-xs">
-          {#if brandName}
-            {brandName}
-            -
-          {/if}
-          {#if yarnName}
-            {yarnName}
-          {/if}
-        </p>
-        {#if name}
-          <p class="text-2xl">{name}</p>
-        {/if}
-      </span>
-    </a>
-  {:else if variant_href}
-    <a
-      class="mx-auto inline-flex w-fit flex-wrap items-center justify-center gap-2 underline"
-      href={variant_href}
-      target="_blank"
-      rel="noreferrer nofollow"
-    >
-      <ExternalLinkIcon />
-
+      {#if affiliate_variant_href}
+        <ShoppingBagIcon />
+      {:else}
+        <ExternalLinkIcon />
+      {/if}
       <span class="flex flex-col items-start">
         <p class="text-xs">
           {#if brandName}
@@ -211,8 +202,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <YarnGridSelect
     limit={true}
     bind:selectedColors
-    selectedBrandId={brandId}
-    selectedYarnId={yarnId}
+    selectedBrandId={brandIdCopy}
+    selectedYarnId={yarnIdCopy}
     incomingColor={currentColor}
     onClickScrollToTop={() => {
       container.scrollIntoView({

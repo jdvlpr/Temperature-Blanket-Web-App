@@ -66,13 +66,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
     scrollToTopButtonBottom = '100px',
   }: Props = $props();
 
-  let loadMoreSpinner = $state(),
-    loadMoreColors = $state();
+  let loadMoreSpinner = $state();
+
+  let loadMoreColors = $state();
 
   let selectedYarnWeightId = $state('');
 
   let filtersContainer = $state();
+
   let showScrollToTopButton = $state(false);
+
   let scrollObserver = new IntersectionObserver(
     (entries, observer) => {
       entries.forEach((entry) => {
@@ -86,28 +89,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     { threshold: 1 },
   );
 
-  $effect(() => {
-    scrollObserver.observe(filtersContainer);
-    loadMoreColors = new IntersectionObserver(
-      function (element) {
-        // isIntersecting is true when element and viewport are overlapping
-        // isIntersecting is false when element and viewport don't overlap
-        if (element[0].isIntersecting === true) {
-          if (itemsToShow <= results.length)
-            itemsToShow += YARN_COLORWAYS_PER_PAGE;
-          getResults;
-        }
-      },
-      { threshold: [0] },
-    );
-    if (!selectedBrandId && !selectedYarnId && defaultYarn.value) {
-      let { brandId, yarnId } = stringToBrandAndYarnDetails(defaultYarn.value);
-      if (brandId) selectedBrandId = brandId;
-      if (yarnId) selectedYarnId = yarnId;
-    }
-  });
+  let hasIncomingColor = $state(selectedColors.length);
 
-  let hasIncomingColor = !!selectedColors.length;
   let itemsToShow = $state(YARN_COLORWAYS_PER_PAGE);
 
   // This is for preview extra colors, so that they can be marked as selected even though their color object only has a hex
@@ -119,9 +102,67 @@ If not, see <https://www.gnu.org/licenses/>. -->
   );
 
   let sortColors = $state(hasIncomingColor ? 'best-match' : 'default');
+
   let results = $state([]);
+
   let gettingResults = $state(true);
+
   let loadingAllColors = $state(false);
+
+  let yarns = $derived(
+    selectedBrandId === ''
+      ? brands
+          .flatMap((n, i) =>
+            n.yarns.map((n) => {
+              return {
+                ...n,
+                brandId: brands[i].id,
+                brandName: brands[i].name,
+              };
+            }),
+          )
+          .sort((a, b) => {
+            const nameA = a.name.toUpperCase(); // ignore upper and lowercase
+            const nameB = b.name.toUpperCase(); // ignore upper and lowercase
+            if (nameA > nameB) {
+              return 1;
+            }
+            if (nameA < nameB) {
+              return -1;
+            }
+            // names must be equal
+            return 0;
+          })
+      : brands
+          ?.filter((brand) => brand.id === selectedBrandId)
+          ?.flatMap((n) => {
+            return n.yarns.map((yarn) => {
+              return {
+                ...yarn,
+                brandId: n.id,
+                brandName: n.name,
+              };
+            });
+          }),
+  );
+
+  let totalResults = $derived(
+    yarns
+      .filter((yarn) => {
+        if (!selectedYarnId) return true;
+        return yarn.id === selectedYarnId;
+      })
+      .filter((yarn) => {
+        if (!selectedYarnWeightId) return true;
+        return yarn.weightId === selectedYarnWeightId;
+      })
+      .flatMap((n) => n.colorways.map((m) => m.colors.length))
+      .reduce((partialSum, a) => partialSum + a, 0),
+  );
+
+  let selectedIds = $derived(
+    selectedColors.map((n) => `${n.hex}${n.name}${n.brandId}${n.yarnId}`),
+  );
 
   function getResults() {
     gettingResults = true;
@@ -192,8 +233,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     affiliate_variant_href,
   }) {
     if (canMarkIfHexMatches) canMarkIfHexMatches = false;
+
     const matchId = `${hex}${name}${brandId}${yarnId}`;
     const doesMatch = selectedIds.includes(matchId);
+
     if (doesMatch && selectedColors.length > 0 && !limit) {
       //remove the color
       const index = selectedIds.indexOf(matchId);
@@ -229,59 +272,29 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 
   $effect(() => {
-    if (loadMoreSpinner) loadMoreColors.observe(loadMoreSpinner);
+    scrollObserver.observe(filtersContainer);
+    loadMoreColors = new IntersectionObserver(
+      function (element) {
+        // isIntersecting is true when element and viewport are overlapping
+        // isIntersecting is false when element and viewport don't overlap
+        if (element[0].isIntersecting === true) {
+          if (itemsToShow <= results.length)
+            itemsToShow += YARN_COLORWAYS_PER_PAGE;
+          getResults;
+        }
+      },
+      { threshold: [0] },
+    );
+    if (!selectedBrandId && !selectedYarnId && defaultYarn.value) {
+      let { brandId, yarnId } = stringToBrandAndYarnDetails(defaultYarn.value);
+      if (brandId) selectedBrandId = brandId;
+      if (yarnId) selectedYarnId = yarnId;
+    }
   });
 
-  let yarns = $derived(
-    selectedBrandId === ''
-      ? brands
-          .flatMap((n, i) =>
-            n.yarns.map((n) => {
-              return {
-                ...n,
-                brandId: brands[i].id,
-                brandName: brands[i].name,
-              };
-            }),
-          )
-          .sort((a, b) => {
-            const nameA = a.name.toUpperCase(); // ignore upper and lowercase
-            const nameB = b.name.toUpperCase(); // ignore upper and lowercase
-            if (nameA > nameB) {
-              return 1;
-            }
-            if (nameA < nameB) {
-              return -1;
-            }
-            // names must be equal
-            return 0;
-          })
-      : brands
-          ?.filter((brand) => brand.id === selectedBrandId)
-          ?.flatMap((n) => {
-            return n.yarns.map((yarn) => {
-              return {
-                ...yarn,
-                brandId: n.id,
-                brandName: n.name,
-              };
-            });
-          }),
-  );
-
-  let totalResults = $derived(
-    yarns
-      .filter((yarn) => {
-        if (!selectedYarnId) return true;
-        return yarn.id === selectedYarnId;
-      })
-      .filter((yarn) => {
-        if (!selectedYarnWeightId) return true;
-        return yarn.weightId === selectedYarnWeightId;
-      })
-      .flatMap((n) => n.colorways.map((m) => m.colors.length))
-      .reduce((partialSum, a) => partialSum + a, 0),
-  );
+  $effect(() => {
+    if (loadMoreSpinner) loadMoreColors.observe(loadMoreSpinner);
+  });
 
   $effect(() => {
     selectedBrandId;
@@ -296,10 +309,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
       getResults();
     });
   });
-
-  let selectedIds = $derived(
-    selectedColors.map((n) => `${n.hex}${n.name}${n.brandId}${n.yarnId}`),
-  );
 </script>
 
 <div
