@@ -426,12 +426,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <h2 class="my-2 text-lg font-bold">Save</h2>
       {#if browser && typeof window.localStorage !== 'undefined' && weather.data.length}
         {#if project.status.saved}
-          <p
-            class="preset-filled-success-100-900 rounded-container inline-flex w-full items-center justify-start gap-2 p-2"
-          >
-            <CircleCheckBigIcon style="size-4" />
+          <p class="inline-flex w-full items-center justify-start gap-2">
+            <CircleCheckBigIcon style="size-4" class="text-success-900-100" />
             Project and {#if weather.isUserEdited}custom weather{:else}weather{/if}
-            data saved to this web browser
+            data saved to this web browser.
           </p>
         {:else if project.status.error.code === 1}
           <div class="text-warning-500 flex flex-col gap-2">

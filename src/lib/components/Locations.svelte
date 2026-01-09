@@ -47,7 +47,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <p
       class="flex w-full flex-wrap items-center justify-center gap-1 text-center text-sm"
     >
-      <CircleCheckBigIcon class=" size-4" />
+      <CircleCheckBigIcon class="text-success-900-100 size-4" />
       {#if weather.isFromLocalStorage && weather.data}
         Loaded project and {#if weather.isUserEdited}custom weather{:else}weather{/if}
         data
