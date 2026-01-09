@@ -35,6 +35,17 @@ export const entries: ChangelogItemGroup[] = [
           {
             notes: [
               {
+                icon: ICONS.checkCircle,
+                text: `42 colorways`,
+                title:
+                  "Added New Yarn: Aunt Lydia's - Classic Crochet Thread 10",
+              },
+            ],
+            version: '5.36.0',
+          },
+          {
+            notes: [
+              {
                 icon: ICONS.design,
                 instructions:
                   'In the Preview tab, select Seasons in the settings to try it out. Note that not all preview pattern types support seasons, but more may be added later. This is a beta feature, and may have unexpected issues. <a href="/documentation#assigning-seasons" class="link">Learn more in the documentation</a>.',
@@ -44,21 +55,6 @@ export const entries: ChangelogItemGroup[] = [
               },
             ],
             version: '5.35.0',
-          },
-          {
-            notes: [
-              {
-                icon: ICONS.checkCircle,
-                text: `84 colorways`,
-                title: 'Added New Yarn: Lion Brand - Hometown',
-              },
-              {
-                icon: ICONS.checkCircle,
-                text: `12 colorways added`,
-                title: 'Added Colorways: Lion Brand - Hue + Me',
-              },
-            ],
-            version: '5.34.0',
           },
           {
             notes: [
