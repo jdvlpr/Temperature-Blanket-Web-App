@@ -472,7 +472,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </div>
 
         <button
-          class="btn preset-filled inline-flex w-fit flex-wrap items-center gap-2"
+          class="btn hover:preset-tonal"
           onclick={() => {
             saveProject({ copy: true });
           }}
