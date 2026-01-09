@@ -16,7 +16,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script>
   import { PopoverInstance } from '$lib/state';
   import { getTextColor } from '$lib/utils';
-  import { fade, scale } from 'svelte/transition';
+  import { scale } from 'svelte/transition';
 
   /**
    * @typedef {Object} Props
@@ -37,7 +37,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <div
     class="rounded-container flex w-full overflow-hidden"
     style="height:{height}"
-    in:fade
   >
     {#if colors}
       {#each colors as { hex, brandName, yarnName, name }}
