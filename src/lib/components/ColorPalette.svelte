@@ -28,9 +28,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   /** @type {Props} */
   let { colors, schemeName = 'Palette Preview', height = '70px' } = $props();
 
-  $effect(() => {
-    if (schemeName === 'Custom') schemeName = 'Color Palette';
-  });
+  let label = $derived(schemeName === 'Custom' ? 'Color Palette' : schemeName);
 </script>
 
 <div class="flex w-full flex-col gap-y-1 text-left">
@@ -95,5 +93,5 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {/each}
     {/if}
   </div>
-  <p class="line-clamp-2 text-xs">{@html schemeName}</p>
+  <p class="line-clamp-2 text-xs">{@html label}</p>
 </div>
