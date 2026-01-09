@@ -425,7 +425,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/if}
 
   {#if pages.save}
-    <div class="mb-4 flex flex-col items-start justify-center gap-2">
+    <div class="mb-8 flex flex-col items-start justify-center gap-2">
       <h2 class="my-2 text-lg font-bold">Save</h2>
       {#if browser && typeof window.localStorage !== 'undefined' && weather.data.length}
         {#if project.status.saved}
@@ -460,14 +460,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
         <p class="text-lg font-bold">Recommended Next Steps:</p>
 
-        <p class="font-bold">1) Save your Project URL</p>
+        <div>
+          <p class="font-bold">1) Save your Project URL</p>
 
-        <p class="">
-          Keep your project URL somewhere safe like a note, bookmark, or
-          document. Use the link to open your project in any web browser, or
-          share it for others to see. If this browser's storage is cleared,
-          you'll need the project URL to open your project again.
-        </p>
+          <p class="">
+            Keep your project URL somewhere safe like a note, bookmark, or
+            document. Use the link to open your project in any web browser, or
+            share it for others to see. If this browser's site data is cleared,
+            you'll need the project URL to open your project again.
+          </p>
+        </div>
 
         <button
           class="btn preset-filled inline-flex w-fit flex-wrap items-center gap-2"
@@ -485,17 +487,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {project.url.href}
         </p>
 
-        <p class="font-bold">2) Backup the Weather Data</p>
+        <div>
+          <p class="font-bold">2) Backup the Weather Data</p>
 
-        <p>
-          By saving the {#if weather.isUserEdited}custom
-          {/if} weather data as a CSV file, you can later
-          <a
-            href="/documentation#import-weather-data"
-            class="link"
-            target="_blank">import the weather data</a
-          >, if needed.
-        </p>
+          <p>
+            Saving the {#if weather.isUserEdited}custom
+            {/if} weather data as a CSV file so you can later
+            <a
+              href="/documentation#import-weather-data"
+              class="link"
+              target="_blank">import the weather data</a
+            >, if needed.
+          </p>
+        </div>
 
         <button
           class="btn hover:preset-tonal"
@@ -503,7 +507,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           title="Download CSV File"
         >
           <DownloadIcon />
-          Weather Data (CSV)</button
+          Download Weather Data (CSV)</button
         >
       {:else}
         <p>To save a project, you first need to get weather data.</p>
