@@ -40,6 +40,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '$lib/utils';
   import { ProjectStorage } from '$lib/storage/projects';
   import {
+    ChevronDownIcon,
     CircleCheckBigIcon,
     ClipboardCopyIcon,
     DownloadIcon,
@@ -51,6 +52,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import WeatherGrouping from '../WeatherGrouping.svelte';
   import WeatherSourceButton from '../buttons/WeatherSourceButton.svelte';
   import { setProjectInStorage } from '$lib/storage/storage-utils.svelte';
+  import { Accordion } from '@skeletonlabs/skeleton-svelte';
+  import { safeSlide } from '$lib/features/transitions/safeSlide';
   interface Props {
     page?: string;
     highlight?: string;
@@ -426,9 +429,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <h2 class="my-2 text-lg font-bold">Save</h2>
       {#if browser && typeof window.localStorage !== 'undefined' && weather.data.length}
         {#if project.status.saved}
-          <p
-            class="inline-flex w-full items-center justify-start gap-2 font-semibold"
-          >
+          <p class="inline-flex w-full items-center justify-start gap-2">
             <CircleCheckBigIcon style="size-4" class="text-success-900-100" />
             Project and {#if weather.isUserEdited}custom weather{:else}weather{/if}
             data saved to this web browser.
@@ -448,10 +449,24 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </div>
         {/if}
 
+        {#if currentProjectIndex && currentProjectIndex?.meta}
+          <div class="w-full">
+            <ProjectDetails
+              project={currentProjectIndex.meta}
+              canRemove={false}
+            />
+          </div>
+        {/if}
+
+        <p class="text-lg font-bold">Recommended Next Steps:</p>
+
+        <p class="font-bold">1) Save your Project URL</p>
+
         <p class="">
-          Save the project URL below somewhere safe like a note, bookmark, or
+          Keep your project URL somewhere safe like a note, bookmark, or
           document. Use the link to open your project in any web browser, or
-          share it for others to see.
+          share it for others to see. If this browser's storage is cleared,
+          you'll need the project URL to open your project again.
         </p>
 
         <button
@@ -470,35 +485,25 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {project.url.href}
         </p>
 
-        {#if currentProjectIndex && currentProjectIndex?.meta}
-          <div class="w-full">
-            <ProjectDetails
-              project={currentProjectIndex.meta}
-              canRemove={false}
-            />
-          </div>
-        {/if}
+        <p class="font-bold">2) Backup the Weather Data</p>
 
         <p>
-          If this browser's storage is cleared, you'll need the project URL to
-          open your project again. You may also want to backup the {#if weather.isUserEdited}custom
-          {/if} weather data as a CSV file by using the button below, so that you
-          can later
+          By saving the {#if weather.isUserEdited}custom
+          {/if} weather data as a CSV file, you can later
           <a
             href="/documentation#import-weather-data"
             class="link"
             target="_blank">import the weather data</a
-          >.
+          >, if needed.
         </p>
 
         <button
           class="btn hover:preset-tonal"
-          onclick={() => {
-            goTo('download');
-          }}
+          onclick={downloadWeatherCSV}
+          title="Download CSV File"
         >
-          <DownloadIcon class="" />
-          <span class="">Download this project</span></button
+          <DownloadIcon />
+          Weather Data (CSV)</button
         >
       {:else}
         <p>To save a project, you first need to get weather data.</p>
