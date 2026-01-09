@@ -142,22 +142,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <meta property="og:image:height" content="630" />
 </svelte:head>
 
-{#snippet gettingStarted()}
-  <button
-    aria-label="Getting Started Guide"
-    onclick={() => {
-      dialog.trigger({
-        type: 'component',
-        component: { ref: GettingStarted },
-      });
-    }}
-    class="btn preset-filled-secondary-500 text-surface-contrast-500 gap-2"
-  >
-    <LightbulbIcon />
-    Getting Started
-  </button>
-{/snippet}
-
 <AppShell pageName="">
   {#snippet stickyHeader()}
     <div class="hidden lg:inline-flex">
@@ -251,7 +235,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       aria-orientation="vertical"
                       aria-label="Help Menu"
                     >
-                      {@render gettingStarted()}
+                      <button
+                        aria-label="Getting Started Guide"
+                        onclick={() => {
+                          dialog.trigger({
+                            type: 'component',
+                            component: { ref: GettingStarted },
+                          });
+                        }}
+                        class="btn preset-filled-secondary-500 text-surface-contrast-500 gap-2"
+                      >
+                        <LightbulbIcon />
+                        Getting Started
+                      </button>
 
                       <p>
                         <a

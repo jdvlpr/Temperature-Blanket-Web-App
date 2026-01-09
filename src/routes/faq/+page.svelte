@@ -51,6 +51,38 @@ If not, see <https://www.gnu.org/licenses/>. -->
             multiple
             class="w-full"
           >
+            <Accordion.Item value="what-is-temperature-blanket">
+              <Accordion.ItemTrigger
+                class="flex items-center justify-between gap-2"
+              >
+                <div class="flex items-center gap-2">
+                  <CircleQuestionMarkIcon />
+
+                  <p class="font-bold">What is a Temperature Blanket?</p>
+                </div>
+
+                <Accordion.ItemIndicator class="group">
+                  <ChevronDownIcon
+                    class="h-5 w-5 transition group-data-[state=open]:rotate-180"
+                  />
+                </Accordion.ItemIndicator>
+              </Accordion.ItemTrigger>
+
+              <Accordion.ItemContent>
+                {#snippet element(attributes)}
+                  {#if !attributes.hidden}
+                    <div {...attributes} transition:safeSlide>
+                      See this blog post: <a
+                        href="/blog/what-is-a-temperature-blanket"
+                        class="link whitespace-pre-wrap"
+                      >
+                        What's a Temperature Blanket?</a
+                      >
+                    </div>
+                  {/if}
+                {/snippet}
+              </Accordion.ItemContent>
+            </Accordion.Item>
             <Accordion.Item value="weather-data-inaccurate">
               <Accordion.ItemTrigger
                 class="flex items-center justify-between gap-2"
