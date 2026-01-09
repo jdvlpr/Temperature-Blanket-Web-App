@@ -252,20 +252,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       aria-label="Help Menu"
                     >
                       {@render gettingStarted()}
-                      <p>
-                        <a
-                          href="/blog/what-is-a-temperature-blanket"
-                          class="link"
-                          rel="noreferrer"
-                        >
-                          What's a Temperature Blanket?</a
-                        >
-                      </p>
 
                       <p>
                         <a
                           href="/faq"
-                          rel="noopener noreferrer"
                           title="View Frequently Asked Questions"
                           class="link"
                         >
@@ -274,15 +264,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       </p>
 
                       <p>
-                        <a href="/changelog" rel="noreferrer" class="link"
-                          >What's New?</a
-                        >
+                        <a href="/changelog" class="link">What's New?</a>
                       </p>
 
                       <p>
-                        <a href="/documentation" rel="noreferrer" class="link"
-                          >Documentation</a
-                        >
+                        <a href="/documentation" class="link">Documentation</a>
                       </p>
                     </div>
                   </Popover.Description>
