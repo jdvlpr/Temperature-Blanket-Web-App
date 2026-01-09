@@ -491,7 +491,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <p class="font-bold">2) Backup the Weather Data</p>
 
           <p>
-            Saving the {#if weather.isUserEdited}custom
+            Save the {#if weather.isUserEdited}custom
             {/if} weather data as a CSV file so you can later
             <a
               href="/documentation#import-weather-data"
