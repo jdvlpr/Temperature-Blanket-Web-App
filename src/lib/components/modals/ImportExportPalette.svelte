@@ -54,13 +54,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let colorHexesWithHashes = $state(true);
 
   let includeBrandInImage = $derived(colors.some((n) => n.brandName));
+  let includeYarnInImage = $derived(colors.some((n) => n.yarnName));
   let includeColorwayInImage = $derived(colors.some((n) => n.name));
   let includeHexInImage = $state(false);
   let includeSpacingInImage = $state(false);
-
-  onMount(() => {
-    includeHexInImage = !includeBrandInImage && !includeColorwayInImage;
-  });
 
   let isExpanded = $state(false);
 
@@ -74,6 +71,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           includeColorway: includeColorwayInImage,
           includeHex: includeHexInImage,
           includeBrand: includeBrandInImage,
+          includeYarn: includeYarnInImage,
           includeSpacing: includeSpacingInImage,
         })
       : null,
@@ -140,9 +138,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
       });
     }
   }
-
   onMount(() => {
-    includeHexInImage = !includeBrandInImage && !includeColorwayInImage;
+    includeHexInImage =
+      !includeBrandInImage && !includeYarnInImage && !includeColorwayInImage;
   });
 </script>
 
@@ -355,7 +353,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   <div class="flex cursor-pointer items-center gap-2">
                     <ToggleSwitch
                       bind:checked={includeBrandInImage}
-                      label="Yarn Brand"
+                      label="Brand Name"
+                    />
+                  </div>
+                {/if}
+                {#if colors.some((n) => n.yarnName)}
+                  <div class="flex cursor-pointer items-center gap-2">
+                    <ToggleSwitch
+                      bind:checked={includeYarnInImage}
+                      label="Yarn Name"
                     />
                   </div>
                 {/if}

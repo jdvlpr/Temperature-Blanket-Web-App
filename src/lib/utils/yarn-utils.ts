@@ -128,10 +128,16 @@ export const getColorways = ({
 };
 
 type PaletteImageOptions = {
-  colors: Array<{ hex: string; name?: string; brandName?: string }>;
+  colors: Array<{
+    hex: string;
+    name?: string;
+    brandName?: string;
+    yarnName?: string;
+  }>;
   includeColorway?: boolean;
   includeHex?: boolean;
   includeBrand?: boolean;
+  includeYarn?: boolean;
   includeSpacing?: boolean;
 };
 
@@ -140,6 +146,7 @@ export function generatePaletteImage({
   includeColorway = false,
   includeHex = false,
   includeBrand = false,
+  includeYarn = false,
   includeSpacing = true,
 }: PaletteImageOptions): string {
   // Create high-resolution canvas
@@ -264,21 +271,35 @@ export function generatePaletteImage({
 
     // Prepare text with appropriate size based on content
     const useSmallFont =
-      includeColorway && color.name && (includeBrand || includeHex);
+      includeColorway &&
+      color.name &&
+      (includeBrand || includeYarn || includeHex);
     const textInfo = [];
 
-    if (includeBrand && color.brandName) {
+    if (includeBrand && color.brandName && includeYarn && color.yarnName) {
+      textInfo.push({
+        text: `${color.brandName} - ${color.yarnName}`,
+        fontSize: useSmallFont ? smallFontSize : normalFontSize,
+      });
+    } else if (includeBrand && color.brandName) {
       textInfo.push({
         text: color.brandName,
         fontSize: useSmallFont ? smallFontSize : normalFontSize,
       });
+    } else if (includeYarn && color.yarnName) {
+      textInfo.push({
+        text: color.yarnName,
+        fontSize: useSmallFont ? smallFontSize : normalFontSize,
+      });
     }
+
     if (includeColorway && color.name) {
       textInfo.push({
         text: color.name,
         fontSize: normalFontSize,
       });
     }
+
     if (includeHex) {
       textInfo.push({
         text: color.hex,
