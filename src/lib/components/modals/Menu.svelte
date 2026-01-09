@@ -426,7 +426,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <h2 class="my-2 text-lg font-bold">Save</h2>
       {#if browser && typeof window.localStorage !== 'undefined' && weather.data.length}
         {#if project.status.saved}
-          <p class="inline-flex w-full items-center justify-start gap-2">
+          <p
+            class="inline-flex w-full items-center justify-start gap-2 font-semibold"
+          >
             <CircleCheckBigIcon style="size-4" class="text-success-900-100" />
             Project and {#if weather.isUserEdited}custom weather{:else}weather{/if}
             data saved to this web browser.
@@ -447,7 +449,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {/if}
 
         <p class="">
-          To access this project from any web browser, use the URL below:
+          Save the project URL below somewhere safe like a note or document. Use
+          the link to open your project in any web browser, or share it for
+          others to see. If this browser's storage is cleared, you'll need the
+          link to open your project again. You may also want to backup the {#if weather.isUserEdited}custom
+          {/if} weather data as a CSV file by using the
+          <span class="italic">Download this project</span> button below, so
+          that you can later
+          <a
+            href="/documentation#import-weather-data"
+            class="link"
+            target="_blank">import the weather data</a
+          >.
         </p>
 
         <button

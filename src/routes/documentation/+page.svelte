@@ -428,8 +428,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 target="_blank">temperature-blanket.com</a
               >
               is a tool for planning a crocheted or knitted project which incorporates
-              weather data into its design. If you don’t know what a temperature
-              blanket is, you can learn more here:
+              weather data into its design. If you don’t know what a temperature blanket
+              is, you can learn more here:
               <a class="link" href="/blog/what-is-a-temperature-blanket/"
                 >What is a Temperature Blanket?</a
               >
@@ -900,9 +900,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   >
                   platform provides access to open data from thousands of weather
                   stations world-wide. Measurements from the nearest stations are
-                  combined to produce an interpolated result. You can optionally
-                  choose to not fill missing weather with statistically optimized
-                  model data. (Filling missing weather data is on by default.)
+                  combined to produce an interpolated result. You can optionally choose
+                  to not fill missing weather with statistically optimized model data.
+                  (Filling missing weather data is on by default.)
                 </p>
                 <p class="">
                   Weather data from
@@ -1016,12 +1016,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     of the week
                   </li>
                   <li>
-                    <span class="font-bold">Rain</span> – The sum of rainfall of
-                    the days in the week
+                    <span class="font-bold">Rain</span> – The sum of rainfall of the
+                    days in the week
                   </li>
                   <li>
-                    <span class="font-bold">Snow</span> – The sum of snowfall of
-                    the days in the week
+                    <span class="font-bold">Snow</span> – The sum of snowfall of the
+                    days in the week
                   </li>
                   <li>
                     <span class="font-bold">Sun</span> – The average daytime of the
@@ -1080,9 +1080,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
               To edit weather data, your project’s <a
                 class="link"
                 href="#grouping-weather-data">weather grouping</a
-              > must be Daily, not Weekly. To edit weather data, press the value
-              you want to change in the table under the weather chart. A modal will
-              open where you can save the new value.
+              > must be Daily, not Weekly. To edit weather data, press the value you
+              want to change in the table under the weather chart. A modal will open
+              where you can save the new value.
             </p>
             <p>
               If you want to edit many values, it may be easier to work with the
@@ -1129,11 +1129,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <h3 class="text-xl font-bold">Import Weather Data</h3>
 
             <p>
-              To import weather data, press the Import Weather Data button; a
-              modal will open where you can upload the CSV weather data file,
-              then press Import to load the weather data into your project. Note
-              that your project’s <a class="link" href="#grouping-weather-data"
-                >weather grouping</a
+              To import weather data, press the Import Weather Data button in
+              the Weather tab; a modal will open where you can upload the CSV
+              weather data file, then press Import to load the weather data into
+              your project. Note that your project’s <a
+                class="link"
+                href="#grouping-weather-data">weather grouping</a
               >
               must be Daily, not Weekly.
             </p>
@@ -1700,8 +1701,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 <span class="font-bold">Chevrons</span> – Zig-zag rows of stitches
               </li>
               <li>
-                <span class="font-bold">Continuous Square</span> – Starting from
-                the center, stitches are added in a clockwise square pattern. Possible
+                <span class="font-bold">Continuous Square</span> – Starting from the
+                center, stitches are added in a clockwise square pattern. Possible
                 crochet patterns: Granny Square, Moss Stitch/Linen Stitch Square.
               </li>
               <li>
@@ -1737,12 +1738,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 <span class="font-bold">Rows</span> – Straight rows of stitches
               </li>
               <li>
-                <span class="font-bold">Split Month Squares</span> – Each square
-                represents one month. Each round in a square represents one day,
-                starting with the first of the month in the center of the square.
-                Each round is split in half to represent two different weather parameters.
-                Months with fewer days have extra rounds added, so that each square
-                has the same number of rounds.
+                <span class="font-bold">Split Month Squares</span> – Each square represents
+                one month. Each round in a square represents one day, starting with
+                the first of the month in the center of the square. Each round is
+                split in half to represent two different weather parameters. Months
+                with fewer days have extra rounds added, so that each square has the
+                same number of rounds.
               </li>
               <li>
                 <span class="font-bold">Square Rounds</span> – Each round in a square
