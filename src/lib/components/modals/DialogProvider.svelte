@@ -22,7 +22,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { EyeIcon } from '@lucide/svelte';
 </script>
 
-<Dialog open={dialog.opened} onOpenChange={(e) => (dialog.opened = e.open)}>
+<Dialog
+  open={dialog.opened}
+  onOpenChange={(e) => (dialog.opened = e.open)}
+  initialFocusEl={undefined}
+>
   <Portal>
     <Dialog.Backdrop
       class="bg-surface-50-950/50 fixed inset-0 z-50 backdrop-blur-md"
@@ -31,7 +35,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       class="fixed inset-0 z-50 flex items-center justify-center"
     >
       <Dialog.Content
-        class="card bg-surface-50 dark:bg-surface-950 max-h-[100svh] space-y-4 overflow-auto shadow-xl max-sm:min-w-[100vw] lg:max-h-[80svh] {dialog
+        class="card bg-surface-50 dark:bg-surface-950 max-h-svh space-y-4 overflow-auto shadow-xl max-sm:min-w-screen lg:max-h-[80svh] {dialog
           .options.size === 'large'
           ? 'max-w-(--breakpoint-lg)'
           : dialog.options.size === 'medium'
