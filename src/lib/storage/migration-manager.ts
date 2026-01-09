@@ -28,7 +28,7 @@ export class MigrationManager {
     try {
       parsed = JSON.parse(legacyProjectsRaw);
     } catch (e) {
-      console.error('Migration: Invalid JSON in legacy projects', e);
+      // console.error('Migration: Invalid JSON in legacy projects', e);
       localStorage.removeItem(LEGACY_PROJECTS_KEY);
       return;
     }
@@ -65,10 +65,10 @@ export class MigrationManager {
         }
         migratedIds.push(id);
       } catch (err: any) {
-        console.error(
-          `Migration: Failed for project "${legacyProject.title}"`,
-          err,
-        );
+        // console.error(
+        //   `Migration: Failed for project "${legacyProject.title}"`,
+        //   err,
+        // );
         failedProjects.push({
           title: legacyProject.title || 'Untitled',
           error: err.message || 'Unknown error',
@@ -81,7 +81,7 @@ export class MigrationManager {
       localStorage.removeItem(LEGACY_PROJECTS_KEY);
     } else {
       const errorMsg = `Migration: Only ${migratedIds.length} of ${parsed.length} projects were migrated. Errors: ${failedProjects.map((f) => f.title).join(', ')}`;
-      console.error(errorMsg);
+      // console.error(errorMsg);
       throw new Error(errorMsg);
     }
   }
