@@ -449,18 +449,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {/if}
 
         <p class="">
-          Save the project URL below somewhere safe like a note or document. Use
-          the link to open your project in any web browser, or share it for
-          others to see. If this browser's storage is cleared, you'll need the
-          link to open your project again. You may also want to backup the {#if weather.isUserEdited}custom
-          {/if} weather data as a CSV file by using the
-          <span class="italic">Download this project</span> button below, so
-          that you can later
-          <a
-            href="/documentation#import-weather-data"
-            class="link"
-            target="_blank">import the weather data</a
-          >.
+          Save the project URL below somewhere safe like a note, bookmark, or
+          document. Use the link to open your project in any web browser, or
+          share it for others to see.
         </p>
 
         <button
@@ -488,14 +479,26 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </div>
         {/if}
 
+        <p>
+          If this browser's storage is cleared, you'll need the project URL to
+          open your project again. You may also want to backup the {#if weather.isUserEdited}custom
+          {/if} weather data as a CSV file by using the button below, so that you
+          can later
+          <a
+            href="/documentation#import-weather-data"
+            class="link"
+            target="_blank">import the weather data</a
+          >.
+        </p>
+
         <button
           class="btn hover:preset-tonal"
           onclick={() => {
             goTo('download');
           }}
         >
-          <DownloadIcon class="relative -top-[2px] mr-1 inline" />
-          <span class="link">Download this project</span></button
+          <DownloadIcon class="" />
+          <span class="">Download this project</span></button
         >
       {:else}
         <p>To save a project, you first need to get weather data.</p>
