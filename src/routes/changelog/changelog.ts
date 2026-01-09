@@ -35,7 +35,7 @@ export const entries: ChangelogItemGroup[] = [
           {
             notes: [
               {
-                icon: ICONS.checkCircle,
+                icon: ICONS.design,
                 instructions:
                   'In the Preview tab, select Seasons in the settings to try it out. Note that not all preview pattern types support seasons, but more may be added later. This is a beta feature, and may have unexpected issues. <a href="/documentation#assigning-seasons" class="link">Learn more in the documentation</a>.',
                 text: `Assign different weather parameters for different seasons when previewing your project's colors.`,
