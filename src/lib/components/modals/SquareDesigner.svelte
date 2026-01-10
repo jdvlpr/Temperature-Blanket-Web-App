@@ -35,8 +35,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     onOkay,
   } = $props();
 
-  let _secondaryTargets = $derived(secondaryTargets);
-
   const colors = {
     tmin: '#38bdf8',
     tavg: '#a3a3a3',
@@ -46,6 +44,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
     dayt: '#facc15',
     moon: '#282828',
   };
+
+  let _secondaryTargets = $state(getSecondaryTargetsCopy());
+
+  let secondaryTargetIndexes = $derived(
+    getSecondaryTargetIndexes(_secondaryTargets),
+  );
+
+  let squares = $derived(
+    createSquares(squareSize, secondaryTargetIndexes, primaryTarget),
+  );
+
+  let maxGridItemWidth = $derived(displayNumber((1 / squareSize) * 800));
+
+  function getSecondaryTargetsCopy() {
+    return secondaryTargets;
+  }
 
   function reset() {
     _secondaryTargets = [];
@@ -75,16 +89,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     }
     return _squares;
   }
-
-  let secondaryTargetIndexes = $derived(
-    getSecondaryTargetIndexes(_secondaryTargets),
-  );
-
-  let squares = $derived(
-    createSquares(squareSize, secondaryTargetIndexes, primaryTarget),
-  );
-
-  let maxGridItemWidth = $derived(displayNumber((1 / squareSize) * 800));
 
   function _onOkay() {
     onOkay({
