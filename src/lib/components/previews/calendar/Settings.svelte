@@ -140,6 +140,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
             },
           },
         },
+        options: {
+          size: 'large',
+        },
       })}
   >
     <SpanYarnColorSelectIcon
@@ -183,6 +186,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 dialog.close();
               },
             },
+          },
+          options: {
+            size: 'large',
           },
         })}
     >

@@ -396,7 +396,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </p>
 {/if}
 
-<div class="my-4 flex flex-wrap justify-center gap-1">
+<div
+  class="my-4 grid grid-cols-1 justify-center gap-1 sm:grid-cols-2 md:grid-cols-3"
+>
   {#if results?.length && !loadingAllColors}
     {#each results as { hex, name, delta, brandName, yarnName, brandId, yarnId, variant_href, affiliate_variant_href }}
       {@const isSelected =
@@ -447,13 +449,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <Spinner />
       </div>
     {/if}
-  {:else}
-    <p class="italic">No Matching Colorways</p>
-  {/if}
-  {#if showScrollToTopButton}
-    <ToTopButton
-      bottom={scrollToTopButtonBottom}
-      onClick={onClickScrollToTop}
-    />
   {/if}
 </div>
+{#if !results?.length && !loadingAllColors}
+  <p class="text-center italic">No Matching Colorways</p>
+{/if}
+{#if showScrollToTopButton}
+  <ToTopButton bottom={scrollToTopButtonBottom} onClick={onClickScrollToTop} />
+{/if}

@@ -296,6 +296,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         onChangeColor,
                       },
                     },
+                    options: {
+                      size: 'large',
+                    },
                   })}
                 onkeydown={(e) => {
                   if (e.key === 'Enter' || e.key === ' ') {
@@ -316,6 +319,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
                           affiliate_variant_href,
                           onChangeColor,
                         },
+                      },
+                      options: {
+                        size: 'large',
                       },
                     });
                   }

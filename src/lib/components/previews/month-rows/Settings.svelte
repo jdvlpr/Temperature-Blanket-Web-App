@@ -117,6 +117,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
               },
             },
           },
+          options: {
+            size: 'large',
+          },
         })}
     >
       <SpanYarnColorSelectIcon color={monthRowsPreview.settings.borderColor} />
@@ -156,6 +159,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
               dialog.close();
             },
           },
+        },
+        options: {
+          size: 'large',
         },
       })}
   >

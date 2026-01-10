@@ -199,12 +199,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
             },
           },
         },
+        options: {
+          size: 'large',
+        },
       })}
   >
     <SpanYarnColorSelectIcon
       color={hexagonRoundsPreview.settings.additionalRoundsColor}
     />
-   Accent Color (for borders and additional rounds)
+    Accent Color (for borders and additional rounds)
   </button>
 </div>
 

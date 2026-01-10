@@ -58,7 +58,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {pluralize('column', squareRoundsPreview.settings.columns)}</span
       >
       and
-      <span class="font-semibold">{squareRoundsPreview.rows}
+      <span class="font-semibold"
+        >{squareRoundsPreview.rows}
         {pluralize('row', squareRoundsPreview.rows)}</span
       >)
       {#if extraRounds}
@@ -188,6 +189,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
               dialog.close();
             },
           },
+        },
+        options: {
+          size: 'large',
         },
       })}
   >
