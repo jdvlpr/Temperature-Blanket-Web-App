@@ -23,7 +23,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     weather,
   } from '$lib/state';
   // Note: the signal store is a weird necessity, investigate this
-  import { delay, getOpenMeteo, goToProjectSection, setSeasonsByLocation } from '$lib/utils';
+  import {
+    delay,
+    getOpenMeteo,
+    goToProjectSection,
+    setSeasonsByLocation,
+  } from '$lib/utils';
   import { onMount } from 'svelte';
   import Spinner from '../Spinner.svelte';
 

@@ -194,16 +194,6 @@ export class LocationsState implements LocationsStateType {
 
 export const locations = new LocationsState();
 
-// const LOCATIONS_KEY = Symbol('LOCATIONS');
-
-// export function setLocationsState() {
-//   return setContext(LOCATIONS_KEY, new LocationsState());
-// }
-
-// export function getLocationsState() {
-//   return getContext<ReturnType<typeof setLocationsState>>(LOCATIONS_KEY);
-// }
-
 // Controller and signal for when searching for locations
 export const controller = $state({ value: null });
 
