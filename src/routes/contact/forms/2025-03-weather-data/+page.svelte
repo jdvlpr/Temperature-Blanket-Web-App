@@ -26,8 +26,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Expand from '$lib/components/Expand.svelte';
   import Spinner from '$lib/components/Spinner.svelte';
   import { locations, project, toast, weather } from '$lib/state';
-  // Supabase is only needed when collecting debugging diagnostics
-  // import { supabase } from '$lib/supabaseClient';
   import {
     dateToISO8601String,
     dateToISO8601StringVersion2,
@@ -107,37 +105,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
         category: 'error',
       });
     }
-
-    // Uncomment for temporary debugging diagnostics
-    // Make sure the Supabase instance is running
-    // if (!dev)
-    //   await supabase.from('Weather Data Feedback').insert({
-    //     dev,
-    //     version,
-    //     flag: true,
-    //     pid: +project.timeStampId || 0,
-    //     details: {
-    //       form: {
-    //         a_stringToDate: stringToDate('2025-01-01'),
-    //         b_stringToDateVersion2: stringToDateVersion2('2025-01-01'),
-    //         c_dateToISO8601String: {
-    //           stringToDate: dateToISO8601String(stringToDate('2025-01-01')),
-    //           stringToDateVersion2: dateToISO8601String(
-    //             stringToDateVersion2('2025-01-01'),
-    //           ),
-    //         },
-    //         e_dateToISO8601StringVersion2: {
-    //           stringToDate: dateToISO8601StringVersion2(
-    //             stringToDate('2025-01-01'),
-    //           ),
-    //           stringToDateVersion2: dateToISO8601StringVersion2(
-    //             stringToDateVersion2('2025-01-01'),
-    //           ),
-    //         },
-    //         jsonObject,
-    //       },
-    //     },
-    //   });
   }
 
   $effect(() => {

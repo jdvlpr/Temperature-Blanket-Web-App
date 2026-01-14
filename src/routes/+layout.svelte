@@ -28,7 +28,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     toast,
   } from '$lib/state';
   import { initializeLocalStorage } from '$lib/storage/storage-utils.svelte.ts';
-  import { supabase } from '$lib/features/diagnostics/supabaseClient';
   import { handleKeyDown, privacy } from '$lib/utils';
   import { YoutubeIcon } from '@lucide/svelte';
   import { onMount, type Snippet } from 'svelte';
@@ -39,28 +38,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
   let { children }: Props = $props();
 
-  // In extreme cases where a user's localstorage space has filled up, there is a possibility for an error when migrating the projects to a new storage system in localstorage. In that case, supabase is used to collect diagnostic data in case a user needs help recovering projects. This is meant as a temporary solution unit it can be confirmed that the migration is successful; This is a worst-case fallback, and the normal migration path should handle most (all, hopefully) issues.
-  async function logMigrationError({ uid }) {
-    const projects = project.status.temporaryProjectsBackup;
-    const { error } = await supabase.from('project_migration').insert({
-      dev,
-      version,
-      uid,
-      projects_length: projects.length,
-      projects,
-    });
-    return { error };
-  }
-
   onMount(async () => {
     try {
       await initializeLocalStorage();
     } catch (e) {
       if (!project.status.temporaryProjectsBackup.length) return;
       const uid = crypto.randomUUID();
-      const { error } = await logMigrationError({ uid });
       project.status.temporaryUid = uid;
-      project.status.temporaryError = error;
       dialog.trigger({
         type: 'component',
         component: { ref: LegacyMigrationError, props: { uid, error } },

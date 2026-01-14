@@ -96,7 +96,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   class="my-2 flex w-fit min-w-[268px] flex-col items-start justify-start gap-2 text-left lg:px-2"
   data-sveltekit-preload-data="hover"
 >
-  {#if project.status.temporaryProjectsBackup && project.status.temporaryUid}
+  {#if project.status.temporaryProjectsBackup && project.status.temporaryProjectsBackup.length && project.status.temporaryUid}
     <!--Access backups for project storage migration error, added in version 5.35.0 -->
     <button
       class="btn preset-filled-error-500"
@@ -107,7 +107,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
             ref: LegacyMigrationError,
             props: {
               uid: project.status.temporaryUid,
-              error: project.status.temporaryError,
             },
           },
           options: {
