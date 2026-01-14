@@ -36,6 +36,16 @@ export const entries: ChangelogItemGroup[] = [
             notes: [
               {
                 icon: ICONS.checkCircle,
+                text: `8 colorways`,
+                title: 'Added New Yarn: Loops & Threads - Soft Classic Neon',
+              },
+            ],
+            version: '5.37.0',
+          },
+          {
+            notes: [
+              {
+                icon: ICONS.checkCircle,
                 text: `42 colorways`,
                 title:
                   "Added New Yarn: Aunt Lydia's - Classic Crochet Thread 10",

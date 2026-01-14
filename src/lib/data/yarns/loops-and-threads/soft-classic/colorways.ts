@@ -3,9 +3,9 @@ import type { Colorway } from '$lib/types';
 const colorways: Colorway[] = [
   {
     source: {
-      name: 'michaels.com',
-      href: 'https://www.michaels.com/product/soft-classic-solid-yarn-by-loops-threads-10661814',
       accessed: '2024-01-02',
+      href: 'https://www.michaels.com/product/soft-classic-solid-yarn-by-loops-threads-10661814',
+      name: 'michaels.com',
     },
     colors: [
       {

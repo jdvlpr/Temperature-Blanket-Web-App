@@ -5,6 +5,7 @@ import { yarn as impeccable } from './impeccable/yarn';
 import { yarn as silkySoft } from './silky-soft/yarn';
 import { yarn as softAndShinySolid } from './soft-and-shiny/yarn';
 import { yarn as softClassic } from './soft-classic/yarn';
+import { yarn as softClassicNeon } from './soft-classic-neon/yarn';
 
 export const brand: Brand = {
   name: 'Loops & Threads',
@@ -16,5 +17,6 @@ export const brand: Brand = {
     silkySoft,
     softAndShinySolid,
     softClassic,
+    softClassicNeon,
   ],
 };
