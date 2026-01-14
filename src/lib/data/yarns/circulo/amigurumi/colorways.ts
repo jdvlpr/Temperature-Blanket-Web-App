@@ -9,251 +9,391 @@ const colorways: Colorway[] = [
     },
     colors: [
       {
-        hex: '#ecebea',
+        hex: '#cecad0',
         name: '8001 - Branco',
       },
       {
-        hex: '#c3baae',
-        name: '1706 - Flocos',
+        hex: '#cdc0b5',
+        name: '8176 - Off-white',
       },
       {
-        hex: '#c9bfb0',
+        hex: '#dbcebe',
+        name: '20 - Natural',
+      },
+      {
+        hex: '#efe2da',
         name: '3061 - Gardênia',
       },
       {
-        hex: '#b8a798',
-        name: '7062 - Amendoim',
+        hex: '#ddb99b',
+        name: '7564 - Porcelana',
       },
       {
-        hex: '#a89580',
-        name: '7096 - Craft',
+        hex: '#d2ac9c',
+        name: '7563 - Chantilly',
       },
       {
-        hex: '#847363',
-        name: '7727 - Madeira',
+        hex: '#cba696',
+        name: '7650 - Amêndoa',
       },
       {
-        hex: '#86695d',
-        name: '7603 - Castor',
-      },
-      {
-        hex: '#7e5b48',
-        name: '7713 - Lenha',
-      },
-      {
-        hex: '#8a6e52',
-        name: '7057 - Gengibre',
-      },
-      {
-        hex: '#8b715c',
+        hex: '#a37455',
         name: '7625 - Castanha',
       },
       {
-        hex: '#48332f',
+        hex: '#5b5147',
+        name: '7066 - Pedra Quente',
+      },
+      {
+        hex: '#574539',
+        name: '7603 - Castor',
+      },
+      {
+        hex: '#604938',
+        name: '7713 - Lenha',
+      },
+      {
+        hex: '#712f2f',
+        name: '7567 - Cacau',
+      },
+      {
+        hex: '#461f1b',
         name: '7569 - Brigadeiro',
       },
       {
-        hex: '#261717',
-        name: '7311 - Tabaco',
+        hex: '#443125',
+        name: '7400 - Brownie',
       },
       {
-        hex: '#934332',
-        name: '7529 - Terracota',
+        hex: '#8c3c24',
+        name: '7220 - Tâmara',
       },
       {
-        hex: '#6d3b2e',
-        name: '4095 - Rum',
+        hex: '#7b563b',
+        name: '7148 - Craft',
       },
       {
-        hex: '#7a572f',
-        name: '7049 - Capivara',
+        hex: '#684f23',
+        name: '7077 - Doce De Leite',
       },
       {
-        hex: '#bd8c33',
-        name: '7069 - Mostarda',
+        hex: '#c38b44',
+        name: '7030 - Mostarda',
       },
       {
-        hex: '#c1742b',
-        name: '4146 - Gema',
+        hex: '#9f855d',
+        name: '7076 - Caramelito',
       },
       {
-        hex: '#bc5330',
-        name: '4456 - Laranja',
+        hex: '#b2a280',
+        name: '7072 - Centeio',
       },
       {
-        hex: '#e1b730',
-        name: '1798 - Coroa',
+        hex: '#e8cc92',
+        name: '1112 - Creme',
       },
       {
-        hex: '#daba58',
+        hex: '#eedd7b',
+        name: '1730 - Amarelo-candy',
+      },
+      {
+        hex: '#e0af52',
         name: '1317 - Solar',
       },
       {
-        hex: '#f7e9bf',
-        name: '1708 - Anjo',
+        hex: '#eac86f',
+        name: '1205 - Magnólia',
       },
       {
-        hex: '#e3c6c3',
-        name: '3081 - Rosado',
+        hex: '#f6c543',
+        name: '1289 - Canário',
       },
       {
-        hex: '#d3b0c2',
-        name: '3526 - Rosa-candy',
+        hex: '#d48031',
+        name: '4146 - Gema',
       },
       {
-        hex: '#ad8078',
-        name: '3112 - Penélope',
+        hex: '#9c6223',
+        name: '4131 - Dark Cheddar',
       },
       {
-        hex: '#be9694',
-        name: '3141 - Menina',
+        hex: '#b74234',
+        name: '4095 - Rum',
       },
       {
-        hex: '#db8fb7',
-        name: '3116 - Sorvete',
+        hex: '#e35239',
+        name: '4448 - Tijolo',
       },
       {
-        hex: '#cb5190',
-        name: '3182 - Pitaya',
+        hex: '#b16b5e',
+        name: '4093 - Tafetá',
       },
       {
-        hex: '#af2d5d',
-        name: '6274 - Choque',
+        hex: '#d09982',
+        name: '4171 - Tropicália',
       },
       {
-        hex: '#be4062',
+        hex: '#c07a5d',
+        name: '4168 - Dália',
+      },
+      {
+        hex: '#ff8f39',
+        name: '4456 - Laranja',
+      },
+      {
+        hex: '#b95427',
+        name: '4445 - Tangerina',
+      },
+      {
+        hex: '#a52824',
+        name: '3583 - Cereja',
+      },
+      {
+        hex: '#761e22',
+        name: '3402 - Vermelho-círculo',
+      },
+      {
+        hex: '#b42833',
+        name: '3528 - Carmim',
+      },
+      {
+        hex: '#642e29',
+        name: '7078 - Pimenta Rosa',
+      },
+      {
+        hex: '#721b23',
+        name: '7136 - Marsala',
+      },
+      {
+        hex: '#841b24',
+        name: '3611 - Rubi',
+      },
+      {
+        hex: '#7c3140',
+        name: '3951 - Viva Magenta',
+      },
+      {
+        hex: '#a93358',
+        name: '3754 - Rosa Pink',
+      },
+      {
+        hex: '#e4415e',
         name: '3334 - Tulipa',
       },
       {
-        hex: '#db7d8a',
+        hex: '#b7636d',
         name: '3048 - Flamingo',
       },
       {
-        hex: '#a7707d',
-        name: '3087 - Pop',
+        hex: '#e56b98',
+        name: '3182 - Pitaya',
       },
       {
-        hex: '#9b464d',
-        name: '3146 - Desejo',
+        hex: '#eb82a9',
+        name: '3131 - Chiclete',
       },
       {
-        hex: '#c47569',
-        name: '4005 - Terra',
+        hex: '#eaa9c1',
+        name: '3077 - Quartzo',
       },
       {
-        hex: '#ca6b49',
-        name: '4140 - Tijolo',
+        hex: '#dfa2ba',
+        name: '3046 - Doçura',
       },
       {
-        hex: '#a32425',
-        name: '3542 - Amor',
+        hex: '#edc4c0',
+        name: '3148 - Macadâmia',
       },
       {
-        hex: '#8f2933',
-        name: '3635 - Paixão',
+        hex: '#f2c4a7',
+        name: '4224 - Peach Fuzz',
       },
       {
-        hex: '#661a1f',
-        name: '3588 - Batom',
+        hex: '#d9b19e',
+        name: '3047 - Sopro',
       },
       {
-        hex: '#391214',
-        name: '3668 - Veludo',
+        hex: '#f1a8a1',
+        name: '4092 - Organza',
       },
       {
-        hex: '#b68eb6',
-        name: '6042 - Orquídea',
+        hex: '#c26b5d',
+        name: '4094 - Cetim',
       },
       {
-        hex: '#98498a',
+        hex: '#b67c8a',
+        name: '3201 - Camafeu',
+      },
+      {
+        hex: '#bf566c',
+        name: '3157 - Roseira',
+      },
+      {
+        hex: '#b679a3',
+        name: '6161 - Violeta',
+      },
+      {
+        hex: '#a37997',
+        name: '6802 - Malva',
+      },
+      {
+        hex: '#baa8c3',
+        name: '6006 - Lilás-candy',
+      },
+      {
+        hex: '#786292',
+        name: '6399 - Azaleia',
+      },
+      {
+        hex: '#856d9c',
+        name: '6034 - Realeza',
+      },
+      {
+        hex: '#822a6f',
         name: '6614 - Alfazema',
       },
       {
-        hex: '#54456b',
-        name: '6780 - Cardo',
+        hex: '#67182e',
+        name: '3154 - Vinho',
       },
       {
-        hex: '#8bc3cd',
-        name: '2218 - Nuvem',
+        hex: '#3a1d42',
+        name: '6030 - Místico',
       },
       {
-        hex: '#8192ab',
-        name: '2236 - Azurita',
+        hex: '#5d4b7b',
+        name: '6201 - Tecno',
       },
       {
-        hex: '#6da3d4',
+        hex: '#3e4c80',
+        name: '2931 - Náutico',
+      },
+      {
+        hex: '#3d759a',
+        name: '2930 - Netuno',
+      },
+      {
+        hex: '#7f90af',
+        name: '2927 - Aquário',
+      },
+      {
+        hex: '#81aaca',
+        name: '2012 - Azul-candy',
+      },
+      {
+        hex: '#85a7e5',
         name: '2137 - Hortênsia',
       },
       {
-        hex: '#3e8cbd',
-        name: '2286 - Piscina',
+        hex: '#4563aa',
+        name: '2500 - Acqua',
       },
       {
-        hex: '#22549f',
-        name: '2620 - Praia',
+        hex: '#018ba7',
+        name: '2194 - Turquesa',
       },
       {
-        hex: '#314257',
-        name: '2790 - Moderno',
+        hex: '#2a5d9b',
+        name: '2618 - Planeta',
       },
       {
-        hex: '#2d2a3c',
-        name: '2401 - Anil-profundo',
+        hex: '#14238e',
+        name: '2829 - Azul-bic',
       },
       {
-        hex: '#a0c9c3',
-        name: '5311 - Água Fresca',
+        hex: '#252d52',
+        name: '2745 - Marinheiro',
       },
       {
-        hex: '#3f8e7d',
-        name: '5078 - Paraíso',
+        hex: '#0f103d',
+        name: '2856 - Anil-profundo',
       },
       {
-        hex: '#27575e',
-        name: '5994 - Folclore',
+        hex: '#1d2836',
+        name: '5073 - Petróleo',
       },
       {
-        hex: '#85947c',
-        name: '5072 - Mirante',
+        hex: '#215039',
+        name: '5076 - Hera',
       },
       {
-        hex: '#a2be8f',
-        name: '5069 - Samambaia',
+        hex: '#213f2b',
+        name: '5398 - Musgo',
       },
       {
-        hex: '#749d45',
-        name: '5203 - Greenery',
-      },
-      {
-        hex: '#9e993a',
-        name: '5270 - Cana',
-      },
-      {
-        hex: '#306f3f',
+        hex: '#2a6430',
         name: '5767 - Bandeira',
       },
       {
-        hex: '#424434',
-        name: '5442 - Natureza',
+        hex: '#449894',
+        name: '5669 - Tiffany',
       },
       {
-        hex: '#b1b1b9',
-        name: '2198 - Fumaça',
+        hex: '#86afa7',
+        name: '5091 - Celeste',
       },
       {
-        hex: '#a096a2',
-        name: '8212 - Cromado',
+        hex: '#a2c9ba',
+        name: '5743 - Neo Mint',
       },
       {
-        hex: '#7c767c',
-        name: '8464 - Cinzelado',
+        hex: '#a1beab',
+        name: '2204 - Verde-candy',
       },
       {
-        hex: '#373737',
+        hex: '#9aa773',
+        name: '5741 - Periquito',
+      },
+      {
+        hex: '#acb555',
+        name: '5806 - Limonada',
+      },
+      {
+        hex: '#c6d248',
+        name: '5583 - Verde Limão',
+      },
+      {
+        hex: '#62772f',
+        name: '5203 - Greenery',
+      },
+      {
+        hex: '#8c9630',
+        name: '5800 - Pistache',
+      },
+      {
+        hex: '#464f1b',
+        name: '5089 - Selva',
+      },
+      {
+        hex: '#465240',
+        name: '5368 - Militar',
+      },
+      {
+        hex: '#636e52',
+        name: '5083 - Eco',
+      },
+      {
+        hex: '#7d8b75',
+        name: '5745 - Eucalipto',
+      },
+      {
+        hex: '#b1b2bd',
+        name: '8013 - Glacial',
+      },
+      {
+        hex: '#aea4ab',
+        name: '8008 - Pedreira',
+      },
+      {
+        hex: '#746a72',
+        name: '8797 - Aço',
+      },
+      {
+        hex: '#434042',
         name: '8069 - Matrix',
       },
       {
-        hex: '#2b2325',
+        hex: '#151518',
         name: '8990 - Preto',
       },
     ],
