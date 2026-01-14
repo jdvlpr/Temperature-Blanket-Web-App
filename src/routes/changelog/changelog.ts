@@ -36,6 +36,11 @@ export const entries: ChangelogItemGroup[] = [
             notes: [
               {
                 icon: ICONS.checkCircle,
+                text: `62 colorways`,
+                title: 'Added New Yarn: Círculo - Amigurumi',
+              },
+              {
+                icon: ICONS.checkCircle,
                 text: `45 colorways`,
                 title: 'Added New Yarn: Knit Picks - Brava Sport',
               },
