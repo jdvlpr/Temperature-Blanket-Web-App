@@ -1,4 +1,5 @@
 import type { Brand } from '$lib/types';
+import { yarn as bravaSport } from './brava-sport/yarn';
 import { yarn as bravaTweed } from './brava-tweed/yarn';
 import { yarn as bravaWorsted } from './brava-worsted/yarn';
 import { yarn as cotlin } from './cotlin/yarn';
@@ -17,6 +18,7 @@ export const brand: Brand = {
   name: 'Knit Picks',
   id: 'knit_picks',
   yarns: [
+    bravaSport,
     bravaTweed,
     bravaWorsted,
     cotlin,
