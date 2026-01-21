@@ -229,9 +229,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </Popover.Trigger>
       <Portal>
         <Popover.Positioner>
-          <Popover.Content
-            class="card bg-surface-200-800 z-49 w-75 p-2 shadow-xl"
-          >
+          <Popover.Content class="card bg-surface-200-800 z-49 p-2 shadow-xl">
             {#snippet element(attributes)}
               {#if !attributes.hidden}
                 <div {...attributes} transition:safeSlide>
