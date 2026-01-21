@@ -36,6 +36,16 @@ export const entries: ChangelogItemGroup[] = [
             notes: [
               {
                 icon: ICONS.checkCircle,
+                text: `44 colorways`,
+                title: 'Added New Yarn: Lana Grossa - Cool Wool Superbig',
+              },
+            ],
+            version: '5.38.0',
+          },
+          {
+            notes: [
+              {
+                icon: ICONS.checkCircle,
                 text: `97 colorways`,
                 title: 'Added New Yarn: Círculo - Amigurumi',
               },

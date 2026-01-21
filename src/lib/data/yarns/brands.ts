@@ -35,6 +35,7 @@ import { brand as kelbourneWoolens } from './kelbourne-woolens/yarns';
 import { brand as kingCole } from './king-cole/yarns';
 import { brand as knitPicks } from './knit-picks/yarns';
 import { brand as knittingForOlive } from './knitting-for-olive/yarns';
+import { brand as lanaGrossa } from './lana-grossa/yarns';
 import { brand as lilySugarNCream } from './lily-sugar-n-cream/yarns';
 import { brand as lindehobby } from './lindehobby/yarns';
 import { brand as lionBrand } from './lion-brand/yarns';
@@ -115,6 +116,7 @@ export const brands: Brand[] = [
   kingCole,
   knitPicks,
   knittingForOlive,
+  lanaGrossa,
   lilySugarNCream,
   lindehobby,
   lionBrand,
