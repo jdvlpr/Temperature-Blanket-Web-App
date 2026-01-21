@@ -48,8 +48,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '$lib/utils';
   import {
     BadgeQuestionMarkIcon,
+    BookIcon,
+    BookOpenIcon,
+    BookOpenTextIcon,
+    CircleQuestionMarkIcon,
     EllipsisVerticalIcon,
+    GiftIcon,
     LightbulbIcon,
+    MailIcon,
     RedoIcon,
     SaveIcon,
     UndoIcon,
@@ -215,23 +221,23 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <Popover>
       <Popover.Trigger
         class="btn hover:preset-tonal"
-        aria-label="About"
-        title="About"
+        aria-label="Help"
+        title="Help"
       >
         <BadgeQuestionMarkIcon />
-        <span class="hidden sm:inline-block">About</span>
+        <span class="hidden sm:inline-block">Help</span>
       </Popover.Trigger>
       <Portal>
         <Popover.Positioner>
           <Popover.Content
-            class="card bg-surface-200-800 z-49 w-72 max-w-(--breakpoint-sm) p-2 shadow-xl"
+            class="card bg-surface-200-800 z-49 w-75 p-2 shadow-xl"
           >
             {#snippet element(attributes)}
               {#if !attributes.hidden}
                 <div {...attributes} transition:safeSlide>
                   <Popover.Description>
                     <div
-                      class="flex flex-col gap-4 p-2"
+                      class="flex flex-col gap-2 p-2"
                       aria-orientation="vertical"
                       aria-label="Help Menu"
                     >
@@ -253,18 +259,25 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         <a
                           href="/faq"
                           title="View Frequently Asked Questions"
-                          class="link"
+                          class="btn hover:preset-tonal"
                         >
+                          <CircleQuestionMarkIcon />
                           Frequently Asked Questions</a
                         >
                       </p>
 
                       <p>
-                        <a href="/changelog" class="link">What's New?</a>
+                        <a href="/documentation" class="btn hover:preset-tonal">
+                          <BookOpenTextIcon />
+                          Documentation</a
+                        >
                       </p>
 
                       <p>
-                        <a href="/documentation" class="link">Documentation</a>
+                        <a href="/contact" class="btn hover:preset-tonal">
+                          <MailIcon />
+                          Contact</a
+                        >
                       </p>
                     </div>
                   </Popover.Description>

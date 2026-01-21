@@ -39,6 +39,11 @@ export const entries: ChangelogItemGroup[] = [
                 text: `44 colorways`,
                 title: 'Added New Yarn: Lana Grossa - Cool Wool Superbig',
               },
+              {
+                icon: ICONS.checkCircle,
+                text: `55 colorways`,
+                title: 'Added New Yarn: Yarn Art - Elite',
+              },
             ],
             version: '5.38.0',
           },
