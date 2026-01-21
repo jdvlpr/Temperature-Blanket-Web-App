@@ -14,7 +14,6 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { dev, version } from '$app/environment';
   import { afterNavigate, beforeNavigate, onNavigate } from '$app/navigation';
   import { PUBLIC_MICROSOFT_CLARITY_ID } from '$env/static/public';
   import DialogProvider from '$lib/components/modals/DialogProvider.svelte';
