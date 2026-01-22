@@ -1,6 +1,5 @@
 [data-theme='classic'] {
-  /* List of Properties */
-  --spacing: 0.25rem;
+  --text-scaling: 1.067;
   --base-font-color: var(--color-surface-950);
   --base-font-color-dark: var(--color-surface-50);
   --base-font-family: inherit;
@@ -27,12 +26,12 @@
   --anchor-text-decoration-hover: underline;
   --anchor-text-decoration-active: none;
   --anchor-text-decoration-focus: none;
-  --text-scaling: 1;
-  --radius-base: 6px;
-  --radius-container: 12px;
+  --spacing: 0.25rem;
+  --radius-base: 0.375rem;
+  --radius-container: 0.75rem;
   --default-border-width: 1px;
   --default-divide-width: 1px;
-  --ring-width-default: 1px;
+  --default-ring-width: 1px;
   --body-background-color: var(--color-surface-50);
   --body-background-color-dark: var(--color-surface-950);
   --color-primary-50: oklch(97.8% 0.018 81.3);

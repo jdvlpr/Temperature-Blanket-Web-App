@@ -83,13 +83,18 @@
   --SOFT: 90;
   --WONK: 1;
 
-  --spacing: 0.22rem;
+  --radius-base: 0.75rem;
+  --radius-container: 1.5rem;
 }
 [data-theme='hamlindigo'] {
   --opsz: 76;
   --wght: 900;
   --SOFT: 0;
   --WONK: 0;
+
+  --spacing: 0.22rem;
+  --radius-base: 0.063rem;
+  --radius-container: 0.125rem;
 
   .lucide {
     stroke-width: 1px;
@@ -101,13 +106,20 @@
   --SOFT: 100;
   --WONK: 1;
 
+  --text-scaling: 1.125;
   --spacing: 0.28rem;
+  --radius-base: 9999rem;
+  --radius-container: 1.5rem;
 }
 [data-theme='rocket'] {
   --opsz: 24;
   --wght: 300;
   --SOFT: 10;
   --WONK: 0;
+
+  --text-scaling: 1;
+  --radius-base: 0.125rem;
+  --radius-container: 0.25rem;
 
   .lucide {
     stroke-width: 1px;
@@ -118,6 +130,9 @@
   --wght: 500;
   --SOFT: 60;
   --WONK: 1;
+
+  --radius-base: 9999rem;
+  --radius-container: 1.5rem;
 }
 
 @media (prefers-reduced-motion) {

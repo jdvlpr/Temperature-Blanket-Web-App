@@ -146,6 +146,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     href="/images/favicon-16x16.png"
   />
   <link rel="shortcut icon" href="/favicon.ico" />
+
   <link rel="stylesheet" href="https://use.typekit.net/obw5vhr.css" />
 
   <meta name="theme-color" content="#f5f5f5" />
