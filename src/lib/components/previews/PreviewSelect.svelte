@@ -18,7 +18,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { THEMES } from '$lib/constants';
   import { previews } from '$lib/state';
   import { preferences } from '$lib/storage/preferences.svelte';
-  import { onDestroy, onMount } from 'svelte';
+  import { onDestroy, onMount, tick } from 'svelte';
 
   let theme = $state(
     getTheme(THEMES.find((n) => n.id === preferences.value.theme.mode)),
@@ -74,6 +74,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
       value={activePreviewSelectId}
       onchange={(e) => {
         onChangePattern(e.target.value);
+        tick().then(() => {
+          const activePreviewBtn = document.getElementById(
+            'active-preview-button',
+          );
+          if (activePreviewBtn) {
+            activePreviewBtn.scrollIntoView({
+              behavior: 'smooth',
+              block: 'nearest',
+              inline: 'center',
+            });
+          }
+        });
       }}
     >
       {#each previews.all as { name, id }}
@@ -83,14 +95,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </label>
 
   <div
-    class="relative mx-auto my-2 flex w-fit snap-x justify-start gap-2 overflow-auto pb-2"
+    class="relative mx-auto my-2 flex w-fit snap-x justify-start overflow-auto pb-2"
   >
     {#each previews.all as { img, name, id }}
       {#if img}
         {#key theme}
           <button
             class={[
-              'relative shrink-0 snap-start rounded p-2',
+              'relative mx-2 shrink-0 snap-center rounded p-2',
               id === previews.activeId
                 ? 'bg-primary-200 dark:bg-primary-800 selected shadow-sm'
                 : 'preset-tonal hover:preset-tonal-primary',

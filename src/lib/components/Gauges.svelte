@@ -91,7 +91,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <button
       id={gauges.activeGaugeId === id ? 'active-gauge-button' : ''}
       class={[
-        'btn mx-2 ',
+        'btn mx-2',
         gauges.activeGaugeId === id ? 'preset-filled' : 'hover:preset-tonal',
       ]}
       onclick={() => {
