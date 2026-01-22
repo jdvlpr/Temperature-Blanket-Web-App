@@ -91,7 +91,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </article>
 
   <div
-    class="mx-auto mt-2 mb-4 flex w-full flex-wrap items-start justify-center gap-4 sm:justify-between"
+    class="mx-auto mt-2 mb-4 flex w-full flex-wrap items-start justify-center gap-4 px-2 sm:justify-between"
   >
     <p class="text-sm">
       {#if table.rowCount.total > 0}

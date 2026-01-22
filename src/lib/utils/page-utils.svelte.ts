@@ -58,6 +58,30 @@ export const goToProjectSection = async (index, animateFromBottom = false) => {
       block: 'start',
     });
   }
+
+  // Scroll active gauge button into view when the gauge section is active
+  if (activeSection.id === 'page-section-gauges') {
+    const activeGaugeBtn = document.getElementById('active-gauge-button');
+    if (activeGaugeBtn) {
+      activeGaugeBtn.scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest',
+        inline: 'center',
+      });
+    }
+  }
+
+  // Scroll active preview button into view when the preview section is active
+  if (activeSection.id === 'page-section-preview') {
+    const activePreviewBtn = document.getElementById('active-preview-button');
+    if (activePreviewBtn) {
+      activePreviewBtn.scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest',
+        inline: 'center',
+      });
+    }
+  }
 };
 
 const setSections = (index) => {

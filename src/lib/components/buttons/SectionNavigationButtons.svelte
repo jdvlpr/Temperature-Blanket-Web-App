@@ -26,17 +26,23 @@ If not, see <https://www.gnu.org/licenses/>. -->
   /** @type {Props} */
   let { thisSectionIndex = 1 } = $props();
 
-  let previousSectionIndex = $derived(thisSectionIndex > 1 ? thisSectionIndex - 1 : null);
-  let previousSectionTitle = $derived(pageSections.items.find(
-    (section) => section.index === previousSectionIndex,
-  )?.title);
-  let nextSectionIndex = $derived(thisSectionIndex < 4 ? thisSectionIndex + 1 : null);
-  let nextSectionTitle = $derived(pageSections.items.find(
-    (section) => section.index === nextSectionIndex,
-  )?.title);
+  let previousSectionIndex = $derived(
+    thisSectionIndex > 1 ? thisSectionIndex - 1 : null,
+  );
+  let previousSectionTitle = $derived(
+    pageSections.items.find((section) => section.index === previousSectionIndex)
+      ?.title,
+  );
+  let nextSectionIndex = $derived(
+    thisSectionIndex < 4 ? thisSectionIndex + 1 : null,
+  );
+  let nextSectionTitle = $derived(
+    pageSections.items.find((section) => section.index === nextSectionIndex)
+      ?.title,
+  );
 </script>
 
-<div class="flex flex-wrap justify-between items-center my-4 gap-y-2">
+<div class="mx-2 my-4 flex flex-wrap items-center justify-between gap-y-2">
   {#if previousSectionIndex}
     <button
       class="btn preset-tonal-tertiary shadow-sm"

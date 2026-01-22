@@ -14,11 +14,17 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import { allGaugesAttributes, dialog, gauges, weather } from '$lib/state';
+  import {
+    allGaugesAttributes,
+    dialog,
+    gauges,
+    pageSections,
+    weather,
+  } from '$lib/state';
   import { preferences } from '$lib/storage/preferences.svelte';
   import { downloadPDF } from '$lib/utils';
   import { CirclePlusIcon, DownloadIcon, Trash2Icon } from '@lucide/svelte';
-  import { onMount, tick } from 'svelte';
+  import { onMount, tick, untrack } from 'svelte';
   import RangeOptionsButton from './buttons/RangeOptionsButton.svelte';
   import Gauge from './Gauge.svelte';
   import GaugeCustomizer from './GaugeCustomizer.svelte';
@@ -61,46 +67,63 @@ If not, see <https://www.gnu.org/licenses/>. -->
       setupAvailableGauges();
     });
   });
+
+  $effect(() => {
+    gauges.activeGaugeId;
+    untrack(() => {
+      if (pageSections.items[3].active === false) return;
+      tick().then(() => {
+        const activeGaugeBtn = document.getElementById('active-gauge-button');
+        if (activeGaugeBtn) {
+          activeGaugeBtn.scrollIntoView({
+            behavior: 'smooth',
+            block: 'nearest',
+            inline: 'center',
+          });
+        }
+      });
+    });
+  });
 </script>
 
-<div class="relative w-full overflow-auto">
-  <div
-    class="rounded-container flex w-full justify-around gap-2 py-2 max-md:overflow-x-scroll"
-  >
-    {#each gauges.allAvailable as { id, label }}
-      <button
-        class={[
-          'btn ',
-          gauges.activeGaugeId === id ? 'preset-filled' : 'hover:preset-tonal',
-        ]}
-        onclick={() => {
-          if (!gauges.allCreated.map((gauge) => gauge.id).includes(id)) {
-            // If the gauge is not created yet, then set it up
-            dialog.trigger({
-              type: 'confirm',
-              title: `Add a ${label}?`,
-              body: `This will add a new gauge to your project. You can delete it later.`,
-              response: (response) => {
-                if (response) gauges.addById(id);
-              },
-            });
-          } else {
-            gauges.activeGaugeId = id;
-          }
-        }}
-      >
-        {#if !gauges.allCreated.map((gauge) => gauge.id).includes(id)}
-          <CirclePlusIcon />
-        {/if}
-        {label}
-      </button>
-    {/each}
-  </div>
+<div class="mx-auto flex max-w-fit snap-x justify-start overflow-auto py-2">
+  {#each gauges.allAvailable as { id, label }}
+    <button
+      id={gauges.activeGaugeId === id ? 'active-gauge-button' : ''}
+      class={[
+        'btn mx-2 ',
+        gauges.activeGaugeId === id ? 'preset-filled' : 'hover:preset-tonal',
+      ]}
+      onclick={() => {
+        if (!gauges.allCreated.map((gauge) => gauge.id).includes(id)) {
+          // If the gauge is not created yet, then set it up
+          dialog.trigger({
+            type: 'confirm',
+            title: `Add a ${label}?`,
+            body: `This will add a new gauge to your project. You can delete it later.`,
+            response: (response) => {
+              if (response) {
+                gauges.addById(id);
+              }
+            },
+          });
+        } else {
+          gauges.activeGaugeId = id;
+        }
+      }}
+    >
+      {#if !gauges.allCreated.map((gauge) => gauge.id).includes(id)}
+        <CirclePlusIcon />
+      {/if}
+      {label}
+    </button>
+  {/each}
 </div>
+
 {#if gauges.activeGauge && !gauges.activeGauge?.calculating}
   {#if gauges.activeGauge.id !== 'temp'}
     <!-- If this is not the default temperature gauge and we're on the project planner page -->
-    <div class="mb-4 flex w-full justify-center sm:mb-6">
+    <div class="mb-4 flex w-full justify-center px-2 sm:mb-6">
       <button
         class="btn hover:preset-tonal relative top-2 justify-start max-sm:mb-2"
         title="Delete {gauges.activeGauge.label}"
@@ -115,21 +138,25 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/if}
 
   {#if gauges.activeGauge?.isStatic}
-    <p class="text-sm">
+    <p class="px-2 text-sm">
       This gauge has a fixed number of colors for the eight phases of the moon.
       You can only edit the colors individually.
     </p>
   {/if}
 
-  <Gauge bind:gauge={gauges.activeGauge} />
+  <div class="px-2">
+    <Gauge bind:gauge={gauges.activeGauge} />
+  </div>
 
   {#key gauges.activeGauge.colors}
-    <GaugeCustomizer bind:gauge={gauges.activeGauge} />
+    <div class="px-2">
+      <GaugeCustomizer bind:gauge={gauges.activeGauge} />
+    </div>
   {/key}
 {/if}
 
 <div
-  class="rounded-container bg-surface-100 dark:bg-surface-900 mt-4 flex flex-wrap justify-center gap-2 px-4 py-2 shadow-inner"
+  class="rounded-container bg-surface-100 dark:bg-surface-900 mx-2 mt-4 flex flex-wrap justify-center gap-2 px-4 py-2 shadow-inner"
 >
   <button
     class="btn hover:preset-tonal h-auto text-left whitespace-pre-wrap"

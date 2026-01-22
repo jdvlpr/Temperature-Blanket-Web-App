@@ -154,9 +154,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   );
 </script>
 
-<div class="mt-2 flex w-full flex-col items-center justify-center gap-2">
-  <div class="flex w-full flex-wrap items-center justify-center gap-x-4">
-    <div class="my-4 flex flex-wrap items-center justify-center gap-4">
+<div class="flex w-full flex-col items-center justify-center gap-2">
+  <div class="flex w-full flex-wrap items-center justify-center gap-x-4 px-2">
+    <div class="flex flex-wrap items-center justify-center gap-2">
       <WeatherSourceButton />
 
       <UnitChanger />
@@ -206,7 +206,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </div>
 
   {#if wasDefaultWeatherSourceChanged}
-    <p class="w-full text-sm">
+    <p class="w-full px-2 text-sm">
       No weather data was available from the default source ({defaultWeatherSourceCopy}),
       so another source was used ({weather.source.name}) and the Weather Source
       setting was automatically updated.
@@ -214,7 +214,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/if}
 
   {#if projectHasRecentWeatherData}
-    <div class="w-fit max-w-(--breakpoint-sm) text-left text-sm">
+    <div class="w-fit max-w-(--breakpoint-sm) px-2 text-left text-sm">
       <Popover>
         <Popover.Trigger
           class="btn hover:preset-tonal text-warning-800-200 text-left text-sm whitespace-pre-wrap"
@@ -274,132 +274,146 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/if}
 
   <div
-    class="from-surface-600 to-surface-950 dark:from-surface-50 dark:to-surface-100 flex flex-wrap items-start justify-center gap-x-2 bg-linear-to-tr box-decoration-clone bg-clip-text text-transparent dark:text-transparent"
+    class="relative mx-auto flex max-w-full snap-x items-start justify-start gap-x-2 overflow-auto pb-2"
   >
     {#if weather.table.showParameters.tmax}
-      <WeatherItem
-        id="tmax"
-        icon="↑"
-        label="Highest Temperature"
-        value={Math.max(
-          ...(weather.params.tmax?.filter((n) => n !== null) as number[]),
-        )}
-        units={UNIT_LABELS.temperature[preferences.value.units]}
-      >
-        {#snippet date()}
-          <p class="text-xs">
-            {#if weather.grouping === 'week'}Week of{/if}
-            {tMaxDay?.date.toLocaleDateString(undefined, {
-              timeZone: 'UTC',
-            })}
-          </p>
-        {/snippet}
-      </WeatherItem>
+      <div class="snap-start">
+        <WeatherItem
+          id="tmax"
+          icon="↑"
+          label="Highest Temperature"
+          value={Math.max(
+            ...(weather.params.tmax?.filter((n) => n !== null) as number[]),
+          )}
+          units={UNIT_LABELS.temperature[preferences.value.units]}
+        >
+          {#snippet date()}
+            <p class="text-xs">
+              {#if weather.grouping === 'week'}Week of{/if}
+              {tMaxDay?.date.toLocaleDateString(undefined, {
+                timeZone: 'UTC',
+              })}
+            </p>
+          {/snippet}
+        </WeatherItem>
+      </div>
     {/if}
 
     {#if weather.table.showParameters.tavg}
-      <WeatherItem
-        id="tavg"
-        icon="~"
-        label="Average Temperature"
-        value={getAverage(
-          weather.params.tavg?.filter((n) => n !== null) as number[],
-        )}
-        units={UNIT_LABELS.temperature[preferences.value.units]}
-      />
+      <div class="snap-center">
+        <WeatherItem
+          id="tavg"
+          icon="~"
+          label="Average Temperature"
+          value={getAverage(
+            weather.params.tavg?.filter((n) => n !== null) as number[],
+          )}
+          units={UNIT_LABELS.temperature[preferences.value.units]}
+        />
+      </div>
     {/if}
 
     {#if weather.table.showParameters.tmin}
-      <WeatherItem
-        id="tmin"
-        icon="↓"
-        label="Lowest Temperature"
-        value={Math.min(
-          ...(weather.params.tmin?.filter((n) => n !== null) as number[]),
-        )}
-        units={UNIT_LABELS.temperature[preferences.value.units]}
-      >
-        {#snippet date()}
-          <p class="text-xs">
-            {#if weather.grouping === 'week'}Week of{/if}
-            {tMinDay?.date.toLocaleDateString(undefined, {
-              timeZone: 'UTC',
-            })}
-          </p>
-        {/snippet}
-      </WeatherItem>
+      <div class="snap-center">
+        <WeatherItem
+          id="tmin"
+          icon="↓"
+          label="Lowest Temperature"
+          value={Math.min(
+            ...(weather.params.tmin?.filter((n) => n !== null) as number[]),
+          )}
+          units={UNIT_LABELS.temperature[preferences.value.units]}
+        >
+          {#snippet date()}
+            <p class="text-xs">
+              {#if weather.grouping === 'week'}Week of{/if}
+              {tMinDay?.date.toLocaleDateString(undefined, {
+                timeZone: 'UTC',
+              })}
+            </p>
+          {/snippet}
+        </WeatherItem>
+      </div>
     {/if}
 
     {#if weather.table.showParameters.prcp}
-      <WeatherItem
-        id="prcp"
-        icon="∴"
-        label="Total Rainfall"
-        value={weather.params.prcp?.every((n) => n === null)
-          ? '-'
-          : displayNumber(
-              weather.params.prcp
-                ?.filter((n) => n !== null)
-                ?.reduce((partialSum: number, a: any) => partialSum + a, 0),
-            )}
-        units={UNIT_LABELS.height[preferences.value.units]}
-      />
-    {/if}
-
-    {#if weather.table.showParameters.snow}
-      <WeatherItem
-        id="snow"
-        icon="∗"
-        label={locations.all?.every((n) => n.source === 'Meteostat')
-          ? 'Highest Snow Depth'
-          : 'Total SnowFall'}
-        value={weather.params.snow?.every((n) => n === null)
-          ? '-'
-          : locations.all?.every((n) => n.source === 'Meteostat')
-            ? Math.max(
-                ...(weather.params.snow?.filter((n) => n !== null) as number[]),
-              )
+      <div class="snap-center">
+        <WeatherItem
+          id="prcp"
+          icon="∴"
+          label="Total Rainfall"
+          value={weather.params.prcp?.every((n) => n === null)
+            ? '-'
             : displayNumber(
-                weather.params.snow
+                weather.params.prcp
                   ?.filter((n) => n !== null)
                   ?.reduce((partialSum: number, a: any) => partialSum + a, 0),
               )}
-        units={UNIT_LABELS.height[preferences.value.units]}
-      >
-        {#snippet button()}
-          <div class="my-2 text-sm">
-            {#if locations.all.some((n) => n.source === 'Meteostat') && locations.all.some((n) => n.source === 'Open-Meteo')}
-              <HelpIcon
-                href="/documentation/#mixed-snow-parameters"
-                title="Read About Mixed Snow Parameters"
-              >
-                {#snippet text()}
-                  <span class="link">Error: Mixed Parameters</span>
-                {/snippet}
-              </HelpIcon>
-            {/if}
-          </div>
-        {/snippet}
-      </WeatherItem>
+          units={UNIT_LABELS.height[preferences.value.units]}
+        />
+      </div>
+    {/if}
+
+    {#if weather.table.showParameters.snow}
+      <div class="snap-center">
+        <WeatherItem
+          id="snow"
+          icon="∗"
+          label={locations.all?.every((n) => n.source === 'Meteostat')
+            ? 'Highest Snow Depth'
+            : 'Total SnowFall'}
+          value={weather.params.snow?.every((n) => n === null)
+            ? '-'
+            : locations.all?.every((n) => n.source === 'Meteostat')
+              ? Math.max(
+                  ...(weather.params.snow?.filter(
+                    (n) => n !== null,
+                  ) as number[]),
+                )
+              : displayNumber(
+                  weather.params.snow
+                    ?.filter((n) => n !== null)
+                    ?.reduce((partialSum: number, a: any) => partialSum + a, 0),
+                )}
+          units={UNIT_LABELS.height[preferences.value.units]}
+        >
+          {#snippet button()}
+            <div class="my-2 text-sm">
+              {#if locations.all.some((n) => n.source === 'Meteostat') && locations.all.some((n) => n.source === 'Open-Meteo')}
+                <HelpIcon
+                  href="/documentation/#mixed-snow-parameters"
+                  title="Read About Mixed Snow Parameters"
+                >
+                  {#snippet text()}
+                    <span class="link">Error: Mixed Parameters</span>
+                  {/snippet}
+                </HelpIcon>
+              {/if}
+            </div>
+          {/snippet}
+        </WeatherItem>
+      </div>
     {/if}
 
     {#if weather.table.showParameters.dayt}
-      <WeatherItem
-        id="dayt"
-        icon="☼"
-        label="Average Daytime"
-        value={convertTime(
-          getAverage(
-            weather.params.dayt?.filter((n) => n !== null) as number[],
-            { decimals: 6 },
-          ),
-        )}
-      />
+      <div class="snap-center">
+        <WeatherItem
+          id="dayt"
+          icon="☼"
+          label="Average Daytime"
+          value={convertTime(
+            getAverage(
+              weather.params.dayt?.filter((n) => n !== null) as number[],
+              { decimals: 6 },
+            ),
+          )}
+        />
+      </div>
     {/if}
   </div>
 </div>
 
-<div bind:this={graph} class="w-full scroll-m-[60px]">
+<div bind:this={graph} class="w-full scroll-m-[60px] px-2">
   {#if showWeatherChart}
     {#if weather.data.length}
       {#key preferences.value.units}
@@ -412,14 +426,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </div>
 
 <div class="flex w-full flex-col items-center justify-center gap-4">
-  <div class="flex flex-wrap items-center justify-center">
+  <div
+    class="mx-auto flex max-w-full snap-x items-center justify-start overflow-auto pb-2"
+  >
     <ToggleWeatherData
       view={weather.table.showParameters.tmax}
       onclick={() => {
         weather.table.showParameters.tmax = !weather.table.showParameters.tmax;
       }}
     >
-      <span class="border-b-2 border-(--tmax)">High Temps</span>
+      <span class="border-b-2 border-(--tmax) whitespace-nowrap"
+        >High Temps</span
+      >
     </ToggleWeatherData>
 
     <ToggleWeatherData
@@ -428,7 +446,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
         weather.table.showParameters.tavg = !weather.table.showParameters.tavg;
       }}
     >
-      <span class="border-b-2 border-(--tavg)">Average Temps</span>
+      <span class="border-b-2 border-(--tavg) whitespace-nowrap"
+        >Average Temps</span
+      >
     </ToggleWeatherData>
 
     <ToggleWeatherData
@@ -437,7 +457,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
         weather.table.showParameters.tmin = !weather.table.showParameters.tmin;
       }}
     >
-      <span class="border-b-2 border-(--tmin)">Low Temps</span>
+      <span class="border-b-2 border-(--tmin) whitespace-nowrap">Low Temps</span
+      >
     </ToggleWeatherData>
 
     <ToggleWeatherData
@@ -446,7 +467,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         weather.table.showParameters.prcp = !weather.table.showParameters.prcp;
       }}
     >
-      <span class="border-b-2 border-(--prcp)">Rain</span>
+      <span class="border-b-2 border-(--prcp) whitespace-nowrap">Rain</span>
     </ToggleWeatherData>
     <ToggleWeatherData
       view={weather.table.showParameters.snow}
@@ -454,7 +475,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         weather.table.showParameters.snow = !weather.table.showParameters.snow;
       }}
     >
-      <span class="border-b-2 border-(--snow)">Snow</span>
+      <span class="border-b-2 border-(--snow) whitespace-nowrap">Snow</span>
     </ToggleWeatherData>
 
     <ToggleWeatherData
@@ -463,7 +484,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         weather.table.showParameters.dayt = !weather.table.showParameters.dayt;
       }}
     >
-      <span class="border-b-2 border-(--dayt)">Daytime</span>
+      <span class="border-b-2 border-(--dayt) whitespace-nowrap">Daytime</span>
     </ToggleWeatherData>
 
     <ToggleWeatherData
@@ -472,13 +493,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
         weather.table.showParameters.moon = !weather.table.showParameters.moon;
       }}
     >
-      <span class="border-b-2 border-(--moon)">Moon Phase </span>
+      <span class="border-b-2 border-(--moon) whitespace-nowrap"
+        >Moon Phase
+      </span>
     </ToggleWeatherData>
   </div>
 
   {#if isDataMissing}
     <div
-      class="variant-outline-surface rounded-container flex w-fit max-w-(--breakpoint-sm) flex-col items-center justify-center gap-2 text-left text-sm"
+      class="variant-outline-surface rounded-container flex w-fit max-w-(--breakpoint-sm) flex-col items-center justify-center gap-2 px-2 text-left text-sm"
     >
       <Popover>
         <Popover.Trigger

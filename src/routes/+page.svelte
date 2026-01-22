@@ -313,7 +313,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   {#snippet main()}
     <main
-      class="mx-auto p-2 text-center max-md:min-h-[calc(100svh-112px)] md:min-h-[calc(100svh-104px)] lg:min-h-[calc(100svh-120px)]"
+      class="mx-auto text-center max-md:min-h-[calc(100svh-112px)] md:min-h-[calc(100svh-104px)] lg:min-h-[calc(100svh-120px)]"
     >
       <div
         id="page-section-location"
@@ -344,7 +344,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </div>
 
         <div
-          class="md:bg-surface-50 dark:md:bg-surface-950 md:rounded-container mb-2 md:p-4 md:shadow-lg"
+          class="md:bg-surface-50 dark:md:bg-surface-950 md:rounded-container mb-2 px-2 md:p-4 md:shadow-lg"
         >
           <Locations />
         </div>
@@ -364,7 +364,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {#if weather.data.length}
             <SectionNavigationButtons thisSectionIndex={2} />
             {#if !weather.isUserEdited}
-              <p class="my-4 text-center text-sm max-lg:mx-2">
+              <p class="my-4 px-2 text-center text-sm">
                 Weather data from <button
                   class="underline"
                   onclick={() => {
@@ -389,7 +389,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {/key}
           {#if weather.data.length}
             <SectionNavigationButtons thisSectionIndex={3} />
-            <p class="my-4 text-center text-sm max-lg:mx-2">
+            <p class="my-4 px-2 text-center text-sm">
               Real yarn colors will look different than what's on the screen.
               Any trademarked yarn or colorway details are owned by their
               respective companies.
@@ -402,7 +402,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           class="w-full scroll-mt-[76px]"
           class:hidden={pageSections.items[4].active === false}
         >
-          <div class="mx-auto max-w-screen-md">
+          <div class="mx-auto max-w-screen-md px-2">
             <p class="mb-2">
               Is this web app worth a cup of coffee to you? Your support enables
               ongoing development, keeps the site ad-free, and helps make this
@@ -417,7 +417,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
           <SectionNavigationButtons thisSectionIndex={4} />
 
-          <p class="my-4 text-center text-sm max-lg:mx-2">
+          <p class="my-4 px-2 text-center text-sm">
             Real projects will look different than the preview. Patterns not
             provided.
           </p>

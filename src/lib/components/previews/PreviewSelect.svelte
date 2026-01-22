@@ -83,18 +83,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </label>
 
   <div
-    class="preview-image-select my-2 flex flex-wrap items-center justify-center gap-4"
+    class="relative mx-auto my-2 flex w-fit snap-x justify-start gap-2 overflow-auto pb-2"
   >
     {#each previews.all as { img, name, id }}
       {#if img}
         {#key theme}
           <button
             class={[
-              'relative flex snap-center flex-col items-center justify-center gap-1 rounded p-2',
+              'relative shrink-0 snap-start rounded p-2',
               id === previews.activeId
-                ? 'bg-primary-300 dark:bg-primary-700 selected shadow-sm'
+                ? 'bg-primary-200 dark:bg-primary-800 selected shadow-sm'
                 : 'preset-tonal hover:preset-tonal-primary',
             ]}
+            id={previews.activeId === id ? 'active-preview-button' : ''}
             onclick={() => {
               onChangePattern(id);
             }}
@@ -106,12 +107,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
               class="size-[52px] opacity-40"
               class:!opacity-100={id === previews.activeId}
             />
-            <!-- {#if id === 'hxrd'}
-              <span
-                class="bg-secondary-100 dark:bg-secondary-900 absolute top-0 left-1/2 -translate-x-1/2 rounded px-1 text-xs font-semibold shadow-sm"
-                >New</span
-              >
-            {/if} -->
           </button>
         {/key}
       {/if}

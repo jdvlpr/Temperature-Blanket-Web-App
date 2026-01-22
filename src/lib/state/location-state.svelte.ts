@@ -28,9 +28,9 @@ import type {
 import { getToday, numberOfDays, stringToDate } from '$lib/utils';
 
 export class LocationClass implements LocationType {
-  uuid: string = $state();
-  index: number = $state();
-  duration?: 'c' | 'y' = $state();
+  uuid: string = $state('');
+  index: number = $state(0);
+  duration?: 'c' | 'y' = $state('y');
   from?: string = $state();
   to?: string = $state();
   label?: string = $state();
