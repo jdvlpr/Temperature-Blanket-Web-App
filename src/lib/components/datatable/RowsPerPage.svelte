@@ -22,18 +22,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 
   let { table }: Props = $props();
-
-  const options = $derived.by(() => {
-    const totalCount = table.rowCount.total;
-     if (totalCount < 10) return [10];
-    if (totalCount < 50) return [10, totalCount];
-    if (totalCount < 190) return [10, 50, totalCount];
-    return [10, 50, 190, totalCount];
-  });
-  
 </script>
 
-<label class="label flex flex-col items-start w-24">
+<label class="label flex w-24 flex-col items-start">
   <span class="text-sm">Rows Per Page</span>
   <select
     class="select"
@@ -50,9 +41,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
       }
     }}
   >
-    {#each options as option}
-      <option value={option}>
-        {option}
+    {#each { length: table.rowCount.total }, option}
+      <option value={option + 1}>
+        {option + 1}
       </option>
     {/each}
   </select>
