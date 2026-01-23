@@ -81,13 +81,13 @@ const colorways: Colorway[] = [
           'https://www.lionbrand.com/products/wool-ease-yarn?variant=32420966924381',
       },
       {
-        hex: '#B3B5B5',
+        hex: '#b3b5b5',
         name: 'Grey Heather',
         variant_href:
           'https://www.lionbrand.com/products/wool-ease-yarn?variant=32420966957149',
       },
       {
-        hex: '#686C6F',
+        hex: '#686c6f',
         name: 'Oxford Grey',
         variant_href:
           'https://www.lionbrand.com/products/wool-ease-yarn?variant=32420966989917',

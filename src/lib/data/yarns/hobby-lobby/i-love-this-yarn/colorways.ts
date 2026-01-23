@@ -345,31 +345,31 @@ const colorways: Colorway[] = [
         name: 'Soft Blue',
       },
       {
-        hex: '#5C3821',
+        hex: '#5c3821',
         variant_href:
           'https://www.hobbylobby.com/Yarn-Needle-Art/Yarn/Cinnamon-I-Love-This-Yarn/p/81087755',
         name: 'Cinnamon',
       },
       {
-        hex: '#BB8759',
+        hex: '#bb8759',
         variant_href:
           'https://www.hobbylobby.com/Yarn-Needle-Art/Yarn/Latte-I-Love-This-Yarn/p/81087763',
         name: 'Late',
       },
       {
-        hex: '#3F484C',
+        hex: '#3f484c',
         variant_href:
           'https://www.hobbylobby.com/Yarn-Needle-Art/Yarn/Blue-Spruce-I-Love-This-Yarn/p/81087766',
         name: 'Blue Spruce',
       },
       {
-        hex: '#514D3D',
+        hex: '#514d3d',
         variant_href:
           'https://www.hobbylobby.com/Yarn-Needle-Art/Yarn/Clover%C2%A0I-Love-This-Yarn/p/81087767',
         name: 'Clover',
       },
       {
-        hex: '#D59D85',
+        hex: '#d59d85',
         variant_href:
           'https://www.hobbylobby.com/Yarn-Needle-Art/Yarn/Cherry-Blossom-I-Love-This-Yarn/p/81087768',
         name: 'Cherry Blossom',

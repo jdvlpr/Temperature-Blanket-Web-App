@@ -73,7 +73,7 @@ const colorways: Colorway[] = [
         name: 'Paper White',
       },
       {
-        hex: '#1B191a',
+        hex: '#1b191a',
         name: 'Pure Black',
       },
       {

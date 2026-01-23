@@ -161,11 +161,11 @@ const colorways: Colorway[] = [
         name: 'Mandarin',
       },
       {
-        hex: '#130E0E',
+        hex: '#130e0e',
         name: 'Black',
       },
       {
-        hex: '#5F141A',
+        hex: '#5f141a',
         name: 'Wine',
       },
     ],
