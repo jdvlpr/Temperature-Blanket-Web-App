@@ -226,7 +226,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <StickyPart position="bottom">
   <div class="p-2 sm:p-4">
-    <div class="mb-2 sm:mb-4">
+    <div class="">
       {#key randomPalette}
         <ColorPaletteEditable
           canUserEditColor={false}

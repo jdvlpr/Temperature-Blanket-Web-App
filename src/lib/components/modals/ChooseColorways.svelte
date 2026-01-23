@@ -59,7 +59,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <StickyPart position="bottom">
   <div class="p-2">
     {#if selectedColors.length}
-      <div class="mb-2 sm:mb-4">
+      <div class="">
         {#key selectedColors.length}
           <ColorPaletteEditable
             canUserEditColor={false}
