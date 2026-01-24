@@ -88,9 +88,15 @@ export interface Colorway {
 }
 
 export interface AffiliateYarn {
-  brand_id: string;
-  yarn_id: string;
-  colors: Color[];
+  a: string; // affiliate_base_href (base for each colorway)
+  b: string; // brand_id
+  y: string; // yarn_id
+  c: AffiliateColor[]; // colors
+}
+
+export interface AffiliateColor {
+  n: string; // name
+  v?: string; // optional viariant suffix for the affiliate_base_href
 }
 
 export interface Color {

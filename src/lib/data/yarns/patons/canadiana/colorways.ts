@@ -78,7 +78,7 @@ const colorways: Colorway[] = [
       },
       {
         hex: '#5d2443',
-        name: 'Fucshia',
+        name: 'Fuchsia',
       },
       {
         hex: '#35274f',
@@ -162,7 +162,7 @@ const colorways: Colorway[] = [
       },
       {
         hex: '#bcb6c1',
-        name: 'Lilac Wasp',
+        name: 'Lilac Wisp',
       },
       {
         hex: '#595a5b',

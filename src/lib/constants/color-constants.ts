@@ -13,7 +13,10 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { PUBLIC_AFFILIATE_YARNS } from '$env/static/public';
+import {
+  PUBLIC_AFFILIATE_BASE_URL,
+  PUBLIC_AFFILIATE_YARNS,
+} from '$env/static/public';
 import type { AffiliateYarn, Color, YarnWeight } from '$lib/types';
 import { brands } from '$lib/data/yarns/brands';
 import chroma from 'chroma-js';
@@ -25,7 +28,22 @@ export const MAXIMUM_YARN_DETAILS_DESCRIPTIONS = 5;
 export const MAXIMUM_COLORWAYS_MATCHES_FOR_IMAGES = 50;
 
 const affiliateYarns: AffiliateYarn[] | null = PUBLIC_AFFILIATE_YARNS
-  ? JSON.parse(PUBLIC_AFFILIATE_YARNS)
+  ? JSON.parse(PUBLIC_AFFILIATE_YARNS).map((affiliateYarn) => {
+      let affiliate_variant_base = `${PUBLIC_AFFILIATE_BASE_URL}-${affiliateYarn.a}`;
+      return {
+        brand_id: affiliateYarn.b,
+        yarn_id: affiliateYarn.y,
+        colors: affiliateYarn.c.map((color) => {
+          const affiliate_variant_href = color?.v
+            ? affiliate_variant_base + color.v
+            : affiliate_variant_base;
+          return {
+            affiliate_variant_href,
+            name: color.n,
+          };
+        }),
+      };
+    })
   : null;
 
 export const ALL_YARN_WEIGHTS: YarnWeight[] = [
