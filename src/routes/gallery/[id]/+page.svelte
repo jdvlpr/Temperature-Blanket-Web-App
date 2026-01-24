@@ -25,9 +25,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import YarnSources from '$lib/components/YarnSources.svelte';
   import ViewToggle from '$lib/components/buttons/ViewToggle.svelte';
   import { ALL_YARN_WEIGHTS } from '$lib/constants';
+  import { safeSlide } from '$lib/features/transitions/safeSlide';
   import { allGaugesAttributes, locations } from '$lib/state';
   import { preferences } from '$lib/storage/preferences.svelte';
-  import { safeSlide } from '$lib/features/transitions/safeSlide';
   import {
     exists,
     getProjectParametersFromURLHash,
@@ -41,7 +41,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     ArrowLeftIcon,
     ChevronDown,
     InfoIcon,
-    ShoppingBagIcon,
+    ShoppingCartIcon,
   } from '@lucide/svelte';
   import { Accordion } from '@skeletonlabs/skeleton-svelte';
   import { onMount } from 'svelte';
@@ -461,7 +461,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                               <p class="mt-4 px-2 text-sm">
                                 Items purchased through links with a shopping
                                 bag icon
-                                <ShoppingBagIcon class="inline size-4" />
+                                <ShoppingCartIcon class="inline size-4" />
                                 help support this site by earning the developer a
                                 percentage of each sale, at no additional cost to
                                 you.
@@ -531,7 +531,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                                       target="_blank"
                                       rel="noreferrer nofollow"
                                     >
-                                      <ShoppingBagIcon />
+                                      <ShoppingCartIcon />
                                       <span class="underline">Buy</span></a
                                     >
                                   {/if}

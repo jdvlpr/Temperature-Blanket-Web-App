@@ -20,6 +20,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { safeSlide } from '$lib/features/transitions/safeSlide';
   import { pluralize, stringToDate } from '$lib/utils';
   import { brands } from '$lib/data/yarns/brands';
+  import { ShoppingCartIcon } from '@lucide/svelte';
 
   interface Props {
     viewSources?: boolean;
@@ -33,12 +34,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     Real yarn colors will look different than what's on the screen. Any
     trademarked yarn or colorway details are owned by their respective
     companies. Results are not sponsored, but items purchased through some links
-    (marked with a shopping bag icon next to the link) may earn the developer of
-    this site a percentage of the sale at no additional cost to you. Requests
-    for yarn to be included in these results can be made by anyone using <a
-      href="/yarn-search-request"
-      class="link">this request form.</a
-    >
+    (marked with a shopping cart icon <ShoppingCartIcon
+      class="inline size-4"
+    />) may earn the developer of this site a percentage of the sale at no
+    additional cost to you. Requests for yarn to be included in these results
+    can be made by anyone using
+    <a href="/yarn-search-request" class="link">this request form.</a>
   </p>
 
   <Expand bind:isExpanded={viewSources} label="Yarn Sources" />

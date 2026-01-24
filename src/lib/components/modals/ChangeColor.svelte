@@ -18,7 +18,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import StickyPart from '$lib/components/modals/StickyPart.svelte';
   import YarnGridSelect from '$lib/components/modals/YarnGridSelect.svelte';
   import { dialog } from '$lib/state';
-  import { ExternalLinkIcon, ShoppingBagIcon } from '@lucide/svelte';
+  import { ExternalLinkIcon, ShoppingCartIcon } from '@lucide/svelte';
   import chroma from 'chroma-js';
 
   interface Props {
@@ -153,7 +153,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       rel="noreferrer nofollow"
     >
       {#if affiliate_variant_href}
-        <ShoppingBagIcon />
+        <ShoppingCartIcon />
       {:else}
         <ExternalLinkIcon />
       {/if}

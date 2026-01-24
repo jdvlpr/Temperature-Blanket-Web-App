@@ -28,6 +28,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     ClockIcon,
     Grid3X3Icon,
     InfoIcon,
+    ShoppingCartIcon,
   } from '@lucide/svelte';
   import { Dialog, Portal } from '@skeletonlabs/skeleton-svelte';
 
@@ -1599,14 +1600,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
               Real yarn colors will look different than what’s on the screen.
               Any trademarked yarn or colorway details are owned by their
               respective companies. Results are not sponsored, but items
-              purchased through some links (marked with a shopping bag icon next
-              to the link) may earn the developer of this site a percentage of
-              the sale at no additional cost to you. Colors may be inaccurate,
-              and may not represent yarn as it appears in physical reality.
-              Requests for yarn to be included in these results can be made by
-              anyone using <a class="link" href="/yarn-search-request"
-                >this request form.</a
-              >
+              purchased through some links (marked with a shopping cart icon <ShoppingCartIcon
+                class="inline size-4"
+              />) may earn the developer of this site a percentage of the sale
+              at no additional cost to you. Colors may be inaccurate, and may
+              not represent yarn as it appears in physical reality. Requests for
+              yarn to be included in these results can be made by anyone using
+              <a class="link" href="/yarn-search-request">this request form.</a>
             </p>
           </div>
           <section

@@ -47,8 +47,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     ALL_YARN_WEIGHTS,
     YARN_COLORWAYS_PER_PAGE,
   } from '$lib/constants';
-  import { toast } from '$lib/state';
+  import { brands } from '$lib/data/yarns/brands';
   import { safeSlide } from '$lib/features/transitions/safeSlide';
+  import { toast } from '$lib/state';
   import type { YarnWeight } from '$lib/types';
   import {
     getTextColor,
@@ -58,7 +59,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     sortColorsDarktoLight,
     sortColorsLightToDark,
   } from '$lib/utils';
-  import { brands } from '$lib/data/yarns/brands';
   import {
     ArrowDownWideNarrowIcon,
     ChevronDownIcon,
@@ -66,7 +66,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     ExternalLinkIcon,
     PlusIcon,
     SearchIcon,
-    ShoppingBagIcon,
+    ShoppingCartIcon,
   } from '@lucide/svelte';
   import { Accordion } from '@skeletonlabs/skeleton-svelte';
   import chroma from 'chroma-js';
@@ -647,7 +647,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                             target="_blank"
                             rel="noopener noreferrer"
                           >
-                            <ShoppingBagIcon />
+                            <ShoppingCartIcon />
                           </a>
                         {:else}
                           <a

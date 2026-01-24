@@ -20,27 +20,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ColorRange from '$lib/components/ColorRange.svelte';
   import DaysInRange from '$lib/components/DaysInRange.svelte';
   import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
+  import { safeSlide } from '$lib/features/transitions/safeSlide';
   import { dialog, gauges, showDaysInRange } from '$lib/state';
   import { preferences } from '$lib/storage/preferences.svelte';
-  import { safeSlide } from '$lib/features/transitions/safeSlide';
   import type { Color } from '$lib/types';
   import { getTextColor } from '$lib/utils';
   import {
-    CogIcon,
-    GridIcon,
-    LayoutGridIcon,
-    LayoutListIcon,
     LayoutPanelTopIcon,
     MoveIcon,
     SearchIcon,
-    ShoppingBagIcon,
+    ShoppingCartIcon,
     Trash2Icon,
   } from '@lucide/svelte';
   import { Popover, Portal } from '@skeletonlabs/skeleton-svelte';
   import { dragHandle, dragHandleZone } from 'svelte-dnd-action';
   import { flip } from 'svelte/animate';
   import RangeOptionsButton from './buttons/RangeOptionsButton.svelte';
-  import { fade } from 'svelte/transition';
 
   const flipDurationMs = 150;
 
@@ -141,8 +136,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 {#if hasAnyAffiliateURLs}
   <p class="mt-4 px-2 text-sm">
-    Items purchased through links with a shopping bag icon
-    <ShoppingBagIcon class="inline size-4" />
+    Items purchased through links with a shopping cart icon
+    <ShoppingCartIcon class="inline size-4" />
     help support this site by earning the developer a percentage of each sale, at
     no additional cost to you.
   </p>
@@ -324,7 +319,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             target="_blank"
             rel="noreferrer nofollow"
           >
-            <ShoppingBagIcon />
+            <ShoppingCartIcon />
             <span class="underline">Buy</span>
           </a>
         {/if}
