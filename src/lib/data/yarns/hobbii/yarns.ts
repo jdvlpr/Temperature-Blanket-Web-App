@@ -5,6 +5,7 @@ import { yarn as amigoChunky } from './amigo-chunky/yarn';
 import { yarn as amigoXl } from './amigo-xl/yarn';
 import { yarn as babyCottonOrganic } from './baby-cotton-organic/yarn';
 import { yarn as dailyStitchAcrylicXl } from './daily-stitch-acrylic-xl/yarn';
+import { yarn as dailyStitchMega } from './daily-stitch-mega/yarn';
 import { yarn as embroideryYarn } from './embroidery-yarn/yarn';
 import { yarn as friendsCottonEightFour } from './friends-cotton-8-4/yarn';
 import { yarn as friendsCottonEightEight } from './friends-cotton-8-8/yarn';
@@ -34,6 +35,7 @@ export const brand: Brand = {
     babyCottonOrganic,
     amigo,
     dailyStitchAcrylicXl,
+    dailyStitchMega,
     embroideryYarn,
     friendsCottonEightFour,
     friendsCottonEightEight,

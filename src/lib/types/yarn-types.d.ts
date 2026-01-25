@@ -88,15 +88,27 @@ export interface Colorway {
 }
 
 export interface AffiliateYarn {
-  a: string; // affiliate_base_href (base for each colorway)
-  b: string; // brand_id
-  y: string; // yarn_id
-  c: AffiliateColor[]; // colors
+  affiliate_yarn_base_href: string; // affiliate_base_href (base for each colorway)
+  brand_id: string; // brand_id
+  yarn_id: string; // yarn_id
+  colors?: AffiliateColor[]; // optional colors, in case each colorway has a unique variant suffix
 }
 
 export interface AffiliateColor {
+  name: string; // name
+  affiliate_variant_href?: string; // optional variant suffix for the affiliate_base_href
+}
+
+export interface AffiliateYarnCompressed {
+  a: string; // affiliate_base_href (base for each colorway)
+  b: string; // brand_id
+  y: string; // yarn_id
+  c?: AffiliateColorCompressed[]; // optional colors, in case each colorway has a unique variant suffix
+}
+
+export interface AffiliateColorCompressed {
   n: string; // name
-  v?: string; // optional viariant suffix for the affiliate_base_href
+  v?: string; // optional variant suffix for the affiliate_base_href
 }
 
 export interface Color {
