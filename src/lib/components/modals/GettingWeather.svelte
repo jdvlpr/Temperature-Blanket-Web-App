@@ -16,9 +16,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import {
     controller,
+    dialog,
     gauges,
     locations,
-    dialog,
     signal,
     weather,
   } from '$lib/state';
