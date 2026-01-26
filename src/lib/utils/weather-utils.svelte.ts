@@ -266,12 +266,11 @@ export const getOpenMeteo = async ({
 
   // Add future days with null values if needed
   if (totalDaysInFuture > 0) {
-    const todayStr = getLocalISODateString();
     // Start from today (since we set the request _to end date to yesterday)
-    const today = stringToDate(todayStr);
+    const todayStrToDate = stringToDate(todayStr);
 
     for (let index = 0; index < totalDaysInFuture; index += 1) {
-      const _date = new Date(today);
+      const _date = new Date(todayStrToDate);
       _date.setUTCDate(_date.getUTCDate() + index);
       const _dayTime = getDayTime({
         date: _date,
