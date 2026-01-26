@@ -19,6 +19,7 @@ import {
   SECRET_METEOSTAT_DEV_API_KEY,
 } from '$env/static/private';
 import { API_SERVICES, NO_DATA_SRTM3 } from '$lib/constants';
+import type { WeatherDay } from '$lib/types.js';
 import {
   celsiusToFahrenheit,
   displayNumber,
@@ -26,6 +27,7 @@ import {
   getMaxOfThree,
   getMinOfThree,
   getMoonPhase,
+  getToday,
   hoursToMinutes,
   millimetersToInches,
   stringToDate,
@@ -41,7 +43,7 @@ export async function POST({ request }) {
   if (!location || typeof location !== 'object')
     throw error(400, 'Missing location object');
 
-  let allData = [];
+  let allData: WeatherDay[] = [];
 
   let url = API_SERVICES.meteostat.baseURL;
   url += `?lat=${location.lat}`;
@@ -96,16 +98,15 @@ export async function POST({ request }) {
     // No data property returned from meteostat
     throw error(400, { message: errorMessage });
   }
-  if (data.data.every((day: any) => day.tavg === null)) {
+  if (data.data.every((day) => day.tavg === null)) {
     // Empty data array
     throw error(400, { message: errorMessage });
   }
 
-  // Only set stations on the first (or only) call
   location.stations = data.meta.stations;
 
   // Process the data
-  const today = new Date();
+  const today = getToday();
 
   for (let index = 0; index < data.data.length; index += 1) {
     const day = data.data[index];
@@ -126,7 +127,7 @@ export async function POST({ request }) {
 
     // With the Meteostat API, if the "model" param is set to "true" (which is the default), it will include future weather predictions.
     //Our application does not want this, so make null any weather parameters which are for days in the future.
-    const isDateInPast = dayDate < today.setHours(0, 0, 0, 0);
+    const isDateInPast = dayDate < new Date(today);
 
     if (!isDateInPast) {
       tmin = null;
@@ -136,7 +137,7 @@ export async function POST({ request }) {
       snow = null;
     }
 
-    const dayData = {};
+    const dayData = {} as WeatherDay;
     dayData.location = location.index;
     dayData.date = dayDate;
     dayData.tavg = {
@@ -192,7 +193,7 @@ export async function POST({ request }) {
   }
 
   // Sort by date
-  allData.sort((a: any, b: any) => a.date - b.date);
+  allData.sort((a, b) => a.date - b.date);
 
   return json(allData);
 }

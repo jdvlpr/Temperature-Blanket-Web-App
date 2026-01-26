@@ -16,13 +16,20 @@
 import { API_SERVICES, MOON_PHASE_NAMES } from '$lib/constants';
 import { allGaugesAttributes, locations, signal, weather } from '$lib/state';
 import { preferences } from '$lib/storage/preferences.svelte';
-import type { MoonPhasesId, WeatherDay, WeatherParam } from '$lib/types';
+import type {
+  LocationType,
+  MoonPhasesId,
+  WeatherDay,
+  WeatherParam,
+} from '$lib/types';
+
 import {
   celsiusToFahrenheit,
   convertTime,
   dateToISO8601String,
   displayNumber,
   getAverage,
+  getToday,
   getColorInfo,
   getLocalISODateString,
   hoursToMinutes,
@@ -81,32 +88,36 @@ export const missingDaysCount = () => {
   return missingDays.length;
 };
 
-export const getOpenMeteo = async ({ location }) => {
+export const getOpenMeteo = async ({
+  location,
+}: {
+  location: LocationType;
+}) => {
   let allData: WeatherDay[] = [];
   let totalDaysInFuture = 0;
 
   const todayStr = getLocalISODateString();
-  let _to = dateRange.to;
+  let _to = location.to;
 
   // If the end date is in the future, set it instead to yesterday
   // The reason for this is because Open-Meteo does not accept end dates in the future
   if (_to >= todayStr) {
     // get today as a date (UTC 00:00 representation of Local Date)
-    const _today = stringToDate(todayStr);
+    const todayStrToDate = stringToDate(todayStr);
 
     // set the number of days which are in the future, including today
-    totalDaysInFuture += numberOfDays(_today, stringToDate(_to));
+    totalDaysInFuture = numberOfDays(todayStrToDate, stringToDate(_to));
 
     // set the _to end date to yesterday, the last day which should be included in the request for weather data
     // We do this by creating a UTC date from the Local String, subtracting 1 day, then formatting back to ISO
-    const yesterday = new Date(_today);
-    yesterday.setUTCDate(_today.getUTCDate() - 1);
+    const yesterday = new Date(todayStrToDate);
+    yesterday.setUTCDate(todayStrToDate.getUTCDate() - 1);
     _to = dateToISO8601String(yesterday);
   }
 
   let url = API_SERVICES.openMeteo.baseURL;
   url += `?latitude=${location.lat}&longitude=${location.lng}`;
-  url += `&start_date=${dateRange.from}`;
+  url += `&start_date=${location.from}`;
   url += `&end_date=${_to}`;
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'auto';
   url += `&daily=temperature_2m_max,temperature_2m_min,rain_sum,snowfall_sum&timezone=${timezone}`;
@@ -131,13 +142,13 @@ export const getOpenMeteo = async ({ location }) => {
   if (data?.error === true) {
     // Example Reason: "Parameter 'start_date' is out of allowed range from 1959-01-01 to 2023-02-01"
     if (data?.reason.includes('is out of allowed range')) {
-      const from = stringToDate(dateRange.from);
-      const to = stringToDate(dateRange.to);
+      const from = stringToDate(location.from);
+      const to = stringToDate(location.to);
 
       let today = getLocalISODateString();
 
       let daysInFuture = null;
-      if (dateRange.to >= today) {
+      if (location.to >= today) {
         daysInFuture = numberOfDays(stringToDate(today), to);
       }
 
@@ -164,9 +175,9 @@ export const getOpenMeteo = async ({ location }) => {
       `<p class="font-bold text-xl my-4">Something Went Wrong</p>
       <p>A search request for weather data from <span class="font-bold">${
         location.label
-      }</span> (${stringToDate(dateRange.from).toLocaleDateString(undefined, {
+      }</span> (${stringToDate(location.from).toLocaleDateString(undefined, {
         timeZone: 'UTC',
-      })} - ${stringToDate(dateRange.to).toLocaleDateString(undefined, {
+      })} - ${stringToDate(location.to).toLocaleDateString(undefined, {
         timeZone: 'UTC',
       })}) was sent to <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer" class="link">Open-Meteo.com</a>, but the response returned an error.</p>
                             <p class="my-4">Try again with a different location or dates.</p>
@@ -181,14 +192,13 @@ export const getOpenMeteo = async ({ location }) => {
     );
   }
 
-  if (data.daily?.temperature_2m_max.every((value: any) => value === null)) {
+  if (data.daily?.temperature_2m_max.every((value) => value === null)) {
     // Empty data
     throw new Error(
       '<p class="font-bold text-xl my-4">Something Went Wrong</p><p class="mt-4">There appears to be insufficient weather data, please try a different location or dates.</p>',
     );
   }
 
-  // Only set stations on the first (or only) call
   location.stations = null; // No station details from Open-Meteo, only from Meteostat
 
   const times = data.daily.time;
