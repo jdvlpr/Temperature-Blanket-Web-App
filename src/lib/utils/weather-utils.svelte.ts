@@ -29,7 +29,6 @@ import {
   dateToISO8601String,
   displayNumber,
   getAverage,
-  getToday,
   getColorInfo,
   getLocalISODateString,
   hoursToMinutes,
