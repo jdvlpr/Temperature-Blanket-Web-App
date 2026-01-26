@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   dateToISO8601String,
   getIsFutureDate,
+  getLocalISODateString,
   getToday,
   getWeekNumber,
   isDateWithinLastSevenDays,
@@ -128,6 +129,21 @@ describe('date-utils', () => {
       expect(today.getUTCHours()).toBe(0);
       expect(today.getUTCDate()).toBe(1);
       vi.useRealTimers();
+    });
+  });
+  describe('getLocalISODateString', () => {
+    it('should return local date string', () => {
+      // Mock local time to be non-UTC midnight friendly if possible, or just check format
+      // Since we can't easily mock timezone in node/vitest without more setup,
+      // we'll rely on checking that it matches the local date components of the date object passed.
+      const date = new Date(2024, 0, 26, 12, 0, 0); // Jan 26, 12:00 Local
+      const result = getLocalISODateString(date);
+      expect(result).toBe('2024-01-26');
+    });
+
+    it('should handle padding', () => {
+      const date = new Date(2024, 0, 5); // Jan 5
+      expect(getLocalISODateString(date)).toBe('2024-01-05');
     });
   });
 });

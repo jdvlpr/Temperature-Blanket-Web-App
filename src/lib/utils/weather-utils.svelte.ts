@@ -24,6 +24,7 @@ import {
   displayNumber,
   getAverage,
   getColorInfo,
+  getLocalISODateString,
   hoursToMinutes,
   millimetersToInches,
   numberOfDays,
@@ -112,22 +113,22 @@ export const getOpenMeteo = async ({ location }) => {
 
   // Fetch data for each date range
   for (const dateRange of dateRanges) {
-    let today = new Date();
-    today.setHours(0, 0, 0, 0);
+    const todayStr = getLocalISODateString();
     let _to = dateRange.to;
 
     // If the end date is in the future, set it instead to yesterday
     // The reason for this is because Open-Meteo does not accept end dates in the future
-    if (stringToDate(_to) >= today) {
-      // get today as a date
-      const _today = new Date();
-      _today.setHours(0, 0, 0, 0);
+    if (_to >= todayStr) {
+      // get today as a date (UTC 00:00 representation of Local Date)
+      const _today = stringToDate(todayStr);
 
       // set the number of days which are in the future, including today
       totalDaysInFuture += numberOfDays(_today, stringToDate(_to));
 
       // set the _to end date to yesterday, the last day which should be included in the request for weather data
-      const yesterday = new Date(_today.getTime() - 24 * 60 * 60 * 1000);
+      // We do this by creating a UTC date from the Local String, subtracting 1 day, then formatting back to ISO
+      const yesterday = new Date(_today);
+      yesterday.setUTCDate(_today.getUTCDate() - 1);
       _to = dateToISO8601String(yesterday);
     }
 
@@ -161,12 +162,11 @@ export const getOpenMeteo = async ({ location }) => {
         const from = stringToDate(dateRange.from);
         const to = stringToDate(dateRange.to);
 
-        let today = new Date();
-        today.setHours(0, 0, 0, 0);
+        let today = getLocalISODateString();
 
         let daysInFuture = null;
-        if (to >= today) {
-          daysInFuture = numberOfDays(today, to);
+        if (dateRange.to >= today) {
+          daysInFuture = numberOfDays(stringToDate(today), to);
         }
 
         let content =
@@ -290,9 +290,9 @@ export const getOpenMeteo = async ({ location }) => {
 
   // Add future days with null values if needed
   if (totalDaysInFuture > 0) {
-    let today = new Date();
-    today.setHours(0, 0, 0, 0);
-    today.setUTCDate(today.getUTCDate() + 1); // Start from tomorrow
+    const todayStr = getLocalISODateString();
+    // Start from today (since we set the request _to end date to yesterday)
+    const today = stringToDate(todayStr);
 
     for (let index = 0; index < totalDaysInFuture; index += 1) {
       const _date = new Date(today);
