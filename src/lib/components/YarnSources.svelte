@@ -33,12 +33,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <p class="text-sm">
     Real yarn colors will look different than what's on the screen. Any
     trademarked yarn or colorway details are owned by their respective
-    companies. Results are not sponsored, but items purchased through some links
-    (marked with a shopping cart icon <ShoppingCartIcon
-      class="inline size-4"
-    />) may earn the developer of this site a percentage of the sale at no
-    additional cost to you. Requests for yarn to be included in these results
-    can be made by anyone using
+    companies. Purchases via links with a shopping cart icon <ShoppingCartIcon
+      class="relative -top-px inline size-4"
+    /> support the developer of this site at no extra cost to you. Requests for yarn
+    to be included in these results can be made by anyone using
     <a href="/yarn-search-request" class="link">this request form.</a>
   </p>
 

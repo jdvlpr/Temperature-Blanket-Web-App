@@ -459,12 +459,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
                             </div>
                             {#if hasAffiliateLinks}
                               <p class="mt-4 px-2 text-sm">
-                                Items purchased through links with a shopping
-                                bag icon
-                                <ShoppingCartIcon class="inline size-4" />
-                                help support this site by earning the developer a
-                                percentage of each sale, at no additional cost to
-                                you.
+                                Purchases via links with a shopping cart icon <ShoppingCartIcon
+                                  class="relative -top-px inline size-4"
+                                /> support the developer of this site at no extra
+                                cost to you.
                               </p>
                             {/if}
                             <div class="mx-auto mt-4 w-fit">

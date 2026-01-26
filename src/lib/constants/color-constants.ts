@@ -47,24 +47,27 @@ export const ALL_YARN_WEIGHTS: YarnWeight[] = [
   { name: 'Jumbo', id: 'j' },
 ];
 
-const affiliateYarns: AffiliateYarn[] | null = getAffiliateYarns();
+const affiliateYarnsMap: Map<string, AffiliateYarn> | null =
+  getAffiliateYarns();
 
 /**
- * Get all affiliate yarns
+ * Get all affiliate yarns as a map keyed by brandId:yarnId
  */
-function getAffiliateYarns(): AffiliateYarn[] | null {
+function getAffiliateYarns(): Map<string, AffiliateYarn> | null {
   if (!PUBLIC_AFFILIATE_YARNS) return null;
   const parsed = JSON.parse(PUBLIC_AFFILIATE_YARNS);
   if (!parsed) return null;
   const locationCode = getLocationCode();
-  return parsed.map((affiliateYarn: AffiliateYarnCompressed) => {
-    let usHref = affiliateYarn.a?.us || null;
-    let otherHref = affiliateYarn.a?.other || null;
+  const map = new Map<string, AffiliateYarn>();
 
-    let affiliateVariantBaseHref =
+  parsed.forEach((affiliateYarn: AffiliateYarnCompressed) => {
+    const usHref = affiliateYarn.a?.us || null;
+    const otherHref = affiliateYarn.a?.other || null;
+
+    const affiliateVariantBaseHref =
       locationCode === 'us' ? usHref || otherHref : otherHref || usHref;
 
-    let affiliate_variant_base_href = `${PUBLIC_AFFILIATE_BASE_URL}-${affiliateVariantBaseHref}`;
+    const affiliate_variant_base_href = `${PUBLIC_AFFILIATE_BASE_URL}-${affiliateVariantBaseHref}`;
 
     let yarn: AffiliateYarn = {
       brand_id: affiliateYarn.b,
@@ -72,14 +75,14 @@ function getAffiliateYarns(): AffiliateYarn[] | null {
       affiliate_variant_base_href,
     };
 
-    if (affiliateYarn?.c && affiliateYarn?.c.length > 0)
+    if (affiliateYarn?.c && affiliateYarn?.c.length > 0) {
       yarn = {
         ...yarn,
         colors: affiliateYarn.c.map((color) => {
-          let usVariantHref = color?.v?.us || null;
-          let otherVariantHref = color?.v?.other || null;
+          const usVariantHref = color?.v?.us || null;
+          const otherVariantHref = color?.v?.other || null;
 
-          let colorVariantHref =
+          const colorVariantHref =
             locationCode === 'us'
               ? usVariantHref || otherVariantHref
               : otherVariantHref || usVariantHref;
@@ -93,8 +96,10 @@ function getAffiliateYarns(): AffiliateYarn[] | null {
           };
         }),
       };
-    return yarn;
+    }
+    map.set(`${yarn.brand_id}-${yarn.yarn_id}`, yarn);
   });
+  return map;
 }
 
 /**
@@ -103,84 +108,53 @@ function getAffiliateYarns(): AffiliateYarn[] | null {
  * @return {Color[]} The colorways with affiliate links
  */
 export const ALL_COLORWAYS_WITH_AFFILIATE_LINKS: Color[] = brands.flatMap(
-  (brand, brandIndex) => {
-    return brand.yarns
-      .map((yarn) => {
-        // Find matching affiliate data for the current yarn
-        const affiliateYarn =
-          affiliateYarns && affiliateYarns.length > 0
-            ? affiliateYarns.find(
-                (affiliateYarn) =>
-                  affiliateYarn.brand_id === brand.id &&
-                  affiliateYarn.yarn_id === yarn.id,
-              )
-            : null;
-        return {
-          ...yarn,
-          brandId: brands[brandIndex].id,
-          brandName: brands[brandIndex].name,
-          affiliateYarn: affiliateYarn
-            ? {
-                affiliateColors: affiliateYarn?.colors || null,
-                affiliateYarnId: affiliateYarn.yarn_id,
-                affiliateVariantBaseHref:
-                  affiliateYarn.affiliate_variant_base_href,
-              }
-            : null,
-        };
-      })
-      .flatMap((yarn) =>
-        // Flatten yarns into their respective colorways
-        yarn.colorways.map((colorway) => {
-          const affiliateColors =
-            yarn.affiliateYarn?.affiliateYarnId === yarn.id
-              ? yarn.affiliateYarn?.affiliateColors || null
-              : null;
+  (brand) => {
+    return brand.yarns.flatMap((yarn) => {
+      // Find matching affiliate data for the current yarn in O(1)
+      const affiliateYarn =
+        affiliateYarnsMap?.get(`${brand.id}-${yarn.id}`) || null;
 
-          const affiliateVariantBaseHref =
-            yarn.affiliateYarn?.affiliateYarnId === yarn.id
-              ? yarn.affiliateYarn?.affiliateVariantBaseHref || null
-              : null;
-          return {
-            ...colorway,
-            affiliateColors,
-            affiliateVariantBaseHref,
-            brandId: yarn.brandId,
-            brandName: yarn.brandName,
-            yarnId: yarn.id,
-            yarnName: yarn.name,
-            yarnWeightId: yarn.weightId,
-          };
-        }),
-      )
-      .flatMap((colorway) =>
-        // Flatten colorways into individual colors with affiliate links and metadata
-        colorway.colors.map((color) => {
+      // Create a map of affiliate colors for O(1) lookup if colors exist
+      const affiliateColorsMap = new Map<string, string>();
+      if (affiliateYarn?.colors) {
+        affiliateYarn.colors.forEach((c) => {
+          if (c.affiliate_variant_href) {
+            affiliateColorsMap.set(c.name, c.affiliate_variant_href);
+          }
+        });
+      }
+
+      const affiliateVariantBaseHref =
+        affiliateYarn?.affiliate_variant_base_href || null;
+
+      return yarn.colorways.flatMap((colorway) => {
+        const unavailable = !!colorway.source?.unavailable;
+
+        return colorway.colors.map((color) => {
           // Resolve the specific affiliate link for this color variant
-          const affiliate_variant_href = colorway?.affiliateColors
-            ? colorway.affiliateColors.find(
-                (affiliateColor) => color.name === affiliateColor.name,
-              )?.affiliate_variant_href
-            : colorway?.affiliateVariantBaseHref || null;
+          const affiliate_variant_href =
+            (color.name && affiliateColorsMap.get(color.name)) ||
+            affiliateVariantBaseHref;
 
           const variant_href = color?.variant_href || colorway.source.href;
           // Normalize hex values using chroma
-          color.hex = chroma(color.hex).hex();
-          const unavailable = !!colorway.source?.unavailable;
+          const hex = chroma(color.hex).hex();
 
           return {
             ...color,
+            hex,
             affiliate_variant_href,
             variant_href,
-            brandName: colorway.brandName,
-            brandId: colorway.brandId,
-            yarnId: colorway.yarnId,
-            yarnName: colorway.yarnName,
-            yarnWeightId: colorway.yarnWeightId,
+            brandName: brand.name,
+            brandId: brand.id,
+            yarnId: yarn.id,
+            yarnName: yarn.name,
+            yarnWeightId: yarn.weightId,
             unavailable,
           };
-        }),
-      );
+        });
+      });
+    });
   },
 );
 
@@ -197,47 +171,26 @@ function getLocationCode(): 'us' | 'other' {
   return lastTwoLetters.toLowerCase() === 'us' ? 'us' : 'other';
 }
 
-export const ALL_COLORWAYS: Color[] = brands.flatMap((n, i) => {
-  return n.yarns
-    .map((yarn) => {
-      return {
-        ...yarn,
-        brandId: brands[i].id,
-        brandName: brands[i].name,
-      };
-    })
-    .flatMap((yarn) =>
-      yarn.colorways.map((n) => {
+export const ALL_COLORWAYS: Color[] = brands.flatMap((brand) => {
+  return brand.yarns.flatMap((yarn) => {
+    return yarn.colorways.flatMap((colorway) => {
+      return colorway.colors.map((color) => {
+        const href = color?.variant_href || colorway.source.href;
+        const hex = chroma(color.hex).hex();
         return {
-          ...n,
-          brandId: yarn.brandId,
-          brandName: yarn.brandName,
+          name: color.name,
+          hex,
+          brandId: brand.id,
+          brandName: brand.name,
           yarnId: yarn.id,
           yarnName: yarn.name,
           yarnWeightId: yarn.weightId,
-        };
-      }),
-    )
-    .flatMap((colorway) =>
-      colorway.colors.map((n) => {
-        const href = n?.variant_href || colorway.source.href;
-        const hex = chroma(n.hex).hex();
-        // No need to check if the colorway is available or not, but here's how to do it:
-        // const isAvailable = !colorway.source?.unavailable;
-        return {
-          name: n.name,
-          hex,
-          brandId: colorway.brandId,
-          brandName: colorway.brandName,
-          yarnId: colorway.yarnId,
-          yarnName: colorway.yarnName,
-          yarnWeightId: colorway.yarnWeightId,
           dateAccessed: colorway.source.accessed,
           href,
-          // isAvailable,
         };
-      }),
-    );
+      });
+    });
+  });
 });
 
 // Preset color schemes

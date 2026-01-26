@@ -600,9 +600,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             {#if areAnyResultsAffiliate}
               <p class="mt-2 text-center text-sm">
-                Items purchased through some links (marked with a shopping cart
-                icon) earn the developer of this site a percentage of the sale
-                at no additional cost to you.
+                Purchases via links with a shopping cart icon <ShoppingCartIcon
+                  class="relative -top-px inline size-4"
+                /> support the developer of this site at no extra cost to you.
               </p>
             {/if}
 
