@@ -31,9 +31,11 @@ import {
   colorsToYarnDetails,
   convertTime,
   dateToISO8601String,
+  getLocalISODateString,
   getWPGauge,
   getWeatherSourceDetails,
   missingDaysCount,
+  stringToDate,
 } from '$lib/utils';
 
 export const getProjectParametersFromURLHash = (hash) => {
@@ -178,10 +180,7 @@ export const sendToProjectGallery = async (img) => {
     };
   });
 
-  const debugData = {
-    today: '',
-    yesterday: '',
-  };
+  const debugData = getDebugData();
 
   const data = {
     colors: JSON.stringify(colors),
@@ -200,6 +199,7 @@ export const sendToProjectGallery = async (img) => {
     weather_grouping: weather.grouping,
     weather_sources: JSON.stringify(getWeatherSourceDetails()),
     wp_tag_id: previews.active.wpTagId,
+    debug_data: JSON.stringify(debugData),
   };
   let message = '';
   try {
@@ -281,3 +281,35 @@ export const getTitleFromLocationsMeta = (locations) => {
 
   return title || '';
 };
+
+// Temporariy diagnostics
+function getDebugData() {
+  // current
+  let current_today = new Date();
+  current_today.setHours(0, 0, 0, 0);
+  // set the _to end date to yesterday, the last day which should be included in the request for weather data
+  const current_yesterday = new Date(
+    current_today.getTime() - 24 * 60 * 60 * 1000,
+  );
+  const current_newTOStart = dateToISO8601String(current_yesterday);
+
+  // proposed
+  const todayStr = getLocalISODateString();
+  const todayStrToDate = stringToDate(todayStr);
+  const yesterday = new Date(todayStrToDate);
+  yesterday.setUTCDate(todayStrToDate.getUTCDate() - 1);
+  const new_TOStart = dateToISO8601String(yesterday);
+  return {
+    current: {
+      today: current_today,
+      yesterday: current_yesterday,
+      newTOStart: current_newTOStart,
+    },
+    proposed: {
+      todayStr,
+      todayStrToDate,
+      yesterday,
+      new_TOStart,
+    },
+  };
+}
