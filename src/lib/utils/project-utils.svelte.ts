@@ -189,6 +189,7 @@ export const sendToProjectGallery = async (img) => {
     tables: JSON.stringify(tables),
     title: locations.projectTitle,
     total_days: weather.rawData.length,
+    raw_weather_data: JSON.stringify(weather.rawData),
     yarn_urls: JSON.stringify(yarnUrls),
     yarn_details: JSON.stringify(yarnDetails),
     weather_grouping: weather.grouping,
