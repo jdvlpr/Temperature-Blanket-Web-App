@@ -19,10 +19,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let { selectedBrandId, selectedYarnId } = $props();
 </script>
 
-<div class="mt-1 flex flex-col gap-1 items-start text-left">
+<div class="mt-1 flex flex-col items-start gap-1 text-left">
   <ToggleSwitch
     label="Set as Default Yarn"
-    details="Automatically select this yarn for certain areas of this site, like for colors with no assigned yarn."
+    details="Automatically select this yarn for certain areas of this web app, like for colors with no assigned yarn."
     onchange={(e) => {
       if (e.target.checked) {
         defaultYarn.value = `${selectedBrandId}-${selectedYarnId}`;

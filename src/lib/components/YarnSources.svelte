@@ -35,8 +35,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     trademarked yarn or colorway details are owned by their respective
     companies. Purchases via links with a shopping cart icon <ShoppingCartIcon
       class="relative -top-px inline size-4"
-    /> support the developer of this site at no extra cost to you. Requests for yarn
-    to be included in these results can be made by anyone using
+    /> support the developer of this web app at no extra cost to you. Requests for
+    yarn to be included in these results can be made by anyone using
     <a href="/yarn-search-request" class="link">this request form.</a>
   </p>
 

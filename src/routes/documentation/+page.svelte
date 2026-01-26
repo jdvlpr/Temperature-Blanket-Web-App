@@ -1601,9 +1601,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
               Any trademarked yarn or colorway details are owned by their
               respective companies. Purchases via links with a shopping cart
               icon <ShoppingCartIcon class="relative -top-px inline size-4" /> support
-              the developer of this site at no extra cost to you. Colors may be inaccurate,
-              and may not represent yarn as it appears in physical reality. Requests
-              for yarn to be included in these results can be made by anyone using
+              the developer of this web app at no extra cost to you. Colors may be
+              inaccurate, and may not represent yarn as it appears in physical reality.
+              Requests for yarn to be included in these results can be made by anyone
+              using
               <a class="link" href="/yarn-search-request">this request form.</a>
             </p>
           </div>

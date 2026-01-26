@@ -461,7 +461,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                               <p class="mt-4 px-2 text-sm">
                                 Purchases via links with a shopping cart icon <ShoppingCartIcon
                                   class="relative -top-px inline size-4"
-                                /> support the developer of this site at no extra
+                                /> support the developer of this web app at no extra
                                 cost to you.
                               </p>
                             {/if}
