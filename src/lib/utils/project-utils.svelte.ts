@@ -178,6 +178,11 @@ export const sendToProjectGallery = async (img) => {
     };
   });
 
+  const debugData = {
+    today: '',
+    yesterday: '',
+  };
+
   const data = {
     colors: JSON.stringify(colors),
     gauges: JSON.stringify(labels),
