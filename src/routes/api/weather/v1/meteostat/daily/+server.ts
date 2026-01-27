@@ -22,12 +22,12 @@ import { API_SERVICES, NO_DATA_SRTM3 } from '$lib/constants';
 import type { WeatherDay } from '$lib/types.js';
 import {
   celsiusToFahrenheit,
+  dateToISO8601String,
   displayNumber,
   getAvgOfThree,
   getMaxOfThree,
   getMinOfThree,
   getMoonPhase,
-  getToday,
   hoursToMinutes,
   millimetersToInches,
   stringToDate,
@@ -106,7 +106,7 @@ export async function POST({ request }) {
   location.stations = data.meta.stations;
 
   // Process the data
-  const today = getToday();
+  const todayDate = new Date();
 
   for (let index = 0; index < data.data.length; index += 1) {
     const day = data.data[index];
@@ -127,7 +127,14 @@ export async function POST({ request }) {
 
     // With the Meteostat API, if the "model" param is set to "true" (which is the default), it will include future weather predictions.
     //Our application does not want this, so make null any weather parameters which are for days in the future.
-    const isDateInPast = dayDate < new Date(today);
+    const isDateInPast =
+      dateToISO8601String(dayDate) < dateToISO8601String(todayDate);
+
+    console.log(
+      dateToISO8601String(dayDate),
+      dateToISO8601String(todayDate),
+      isDateInPast,
+    );
 
     if (!isDateInPast) {
       tmin = null;
