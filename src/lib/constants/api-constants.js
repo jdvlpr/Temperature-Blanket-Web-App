@@ -15,27 +15,27 @@
 
 import { dev } from '$app/environment';
 
-// When in dev mode, use free geonames.net instead of paid geonames.net credits. It's mandatory for local dev environment to use the .org domain because of permissions
-// Check GeoNames api usage here: https://www.geonames.net/account
+// When in dev mode, use free geonames.com instead of paid geonames.net credits. It's mandatory for local dev environment to use the .com domain because of permissions
+// Check GeoNames api usage here: https://www.geonames.com/account
 export const API_SERVICES = {
   geonames: {
     baseURL: dev
-      ? 'https://secure.geonames.net/searchJSON'
+      ? 'https://secure.geonames.com/searchJSON'
       : 'https://secure.geonames.net/searchJSON',
   },
   geonamesfindNearbyPlaceName: {
     baseURL: dev
-      ? 'https://secure.geonames.net/findNearbyPlaceNameJSON'
+      ? 'https://secure.geonames.com/findNearbyPlaceNameJSON'
       : 'https://secure.geonames.net/findNearbyPlaceNameJSON',
   },
   geonamesGetID: {
     baseURL: dev
-      ? 'https://secure.geonames.net/getJSON'
+      ? 'https://secure.geonames.com/getJSON'
       : 'https://secure.geonames.net/getJSON',
   },
   geonamesGetAltitude: {
     baseURL: dev
-      ? 'https://secure.geonames.net/srtm3JSON'
+      ? 'https://secure.geonames.com/srtm3JSON'
       : 'https://secure.geonames.net/srtm3JSON',
   },
   meteostat: {

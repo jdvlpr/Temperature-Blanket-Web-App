@@ -64,7 +64,11 @@ export class LocationState extends LocationClass implements LocationStateType {
     return stringToDate(this.to);
   });
 
-  days = $derived(getDaysBetween(this.#fromDate, this.#toDate));
+  days = $derived(
+    this.#fromDate && this.#toDate
+      ? getDaysBetween(this.#fromDate, this.#toDate)
+      : 0,
+  );
 
   #today = $state<TISO8601DateString | null>(null); // YYYY-MM-DD
 
@@ -102,7 +106,7 @@ export class LocationsState implements LocationsStateType {
   all = $state([]);
 
   totalDays = $derived.by(() => {
-    const arrayOfDayCount = this.all.map((n) => {
+    const arrayOfDayCount = this.all.map((n: LocationState) => {
       if (!n.from || !n.to) return null;
       const from = stringToDate(n.from);
       const to = stringToDate(n.to);
