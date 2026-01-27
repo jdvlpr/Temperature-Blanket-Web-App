@@ -23,6 +23,7 @@ import type {
   LocationsStateType,
   LocationStateType,
   LocationType,
+  TISO8601DateString,
   WeatherSource,
 } from '$lib/types';
 import { dateToISO8601String, getDaysBetween, stringToDate } from '$lib/utils';
@@ -31,8 +32,8 @@ export class LocationClass implements LocationType {
   uuid: string = $state('');
   index: number = $state(0);
   duration?: 'c' | 'y' = $state('y');
-  from?: string = $state();
-  to?: string = $state();
+  from?: TISO8601DateString = $state();
+  to?: TISO8601DateString = $state();
   label?: string = $state();
   result?: string = $state();
   id?: number = $state();
@@ -65,16 +66,16 @@ export class LocationState extends LocationClass implements LocationStateType {
 
   days = $derived(getDaysBetween(this.#fromDate, this.#toDate));
 
-  #today = $state<string>(); // YYYY-MM-DD
+  #today = $state<TISO8601DateString | null>(null); // YYYY-MM-DD
 
   daysInFuture = $derived.by(() => {
-    if (this.to >= this.#today)
+    if (this.#today && this.to >= this.#today)
       return getDaysBetween(stringToDate(this.#today), this.#toDate);
     else return 0;
   });
 
   errorMessage = $derived.by(() => {
-    if (this.from >= this.#today)
+    if (this.from && this.#today && this.from >= this.#today)
       return 'The starting date must be at least one day in the past.';
 
     if (this.days > MAXIMUM_DAYS_PER_LOCATION)

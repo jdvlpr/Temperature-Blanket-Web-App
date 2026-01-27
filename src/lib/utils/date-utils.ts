@@ -19,6 +19,9 @@ import type {
   TISO8601DateString,
   TISO8601DateStringPeriodSeparated,
   TISO8601DateStringSlashSeparated,
+  TMonthString,
+  TDayString,
+  TYearString,
   WeatherDay,
 } from '$lib/types';
 
@@ -83,10 +86,10 @@ export const yearFrom = (date: string): Date => {
  * @param {Date} date - The date to be converted.
  * @returns {string} The ISO 8601 formatted date string `YYYY-MM-DD`.
  */
-export const dateToISO8601String = (date) => {
-  const year = date.getUTCFullYear();
-  const month = `${date.getUTCMonth() + 1}`.padStart(2, '0');
-  const day = `${date.getUTCDate()}`.padStart(2, '0');
+export const dateToISO8601String = (date: Date): TISO8601DateString => {
+  const year = date.getUTCFullYear().toString() as TYearString;
+  const month = `${date.getUTCMonth() + 1}`.padStart(2, '0') as TMonthString;
+  const day = `${date.getUTCDate()}`.padStart(2, '0') as TDayString;
 
   return `${year}-${month}-${day}`;
 };
@@ -244,9 +247,9 @@ export const getLocalISODateString = (
   date: Date = new Date(),
 ): TISO8601DateString => {
   const d = new Date(date);
-  const year = d.getFullYear();
-  const month = `${d.getMonth() + 1}`.padStart(2, '0');
-  const day = `${d.getDate()}`.padStart(2, '0');
+  const year = d.getFullYear().toString() as TYearString;
+  const month = `${d.getMonth() + 1}`.padStart(2, '0') as TMonthString;
+  const day = `${d.getDate()}`.padStart(2, '0') as TDayString;
 
   return `${year}-${month}-${day}`;
 };

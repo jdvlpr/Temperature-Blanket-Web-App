@@ -43,15 +43,17 @@ export type MoonPhasesName =
   | 'Third Quarter'
   | 'Waning Crescent';
 
-type TYear = `${number}${number}${number}${number}`;
-type TMonth = `${number}${number}`;
-type TDay = `${number}${number}`;
+export type TYearString = `${number}${number}${number}${number}`;
+export type TMonthString = `${number}${number}`;
+export type TDayString = `${number}${number}`;
 /** YYYY-MM-DD representation of a date */
-export type TISO8601DateString = `${TYear}-${TMonth}-${TDay}`;
+export type TISO8601DateString = `${TYearString}-${TMonthString}-${TDayString}`;
 /** YYYY.MM.DD representation of a date */
-export type TISO8601DateStringPeriodSeparated = `${TYear}.${TMonth}.${TDay}`;
+export type TISO8601DateStringPeriodSeparated =
+  `${TYearString}.${TMonthString}.${TDayString}`;
 /** YYYY/MM/DD representation of a date */
-export type TISO8601DateStringSlashSeparated = `${TYear}/${TMonth}/${TDay}`;
+export type TISO8601DateStringSlashSeparated =
+  `${TYearString}/${TMonthString}/${TDayString}`;
 
 export interface WeatherDay {
   /** 0-based index of which location the weather day is for */
