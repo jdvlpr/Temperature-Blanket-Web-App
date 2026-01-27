@@ -13,17 +13,15 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import type { WeatherSource } from './weather-types';
+import type { TISO8601DateString, WeatherSource } from './weather-types';
 
 export interface LocationType {
   uuid?: string;
   index?: number;
   /** 'c' is for Custom, 'y' is for One Year */
   duration?: 'c' | 'y';
-  /** ISO 8601 date string `YYYY-MM-DD` */
-  from?: string;
-  /** ISO 8601 date string `YYYY-MM-DD` */
-  to?: string;
+  from?: TISO8601DateString;
+  to?: TISO8601DateString;
   label?: string;
   result?: string;
   /** Id from the GeoNames api */
@@ -45,7 +43,7 @@ export interface LocationStateType {
   #fromDate: Date | null;
   #toDate: Date | null;
   days: number;
-  #today: Date;
+  #today: TISO8601DateString | null;
   daysInFuture: number;
   errorMessage: string;
 }

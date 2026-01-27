@@ -13,7 +13,6 @@ import {
   missingDaysCount,
   sum,
 } from './weather-utils.svelte';
-import { preferences } from '$lib/storage/preferences.svelte';
 
 // Mocking $lib modules
 vi.mock('$lib/constants', async (importOriginal) => ({
@@ -92,10 +91,6 @@ vi.mock('$lib/utils', async (importOriginal) => {
     getAverage: vi.fn(
       (arr: number[]) => arr.reduce((a, b) => a + b, 0) / arr.length,
     ),
-    getToday: vi.fn(() => {
-      const d = new Date('2024-01-01T00:00:00Z');
-      return d;
-    }),
     celsiusToFahrenheit: (n: number | null) =>
       n === null ? null : (n * 9) / 5 + 32,
     millimetersToInches: (n: number | null) => (n === null ? null : n / 25.4),

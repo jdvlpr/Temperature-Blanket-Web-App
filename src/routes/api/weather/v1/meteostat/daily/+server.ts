@@ -130,12 +130,6 @@ export async function POST({ request }) {
     const isDateInPast =
       dateToISO8601String(dayDate) < dateToISO8601String(todayDate);
 
-    console.log(
-      dateToISO8601String(dayDate),
-      dateToISO8601String(todayDate),
-      isDateInPast,
-    );
-
     if (!isDateInPast) {
       tmin = null;
       tavg = null;

@@ -3,7 +3,6 @@ import {
   dateToISO8601String,
   getIsFutureDate,
   getLocalISODateString,
-  getToday,
   getWeekNumber,
   isDateWithinLastSevenDays,
   numberOfDays,
@@ -120,17 +119,6 @@ describe('date-utils', () => {
     });
   });
 
-  describe('getToday', () => {
-    it('should return today as a timestamp at midnight UTC', () => {
-      vi.useFakeTimers();
-      vi.setSystemTime(new Date('2024-01-01T15:00:00Z'));
-      const todayTimestamp = getToday();
-      const today = new Date(todayTimestamp);
-      expect(today.getUTCHours()).toBe(0);
-      expect(today.getUTCDate()).toBe(1);
-      vi.useRealTimers();
-    });
-  });
   describe('getLocalISODateString', () => {
     it('should return local date string', () => {
       // Mock local time to be non-UTC midnight friendly if possible, or just check format

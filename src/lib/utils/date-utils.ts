@@ -15,7 +15,12 @@
 
 import { METEOSTAT_DELAY_DAYS, OPEN_METEO_DELAY_DAYS } from '$lib/constants';
 import { weather } from '$lib/state';
-import type { WeatherDay } from '$lib/types';
+import type {
+  TISO8601DateString,
+  TISO8601DateStringPeriodSeparated,
+  TISO8601DateStringSlashSeparated,
+  WeatherDay,
+} from '$lib/types';
 
 /**
  * Checks if a given date is recent based on the weather source.
@@ -101,11 +106,13 @@ export const dateToISO8601StringVersion2 = (date) => {
 /**
  * Converts a string in the format "YYYY-MM-DD",  "YYYY.MM.DD", or  "YYYY/MM/DD" to a date.
  *
- * @param   {string}  str  The string to be converted.
- *
- * @return  {Date} The UTC date
  */
-export const stringToDate = (str) => {
+export const stringToDate = (
+  str:
+    | TISO8601DateString
+    | TISO8601DateStringPeriodSeparated
+    | TISO8601DateStringSlashSeparated,
+): Date => {
   const [datePart, timePart] = str.split(' ');
   let [year, month, day] = datePart.split(/[-./]/).map(Number);
 
@@ -229,19 +236,13 @@ export const isDateWithinLastSevenDays = (date) => {
   return inputDate >= sevenDaysAgo && inputDate <= currentDate;
 };
 
-export const getToday = () => {
-  let dateToday = new Date(new Date().setUTCHours(24, 0, 0, 0));
-  let today = dateToday.setUTCDate(dateToday.getUTCDate() - 1); // why this way??
-  return today;
-};
-
 /**
  * Converts a date to a Local ISO 8601 string (YYYY-MM-DD)
  * Uses the local machine's timezone, NOT UTC.
- * @param {Date} date - The date to be converted.
- * @returns {string} The ISO 8601 formatted date string `YYYY-MM-DD`.
  */
-export const getLocalISODateString = (date = new Date()) => {
+export const getLocalISODateString = (
+  date: Date = new Date(),
+): TISO8601DateString => {
   const d = new Date(date);
   const year = d.getFullYear();
   const month = `${d.getMonth() + 1}`.padStart(2, '0');

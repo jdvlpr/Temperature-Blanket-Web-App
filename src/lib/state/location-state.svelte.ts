@@ -25,11 +25,7 @@ import type {
   LocationType,
   WeatherSource,
 } from '$lib/types';
-import {
-  getDaysBetween,
-  getLocalISODateString,
-  stringToDate,
-} from '$lib/utils';
+import { dateToISO8601String, getDaysBetween, stringToDate } from '$lib/utils';
 
 export class LocationClass implements LocationType {
   uuid: string = $state('');
@@ -54,7 +50,7 @@ export class LocationState extends LocationClass implements LocationStateType {
       browser && crypto && typeof crypto.randomUUID === 'function'
         ? crypto.randomUUID()
         : `${Math.random() * 100}-${Math.random() * 100}-${Math.random() * 100}`;
-    this.#today = browser ? getLocalISODateString() : null; // caused a build error without the browser check...
+    this.#today = browser ? dateToISO8601String(new Date()) : null; // caused a build error without the browser check...
   }
 
   #fromDate = $derived.by(() => {
