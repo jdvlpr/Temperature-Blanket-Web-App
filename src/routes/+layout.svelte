@@ -179,21 +179,30 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/if}
 </svelte:head>
 
-<div
-  class="bg-primary-100-900 w-full p-2 text-center [view-transition-name:top-banner]"
->
-  <a
-    href="https://www.youtube.com/watch?v=7NRLrpZb0Lo"
-    target="_blank"
-    rel="noopener"
-    class="btn hover:preset-tonal whitespace-pre-wrap"
+<div class="flex w-full flex-col [view-transition-name:top-banner]">
+  <div class="bg-primary-100-900 w-full p-2 text-center">
+    <a
+      href="https://www.youtube.com/watch?v=7NRLrpZb0Lo"
+      target="_blank"
+      rel="noopener"
+      class="btn hover:preset-tonal whitespace-pre-wrap"
+    >
+      <YoutubeIcon />
+      <span>
+        Watch: Plan a Temperature Blanket
+        <span class="max-sm:hidden">the Easy Way</span>
+      </span>
+    </a>
+  </div>
+  <div
+    class="bg-primary-50-950 flex w-full items-center justify-center p-2 text-center"
   >
-    <YoutubeIcon />
-    <span>
-      Watch: Plan a Temperature Blanket
-      <span class="max-sm:hidden">the Easy Way</span>
-    </span>
-  </a>
+    <p class="inline text-sm">
+      Notice: <a href="https://facebook.com/" class="link" target="_blank"
+        >Fixing a Future Dates Issue</a
+      >
+    </p>
+  </div>
 </div>
 
 {@render children?.()}

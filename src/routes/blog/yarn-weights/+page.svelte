@@ -19,7 +19,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import AppShell from '$lib/components/AppShell.svelte';
   import Card from '$lib/components/Card.svelte';
   import YarnWeightChart from '$lib/components/YarnWeightChart.svelte';
-  import { ICONS } from '$lib/constants';
   import { ArrowLeftIcon } from '@lucide/svelte';
 </script>
 
@@ -47,7 +46,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <AppShell pageName="Yarn Weights">
   {#snippet stickyHeader()}
-    <div class="hidden lg:inline-flex mx-auto"><AppLogo /></div>
+    <div class="mx-auto hidden lg:inline-flex"><AppLogo /></div>
   {/snippet}
   {#snippet main()}
     <main class="pb-8">
@@ -58,7 +57,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       >
       <Card>
         {#snippet content()}
-          <div class="pb-4 px-2">
+          <div class="px-2 pb-4">
             <YarnWeightChart />
           </div>
         {/snippet}
