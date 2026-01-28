@@ -195,7 +195,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </a>
   </div>
   <div
-    class="bg-primary-100-900 flex w-full items-center justify-center p-2 text-center"
+    class="bg-surface-100-900 flex w-full items-center justify-center p-2 text-center"
   >
     <p class="inline text-sm">
       Technical Update: <a

@@ -36,13 +36,12 @@ export const entries: ChangelogItemGroup[] = [
             notes: [
               {
                 icon: ICONS.wrench,
-                instructions:
-                  'If your saved project contained future dates, you can continue to open and edit your saved project, but you may need to modify the preview settings.',
-                text: `For some projects with future dates, one day was missing from the weather data. This caused the temperature blanket preview to be generated inaccurately. This update fixes that issue.`,
-                title: 'Fixed Issue for Projects with Future Dates',
+                instructions: `For more information, and to see if your project was affected or not, see this post: <a href="https://facebook.com/" target="_blank" class="link">Technical Update: Future Date Issue</a>.`,
+                text: `For some projects with future dates, one day was incorrect or missing. This update fixes the issue.`,
+                title: 'Future Date Issue',
               },
             ],
-            version: '5.39.5',
+            version: '5.39.4',
           },
           {
             notes: [

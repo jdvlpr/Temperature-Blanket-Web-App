@@ -16,11 +16,11 @@
 import { METEOSTAT_DELAY_DAYS, OPEN_METEO_DELAY_DAYS } from '$lib/constants';
 import { weather } from '$lib/state';
 import type {
+  TDayString,
   TISO8601DateString,
   TISO8601DateStringPeriodSeparated,
   TISO8601DateStringSlashSeparated,
   TMonthString,
-  TDayString,
   TYearString,
   WeatherDay,
 } from '$lib/types';
