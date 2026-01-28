@@ -253,18 +253,3 @@ export const getLocalISODateString = (
 
   return `${year}-${month}-${day}`;
 };
-
-/**
- * Converts a date to a Local ISO 8601 string (YYYY-MM-DD)
- * Uses the local machine's timezone, NOT UTC.
- * @param {Date} date - The date to be converted.
- * @returns {string} The ISO 8601 formatted date string `YYYY-MM-DD`.
- */
-export const getLocalISODateString = (date = new Date()) => {
-  const d = new Date(date);
-  const year = d.getFullYear();
-  const month = `${d.getMonth() + 1}`.padStart(2, '0');
-  const day = `${d.getDate()}`.padStart(2, '0');
-
-  return `${year}-${month}-${day}`;
-};
