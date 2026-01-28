@@ -42,7 +42,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { Accordion } from '@skeletonlabs/skeleton-svelte';
   import { safeSlide } from '$lib/features/transitions/safeSlide';
 
-  let accordionValue = $state(['apr20']);
+  let accordionValue = $state(['jan28,2026']);
 
   let includeDebugInfo = $state(true);
 
@@ -136,7 +136,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/snippet}
   {#snippet main()}
     <main
-      class="mx-auto flex max-w-screen-sm flex-col gap-4 px-4 pt-4 pb-8 lg:px-0"
+      class="mx-auto flex max-w-screen-sm flex-col gap-2 px-4 pt-4 pb-8 lg:px-0"
     >
       <a href="/contact" class="btn hover:preset-tonal w-fit"
         ><ArrowLeftIcon /> Contact</a
@@ -151,7 +151,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
       <div id="info" class="scroll-mt-[58px]"></div>
 
-      <div class="mb-4 flex flex-col items-start justify-between gap-4">
+      <div class="mb-4 flex flex-col items-start justify-between gap-2">
         <div class="bg-warning-50-950/50 rounded-container">
           <Expand bind:isExpanded={statusExpanded} label="Status Updates" />
         </div>
@@ -164,6 +164,80 @@ If not, see <https://www.gnu.org/licenses/>. -->
             multiple
             class="bg-warning-50-950/50 rounded-container"
           >
+            <Accordion.Item value="jan28,2026" class="font-bold">
+              <h3>
+                <Accordion.ItemTrigger
+                  class="flex items-center justify-between gap-2 font-bold"
+                >
+                  <InfoIcon />
+                  January 28, 2026
+                  <Accordion.ItemIndicator class="group">
+                    <ChevronDownIcon
+                      class="h-5 w-5 transition group-data-[state=open]:rotate-180"
+                    />
+                  </Accordion.ItemIndicator>
+                </Accordion.ItemTrigger>
+              </h3>
+
+              <Accordion.ItemContent class="font-normal">
+                {#snippet element(attributes)}
+                  {#if !attributes.hidden}
+                    <div
+                      {...attributes}
+                      transition:safeSlide
+                      class="flex flex-col gap-2 font-normal"
+                    >
+                      <p>
+                        I recently identified and fixed a bug in the Project
+                        Planner that affected how future dates were handled. If
+                        you created a project recently, please take a moment to
+                        see if your project needs a quick refresh.
+                      </p>
+
+                      <p>
+                        <span class="font-bold">Is my project affected?</span> Your
+                        project may be affected only if it meets ALL of these criteria:
+                      </p>
+                      <div class="ml-2">
+                        <p>
+                          - Created between March 27, 2025, and January 28, 2026
+                          (at about 3:30 am CST)
+                        </p>
+                        <p>- Used Open-Meteo (the default weather source)</p>
+                        <p>- Contained future dates at the time of creation</p>
+                      </div>
+
+                      <p>
+                        Note: Projects using historical data, Meteostat as the
+                        weather source, or which were created outside the above
+                        timeframe are not affected.
+                      </p>
+
+                      <p>
+                        <span class="font-bold">What was the impact?</span> The bug
+                        only impacted a project's layout and a future date, temperature
+                        data and colors were not affected. If you downloaded a PDF
+                        or CSV file, it may have a missing or incorrect date. For
+                        some preview images, such as the Calendar or Square pattern
+                        types, the grid may have shifted, causing month divisions
+                        to look off. (The Rows and Chevrons preview images were likely
+                        fine.)
+                      </p>
+
+                      <p>
+                        <span class="font-bold">How to fix it:</span> The latest version
+                        of the web app applies the fix automatically. Simply open
+                        the affected project on temperature-blanket.com and search
+                        for weather data. If you previously downloaded a PDF or CSV
+                        file, you may want to download the new, corrected file. In
+                        the Preview tab, you may also want to adjust the preview settings
+                        if the layout looks different.
+                      </p>
+                    </div>
+                  {/if}
+                {/snippet}
+              </Accordion.ItemContent>
+            </Accordion.Item>
             <Accordion.Item value="apr20" class="font-bold">
               <h3>
                 <Accordion.ItemTrigger

@@ -35,6 +35,18 @@ export const entries: ChangelogItemGroup[] = [
           {
             notes: [
               {
+                icon: ICONS.wrench,
+                instructions:
+                  'If your saved project contained future dates, you can continue to open and edit your saved project, but you may need to modify the preview settings.',
+                text: `For some projects with future dates, one day was missing from the weather data. This caused the temperature blanket preview to be generated inaccurately. This update fixes that issue.`,
+                title: 'Fixed Issue for Projects with Future Dates',
+              },
+            ],
+            version: '5.39.5',
+          },
+          {
+            notes: [
+              {
                 icon: ICONS.checkCircle,
                 text: `21 colorways`,
                 title: 'Added New Yarn: Hobbii - Daily Stitch Mega',

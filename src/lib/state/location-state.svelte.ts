@@ -23,16 +23,17 @@ import type {
   LocationsStateType,
   LocationStateType,
   LocationType,
+  TISO8601DateString,
   WeatherSource,
 } from '$lib/types';
-import { getToday, numberOfDays, stringToDate } from '$lib/utils';
+import { dateToISO8601String, getDaysBetween, stringToDate } from '$lib/utils';
 
 export class LocationClass implements LocationType {
   uuid: string = $state('');
   index: number = $state(0);
   duration?: 'c' | 'y' = $state('y');
-  from?: string = $state();
-  to?: string = $state();
+  from?: TISO8601DateString = $state();
+  to?: TISO8601DateString = $state();
   label?: string = $state();
   result?: string = $state();
   id?: number = $state();
@@ -50,7 +51,7 @@ export class LocationState extends LocationClass implements LocationStateType {
       browser && crypto && typeof crypto.randomUUID === 'function'
         ? crypto.randomUUID()
         : `${Math.random() * 100}-${Math.random() * 100}-${Math.random() * 100}`;
-    this.#today = browser ? getToday() : null; // caused a build error without the browser check...
+    this.#today = browser ? dateToISO8601String(new Date()) : null; // caused a build error without the browser check...
   }
 
   #fromDate = $derived.by(() => {
@@ -63,18 +64,22 @@ export class LocationState extends LocationClass implements LocationStateType {
     return stringToDate(this.to);
   });
 
-  days = $derived(numberOfDays(this.#fromDate, this.#toDate));
+  days = $derived(
+    this.#fromDate && this.#toDate
+      ? getDaysBetween(this.#fromDate, this.#toDate)
+      : 0,
+  );
 
-  #today = $state();
+  #today = $state<TISO8601DateString | null>(null); // YYYY-MM-DD
 
   daysInFuture = $derived.by(() => {
-    if (this.#toDate >= this.#today)
-      return numberOfDays(this.#today, this.#toDate);
+    if (this.#today && this.to >= this.#today)
+      return getDaysBetween(stringToDate(this.#today), this.#toDate);
     else return 0;
   });
 
   errorMessage = $derived.by(() => {
-    if (this.#fromDate >= this.#today)
+    if (this.from && this.#today && this.from >= this.#today)
       return 'The starting date must be at least one day in the past.';
 
     if (this.days > MAXIMUM_DAYS_PER_LOCATION)
@@ -101,13 +106,13 @@ export class LocationsState implements LocationsStateType {
   all = $state([]);
 
   totalDays = $derived.by(() => {
-    const arrayOfDayCount = this.all.map((n) => {
+    const arrayOfDayCount = this.all.map((n: LocationState) => {
       if (!n.from || !n.to) return null;
       const from = stringToDate(n.from);
       const to = stringToDate(n.to);
 
       if (!from || !to) return null;
-      return numberOfDays(from, to);
+      return getDaysBetween(from, to);
     });
     const sum = arrayOfDayCount.reduce((accumulator, value) => {
       return accumulator + value;

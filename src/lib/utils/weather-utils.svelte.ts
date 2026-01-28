@@ -16,7 +16,13 @@
 import { API_SERVICES, MOON_PHASE_NAMES } from '$lib/constants';
 import { allGaugesAttributes, locations, signal, weather } from '$lib/state';
 import { preferences } from '$lib/storage/preferences.svelte';
-import type { MoonPhasesId, WeatherDay, WeatherParam } from '$lib/types';
+import type {
+  LocationType,
+  MoonPhasesId,
+  WeatherDay,
+  WeatherParam,
+} from '$lib/types';
+
 import {
   celsiusToFahrenheit,
   convertTime,
@@ -24,6 +30,7 @@ import {
   displayNumber,
   getAverage,
   getColorInfo,
+  getLocalISODateString,
   hoursToMinutes,
   millimetersToInches,
   numberOfDays,
@@ -80,222 +87,189 @@ export const missingDaysCount = () => {
   return missingDays.length;
 };
 
-export const getOpenMeteo = async ({ location }) => {
+export const getOpenMeteo = async ({
+  location,
+}: {
+  location: LocationType;
+}) => {
   let allData: WeatherDay[] = [];
   let totalDaysInFuture = 0;
 
-  // Handle recurring dates by making individual calls for each year
-  let dateRanges: Array<{ from: string; to: string }> = [];
+  const todayStr = getLocalISODateString();
+  let _to = location.to;
 
-  if (
-    location.duration === 'r' &&
-    location.recurringMonth &&
-    location.recurringDay &&
-    location.recurringFromYear &&
-    location.recurringToYear
-  ) {
-    // For recurring dates, create a date range for each year
-    const month = String(location.recurringMonth).padStart(2, '0');
-    const day = String(location.recurringDay).padStart(2, '0');
-    for (
-      let year = location.recurringFromYear;
-      year <= location.recurringToYear;
-      year++
-    ) {
-      const dateStr = `${year}-${month}-${day}`;
-      dateRanges.push({ from: dateStr, to: dateStr });
-    }
-  } else {
-    // For non-recurring dates, use the standard from/to dates
-    dateRanges.push({ from: location.from, to: location.to });
+  // If the end date is in the future, set it instead to yesterday
+  // The reason for this is because Open-Meteo does not accept end dates in the future
+  if (_to >= todayStr) {
+    // get today as a date (UTC 00:00 representation of Local Date)
+    const todayStrToDate = stringToDate(todayStr);
+
+    // set the number of days which are in the future, including today
+    totalDaysInFuture = numberOfDays(todayStrToDate, stringToDate(_to));
+
+    // set the _to end date to yesterday, the last day which should be included in the request for weather data
+    // We do this by creating a UTC date from the Local String, subtracting 1 day, then formatting back to ISO
+    const yesterday = new Date(todayStrToDate);
+    yesterday.setUTCDate(todayStrToDate.getUTCDate() - 1);
+    _to = dateToISO8601String(yesterday);
   }
 
-  // Fetch data for each date range
-  for (const dateRange of dateRanges) {
-    let today = new Date();
-    today.setHours(0, 0, 0, 0);
-    let _to = dateRange.to;
+  let url = API_SERVICES.openMeteo.baseURL;
+  url += `?latitude=${location.lat}&longitude=${location.lng}`;
+  url += `&start_date=${location.from}`;
+  url += `&end_date=${_to}`;
+  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'auto';
+  url += `&daily=temperature_2m_max,temperature_2m_min,rain_sum,snowfall_sum&timezone=${timezone}`;
 
-    // If the end date is in the future, set it instead to yesterday
-    // The reason for this is because Open-Meteo does not accept end dates in the future
-    if (stringToDate(_to) >= today) {
-      // get today as a date
-      const _today = new Date();
-      _today.setHours(0, 0, 0, 0);
+  if (
+    weather.source?.settings &&
+    weather.source.settings.openMeteo.model !== 'auto'
+  )
+    url += `&models=${weather.source.settings.openMeteo.model}`;
 
-      // set the number of days which are in the future, including today
-      totalDaysInFuture += numberOfDays(_today, stringToDate(_to));
+  const response = await fetch(url, { signal: signal.value });
 
-      // set the _to end date to yesterday, the last day which should be included in the request for weather data
-      const yesterday = new Date(_today.getTime() - 24 * 60 * 60 * 1000);
-      _to = dateToISO8601String(yesterday);
-    }
+  if (response.status === 503) {
+    // Service Temporarily Unavailable
+    throw new Error(
+      '<p class="font-bold text-xl my-4">Service Temporarily Unavailable</p><p class="mt-4">Please try again.</p>',
+    );
+  }
 
-    let url = API_SERVICES.openMeteo.baseURL;
-    url += `?latitude=${location.lat}&longitude=${location.lng}`;
-    url += `&start_date=${dateRange.from}`;
-    url += `&end_date=${_to}`;
-    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'auto';
-    url += `&daily=temperature_2m_max,temperature_2m_min,rain_sum,snowfall_sum&timezone=${timezone}`;
+  const data = await response.json();
 
-    if (
-      weather.source?.settings &&
-      weather.source.settings.openMeteo.model !== 'auto'
-    )
-      url += `&models=${weather.source.settings.openMeteo.model}`;
+  if (data?.error === true) {
+    // Example Reason: "Parameter 'start_date' is out of allowed range from 1959-01-01 to 2023-02-01"
+    if (data?.reason.includes('is out of allowed range')) {
+      const from = stringToDate(location.from);
+      const to = stringToDate(location.to);
 
-    const response = await fetch(url, { signal: signal.value });
+      let today = getLocalISODateString();
 
-    if (response.status === 503) {
-      // Service Temporarily Unavailable
-      throw new Error(
-        '<p class="font-bold text-xl my-4">Service Temporarily Unavailable</p><p class="mt-4">Please try again.</p>',
-      );
-    }
-
-    const data = await response.json();
-
-    if (data?.error === true) {
-      // Example Reason: "Parameter 'start_date' is out of allowed range from 1959-01-01 to 2023-02-01"
-      if (data?.reason.includes('is out of allowed range')) {
-        const from = stringToDate(dateRange.from);
-        const to = stringToDate(dateRange.to);
-
-        let today = new Date();
-        today.setHours(0, 0, 0, 0);
-
-        let daysInFuture = null;
-        if (to >= today) {
-          daysInFuture = numberOfDays(today, to);
-        }
-
-        let content =
-          '<p class="font-bold text-xl my-4">Dates Out of Range</p>';
-
-        if (daysInFuture) {
-          content += `It looks like ${daysInFuture} ${pluralize('day', daysInFuture)} ${pluralize({ singular: 'is', plural: 'are' }, daysInFuture)} not in the past.`;
-          content += ' Change the dates so that all days are in the past.';
-        }
-
-        if (from < new Date('1940-01-01')) {
-          content += 'There may not be weather data for dates before 1940.';
-        }
-
-        content += `<p class="italic text-sm mt-4">Error status code: ${response.status}</p>`;
-
-        throw new Error(content);
+      let daysInFuture = null;
+      if (location.to >= today) {
+        daysInFuture = numberOfDays(stringToDate(today), to);
       }
-    }
 
-    if (!response.ok) {
-      // Request Failed with HTTP code ${response.status}
-      throw new Error(
-        `<p class="font-bold text-xl my-4">Something Went Wrong</p>
+      let content = '<p class="font-bold text-xl my-4">Dates Out of Range</p>';
+
+      if (daysInFuture) {
+        content += `It looks like ${daysInFuture} ${pluralize('day', daysInFuture)} ${pluralize({ singular: 'is', plural: 'are' }, daysInFuture)} not in the past.`;
+        content += ' Change the dates so that all days are in the past.';
+      }
+
+      if (from < new Date('1940-01-01')) {
+        content += 'There may not be weather data for dates before 1940.';
+      }
+
+      content += `<p class="italic text-sm mt-4">Error status code: ${response.status}</p>`;
+
+      throw new Error(content);
+    }
+  }
+
+  if (!response.ok) {
+    // Request Failed with HTTP code ${response.status}
+    throw new Error(
+      `<p class="font-bold text-xl my-4">Something Went Wrong</p>
       <p>A search request for weather data from <span class="font-bold">${
         location.label
-      }</span> (${stringToDate(dateRange.from).toLocaleDateString(undefined, {
+      }</span> (${stringToDate(location.from).toLocaleDateString(undefined, {
         timeZone: 'UTC',
-      })} - ${stringToDate(dateRange.to).toLocaleDateString(undefined, {
+      })} - ${stringToDate(location.to).toLocaleDateString(undefined, {
         timeZone: 'UTC',
       })}) was sent to <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer" class="link">Open-Meteo.com</a>, but the response returned an error.</p>
                             <p class="my-4">Try again with a different location or dates.</p>
                             <p class="italic text-sm">Error status code: ${response.status}</p>`,
-      );
-    }
+    );
+  }
 
-    if (!data?.daily) {
-      // No data returned from Open-Meteo
-      throw new Error(
-        '<p class="font-bold text-xl my-4">Something Went Wrong</p><p class="mt-4">There appears to be insufficient weather data, please try a different location or dates.</p>',
-      );
-    }
+  if (!data?.daily) {
+    // No data returned from Open-Meteo
+    throw new Error(
+      '<p class="font-bold text-xl my-4">Something Went Wrong</p><p class="mt-4">There appears to be insufficient weather data, please try a different location or dates.</p>',
+    );
+  }
 
-    if (data.daily?.temperature_2m_max.every((value: any) => value === null)) {
-      // Empty data
-      throw new Error(
-        '<p class="font-bold text-xl my-4">Something Went Wrong</p><p class="mt-4">There appears to be insufficient weather data, please try a different location or dates.</p>',
-      );
-    }
+  if (data.daily?.temperature_2m_max.every((value) => value === null)) {
+    // Empty data
+    throw new Error(
+      '<p class="font-bold text-xl my-4">Something Went Wrong</p><p class="mt-4">There appears to be insufficient weather data, please try a different location or dates.</p>',
+    );
+  }
 
-    if (dateRanges.length === 1) {
-      // Only set stations on the first (or only) call
-      location.stations = null; // No station details from Open-Meteo, only from Meteostat
-    }
+  location.stations = null; // No station details from Open-Meteo, only from Meteostat
 
-    const times = data.daily.time;
-    const tmaxs = data.daily.temperature_2m_max;
-    const tmins = data.daily.temperature_2m_min;
-    const prcps = data.daily.rain_sum;
-    const snows = data.daily.snowfall_sum;
+  const times = data.daily.time;
+  const tmaxs = data.daily.temperature_2m_max;
+  const tmins = data.daily.temperature_2m_min;
+  const prcps = data.daily.rain_sum;
+  const snows = data.daily.snowfall_sum;
 
-    for (let index = 0; index < times.length; index += 1) {
-      // const day = data.data[index];
-      const tmin = tmins[index];
-      const tmax = tmaxs[index];
-      const tavg =
-        tmin === null || tmax === null
-          ? null
-          : displayNumber((tmin + tmax) / 2); // Calculate average temp based on max and min temps
-      const snow = snows[index];
-      const prcp = prcps[index];
+  for (let index = 0; index < times.length; index += 1) {
+    // const day = data.data[index];
+    const tmin = tmins[index];
+    const tmax = tmaxs[index];
+    const tavg =
+      tmin === null || tmax === null ? null : displayNumber((tmin + tmax) / 2); // Calculate average temp based on max and min temps
+    const snow = snows[index];
+    const prcp = prcps[index];
 
-      const date = stringToDate(times[index]);
+    const date = stringToDate(times[index]);
 
-      const dayTime = getDayTime({
-        date,
-        lat: location.lat,
-        lng: location.lng,
-      });
+    const dayTime = getDayTime({
+      date,
+      lat: location.lat,
+      lng: location.lng,
+    });
 
-      const dayData: WeatherDay = {
-        location: location.index,
-        date,
-        tavg: {
-          metric: tavg,
-          imperial: celsiusToFahrenheit(tavg),
-        },
-        tmin: {
-          metric: tmin,
-          imperial: celsiusToFahrenheit(tmin),
-        },
-        tmax: {
-          metric: tmax,
-          imperial: celsiusToFahrenheit(tmax),
-        },
-        prcp: {
-          metric: prcp,
-          imperial: millimetersToInches(prcp),
-        },
-        snow: {
-          metric: snow === null ? null : displayNumber(snow * 10),
-          imperial: snow === null ? null : millimetersToInches(snow * 10),
-        },
-        dayt: {
-          metric: dayTime.metric,
-          imperial: dayTime.imperial,
-        },
-        moon: getMoonPhase(date),
-      };
+    const dayData: WeatherDay = {
+      location: location.index,
+      date,
+      tavg: {
+        metric: tavg,
+        imperial: celsiusToFahrenheit(tavg),
+      },
+      tmin: {
+        metric: tmin,
+        imperial: celsiusToFahrenheit(tmin),
+      },
+      tmax: {
+        metric: tmax,
+        imperial: celsiusToFahrenheit(tmax),
+      },
+      prcp: {
+        metric: prcp,
+        imperial: millimetersToInches(prcp),
+      },
+      snow: {
+        metric: snow === null ? null : displayNumber(snow * 10),
+        imperial: snow === null ? null : millimetersToInches(snow * 10),
+      },
+      dayt: {
+        metric: dayTime.metric,
+        imperial: dayTime.imperial,
+      },
+      moon: getMoonPhase(date),
+    };
 
-      // Other possible parameters from Open-Meteo, not used
-      // dayData.wdir = day.wdir; // Wind Direction degrees (unused)
-      // dayData.wspd = day.wspd; // WindSpeed km/hr (unused)
-      // dayData.wpgt = day.wpgt; //T he peak wind gust in km/h (unused)
-      // dayData.pres = day.pres; // The average sea-level air pressure in hPa (unused)
-      // dayData.tsun = day.tsun; // The daily sunshine total in minutes (m) (unused)
+    // Other possible parameters from Open-Meteo, not used
+    // dayData.wdir = day.wdir; // Wind Direction degrees (unused)
+    // dayData.wspd = day.wspd; // WindSpeed km/hr (unused)
+    // dayData.wpgt = day.wpgt; //T he peak wind gust in km/h (unused)
+    // dayData.pres = day.pres; // The average sea-level air pressure in hPa (unused)
+    // dayData.tsun = day.tsun; // The daily sunshine total in minutes (m) (unused)
 
-      allData = [...allData, dayData];
-    }
+    allData = [...allData, dayData];
   }
 
   // Add future days with null values if needed
   if (totalDaysInFuture > 0) {
-    let today = new Date();
-    today.setHours(0, 0, 0, 0);
-    today.setUTCDate(today.getUTCDate() + 1); // Start from tomorrow
+    // Start from today (since we set the request _to end date to yesterday)
+    const todayStrToDate = stringToDate(todayStr);
 
     for (let index = 0; index < totalDaysInFuture; index += 1) {
-      const _date = new Date(today);
+      const _date = new Date(todayStrToDate);
       _date.setUTCDate(_date.getUTCDate() + index);
       const _dayTime = getDayTime({
         date: _date,
