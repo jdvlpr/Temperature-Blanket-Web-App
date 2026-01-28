@@ -36,7 +36,7 @@ export const entries: ChangelogItemGroup[] = [
             notes: [
               {
                 icon: ICONS.wrench,
-                instructions: `For more information, and to see if your project was affected or not, see this post: <a href="https://facebook.com/" target="_blank" class="link">Technical Update: Future Date Issue</a>.`,
+                instructions: `For more information, and to see if your project was affected or not, see this post: <a href="https://www.facebook.com/share/p/1AUDsPmA7w/" target="_blank" class="link">Technical Update: Future Date Issue</a>.`,
                 text: `For some projects with future dates, one day was incorrect or missing. This update fixes the issue.`,
                 title: 'Future Date Issue',
               },

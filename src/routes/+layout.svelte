@@ -199,7 +199,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   >
     <p class="inline text-sm">
       Technical Update: <a
-        href="https://facebook.com/"
+        href="https://www.facebook.com/share/p/1AUDsPmA7w/"
         class="link"
         target="_blank"
       >
