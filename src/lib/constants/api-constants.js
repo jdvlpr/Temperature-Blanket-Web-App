@@ -15,8 +15,8 @@
 
 import { dev } from '$app/environment';
 
-// When in dev mode, use free geonames .com instead of paid geonames.net credits. It's mandatory for local dev environment to use the .com domain because of permissions
-// Check GeoNames api usage here: https://www.geonames .com/account
+// When in dev mode, use free geonames .org instead of paid geonames.net credits. It's mandatory for local dev environment to use the .org domain because of permissions
+// Check GeoNames api usage here: https://www.geonames .org/account
 export const API_SERVICES = {
   geonames: {
     baseURL: dev

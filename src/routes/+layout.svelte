@@ -28,7 +28,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '$lib/state';
   import { initializeLocalStorage } from '$lib/storage/storage-utils.svelte.ts';
   import { handleKeyDown, privacy } from '$lib/utils';
-  import { YoutubeIcon } from '@lucide/svelte';
+  import { ExternalLinkIcon, YoutubeIcon } from '@lucide/svelte';
   import { onMount, type Snippet } from 'svelte';
   import '../css/main.css';
 
@@ -194,12 +194,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </span>
     </a>
   </div>
-  <div
-    class="bg-primary-50-950 flex w-full items-center justify-center p-2 text-center"
-  >
+  <div class=" flex w-full items-center justify-center p-2 text-center">
     <p class="inline text-sm">
-      Notice: <a href="https://facebook.com/" class="link" target="_blank"
-        >Fixing a Future Dates Issue</a
+      Technical Update: <a
+        href="https://facebook.com/"
+        class="link"
+        target="_blank"
+      >
+        <ExternalLinkIcon class="relative -top-[2px] inline size-4" />
+        Future Date Issue</a
       >
     </p>
   </div>

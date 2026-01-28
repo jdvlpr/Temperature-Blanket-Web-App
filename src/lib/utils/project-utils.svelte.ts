@@ -31,9 +31,11 @@ import {
   colorsToYarnDetails,
   convertTime,
   dateToISO8601String,
+  getLocalISODateString,
   getWPGauge,
   getWeatherSourceDetails,
   missingDaysCount,
+  stringToDate,
 } from '$lib/utils';
 
 export const getProjectParametersFromURLHash = (hash) => {
@@ -178,14 +180,18 @@ export const sendToProjectGallery = async (img) => {
     };
   });
 
+  const debugData = getDebugData();
+
   const data = {
     colors: JSON.stringify(colors),
+    debug_data: JSON.stringify(debugData),
     gauges: JSON.stringify(labels),
     img,
     locations: JSON.stringify(_locations),
     missing_days: missingDaysCount(),
     palettes: JSON.stringify(palettes),
     project_url: project.url.href,
+    raw_weather_data: JSON.stringify(weather.rawData),
     tables: JSON.stringify(tables),
     title: locations.projectTitle,
     total_days: weather.rawData.length,
@@ -275,3 +281,35 @@ export const getTitleFromLocationsMeta = (locations) => {
 
   return title || '';
 };
+
+// Temporariy diagnostics
+function getDebugData() {
+  // previous
+  let previous_today = new Date();
+  previous_today.setHours(0, 0, 0, 0);
+  // set the _to end date to yesterday, the last day which should be included in the request for weather data
+  const previous_yesterday = new Date(
+    previous_today.getTime() - 24 * 60 * 60 * 1000,
+  );
+  const previous_newTOStart = dateToISO8601String(previous_yesterday);
+
+  // current
+  const todayStr = getLocalISODateString();
+  const todayStrToDate = stringToDate(todayStr);
+  const yesterday = new Date(todayStrToDate);
+  yesterday.setUTCDate(todayStrToDate.getUTCDate() - 1);
+  const new_TOStart = dateToISO8601String(yesterday);
+  return {
+    previous: {
+      today: previous_today,
+      yesterday: previous_yesterday,
+      newTOStart: previous_newTOStart,
+    },
+    current: {
+      todayStr,
+      todayStrToDate,
+      yesterday,
+      new_TOStart,
+    },
+  };
+}
