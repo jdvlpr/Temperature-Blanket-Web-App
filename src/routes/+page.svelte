@@ -371,6 +371,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     dialog.trigger({
                       type: 'component',
                       component: { ref: ChooseWeatherSource },
+                      options: {
+                        size: 'medium',
+                      },
                     });
                   }}>{weather.source.name}</button
                 >.
