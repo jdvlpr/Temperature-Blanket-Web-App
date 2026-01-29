@@ -62,7 +62,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <div
   data-vaul-drawer-wrapper="true"
   class={[
-    'min-h-[100svh]',
     (page.route.id === '/' &&
       Array(0, 1).includes(pageSections.items.find((p) => p.active)?.index)) ||
     page.route.id !== '/'

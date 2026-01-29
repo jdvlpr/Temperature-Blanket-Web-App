@@ -313,11 +313,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   {#snippet main()}
     <main
-      class="mx-auto text-center max-md:min-h-[calc(100svh-112px)] md:min-h-[calc(100svh-104px)] lg:min-h-[calc(100svh-120px)]"
+      class="mx-auto text-center max-md:min-h-[calc(100dvh-209px)] md:min-h-[calc(100dvh-201px)] lg:min-h-[calc(100dvh-217px)]"
     >
       <div
         id="page-section-location"
-        class="mx-auto max-w-(--breakpoint-md) scroll-mt-[76px] pb-12"
+        class="mx-auto max-w-(--breakpoint-md) scroll-mt-[76px]"
         class:hidden={pageSections.items[1].active === false}
       >
         <div class="w-full px-2 py-4">

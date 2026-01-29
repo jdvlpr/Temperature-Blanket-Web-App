@@ -35,7 +35,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       class="fixed inset-0 z-50 flex items-center justify-center"
     >
       <Dialog.Content
-        class="card bg-surface-50 dark:bg-surface-950 max-h-svh space-y-4 overflow-auto shadow-xl max-sm:min-w-screen lg:max-h-[80svh] {dialog
+        class="card bg-surface-50 dark:bg-surface-950 max-h-dvh space-y-4 overflow-auto shadow-xl max-sm:min-w-screen lg:max-h-[80svh] {dialog
           .options.size === 'large'
           ? 'max-w-(--breakpoint-lg)'
           : dialog.options.size === 'medium'
