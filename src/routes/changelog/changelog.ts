@@ -35,6 +35,21 @@ export const entries: ChangelogItemGroup[] = [
           {
             notes: [
               {
+                icon: ICONS.checkCircle,
+                text: `75 colorways`,
+                title: 'Added New Yarn: Círculo - Mollet',
+              },
+              {
+                icon: ICONS.checkCircle,
+                text: `71 colorways`,
+                title: 'Added New Yarn: Paintbox Yarns - Cotton Aran',
+              },
+            ],
+            version: '5.40.0',
+          },
+          {
+            notes: [
+              {
                 icon: ICONS.wrench,
                 instructions: `For more information, and to see if your project was affected or not, see this post: <a href="https://www.facebook.com/share/p/1AUDsPmA7w/" target="_blank" class="link">Technical Update: Future Date Issue</a>.`,
                 text: `For some projects with future dates, one day was incorrect or missing. This update fixes the issue.`,
