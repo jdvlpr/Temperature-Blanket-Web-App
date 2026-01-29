@@ -5,7 +5,7 @@ const colorways: Colorway[] = [
     source: {
       name: 'scheepjes.com',
       href: 'https://www.scheepjes.com/en/stone-washed-440/',
-      accessed: '2023-03-06',
+      accessed: '2026-01-29',
     },
     colors: [
       {
@@ -151,6 +151,70 @@ const colorways: Colorway[] = [
       {
         hex: '#835b61',
         name: 'Garnet',
+      },
+      {
+        hex: '#747579',
+        name: 'Graphite',
+      },
+      {
+        hex: '#efc574',
+        name: 'Orpiment',
+      },
+      {
+        hex: '#b3ae72',
+        name: 'Prehnite',
+      },
+      {
+        hex: '#7f7e65',
+        name: 'Chlorite Green',
+      },
+      {
+        hex: '#856d97',
+        name: 'Rich Charoite',
+      },
+      {
+        hex: '#92a896',
+        name: 'Soft Epidote',
+      },
+      {
+        hex: '#639c9c',
+        name: 'Bright Actinolite',
+      },
+      {
+        hex: '#5b6776',
+        name: 'Sodalite',
+      },
+      {
+        hex: '#7288ab',
+        name: 'Lazurite',
+      },
+      {
+        hex: '#94b4d1',
+        name: 'Royal Azurite',
+      },
+      {
+        hex: '#ca6f5b',
+        name: 'Realgar Red',
+      },
+      {
+        hex: '#ebac63',
+        name: 'Orange Calcite',
+      },
+      {
+        hex: '#f2d1a7',
+        name: 'Aragonite',
+      },
+      {
+        hex: '#f2dad2',
+        name: 'Stilbite',
+      },
+      {
+        hex: '#bd455c',
+        name: 'Eudialyte',
+      },
+      {
+        hex: '#914246',
+        name: 'Vanadinite',
       },
     ],
   },

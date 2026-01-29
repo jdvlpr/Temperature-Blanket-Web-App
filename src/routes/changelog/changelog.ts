@@ -44,6 +44,11 @@ export const entries: ChangelogItemGroup[] = [
                 text: `71 colorways`,
                 title: 'Added New Yarn: Paintbox Yarns - Cotton Aran',
               },
+              {
+                icon: ICONS.checkCircle,
+                text: `16 colorways added`,
+                title: 'Added Colorways: Scheepjes - Stone Washed',
+              },
             ],
             version: '5.40.0',
           },
