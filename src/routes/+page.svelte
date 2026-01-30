@@ -154,7 +154,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {#if weather.data.length && locations.allValid}
         <div class="hidden lg:inline-flex">
           <button
-            class="btn hover:preset-tonal"
+            class="btn hover:preset-tonal-surface"
             title="Save your project in this browser and as a URL."
             onclick={() =>
               dialog.trigger({
@@ -175,7 +175,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <div class="mx-auto sm:mx-0">
           <button
             aria-label="Undo"
-            class="btn hover:preset-tonal"
+            class="btn hover:preset-tonal-surface"
             title="Undo [Cmd ⌘]+[z] or [Ctrl]+[z]"
             id="undo"
             disabled={!weather.data.length ||
@@ -194,7 +194,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
           <button
             aria-label="Redo"
-            class="btn hover:preset-tonal"
+            class="btn hover:preset-tonal-surface"
             id="redo"
             title="Redo [Cmd ⌘]+[Shift ⇧]+[z] or [Ctrl]+[Shift ⇧]+[Z]"
             disabled={!weather.data.length ||
@@ -217,7 +217,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     <Popover>
       <Popover.Trigger
-        class="btn hover:preset-tonal"
+        class="btn hover:preset-tonal-surface"
         aria-label="Help"
         title="Help"
       >
@@ -254,7 +254,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         <a
                           href="/faq"
                           title="View Frequently Asked Questions"
-                          class="btn hover:preset-tonal"
+                          class="btn hover:preset-tonal-surface"
                         >
                           <CircleQuestionMarkIcon />
                           Frequently Asked Questions</a
@@ -262,14 +262,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       </p>
 
                       <p>
-                        <a href="/documentation" class="btn hover:preset-tonal">
+                        <a
+                          href="/documentation"
+                          class="btn hover:preset-tonal-surface"
+                        >
                           <BookOpenTextIcon />
                           Documentation</a
                         >
                       </p>
 
                       <p>
-                        <a href="/contact" class="btn hover:preset-tonal">
+                        <a
+                          href="/contact"
+                          class="btn hover:preset-tonal-surface"
+                        >
                           <MailIcon />
                           Contact</a
                         >
@@ -292,7 +298,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <button
       aria-label="Project Options"
       title="Project Options"
-      class="max-sm:btn-icon sm:btn hover:preset-tonal"
+      class="max-sm:btn-icon sm:btn hover:preset-tonal-surface"
       onclick={() =>
         dialog.trigger({
           type: 'component',

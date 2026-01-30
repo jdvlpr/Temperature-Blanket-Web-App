@@ -102,7 +102,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   {#if monthRowsPreview.settings.borderStitches > 0}
     <button
-      class="btn hover:preset-tonal"
+      class="btn hover:preset-tonal-surface"
       title="Choose a Color for Border Stitches"
       onclick={() =>
         dialog.trigger({
@@ -145,7 +145,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   />
 
   <button
-    class="btn hover:preset-tonal"
+    class="btn hover:preset-tonal-surface"
     title="Choose a Color for Extra Rows"
     onclick={() =>
       dialog.trigger({

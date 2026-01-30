@@ -45,7 +45,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     class="rounded-container bg-surface-100 dark:bg-surface-900 mx-2 mt-4 mb-2 flex items-start justify-start gap-2 px-4 py-2 shadow-inner max-sm:flex-col sm:flex-wrap sm:items-center sm:justify-center lg:mb-4"
   >
     <button
-      class="btn hover:preset-tonal h-auto text-left whitespace-pre-wrap"
+      class="btn hover:preset-tonal-surface h-auto text-left whitespace-pre-wrap"
       onclick={downloadPDF}
       title="Download PDF File"
     >
@@ -53,7 +53,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </button>
 
     <button
-      class="btn hover:preset-tonal h-auto text-left whitespace-pre-wrap"
+      class="btn hover:preset-tonal-surface h-auto text-left whitespace-pre-wrap"
       onclick={downloadWeatherCSV}
       title="Download CSV File"
     >
@@ -62,7 +62,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     {#if weather.grouping !== 'week'}
       <button
-        class="btn hover:preset-tonal h-auto text-left whitespace-pre-wrap"
+        class="btn hover:preset-tonal-surface h-auto text-left whitespace-pre-wrap"
         onclick={() => {
           dialog.trigger({
             type: 'component',

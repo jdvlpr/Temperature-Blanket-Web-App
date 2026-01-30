@@ -282,7 +282,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </div>
       {:else if showReset}
         <button
-          class="ig-btn hover:preset-tonal"
+          class="ig-btn hover:preset-tonal-surface"
           title="Reset Location Search"
           onclick={async () => {
             weatherLocationState.inputLocation.value = '';
@@ -301,7 +301,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </button>
       {:else if navigatorAvailable}
         <button
-          class="ig-btn hover:preset-tonal"
+          class="ig-btn hover:preset-tonal-surface"
           title="Use My Location"
           onclick={async () => {
             weatherLocationState.inputLocation.value = 'Loading...';

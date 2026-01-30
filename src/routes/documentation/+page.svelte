@@ -358,7 +358,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         }}
       >
         <Dialog.Trigger
-          class="btn hover:preset-tonal my-2"
+          class="btn hover:preset-tonal-surface my-2"
           aria-label="Content Menu"
         >
           <div class="flex flex-wrap items-center gap-1">

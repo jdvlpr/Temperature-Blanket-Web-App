@@ -24,7 +24,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import AppLogo from '$lib/components/AppLogo.svelte';
   import AppShell from '$lib/components/AppShell.svelte';
   import {
-  CloudAlertIcon,
+    CloudAlertIcon,
     ExternalLinkIcon,
     FacebookIcon,
     GithubIcon,
@@ -51,30 +51,36 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <AppShell pageName="Contact">
   {#snippet stickyHeader()}
-      <div class="mx-auto hidden lg:inline-flex"><AppLogo /></div>
+    <div class="mx-auto hidden lg:inline-flex"><AppLogo /></div>
   {/snippet}
   {#snippet main()}
     <main
       class="mx-auto flex max-w-(--breakpoint-sm) flex-col gap-4 px-4 lg:px-0"
     >
       <div>
-        <h2 class="h2 text-gradient max-lg:hidden mt-2">Contact</h2>
+        <h2 class="h2 text-gradient mt-2 max-lg:hidden">Contact</h2>
         <div class="mt-2 flex flex-col gap-4">
           <p class="font-bold">General Communication</p>
 
-          <a href="mailto:{email}" class="btn hover:preset-tonal w-fit">
+          <a href="mailto:{email}" class="btn hover:preset-tonal-surface w-fit">
             <MailIcon />
             {email}
           </a>
 
-           <p class="font-bold">Forms</p>
+          <p class="font-bold">Forms</p>
 
-          <a href="/yarn-search-request" class="btn hover:preset-tonal w-fit">
+          <a
+            href="/yarn-search-request"
+            class="btn hover:preset-tonal-surface w-fit"
+          >
             <MessageCirclePlusIcon />
             Request Yarn
           </a>
 
-           <a href="/contact/forms/2025-03-weather-data" class="btn hover:preset-tonal w-fit">
+          <a
+            href="/contact/forms/2025-03-weather-data"
+            class="btn hover:preset-tonal-surface w-fit"
+          >
             <CloudAlertIcon />
             Weather Data Feedback
           </a>
@@ -85,7 +91,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               href="{PUBLIC_GITHUB_LINK}/issues"
               target="_blank"
               rel="noreferrer"
-              class="btn hover:preset-tonal w-fit text-left"
+              class="btn hover:preset-tonal-surface w-fit text-left"
             >
               <GithubIcon />
               GitHub Issues
@@ -99,7 +105,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               href="{PUBLIC_GITHUB_LINK}/discussions"
               target="_blank"
               rel="noreferrer"
-              class="btn hover:preset-tonal w-fit text-left"
+              class="btn hover:preset-tonal-surface w-fit text-left"
             >
               <GithubIcon />
               GitHub Discussions
@@ -113,21 +119,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
               href={PUBLIC_FACEBOOK_LINK}
               target="_blank"
               rel="noreferrer"
-              class="btn hover:preset-tonal w-fit text-left"
+              class="btn hover:preset-tonal-surface w-fit text-left"
             >
               <FacebookIcon />
               {PUBLIC_SITE_TITLE}
               <ExternalLinkIcon class="relative -top-[1px] size-5" />
             </a>
           {/if}
-
-         
         </div>
       </div>
       <div class="rounded-container bg-surface-100-900 my-4 w-fit p-2">
         <p>
-          See the <a href="/faq" class="link">Frequently Asked Questions</a> for
-          answers to common questions.
+          See the <a href="/faq" class="link">Frequently Asked Questions</a> for answers
+          to common questions.
         </p>
       </div>
     </main>

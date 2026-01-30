@@ -35,7 +35,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <button
-  class="btn hover:preset-tonal"
+  class="btn hover:preset-tonal-surface"
   onclick={() => (isExpanded = !isExpanded)}
   {disabled}
 >

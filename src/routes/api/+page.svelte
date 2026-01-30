@@ -34,24 +34,24 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <AppShell pageName="API">
   {#snippet stickyHeader()}
-    <div class="hidden lg:inline-flex mx-auto"><AppLogo /></div>
+    <div class="mx-auto hidden lg:inline-flex"><AppLogo /></div>
   {/snippet}
 
   {#snippet main()}
     <div
-      class="max-w-(--breakpoint-xl) m-auto flex flex-wrap justify-start gap-4 px-2 lg:px-0 my-4 lg:mt-0"
+      class="m-auto my-4 flex max-w-(--breakpoint-xl) flex-wrap justify-start gap-4 px-2 lg:mt-0 lg:px-0"
     >
       <div class="flex flex-col gap-4">
         <a
-          class="card hover:preset-tonal p-4 whitespace-pre-wrap w-fit text-center flex flex-col items-center justify-center gap-2"
+          class="card hover:preset-tonal-surfacep-4 flex w-fit flex-col items-center justify-center gap-2 text-center whitespace-pre-wrap"
           href="/api/yarn-colorways"
         >
           <img
             src="/images/api-images/yarn-colorways-api.png"
-            class="h-36 object-fit w-full"
+            class="object-fit h-36 w-full"
             alt="Yarn Colorways API"
           />
-          <span class="font-bold text-lg">Yarn Colorways API</span>
+          <span class="text-lg font-bold">Yarn Colorways API</span>
         </a>
       </div>
     </div>

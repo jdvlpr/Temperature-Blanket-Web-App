@@ -182,7 +182,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {@const title = getTitleFromLocationsMeta(meta.locations)}
           <a
             href="/gallery/{id}"
-            class="rounded-container group hover:preset-tonal mx-auto flex min-h-[200px] max-w-[245px] shrink-0 snap-center flex-col flex-wrap items-center justify-start gap-1 p-2 text-center lg:max-w-[350px]"
+            class="rounded-container group hover:preset-tonal-surfacemx-auto flex min-h-[200px] max-w-[245px] shrink-0 snap-center flex-col flex-wrap items-center justify-start gap-1 p-2 text-center lg:max-w-[350px]"
           >
             <img
               src={featured_image_src}
@@ -262,7 +262,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             {#if showSearchReset}
               <button
                 disabled={loading}
-                class="ig-btn hover:preset-tonal"
+                class="ig-btn hover:preset-tonal-surface"
                 title="Reset Search"
                 onclick={() => {
                   galleryState.search = '';
@@ -388,7 +388,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {@const title = getTitleFromLocationsMeta(locations)}
           <a
             href="/gallery/{databaseId}"
-            class="rounded-container group hover:preset-tonal flex gap-1 p-2 text-center {layout ===
+            class="rounded-container group hover:preset-tonal-surfaceflex gap-1 p-2 text-center {layout ===
             'grid'
               ? 'flex-col items-center justify-center'
               : 'w-full flex-col items-center justify-start'}"

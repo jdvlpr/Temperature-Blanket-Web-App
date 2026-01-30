@@ -81,9 +81,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let containerElement = $state(null);
 
   onMount(async () => {
-    const ct = await import(
-      '../../../../node_modules/getimagepalette/dist/color-thief.mjs'
-    );
+    const ct =
+      await import('../../../../node_modules/getimagepalette/dist/color-thief.mjs');
     ColorThief = ct.default;
 
     if (numberOfColors > MAXIMUM_COLORWAYS_MATCHES_FOR_IMAGES)
@@ -355,12 +354,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
       bind:this={input}
       onchange={handleImageChange}
     />
-    <button class="btn hover:preset-tonal" onclick={getRandomImage}>
+    <button class="btn hover:preset-tonal-surface" onclick={getRandomImage}>
       <RefreshCcwIcon />
       Random Image</button
     >
     <button
-      class="btn hover:preset-tonal"
+      class="btn hover:preset-tonal-surface"
       onclick={() => {
         if (typeof input !== 'undefined') input.click();
       }}
@@ -548,7 +547,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <div class="text-warning-900-100 flex gap-2">
           <p>{warningMessage}</p>
           <button
-            class="btn hover:preset-tonal"
+            class="btn hover:preset-tonal-surface"
             aria-label="close"
             onclick={() => (warningMessage = null)}
           >
@@ -558,7 +557,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {/if}
 
       <button
-        class="btn hover:preset-tonal"
+        class="btn hover:preset-tonal-surface"
         onclick={() => {
           if (numberOfColors < 2) numberOfColors = 2;
           matchingYarnColors = getMatchingYarnColors({
@@ -573,7 +572,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </button>
 
       <button
-        class="btn hover:preset-tonal"
+        class="btn hover:preset-tonal-surface"
         onclick={() => {
           matchingYarnColors = matchingYarnColors.filter(
             (color) => color.locked,

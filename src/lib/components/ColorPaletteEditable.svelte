@@ -267,7 +267,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     if (onchanged) onchanged();
                   }
                 }}
-                class="btn hover:preset-tonal h-auto gap-1"
+                class="btn hover:preset-tonal-surface h-auto gap-1"
                 aria-label="Delete color {index + 1}"
               >
                 <span class="text-xs" aria-hidden="true">{index + 1}</span>
@@ -277,7 +277,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             {#if canUserEditColor}
               <button
-                class="btn hover:preset-tonal h-auto"
+                class="btn hover:preset-tonal-surface h-auto"
                 onclick={() =>
                   dialog.trigger({
                     type: 'component',

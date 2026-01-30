@@ -96,7 +96,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <div class="w-fit text-left">
   <Popover modal={true} autoFocus={true}>
-    <Popover.Trigger class="btn hover:preset-tonal">
+    <Popover.Trigger class="btn hover:preset-tonal-surface">
       {#key preferences.value?.theme.mode}
         <span
           >{#if browser}{@html activeTheme?.icon}{:else}{@html THEMES.find(
@@ -154,7 +154,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                             preferences.value.theme.id = id;
                           }}
                           class={[
-                            'btn hover:preset-tonal-secondary flex w-full items-center justify-start gap-2',
+                            'btn hover:preset-tonal-surface-secondary flex w-full items-center justify-start gap-2',
                             preferences.value.theme.id === id &&
                               'preset-filled-secondary-500',
                           ]}

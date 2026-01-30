@@ -59,16 +59,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 </script>
 
-<div
-  data-vaul-drawer-wrapper="true"
-  class={[
-    (page.route.id === '/' &&
-      Array(0, 1).includes(pageSections.items.find((p) => p.active)?.index)) ||
-    page.route.id !== '/'
-      ? 'gradient-background'
-      : '',
-  ]}
->
+<div data-vaul-drawer-wrapper="true">
   <div
     class={[
       'bg-surface-50/90 dark:bg-surface-950/90 sticky top-0 z-20 backdrop-blur-md [view-transition-name:sticky-header]',
@@ -87,7 +78,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           open={drawerState.appNavigation}
         >
           <Dialog.Trigger
-            class="btn hover:preset-tonal my-2"
+            class="btn hover:preset-tonal-surface my-2"
             aria-label="Open menu"
           >
             <MenuIcon />
@@ -127,7 +118,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       bind:clientWidth={sidebarWidth}
     >
       <button
-        class="btn hover:preset-tonal mx-2 mt-2 hidden justify-center lg:flex"
+        class="btn hover:preset-tonal-surface mx-2 mt-2 hidden justify-center lg:flex"
         title={`${showNavigationSideBar.value ? 'Hide' : 'Show'} Sidebar`}
         onclick={async () => {
           showNavigationSideBar.value = !showNavigationSideBar.value;
@@ -158,30 +149,3 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
   </div>
 </div>
-
-<style>
-  .gradient-background {
-    background-size: cover;
-    background-image:
-      radial-gradient(
-        at 0% 95%,
-        color-mix(in oklab, var(--color-tertiary-500) 10%, transparent) 0px,
-        transparent 50%
-      ),
-      radial-gradient(
-        at 53% 40%,
-        color-mix(in oklab, var(--color-surface-500) 16%, transparent) 0px,
-        transparent 60%
-      ),
-      radial-gradient(
-        at 85% 8%,
-        color-mix(in oklab, var(--color-primary-500) 8%, transparent) 0px,
-        transparent 50%
-      ),
-      radial-gradient(
-        at 100% 100%,
-        color-mix(in oklab, var(--color-surface-500) 9%, transparent) 0px,
-        transparent 50%
-      );
-  }
-</style>

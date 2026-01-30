@@ -33,7 +33,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     href={PUBLIC_KOFI_LINK}
     target="_blank"
     rel="noopener noreferrer"
-    class="btn preset-tonal hover:preset-tonal-primary inline-flex h-auto items-center justify-center gap-1"
+    class="btn hover:preset-tonal-surface inline-flex h-auto items-center justify-center gap-1"
   >
     <HeartIcon fill="#EE6E6C" color="#EE6E6C" />
     <span class="text-left whitespace-pre-wrap"

@@ -149,7 +149,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
     <Popover>
       <Popover.Trigger
-        class="btn hover:preset-tonal"
+        class="btn hover:preset-tonal-surface"
         aria-label="View Options"
         title="View Options"
       >
@@ -220,7 +220,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {#if movable && !isStaticGauge}
             <button
               title="Remove Color"
-              class="btn hover:preset-tonal flex flex-wrap items-center justify-center gap-1"
+              class="btn hover:preset-tonal-surface flex flex-wrap items-center justify-center gap-1"
               onclick={() => {
                 gauge.updateColors({
                   colors: gauge.colors.filter(
@@ -240,7 +240,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             title="Move Color"
             tabindex="-1"
             aria-label="Crag handle for color {index + 1}"
-            class="btn-icon hover:preset-tonal handle p-2"
+            class="btn-icon hover:preset-tonal-surfacehandle p-2"
             use:dragHandle
           >
             <MoveIcon />
@@ -268,7 +268,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
         <div class={[preferences.value.layout === 'list' && 'flex-auto']}>
           <button
-            class={['btn hover:preset-tonal flex h-auto justify-start']}
+            class={['btn hover:preset-tonal-surface flex h-auto justify-start']}
             title="Choose a Color"
             onclick={() =>
               dialog.trigger({
@@ -313,7 +313,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
         {#if affiliate_variant_href}
           <a
-            class="btn hover:preset-tonal"
+            class="btn hover:preset-tonal-surface"
             href={affiliate_variant_href}
             target="_blank"
             rel="noreferrer nofollow"

@@ -28,7 +28,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <span class="range-input-container">
   <button
-    class="btn hover:preset-tonal h-auto"
+    class="btn hover:preset-tonal-surface h-auto"
     title="Adjust Range"
     onclick={(e) => {
       const wasToClicked =

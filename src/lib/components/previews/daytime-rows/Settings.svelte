@@ -229,7 +229,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </DataTable>
         <div class="mt-4">
           <button
-            class="btn hover:preset-tonal"
+            class="btn hover:preset-tonal-surface"
             onclick={downloadStitchesTableCSV}
             title="Download CSV File"
           >

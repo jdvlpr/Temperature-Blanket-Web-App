@@ -62,7 +62,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <button
         type="button"
         disabled={!daysInRange?.length}
-        class="btn hover:preset-tonal h-auto"
+        class="btn hover:preset-tonal-surface h-auto"
         onclick={() =>
           dialog.trigger({
             type: 'component',

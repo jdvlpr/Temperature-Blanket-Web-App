@@ -122,7 +122,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <a
     href="/supporters"
     class={[
-      'btn hover:preset-tonal-surface w-fit',
+      'btn hover:preset-tonal-surface-surface w-fit',
       page.url.pathname === '/supporters' && 'preset-tonal-secondary',
     ]}
   >
@@ -161,7 +161,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <a
                 href="/"
                 class={[
-                  'btn hover:preset-tonal w-fit',
+                  'btn hover:preset-tonal-surface w-fit',
                   page.url.pathname === '/' && 'preset-tonal-secondary',
                 ]}
               >
@@ -172,7 +172,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <a
                 href="/yarn-colorway-finder"
                 class={[
-                  'btn hover:preset-tonal w-fit',
+                  'btn hover:preset-tonal-surface w-fit',
                   page.url.pathname === '/yarn-colorway-finder' &&
                     'preset-tonal-secondary',
                 ]}
@@ -184,7 +184,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <a
                 href="/yarn"
                 class={[
-                  'btn hover:preset-tonal w-fit',
+                  'btn hover:preset-tonal-surface w-fit',
                   page.url.pathname === '/yarn' && 'preset-tonal-secondary',
                 ]}
               >
@@ -195,7 +195,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <a
                 href="/weather"
                 class={[
-                  'btn hover:preset-tonal w-fit',
+                  'btn hover:preset-tonal-surface w-fit',
                   page.url.pathname === '/weather' && 'preset-tonal-secondary',
                 ]}
               >
@@ -221,7 +221,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <a
                 href="/gallery"
                 class={[
-                  'btn hover:preset-tonal w-fit',
+                  'btn hover:preset-tonal-surface w-fit',
                   page.url.pathname === '/gallery' && 'preset-tonal-secondary',
                 ]}
               >
@@ -232,7 +232,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <a
                 href="/yarn-palette-gallery"
                 class={[
-                  'btn hover:preset-tonal w-fit',
+                  'btn hover:preset-tonal-surface w-fit',
                   page.url.pathname === '/yarn-palette-gallery' &&
                     'preset-tonal-secondary',
                 ]}
@@ -260,7 +260,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <a
                 href="/faq"
                 class={[
-                  'btn hover:preset-tonal w-fit',
+                  'btn hover:preset-tonal-surface w-fit',
                   page.url.pathname === '/faq' && 'preset-tonal-secondary',
                 ]}
               >
@@ -271,7 +271,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <a
                 href="/changelog"
                 class={[
-                  'btn hover:preset-tonal w-fit',
+                  'btn hover:preset-tonal-surface w-fit',
                   page.url.pathname === '/changelog' &&
                     'preset-tonal-secondary',
                 ]}
@@ -283,7 +283,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <a
                 href="/contact"
                 class={[
-                  'btn hover:preset-tonal w-fit',
+                  'btn hover:preset-tonal-surface w-fit',
                   page.url.pathname === '/contact' && 'preset-tonal-secondary',
                 ]}
               >
@@ -294,7 +294,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <a
                 href="/blog"
                 class={[
-                  'btn hover:preset-tonal w-fit text-left',
+                  'btn hover:preset-tonal-surface w-fit text-left',
                   (page.url.pathname === '/blog' ||
                     page.url.pathname.includes('/blog')) &&
                     'preset-tonal-secondary',
@@ -306,7 +306,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <a
                 href="/documentation"
                 class={[
-                  'btn hover:preset-tonal w-fit',
+                  'btn hover:preset-tonal-surface w-fit',
                   page.url.pathname === '/documentation' &&
                     'preset-tonal-secondary',
                 ]}
@@ -318,7 +318,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <a
                 href="/privacy"
                 class={[
-                  'btn hover:preset-tonal w-fit',
+                  'btn hover:preset-tonal-surface w-fit',
                   page.url.pathname === '/privacy' && 'preset-tonal-secondary',
                 ]}
               >
@@ -344,7 +344,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <a
                 href="/api/yarn-colorways"
                 class={[
-                  'btn hover:preset-tonal w-fit',
+                  'btn hover:preset-tonal-surface w-fit',
                   page.url.pathname === '/api/yarn-colorways' &&
                     'preset-tonal-secondary',
                 ]}
@@ -355,7 +355,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               {#if PUBLIC_GITHUB_LINK}
                 <a
                   href={PUBLIC_GITHUB_LINK}
-                  class="btn hover:preset-tonal w-fit"
+                  class="btn hover:preset-tonal-surface w-fit"
                   target="_blank"
                 >
                   <GithubIcon />
@@ -371,7 +371,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </Accordion>
 
   <a
-    class="btn hover:preset-tonal w-fit opacity-50 hover:opacity-100"
+    class="btn hover:preset-tonal-surface w-fit opacity-50 hover:opacity-100"
     href="/changelog">v{version}</a
   >
 </div>

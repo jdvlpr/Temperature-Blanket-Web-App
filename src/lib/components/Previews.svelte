@@ -80,7 +80,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       class="rounded-container bg-surface-100 dark:bg-surface-900 mt-2 flex w-full flex-wrap justify-center gap-2 px-4 py-2 shadow-inner"
     >
       <button
-        class="btn hover:preset-tonal"
+        class="btn hover:preset-tonal-surface"
         title="Download PNG"
         onclick={() => {
           downloadPreviewPNG(
@@ -116,7 +116,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <a
               href={project.gallery.href}
               target="_blank"
-              class="btn hover:preset-tonal w-fit whitespace-pre-wrap underline"
+              class="btn hover:preset-tonal-surface w-fit whitespace-pre-wrap underline"
               rel="noreferrer">{project.gallery.title}</a
             >
           </p>

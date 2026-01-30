@@ -25,7 +25,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <button
-  class="btn hover:preset-tonal"
+  class="btn hover:preset-tonal-surface"
   title="Change the gauge direction, generate ranges, and more."
   onclick={() =>
     dialog.trigger({

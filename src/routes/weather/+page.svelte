@@ -401,7 +401,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   {#if !weatherState.weatherLocations.find((item) => item.id === weatherState.activeLocationID)?.saved}
                     <button
                       in:fade
-                      class="btn hover:preset-tonal"
+                      class="btn hover:preset-tonal-surface"
                       title="Add to Locations"
                       onclick={async () => {
                         weatherState.weatherLocations.map((item) => {
@@ -429,7 +429,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   {:else if weatherState.weatherLocations.filter((item) => item?.saved)?.length}
                     <button
                       in:fade
-                      class="btn hover:preset-tonal"
+                      class="btn hover:preset-tonal-surface"
                       onclick={() =>
                         dialog.trigger({
                           type: 'component',

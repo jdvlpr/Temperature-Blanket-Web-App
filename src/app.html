@@ -25,7 +25,34 @@ If not, see <https://www.gnu.org/licenses/>. -->
     %sveltekit.head%
   </head>
 
-  <body class="min-h-dvh scroll-smooth">
+  <body class="min-h-dvh scroll-smooth gradient-background">
     <div style="display: contents">%sveltekit.body%</div>
   </body>
+
+  <style>
+    .gradient-background {
+    background-size: cover;
+    background-image:
+      radial-gradient(
+        at 0% 95%,
+        color-mix(in oklab, var(--color-tertiary-500) 6%, transparent) 0px,
+        transparent 50%
+      ),
+      radial-gradient(
+        at 53% 40%,
+        color-mix(in oklab, var(--color-surface-500) 12%, transparent) 0px,
+        transparent 60%
+      ),
+      radial-gradient(
+        at 85% 8%,
+        color-mix(in oklab, var(--color-primary-500) 4%, transparent) 0px,
+        transparent 50%
+      ),
+      radial-gradient(
+        at 100% 100%,
+        color-mix(in oklab, var(--color-surface-500) 5%, transparent) 0px,
+        transparent 50%
+      );
+  }
+  </style>
 </html>

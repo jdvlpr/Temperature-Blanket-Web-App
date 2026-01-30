@@ -554,7 +554,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     {#if yarnColorwayFinderState.search}
                       <button
                         aria-label="Clear Search"
-                        class="ig-btn hover:preset-tonal"
+                        class="ig-btn hover:preset-tonal-surface"
                         onclick={() => {
                           yarnColorwayFinderState.search = '';
                         }}

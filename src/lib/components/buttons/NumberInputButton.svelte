@@ -26,15 +26,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
     max?: number | undefined;
     icon?: Component | undefined;
   }
-  let { value = $bindable(), title, min, max, icon = RulerIcon }: Props = $props();
-  
+  let {
+    value = $bindable(),
+    title,
+    min,
+    max,
+    icon = RulerIcon,
+  }: Props = $props();
+
   let iconcomponent = $derived({
     ref: icon,
   });
 </script>
 
 <button
-  class="btn hover:preset-tonal"
+  class="btn hover:preset-tonal-surface"
   title="Set {title}"
   onclick={() =>
     dialog.trigger({
@@ -53,6 +59,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
       },
     })}
 >
-  <iconcomponent.ref/>
+  <iconcomponent.ref />
   {title}: {value}
 </button>

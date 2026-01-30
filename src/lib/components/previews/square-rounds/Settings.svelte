@@ -175,7 +175,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </label>
 
   <button
-    class="btn hover:preset-tonal text-left whitespace-pre-wrap"
+    class="btn hover:preset-tonal-surface text-left whitespace-pre-wrap"
     title="Choose a Color"
     onclick={() =>
       dialog.trigger({

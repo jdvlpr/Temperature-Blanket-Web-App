@@ -137,7 +137,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 >
   {#if locations.all.length < MAXIMUM_LOCATIONS}
     <button
-      class={['btn hover:preset-tonal', weather.isUserEdited && 'hidden']}
+      class={[
+        'btn hover:preset-tonal-surface',
+        weather.isUserEdited && 'hidden',
+      ]}
       disabled={project.status.loading}
       onclick={() => locations.add()}
       title="Add a New Location"

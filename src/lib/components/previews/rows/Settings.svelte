@@ -101,7 +101,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {#each seasons as season, seasonIndex}
         <div class="flex max-w-sm flex-col items-start gap-2">
           <button
-            class="btn hover:preset-tonal w-fit gap-1 font-bold whitespace-pre-wrap"
+            class="btn hover:preset-tonal-surface w-fit gap-1 font-bold whitespace-pre-wrap"
             title="Edit Seasons"
             onclick={() => {
               dialog.trigger({
@@ -160,7 +160,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   {#if rowsPreview.countOfAdditionalStitches || rowsPreview.hasDatesOutOfSeasonsRanges}
     <button
-      class="btn hover:preset-tonal"
+      class="btn hover:preset-tonal-surface"
       title="Choose a color for any additional stitches"
       onclick={() =>
         dialog.trigger({

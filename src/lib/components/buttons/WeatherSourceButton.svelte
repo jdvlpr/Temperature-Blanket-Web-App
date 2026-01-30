@@ -5,7 +5,7 @@
 </script>
 
 <button
-  class="btn hover:preset-tonal w-fit"
+  class="btn hover:preset-tonal-surface w-fit"
   disabled={project.status.loading}
   onclick={async () => {
     dialog.trigger({

@@ -273,7 +273,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <div class="my-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
         <!-- HTML Color Codes Button -->
         <button
-          class="card hover:preset-tonal p-4 text-left"
+          class="card hover:preset-tonal-surface p-4 text-left"
           onclick={() => (selectedExportType = 'html')}
         >
           <div class="flex items-center gap-2">
@@ -287,7 +287,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
         <!-- Image Export Button -->
         <button
-          class="card hover:preset-tonal p-4 text-left"
+          class="card hover:preset-tonal-surface p-4 text-left"
           onclick={() => (selectedExportType = 'image')}
         >
           <div class="flex items-center gap-2">
@@ -301,7 +301,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
         <!-- Palette Code Button -->
         <button
-          class="card hover:preset-tonal p-4 text-left"
+          class="card hover:preset-tonal-surface p-4 text-left"
           onclick={() => (selectedExportType = 'palette')}
         >
           <div class="flex items-center gap-2">
@@ -316,7 +316,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <!-- Yarn Colorway Names Button -->
         {#if colorNames}
           <button
-            class="card hover:preset-tonal p-4 text-left"
+            class="card hover:preset-tonal-surface p-4 text-left"
             onclick={() => (selectedExportType = 'colorway')}
           >
             <div class="flex items-center gap-2">
@@ -332,7 +332,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {:else}
       <!-- Back Button -->
       <button
-        class="btn hover:preset-tonal mt-4"
+        class="btn hover:preset-tonal-surface mt-4"
         onclick={() => (selectedExportType = 'main')}
       >
         <ArrowLeftIcon />
@@ -401,7 +401,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               {/if}
 
               <button
-                class="btn hover:preset-tonal mb-8 w-fit"
+                class="btn hover:preset-tonal-surface mb-8 w-fit"
                 onclick={downloadImage}
               >
                 <DownloadIcon />
@@ -435,7 +435,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </div>
 
             <button
-              class="btn hover:preset-tonal mt-4"
+              class="btn hover:preset-tonal-surface mt-4"
               onclick={() => {
                 try {
                   window.navigator.clipboard.writeText(colorHexes);
@@ -473,7 +473,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </p>
 
             <button
-              class="btn hover:preset-tonal mt-4"
+              class="btn hover:preset-tonal-surface mt-4"
               onclick={() => {
                 try {
                   window.navigator.clipboard.writeText(paletteCode);
@@ -511,7 +511,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </div>
 
             <button
-              class="btn hover:preset-tonal mt-4"
+              class="btn hover:preset-tonal-surface mt-4"
               onclick={() => {
                 try {
                   window.navigator.clipboard.writeText(colorNames);

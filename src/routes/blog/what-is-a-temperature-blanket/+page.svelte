@@ -65,13 +65,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <AppShell pageName="What is a Temperature Blanket?">
   {#snippet stickyHeader()}
-    <div class="hidden lg:inline-flex mx-auto"><AppLogo /></div>
+    <div class="mx-auto hidden lg:inline-flex"><AppLogo /></div>
   {/snippet}
   {#snippet main()}
     <main class="pb-8">
       <a
         href="/blog"
-        class="btn hover:preset-tonal mb-2 max-lg:mx-2 max-lg:mt-2"
+        class="btn hover:preset-tonal-surface mb-2 max-lg:mx-2 max-lg:mt-2"
         ><ArrowLeftIcon />Blog</a
       >
       <Card>
@@ -79,15 +79,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <div>
             <img
               src="/images/blog-images/what-is-a-temperature-blanket/temperature-blanket-featured-image.png"
-              class="h-36 object-fit w-full"
+              class="object-fit h-36 w-full"
               alt="Preview of a Temperature Blanket Project"
             />
           </div>
         {/snippet}
 
         {#snippet content()}
-          <div class="pb-4 px-2">
-            <h2 class="py-4 h2 text-gradient">
+          <div class="px-2 pb-4">
+            <h2 class="h2 text-gradient py-4">
               What is a Temperature Blanket?
             </h2>
             <div class="flex flex-col gap-4">
@@ -101,17 +101,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
               </p>
 
               <div
-                class="grid grid-cols-1 md:grid-cols-12 md:items-center gap-4 md:gap-2 my-4 bg-surface-100 dark:bg-surface-900 rounded-container p-4 shadow-inner"
+                class="bg-surface-100 dark:bg-surface-900 rounded-container my-4 grid grid-cols-1 gap-4 p-4 shadow-inner md:grid-cols-12 md:items-center md:gap-2"
               >
                 <div
-                  class="order-3 md:order-1 col-span-full md:col-span-7 flex flex-col"
+                  class="order-3 col-span-full flex flex-col md:order-1 md:col-span-7"
                 >
                   <img
                     src="/images/blog-images/what-is-a-temperature-blanket/symea_3270.png"
                     alt="Example of a temperature blanket"
                     class=""
                   />
-                  <p class="col-span-full text-sm mt-2">
+                  <p class="col-span-full mt-2 text-sm">
                     Temperature blanket by <a
                       href="https://www.ravelry.com/projects/symea/temperature-blanket---temperaturdecke"
                       class="link"
@@ -121,7 +121,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 </div>
 
                 <p
-                  class="order-1 md:order-3 text-xl font-light col-span-full md:col-span-4 text-center md:-top-6 md:relative text-balance"
+                  class="order-1 col-span-full text-center text-xl font-light text-balance md:relative md:-top-6 md:order-3 md:col-span-4"
                 >
                   These 366 rows of yarn represent the temperature in Göppingen,
                   Germany from May 15, 1943 to May 14, 1944!
@@ -137,7 +137,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
               <div class="flex flex-col gap-4">
                 <div class="">
-                  <p class="font-bold text-lg">Yarn Colors & Gauge</p>
+                  <p class="text-lg font-bold">Yarn Colors & Gauge</p>
                   <p>
                     Any yarn colors can be used to create a temperature blanket.
                     Usually, people choose between 6 and 18 different colors of
@@ -148,16 +148,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   </p>
                 </div>
 
-                <div class="flex flex-col gap-2 max-w-sm">
+                <div class="flex max-w-sm flex-col gap-2">
                   <p class="text-sm">Example of a temperature gauge:</p>
                   <div
-                    class="flex flex-col rounded-container overflow-hidden shadow-md"
+                    class="rounded-container flex flex-col overflow-hidden shadow-md"
                   >
                     {#each colors as { hex, brandName, yarnName, name }, _i}
                       {@const textColor = getTextColor(hex)}
                       <div
                         style="background:{hex}; color:{textColor}"
-                        class="w-full py-2 flex items-center justify-around"
+                        class="flex w-full items-center justify-around py-2"
                       >
                         <div class="col-span-1 flex flex-col">
                           <p class="text-xs">{brandName} - {yarnName}</p>
@@ -179,7 +179,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 </div>
 
                 <div>
-                  <p class="font-bold text-lg">Weather Data</p>
+                  <p class="text-lg font-bold">Weather Data</p>
                   <p>
                     People either get historical weather data or track the
                     current temperature over time. Then the yarn corresponding
@@ -192,7 +192,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 </div>
 
                 <div>
-                  <p class="font-bold text-lg">Project Pattern</p>
+                  <p class="text-lg font-bold">Project Pattern</p>
                   <p>
                     There are countless options for a temperature blanket
                     pattern. A typical project has one row for each day, but
@@ -206,7 +206,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     Examples of different types of patterns:
                   </p>
                   <div
-                    class="grid grid-cols-2 md:grid-cols-4 gap-4 items-start"
+                    class="grid grid-cols-2 items-start gap-4 md:grid-cols-4"
                   >
                     <div>
                       <img
@@ -245,7 +245,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               </div>
 
               <div>
-                <h3 class="font-bold text-lg">Variations</h3>
+                <h3 class="text-lg font-bold">Variations</h3>
                 <p>
                   There are many other ways to customize a temperature blanket:
                 </p>
@@ -262,7 +262,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               </ul>
 
               <div>
-                <h3 class="font-bold text-lg">Resources</h3>
+                <h3 class="text-lg font-bold">Resources</h3>
                 <p>
                   Here are some resources for inspiration, tips, and more
                   information about temperature blankets:

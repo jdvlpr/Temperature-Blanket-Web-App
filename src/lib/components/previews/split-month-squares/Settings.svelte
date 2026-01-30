@@ -88,7 +88,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   />
 
   <button
-    class="btn hover:preset-tonal"
+    class="btn hover:preset-tonal-surface"
     title="Choose a color for any additional rounds"
     onclick={() =>
       dialog.trigger({

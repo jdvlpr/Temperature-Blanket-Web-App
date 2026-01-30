@@ -45,7 +45,7 @@
     <a
       href="https://www.geonames.org/{location.id}"
       target="_blank"
-      class="link btn hover:preset-tonal w-fit"
+      class="link btn hover:preset-tonal-surface w-fit"
       >More info from GeoNames <svg
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 24 24"

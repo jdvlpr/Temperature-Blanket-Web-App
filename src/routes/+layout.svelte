@@ -188,7 +188,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       href="https://www.youtube.com/watch?v=7NRLrpZb0Lo"
       target="_blank"
       rel="noopener"
-      class="btn hover:preset-tonal whitespace-pre-wrap"
+      class="btn hover:preset-tonal-surface whitespace-pre-wrap"
     >
       <YoutubeIcon />
       <span>

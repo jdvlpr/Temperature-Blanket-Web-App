@@ -313,7 +313,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   <div {...attributes} transition:safeSlide>
                     <Popover.Description>
                       <button
-                        class="btn hover:preset-tonal"
+                        class="btn hover:preset-tonal-surface"
                         onclick={() => {
                           locations.remove(location.uuid);
                           weather.rawData = [];
@@ -393,7 +393,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </div>
         {:else if showReset}
           <button
-            class="ig-btn hover:preset-tonal"
+            class="ig-btn hover:preset-tonal-surface"
             title="Reset Location Search"
             disabled={weather.isUserEdited || project.status.loading}
             onclick={() => {
@@ -413,7 +413,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </button>
         {:else if project.geolocationAvailable}
           <button
-            class="ig-btn hover:preset-tonal"
+            class="ig-btn hover:preset-tonal-surface"
             title="Use My Location"
             disabled={weather.isUserEdited || project.status.loading}
             onclick={async () => {
@@ -494,7 +494,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </div>
       {#if location.id && location.lat && location.lng}
         <button
-          class="btn hover:preset-tonal w-fit text-xs opacity-50 hover:opacity-100"
+          class="btn hover:preset-tonal-surface w-fit text-xs opacity-50 hover:opacity-100"
           onclick={() => {
             dialog.trigger({
               type: 'component',

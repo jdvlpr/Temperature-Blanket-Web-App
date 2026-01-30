@@ -59,7 +59,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <a
           href={project.gallery.href}
           target="_blank"
-          class="link btn hover:preset-tonal w-fit whitespace-pre-wrap"
+          class="link btn hover:preset-tonal-surface w-fit whitespace-pre-wrap"
           rel="noreferrer"><ExternalLinkIcon />{project.gallery.title}</a
         >
       </p>

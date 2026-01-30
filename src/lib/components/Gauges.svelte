@@ -125,7 +125,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <!-- If this is not the default temperature gauge and we're on the project planner page -->
     <div class="mb-4 flex w-full justify-center px-2 sm:mb-6">
       <button
-        class="btn hover:preset-tonal relative top-2 justify-start max-sm:mb-2"
+        class="btn hover:preset-tonal-surface relative top-2 justify-start max-sm:mb-2"
         title="Delete {gauges.activeGauge.label}"
         onclick={() => {
           gauges.remove(gauges.activeGauge.id);
@@ -159,7 +159,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   class="rounded-container bg-surface-100 dark:bg-surface-900 mx-2 mt-4 flex flex-wrap justify-center gap-2 px-4 py-2 shadow-inner"
 >
   <button
-    class="btn hover:preset-tonal h-auto text-left whitespace-pre-wrap"
+    class="btn hover:preset-tonal-surface h-auto text-left whitespace-pre-wrap"
     onclick={downloadPDF}
     title="Download PDF File"
   >

@@ -217,7 +217,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <div class="w-fit max-w-(--breakpoint-sm) px-2 text-left text-sm">
       <Popover>
         <Popover.Trigger
-          class="btn hover:preset-tonal text-warning-800-200 text-left text-sm whitespace-pre-wrap"
+          class="btn hover:preset-tonal-surface text-warning-800-200 text-left text-sm whitespace-pre-wrap"
         >
           <TriangleAlertIcon size="18" />
           <p>
@@ -505,7 +505,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     >
       <Popover>
         <Popover.Trigger
-          class="btn hover:preset-tonal text-warning-800-200 text-left text-sm whitespace-pre-wrap"
+          class="btn hover:preset-tonal-surface text-warning-800-200 text-left text-sm whitespace-pre-wrap"
         >
           <CloudAlert size="18" />
           There's some missing data

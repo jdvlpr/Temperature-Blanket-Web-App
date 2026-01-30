@@ -20,7 +20,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '$env/static/public';
   import AppLogo from '$lib/components/AppLogo.svelte';
   import AppShell from '$lib/components/AppShell.svelte';
-  import { ArrowLeftIcon, CircleCheckIcon, CircleMinusIcon } from '@lucide/svelte';
+  import {
+    ArrowLeftIcon,
+    CircleCheckIcon,
+    CircleMinusIcon,
+  } from '@lucide/svelte';
 </script>
 
 <svelte:head>
@@ -45,13 +49,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/snippet}
   {#snippet main()}
     <main
-      class="m-auto mx-auto lg:mt-4 mb-4 flex max-w-(--breakpoint-md) flex-col gap-4 px-2 text-left"
+      class="m-auto mx-auto mb-4 flex max-w-(--breakpoint-md) flex-col gap-4 px-2 text-left lg:mt-4"
     >
-    <a href="/contact" class="btn hover:preset-tonal w-fit max-lg:mt-2"
+      <a
+        href="/contact"
+        class="btn hover:preset-tonal-surface w-fit max-lg:mt-2"
         ><ArrowLeftIcon /> Contact</a
       >
 
-    <h2 class="h2 text-gradient ">Request Yarn Colorways</h2>
+      <h2 class="h2 text-gradient">Request Yarn Colorways</h2>
       <div
         class="rounded-container bg-surface-50-950 flex flex-wrap items-end justify-center gap-2 p-4 text-left"
       >
@@ -81,8 +87,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <CircleCheckIcon
                 class="inline"
                 style="color:var(--color-success-500)"
-              /> A suggestion for correcting or updating existing yarn colorways
-              on temperature-blanket.com
+              /> A suggestion for correcting or updating existing yarn colorways on
+              temperature-blanket.com
             </p>
           </div>
           <div class="card flex flex-col gap-2 p-4">

@@ -150,7 +150,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         }}
       >
         <Dialog.Trigger
-          class="btn hover:preset-tonal my-2"
+          class="btn hover:preset-tonal-surface my-2"
           aria-label="Content Menu"
         >
           <div class="flex flex-wrap items-center gap-1">
@@ -202,7 +202,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               Yarn Colorways API
             </h2>
             <section
-              class="card preset-tonal rounded-container mt-2 flex flex-col gap-2 p-4 lg:mt-0"
+              class="card preset-tonal-surface rounded-container mt-2 flex flex-col gap-2 p-4 lg:mt-0"
             >
               <p>Find yarn colorways by HTML hex color code.</p>
 
@@ -271,8 +271,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 href="https://rapidapi.com/temperature-blanket-temperature-blanket-default/api/yarn-colorways//pricing"
                 target="_blank"
                 class="link">subscribe to one of the plans</a
-              > to get a key for accessing the Yarn Colorways API. The free plan
-              allows up to 500 calls per month.
+              > to get a key for accessing the Yarn Colorways API. The free plan allows
+              up to 500 calls per month.
             </p>
           </section>
           <section

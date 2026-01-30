@@ -138,7 +138,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <main
       class="mx-auto flex max-w-screen-sm flex-col gap-2 px-4 pt-4 pb-8 lg:px-0"
     >
-      <a href="/contact" class="btn hover:preset-tonal w-fit"
+      <a href="/contact" class="btn hover:preset-tonal-surface w-fit"
         ><ArrowLeftIcon /> Contact</a
       >
 

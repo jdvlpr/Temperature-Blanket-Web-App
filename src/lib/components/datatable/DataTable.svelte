@@ -160,7 +160,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {#if includesToday}
       <button
         aria-label="Today"
-        class="btn hover:preset-tonal"
+        class="btn hover:preset-tonal-surface"
         title="Go to Today"
         onclick={() => goToToday()}
       >

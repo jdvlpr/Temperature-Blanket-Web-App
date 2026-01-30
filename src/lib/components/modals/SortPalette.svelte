@@ -61,7 +61,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </label>
 
       <button
-        class="btn hover:preset-tonal"
+        class="btn hover:preset-tonal-surface"
         onclick={() => {
           colors.reverse();
           key = !key;

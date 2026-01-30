@@ -177,7 +177,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       >
         <a
           href="/gallery"
-          class="btn hover:preset-tonal mx-2 mt-2 flex w-fit items-center lg:mx-0 lg:mt-0"
+          class="btn hover:preset-tonal-surface mx-2 mt-2 flex w-fit items-center lg:mx-0 lg:mt-0"
         >
           <ArrowLeftIcon />
           Project Gallery</a
@@ -524,7 +524,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                                   </div>
                                   {#if affiliate_variant_href}
                                     <a
-                                      class="btn hover:preset-tonal flex flex-wrap items-center justify-start"
+                                      class="btn hover:preset-tonal-surface flex flex-wrap items-center justify-start"
                                       href={affiliate_variant_href}
                                       target="_blank"
                                       rel="noreferrer nofollow"

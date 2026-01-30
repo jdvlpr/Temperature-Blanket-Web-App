@@ -119,7 +119,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <p class="text-2xl font-bold">Square Settings</p>
 
   <button
-    class="btn hover:preset-tonal"
+    class="btn hover:preset-tonal-surface"
     title="Edit Square Design"
     onclick={() =>
       dialog.trigger({
@@ -146,7 +146,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   {#if squaresPreview.details?.additionalSquares || squaresPreview.settings?.squaresBetweenMonthsCount}
     <button
-      class="btn hover:preset-tonal"
+      class="btn hover:preset-tonal-surface"
       title="Choose a color for any additional squares"
       onclick={() =>
         dialog.trigger({
@@ -194,7 +194,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   {#if squaresPreview.settings.joinStitches > 0}
     <button
-      class="btn hover:preset-tonal text-left whitespace-pre-wrap"
+      class="btn hover:preset-tonal-surface text-left whitespace-pre-wrap"
       title="Choose a color for the border stitches around each square"
       onclick={() =>
         dialog.trigger({

@@ -160,7 +160,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <a
           href="/"
           target="_blank"
-          class="btn hover:preset-tonal w-fit"
+          class="btn hover:preset-tonal-surface w-fit"
           title="New Project"
         >
           <SquarePlusIcon />
@@ -168,7 +168,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </a>
 
         <button
-          class="btn hover:preset-tonal w-fit"
+          class="btn hover:preset-tonal-surface w-fit"
           onclick={() => {
             goTo('save');
           }}
@@ -180,7 +180,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
         {#if weather.data.length}
           <button
-            class="btn hover:preset-tonal w-fit"
+            class="btn hover:preset-tonal-surface w-fit"
             onclick={() => goTo('download')}
             disabled={!weather.data.length}
             title="Open Download Menu"
@@ -254,7 +254,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
       <h2 class="mt-8 mb-2 text-xl font-bold">Page</h2>
       <button
-        class="btn hover:preset-tonal w-fit"
+        class="btn hover:preset-tonal-surface w-fit"
         onclick={() => {
           dialog.trigger({
             type: 'component',
@@ -385,7 +385,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <h2 class="my-2 text-lg font-bold">Download</h2>
       <div class="flex flex-col items-start gap-2 text-left">
         <button
-          class="btn hover:preset-tonal"
+          class="btn hover:preset-tonal-surface"
           onclick={downloadPDF}
           title="Download PDF File"
         >
@@ -393,7 +393,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           Gauges and Weather Data (PDF)
         </button>
         <button
-          class="btn hover:preset-tonal"
+          class="btn hover:preset-tonal-surface"
           onclick={downloadWeatherCSV}
           title="Download CSV File"
         >
@@ -403,7 +403,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
         {#if previews.active?.previewComponent}
           <button
-            class="btn hover:preset-tonal h-auto"
+            class="btn hover:preset-tonal-surface h-auto"
             title="Download PNG File"
             onclick={() => {
               downloadPreviewPNG(
@@ -472,7 +472,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </div>
 
         <button
-          class="btn hover:preset-tonal"
+          class="btn hover:preset-tonal-surface"
           onclick={() => {
             saveProject({ copy: true });
           }}
@@ -502,7 +502,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </div>
 
         <button
-          class="btn hover:preset-tonal"
+          class="btn hover:preset-tonal-surface"
           onclick={downloadWeatherCSV}
           title="Download CSV File"
         >

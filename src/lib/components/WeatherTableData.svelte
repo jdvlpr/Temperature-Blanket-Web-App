@@ -96,7 +96,7 @@
             >
               <button
                 class={[
-                  weather.grouping === 'day' && 'hover:preset-tonal btn',
+                  weather.grouping === 'day' && 'hover:preset-tonal-surfacebtn',
                   (weather.grouping === 'week' || id === 'moon') &&
                     'disabled:opacity-100',
                   isRecentDate && 'opacity-65',
