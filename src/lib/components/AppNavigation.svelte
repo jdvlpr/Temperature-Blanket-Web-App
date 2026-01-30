@@ -48,6 +48,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { untrack } from 'svelte';
   import LegacyMigrationError from './modals/LegacyMigrationError.svelte';
   import ArrowUp_0_1 from '@lucide/svelte/icons/arrow-up-0-1';
+  import { APP_NAVIGATION_SIDEBAR_WIDTH } from '$lib/constants';
 
   // Set opened navigation items based on current page
   $effect(() => {

@@ -113,7 +113,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <section class="flex flex-wrap items-end justify-end gap-2">
           <button
             aria-label="Previous Page"
-            class="btn-icon hover:preset-tonal"
+            class="btn-icon hover:preset-tonal-surface"
             title="Previous Page"
             disabled={table.currentPage === 1}
             onclick={() => {
@@ -143,7 +143,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
           <button
             aria-label="Next Page"
-            class="btn-icon hover:preset-tonal"
+            class="btn-icon hover:preset-tonal-surface"
             title="Next Page"
             disabled={table.currentPage === table.pages.length}
             onclick={() => {

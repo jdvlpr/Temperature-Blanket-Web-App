@@ -365,7 +365,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             {#if typeof color.locked !== 'undefined'}
               <button
-                class="btn-icon hover:preset-tonal"
+                class="btn-icon hover:preset-tonal-surface"
                 onclick={(e) => {
                   e.preventDefault();
                   colors[index].locked = !colors[index].locked;

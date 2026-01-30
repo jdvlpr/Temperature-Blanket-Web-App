@@ -54,7 +54,7 @@
     shadow = 'shadow-lg',
     zIndex = 'z-9999',
     buttonAction = 'btn preset-filled',
-    buttonDismiss = 'btn-icon hover:preset-tonal',
+    buttonDismiss = 'btn-icon hover:preset-tonal-surface',
     buttonDismissLabel = '✕',
   }: Props = $props();
 
@@ -72,19 +72,51 @@
     let cPosition: string = '';
     let cAlign: string = ''; // items-center
     let animAxis = { x: 0, y: 0 };
-    
+
     // Set Position
     switch (position) {
       // Middles
-      case('t'): cPosition = 'justify-center items-start'; cAlign = 'items-center'; animAxis = { x: 0, y: -100 }; break;
-      case('b'): cPosition = 'justify-center items-end'; cAlign = 'items-center'; animAxis = { x: 0, y: 100 }; break;
-      case('l'): cPosition = 'justify-start items-center'; cAlign = 'items-start'; animAxis = { x: -100, y: 0 }; break;
-      case('r'): cPosition = 'justify-end items-center'; cAlign = 'items-end'; animAxis = { x: 100, y: 0 }; break;
+      case 't':
+        cPosition = 'justify-center items-start';
+        cAlign = 'items-center';
+        animAxis = { x: 0, y: -100 };
+        break;
+      case 'b':
+        cPosition = 'justify-center items-end';
+        cAlign = 'items-center';
+        animAxis = { x: 0, y: 100 };
+        break;
+      case 'l':
+        cPosition = 'justify-start items-center';
+        cAlign = 'items-start';
+        animAxis = { x: -100, y: 0 };
+        break;
+      case 'r':
+        cPosition = 'justify-end items-center';
+        cAlign = 'items-end';
+        animAxis = { x: 100, y: 0 };
+        break;
       // Corners
-      case ('tl'): cPosition = 'justify-start items-start'; cAlign = 'items-start'; animAxis = { x: -100, y: 0 }; break;
-      case ('tr'): cPosition = 'justify-end items-start'; cAlign = 'items-end'; animAxis = { x: 100, y: 0 }; break;
-      case ('bl'): cPosition = 'justify-start items-end'; cAlign = 'items-start'; animAxis = { x: -100, y: 0 }; break;
-      case ('br'): cPosition = 'justify-end items-end'; cAlign = 'items-end'; animAxis = { x: 100, y: 0 }; break;
+      case 'tl':
+        cPosition = 'justify-start items-start';
+        cAlign = 'items-start';
+        animAxis = { x: -100, y: 0 };
+        break;
+      case 'tr':
+        cPosition = 'justify-end items-start';
+        cAlign = 'items-end';
+        animAxis = { x: 100, y: 0 };
+        break;
+      case 'bl':
+        cPosition = 'justify-start items-end';
+        cAlign = 'items-start';
+        animAxis = { x: -100, y: 0 };
+        break;
+      case 'br':
+        cPosition = 'justify-end items-end';
+        cAlign = 'items-end';
+        animAxis = { x: 100, y: 0 };
+        break;
     }
     return { cPosition, cAlign, animAxis };
   }
@@ -108,18 +140,17 @@
     }
   }
 
-  
   // Reactive
   let classesWrapper = $derived(`${cWrapper} ${cPosition} ${zIndex}`);
-  
+
   let classesSnackbar = $derived(`${cSnackbar} ${cAlign} ${padding}`);
-  
+
   let classesToast = $derived(
     `${cToast} ${width} ${color} ${padding} ${spacing} ${rounded} ${shadow}`,
   );
   // Filtered Toast Store
   let filteredToasts = $derived(Array.from(toast.queue).slice(0, max));
-  
+
   let wrapperVisible = $derived(filteredToasts.length > 0);
 </script>
 

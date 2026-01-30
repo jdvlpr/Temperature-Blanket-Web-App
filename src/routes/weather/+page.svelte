@@ -343,7 +343,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
       <button
         aria-label="Open Settings"
-        class="btn-icon hover:preset-tonal"
+        class="btn-icon hover:preset-tonal-surface"
         title="Open Settings"
         onclick={() =>
           dialog.trigger({
@@ -361,7 +361,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {#if weatherState.weatherLocations.filter((item) => item?.saved).length}
         <button
           aria-label="Open Locations"
-          class="btn-icon hover:preset-tonal"
+          class="btn-icon hover:preset-tonal-surface"
           title="Open Locations"
           onclick={() =>
             dialog.trigger({

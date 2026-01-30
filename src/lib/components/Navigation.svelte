@@ -14,6 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
+  import { APP_NAVIGATION_SIDEBAR_WIDTH } from '$lib/constants';
   import { pageSections, showNavigationSideBar, weather } from '$lib/state';
   import { goToProjectSection } from '$lib/utils';
 </script>
@@ -22,8 +23,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   class={[
     'bg-surface-50 dark:bg-surface-950 lg:rounded-t-container fixed bottom-0 z-10 flex h-16 w-full justify-center gap-2 overflow-hidden backdrop-blur-md transition-all',
     showNavigationSideBar.value
-      ? 'lg:left-[284px] lg:max-w-[calc(100vw-302px)]'
-      : 'lg:left-[78px] lg:max-w-[calc(100vw-96px)]',
+      ? `lg:left-[284px] lg:max-w-[calc(min(100vw,var(--breakpoint-xl))-302px)] xl:left-[calc(50%-(var(--breakpoint-xl)/2)+278px)] xl:max-w-[calc(min(100vw,var(--breakpoint-xl))-278px)]`
+      : 'lg:left-[78px] lg:max-w-[calc(min(100vw,var(--breakpoint-xl))-96px)] xl:left-[calc(50%-(var(--breakpoint-xl)/2)+78px)]',
   ]}
   id="bottom-section-nav"
 >

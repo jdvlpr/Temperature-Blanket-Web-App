@@ -85,30 +85,30 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {/if}
     <div class="flex flex-wrap items-center justify-center gap-2">
       <button
-        class="btn-icon hover:preset-tonal"
+        class="btn-icon hover:preset-tonal-surface"
         onclick={() => (value = displayNumber(value - 20))}
         disabled={noMinMax ? false : value < min + 20}>-20</button
       >
       <button
-        class="btn-icon hover:preset-tonal"
+        class="btn-icon hover:preset-tonal-surface"
         onclick={() => (value = displayNumber(value - 5))}
         disabled={noMinMax ? false : value < min + 5}>-5</button
       >
       <button
-        class="btn-icon hover:preset-tonal"
+        class="btn-icon hover:preset-tonal-surface"
         onclick={() => (value = displayNumber(value - 1))}
         disabled={noMinMax ? false : value < min + 1}>-1</button
       >
       <button
-        class="btn-icon hover:preset-tonal"
+        class="btn-icon hover:preset-tonal-surface"
         onclick={() => (value = displayNumber(value + 1))}>+1</button
       >
       <button
-        class="btn-icon hover:preset-tonal"
+        class="btn-icon hover:preset-tonal-surface"
         onclick={() => (value = displayNumber(value + 5))}>+5</button
       >
       <button
-        class="btn-icon hover:preset-tonal"
+        class="btn-icon hover:preset-tonal-surface"
         onclick={() => (value = displayNumber(value + 20))}>+20</button
       >
     </div>

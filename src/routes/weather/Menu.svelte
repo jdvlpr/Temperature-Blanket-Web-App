@@ -101,7 +101,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </div>
             <button
               aria-label="Remove from Locations"
-              class="btn-icon hover:preset-tonal"
+              class="btn-icon hover:preset-tonal-surface"
               title="Remove from Locations"
               onclick={(e) => {
                 e.stopPropagation();

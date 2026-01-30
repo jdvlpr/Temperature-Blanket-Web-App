@@ -147,7 +147,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     <button
       class={[
-        'hover:preset-tonal',
+        'hover:preset-tonal-surface',
         fullscreen.value ? 'btn-icon' : 'btn justify-start',
       ]}
       title="Select Premade Colorway Palettes"
@@ -173,7 +173,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     <button
       class={[
-        'hover:preset-tonal',
+        'hover:preset-tonal-surface',
         fullscreen.value ? 'btn-icon' : 'btn justify-start',
       ]}
       title="Choose Yarn Colorways, Filtered by Brand and Yarn"
@@ -199,7 +199,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     <button
       class={[
-        'hover:preset-tonal',
+        'hover:preset-tonal-surface',
         fullscreen.value ? 'btn-icon' : 'btn justify-start',
       ]}
       title="Get Palette from Image"
@@ -226,7 +226,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     <button
       class={[
-        'hover:preset-tonal',
+        'hover:preset-tonal-surface',
         fullscreen.value ? 'btn-icon' : 'btn justify-start',
       ]}
       title="Generate Random Colors"
@@ -253,7 +253,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     <button
       class={[
-        'hover:preset-tonal',
+        'hover:preset-tonal-surface',
         fullscreen.value ? 'btn-icon' : 'btn justify-start',
       ]}
       title="Load Colors or Get a Palette Code to Share"
@@ -278,7 +278,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     <button
       class={[
-        'hover:preset-tonal',
+        'hover:preset-tonal-surface',
         fullscreen.value ? 'btn-icon' : 'btn justify-start',
       ]}
       title="Sort Colors"
@@ -305,7 +305,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     <button
       aria-label="Fullscreen"
-      class={['btn', !fullscreen.value ? 'hover:preset-tonal' : 'preset-tonal']}
+      class={['btn hover:preset-tonal-surface']}
       onclick={() => (fullscreen.value = !fullscreen.value)}
       title="Toggle Fullscreen Editing Mode (f)"
     >

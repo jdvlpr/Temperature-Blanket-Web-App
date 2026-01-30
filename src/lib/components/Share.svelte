@@ -45,7 +45,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     openState = e.open;
   }}
 >
-  <Popover.Trigger class="btn-icon hover:preset-tonal">
+  <Popover.Trigger class="btn-icon hover:preset-tonal-surface">
     <Share2Icon />
   </Popover.Trigger>
   <Popover.Positioner>

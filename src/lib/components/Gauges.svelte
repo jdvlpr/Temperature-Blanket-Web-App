@@ -19,6 +19,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     dialog,
     gauges,
     pageSections,
+    showNavigationSideBar,
     weather,
   } from '$lib/state';
   import { preferences } from '$lib/storage/preferences.svelte';
@@ -28,6 +29,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import RangeOptionsButton from './buttons/RangeOptionsButton.svelte';
   import Gauge from './Gauge.svelte';
   import GaugeCustomizer from './GaugeCustomizer.svelte';
+  import { APP_NAVIGATION_SIDEBAR_WIDTH } from '$lib/constants';
 
   onMount(() => {
     setupAvailableGauges();
@@ -86,13 +88,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 </script>
 
-<div class="mx-auto flex max-w-fit snap-x justify-start overflow-auto py-2">
+<div
+  class={[
+    'mx-auto flex max-w-fit snap-x justify-start overflow-auto py-2',
+    showNavigationSideBar.value
+      ? `lg:max-w-[calc(min(100vw,var(--breakpoint-xl))-306px)] xl:max-w-fit`
+      : 'lg:max-w-[calc(min(100vw,var(--breakpoint-xl))-96px)] xl:max-w-fit',
+  ]}
+>
   {#each gauges.allAvailable as { id, label }}
     <button
       id={gauges.activeGaugeId === id ? 'active-gauge-button' : ''}
       class={[
         'btn mx-2',
-        gauges.activeGaugeId === id ? 'preset-filled' : 'hover:preset-tonal',
+        gauges.activeGaugeId === id
+          ? 'preset-filled'
+          : 'hover:preset-tonal-surface',
       ]}
       onclick={() => {
         if (!gauges.allCreated.map((gauge) => gauge.id).includes(id)) {

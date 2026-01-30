@@ -132,7 +132,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {#if !pages.main}
     <button
       aria-label="Go To Main Menu"
-      class="btn-icon hover:preset-tonal"
+      class="btn-icon hover:preset-tonal-surface"
       onclick={() => goTo('main')}
       title="Go To Main Menu"
     >

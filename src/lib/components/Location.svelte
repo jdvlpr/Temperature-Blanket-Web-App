@@ -298,7 +298,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <div class="justify-self-end">
       <Popover>
         <Popover.Trigger
-          class="btn-icon hover:preset-tonal"
+          class="btn-icon hover:preset-tonal-surface"
           title="Location Options"
         >
           <EllipsisVerticalIcon />
@@ -329,6 +329,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       </button>
                     </Popover.Description>
                     <Popover.Arrow
+                      class="-z-10"
                       style="--arrow-size: calc(var(--spacing) * 4); --arrow-background: var(--color-surface-200-800);"
                     >
                       <Popover.ArrowTip />
