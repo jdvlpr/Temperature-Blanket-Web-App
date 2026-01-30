@@ -72,8 +72,8 @@ export const goToProjectSection = async (index: number, animateFromBottom: boole
     if (activeSection?.id === 'page-section-gauges') {
       await tick();
       const activeGaugeBtn = document.getElementById('active-gauge-button');
-      const isVisible = activeGaugeBtn?.getBoundingClientRect().left < 0 || activeGaugeBtn?.getBoundingClientRect().right < window.innerWidth;
-      if (activeGaugeBtn && isVisible) {
+      const isHidden = activeGaugeBtn?.getBoundingClientRect().left < 0 || activeGaugeBtn?.getBoundingClientRect().right > window.innerWidth;
+      if (activeGaugeBtn && isHidden) {
         activeGaugeBtn.scrollIntoView({
           behavior: 'smooth',
           block: 'nearest',
@@ -86,8 +86,8 @@ export const goToProjectSection = async (index: number, animateFromBottom: boole
     if (activeSection?.id === 'page-section-preview') {
       await tick();
       const activePreviewBtn = document.getElementById('active-preview-button');
-      const isVisible = activePreviewBtn?.getBoundingClientRect().left < 0 || activePreviewBtn?.getBoundingClientRect().right < window.innerWidth;
-      if (activePreviewBtn && !isVisible) {
+      const isHidden = activePreviewBtn?.getBoundingClientRect().left < 0 || activePreviewBtn?.getBoundingClientRect().right > window.innerWidth;
+      if (activePreviewBtn && isHidden) {
         activePreviewBtn.scrollIntoView({
           behavior: 'smooth',
           block: 'nearest',
