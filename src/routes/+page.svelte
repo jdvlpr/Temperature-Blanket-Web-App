@@ -315,7 +315,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/snippet}
 
   {#snippet main()}
-    <main class="mx-auto pb-16 text-center" id="main-page">
+    <main class="mx-auto pb-18 text-center" id="main-page">
       <div
         id="page-section-location"
         class="mx-auto max-w-(--breakpoint-md) scroll-mt-[76px]"

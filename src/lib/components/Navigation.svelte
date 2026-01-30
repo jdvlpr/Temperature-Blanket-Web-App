@@ -65,7 +65,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <div
   class={[
-    'bg-surface-50/80 dark:bg-surface-950/80 lg:rounded-t-container fixed bottom-0 z-10 flex h-16 w-full justify-center gap-2 overflow-hidden backdrop-blur-md transition-all',
+    'bg-surface-50/80 dark:bg-surface-950/80 lg:rounded-t-container fixed bottom-0 z-10 flex h-18 w-full justify-center gap-2 overflow-hidden backdrop-blur-md transition-all',
     showNavigationSideBar.value
       ? `lg:left-[284px] lg:max-w-[calc(min(100vw,var(--breakpoint-xl))-302px)] xl:left-[calc(50%-(var(--breakpoint-xl)/2)+278px)] xl:max-w-[calc(min(100vw,var(--breakpoint-xl))-278px)]`
       : 'lg:left-[78px] lg:max-w-[calc(min(100vw,var(--breakpoint-xl))-96px)] xl:left-[calc(50%-(var(--breakpoint-xl)/2)+78px)]',
@@ -73,7 +73,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   id="bottom-section-nav"
 >
   <div
-    class="relative flex w-full justify-around max-lg:mx-2"
+    class="relative flex w-full justify-around max-lg:mx-2 max-lg:mb-2"
     bind:this={containerFn}
   >
     <div
@@ -92,7 +92,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           data-active={active}
           data-no-weather={!weather.data}
           class={[
-            'hover:data-[no-weather=false]:data-[active=false]:bg-primary-50/50 dark:hover:data-[no-weather=false]:data-[active=false]:bg-primary-950/20 hover:data-[no-weather=false]:data-[active=false]:text-surface-900-100 z-10 flex w-full flex-col items-center justify-center p-2 transition-colors duration-200 disabled:opacity-30 data-[active=false]:data-[no-weather=true]:opacity-50',
+            ' hover:data-[no-weather=false]:data-[active=false]:text-surface-700-300 z-10 flex w-full flex-col items-center justify-center p-2 transition-colors duration-200 disabled:opacity-30 data-[active=false]:data-[no-weather=true]:opacity-50',
             !weather.data && 'bg-none backdrop-blur-none',
           ]}
         >
