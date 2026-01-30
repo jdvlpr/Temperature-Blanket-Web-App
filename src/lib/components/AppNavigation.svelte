@@ -93,7 +93,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div
-  class="my-2 flex w-fit min-w-[268px] flex-col items-start justify-start gap-2 text-left lg:px-2"
+  class="my-2 flex w-fit min-w-[278px] flex-col items-start justify-start gap-2 text-left lg:px-2"
   data-sveltekit-preload-data="hover"
 >
   {#if project.status.temporaryProjectsBackup && project.status.temporaryProjectsBackup.length && project.status.temporaryUid}

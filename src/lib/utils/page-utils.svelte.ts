@@ -37,11 +37,11 @@ export const goToProjectSection = async (index, animateFromBottom = false) => {
 
   var topBanner = document.getElementById('top-banner')?.getBoundingClientRect() ?? {height: 0};
   
-  const topBanerHeight = topBanner.height;
+  const topBannerHeight = topBanner.height;
   const sectionScrollTop = activeSection?.scrollTop; 
   const currentScrollTop = document.documentElement.scrollTop;
 
-  console.log({currentScrollTop, sectionScrollTop, topBanerHeight});
+  console.log({currentScrollTop, sectionScrollTop, topBannerHeight});
   
 
   if (animateFromBottom) {
@@ -64,9 +64,9 @@ export const goToProjectSection = async (index, animateFromBottom = false) => {
     });
   } else {
     await tick();
-    console.log('topBanerHeight');
+    console.log('topBannerHeight');
     document.documentElement.scrollTo({
-      top: topBanerHeight,
+      top: topBannerHeight,
       behavior: 'smooth',
     });
   }

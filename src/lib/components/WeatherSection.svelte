@@ -166,7 +166,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     {#if weather.grouping === 'week'}
       <div
-        class="rounded-container bg-surface-100 dark:bg-surface-900 mb-4 flex w-full max-w-screen-md flex-col items-start justify-start gap-2 p-2 text-left"
+        class="rounded-container bg-surface-100 dark:bg-surface-900 my-2 flex w-full max-w-screen-md flex-col items-start justify-start gap-2 p-2 text-left"
       >
         <p class="">
           Weekly weather grouping can result in a shorter project. <a

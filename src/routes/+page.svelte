@@ -315,7 +315,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/snippet}
 
   {#snippet main()}
-    <main class="mx-auto text-center" id="main-page">
+    <main class="mx-auto pb-16 text-center" id="main-page">
       <div
         id="page-section-location"
         class="mx-auto max-w-(--breakpoint-md) scroll-mt-[76px]"
@@ -434,28 +434,3 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <Navigation />
   {/snippet}
 </AppShell>
-
-<style>
-  /* This is the offset created by the optional top-banner and the sticky top-navbar */
-  :root {
-    --page-offset-height: 209px;
-  }
-  #main-page {
-    /* Base height (xs) */
-    min-height: calc(100dvh - var(--page-offset-height));
-  }
-
-  /* md - Tailwind Default (768px) */
-  @media (width >= 48rem) {
-    :root {
-      --page-offset-height: 201px;
-    }
-  }
-
-  /* lg - Tailwind Default (1024px) */
-  @media (width >= 64rem) {
-    :root {
-      --page-offset-height: 217px;
-    }
-  }
-</style>
