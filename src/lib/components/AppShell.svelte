@@ -62,7 +62,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <div data-vaul-drawer-wrapper="true">
   <div
     class={[
-      'bg-surface-50/90 dark:bg-surface-950/90 sticky top-0 z-20 backdrop-blur-md [view-transition-name:sticky-header]',
+      'bg-surface-50/80 dark:bg-surface-950/80 sticky top-0 z-20 backdrop-blur-md [view-transition-name:sticky-header]',
       stickyHeader && 'lg:py-2',
     ]}
     id="top-navbar"
