@@ -54,8 +54,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
         gauges.addById('temp');
         weather.isUserEdited = false;
         weather.isFromLocalStorage = false;
-        await goToProjectSection(2, true);
         dialog.close();
+        await goToProjectSection(2, true);
         // Auto-set seasons based on the first location's hemisphere
         setSeasonsByLocation(locations.all[0]);
       })

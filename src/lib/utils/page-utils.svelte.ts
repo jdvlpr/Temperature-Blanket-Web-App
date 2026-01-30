@@ -22,15 +22,25 @@ import { delay, loadFromHistory } from '$lib/utils';
 import { tick } from 'svelte';
 
 // Go to a section
-export const goToProjectSection = async (index, animateFromBottom = false) => {
+export const goToProjectSection = async (index: number, animateFromBottom: boolean = false) => {
   if (index === 0) {
     if (typeof document.documentElement !== 'undefined')
       document.documentElement.scrollTop = 0;
     return;
   }
-
+     
   setSections(index);
-
+  
+  if (animateFromBottom) {
+    await tick();
+    // scroll to bottom
+    window.scrollTo({
+      top: document.documentElement.scrollHeight,
+      behavior: 'instant',
+    });
+    await delay(50);
+  }
+  
   const activeSection = pageSections.items.find(
     (section) => section.active === true && section.index === index,
   );
@@ -41,57 +51,49 @@ export const goToProjectSection = async (index, animateFromBottom = false) => {
   const sectionScrollTop = activeSection?.scrollTop; 
   const currentScrollTop = document.documentElement.scrollTop;
 
-  console.log({currentScrollTop, sectionScrollTop, topBannerHeight});
-  
-
-  if (animateFromBottom) {
-    await tick();
-    console.log('animateFromBottom');
-    
-    document.documentElement.scrollTo({
-      top: document.documentElement.scrollHeight,
-      behavior: 'instant',
-    });
-  }
 
 
   if (sectionScrollTop !== 0 && currentScrollTop !== sectionScrollTop) {
     await tick();
-    console.log('sectionScrollTop');
+    // Scroll to previous position of section
     document.documentElement.scrollTo({
       top: sectionScrollTop,
       behavior: 'smooth',
     });
   } else {
+    // Scroll to top of section
     await tick();
-    console.log('topBannerHeight');
     document.documentElement.scrollTo({
       top: topBannerHeight,
       behavior: 'smooth',
     });
-  }
 
-  // Horizontal scroll active gauge button into view when the gauge section is active
-  if (activeSection.id === 'page-section-gauges') {
-    const activeGaugeBtn = document.getElementById('active-gauge-button');
-    if (activeGaugeBtn) {
-      activeGaugeBtn.scrollIntoView({
-        behavior: 'smooth',
-        block: 'nearest',
-        inline: 'center',
-      });
+    // Horizontal scroll active gauge button into view when the gauge section is active
+    if (activeSection?.id === 'page-section-gauges') {
+      await tick();
+      const activeGaugeBtn = document.getElementById('active-gauge-button');
+      const isVisible = activeGaugeBtn?.getBoundingClientRect().left < 0 || activeGaugeBtn?.getBoundingClientRect().right < window.innerWidth;
+      if (activeGaugeBtn && isVisible) {
+        activeGaugeBtn.scrollIntoView({
+          behavior: 'smooth',
+          block: 'nearest',
+          inline: 'center',
+        });
+      }
     }
-  }
 
-  // Horizontal scroll active preview button into view when the preview section is active
-  if (activeSection.id === 'page-section-preview') {
-    const activePreviewBtn = document.getElementById('active-preview-button');
-    if (activePreviewBtn) {
-      activePreviewBtn.scrollIntoView({
-        behavior: 'smooth',
-        block: 'nearest',
-        inline: 'center',
-      });
+    // Horizontal scroll active preview button into view when the preview section is active
+    if (activeSection?.id === 'page-section-preview') {
+      await tick();
+      const activePreviewBtn = document.getElementById('active-preview-button');
+      const isVisible = activePreviewBtn?.getBoundingClientRect().left < 0 || activePreviewBtn?.getBoundingClientRect().right < window.innerWidth;
+      if (activePreviewBtn && !isVisible) {
+        activePreviewBtn.scrollIntoView({
+          behavior: 'smooth',
+          block: 'nearest',
+          inline: 'center',
+        });
+      }
     }
   }
 };
@@ -104,15 +106,13 @@ const setSections = (index) => {
       section.scrollTop = currentScrollTop;
     }
     const isActive = i === index;
-    const isPinned = section.pinned === true;
     if (
-      !isPinned &&
       section.active &&
       sections.filter((section) => section.active).length > 1
     ) {
       section.active = false;
     } else {
-      section.active = isActive || isPinned;
+      section.active = isActive;
     }
   });
 };

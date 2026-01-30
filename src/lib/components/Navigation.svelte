@@ -29,19 +29,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
   id="bottom-section-nav"
 >
   <div class="flex w-full justify-around">
-    {#each pageSections.items as { title, icon, index, active, pinned, tooltipText }}
+    {#each pageSections.items as { title, icon, index, active, tooltipText }}
       {#if index !== 0}
         <button
           title={tooltipText}
           disabled={!weather.data.length && index !== 1}
           onclick={() => goToProjectSection(index)}
-          data-pinned={pinned}
           data-active={active}
           data-no-weather={!weather.data}
           class={[
-            `dark:data-[pinned=false]:data-[active=true]:data-[no-weather=false]:bg-primary-900 dark:data-[pinned=false]:data-[active=true]:data-[no-weather=false]:text-surface-50! data-[pinned=false]:data-[active=true]:data-[no-weather=false]:bg-primary-300 data-[pinned=false]:data-[active=true]:data-[no-weather=false]:text-surface-900! hover:data-[no-weather=false]:data-[active=false]:bg-primary-hover-token flex w-full flex-col items-center 
-                                justify-center 
-                                p-2
+            `dark:data-[active=true]:data-[no-weather=false]:bg-primary-900 dark:data-[active=true]:data-[no-weather=false]:text-surface-50! data-[active=true]:data-[no-weather=false]:bg-primary-300 data-[active=true]:data-[no-weather=false]:text-surface-900! hover:data-[no-weather=false]:data-[active=false]:preset-tonal-primary flex w-full flex-col items-center justify-center 
+                                p-2 
                                 pb-4
                                 disabled:opacity-30
                                 data-[active=false]:data-[no-weather=true]:opacity-50
