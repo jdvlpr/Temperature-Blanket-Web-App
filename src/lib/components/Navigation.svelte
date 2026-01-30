@@ -91,10 +91,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           onclick={() => goToProjectSection(index)}
           data-active={active}
           data-no-weather={!weather.data}
-          class={[
-            ' hover:data-[no-weather=false]:data-[active=false]:text-surface-700-300 z-10 flex w-full flex-col items-center justify-center p-2 transition-colors duration-200 disabled:opacity-30 data-[active=false]:data-[no-weather=true]:opacity-50',
-            !weather.data && 'bg-none backdrop-blur-none',
-          ]}
+          class=" hover:data-[no-weather=false]:data-[active=false]:text-surface-950-50 data-[active=true]:text-surface-950-50 text-surface-700-300 z-10 flex w-full flex-col items-center justify-center p-2 transition-colors duration-200 disabled:opacity-30 data-[active=false]:data-[no-weather=true]:opacity-50"
         >
           <span>
             {@html icon}
