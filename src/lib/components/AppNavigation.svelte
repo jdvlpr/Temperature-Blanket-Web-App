@@ -122,7 +122,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <a
     href="/supporters"
     class={[
-      'btn hover:preset-tonal w-fit',
+      'btn hover:preset-tonal-surface w-fit',
       page.url.pathname === '/supporters' && 'preset-tonal-secondary',
     ]}
   >

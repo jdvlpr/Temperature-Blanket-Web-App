@@ -19,6 +19,7 @@ import Menu from '$lib/components/modals/Menu.svelte';
 import { dialog, pageSections, project, toast, weather } from '$lib/state';
 import { preferences } from '$lib/storage/preferences.svelte';
 import { delay, loadFromHistory } from '$lib/utils';
+import { tick } from 'svelte';
 
 // Go to a section
 export const goToProjectSection = async (index, animateFromBottom = false) => {
@@ -34,32 +35,43 @@ export const goToProjectSection = async (index, animateFromBottom = false) => {
     (section) => section.active === true && section.index === index,
   );
 
-  const newScrollTop = activeSection?.scrollTop;
+  var topBanner = document.getElementById('top-banner')?.getBoundingClientRect() ?? {height: 0};
+  
+  const topBanerHeight = topBanner.height;
+  const sectionScrollTop = activeSection?.scrollTop; 
   const currentScrollTop = document.documentElement.scrollTop;
 
+  console.log({currentScrollTop, sectionScrollTop, topBanerHeight});
+  
+
   if (animateFromBottom) {
-    await delay(10);
+    await tick();
+    console.log('animateFromBottom');
+    
     document.documentElement.scrollTo({
       top: document.documentElement.scrollHeight,
       behavior: 'instant',
     });
   }
 
-  if (currentScrollTop !== newScrollTop && newScrollTop !== 0) {
+
+  if (sectionScrollTop !== 0 && currentScrollTop !== sectionScrollTop) {
+    await tick();
+    console.log('sectionScrollTop');
     document.documentElement.scrollTo({
-      top: newScrollTop,
+      top: sectionScrollTop,
       behavior: 'smooth',
     });
   } else {
-    await delay(10);
-    const activeElement = document.getElementById(activeSection.id);
-    activeElement?.scrollIntoView({
+    await tick();
+    console.log('topBanerHeight');
+    document.documentElement.scrollTo({
+      top: topBanerHeight,
       behavior: 'smooth',
-      block: 'start',
     });
   }
 
-  // Scroll active gauge button into view when the gauge section is active
+  // Horizontal scroll active gauge button into view when the gauge section is active
   if (activeSection.id === 'page-section-gauges') {
     const activeGaugeBtn = document.getElementById('active-gauge-button');
     if (activeGaugeBtn) {
@@ -71,7 +83,7 @@ export const goToProjectSection = async (index, animateFromBottom = false) => {
     }
   }
 
-  // Scroll active preview button into view when the preview section is active
+  // Horizontal scroll active preview button into view when the preview section is active
   if (activeSection.id === 'page-section-preview') {
     const activePreviewBtn = document.getElementById('active-preview-button');
     if (activePreviewBtn) {

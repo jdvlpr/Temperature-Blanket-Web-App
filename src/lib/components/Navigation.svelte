@@ -19,9 +19,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div
-  class="sticky bottom-0 flex justify-center z-10 gap-2 w-full bg-surface-50 dark:bg-surface-950 backdrop-blur-md lg:rounded-t-container overflow-hidden"
+  class="bg-surface-50 dark:bg-surface-950 lg:rounded-t-container sticky bottom-0 z-10 flex w-full justify-center gap-2 overflow-hidden backdrop-blur-md"
+  id="bottom-section-nav"
 >
-  <div class="flex justify-around w-full">
+  <div class="flex w-full justify-around">
     {#each pageSections.items as { title, icon, index, active, pinned, tooltipText }}
       {#if index !== 0}
         <button
@@ -32,19 +33,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
           data-active={active}
           data-no-weather={!weather.data}
           class={[
-            `flex flex-col justify-center items-center disabled:opacity-30 p-2 pb-4 md:pb-2 w-full 
-                                data-[active=false]:data-[no-weather=true]:opacity-50 
-                                dark:data-[pinned=false]:data-[active=true]:data-[no-weather=false]:bg-primary-900
-                                dark:data-[pinned=false]:data-[active=true]:data-[no-weather=false]:text-surface-50!
-                                data-[pinned=false]:data-[active=true]:data-[no-weather=false]:bg-primary-300
-                                data-[pinned=false]:data-[active=true]:data-[no-weather=false]:!text-surface-900
-                                hover:data-[no-weather=false]:data-[active=false]:bg-primary-hover-token`,
+            `dark:data-[pinned=false]:data-[active=true]:data-[no-weather=false]:bg-primary-900 dark:data-[pinned=false]:data-[active=true]:data-[no-weather=false]:text-surface-50! data-[pinned=false]:data-[active=true]:data-[no-weather=false]:bg-primary-300 data-[pinned=false]:data-[active=true]:data-[no-weather=false]:!text-surface-900 hover:data-[no-weather=false]:data-[active=false]:bg-primary-hover-token flex w-full flex-col items-center 
+                                justify-center 
+                                p-2
+                                pb-4
+                                disabled:opacity-30
+                                data-[active=false]:data-[no-weather=true]:opacity-50
+                                md:pb-2`,
             !weather.data && 'bg-none backdrop-blur-none',
           ]}
         >
           <span>
             {@html icon}
-          </span><span class="text-xs flex gap-1 items-center">{title} </span>
+          </span><span class="flex items-center gap-1 text-xs">{title} </span>
         </button>
       {/if}
     {/each}

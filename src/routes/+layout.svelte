@@ -179,7 +179,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/if}
 </svelte:head>
 
-<div class="flex w-full flex-col [view-transition-name:top-banner]">
+<div
+  class="flex w-full flex-col [view-transition-name:top-banner]"
+  id="top-banner"
+>
   <div class="bg-primary-100-900 w-full p-2 text-center">
     <a
       href="https://www.youtube.com/watch?v=7NRLrpZb0Lo"

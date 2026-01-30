@@ -29,6 +29,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import GettingStarted from '$lib/components/modals/GettingStarted.svelte';
   import LegacyNotification from '$lib/components/modals/LegacyNotification.svelte';
   import Menu from '$lib/components/modals/Menu.svelte';
+  import { safeSlide } from '$lib/features/transitions/safeSlide';
   import {
     dialog,
     locations,
@@ -38,7 +39,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     weather,
   } from '$lib/state';
   import { checkForProjectInStorage } from '$lib/storage/storage-utils.svelte';
-  import { safeSlide } from '$lib/features/transitions/safeSlide';
   import {
     loadFromHistory,
     setProjectSettings,
@@ -48,12 +48,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '$lib/utils';
   import {
     BadgeQuestionMarkIcon,
-    BookIcon,
-    BookOpenIcon,
     BookOpenTextIcon,
     CircleQuestionMarkIcon,
     EllipsisVerticalIcon,
-    GiftIcon,
     LightbulbIcon,
     MailIcon,
     RedoIcon,
@@ -70,23 +67,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     window.clearTimeout(debounceTimer);
     debounceTimer = window.setTimeout(callback, time);
   };
-
-  onMount(async () => {
-    const hasProjectURLParam = new URL(window.location.href).searchParams.has(
-      'project',
-    );
-
-    if (hasProjectURLParam) {
-      // Load a project from the URL
-      await loadProjectFromURL();
-    } else {
-      // Setup up a new project
-      // Load the default units based on window.navigator
-      setUnitsFromNavigator();
-    }
-
-    project.status.loading = false;
-  });
 
   async function loadProjectFromURL() {
     // Check if the project needs to show a legacy notification
@@ -105,6 +85,23 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   $effect(() => {
     if (project.url.hash) debounce(() => updateHistory(), 300);
+  });
+
+  onMount(async () => {
+    const hasProjectURLParam = new URL(window.location.href).searchParams.has(
+      'project',
+    );
+
+    if (hasProjectURLParam) {
+      // Load a project from the URL
+      await loadProjectFromURL();
+    } else {
+      // Setup up a new project
+      // Load the default units based on window.navigator
+      setUnitsFromNavigator();
+    }
+
+    project.status.loading = false;
   });
 </script>
 
@@ -312,9 +309,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/snippet}
 
   {#snippet main()}
-    <main
-      class="mx-auto text-center max-md:min-h-[calc(100dvh-209px)] md:min-h-[calc(100dvh-201px)] lg:min-h-[calc(100dvh-217px)]"
-    >
+    <main class="mx-auto text-center" id="main-page">
       <div
         id="page-section-location"
         class="mx-auto max-w-(--breakpoint-md) scroll-mt-[76px]"
@@ -433,3 +428,28 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <Navigation />
   {/snippet}
 </AppShell>
+
+<style>
+  /* This is the offset created by the optional top-banner and the sticky top-navbar */
+  :root {
+    --page-offset-height: 209px;
+  }
+  #main-page {
+    /* Base height (xs) */
+    min-height: calc(100dvh - var(--page-offset-height));
+  }
+
+  /* md - Tailwind Default (768px) */
+  @media (width >= 48rem) {
+    :root {
+      --page-offset-height: 201px;
+    }
+  }
+
+  /* lg - Tailwind Default (1024px) */
+  @media (width >= 64rem) {
+    :root {
+      --page-offset-height: 217px;
+    }
+  }
+</style>

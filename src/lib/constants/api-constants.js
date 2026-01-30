@@ -20,22 +20,22 @@ import { dev } from '$app/environment';
 export const API_SERVICES = {
   geonames: {
     baseURL: dev
-      ? 'https://secure.geonames.org/searchJSON'
+      ? 'https://secure.geonames.net/searchJSON'
       : 'https://secure.geonames.net/searchJSON',
   },
   geonamesfindNearbyPlaceName: {
     baseURL: dev
-      ? 'https://secure.geonames.org/findNearbyPlaceNameJSON'
+      ? 'https://secure.geonames.net/findNearbyPlaceNameJSON'
       : 'https://secure.geonames.net/findNearbyPlaceNameJSON',
   },
   geonamesGetID: {
     baseURL: dev
-      ? 'https://secure.geonames.org/getJSON'
+      ? 'https://secure.geonames.net/getJSON'
       : 'https://secure.geonames.net/getJSON',
   },
   geonamesGetAltitude: {
     baseURL: dev
-      ? 'https://secure.geonames.org/srtm3JSON'
+      ? 'https://secure.geonames.net/srtm3JSON'
       : 'https://secure.geonames.net/srtm3JSON',
   },
   meteostat: {
