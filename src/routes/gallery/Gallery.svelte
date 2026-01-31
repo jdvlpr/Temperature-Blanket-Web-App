@@ -387,7 +387,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {@const title = getTitleFromLocationsMeta(locations)}
           <a
             href="/gallery/{databaseId}"
-            class="rounded-container group hover:preset-tonal-surfaceflex gap-1 p-2 text-center {layout ===
+            class="rounded-container group hover:preset-tonal-surface flex gap-1 p-2 text-center {layout ===
             'grid'
               ? 'flex-col items-center justify-center'
               : 'w-full flex-col items-center justify-start'}"
