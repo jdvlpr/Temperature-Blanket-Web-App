@@ -154,7 +154,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                             preferences.value.theme.id = id;
                           }}
                           class={[
-                            'btn hover:preset-tonal-surface-secondary flex w-full items-center justify-start gap-2',
+                            'btn hover:preset-tonal-surface flex w-full items-center justify-start gap-2',
                             preferences.value.theme.id === id &&
                               'preset-filled-secondary-500',
                           ]}

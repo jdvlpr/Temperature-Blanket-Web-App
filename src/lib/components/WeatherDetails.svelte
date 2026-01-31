@@ -100,7 +100,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       aria-label="Show Previous {capitalizeFirstLetter(
         weather.grouping,
       )}'s Weather"
-      class="prev btn-icon hover:preset-tonal-surfacescale-125"
+      class="prev btn-icon hover:preset-tonal-surface scale-125"
       onclick={() => weather.currentIndex--}
       disabled={weather.currentIndex === 0}
       title="Show Previous {capitalizeFirstLetter(weather.grouping)}'s Weather"
@@ -125,7 +125,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     <button
       aria-label="Show Next {capitalizeFirstLetter(weather.grouping)}'s Weather"
-      class="next btn-icon hover:preset-tonal-surfacescale-125"
+      class="next btn-icon hover:preset-tonal-surface scale-125"
       onclick={() => weather.currentIndex++}
       disabled={weather.currentIndex === data?.length - 1}
       title="Show Next {capitalizeFirstLetter(weather.grouping)}'s Weather"

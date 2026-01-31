@@ -19,7 +19,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ToTopButton from '$lib/components/buttons/ToTopButton.svelte';
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
   import ViewToggleBindable from '$lib/components/buttons/ViewToggleBindable.svelte';
-  import { ICONS } from '$lib/constants';
   import { previews } from '$lib/state';
   import {
     fetchPopularProjects,
@@ -27,14 +26,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
     getColorsFromInput,
     getTitleFromLocationsMeta,
   } from '$lib/utils';
-  import { onMount } from 'svelte';
-  import { galleryState } from './state.svelte';
   import {
     ArrowUpDownIcon,
     ChevronRightIcon,
     SearchIcon,
     XIcon,
   } from '@lucide/svelte';
+  import { onMount } from 'svelte';
+  import { galleryState } from './state.svelte';
 
   let first = 40;
   let loading = $state(true);
@@ -182,7 +181,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {@const title = getTitleFromLocationsMeta(meta.locations)}
           <a
             href="/gallery/{id}"
-            class="rounded-container group hover:preset-tonal-surfacemx-auto flex min-h-[200px] max-w-[245px] shrink-0 snap-center flex-col flex-wrap items-center justify-start gap-1 p-2 text-center lg:max-w-[350px]"
+            class="rounded-container group hover:preset-tonal-surface mx-auto flex min-h-[200px] max-w-[245px] shrink-0 snap-center flex-col flex-wrap items-center justify-start gap-1 p-2 text-center lg:max-w-[350px]"
           >
             <img
               src={featured_image_src}

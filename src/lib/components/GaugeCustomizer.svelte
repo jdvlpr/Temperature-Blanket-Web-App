@@ -240,7 +240,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             title="Move Color"
             tabindex="-1"
             aria-label="Crag handle for color {index + 1}"
-            class="btn-icon hover:preset-tonal-surfacehandle p-2"
+            class="btn-icon hover:preset-tonal-surface handle p-2"
             use:dragHandle
           >
             <MoveIcon />
