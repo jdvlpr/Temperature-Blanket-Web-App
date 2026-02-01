@@ -15,7 +15,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import { dialog, gauges, toast } from '$lib/state';
-  import { FilePlusIcon, LoaderCircleIcon, XIcon } from '@lucide/svelte';
+  import {
+    CheckIcon,
+    ExternalLinkIcon,
+    LoaderCircleIcon,
+    XIcon,
+  } from '@lucide/svelte';
   import { exportToGoogleSheet } from './client';
   import type { ExportOptions } from './types';
 
@@ -108,15 +113,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <div class="flex flex-col gap-4 p-4">
   <h2 class="text-xl font-bold">Create Google Sheet</h2>
 
-  <p class="text-sm">
-    Automatically create a Google Sheet formatted with your weather data and
-    colors. <a href="" target="_blank" class="link"
-      >Click here to see an example.</a
-    > A popup will appear asking you to sign in to your Google account. Follow the
-    instructions to authorize this web app to create a new Google Sheet, which will
-    then show up in your Google Drive.
-  </p>
-
   <div class="flex flex-col gap-2">
     <h3 class="font-semibold">Weather Data</h3>
     <label class="flex items-center gap-2">
@@ -190,15 +186,25 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {/if}
   </div>
 
-  <div class="flex flex-col gap-2">
-    <h3 class="font-semibold">Gauge Options</h3>
-    <label class="flex items-center gap-2">
-      <input type="checkbox" class="checkbox" bind:checked={includeDayCounts} />
-      <span>Show number of days in ranges</span>
-    </label>
-  </div>
+  {#if applyTempGauge || applyRainGauge || applySnowGauge || applyDaytimeGauge || applyMoonGauge}
+    <div class="flex flex-col gap-2">
+      <h3 class="font-semibold">Gauge Options</h3>
+      <label class="flex items-center gap-2">
+        <input
+          type="checkbox"
+          class="checkbox"
+          bind:checked={includeDayCounts}
+        />
+        <span>Show number of days in ranges</span>
+      </label>
+    </div>
+  {/if}
 
-  <div class="mt-4 flex justify-center gap-2">
+  <p class="text-sm italic">
+    A new Google Sheet will be created in your Google Drive.
+  </p>
+
+  <div class="flex justify-center gap-2">
     <button
       class="btn hover:preset-tonal-surface"
       onclick={() => dialog.close()}
@@ -216,7 +222,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <LoaderCircleIcon class="animate-spin" />
         Creating...
       {:else}
-        <FilePlusIcon />
+        <CheckIcon />
         Create
       {/if}
     </button>

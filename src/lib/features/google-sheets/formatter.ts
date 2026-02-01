@@ -399,54 +399,33 @@ function createGaugeLegendData(
 
   const rows: (string | number | boolean)[][] = [];
 
-  // 1. Build Header Row
-  // "Day Count" header merged above the sub-columns?
-  // The user asked for "Day Count | Percentage", and under Day Count: "High Temp | Low Temp", etc.
-  // This implies a double header structure for accurate labeling.
-  // Row 1: Range Start | Range End | Color | Yarn Info | Day Count (merged) | Percentage (merged)
-  // Row 2: ... | ... | ... | ... | High Temp | Low Temp | High Temp | Low Temp
+  // Row 1: Range Start | Range End | Color | Yarn Info | Day Count\nLabel | Percentage\nLabel
 
-  const headerRow1 = [
-    `Range Start (${includeFrom ? 'including' : 'excluding'})`,
-    `Range End (${includeTo ? 'including' : 'excluding'})`,
-    'Color (Hex)',
+  const headerRow = [
+    `Range Start\n(${includeFrom ? 'including' : 'excluding'})`,
+    `Range End\n(${includeTo ? 'including' : 'excluding'})`,
+    'Color\n(Hex)',
     'Yarn Info',
   ];
 
-  const headerRow2 = ['', '', '', '']; // Spacers for first 4 cols
-
   if (options.includeDayCounts && applicableTypes.length > 0) {
-    // Add Day Count header
-    headerRow1.push('Day Count');
-    // Add spacer cols for Day Count if multiple types
-    for (let k = 1; k < applicableTypes.length; k++) headerRow1.push('');
-
-    // Add Percentage header
-    headerRow1.push('Percentage');
-    // Add spacer cols for Percentage if multiple types
-    for (let k = 1; k < applicableTypes.length; k++) headerRow1.push('');
-
-    // Fill Row 2 with Labels
-    // Day Count columns
+    // Add Day Count headers
     for (const t of applicableTypes) {
       const info = DATA_LABELS[t];
-      headerRow2.push(
-        `${info.label} (${preferences.value.units === 'imperial' ? info.unitImperial : info.unitMetric})`,
+      headerRow.push(
+        `Day Count\n${info.label} (${preferences.value.units === 'imperial' ? info.unitImperial : info.unitMetric})`,
       );
     }
-    // Percentage columns
+    // Add Percentage headers
     for (const t of applicableTypes) {
       const info = DATA_LABELS[t];
-      headerRow2.push(
-        `${info.label} (${preferences.value.units === 'imperial' ? info.unitImperial : info.unitMetric})`,
+      headerRow.push(
+        `Percentage\n${info.label} (${preferences.value.units === 'imperial' ? info.unitImperial : info.unitMetric})`,
       );
     }
   }
 
-  rows.push(headerRow1);
-  if (options.includeDayCounts && applicableTypes.length > 0) {
-    rows.push(headerRow2);
-  }
+  rows.push(headerRow);
 
   // 2. Build Data Rows
   for (let i = 0; i < gauge.ranges.length; i++) {
@@ -488,15 +467,15 @@ function createGaugeLegendData(
           // Actually, constructing the criteria string is tricky because A2/B2 are relative.
           // Row is (i + 3) if double header, or (i + 2).
           // Let's assume double header exists.
-          // Reference to Range Start: $A3
-          // Reference to Range End: $B3
+          // Reference to Range Start: $A2
+          // Reference to Range End: $B2
           // We use absolute column so we can copy paste if needed, relative row.
 
           // The row index in the sheet will be: start row (1-based) + current index.
-          // Header 1: row 1. Header 2: row 2. Data starts row 3.
-          // So current row is i + 3.
+          // Header 1: row 1. Data starts row 2.
+          // So current row is i + 2.
 
-          const rowIdx = i + 3;
+          const rowIdx = i + 2;
           const refFrom = `$A${rowIdx}`;
           const refTo = `$B${rowIdx}`;
 
@@ -567,8 +546,8 @@ function createGaugeLegendData(
       for (let k = 0; k < applicableTypes.length; k++) {
         const colIdxOfCount = 4 + k;
         const letter = getColumnLetter(colIdxOfCount);
-        const rowIdx = i + 3;
-        // Formula: =E3 / 365
+        const rowIdx = i + 2;
+        // Formula: =E2 / 365
         row.push(`=${letter}${rowIdx}/${totalDays}`);
       }
     }
@@ -655,7 +634,7 @@ function createLegendColorRequests(
 ): gapi.client.sheets.Request[] {
   if (!gauge.colors) return [];
   const requests: gapi.client.sheets.Request[] = [];
-  const headerRows = getApplicableTypesCount(gauge, options) > 0 ? 2 : 1;
+  const headerRows = 1;
 
   for (let i = 0; i < gauge.colors.length; i++) {
     const color = gauge.colors[i];
@@ -699,7 +678,7 @@ function createPercentageFormatRequests(
   const count = getApplicableTypesCount(gauge, options);
   if (count === 0) return requests;
 
-  const headerRows = 2; // With Day Counts, we always have 2 header rows
+  const headerRows = 1;
   const startCol = 4 + count; // Start after 'Info' (4) + DayCount cols (count)
 
   // Apply percentage format to the Percentage columns for all data rows
@@ -749,45 +728,37 @@ function createLegendMergeRequests(
   );
   const count = applicableTypes.length;
 
-  if (count > 0) {
-    // Merge "Day Count" (Col 4, Index 4) across `count` columns
-    // Start Col Index: 4. End Col Index: 4 + count.
-    requests.push({
-      mergeCells: {
-        range: {
-          sheetId,
-          startRowIndex: 0,
-          endRowIndex: 1,
-          startColumnIndex: 4,
-          endColumnIndex: 4 + count,
-        },
-        mergeType: 'MERGE_ALL',
-      },
-    });
+  const totalLegendCols = 4 + 2 * count;
 
-    // Merge "Percentage" (Col 4+count, Index 4+count) across `count` columns
-    // Start: 4 + count. End: 4 + count + count.
-    requests.push({
-      mergeCells: {
-        range: {
-          sheetId,
-          startRowIndex: 0,
-          endRowIndex: 1,
-          startColumnIndex: 4 + count,
-          endColumnIndex: 4 + 2 * count,
-        },
-        mergeType: 'MERGE_ALL',
+  // Header Row Formatting (Bold + Wrap + Alignment)
+  requests.push({
+    repeatCell: {
+      range: {
+        sheetId,
+        startRowIndex: 0,
+        endRowIndex: 1,
+        startColumnIndex: 0,
+        endColumnIndex: totalLegendCols,
       },
-    });
-  }
-  if (count > 0) {
+      cell: {
+        userEnteredFormat: {
+          textFormat: { bold: true },
+          wrapStrategy: 'WRAP',
+          verticalAlignment: 'MIDDLE',
+          horizontalAlignment: 'CENTER',
+        },
+      },
+      fields:
+        'userEnteredFormat.textFormat.bold,userEnteredFormat.wrapStrategy,userEnteredFormat.verticalAlignment,userEnteredFormat.horizontalAlignment',
+    },
+  });
+
+  if (count >= 0) {
     // Merge for Note row
-    // The note is at: Header Rows (2) + Gauge Ranges Count + 2 empty rows + 1 note row (0-indexed).
-    // Row Index = 2 + (gauge.ranges?.length || 0) + 2.
-    // But if no Day counts, there is only 1 header row.
-    const headerRows = options.includeDayCounts ? 2 : 1;
+    // The note is at: Header Rows (1) + Gauge Ranges Count + 2 empty rows + 1 note row (0-indexed).
+    // Row Index = 1 + (gauge.ranges?.length || 0) + 2.
+    const headerRows = 1;
     const noteRowIdx = headerRows + (gauge.ranges?.length || 0) + 2;
-    const totalLegendCols = 4 + 2 * count;
 
     requests.push({
       mergeCells: {

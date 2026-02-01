@@ -27,9 +27,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     project,
   } from '$lib/state';
   import { downloadPreviewPNG } from '$lib/utils';
-  import { DownloadIcon, SendIcon } from '@lucide/svelte';
+  import { DownloadIcon, ImageIcon, SendIcon } from '@lucide/svelte';
   import { onMount } from 'svelte';
   import { Drawer } from 'vaul-svelte';
+  import DownloadCreateMenuButton from './DownloadCreateMenuButton.svelte';
 
   onMount(() => {
     if (!previews.activeId) {
@@ -90,7 +91,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           );
         }}
       >
-        <DownloadIcon />
+        <ImageIcon />
         Download Image (PNG)
       </button>
 

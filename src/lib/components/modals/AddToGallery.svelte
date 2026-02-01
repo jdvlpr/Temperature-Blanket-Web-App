@@ -75,8 +75,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <p>
             • I am submitting this project's location and dates, gauge and yarn
             information, URL, preview image, and the current date to be
-            displayed on a public gallery page. No personal information will be
-            sent.
+            displayed as a gallery page in the public <a
+              href="/gallery"
+              target="_blank"
+              class="link">Project Gallery</a
+            >. No personal information will be sent.
           </p>
           <p>
             • This project's gallery page cannot be edited once it is submitted.
@@ -112,7 +115,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <StickyPart position="bottom">
   {#if !submitting && !message}
-    <div class="flex items-center justify-center p-2 py-4 text-center">
+    <div
+      class="flex flex-col items-center justify-center gap-2 p-2 py-4 text-center"
+    >
+      <p class="text-sm italic">This action can't be undone.</p>
       <button
         class="btn preset-filled-primary-500"
         title="Add project to gallery"

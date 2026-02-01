@@ -30,6 +30,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Gauge from './Gauge.svelte';
   import GaugeCustomizer from './GaugeCustomizer.svelte';
   import { APP_NAVIGATION_SIDEBAR_WIDTH } from '$lib/constants';
+  import DownloadCreateMenuButton from './DownloadCreateMenuButton.svelte';
 
   onMount(() => {
     setupAvailableGauges();
@@ -165,15 +166,3 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
   {/key}
 {/if}
-
-<div
-  class="rounded-container bg-surface-100 dark:bg-surface-900 mx-2 mt-4 flex flex-wrap justify-center gap-2 px-4 py-2 shadow-inner"
->
-  <button
-    class="btn hover:preset-tonal-surface h-auto text-left whitespace-pre-wrap"
-    onclick={downloadPDF}
-    title="Download PDF File"
-  >
-    <DownloadIcon /> Download Gauges and Weather Data (PDF)
-  </button>
-</div>

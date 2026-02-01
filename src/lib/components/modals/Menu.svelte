@@ -15,7 +15,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script module>
   let pages = $state({
-    download: false,
     main: false,
     save: false,
   });
@@ -30,31 +29,24 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import YarnSources from '$lib/components/YarnSources.svelte';
   import KeyboardShortcuts from '$lib/components/modals/KeyboardShortcuts.svelte';
   import { DAYS_OF_THE_WEEK, MONTHS } from '$lib/constants';
-  import { dialog, previews, project, toast, weather } from '$lib/state';
-  import {
-    delay,
-    downloadPDF,
-    downloadPreviewPNG,
-    downloadWeatherCSV,
-    pluralize,
-  } from '$lib/utils';
+  import { dialog, project, toast, weather } from '$lib/state';
   import { ProjectStorage } from '$lib/storage/projects';
+  import { setProjectInStorage } from '$lib/storage/storage-utils.svelte';
+  import { delay, downloadWeatherCSV, pluralize } from '$lib/utils';
   import {
-    ChevronDownIcon,
     CircleCheckBigIcon,
     ClipboardCopyIcon,
     DownloadIcon,
     KeyboardIcon,
     SaveIcon,
+    SendIcon,
     SquarePlusIcon,
   } from '@lucide/svelte';
   import { onMount } from 'svelte';
+  import DownloadCreateMenuButton from '../DownloadCreateMenuButton.svelte';
   import WeatherGrouping from '../WeatherGrouping.svelte';
   import WeatherSourceButton from '../buttons/WeatherSourceButton.svelte';
-  import { setProjectInStorage } from '$lib/storage/storage-utils.svelte';
-  import { Accordion } from '@skeletonlabs/skeleton-svelte';
-  import { safeSlide } from '$lib/features/transitions/safeSlide';
-  import ExportToSheetsButton from '$lib/features/google-sheets/ExportToSheetsButton.svelte';
+  import AddToGallery from './AddToGallery.svelte';
   interface Props {
     page?: string;
     highlight?: string;
@@ -180,15 +172,36 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </button>
 
         {#if weather.data.length}
+          <DownloadCreateMenuButton />
+
           <button
-            class="btn hover:preset-tonal-surface w-fit"
-            onclick={() => goTo('download')}
-            disabled={!weather.data.length}
-            title="Open Download Menu"
+            class="btn hover:preset-tonal-surface h-auto w-fit items-center text-left whitespace-pre-wrap"
+            onclick={() =>
+              dialog.trigger({
+                type: 'component',
+                component: {
+                  ref: AddToGallery,
+                },
+              })}
+            title="Show Send to Gallery Dialog"
           >
-            <DownloadIcon />
-            Download
+            <SendIcon />
+            Send to Project Gallery
           </button>
+
+          {#if project.gallery.href && project.gallery.title && project.gallery.title === locations.projectTitle}
+            <div class="flex w-full flex-col justify-center gap-1">
+              <p>View this project's gallery page:</p>
+              <p>
+                <a
+                  href={project.gallery.href}
+                  target="_blank"
+                  class="btn hover:preset-tonal-surface w-fit whitespace-pre-wrap underline"
+                  rel="noreferrer">{project.gallery.title}</a
+                >
+              </p>
+            </div>
+          {/if}
         {/if}
       </div>
 
@@ -377,52 +390,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
           >.
         </p>
         <YarnSources />
-      </div>
-    </div>
-  {/if}
-
-  {#if pages.download}
-    <div class="mb-4">
-      <h2 class="my-2 text-lg font-bold">Download</h2>
-      <div class="flex flex-col items-start gap-2 text-left">
-        <button
-          class="btn hover:preset-tonal-surface"
-          onclick={downloadPDF}
-          title="Download PDF File"
-        >
-          <DownloadIcon />
-          Gauges and Weather Data (PDF)
-        </button>
-        <button
-          class="btn hover:preset-tonal-surface"
-          onclick={downloadWeatherCSV}
-          title="Download CSV File"
-        >
-          <DownloadIcon />
-          Weather Data (CSV)</button
-        >
-
-        <ExportToSheetsButton />
-
-        {#if previews.active?.previewComponent}
-          <button
-            class="btn hover:preset-tonal-surface h-auto"
-            title="Download PNG File"
-            onclick={() => {
-              downloadPreviewPNG(
-                previews.active.width,
-                previews.active.height,
-                previews.active.svg,
-              );
-            }}
-          >
-            <span class="m-auto h-auto w-[50px]">
-              <previews.active.previewComponent />
-            </span>
-
-            Preview Image (PNG)
-          </button>
-        {/if}
       </div>
     </div>
   {/if}

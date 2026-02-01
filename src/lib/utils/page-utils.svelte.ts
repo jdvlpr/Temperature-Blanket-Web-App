@@ -22,15 +22,18 @@ import { delay, loadFromHistory } from '$lib/utils';
 import { tick } from 'svelte';
 
 // Go to a section
-export const goToProjectSection = async (index: number, animateFromBottom: boolean = false) => {
+export const goToProjectSection = async (
+  index: number,
+  animateFromBottom: boolean = false,
+) => {
   if (index === 0) {
     if (typeof document.documentElement !== 'undefined')
       document.documentElement.scrollTop = 0;
     return;
   }
-     
+
   setSections(index);
-  
+
   if (animateFromBottom) {
     await tick();
     // scroll to bottom
@@ -40,18 +43,18 @@ export const goToProjectSection = async (index: number, animateFromBottom: boole
     });
     await delay(50);
   }
-  
+
   const activeSection = pageSections.items.find(
     (section) => section.active === true && section.index === index,
   );
 
-  var topBanner = document.getElementById('top-banner')?.getBoundingClientRect() ?? {height: 0};
-  
+  var topBanner = document
+    .getElementById('top-banner')
+    ?.getBoundingClientRect() ?? { height: 0 };
+
   const topBannerHeight = topBanner.height;
-  const sectionScrollTop = activeSection?.scrollTop; 
+  const sectionScrollTop = activeSection?.scrollTop;
   const currentScrollTop = document.documentElement.scrollTop;
-
-
 
   if (sectionScrollTop !== 0 && currentScrollTop !== sectionScrollTop) {
     await tick();
@@ -72,7 +75,9 @@ export const goToProjectSection = async (index: number, animateFromBottom: boole
     if (activeSection?.id === 'page-section-gauges') {
       await tick();
       const activeGaugeBtn = document.getElementById('active-gauge-button');
-      const isHidden = activeGaugeBtn?.getBoundingClientRect().left < 0 || activeGaugeBtn?.getBoundingClientRect().right > window.innerWidth;
+      const isHidden =
+        activeGaugeBtn?.getBoundingClientRect().left < 0 ||
+        activeGaugeBtn?.getBoundingClientRect().right > window.innerWidth;
       if (activeGaugeBtn && isHidden) {
         activeGaugeBtn.scrollIntoView({
           behavior: 'smooth',
@@ -86,7 +91,9 @@ export const goToProjectSection = async (index: number, animateFromBottom: boole
     if (activeSection?.id === 'page-section-preview') {
       await tick();
       const activePreviewBtn = document.getElementById('active-preview-button');
-      const isHidden = activePreviewBtn?.getBoundingClientRect().left < 0 || activePreviewBtn?.getBoundingClientRect().right > window.innerWidth;
+      const isHidden =
+        activePreviewBtn?.getBoundingClientRect().left < 0 ||
+        activePreviewBtn?.getBoundingClientRect().right > window.innerWidth;
       if (activePreviewBtn && isHidden) {
         activePreviewBtn.scrollIntoView({
           behavior: 'smooth',
@@ -223,12 +230,6 @@ export const handleKeyDown = (ev) => {
       }
       // Check for section navigation shortcuts
       switch (ev.key) {
-        case 'd':
-          dialog.trigger({
-            type: 'component',
-            component: { ref: Menu, props: { page: 'download' } },
-          });
-          break;
         case '0':
         case '1':
         case '2':

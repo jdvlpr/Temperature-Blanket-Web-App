@@ -26,6 +26,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import type { Color } from '$lib/types';
   import { getTextColor } from '$lib/utils';
   import {
+    ChevronDownIcon,
     LayoutPanelTopIcon,
     MoveIcon,
     SearchIcon,
@@ -155,6 +156,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       >
         <LayoutPanelTopIcon />
         View
+        <ChevronDownIcon size={20} />
       </Popover.Trigger>
       <Portal>
         <Popover.Positioner>

@@ -52,10 +52,6 @@ export const KEYBOARD_SHORTCUTS = [
     details: "These shortcuts won't work until the project has weather data.",
     items: [
       {
-        description: 'Open Download Menu',
-        keys: ['d'],
-      },
-      {
         description: 'Save Project',
         keys: [
           ['Cmd ⌘', 's'],
