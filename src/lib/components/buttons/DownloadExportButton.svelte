@@ -7,26 +7,23 @@
     downloadWeatherCSV,
   } from '$lib/utils';
   import {
-    ChartColumnIcon,
     ChevronDownIcon,
     DownloadIcon,
-    FileIcon,
     FilePlusIcon,
-    FileTextIcon,
     ImageIcon,
     TableIcon,
   } from '@lucide/svelte';
   import { Menu, Portal } from '@skeletonlabs/skeleton-svelte';
 </script>
 
-<Menu positioning={{ placement: 'top' }}>
+<Menu positioning={{ placement: 'top' }} class="m-0 p-0">
   <Menu.Trigger class="btn hover:preset-tonal-surface w-fit">
-    <DownloadIcon /> Download/Export <ChevronDownIcon /></Menu.Trigger
+    <DownloadIcon /> Download/Export <ChevronDownIcon size={20} /></Menu.Trigger
   >
   <Portal>
     <Menu.Positioner>
-      <Menu.Content class="z-9999">
-        <Menu.Item value="pdf">
+      <Menu.Content class="bg-surface-100-900 z-9999">
+        <Menu.Item value="pdf" class="hover:preset-tonal-surface">
           <button
             class="flex items-center gap-2 text-left whitespace-pre-wrap"
             onclick={downloadPDF}
@@ -39,7 +36,7 @@
             </div>
           </button>
         </Menu.Item>
-        <Menu.Item value="csv">
+        <Menu.Item value="csv" class="hover:preset-tonal-surface">
           <button
             class="flex items-center gap-2 text-left whitespace-pre-wrap"
             onclick={downloadWeatherCSV}
@@ -53,7 +50,7 @@
           </button>
         </Menu.Item>
         {#if previews.active?.previewComponent}
-          <Menu.Item value="preview">
+          <Menu.Item value="preview" class="hover:preset-tonal-surface">
             <button
               class="flex h-auto items-center gap-2 text-left whitespace-pre-wrap"
               title="Download PNG File"
@@ -74,7 +71,7 @@
           </Menu.Item>
         {/if}
         <Menu.Separator />
-        <Menu.Item value="google-sheet">
+        <Menu.Item value="google-sheet" class="hover:preset-tonal-surface">
           <button
             class="flex items-center gap-2 text-left whitespace-pre-wrap"
             onclick={() => {

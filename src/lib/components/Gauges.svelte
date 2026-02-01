@@ -23,14 +23,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     weather,
   } from '$lib/state';
   import { preferences } from '$lib/storage/preferences.svelte';
-  import { downloadPDF } from '$lib/utils';
-  import { CirclePlusIcon, DownloadIcon, Trash2Icon } from '@lucide/svelte';
+  import { CirclePlusIcon, Trash2Icon } from '@lucide/svelte';
   import { onMount, tick, untrack } from 'svelte';
-  import RangeOptionsButton from './buttons/RangeOptionsButton.svelte';
   import Gauge from './Gauge.svelte';
   import GaugeCustomizer from './GaugeCustomizer.svelte';
-  import { APP_NAVIGATION_SIDEBAR_WIDTH } from '$lib/constants';
-  import DownloadCreateMenuButton from './DownloadCreateMenuButton.svelte';
 
   onMount(() => {
     setupAvailableGauges();

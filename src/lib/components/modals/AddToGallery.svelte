@@ -51,7 +51,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 </script>
 
-<div class="p-2 text-center">
+<div class="w-full p-4 text-center">
   {#if project.gallery.href && project.gallery.title && project.gallery.title === locations.projectTitle}
     <div class="card preset-filled-surface-100-900 mt-4 p-4 text-center">
       <p class="my-2">

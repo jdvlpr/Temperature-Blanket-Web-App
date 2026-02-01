@@ -16,20 +16,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script>
   import WeatherTableWrapper from '$lib/components/WeatherTableWrapper.svelte';
   import ImportWeatherData from '$lib/components/modals/ImportWeatherData.svelte';
-  import ExportToSheetsButton from '$lib/features/google-sheets/ExportToSheetsButton.svelte';
-  import { dialog, previews, weather } from '$lib/state';
-  import { downloadPDF, downloadWeatherCSV } from '$lib/utils';
-  import {
-    ChevronDownIcon,
-    DownloadIcon,
-    FilePlus2Icon,
-    FilePlusIcon,
-    FileUpIcon,
-  } from '@lucide/svelte';
+  import { dialog, weather } from '$lib/state';
+  import { FileUpIcon } from '@lucide/svelte';
   import { weatherChart } from './WeatherChart.svelte';
-  import { Menu, Portal } from '@skeletonlabs/skeleton-svelte';
-  import ExportToGoogleSheetModal from '$lib/features/google-sheets/ExportToGoogleSheetModal.svelte';
-  import DownloadCreateMenuButton from './DownloadCreateMenuButton.svelte';
+  import DownloadExportButton from './buttons/DownloadExportButton.svelte';
 
   let debounceTimer;
   const debounce = (callback, time) => {
@@ -54,7 +44,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <div
     class="rounded-container bg-surface-100 dark:bg-surface-900 mx-2 mt-4 mb-2 flex items-center justify-center gap-2 px-4 py-2 shadow-inner max-sm:flex-col sm:flex-wrap sm:items-center sm:justify-center lg:mb-4"
   >
-    <DownloadCreateMenuButton />
+    <DownloadExportButton />
 
     {#if weather.grouping !== 'week'}
       <button

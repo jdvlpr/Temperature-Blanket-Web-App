@@ -36,7 +36,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 {#key projects}
   {#if projects?.length}
     <div class="mb-2 flex w-full flex-col items-start justify-center">
-      <h2 class="mt-8 text-xl font-bold">Saved Projects</h2>
+      <h2 class="mt-4 text-xl font-bold">Saved Projects</h2>
       <p class="mb-2 text-sm">Stored in this browser</p>
       <div class="flex w-full flex-col items-start justify-center gap-2">
         {#each projects as project}

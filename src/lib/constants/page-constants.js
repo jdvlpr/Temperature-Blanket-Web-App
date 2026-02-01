@@ -26,7 +26,7 @@ export const KEYBOARD_SHORTCUTS = [
     details: '',
     items: [
       {
-        description: 'Open Menu',
+        description: 'Open Project Menu',
         keys: ['.'],
       },
       {

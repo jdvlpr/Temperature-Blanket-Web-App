@@ -197,20 +197,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </span>
     </a>
   </div>
-  <div
-    class="bg-surface-100-900 flex w-full items-center justify-center p-2 text-center"
-  >
-    <p class="inline text-sm">
-      Technical Update: <a
-        href="https://www.facebook.com/share/p/1AUDsPmA7w/"
-        class="link"
-        target="_blank"
-      >
-        <ExternalLinkIcon class="relative -top-[2px] inline size-4" />
-        Future Date Issue</a
-      >
-    </p>
-  </div>
 </div>
 
 {@render children?.()}

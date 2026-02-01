@@ -27,8 +27,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import SectionNavigationButtons from '$lib/components/buttons/SectionNavigationButtons.svelte';
   import ChooseWeatherSource from '$lib/components/modals/ChooseWeatherSource.svelte';
   import GettingStarted from '$lib/components/modals/GettingStarted.svelte';
+  import KeyboardShortcuts from '$lib/components/modals/KeyboardShortcuts.svelte';
   import LegacyNotification from '$lib/components/modals/LegacyNotification.svelte';
   import Menu from '$lib/components/modals/Menu.svelte';
+  import SaveProjectModal from '$lib/components/modals/SaveProjectModal.svelte';
   import { safeSlide } from '$lib/features/transitions/safeSlide';
   import {
     dialog,
@@ -48,13 +50,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '$lib/utils';
   import {
     BadgeQuestionMarkIcon,
+    BookmarkIcon,
     BookOpenTextIcon,
     CircleQuestionMarkIcon,
     EllipsisVerticalIcon,
+    KeyboardIcon,
     LightbulbIcon,
     MailIcon,
     RedoIcon,
-    SaveIcon,
     UndoIcon,
   } from '@lucide/svelte';
   import { Popover, Portal } from '@skeletonlabs/skeleton-svelte';
@@ -152,21 +155,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
     <div class="flex flex-1 justify-between gap-2 sm:justify-end">
       {#if weather.data.length && locations.allValid}
-        <div class="hidden lg:inline-flex">
+        <div class="hidden sm:inline-flex">
           <button
-            class="btn hover:preset-tonal-surface"
+            class="btn bg-primary-50-950 border-primary-500 hover:preset-tonal-primary border"
             title="Save your project in this browser and as a URL."
             onclick={() =>
               dialog.trigger({
                 type: 'component',
-                component: { ref: Menu, props: { page: 'save' } },
+                component: { ref: SaveProjectModal },
               })}
           >
-            <SaveIcon />
-
-            <span class="max-[700px]:hidden min-[700px]:inline-block">
-              Save
-            </span>
+            <BookmarkIcon />
+            <span class="inline-block max-sm:hidden">Save</span>
           </button>
         </div>
       {/if}
@@ -188,8 +188,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             }}
           >
             <UndoIcon />
-            <span class="max-[740px]:hidden min-[740px]:inline-block">Undo</span
-            >
+            <span class="inline-block max-md:hidden">Undo</span>
           </button>
 
           <button
@@ -207,9 +206,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             }}
           >
             <RedoIcon />
-            <span class=" max-[740px]:hidden min-[740px]:inline-block"
-              >Redo</span
-            >
+            <span class="inline-block max-md:hidden">Redo</span>
           </button>
         </div>
       {/if}
@@ -280,6 +277,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
                           Contact</a
                         >
                       </p>
+
+                      <button
+                        class="btn hover:preset-tonal-surface w-fit"
+                        onclick={() => {
+                          dialog.trigger({
+                            type: 'component',
+                            component: { ref: KeyboardShortcuts },
+                          });
+                        }}
+                        title="View Keyboard Shortcuts"
+                      >
+                        <KeyboardIcon />
+                        <span class="text-left whitespace-pre-wrap"
+                          >Keyboard Shortcuts</span
+                        >
+                      </button>
                     </div>
                   </Popover.Description>
                   <Popover.Arrow

@@ -16,6 +16,7 @@
 import { page } from '$app/state';
 import KeyboardShortcuts from '$lib/components/modals/KeyboardShortcuts.svelte';
 import Menu from '$lib/components/modals/Menu.svelte';
+import SaveProjectModal from '$lib/components/modals/SaveProjectModal.svelte';
 import { dialog, pageSections, project, toast, weather } from '$lib/state';
 import { preferences } from '$lib/storage/preferences.svelte';
 import { delay, loadFromHistory } from '$lib/utils';
@@ -201,7 +202,7 @@ export const handleKeyDown = (ev) => {
       case '.':
         dialog.trigger({
           type: 'component',
-          component: { ref: Menu, props: { page: 'main' } },
+          component: { ref: Menu },
         });
         break;
       case 'u':
@@ -225,7 +226,7 @@ export const handleKeyDown = (ev) => {
         ev.preventDefault();
         dialog.trigger({
           type: 'component',
-          component: { ref: Menu, props: { page: 'save' } },
+          component: { ref: SaveProjectModal },
         });
       }
       // Check for section navigation shortcuts

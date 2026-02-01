@@ -14,23 +14,21 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import AddToGallery from '$lib/components/modals/AddToGallery.svelte';
   import PreviewSelect from '$lib/components/previews/PreviewSelect.svelte';
   import WeatherDetails from '$lib/components/WeatherDetails.svelte';
   import {
     drawerState,
     gauges,
     locations,
-    dialog,
     previews,
     previewWeatherTargets,
     project,
   } from '$lib/state';
   import { downloadPreviewPNG } from '$lib/utils';
-  import { DownloadIcon, ImageIcon, SendIcon } from '@lucide/svelte';
+  import { ImageIcon } from '@lucide/svelte';
   import { onMount } from 'svelte';
   import { Drawer } from 'vaul-svelte';
-  import DownloadCreateMenuButton from './DownloadCreateMenuButton.svelte';
+  import SendToGalleryButton from './buttons/SendToGalleryButton.svelte';
 
   onMount(() => {
     if (!previews.activeId) {
@@ -95,20 +93,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         Download Image (PNG)
       </button>
 
-      <button
-        class="btn preset-tonal-primary border-primary-500 h-auto items-center border text-left whitespace-pre-wrap"
-        onclick={() =>
-          dialog.trigger({
-            type: 'component',
-            component: {
-              ref: AddToGallery,
-            },
-          })}
-        title="Show Send to Gallery Dialog"
-      >
-        <SendIcon />
-        Send to Project Gallery
-      </button>
+      <SendToGalleryButton isPrimary={true} />
 
       {#if project.gallery.href && project.gallery.title && project.gallery.title === locations.projectTitle}
         <div class="flex w-full flex-col justify-center gap-1">

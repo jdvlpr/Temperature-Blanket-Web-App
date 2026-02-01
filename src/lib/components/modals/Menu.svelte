@@ -13,67 +13,29 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script module>
-  let pages = $state({
-    main: false,
-    save: false,
-  });
-</script>
-
 <script lang="ts">
-  import { browser } from '$app/environment';
-  import { replaceState } from '$app/navigation';
   import LocalProjects from '$lib/components/LocalProjects.svelte';
-  import ProjectDetails from '$lib/components/ProjectDetails.svelte';
   import UnitChanger from '$lib/components/UnitChanger.svelte';
   import YarnSources from '$lib/components/YarnSources.svelte';
-  import KeyboardShortcuts from '$lib/components/modals/KeyboardShortcuts.svelte';
   import { DAYS_OF_THE_WEEK, MONTHS } from '$lib/constants';
-  import { dialog, project, toast, weather } from '$lib/state';
-  import { ProjectStorage } from '$lib/storage/projects';
-  import { setProjectInStorage } from '$lib/storage/storage-utils.svelte';
-  import { delay, downloadWeatherCSV, pluralize } from '$lib/utils';
-  import {
-    CircleCheckBigIcon,
-    ClipboardCopyIcon,
-    DownloadIcon,
-    KeyboardIcon,
-    SaveIcon,
-    SendIcon,
-    SquarePlusIcon,
-  } from '@lucide/svelte';
+  import { dialog, locations, project, weather } from '$lib/state';
+  import { delay, pluralize } from '$lib/utils';
+  import { BookmarkIcon, ExternalLinkIcon } from '@lucide/svelte';
   import { onMount } from 'svelte';
-  import DownloadCreateMenuButton from '../DownloadCreateMenuButton.svelte';
   import WeatherGrouping from '../WeatherGrouping.svelte';
+  import DownloadExportButton from '../buttons/DownloadExportButton.svelte';
+  import SendToGalleryButton from '../buttons/SendToGalleryButton.svelte';
   import WeatherSourceButton from '../buttons/WeatherSourceButton.svelte';
-  import AddToGallery from './AddToGallery.svelte';
+  import SaveProjectModal from './SaveProjectModal.svelte';
   interface Props {
-    page?: string;
     highlight?: string;
   }
 
-  let { page = 'main', highlight }: Props = $props();
-
-  let currentProjectIndex = $state(null);
+  let { highlight }: Props = $props();
 
   let weatherSettingsElement: HTMLElement | null = $state(null);
 
-  async function goTo(page) {
-    let _pages = $state.snapshot(pages);
-    for (const key in pages) {
-      _pages[key] = page === key;
-    }
-
-    await delay(100); // on mobile it wasn't working without a delay...
-
-    pages = _pages;
-
-    if (page === 'save') saveProject({ copy: false });
-  }
-
   onMount(async () => {
-    if (page) goTo(page);
-
     if (highlight === 'weather-settings') {
       await delay(200);
       weatherSettingsElement?.scrollIntoView({
@@ -82,406 +44,222 @@ If not, see <https://www.gnu.org/licenses/>. -->
       });
     }
   });
-
-  async function saveProject({ copy = true }) {
-    // Copy window url to clipboard
-    if (copy) {
-      try {
-        window.navigator.clipboard.writeText(project.url.href);
-        toast.trigger({
-          message: 'Copied',
-          category: 'success',
-        });
-      } catch {
-        toast.trigger({
-          message: 'Unable to copy to your clipboard',
-          category: 'error',
-        });
-      }
-    }
-
-    const newURL = new URL(project.url.href);
-    replaceState(newURL, '');
-
-    try {
-      await setProjectInStorage();
-      currentProjectIndex = await ProjectStorage.getIndexItemByHref(
-        project.url.href,
-      );
-      project.status.saved = true;
-    } catch (e) {
-      currentProjectIndex = null;
-      project.status.saved = false;
-      project.status.error = {
-        code: 1,
-        message: 'Unable to save project to storage',
-      };
-      console.warn("Can't save project", { e });
-    }
-  }
 </script>
 
-<div class="p-4">
-  {#if !pages.main}
-    <button
-      aria-label="Go To Main Menu"
-      class="btn-icon hover:preset-tonal-surface"
-      onclick={() => goTo('main')}
-      title="Go To Main Menu"
-    >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke-width="1.5"
-        stroke="currentColor"
-        class="h-6 w-6"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"
-        />
-      </svg>
-    </button>
-  {/if}
-
-  {#if pages.main}
-    <div>
-      <h2 class="mb-2 text-xl font-bold">Project</h2>
-      <div class="my-4 flex w-full flex-col gap-2">
-        <a
-          href="/"
-          target="_blank"
-          class="btn hover:preset-tonal-surface w-fit"
-          title="New Project"
-        >
-          <SquarePlusIcon />
-          New
-        </a>
-
-        <button
-          class="btn hover:preset-tonal-surface w-fit"
-          onclick={() => {
-            goTo('save');
-          }}
-          title="Save Project"
-        >
-          <SaveIcon />
-          Save
-        </button>
-
-        {#if weather.data.length}
-          <DownloadCreateMenuButton />
-
-          <button
-            class="btn hover:preset-tonal-surface h-auto w-fit items-center text-left whitespace-pre-wrap"
-            onclick={() =>
-              dialog.trigger({
-                type: 'component',
-                component: {
-                  ref: AddToGallery,
-                },
-              })}
-            title="Show Send to Gallery Dialog"
-          >
-            <SendIcon />
-            Send to Project Gallery
-          </button>
-
-          {#if project.gallery.href && project.gallery.title && project.gallery.title === locations.projectTitle}
-            <div class="flex w-full flex-col justify-center gap-1">
-              <p>View this project's gallery page:</p>
-              <p>
-                <a
-                  href={project.gallery.href}
-                  target="_blank"
-                  class="btn hover:preset-tonal-surface w-fit whitespace-pre-wrap underline"
-                  rel="noreferrer">{project.gallery.title}</a
-                >
-              </p>
-            </div>
-          {/if}
-        {/if}
-      </div>
-
-      <h2
-        class="mt-8 mb-2 scroll-mt-[12px] text-xl font-bold"
-        bind:this={weatherSettingsElement}
-      >
-        Weather Settings
-      </h2>
-
-      <div class="my-4 flex w-full flex-col items-start gap-4">
-        <UnitChanger />
-
-        {#if weather.data.length}
-          <WeatherGrouping />
-
-          {#if weather.grouping === 'week'}
-            <div
-              class="rounded-container bg-surface-100 dark:bg-surface-900 flex w-full flex-col items-start justify-start gap-2 p-2"
-            >
-              <p class="">
-                Weekly weather grouping can result in a shorter project. <a
-                  href="/documentation/#grouping-weather-data"
-                  target="_blank"
-                  class="link"
-                  rel="noopener noreferrer">Read more details.</a
-                >
-                {#if weather.groupedByWeek}
-                  Your project starts on {DAYS_OF_THE_WEEK.filter(
-                    (n) =>
-                      n.value === weather.groupedByWeek[0].date.getUTCDay(),
-                  )[0].label},
-                  {MONTHS.filter(
-                    (n) =>
-                      n.value - 1 ===
-                      weather.groupedByWeek[0].date.getUTCMonth(),
-                  )[0]?.name}
-                  {weather.groupedByWeek[0].date.getUTCDate()},
-                  {weather.groupedByWeek[0].date.getUTCFullYear()}. It spans {weather
-                    .groupedByWeek.length}
-                  {pluralize('week', weather.groupedByWeek.length)}.
-                {/if}
-              </p>
-              <label class="label flex flex-col">
-                <span>Weeks Start On</span>
-                <select
-                  class="select mx-auto w-fit"
-                  bind:value={weather.monthGroupingStartDay}
-                  id="weather-weeks-start-week-on"
-                >
-                  {#each DAYS_OF_THE_WEEK as { value, label }}
-                    <option {value}>{label}</option>
-                  {/each}
-                </select>
-              </label>
-            </div>
-          {/if}
-        {/if}
-
-        <WeatherSourceButton />
-      </div>
-
-      <LocalProjects />
-
-      <h2 class="mt-8 mb-2 text-xl font-bold">Page</h2>
+<div class="w-full p-4">
+  <h2 class="mb-2 text-xl font-bold">Project</h2>
+  <div class="my-4 flex w-full flex-col gap-2">
+    <div class="flex flex-wrap gap-2">
       <button
-        class="btn hover:preset-tonal-surface w-fit"
+        class="btn bg-primary-50-950 border-primary-500 hover:preset-tonal-primary w-fit border"
         onclick={() => {
           dialog.trigger({
             type: 'component',
-            component: { ref: KeyboardShortcuts },
+            component: { ref: SaveProjectModal },
           });
         }}
-        title="View Keyboard Shortcuts"
+        title="Save Project"
       >
-        <KeyboardIcon />
-        <span class="text-left whitespace-pre-wrap">Keyboard Shortcuts</span>
+        <BookmarkIcon />
+        Save
       </button>
-
-      <h2 class="mt-8 mb-2 text-xl font-bold">Sources</h2>
-      <div class="flex w-full flex-col items-start gap-2 text-sm">
-        <p>
-          Location data is from <a
-            href="https://www.geonames.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="link">Geonames</a
-          >
-          licensed under
-          <a
-            href="https://creativecommons.org/licenses/by/2.0/"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="link">CC BY 2.0</a
-          >. Weather data from
-          <a
-            href="https://meteostat.net/"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="link">Meteostat</a
-          >
-          is licensed under
-          <a
-            href="https://creativecommons.org/licenses/by-nc/4.0/"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="link">CC BY-NC 4.0</a
-          >, with raw data provided by
-          <a
-            href="https://www.noaa.gov/"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="link">NOAA</a
-          >,
-          <a
-            href="https://www.dwd.de/"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="link">DWD</a
-          >
-          and
-          <a
-            href="https://dev.meteostat.net/docs/sources.html"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="link">others</a
-          >. Weather data from
-          <a
-            href="https://www.open-meteo.com"
-            rel="noopener noreferrer"
-            class="link"
-            target="_blank">Open-Meteo</a
-          >
-          is licenced under
-          <a
-            href="https://creativecommons.org/licenses/by/4.0/"
-            target="_blank"
-            class="link"
-            rel="noreferrer noopener"
-            >Attribution 4.0 International (CC BY 4.0)</a
-          >, and includes data from the
-          <a
-            href="https://cds.climate.copernicus.eu/cdsapp#!/dataset/reanalysis-era5-land?tab=overview"
-            rel="noopener noreferrer"
-            target="_blank"
-            class="link">Copernicus Program</a
-          >. Daytime length calculations are by
-          <a
-            href="https://github.com/mourner/suncalc"
-            target="_blank"
-            class="link"
-            rel="noopener noreferrer">SunCalc</a
-          >
-          licensed under
-          <a
-            href="https://choosealicense.com/licenses/bsd-2-clause/"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="link">BSD 2</a
-          >. Default color schemes are based on
-          <a
-            href="https://ColorBrewer2.org"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="link">ColorBrewer2.org</a
-          >
-          by Cynthia A. Brewer, Geography, Pennsylvania State University, licenced
-          under
-          <a
-            href="https://www.apache.org/licenses/LICENSE-2.0"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="link">Apache 2</a
-          >. Country flag icons are made by
-          <a
-            href="https://www.freakflagsprite.com/"
-            target="_blank"
-            class="link"
-            rel="noopener noreferrer">Michael P. Cohen.</a
-          >
-          <a
-            href="https://www.apache.org/licenses/LICENSE-2.0"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="link">Apache 2</a
-          >.
-        </p>
-        <YarnSources />
-      </div>
+      <a
+        href="/"
+        target="_blank"
+        class="btn hover:preset-tonal-surface w-fit"
+        title="New Project"
+      >
+        <ExternalLinkIcon />
+        New
+      </a>
     </div>
-  {/if}
 
-  {#if pages.save}
-    <div class="mb-8 flex flex-col items-start justify-center gap-2">
-      <h2 class="my-2 text-lg font-bold">Save</h2>
-      {#if browser && typeof window.localStorage !== 'undefined' && weather.data.length}
-        {#if project.status.saved}
-          <p class="inline-flex w-full items-center justify-start gap-2">
-            <CircleCheckBigIcon style="size-4" class="text-success-900-100" />
-            Project and {#if weather.isUserEdited}custom weather{:else}weather{/if}
-            data saved to this web browser.
-          </p>
-        {:else if project.status.error.code === 1}
-          <div class="text-warning-500 flex flex-col gap-2">
-            <p>
-              It looks like there was a problem saving your project to this
-              browser, but it can still be accessed using the URL below.
-            </p>
+    {#if weather.data.length}
+      <DownloadExportButton />
 
-            <p>
-              The storage space in this browser for saved projects might be
-              full. If you have other saved projects, you can remove some and
-              try to save this one again.
-            </p>
-          </div>
-        {/if}
+      <SendToGalleryButton />
 
-        {#if currentProjectIndex && currentProjectIndex?.meta}
-          <div class="w-full">
-            <ProjectDetails
-              project={currentProjectIndex.meta}
-              canRemove={false}
-            />
-          </div>
-        {/if}
-
-        <p class="text-lg font-bold">Recommended Next Steps:</p>
-
-        <div>
-          <p class="font-bold">1) Save your Project URL</p>
-
-          <p class="">
-            Keep your project URL somewhere safe like a note, bookmark, or
-            document. Use the link to open your project in any web browser, or
-            share it for others to see. If this browser's site data is cleared,
-            you'll need the project URL to open your project again.
-          </p>
-        </div>
-
-        <button
-          class="btn hover:preset-tonal-surface"
-          onclick={() => {
-            saveProject({ copy: true });
-          }}
-        >
-          <ClipboardCopyIcon />
-          Copy Project URL
-        </button>
-
-        <p
-          class="card bg-primary-50 dark:bg-primary-950 basis-full p-4 text-sm break-all select-all"
-        >
-          {project.url.href}
-        </p>
-
-        <div>
-          <p class="font-bold">2) Backup the Weather Data</p>
-
+      {#if project.gallery.href && project.gallery.title && project.gallery.title === locations.projectTitle}
+        <div class="flex w-full flex-col justify-center gap-1">
+          <p>View this project's gallery page:</p>
           <p>
-            Save the {#if weather.isUserEdited}custom
-            {/if} weather data as a CSV file so you can later
             <a
-              href="/documentation#import-weather-data"
-              class="link"
-              target="_blank">import the weather data</a
-            >, if needed.
+              href={project.gallery.href}
+              target="_blank"
+              class="btn hover:preset-tonal-surface w-fit whitespace-pre-wrap underline"
+              rel="noreferrer">{project.gallery.title}</a
+            >
           </p>
         </div>
-
-        <button
-          class="btn hover:preset-tonal-surface"
-          onclick={downloadWeatherCSV}
-          title="Download CSV File"
-        >
-          <DownloadIcon />
-          Download Weather Data (CSV)</button
-        >
-      {:else}
-        <p>To save a project, you first need to get weather data.</p>
       {/if}
-    </div>
-  {/if}
+    {/if}
+  </div>
+
+  <h2
+    class="mt-8 mb-2 scroll-mt-[12px] text-xl font-bold"
+    bind:this={weatherSettingsElement}
+  >
+    Settings
+  </h2>
+
+  <div class="my-4 flex w-full flex-col items-start gap-4">
+    <UnitChanger />
+
+    {#if weather.data.length}
+      <WeatherGrouping />
+
+      {#if weather.grouping === 'week'}
+        <div
+          class="rounded-container bg-surface-100 dark:bg-surface-900 flex w-full flex-col items-start justify-start gap-2 p-2"
+        >
+          <p class="">
+            Weekly weather grouping can result in a shorter project. <a
+              href="/documentation/#grouping-weather-data"
+              target="_blank"
+              class="link"
+              rel="noopener noreferrer">Read more details.</a
+            >
+            {#if weather.groupedByWeek}
+              Your project starts on {DAYS_OF_THE_WEEK.filter(
+                (n) => n.value === weather.groupedByWeek[0].date.getUTCDay(),
+              )[0].label},
+              {MONTHS.filter(
+                (n) =>
+                  n.value - 1 === weather.groupedByWeek[0].date.getUTCMonth(),
+              )[0]?.name}
+              {weather.groupedByWeek[0].date.getUTCDate()},
+              {weather.groupedByWeek[0].date.getUTCFullYear()}. It spans {weather
+                .groupedByWeek.length}
+              {pluralize('week', weather.groupedByWeek.length)}.
+            {/if}
+          </p>
+          <label class="label flex flex-col">
+            <span>Weeks Start On</span>
+            <select
+              class="select mx-auto w-fit"
+              bind:value={weather.monthGroupingStartDay}
+              id="weather-weeks-start-week-on"
+            >
+              {#each DAYS_OF_THE_WEEK as { value, label }}
+                <option {value}>{label}</option>
+              {/each}
+            </select>
+          </label>
+        </div>
+      {/if}
+    {/if}
+
+    <WeatherSourceButton />
+  </div>
+
+  <LocalProjects />
+
+  <h2 class="mt-8 mb-2 text-xl font-bold">Data Sources</h2>
+  <div class="flex w-full flex-col items-start gap-2 text-sm">
+    <p>
+      Location data is from <a
+        href="https://www.geonames.org/"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="link">Geonames</a
+      >
+      licensed under
+      <a
+        href="https://creativecommons.org/licenses/by/2.0/"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="link">CC BY 2.0</a
+      >. Weather data from
+      <a
+        href="https://meteostat.net/"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="link">Meteostat</a
+      >
+      is licensed under
+      <a
+        href="https://creativecommons.org/licenses/by-nc/4.0/"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="link">CC BY-NC 4.0</a
+      >, with raw data provided by
+      <a
+        href="https://www.noaa.gov/"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="link">NOAA</a
+      >,
+      <a
+        href="https://www.dwd.de/"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="link">DWD</a
+      >
+      and
+      <a
+        href="https://dev.meteostat.net/docs/sources.html"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="link">others</a
+      >. Weather data from
+      <a
+        href="https://www.open-meteo.com"
+        rel="noopener noreferrer"
+        class="link"
+        target="_blank">Open-Meteo</a
+      >
+      is licenced under
+      <a
+        href="https://creativecommons.org/licenses/by/4.0/"
+        target="_blank"
+        class="link"
+        rel="noreferrer noopener">Attribution 4.0 International (CC BY 4.0)</a
+      >, and includes data from the
+      <a
+        href="https://cds.climate.copernicus.eu/cdsapp#!/dataset/reanalysis-era5-land?tab=overview"
+        rel="noopener noreferrer"
+        target="_blank"
+        class="link">Copernicus Program</a
+      >. Daytime length calculations are by
+      <a
+        href="https://github.com/mourner/suncalc"
+        target="_blank"
+        class="link"
+        rel="noopener noreferrer">SunCalc</a
+      >
+      licensed under
+      <a
+        href="https://choosealicense.com/licenses/bsd-2-clause/"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="link">BSD 2</a
+      >. Default color schemes are based on
+      <a
+        href="https://ColorBrewer2.org"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="link">ColorBrewer2.org</a
+      >
+      by Cynthia A. Brewer, Geography, Pennsylvania State University, licenced under
+      <a
+        href="https://www.apache.org/licenses/LICENSE-2.0"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="link">Apache 2</a
+      >. Country flag icons are made by
+      <a
+        href="https://www.freakflagsprite.com/"
+        target="_blank"
+        class="link"
+        rel="noopener noreferrer">Michael P. Cohen.</a
+      >
+      <a
+        href="https://www.apache.org/licenses/LICENSE-2.0"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="link">Apache 2</a
+      >.
+    </p>
+    <YarnSources />
+  </div>
 </div>
