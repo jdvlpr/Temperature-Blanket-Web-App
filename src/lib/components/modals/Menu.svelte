@@ -54,6 +54,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { setProjectInStorage } from '$lib/storage/storage-utils.svelte';
   import { Accordion } from '@skeletonlabs/skeleton-svelte';
   import { safeSlide } from '$lib/features/transitions/safeSlide';
+  import ExportToSheetsButton from '$lib/features/google-sheets/ExportToSheetsButton.svelte';
   interface Props {
     page?: string;
     highlight?: string;
@@ -400,6 +401,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <DownloadIcon />
           Weather Data (CSV)</button
         >
+
+        <ExportToSheetsButton />
 
         {#if previews.active?.previewComponent}
           <button

@@ -16,6 +16,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script>
   import WeatherTableWrapper from '$lib/components/WeatherTableWrapper.svelte';
   import ImportWeatherData from '$lib/components/modals/ImportWeatherData.svelte';
+  import ExportToSheetsButton from '$lib/features/google-sheets/ExportToSheetsButton.svelte';
   import { dialog, weather } from '$lib/state';
   import { downloadPDF, downloadWeatherCSV } from '$lib/utils';
   import { DownloadIcon, FilePlus2Icon } from '@lucide/svelte';
@@ -59,6 +60,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     >
       <DownloadIcon class="inline" /> Download Weather Data (CSV)
     </button>
+
+    <ExportToSheetsButton />
 
     {#if weather.grouping !== 'week'}
       <button

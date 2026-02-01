@@ -69,6 +69,15 @@ importers:
       '@tailwindcss/vite':
         specifier: ^4.1.18
         version: 4.1.18(vite@7.3.1(@types/node@22.13.14)(jiti@2.6.1)(lightningcss@1.30.2)(sass@1.97.1))
+      '@types/gapi':
+        specifier: ^0.0.47
+        version: 0.0.47
+      '@types/gapi.client.sheets':
+        specifier: ^4.0.20201031
+        version: 4.0.20201031
+      '@types/google.accounts':
+        specifier: ^0.0.18
+        version: 0.0.18
       '@typescript-eslint/eslint-plugin':
         specifier: ^8.54.0
         version: 8.54.0(@typescript-eslint/parser@8.54.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3)
@@ -734,6 +743,12 @@ packages:
     peerDependencies:
       svelte: ^5
 
+  '@maxim_mazurok/gapi.client.discovery-v1@0.4.20200806':
+    resolution: {integrity: sha512-Jeo/KZqK39DI6ExXHcJ4lqnn1O/wEqboQ6eQ8WnNpu5eJ7wUnX/C5KazOgs1aRhnIB/dVzDe8wm62nmtkMIoaw==}
+
+  '@maxim_mazurok/gapi.client.sheets-v4@0.1.20260126':
+    resolution: {integrity: sha512-iM5Mzm9SSrh0gfIcI2vEWpD19DH+xQAbwV70jcBxLY1Do1ZVGn72R9kRBs+BfqQ00uq90IIUt9cvWfQoPxzx9g==}
+
   '@parcel/watcher-android-arm64@2.5.1':
     resolution: {integrity: sha512-KF8+j9nNbUN8vzOFDpRMsaKBHZ/mcjEjMToVMJOhTozkDonQFFrRcfdLWn6yWKCmJKmdVxSgHiYvTCef4/qcBA==}
     engines: {node: '>= 10.0.0'}
@@ -1091,6 +1106,22 @@ packages:
 
   '@types/estree@1.0.8':
     resolution: {integrity: sha512-dWHzHa2WqEXI/O1E9OjrocMTKJl2mSrEolh1Iomrv6U+JuNwaHXsXx9bLu5gG7BUWFIN0skIQJQ/L1rIex4X6w==}
+
+  '@types/gapi.client.discovery-v1@0.0.4':
+    resolution: {integrity: sha512-uevhRumNE65F5mf2gABLaReOmbFSXONuzFZjNR3dYv6BmkHg+wciubHrfBAsp3554zNo3Dcg6dUAlwMqQfpwjQ==}
+
+  '@types/gapi.client.sheets@4.0.20201031':
+    resolution: {integrity: sha512-1Aiu11rNNoyPDHW6v8TVcSmlDN+MkxSuafwiawaK5YqZ+uYA+O63vjUvkK+3qNduSLh7D9qBJc/8GGwgN6gsTw==}
+    deprecated: use @types/gapi.client.sheets-v4 instead; see https://github.com/Maxim-Mazurok/google-api-typings-generator/issues/652 for details
+
+  '@types/gapi.client@1.0.8':
+    resolution: {integrity: sha512-qJQUmmumbYym3Amax0S8CVzuSngcXsC1fJdwRS2zeW5lM63zXkw4wJFP+bG0jzgi0R6EsJKoHnGNVTDbOyG1ng==}
+
+  '@types/gapi@0.0.47':
+    resolution: {integrity: sha512-/ZsLuq6BffMgbKMtZyDZ8vwQvTyKhKQ1G2K6VyWCgtHHhfSSXbk4+4JwImZiTjWNXfI2q1ZStAwFFHSkNoTkHA==}
+
+  '@types/google.accounts@0.0.18':
+    resolution: {integrity: sha512-yHaPznll97ZnMJlPABHyeiIlLn3u6gQaUjA5k/O9lrrpgFB9VT10CKPLuKM0qTHMl50uXpW5sIcG+utm8jMOHw==}
 
   '@types/json-schema@7.0.15':
     resolution: {integrity: sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==}
@@ -3236,6 +3267,16 @@ snapshots:
     dependencies:
       svelte: 5.49.0
 
+  '@maxim_mazurok/gapi.client.discovery-v1@0.4.20200806':
+    dependencies:
+      '@types/gapi.client': 1.0.8
+      '@types/gapi.client.discovery-v1': 0.0.4
+
+  '@maxim_mazurok/gapi.client.sheets-v4@0.1.20260126':
+    dependencies:
+      '@types/gapi.client': 1.0.8
+      '@types/gapi.client.discovery-v1': 0.0.4
+
   '@parcel/watcher-android-arm64@2.5.1':
     optional: true
 
@@ -3543,6 +3584,20 @@ snapshots:
   '@types/deep-eql@4.0.2': {}
 
   '@types/estree@1.0.8': {}
+
+  '@types/gapi.client.discovery-v1@0.0.4':
+    dependencies:
+      '@maxim_mazurok/gapi.client.discovery-v1': 0.4.20200806
+
+  '@types/gapi.client.sheets@4.0.20201031':
+    dependencies:
+      '@maxim_mazurok/gapi.client.sheets-v4': 0.1.20260126
+
+  '@types/gapi.client@1.0.8': {}
+
+  '@types/gapi@0.0.47': {}
+
+  '@types/google.accounts@0.0.18': {}
 
   '@types/json-schema@7.0.15': {}
 
