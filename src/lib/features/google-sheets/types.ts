@@ -22,6 +22,7 @@ export interface ExportOptions {
     prcp: boolean;
     snow: boolean;
     dayt: boolean;
+    moon: boolean;
   };
   /** Gauges to apply conditional formatting for */
   gaugesToApply: {
@@ -29,6 +30,7 @@ export interface ExportOptions {
     prcp: boolean;
     snow: boolean;
     dayt: boolean;
+    moon: boolean;
   };
   /** Whether to include day counts and percentages in gauge tabs */
   includeDayCounts: boolean;

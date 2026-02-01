@@ -17,6 +17,7 @@ import { gauges, locations, weather } from '$lib/state';
 import { preferences } from '$lib/storage/preferences.svelte';
 import type { ExportOptions, SpreadsheetData } from './types';
 import { getTextColor } from '$lib/utils/color-utils';
+import { MOON_PHASE_NAMES } from '$lib/constants/weather-constants';
 
 const MONTHS = [
   'January',
@@ -42,7 +43,8 @@ const DATA_LABELS: Record<
   tmin: { label: 'Low Temp', unitImperial: '°F', unitMetric: '°C' },
   prcp: { label: 'Rain', unitImperial: 'in', unitMetric: 'mm' },
   snow: { label: 'Snow', unitImperial: 'in', unitMetric: 'cm' },
-  dayt: { label: 'Day Length', unitImperial: 'hrs', unitMetric: 'hrs' },
+  dayt: { label: 'Daytime', unitImperial: 'hrs', unitMetric: 'hrs' },
+  moon: { label: 'Moon Phase', unitImperial: '', unitMetric: '' },
 };
 
 function hexToRgb(hex: string): { red: number; green: number; blue: number } {
@@ -128,8 +130,15 @@ function createWeatherGrid(
         const dayData = dateMap.get(`${month}-${day}`);
         for (const type of selectedTypes) {
           if (dayData) {
-            const val = (dayData as any)[type]?.[units];
-            row.push(val ?? null);
+            if (type === 'moon') {
+              const moonId = (dayData as any).moon;
+              row.push(
+                typeof moonId === 'number' ? MOON_PHASE_NAMES[moonId] : null,
+              );
+            } else {
+              const val = (dayData as any)[type]?.[units];
+              row.push(val ?? null);
+            }
           } else {
             row.push(null);
           }
@@ -165,6 +174,7 @@ function createConditionalFormattingRules(
     prcp: ['prcp'],
     snow: ['snow'],
     dayt: ['dayt'],
+    moon: ['moon'],
   };
 
   for (const gauge of gauges.allCreated) {
@@ -378,6 +388,7 @@ function createGaugeLegendData(
     prcp: ['prcp'],
     snow: ['snow'],
     dayt: ['dayt'],
+    moon: ['moon'],
   };
   const possibleTypes = gaugeToTypes[gauge.id] || [];
   // Filter by what's actually selected in options
@@ -627,6 +638,7 @@ function getApplicableTypesCount(
     prcp: ['prcp'],
     snow: ['snow'],
     dayt: ['dayt'],
+    moon: ['moon'],
   };
   const possibleTypes = gaugeToTypes[gauge.id] || [];
   const selectedTypesInOrder = getSelectedDataTypes(options);
@@ -728,6 +740,7 @@ function createLegendMergeRequests(
     prcp: ['prcp'],
     snow: ['snow'],
     dayt: ['dayt'],
+    moon: ['moon'],
   };
   const possibleTypes = gaugeToTypes[gauge.id] || [];
   const selectedTypesInOrder = getSelectedDataTypes(options);

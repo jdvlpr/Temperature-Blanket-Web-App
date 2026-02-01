@@ -28,12 +28,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let includeRain = $state(false);
   let includeSnow = $state(false);
   let includeDayLength = $state(false);
+  let includeMoon = $state(false);
 
   // Gauges to apply options
   let applyTempGauge = $state(true);
   let applyRainGauge = $state(false);
   let applySnowGauge = $state(false);
   let applyDaytimeGauge = $state(false);
+  let applyMoonGauge = $state(false);
 
   // Additional options
   let includeDayCounts = $state(true);
@@ -45,6 +47,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let hasDaytimeGauge = $derived(
     gauges.allCreated.some((g) => g.id === 'dayt'),
   );
+  let hasMoonGauge = $derived(gauges.allCreated.some((g) => g.id === 'moon'));
 
   async function handleExport() {
     isExporting = true;
@@ -57,12 +60,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
         prcp: includeRain,
         snow: includeSnow,
         dayt: includeDayLength,
+        moon: includeMoon,
       },
       gaugesToApply: {
         temp: applyTempGauge && hasTempGauge,
         prcp: applyRainGauge && hasRainGauge,
         snow: applySnowGauge && hasSnowGauge,
         dayt: applyDaytimeGauge && hasDaytimeGauge,
+        moon: applyMoonGauge && hasMoonGauge,
       },
       includeDayCounts,
     };
@@ -105,7 +110,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   <p class="text-sm">
     Automatically create a Google Sheet formatted with your weather data and
-    gauges. <a href="" target="_blank" class="link"
+    colors. <a href="" target="_blank" class="link"
       >Click here to see an example.</a
     > A popup will appear asking you to sign in to your Google account. Follow the
     instructions to authorize this web app to create a new Google Sheet, which will
@@ -136,7 +141,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </label>
     <label class="flex items-center gap-2">
       <input type="checkbox" class="checkbox" bind:checked={includeDayLength} />
-      <span>Day Length</span>
+      <span>Daytime</span>
+    </label>
+    <label class="flex items-center gap-2">
+      <input type="checkbox" class="checkbox" bind:checked={includeMoon} />
+      <span>Moon Phase</span>
     </label>
   </div>
 
@@ -170,7 +179,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <span>Daytime Gauge</span>
       </label>
     {/if}
-    {#if !hasTempGauge && !hasRainGauge && !hasSnowGauge && !hasDaytimeGauge}
+    {#if hasMoonGauge}
+      <label class="flex items-center gap-2">
+        <input type="checkbox" class="checkbox" bind:checked={applyMoonGauge} />
+        <span>Moon Gauge</span>
+      </label>
+    {/if}
+    {#if !hasTempGauge && !hasRainGauge && !hasSnowGauge && !hasDaytimeGauge && !hasMoonGauge}
       <p class="text-surface-500 text-sm">No gauges have been created yet.</p>
     {/if}
   </div>
