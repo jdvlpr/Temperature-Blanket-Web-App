@@ -19,7 +19,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ExportToSheetsButton from '$lib/features/google-sheets/ExportToSheetsButton.svelte';
   import { dialog, weather } from '$lib/state';
   import { downloadPDF, downloadWeatherCSV } from '$lib/utils';
-  import { DownloadIcon, FilePlus2Icon } from '@lucide/svelte';
+  import { DownloadIcon, FilePlus2Icon, FileUpIcon } from '@lucide/svelte';
   import { weatherChart } from './WeatherChart.svelte';
 
   let debounceTimer;
@@ -76,7 +76,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         }}
         title="Import Weather Data"
       >
-        <FilePlus2Icon class="inline" /> Import Weather Data
+        <FileUpIcon class="inline" /> Import Weather Data
       </button>
     {/if}
   </div>

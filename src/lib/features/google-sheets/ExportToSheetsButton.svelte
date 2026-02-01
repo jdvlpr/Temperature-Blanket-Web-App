@@ -16,7 +16,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import { dialog } from '$lib/state';
   import ExportToGoogleSheetModal from './ExportToGoogleSheetModal.svelte';
-  import { FileSpreadsheetIcon } from '@lucide/svelte';
+  import { FilePlusIcon, FileSpreadsheetIcon } from '@lucide/svelte';
 
   function openExportModal() {
     dialog.trigger({
@@ -31,8 +31,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <button
   class="btn hover:preset-tonal-surface h-auto text-left whitespace-pre-wrap"
   onclick={openExportModal}
-  title="Export to Google Sheets"
+  title="Create Google Sheet"
 >
-  <FileSpreadsheetIcon class="inline" />
-  Export to Google Sheets
+  <FilePlusIcon class="inline" />
+  Create Google Sheet
 </button>

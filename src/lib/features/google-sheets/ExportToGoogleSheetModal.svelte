@@ -15,9 +15,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import { dialog, gauges, toast } from '$lib/state';
-  import type { ExportOptions } from './types';
+  import { FilePlusIcon, LoaderCircleIcon, XIcon } from '@lucide/svelte';
   import { exportToGoogleSheet } from './client';
-  import { LoaderCircleIcon } from '@lucide/svelte';
+  import type { ExportOptions } from './types';
 
   let isExporting = $state(false);
 
@@ -36,7 +36,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let applyDaytimeGauge = $state(false);
 
   // Additional options
-  let includeDayCounts = $state(false);
+  let includeDayCounts = $state(true);
 
   // Check which gauges are available
   let hasTempGauge = $derived(gauges.allCreated.some((g) => g.id === 'temp'));
@@ -76,22 +76,23 @@ If not, see <https://www.gnu.org/licenses/>. -->
       if (!opened) {
         // Popup was blocked - show clickable link
         toast.trigger({
-          message: `Spreadsheet created! <a href="${url}" target="_blank" class="underline">Click here to open</a>`,
+          message: `<div class="flex flex-wrap items-center justify-center gap-2">Google Sheet created! <a href="${url}" target="_blank" class="link font-bold">Click here to open</a></div>`,
           category: 'success',
+          autohide: false,
         });
       } else {
         toast.trigger({
-          message: 'Spreadsheet created successfully!',
+          message: `<div class="flex flex-wrap items-center justify-center gap-2">Google Sheet created successfully! <a href="${url}" target="_blank" class="link ml-2">Open again</a></div>`,
           category: 'success',
+          autohide: false,
         });
       }
-
       dialog.close();
     } catch (error) {
-      console.error('Export failed:', error);
       toast.trigger({
         message: `Export failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
         category: 'error',
+        autohide: false,
       });
     } finally {
       isExporting = false;
@@ -100,10 +101,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div class="flex flex-col gap-4 p-4">
-  <h2 class="text-xl font-bold">Export to Google Sheets</h2>
+  <h2 class="text-xl font-bold">Create Google Sheet</h2>
+
+  <p class="text-sm">
+    Automatically create a Google Sheet formatted with your weather data and
+    gauges. <a href="" target="_blank" class="link"
+      >Click here to see an example.</a
+    > A popup will appear asking you to sign in to your Google account. Follow the
+    instructions to authorize this web app to create a new Google Sheet, which will
+    then show up in your Google Drive.
+  </p>
 
   <div class="flex flex-col gap-2">
-    <h3 class="font-semibold">Data to Include</h3>
+    <h3 class="font-semibold">Weather Data</h3>
     <label class="flex items-center gap-2">
       <input type="checkbox" class="checkbox" bind:checked={includeHighTemp} />
       <span>High Temperature</span>
@@ -131,7 +141,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </div>
 
   <div class="flex flex-col gap-2">
-    <h3 class="font-semibold">Gauges to Apply (Conditional Formatting)</h3>
+    <h3 class="font-semibold">Gauges</h3>
     {#if hasTempGauge}
       <label class="flex items-center gap-2">
         <input type="checkbox" class="checkbox" bind:checked={applyTempGauge} />
@@ -166,19 +176,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </div>
 
   <div class="flex flex-col gap-2">
-    <h3 class="font-semibold">Options</h3>
+    <h3 class="font-semibold">Gauge Options</h3>
     <label class="flex items-center gap-2">
       <input type="checkbox" class="checkbox" bind:checked={includeDayCounts} />
-      <span>Include Day Counts & Percentages in Gauge Tabs</span>
+      <span>Show number of days in ranges</span>
     </label>
   </div>
 
-  <div class="mt-4 flex justify-end gap-2">
+  <div class="mt-4 flex justify-center gap-2">
     <button
       class="btn hover:preset-tonal-surface"
       onclick={() => dialog.close()}
       disabled={isExporting}
     >
+      <XIcon />
       Cancel
     </button>
     <button
@@ -188,9 +199,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     >
       {#if isExporting}
         <LoaderCircleIcon class="animate-spin" />
-        Exporting...
+        Creating...
       {:else}
-        Export
+        <FilePlusIcon />
+        Create
       {/if}
     </button>
   </div>
