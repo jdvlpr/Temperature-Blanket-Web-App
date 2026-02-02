@@ -30,7 +30,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div class="my-4 flex flex-wrap justify-center gap-2">
-  <p class="text-sm">
+  <p class="text-surface-700-300 text-sm">
     Real yarn colors will look different than what's on the screen. Any
     trademarked yarn or colorway details are owned by their respective
     companies. Purchases via links with a shopping cart icon <ShoppingCartIcon

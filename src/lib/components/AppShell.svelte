@@ -68,7 +68,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     id="top-navbar"
   >
     <div
-      class="m-auto flex max-w-(--breakpoint-xl) items-center justify-between gap-2 px-2"
+      class="m-auto flex max-w-(--breakpoint-xl) items-center justify-between px-2 max-sm:gap-1 sm:gap-2"
     >
       <div class="lg:hidden">
         <Dialog
@@ -78,17 +78,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
           open={drawerState.appNavigation}
         >
           <Dialog.Trigger
-            class="btn hover:preset-tonal-surface my-2"
+            class="hover:preset-tonal-surface max-sm:btn-icon sm:btn my-2"
             aria-label="Open menu"
           >
             <MenuIcon />
-            <span class="max-[355px]:hidden">
-              {#if pageName}
-                {pageName}
-              {:else}
-                Menu
-              {/if}
-            </span>
+            <span class="max-sm:hidden">{pageName || 'Menu'}</span>
           </Dialog.Trigger>
           <Portal>
             <Dialog.Backdrop

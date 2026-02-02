@@ -20,36 +20,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { DAYS_OF_THE_WEEK, MONTHS } from '$lib/constants';
   import { dialog, locations, project, weather } from '$lib/state';
   import { delay, pluralize } from '$lib/utils';
-  import { BookmarkIcon, ExternalLinkIcon } from '@lucide/svelte';
+  import { BookmarkIcon, ExternalLinkIcon, PlusIcon } from '@lucide/svelte';
   import { onMount } from 'svelte';
   import WeatherGrouping from '../WeatherGrouping.svelte';
   import DownloadExportButton from '../buttons/DownloadExportButton.svelte';
   import SendToGalleryButton from '../buttons/SendToGalleryButton.svelte';
   import WeatherSourceButton from '../buttons/WeatherSourceButton.svelte';
   import SaveProjectModal from './SaveProjectModal.svelte';
-  interface Props {
-    highlight?: string;
-  }
-
-  let { highlight }: Props = $props();
-
-  let weatherSettingsElement: HTMLElement | null = $state(null);
-
-  onMount(async () => {
-    if (highlight === 'weather-settings') {
-      await delay(200);
-      weatherSettingsElement?.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start',
-      });
-    }
-  });
 </script>
 
 <div class="w-full p-4">
   <h2 class="mb-2 text-xl font-bold">Project</h2>
   <div class="my-4 flex w-full flex-col gap-2">
-    <div class="flex flex-wrap gap-2">
+    <div class=" flex flex-wrap gap-2">
       <button
         class="btn bg-primary-50-950 border-primary-500 hover:preset-tonal-primary w-fit border"
         onclick={() => {
@@ -69,7 +52,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         class="btn hover:preset-tonal-surface w-fit"
         title="New Project"
       >
-        <ExternalLinkIcon />
+        <PlusIcon />
         New
       </a>
     </div>
@@ -95,12 +78,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {/if}
   </div>
 
-  <h2
-    class="mt-8 mb-2 scroll-mt-[12px] text-xl font-bold"
-    bind:this={weatherSettingsElement}
-  >
-    Settings
-  </h2>
+  <h2 class="mt-8 mb-2 scroll-mt-[12px] text-xl font-bold">Settings</h2>
 
   <div class="my-4 flex w-full flex-col items-start gap-4">
     <UnitChanger />
@@ -155,8 +133,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <LocalProjects />
 
   <h2 class="mt-8 mb-2 text-xl font-bold">Data Sources</h2>
-  <div class="flex w-full flex-col items-start gap-2 text-sm">
-    <p>
+  <div class=" flex w-full flex-col items-start gap-2 text-sm">
+    <p class="text-surface-700-300">
       Location data is from <a
         href="https://www.geonames.org/"
         target="_blank"

@@ -154,23 +154,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <AppLogo />
     </div>
     <div class="flex flex-1 justify-between gap-2 sm:justify-end">
-      {#if weather.data.length && locations.allValid}
-        <div class="hidden sm:inline-flex">
-          <button
-            class="btn bg-primary-50-950 border-primary-500 hover:preset-tonal-primary border"
-            title="Save your project in this browser and as a URL."
-            onclick={() =>
-              dialog.trigger({
-                type: 'component',
-                component: { ref: SaveProjectModal },
-              })}
-          >
-            <BookmarkIcon />
-            <span class="inline-block max-sm:hidden">Save</span>
-          </button>
-        </div>
-      {/if}
-
       {#if weather.data.length}
         <div class="mx-auto sm:mx-0">
           <button
@@ -308,22 +291,37 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </Portal>
     </Popover>
 
+    {#if weather.data.length && locations.allValid}
+      <div class="hidden sm:inline-flex">
+        <button
+          class="btn bg-primary-50-950 border-primary-500 hover:preset-tonal-primary border"
+          title="Save your project in this browser and as a URL."
+          onclick={() =>
+            dialog.trigger({
+              type: 'component',
+              component: { ref: SaveProjectModal },
+            })}
+        >
+          <BookmarkIcon />
+          <span class="inline-block max-sm:hidden">Save</span>
+        </button>
+      </div>
+    {/if}
+
     <button
       aria-label="Project Options"
       title="Project Options"
-      class="max-sm:btn-icon sm:btn hover:preset-tonal-surface"
+      class="btn hover:preset-tonal-surface gap-1"
       onclick={() =>
         dialog.trigger({
           type: 'component',
           component: {
             ref: Menu,
-            props: { page: 'main' },
           },
-          options: { showCloseButton: true },
         })}
     >
       <EllipsisVerticalIcon />
-      <span class="hidden sm:inline-block">Project</span>
+      <span class="">Project</span>
     </button>
   {/snippet}
 

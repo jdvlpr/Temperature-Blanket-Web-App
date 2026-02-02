@@ -150,13 +150,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
     <Popover>
       <Popover.Trigger
-        class="btn hover:preset-tonal-surface"
+        class="btn hover:preset-tonal-surface "
         aria-label="View Options"
         title="View Options"
       >
         <LayoutPanelTopIcon />
-        View
-        <ChevronDownIcon size={20} />
+        <span class="flex items-center gap-1">
+          View
+          <ChevronDownIcon size={18} />
+        </span>
       </Popover.Trigger>
       <Portal>
         <Popover.Positioner>

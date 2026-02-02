@@ -111,7 +111,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div class="flex flex-col gap-4 p-4">
-  <h2 class="text-xl font-bold">Create Google Sheet</h2>
+  <h2 class="h2">Create Google Sheet</h2>
 
   <div class="flex flex-col gap-2">
     <h3 class="font-semibold">Weather Data</h3>
@@ -201,7 +201,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/if}
 
   <p class="text-sm italic">
-    A new Google Sheet will be created in your Google Drive.
+    A new Google Sheet will be saved to your Google Drive.
   </p>
 
   <div class="flex justify-center gap-2">
