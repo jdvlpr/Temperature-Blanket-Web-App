@@ -1,9 +1,9 @@
 <script lang="ts">
   import { ALL_YARN_WEIGHTS } from '$lib/constants';
+  import { brands } from '$lib/data/yarns/brands';
   import type { YarnWeight } from '$lib/types';
   import { pluralize } from '$lib/utils';
-  import { brands } from '$lib/data/yarns/brands';
-  import { CircleHelpIcon, WeightIcon } from '@lucide/svelte';
+  import { CircleQuestionMarkIcon, WeightIcon } from '@lucide/svelte';
 
   interface Props {
     selectedBrandId?: string;
@@ -55,28 +55,33 @@
   });
 </script>
 
-<label class="label text-left">
-  <span class="flex items-center gap-1">
-    <WeightIcon class="size-4" />
-    <span>Yarn Weight</span>
-    <a
+<label class="label">
+  <span class="label-text flex items-start gap-1"
+    >Yarn Weight <a
       aria-label="See the yarn weights chart"
       href="/blog/yarn-weights{selectedYarnWeightId
         ? `?highlight=${ALL_YARN_WEIGHTS.find((n) => n.id === selectedYarnWeightId)?.name}`
         : ''}"
-      class="link top-1"
+      class="link"
       target="_blank"
       title="See the yarn weights chart"
     >
-      <CircleHelpIcon class="size-4" /></a
+      <CircleQuestionMarkIcon class="size-4" /></a
+    ></span
+  >
+  <div class="relative flex items-center">
+    <WeightIcon class="absolute left-2" />
+    <select
+      class="select truncate pl-10"
+      bind:value={selectedYarnWeightId}
+      {onchange}
     >
-  </span>
-  <select class="select" bind:value={selectedYarnWeightId} {onchange}>
-    <option value="">All</option>
-    {#each yarnWeights as { name, id, numberOfYarns }}
-      <option value={id}
-        >{name} ({numberOfYarns} {pluralize('yarn', numberOfYarns)})</option
-      >
-    {/each}
-  </select>
+      <option value="">All</option>
+      {#each yarnWeights as { name, id, numberOfYarns }}
+        <option value={id}
+          >{name} ({numberOfYarns} {pluralize('yarn', numberOfYarns)})</option
+        >
+      {/each}
+    </select>
+  </div>
 </label>

@@ -189,8 +189,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
             {pluralize('week', weather.groupedByWeek.length)}.
           {/if}
         </p>
-        <label class="label mx-auto flex flex-col">
-          <span>Weeks Start On</span>
+        <label class="label mx-auto">
+          <span class="label-text">Weeks Start On</span>
           <select
             class="select mx-auto w-fit"
             bind:value={weather.monthGroupingStartDay}

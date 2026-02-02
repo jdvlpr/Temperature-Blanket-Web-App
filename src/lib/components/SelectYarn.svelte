@@ -18,7 +18,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { defaultYarn } from '$lib/state';
   import { delay, pluralize, stringToBrandAndYarnDetails } from '$lib/utils';
   import { brands } from '$lib/data/yarns/brands';
-  import { ChevronDownIcon, ListFilterIcon, XIcon } from '@lucide/svelte';
+  import {
+    ChevronDownIcon,
+    ListFilterIcon,
+    SpoolIcon,
+    TagsIcon,
+    XIcon,
+  } from '@lucide/svelte';
   import autocomplete from 'autocompleter';
   import { onMount, untrack } from 'svelte';
 
@@ -322,108 +328,106 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div
-  class="flex w-full flex-col justify-start gap-1 md:col-span-2"
+  class="label flex w-full flex-col justify-start md:col-span-2"
   bind:this={inputGroup}
 >
-  <span class="flex items-center gap-1">
-    <ListFilterIcon class="size-4" />
-    Yarn Name
-  </span>
+  <span class="label-text"> Yarn Name </span>
 
-  <div class="flex flex-wrap items-center justify-center gap-1">
-    <div class="input-group w-full grid-cols-[1fr_auto_auto]">
-      <input
-        bind:this={inputElement}
-        class="ig-input truncate"
-        {disabled}
-        id="input-select-yarn"
-        type="text"
-        name="yarn-filter-search"
-        autocomplete="off"
-        onfocus={async () => {
-          showingAutocomplete = true;
+  <div class="input-group w-full grid-cols-[auto_1fr_auto_auto]">
+    <span class="ig-cell">
+      <SpoolIcon />
+    </span>
+    <input
+      bind:this={inputElement}
+      class="ig-input truncate"
+      {disabled}
+      id="input-select-yarn"
+      type="text"
+      name="yarn-filter-search"
+      autocomplete="off"
+      onfocus={async () => {
+        showingAutocomplete = true;
 
-          if (selectedBrandId && selectedYarnId) {
-            await delay(100);
-            const element = document.querySelector(
-              `[data-id="${selectedBrandId}-${selectedYarnId}"]`,
-            );
-            if (element) {
-              const topPos = element.offsetTop;
-              element.classList.add('selected');
-              element.setAttribute('aria-selected', 'true');
-              setTimeout(function () {
-                document.getElementsByClassName('autocomplete')[0].scrollTo({
-                  top: topPos,
-                  behavior: 'smooth',
-                });
-              }, 10);
-            }
-          } else if (selectedBrandId) {
-            await delay(100);
-            const element = document.querySelector(
-              `[data-id="${selectedBrandId}"]`,
-            );
-            if (element) {
-              const topPos = element.offsetTop;
-              setTimeout(function () {
-                document.getElementsByClassName('autocomplete')[0].scrollTo({
-                  top: topPos,
-                  behavior: 'smooth',
-                });
-              }, 10);
-            }
-            if (inputValue.includes('(')) {
-              inputValue = inputValue.split('(')?.[0]?.trim() || inputValue;
-            }
+        if (selectedBrandId && selectedYarnId) {
+          await delay(100);
+          const element = document.querySelector(
+            `[data-id="${selectedBrandId}-${selectedYarnId}"]`,
+          );
+          if (element) {
+            const topPos = element.offsetTop;
+            element.classList.add('selected');
+            element.setAttribute('aria-selected', 'true');
+            setTimeout(function () {
+              document.getElementsByClassName('autocomplete')[0].scrollTo({
+                top: topPos,
+                behavior: 'smooth',
+              });
+            }, 10);
           }
+        } else if (selectedBrandId) {
+          await delay(100);
+          const element = document.querySelector(
+            `[data-id="${selectedBrandId}"]`,
+          );
+          if (element) {
+            const topPos = element.offsetTop;
+            setTimeout(function () {
+              document.getElementsByClassName('autocomplete')[0].scrollTo({
+                top: topPos,
+                behavior: 'smooth',
+              });
+            }, 10);
+          }
+          if (inputValue.includes('(')) {
+            inputValue = inputValue.split('(')?.[0]?.trim() || inputValue;
+          }
+        }
+      }}
+      onblur={() => (showingAutocomplete = false)}
+      bind:value={inputValue}
+      placeholder="{allYarns.length} {pluralize(
+        'Yarn',
+        allYarns.length,
+      )} ({allYarns
+        .reduce((a, b) => {
+          return a + b.meta.numberOfColorways;
+        }, 0)
+        .toLocaleString()} colorways)"
+    />
+    {#if !showingAutocomplete}
+      <button
+        aria-label="Show All Yarns"
+        {disabled}
+        class="ig-btn hover:preset-tonal-surface"
+        onclick={() => {
+          forceDisplayAll = true;
+          inputElement.focus();
         }}
-        onblur={() => (showingAutocomplete = false)}
-        bind:value={inputValue}
-        placeholder="{allYarns.length} {pluralize(
-          'Yarn',
-          allYarns.length,
-        )} ({allYarns
-          .reduce((a, b) => {
-            return a + b.meta.numberOfColorways;
-          }, 0)
-          .toLocaleString()} colorways)"
-      />
-      {#if !showingAutocomplete}
-        <button
-          aria-label="Show All Yarns"
-          {disabled}
-          class="ig-btn hover:preset-tonal-surface"
-          onclick={() => {
-            forceDisplayAll = true;
-            inputElement.focus();
-          }}
-        >
-          <ChevronDownIcon />
-        </button>
-      {/if}
-      {#if inputValue.length || showingAutocomplete}
-        <button
-          aria-label="Clear"
-          {disabled}
-          class="ig-btn hover:preset-tonal-surface"
-          onclick={async () => {
-            inputValue = '';
-            selectedBrandId = '';
-            selectedYarnId = '';
-            await delay(10);
-            if (!inputValue.length) showingAutocomplete = false;
-            document.getElementById('input-select-yarn')?.focus();
-            onselectautocomplete({
-              selectedBrandId,
-              selectedYarnId,
-            });
-          }}
-        >
-          <XIcon />
-        </button>
-      {/if}
-    </div>
+      >
+        <ChevronDownIcon />
+      </button>
+    {/if}
+    {#if inputValue.length || showingAutocomplete}
+      <button
+        aria-label="Clear"
+        {disabled}
+        class="ig-btn hover:preset-tonal-surface"
+        onclick={async () => {
+          inputValue = '';
+          selectedBrandId = '';
+          selectedYarnId = '';
+          await delay(10);
+          if (!inputValue.length) showingAutocomplete = false;
+          document.getElementById('input-select-yarn')?.focus();
+          onselectautocomplete({
+            selectedBrandId,
+            selectedYarnId,
+          });
+        }}
+      >
+        <XIcon />
+      </button>
+    {/if}
   </div>
   <div bind:this={autocompleteContainer} class="text-left"></div>
 </div>

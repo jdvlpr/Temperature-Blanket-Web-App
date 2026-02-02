@@ -29,11 +29,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import {
     ArrowUpDownIcon,
     ChevronRightIcon,
-    SearchIcon,
+    EarthIcon,
+    Grid2X2Icon,
+    Grid3x3,
+    GridIcon,
     XIcon,
   } from '@lucide/svelte';
   import { onMount } from 'svelte';
   import { galleryState } from './state.svelte';
+  import Grid_2x2 from '@lucide/svelte/icons/grid-2x2';
 
   let first = 40;
   let loading = $state(true);
@@ -145,11 +149,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <div class="inline-grid gap-2 text-center">
     <div class="my-2">
       <h2 class="h2 text-gradient">Featured Projects</h2>
-      <label>
-        <span>Popular during the past</span>
+      <label class="label">
+        <span class="label-text text-center">Popular during the past</span>
         <select
           bind:value={galleryState.timePeriod}
-          class="select mx-auto w-fit min-w-[90px]"
+          class="select mx-auto w-fit min-w-[100px]"
           onchange={() => {
             galleryState.popularProjects = [];
             fetchPopularProjectsWrapper();
@@ -241,14 +245,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </div>
         {/if}
 
-        <div
-          class="col-span-12 flex flex-col justify-start gap-1 md:col-span-5"
-        >
-          <span class="flex items-center gap-1">
-            <SearchIcon class="size-4" />
-            Search Projects
-          </span>
-          <div class="input-group grid-cols-[1fr_auto]">
+        <div class="label col-span-12 md:col-span-5">
+          <span class="label-text">Search Projects</span>
+          <div class="input-group grid-cols-[auto_1fr_auto]">
+            <span class="ig-cell"><EarthIcon /></span>
             <input
               disabled={loading}
               type="text"
@@ -274,50 +274,38 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </div>
 
         <label class="label col-span-6 w-full md:col-span-3">
-          <span class="flex items-center">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-              class="mr-1 h-4 w-4"
+          <span class="label-text"> Pattern Type </span>
+          <div class="relative flex items-center">
+            <Grid3x3 class="pointer-events-none absolute left-2" />
+            <select
+              disabled={loading}
+              class="select truncate pl-10"
+              id="select-gallery-pattern-type"
+              bind:value={galleryState.filteredPatternType}
             >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z"
-              />
-            </svg>
-            Pattern Type
-          </span>
-          <select
-            disabled={loading}
-            class="select truncate"
-            id="select-gallery-pattern-type"
-            bind:value={galleryState.filteredPatternType}
-          >
-            <option value="">Any Pattern</option>
-            {#each previews.all as { name, wpTagSlug }}
-              <option value={wpTagSlug}>{name}</option>
-            {/each}
-          </select>
+              <option value="">Any Pattern</option>
+              {#each previews.all as { name, wpTagSlug }}
+                <option value={wpTagSlug}>{name}</option>
+              {/each}
+            </select>
+          </div>
         </label>
 
         <label class="label col-span-6 w-full md:col-span-3">
-          <span class="flex items-center gap-1">
-            <ArrowUpDownIcon class="size-4" />
-            Order By
-          </span>
-          <select
-            class="select truncate"
-            bind:value={galleryState.orderBy}
-            disabled={loading}
-          >
-            <option value="DESC" selected>Newest First</option>
-            <option value="ASC">Oldest First</option>
-          </select>
-        </label>
+          <span class="label-text"> Order By </span>
+          <div class="relative flex items-center">
+            <ArrowUpDownIcon class="pointer-events-none absolute left-2" />
+            <select
+              class="select truncate pl-10"
+              bind:value={galleryState.orderBy}
+              disabled={loading}
+            >
+              <option value="DESC" selected>Newest First</option>
+              <option value="ASC">Oldest First</option>
+            </select>
+            <div class="relative flex items-center"></div>
+          </div></label
+        >
 
         <div
           class="col-span-12 flex justify-center {galleryState.filteredBrandId ||

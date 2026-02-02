@@ -125,8 +125,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div class="flex flex-wrap items-end justify-center gap-2 pb-4 text-center">
-  <label class="label text-sm">
-    <span>Popular during the past</span>
+  <label class="label">
+    <span class="label-text">Popular during the past</span>
     <select
       class="select mx-auto w-fit min-w-[90px]"
       id="select-time-period"

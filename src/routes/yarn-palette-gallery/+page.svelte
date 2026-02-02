@@ -60,6 +60,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import {
     ArrowUpDownIcon,
     ChevronRightIcon,
+    EarthIcon,
     PlusIcon,
     SearchIcon,
     XIcon,
@@ -234,8 +235,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <div class="inline-grid gap-2 text-center">
           <div class="my-2">
             <h2 class="h2 text-gradient">Featured Yarn Palettes</h2>
-            <label>
-              <span>From popular projects during the past</span>
+            <label class="label">
+              <span class="label-text text-center"
+                >From popular projects during the past</span
+              >
               <select
                 bind:value={yarnPaletteGalleryState.timePeriod}
                 class="select mx-auto w-fit min-w-[90px]"
@@ -315,17 +318,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 </div>
               {/if}
 
-              <div
-                class="col-span-12 flex w-full flex-col justify-start gap-1 md:col-span-3"
-              >
-                <span class="flex items-center gap-1">
-                  <SearchIcon class="size-4" />
-                  Search Projects
-                </span>
-                <div class="input-group grid-cols-[1fr_auto]">
+              <div class="label col-span-12 w-full md:col-span-3">
+                <span class="label-text"> Search Projects </span>
+                <div class="input-group grid-cols-[auto_1fr_auto]">
+                  <span class="ig-cell"><EarthIcon /></span>
                   <input
                     type="text"
-                    class="ig-input w-full truncate"
+                    class="ig-input truncate"
                     autocomplete="off"
                     placeholder="e.g., Kansas, 2003"
                     disabled={loading}
@@ -348,18 +347,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
               </div>
 
               <label class="label col-span-6 w-full md:col-span-2">
-                <span class="flex items-center gap-1">
-                  <ArrowUpDownIcon class="size-4" />
-                  Order By
-                </span>
-                <select
-                  class="select w-full truncate"
-                  bind:value={yarnPaletteGalleryState.orderBy}
-                  disabled={loading}
-                >
-                  <option value="DESC" selected>Newest First</option>
-                  <option value="ASC">Oldest First</option>
-                </select>
+                <span class="label-text"> Order By </span>
+                <div class="relative flex items-center">
+                  <ArrowUpDownIcon
+                    class="pointer-events-none absolute left-2"
+                  />
+                  <select
+                    class="select w-full truncate pl-10"
+                    bind:value={yarnPaletteGalleryState.orderBy}
+                    disabled={loading}
+                  >
+                    <option value="DESC" selected>Newest First</option>
+                    <option value="ASC">Oldest First</option>
+                  </select>
+                </div>
               </label>
 
               <div

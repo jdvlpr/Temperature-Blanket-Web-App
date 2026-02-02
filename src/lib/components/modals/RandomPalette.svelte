@@ -188,27 +188,27 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
 
     <label class="label order-6 col-span-full w-full sm:col-span-4">
-      <span class="flex items-center gap-1">
-        <ArrowDownWideNarrowIcon class="size-4" />
-        <span>Sort By</span>
-      </span>
-      <select
-        class="select truncate"
-        id="sort-colors-by"
-        bind:value={sortColors}
-        onchange={() => {
-          randomPalette = getSortedPalette({
-            palette: randomPalette,
-            sortColors,
-          });
-        }}
-      >
-        <option value="none">None</option>
-        <option value="light-to-dark">Lightest to Darkest</option>
-        <option value="dark-to-light">Darkest to Lightest</option>
-        <option value="name">Name A-Z</option>
-        <option value="name-z-to-a">Name Z-A</option>
-      </select>
+      <span class="label-text"> Sort By</span>
+      <div class="relative flex items-center">
+        <ArrowDownWideNarrowIcon class="absolute left-2" />
+        <select
+          class="select truncate pl-10"
+          id="sort-colors-by"
+          bind:value={sortColors}
+          onchange={() => {
+            randomPalette = getSortedPalette({
+              palette: randomPalette,
+              sortColors,
+            });
+          }}
+        >
+          <option value="none">None</option>
+          <option value="light-to-dark">Lightest to Darkest</option>
+          <option value="dark-to-light">Darkest to Lightest</option>
+          <option value="name">Name A-Z</option>
+          <option value="name-z-to-a">Name Z-A</option>
+        </select>
+      </div>
     </label>
 
     <button

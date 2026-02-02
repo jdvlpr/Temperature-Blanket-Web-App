@@ -25,7 +25,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <label class="label flex w-24 flex-col items-start">
-  <span class="text-sm">Rows Per Page</span>
+  <span class="label-text">Rows Per Page</span>
   <select
     class="select"
     value={table.rowsPerPage}

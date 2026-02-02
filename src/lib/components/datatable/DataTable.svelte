@@ -125,7 +125,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </button>
 
           <label class="label flex w-20 flex-col items-start">
-            <span class="text-sm">Page</span>
+            <span class="label-text">Page</span>
             <select
               class="select mx-auto w-fit min-w-[60px]"
               id="datatable-page"

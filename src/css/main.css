@@ -17,6 +17,19 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* To avoid a breaking style issue in Windows-based browsers, it’s recommended you include this temporary fix into your global stylesheet. Please note this change will be automatically and permanently applied for you in Skeleton v5+. 
+https://www.skeleton.dev/docs/svelte/tailwind-components/forms#windows-bugfix 
+*/
+/* 
+.select,
+.input,
+.textarea,
+.ig-input,
+.ig-select {
+  background-color: var(--color-surface-50-950);
+  color: var(--color-surface-950-50);
+} */
+
 /* Define variables for weather parameters */
 :root {
   --tmin: #38bdf8;

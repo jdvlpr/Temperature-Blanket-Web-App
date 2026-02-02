@@ -34,30 +34,30 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <div class="mt-6 flex w-full flex-col items-center gap-2 sm:mt-4">
     <div class="flex flex-wrap items-end justify-center gap-2">
       <label class="label">
-        <span class="flex items-center gap-1">
-          <ArrowDownWideNarrow class="size-4" />
-          <span>Sort By</span>
-        </span>
-        <select
-          class="select truncate"
-          id="sort-colors-by"
-          bind:value={sortColors}
-          onchange={() => {
-            colors = getSortedPalette({
-              palette: $state.snapshot(colors),
-              sortColors,
-            });
-            key = !key;
-          }}
-        >
-          <option value="custom">Custom</option>
-          <option value="light-to-dark">Lightest to Darkest</option>
-          <option value="dark-to-light">Darkest to Lightest</option>
-          {#if allColorsHaveNames}
-            <option value="name">Name A-Z</option>
-            <option value="name-z-to-a">Name Z-A</option>
-          {/if}
-        </select>
+        <span class="label-text">Sort By</span>
+        <div class="relative flex items-center">
+          <ArrowDownWideNarrow class="absolute left-2" />
+          <select
+            class="select truncate pl-10"
+            id="sort-colors-by"
+            bind:value={sortColors}
+            onchange={() => {
+              colors = getSortedPalette({
+                palette: $state.snapshot(colors),
+                sortColors,
+              });
+              key = !key;
+            }}
+          >
+            <option value="custom">Custom</option>
+            <option value="light-to-dark">Lightest to Darkest</option>
+            <option value="dark-to-light">Darkest to Lightest</option>
+            {#if allColorsHaveNames}
+              <option value="name">Name A-Z</option>
+              <option value="name-z-to-a">Name Z-A</option>
+            {/if}
+          </select>
+        </div>
       </label>
 
       <button

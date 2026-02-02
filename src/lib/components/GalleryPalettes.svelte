@@ -52,6 +52,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import {
     ArrowUpDownIcon,
     ChevronRightIcon,
+    EarthIcon,
     PlusIcon,
     SearchIcon,
     XIcon,
@@ -142,14 +143,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </div>
       {/if}
 
-      <div
-        class="col-span-12 flex w-full flex-col justify-start gap-1 md:col-span-3"
-      >
-        <span class="flex items-center gap-1">
-          <SearchIcon class="size-4" />
-          Search Projects
-        </span>
-        <div class="input-group grid-cols-[1fr_auto]">
+      <div class="col-span-12 flex w-full flex-col justify-start md:col-span-3">
+        <span class="label-text text-left"> Search Projects </span>
+        <div class="input-group grid-cols-[auto_1fr_auto]">
+          <span class="ig-cell">
+            <EarthIcon />
+          </span>
           <input
             type="text"
             class="ig-input w-full truncate"
@@ -175,18 +174,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </div>
 
       <label class="label col-span-6 w-full md:col-span-2">
-        <span class="flex items-center gap-1">
-          <ArrowUpDownIcon class="size-4" />
-          Order By
-        </span>
-        <select
-          class="select truncate"
-          bind:value={galleryPalettesState.orderBy}
-          disabled={loading}
-        >
-          <option value="DESC" selected>Newest First</option>
-          <option value="ASC">Oldest First</option>
-        </select>
+        <span class="label-text flex items-center"> Order By </span>
+        <div class="relative flex items-center">
+          <ArrowUpDownIcon class="absolute left-2" />
+          <select
+            class="select truncate pl-10"
+            bind:value={galleryPalettesState.orderBy}
+            disabled={loading}
+          >
+            <option value="DESC" selected>Newest First</option>
+            <option value="ASC">Oldest First</option>
+          </select>
+        </div>
       </label>
 
       <div

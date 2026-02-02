@@ -57,19 +57,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
   class="flex scroll-mt-[70px] flex-wrap items-end justify-center gap-4 px-2 pb-4 text-center"
 >
   <label class="label">
-    <span class="flex items-center gap-2">
-      <PaletteIcon class="size-4" />
-      Color Scheme
-    </span>
-    <select
-      class="select truncate"
-      id="select-sort-by"
-      bind:value={currentScheme}
-    >
-      {#each schemes as scheme}
-        <option value={scheme}>{scheme}</option>
-      {/each}
-    </select>
+    <span class="label-text flex items-center gap-1"> Color Scheme </span>
+    <div class="relative flex items-center">
+      <PaletteIcon class="absolute left-2" />
+      <select
+        class="select truncate pl-10"
+        id="select-sort-by"
+        bind:value={currentScheme}
+      >
+        {#each schemes as scheme}
+          <option value={scheme}>{scheme}</option>
+        {/each}
+      </select>
+    </div>
   </label>
 
   <SelectNumberOfColors bind:numberOfColors />

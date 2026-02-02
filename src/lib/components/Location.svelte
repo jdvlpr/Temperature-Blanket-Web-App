@@ -344,8 +344,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
   {/if}
   <div class="grid grid-cols-1 gap-4">
-    <div class="flex w-full flex-col gap-1 text-left">
-      <p>
+    <label class="label">
+      <p class="label-text">
         {#if showSelectLocationLabelMessage}
           <span class="text-error-900-100">Choose a result</span>
         {:else if locations.all.length > 1 && location?.label}
@@ -510,7 +510,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           Details
         </button>
       {/if}
-    </div>
+    </label>
 
     <div
       class="grid w-full grid-cols-12 items-start justify-between gap-4 text-left"
@@ -520,7 +520,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           class="col-span-12 grid grid-cols-3 items-center justify-between gap-4 sm:col-span-6"
         >
           <label class="label">
-            <span> Year </span>
+            <span class="label-text"> Year </span>
             <select
               class="select"
               bind:value={year}
@@ -538,7 +538,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </label>
 
           <label class="label">
-            <span>Month</span>
+            <span class="label-text">Month</span>
             <select
               class="select"
               bind:value={month}
@@ -556,7 +556,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </label>
 
           <label class="label">
-            <span>Day</span>
+            <span class="label-text">Day</span>
             <select
               class="select"
               bind:value={day}
@@ -576,8 +576,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <div
           class="col-span-12 grid grid-cols-2 items-center justify-between gap-4 sm:col-span-6"
         >
-          <label for="datepicker-from-{location.uuid}" class="">
-            <span>From</span>
+          <label for="datepicker-from-{location.uuid}" class="label">
+            <span class="label-text">From</span>
             <input
               type="date"
               class="input"
@@ -591,8 +591,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
               disabled={project.status.loading || weather.isUserEdited}
             />
           </label>
-          <label for="datepicker-to-{location.uuid}" class="">
-            <span>To</span>
+          <label for="datepicker-to-{location.uuid}" class="label">
+            <span class="label-text">To</span>
             <input
               type="date"
               class="input"
@@ -611,7 +611,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {/if}
 
       <label class="label col-span-8 w-full sm:col-span-4 sm:col-start-9">
-        <span>Duration</span>
+        <span class="label-text">Duration</span>
         <select
           class="select w-full"
           bind:value={location.duration}
@@ -665,7 +665,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <p
           class="text-warning-800-200 rounded-container my-2 w-full p-2 text-sm"
         >
-          <TriangleAlertIcon class="relative -top-[1px] inline size-4" />
+          <TriangleAlertIcon class="relative -top-px inline size-4" />
           {location.errorMessage}
         </p>
       {:else if project.status.loading}

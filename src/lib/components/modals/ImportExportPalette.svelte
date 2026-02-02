@@ -169,25 +169,27 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </div>
 
   {#if segmentValue === 'import'}
-    <label for="palette-code" class="text-small"
-      >Enter HTML colors, a palette code, or a project URL</label
-    >
-    <textarea
-      bind:this={textAreaInputElement}
-      id="palette-code"
-      class="textarea select-all"
-      placeholder="e.g. red, FFA500, #ADD8E6"
-      bind:value={inputValue}
-      onkeyup={triggerChange}
-      onchange={triggerChange}
-      onpaste={(e) => {
-        if (e.cancelable) e.preventDefault();
-        const _tempInputValue = e.clipboardData?.getData('text');
-        inputValue = _tempInputValue || '';
-        triggerChange();
-        // textAreaInputElement.blur();
-      }}
-    ></textarea>
+    <label for="palette-code" class="label">
+      <span class="label-text"
+        >Enter HTML colors, a palette code, or a project URL</span
+      >
+      <textarea
+        bind:this={textAreaInputElement}
+        id="palette-code"
+        class="textarea select-all"
+        placeholder="e.g. red, FFA500, #ADD8E6"
+        bind:value={inputValue}
+        onkeyup={triggerChange}
+        onchange={triggerChange}
+        onpaste={(e) => {
+          if (e.cancelable) e.preventDefault();
+          const _tempInputValue = e.clipboardData?.getData('text');
+          inputValue = _tempInputValue || '';
+          triggerChange();
+          // textAreaInputElement.blur();
+        }}
+      ></textarea>
+    </label>
 
     <div class="my-2 flex flex-col gap-2 text-left">
       <div class="m-auto">

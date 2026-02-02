@@ -67,6 +67,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     PlusIcon,
     SearchIcon,
     ShoppingCartIcon,
+    XIcon,
   } from '@lucide/svelte';
   import { Accordion } from '@skeletonlabs/skeleton-svelte';
   import chroma from 'chroma-js';
@@ -415,87 +416,55 @@ If not, see <https://www.gnu.org/licenses/>. -->
               bind:this={filtersContainer}
               class="my-2 grid w-full scroll-mt-[66px] grid-cols-12 items-end justify-between gap-4"
             >
-              <div
-                class="col-span-full flex w-full flex-col justify-start gap-1"
-              >
-                <span class="flex items-center gap-1"
-                  ><svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke-width="1.5"
-                    stroke="currentColor"
-                    class="h-4 w-4"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
-                    />
-                  </svg>
-                  Search by Color</span
-                >
-                <div class="flex flex-wrap items-center justify-center gap-1">
-                  <div class="input-group w-full grid-cols-[auto_1fr_auto]">
-                    <input
-                      type="color"
-                      class="input ig-cell m-2 rounded-full! p-0"
-                      bind:this={yarnColorwayFinderState.inputTypeColorElement}
-                      onchange={(e) => {
-                        inputTypeColorOnChange({
-                          value: e.target.value,
-                        });
+              <div class="label col-span-full w-full">
+                <span class="label-text"> Search by Color</span>
+                <div class="input-group w-full grid-cols-[auto_1fr_auto]">
+                  <input
+                    type="color"
+                    class="input ig-cell m-2 rounded-full! p-0"
+                    bind:this={yarnColorwayFinderState.inputTypeColorElement}
+                    onchange={(e) => {
+                      inputTypeColorOnChange({
+                        value: e.target.value,
+                      });
+                    }}
+                  />
+                  <input
+                    type="text"
+                    class="ig-input"
+                    placeholder="e.g., pink, #c3f4d2"
+                    style="background:{yarnColorwayFinderState.hex ||
+                      'none'} !important;color:{getTextColor(
+                      yarnColorwayFinderState.hex,
+                    )}"
+                    value={yarnColorwayFinderState.inputTypeTextValue}
+                    onkeyup={(e) =>
+                      inputTypeTextOnChange({
+                        value: e.target.value,
+                      })}
+                    onpaste={(e) => {
+                      if (e.cancelable) e.preventDefault();
+                      const _tempInputValue =
+                        e.clipboardData?.getData('text') || '';
+                      inputTypeColorOnChange({
+                        value: _tempInputValue,
+                      });
+                    }}
+                  />
+                  {#if (!!yarnColorwayFinderState.hex || !!yarnColorwayFinderState.inputTypeTextValue) && !!yarnColorwayFinderState.inputTypeColorElement?.value}
+                    <button
+                      aria-label="Clear Color"
+                      class="ig-btn"
+                      onclick={() => {
+                        yarnColorwayFinderState.hex = '';
+                        yarnColorwayFinderState.inputTypeTextValue = '';
+                        if (browser)
+                          yarnColorwayFinderState.inputTypeColorElement.value =
+                            '#000000';
                       }}
-                    />
-                    <input
-                      type="text"
-                      placeholder="e.g., pink, #c3f4d2"
-                      style="background:{yarnColorwayFinderState.hex ||
-                        'none'} !important;color:{getTextColor(
-                        yarnColorwayFinderState.hex,
-                      )}"
-                      value={yarnColorwayFinderState.inputTypeTextValue}
-                      onkeyup={(e) =>
-                        inputTypeTextOnChange({
-                          value: e.target.value,
-                        })}
-                      onpaste={(e) => {
-                        if (e.cancelable) e.preventDefault();
-                        const _tempInputValue =
-                          e.clipboardData?.getData('text') || '';
-                        inputTypeColorOnChange({
-                          value: _tempInputValue,
-                        });
-                      }}
-                    />
-                    {#if (!!yarnColorwayFinderState.hex || !!yarnColorwayFinderState.inputTypeTextValue) && !!yarnColorwayFinderState.inputTypeColorElement?.value}
-                      <button
-                        aria-label="Clear Color"
-                        class="p-2"
-                        onclick={() => {
-                          yarnColorwayFinderState.hex = '';
-                          yarnColorwayFinderState.inputTypeTextValue = '';
-                          if (browser)
-                            yarnColorwayFinderState.inputTypeColorElement.value =
-                              '#000000';
-                        }}
-                        ><svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke-width="1.5"
-                          stroke="currentColor"
-                          class="size-5"
-                        >
-                          <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            d="M6 18L18 6M6 6l12 12"
-                          />
-                        </svg>
-                      </button>
-                    {/if}
-                  </div>
+                      ><XIcon />
+                    </button>
+                  {/if}
                 </div>
               </div>
 
@@ -532,20 +501,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
               {/key}
 
               <div
-                class="col-span-12 flex w-full flex-col justify-start gap-1 md:col-span-3"
+                class="col-span-12 flex w-full flex-col justify-start gap-1 md:col-span-4"
               >
-                <span class="flex items-center gap-1">
-                  <SearchIcon class="size-4" />
-                  <span>Colorway Name</span>
-                </span>
-                <div class="flex flex-wrap items-center justify-center gap-1">
-                  <div class="input-group w-full grid-cols-[1fr_auto]">
+                <div class="label">
+                  <span class="label-text"> Colorway Name </span>
+                  <div class="input-group w-full grid-cols-[auto_1fr_auto]">
+                    <span class="ig-cell"><SearchIcon /></span>
                     <input
                       id="yarn-select-search-input"
                       autocomplete="off"
                       placeholder="e.g., Wisteria, Cream"
                       type="text"
-                      class="ig-input w-full"
+                      class="ig-input truncate"
                       bind:value={yarnColorwayFinderState.search}
                       oninput={() => {
                         itemsToShow = YARN_COLORWAYS_PER_PAGE;
@@ -579,22 +546,25 @@ If not, see <https://www.gnu.org/licenses/>. -->
               </div>
 
               <label class="label col-span-8 w-full md:col-span-3">
-                <span class="flex items-center gap-1">
-                  <ArrowDownWideNarrowIcon class="size-4" />
-                  <span>Sort By</span>
-                </span>
-                <select
-                  class="select"
-                  id="sort-colors-by"
-                  bind:value={yarnColorwayFinderState.sortColors}
-                  disabled={gettingResults}
-                >
-                  <option value="default">Default</option>
-                  <option value="light-to-dark">Lightest to Darkest</option>
-                  <option value="dark-to-light">Darkest to Lightest</option>
-                  <option value="name">Name A-Z</option>
-                  <option value="name-z-to-a">Name Z-A</option>
-                </select>
+                <span class="label-text">Sort By</span>
+
+                <div class="relative flex items-center">
+                  <ArrowDownWideNarrowIcon
+                    class="pointer-events-none absolute left-2"
+                  />
+                  <select
+                    class="select truncate pl-10"
+                    id="sort-colors-by"
+                    bind:value={yarnColorwayFinderState.sortColors}
+                    disabled={gettingResults}
+                  >
+                    <option value="default">Default</option>
+                    <option value="light-to-dark">Lightest to Darkest</option>
+                    <option value="dark-to-light">Darkest to Lightest</option>
+                    <option value="name">Name A-Z</option>
+                    <option value="name-z-to-a">Name Z-A</option>
+                  </select>
+                </div>
               </label>
             </div>
 

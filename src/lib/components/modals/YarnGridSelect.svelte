@@ -343,45 +343,47 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/key}
 
   <div
-    class="tex-left order-4 col-span-full flex w-full flex-col items-start gap-1 md:col-span-5"
+    class="label order-4 col-span-full flex w-full flex-col items-start md:col-span-5"
   >
-    <label for="yarn-select-search-input" class="label flex items-center gap-1">
-      <SearchIcon class="size-4" />
-      <span>Colorway Name</span>
-    </label>
-    <input
-      id="yarn-select-search-input"
-      autocomplete="off"
-      placeholder="e.g., Wisteria, Cream"
-      type="text"
-      class="input w-full"
-      bind:value={search}
-      oninput={() => {
-        itemsToShow = YARN_COLORWAYS_PER_PAGE;
-      }}
-    />
+    <p class="label-text">Colorway Name</p>
+    <div class="input-group grid-cols-[auto_1fr]">
+      <div class="ig-cell">
+        <SearchIcon />
+      </div>
+      <input
+        id="yarn-select-search-input"
+        autocomplete="off"
+        placeholder="e.g., Wisteria, Cream"
+        type="text"
+        class="ig-input"
+        bind:value={search}
+        oninput={() => {
+          itemsToShow = YARN_COLORWAYS_PER_PAGE;
+        }}
+      />
+    </div>
   </div>
 
   <label class="label order-5 col-span-8 w-full md:col-span-3 md:col-start-10">
-    <span class="flex items-center gap-1">
-      <ArrowDownWideNarrowIcon class="size-4" />
-      <span> Sort By</span>
-    </span>
-    <select
-      class="select"
-      id="sort-colors-by"
-      bind:value={sortColors}
-      disabled={gettingResults}
-    >
-      {#if hasIncomingColor}
-        <option value="best-match">Best Match</option>
-      {/if}
-      <option value="default">Default</option>
-      <option value="light-to-dark">Lightest to Darkest</option>
-      <option value="dark-to-light">Darkest to Lightest</option>
-      <option value="name">Name A-Z</option>
-      <option value="name-z-to-a">Name Z-A</option>
-    </select>
+    <span class="label-text"> Sort By </span>
+    <div class="relative flex items-center">
+      <ArrowDownWideNarrowIcon class="absolute left-2" />
+      <select
+        class="select truncate pl-10"
+        id="sort-colors-by"
+        bind:value={sortColors}
+        disabled={gettingResults}
+      >
+        {#if hasIncomingColor}
+          <option value="best-match">Best Match</option>
+        {/if}
+        <option value="default">Default</option>
+        <option value="light-to-dark">Lightest to Darkest</option>
+        <option value="dark-to-light">Darkest to Lightest</option>
+        <option value="name">Name A-Z</option>
+        <option value="name-z-to-a">Name Z-A</option>
+      </select>
+    </div>
   </label>
 </div>
 

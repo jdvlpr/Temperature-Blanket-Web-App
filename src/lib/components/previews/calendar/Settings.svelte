@@ -76,7 +76,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   />
 
   <label class="label">
-    <span>Weeks Start On</span>
+    <span class="label-text">Weeks Start On</span>
     <select
       class="select w-fit"
       bind:value={calendarPreview.settings.weekStartCode}

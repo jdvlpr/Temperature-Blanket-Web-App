@@ -233,8 +233,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div class="flex flex-wrap items-end justify-center gap-x-4 gap-y-2 py-2">
-  <div class="flex w-full max-w-screen-sm flex-col gap-1 text-left">
-    <p>
+  <label class="label max-w-screen-sm">
+    <span class="label-text">
       {#if hasError}
         <span class="text-error-900-100">Choose a result</span>
       {:else if weatherLocationState.inputLocation?.value}
@@ -242,7 +242,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {:else}
         Search for a city, region, or landmark
       {/if}
-    </p>
+    </span>
     <div
       class="input-group grid-cols-[auto_1fr_auto]"
       bind:this={locationGroup}
@@ -322,5 +322,5 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </button>
       {/if}
     </div>
-  </div>
+  </label>
 </div>
