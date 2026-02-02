@@ -587,7 +587,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
   {/if}
 
-  <p class="my-2 text-center text-sm">
+  <p class="text-surface-700-300 my-2 text-center text-sm">
     Random images from <a
       href="https://unsplash.com"
       class="link"

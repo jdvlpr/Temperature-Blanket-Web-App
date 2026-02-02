@@ -75,30 +75,30 @@ If not, see <https://www.gnu.org/licenses/>. -->
           })}
       >
         <span class="flex flex-col items-start justify-center">
-          <span class="text-xs">
+          <p class="text-xs">
             {icon}
             {gaugeLabel}
-          </span>
-          <span>
+          </p>
+          <p>
             {daysInRange.length}
-            {pluralize(weather.grouping, daysInRange.length)} ({getDaysPercent(
-              daysInRange.length,
-            )}%)
-          </span>
+            {pluralize(weather.grouping, daysInRange.length)}
+          </p>
+          <p class="text-xs opacity-50">
+            {getDaysPercent(daysInRange.length)}%
+          </p>
         </span>
       </button>
     {:else}
       <div class="flex flex-col items-start justify-center">
-        <span class="text-xs">
+        <p class="text-xs">
           {icon}
           {gaugeLabel}
-        </span>
-        <span>
+        </p>
+        <p>
           {daysInRange.length}
-          {pluralize(weather.grouping, daysInRange.length)} ({getDaysPercent(
-            daysInRange.length,
-          )}%)
-        </span>
+          {pluralize(weather.grouping, daysInRange.length)}
+        </p>
+        <p class="text-xs opacity-50">{getDaysPercent(daysInRange.length)}%</p>
       </div>
     {/if}
   {/each}

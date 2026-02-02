@@ -30,6 +30,23 @@ export const entries: ChangelogItemGroup[] = [
     year: 2026,
     months: [
       {
+        month: 'February',
+        items: [
+          {
+            notes: [
+              {
+                icon: ICONS.design,
+                instructions:
+                  'In the Project Menu or in the Weather tab, select the Download/Export button, then Create Google Sheet.',
+                text: `Save your weather data, ranges, and colors in a Google Sheet.`,
+                title: 'New Feature - Create Google Sheet',
+              },
+            ],
+            version: '5.41.0',
+          },
+        ],
+      },
+      {
         month: 'January',
         items: [
           {

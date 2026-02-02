@@ -427,9 +427,29 @@ export const parseGaugeURLHash = (hashString: string, gauge) => {
   // and stop parsing the hashString
   if (!hashStringSettings) return gauge;
 
-  // when this function is run in /gallery/[id], the gauge does not have rangeOptions and doesn't need the range options to be updated,
-  // so just return the gauge as it is
-  if (!gauge?.rangeOptions) return gauge;
+  // when this function is run in /gallery/[id], the gauge does not have rangeOptions, so create a placeholder object
+  if (!gauge?.rangeOptions)
+    gauge.rangeOptions = {
+      auto: {
+        optimization: 'tmax',
+        start: {
+          high: 0,
+          low: 0,
+        },
+        increment: 0,
+        roundIncrement: true,
+      },
+      manual: {
+        start: 0,
+        increment: 0,
+      },
+      direction: 'high-to-low',
+      includeFromValue: true,
+      includeToValue: false,
+      linked: true,
+      mode: 'auto',
+      isCustomRanges: false,
+    };
 
   gauge.rangeOptions.mode =
     hashStringSettings.substring(0, 1) === 'a' ? 'auto' : 'manual';

@@ -139,7 +139,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <Footer>
         {#snippet sources()}
           <div class="text-sm">
-            <p>
+            <p class="text-surface-700-300">
               Default color schemes based on <a
                 href="https://www.ColorBrewer2.org"
                 target="_blank"

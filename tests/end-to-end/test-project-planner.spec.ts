@@ -62,11 +62,6 @@ test.describe('Project Planner', () => {
 
     // 5. Verify Results
     await expect(page.getByText('°C / mm °F / in')).toBeVisible();
-    await expect(
-      page.getByRole('button', {
-        name: 'Download Weather Data (CSV)',
-      }),
-    ).toBeVisible();
   });
 
   test('Tab Navigation', async ({ page }) => {
@@ -95,11 +90,6 @@ test.describe('Project Planner', () => {
     await page.getByRole('button', { name: 'Colors' }).nth(1).click();
     await expect(
       page.getByRole('button', { name: 'Browse Palettes' }),
-    ).toBeVisible();
-    await expect(
-      page.getByRole('button', {
-        name: 'Download Gauges and Weather',
-      }),
     ).toBeVisible();
 
     // Go to Preview Tab

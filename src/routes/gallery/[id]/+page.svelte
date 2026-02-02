@@ -410,7 +410,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   <div class="flex flex-col gap-8">
                     {#if gauges?.length}
                       {#key gauges}
-                        {#each gauges as { colors, ranges, id }, gaugeIndex}
+                        {#each gauges as { colors, ranges, id, rangeOptions }, gaugeIndex}
                           {@const gaugeType = gauges[gaugeIndex].unit.type}
                           {@const item = ranges.map((range, index) => {
                             return {
@@ -493,33 +493,36 @@ If not, see <https://www.gnu.org/licenses/>. -->
                                     {#if gaugeType === 'category'}
                                       <p id="range-{i}-value">{range.label}</p>
                                     {:else}
-                                      <span
+                                      <div
                                         class="flex flex-col items-start text-left"
                                         id="range-{i}-from"
                                       >
-                                        <span class="text-xs">From</span>
-                                        <span class="flex items-start">
-                                          <span class="text-lg"
-                                            >{range.from}</span
-                                          >
-                                          <span class="text-xs"
-                                            >{unitLabel}</span
-                                          >
-                                        </span>
-                                      </span>
-                                      <span
+                                        <p class="text-xs">From</p>
+                                        <p class="-mt-1 text-xs opacity-50">
+                                          {rangeOptions.includeFromValue
+                                            ? 'Including'
+                                            : 'Excluding'}
+                                        </p>
+                                        <div class="flex items-start">
+                                          <p class="text-lg">{range.from}</p>
+                                          <p class="text-xs">{unitLabel}</p>
+                                        </div>
+                                      </div>
+                                      <div
                                         class="flex flex-col items-start text-left"
                                         id="range-{i}-to"
                                       >
-                                        <span class="text-xs">To</span>
-                                        <span class="flex items-start">
-                                          <span class="text-lg">{range.to}</span
-                                          >
-                                          <span class="text-xs"
-                                            >{unitLabel}</span
-                                          >
-                                        </span>
-                                      </span>
+                                        <p class="text-xs">To</p>
+                                        <p class="-mt-1 text-xs opacity-50">
+                                          {rangeOptions.includeToValue
+                                            ? 'Including'
+                                            : 'Excluding'}
+                                        </p>
+                                        <div class="flex items-start">
+                                          <p class="text-lg">{range.to}</p>
+                                          <p class="text-xs">{unitLabel}</p>
+                                        </div>
+                                      </div>
                                     {/if}
                                   </div>
                                   {#if affiliate_variant_href}

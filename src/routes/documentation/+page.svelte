@@ -591,8 +591,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <p>
               To change your project’s units between metric and imperial, from
               the top bar select °C / mm or °F / in. On smaller screens, press
-              the three-dot menu icon, then choose your Units selection. On the
-              Project Planner you can also use the following keyboard shortcut:
+              the Project Menu, then choose your Units selection. On the Project
+              Planner you can also use the following keyboard shortcut:
             </p>
             <figure class="">
               <table>
@@ -1878,20 +1878,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <p>
               To download your color charts and weather data as a PDF file,
-              press the three-dot menu icon, press the Download button, then
-              press the Color Charts and Weather Data (PDF) button. You can also
-              open the download menu by using the following keyboard shortcut:
+              press the Project Menu, press the Download/Export button, then
+              press the Color Charts and Weather Data (PDF) button.
             </p>
-            <figure class="">
-              <table>
-                <tbody
-                  ><tr
-                    class="flex-flow border-surface-950-50 rounded-container flex w-full items-center justify-between gap-2 border p-2 font-bold"
-                    ><td class="kbd">d</td><td>Open Download Menu</td></tr
-                  ></tbody
-                >
-              </table>
-            </figure>
           </section>
           <section
             id="download-weather-data-csv"
@@ -1900,20 +1889,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <h3 class="text-xl font-bold">Download Weather Data (CSV)</h3>
             <p>
               To download a CSV file with your project’s weather data, press the
-              three-dot menu icon, press Download, then press Weather Data
-              (CSV). You can also open the download menu by using the following
-              keyboard shortcut:
+              Project Menu, press Download/Export button, then press Weather
+              Data (CSV).
             </p>
-            <figure class="">
-              <table>
-                <tbody
-                  ><tr
-                    class="flex-flow border-surface-950-50 rounded-container flex w-full items-center justify-between gap-2 border p-2 font-bold"
-                    ><td class="kbd">d</td><td>Open Download Menu</td></tr
-                  ></tbody
-                >
-              </table>
-            </figure>
           </section>
           <section
             id="download-preview-image-png"
@@ -1922,20 +1900,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <h3 class="text-xl font-bold">Download Preview Image (PNG)</h3>
             <p>
               To download a PNG file of your project’s preview image, press the
-              three-dot menu icon, press Download, then press Preview Image
-              (PNG). You can also open the download menu by using the following
-              keyboard shortcut:
+              Project Menu, press Download/Export button, then press Preview
+              Image (PNG).
             </p>
-            <figure class="">
-              <table>
-                <tbody
-                  ><tr
-                    class="flex-flow border-surface-950-50 rounded-container flex w-full items-center justify-between gap-2 border p-2 font-bold"
-                    ><td class="kbd">d</td><td>Open Download Menu</td></tr
-                  ></tbody
-                >
-              </table>
-            </figure>
           </section>
         </div>
         <div

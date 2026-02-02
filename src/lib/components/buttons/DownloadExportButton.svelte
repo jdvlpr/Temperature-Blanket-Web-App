@@ -57,7 +57,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <div class="flex flex-col">
                 <p>Download PDF</p>
                 <p class="text-surface-700-300 text-xs">
-                  Gauges and Weather Data
+                  Gauges & Weather Data
                 </p>
               </div>
             </button>
@@ -118,9 +118,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <div class="flex flex-col">
                 <p>Create Google Sheet</p>
                 <p class="text-surface-700-300 text-xs">
-                  Gauges and Weather Data
+                  Gauges & Weather Data
                 </p>
               </div>
+              <span class="badge preset-filled-secondary-500">New</span>
             </button>
           </Menu.Item>
         {/if}
