@@ -537,7 +537,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             values using these options and this range calculation method ({@html rangeExample}).
             To show the optimal From and To values, {#if isNotAutoIncrements}
               set Automatic Ranges above, then
-            {/if} uncheck Round Numbers{#if !isNotAutoIncrements}
+            {/if} uncheck Round Numbers {#if !isNotAutoIncrements}
               above{/if}, or change the Range Calculation Method.
           </p>
         {/if}
@@ -571,10 +571,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     class="label flex w-fit flex-col items-start justify-start"
                     id="settings-range-{index}-from"
                   >
-                    <span class="text-xs">From ({unitLabel})</span>
+                    <div class="flex flex-col">
+                      <p class="text-xs">From ({unitLabel})</p>
+                      <p class="-mt-1 text-xs opacity-50">
+                        {_gauge.rangeOptions.includeFromValue
+                          ? 'Including'
+                          : 'Excluding'}
+                      </p>
+                    </div>
                     <input
                       type="number"
-                      class="input max-w-[75px] text-lg"
+                      class="input max-w-[100px] text-lg"
                       value={from}
                       onchange={(e) => {
                         const value = +e.target.value;
@@ -603,10 +610,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     class="label flex w-fit flex-col items-start justify-start"
                     id="settings-range-{index}-to"
                   >
-                    <span class="text-xs">To ({unitLabel})</span>
+                    <div class="flex flex-col">
+                      <p class="text-xs">To ({unitLabel})</p>
+                      <p class="-mt-1 text-xs opacity-50">
+                        {_gauge.rangeOptions?.includeToValue
+                          ? 'Including'
+                          : 'Excluding'}
+                      </p>
+                    </div>
                     <input
                       type="number"
-                      class="input max-w-[75px] text-lg"
+                      class="input max-w-[100px] text-lg"
                       value={to}
                       onchange={(e) => {
                         const value = +e.target.value;

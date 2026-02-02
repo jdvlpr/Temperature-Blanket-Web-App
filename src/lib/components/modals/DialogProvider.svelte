@@ -74,42 +74,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 >
                   <h2 class="h2">Download PDF</h2>
 
-                  <div class="flex flex-col gap-2">
-                    <p class="font-bold">Gauges</p>
-                    <div class="flex flex-col gap-1">
-                      {#each gauges.allCreated as { id, label }}
-                        <label class="flex items-center space-x-2">
-                          <input
-                            type="checkbox"
-                            name="id"
-                            class="checkbox"
-                            value={id}
-                            bind:group={weather.pdfOptions.gauges}
-                          />
-                          <p>{label}</p>
-                        </label>
-                      {/each}
-                    </div>
-                  </div>
-
-                  {#if weather.pdfOptions.gauges.length > 0}
-                    <div class="flex flex-col gap-2">
-                      <p class="font-bold">Gauge Options</p>
-                      <div class="flex flex-col gap-1">
-                        <label class="flex items-center space-x-2">
-                          <input
-                            type="checkbox"
-                            name="showDaysInRange"
-                            class="checkbox"
-                            bind:checked={weather.pdfOptions.showDaysInRange}
-                          />
-                          <p class="">Show number of days in ranges</p>
-                        </label>
-                      </div>
-                    </div>
-                  {/if}
-
-                  <div class="flex flex-col gap-2">
+                  <div class="flex flex-col gap-1">
                     <p class="font-bold">Weather Data</p>
                     <div class="flex flex-col gap-1">
                       {#each allGaugesAttributes as { targets }}
@@ -129,6 +94,46 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       {/each}
                     </div>
                   </div>
+
+                  <div class="flex flex-col gap-1">
+                    <div class="flex flex-col">
+                      <p class="font-bold">Gauges</p>
+                      <p class="text-surface-700-300 text-xs">
+                        Colors & Ranges
+                      </p>
+                    </div>
+                    <div class="flex flex-col gap-1">
+                      {#each gauges.allCreated as { id, label }}
+                        <label class="flex items-center space-x-2">
+                          <input
+                            type="checkbox"
+                            name="id"
+                            class="checkbox"
+                            value={id}
+                            bind:group={weather.pdfOptions.gauges}
+                          />
+                          <p>{label}</p>
+                        </label>
+                      {/each}
+                    </div>
+                  </div>
+
+                  {#if weather.pdfOptions.gauges.length > 0}
+                    <div class="flex flex-col gap-1">
+                      <p class="font-bold">Gauge Options</p>
+                      <div class="flex flex-col gap-1">
+                        <label class="flex items-center space-x-2">
+                          <input
+                            type="checkbox"
+                            name="showDaysInRange"
+                            class="checkbox"
+                            bind:checked={weather.pdfOptions.showDaysInRange}
+                          />
+                          <p class="">Show number of days in ranges</p>
+                        </label>
+                      </div>
+                    </div>
+                  {/if}
 
                   <Dialog.CloseTrigger>
                     <SaveAndCloseButtons

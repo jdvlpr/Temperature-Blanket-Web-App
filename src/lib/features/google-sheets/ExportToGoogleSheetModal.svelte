@@ -108,81 +108,112 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <div class="flex flex-col gap-4 p-4">
   <h2 class="h2">Create Google Sheet</h2>
 
-  <div class="flex flex-col gap-2">
+  <div class="flex flex-col gap-1">
     <h3 class="font-semibold">Weather Data</h3>
-    <label class="flex items-center gap-2">
-      <input type="checkbox" class="checkbox" bind:checked={includeHighTemp} />
-      <span>High Temperature</span>
-    </label>
-    <label class="flex items-center gap-2">
-      <input type="checkbox" class="checkbox" bind:checked={includeAvgTemp} />
-      <span>Average Temperature</span>
-    </label>
-    <label class="flex items-center gap-2">
-      <input type="checkbox" class="checkbox" bind:checked={includeLowTemp} />
-      <span>Low Temperature</span>
-    </label>
-    <label class="flex items-center gap-2">
-      <input type="checkbox" class="checkbox" bind:checked={includeRain} />
-      <span>Rain</span>
-    </label>
-    <label class="flex items-center gap-2">
-      <input type="checkbox" class="checkbox" bind:checked={includeSnow} />
-      <span>Snow</span>
-    </label>
-    <label class="flex items-center gap-2">
-      <input type="checkbox" class="checkbox" bind:checked={includeDayLength} />
-      <span>Daytime</span>
-    </label>
-    <label class="flex items-center gap-2">
-      <input type="checkbox" class="checkbox" bind:checked={includeMoon} />
-      <span>Moon Phase</span>
-    </label>
-  </div>
-
-  <div class="flex flex-col gap-2">
-    <h3 class="font-semibold">Gauges</h3>
-    {#if hasTempGauge}
-      <label class="flex items-center gap-2">
-        <input type="checkbox" class="checkbox" bind:checked={applyTempGauge} />
-        <span>Temperature Gauge</span>
-      </label>
-    {/if}
-    {#if hasRainGauge}
-      <label class="flex items-center gap-2">
-        <input type="checkbox" class="checkbox" bind:checked={applyRainGauge} />
-        <span>Rain Gauge</span>
-      </label>
-    {/if}
-    {#if hasSnowGauge}
-      <label class="flex items-center gap-2">
-        <input type="checkbox" class="checkbox" bind:checked={applySnowGauge} />
-        <span>Snow Gauge</span>
-      </label>
-    {/if}
-    {#if hasDaytimeGauge}
+    <div class="flex flex-col gap-1">
       <label class="flex items-center gap-2">
         <input
           type="checkbox"
           class="checkbox"
-          bind:checked={applyDaytimeGauge}
+          bind:checked={includeHighTemp}
         />
-        <span>Daytime Gauge</span>
+        <span>High Temperature</span>
       </label>
-    {/if}
-    {#if hasMoonGauge}
       <label class="flex items-center gap-2">
-        <input type="checkbox" class="checkbox" bind:checked={applyMoonGauge} />
-        <span>Moon Gauge</span>
+        <input type="checkbox" class="checkbox" bind:checked={includeAvgTemp} />
+        <span>Average Temperature</span>
       </label>
-    {/if}
-    {#if !hasTempGauge && !hasRainGauge && !hasSnowGauge && !hasDaytimeGauge && !hasMoonGauge}
-      <p class="text-surface-500 text-sm">No gauges have been created yet.</p>
-    {/if}
+      <label class="flex items-center gap-2">
+        <input type="checkbox" class="checkbox" bind:checked={includeLowTemp} />
+        <span>Low Temperature</span>
+      </label>
+      <label class="flex items-center gap-2">
+        <input type="checkbox" class="checkbox" bind:checked={includeRain} />
+        <span>Rain</span>
+      </label>
+      <label class="flex items-center gap-2">
+        <input type="checkbox" class="checkbox" bind:checked={includeSnow} />
+        <span>Snow</span>
+      </label>
+      <label class="flex items-center gap-2">
+        <input
+          type="checkbox"
+          class="checkbox"
+          bind:checked={includeDayLength}
+        />
+        <span>Daytime</span>
+      </label>
+      <label class="flex items-center gap-2">
+        <input type="checkbox" class="checkbox" bind:checked={includeMoon} />
+        <span>Moon Phase</span>
+      </label>
+    </div>
   </div>
 
-  {#if applyTempGauge || applyRainGauge || applySnowGauge || applyDaytimeGauge || applyMoonGauge}
-    <div class="flex flex-col gap-2">
+  <div class="flex flex-col gap-1">
+    <div class="flex flex-col">
+      <h3 class="font-semibold">Gauges</h3>
+      <p class="text-surface-700-300 text-xs">Colors & Ranges</p>
+    </div>
+    <div class="flex flex-col gap-1">
+      {#if hasTempGauge}
+        <label class="flex items-center gap-2">
+          <input
+            type="checkbox"
+            class="checkbox"
+            bind:checked={applyTempGauge}
+          />
+          <span>Temperature Gauge</span>
+        </label>
+      {/if}
+      {#if hasRainGauge}
+        <label class="flex items-center gap-2">
+          <input
+            type="checkbox"
+            class="checkbox"
+            bind:checked={applyRainGauge}
+          />
+          <span>Rain Gauge</span>
+        </label>
+      {/if}
+      {#if hasSnowGauge}
+        <label class="flex items-center gap-2">
+          <input
+            type="checkbox"
+            class="checkbox"
+            bind:checked={applySnowGauge}
+          />
+          <span>Snow Gauge</span>
+        </label>
+      {/if}
+      {#if hasDaytimeGauge}
+        <label class="flex items-center gap-2">
+          <input
+            type="checkbox"
+            class="checkbox"
+            bind:checked={applyDaytimeGauge}
+          />
+          <span>Daytime Gauge</span>
+        </label>
+      {/if}
+      {#if hasMoonGauge}
+        <label class="flex items-center gap-2">
+          <input
+            type="checkbox"
+            class="checkbox"
+            bind:checked={applyMoonGauge}
+          />
+          <span>Moon Gauge</span>
+        </label>
+      {/if}
+      {#if !hasTempGauge && !hasRainGauge && !hasSnowGauge && !hasDaytimeGauge && !hasMoonGauge}
+        <p class="text-surface-500 text-sm">No gauges have been created yet.</p>
+      {/if}
+    </div>
+  </div>
+
+  {#if (applyTempGauge || applyRainGauge || applySnowGauge || applyDaytimeGauge || applyMoonGauge) && (hasTempGauge || hasRainGauge || hasSnowGauge || hasDaytimeGauge || hasMoonGauge)}
+    <div class="flex flex-col gap-1">
       <h3 class="font-semibold">Gauge Options</h3>
       <label class="flex items-center gap-2">
         <input
@@ -195,8 +226,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
   {/if}
 
-  <p class="text-sm italic">
-    A new Google Sheet will be saved to your Google Drive.
+  <p class="max-w-md text-center text-sm italic">
+    A new Google Sheet will be saved to your Google Drive. You may need to allow
+    popups in order to authenticate with Google.
   </p>
 
   <div class="flex justify-center gap-2">

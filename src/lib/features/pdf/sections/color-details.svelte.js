@@ -16,7 +16,7 @@
 import { weather } from '$lib/state';
 import { getDaysInRange, getDaysPercent } from '$lib/utils';
 import pdfConfig from '../pdf-config';
-import pdfGauge from './gauge.svelte';
+import pdfGauge from './gauge.svelte.ts';
 
 const pdfColorDetails = {
   positionX: 95,

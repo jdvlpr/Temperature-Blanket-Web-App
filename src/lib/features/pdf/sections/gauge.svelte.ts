@@ -15,6 +15,7 @@
 
 import { gauges, weather } from '$lib/state';
 import { preferences } from '$lib/storage/preferences.svelte';
+import type { GaugeRangeOptions, GaugeStateInterface } from '$lib/types';
 import pdfConfig from '../pdf-config';
 import pdfColorDetails from './color-details.svelte';
 import pdfFooter from './footer.svelte';
@@ -54,7 +55,7 @@ const pdfGauge = {
     doc.line(x1, y, pdfConfig.leftMargin + x2, y);
   },
 
-  createHeaderItems: (doc, items, gauge) => {
+  createHeaderItems: (doc, items, gauge: GaugeStateInterface) => {
     for (let index = 0; index < Object.entries(items).length; index += 1) {
       doc.setFontSize(pdfConfig.font.p);
       doc.setFont(pdfConfig.font.paragraph, '');
@@ -69,8 +70,7 @@ const pdfGauge = {
         );
       } else if (
         gauge?.unit.type !== 'category' &&
-        ((title === 'From' && !gauge?.rangeOptions?.includeFromValue) ||
-          (title === 'To' && !gauge?.rangeOptions?.includeToValue))
+        (title === 'From' || title === 'To')
       ) {
         doc.text(
           title,
@@ -78,12 +78,20 @@ const pdfGauge = {
           pdfConfig.topMargin + pdfGauge.itemHeight - 1,
         );
         doc.setFontSize(pdfConfig.font.micro);
+        // Set a gray text color
+        doc.setTextColor(128, 128, 128);
+        const label = pdfGauge.getGaugeRangeLabel({
+          title,
+          rangeOptions: gauge?.rangeOptions,
+        });
         doc.text(
-          '(not including)',
+          label,
           pdfConfig.leftMargin + Object.values(items)[index].position,
           pdfConfig.topMargin + pdfGauge.itemHeight + 1,
         );
         doc.setFontSize(pdfConfig.font.p);
+        // Revert to a black text color
+        doc.setTextColor(0, 0, 0);
       } else if (
         !gauge ||
         (gauge?.unit.type === 'category' && title !== 'To') ||
@@ -97,7 +105,25 @@ const pdfGauge = {
       }
     }
   },
-  createHeader: (doc, gauge) => {
+
+  getGaugeRangeLabel: ({
+    title,
+    rangeOptions,
+  }: {
+    title: string;
+    rangeOptions: GaugeRangeOptions;
+  }) => {
+    const includeFrom = rangeOptions.includeFromValue;
+    const includeTo = rangeOptions.includeToValue;
+    const excluding = 'Excluding';
+    const including = 'Including';
+    if (title === 'From' && includeFrom) return including;
+    if (title === 'From' && !includeFrom) return excluding;
+    if (title === 'To' && includeTo) return including;
+    if (title === 'To' && !includeTo) return excluding;
+    return '';
+  },
+  createHeader: (doc, gauge: GaugeStateInterface) => {
     // Gauge Title
     doc.setFontSize(pdfConfig.font.h2);
     doc.setFont(pdfConfig.font.heading, 'normal');

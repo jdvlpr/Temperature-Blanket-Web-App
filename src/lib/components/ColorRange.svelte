@@ -56,8 +56,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
       });
     }}
   >
-    <span class="flex flex-col text-left" id="range-{index}-from"
-      ><span class="text-xs">From</span>
+    <span class="flex flex-col text-left" id="range-{index}-from">
+      <div class="flex flex-col">
+        <p class="text-xs">From</p>
+        <p class="-mt-1 text-xs opacity-50">
+          {gauges.activeGauge.rangeOptions.includeFromValue
+            ? 'Including'
+            : 'Excluding'}
+        </p>
+      </div>
+
       <span class="flex items-start"
         ><span class="text-lg">{gauges.activeGauge.ranges[index]?.from}</span>
         <span class="text-xs"
@@ -65,8 +73,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
         ></span
       ></span
     >
-    <span class="flex flex-col text-left" id="range-{index}-to"
-      ><span class="text-xs">To</span>
+    <span class="flex flex-col text-left" id="range-{index}-to">
+      <div class="flex flex-col gap-0">
+        <span class="text-xs">To </span>
+        <span class="-mt-1 text-xs opacity-50"
+          >{gauges.activeGauge.rangeOptions.includeToValue
+            ? 'Including'
+            : 'Excluding'}</span
+        >
+      </div>
+
       <span class="flex items-start"
         ><span class="text-lg">{gauges.activeGauge.ranges[index]?.to}</span>
         <span class="text-xs"

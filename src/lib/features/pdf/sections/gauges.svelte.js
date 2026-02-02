@@ -14,7 +14,7 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { gauges, weather } from '$lib/state';
-import pdfGauge from './gauge.svelte';
+import pdfGauge from './gauge.svelte.ts';
 
 const gaugeGroup = {
   pages: () => {

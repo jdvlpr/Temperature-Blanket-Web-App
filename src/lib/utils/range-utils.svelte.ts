@@ -246,7 +246,7 @@ export const isValueInRange = ({
  */
 export const getDaysPercent = (daysCount) => {
   const weatherLength = weather.data.length;
-  let round = Math.round((daysCount / weatherLength) * 100);
+  let round = displayNumber((daysCount / weatherLength) * 100);
   if (daysCount > 0 && round === 0) {
     round = 1;
   }

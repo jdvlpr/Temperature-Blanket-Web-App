@@ -13,26 +13,13 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { MOON_PHASE_NAMES } from '$lib/constants/weather-constants';
+import { MONTHS, MOON_PHASE_NAMES } from '$lib/constants/weather-constants';
 import { gauges, locations, weather } from '$lib/state';
 import { preferences } from '$lib/storage/preferences.svelte';
 import { getTextColor } from '$lib/utils/color-utils';
 import type { ExportOptions, SpreadsheetData } from './types';
 
-const MONTHS = [
-  'January',
-  'February',
-  'March',
-  'April',
-  'May',
-  'June',
-  'July',
-  'August',
-  'September',
-  'October',
-  'November',
-  'December',
-];
+const MONTH_NAMES = MONTHS.map((m) => m.name);
 
 const DATA_LABELS: Record<
   string,
@@ -102,7 +89,7 @@ function createWeatherGrid(
 
   // Row 1: Month headers (merged later)
   const monthRow: (string | null)[] = [];
-  for (const month of MONTHS) {
+  for (const month of MONTH_NAMES) {
     monthRow.push(month);
     for (let i = 1; i < colsPerMonth; i++) monthRow.push(null);
   }
@@ -212,11 +199,6 @@ function createConditionalFormattingRules(
         const opFrom = includeFrom ? '<=' : '<';
         const opTo = includeTo ? '>=' : '>';
         // Example: AND(val <= 39, val > 36)
-        // We use RC (R1C1 relative reference) style implicitly by referring to top-left cell in range
-        // BUT for conditional formatting 'custom formula', we should refer to the top-left cell of the APPLIED range.
-        // We will build the formula once we know the start cell. Using A1 notation relative to start cell is standard.
-        // However, we apply this to multiple disjunct ranges (columns in different months).
-        // It's safer to add a rule PER MONTH column so the relative reference is clean.
       }
 
       // Apply to each month's relevant columns
@@ -225,8 +207,6 @@ function createConditionalFormattingRules(
           const colIndex = month * colsPerMonth + 1 + typeIdx; // 0-indexed column index
           // Convert column index to A1 notation column letter (e.g., 0->A, 1->B)
           // Since we might go beyond Z, we need proper conversion or just rely on the API applying it to the range.
-          // In Custom Formula, if we say "=A1>5" and applying to B1:B10, it checks B1>5 (relative).
-          // So we need to refer to the TOP-LEFT cell of the range being formatted.
           const colLetter = getColumnLetter(colIndex); // Helper we need to add
           const startCell = `${colLetter}3`; // Data starts at row 3 (index 2)
 
@@ -452,29 +432,12 @@ function createGaugeLegendData(
       // Day Counts
       for (const type of applicableTypes) {
         // Formula: =COUNTIFS('Weather Data'!B:B, ">=Start", 'Weather Data'!B:B, "<End") + ... for each month
-        // Actually, COUNTIFS allows multiple ranges. We can sum checks for each month column? No, COUNTIFS criteria must match distinct ranges.
-        // A single COUNTIFS checks B AND C AND D...
-        // To count total occurances across multiple non-contiguous columns (Jan Temp, Feb Temp...)
-        // We essentially need =COUNTIFS(JanCol, criteria) + COUNTIFS(FebCol, criteria)...
-        // That's a long formula, but robust.
 
         const letters = getWeatherDataColumnLetters(options, type);
         const parts: string[] = [];
 
         for (const letCol of letters) {
           // Check based on range settings
-          // Range values are in Col A (1) and Col B (2) of THIS sheet (the Legend sheet).
-          // Actually, constructing the criteria string is tricky because A2/B2 are relative.
-          // Row is (i + 3) if double header, or (i + 2).
-          // Let's assume double header exists.
-          // Reference to Range Start: $A2
-          // Reference to Range End: $B2
-          // We use absolute column so we can copy paste if needed, relative row.
-
-          // The row index in the sheet will be: start row (1-based) + current index.
-          // Header 1: row 1. Data starts row 2.
-          // So current row is i + 2.
-
           const rowIdx = i + 2;
           const refFrom = `$A${rowIdx}`;
           const refTo = `$B${rowIdx}`;
@@ -506,42 +469,7 @@ function createGaugeLegendData(
         row.push(finalFormula);
       }
 
-      // Percentages
-      // =DayCountCell / (TotalRows * 12) ? No, total valid days.
-      // Easiest is to sum the DayCount column? No, cyclic dependency if we sum column.
-      // Or just =DayCount / [Total Days In Year].
-      // Is [Total Days In Year] constant? Yes.
-      // We can hardcode total days or use a formula that counts all non-blank cells?
-      // COUNT('Weather Data'!B:B) * 12 is rough.
-      // Better: Sum of all checks.
-      // Let's just use SUM(Month columns count) as denominator?
-      // A simple approximation: =E3 / 365 (or 366).
-      // Or more robust: =E3 / COUNT('Weather Data'!B:B ... all columns)
-      // Determining denominator dynamically is hard without a specific "Total Cell".
-      // Let's use the known length of weather data: weather.data.length.
       const totalDays = weather.data.length;
-
-      // Col Index for Day Count cell.
-      // 0(A), 1(B), 2(C), 3(D).
-      // 4 is first Day Count.
-      // If we have multiple types, they are at 4, 5...
-      // Percentage for Type 1 (at index 4) should refer to cell at index 4.
-      // Percentage starts after ALL day count columns.
-      // Count cols count = applicableTypes.length.
-      // Start of Pct = 4 + applicableTypes.length.
-      // Relative reference: RC[-offset].
-      // R[0]C[-numTypes] ...
-
-      // Actually, we are pushing cells in order.
-      // We have `row` array so far.
-      // Indices of the Day Count values we just pushed:
-      // Start index = 4.
-      // Current type index k (0 to N-1).
-      // Day count value is at row[4 + k].
-      // We are now pushing percentages.
-      // For type k, we reference column letter of (4 + k).
-      // A(0).. E(4).
-      // Col index = 4 + typeIndex.
 
       for (let k = 0; k < applicableTypes.length; k++) {
         const colIdxOfCount = 4 + k;
@@ -559,7 +487,7 @@ function createGaugeLegendData(
   rows.push([]); // Empty row
   rows.push([]); // Empty row
   rows.push([
-    "NOTE: If you change the hex color or range values above, you'll need to also update the Conditional Formatting rules in order for changes to take effect. Go to the Weather Data sheet, then from the menu select Format > Conditional Formatting and update the color rules.",
+    "NOTE: If you change the hex color or range values above, you'll need to also update the Conditional Formatting rules in order for changes to take effect; Go to the Weather Data sheet, select a colored cell, then from the menu select Format > Conditional Formatting and update the color rules.",
   ]);
 
   return rows;
