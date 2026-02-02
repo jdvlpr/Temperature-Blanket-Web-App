@@ -21,6 +21,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let isExporting = $state(false);
 
+  let showPopupBlockedErrorMessage = $state(false);
+
   // Data to include options
   let includeHighTemp = $state(true);
   let includeAvgTemp = $state(false);
@@ -93,12 +95,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
         });
       }
       dialog.close();
+      showPopupBlockedErrorMessage = false;
     } catch (error) {
-      toast.trigger({
-        message: `Export failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
-        category: 'error',
-        autohide: false,
-      });
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
+
+      if (errorMessage === 'POPUP_BLOCKED') {
+        showPopupBlockedErrorMessage = true;
+      } else {
+        toast.trigger({
+          message: `Export failed: ${errorMessage}`,
+          category: 'error',
+          autohide: false,
+        });
+        showPopupBlockedErrorMessage = true;
+      }
     } finally {
       isExporting = false;
     }
@@ -231,6 +242,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
     popups in order to authenticate with Google.
   </p>
 
+  {#if showPopupBlockedErrorMessage}
+    <p class="text-warning-500 text-center">
+      It looks like the popup was blocked. Please allow popups for this site and
+      try again.
+    </p>
+  {/if}
+
   <div class="flex justify-center gap-2">
     <button
       class="btn hover:preset-tonal-surface"
@@ -244,6 +262,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       class="btn preset-filled-primary-500"
       onclick={handleExport}
       disabled={isExporting}
+      data-retry-export
     >
       {#if isExporting}
         <LoaderCircleIcon class="animate-spin" />

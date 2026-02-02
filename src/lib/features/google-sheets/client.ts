@@ -117,8 +117,20 @@ function getAccessToken(): Promise<void> {
       return;
     }
 
+    let callbackFired = false;
+
+    // Detect popup blocking with timeout
+    const popupBlockTimer = setTimeout(() => {
+      if (!callbackFired) {
+        reject(new Error('POPUP_BLOCKED'));
+      }
+    }, 500);
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (tokenClient as any).callback = (response: any) => {
+      callbackFired = true;
+      clearTimeout(popupBlockTimer);
+
       if (response.error) {
         reject(new Error(response.error));
         return;

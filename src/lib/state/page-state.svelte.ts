@@ -59,7 +59,7 @@ class DialogClass {
     response?: any;
     component?: any;
     options?: DialogOptions;
-  }) => {    
+  }) => {
     // close the dialog
     this.close();
 
@@ -116,7 +116,7 @@ export interface ToastSettings {
   /** Provide arbitrary CSS classes to style the toast. */
   classes?: string;
   /** Category of the toast. */
-  category?: 'success' | 'error' | null;
+  category?: 'success' | 'error' | 'warning' | null;
   /** Callback function that fires on trigger and close. */
   callback?: (response: { id: string; status: 'queued' | 'closed' }) => void;
 }
@@ -171,7 +171,7 @@ class ToastService {
     if (toast && toast.callback) toast.callback({ id, status: 'queued' });
     // activate autohide when dismiss button is hidden.
     if (toast.hideDismiss) toast.autohide = true;
-    
+
     // Merge with defaults
     const tMerged: Toast = { ...this.#toastDefaults, ...toast, id };
     // Handle auto-hide, if needed
