@@ -117,20 +117,8 @@ function getAccessToken(): Promise<void> {
       return;
     }
 
-    let callbackFired = false;
-
-    // Detect popup blocking with timeout
-    const popupBlockTimer = setTimeout(() => {
-      if (!callbackFired) {
-        reject(new Error('POPUP_BLOCKED'));
-      }
-    }, 500);
-
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (tokenClient as any).callback = (response: any) => {
-      callbackFired = true;
-      clearTimeout(popupBlockTimer);
-
       if (response.error) {
         reject(new Error(response.error));
         return;
@@ -199,17 +187,27 @@ async function updateValues(
 }
 
 /**
- * Main export function - orchestrates the entire export process
+ * Pre-initializes Google API and Identity Services clients.
+ * This should be called before the user clicks the export button to avoid
+ * popup blockers caused by async delays.
  */
-export async function exportToGoogleSheet(
-  options: ExportOptions,
-): Promise<string> {
+export async function prepareGoogleExport(): Promise<void> {
   // Load scripts
   await Promise.all([loadGapiScript(), loadGisScript()]);
 
   // Initialize clients
   await initializeGapiClient();
   await initializeGisClient();
+}
+
+/**
+ * Main export function - orchestrates the entire export process
+ */
+export async function exportToGoogleSheet(
+  options: ExportOptions,
+): Promise<string> {
+  // Ensure scripts and clients are initialized
+  await prepareGoogleExport();
 
   // Get access token (will prompt user for authorization)
   await getAccessToken();

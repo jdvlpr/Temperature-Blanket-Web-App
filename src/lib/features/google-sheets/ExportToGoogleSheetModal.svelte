@@ -14,14 +14,19 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
+  import { onMount } from 'svelte';
   import { dialog, gauges, toast } from '$lib/state';
   import { CheckIcon, LoaderCircleIcon, XIcon } from '@lucide/svelte';
-  import { exportToGoogleSheet } from './client';
+  import { exportToGoogleSheet, prepareGoogleExport } from './client';
   import type { ExportOptions } from './types';
 
-  let isExporting = $state(false);
+  onMount(() => {
+    prepareGoogleExport().catch((err) => {
+      console.error('Failed to prepare Google Export:', err);
+    });
+  });
 
-  let showPopupBlockedErrorMessage = $state(false);
+  let isExporting = $state(false);
 
   // Data to include options
   let includeHighTemp = $state(true);
@@ -95,21 +100,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
         });
       }
       dialog.close();
-      showPopupBlockedErrorMessage = false;
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : 'Unknown error';
-
-      if (errorMessage === 'POPUP_BLOCKED') {
-        showPopupBlockedErrorMessage = true;
-      } else {
-        toast.trigger({
-          message: `Export failed: ${errorMessage}`,
-          category: 'error',
-          autohide: false,
-        });
-        showPopupBlockedErrorMessage = true;
-      }
+      toast.trigger({
+        message: `Export failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        category: 'error',
+        autohide: false,
+      });
     } finally {
       isExporting = false;
     }
@@ -241,13 +237,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     A new Google Sheet will be saved to your Google Drive. You may need to allow
     popups in order to authenticate with Google.
   </p>
-
-  {#if showPopupBlockedErrorMessage}
-    <p class="text-warning-500 text-center">
-      It looks like the popup was blocked. Please allow popups for this site and
-      try again.
-    </p>
-  {/if}
 
   <div class="flex justify-center gap-2">
     <button
