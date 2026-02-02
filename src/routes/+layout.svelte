@@ -28,7 +28,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '$lib/state';
   import { initializeLocalStorage } from '$lib/storage/storage-utils.svelte.ts';
   import { handleKeyDown, privacy } from '$lib/utils';
-  import { ExternalLinkIcon, YoutubeIcon } from '@lucide/svelte';
+  import { YoutubeIcon } from '@lucide/svelte';
   import { onMount, type Snippet } from 'svelte';
   import '../css/main.css';
 

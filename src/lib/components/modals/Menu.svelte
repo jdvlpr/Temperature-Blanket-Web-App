@@ -19,9 +19,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import YarnSources from '$lib/components/YarnSources.svelte';
   import { DAYS_OF_THE_WEEK, MONTHS } from '$lib/constants';
   import { dialog, locations, project, weather } from '$lib/state';
-  import { delay, pluralize } from '$lib/utils';
-  import { BookmarkIcon, ExternalLinkIcon, PlusIcon } from '@lucide/svelte';
-  import { onMount } from 'svelte';
+  import { pluralize } from '$lib/utils';
+  import { BookmarkIcon, PlusIcon } from '@lucide/svelte';
   import WeatherGrouping from '../WeatherGrouping.svelte';
   import DownloadExportButton from '../buttons/DownloadExportButton.svelte';
   import SendToGalleryButton from '../buttons/SendToGalleryButton.svelte';

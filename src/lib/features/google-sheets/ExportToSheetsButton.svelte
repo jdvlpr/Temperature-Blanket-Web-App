@@ -15,8 +15,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import { dialog } from '$lib/state';
+  import { FilePlusIcon } from '@lucide/svelte';
   import ExportToGoogleSheetModal from './ExportToGoogleSheetModal.svelte';
-  import { FilePlusIcon, FileSpreadsheetIcon } from '@lucide/svelte';
 
   function openExportModal() {
     dialog.trigger({

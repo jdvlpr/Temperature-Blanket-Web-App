@@ -14,15 +14,9 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import { page } from '$app/state';
   import AppNavigation from '$lib/components/AppNavigation.svelte';
-  import {
-    drawerState,
-    pageSections,
-    showNavigationSideBar,
-    weather,
-  } from '$lib/state';
   import { safeSlide } from '$lib/features/transitions/safeSlide';
+  import { drawerState, showNavigationSideBar, weather } from '$lib/state';
   import {
     MenuIcon,
     PanelLeftClose,

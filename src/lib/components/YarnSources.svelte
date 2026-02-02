@@ -17,9 +17,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import HelpIcon from '$lib/components/buttons/HelpIcon.svelte';
   import Expand from '$lib/components/Expand.svelte';
   import { ALL_YARN_WEIGHTS } from '$lib/constants';
+  import { brands } from '$lib/data/yarns/brands';
   import { safeSlide } from '$lib/features/transitions/safeSlide';
   import { pluralize, stringToDate } from '$lib/utils';
-  import { brands } from '$lib/data/yarns/brands';
   import { ShoppingCartIcon } from '@lucide/svelte';
 
   interface Props {

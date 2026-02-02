@@ -13,11 +13,11 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
+import { MOON_PHASE_NAMES } from '$lib/constants/weather-constants';
 import { gauges, locations, weather } from '$lib/state';
 import { preferences } from '$lib/storage/preferences.svelte';
-import type { ExportOptions, SpreadsheetData } from './types';
 import { getTextColor } from '$lib/utils/color-utils';
-import { MOON_PHASE_NAMES } from '$lib/constants/weather-constants';
+import type { ExportOptions, SpreadsheetData } from './types';
 
 const MONTHS = [
   'January',

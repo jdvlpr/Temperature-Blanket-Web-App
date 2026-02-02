@@ -15,12 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import { dialog, gauges, toast } from '$lib/state';
-  import {
-    CheckIcon,
-    ExternalLinkIcon,
-    LoaderCircleIcon,
-    XIcon,
-  } from '@lucide/svelte';
+  import { CheckIcon, LoaderCircleIcon, XIcon } from '@lucide/svelte';
   import { exportToGoogleSheet } from './client';
   import type { ExportOptions } from './types';
 
