@@ -109,7 +109,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <div class="mb-4 flex flex-col items-center justify-center gap-4">
     <div class="flex w-full flex-wrap items-end justify-center gap-4">
       <label class="label">
-        <span>Square Size</span>
+        <span class="label-text">Square Size</span>
         <select
           class="select min-w-[100px]"
           id="square-size"
@@ -126,7 +126,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </label>
 
       <label class="label">
-        <span>Primary (Background) Color Using the Day's</span>
+        <span class="label-text"
+          >Primary (Background) Color Using the Day's</span
+        >
         <select
           class="select w-fit min-w-[220px] truncate"
           id="primary-target"

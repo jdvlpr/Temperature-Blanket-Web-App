@@ -144,7 +144,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div class="p-4 text-center" bind:this={container}>
-  <p class="my-2 text-center text-xs">Color {title}</p>
   {#if href}
     <a
       class="mx-auto flex w-fit flex-wrap items-center justify-center gap-2 underline"
@@ -174,29 +173,32 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </a>
   {/if}
 
-  <div class="my-2 flex w-full flex-wrap items-center justify-center gap-2">
-    <label class="color-select-label" title="Choose a Color">
-      <input
-        type="color"
-        class="input"
-        value={inputTypeColorValue}
-        onchange={(e) =>
-          inputTypeColorOnChange({
-            value: e.target.value,
-          })}
-      />
-    </label>
-    <label class="color-text-label flex-1" title="Enter a Color">
-      <input
-        type="text"
-        class="input w-full grow"
-        value={inputTypeTextValue}
-        onkeyup={(e) =>
-          inputTypeTextOnChange({
-            value: e.target.value,
-          })}
-      />
-    </label>
+  <div class="flex flex-col justify-start gap-1">
+    <p class="label-text text-left">Color {title}</p>
+    <div class="flex w-full flex-wrap items-center justify-center gap-x-2">
+      <label class="label" title="Choose a Color">
+        <input
+          type="color"
+          class="input"
+          value={inputTypeColorValue}
+          onchange={(e) =>
+            inputTypeColorOnChange({
+              value: e.target.value,
+            })}
+        />
+      </label>
+      <label class=" flex-1" title="Enter a Color">
+        <input
+          type="text"
+          class="input w-full grow"
+          value={inputTypeTextValue}
+          onkeyup={(e) =>
+            inputTypeTextOnChange({
+              value: e.target.value,
+            })}
+        />
+      </label>
+    </div>
   </div>
 
   <YarnGridSelect

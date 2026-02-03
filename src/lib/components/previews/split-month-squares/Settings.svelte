@@ -18,7 +18,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
   import PreviewInfo from '$lib/components/PreviewInfo.svelte';
   import SpanYarnColorSelectIcon from '$lib/components/SpanYarnColorSelectIcon.svelte';
-  import { gauges, dialog, weather } from '$lib/state';
+  import { dialog, gauges, weather } from '$lib/state';
   import { pluralize } from '$lib/utils';
   import { capitalizeFirstLetter } from '$lib/utils/other-utils';
   import { SquareDashedIcon } from '@lucide/svelte';
@@ -57,7 +57,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <p class="text-2xl font-bold">Layout Settings</p>
 
   <label class="label">
-    <span>Size (width x height)</span>
+    <span class="label-text">Size (width x height)</span>
     <select
       class="select w-fit min-w-[80px]"
       id="smsq-dimensions"
@@ -120,7 +120,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 >
   <p class="text-2xl font-bold">Round Settings</p>
   <label class="label">
-    <span
+    <span class="label-text"
       >Color Left Side Using the {capitalizeFirstLetter(
         weather.grouping,
       )}'s</span
@@ -137,7 +137,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </label>
 
   <label class="label">
-    <span
+    <span class="label-text"
       >Color Right Side Using the {capitalizeFirstLetter(
         weather.grouping,
       )}'s</span

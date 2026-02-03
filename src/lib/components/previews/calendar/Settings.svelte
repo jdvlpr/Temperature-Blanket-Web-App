@@ -54,7 +54,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <p class="text-2xl font-bold">Layout Settings</p>
 
   <label class="label">
-    Size (width x height)
+    <span class="label-text">Size (width x height)</span>
     <select
       class="select w-fit min-w-[210px]"
       bind:value={calendarPreview.settings.dimensions}
@@ -152,7 +152,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </button>
 
   <label class="label">
-    Border Size
+    <span class="label-text">Border Size</span>
     <select
       class="select w-fit min-w-[110px]"
       bind:value={calendarPreview.settings.joinStitches}

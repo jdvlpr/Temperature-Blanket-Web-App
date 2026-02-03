@@ -14,32 +14,33 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import { ArrowUpDownIcon } from '@lucide/svelte';
+  import {
+    ArrowDownNarrowWideIcon,
+    ArrowDownWideNarrowIcon,
+  } from '@lucide/svelte';
   import { SegmentedControl } from '@skeletonlabs/skeleton-svelte';
 
   let { direction, onchange } = $props();
 </script>
 
 <SegmentedControl value={direction} onValueChange={onchange}>
-  <SegmentedControl.Label
-    ><p class="flex items-center justify-start gap-1">
-      <ArrowUpDownIcon class="size-4" />
-      <span>Direction</span>
-    </p></SegmentedControl.Label
-  >
   <SegmentedControl.Control
     class="bg-surface-100 dark:bg-surface-900 rounded-container flex-wrap items-start justify-start gap-y-2 border-none shadow-sm"
   >
     <SegmentedControl.Indicator />
     <SegmentedControl.Item value="high-to-low">
-      <SegmentedControl.ItemText title="Set Gauge Direction to High to Low"
-        >High to Low</SegmentedControl.ItemText
+      <SegmentedControl.ItemText
+        title="Set Gauge Direction to High to Low"
+        class="flex items-center gap-1"
+        ><ArrowDownWideNarrowIcon class="" /> High to Low</SegmentedControl.ItemText
       >
       <SegmentedControl.ItemHiddenInput />
     </SegmentedControl.Item>
     <SegmentedControl.Item value="low-to-high">
-      <SegmentedControl.ItemText title="Set Gauge Direction to Low to High"
-        >Low to High</SegmentedControl.ItemText
+      <SegmentedControl.ItemText
+        title="Set Gauge Direction to Low to High"
+        class="flex items-center gap-1"
+        ><ArrowDownNarrowWideIcon class="" /> Low to High</SegmentedControl.ItemText
       >
       <SegmentedControl.ItemHiddenInput />
     </SegmentedControl.Item>

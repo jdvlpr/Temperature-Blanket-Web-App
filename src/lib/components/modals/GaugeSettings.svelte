@@ -20,9 +20,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
   import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
   import StickyPart from '$lib/components/modals/StickyPart.svelte';
+  import { safeSlide } from '$lib/features/transitions/safeSlide';
   import { dialog, gauges, weather } from '$lib/state';
   import { preferences } from '$lib/storage/preferences.svelte';
-  import { safeSlide } from '$lib/features/transitions/safeSlide';
   import {
     displayNumber,
     getIncrement,
@@ -38,9 +38,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     CogIcon,
     Icon,
     ListStartIcon,
+    MoveVerticalIcon,
     TriangleAlertIcon,
     WandIcon,
     WandSparklesIcon,
+    WrenchIcon,
   } from '@lucide/svelte';
   import { SegmentedControl } from '@skeletonlabs/skeleton-svelte';
   import { onMount, tick } from 'svelte';
@@ -211,7 +213,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <div class="p-4">
   <div class="flex w-full items-start justify-center gap-2 max-lg:flex-col">
     <div
-      class="flex flex-col items-start justify-start lg:max-w-[500px]"
+      class="flex flex-col items-start justify-start lg:max-w-[400px]"
       bind:this={setupContainer}
     >
       <h2 class="mb-2 flex flex-wrap items-start text-xl font-bold">
@@ -219,7 +221,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </h2>
 
       <div class="rounded-container flex w-full flex-col gap-2">
-        <div class="flex flex-col items-start justify-start gap-1">
+        <div class="flex flex-col items-start justify-start">
+          <p class="text-xs">Direction</p>
           <ChooseRangeDirection
             direction={_gauge.rangeOptions.direction}
             onchange={(e) => {
@@ -247,11 +250,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <div
           class="card preset-filled-surface-200-800 flex flex-col items-start justify-start gap-2 p-4"
         >
-          <div class="flex flex-col items-start justify-start gap-1">
-            <p class="flex items-center justify-start gap-1">
-              <WandIcon class="size-4" />
-              <span>Generate Ranges</span>
-            </p>
+          <div class="flex flex-col items-start justify-start">
+            <p class="text-xs">Generate Ranges</p>
 
             <SegmentedControl
               value={incrementMode}
@@ -265,15 +265,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 <SegmentedControl.Indicator />
                 <SegmentedControl.Item value="auto">
                   <SegmentedControl.ItemText
+                    class="flex items-center gap-1"
                     title="Automatically Set the Gauge Values"
-                    >Automatic
+                    ><WandIcon /> Automatic
                   </SegmentedControl.ItemText>
                   <SegmentedControl.ItemHiddenInput />
                 </SegmentedControl.Item>
                 <SegmentedControl.Item value="manual">
                   <SegmentedControl.ItemText
+                    class="flex items-center gap-1"
                     title="Manually Set the Gauge Values"
-                    >Manual</SegmentedControl.ItemText
+                    ><WrenchIcon /> Manual</SegmentedControl.ItemText
                   >
                   <SegmentedControl.ItemHiddenInput />
                 </SegmentedControl.Item>
@@ -296,27 +298,29 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 <div class="flex flex-col items-start justify-start gap-2">
                   {#if _gauge.id === 'temp'}
                     <label class="label">
-                      <span class="flex flex-wrap items-center gap-1">
-                        <Icon iconNode={targetArrow} class="size-4" />
-
-                        <span>Balance Focus</span>
-                      </span>
-                      <select
-                        bind:value={_gauge.rangeOptions.auto.optimization}
-                        onchange={() => {
-                          autoUpdateRanges();
-                        }}
-                        class="select bg-surface-100 dark:bg-surface-900"
-                      >
-                        <option value="ranges">Range Increments</option>
-                        {#each _gauge.targets as { id, label, icon }}
-                          <option value={id}>
-                            {icon}
-                            {label}
-                            Days</option
-                          >
-                        {/each}
-                      </select>
+                      <span class="label-text"> Balance Focus </span>
+                      <div class="relative flex items-center">
+                        <Icon
+                          iconNode={targetArrow}
+                          class="pointer-events-none absolute left-2"
+                        />
+                        <select
+                          bind:value={_gauge.rangeOptions.auto.optimization}
+                          onchange={() => {
+                            autoUpdateRanges();
+                          }}
+                          class="select bg-surface-100 dark:bg-surface-900 pl-10"
+                        >
+                          <option value="ranges">Range Increments</option>
+                          {#each _gauge.targets as { id, label, icon }}
+                            <option value={id}>
+                              {icon}
+                              {label}
+                              Days</option
+                            >
+                          {/each}
+                        </select>
+                      </div>
                     </label>
                     <div
                       class="card preset-tonal-success border-success-500 border p-4 text-left"
@@ -383,61 +387,61 @@ If not, see <https://www.gnu.org/licenses/>. -->
               {/if}
 
               {#if _gauge.rangeOptions.mode === 'manual'}
-                <div class="flex flex-wrap justify-start gap-2">
-                  <div
-                    class="tex-left flex w-fit flex-col items-start justify-end"
-                  >
-                    <label for="manual-increment" class="label"
-                      >Increment ({unitLabel})</label
+                <div class="flex flex-col justify-start gap-2">
+                  <label for="manual-increment" class="label">
+                    <span class="label-text">Increment ({unitLabel})</span>
+                    <div
+                      class="input-group bg-surface-100 dark:bg-surface-900 w-fit grid-cols-[auto_1fr]"
                     >
-                    <input
-                      id="manual-increment"
-                      type="number"
-                      min="0"
-                      class="input bg-surface-100 dark:bg-surface-900 w-fit"
-                      onchange={() => {
-                        autoUpdateRanges();
-                      }}
-                      onfocus={() => {
-                        // _gauge.rangeOptions.mode = 'manual';
-                        // _gauge.rangeOptions.isCustomRanges = false;
-                      }}
-                      bind:value={_gauge.rangeOptions.manual.increment}
-                    />
-                  </div>
+                      <span class="ig-cell"><MoveVerticalIcon /></span>
+                      <input
+                        id="manual-increment"
+                        type="number"
+                        class="ig-input"
+                        onchange={() => {
+                          autoUpdateRanges();
+                        }}
+                        onfocus={() => {
+                          // _gauge.rangeOptions.mode = 'manual';
+                          // _gauge.rangeOptions.isCustomRanges = false;
+                        }}
+                        bind:value={_gauge.rangeOptions.manual.increment}
+                      />
+                    </div>
+                  </label>
 
-                  <div class="tex-left flex w-fit flex-col items-start">
-                    <label
-                      for="startFrom"
-                      class="label flex flex-wrap items-center"
+                  <label for="startFrom" class="label">
+                    <span class="label-text">Start From ({unitLabel})</span>
+
+                    <div
+                      class="input-group bg-surface-100 dark:bg-surface-900 w-fit grid-cols-[auto_1fr]"
                     >
-                      <ListStartIcon class="size-4" />
-                      Start From ({unitLabel})
-                      <p class="text-sm">
-                        This should usually be the
-                        {_gauge.rangeOptions.direction === 'high-to-low'
-                          ? 'highest'
-                          : 'lowest'}
-                        possible value from your weather data.
-                      </p>
-                    </label>
-                    <input
-                      id="startFrom"
-                      type="number"
-                      class="input bg-surface-100 dark:bg-surface-900 w-fit"
-                      onfocus={() => {
-                        _gauge.rangeOptions.mode = 'manual';
-                        autoUpdateRanges();
-                      }}
-                      onchange={() => {
-                        autoUpdateRanges();
-                      }}
-                      onkeyup={() => {
-                        autoUpdateRanges();
-                      }}
-                      bind:value={_gauge.rangeOptions.manual.start}
-                    />
-                  </div>
+                      <span class="ig-cell"><ListStartIcon /></span>
+                      <input
+                        id="startFrom"
+                        type="number"
+                        class="ig-input"
+                        onfocus={() => {
+                          _gauge.rangeOptions.mode = 'manual';
+                          autoUpdateRanges();
+                        }}
+                        onchange={() => {
+                          autoUpdateRanges();
+                        }}
+                        onkeyup={() => {
+                          autoUpdateRanges();
+                        }}
+                        bind:value={_gauge.rangeOptions.manual.start}
+                      />
+                    </div>
+                    <p class="text-surface-700-300 text-sm">
+                      This should usually be the
+                      {_gauge.rangeOptions.direction === 'high-to-low'
+                        ? 'highest'
+                        : 'lowest'}
+                      possible value from your weather data.
+                    </p>
+                  </label>
                 </div>
               {/if}
             </div>
@@ -464,28 +468,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
               class="bg-surface-100 dark:bg-surface-900 rounded-container p-2"
             >
               <label class="label">
-                <span
-                  class="my-2 flex flex-col items-center justify-center gap-2"
-                >
-                  <span
-                    class="flex flex-wrap items-center justify-center gap-1"
-                  >
-                    <CalculatorIcon class="size-4" />
-                    Range Calculation Method:<span>{@html rangeExample}</span>
-                    <p class="text-sm">
-                      If you change this setting,
-                      <a
-                        href="/documentation/#range-calculation-methods"
-                        target="_blank"
-                        class="link"
-                        rel="noopener noreferrer"
-                        >make sure your ranges are set up correctly.</a
-                      >
-                    </p>
-                  </span>
+                <span class="label-text">
+                  Range Calculation Method:<span>{@html rangeExample}</span>
+                </span>
 
+                <div class="relative flex items-center">
+                  <CalculatorIcon class="pointer-events-none absolute left-2" />
                   <select
-                    class="select max-w-[500px] truncate"
+                    class="select max-w-[500px] truncate pl-10"
                     value={initialValueSelectRangeCalculationMethod}
                     onchange={(e) => {
                       switch (e.target.value) {
@@ -525,7 +515,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       >Don't include From and To</option
                     >
                   </select>
-                </span>
+                </div>
+                <p class="text-surface-700-300 text-sm">
+                  If you change this setting,
+                  <a
+                    href="/documentation/#range-calculation-methods"
+                    target="_blank"
+                    class="link"
+                    rel="noopener noreferrer"
+                    >make sure your ranges are set up correctly.</a
+                  >
+                </p>
               </label>
             </div>
           </div>

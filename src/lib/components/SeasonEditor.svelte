@@ -139,8 +139,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </div>
 
           <!-- Start Date -->
-          <div class="flex flex-col gap-1">
-            <span class="text-sm font-medium">Start Date</span>
+          <div class="label">
+            <span class="label-text">Start Date</span>
             <div class="flex gap-2">
               <select
                 class="select w-fit"
@@ -184,8 +184,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </div>
 
           <!-- End Date -->
-          <div class="flex flex-col gap-1">
-            <span class="text-sm font-medium">End Date</span>
+          <div class="label">
+            <span class="label-text">End Date</span>
             <div class="flex gap-2">
               <select
                 class="select w-fit"

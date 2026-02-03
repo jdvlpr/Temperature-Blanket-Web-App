@@ -248,7 +248,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <p class="text-2xl font-bold">Settings</p>
 
   <label class="label">
-    <span>Position of Daytime Stitches</span>
+    <span class="label-text">Position of Daytime Stitches</span>
     <select
       class="select w-fit min-w-[150px]"
       id="rsun-daytime-position"
@@ -262,7 +262,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </label>
 
   <label class="label">
-    <span
+    <span class="label-text"
       >Color Daytime ({daytimeRowsPreview.daytimeLabel}) Using the {capitalizeFirstLetter(
         weather.grouping,
       )}'s</span
@@ -279,7 +279,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </label>
 
   <label class="label">
-    <span
+    <span class="label-text"
       >Color Night ({daytimeRowsPreview.nightLabel}) Using the {capitalizeFirstLetter(
         weather.grouping,
       )}'s</span

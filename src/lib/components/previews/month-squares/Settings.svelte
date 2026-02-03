@@ -55,7 +55,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <p class="text-2xl font-bold">Layout Settings</p>
 
   <label class="label">
-    <span>Size (width x height)</span>
+    <span class="label-text">Size (width x height)</span>
     <select
       class="select w-fit min-w-[210px]"
       id="msqs-dimensions"
@@ -118,7 +118,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <p class="text-2xl font-bold">Round Settings</p>
 
   <label class="label">
-    <span
+    <span class="label-text"
       >Color Each Round Using the {capitalizeFirstLetter(
         weather.grouping,
       )}'s</span

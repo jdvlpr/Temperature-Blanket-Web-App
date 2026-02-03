@@ -18,7 +18,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
   import PreviewInfo from '$lib/components/PreviewInfo.svelte';
   import SpanYarnColorSelectIcon from '$lib/components/SpanYarnColorSelectIcon.svelte';
-  import { gauges, dialog, weather } from '$lib/state';
+  import { dialog, gauges, weather } from '$lib/state';
   import { capitalizeFirstLetter } from '$lib/utils/other-utils';
   import { pluralize } from '$lib/utils/string-utils';
   import { continuousSquarePreview } from './state.svelte';
@@ -56,7 +56,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <p class="text-2xl font-bold">Settings</p>
 
   <label class="label">
-    <span
+    <span class="label-text"
       >Color Stitches Using the {capitalizeFirstLetter(
         weather.grouping,
       )}'s</span

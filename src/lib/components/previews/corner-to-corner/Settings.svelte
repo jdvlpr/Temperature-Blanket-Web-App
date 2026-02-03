@@ -36,7 +36,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <p class="text-2xl font-bold">Settings</p>
 
   <label class="label">
-    <span
+    <span class="label-text"
       >Color Lines Using the {capitalizeFirstLetter(weather.grouping)}'s</span
     >
     <select
@@ -56,7 +56,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   {#if cornerToCornerPreview.dimensionsOptions}
     <label class="label">
-      <span>Size (width x height)</span>
+      <span class="label-text">Size (width x height)</span>
       <select
         class="select w-fit min-w-[100px]"
         bind:value={cornerToCornerPreview.settings.dimensions}

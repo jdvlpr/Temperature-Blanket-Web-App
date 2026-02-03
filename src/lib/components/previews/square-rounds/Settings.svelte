@@ -101,7 +101,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <p class="text-2xl font-bold">Layout Settings</p>
 
   <label class="label">
-    Size (width)
+    <span class="label-text">Size (width)</span>
     <select
       class="select w-fit min-w-[120px]"
       bind:value={squareRoundsPreview.settings.columns}
@@ -146,7 +146,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <p class="text-2xl font-bold">Square Settings</p>
 
   <label class="label">
-    {capitalizeFirstLetter(weather.grouping)}s Per Square
+    <span class="label-text"
+      >{capitalizeFirstLetter(weather.grouping)}s Per Square</span
+    >
     <select
       class="select w-fit min-w-[60px]"
       bind:value={squareRoundsPreview.settings.daysPerSquare}
@@ -160,7 +162,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </label>
 
   <label class="label">
-    Border Around Each Square
+    <span class="label-text">Border Around Each Square</span>
     <select
       class="select w-fit min-w-[120px]"
       bind:value={squareRoundsPreview.settings.squareBorder}
@@ -208,7 +210,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <p class="text-2xl font-bold">Round Settings</p>
 
   <label class="label">
-    <span
+    <span class="label-text"
       >Color Each Round Using the {capitalizeFirstLetter(
         weather.grouping,
       )}'s</span

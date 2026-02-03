@@ -38,25 +38,32 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <label
   for="{uid}-checkbox"
-  class={["flex justify-between gap-4 w-full bg-surface-100 dark:bg-surface-900 py-2 px-4 rounded-container shadow-sm", !disabled && 'cursor-pointer']}
+  class={[
+    'bg-surface-100 dark:bg-surface-900 rounded-container flex w-full justify-between gap-4 px-4 py-2 shadow-sm',
+    !disabled && 'cursor-pointer',
+  ]}
 >
-    <div class="flex flex-col items-start">
-      <span class={["flex gap-2 items-center", hasDetails && 'font-bold']}>{@html label}</span>
-      {#if hasDetails}
-        <span class="{detailsTextSize} text-left">{@html details}</span>
-      {/if}
-    </div>
+  <div class="flex flex-col items-start">
+    <span class={['flex items-center gap-2', hasDetails && 'font-bold']}
+      >{@html label}</span
+    >
+    {#if hasDetails}
+      <span class="{detailsTextSize} text-surface-700-300 text-left"
+        >{@html details}</span
+      >
+    {/if}
+  </div>
   <div class="relative inline-flex items-start gap-2">
     <input
       id="{uid}-checkbox"
       type="checkbox"
       bind:checked
-      class="sr-only peer"
+      class="peer sr-only"
       {disabled}
       {onchange}
     />
     <div
-      class="shrink-0 w-11 h-6 bg-surface-300 dark:bg-surface-700 peer-disabled:bg-surface-500 dark:peer-disabled:bg-secondary-900 peer-focus:outline-hidden peer-focus:ring-4 peer-focus:ring-tertiary-200 dark:peer-focus:ring-tertiary-600 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-surface-50-950 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-surface-50 after:border-surface-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-surface-600 peer-checked:bg-primary-900 dark:peer-checked:bg-primary-600"
+      class="bg-surface-300 dark:bg-surface-700 peer-disabled:bg-surface-500 dark:peer-disabled:bg-secondary-900 peer-focus:ring-tertiary-200 dark:peer-focus:ring-tertiary-600 peer peer-checked:after:border-surface-50-950 after:bg-surface-50 after:border-surface-300 dark:border-surface-600 peer-checked:bg-primary-900 dark:peer-checked:bg-primary-600 h-6 w-11 shrink-0 rounded-full peer-focus:ring-4 peer-focus:outline-hidden after:absolute after:top-[2px] after:left-[2px] after:h-5 after:w-5 after:rounded-full after:border after:transition-all after:content-[''] peer-checked:after:translate-x-full"
     ></div>
   </div>
 </label>

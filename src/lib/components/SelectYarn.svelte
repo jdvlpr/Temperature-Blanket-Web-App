@@ -20,6 +20,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { brands } from '$lib/data/yarns/brands';
   import {
     ChevronDownIcon,
+    Icon,
     ListFilterIcon,
     SpoolIcon,
     TagsIcon,
@@ -27,6 +28,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '@lucide/svelte';
   import autocomplete from 'autocompleter';
   import { onMount, untrack } from 'svelte';
+  import { yarnBall } from '@lucide/lab';
 
   interface Props {
     selectedBrandId?: string;
@@ -335,7 +337,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   <div class="input-group w-full grid-cols-[auto_1fr_auto_auto]">
     <span class="ig-cell">
-      <SpoolIcon />
+      <Icon iconNode={yarnBall} />
     </span>
     <input
       bind:this={inputElement}

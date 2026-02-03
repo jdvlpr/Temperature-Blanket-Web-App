@@ -104,7 +104,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   <div class="flex flex-col gap-2">
     <label class="label">
-      Size (width)
+      <span class="label-text">Size (width)</span>
       <select
         class="select w-fit min-w-[120px]"
         bind:value={hexagonRoundsPreview.settings.columns}
@@ -155,7 +155,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <p class="text-2xl font-bold">Hexagon Settings</p>
 
   <label class="label">
-    {capitalizeFirstLetter(weather.grouping)}s Per Hexagon
+    <span class="label-text"
+      >{capitalizeFirstLetter(weather.grouping)}s Per Hexagon</span
+    >
     <select
       class="select w-fit min-w-[60px]"
       bind:value={hexagonRoundsPreview.settings.roundsPerHexagon}
@@ -169,7 +171,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </label>
 
   <label class="label">
-    Border Around Each Hexagon
+    <span class="label-text">Border Around Each Hexagon</span>
     <select
       class="select w-fit min-w-[120px]"
       bind:value={hexagonRoundsPreview.settings.hexagonBorder}
@@ -217,7 +219,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <p class="text-2xl font-bold">Round Settings</p>
 
   <label class="label">
-    <span
+    <span class="label-text"
       >Color Each Round Using the {capitalizeFirstLetter(
         weather.grouping,
       )}'s</span

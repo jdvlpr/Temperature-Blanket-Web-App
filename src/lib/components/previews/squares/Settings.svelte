@@ -16,12 +16,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script>
   import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
   import SquareDesigner from '$lib/components/modals/SquareDesigner.svelte';
+  import PreviewInfo from '$lib/components/PreviewInfo.svelte';
   import SpanYarnColorSelectIcon from '$lib/components/SpanYarnColorSelectIcon.svelte';
-  import { gauges, dialog, weather } from '$lib/state';
+  import { dialog, gauges, weather } from '$lib/state';
   import { pluralize } from '$lib/utils';
   import { SquareDashedIcon, SquareSquareIcon } from '@lucide/svelte';
   import { squaresPreview } from './state.svelte';
-  import PreviewInfo from '$lib/components/PreviewInfo.svelte';
 
   let targets = $derived(gauges.allCreated.map((n) => n.targets).flat());
 
@@ -69,7 +69,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <p class="text-2xl font-bold">Layout Settings</p>
 
   <label class="label">
-    Size (width)
+    <span class="label-text">Size (width)</span>
     <select
       class="select w-fit min-w-[120px]"
       bind:value={squaresPreview.settings.columns}
@@ -85,7 +85,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </label>
 
   <label class="label">
-    <span>Squares at Beginning</span>
+    <span class="label-text">Squares at Beginning</span>
     <select
       class="select w-fit min-w-[60px]"
       bind:value={squaresPreview.settings.squaresAtBeginning}
@@ -99,7 +99,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </label>
 
   <label class="label">
-    <span>Squares Between Months</span>
+    <span class="label-text">Squares Between Months</span>
     <select
       class="select w-fit min-w-[60px]"
       bind:value={squaresPreview.settings.squaresBetweenMonthsCount}
@@ -174,7 +174,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/if}
 
   <label class="label">
-    Border Size
+    <span class="label-text">Border Size</span>
     <select
       class="select w-fit min-w-[110px]"
       bind:value={squaresPreview.settings.joinStitches}

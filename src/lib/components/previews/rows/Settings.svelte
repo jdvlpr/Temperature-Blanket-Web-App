@@ -137,7 +137,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   />
 
   <label class="label">
-    <span>Stitches Per {capitalizeFirstLetter(weather.grouping)} Using</span>
+    <span class="label-text"
+      >Stitches Per {capitalizeFirstLetter(weather.grouping)} Using</span
+    >
     <select
       class="select w-fit"
       id="rows-length-param"
