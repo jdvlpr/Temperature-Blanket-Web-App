@@ -48,7 +48,7 @@ class PreviewsState {
     squaresPreview,
   ]);
 
-  activeId = $state();
+  activeId = $state<string>();
 
   active = $derived(this.all.find((n) => n.id === this.activeId));
 

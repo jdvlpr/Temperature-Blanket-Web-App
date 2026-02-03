@@ -22,11 +22,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let activeIndex = $derived(
     pageSections.items.find((section) => section.active === true)?.index || 1,
   );
-  // 3. Element References
+  // element references
   let containerFn = $state();
   let buttonRefs = $state([]);
 
-  // 4. Logic to calculate position
+  // Logic to calculate position
   function updateIndicator() {
     // Find the active button element based on ID
     const index = activeIndex;
@@ -44,14 +44,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
     }
   }
 
-  // 5. Reactive Effect: Re-run when activeId changes
+  // Reactive Effect: Re-run when activeId changes
   $effect(() => {
     // Just referencing activeId makes this effect run when it changes
     activeIndex;
     updateIndicator();
   });
 
-  // 6. Handle Window Resizing
+  // Handle Window Resizing
   onMount(() => {
     // Initial calculation after mount
     updateIndicator();
@@ -91,7 +91,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           onclick={() => goToProjectSection(index)}
           data-active={active}
           data-no-weather={!weather.data}
-          class=" hover:data-[no-weather=false]:data-[active=false]:text-surface-950-50 data-[active=true]:text-surface-950-50 text-surface-700-300 z-10 flex w-full flex-col items-center justify-center p-2 transition-colors duration-200 disabled:opacity-30 data-[active=false]:data-[no-weather=true]:opacity-50"
+          class="hover:data-[no-weather=false]:data-[active=false]:text-surface-950-50 data-[active=true]:text-surface-950-50 text-surface-700-300 z-10 flex w-full flex-col items-center justify-center p-2 transition-colors duration-200 disabled:opacity-30 data-[active=false]:data-[no-weather=true]:opacity-50"
         >
           <span>
             {@html icon}

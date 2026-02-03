@@ -95,14 +95,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </label>
 
   <div
-    class="relative mx-auto my-2 flex w-fit snap-x justify-start overflow-auto pb-2"
+    class="relative mx-auto my-2 flex w-fit snap-x justify-start overflow-auto pb-3"
   >
     {#each previews.all as { img, name, id }}
       {#if img}
         {#key theme}
           <button
             class={[
-              'relative mx-2 shrink-0 snap-center rounded p-2',
+              'relative mx-1 shrink-0 snap-center rounded p-2',
               id === previews.activeId
                 ? 'bg-primary-200 dark:bg-primary-800 selected shadow-sm'
                 : 'hover:preset-tonal-surface',
