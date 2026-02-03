@@ -495,7 +495,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </div>
       {#if location.id && location.lat && location.lng}
         <button
-          class="btn hover:preset-tonal-surface w-fit text-xs opacity-50 hover:opacity-100"
+          class="btn hover:preset-tonal-surface w-fit gap-1 text-xs opacity-50 hover:opacity-100"
           onclick={() => {
             dialog.trigger({
               type: 'component',
