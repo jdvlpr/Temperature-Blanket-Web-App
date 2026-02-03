@@ -3,7 +3,7 @@
   import { brands } from '$lib/data/yarns/brands';
   import type { YarnWeight } from '$lib/types';
   import { pluralize } from '$lib/utils';
-  import { CircleQuestionMarkIcon, WeightIcon } from '@lucide/svelte';
+  import { CircleQuestionMarkIcon, SpoolIcon } from '@lucide/svelte';
 
   interface Props {
     selectedBrandId?: string;
@@ -70,7 +70,7 @@
     ></span
   >
   <div class="relative flex items-center">
-    <WeightIcon class="absolute left-2" />
+    <SpoolIcon class="absolute left-2" />
     <select
       class="select truncate pl-10"
       bind:value={selectedYarnWeightId}

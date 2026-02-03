@@ -25,6 +25,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
   import Expand from '$lib/components/Expand.svelte';
   import Spinner from '$lib/components/Spinner.svelte';
+  import { safeSlide } from '$lib/features/transitions/safeSlide';
   import { locations, project, toast, weather } from '$lib/state';
   import {
     dateToISO8601String,
@@ -40,7 +41,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     XIcon,
   } from '@lucide/svelte';
   import { Accordion } from '@skeletonlabs/skeleton-svelte';
-  import { safeSlide } from '$lib/features/transitions/safeSlide';
 
   let accordionValue = $state(['jan28,2026']);
 
@@ -500,27 +500,29 @@ If not, see <https://www.gnu.org/licenses/>. -->
         class="m-2 mb-4 flex flex-col gap-6"
       >
         <div>
-          <label for="projectLink" class="label">Link to your project </label>
-          <div class="input-group grid-cols-[1fr_auto]">
-            <input
-              id="projectLink"
-              class="ig-input"
-              bind:value={projectLink}
-              type="text"
-              name="projectLink"
-              placeholder="Your Project URL"
-            />
-            <button
-              class="ig-btn preset-filled"
-              title="Clear"
-              onclick={(e) => {
-                e.preventDefault();
-                projectLink = '';
-              }}
-            >
-              <XIcon size={16} />
-            </button>
-          </div>
+          <label for="projectLink" class="label">
+            <span class="label-text">Link to your project</span>
+            <div class="input-group grid-cols-[1fr_auto]">
+              <input
+                id="projectLink"
+                class="ig-input"
+                bind:value={projectLink}
+                type="text"
+                name="projectLink"
+                placeholder="Your Project URL"
+              />
+              <button
+                class="ig-btn preset-filled"
+                title="Clear"
+                onclick={(e) => {
+                  e.preventDefault();
+                  projectLink = '';
+                }}
+              >
+                <XIcon size={16} />
+              </button>
+            </div>
+          </label>
         </div>
 
         <p class="font-bold">What issue are you having?</p>
@@ -538,9 +540,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
         {#if dataShifted}
           <label for="frequencyShifted" class="label">
-            How often does this happen?
+            <span class="label-text">How often does this happen?</span>
             <select
-              class="select whitespace-pre-wrap"
+              class="select truncate whitespace-pre-wrap"
               id="frequencyShifted"
               name="frequencyShifted"
             >
@@ -557,7 +559,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </label>
 
           <label for="sameDates" class="label">
-            <p>Are the following two dates the same?</p>
+            <p class="label-text">Are the following two dates the same?</p>
             <div class="grid grid-cols-2 items-center gap-2 text-center">
               <p class="bg-surface-50-950 rounded-container p-2">
                 {dateToISO8601String(stringToDate('2025-01-01'))}
@@ -610,7 +612,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </ul>
 
             <label for="description" class="label">
-              If you tested the archived version, what was the result?
+              <span class="label-text"
+                >If you tested the archived version, what was the result?</span
+              >
               <textarea
                 id="archiveResult"
                 class="textarea"
@@ -635,7 +639,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
         {#if otherIssue}
           <label for="description" class="label">
-            Describe the issue, as well as any steps taken beforehand
+            <span class="label-text"
+              >Describe the issue, as well as any steps taken beforehand</span
+            >
             <textarea
               id="description"
               class="textarea"
@@ -647,7 +653,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {/if}
 
         <label for="comments" class="label">
-          Any other comments
+          <span class="label-text">Any other comments</span>
           <textarea
             id="comments"
             class="textarea"
@@ -659,7 +665,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
         <!-- File Input -->
         <label class="label">
-          Attach any relevant images or screenshots (5MB max)
+          <span class="label-text"
+            >Attach any relevant images or screenshots (5MB max)</span
+          >
           <input
             type="file"
             class="input"
@@ -677,7 +685,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </div>
 
         <label for="your-email" class="label">
-          Your email (if you're interested in further communication)
+          <span class="label-text"
+            >Your email (if you're interested in further communication)</span
+          >
           <input
             id="your-email"
             class="input"
@@ -687,7 +697,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           />
         </label>
         <label for="your-name" class="label">
-          Your name (if you're interested in further communication)
+          <span class="label-text"
+            >Your name (if you're interested in further communication)</span
+          >
           <input
             id="your-name"
             class="input"
