@@ -610,7 +610,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </div>
       {/if}
 
-      <label class="label col-span-8 w-full sm:col-span-4 sm:col-start-9">
+      <label
+        class="label col-span-8 w-full sm:col-span-4 sm:col-start-9"
+        for="duration-{location.uuid}"
+      >
         <span class="label-text">Duration</span>
         <select
           class="select w-full"
@@ -624,6 +627,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               setDates({});
             }
           }}
+          id="duration-{location.uuid}"
           title="Select a duration"
         >
           <option value="y" selected>One Year</option>

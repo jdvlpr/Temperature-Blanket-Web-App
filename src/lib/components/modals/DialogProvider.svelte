@@ -19,7 +19,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { fly } from 'svelte/transition';
   import CloseButton from './CloseButton.svelte';
   import SaveAndCloseButtons from './SaveAndCloseButtons.svelte';
-  import { EyeIcon } from '@lucide/svelte';
 </script>
 
 <Dialog
