@@ -34,6 +34,8 @@ vi.mock('$lib/state', () => ({
   },
   locations: {
     projectTitle: 'Test Project',
+    all: [],
+    load: vi.fn(),
   },
 }));
 
@@ -88,6 +90,7 @@ describe('storage-utils integration', () => {
     vi.stubGlobal('indexedDB', {});
     vi.stubGlobal('$effect', { root: vi.fn() });
     vi.stubGlobal('fetch', vi.fn());
+    vi.stubGlobal('$state', { snapshot: vi.fn((v) => v) });
     vi.stubGlobal('document', {
       documentElement: {
         classList: { add: vi.fn(), remove: vi.fn(), toggle: vi.fn() },
@@ -131,10 +134,10 @@ describe('storage-utils integration', () => {
 
     vi.spyOn(ProjectStorage, 'getById').mockResolvedValue(projectData as any);
 
-    await storageUtils.checkForProjectInStorage();
+    await storageUtils.loadProjectFromStorage();
 
     const { weather } = await import('$lib/state');
     expect(weather.rawData).toHaveLength(1);
-    expect(weather.isFromLocalStorage).toBe(true);
+    expect(weather.wasLoadedFromStorage).toBe(true);
   });
 });

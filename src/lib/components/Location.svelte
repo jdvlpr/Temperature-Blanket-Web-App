@@ -18,7 +18,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { MONTHS } from '$lib/constants';
   import { safeSlide } from '$lib/features/transitions/safeSlide';
   import { dialog, locations, project, toast, weather } from '$lib/state';
-  import type { LocationType } from '$lib/types/location-types';
+  import type {
+    LocationStateType,
+    LocationType,
+  } from '$lib/types/location-types';
   import {
     dateToISO8601String,
     displayGeoNamesErrorMessage,
@@ -48,7 +51,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import LocationDetails from './modals/LocationDetails.svelte';
 
   interface Props {
-    location: LocationType;
+    location: LocationStateType;
     index: number;
   }
 
@@ -102,7 +105,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   // 'hasLoaded' gets checked so that the initial setup function doesn't run again. This is important because otherwise it would get called on every keystroke.
   // NOTE: This is a bit of a hack, but it works.
   $effect(() => {
-    if (location?.wasLoadedFromSavedProject && !hasLoaded) {
+    if (
+      (location?.wasLoadedFromURL || location?.wasLoadedFromStorage) &&
+      !hasLoaded
+    ) {
       location.duration = location?.duration || 'c';
 
       if (location?.from) {

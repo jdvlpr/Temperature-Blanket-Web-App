@@ -745,9 +745,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             name="loaded"
             value={encodeURIComponent(
               JSON.stringify(
-                $state.snapshot(
-                  locations.all.map((n) => n.wasLoadedFromSavedProject),
-                ),
+                $state.snapshot(locations.all.map((n) => n.wasLoadedFromURL)),
               ),
             )}
           />

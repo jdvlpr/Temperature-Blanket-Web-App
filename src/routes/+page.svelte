@@ -37,13 +37,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     locations,
     pageSections,
     project,
-    wasProjectLoadedFromURL,
     weather,
   } from '$lib/state';
-  import { checkForProjectInStorage } from '$lib/storage/storage-utils.svelte';
+  import { loadProjectFromStorage } from '$lib/storage/storage-utils.svelte';
   import {
     loadFromHistory,
-    setProjectSettings,
+    loadProjectFromURL,
     setUnitsFromNavigator,
     updateHistory,
     upToDate,
@@ -71,19 +70,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
     debounceTimer = window.setTimeout(callback, time);
   };
 
-  async function loadProjectFromURL() {
+  async function loadProject() {
     // Check if the project needs to show a legacy notification
     // Use this to display warnings about backwards compatibility if the project is incompatible
-    if (!upToDate(project.loaded.version, '0.98'))
+    if (!upToDate(project.onLoaded.version, '0.98'))
       dialog.trigger({
         type: 'component',
         component: { ref: LegacyNotification, props: { v: 'v0.98' } },
       });
 
-    await setProjectSettings();
+    await loadProjectFromStorage();
 
-    await checkForProjectInStorage();
-    if (locations.allValid) wasProjectLoadedFromURL.value = true;
+    await loadProjectFromURL();
+
+    if (locations.allValid) project.status.wasLoaded = true;
   }
 
   $effect(() => {
@@ -91,13 +91,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 
   onMount(async () => {
-    const hasProjectURLParam = new URL(window.location.href).searchParams.has(
-      'project',
-    );
+    const isProject = new URL(window.location.href).searchParams.has('project');
 
-    if (hasProjectURLParam) {
+    if (isProject) {
       // Load a project from the URL
-      await loadProjectFromURL();
+      await loadProject();
     } else {
       // Setup up a new project
       // Load the default units based on window.navigator

@@ -34,19 +34,26 @@ export class LocationClass implements LocationType {
   duration?: 'c' | 'y' = $state('y');
   from?: TISO8601DateString = $state();
   to?: TISO8601DateString = $state();
-  label?: string = $state();
-  result?: string = $state();
+  label?: string = $state('');
+  result?: string = $state('');
   id?: number = $state();
-  lat?: string = $state();
-  lng?: string = $state();
+  lat?: string = $state('');
+  lng?: string = $state('');
   elevation?: number = $state();
   stations?: null | any[] = $state();
   source?: WeatherSource = $state();
-  wasLoadedFromSavedProject?: boolean = $state();
+  wasLoadedFromURL?: boolean = $state(false);
+  wasLoadedFromStorage?: boolean = $state(false);
 }
 export class LocationState extends LocationClass implements LocationStateType {
-  constructor() {
+  constructor(location?: LocationType) {
     super();
+    if (location) {
+      // for each key in location, set this[key] = location[key]
+      Object.keys(location).forEach((key) => {
+        this[key] = location[key];
+      });
+    }
     this.uuid =
       browser && crypto && typeof crypto.randomUUID === 'function'
         ? crypto.randomUUID()
@@ -103,7 +110,7 @@ export class LocationsState implements LocationsStateType {
     this.all.push(location);
   }
 
-  all = $state([]);
+  all = $state<LocationStateType[]>([]);
 
   totalDays = $derived.by(() => {
     const arrayOfDayCount = this.all.map((n: LocationState) => {
@@ -150,7 +157,7 @@ export class LocationsState implements LocationsStateType {
   });
 
   projectFilename = $derived.by(() => {
-    if (!this.all.length) return false;
+    if (!this.all.length) return '';
     let filename = '';
     this.all.forEach((location) => {
       filename += `${location?.label}-from-${location?.from}-to-${location?.to}`;
@@ -177,7 +184,7 @@ export class LocationsState implements LocationsStateType {
         titles.push(title);
       }
     });
-    if (titles.length === 0) return;
+    if (titles.length === 0) return '';
     let title = titles.join('; ');
     return title;
   });
@@ -187,6 +194,22 @@ export class LocationsState implements LocationsStateType {
     const newLocation = new LocationState();
     newLocation.index = this.all.length;
     this.all.push(newLocation);
+  }
+
+  load({
+    locations,
+    source = 'storage',
+  }: {
+    locations: LocationType[];
+    source?: 'storage';
+  }): void {
+    this.all = [];
+    for (const location of locations) {
+      const newLocation = new LocationState(location);
+      newLocation.index = this.all.length;
+      if (source === 'storage') newLocation.wasLoadedFromStorage = true;
+      this.all.push(newLocation);
+    }
   }
 
   remove(uuid: string) {

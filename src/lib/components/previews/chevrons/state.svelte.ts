@@ -124,7 +124,7 @@ export class ChevronsPreviewClass {
       separatorIndex + 1,
       endIndex,
     );
-    if (!upToDate(project.loaded.version, '1.747'))
+    if (!upToDate(project.onLoaded.version, '1.747'))
       this.settings.chevronSideLength = Math.round(
         (this.settings.chevronSideLength / 2) * Math.sqrt(2),
       ); // Version 1.747 changed chevronWidth to the length of each side of the chevron

@@ -237,7 +237,7 @@ class WeatherClass {
 
   isUserEdited: boolean = $state(false);
 
-  isFromLocalStorage: boolean = $state(false);
+  wasLoadedFromStorage: boolean = $state(false);
 
   pdfOptions: {
     gauges: GaugeAttributes['id'][];
