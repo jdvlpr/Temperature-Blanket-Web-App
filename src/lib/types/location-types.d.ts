@@ -35,10 +35,11 @@ export interface LocationType {
   population?: number;
   stations?: null | any[]; // TODO: Change 'any[]' to a more specific type if possible. Stations are set when using Meteostat for a weather source.
   source?: WeatherSource;
-  wasLoadedFromSavedProject?: boolean;
+  wasLoadedFromURL?: boolean;
+  wasLoadedFromStorage?: boolean;
 }
 
-export interface LocationStateType {
+export interface LocationStateType extends LocationType {
   isValid: boolean;
   #fromDate: Date | null;
   #toDate: Date | null;
@@ -50,9 +51,9 @@ export interface LocationStateType {
 
 export interface LocationsStateType {
   all: LocationStateType[];
-  totalDays: number;
+  totalDays: number | null;
   allValid: boolean;
   urlHash: string;
-  projectFileName: string;
-  projectTitle: string | undefined | null;
+  projectFilename: string;
+  projectTitle: string;
 }

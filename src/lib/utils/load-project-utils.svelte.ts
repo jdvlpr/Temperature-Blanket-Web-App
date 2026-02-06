@@ -46,7 +46,7 @@ import {
 } from '$lib/utils';
 import { seasonsFromUrlHash } from '$lib/utils/seasons-utils.svelte';
 
-export const setProjectSettings = async (
+export const loadProjectFromURL = async (
   hash = window.location.hash.substring(1),
 ) => {
   const params = getProjectParametersFromURLHash(hash);
@@ -94,7 +94,9 @@ export const setProjectSettings = async (
   });
 
   // Load Weather Source (added in v1.823)
-  if (exists(params.s)) {
+  loadWeatherSource: if (exists(params.s)) {
+    if (weather.source.wasLoadedFromStorage) break loadWeatherSource;
+
     const sourceCode = params.s.value.substring(0, 1);
     if (sourceCode === '0') weather.source.name = 'Meteostat';
     else if (sourceCode === '1') weather.source.name = 'Open-Meteo';
@@ -111,6 +113,7 @@ export const setProjectSettings = async (
       else if (lastSubstring === 'e')
         weather.source.settings.openMeteo.model = 'era5';
     }
+    weather.source.wasLoadedFromURLHash = true;
   } else {
     // Projects before v1.823 didn't have this param, and only used Meteostat as a weather source
     weather.source.name = 'Meteostat';
@@ -139,6 +142,12 @@ export const setProjectSettings = async (
 };
 
 const parseLocationURLHash = async (hashString) => {
+  const wasLoadedFromStorage = locations.all.every(
+    (location) => location.wasLoadedFromStorage,
+  );
+
+  // If all locations were loaded from storage, then we don't need to load them from the URL hash
+  if (wasLoadedFromStorage) return;
   // First, get all the positions of the separator character(s)
   // This determines the number of locations
   const separatorIndices = [];
@@ -161,7 +170,7 @@ const parseLocationURLHash = async (hashString) => {
 
     if (_locations.length - 1 < i) {
       // There needs to be another location, so create it
-      locations.add();
+      locations.add({ clearWeatherData: false });
     }
 
     _locations[i].label = 'Loading...';
@@ -233,9 +242,6 @@ const parseLocationURLHash = async (hashString) => {
     // Set the location's to date
     _locations[i].to = to;
 
-    // Set this to true so that certain functions on the Project Planner page know to run when this location is loaded
-    _locations[i].wasLoadedFromSavedProject = true;
-
     // Get  data from GeoNames using the location's id
     try {
       const response = await fetch(`/api/location/${id}`);
@@ -277,6 +283,9 @@ const parseLocationURLHash = async (hashString) => {
     } catch (e) {
       throw displayGeoNamesErrorMessage(e);
     }
+
+    // Set this to true so that certain functions on the Project Planner page know to run when this location is loaded
+    _locations[i].wasLoadedFromURL = true;
   }
 
   locations.all = _locations;
@@ -387,7 +396,7 @@ export const parseGaugeURLHash = (hashString: string, gauge) => {
 
     // Before version 1.700, all numbers were saved in metric
     // So convert the From and To values if needed
-    if (!upToDate(project.loaded.version, '1.700')) {
+    if (!upToDate(project.onLoaded.version, '1.700')) {
       if (preferences.value.units === 'imperial') {
         switch (gauge.id) {
           case 'temp':
@@ -542,7 +551,7 @@ export const parseGaugeURLHash = (hashString: string, gauge) => {
     // Before version 1.700, all numbers were in metric
     // So update them if needed
     if (
-      !upToDate(project.loaded.version, '1.700') &&
+      !upToDate(project.onLoaded.version, '1.700') &&
       preferences.value.units === 'imperial'
     ) {
       increment = celsiusToFahrenheit(increment);

@@ -71,23 +71,23 @@ type ProjectStatusType = {
   };
   temporaryProjectsBackup: any[]; // A temporary backup of projects in case migration fails
   temporaryUid: string;
+  wasLoaded: boolean;
 };
 
 class ProjectClass {
   // *****************
   // Constant Properties
   // *****************
-  loaded = {
+  onLoaded = {
     version: browser
-      ? new URL(window.location).searchParams.get('v') || version
+      ? new URL(window.location.href).searchParams.get('v') || version
       : '',
-    href: browser ? new URL(window.location).href : '',
   };
 
   // Timestamp identifying when the app was initialized, used as a kind of unique ID for the project (though technically may not be unique if two users initialize at the exact same time).
   // It doesn't have any real meaning apart from an identifier for a project.
   timeStampId = browser
-    ? new URL(window.location).searchParams.get('project') ||
+    ? new URL(window.location.href).searchParams.get('project') ||
       new Date().getTime()?.toString()
     : '';
 
@@ -151,14 +151,15 @@ class ProjectClass {
   });
 
   status = $state<ProjectStatusType>({
-    saved: false,
-    loading: true,
     error: {
       code: null,
       message: '',
     },
+    loading: true,
+    saved: false,
     temporaryProjectsBackup: [],
     temporaryUid: '',
+    wasLoaded: false,
   });
 
   gallery = $state({

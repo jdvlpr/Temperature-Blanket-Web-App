@@ -219,6 +219,8 @@ class WeatherClass {
         model: true,
       },
     },
+    wasLoadedFromStorage: false,
+    wasLoadedFromURLHash: false,
   });
 
   grouping: 'day' | 'week' = $state('day');
@@ -237,7 +239,7 @@ class WeatherClass {
 
   isUserEdited: boolean = $state(false);
 
-  isFromLocalStorage: boolean = $state(false);
+  wasLoadedFromStorage: boolean = $state(false);
 
   pdfOptions: {
     gauges: GaugeAttributes['id'][];

@@ -53,7 +53,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         // Add the default temperature gauge
         gauges.addById('temp');
         weather.isUserEdited = false;
-        weather.isFromLocalStorage = false;
+        weather.wasLoadedFromStorage = false;
         dialog.close();
         await goToProjectSection(2, true);
         // Auto-set seasons based on the first location's hemisphere
@@ -63,7 +63,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         controller.value = null;
         weather.rawData = [];
         weather.isUserEdited = false;
-        weather.isFromLocalStorage = false;
+        weather.wasLoadedFromStorage = false;
         error = e?.message;
       });
   }

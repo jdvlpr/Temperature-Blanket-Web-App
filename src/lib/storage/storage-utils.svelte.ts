@@ -127,7 +127,7 @@ export async function initializeLocalStorage() {
 /**
  * Retrieves the project data from storage and sets the necessary values.
  */
-export const checkForProjectInStorage = async () => {
+export const loadProjectFromStorage = async () => {
   if (!ProjectStorage.isAvailable()) return;
   const id = new URL(window.location.href).searchParams.get('project');
   if (!id) return;
@@ -143,10 +143,16 @@ export const checkForProjectInStorage = async () => {
     weather.source.useSecondary = useSecondary;
     if (weatherSource?.settings)
       weather.source.settings = weatherSource.settings;
+    weather.source.wasLoadedFromStorage = true;
   }
 
   // Set isCustomWeather
   weather.isUserEdited = matchedProject.isCustomWeatherData === true;
+
+  // Set location data
+  if (matchedProject.locations && matchedProject.locations.length) {
+    locations.load({ locations: matchedProject.locations, source: 'storage' });
+  }
 
   // Set weather data and convert dates to Date objects
   const weatherLocalStorage = matchedProject.weatherData;
@@ -179,7 +185,7 @@ export const checkForProjectInStorage = async () => {
 
   // Set the weather data and indicate that it was loaded from storage
   weather.rawData = newWeatherUngrouped;
-  weather.isFromLocalStorage = true;
+  weather.wasLoadedFromStorage = true;
 };
 
 export const setProjectInStorage = async () => {
@@ -222,10 +228,28 @@ const createProjectLocalStorageProjectObject = (): LocalStorageProject => {
 
   const weatherSource: WeatherSourceOptions = $state.snapshot(weather.source);
 
+  const locationsDetails = locations.all.map((location) => {
+    return {
+      duration: location.duration,
+      from: location.from,
+      to: location.to,
+      id: location.id,
+      lat: location.lat,
+      lng: location.lng,
+      elevation: location.elevation,
+      fclName: location.fclName,
+      population: location.population,
+      label: location.label,
+      flagIcon: location.flagIcon,
+      result: location.result,
+    };
+  });
+
   return {
     date,
     isCustomWeatherData,
     href,
+    locations: locationsDetails,
     title: _title,
     weatherData: weatherData as unknown as WeatherDay[],
     weatherSource: weatherSource as unknown as WeatherSourceOptions,

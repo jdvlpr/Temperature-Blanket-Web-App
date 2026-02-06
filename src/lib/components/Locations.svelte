@@ -17,12 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { version } from '$app/environment';
   import Location from '$lib/components/Location.svelte';
   import { MAXIMUM_LOCATIONS } from '$lib/constants';
-  import {
-    locations,
-    project,
-    wasProjectLoadedFromURL,
-    weather,
-  } from '$lib/state';
+  import { locations, project, weather } from '$lib/state';
   import { pluralize, stringToDate } from '$lib/utils';
   import {
     CircleCheckBigIcon,
@@ -35,8 +30,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   const loading = $derived(locations.allValid && project.status.loading);
   const validLoadedProject = $derived(
-    (weather.isFromLocalStorage && weather.data) ||
-      wasProjectLoadedFromURL.value,
+    (weather.wasLoadedFromStorage && !!weather.data.length) ||
+      project.status.wasLoaded,
   );
 </script>
 
@@ -48,10 +43,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
       class="flex w-full flex-wrap items-center justify-center gap-1 text-center text-sm"
     >
       <CircleCheckBigIcon class="text-success-900-100 size-4" />
-      {#if weather.isFromLocalStorage && weather.data}
+      {#if weather.wasLoadedFromStorage && !!weather.data.length}
         Loaded project and {#if weather.isUserEdited}custom weather{:else}weather{/if}
         data
-      {:else if wasProjectLoadedFromURL.value}
+      {:else if project.status.wasLoaded}
         Loaded project
       {/if}
     </p>

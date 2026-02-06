@@ -30,6 +30,8 @@ export interface WeatherSourceOptions {
       model: boolean;
     };
   };
+  wasLoadedFromStorage: boolean;
+  wasLoadedFromURLHash: boolean;
 }
 
 export type MoonPhasesId = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7;

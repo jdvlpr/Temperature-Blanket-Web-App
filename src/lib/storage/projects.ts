@@ -1,6 +1,10 @@
 import { browser } from '$app/environment';
+import type {
+  LocationType,
+  WeatherDay,
+  WeatherSourceOptions,
+} from '$lib/types';
 import { del, get, set } from 'idb-keyval';
-import type { WeatherDay, WeatherSourceOptions } from '$lib/types';
 
 export type LocalStorageProjectIndexItem = {
   id: string;
@@ -15,6 +19,7 @@ export type LocalStorageProjectIndexItem = {
 export type LocalStorageProject = {
   date: string;
   href: string;
+  locations?: LocationType[];
   isCustomWeatherData: boolean;
   title: string;
   weatherData: WeatherDay[];
@@ -165,5 +170,20 @@ export class ProjectStorage {
     const indexItem = await this.getIndexItemByHref(href);
     if (!indexItem) return;
     await this.removeById(indexItem.id);
+  }
+
+  /**
+   * Get full project by its timestamp
+   */
+  static async getByTimestamp(
+    timestamp: string,
+  ): Promise<LocalStorageProject | null> {
+    const index = await this.getIndex();
+    const indexItem = index.find((i) => {
+      const url = new URL(i.meta.href);
+      return url.searchParams?.get('t') === timestamp;
+    });
+    if (!indexItem) return null;
+    return this.getById(indexItem.id);
   }
 }
