@@ -50,6 +50,9 @@ vi.mock('$lib/state', () => ({
       return null;
     }),
   },
+  project: {
+    url: { href: 'http://localhost/?project=123' },
+  },
 }));
 
 vi.mock('$lib/utils', async (importOriginal) => {

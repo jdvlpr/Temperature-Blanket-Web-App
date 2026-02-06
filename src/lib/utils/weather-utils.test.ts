@@ -80,6 +80,9 @@ vi.mock('$lib/state', () => ({
   locations: mockLocations,
   signal: { value: null },
   allGaugesAttributes: mockAllGaugesAttributes,
+  project: {
+    url: { href: 'http://localhost/?project=123' },
+  },
 }));
 
 // Mock utils that are used within weather-utils

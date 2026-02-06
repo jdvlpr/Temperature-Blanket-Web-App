@@ -1,9 +1,9 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
 import { MigrationManager } from '../storage/migration-manager';
-import { ProjectStorage } from './projects';
+import { ProjectStorage } from './projects.svelte';
 
 // Mock ProjectStorage
-vi.mock('./projects', () => ({
+vi.mock('./projects.svelte', () => ({
   ProjectStorage: {
     isAvailable: vi.fn(() => true),
     getById: vi.fn(),

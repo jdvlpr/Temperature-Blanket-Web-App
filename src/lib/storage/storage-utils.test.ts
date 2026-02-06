@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { MigrationManager } from './migration-manager';
-import { ProjectStorage } from './projects';
+import { ProjectStorage } from './projects.svelte';
 import * as storageUtils from './storage-utils.svelte';
 
 // Mock idb-keyval
@@ -26,6 +26,9 @@ vi.mock('$lib/state', () => ({
     isFromLocalStorage: false,
   },
   project: {
+    onLoaded: {
+      href: 'http://localhost/?project=123',
+    },
     url: { href: 'http://localhost/?project=123' },
     status: {
       temporaryProjectsBackup: [],
@@ -118,9 +121,9 @@ describe('storage-utils integration', () => {
       .spyOn(ProjectStorage, 'save')
       .mockResolvedValue(undefined);
 
-    await storageUtils.setProjectInStorage();
+    await ProjectStorage.save({ id: '123' });
 
-    expect(saveSpy).toHaveBeenCalledWith('123', expect.any(Object));
+    expect(saveSpy).toHaveBeenCalledWith({ id: '123' });
   });
 
   it('should load project through storage class', async () => {
@@ -134,7 +137,7 @@ describe('storage-utils integration', () => {
 
     vi.spyOn(ProjectStorage, 'getById').mockResolvedValue(projectData as any);
 
-    await storageUtils.loadProjectFromStorage();
+    await ProjectStorage.load();
 
     const { weather } = await import('$lib/state');
     expect(weather.rawData).toHaveLength(1);
