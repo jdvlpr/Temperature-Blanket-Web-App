@@ -219,6 +219,8 @@ class WeatherClass {
         model: true,
       },
     },
+    wasLoadedFromStorage: false,
+    wasLoadedFromURLHash: false,
   });
 
   grouping: 'day' | 'week' = $state('day');

@@ -94,7 +94,9 @@ export const loadProjectFromURL = async (
   });
 
   // Load Weather Source (added in v1.823)
-  if (exists(params.s)) {
+  loadWeatherSource: if (exists(params.s)) {
+    if (weather.source.wasLoadedFromStorage) break loadWeatherSource;
+
     const sourceCode = params.s.value.substring(0, 1);
     if (sourceCode === '0') weather.source.name = 'Meteostat';
     else if (sourceCode === '1') weather.source.name = 'Open-Meteo';
@@ -111,6 +113,7 @@ export const loadProjectFromURL = async (
       else if (lastSubstring === 'e')
         weather.source.settings.openMeteo.model = 'era5';
     }
+    weather.source.wasLoadedFromURLHash = true;
   } else {
     // Projects before v1.823 didn't have this param, and only used Meteostat as a weather source
     weather.source.name = 'Meteostat';
@@ -167,7 +170,7 @@ const parseLocationURLHash = async (hashString) => {
 
     if (_locations.length - 1 < i) {
       // There needs to be another location, so create it
-      locations.add();
+      locations.add({ clearWeatherData: false });
     }
 
     _locations[i].label = 'Loading...';

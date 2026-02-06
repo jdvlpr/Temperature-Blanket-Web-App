@@ -189,8 +189,8 @@ export class LocationsState implements LocationsStateType {
     return title;
   });
 
-  add(): void {
-    if (weather.rawData.length > 0) weather.rawData = [];
+  add({ clearWeatherData = true }: { clearWeatherData?: boolean } = {}): void {
+    if (clearWeatherData && weather.rawData.length > 0) weather.rawData = [];
     const newLocation = new LocationState();
     newLocation.index = this.all.length;
     this.all.push(newLocation);

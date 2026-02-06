@@ -143,6 +143,7 @@ export const loadProjectFromStorage = async () => {
     weather.source.useSecondary = useSecondary;
     if (weatherSource?.settings)
       weather.source.settings = weatherSource.settings;
+    weather.source.wasLoadedFromStorage = true;
   }
 
   // Set isCustomWeather

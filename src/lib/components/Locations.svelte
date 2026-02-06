@@ -30,7 +30,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   const loading = $derived(locations.allValid && project.status.loading);
   const validLoadedProject = $derived(
-    (weather.wasLoadedFromStorage && weather.data) || project.status.wasLoaded,
+    (weather.wasLoadedFromStorage && !!weather.data.length) ||
+      project.status.wasLoaded,
   );
 </script>
 
@@ -42,7 +43,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       class="flex w-full flex-wrap items-center justify-center gap-1 text-center text-sm"
     >
       <CircleCheckBigIcon class="text-success-900-100 size-4" />
-      {#if weather.wasLoadedFromStorage && weather.data}
+      {#if weather.wasLoadedFromStorage && !!weather.data.length}
         Loaded project and {#if weather.isUserEdited}custom weather{:else}weather{/if}
         data
       {:else if project.status.wasLoaded}
