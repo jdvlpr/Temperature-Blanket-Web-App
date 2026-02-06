@@ -1,5 +1,5 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
-import { ProjectStorage } from './projects';
+import { ProjectStorage } from './projects.svelte';
 
 // Shared store for mock
 const vi_mockStore = {
@@ -22,12 +22,40 @@ vi.mock('idb-keyval', () => ({
 
 vi.mock('$app/environment', () => ({
   browser: true,
+  dev: true,
+  version: '1.0.0',
+}));
+
+vi.mock('$lib/state', () => ({
+  project: {
+    url: { href: 'http://localhost/?project=123' },
+    onLoaded: { href: 'http://localhost/?project=123' },
+  },
+  weather: {
+    source: { name: 'Meteostat', useSecondary: false, settings: {} },
+    isUserEdited: false,
+    rawData: [],
+  },
+  locations: {
+    projectTitle: 'Test Project',
+    all: [],
+  },
+}));
+
+vi.mock('$lib/utils', () => ({
+  dateToISO8601String: vi.fn((d) => d.toISOString().split('T')[0]),
+  stringToDate: vi.fn((s) => new Date(s)),
+  getMoonPhase: vi.fn(() => 0),
+  numberOfDays: vi.fn(() => 1),
 }));
 
 describe('ProjectStorage', () => {
   beforeEach(() => {
     vi_mockStore.data.clear();
     vi.stubGlobal('indexedDB', {});
+    vi.stubGlobal('window', {
+      location: { href: 'http://localhost/?project=123' },
+    });
   });
 
   afterEach(() => {
@@ -50,7 +78,7 @@ describe('ProjectStorage', () => {
       weatherSource: { name: 'Meteostat' },
     } as any;
 
-    await ProjectStorage.save('123', project);
+    await ProjectStorage.save({ id: '123', localProject: project });
 
     const retrieved = await ProjectStorage.getById('123');
     expect(retrieved).toEqual(project);
@@ -69,16 +97,16 @@ describe('ProjectStorage', () => {
     vi.mocked(get).mockResolvedValue(null);
 
     const project = { title: 'Fail' } as any;
-    await expect(ProjectStorage.save('fail', project)).rejects.toThrow(
-      /Failed to verify/,
-    );
+    await expect(
+      ProjectStorage.save({ id: 'fail', localProject: project }),
+    ).rejects.toThrow(/Failed to verify/);
   });
 
   it('should retrieve by href', async () => {
     const href = 'http://localhost/?project=456';
     const project = { title: 'By Href', href } as any;
 
-    await ProjectStorage.save('456', project);
+    await ProjectStorage.save({ id: '456', localProject: project });
 
     const retrieved = await ProjectStorage.getByHref(href);
     expect(retrieved?.title).toBe('By Href');
@@ -88,8 +116,8 @@ describe('ProjectStorage', () => {
   });
 
   it('should remove by id and href', async () => {
-    await ProjectStorage.save('1', { href: 'h1' } as any);
-    await ProjectStorage.save('2', { href: 'h2' } as any);
+    await ProjectStorage.save({ id: '1', localProject: { href: 'h1' } as any });
+    await ProjectStorage.save({ id: '2', localProject: { href: 'h2' } as any });
 
     await ProjectStorage.removeById('1');
     expect(await ProjectStorage.getById('1')).toBeNull();
@@ -101,8 +129,14 @@ describe('ProjectStorage', () => {
   });
 
   it('should return projects for display reversed', async () => {
-    await ProjectStorage.save('1', { title: 'First' } as any);
-    await ProjectStorage.save('2', { title: 'Second' } as any);
+    await ProjectStorage.save({
+      id: '1',
+      localProject: { title: 'First' } as any,
+    });
+    await ProjectStorage.save({
+      id: '2',
+      localProject: { title: 'Second' } as any,
+    });
 
     const display = await ProjectStorage.getProjectsForDisplay();
     expect(display[0].meta.title).toBe('Second');

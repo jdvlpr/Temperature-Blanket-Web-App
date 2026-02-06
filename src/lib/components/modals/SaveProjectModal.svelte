@@ -13,19 +13,21 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script>
+<script lang="ts">
   import { browser } from '$app/environment';
   import { replaceState } from '$app/navigation';
   import { project, toast, weather } from '$lib/state';
-  import { ProjectStorage } from '$lib/storage/projects';
-  import { setProjectInStorage } from '$lib/storage/storage-utils.svelte';
+  import {
+    ProjectStorage,
+    type StoredProjectIndexItem,
+  } from '$lib/storage/projects.svelte';
   import { CircleCheckIcon, ClipboardCopyIcon, LinkIcon } from '@lucide/svelte';
   import { onMount } from 'svelte';
   import ProjectDetails from '../ProjectDetails.svelte';
   import DownloadExportButton from '../buttons/DownloadExportButton.svelte';
   import SendToGalleryButton from '../buttons/SendToGalleryButton.svelte';
 
-  let currentProjectIndex = $state(null);
+  let storedProject: StoredProjectIndexItem | null = $state(null);
 
   let urlInputElement = $state();
 
@@ -50,13 +52,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     replaceState(newURL, '');
 
     try {
-      await setProjectInStorage();
-      currentProjectIndex = await ProjectStorage.getIndexItemByHref(
-        project.url.href,
-      );
+      storedProject = await ProjectStorage.save();
       project.status.saved = true;
     } catch (e) {
-      currentProjectIndex = null;
+      storedProject = null;
       project.status.saved = false;
       project.status.error = {
         code: 1,
@@ -106,9 +105,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </div>
     {/if}
 
-    {#if currentProjectIndex && currentProjectIndex?.meta}
+    {#if storedProject && storedProject?.meta}
       <div class="w-full">
-        <ProjectDetails project={currentProjectIndex.meta} canRemove={false} />
+        <ProjectDetails project={storedProject.meta} canRemove={false} />
       </div>
     {/if}
 

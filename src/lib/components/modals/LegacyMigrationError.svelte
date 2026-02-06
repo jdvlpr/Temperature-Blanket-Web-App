@@ -16,7 +16,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import { MOON_PHASE_NAMES } from '$lib/constants';
   import { allGaugesAttributes, project, toast } from '$lib/state';
-  import type { LocalStorageProject } from '$lib/storage/projects';
+  import type { StoredProject } from '$lib/storage/projects.svelte';
   import {
     convertTime,
     exists,
@@ -59,7 +59,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     }
   }
 
-  function downloadWeatherCSV(project: LocalStorageProject) {
+  function downloadWeatherCSV(project: StoredProject) {
     const weatherData = project.weatherData;
     const units = getUnits(project.href);
 

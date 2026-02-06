@@ -16,7 +16,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script>
   import { browser } from '$app/environment';
   import ProjectDetails from '$lib/components/ProjectDetails.svelte';
-  import { ProjectStorage } from '$lib/storage/projects';
+  import { ProjectStorage } from '$lib/storage/projects.svelte';
 
   let projects = $state([]);
 

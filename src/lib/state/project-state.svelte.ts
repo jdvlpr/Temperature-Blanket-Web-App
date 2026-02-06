@@ -82,6 +82,10 @@ class ProjectClass {
     version: browser
       ? new URL(window.location.href).searchParams.get('v') || version
       : '',
+    href: browser ? new URL(window.location.href) : null,
+    isProject: browser
+      ? new URL(window.location.href).searchParams.has('project')
+      : false,
   };
 
   // Timestamp identifying when the app was initialized, used as a kind of unique ID for the project (though technically may not be unique if two users initialize at the exact same time).

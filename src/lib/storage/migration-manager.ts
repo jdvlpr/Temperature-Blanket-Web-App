@@ -1,5 +1,5 @@
 import { project } from '$lib/state';
-import { ProjectStorage, type LocalStorageProject } from './projects';
+import { ProjectStorage, type StoredProject } from './projects.svelte';
 
 const LEGACY_PROJECTS_KEY = 'projects';
 
@@ -24,7 +24,7 @@ export class MigrationManager {
 
     if (!legacyProjectsRaw) return;
 
-    let parsed: LocalStorageProject[];
+    let parsed: StoredProject[];
     try {
       parsed = JSON.parse(legacyProjectsRaw);
     } catch (e) {

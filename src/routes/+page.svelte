@@ -39,7 +39,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     project,
     weather,
   } from '$lib/state';
-  import { loadProjectFromStorage } from '$lib/storage/storage-utils.svelte';
+  import { ProjectStorage } from '$lib/storage/projects.svelte';
   import {
     loadFromHistory,
     loadProjectFromURL,
@@ -79,7 +79,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         component: { ref: LegacyNotification, props: { v: 'v0.98' } },
       });
 
-    await loadProjectFromStorage();
+    if (project.onLoaded.isProject) await ProjectStorage.load();
 
     await loadProjectFromURL();
 
