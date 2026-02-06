@@ -15,7 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import GaugeSettings from '$lib/components/modals/GaugeSettings.svelte';
-  import { gauges, dialog } from '$lib/state';
+  import { dialog, gauges } from '$lib/state';
   import { preferences } from '$lib/storage/preferences.svelte';
 
   let { index } = $props();
