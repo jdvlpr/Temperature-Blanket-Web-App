@@ -30,14 +30,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     ArrowUpDownIcon,
     ChevronRightIcon,
     EarthIcon,
-    Grid2X2Icon,
     Grid3x3,
-    GridIcon,
-    XIcon,
+    XIcon
   } from '@lucide/svelte';
   import { onMount } from 'svelte';
   import { galleryState } from './state.svelte';
-  import Grid_2x2 from '@lucide/svelte/icons/grid-2x2';
+  import { page } from '$app/state';
 
   let first = 40;
   let loading = $state(true);
@@ -49,6 +47,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let layout = $state('grid');
 
   onMount(async () => {
+    const searchParam = page.url.searchParams.get('search');
+      if (searchParam) {
+        galleryState.search = searchParam;
+        projectsList.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start',
+              });
+      }
+
+
     if (!galleryState.projects.length) {
       let results = await fetchProjects({
         first,
@@ -173,7 +181,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
       bind:this={featuredProjectsEl}
     >
       {#if !galleryState.popularProjects.length}
-        <!-- <div class="my-36 mx-auto"><Spinner /></div> -->
 
         {#each Array(5)}
           <div

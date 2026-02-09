@@ -26,7 +26,11 @@ import type {
   TISO8601DateString,
   WeatherSource,
 } from '$lib/types';
-import { dateToISO8601String, getDaysBetween, stringToDate } from '$lib/utils';
+import {
+  dateToISO8601String,
+  getDaysBetween,
+  stringToDate,
+} from '$lib/utils/date-utils';
 
 export class LocationClass implements LocationType {
   uuid: string = $state('');
