@@ -12,18 +12,9 @@
     updatedAt?: string
   }>();
 
-  // Theme Detection
-  const isSystemDark = new MediaQuery('(prefers-color-scheme: dark)');
-  const isDarkMode = $derived(
-    preferences.value.theme.mode === 'dark' || 
-    (preferences.value.theme.mode === 'system' && isSystemDark.current)
-  );
-
   // Modern devices detection for hover support
   const canHover = new MediaQuery('(hover: hover)');
 
-  const nightTexture = '//cdn.jsdelivr.net/npm/three-globe/example/img/earth-night.jpg';
-  const dayTexture = '//cdn.jsdelivr.net/npm/three-globe/example/img/earth-blue-marble.jpg';
 
   // Reactivity
   let selectedPoint = $state(null);
@@ -32,16 +23,6 @@
   let Globe: any = $state();
   let globe: any = $state();
   let resizeObserver: ResizeObserver | undefined = $state();
-
-  $effect(() => {
-    isDarkMode;
-    untrack(() => {
-        if (globe) {
-            globe.globeImageUrl(isDarkMode ? nightTexture : dayTexture);
-            updateGlobe();
-        }
-    })
-  });
  
   // Local throttle utility
   function throttle<T extends (...args: any[]) => any>(func: T, limit: number): (...args: Parameters<T>) => void {
@@ -181,18 +162,18 @@
       
       globe = Globe()
         (globeContainer)
-        .globeImageUrl(isDarkMode ? nightTexture : dayTexture)
+        .globeImageUrl('/images/earth_highres.jpg')
         .backgroundImageUrl('//cdn.jsdelivr.net/npm/three-globe/example/img/night-sky.png')
-        .bumpImageUrl('//cdn.jsdelivr.net/npm/three-globe/example/img/earth-topology.png')
+        .bumpImageUrl('/images/earthbumps.jpeg')
         .atmosphereAltitude(.2)
         .atmosphereColor('lightskyblue')
-        .globeCurvatureResolution(10)
+        .globeCurvatureResolution(8)
         .pointsData(data)
         .pointLat('lat')
         .pointLng('lng')
         .pointLabel(null) // Disable hover tooltips
         .pointResolution(8)
-        .pointAltitude((d: any) => Math.min((d.projects?.length || 1) * 0.005 + 0.02, 0.5))
+        .pointAltitude((d: any) => Math.min((d.projects?.length || 1) * 0.009 + 0.02, 0.5))
         .pointRadius(0.5)
         .pointColor((d: any) => {
             return d.popular_color?.hex || '#ffcc00';
@@ -225,16 +206,15 @@
       let lastAltitude = -1;
       const updatePointRadius = throttle(() => {
           if (!globe) return;
-          const { altitude } = globe.pointOfView();
+          const { altitude } = globe.pointOfView();    
           
-          // Only update if altitude changed significantly
           if (Math.abs(altitude - lastAltitude) < 0.02) return;
           lastAltitude = altitude;
           
           // Generally bigger points: increased multiplier and min/max bounds
           const newRadius = Math.round(Math.max(0.02, Math.min(0.2, altitude * 0.5)) * 1000) / 1000;
           globe.pointRadius(newRadius);
-      }, 600);
+      }, 650);
 
       globe.controls().addEventListener('change', updatePointRadius);
 
@@ -260,7 +240,7 @@
 </script>
 
 <div 
-    class="w-full h-[60vh] relative lg:rounded-container overflow-hidden"
+    class="w-full h-[70dvh] sm:h-[75dvh] relative lg:rounded-container overflow-hidden lg:shadow-md"
     onmouseenter={handleMouseEnter}
     onmouseleave={handleMouseLeave}
     role="application"
@@ -313,12 +293,17 @@
     {/if}
 </div>
 
+<div class="mt-1 text-center flex flex-col items-center justify-center gap-2 w-full">
+
+    <p class="text-sm text-surface-500">Click on a point to see the projects in that location.</p>
+
 <!-- Last Updated Notice -->
 {#if updatedAt}
-    <div class="text-xs pointer-events-none text-surface-500 mt-1 text-center">
-        Global map last updated: {new Date(updatedAt.replace(' ', 'T')).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}
-    </div>
+<p class="text-xs pointer-events-none text-surface-500">
+    Global map last updated: {new Date(updatedAt.replace(' ', 'T')).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}
+</p>
 {/if}
+</div>
 
 <style>
     /* Ensure the globe container allows for the absolute labels relative to it */

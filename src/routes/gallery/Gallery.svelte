@@ -19,7 +19,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ToTopButton from '$lib/components/buttons/ToTopButton.svelte';
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
   import ViewToggleBindable from '$lib/components/buttons/ViewToggleBindable.svelte';
-  import Globe from '$lib/components/visualizations/Globe.svelte';
   import { previews } from '$lib/state';
   import {
     fetchPopularProjects,
@@ -64,24 +63,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     if (!galleryState.popularProjects.length) {
       await fetchPopularProjectsWrapper();
-    }
-
-    if (!galleryState.globeData.length) {
-      galleryState.loadingGlobe = true;
-      galleryState.loadingGlobeError = false;
-      try {
-        const res = await fetch(`${PUBLIC_WORDPRESS_BASE_URL}/wp-json/tbgalleryapi/v1/globe-data`, {cache: 'reload'});
-        if (res.ok) {
-          const json = await res.json();          
-          galleryState.globeData = json.data || [];
-          galleryState.globeUpdatedAt = json.updated_at || '';
-          galleryState.loadingGlobeError = false;
-        }
-      } catch (e) {
-        galleryState.loadingGlobeError = true;
-        console.error('Failed to load globe data:', e);
-      }
-      galleryState.loadingGlobe = false;
     }
 
     loading = false;
@@ -203,20 +184,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 </script>
 
-<div class="">
-  {#if galleryState.loadingGlobe}
-  <div class="w-full placeholder h-[60vh] bg-surface-100-900 animate-pulse rounded-none lg:rounded-container">
-  </div>
-  <p class="text-xs text-center text-surface-500 animate-pulse mt-1">Loading globe data...</p>
-  {:else if !galleryState.loadingGlobeError}
-  <div class="w-full">
-    <Globe 
-    data={galleryState.globeData} 
-    updatedAt={galleryState.globeUpdatedAt}
-    />
-  </div>
-  {/if}
-</div>
 <div class="flex flex-col justify-center gap-8">
   <div class="inline-grid gap-2 text-center">
     <div class="my-2">

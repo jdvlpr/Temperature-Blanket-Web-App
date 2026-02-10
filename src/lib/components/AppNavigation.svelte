@@ -22,8 +22,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { page } from '$app/state';
   import { PUBLIC_GITHUB_LINK } from '$env/static/public';
   import ThemeSwitcher from '$lib/components/ThemeSwitcher.svelte';
-  import { dialog, project } from '$lib/state';
   import { safeSlide } from '$lib/features/transitions/safeSlide';
+  import { dialog, project } from '$lib/state';
   import { yarnBall } from '@lucide/lab';
   import {
     BookOpenTextIcon,
@@ -34,6 +34,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     GalleryVerticalEndIcon,
     GiftIcon,
     GithubIcon,
+    GlobeIcon,
     HeartIcon,
     Icon,
     MailIcon,
@@ -47,8 +48,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { Accordion } from '@skeletonlabs/skeleton-svelte';
   import { untrack } from 'svelte';
   import LegacyMigrationError from './modals/LegacyMigrationError.svelte';
-  import ArrowUp_0_1 from '@lucide/svelte/icons/arrow-up-0-1';
-  import { APP_NAVIGATION_SIDEBAR_WIDTH } from '$lib/constants';
 
   // Set opened navigation items based on current page
   $effect(() => {
@@ -62,6 +61,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           if (!openedNavigationItems.includes('tools'))
             openedNavigationItems = [...openedNavigationItems, 'tools'];
           break;
+        case '/world-view':
         case '/gallery':
         case '/yarn-palette-gallery':
           if (!openedNavigationItems.includes('gallery'))
@@ -211,7 +211,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <Accordion.Item value="gallery" class="group gap-0">
       <h3>
         <Accordion.ItemTrigger class="flex items-center justify-between">
-          Gallery
+          Explore
           {@render indicator()}
         </Accordion.ItemTrigger>
       </h3>
@@ -220,6 +220,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {#if !attributes.hidden}
             <div {...attributes} transition:safeSlide>
               <a
+                href="/world-view"
+                class={[
+                  'btn hover:preset-tonal-surface w-fit',
+                  page.url.pathname === '/world-view' && 'preset-tonal-secondary',
+                ]}
+              >
+                <GlobeIcon/>
+                World View <span class="badge preset-filled-secondary-500">New</span>
+              </a>
+              <a
                 href="/gallery"
                 class={[
                   'btn hover:preset-tonal-surface w-fit',
@@ -227,7 +237,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 ]}
               >
                 <GalleryVerticalEndIcon />
-                Projects
+                Gallery
               </a>
 
               <a
