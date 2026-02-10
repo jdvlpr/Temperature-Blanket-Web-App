@@ -131,7 +131,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {/if}
     </div>
 
-    <div class="w-full">
+    <div class="flex-1 min-w-0">
       <div class="lg:m-2 xl:mx-0">{@render main?.()}</div>
       {@render footer?.()}
     </div>

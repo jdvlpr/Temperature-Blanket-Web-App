@@ -13,12 +13,13 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script>
+<script lang="ts">
   import { PUBLIC_WORDPRESS_BASE_URL } from '$env/static/public';
   import SelectYarn from '$lib/components/SelectYarn.svelte';
   import ToTopButton from '$lib/components/buttons/ToTopButton.svelte';
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
   import ViewToggleBindable from '$lib/components/buttons/ViewToggleBindable.svelte';
+  import Globe from '$lib/components/visualizations/Globe.svelte';
   import { previews } from '$lib/state';
   import {
     fetchPopularProjects,
@@ -35,7 +36,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '@lucide/svelte';
   import { onMount } from 'svelte';
   import { galleryState } from './state.svelte';
-  import { page } from '$app/state';
 
   let first = 40;
   let loading = $state(true);
@@ -47,16 +47,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let layout = $state('grid');
 
   onMount(async () => {
-    const searchParam = page.url.searchParams.get('search');
-      if (searchParam) {
-        galleryState.search = searchParam;
-        projectsList.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start',
-              });
-      }
-
-
     if (!galleryState.projects.length) {
       let results = await fetchProjects({
         first,
@@ -74,6 +64,24 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     if (!galleryState.popularProjects.length) {
       await fetchPopularProjectsWrapper();
+    }
+
+    if (!galleryState.globeData.length) {
+      galleryState.loadingGlobe = true;
+      galleryState.loadingGlobeError = false;
+      try {
+        const res = await fetch(`${PUBLIC_WORDPRESS_BASE_URL}/wp-json/tbgalleryapi/v1/globe-data`, {cache: 'reload'});
+        if (res.ok) {
+          const json = await res.json();          
+          galleryState.globeData = json.data || [];
+          galleryState.globeUpdatedAt = json.updated_at || '';
+          galleryState.loadingGlobeError = false;
+        }
+      } catch (e) {
+        galleryState.loadingGlobeError = true;
+        console.error('Failed to load globe data:', e);
+      }
+      galleryState.loadingGlobe = false;
     }
 
     loading = false;
@@ -151,8 +159,64 @@ If not, see <https://www.gnu.org/licenses/>. -->
         });
     });
   }
+
+  async function handleSearch(query?: string) {
+    if (query !== undefined) {
+      galleryState.search = query;
+    }
+
+    projectsList.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start',
+    });
+
+    galleryState.projects = [];
+    galleryState.displayedProjects = [];
+    loading = true;
+
+    const yarnSearch = galleryState.getYarnSearch({
+      brandId: galleryState.filteredBrandId,
+      yarnId: galleryState.filteredYarnId,
+    });
+
+    try {
+      let results = await fetchProjects({
+        search: galleryState.search,
+        order: galleryState.orderBy,
+        yarn: yarnSearch,
+        pattern: galleryState.filteredPatternType,
+      });
+
+      galleryState.gallery.pageInfo = results.pageInfo;
+      if (galleryState.search) {
+        galleryState.projects = results.edges.flatMap((item) => item.node);
+      } else {
+        galleryState.projects.push(...results.edges.flatMap((item) => item.node));
+        galleryState.projects = galleryState.projects;
+      }
+      galleryState.displayedProjects = getFilteredProjects();
+    } catch (e) {
+      console.error('Search failed:', e);
+    } finally {
+      loading = false;
+    }
+  }
 </script>
 
+<div class="">
+  {#if galleryState.loadingGlobe}
+  <div class="w-full placeholder h-[60vh] bg-surface-100-900 animate-pulse rounded-none lg:rounded-container">
+  </div>
+  <p class="text-xs text-center text-surface-500 animate-pulse mt-1">Loading globe data...</p>
+  {:else if !galleryState.loadingGlobeError}
+  <div class="w-full">
+    <Globe 
+    data={galleryState.globeData} 
+    updatedAt={galleryState.globeUpdatedAt}
+    />
+  </div>
+  {/if}
+</div>
 <div class="flex flex-col justify-center gap-8">
   <div class="inline-grid gap-2 text-center">
     <div class="my-2">
@@ -323,41 +387,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <button
             disabled={loading}
             class="btn preset-filled flex w-full items-center"
-            onclick={async () => {
-              projectsList.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start',
-              });
-              galleryState.projects = [];
-              galleryState.displayedProjects = [];
-              loading = true;
-              const yarnSearch = galleryState.getYarnSearch({
-                brandId: galleryState.filteredBrandId,
-                yarnId: galleryState.filteredYarnId,
-              });
-
-              let results = await fetchProjects({
-                search: galleryState.search,
-                order: galleryState.orderBy,
-                yarn: yarnSearch,
-                pattern: galleryState.filteredPatternType,
-              });
-
-              if (galleryState.search) {
-                galleryState.gallery.pageInfo = results.pageInfo;
-                galleryState.projects = results.edges.flatMap(
-                  (item) => item.node,
-                );
-              } else {
-                galleryState.gallery.pageInfo = results.pageInfo;
-                galleryState.projects.push(
-                  ...results.edges.flatMap((item) => item.node),
-                );
-                galleryState.projects = galleryState.projects;
-              }
-              galleryState.displayedProjects = getFilteredProjects();
-              loading = false;
-            }}
+            onclick={() => handleSearch()}
           >
             Search
             <ChevronRightIcon />
@@ -366,7 +396,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </div>
     </div>
     <div
-      class="flex scroll-mt-[58px] flex-col items-center lg:scroll-mt-[44px]"
+      class="flex scroll-mt-[58px] flex-col items-center lg:scroll-mt-[44px] min-h-[70vh]"
       bind:this={projectsList}
     >
       <div class="mx-auto my-2">

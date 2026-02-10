@@ -6,6 +6,7 @@
   import AppLogo from '$lib/components/AppLogo.svelte';
   
   let globeData = $state<any[]>([]);
+  let updatedAt = $state('');
   let loading = $state(true);
   let error = $state('');
 
@@ -14,7 +15,9 @@
       // Fetch the data from the new REST API endpoint
       const res = await fetch(`${PUBLIC_WORDPRESS_BASE_URL}/wp-json/tbgalleryapi/v1/globe-data`, {cache: 'no-store'});
       if (!res.ok) throw new Error('Failed to load globe data');
-      globeData = await res.json();
+      const json = await res.json();
+      globeData = json.data || [];
+      updatedAt = json.updated_at || '';
       
     } catch (e) {
       console.error(e);
@@ -44,7 +47,7 @@
                 </button>
             </div>
         {:else}
-              <Globe data={globeData} />
+              <Globe data={globeData} {updatedAt} />
               {/if}
             </div>
         {#if !loading && globeData.length > 0 && !error}
