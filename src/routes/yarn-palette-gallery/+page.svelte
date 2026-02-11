@@ -60,6 +60,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import {
     ArrowUpDownIcon,
     ChevronRightIcon,
+    ClockIcon,
     EarthIcon,
     PlusIcon,
     SearchIcon,
@@ -233,17 +234,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <main class="m-auto mx-2 flex flex-col justify-start gap-2">
       <div class="flex flex-col justify-center gap-8">
         <div class="inline-grid gap-2 text-center">
-          <div class="my-2">
+          <div class="my-2 flex flex-col items-center">
             <h2 class="h2 text-gradient">Featured Yarn Palettes</h2>
             <label class="label">
-              <span class="label-text text-center"
-                >From popular projects during the past</span
-              >
-              <select
-                bind:value={yarnPaletteGalleryState.timePeriod}
-                class="select mx-auto w-fit min-w-[90px]"
-                onchange={() => {
-                  yarnPaletteGalleryState.popularPalettes = [];
+              <span class="label-text">Popular in the last</span>
+              <div class="relative flex items-center w-fit">
+                <ClockIcon class="pointer-events-none absolute left-2" />
+                <select
+                  bind:value={yarnPaletteGalleryState.timePeriod}
+                  class="select mx-auto w-fit min-w-[90px] truncate pl-10"
+                  onchange={() => {
+                    yarnPaletteGalleryState.popularPalettes = [];
                   fetchPopularPalettes();
                 }}
               >

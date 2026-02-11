@@ -29,6 +29,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import {
     ArrowUpDownIcon,
     ChevronRightIcon,
+    ClockIcon,
     EarthIcon,
     Grid3x3,
     XIcon
@@ -186,24 +187,27 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <div class="flex flex-col justify-center gap-8">
   <div class="inline-grid gap-2 text-center">
-    <div class="my-2">
+    <div class="my-2 flex flex-col items-center">
       <h2 class="h2 text-gradient">Featured Projects</h2>
-      <label class="label">
-        <span class="label-text text-center">Popular during the past</span>
-        <select
-          bind:value={galleryState.timePeriod}
-          class="select mx-auto w-fit min-w-[100px]"
-          onchange={() => {
-            galleryState.popularProjects = [];
-            fetchPopularProjectsWrapper();
-            featuredProjectsEl.scrollLeft = 0;
-          }}
-        >
-          <option value={0.0357}>day</option>
-          <option value={0.25}>week</option>
-          <option value={1}>month</option>
-          <option value={12}>year</option>
-        </select>
+      <label class="label ">
+        <span class="label-text">Popular in the last</span>
+        <div class="relative flex items-center w-fit">
+          <ClockIcon class="pointer-events-none absolute left-2" />
+          <select
+            bind:value={galleryState.timePeriod}
+            class="select mx-auto w-fit min-w-[100px] truncate pl-10"
+            onchange={() => {
+              galleryState.popularProjects = [];
+              fetchPopularProjectsWrapper();
+              featuredProjectsEl.scrollLeft = 0;
+            }}
+          >
+            <option value={0.0357}>Day</option>
+            <option value={0.25}>Week</option>
+            <option value={1}>Month</option>
+            <option value={12}>Year</option>
+          </select>
+        </div>
       </label>
     </div>
 

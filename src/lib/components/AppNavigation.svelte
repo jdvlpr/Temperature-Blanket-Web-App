@@ -37,6 +37,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     GlobeIcon,
     HeartIcon,
     Icon,
+    LandmarkIcon,
     MailIcon,
     NotebookPenIcon,
     RssIcon,
@@ -61,7 +62,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           if (!openedNavigationItems.includes('tools'))
             openedNavigationItems = [...openedNavigationItems, 'tools'];
           break;
-        case '/world-view':
+        case '/project-globe':
         case '/gallery':
         case '/yarn-palette-gallery':
           if (!openedNavigationItems.includes('gallery'))
@@ -220,14 +221,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {#if !attributes.hidden}
             <div {...attributes} transition:safeSlide>
               <a
-                href="/world-view"
+                href="/project-globe"
                 class={[
                   'btn hover:preset-tonal-surface w-fit',
-                  page.url.pathname === '/world-view' && 'preset-tonal-secondary',
+                  page.url.pathname === '/project-globe' && 'preset-tonal-secondary',
                 ]}
               >
                 <GlobeIcon/>
-                World View <span class="badge preset-filled-secondary-500">New</span>
+                Project Globe <span class="badge preset-filled-secondary-500 shadow-sm">New</span>
               </a>
               <a
                 href="/gallery"
@@ -236,8 +237,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   page.url.pathname === '/gallery' && 'preset-tonal-secondary',
                 ]}
               >
-                <GalleryVerticalEndIcon />
-                Gallery
+                <LandmarkIcon />
+                Project Gallery
               </a>
 
               <a

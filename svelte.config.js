@@ -45,6 +45,7 @@ const config = {
           '/changelog',
           '/documentation',
           '/privacy',
+          '/project-globe',
           '/contact',
           '/contact/*',
           '/faq',
