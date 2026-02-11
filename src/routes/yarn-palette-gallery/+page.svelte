@@ -210,13 +210,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <svelte:head>
-  <title>Yarn Palette Gallery</title>
+  <title>Temperature Blanket Yarn Palette Gallery</title>
   <meta
     name="description"
     content="Browse a collection of yarn palettes from user-created projects."
   />
 
-  <meta property="og:title" content="Yarn Palette Gallery" />
+  <meta property="og:title" content="Temperature Blanket Yarn Palette Gallery" />
   <meta
     property="og:description"
     content="Browse a collection of yarn palettes from user-created projects."

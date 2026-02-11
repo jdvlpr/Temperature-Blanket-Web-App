@@ -18,6 +18,7 @@ import { ICONS } from '$lib/constants';
 import type { ChangelogItemGroup } from '$lib/types';
 import {
   CloudCogIcon,
+  GlobeIcon,
   ImageIcon,
   MoonStarIcon,
   RocketIcon,
@@ -32,6 +33,16 @@ export const entries: ChangelogItemGroup[] = [
       {
         month: 'February',
         items: [
+          {
+            notes: [
+              {
+                IconComponent: GlobeIcon,
+                text: `Explore a 3D map of user-created temperature blanket projects from around the world on the new <a href="/globe" class="link">Globe</a> page.`,
+                title: 'New Feature - Project Globe',
+              },
+            ],
+            version: '5.42.0',
+          },
           {
             notes: [
               {

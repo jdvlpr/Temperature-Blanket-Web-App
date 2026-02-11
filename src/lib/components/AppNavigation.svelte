@@ -14,7 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script module>
-  let openedNavigationItems = $state(['tools']);
+  let openedNavigationItems = $state(['tools', 'explore']);
 </script>
 
 <script>
@@ -31,7 +31,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     CircleQuestionMarkIcon,
     CloudyIcon,
     ExternalLinkIcon,
-    GalleryVerticalEndIcon,
     GiftIcon,
     GithubIcon,
     GlobeIcon,
@@ -44,7 +43,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     ShieldAlertIcon,
     SquareTerminalIcon,
     SwatchBookIcon,
-    TriangleAlertIcon,
+    TriangleAlertIcon
   } from '@lucide/svelte';
   import { Accordion } from '@skeletonlabs/skeleton-svelte';
   import { untrack } from 'svelte';
@@ -62,11 +61,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
           if (!openedNavigationItems.includes('tools'))
             openedNavigationItems = [...openedNavigationItems, 'tools'];
           break;
-        case '/project-globe':
+        case '/globe':
         case '/gallery':
         case '/yarn-palette-gallery':
-          if (!openedNavigationItems.includes('gallery'))
-            openedNavigationItems = [...openedNavigationItems, 'gallery'];
+          if (!openedNavigationItems.includes('explore'))
+            openedNavigationItems = [...openedNavigationItems, 'explore'];
           break;
         case '/faq':
         case '/contact':
@@ -209,7 +208,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {/snippet}
       </Accordion.ItemContent>
     </Accordion.Item>
-    <Accordion.Item value="gallery" class="group gap-0">
+    <Accordion.Item value="explore" class="group gap-0">
       <h3>
         <Accordion.ItemTrigger class="flex items-center justify-between">
           Explore
@@ -221,26 +220,25 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {#if !attributes.hidden}
             <div {...attributes} transition:safeSlide>
               <a
-                href="/project-globe"
-                class={[
-                  'btn hover:preset-tonal-surface w-fit',
-                  page.url.pathname === '/project-globe' && 'preset-tonal-secondary',
-                ]}
-              >
-                <GlobeIcon/>
-                Project Globe <span class="badge preset-filled-secondary-500 shadow-sm">New</span>
-              </a>
-              <a
                 href="/gallery"
                 class={[
                   'btn hover:preset-tonal-surface w-fit',
                   page.url.pathname === '/gallery' && 'preset-tonal-secondary',
                 ]}
-              >
+                >
                 <LandmarkIcon />
-                Project Gallery
+                Gallery
               </a>
-
+              <a
+                href="/globe"
+                class={[
+                  'btn hover:preset-tonal-surface w-fit',
+                  page.url.pathname === '/globe' && 'preset-tonal-secondary',
+                ]}
+              >
+                <GlobeIcon/>
+                Globe <span class="badge preset-filled-secondary-500 shadow-sm">New</span>
+              </a>
               <a
                 href="/yarn-palette-gallery"
                 class={[

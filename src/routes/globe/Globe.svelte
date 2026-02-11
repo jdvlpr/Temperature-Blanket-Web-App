@@ -30,6 +30,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let isAutoRotating = $state(true);
   let globeContainer: HTMLElement | undefined = $state();
   let resizeObserver: ResizeObserver | undefined = $state();
+  let updatePointRadiusFn: ((...args: any[]) => void) | null = null;
  
   // Local throttle utility
   function throttle<T extends (...args: any[]) => any>(func: T, limit: number): (...args: Parameters<T>) => void {
@@ -136,18 +137,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     if (!globeState.globe) return;
     isAutoRotating = !isAutoRotating;
     
-    // Manual toggle overrides any hover state
-    if (isAutoRotating) {
-        isHovering = false; // Reset hover state if manually playing
-    }
-    
     globeState.globe.controls().autoRotate = isAutoRotating;
   }
 
-  let isHovering = false;
   function handleMouseEnter() {
     if (!canHover.current) return;
-    isHovering = true;
     if (globeState.globe && isAutoRotating) {
         globeState.globe.controls().autoRotate = false;
         isAutoRotating = false;
@@ -156,7 +150,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   function handleMouseLeave() {
     if (!canHover.current) return;
-    isHovering = false;
     if (globeState.globe && !isAutoRotating) {
         globeState.globe.controls().autoRotate = true;
         isAutoRotating = true;
@@ -196,73 +189,88 @@ If not, see <https://www.gnu.org/licenses/>. -->
       await tick();
       
       if (globeState.Globe && globeContainer) {
-        // Clean up any existing globe instance
+        // If globe already exists, reuse it — just move its DOM back in
         if (globeState.globe) {
-            try { globeState.globe._destructor(); } catch(e) {}
+            // The globe's internal container div was detached on last unmount;
+            // re-attach it into the new component's container element.
+            const internalContainer = globeState.globe.renderer().domElement.closest('.scene-container')?.parentElement;
+            if (internalContainer) {
+              globeContainer.innerHTML = '';
+              globeContainer.appendChild(internalContainer);
+            }
+
+            // Resize to fit the new container
+            const { width, height } = globeContainer.getBoundingClientRect();
+            globeState.globe.width(width).height(height);
+
+            // Resume animation
+            globeState.globe.resumeAnimation();
+
+        } else {
+          // First time: create the globe from scratch
+          globeState.globe = globeState.Globe()
+              (globeContainer)
+              .globeImageUrl('/images/earth-lowres.jpg')
+              .backgroundImageUrl('/images/night-sky.png')
+              .bumpImageUrl('/images/earthbumps.jpeg')
+              .atmosphereAltitude(.2)
+              .atmosphereColor('lightskyblue')
+              .globeCurvatureResolution(8)
+              .pointsData(globeState.data)
+              .pointLat('lat')
+              .pointLng('lng')
+              .pointLabel(null) // Disable hover tooltips
+              .pointResolution(10)
+              .pointAltitude((d: any) => Math.min((d.projects?.length || 1) * 0.009 + 0.02, 0.5))
+              .pointRadius(0.5)
+              .pointColor((d: any) => {
+                  return d.popular_color?.hex || '#ffcc00';
+              })
+              .onPointClick((d: any) => {
+                  selectedPoint = d;
+                  
+                  // Pause rotation when a point is clicked
+                  if (isAutoRotating) {
+                      isAutoRotating = false;
+                      globeState.globe.controls().autoRotate = false;
+                  }
+                  
+                  updateGlobe();
+              })
+              .htmlLat('lat')
+              .htmlLng('lng')
+              .htmlElement(createLabelElement)
+              .onGlobeClick(() => {
+                  if (selectedPoint) {
+                      selectedPoint = null;
+                      updateGlobe();
+                  }
+              });
+              
+              globeState.globe.controls().autoRotate = isAutoRotating;
+              globeState.globe.controls().autoRotateSpeed = 1;
+
+              // Throttled point radius update based on zoom (altitude)
+              let lastAltitude = -1;
+              updatePointRadiusFn = throttle(() => {
+                  if (!globeState.globe) return;
+                  const { altitude } = globeState.globe.pointOfView();
+
+                  if (altitude < 2 && !globeState.isHighResolution) {
+                      globeState.globe.globeImageUrl('/images/earth-highres.jpg');
+                      globeState.isHighResolution = true;
+                  }
+                  
+                  if (Math.abs(altitude - lastAltitude) < 0.015) return;
+                  lastAltitude = altitude;
+                  
+                  // Generally bigger points: increased multiplier and min/max bounds
+                  const newRadius = Math.round(Math.max(0.02, Math.min(0.2, altitude * 0.5)) * 1000) / 1000;
+                  globeState.globe.pointRadius(newRadius);
+              }, 350);
+              
+              globeState.globe.controls().addEventListener('change', updatePointRadiusFn);
         }
-        globeState.globe = globeState.Globe()
-            (globeContainer)
-            .globeImageUrl('/images/earth-lowres.jpg')
-            .backgroundImageUrl('/images/night-sky.png')
-            .bumpImageUrl('/images/earthbumps.jpeg')
-            .atmosphereAltitude(.2)
-            .atmosphereColor('lightskyblue')
-            .globeCurvatureResolution(8)
-            .pointsData(globeState.data)
-            .pointLat('lat')
-            .pointLng('lng')
-            .pointLabel(null) // Disable hover tooltips
-            .pointResolution(8)
-            .pointAltitude((d: any) => Math.min((d.projects?.length || 1) * 0.009 + 0.02, 0.5))
-            .pointRadius(0.5)
-            .pointColor((d: any) => {
-                return d.popular_color?.hex || '#ffcc00';
-            })
-            .onPointClick((d: any) => {
-                selectedPoint = d;
-                
-                // Pause rotation when a point is clicked
-                if (isAutoRotating) {
-                    isAutoRotating = false;
-                    globeState.globe.controls().autoRotate = false;
-                }
-                
-                updateGlobe();
-            })
-            .htmlLat('lat')
-            .htmlLng('lng')
-            .htmlElement(createLabelElement)
-            .onGlobeClick(() => {
-                if (selectedPoint) {
-                    selectedPoint = null;
-                    updateGlobe();
-                }
-            });
-            
-            globeState.globe.controls().autoRotate = isAutoRotating;
-            globeState.globe.controls().autoRotateSpeed = 1;
-
-            // Throttled point radius update based on zoom (altitude)
-            let lastAltitude = -1;
-            const updatePointRadius = throttle(() => {
-                if (!globeState.globe) return;
-                const { altitude } = globeState.globe.pointOfView();
-
-                if (altitude < 2 && !globeState.isHighResolution) {
-                    globeState.globe.globeImageUrl('/images/earth-highres.jpg');
-                    globeState.isHighResolution = true;
-                }
-                
-                if (Math.abs(altitude - lastAltitude) < 0.02) return;
-                lastAltitude = altitude;
-                
-                // Generally bigger points: increased multiplier and min/max bounds
-                const newRadius = Math.round(Math.max(0.02, Math.min(0.2, altitude * 0.5)) * 1000) / 1000;
-                globeState.globe.pointRadius(newRadius);
-            }, 650);
-            
-            globeState.globe.controls().addEventListener('change', updatePointRadius);
-        
 
         // Handle responsiveness
         resizeObserver = new ResizeObserver((entries) => {
@@ -276,7 +284,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         });
         resizeObserver.observe(globeContainer);
         
-        // FINALLY set loading to false once the globe is ready to be shown
+        // Set loading to false once the globe is ready to be shown
         globeState.loading = false;
       }
 
@@ -284,8 +292,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 
   onDestroy(() => {    
+    // Pause animation but keep the globe instance alive for reuse.
+    // Globe.gl's _destructor() is too incomplete to properly clean up
+    // (leaks WebGL context, CSS2DRenderer, Three.js textures, internal listeners).
+    // Instead, we just pause and detach the DOM.
     if (globeState.globe) {
-        globeState.globe._destructor();
+        globeState.globe.pauseAnimation();
     }
     if (resizeObserver) {
         resizeObserver.disconnect();
@@ -316,7 +328,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 <div class="size-74 rounded-full bg-surface-500/20 mb-4 shadow-xl flex items-center justify-center">
                     <LoaderCircleIcon class="animate-spin size-12 text-surface-300"  />
                 </div>
-                <p class="text-surface-400 font-medium">Loading World...</p>
+                <p class="text-surface-400 font-medium animate-pulse">Loading world...</p>
             </div>
         {/if}
 
@@ -369,15 +381,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {/if}
     </div>
 
-    <div class="mt-1 mb-4 text-center flex flex-col items-center justify-center gap-1 w-full px-2">
-        <p class="text-sm text-surface-700-300">Touch or click a point to see projects from that area.</p>
-        <!-- Last Updated Notice -->
-        {#if globeState.updatedAt}
-        <p class="text-xs pointer-events-none text-surface-400-600">
-            Updated once a day. Last updated: {new Date(globeState.updatedAt.replace(' ', 'T')).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}
-        </p>
-        {/if}
-    </div>
+    {#if !globeState.loading}
+        <div class="mt-2 mb-4 text-center flex flex-col items-center justify-center gap-2 w-full px-2">
+            <p class="text-sm text-surface-700-300">Touch or click a point to see projects.</p>
+            <!-- Last Updated Notice -->
+            {#if globeState.updatedAt}
+            <p class="text-xs pointer-events-none text-surface-400-600">
+                Updated once a day. Last updated: {new Date(globeState.updatedAt.replace(' ', 'T')).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}
+            </p>
+            {/if}
+        </div>
+    {/if}
 {/if}
 
 <style>
