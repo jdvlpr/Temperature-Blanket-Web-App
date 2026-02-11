@@ -16,12 +16,23 @@
 import fetch from 'node-fetch';
 import { describe, expect, test } from 'vitest';
 import routes from './.svelte-kit/cloudflare/_routes.json';
+import fs from 'node:fs';
+
+// Constants for base URL
+const PORT = 5180;
+const HOST = 'localhost';
+
+// Determine protocol based on environment or same logic as vite.config.ts
+const certPath = process.env.PRIVATE_TAILSCALE_CRT_PATH;
+const keyPath = process.env.PRIVATE_TAILSCALE_KEY_PATH;
+const useHttps =
+  certPath && keyPath && fs.existsSync(certPath) && fs.existsSync(keyPath);
+const PROTOCOL = useHttps ? 'https' : 'http';
+const BASE_URL = process.env.TEST_BASE_URL || `${PROTOCOL}://${HOST}:${PORT}`;
 
 describe('Yarn Colorways API', () => {
   test('Endpoint /colorways', async () => {
-    const response = await fetch(
-      'http://localhost:5180/api/yarn-colorways/v1/colorways',
-    );
+    const response = await fetch(`${BASE_URL}/api/yarn-colorways/v1/colorways`);
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -37,7 +48,7 @@ describe('Yarn Colorways API', () => {
 
   test('Endpoint /match/green', async () => {
     const response = await fetch(
-      'http://localhost:5180/api/yarn-colorways/v1/match/green',
+      `${BASE_URL}/api/yarn-colorways/v1/match/green`,
     );
     const data = await response.json();
 
@@ -53,9 +64,7 @@ describe('Yarn Colorways API', () => {
   });
 
   test('Endpoint /brands', async () => {
-    const response = await fetch(
-      'http://localhost:5180/api/yarn-colorways/v1/brands',
-    );
+    const response = await fetch(`${BASE_URL}/api/yarn-colorways/v1/brands`);
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -67,9 +76,7 @@ describe('Yarn Colorways API', () => {
   });
 
   test('Endpoint /yarns', async () => {
-    const response = await fetch(
-      'http://localhost:5180/api/yarn-colorways/v1/yarns',
-    );
+    const response = await fetch(`${BASE_URL}/api/yarn-colorways/v1/yarns`);
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -81,9 +88,7 @@ describe('Yarn Colorways API', () => {
   });
 
   test('Endpoint /weights', async () => {
-    const response = await fetch(
-      'http://localhost:5180/api/yarn-colorways/v1/weights',
-    );
+    const response = await fetch(`${BASE_URL}/api/yarn-colorways/v1/weights`);
     const data = await response.json();
 
     expect(response.status).toBe(200);

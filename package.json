@@ -14,7 +14,7 @@
     "format": "prettier --plugin-search-dir . --write .",
     "test": "pnpm test:unit && pnpm test:integration && pnpm test:e2e",
     "test:unit": "vitest run src",
-    "test:integration": "start-server-and-test 'vite dev --host localhost --port 5180' http://localhost:5180 'vitest run tests/integration'",
+    "test:integration": "node scripts/test-integration.js",
     "test:e2e": "playwright test"
   },
   "dependencies": {

@@ -14,6 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
+  import { PUBLIC_BASE_URL } from '$env/static/public';
   import AppLogo from '$lib/components/AppLogo.svelte';
   import AppShell from '$lib/components/AppShell.svelte';
   import Globe from './Globe.svelte';
@@ -22,7 +23,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <svelte:head>
     <title>Project Globe</title>
     <meta name="description" content="Explore temperature blanket projects on a 3D globe" />
+    <meta property="og:title" content="Project Globe" />
+    <meta property="og:description" content="Explore temperature blanket projects on a 3D globe" />
+    <meta property="og:url" content="{PUBLIC_BASE_URL}/project-globe" />
+    <meta property="og:type" content="website" />
 </svelte:head>
+
 <AppShell pageName="Project Globe">
   {#snippet stickyHeader()}
     <div class="hidden lg:inline-flex"><AppLogo /></div>

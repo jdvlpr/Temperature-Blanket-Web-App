@@ -29,6 +29,16 @@ export default defineConfig(({ mode }) => {
           }
         : undefined,
     },
+    preview: {
+      https: useHttps
+        ? {
+            key: fs.readFileSync(keyPath),
+            cert: fs.readFileSync(certPath),
+          }
+        : undefined,
+      host: true,
+      port: 4173,
+    },
     esbuild: {
       supported: {
         'top-level-await': true,

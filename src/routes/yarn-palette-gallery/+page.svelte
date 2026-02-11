@@ -245,14 +245,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   class="select mx-auto w-fit min-w-[90px] truncate pl-10"
                   onchange={() => {
                     yarnPaletteGalleryState.popularPalettes = [];
-                  fetchPopularPalettes();
-                }}
-              >
-                <option value={0.0357}>day</option>
-                <option value={0.25}>week</option>
-                <option value={1}>month</option>
-                <option value={12}>year</option>
-              </select>
+                    fetchPopularPalettes();
+                  }}
+                >
+                  <option value={0.0357}>day</option>
+                  <option value={0.25}>week</option>
+                  <option value={1}>month</option>
+                  <option value={12}>year</option>
+                </select>
+              </div>
             </label>
           </div>
           <div
