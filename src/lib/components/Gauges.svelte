@@ -12,7 +12,6 @@ See the GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
-
 <script>
   import {
     allGaugesAttributes,
@@ -67,10 +66,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
     });
   });
 
+  // Scroll to the active gauge button when the active gauge changes or the color section is activated
   $effect(() => {
     gauges.activeGaugeId;
-    untrack(() => {
-      if (pageSections.items[3].active === false) return;
+    
+    if (!pageSections.items[3].active) return;
+    
+    untrack(() => {      
+      if (!gauges.allowScrollToActiveGaugeButton) return;
       tick().then(() => {
         const activeGaugeBtn = document.getElementById('active-gauge-button');
         if (activeGaugeBtn) {
@@ -79,6 +82,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             block: 'nearest',
             inline: 'center',
           });
+          gauges.allowScrollToActiveGaugeButton = false;
         }
       });
     });

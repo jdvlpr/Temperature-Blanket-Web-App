@@ -53,6 +53,9 @@ class GaugesState {
     this.allCreated.find((gauge) => gauge.id === this.activeGaugeId),
   );
 
+  // Set this to true so that the active gauge button is scrolled to when the gauge is added. This is only necessary for the first time a gauge is added, and is reset to false after the active gauge button is scrolled to. It is necessary in order to prevent unwanted scrolling when editing an existing gauge, since the scroll behavior is triggered by an effect.
+  allowScrollToActiveGaugeButton = $state(true);
+
   urlHash = $derived.by(() => {
     let hash = '';
     this.allCreated.forEach((gauge) => {
@@ -170,6 +173,8 @@ class GaugesState {
 
     // if (id === 'prcp') newGauge = new RainGauge();
     // else newGauge = new GaugeState({ attributes, settings });
+
+    this.allowScrollToActiveGaugeButton = true;
 
     this.allCreated.push(newGauge);
 
