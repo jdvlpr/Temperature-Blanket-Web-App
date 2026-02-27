@@ -23,8 +23,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 {#if SUPPORTERS}
   <!-- when there are more items, add these classes: sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-4 -->
   <div class="flex flex-col items-center gap-4">
-    {#if SUPPORTERS?.gold?.length}
-      <div class="grid w-full grid-cols-1 gap-4 rounded-none md:grid-cols-2">
+    <div class="grid w-full grid-cols-1 gap-4 rounded-none md:grid-cols-2">
+      {#if SUPPORTERS?.gold?.length}
         {#each SUPPORTERS?.gold as { name, href, linkText, imageSrc, date }}
           {@const monthAndYear = new Date(date).toLocaleString('default', {
             month: 'long',
@@ -33,12 +33,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <div
             class="bg-surface-50 dark:bg-surface-950 rounded-container flex w-full flex-col justify-center px-2 py-4"
           >
-            <Avatar
-              class="mx-auto size-24 shrink-0 rounded-[5px] bg-transparent"
-            >
-              <Avatar.Image src={imageSrc} alt="Jane Doe" {name} />
-              <Avatar.Fallback>{name}</Avatar.Fallback>
-            </Avatar>
+            {#if imageSrc}
+              <Avatar
+                class="mx-auto size-24 shrink-0 rounded-[5px] bg-transparent"
+              >
+                <Avatar.Image src={imageSrc} alt={name} />
+                <Avatar.Fallback>{name}</Avatar.Fallback>
+              </Avatar>
+            {/if}
             <div class="flex flex-col items-center justify-center">
               <h4 class="h4">
                 {name}
@@ -58,11 +60,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </div>
           </div>
         {/each}
-      </div>
-    {/if}
+      {/if}
 
-    {#if SUPPORTERS?.silver?.length}
-      <div class="grid w-full grid-cols-1 gap-4 rounded-none md:grid-cols-2">
+      {#if SUPPORTERS?.silver?.length}
         {#each SUPPORTERS.silver as { name, href, linkText, date }}
           {@const monthAndYear = new Date(date).toLocaleString('default', {
             month: 'long',
@@ -83,11 +83,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <a {href} target="_blank" class="anchor">{linkText}</a>
           </div>
         {/each}
-      </div>
-    {/if}
+      {/if}
 
-    {#if SUPPORTERS?.bronze?.length}
-      <div class="grid w-full grid-cols-1 gap-4 rounded-none md:grid-cols-2">
+      {#if SUPPORTERS?.bronze?.length}
         {#each SUPPORTERS?.bronze as { name, date }}
           {@const monthAndYear = new Date(date).toLocaleString('default', {
             month: 'long',
@@ -106,7 +104,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </p>
           </div>
         {/each}
-      </div>
-    {/if}
+      {/if}
+    </div>
   </div>
 {/if}
