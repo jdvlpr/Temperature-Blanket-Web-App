@@ -16,9 +16,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import Spinner from '$lib/components/Spinner.svelte';
   import { weather } from '$lib/state';
-  import {
-    showPreviewImageWeatherDetails,
-  } from '$lib/utils';
+  import { showPreviewImageWeatherDetails } from '$lib/utils';
   import { rowsPreview } from './state.svelte';
 </script>
 
@@ -39,7 +37,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
       const group = target.parentElement as SVGGElement | null;
       if (!group || group.tagName !== 'g') return;
 
-      if (group.dataset.isweathersection === 'true' && group.dataset.dayindex !== undefined) {
+      if (
+        group.dataset.isweathersection === 'true' &&
+        group.dataset.dayindex !== undefined
+      ) {
         const dayIndex = +group.dataset.dayindex;
         weather.currentIndex = dayIndex;
 

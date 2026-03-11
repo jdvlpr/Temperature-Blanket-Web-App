@@ -25,7 +25,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <script lang="ts">
-  import { goto } from '$app/navigation';
   import { page } from '$app/state';
   import { NO_DATA_SRTM3 } from '$lib/constants';
   import { project } from '$lib/state';
@@ -75,7 +74,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       debounceWaitMs: 550,
       showOnFocus: false,
       emptyMsg: 'Trouble getting location. Please search again.',
-      customize: function (input, inputRect, container, maxHeight) {
+      customize: function (container) {
         const group = locationGroup.getBoundingClientRect();
         container.style.width = `${group.width}px`;
         container.style.left = `${group.left}px`;

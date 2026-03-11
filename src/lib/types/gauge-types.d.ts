@@ -93,8 +93,7 @@ export interface GaugeAttributes {
 }
 
 export interface GaugeStateInterface
-  extends GaugeSettingsType,
-    GaugeAttributes {}
+  extends GaugeSettingsType, GaugeAttributes {}
 
 export type WeatherParam = {
   id: 'tmax' | 'tavg' | 'tmin' | 'prcp' | 'snow' | 'dayt' | 'moon';

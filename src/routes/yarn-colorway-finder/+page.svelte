@@ -116,7 +116,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       yarnColorwayFinderState.search = urlParams.get('n');
 
     const scrollObserver = new IntersectionObserver(
-      (entries, observer) => {
+      (entries) => {
         entries.forEach((entry) => {
           if (entry.intersectionRatio != 1) {
             showScrollToTopButton = true;

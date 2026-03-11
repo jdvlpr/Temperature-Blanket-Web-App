@@ -18,25 +18,25 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div class="p-4">
-  <h2 class="font-bold my-2 text-2xl">Keyboard Shortcuts</h2>
+  <h2 class="my-2 text-2xl font-bold">Keyboard Shortcuts</h2>
 
   {#each KEYBOARD_SHORTCUTS as { group, items, details }}
-    <p class="mt-2 font-bold text-xl">{group}</p>
+    <p class="mt-2 text-xl font-bold">{group}</p>
     <p class="mb-2 italic">{details}</p>
     <table
-      class="table-auto m-auto border border-surface-300-700 py-1 px-2 text-left w-full mb-8"
+      class="border-surface-300-700 m-auto mb-8 w-full table-auto border px-2 py-1 text-left"
     >
-      <thead class="divide-y border-b border-surface-300-700">
+      <thead class="border-surface-300-700 divide-y border-b">
         <tr>
-          <th class=" py-0 px-2">Shortcut</th>
-          <th class=" py-0 px-2">Description</th>
+          <th class=" px-2 py-0">Shortcut</th>
+          <th class=" px-2 py-0">Description</th>
         </tr>
       </thead>
-      <tbody class="divide-y divide-surface-300 dark:divide-surface-600">
+      <tbody class="divide-surface-300 dark:divide-surface-600 divide-y">
         {#each items as { keys, description }}
           <tr>
             <td
-              class="py-0 px-2 flex flex-col sm:flex-row sm:flex-wrap justify-start sm:gap-2 items-start sm:items-center gap-0"
+              class="flex flex-col items-start justify-start gap-0 px-2 py-0 sm:flex-row sm:flex-wrap sm:items-center sm:gap-2"
             >
               {#each keys as keys, index}
                 {#if index > 0}<span class="-my-2">or</span>{/if}
@@ -45,7 +45,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 <kbd class="kbd my-2">{shortcut}</kbd>
               {/each}
             </td>
-            <td class="py-0 px-2">{description}</td>
+            <td class="px-2 py-0">{description}</td>
           </tr>
         {/each}
       </tbody>

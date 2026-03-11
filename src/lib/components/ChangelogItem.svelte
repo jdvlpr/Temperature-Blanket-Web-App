@@ -49,7 +49,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
           <span class="flex flex-col">
             {#if title}
-              <span class="font-bold flex items-center gap-2">{@html title}</span>
+              <span class="flex items-center gap-2 font-bold"
+                >{@html title}</span
+              >
             {/if}
             {#if text}
               <span>{@html text}</span>

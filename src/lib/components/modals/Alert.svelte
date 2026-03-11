@@ -22,5 +22,5 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div class="p-2">
-  <div class="text-center w-full inline-block">{@html message}</div>
+  <div class="inline-block w-full text-center">{@html message}</div>
 </div>

@@ -26,7 +26,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }}
 >
   <SegmentedControl.Control
-    class="bg-surface-100 dark:bg-surface-900 shadown-sm rounded-container border-0"
+    class="bg-surface-100 dark:bg-surface-900 shadow-sm rounded-container border-0"
   >
     <SegmentedControl.Indicator />
     <SegmentedControl.Item value={'metric'}>

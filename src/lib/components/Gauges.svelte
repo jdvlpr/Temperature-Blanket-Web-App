@@ -69,10 +69,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   // Scroll to the active gauge button when the active gauge changes or the color section is activated
   $effect(() => {
     gauges.activeGaugeId;
-    
+
     if (!pageSections.items[3].active) return;
-    
-    untrack(() => {      
+
+    untrack(() => {
       if (!gauges.allowScrollToActiveGaugeButton) return;
       tick().then(() => {
         const activeGaugeBtn = document.getElementById('active-gauge-button');

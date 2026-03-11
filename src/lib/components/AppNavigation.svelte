@@ -43,7 +43,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     ShieldAlertIcon,
     SquareTerminalIcon,
     SwatchBookIcon,
-    TriangleAlertIcon
+    TriangleAlertIcon,
   } from '@lucide/svelte';
   import { Accordion } from '@skeletonlabs/skeleton-svelte';
   import { untrack } from 'svelte';
@@ -224,7 +224,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   'btn hover:preset-tonal-surface w-fit',
                   page.url.pathname === '/gallery' && 'preset-tonal-secondary',
                 ]}
-                >
+              >
                 <LandmarkIcon />
                 Gallery
               </a>
@@ -235,7 +235,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   page.url.pathname === '/globe' && 'preset-tonal-secondary',
                 ]}
               >
-                <GlobeIcon/>
+                <GlobeIcon />
                 Globe
               </a>
             </div>

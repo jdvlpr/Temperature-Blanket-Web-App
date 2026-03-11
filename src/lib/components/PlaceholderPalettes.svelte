@@ -30,13 +30,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div
-  class="gap-4 mb-2 flex flex-col items-start justify-start w-[calc(100vw-1rem)] max-w-[calc(1024px-1rem)]"
+  class="mb-2 flex w-[calc(100vw-1rem)] max-w-[calc(1024px-1rem)] flex-col items-start justify-start gap-4"
   class:!max-w-full={maxWFull}
   class:!w-full={wFull}
 >
   {#each Array(items) as _, index}
     <div
-      class="placeholder animate-pulse w-full rounded-container"
+      class="placeholder rounded-container w-full animate-pulse"
       style="height:{height}"
     ></div>
   {/each}

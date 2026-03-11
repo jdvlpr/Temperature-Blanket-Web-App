@@ -29,13 +29,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div
-  class="w-full flex justify-end"
+  class="flex w-full justify-end"
   style="bottom:{bottom};position:{position}"
 >
   <button
     aria-label="Back to Top"
     transition:fade
-    class="btn-icon backdrop-blur-xs p-2 m-2 z-20 shadow-sm preset-filled-primary-500 opacity-80 transition-all inline-flex justify-center items-center"
+    class="btn-icon preset-filled-primary-500 z-20 m-2 inline-flex items-center justify-center p-2 opacity-80 shadow-sm backdrop-blur-xs transition-all"
     onclick={onClick}
   >
     <ChevronUpIcon />

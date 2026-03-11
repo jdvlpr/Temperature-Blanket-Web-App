@@ -38,7 +38,7 @@ test.describe('Yarn Colorway Finder', () => {
     await expect(
       page.locator('.rounded-container').filter({ hasText: 'Cream' }).first(),
     ).toBeVisible();
-    
+
     // Also check for the match percentage text which appears when searching by hex
     // await expect(page.getByText(/Match/).first()).toBeVisible();
   });

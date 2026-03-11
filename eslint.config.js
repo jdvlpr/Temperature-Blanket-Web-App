@@ -1,16 +1,32 @@
+import js from '@eslint/js';
+import svelte from 'eslint-plugin-svelte';
+import globals from 'globals';
+import ts from 'typescript-eslint';
+import prettier from 'eslint-config-prettier';
+
 export default [
+  js.configs.recommended,
+  ...ts.configs.recommended,
+  ...svelte.configs['flat/recommended'],
+  prettier,
+  ...svelte.configs['flat/prettier'],
   {
-    root: true,
-    extends: ['eslint:recommended', 'plugin:svelte/recommended', 'prettier'],
-    parserOptions: {
-      sourceType: 'module',
-      ecmaVersion: 2020,
-      extraFileExtensions: ['.svelte'],
+    languageOptions: {
+      globals: {
+        ...globals.browser,
+        ...globals.node,
+      },
     },
-    env: {
-      browser: true,
-      es2017: true,
-      node: true,
+  },
+  {
+    files: ['**/*.svelte'],
+    languageOptions: {
+      parserOptions: {
+        parser: ts.parser,
+      },
     },
+  },
+  {
+    ignores: ['build/', '.svelte-kit/', 'dist/'],
   },
 ];

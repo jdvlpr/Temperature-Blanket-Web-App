@@ -36,7 +36,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     ClockIcon,
     EarthIcon,
     PlusIcon,
-    XIcon
+    XIcon,
   } from '@lucide/svelte';
   import { onMount } from 'svelte';
   import { yarnPageState } from '../yarn/state.svelte';
@@ -83,7 +83,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     }
     loading = false;
     const scrollObserver = new IntersectionObserver(
-      (entries, observer) => {
+      (entries) => {
         entries.forEach((entry) => {
           showScrollToTopButton =
             !entry.isIntersecting && entry.boundingClientRect.top < 0;
@@ -185,10 +185,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <div class="flex flex-col justify-center gap-8 px-2 lg:px-0">
   <div class="inline-grid gap-2 text-center">
     <div class="my-2 flex flex-col items-center">
-      <h2 class="h2 text-gradient">Featured Yarn Palettes</h2>
+      <p class="text-xl font-semibold text-surface-700-300">Featured Yarn Palettes</p>
       <label class="label">
         <span class="label-text">Popular in the last</span>
-        <div class="relative flex items-center w-fit">
+        <div class="relative flex w-fit items-center">
           <ClockIcon class="pointer-events-none absolute left-2" />
           <select
             bind:value={yarnPaletteGalleryState.timePeriod}
@@ -206,9 +206,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </div>
       </label>
     </div>
-    <div
-      class="my-2 flex w-full flex-col items-start justify-start gap-4"
-    >
+    <div class="my-2 flex w-full flex-col items-start justify-start gap-4">
       {#if !yarnPaletteGalleryState.popularPalettes.length}
         <PlaceholderPalettes items={5} maxWFull={true} wFull={true} />
       {:else}
@@ -236,7 +234,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       class="flex scroll-mt-[70px] flex-col items-center justify-center gap-2 pb-4 text-center"
     >
       <div class="flex flex-col">
-        <h2 class="h2 text-gradient">All Yarn Palettes</h2>
+        <p class="text-xl font-semibold text-surface-700-300">All Yarn Palettes</p>
         <p class="text-sm">Palettes from all user-created projects</p>
       </div>
       <div class="grid w-full grid-cols-12 items-end gap-4">
@@ -301,9 +299,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <label class="label col-span-6 w-full md:col-span-2">
           <span class="label-text"> Order By </span>
           <div class="relative flex items-center">
-            <ArrowUpDownIcon
-              class="pointer-events-none absolute left-2"
-            />
+            <ArrowUpDownIcon class="pointer-events-none absolute left-2" />
             <select
               class="select w-full truncate pl-10"
               bind:value={yarnPaletteGalleryState.orderBy}
@@ -366,9 +362,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </div>
       </div>
     </div>
-    <div
-      class="my-2 flex w-full flex-col items-start justify-start gap-4"
-    >
+    <div class="my-2 flex w-full flex-col items-start justify-start gap-4">
       {#each yarnPaletteGalleryState.palettes as { colors, schemeName, projectId }}
         <a
           onclick={async () => {
@@ -409,8 +403,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             yarnPaletteGalleryState.projects.push(
               ...results.edges.flatMap((item) => item.node),
             );
-            yarnPaletteGalleryState.projects =
-              yarnPaletteGalleryState.projects;
+            yarnPaletteGalleryState.projects = yarnPaletteGalleryState.projects;
             yarnPaletteGalleryState.palettes = getPalettesFromProjects({
               projects: yarnPaletteGalleryState.projects,
               selectedBrandId: yarnPaletteGalleryState.filteredBrandId,

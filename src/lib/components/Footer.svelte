@@ -24,20 +24,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <footer
-  class="py-4 max-w-(--breakpoint-xl) m-auto px-2 xl:px-0 text-left grid grid-cols-12 justify-center gap-4"
+  class="m-auto grid max-w-(--breakpoint-xl) grid-cols-12 justify-center gap-4 px-2 py-4 text-left xl:px-0"
   class:bg-transparent={subtleBackground}
   class:dark:bg-transparent={subtleBackground}
 >
   {#if about}
-    <div class="card h-fit preset-tonal-surface p-4 col-span-full shadow-xl">
-      <h3 class="font-bold text-xl mb-2">About</h3>
+    <div class="card preset-tonal-surface col-span-full h-fit p-4 shadow-xl">
+      <h3 class="mb-2 text-xl font-bold">About</h3>
       {@render about?.()}
     </div>
   {/if}
 
   {#if sources}
-    <div class="card preset-tonal-surface p-4 h-fit col-span-full shadow-xl">
-      <h3 class="font-bold text-xl mb-2">Sources</h3>
+    <div class="card preset-tonal-surface col-span-full h-fit p-4 shadow-xl">
+      <h3 class="mb-2 text-xl font-bold">Sources</h3>
       {@render sources?.()}
     </div>
   {/if}

@@ -26,7 +26,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ToTopButton from '$lib/components/buttons/ToTopButton.svelte';
   import { onMount } from 'svelte';
   import { entries } from './changelog';
-  import { CalendarIcon } from '@lucide/svelte';
 
   let container = $state();
   let showScrollToTopButton = $state(false);
@@ -70,7 +69,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       class="m-auto mx-auto mt-2 mb-6 max-w-(--breakpoint-md) px-2 text-center"
     >
       <div class="flex flex-col items-start gap-2" bind:this={container}>
-        <h2 class="h2 text-gradient max-lg:hidden mt-2">What's New?</h2>
+        <h2 class="h2 text-gradient mt-2 max-lg:hidden">What's New?</h2>
         <p class="text-left">
           See what's new and review past changes from {PUBLIC_BASE_DOMAIN_NAME}.
           This changelog includes only select milestones.
@@ -85,7 +84,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <div class="flex flex-col gap-2">
           {#each entries as { year, months }}
             {#each months as { month, items }}
-              <p class="font-bold text-xl">{month}, {year}</p>
+              <p class="text-xl font-bold">{month}, {year}</p>
               <div class="flex w-full flex-col gap-4">
                 {#each items as { version, notes }}
                   <ChangelogItem {version} {notes} />

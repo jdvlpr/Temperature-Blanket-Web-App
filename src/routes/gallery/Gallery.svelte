@@ -32,7 +32,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     ClockIcon,
     EarthIcon,
     Grid3x3,
-    XIcon
+    XIcon,
   } from '@lucide/svelte';
   import { onMount } from 'svelte';
   import { galleryState } from './state.svelte';
@@ -173,7 +173,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
       if (galleryState.search) {
         galleryState.projects = results.edges.flatMap((item) => item.node);
       } else {
-        galleryState.projects.push(...results.edges.flatMap((item) => item.node));
+        galleryState.projects.push(
+          ...results.edges.flatMap((item) => item.node),
+        );
         galleryState.projects = galleryState.projects;
       }
       galleryState.displayedProjects = getFilteredProjects();
@@ -188,10 +190,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <div class="flex flex-col justify-center gap-8">
   <div class="inline-grid gap-2 text-center">
     <div class="my-2 flex flex-col items-center">
-      <h2 class="h2 text-gradient">Featured Projects</h2>
-      <label class="label ">
+      <p class="text-xl font-semibold text-surface-700-300">Featured Projects</p>
+      <label class="label">
         <span class="label-text">Popular in the last</span>
-        <div class="relative flex items-center w-fit">
+        <div class="relative flex w-fit items-center">
           <ClockIcon class="pointer-events-none absolute left-2" />
           <select
             bind:value={galleryState.timePeriod}
@@ -216,7 +218,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
       bind:this={featuredProjectsEl}
     >
       {#if !galleryState.popularProjects.length}
-
         {#each Array(5)}
           <div
             class="placeholder rounded-container bg-surface-100 dark:bg-surface-900 h-[324px] w-[245px] shrink-0 animate-pulse snap-center"
@@ -243,12 +244,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
   </div>
 
-  <div class="flex flex-col gap-2 text-center px-2 lg:px-0">
+  <div class="flex flex-col gap-2 px-2 text-center lg:px-0">
     <div
       bind:this={scrollContainer}
       class="flex scroll-mt-[70px] flex-wrap items-end justify-center text-center"
     >
-      <h2 class="h2 text-gradient">All Projects</h2>
+      <p class="text-xl font-semibold text-surface-700-300">All Projects</p>
       <div class="mb-2 flex w-full justify-center">
         {#if totalProjects === 0}
           <p class="animate-pulse text-xs">...</p>
@@ -367,7 +368,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </div>
     </div>
     <div
-      class="flex scroll-mt-[58px] flex-col items-center lg:scroll-mt-[44px] min-h-[70vh]"
+      class="flex min-h-[70vh] scroll-mt-[58px] flex-col items-center lg:scroll-mt-[44px]"
       bind:this={projectsList}
     >
       <div class="mx-auto my-2">

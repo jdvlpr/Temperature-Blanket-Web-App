@@ -21,12 +21,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <svelte:head>
-    <title>Temperature Blanket Globe</title>
-    <meta name="description" content="Explore temperature blanket projects on a 3D map of the earth" />
-    <meta property="og:title" content="Temperature Blanket Globe" />
-    <meta property="og:description" content="Explore temperature blanket projects on a 3D map of the earth" />
-    <meta property="og:url" content="{PUBLIC_BASE_URL}/globe" />
-    <meta property="og:type" content="website" />
+  <title>Temperature Blanket Globe</title>
+  <meta
+    name="description"
+    content="Explore temperature blanket projects on a 3D map of the earth"
+  />
+  <meta property="og:title" content="Temperature Blanket Globe" />
+  <meta
+    property="og:description"
+    content="Explore temperature blanket projects on a 3D map of the earth"
+  />
+  <meta property="og:url" content="{PUBLIC_BASE_URL}/globe" />
+  <meta property="og:type" content="website" />
 </svelte:head>
 
 <AppShell pageName="Globe">
@@ -35,7 +41,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/snippet}
   {#snippet main()}
     <div class="mx-auto w-full">
-        <Globe/>
+      <Globe />
     </div>
   {/snippet}
 </AppShell>

@@ -33,8 +33,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { onMount } from 'svelte';
   import { yarnPageState } from './state.svelte';
 
-  let urlParams,
-    schemeId = $state('Custom');
+  let urlParams;
   let isFinishedOnMount = $state(false);
 
   onMount(() => {

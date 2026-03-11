@@ -18,7 +18,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div class="flex flex-col items-start gap-4 p-4">
-  <h2 class="font-bold my-2 text-xl">There's Been An Update</h2>
+  <h2 class="my-2 text-xl font-bold">There's Been An Update</h2>
 
   <p>
     Some breaking changes were made to improve the accuracy and functionality of

@@ -19,10 +19,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { PUBLIC_BASE_URL } from '$env/static/public';
   import AppLogo from '$lib/components/AppLogo.svelte';
   import AppShell from '$lib/components/AppShell.svelte';
-  import { NotebookPenIcon, PaletteIcon, ProjectorIcon, SwatchBookIcon } from '@lucide/svelte';
+  import { NotebookPenIcon, SwatchBookIcon } from '@lucide/svelte';
+  import { SegmentedControl } from '@skeletonlabs/skeleton-svelte';
   import Gallery from './Gallery.svelte';
   import YarnPaletteGallery from './YarnPaletteGallery.svelte';
-  import { SegmentedControl } from '@skeletonlabs/skeleton-svelte';
 
   // Use URL hash to set initial view but default to 'projects'
   let view = $state('projects');
@@ -37,22 +37,34 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <svelte:head>
-  <title>Temperature Blanket {view === 'projects' ? 'Project' : 'Yarn Palette'} Gallery</title>
+  <title
+    >Temperature Blanket {view === 'projects' ? 'Project' : 'Yarn Palette'} Gallery</title
+  >
   <meta
     name="description"
-    content={view === 'projects' 
-      ? 'Browse a collection of temperature blanket projects.' 
+    content={view === 'projects'
+      ? 'Browse a collection of temperature blanket projects.'
       : 'Browse a collection of yarn palettes from user-created projects.'}
   />
 
-  <meta property="og:title" content="Temperature Blanket {view === 'projects' ? 'Project' : 'Yarn Palette'} Gallery" />
+  <meta
+    property="og:title"
+    content="Temperature Blanket {view === 'projects'
+      ? 'Project'
+      : 'Yarn Palette'} Gallery"
+  />
   <meta
     property="og:description"
-    content={view === 'projects' 
-      ? 'Browse a collection of temperature blanket projects.' 
+    content={view === 'projects'
+      ? 'Browse a collection of temperature blanket projects.'
       : 'Browse a collection of yarn palettes from user-created projects.'}
   />
-  <meta property="og:url" content="{PUBLIC_BASE_URL || ''}/gallery{view === 'yarn-palettes' ? '#yarn-palettes' : ''}" />
+  <meta
+    property="og:url"
+    content="{PUBLIC_BASE_URL || ''}/gallery{view === 'yarn-palettes'
+      ? '#yarn-palettes'
+      : ''}"
+  />
   <meta property="og:type" content="website" />
 </svelte:head>
 
@@ -62,34 +74,44 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/snippet}
 
   {#snippet main()}
-    <main class="max-w-(--breakpoint-xl) m-auto flex flex-col justify-start gap-2 mb-8">
-      <div class="mx-auto my-4 w-full max-w-sm px-2">
-        <SegmentedControl
+    <main
+      class="m-auto mb-8 flex max-w-(--breakpoint-xl) flex-col justify-start gap-2"
+    >
+
+<h2 class="h2 text-gradient text-center">Gallery</h2>
+<div class="mx-auto w-full max-w-sm px-2">
+  <SegmentedControl
           value={view}
           onValueChange={(e) => {
             view = e.value;
             // Optionally update hash so links can be shared to specific views
             if (browser) {
-               window.location.hash = e.value;
+              window.location.hash = e.value;
             }
           }}
         >
           <SegmentedControl.Control
-            class="bg-surface-100 dark:bg-surface-900 shadown-sm rounded-container border-0"
+               class="bg-surface-100 dark:bg-surface-900 shadow-sm rounded-container border-0"
           >
             <SegmentedControl.Indicator />
             <SegmentedControl.Item value={'projects'}>
-              <SegmentedControl.ItemText><div class="flex items-center justify-center gap-1">
-          <NotebookPenIcon />
-          <span class="">Projects</span>
-        </div></SegmentedControl.ItemText>
+              <SegmentedControl.ItemText
+                ><div class="flex items-center justify-center gap-1">
+                  <NotebookPenIcon />
+                  <span class="">Projects</span>
+                </div></SegmentedControl.ItemText
+              >
               <SegmentedControl.ItemHiddenInput />
             </SegmentedControl.Item>
             <SegmentedControl.Item value={'yarn-palettes'}>
-              <SegmentedControl.ItemText><div class="flex items-center justify-center gap-1">
-          <SwatchBookIcon />
-          <span class=""><span class="max-sm:hidden">Yarn</span> Palettes</span>
-        </div></SegmentedControl.ItemText>
+              <SegmentedControl.ItemText
+                ><div class="flex items-center justify-center gap-1">
+                  <SwatchBookIcon />
+                  <span class=""
+                    ><span class="max-sm:hidden">Yarn</span> Palettes</span
+                  >
+                </div></SegmentedControl.ItemText
+              >
               <SegmentedControl.ItemHiddenInput />
             </SegmentedControl.Item>
           </SegmentedControl.Control>
