@@ -54,7 +54,6 @@ const config = {
           '/weather',
           '/yarn',
           '/yarn-colorway-finder',
-          '/yarn-palette-gallery',
           '/yarn-search-request',
           '/yarn-search-request/*',
         ],

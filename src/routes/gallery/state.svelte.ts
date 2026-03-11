@@ -26,4 +26,31 @@ class GalleryState {
   };
 }
 
+class YarnPaletteGalleryState {
+  search = $state('');
+  filteredBrandId = $state('');
+  filteredYarnId = $state('');
+  palettesContainOnlyFilteredYarn = $state(false);
+  orderBy = $state('DESC');
+  projects = $state([]);
+  palettes = $state([]);
+  popularPalettes = $state([]);
+  gallery = $state({});
+  timePeriod = $state(0.25);
+
+  getYarnSearch = ({
+    brandId,
+    yarnId,
+  }: {
+    brandId: string;
+    yarnId: string;
+  }) => {
+    if (brandId && yarnId) return `${brandId}-${yarnId}`;
+    else if (brandId) return brandId;
+    else if (yarnId) return yarnId;
+    return '';
+  };
+}
+
 export const galleryState = new GalleryState();
+export const yarnPaletteGalleryState = new YarnPaletteGalleryState();

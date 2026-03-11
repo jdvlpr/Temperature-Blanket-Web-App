@@ -243,7 +243,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
   </div>
 
-  <div class=" flex flex-col gap-2 text-center">
+  <div class="flex flex-col gap-2 text-center px-2 lg:px-0">
     <div
       bind:this={scrollContainer}
       class="flex scroll-mt-[70px] flex-wrap items-end justify-center text-center"
@@ -258,7 +258,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </p>
         {/if}
       </div>
-      <div class="grid w-full grid-cols-12 items-end gap-4 px-4">
+      <div class="grid w-full grid-cols-12 items-end gap-4">
         <div class="col-span-12 w-full md:col-span-7">
           <SelectYarn
             preselectDefaultYarn={false}

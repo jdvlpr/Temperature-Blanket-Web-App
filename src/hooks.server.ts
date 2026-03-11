@@ -64,6 +64,11 @@ const legacyRedirects: Handle = async ({ event, resolve }) => {
     redirect(301, newPath);
   }
 
+  // Redirect old Yarn Palette Gallery to unified Gallery
+  if (path === '/yarn-palette-gallery' || path === '/yarn-palette-gallery/') {
+    redirect(301, '/gallery#yarn-palettes');
+  }
+
   return resolve(event);
 };
 

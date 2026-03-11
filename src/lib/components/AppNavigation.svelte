@@ -63,7 +63,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
           break;
         case '/globe':
         case '/gallery':
-        case '/yarn-palette-gallery':
           if (!openedNavigationItems.includes('explore'))
             openedNavigationItems = [...openedNavigationItems, 'explore'];
           break;
@@ -237,19 +236,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 ]}
               >
                 <GlobeIcon/>
-                Globe <span class="badge preset-filled-secondary-500 shadow-sm">New</span>
+                Globe
               </a>
-              <a
-                href="/yarn-palette-gallery"
-                class={[
-                  'btn hover:preset-tonal-surface w-fit',
-                  page.url.pathname === '/yarn-palette-gallery' &&
-                    'preset-tonal-secondary',
-                ]}
-              >
-                <SwatchBookIcon />
-                Yarn Palettes</a
-              >
             </div>
           {/if}
         {/snippet}
