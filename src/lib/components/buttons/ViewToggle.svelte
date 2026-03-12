@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -26,7 +26,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }}
 >
   <SegmentedControl.Control
-   class="bg-surface-100 dark:bg-surface-900 shadow-sm rounded-container border-0"
+    class="bg-surface-100 dark:bg-surface-900 rounded-container border-0 shadow-sm"
   >
     <SegmentedControl.Indicator />
     <SegmentedControl.Item value="list">

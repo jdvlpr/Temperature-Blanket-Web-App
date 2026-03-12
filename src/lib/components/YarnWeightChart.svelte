@@ -1,6 +1,7 @@
 <script lang="ts">
   import { page } from '$app/state';
-  import { ALL_YARN_WEIGHTS, yarnWeightIcons } from '$lib/constants';
+  import { ALL_YARN_WEIGHTS } from '$lib/constants/color-constants';
+  import { yarnWeightIcons } from '$lib/constants/yarn-weight-icon-constants';
 
   let highlight = $state(null);
 

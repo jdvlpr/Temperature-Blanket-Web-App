@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -17,7 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { goto } from '$app/navigation';
   import { page } from '$app/state';
   import { PUBLIC_SITE_TITLE } from '$env/static/public';
-  import { dialog } from '$lib/state';
+  import { dialog } from '$lib/state/page-state.svelte';
 </script>
 
 <button

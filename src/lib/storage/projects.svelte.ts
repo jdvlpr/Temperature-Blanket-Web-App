@@ -1,16 +1,18 @@
 import { browser } from '$app/environment';
-import { locations, project, weather } from '$lib/state';
+import { locations } from '$lib/state/location-state.svelte';
+import { project } from '$lib/state/project-state.svelte';
+import { weather } from '$lib/state/weather-state.svelte';
+import type { LocationType } from '$lib/types/location-types';
 import type {
-  LocationType,
   WeatherDay,
   WeatherSourceOptions,
-} from '$lib/types';
+} from '$lib/types/weather-types';
 import {
   dateToISO8601String,
-  getMoonPhase,
   numberOfDays,
   stringToDate,
-} from '$lib/utils';
+} from '$lib/utils/date-utils';
+import { getMoonPhase } from '$lib/utils/weather-utils.svelte';
 import { del, get, set } from 'idb-keyval';
 
 export type StoredProjectIndexItem = {

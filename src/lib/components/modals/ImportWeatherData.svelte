@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -16,19 +16,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script>
   import Spinner from '$lib/components/Spinner.svelte';
   import HelpIcon from '$lib/components/buttons/HelpIcon.svelte';
-  import { weather } from '$lib/state';
+  import { weather } from '$lib/state/weather-state.svelte';
+  import { CSVtoArray } from '$lib/utils/weather-utils.svelte';
   import {
-    CSVtoArray,
     celsiusToFahrenheit,
     convertTime,
-    dateToISO8601String,
-    displayNumber,
     fahrenheitToCelsius,
     hoursToMinutes,
     inchesToMillimeters,
     millimetersToInches,
-    stringToDate,
-  } from '$lib/utils';
+  } from '$lib/utils/unit-utils.svelte';
+  import { dateToISO8601String, stringToDate } from '$lib/utils/date-utils';
+  import { displayNumber } from '$lib/utils/number-utils';
   import { FileIcon } from '@lucide/svelte';
   import { FileUpload } from '@skeletonlabs/skeleton-svelte';
 

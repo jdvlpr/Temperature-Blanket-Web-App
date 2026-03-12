@@ -1,4 +1,4 @@
-// Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+// Copyright (c) 2026, Thomas (https://github.com/jdvlpr)
 //
 // This file is part of Temperature-Blanket-Web-App.
 //
@@ -14,7 +14,7 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { PUBLIC_BASE_DOMAIN_NAME, PUBLIC_BASE_URL } from '$env/static/public';
-import { locations } from '$lib/state';
+import { locations } from '$lib/state/location-state.svelte';
 import pdfConfig from '../pdf-config';
 import gauges from './gauges.svelte';
 import weatherData from './weather-data.svelte';

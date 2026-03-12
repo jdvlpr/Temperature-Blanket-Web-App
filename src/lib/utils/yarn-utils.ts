@@ -1,4 +1,4 @@
-// Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+// Copyright (c) 2026, Thomas (https://github.com/jdvlpr)
 //
 // This file is part of Temperature-Blanket-Web-App.
 //
@@ -13,8 +13,8 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { ALL_COLORWAYS_WITH_AFFILIATE_LINKS } from '$lib/constants';
-import { getColorName } from '$lib/utils';
+import { ALL_COLORWAYS_WITH_AFFILIATE_LINKS } from '$lib/constants/color-constants';
+import { getColorName } from '$lib/utils/color-utils';
 import { getTextColor } from '$lib/utils/color-utils';
 import { brands } from '$lib/data/yarns/brands';
 

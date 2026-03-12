@@ -1,4 +1,4 @@
-// Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+// Copyright (c) 2026, Thomas (https://github.com/jdvlpr)
 //
 // This file is part of Temperature-Blanket-Web-App.
 //
@@ -18,20 +18,22 @@ import {
   SECRET_METEOSTAT_API_KEY,
   SECRET_METEOSTAT_DEV_API_KEY,
 } from '$env/static/private';
-import { API_SERVICES, NO_DATA_SRTM3 } from '$lib/constants';
-import type { WeatherDay } from '$lib/types.js';
+import { API_SERVICES } from '$lib/constants/api-constants';
+import { NO_DATA_SRTM3 } from '$lib/constants/location-constants';
+import type { WeatherDay } from '$lib/types/weather-types';
+import { dateToISO8601String, stringToDate } from '$lib/utils/date-utils';
 import {
-  celsiusToFahrenheit,
-  dateToISO8601String,
   displayNumber,
   getAvgOfThree,
   getMaxOfThree,
   getMinOfThree,
-  getMoonPhase,
+} from '$lib/utils/number-utils';
+import {
+  celsiusToFahrenheit,
   hoursToMinutes,
   millimetersToInches,
-  stringToDate,
-} from '$lib/utils.js';
+} from '$lib/utils/unit-utils.svelte.js';
+import { getMoonPhase } from '$lib/utils/weather-utils.svelte';
 import { error, json } from '@sveltejs/kit';
 import SunCalc from 'suncalc';
 

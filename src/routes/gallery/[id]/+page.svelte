@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -24,19 +24,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Spinner from '$lib/components/Spinner.svelte';
   import YarnSources from '$lib/components/YarnSources.svelte';
   import ViewToggle from '$lib/components/buttons/ViewToggle.svelte';
-  import { ALL_YARN_WEIGHTS } from '$lib/constants';
+  import { ALL_YARN_WEIGHTS } from '$lib/constants/color-constants';
   import { safeSlide } from '$lib/features/transitions/safeSlide';
-  import { allGaugesAttributes, locations } from '$lib/state';
+  import { allGaugesAttributes } from '$lib/state/gauges-state.svelte';
+  import { locations } from '$lib/state/location-state.svelte';
   import { preferences } from '$lib/storage/preferences.svelte';
+  import { exists } from '$lib/utils/other-utils';
   import {
-    exists,
     getProjectParametersFromURLHash,
-    getTextColor,
     getTitleFromLocationsMeta,
-    parseGaugeURLHash,
-    pluralize,
-    stripHTMLTags,
-  } from '$lib/utils';
+  } from '$lib/utils/project-utils.svelte';
+  import { getTextColor } from '$lib/utils/color-utils';
+  import { parseGaugeURLHash } from '$lib/utils/load-project-utils.svelte';
+  import { pluralize, stripHTMLTags } from '$lib/utils/string-utils';
   import {
     ArrowLeftIcon,
     ChevronDown,

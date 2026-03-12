@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -46,19 +46,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
     ALL_COLORWAYS_WITH_AFFILIATE_LINKS,
     ALL_YARN_WEIGHTS,
     YARN_COLORWAYS_PER_PAGE,
-  } from '$lib/constants';
+  } from '$lib/constants/color-constants';
   import { brands } from '$lib/data/yarns/brands';
   import { safeSlide } from '$lib/features/transitions/safeSlide';
-  import { toast } from '$lib/state';
-  import type { YarnWeight } from '$lib/types';
+  import { toast } from '$lib/state/page-state.svelte';
+  import type { YarnWeight } from '$lib/types/yarn-types';
   import {
     getTextColor,
-    pluralize,
     sortColorsByName,
     sortColorsByNameZtoA,
     sortColorsDarktoLight,
     sortColorsLightToDark,
-  } from '$lib/utils';
+  } from '$lib/utils/color-utils';
+  import { pluralize } from '$lib/utils/string-utils';
   import {
     ArrowDownWideNarrowIcon,
     ChevronDownIcon,

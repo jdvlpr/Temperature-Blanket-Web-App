@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -20,13 +20,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import SelectYarn from '$lib/components/SelectYarn.svelte';
   import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
   import StickyPart from '$lib/components/modals/StickyPart.svelte';
-  import { dialog } from '$lib/state';
-  import {
-    getColorways,
-    getFilteredYarns,
-    getSortedPalette,
-    pickRandomFromArray,
-  } from '$lib/utils';
+  import { dialog } from '$lib/state/page-state.svelte';
+  import { getColorways, getFilteredYarns } from '$lib/utils/yarn-utils';
+  import { getSortedPalette } from '$lib/utils/color-utils';
+  import { pickRandomFromArray } from '$lib/utils/number-utils';
   import {
     ArrowDownWideNarrowIcon,
     ExternalLinkIcon,

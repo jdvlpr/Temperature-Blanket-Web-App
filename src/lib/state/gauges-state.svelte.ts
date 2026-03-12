@@ -1,4 +1,4 @@
-// Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+// Copyright (c) 2026, Thomas (https://github.com/jdvlpr)
 //
 // This file is part of Temperature-Blanket-Web-App.
 //
@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { CHARACTERS_FOR_URL_HASH } from '$lib/constants';
+import { CHARACTERS_FOR_URL_HASH } from '$lib/constants/page-constants';
 import {
   RainGauge,
   gaugeAttributes as rainGaugeAttributes,
@@ -30,8 +30,12 @@ import {
   DayTimeGauge,
   gaugeAttributes as daytGaugeAttributes,
 } from '$lib/state/gauges/daytime-gauge-state.svelte';
-import type { GaugeAttributes, GaugeStateInterface } from '$lib/types';
-import { colorsToYarnDetails, displayNumber } from '$lib/utils';
+import type {
+  GaugeAttributes,
+  GaugeStateInterface,
+} from '$lib/types/gauge-types';
+import { colorsToYarnDetails } from '$lib/utils/color-utils';
+import { displayNumber } from '$lib/utils/number-utils';
 import {
   MoonPhaseGauge,
   gaugeAttributes as moonGaugeAttributes,

@@ -25,6 +25,9 @@ export default [
         parser: ts.parser,
       },
     },
+    rules: {
+      'import/no-cycle': 'error',
+    },
   },
   {
     ignores: ['build/', '.svelte-kit/', 'dist/'],

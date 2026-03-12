@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -23,11 +23,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     consentToMSClarityCookies,
     dialog,
     drawerState,
-    project,
     toast,
-  } from '$lib/state';
+  } from '$lib/state/page-state.svelte';
+  import { project } from '$lib/state/project-state.svelte';
   import { initializeLocalStorage } from '$lib/storage/storage-utils.svelte';
-  import { handleKeyDown, privacy } from '$lib/utils';
+  import { handleKeyDown } from '$lib/utils/page-utils.svelte';
+  import { privacy } from '$lib/utils/privacy-utils.svelte';
   import { YoutubeIcon } from '@lucide/svelte';
   import { onMount, type Snippet } from 'svelte';
   import '../css/main.css';

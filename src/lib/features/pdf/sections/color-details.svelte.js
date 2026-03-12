@@ -1,4 +1,4 @@
-// Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+// Copyright (c) 2026, Thomas (https://github.com/jdvlpr)
 //
 // This file is part of Temperature-Blanket-Web-App.
 //
@@ -13,8 +13,8 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { weather } from '$lib/state';
-import { getDaysInRange, getDaysPercent } from '$lib/utils';
+import { weather } from '$lib/state/weather-state.svelte';
+import { getDaysInRange, getDaysPercent } from '$lib/utils/range-utils.svelte';
 import pdfConfig from '../pdf-config';
 import pdfGauge from './gauge.svelte.ts';
 

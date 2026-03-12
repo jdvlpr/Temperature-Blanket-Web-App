@@ -1,4 +1,4 @@
-import type { Brand } from '$lib/types';
+import type { Brand } from '$lib/types/yarn-types';
 import { yarn as amigurumi } from './amigurumi/yarn';
 import { yarn as amigurumiSoft } from './amigurumi-soft/yarn';
 import { yarn as mollet } from './mollet/yarn';

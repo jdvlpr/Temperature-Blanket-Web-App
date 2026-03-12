@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -14,7 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import { dialog } from '$lib/state';
+  import { dialog } from '$lib/state/page-state.svelte';
   import { SendIcon } from '@lucide/svelte';
   import AddToGallery from '../modals/AddToGallery.svelte';
 

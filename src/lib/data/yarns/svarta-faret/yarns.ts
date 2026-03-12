@@ -1,4 +1,4 @@
-import type { Brand } from '$lib/types';
+import type { Brand } from '$lib/types/yarn-types';
 import { yarn as tilda } from './tilda/yarn';
 import { yarn as ulrikaUllgarn } from './ulrika-ullgarn/yarn';
 

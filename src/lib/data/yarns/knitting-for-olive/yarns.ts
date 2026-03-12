@@ -1,4 +1,4 @@
-import type { Brand } from '$lib/types';
+import type { Brand } from '$lib/types/yarn-types';
 import { yarn as compatibleCashmere } from './compatible-cashmere/yarn';
 import { yarn as cottonMerino } from './cotton-merino/yarn';
 import { yarn as merino } from './merino/yarn';

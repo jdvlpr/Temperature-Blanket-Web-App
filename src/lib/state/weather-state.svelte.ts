@@ -1,4 +1,4 @@
-// Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+// Copyright (c) 2026, Thomas (https://github.com/jdvlpr)
 //
 // This file is part of Temperature-Blanket-Web-App.
 //
@@ -13,19 +13,17 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { locations, showDaysInRange } from '$lib/state';
+import { locations } from '$lib/state/location-state.svelte';
+import { showDaysInRange } from '$lib/state/gauges-state.svelte';
 import { preferences } from '$lib/storage/preferences.svelte';
+import type { GaugeAttributes, WeatherParam } from '$lib/types/gauge-types';
 import type {
-  GaugeAttributes,
   WeatherDay,
-  WeatherParam,
   WeatherSourceOptions,
-} from '$lib/types';
-import {
-  createWeeksProperty,
-  displayNumber,
-  getWeatherTargets,
-} from '$lib/utils';
+} from '$lib/types/weather-types';
+import { createWeeksProperty } from '$lib/utils/date-utils';
+import { displayNumber } from '$lib/utils/number-utils';
+import { getWeatherTargets } from '$lib/utils/weather-utils.svelte';
 
 class WeatherClass {
   // ***************

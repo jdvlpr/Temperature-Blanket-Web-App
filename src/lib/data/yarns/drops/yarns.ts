@@ -1,4 +1,4 @@
-import type { Brand } from '$lib/types';
+import type { Brand } from '$lib/types/yarn-types';
 import { yarn as alpaca } from './alpaca/yarn';
 import { yarn as babyMerino } from './baby-merino/yarn';
 import { yarn as brushedAlpacaSilk } from './brushed-alpaca-silk/yarn';

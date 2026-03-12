@@ -2,34 +2,37 @@ import { describe, expect, it, vi } from 'vitest';
 import * as projectUtils from './project-utils.svelte';
 
 // Mock dependencies
-vi.mock('$lib/state', () => ({
-  weather: {
-    data: [],
-    grouping: 'month',
-    rawData: [],
-  },
+vi.mock('$lib/state/weather-state.svelte', () => ({
+  weather: { data: [], grouping: 'month', rawData: [] },
+}));
+
+vi.mock('$lib/state/location-state.svelte', () => ({
   locations: {
     projectTitle: 'Test Project',
     projectFilename: 'test-project',
     all: [],
   },
-  gauges: {
-    allCreated: [],
-  },
-  previews: {
-    active: { wpTagId: 123 },
-  },
+}));
+
+vi.mock('$lib/state/gauges-state.svelte', () => ({
+  gauges: { allCreated: [] },
+  allGaugesAttributes: [],
+}));
+
+vi.mock('$lib/state/preview-state.svelte', () => ({
+  previews: { active: { wpTagId: 123 } },
+}));
+
+vi.mock('$lib/state/project-state.svelte', () => ({
   project: {
     url: { href: 'http://localhost' },
     gallery: { href: '', title: '' },
   },
-  dialog: {
-    trigger: vi.fn(),
-  },
-  toast: {
-    elements: [],
-  },
-  allGaugesAttributes: [],
+}));
+
+vi.mock('$lib/state/page-state.svelte', () => ({
+  dialog: { trigger: vi.fn() },
+  toast: { elements: [] },
 }));
 
 // Mock preferences
@@ -48,15 +51,34 @@ vi.mock('$lib/pdf/sections/weather-data.svelte', () => ({
 }));
 
 // Mock utils that are used in project-utils
-vi.mock('$lib/utils', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('$lib/utils')>();
+vi.mock('$lib/utils/color-utils', async (importOriginal) => {
+  const actual = await importOriginal<any>();
   return {
     ...actual,
     colorsToCode: vi.fn(() => 'code'),
     colorsToYarnDetails: vi.fn(() => 'details'),
-    convertTime: vi.fn((val) => val),
-    dateToISO8601String: vi.fn((date) => '2024-01-01'),
-    getWPGauge: vi.fn(() => ({})),
+  };
+});
+
+vi.mock('$lib/utils/unit-utils.svelte', async (importOriginal) => {
+  const actual = await importOriginal<any>();
+  return { ...actual, convertTime: vi.fn((val) => val) };
+});
+
+vi.mock('$lib/utils/date-utils', async (importOriginal) => {
+  const actual = await importOriginal<any>();
+  return { ...actual, dateToISO8601String: vi.fn((date) => '2024-01-01') };
+});
+
+vi.mock('$lib/utils/gauge-utils.svelte', async (importOriginal) => {
+  const actual = await importOriginal<any>();
+  return { ...actual, getWPGauge: vi.fn(() => ({})) };
+});
+
+vi.mock('$lib/utils/weather-utils.svelte', async (importOriginal) => {
+  const actual = await importOriginal<any>();
+  return {
+    ...actual,
     getWeatherSourceDetails: vi.fn(() => []),
     missingDaysCount: vi.fn(() => 0),
   };

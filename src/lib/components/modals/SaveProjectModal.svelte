@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -16,7 +16,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import { browser } from '$app/environment';
   import { replaceState } from '$app/navigation';
-  import { project, toast, weather } from '$lib/state';
+  import { project } from '$lib/state/project-state.svelte';
+  import { toast } from '$lib/state/page-state.svelte';
+  import { weather } from '$lib/state/weather-state.svelte';
   import {
     ProjectStorage,
     type StoredProjectIndexItem,

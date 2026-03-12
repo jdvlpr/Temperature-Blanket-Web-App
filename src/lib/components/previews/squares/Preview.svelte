@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -15,15 +15,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import Spinner from '$lib/components/Spinner.svelte';
-  import { weather } from '$lib/state';
-  import type { Color, WeatherParam } from '$lib/types';
+  import { weather } from '$lib/state/weather-state.svelte';
+  import type { Color } from '$lib/types/yarn-types';
+  import type { WeatherParam } from '$lib/types/gauge-types';
+  import { getColorInfo } from '$lib/utils/color-utils';
   import {
-    getColorInfo,
     getSquareSectionTargetIds,
-    getWeatherValue,
-    runPreview,
     showPreviewImageWeatherDetails,
-  } from '$lib/utils';
+  } from '$lib/utils/preview-utils.svelte';
+  import { getWeatherValue } from '$lib/utils/weather-utils.svelte';
+  import { runPreview } from '$lib/utils/function-utils.svelte';
   import { squaresPreview } from './state.svelte';
 
   let width = $state(squaresPreview.width);

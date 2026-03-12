@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -32,7 +32,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     if (browser && page.url.searchParams.get('view') === 'yarn-palettes') {
       view = 'yarn-palettes';
     } else if (browser && page.url.searchParams.get('view') === 'projects') {
-      view = 'projects'; 
+      view = 'projects';
     }
   });
 </script>
@@ -76,10 +76,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <main
       class="m-auto mb-8 flex max-w-(--breakpoint-xl) flex-col justify-start gap-2"
     >
-
-<h2 class="h2 text-gradient text-center">Gallery</h2>
-<div class="mx-auto w-full max-w-sm px-2">
-  <SegmentedControl
+      <h2 class="h2 text-gradient text-center">Gallery</h2>
+      <div class="mx-auto w-full max-w-sm px-2">
+        <SegmentedControl
           value={view}
           onValueChange={(e) => {
             view = e.value;
@@ -90,7 +89,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           }}
         >
           <SegmentedControl.Control
-               class="bg-surface-100 dark:bg-surface-900 shadow-sm rounded-container border-0"
+            class="bg-surface-100 dark:bg-surface-900 rounded-container border-0 shadow-sm"
           >
             <SegmentedControl.Indicator />
             <SegmentedControl.Item value={'projects'}>

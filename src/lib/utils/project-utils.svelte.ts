@@ -1,4 +1,4 @@
-// Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+// Copyright (c) 2026, Thomas (https://github.com/jdvlpr)
 //
 // This file is part of Temperature-Blanket-Web-App.
 //
@@ -13,30 +13,28 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { MOON_PHASE_NAMES } from '$lib/constants';
+import { MOON_PHASE_NAMES } from '$lib/constants/weather-constants';
 import pdfGauges from '$lib/features/pdf/sections/gauges.svelte';
 import pdfWeatherData from '$lib/features/pdf/sections/weather-data.svelte';
-import {
-  allGaugesAttributes,
-  dialog,
-  gauges,
-  locations,
-  previews,
-  project,
-  weather,
-} from '$lib/state';
+import { allGaugesAttributes, gauges } from '$lib/state/gauges-state.svelte';
+import { dialog } from '$lib/state/page-state.svelte';
+import { locations } from '$lib/state/location-state.svelte';
+import { previews } from '$lib/state/preview-state.svelte';
+import { project } from '$lib/state/project-state.svelte';
+import { weather } from '$lib/state/weather-state.svelte';
 import { preferences } from '$lib/storage/preferences.svelte';
+import { colorsToCode, colorsToYarnDetails } from '$lib/utils/color-utils';
+import { convertTime } from '$lib/utils/unit-utils.svelte';
 import {
-  colorsToCode,
-  colorsToYarnDetails,
-  convertTime,
   dateToISO8601String,
   getLocalISODateString,
-  getWPGauge,
+  stringToDate,
+} from '$lib/utils/date-utils';
+import { getWPGauge } from '$lib/utils/gauge-utils.svelte';
+import {
   getWeatherSourceDetails,
   missingDaysCount,
-  stringToDate,
-} from '$lib/utils';
+} from '$lib/utils/weather-utils.svelte';
 
 export const getProjectParametersFromURLHash = (hash) => {
   return hash.split('&').reduce(function (res, item) {

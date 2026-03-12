@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -25,15 +25,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script>
   import ColorPalette from '$lib/components/ColorPalette.svelte';
   import PlaceholderPalettes from '$lib/components/PlaceholderPalettes.svelte';
-  import { allGaugesAttributes } from '$lib/state';
+  import { allGaugesAttributes } from '$lib/state/gauges-state.svelte';
   import {
     fetchPopularProjects,
-    getColorsFromInput,
+    recordPageView,
+  } from '$lib/utils/gallery-utils';
+  import { getColorsFromInput } from '$lib/utils/color-utils';
+  import {
     getProjectParametersFromURLHash,
     getTitleFromLocationsMeta,
-    pluralize,
-    recordPageView,
-  } from '$lib/utils';
+  } from '$lib/utils/project-utils.svelte';
+  import { pluralize } from '$lib/utils/string-utils';
   import { getContext, onMount } from 'svelte';
 
   let close = $state(null);

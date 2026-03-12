@@ -18,7 +18,7 @@ vi.mock('./color-utils', () => ({
 }));
 
 // Mock constants and yarns data
-vi.mock('$lib/constants', () => {
+vi.mock('$lib/constants/color-constants', () => {
   return {
     ALL_COLORWAYS_WITH_AFFILIATE_LINKS: [
       {
@@ -49,6 +49,11 @@ vi.mock('$lib/constants', () => {
         yarnName: 'Yarn 3',
       },
     ],
+  };
+});
+
+vi.mock('$lib/constants/seasons-constants', () => {
+  return {
     SEASON_PRESETS: {
       northernMeteorological: { seasons: [] },
       northernAstronomical: { seasons: [] },

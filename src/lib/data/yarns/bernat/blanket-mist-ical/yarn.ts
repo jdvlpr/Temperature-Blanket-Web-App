@@ -1,4 +1,4 @@
-import type { Yarn } from '$lib/types.js';
+import type { Yarn } from '$lib/types/yarn-types';
 import colorways from './colorways.js';
 
 export const yarn: Yarn = {

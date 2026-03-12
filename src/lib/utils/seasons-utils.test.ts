@@ -1,4 +1,7 @@
-import { DEFAULT_SEASONS, SEASON_PRESETS } from '$lib/constants';
+import {
+  DEFAULT_SEASONS,
+  SEASON_PRESETS,
+} from '$lib/constants/seasons-constants';
 import { describe, expect, it, vi } from 'vitest';
 import {
   formatDateRange,
@@ -9,7 +12,7 @@ import {
 } from './seasons-utils.svelte';
 
 // Mock state since it's imported in seasons-utils
-vi.mock('$lib/state', () => ({
+vi.mock('$lib/state/preview-state.svelte', () => ({
   previews: { active: null },
 }));
 

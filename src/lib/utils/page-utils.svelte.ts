@@ -1,4 +1,4 @@
-// Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+// Copyright (c) 2026, Thomas (https://github.com/jdvlpr)
 //
 // This file is part of Temperature-Blanket-Web-App.
 //
@@ -17,9 +17,12 @@ import { page } from '$app/state';
 import KeyboardShortcuts from '$lib/components/modals/KeyboardShortcuts.svelte';
 import Menu from '$lib/components/modals/Menu.svelte';
 import SaveProjectModal from '$lib/components/modals/SaveProjectModal.svelte';
-import { dialog, pageSections, project, toast, weather } from '$lib/state';
+import { dialog, pageSections, toast } from '$lib/state/page-state.svelte';
+import { project } from '$lib/state/project-state.svelte';
+import { weather } from '$lib/state/weather-state.svelte';
 import { preferences } from '$lib/storage/preferences.svelte';
-import { delay, loadFromHistory } from '$lib/utils';
+import { delay } from '$lib/utils/function-utils.svelte';
+import { loadFromHistory } from '$lib/utils/history-utils.svelte';
 import { tick } from 'svelte';
 
 // Go to a section

@@ -1,4 +1,4 @@
-import type { Brand } from '$lib/types';
+import type { Brand } from '$lib/types/yarn-types';
 import { yarn as dkMerinoSuperwash } from './dk-merino-superwash/yarn';
 import { yarn as encoreWorsted } from './encore-worsted/yarn';
 import { yarn as worstedMerinoSuperwash } from './worsted-merino-superwash/yarn';

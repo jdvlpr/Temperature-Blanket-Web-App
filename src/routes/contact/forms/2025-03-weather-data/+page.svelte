@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -26,13 +26,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Expand from '$lib/components/Expand.svelte';
   import Spinner from '$lib/components/Spinner.svelte';
   import { safeSlide } from '$lib/features/transitions/safeSlide';
-  import { locations, project, toast, weather } from '$lib/state';
+  import { locations } from '$lib/state/location-state.svelte';
+  import { project } from '$lib/state/project-state.svelte';
+  import { toast } from '$lib/state/page-state.svelte';
+  import { weather } from '$lib/state/weather-state.svelte';
   import {
     dateToISO8601String,
     dateToISO8601StringVersion2,
     stringToDate,
     stringToDateVersion2,
-  } from '$lib/utils';
+  } from '$lib/utils/date-utils';
   import {
     ArrowLeftIcon,
     ChevronDownIcon,

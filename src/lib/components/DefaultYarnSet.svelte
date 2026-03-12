@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -15,7 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
-  import { defaultYarn } from '$lib/state';
+  import { defaultYarn } from '$lib/state/page-state.svelte';
   let { selectedBrandId, selectedYarnId } = $props();
 </script>
 

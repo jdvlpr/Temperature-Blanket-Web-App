@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -23,7 +23,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { PUBLIC_GITHUB_LINK } from '$env/static/public';
   import ThemeSwitcher from '$lib/components/ThemeSwitcher.svelte';
   import { safeSlide } from '$lib/features/transitions/safeSlide';
-  import { dialog, project } from '$lib/state';
+  import { dialog } from '$lib/state/page-state.svelte';
+  import { project } from '$lib/state/project-state.svelte';
   import { yarnBall } from '@lucide/lab';
   import {
     BookOpenTextIcon,

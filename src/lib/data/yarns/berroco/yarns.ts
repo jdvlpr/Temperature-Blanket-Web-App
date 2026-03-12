@@ -1,4 +1,4 @@
-import type { Brand } from '$lib/types';
+import type { Brand } from '$lib/types/yarn-types';
 import { yarn as comfort } from './comfort/yarn';
 import { yarn as remixLight } from './remix-light/yarn';
 import { yarn as remix } from './remix/yarn';

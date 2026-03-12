@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -17,8 +17,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
   import PreviewInfo from '$lib/components/PreviewInfo.svelte';
   import SpanYarnColorSelectIcon from '$lib/components/SpanYarnColorSelectIcon.svelte';
-  import { dialog, gauges, weather } from '$lib/state';
-  import { pluralize } from '$lib/utils';
+  import { dialog } from '$lib/state/page-state.svelte';
+  import { gauges } from '$lib/state/gauges-state.svelte';
+  import { weather } from '$lib/state/weather-state.svelte';
+  import { pluralize } from '$lib/utils/string-utils';
   import { capitalizeFirstLetter } from '$lib/utils/other-utils';
   import { ArrowRightIcon } from '@lucide/svelte';
   import { hexagonRoundsPreview } from './state.svelte';
@@ -119,9 +121,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </select>
     </label>
     <p class="max-w-sm text-left text-sm italic">
-      This is the number of hexagons in the first (top) row and subsequent odd-numbered
-      rows. Because of the staggered layout, even-numbered rows will have one
-      more hexagon than the width set above.
+      This is the number of hexagons in the first (top) row and subsequent
+      odd-numbered rows. Because of the staggered layout, even-numbered rows
+      will have one more hexagon than the width set above.
     </p>
   </div>
 

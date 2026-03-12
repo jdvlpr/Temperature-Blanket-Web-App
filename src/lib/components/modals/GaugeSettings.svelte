@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -21,16 +21,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
   import StickyPart from '$lib/components/modals/StickyPart.svelte';
   import { safeSlide } from '$lib/features/transitions/safeSlide';
-  import { dialog, gauges, weather } from '$lib/state';
+  import { dialog } from '$lib/state/page-state.svelte';
+  import { gauges } from '$lib/state/gauges-state.svelte';
+  import { weather } from '$lib/state/weather-state.svelte';
   import { preferences } from '$lib/storage/preferences.svelte';
+  import { displayNumber } from '$lib/utils/number-utils';
   import {
-    displayNumber,
     getIncrement,
     getRangeExample,
-    getRanges,
     getStart,
-    getTextColor,
-  } from '$lib/utils';
+  } from '$lib/utils/range-utils.svelte';
+  import { getRanges } from '$lib/utils/gauge-utils.svelte';
+  import { getTextColor } from '$lib/utils/color-utils';
   import { targetArrow } from '@lucide/lab';
   import {
     CalculatorIcon,

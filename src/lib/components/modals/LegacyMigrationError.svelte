@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -14,15 +14,15 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { MOON_PHASE_NAMES } from '$lib/constants';
-  import { allGaugesAttributes, project, toast } from '$lib/state';
+  import { MOON_PHASE_NAMES } from '$lib/constants/weather-constants';
+  import { allGaugesAttributes } from '$lib/state/gauges-state.svelte';
+  import { project } from '$lib/state/project-state.svelte';
+  import { toast } from '$lib/state/page-state.svelte';
   import type { StoredProject } from '$lib/storage/projects.svelte';
-  import {
-    convertTime,
-    exists,
-    getProjectParametersFromURLHash,
-    pluralize,
-  } from '$lib/utils';
+  import { convertTime } from '$lib/utils/unit-utils.svelte';
+  import { exists } from '$lib/utils/other-utils';
+  import { getProjectParametersFromURLHash } from '$lib/utils/project-utils.svelte';
+  import { pluralize } from '$lib/utils/string-utils';
   import {
     ClipboardCopyIcon,
     DownloadIcon,

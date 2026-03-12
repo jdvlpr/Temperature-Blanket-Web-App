@@ -1,4 +1,4 @@
-// Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+// Copyright (c) 2026, Thomas (https://github.com/jdvlpr)
 //
 // This file is part of Temperature-Blanket-Web-App.
 //
@@ -22,7 +22,7 @@ import type {
   AffiliateYarnCompressed,
   Color,
   YarnWeight,
-} from '$lib/types';
+} from '$lib/types/yarn-types';
 import { brands } from '$lib/data/yarns/brands';
 import chroma from 'chroma-js';
 

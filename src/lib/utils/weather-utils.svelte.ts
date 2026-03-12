@@ -1,4 +1,4 @@
-// Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+// Copyright (c) 2026, Thomas (https://github.com/jdvlpr)
 //
 // This file is part of Temperature-Blanket-Web-App.
 //
@@ -13,30 +13,31 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { API_SERVICES, MOON_PHASE_NAMES } from '$lib/constants';
-import { allGaugesAttributes, locations, signal, weather } from '$lib/state';
+import { API_SERVICES } from '$lib/constants/api-constants';
+import { MOON_PHASE_NAMES } from '$lib/constants/weather-constants';
+import { allGaugesAttributes } from '$lib/state/gauges-state.svelte';
+import { locations, signal } from '$lib/state/location-state.svelte';
+import { weather } from '$lib/state/weather-state.svelte';
 import { preferences } from '$lib/storage/preferences.svelte';
-import type {
-  LocationType,
-  MoonPhasesId,
-  WeatherDay,
-  WeatherParam,
-} from '$lib/types';
+import type { LocationType } from '$lib/types/location-types';
+import type { MoonPhasesId, WeatherDay } from '$lib/types/weather-types';
+import type { WeatherParam } from '$lib/types/gauge-types';
 
 import {
   celsiusToFahrenheit,
   convertTime,
-  dateToISO8601String,
-  displayNumber,
-  getAverage,
-  getColorInfo,
-  getLocalISODateString,
   hoursToMinutes,
   millimetersToInches,
+} from '$lib/utils/unit-utils.svelte';
+import {
+  dateToISO8601String,
+  getLocalISODateString,
   numberOfDays,
-  pluralize,
   stringToDate,
-} from '$lib/utils';
+} from '$lib/utils/date-utils';
+import { displayNumber, getAverage } from '$lib/utils/number-utils';
+import { getColorInfo } from '$lib/utils/color-utils';
+import { pluralize } from '$lib/utils/string-utils';
 import SunCalc from 'suncalc';
 
 /**

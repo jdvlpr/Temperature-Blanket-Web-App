@@ -1,7 +1,13 @@
-import { CHARACTERS_FOR_URL_HASH } from '$lib/constants';
-import { gauges, previews, weather } from '$lib/state';
-import type { BasePreviewSettings, Color, WeatherParam } from '$lib/types';
-import { displayNumber, getWeatherTargets, setTargets } from '$lib/utils';
+import { CHARACTERS_FOR_URL_HASH } from '$lib/constants/page-constants';
+import { gauges } from '$lib/state/gauges-state.svelte';
+import { previews } from '$lib/state/preview-state.svelte';
+import { weather } from '$lib/state/weather-state.svelte';
+import type { BasePreviewSettings } from '$lib/types/preview-types';
+import type { Color } from '$lib/types/yarn-types';
+import type { WeatherParam } from '$lib/types/gauge-types';
+import { displayNumber } from '$lib/utils/number-utils';
+import { getWeatherTargets } from '$lib/utils/weather-utils.svelte';
+import { setTargets } from '$lib/utils/preview-utils.svelte';
 import chroma from 'chroma-js';
 import Preview from './Preview.svelte';
 import Settings from './Settings.svelte';

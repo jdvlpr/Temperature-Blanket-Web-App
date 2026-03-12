@@ -1,4 +1,4 @@
-// Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+// Copyright (c) 2026, Thomas (https://github.com/jdvlpr)
 //
 // This file is part of Temperature-Blanket-Web-App.
 //
@@ -14,8 +14,8 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { PUBLIC_GITHUB_LINK } from '$env/static/public';
-import { ICONS } from '$lib/constants';
-import type { ChangelogItemGroup } from '$lib/types';
+import { ICONS } from '$lib/constants/icon-constants';
+import type { ChangelogItemGroup } from '$lib/types/page-types';
 import {
   CloudCogIcon,
   GlobeIcon,

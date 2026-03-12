@@ -1,4 +1,4 @@
-import type { Brand } from '$lib/types';
+import type { Brand } from '$lib/types/yarn-types';
 import { yarn as astra } from './astra/yarn';
 import { yarn as canadiana } from './canadiana/yarn';
 import { yarn as classicWoolWorsted } from './classic-wool-worsted/yarn';

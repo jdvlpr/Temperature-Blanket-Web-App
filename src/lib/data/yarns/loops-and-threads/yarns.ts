@@ -1,4 +1,4 @@
-import type { Brand } from '$lib/types';
+import type { Brand } from '$lib/types/yarn-types';
 import { yarn as classicCotton } from './classic-cotton/yarn';
 import { yarn as colorCraft } from './color-craft/yarn';
 import { yarn as demiPurl } from './demi-purl/yarn';

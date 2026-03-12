@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -15,8 +15,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
-  import { dialog } from '$lib/state';
-  import { displayNumber } from '$lib/utils';
+  import { dialog } from '$lib/state/page-state.svelte';
+  import { displayNumber } from '$lib/utils/number-utils';
 
   interface Props {
     value: number;

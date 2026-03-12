@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -15,7 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import { PUBLIC_KOFI_LINK } from '$env/static/public';
-  import { SUPPORTERS } from '$lib/constants';
+  import { SUPPORTERS } from '$lib/constants/supporter-constants';
   import { AwardIcon } from '@lucide/svelte';
   import { Avatar } from '@skeletonlabs/skeleton-svelte';
 </script>

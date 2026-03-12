@@ -1,7 +1,10 @@
-import { CHARACTERS_FOR_URL_HASH } from '$lib/constants';
-import { gauges, previews, weather } from '$lib/state';
-import type { BasePreviewSettings, WeatherParam } from '$lib/types';
-import { setTargets } from '$lib/utils';
+import { CHARACTERS_FOR_URL_HASH } from '$lib/constants/page-constants';
+import { gauges } from '$lib/state/gauges-state.svelte';
+import { previews } from '$lib/state/preview-state.svelte';
+import { weather } from '$lib/state/weather-state.svelte';
+import type { BasePreviewSettings } from '$lib/types/preview-types';
+import type { WeatherParam } from '$lib/types/gauge-types';
+import { setTargets } from '$lib/utils/preview-utils.svelte';
 import Preview from './Preview.svelte';
 import Settings from './Settings.svelte';
 

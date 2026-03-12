@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -19,15 +19,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Expand from '$lib/components/Expand.svelte';
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
   import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
-  import { dialog, toast } from '$lib/state';
+  import { dialog, toast } from '$lib/state/page-state.svelte';
   import { safeSlide } from '$lib/features/transitions/safeSlide';
   import {
     colorsToCode,
     colorsToYarnDetails,
-    generatePaletteImage,
     getColorsFromInput,
-    pluralize,
-  } from '$lib/utils';
+  } from '$lib/utils/color-utils';
+  import { generatePaletteImage } from '$lib/utils/yarn-utils';
+  import { pluralize } from '$lib/utils/string-utils';
   import {
     ArrowLeftIcon,
     ClipboardCopyIcon,

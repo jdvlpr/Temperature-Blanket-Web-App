@@ -1,12 +1,15 @@
-import { weather } from '$lib/state';
-import type { GaugeAttributes, GaugeSettingsType } from '$lib/types';
+import { weather } from '$lib/state/weather-state.svelte';
+import type {
+  GaugeAttributes,
+  GaugeSettingsType,
+} from '$lib/types/gauge-types';
+import { displayNumber } from '$lib/utils/number-utils';
 import {
-  displayNumber,
   getEvenlyDistributedRangeValuesWithEqualDayCount,
   getIncrement,
-  getRanges,
   getStart,
-} from '$lib/utils';
+} from '$lib/utils/range-utils.svelte';
+import { getRanges } from '$lib/utils/gauge-utils.svelte';
 import chroma from 'chroma-js';
 
 export const gaugeAttributes: GaugeAttributes = {

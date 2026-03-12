@@ -1,4 +1,4 @@
-import type { Brand } from '$lib/types';
+import type { Brand } from '$lib/types/yarn-types';
 import { yarn as cahlista } from './cahlista/yarn';
 import { yarn as catona } from './catona/yarn';
 import { yarn as chunkyMonkey } from './chunky-monkey/yarn';

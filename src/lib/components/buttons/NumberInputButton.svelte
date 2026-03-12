@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -15,7 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import NumberInput from '$lib/components/modals/NumberInput.svelte';
-  import { dialog } from '$lib/state';
+  import { dialog } from '$lib/state/page-state.svelte';
   import { RulerIcon } from '@lucide/svelte';
   import type { Component } from 'svelte';
 

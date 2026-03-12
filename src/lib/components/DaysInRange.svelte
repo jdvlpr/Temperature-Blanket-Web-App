@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -15,13 +15,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import WeatherTable from '$lib/components/modals/WeatherTable.svelte';
-  import { dialog, weather } from '$lib/state';
+  import { dialog } from '$lib/state/page-state.svelte';
+  import { weather } from '$lib/state/weather-state.svelte';
   import type {
     GaugeAttributes,
     GaugeRange,
     GaugeSettingsType,
-  } from '$lib/types';
-  import { getDaysInRange, getDaysPercent, pluralize } from '$lib/utils';
+  } from '$lib/types/gauge-types';
+  import {
+    getDaysInRange,
+    getDaysPercent,
+  } from '$lib/utils/range-utils.svelte';
+  import { pluralize } from '$lib/utils/string-utils';
 
   let isModal = $derived(dialog.opened);
 

@@ -1,4 +1,4 @@
-// Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+// Copyright (c) 2026, Thomas (https://github.com/jdvlpr)
 //
 // This file is part of Temperature-Blanket-Web-App.
 //
@@ -13,17 +13,20 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { SCHEMES } from '$lib/constants';
-import { gauges, toast, weather } from '$lib/state';
+import { SCHEMES } from '$lib/constants/color-constants';
+import { gauges } from '$lib/state/gauges-state.svelte';
+import { toast } from '$lib/state/page-state.svelte';
+import { weather } from '$lib/state/weather-state.svelte';
 import { preferences } from '$lib/storage/preferences.svelte';
-import type { Color, GaugeSettingsType } from '$lib/types';
+import type { Color } from '$lib/types/yarn-types';
+import type { GaugeSettingsType } from '$lib/types/gauge-types';
+import { displayNumber } from '$lib/utils/number-utils';
 import {
-  displayNumber,
   getDaysInRange,
   getDaysPercent,
   getEvenlyDistributedRangeValuesWithEqualDayCount,
-  pluralize,
-} from '$lib/utils';
+} from '$lib/utils/range-utils.svelte';
+import { pluralize } from '$lib/utils/string-utils';
 import chroma from 'chroma-js';
 
 export function getRanges({

@@ -1,4 +1,4 @@
-// Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+// Copyright (c) 2026, Thomas (https://github.com/jdvlpr)
 //
 // This file is part of Temperature-Blanket-Web-App.
 //
@@ -15,7 +15,7 @@
 
 import { dev } from '$app/environment';
 import { SECRET_RAPID_API_PROXY_HEADER_KEY } from '$env/static/private';
-import { ALL_YARN_WEIGHTS } from '$lib/constants.js';
+import { ALL_YARN_WEIGHTS } from '$lib/constants/color-constants';
 import { brands } from '$lib/data/yarns/brands.js';
 import { error, json } from '@sveltejs/kit';
 

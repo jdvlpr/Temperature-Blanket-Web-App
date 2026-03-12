@@ -1,4 +1,4 @@
-// Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+// Copyright (c) 2026, Thomas (https://github.com/jdvlpr)
 //
 // This file is part of Temperature-Blanket-Web-App.
 //
@@ -13,8 +13,11 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { METEOSTAT_DELAY_DAYS, OPEN_METEO_DELAY_DAYS } from '$lib/constants';
-import { weather } from '$lib/state';
+import {
+  METEOSTAT_DELAY_DAYS,
+  OPEN_METEO_DELAY_DAYS,
+} from '$lib/constants/weather-constants';
+import { weather } from '$lib/state/weather-state.svelte';
 import type {
   TDayString,
   TISO8601DateString,
@@ -23,7 +26,7 @@ import type {
   TMonthString,
   TYearString,
   WeatherDay,
-} from '$lib/types';
+} from '$lib/types/weather-types';
 
 /**
  * Checks if a given date is recent based on the weather source.

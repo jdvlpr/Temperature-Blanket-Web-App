@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -15,12 +15,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import ExportToGoogleSheetModal from '$lib/features/google-sheets/ExportToGoogleSheetModal.svelte';
-  import { dialog, previews } from '$lib/state';
+  import { dialog } from '$lib/state/page-state.svelte';
+  import { previews } from '$lib/state/preview-state.svelte';
   import {
     downloadPDF,
-    downloadPreviewPNG,
     downloadWeatherCSV,
-  } from '$lib/utils';
+  } from '$lib/utils/project-utils.svelte';
+  import { downloadPreviewPNG } from '$lib/utils/preview-utils.svelte';
   import {
     ChevronDownIcon,
     DownloadIcon,

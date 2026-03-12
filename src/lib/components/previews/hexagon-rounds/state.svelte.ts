@@ -1,7 +1,27 @@
-import { CHARACTERS_FOR_URL_HASH } from '$lib/constants';
-import { gauges, previews, weather } from '$lib/state';
-import type { BasePreviewSettings, Color, WeatherParam } from '$lib/types';
-import { chunkArray, setTargets } from '$lib/utils';
+// Copyright (c) 2026, Thomas (https://github.com/jdvlpr)
+
+// This file is part of Temperature-Blanket-Web-App.
+
+// Temperature-Blanket-Web-App is free software: you can redistribute it and/or modify it
+// under the terms of the GNU General Public License as published by the Free Software Foundation,
+// either version 3 of the License, or (at your option) any later version.
+
+// Temperature-Blanket-Web-App is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+// without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
+// If not, see <https://www.gnu.org/licenses/>.
+
+import { CHARACTERS_FOR_URL_HASH } from '$lib/constants/page-constants';
+import { gauges } from '$lib/state/gauges-state.svelte';
+import { previews } from '$lib/state/preview-state.svelte';
+import { weather } from '$lib/state/weather-state.svelte';
+import type { WeatherParam } from '$lib/types/gauge-types';
+import type { BasePreviewSettings } from '$lib/types/preview-types';
+import type { Color } from '$lib/types/yarn-types';
+import { setTargets } from '$lib/utils/preview-utils.svelte';
+import { chunkArray } from '$lib/utils/weather-utils.svelte';
 import chroma from 'chroma-js';
 import { untrack } from 'svelte';
 import Preview from './Preview.svelte';

@@ -1,16 +1,18 @@
 import { weatherDataUpdatedKey } from '$lib/components/WeatherTableWrapper.svelte';
-import { CHARACTERS_FOR_URL_HASH } from '$lib/constants';
+import { CHARACTERS_FOR_URL_HASH } from '$lib/constants/page-constants';
 import { DEFAULT_SEASONS } from '$lib/constants/seasons-constants';
-import { gauges, previews, project, weather } from '$lib/state';
+import { gauges } from '$lib/state/gauges-state.svelte';
+import { previews } from '$lib/state/preview-state.svelte';
+import { project } from '$lib/state/project-state.svelte';
+import { weather } from '$lib/state/weather-state.svelte';
 import { preferences } from '$lib/storage/preferences.svelte';
-import type { BasePreviewSettings, Color, WeatherParam } from '$lib/types';
-import {
-  displayNumber,
-  getColorInfo,
-  getWeatherValue,
-  setTargets,
-  sum,
-} from '$lib/utils';
+import type { BasePreviewSettings } from '$lib/types/preview-types';
+import type { Color } from '$lib/types/yarn-types';
+import type { WeatherParam } from '$lib/types/gauge-types';
+import { displayNumber } from '$lib/utils/number-utils';
+import { getColorInfo } from '$lib/utils/color-utils';
+import { getWeatherValue, sum } from '$lib/utils/weather-utils.svelte';
+import { setTargets } from '$lib/utils/preview-utils.svelte';
 import { getSeasonForDate } from '$lib/utils/seasons-utils.svelte';
 import chroma from 'chroma-js';
 import Preview from './Preview.svelte';

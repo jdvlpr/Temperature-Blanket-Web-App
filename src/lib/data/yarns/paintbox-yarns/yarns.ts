@@ -1,4 +1,4 @@
-import type { Brand } from '$lib/types';
+import type { Brand } from '$lib/types/yarn-types';
 import { yarn as cottonAran } from './cotton-aran/yarn';
 import { yarn as simplyDK } from './simply-dk/yarn';
 

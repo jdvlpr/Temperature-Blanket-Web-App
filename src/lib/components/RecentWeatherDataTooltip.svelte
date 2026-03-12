@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -14,8 +14,12 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import { METEOSTAT_DELAY_DAYS, OPEN_METEO_DELAY_DAYS } from '$lib/constants';
-  import { PopoverInstance, weather } from '$lib/state';
+  import {
+    METEOSTAT_DELAY_DAYS,
+    OPEN_METEO_DELAY_DAYS,
+  } from '$lib/constants/weather-constants';
+  import { PopoverInstance } from '$lib/state/attachments/floating-state.svelte';
+  import { weather } from '$lib/state/weather-state.svelte';
   import { TriangleAlertIcon } from '@lucide/svelte';
 
   let popover = new PopoverInstance();

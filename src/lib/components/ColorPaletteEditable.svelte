@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -19,9 +19,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
-  import { dialog, InteractivePopoverInstance } from '$lib/state';
-  import type { Color } from '$lib/types';
-  import { getTextColor } from '$lib/utils';
+  import { dialog } from '$lib/state/page-state.svelte';
+  import { InteractivePopoverInstance } from '$lib/state/attachments/floating-state.svelte';
+  import type { Color } from '$lib/types/yarn-types';
+  import { getTextColor } from '$lib/utils/color-utils';
   import {
     LockKeyholeIcon,
     LockOpenIcon,

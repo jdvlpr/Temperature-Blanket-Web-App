@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -17,13 +17,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
   import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
   import StickyPart from '$lib/components/modals/StickyPart.svelte';
-  import { dialog } from '$lib/state';
+  import { dialog } from '$lib/state/page-state.svelte';
+  import { displayNumber } from '$lib/utils/number-utils';
   import {
-    displayNumber,
     getSecondaryTargetIndexes,
-    getTextColor,
     setSecondaryTargets,
-  } from '$lib/utils';
+  } from '$lib/utils/preview-utils.svelte';
+  import { getTextColor } from '$lib/utils/color-utils';
   import { RefreshCwIcon } from '@lucide/svelte';
 
   let {

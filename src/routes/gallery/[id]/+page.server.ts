@@ -1,4 +1,4 @@
-// Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+// Copyright (c) 2026, Thomas (https://github.com/jdvlpr)
 //
 // This file is part of Temperature-Blanket-Web-App.
 //
@@ -14,7 +14,7 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { PUBLIC_WORDPRESS_BASE_URL } from '$env/static/public';
-import { recordPageView } from '$lib/utils';
+import { recordPageView } from '$lib/utils/gallery-utils';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async (event) => {

@@ -5,9 +5,13 @@ import { delay } from './function-utils.svelte';
 vi.mock('$lib/components/WeatherTableWrapper.svelte', () => ({
   weatherDataUpdatedKey: { value: 0 },
 }));
-vi.mock('$lib/state', () => ({
+vi.mock('$lib/state/gauges-state.svelte', () => ({
   gauges: { allCreated: [] },
+}));
+vi.mock('$lib/state/project-state.svelte', () => ({
   project: { url: { href: '' } },
+}));
+vi.mock('$lib/state/weather-state.svelte', () => ({
   weather: { data: [] },
 }));
 

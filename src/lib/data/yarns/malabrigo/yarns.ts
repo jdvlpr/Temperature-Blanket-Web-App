@@ -1,4 +1,4 @@
-import type { Brand } from '$lib/types';
+import type { Brand } from '$lib/types/yarn-types';
 import { yarn as rios } from './rios/yarn';
 import { yarn as worsted } from './worsted/yarn';
 

@@ -1,6 +1,11 @@
-import { weather } from '$lib/state';
-import type { GaugeAttributes, GaugeSettingsType } from '$lib/types';
-import { displayNumber, getIncrement, getRanges, getStart } from '$lib/utils';
+import { weather } from '$lib/state/weather-state.svelte';
+import type {
+  GaugeAttributes,
+  GaugeSettingsType,
+} from '$lib/types/gauge-types';
+import { displayNumber } from '$lib/utils/number-utils';
+import { getIncrement, getStart } from '$lib/utils/range-utils.svelte';
+import { getRanges } from '$lib/utils/gauge-utils.svelte';
 import chroma from 'chroma-js';
 
 export const gaugeAttributes: GaugeAttributes = {

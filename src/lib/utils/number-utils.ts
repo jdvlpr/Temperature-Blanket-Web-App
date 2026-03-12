@@ -1,4 +1,4 @@
-// Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+// Copyright (c) 2026, Thomas (https://github.com/jdvlpr)
 //
 // This file is part of Temperature-Blanket-Web-App.
 //
@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { WEATHER_DATA_DECIMALS } from '$lib/constants';
+import { WEATHER_DATA_DECIMALS } from '$lib/constants/weather-constants';
 
 export const getRandomNumber = (min: number, max: number): number => {
   // min and max included

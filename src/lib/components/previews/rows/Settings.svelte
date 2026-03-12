@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -21,13 +21,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import PreviewInfo from '$lib/components/PreviewInfo.svelte';
   import SeasonEditor from '$lib/components/SeasonEditor.svelte';
   import SpanYarnColorSelectIcon from '$lib/components/SpanYarnColorSelectIcon.svelte';
-  import { dialog, gauges, previews, weather } from '$lib/state';
+  import { dialog } from '$lib/state/page-state.svelte';
+  import { gauges } from '$lib/state/gauges-state.svelte';
+  import { previews } from '$lib/state/preview-state.svelte';
+  import { weather } from '$lib/state/weather-state.svelte';
   import { preferences } from '$lib/storage/preferences.svelte';
-  import {
-    capitalizeFirstLetter,
-    formatDateRange,
-    pluralize,
-  } from '$lib/utils';
+  import { capitalizeFirstLetter } from '$lib/utils/other-utils';
+  import { formatDateRange } from '$lib/utils/seasons-utils.svelte';
+  import { pluralize } from '$lib/utils/string-utils';
   import { PencilIcon } from '@lucide/svelte';
   import { rowsPreview } from './state.svelte';
 

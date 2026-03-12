@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -16,15 +16,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script>
   import PreviewSelect from '$lib/components/previews/PreviewSelect.svelte';
   import WeatherDetails from '$lib/components/WeatherDetails.svelte';
+  import { drawerState } from '$lib/state/page-state.svelte';
+  import { gauges } from '$lib/state/gauges-state.svelte';
+  import { locations } from '$lib/state/location-state.svelte';
   import {
-    drawerState,
-    gauges,
-    locations,
     previews,
     previewWeatherTargets,
-    project,
-  } from '$lib/state';
-  import { downloadPreviewPNG } from '$lib/utils';
+  } from '$lib/state/preview-state.svelte';
+  import { project } from '$lib/state/project-state.svelte';
+  import { downloadPreviewPNG } from '$lib/utils/preview-utils.svelte';
   import { ImageIcon } from '@lucide/svelte';
   import { onMount } from 'svelte';
   import { Drawer } from 'vaul-svelte';

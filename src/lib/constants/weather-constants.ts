@@ -1,4 +1,4 @@
-// Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+// Copyright (c) 2026, Thomas (https://github.com/jdvlpr)
 //
 // This file is part of Temperature-Blanket-Web-App.
 //
@@ -13,7 +13,10 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import type { MoonPhasesName, WeatherSourceOptions } from '$lib/types';
+import type {
+  MoonPhasesName,
+  WeatherSourceOptions,
+} from '$lib/types/weather-types';
 
 export const OPEN_METEO_DELAY_DAYS = 6;
 

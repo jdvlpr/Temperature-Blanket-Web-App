@@ -13,7 +13,7 @@ import {
 } from './color-utils';
 
 // Mocking $lib modules
-vi.mock('$lib/state', () => ({
+vi.mock('$lib/state/gauges-state.svelte', () => ({
   allGaugesAttributes: [
     {
       id: 'tmax_gauge',
@@ -50,22 +50,39 @@ vi.mock('$lib/state', () => ({
       return null;
     }),
   },
+}));
+
+vi.mock('$lib/state/project-state.svelte', () => ({
   project: {
     url: { href: 'http://localhost/?project=123' },
   },
 }));
 
-vi.mock('$lib/utils', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('$lib/utils')>();
+vi.mock('$lib/utils/number-utils', async (importOriginal) => {
+  const actual = await importOriginal<any>();
   return {
     ...actual,
     isValueInRange: vi.fn(
       ({ value, range }) => value >= range.from && value <= range.to,
     ),
+  };
+});
+
+vi.mock('$lib/utils/gauge-utils.svelte', async (importOriginal) => {
+  const actual = await importOriginal<any>();
+  return {
+    ...actual,
     getTargetParentGaugeId: vi.fn((param) => {
       if (param === 'tmax') return 'tmax_gauge';
       return param;
     }),
+  };
+});
+
+vi.mock('$lib/utils/yarn-utils', async (importOriginal) => {
+  const actual = await importOriginal<any>();
+  return {
+    ...actual,
     getColorPropertiesFromYarnStringAndHex: vi.fn(({ yarnString, hex }) => {
       // Simple mock for testing yarnDetailsToColors
       if (yarnString === 'brand1-yarn1') {

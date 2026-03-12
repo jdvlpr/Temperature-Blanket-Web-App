@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -21,10 +21,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import DaysInRange from '$lib/components/DaysInRange.svelte';
   import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
   import { safeSlide } from '$lib/features/transitions/safeSlide';
-  import { dialog, gauges, showDaysInRange } from '$lib/state';
+  import { dialog } from '$lib/state/page-state.svelte';
+  import { gauges, showDaysInRange } from '$lib/state/gauges-state.svelte';
   import { preferences } from '$lib/storage/preferences.svelte';
-  import type { Color } from '$lib/types';
-  import { getTextColor } from '$lib/utils';
+  import type { Color } from '$lib/types/yarn-types';
+  import { getTextColor } from '$lib/utils/color-utils';
   import {
     ChevronDownIcon,
     LayoutPanelTopIcon,

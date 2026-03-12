@@ -15,11 +15,15 @@ import {
 } from './weather-utils.svelte';
 
 // Mocking $lib modules
-vi.mock('$lib/constants', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('$lib/constants')>()),
+vi.mock('$lib/constants/api-constants', async (importOriginal) => ({
+  ...(await importOriginal<any>()),
   API_SERVICES: {
     openMeteo: { baseURL: 'https://archive-api.open-meteo.com/v1/archive' },
   },
+}));
+
+vi.mock('$lib/constants/weather-constants', async (importOriginal) => ({
+  ...(await importOriginal<any>()),
   MOON_PHASE_NAMES: [
     'New Moon',
     'Waxing Crescent',
@@ -75,29 +79,53 @@ vi.mock('$lib/storage/preferences.svelte', () => ({
   preferences: mockPreferences,
 }));
 
-vi.mock('$lib/state', () => ({
+vi.mock('$lib/state/weather-state.svelte', () => ({
   weather: mockWeather,
+}));
+
+vi.mock('$lib/state/location-state.svelte', () => ({
   locations: mockLocations,
   signal: { value: null },
+}));
+
+vi.mock('$lib/state/gauges-state.svelte', () => ({
   allGaugesAttributes: mockAllGaugesAttributes,
+}));
+
+vi.mock('$lib/state/project-state.svelte', () => ({
   project: {
     url: { href: 'http://localhost/?project=123' },
   },
 }));
 
 // Mock utils that are used within weather-utils
-vi.mock('$lib/utils', async (importOriginal) => {
-  const actual = await importOriginal();
+vi.mock('$lib/utils/unit-utils.svelte', async (importOriginal) => {
+  const actual = await importOriginal<any>();
+  return {
+    ...actual,
+    celsiusToFahrenheit: (n: number | null) =>
+      n === null ? null : (n * 9) / 5 + 32,
+    millimetersToInches: (n: number | null) => (n === null ? null : n / 25.4),
+    hoursToMinutes: (h: number) => h * 60,
+    convertTime: vi.fn((t) => t),
+  };
+});
+
+vi.mock('$lib/utils/number-utils', async (importOriginal) => {
+  const actual = await importOriginal<any>();
   return {
     ...actual,
     displayNumber: vi.fn((n: number) => Math.round(n * 100) / 100),
     getAverage: vi.fn(
       (arr: number[]) => arr.reduce((a, b) => a + b, 0) / arr.length,
     ),
-    celsiusToFahrenheit: (n: number | null) =>
-      n === null ? null : (n * 9) / 5 + 32,
-    millimetersToInches: (n: number | null) => (n === null ? null : n / 25.4),
-    hoursToMinutes: (h: number) => h * 60,
+  };
+});
+
+vi.mock('$lib/utils/date-utils', async (importOriginal) => {
+  const actual = await importOriginal<any>();
+  return {
+    ...actual,
     stringToDate: (s: string) => new Date(s + 'T00:00:00Z'),
     dateToISO8601String: (d: Date) => {
       const year = d.getFullYear();
@@ -107,8 +135,14 @@ vi.mock('$lib/utils', async (importOriginal) => {
     },
     numberOfDays: (d1: Date, d2: Date) =>
       Math.ceil((d2.getTime() - d1.getTime()) / (1000 * 60 * 60 * 24)),
+  };
+});
+
+vi.mock('$lib/utils/color-utils', async (importOriginal) => {
+  const actual = await importOriginal<any>();
+  return {
+    ...actual,
     getColorInfo: vi.fn(() => ({ color: '#ffffff', textColor: '#000000' })),
-    convertTime: vi.fn((t) => t),
   };
 });
 

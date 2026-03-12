@@ -1,4 +1,4 @@
-// Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+// Copyright (c) 2026, Thomas (https://github.com/jdvlpr)
 //
 // This file is part of Temperature-Blanket-Web-App.
 //
@@ -14,36 +14,33 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { version } from '$app/environment';
+import { CHARACTERS_FOR_URL_HASH } from '$lib/constants/page-constants';
 import {
-  CHARACTERS_FOR_URL_HASH,
   DAYS_OF_THE_WEEK,
-  NO_DATA_SRTM3,
   UNIT_LABELS,
-} from '$lib/constants';
-import {
-  allGaugesAttributes,
-  gauges,
-  locations,
-  previews,
-  project,
-  toast,
-  weather,
-} from '$lib/state';
+} from '$lib/constants/weather-constants';
+import { NO_DATA_SRTM3 } from '$lib/constants/location-constants';
+import { allGaugesAttributes, gauges } from '$lib/state/gauges-state.svelte';
+import { locations } from '$lib/state/location-state.svelte';
+import { previews } from '$lib/state/preview-state.svelte';
+import { project } from '$lib/state/project-state.svelte';
+import { toast } from '$lib/state/page-state.svelte';
+import { weather } from '$lib/state/weather-state.svelte';
 import { MoonPhaseGauge } from '$lib/state/gauges/moon-phase-gauge-state.svelte';
 import { preferences } from '$lib/storage/preferences.svelte';
 import {
   celsiusToFahrenheit,
-  dateToISO8601String,
-  displayGeoNamesErrorMessage,
-  exists,
+  millimetersToInches,
+} from '$lib/utils/unit-utils.svelte';
+import { dateToISO8601String, yearFrom } from '$lib/utils/date-utils';
+import { displayGeoNamesErrorMessage } from '$lib/utils/error-utils.svelte';
+import { exists, upToDate } from '$lib/utils/other-utils';
+import {
   formatFeatureName,
   formatLocationLabel,
-  getColorsFromInput,
-  getProjectParametersFromURLHash,
-  millimetersToInches,
-  upToDate,
-  yearFrom,
-} from '$lib/utils';
+} from '$lib/utils/location-utils.svelte';
+import { getColorsFromInput } from '$lib/utils/color-utils';
+import { getProjectParametersFromURLHash } from '$lib/utils/project-utils.svelte';
 import { seasonsFromUrlHash } from '$lib/utils/seasons-utils.svelte';
 
 export const loadProjectFromURL = async (

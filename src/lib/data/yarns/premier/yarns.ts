@@ -1,4 +1,4 @@
-import type { Brand } from '$lib/types';
+import type { Brand } from '$lib/types/yarn-types';
 import { yarn as afternoonCotton } from './afternoon-cotton/yarn';
 import { yarn as antiPillingEverydayDK } from './anti-pilling-everyday-dk/yarn';
 import { yarn as antiPillingEverydayWorsted } from './anti-pilling-everyday-worsted/yarn';

@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -15,8 +15,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import ColorPalette from '$lib/components/ColorPalette.svelte';
-  import { MAXIMUM_YARN_DETAILS_DESCRIPTIONS } from '$lib/constants';
-  import { getColorsFromInput, pluralize } from '$lib/utils';
+  import { MAXIMUM_YARN_DETAILS_DESCRIPTIONS } from '$lib/constants/color-constants';
+  import { getColorsFromInput } from '$lib/utils/color-utils';
+  import { pluralize } from '$lib/utils/string-utils';
   import { Trash2Icon } from '@lucide/svelte';
 
   /**

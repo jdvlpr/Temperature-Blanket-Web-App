@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -16,9 +16,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import { version } from '$app/environment';
   import Location from '$lib/components/Location.svelte';
-  import { MAXIMUM_LOCATIONS } from '$lib/constants';
-  import { locations, project, weather } from '$lib/state';
-  import { pluralize, stringToDate } from '$lib/utils';
+  import { MAXIMUM_LOCATIONS } from '$lib/constants/location-constants';
+  import { locations } from '$lib/state/location-state.svelte';
+  import { project } from '$lib/state/project-state.svelte';
+  import { weather } from '$lib/state/weather-state.svelte';
+  import { pluralize } from '$lib/utils/string-utils';
+  import { stringToDate } from '$lib/utils/date-utils';
   import {
     CircleCheckBigIcon,
     CirclePlusIcon,

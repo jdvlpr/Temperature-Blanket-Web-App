@@ -1,4 +1,4 @@
-// Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+// Copyright (c) 2026, Thomas (https://github.com/jdvlpr)
 //
 // This file is part of Temperature-Blanket-Web-App.
 //
@@ -14,18 +14,18 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { browser } from '$app/environment';
-import {
-  CHARACTERS_FOR_URL_HASH,
-  MAXIMUM_DAYS_PER_LOCATION,
-} from '$lib/constants';
-import { weather } from '$lib/state';
+import { CHARACTERS_FOR_URL_HASH } from '$lib/constants/page-constants';
+import { MAXIMUM_DAYS_PER_LOCATION } from '$lib/constants/location-constants';
+import { weather } from '$lib/state/weather-state.svelte';
 import type {
   LocationsStateType,
   LocationStateType,
   LocationType,
+} from '$lib/types/location-types';
+import type {
   TISO8601DateString,
   WeatherSource,
-} from '$lib/types';
+} from '$lib/types/weather-types';
 import {
   dateToISO8601String,
   getDaysBetween,

@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -27,9 +27,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ImportExportPalette from '$lib/components/modals/ImportExportPalette.svelte';
   import RandomPalette from '$lib/components/modals/RandomPalette.svelte';
   import SortPalette from '$lib/components/modals/SortPalette.svelte';
-  import { drawerState, dialog, pageSections } from '$lib/state';
-  import type { Color, GaugeSettingsType } from '$lib/types';
-  import { createGaugeColors } from '$lib/utils';
+  import {
+    drawerState,
+    dialog,
+    pageSections,
+  } from '$lib/state/page-state.svelte';
+  import type { Color } from '$lib/types/yarn-types';
+  import type { GaugeSettingsType } from '$lib/types/gauge-types';
+  import { createGaugeColors } from '$lib/utils/gauge-utils.svelte';
   import {
     ArrowDownWideNarrowIcon,
     CircleCheckIcon,

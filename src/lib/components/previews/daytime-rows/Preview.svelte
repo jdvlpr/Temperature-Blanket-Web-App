@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -15,15 +15,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import Spinner from '$lib/components/Spinner.svelte';
-  import { HOURS_PER_DAY } from '$lib/constants';
-  import { weather } from '$lib/state';
-  import {
-    displayNumber,
-    getColorInfo,
-    getWeatherValue,
-    runPreview,
-    showPreviewImageWeatherDetails,
-  } from '$lib/utils';
+  import { HOURS_PER_DAY } from '$lib/constants/weather-constants';
+  import { weather } from '$lib/state/weather-state.svelte';
+  import { displayNumber } from '$lib/utils/number-utils';
+  import { getColorInfo } from '$lib/utils/color-utils';
+  import { getWeatherValue } from '$lib/utils/weather-utils.svelte';
+  import { runPreview } from '$lib/utils/function-utils.svelte';
+  import { showPreviewImageWeatherDetails } from '$lib/utils/preview-utils.svelte';
   import { daytimeRowsPreview } from './state.svelte';
 
   let width = $state(daytimeRowsPreview.width);

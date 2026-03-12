@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -16,7 +16,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import CloseButton from '$lib/components/modals/CloseButton.svelte';
   import StickyPart from '$lib/components/modals/StickyPart.svelte';
-  import { MONTHS } from '$lib/constants';
+  import { MONTHS } from '$lib/constants/weather-constants';
   import { SEASON_PRESETS } from '$lib/constants/seasons-constants';
   import { preferences } from '$lib/storage/preferences.svelte';
   import { formatDateRange } from '$lib/utils/seasons-utils.svelte';

@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -17,8 +17,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { PUBLIC_BASE_DOMAIN_NAME, PUBLIC_BASE_URL } from '$env/static/public';
   import AppLogo from '$lib/components/AppLogo.svelte';
   import AppShell from '$lib/components/AppShell.svelte';
-  import type { TISO8601DateString } from '$lib/types';
-  import { stringToDate } from '$lib/utils';
+  import type { TISO8601DateString } from '$lib/types/weather-types';
+  import { stringToDate } from '$lib/utils/date-utils';
   import { SegmentedControl } from '@skeletonlabs/skeleton-svelte';
   import { fade } from 'svelte/transition';
 

@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -20,8 +20,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import {
     MAXIMUM_DAYS_PER_LOCATION,
     MAXIMUM_LOCATIONS,
-    OPEN_METEO_MODELS,
-  } from '$lib/constants';
+  } from '$lib/constants/location-constants';
+  import { OPEN_METEO_MODELS } from '$lib/constants/weather-constants';
   import {
     CircleCheckIcon,
     CircleMinusIcon,

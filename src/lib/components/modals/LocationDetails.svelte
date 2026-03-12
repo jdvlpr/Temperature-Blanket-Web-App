@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { LocationType } from '$lib/types';
+  import type { LocationType } from '$lib/types/location-types';
   import { GlobeIcon, MapPinnedIcon, PersonStandingIcon } from '@lucide/svelte';
 
   interface Props {

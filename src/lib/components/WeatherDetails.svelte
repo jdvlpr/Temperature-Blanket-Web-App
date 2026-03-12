@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -16,17 +16,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import WeatherItem from '$lib/components/WeatherItem.svelte';
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
-  import { UNIT_LABELS } from '$lib/constants';
-  import { locations, previews, weather } from '$lib/state';
+  import { UNIT_LABELS } from '$lib/constants/weather-constants';
+  import { locations } from '$lib/state/location-state.svelte';
+  import { previews } from '$lib/state/preview-state.svelte';
+  import { weather } from '$lib/state/weather-state.svelte';
   import { preferences } from '$lib/storage/preferences.svelte';
-  import type { WeatherParam } from '$lib/types';
-  import {
-    capitalizeFirstLetter,
-    convertTime,
-    exists,
-    getColorInfo,
-    getIsRecentDate,
-  } from '$lib/utils';
+  import type { WeatherParam } from '$lib/types/gauge-types';
+  import { capitalizeFirstLetter, exists } from '$lib/utils/other-utils';
+  import { convertTime } from '$lib/utils/unit-utils.svelte';
+  import { getColorInfo } from '$lib/utils/color-utils';
+  import { getIsRecentDate } from '$lib/utils/date-utils';
   import { getTextColor } from '$lib/utils/color-utils';
   import { CircleArrowLeftIcon, CircleArrowRightIcon } from '@lucide/svelte';
 

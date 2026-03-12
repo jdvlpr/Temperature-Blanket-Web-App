@@ -1,4 +1,4 @@
-import type { Brand } from '$lib/types';
+import type { Brand } from '$lib/types/yarn-types';
 import { yarn as blanket } from './blanket/yarn';
 import { yarn as blanketMistical } from './blanket-mist-ical/yarn';
 import { yarn as softeeBaby } from './softee-baby/yarn';

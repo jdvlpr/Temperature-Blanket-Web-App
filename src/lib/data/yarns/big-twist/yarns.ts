@@ -1,4 +1,4 @@
-import type { Brand } from '$lib/types';
+import type { Brand } from '$lib/types/yarn-types';
 import { yarn as bigTwistSoft } from './big-twist-soft/yarn';
 import { yarn as heather } from './heather/yarn';
 import { yarn as shine } from './shine/yarn';

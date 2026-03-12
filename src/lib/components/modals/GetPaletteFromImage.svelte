@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -21,13 +21,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Spinner from '$lib/components/Spinner.svelte';
   import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
   import StickyPart from '$lib/components/modals/StickyPart.svelte';
-  import { MAXIMUM_COLORWAYS_MATCHES_FOR_IMAGES } from '$lib/constants';
-  import { defaultYarn, dialog } from '$lib/state';
+  import { MAXIMUM_COLORWAYS_MATCHES_FOR_IMAGES } from '$lib/constants/color-constants';
+  import { defaultYarn, dialog } from '$lib/state/page-state.svelte';
   import {
     getColorways,
-    getTextColor,
     stringToBrandAndYarnDetails,
-  } from '$lib/utils';
+  } from '$lib/utils/yarn-utils';
+  import { getTextColor } from '$lib/utils/color-utils';
   import {
     CameraIcon,
     RefreshCcwIcon,

@@ -1,4 +1,4 @@
-import type { Brand } from '$lib/types';
+import type { Brand } from '$lib/types/yarn-types';
 import { yarn as twotwozeroSolidsAndHeathers } from './220-solids-and-heathers/yarn';
 import { yarn as twotwozeroSport } from './220-sport/yarn';
 import { yarn as twotwozeroSuperwash } from './220-superwash/yarn';

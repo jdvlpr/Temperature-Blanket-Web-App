@@ -1,5 +1,7 @@
 <script>
-  import { dialog, project, weather } from '$lib/state';
+  import { dialog } from '$lib/state/page-state.svelte';
+  import { project } from '$lib/state/project-state.svelte';
+  import { weather } from '$lib/state/weather-state.svelte';
   import { CloudCogIcon } from '@lucide/svelte';
   import ChooseWeatherSource from '../modals/ChooseWeatherSource.svelte';
 </script>

@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -19,17 +19,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import SelectYarn from '$lib/components/SelectYarn.svelte';
   import ToTopButton from '$lib/components/buttons/ToTopButton.svelte';
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
-  import { allGaugesAttributes } from '$lib/state';
+  import { allGaugesAttributes } from '$lib/state/gauges-state.svelte';
   import {
     fetchPopularProjects,
     fetchProjects,
+    recordPageView,
+  } from '$lib/utils/gallery-utils';
+  import {
     getColorsFromInput,
     getPalettesFromProjects,
+  } from '$lib/utils/color-utils';
+  import {
     getProjectParametersFromURLHash,
     getTitleFromLocationsMeta,
-    pluralize,
-    recordPageView,
-  } from '$lib/utils';
+  } from '$lib/utils/project-utils.svelte';
+  import { pluralize } from '$lib/utils/string-utils';
   import {
     ArrowUpDownIcon,
     ChevronRightIcon,
@@ -185,7 +189,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <div class="flex flex-col justify-center gap-8 px-2 lg:px-0">
   <div class="inline-grid gap-2 text-center">
     <div class="my-2 flex flex-col items-center">
-      <p class="text-xl font-semibold text-surface-700-300">Featured Yarn Palettes</p>
+      <p class="text-surface-700-300 text-xl font-semibold">
+        Featured Yarn Palettes
+      </p>
       <label class="label">
         <span class="label-text">Popular in the last</span>
         <div class="relative flex w-fit items-center">
@@ -234,7 +240,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
       class="flex scroll-mt-[70px] flex-col items-center justify-center gap-2 pb-4 text-center"
     >
       <div class="flex flex-col">
-        <p class="text-xl font-semibold text-surface-700-300">All Yarn Palettes</p>
+        <p class="text-surface-700-300 text-xl font-semibold">
+          All Yarn Palettes
+        </p>
         <p class="text-sm">Palettes from all user-created projects</p>
       </div>
       <div class="grid w-full grid-cols-12 items-end gap-4">

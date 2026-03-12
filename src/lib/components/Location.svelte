@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -15,22 +15,27 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import { browser } from '$app/environment';
-  import { MONTHS } from '$lib/constants';
+  import { MONTHS } from '$lib/constants/weather-constants';
   import { safeSlide } from '$lib/features/transitions/safeSlide';
-  import { dialog, locations, project, toast, weather } from '$lib/state';
+  import { dialog, toast } from '$lib/state/page-state.svelte';
+  import { locations } from '$lib/state/location-state.svelte';
+  import { project } from '$lib/state/project-state.svelte';
+  import { weather } from '$lib/state/weather-state.svelte';
   import type {
     LocationStateType,
     LocationType,
   } from '$lib/types/location-types';
   import {
     dateToISO8601String,
-    displayGeoNamesErrorMessage,
-    getSuggestions,
-    pluralize,
-    renderResult,
     stringToDate,
     yearFrom,
-  } from '$lib/utils';
+  } from '$lib/utils/date-utils';
+  import { displayGeoNamesErrorMessage } from '$lib/utils/error-utils.svelte';
+  import {
+    getSuggestions,
+    renderResult,
+  } from '$lib/utils/location-utils.svelte';
+  import { pluralize } from '$lib/utils/string-utils';
   import {
     EllipsisVerticalIcon,
     MapIcon,

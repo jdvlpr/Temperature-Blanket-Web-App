@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -15,8 +15,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import UnitChanger from '$lib/components/UnitChanger.svelte';
-  import { dialog } from '$lib/state';
-  import { getWeatherCodeDetails } from '$lib/utils';
+  import { dialog } from '$lib/state/page-state.svelte';
+  import { getWeatherCodeDetails } from '$lib/utils/weather-forecast-utils';
   import { Trash2Icon } from '@lucide/svelte';
   import { SegmentedControl } from '@skeletonlabs/skeleton-svelte';
   import { weatherState } from './+page.svelte';

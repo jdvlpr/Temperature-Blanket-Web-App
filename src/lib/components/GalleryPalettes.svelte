@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -41,14 +41,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import PlaceholderPalettes from '$lib/components/PlaceholderPalettes.svelte';
   import SelectYarn from '$lib/components/SelectYarn.svelte';
   import Spinner from '$lib/components/Spinner.svelte';
-  import { ICONS } from '$lib/constants';
-  import { isDesktop } from '$lib/state';
+  import { ICONS } from '$lib/constants/icon-constants';
+  import { isDesktop } from '$lib/state/page-state.svelte';
   import { safeSlide } from '$lib/features/transitions/safeSlide';
-  import {
-    fetchProjects,
-    getPalettesFromProjects,
-    recordPageView,
-  } from '$lib/utils';
+  import { fetchProjects, recordPageView } from '$lib/utils/gallery-utils';
+  import { getPalettesFromProjects } from '$lib/utils/color-utils';
   import {
     ArrowUpDownIcon,
     ChevronRightIcon,

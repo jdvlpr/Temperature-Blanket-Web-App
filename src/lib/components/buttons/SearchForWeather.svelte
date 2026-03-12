@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -16,13 +16,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script>
   import GettingWeather from '$lib/components/modals/GettingWeather.svelte';
   import GettingWeatherWarnCustomWeather from '$lib/components/modals/GettingWeatherWarnCustomWeather.svelte';
-  import {
-    dialog,
-    locations,
-    project,
-    weather,
-    PopoverInstance,
-  } from '$lib/state';
+  import { dialog } from '$lib/state/page-state.svelte';
+  import { locations } from '$lib/state/location-state.svelte';
+  import { project } from '$lib/state/project-state.svelte';
+  import { weather } from '$lib/state/weather-state.svelte';
+  import { PopoverInstance } from '$lib/state/attachments/floating-state.svelte';
   import { ChevronRightIcon } from '@lucide/svelte';
   import { scale } from 'svelte/transition';
 

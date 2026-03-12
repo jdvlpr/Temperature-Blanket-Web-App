@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -14,8 +14,10 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import { OPEN_METEO_MODELS } from '$lib/constants';
-  import { dialog, locations, weather } from '$lib/state';
+  import { OPEN_METEO_MODELS } from '$lib/constants/weather-constants';
+  import { dialog } from '$lib/state/page-state.svelte';
+  import { locations } from '$lib/state/location-state.svelte';
+  import { weather } from '$lib/state/weather-state.svelte';
   import {
     ClockIcon,
     ExternalLinkIcon,

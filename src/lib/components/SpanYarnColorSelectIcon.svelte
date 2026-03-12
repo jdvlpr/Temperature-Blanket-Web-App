@@ -1,5 +1,5 @@
 <script>
-  import { getTextColor } from '$lib/utils';
+  import { getTextColor } from '$lib/utils/color-utils';
   import { PaletteIcon } from '@lucide/svelte';
 
   let { color, size = 20 } = $props();

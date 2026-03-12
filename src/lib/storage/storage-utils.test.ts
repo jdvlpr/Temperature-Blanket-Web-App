@@ -18,13 +18,16 @@ vi.mock('idb-keyval', () => ({
 }));
 
 // Mock $lib/state
-vi.mock('$lib/state', () => ({
+vi.mock('$lib/state/weather-state.svelte', () => ({
   weather: {
     source: { name: 'Meteostat', useSecondary: false, settings: {} },
     isUserEdited: false,
     rawData: [],
     isFromLocalStorage: false,
   },
+}));
+
+vi.mock('$lib/state/project-state.svelte', () => ({
   project: {
     onLoaded: {
       href: 'http://localhost/?project=123',
@@ -35,6 +38,9 @@ vi.mock('$lib/state', () => ({
       error: { code: null, message: '' },
     },
   },
+}));
+
+vi.mock('$lib/state/location-state.svelte', () => ({
   locations: {
     projectTitle: 'Test Project',
     all: [],
@@ -139,7 +145,7 @@ describe('storage-utils integration', () => {
 
     await ProjectStorage.load();
 
-    const { weather } = await import('$lib/state');
+    const { weather } = await import('$lib/state/weather-state.svelte');
     expect(weather.rawData).toHaveLength(1);
     expect(weather.wasLoadedFromStorage).toBe(true);
   });

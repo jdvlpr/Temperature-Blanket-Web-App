@@ -1,4 +1,4 @@
-// Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+// Copyright (c) 2026, Thomas (https://github.com/jdvlpr)
 //
 // This file is part of Temperature-Blanket-Web-App.
 //
@@ -15,9 +15,9 @@
 
 import { browser } from '$app/environment';
 import { skeletonThemes } from '$lib/components/ThemeSwitcher.svelte';
-import { DEFAULT_SEASONS } from '$lib/constants';
+import { DEFAULT_SEASONS } from '$lib/constants/seasons-constants';
 import { preferences } from '$lib/storage/preferences.svelte';
-import type { PageLayout } from '$lib/types';
+import type { PageLayout } from '$lib/types/page-types';
 import { MigrationManager } from './migration-manager';
 
 /**

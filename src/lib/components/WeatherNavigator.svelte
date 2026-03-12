@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -16,7 +16,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script>
   import WeatherTableWrapper from '$lib/components/WeatherTableWrapper.svelte';
   import ImportWeatherData from '$lib/components/modals/ImportWeatherData.svelte';
-  import { dialog, weather } from '$lib/state';
+  import { dialog } from '$lib/state/page-state.svelte';
+  import { weather } from '$lib/state/weather-state.svelte';
   import { FileUpIcon } from '@lucide/svelte';
   import { weatherChart } from './WeatherChart.svelte';
   import DownloadExportButton from './buttons/DownloadExportButton.svelte';

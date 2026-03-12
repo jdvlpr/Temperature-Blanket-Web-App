@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -18,20 +18,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import SelectYarn from '$lib/components/SelectYarn.svelte';
   import Spinner from '$lib/components/Spinner.svelte';
   import ToTopButton from '$lib/components/buttons/ToTopButton.svelte';
-  import { YARN_COLORWAYS_PER_PAGE } from '$lib/constants';
-  import { defaultYarn } from '$lib/state';
-  import type { Color } from '$lib/types';
+  import { YARN_COLORWAYS_PER_PAGE } from '$lib/constants/color-constants';
+  import { brands } from '$lib/data/yarns/brands';
+  import { defaultYarn } from '$lib/state/page-state.svelte';
+  import type { Color } from '$lib/types/yarn-types';
   import {
-    getColorways,
     getTextColor,
-    pluralize,
     sortColorsByName,
     sortColorsByNameZtoA,
     sortColorsDarktoLight,
     sortColorsLightToDark,
+  } from '$lib/utils/color-utils';
+  import { pluralize } from '$lib/utils/string-utils';
+  import {
+    getColorways,
     stringToBrandAndYarnDetails,
-  } from '$lib/utils';
-  import { brands } from '$lib/data/yarns/brands';
+  } from '$lib/utils/yarn-utils';
   import {
     ArrowDownWideNarrowIcon,
     CircleCheckIcon,
@@ -39,8 +41,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     SearchIcon,
   } from '@lucide/svelte';
   import chroma from 'chroma-js';
-  import SelectYarnWeight from '../SelectYarnWeight.svelte';
   import { tick } from 'svelte';
+  import SelectYarnWeight from '../SelectYarnWeight.svelte';
 
   interface Props {
     selectedBrandId?: string;

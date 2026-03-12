@@ -1,4 +1,4 @@
-import type { Brand } from '$lib/types';
+import type { Brand } from '$lib/types/yarn-types';
 import { yarn as organicCottonWorsted } from './organic-cotton-worsted/yarn';
 import { yarn as sweater } from './sweater/yarn';
 import { yarn as woolstokLight } from './woolstok-light/yarn';

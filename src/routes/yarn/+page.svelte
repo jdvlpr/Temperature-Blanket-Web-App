@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -29,7 +29,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     colorsToYarnDetails,
     stringToColors,
     yarnDetailsToColors,
-  } from '$lib/utils';
+  } from '$lib/utils/color-utils';
   import { onMount } from 'svelte';
   import { yarnPageState } from './state.svelte';
 

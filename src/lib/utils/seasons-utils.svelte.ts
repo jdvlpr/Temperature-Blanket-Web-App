@@ -1,4 +1,4 @@
-// Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+// Copyright (c) 2026, Thomas (https://github.com/jdvlpr)
 //
 // This file is part of Temperature-Blanket-Web-App.
 //
@@ -13,10 +13,14 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { DEFAULT_SEASONS, MONTHS, SEASON_PRESETS } from '$lib/constants';
-import { previews } from '$lib/state';
+import {
+  DEFAULT_SEASONS,
+  SEASON_PRESETS,
+} from '$lib/constants/seasons-constants';
+import { MONTHS } from '$lib/constants/weather-constants';
+import { previews } from '$lib/state/preview-state.svelte';
 import { preferences } from '$lib/storage/preferences.svelte';
-import type { LocationType } from '$lib/types';
+import type { LocationType } from '$lib/types/location-types';
 
 /**
  * Parse a MM-DD string into month and day numbers

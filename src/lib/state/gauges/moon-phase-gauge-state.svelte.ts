@@ -1,10 +1,10 @@
-import { MOON_PHASE_NAMES } from '$lib/constants';
+import { MOON_PHASE_NAMES } from '$lib/constants/weather-constants';
+import type { Color } from '$lib/types/yarn-types';
 import type {
-  Color,
   GaugeAttributes,
   GaugeRangeCategory,
   GaugeSettingsType,
-} from '$lib/types';
+} from '$lib/types/gauge-types';
 import chroma from 'chroma-js';
 
 export const gaugeAttributes: GaugeAttributes = {

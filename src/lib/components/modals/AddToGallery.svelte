@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -15,8 +15,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import Spinner from '$lib/components/Spinner.svelte';
-  import { locations, previews, project } from '$lib/state';
-  import { sendToProjectGallery, svgToPNG } from '$lib/utils';
+  import { locations } from '$lib/state/location-state.svelte';
+  import { previews } from '$lib/state/preview-state.svelte';
+  import { project } from '$lib/state/project-state.svelte';
+  import { sendToProjectGallery } from '$lib/utils/project-utils.svelte';
+  import { svgToPNG } from '$lib/utils/preview-utils.svelte';
   import { ExternalLinkIcon } from '@lucide/svelte';
   import StickyPart from './StickyPart.svelte';
 

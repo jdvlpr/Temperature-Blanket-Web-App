@@ -1,4 +1,4 @@
-import type { Brand } from '$lib/types';
+import type { Brand } from '$lib/types/yarn-types';
 import { yarn as superwashClassic } from './superwash-classic/yarn';
 
 export const brand: Brand = {

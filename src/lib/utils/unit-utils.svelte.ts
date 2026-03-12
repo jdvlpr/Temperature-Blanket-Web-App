@@ -1,4 +1,4 @@
-// Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+// Copyright (c) 2026, Thomas (https://github.com/jdvlpr)
 //
 // This file is part of Temperature-Blanket-Web-App.
 //
@@ -13,10 +13,12 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { WEATHER_DATA_DECIMALS } from '$lib/constants';
-import { windowLanguage } from '$lib/state';
+import { WEATHER_DATA_DECIMALS } from '$lib/constants/weather-constants';
+import { windowLanguage } from '$lib/state/page-state.svelte';
 import { preferences } from '$lib/storage/preferences.svelte';
-import { displayNumber, exists, pluralize } from '$lib/utils';
+import { displayNumber } from '$lib/utils/number-utils';
+import { exists } from '$lib/utils/other-utils';
+import { pluralize } from '$lib/utils/string-utils';
 /**
  * [description]
  */

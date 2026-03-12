@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -17,9 +17,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import LocalProjects from '$lib/components/LocalProjects.svelte';
   import UnitChanger from '$lib/components/UnitChanger.svelte';
   import YarnSources from '$lib/components/YarnSources.svelte';
-  import { DAYS_OF_THE_WEEK, MONTHS } from '$lib/constants';
-  import { dialog, locations, project, weather } from '$lib/state';
-  import { pluralize } from '$lib/utils';
+  import { DAYS_OF_THE_WEEK, MONTHS } from '$lib/constants/weather-constants';
+  import { dialog } from '$lib/state/page-state.svelte';
+  import { locations } from '$lib/state/location-state.svelte';
+  import { project } from '$lib/state/project-state.svelte';
+  import { weather } from '$lib/state/weather-state.svelte';
+  import { pluralize } from '$lib/utils/string-utils';
   import { BookmarkIcon, PlusIcon } from '@lucide/svelte';
   import WeatherGrouping from '../WeatherGrouping.svelte';
   import DownloadExportButton from '../buttons/DownloadExportButton.svelte';

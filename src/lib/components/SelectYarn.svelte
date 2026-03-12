@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -14,9 +14,11 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { ALL_YARN_WEIGHTS } from '$lib/constants';
-  import { defaultYarn } from '$lib/state';
-  import { delay, pluralize, stringToBrandAndYarnDetails } from '$lib/utils';
+  import { ALL_YARN_WEIGHTS } from '$lib/constants/color-constants';
+  import { defaultYarn } from '$lib/state/page-state.svelte';
+  import { delay } from '$lib/utils/function-utils.svelte';
+  import { pluralize } from '$lib/utils/string-utils';
+  import { stringToBrandAndYarnDetails } from '$lib/utils/yarn-utils';
   import { brands } from '$lib/data/yarns/brands';
   import {
     ChevronDownIcon,

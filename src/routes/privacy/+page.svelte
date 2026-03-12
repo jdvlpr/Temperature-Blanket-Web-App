@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -18,7 +18,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import AppLogo from '$lib/components/AppLogo.svelte';
   import AppShell from '$lib/components/AppShell.svelte';
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
-  import { consentToMSClarityCookies, toast } from '$lib/state';
+  import {
+    consentToMSClarityCookies,
+    toast,
+  } from '$lib/state/page-state.svelte';
   import { preferences } from '$lib/storage/preferences.svelte';
   import { RefreshCcwIcon } from '@lucide/svelte';
 

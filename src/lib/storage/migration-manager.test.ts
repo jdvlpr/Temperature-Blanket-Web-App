@@ -12,7 +12,7 @@ vi.mock('./projects.svelte', () => ({
 }));
 
 // Mock $lib/state
-vi.mock('$lib/state', () => ({
+vi.mock('$lib/state/project-state.svelte', () => ({
   project: {
     status: {
       temporaryProjectsBackup: [],
@@ -59,7 +59,7 @@ describe('MigrationManager', () => {
     const legacy = [{ title: 'P1', href: 'h1' }];
     localStorageMock['projects'] = JSON.stringify(legacy);
 
-    const { project } = await import('$lib/state');
+    const { project } = await import('$lib/state/project-state.svelte');
     project.status.temporaryProjectsBackup = [];
 
     await MigrationManager.migrateFromLocalStorage();

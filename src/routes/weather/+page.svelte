@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -34,18 +34,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Share from '$lib/components/Share.svelte';
   import Spinner from '$lib/components/Spinner.svelte';
   import UnitChanger from '$lib/components/UnitChanger.svelte';
-  import {
-    dialog,
-    locations,
-    project,
-    showNavigationSideBar,
-  } from '$lib/state';
+  import { dialog, showNavigationSideBar } from '$lib/state/page-state.svelte';
+  import { locations } from '$lib/state/location-state.svelte';
+  import { project } from '$lib/state/project-state.svelte';
   import { preferences } from '$lib/storage/preferences.svelte';
-  import {
-    delay,
-    getWeatherCodeDetails,
-    setUnitsFromNavigator,
-  } from '$lib/utils';
+  import { delay } from '$lib/utils/function-utils.svelte';
+  import { getWeatherCodeDetails } from '$lib/utils/weather-forecast-utils';
+  import { setUnitsFromNavigator } from '$lib/utils/unit-utils.svelte';
   import { ListIcon, PlusIcon, SettingsIcon } from '@lucide/svelte';
   import { onDestroy, onMount, tick } from 'svelte';
   import { fade } from 'svelte/transition';

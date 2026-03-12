@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -15,7 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import GettingWeather from '$lib/components/modals/GettingWeather.svelte';
-  import { dialog } from '$lib/state';
+  import { dialog } from '$lib/state/page-state.svelte';
 
   function setModal() {
     dialog.trigger({

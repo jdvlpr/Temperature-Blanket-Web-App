@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -14,8 +14,12 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import { pageSections, showNavigationSideBar, weather } from '$lib/state';
-  import { goToProjectSection } from '$lib/utils';
+  import {
+    pageSections,
+    showNavigationSideBar,
+  } from '$lib/state/page-state.svelte';
+  import { weather } from '$lib/state/weather-state.svelte';
+  import { goToProjectSection } from '$lib/utils/page-utils.svelte';
   import { onMount } from 'svelte';
 
   let indicator = $state({ left: 0, width: 0 });

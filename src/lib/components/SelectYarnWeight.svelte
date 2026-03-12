@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { ALL_YARN_WEIGHTS } from '$lib/constants';
+  import { ALL_YARN_WEIGHTS } from '$lib/constants/color-constants';
   import { brands } from '$lib/data/yarns/brands';
-  import type { YarnWeight } from '$lib/types';
-  import { pluralize } from '$lib/utils';
+  import type { YarnWeight } from '$lib/types/yarn-types';
+  import { pluralize } from '$lib/utils/string-utils';
   import { CircleQuestionMarkIcon, SpoolIcon } from '@lucide/svelte';
 
   interface Props {

@@ -1,4 +1,4 @@
-import type { Brand } from '$lib/types';
+import type { Brand } from '$lib/types/yarn-types';
 import { yarn as bambu7 } from './bambu-7/yarn';
 
 export const brand: Brand = {

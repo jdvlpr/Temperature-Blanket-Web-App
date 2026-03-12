@@ -1,4 +1,4 @@
-import type { Brand } from '$lib/types';
+import type { Brand } from '$lib/types/yarn-types';
 import { yarn as flindersCotton8Ply } from './flinders-cotton-8-ply/yarn';
 import { yarn as marvel8Ply } from './marvel-8-ply/yarn';
 import { yarn as marvel12PlyBulky } from './marvel-12-ply-bulky/yarn';

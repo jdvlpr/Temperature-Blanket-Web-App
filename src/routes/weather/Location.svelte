@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -26,13 +26,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import { page } from '$app/state';
-  import { NO_DATA_SRTM3 } from '$lib/constants';
-  import { project } from '$lib/state';
+  import { NO_DATA_SRTM3 } from '$lib/constants/location-constants';
+  import { project } from '$lib/state/project-state.svelte';
+  import { displayGeoNamesErrorMessage } from '$lib/utils/error-utils.svelte';
   import {
-    displayGeoNamesErrorMessage,
     getSuggestions,
     renderResult,
-  } from '$lib/utils';
+  } from '$lib/utils/location-utils.svelte';
   import { MapPinIcon, SearchIcon, XIcon } from '@lucide/svelte';
   import autocomplete from 'autocompleter';
   import { onMount } from 'svelte';

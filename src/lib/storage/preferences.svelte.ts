@@ -1,4 +1,5 @@
-import type { PageLayout, Unit } from '$lib/types';
+import type { PageLayout } from '$lib/types/page-types';
+import type { Unit } from '$lib/types/weather-types';
 import { DEFAULT_SEASONS } from '$lib/constants/seasons-constants';
 
 // Season configuration type

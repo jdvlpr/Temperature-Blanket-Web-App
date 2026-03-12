@@ -1,4 +1,4 @@
-import type { Brand } from '$lib/types';
+import type { Brand } from '$lib/types/yarn-types';
 import { yarn as twentyFourSevenCotton } from './24-7-cotton/yarn';
 import { yarn as basicStitchAntiMicrobial } from './basic-stitch-anti-microbial/yarn';
 import { yarn as basicStitchAntiPilling } from './basic-stitch-anti-pilling/yarn';

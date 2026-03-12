@@ -26,27 +26,36 @@ vi.mock('$app/environment', () => ({
   version: '1.0.0',
 }));
 
-vi.mock('$lib/state', () => ({
+vi.mock('$lib/state/project-state.svelte', () => ({
   project: {
     url: { href: 'http://localhost/?project=123' },
     onLoaded: { href: 'http://localhost/?project=123' },
   },
+}));
+
+vi.mock('$lib/state/weather-state.svelte', () => ({
   weather: {
     source: { name: 'Meteostat', useSecondary: false, settings: {} },
     isUserEdited: false,
     rawData: [],
   },
+}));
+
+vi.mock('$lib/state/location-state.svelte', () => ({
   locations: {
     projectTitle: 'Test Project',
     all: [],
   },
 }));
 
-vi.mock('$lib/utils', () => ({
+vi.mock('$lib/utils/date-utils', () => ({
   dateToISO8601String: vi.fn((d) => d.toISOString().split('T')[0]),
   stringToDate: vi.fn((s) => new Date(s)),
-  getMoonPhase: vi.fn(() => 0),
   numberOfDays: vi.fn(() => 1),
+}));
+
+vi.mock('$lib/utils/weather-utils.svelte', () => ({
+  getMoonPhase: vi.fn(() => 0),
 }));
 
 describe('ProjectStorage', () => {

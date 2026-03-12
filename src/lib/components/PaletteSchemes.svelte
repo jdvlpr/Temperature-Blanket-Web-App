@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -16,8 +16,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script>
   import ColorPalette from '$lib/components/ColorPalette.svelte';
   import SelectNumberOfColors from '$lib/components/SelectNumberOfColors.svelte';
-  import { SCHEMES } from '$lib/constants';
-  import { dialog } from '$lib/state';
+  import { SCHEMES } from '$lib/constants/color-constants';
+  import { dialog } from '$lib/state/page-state.svelte';
   import { PaletteIcon } from '@lucide/svelte';
   import chroma from 'chroma-js';
 

@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -27,17 +27,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
     MONTHS,
     OPEN_METEO_DELAY_DAYS,
     UNIT_LABELS,
-  } from '$lib/constants';
-  import { dialog, gauges, locations, weather } from '$lib/state';
+  } from '$lib/constants/weather-constants';
+  import { dialog } from '$lib/state/page-state.svelte';
+  import { gauges } from '$lib/state/gauges-state.svelte';
+  import { locations } from '$lib/state/location-state.svelte';
+  import { weather } from '$lib/state/weather-state.svelte';
   import { preferences } from '$lib/storage/preferences.svelte';
   import { safeSlide } from '$lib/features/transitions/safeSlide';
-  import {
-    convertTime,
-    displayNumber,
-    getAverage,
-    isDateWithinLastSevenDays,
-    pluralize,
-  } from '$lib/utils';
+  import { convertTime } from '$lib/utils/unit-utils.svelte';
+  import { displayNumber, getAverage } from '$lib/utils/number-utils';
+  import { isDateWithinLastSevenDays } from '$lib/utils/date-utils';
+  import { pluralize } from '$lib/utils/string-utils';
   import { CloudAlert, TriangleAlertIcon } from '@lucide/svelte';
   import { Popover, Portal } from '@skeletonlabs/skeleton-svelte';
   import { onMount } from 'svelte';

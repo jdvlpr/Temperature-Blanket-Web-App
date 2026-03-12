@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -16,10 +16,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import HelpIcon from '$lib/components/buttons/HelpIcon.svelte';
   import Expand from '$lib/components/Expand.svelte';
-  import { ALL_YARN_WEIGHTS } from '$lib/constants';
+  import { ALL_YARN_WEIGHTS } from '$lib/constants/color-constants';
   import { brands } from '$lib/data/yarns/brands';
   import { safeSlide } from '$lib/features/transitions/safeSlide';
-  import { pluralize, stringToDate } from '$lib/utils';
+  import { pluralize } from '$lib/utils/string-utils';
+  import { stringToDate } from '$lib/utils/date-utils';
   import { ShoppingCartIcon } from '@lucide/svelte';
 
   interface Props {

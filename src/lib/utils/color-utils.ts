@@ -1,4 +1,4 @@
-// Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+// Copyright (c) 2026, Thomas (https://github.com/jdvlpr)
 //
 // This file is part of Temperature-Blanket-Web-App.
 //
@@ -13,18 +13,19 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { CHARACTERS_FOR_URL_HASH } from '$lib/constants';
-import { allGaugesAttributes, gauges } from '$lib/state';
-import type { Color, WeatherParam } from '$lib/types';
+import { CHARACTERS_FOR_URL_HASH } from '$lib/constants/page-constants';
+import { allGaugesAttributes, gauges } from '$lib/state/gauges-state.svelte';
+import type { Color } from '$lib/types/yarn-types';
+import type { WeatherParam } from '$lib/types/gauge-types';
+import { capitalizeFirstLetter } from '$lib/utils/other-utils';
+import { getColorPropertiesFromYarnStringAndHex } from '$lib/utils/yarn-utils';
 import {
-  capitalizeFirstLetter,
-  getColorPropertiesFromYarnStringAndHex,
   getProjectParametersFromURLHash,
-  getTargetParentGaugeId,
   getTitleFromLocationsMeta,
-  isValueInRange,
-  pluralize,
-} from '$lib/utils';
+} from '$lib/utils/project-utils.svelte';
+import { getTargetParentGaugeId } from '$lib/utils/gauge-utils.svelte';
+import { isValueInRange } from '$lib/utils/range-utils.svelte';
+import { pluralize } from '$lib/utils/string-utils';
 import { brands } from '$lib/data/yarns/brands';
 import chroma from 'chroma-js';
 
