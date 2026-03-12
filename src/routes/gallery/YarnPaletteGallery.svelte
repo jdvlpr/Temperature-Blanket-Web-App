@@ -198,10 +198,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
               fetchPopularPalettes();
             }}
           >
-            <option value={0.0357}>day</option>
-            <option value={0.25}>week</option>
-            <option value={1}>month</option>
-            <option value={12}>year</option>
+            <option value={0.0357}>Day</option>
+            <option value={0.25}>Week</option>
+            <option value={1}>Month</option>
+            <option value={12}>Year</option>
           </select>
         </div>
       </label>

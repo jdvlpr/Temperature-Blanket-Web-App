@@ -119,8 +119,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </select>
     </label>
     <p class="max-w-sm text-left text-sm italic">
-      This is the number of hexagons in the top row and subsequent even-numbered
-      rows. Because of the staggered layout, odd-numbered rows will have one
+      This is the number of hexagons in the first (top) row and subsequent odd-numbered
+      rows. Because of the staggered layout, even-numbered rows will have one
       more hexagon than the width set above.
     </p>
   </div>
