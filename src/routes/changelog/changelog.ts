@@ -719,7 +719,7 @@ export const entries: ChangelogItemGroup[] = [
                       ></svg
                   >`,
                 instructions:
-                  "<a href='/gallery#yarn-palettes' class='link'>View the Yarn Palette Gallery</a>.",
+                  "<a href='/gallery?view=yarn-palettes' class='link'>View the Yarn Palette Gallery</a>.",
                 text: 'Browse user-created yarn colorway combinations.',
                 title: 'Yarn Palette Gallery',
               },

@@ -15,6 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import { browser } from '$app/environment';
+  import { goto } from '$app/navigation';
   import { page } from '$app/state';
   import { PUBLIC_BASE_URL } from '$env/static/public';
   import AppLogo from '$lib/components/AppLogo.svelte';
@@ -28,10 +29,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let view = $state('projects');
 
   $effect(() => {
-    if (browser && page.url.hash === '#yarn-palettes') {
+    if (browser && page.url.searchParams.get('view') === 'yarn-palettes') {
       view = 'yarn-palettes';
-    } else if (browser && page.url.hash === '#projects') {
-      view = 'projects';
+    } else if (browser && page.url.searchParams.get('view') === 'projects') {
+      view = 'projects'; 
     }
   });
 </script>
@@ -61,9 +62,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   />
   <meta
     property="og:url"
-    content="{PUBLIC_BASE_URL || ''}/gallery{view === 'yarn-palettes'
-      ? '#yarn-palettes'
-      : ''}"
+    content="{PUBLIC_BASE_URL || ''}/gallery?view={view}"
   />
   <meta property="og:type" content="website" />
 </svelte:head>
@@ -84,9 +83,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           value={view}
           onValueChange={(e) => {
             view = e.value;
-            // Optionally update hash so links can be shared to specific views
+            // Optionally update search params so links can be shared to specific views
             if (browser) {
-              window.location.hash = e.value;
+              goto(`?view=${e.value}`);
             }
           }}
         >
