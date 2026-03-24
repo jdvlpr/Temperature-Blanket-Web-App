@@ -42,6 +42,7 @@ import { brand as lionBrand } from './lion-brand/yarns';
 import { brand as loopsAndThreads } from './loops-and-threads/yarns';
 import { brand as malabrigo } from './malabrigo/yarns';
 import { brand as mauriceBrassard } from './maurice-brassard/yarns';
+import { brand as melissa } from './melissa/yarns';
 import { brand as missBabs } from './miss-babs/yarns';
 import { brand as nako } from './nako/yarns';
 import { brand as paintboxYarns } from './paintbox-yarns/yarns';
@@ -123,6 +124,7 @@ export const brands: Brand[] = [
   loopsAndThreads,
   malabrigo,
   mauriceBrassard,
+  melissa,
   missBabs,
   nako,
   paintboxYarns,
