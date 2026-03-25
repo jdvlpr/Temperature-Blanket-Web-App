@@ -13,12 +13,12 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script module>
+<script module lang="ts">
   // Validates location id
 
   class WeatherLocationState {
     validId = $state(false);
-    inputLocation = $state(null);
+    inputLocation: HTMLInputElement | null = $state(null);
   }
 
   export const weatherLocationState = new WeatherLocationState();
@@ -47,13 +47,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let navigatorAvailable = $state(true);
 
   let showResetKey = $state(false);
-  // Weather or not the clear input text button should appear
+  // Whether or not the clear input text button should appear
   let showReset = $derived.by(() => {
     showResetKey;
     return (
       !searching &&
-      weatherLocationState.inputLocation?.value &&
-      weatherLocationState.inputLocation?.value?.length > 1
+      (weatherLocationState.inputLocation?.value?.length ?? 0) > 1
     );
   });
 
@@ -69,12 +68,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     }
     // Setup the autocomplete location
     autocomplete({
-      input: weatherLocationState.inputLocation,
+      input: weatherLocationState.inputLocation!,
       minLength: 2,
       debounceWaitMs: 550,
       showOnFocus: false,
       emptyMsg: 'Trouble getting location. Please search again.',
-      customize: function (container) {
+      customize: function (input, inputRect, container, maxHeight) {
         const group = locationGroup.getBoundingClientRect();
         container.style.width = `${group.width}px`;
         container.style.left = `${group.left}px`;
@@ -130,6 +129,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }); // End of onMount
 
   function validate() {
+    const value = weatherLocationState.inputLocation?.value || '';
+
+    // Check to see if the user has selected the location input text
+    let hasUserSelectedInputValue = false;
+    if (typeof window.getSelection != 'undefined')
+      hasUserSelectedInputValue = window.getSelection()?.toString() === value;
+
+    // If the input has at least two characters and is not selected, show the searching icon
+    if (value.length > 1 && !hasUserSelectedInputValue) {
+      searching = true;
+    } else {
+      searching = false;
+    }
+
     if (
       !weatherState.weatherLocations?.find(
         (item) => item.id === weatherState.activeLocationID,
@@ -139,7 +152,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       return;
     }
 
-    if (weatherLocationState.inputLocation?.value?.length < 2) {
+    if (value.length < 2) {
       invalidate();
       return;
     }
