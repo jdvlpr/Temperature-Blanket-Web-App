@@ -37,6 +37,16 @@ export const entries: ChangelogItemGroup[] = [
             notes: [
               {
                 icon: ICONS.checkCircle,
+                text: `54 colorways`,
+                title: 'Added New Yarn: Emu - Classic DK',
+              },
+            ],
+            version: '5.45.0',
+          },
+          {
+            notes: [
+              {
+                icon: ICONS.checkCircle,
                 text: `44 colorways`,
                 title: 'Added New Yarn: Melissa - Lana Mediana',
               },

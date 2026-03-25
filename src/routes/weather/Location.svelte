@@ -231,8 +231,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   };
 </script>
 
-<div class="flex flex-wrap items-end justify-center gap-x-4 gap-y-2 py-2">
-  <label class="label max-w-screen-sm">
+<div class="grid grid-cols-1 gap-4 py-2">
+  <label class="label">
     <span class="label-text">
       {#if hasError}
         <span class="text-error-900-100">Choose a result</span>

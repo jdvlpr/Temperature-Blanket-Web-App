@@ -17,6 +17,7 @@ import { brand as dmc } from './dmc/yarns';
 import { brand as drops } from './drops/yarns';
 import { brand as ellaRae } from './ella-rae/yarns';
 import { brand as elle } from './elle/yarns';
+import { brand as emu } from './emu/yarns';
 import { brand as euroroma } from './euroroma/yarns';
 import { brand as fiddlesticks } from './fiddlesticks/yarns';
 import { brand as filaturaDiCrosa } from './filatura-di-crosa/yarns';
@@ -99,6 +100,7 @@ export const brands: Brand[] = [
   drops,
   ellaRae,
   elle,
+  emu,
   euroroma,
   fiddlesticks,
   filaturaDiCrosa,
