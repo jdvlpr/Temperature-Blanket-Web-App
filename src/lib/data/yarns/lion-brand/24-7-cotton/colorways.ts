@@ -5,7 +5,7 @@ const colorways: Colorway[] = [
     source: {
       name: 'lionbrand.com',
       href: 'https://www.lionbrand.com/products/24-7-cotton',
-      accessed: '2023-11-05',
+      accessed: '2026-03-25',
     },
     colors: [
       {
