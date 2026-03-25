@@ -37,6 +37,16 @@ export const entries: ChangelogItemGroup[] = [
             notes: [
               {
                 icon: ICONS.checkCircle,
+                text: `17 colorways added`,
+                title: 'Added Colorways: Lion Brand - 24/7 Cotton',
+              },
+            ],
+            version: '5.46.0',
+          },
+          {
+            notes: [
+              {
+                icon: ICONS.checkCircle,
                 text: `54 colorways`,
                 title: 'Added New Yarn: Emu - Classic DK',
               },
@@ -98,26 +108,6 @@ export const entries: ChangelogItemGroup[] = [
           {
             notes: [
               {
-                icon: ICONS.checkCircle,
-                text: `75 colorways`,
-                title: 'Added New Yarn: Círculo - Mollet',
-              },
-              {
-                icon: ICONS.checkCircle,
-                text: `71 colorways`,
-                title: 'Added New Yarn: Paintbox Yarns - Cotton Aran',
-              },
-              {
-                icon: ICONS.checkCircle,
-                text: `16 colorways added`,
-                title: 'Added Colorways: Scheepjes - Stone Washed',
-              },
-            ],
-            version: '5.40.0',
-          },
-          {
-            notes: [
-              {
                 icon: ICONS.wrench,
                 instructions: `For more information, and to see if your project was affected or not, see this post: <a href="https://www.facebook.com/share/p/1AUDsPmA7w/" target="_blank" class="link">Technical Update: Future Date Issue</a>.`,
                 text: `For some projects with future dates, one day was incorrect or missing. This update fixes the issue.`,
@@ -139,52 +129,6 @@ export const entries: ChangelogItemGroup[] = [
           {
             notes: [
               {
-                icon: ICONS.checkCircle,
-                text: `44 colorways`,
-                title: 'Added New Yarn: Lana Grossa - Cool Wool Superbig',
-              },
-              {
-                icon: ICONS.checkCircle,
-                text: `55 colorways`,
-                title: 'Added New Yarn: Yarn Art - Elite',
-              },
-            ],
-            version: '5.38.0',
-          },
-          {
-            notes: [
-              {
-                icon: ICONS.checkCircle,
-                text: `97 colorways`,
-                title: 'Added New Yarn: Círculo - Amigurumi',
-              },
-              {
-                icon: ICONS.checkCircle,
-                text: `45 colorways`,
-                title: 'Added New Yarn: Knit Picks - Brava Sport',
-              },
-              {
-                icon: ICONS.checkCircle,
-                text: `8 colorways`,
-                title: 'Added New Yarn: Loops & Threads - Soft Classic Neon',
-              },
-            ],
-            version: '5.37.0',
-          },
-          {
-            notes: [
-              {
-                icon: ICONS.checkCircle,
-                text: `42 colorways`,
-                title:
-                  "Added New Yarn: Aunt Lydia's - Classic Crochet Thread 10",
-              },
-            ],
-            version: '5.36.0',
-          },
-          {
-            notes: [
-              {
                 icon: ICONS.design,
                 instructions:
                   'In the Preview tab, select Seasons in the settings to try it out. Note that not all preview pattern types support seasons, but more may be added later. This is a beta feature, and may have unexpected issues. <a href="/documentation#assigning-seasons" class="link">Learn more in the documentation</a>.',
@@ -194,31 +138,6 @@ export const entries: ChangelogItemGroup[] = [
               },
             ],
             version: '5.35.0',
-          },
-          {
-            notes: [
-              {
-                icon: ICONS.checkCircle,
-                text: `24 colorways added`,
-                title: 'Added Colorways: Hobby Store - Aran Anti-Pill',
-              },
-            ],
-            version: '5.33.0',
-          },
-          {
-            notes: [
-              {
-                icon: ICONS.checkCircle,
-                text: `34 colorways`,
-                title: 'Added New Yarn: Bendigo Woollen Mills - Cotton 10 Ply',
-              },
-              {
-                icon: ICONS.checkCircle,
-                text: `21 colorways`,
-                title: 'Added New Yarn: Semco - Stallion 8 Ply',
-              },
-            ],
-            version: '5.32.0',
           },
         ],
       },
@@ -268,46 +187,6 @@ export const entries: ChangelogItemGroup[] = [
           {
             notes: [
               {
-                icon: ICONS.checkCircle,
-                text: `19 colorways`,
-                title: 'Added New Yarn: 4 Seasons - Marvel 12 Ply Bulky',
-              },
-              {
-                icon: ICONS.checkCircle,
-                text: `50 colorways`,
-                title: 'Added New Yarn: Knit Picks - Cotlin',
-              },
-              {
-                icon: ICONS.checkCircle,
-                text: `3 new colorways`,
-                title: 'Updated Colorways: 4 Seasons - Marvel 8 Ply',
-              },
-            ],
-            version: '5.30.0',
-          },
-          {
-            notes: [
-              {
-                icon: ICONS.checkCircle,
-                text: `74 colorways`,
-                title: 'Added New Yarn: Lion Brand - Wool-Ease Thick & Quick',
-              },
-            ],
-            version: '5.29.0',
-          },
-          {
-            notes: [
-              {
-                icon: ICONS.checkCircle,
-                text: `26 colorways`,
-                title: 'Added New Yarn: Woll Butt - Innsbruck Uni',
-              },
-            ],
-            version: '5.28.0',
-          },
-          {
-            notes: [
-              {
                 IconComponent: WrenchIcon,
                 text: `There was an error with the Sage Green colorway from Scheepjes - Catona (it was the same color as the Kiwi colorway). This update fixes the Sage Green colorway so that it is no longer the same color as the Kiwi colorway.`,
                 title: 'Modified Colorway: Sage Green (Scheepjes - Catona)',
@@ -317,89 +196,8 @@ export const entries: ChangelogItemGroup[] = [
             ],
             version: '5.27.0',
           },
-          {
-            notes: [
-              {
-                icon: ICONS.checkCircle,
-                text: `51 colorways`,
-                title: 'Added New Yarn: Alize - Superlana Midi',
-              },
-              {
-                icon: ICONS.checkCircle,
-                text: `22 new colorways`,
-                title: 'Updated Colorways: Hobbii - Happy Place Solid',
-              },
-            ],
-            version: '5.26.0',
-          },
-          {
-            notes: [
-              {
-                icon: ICONS.checkCircle,
-                text: `51 colorways`,
-                title: 'Added New Yarn: Alize - Superlana Midi',
-              },
-              {
-                icon: ICONS.checkCircle,
-                text: `22 new colorways`,
-                title: 'Updated Colorways: Hobbii - Happy Place Solid',
-              },
-            ],
-            version: '5.26.0',
-          },
-          {
-            notes: [
-              {
-                icon: ICONS.checkCircle,
-                text: `6 new colorways`,
-                title: 'Updated Colorways: Lion Brand - Color Theory',
-              },
-            ],
-            version: '5.25.0',
-          },
         ],
       },
-      {
-        month: 'October',
-        items: [
-          {
-            notes: [
-              {
-                icon: ICONS.checkCircle,
-                text: `28 colorways`,
-                title: 'Added New Yarn: Loops & Threads - Classic Cotton',
-              },
-              {
-                icon: ICONS.checkCircle,
-                text: `44 colorways`,
-                title: 'Added New Yarn: Premier - Bamboo Fair',
-              },
-              {
-                icon: ICONS.checkCircle,
-                text: `58 colorways`,
-                title: 'Added New Yarn: Sandnes - Tynn Silk Mohair',
-              },
-              {
-                icon: ICONS.checkCircle,
-                text: `26 new colorways`,
-                title: 'Updated Colorways: Bernat - Blanket',
-              },
-            ],
-            version: '5.24.0',
-          },
-          {
-            notes: [
-              {
-                icon: ICONS.checkCircle,
-                text: `82 colorways`,
-                title: 'Added New Yarn: Knitting for Olive - Soft Silk Mohair',
-              },
-            ],
-            version: '5.23.0',
-          },
-        ],
-      },
-
       {
         month: 'September',
         items: [
