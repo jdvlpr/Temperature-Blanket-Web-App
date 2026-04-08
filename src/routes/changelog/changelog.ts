@@ -31,6 +31,21 @@ export const entries: ChangelogItemGroup[] = [
     year: 2026,
     months: [
       {
+        month: 'April',
+        items: [
+          {
+            notes: [
+              {
+                icon: ICONS.checkCircle,
+                text: `placeholder colorways`,
+                title: 'Added New Yarn: Rosários 4 - Be Cool',
+              },
+            ],
+            version: '5.46.3',
+          },
+        ],
+      },
+      {
         month: 'March',
         items: [
           {
