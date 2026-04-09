@@ -43,6 +43,11 @@ export const entries: ChangelogItemGroup[] = [
               {
                 icon: ICONS.checkCircle,
                 text: `5 colorways added`,
+                title: 'Added Colorways: Stylecraft - Naturals Bamboo + Cotton',
+              },
+              {
+                icon: ICONS.checkCircle,
+                text: `5 colorways added`,
                 title: 'Added Colorways: Stylecraft - Special DK',
               },
               {
