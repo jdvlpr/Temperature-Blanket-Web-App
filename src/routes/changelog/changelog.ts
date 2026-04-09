@@ -37,11 +37,11 @@ export const entries: ChangelogItemGroup[] = [
             notes: [
               {
                 icon: ICONS.checkCircle,
-                text: `placeholder colorways`,
+                text: `41 colorways`,
                 title: 'Added New Yarn: Rosários 4 - Be Cool',
               },
             ],
-            version: '5.46.3',
+            version: '5.47.0',
           },
         ],
       },
