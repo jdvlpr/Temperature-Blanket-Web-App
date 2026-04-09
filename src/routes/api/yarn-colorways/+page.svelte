@@ -312,8 +312,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   </p>
                   <ul class="list-disc pl-8 text-sm">
                     <li>For the <a href="#colorways" class="link">Colorways</a> endpoint, the default behavior of the <span class="code px-2">name</span> parameter is now 'contains' instead of 'exact match'. So for example, a request with <span class="code px-2">?name=blue</span> will now return all colorways with 'blue' in the name, instead of only colorways with the exact name 'blue'.</li>
-                    <li>The <a href="#match" class="link">Find Yarn by Color</a> endpoint also accepts a <span class="code px-2">name</span> parameter to filter the results by colorway name.</li>
-                    <li>The <a href="#colorways" class="link">Colorways</a> and <a href="#match" class="link">Find Yarn by Color</a> endpoints accept an optional <span class="code px-2">exactName</span> parameter for exact matching.</li>
+                    <li>The <a href="#find-yarn-by-color" class="link">Find Yarn by Color</a> endpoint also accepts a <span class="code px-2">name</span> parameter to filter the results by colorway name.</li>
+                    <li>The <a href="#colorways" class="link">Colorways</a> and <a href="#find-yarn-by-color" class="link">Find Yarn by Color</a> endpoints accept an optional <span class="code px-2">exactName</span> parameter for exact matching.</li>
                   </ul>
                   {/if}
 

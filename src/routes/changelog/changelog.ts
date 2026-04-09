@@ -18,10 +18,12 @@ import { ICONS } from '$lib/constants/icon-constants';
 import type { ChangelogItemGroup } from '$lib/types/page-types';
 import {
   CloudCogIcon,
+  CodeIcon,
   GlobeIcon,
   ImageIcon,
   MoonStarIcon,
   RocketIcon,
+  SquareTerminalIcon,
   WrenchIcon,
   YoutubeIcon,
 } from '@lucide/svelte';
@@ -56,7 +58,7 @@ export const entries: ChangelogItemGroup[] = [
                 title: 'Updated colorway names for Stylecraft yarns',
               },
               {
-                icon: ICONS.checkCircle,
+                IconComponent: SquareTerminalIcon,
                 instructions:
                   "<a href='/api/yarn-colorways' class='link'>Read the API Docs</a>",
                 text: 'Introduced v2 of the Yarn Colorways API, adding <span class="code px-1">name</span> and <span class="code px-1">exactName</span> parameters for filtering colorways by name with partial or exact matching.',
