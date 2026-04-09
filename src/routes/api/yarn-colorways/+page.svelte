@@ -14,7 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script module>
-  let selectedVersion = $state({value:'v2'});
+  let selectedVersion = $state({value:'v3'});
 </script>
 
 <script>
@@ -291,7 +291,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <section id="version" class="flex scroll-mt-[58px] flex-col gap-2">
             <h3 class="text-xl font-bold">Choosing a Version</h3>
 
-            <p>Unless you have a specific reason to use a previous version, you should use the latest (v2) version. Selecting a version below will update this page to show the relevant documentation.</p>
+            <p>Unless you have a specific reason to use a previous version, you should use the latest (v3) version. Selecting a version below will update this page to show the relevant documentation.</p>
 
             <label for="version-select" class="label">
               <span class="label-text">API Version</span>
@@ -301,22 +301,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 bind:value={selectedVersion.value}
               >
                 <option value="v1">v1</option>
-                <option value="v2">v2 (Latest)</option>
+                <option value="v2" disabled>v2 (unavailable)</option>
+                <option value="v3">v3 (Latest)</option>
               </select>
             </label>
 
             {#if selectedVersion.value === 'v1'}
                   <p>This is the original version of the API.</p>
-{:else if selectedVersion.value === 'v2'}
-                  <p>This version was introduced on {new Date('2026-04-09').toLocaleDateString()}. Compared to Version 1, the changes are:
+            {:else if selectedVersion.value === 'v3'}
+                  <p>This version was introduced on {new Date('2026-04-09').toLocaleDateString()}. Compared to the previous version, the changes are:
                   </p>
                   <ul class="list-disc pl-8 text-sm">
                     <li>For the <a href="#colorways" class="link">Colorways</a> endpoint, the default behavior of the <span class="code px-2">name</span> parameter is now 'contains' instead of 'exact match'. So for example, a request with <span class="code px-2">?name=blue</span> will now return all colorways with 'blue' in the name, instead of only colorways with the exact name 'blue'.</li>
                     <li>The <a href="#find-yarn-by-color" class="link">Find Yarn by Color</a> endpoint also accepts a <span class="code px-2">name</span> parameter to filter the results by colorway name.</li>
                     <li>The <a href="#colorways" class="link">Colorways</a> and <a href="#find-yarn-by-color" class="link">Find Yarn by Color</a> endpoints accept an optional <span class="code px-2">exactName</span> parameter for exact matching.</li>
                   </ul>
-                  {/if}
-
+              {/if}
           </section>
 
           <section
@@ -450,6 +450,28 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     <td><span class="">Yes</span></td>
                     <td><span class="italic">undefined</span></td>
                   </tr>
+                  {#if selectedVersion.value === 'v3'}
+                    <tr>
+                      <td>name</td>
+                      <td
+                        >A colorway name, or a comma-separated list of colorway
+                        names to filter the results by. Text case is ignored. By default, it performs a partial (containing) match, so for example <span class="code px-2">blue</span> will include 'Royal Blue' and 'Dark Blue'.</td
+                      >
+                      <td>String</td>
+                      <td>No</td>
+                      <td><span class="italic">undefined</span></td>
+                    </tr>
+                    <tr>
+                      <td>exactName</td>
+                      <td
+                        >Set to <span class="code px-2">true</span> to require an
+                        exact match instead of a partial match for the name parameter.</td
+                      >
+                      <td>Boolean</td>
+                      <td>No</td>
+                      <td><span class="code px-2">false</span></td>
+                    </tr>
+                  {/if}
                   <tr>
                     <td>brand</td>
                     <td
@@ -483,28 +505,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     <td>No</td>
                     <td><span class="italic">undefined</span></td>
                   </tr>
-                  {#if selectedVersion.value === 'v2'}
-                    <tr>
-                      <td>name</td>
-                      <td
-                        >A colorway name, or a comma-separated list of colorway
-                        names to filter the results by. Text case is ignored. By default, it performs a partial (containing) match, so for example <span class="code px-2">blue</span> will include 'Royal Blue' and 'Dark Blue'.</td
-                      >
-                      <td>String</td>
-                      <td>No</td>
-                      <td><span class="italic">undefined</span></td>
-                    </tr>
-                    <tr>
-                      <td>exactName</td>
-                      <td
-                        >Set to <span class="code px-2">true</span> to require an
-                        exact match instead of a partial match for the name parameter.</td
-                      >
-                      <td>Boolean</td>
-                      <td>No</td>
-                      <td><span class="code px-2">false</span></td>
-                    </tr>
-                  {/if}
                   <tr>
                     <td>limit</td>
                     <td
@@ -556,7 +556,14 @@ GET https://yarn-colorways.p.rapidapi.com/${selectedVersion.value}/match/green
 GET https://yarn-colorways.p.rapidapi.com/${selectedVersion.value}/match/rgb%28102%2C94%2C63%29
 
 // get matches only from a specified brand and yarn
-GET https://yarn-colorways.p.rapidapi.com/${selectedVersion.value}/match/665e3f?brand=cascade&yarn=anchor_bay${selectedVersion.value === 'v2' ? '\n\n// get matches by name (v2 only)\nGET https://yarn-colorways.p.rapidapi.com/v2/match/665e3f?name=blue' : ''}`}
+GET https://yarn-colorways.p.rapidapi.com/${selectedVersion.value}/match/665e3f?brand=cascade&yarn=anchor_bay`}
+
+{#if selectedVersion.value === 'v3'}
+  {`
+
+// get matches by name
+GET https://yarn-colorways.p.rapidapi.com/v3/match/665e3f?name=blue`}
+{/if}
             </p>
 
             <p class="font-bold">Response</p>
@@ -712,7 +719,7 @@ GET https://yarn-colorways.p.rapidapi.com/${selectedVersion.value}/match/665e3f?
                       <td>No</td>
                       <td><span class="italic">undefined</span></td>
                     </tr>
-                  {:else if selectedVersion.value === 'v2'}
+                  {:else if selectedVersion.value === 'v3'}
                     <tr>
                       <td>name</td>
                       <td
@@ -823,7 +830,7 @@ GET https://yarn-colorways.p.rapidapi.com/${selectedVersion.value}/colorways
 GET https://yarn-colorways.p.rapidapi.com/${selectedVersion.value}/colorways?brand=premire&yarn=afternoon_cotton&sortBy=lightness
 
 // get all colorways with a specified name 
-GET https://yarn-colorways.p.rapidapi.com/${selectedVersion.value}/colorways?name=peach${selectedVersion.value === 'v2' ? '&exactName=true' : ''}`}
+GET https://yarn-colorways.p.rapidapi.com/${selectedVersion.value}/colorways?name=peach`}
             </p>
 
             <p class="font-bold">Response</p>

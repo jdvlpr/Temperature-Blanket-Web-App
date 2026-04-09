@@ -107,8 +107,8 @@ describe('Yarn Colorways API', () => {
   });
 
   // v2 endpoint tests
-  test('Endpoint v2 /colorways', async () => {
-    const response = await fetch(`${BASE_URL}/api/yarn-colorways/v2/colorways`);
+  test('Endpoint v3 /colorways', async () => {
+    const response = await fetch(`${BASE_URL}/api/yarn-colorways/v3/colorways`);
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -121,9 +121,9 @@ describe('Yarn Colorways API', () => {
     expect(data.data[0]).toHaveProperty('yarnWeightId');
   });
 
-  test('Endpoint v2 /colorways?name=blue (partial match)', async () => {
+  test('Endpoint v3 /colorways?name=blue (partial match)', async () => {
     const response = await fetch(
-      `${BASE_URL}/api/yarn-colorways/v2/colorways?name=blue`,
+      `${BASE_URL}/api/yarn-colorways/v3/colorways?name=blue`,
     );
     const data = await response.json();
 
@@ -135,9 +135,9 @@ describe('Yarn Colorways API', () => {
     });
   });
 
-  test('Endpoint v2 /colorways?name=blue&exactName=true (exact match)', async () => {
+  test('Endpoint v3 /colorways?name=blue&exactName=true (exact match)', async () => {
     const response = await fetch(
-      `${BASE_URL}/api/yarn-colorways/v2/colorways?name=blue&exactName=true`,
+      `${BASE_URL}/api/yarn-colorways/v3/colorways?name=blue&exactName=true`,
     );
     const data = await response.json();
 
@@ -149,9 +149,9 @@ describe('Yarn Colorways API', () => {
     });
   });
 
-  test('Endpoint v2 /match/green', async () => {
+  test('Endpoint v3 /match/green', async () => {
     const response = await fetch(
-      `${BASE_URL}/api/yarn-colorways/v2/match/green`,
+      `${BASE_URL}/api/yarn-colorways/v3/match/green`,
     );
     const data = await response.json();
 
@@ -162,9 +162,9 @@ describe('Yarn Colorways API', () => {
     expect(data.data[0]).toHaveProperty('percentMatch');
   });
 
-  test('Endpoint v2 /match/green?name=green (partial match)', async () => {
+  test('Endpoint v3 /match/green?name=green (partial match)', async () => {
     const response = await fetch(
-      `${BASE_URL}/api/yarn-colorways/v2/match/green?name=green`,
+      `${BASE_URL}/api/yarn-colorways/v3/match/green?name=green`,
     );
     const data = await response.json();
 
@@ -176,8 +176,8 @@ describe('Yarn Colorways API', () => {
     });
   });
 
-  test('Endpoint v2 /brands', async () => {
-    const response = await fetch(`${BASE_URL}/api/yarn-colorways/v2/brands`);
+  test('Endpoint v3 /brands', async () => {
+    const response = await fetch(`${BASE_URL}/api/yarn-colorways/v3/brands`);
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -186,8 +186,8 @@ describe('Yarn Colorways API', () => {
     expect(data.data[0]).toHaveProperty('brandId');
   });
 
-  test('Endpoint v2 /yarns', async () => {
-    const response = await fetch(`${BASE_URL}/api/yarn-colorways/v2/yarns`);
+  test('Endpoint v3 /yarns', async () => {
+    const response = await fetch(`${BASE_URL}/api/yarn-colorways/v3/yarns`);
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -196,8 +196,8 @@ describe('Yarn Colorways API', () => {
     expect(data.data[0]).toHaveProperty('yarnId');
   });
 
-  test('Endpoint v2 /weights', async () => {
-    const response = await fetch(`${BASE_URL}/api/yarn-colorways/v2/weights`);
+  test('Endpoint v3 /weights', async () => {
+    const response = await fetch(`${BASE_URL}/api/yarn-colorways/v3/weights`);
     const data = await response.json();
 
     expect(response.status).toBe(200);

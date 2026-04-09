@@ -61,8 +61,8 @@ export const entries: ChangelogItemGroup[] = [
                 IconComponent: SquareTerminalIcon,
                 instructions:
                   "<a href='/api/yarn-colorways' class='link'>Read the API Docs</a>",
-                text: 'Introduced v2 of the Yarn Colorways API, adding <span class="code px-1">name</span> and <span class="code px-1">exactName</span> parameters for filtering colorways by name with partial or exact matching.',
-                title: 'Yarn Colorways API v2',
+                text: 'Introduced v3 of the Yarn Colorways API, adding <span class="code px-1">name</span> and <span class="code px-1">exactName</span> parameters for filtering colorways by name with partial or exact matching.',
+                title: 'Yarn Colorways API v3',
               },
             ],
             version: '5.47.0',
