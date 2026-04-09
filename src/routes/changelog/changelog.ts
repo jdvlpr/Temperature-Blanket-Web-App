@@ -18,7 +18,6 @@ import { ICONS } from '$lib/constants/icon-constants';
 import type { ChangelogItemGroup } from '$lib/types/page-types';
 import {
   CloudCogIcon,
-  CodeIcon,
   GlobeIcon,
   ImageIcon,
   MoonStarIcon,
@@ -35,6 +34,21 @@ export const entries: ChangelogItemGroup[] = [
       {
         month: 'April',
         items: [
+          {
+            notes: [
+              {
+                icon: ICONS.checkCircle,
+                text: `24 colorways`,
+                title: 'Added New Yarn: Stylecraft - Highland Heathers DK',
+              },
+              {
+                icon: ICONS.checkCircle,
+                text: `39 colorways`,
+                title: 'Added New Yarn: Stylecraft - Life DK',
+              },
+            ],
+            version: '5.48.0',
+          },
           {
             notes: [
               {
