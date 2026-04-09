@@ -551,7 +551,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                                       ref: ChooseWeatherSource,
                                     },
                                     options: {
-                                      size: 'medium',
+                                      size: 'small',
                                     },
                                   });
                                 }}>Weather Source</button

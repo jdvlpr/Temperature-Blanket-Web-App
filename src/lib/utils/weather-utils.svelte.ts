@@ -257,7 +257,7 @@ export const getOpenMeteo = async ({
     // Other possible parameters from Open-Meteo, not used
     // dayData.wdir = day.wdir; // Wind Direction degrees (unused)
     // dayData.wspd = day.wspd; // WindSpeed km/hr (unused)
-    // dayData.wpgt = day.wpgt; //T he peak wind gust in km/h (unused)
+    // dayData.wpgt = day.wpgt; // The peak wind gust in km/h (unused)
     // dayData.pres = day.pres; // The average sea-level air pressure in hPa (unused)
     // dayData.tsun = day.tsun; // The daily sunshine total in minutes (m) (unused)
 
