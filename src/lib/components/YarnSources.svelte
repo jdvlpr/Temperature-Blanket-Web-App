@@ -50,7 +50,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     >
       {#each brands as brand}
         {#each brand.yarns as yarn}
-          {@const unavailable = yarn.colorways.some(
+          {@const unavailable = yarn.colorways.every(
             (n) => !!n.source?.unavailable,
           )}
           {@const yarnWeightName = ALL_YARN_WEIGHTS.find(
@@ -71,13 +71,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   >)
                 </span>
               {/if}
-              {#if unavailable}
-                <span class="font-normal"
-                  >[{pluralize('Link', yarn.colorways.length)} Unavailable]
-
-                  <HelpIcon href="/documentation#link-unavailable" /></span
-                >{/if}
             </p>
+            
+            {#if unavailable}
+                <HelpIcon href="/documentation#link-unavailable">
+                  {#snippet text()}
+                    <span class="font-normal"
+                      >Link Unavailable</span
+                    >
+                  {/snippet}
+                </HelpIcon>
+            {/if}
 
             <p>
               {#each yarn.colorways as { source, colors }}

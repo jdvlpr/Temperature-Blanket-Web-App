@@ -15,22 +15,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import { ALL_YARN_WEIGHTS } from '$lib/constants/color-constants';
+  import { brands } from '$lib/data/yarns/brands';
   import { defaultYarn } from '$lib/state/page-state.svelte';
   import { delay } from '$lib/utils/function-utils.svelte';
   import { pluralize } from '$lib/utils/string-utils';
   import { stringToBrandAndYarnDetails } from '$lib/utils/yarn-utils';
-  import { brands } from '$lib/data/yarns/brands';
+  import { yarnBall } from '@lucide/lab';
   import {
     ChevronDownIcon,
     Icon,
-    ListFilterIcon,
-    SpoolIcon,
-    TagsIcon,
-    XIcon,
+    XIcon
   } from '@lucide/svelte';
   import autocomplete from 'autocompleter';
   import { onMount, untrack } from 'svelte';
-  import { yarnBall } from '@lucide/lab';
+  import HelpIcon from './buttons/HelpIcon.svelte';
 
   interface Props {
     selectedBrandId?: string;
@@ -60,6 +58,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let showingAutocomplete = $state(false);
 
   let allYarns = $state(getAllYarns());
+
+  let isSelectedYarnUnavailable = $derived.by(() => {
+    return allYarns.find(
+      (yarn) => yarn.meta.brandId === selectedBrandId && yarn.meta.yarnId === selectedYarnId,
+    )?.meta.unavailable;
+  });
 
   function onSelectedYarnWeightIdChange() {
     if (selectedBrandId || selectedYarnId) {
@@ -160,6 +164,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             }).length,
             totalBrandColorways,
           };
+          
           return {
             group: JSON.stringify(meta),
             meta: {
@@ -170,6 +175,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               numberOfColorways: yarn.colorways.reduce((a, b) => {
                 return a + b.colors.length;
               }, 0),
+              unavailable: !!yarn.colorways.every((colorway) => colorway.source?.unavailable),
             },
           };
         });
@@ -253,9 +259,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
           }
         }
 
-        div.innerHTML = `<div class="inline-block ml-4">
-                            ${yarn} <span class="text-sm opacity-60">(${yarnWeight ? `${yarnWeight}, ` : ''}${item.meta.numberOfColorways.toLocaleString()} colorways)</span>
-                        </div>`;
+        div.innerHTML = `<div class="inline-block ml-4">`;
+        div.innerHTML += `${yarn} <span class="text-sm opacity-60">(${yarnWeight ? `${yarnWeight}, ` : ''}${item.meta.numberOfColorways.toLocaleString()} colorways)</span>`;
+        
+        if (item.meta.unavailable) {
+          div.innerHTML += ` <span class="text-sm italic opacity-60">Link Unavailable</span>`;
+        }
+        
+        div.innerHTML += `</div>`;
         div.dataset.id = `${item.meta.brandId}-${item.meta.yarnId}`;
         div.classList.add('selectable-yarn-list-item');
         return div;
@@ -434,4 +445,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {/if}
   </div>
   <div bind:this={autocompleteContainer} class="text-left"></div>
+  {#if isSelectedYarnUnavailable}
+    <div class="w-fit">
+      <HelpIcon href="/documentation#link-unavailable">
+        {#snippet text()}
+          <span class="font-normal">Link Unavailable</span>
+        {/snippet}
+      </HelpIcon>
+    </div>
+  {/if}
 </div>

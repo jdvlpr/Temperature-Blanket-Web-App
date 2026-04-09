@@ -3,9 +3,10 @@ import type { Colorway } from '$lib/types/yarn-types';
 const colorways: Colorway[] = [
   {
     source: {
-      name: 'stylecraft-yarns.co.uk',
-      href: 'https://www.stylecraft-yarns.co.uk/yarns/naturals-organic-cotton',
       accessed: '2022-03-20',
+      href: 'https://www.stylecraft-yarns.co.uk/yarns/naturals-organic-cotton',
+      name: 'stylecraft-yarns.co.uk',
+      unavailable: '2026-04-09',
     },
     colors: [
       {

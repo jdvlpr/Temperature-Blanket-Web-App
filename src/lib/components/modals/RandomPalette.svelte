@@ -30,6 +30,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     ShuffleIcon,
   } from '@lucide/svelte';
   import SelectYarnWeight from '../SelectYarnWeight.svelte';
+  import HelpIcon from '../buttons/HelpIcon.svelte';
 
   let { numberOfColors, updateGauge } = $props();
 
@@ -106,11 +107,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
       selectedYarnWeightId,
     }),
   );
-  let isYarnUnavailable = $derived(
-    filteredYarnsList
-      ?.filter((n) => n.id === selectedYarnId)[0]
-      ?.colorways.some((colorway) => !!colorway.source?.unavailable),
-  );
 
   $effect(() => {
     selectedBrandId;
@@ -164,17 +160,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <SelectYarnWeight {selectedBrandId} bind:selectedYarnWeightId />
       </div>
     {/key}
-
-    {#if isYarnUnavailable}
-      <div class="order-4 col-span-full w-full">
-        <a href="/documentation#link-unavailable" target="_blank" class="link">
-          Link Unavailable <ExternalLinkIcon
-            size="18"
-            class="relative -top-[2px] inline"
-          />
-        </a>
-      </div>
-    {/if}
 
     <div class="order-5 col-span-full justify-self-start sm:col-span-3">
       <SelectNumberOfColors

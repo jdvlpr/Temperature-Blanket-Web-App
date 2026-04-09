@@ -1662,12 +1662,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <h3 class="text-xl font-bold">Link Unavailable</h3>
 
             <p>
-              A yarn that says Link Unavailable means the webpage from which the
-              colorways were accessed is no longer available. Yarns whos links
-              are unavailable will remain on this web app for legacy purposes,
-              but links to the yarn and its colorways will not work.
+              A yarn that says <span class="italic">Link Unavailable</span> means the webpage from which the
+              colorways were accessed is no longer available.
             </p>
-            <p>A yarn with unavailable links could mean:</p>
+            <p>It could mean:</p>
             <ul class="ml-4">
               <li>- The yarn has been discontinued</li>
               <li>- The yarn has been renamed</li>
@@ -1676,6 +1674,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 longer exist
               </li>
             </ul>
+            <p>Yarns with unavailable links remain on this web app for legacy purposes, but you may not want to use them for new projects.</p>
           </section>
           <h2 class="scroll-mt-[58px] text-2xl font-bold" id="preview">
             Preview

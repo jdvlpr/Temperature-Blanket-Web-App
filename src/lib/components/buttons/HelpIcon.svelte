@@ -16,13 +16,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import { CircleQuestionMarkIcon } from '@lucide/svelte';
 
-  interface Props {
-    href: any;
-    title?: string;
-    text?: import('svelte').Snippet;
-  }
-
-  /** @type {Props} */
   let { href, title = 'Get Help', text } = $props();
 </script>
 
@@ -35,6 +28,5 @@ If not, see <https://www.gnu.org/licenses/>. -->
   class:top-[5px]={!text}
 >
   <CircleQuestionMarkIcon class="relative bottom-[2px] size-5" />
-
   {@render text?.()}
 </a>

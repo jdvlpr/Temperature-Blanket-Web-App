@@ -13,6 +13,8 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
+import type { TISO8601DateString } from './weather-types';
+
 export interface Brand {
   name: string;
   /** snake_case version of the name */
@@ -78,11 +80,11 @@ export interface Colorway {
     name: string;
     href: string;
     /** YYYY-MM-DD date when the colorways were accessed */
-    accessed: string;
+    accessed: TISO8601DateString;
     /** If the href is no longer available or no longer points to the colorways
      * then this is a YYYY-MM-DD date when the href stopped working
      */
-    unavailable?: string;
+    unavailable?: TISO8601DateString;
   };
   colors: Color[];
 }
