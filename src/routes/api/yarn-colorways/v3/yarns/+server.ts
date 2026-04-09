@@ -56,6 +56,9 @@ export async function GET({ url, request }) {
       const colorways = yarn.colorways.reduce((a, b) => {
         return a + b.colors.length;
       }, 0);
+      const isUnavailable = yarn.colorways.every(
+        (c) => !!c.source?.unavailable,
+      );
       return {
         brandId: brand.id,
         brandName: brand.name,
@@ -63,6 +66,10 @@ export async function GET({ url, request }) {
         yarnName: yarn.name,
         yarnWeightId: yarn.weightId,
         colorways,
+        unavailable: isUnavailable || undefined,
+        unavailableDate:
+          (isUnavailable && yarn.colorways[0]?.source?.unavailable) ||
+          undefined,
       };
     });
   });

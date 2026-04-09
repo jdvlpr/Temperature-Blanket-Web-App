@@ -187,6 +187,8 @@ export const ALL_COLORWAYS: Color[] = brands.flatMap((brand) => {
           yarnWeightId: yarn.weightId,
           dateAccessed: colorway.source.accessed,
           href,
+          unavailable: !!colorway.source?.unavailable || undefined,
+          unavailableDate: colorway.source?.unavailable || undefined,
         };
       });
     });

@@ -25,8 +25,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let openTableOfContents = $state(false);
 
-  let isExpanded = $state(false);
-
   // The following animations are optional.
   // These may also be included inline.
   const animBackdrop =
@@ -280,7 +278,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               >
               and
               <a
-                href="https://rapidapi.com/temperature-blanket-temperature-blanket-default/api/yarn-colorways//pricing"
+                href="https://rapidapi.com/temperature-blanket-temperature-blanket-default/api/yarn-colorways/pricing"
                 target="_blank"
                 class="link">subscribe to one of the plans</a
               > to get a key for accessing the Yarn Colorways API. The free plan allows
@@ -315,6 +313,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     <li>For the <a href="#colorways" class="link">Colorways</a> endpoint, the default behavior of the <span class="code px-2">name</span> parameter is now 'contains' instead of 'exact match'. So for example, a request with <span class="code px-2">?name=blue</span> will now return all colorways with 'blue' in the name, instead of only colorways with the exact name 'blue'.</li>
                     <li>The <a href="#find-yarn-by-color" class="link">Find Yarn by Color</a> endpoint also accepts a <span class="code px-2">name</span> parameter to filter the results by colorway name.</li>
                     <li>The <a href="#colorways" class="link">Colorways</a> and <a href="#find-yarn-by-color" class="link">Find Yarn by Color</a> endpoints accept an optional <span class="code px-2">exactName</span> parameter for exact matching.</li>
+                    <li>The <a href="#colorways" class="link">Colorways</a>, <a href="#find-yarn-by-color" class="link">Find Yarn by Color</a>, and <a href="#yarns" class="link">Yarns</a> endpoints now return <span class="code px-2">unavailable</span> and <span class="code px-2">unavailableDate</span> if the <a href="/documentation#link-unavailable" target="_blank" class="link">yarn link is no longer available</a>.</li>
                   </ul>
               {/if}
           </section>
@@ -652,6 +651,18 @@ GET https://yarn-colorways.p.rapidapi.com/v3/match/665e3f?name=blue`}
                     >
                     <td>Number</td>
                   </tr>
+                  {#if selectedVersion.value === 'v3'}
+                    <tr>
+                      <td>unavailable</td>
+                      <td>This property is only returned if the yarn link is no longer available. See <a href="/documentation#link-unavailable" class="link" target="_blank">yarn link unavailable</a> for more information.</td>
+                      <td>Boolean</td>
+                    </tr>
+                    <tr>
+                      <td>unavailableDate</td>
+                      <td>This property is only returned if the yarn link is no longer available. The YYYY-MM-DD date when the colorway's yarn was marked as unavailable. See <a href="/documentation#link-unavailable" class="link" target="_blank">yarn link unavailable</a> for more information.</td>
+                      <td>String</td>
+                    </tr>
+                  {/if}
                 </tbody>
               </table>
             </div>
@@ -902,6 +913,18 @@ GET https://yarn-colorways.p.rapidapi.com/${selectedVersion.value}/colorways?nam
                     <td>The webpage where the colorway was found.</td>
                     <td>String</td>
                   </tr>
+                  {#if selectedVersion.value === 'v3'}
+                    <tr>
+                      <td>unavailable</td>
+                      <td>This property is only returned if the yarn link is no longer available. See <a href="/documentation#link-unavailable" class="link" target="_blank">yarn link unavailable</a> for more information.</td>
+                      <td>Boolean</td>
+                    </tr>
+                    <tr>
+                      <td>unavailableDate</td>
+                      <td>This property is only returned if the yarn link is no longer available. The YYYY-MM-DD date when the colorway's yarn was marked as unavailable. See <a href="/documentation#link-unavailable" class="link" target="_blank">yarn link unavailable</a> for more information.</td>
+                      <td>String</td>
+                    </tr>
+                  {/if}
                 </tbody>
               </table>
             </div>
@@ -1107,6 +1130,18 @@ GET https://yarn-colorways.p.rapidapi.com/${selectedVersion.value}/yarns?brand=b
                     <td>The number of colorways in this yarn.</td>
                     <td>Number</td>
                   </tr>
+                  {#if selectedVersion.value === 'v3'}
+                    <tr>
+                      <td>unavailable</td>
+                      <td>This property is only returned if the yarn link is no longer available. See <a href="/documentation#link-unavailable" class="link" target="_blank">yarn link unavailable</a> for more information.</td>
+                      <td>Boolean</td>
+                    </tr>
+                    <tr>
+                      <td>unavailableDate</td>
+                      <td>This property is only returned if the yarn link is no longer available. The YYYY-MM-DD date when the colorway's yarn was marked as unavailable. See <a href="/documentation#link-unavailable" class="link" target="_blank">yarn link unavailable</a> for more information.</td>
+                      <td>String</td>
+                    </tr>
+                  {/if}
                 </tbody>
               </table>
             </div>
