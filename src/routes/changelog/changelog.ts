@@ -40,6 +40,16 @@ export const entries: ChangelogItemGroup[] = [
                 text: `41 colorways`,
                 title: 'Added New Yarn: Rosários 4 - Be Cool',
               },
+              {
+                icon: ICONS.checkCircle,
+                text: `5 colorways added`,
+                title: 'Added Colorways: Stylecraft - Special DK',
+              },
+              {
+                icon: ICONS.wrench,
+                text: `Colorway names now include the Stylecraft shade value. For example, "White" is now "White 1001"`,
+                title: 'Updated colorway names for Stylecraft yarns',
+              },
             ],
             version: '5.47.0',
           },

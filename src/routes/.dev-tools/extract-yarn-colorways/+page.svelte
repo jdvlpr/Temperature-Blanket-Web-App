@@ -7,6 +7,8 @@
     querySelector: '',
     useElementAttribute: false,
     querySelectorAttribute: '',
+    exclude: false,
+    excludeString: '',
     excludeBefore: false,
     excludeBeforeString: '',
     excludeAfter: false,
@@ -84,16 +86,22 @@
       let name = options.value.useElementAttribute
         ? element.getAttribute(options.value.querySelectorAttribute)
         : element.innerText;
+      // Remove string
+      if (options.value.exclude) name = name.replaceAll(options.value.excludeString, "");
+
+      // Remove everything before string
       if (options.value.excludeBefore)
         name = name.substring(
           name.indexOf(options.value.excludeBeforeString) +
             options.value.excludeBeforeString?.length,
         );
+    
+      // Remove everything after string
       if (options.value.excludeAfter)
-        name = name.substring(
-          0,
-          name.indexOf(options.value.excludeAfterString),
-        );
+      name = name.substring(
+        0,
+        name.indexOf(options.value.excludeAfterString),
+      );
       name = name.toLowerCase(); // lowercase everything
       name = name.replaceAll('\n', ' '); // remove new lines
       name = name.replaceAll('  ', ''); // remove multiple spaces
@@ -179,6 +187,25 @@
                       placeholder="e.g., title, data-name"
                       class="input w-full"
                       bind:value={options.value.querySelectorAttribute}
+                    />
+                  </label>
+                </div>
+              {/if}
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <ToggleSwitch
+                bind:checked={options.value.exclude}
+                label="Exclude"
+              />
+              {#if options.value.exclude}
+                <div class="flex flex-col items-start text-left">
+                  <label class="w-full text-sm">
+                    Exclude
+                    <input
+                      type="text"
+                      class="input w-full"
+                      bind:value={options.value.excludeString}
                     />
                   </label>
                 </div>
