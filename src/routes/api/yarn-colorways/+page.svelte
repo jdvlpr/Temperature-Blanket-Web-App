@@ -13,6 +13,10 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
+<script module>
+  let selectedVersion = $state({value:'v2'});
+</script>
+
 <script>
   import { PUBLIC_BASE_DOMAIN_NAME, PUBLIC_BASE_URL } from '$env/static/public';
   import AppLogo from '$lib/components/AppLogo.svelte';
@@ -20,6 +24,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { Dialog, Portal } from '@skeletonlabs/skeleton-svelte';
 
   let openTableOfContents = $state(false);
+
+  let isExpanded = $state(false);
 
   // The following animations are optional.
   // These may also be included inline.
@@ -77,6 +83,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <li class="toc-list-item ml-4 block">
         <a href="#sign-up" class="toc-anchor opacity-60 hover:opacity-100"
           >Sign Up</a
+        >
+      </li>
+      <li class="toc-list-item ml-4 block">
+        <a href="#version" class="toc-anchor opacity-60 hover:opacity-100"
+          >Choosing a Version</a
         >
       </li>
       <li class="toc-list-item ml-4 block">
@@ -201,6 +212,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             >
               Yarn Colorways API
             </h2>
+            
             <section
               class="card preset-tonal-surface rounded-container mt-2 flex flex-col gap-2 p-4 lg:mt-0"
             >
@@ -243,7 +255,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <h2 class="text-2xl font-bold" id="using-the-api">Using the API</h2>
 
           <section id="sign-up" class="flex scroll-mt-[58px] flex-col gap-2">
-            <h3 class="text-xl font-bold" id="sign-up">Sign Up</h3>
+            <h3 class="text-xl font-bold">Sign Up</h3>
             <p class="first-letter:capitalize">
               {PUBLIC_BASE_DOMAIN_NAME} uses
               <a
@@ -275,16 +287,48 @@ If not, see <https://www.gnu.org/licenses/>. -->
               up to 500 calls per month.
             </p>
           </section>
+
+          <section id="version" class="flex scroll-mt-[58px] flex-col gap-2">
+            <h3 class="text-xl font-bold">Choosing a Version</h3>
+
+            <p>Unless you have a specific reason to use a previous version, you should use the latest (v2) version. Selecting a version below will update this page to show the relevant documentation.</p>
+
+            <label for="version-select" class="label">
+              <span class="label-text">API Version</span>
+              <select
+                id="version-select"
+                class="select w-fit"
+                bind:value={selectedVersion.value}
+              >
+                <option value="v1">v1</option>
+                <option value="v2">v2 (Latest)</option>
+              </select>
+            </label>
+
+            {#if selectedVersion.value === 'v1'}
+                  <p>This is the original version of the API.</p>
+{:else if selectedVersion.value === 'v2'}
+                  <p>This version was introduced on {new Date('2026-04-09').toLocaleDateString()}. Compared to Version 1, the changes are:
+                  </p>
+                  <ul class="list-disc pl-8 text-sm">
+                    <li>For the <a href="#colorways" class="link">Colorways</a> endpoint, the default behavior of the <span class="code px-2">name</span> parameter is now 'contains' instead of 'exact match'. So for example, a request with <span class="code px-2">?name=blue</span> will now return all colorways with 'blue' in the name, instead of only colorways with the exact name 'blue'.</li>
+                    <li>The <a href="#match" class="link">Find Yarn by Color</a> endpoint also accepts a <span class="code px-2">name</span> parameter to filter the results by colorway name.</li>
+                    <li>The <a href="#colorways" class="link">Colorways</a> and <a href="#match" class="link">Find Yarn by Color</a> endpoints accept an optional <span class="code px-2">exactName</span> parameter for exact matching.</li>
+                  </ul>
+                  {/if}
+
+          </section>
+
           <section
-            id="sending-requests"
+            id="making-a-request"
             class="flex scroll-mt-[58px] flex-col gap-2"
           >
-            <h3 class="text-xl font-bold" id="making-a-request">
+            <h3 class="text-xl font-bold">
               Making a Request
             </h3>
             <p>This is the base URL for all endpoints:</p>
             <p class="codeblock code w-fit p-4! break-all whitespace-pre-wrap!">
-              https://yarn-colorways.p.rapidapi.com/v1
+              https://yarn-colorways.p.rapidapi.com/{selectedVersion.value}
             </p>
 
             <p>Include the following headers:</p>
@@ -301,7 +345,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             id="reading-a-response"
             class="flex scroll-mt-[58px] flex-col gap-2"
           >
-            <h3 class="text-xl font-bold" id="reading-a-response">
+            <h3 class="text-xl font-bold">
               Reading a Response
             </h3>
             <p>
@@ -356,7 +400,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             id="find-yarn-by-color"
             class="card bg-surface-200 dark:bg-surface-800 flex scroll-mt-[58px] flex-col gap-2 p-4"
           >
-            <h3 class="text-xl font-bold" id="find-yarn-by-color">
+            <h3 class="text-xl font-bold">
               Find Yarn by Color
             </h3>
             <p>Get best-matching yarn colorways for a specified color.</p>
@@ -439,6 +483,28 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     <td>No</td>
                     <td><span class="italic">undefined</span></td>
                   </tr>
+                  {#if selectedVersion.value === 'v2'}
+                    <tr>
+                      <td>name</td>
+                      <td
+                        >A colorway name, or a comma-separated list of colorway
+                        names to filter the results by. Text case is ignored. By default, it performs a partial (containing) match, so for example <span class="code px-2">blue</span> will include 'Royal Blue' and 'Dark Blue'.</td
+                      >
+                      <td>String</td>
+                      <td>No</td>
+                      <td><span class="italic">undefined</span></td>
+                    </tr>
+                    <tr>
+                      <td>exactName</td>
+                      <td
+                        >Set to <span class="code px-2">true</span> to require an
+                        exact match instead of a partial match for the name parameter.</td
+                      >
+                      <td>Boolean</td>
+                      <td>No</td>
+                      <td><span class="code px-2">false</span></td>
+                    </tr>
+                  {/if}
                   <tr>
                     <td>limit</td>
                     <td
@@ -478,19 +544,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <p class="code w-fit p-4! break-all whitespace-pre-wrap!">
               {`// get colorways matching an HTML hex code without the # hash 
-GET https://yarn-colorways.p.rapidapi.com/v1/match/665e3f 
+GET https://yarn-colorways.p.rapidapi.com/${selectedVersion.value}/match/665e3f 
 
 // get colorways matching a URL encoded HTML hex code #665e3f
-GET https://yarn-colorways.p.rapidapi.com/v1/match/%23665e3f 
+GET https://yarn-colorways.p.rapidapi.com/${selectedVersion.value}/match/%23665e3f 
 
 // get colorways matching a standard HTML color name 
-GET https://yarn-colorways.p.rapidapi.com/v1/match/green 
+GET https://yarn-colorways.p.rapidapi.com/${selectedVersion.value}/match/green 
 
 // get colorways matching a URL encoded RGB color code rgb(102,94,63)
-GET https://yarn-colorways.p.rapidapi.com/v1/match/rgb%28102%2C94%2C63%29
+GET https://yarn-colorways.p.rapidapi.com/${selectedVersion.value}/match/rgb%28102%2C94%2C63%29
 
 // get matches only from a specified brand and yarn
-GET https://yarn-colorways.p.rapidapi.com/v1/match/665e3f?brand=cascade&yarn=anchor_bay`}
+GET https://yarn-colorways.p.rapidapi.com/${selectedVersion.value}/match/665e3f?brand=cascade&yarn=anchor_bay${selectedVersion.value === 'v2' ? '\n\n// get matches by name (v2 only)\nGET https://yarn-colorways.p.rapidapi.com/v2/match/665e3f?name=blue' : ''}`}
             </p>
 
             <p class="font-bold">Response</p>
@@ -588,7 +654,7 @@ GET https://yarn-colorways.p.rapidapi.com/v1/match/665e3f?brand=cascade&yarn=anc
             id="colorways"
             class="card bg-surface-200 dark:bg-surface-800 flex scroll-mt-[58px] flex-col gap-2 p-4"
           >
-            <h3 class="text-xl font-bold" id="colorways">Colorways</h3>
+            <h3 class="text-xl font-bold">Colorways</h3>
             <p>Get yarn colorways.</p>
 
             <p>
@@ -636,13 +702,38 @@ GET https://yarn-colorways.p.rapidapi.com/v1/match/665e3f?brand=cascade&yarn=anc
                     <td>No</td>
                     <td><span class="italic">undefined</span></td>
                   </tr>
-                  <tr>
-                    <td>name</td>
-                    <td>Any colorway name. Text case is ignored.</td>
-                    <td>String</td>
-                    <td>No</td>
-                    <td><span class="italic">undefined</span></td>
-                  </tr>
+                  {#if selectedVersion.value === 'v1'}
+                    <tr>
+                      <td>name</td>
+                      <td
+                        >Any colorway name. Text case is ignored.</td
+                      >
+                      <td>String</td>
+                      <td>No</td>
+                      <td><span class="italic">undefined</span></td>
+                    </tr>
+                  {:else if selectedVersion.value === 'v2'}
+                    <tr>
+                      <td>name</td>
+                      <td
+                        >A colorway name, or a comma-separated list of colorway
+                        names to filter the results by. Text case is ignored. By default, it performs a partial (containing) match, so for example <span class="code px-2">blue</span> will include 'Royal Blue' and 'Dark Blue'.</td
+                      >
+                      <td>String</td>
+                      <td>No</td>
+                      <td><span class="italic">undefined</span></td>
+                    </tr>
+                    <tr>
+                      <td>exactName</td>
+                      <td
+                        >Set to <span class="code px-2">true</span> to require an
+                        exact match instead of a partial match for the name parameter.</td
+                      >
+                      <td>Boolean</td>
+                      <td>No</td>
+                      <td><span class="code px-2">false</span></td>
+                    </tr>
+                  {/if}
                   <tr>
                     <td>brand</td>
                     <td
@@ -726,13 +817,13 @@ GET https://yarn-colorways.p.rapidapi.com/v1/match/665e3f?brand=cascade&yarn=anc
 
             <p class="codeblock code w-fit p-4! break-all whitespace-pre-wrap!">
               {`// get all colorways 
-GET https://yarn-colorways.p.rapidapi.com/v1/colorways
+GET https://yarn-colorways.p.rapidapi.com/${selectedVersion.value}/colorways
 
 // get all colorways from a specified brand and yarn, sorted by lightest-to-darkest 
-GET https://yarn-colorways.p.rapidapi.com/v1/colorways?brand=premire&yarn=afternoon_cotton&sortBy=lightness
+GET https://yarn-colorways.p.rapidapi.com/${selectedVersion.value}/colorways?brand=premire&yarn=afternoon_cotton&sortBy=lightness
 
 // get all colorways with a specified name 
-GET https://yarn-colorways.p.rapidapi.com/v1/colorways?name=peach`}
+GET https://yarn-colorways.p.rapidapi.com/${selectedVersion.value}/colorways?name=peach${selectedVersion.value === 'v2' ? '&exactName=true' : ''}`}
             </p>
 
             <p class="font-bold">Response</p>
@@ -813,7 +904,7 @@ GET https://yarn-colorways.p.rapidapi.com/v1/colorways?name=peach`}
             id="brands"
             class="card bg-surface-200 dark:bg-surface-800 flex scroll-mt-[58px] flex-col gap-2 p-4"
           >
-            <h3 class="text-xl font-bold" id="brands">Brands</h3>
+            <h3 class="text-xl font-bold">Brands</h3>
             <p>
               Get all brand IDs and names, useful to filter <a
                 href="#find-yarn-by-color"
@@ -839,7 +930,7 @@ GET https://yarn-colorways.p.rapidapi.com/v1/colorways?name=peach`}
 
             <p class="codeblock code w-fit p-4! break-all whitespace-pre-wrap!">
               {`// get all brands 
-GET https://yarn-colorways.p.rapidapi.com/v1/brands`}
+GET https://yarn-colorways.p.rapidapi.com/${selectedVersion.value}/brands`}
             </p>
 
             <p class="font-bold">Response</p>
@@ -892,7 +983,7 @@ GET https://yarn-colorways.p.rapidapi.com/v1/brands`}
             id="yarns"
             class="card bg-surface-200 dark:bg-surface-800 flex scroll-mt-[58px] flex-col gap-2 p-4"
           >
-            <h3 class="text-xl font-bold" id="yarns">Yarns</h3>
+            <h3 class="text-xl font-bold">Yarns</h3>
             <p>
               Get all yarn IDs and names, useful to filter <a
                 href="#find-yarn-by-color"
@@ -949,13 +1040,13 @@ GET https://yarn-colorways.p.rapidapi.com/v1/brands`}
 
             <p class="codeblock code w-fit p-4! break-all whitespace-pre-wrap!">
               {`// get all yarns 
-GET https://yarn-colorways.p.rapidapi.com/v1/yarns
+GET https://yarn-colorways.p.rapidapi.com/${selectedVersion.value}/yarns
 
 // filter by brand 
-GET https://yarn-colorways.p.rapidapi.com/v1/yarns?brand=hobbii 
+GET https://yarn-colorways.p.rapidapi.com/${selectedVersion.value}/yarns?brand=hobbii 
 
 // filter by multiple brands 
-GET https://yarn-colorways.p.rapidapi.com/v1/yarns?brand=bernat,loops_and_threads,plymouth_yarn`}
+GET https://yarn-colorways.p.rapidapi.com/${selectedVersion.value}/yarns?brand=bernat,loops_and_threads,plymouth_yarn`}
             </p>
 
             <p class="font-bold">Response</p>
@@ -1018,7 +1109,7 @@ GET https://yarn-colorways.p.rapidapi.com/v1/yarns?brand=bernat,loops_and_thread
             id="yarn-weights"
             class="card bg-surface-200 dark:bg-surface-800 flex scroll-mt-[58px] flex-col gap-2 p-4"
           >
-            <h3 class="text-xl font-bold" id="yarn-weight">Yarn Weights</h3>
+            <h3 class="text-xl font-bold">Yarn Weights</h3>
             <p>
               Get all yarn weight IDs and names, useful to filter <a
                 href="#find-yarn-by-color"
@@ -1044,7 +1135,7 @@ GET https://yarn-colorways.p.rapidapi.com/v1/yarns?brand=bernat,loops_and_thread
 
             <p class="codeblock code w-fit p-4! break-all whitespace-pre-wrap!">
               {`// get all yarn weights 
-GET https://yarn-colorways.p.rapidapi.com/v1/weights`}
+GET https://yarn-colorways.p.rapidapi.com/${selectedVersion.value}/weights`}
             </p>
 
             <p class="font-bold">Response</p>

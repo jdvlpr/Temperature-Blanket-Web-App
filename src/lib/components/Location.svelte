@@ -17,13 +17,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { browser } from '$app/environment';
   import { MONTHS } from '$lib/constants/weather-constants';
   import { safeSlide } from '$lib/features/transitions/safeSlide';
-  import { dialog, toast } from '$lib/state/page-state.svelte';
   import { locations } from '$lib/state/location-state.svelte';
+  import { dialog, toast } from '$lib/state/page-state.svelte';
   import { project } from '$lib/state/project-state.svelte';
   import { weather } from '$lib/state/weather-state.svelte';
   import type {
-    LocationStateType,
-    LocationType,
+    LocationStateType
   } from '$lib/types/location-types';
   import {
     dateToISO8601String,
@@ -47,8 +46,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '@lucide/svelte';
   import {
     Popover,
-    Portal,
-    SegmentedControl,
+    Portal
   } from '@skeletonlabs/skeleton-svelte';
   import autocomplete from 'autocompleter';
   import { onMount } from 'svelte';

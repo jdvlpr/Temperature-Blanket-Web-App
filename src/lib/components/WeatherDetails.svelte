@@ -22,11 +22,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { weather } from '$lib/state/weather-state.svelte';
   import { preferences } from '$lib/storage/preferences.svelte';
   import type { WeatherParam } from '$lib/types/gauge-types';
+  import { getColorInfo, getTextColor } from '$lib/utils/color-utils';
+  import { getIsRecentDate } from '$lib/utils/date-utils';
   import { capitalizeFirstLetter, exists } from '$lib/utils/other-utils';
   import { convertTime } from '$lib/utils/unit-utils.svelte';
-  import { getColorInfo } from '$lib/utils/color-utils';
-  import { getIsRecentDate } from '$lib/utils/date-utils';
-  import { getTextColor } from '$lib/utils/color-utils';
   import { CircleArrowLeftIcon, CircleArrowRightIcon } from '@lucide/svelte';
 
   let {

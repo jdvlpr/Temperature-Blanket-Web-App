@@ -55,6 +55,13 @@ export const entries: ChangelogItemGroup[] = [
                 text: `Colorway names now include the Stylecraft shade value. For example, "White" is now "White 1001"`,
                 title: 'Updated colorway names for Stylecraft yarns',
               },
+              {
+                icon: ICONS.checkCircle,
+                instructions:
+                  "<a href='/api/yarn-colorways' class='link'>Read the API Docs</a>",
+                text: 'Introduced v2 of the Yarn Colorways API, adding <span class="code px-1">name</span> and <span class="code px-1">exactName</span> parameters for filtering colorways by name with partial or exact matching.',
+                title: 'Yarn Colorways API v2',
+              },
             ],
             version: '5.47.0',
           },

@@ -105,4 +105,104 @@ describe('Yarn Colorways API', () => {
   test('"api/*" is not in the excluded routes list', () => {
     expect(routes.exclude).not.toContain('/api/*');
   });
+
+  // v2 endpoint tests
+  test('Endpoint v2 /colorways', async () => {
+    const response = await fetch(`${BASE_URL}/api/yarn-colorways/v2/colorways`);
+    const data = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(data).toHaveProperty('data');
+    expect(data).toHaveProperty('meta');
+    expect(data.data[0]).toHaveProperty('hex');
+    expect(data.data[0]).toHaveProperty('name');
+    expect(data.data[0]).toHaveProperty('brandId');
+    expect(data.data[0]).toHaveProperty('yarnId');
+    expect(data.data[0]).toHaveProperty('yarnWeightId');
+  });
+
+  test('Endpoint v2 /colorways?name=blue (partial match)', async () => {
+    const response = await fetch(
+      `${BASE_URL}/api/yarn-colorways/v2/colorways?name=blue`,
+    );
+    const data = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(data).toHaveProperty('data');
+    // All results should have names containing "blue" (case-insensitive)
+    data.data.forEach((colorway: { name: string }) => {
+      expect(colorway.name.toLowerCase()).toContain('blue');
+    });
+  });
+
+  test('Endpoint v2 /colorways?name=blue&exactName=true (exact match)', async () => {
+    const response = await fetch(
+      `${BASE_URL}/api/yarn-colorways/v2/colorways?name=blue&exactName=true`,
+    );
+    const data = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(data).toHaveProperty('data');
+    // All results should have names exactly equal to "blue" (case-insensitive)
+    data.data.forEach((colorway: { name: string }) => {
+      expect(colorway.name.toLowerCase()).toBe('blue');
+    });
+  });
+
+  test('Endpoint v2 /match/green', async () => {
+    const response = await fetch(
+      `${BASE_URL}/api/yarn-colorways/v2/match/green`,
+    );
+    const data = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(data).toHaveProperty('data');
+    expect(data).toHaveProperty('meta');
+    expect(data.data[0]).toHaveProperty('delta');
+    expect(data.data[0]).toHaveProperty('percentMatch');
+  });
+
+  test('Endpoint v2 /match/green?name=green (partial match)', async () => {
+    const response = await fetch(
+      `${BASE_URL}/api/yarn-colorways/v2/match/green?name=green`,
+    );
+    const data = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(data).toHaveProperty('data');
+    // All results should have names containing "green" (case-insensitive)
+    data.data.forEach((colorway: { name: string }) => {
+      expect(colorway.name.toLowerCase()).toContain('green');
+    });
+  });
+
+  test('Endpoint v2 /brands', async () => {
+    const response = await fetch(`${BASE_URL}/api/yarn-colorways/v2/brands`);
+    const data = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(data).toHaveProperty('data');
+    expect(data).toHaveProperty('meta');
+    expect(data.data[0]).toHaveProperty('brandId');
+  });
+
+  test('Endpoint v2 /yarns', async () => {
+    const response = await fetch(`${BASE_URL}/api/yarn-colorways/v2/yarns`);
+    const data = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(data).toHaveProperty('data');
+    expect(data).toHaveProperty('meta');
+    expect(data.data[0]).toHaveProperty('yarnId');
+  });
+
+  test('Endpoint v2 /weights', async () => {
+    const response = await fetch(`${BASE_URL}/api/yarn-colorways/v2/weights`);
+    const data = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(data).toHaveProperty('data');
+    expect(data).toHaveProperty('meta');
+    expect(data.data[0]).toHaveProperty('id');
+  });
 });
