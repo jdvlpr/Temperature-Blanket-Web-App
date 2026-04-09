@@ -208,7 +208,7 @@ class WeatherClass {
   source: WeatherSourceOptions = $state({
     name: 'Open-Meteo',
     /* In the project URL hash, this is '0' for 'false' or '1' for 'true' */
-    useSecondary: true,
+    useSecondary: false,
     settings: {
       openMeteo: {
         model: 'auto',
