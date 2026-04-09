@@ -478,19 +478,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <p class="code w-fit p-4! break-all whitespace-pre-wrap!">
               {`// get colorways matching an HTML hex code without the # hash 
-  GET https://yarn-colorways.p.rapidapi.com/v1/match/665e3f 
+GET https://yarn-colorways.p.rapidapi.com/v1/match/665e3f 
 
-  // get colorways matching a URL encoded HTML hex code #665e3f
-  GET https://yarn-colorways.p.rapidapi.com/v1/match/%23665e3f 
+// get colorways matching a URL encoded HTML hex code #665e3f
+GET https://yarn-colorways.p.rapidapi.com/v1/match/%23665e3f 
 
-  // get colorways matching a standard HTML color name 
-  GET https://yarn-colorways.p.rapidapi.com/v1/match/green 
+// get colorways matching a standard HTML color name 
+GET https://yarn-colorways.p.rapidapi.com/v1/match/green 
 
-  // get colorways matching a URL encoded RGB color code rgb(102,94,63)
-  GET https://yarn-colorways.p.rapidapi.com/v1/match/rgb%28102%2C94%2C63%29
+// get colorways matching a URL encoded RGB color code rgb(102,94,63)
+GET https://yarn-colorways.p.rapidapi.com/v1/match/rgb%28102%2C94%2C63%29
 
-  // get matches only from a specified brand and yarn
-  GET https://yarn-colorways.p.rapidapi.com/v1/match/665e3f?brand=cascade&yarn=anchor_bay`}
+// get matches only from a specified brand and yarn
+GET https://yarn-colorways.p.rapidapi.com/v1/match/665e3f?brand=cascade&yarn=anchor_bay`}
             </p>
 
             <p class="font-bold">Response</p>
@@ -726,15 +726,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <p class="codeblock code w-fit p-4! break-all whitespace-pre-wrap!">
               {`// get all colorways 
-  GET https://yarn-colorways.p.rapidapi.com/v1/colorways
+GET https://yarn-colorways.p.rapidapi.com/v1/colorways
 
-  // get all colorways from a specified brand and yarn, sorted by lightest-to-darkest 
-  GET https://yarn-colorways.p.rapidapi.com/v1/colorways?brand=premire&yarn=afternoon_cotton&sortBy=lightness
+// get all colorways from a specified brand and yarn, sorted by lightest-to-darkest 
+GET https://yarn-colorways.p.rapidapi.com/v1/colorways?brand=premire&yarn=afternoon_cotton&sortBy=lightness
 
-  // get all colorways with a specified name 
-  GET https://yarn-colorways.p.rapidapi.com/v1/colorways?name=peach
-
-  `}
+// get all colorways with a specified name 
+GET https://yarn-colorways.p.rapidapi.com/v1/colorways?name=peach`}
             </p>
 
             <p class="font-bold">Response</p>
@@ -841,8 +839,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <p class="codeblock code w-fit p-4! break-all whitespace-pre-wrap!">
               {`// get all brands 
-  GET https://yarn-colorways.p.rapidapi.com/v1/brands 
-  `}
+GET https://yarn-colorways.p.rapidapi.com/v1/brands`}
             </p>
 
             <p class="font-bold">Response</p>
@@ -952,14 +949,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <p class="codeblock code w-fit p-4! break-all whitespace-pre-wrap!">
               {`// get all yarns 
-  GET https://yarn-colorways.p.rapidapi.com/v1/yarns
+GET https://yarn-colorways.p.rapidapi.com/v1/yarns
 
-  // filter by brand 
-  GET https://yarn-colorways.p.rapidapi.com/v1/yarns?brand=hobbii 
+// filter by brand 
+GET https://yarn-colorways.p.rapidapi.com/v1/yarns?brand=hobbii 
 
-  // filter by multiple brands 
-  GET https://yarn-colorways.p.rapidapi.com/v1/yarns?brand=bernat,loops_and_threads,plymouth_yarn
-  `}
+// filter by multiple brands 
+GET https://yarn-colorways.p.rapidapi.com/v1/yarns?brand=bernat,loops_and_threads,plymouth_yarn`}
             </p>
 
             <p class="font-bold">Response</p>
@@ -1048,8 +1044,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <p class="codeblock code w-fit p-4! break-all whitespace-pre-wrap!">
               {`// get all yarn weights 
-  GET https://yarn-colorways.p.rapidapi.com/v1/weights
-  `}
+GET https://yarn-colorways.p.rapidapi.com/v1/weights`}
             </p>
 
             <p class="font-bold">Response</p>
