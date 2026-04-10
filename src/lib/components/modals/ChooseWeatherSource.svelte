@@ -81,7 +81,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 </script>
 
-<div class="flex w-full flex-col items-center gap-2 py-2 px-2 sm:px-4 text-left">
+<div class="flex w-full flex-col items-start gap-2 py-2 px-2 sm:px-4 text-left">
   <label class="label">
     <span class="label-text">Choose a Weather Source</span>
     <select class="select" bind:value={sourceName}>
@@ -132,49 +132,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </p>
       </div>
 
-    <p class="font-bold text-xl w-full">Settings</p>
-
-    <div class="flex flex-col gap-2 ">
-      <p class="font-bold">Choose a Model</p>
-
-      {#each OPEN_METEO_MODELS as { value, title, timespan, resolution, details }}
-          <div
-            class={[
-              'rounded-container flex flex-col gap-1 border p-2',
-              openMeteoModel === value && sourceName === 'Open-Meteo'
-                ? 'border-primary-500 bg-primary-100/50 dark:bg-primary-950/30'
-                : 'border-transparent',
-            ]}
-          >
-            <label class="flex items-center gap-2 font-bold">
-              <input
-                type="radio"
-                class="radio flex items-center gap-2"
-                {value}
-                disabled={sourceName !== 'Open-Meteo'}
-                bind:group={openMeteoModel}
-              />
-              {@html title}
-            </label>
-            <div class="ml-4 flex flex-col gap-1 text-sm">
-              <p class="">
-                <ClockIcon class="relative -top-[2px] mr-1 inline size-4" />
-                {timespan}
-              </p>
-              <p class="">
-                <Grid3X3Icon class="relative -top-[2px] mr-1 inline size-4" />
-                {resolution}
-              </p>
-              <p class="">
-                <InfoIcon class="relative -top-[2px] mr-1 inline size-4" />
-                {@html details}
-              </p>
-            </div>
-          </div>
-        {/each}
-      </div>
-
-      {:else if sourceName === 'Meteostat'}
+    {:else if sourceName === 'Meteostat'}
 
       <div class="flex flex-col items-start justify-center w-full text-sm">
         
@@ -230,10 +188,59 @@ If not, see <https://www.gnu.org/licenses/>. -->
         >  All weather data is subject to change if the provider updates their models.
         </p>
       </div>
+    {/if}
+    <div class="">
+    <ToggleSwitch
+      bind:checked={useSecondary}
+      label="If data is not available, automatically try the other weather source."
+    />
+  </div>
 
-    <p class="font-bold text-xl w-full">Settings</p>
+  <p class="font-bold text-xl w-full">Settings</p>
 
-        <div class="mt-2 flex flex-col gap-1 w-full">
+  {#if sourceName === 'Open-Meteo'}
+
+    <div class="flex flex-col gap-2 ">
+      <p class="font-bold">Choose a Model</p>
+
+      {#each OPEN_METEO_MODELS as { value, title, timespan, resolution, details }}
+          <div
+            class={[
+              'rounded-container flex flex-col gap-1 border p-2',
+              openMeteoModel === value && sourceName === 'Open-Meteo'
+                ? 'border-primary-500 bg-primary-100/50 dark:bg-primary-950/30'
+                : 'border-transparent',
+            ]}
+          >
+            <label class="flex items-center gap-2 font-bold">
+              <input
+                type="radio"
+                class="radio flex items-center gap-2"
+                {value}
+                disabled={sourceName !== 'Open-Meteo'}
+                bind:group={openMeteoModel}
+              />
+              {@html title}
+            </label>
+            <div class="ml-4 flex flex-col gap-1 text-sm">
+              <p class="">
+                <ClockIcon class="relative -top-[2px] mr-1 inline size-4" />
+                {timespan}
+              </p>
+              <p class="">
+                <Grid3X3Icon class="relative -top-[2px] mr-1 inline size-4" />
+                {resolution}
+              </p>
+              <p class="">
+                <InfoIcon class="relative -top-[2px] mr-1 inline size-4" />
+                {@html details}
+              </p>
+            </div>
+          </div>
+        {/each}
+      </div>
+      {:else if sourceName === 'Meteostat'}
+      <div class="mt-2 flex flex-col gap-1 w-full">
           <label class="flex items-center gap-2 pb-1 font-bold">
             <input
               type="checkbox"
@@ -248,14 +255,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
             >Substitute missing records with statistically optimized model data.
           </span>
         </div>
-    {/if}
-
-  <div class="py-8">
-    <ToggleSwitch
-      bind:checked={useSecondary}
-      label="Use the other weather source if data is not available from the selected one."
-    />
-  </div>
+{/if}
+      
 </div>
 
 <StickyPart position="bottom">
