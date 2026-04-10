@@ -1,9 +1,10 @@
 import type { Brand } from '$lib/types/yarn-types';
 import { yarn as cottonGold } from './cotton-gold/yarn';
+import { yarn as softyPlus } from './softy-plus/yarn';
 import { yarn as superlandaMidi } from './superlana-midi/yarn';
 
 export const brand: Brand = {
   name: 'Alize',
   id: 'alize',
-  yarns: [cottonGold, superlandaMidi],
+  yarns: [cottonGold, softyPlus, superlandaMidi],
 };

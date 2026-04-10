@@ -38,6 +38,21 @@ export const entries: ChangelogItemGroup[] = [
             notes: [
               {
                 icon: ICONS.checkCircle,
+                text: `35 colorways`,
+                title: 'Added New Yarn: Alize - Softy Plus',
+              },
+              {
+                icon: ICONS.checkCircle,
+                text: `30 colorways`,
+                title: 'Added New Yarn: Knit Picks - Animation',
+              },
+            ],
+            version: '5.49.0',
+          },
+          {
+            notes: [
+              {
+                icon: ICONS.checkCircle,
                 text: `24 colorways`,
                 title: 'Added New Yarn: Stylecraft - Highland Heathers DK',
               },
