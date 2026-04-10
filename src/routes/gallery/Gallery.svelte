@@ -142,48 +142,44 @@ If not, see <https://www.gnu.org/licenses/>. -->
     });
   }
 
-  async function handleSearch(query?: string) {
-    if (query !== undefined) {
-      galleryState.search = query;
-    }
+  let searchTimeout: any;
 
-    projectsList.scrollIntoView({
-      behavior: 'smooth',
-      block: 'start',
-    });
+  function debouncedSearch() {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(async () => {
+      galleryState.projects = [];
+      galleryState.displayedProjects = [];
+      loading = true;
 
-    galleryState.projects = [];
-    galleryState.displayedProjects = [];
-    loading = true;
-
-    const yarnSearch = galleryState.getYarnSearch({
-      brandId: galleryState.filteredBrandId,
-      yarnId: galleryState.filteredYarnId,
-    });
-
-    try {
-      let results = await fetchProjects({
-        search: galleryState.search,
-        order: galleryState.orderBy,
-        yarn: yarnSearch,
-        pattern: galleryState.filteredPatternType,
+      const yarnSearch = galleryState.getYarnSearch({
+        brandId: galleryState.filteredBrandId,
+        yarnId: galleryState.filteredYarnId,
       });
 
-      galleryState.gallery.pageInfo = results.pageInfo;
-      if (galleryState.search) {
-        galleryState.projects = results.edges.flatMap((item) => item.node);
-      } else {
-        galleryState.projects.push(
-          ...results.edges.flatMap((item) => item.node),
-        );
-        galleryState.projects = galleryState.projects;
+      try {
+        let results = await fetchProjects({
+          search: galleryState.search,
+          order: galleryState.orderBy,
+          yarn: yarnSearch,
+          pattern: galleryState.filteredPatternType,
+        });
+
+        galleryState.gallery.pageInfo = results.pageInfo;
+        if (galleryState.search) {
+          galleryState.projects = results.edges.flatMap((item) => item.node);
+        } else {
+          galleryState.projects.push(
+            ...results.edges.flatMap((item) => item.node),
+          );
+          galleryState.projects = galleryState.projects;
+        }
+        galleryState.displayedProjects = getFilteredProjects();
+      } catch (e) {
+        console.error('Search failed:', e);
+      } finally {
+        loading = false;
       }
-      galleryState.displayedProjects = getFilteredProjects();
-    } catch (e) {
-      console.error('Search failed:', e);
-    } finally {
-      loading = false;
-    }
+    }, 500);
   }
 </script>
 
@@ -268,6 +264,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             disabled={loading}
             bind:selectedBrandId={galleryState.filteredBrandId}
             bind:selectedYarnId={galleryState.filteredYarnId}
+            onselectautocomplete={debouncedSearch}
           />
         </div>
 
@@ -278,6 +275,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <ToggleSwitch
               disabled={loading}
               bind:checked={galleryState.palettesContainOnlyFilteredYarn}
+              onchange={debouncedSearch}
               label="Only This {galleryState.filteredBrandId &&
               galleryState.filteredYarnId
                 ? 'Yarn'
@@ -295,21 +293,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <div class="input-group grid-cols-[auto_1fr_auto]">
             <span class="ig-cell"><EarthIcon /></span>
             <input
-              disabled={loading}
               type="text"
               class="ig-input w-full truncate"
               autocomplete="off"
               placeholder="e.g., Kansas, 2003"
               bind:value={galleryState.search}
+              oninput={debouncedSearch}
             />
 
             {#if showSearchReset}
               <button
-                disabled={loading}
                 class="ig-btn hover:preset-tonal-surface"
                 title="Reset Search"
                 onclick={() => {
                   galleryState.search = '';
+                  debouncedSearch();
                 }}
               >
                 <XIcon />
@@ -327,6 +325,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               class="select truncate pl-10"
               id="select-gallery-pattern-type"
               bind:value={galleryState.filteredPatternType}
+              onchange={debouncedSearch}
             >
               <option value="">Any Pattern</option>
               {#each previews.all as { name, wpTagSlug }}
@@ -343,6 +342,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <select
               class="select truncate pl-10"
               bind:value={galleryState.orderBy}
+              onchange={debouncedSearch}
               disabled={loading}
             >
               <option value="DESC" selected>Newest First</option>
@@ -351,22 +351,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <div class="relative flex items-center"></div>
           </div></label
         >
-
-        <div
-          class="col-span-12 flex justify-center {galleryState.filteredBrandId ||
-          galleryState.filteredYarnId
-            ? 'md:col-span-4 md:col-start-5'
-            : 'md:col-span-3 md:col-start-10'}"
-        >
-          <button
-            disabled={loading}
-            class="btn preset-filled flex w-full items-center"
-            onclick={() => handleSearch()}
-          >
-            Search
-            <ChevronRightIcon />
-          </button>
-        </div>
       </div>
     </div>
     <div

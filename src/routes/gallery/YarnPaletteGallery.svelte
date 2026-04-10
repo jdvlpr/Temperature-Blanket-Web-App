@@ -13,7 +13,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script>
+<script lang="ts">
   import ColorPalette from '$lib/components/ColorPalette.svelte';
   import PlaceholderPalettes from '$lib/components/PlaceholderPalettes.svelte';
   import SelectYarn from '$lib/components/SelectYarn.svelte';
@@ -106,6 +106,45 @@ If not, see <https://www.gnu.org/licenses/>. -->
   );
 
   let showSearchReset = $derived(!!yarnPaletteGalleryState.search.length);
+
+  let searchTimeout: any;
+
+  function debouncedSearch() {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(async () => {
+      yarnPaletteGalleryState.projects = [];
+      yarnPaletteGalleryState.palettes = [];
+      loading = true;
+      const yarnSearch = yarnPaletteGalleryState.getYarnSearch({
+        brandId: yarnPaletteGalleryState.filteredBrandId,
+        yarnId: yarnPaletteGalleryState.filteredYarnId,
+      });
+      let results = await fetchProjects({
+        search: yarnPaletteGalleryState.search,
+        order: yarnPaletteGalleryState.orderBy,
+        yarn: yarnSearch,
+      });
+      yarnPaletteGalleryState.gallery.pageInfo = results.pageInfo;
+      if (yarnPaletteGalleryState.search)
+        yarnPaletteGalleryState.projects = results.edges.flatMap(
+          (item) => item.node,
+        );
+      else {
+        yarnPaletteGalleryState.projects.push(
+          ...results.edges.flatMap((item) => item.node),
+        );
+        yarnPaletteGalleryState.projects = yarnPaletteGalleryState.projects;
+      }
+      yarnPaletteGalleryState.palettes = getPalettesFromProjects({
+        projects: yarnPaletteGalleryState.projects,
+        selectedBrandId: yarnPaletteGalleryState.filteredBrandId,
+        selectedYarnId: yarnPaletteGalleryState.filteredYarnId,
+        palettesContainOnlyFilteredYarn:
+          yarnPaletteGalleryState.palettesContainOnlyFilteredYarn,
+      });
+      loading = false;
+    }, 500);
+  }
 
   async function fetchPopularPalettes() {
     let promisePopularPalettes = await fetchPopularProjects({
@@ -252,6 +291,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             disabled={loading}
             bind:selectedBrandId={yarnPaletteGalleryState.filteredBrandId}
             bind:selectedYarnId={yarnPaletteGalleryState.filteredYarnId}
+            onselectautocomplete={debouncedSearch}
           />
         </div>
 
@@ -264,6 +304,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               bind:checked={
                 yarnPaletteGalleryState.palettesContainOnlyFilteredYarn
               }
+              onchange={debouncedSearch}
               label="Only This {yarnPaletteGalleryState.filteredBrandId &&
               yarnPaletteGalleryState.filteredYarnId
                 ? 'Yarn'
@@ -285,17 +326,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
               class="ig-input truncate"
               autocomplete="off"
               placeholder="e.g., Kansas, 2003"
-              disabled={loading}
               bind:value={yarnPaletteGalleryState.search}
+              oninput={debouncedSearch}
             />
 
             {#if showSearchReset}
               <button
-                disabled={loading}
                 class="ig-btn hover:preset-tonal-surface"
                 title="Reset Search"
                 onclick={() => {
                   yarnPaletteGalleryState.search = '';
+                  debouncedSearch();
                 }}
               >
                 <XIcon />
@@ -311,6 +352,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <select
               class="select w-full truncate pl-10"
               bind:value={yarnPaletteGalleryState.orderBy}
+              onchange={debouncedSearch}
               disabled={loading}
             >
               <option value="DESC" selected>Newest First</option>
@@ -318,56 +360,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </select>
           </div>
         </label>
-
-        <div
-          class="col-span-6 flex justify-center md:col-span-2 {yarnPaletteGalleryState.filteredBrandId ||
-          yarnPaletteGalleryState.filteredYarnId
-            ? 'md:col-start-11'
-            : ''}"
-        >
-          <button
-            class="btn preset-filled flex w-full items-center"
-            disabled={loading}
-            onclick={async () => {
-              yarnPaletteGalleryState.projects = [];
-              yarnPaletteGalleryState.palettes = [];
-              loading = true;
-              const yarnSearch = yarnPaletteGalleryState.getYarnSearch({
-                brandId: yarnPaletteGalleryState.filteredBrandId,
-                yarnId: yarnPaletteGalleryState.filteredYarnId,
-              });
-              let results = await fetchProjects({
-                first,
-                search: yarnPaletteGalleryState.search,
-                order: yarnPaletteGalleryState.orderBy,
-                yarn: yarnSearch,
-              });
-              yarnPaletteGalleryState.gallery.pageInfo = results.pageInfo;
-              if (yarnPaletteGalleryState.search)
-                yarnPaletteGalleryState.projects = results.edges.flatMap(
-                  (item) => item.node,
-                );
-              else {
-                yarnPaletteGalleryState.projects.push(
-                  ...results.edges.flatMap((item) => item.node),
-                );
-                yarnPaletteGalleryState.projects =
-                  yarnPaletteGalleryState.projects;
-              }
-              yarnPaletteGalleryState.palettes = getPalettesFromProjects({
-                projects: yarnPaletteGalleryState.projects,
-                selectedBrandId: yarnPaletteGalleryState.filteredBrandId,
-                selectedYarnId: yarnPaletteGalleryState.filteredYarnId,
-                palettesContainOnlyFilteredYarn:
-                  yarnPaletteGalleryState.palettesContainOnlyFilteredYarn,
-              });
-              loading = false;
-            }}
-          >
-            Search
-            <ChevronRightIcon />
-          </button>
-        </div>
       </div>
     </div>
     <div class="my-2 flex w-full flex-col items-start justify-start gap-4">

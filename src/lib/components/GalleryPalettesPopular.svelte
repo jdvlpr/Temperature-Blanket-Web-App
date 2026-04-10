@@ -37,6 +37,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '$lib/utils/project-utils.svelte';
   import { pluralize } from '$lib/utils/string-utils';
   import { getContext, onMount } from 'svelte';
+  import { ClockIcon } from '@lucide/svelte';
 
   let close = $state(null);
   if (typeof getContext === 'function')
@@ -128,12 +129,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <div class="flex flex-wrap items-end justify-center gap-2 pb-4 text-center">
   <label class="label">
-    <span class="label-text">Popular during the past</span>
-    <select
-      class="select mx-auto w-fit min-w-[90px]"
-      id="select-time-period"
-      bind:value={galleryPalettesPopularState.months}
-      onchange={async () => {
+    <span class="label-text">Popular in the last</span>
+    <div class="relative flex w-fit items-center">
+      <ClockIcon class="pointer-events-none absolute left-2" />
+      <select
+        class="select mx-auto w-fit min-w-[100px] truncate pl-10"
+        id="select-time-period"
+        bind:value={galleryPalettesPopularState.months}
+        onchange={async () => {
         loading = true;
         galleryPalettesPopularState.projects = [];
         let results = await fetchPopularProjects({
@@ -148,11 +151,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
           document.getElementsByClassName('content')[0].scrollTop = 0;
       }}
     >
-      <option value={0.0357}>day</option>
-      <option value={0.25}>week</option>
-      <option value={1}>month</option>
-      <option value={12}>year</option>
+      <option value={0.0357}>Day</option>
+      <option value={0.25}>Week</option>
+      <option value={1}>Month</option>
+      <option value={12}>Year</option>
     </select>
+    </div>
   </label>
 </div>
 

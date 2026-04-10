@@ -42,17 +42,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import SelectYarn from '$lib/components/SelectYarn.svelte';
   import Spinner from '$lib/components/Spinner.svelte';
   import { ICONS } from '$lib/constants/icon-constants';
-  import { isDesktop } from '$lib/state/page-state.svelte';
   import { safeSlide } from '$lib/features/transitions/safeSlide';
-  import { fetchProjects, recordPageView } from '$lib/utils/gallery-utils';
+  import { isDesktop } from '$lib/state/page-state.svelte';
   import { getPalettesFromProjects } from '$lib/utils/color-utils';
+  import { fetchProjects, recordPageView } from '$lib/utils/gallery-utils';
   import {
     ArrowUpDownIcon,
-    ChevronRightIcon,
     EarthIcon,
     PlusIcon,
-    SearchIcon,
-    XIcon,
+    XIcon
   } from '@lucide/svelte';
   import { onMount } from 'svelte';
 
@@ -68,6 +66,39 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let loading = $state(true);
   let projectsList = $state();
   let isLoadingMore = $state(false);
+
+  let searchTimeout: any;
+
+  function debouncedSearch() {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(async () => {
+      galleryPalettesState.projects = [];
+      galleryPalettesState.palettes = [];
+      loading = true;
+      const yarnSearch = galleryPalettesState.getYarnSearch({
+        brandId: galleryPalettesState.filteredBrandId,
+        yarnId: galleryPalettesState.filteredYarnId,
+      });
+
+      let results = await fetchProjects({
+        search: galleryPalettesState.search,
+        order: galleryPalettesState.orderBy,
+        yarn: yarnSearch,
+      });
+
+      galleryPalettesState.gallery.pageInfo = results.pageInfo;
+      galleryPalettesState.projects = results.edges.flatMap(
+        (item) => item.node,
+      );
+      galleryPalettesState.palettes = getPalettesFromProjects({
+        projects: galleryPalettesState.projects,
+        selectedBrandId: galleryPalettesState.filteredBrandId,
+        selectedYarnId: galleryPalettesState.filteredYarnId,
+        palettesContainOnlyFilteredYarn: galleryPalettesState.palettesContainOnlyFilteredYarn,
+      });
+      loading = false;
+    }, 500);
+  }
 
   onMount(async () => {
     if (!galleryPalettesState.projects.length) {
@@ -117,6 +148,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           disabled={loading}
           bind:selectedBrandId={galleryPalettesState.filteredBrandId}
           bind:selectedYarnId={galleryPalettesState.filteredYarnId}
+          onselectautocomplete={debouncedSearch}
           context="modal"
         />
       </div>
@@ -128,6 +160,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <ToggleSwitch
             disabled={loading}
             bind:checked={galleryPalettesState.palettesContainOnlyFilteredYarn}
+            onchange={debouncedSearch}
             label="Only This {galleryPalettesState.filteredBrandId &&
             galleryPalettesState.filteredYarnId
               ? 'Yarn'
@@ -150,18 +183,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
             type="text"
             class="ig-input w-full truncate"
             autocomplete="off"
-            disabled={loading}
             placeholder="e.g., Kansas, 2003"
             bind:value={galleryPalettesState.search}
+            oninput={debouncedSearch}
           />
 
           {#if showSearchReset}
             <button
-              disabled={loading}
               class="ig-btn hover:preset-tonal-surface"
               title="Reset Search"
               onclick={() => {
                 galleryPalettesState.search = '';
+                debouncedSearch();
               }}
             >
               <XIcon />
@@ -177,6 +210,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <select
             class="select truncate pl-10"
             bind:value={galleryPalettesState.orderBy}
+            onchange={debouncedSearch}
             disabled={loading}
           >
             <option value="DESC" selected>Newest First</option>
@@ -184,61 +218,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </select>
         </div>
       </label>
-
-      <div
-        class="col-span-12 flex w-full justify-center md:col-span-2 {galleryPalettesState.filteredBrandId ||
-        galleryPalettesState.filteredYarnId
-          ? 'md:col-start-11'
-          : ''}"
-      >
-        <button
-          disabled={loading}
-          class="btn preset-filled flex w-full items-center"
-          onclick={async () => {
-            projectsList.scrollIntoView({
-              behavior: 'smooth',
-              block: 'start',
-            });
-            galleryPalettesState.projects = [];
-            galleryPalettesState.palettes = [];
-            loading = true;
-            const yarnSearch = galleryPalettesState.getYarnSearch({
-              brandId: galleryPalettesState.filteredBrandId,
-              yarnId: galleryPalettesState.filteredYarnId,
-            });
-
-            let results = await fetchProjects({
-              search: galleryPalettesState.search,
-              order: galleryPalettesState.orderBy,
-              yarn: yarnSearch,
-            });
-
-            if (galleryPalettesState.search) {
-              galleryPalettesState.gallery.pageInfo = results.pageInfo;
-              galleryPalettesState.projects = results.edges.flatMap(
-                (item) => item.node,
-              );
-            } else {
-              galleryPalettesState.gallery.pageInfo = results.pageInfo;
-              galleryPalettesState.projects.push(
-                ...results.edges.flatMap((item) => item.node),
-              );
-              galleryPalettesState.projects = galleryPalettesState.projects;
-            }
-            galleryPalettesState.palettes = getPalettesFromProjects({
-              projects: galleryPalettesState.projects,
-              selectedBrandId: galleryPalettesState.filteredBrandId,
-              selectedYarnId: galleryPalettesState.filteredYarnId,
-              palettesContainOnlyFilteredYarn:
-                galleryPalettesState.palettesContainOnlyFilteredYarn,
-            });
-            loading = false;
-          }}
-        >
-          Search
-          <ChevronRightIcon />
-        </button>
-      </div>
     </div>
   {/if}
 </div>
