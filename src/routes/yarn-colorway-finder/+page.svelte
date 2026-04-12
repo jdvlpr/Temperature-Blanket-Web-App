@@ -591,19 +591,29 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             {#if results?.length && !loadingAllColors}
               <div
-                class="rounded-container my-4 w-full justify-center gap-1 overflow-hidden {layout ===
+                class="rounded-container my-4 w-full justify-center gap-2 {layout ===
                 'grid'
                   ? 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5'
                   : 'flex flex-col'}"
               >
                 {#each results as { hex, name, delta, brandName, yarnName, variant_href, affiliate_variant_href, unavailable }}
                   {@const percentMatch = Math.floor(100 - delta)}
+                  <!-- svelte-ignore a11y_click_events_have_key_events -->
+                  <!-- svelte-ignore a11y_no_static_element_interactions -->
                   <div
-                    class="rounded-container flex min-w-fit flex-1 items-center gap-x-2 p-2 shadow-sm {layout ===
+                    class="rounded-container flex min-w-fit flex-1 items-center gap-x-2 p-2 shadow-sm transition-transform hover:scale-[1.02] hover:z-10 relative active:scale-95 cursor-pointer {layout ===
                     'grid'
                       ? 'justify-center'
                       : ''}"
                     style="background:{hex}; color:{getTextColor(hex)};"
+                    onclick={() => {
+                      window.navigator.clipboard.writeText(name);
+                      toast.trigger({
+                        message: `<span class="font-bold">${name}</span> copied`,
+                        category: 'success',
+                      });
+                    }}
+                    title="Copy {name} to clipboard"
                   >
                     <!-- <div class={layout === "grid" ? "" : "md:w-2/5"}></div> -->
                     <div class="min-h-[43px] min-w-[43px]">
@@ -616,6 +626,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                             href={affiliate_variant_href}
                             target="_blank"
                             rel="noopener noreferrer"
+                            onclick={(e) => e.stopPropagation()}
                           >
                             <ShoppingCartIcon />
                           </a>
@@ -627,6 +638,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                             target="_blank"
                             rel="noopener noreferrer"
                             title="Open link to this yarn colorway"
+                            onclick={(e) => e.stopPropagation()}
                           >
                             <ExternalLinkIcon />
                           </a>
@@ -634,40 +646,35 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       {/if}
                     </div>
                     <div class="flex flex-col items-start gap-1 text-pretty">
-                      <span class="text-left text-xs">
+                      <span class="text-left text-xs pointer-events-none">
                         {brandName} - {yarnName}
                       </span>
 
-                      <button
-                        class="text-left text-lg leading-tight"
-                        aria-label="Copy {name} to clipboard"
-                        title="Copy {name} to clipboard"
-                        onclick={() => {
-                          window.navigator.clipboard.writeText(name);
-                          toast.trigger({
-                            message: `<span class="font-bold">${name}</span> copied`,
-                            category: 'success',
-                          });
-                        }}>{name}</button
-                      >
+                      <span class="text-left text-lg leading-tight pointer-events-none">
+                        {name}
+                      </span>
 
                       {#if percentMatch}
-                        <p class="text-xs">
+                        <p class="text-xs pointer-events-none">
                           {percentMatch}% Match
                         </p>
                       {/if}
 
-                      <button
-                        class="text-xs select-all"
+                      <!-- svelte-ignore a11y_click_events_have_key_events -->
+                      <span
+                        role="button"
+                        tabindex="0"
+                        class="text-xs select-all hover:opacity-80"
                         aria-label="Copy {hex} to clipboard"
                         title="Copy {hex} to clipboard"
-                        onclick={() => {
+                        onclick={(e) => {
+                          e.stopPropagation();
                           window.navigator.clipboard.writeText(hex);
                           toast.trigger({
                             message: `<span class="font-bold">${hex}</span> copied`,
                             category: 'success',
                           });
-                        }}>{hex}</button
+                        }}>{hex}</span
                       >
                     </div>
                   </div>
