@@ -562,12 +562,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 class="w-full items-center gap-2 p-2 max-xl:flex max-xl:flex-col max-xl:justify-center xl:grid xl:grid-cols-12"
                 style="background:{hex};color:{getTextColor(hex)}"
               >
-                <p class="col-span-2 text-xs">
-                  Color {index + 1}
+                <p class="col-span-1 text-xs">
+                  {index + 1}
                 </p>
 
                 <div
-                  class="col-span-4 col-start-3 flex min-w-[220px] flex-wrap items-start gap-2 max-xl:justify-center xl:justify-start"
+                  class="col-span-4 col-start-2 flex min-w-[220px] flex-wrap items-start gap-2 max-xl:justify-center xl:justify-start"
                 >
                   <label
                     class="label flex w-fit flex-col items-start justify-start"
@@ -659,7 +659,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 </div>
 
                 <div
-                  class="col-span-6 col-start-7 flex flex-wrap justify-center gap-2"
+                  class="col-span-7 col-start-6 flex flex-wrap justify-center gap-2"
                 >
                   <DaysInRange
                     range={_gauge.ranges[index]}

@@ -14,6 +14,7 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { MediaQuery } from 'svelte/reactivity';
+import type { Component } from 'svelte';
 
 type DialogOptions = {
   showCloseButton?: boolean;
@@ -117,6 +118,8 @@ export interface ToastSettings {
   classes?: string;
   /** Category of the toast. */
   category?: 'success' | 'error' | 'warning' | null;
+  /** Custom Icon Component */
+  icon?: Component;
   /** Callback function that fires on trigger and close. */
   callback?: (response: { id: string; status: 'queued' | 'closed' }) => void;
 }

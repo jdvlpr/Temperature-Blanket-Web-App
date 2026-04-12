@@ -186,7 +186,13 @@
             ]}
             data-testid="toast"
           >
-            {#if t.category === 'success'}
+            {#if t.icon}
+              {@const CustomIcon = t.icon as any}
+              <div class="flex items-center justify-between gap-4 text-base">
+                <CustomIcon class="inline" />
+                {@html t.message}
+              </div>
+            {:else if t.category === 'success'}
               <div class="flex items-center justify-between gap-4 text-base">
                 <CircleCheckIcon class="inline" />
                 {@html t.message}

@@ -63,6 +63,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     ArrowDownWideNarrowIcon,
     ChevronDownIcon,
     CircleQuestionMarkIcon,
+    ClipboardCheckIcon,
     ExternalLinkIcon,
     PlusIcon,
     SearchIcon,
@@ -609,8 +610,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     onclick={() => {
                       window.navigator.clipboard.writeText(name);
                       toast.trigger({
-                        message: `<span class="font-bold">${name}</span> copied`,
+                        message: `<div class="flex flex-col"><span class="font-bold">${name}</span><span class="text-xs">Copied to clipboard</span></div>`,
                         category: 'success',
+                        icon: ClipboardCheckIcon
                       });
                     }}
                     title="Copy {name} to clipboard"
@@ -671,8 +673,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
                           e.stopPropagation();
                           window.navigator.clipboard.writeText(hex);
                           toast.trigger({
-                            message: `<span class="font-bold">${hex}</span> copied`,
+                            message: `<div class="flex flex-col"><span class="font-bold">${hex}</span><span class="text-xs">Copied to clipboard</span></div>`,
                             category: 'success',
+                            icon: ClipboardCheckIcon
                           });
                         }}>{hex}</span
                       >
