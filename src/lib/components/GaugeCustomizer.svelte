@@ -41,7 +41,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   const flipDurationMs = 150;
 
-  const isProjectPlannerPage = page.route.id === '/';
+  const isProjectPlannerPage = page.url.pathname === '/';
 
   let { gauge = $bindable() } = $props();
 
