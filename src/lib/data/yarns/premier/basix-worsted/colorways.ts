@@ -5,7 +5,7 @@ const colorways: Colorway[] = [
     source: {
       name: 'premieryarns.com',
       href: 'https://www.premieryarns.com/products/pbasix',
-      accessed: '2023-10-16',
+      accessed: '2026-04-17',
     },
     colors: [
       {
@@ -343,6 +343,70 @@ const colorways: Colorway[] = [
       {
         hex: '#3e261e',
         name: 'Mahogany',
+      },
+      {
+        hex: '#e8b840',
+        name: 'Sunny',
+      },
+      {
+        hex: '#d73424',
+        name: 'Bright Orange',
+      },
+      {
+        hex: '#2b0e16',
+        name: 'Merlot',
+      },
+      {
+        hex: '#b25b9d',
+        name: 'Orchid',
+      },
+      {
+        hex: '#671b37',
+        name: 'Rouge',
+      },
+      {
+        hex: '#462b74',
+        name: 'Dark Purple',
+      },
+      {
+        hex: '#8ba4d3',
+        name: 'Carolina Sky',
+      },
+      {
+        hex: '#293574',
+        name: 'Twilight',
+      },
+      {
+        hex: '#8a93c1',
+        name: 'Powder Blue',
+      },
+      {
+        hex: '#57516a',
+        name: 'Cadet',
+      },
+      {
+        hex: '#295f9f',
+        name: 'Blue',
+      },
+      {
+        hex: '#9ea97f',
+        name: 'Celery',
+      },
+      {
+        hex: '#aaab8f',
+        name: 'Artichoke',
+      },
+      {
+        hex: '#a7c59f',
+        name: 'Mint',
+      },
+      {
+        hex: '#2d663b',
+        name: 'Holly',
+      },
+      {
+        hex: '#657f73',
+        name: 'Thyme',
       },
     ],
   },

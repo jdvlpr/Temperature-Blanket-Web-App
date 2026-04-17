@@ -38,6 +38,16 @@ export const entries: ChangelogItemGroup[] = [
             notes: [
               {
                 icon: ICONS.checkCircle,
+                text: `16 colorways`,
+                title: 'Added Colorways: Premier - Basix Worsted',
+              },
+            ],
+            version: '5.50.0',
+          },
+          {
+            notes: [
+              {
+                icon: ICONS.checkCircle,
                 text: `35 colorways`,
                 title: 'Added New Yarn: Alize - Softy Plus',
               },
