@@ -817,8 +817,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <p>
               Temperature-blanket.com provides several options from where to get
               weather data. To change the weather source settings, press the
-              Weather Source button Weather tab or in the
-              Project Menu.
+              Weather Source button in the Weather tab or Project Menu.
             </p>
             <ul class="flex flex-col gap-4">
               <li class="flex flex-col gap-1">
