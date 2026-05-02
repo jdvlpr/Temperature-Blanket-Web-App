@@ -150,6 +150,4 @@ If not, see <https://www.gnu.org/licenses/>. -->
       You've added the maximum allowed number of locations
     </p>
   {/if}
-
-  <WeatherSourceButton />
 </div>

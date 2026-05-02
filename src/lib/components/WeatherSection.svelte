@@ -156,7 +156,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <div class="flex w-full flex-col items-center justify-center gap-2">
   <div class="flex w-full flex-wrap items-center justify-center gap-x-4 px-2">
-    <div class="flex flex-wrap items-center justify-center gap-2">
+    <div class="flex flex-wrap items-center justify-center gap-2 mt-2">
       <WeatherSourceButton />
 
       <UnitChanger />
