@@ -38,6 +38,16 @@ export const entries: ChangelogItemGroup[] = [
             notes: [
               {
                 icon: ICONS.checkCircle,
+                text: `14 colorways`,
+                title: 'Added New Yarn: Loops & Threads - Luxe Merino',
+              },
+              {
+                icon: ICONS.checkCircle,
+                text: `20 colorways`,
+                title: 'Added New Yarn: Loops & Threads - Superwash Merino',
+              },
+              {
+                icon: ICONS.checkCircle,
                 text: `80 colorways`,
                 title: 'Added New Yarn: Scheepjes - Metropolis',
               },
