@@ -17,11 +17,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { PUBLIC_BASE_DOMAIN_NAME, PUBLIC_BASE_URL } from '$env/static/public';
   import AppLogo from '$lib/components/AppLogo.svelte';
   import AppShell from '$lib/components/AppShell.svelte';
+  import Expand from '$lib/components/Expand.svelte';
   import { safeSlide } from '$lib/features/transitions/safeSlide';
   import { ChevronDownIcon, CircleQuestionMarkIcon } from '@lucide/svelte';
   import { Accordion } from '@skeletonlabs/skeleton-svelte';
 
   let value = $state(['club']);
+
+  let isExpandedRevealInstructions = $state(false);
 </script>
 
 <svelte:head>
@@ -359,6 +362,46 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       You can try changing the dates: select a different year, or
                       make sure no days are in the future. If that doesn’t work, try
                       searching for a different nearby location.
+                    </div>
+                  {/if}
+                {/snippet}
+              </Accordion.ItemContent>
+            </Accordion.Item>
+            <Accordion.Item value="specific-date-over-multiple-years">
+              <Accordion.ItemTrigger
+                class="flex items-center justify-between gap-2"
+              >
+                <div class="flex items-center gap-2">
+                  <CircleQuestionMarkIcon />
+
+                  <p class="font-bold">
+                    How can I make a temperature blanket project with a specific date over multiple years?
+                  </p>
+                </div>
+
+                <Accordion.ItemIndicator class="group">
+                  <ChevronDownIcon
+                    class="h-5 w-5 transition group-data-[state=open]:rotate-180"
+                  />
+                </Accordion.ItemIndicator>
+              </Accordion.ItemTrigger>
+
+              <Accordion.ItemContent>
+                {#snippet element(attributes)}
+                  {#if !attributes.hidden}
+                    <div {...attributes} transition:safeSlide>
+                      <p class="mb-2">This web app isn't designed for this specific use-case, so <span class="font-bold text-warning-600-400">it's not recommended</span>. There is a way you can do it, but it is a tedious process, and you may experience performance issues when searching for weather data. That being said, press <span class="italic">Reveal Instructions</span> below to see how you would go about making a project with a specific date over multiple years (e.g. a blanket showing weather data for March 10 from 1942 to 2026) using the Project Planner on this web app.
+                      </p>
+                      <Expand bind:isExpanded={isExpandedRevealInstructions} label="Reveal Instructions" />
+                      {#if isExpandedRevealInstructions}
+                      <ol class="ml-8 mt-2 list-decimal">
+                        <li>Enter and select your location, then for the location's duration, choose <span class="italic">Custom</span>.</li>
+                        <li>Set the <span class="italic">From</span> and <span class="italic">To</span> dates to the first date you want to use (e.g. both fields would be set to March 10, 1942, for only one day of weather data).</li>
+                        <li>Press <span class="italic">Add Location</span>.</li>
+                        <li>Enter and select the same location, then repeat steps 2-3 for each year you want to include in your project, changing the <span class="italic">From</span> and <span class="italic">To</span> dates to the same date in the following year.</li>
+                        <li>Once you've added a new location for each year, you can proceed with the rest of the Project Planner as usual. Make sure to save your project so you don't have to set up all the locations again.</li>
+                      </ol>
+                      {/if}
                     </div>
                   {/if}
                 {/snippet}
