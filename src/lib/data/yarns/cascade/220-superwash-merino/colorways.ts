@@ -5,7 +5,7 @@ const colorways: Colorway[] = [
     source: {
       name: 'cascadeyarns.com',
       href: 'https://www.cascadeyarns.com/product/220-superwash-merino',
-      accessed: '2024-01-06',
+      accessed: '2025-05-07',
     },
     colors: [
       {
@@ -447,6 +447,46 @@ const colorways: Colorway[] = [
       {
         hex: '#3d1b23',
         name: 'Burgundy',
+      },
+      {
+        hex: '#808c8d',
+        name: 'Silver Blue',
+      },
+      {
+        hex: '#312a23',
+        name: 'Bitter Chocolate',
+      },
+      {
+        hex: '#b09363',
+        name: 'Camel',
+      },
+      {
+        hex: '#b62670',
+        name: 'Highlighter Pink',
+      },
+      {
+        hex: '#df5044',
+        name: 'Highlighter Tangelo',
+      },
+      {
+        hex: '#c7d566',
+        name: 'Highlighter Yellow',
+      },
+      {
+        hex: '#60b952',
+        name: 'Highlighter Green',
+      },
+      {
+        hex: '#3a83b2',
+        name: 'Highlighter Turquoise',
+      },
+      {
+        hex: '#2047b1',
+        name: 'Highlighter Blue',
+      },
+      {
+        hex: '#4f3cb1',
+        name: 'Highlighter Grape',
       },
     ],
   },

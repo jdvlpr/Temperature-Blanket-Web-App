@@ -305,7 +305,16 @@
                     hex,
                   )};width:{options.value.columnWidth}px"
                 >
-                  <p class="text-sm">{index + 1}</p>
+                  <div class="flex items-center gap-2">
+                    <p class="text-sm">{index + 1}</p>
+                    {#if options.value.mergeWithExistingColors && options.value.selectedYarn.brandId && options.value.selectedYarn.yarnId}
+                      {#if !existingColorways.some((ec) => ec.name.toLowerCase() === name.toLowerCase())}
+                        <span class="badge bg-primary-500 uppercase text-[10px]"
+                          >new</span
+                        >
+                      {/if}
+                    {/if}
+                  </div>
                   <div
                     contenteditable="true"
                     bind:innerHTML={options.value.names[index].name}

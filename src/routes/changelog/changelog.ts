@@ -41,6 +41,11 @@ export const entries: ChangelogItemGroup[] = [
                 text: `80 colorways`,
                 title: 'Added New Yarn: Scheepjes - Metropolis',
               },
+              {
+                icon: ICONS.checkCircle,
+                text: `10 colorways`,
+                title: 'Added Colorways: Cascade Yarns - 220 Superwash Merino',
+              },
             ],
             version: '5.51.0',
           },
