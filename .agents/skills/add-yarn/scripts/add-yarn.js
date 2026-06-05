@@ -1,7 +1,10 @@
 #!/usr/bin/env node
 
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // Helper to convert strings to snake_case
 function toSnakeCase(str) {
@@ -94,7 +97,7 @@ async function main() {
     fs.mkdirSync(yarnDir, { recursive: true });
     console.log(`✓ Created directory: ${yarnDir}`);
 
-    // Create colorways.ts
+    // Create colorways.ts — always uses 2 placeholder colorways (update manually after)
     const sourceName = extractDomain(sourceHref);
     const colorwaysContent = `import type { Colorway } from '$lib/types/yarn-types';
 
@@ -171,45 +174,40 @@ export const yarn: Yarn = {
         brandYarnsContent = brandYarnsContent.slice(0, lineEnd) + '\n' + newImport + brandYarnsContent.slice(lineEnd);
       }
 
-      // Find the export array and add the new yarn in alphabetical order
-      const exportMatch = brandYarnsContent.match(/export\s+const\s+brand:\s+Brand\s*=\s*{[\s\S]*?};/);
-      if (exportMatch) {
-        const exportBlock = exportMatch[0];
-        const yarnsArrayMatch = exportBlock.match(/yarns:\s*\[\s*([\s\S]*?)\s*\]/);
-        if (yarnsArrayMatch) {
-          const yarnsArrayContent = yarnsArrayMatch[1];
-          const yarnRefs = yarnsArrayContent.match(/\b\w+\b(?=\s*[,\]])/g) || [];
+      // Find the yarns array and add the new yarn in alphabetical order
+      const yarnsArrayMatch = brandYarnsContent.match(/yarns:\s*\[([^\]]*)\]/);
+      if (yarnsArrayMatch) {
+        const fullMatch = yarnsArrayMatch[0];
+        const yarnsArrayContent = yarnsArrayMatch[1];
+        const yarnRefs = (yarnsArrayContent.match(/\b\w+\b/g) || []).filter(r => r !== 'yarns');
 
-          // Find insertion point alphabetically
-          let insertPoint = null;
-          for (let i = 0; i < yarnRefs.length; i++) {
-            const ref = yarnRefs[i];
-            // Convert camelCase back to compare
-            const refSnake = ref.replace(/([A-Z])/g, '_$1').toLowerCase().replace(/^_/, '');
-            if (refSnake < yarnSnake && (insertPoint === null || refSnake > insertPoint)) {
-              insertPoint = ref;
-            }
+        // Find insertion point alphabetically
+        let insertAfterRef = null;
+        for (const ref of yarnRefs) {
+          const refSnake = ref.replace(/([A-Z])/g, '_$1').toLowerCase().replace(/^_/, '');
+          if (refSnake < yarnSnake) {
+            insertAfterRef = ref;
           }
-
-          let newYarnsArray;
-          if (insertPoint) {
-            // Insert after insertPoint
-            const insertAfterLine = `    ${insertPoint},`;
-            newYarnsArray = yarnsArrayContent.replace(insertAfterLine, `${insertAfterLine}\n    ${yarnCamel},`);
-          } else if (yarnRefs.length > 0 && yarnSnake < yarnRefs[0]) {
-            // Insert at beginning
-            const firstYarn = yarnRefs[0];
-            const firstYarnLine = `    ${firstYarn},`;
-            newYarnsArray = yarnsArrayContent.replace(firstYarnLine, `    ${yarnCamel},\n${firstYarnLine}`);
-          } else {
-            // Append at end
-            newYarnsArray = yarnsArrayContent.trimEnd() + `,\n    ${yarnCamel},`;
-          }
-
-          const oldYarnsArray = `yarns: [\n${yarnsArrayContent}\n  ]`;
-          const newExport = `yarns: [\n${newYarnsArray}\n  ]`;
-          brandYarnsContent = brandYarnsContent.replace(oldYarnsArray, newExport);
         }
+
+        let newYarnsArray;
+        if (insertAfterRef) {
+          // Insert after insertAfterRef
+          newYarnsArray = yarnsArrayContent.replace(
+            new RegExp(`\\b${insertAfterRef}\\b`),
+            `${insertAfterRef}, ${yarnCamel}`
+          );
+        } else if (yarnRefs.length > 0) {
+          // Insert at beginning
+          newYarnsArray = yarnsArrayContent.replace(
+            new RegExp(`\\b${yarnRefs[0]}\\b`),
+            `${yarnCamel}, ${yarnRefs[0]}`
+          );
+        } else {
+          newYarnsArray = ` ${yarnCamel} `;
+        }
+
+        brandYarnsContent = brandYarnsContent.replace(fullMatch, `yarns: [${newYarnsArray}]`);
       }
 
       fs.writeFileSync(brandYarnsFile, brandYarnsContent);
@@ -288,11 +286,11 @@ export const yarn: Yarn = {
     const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
     const currentMonth = monthNames[now.getMonth()];
 
-    // Create new entry
+    // Create new entry — always 2 placeholder colorways; update manually after adding real colors
     const newEntry = `              {
                 icon: ICONS.checkCircle,
-                text: \`Add yarn details (colorway count)\`,
-                title: 'Added New Yarn: ${brandName} - ${yarnName}',
+                text: \`2 colorways\`,
+                title: 'Added New Yarn: ${brandNameArg} - ${yarnName}',
               },`;
 
     // Find the current month's items array and insert before the closing bracket
@@ -308,7 +306,6 @@ export const yarn: Yarn = {
       changelogContent = changelogContent.replace(match[0], newMonthBlock);
     } else {
       // Month doesn't exist, need to create it
-      // Find the current year block
       const yearPattern = new RegExp(`year: ${currentYear},\\s*months: \\[([\\s\\S]*?)\\]\\s*}`);
       const yearMatch = changelogContent.match(yearPattern);
 
@@ -339,7 +336,7 @@ ${newEntry}
     console.log('\n✅ Successfully added yarn!\n');
     console.log('📝 Next steps:');
     console.log(`  1. Update colorways.ts with actual colors`);
-    console.log(`  2. Update changelog.ts with the colorway count and proper version`);
+    console.log(`  2. Update changelog.ts with the real colorway count and proper version`);
     console.log(`  3. Test the application to verify the yarn displays correctly\n`);
 
   } catch (error) {

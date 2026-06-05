@@ -43,10 +43,12 @@ src/lib/data/yarns/{brand}/{yarn-directory}/
 ├── colorways.ts     # Placeholder colorways (2 colors)
 ```
 
-**Placeholder colorways** (to be updated later):
+**Placeholder colorways** (always used — update manually after running the script):
 
 - Color 1: White (#f2f2f2)
 - Color 2: Black (#000000)
+
+> **Note:** The script never fetches external URLs or scrapes colorway data. All colorways are placeholders to be replaced with real data manually.
 
 **Note:** All IDs are in `snake_case` format.
 
@@ -59,7 +61,8 @@ Short IDs: t, c, l, lf, f, s, d, w, a, b, sb, j
 ## Next steps after adding
 
 - Update `colorways.ts` with actual colorway data
-- Update the changelog entry version if needed
+- Update the changelog entry with the real colorway count
+- Update the changelog version number — each new yarn requires a **minor version bump** (e.g. `5.54.0` → `5.55.0`). The script appends the new note to the current month's latest item, but it should usually be its own separate item with a new version number
 - Verify the yarn appears in the application UI
 
 ## Troubleshooting
