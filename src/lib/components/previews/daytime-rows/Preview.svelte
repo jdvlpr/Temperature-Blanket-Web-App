@@ -19,7 +19,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { weather } from '$lib/state/weather-state.svelte';
   import { displayNumber } from '$lib/utils/number-utils';
   import { getColorInfo } from '$lib/utils/color-utils';
-  import { getWeatherValue } from '$lib/utils/weather-utils.svelte';
   import { runPreview } from '$lib/utils/function-utils.svelte';
   import { showPreviewImageWeatherDetails } from '$lib/utils/preview-utils.svelte';
   import { daytimeRowsPreview } from './state.svelte';
@@ -107,7 +106,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             break;
         }
         let param = weatherParams[paramIndex];
-        let value = getWeatherValue({ dayIndex, param });
+        let value = weather.getWeatherValue({ dayIndex, param });
 
         // Get the color based on the gauge ID and value
         const color = getColorInfo({ param, value }).hex;

@@ -18,7 +18,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Spinner from '$lib/components/Spinner.svelte';
   import { weather } from '$lib/state/weather-state.svelte';
   import { getColorInfo } from '$lib/utils/color-utils';
-  import { getWeatherValue } from '$lib/utils/weather-utils.svelte';
   import { runPreview } from '$lib/utils/function-utils.svelte';
   import { showPreviewImageWeatherDetails } from '$lib/utils/preview-utils.svelte';
 
@@ -134,7 +133,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         let color;
         if (isWeatherSquare) {
           let param = calendarPreview.squareSectionParams[squareSectionIndex];
-          let value = getWeatherValue({ dayIndex: _dayIndex, param });
+          let value = weather.getWeatherValue({ dayIndex: _dayIndex, param });
           if (
             (calendarPreview.settings.primaryTargetAsBackup === 1 &&
               value === 0) ||
@@ -142,7 +141,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               value === null)
           ) {
             param = calendarPreview.settings.primaryTarget;
-            value = getWeatherValue({ dayIndex: _dayIndex, param });
+            value = weather.getWeatherValue({ dayIndex: _dayIndex, param });
           }
 
           // Get the color based on the gauge ID and value

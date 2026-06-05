@@ -11,7 +11,6 @@ import type { Color } from '$lib/types/yarn-types';
 import type { WeatherParam } from '$lib/types/gauge-types';
 import { displayNumber } from '$lib/utils/number-utils';
 import { getColorInfo } from '$lib/utils/color-utils';
-import { getWeatherValue, sum } from '$lib/utils/weather-utils.svelte';
 import { setTargets } from '$lib/utils/preview-utils.svelte';
 import { getSeasonForDate } from '$lib/utils/seasons-utils.svelte';
 import chroma from 'chroma-js';
@@ -117,7 +116,7 @@ export class RowsPreviewClass {
       return this.settings.stitchesPerRow * weather.data?.length;
     if (this.settings.lengthTarget === 'custom')
       return this.settings.stitchesPerDay * weather.data?.length;
-    return sum(this.settings.lengthTarget);
+    return weather.sum(this.settings.lengthTarget);
   });
 
   rows = $derived(Math.ceil(this.totalStitches / this.settings.stitchesPerRow));
@@ -247,7 +246,7 @@ export class RowsPreviewClass {
             if (param === EXTRAS_TARGET) {
               color = this.settings.extrasColor;
             } else {
-              let value = getWeatherValue({ dayIndex, param });
+              let value = weather.getWeatherValue({ dayIndex, param });
               const colorInfo = getColorInfo({ param, value });
               color = colorInfo.hex || '#cccccc';
             }

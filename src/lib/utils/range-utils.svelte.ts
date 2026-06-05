@@ -23,7 +23,7 @@ import type {
 } from '$lib/types/gauge-types';
 import type { WeatherDay } from '$lib/types/weather-types';
 import { displayNumber } from '$lib/utils/number-utils';
-import { getWeatherValue } from '$lib/utils/weather-utils.svelte';
+
 
 export const getStart = (rangeOptions) => {
   if (rangeOptions?.mode === 'auto') {
@@ -181,7 +181,7 @@ export const getDaysInRange = ({
 
   if (gaugeUnitType === 'category') {
     const days = weather.data.filter((day, i) => {
-      const value = getWeatherValue({ dayIndex: i, param: id });
+      const value = weather.getWeatherValue({ dayIndex: i, param: id });
       if (value === 'null') return false;
       return 'value' in range && range.value === value;
     });
@@ -197,7 +197,7 @@ export const getDaysInRange = ({
     return [];
 
   const days = weather.data.filter((day, i) => {
-    const value = getWeatherValue({ dayIndex: i, param: id });
+    const value = weather.getWeatherValue({ dayIndex: i, param: id });
     return isValueInRange({
       value,
       range,

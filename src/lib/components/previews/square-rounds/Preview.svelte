@@ -17,7 +17,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Spinner from '$lib/components/Spinner.svelte';
   import { weather } from '$lib/state/weather-state.svelte';
   import { getColorInfo } from '$lib/utils/color-utils';
-  import { getWeatherValue } from '$lib/utils/weather-utils.svelte';
   import { runPreview } from '$lib/utils/function-utils.svelte';
   import { showPreviewImageWeatherDetails } from '$lib/utils/preview-utils.svelte';
   import { squareRoundsPreview } from './state.svelte';
@@ -85,7 +84,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
       let color;
       if (day) {
-        const value = getWeatherValue({
+        const value = weather.getWeatherValue({
           dayIndex: _dayIndex,
           param: squareRoundsPreview.settings.selectedTarget,
         });
@@ -176,7 +175,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {#each Array(squareRoundsPreview.settings.layoutBorder), i}
         {@const increment = i + 1}
         {@const weatherIndex = weather.data.length - increment}
-        {@const value = getWeatherValue({
+        {@const value = weather.getWeatherValue({
           dayIndex: weatherIndex,
           param: squareRoundsPreview.settings.selectedTarget,
         })}

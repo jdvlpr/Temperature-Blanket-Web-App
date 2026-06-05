@@ -17,7 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Spinner from '$lib/components/Spinner.svelte';
   import { weather } from '$lib/state/weather-state.svelte';
   import { getColorInfo } from '$lib/utils/color-utils';
-  import { getWeatherValue } from '$lib/utils/weather-utils.svelte';
+
   import { runPreview } from '$lib/utils/function-utils.svelte';
   import { showPreviewImageWeatherDetails } from '$lib/utils/preview-utils.svelte';
   import { monthRowsPreview } from './state.svelte';
@@ -154,7 +154,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         };
         let color;
         if (day.length) {
-          const value = getWeatherValue({
+          const value = weather.getWeatherValue({
             dayIndex: _dayIndex,
             param: monthRowsPreview.settings.selectedTargets[paramIndex],
           });

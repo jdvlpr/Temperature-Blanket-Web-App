@@ -25,6 +25,7 @@ vi.mock('$lib/state/weather-state.svelte', () => ({
     rawData: [],
     isFromLocalStorage: false,
   },
+  getMoonPhase: vi.fn(() => 0),
 }));
 
 vi.mock('$lib/state/project-state.svelte', () => ({

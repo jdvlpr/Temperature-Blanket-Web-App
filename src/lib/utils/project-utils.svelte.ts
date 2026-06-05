@@ -31,10 +31,7 @@ import {
   stringToDate,
 } from '$lib/utils/date-utils';
 import { getWPGauge } from '$lib/utils/gauge-utils.svelte';
-import {
-  getWeatherSourceDetails,
-  missingDaysCount,
-} from '$lib/utils/weather-utils.svelte';
+
 
 export const getProjectParametersFromURLHash = (hash) => {
   return hash.split('&').reduce(function (res, item) {
@@ -186,7 +183,7 @@ export const sendToProjectGallery = async (img) => {
     gauges: JSON.stringify(labels),
     img,
     locations: JSON.stringify(_locations),
-    missing_days: missingDaysCount(),
+    missing_days: weather.missingDaysCount(),
     palettes: JSON.stringify(palettes),
     project_url: project.url.href,
     raw_weather_data: JSON.stringify(weather.rawData),
@@ -196,7 +193,7 @@ export const sendToProjectGallery = async (img) => {
     yarn_urls: JSON.stringify(yarnUrls),
     yarn_details: JSON.stringify(yarnDetails),
     weather_grouping: weather.grouping,
-    weather_sources: JSON.stringify(getWeatherSourceDetails()),
+    weather_sources: JSON.stringify(weather.getWeatherSourceDetails()),
     wp_tag_id: previews.active.wpTagId,
   };
   let message = '';

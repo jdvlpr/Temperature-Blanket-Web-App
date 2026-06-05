@@ -24,7 +24,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { weather } from '$lib/state/weather-state.svelte';
   // Note: the signal store is a weird necessity, investigate this
   import { delay } from '$lib/utils/function-utils.svelte';
-  import { getOpenMeteo } from '$lib/utils/weather-utils.svelte';
   import { goToProjectSection } from '$lib/utils/page-utils.svelte';
   import { setSeasonsByLocation } from '$lib/utils/seasons-utils.svelte';
   import { onMount } from 'svelte';
@@ -158,7 +157,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           continueWhile
         ) {
           try {
-            const data = await getOpenMeteo({ location });
+            const data = await weather.getOpenMeteo({ location });
             tempAllData.push(data);
             location.source = 'Open-Meteo';
           } catch (error) {

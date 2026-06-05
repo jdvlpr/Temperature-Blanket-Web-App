@@ -33,7 +33,7 @@ import {
   hoursToMinutes,
   millimetersToInches,
 } from '$lib/utils/unit-utils.svelte.js';
-import { getMoonPhase } from '$lib/utils/weather-utils.svelte';
+import { getMoonPhase } from '$lib/state/weather-state.svelte';
 import { error, json } from '@sveltejs/kit';
 import SunCalc from 'suncalc';
 

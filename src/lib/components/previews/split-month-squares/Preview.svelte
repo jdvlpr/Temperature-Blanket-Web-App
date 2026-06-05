@@ -17,7 +17,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Spinner from '$lib/components/Spinner.svelte';
   import { weather } from '$lib/state/weather-state.svelte';
   import { getColorInfo } from '$lib/utils/color-utils';
-  import { getWeatherValue } from '$lib/utils/weather-utils.svelte';
   import { runPreview } from '$lib/utils/function-utils.svelte';
   import { showPreviewImageWeatherDetails } from '$lib/utils/preview-utils.svelte';
   import { splitMonthSquaresPreview } from './state.svelte';
@@ -97,7 +96,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
       let color = { left: '', right: '' };
       if (day.length) {
-        const leftValue = getWeatherValue({
+        const leftValue = weather.getWeatherValue({
           dayIndex: _dayIndex,
           param: splitMonthSquaresPreview.settings.leftTarget,
         });
@@ -108,7 +107,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           value: leftValue,
         }).hex;
 
-        const rightValue = getWeatherValue({
+        const rightValue = weather.getWeatherValue({
           dayIndex: _dayIndex,
           param: splitMonthSquaresPreview.settings.rightTarget,
         });

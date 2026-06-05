@@ -12,7 +12,7 @@ import {
   numberOfDays,
   stringToDate,
 } from '$lib/utils/date-utils';
-import { getMoonPhase } from '$lib/utils/weather-utils.svelte';
+import { getMoonPhase } from '$lib/state/weather-state.svelte';
 import { del, get, set } from 'idb-keyval';
 
 export type StoredProjectIndexItem = {

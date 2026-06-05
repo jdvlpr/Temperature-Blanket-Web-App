@@ -24,13 +24,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { project } from '$lib/state/project-state.svelte';
   import { weather } from '$lib/state/weather-state.svelte';
   import { preferences } from '$lib/storage/preferences.svelte';
-  import { getTableData } from '$lib/utils/weather-utils.svelte';
+
   import { ExternalLinkIcon } from '@lucide/svelte';
   import { tick } from 'svelte';
   import ToggleSwitch from './buttons/ToggleSwitch.svelte';
   import WeatherTableData from './WeatherTableData.svelte';
 
-  let tableData = $state(getTableData());
+  let tableData = $state(weather.getTableData());
 
   const uid = $props.id();
 
@@ -43,7 +43,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   function updateTable() {
     weatherDataUpdatedKey.value = true;
     debounce(() => {
-      tableData = getTableData();
+      tableData = weather.getTableData();
       weatherDataUpdatedKey.value = false;
     }, 10);
   }

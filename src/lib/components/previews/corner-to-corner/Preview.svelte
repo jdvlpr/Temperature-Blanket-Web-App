@@ -17,7 +17,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Spinner from '$lib/components/Spinner.svelte';
   import { weather } from '$lib/state/weather-state.svelte';
   import { getColorInfo } from '$lib/utils/color-utils';
-  import { getWeatherValue } from '$lib/utils/weather-utils.svelte';
   import { runPreview } from '$lib/utils/function-utils.svelte';
   import { showPreviewImageWeatherDetails } from '$lib/utils/preview-utils.svelte';
   import { cornerToCornerPreview } from './state.svelte';
@@ -107,7 +106,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     ) {
       let section = [];
       let target = cornerToCornerPreview.settings.selectedTarget;
-      let value = getWeatherValue({ dayIndex, param: target });
+      let value = weather.getWeatherValue({ dayIndex, param: target });
 
       // Get the color based on the gauge ID and value
       const color = getColorInfo({ param: target, value }).hex;

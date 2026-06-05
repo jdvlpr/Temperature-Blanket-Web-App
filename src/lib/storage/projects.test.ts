@@ -39,6 +39,7 @@ vi.mock('$lib/state/weather-state.svelte', () => ({
     isUserEdited: false,
     rawData: [],
   },
+  getMoonPhase: vi.fn(() => 0),
 }));
 
 vi.mock('$lib/state/location-state.svelte', () => ({
@@ -54,9 +55,7 @@ vi.mock('$lib/utils/date-utils', () => ({
   numberOfDays: vi.fn(() => 1),
 }));
 
-vi.mock('$lib/utils/weather-utils.svelte', () => ({
-  getMoonPhase: vi.fn(() => 0),
-}));
+
 
 describe('ProjectStorage', () => {
   beforeEach(() => {

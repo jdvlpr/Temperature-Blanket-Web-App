@@ -23,7 +23,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     getSquareSectionTargetIds,
     showPreviewImageWeatherDetails,
   } from '$lib/utils/preview-utils.svelte';
-  import { getWeatherValue } from '$lib/utils/weather-utils.svelte';
   import { runPreview } from '$lib/utils/function-utils.svelte';
   import { squaresPreview } from './state.svelte';
 
@@ -116,7 +115,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           // Get the weather data for the current day
           let targetId: WeatherParam['id'] =
             squareSectionTargetIds[squareSectionIndex];
-          let value = getWeatherValue({ dayIndex, param: targetId });
+          let value = weather.getWeatherValue({ dayIndex, param: targetId });
 
           // Check if the primary target value is 0 or null, use the primary target as a backup
           if (
@@ -126,7 +125,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               value === null)
           ) {
             targetId = squaresPreview.settings.primaryTarget;
-            value = getWeatherValue({ dayIndex, param: targetId });
+            value = weather.getWeatherValue({ dayIndex, param: targetId });
           }
 
           // Get the color based on the gauge ID and value

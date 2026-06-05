@@ -17,7 +17,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Spinner from '$lib/components/Spinner.svelte';
   import { weather } from '$lib/state/weather-state.svelte';
   import { getColorInfo } from '$lib/utils/color-utils';
-  import { getWeatherValue } from '$lib/utils/weather-utils.svelte';
   import { runPreview } from '$lib/utils/function-utils.svelte';
   import { showPreviewImageWeatherDetails } from '$lib/utils/preview-utils.svelte';
   import { hexagonRoundsPreview } from './state.svelte';
@@ -110,7 +109,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       let _dayIndex = dayIndex;
       let color;
       if (day) {
-        const value = getWeatherValue({
+        const value = weather.getWeatherValue({
           dayIndex: _dayIndex,
           param: hexagonRoundsPreview.settings.selectedTarget,
         });
@@ -199,7 +198,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             hexagonRoundsPreview.settings.layoutBorder +
             reverseI}
 
-          {@const value = getWeatherValue({
+          {@const value = weather.getWeatherValue({
             dayIndex,
             param: hexagonRoundsPreview.settings.selectedTarget,
           })}
