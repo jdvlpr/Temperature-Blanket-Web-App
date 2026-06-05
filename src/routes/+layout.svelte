@@ -29,9 +29,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { project } from '$lib/state/project-state.svelte';
   import { initializeLocalStorage } from '$lib/storage/storage-utils.svelte';
   import { privacy } from '$lib/utils/privacy-utils.svelte';
-  import { YoutubeIcon } from '@lucide/svelte';
   import { onMount, type Snippet } from 'svelte';
   import '../css/main.css';
+  import { ICONS } from '$lib/constants/icon-constants';
+  import { SquarePlayIcon } from '@lucide/svelte';
 
   interface Props {
     children?: Snippet;
@@ -191,7 +192,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       rel="noopener"
       class="btn hover:preset-tonal-surface whitespace-pre-wrap"
     >
-      <YoutubeIcon />
+      <SquarePlayIcon />
       <span>
         Watch: Plan a Temperature Blanket
         <span class="max-sm:hidden">the Easy Way</span>

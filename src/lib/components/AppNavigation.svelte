@@ -30,10 +30,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     BookOpenTextIcon,
     ChevronDownIcon,
     CircleQuestionMarkIcon,
+    CodeIcon,
     CloudyIcon,
     ExternalLinkIcon,
     GiftIcon,
-    GithubIcon,
     GlobeIcon,
     HeartIcon,
     Icon,
@@ -49,6 +49,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { Accordion } from '@skeletonlabs/skeleton-svelte';
   import { untrack } from 'svelte';
   import LegacyMigrationError from './modals/LegacyMigrationError.svelte';
+  import { ICONS } from '$lib/constants/icon-constants';
 
   // Set opened navigation items based on current page
   $effect(() => {
@@ -357,7 +358,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   class="btn hover:preset-tonal-surface w-fit"
                   target="_blank"
                 >
-                  <GithubIcon />
+                  <CodeIcon />
                   GitHub
                   <ExternalLinkIcon class="relative -top-[1px] size-5" />
                 </a>

@@ -25,11 +25,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import AppShell from '$lib/components/AppShell.svelte';
   import {
     CloudAlertIcon,
+    CodeIcon,
     ExternalLinkIcon,
-    FacebookIcon,
-    GithubIcon,
     MailIcon,
     MessageCirclePlusIcon,
+    UsersIcon,
   } from '@lucide/svelte';
 
   let email = $state('Loading...');
@@ -93,7 +93,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               rel="noreferrer"
               class="btn hover:preset-tonal-surface w-fit text-left"
             >
-              <GithubIcon />
+              <CodeIcon />
               GitHub Issues
               <ExternalLinkIcon class="relative -top-[1px] size-5" />
             </a>
@@ -107,7 +107,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               rel="noreferrer"
               class="btn hover:preset-tonal-surface w-fit text-left"
             >
-              <GithubIcon />
+              <CodeIcon />
               GitHub Discussions
               <ExternalLinkIcon class="relative -top-[1px] size-5" />
             </a>
@@ -121,8 +121,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
               rel="noreferrer"
               class="btn hover:preset-tonal-surface w-fit text-left"
             >
-              <FacebookIcon />
-              {PUBLIC_SITE_TITLE}
+              <UsersIcon />
+              Facebook
               <ExternalLinkIcon class="relative -top-[1px] size-5" />
             </a>
           {/if}

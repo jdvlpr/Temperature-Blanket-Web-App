@@ -22,9 +22,9 @@ import {
   ImageIcon,
   MoonStarIcon,
   RocketIcon,
+  SquarePlayIcon,
   SquareTerminalIcon,
   WrenchIcon,
-  YoutubeIcon,
 } from '@lucide/svelte';
 
 export const entries: ChangelogItemGroup[] = [
@@ -305,7 +305,7 @@ export const entries: ChangelogItemGroup[] = [
           {
             notes: [
               {
-                IconComponent: YoutubeIcon,
+                IconComponent: SquarePlayIcon,
                 text: `<a href="https://www.youtube.com/watch?v=7NRLrpZb0Lo" target="_blank" class="link">Click here to watch</a>`,
                 title: 'New Video: Plan a Temperature Blanket the Easy Way',
               },
