@@ -15,14 +15,13 @@
 
 import WeatherDetails from '$lib/components/WeatherDetails.svelte';
 import { drawerState, isDesktop, dialog } from '$lib/state/page-state.svelte';
-import { gauges } from '$lib/state/gauges-state.svelte';
+import { gauges, getTargetParentGaugeId } from '$lib/state/gauges-state.svelte';
 import { locations } from '$lib/state/location-state.svelte';
 import { previewWeatherTargets } from '$lib/state/preview-state.svelte';
 import { weather } from '$lib/state/weather-state.svelte';
 import type { WeatherDay } from '$lib/types/weather-types';
 import type { WeatherParam } from '$lib/types/gauge-types';
 import { exists } from '$lib/utils/other-utils';
-import { getTargetParentGaugeId } from '$lib/utils/gauge-utils.svelte';
 
 export const showPreviewImageWeatherDetails = (
   targets: WeatherParam[],

@@ -16,7 +16,7 @@
 import { MOON_PHASE_NAMES } from '$lib/constants/weather-constants';
 import pdfGauges from '$lib/features/pdf/sections/gauges.svelte';
 import pdfWeatherData from '$lib/features/pdf/sections/weather-data.svelte';
-import { allGaugesAttributes, gauges } from '$lib/state/gauges-state.svelte';
+import { allGaugesAttributes, gauges, getWPGauge } from '$lib/state/gauges-state.svelte';
 import { dialog } from '$lib/state/page-state.svelte';
 import { locations } from '$lib/state/location-state.svelte';
 import { previews } from '$lib/state/preview-state.svelte';
@@ -30,7 +30,6 @@ import {
   getLocalISODateString,
   stringToDate,
 } from '$lib/utils/date-utils';
-import { getWPGauge } from '$lib/utils/gauge-utils.svelte';
 
 
 export const getProjectParametersFromURLHash = (hash) => {

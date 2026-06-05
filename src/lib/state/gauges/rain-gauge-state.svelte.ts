@@ -51,6 +51,7 @@ function getFirstRanges({
     colors,
     includeFromAndTo,
     dontIncludeFromAndTo,
+    gaugeId: 'prcp',
   });
   return ranges;
 }
@@ -224,6 +225,7 @@ export class RainGauge {
       colors: this.colors,
       includeFromAndTo: this.#includeFromAndTo,
       dontIncludeFromAndTo: this.#dontIncludeFromAndTo,
+      gaugeId: 'prcp',
     });
     this.ranges = ranges;
     this.rangeOptions = this.rangeOptions;

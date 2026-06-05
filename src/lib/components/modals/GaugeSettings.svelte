@@ -22,7 +22,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import StickyPart from '$lib/components/modals/StickyPart.svelte';
   import { safeSlide } from '$lib/features/transitions/safeSlide';
   import { dialog } from '$lib/state/page-state.svelte';
-  import { gauges } from '$lib/state/gauges-state.svelte';
+  import { gauges, getRanges } from '$lib/state/gauges-state.svelte';
   import { weather } from '$lib/state/weather-state.svelte';
   import { preferences } from '$lib/storage/preferences.svelte';
   import { displayNumber } from '$lib/utils/number-utils';
@@ -31,7 +31,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     getRangeExample,
     getStart,
   } from '$lib/utils/range-utils.svelte';
-  import { getRanges } from '$lib/utils/gauge-utils.svelte';
   import { getTextColor } from '$lib/utils/color-utils';
   import { targetArrow } from '@lucide/lab';
   import {
@@ -169,6 +168,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       colors: _gauge.colors,
       includeFromAndTo,
       dontIncludeFromAndTo,
+      gaugeId: _gauge.id,
     });
     _gauge.ranges = ranges;
     if (mustUpdateCustomRanges) customRanges = ranges;

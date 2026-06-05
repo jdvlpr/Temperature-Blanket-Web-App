@@ -14,7 +14,6 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { SCHEMES } from '$lib/constants/color-constants';
-import { gauges } from '$lib/state/gauges-state.svelte';
 import { toast } from '$lib/state/page-state.svelte';
 import { weather } from '$lib/state/weather-state.svelte';
 import { preferences } from '$lib/storage/preferences.svelte';
@@ -37,6 +36,7 @@ export function getRanges({
   colors,
   includeFromAndTo,
   dontIncludeFromAndTo,
+  gaugeId = '',
 }) {
   let newRanges;
   let mustUpdateCustomRanges = false;
@@ -52,9 +52,8 @@ export function getRanges({
       if (prop === 'ranges') {
         // Only temp gauges have multiple props (tmax, tavg, tmin)
         // So if it's not a temp gauge, use the gauge id (e.g. prcp, snow)
-        if (gauges.activeGauge?.id !== 'temp') prop = gauges.activeGauge?.id;
+        if (gaugeId !== 'temp') prop = gaugeId;
         // Otherwise if it is a temp gauge, use tmax as default
-        // I don't think the following condition should ever be reached, but it's here just in case
         else prop = 'tmax';
       }
 

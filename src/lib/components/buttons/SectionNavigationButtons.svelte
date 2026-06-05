@@ -14,8 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import { pageSections } from '$lib/state/page-state.svelte';
-  import { goToProjectSection } from '$lib/utils/page-utils.svelte';
+  import { pageSections, goToProjectSection } from '$lib/state/page-state.svelte';
   import { ArrowLeftIcon, ArrowRightIcon } from '@lucide/svelte';
 
   /**

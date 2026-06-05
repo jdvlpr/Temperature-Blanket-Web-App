@@ -242,6 +242,7 @@ export class TemperatureGauge {
       colors: this.colors,
       includeFromAndTo: this.#includeFromAndTo,
       dontIncludeFromAndTo: this.#dontIncludeFromAndTo,
+      gaugeId: 'temp',
     });
 
     this.ranges = ranges;

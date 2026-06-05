@@ -34,7 +34,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '$lib/state/page-state.svelte';
   import type { Color } from '$lib/types/yarn-types';
   import type { GaugeSettingsType } from '$lib/types/gauge-types';
-  import { createGaugeColors } from '$lib/utils/gauge-utils.svelte';
+  import { createGaugeColors } from '$lib/state/gauges-state.svelte';
   import {
     ArrowDownWideNarrowIcon,
     CircleCheckIcon,

@@ -50,6 +50,10 @@ vi.mock('$lib/state/gauges-state.svelte', () => ({
       return null;
     }),
   },
+  getTargetParentGaugeId: vi.fn((param) => {
+    if (param === 'tmax') return 'tmax_gauge';
+    return param;
+  }),
 }));
 
 vi.mock('$lib/state/project-state.svelte', () => ({
@@ -65,17 +69,6 @@ vi.mock('$lib/utils/number-utils', async (importOriginal) => {
     isValueInRange: vi.fn(
       ({ value, range }) => value >= range.from && value <= range.to,
     ),
-  };
-});
-
-vi.mock('$lib/utils/gauge-utils.svelte', async (importOriginal) => {
-  const actual = await importOriginal<any>();
-  return {
-    ...actual,
-    getTargetParentGaugeId: vi.fn((param) => {
-      if (param === 'tmax') return 'tmax_gauge';
-      return param;
-    }),
   };
 });
 

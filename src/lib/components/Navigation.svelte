@@ -17,9 +17,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import {
     pageSections,
     showNavigationSideBar,
+    goToProjectSection,
   } from '$lib/state/page-state.svelte';
   import { weather } from '$lib/state/weather-state.svelte';
-  import { goToProjectSection } from '$lib/utils/page-utils.svelte';
   import { onMount } from 'svelte';
 
   let indicator = $state({ left: 0, width: 0 });

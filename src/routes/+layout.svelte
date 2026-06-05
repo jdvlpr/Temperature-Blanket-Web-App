@@ -24,10 +24,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     dialog,
     drawerState,
     toast,
+    handleKeyDown,
   } from '$lib/state/page-state.svelte';
   import { project } from '$lib/state/project-state.svelte';
   import { initializeLocalStorage } from '$lib/storage/storage-utils.svelte';
-  import { handleKeyDown } from '$lib/utils/page-utils.svelte';
   import { privacy } from '$lib/utils/privacy-utils.svelte';
   import { YoutubeIcon } from '@lucide/svelte';
   import { onMount, type Snippet } from 'svelte';

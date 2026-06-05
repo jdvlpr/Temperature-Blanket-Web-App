@@ -51,6 +51,7 @@ function getFirstRanges({
     colors,
     includeFromAndTo,
     dontIncludeFromAndTo,
+    gaugeId: 'dayt',
   });
   return ranges;
 }
@@ -224,6 +225,7 @@ export class DayTimeGauge {
       colors: this.colors,
       includeFromAndTo: this.#includeFromAndTo,
       dontIncludeFromAndTo: this.#dontIncludeFromAndTo,
+      gaugeId: 'dayt',
     });
     this.ranges = ranges;
     this.rangeOptions = this.rangeOptions;

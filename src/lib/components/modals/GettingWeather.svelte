@@ -19,12 +19,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     locations,
     signal,
   } from '$lib/state/location-state.svelte';
-  import { dialog } from '$lib/state/page-state.svelte';
+  import { dialog, goToProjectSection } from '$lib/state/page-state.svelte';
   import { gauges } from '$lib/state/gauges-state.svelte';
   import { weather } from '$lib/state/weather-state.svelte';
   // Note: the signal store is a weird necessity, investigate this
   import { delay } from '$lib/utils/function-utils.svelte';
-  import { goToProjectSection } from '$lib/utils/page-utils.svelte';
   import { setSeasonsByLocation } from '$lib/utils/seasons-utils.svelte';
   import { onMount } from 'svelte';
   import Spinner from '../Spinner.svelte';

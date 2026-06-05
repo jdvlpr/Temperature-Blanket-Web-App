@@ -242,3 +242,11 @@ export const allGaugesAttributes: GaugeAttributes[] = [
   daytGaugeAttributes,
   moonGaugeAttributes,
 ];
+
+export {
+  getRanges,
+  createGaugeColors,
+  getWPGauge,
+  getTargetParentGaugeId,
+  getSchemeName,
+} from '$lib/utils/gauge-utils.svelte';

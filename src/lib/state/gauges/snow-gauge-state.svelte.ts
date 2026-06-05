@@ -51,6 +51,7 @@ function getFirstRanges({
     colors,
     includeFromAndTo,
     dontIncludeFromAndTo,
+    gaugeId: 'snow',
   });
   return ranges;
 }
@@ -224,6 +225,7 @@ export class SnowGauge {
       colors: this.colors,
       includeFromAndTo: this.#includeFromAndTo,
       dontIncludeFromAndTo: this.#dontIncludeFromAndTo,
+      gaugeId: 'snow',
     });
     this.ranges = ranges;
     this.rangeOptions = this.rangeOptions;

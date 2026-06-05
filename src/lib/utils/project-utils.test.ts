@@ -17,6 +17,7 @@ vi.mock('$lib/state/location-state.svelte', () => ({
 vi.mock('$lib/state/gauges-state.svelte', () => ({
   gauges: { allCreated: [] },
   allGaugesAttributes: [],
+  getWPGauge: vi.fn(() => ({})),
 }));
 
 vi.mock('$lib/state/preview-state.svelte', () => ({
@@ -68,11 +69,6 @@ vi.mock('$lib/utils/unit-utils.svelte', async (importOriginal) => {
 vi.mock('$lib/utils/date-utils', async (importOriginal) => {
   const actual = await importOriginal<any>();
   return { ...actual, dateToISO8601String: vi.fn((date) => '2024-01-01') };
-});
-
-vi.mock('$lib/utils/gauge-utils.svelte', async (importOriginal) => {
-  const actual = await importOriginal<any>();
-  return { ...actual, getWPGauge: vi.fn(() => ({})) };
 });
 
 vi.mock('$lib/utils/weather-utils.svelte', async (importOriginal) => {
