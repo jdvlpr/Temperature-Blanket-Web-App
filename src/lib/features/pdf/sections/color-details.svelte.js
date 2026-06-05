@@ -16,41 +16,44 @@
 import { weather } from '$lib/state/weather-state.svelte';
 import { getDaysInRange, getDaysPercent } from '$lib/utils/range-utils.svelte';
 import pdfConfig from '../pdf-config';
-import pdfGauge from './gauge.svelte.ts';
+
+// Read shared layout constants from pdf-config (avoids importing gauge.svelte.ts)
+const { positionX, columnWidth } = pdfConfig.colorDetails;
+const { linePadding, itemHeight } = pdfConfig.gauge;
 
 const pdfColorDetails = {
-  positionX: 95,
-  columnWidth: 30,
+  positionX,
+  columnWidth,
   createHeaderHorizontalLines: (doc, items) => {
     // Lines
     const x1 =
-      pdfConfig.leftMargin + pdfColorDetails.positionX - pdfGauge.linePadding;
+      pdfConfig.leftMargin + positionX - linePadding;
     const x2 =
       pdfConfig.leftMargin +
-      pdfColorDetails.positionX +
-      Object.keys(items).length * pdfColorDetails.columnWidth -
-      pdfGauge.linePadding;
+      positionX +
+      Object.keys(items).length * columnWidth -
+      linePadding;
     // OverLine
-    let y = pdfConfig.topMargin + pdfGauge.linePadding * 3;
+    let y = pdfConfig.topMargin + linePadding * 3;
     doc.line(x1, y, x2, y);
     // Underline
-    y = pdfConfig.topMargin + pdfGauge.itemHeight + pdfGauge.linePadding;
+    y = pdfConfig.topMargin + itemHeight + linePadding;
     doc.line(x1, y, x2, y);
   },
-  createColorDetailsHeader: (doc, gauge) => {
+  createColorDetailsHeader: (doc, gauge, createHeaderItemsFn) => {
     const header = weather.grouping === 'week' ? 'Weeks' : 'Days';
     const items = {
       davg: {
         name: `${header} High`,
-        position: pdfColorDetails.positionX,
+        position: positionX,
       },
       dmax: {
         name: `${header} Average`,
-        position: pdfColorDetails.positionX + pdfColorDetails.columnWidth,
+        position: positionX + columnWidth,
       },
       dmin: {
         name: `${header} Low`,
-        position: pdfColorDetails.positionX + pdfColorDetails.columnWidth * 2,
+        position: positionX + columnWidth * 2,
       },
     };
     if (gauge.targets.length === 1) {
@@ -59,10 +62,10 @@ const pdfColorDetails = {
       delete items.dmin;
       items.days = {
         name: header,
-        position: pdfColorDetails.positionX,
+        position: positionX,
       };
     }
-    pdfGauge.createHeaderItems(doc, items);
+    createHeaderItemsFn(doc, items);
     pdfColorDetails.createHeaderHorizontalLines(doc, items);
   },
   create: (doc, gauge, colorIndex, line) => {
@@ -83,40 +86,34 @@ const pdfColorDetails = {
     doc.setFont(pdfConfig.font.paragraph, '');
     // Days avg, max, and min
     for (
-      let i = 0, x = pdfColorDetails.positionX;
+      let i = 0, x = positionX;
       i < details.length;
-      i += 1, x += pdfColorDetails.columnWidth
+      i += 1, x += columnWidth
     ) {
       doc.text(details[i], pdfConfig.leftMargin + x, line);
     }
     // underline
-    const width = gauge.targets.length * pdfColorDetails.columnWidth;
+    const width = gauge.targets.length * columnWidth;
     doc.line(
-      pdfConfig.leftMargin + pdfColorDetails.positionX - pdfGauge.linePadding,
+      pdfConfig.leftMargin + positionX - linePadding,
       line + 5,
       pdfConfig.leftMargin +
-        pdfColorDetails.positionX +
+        positionX +
         width -
-        pdfGauge.linePadding,
+        linePadding,
       line + 5,
     );
     // Vertical Lines
     const vLinePositions = [
-      pdfColorDetails.positionX +
-        pdfColorDetails.columnWidth -
-        pdfGauge.linePadding,
-      pdfColorDetails.positionX +
-        pdfColorDetails.columnWidth * 2 -
-        pdfGauge.linePadding,
-      pdfColorDetails.positionX +
-        pdfColorDetails.columnWidth * 3 -
-        pdfGauge.linePadding,
+      positionX + columnWidth - linePadding,
+      positionX + columnWidth * 2 - linePadding,
+      positionX + columnWidth * 3 - linePadding,
     ];
     if (details.length === 1) vLinePositions.length = 1;
     vLinePositions.forEach((item) => {
       doc.line(
         pdfConfig.leftMargin + item,
-        pdfConfig.topMargin + pdfGauge.linePadding * 3,
+        pdfConfig.topMargin + linePadding * 3,
         pdfConfig.leftMargin + item,
         line + 5,
       );

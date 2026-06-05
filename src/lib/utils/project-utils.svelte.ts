@@ -52,8 +52,9 @@ export const downloadPDF = async () => {
           .then((module) => {
             const JsPDF = module.default;
             const doc = new JsPDF();
-            pdfGauges.create(doc);
-            pdfWeatherData.create(doc);
+            const totalPages = pdfGauges.pages() + pdfWeatherData.pages();
+            pdfGauges.create(doc, totalPages);
+            pdfWeatherData.create(doc, totalPages);
             // Remove blank first page, ugly hack
             doc.deletePage(1);
             doc.save(`Temperature-Blanket-${locations.projectFilename}.pdf`);

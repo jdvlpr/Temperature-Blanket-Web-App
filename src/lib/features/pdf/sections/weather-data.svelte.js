@@ -63,7 +63,7 @@ const pdfWeatherData = {
     pages += Math.ceil(rows / pdfWeatherData.MAX_ROWS_FULL_PAGE); // Add the rest of the pages
     return pages;
   },
-  create: function (doc) {
+  create: function (doc, totalPages) {
     if (weather.pdfOptions.weatherDataParams.length === 0) return;
     doc.addPage();
     // pdfHeader.create(doc);
@@ -87,7 +87,7 @@ const pdfWeatherData = {
 
     // Create footer
     const pageCurrent = doc.internal.getCurrentPageInfo().pageNumber - 1; // minus one because first page is blank...
-    pdfFooter.create(doc, pageCurrent);
+    pdfFooter.create(doc, pageCurrent, totalPages);
 
     // Create Data Header
     pdfWeatherData.createDataHeader(doc, pdfConfig.topMargin + 20);
@@ -109,7 +109,7 @@ const pdfWeatherData = {
         pdfWeatherData.createDataHeader(doc, pdfConfig.topMargin);
         line = pdfConfig.topMargin + this.LINE_HEIGHT;
         const pageCurrent = doc.internal.getCurrentPageInfo().pageNumber - 1; // minus one because first page is blank...
-        pdfFooter.create(doc, pageCurrent);
+        pdfFooter.create(doc, pageCurrent, totalPages);
         pageRows = 0;
       } else if (
         pageRows % pdfWeatherData.MAX_ROWS_FULL_PAGE === 0 &&
@@ -121,7 +121,7 @@ const pdfWeatherData = {
         pdfWeatherData.createDataHeader(doc, pdfConfig.topMargin);
         line = pdfConfig.topMargin + this.LINE_HEIGHT;
         const pageCurrent = doc.internal.getCurrentPageInfo().pageNumber - 1; // minus one because first page is blank...
-        pdfFooter.create(doc, pageCurrent);
+        pdfFooter.create(doc, pageCurrent, totalPages);
       }
 
       doc.setFont(pdfConfig.font.paragraph, 'normal');

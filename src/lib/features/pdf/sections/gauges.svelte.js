@@ -15,6 +15,7 @@
 
 import { gauges } from '$lib/state/gauges-state.svelte';
 import { weather } from '$lib/state/weather-state.svelte';
+import pdfConfig from '../pdf-config';
 import pdfGauge from './gauge.svelte.ts';
 
 const gaugeGroup = {
@@ -23,15 +24,17 @@ const gaugeGroup = {
     gauges.allCreated
       .filter((gauge) => weather.pdfOptions.gauges.includes(gauge.id))
       .forEach((gauge) => {
-        pages += Math.ceil(gauge.ranges.length / pdfGauge.MAX_COLORS_PER_PAGE);
+        pages += Math.ceil(
+          gauge.ranges.length / pdfConfig.gauge.MAX_COLORS_PER_PAGE,
+        );
       });
     return pages;
   },
-  create: (doc) => {
+  create: (doc, totalPages) => {
     gauges.allCreated
       .filter((gauge) => weather.pdfOptions.gauges.includes(gauge.id))
       .forEach((gauge) => {
-        pdfGauge.create(doc, gauge.id);
+        pdfGauge.create(doc, gauge.id, totalPages);
       });
   },
 };

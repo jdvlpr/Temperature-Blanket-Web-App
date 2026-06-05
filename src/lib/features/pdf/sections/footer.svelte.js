@@ -16,18 +16,19 @@
 import { PUBLIC_BASE_DOMAIN_NAME, PUBLIC_BASE_URL } from '$env/static/public';
 import { locations } from '$lib/state/location-state.svelte';
 import pdfConfig from '../pdf-config';
-import gauges from './gauges.svelte';
-import weatherData from './weather-data.svelte';
 
 const pdfFooter = {
-  pages: () => {
-    return gauges.pages() + weatherData.pages();
-  },
-  create: (doc, page) => {
+  /**
+   * Render the footer on the current page.
+   * @param doc       - jsPDF document instance
+   * @param page      - current (1-based) page number
+   * @param totalPages - total page count (computed by the caller to avoid circular imports)
+   */
+  create: (doc, page, totalPages) => {
     // page number
     doc.setFontSize(pdfConfig.font.p);
     doc.setFont(pdfConfig.font.paragraph, 'normal');
-    doc.text(`Page ${page} of ${pdfFooter.pages()}`, pdfConfig.leftMargin, 273);
+    doc.text(`Page ${page} of ${totalPages}`, pdfConfig.leftMargin, 273);
 
     // footer text
     doc.setFontSize(pdfConfig.font.p);

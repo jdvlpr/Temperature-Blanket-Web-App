@@ -27,6 +27,26 @@ const pdfConfig = {
     mini: 8,
     micro: 6,
   },
+  // Shared layout constants for the gauge section (used by gauge + color-details)
+  gauge: {
+    MAX_COLORS_PER_PAGE: 15,
+    titleTopMargin: 10,
+    headerTopMargin: 20,
+    itemTopMargin: 15,
+    itemHeight: 11,
+    linePadding: 2,
+    headerItems: {
+      color: { name: 'Color', position: 2 },
+      name: { name: 'Name', position: 25 },
+      from: { name: 'From', position: 56 },
+      to: { name: 'To', position: 75 },
+    },
+  },
+  // Shared layout constants for the color-details section
+  colorDetails: {
+    positionX: 95,
+    columnWidth: 30,
+  },
 };
 
 export { pdfConfig as default };

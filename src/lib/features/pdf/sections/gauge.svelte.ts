@@ -24,38 +24,32 @@ import pdfConfig from '../pdf-config';
 import pdfColorDetails from './color-details.svelte';
 import pdfFooter from './footer.svelte';
 
+// Read shared layout constants from pdf-config (avoids circular import with color-details)
+const {
+  MAX_COLORS_PER_PAGE,
+  titleTopMargin,
+  headerTopMargin,
+  itemTopMargin,
+  itemHeight,
+  linePadding,
+  headerItems,
+} = pdfConfig.gauge;
+
 const pdfGauge = {
-  MAX_COLORS_PER_PAGE: 15,
-  titleTopMargin: 10,
-  headerTopMargin: 20,
-  itemTopMargin: 15,
-  itemHeight: 11,
-  linePadding: 2,
-  headerItems: {
-    color: {
-      name: 'Color',
-      position: 2,
-    },
-    name: {
-      name: 'Name',
-      position: 25,
-    },
-    from: {
-      name: `From`,
-      position: 56,
-    },
-    to: {
-      name: 'To',
-      position: 75,
-    },
-  },
+  MAX_COLORS_PER_PAGE,
+  titleTopMargin,
+  headerTopMargin,
+  itemTopMargin,
+  itemHeight,
+  linePadding,
+  headerItems,
 
   createHeaderHorizontalLines: (doc, x1, x2) => {
     // OverLine
-    let y = pdfConfig.topMargin + pdfGauge.linePadding * 3;
+    let y = pdfConfig.topMargin + linePadding * 3;
     doc.line(x1, y, pdfConfig.leftMargin + x2, y);
     // Underline
-    y = pdfConfig.topMargin + pdfGauge.itemHeight + pdfGauge.linePadding;
+    y = pdfConfig.topMargin + itemHeight + linePadding;
     doc.line(x1, y, pdfConfig.leftMargin + x2, y);
   },
 
@@ -70,7 +64,7 @@ const pdfGauge = {
         doc.text(
           'Title',
           pdfConfig.leftMargin + Object.values(items)[index].position,
-          pdfConfig.topMargin + pdfGauge.itemHeight,
+          pdfConfig.topMargin + itemHeight,
         );
       } else if (
         gauge?.unit.type !== 'category' &&
@@ -79,7 +73,7 @@ const pdfGauge = {
         doc.text(
           title,
           pdfConfig.leftMargin + Object.values(items)[index].position,
-          pdfConfig.topMargin + pdfGauge.itemHeight - 1,
+          pdfConfig.topMargin + itemHeight - 1,
         );
         doc.setFontSize(pdfConfig.font.micro);
         // Set a gray text color
@@ -91,7 +85,7 @@ const pdfGauge = {
         doc.text(
           label,
           pdfConfig.leftMargin + Object.values(items)[index].position,
-          pdfConfig.topMargin + pdfGauge.itemHeight + 1,
+          pdfConfig.topMargin + itemHeight + 1,
         );
         doc.setFontSize(pdfConfig.font.p);
         // Revert to a black text color
@@ -104,7 +98,7 @@ const pdfGauge = {
         doc.text(
           title,
           pdfConfig.leftMargin + Object.values(items)[index].position,
-          pdfConfig.topMargin + pdfGauge.itemHeight,
+          pdfConfig.topMargin + itemHeight,
         );
       }
     }
@@ -127,56 +121,59 @@ const pdfGauge = {
     if (title === 'To' && !includeTo) return excluding;
     return '';
   },
+
   createHeader: (doc, gauge: GaugeStateInterface) => {
     // Gauge Title
     doc.setFontSize(pdfConfig.font.h2);
     doc.setFont(pdfConfig.font.heading, 'normal');
     doc.text(gauge.label, pdfConfig.leftMargin, pdfConfig.topMargin);
-    pdfGauge.createHeaderItems(doc, pdfGauge.headerItems, gauge);
+    pdfGauge.createHeaderItems(doc, headerItems, gauge);
     pdfGauge.createHeaderHorizontalLines(
       doc,
       pdfConfig.leftMargin,
-      pdfColorDetails.positionX - pdfGauge.linePadding,
+      pdfConfig.colorDetails.positionX - linePadding,
     );
   },
-  create: function (doc, gaugeId) {
+
+  create: function (doc, gaugeId, totalPages: number) {
     let gauge = gauges.allCreated.find((g) => g.id === gaugeId);
 
     // Gauge Item
     const length = gauge.ranges.length;
     let l =
-      pdfConfig.topMargin + (pdfGauge.itemHeight + pdfGauge.linePadding) * 2;
-    for (let i = 0; i < length; i++, l += pdfGauge.itemTopMargin) {
-      if (i % pdfGauge.MAX_COLORS_PER_PAGE === 0) {
+      pdfConfig.topMargin + (itemHeight + linePadding) * 2;
+    for (let i = 0; i < length; i++, l += itemTopMargin) {
+      if (i % MAX_COLORS_PER_PAGE === 0) {
         doc.addPage();
-        // pdfHeader.create(doc);
         pdfGauge.createHeader(doc, gauge);
         if (weather.pdfOptions.showDaysInRange)
-          pdfColorDetails.createColorDetailsHeader(doc, gauge);
+          pdfColorDetails.createColorDetailsHeader(
+            doc,
+            gauge,
+            (d, items) => pdfGauge.createHeaderItems(d, items, gauge),
+          );
         l =
           pdfConfig.topMargin +
-          (pdfGauge.itemHeight + pdfGauge.linePadding) * 2;
-        const pageCurrent = doc.internal.getCurrentPageInfo().pageNumber - 1; // minus one because first page is blank...
-        pdfFooter.create(doc, pageCurrent);
+          (itemHeight + linePadding) * 2;
+        const pageCurrent = doc.internal.getCurrentPageInfo().pageNumber - 1;
+        pdfFooter.create(doc, pageCurrent, totalPages);
       }
       // Vertical Lines
       const vLinePositions = [
         0,
-        pdfGauge.headerItems.name.position - pdfGauge.linePadding,
-        pdfGauge.headerItems.from.position - pdfGauge.linePadding,
+        headerItems.name.position - linePadding,
+        headerItems.from.position - linePadding,
       ];
 
       if (gauge?.unit.type !== 'category')
-        vLinePositions.push(
-          pdfGauge.headerItems.to.position - pdfGauge.linePadding,
-        );
+        vLinePositions.push(headerItems.to.position - linePadding);
 
-      vLinePositions.push(pdfColorDetails.positionX - pdfGauge.linePadding);
+      vLinePositions.push(pdfConfig.colorDetails.positionX - linePadding);
 
       vLinePositions.forEach((item) => {
         doc.line(
           pdfConfig.leftMargin + item,
-          pdfConfig.topMargin + pdfGauge.linePadding * 3,
+          pdfConfig.topMargin + linePadding * 3,
           pdfConfig.leftMargin + item,
           l + 5,
         );
@@ -185,7 +182,7 @@ const pdfGauge = {
       doc.setFontSize(pdfConfig.font.p);
       doc.text(
         (i + 1).toString(),
-        pdfConfig.leftMargin + pdfGauge.linePadding,
+        pdfConfig.leftMargin + linePadding,
         l,
       );
       // Item Color
@@ -193,8 +190,8 @@ const pdfGauge = {
       doc.rect(
         pdfConfig.leftMargin + 8,
         l - 8,
-        pdfGauge.itemHeight,
-        pdfGauge.itemHeight,
+        itemHeight,
+        itemHeight,
         'F',
       );
       // Item Yarn and Name
@@ -206,18 +203,18 @@ const pdfGauge = {
         doc.setFontSize(pdfConfig.font.micro);
         doc.text(
           gauge.colors[i]?.brandName,
-          pdfConfig.leftMargin + pdfGauge.headerItems.name.position,
+          pdfConfig.leftMargin + headerItems.name.position,
           l - 6.2,
         );
         doc.text(
           gauge.colors[i]?.yarnName,
-          pdfConfig.leftMargin + pdfGauge.headerItems.name.position,
+          pdfConfig.leftMargin + headerItems.name.position,
           l - 4,
         );
         doc.setFontSize(pdfConfig.font.mini);
         doc.text(
           gauge.colors[i]?.name,
-          pdfConfig.leftMargin + pdfGauge.headerItems.name.position,
+          pdfConfig.leftMargin + headerItems.name.position,
           l,
         );
         doc.setFontSize(pdfConfig.font.p);
@@ -229,7 +226,7 @@ const pdfGauge = {
         const label = gauge.ranges[i].label;
         doc.text(
           label,
-          pdfConfig.leftMargin + pdfGauge.headerItems.from.position,
+          pdfConfig.leftMargin + headerItems.from.position,
           l,
         );
       } else {
@@ -244,12 +241,12 @@ const pdfGauge = {
           gauge.unit.label[preferences.value.units];
         doc.text(
           from,
-          pdfConfig.leftMargin + pdfGauge.headerItems.from.position,
+          pdfConfig.leftMargin + headerItems.from.position,
           l,
         );
         doc.text(
           to,
-          pdfConfig.leftMargin + pdfGauge.headerItems.to.position,
+          pdfConfig.leftMargin + headerItems.to.position,
           l,
         );
       }
@@ -258,7 +255,9 @@ const pdfGauge = {
       doc.line(
         pdfConfig.leftMargin,
         l + 5,
-        pdfConfig.leftMargin + pdfColorDetails.positionX - pdfGauge.linePadding,
+        pdfConfig.leftMargin +
+          pdfConfig.colorDetails.positionX -
+          linePadding,
         l + 5,
       );
 
