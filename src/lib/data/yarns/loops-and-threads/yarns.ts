@@ -9,6 +9,7 @@ import { yarn as softClassic } from './soft-classic/yarn';
 import { yarn as luxeMerino } from './luxe-merino/yarn';
 import { yarn as softClassicNeon } from './soft-classic-neon/yarn';
 import { yarn as superwashMerino } from './superwash-merino/yarn';
+import { yarn as sweetSnugglesLite } from './sweet-snuggles-lite/yarn';
 
 export const brand: Brand = {
   name: 'Loops & Threads',
@@ -24,5 +25,6 @@ export const brand: Brand = {
     softClassic,
     softClassicNeon,
     superwashMerino,
+    sweetSnugglesLite,
   ],
 };

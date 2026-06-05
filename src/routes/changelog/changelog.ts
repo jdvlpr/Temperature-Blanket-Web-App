@@ -32,6 +32,21 @@ export const entries: ChangelogItemGroup[] = [
     year: 2026,
     months: [
       {
+        month: 'June',
+        items: [
+          {
+            notes: [
+              {
+                icon: ICONS.checkCircle,
+                text: `19 colorways`,
+                title: 'Added New Yarn: Loops & Threads - Sweet Snuggles Lite',
+              },
+            ],
+            version: '5.52.0',
+          },
+        ],
+      },
+      {
         month: 'May',
         items: [
           {
