@@ -18,7 +18,8 @@ import { recordPageView } from '$lib/utils/gallery-utils';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async (event) => {
-  return { stream: getProject(event) };
+  const { project } = await getProject(event);
+  return { project };
 };
 
 async function getProject(event) {

@@ -52,33 +52,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let imageWidth = $state();
   let imageHeight = $state();
 
-  let project = $state();
-  let projectURL = $state();
-  let projectTitle = $state();
-  let projectTitleNoHTML = $state('');
-  let weatherSources = $state();
-  let hash;
-  let params = $state();
-  let gauges = $state();
-  let flatColors = $state();
+  let project = $derived(data.project);
+  let projectURL = $derived(project?.projectUrl);
+  let projectTitle = $derived(project ? getTitleFromLocationsMeta(project.locations) : '');
+  let projectTitleNoHTML = $derived(stripHTMLTags(projectTitle));
+  let weatherSources = $derived(project?.weatherSources
+    ? JSON.parse(project?.weatherSources)
+    : null);
+  let hash = $derived(projectURL ? new URL(projectURL).hash.substring(1) : '');
+  let params = $derived(getProjectParametersFromURLHash(hash));
+  let gauges = $derived(getGauges(params));
+  let flatColors = $derived(gauges.flatMap((item) => item.colors));
 
   let aboutState = $state([]);
-
-  onMount(async () => {
-    const { project: streamedProject } = await data.stream;
-
-    project = streamedProject;
-    projectURL = project?.projectUrl;
-    projectTitle = getTitleFromLocationsMeta(project.locations);
-    projectTitleNoHTML = stripHTMLTags(projectTitle);
-    weatherSources = project?.weatherSources
-      ? JSON.parse(project?.weatherSources)
-      : null;
-    hash = projectURL ? new URL(projectURL).hash.substring(1) : '';
-    params = getProjectParametersFromURLHash(hash);
-    gauges = getGauges(params);
-    flatColors = gauges.flatMap((item) => item.colors);
-  });
 
   let yarns = [];
 
@@ -188,44 +174,38 @@ If not, see <https://www.gnu.org/licenses/>. -->
               class="bg-surface-100 dark:bg-surface-900 flex flex-col gap-2 p-4 text-center"
             >
               <p class="text-xl">
-                {#await data.stream}
-                  ...
-                {:then}
-                  {#if project}
-                    {@html projectTitle}
-                  {:else}
-                    This project gallery page cannot be found.
-                  {/if}
-                {/await}
+                {#if project}
+                  {@html projectTitle}
+                {:else}
+                  This project gallery page cannot be found.
+                {/if}
               </p>
 
-              {#await data.stream then}
-                {#if projectURL}
-                  <a
-                    class="btn preset-filled-primary-500 m-auto w-fit items-center gap-1"
-                    href={projectURL}
-                    target={locations.allValid ? '_blank' : '_self'}
+              {#if projectURL}
+                <a
+                  class="btn preset-filled-primary-500 m-auto w-fit items-center gap-1"
+                  href={projectURL}
+                  target={locations.allValid ? '_blank' : '_self'}
+                >
+                  Open in {#if locations.allValid}
+                    New
+                  {/if} Project Planner
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="currentColor"
+                    class="size-5"
                   >
-                    Open in {#if locations.allValid}
-                      New
-                    {/if} Project Planner
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke-width="1.5"
-                      stroke="currentColor"
-                      class="size-5"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="m8.25 4.5 7.5 7.5-7.5 7.5"
-                      />
-                    </svg>
-                  </a>
-                {/if}
-              {/await}
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="m8.25 4.5 7.5 7.5-7.5 7.5"
+                    />
+                  </svg>
+                </a>
+              {/if}
               <div
                 class="preset-tonal-tertiary rounded-container mx-auto mt-2 w-full max-w-(--breakpoint-sm) text-left"
               >
@@ -252,134 +232,132 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       {#snippet element(attributes)}
                         {#if !attributes.hidden}
                           <div {...attributes} transition:safeSlide>
-                            {#await data.stream then}
-                              <div class="flex flex-col gap-2">
-                                <p class="">
-                                  <span class="font-bold">Date Created:</span>
-                                  {new Date(project?.date).toLocaleDateString(
-                                    undefined,
-                                    {
-                                      timeZone: 'UTC',
-                                    },
-                                  )}
-                                </p>
+                            <div class="flex flex-col gap-2">
+                              <p class="">
+                                <span class="font-bold">Date Created:</span>
+                                {new Date(project?.date).toLocaleDateString(
+                                  undefined,
+                                  {
+                                    timeZone: 'UTC',
+                                  },
+                                )}
+                              </p>
 
-                                {#if JSON.stringify(reshapedColors) !== '{}'}
-                                  {#if reshapedColors?.some((item) => item.brandName && item.yarnName)}
-                                    <span class="">
-                                      <span class="font-bold">Yarn</span>:
-                                      <div class="flex flex-col gap-2 pl-4">
-                                        {#each reshapedColors as { brandName, yarnName, yarnWeightId, colors }}
-                                          {@const yarnWeightName =
-                                            ALL_YARN_WEIGHTS.find(
-                                              (n) => n.id === yarnWeightId,
-                                            )?.name}
-                                          {#if brandName && yarnName}
-                                            <div>
-                                              <span>
-                                                {brandName}
-                                                -
-                                                {yarnName}
-                                                <span
-                                                  class="text-sm opacity-70"
-                                                >
-                                                  ({#if yarnWeightName}
-                                                    <a
-                                                      href="/blog/yarn-weights?highlight={yarnWeightName}"
-                                                      class="link"
-                                                      target="_blank"
-                                                      title="See the yarn weights chart"
-                                                      >{yarnWeightName}</a
-                                                    >,
-                                                  {/if}{colors.length}
-                                                  {pluralize(
-                                                    'colorway',
-                                                    colors.length,
-                                                  )})
-                                                </span>
+                              {#if JSON.stringify(reshapedColors) !== '{}'}
+                                {#if reshapedColors?.some((item) => item.brandName && item.yarnName)}
+                                  <span class="">
+                                    <span class="font-bold">Yarn</span>:
+                                    <div class="flex flex-col gap-2 pl-4">
+                                      {#each reshapedColors as { brandName, yarnName, yarnWeightId, colors }}
+                                        {@const yarnWeightName =
+                                          ALL_YARN_WEIGHTS.find(
+                                            (n) => n.id === yarnWeightId,
+                                          )?.name}
+                                        {#if brandName && yarnName}
+                                          <div>
+                                            <span>
+                                              {brandName}
+                                              -
+                                              {yarnName}
+                                              <span
+                                                class="text-sm opacity-70"
+                                              >
+                                                ({#if yarnWeightName}
+                                                  <a
+                                                    href="/blog/yarn-weights?highlight={yarnWeightName}"
+                                                    class="link"
+                                                    target="_blank"
+                                                    title="See the yarn weights chart"
+                                                    >{yarnWeightName}</a
+                                                  >,
+                                                {/if}{colors.length}
+                                                {pluralize(
+                                                  'colorway',
+                                                  colors.length,
+                                                )})
                                               </span>
-                                              <div class="pl-4">
-                                                {#each colors as { name, hex }, index}
+                                            </span>
+                                            <div class="pl-4">
+                                              {#each colors as { name, hex }, index}
+                                                <div
+                                                  class="flex items-center gap-2"
+                                                >
                                                   <div
-                                                    class="flex items-center gap-2"
-                                                  >
-                                                    <div
-                                                      class="h-4 w-4 rounded-full"
-                                                      style="background:{hex};"
-                                                    ></div>
-                                                    <p class="">
-                                                      {name}
-                                                    </p>
-                                                  </div>
-                                                {/each}
-                                              </div>
+                                                    class="h-4 w-4 rounded-full"
+                                                    style="background:{hex};"
+                                                  ></div>
+                                                  <p class="">
+                                                    {name}
+                                                  </p>
+                                                </div>
+                                              {/each}
                                             </div>
-                                          {/if}
-                                        {/each}
-                                      </div>
-                                    </span>
-                                  {/if}
+                                          </div>
+                                        {/if}
+                                      {/each}
+                                    </div>
+                                  </span>
                                 {/if}
+                              {/if}
 
-                                {#if project?.projectTags.nodes[0].name}
-                                  <p>
-                                    <span class="font-bold">Pattern Type</span>:
-                                    <span class=""
-                                      >{project?.projectTags.nodes[0]
-                                        .name}</span
-                                    >
-                                  </p>
-                                {/if}
-
-                                {#if project?.projectTags.nodes[0].description}
-                                  <p>
-                                    <span class="font-bold"
-                                      >Pattern Description</span
-                                    >:
-                                    <span class="">
-                                      {project?.projectTags.nodes[0]
-                                        .description}</span
-                                    >
-                                  </p>
-                                {/if}
-
-                                {#if project?.totalDays}
-                                  <p>
-                                    <span class="font-bold">Total Days</span>:
-                                    <span class="">{project?.totalDays}</span>
-                                  </p>
-                                {/if}
-
-                                {#if project?.missingDays}
-                                  <p>
-                                    <span class="font-bold"
-                                      >Days Without Weather Data</span
-                                    >:
-                                    <span class="">{project?.missingDays}</span>
-                                  </p>
-                                {/if}
-
-                                {#if weatherSources}
-                                  {#each weatherSources as { name, url }}
-                                    <p>
-                                      <span class="font-bold"
-                                        >Weather Source</span
-                                      >:
-                                      <a href={url} target="_blank" class="link"
-                                        >{name}</a
-                                      >
-                                    </p>
-                                  {/each}
-                                {/if}
-
-                                <p class="italic">
-                                  The preview image below may not reflect the
-                                  most recent weather information. Open the
-                                  project in the Project Planner to see any
-                                  updates.
+                              {#if project?.projectTags.nodes[0].name}
+                                <p>
+                                  <span class="font-bold">Pattern Type</span>:
+                                  <span class=""
+                                    >{project?.projectTags.nodes[0]
+                                      .name}</span
+                                  >
                                 </p>
-                              </div>
-                            {/await}
+                              {/if}
+
+                              {#if project?.projectTags.nodes[0].description}
+                                <p>
+                                  <span class="font-bold"
+                                    >Pattern Description</span
+                                  >:
+                                  <span class="">
+                                    {project?.projectTags.nodes[0]
+                                      .description}</span
+                                  >
+                                </p>
+                              {/if}
+
+                              {#if project?.totalDays}
+                                <p>
+                                  <span class="font-bold">Total Days</span>:
+                                  <span class="">{project?.totalDays}</span>
+                                </p>
+                              {/if}
+
+                              {#if project?.missingDays}
+                                <p>
+                                  <span class="font-bold"
+                                    >Days Without Weather Data</span
+                                  >:
+                                  <span class="">{project?.missingDays}</span>
+                                </p>
+                              {/if}
+
+                              {#if weatherSources}
+                                {#each weatherSources as { name, url }}
+                                  <p>
+                                    <span class="font-bold"
+                                      >Weather Source</span
+                                    >:
+                                    <a href={url} target="_blank" class="link"
+                                      >{name}</a
+                                    >
+                                  </p>
+                               {/each}
+                              {/if}
+
+                              <p class="italic">
+                                The preview image below may not reflect the
+                                most recent weather information. Open the
+                                project in the Project Planner to see any
+                                updates.
+                              </p>
+                            </div>
                           </div>
                         {/if}
                       {/snippet}
@@ -392,9 +370,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {#snippet content()}
             <div class="grid grid-cols-1 gap-2 py-2">
               <div class="mt-2 text-center">
-                {#await data.stream}
-                  <div class="my-40"><Spinner /></div>
-                {:then}
                   {#if project}
                     <img
                       src={project?.featuredImage?.node.mediaItemUrl}
@@ -402,10 +377,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       class="m-auto max-h-[60vh]"
                     />
                   {/if}
-                {/await}
               </div>
 
-              {#await data.stream then}
                 <div class="mt-2 flex flex-col gap-4 text-center">
                   <div class="flex flex-col gap-8">
                     {#if gauges?.length}
@@ -563,7 +536,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     {/if}
                   </div>
                 </div>
-              {/await}
             </div>
           {/snippet}
         </Card>
