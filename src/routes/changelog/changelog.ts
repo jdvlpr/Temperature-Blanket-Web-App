@@ -38,6 +38,16 @@ export const entries: ChangelogItemGroup[] = [
             notes: [
               {
                 icon: ICONS.checkCircle,
+                text: `16 colorways`,
+                title: 'Added New Yarn: Herrschners - Worsted 8 Heathers',
+              },
+            ],
+            version: '5.54.0',
+          },
+          {
+            notes: [
+              {
+                icon: ICONS.checkCircle,
                 text: `78 colorways`,
                 title: 'Added New Yarn: Círculo - Anne',
               },
