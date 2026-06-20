@@ -224,6 +224,46 @@ const colorways: Colorway[] = [
         name: 'Beach Foam',
         hex: '#dad2d1',
       },
+      {
+        hex: '#4c5987',
+        name: 'Cobalt',
+      },
+      {
+        hex: '#88915f',
+        name: 'Fern',
+      },
+      {
+        hex: '#2b292b',
+        name: 'Dark Chocolate',
+      },
+      {
+        hex: '#51405f',
+        name: 'Deep Grape',
+      },
+      {
+        hex: '#8ba09d',
+        name: 'Rosemary',
+      },
+      {
+        hex: '#9eaa97',
+        name: 'Clary Sage',
+      },
+      {
+        hex: '#bf969e',
+        name: 'Lotus',
+      },
+      {
+        hex: '#4c507f',
+        name: 'Surf',
+      },
+      {
+        hex: '#b5c4af',
+        name: 'Spring Grass',
+      },
+      {
+        hex: '#b6a6c3',
+        name: 'Floret',
+      },
     ],
   },
 ];
