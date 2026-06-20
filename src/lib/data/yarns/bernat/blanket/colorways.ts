@@ -5,7 +5,7 @@ const colorways: Colorway[] = [
     source: {
       name: 'yarnspirations.com',
       href: 'https://www.yarnspirations.com/products/bernat-blanket-yarn-300g-10-5oz-1',
-      accessed: '2025-10-23',
+      accessed: '2026-06-20',
     },
     colors: [
       {
