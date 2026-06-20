@@ -48,8 +48,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
         >
         for their contributions, as well as to the following monthly supporters!
       </p>
-      <Supporters />
+
       <div class=""><DonateButton /></div>
+
+      <Supporters />
     </main>
   {/snippet}
 </AppShell>

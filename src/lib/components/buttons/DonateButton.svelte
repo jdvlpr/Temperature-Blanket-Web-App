@@ -15,30 +15,31 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import { PUBLIC_KOFI_LINK } from '$env/static/public';
+  import DonateOptionsModal from '$lib/components/modals/DonateOptionsModal.svelte';
+  import { dialog } from '$lib/state/page-state.svelte';
   import { HeartIcon } from '@lucide/svelte';
 
-  /**
-   * @typedef {Object} Props
-   * @property {boolean} [showlink]
-   */
-
-  /** @type {Props} */
-  let { showlink = true } = $props();
-  let url = new URL(PUBLIC_KOFI_LINK || 'https://kofi.com');
-  let linkTitle = url?.hostname + url?.pathname;
+  function openDonationOptions() {
+    dialog.trigger({
+      type: 'component',
+      component: {
+        ref: DonateOptionsModal,
+      },
+      options: {
+        showCloseButton: true,
+        size: 'small',
+      },
+    });
+  }
 </script>
 
 {#if PUBLIC_KOFI_LINK}
-  <a
-    href={PUBLIC_KOFI_LINK}
-    target="_blank"
-    rel="noopener noreferrer"
+  <button
+    type="button"
+    onclick={openDonationOptions}
     class="btn hover:preset-tonal-surface inline-flex h-auto items-center justify-center gap-1"
   >
     <HeartIcon fill="#EE6E6C" color="#EE6E6C" />
-    <span class="text-left whitespace-pre-wrap"
-      >Donate {#if showlink}
-        at <span class="">{linkTitle}</span>{/if}</span
-    >
-  </a>
+    <span class="text-left whitespace-pre-wrap">Donate Now</span>
+  </button>
 {/if}
