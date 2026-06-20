@@ -41,6 +41,11 @@ export const entries: ChangelogItemGroup[] = [
                 text: `16 colorways`,
                 title: 'Added New Yarn: Herrschners - Worsted 8 Heathers',
               },
+              {
+                icon: ICONS.checkCircle,
+                text: `8 colorways`,
+                title: 'Added New Yarn: Herrschners - Worsted 8 Wildflowers',
+              },
             ],
             version: '5.54.0',
           },
