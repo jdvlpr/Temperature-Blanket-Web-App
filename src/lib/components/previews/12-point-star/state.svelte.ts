@@ -62,7 +62,7 @@ export class TwelvePointStarPreviewClass {
 
   wpTagId = 16;
 
-  wpTagSlug = 'twelve-point-star';
+  wpTagSlug = '12-point-star';
 
   settingsComponent = Settings;
 
@@ -86,7 +86,7 @@ export class TwelvePointStarPreviewClass {
   // *******************
   settings = $state<TwelvePointStarPreviewSettings>({
     selectedTarget: 'tmax',
-    sharpness: 4,
+    sharpness: 5,
     centerSize: 3,
     additionalRoundsColor: '#f0f3f3',
     useSeasonTargets: false,
@@ -115,8 +115,8 @@ export class TwelvePointStarPreviewClass {
     Math.max(...this.weatherByMonth.map((m) => m.length), 1),
   );
 
-  /** Sharpness as float 0.0-1.0 */
-  sharpnessFloat = $derived(this.settings.sharpness / 10);
+  /** Sharpness as float 0.0- */
+  sharpnessFloat = $derived(this.settings.sharpness / 50);
 
   /** Center star peak radius (at star point tips) */
   centerPeakR = $derived(

@@ -96,8 +96,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 >
   <p class="text-2xl font-bold">Star Settings</p>
 
-  <div class="w-full max-w-sm text-left px-4 mb-4">
-    <Slider defaultValue={[twelvePointStarPreview.settings.sharpness]} min={0} max={4} step={1} onValueChange={({value}) => twelvePointStarPreview.settings.sharpness = value[0]}>
+  <div class="w-full max-w-md text-left mb-4">
+    <Slider defaultValue={[twelvePointStarPreview.settings.sharpness]} min={0} max={15} step={1} onValueChange={({value}) => twelvePointStarPreview.settings.sharpness = value[0]}>
     <Slider.Label>Star Sharpness</Slider.Label>
     <Slider.Control>
       <Slider.Track>
@@ -108,8 +108,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </Slider.Thumb>
     </Slider.Control>
     <Slider.MarkerGroup>
-      <Slider.Marker value={0}>Circular</Slider.Marker>
-      <Slider.Marker value={4}>Pointy</Slider.Marker>
+      <Slider.Marker class="inset-s-auto! translate-x-0! translate-y-0!" value={0}>Less Sharp</Slider.Marker>
+      <Slider.Marker  class="inset-s-[calc(100%-70px)]! translate-x-0! translate-y-0!" value={4}>More Sharp</Slider.Marker>
     </Slider.MarkerGroup>
   </Slider>
   </div>
