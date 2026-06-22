@@ -148,8 +148,6 @@ export class TwelvePointStarPreviewClass {
     this.centerValleyR + this.maxDaysInMonth * this.valleyStep,
   );
 
-
-
   /** Total SVG width */
   width = $derived(
     (this.outerPeakR +
@@ -185,7 +183,10 @@ export class TwelvePointStarPreviewClass {
     hash += `${this.id}=`;
     hash += `${this.settings.selectedTarget}`;
     hash += '(';
-    hash += `${this.settings.sharpness}${CHARACTERS_FOR_URL_HASH.separator}${this.settings.centerSize}${CHARACTERS_FOR_URL_HASH.separator}${chroma(this.settings.additionalRoundsColor).hex().substring(1)}${CHARACTERS_FOR_URL_HASH.separator}${this.settings.showBorder ? 1 : 0}${CHARACTERS_FOR_URL_HASH.separator}${this.settings.borderThickness}${CHARACTERS_FOR_URL_HASH.separator}${chroma(this.settings.borderColor).hex().substring(1)}`;
+    hash += `${this.settings.sharpness}${CHARACTERS_FOR_URL_HASH.separator}${this.settings.centerSize}${CHARACTERS_FOR_URL_HASH.separator}${chroma(this.settings.additionalRoundsColor).hex().substring(1)}`;
+    if (this.settings.showBorder) {
+      hash += `${CHARACTERS_FOR_URL_HASH.separator}1${CHARACTERS_FOR_URL_HASH.separator}${this.settings.borderThickness}${CHARACTERS_FOR_URL_HASH.separator}${chroma(this.settings.borderColor).hex().substring(1)}`;
+    }
     hash += ')';
     return hash;
   });
@@ -261,6 +262,8 @@ export class TwelvePointStarPreviewClass {
       (showBorder === '1' || showBorder === '0')
     ) {
       this.settings.showBorder = showBorder === '1';
+    } else {
+      this.settings.showBorder = false;
     }
     if (borderThickness !== undefined && Number.isFinite(+borderThickness)) {
       this.settings.borderThickness = +borderThickness;

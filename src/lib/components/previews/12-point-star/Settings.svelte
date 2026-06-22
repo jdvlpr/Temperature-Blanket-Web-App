@@ -75,7 +75,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           twelvePointStarPreview.weatherByMonth.filter((m) => m.length > 0)
             .length,
         )}</span
-      >, with up to
+      >, with
       <span class="font-semibold"
         >{twelvePointStarPreview.maxDaysInMonth} rows</span
       > per point.
