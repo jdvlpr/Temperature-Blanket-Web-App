@@ -148,14 +148,14 @@ export class TwelvePointStarPreviewClass {
     this.centerValleyR + this.maxDaysInMonth * this.valleyStep,
   );
 
-  /** Border star peak radius (center of the border stroke) */
+  /** Border star outer peak radius */
   borderPeakR = $derived(
-    this.outerPeakR + (this.settings.borderThickness * this.peakStep) / 2,
+    this.outerPeakR + this.settings.borderThickness * this.peakStep,
   );
 
-  /** Border star valley radius (center of the border stroke) */
+  /** Border star outer valley radius */
   borderValleyR = $derived(
-    this.outerValleyR + (this.settings.borderThickness * this.valleyStep) / 2,
+    this.outerValleyR + this.settings.borderThickness * this.valleyStep,
   );
 
   /** Total SVG width */

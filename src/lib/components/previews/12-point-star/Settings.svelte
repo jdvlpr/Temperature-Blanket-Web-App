@@ -170,17 +170,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <SpanYarnColorSelectIcon
       color={twelvePointStarPreview.settings.additionalRoundsColor}
     />
-    Accent Color (center star and padding rows)
+    Accent Color (for center star and padding rows)
   </button>
 
-  <hr class="w-full border-surface-500/20 my-1" />
+  <div>
 
-  <p class="text-xl font-bold">Border Settings</p>
-
-  <ToggleSwitch
+    <ToggleSwitch
     bind:checked={twelvePointStarPreview.settings.showBorder}
-    label="Show Outer Border"
+    label="Outer Border"
   />
+  </div>
 
   {#if twelvePointStarPreview.settings.showBorder}
     <label class="label">
@@ -189,7 +188,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         class="select w-fit min-w-[80px]"
         bind:value={twelvePointStarPreview.settings.borderThickness}
       >
-        {#each Array(5), i}
+        {#each Array(10), i}
           {@const value = i + 1}
           <option {value}>
             {value} {pluralize('round', value)}

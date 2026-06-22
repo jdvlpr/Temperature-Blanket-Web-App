@@ -185,6 +185,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
       showPreviewImageWeatherDetails(twelvePointStarPreview.targets);
     }}
   >
+    <!-- Optional outer border (rendered first/underneath) -->
+    {#if twelvePointStarPreview.settings.showBorder}
+      <polygon
+        points={getStarPolygonPoints(
+          width / 2,
+          height / 2,
+          twelvePointStarPreview.borderPeakR,
+          twelvePointStarPreview.borderValleyR,
+        )}
+        fill={twelvePointStarPreview.settings.borderColor}
+        stroke={twelvePointStarPreview.settings.borderColor}
+        stroke-width="0.5"
+      />
+    {/if}
+
     <!-- Center star shape -->
     <polygon
       points={getStarPolygonPoints(
@@ -209,20 +224,5 @@ If not, see <https://www.gnu.org/licenses/>. -->
         data-dayindex={dayIndex}
       />
     {/each}
-
-    <!-- Optional outer border -->
-    {#if twelvePointStarPreview.settings.showBorder}
-      <polygon
-        points={getStarPolygonPoints(
-          width / 2,
-          height / 2,
-          twelvePointStarPreview.borderPeakR,
-          twelvePointStarPreview.borderValleyR,
-        )}
-        fill="none"
-        stroke={twelvePointStarPreview.settings.borderColor}
-        stroke-width={twelvePointStarPreview.settings.borderThickness * twelvePointStarPreview.STITCH_SIZE}
-      />
-    {/if}
   </svg>
 {/if}
