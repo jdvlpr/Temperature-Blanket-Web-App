@@ -413,7 +413,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           class:hidden={pageSections.items[4].active === false}
         >
           <div class="mx-auto max-w-screen-md px-2">
-            <p class="mb-2">
+            <p class="my-2">
               Is this web app worth a cup of coffee to you? Your support enables
               ongoing development, keeps the site ad-free, and helps make this
               service available to craftspeople all around the world. Thanks!

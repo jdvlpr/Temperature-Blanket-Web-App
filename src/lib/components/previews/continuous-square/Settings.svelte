@@ -33,23 +33,28 @@ If not, see <https://www.gnu.org/licenses/>. -->
 {#if continuousSquarePreview.details?.rounds}
   <PreviewInfo previewTitle={continuousSquarePreview.name}>
     {#snippet description()}
-      Starting from the center, stitches are added in a clockwise square
-      pattern. Possible crochet patterns: Granny Square, Moss Stitch/Linen
-      Stitch Square.
+      <p>
+        Starting from the center, stitches are added in a clockwise square
+        pattern. Possible crochet patterns: Granny Square, Moss Stitch/Linen
+        Stitch Square.
+      </p>
     {/snippet}
     {#snippet details()}
-      There are <span class="font-semibold"
-        >{continuousSquarePreview.details.rounds}
-        rounds</span
-      >
-      with
-      <span class="font-semibold"
-        >{continuousSquarePreview.details.countOfAdditionalStitches} additional {pluralize(
-          'stitch',
-          continuousSquarePreview.details.countOfAdditionalStitches,
-          'es',
-        )}</span
-      >.
+      <p>
+        There are <span class="font-semibold"
+          >{continuousSquarePreview.details.rounds}
+          rounds</span
+        >
+        with
+        <span class="font-semibold"
+          >{continuousSquarePreview.details.countOfAdditionalStitches} additional
+          {pluralize(
+            'stitch',
+            continuousSquarePreview.details.countOfAdditionalStitches,
+            'es',
+          )}</span
+        >.
+      </p>
     {/snippet}
   </PreviewInfo>
 {/if}

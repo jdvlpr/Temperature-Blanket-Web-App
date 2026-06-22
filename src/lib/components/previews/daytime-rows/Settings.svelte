@@ -78,7 +78,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     link.setAttribute('href', encodedUri);
     link.setAttribute(
       'download',
-      `Stitches Table for ${locations.projectFilename}`,
+      `Stitches Per Row for ${locations.projectFilename}`,
     );
     link.className = 'hidden';
     document.body.appendChild(link);
@@ -89,7 +89,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <PreviewInfo previewTitle={daytimeRowsPreview.name}>
   {#snippet description()}
-    Each row is split according to the duration of sunlight that {weather.grouping}.
+    <p>
+      Each row is split according to the duration of sunlight that {weather.grouping}.
+    </p>
   {/snippet}
   {#snippet details()}
     {#if daytimeRowsPreview.settings.daytimePosition === 'left'}
@@ -175,7 +177,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <div class="mt-2 w-full">
       <Expand
         bind:isExpanded={isTableExpanded}
-        label="{tableIcon} Stitches Table"
+        label="{tableIcon} Stitches Per Row"
       />
     </div>
     {#if isTableExpanded}
@@ -238,7 +240,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             title="Download CSV File"
           >
             <DownloadIcon />
-            Download Stitches Table (CSV File)</button
+            Download Stitches Per Row (CSV File)</button
           >
         </div>
       </div>
@@ -247,7 +249,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </PreviewInfo>
 
 {@render previewComponent?.()}
-
 
 <div
   class="preset-outlined-surface-300-700 card flex flex-col items-start gap-4 p-4"

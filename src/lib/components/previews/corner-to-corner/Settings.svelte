@@ -21,15 +21,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { capitalizeFirstLetter } from '$lib/utils/other-utils';
   import { cornerToCornerPreview } from './state.svelte';
 
+  let { previewComponent } = $props();
+
   let targets = $derived(gauges.allCreated.map((n) => n.targets).flat());
 </script>
 
 <PreviewInfo previewTitle={cornerToCornerPreview.name}>
   {#snippet description()}
-    Days are represented by lines added in a back-and-forth pattern starting
-    from the bottom right.
+    <p>
+      Days are represented by lines added in a back-and-forth pattern starting
+      from the bottom right.
+    </p>
   {/snippet}
 </PreviewInfo>
+
+{@render previewComponent?.()}
 
 <div
   class="preset-outlined-surface-300-700 card flex flex-col items-start gap-4 p-4"

@@ -33,23 +33,27 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <PreviewInfo previewTitle={monthSquaresPreview.name}>
   {#snippet description()}
-    Each square represents one month. Each round in a square represents one day,
-    starting with the first of the month in the center of the square. Months
-    with fewer days have extra rounds added, so that each square has the same
-    number of rounds.
+    <p>
+      Each square represents one month. Each round in a square represents one
+      day, starting with the first of the month in the center of the square.
+      Months with fewer days have extra rounds added, so that each square has
+      the same number of rounds.
+    </p>
   {/snippet}
   {#snippet details()}
     {#if monthSquaresPreview.details}
-      There are <span class="font-semibold"
-        >{monthSquaresPreview.weatherMonths.length} month
-        {pluralize('square', monthSquaresPreview.weatherMonths.length)}</span
-      >. Each month square has
-      <span class="font-semibold"
-        >{monthSquaresPreview.details.roundsPerSquare} total {pluralize(
-          'round',
-          monthSquaresPreview.details.roundsPerSquare,
-        )}</span
-      >.
+      <p>
+        There are <span class="font-semibold"
+          >{monthSquaresPreview.weatherMonths.length} month
+          {pluralize('square', monthSquaresPreview.weatherMonths.length)}</span
+        >. Each month square has
+        <span class="font-semibold"
+          >{monthSquaresPreview.details.roundsPerSquare} total {pluralize(
+            'round',
+            monthSquaresPreview.details.roundsPerSquare,
+          )}</span
+        >.
+      </p>
     {/if}
   {/snippet}
 </PreviewInfo>

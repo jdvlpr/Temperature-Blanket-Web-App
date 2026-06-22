@@ -25,21 +25,24 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let { previewComponent } = $props();
 
-
   let targets = $derived(gauges.allCreated.map((n) => n.targets).flat());
 </script>
 
 <PreviewInfo previewTitle={chevronsPreview.name}>
   {#snippet description()}
-    Each {weather.grouping} is represented by a row of chevrons, added from top to
-    bottom.
+    <p>
+      Each {weather.grouping} is represented by a row of chevrons, added from top
+      to bottom.
+    </p>
   {/snippet}
   {#snippet details()}
     {#if chevronsPreview.details.rows}
-      There are <span class="font-semibold"
-        >{chevronsPreview.details.rows}
-        {pluralize('row', chevronsPreview.details.rows)}</span
-      >.
+      <p>
+        There are <span class="font-semibold"
+          >{chevronsPreview.details.rows}
+          {pluralize('row', chevronsPreview.details.rows)}</span
+        >.
+      </p>
     {/if}
   {/snippet}
 </PreviewInfo>

@@ -35,24 +35,28 @@ If not, see <https://www.gnu.org/licenses/>. -->
 {#if monthRowsPreview.details}
   <PreviewInfo previewTitle={monthRowsPreview.name}>
     {#snippet description()}
-      Rows are grouped by month from <span class="font-semibold"
-        >{#if monthRowsPreview.settings?.direction === 'left-to-right'}left to
-          right{:else if monthRowsPreview.settings.direction === 'top-to-bottom'}top
-          to bottom{/if}</span
-      >. Months with fewer days have extra rows added, so that each month
-      section has the same number of rows.
+      <p>
+        Rows are grouped by month from <span class="font-semibold"
+          >{#if monthRowsPreview.settings?.direction === 'left-to-right'}left to
+            right{:else if monthRowsPreview.settings.direction === 'top-to-bottom'}top
+            to bottom{/if}</span
+        >. Months with fewer days have extra rows added, so that each month
+        section has the same number of rows.
+      </p>
     {/snippet}
     {#snippet details()}
-      There are <span class="font-semibold"
-        >{monthRowsPreview.monthsInData.length} month
-        {pluralize('section', monthRowsPreview.monthsInData.length)}</span
-      >. Each month section has
-      <span class="font-semibold"
-        >{monthRowsPreview.details.rowsPerMonth} total {pluralize(
-          'row',
-          monthRowsPreview.details.rowsPerMonth,
-        )}</span
-      >.
+      <p>
+        There are <span class="font-semibold"
+          >{monthRowsPreview.monthsInData.length} month
+          {pluralize('section', monthRowsPreview.monthsInData.length)}</span
+        >. Each month section has
+        <span class="font-semibold"
+          >{monthRowsPreview.details.rowsPerMonth} total {pluralize(
+            'row',
+            monthRowsPreview.details.rowsPerMonth,
+          )}</span
+        >.
+      </p>
     {/snippet}
   </PreviewInfo>
 {/if}

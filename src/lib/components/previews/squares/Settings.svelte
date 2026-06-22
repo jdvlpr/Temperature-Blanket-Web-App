@@ -42,27 +42,34 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <PreviewInfo previewTitle={squaresPreview.name}>
   {#snippet description()}
-    Each square represents one {weather.grouping}. Squares are added from left
-    to right, top to bottom.
+    <p>
+      Each square represents one {weather.grouping}. Squares are added from left
+      to right, top to bottom.
+    </p>
   {/snippet}
   {#snippet details()}
     {#if squaresPreview.details}
-      There are <span class="font-semibold"
-        >{squaresPreview.squaresTotalCount} total {pluralize(
-          'square',
-          squaresPreview.squaresTotalCount,
-        )}</span
-      >
-      in
-      <span class="font-semibold"
-        >{squaresPreview.details.rows}
-        {pluralize('row', squaresPreview.details.rows)}</span
-      >{#if squaresPreview.details.additionalSquares}.
+      <p>
+        There are <span class="font-semibold"
+          >{squaresPreview.squaresTotalCount} total {pluralize(
+            'square',
+            squaresPreview.squaresTotalCount,
+          )}</span
+        >
+        in
         <span class="font-semibold"
-          >{squaresPreview.details.additionalSquares}
-          {pluralize('square', squaresPreview.details.additionalSquares)}</span
-        > have no weather data
-      {/if}.
+          >{squaresPreview.details.rows}
+          {pluralize('row', squaresPreview.details.rows)}</span
+        >{#if squaresPreview.details.additionalSquares}.
+          <span class="font-semibold"
+            >{squaresPreview.details.additionalSquares}
+            {pluralize(
+              'square',
+              squaresPreview.details.additionalSquares,
+            )}</span
+          > have no weather data
+        {/if}.
+      </p>
     {/if}
   {/snippet}
 </PreviewInfo>

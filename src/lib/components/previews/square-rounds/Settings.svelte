@@ -48,42 +48,47 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <PreviewInfo previewTitle={squareRoundsPreview.name}>
   {#snippet description()}
-    Each round in a square represents one {weather.grouping}. Squares are added
-    from left to right, top to bottom.
+    <p>
+      Each round in a square represents one {weather.grouping}. Squares are
+      added from left to right, top to bottom.
+    </p>
   {/snippet}
   {#snippet details()}
     {#if squareRoundsPreview.rows}
-      There are <span class="font-semibold"
-        >{squareRoundsPreview.totalSquares}
-        total {pluralize('square', squareRoundsPreview.totalSquares)}</span
-      >
-      (<span class="font-semibold"
-        >{squareRoundsPreview.settings.columns}
-        {pluralize('column', squareRoundsPreview.settings.columns)}</span
-      >
-      and
-      <span class="font-semibold"
-        >{squareRoundsPreview.rows}
-        {pluralize('row', squareRoundsPreview.rows)}</span
-      >)
-      {#if extraRounds}
-        , 1 square has <span class="font-semibold">{extraRounds}</span> of
-        <span class="font-semibold"
-          >{weatherRoundsPerSquare}
-          {pluralize('round', weatherRoundsPerSquare)}</span
-        > of weather data
-      {/if}
-
-      {#if squareRoundsPreview.extraSquares}
-        , <span class="font-semibold"
-          >{squareRoundsPreview.extraSquares}
-          {pluralize('square', squareRoundsPreview.extraSquares)}</span
+      <p>
+        There are <span class="font-semibold"
+          >{squareRoundsPreview.totalSquares}
+          total {pluralize('square', squareRoundsPreview.totalSquares)}</span
         >
-        {pluralize(
-          { singular: 'has', plural: 'have' },
-          squareRoundsPreview.extraSquares,
-        )} no weather data.
-      {/if}{#if extraRounds || squareRoundsPreview.extraSquares}
+        (<span class="font-semibold"
+          >{squareRoundsPreview.settings.columns}
+          {pluralize('column', squareRoundsPreview.settings.columns)}</span
+        >
+        and
+        <span class="font-semibold"
+          >{squareRoundsPreview.rows}
+          {pluralize('row', squareRoundsPreview.rows)}</span
+        >)
+        {#if extraRounds}
+          , 1 square has <span class="font-semibold">{extraRounds}</span> of
+          <span class="font-semibold"
+            >{weatherRoundsPerSquare}
+            {pluralize('round', weatherRoundsPerSquare)}</span
+          > of weather data
+        {/if}
+
+        {#if squareRoundsPreview.extraSquares}
+          , <span class="font-semibold"
+            >{squareRoundsPreview.extraSquares}
+            {pluralize('square', squareRoundsPreview.extraSquares)}</span
+          >
+          {pluralize(
+            { singular: 'has', plural: 'have' },
+            squareRoundsPreview.extraSquares,
+          )} no weather data.
+        {/if}
+      </p>
+      {#if extraRounds || squareRoundsPreview.extraSquares}
         <p class="italic">
           Adjust the <span class="inline font-bold">Layout Settings</span>
           or

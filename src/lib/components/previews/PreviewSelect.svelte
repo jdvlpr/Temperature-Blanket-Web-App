@@ -75,32 +75,31 @@ If not, see <https://www.gnu.org/licenses/>. -->
         id="select-pattern-type"
         value={activePreviewSelectId}
         onchange={(e) => {
-        onChangePattern(e.target.value);
-        tick().then(() => {
-          const activePreviewBtn = document.getElementById(
-            'active-preview-button',
-          );
-          if (activePreviewBtn) {
-            activePreviewBtn.scrollIntoView({
-              behavior: 'smooth',
-              block: 'nearest',
-              inline: 'center',
-            });
-          }
-        });
-      }}
-    >
-      {#each previews.all as { name, id }}
-        {#if id === 'twsr'}
-        <option value={id}>{name} (New)</option>
-        {:else}
-        <option value={id}>{name}</option>
-        {/if}
-      {/each}
-    </select>
-          </div>
-        </label>
-
+          onChangePattern(e.target.value);
+          tick().then(() => {
+            const activePreviewBtn = document.getElementById(
+              'active-preview-button',
+            );
+            if (activePreviewBtn) {
+              activePreviewBtn.scrollIntoView({
+                behavior: 'smooth',
+                block: 'nearest',
+                inline: 'center',
+              });
+            }
+          });
+        }}
+      >
+        {#each previews.all as { name, id }}
+          {#if id === 'twsr'}
+            <option value={id}>{name} (New)</option>
+          {:else}
+            <option value={id}>{name}</option>
+          {/if}
+        {/each}
+      </select>
+    </div>
+  </label>
 
   <div
     class="relative mx-auto my-2 flex w-fit snap-x justify-start overflow-auto pb-3"
@@ -128,11 +127,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
               class:!opacity-100={id === previews.activeId}
             />
             {#if id === 'twsr'}
-                <span class="badge bg-tertiary-100-900 absolute left-2 -bottom-3">New</span>
+              <span
+                class="badge bg-tertiary-100-900 absolute -bottom-3 left-0 w-full"
+                >New</span
+              >
             {/if}
           </button>
-          {/key}
-          {/if}
-          {/each}
+        {/key}
+      {/if}
+    {/each}
   </div>
 </div>

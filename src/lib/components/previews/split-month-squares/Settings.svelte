@@ -33,24 +33,29 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <PreviewInfo previewTitle={splitMonthSquaresPreview.name}>
   {#snippet description()}
-    Each square represents one month. Months are added from left to right, top
-    to bottom. Each round in a square represents one day, starting with the
-    first of the month in the center of the square. Each round is split in half
-    to represent two different weather parameters. Months with fewer days have
-    extra rounds added, so that each square has the same number of rounds.
+    <p>
+      Each square represents one month. Months are added from left to right, top
+      to bottom. Each round in a square represents one day, starting with the
+      first of the month in the center of the square. Each round is split in
+      half to represent two different weather parameters. Months with fewer days
+      have extra rounds added, so that each square has the same number of
+      rounds.
+    </p>
   {/snippet}
   {#snippet details()}
     {#if splitMonthSquaresPreview.details}
-      There are <span class="font-semibold"
-        >{splitMonthSquaresPreview.weatherMonths.length} month
-        {pluralize(
-          'square',
-          splitMonthSquaresPreview.weatherMonths.length,
-        )}</span
-      >. Each month square has
-      <span class="font-semibold"
-        >{splitMonthSquaresPreview.details.roundsPerSquare} total rounds</span
-      >.
+      <p>
+        There are <span class="font-semibold"
+          >{splitMonthSquaresPreview.weatherMonths.length} month
+          {pluralize(
+            'square',
+            splitMonthSquaresPreview.weatherMonths.length,
+          )}</span
+        >. Each month square has
+        <span class="font-semibold"
+          >{splitMonthSquaresPreview.details.roundsPerSquare} total rounds</span
+        >.
+      </p>
     {/if}
   {/snippet}
 </PreviewInfo>

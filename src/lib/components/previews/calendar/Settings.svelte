@@ -48,7 +48,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <PreviewInfo previewTitle={calendarPreview.name}>
   {#snippet description()}
-    Squares are arranged in a calendar-like grid, grouped by month.
+    <p>
+      Squares are arranged in a calendar-like grid, grouped by month.
+    </p>
   {/snippet}
 </PreviewInfo>
 

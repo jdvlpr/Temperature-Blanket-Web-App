@@ -48,42 +48,47 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <PreviewInfo previewTitle={twelvePointStarPreview.name}>
   {#snippet description()}
-    Each of the 12 points represents a month (starting with January at the top, moving clockwise).
-    Each chevron row within a point represents one {weather.grouping}'s weather
-    data, radiating outward from the center.
+    <p>
+      Each of the 12 points represents a month (starting with January at the
+      top, moving clockwise). Each chevron row within a point represents one {weather.grouping}'s
+      weather data, radiating outward from the center.
+    </p>
+    <p class="font-semibold mt-2">Important Note:</p>
+    <p class="">
+      The 12-Point Star works best with exactly 12 complete months of weather
+      data (January to December). If there are fewer than 12 months, points
+      representing missing months will remain completely filled with the accent
+      color. If there are more than 12 months, days from the same calendar month
+      across multiple years are stacked together in the same point, resulting in
+      longer points.
+    </p>
   {/snippet}
 
   {#snippet details()}
     {#if twelvePointStarPreview.weatherByMonth.some((m) => m.length > 0)}
-      There are <span class="font-semibold"
-        >{weather.data.length}
-        {pluralize(weather.grouping, weather.data.length)}</span
-      >
-      of weather data across
-      <span class="font-semibold"
-        >{twelvePointStarPreview.weatherByMonth.filter((m) => m.length > 0).length}
-        {pluralize(
-          'month',
-          twelvePointStarPreview.weatherByMonth.filter((m) => m.length > 0)
-            .length,
-        )}</span
-      >, with
-      <span class="font-semibold"
-        >{twelvePointStarPreview.maxRows} rows</span
-      > per point.
-      {#if monthsWithPadding.length > 0}
-          Months with fewer than {twelvePointStarPreview.maxDaysInMonth}
+      <p>
+        There are <span class="font-semibold"
+          >{weather.data.length}
+          {pluralize(weather.grouping, weather.data.length)}</span
+        >
+        of weather data across
+        <span class="font-semibold"
+          >{twelvePointStarPreview.weatherByMonth.filter((m) => m.length > 0)
+            .length}
           {pluralize(
-            weather.grouping,
-            twelvePointStarPreview.maxDaysInMonth,
-          )} have extra rows filled with the accent color.
-      {/if}
-      <div class="mt-4">
-        <p class="text-sm font-semibold">Important Note:</p>
-        <p class="text-sm text-surface-600-400 mt-1 leading-relaxed">
-          The 12-Point Star works best with exactly 12 complete months of weather data (January to December). If there are fewer than 12 months, points representing missing months will remain completely filled with the accent color. If there are more than 12 months, days from the same calendar month across multiple years are stacked together in the same point, resulting in longer points.
-        </p>
-      </div>
+            'month',
+            twelvePointStarPreview.weatherByMonth.filter((m) => m.length > 0)
+              .length,
+          )}</span
+        >, with
+        <span class="font-semibold">{twelvePointStarPreview.maxRows} rows</span>
+        per point.
+        {#if monthsWithPadding.length > 0}
+          Months with fewer than {twelvePointStarPreview.maxDaysInMonth}
+          {pluralize(weather.grouping, twelvePointStarPreview.maxDaysInMonth)} have
+          extra rows filled with the accent color.
+        {/if}
+      </p>
     {/if}
   {/snippet}
 </PreviewInfo>
@@ -96,21 +101,39 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <p class="text-2xl font-bold">Star Settings</p>
 
   <div class="w-full max-w-md text-left mb-4">
-    <Slider value={[twelvePointStarPreview.settings.sharpness]} min={0} max={20} step={1} onValueChange={({value}) => twelvePointStarPreview.settings.sharpness = value[0]}>
-    <Slider.Label>Star Sharpness: {displayNumber(twelvePointStarPreview.settings.sharpness / 20 * 100, 0)}%</Slider.Label>
-    <Slider.Control>
-      <Slider.Track>
-        <Slider.Range />
-      </Slider.Track>
-      <Slider.Thumb index={0}>
-        <Slider.HiddenInput />
-      </Slider.Thumb>
-    </Slider.Control>
-    <Slider.MarkerGroup>
-      <Slider.Marker class="inset-s-auto! translate-x-0! translate-y-0!" value={0}>Flat</Slider.Marker>
-      <Slider.Marker  class="inset-s-[calc(100%-35px)]! translate-x-0! translate-y-0!" value={20}>Sharp</Slider.Marker>
-    </Slider.MarkerGroup>
-  </Slider>
+    <Slider
+      value={[twelvePointStarPreview.settings.sharpness]}
+      min={0}
+      max={20}
+      step={1}
+      onValueChange={({ value }) =>
+        (twelvePointStarPreview.settings.sharpness = value[0])}
+    >
+      <Slider.Label
+        >Star Sharpness: {displayNumber(
+          (twelvePointStarPreview.settings.sharpness / 20) * 100,
+          0,
+        )}%</Slider.Label
+      >
+      <Slider.Control>
+        <Slider.Track>
+          <Slider.Range />
+        </Slider.Track>
+        <Slider.Thumb index={0}>
+          <Slider.HiddenInput />
+        </Slider.Thumb>
+      </Slider.Control>
+      <Slider.MarkerGroup>
+        <Slider.Marker
+          class="inset-s-auto! translate-x-0! translate-y-0!"
+          value={0}>Flat</Slider.Marker
+        >
+        <Slider.Marker
+          class="inset-s-[calc(100%-35px)]! translate-x-0! translate-y-0!"
+          value={20}>Sharp</Slider.Marker
+        >
+      </Slider.MarkerGroup>
+    </Slider>
   </div>
 
   <label class="label">
@@ -156,11 +179,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </button>
 
   <div>
-
     <ToggleSwitch
-    bind:checked={twelvePointStarPreview.settings.showBorder}
-    label="Outer Border"
-  />
+      bind:checked={twelvePointStarPreview.settings.showBorder}
+      label="Outer Border"
+    />
   </div>
 
   {#if twelvePointStarPreview.settings.showBorder}
@@ -173,7 +195,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {#each Array(10), i}
           {@const value = i + 1}
           <option {value}>
-            {value} {pluralize('round', value)}
+            {value}
+            {pluralize('round', value)}
           </option>
         {/each}
       </select>

@@ -48,41 +48,45 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <PreviewInfo previewTitle={hexagonRoundsPreview.name}>
   {#snippet description()}
-    Each round in a hexagon represents one {weather.grouping}. Hexagons are
-    added from left to right, top to bottom.
+    <p>
+      Each round in a hexagon represents one {weather.grouping}. Hexagons are
+      added from left to right, top to bottom.
+    </p>
   {/snippet}
 
   {#snippet details()}
     {#if hexagonRoundsPreview.rows}
-      There are <span class="font-semibold"
-        >{hexagonRoundsPreview.totalHexagons}
-        total {pluralize('hexagon', hexagonRoundsPreview.totalHexagons)}</span
-      >
-      in
-      <span class="font-semibold"
-        >{hexagonRoundsPreview.rows}
-        {pluralize('row', hexagonRoundsPreview.rows)}</span
-      >{#if extraRounds}, <span class="font-semibold">1</span> hexagon has
-        <span class="font-semibold">{extraRounds}</span>
-        of
-        <span class="font-semibold"
-          >{weatherRoundsPerHexagon}
-          {pluralize('round', weatherRoundsPerHexagon)}
-        </span> of weather data
-      {/if}
-      {#if hexagonRoundsPreview.hexagonsWithNoWeatherData}, and <span
-          class="font-semibold"
-          >{hexagonRoundsPreview.hexagonsWithNoWeatherData}
-          {pluralize(
-            'hexagon',
-            hexagonRoundsPreview.hexagonsWithNoWeatherData,
-          )}</span
+      <p>
+        There are <span class="font-semibold"
+          >{hexagonRoundsPreview.totalHexagons}
+          total {pluralize('hexagon', hexagonRoundsPreview.totalHexagons)}</span
         >
-        {pluralize(
-          { singular: 'has', plural: 'have' },
-          hexagonRoundsPreview.hexagonsWithNoWeatherData,
-        )} no weather data.
-      {/if}
+        in
+        <span class="font-semibold"
+          >{hexagonRoundsPreview.rows}
+          {pluralize('row', hexagonRoundsPreview.rows)}</span
+        >{#if extraRounds}, <span class="font-semibold">1</span> hexagon has
+          <span class="font-semibold">{extraRounds}</span>
+          of
+          <span class="font-semibold"
+            >{weatherRoundsPerHexagon}
+            {pluralize('round', weatherRoundsPerHexagon)}
+          </span> of weather data
+        {/if}
+        {#if hexagonRoundsPreview.hexagonsWithNoWeatherData}, and <span
+            class="font-semibold"
+            >{hexagonRoundsPreview.hexagonsWithNoWeatherData}
+            {pluralize(
+              'hexagon',
+              hexagonRoundsPreview.hexagonsWithNoWeatherData,
+            )}</span
+          >
+          {pluralize(
+            { singular: 'has', plural: 'have' },
+            hexagonRoundsPreview.hexagonsWithNoWeatherData,
+          )} no weather data.
+        {/if}
+      </p>
       {#if extraRounds || hexagonRoundsPreview.hexagonsWithNoWeatherData}
         <p class="italic">
           To potentially avoid rounds with no weather data, adjust the <span

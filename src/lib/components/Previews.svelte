@@ -38,81 +38,80 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div class="preset-tonal-surface card p-2 md:p-4 md:shadow-lg mt-4">
+  <PreviewSelect />
 
-<PreviewSelect />
+  <div class="flex flex-col items-start justify-center gap-2">
+    {#if gauges.activeGauge?.colors}
+      {#key previews.active}
+        <div class="flex w-full flex-wrap items-start justify-center gap-4">
+          <previews.active.settingsComponent>
+            {#snippet previewComponent()}
+              <div class="w-full">
+                <previews.active.previewComponent />
+              </div>
+            {/snippet}
+          </previews.active.settingsComponent>
 
-<div class="flex flex-col items-start justify-center gap-2">
-  {#if gauges.activeGauge?.colors}
-    {#key previews.active}
-      <div class="flex w-full flex-wrap items-start justify-center gap-4">
-        <previews.active.settingsComponent>
-          {#snippet previewComponent()}
-            <previews.active.previewComponent />
-             <p class="text-sm w-full">Touch or click the preview above to see weather details.</p>
-          {/snippet}
-        </previews.active.settingsComponent>
+          <Drawer.Root bind:open={drawerState.weatherDetails}>
+            <Drawer.Portal>
+              <Drawer.Overlay class="fixed inset-0 z-40 bg-black/40" />
 
-        <Drawer.Root bind:open={drawerState.weatherDetails}>
-          <Drawer.Portal>
-            <Drawer.Overlay class="fixed inset-0 z-40 bg-black/40" />
-
-            <Drawer.Content
-              class="bg-surface-50 dark:bg-surface-950 rounded-tl-container rounded-tr-container fixed right-0 bottom-0 left-0 z-50 mt-24 flex flex-col"
-            >
-              <div
-                class="rounded-tl-container rounded-tr-container overflow-auto pt-4"
+              <Drawer.Content
+                class="bg-surface-50 dark:bg-surface-950 rounded-tl-container rounded-tr-container fixed right-0 bottom-0 left-0 z-50 mt-24 flex flex-col"
               >
                 <div
-                  class="bg-surface-950-50 mx-auto mb-4 h-1.5 w-12 shrink-0 rounded-full"
-                ></div>
-                <div class="mx-auto text-center">
-                  <WeatherDetails
-                    weatherTargets={previewWeatherTargets.value}
-                    getTargets={previewWeatherTargets.getter}
-                  />
+                  class="rounded-tl-container rounded-tr-container overflow-auto pt-4"
+                >
+                  <div
+                    class="bg-surface-950-50 mx-auto mb-4 h-1.5 w-12 shrink-0 rounded-full"
+                  ></div>
+                  <div class="mx-auto text-center">
+                    <WeatherDetails
+                      weatherTargets={previewWeatherTargets.value}
+                      getTargets={previewWeatherTargets.getter}
+                    />
+                  </div>
                 </div>
-              </div>
-            </Drawer.Content>
-          </Drawer.Portal>
-        </Drawer.Root>
-      </div>      
-    {/key}
-
-    <div
-      class="rounded-container bg-surface-100 dark:bg-surface-900 mt-2 flex w-full flex-wrap justify-center gap-2 px-4 py-2 shadow-inner"
-    >
-      <button
-        class="btn hover:preset-tonal-surface"
-        title="Download PNG"
-        onclick={() => {
-          downloadPreviewPNG(
-            previews.active.width,
-            previews.active.height,
-            previews.active.svg,
-          );
-        }}
-      >
-        <ImageIcon />
-        Download Image (PNG)
-      </button>
-
-      <SendToGalleryButton isPrimary={true} />
-
-      {#if project.gallery.href && project.gallery.title && project.gallery.title === locations.projectTitle}
-        <div class="flex w-full flex-col justify-center gap-1">
-          <p>View this project's gallery page:</p>
-          <p>
-            <a
-              href={project.gallery.href}
-              target="_blank"
-              class="btn hover:preset-tonal-surface w-fit whitespace-pre-wrap underline"
-              rel="noreferrer">{project.gallery.title}</a
-            >
-          </p>
+              </Drawer.Content>
+            </Drawer.Portal>
+          </Drawer.Root>
         </div>
-      {/if}
-    </div>
-  {/if}
-</div>
+      {/key}
 
+      <div
+        class="rounded-container bg-surface-100 dark:bg-surface-900 mt-2 flex w-full flex-wrap justify-center gap-2 px-4 py-2 shadow-inner"
+      >
+        <button
+          class="btn hover:preset-tonal-surface"
+          title="Download PNG"
+          onclick={() => {
+            downloadPreviewPNG(
+              previews.active.width,
+              previews.active.height,
+              previews.active.svg,
+            );
+          }}
+        >
+          <ImageIcon />
+          Download Image (PNG)
+        </button>
+
+        <SendToGalleryButton isPrimary={true} />
+
+        {#if project.gallery.href && project.gallery.title && project.gallery.title === locations.projectTitle}
+          <div class="flex w-full flex-col justify-center gap-1">
+            <p>View this project's gallery page:</p>
+            <p>
+              <a
+                href={project.gallery.href}
+                target="_blank"
+                class="btn hover:preset-tonal-surface w-fit whitespace-pre-wrap underline"
+                rel="noreferrer">{project.gallery.title}</a
+              >
+            </p>
+          </div>
+        {/if}
+      </div>
+    {/if}
+  </div>
 </div>
