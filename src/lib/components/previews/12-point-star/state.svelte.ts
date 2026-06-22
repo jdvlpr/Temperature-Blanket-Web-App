@@ -51,13 +51,13 @@ export class TwelvePointStarPreviewClass {
   // *******************
   name = '12-Point Star';
 
-  id = 'strd';
+  id = 'twsr';
 
   svg = $state();
 
   img = {
-    light: './images/preview_icons/12-Point Star.png',
-    dark: './images/preview_icons/12-Point Star White.png',
+    light: './images/preview_icons/12 Point Star.png',
+    dark: './images/preview_icons/12 Point Star White.png',
   };
 
   wpTagId = 16;
@@ -120,16 +120,12 @@ export class TwelvePointStarPreviewClass {
 
   /** Center star peak radius (at star point tips) */
   centerPeakR = $derived(
-    this.settings.centerSize *
-      this.STITCH_SIZE *
-      (1 + this.sharpnessFloat),
+    this.settings.centerSize * this.STITCH_SIZE * (1 + this.sharpnessFloat),
   );
 
   /** Center star valley radius (between star points) */
   centerValleyR = $derived(
-    this.settings.centerSize *
-      this.STITCH_SIZE *
-      (1 - this.sharpnessFloat),
+    this.settings.centerSize * this.STITCH_SIZE * (1 - this.sharpnessFloat),
   );
 
   /** How much the peak radius grows per row */
@@ -139,9 +135,7 @@ export class TwelvePointStarPreviewClass {
   valleyStep = $derived(this.STITCH_SIZE * (1 - this.sharpnessFloat));
 
   /** Outermost peak radius */
-  outerPeakR = $derived(
-    this.centerPeakR + this.maxDaysInMonth * this.peakStep,
-  );
+  outerPeakR = $derived(this.centerPeakR + this.maxDaysInMonth * this.peakStep);
 
   /** Total SVG width */
   width = $derived(this.outerPeakR * 2 + this.STITCH_SIZE * 4);
@@ -177,8 +171,7 @@ export class TwelvePointStarPreviewClass {
     const closeParen = hash.indexOf(')');
 
     // If either parenthesis is missing or in the wrong order, stop
-    if (openParen === -1 || closeParen === -1 || closeParen < openParen)
-      return;
+    if (openParen === -1 || closeParen === -1 || closeParen < openParen) return;
 
     // Extract the part before the parentheses as targets
     const targets = hash.substring(0, openParen);
@@ -213,8 +206,7 @@ export class TwelvePointStarPreviewClass {
 
     // Try parsing each setting safely
     if (Number.isFinite(+sharpness)) this.settings.sharpness = +sharpness;
-    if (Number.isFinite(+centerSize))
-      this.settings.centerSize = +centerSize;
+    if (Number.isFinite(+centerSize)) this.settings.centerSize = +centerSize;
 
     if (
       typeof additionalRoundsColor !== 'undefined' &&
@@ -222,13 +214,11 @@ export class TwelvePointStarPreviewClass {
       additionalRoundsColor !== ''
     ) {
       try {
-        this.settings.additionalRoundsColor =
-          chroma(additionalRoundsColor).hex();
-      } catch (e) {
-        console.warn(
-          'Invalid color value in hash:',
+        this.settings.additionalRoundsColor = chroma(
           additionalRoundsColor,
-        );
+        ).hex();
+      } catch (e) {
+        console.warn('Invalid color value in hash:', additionalRoundsColor);
       }
     }
   }

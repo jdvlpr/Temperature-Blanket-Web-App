@@ -15,6 +15,7 @@
 
 import { calendarPreview } from '$lib/components/previews/calendar/state.svelte';
 import type { WeatherParam } from '$lib/types/gauge-types';
+import { twelvePointStarPreview } from '$lib/components/previews/12-point-star/state.svelte';
 import { chevronsPreview } from '$lib/components/previews/chevrons/state.svelte';
 import { continuousSquarePreview } from '$lib/components/previews/continuous-square/state.svelte';
 import { cornerToCornerPreview } from '$lib/components/previews/corner-to-corner/state.svelte';
@@ -26,7 +27,6 @@ import { rowsPreview } from '$lib/components/previews/rows/state.svelte';
 import { splitMonthSquaresPreview } from '$lib/components/previews/split-month-squares/state.svelte';
 import { squareRoundsPreview } from '$lib/components/previews/square-rounds/state.svelte';
 import { squaresPreview } from '$lib/components/previews/squares/state.svelte';
-import { twelvePointStarPreview } from '$lib/components/previews/twelve-point-star/state.svelte';
 
 export const previewWeatherTargets = $state({
   value: [] as WeatherParam[],
@@ -35,6 +35,7 @@ export const previewWeatherTargets = $state({
 
 class PreviewsState {
   all = $state([
+    twelvePointStarPreview,
     calendarPreview,
     chevronsPreview,
     continuousSquarePreview,
@@ -47,7 +48,6 @@ class PreviewsState {
     splitMonthSquaresPreview,
     squareRoundsPreview,
     squaresPreview,
-    twelvePointStarPreview,
   ]);
 
   activeId = $state<string>();

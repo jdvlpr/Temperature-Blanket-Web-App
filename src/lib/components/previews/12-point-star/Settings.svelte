@@ -23,6 +23,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { pluralize } from '$lib/utils/string-utils';
   import { capitalizeFirstLetter } from '$lib/utils/other-utils';
   import { twelvePointStarPreview } from './state.svelte';
+  import { Slider } from '@skeletonlabs/skeleton-svelte';
 
   let targets = $derived(gauges.allCreated.map((n) => n.targets).flat());
 
@@ -95,26 +96,23 @@ If not, see <https://www.gnu.org/licenses/>. -->
 >
   <p class="text-2xl font-bold">Star Settings</p>
 
-  <label class="label">
-    <span class="label-text">Star Sharpness</span>
-    <input
-      type="range"
-      class="range w-full max-w-[250px]"
-      min="0"
-      max="8"
-      step="1"
-      bind:value={twelvePointStarPreview.settings.sharpness}
-    />
-    <span class="text-sm"
-      >{twelvePointStarPreview.settings.sharpness === 0
-        ? 'Circle'
-        : twelvePointStarPreview.settings.sharpness <= 3
-          ? 'Subtle'
-          : twelvePointStarPreview.settings.sharpness <= 5
-            ? 'Moderate'
-            : 'Sharp'}</span
-    >
-  </label>
+  <div class="w-full max-w-sm text-left px-4 mb-4">
+    <Slider defaultValue={[twelvePointStarPreview.settings.sharpness]} min={0} max={4} step={1} onValueChange={({value}) => twelvePointStarPreview.settings.sharpness = value[0]}>
+    <Slider.Label>Star Sharpness</Slider.Label>
+    <Slider.Control>
+      <Slider.Track>
+        <Slider.Range />
+      </Slider.Track>
+      <Slider.Thumb index={0}>
+        <Slider.HiddenInput />
+      </Slider.Thumb>
+    </Slider.Control>
+    <Slider.MarkerGroup>
+      <Slider.Marker value={0}>Circular</Slider.Marker>
+      <Slider.Marker value={4}>Pointy</Slider.Marker>
+    </Slider.MarkerGroup>
+  </Slider>
+  </div>
 
   <label class="label">
     <span class="label-text">Center Size</span>
@@ -172,7 +170,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     >
     <select
       class="select w-fit"
-      id="strd-param"
+      id="twsr-param"
       bind:value={twelvePointStarPreview.settings.selectedTarget}
     >
       {#each targets as { id, label, icon }}
