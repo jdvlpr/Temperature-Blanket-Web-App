@@ -93,7 +93,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   <div class="w-full max-w-md text-left mb-4">
     <Slider defaultValue={[twelvePointStarPreview.settings.sharpness]} min={0} max={15} step={1} onValueChange={({value}) => twelvePointStarPreview.settings.sharpness = value[0]}>
-    <Slider.Label>Star Sharpness</Slider.Label>
+    <Slider.Label>Star Sharpness {displayNumber(twelvePointStarPreview.settings.sharpness / 15 * 100, 0)}%</Slider.Label>
     <Slider.Control>
       <Slider.Track>
         <Slider.Range />
@@ -106,7 +106,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <Slider.Marker class="inset-s-auto! translate-x-0! translate-y-0!" value={0}>Flat</Slider.Marker>
       {#each Array(12).keys() as i}
         {@const value = i + 2}
-        <Slider.Marker class="opacity-30" value={value}>{displayNumber((i + 2) / 15 * 100, 0)}%</Slider.Marker>
+        <Slider.Marker class="opacity-30" value={value}>❘</Slider.Marker>
       {/each}
       <Slider.Marker  class="inset-s-[calc(100%-48px)]! translate-x-0! translate-y-0!" value={4}>Sharp</Slider.Marker>
     </Slider.MarkerGroup>
