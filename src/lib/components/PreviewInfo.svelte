@@ -23,7 +23,7 @@
   </button>
 
   {#if previews.showInformation}
-    <div class="flex flex-col gap-2" transition:slide>
+    <div class="flex flex-col gap-2 max-w-screen-md" transition:slide>
       {#if description}
         <div class="">
           <p class="text-2xl font-bold">About</p>

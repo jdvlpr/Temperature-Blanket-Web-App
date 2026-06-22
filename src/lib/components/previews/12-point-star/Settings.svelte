@@ -53,14 +53,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
       top, moving clockwise). Each chevron row within a point represents one {weather.grouping}'s
       weather data, radiating outward from the center.
     </p>
-    <p class="font-semibold mt-2">Important Note:</p>
+    <p class="font-semibold mt-2">Important Note</p>
     <p class="">
       The 12-Point Star works best with exactly 12 complete months of weather
-      data (January to December). If there are fewer than 12 months, points
-      representing missing months will remain completely filled with the accent
-      color. If there are more than 12 months, days from the same calendar month
-      across multiple years are stacked together in the same point, resulting in
-      longer points.
+      data (January 1st to December 31st). If there are fewer than 12 months,
+      points representing missing months will remain completely filled with the
+      accent color. If there are more than 12 months, days from the same
+      calendar month across multiple years are stacked together in the same
+      point, resulting in longer points.
     </p>
   {/snippet}
 

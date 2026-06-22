@@ -88,6 +88,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     Portal,
     SegmentedControl,
   } from '@skeletonlabs/skeleton-svelte';
+  import { ContrastIcon } from '@lucide/svelte';
 
   let activeTheme = $derived(
     THEMES.find((n) => n.id === (preferences.value.theme.mode || 'system')),
@@ -98,11 +99,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <Popover modal={true} autoFocus={true}>
     <Popover.Trigger class="btn hover:preset-tonal-surface">
       {#key preferences.value?.theme.mode}
-        <span
-          >{#if browser}{@html activeTheme?.icon}{:else}{@html THEMES.find(
-              (t) => t.id === 'system',
-            ).icon}{/if}</span
-        >
+        <span><ContrastIcon /></span>
         Theme
       {/key}
     </Popover.Trigger>
@@ -136,8 +133,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
                               >
                                 {@html icon}
                                 <span
-                                  class="hidden text-sm min-[400px]:inline md:text-base"
-                                  >{name}</span
+                                  class={[
+                                    id !== preferences.value.theme.mode &&
+                                      'hidden',
+                                    'text-sm min-[400px]:inline md:text-base',
+                                  ]}>{name}</span
                                 >
                               </span>
                             </SegmentedControl.ItemText>
