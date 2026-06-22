@@ -30,6 +30,9 @@ interface TwelvePointStarPreviewSettings extends BasePreviewSettings {
   sharpness: number; // 1-10, controls star pointiness (divided by 10 for actual ratio)
   centerSize: number; // multiplier of STITCH_SIZE for center star radius
   additionalRoundsColor: Color['hex'];
+  showBorder: boolean;
+  borderThickness: number;
+  borderColor: Color['hex'];
 }
 
 export class TwelvePointStarPreviewClass {
@@ -89,6 +92,9 @@ export class TwelvePointStarPreviewClass {
     sharpness: 5,
     centerSize: 3,
     additionalRoundsColor: '#f0f3f3',
+    showBorder: false,
+    borderThickness: 2,
+    borderColor: '#f0f3f3',
     useSeasonTargets: false,
   });
 
@@ -137,6 +143,11 @@ export class TwelvePointStarPreviewClass {
   /** Outermost peak radius */
   outerPeakR = $derived(this.centerPeakR + this.maxDaysInMonth * this.peakStep);
 
+  /** Outermost valley radius */
+  outerValleyR = $derived(
+    this.centerValleyR + this.maxDaysInMonth * this.valleyStep,
+  );
+
   /** Total SVG width */
   width = $derived(this.outerPeakR * 2 + this.STITCH_SIZE * 4);
 
@@ -158,7 +169,7 @@ export class TwelvePointStarPreviewClass {
     hash += `${this.id}=`;
     hash += `${this.settings.selectedTarget}`;
     hash += '(';
-    hash += `${this.settings.sharpness}${CHARACTERS_FOR_URL_HASH.separator}${this.settings.centerSize}${CHARACTERS_FOR_URL_HASH.separator}${chroma(this.settings.additionalRoundsColor).hex().substring(1)}`;
+    hash += `${this.settings.sharpness}${CHARACTERS_FOR_URL_HASH.separator}${this.settings.centerSize}${CHARACTERS_FOR_URL_HASH.separator}${chroma(this.settings.additionalRoundsColor).hex().substring(1)}${CHARACTERS_FOR_URL_HASH.separator}${this.settings.showBorder ? 1 : 0}${CHARACTERS_FOR_URL_HASH.separator}${this.settings.borderThickness}${CHARACTERS_FOR_URL_HASH.separator}${chroma(this.settings.borderColor).hex().substring(1)}`;
     hash += ')';
     return hash;
   });
@@ -202,7 +213,14 @@ export class TwelvePointStarPreviewClass {
     if (!parts || parts.length < 3) return;
 
     // Destructure parts into named settings
-    const [sharpness, centerSize, additionalRoundsColor] = parts;
+    const [
+      sharpness,
+      centerSize,
+      additionalRoundsColor,
+      showBorder,
+      borderThickness,
+      borderColor,
+    ] = parts;
 
     // Try parsing each setting safely
     if (Number.isFinite(+sharpness)) this.settings.sharpness = +sharpness;
@@ -219,6 +237,27 @@ export class TwelvePointStarPreviewClass {
         ).hex();
       } catch (e) {
         console.warn('Invalid color value in hash:', additionalRoundsColor);
+      }
+    }
+
+    if (
+      showBorder !== undefined &&
+      (showBorder === '1' || showBorder === '0')
+    ) {
+      this.settings.showBorder = showBorder === '1';
+    }
+    if (borderThickness !== undefined && Number.isFinite(+borderThickness)) {
+      this.settings.borderThickness = +borderThickness;
+    }
+    if (
+      typeof borderColor !== 'undefined' &&
+      borderColor !== null &&
+      borderColor !== ''
+    ) {
+      try {
+        this.settings.borderColor = chroma(borderColor).hex();
+      } catch (e) {
+        console.warn('Invalid border color value in hash:', borderColor);
       }
     }
   }

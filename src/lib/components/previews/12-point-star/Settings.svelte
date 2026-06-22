@@ -17,6 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
   import PreviewInfo from '$lib/components/PreviewInfo.svelte';
   import SpanYarnColorSelectIcon from '$lib/components/SpanYarnColorSelectIcon.svelte';
+  import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
   import { dialog } from '$lib/state/page-state.svelte';
   import { gauges } from '$lib/state/gauges-state.svelte';
   import { weather } from '$lib/state/weather-state.svelte';
@@ -87,6 +88,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
           )} have extra rows filled with the accent color.
         </p>
       {/if}
+      <div class="mt-4 border-t border-surface-500/30 pt-3">
+        <p class="text-sm font-semibold">Important Note on Month Data:</p>
+        <p class="text-xs text-surface-600-400 mt-1 leading-relaxed">
+          The 12-Point Star works best with exactly 12 complete months of weather data (January to December).
+        </p>
+        <p class="text-xs text-surface-600-400 mt-1 leading-relaxed font-medium">
+          • Fewer than 12 months: Points representing missing months will remain completely filled with the Accent Color (padding rows).
+        </p>
+        <p class="text-xs text-surface-600-400 mt-1 leading-relaxed font-medium">
+          • More than 12 months (e.g. multi-year data): Days from the same calendar month across multiple years are stacked together in the same point, resulting in longer points.
+        </p>
+      </div>
     {/if}
   {/snippet}
 </PreviewInfo>
@@ -113,7 +126,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {@const value = i + 2}
         <Slider.Marker class="opacity-30" value={value}>❘</Slider.Marker>
       {/each}
-      <Slider.Marker  class="inset-s-[calc(100%-50px)]! translate-x-0! translate-y-0!" value={4}>Pointier</Slider.Marker>
+      <Slider.Marker  class="inset-s-[calc(100%-48px)]! translate-x-0! translate-y-0!" value={4}>Pointier</Slider.Marker>
     </Slider.MarkerGroup>
   </Slider>
   </div>
@@ -125,7 +138,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       bind:value={twelvePointStarPreview.settings.centerSize}
     >
       {#each Array(11), i}
-        {@const value = i + 1}
+        {@const value = i}
         <option {value}>
           {value}
         </option>
@@ -159,6 +172,59 @@ If not, see <https://www.gnu.org/licenses/>. -->
     />
     Accent Color (center star and padding rows)
   </button>
+
+  <hr class="w-full border-surface-500/20 my-1" />
+
+  <p class="text-xl font-bold">Border Settings</p>
+
+  <ToggleSwitch
+    bind:checked={twelvePointStarPreview.settings.showBorder}
+    label="Show Outer Border"
+  />
+
+  {#if twelvePointStarPreview.settings.showBorder}
+    <label class="label">
+      <span class="label-text">Border Thickness</span>
+      <select
+        class="select w-fit min-w-[60px]"
+        bind:value={twelvePointStarPreview.settings.borderThickness}
+      >
+        {#each Array(5), i}
+          {@const value = i + 1}
+          <option {value}>
+            {value}px
+          </option>
+        {/each}
+      </select>
+    </label>
+
+    <button
+      class="btn hover:preset-tonal-surface text-left whitespace-pre-wrap"
+      title="Choose a Border Color"
+      onclick={() =>
+        dialog.trigger({
+          type: 'component',
+          component: {
+            ref: ChangeColor,
+            props: {
+              hex: twelvePointStarPreview.settings.borderColor,
+              onChangeColor: ({ hex }) => {
+                twelvePointStarPreview.settings.borderColor = hex;
+                dialog.close();
+              },
+            },
+          },
+          options: {
+            size: 'large',
+          },
+        })}
+    >
+      <SpanYarnColorSelectIcon
+        color={twelvePointStarPreview.settings.borderColor}
+      />
+      Border Color
+    </button>
+  {/if}
 </div>
 
 <div

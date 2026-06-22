@@ -209,5 +209,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
         data-dayindex={dayIndex}
       />
     {/each}
+
+    <!-- Optional outer border -->
+    {#if twelvePointStarPreview.settings.showBorder}
+      <polygon
+        points={getStarPolygonPoints(
+          width / 2,
+          height / 2,
+          twelvePointStarPreview.outerPeakR,
+          twelvePointStarPreview.outerValleyR,
+        )}
+        fill="none"
+        stroke={twelvePointStarPreview.settings.borderColor}
+        stroke-width={twelvePointStarPreview.settings.borderThickness}
+      />
+    {/if}
   </svg>
 {/if}
