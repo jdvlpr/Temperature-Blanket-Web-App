@@ -41,13 +41,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <PreviewSelect />
 
   <div class="flex flex-col items-start justify-center gap-2">
-    {#if gauges.activeGauge?.colors}
+    {#if gauges.activeGauge?.colors && previews.active?.previewComponent}
       {#key previews.active}
         <div class="flex w-full flex-wrap items-start justify-center gap-4">
           <previews.active.settingsComponent>
             {#snippet previewComponent()}
               <div class="w-full">
-                <previews.active.previewComponent />
+                {#if previews?.active?.previewComponent}
+                  <previews.active.previewComponent />
+                {/if}
               </div>
             {/snippet}
           </previews.active.settingsComponent>
