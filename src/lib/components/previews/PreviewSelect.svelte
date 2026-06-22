@@ -89,7 +89,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
       }}
     >
       {#each previews.all as { name, id }}
+        {#if id === 'twsr'}
+        <option value={id}>{name} (New)</option>
+        {:else}
         <option value={id}>{name}</option>
+        {/if}
       {/each}
     </select>
   </label>
@@ -119,9 +123,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
               class="size-[52px] opacity-40"
               class:!opacity-100={id === previews.activeId}
             />
+            {#if id === 'twsr'}
+                <span class="badge bg-tertiary-100-900 absolute left-2 -bottom-3">New</span>
+            {/if}
           </button>
-        {/key}
-      {/if}
-    {/each}
+          {/key}
+          {/if}
+          {/each}
   </div>
 </div>

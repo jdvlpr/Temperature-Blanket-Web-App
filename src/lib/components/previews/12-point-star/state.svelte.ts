@@ -27,7 +27,7 @@ import Settings from './Settings.svelte';
 
 interface TwelvePointStarPreviewSettings extends BasePreviewSettings {
   selectedTargets: WeatherParam['id'][];
-  sharpness: number; // 1-10, controls star pointiness (divided by 10 for actual ratio)
+  sharpness: number; // 1-20, controls star pointiness (divided by 50 for actual ratio)
   centerSize: number; // multiplier of STITCH_SIZE for center star radius
   additionalRoundsColor: Color['hex'];
   showBorder: boolean;
@@ -90,12 +90,12 @@ export class TwelvePointStarPreviewClass {
   settings = $state<TwelvePointStarPreviewSettings>({
     selectedTargets: ['tmax'],
     sharpness: 5,
-    centerSize: 3,
+    centerSize: 1,
     additionalRoundsColor: '#f0f3f3',
     showBorder: false,
     borderThickness: 2,
     borderColor: '#f0f3f3',
-    useSeasonTargets: false,
+    useSeasonTargets: false, // Not implemented yet
   });
 
   // *******************
@@ -126,7 +126,7 @@ export class TwelvePointStarPreviewClass {
     this.maxDaysInMonth * this.settings.selectedTargets.length,
   );
 
-  /** Sharpness as float 0.0- */
+  /** Sharpness as float*/
   sharpnessFloat = $derived(this.settings.sharpness / 50);
 
   /** Center star peak radius (at star point tips) */
@@ -149,9 +149,7 @@ export class TwelvePointStarPreviewClass {
   outerPeakR = $derived(this.centerPeakR + this.maxRows * this.peakStep);
 
   /** Outermost valley radius */
-  outerValleyR = $derived(
-    this.centerValleyR + this.maxRows * this.valleyStep,
-  );
+  outerValleyR = $derived(this.centerValleyR + this.maxRows * this.valleyStep);
 
   /** Total SVG width */
   width = $derived(
