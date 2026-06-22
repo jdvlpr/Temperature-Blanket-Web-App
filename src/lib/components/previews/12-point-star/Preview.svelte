@@ -99,13 +99,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
     const sections = [];
     const cx = twelvePointStarPreview.width / 2;
     const cy = twelvePointStarPreview.height / 2;
-    const maxDays = twelvePointStarPreview.maxDaysInMonth;
+    const maxRows = twelvePointStarPreview.maxRows;
+    const numTargets = twelvePointStarPreview.settings.selectedTargets.length;
 
     for (let monthIndex = 0; monthIndex < 12; monthIndex++) {
       const monthDays = twelvePointStarPreview.weatherByMonth[monthIndex];
       const actualDayCount = monthDays.length;
 
-      for (let row = 0; row < maxDays; row++) {
+      for (let row = 0; row < maxRows; row++) {
         const innerPeakR =
           twelvePointStarPreview.centerPeakR +
           row * twelvePointStarPreview.peakStep;
@@ -133,15 +134,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
         let isWeather = false;
         let dayIndex = 0;
 
-        if (row < actualDayCount) {
+        const dayIdxInMonth = Math.floor(row / numTargets);
+        const paramIdx = row % numTargets;
+
+        if (dayIdxInMonth < actualDayCount) {
           // This row has weather data
-          dayIndex = monthDays[row].dayIndex;
+          dayIndex = monthDays[dayIdxInMonth].dayIndex;
           const value = weather.getWeatherValue({
             dayIndex,
-            param: twelvePointStarPreview.settings.selectedTarget,
+            param: twelvePointStarPreview.settings.selectedTargets[paramIdx],
           });
           color = getColorInfo({
-            param: twelvePointStarPreview.settings.selectedTarget,
+            param: twelvePointStarPreview.settings.selectedTargets[paramIdx],
             value,
           }).hex;
           isWeather = true;

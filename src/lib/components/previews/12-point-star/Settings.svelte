@@ -18,6 +18,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import PreviewInfo from '$lib/components/PreviewInfo.svelte';
   import SpanYarnColorSelectIcon from '$lib/components/SpanYarnColorSelectIcon.svelte';
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
+  import ToggleSwitchGroup from '$lib/components/buttons/ToggleSwitchGroup.svelte';
   import { dialog } from '$lib/state/page-state.svelte';
   import { gauges } from '$lib/state/gauges-state.svelte';
   import { weather } from '$lib/state/weather-state.svelte';
@@ -25,23 +26,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { capitalizeFirstLetter } from '$lib/utils/other-utils';
   import { twelvePointStarPreview } from './state.svelte';
   import { Slider } from '@skeletonlabs/skeleton-svelte';
+  import { MONTHS } from '$lib/constants/weather-constants';
+  import { displayNumber } from '$lib/utils/number-utils';
 
   let targets = $derived(gauges.allCreated.map((n) => n.targets).flat());
 
-  const MONTH_NAMES = [
-    'January',
-    'February',
-    'March',
-    'April',
-    'May',
-    'June',
-    'July',
-    'August',
-    'September',
-    'October',
-    'November',
-    'December',
-  ];
+  const MONTH_NAMES = MONTHS.map((m) => m.name);
 
   let monthsWithPadding = $derived(
     twelvePointStarPreview.weatherByMonth
@@ -56,7 +46,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <PreviewInfo previewTitle={twelvePointStarPreview.name}>
   {#snippet description()}
-    Each of the 12 points represents a month (January at top, clockwise).
+    Each of the 12 points represents a month (starting with January at the top, moving clockwise).
     Each chevron row within a point represents one {weather.grouping}'s weather
     data, radiating outward from the center.
   {/snippet}
@@ -80,24 +70,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
         >{twelvePointStarPreview.maxDaysInMonth} rows</span
       > per point.
       {#if monthsWithPadding.length > 0}
-        <p class="mt-1 text-sm italic">
           Months with fewer than {twelvePointStarPreview.maxDaysInMonth}
           {pluralize(
             weather.grouping,
             twelvePointStarPreview.maxDaysInMonth,
           )} have extra rows filled with the accent color.
-        </p>
       {/if}
-      <div class="mt-4 border-t border-surface-500/30 pt-3">
-        <p class="text-sm font-semibold">Important Note on Month Data:</p>
-        <p class="text-xs text-surface-600-400 mt-1 leading-relaxed">
-          The 12-Point Star works best with exactly 12 complete months of weather data (January to December).
-        </p>
-        <p class="text-xs text-surface-600-400 mt-1 leading-relaxed font-medium">
-          • Fewer than 12 months: Points representing missing months will remain completely filled with the Accent Color (padding rows).
-        </p>
-        <p class="text-xs text-surface-600-400 mt-1 leading-relaxed font-medium">
-          • More than 12 months (e.g. multi-year data): Days from the same calendar month across multiple years are stacked together in the same point, resulting in longer points.
+      <div class="mt-4">
+        <p class="text-sm font-semibold">Important Note:</p>
+        <p class="text-sm text-surface-600-400 mt-1 leading-relaxed">
+          The 12-Point Star works best with exactly 12 complete months of weather data (January to December). If there are fewer than 12 months, points representing missing months will remain completely filled with the accent color. If there are more than 12 months, days from the same calendar month across multiple years are stacked together in the same point, resulting in longer points.
         </p>
       </div>
     {/if}
@@ -121,12 +103,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </Slider.Thumb>
     </Slider.Control>
     <Slider.MarkerGroup>
-      <Slider.Marker class="inset-s-auto! translate-x-0! translate-y-0!" value={0}>Rounder</Slider.Marker>
+      <Slider.Marker class="inset-s-auto! translate-x-0! translate-y-0!" value={0}>Flat</Slider.Marker>
       {#each Array(12).keys() as i}
         {@const value = i + 2}
-        <Slider.Marker class="opacity-30" value={value}>❘</Slider.Marker>
+        <Slider.Marker class="opacity-30" value={value}>{displayNumber((i + 2) / 15 * 100, 0)}%</Slider.Marker>
       {/each}
-      <Slider.Marker  class="inset-s-[calc(100%-48px)]! translate-x-0! translate-y-0!" value={4}>Pointier</Slider.Marker>
+      <Slider.Marker  class="inset-s-[calc(100%-48px)]! translate-x-0! translate-y-0!" value={4}>Sharp</Slider.Marker>
     </Slider.MarkerGroup>
   </Slider>
   </div>
@@ -231,20 +213,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 >
   <p class="text-2xl font-bold">Row Settings</p>
 
-  <label class="label">
-    <span class="label-text"
-      >Color Each Row Using the {capitalizeFirstLetter(
-        weather.grouping,
-      )}'s</span
-    >
-    <select
-      class="select w-fit"
-      id="twsr-param"
-      bind:value={twelvePointStarPreview.settings.selectedTarget}
-    >
-      {#each targets as { id, label, icon }}
-        <option value={id}>{icon} {label} </option>
-      {/each}
-    </select>
-  </label>
+  <ToggleSwitchGroup
+    groupLabel={`Color Each Row Using the ${capitalizeFirstLetter(weather.grouping)}'s`}
+    {targets}
+    bind:value={twelvePointStarPreview.settings.selectedTargets}
+  />
 </div>

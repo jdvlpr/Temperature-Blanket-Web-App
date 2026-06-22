@@ -26,7 +26,7 @@ import Preview from './Preview.svelte';
 import Settings from './Settings.svelte';
 
 interface TwelvePointStarPreviewSettings extends BasePreviewSettings {
-  selectedTarget: WeatherParam['id'];
+  selectedTargets: WeatherParam['id'][];
   sharpness: number; // 1-10, controls star pointiness (divided by 10 for actual ratio)
   centerSize: number; // multiplier of STITCH_SIZE for center star radius
   additionalRoundsColor: Color['hex'];
@@ -41,8 +41,8 @@ export class TwelvePointStarPreviewClass {
       // If a gauge is created or deleted, handle updating the available weather parameter targets
       $effect(() => {
         if (gauges.allCreated.length) {
-          this.settings.selectedTarget = setTargets(
-            this.settings.selectedTarget,
+          this.settings.selectedTargets = setTargets(
+            this.settings.selectedTargets,
           );
         }
       });
@@ -88,7 +88,7 @@ export class TwelvePointStarPreviewClass {
   // User settings properties
   // *******************
   settings = $state<TwelvePointStarPreviewSettings>({
-    selectedTarget: 'tmax',
+    selectedTargets: ['tmax'],
     sharpness: 5,
     centerSize: 3,
     additionalRoundsColor: '#f0f3f3',
@@ -121,6 +121,11 @@ export class TwelvePointStarPreviewClass {
     Math.max(...this.weatherByMonth.map((m) => m.length), 1),
   );
 
+  /** Max rows in any single point (month days * number of parameters) */
+  maxRows = $derived(
+    this.maxDaysInMonth * this.settings.selectedTargets.length,
+  );
+
   /** Sharpness as float 0.0- */
   sharpnessFloat = $derived(this.settings.sharpness / 50);
 
@@ -141,11 +146,11 @@ export class TwelvePointStarPreviewClass {
   valleyStep = $derived(this.STITCH_SIZE * (1 - this.sharpnessFloat));
 
   /** Outermost peak radius */
-  outerPeakR = $derived(this.centerPeakR + this.maxDaysInMonth * this.peakStep);
+  outerPeakR = $derived(this.centerPeakR + this.maxRows * this.peakStep);
 
   /** Outermost valley radius */
   outerValleyR = $derived(
-    this.centerValleyR + this.maxDaysInMonth * this.valleyStep,
+    this.centerValleyR + this.maxRows * this.valleyStep,
   );
 
   /** Total SVG width */
@@ -172,7 +177,7 @@ export class TwelvePointStarPreviewClass {
     gauges.allCreated
       .map((n) => n.targets)
       .flat()
-      .filter((n) => this.settings.selectedTarget.includes(n.id)),
+      .filter((n) => this.settings.selectedTargets.includes(n.id)),
   );
 
   // *******************
@@ -181,7 +186,7 @@ export class TwelvePointStarPreviewClass {
   hash = $derived.by(() => {
     let hash = '&';
     hash += `${this.id}=`;
-    hash += `${this.settings.selectedTarget}`;
+    hash += `${this.settings.selectedTargets.join('')}`;
     hash += '(';
     hash += `${this.settings.sharpness}${CHARACTERS_FOR_URL_HASH.separator}${this.settings.centerSize}${CHARACTERS_FOR_URL_HASH.separator}${chroma(this.settings.additionalRoundsColor).hex().substring(1)}`;
     if (this.settings.showBorder) {
@@ -202,8 +207,11 @@ export class TwelvePointStarPreviewClass {
     if (openParen === -1 || closeParen === -1 || closeParen < openParen) return;
 
     // Extract the part before the parentheses as targets
-    const targets = hash.substring(0, openParen);
-    this.settings.selectedTarget = targets;
+    const targetsStr = hash.substring(0, openParen);
+    const targets = targetsStr.match(/.{1,4}/g);
+    if (targets && targets.length) {
+      this.settings.selectedTargets = targets;
+    }
 
     // Set the current active id to this
     previews.activeId = this.id;
