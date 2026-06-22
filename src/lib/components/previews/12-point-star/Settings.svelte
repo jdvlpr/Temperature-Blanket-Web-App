@@ -108,8 +108,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </Slider.Thumb>
     </Slider.Control>
     <Slider.MarkerGroup>
-      <Slider.Marker class="inset-s-auto! translate-x-0! translate-y-0!" value={0}>Less Sharp</Slider.Marker>
-      <Slider.Marker  class="inset-s-[calc(100%-70px)]! translate-x-0! translate-y-0!" value={4}>More Sharp</Slider.Marker>
+      <Slider.Marker class="inset-s-auto! translate-x-0! translate-y-0!" value={0}>Rounder</Slider.Marker>
+      {#each Array(12).keys() as i}
+        {@const value = i + 2}
+        <Slider.Marker class="opacity-30" value={value}>❘</Slider.Marker>
+      {/each}
+      <Slider.Marker  class="inset-s-[calc(100%-50px)]! translate-x-0! translate-y-0!" value={4}>Pointier</Slider.Marker>
     </Slider.MarkerGroup>
   </Slider>
   </div>
