@@ -37,7 +37,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     const points = [];
     const totalVertices = numPoints * 2;
     for (let i = 0; i < totalVertices; i++) {
-      const angle = (Math.PI / numPoints) * i - Math.PI / 2; // start from top
+      const angle = (Math.PI / numPoints) * i - Math.PI / 2 + Math.PI / numPoints; // start from top with half-step offset to align peaks with chevron peaks
       const r = i % 2 === 0 ? peakR : valleyR;
       const x = cx + r * Math.cos(angle);
       const y = cy + r * Math.sin(angle);
