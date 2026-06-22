@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -14,25 +14,25 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { dev, version } from '$app/environment';
-  import { beforeNavigate, onNavigate } from '$app/navigation';
-  import { page } from '$app/state';
+  import { afterNavigate, beforeNavigate, onNavigate } from '$app/navigation';
   import { PUBLIC_MICROSOFT_CLARITY_ID } from '$env/static/public';
-  import ModalProvider from '$lib/components/modals/ModalProvider.svelte';
+  import DialogProvider from '$lib/components/modals/DialogProvider.svelte';
+  import LegacyMigrationError from '$lib/components/modals/LegacyMigrationError.svelte';
   import ToastProvider from '$lib/components/ToastProvider.svelte';
-  import { consentToMSClarityCookies, modal, project, toast } from '$lib/state';
-  import { supabase } from '$lib/supabaseClient';
   import {
-    dateToISO8601String,
-    dateToISO8601StringVersion2,
+    consentToMSClarityCookies,
+    dialog,
+    drawerState,
+    toast,
     handleKeyDown,
-    initializeLocalStorage,
-    privacy,
-    stringToDate,
-    stringToDateVersion2,
-  } from '$lib/utils';
+  } from '$lib/state/page-state.svelte';
+  import { project } from '$lib/state/project-state.svelte';
+  import { initializeLocalStorage } from '$lib/storage/storage-utils.svelte';
+  import { privacy } from '$lib/utils/privacy-utils.svelte';
   import { onMount, type Snippet } from 'svelte';
   import '../css/main.css';
+  import { ICONS } from '$lib/constants/icon-constants';
+  import { SquarePlayIcon } from '@lucide/svelte';
 
   interface Props {
     children?: Snippet;
@@ -40,43 +40,33 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let { children }: Props = $props();
 
   onMount(async () => {
-    initializeLocalStorage();
+    try {
+      await initializeLocalStorage();
+    } catch (e) {
+      if (!project.status.temporaryProjectsBackup.length) return;
+      const uid = crypto.randomUUID();
+      project.status.temporaryUid = uid;
+      dialog.trigger({
+        type: 'component',
+        component: { ref: LegacyMigrationError, props: { uid, error } },
+        options: {
+          size: 'large',
+        },
+      });
+    }
 
     // NOTE: Set window variable in order to access it inside the MS clarity function
     // See the script tag with id="clarity-script"
     window.MS_CLARITY_ID = PUBLIC_MICROSOFT_CLARITY_ID || null;
     privacy.init();
-
-    // temporary diagnostics
-    const a_stringToDate = stringToDate('2025-01-01');
-    const b_stringToDateVersion2 = stringToDateVersion2('2025-01-01');
-    const c_dateToISO8601String = dateToISO8601String(a_stringToDate);
-    const d_dateToISO8601String2 = dateToISO8601StringVersion2(
-      b_stringToDateVersion2,
-    );
-
-    const currentError = c_dateToISO8601String !== '2025-01-01';
-    const v2Error = d_dateToISO8601String2 !== '2025-01-01';
-    if (currentError || v2Error) {
-      await supabase.from('Weather Data Feedback').insert({
-        dev,
-        version,
-        flag: true,
-        pid: +project.timeStampId || 0,
-        details: {
-          [page.route.id || 'layout']: {
-            a_stringToDate,
-            b_stringToDateVersion2,
-            c_dateToISO8601String,
-            d_dateToISO8601String2,
-          },
-        },
-      });
-    }
   });
 
   beforeNavigate(() => {
-    modal.close();
+    dialog.close();
+  });
+
+  afterNavigate(() => {
+    drawerState.closeAll();
   });
 
   onNavigate((navigation) => {
@@ -158,6 +148,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     href="/images/favicon-16x16.png"
   />
   <link rel="shortcut icon" href="/favicon.ico" />
+
   <link rel="stylesheet" href="https://use.typekit.net/obw5vhr.css" />
 
   <meta name="theme-color" content="#f5f5f5" />
@@ -190,11 +181,31 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/if}
 </svelte:head>
 
+<div
+  class="flex w-full flex-col [view-transition-name:top-banner]"
+  id="top-banner"
+>
+  <div class="bg-primary-100-900 w-full p-2 text-center">
+    <a
+      href="https://www.youtube.com/watch?v=7NRLrpZb0Lo"
+      target="_blank"
+      rel="noopener"
+      class="btn hover:preset-tonal-surface whitespace-pre-wrap"
+    >
+      <SquarePlayIcon />
+      <span>
+        Watch: Plan a Temperature Blanket
+        <span class="max-sm:hidden">the Easy Way</span>
+      </span>
+    </a>
+  </div>
+</div>
+
 {@render children?.()}
 
 <ToastProvider />
 
-<ModalProvider />
+<DialogProvider />
 
 <style>
   @keyframes fade-in {
@@ -230,6 +241,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   :root::view-transition-new(root) {
     animation:
       210ms cubic-bezier(0, 0, 0.2, 1) 90ms both fade-in,
-      300ms cubic-bezier(0.4, 0, 0.2, 1) both slide-from-right;
+      400ms cubic-bezier(0.4, 0, 0.2, 1) both slide-from-right;
   }
 </style>

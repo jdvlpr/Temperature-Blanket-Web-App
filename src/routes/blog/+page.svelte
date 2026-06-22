@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -13,15 +13,26 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script>
+<script lang="ts">
   import { PUBLIC_BASE_DOMAIN_NAME, PUBLIC_BASE_URL } from '$env/static/public';
   import AppLogo from '$lib/components/AppLogo.svelte';
   import AppShell from '$lib/components/AppShell.svelte';
-  import { Segment } from '@skeletonlabs/skeleton-svelte';
+  import type { TISO8601DateString } from '$lib/types/weather-types';
+  import { stringToDate } from '$lib/utils/date-utils';
+  import { SegmentedControl } from '@skeletonlabs/skeleton-svelte';
   import { fade } from 'svelte/transition';
 
-  const posts = [
+  type BlogPostType = {
+    date?: TISO8601DateString;
+    href: string;
+    imgSrc: string;
+    imgAlt: string;
+    title: string;
+    tags: ('Help' | 'News')[];
+  };
+  const posts: BlogPostType[] = [
     {
+      date: '2025-03-20',
       href: '/blog/2025-03-20-version-5',
       imgSrc: '/images/blog-images/2025-03-20-version-5/featured-image.png',
       imgAlt: 'Version 5: Refreshed & Rebuilt',
@@ -36,6 +47,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       tags: ['Help'],
     },
     {
+      date: '2024-09-03',
       href: '/blog/2024-09-03-now-open-source',
       imgSrc: '/images/blog-images/2024-09-03-now-open-source/banner.jpeg',
       imgAlt: 'Open Source',
@@ -43,6 +55,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       tags: ['News'],
     },
     {
+      date: '2024-02-09',
       href: '/blog/2024-02-09-how-to-plan-a-temperature-blanket',
       imgSrc:
         '/images/blog-images/2024-02-09-how-to-plan-a-temperature-blanket/how-to-plan-your-project.png',
@@ -51,6 +64,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       tags: ['Help'],
     },
     {
+      date: '2023-12-19',
       href: '/blog/2023-12-19-version-3-unified-site-design',
       imgSrc:
         '/images/blog-images/2023-12-19-version-3-unified-site-design/featured-image.png',
@@ -107,29 +121,35 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <main
       class="m-auto mb-4 flex max-w-(--breakpoint-xl) flex-col items-center gap-4 px-2"
     >
-      <Segment
+      <SegmentedControl
         value={selectedTag}
         onValueChange={(e) => {
           selectedTag = e.value;
         }}
-        classes="mt-4"
-        background="bg-surface-100 dark:bg-surface-900 shadow-sm"
       >
-        {#each tags as tag}
-          <Segment.Item value={tag}>
-            <span class="flex items-center justify-center gap-1">
-              {tag}
-            </span>
-          </Segment.Item>
-        {/each}
-      </Segment>
+        <SegmentedControl.Control
+          class="bg-surface-100 dark:bg-surface-900 rounded-container mt-4 border-none shadow-sm"
+        >
+          <SegmentedControl.Indicator />
+          {#each tags as tag}
+            <SegmentedControl.Item value={tag}>
+              <SegmentedControl.ItemText>
+                <span class="flex items-center justify-center gap-1">
+                  {tag}
+                </span></SegmentedControl.ItemText
+              >
+              <SegmentedControl.ItemHiddenInput />
+            </SegmentedControl.Item>
+          {/each}
+        </SegmentedControl.Control>
+      </SegmentedControl>
 
       {#key selectedTag}
         <div
           in:fade
           class="m-auto grid max-w-(--breakpoint-xl) grid-cols-1 justify-start gap-4 md:grid-cols-3"
         >
-          {#each filteredPosts as { href, imgSrc, imgAlt, title, tags }}
+          {#each filteredPosts as { date, href, imgSrc, imgAlt, title, tags }}
             <div class="flex flex-col gap-4">
               <a
                 class="card bg-surface-50-950 hover:bg-surface-100-900 flex w-full flex-col items-center justify-center gap-2 p-4 text-center whitespace-pre-wrap"
@@ -142,15 +162,24 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 />
                 <h5 class="h5">{title}</h5>
 
-                {#if tags}
-                  {#each tags as item}
-                    <p
-                      class="bg-tertiary-200 dark:bg-tertiary-800 inline rounded px-2 text-sm"
-                    >
-                      {item}
+                <div class="flex w-full items-baseline justify-center gap-2">
+                  {#if date}
+                    <p class="text-surface-500 text-sm">
+                      {stringToDate(date).toLocaleDateString(undefined, {
+                        timeZone: 'UTC',
+                      })}
                     </p>
-                  {/each}
-                {/if}
+                  {/if}
+                  {#if tags}
+                    {#each tags as item}
+                      <p
+                        class="bg-tertiary-200 dark:bg-tertiary-800 inline rounded px-2 text-sm"
+                      >
+                        {item}
+                      </p>
+                    {/each}
+                  {/if}
+                </div>
               </a>
             </div>
           {/each}

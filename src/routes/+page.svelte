@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -14,7 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { browser, version } from '$app/environment';
+  import { browser } from '$app/environment';
   import { PUBLIC_BASE_URL, PUBLIC_SITE_TITLE } from '$env/static/public';
   import AppLogo from '$lib/components/AppLogo.svelte';
   import AppShell from '$lib/components/AppShell.svelte';
@@ -22,38 +22,41 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Locations from '$lib/components/Locations.svelte';
   import Navigation from '$lib/components/Navigation.svelte';
   import Previews from '$lib/components/Previews.svelte';
-  import Tooltip from '$lib/components/Tooltip.svelte';
   import WeatherSection from '$lib/components/WeatherSection.svelte';
   import DonateButton from '$lib/components/buttons/DonateButton.svelte';
   import SectionNavigationButtons from '$lib/components/buttons/SectionNavigationButtons.svelte';
   import ChooseWeatherSource from '$lib/components/modals/ChooseWeatherSource.svelte';
   import GettingStarted from '$lib/components/modals/GettingStarted.svelte';
+  import KeyboardShortcuts from '$lib/components/modals/KeyboardShortcuts.svelte';
   import LegacyNotification from '$lib/components/modals/LegacyNotification.svelte';
   import Menu from '$lib/components/modals/Menu.svelte';
+  import SaveProjectModal from '$lib/components/modals/SaveProjectModal.svelte';
+  import { safeSlide } from '$lib/features/transitions/safeSlide';
+  import { dialog, pageSections } from '$lib/state/page-state.svelte';
+  import { locations } from '$lib/state/location-state.svelte';
+  import { project } from '$lib/state/project-state.svelte';
+  import { weather } from '$lib/state/weather-state.svelte';
+  import { ProjectStorage } from '$lib/storage/projects.svelte';
   import {
-    locations,
-    modal,
-    pageSections,
-    project,
-    wasProjectLoadedFromURL,
-    weather,
-  } from '$lib/state';
-  import {
-    checkForProjectInLocalStorage,
     loadFromHistory,
-    setProjectSettings,
-    setUnitsFromNavigator,
     updateHistory,
-    upToDate,
-  } from '$lib/utils';
+  } from '$lib/utils/history-utils.svelte';
+  import { loadProjectFromURL } from '$lib/utils/load-project-utils.svelte';
+  import { setUnitsFromNavigator } from '$lib/utils/unit-utils.svelte';
+  import { upToDate } from '$lib/utils/other-utils';
   import {
-    BadgeHelpIcon,
+    BadgeQuestionMarkIcon,
+    BookmarkIcon,
+    BookOpenTextIcon,
+    CircleQuestionMarkIcon,
     EllipsisVerticalIcon,
+    KeyboardIcon,
     LightbulbIcon,
+    MailIcon,
     RedoIcon,
-    SaveIcon,
     UndoIcon,
   } from '@lucide/svelte';
+  import { Popover, Portal } from '@skeletonlabs/skeleton-svelte';
   import { onMount } from 'svelte';
 
   let debounceTimer: number;
@@ -64,14 +67,32 @@ If not, see <https://www.gnu.org/licenses/>. -->
     debounceTimer = window.setTimeout(callback, time);
   };
 
-  onMount(async () => {
-    const hasProjectURLParam = new URL(window.location.href).searchParams.has(
-      'project',
-    );
+  async function loadProject() {
+    // Check if the project needs to show a legacy notification
+    // Use this to display warnings about backwards compatibility if the project is incompatible
+    if (!upToDate(project.onLoaded.version, '0.98'))
+      dialog.trigger({
+        type: 'component',
+        component: { ref: LegacyNotification, props: { v: 'v0.98' } },
+      });
 
-    if (hasProjectURLParam) {
+    if (project.onLoaded.isProject) await ProjectStorage.load();
+
+    await loadProjectFromURL();
+
+    if (locations.allValid) project.status.wasLoaded = true;
+  }
+
+  $effect(() => {
+    if (project.url.hash) debounce(() => updateHistory(), 300);
+  });
+
+  onMount(async () => {
+    const isProject = new URL(window.location.href).searchParams.has('project');
+
+    if (isProject) {
       // Load a project from the URL
-      await loadProjectFromURL();
+      await loadProject();
     } else {
       // Setup up a new project
       // Load the default units based on window.navigator
@@ -79,26 +100,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     }
 
     project.status.loading = false;
-  });
-
-  async function loadProjectFromURL() {
-    // Check if the project needs to show a legacy notification
-    // Use this to display warnings about backwards compatibility if the project is incompatible
-    if (!upToDate(project.loaded.version, '0.98'))
-      modal.trigger({
-        type: 'component',
-        component: { ref: LegacyNotification, props: { v: 'v0.98' } },
-      });
-
-    await setProjectSettings();
-
-    await checkForProjectInLocalStorage();
-
-    wasProjectLoadedFromURL.value = true;
-  }
-
-  $effect(() => {
-    if (project.url.hash) debounce(() => updateHistory(), 300);
   });
 </script>
 
@@ -142,58 +143,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <meta property="og:image:height" content="630" />
 </svelte:head>
 
-{#snippet gettingStarted()}
-  <button
-    aria-label="Getting Started Guide"
-    onclick={() =>
-      modal.trigger({
-        type: 'component',
-        component: { ref: GettingStarted },
-        options: {
-          size: 'large',
-        },
-      })}
-    class="btn preset-filled-secondary-500 text-surface-contrast-500 gap-2"
-  >
-    <LightbulbIcon />
-    Getting Started
-  </button>
-{/snippet}
-
 <AppShell pageName="">
   {#snippet stickyHeader()}
     <div class="hidden lg:inline-flex">
       <AppLogo />
     </div>
-
     <div class="flex flex-1 justify-between gap-2 sm:justify-end">
-      {#if weather.data.length && locations.allValid}
-        <div class="hidden lg:inline-flex">
-          <Tooltip
-            classNames="btn hover:preset-tonal"
-            title="Save Project [Cmd]+[s] or [Ctrl]+[s]"
-            onclick={() =>
-              modal.trigger({
-                type: 'component',
-                component: { ref: Menu, props: { page: 'save' } },
-              })}
-          >
-            <SaveIcon />
-
-            <span class="max-[700px]:hidden min-[700px]:inline-block">Save</span
-            >
-            {#snippet tooltip()}
-              <p>Save your project in this browser and as a URL.</p>
-            {/snippet}
-          </Tooltip>
-        </div>
-      {/if}
-
       {#if weather.data.length}
         <div class="mx-auto sm:mx-0">
           <button
             aria-label="Undo"
-            class="btn hover:preset-tonal"
+            class="btn hover:preset-tonal-surface"
             title="Undo [Cmd ⌘]+[z] or [Ctrl]+[z]"
             id="undo"
             disabled={!weather.data.length ||
@@ -206,13 +166,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
             }}
           >
             <UndoIcon />
-            <span class="max-[740px]:hidden min-[740px]:inline-block">Undo</span
-            >
+            <span class="inline-block max-md:hidden">Undo</span>
           </button>
 
           <button
             aria-label="Redo"
-            class="btn hover:preset-tonal"
+            class="btn hover:preset-tonal-surface"
             id="redo"
             title="Redo [Cmd ⌘]+[Shift ⇧]+[z] or [Ctrl]+[Shift ⇧]+[Z]"
             disabled={!weather.data.length ||
@@ -225,100 +184,147 @@ If not, see <https://www.gnu.org/licenses/>. -->
             }}
           >
             <RedoIcon />
-            <span class=" max-[740px]:hidden min-[740px]:inline-block"
-              >Redo</span
-            >
+            <span class="inline-block max-md:hidden">Redo</span>
           </button>
         </div>
       {/if}
     </div>
 
-    <Tooltip
-      classNames="max-sm:btn-icon sm:btn hover:preset-tonal"
-      minWidth="265px"
-      title="Help"
-    >
-      <BadgeHelpIcon />
-      <span class="hidden sm:inline-block">About</span>
-      {#snippet tooltip()}
-        <div
-          class="flex flex-col gap-4 p-2"
-          aria-orientation="vertical"
-          aria-label="Help Menu"
-          tabindex="-1"
+    <Popover>
+      <Popover.Trigger
+        class="btn hover:preset-tonal-surface"
+        aria-label="Help"
+        title="Help"
+      >
+        <BadgeQuestionMarkIcon />
+        <span class="hidden sm:inline-block">Help</span>
+      </Popover.Trigger>
+      <Portal>
+        <Popover.Positioner>
+          <Popover.Content class="card bg-surface-200-800 z-49 p-2 shadow-xl">
+            {#snippet element(attributes)}
+              {#if !attributes.hidden}
+                <div {...attributes} transition:safeSlide>
+                  <Popover.Description>
+                    <div
+                      class="flex flex-col gap-2 p-2"
+                      aria-orientation="vertical"
+                      aria-label="Help Menu"
+                    >
+                      <button
+                        aria-label="Getting Started Guide"
+                        onclick={() => {
+                          dialog.trigger({
+                            type: 'component',
+                            component: { ref: GettingStarted },
+                          });
+                        }}
+                        class="btn preset-filled-secondary-500 text-surface-contrast-500 gap-2"
+                      >
+                        <LightbulbIcon />
+                        Getting Started
+                      </button>
+
+                      <p>
+                        <a
+                          href="/faq"
+                          title="View Frequently Asked Questions"
+                          class="btn hover:preset-tonal-surface"
+                        >
+                          <CircleQuestionMarkIcon />
+                          Frequently Asked Questions</a
+                        >
+                      </p>
+
+                      <p>
+                        <a
+                          href="/documentation"
+                          class="btn hover:preset-tonal-surface"
+                        >
+                          <BookOpenTextIcon />
+                          Documentation</a
+                        >
+                      </p>
+
+                      <p>
+                        <a
+                          href="/contact"
+                          class="btn hover:preset-tonal-surface"
+                        >
+                          <MailIcon />
+                          Contact</a
+                        >
+                      </p>
+
+                      <button
+                        class="btn hover:preset-tonal-surface w-fit"
+                        onclick={() => {
+                          dialog.trigger({
+                            type: 'component',
+                            component: { ref: KeyboardShortcuts },
+                          });
+                        }}
+                        title="View Keyboard Shortcuts"
+                      >
+                        <KeyboardIcon />
+                        <span class="text-left whitespace-pre-wrap"
+                          >Keyboard Shortcuts</span
+                        >
+                      </button>
+                    </div>
+                  </Popover.Description>
+                  <Popover.Arrow
+                    style="--arrow-size: calc(var(--spacing) * 4); --arrow-background: var(--color-surface-200-800);"
+                  >
+                    <Popover.ArrowTip />
+                  </Popover.Arrow>
+                </div>
+              {/if}
+            {/snippet}
+          </Popover.Content>
+        </Popover.Positioner>
+      </Portal>
+    </Popover>
+
+    {#if weather.data.length && locations.allValid}
+      <div class="hidden sm:inline-flex">
+        <button
+          class="btn bg-primary-50-950 border-primary-500 hover:preset-tonal-primary border"
+          title="Save your project in this browser and as a URL."
+          onclick={() =>
+            dialog.trigger({
+              type: 'component',
+              component: { ref: SaveProjectModal },
+            })}
         >
-          {@render gettingStarted()}
-
-          <p>
-            <a
-              href="/blog/what-is-a-temperature-blanket"
-              class="link"
-              rel="noreferrer"
-            >
-              What's a Temperature Blanket?</a
-            >
-          </p>
-
-          <p>
-            <a
-              href="/faq"
-              rel="noopener noreferrer"
-              title="View Frequently Asked Questions"
-              class="link"
-            >
-              Frequently Asked Questions</a
-            >
-          </p>
-
-          <p>
-            <a href="/changelog" rel="noreferrer" class="link"
-              >Changelog - What's New?</a
-            >
-          </p>
-
-          <p>
-            <a href="/documentation" rel="noreferrer" class="link"
-              >Documentation</a
-            >
-          </p>
-
-          <div class="flex items-center gap-2">
-            <div class="border-surface-300-700 grow border-t"></div>
-
-            <p class="shrink text-xs">
-              Version {version}
-            </p>
-            <div class="border-surface-300-700 grow border-t"></div>
-          </div>
-        </div>
-      {/snippet}
-    </Tooltip>
+          <BookmarkIcon />
+          <span class="inline-block max-sm:hidden">Save</span>
+        </button>
+      </div>
+    {/if}
 
     <button
-      aria-label="menu"
-      class="max-sm:btn-icon sm:btn hover:preset-tonal"
+      aria-label="Project Options"
+      title="Project Options"
+      class="btn hover:preset-tonal-surface gap-1"
       onclick={() =>
-        modal.trigger({
+        dialog.trigger({
           type: 'component',
           component: {
             ref: Menu,
-            props: { page: 'main' },
           },
-          options: { showCloseButton: true },
         })}
     >
       <EllipsisVerticalIcon />
-      <span class="hidden sm:inline-block">Project</span>
+      <span class="">Project</span>
     </button>
   {/snippet}
 
   {#snippet main()}
-    <main
-      class="mx-auto p-2 text-center max-md:min-h-[calc(100svh-112px)] md:min-h-[calc(100svh-104px)] lg:min-h-[calc(100svh-120px)]"
-    >
+    <main class="mx-auto pb-18 text-center" id="main-page">
       <div
         id="page-section-location"
-        class="mx-auto max-w-(--breakpoint-md) scroll-mt-[76px] pb-12"
+        class="mx-auto max-w-(--breakpoint-md) scroll-mt-[76px]"
         class:hidden={pageSections.items[1].active === false}
       >
         <div class="w-full px-2 py-4">
@@ -345,7 +351,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </div>
 
         <div
-          class="md:bg-surface-50 dark:md:bg-surface-950 md:rounded-container mb-2 md:p-4 md:shadow-lg"
+          class="md:bg-surface-50 dark:md:bg-surface-950 md:rounded-container mb-2 px-2 md:p-4 md:shadow-lg"
         >
           <Locations />
         </div>
@@ -365,15 +371,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {#if weather.data.length}
             <SectionNavigationButtons thisSectionIndex={2} />
             {#if !weather.isUserEdited}
-              <p class="my-4 text-center text-sm max-lg:mx-2">
+              <p class="my-4 px-2 text-center text-sm">
                 Weather data from <button
                   class="underline"
                   onclick={() => {
-                    modal.trigger({
+                    dialog.trigger({
                       type: 'component',
                       component: { ref: ChooseWeatherSource },
+                      options: {
+                        size: 'small',
+                      },
                     });
-                  }}>{weather.defaultSource}</button
+                  }}>{weather.source.name}</button
                 >.
               </p>
             {/if}
@@ -390,7 +399,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {/key}
           {#if weather.data.length}
             <SectionNavigationButtons thisSectionIndex={3} />
-            <p class="my-4 text-center text-sm max-lg:mx-2">
+            <p class="my-4 px-2 text-center text-sm">
               Real yarn colors will look different than what's on the screen.
               Any trademarked yarn or colorway details are owned by their
               respective companies.
@@ -403,7 +412,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           class="w-full scroll-mt-[76px]"
           class:hidden={pageSections.items[4].active === false}
         >
-          <div class="mx-auto max-w-(--breakpoint-sm)">
+          <div class="mx-auto max-w-screen-md px-2">
             <p class="mb-2">
               Is this web app worth a cup of coffee to you? Your support enables
               ongoing development, keeps the site ad-free, and helps make this
@@ -418,7 +427,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
           <SectionNavigationButtons thisSectionIndex={4} />
 
-          <p class="my-4 text-center text-sm max-lg:mx-2">
+          <p class="my-4 px-2 text-center text-sm">
             Real projects will look different than the preview. Patterns not
             provided.
           </p>

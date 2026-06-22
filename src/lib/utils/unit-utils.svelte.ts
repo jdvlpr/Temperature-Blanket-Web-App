@@ -1,4 +1,4 @@
-// Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+// Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 //
 // This file is part of Temperature-Blanket-Web-App.
 //
@@ -13,9 +13,12 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { WEATHER_DATA_DECIMALS } from '$lib/constants';
-import { localState, windowLanguage } from '$lib/state';
-import { displayNumber, exists, pluralize } from '$lib/utils';
+import { WEATHER_DATA_DECIMALS } from '$lib/constants/weather-constants';
+import { windowLanguage } from '$lib/state/page-state.svelte';
+import { preferences } from '$lib/storage/preferences.svelte';
+import { displayNumber } from '$lib/utils/number-utils';
+import { exists } from '$lib/utils/other-utils';
+import { pluralize } from '$lib/utils/string-utils';
 /**
  * [description]
  */
@@ -49,7 +52,7 @@ export const convertTime = (
 ) => {
   let hours, minutes;
   const { displayUnits, padStart, forceUnits } = props;
-  const _units = forceUnits || localState.value.units;
+  const _units = forceUnits || preferences.value.units;
   if (_units === 'metric') {
     hours = Math.floor(value / 60);
     minutes = value % 60;
@@ -82,20 +85,20 @@ export const setUnitsFromNavigator = () => {
   // if (loadFromURL()) return;
 
   // If the units are already set, don't change them
-  // localState.value.units may not be set if the user is visiting for the first time since version 5.0.0
+  // preferences.value.units may not be set if the user is visiting for the first time since version 5.0.0
   // (that's why theres the '?' check)
-  if (localState.value?.units && localState.value.units !== null) return;
+  if (preferences.value?.units && preferences.value.units !== null) return;
   const language = window.navigator.language;
   if (exists(language)) {
     const letters = language.slice(-2).toUpperCase();
     windowLanguage.value = letters;
     // Set imperial for United States, Myenmar, and Liberia
     if (letters === 'US' || letters === 'MY') {
-      localState.value.units = 'imperial';
+      preferences.value.units = 'imperial';
     } else {
-      localState.value.units = 'metric';
+      preferences.value.units = 'metric';
     }
   } else {
-    localState.value.units = 'metric';
+    preferences.value.units = 'metric';
   }
 };

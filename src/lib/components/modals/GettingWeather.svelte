@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -16,14 +16,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import {
     controller,
-    gauges,
     locations,
-    modal,
     signal,
-    weather,
-  } from '$lib/state';
+  } from '$lib/state/location-state.svelte';
+  import { dialog, goToProjectSection } from '$lib/state/page-state.svelte';
+  import { gauges } from '$lib/state/gauges-state.svelte';
+  import { weather } from '$lib/state/weather-state.svelte';
   // Note: the signal store is a weird necessity, investigate this
-  import { delay, getOpenMeteo, goToProjectSection } from '$lib/utils';
+  import { delay } from '$lib/utils/function-utils.svelte';
+  import { setSeasonsByLocation } from '$lib/utils/seasons-utils.svelte';
   import { onMount } from 'svelte';
   import Spinner from '../Spinner.svelte';
   import type { LocationType } from '$lib/types';
@@ -49,15 +50,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
         // Add the default temperature gauge
         gauges.addById('temp');
         weather.isUserEdited = false;
-        weather.isFromLocalStorage = false;
+        weather.wasLoadedFromStorage = false;
+        dialog.close();
         await goToProjectSection(2, true);
-        modal.close();
+        // Auto-set seasons based on the first location's hemisphere
+        setSeasonsByLocation(locations.all[0]);
       })
       .catch((e) => {
         controller.value = null;
         weather.rawData = [];
         weather.isUserEdited = false;
-        weather.isFromLocalStorage = false;
+        weather.wasLoadedFromStorage = false;
         error = e?.message;
       });
   }
@@ -105,7 +108,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         tempAllData.length === thisLocation &&
         continueWhile
       ) {
-        if (weather.defaultSource === 'Meteostat' || errors.length > 0) {
+        if (weather.source.name === 'Meteostat' || errors.length > 0) {
           try {
             // Since location is a proxy state, and for some reason $state.snapshot doesn't include all the properties,
             // we have to manually copy each property to a new non-proxy object
@@ -144,17 +147,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
         }
 
         if (
-          (errors.length > 0 && !weather.useSecondarySources) ||
-          (errors.length && weather.defaultSource === 'Open-Meteo')
+          (errors.length > 0 && !weather.source.useSecondary) ||
+          (errors.length && weather.source.name === 'Open-Meteo')
         )
           continueWhile = false;
 
         if (
-          (weather.defaultSource === 'Open-Meteo' || errors.length > 0) &&
+          (weather.source.name === 'Open-Meteo' || errors.length > 0) &&
           continueWhile
         ) {
           try {
-            const data = await getOpenMeteo({ location });
+            const data = await weather.getOpenMeteo({ location });
             tempAllData.push(data);
             location.source = 'Open-Meteo';
           } catch (error) {
@@ -162,7 +165,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           }
         }
 
-        if (errors.length > 0 && !weather.useSecondarySources)
+        if (errors.length > 0 && !weather.source.useSecondary)
           continueWhile = false;
       }
 

@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -14,7 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { browser, dev, version } from '$app/environment';
+  import { browser, version } from '$app/environment';
   import { page } from '$app/state';
   import {
     PUBLIC_BASE_URL,
@@ -23,24 +23,29 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import AppLogo from '$lib/components/AppLogo.svelte';
   import AppShell from '$lib/components/AppShell.svelte';
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
+  import Expand from '$lib/components/Expand.svelte';
   import Spinner from '$lib/components/Spinner.svelte';
-  import { locations, project, toast, weather } from '$lib/state';
-  import { supabase } from '$lib/supabaseClient';
+  import { safeSlide } from '$lib/features/transitions/safeSlide';
+  import { locations } from '$lib/state/location-state.svelte';
+  import { project } from '$lib/state/project-state.svelte';
+  import { toast } from '$lib/state/page-state.svelte';
+  import { weather } from '$lib/state/weather-state.svelte';
   import {
     dateToISO8601String,
     dateToISO8601StringVersion2,
     stringToDate,
     stringToDateVersion2,
-  } from '$lib/utils';
+  } from '$lib/utils/date-utils';
   import {
     ArrowLeftIcon,
+    ChevronDownIcon,
     ExternalLinkIcon,
     InfoIcon,
     XIcon,
   } from '@lucide/svelte';
   import { Accordion } from '@skeletonlabs/skeleton-svelte';
 
-  let accordionValue = $state(['apr2']);
+  let accordionValue = $state(['jan28,2026']);
 
   let includeDebugInfo = $state(true);
 
@@ -53,6 +58,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let projectLinkURL = $derived(getProjectLinkURL(projectLink));
 
   let params = $derived(browser ? page.url.searchParams : null);
+
+  let statusExpanded = $state(false);
 
   let projectLinkURLPart = $derived(
     projectLinkURL?.searchParams.has('project')
@@ -71,7 +78,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 
   async function submitForm(event) {
-    event.preventDefault();
+    if (event.cancelable) event.preventDefault();
     submitting = true;
 
     const formData = new FormData(event.target);
@@ -101,36 +108,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
         category: 'error',
       });
     }
-
-    // temporary diagnostics
-    if (!dev)
-      await supabase.from('Weather Data Feedback').insert({
-        dev,
-        version,
-        flag: true,
-        pid: +project.timeStampId || 0,
-        details: {
-          form: {
-            a_stringToDate: stringToDate('2025-01-01'),
-            b_stringToDateVersion2: stringToDateVersion2('2025-01-01'),
-            c_dateToISO8601String: {
-              stringToDate: dateToISO8601String(stringToDate('2025-01-01')),
-              stringToDateVersion2: dateToISO8601String(
-                stringToDateVersion2('2025-01-01'),
-              ),
-            },
-            e_dateToISO8601StringVersion2: {
-              stringToDate: dateToISO8601StringVersion2(
-                stringToDate('2025-01-01'),
-              ),
-              stringToDateVersion2: dateToISO8601StringVersion2(
-                stringToDateVersion2('2025-01-01'),
-              ),
-            },
-            jsonObject,
-          },
-        },
-      });
   }
 
   $effect(() => {
@@ -158,204 +135,354 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <AppShell pageName="Weather Data Feedback Form">
   {#snippet stickyHeader()}
-    <div class="hidden lg:inline-flex"><AppLogo /></div>
+    <div class="mx-auto hidden lg:inline-flex"><AppLogo /></div>
   {/snippet}
   {#snippet main()}
     <main
-      class="mx-auto flex max-w-screen-sm flex-col gap-4 px-4 pt-4 pb-8 lg:px-0"
+      class="mx-auto flex max-w-screen-sm flex-col gap-2 px-4 pt-4 pb-8 lg:px-0"
     >
-      <a href="/contact" class="btn hover:preset-tonal w-fit"
+      <a href="/contact" class="btn hover:preset-tonal-surface w-fit"
         ><ArrowLeftIcon /> Contact</a
       >
-      <div class="">
-        <h2 class="h2">Weather Data Feedback Form</h2>
-        <p class="text-sm">Updated April 2, 2025</p>
-      </div>
+
+      <h2 class="h2 text-gradient">Weather Data Feedback Form</h2>
 
       <p>
         Fill out the form below if you've noticed something wrong with weather
-        data on temperature-blanket.com, or to give feedback. For context and to
-        address questions you might have, here's also some relevant information:
+        data on temperature-blanket.com, or to give feedback.
       </p>
 
       <div id="info" class="scroll-mt-[58px]"></div>
 
-      <Accordion
-        value={accordionValue}
-        onValueChange={(e) => (accordionValue = e.value)}
-        collapsible
-        multiple
-        rounded="rounded-container"
-        classes="bg-warning-50-950/50"
-      >
-        <Accordion.Item value="apr2" controlClasses="font-bold">
-          {#snippet lead()}
-            <InfoIcon />
-          {/snippet}
-          {#snippet control()}
-            April 2 Update
-          {/snippet}
-          {#snippet panel()}
-            After the April 1 update, there was another report of off-by-one
-            weather data date issues. The issue was identified and fixed (<a
-              href="/changelog#5.2.35"
-              target="_blank"
-              class="link">see the changelog for details</a
-            >).
-            <br />
-            <br />
-            I'm sorry for all these recent changes. Fixing one issue has seemed to
-            cause other issues for other users. I believe the source of the issues
-            is how the web app handles dates in relation to the user's timezone (and
-            I can't test every timezone). So in the latest update I've switch back
-            to using UTC time for dates (which is timezone independent), and implemented
-            different fixes for issues that the first implementation of using UTC
-            had (in v5.2.2, I believe).
-            <br />
-            <br />
-            If you are still seeing a problem with the weather data, please fill
-            out the form below. It really helps!
-          {/snippet}
-        </Accordion.Item>
-        <Accordion.Item value="apr1" controlClasses="font-bold">
-          {#snippet lead()}
-            <InfoIcon />
-          {/snippet}
-          {#snippet control()}
-            April 1 Update
-          {/snippet}
-          {#snippet panel()}
-            Between March 28 and April 1, there were several more reports of
-            off-by-one weather data date issues. With the help of a supporter, I
-            believe we identified and fixed the issue (<a
-              href="/changelog#5.2.33"
-              target="_blank"
-              class="link">see the changelog for details</a
-            >). If you are still seeing a problem with the weather data, please
-            fill out the form below.
-          {/snippet}
-        </Accordion.Item>
-        <Accordion.Item value="mar28" controlClasses="font-bold">
-          {#snippet lead()}
-            <InfoIcon />
-          {/snippet}
-          {#snippet control()}
-            March 28 Update
-          {/snippet}
-          {#snippet panel()}
-            The notice above the weather table about possible dates shifting has
-            been taken down, since I believe the issue has been resolved. If you
-            are still seeing a problem with the weather data, please fill out
-            the form below.
-          {/snippet}
-        </Accordion.Item>
-        <Accordion.Item value="mar27" controlClasses="font-bold">
-          {#snippet lead()}
-            <InfoIcon />
-          {/snippet}
-          {#snippet control()}
-            March 27 Update
-          {/snippet}
-          {#snippet panel()}
-            An update was applied that hopefully fixes the dates-shifting issue.
-            If you are still seeing issues, please fill out the form below.
-          {/snippet}
-        </Accordion.Item>
-        <Accordion.Item value="info" controlClasses="font-bold">
-          {#snippet lead()}
-            <InfoIcon />
-          {/snippet}
-          {#snippet control()}
-            What's going on?
-          {/snippet}
-          {#snippet panel()}
-            On March 20, 2025, temperature-blanket.com was updated to a new
-            version (<a
-              href="/blog/2025-03-20-version-5"
-              class="link"
-              target="_blank">see this blog post for more details</a
-            >). Since then, and through a series of successive updates over the
-            next several days, some users have reported weather data for their
-            project has shifted—it's off by one day. This issue appears to be
-            ongoing for some users.
-            <br />
-            <br />
-            A separate but possibly related issue also occurred during the site update
-            on March 20, where weather data for some projects changed—different temperatures
-            were reported. I believe this issue was fixed on March 24, 2025 (<a
-              href="/changelog#5.2.2"
-              target="_blank"
-              class="link">see the changelog for details</a
-            >).
-            <br />
-            <br />
-            A third factor involved is that the sources temperature-blanket.com uses
-            to get weather data (<a
-              href="https://open-meteo.com/"
-              target="_blank"
-              class="link">Open-Meteo</a
-            >
-            and
-            <a href="https://meteostat.net" target="_blank" class="link"
-              >Meteostat</a
-            >) sometimes update their weather models. This can cause weather
-            data, even historical data, to change. Currently,
-            temperature-blanket.com doesn't have any way of detecting or
-            notifying users when the models get updated. This is known issue
-            that has been present from the beginning in 2021.
-          {/snippet}
-        </Accordion.Item>
-        <Accordion.Item value="what" controlClasses="font-bold">
-          {#snippet lead()}
-            <InfoIcon />
-          {/snippet}
-          {#snippet control()}
-            What is being done?
-          {/snippet}
-          {#snippet panel()}
-            I am diagnosing the problem where users are seeing weather data
-            shifted. <span class="font-bold"
-              >I have a few ideas for fixes, but a tough barrier I'm facing is
-              that I haven't been able to recreate the issue people are
-              reporting in order to test solutions. In other words, I haven't
-              been able to recreate a project where the weather data has
-              shifted, so I don't know if what I change is fixing the issue or
-              not.
-            </span>
-            That's why I'm trying to gather information from users who are experiencing
-            the issue, so that hopefully I can figure out what is causing weather
-            data to shift for some people, and how to fix it. This is the primary
-            issue I'm currently trying to fix.
-            <br />
-            <br />
-            Additionally, I'm considering how to address the long-standing issue
-            of historical weather data occasionally changing. Specifically, while
-            looking more into the details about the weather models offered by Open-Meteo,
-            I came across this
-            <a
-              href="https://open-meteo.com/en/docs/historical-weather-api#data_sources"
-              target="_blank"
-              class="link">from their documentation</a
-            >: "
-            <span class="italic"
-              >...when studying climate change over decades, it is advisable to
-              exclusively utilize ERA5 or ERA5-Land. This choice ensures data
-              consistency and prevents unintentional alterations that could
-              arise from the adoption of different weather model upgrades.</span
-            >" So I'm wondering if allowing users of temperature-blanket.com to
-            choose to use only these models would be beneficial (instead of the
-            default currently used, which is that the model is automatically
-            selected by Open-Meteo). This is an issue that will take more
-            research and development. My primary concern at the moment is the
-            first issue of weather data shifting for some users.
-            <br />
-            <br />
-            Hopefully the dates-shifting issue can be fixed soon. I'll update this
-            form, as well as the notice above the weather chart, with further developments.
-            Thanks for your patience, and sorry for the inconvenience.
-          {/snippet}
-        </Accordion.Item>
-      </Accordion>
+      <div class="mb-4 flex flex-col items-start justify-between gap-2">
+        <div class="bg-warning-50-950/50 rounded-container">
+          <Expand bind:isExpanded={statusExpanded} label="Status Updates" />
+        </div>
+
+        {#if statusExpanded}
+          <Accordion
+            value={accordionValue}
+            onValueChange={(e) => (accordionValue = e.value)}
+            collapsible
+            multiple
+            class="bg-warning-50-950/50 rounded-container"
+          >
+            <Accordion.Item value="jan28,2026" class="font-bold">
+              <h3>
+                <Accordion.ItemTrigger
+                  class="flex items-center justify-between gap-2 font-bold"
+                >
+                  <InfoIcon />
+                  January 28, 2026
+                  <Accordion.ItemIndicator class="group">
+                    <ChevronDownIcon
+                      class="h-5 w-5 transition group-data-[state=open]:rotate-180"
+                    />
+                  </Accordion.ItemIndicator>
+                </Accordion.ItemTrigger>
+              </h3>
+
+              <Accordion.ItemContent class="font-normal">
+                {#snippet element(attributes)}
+                  {#if !attributes.hidden}
+                    <div
+                      {...attributes}
+                      transition:safeSlide
+                      class="flex flex-col gap-2 font-normal"
+                    >
+                      <p>
+                        I recently identified and fixed a bug in the Project
+                        Planner that affected how future dates were handled. If
+                        you created a project recently, please take a moment to
+                        see if your project needs a quick refresh.
+                      </p>
+
+                      <p>
+                        <span class="font-bold">Is my project affected?</span> Your
+                        project may be affected only if it meets ALL of these criteria:
+                      </p>
+                      <div class="ml-2">
+                        <p>
+                          - Created between March 27, 2025, and January 28, 2026
+                          (at about 3:30 am CST)
+                        </p>
+                        <p>- Used Open-Meteo (the default weather source)</p>
+                        <p>- Contained future dates at the time of creation</p>
+                      </div>
+
+                      <p>
+                        Note: Projects using historical data, Meteostat as the
+                        weather source, or which were created outside the above
+                        timeframe are not affected.
+                      </p>
+
+                      <p>
+                        <span class="font-bold">What was the impact?</span> The bug
+                        only impacted a project's layout and a future date, temperature
+                        data and colors were not affected. If you downloaded a PDF
+                        or CSV file, it may have a missing or incorrect date. For
+                        some preview images, such as the Calendar or Square pattern
+                        types, the grid may have shifted, causing month divisions
+                        to look off. (The Rows and Chevrons preview images were likely
+                        fine.)
+                      </p>
+
+                      <p>
+                        <span class="font-bold">How to fix it:</span> The latest version
+                        of the web app applies the fix automatically. Simply open
+                        the affected project on temperature-blanket.com and search
+                        for weather data. If you previously downloaded a PDF or CSV
+                        file, you may want to download the new, corrected file. In
+                        the Preview tab, you may also want to adjust the preview settings
+                        if the layout looks different.
+                      </p>
+                    </div>
+                  {/if}
+                {/snippet}
+              </Accordion.ItemContent>
+            </Accordion.Item>
+            <Accordion.Item value="apr20" class="font-bold">
+              <h3>
+                <Accordion.ItemTrigger
+                  class="flex items-center justify-between gap-2 font-bold"
+                >
+                  <InfoIcon />
+                  April 20, 2025
+                  <Accordion.ItemIndicator class="group">
+                    <ChevronDownIcon
+                      class="h-5 w-5 transition group-data-[state=open]:rotate-180"
+                    />
+                  </Accordion.ItemIndicator>
+                </Accordion.ItemTrigger>
+              </h3>
+
+              <Accordion.ItemContent class="font-normal">
+                {#snippet element(attributes)}
+                  {#if !attributes.hidden}
+                    <div {...attributes} transition:safeSlide>
+                      Addressing the issue of historical weather data
+                      occasionally being adjusted because of model upgrades, an
+                      option has been added to the Weather Source settings to
+                      choose a more stable weather data model. This is only
+                      possible when using Open-Meteo as the weather source. More
+                      details about the new options can be found in the <a
+                        href="/documentation#weather-sources"
+                        target="_blank"
+                        class="link">documentation</a
+                      >.
+
+                      <br />
+                      <br />
+                      Using the new models (ERA5 Land and ERA5) is in beta status—you
+                      can use them, and weather data theoretically should not be adjusted
+                      over time, but they have not been thoroughly tested on this
+                      site. I'd love to hear your feedback about the new weather models,
+                      especially if the new ERA5 Land and ERA5 models provide any
+                      weather data that gets adjusted over time.
+                    </div>
+                  {/if}
+                {/snippet}
+              </Accordion.ItemContent>
+            </Accordion.Item>
+
+            <Accordion.Item value="apr2" class="font-bold">
+              <h3>
+                <Accordion.ItemTrigger
+                  class="flex items-center justify-between gap-2 font-bold"
+                >
+                  <InfoIcon />
+                  April 2, 2025
+                  <Accordion.ItemIndicator class="group">
+                    <ChevronDownIcon
+                      class="h-5 w-5 transition group-data-[state=open]:rotate-180"
+                    />
+                  </Accordion.ItemIndicator>
+                </Accordion.ItemTrigger>
+              </h3>
+
+              <Accordion.ItemContent class="font-normal">
+                {#snippet element(attributes)}
+                  {#if !attributes.hidden}
+                    <div {...attributes} transition:safeSlide>
+                      After the April 1 update, there was another report of
+                      off-by-one weather data date issues. The issue was
+                      identified and fixed (<a
+                        href="/changelog#5.2.35"
+                        target="_blank"
+                        class="link">see the changelog for details</a
+                      >).
+                      <br />
+                      <br />
+                      I'm sorry for all these recent changes. Fixing one issue has
+                      seemed to cause other issues for other users. I believe the
+                      source of the issues is how the web app handles dates in relation
+                      to the user's timezone (and I can't test every timezone). So
+                      in the latest update I've switch back to using UTC time for
+                      dates (which is timezone independent), and implemented different
+                      fixes for issues that the first implementation of using UTC
+                      had (in v5.2.2, I believe).
+                      <br />
+                      <br />
+                      If you are still seeing a problem with the weather data, please
+                      fill out the form below. It really helps!
+                    </div>
+                  {/if}
+                {/snippet}
+              </Accordion.ItemContent>
+            </Accordion.Item>
+            <Accordion.Item value="apr1" class="font-bold">
+              <h3>
+                <Accordion.ItemTrigger
+                  class="flex items-center justify-between gap-2 font-bold"
+                >
+                  <InfoIcon />
+                  April 1, 2025
+                  <Accordion.ItemIndicator class="group">
+                    <ChevronDownIcon
+                      class="h-5 w-5 transition group-data-[state=open]:rotate-180"
+                    />
+                  </Accordion.ItemIndicator>
+                </Accordion.ItemTrigger>
+              </h3>
+
+              <Accordion.ItemContent class="font-normal">
+                {#snippet element(attributes)}
+                  {#if !attributes.hidden}
+                    <div {...attributes} transition:safeSlide>
+                      Between March 28 and April 1, there were several more
+                      reports of off-by-one weather data date issues. With the
+                      help of a supporter, I believe we identified and fixed the
+                      issue (<a
+                        href="/changelog#5.2.33"
+                        target="_blank"
+                        class="link">see the changelog for details</a
+                      >). If you are still seeing a problem with the weather
+                      data, please fill out the form below.
+                    </div>
+                  {/if}
+                {/snippet}
+              </Accordion.ItemContent>
+            </Accordion.Item>
+            <Accordion.Item value="mar28" class="font-bold">
+              <h3>
+                <Accordion.ItemTrigger
+                  class="flex items-center justify-between gap-2 font-bold"
+                >
+                  <InfoIcon />
+                  March 28, 2025
+                  <Accordion.ItemIndicator class="group">
+                    <ChevronDownIcon
+                      class="h-5 w-5 transition group-data-[state=open]:rotate-180"
+                    />
+                  </Accordion.ItemIndicator>
+                </Accordion.ItemTrigger>
+              </h3>
+
+              <Accordion.ItemContent class="font-normal">
+                {#snippet element(attributes)}
+                  {#if !attributes.hidden}
+                    <div {...attributes} transition:safeSlide>
+                      The notice above the weather table about possible dates
+                      shifting has been taken down, since I believe the issue
+                      has been resolved. If you are still seeing a problem with
+                      the weather data, please fill out the form below.
+                    </div>
+                  {/if}
+                {/snippet}
+              </Accordion.ItemContent>
+            </Accordion.Item>
+            <Accordion.Item value="mar27" class="font-bold">
+              <h3>
+                <Accordion.ItemTrigger
+                  class="flex items-center justify-between gap-2 font-bold"
+                >
+                  <InfoIcon />
+                  March 27, 2025
+                  <Accordion.ItemIndicator class="group">
+                    <ChevronDownIcon
+                      class="h-5 w-5 transition group-data-[state=open]:rotate-180"
+                    />
+                  </Accordion.ItemIndicator>
+                </Accordion.ItemTrigger>
+              </h3>
+
+              <Accordion.ItemContent class="font-normal">
+                {#snippet element(attributes)}
+                  {#if !attributes.hidden}
+                    <div {...attributes} transition:safeSlide>
+                      An update was applied that hopefully fixes the
+                      dates-shifting issue. If you are still seeing issues,
+                      please fill out the form below.
+                    </div>
+                  {/if}
+                {/snippet}
+              </Accordion.ItemContent>
+            </Accordion.Item>
+            <Accordion.Item value="info" class="font-bold">
+              <h3>
+                <Accordion.ItemTrigger
+                  class="flex items-center justify-between gap-2 font-bold"
+                >
+                  <InfoIcon />
+                  March 26, 2025
+                  <Accordion.ItemIndicator class="group">
+                    <ChevronDownIcon
+                      class="h-5 w-5 transition group-data-[state=open]:rotate-180"
+                    />
+                  </Accordion.ItemIndicator>
+                </Accordion.ItemTrigger>
+              </h3>
+
+              <Accordion.ItemContent class="font-normal">
+                {#snippet element(attributes)}
+                  {#if !attributes.hidden}
+                    <div {...attributes} transition:safeSlide>
+                      On March 20, 2025, temperature-blanket.com was updated to
+                      a new version (<a
+                        href="/blog/2025-03-20-version-5"
+                        class="link"
+                        target="_blank">see this blog post for more details</a
+                      >). Since then, and through a series of successive updates
+                      over the next several days, some users have reported
+                      weather data for their project has shifted—it's off by one
+                      day. This issue appears to be ongoing for some users.
+                      <br />
+                      <br />
+                      A separate but possibly related issue also occurred during the
+                      site update on March 20, where weather data for some projects
+                      changed—different temperatures were reported. I believe this
+                      issue was fixed on March 24, 2025 (<a
+                        href="/changelog#5.2.2"
+                        target="_blank"
+                        class="link">see the changelog for details</a
+                      >).
+                      <br />
+                      <br />
+                      A third factor involved is that the sources temperature-blanket.com
+                      uses to get weather data (<a
+                        href="https://open-meteo.com/"
+                        target="_blank"
+                        class="link">Open-Meteo</a
+                      >
+                      and
+                      <a
+                        href="https://meteostat.net"
+                        target="_blank"
+                        class="link">Meteostat</a
+                      >) sometimes update their weather models. This can cause
+                      weather data, even historical data, to change. Currently,
+                      temperature-blanket.com doesn't have any way of detecting
+                      or notifying users when the models get updated. This is
+                      known issue that has been present from the beginning in
+                      2021.
+                    </div>
+                  {/if}
+                {/snippet}
+              </Accordion.ItemContent>
+            </Accordion.Item>
+          </Accordion>
+        {/if}
+      </div>
 
       <div class="">
         Before filling out the form, please confirm you have tried using the
@@ -363,8 +490,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <a href="https://temperature-blanket.com" target="_blank" class="link"
           >temperature-blanket.com</a
         >
-        by refreshing the page for your project. The latest version is currently
-        v{version}.
+        by refreshing the page for your project. The latest version is currently v{version}.
       </div>
 
       <p>
@@ -377,27 +503,29 @@ If not, see <https://www.gnu.org/licenses/>. -->
         class="m-2 mb-4 flex flex-col gap-6"
       >
         <div>
-          <label for="projectLink" class="label">Link to your project </label>
-          <div class="input-group grid-cols-[1fr_auto]">
-            <input
-              id="projectLink"
-              class="ig-input"
-              bind:value={projectLink}
-              type="text"
-              name="projectLink"
-              placeholder="Your Project URL"
-            />
-            <button
-              class="ig-btn preset-filled"
-              title="Clear"
-              onclick={(e) => {
-                e.preventDefault();
-                projectLink = '';
-              }}
-            >
-              <XIcon size={16} />
-            </button>
-          </div>
+          <label for="projectLink" class="label">
+            <span class="label-text">Link to your project</span>
+            <div class="input-group grid-cols-[1fr_auto]">
+              <input
+                id="projectLink"
+                class="ig-input"
+                bind:value={projectLink}
+                type="text"
+                name="projectLink"
+                placeholder="Your Project URL"
+              />
+              <button
+                class="ig-btn preset-filled"
+                title="Clear"
+                onclick={(e) => {
+                  e.preventDefault();
+                  projectLink = '';
+                }}
+              >
+                <XIcon size={16} />
+              </button>
+            </div>
+          </label>
         </div>
 
         <p class="font-bold">What issue are you having?</p>
@@ -415,9 +543,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
         {#if dataShifted}
           <label for="frequencyShifted" class="label">
-            How often does this happen?
+            <span class="label-text">How often does this happen?</span>
             <select
-              class="select whitespace-pre-wrap"
+              class="select truncate whitespace-pre-wrap"
               id="frequencyShifted"
               name="frequencyShifted"
             >
@@ -434,7 +562,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </label>
 
           <label for="sameDates" class="label">
-            <p>Are the following two dates the same?</p>
+            <p class="label-text">Are the following two dates the same?</p>
             <div class="grid grid-cols-2 items-center gap-2 text-center">
               <p class="bg-surface-50-950 rounded-container p-2">
                 {dateToISO8601String(stringToDate('2025-01-01'))}
@@ -464,12 +592,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <ul class="flex list-inside list-decimal flex-col gap-2">
               <li>
                 <a
-                  href="https://v4.temperature-blanket.com{projectLinkURLPart ||
+                  href="https://archive-v4.temperature-blanket.com{projectLinkURLPart ||
                     ''}"
                   class="link"
                   target="_blank"
                   >Click here to open the archived version at
-                  v4.temperature-blanket.com
+                  archive-v4.temperature-blanket.com
                   <ExternalLinkIcon class="relative -top-[2px] inline size-4" />
                 </a>
               </li>
@@ -487,7 +615,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </ul>
 
             <label for="description" class="label">
-              If you tested the archived version, what was the result?
+              <span class="label-text"
+                >If you tested the archived version, what was the result?</span
+              >
               <textarea
                 id="archiveResult"
                 class="textarea"
@@ -512,7 +642,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
         {#if otherIssue}
           <label for="description" class="label">
-            Describe the issue, as well as any steps taken beforehand
+            <span class="label-text"
+              >Describe the issue, as well as any steps taken beforehand</span
+            >
             <textarea
               id="description"
               class="textarea"
@@ -524,7 +656,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {/if}
 
         <label for="comments" class="label">
-          Any other comments
+          <span class="label-text">Any other comments</span>
           <textarea
             id="comments"
             class="textarea"
@@ -536,7 +668,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
         <!-- File Input -->
         <label class="label">
-          Attach any relevant images or screenshots (5MB max)
+          <span class="label-text"
+            >Attach any relevant images or screenshots (5MB max)</span
+          >
           <input
             type="file"
             class="input"
@@ -554,7 +688,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </div>
 
         <label for="your-email" class="label">
-          Your email (if you're interested in further communication)
+          <span class="label-text"
+            >Your email (if you're interested in further communication)</span
+          >
           <input
             id="your-email"
             class="input"
@@ -564,7 +700,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           />
         </label>
         <label for="your-name" class="label">
-          Your name (if you're interested in further communication)
+          <span class="label-text"
+            >Your name (if you're interested in further communication)</span
+          >
           <input
             id="your-name"
             class="input"
@@ -610,9 +748,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             name="loaded"
             value={encodeURIComponent(
               JSON.stringify(
-                $state.snapshot(
-                  locations.all.map((n) => n.wasLoadedFromSavedProject),
-                ),
+                $state.snapshot(locations.all.map((n) => n.wasLoadedFromURL)),
               ),
             )}
           />

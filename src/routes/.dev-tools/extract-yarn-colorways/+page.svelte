@@ -1,50 +1,74 @@
+<script module lang="ts">
+  import { persistedState } from '$lib/storage/preferences.svelte';
+
+  const options = persistedState('[/.dev-tools]options', {
+    content: '',
+    columnWidth: 200,
+    querySelector: '',
+    useElementAttribute: false,
+    querySelectorAttribute: '',
+    exclude: false,
+    excludeString: '',
+    excludeBefore: false,
+    excludeBeforeString: '',
+    excludeAfter: false,
+    excludeAfterString: '',
+    removeNumbers: true,
+    mergeWithExistingColors: false,
+    selectedYarn: {
+      brandId: '',
+      yarnId: '',
+    },
+    names: [],
+  });
+</script>
+
 <script lang="ts">
   import { browser, dev } from '$app/environment';
   import AppLogo from '$lib/components/AppLogo.svelte';
   import AppShell from '$lib/components/AppShell.svelte';
   import Expand from '$lib/components/Expand.svelte';
   import Footer from '$lib/components/Footer.svelte';
+  import SelectYarn from '$lib/components/SelectYarn.svelte';
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
-  import { getTextColor } from '$lib/utils';
+  import { brands } from '$lib/data/yarns/brands';
+  import { toast } from '$lib/state/page-state.svelte';
+  import type { Color } from '$lib/types/yarn-types';
+  import { getTextColor } from '$lib/utils/color-utils';
   import chroma from 'chroma-js';
-  import { onMount } from 'svelte';
 
-  let content: string = $state('');
   let showClearButton = $state(false);
 
-  let columnWidth = $state(200);
-
-  let mounted = false;
-
-  onMount(() => {
-    if (localStorage.getItem('[/.dev-tools]querySelector') !== 'null')
-      querySelector = localStorage.getItem('[/.dev-tools]querySelector');
-    if (localStorage.getItem('[/.dev-tools]useElementAttribute') !== 'null')
-      useElementAttribute = localStorage.getItem(
-        '[/.dev-tools]useElementAttribute',
-      );
-    if (localStorage.getItem('[/.dev-tools]content') !== 'null')
-      content = JSON.parse(localStorage.getItem('[/.dev-tools]content'));
+  let existingColorways: Color[] = $derived.by(() => {
     if (
-      localStorage.getItem('[/.dev-tools]names') !== 'null' &&
-      localStorage.getItem('[/.dev-tools]names') !== '[]'
+      !browser ||
+      !options.value.selectedYarn?.brandId ||
+      !options.value.selectedYarn?.yarnId
     )
-      names = JSON.parse(localStorage.getItem('[/.dev-tools]names'));
-
-    mounted = true;
+      return [];
+    // Fetch existing colorways based on selected brand and yarn
+    return (
+      brands
+        .find((b) => b.id === options.value.selectedYarn.brandId)
+        ?.yarns.find((y) => y.id === options.value.selectedYarn.yarnId)
+        ?.colorways.flatMap((colorway) => colorway.colors) || []
+    );
   });
 
-  function setLocalStorage() {
-    if (!browser || !mounted) return;
-    localStorage.setItem('[/.dev-tools]querySelector', querySelector);
-    localStorage.setItem(
-      '[/.dev-tools]useElementAttribute',
-      useElementAttribute,
-    );
-    localStorage.setItem('[/.dev-tools]content', JSON.stringify(content));
-    if (names)
-      localStorage.setItem('[/.dev-tools]names', JSON.stringify(names));
-  }
+  let onlyNewColors = $derived(
+    options.value.names
+      .map((n) => {
+        return {
+          hex: chroma.valid(n.hex) ? chroma(n.hex).hex().toLowerCase() : '',
+          name: n.name,
+        };
+      })
+      .filter((n) => {
+        return !existingColorways
+          .map((ec) => ec.name.toLowerCase())
+          .includes(n.name.toLowerCase());
+      }),
+  );
 
   function createHTMLObject(content: string) {
     if (!browser) return;
@@ -54,23 +78,34 @@
   }
 
   async function getNames() {
-    // const fac = new FastAverageColor();
-    names = [];
+    options.value.names = [];
     let i = 1;
-    for (const element of [...htmlObject.querySelectorAll(querySelector)]) {
-      let name = useElementAttribute
-        ? element.getAttribute(querySelectorAttribute)
+    for (const element of [
+      ...htmlObject.querySelectorAll(options.value.querySelector),
+    ]) {
+      let name = options.value.useElementAttribute
+        ? element.getAttribute(options.value.querySelectorAttribute)
         : element.innerText;
-      if (excludeBefore)
+      // Remove string
+      if (options.value.exclude) name = name.replaceAll(options.value.excludeString, "");
+
+      // Remove everything before string
+      if (options.value.excludeBefore)
         name = name.substring(
-          name.indexOf(excludeBeforeString) + excludeBeforeString?.length,
+          name.indexOf(options.value.excludeBeforeString) +
+            options.value.excludeBeforeString?.length,
         );
-      if (excludeAfter)
-        name = name.substring(0, name.indexOf(excludeAfterString));
+    
+      // Remove everything after string
+      if (options.value.excludeAfter)
+      name = name.substring(
+        0,
+        name.indexOf(options.value.excludeAfterString),
+      );
       name = name.toLowerCase(); // lowercase everything
       name = name.replaceAll('\n', ' '); // remove new lines
       name = name.replaceAll('  ', ''); // remove multiple spaces
-      if (removeNumbers) name = name.replace(/[0-9]/g, '');
+      if (options.value.removeNumbers) name = name.replace(/[0-9]/g, '');
       name = name.trim(); // trim whitespace
       name = name.split(' '); // split words
       for (let i = 0; i < name?.length; i++) {
@@ -81,58 +116,21 @@
       name = name.join(' '); // join words into one string
 
       let colorHex = '';
-      // colorHex = chroma(color.hex).hex();
-      // await fac
-      //     .getColorAsync(encodeURIComponent(`/images/Layer ${i}.png`))
-      //     .then((color) => {
-      //     })
-      //     .catch((e) => {
-      //         // console.log(e);
-      //     });
-      names.push({ name, hex: colorHex });
+
+      options.value.names.push({ name, hex: colorHex });
       i = Number(i);
       i++;
     }
-    names = names;
   }
-  let querySelector = $state('');
 
-  let useElementAttribute = $state(false);
-
-  let querySelectorAttribute = $state('');
-
-  let excludeBefore = $state(false);
-
-  let excludeBeforeString = $state('');
-
-  let excludeAfter = $state(false);
-
-  let excludeAfterString = $state('');
-
-  let removeNumbers = $state(true);
-
-  let names = $state([]);
-
-  let data = $derived({ querySelector, content, names });
-
-  $effect(() => {
-    data;
-    setLocalStorage();
-  });
-  let htmlObject = $derived(createHTMLObject(content));
+  let htmlObject = $derived(createHTMLObject(options.value.content));
 </script>
 
 <svelte:head>
   <title>Extract Yarn Colorways</title>
   <meta name="description" content="Extract Yarn Colorways" />
-  <!-- <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no" /> -->
   <meta property="og:title" content="Extract Yarn Colorways" />
   <meta property="og:description" content="Extract Yarn Colorways" />
-  <!-- <meta property="og:url" content="https://temperature-blanket.com" />
-    <meta property="og:type" content="website" />
-    <meta property="og:image" content="https://temperature-blanket.com/images/temperature-blanket-og-image-5.0.0.jpg" />
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="630" /> -->
 </svelte:head>
 
 <AppShell pageName="Extract Yarn Colorways">
@@ -140,87 +138,133 @@
     <div class="hidden lg:inline-flex"><AppLogo /></div>
   {/snippet}
   {#snippet main()}
-    <main class="max-w-screen-xl px-2 text-left lg:px-0">
+    <main class="mb-[100vh] max-w-screen-xl px-2 text-left lg:px-0">
       {#if dev}
         <h2 class="h2 text-gradient my-2">Input</h2>
 
-        <div class="flex max-w-screen-sm flex-col gap-4 px-2">
+        <div class="flex flex-col gap-4 px-2">
           <label class="text-sm"
             >Paste HTML Here
             <textarea
               class="textarea w-full grow border-none shadow-inner"
-              bind:value={content}
+              bind:value={options.value.content}
               rows="5"
             ></textarea>
           </label>
 
-          <div class="tex-left flex flex-col items-start">
-            <label class="w-full text-sm">
-              Element Query Selector
-              <input
-                type="text"
-                placeholder="e.g., a, .description"
-                class="input w-full"
-                bind:value={querySelector}
+          <div class="flex max-w-md flex-col gap-4">
+            <div class="flex flex-col items-start text-left">
+              <label class="w-full text-sm">
+                Element Query Selector
+                <input
+                  type="text"
+                  placeholder="e.g., a, .description"
+                  class="input w-full"
+                  bind:value={options.value.querySelector}
+                />
+              </label>
+            </div>
+
+            <div>
+              <ToggleSwitch
+                bind:checked={options.value.removeNumbers}
+                label="Remove Numbers"
               />
-            </label>
-          </div>
+            </div>
 
-          <div>
-            <ToggleSwitch bind:checked={removeNumbers} label="Remove Numbers" />
-          </div>
+            <div class="flex flex-col gap-2">
+              <ToggleSwitch
+                bind:checked={options.value.useElementAttribute}
+                label="Use Element Attribute"
+              />
 
-          <div>
-            <ToggleSwitch
-              bind:checked={useElementAttribute}
-              label="Use Element Attribute"
-            />
+              {#if options.value.useElementAttribute}
+                <div class="flex flex-col items-start text-left">
+                  <label class="w-full text-sm">
+                    Element Attribute
+                    <input
+                      type="text"
+                      placeholder="e.g., title, data-name"
+                      class="input w-full"
+                      bind:value={options.value.querySelectorAttribute}
+                    />
+                  </label>
+                </div>
+              {/if}
+            </div>
 
-            {#if useElementAttribute}
-              <div class="tex-left flex flex-col items-start">
-                <label class="w-full text-sm">
-                  Element Attribute
-                  <input
-                    type="text"
-                    placeholder="e.g., title, data-name"
-                    class="input w-full"
-                    bind:value={querySelectorAttribute}
+            <div class="flex flex-col gap-2">
+              <ToggleSwitch
+                bind:checked={options.value.exclude}
+                label="Exclude"
+              />
+              {#if options.value.exclude}
+                <div class="flex flex-col items-start text-left">
+                  <label class="w-full text-sm">
+                    Exclude
+                    <input
+                      type="text"
+                      class="input w-full"
+                      bind:value={options.value.excludeString}
+                    />
+                  </label>
+                </div>
+              {/if}
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <ToggleSwitch
+                bind:checked={options.value.excludeBefore}
+                label="Exclude Before"
+              />
+              {#if options.value.excludeBefore}
+                <div class="flex flex-col items-start text-left">
+                  <label class="w-full text-sm">
+                    Exclude Before
+                    <input
+                      type="text"
+                      class="input w-full"
+                      bind:value={options.value.excludeBeforeString}
+                    />
+                  </label>
+                </div>
+              {/if}
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <ToggleSwitch
+                bind:checked={options.value.excludeAfter}
+                label="Exclude After"
+              />
+              {#if options.value.excludeAfter}
+                <div class="flex flex-col items-start text-left">
+                  <label class="w-full text-sm">
+                    Exclude After
+                    <input
+                      type="text"
+                      class="input w-full"
+                      bind:value={options.value.excludeAfterString}
+                    />
+                  </label>
+                </div>
+              {/if}
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <ToggleSwitch
+                bind:checked={options.value.mergeWithExistingColors}
+                label="Merge With Existing Yarn Colorways"
+              />
+              {#if options.value.mergeWithExistingColors}
+                <div class="mt-2 flex flex-col items-start text-left">
+                  <SelectYarn
+                    preselectDefaultYarn={false}
+                    bind:selectedBrandId={options.value.selectedYarn.brandId}
+                    bind:selectedYarnId={options.value.selectedYarn.yarnId}
                   />
-                </label>
-              </div>
-            {/if}
-          </div>
-
-          <div>
-            <ToggleSwitch bind:checked={excludeBefore} label="Exclude Before" />
-            {#if excludeBefore}
-              <div class="tex-left flex flex-col items-start">
-                <label class="w-full text-sm">
-                  Exclude Before
-                  <input
-                    type="text"
-                    class="input w-full"
-                    bind:value={excludeBeforeString}
-                  />
-                </label>
-              </div>
-            {/if}
-          </div>
-
-          <div>
-            <ToggleSwitch bind:checked={excludeAfter} label="Exclude After" />
-            {#if excludeAfter}
-              <div class="tex-left flex flex-col items-start">
-                <label class="w-full text-sm">
-                  Exclude After
-                  <input
-                    type="text"
-                    class="input w-full"
-                    bind:value={excludeAfterString}
-                  />
-                </label>
-              </div>
-            {/if}
+                </div>
+              {/if}
+            </div>
           </div>
 
           <h2 class="h2 text-gradient my-2">Output</h2>
@@ -229,18 +273,14 @@
             <button
               class="btn preset-filled-primary-500"
               onclick={async () => await getNames()}
-              disabled={querySelector === '' || content === ''}
-              >Get Colorway Names</button
+              disabled={options.value.querySelector === '' ||
+                options.value.content === ''}>Get Colorway Names</button
             >
-            <Expand
-              bind:isExpanded={showClearButton}
-              less="Hide Clear Button"
-              more="Show Clear Button"
-            />
+            <Expand bind:isExpanded={showClearButton} label="Clear Button" />
             {#if showClearButton}
               <button
                 class="btn preset-filled-primary-500"
-                onclick={() => (names = [])}>Clear</button
+                onclick={() => (options.value.names = [])}>Clear</button
               >
             {/if}
           </div>
@@ -251,31 +291,40 @@
               type="number"
               class="select w-fit"
               id="numberOfColumns"
-              bind:value={columnWidth}
+              bind:value={options.value.columnWidth}
             />
           </div>
 
-          {#if names?.length}
-            <p>{names.length} Colorways</p>
+          {#if options.value.names?.length}
+            <p>{options.value.names.length} Colorways</p>
             <div class="flex flex-wrap justify-start">
-              {#each names as { name, hex }, index}
+              {#each options.value.names as { name, hex }, index}
                 <div
                   class="flex flex-col gap-1 p-2"
                   style="background:{hex};color:{getTextColor(
                     hex,
-                  )};width:{columnWidth}px"
+                  )};width:{options.value.columnWidth}px"
                 >
-                  <p class="text-sm">{index + 1}</p>
+                  <div class="flex items-center gap-2">
+                    <p class="text-sm">{index + 1}</p>
+                    {#if options.value.mergeWithExistingColors && options.value.selectedYarn.brandId && options.value.selectedYarn.yarnId}
+                      {#if !existingColorways.some((ec) => ec.name.toLowerCase() === name.toLowerCase())}
+                        <span class="badge bg-primary-500 uppercase text-[10px]"
+                          >new</span
+                        >
+                      {/if}
+                    {/if}
+                  </div>
                   <div
                     contenteditable="true"
-                    bind:innerHTML={names[index].name}
+                    bind:innerHTML={options.value.names[index].name}
                     class=""
                   >
                     {name}
                   </div>
                   <div
                     contenteditable="true"
-                    bind:innerHTML={names[index].hex}
+                    bind:innerHTML={options.value.names[index].hex}
                     class="border bg-white text-black"
                   >
                     {hex}
@@ -283,11 +332,11 @@
                 </div>
               {/each}
             </div>
-            <div>
+            <div class="flex flex-wrap gap-4">
               <button
                 class="btn preset-filled-primary-500"
                 onclick={() => {
-                  let namesToCopy = names.map((n) => {
+                  let colors = options.value.names.map((n) => {
                     return {
                       hex: chroma.valid(n.hex)
                         ? chroma(n.hex).hex().toLowerCase()
@@ -295,14 +344,35 @@
                       name: n.name,
                     };
                   });
-                  window.navigator.clipboard.writeText(
-                    JSON.stringify(namesToCopy),
-                  );
-                  console.log(namesToCopy);
+                  window.navigator.clipboard.writeText(JSON.stringify(colors));
+                  toast.trigger({
+                    message: `Copied (${colors.length})`,
+                    category: 'success',
+                  });
+                  console.log(colors);
                 }}
               >
                 Copy to Clipboard As Array
               </button>
+
+              {#if options.value.mergeWithExistingColors && existingColorways.length}
+                <button
+                  class="btn preset-filled-primary-500"
+                  onclick={() => {
+                    window.navigator.clipboard.writeText(
+                      JSON.stringify(onlyNewColors),
+                    );
+                    toast.trigger({
+                      message: `Copied Only New Colorways (${onlyNewColors.length})`,
+                      category: 'success',
+                    });
+                    console.log(onlyNewColors);
+                  }}
+                >
+                  Copy Only New Colorways ({onlyNewColors.length}) to Clipboard
+                  As Array
+                </button>
+              {/if}
             </div>
           {/if}
         </div>

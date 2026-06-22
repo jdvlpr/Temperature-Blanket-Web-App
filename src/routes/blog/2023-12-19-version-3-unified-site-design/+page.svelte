@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -18,7 +18,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import AppLogo from '$lib/components/AppLogo.svelte';
   import AppShell from '$lib/components/AppShell.svelte';
   import Card from '$lib/components/Card.svelte';
-  import { ICONS } from '$lib/constants';
   import { ArrowLeftIcon } from '@lucide/svelte';
 </script>
 
@@ -43,13 +42,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <AppShell pageName="Version 3 Update">
   {#snippet stickyHeader()}
-    <div class="hidden lg:inline-flex mx-auto"><AppLogo /></div>
+    <div class="mx-auto hidden lg:inline-flex"><AppLogo /></div>
   {/snippet}
   {#snippet main()}
     <main class="pb-8">
       <a
         href="/blog"
-        class="btn hover:preset-tonal mb-2 max-lg:mx-2 max-lg:mt-2"
+        class="btn hover:preset-tonal-surface mb-2 max-lg:mx-2 max-lg:mt-2"
         ><ArrowLeftIcon /> Blog</a
       >
       <Card>
@@ -57,14 +56,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <div>
             <img
               src="/images/blog-images/2023-12-19-version-3-unified-site-design/featured-image.png"
-              class="h-36 object-cover w-full"
+              class="h-36 w-full object-cover"
               alt="Version 3"
             />
           </div>
         {/snippet}
 
         {#snippet content()}
-          <div class="pb-4 px-2">
+          <div class="px-2 pb-4">
             <div class="flex flex-col gap-4">
               <div class="mt-4 flex flex-col gap-2">
                 <h2 class="h2 text-gradient">Version 3: Unified Site Design</h2>
@@ -83,7 +82,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 navigation between pages, and improved sharing capabilities.
               </p>
 
-              <h2 class="font-bold text-lg">Updated Project Gallery Pages</h2>
+              <h2 class="text-lg font-bold">Updated Project Gallery Pages</h2>
               <p>
                 Hundreds of user-created projects have been shared to the <a
                   href="/gallery"
@@ -97,11 +96,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 pages will automatically be redirected to their new addresses.
               </p>
               <p>For example, an old project url like this:</p>
-              <p class="ml-4 code w-fit whitespace-pre-wrap">
+              <p class="code ml-4 w-fit whitespace-pre-wrap">
                 www.temperature-blanket.com/info/project/123/my-saved-project
               </p>
               <p>is now:</p>
-              <p class="ml-4 code w-fit whitespace-pre-wrap">
+              <p class="code ml-4 w-fit whitespace-pre-wrap">
                 temperature-blanket.com/gallery/123
               </p>
               <p>
@@ -111,7 +110,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 the site. The other benefit is that they are easier to maintain.
                 I don't have to maintain two separate sites.
               </p>
-              <h2 class="font-bold text-lg">
+              <h2 class="text-lg font-bold">
                 Improved Navigation Between Pages
               </h2>
               <p>
@@ -122,7 +121,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 and smoother.
               </p>
 
-              <h2 class="font-bold text-lg">
+              <h2 class="text-lg font-bold">
                 Easily Share a Yarn Palette, Colorway Search, or Weather
                 Forecast Page
               </h2>
@@ -131,7 +130,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 Forecast tools, click the share icon at the top of the page to
                 get a shareable link to that page.
               </p>
-              <h2 class="font-bold text-lg">
+              <h2 class="text-lg font-bold">
                 Bug Fixes, Performance Improvements, and More
               </h2>
               <p>

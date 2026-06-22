@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -27,7 +27,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {src}
       {alt}
       onload={() => dispatch('loaded')}
-      class="object-contain max-w-full max-h-[90vh]"
+      class="max-h-[90vh] max-w-full object-contain"
     />
   </picture>
 {/if}

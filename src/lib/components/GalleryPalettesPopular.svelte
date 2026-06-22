@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -25,16 +25,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script>
   import ColorPalette from '$lib/components/ColorPalette.svelte';
   import PlaceholderPalettes from '$lib/components/PlaceholderPalettes.svelte';
-  import { allGaugesAttributes } from '$lib/state';
+  import { allGaugesAttributes } from '$lib/state/gauges-state.svelte';
   import {
     fetchPopularProjects,
-    getColorsFromInput,
+    recordPageView,
+  } from '$lib/utils/gallery-utils';
+  import { getColorsFromInput } from '$lib/utils/color-utils';
+  import {
     getProjectParametersFromURLHash,
     getTitleFromLocationsMeta,
-    pluralize,
-    recordPageView,
-  } from '$lib/utils';
+  } from '$lib/utils/project-utils.svelte';
+  import { pluralize } from '$lib/utils/string-utils';
   import { getContext, onMount } from 'svelte';
+  import { ClockIcon } from '@lucide/svelte';
 
   let close = $state(null);
   if (typeof getContext === 'function')
@@ -124,14 +127,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 </script>
 
-<div class="text-center flex flex-wrap justify-center items-end pb-4 gap-2">
-  <label class="label text-sm">
-    <span>Popular during the past</span>
-    <select
-      class="select w-fit min-w-[90px] mx-auto"
-      id="select-time-period"
-      bind:value={galleryPalettesPopularState.months}
-      onchange={async () => {
+<div class="flex flex-wrap items-end justify-center gap-2 pb-4 text-center">
+  <label class="label">
+    <span class="label-text">Popular in the last</span>
+    <div class="relative flex w-fit items-center">
+      <ClockIcon class="pointer-events-none absolute left-2" />
+      <select
+        class="select mx-auto w-fit min-w-[100px] truncate pl-10"
+        id="select-time-period"
+        bind:value={galleryPalettesPopularState.months}
+        onchange={async () => {
         loading = true;
         galleryPalettesPopularState.projects = [];
         let results = await fetchPopularProjects({
@@ -146,26 +151,27 @@ If not, see <https://www.gnu.org/licenses/>. -->
           document.getElementsByClassName('content')[0].scrollTop = 0;
       }}
     >
-      <option value={0.0357}>day</option>
-      <option value={0.25}>week</option>
-      <option value={1}>month</option>
-      <option value={12}>year</option>
+      <option value={0.0357}>Day</option>
+      <option value={0.25}>Week</option>
+      <option value={1}>Month</option>
+      <option value={12}>Year</option>
     </select>
+    </div>
   </label>
 </div>
 
 <div
-  class="flex flex-col items-center scroll-mt-[58px] lg:scroll-mt-[44px] px-2"
+  class="flex scroll-mt-[58px] flex-col items-center px-2 lg:scroll-mt-[44px]"
 >
   {#if loading}
     <div class="my-1"></div>
     <PlaceholderPalettes items={20} maxWFull={true} />
   {:else}
-    <div class="gap-4 my-2 flex flex-col items-start justify-start w-full">
+    <div class="my-2 flex w-full flex-col items-start justify-start gap-4">
       {#each palettes as { colors, schemeName, projectId }}
         <button
           type="button"
-          class="cursor-pointer w-full"
+          class="w-full cursor-pointer"
           onclick={() => {
             recordPageView(projectId);
             updateGauge({
@@ -183,6 +189,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/if}
 
   {#if !galleryPalettesPopularState.projects.length && !loading}
-    <p class="text-center my-8">No Results</p>
+    <p class="my-8 text-center">No Results</p>
   {/if}
 </div>

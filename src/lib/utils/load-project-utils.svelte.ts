@@ -1,4 +1,4 @@
-// Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+// Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 //
 // This file is part of Temperature-Blanket-Web-App.
 //
@@ -14,49 +14,48 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { version } from '$app/environment';
+import { CHARACTERS_FOR_URL_HASH } from '$lib/constants/page-constants';
 import {
-  CHARACTERS_FOR_URL_HASH,
   DAYS_OF_THE_WEEK,
-  NO_DATA_SRTM3,
   UNIT_LABELS,
-} from '$lib/constants';
-import {
-  allGaugesAttributes,
-  gauges,
-  localState,
-  locations,
-  previews,
-  project,
-  toast,
-  weather,
-} from '$lib/state';
+} from '$lib/constants/weather-constants';
+import { NO_DATA_SRTM3 } from '$lib/constants/location-constants';
+import { allGaugesAttributes, gauges } from '$lib/state/gauges-state.svelte';
+import { locations } from '$lib/state/location-state.svelte';
+import { previews } from '$lib/state/preview-state.svelte';
+import { project } from '$lib/state/project-state.svelte';
+import { toast } from '$lib/state/page-state.svelte';
+import { weather } from '$lib/state/weather-state.svelte';
+import { MoonPhaseGauge } from '$lib/state/gauges/moon-phase-gauge-state.svelte';
+import { preferences } from '$lib/storage/preferences.svelte';
 import {
   celsiusToFahrenheit,
-  dateToISO8601String,
-  displayGeoNamesErrorMessage,
-  exists,
+  millimetersToInches,
+} from '$lib/utils/unit-utils.svelte';
+import { dateToISO8601String, yearFrom } from '$lib/utils/date-utils';
+import { displayGeoNamesErrorMessage } from '$lib/utils/error-utils.svelte';
+import { exists, upToDate } from '$lib/utils/other-utils';
+import {
   formatFeatureName,
   formatLocationLabel,
-  getColorsFromInput,
-  getProjectParametersFromURLHash,
-  millimetersToInches,
-  upToDate,
-  yearFrom,
-} from '$lib/utils';
+} from '$lib/utils/location-utils.svelte';
+import { getColorsFromInput } from '$lib/utils/color-utils';
+import { getProjectParametersFromURLHash } from '$lib/utils/project-utils.svelte';
+import { seasonsFromUrlHash } from '$lib/utils/seasons-utils.svelte';
 
-export const setProjectSettings = async (
+export const loadProjectFromURL = async (
   hash = window.location.hash.substring(1),
 ) => {
   const params = getProjectParametersFromURLHash(hash);
 
   // Load Units
   if (exists(params.u)) {
-    const _units = $state.snapshot(localState.value.units);
-    if (params.u.value === 'i') localState.value.units = 'imperial';
-    if (params.u.value === 'm') localState.value.units = 'metric';
-    if (_units !== localState.value.units) {
+    const _units = $state.snapshot(preferences.value.units);
+    if (params.u.value === 'i') preferences.value.units = 'imperial';
+    if (params.u.value === 'm') preferences.value.units = 'metric';
+    if (_units !== preferences.value.units) {
       const label =
-        localState.value.units === 'metric'
+        preferences.value.units === 'metric'
           ? `${UNIT_LABELS.temperature.metric} /
 	    ${UNIT_LABELS.height.metric}`
           : `${UNIT_LABELS.temperature.imperial} /
@@ -76,14 +75,14 @@ export const setProjectSettings = async (
   allGaugesAttributes.forEach((gauge) => {
     if (!exists(params[gauge.id])) return;
     gauges.addById(gauge.id);
+
     const settings = parseGaugeURLHash(
       params[gauge.id].value,
       gauges.getSnapshot(gauge.id),
     );
 
-    gauges.allCreated
-      .find((g) => g.id === gauge.id)
-      .updateSettings({ settings });
+    const _gauge = gauges.allCreated.find((g) => g.id === gauge.id);
+    if (_gauge) _gauge.updateSettings({ settings });
   });
 
   // Load Preview
@@ -92,18 +91,30 @@ export const setProjectSettings = async (
   });
 
   // Load Weather Source (added in v1.823)
-  if (exists(params.s)) {
+  loadWeatherSource: if (exists(params.s)) {
+    if (weather.source.wasLoadedFromStorage) break loadWeatherSource;
+
     const sourceCode = params.s.value.substring(0, 1);
-    if (sourceCode === '0') weather.defaultSource = 'Meteostat';
-    else if (sourceCode === '1') weather.defaultSource = 'Open-Meteo';
+    if (sourceCode === '0') weather.source.name = 'Meteostat';
+    else if (sourceCode === '1') weather.source.name = 'Open-Meteo';
 
     const secondaryCode = params.s.value.substring(1, 2);
-    if (secondaryCode === '0') weather.useSecondarySources = false;
-    else if (secondaryCode === '1') weather.useSecondarySources = true;
+    if (secondaryCode === '0') weather.source.useSecondary = false;
+    else if (secondaryCode === '1') weather.source.useSecondary = true;
+
+    const lastSubstring = params.s.value.substring(2);
+    if (lastSubstring && weather.source?.settings) {
+      if (+lastSubstring === 0) weather.source.settings.meteoStat.model = false;
+      else if (lastSubstring === 'l')
+        weather.source.settings.openMeteo.model = 'era5_land';
+      else if (lastSubstring === 'e')
+        weather.source.settings.openMeteo.model = 'era5';
+    }
+    weather.source.wasLoadedFromURLHash = true;
   } else {
     // Projects before v1.823 didn't have this param, and only used Meteostat as a weather source
-    weather.defaultSource = 'Meteostat';
-    weather.useSecondarySources = true;
+    weather.source.name = 'Meteostat';
+    weather.source.useSecondary = true;
   }
 
   // Load Weather Grouping Setting if present
@@ -116,9 +127,24 @@ export const setProjectSettings = async (
     // Otherwise set to the default 'day'
     weather.grouping = 'day';
   }
+
+  // Load Seasons from URL (n parameter)
+  if (exists(params.n)) {
+    const decoded = seasonsFromUrlHash(params.n.value);
+    if (decoded) {
+      preferences.value.seasons = decoded;
+      if (previews.active) previews.active.settings.useSeasonTargets = true;
+    }
+  }
 };
 
 const parseLocationURLHash = async (hashString) => {
+  const wasLoadedFromStorage = locations.all.every(
+    (location) => location.wasLoadedFromStorage,
+  );
+
+  // If all locations were loaded from storage, then we don't need to load them from the URL hash
+  if (wasLoadedFromStorage) return;
   // First, get all the positions of the separator character(s)
   // This determines the number of locations
   const separatorIndices = [];
@@ -141,7 +167,7 @@ const parseLocationURLHash = async (hashString) => {
 
     if (_locations.length - 1 < i) {
       // There needs to be another location, so create it
-      locations.add();
+      locations.add({ clearWeatherData: false });
     }
 
     _locations[i].label = 'Loading...';
@@ -213,9 +239,6 @@ const parseLocationURLHash = async (hashString) => {
     // Set the location's to date
     _locations[i].to = to;
 
-    // Set this to true so that certain functions on the Project Planner page know to run when this location is loaded
-    _locations[i].wasLoadedFromSavedProject = true;
-
     // Get  data from GeoNames using the location's id
     try {
       const response = await fetch(`/api/location/${id}`);
@@ -257,6 +280,9 @@ const parseLocationURLHash = async (hashString) => {
     } catch (e) {
       throw displayGeoNamesErrorMessage(e);
     }
+
+    // Set this to true so that certain functions on the Project Planner page know to run when this location is loaded
+    _locations[i].wasLoadedFromURL = true;
   }
 
   locations.all = _locations;
@@ -312,7 +338,7 @@ export const parseGaugeURLHash = (hashString: string, gauge) => {
 
   // If the colors aren't formatted correctly, stop parsing the gauge's hashString.
   // All the default colors and settings will be used
-  if (!isValidColorsString) return;
+  if (!isValidColorsString && gauge.id !== 'moon') return;
 
   // If the gauge uses a scheme instead of individual colors, set the scheme Id
   // Otherwise the schemeId is 'Custom'
@@ -344,6 +370,13 @@ export const parseGaugeURLHash = (hashString: string, gauge) => {
     gauge.numberOfColors = colors.length;
   }
 
+  // If it's a moon gauge, this is enough, so return the gauge and don't process any further
+  if (gauge.id === 'moon') {
+    const _moonGauge = new MoonPhaseGauge();
+    gauge.ranges = _moonGauge.ranges;
+    return gauge;
+  }
+
   const ranges = [];
   for (let i = 0; i < rangeFromIndices.length; i++) {
     // The color's From range value is the number from the '(' character to the "'" separator character
@@ -360,8 +393,8 @@ export const parseGaugeURLHash = (hashString: string, gauge) => {
 
     // Before version 1.700, all numbers were saved in metric
     // So convert the From and To values if needed
-    if (!upToDate(project.loaded.version, '1.700')) {
-      if (localState.value.units === 'imperial') {
+    if (!upToDate(project.onLoaded.version, '1.700')) {
+      if (preferences.value.units === 'imperial') {
         switch (gauge.id) {
           case 'temp':
             from = celsiusToFahrenheit(from);
@@ -400,9 +433,29 @@ export const parseGaugeURLHash = (hashString: string, gauge) => {
   // and stop parsing the hashString
   if (!hashStringSettings) return gauge;
 
-  // when this function is run in /gallery/[id], the gauge does not have rangeOptions and doesn't need the range options to be updated,
-  // so just return the gauge as it is
-  if (!gauge?.rangeOptions) return gauge;
+  // when this function is run in /gallery/[id], the gauge does not have rangeOptions, so create a placeholder object
+  if (!gauge?.rangeOptions)
+    gauge.rangeOptions = {
+      auto: {
+        optimization: 'tmax',
+        start: {
+          high: 0,
+          low: 0,
+        },
+        increment: 0,
+        roundIncrement: true,
+      },
+      manual: {
+        start: 0,
+        increment: 0,
+      },
+      direction: 'high-to-low',
+      includeFromValue: true,
+      includeToValue: false,
+      linked: true,
+      mode: 'auto',
+      isCustomRanges: false,
+    };
 
   gauge.rangeOptions.mode =
     hashStringSettings.substring(0, 1) === 'a' ? 'auto' : 'manual';
@@ -495,8 +548,8 @@ export const parseGaugeURLHash = (hashString: string, gauge) => {
     // Before version 1.700, all numbers were in metric
     // So update them if needed
     if (
-      !upToDate(project.loaded.version, '1.700') &&
-      localState.value.units === 'imperial'
+      !upToDate(project.onLoaded.version, '1.700') &&
+      preferences.value.units === 'imperial'
     ) {
       increment = celsiusToFahrenheit(increment);
       start = celsiusToFahrenheit(start);

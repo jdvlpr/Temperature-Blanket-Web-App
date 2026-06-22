@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -14,22 +14,21 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import AddToGallery from '$lib/components/modals/AddToGallery.svelte';
   import PreviewSelect from '$lib/components/previews/PreviewSelect.svelte';
   import WeatherDetails from '$lib/components/WeatherDetails.svelte';
+  import { drawerState } from '$lib/state/page-state.svelte';
+  import { gauges } from '$lib/state/gauges-state.svelte';
+  import { locations } from '$lib/state/location-state.svelte';
   import {
-    drawerState,
-    gauges,
-    locations,
-    modal,
     previews,
     previewWeatherTargets,
-    project,
-  } from '$lib/state';
-  import { downloadPreviewPNG } from '$lib/utils';
-  import { DownloadIcon, SendIcon } from '@lucide/svelte';
+  } from '$lib/state/preview-state.svelte';
+  import { project } from '$lib/state/project-state.svelte';
+  import { downloadPreviewPNG } from '$lib/utils/preview-utils.svelte';
+  import { ImageIcon } from '@lucide/svelte';
   import { onMount } from 'svelte';
   import { Drawer } from 'vaul-svelte';
+  import SendToGalleryButton from './buttons/SendToGalleryButton.svelte';
 
   onMount(() => {
     if (!previews.activeId) {
@@ -40,7 +39,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <PreviewSelect />
 
-<div class="flex flex-col items-start justify-center gap-2">
+<div class="flex flex-col items-start justify-center gap-2 px-2">
   {#if gauges.activeGauge?.colors}
     {#key previews.active}
       <div class="flex w-full flex-col items-center justify-center gap-4">
@@ -62,6 +61,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 <div class="mx-auto text-center">
                   <WeatherDetails
                     weatherTargets={previewWeatherTargets.value}
+                    getTargets={previewWeatherTargets.getter}
                   />
                 </div>
               </div>
@@ -79,7 +79,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       class="rounded-container bg-surface-100 dark:bg-surface-900 mt-2 flex w-full flex-wrap justify-center gap-2 px-4 py-2 shadow-inner"
     >
       <button
-        class="btn hover:preset-tonal"
+        class="btn hover:preset-tonal-surface"
         title="Download PNG"
         onclick={() => {
           downloadPreviewPNG(
@@ -89,24 +89,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
           );
         }}
       >
-        <DownloadIcon />
+        <ImageIcon />
         Download Image (PNG)
       </button>
 
-      <button
-        class="btn preset-tonal-primary border-primary-500 h-auto items-center border text-left whitespace-pre-wrap"
-        onclick={() =>
-          modal.trigger({
-            type: 'component',
-            component: {
-              ref: AddToGallery,
-            },
-          })}
-        title="Show Send to Gallery Dialog"
-      >
-        <SendIcon />
-        Send to Project Gallery
-      </button>
+      <SendToGalleryButton isPrimary={true} />
 
       {#if project.gallery.href && project.gallery.title && project.gallery.title === locations.projectTitle}
         <div class="flex w-full flex-col justify-center gap-1">
@@ -115,7 +102,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <a
               href={project.gallery.href}
               target="_blank"
-              class="btn hover:preset-tonal w-fit whitespace-pre-wrap underline"
+              class="btn hover:preset-tonal-surface w-fit whitespace-pre-wrap underline"
               rel="noreferrer">{project.gallery.title}</a
             >
           </p>

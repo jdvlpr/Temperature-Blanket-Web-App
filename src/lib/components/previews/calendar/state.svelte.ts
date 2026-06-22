@@ -1,19 +1,37 @@
 import Preview from '$lib/components/previews/calendar/Preview.svelte';
 import Settings from '$lib/components/previews/calendar/Settings.svelte';
-import { CHARACTERS_FOR_URL_HASH } from '$lib/constants';
-import { gauges, previews, weather } from '$lib/state';
+import { CHARACTERS_FOR_URL_HASH } from '$lib/constants/page-constants';
+import { gauges } from '$lib/state/gauges-state.svelte';
+import { previews } from '$lib/state/preview-state.svelte';
+import { weather } from '$lib/state/weather-state.svelte';
+import type { BasePreviewSettings } from '$lib/types/preview-types';
+import type { Color } from '$lib/types/yarn-types';
+import type { WeatherParam } from '$lib/types/gauge-types';
 import {
   getDaysInLongestMonth,
   getFactors,
-  getMiddleValueOfArray,
   getPossibleDimensions,
   getSquareSectionTargetIds,
-  getWeatherTargets,
   setSecondaryTargets,
   setTargets,
   weatherMonthsData,
-} from '$lib/utils';
+} from '$lib/utils/preview-utils.svelte';
+import { getMiddleValueOfArray } from '$lib/utils/number-utils';
+import { getWeatherTargets } from '$lib/utils/weather-utils.svelte';
 import chroma from 'chroma-js';
+
+interface CalendarPreviewSettings extends BasePreviewSettings {
+  primaryTarget: WeatherParam['id'];
+  squareSize: number;
+  secondaryTargets: { indexes: number; targetId: WeatherParam['id'] }[];
+  dimensions: string;
+  weekStartCode: number;
+  monthPadding: number;
+  additionalSquaresColor: Color['hex'];
+  primaryTargetAsBackup: number;
+  joinStitches: number;
+  joinColor: Color['hex'];
+}
 
 export class CalendarPreviewClass {
   constructor() {
@@ -80,7 +98,7 @@ export class CalendarPreviewClass {
   // User settings properties
   // *******************
 
-  settings = $state({
+  settings = $state<CalendarPreviewSettings>({
     primaryTarget: 'tmax',
     squareSize: 3,
     secondaryTargets: [],
@@ -91,6 +109,7 @@ export class CalendarPreviewClass {
     primaryTargetAsBackup: 1,
     joinStitches: 0,
     joinColor: '#e8e3e2',
+    useSeasonTargets: false,
   });
 
   // *******************

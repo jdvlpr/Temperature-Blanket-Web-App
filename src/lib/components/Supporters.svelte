@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -14,95 +14,97 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import { SUPPORTERS } from '$lib/constants';
+  import { PUBLIC_KOFI_LINK } from '$env/static/public';
+  import { SUPPORTERS } from '$lib/constants/supporter-constants';
   import { AwardIcon } from '@lucide/svelte';
   import { Avatar } from '@skeletonlabs/skeleton-svelte';
 </script>
 
 {#if SUPPORTERS}
   <!-- when there are more items, add these classes: sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-4 -->
-  <div
-    class="my-4 grid grid-cols-1 gap-4 rounded-none lg:grid-cols-2 2xl:grid-cols-3"
-  >
-    {#if SUPPORTERS?.gold?.length}
-      <div class="relative flex items-center w-full col-span-full">
-        <div class="grow border-t border-surface-300-700"></div>
-        <div class="shrink mx-4 flex items-center gap-2">
-          <AwardIcon />
-          <div class="">
-            <p class="">Gold Tier</p>
-            <p class="text-xs">$6 per month</p>
+  <div class="flex flex-col items-center gap-4">
+    <div class="grid w-full grid-cols-1 gap-4 rounded-none md:grid-cols-2">
+      {#if SUPPORTERS?.gold?.length}
+        {#each SUPPORTERS?.gold as { name, href, linkText, imageSrc, date }}
+          {@const monthAndYear = new Date(date).toLocaleString('default', {
+            month: 'long',
+            year: 'numeric',
+          })}
+          <div
+            class="bg-surface-50 dark:bg-surface-950 rounded-container flex w-full flex-col justify-center px-2 py-4"
+          >
+            {#if imageSrc}
+              <Avatar
+                class="mx-auto size-24 shrink-0 rounded-[5px] bg-transparent"
+              >
+                <Avatar.Image src={imageSrc} alt={name} />
+                <Avatar.Fallback>{name}</Avatar.Fallback>
+              </Avatar>
+            {/if}
+            <div class="flex flex-col items-center justify-center">
+              <h4 class="h4">
+                {name}
+              </h4>
+              <p class="text-surface-500 mb-1 text-xs">
+                <AwardIcon class="inline size-4 text-yellow-500" />
+                <a
+                  href="{PUBLIC_KOFI_LINK}/tiers"
+                  class="anchor"
+                  target="_blank">Gold Supporter</a
+                >
+                since {monthAndYear}
+              </p>
+              <a {href} target="_blank" class="anchor break-all">
+                {linkText}
+              </a>
+            </div>
           </div>
-        </div>
-        <div class="grow border-t border-surface-300-700"></div>
-      </div>
-      {#each SUPPORTERS?.gold as { name, href, linkText, imageSrc }}
-        <div
-          class="bg-surface-50 dark:bg-surface-950 px-2 py-4 rounded-container w-full flex flex-col justify-center"
-        >
-          <Avatar
-            src={imageSrc}
-            {name}
-            size="size-24"
-            rounded="rounded-[5px]"
-            background="bg-none"
-            classes="mx-auto shrink-0"
-          />
-          <div class="flex flex-col justify-center items-center">
-            <h5 class="h5">
-              {name}
-            </h5>
-            <a {href} target="_blank" class="link break-all">
-              {linkText}
-            </a>
+        {/each}
+      {/if}
+
+      {#if SUPPORTERS?.silver?.length}
+        {#each SUPPORTERS.silver as { name, href, linkText, date }}
+          {@const monthAndYear = new Date(date).toLocaleString('default', {
+            month: 'long',
+            year: 'numeric',
+          })}
+
+          <div
+            class="bg-surface-50 dark:bg-surface-950 rounded-container flex h-fit flex-col items-center p-4"
+          >
+            <h4 class="h4">{name}</h4>
+            <p class="text-surface-500 text-xs">
+              <AwardIcon class="inline size-4 text-slate-500" />
+              <a href="{PUBLIC_KOFI_LINK}/tiers" class="anchor" target="_blank"
+                >Silver Supporter</a
+              >
+              since {monthAndYear}
+            </p>
+            <a {href} target="_blank" class="anchor">{linkText}</a>
           </div>
-        </div>
-      {/each}
-    {/if}
+        {/each}
+      {/if}
 
-    {#if SUPPORTERS?.silver?.length}
-      <div class="relative flex items-center w-full col-span-full">
-        <div class="grow border-t border-surface-300-700"></div>
-        <div class="shrink mx-4 flex items-center gap-2">
-          <AwardIcon />
-
-          <div class="">
-            <p class="">Silver Tier</p>
-            <p class="text-xs">$4 per month</p>
+      {#if SUPPORTERS?.bronze?.length}
+        {#each SUPPORTERS?.bronze as { name, date }}
+          {@const monthAndYear = new Date(date).toLocaleString('default', {
+            month: 'long',
+            year: 'numeric',
+          })}
+          <div
+            class="bg-surface-50 dark:bg-surface-950 rounded-container flex h-fit flex-col items-center p-4"
+          >
+            <h4 class="h4">{name}</h4>
+            <p class="text-surface-500 text-xs">
+              <AwardIcon class="inline size-4 text-yellow-700" />
+              <a href="{PUBLIC_KOFI_LINK}/tiers" class="anchor" target="_blank"
+                >Bronze Supporter</a
+              >
+              since {monthAndYear}
+            </p>
           </div>
-        </div>
-        <div class="grow border-t border-surface-300-700"></div>
-      </div>
-      {#each SUPPORTERS.silver as { name, href, linkText }}
-        <div
-          class="h-fit bg-surface-50 dark:bg-surface-950 p-4 rounded-container flex flex-col items-center"
-        >
-          <h5 class="h5">{name}</h5>
-          <a {href} target="_blank" class="link">{linkText}</a>
-        </div>
-      {/each}
-    {/if}
-
-    {#if SUPPORTERS?.bronze?.length}
-      <div class="relative flex items-center w-full col-span-full">
-        <div class="grow border-t border-surface-300-700"></div>
-        <div class="shrink mx-4 flex items-center gap-2">
-          <AwardIcon />
-
-          <div class="">
-            <p class="">Bronze Tier</p>
-            <p class="text-xs">$2 per month</p>
-          </div>
-        </div>
-        <div class="grow border-t border-surface-300-700"></div>
-      </div>
-      {#each SUPPORTERS?.bronze as { name }}
-        <div
-          class="h-fit bg-surface-50 dark:bg-surface-950 p-4 rounded-container flex flex-col items-center"
-        >
-          <h5 class="h5">{name}</h5>
-        </div>
-      {/each}
-    {/if}
+        {/each}
+      {/if}
+    </div>
   </div>
 {/if}

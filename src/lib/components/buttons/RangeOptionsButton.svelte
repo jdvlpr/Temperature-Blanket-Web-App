@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -14,10 +14,10 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import Tooltip from '$lib/components/Tooltip.svelte';
   import GaugeSettings from '$lib/components/modals/GaugeSettings.svelte';
-  import { gauges, modal } from '$lib/state';
-  import { CogIcon, Settings2Icon } from '@lucide/svelte';
+  import { dialog } from '$lib/state/page-state.svelte';
+  import { gauges } from '$lib/state/gauges-state.svelte';
+  import { Settings2Icon } from '@lucide/svelte';
 
   function onSaveRangeOptions(e) {
     gauges.activeGauge.ranges = e.ranges;
@@ -25,11 +25,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 </script>
 
-<Tooltip
-  classNames="btn preset-filled"
-  title="Configure Ranges"
+<button
+  class="btn hover:preset-tonal-surface"
+  title="Change the gauge direction, generate ranges, and more."
   onclick={() =>
-    modal.trigger({
+    dialog.trigger({
       type: 'component',
       component: {
         ref: GaugeSettings,
@@ -43,13 +43,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
       },
     })}
 >
-  <div class="flex flex-wrap items-center justify-center gap-2">
-    <Settings2Icon />
-    Configure Ranges
-  </div>
-  {#snippet tooltip()}
-    <div>
-      <p>Change the gauge direction, generate ranges, and more.</p>
-    </div>
-  {/snippet}
-</Tooltip>
+  <Settings2Icon />
+  Configure Ranges
+</button>

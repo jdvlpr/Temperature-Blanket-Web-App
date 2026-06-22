@@ -1,22 +1,26 @@
 <script>
-  import { modal, weather } from '$lib/state';
-  import { CloudCogIcon, CloudLightningIcon } from '@lucide/svelte';
+  import { dialog } from '$lib/state/page-state.svelte';
+  import { project } from '$lib/state/project-state.svelte';
+  import { weather } from '$lib/state/weather-state.svelte';
+  import { CloudCogIcon } from '@lucide/svelte';
   import ChooseWeatherSource from '../modals/ChooseWeatherSource.svelte';
 </script>
 
 <button
-  class="btn hover:preset-tonal w-fit"
+  class="btn hover:preset-tonal-surface w-fit"
+  disabled={project.status.loading}
   onclick={async () => {
-    modal.trigger({
+    dialog.trigger({
       type: 'component',
       component: { ref: ChooseWeatherSource },
+      options: {
+        size: 'small',
+      },
     });
   }}
 >
   <CloudCogIcon />
   <span class="text-left whitespace-pre-wrap"
-    >Weather Source: {weather.isUserEdited
-      ? 'Custom'
-      : weather.defaultSource}</span
-  >
+    >Weather Source: {weather.isUserEdited ? 'Custom' : weather.source.name}
+  </span>
 </button>

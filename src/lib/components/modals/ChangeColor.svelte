@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -17,8 +17,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
   import StickyPart from '$lib/components/modals/StickyPart.svelte';
   import YarnGridSelect from '$lib/components/modals/YarnGridSelect.svelte';
-  import { modal } from '$lib/state';
-  import { ExternalLinkIcon, ShoppingBagIcon } from '@lucide/svelte';
+  import { dialog } from '$lib/state/page-state.svelte';
+  import { ExternalLinkIcon, ShoppingCartIcon } from '@lucide/svelte';
   import chroma from 'chroma-js';
 
   interface Props {
@@ -50,9 +50,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let container: HTMLElement = $state();
 
   let valid = $state(true);
-  let inputTypeColorValue = $state(hex);
-  let inputTypeTextValue = $state(hex);
-  let selectedColors = $state([
+
+  // A copy is necessary so that selecting a yarn colorway doesn't update the results
+  let brandIdCopy = $state(getInitialValue('brandId'));
+
+  // A copy is necessary so that selecting a yarn colorway doesn't update the results
+  let yarnIdCopy = $state(getInitialValue('yarnId'));
+
+  let inputTypeColorValue = $derived(hex);
+
+  let inputTypeTextValue = $derived(hex);
+
+  let title = $derived(index !== null ? `${index + 1}` : '');
+
+  let currentColor = $derived({ hex });
+
+  let selectedColors = $derived([
     {
       hex,
       name,
@@ -64,9 +77,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
       affiliate_variant_href,
     },
   ]);
-  let title = index !== null ? `${index + 1}` : '';
-  let _brandId = brandId;
-  let _yarnId = yarnId;
+
+  let href = $derived(affiliate_variant_href || variant_href);
+
+  function getInitialValue(prop: string) {
+    if (prop === 'brandId') return brandId;
+    if (prop === 'yarnId') return yarnId;
+  }
 
   function inputTypeColorOnChange({ value, color }) {
     name = color?.name;
@@ -124,44 +141,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
       });
     else onChangeColor({ hex });
   }
-
-  let currentColor = $derived({ hex });
 </script>
 
 <div class="p-4 text-center" bind:this={container}>
-  <p class="my-2 text-center text-xs">Color {title}</p>
-  {#if affiliate_variant_href}
+  {#if href}
     <a
       class="mx-auto flex w-fit flex-wrap items-center justify-center gap-2 underline"
-      href={affiliate_variant_href}
+      {href}
       target="_blank"
       rel="noreferrer nofollow"
     >
-      <ShoppingBagIcon />
-      <span class="flex flex-col items-start">
-        <p class="text-xs">
-          {#if brandName}
-            {brandName}
-            -
-          {/if}
-          {#if yarnName}
-            {yarnName}
-          {/if}
-        </p>
-        {#if name}
-          <p class="text-2xl">{name}</p>
-        {/if}
-      </span>
-    </a>
-  {:else if variant_href}
-    <a
-      class="mx-auto inline-flex w-fit flex-wrap items-center justify-center gap-2 underline"
-      href={variant_href}
-      target="_blank"
-      rel="noreferrer nofollow"
-    >
-      <ExternalLinkIcon />
-
+      {#if affiliate_variant_href}
+        <ShoppingCartIcon />
+      {:else}
+        <ExternalLinkIcon />
+      {/if}
       <span class="flex flex-col items-start">
         <p class="text-xs">
           {#if brandName}
@@ -179,36 +173,39 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </a>
   {/if}
 
-  <div class="my-2 flex w-full flex-wrap items-center justify-center gap-2">
-    <label class="color-select-label" title="Choose a Color">
-      <input
-        type="color"
-        class="input"
-        value={inputTypeColorValue}
-        onchange={(e) =>
-          inputTypeColorOnChange({
-            value: e.target.value,
-          })}
-      />
-    </label>
-    <label class="color-text-label flex-1" title="Enter a Color">
-      <input
-        type="text"
-        class="input w-full grow"
-        value={inputTypeTextValue}
-        onkeyup={(e) =>
-          inputTypeTextOnChange({
-            value: e.target.value,
-          })}
-      />
-    </label>
+  <div class="flex flex-col justify-start gap-1">
+    <p class="label-text text-left">Color {title}</p>
+    <div class="flex w-full flex-wrap items-center justify-center gap-x-2">
+      <label class="label" title="Choose a Color">
+        <input
+          type="color"
+          class="input"
+          value={inputTypeColorValue}
+          onchange={(e) =>
+            inputTypeColorOnChange({
+              value: e.target.value,
+            })}
+        />
+      </label>
+      <label class=" flex-1" title="Enter a Color">
+        <input
+          type="text"
+          class="input w-full grow"
+          value={inputTypeTextValue}
+          onkeyup={(e) =>
+            inputTypeTextOnChange({
+              value: e.target.value,
+            })}
+        />
+      </label>
+    </div>
   </div>
 
   <YarnGridSelect
     limit={true}
     bind:selectedColors
-    selectedBrandId={_brandId}
-    selectedYarnId={_yarnId}
+    selectedBrandId={brandIdCopy}
+    selectedYarnId={yarnIdCopy}
     incomingColor={currentColor}
     onClickScrollToTop={() => {
       container.scrollIntoView({
@@ -232,7 +229,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <div class="max-sm:pb-2">
       <SaveAndCloseButtons
         onSave={_onOkay}
-        onClose={modal.close}
+        onClose={dialog.close}
         disabled={!valid}
       />
     </div>

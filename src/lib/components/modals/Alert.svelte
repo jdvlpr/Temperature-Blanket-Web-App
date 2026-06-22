@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -22,5 +22,5 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div class="p-2">
-  <div class="text-center w-full inline-block">{@html message}</div>
+  <div class="inline-block w-full text-center">{@html message}</div>
 </div>

@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -16,43 +16,46 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import { version } from '$app/environment';
   import Location from '$lib/components/Location.svelte';
-  import Tooltip from '$lib/components/Tooltip.svelte';
-  import { MAXIMUM_LOCATIONS } from '$lib/constants';
-  import {
-    locations,
-    project,
-    wasProjectLoadedFromURL,
-    weather,
-  } from '$lib/state';
-  import { pluralize, stringToDate } from '$lib/utils';
+  import { MAXIMUM_LOCATIONS } from '$lib/constants/location-constants';
+  import { locations } from '$lib/state/location-state.svelte';
+  import { project } from '$lib/state/project-state.svelte';
+  import { weather } from '$lib/state/weather-state.svelte';
+  import { pluralize } from '$lib/utils/string-utils';
+  import { stringToDate } from '$lib/utils/date-utils';
   import {
     CircleCheckBigIcon,
     CirclePlusIcon,
+    ExternalLinkIcon,
     TriangleAlertIcon,
   } from '@lucide/svelte';
   import SearchForWeather from './buttons/SearchForWeather.svelte';
   import WeatherSourceButton from './buttons/WeatherSourceButton.svelte';
+
+  const loading = $derived(locations.allValid && project.status.loading);
+  const validLoadedProject = $derived(
+    (weather.wasLoadedFromStorage && !!weather.data.length) ||
+      project.status.wasLoaded,
+  );
 </script>
 
 <div class="mx-auto mt-2 max-w-(--breakpoint-md)">
-  {#if weather.isFromLocalStorage && weather.data}
+  {#if loading}
+    <p class="h-auto animate-pulse text-sm">Loading project...</p>
+  {:else if validLoadedProject}
     <p
       class="flex w-full flex-wrap items-center justify-center gap-1 text-center text-sm"
     >
-      <CircleCheckBigIcon class=" size-4" />
-      Loaded project and {#if weather.isUserEdited}custom weather{:else}weather{/if}
-      data
-    </p>
-  {:else if wasProjectLoadedFromURL.value}
-    <p
-      class="flex w-full flex-wrap items-center justify-center gap-1 text-center text-sm"
-    >
-      <CircleCheckBigIcon class=" size-4" />
-      Loaded project
+      <CircleCheckBigIcon class="text-success-900-100 size-4" />
+      {#if weather.wasLoadedFromStorage && !!weather.data.length}
+        Loaded project and {#if weather.isUserEdited}custom weather{:else}weather{/if}
+        data
+      {:else if project.status.wasLoaded}
+        Loaded project
+      {/if}
     </p>
   {/if}
 
-  {#if !!weather.isUserEdited}
+  {#if weather.isUserEdited}
     <div class="my-4 flex flex-col items-center gap-2">
       {#each locations.all as location}
         <p class="flex flex-wrap items-center justify-center gap-x-1">
@@ -64,45 +67,32 @@ If not, see <https://www.gnu.org/licenses/>. -->
               timeZone: 'UTC',
             })}
           </span>
-          <Tooltip>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-              class="h-6 w-6"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"
-              />
-            </svg>
-            {#snippet tooltip()}
-              <span>
-                To edit location details, reload weather data or <a
-                  href={`/?project=${new Date().getTime()?.toString()}&v=${version}#${project.url.hash.substring(
-                    0,
-                    project.url.hash.indexOf('l='),
-                  )}${project.url.hash.substring(project.url.hash.indexOf('temp'))}`}
-                  class="cursor-pointer underline"
-                  target="_blank"
-                  rel="noreferrer">open a new project</a
-                >.
-              </span>
-            {/snippet}
-          </Tooltip>
+
+          <span class="p-2 text-sm">
+            To edit location details, reload weather data below or <a
+              href={`/?project=${new Date().getTime()?.toString()}&v=${version}#${project.url.hash.substring(
+                0,
+                project.url.hash.indexOf('l='),
+              )}${project.url.hash.substring(project.url.hash.indexOf('temp'))}`}
+              class="cursor-pointer underline"
+              target="_blank"
+              rel="noreferrer"
+              >open a new project <ExternalLinkIcon
+                size="12"
+                class="relative -top-[2px] inline"
+              /></a
+            >.
+          </span>
         </p>
       {/each}
-      <p class="w-full text-sm italic">
+      <p class="w-full text-sm">
         {locations.totalDays} Total {pluralize('Day', locations.totalDays)}
       </p>
     </div>
   {/if}
 
   <div
-    class:hidden={!!weather.isUserEdited}
+    class:hidden={weather.isUserEdited}
     class="divide-surface-300 dark:divide-surface-600 divide-y divide-solid"
   >
     {#each locations.all, index}
@@ -133,7 +123,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
 
     {#if locations.all.length > 1 && locations.totalDays && locations.allValid && !weather.isUserEdited}
-      <p class="w-full text-sm italic">
+      <p class="w-full text-sm">
         {locations.totalDays} Total {pluralize('Day', locations.totalDays)}
       </p>
     {/if}
@@ -145,8 +135,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 >
   {#if locations.all.length < MAXIMUM_LOCATIONS}
     <button
-      class={['btn hover:preset-tonal', weather.isUserEdited && 'hidden']}
-      id="add-location-button"
+      class={[
+        'btn hover:preset-tonal-surface',
+        weather.isUserEdited && 'hidden',
+      ]}
       disabled={project.status.loading}
       onclick={() => locations.add()}
       title="Add a New Location"
@@ -158,6 +150,4 @@ If not, see <https://www.gnu.org/licenses/>. -->
       You've added the maximum allowed number of locations
     </p>
   {/if}
-
-  <WeatherSourceButton />
 </div>

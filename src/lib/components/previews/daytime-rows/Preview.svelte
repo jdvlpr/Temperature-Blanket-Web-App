@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -15,14 +15,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import Spinner from '$lib/components/Spinner.svelte';
-  import { HOURS_PER_DAY } from '$lib/constants';
-  import { localState, weather } from '$lib/state';
-  import {
-    displayNumber,
-    getColorInfo,
-    runPreview,
-    showPreviewImageWeatherDetails,
-  } from '$lib/utils';
+  import { HOURS_PER_DAY } from '$lib/constants/weather-constants';
+  import { weather } from '$lib/state/weather-state.svelte';
+  import { displayNumber } from '$lib/utils/number-utils';
+  import { getColorInfo } from '$lib/utils/color-utils';
+  import { runPreview } from '$lib/utils/function-utils.svelte';
+  import { showPreviewImageWeatherDetails } from '$lib/utils/preview-utils.svelte';
   import { daytimeRowsPreview } from './state.svelte';
 
   let width = $state(daytimeRowsPreview.width);
@@ -108,7 +106,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             break;
         }
         let param = weatherParams[paramIndex];
-        let value = weather.data[dayIndex][param][localState.value.units];
+        let value = weather.getWeatherValue({ dayIndex, param });
 
         // Get the color based on the gauge ID and value
         const color = getColorInfo({ param, value }).hex;

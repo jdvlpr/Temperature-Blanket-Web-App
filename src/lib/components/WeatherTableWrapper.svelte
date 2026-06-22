@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -19,23 +19,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <script>
-  import { dev, version } from '$app/environment';
   import { page } from '$app/state';
-  import { gauges, localState, project, weather } from '$lib/state';
-  import { supabase } from '$lib/supabaseClient';
-  import {
-    dateToISO8601String,
-    dateToISO8601StringVersion2,
-    getTableData,
-    stringToDate,
-    stringToDateVersion2,
-  } from '$lib/utils';
+  import { gauges } from '$lib/state/gauges-state.svelte';
+  import { project } from '$lib/state/project-state.svelte';
+  import { weather } from '$lib/state/weather-state.svelte';
+  import { preferences } from '$lib/storage/preferences.svelte';
+
   import { ExternalLinkIcon } from '@lucide/svelte';
-  import { onMount, tick } from 'svelte';
+  import { tick } from 'svelte';
   import ToggleSwitch from './buttons/ToggleSwitch.svelte';
   import WeatherTableData from './WeatherTableData.svelte';
 
-  let tableData = $state(getTableData());
+  let tableData = $state(weather.getTableData());
 
   const uid = $props.id();
 
@@ -48,7 +43,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   function updateTable() {
     weatherDataUpdatedKey.value = true;
     debounce(() => {
-      tableData = getTableData();
+      tableData = weather.getTableData();
       weatherDataUpdatedKey.value = false;
     }, 10);
   }
@@ -58,7 +53,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   $effect(() => {
     // These three can be together because they don't all change near the same moment, unlike the next three $effect() blocks
     weather.data;
-    localState.value.units;
+    preferences.value.units;
     weather.tableWeatherTargets;
     tick().then(() => {
       updateTable();
@@ -85,47 +80,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
       updateTable();
     });
   });
-
-  let diagnostics = $derived({
-    dev,
-    version,
-    pid: +project.timeStampId || 0,
-    details: {
-      href: page.url.href,
-      projectHref: project.url.href,
-      weatherTable: {
-        a_dataDate: weather.data[0].date,
-        b_tableDataDate: tableData[0].date,
-      },
-      dateTest: {
-        a_stringToDate: stringToDate('2025-01-01'),
-        b_stringToDateVersion2: stringToDateVersion2('2025-01-01'),
-        c_dateToISO8601String: {
-          stringToDate: dateToISO8601String(stringToDate('2025-01-01')),
-          stringToDateVersion2: dateToISO8601String(
-            stringToDateVersion2('2025-01-01'),
-          ),
-        },
-        e_dateToISO8601StringVersion2: {
-          stringToDate: dateToISO8601StringVersion2(stringToDate('2025-01-01')),
-          stringToDateVersion2: dateToISO8601StringVersion2(
-            stringToDateVersion2('2025-01-01'),
-          ),
-        },
-      },
-    },
-  });
-
-  onMount(async () => {
-    tick().then(async () => {
-      // diagnostics
-      if (!dev)
-        await supabase.from('Weather Data Feedback').insert(diagnostics);
-    });
-  });
 </script>
 
-<div class="mx-auto mt-4 w-fit">
+<div class="mx-auto mt-4 w-fit px-2">
   <ToggleSwitch
     bind:checked={showColorDetails.value}
     label={'Show Color Details'}
@@ -143,13 +100,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     page.url.href,
   )}&projectURL={encodeURIComponent(project.url.href)}&data0={weather.data[0]
     .date}&table0={tableData[0].date}"
-  class="link mb-4 inline-block text-sm"
-  onclick={async () => {
-    if (!dev)
-      await supabase
-        .from('Weather Data Feedback')
-        .insert({ is_data_ok: false, flag: true, ...diagnostics });
-  }}
+  class="link mb-4 inline-block px-2 text-sm"
   target="_blank"
 >
   <ExternalLinkIcon class="relative -top-[2px] inline size-4" /> Weather Data Feedback

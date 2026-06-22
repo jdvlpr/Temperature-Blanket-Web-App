@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -14,7 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { weather } from '$lib/state';
+  import { weather } from '$lib/state/weather-state.svelte';
   import type { TableHandler } from '@vincjo/datatables';
 
   interface Props {
@@ -22,18 +22,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 
   let { table }: Props = $props();
-
-  const options = createOptions(table.rowCount.total);
-  function createOptions(totalCount) {
-    if (totalCount < 10) return [10];
-    if (totalCount < 50) return [10, totalCount];
-    if (totalCount < 190) return [10, 50, totalCount];
-    return [10, 50, 190, totalCount];
-  }
 </script>
 
-<label class="label flex flex-col items-start w-24">
-  <span class="text-sm">Rows Per Page</span>
+<label class="label flex w-24 flex-col items-start">
+  <span class="label-text">Rows Per Page</span>
   <select
     class="select"
     value={table.rowsPerPage}
@@ -49,9 +41,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
       }
     }}
   >
-    {#each options as option}
-      <option value={option}>
-        {option}
+    {#each { length: table.rowCount.total }, option}
+      <option value={option + 1}>
+        {option + 1}
       </option>
     {/each}
   </select>

@@ -1,4 +1,4 @@
-// Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+// Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 //
 // This file is part of Temperature-Blanket-Web-App.
 //
@@ -13,8 +13,17 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { localState, weather } from '$lib/state';
-import { displayNumber } from '$lib/utils';
+import { weather } from '$lib/state/weather-state.svelte';
+import { preferences } from '$lib/storage/preferences.svelte';
+import type {
+  GaugeAttributes,
+  GaugeRange,
+  GaugeRangeCategory,
+  GaugeRangeOptions,
+} from '$lib/types/gauge-types';
+import type { WeatherDay } from '$lib/types/weather-types';
+import { displayNumber } from '$lib/utils/number-utils';
+
 
 export const getStart = (rangeOptions) => {
   if (rangeOptions?.mode === 'auto') {
@@ -66,7 +75,7 @@ export const getEvenlyDistributedRangeValuesWithEqualDayCount = ({
 }) => {
   if (!weatherData) weatherData = weather.data;
 
-  const _units = localState.value.units;
+  const _units = preferences.value.units;
 
   let _weatherData = [...weatherData];
   _weatherData = _weatherData.filter((day) => day[prop][_units] !== null); // filter out any missing values
@@ -156,17 +165,41 @@ export const getDaysInRange = ({
   direction,
   includeFromValue,
   includeToValue,
-}) => {
+  gaugeUnitType,
+}: {
+  id: keyof Pick<
+    WeatherDay,
+    'tmax' | 'tavg' | 'tmin' | 'prcp' | 'snow' | 'dayt' | 'moon'
+  >;
+  range: GaugeRange | GaugeRangeCategory;
+  direction: GaugeRangeOptions['direction'] | undefined;
+  includeFromValue: boolean | undefined;
+  includeToValue: boolean | undefined;
+  gaugeUnitType: GaugeAttributes['unit']['type'];
+}): WeatherDay[] => {
+  if (!weather.data) return [];
+
+  if (gaugeUnitType === 'category') {
+    const days = weather.data.filter((day, i) => {
+      const value = weather.getWeatherValue({ dayIndex: i, param: id });
+      if (value === 'null') return false;
+      return 'value' in range && range.value === value;
+    });
+
+    return days;
+  }
+
   if (
     !direction ||
-    !weather.data ||
     typeof includeFromValue === 'undefined' ||
     typeof includeToValue === 'undefined'
   )
     return [];
-  const days = weather.data.filter((day) => {
+
+  const days = weather.data.filter((day, i) => {
+    const value = weather.getWeatherValue({ dayIndex: i, param: id });
     return isValueInRange({
-      value: day[id][localState.value.units],
+      value,
       range,
       direction,
       includeFromValue,
@@ -214,7 +247,7 @@ export const isValueInRange = ({
  */
 export const getDaysPercent = (daysCount) => {
   const weatherLength = weather.data.length;
-  let round = Math.round((daysCount / weatherLength) * 100);
+  let round = displayNumber((daysCount / weatherLength) * 100);
   if (daysCount > 0 && round === 0) {
     round = 1;
   }

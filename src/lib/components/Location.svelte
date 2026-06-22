@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -15,19 +15,26 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import { browser } from '$app/environment';
-  import Tooltip from '$lib/components/Tooltip.svelte';
-  import { MONTHS } from '$lib/constants';
-  import { locations, modal, project, toast, weather } from '$lib/state';
-  import type { LocationType } from '$lib/types/location-types';
+  import { MONTHS } from '$lib/constants/weather-constants';
+  import { safeSlide } from '$lib/features/transitions/safeSlide';
+  import { locations } from '$lib/state/location-state.svelte';
+  import { dialog, toast } from '$lib/state/page-state.svelte';
+  import { project } from '$lib/state/project-state.svelte';
+  import { weather } from '$lib/state/weather-state.svelte';
+  import type {
+    LocationStateType
+  } from '$lib/types/location-types';
   import {
     dateToISO8601String,
-    displayGeoNamesErrorMessage,
-    getSuggestions,
-    pluralize,
-    renderResult,
     stringToDate,
     yearFrom,
-  } from '$lib/utils';
+  } from '$lib/utils/date-utils';
+  import { displayGeoNamesErrorMessage } from '$lib/utils/error-utils.svelte';
+  import {
+    getSuggestions,
+    renderResult,
+  } from '$lib/utils/location-utils.svelte';
+  import { pluralize } from '$lib/utils/string-utils';
   import {
     EllipsisVerticalIcon,
     MapIcon,
@@ -37,13 +44,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
     TriangleAlertIcon,
     XIcon,
   } from '@lucide/svelte';
+  import {
+    Popover,
+    Portal
+  } from '@skeletonlabs/skeleton-svelte';
   import autocomplete from 'autocompleter';
   import { onMount } from 'svelte';
   import '../../css/flag-icons.css';
   import LocationDetails from './modals/LocationDetails.svelte';
 
   interface Props {
-    location: LocationType;
+    location: LocationStateType;
     index: number;
   }
 
@@ -84,9 +95,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let days = $derived(getDays(month, year));
 
   let datesMustBeHistorical = $derived(
-    weather.defaultSource === 'Open-Meteo' &&
+    weather.source.name === 'Open-Meteo' &&
       location.daysInFuture >= 1 &&
-      !weather.useSecondarySources,
+      !weather.source.useSecondary,
   );
 
   $effect(() => {
@@ -97,7 +108,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   // 'hasLoaded' gets checked so that the initial setup function doesn't run again. This is important because otherwise it would get called on every keystroke.
   // NOTE: This is a bit of a hack, but it works.
   $effect(() => {
-    if (location?.wasLoadedFromSavedProject && !hasLoaded) {
+    if (
+      (location?.wasLoadedFromURL || location?.wasLoadedFromStorage) &&
+      !hasLoaded
+    ) {
       location.duration = location?.duration || 'c';
 
       if (location?.from) {
@@ -174,7 +188,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }); // End of onMount
 
   function validate() {
-    if (weather.isUserEdited > 0) return;
+    if (weather.isUserEdited) return;
 
     weather.rawData = [];
 
@@ -291,34 +305,56 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <div class="grid grid-cols-1 items-end justify-center gap-4 py-2">
   {#if locations.all?.length > 1}
     <div class="justify-self-end">
-      <Tooltip placement="bottom" minWidth="250px">
-        <div class="btn-icon hover:preset-tonal">
+      <Popover>
+        <Popover.Trigger
+          class="btn-icon hover:preset-tonal-surface"
+          title="Location Options"
+        >
           <EllipsisVerticalIcon />
-        </div>
-        {#snippet tooltip()}
-          <div class="flex items-center justify-center gap-2">
-            <button
-              class="btn hover:preset-tonal"
-              onclick={() => {
-                locations.remove(location.uuid);
-                weather.rawData = [];
-              }}
-              disabled={weather.isUserEdited > 0 || project.status.loading}
-              title="Remove Location"
+        </Popover.Trigger>
+        <Portal>
+          <Popover.Positioner>
+            <Popover.Content
+              class="bg-surface-200-800 rounded-container z-50 flex items-center justify-center gap-2 p-2 shadow-xl"
             >
-              <Trash2Icon />
-              <p>
-                Remove Location {index + 1}
-              </p>
-            </button>
-          </div>
-        {/snippet}
-      </Tooltip>
+              {#snippet element(attributes)}
+                {#if !attributes.hidden}
+                  <div {...attributes} transition:safeSlide>
+                    <Popover.Description>
+                      <button
+                        class="btn hover:preset-tonal-surface"
+                        onclick={() => {
+                          locations.remove(location.uuid);
+                          weather.rawData = [];
+                        }}
+                        disabled={weather.isUserEdited ||
+                          project.status.loading}
+                        title="Remove Location"
+                      >
+                        <Trash2Icon />
+                        <p>
+                          Remove Location {index + 1}
+                        </p>
+                      </button>
+                    </Popover.Description>
+                    <Popover.Arrow
+                      class="-z-10"
+                      style="--arrow-size: calc(var(--spacing) * 4); --arrow-background: var(--color-surface-200-800);"
+                    >
+                      <Popover.ArrowTip />
+                    </Popover.Arrow>
+                  </div>
+                {/if}
+              {/snippet}
+            </Popover.Content>
+          </Popover.Positioner>
+        </Portal>
+      </Popover>
     </div>
   {/if}
   <div class="grid grid-cols-1 gap-4">
-    <div class="flex w-full flex-col gap-1 text-left">
-      <p>
+    <label class="label">
+      <p class="label-text">
         {#if showSelectLocationLabelMessage}
           <span class="text-error-900-100">Choose a result</span>
         {:else if locations.all.length > 1 && location?.label}
@@ -345,7 +381,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           bind:this={inputLocation}
           oninput={validate}
           onkeyup={validateKeyup}
-          disabled={project.status.loading || weather.isUserEdited > 0}
+          disabled={project.status.loading || weather.isUserEdited}
         />
         {#if searching}
           <div class="ig-cell flex items-center justify-center">
@@ -367,9 +403,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </div>
         {:else if showReset}
           <button
-            class="ig-btn hover:preset-tonal"
+            class="ig-btn hover:preset-tonal-surface"
             title="Reset Location Search"
-            disabled={!!weather.isUserEdited}
+            disabled={weather.isUserEdited || project.status.loading}
             onclick={() => {
               if (weather.isUserEdited) return;
               showResetKey = !showResetKey;
@@ -387,12 +423,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </button>
         {:else if project.geolocationAvailable}
           <button
-            class="ig-btn hover:preset-tonal"
+            class="ig-btn hover:preset-tonal-surface"
             title="Use My Location"
-            disabled={!!weather.isUserEdited}
+            disabled={weather.isUserEdited || project.status.loading}
             onclick={async () => {
               searching = true;
-              inputLocation.placeholder = 'Loading...';
+              inputLocation.placeholder = 'Requesting your location...';
 
               async function success(position) {
                 const latitude = position.coords.latitude;
@@ -468,9 +504,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </div>
       {#if location.id && location.lat && location.lng}
         <button
-          class="btn hover:preset-tonal w-fit text-xs opacity-50 hover:opacity-100"
+          class="btn hover:preset-tonal-surface w-fit gap-1 text-xs opacity-50 hover:opacity-100"
           onclick={() => {
-            modal.trigger({
+            dialog.trigger({
               type: 'component',
               component: {
                 ref: LocationDetails,
@@ -483,7 +519,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           Details
         </button>
       {/if}
-    </div>
+    </label>
 
     <div
       class="grid w-full grid-cols-12 items-start justify-between gap-4 text-left"
@@ -493,13 +529,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
           class="col-span-12 grid grid-cols-3 items-center justify-between gap-4 sm:col-span-6"
         >
           <label class="label">
-            <span> Year </span>
+            <span class="label-text"> Year </span>
             <select
               class="select"
               bind:value={year}
               id={`choose-year-${location.uuid}`}
               title="Choose a Year"
-              disabled={!!weather.isUserEdited || project.status.loading}
+              disabled={weather.isUserEdited || project.status.loading}
               onchange={() => {
                 setDates({});
               }}
@@ -511,13 +547,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </label>
 
           <label class="label">
-            <span>Month</span>
+            <span class="label-text">Month</span>
             <select
               class="select"
               bind:value={month}
               id={`choose-month-${location.uuid}`}
               title="Choose a Month"
-              disabled={!!weather.isUserEdited || project.status.loading}
+              disabled={weather.isUserEdited || project.status.loading}
               onchange={() => {
                 setDates({});
               }}
@@ -529,13 +565,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </label>
 
           <label class="label">
-            <span>Day</span>
+            <span class="label-text">Day</span>
             <select
               class="select"
               bind:value={day}
               id={`choose-day-${location.uuid}`}
               title="Choose a Day"
-              disabled={!!weather.isUserEdited || project.status.loading}
+              disabled={weather.isUserEdited || project.status.loading}
               onchange={() => setDates({})}
             >
               {#each Array(days) as _, i}
@@ -549,8 +585,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <div
           class="col-span-12 grid grid-cols-2 items-center justify-between gap-4 sm:col-span-6"
         >
-          <label for="datepicker-from-{location.uuid}" class="">
-            <span>From</span>
+          <label for="datepicker-from-{location.uuid}" class="label">
+            <span class="label-text">From</span>
             <input
               type="date"
               class="input"
@@ -561,11 +597,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
               bind:value={location.from}
               bind:this={inputStart}
               onchange={() => (weather.rawData = [])}
-              disabled={project.status.loading || !!weather.isUserEdited}
+              disabled={project.status.loading || weather.isUserEdited}
             />
           </label>
-          <label for="datepicker-to-{location.uuid}" class="">
-            <span>To</span>
+          <label for="datepicker-to-{location.uuid}" class="label">
+            <span class="label-text">To</span>
             <input
               type="date"
               class="input"
@@ -577,19 +613,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
               bind:value={location.to}
               bind:this={inputEnd}
               onchange={() => (weather.rawData = [])}
-              disabled={project.status.loading || !!weather.isUserEdited}
+              disabled={project.status.loading || weather.isUserEdited}
             />
           </label>
         </div>
       {/if}
 
-      <label class="label col-span-8 w-full sm:col-span-4 sm:col-start-9">
-        <span>Duration</span>
+      <label
+        class="label col-span-8 w-full sm:col-span-4 sm:col-start-9"
+        for="duration-{location.uuid}"
+      >
+        <span class="label-text">Duration</span>
         <select
           class="select w-full"
-          id={`duration-${location.uuid}`}
           bind:value={location.duration}
-          disabled={!!weather.isUserEdited || project.status.loading}
+          disabled={weather.isUserEdited || project.status.loading}
           onchange={() => {
             if (location?.duration === 'y') {
               year = stringToDate(location.from).getUTCFullYear();
@@ -598,6 +636,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               setDates({});
             }
           }}
+          id="duration-{location.uuid}"
           title="Select a duration"
         >
           <option value="y" selected>One Year</option>
@@ -608,13 +647,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     <div class="flex w-full flex-col items-center justify-center gap-2">
       {#if !location.errorMessage && location.days}
-        <p class="text-sm italic">
+        <p class="text-sm">
           {location.days}
           {pluralize('Day', location.days)}
         </p>
         {#if location.daysInFuture}
           <p
-            class="bg-warning-500/20 rounded-container my-2 w-full p-2 text-sm"
+            class="text-warning-800-200 rounded-container my-2 w-full p-2 text-sm"
           >
             <TriangleAlertIcon class="relative -top-[1px] inline size-4" />
 
@@ -636,12 +675,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </p>
         {/if}
       {:else if location.errorMessage && browser}
-        <p class="bg-warning-500/20 rounded-container my-2 w-full p-2 text-sm">
-          <TriangleAlertIcon class="relative -top-[1px] inline size-4" />
+        <p
+          class="text-warning-800-200 rounded-container my-2 w-full p-2 text-sm"
+        >
+          <TriangleAlertIcon class="relative -top-px inline size-4" />
           {location.errorMessage}
         </p>
       {:else if project.status.loading}
-        <p class="text-sm italic">...</p>
+        <p class="animate-pulse text-sm">...</p>
       {/if}
     </div>
   </div>

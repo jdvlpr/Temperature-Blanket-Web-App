@@ -1,4 +1,4 @@
-// Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+// Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 //
 // This file is part of Temperature-Blanket-Web-App.
 //
@@ -13,17 +13,15 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import type { WeatherSource } from './weather-types';
+import type { TISO8601DateString, WeatherSource } from './weather-types';
 
 export interface LocationType {
   uuid?: string;
   index?: number;
   /** 'c' is for Custom, 'y' is for One Year */
   duration?: 'c' | 'y';
-  /** ISO 8601 date string `YYYY-MM-DD` */
-  from?: string;
-  /** ISO 8601 date string `YYYY-MM-DD` */
-  to?: string;
+  from?: TISO8601DateString;
+  to?: TISO8601DateString;
   label?: string;
   result?: string;
   /** Id from the GeoNames api */
@@ -37,24 +35,25 @@ export interface LocationType {
   population?: number;
   stations?: null | any[]; // TODO: Change 'any[]' to a more specific type if possible. Stations are set when using Meteostat for a weather source.
   source?: WeatherSource;
-  wasLoadedFromSavedProject?: boolean;
+  wasLoadedFromURL?: boolean;
+  wasLoadedFromStorage?: boolean;
 }
 
-export interface LocationStateType {
+export interface LocationStateType extends LocationType {
   isValid: boolean;
   #fromDate: Date | null;
   #toDate: Date | null;
   days: number;
-  #today: Date;
+  #today: TISO8601DateString | null;
   daysInFuture: number;
   errorMessage: string;
 }
 
 export interface LocationsStateType {
   all: LocationStateType[];
-  totalDays: number;
+  totalDays: number | null;
   allValid: boolean;
   urlHash: string;
-  projectFileName: string;
-  projectTitle: string | undefined | null;
+  projectFilename: string;
+  projectTitle: string;
 }

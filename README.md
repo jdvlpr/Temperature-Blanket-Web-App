@@ -9,7 +9,7 @@ Visualize your city's historical climate data, create color gauges, and preview 
 Built with:
 
 - [Svelte 5 & Sveltekit 2](https://svelte.dev/)
-- [Skeleton 3](https://github.com/skeletonlabs/skeleton)
+- [Skeleton 4](https://github.com/skeletonlabs/skeleton)
 - [Tailwind 4](https://github.com/tailwindlabs/tailwindcss)
 
 ## 🚀 Getting Started
@@ -46,16 +46,28 @@ First build the app (to generate cloudflare \_routes.json file)
 pnpm build
 ```
 
-Test frontend pages and functions
+Unit tests (for functions)
+
+```bash
+pnpm test:unit
+```
+
+Integration tests (for the yarn colorway api route)
+
+```bash
+pnpm test:integration
+```
+
+End-to-end tests (for pages and ui flows)
+
+```bash
+pnpm test:e2e
+```
+
+Run all tests (unit, integration, and end-to-end)
 
 ```bash
 pnpm test
-```
-
-Test internal api routes (for the Yarn Colorways API)
-
-```bash
-pnpm test:api
 ```
 
 ## 🙌 Acknowledgments
@@ -105,19 +117,32 @@ define('PROJECT_CREATION_AUTH_KEY', 'auth_key');
 
 ### 💾 Local Storage
 
-Various site settings and data are stored in the browser.
+Settings and user preferences are stored in the browser's Local Storage.
 
 <details>
 <summary>View Details</summary>
 
-| Key Name              | Description                                                | Default Value                                                                                                 | Possible Values                                                     | Version Added\* |
-| --------------------- | ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- | --------------- |
-| preferences           | User preferences object                                    | `{ disableToastAnalytics: false, theme: { id: 'classic', mode: 'system',},layout: 'list',} units: 'imperial'` | [`LocalStateType`](src/lib/state/persisted-state.svelte.ts)         | 5.0.0           |
-| projects              | Projects the user has saved                                | `[]`                                                                                                          | array of [`SavedProject`](src/lib/types/project-types.d.ts) objects | < 3.28.3        |
-| [/weather]units       | Units for the weather forecast page                        | `imperial`                                                                                                    | `imperial`, `metric`                                                | < 3.28.3        |
-| [/weather]hour_format | Time format for the weather forecast page                  | `12`                                                                                                          | `12`, `24`                                                          | < 3.28.3        |
-| [/weather]locations   | Locations the user has added for the weather forecast page | `[]`                                                                                                          | array of [`Location`](src/lib/types/location-types.d.ts) objects    | < 3.28.3        |
+| Key Name              | Description                                                | Default Value                                                                                                                                 | Possible Values                                                      | Version Added\* |
+| --------------------- | ---------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- | --------------- |
+| preferences           | User preferences object                                    | `{ disableToastAnalytics: false, layout: 'list', seasons: [...DEFAULT_SEASONS], theme: { id: 'classic', mode: 'system',}, units: 'imperial'}` | [`LocalStatePreferencesType`](src/lib/storage/preferences.svelte.ts) | 5.0.0           |
+| [/weather]units       | Units for the weather forecast page                        | `imperial`                                                                                                                                    | `imperial`, `metric`                                                 | < 3.28.3        |
+| [/weather]hour_format | Time format for the weather forecast page                  | `12`                                                                                                                                          | `12`, `24`                                                           | < 3.28.3        |
+| [/weather]locations   | Locations the user has added for the weather forecast page | `[]`                                                                                                                                          | array of [`Location`](src/lib/types/location-types.d.ts) objects     | < 3.28.3        |
 
 _\*Items with a < before the version means sometime before that version, I'm not sure exactly when because I wasn't keeping track before version 3.28.3._
+
+</details>
+
+### 🗃️ IndexedDB Storage
+
+User's saved projects are stored in the browser's IndexedDB.
+
+<details>
+<summary>View Details</summary>
+
+| Key Name       | Description                             | Default Value | Possible Values                                                                          | Version Added |
+| -------------- | --------------------------------------- | ------------- | ---------------------------------------------------------------------------------------- | ------------- |
+| projects_index | An index of projects the user has saved | `[]`          | array of [`LocalStorageProjectIndexItem`](src/lib/storage/projects.svelte.ts) objects    | 5.35.0        |
+| p\_{id}        | An individual saved project             | _not set_     | [`LocalStorageProject`](src/lib/storage/projects.svelte.ts) objects, keyed by project id | 5.35.0        |
 
 </details>

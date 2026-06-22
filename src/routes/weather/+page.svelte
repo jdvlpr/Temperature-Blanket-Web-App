@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -34,18 +34,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Share from '$lib/components/Share.svelte';
   import Spinner from '$lib/components/Spinner.svelte';
   import UnitChanger from '$lib/components/UnitChanger.svelte';
-  import {
-    localState,
-    locations,
-    modal,
-    project,
-    showNavigationSideBar,
-  } from '$lib/state';
-  import {
-    delay,
-    getWeatherCodeDetails,
-    setUnitsFromNavigator,
-  } from '$lib/utils';
+  import { dialog, showNavigationSideBar } from '$lib/state/page-state.svelte';
+  import { locations } from '$lib/state/location-state.svelte';
+  import { project } from '$lib/state/project-state.svelte';
+  import { preferences } from '$lib/storage/preferences.svelte';
+  import { delay } from '$lib/utils/function-utils.svelte';
+  import { getWeatherCodeDetails } from '$lib/utils/weather-forecast-utils';
+  import { setUnitsFromNavigator } from '$lib/utils/unit-utils.svelte';
   import { ListIcon, PlusIcon, SettingsIcon } from '@lucide/svelte';
   import { onDestroy, onMount, tick } from 'svelte';
   import { fade } from 'svelte/transition';
@@ -210,20 +205,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   $effect(() => {
     weatherState.activeLocationID;
-    localState.value.units;
+    preferences.value.units;
     weatherState.hour;
     getShareableURL({
       id: weatherState.activeLocationID,
-      units: localState.value.units,
+      units: preferences.value.units,
       hourFormat: weatherState.hour,
     });
   });
 
   $effect(async () => {
-    localStorage.setItem('[/weather]units', localState.value.units);
+    localStorage.setItem('[/weather]units', preferences.value.units);
     if (
       weatherState.weatherLocations?.some(
-        (item) => item.units !== localState.value.units,
+        (item) => item.units !== preferences.value.units,
       )
     )
       await fetchData();
@@ -232,10 +227,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   onMount(async () => {
     // units
     const paramUnits = page.url.searchParams.get('u');
-    if (paramUnits === 'i') localState.value.units = 'imperial';
-    else if (paramUnits === 'm') localState.value.units = 'metric';
+    if (paramUnits === 'i') preferences.value.units = 'imperial';
+    else if (paramUnits === 'm') preferences.value.units = 'metric';
     else if (localStorage.getItem('[/weather]units'))
-      localState.value.units = localStorage.getItem('[/weather]units');
+      preferences.value.units = localStorage.getItem('[/weather]units');
     else setUnitsFromNavigator();
 
     // hour12
@@ -244,7 +239,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     else if (hourFormat === '1') weatherState.hour = '24';
     else if (localStorage.getItem('[/weather]hour_format'))
       weatherState.hour = localStorage.getItem('[/weather]hour_format');
-    else weatherState.hour = localState.value.units === 'metric' ? '24' : '12';
+    else weatherState.hour = preferences.value.units === 'metric' ? '24' : '12';
 
     // saved weather locations
     if (localStorage.getItem('[/weather]locations')) {
@@ -343,10 +338,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
       <button
         aria-label="Open Settings"
-        class="btn-icon hover:preset-tonal"
+        class="btn-icon hover:preset-tonal-surface"
         title="Open Settings"
         onclick={() =>
-          modal.trigger({
+          dialog.trigger({
             type: 'component',
             component: {
               ref: Menu,
@@ -361,10 +356,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {#if weatherState.weatherLocations.filter((item) => item?.saved).length}
         <button
           aria-label="Open Locations"
-          class="btn-icon hover:preset-tonal"
+          class="btn-icon hover:preset-tonal-surface"
           title="Open Locations"
           onclick={() =>
-            modal.trigger({
+            dialog.trigger({
               type: 'component',
               component: {
                 ref: Menu,
@@ -401,7 +396,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   {#if !weatherState.weatherLocations.find((item) => item.id === weatherState.activeLocationID)?.saved}
                     <button
                       in:fade
-                      class="btn hover:preset-tonal"
+                      class="btn hover:preset-tonal-surface"
                       title="Add to Locations"
                       onclick={async () => {
                         weatherState.weatherLocations.map((item) => {
@@ -419,7 +414,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         );
                         page.url.searchParams.set(
                           'u',
-                          localState.value.units === 'metric' ? 'm' : 'i',
+                          preferences.value.units === 'metric' ? 'm' : 'i',
                         );
                       }}
                     >
@@ -429,9 +424,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   {:else if weatherState.weatherLocations.filter((item) => item?.saved)?.length}
                     <button
                       in:fade
-                      class="btn hover:preset-tonal"
+                      class="btn hover:preset-tonal-surface"
                       onclick={() =>
-                        modal.trigger({
+                        dialog.trigger({
                           type: 'component',
                           component: {
                             ref: Menu,

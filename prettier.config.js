@@ -11,6 +11,7 @@ const config = {
   overrides: [
     {
       files: '*.svelte',
+      excludeFiles: '.dev/**',
       options: {
         parser: 'svelte',
       },

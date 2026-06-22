@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -15,8 +15,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import ColorPalette from '$lib/components/ColorPalette.svelte';
-  import { MAXIMUM_YARN_DETAILS_DESCRIPTIONS } from '$lib/constants';
-  import { getColorsFromInput, pluralize } from '$lib/utils';
+  import { MAXIMUM_YARN_DETAILS_DESCRIPTIONS } from '$lib/constants/color-constants';
+  import { getColorsFromInput } from '$lib/utils/color-utils';
+  import { pluralize } from '$lib/utils/string-utils';
   import { Trash2Icon } from '@lucide/svelte';
 
   /**
@@ -29,8 +30,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   /** @type {Props} */
   let { project, canRemove = true, onclick } = $props();
 
-  const { href, title, date, isCustomWeatherData } = project;
-  let colors = getColorsFromInput({ string: href });
+  const href = $derived(project.href);
+  const title = $derived(project.title);
+  const date = $derived(project.date);
+  const isCustomWeatherData = $derived(project.isCustomWeatherData);
+
+  let colors = $derived(getColorsFromInput({ string: href }));
 
   function getProjectDescription({ colors, date }) {
     let schemeName =
@@ -65,14 +70,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div
-  class="flex justify-start items-center gap-2 w-full bg-surface-100 dark:bg-surface-900 rounded-container p-4"
+  class="bg-surface-100 dark:bg-surface-900 rounded-container flex w-full items-center justify-start gap-2 p-4"
 >
-  <div class="flex flex-col w-full">
+  <div class="flex w-full flex-col">
     <a
       {href}
       target="_blank"
       rel="noopener noreferrer"
-      class="underline line-clamp-4">{title}</a
+      class="line-clamp-4 underline">{title}</a
     >
     <ColorPalette
       {colors}
@@ -81,7 +86,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     />
   </div>
   {#if canRemove}
-    <button class="btn-icon hover:preset-tonal" {onclick}>
+    <button class="btn-icon hover:preset-tonal-surface" {onclick}>
       <Trash2Icon />
     </button>
   {/if}

@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -16,20 +16,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script>
   import Spinner from '$lib/components/Spinner.svelte';
   import HelpIcon from '$lib/components/buttons/HelpIcon.svelte';
-  import { weather } from '$lib/state';
+  import { weather } from '$lib/state/weather-state.svelte';
+  import { CSVtoArray } from '$lib/utils/weather-utils.svelte';
   import {
-    CSVtoArray,
     celsiusToFahrenheit,
     convertTime,
-    dateToISO8601String,
-    displayNumber,
     fahrenheitToCelsius,
     hoursToMinutes,
     inchesToMillimeters,
     millimetersToInches,
-    stringToDate,
-  } from '$lib/utils';
-  import { CircleXIcon, FileIcon, FilePlusIcon } from '@lucide/svelte';
+  } from '$lib/utils/unit-utils.svelte';
+  import { dateToISO8601String, stringToDate } from '$lib/utils/date-utils';
+  import { displayNumber } from '$lib/utils/number-utils';
+  import { FileIcon } from '@lucide/svelte';
   import { FileUpload } from '@skeletonlabs/skeleton-svelte';
 
   let imported = $state(false);
@@ -203,7 +202,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {#if !imported || errorMessages.length > 0}
       <FileUpload
         name="files"
-        classes="mt-4 justify-center"
+        class="mt-4 justify-center"
         onFileAccept={(e) => {
           csvUpload = e.files;
           submitForm(e);
@@ -211,10 +210,29 @@ If not, see <https://www.gnu.org/licenses/>. -->
         accept=".csv"
         subtext="Only CSV files allowed"
       >
-        {#snippet iconInterface()}<FilePlusIcon class="size-8" />{/snippet}
-        {#snippet iconFile()}<FileIcon class="size-4" />{/snippet}
-        {#snippet iconFileRemove()}<CircleXIcon class="size-4" />{/snippet}
+        <FileUpload.Dropzone>
+          <FileIcon class="size-10" />
+          <span>Select a CSV file or drag here.</span>
+          <FileUpload.Trigger>Browse Files</FileUpload.Trigger>
+          <FileUpload.HiddenInput />
+        </FileUpload.Dropzone>
+        <FileUpload.ItemGroup>
+          <FileUpload.Context>
+            {#snippet children(fileUpload)}
+              {#each fileUpload().acceptedFiles as file (file.name)}
+                <FileUpload.Item {file}>
+                  <FileUpload.ItemName>{file.name}</FileUpload.ItemName>
+                  <FileUpload.ItemSizeText
+                    >{file.size} bytes</FileUpload.ItemSizeText
+                  >
+                  <FileUpload.ItemDeleteTrigger />
+                </FileUpload.Item>
+              {/each}
+            {/snippet}
+          </FileUpload.Context>
+        </FileUpload.ItemGroup>
       </FileUpload>
+
       {#if errorMessages.length > 0}
         <p>Import finished, but there were some issues (listed below).</p>
         <p class="mb-2">

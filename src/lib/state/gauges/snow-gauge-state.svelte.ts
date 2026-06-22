@@ -1,10 +1,16 @@
-import { weather } from '$lib/state';
-import type { GaugeAttributes, GaugeSettingsType } from '$lib/types';
-import { displayNumber, getIncrement, getRanges, getStart } from '$lib/utils';
+import { weather } from '$lib/state/weather-state.svelte';
+import type {
+  GaugeAttributes,
+  GaugeSettingsType,
+} from '$lib/types/gauge-types';
+import { displayNumber } from '$lib/utils/number-utils';
+import { getIncrement, getStart } from '$lib/utils/range-utils.svelte';
+import { getRanges } from '$lib/utils/gauge-utils.svelte';
 import chroma from 'chroma-js';
 
 export const gaugeAttributes: GaugeAttributes = {
   id: 'snow',
+  isStatic: false,
   label: 'Snow Gauge',
   unit: {
     type: 'height',
@@ -45,6 +51,7 @@ function getFirstRanges({
     colors,
     includeFromAndTo,
     dontIncludeFromAndTo,
+    gaugeId: 'snow',
   });
   return ranges;
 }
@@ -218,6 +225,7 @@ export class SnowGauge {
       colors: this.colors,
       includeFromAndTo: this.#includeFromAndTo,
       dontIncludeFromAndTo: this.#dontIncludeFromAndTo,
+      gaugeId: 'snow',
     });
     this.ranges = ranges;
     this.rangeOptions = this.rangeOptions;

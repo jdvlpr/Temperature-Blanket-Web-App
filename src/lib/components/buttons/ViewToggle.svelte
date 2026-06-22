@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -14,29 +14,38 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import { localState } from '$lib/state';
+  import { preferences } from '$lib/storage/preferences.svelte';
   import { LayoutGridIcon, LayoutListIcon } from '@lucide/svelte';
-  import { Segment } from '@skeletonlabs/skeleton-svelte';
+  import { SegmentedControl } from '@skeletonlabs/skeleton-svelte';
 </script>
 
-<Segment
-  value={localState.value.layout}
+<SegmentedControl
+  value={preferences.value.layout}
   onValueChange={(e) => {
-    localState.value.layout = e.value;
+    preferences.value.layout = e.value;
   }}
-  background="bg-surface-100 dark:bg-surface-900"
-  classes="shadow-sm"
 >
-  <Segment.Item value="list">
-    <div class="flex items-center justify-center gap-1">
-      <LayoutListIcon />
-      <span class="">List</span>
-    </div>
-  </Segment.Item>
-  <Segment.Item value="grid">
-    <div class="flex items-center justify-center gap-1">
-      <LayoutGridIcon />
-      <span class="">Grid</span>
-    </div>
-  </Segment.Item>
-</Segment>
+  <SegmentedControl.Control
+    class="bg-surface-100 dark:bg-surface-900 rounded-container border-0 shadow-sm"
+  >
+    <SegmentedControl.Indicator />
+    <SegmentedControl.Item value="list">
+      <SegmentedControl.ItemText
+        ><div class="flex items-center justify-center gap-1">
+          <LayoutListIcon />
+          <span class="">List</span>
+        </div></SegmentedControl.ItemText
+      >
+      <SegmentedControl.ItemHiddenInput />
+    </SegmentedControl.Item>
+    <SegmentedControl.Item value="grid">
+      <SegmentedControl.ItemText
+        ><div class="flex items-center justify-center gap-1">
+          <LayoutGridIcon />
+          <span class="">Grid</span>
+        </div></SegmentedControl.ItemText
+      >
+      <SegmentedControl.ItemHiddenInput />
+    </SegmentedControl.Item>
+  </SegmentedControl.Control>
+</SegmentedControl>

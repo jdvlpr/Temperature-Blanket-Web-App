@@ -1,6 +1,7 @@
 <script lang="ts">
   import { page } from '$app/state';
-  import { ALL_YARN_WEIGHTS, yarnWeightIcons } from '$lib/constants';
+  import { ALL_YARN_WEIGHTS } from '$lib/constants/color-constants';
+  import { yarnWeightIcons } from '$lib/constants/yarn-weight-icon-constants';
 
   let highlight = $state(null);
 
@@ -108,7 +109,7 @@
   </div>
   <div class="overflow-x-auto">
     <table
-      class="border-separate border-spacing-0 w-full border-surface-300-700 border rounded-container overflow-hidden text-left"
+      class="border-surface-300-700 rounded-container w-full border-separate border-spacing-0 overflow-hidden border text-left"
     >
       <thead class="bg-surface-200 dark:bg-surface-800">
         <tr class="">
@@ -170,7 +171,7 @@
             >
 
             <td class=""
-              ><div class="flex flex-wrap items-center gap-2 justify-between">
+              ><div class="flex flex-wrap items-center justify-between gap-2">
                 {standard_name}
                 {@html icon}
               </div>

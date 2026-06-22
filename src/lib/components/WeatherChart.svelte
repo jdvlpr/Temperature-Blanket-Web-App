@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -15,7 +15,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script module>
   import { browser } from '$app/environment';
-  import { localState, weather } from '$lib/state';
+  import { weather } from '$lib/state/weather-state.svelte';
+  import { preferences } from '$lib/storage/preferences.svelte';
   import {
     CategoryScale,
     Chart,
@@ -202,7 +203,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               },
               title: {
                 text:
-                  localState.value.units === 'metric'
+                  preferences.value.units === 'metric'
                     ? 'Degrees Celsius'
                     : 'Degrees Fahrenheit',
                 display: true,
@@ -222,7 +223,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               },
               title: {
                 text:
-                  localState.value.units === 'metric'
+                  preferences.value.units === 'metric'
                     ? 'Millimeters / Minutes'
                     : 'Inches / Hours',
                 display: true,

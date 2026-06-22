@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -15,14 +15,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
-  import { defaultYarn } from '$lib/state';
+  import { defaultYarn } from '$lib/state/page-state.svelte';
   let { selectedBrandId, selectedYarnId } = $props();
 </script>
 
-<div class="mt-1 flex flex-col gap-1 items-start text-left">
+<div class="mt-1 flex flex-col items-start gap-1 text-left">
   <ToggleSwitch
     label="Set as Default Yarn"
-    details="Automatically select this yarn for certain areas of this site, like for colors with no assigned yarn."
+    details="Automatically select this yarn for certain areas of this web app, like for colors with no assigned yarn."
     onchange={(e) => {
       if (e.target.checked) {
         defaultYarn.value = `${selectedBrandId}-${selectedYarnId}`;

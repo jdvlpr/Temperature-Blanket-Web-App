@@ -1,4 +1,4 @@
-// Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+// Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 //
 // This file is part of Temperature-Blanket-Web-App.
 //
@@ -15,8 +15,8 @@
 
 import { dev } from '$app/environment';
 
-// When in dev mode, use free geonames.org instead of paid geonames.net credits. It's mandatory for local dev environment to use the .org domain because of permissions
-// Check GeoNames api usage here: https://www.geonames.org/account
+// When in dev mode, use free geonames .org instead of paid geonames.net credits. It's mandatory for local dev environment to use the .org domain because of permissions
+// Check GeoNames api usage here: https://www.geonames .org/account
 export const API_SERVICES = {
   geonames: {
     baseURL: dev

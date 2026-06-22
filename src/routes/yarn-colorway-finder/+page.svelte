@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -46,24 +46,29 @@ If not, see <https://www.gnu.org/licenses/>. -->
     ALL_COLORWAYS_WITH_AFFILIATE_LINKS,
     ALL_YARN_WEIGHTS,
     YARN_COLORWAYS_PER_PAGE,
-  } from '$lib/constants';
-  import { toast } from '$lib/state';
-  import type { YarnWeight } from '$lib/types';
+  } from '$lib/constants/color-constants';
+  import { brands } from '$lib/data/yarns/brands';
+  import { safeSlide } from '$lib/features/transitions/safeSlide';
+  import { toast } from '$lib/state/page-state.svelte';
+  import type { YarnWeight } from '$lib/types/yarn-types';
   import {
     getTextColor,
-    pluralize,
     sortColorsByName,
     sortColorsByNameZtoA,
     sortColorsDarktoLight,
     sortColorsLightToDark,
-  } from '$lib/utils';
-  import { brands } from '$lib/yarns/brands';
+  } from '$lib/utils/color-utils';
+  import { pluralize } from '$lib/utils/string-utils';
   import {
     ArrowDownWideNarrowIcon,
+    ChevronDownIcon,
+    CircleQuestionMarkIcon,
+    ClipboardCheckIcon,
     ExternalLinkIcon,
     PlusIcon,
     SearchIcon,
-    ShoppingBagIcon,
+    ShoppingCartIcon,
+    XIcon,
   } from '@lucide/svelte';
   import { Accordion } from '@skeletonlabs/skeleton-svelte';
   import chroma from 'chroma-js';
@@ -71,7 +76,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let loadMoreSpinner = $state();
   let urlParams;
-  let isLoaded = false;
+  let isLoaded = $state(false);
   let filtersContainer = $state();
   let showScrollToTopButton = $state(false);
   let itemsToShow = $state(YARN_COLORWAYS_PER_PAGE);
@@ -112,7 +117,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       yarnColorwayFinderState.search = urlParams.get('n');
 
     const scrollObserver = new IntersectionObserver(
-      (entries, observer) => {
+      (entries) => {
         entries.forEach((entry) => {
           if (entry.intersectionRatio != 1) {
             showScrollToTopButton = true;
@@ -175,6 +180,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       return;
     }
     const [brandId, yarnId] = paramString.split('-');
+
     // check if brandId exists
     if (brands.find((brand) => brand.id === brandId))
       yarnColorwayFinderState.selectedBrandId = brandId;
@@ -336,14 +342,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
   );
 
   $effect(() => {
-    yarnColorwayFinderState.selectedBrandId,
+    (yarnColorwayFinderState.selectedBrandId,
       yarnColorwayFinderState.selectedYarnId,
       yarnColorwayFinderState.selectedYarnWeightId,
       yarnColorwayFinderState.search,
       yarns,
       yarnColorwayFinderState.sortColors,
       itemsToShow,
-      yarnColorwayFinderState.hex;
+      yarnColorwayFinderState.hex);
 
     tick().then(() => {
       getResults();
@@ -396,7 +402,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <Card>
         {#snippet header()}
           <div>
-            <div class="bg-surface-200 dark:bg-surface-800 p-4">
+            <div class="bg-surface-100-900 p-4">
               <p class="text-center">
                 Browse a collection of yarn colorways. Filter by brand or yarn
                 name, and search by HTML hex color code to find matching yarn
@@ -411,93 +417,74 @@ If not, see <https://www.gnu.org/licenses/>. -->
               bind:this={filtersContainer}
               class="my-2 grid w-full scroll-mt-[66px] grid-cols-12 items-end justify-between gap-4"
             >
-              <div
-                class="col-span-full flex w-full flex-col justify-start gap-1"
-              >
-                <span class="flex items-center gap-1"
-                  ><svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke-width="1.5"
-                    stroke="currentColor"
-                    class="h-4 w-4"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
-                    />
-                  </svg>
-                  Search by Color</span
-                >
-                <div class="flex flex-wrap items-center justify-center gap-1">
-                  <div class="input-group w-full grid-cols-[auto_1fr_auto]">
-                    <input
-                      type="color"
-                      class="input ig-cell m-2 rounded-full! p-0"
-                      bind:this={yarnColorwayFinderState.inputTypeColorElement}
-                      onchange={(e) =>
-                        inputTypeColorOnChange({
-                          value: e.target.value,
-                        })}
-                    />
-                    <input
-                      type="text"
-                      placeholder="e.g., pink, #c3f4d2"
-                      style="background:{yarnColorwayFinderState.hex ||
-                        'none'} !important;color:{getTextColor(
-                        yarnColorwayFinderState.hex,
-                      )}"
-                      value={yarnColorwayFinderState.inputTypeTextValue}
-                      onkeyup={(e) =>
-                        inputTypeTextOnChange({
-                          value: e.target.value,
-                        })}
-                    />
-                    {#if (!!yarnColorwayFinderState.hex || !!yarnColorwayFinderState.inputTypeTextValue) && !!yarnColorwayFinderState.inputTypeColorElement?.value}
-                      <button
-                        aria-label="Clear Color"
-                        class="p-2"
-                        onclick={() => {
-                          yarnColorwayFinderState.hex = '';
-                          yarnColorwayFinderState.inputTypeTextValue = '';
-                          if (browser)
-                            yarnColorwayFinderState.inputTypeColorElement.value =
-                              '#000000';
-                        }}
-                        ><svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke-width="1.5"
-                          stroke="currentColor"
-                          class="size-5"
-                        >
-                          <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            d="M6 18L18 6M6 6l12 12"
-                          />
-                        </svg>
-                      </button>
-                    {/if}
-                  </div>
+              <div class="label col-span-full w-full">
+                <span class="label-text"> Search by Color</span>
+                <div class="input-group w-full grid-cols-[auto_1fr_auto]">
+                  <input
+                    type="color"
+                    class="input ig-cell m-2 rounded-full! p-0"
+                    bind:this={yarnColorwayFinderState.inputTypeColorElement}
+                    onchange={(e) => {
+                      inputTypeColorOnChange({
+                        value: e.target.value,
+                      });
+                    }}
+                  />
+                  <input
+                    type="text"
+                    class="ig-input"
+                    placeholder="e.g., pink, #c3f4d2"
+                    style="background:{yarnColorwayFinderState.hex ||
+                      'none'} !important;color:{getTextColor(
+                      yarnColorwayFinderState.hex,
+                    )}"
+                    value={yarnColorwayFinderState.inputTypeTextValue}
+                    onkeyup={(e) =>
+                      inputTypeTextOnChange({
+                        value: e.target.value,
+                      })}
+                    onpaste={(e) => {
+                      if (e.cancelable) e.preventDefault();
+                      const _tempInputValue =
+                        e.clipboardData?.getData('text') || '';
+                      inputTypeColorOnChange({
+                        value: _tempInputValue,
+                      });
+                    }}
+                  />
+                  {#if (!!yarnColorwayFinderState.hex || !!yarnColorwayFinderState.inputTypeTextValue) && !!yarnColorwayFinderState.inputTypeColorElement?.value}
+                    <button
+                      aria-label="Clear Color"
+                      class="ig-btn"
+                      onclick={() => {
+                        yarnColorwayFinderState.hex = '';
+                        yarnColorwayFinderState.inputTypeTextValue = '';
+                        if (browser)
+                          yarnColorwayFinderState.inputTypeColorElement.value =
+                            '#000000';
+                      }}
+                      ><XIcon />
+                    </button>
+                  {/if}
                 </div>
               </div>
 
-              <div
-                class="col-span-12 w-full md:col-span-9"
-                class:md:col-span-full={!!yarnColorwayFinderState.selectedBrandId &&
-                  !!yarnColorwayFinderState.selectedYarnId}
-              >
-                <SelectYarn
-                  preselectDefaultYarn={false}
-                  bind:selectedBrandId={yarnColorwayFinderState.selectedBrandId}
-                  bind:selectedYarnId={yarnColorwayFinderState.selectedYarnId}
-                  selectedYarnWeightId={yarnColorwayFinderState.selectedYarnWeightId}
-                />
-              </div>
+              {#key isLoaded}
+                <div
+                  class="col-span-12 w-full md:col-span-9"
+                  class:md:col-span-full={!!yarnColorwayFinderState.selectedBrandId &&
+                    !!yarnColorwayFinderState.selectedYarnId}
+                >
+                  <SelectYarn
+                    preselectDefaultYarn={false}
+                    bind:selectedBrandId={
+                      yarnColorwayFinderState.selectedBrandId
+                    }
+                    bind:selectedYarnId={yarnColorwayFinderState.selectedYarnId}
+                    selectedYarnWeightId={yarnColorwayFinderState.selectedYarnWeightId}
+                  />
+                </div>
+              {/key}
 
               {#key yarnColorwayFinderState.selectedBrandId || yarnColorwayFinderState.selectedYarnId}
                 <div
@@ -515,20 +502,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
               {/key}
 
               <div
-                class="col-span-12 flex w-full flex-col justify-start gap-1 md:col-span-3"
+                class="col-span-12 flex w-full flex-col justify-start gap-1 md:col-span-4"
               >
-                <span class="flex items-center gap-1">
-                  <SearchIcon class="size-4" />
-                  <span>Colorway Name</span>
-                </span>
-                <div class="flex flex-wrap items-center justify-center gap-1">
-                  <div class="input-group w-full grid-cols-[1fr_auto]">
+                <div class="label">
+                  <span class="label-text"> Colorway Name </span>
+                  <div class="input-group w-full grid-cols-[auto_1fr_auto]">
+                    <span class="ig-cell"><SearchIcon /></span>
                     <input
                       id="yarn-select-search-input"
                       autocomplete="off"
                       placeholder="e.g., Wisteria, Cream"
                       type="text"
-                      class="ig-input w-full"
+                      class="ig-input truncate"
                       bind:value={yarnColorwayFinderState.search}
                       oninput={() => {
                         itemsToShow = YARN_COLORWAYS_PER_PAGE;
@@ -537,7 +522,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     {#if yarnColorwayFinderState.search}
                       <button
                         aria-label="Clear Search"
-                        class="ig-btn hover:preset-tonal"
+                        class="ig-btn hover:preset-tonal-surface"
                         onclick={() => {
                           yarnColorwayFinderState.search = '';
                         }}
@@ -562,30 +547,33 @@ If not, see <https://www.gnu.org/licenses/>. -->
               </div>
 
               <label class="label col-span-8 w-full md:col-span-3">
-                <span class="flex items-center gap-1">
-                  <ArrowDownWideNarrowIcon class="size-4" />
-                  <span>Sort By</span>
-                </span>
-                <select
-                  class="select"
-                  id="sort-colors-by"
-                  bind:value={yarnColorwayFinderState.sortColors}
-                  disabled={gettingResults}
-                >
-                  <option value="default">Default</option>
-                  <option value="light-to-dark">Lightest to Darkest</option>
-                  <option value="dark-to-light">Darkest to Lightest</option>
-                  <option value="name">Name A-Z</option>
-                  <option value="name-z-to-a">Name Z-A</option>
-                </select>
+                <span class="label-text">Sort By</span>
+
+                <div class="relative flex items-center">
+                  <ArrowDownWideNarrowIcon
+                    class="pointer-events-none absolute left-2"
+                  />
+                  <select
+                    class="select truncate pl-10"
+                    id="sort-colors-by"
+                    bind:value={yarnColorwayFinderState.sortColors}
+                    disabled={gettingResults}
+                  >
+                    <option value="default">Default</option>
+                    <option value="light-to-dark">Lightest to Darkest</option>
+                    <option value="dark-to-light">Darkest to Lightest</option>
+                    <option value="name">Name A-Z</option>
+                    <option value="name-z-to-a">Name Z-A</option>
+                  </select>
+                </div>
               </label>
             </div>
 
             {#if areAnyResultsAffiliate}
               <p class="mt-2 text-center text-sm">
-                Items purchased through some links (marked with a shopping bag
-                icon) earn the developer of this site a percentage of the sale
-                at no additional cost to you.
+                Purchases via links with a shopping cart icon <ShoppingCartIcon
+                  class="relative -top-px inline size-4"
+                /> support the developer of this web app at no extra cost to you.
               </p>
             {/if}
 
@@ -604,19 +592,30 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             {#if results?.length && !loadingAllColors}
               <div
-                class="rounded-container my-4 w-full justify-center gap-1 overflow-hidden {layout ===
+                class="rounded-container my-4 w-full justify-center gap-2 {layout ===
                 'grid'
                   ? 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5'
                   : 'flex flex-col'}"
               >
                 {#each results as { hex, name, delta, brandName, yarnName, variant_href, affiliate_variant_href, unavailable }}
                   {@const percentMatch = Math.floor(100 - delta)}
+                  <!-- svelte-ignore a11y_click_events_have_key_events -->
+                  <!-- svelte-ignore a11y_no_static_element_interactions -->
                   <div
-                    class="rounded-container flex min-w-fit flex-1 items-center gap-x-2 p-2 shadow-sm {layout ===
+                    class="rounded-container flex min-w-fit flex-1 items-center gap-x-2 p-2 shadow-sm transition-transform hover:scale-[1.02] hover:z-10 relative active:scale-95 cursor-pointer {layout ===
                     'grid'
                       ? 'justify-center'
                       : ''}"
                     style="background:{hex}; color:{getTextColor(hex)};"
+                    onclick={() => {
+                      window.navigator.clipboard.writeText(name);
+                      toast.trigger({
+                        message: `<div class="flex flex-col"><span class="font-bold">${name}</span><span class="text-xs">Copied to clipboard</span></div>`,
+                        category: 'success',
+                        icon: ClipboardCheckIcon
+                      });
+                    }}
+                    title="Copy {name} to clipboard"
                   >
                     <!-- <div class={layout === "grid" ? "" : "md:w-2/5"}></div> -->
                     <div class="min-h-[43px] min-w-[43px]">
@@ -624,22 +623,24 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         {#if affiliate_variant_href}
                           <a
                             aria-label="Buy this yarn colorway"
-                            class="btn-icon hover:preset-tonal"
                             title="Buy this yarn colorway"
+                            class="btn-icon hover:preset-tonal-surface"
                             href={affiliate_variant_href}
                             target="_blank"
                             rel="noopener noreferrer"
+                            onclick={(e) => e.stopPropagation()}
                           >
-                            <ShoppingBagIcon />
+                            <ShoppingCartIcon />
                           </a>
                         {:else}
                           <a
                             aria-label="Open link to this yarn colorway"
-                            class="btn-icon hover:preset-tonal"
+                            class="btn-icon hover:preset-tonal-surface"
                             href={variant_href}
                             target="_blank"
                             rel="noopener noreferrer"
                             title="Open link to this yarn colorway"
+                            onclick={(e) => e.stopPropagation()}
                           >
                             <ExternalLinkIcon />
                           </a>
@@ -647,36 +648,36 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       {/if}
                     </div>
                     <div class="flex flex-col items-start gap-1 text-pretty">
-                      <span class="text-left text-xs">
+                      <span class="text-left text-xs pointer-events-none">
                         {brandName} - {yarnName}
                       </span>
 
-                      <button
-                        class="text-left text-lg leading-tight"
-                        onclick={() => {
-                          window.navigator.clipboard.writeText(name);
-                          toast.trigger({
-                            message: `<span class="font-bold">${name}</span> copied`,
-                            category: 'success',
-                          });
-                        }}>{name}</button
-                      >
+                      <span class="text-left text-lg leading-tight pointer-events-none">
+                        {name}
+                      </span>
 
                       {#if percentMatch}
-                        <p class="text-xs">
+                        <p class="text-xs pointer-events-none">
                           {percentMatch}% Match
                         </p>
                       {/if}
 
-                      <button
-                        class="text-xs select-all"
-                        onclick={() => {
+                      <!-- svelte-ignore a11y_click_events_have_key_events -->
+                      <span
+                        role="button"
+                        tabindex="0"
+                        class="text-xs select-all hover:opacity-80"
+                        aria-label="Copy {hex} to clipboard"
+                        title="Copy {hex} to clipboard"
+                        onclick={(e) => {
+                          e.stopPropagation();
                           window.navigator.clipboard.writeText(hex);
                           toast.trigger({
-                            message: `<span class="font-bold">${hex}</span> copied`,
+                            message: `<div class="flex flex-col"><span class="font-bold">${hex}</span><span class="text-xs">Copied to clipboard</span></div>`,
                             category: 'success',
+                            icon: ClipboardCheckIcon
                           });
-                        }}>{hex}</button
+                        }}>{hex}</span
                       >
                     </div>
                   </div>
@@ -723,100 +724,73 @@ If not, see <https://www.gnu.org/licenses/>. -->
             collapsible
             multiple
           >
-            {#snippet iconOpen()}<svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="currentColor"
-                class="size-4"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="m4.5 15.75 7.5-7.5 7.5 7.5"
-                />
-              </svg>
-            {/snippet}
-            {#snippet iconClosed()}<svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="currentColor"
-                class="size-4"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="m19.5 8.25-7.5 7.5-7.5-7.5"
-                />
-              </svg>
-            {/snippet}
             <Accordion.Item value="accurate">
-              {#snippet lead()}
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke-width="1.5"
-                  stroke="currentColor"
-                  class="h-6 w-6"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z"
+              <Accordion.ItemTrigger
+                class="flex items-center justify-between gap-2"
+              >
+                <div class="flex items-center gap-2">
+                  <CircleQuestionMarkIcon />
+
+                  <p class="font-bold">Are the colors accurate?</p>
+                </div>
+
+                <Accordion.ItemIndicator class="group">
+                  <ChevronDownIcon
+                    class="h-5 w-5 transition group-data-[state=open]:rotate-180"
                   />
-                </svg>
-              {/snippet}
-              {#snippet control()}
-                <p class="font-bold">Are the colors accurate?</p>
-              {/snippet}
-              {#snippet panel()}
-                Colors on a screen will always look different from actual yarn
-                colorways. The colors used for this site are meant to be an
-                approximation. They also might not be up-to-date; some colorways
-                might have changed or not be available. These results do not
-                represent official colorway information from their respective
-                companies. The process used to obtain colorway information is
-                described here: <a
-                  href="/documentation/#getting-yarn-colorway-data"
-                  class="link">Getting Yarn Colorway Data</a
-                >. If you find an inaccuracy, send an email to
-                hello@temperature-blanket.com.
-              {/snippet}
+                </Accordion.ItemIndicator>
+              </Accordion.ItemTrigger>
+              <Accordion.ItemContent>
+                {#snippet element(attributes)}
+                  {#if !attributes.hidden}
+                    <div {...attributes} transition:safeSlide>
+                      Colors on a screen will always look different from actual
+                      yarn colorways. The colors used for this site are meant to
+                      be an approximation. They also might not be up-to-date;
+                      some colorways might have changed or not be available.
+                      These results do not represent official colorway
+                      information from their respective companies. The process
+                      used to obtain colorway information is described here: <a
+                        href="/documentation/#getting-yarn-colorway-data"
+                        class="link">Getting Yarn Colorway Data</a
+                      >. If you find an inaccuracy, send an email to
+                      hello@temperature-blanket.com.
+                    </div>
+                  {/if}
+                {/snippet}
+              </Accordion.ItemContent>
             </Accordion.Item>
             <Accordion.Item value="find">
-              {#snippet lead()}
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke-width="1.5"
-                  stroke="currentColor"
-                  class="h-6 w-6"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z"
+              <Accordion.ItemTrigger
+                class="flex items-center justify-between gap-2"
+              >
+                <div class="flex items-center gap-2">
+                  <CircleQuestionMarkIcon />
+                  <p class="font-bold">
+                    What if I can't find the yarn I'm looking for?
+                  </p>
+                </div>
+
+                <Accordion.ItemIndicator class="group">
+                  <ChevronDownIcon
+                    class="h-5 w-5 transition group-data-[state=open]:rotate-180"
                   />
-                </svg>
-              {/snippet}
-              {#snippet control()}
-                <p class="font-bold">
-                  What if I can't find the yarn I'm looking for?
-                </p>
-              {/snippet}
-              {#snippet panel()}
-                Requests for yarn to be included in these results can be made by
-                anyone using <a
-                  href="/yarn-search-request"
-                  rel="noreferrer"
-                  class="link">this request form.</a
-                >.
-              {/snippet}
+                </Accordion.ItemIndicator>
+              </Accordion.ItemTrigger>
+              <Accordion.ItemContent>
+                {#snippet element(attributes)}
+                  {#if !attributes.hidden}
+                    <div {...attributes} transition:safeSlide>
+                      Requests for yarn to be included in these results can be
+                      made by anyone using <a
+                        href="/yarn-search-request"
+                        rel="noreferrer"
+                        class="link">this request form</a
+                      >.
+                    </div>
+                  {/if}
+                {/snippet}
+              </Accordion.ItemContent>
             </Accordion.Item>
           </Accordion>
         </span>

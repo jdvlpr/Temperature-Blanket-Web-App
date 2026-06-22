@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -17,11 +17,29 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { PUBLIC_BASE_URL } from '$env/static/public';
   import AppLogo from '$lib/components/AppLogo.svelte';
   import AppShell from '$lib/components/AppShell.svelte';
-  import { MAXIMUM_DAYS_PER_LOCATION, MAXIMUM_LOCATIONS } from '$lib/constants';
-  import { CircleCheckIcon, CircleMinusIcon } from '@lucide/svelte';
-  import { Modal } from '@skeletonlabs/skeleton-svelte';
+  import {
+    MAXIMUM_DAYS_PER_LOCATION,
+    MAXIMUM_LOCATIONS,
+  } from '$lib/constants/location-constants';
+  import { OPEN_METEO_MODELS } from '$lib/constants/weather-constants';
+  import {
+    CircleCheckIcon,
+    CircleMinusIcon,
+    ClockIcon,
+    Grid3X3Icon,
+    InfoIcon,
+    ShoppingCartIcon,
+  } from '@lucide/svelte';
+  import { Dialog, Portal } from '@skeletonlabs/skeleton-svelte';
 
   let openTableOfContents = $state(false);
+
+  // The following animations are optional.
+  // These may also be included inline.
+  const animBackdrop =
+    'transition transition-discrete opacity-0 starting:data-[state=open]:opacity-0 data-[state=open]:opacity-100';
+  const animModal =
+    'transition transition-discrete opacity-0 translate-x-full starting:data-[state=open]:opacity-0 starting:data-[state=open]:translate-x-full data-[state=open]:opacity-100 data-[state=open]:translate-x-0';
 </script>
 
 <svelte:document
@@ -278,6 +296,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
           class="toc-anchor opacity-60 hover:opacity-100">Create a Preview</a
         >
       </li>
+      <li class="toc-list-item ml-4 block">
+        <a
+          href="#assigning-seasons"
+          class="toc-anchor flex items-center gap-2 opacity-60 hover:opacity-100"
+          >Assigning Seasons <span class="badge bg-tertiary-100-900">Beta</span
+          ></a
+        >
+      </li>
       <li class="toc-list-item block">
         <a href="#gallery" class="toc-anchor opacity-60 hover:opacity-100"
           >Gallery</a
@@ -325,20 +351,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <AppLogo />
     </div>
     <div class="sm:hidden">
-      <Modal
+      <Dialog
         open={openTableOfContents}
         onOpenChange={(e) => {
           openTableOfContents = e.open;
         }}
-        triggerBase="hover:preset-tonal"
-        contentBase="bg-surface-50 dark:bg-surface-950 p-4 space-y-4 shadow-xl w-fit h-screen overflow-auto"
-        positionerJustify="justify-end"
-        positionerAlign=""
-        positionerPadding=""
-        transitionsPositionerIn={{ x: 480, duration: 200 }}
-        transitionsPositionerOut={{ x: 480, duration: 200 }}
       >
-        {#snippet trigger()}
+        <Dialog.Trigger
+          class="btn hover:preset-tonal-surface my-2"
+          aria-label="Content Menu"
+        >
           <div class="flex flex-wrap items-center gap-1">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -351,13 +373,23 @@ If not, see <https://www.gnu.org/licenses/>. -->
             >
 
             <span class="">Content</span>
-          </div>{/snippet}
-        {#snippet content()}
-          <div class="mb-20">
-            {@render tableOfContents()}
           </div>
-        {/snippet}
-      </Modal>
+        </Dialog.Trigger>
+        <Portal>
+          <Dialog.Backdrop
+            class="bg-surface-50-950/50 fixed inset-0 z-50 {animBackdrop}"
+          />
+          <Dialog.Positioner class="fixed inset-0 z-50 flex justify-end">
+            <Dialog.Content
+              class="bg-surface-50 dark:bg-surface-950 h-screen w-fit space-y-4 overflow-auto p-4 shadow-xl {animModal}"
+            >
+              <div class="mb-20">
+                {@render tableOfContents()}
+              </div>
+            </Dialog.Content>
+          </Dialog.Positioner>
+        </Portal>
+      </Dialog>
     </div>
   {/snippet}
   {#snippet main()}
@@ -397,8 +429,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 target="_blank">temperature-blanket.com</a
               >
               is a tool for planning a crocheted or knitted project which incorporates
-              weather data into its design. If you don’t know what a temperature
-              blanket is, you can learn more here:
+              weather data into its design. If you don’t know what a temperature blanket
+              is, you can learn more here:
               <a class="link" href="/blog/what-is-a-temperature-blanket/"
                 >What is a Temperature Blanket?</a
               >
@@ -559,8 +591,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <p>
               To change your project’s units between metric and imperial, from
               the top bar select °C / mm or °F / in. On smaller screens, press
-              the three-dot menu icon, then choose your Units selection. On the
-              Project Planner you can also use the following keyboard shortcut:
+              the Project Menu, then choose your Units selection. On the Project
+              Planner you can also use the following keyboard shortcut:
             </p>
             <figure class="">
               <table>
@@ -783,106 +815,133 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <h3 class="text-xl font-bold">Weather Sources</h3>
 
             <p>
-              Sometimes one weather service may not have data for your location.
-              Changing weather sources can let you see different weather data.
-              Often the differences are minimal, but because of the particular
-              ways weather services collect and interpret data, sometimes there
-              are significant differences.
+              Temperature-blanket.com provides several options from where to get
+              weather data. To change the weather source settings, press the
+              Weather Source button in the Weather tab or Project Menu.
             </p>
-            <ul>
-              <li>
-                <a
-                  class="link"
-                  rel="noreferrer noopener"
-                  href="https://meteostat.net/"
-                  target="_blank">Meteostat</a
-                >
-                – The
-                <a
-                  class="link"
-                  rel="noreferrer noopener"
-                  href="https://meteostat.net/"
-                  target="_blank">Meteostat</a
-                >
-                platform provides access to open data from thousands of weather stations
-                world-wide. Measurements from the nearest stations are combined to
-                produce an interpolated result. Weather data from
-                <a
-                  class="link"
-                  rel="noreferrer noopener"
-                  href="https://meteostat.net/"
-                  target="_blank">Meteostat</a
-                >
-                is licensed under
-                <a
-                  class="link"
-                  rel="noreferrer noopener"
-                  href="https://creativecommons.org/licenses/by-nc/4.0/"
-                  target="_blank">CC BY-NC 4.0</a
-                >, with raw data provided by
-                <a
-                  class="link"
-                  rel="noreferrer noopener"
-                  href="https://www.noaa.gov/"
-                  target="_blank">NOAA</a
-                >,
-                <a
-                  class="link"
-                  rel="noreferrer noopener"
-                  href="https://www.dwd.de/"
-                  target="_blank">DWD</a
-                >
-                and
-                <a
-                  class="link"
-                  rel="noreferrer noopener"
-                  href="https://dev.meteostat.net/docs/sources.html"
-                  target="_blank">others</a
-                >.
+            <ul class="flex flex-col gap-4">
+              <li class="flex flex-col gap-1">
+                <p class="text-lg font-bold">Open-Meteo</p>
+                <p>
+                  The
+                  <a
+                    class="link"
+                    rel="noreferrer noopener"
+                    href="https://open-meteo.com/"
+                    target="_blank">Open-Meteo</a
+                  >
+                  database contains more than 60 years of weather data from a variety
+                  of open sources.
+                </p>
+                <p>
+                  You can choose from the following Open-Meteo weather data
+                  models:
+                </p>
+                {#each OPEN_METEO_MODELS as { title, timespan, resolution, details }}
+                  <div class="ml-4 flex flex-col gap-1">
+                    <p class="flex items-center gap-2 font-bold">
+                      {@html title}
+                    </p>
+                    <div class="ml-4 flex flex-col gap-1">
+                      <p class="">
+                        <ClockIcon
+                          class="relative -top-[2px] mr-1 inline size-4"
+                        />
+                        {timespan}
+                      </p>
+                      <p class="">
+                        <Grid3X3Icon
+                          class="relative -top-[2px] mr-1 inline size-4"
+                        />
+                        {resolution}
+                      </p>
+                      <p class="">
+                        <InfoIcon
+                          class="relative -top-[2px] mr-1 inline size-4"
+                        />
+                        {@html details}
+                      </p>
+                    </div>
+                  </div>
+                {/each}
+
+                <p class="">
+                  Weather data from
+                  <a
+                    class="link"
+                    rel="noreferrer noopener"
+                    href="https://www.open-meteo.com/"
+                    target="_blank">Open-Meteo</a
+                  >
+                  is licensed under
+                  <a
+                    class="link"
+                    rel="noreferrer noopener"
+                    href="https://creativecommons.org/licenses/by/4.0/"
+                    target="_blank">Attribution 4.0 International (CC BY 4.0)</a
+                  >, and includes data from the
+                  <a
+                    class="link"
+                    rel="noreferrer noopener"
+                    href="https://cds.climate.copernicus.eu/cdsapp#!/dataset/reanalysis-era5-land?tab=overview"
+                    target="_blank">Copernicus Program</a
+                  >.
+                </p>
               </li>
-              <li>
-                <a
-                  class="link"
-                  rel="noreferrer noopener"
-                  href="https://open-meteo.com/"
-                  target="_blank">Open-Meteo</a
-                >
-                – The
-                <a
-                  class="link"
-                  rel="noreferrer noopener"
-                  href="https://open-meteo.com/"
-                  target="_blank">Open-Meteo</a
-                >
-                database contains more than 60 years of weather data from a variety
-                of open sources, including data from the
-                <a
-                  class="link"
-                  rel="noreferrer noopener"
-                  href="https://cds.climate.copernicus.eu/cdsapp#!/dataset/reanalysis-era5-land?tab=overview"
-                  target="_blank">Copernicus Program</a
-                >. Weather data from
-                <a
-                  class="link"
-                  rel="noreferrer noopener"
-                  href="https://www.open-meteo.com/"
-                  target="_blank">Open-Meteo</a
-                >
-                is licensed under
-                <a
-                  class="link"
-                  rel="noreferrer noopener"
-                  href="https://creativecommons.org/licenses/by/4.0/"
-                  target="_blank">Attribution 4.0 International (CC BY 4.0)</a
-                >, and includes data from the
-                <a
-                  class="link"
-                  rel="noreferrer noopener"
-                  href="https://cds.climate.copernicus.eu/cdsapp#!/dataset/reanalysis-era5-land?tab=overview"
-                  target="_blank">Copernicus Program</a
-                >.
+              <li class="flex flex-col gap-2">
+                <p class="text-lg font-bold">Meteostat</p>
+                <p>
+                  The
+                  <a
+                    class="link"
+                    rel="noreferrer noopener"
+                    href="https://meteostat.net/"
+                    target="_blank">Meteostat</a
+                  >
+                  platform provides access to open data from thousands of weather
+                  stations world-wide. Measurements from the nearest stations are
+                  combined to produce an interpolated result. You can optionally choose
+                  to not fill missing weather with statistically optimized model data.
+                  (Filling missing weather data is on by default.)
+                </p>
+                <p class="">
+                  Weather data from
+                  <a
+                    class="link"
+                    rel="noreferrer noopener"
+                    href="https://meteostat.net/"
+                    target="_blank">Meteostat</a
+                  >
+                  is licensed under
+                  <a
+                    class="link"
+                    rel="noreferrer noopener"
+                    href="https://creativecommons.org/licenses/by-nc/4.0/"
+                    target="_blank">CC BY-NC 4.0</a
+                  >, with raw data provided by
+                  <a
+                    class="link"
+                    rel="noreferrer noopener"
+                    href="https://www.noaa.gov/"
+                    target="_blank">NOAA</a
+                  >,
+                  <a
+                    class="link"
+                    rel="noreferrer noopener"
+                    href="https://www.dwd.de/"
+                    target="_blank">DWD</a
+                  >
+                  and
+                  <a
+                    class="link"
+                    rel="noreferrer noopener"
+                    href="https://dev.meteostat.net/docs/sources.html"
+                    target="_blank">others</a
+                  >.
+                </p>
               </li>
             </ul>
+            <hr class="hr my-2" />
             <p>
               Daytime length calculations are by <a
                 class="link"
@@ -900,14 +959,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </p>
             <p>
               If your project has missing or incorrect weather data, you can
-              also <a class="link" href="#edit-weather-data"
-                >edit the weather data</a
-              >.
+              also <a class="link" href="#import-weather-data">import</a> or
+              <a class="link" href="#edit-weather-data">edit</a> weather data.
             </p>
             <div class="card bg-warning-500/20 flex flex-col gap-2 p-4">
               <p>
-                For any weather provider, recent weather data may be delayed by
-                a few days.
+                All weather data is subject to change if the provider updates
+                their models.
               </p>
             </div>
           </section>
@@ -958,12 +1016,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     of the week
                   </li>
                   <li>
-                    <span class="font-bold">Rain</span> – The sum of rainfall of
-                    the days in the week
+                    <span class="font-bold">Rain</span> – The sum of rainfall of the
+                    days in the week
                   </li>
                   <li>
-                    <span class="font-bold">Snow</span> – The sum of snowfall of
-                    the days in the week
+                    <span class="font-bold">Snow</span> – The sum of snowfall of the
+                    days in the week
                   </li>
                   <li>
                     <span class="font-bold">Sun</span> – The average daytime of the
@@ -1022,9 +1080,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
               To edit weather data, your project’s <a
                 class="link"
                 href="#grouping-weather-data">weather grouping</a
-              > must be Daily, not Weekly. To edit weather data, press the value
-              you want to change in the table under the weather chart. A modal will
-              open where you can save the new value.
+              > must be Daily, not Weekly. To edit weather data, press the value you
+              want to change in the table under the weather chart. A modal will open
+              where you can save the new value.
             </p>
             <p>
               If you want to edit many values, it may be easier to work with the
@@ -1071,11 +1129,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <h3 class="text-xl font-bold">Import Weather Data</h3>
 
             <p>
-              To import weather data, press the Import Weather Data button; a
-              modal will open where you can upload the CSV weather data file,
-              then press Import to load the weather data into your project. Note
-              that your project’s <a class="link" href="#grouping-weather-data"
-                >weather grouping</a
+              To import weather data, press the Import Weather Data button in
+              the Weather tab; a modal will open where you can upload the CSV
+              weather data file, then press Import to load the weather data into
+              your project. Note that your project’s <a
+                class="link"
+                href="#grouping-weather-data">weather grouping</a
               >
               must be Daily, not Weekly.
             </p>
@@ -1539,15 +1598,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <p>
               Real yarn colors will look different than what’s on the screen.
               Any trademarked yarn or colorway details are owned by their
-              respective companies. Results are not sponsored, but items
-              purchased through some links (marked with a shopping bag icon next
-              to the link) may earn the developer of this site a percentage of
-              the sale at no additional cost to you. Colors may be inaccurate,
-              and may not represent yarn as it appears in physical reality.
-              Requests for yarn to be included in these results can be made by
-              anyone using <a class="link" href="/yarn-search-request"
-                >this request form.</a
-              >
+              respective companies. Purchases via links with a shopping cart
+              icon <ShoppingCartIcon class="relative -top-px inline size-4" /> support
+              the developer of this web app at no extra cost to you. Colors may be
+              inaccurate, and may not represent yarn as it appears in physical reality.
+              Requests for yarn to be included in these results can be made by anyone
+              using
+              <a class="link" href="/yarn-search-request">this request form.</a>
             </p>
           </div>
           <section
@@ -1579,7 +1636,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               </li>
               <li>
                 - The HTML color code, colorway name, and link to the colorway’s
-                webpage is saved in a database which this web apps uses to
+                webpage is saved in a database which this web app uses to
                 display the colorway data.
               </li>
             </ol>
@@ -1604,12 +1661,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <h3 class="text-xl font-bold">Link Unavailable</h3>
 
             <p>
-              A yarn that says Link Unavailable means the webpage from which the
-              colorways were accessed is no longer available. Yarns whos links
-              are unavailable will remain on this web app for legacy purposes,
-              but links to the yarn and its colorways will not work.
+              A yarn that says <span class="italic">Link Unavailable</span> means the webpage from which the
+              colorways were accessed is no longer available.
             </p>
-            <p>A yarn with unavailable links could mean:</p>
+            <p>It could mean:</p>
             <ul class="ml-4">
               <li>- The yarn has been discontinued</li>
               <li>- The yarn has been renamed</li>
@@ -1618,6 +1673,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 longer exist
               </li>
             </ul>
+            <p>Yarns with unavailable links remain on this web app for legacy purposes, but you may not want to use them for new projects.</p>
           </section>
           <h2 class="scroll-mt-[58px] text-2xl font-bold" id="preview">
             Preview
@@ -1642,8 +1698,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 <span class="font-bold">Chevrons</span> – Zig-zag rows of stitches
               </li>
               <li>
-                <span class="font-bold">Continuous Square</span> – Starting from
-                the center, stitches are added in a clockwise square pattern. Possible
+                <span class="font-bold">Continuous Square</span> – Starting from the
+                center, stitches are added in a clockwise square pattern. Possible
                 crochet patterns: Granny Square, Moss Stitch/Linen Stitch Square.
               </li>
               <li>
@@ -1657,6 +1713,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 <strong>r</strong> − Daytime stitches. d = Daytime (time from
                 the day’s sunrise to sunset in hours). r is the total stitches
                 per row. 24 is the number of hours in a day.
+              </li>
+              <li>
+                <span class="font-bold">Hexagon Rounds</span>
+                Each round in a hexagon represents one day. Hexagons are added from
+                left to right, top to bottom.
               </li>
               <li>
                 <span class="font-bold">Month Rows</span> – Rows are grouped by month from
@@ -1674,12 +1735,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 <span class="font-bold">Rows</span> – Straight rows of stitches
               </li>
               <li>
-                <span class="font-bold">Split Month Squares</span> – Each square
-                represents one month. Each round in a square represents one day,
-                starting with the first of the month in the center of the square.
-                Each round is split in half to represent two different weather parameters.
-                Months with fewer days have extra rounds added, so that each square
-                has the same number of rounds.
+                <span class="font-bold">Split Month Squares</span> – Each square represents
+                one month. Each round in a square represents one day, starting with
+                the first of the month in the center of the square. Each round is
+                split in half to represent two different weather parameters. Months
+                with fewer days have extra rounds added, so that each square has the
+                same number of rounds.
+              </li>
+              <li>
+                <span class="font-bold">Square Rounds</span> – Each round in a square
+                represents one day.
               </li>
               <li>
                 <span class="font-bold">Squares</span> – Each square represents one
@@ -1694,6 +1759,68 @@ If not, see <https://www.gnu.org/licenses/>. -->
               </p>
             </div>
           </section>
+
+          <section
+            id="assigning-seasons"
+            class="card bg-surface-100 dark:bg-surface-900 flex scroll-mt-[58px] flex-col gap-2 p-4"
+          >
+            <h3 class="flex items-center gap-2 text-xl font-bold">
+              Assigning Seasons<span class="badge bg-tertiary-100-900"
+                >Beta</span
+              >
+            </h3>
+
+            <p class="bg-tertiary-100-900 rounded-container p-2">
+              This feature is in beta, which means it may have unexpected issues
+              or may have breaking changes in the future. If you encounter any
+              issues or have feedback, please let the developer know. <a
+                href="/contact"
+                class="link"
+                target="_blank">Here is the contact page</a
+              >.
+            </p>
+
+            <p>
+              Assigning seasons allows you to use different weather parameters
+              for different times of the year. For example, you could use High
+              Temperatures for Spring and Summer, and Low Temperatures for Fall
+              (Autumn) and Winter.
+            </p>
+
+            <p>
+              To assign seasons, select the Seasons toggle in the settings of
+              the Preview tab. Note that not all pattern types support seasons,
+              so if you don't see the Seasons toggle, select a different pattern
+              type.
+            </p>
+
+            <p>
+              To edit which dates are in which seasons, press the name of a
+              season. You can choose from several preset options, or customize
+              the start and end dates for each season.
+            </p>
+
+            <p>Notes:</p>
+            <ul class="ml-4">
+              <li>
+                - If a date falls outside of a custom defined seasons' ranges,
+                that date will use the Accent Color as a fallback.
+              </li>
+              <li>
+                - If two season's date ranges overlap, the first season which
+                includes that date will be used. The order of the seasons is as
+                follows: 1) Spring, 2) Summer, 3) Fall (Autumn), 4) Winter.
+              </li>
+            </ul>
+
+            <div class="card bg-warning-500/20 flex flex-col gap-2 p-4">
+              <p>
+                For now, only the Rows pattern type supports assigning seasons.
+                Support for more pattern types may be added in future updates.
+              </p>
+            </div>
+          </section>
+
           <h2 class="scroll-mt-[58px] text-2xl font-bold" id="gallery">
             Gallery
           </h2>
@@ -1749,20 +1876,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <p>
               To download your color charts and weather data as a PDF file,
-              press the three-dot menu icon, press the Download button, then
-              press the Color Charts and Weather Data (PDF) button. You can also
-              open the download menu by using the following keyboard shortcut:
+              press the Project Menu, press the Download/Export button, then
+              press the Color Charts and Weather Data (PDF) button.
             </p>
-            <figure class="">
-              <table>
-                <tbody
-                  ><tr
-                    class="flex-flow border-surface-950-50 rounded-container flex w-full items-center justify-between gap-2 border p-2 font-bold"
-                    ><td class="kbd">d</td><td>Open Download Menu</td></tr
-                  ></tbody
-                >
-              </table>
-            </figure>
           </section>
           <section
             id="download-weather-data-csv"
@@ -1771,20 +1887,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <h3 class="text-xl font-bold">Download Weather Data (CSV)</h3>
             <p>
               To download a CSV file with your project’s weather data, press the
-              three-dot menu icon, press Download, then press Weather Data
-              (CSV). You can also open the download menu by using the following
-              keyboard shortcut:
+              Project Menu, press Download/Export button, then press Weather
+              Data (CSV).
             </p>
-            <figure class="">
-              <table>
-                <tbody
-                  ><tr
-                    class="flex-flow border-surface-950-50 rounded-container flex w-full items-center justify-between gap-2 border p-2 font-bold"
-                    ><td class="kbd">d</td><td>Open Download Menu</td></tr
-                  ></tbody
-                >
-              </table>
-            </figure>
           </section>
           <section
             id="download-preview-image-png"
@@ -1793,24 +1898,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <h3 class="text-xl font-bold">Download Preview Image (PNG)</h3>
             <p>
               To download a PNG file of your project’s preview image, press the
-              three-dot menu icon, press Download, then press Preview Image
-              (PNG). You can also open the download menu by using the following
-              keyboard shortcut:
+              Project Menu, press Download/Export button, then press Preview
+              Image (PNG).
             </p>
-            <figure class="">
-              <table>
-                <tbody
-                  ><tr
-                    class="flex-flow border-surface-950-50 rounded-container flex w-full items-center justify-between gap-2 border p-2 font-bold"
-                    ><td class="kbd">d</td><td>Open Download Menu</td></tr
-                  ></tbody
-                >
-              </table>
-            </figure>
           </section>
         </div>
         <div
-          class="sticky top-16 hidden h-auto w-1/5 min-w-[200px] self-start sm:inline-block"
+          class="sticky top-16 hidden h-auto w-1/5 min-w-[240px] self-start sm:inline-block"
         >
           <div class="max-h-[90svh] overflow-auto pb-20">
             {@render tableOfContents()}

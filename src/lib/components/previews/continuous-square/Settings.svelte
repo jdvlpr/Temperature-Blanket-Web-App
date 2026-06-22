@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -16,35 +16,40 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import NumberInputButton from '$lib/components/buttons/NumberInputButton.svelte';
   import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
-  import { gauges, modal, weather } from '$lib/state';
+  import PreviewInfo from '$lib/components/PreviewInfo.svelte';
+  import SpanYarnColorSelectIcon from '$lib/components/SpanYarnColorSelectIcon.svelte';
+  import { dialog } from '$lib/state/page-state.svelte';
+  import { gauges } from '$lib/state/gauges-state.svelte';
+  import { weather } from '$lib/state/weather-state.svelte';
   import { capitalizeFirstLetter } from '$lib/utils/other-utils';
   import { pluralize } from '$lib/utils/string-utils';
-  import { PipetteIcon } from '@lucide/svelte';
   import { continuousSquarePreview } from './state.svelte';
 
   let targets = $derived(gauges.allCreated.map((n) => n.targets).flat());
 </script>
 
 {#if continuousSquarePreview.details?.rounds}
-  <div class="w-full">
-    <div class="mx-auto max-w-(--breakpoint-sm)">
-      <p class="mb-2">
-        Starting from the center, stitches are added in a clockwise square
-        pattern. Possible crochet patterns: Granny Square, Moss Stitch/Linen
-        Stitch Square.
-      </p>
-      <p class="italic">
-        {continuousSquarePreview.details.rounds} rounds with {continuousSquarePreview
-          .details.countOfAdditionalStitches}
-        additional
-        {pluralize(
+  <PreviewInfo previewTitle={continuousSquarePreview.name}>
+    {#snippet description()}
+      Starting from the center, stitches are added in a clockwise square
+      pattern. Possible crochet patterns: Granny Square, Moss Stitch/Linen
+      Stitch Square.
+    {/snippet}
+    {#snippet details()}
+      There are <span class="font-semibold"
+        >{continuousSquarePreview.details.rounds}
+        rounds</span
+      >
+      with
+      <span class="font-semibold"
+        >{continuousSquarePreview.details.countOfAdditionalStitches} additional {pluralize(
           'stitch',
           continuousSquarePreview.details.countOfAdditionalStitches,
           'es',
-        )}.
-      </p>
-    </div>
-  </div>
+        )}</span
+      >.
+    {/snippet}
+  </PreviewInfo>
 {/if}
 
 <div
@@ -53,7 +58,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <p class="text-2xl font-bold">Settings</p>
 
   <label class="label">
-    <span
+    <span class="label-text"
       >Color Stitches Using the {capitalizeFirstLetter(
         weather.grouping,
       )}'s</span
@@ -72,16 +77,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <NumberInputButton
     bind:value={continuousSquarePreview.settings.stitchesPerDay}
     title="Stitches Per {capitalizeFirstLetter(weather.grouping)}"
-    icon={true}
   />
 
   {#if continuousSquarePreview.details}
     {#if continuousSquarePreview.details.countOfAdditionalStitches}
       <button
-        class="btn hover:preset-tonal"
+        class="btn hover:preset-tonal-surface"
         title="Choose a Color"
         onclick={() =>
-          modal.trigger({
+          dialog.trigger({
             type: 'component',
             component: {
               ref: ChangeColor,
@@ -89,14 +93,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 hex: continuousSquarePreview.settings.extrasColor,
                 onChangeColor: ({ hex }) => {
                   continuousSquarePreview.settings.extrasColor = hex;
-                  modal.close();
+                  dialog.close();
                 },
               },
             },
+            options: {
+              size: 'large',
+            },
           })}
       >
-        <PipetteIcon />
-        Color of Additional Stitches
+        <SpanYarnColorSelectIcon
+          color={continuousSquarePreview.settings.extrasColor}
+        />
+        Accent Color (for additional stitches)
       </button>
     {/if}
   {/if}

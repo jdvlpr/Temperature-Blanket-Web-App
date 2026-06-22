@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -16,10 +16,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import HelpIcon from '$lib/components/buttons/HelpIcon.svelte';
   import Expand from '$lib/components/Expand.svelte';
-  import { ALL_YARN_WEIGHTS } from '$lib/constants';
-  import { pluralize, stringToDate } from '$lib/utils';
-  import { brands } from '$lib/yarns/brands';
-  import { slide } from 'svelte/transition';
+  import { ALL_YARN_WEIGHTS } from '$lib/constants/color-constants';
+  import { brands } from '$lib/data/yarns/brands';
+  import { safeSlide } from '$lib/features/transitions/safeSlide';
+  import { pluralize } from '$lib/utils/string-utils';
+  import { stringToDate } from '$lib/utils/date-utils';
+  import { ShoppingCartIcon } from '@lucide/svelte';
 
   interface Props {
     viewSources?: boolean;
@@ -29,32 +31,26 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div class="my-4 flex flex-wrap justify-center gap-2">
-  <p class="text-sm">
+  <p class="text-surface-700-300 text-sm">
     Real yarn colors will look different than what's on the screen. Any
     trademarked yarn or colorway details are owned by their respective
-    companies. Results are not sponsored, but items purchased through some links
-    (marked with a shopping bag icon next to the link) may earn the developer of
-    this site a percentage of the sale at no additional cost to you. Requests
-    for yarn to be included in these results can be made by anyone using <a
-      href="/yarn-search-request"
-      class="link">this request form.</a
-    >
+    companies. Purchases via links with a shopping cart icon <ShoppingCartIcon
+      class="relative -top-px inline size-4"
+    /> support the developer of this web app at no extra cost to you. Requests for
+    yarn to be included in these results can be made by anyone using
+    <a href="/yarn-search-request" class="link">this request form.</a>
   </p>
 
-  <Expand
-    bind:isExpanded={viewSources}
-    more="View Yarn Sources"
-    less="Hide Yarn Sources"
-  />
+  <Expand bind:isExpanded={viewSources} label="Yarn Sources" />
 
   {#if viewSources}
     <div
-      transition:slide
+      transition:safeSlide
       class="flex flex-wrap items-start justify-start gap-2 text-sm"
     >
       {#each brands as brand}
         {#each brand.yarns as yarn}
-          {@const unavailable = yarn.colorways.some(
+          {@const unavailable = yarn.colorways.every(
             (n) => !!n.source?.unavailable,
           )}
           {@const yarnWeightName = ALL_YARN_WEIGHTS.find(
@@ -75,13 +71,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   >)
                 </span>
               {/if}
-              {#if unavailable}
-                <span class="font-normal"
-                  >[{pluralize('Link', yarn.colorways.length)} Unavailable]
-
-                  <HelpIcon href="/documentation#link-unavailable" /></span
-                >{/if}
             </p>
+            
+            {#if unavailable}
+                <HelpIcon href="/documentation#link-unavailable">
+                  {#snippet text()}
+                    <span class="font-normal"
+                      >Link Unavailable</span
+                    >
+                  {/snippet}
+                </HelpIcon>
+            {/if}
 
             <p>
               {#each yarn.colorways as { source, colors }}

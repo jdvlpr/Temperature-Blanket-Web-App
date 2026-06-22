@@ -1,30 +1,36 @@
 <script lang="ts">
-  import { localState, modal, weather } from '$lib/state';
-  import { TableHandler, ThSort } from '@vincjo/datatables';
-  import DataTable from './datatable/DataTable.svelte';
+  import { UNIT_LABELS } from '$lib/constants/weather-constants';
+  import { dialog } from '$lib/state/page-state.svelte';
+  import { weather } from '$lib/state/weather-state.svelte';
+  import { preferences } from '$lib/storage/preferences.svelte';
   import {
     celsiusToFahrenheit,
-    dateToISO8601String,
-    displayNumber,
     fahrenheitToCelsius,
-    getIsFutureDate,
-    getIsRecentDate,
-    getTextColor,
     hoursToMinutes,
     inchesToMillimeters,
     millimetersToInches,
-  } from '$lib/utils';
-  import { showColorDetails } from './WeatherTableWrapper.svelte';
-  import RecentWeatherDataTooltip from './RecentWeatherDataTooltip.svelte';
-  import TextInput from './modals/TextInput.svelte';
-  import NumberInput from './modals/NumberInput.svelte';
-  import { UNIT_LABELS } from '$lib/constants';
+  } from '$lib/utils/unit-utils.svelte';
+  import {
+    dateToISO8601String,
+    getIsFutureDate,
+    getIsRecentDate,
+  } from '$lib/utils/date-utils';
+  import { displayNumber } from '$lib/utils/number-utils';
+  import { getTextColor } from '$lib/utils/color-utils';
+  import { TableHandler, ThSort } from '@vincjo/datatables';
   import { onMount } from 'svelte';
+  import RecentWeatherDataTooltip from './RecentWeatherDataTooltip.svelte';
+  import { showColorDetails } from './WeatherTableWrapper.svelte';
+  import DataTable from './datatable/DataTable.svelte';
+  import NumberInput from './modals/NumberInput.svelte';
+  import TextInput from './modals/TextInput.svelte';
 
   let { tableData, updateTable, uid } = $props();
 
-  let table = new TableHandler(tableData, {
-    rowsPerPage: weather.table.rowsPerPage,
+  let table = $derived.by(() => {
+    return new TableHandler(tableData, {
+      rowsPerPage: weather.table.rowsPerPage,
+    });
   });
 
   onMount(() => {
@@ -43,14 +49,19 @@
           >
         </ThSort>
         {#each weather.tableWeatherTargets as { id, pdfHeader }}
-          {@const header = pdfHeader[localState.value.units]}
+          {@const header = pdfHeader[preferences.value.units]}
+          {@const hasHeaderUnits = header.includes('(')}
           {@const headerLabel = header.slice(0, header.indexOf('('))}
           {@const headerUnits = header.slice(header.indexOf('('))}
           <ThSort {table} field={id}>
-            <span class="flex flex-wrap items-center justify-center gap-1"
-              >{headerLabel}
-              <span class="text-xs">{headerUnits}</span></span
-            >
+            <span class="flex flex-wrap items-center justify-center gap-1">
+              {#if hasHeaderUnits}
+                {headerLabel}
+                <span class="text-xs">{headerUnits}</span>
+              {:else}
+                {header}
+              {/if}
+            </span>
           </ThSort>
         {/each}
       </tr>
@@ -88,14 +99,16 @@
             >
               <button
                 class={[
-                  weather.grouping === 'day' && 'hover:preset-tonal btn',
-                  weather.grouping === 'week' && 'disabled:opacity-100',
+                  weather.grouping === 'day' &&
+                    'hover:preset-tonal-surface btn',
+                  (weather.grouping === 'week' || id === 'moon') &&
+                    'disabled:opacity-100',
                   isRecentDate && 'opacity-65',
                 ]}
-                disabled={weather.grouping === 'week'}
+                disabled={weather.grouping === 'week' || id === 'moon'}
                 onclick={() => {
                   if (id === 'dayt') {
-                    modal.trigger({
+                    dialog.trigger({
                       type: 'component',
                       component: {
                         ref: TextInput,
@@ -134,14 +147,14 @@
                       },
                     });
                   } else {
-                    modal.trigger({
+                    dialog.trigger({
                       type: 'component',
                       component: {
                         ref: NumberInput,
                         props: {
                           max: 1000,
                           value: row[id],
-                          title: `<div class="flex flex-col items-center justify-center"><span class="font-bold">${row.date}</span><span>${label} <span class="text-sm">(${UNIT_LABELS[type][localState.value.units]})</span></span></div>`,
+                          title: `<div class="flex flex-col items-center justify-center"><span class="font-bold">${row.date}</span><span>${label} <span class="text-sm">(${UNIT_LABELS[type][preferences.value.units]})</span></span></div>`,
                           noMinMax: true,
                           showSlider: false,
                           onOkay: async (_value) => {
@@ -157,7 +170,7 @@
                             weather.table.rowsPerPage = table.rowsPerPage;
                             weather.table.page = table.currentPage;
 
-                            if (localState.value.units === 'metric') {
+                            if (preferences.value.units === 'metric') {
                               weather.rawData[i][id].metric = _value;
                               if (type === 'temperature')
                                 weather.rawData[i][id].imperial =
@@ -166,7 +179,7 @@
                                 weather.rawData[i][id].imperial =
                                   millimetersToInches(_value);
                             }
-                            if (localState.value.units === 'imperial') {
+                            if (preferences.value.units === 'imperial') {
                               weather.rawData[i][id].imperial = _value;
                               if (type === 'temperature')
                                 weather.rawData[i][id].metric =

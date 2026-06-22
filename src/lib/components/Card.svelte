@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -25,7 +25,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div
-  class="lg:rounded-container lg:shadow-lg bg-surface-50 dark:bg-surface-950 overflow-hidden"
+  class="lg:rounded-container bg-surface-50 dark:bg-surface-950 overflow-hidden lg:shadow-lg"
 >
   <div>
     {@render header?.()}

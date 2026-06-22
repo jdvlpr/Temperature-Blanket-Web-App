@@ -16,8 +16,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import NumberInputButton from '$lib/components/buttons/NumberInputButton.svelte';
   import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
-  import { gauges, modal, weather } from '$lib/state';
-  import { capitalizeFirstLetter, pluralize } from '$lib/utils';
+  import { gauges } from '$lib/state/gauges-state.svelte';
+  import { dialog } from '$lib/state/page-state.svelte';
+  import { weather } from '$lib/state/weather-state.svelte';
+  import { capitalizeFirstLetter } from '$lib/utils/other-utils';
+  import { pluralize } from '$lib/utils/string-utils';
   import { SquareDashedIcon } from '@lucide/svelte';
   import { hexagonsPreview } from './state.svelte';
 
@@ -54,7 +57,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <NumberInputButton
     bind:value={hexagonsPreview.settings.hexagonSize}
     title="Hexagon Size"
-    icon={true}
   />
 
   {#if hexagonsPreview.dimensionsOptions}
@@ -96,7 +98,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       class="btn hover:preset-tonal text-left whitespace-pre-wrap"
       title="Choose a color for the border stitches around each square"
       onclick={() =>
-        modal.trigger({
+        dialog.trigger({
           type: 'component',
           component: {
             ref: ChangeColor,
@@ -104,7 +106,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               hex: hexagonsPreview.settings.joinColor,
               onChangeColor: ({ hex }) => {
                 hexagonsPreview.settings.joinColor = hex;
-                modal.close();
+                dialog.close();
               },
             },
           },

@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -27,9 +27,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ImportExportPalette from '$lib/components/modals/ImportExportPalette.svelte';
   import RandomPalette from '$lib/components/modals/RandomPalette.svelte';
   import SortPalette from '$lib/components/modals/SortPalette.svelte';
-  import { drawerState, modal, pageSections } from '$lib/state';
-  import type { Color, GaugeSettingsType } from '$lib/types';
-  import { createGaugeColors } from '$lib/utils';
+  import {
+    drawerState,
+    dialog,
+    pageSections,
+  } from '$lib/state/page-state.svelte';
+  import type { Color } from '$lib/types/yarn-types';
+  import type { GaugeSettingsType } from '$lib/types/gauge-types';
+  import { createGaugeColors } from '$lib/state/gauges-state.svelte';
   import {
     ArrowDownWideNarrowIcon,
     CircleCheckIcon,
@@ -60,7 +65,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     drawerState.closeAll();
 
-    modal.close();
+    dialog.close();
   }
 
   $effect(() => {
@@ -102,7 +107,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     'flex w-full flex-col items-center',
     fullscreen.value
       ? 'bg-surface-50 dark:bg-surface-950 fixed top-0 left-0 h-full w-full justify-start overflow-scroll max-sm:pb-2'
-      : 'rounded-container bg-surface-100 dark:bg-surface-900 mt-2 justify-center gap-2 pb-2 shadow-inner',
+      : 'rounded-container bg-surface-100 dark:bg-surface-900 mt-2 justify-center gap-2 shadow-inner',
+    gauge.unit.type !== 'category' ? 'pb-2' : 'overflow-hidden',
   ]}
   bind:this={gaugeContainerElement}
 >
@@ -114,6 +120,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         schemeName={gauge.schemeId}
         showSchemeName={false}
         roundedBottom={false}
+        isStaticGauge={gauge.isStatic}
         onchanged={() => {
           updateGauge({ _colors: gauge.colors });
         }}
@@ -125,9 +132,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     class={[
       'flex flex-wrap items-center justify-center gap-2 px-2',
       fullscreen.value && 'order-1 py-2',
+      gauge.unit.type === 'category' && 'hidden',
     ]}
   >
-    <div class="">
+    {#key fullscreen.value}
       <SelectNumberOfColors
         hideText={fullscreen.value}
         numberOfColors={gauge.colors.length}
@@ -140,15 +148,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
           gauge.updateColors({ colors });
         }}
       />
-    </div>
+    {/key}
 
     <button
       class={[
-        'hover:preset-tonal',
+        'hover:preset-tonal-surface',
         fullscreen.value ? 'btn-icon' : 'btn justify-start',
       ]}
+      title="Select Premade Colorway Palettes"
       onclick={() =>
-        modal.trigger({
+        dialog.trigger({
           type: 'component',
           component: {
             ref: BrowsePalettes,
@@ -169,12 +178,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     <button
       class={[
-        'hover:preset-tonal',
+        'hover:preset-tonal-surface',
         fullscreen.value ? 'btn-icon' : 'btn justify-start',
       ]}
       title="Choose Yarn Colorways, Filtered by Brand and Yarn"
       onclick={() =>
-        modal.trigger({
+        dialog.trigger({
           type: 'component',
           component: {
             ref: ChooseColorways,
@@ -195,12 +204,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     <button
       class={[
-        'hover:preset-tonal',
+        'hover:preset-tonal-surface',
         fullscreen.value ? 'btn-icon' : 'btn justify-start',
       ]}
       title="Get Palette from Image"
       onclick={() =>
-        modal.trigger({
+        dialog.trigger({
           type: 'component',
           component: {
             ref: GetPaletteFromImage,
@@ -222,12 +231,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     <button
       class={[
-        'hover:preset-tonal',
+        'hover:preset-tonal-surface',
         fullscreen.value ? 'btn-icon' : 'btn justify-start',
       ]}
       title="Generate Random Colors"
       onclick={() =>
-        modal.trigger({
+        dialog.trigger({
           type: 'component',
           component: {
             ref: RandomPalette,
@@ -249,12 +258,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     <button
       class={[
-        'hover:preset-tonal',
+        'hover:preset-tonal-surface',
         fullscreen.value ? 'btn-icon' : 'btn justify-start',
       ]}
       title="Load Colors or Get a Palette Code to Share"
       onclick={() =>
-        modal.trigger({
+        dialog.trigger({
           type: 'component',
           component: {
             ref: ImportExportPalette,
@@ -274,12 +283,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     <button
       class={[
-        'hover:preset-tonal',
+        'hover:preset-tonal-surface',
         fullscreen.value ? 'btn-icon' : 'btn justify-start',
       ]}
       title="Sort Colors"
       onclick={() =>
-        modal.trigger({
+        dialog.trigger({
           type: 'component',
           component: {
             ref: SortPalette,
@@ -301,7 +310,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     <button
       aria-label="Fullscreen"
-      class={['btn', !fullscreen.value ? 'hover:preset-tonal' : 'preset-tonal']}
+      class={['btn hover:preset-tonal-surface']}
       onclick={() => (fullscreen.value = !fullscreen.value)}
       title="Toggle Fullscreen Editing Mode (f)"
     >

@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -15,10 +15,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import UnitChanger from '$lib/components/UnitChanger.svelte';
-  import { modal } from '$lib/state';
-  import { getWeatherCodeDetails } from '$lib/utils';
+  import { dialog } from '$lib/state/page-state.svelte';
+  import { getWeatherCodeDetails } from '$lib/utils/weather-forecast-utils';
   import { Trash2Icon } from '@lucide/svelte';
-  import { Segment } from '@skeletonlabs/skeleton-svelte';
+  import { SegmentedControl } from '@skeletonlabs/skeleton-svelte';
   import { weatherState } from './+page.svelte';
   import { fetchData } from './GetWeather.svelte';
   import { weatherLocationState } from './Location.svelte';
@@ -52,14 +52,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
               weatherState.activeLocationID = id;
               await fetchData();
               weatherLocationState.validId = true;
-              modal.close();
+              dialog.close();
             }}
             onkeydown={async (e) => {
               if (e.key === 'Enter') {
                 weatherState.activeLocationID = id;
                 await fetchData();
                 weatherLocationState.validId = true;
-                modal.close();
+                dialog.close();
               }
             }}
           >
@@ -101,17 +101,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </div>
             <button
               aria-label="Remove from Locations"
-              class="btn-icon hover:preset-tonal"
+              class="btn-icon hover:preset-tonal-surface"
               title="Remove from Locations"
               onclick={(e) => {
                 e.stopPropagation();
-                e.preventDefault();
+                if (e.cancelable) e.preventDefault();
                 weatherState.weatherLocations.map((item) => {
                   if (item.id === id) item.saved = false;
                   return item;
                 });
-                // const _weatherForecastData = weatherState.weatherLocations.filter((item) => item.id !== id);
-                // weatherState.weatherLocations = _weatherForecastData;
 
                 if (id === weatherState.activeLocationID)
                   weatherState.activeLocationID =
@@ -122,7 +120,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   !weatherState.weatherLocations.filter((item) => item?.saved)
                     ?.length
                 )
-                  modal.close();
+                  dialog.close();
               }}
             >
               <Trash2Icon />
@@ -143,17 +141,26 @@ If not, see <https://www.gnu.org/licenses/>. -->
           class="rounded-container flex flex-wrap items-center justify-center gap-4 p-2"
         >
           <div class="flex flex-wrap items-center justify-center gap-2">
-            <Segment
+            <SegmentedControl
               value={weatherState.hour}
               onValueChange={(e) => {
                 weatherState.hour = e.value;
               }}
-              classes="flex-wrap gap-y-2"
-              background="bg-surface-100 dark:bg-surface-900 shadow-sm"
             >
-              <Segment.Item value="12">12hr</Segment.Item>
-              <Segment.Item value="24">24hr</Segment.Item>
-            </Segment>
+              <SegmentedControl.Control
+                class="bg-surface-100 dark:bg-surface-900 rounded-container flex-wrap gap-y-2 border-none shadow-sm"
+              >
+                <SegmentedControl.Indicator />
+                <SegmentedControl.Item value="12">
+                  <SegmentedControl.ItemText>12hr</SegmentedControl.ItemText>
+                  <SegmentedControl.ItemHiddenInput />
+                </SegmentedControl.Item>
+                <SegmentedControl.Item value="24">
+                  <SegmentedControl.ItemText>24hr</SegmentedControl.ItemText>
+                  <SegmentedControl.ItemHiddenInput />
+                </SegmentedControl.Item>
+              </SegmentedControl.Control>
+            </SegmentedControl>
             <p class="text-sm">
               {new Date().toLocaleTimeString(navigator.language, {
                 timeStyle: 'short',

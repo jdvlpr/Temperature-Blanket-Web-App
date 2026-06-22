@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -14,23 +14,35 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import { ArrowUpDownIcon } from '@lucide/svelte';
-  import { Segment } from '@skeletonlabs/skeleton-svelte';
+  import {
+    ArrowDownNarrowWideIcon,
+    ArrowDownWideNarrowIcon,
+  } from '@lucide/svelte';
+  import { SegmentedControl } from '@skeletonlabs/skeleton-svelte';
 
   let { direction, onchange } = $props();
 </script>
 
-<p class="flex justify-start items-center gap-1">
-  <ArrowUpDownIcon class="size-4" />
-  <span>Direction</span>
-</p>
-
-<Segment
-  value={direction}
-  classes="flex-wrap gap-y-2 justify-start items-start"
-  background="bg-surface-100 dark:bg-surface-900"
-  onValueChange={onchange}
->
-  <Segment.Item value="high-to-low">High to Low</Segment.Item>
-  <Segment.Item value="low-to-high">Low to High</Segment.Item>
-</Segment>
+<SegmentedControl value={direction} onValueChange={onchange}>
+  <SegmentedControl.Control
+    class="bg-surface-100 dark:bg-surface-900 rounded-container flex-wrap items-start justify-start gap-y-2 border-none shadow-sm"
+  >
+    <SegmentedControl.Indicator />
+    <SegmentedControl.Item value="high-to-low">
+      <SegmentedControl.ItemText
+        title="Set Gauge Direction to High to Low"
+        class="flex items-center gap-1"
+        ><ArrowDownWideNarrowIcon class="" /> High to Low</SegmentedControl.ItemText
+      >
+      <SegmentedControl.ItemHiddenInput />
+    </SegmentedControl.Item>
+    <SegmentedControl.Item value="low-to-high">
+      <SegmentedControl.ItemText
+        title="Set Gauge Direction to Low to High"
+        class="flex items-center gap-1"
+        ><ArrowDownNarrowWideIcon class="" /> Low to High</SegmentedControl.ItemText
+      >
+      <SegmentedControl.ItemHiddenInput />
+    </SegmentedControl.Item>
+  </SegmentedControl.Control>
+</SegmentedControl>

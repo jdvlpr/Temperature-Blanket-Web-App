@@ -1,4 +1,4 @@
-// Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+// Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 //
 // This file is part of Temperature-Blanket-Web-App.
 //
@@ -13,18 +13,19 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { CHARACTERS_FOR_URL_HASH } from '$lib/constants';
-import { allGaugesAttributes, gauges } from '$lib/state';
-import type { Color, WeatherParam } from '$lib/types';
+import { CHARACTERS_FOR_URL_HASH } from '$lib/constants/page-constants';
+import { allGaugesAttributes, gauges, getTargetParentGaugeId } from '$lib/state/gauges-state.svelte';
+import type { Color } from '$lib/types/yarn-types';
+import type { WeatherParam } from '$lib/types/gauge-types';
+import { capitalizeFirstLetter } from '$lib/utils/other-utils';
+import { getColorPropertiesFromYarnStringAndHex } from '$lib/utils/yarn-utils';
 import {
-  capitalizeFirstLetter,
-  getColorPropertiesFromYarnStringAndHex,
   getProjectParametersFromURLHash,
-  getTargetParentGaugeId,
   getTitleFromLocationsMeta,
-  isValueInRange,
-  pluralize,
-} from '$lib/utils';
+} from '$lib/utils/project-utils.svelte';
+import { isValueInRange } from '$lib/utils/range-utils.svelte';
+import { pluralize } from '$lib/utils/string-utils';
+import { brands } from '$lib/data/yarns/brands';
 import chroma from 'chroma-js';
 
 /**
@@ -191,6 +192,7 @@ export const getColorsFromInput = ({
   // project checker
   let colors =
     getColorsFromProjectURL(string) || getColorsFromYarnSearchURL(string);
+
   if (colors) return colors;
 
   if (string.includes('coolors.co/'))
@@ -239,22 +241,30 @@ export const getColorInfo = ({
 
   const gaugeLength = gauge.ranges.length;
 
-  for (let i = 0; i < gaugeLength; i++) {
-    const { from, to } = gauge.ranges[i];
-    if (
-      isValueInRange({
-        value,
-        range: { from, to },
-        direction: gauge.rangeOptions.direction,
-        includeFromValue: gauge.rangeOptions.includeFromValue,
-        includeToValue: gauge.rangeOptions.includeToValue,
-      })
-    ) {
-      color = {
-        ...gauge.colors[i],
-        index: i,
-        gaugeLength,
-      };
+  if (gauge.unit.type === 'category') {
+    color = {
+      ...gauge.colors[value],
+      index: value,
+      gaugeLength,
+    };
+  } else {
+    for (let i = 0; i < gaugeLength; i++) {
+      const { from, to } = gauge.ranges[i];
+      if (
+        isValueInRange({
+          value,
+          range: { from, to },
+          direction: gauge.rangeOptions.direction,
+          includeFromValue: gauge.rangeOptions.includeFromValue,
+          includeToValue: gauge.rangeOptions.includeToValue,
+        })
+      ) {
+        color = {
+          ...gauge.colors[i],
+          index: i,
+          gaugeLength,
+        };
+      }
     }
   }
 
@@ -306,6 +316,7 @@ const getColorsFromProjectURL = (string: string): string[] | false => {
           string: colorsString,
         });
         let extraText = text.substring(text.indexOf('!') + 1);
+
         if (extraText.includes('!')) {
           // if has yarn details too
           let yarnDetails = extraText.substring(extraText.lastIndexOf('!') + 1);
@@ -327,6 +338,7 @@ const getColorsFromProjectURL = (string: string): string[] | false => {
       }
     }
   });
+
   return colors;
 };
 
@@ -376,7 +388,9 @@ export const getColorName = ({
       showGenericName,
       showNamedHexCodes,
     });
-  const yarn = getYarn({ brandId, yarnId });
+  const yarn = brands
+    .find((brand) => brand.id === brandId)
+    ?.yarns.find((yarn) => yarn.id === yarnId);
   if (!yarn)
     return getGenericColorName({
       color,

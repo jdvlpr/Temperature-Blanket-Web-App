@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -14,25 +14,34 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import { UNIT_LABELS } from '$lib/constants';
-  import { localState } from '$lib/state';
-  import { Segment } from '@skeletonlabs/skeleton-svelte';
+  import { UNIT_LABELS } from '$lib/constants/weather-constants';
+  import { preferences } from '$lib/storage/preferences.svelte';
+  import { SegmentedControl } from '@skeletonlabs/skeleton-svelte';
 </script>
 
-<Segment
-  value={localState.value.units}
+<SegmentedControl
+  value={preferences.value.units}
   onValueChange={(e) => {
-    localState.value.units = e.value;
+    preferences.value.units = e.value;
   }}
-  background="bg-surface-100 dark:bg-surface-900"
-  classes="shadow-sm"
 >
-  <Segment.Item value={'metric'}>
-    {`${UNIT_LABELS.temperature.metric} /
-  	    ${UNIT_LABELS.height.metric}`}
-  </Segment.Item>
-  <Segment.Item value={'imperial'}>
-    {`${UNIT_LABELS.temperature.imperial} /
-  	    ${UNIT_LABELS.height.imperial}`}
-  </Segment.Item>
-</Segment>
+  <SegmentedControl.Control
+    class="bg-surface-100 dark:bg-surface-900 rounded-container border-0 shadow-sm"
+  >
+    <SegmentedControl.Indicator />
+    <SegmentedControl.Item value={'metric'}>
+      <SegmentedControl.ItemText
+        >{`${UNIT_LABELS.temperature.metric} /
+  	    ${UNIT_LABELS.height.metric}`}</SegmentedControl.ItemText
+      >
+      <SegmentedControl.ItemHiddenInput />
+    </SegmentedControl.Item>
+    <SegmentedControl.Item value={'imperial'}>
+      <SegmentedControl.ItemText
+        >{`${UNIT_LABELS.temperature.imperial} /
+  	    ${UNIT_LABELS.height.imperial}`}</SegmentedControl.ItemText
+      >
+      <SegmentedControl.ItemHiddenInput />
+    </SegmentedControl.Item>
+  </SegmentedControl.Control>
+</SegmentedControl>

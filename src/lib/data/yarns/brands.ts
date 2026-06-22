@@ -1,0 +1,166 @@
+import type { Brand } from '$lib/types/yarn-types';
+import { brand as _4Seasons } from './4-seasons/yarns'; // Add underscore to keep alpha-numeric placement at top of import list and avoid linting error
+import { brand as auntLydias } from './aunt-lydias/yarns';
+import { brand as alize } from './alize/yarns';
+import { brand as bcGarn } from './bc-garn/yarns';
+import { brand as bellissimo } from './bellissimo/yarns';
+import { brand as bendigoWoolenMills } from './bendigo-woollen-mills/yarns';
+import { brand as bernat } from './bernat/yarns';
+import { brand as berroco } from './berroco/yarns';
+import { brand as bigTwist } from './big-twist/yarns';
+import { brand as blueSkyFibers } from './blue-sky-fibers/yarns';
+import { brand as caron } from './caron/yarns';
+import { brand as cascade } from './cascade/yarns';
+import { brand as circulo } from './circulo/yarns';
+import { brand as coopKnits } from './coop-knits/yarns';
+import { brand as dmc } from './dmc/yarns';
+import { brand as drops } from './drops/yarns';
+import { brand as ellaRae } from './ella-rae/yarns';
+import { brand as elle } from './elle/yarns';
+import { brand as emu } from './emu/yarns';
+import { brand as euroroma } from './euroroma/yarns';
+import { brand as fiddlesticks } from './fiddlesticks/yarns';
+import { brand as filaturaDiCrosa } from './filatura-di-crosa/yarns';
+import { brand as garnmanufaktur } from './garnmanufaktur/yarns';
+import { brand as gepard } from './gepard/yarns';
+import { brand as grundl } from './grundl/yarns';
+import { brand as herrschners } from './herrschners/yarns';
+import { brand as himalaya } from './himalaya/yarns';
+import { brand as hobbii } from './hobbii/yarns';
+import { brand as hobbyLobby } from './hobby-lobby/yarns';
+import { brand as hobbyStore } from './hobby-store/yarns';
+import { brand as holst } from './holst/yarns';
+import { brand as iceYarns } from './ice-yarns/yarns';
+import { brand as katia } from './katia/yarns';
+import { brand as kelbourneWoolens } from './kelbourne-woolens/yarns';
+import { brand as kingCole } from './king-cole/yarns';
+import { brand as knitPicks } from './knit-picks/yarns';
+import { brand as knittingForOlive } from './knitting-for-olive/yarns';
+import { brand as lanaGrossa } from './lana-grossa/yarns';
+import { brand as lilySugarNCream } from './lily-sugar-n-cream/yarns';
+import { brand as lindehobby } from './lindehobby/yarns';
+import { brand as lionBrand } from './lion-brand/yarns';
+import { brand as loopsAndThreads } from './loops-and-threads/yarns';
+import { brand as malabrigo } from './malabrigo/yarns';
+import { brand as mauriceBrassard } from './maurice-brassard/yarns';
+import { brand as melissa } from './melissa/yarns';
+import { brand as missBabs } from './miss-babs/yarns';
+import { brand as nako } from './nako/yarns';
+import { brand as paintboxYarns } from './paintbox-yarns/yarns';
+import { brand as patons } from './patons/yarns';
+import { brand as pingouin } from './pingouin/yarns';
+import { brand as plymouthYarn } from './plymouth-yarn/yarns';
+import { brand as premier } from './premier/yarns';
+import { brand as purlSoho } from './purl-soho/yarns';
+import { brand as rauma } from './rauma/yarns';
+import { brand as redHeart } from './red-heart/yarns';
+import { brand as rosarios4 } from './rosarios-4/yarns';
+import { brand as rowan } from './rowan/yarns';
+import { brand as sandnes } from './sandnes/yarns';
+import { brand as schachenmayr } from './schachenmayr/yarns';
+import { brand as scheepjes } from './scheepjes/yarns';
+import { brand as semco } from './semco/yarns';
+import { brand as silkCityFibers } from './silk-city-fibers/yarns';
+import { brand as sirdar } from './sirdar/yarns';
+import { brand as skeinz } from './skeinz/yarns';
+import { brand as sourceOfFibre } from './source-of-fibre/yarns';
+import { brand as stylecraft } from './stylecraft/yarns';
+import { brand as svartaFaret } from './svarta-faret/yarns';
+import { brand as tessiland } from './tessiland/yarns';
+import { brand as theFibreCo } from './the-fibre-co/yarns';
+import { brand as theWomensInstitute } from './the-womens-institute/yarns';
+import { brand as tricotCafe } from './tricot-cafe/yarns';
+import { brand as tuftingEurope } from './tufting-europe/yarns';
+import { brand as valleyYarns } from './valley-yarns/yarns';
+import { brand as weLoveYarn } from './we-love-yarn/yarns';
+import { brand as westYorkshireSpinners } from './west-yorkshire-spinners/yarns';
+import { brand as willowYarns } from './willow-yarns/yarns';
+import { brand as wollButt } from './woll-butt/yarns';
+import { brand as yarnAndColors } from './yarn-and-colors/yarns';
+import { brand as yarnalia } from './yarnalia/yarns';
+import { brand as yarnart } from './yarnart/yarns';
+import { brand as yarnsmiths } from './yarnsmiths/yarns';
+
+export const brands: Brand[] = [
+  _4Seasons,
+  auntLydias,
+  alize,
+  bcGarn,
+  bellissimo,
+  bendigoWoolenMills,
+  bernat,
+  berroco,
+  bigTwist,
+  blueSkyFibers,
+  caron,
+  cascade,
+  circulo,
+  coopKnits,
+  dmc,
+  drops,
+  ellaRae,
+  elle,
+  emu,
+  euroroma,
+  fiddlesticks,
+  filaturaDiCrosa,
+  garnmanufaktur,
+  gepard,
+  grundl,
+  herrschners,
+  himalaya,
+  hobbii,
+  hobbyLobby,
+  hobbyStore,
+  holst,
+  iceYarns,
+  katia,
+  kelbourneWoolens,
+  kingCole,
+  knitPicks,
+  knittingForOlive,
+  lanaGrossa,
+  lilySugarNCream,
+  lindehobby,
+  lionBrand,
+  loopsAndThreads,
+  malabrigo,
+  mauriceBrassard,
+  melissa,
+  missBabs,
+  nako,
+  paintboxYarns,
+  patons,
+  pingouin,
+  plymouthYarn,
+  rauma,
+  premier,
+  purlSoho,
+  redHeart,
+  rosarios4,
+  rowan,
+  sandnes,
+  schachenmayr,
+  scheepjes,
+  semco,
+  silkCityFibers,
+  sirdar,
+  skeinz,
+  sourceOfFibre,
+  stylecraft,
+  svartaFaret,
+  tessiland,
+  theFibreCo,
+  theWomensInstitute,
+  tricotCafe,
+  tuftingEurope,
+  valleyYarns,
+  weLoveYarn,
+  westYorkshireSpinners,
+  willowYarns,
+  wollButt,
+  yarnAndColors,
+  yarnalia,
+  yarnart,
+  yarnsmiths,
+];

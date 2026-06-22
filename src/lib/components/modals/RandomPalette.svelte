@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -18,18 +18,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import DefaultYarnSet from '$lib/components/DefaultYarnSet.svelte';
   import SelectNumberOfColors from '$lib/components/SelectNumberOfColors.svelte';
   import SelectYarn from '$lib/components/SelectYarn.svelte';
-  import Tooltip from '$lib/components/Tooltip.svelte';
   import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
   import StickyPart from '$lib/components/modals/StickyPart.svelte';
-  import { modal } from '$lib/state';
+  import { dialog } from '$lib/state/page-state.svelte';
+  import { getColorways, getFilteredYarns } from '$lib/utils/yarn-utils';
+  import { getSortedPalette } from '$lib/utils/color-utils';
+  import { pickRandomFromArray } from '$lib/utils/number-utils';
   import {
-    getColorways,
-    getFilteredYarns,
-    getSortedPalette,
-    pickRandomFromArray,
-  } from '$lib/utils';
-  import { ArrowDownWideNarrowIcon, ShuffleIcon } from '@lucide/svelte';
+    ArrowDownWideNarrowIcon,
+    ExternalLinkIcon,
+    ShuffleIcon,
+  } from '@lucide/svelte';
   import SelectYarnWeight from '../SelectYarnWeight.svelte';
+  import HelpIcon from '../buttons/HelpIcon.svelte';
 
   let { numberOfColors, updateGauge } = $props();
 
@@ -106,11 +107,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
       selectedYarnWeightId,
     }),
   );
-  let isYarnUnavailable = $derived(
-    filteredYarnsList
-      ?.filter((n) => n.id === selectedYarnId)[0]
-      ?.colorways.some((colorway) => !!colorway.source?.unavailable),
-  );
 
   $effect(() => {
     selectedBrandId;
@@ -165,47 +161,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </div>
     {/key}
 
-    {#if isYarnUnavailable}
-      <div class="order-4 col-span-full w-full">
-        <Tooltip>
-          Link Unavailable <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="1.5"
-            stroke="currentColor"
-            class="inline h-6 w-6"
-            ><path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"
-            ></path></svg
-          >
-          {#snippet tooltip()}
-            <div class="flex flex-col justify-start gap-2 text-left text-base">
-              <p>
-                A yarn that says Link Unavailable means the webpage from which
-                the colorways were accessed is no longer available. Yarns whose
-                links are unavailable will remain on this web app for legacy
-                purposes, but links to the yarn and its colorways will not work.
-              </p>
-
-              <p>A yarn with unavailable links could mean:</p>
-
-              <div class="ml-4">
-                <p>- The yarn has been discontinued</p>
-                <p>- The yarn has been renamed</p>
-                <p>
-                  - The yarn’s website has been re-designed and old links no
-                  longer exist
-                </p>
-              </div>
-            </div>
-          {/snippet}
-        </Tooltip>
-      </div>
-    {/if}
-
     <div class="order-5 col-span-full justify-self-start sm:col-span-3">
       <SelectNumberOfColors
         {numberOfColors}
@@ -215,27 +170,27 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
 
     <label class="label order-6 col-span-full w-full sm:col-span-4">
-      <span class="flex items-center gap-1">
-        <ArrowDownWideNarrowIcon class="size-4" />
-        <span>Sort By</span>
-      </span>
-      <select
-        class="select truncate"
-        id="sort-colors-by"
-        bind:value={sortColors}
-        onchange={() => {
-          randomPalette = getSortedPalette({
-            palette: randomPalette,
-            sortColors,
-          });
-        }}
-      >
-        <option value="none">None</option>
-        <option value="light-to-dark">Lightest to Darkest</option>
-        <option value="dark-to-light">Darkest to Lightest</option>
-        <option value="name">Name A-Z</option>
-        <option value="name-z-to-a">Name Z-A</option>
-      </select>
+      <span class="label-text"> Sort By</span>
+      <div class="relative flex items-center">
+        <ArrowDownWideNarrowIcon class="absolute left-2" />
+        <select
+          class="select truncate pl-10"
+          id="sort-colors-by"
+          bind:value={sortColors}
+          onchange={() => {
+            randomPalette = getSortedPalette({
+              palette: randomPalette,
+              sortColors,
+            });
+          }}
+        >
+          <option value="none">None</option>
+          <option value="light-to-dark">Lightest to Darkest</option>
+          <option value="dark-to-light">Darkest to Lightest</option>
+          <option value="name">Name A-Z</option>
+          <option value="name-z-to-a">Name Z-A</option>
+        </select>
+      </div>
     </label>
 
     <button
@@ -253,7 +208,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <StickyPart position="bottom">
   <div class="p-2 sm:p-4">
-    <div class="mb-2 sm:mb-4">
+    <div class="">
       {#key randomPalette}
         <ColorPaletteEditable
           canUserEditColor={false}
@@ -276,9 +231,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
             return color;
           }),
         });
-        modal.close();
+        dialog.close();
       }}
-      onClose={modal.close}
+      onClose={dialog.close}
     />
   </div>
 </StickyPart>

@@ -1,19 +1,33 @@
-import { CHARACTERS_FOR_URL_HASH } from '$lib/constants';
-import { gauges, previews, weather } from '$lib/state';
-import { displayNumber, getWeatherTargets, setTargets } from '$lib/utils';
+import { CHARACTERS_FOR_URL_HASH } from '$lib/constants/page-constants';
+import { gauges } from '$lib/state/gauges-state.svelte';
+import { previews } from '$lib/state/preview-state.svelte';
+import { weather } from '$lib/state/weather-state.svelte';
+import type { BasePreviewSettings } from '$lib/types/preview-types';
+import type { Color } from '$lib/types/yarn-types';
+import type { WeatherParam } from '$lib/types/gauge-types';
+import { displayNumber } from '$lib/utils/number-utils';
+import { getWeatherTargets } from '$lib/utils/weather-utils.svelte';
+import { setTargets } from '$lib/utils/preview-utils.svelte';
 import chroma from 'chroma-js';
 import Preview from './Preview.svelte';
 import Settings from './Settings.svelte';
 
-function getNumberOfStitchesInRound(round) {
+function getNumberOfStitchesInRound(round: number): number {
   if (round === 1) return 4;
   return getEndOfRoundStitch(round) - getEndOfRoundStitch(round - 1);
 }
 
-function getEndOfRoundStitch(round) {
+function getEndOfRoundStitch(round: number): number {
   if (round <= 1) return round * 4;
   return 4 * round + getEndOfRoundStitch(round - 1);
 }
+
+interface ContinuousSquarePreviewSettings extends BasePreviewSettings {
+  selectedTarget: WeatherParam['id'];
+  stitchesPerDay: number;
+  extrasColor: Color['hex'];
+}
+
 export class ContinuousSquarePreviewClass {
   constructor() {
     $effect.root(() => {
@@ -57,10 +71,11 @@ export class ContinuousSquarePreviewClass {
   // *******************
   // User settings properties
   // *******************
-  settings = $state({
+  settings = $state<ContinuousSquarePreviewSettings>({
     selectedTarget: 'tmax',
     stitchesPerDay: 28,
     extrasColor: '#f0f3f3',
+    useSeasonTargets: false,
   });
 
   // *******************
@@ -133,7 +148,7 @@ export class ContinuousSquarePreviewClass {
   // *******************
   // Method for loading settings from a url hash string
   // *******************
-  load(hash) {
+  load(hash: string) {
     let startIndex, separatorIndex, lengthEndIndex;
 
     for (let i = 0; i < hash.length; i++) {
@@ -148,7 +163,7 @@ export class ContinuousSquarePreviewClass {
 
     if (!startIndex || !lengthEndIndex) return; // format of hash was wrong, so stop processing
 
-    let target = hash.substring(0, startIndex);
+    let target = hash.substring(0, startIndex) as WeatherParam['id'];
     this.settings.selectedTarget = target;
 
     // stitches per day

@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -23,90 +23,81 @@ If not, see <https://www.gnu.org/licenses/>. -->
         secondary: '#075985',
         surface: '#64748b',
       },
-      rounded: '8px',
+      rounded: '0.375rem',
     },
     {
       id: 'crimson',
       name: 'Garnet',
       colors: {
-        primary: '#d4163c',
-        secondary: '#4685af',
-        surface: '#2b2e40',
+        primary: '#d21d3d',
+        secondary: '#4785ae',
+        surface: '#353a50',
       },
-      rounded: '24px',
+      rounded: '0.75rem',
     },
     {
       id: 'hamlindigo',
       name: 'Lapis Lazuli',
       colors: {
-        primary: '#a8bef1',
-        secondary: '#a48e5b',
-        surface: '#6376a3',
+        primary: '#a7bef3',
+        secondary: '#a38e5e',
+        surface: '#6476a1',
       },
-      rounded: '2px',
+      rounded: '0.063rem',
     },
     {
       id: 'modern',
       name: 'Jasper',
       colors: {
-        primary: '#f27fb8',
-        secondary: '#06b6d4',
-        surface: '#6366f1',
+        primary: '#eb4999',
+        secondary: '#00b7d6',
+        surface: '#6367ef',
       },
-      rounded: '24px',
+      rounded: '9999rem',
     },
     {
       id: 'rocket',
       name: 'Geode',
       colors: {
-        primary: '#06b6d4',
-        secondary: '#3b82f6',
+        primary: '#00b7d6',
+        secondary: '#3a82f7',
         surface: '#64748b',
       },
-      rounded: '0px',
+      rounded: '0.125rem',
     },
     {
       id: 'legacy',
       name: 'Tufa',
       colors: {
-        surface: '#495a8f',
-        primary: '#0fba81',
-        secondary: '#4f46e5',
+        surface: '#11ba81',
+        primary: '#4f46e5',
+        secondary: '#495a90',
       },
-      rounded: '8px',
+      rounded: '9999rem',
     },
   ];
 </script>
 
 <script>
   import { browser } from '$app/environment';
-  import { THEMES } from '$lib/constants';
-  import { localState } from '$lib/state';
-  import { Popover, Segment } from '@skeletonlabs/skeleton-svelte';
-
-  let openState = $state(false);
+  import { THEMES } from '$lib/constants/page-constants';
+  import { preferences } from '$lib/storage/preferences.svelte';
+  import { safeSlide } from '$lib/features/transitions/safeSlide';
+  import {
+    Popover,
+    Portal,
+    SegmentedControl,
+  } from '@skeletonlabs/skeleton-svelte';
 
   let activeTheme = $derived(
-    THEMES.find((n) => n.id === (localState.value.theme.mode || 'system')),
+    THEMES.find((n) => n.id === (preferences.value.theme.mode || 'system')),
   );
 </script>
 
 <div class="w-fit text-left">
-  <Popover
-    open={openState}
-    onOpenChange={(e) => {
-      openState = e.open;
-    }}
-    triggerBase="btn  hover:preset-tonal"
-    contentBase="card bg-surface-200 dark:bg-surface-800 p-4 space-y-4 shadow-xl"
-    positionerClasses="z-9999!"
-    arrow
-    arrowBackground="bg-surface-200! dark:bg-surface-800!"
-    modal={true}
-    autoFocus={false}
-  >
-    {#snippet trigger()}
-      {#key localState.value?.theme.mode}
+  <Popover modal={true} autoFocus={true}>
+    <Popover.Trigger class="btn hover:preset-tonal-surface">
+      {#key preferences.value?.theme.mode}
         <span
           >{#if browser}{@html activeTheme?.icon}{:else}{@html THEMES.find(
               (t) => t.id === 'system',
@@ -114,62 +105,93 @@ If not, see <https://www.gnu.org/licenses/>. -->
         >
         Theme
       {/key}
-    {/snippet}
-    {#snippet content()}
-      <div class="flex flex-col gap-2">
-        <Segment
-          value={localState.value.theme.mode}
-          onValueChange={(e) => {
-            localState.value.theme.mode = e.value;
-          }}
-          classes="flex wrap gap-y-2 shadow-sm"
-          background="bg-surface-100 dark:bg-surface-900"
+    </Popover.Trigger>
+    <Portal>
+      <Popover.Positioner>
+        <Popover.Content
+          class="card bg-surface-200-800 z-999 space-y-4 p-4 shadow-xl"
         >
-          {#each THEMES as { name, id, icon, description }}
-            <Segment.Item value={id}>
-              <span class="flex items-center justify-center gap-1">
-                {@html icon}
-                <span class="hidden min-[375px]:inline">{name}</span>
-              </span>
-            </Segment.Item>
-          {/each}
-        </Segment>
+          {#snippet element(attributes)}
+            {#if !attributes.hidden}
+              <div {...attributes} transition:safeSlide>
+                <Popover.Description>
+                  <div class="flex flex-col gap-2">
+                    <SegmentedControl
+                      value={preferences.value.theme.mode}
+                      onValueChange={(e) => {
+                        if (preferences.value?.theme.mode) {
+                          preferences.value.theme.mode = e.value;
+                        }
+                      }}
+                    >
+                      <SegmentedControl.Control
+                        class="bg-surface-100 dark:bg-surface-900 card"
+                      >
+                        <SegmentedControl.Indicator />
+                        {#each THEMES as { name, id, icon, description }}
+                          <SegmentedControl.Item value={id} title={description}>
+                            <SegmentedControl.ItemText>
+                              <span
+                                class="flex items-center justify-center gap-1"
+                              >
+                                {@html icon}
+                                <span
+                                  class="hidden text-sm min-[400px]:inline md:text-base"
+                                  >{name}</span
+                                >
+                              </span>
+                            </SegmentedControl.ItemText>
+                            <SegmentedControl.ItemHiddenInput />
+                          </SegmentedControl.Item>
+                        {/each}
+                      </SegmentedControl.Control>
+                    </SegmentedControl>
 
-        <div class="flex flex-col items-start gap-2">
-          {#each skeletonThemes as { name, id, colors, rounded }}
-            <button
-              onclick={(e) => {
-                localState.value.theme.id = id;
-              }}
-              class={[
-                'btn hover:preset-tonal-secondary flex w-full items-center justify-start gap-2',
-                localState.value.theme.id === id &&
-                  'preset-filled-secondary-500',
-              ]}
-            >
-              <div
-                class="border-surface-50-950 flex h-6 w-16 overflow-hidden border"
-                style="border-radius:{rounded}"
-              >
-                <div
-                  class="flex-auto"
-                  style="background:{colors.surface}"
-                ></div>
-                <div
-                  class="flex-auto"
-                  style="background:{colors.primary}"
-                ></div>
-                <div
-                  class="flex-auto"
-                  style="background:{colors.secondary}"
-                ></div>
+                    <div class="flex flex-col items-start gap-2">
+                      {#each skeletonThemes as { name, id, colors, rounded }}
+                        <button
+                          onclick={(e) => {
+                            preferences.value.theme.id = id;
+                          }}
+                          class={[
+                            'btn hover:preset-tonal-surface flex w-full items-center justify-start gap-2',
+                            preferences.value.theme.id === id &&
+                              'preset-filled-secondary-500',
+                          ]}
+                        >
+                          <div
+                            class="border-surface-50-950 flex h-6 w-16 overflow-hidden border"
+                            style="border-radius:{rounded}"
+                          >
+                            <div
+                              class="flex-auto"
+                              style="background:{colors.surface}"
+                            ></div>
+                            <div
+                              class="flex-auto"
+                              style="background:{colors.primary}"
+                            ></div>
+                            <div
+                              class="flex-auto"
+                              style="background:{colors.secondary}"
+                            ></div>
+                          </div>
+                          {name}
+                        </button>
+                      {/each}
+                    </div>
+                  </div>
+                </Popover.Description>
+                <Popover.Arrow
+                  style="--arrow-size: calc(var(--spacing) * 2); --arrow-background: var(--color-surface-200-800);"
+                >
+                  <Popover.ArrowTip />
+                </Popover.Arrow>
               </div>
-              {name}
-            </button>
-          {/each}
-        </div>
-        <button class="close" aria-label="Close"></button>
-      </div>
-    {/snippet}
+            {/if}
+          {/snippet}
+        </Popover.Content>
+      </Popover.Positioner>
+    </Portal>
   </Popover>
 </div>

@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -15,22 +15,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import AppNavigation from '$lib/components/AppNavigation.svelte';
+  import { safeSlide } from '$lib/features/transitions/safeSlide';
   import {
-    modal,
-    pageSections,
+    drawerState,
     showNavigationSideBar,
-    weather,
-  } from '$lib/state';
-  import { slide } from 'svelte/transition';
-  import { weatherChart } from './WeatherChart.svelte';
-  import { Modal } from '@skeletonlabs/skeleton-svelte';
-  import AppLogo from './AppLogo.svelte';
-  import { page } from '$app/state';
+  } from '$lib/state/page-state.svelte';
+  import { weather } from '$lib/state/weather-state.svelte';
   import {
     MenuIcon,
     PanelLeftClose,
     PanelRightCloseIcon,
   } from '@lucide/svelte';
+  import { Dialog, Portal } from '@skeletonlabs/skeleton-svelte';
+  import AppLogo from './AppLogo.svelte';
+  import { weatherChart } from './WeatherChart.svelte';
 
   /**
    * @typedef {Object} Props
@@ -59,60 +57,47 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 </script>
 
-<div
-  data-vaul-drawer-wrapper="true"
-  class={[
-    'min-h-[100svh]',
-    (page.route.id === '/' &&
-      Array(0, 1).includes(pageSections.items.find((p) => p.active)?.index)) ||
-    page.route.id !== '/'
-      ? 'gradient-background'
-      : '',
-  ]}
->
+<div data-vaul-drawer-wrapper="true">
   <div
     class={[
-      'bg-surface-50/90 dark:bg-surface-950/90 sticky top-0 z-20 backdrop-blur-md [view-transition-name:sticky-header]',
+      'bg-surface-50/80 dark:bg-surface-950/80 sticky top-0 z-20 backdrop-blur-md [view-transition-name:sticky-header]',
       stickyHeader && 'lg:py-2',
     ]}
     id="top-navbar"
   >
     <div
-      class="m-auto flex max-w-(--breakpoint-xl) items-center justify-between gap-2 px-2"
+      class="m-auto flex max-w-(--breakpoint-xl) items-center justify-between px-2 max-sm:gap-1 sm:gap-2"
     >
       <div class="lg:hidden">
-        <Modal
+        <Dialog
           onOpenChange={(e) => {
-            modal.drawer.leftNavigation = e.open;
+            drawerState.appNavigation = e.open;
           }}
-          open={modal.drawer.leftNavigation}
-          triggerBase="btn hover:preset-tonal my-2"
-          triggerAriaLabel="Open menu"
-          contentBase="bg-surface-50 dark:bg-surface-950 p-4 space-y-4 shadow-xl w-fit h-screen overflow-auto"
-          positionerJustify="justify-start"
-          positionerAlign=""
-          positionerPadding=""
-          transitionsPositionerIn={{ x: -480, duration: 200 }}
-          transitionsPositionerOut={{ x: -480, duration: 200 }}
+          open={drawerState.appNavigation}
         >
-          {#snippet trigger()}
+          <Dialog.Trigger
+            class="hover:preset-tonal-surface max-sm:btn-icon sm:btn my-2"
+            aria-label="Open menu"
+          >
             <MenuIcon />
-
-            <span class="max-[355px]:hidden">
-              {#if pageName}
-                {pageName}
-              {:else}
-                Menu
-              {/if}
-            </span>
-          {/snippet}
-          {#snippet content()}
-            <div class="mb-20 flex min-w-[265px] flex-col gap-2">
-              <AppLogo />
-              <AppNavigation />
-            </div>
-          {/snippet}
-        </Modal>
+            <span class="max-sm:hidden">{pageName || 'Menu'}</span>
+          </Dialog.Trigger>
+          <Portal>
+            <Dialog.Backdrop
+              class="bg-surface-50-950/50 fixed inset-0 z-50 opacity-0 transition transition-discrete data-[state=open]:opacity-100 starting:data-[state=open]:opacity-0"
+            />
+            <Dialog.Positioner class="fixed inset-0 z-50 flex justify-start">
+              <Dialog.Content
+                class="bg-surface-50 dark:bg-surface-950 relative h-screen w-fit -translate-x-full space-y-4 overflow-auto p-4 opacity-0 transition transition-discrete data-[state=open]:translate-x-0 data-[state=open]:opacity-100 starting:data-[state=open]:-translate-x-full starting:data-[state=open]:opacity-0"
+              >
+                <div class="mb-20 flex min-w-[265px] flex-col gap-2">
+                  <AppLogo />
+                  <AppNavigation />
+                </div>
+              </Dialog.Content>
+            </Dialog.Positioner>
+          </Portal>
+        </Dialog>
       </div>
 
       {@render stickyHeader?.()}
@@ -125,7 +110,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       bind:clientWidth={sidebarWidth}
     >
       <button
-        class="btn hover:preset-tonal mx-2 mt-2 hidden justify-center lg:flex"
+        class="btn hover:preset-tonal-surface mx-2 mt-2 hidden justify-center lg:flex"
         title={`${showNavigationSideBar.value ? 'Hide' : 'Show'} Sidebar`}
         onclick={async () => {
           showNavigationSideBar.value = !showNavigationSideBar.value;
@@ -133,7 +118,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       >
         {#if showNavigationSideBar.value}
           <PanelLeftClose />
-          <span in:slide={{ axis: 'x', duration: 90 }}>Hide Sidebar</span>
+          <span in:safeSlide={{ axis: 'x' }}>Hide Sidebar</span>
         {:else}
           <PanelRightCloseIcon />
         {/if}
@@ -141,7 +126,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {#if showNavigationSideBar.value}
         <div
           class="hidden w-fit flex-col lg:flex"
-          transition:slide={{ axis: 'x', duration: 100 }}
+          transition:safeSlide={{ axis: 'x' }}
         >
           <div class="w-fit">
             <AppNavigation />
@@ -150,36 +135,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {/if}
     </div>
 
-    <div class="w-full">
+    <div class="min-w-0 flex-1">
       <div class="lg:m-2 xl:mx-0">{@render main?.()}</div>
       {@render footer?.()}
     </div>
   </div>
 </div>
-
-<style>
-  .gradient-background {
-    background-size: cover;
-    background-image:
-      radial-gradient(
-        at 0% 95%,
-        color-mix(in oklab, var(--color-tertiary-500) 10%, transparent) 0px,
-        transparent 50%
-      ),
-      radial-gradient(
-        at 53% 40%,
-        color-mix(in oklab, var(--color-surface-500) 16%, transparent) 0px,
-        transparent 60%
-      ),
-      radial-gradient(
-        at 85% 8%,
-        color-mix(in oklab, var(--color-primary-500) 8%, transparent) 0px,
-        transparent 50%
-      ),
-      radial-gradient(
-        at 100% 100%,
-        color-mix(in oklab, var(--color-surface-500) 9%, transparent) 0px,
-        transparent 50%
-      );
-  }
-</style>

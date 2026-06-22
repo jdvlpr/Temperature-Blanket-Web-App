@@ -1,16 +1,29 @@
-import { CHARACTERS_FOR_URL_HASH } from '$lib/constants';
-import { gauges, previews, weather } from '$lib/state';
+import { CHARACTERS_FOR_URL_HASH } from '$lib/constants/page-constants';
+import { gauges } from '$lib/state/gauges-state.svelte';
+import { previews } from '$lib/state/preview-state.svelte';
+import { weather } from '$lib/state/weather-state.svelte';
+import type { BasePreviewSettings } from '$lib/types/preview-types';
+import type { Color } from '$lib/types/yarn-types';
+import type { WeatherParam } from '$lib/types/gauge-types';
 import {
   getDaysInLongestMonth,
   getFactors,
-  getMiddleValueOfArray,
   getPossibleDimensions,
   setTargets,
   weatherMonthsData,
-} from '$lib/utils';
+} from '$lib/utils/preview-utils.svelte';
+import { getMiddleValueOfArray } from '$lib/utils/number-utils';
 import chroma from 'chroma-js';
 import Preview from './Preview.svelte';
 import Settings from './Settings.svelte';
+
+interface SplitMonthSquaresPreviewSettings extends BasePreviewSettings {
+  leftTarget: WeatherParam['id'];
+  rightTarget: WeatherParam['id'];
+  dimensions: string;
+  additionalRoundsColor: Color['hex'];
+  additionalRoundsPerSquare: number;
+}
 
 export class SplitMonthSquaresPreviewClass {
   constructor() {
@@ -65,12 +78,13 @@ export class SplitMonthSquaresPreviewClass {
   // *******************
   // User settings properties
   // *******************
-  settings = $state({
+  settings = $state<SplitMonthSquaresPreviewSettings>({
     leftTarget: 'tmin',
     rightTarget: 'tmax',
     dimensions: '3x4',
     additionalRoundsColor: '#f0f3f3',
     additionalRoundsPerSquare: 1,
+    useSeasonTargets: false,
   });
 
   // *******************

@@ -1,10 +1,9 @@
 @import 'tailwindcss';
 @plugin '@tailwindcss/forms';
 
-@source '../../node_modules/@skeletonlabs/skeleton-svelte/dist';
+@import '@skeletonlabs/skeleton-svelte';
 
 @import '@skeletonlabs/skeleton';
-@import '@skeletonlabs/skeleton/optional/presets';
 
 /* Preset Themes */
 @import '@skeletonlabs/skeleton/themes/crimson';
@@ -18,6 +17,18 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* To avoid a breaking style issue in Windows-based browsers, it’s recommended you include this temporary fix into your global stylesheet. Please note this change will be automatically and permanently applied for you in Skeleton v5+. 
+https://www.skeleton.dev/docs/svelte/tailwind-components/forms#windows-bugfix 
+*/
+
+.select,
+.input,
+.textarea,
+.ig-group {
+  background-color: var(--color-surface-50-950);
+  color: var(--color-surface-950-50);
+}
+
 /* Define variables for weather parameters */
 :root {
   --tmin: #38bdf8;
@@ -26,6 +37,7 @@
   --prcp: #818cf8;
   --snow: #94a3b8;
   --dayt: #facc15;
+  --moon: #282828;
 }
 
 /* Compatibility styles for Tailwind CSS v4 */
@@ -41,6 +53,27 @@
   ::selection {
     color: var(--base-font-color-dark);
   }
+}
+
+/* Floating element styles */
+[data-floating] {
+  width: max-content;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 50;
+}
+
+/* Arrow styling for floating elements. The JS sets `data-placement` on the
+   floating element and positions the arrow's inline axis with left/top. */
+[data-floating] .popover-arrow {
+  position: absolute;
+  background: inherit;
+  width: 8px;
+  height: 8px;
+  transform: rotate(45deg);
+  pointer-events: none;
+  z-index: 10;
 }
 
 /* Override default theme font families */
@@ -62,13 +95,18 @@
   --SOFT: 90;
   --WONK: 1;
 
-  --spacing: 0.22rem;
+  --radius-base: 0.75rem;
+  --radius-container: 1.5rem;
 }
 [data-theme='hamlindigo'] {
   --opsz: 76;
   --wght: 900;
   --SOFT: 0;
   --WONK: 0;
+
+  --spacing: 0.22rem;
+  --radius-base: 0.063rem;
+  --radius-container: 0.125rem;
 
   .lucide {
     stroke-width: 1px;
@@ -80,13 +118,20 @@
   --SOFT: 100;
   --WONK: 1;
 
+  --text-scaling: 1.125;
   --spacing: 0.28rem;
+  --radius-base: 9999rem;
+  --radius-container: 1.5rem;
 }
 [data-theme='rocket'] {
   --opsz: 24;
   --wght: 300;
   --SOFT: 10;
   --WONK: 0;
+
+  --text-scaling: 1;
+  --radius-base: 0.125rem;
+  --radius-container: 0.25rem;
 
   .lucide {
     stroke-width: 1px;
@@ -97,6 +142,9 @@
   --wght: 500;
   --SOFT: 60;
   --WONK: 1;
+
+  --radius-base: 9999rem;
+  --radius-container: 1.5rem;
 }
 
 @media (prefers-reduced-motion) {

@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -15,35 +15,59 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import { page } from '$app/state';
-  import ColorRange from '$lib/components/ColorRange.svelte';
-  import DaysInRange from '$lib/components/DaysInRange.svelte';
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
   import ViewToggle from '$lib/components/buttons/ViewToggle.svelte';
+  import ColorRange from '$lib/components/ColorRange.svelte';
+  import DaysInRange from '$lib/components/DaysInRange.svelte';
   import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
-  import { localState, modal, showDaysInRange } from '$lib/state';
-  import type { Color } from '$lib/types';
-  import { getTextColor } from '$lib/utils';
+  import { safeSlide } from '$lib/features/transitions/safeSlide';
+  import { dialog } from '$lib/state/page-state.svelte';
+  import { gauges, showDaysInRange } from '$lib/state/gauges-state.svelte';
+  import { preferences } from '$lib/storage/preferences.svelte';
+  import type { Color } from '$lib/types/yarn-types';
+  import { getTextColor } from '$lib/utils/color-utils';
   import {
+    ChevronDownIcon,
+    LayoutPanelTopIcon,
     MoveIcon,
     SearchIcon,
-    ShoppingBagIcon,
+    ShoppingCartIcon,
     Trash2Icon,
   } from '@lucide/svelte';
-  import { dragHandle, dragHandleZone, SOURCES } from 'svelte-dnd-action';
+  import { Popover, Portal } from '@skeletonlabs/skeleton-svelte';
+  import { dragHandle, dragHandleZone } from 'svelte-dnd-action';
   import { flip } from 'svelte/animate';
+  import RangeOptionsButton from './buttons/RangeOptionsButton.svelte';
+
+  const flipDurationMs = 150;
+
+  const isProjectPlannerPage = page.url.pathname === '/';
 
   let { gauge = $bindable() } = $props();
 
-  let dragDisabled = $state(false);
+  let isStaticGauge = $state(gauge.isStatic);
 
-  const flipDurationMs = 90;
+  let movable = $derived(gauge.colors?.length > 1);
 
-  const isProjectPlannerPage = page.route.id === '/';
+  let hasAnyAffiliateURLs = $derived(
+    gauge.colors?.some((color: Color) => color?.affiliate_variant_href),
+  );
 
-  function checkForAffiliateURLs({ colors }) {
-    return colors?.some((n) => n?.affiliate_variant_href);
-  }
+  let sortableColors: Color[] = $state(getSortableColors());
 
+  let numberOfColumns = $derived.by(() => {
+    let cols = 4;
+    if (hasAnyAffiliateURLs) cols++;
+    if (sortableColors.length < 2) cols--;
+    if (!isProjectPlannerPage) {
+      cols--;
+      return cols;
+    }
+    if (showDaysInRange.value) cols++;
+    return cols;
+  });
+
+  // Handle color change from ChangeColor modal
   function onChangeColor({
     index,
     hex,
@@ -77,20 +101,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
     });
 
     sortableColors = getSortableColors();
-    modal.close();
+    dialog.close();
   }
 
-  function handleConsider(e) {
-    dragDisabled = true;
-    const {
-      items: newItems,
-      info: { source, trigger, id },
-    } = e.detail;
-
-    sortableColors = newItems;
+  // Handle drag and drop events
+  function handleConsider(e: any) {
+    sortableColors = e.detail.items;
   }
 
-  function handleFinalize(e) {
+  // On drag end, update the gauge colors
+  function handleFinalize(e: any) {
     const {
       items: newItems,
       info: { source },
@@ -98,31 +118,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     sortableColors = newItems;
 
-    gauge.colors = sortableColors.map((color) => {
+    gauge.colors = sortableColors.map((color: Color) => {
       delete color.id;
       return color;
     });
 
     gauge.schemeId = 'Custom';
-    // Ensure dragging is stopped on drag finish via pointer (mouse, touch)
-    if (source === SOURCES.POINTER) {
-      dragDisabled = false;
-    }
-  }
-  function startDrag(e) {
-    // preventing default to prevent lag on touch devices (because of the browser checking for screen scrolling)
-    e.preventDefault();
-    dragDisabled = false;
   }
 
-  let movable = $derived(gauge.colors?.length > 1);
-
-  let hasAnyAffiliateURLs = $derived(
-    checkForAffiliateURLs({ colors: gauge.colors }),
-  );
-
-  let sortableColors: Color[] = $state(getSortableColors());
-
+  // Prepare sortable colors with IDs for svelte-dnd-action
   function getSortableColors() {
     const _sortableColors = [];
     gauge.colors.forEach((color, i) => {
@@ -134,163 +138,214 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 {#if hasAnyAffiliateURLs}
   <p class="mt-4 px-2 text-sm">
-    Items purchased through links with a shopping bag icon
-    <ShoppingBagIcon class="inline size-4" />
-    help support this site by earning the developer a percentage of each sale, at
-    no additional cost to you.
+    Purchases via links with a shopping cart icon <ShoppingCartIcon
+      class="relative -top-px inline size-4"
+    /> support the developer of this web app at no extra cost to you.
   </p>
 {/if}
 
-<div class="grid grid-cols-12 gap-2 pt-2">
+<div class={['mt-4 flex flex-wrap justify-center gap-4']}>
   {#if isProjectPlannerPage}
-    <div
-      class="col-span-full flex w-fit flex-col items-start gap-1 text-left md:col-span-8"
-    >
-      <ToggleSwitch
-        bind:checked={showDaysInRange.value}
-        label={`Show number of days in ranges`}
-        details="Applies to the view below and PDF file"
-      />
+    <div class={[gauges.activeGauge?.isStatic && 'hidden']}>
+      <RangeOptionsButton />
     </div>
-  {/if}
-
-  <div
-    class="col-span-full my-2 flex flex-wrap justify-center {isProjectPlannerPage
-      ? 'md:cols-start-9 md:col-span-4 md:justify-end'
-      : ''}"
-  >
+    <Popover>
+      <Popover.Trigger
+        class="btn hover:preset-tonal-surface "
+        aria-label="View Options"
+        title="View Options"
+      >
+        <LayoutPanelTopIcon />
+        <span class="flex items-center gap-1">
+          View
+          <ChevronDownIcon size={18} />
+        </span>
+      </Popover.Trigger>
+      <Portal>
+        <Popover.Positioner>
+          <Popover.Content
+            class="card bg-surface-200-800 z-49 w-72 max-w-(--breakpoint-sm) p-2 shadow-xl"
+          >
+            {#snippet element(attributes)}
+              {#if !attributes.hidden}
+                <div {...attributes} in:safeSlide>
+                  <Popover.Description class="flex flex-col gap-4 p-2">
+                    <div class="w-fit"><ViewToggle /></div>
+                    <div class="w-fit">
+                      <ToggleSwitch
+                        bind:checked={showDaysInRange.value}
+                        label={`Show number of days in ranges`}
+                      />
+                    </div>
+                  </Popover.Description>
+                  <Popover.Arrow
+                    style="--arrow-size: calc(var(--spacing) * 4); --arrow-background: var(--color-surface-200-800);"
+                  >
+                    <Popover.ArrowTip />
+                  </Popover.Arrow>
+                </div>
+              {/if}
+            {/snippet}
+          </Popover.Content>
+        </Popover.Positioner>
+      </Portal>
+    </Popover>
+  {:else}
     <ViewToggle />
-  </div>
+  {/if}
 </div>
 
 <div
-  class="rounded-container mt-2 mb-2 overflow-hidden lg:mb-4 {localState.value
+  class="rounded-container mt-4 mb-2 overflow-hidden lg:mb-4 {preferences.value
     .layout === 'grid'
-    ? 'grid grid-cols-2 gap-1 md:grid-cols-3 xl:grid-cols-4'
+    ? 'grid grid-cols-2 gap-1 lg:grid-cols-3 xl:grid-cols-4'
     : 'flex flex-col'}"
   use:dragHandleZone={{
     items: sortableColors,
     flipDurationMs,
     type: 'gaugeCustomizer',
-    dragDisabled,
   }}
   onconsider={handleConsider}
   onfinalize={handleFinalize}
 >
   {#each sortableColors as { hex, name, brandId, yarnId, brandName, yarnName, variant_href, affiliate_variant_href, id }, index (id)}
     <div
-      class="color flex flex-wrap items-center justify-around gap-2 p-2 {localState
+      class="color flex flex-wrap items-center justify-around gap-2 p-2 {preferences
         .value.layout === 'grid'
-        ? 'rounded-container flex-auto basis-1/3 sm:basis-1/4 md:basis-1/5'
-        : ''}"
+        ? 'rounded-container flex-auto basis-1/3  sm:basis-1/4 md:basis-1/5'
+        : `${isProjectPlannerPage ? numberOfColumns < 5 && 'lg:grid lg:grid-cols-[1fr_3fr_1fr]' : 'lg:grid lg:grid-cols-[1fr_1.4fr_1fr]'}`}"
       style="background:{hex};color:{getTextColor(hex)}"
       animate:flip={{ duration: flipDurationMs }}
     >
-      {#if movable}
-        <button
-          title="Remove Color"
-          class="btn hover:preset-tonal flex flex-wrap items-center justify-center"
-          onclick={() => {
-            gauge.updateColors({
-              colors: gauge.colors.filter((_, i) => i !== index),
-            });
-            sortableColors = getSortableColors();
-            gauge.schemeId = 'Custom';
-          }}
-        >
-          <span class="text-xs">{index + 1}</span>
-          <Trash2Icon />
-        </button>
-      {/if}
+      <!-- The following empty div is necessary to center content in list view -->
+      <div></div>
 
-      <button
-        title="Move Color"
-        tabindex="-1"
-        aria-label="Crag handle for color {index + 1}"
-        class="btn-icon hover:preset-tonal handle p-2 {dragDisabled
-          ? 'cursor-grabbing'
-          : 'cursor-grab'}"
-        onmousedown={startDrag}
-        ontouchstart={startDrag}
-        use:dragHandle
-      >
-        <MoveIcon />
-      </button>
+      <div class="flex flex-auto flex-wrap items-center justify-around gap-2">
+        <div class="flex flex-wrap items-center gap-2">
+          {#if movable && !isStaticGauge}
+            <button
+              title="Remove Color"
+              class="btn hover:preset-tonal-surface flex flex-wrap items-center justify-center gap-1"
+              onclick={() => {
+                gauge.updateColors({
+                  colors: gauge.colors.filter(
+                    (_: Color, i: number) => i !== index,
+                  ),
+                });
+                sortableColors = getSortableColors();
+                gauge.schemeId = 'Custom';
+              }}
+            >
+              <span class="text-xs">{index + 1}</span>
+              <Trash2Icon size="18" />
+            </button>
+          {/if}
 
-      <button
-        class="btn hover:preset-tonal h-auto"
-        title="Choose a Color"
-        onclick={() =>
-          modal.trigger({
-            type: 'component',
-            component: {
-              ref: ChangeColor,
-              props: {
-                index,
-                hex,
-                name,
-                brandId,
-                yarnId,
-                brandName,
-                yarnName,
-                variant_href,
-                affiliate_variant_href,
-                onChangeColor,
-              },
-            },
-            options: {
-              size: 'medium',
-            },
-          })}
-      >
-        <SearchIcon />
-        <span
-          class="flex flex-col items-start justify-start text-left text-wrap"
-        >
-          <span class="text-xs">
-            {#if brandName && yarnName}
-              {brandName}
-              -
-              {yarnName}
-            {:else}
-              Find Matching Yarn
-            {/if}
-          </span>
-          <span class="text-lg leading-tight"> {name || hex}</span>
-        </span>
-      </button>
-
-      {#if affiliate_variant_href}
-        <a
-          class="btn hover:preset-tonal"
-          href={affiliate_variant_href}
-          target="_blank"
-          rel="noreferrer nofollow"
-        >
-          <ShoppingBagIcon />
-          <span class="underline">Buy</span>
-        </a>
-      {/if}
-
-      {#if isProjectPlannerPage}
-        <div class="flex gap-2">
-          {#key index}
-            <ColorRange {index} />
-          {/key}
+          <button
+            title="Move Color"
+            tabindex="-1"
+            aria-label="Crag handle for color {index + 1}"
+            class="btn-icon hover:preset-tonal-surface handle p-2"
+            use:dragHandle
+          >
+            <MoveIcon />
+          </button>
         </div>
 
-        {#if showDaysInRange.value}
-          <div
-            class="bg-surface-900/10 rounded-container flex w-fit flex-wrap items-center justify-center overflow-hidden shadow-inner"
-          >
-            <DaysInRange
-              range={gauge.ranges[index]}
-              rangeOptions={gauge.rangeOptions}
-              targets={gauge.targets}
-            />
-          </div>
+        {#if isProjectPlannerPage}
+          {#if gauge?.unit.type === 'category'}
+            <p class="min-w-[140px] p-2 text-left">
+              {gauge.ranges[index].label}
+            </p>
+          {:else}
+            <div
+              class={[
+                'flex gap-2',
+                preferences.value.layout === 'grid' ? '' : '',
+              ]}
+            >
+              {#key index}
+                <ColorRange {index} />
+              {/key}
+            </div>
+          {/if}
         {/if}
-      {/if}
+
+        <div class={[preferences.value.layout === 'list' && 'flex-auto']}>
+          <button
+            class={['btn hover:preset-tonal-surface flex h-auto justify-start']}
+            title="Choose a Color"
+            onclick={() =>
+              dialog.trigger({
+                type: 'component',
+                component: {
+                  ref: ChangeColor,
+                  props: {
+                    index,
+                    hex,
+                    name,
+                    brandId,
+                    yarnId,
+                    brandName,
+                    yarnName,
+                    variant_href,
+                    affiliate_variant_href,
+                    onChangeColor,
+                  },
+                },
+                options: {
+                  size: 'large',
+                },
+              })}
+          >
+            <SearchIcon />
+            <span
+              class="flex flex-col items-start justify-start text-left text-wrap"
+            >
+              <span class="text-xs">
+                {#if brandName && yarnName}
+                  {brandName}
+                  -
+                  {yarnName}
+                {:else}
+                  Find Matching Yarn
+                {/if}
+              </span>
+              <span class="text-lg leading-tight"> {name || hex}</span>
+            </span>
+          </button>
+        </div>
+
+        {#if affiliate_variant_href}
+          <a
+            class="btn hover:preset-tonal-surface"
+            href={affiliate_variant_href}
+            target="_blank"
+            rel="noreferrer nofollow"
+          >
+            <ShoppingCartIcon />
+            <span class="underline">Buy</span>
+          </a>
+        {/if}
+
+        {#if isProjectPlannerPage}
+          {#if showDaysInRange.value}
+            <div
+              class="bg-surface-900/10 rounded-container number-of-days-in-range flex w-fit flex-wrap items-center justify-center overflow-hidden shadow-inner"
+            >
+              <DaysInRange
+                range={gauge.ranges[index]}
+                rangeOptions={gauge?.rangeOptions}
+                targets={gauge.targets}
+                gaugeUnitType={gauge.unit.type}
+              />
+            </div>
+          {/if}
+        {/if}
+      </div>
+
+      <!-- The following empty div is necessary to center content in list view -->
+      <div></div>
     </div>
   {/each}
 </div>

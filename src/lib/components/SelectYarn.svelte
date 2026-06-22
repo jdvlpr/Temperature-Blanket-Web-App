@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -14,13 +14,21 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import { ALL_YARN_WEIGHTS } from '$lib/constants';
-  import { defaultYarn } from '$lib/state';
-  import { delay, pluralize, stringToBrandAndYarnDetails } from '$lib/utils';
-  import { brands } from '$lib/yarns/brands';
-  import { ChevronDownIcon, ListFilterIcon, XIcon } from '@lucide/svelte';
+  import { ALL_YARN_WEIGHTS } from '$lib/constants/color-constants';
+  import { brands } from '$lib/data/yarns/brands';
+  import { defaultYarn } from '$lib/state/page-state.svelte';
+  import { delay } from '$lib/utils/function-utils.svelte';
+  import { pluralize } from '$lib/utils/string-utils';
+  import { stringToBrandAndYarnDetails } from '$lib/utils/yarn-utils';
+  import { yarnBall } from '@lucide/lab';
+  import {
+    ChevronDownIcon,
+    Icon,
+    XIcon
+  } from '@lucide/svelte';
   import autocomplete from 'autocompleter';
   import { onMount, untrack } from 'svelte';
+  import HelpIcon from './buttons/HelpIcon.svelte';
 
   interface Props {
     selectedBrandId?: string;
@@ -50,6 +58,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let showingAutocomplete = $state(false);
 
   let allYarns = $state(getAllYarns());
+
+  let isSelectedYarnUnavailable = $derived.by(() => {
+    return allYarns.find(
+      (yarn) => yarn.meta.brandId === selectedBrandId && yarn.meta.yarnId === selectedYarnId,
+    )?.meta.unavailable;
+  });
 
   function onSelectedYarnWeightIdChange() {
     if (selectedBrandId || selectedYarnId) {
@@ -150,6 +164,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             }).length,
             totalBrandColorways,
           };
+          
           return {
             group: JSON.stringify(meta),
             meta: {
@@ -160,6 +175,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               numberOfColorways: yarn.colorways.reduce((a, b) => {
                 return a + b.colors.length;
               }, 0),
+              unavailable: !!yarn.colorways.every((colorway) => colorway.source?.unavailable),
             },
           };
         });
@@ -213,7 +229,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
         }
         container.style.zIndex = `12000`;
         if (maxHeight > 480) container.style.maxHeight = `480px`;
+
         container.style.overflowY = `scroll`;
+
         if (context === 'modal') {
           container.style.position = 'fixed';
           container.style.top = `${inputRect.bottom}px`;
@@ -241,9 +259,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
           }
         }
 
-        div.innerHTML = `<div class="inline-block ml-4">
-                            ${yarn} <span class="text-sm opacity-60">(${yarnWeight ? `${yarnWeight}, ` : ''}${item.meta.numberOfColorways.toLocaleString()} colorways)</span>
-                        </div>`;
+        div.innerHTML = `<div class="inline-block ml-4">`;
+        div.innerHTML += `${yarn} <span class="text-sm opacity-60">(${yarnWeight ? `${yarnWeight}, ` : ''}${item.meta.numberOfColorways.toLocaleString()} colorways)</span>`;
+        
+        if (item.meta.unavailable) {
+          div.innerHTML += ` <span class="text-sm italic opacity-60">Link Unavailable</span>`;
+        }
+        
+        div.innerHTML += `</div>`;
         div.dataset.id = `${item.meta.brandId}-${item.meta.yarnId}`;
         div.classList.add('selectable-yarn-list-item');
         return div;
@@ -320,108 +343,115 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div
-  class="w-full flex flex-col justify-start md:col-span-2 gap-1"
+  class="label flex w-full flex-col justify-start md:col-span-2"
   bind:this={inputGroup}
 >
-  <span class="flex items-center gap-1">
-    <ListFilterIcon class="size-4" />
-    Yarn Name
-  </span>
+  <span class="label-text"> Yarn Name </span>
 
-  <div class="flex flex-wrap items-center justify-center gap-1">
-    <div class="input-group grid-cols-[1fr_auto_auto] w-full">
-      <input
-        bind:this={inputElement}
-        class="truncate ig-input"
-        {disabled}
-        id="input-select-yarn"
-        type="text"
-        name="yarn-filter-search"
-        autocomplete="off"
-        onfocus={async () => {
-          showingAutocomplete = true;
+  <div class="input-group w-full grid-cols-[auto_1fr_auto_auto]">
+    <span class="ig-cell">
+      <Icon iconNode={yarnBall} />
+    </span>
+    <input
+      bind:this={inputElement}
+      class="ig-input truncate"
+      {disabled}
+      id="input-select-yarn"
+      type="text"
+      name="yarn-filter-search"
+      autocomplete="off"
+      onfocus={async () => {
+        showingAutocomplete = true;
 
-          if (selectedBrandId && selectedYarnId) {
-            await delay(100);
-            const element = document.querySelector(
-              `[data-id="${selectedBrandId}-${selectedYarnId}"]`,
-            );
-            if (element) {
-              const topPos = element.offsetTop;
-              element.classList.add('selected');
-              element.setAttribute('aria-selected', 'true');
-              setTimeout(function () {
-                document.getElementsByClassName('autocomplete')[0].scrollTo({
-                  top: topPos,
-                  behavior: 'smooth',
-                });
-              }, 10);
-            }
-          } else if (selectedBrandId) {
-            await delay(100);
-            const element = document.querySelector(
-              `[data-id="${selectedBrandId}"]`,
-            );
-            if (element) {
-              const topPos = element.offsetTop;
-              setTimeout(function () {
-                document.getElementsByClassName('autocomplete')[0].scrollTo({
-                  top: topPos,
-                  behavior: 'smooth',
-                });
-              }, 10);
-            }
-            if (inputValue.includes('(')) {
-              inputValue = inputValue.split('(')?.[0]?.trim() || inputValue;
-            }
+        if (selectedBrandId && selectedYarnId) {
+          await delay(100);
+          const element = document.querySelector(
+            `[data-id="${selectedBrandId}-${selectedYarnId}"]`,
+          );
+          if (element) {
+            const topPos = element.offsetTop;
+            element.classList.add('selected');
+            element.setAttribute('aria-selected', 'true');
+            setTimeout(function () {
+              document.getElementsByClassName('autocomplete')[0].scrollTo({
+                top: topPos,
+                behavior: 'smooth',
+              });
+            }, 10);
           }
+        } else if (selectedBrandId) {
+          await delay(100);
+          const element = document.querySelector(
+            `[data-id="${selectedBrandId}"]`,
+          );
+          if (element) {
+            const topPos = element.offsetTop;
+            setTimeout(function () {
+              document.getElementsByClassName('autocomplete')[0].scrollTo({
+                top: topPos,
+                behavior: 'smooth',
+              });
+            }, 10);
+          }
+          if (inputValue.includes('(')) {
+            inputValue = inputValue.split('(')?.[0]?.trim() || inputValue;
+          }
+        }
+      }}
+      onblur={() => (showingAutocomplete = false)}
+      bind:value={inputValue}
+      placeholder="{allYarns.length} {pluralize(
+        'Yarn',
+        allYarns.length,
+      )} ({allYarns
+        .reduce((a, b) => {
+          return a + b.meta.numberOfColorways;
+        }, 0)
+        .toLocaleString()} colorways)"
+    />
+    {#if !showingAutocomplete}
+      <button
+        aria-label="Show All Yarns"
+        {disabled}
+        class="ig-btn hover:preset-tonal-surface"
+        onclick={() => {
+          forceDisplayAll = true;
+          inputElement.focus();
         }}
-        onblur={() => (showingAutocomplete = false)}
-        bind:value={inputValue}
-        placeholder="{allYarns.length} {pluralize(
-          'Yarn',
-          allYarns.length,
-        )} ({allYarns
-          .reduce((a, b) => {
-            return a + b.meta.numberOfColorways;
-          }, 0)
-          .toLocaleString()} colorways)"
-      />
-      {#if !showingAutocomplete}
-        <button
-          aria-label="Show All Yarns"
-          {disabled}
-          class="ig-btn hover:preset-tonal"
-          onclick={() => {
-            forceDisplayAll = true;
-            inputElement.focus();
-          }}
-        >
-          <ChevronDownIcon />
-        </button>
-      {/if}
-      {#if inputValue.length || showingAutocomplete}
-        <button
-          aria-label="Clear"
-          {disabled}
-          class="ig-btn hover:preset-tonal"
-          onclick={async () => {
-            inputValue = '';
-            selectedBrandId = '';
-            selectedYarnId = '';
-            await delay(10);
-            if (!inputValue.length) showingAutocomplete = false;
-            document.getElementById('input-select-yarn')?.focus();
-            onselectautocomplete({
-              selectedBrandId,
-              selectedYarnId,
-            });
-          }}
-        >
-          <XIcon />
-        </button>
-      {/if}
-    </div>
+      >
+        <ChevronDownIcon />
+      </button>
+    {/if}
+    {#if inputValue.length || showingAutocomplete}
+      <button
+        aria-label="Clear"
+        {disabled}
+        class="ig-btn hover:preset-tonal-surface"
+        onclick={async () => {
+          inputValue = '';
+          selectedBrandId = '';
+          selectedYarnId = '';
+          await delay(10);
+          if (!inputValue.length) showingAutocomplete = false;
+          document.getElementById('input-select-yarn')?.focus();
+          onselectautocomplete({
+            selectedBrandId,
+            selectedYarnId,
+          });
+        }}
+      >
+        <XIcon />
+      </button>
+    {/if}
   </div>
   <div bind:this={autocompleteContainer} class="text-left"></div>
+  {#if isSelectedYarnUnavailable}
+    <div class="w-fit">
+      <HelpIcon href="/documentation#link-unavailable">
+        {#snippet text()}
+          <span class="font-normal">Link Unavailable</span>
+        {/snippet}
+      </HelpIcon>
+    </div>
+  {/if}
 </div>

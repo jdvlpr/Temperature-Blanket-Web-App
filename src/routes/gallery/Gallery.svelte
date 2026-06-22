@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -13,28 +13,29 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script>
+<script lang="ts">
   import { PUBLIC_WORDPRESS_BASE_URL } from '$env/static/public';
   import SelectYarn from '$lib/components/SelectYarn.svelte';
   import ToTopButton from '$lib/components/buttons/ToTopButton.svelte';
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
   import ViewToggleBindable from '$lib/components/buttons/ViewToggleBindable.svelte';
-  import { ICONS } from '$lib/constants';
-  import { previews } from '$lib/state';
+  import { previews } from '$lib/state/preview-state.svelte';
   import {
     fetchPopularProjects,
     fetchProjects,
-    getColorsFromInput,
-    getTitleFromLocationsMeta,
-  } from '$lib/utils';
-  import { onMount } from 'svelte';
-  import { galleryState } from './state.svelte';
+  } from '$lib/utils/gallery-utils';
+  import { getColorsFromInput } from '$lib/utils/color-utils';
+  import { getTitleFromLocationsMeta } from '$lib/utils/project-utils.svelte';
   import {
     ArrowUpDownIcon,
     ChevronRightIcon,
-    SearchIcon,
+    ClockIcon,
+    EarthIcon,
+    Grid3x3,
     XIcon,
   } from '@lucide/svelte';
+  import { onMount } from 'svelte';
+  import { galleryState } from './state.svelte';
 
   let first = 40;
   let loading = $state(true);
@@ -140,28 +141,73 @@ If not, see <https://www.gnu.org/licenses/>. -->
         });
     });
   }
+
+  let searchTimeout: any;
+
+  function debouncedSearch() {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(async () => {
+      galleryState.projects = [];
+      galleryState.displayedProjects = [];
+      loading = true;
+
+      const yarnSearch = galleryState.getYarnSearch({
+        brandId: galleryState.filteredBrandId,
+        yarnId: galleryState.filteredYarnId,
+      });
+
+      try {
+        let results = await fetchProjects({
+          search: galleryState.search,
+          order: galleryState.orderBy,
+          yarn: yarnSearch,
+          pattern: galleryState.filteredPatternType,
+        });
+
+        galleryState.gallery.pageInfo = results.pageInfo;
+        if (galleryState.search) {
+          galleryState.projects = results.edges.flatMap((item) => item.node);
+        } else {
+          galleryState.projects.push(
+            ...results.edges.flatMap((item) => item.node),
+          );
+          galleryState.projects = galleryState.projects;
+        }
+        galleryState.displayedProjects = getFilteredProjects();
+      } catch (e) {
+        console.error('Search failed:', e);
+      } finally {
+        loading = false;
+      }
+    }, 500);
+  }
 </script>
 
 <div class="flex flex-col justify-center gap-8">
   <div class="inline-grid gap-2 text-center">
-    <div class="my-2">
-      <h2 class="h2 text-gradient">Featured Projects</h2>
-      <label>
-        <span>Popular during the past</span>
-        <select
-          bind:value={galleryState.timePeriod}
-          class="select mx-auto w-fit min-w-[90px]"
-          onchange={() => {
-            galleryState.popularProjects = [];
-            fetchPopularProjectsWrapper();
-            featuredProjectsEl.scrollLeft = 0;
-          }}
-        >
-          <option value={0.0357}>day</option>
-          <option value={0.25}>week</option>
-          <option value={1}>month</option>
-          <option value={12}>year</option>
-        </select>
+    <div class="my-2 flex flex-col items-center">
+      <p class="text-surface-700-300 text-xl font-semibold">
+        Featured Projects
+      </p>
+      <label class="label">
+        <span class="label-text">Popular in the last</span>
+        <div class="relative flex w-fit items-center">
+          <ClockIcon class="pointer-events-none absolute left-2" />
+          <select
+            bind:value={galleryState.timePeriod}
+            class="select mx-auto w-fit min-w-[100px] truncate pl-10"
+            onchange={() => {
+              galleryState.popularProjects = [];
+              fetchPopularProjectsWrapper();
+              featuredProjectsEl.scrollLeft = 0;
+            }}
+          >
+            <option value={0.0357}>Day</option>
+            <option value={0.25}>Week</option>
+            <option value={1}>Month</option>
+            <option value={12}>Year</option>
+          </select>
+        </div>
       </label>
     </div>
 
@@ -170,8 +216,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
       bind:this={featuredProjectsEl}
     >
       {#if !galleryState.popularProjects.length}
-        <!-- <div class="my-36 mx-auto"><Spinner /></div> -->
-
         {#each Array(5)}
           <div
             class="placeholder rounded-container bg-surface-100 dark:bg-surface-900 h-[324px] w-[245px] shrink-0 animate-pulse snap-center"
@@ -182,7 +226,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {@const title = getTitleFromLocationsMeta(meta.locations)}
           <a
             href="/gallery/{id}"
-            class="rounded-container group hover:preset-tonal mx-auto flex min-h-[200px] max-w-[245px] shrink-0 snap-center flex-col flex-wrap items-center justify-start gap-1 p-2 text-center lg:max-w-[350px]"
+            class="rounded-container group hover:preset-tonal-surface mx-auto flex min-h-[200px] max-w-[245px] shrink-0 snap-center flex-col flex-wrap items-center justify-start gap-1 p-2 text-center lg:max-w-[350px]"
           >
             <img
               src={featured_image_src}
@@ -198,12 +242,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
   </div>
 
-  <div class=" flex flex-col gap-2 text-center">
+  <div class="flex flex-col gap-2 px-2 text-center lg:px-0">
     <div
       bind:this={scrollContainer}
       class="flex scroll-mt-[70px] flex-wrap items-end justify-center text-center"
     >
-      <h2 class="h2 text-gradient">All Projects</h2>
+      <p class="text-surface-700-300 text-xl font-semibold">All Projects</p>
       <div class="mb-2 flex w-full justify-center">
         {#if totalProjects === 0}
           <p class="animate-pulse text-xs">...</p>
@@ -213,13 +257,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </p>
         {/if}
       </div>
-      <div class="grid w-full grid-cols-12 items-end gap-4 px-4">
+      <div class="grid w-full grid-cols-12 items-end gap-4">
         <div class="col-span-12 w-full md:col-span-7">
           <SelectYarn
             preselectDefaultYarn={false}
             disabled={loading}
             bind:selectedBrandId={galleryState.filteredBrandId}
             bind:selectedYarnId={galleryState.filteredYarnId}
+            onselectautocomplete={debouncedSearch}
           />
         </div>
 
@@ -230,6 +275,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <ToggleSwitch
               disabled={loading}
               bind:checked={galleryState.palettesContainOnlyFilteredYarn}
+              onchange={debouncedSearch}
               label="Only This {galleryState.filteredBrandId &&
               galleryState.filteredYarnId
                 ? 'Yarn'
@@ -242,30 +288,26 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </div>
         {/if}
 
-        <div
-          class="col-span-12 flex flex-col justify-start gap-1 md:col-span-5"
-        >
-          <span class="flex items-center gap-1">
-            <SearchIcon class="size-4" />
-            Search Projects
-          </span>
-          <div class="input-group grid-cols-[1fr_auto]">
+        <div class="label col-span-12 md:col-span-5">
+          <span class="label-text">Search Projects</span>
+          <div class="input-group grid-cols-[auto_1fr_auto]">
+            <span class="ig-cell"><EarthIcon /></span>
             <input
-              disabled={loading}
               type="text"
               class="ig-input w-full truncate"
               autocomplete="off"
               placeholder="e.g., Kansas, 2003"
               bind:value={galleryState.search}
+              oninput={debouncedSearch}
             />
 
             {#if showSearchReset}
               <button
-                disabled={loading}
-                class="ig-btn hover:preset-tonal"
+                class="ig-btn hover:preset-tonal-surface"
                 title="Reset Search"
                 onclick={() => {
                   galleryState.search = '';
+                  debouncedSearch();
                 }}
               >
                 <XIcon />
@@ -275,104 +317,44 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </div>
 
         <label class="label col-span-6 w-full md:col-span-3">
-          <span class="flex items-center">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-              class="mr-1 h-4 w-4"
+          <span class="label-text"> Pattern Type </span>
+          <div class="relative flex items-center">
+            <Grid3x3 class="pointer-events-none absolute left-2" />
+            <select
+              disabled={loading}
+              class="select truncate pl-10"
+              id="select-gallery-pattern-type"
+              bind:value={galleryState.filteredPatternType}
+              onchange={debouncedSearch}
             >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z"
-              />
-            </svg>
-            Pattern Type
-          </span>
-          <select
-            disabled={loading}
-            class="select truncate"
-            id="select-gallery-pattern-type"
-            bind:value={galleryState.filteredPatternType}
-          >
-            <option value="">Any Pattern</option>
-            {#each previews.all as { name, wpTagSlug }}
-              <option value={wpTagSlug}>{name}</option>
-            {/each}
-          </select>
+              <option value="">Any Pattern</option>
+              {#each previews.all as { name, wpTagSlug }}
+                <option value={wpTagSlug}>{name}</option>
+              {/each}
+            </select>
+          </div>
         </label>
 
         <label class="label col-span-6 w-full md:col-span-3">
-          <span class="flex items-center gap-1">
-            <ArrowUpDownIcon class="size-4" />
-            Order By
-          </span>
-          <select
-            class="select truncate"
-            bind:value={galleryState.orderBy}
-            disabled={loading}
-          >
-            <option value="DESC" selected>Newest First</option>
-            <option value="ASC">Oldest First</option>
-          </select>
-        </label>
-
-        <div
-          class="col-span-12 flex justify-center {galleryState.filteredBrandId ||
-          galleryState.filteredYarnId
-            ? 'md:col-span-4 md:col-start-5'
-            : 'md:col-span-3 md:col-start-10'}"
+          <span class="label-text"> Order By </span>
+          <div class="relative flex items-center">
+            <ArrowUpDownIcon class="pointer-events-none absolute left-2" />
+            <select
+              class="select truncate pl-10"
+              bind:value={galleryState.orderBy}
+              onchange={debouncedSearch}
+              disabled={loading}
+            >
+              <option value="DESC" selected>Newest First</option>
+              <option value="ASC">Oldest First</option>
+            </select>
+            <div class="relative flex items-center"></div>
+          </div></label
         >
-          <button
-            disabled={loading}
-            class="btn preset-filled flex w-full items-center"
-            onclick={async () => {
-              projectsList.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start',
-              });
-              galleryState.projects = [];
-              galleryState.displayedProjects = [];
-              loading = true;
-              const yarnSearch = galleryState.getYarnSearch({
-                brandId: galleryState.filteredBrandId,
-                yarnId: galleryState.filteredYarnId,
-              });
-
-              let results = await fetchProjects({
-                search: galleryState.search,
-                order: galleryState.orderBy,
-                yarn: yarnSearch,
-                pattern: galleryState.filteredPatternType,
-              });
-
-              if (galleryState.search) {
-                galleryState.gallery.pageInfo = results.pageInfo;
-                galleryState.projects = results.edges.flatMap(
-                  (item) => item.node,
-                );
-              } else {
-                galleryState.gallery.pageInfo = results.pageInfo;
-                galleryState.projects.push(
-                  ...results.edges.flatMap((item) => item.node),
-                );
-                galleryState.projects = galleryState.projects;
-              }
-              galleryState.displayedProjects = getFilteredProjects();
-              loading = false;
-            }}
-          >
-            Search
-            <ChevronRightIcon />
-          </button>
-        </div>
       </div>
     </div>
     <div
-      class="flex scroll-mt-[58px] flex-col items-center lg:scroll-mt-[44px]"
+      class="flex min-h-[70vh] scroll-mt-[58px] flex-col items-center lg:scroll-mt-[44px]"
       bind:this={projectsList}
     >
       <div class="mx-auto my-2">
@@ -388,7 +370,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {@const title = getTitleFromLocationsMeta(locations)}
           <a
             href="/gallery/{databaseId}"
-            class="rounded-container group hover:preset-tonal flex gap-1 p-2 text-center {layout ===
+            class="rounded-container group hover:preset-tonal-surface flex gap-1 p-2 text-center {layout ===
             'grid'
               ? 'flex-col items-center justify-center'
               : 'w-full flex-col items-center justify-start'}"

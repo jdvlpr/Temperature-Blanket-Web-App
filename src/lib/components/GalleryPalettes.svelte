@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -41,22 +41,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import PlaceholderPalettes from '$lib/components/PlaceholderPalettes.svelte';
   import SelectYarn from '$lib/components/SelectYarn.svelte';
   import Spinner from '$lib/components/Spinner.svelte';
-  import { ICONS } from '$lib/constants';
-  import { isDesktop } from '$lib/state';
-  import {
-    fetchProjects,
-    getPalettesFromProjects,
-    recordPageView,
-  } from '$lib/utils';
+  import { ICONS } from '$lib/constants/icon-constants';
+  import { safeSlide } from '$lib/features/transitions/safeSlide';
+  import { isDesktop } from '$lib/state/page-state.svelte';
+  import { getPalettesFromProjects } from '$lib/utils/color-utils';
+  import { fetchProjects, recordPageView } from '$lib/utils/gallery-utils';
   import {
     ArrowUpDownIcon,
-    ChevronRightIcon,
+    EarthIcon,
     PlusIcon,
-    SearchIcon,
-    XIcon,
+    XIcon
   } from '@lucide/svelte';
   import { onMount } from 'svelte';
-  import { slide } from 'svelte/transition';
 
   interface Props {
     updateGauge?: any;
@@ -70,6 +66,39 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let loading = $state(true);
   let projectsList = $state();
   let isLoadingMore = $state(false);
+
+  let searchTimeout: any;
+
+  function debouncedSearch() {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(async () => {
+      galleryPalettesState.projects = [];
+      galleryPalettesState.palettes = [];
+      loading = true;
+      const yarnSearch = galleryPalettesState.getYarnSearch({
+        brandId: galleryPalettesState.filteredBrandId,
+        yarnId: galleryPalettesState.filteredYarnId,
+      });
+
+      let results = await fetchProjects({
+        search: galleryPalettesState.search,
+        order: galleryPalettesState.orderBy,
+        yarn: yarnSearch,
+      });
+
+      galleryPalettesState.gallery.pageInfo = results.pageInfo;
+      galleryPalettesState.projects = results.edges.flatMap(
+        (item) => item.node,
+      );
+      galleryPalettesState.palettes = getPalettesFromProjects({
+        projects: galleryPalettesState.projects,
+        selectedBrandId: galleryPalettesState.filteredBrandId,
+        selectedYarnId: galleryPalettesState.filteredYarnId,
+        palettesContainOnlyFilteredYarn: galleryPalettesState.palettesContainOnlyFilteredYarn,
+      });
+      loading = false;
+    }, 500);
+  }
 
   onMount(async () => {
     if (!galleryPalettesState.projects.length) {
@@ -105,18 +134,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div class=" flex flex-wrap items-end justify-center gap-2 pb-2 text-center">
-  <Expand
-    bind:isExpanded={filtersExpanded}
-    more="Show Filters"
-    less="Hide Filters"
-    iconLess={ICONS.filter}
-    iconMore={ICONS.filter}
+  <Expand bind:isExpanded={filtersExpanded} label="{ICONS.filter} Filters"
   ></Expand>
 
   {#if filtersExpanded}
     <div
       class="grid w-full grid-cols-12 items-end justify-center gap-4 px-2"
-      transition:slide
+      transition:safeSlide
     >
       <div class="col-span-12 w-full md:col-span-5">
         <SelectYarn
@@ -124,6 +148,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           disabled={loading}
           bind:selectedBrandId={galleryPalettesState.filteredBrandId}
           bind:selectedYarnId={galleryPalettesState.filteredYarnId}
+          onselectautocomplete={debouncedSearch}
           context="modal"
         />
       </div>
@@ -135,6 +160,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <ToggleSwitch
             disabled={loading}
             bind:checked={galleryPalettesState.palettesContainOnlyFilteredYarn}
+            onchange={debouncedSearch}
             label="Only This {galleryPalettesState.filteredBrandId &&
             galleryPalettesState.filteredYarnId
               ? 'Yarn'
@@ -147,30 +173,28 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </div>
       {/if}
 
-      <div
-        class="col-span-12 flex w-full flex-col justify-start gap-1 md:col-span-3"
-      >
-        <span class="flex items-center gap-1">
-          <SearchIcon class="size-4" />
-          Search Projects
-        </span>
-        <div class="input-group grid-cols-[1fr_auto]">
+      <div class="col-span-12 flex w-full flex-col justify-start md:col-span-3">
+        <span class="label-text text-left"> Search Projects </span>
+        <div class="input-group grid-cols-[auto_1fr_auto]">
+          <span class="ig-cell">
+            <EarthIcon />
+          </span>
           <input
             type="text"
             class="ig-input w-full truncate"
             autocomplete="off"
-            disabled={loading}
             placeholder="e.g., Kansas, 2003"
             bind:value={galleryPalettesState.search}
+            oninput={debouncedSearch}
           />
 
           {#if showSearchReset}
             <button
-              disabled={loading}
-              class="ig-btn hover:preset-tonal"
+              class="ig-btn hover:preset-tonal-surface"
               title="Reset Search"
               onclick={() => {
                 galleryPalettesState.search = '';
+                debouncedSearch();
               }}
             >
               <XIcon />
@@ -180,74 +204,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </div>
 
       <label class="label col-span-6 w-full md:col-span-2">
-        <span class="flex items-center gap-1">
-          <ArrowUpDownIcon class="size-4" />
-          Order By
-        </span>
-        <select
-          class="select truncate"
-          bind:value={galleryPalettesState.orderBy}
-          disabled={loading}
-        >
-          <option value="DESC" selected>Newest First</option>
-          <option value="ASC">Oldest First</option>
-        </select>
+        <span class="label-text flex items-center"> Order By </span>
+        <div class="relative flex items-center">
+          <ArrowUpDownIcon class="absolute left-2" />
+          <select
+            class="select truncate pl-10"
+            bind:value={galleryPalettesState.orderBy}
+            onchange={debouncedSearch}
+            disabled={loading}
+          >
+            <option value="DESC" selected>Newest First</option>
+            <option value="ASC">Oldest First</option>
+          </select>
+        </div>
       </label>
-
-      <div
-        class="col-span-12 flex w-full justify-center md:col-span-2 {galleryPalettesState.filteredBrandId ||
-        galleryPalettesState.filteredYarnId
-          ? 'md:col-start-11'
-          : ''}"
-      >
-        <button
-          disabled={loading}
-          class="btn preset-filled flex w-full items-center"
-          onclick={async () => {
-            projectsList.scrollIntoView({
-              behavior: 'smooth',
-              block: 'start',
-            });
-            galleryPalettesState.projects = [];
-            galleryPalettesState.palettes = [];
-            loading = true;
-            const yarnSearch = galleryPalettesState.getYarnSearch({
-              brandId: galleryPalettesState.filteredBrandId,
-              yarnId: galleryPalettesState.filteredYarnId,
-            });
-
-            let results = await fetchProjects({
-              search: galleryPalettesState.search,
-              order: galleryPalettesState.orderBy,
-              yarn: yarnSearch,
-            });
-
-            if (galleryPalettesState.search) {
-              galleryPalettesState.gallery.pageInfo = results.pageInfo;
-              galleryPalettesState.projects = results.edges.flatMap(
-                (item) => item.node,
-              );
-            } else {
-              galleryPalettesState.gallery.pageInfo = results.pageInfo;
-              galleryPalettesState.projects.push(
-                ...results.edges.flatMap((item) => item.node),
-              );
-              galleryPalettesState.projects = galleryPalettesState.projects;
-            }
-            galleryPalettesState.palettes = getPalettesFromProjects({
-              projects: galleryPalettesState.projects,
-              selectedBrandId: galleryPalettesState.filteredBrandId,
-              selectedYarnId: galleryPalettesState.filteredYarnId,
-              palettesContainOnlyFilteredYarn:
-                galleryPalettesState.palettesContainOnlyFilteredYarn,
-            });
-            loading = false;
-          }}
-        >
-          Search
-          <ChevronRightIcon />
-        </button>
-      </div>
     </div>
   {/if}
 </div>

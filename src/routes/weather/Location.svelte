@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -13,27 +13,26 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script module>
+<script module lang="ts">
   // Validates location id
 
   class WeatherLocationState {
     validId = $state(false);
-    inputLocation = $state(null);
+    inputLocation: HTMLInputElement | null = $state(null);
   }
 
   export const weatherLocationState = new WeatherLocationState();
 </script>
 
 <script lang="ts">
-  import { goto } from '$app/navigation';
   import { page } from '$app/state';
-  import { NO_DATA_SRTM3 } from '$lib/constants';
-  import { project } from '$lib/state';
+  import { NO_DATA_SRTM3 } from '$lib/constants/location-constants';
+  import { project } from '$lib/state/project-state.svelte';
+  import { displayGeoNamesErrorMessage } from '$lib/utils/error-utils.svelte';
   import {
-    displayGeoNamesErrorMessage,
     getSuggestions,
     renderResult,
-  } from '$lib/utils';
+  } from '$lib/utils/location-utils.svelte';
   import { MapPinIcon, SearchIcon, XIcon } from '@lucide/svelte';
   import autocomplete from 'autocompleter';
   import { onMount } from 'svelte';
@@ -42,16 +41,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { fetchData } from './GetWeather.svelte';
 
   let searching = $state(false); // Autocomplete searching status
-  let showReset = $state(false);
+
   let locationGroup = $state();
 
   let navigatorAvailable = $state(true);
 
-  $effect(() => {
-    if (weatherLocationState.inputLocation) {
-      showReset =
-        !searching && weatherLocationState.inputLocation?.value?.length > 1;
-    }
+  let showResetKey = $state(false);
+  // Whether or not the clear input text button should appear
+  let showReset = $derived.by(() => {
+    showResetKey;
+    return (
+      !searching &&
+      (weatherLocationState.inputLocation?.value?.length ?? 0) > 1
+    );
   });
 
   let hasError = $derived(
@@ -66,7 +68,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     }
     // Setup the autocomplete location
     autocomplete({
-      input: weatherLocationState.inputLocation,
+      input: weatherLocationState.inputLocation!,
       minLength: 2,
       debounceWaitMs: 550,
       showOnFocus: false,
@@ -113,6 +115,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         await fetchData();
         weatherState.activeLocationID = item.id;
         weatherLocationState.inputLocation.value = '';
+        showResetKey = !showResetKey;
         weatherLocationState.validId = true;
       },
     });
@@ -126,6 +129,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }); // End of onMount
 
   function validate() {
+    const value = weatherLocationState.inputLocation?.value || '';
+
+    // Check to see if the user has selected the location input text
+    let hasUserSelectedInputValue = false;
+    if (typeof window.getSelection != 'undefined')
+      hasUserSelectedInputValue = window.getSelection()?.toString() === value;
+
+    // If the input has at least two characters and is not selected, show the searching icon
+    if (value.length > 1 && !hasUserSelectedInputValue) {
+      searching = true;
+    } else {
+      searching = false;
+    }
+
     if (
       !weatherState.weatherLocations?.find(
         (item) => item.id === weatherState.activeLocationID,
@@ -135,7 +152,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       return;
     }
 
-    if (weatherLocationState.inputLocation?.value?.length < 2) {
+    if (value.length < 2) {
       invalidate();
       return;
     }
@@ -227,9 +244,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   };
 </script>
 
-<div class="flex flex-wrap items-end justify-center gap-x-4 gap-y-2 py-2">
-  <div class="flex w-full max-w-screen-sm flex-col gap-1 text-left">
-    <p>
+<div class="grid grid-cols-1 gap-4 py-2">
+  <label class="label">
+    <span class="label-text">
       {#if hasError}
         <span class="text-error-900-100">Choose a result</span>
       {:else if weatherLocationState.inputLocation?.value}
@@ -237,7 +254,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {:else}
         Search for a city, region, or landmark
       {/if}
-    </p>
+    </span>
     <div
       class="input-group grid-cols-[auto_1fr_auto]"
       bind:this={locationGroup}
@@ -247,7 +264,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </div>
       <input
         type="text"
-        id="location-0"
+        id="location-weather"
         class="ig-input truncate"
         autocomplete="off"
         placeholder={project.status.loading ? 'Loading...' : 'Enter a place'}
@@ -275,50 +292,47 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </g>
           </svg>
         </div>
-      {/if}
-
-      {#if showReset}
+      {:else if showReset}
         <button
-          class="ig-btn hover:preset-tonal"
+          class="ig-btn hover:preset-tonal-surface"
           title="Reset Location Search"
           onclick={async () => {
             weatherLocationState.inputLocation.value = '';
             // $location.label = "";
             // $location.id = null;
+            showResetKey = !showResetKey;
             weatherLocationState.validId = false;
             if (document.querySelector('.autocomplete'))
               document.querySelector('.autocomplete').remove();
-            await goto('?');
+            // await goto('?');
+            // showReset = false;
             weatherLocationState.inputLocation.focus();
           }}
         >
           <XIcon />
         </button>
+      {:else if navigatorAvailable}
+        <button
+          class="ig-btn hover:preset-tonal-surface"
+          title="Use My Location"
+          onclick={async () => {
+            weatherLocationState.inputLocation.value = 'Loading...';
+            navigator.geolocation.getCurrentPosition(
+              async (response) => {
+                await setLocationFromCoords({
+                  coords: response.coords,
+                });
+                weatherLocationState.inputLocation.value = '';
+              },
+              (error) => {
+                weatherLocationState.inputLocation.value = '';
+              },
+            );
+          }}
+        >
+          <MapPinIcon /> <span class="hidden sm:inline">My Location</span>
+        </button>
       {/if}
     </div>
-  </div>
-
-  {#if navigatorAvailable}
-    <button
-      class="btn hover:preset-tonal relative flex items-center gap-1 lg:-top-1"
-      title="Use My Location"
-      onclick={async () => {
-        weatherLocationState.inputLocation.value = 'Loading...';
-        navigator.geolocation.getCurrentPosition(
-          async (response) => {
-            await setLocationFromCoords({
-              coords: response.coords,
-            });
-            weatherLocationState.inputLocation.value = '';
-          },
-          (error) => {
-            weatherLocationState.inputLocation.value = '';
-          },
-        );
-      }}
-    >
-      <MapPinIcon />
-      Use My Location
-    </button>
-  {/if}
+  </label>
 </div>

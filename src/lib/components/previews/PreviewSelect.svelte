@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -15,15 +15,32 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import { browser } from '$app/environment';
-  import { THEMES } from '$lib/constants';
-  import { localState, previews } from '$lib/state';
-  import { onDestroy, onMount } from 'svelte';
+  import { THEMES } from '$lib/constants/page-constants';
+  import { previews } from '$lib/state/preview-state.svelte';
+  import { preferences } from '$lib/storage/preferences.svelte';
+  import { onDestroy, onMount, tick } from 'svelte';
 
   let theme = $state(
-    getTheme(THEMES.find((n) => n.id === localState.value.theme.mode)),
+    getTheme(THEMES.find((n) => n.id === preferences.value.theme.mode)),
   );
 
   let activePreviewSelectId = $state(previews.activeId);
+
+  // Update theme when the system theme changes
+  function handleColorSchemeChange() {
+    theme = getTheme(preferences.value.theme.mode || 'system');
+  }
+
+  function getTheme(id) {
+    if (id !== 'system') return id;
+    if (window.matchMedia('(prefers-color-scheme: dark)').matches)
+      return 'dark';
+    return 'light';
+  }
+
+  function onChangePattern(newId) {
+    previews.activeId = newId;
+  }
 
   onMount(() => {
     window
@@ -38,18 +55,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
       .removeEventListener('change', handleColorSchemeChange);
   });
 
-  // Update theme when the system theme changes
-  function handleColorSchemeChange() {
-    theme = getTheme(localState.value.theme.mode || 'system');
-  }
-
-  function getTheme(id) {
-    if (id !== 'system') return id;
-    if (window.matchMedia('(prefers-color-scheme: dark)').matches)
-      return 'dark';
-    return 'light';
-  }
-
   $effect(() => {
     if (previews.activeId !== activePreviewSelectId)
       activePreviewSelectId = previews.activeId;
@@ -57,7 +62,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   // Update theme when user changes the theme mode
   $effect(() => {
-    theme = getTheme(localState.value.theme.mode || 'system');
+    theme = getTheme(preferences.value.theme.mode || 'system');
   });
 </script>
 
@@ -68,7 +73,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
       id="select-pattern-type"
       value={activePreviewSelectId}
       onchange={(e) => {
-        previews.activeId = e.target.value;
+        onChangePattern(e.target.value);
+        tick().then(() => {
+          const activePreviewBtn = document.getElementById(
+            'active-preview-button',
+          );
+          if (activePreviewBtn) {
+            activePreviewBtn.scrollIntoView({
+              behavior: 'smooth',
+              block: 'nearest',
+              inline: 'center',
+            });
+          }
+        });
       }}
     >
       {#each previews.all as { name, id }}
@@ -78,27 +95,28 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </label>
 
   <div
-    class="preview-image-select flex flex-wrap items-center justify-center gap-2"
+    class="relative mx-auto my-2 flex w-fit snap-x justify-start overflow-auto pb-3"
   >
     {#each previews.all as { img, name, id }}
       {#if img}
         {#key theme}
           <button
             class={[
-              'rounded-container flex snap-center flex-col items-center justify-center gap-2 p-4',
+              'relative mx-1 shrink-0 snap-center rounded p-2',
               id === previews.activeId
-                ? 'bg-primary-300 dark:bg-primary-700 selected shadow-sm'
-                : 'preset-tonal hover:preset-tonal-primary',
+                ? 'bg-primary-200 dark:bg-primary-800 selected shadow-sm'
+                : 'hover:preset-tonal-surface',
             ]}
+            id={previews.activeId === id ? 'active-preview-button' : ''}
             onclick={() => {
-              previews.activeId = id;
+              onChangePattern(id);
             }}
-            title="Preview {name} Design"
+            title="Preview {name} Layout"
           >
             <img
               src={img[theme]}
               alt={name}
-              class="size-[48px] opacity-40"
+              class="size-[52px] opacity-40"
               class:!opacity-100={id === previews.activeId}
             />
           </button>

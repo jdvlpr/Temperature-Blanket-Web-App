@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -30,7 +30,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     onchange,
   }: Props = $props();
 
-  let start = allowZero ? -1 : 0;
+  let start = $derived(allowZero ? -1 : 0);
 
   let numEl = $state();
 </script>
@@ -38,7 +38,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <label class="label">
   <span>
     <select
-      class="select w-fit min-w-[120px] mx-auto"
+      class={['select mx-auto w-fit', hideText ? '' : 'min-w-[120px]']}
       bind:this={numEl}
       id="number-of-colors"
       bind:value={numberOfColors}

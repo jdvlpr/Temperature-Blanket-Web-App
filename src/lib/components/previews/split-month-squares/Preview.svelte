@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -15,12 +15,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import Spinner from '$lib/components/Spinner.svelte';
-  import { localState, weather } from '$lib/state';
-  import {
-    getColorInfo,
-    runPreview,
-    showPreviewImageWeatherDetails,
-  } from '$lib/utils';
+  import { weather } from '$lib/state/weather-state.svelte';
+  import { getColorInfo } from '$lib/utils/color-utils';
+  import { runPreview } from '$lib/utils/function-utils.svelte';
+  import { showPreviewImageWeatherDetails } from '$lib/utils/preview-utils.svelte';
   import { splitMonthSquaresPreview } from './state.svelte';
 
   let width = $state(splitMonthSquaresPreview.width);
@@ -98,10 +96,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
       let color = { left: '', right: '' };
       if (day.length) {
-        const leftValue =
-          weather.data[_dayIndex][splitMonthSquaresPreview.settings.leftTarget][
-            localState.value.units
-          ];
+        const leftValue = weather.getWeatherValue({
+          dayIndex: _dayIndex,
+          param: splitMonthSquaresPreview.settings.leftTarget,
+        });
 
         // Get the color based on the gauge ID and value
         color.left = getColorInfo({
@@ -109,10 +107,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
           value: leftValue,
         }).hex;
 
-        const rightValue =
-          weather.data[_dayIndex][
-            splitMonthSquaresPreview.settings.rightTarget
-          ][localState.value.units];
+        const rightValue = weather.getWeatherValue({
+          dayIndex: _dayIndex,
+          param: splitMonthSquaresPreview.settings.rightTarget,
+        });
 
         // Get the color based on the gauge ID and value
         color.right = getColorInfo({

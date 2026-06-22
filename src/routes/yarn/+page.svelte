@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -29,12 +29,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     colorsToYarnDetails,
     stringToColors,
     yarnDetailsToColors,
-  } from '$lib/utils';
+  } from '$lib/utils/color-utils';
   import { onMount } from 'svelte';
   import { yarnPageState } from './state.svelte';
 
-  let urlParams,
-    schemeId = $state('Custom');
+  let urlParams;
   let isFinishedOnMount = $state(false);
 
   onMount(() => {
@@ -110,7 +109,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/snippet}
   {#snippet main()}
     <div>
-      <main class="max-w-(--breakpoint-xl) m-auto text-center">
+      <main class="m-auto max-w-(--breakpoint-xl) text-center">
         <Card>
           {#snippet header()}
             <div class="bg-surface-100 dark:bg-surface-900 p-4">
@@ -139,7 +138,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <Footer>
         {#snippet sources()}
           <div class="text-sm">
-            <p>
+            <p class="text-surface-700-300">
               Default color schemes based on <a
                 href="https://www.ColorBrewer2.org"
                 target="_blank"

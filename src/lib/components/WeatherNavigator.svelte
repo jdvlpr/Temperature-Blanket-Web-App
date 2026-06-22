@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -16,10 +16,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script>
   import WeatherTableWrapper from '$lib/components/WeatherTableWrapper.svelte';
   import ImportWeatherData from '$lib/components/modals/ImportWeatherData.svelte';
-  import { modal, weather } from '$lib/state';
-  import { downloadPDF, downloadWeatherCSV } from '$lib/utils';
-  import { DownloadIcon, FilePlus2Icon } from '@lucide/svelte';
+  import { dialog } from '$lib/state/page-state.svelte';
+  import { weather } from '$lib/state/weather-state.svelte';
+  import { FileUpIcon } from '@lucide/svelte';
   import { weatherChart } from './WeatherChart.svelte';
+  import DownloadExportButton from './buttons/DownloadExportButton.svelte';
 
   let debounceTimer;
   const debounce = (callback, time) => {
@@ -42,29 +43,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <WeatherTableWrapper />
 
   <div
-    class="rounded-container bg-surface-100 dark:bg-surface-900 mt-4 mb-2 flex items-start justify-start gap-2 px-4 py-2 shadow-inner max-sm:flex-col sm:flex-wrap sm:items-center sm:justify-center lg:mb-4"
+    class="rounded-container bg-surface-100 dark:bg-surface-900 mx-2 mt-4 mb-2 flex items-center justify-center gap-2 px-4 py-2 shadow-inner max-sm:flex-col sm:flex-wrap sm:items-center sm:justify-center lg:mb-4"
   >
-    <button
-      class="btn hover:preset-tonal h-auto text-left whitespace-pre-wrap"
-      onclick={downloadPDF}
-      title="Download PDF File"
-    >
-      <DownloadIcon class="inline" /> Download Gauges and Weather Data (PDF)
-    </button>
-
-    <button
-      class="btn hover:preset-tonal h-auto text-left whitespace-pre-wrap"
-      onclick={downloadWeatherCSV}
-      title="Download CSV File"
-    >
-      <DownloadIcon class="inline" /> Download Weather Data (CSV)
-    </button>
+    <DownloadExportButton
+      buttonText="Download/Export Data"
+      menuList={['pdf', 'csv', 'google-sheet']}
+    />
 
     {#if weather.grouping !== 'week'}
       <button
-        class="btn hover:preset-tonal h-auto text-left whitespace-pre-wrap"
+        class="btn hover:preset-tonal-surface h-auto text-left whitespace-pre-wrap"
         onclick={() => {
-          modal.trigger({
+          dialog.trigger({
             type: 'component',
             component: {
               ref: ImportWeatherData,
@@ -73,7 +63,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         }}
         title="Import Weather Data"
       >
-        <FilePlus2Icon class="inline" /> Import Weather Data
+        <FileUpIcon class="inline" /> Import Weather Data
       </button>
     {/if}
   </div>

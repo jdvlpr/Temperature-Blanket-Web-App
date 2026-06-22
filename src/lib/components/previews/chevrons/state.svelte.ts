@@ -1,8 +1,20 @@
-import { CHARACTERS_FOR_URL_HASH } from '$lib/constants';
-import { gauges, previews, project, weather } from '$lib/state';
-import { setTargets, upToDate } from '$lib/utils';
+import { CHARACTERS_FOR_URL_HASH } from '$lib/constants/page-constants';
+import { gauges } from '$lib/state/gauges-state.svelte';
+import { previews } from '$lib/state/preview-state.svelte';
+import { project } from '$lib/state/project-state.svelte';
+import { weather } from '$lib/state/weather-state.svelte';
+import type { BasePreviewSettings } from '$lib/types/preview-types';
+import type { WeatherParam } from '$lib/types/gauge-types';
+import { setTargets } from '$lib/utils/preview-utils.svelte';
+import { upToDate } from '$lib/utils/other-utils';
 import Preview from './Preview.svelte';
 import Settings from './Settings.svelte';
+
+interface ChevronsPreviewSettings extends BasePreviewSettings {
+  selectedTargets: WeatherParam['id'][];
+  chevronsPerRow: number;
+  chevronSideLength: number;
+}
 
 export class ChevronsPreviewClass {
   constructor() {
@@ -47,10 +59,11 @@ export class ChevronsPreviewClass {
   // *******************
   // User settings properties
   // *******************
-  settings = $state({
+  settings = $state<ChevronsPreviewSettings>({
     selectedTargets: ['tmax'],
     chevronsPerRow: 30,
     chevronSideLength: 32,
+    useSeasonTargets: false,
   });
 
   // *******************
@@ -116,7 +129,7 @@ export class ChevronsPreviewClass {
       separatorIndex + 1,
       endIndex,
     );
-    if (!upToDate(project.loaded.version, '1.747'))
+    if (!upToDate(project.onLoaded.version, '1.747'))
       this.settings.chevronSideLength = Math.round(
         (this.settings.chevronSideLength / 2) * Math.sqrt(2),
       ); // Version 1.747 changed chevronWidth to the length of each side of the chevron

@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -18,20 +18,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import SelectYarn from '$lib/components/SelectYarn.svelte';
   import Spinner from '$lib/components/Spinner.svelte';
   import ToTopButton from '$lib/components/buttons/ToTopButton.svelte';
-  import { YARN_COLORWAYS_PER_PAGE } from '$lib/constants';
-  import { defaultYarn } from '$lib/state';
-  import type { Color } from '$lib/types';
+  import { YARN_COLORWAYS_PER_PAGE } from '$lib/constants/color-constants';
+  import { brands } from '$lib/data/yarns/brands';
+  import { defaultYarn } from '$lib/state/page-state.svelte';
+  import type { Color } from '$lib/types/yarn-types';
   import {
-    getColorways,
     getTextColor,
-    pluralize,
     sortColorsByName,
     sortColorsByNameZtoA,
     sortColorsDarktoLight,
     sortColorsLightToDark,
+  } from '$lib/utils/color-utils';
+  import { pluralize } from '$lib/utils/string-utils';
+  import {
+    getColorways,
     stringToBrandAndYarnDetails,
-  } from '$lib/utils';
-  import { brands } from '$lib/yarns/brands';
+  } from '$lib/utils/yarn-utils';
   import {
     ArrowDownWideNarrowIcon,
     CircleCheckIcon,
@@ -39,8 +41,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     SearchIcon,
   } from '@lucide/svelte';
   import chroma from 'chroma-js';
-  import SelectYarnWeight from '../SelectYarnWeight.svelte';
   import { tick } from 'svelte';
+  import SelectYarnWeight from '../SelectYarnWeight.svelte';
 
   interface Props {
     selectedBrandId?: string;
@@ -66,13 +68,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
     scrollToTopButtonBottom = '100px',
   }: Props = $props();
 
-  let loadMoreSpinner = $state(),
-    loadMoreColors = $state();
+  let loadMoreSpinner = $state();
+
+  let loadMoreColors = $state();
 
   let selectedYarnWeightId = $state('');
 
   let filtersContainer = $state();
+
   let showScrollToTopButton = $state(false);
+
   let scrollObserver = new IntersectionObserver(
     (entries, observer) => {
       entries.forEach((entry) => {
@@ -86,28 +91,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     { threshold: 1 },
   );
 
-  $effect(() => {
-    scrollObserver.observe(filtersContainer);
-    loadMoreColors = new IntersectionObserver(
-      function (element) {
-        // isIntersecting is true when element and viewport are overlapping
-        // isIntersecting is false when element and viewport don't overlap
-        if (element[0].isIntersecting === true) {
-          if (itemsToShow <= results.length)
-            itemsToShow += YARN_COLORWAYS_PER_PAGE;
-          getResults;
-        }
-      },
-      { threshold: [0] },
-    );
-    if (!selectedBrandId && !selectedYarnId && defaultYarn.value) {
-      let { brandId, yarnId } = stringToBrandAndYarnDetails(defaultYarn.value);
-      if (brandId) selectedBrandId = brandId;
-      if (yarnId) selectedYarnId = yarnId;
-    }
-  });
+  let hasIncomingColor = $state(selectedColors.length);
 
-  let hasIncomingColor = !!selectedColors.length;
   let itemsToShow = $state(YARN_COLORWAYS_PER_PAGE);
 
   // This is for preview extra colors, so that they can be marked as selected even though their color object only has a hex
@@ -119,9 +104,67 @@ If not, see <https://www.gnu.org/licenses/>. -->
   );
 
   let sortColors = $state(hasIncomingColor ? 'best-match' : 'default');
+
   let results = $state([]);
+
   let gettingResults = $state(true);
+
   let loadingAllColors = $state(false);
+
+  let yarns = $derived(
+    selectedBrandId === ''
+      ? brands
+          .flatMap((n, i) =>
+            n.yarns.map((n) => {
+              return {
+                ...n,
+                brandId: brands[i].id,
+                brandName: brands[i].name,
+              };
+            }),
+          )
+          .sort((a, b) => {
+            const nameA = a.name.toUpperCase(); // ignore upper and lowercase
+            const nameB = b.name.toUpperCase(); // ignore upper and lowercase
+            if (nameA > nameB) {
+              return 1;
+            }
+            if (nameA < nameB) {
+              return -1;
+            }
+            // names must be equal
+            return 0;
+          })
+      : brands
+          ?.filter((brand) => brand.id === selectedBrandId)
+          ?.flatMap((n) => {
+            return n.yarns.map((yarn) => {
+              return {
+                ...yarn,
+                brandId: n.id,
+                brandName: n.name,
+              };
+            });
+          }),
+  );
+
+  let totalResults = $derived(
+    yarns
+      .filter((yarn) => {
+        if (!selectedYarnId) return true;
+        return yarn.id === selectedYarnId;
+      })
+      .filter((yarn) => {
+        if (!selectedYarnWeightId) return true;
+        return yarn.weightId === selectedYarnWeightId;
+      })
+      .flatMap((n) => n.colorways.map((m) => m.colors.length))
+      .reduce((partialSum, a) => partialSum + a, 0),
+  );
+
+  let selectedIds = $derived(
+    selectedColors.map((n) => `${n.hex}${n.name}${n.brandId}${n.yarnId}`),
+  );
 
   function getResults() {
     gettingResults = true;
@@ -192,8 +235,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     affiliate_variant_href,
   }) {
     if (canMarkIfHexMatches) canMarkIfHexMatches = false;
+
     const matchId = `${hex}${name}${brandId}${yarnId}`;
     const doesMatch = selectedIds.includes(matchId);
+
     if (doesMatch && selectedColors.length > 0 && !limit) {
       //remove the color
       const index = selectedIds.indexOf(matchId);
@@ -229,59 +274,29 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 
   $effect(() => {
-    if (loadMoreSpinner) loadMoreColors.observe(loadMoreSpinner);
+    scrollObserver.observe(filtersContainer);
+    loadMoreColors = new IntersectionObserver(
+      function (element) {
+        // isIntersecting is true when element and viewport are overlapping
+        // isIntersecting is false when element and viewport don't overlap
+        if (element[0].isIntersecting === true) {
+          if (itemsToShow <= results.length)
+            itemsToShow += YARN_COLORWAYS_PER_PAGE;
+          getResults;
+        }
+      },
+      { threshold: [0] },
+    );
+    if (!selectedBrandId && !selectedYarnId && defaultYarn.value) {
+      let { brandId, yarnId } = stringToBrandAndYarnDetails(defaultYarn.value);
+      if (brandId) selectedBrandId = brandId;
+      if (yarnId) selectedYarnId = yarnId;
+    }
   });
 
-  let yarns = $derived(
-    selectedBrandId === ''
-      ? brands
-          .flatMap((n, i) =>
-            n.yarns.map((n) => {
-              return {
-                ...n,
-                brandId: brands[i].id,
-                brandName: brands[i].name,
-              };
-            }),
-          )
-          .sort((a, b) => {
-            const nameA = a.name.toUpperCase(); // ignore upper and lowercase
-            const nameB = b.name.toUpperCase(); // ignore upper and lowercase
-            if (nameA > nameB) {
-              return 1;
-            }
-            if (nameA < nameB) {
-              return -1;
-            }
-            // names must be equal
-            return 0;
-          })
-      : brands
-          ?.filter((brand) => brand.id === selectedBrandId)
-          ?.flatMap((n) => {
-            return n.yarns.map((yarn) => {
-              return {
-                ...yarn,
-                brandId: n.id,
-                brandName: n.name,
-              };
-            });
-          }),
-  );
-
-  let totalResults = $derived(
-    yarns
-      .filter((yarn) => {
-        if (!selectedYarnId) return true;
-        return yarn.id === selectedYarnId;
-      })
-      .filter((yarn) => {
-        if (!selectedYarnWeightId) return true;
-        return yarn.weightId === selectedYarnWeightId;
-      })
-      .flatMap((n) => n.colorways.map((m) => m.colors.length))
-      .reduce((partialSum, a) => partialSum + a, 0),
-  );
+  $effect(() => {
+    if (loadMoreSpinner) loadMoreColors.observe(loadMoreSpinner);
+  });
 
   $effect(() => {
     selectedBrandId;
@@ -296,10 +311,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
       getResults();
     });
   });
-
-  let selectedIds = $derived(
-    selectedColors.map((n) => `${n.hex}${n.name}${n.brandId}${n.yarnId}`),
-  );
 </script>
 
 <div
@@ -334,45 +345,47 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/key}
 
   <div
-    class="tex-left order-4 col-span-full flex w-full flex-col items-start gap-1 md:col-span-5"
+    class="label order-4 col-span-full flex w-full flex-col items-start md:col-span-5"
   >
-    <label for="yarn-select-search-input" class="label flex items-center gap-1">
-      <SearchIcon class="size-4" />
-      <span>Colorway Name</span>
-    </label>
-    <input
-      id="yarn-select-search-input"
-      autocomplete="off"
-      placeholder="e.g., Wisteria, Cream"
-      type="text"
-      class="input w-full"
-      bind:value={search}
-      oninput={() => {
-        itemsToShow = YARN_COLORWAYS_PER_PAGE;
-      }}
-    />
+    <p class="label-text">Colorway Name</p>
+    <div class="input-group grid-cols-[auto_1fr]">
+      <div class="ig-cell">
+        <SearchIcon />
+      </div>
+      <input
+        id="yarn-select-search-input"
+        autocomplete="off"
+        placeholder="e.g., Wisteria, Cream"
+        type="text"
+        class="ig-input"
+        bind:value={search}
+        oninput={() => {
+          itemsToShow = YARN_COLORWAYS_PER_PAGE;
+        }}
+      />
+    </div>
   </div>
 
   <label class="label order-5 col-span-8 w-full md:col-span-3 md:col-start-10">
-    <span class="flex items-center gap-1">
-      <ArrowDownWideNarrowIcon class="size-4" />
-      <span> Sort By</span>
-    </span>
-    <select
-      class="select"
-      id="sort-colors-by"
-      bind:value={sortColors}
-      disabled={gettingResults}
-    >
-      {#if hasIncomingColor}
-        <option value="best-match">Best Match</option>
-      {/if}
-      <option value="default">Default</option>
-      <option value="light-to-dark">Lightest to Darkest</option>
-      <option value="dark-to-light">Darkest to Lightest</option>
-      <option value="name">Name A-Z</option>
-      <option value="name-z-to-a">Name Z-A</option>
-    </select>
+    <span class="label-text"> Sort By </span>
+    <div class="relative flex items-center">
+      <ArrowDownWideNarrowIcon class="absolute left-2" />
+      <select
+        class="select truncate pl-10"
+        id="sort-colors-by"
+        bind:value={sortColors}
+        disabled={gettingResults}
+      >
+        {#if hasIncomingColor}
+          <option value="best-match">Best Match</option>
+        {/if}
+        <option value="default">Default</option>
+        <option value="light-to-dark">Lightest to Darkest</option>
+        <option value="dark-to-light">Darkest to Lightest</option>
+        <option value="name">Name A-Z</option>
+        <option value="name-z-to-a">Name Z-A</option>
+      </select>
+    </div>
   </label>
 </div>
 
@@ -387,7 +400,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </p>
 {/if}
 
-<div class="my-4 flex flex-wrap justify-center gap-1">
+<div
+  class="my-4 grid grid-cols-1 justify-center gap-1 sm:grid-cols-2 md:grid-cols-3"
+>
   {#if results?.length && !loadingAllColors}
     {#each results as { hex, name, delta, brandName, yarnName, brandId, yarnId, variant_href, affiliate_variant_href }}
       {@const isSelected =
@@ -438,13 +453,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <Spinner />
       </div>
     {/if}
-  {:else}
-    <p class="italic">No Matching Colorways</p>
-  {/if}
-  {#if showScrollToTopButton}
-    <ToTopButton
-      bottom={scrollToTopButtonBottom}
-      onClick={onClickScrollToTop}
-    />
   {/if}
 </div>
+{#if !results?.length && !loadingAllColors}
+  <p class="text-center italic">No Matching Colorways</p>
+{/if}
+{#if showScrollToTopButton}
+  <ToTopButton bottom={scrollToTopButtonBottom} onClick={onClickScrollToTop} />
+{/if}

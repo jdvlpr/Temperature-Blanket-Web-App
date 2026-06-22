@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -14,43 +14,61 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import Tooltip from '$lib/components/Tooltip.svelte';
   import GettingWeather from '$lib/components/modals/GettingWeather.svelte';
   import GettingWeatherWarnCustomWeather from '$lib/components/modals/GettingWeatherWarnCustomWeather.svelte';
-  import { locations, modal, project, weather } from '$lib/state';
+  import { dialog } from '$lib/state/page-state.svelte';
+  import { locations } from '$lib/state/location-state.svelte';
+  import { project } from '$lib/state/project-state.svelte';
+  import { weather } from '$lib/state/weather-state.svelte';
+  import { PopoverInstance } from '$lib/state/attachments/floating-state.svelte';
   import { ChevronRightIcon } from '@lucide/svelte';
+  import { scale } from 'svelte/transition';
+
+  let popover = new PopoverInstance();
 
   let disabled = $derived(!locations.allValid || project.status.loading);
 </script>
 
+{#snippet buttonContent()}
+  {#if weather.isUserEdited}
+    Reload Weather Data
+  {:else}
+    Search {#if weather.data.length && !project.status.loading}Again{/if}
+  {/if}
+  <ChevronRightIcon />
+{/snippet}
+
 {#if disabled && !project.status.loading}
-  <Tooltip
-    buttonDisabled={disabled}
-    title="Search for Weather Data"
-    id="location-action-button"
-    classNames="btn btn-lg preset-filled-primary-500 sm:w-fit gap-1 shadow-sm"
+  <button
+    {...popover.reference()}
+    class="btn btn-lg preset-filled-primary-500 gap-1 shadow-sm sm:w-fit"
+    {disabled}
   >
-    {#if !!weather.isUserEdited}
-      Reload Weather Data
-    {:else}
-      Search {#if weather.data.length}Again{/if}
-    {/if}
-    <ChevronRightIcon />
-    {#snippet tooltip()}
-      <p>Choose a valid location and dates above.</p>
-    {/snippet}
-  </Tooltip>
+    {@render buttonContent()}
+  </button>
+
+  {#if popover.isOpen()}
+    <div
+      data-floating
+      {...popover.floating()}
+      class="preset-filled-surface-100-900 card p-2"
+      in:scale={{ duration: 150, delay: 150 }}
+    >
+      <p class="">Choose a valid location and dates above.</p>
+      <div {...popover.arrow()}></div>
+    </div>
+  {/if}
 {:else}
   <button
     class="btn btn-lg preset-filled-primary-500 gap-1 shadow-sm sm:w-fit"
     onclick={() => {
       if (weather.isUserEdited)
-        modal.trigger({
+        dialog.trigger({
           type: 'component',
           component: { ref: GettingWeatherWarnCustomWeather },
         });
       else
-        modal.trigger({
+        dialog.trigger({
           type: 'component',
           component: { ref: GettingWeather },
         });
@@ -59,11 +77,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     id="location-action-button"
     {disabled}
   >
-    {#if !!weather.isUserEdited}
-      Reload Weather Data
-    {:else}
-      Search {#if weather.data.length}Again{/if}
-    {/if}
-    <ChevronRightIcon />
+    {@render buttonContent()}
   </button>
 {/if}

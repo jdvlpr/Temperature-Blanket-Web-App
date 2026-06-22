@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -17,55 +17,53 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ColorPaletteEditable from '$lib/components/ColorPaletteEditable.svelte';
   import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
   import StickyPart from '$lib/components/modals/StickyPart.svelte';
-  import { modal } from '$lib/state';
-  import { getSortedPalette } from '$lib/utils';
+  import { dialog } from '$lib/state/page-state.svelte';
+  import { getSortedPalette } from '$lib/utils/color-utils';
   import { ArrowDownWideNarrow, ArrowLeftRightIcon } from '@lucide/svelte';
 
   let { colors, updateGauge } = $props();
-
-  let _colors = $state(colors);
 
   let sortColors = $state('custom');
 
   let key = $state(false);
 
-  let allColorsHaveNames = $derived(_colors.every((color) => color?.name));
+  let allColorsHaveNames = $derived(colors.every((color) => color?.name));
 </script>
 
-<div class="p-4 sm:min-w-[600px]">
-  <div class="mt-6 flex flex-col items-center gap-2 sm:mt-4">
+<div class="px-4 pt-8 sm:min-w-[600px]">
+  <div class="mt-6 flex w-full flex-col items-center gap-2 sm:mt-4">
     <div class="flex flex-wrap items-end justify-center gap-2">
       <label class="label">
-        <span class="flex items-center gap-1">
-          <ArrowDownWideNarrow class="size-4" />
-          <span>Sort By</span>
-        </span>
-        <select
-          class="select truncate"
-          id="sort-colors-by"
-          bind:value={sortColors}
-          onchange={() => {
-            _colors = getSortedPalette({
-              palette: $state.snapshot(_colors),
-              sortColors,
-            });
-            key = !key;
-          }}
-        >
-          <option value="custom">Custom</option>
-          <option value="light-to-dark">Lightest to Darkest</option>
-          <option value="dark-to-light">Darkest to Lightest</option>
-          {#if allColorsHaveNames}
-            <option value="name">Name A-Z</option>
-            <option value="name-z-to-a">Name Z-A</option>
-          {/if}
-        </select>
+        <span class="label-text">Sort By</span>
+        <div class="relative flex items-center">
+          <ArrowDownWideNarrow class="absolute left-2" />
+          <select
+            class="select truncate pl-10"
+            id="sort-colors-by"
+            bind:value={sortColors}
+            onchange={() => {
+              colors = getSortedPalette({
+                palette: $state.snapshot(colors),
+                sortColors,
+              });
+              key = !key;
+            }}
+          >
+            <option value="custom">Custom</option>
+            <option value="light-to-dark">Lightest to Darkest</option>
+            <option value="dark-to-light">Darkest to Lightest</option>
+            {#if allColorsHaveNames}
+              <option value="name">Name A-Z</option>
+              <option value="name-z-to-a">Name Z-A</option>
+            {/if}
+          </select>
+        </div>
       </label>
 
       <button
-        class="btn hover:preset-tonal"
+        class="btn hover:preset-tonal-surface"
         onclick={() => {
-          _colors.reverse();
+          colors.reverse();
           key = !key;
           sortColors = 'custom';
         }}
@@ -82,7 +80,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             sortColors = 'custom';
           }}
           canUserEditColor={false}
-          bind:colors={_colors}
+          bind:colors
         />
       {/key}
     </div>
@@ -93,14 +91,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <SaveAndCloseButtons
       onSave={() => {
         updateGauge({
-          _colors: _colors.map((n) => {
+          colors: colors.map((n) => {
             delete n.id;
             return n;
           }),
         });
-        modal.close();
+        dialog.close();
       }}
-      onClose={modal.close}
+      onClose={dialog.close}
     />
   </div>
 </StickyPart>

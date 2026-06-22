@@ -1,4 +1,4 @@
-// Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+// Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 //
 // This file is part of Temperature-Blanket-Web-App.
 //
@@ -13,26 +13,24 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import pdfGauges from '$lib/pdf/sections/gauges.svelte';
-import pdfWeatherData from '$lib/pdf/sections/weather-data.svelte';
+import { MOON_PHASE_NAMES } from '$lib/constants/weather-constants';
+import pdfGauges from '$lib/features/pdf/sections/gauges.svelte';
+import pdfWeatherData from '$lib/features/pdf/sections/weather-data.svelte';
+import { allGaugesAttributes, gauges, getWPGauge } from '$lib/state/gauges-state.svelte';
+import { dialog } from '$lib/state/page-state.svelte';
+import { locations } from '$lib/state/location-state.svelte';
+import { previews } from '$lib/state/preview-state.svelte';
+import { project } from '$lib/state/project-state.svelte';
+import { weather } from '$lib/state/weather-state.svelte';
+import { preferences } from '$lib/storage/preferences.svelte';
+import { colorsToCode, colorsToYarnDetails } from '$lib/utils/color-utils';
+import { convertTime } from '$lib/utils/unit-utils.svelte';
 import {
-  allGaugesAttributes,
-  gauges,
-  localState,
-  locations,
-  previews,
-  project,
-  weather,
-} from '$lib/state';
-import {
-  colorsToCode,
-  colorsToYarnDetails,
-  convertTime,
   dateToISO8601String,
-  getWPGauge,
-  getWeatherSourceDetails,
-  missingDaysCount,
-} from '$lib/utils';
+  getLocalISODateString,
+  stringToDate,
+} from '$lib/utils/date-utils';
+
 
 export const getProjectParametersFromURLHash = (hash) => {
   return hash.split('&').reduce(function (res, item) {
@@ -46,19 +44,27 @@ export const getProjectParametersFromURLHash = (hash) => {
 };
 
 export const downloadPDF = async () => {
-  await import('jspdf')
-    .then((module) => {
-      const JsPDF = module.default;
-      const doc = new JsPDF();
-      pdfGauges.create(doc);
-      pdfWeatherData.create(doc);
-      // Remove blank first page, ugly hack
-      doc.deletePage(1);
-      doc.save(`Temperature-Blanket-${locations.projectFilename}.pdf`);
-    })
-    .catch((error) => {
-      throw new Error(error);
-    });
+  dialog.trigger({
+    type: 'choose-weather-params',
+    response: async (response) => {
+      if (response) {
+        await import('jspdf')
+          .then((module) => {
+            const JsPDF = module.default;
+            const doc = new JsPDF();
+            const totalPages = pdfGauges.pages() + pdfWeatherData.pages();
+            pdfGauges.create(doc, totalPages);
+            pdfWeatherData.create(doc, totalPages);
+            // Remove blank first page, ugly hack
+            doc.deletePage(1);
+            doc.save(`Temperature-Blanket-${locations.projectFilename}.pdf`);
+          })
+          .catch((error) => {
+            throw new Error(error);
+          });
+      }
+    },
+  });
 };
 
 export const downloadWeatherCSV = () => {
@@ -67,15 +73,17 @@ export const downloadWeatherCSV = () => {
     gauge.targets.forEach((target) => {
       if (target?.id === 'dayt') {
         labels.push(`${target.label} (h:m)`);
+      } else if (target?.id === 'moon') {
+        labels.push(`${target.label}`);
       } else {
         labels.push(
-          `${target.label} (${gauge.unit.label[localState.value.units]})`,
+          `${target.label} (${gauge.unit.label[preferences.value.units]})`,
         );
       }
     });
   });
   if (!weather.data) return;
-  const _units = localState.value.units;
+  const _units = preferences.value.units;
   const _weather = [...weather.data].map((day, index) => {
     const gaugeInfo = [];
     allGaugesAttributes?.forEach((gauge) => {
@@ -87,6 +95,8 @@ export const downloadWeatherCSV = () => {
               padStart: true,
             }),
           );
+        } else if (target?.id === 'moon') {
+          gaugeInfo.push(MOON_PHASE_NAMES[day[target?.id]]);
         } else {
           gaugeInfo.push(day[target?.id][_units]);
         }
@@ -165,21 +175,25 @@ export const sendToProjectGallery = async (img) => {
     };
   });
 
+  const debugData = getDebugData();
+
   const data = {
     colors: JSON.stringify(colors),
+    debug_data: JSON.stringify(debugData),
     gauges: JSON.stringify(labels),
     img,
     locations: JSON.stringify(_locations),
-    missing_days: missingDaysCount(),
+    missing_days: weather.missingDaysCount(),
     palettes: JSON.stringify(palettes),
     project_url: project.url.href,
+    raw_weather_data: JSON.stringify(weather.rawData),
     tables: JSON.stringify(tables),
     title: locations.projectTitle,
     total_days: weather.rawData.length,
     yarn_urls: JSON.stringify(yarnUrls),
     yarn_details: JSON.stringify(yarnDetails),
     weather_grouping: weather.grouping,
-    weather_sources: JSON.stringify(getWeatherSourceDetails()),
+    weather_sources: JSON.stringify(weather.getWeatherSourceDetails()),
     wp_tag_id: previews.active.wpTagId,
   };
   let message = '';
@@ -195,7 +209,7 @@ export const sendToProjectGallery = async (img) => {
 
     if (response.code === 200) {
       // success
-      message = `<p class="font-bold text-xl my-2">${response.message}</p><p>The project gallery webpage has been created:</p>`;
+      message = `<p class="font-bold text-xl my-2">${response.message}</p><p>The project gallery webpage has been created.</p>`;
       project.gallery.href = response.link;
       project.gallery.title = response.title;
       // reloadRecentGalleryProjects();
@@ -262,3 +276,35 @@ export const getTitleFromLocationsMeta = (locations) => {
 
   return title || '';
 };
+
+// Temporariy diagnostics
+function getDebugData() {
+  // previous
+  let previous_today = new Date();
+  previous_today.setHours(0, 0, 0, 0);
+  // set the _to end date to yesterday, the last day which should be included in the request for weather data
+  const previous_yesterday = new Date(
+    previous_today.getTime() - 24 * 60 * 60 * 1000,
+  );
+  const previous_newTOStart = dateToISO8601String(previous_yesterday);
+
+  // current
+  const todayStr = getLocalISODateString();
+  const todayStrToDate = stringToDate(todayStr);
+  const yesterday = new Date(todayStrToDate);
+  yesterday.setUTCDate(todayStrToDate.getUTCDate() - 1);
+  const new_TOStart = dateToISO8601String(yesterday);
+  return {
+    previous: {
+      today: previous_today,
+      yesterday: previous_yesterday,
+      newTOStart: previous_newTOStart,
+    },
+    current: {
+      todayStr,
+      todayStrToDate,
+      yesterday,
+      new_TOStart,
+    },
+  };
+}

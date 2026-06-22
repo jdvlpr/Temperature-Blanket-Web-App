@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -17,16 +17,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
   import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
   import SquareDesigner from '$lib/components/modals/SquareDesigner.svelte';
+  import PreviewInfo from '$lib/components/PreviewInfo.svelte';
   import { calendarPreview } from '$lib/components/previews/calendar/state.svelte';
-  import { DAYS_OF_THE_WEEK } from '$lib/constants';
-  import { gauges, modal, weather } from '$lib/state';
-  import { pluralize } from '$lib/utils';
-  import {
-    Grid2x2CheckIcon,
-    PipetteIcon,
-    SquareDashedIcon,
-    SquareSquareIcon,
-  } from '@lucide/svelte';
+  import SpanYarnColorSelectIcon from '$lib/components/SpanYarnColorSelectIcon.svelte';
+  import { DAYS_OF_THE_WEEK } from '$lib/constants/weather-constants';
+  import { gauges } from '$lib/state/gauges-state.svelte';
+  import { dialog } from '$lib/state/page-state.svelte';
+  import { weather } from '$lib/state/weather-state.svelte';
+  import { pluralize } from '$lib/utils/string-utils';
+  import { SquareSquareIcon } from '@lucide/svelte';
 
   let targets = $derived(gauges.allCreated.map((n) => n.targets).flat());
 
@@ -45,9 +44,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 </script>
 
-<p class="w-full">
-  Squares are arranged in a calendar-like grid, grouped by month.
-</p>
+<PreviewInfo previewTitle={calendarPreview.name}>
+  {#snippet description()}
+    Squares are arranged in a calendar-like grid, grouped by month.
+  {/snippet}
+</PreviewInfo>
 
 <div
   class="preset-outlined-surface-300-700 card flex flex-col items-start gap-4 p-4"
@@ -55,7 +56,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <p class="text-2xl font-bold">Layout Settings</p>
 
   <label class="label">
-    Size (width x height)
+    <span class="label-text">Size (width x height)</span>
     <select
       class="select w-fit min-w-[210px]"
       bind:value={calendarPreview.settings.dimensions}
@@ -77,7 +78,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   />
 
   <label class="label">
-    <span>Weeks Start On</span>
+    <span class="label-text">Weeks Start On</span>
     <select
       class="select w-fit"
       bind:value={calendarPreview.settings.weekStartCode}
@@ -99,10 +100,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <p class="text-2xl font-bold">Square Settings</p>
 
   <button
-    class="btn hover:preset-tonal"
+    class="btn hover:preset-tonal-surface"
     title="Edit Square Design"
     onclick={async () => {
-      modal.trigger({
+      dialog.trigger({
         type: 'component',
         component: {
           ref: SquareDesigner,
@@ -126,10 +127,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   >
 
   <button
-    class="btn hover:preset-tonal"
+    class="btn hover:preset-tonal-surface"
     title="Choose a Color"
     onclick={() =>
-      modal.trigger({
+      dialog.trigger({
         type: 'component',
         component: {
           ref: ChangeColor,
@@ -137,18 +138,23 @@ If not, see <https://www.gnu.org/licenses/>. -->
             hex: calendarPreview.settings.additionalSquaresColor,
             onChangeColor: ({ hex }) => {
               calendarPreview.settings.additionalSquaresColor = hex;
-              modal.close();
+              dialog.close();
             },
           },
         },
+        options: {
+          size: 'large',
+        },
       })}
   >
-    <PipetteIcon />
-    Color of Additional Squares
+    <SpanYarnColorSelectIcon
+      color={calendarPreview.settings.additionalSquaresColor}
+    />
+    Accent Color (for additional squares)
   </button>
 
   <label class="label">
-    Border Size
+    <span class="label-text">Border Size</span>
     <select
       class="select w-fit min-w-[110px]"
       bind:value={calendarPreview.settings.joinStitches}
@@ -168,10 +174,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   {#if calendarPreview.settings.joinStitches > 0}
     <button
-      class="btn hover:preset-tonal"
+      class="btn hover:preset-tonal-surface"
       title="Choose a color for the border stitches around each square"
       onclick={() =>
-        modal.trigger({
+        dialog.trigger({
           type: 'component',
           component: {
             ref: ChangeColor,
@@ -179,13 +185,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
               hex: calendarPreview.settings.joinColor,
               onChangeColor: ({ hex }) => {
                 calendarPreview.settings.joinColor = hex;
-                modal.close();
+                dialog.close();
               },
             },
           },
+          options: {
+            size: 'large',
+          },
         })}
     >
-      <SquareDashedIcon />
+      <SpanYarnColorSelectIcon color={calendarPreview.settings.joinColor} />
       Border Color
     </button>
   {/if}

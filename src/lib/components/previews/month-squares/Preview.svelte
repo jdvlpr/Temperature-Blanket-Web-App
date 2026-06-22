@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -15,12 +15,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import Spinner from '$lib/components/Spinner.svelte';
-  import { localState, weather } from '$lib/state';
-  import {
-    getColorInfo,
-    runPreview,
-    showPreviewImageWeatherDetails,
-  } from '$lib/utils';
+  import { weather } from '$lib/state/weather-state.svelte';
+  import { getColorInfo } from '$lib/utils/color-utils';
+  import { runPreview } from '$lib/utils/function-utils.svelte';
+  import { showPreviewImageWeatherDetails } from '$lib/utils/preview-utils.svelte';
   import { monthSquaresPreview } from './state.svelte';
 
   let width = $state(monthSquaresPreview.width);
@@ -97,17 +95,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
       let color;
       if (day.length) {
-        const value =
-          weather.data[_dayIndex][monthSquaresPreview.settings.selectedTarget][
-            localState.value.units
-          ];
+        const value = weather.getWeatherValue({
+          dayIndex: _dayIndex,
+          param: monthSquaresPreview.settings.selectedTarget,
+        });
 
         // Get the color based on the gauge ID and value
         color = getColorInfo({
           param: monthSquaresPreview.settings.selectedTarget,
           value,
         }).hex;
+
         isWeather = true;
+
         square = {
           ...square,
           isWeather,
@@ -118,7 +118,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
         dateInMonth += 1;
       } else {
         color = monthSquaresPreview.settings.additionalRoundsColor;
+
         isWeather = false;
+
         square = {
           ...square,
           isWeather,

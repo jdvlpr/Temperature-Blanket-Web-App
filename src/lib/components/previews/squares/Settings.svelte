@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -16,13 +16,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script>
   import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
   import SquareDesigner from '$lib/components/modals/SquareDesigner.svelte';
-  import { gauges, modal } from '$lib/state';
-  import { pluralize } from '$lib/utils';
-  import {
-    PipetteIcon,
-    SquareDashedIcon,
-    SquareSquareIcon,
-  } from '@lucide/svelte';
+  import PreviewInfo from '$lib/components/PreviewInfo.svelte';
+  import SpanYarnColorSelectIcon from '$lib/components/SpanYarnColorSelectIcon.svelte';
+  import { dialog } from '$lib/state/page-state.svelte';
+  import { gauges } from '$lib/state/gauges-state.svelte';
+  import { weather } from '$lib/state/weather-state.svelte';
+  import { pluralize } from '$lib/utils/string-utils';
+  import { SquareDashedIcon, SquareSquareIcon } from '@lucide/svelte';
   import { squaresPreview } from './state.svelte';
 
   let targets = $derived(gauges.allCreated.map((n) => n.targets).flat());
@@ -38,15 +38,32 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 </script>
 
-{#if squaresPreview.details}
-  <div class="w-full">
-    <p class="italic">
-      {squaresPreview.details.rows} rows with {squaresPreview.details
-        .additionalSquares} additional
-      {pluralize('square', squaresPreview.details.additionalSquares)}.
-    </p>
-  </div>
-{/if}
+<PreviewInfo previewTitle={squaresPreview.name}>
+  {#snippet description()}
+    Each square represents one {weather.grouping}. Squares are added from left
+    to right, top to bottom.
+  {/snippet}
+  {#snippet details()}
+    {#if squaresPreview.details}
+      There are <span class="font-semibold"
+        >{squaresPreview.squaresTotalCount} total {pluralize(
+          'square',
+          squaresPreview.squaresTotalCount,
+        )}</span
+      >
+      in
+      <span class="font-semibold"
+        >{squaresPreview.details.rows}
+        {pluralize('row', squaresPreview.details.rows)}</span
+      >{#if squaresPreview.details.additionalSquares}.
+        <span class="font-semibold"
+          >{squaresPreview.details.additionalSquares}
+          {pluralize('square', squaresPreview.details.additionalSquares)}</span
+        > have no weather data
+      {/if}.
+    {/if}
+  {/snippet}
+</PreviewInfo>
 
 <div
   class="preset-outlined-surface-300-700 card flex flex-col items-start gap-4 p-4"
@@ -54,27 +71,25 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <p class="text-2xl font-bold">Layout Settings</p>
 
   <label class="label">
-    Number of Columns
+    <span class="label-text">Size (width)</span>
     <select
-      class="select w-fit min-w-[60px]"
-      id="sqrs-columns"
+      class="select w-fit min-w-[120px]"
       bind:value={squaresPreview.settings.columns}
     >
       {#each Array(300) as _, i}
-        {#if i > 0}
-          <option value={i}>
-            {i}
-          </option>
-        {/if}
+        {@const number = i + 1}
+        <option value={number}>
+          {number}
+          {pluralize('square', number)}
+        </option>
       {/each}
     </select>
   </label>
 
   <label class="label">
-    <span>Squares at Beginning</span>
+    <span class="label-text">Squares at Beginning</span>
     <select
       class="select w-fit min-w-[60px]"
-      id="sqrs-squares-at-beginning"
       bind:value={squaresPreview.settings.squaresAtBeginning}
     >
       {#each Array(51) as _, i}
@@ -86,10 +101,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </label>
 
   <label class="label">
-    <span>Squares Between Months</span>
+    <span class="label-text">Squares Between Months</span>
     <select
       class="select w-fit min-w-[60px]"
-      id="sqrs-squares-between-months"
       bind:value={squaresPreview.settings.squaresBetweenMonthsCount}
     >
       {#each Array(51) as _, i}
@@ -107,10 +121,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <p class="text-2xl font-bold">Square Settings</p>
 
   <button
-    class="btn hover:preset-tonal"
+    class="btn hover:preset-tonal-surface"
     title="Edit Square Design"
     onclick={() =>
-      modal.trigger({
+      dialog.trigger({
         type: 'component',
         component: {
           ref: SquareDesigner,
@@ -134,10 +148,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   {#if squaresPreview.details?.additionalSquares || squaresPreview.settings?.squaresBetweenMonthsCount}
     <button
-      class="btn hover:preset-tonal"
+      class="btn hover:preset-tonal-surface"
       title="Choose a color for any additional squares"
       onclick={() =>
-        modal.trigger({
+        dialog.trigger({
           type: 'component',
           component: {
             ref: ChangeColor,
@@ -145,19 +159,24 @@ If not, see <https://www.gnu.org/licenses/>. -->
               hex: squaresPreview.settings.additionalSquaresColor,
               onChangeColor: ({ hex }) => {
                 squaresPreview.settings.additionalSquaresColor = hex;
-                modal.close();
+                dialog.close();
               },
             },
           },
+          options: {
+            size: 'large',
+          },
         })}
     >
-      <PipetteIcon />
-      Color of Additional Squares
+      <SpanYarnColorSelectIcon
+        color={squaresPreview.settings.additionalSquaresColor}
+      />
+      Accent Color (for additional squares)
     </button>
   {/if}
 
   <label class="label">
-    Border Size
+    <span class="label-text">Border Size</span>
     <select
       class="select w-fit min-w-[110px]"
       bind:value={squaresPreview.settings.joinStitches}
@@ -177,10 +196,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   {#if squaresPreview.settings.joinStitches > 0}
     <button
-      class="btn hover:preset-tonal text-left whitespace-pre-wrap"
+      class="btn hover:preset-tonal-surface text-left whitespace-pre-wrap"
       title="Choose a color for the border stitches around each square"
       onclick={() =>
-        modal.trigger({
+        dialog.trigger({
           type: 'component',
           component: {
             ref: ChangeColor,
@@ -188,9 +207,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
               hex: squaresPreview.settings.joinColor,
               onChangeColor: ({ hex }) => {
                 squaresPreview.settings.joinColor = hex;
-                modal.close();
+                dialog.close();
               },
             },
+          },
+          options: {
+            size: 'large',
           },
         })}
     >

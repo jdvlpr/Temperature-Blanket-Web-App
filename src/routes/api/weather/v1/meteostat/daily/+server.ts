@@ -1,4 +1,4 @@
-// Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+// Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 //
 // This file is part of Temperature-Blanket-Web-App.
 //
@@ -18,17 +18,22 @@ import {
   SECRET_METEOSTAT_API_KEY,
   SECRET_METEOSTAT_DEV_API_KEY,
 } from '$env/static/private';
-import { API_SERVICES, NO_DATA_SRTM3 } from '$lib/constants';
+import { API_SERVICES } from '$lib/constants/api-constants';
+import { NO_DATA_SRTM3 } from '$lib/constants/location-constants';
+import type { WeatherDay } from '$lib/types/weather-types';
+import { dateToISO8601String, stringToDate } from '$lib/utils/date-utils';
 import {
-  celsiusToFahrenheit,
   displayNumber,
   getAvgOfThree,
   getMaxOfThree,
   getMinOfThree,
+} from '$lib/utils/number-utils';
+import {
+  celsiusToFahrenheit,
   hoursToMinutes,
   millimetersToInches,
-  stringToDate,
-} from '$lib/utils.js';
+} from '$lib/utils/unit-utils.svelte.js';
+import { getMoonPhase } from '$lib/state/weather-state.svelte';
 import { error, json } from '@sveltejs/kit';
 import SunCalc from 'suncalc';
 
@@ -40,7 +45,7 @@ export async function POST({ request }) {
   if (!location || typeof location !== 'object')
     throw error(400, 'Missing location object');
 
-  let allData = [];
+  let allData: WeatherDay[] = [];
 
   let url = API_SERVICES.meteostat.baseURL;
   url += `?lat=${location.lat}`;
@@ -57,7 +62,7 @@ export async function POST({ request }) {
     headers: {
       'X-RapidAPI-Key': dev
         ? SECRET_METEOSTAT_DEV_API_KEY || SECRET_METEOSTAT_API_KEY
-        : SECRET_METEOSTAT_API_KEY, // Use a free dev rapidAPI account for testing to save request credits
+        : SECRET_METEOSTAT_API_KEY,
       'X-RapidAPI-Host': 'meteostat.p.rapidapi.com',
     },
   });
@@ -102,7 +107,8 @@ export async function POST({ request }) {
 
   location.stations = data.meta.stations;
 
-  const today = new Date();
+  // Process the data
+  const todayDate = new Date();
 
   for (let index = 0; index < data.data.length; index += 1) {
     const day = data.data[index];
@@ -123,7 +129,8 @@ export async function POST({ request }) {
 
     // With the Meteostat API, if the "model" param is set to "true" (which is the default), it will include future weather predictions.
     //Our application does not want this, so make null any weather parameters which are for days in the future.
-    const isDateInPast = dayDate < today.setHours(0, 0, 0, 0);
+    const isDateInPast =
+      dateToISO8601String(dayDate) < dateToISO8601String(todayDate);
 
     if (!isDateInPast) {
       tmin = null;
@@ -133,7 +140,7 @@ export async function POST({ request }) {
       snow = null;
     }
 
-    const dayData = {};
+    const dayData = {} as WeatherDay;
     dayData.location = location.index;
     dayData.date = dayDate;
     dayData.tavg = {
@@ -182,8 +189,14 @@ export async function POST({ request }) {
     } else {
       dayData.dayt = { metric: null, imperial: null };
     }
+
+    dayData.moon = getMoonPhase(dayDate);
+
     allData = [...allData, dayData];
   }
+
+  // Sort by date
+  allData.sort((a, b) => a.date - b.date);
 
   return json(allData);
 }

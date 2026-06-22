@@ -1,18 +1,22 @@
-import { CHARACTERS_FOR_URL_HASH } from '$lib/constants';
-import { gauges, previews, weather } from '$lib/state';
-import type { Color, WeatherParam } from '$lib/types';
+import { CHARACTERS_FOR_URL_HASH } from '$lib/constants/page-constants';
+import { gauges } from '$lib/state/gauges-state.svelte';
+import { previews } from '$lib/state/preview-state.svelte';
+import { weather } from '$lib/state/weather-state.svelte';
+import type { BasePreviewSettings } from '$lib/types/preview-types';
+import type { Color } from '$lib/types/yarn-types';
+import type { WeatherParam } from '$lib/types/gauge-types';
 import {
   getMonthSepparatorIndexes,
   getSquareSectionTargetIds,
-  getWeatherTargets,
   setSecondaryTargets,
   setTargets,
-} from '$lib/utils';
+} from '$lib/utils/preview-utils.svelte';
+import { getWeatherTargets } from '$lib/utils/weather-utils.svelte';
 import chroma from 'chroma-js';
 import Preview from './Preview.svelte';
 import Settings from './Settings.svelte';
 
-type SquaresPreviewSettings = {
+interface SquaresPreviewSettings extends BasePreviewSettings {
   primaryTarget: WeatherParam['id'];
   squareSize: number;
   columns: number;
@@ -23,7 +27,7 @@ type SquaresPreviewSettings = {
   joinColor: Color['hex'];
   additionalSquaresColor: Color['hex'];
   primaryTargetAsBackup: boolean;
-};
+}
 
 export class SquaresPreviewClass {
   constructor() {
@@ -82,6 +86,7 @@ export class SquaresPreviewClass {
     primaryTargetAsBackup: true,
     joinStitches: 0,
     joinColor: '#e8e3e2',
+    useSeasonTargets: false,
   });
 
   // *******************

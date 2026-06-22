@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -19,7 +19,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div class="rounded-container bg-surface-200 dark:bg-surface-800 p-4 text-left">
-  <div class="mb-2 text-sm">{groupLabel}</div>
+  <div class="mb-1 text-xs">{groupLabel}</div>
   <div class="flex flex-col gap-2">
     {#each targets as { id, label, icon }}
       {@const containsId = value.includes(id)}

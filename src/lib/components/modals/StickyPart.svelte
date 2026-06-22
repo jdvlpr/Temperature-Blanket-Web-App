@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -27,7 +27,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div
-  class="sticky {classPosition} rounded-br-container rounded-bl-container z-10 bg-surface-100 dark:bg-surface-900 px-0 mx-0"
+  class="sticky {classPosition} bg-surface-100 dark:bg-surface-900 z-10 mx-0 px-0"
 >
   {@render children?.()}
 </div>

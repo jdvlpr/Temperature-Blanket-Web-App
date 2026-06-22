@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -22,7 +22,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '$env/static/public';
   import AppLogo from '$lib/components/AppLogo.svelte';
   import AppShell from '$lib/components/AppShell.svelte';
-  import Card from '$lib/components/Card.svelte';
   import ChangelogItem from '$lib/components/ChangelogItem.svelte';
   import ToTopButton from '$lib/components/buttons/ToTopButton.svelte';
   import { onMount } from 'svelte';
@@ -46,13 +45,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <svelte:head>
-  <title>Changelog</title>
+  <title>What's New?</title>
   <meta
     name="description"
     content="See what's new and review past changes from {PUBLIC_BASE_DOMAIN_NAME}."
   />
 
-  <meta property="og:title" content="Changelog" />
+  <meta property="og:title" content="What's New?" />
   <meta
     property="og:description"
     content="See what's new and review past changes from {PUBLIC_BASE_DOMAIN_NAME}."
@@ -60,6 +59,40 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <meta property="og:url" content="{PUBLIC_BASE_URL}/changelog" />
   <meta property="og:type" content="website" />
 </svelte:head>
+
+<AppShell pageName="What's New?">
+  {#snippet stickyHeader()}
+    <div class="mx-auto hidden lg:inline-flex"><AppLogo /></div>
+  {/snippet}
+  {#snippet main()}
+    <main
+      class="m-auto mx-auto mt-2 mb-6 max-w-(--breakpoint-md) px-2 text-center"
+    >
+      <div class="flex flex-col items-start gap-2" bind:this={container}>
+        <h2 class="h2 text-gradient mt-2 max-lg:hidden">What's New?</h2>
+        <p class="text-left text-sm text-surface-700-300">Selected highlights of changes to {PUBLIC_BASE_DOMAIN_NAME}. To see the full changelog, <a
+            href="{PUBLIC_GITHUB_LINK}/commits/main/"
+            class="link"
+            target="_blank">visit the GitHub repository</a
+          >.</p>
+      </div>
+      <div class="flex flex-col items-start gap-2 py-4 text-left">
+        <div class="flex flex-col gap-2">
+          {#each entries as { year, months }}
+            {#each months as { month, items }}
+              <p class="text-xl font-bold">{month}, {year}</p>
+              <div class="flex w-full flex-col gap-4">
+                {#each items as { version, notes }}
+                  <ChangelogItem {version} {notes} />
+                {/each}
+              </div>
+            {/each}
+          {/each}
+        </div>
+      </div>
+    </main>
+  {/snippet}
+</AppShell>
 
 {#if showScrollToTopButton}
   <ToTopButton
@@ -70,29 +103,3 @@ If not, see <https://www.gnu.org/licenses/>. -->
       })}
   />
 {/if}
-
-<AppShell pageName="Changelog">
-  {#snippet stickyHeader()}
-    <div class="hidden lg:inline-flex"><AppLogo /></div>
-  {/snippet}
-  {#snippet main()}
-    <main class="max-w-(--breakpoint-md) m-auto text-center mb-6 mt-2 px-2 mx-auto">
-      <div class="" bind:this={container}>
-        <p class="text-left">
-          See what's new and review past changes from {PUBLIC_BASE_DOMAIN_NAME}.
-          This changelog includes only select milestones.
-          <a
-            href="{PUBLIC_GITHUB_LINK}/commits/main/"
-            class="link"
-            target="_blank">Visit the GitHub repository</a
-          > to see the full changelog since version 4.
-        </p>
-      </div>
-      <div class="flex flex-col gap-2 text-left items-start py-4">
-        {#each entries as { version, date, notes }}
-          <ChangelogItem {version} {date} {notes} />
-        {/each}
-      </div>
-    </main>
-  {/snippet}
-</AppShell>

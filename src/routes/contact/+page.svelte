@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -24,10 +24,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import AppLogo from '$lib/components/AppLogo.svelte';
   import AppShell from '$lib/components/AppShell.svelte';
   import {
+    CloudAlertIcon,
+    CodeIcon,
     ExternalLinkIcon,
-    FacebookIcon,
-    GithubIcon,
     MailIcon,
+    MessageCirclePlusIcon,
+    UsersIcon,
   } from '@lucide/svelte';
 
   let email = $state('Loading...');
@@ -49,21 +51,38 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <AppShell pageName="Contact">
   {#snippet stickyHeader()}
-    <div class="hidden lg:inline-flex"><AppLogo /></div>
+    <div class="mx-auto hidden lg:inline-flex"><AppLogo /></div>
   {/snippet}
   {#snippet main()}
     <main
       class="mx-auto flex max-w-(--breakpoint-sm) flex-col gap-4 px-4 lg:px-0"
     >
       <div>
-        <h2 class="h2 text-gradient max-lg:hidden">Contact</h2>
+        <h2 class="h2 text-gradient mt-2 max-lg:hidden">Contact</h2>
         <div class="mt-2 flex flex-col gap-4">
           <p class="font-bold">General Communication</p>
 
-          <a href="mailto:{email}" class="btn hover:preset-tonal w-fit">
+          <a href="mailto:{email}" class="btn hover:preset-tonal-surface w-fit">
             <MailIcon />
-
             {email}
+          </a>
+
+          <p class="font-bold">Forms</p>
+
+          <a
+            href="/yarn-search-request"
+            class="btn hover:preset-tonal-surface w-fit"
+          >
+            <MessageCirclePlusIcon />
+            Request Yarn
+          </a>
+
+          <a
+            href="/contact/forms/2025-03-weather-data"
+            class="btn hover:preset-tonal-surface w-fit"
+          >
+            <CloudAlertIcon />
+            Weather Data Feedback
           </a>
 
           {#if PUBLIC_GITHUB_LINK}
@@ -72,9 +91,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
               href="{PUBLIC_GITHUB_LINK}/issues"
               target="_blank"
               rel="noreferrer"
-              class="btn hover:preset-tonal w-fit text-left"
+              class="btn hover:preset-tonal-surface w-fit text-left"
             >
-              <GithubIcon />
+              <CodeIcon />
               GitHub Issues
               <ExternalLinkIcon class="relative -top-[1px] size-5" />
             </a>
@@ -86,9 +105,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
               href="{PUBLIC_GITHUB_LINK}/discussions"
               target="_blank"
               rel="noreferrer"
-              class="btn hover:preset-tonal w-fit text-left"
+              class="btn hover:preset-tonal-surface w-fit text-left"
             >
-              <GithubIcon />
+              <CodeIcon />
               GitHub Discussions
               <ExternalLinkIcon class="relative -top-[1px] size-5" />
             </a>
@@ -100,24 +119,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
               href={PUBLIC_FACEBOOK_LINK}
               target="_blank"
               rel="noreferrer"
-              class="btn hover:preset-tonal w-fit text-left"
+              class="btn hover:preset-tonal-surface w-fit text-left"
             >
-              <FacebookIcon />
-              {PUBLIC_SITE_TITLE}
+              <UsersIcon />
+              Facebook
               <ExternalLinkIcon class="relative -top-[1px] size-5" />
             </a>
           {/if}
-
-          <p class="font-bold">Forms</p>
-          <a href="/contact/forms/2025-03-weather-data" class="link">
-            Weather Data Feedback Form
-          </a>
         </div>
       </div>
       <div class="rounded-container bg-surface-100-900 my-4 w-fit p-2">
         <p>
-          See the <a href="/faq" class="link">Frequently Asked Questions</a> for
-          answers to common questions.
+          See the <a href="/faq" class="link">Frequently Asked Questions</a> for answers
+          to common questions.
         </p>
       </div>
     </main>

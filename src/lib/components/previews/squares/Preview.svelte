@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -15,14 +15,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import Spinner from '$lib/components/Spinner.svelte';
-  import { localState, weather } from '$lib/state';
-  import type { Color, WeatherDay, WeatherParam } from '$lib/types';
+  import { weather } from '$lib/state/weather-state.svelte';
+  import type { Color } from '$lib/types/yarn-types';
+  import type { WeatherParam } from '$lib/types/gauge-types';
+  import { getColorInfo } from '$lib/utils/color-utils';
   import {
-    getColorInfo,
     getSquareSectionTargetIds,
-    runPreview,
     showPreviewImageWeatherDetails,
-  } from '$lib/utils';
+  } from '$lib/utils/preview-utils.svelte';
+  import { runPreview } from '$lib/utils/function-utils.svelte';
   import { squaresPreview } from './state.svelte';
 
   let width = $state(squaresPreview.width);
@@ -112,10 +113,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
         if (isWeatherSquare) {
           // Get the weather data for the current day
-          const day: WeatherDay = weather.data[dayIndex];
           let targetId: WeatherParam['id'] =
             squareSectionTargetIds[squareSectionIndex];
-          let value = day[targetId][localState.value.units];
+          let value = weather.getWeatherValue({ dayIndex, param: targetId });
 
           // Check if the primary target value is 0 or null, use the primary target as a backup
           if (
@@ -125,7 +125,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               value === null)
           ) {
             targetId = squaresPreview.settings.primaryTarget;
-            value = day[targetId][localState.value.units];
+            value = weather.getWeatherValue({ dayIndex, param: targetId });
           }
 
           // Get the color based on the gauge ID and value

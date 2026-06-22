@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -13,13 +13,24 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
+<script module>
+  let selectedVersion = $state({value:'v3'});
+</script>
+
 <script>
   import { PUBLIC_BASE_DOMAIN_NAME, PUBLIC_BASE_URL } from '$env/static/public';
   import AppLogo from '$lib/components/AppLogo.svelte';
   import AppShell from '$lib/components/AppShell.svelte';
-  import { Modal } from '@skeletonlabs/skeleton-svelte';
+  import { Dialog, Portal } from '@skeletonlabs/skeleton-svelte';
 
   let openTableOfContents = $state(false);
+
+  // The following animations are optional.
+  // These may also be included inline.
+  const animBackdrop =
+    'transition transition-discrete opacity-0 starting:data-[state=open]:opacity-0 data-[state=open]:opacity-100';
+  const animModal =
+    'transition transition-discrete opacity-0 translate-x-full starting:data-[state=open]:opacity-0 starting:data-[state=open]:translate-x-full data-[state=open]:opacity-100 data-[state=open]:translate-x-0';
 </script>
 
 <svelte:head>
@@ -70,6 +81,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <li class="toc-list-item ml-4 block">
         <a href="#sign-up" class="toc-anchor opacity-60 hover:opacity-100"
           >Sign Up</a
+        >
+      </li>
+      <li class="toc-list-item ml-4 block">
+        <a href="#version" class="toc-anchor opacity-60 hover:opacity-100"
+          >Choosing a Version</a
         >
       </li>
       <li class="toc-list-item ml-4 block">
@@ -136,20 +152,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <AppLogo />
     </div>
     <div class="sm:hidden">
-      <Modal
+      <Dialog
         open={openTableOfContents}
         onOpenChange={(e) => {
           openTableOfContents = e.open;
         }}
-        triggerBase="hover:preset-tonal"
-        contentBase="bg-surface-50 dark:bg-surface-950 p-4 space-y-4 shadow-xl w-fit h-screen overflow-auto"
-        positionerJustify="justify-end"
-        positionerAlign=""
-        positionerPadding=""
-        transitionsPositionerIn={{ x: 480, duration: 200 }}
-        transitionsPositionerOut={{ x: 480, duration: 200 }}
       >
-        {#snippet trigger()}
+        <Dialog.Trigger
+          class="btn hover:preset-tonal-surface my-2"
+          aria-label="Content Menu"
+        >
           <div class="flex flex-wrap items-center gap-1">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -162,13 +174,23 @@ If not, see <https://www.gnu.org/licenses/>. -->
             >
 
             <span class="">Content</span>
-          </div>{/snippet}
-        {#snippet content()}
-          <div class="mb-20">
-            {@render tableOfContents()}
           </div>
-        {/snippet}
-      </Modal>
+        </Dialog.Trigger>
+        <Portal>
+          <Dialog.Backdrop
+            class="bg-surface-50-950/50 fixed inset-0 z-50 {animBackdrop}"
+          />
+          <Dialog.Positioner class="fixed inset-0 z-50 flex justify-end">
+            <Dialog.Content
+              class="bg-surface-50 dark:bg-surface-950 h-screen w-fit space-y-4 overflow-auto p-4 shadow-xl {animModal}"
+            >
+              <div class="mb-20">
+                {@render tableOfContents()}
+              </div>
+            </Dialog.Content>
+          </Dialog.Positioner>
+        </Portal>
+      </Dialog>
     </div>
   {/snippet}
 
@@ -188,8 +210,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
             >
               Yarn Colorways API
             </h2>
+            
             <section
-              class="card preset-tonal rounded-container mt-2 flex flex-col gap-2 p-4 lg:mt-0"
+              class="card preset-tonal-surface rounded-container mt-2 flex flex-col gap-2 p-4 lg:mt-0"
             >
               <p>Find yarn colorways by HTML hex color code.</p>
 
@@ -230,7 +253,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <h2 class="text-2xl font-bold" id="using-the-api">Using the API</h2>
 
           <section id="sign-up" class="flex scroll-mt-[58px] flex-col gap-2">
-            <h3 class="text-xl font-bold" id="sign-up">Sign Up</h3>
+            <h3 class="text-xl font-bold">Sign Up</h3>
             <p class="first-letter:capitalize">
               {PUBLIC_BASE_DOMAIN_NAME} uses
               <a
@@ -255,23 +278,56 @@ If not, see <https://www.gnu.org/licenses/>. -->
               >
               and
               <a
-                href="https://rapidapi.com/temperature-blanket-temperature-blanket-default/api/yarn-colorways//pricing"
+                href="https://rapidapi.com/temperature-blanket-temperature-blanket-default/api/yarn-colorways/pricing"
                 target="_blank"
                 class="link">subscribe to one of the plans</a
-              > to get a key for accessing the Yarn Colorways API. The free plan
-              allows up to 500 calls per month.
+              > to get a key for accessing the Yarn Colorways API. The free plan allows
+              up to 500 calls per month.
             </p>
           </section>
+
+          <section id="version" class="flex scroll-mt-[58px] flex-col gap-2">
+            <h3 class="text-xl font-bold">Choosing a Version</h3>
+
+            <p>Unless you have a specific reason to use a previous version, you should use the latest (v3) version. Selecting a version below will update this page to show the relevant documentation.</p>
+
+            <label for="version-select" class="label">
+              <span class="label-text">API Version</span>
+              <select
+                id="version-select"
+                class="select w-fit"
+                bind:value={selectedVersion.value}
+              >
+                <option value="v1">v1</option>
+                <option value="v2" disabled>v2 (unavailable)</option>
+                <option value="v3">v3 (Latest)</option>
+              </select>
+            </label>
+
+            {#if selectedVersion.value === 'v1'}
+                  <p>This is the original version of the API.</p>
+            {:else if selectedVersion.value === 'v3'}
+                  <p>This version was introduced on {new Date('2026-04-09').toLocaleDateString()}. Compared to the previous version, the changes are:
+                  </p>
+                  <ul class="list-disc pl-8 text-sm">
+                    <li>For the <a href="#colorways" class="link">Colorways</a> endpoint, the default behavior of the <span class="code px-2">name</span> parameter is now 'contains' instead of 'exact match'. So for example, a request with <span class="code px-2">?name=blue</span> will now return all colorways with 'blue' in the name, instead of only colorways with the exact name 'blue'.</li>
+                    <li>The <a href="#find-yarn-by-color" class="link">Find Yarn by Color</a> endpoint also accepts a <span class="code px-2">name</span> parameter to filter the results by colorway name.</li>
+                    <li>The <a href="#colorways" class="link">Colorways</a> and <a href="#find-yarn-by-color" class="link">Find Yarn by Color</a> endpoints accept an optional <span class="code px-2">exactName</span> parameter for exact matching.</li>
+                    <li>The <a href="#colorways" class="link">Colorways</a>, <a href="#find-yarn-by-color" class="link">Find Yarn by Color</a>, and <a href="#yarns" class="link">Yarns</a> endpoints now return <span class="code px-2">unavailable</span> and <span class="code px-2">unavailableDate</span> if the <a href="/documentation#link-unavailable" target="_blank" class="link">yarn link is no longer available</a>.</li>
+                  </ul>
+              {/if}
+          </section>
+
           <section
-            id="sending-requests"
+            id="making-a-request"
             class="flex scroll-mt-[58px] flex-col gap-2"
           >
-            <h3 class="text-xl font-bold" id="making-a-request">
+            <h3 class="text-xl font-bold">
               Making a Request
             </h3>
             <p>This is the base URL for all endpoints:</p>
             <p class="codeblock code w-fit p-4! break-all whitespace-pre-wrap!">
-              https://yarn-colorways.p.rapidapi.com/v1
+              https://yarn-colorways.p.rapidapi.com/{selectedVersion.value}
             </p>
 
             <p>Include the following headers:</p>
@@ -288,7 +344,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             id="reading-a-response"
             class="flex scroll-mt-[58px] flex-col gap-2"
           >
-            <h3 class="text-xl font-bold" id="reading-a-response">
+            <h3 class="text-xl font-bold">
               Reading a Response
             </h3>
             <p>
@@ -343,7 +399,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             id="find-yarn-by-color"
             class="card bg-surface-200 dark:bg-surface-800 flex scroll-mt-[58px] flex-col gap-2 p-4"
           >
-            <h3 class="text-xl font-bold" id="find-yarn-by-color">
+            <h3 class="text-xl font-bold">
               Find Yarn by Color
             </h3>
             <p>Get best-matching yarn colorways for a specified color.</p>
@@ -393,6 +449,28 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     <td><span class="">Yes</span></td>
                     <td><span class="italic">undefined</span></td>
                   </tr>
+                  {#if selectedVersion.value === 'v3'}
+                    <tr>
+                      <td>name</td>
+                      <td
+                        >A colorway name, or a comma-separated list of colorway
+                        names to filter the results by. Text case is ignored. By default, it performs a partial (containing) match, so for example <span class="code px-2">blue</span> will include 'Royal Blue' and 'Dark Blue'.</td
+                      >
+                      <td>String</td>
+                      <td>No</td>
+                      <td><span class="italic">undefined</span></td>
+                    </tr>
+                    <tr>
+                      <td>exactName</td>
+                      <td
+                        >Set to <span class="code px-2">true</span> to require an
+                        exact match instead of a partial match for the name parameter.</td
+                      >
+                      <td>Boolean</td>
+                      <td>No</td>
+                      <td><span class="code px-2">false</span></td>
+                    </tr>
+                  {/if}
                   <tr>
                     <td>brand</td>
                     <td
@@ -465,19 +543,26 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <p class="code w-fit p-4! break-all whitespace-pre-wrap!">
               {`// get colorways matching an HTML hex code without the # hash 
-  GET https://yarn-colorways.p.rapidapi.com/v1/match/665e3f 
+GET https://yarn-colorways.p.rapidapi.com/${selectedVersion.value}/match/665e3f 
 
-  // get colorways matching a URL encoded HTML hex code #665e3f
-  GET https://yarn-colorways.p.rapidapi.com/v1/match/%23665e3f 
+// get colorways matching a URL encoded HTML hex code #665e3f
+GET https://yarn-colorways.p.rapidapi.com/${selectedVersion.value}/match/%23665e3f 
 
-  // get colorways matching a standard HTML color name 
-  GET https://yarn-colorways.p.rapidapi.com/v1/match/green 
+// get colorways matching a standard HTML color name 
+GET https://yarn-colorways.p.rapidapi.com/${selectedVersion.value}/match/green 
 
-  // get colorways matching a URL encoded RGB color code rgb(102,94,63)
-  GET https://yarn-colorways.p.rapidapi.com/v1/match/rgb%28102%2C94%2C63%29
+// get colorways matching a URL encoded RGB color code rgb(102,94,63)
+GET https://yarn-colorways.p.rapidapi.com/${selectedVersion.value}/match/rgb%28102%2C94%2C63%29
 
-  // get matches only from a specified brand and yarn
-  GET https://yarn-colorways.p.rapidapi.com/v1/match/665e3f?brand=cascade&yarn=anchor_bay`}
+// get matches only from a specified brand and yarn
+GET https://yarn-colorways.p.rapidapi.com/${selectedVersion.value}/match/665e3f?brand=cascade&yarn=anchor_bay`}
+
+{#if selectedVersion.value === 'v3'}
+  {`
+
+// get matches by name
+GET https://yarn-colorways.p.rapidapi.com/v3/match/665e3f?name=blue`}
+{/if}
             </p>
 
             <p class="font-bold">Response</p>
@@ -566,6 +651,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     >
                     <td>Number</td>
                   </tr>
+                  {#if selectedVersion.value === 'v3'}
+                    <tr>
+                      <td>unavailable</td>
+                      <td>This property is only returned if the yarn link is no longer available. See <a href="/documentation#link-unavailable" class="link" target="_blank">yarn link unavailable</a> for more information.</td>
+                      <td>Boolean</td>
+                    </tr>
+                    <tr>
+                      <td>unavailableDate</td>
+                      <td>This property is only returned if the yarn link is no longer available. The YYYY-MM-DD date when the colorway's yarn was marked as unavailable. See <a href="/documentation#link-unavailable" class="link" target="_blank">yarn link unavailable</a> for more information.</td>
+                      <td>String</td>
+                    </tr>
+                  {/if}
                 </tbody>
               </table>
             </div>
@@ -575,7 +672,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             id="colorways"
             class="card bg-surface-200 dark:bg-surface-800 flex scroll-mt-[58px] flex-col gap-2 p-4"
           >
-            <h3 class="text-xl font-bold" id="colorways">Colorways</h3>
+            <h3 class="text-xl font-bold">Colorways</h3>
             <p>Get yarn colorways.</p>
 
             <p>
@@ -623,13 +720,38 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     <td>No</td>
                     <td><span class="italic">undefined</span></td>
                   </tr>
-                  <tr>
-                    <td>name</td>
-                    <td>Any colorway name. Text case is ignored.</td>
-                    <td>String</td>
-                    <td>No</td>
-                    <td><span class="italic">undefined</span></td>
-                  </tr>
+                  {#if selectedVersion.value === 'v1'}
+                    <tr>
+                      <td>name</td>
+                      <td
+                        >Any colorway name. Text case is ignored.</td
+                      >
+                      <td>String</td>
+                      <td>No</td>
+                      <td><span class="italic">undefined</span></td>
+                    </tr>
+                  {:else if selectedVersion.value === 'v3'}
+                    <tr>
+                      <td>name</td>
+                      <td
+                        >A colorway name, or a comma-separated list of colorway
+                        names to filter the results by. Text case is ignored. By default, it performs a partial (containing) match, so for example <span class="code px-2">blue</span> will include 'Royal Blue' and 'Dark Blue'.</td
+                      >
+                      <td>String</td>
+                      <td>No</td>
+                      <td><span class="italic">undefined</span></td>
+                    </tr>
+                    <tr>
+                      <td>exactName</td>
+                      <td
+                        >Set to <span class="code px-2">true</span> to require an
+                        exact match instead of a partial match for the name parameter.</td
+                      >
+                      <td>Boolean</td>
+                      <td>No</td>
+                      <td><span class="code px-2">false</span></td>
+                    </tr>
+                  {/if}
                   <tr>
                     <td>brand</td>
                     <td
@@ -713,15 +835,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <p class="codeblock code w-fit p-4! break-all whitespace-pre-wrap!">
               {`// get all colorways 
-  GET https://yarn-colorways.p.rapidapi.com/v1/colorways
+GET https://yarn-colorways.p.rapidapi.com/${selectedVersion.value}/colorways
 
-  // get all colorways from a specified brand and yarn, sorted by lightest-to-darkest 
-  GET https://yarn-colorways.p.rapidapi.com/v1/colorways?brand=premire&yarn=afternoon_cotton&sortBy=lightness
+// get all colorways from a specified brand and yarn, sorted by lightest-to-darkest 
+GET https://yarn-colorways.p.rapidapi.com/${selectedVersion.value}/colorways?brand=premire&yarn=afternoon_cotton&sortBy=lightness
 
-  // get all colorways with a specified name 
-  GET https://yarn-colorways.p.rapidapi.com/v1/colorways?name=peach
-
-  `}
+// get all colorways with a specified name 
+GET https://yarn-colorways.p.rapidapi.com/${selectedVersion.value}/colorways?name=peach`}
             </p>
 
             <p class="font-bold">Response</p>
@@ -793,6 +913,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     <td>The webpage where the colorway was found.</td>
                     <td>String</td>
                   </tr>
+                  {#if selectedVersion.value === 'v3'}
+                    <tr>
+                      <td>unavailable</td>
+                      <td>This property is only returned if the yarn link is no longer available. See <a href="/documentation#link-unavailable" class="link" target="_blank">yarn link unavailable</a> for more information.</td>
+                      <td>Boolean</td>
+                    </tr>
+                    <tr>
+                      <td>unavailableDate</td>
+                      <td>This property is only returned if the yarn link is no longer available. The YYYY-MM-DD date when the colorway's yarn was marked as unavailable. See <a href="/documentation#link-unavailable" class="link" target="_blank">yarn link unavailable</a> for more information.</td>
+                      <td>String</td>
+                    </tr>
+                  {/if}
                 </tbody>
               </table>
             </div>
@@ -802,7 +934,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             id="brands"
             class="card bg-surface-200 dark:bg-surface-800 flex scroll-mt-[58px] flex-col gap-2 p-4"
           >
-            <h3 class="text-xl font-bold" id="brands">Brands</h3>
+            <h3 class="text-xl font-bold">Brands</h3>
             <p>
               Get all brand IDs and names, useful to filter <a
                 href="#find-yarn-by-color"
@@ -828,8 +960,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <p class="codeblock code w-fit p-4! break-all whitespace-pre-wrap!">
               {`// get all brands 
-  GET https://yarn-colorways.p.rapidapi.com/v1/brands 
-  `}
+GET https://yarn-colorways.p.rapidapi.com/${selectedVersion.value}/brands`}
             </p>
 
             <p class="font-bold">Response</p>
@@ -882,7 +1013,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             id="yarns"
             class="card bg-surface-200 dark:bg-surface-800 flex scroll-mt-[58px] flex-col gap-2 p-4"
           >
-            <h3 class="text-xl font-bold" id="yarns">Yarns</h3>
+            <h3 class="text-xl font-bold">Yarns</h3>
             <p>
               Get all yarn IDs and names, useful to filter <a
                 href="#find-yarn-by-color"
@@ -939,14 +1070,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <p class="codeblock code w-fit p-4! break-all whitespace-pre-wrap!">
               {`// get all yarns 
-  GET https://yarn-colorways.p.rapidapi.com/v1/yarns
+GET https://yarn-colorways.p.rapidapi.com/${selectedVersion.value}/yarns
 
-  // filter by brand 
-  GET https://yarn-colorways.p.rapidapi.com/v1/yarns?brand=hobbii 
+// filter by brand 
+GET https://yarn-colorways.p.rapidapi.com/${selectedVersion.value}/yarns?brand=hobbii 
 
-  // filter by multiple brands 
-  GET https://yarn-colorways.p.rapidapi.com/v1/yarns?brand=bernat,loops_and_threads,plymouth_yarn
-  `}
+// filter by multiple brands 
+GET https://yarn-colorways.p.rapidapi.com/${selectedVersion.value}/yarns?brand=bernat,loops_and_threads,plymouth_yarn`}
             </p>
 
             <p class="font-bold">Response</p>
@@ -1000,6 +1130,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     <td>The number of colorways in this yarn.</td>
                     <td>Number</td>
                   </tr>
+                  {#if selectedVersion.value === 'v3'}
+                    <tr>
+                      <td>unavailable</td>
+                      <td>This property is only returned if the yarn link is no longer available. See <a href="/documentation#link-unavailable" class="link" target="_blank">yarn link unavailable</a> for more information.</td>
+                      <td>Boolean</td>
+                    </tr>
+                    <tr>
+                      <td>unavailableDate</td>
+                      <td>This property is only returned if the yarn link is no longer available. The YYYY-MM-DD date when the colorway's yarn was marked as unavailable. See <a href="/documentation#link-unavailable" class="link" target="_blank">yarn link unavailable</a> for more information.</td>
+                      <td>String</td>
+                    </tr>
+                  {/if}
                 </tbody>
               </table>
             </div>
@@ -1009,7 +1151,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             id="yarn-weights"
             class="card bg-surface-200 dark:bg-surface-800 flex scroll-mt-[58px] flex-col gap-2 p-4"
           >
-            <h3 class="text-xl font-bold" id="yarn-weight">Yarn Weights</h3>
+            <h3 class="text-xl font-bold">Yarn Weights</h3>
             <p>
               Get all yarn weight IDs and names, useful to filter <a
                 href="#find-yarn-by-color"
@@ -1035,8 +1177,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <p class="codeblock code w-fit p-4! break-all whitespace-pre-wrap!">
               {`// get all yarn weights 
-  GET https://yarn-colorways.p.rapidapi.com/v1/weights
-  `}
+GET https://yarn-colorways.p.rapidapi.com/${selectedVersion.value}/weights`}
             </p>
 
             <p class="font-bold">Response</p>

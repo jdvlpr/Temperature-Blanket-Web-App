@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -16,33 +16,36 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script>
   import { browser } from '$app/environment';
   import ProjectDetails from '$lib/components/ProjectDetails.svelte';
+  import { ProjectStorage } from '$lib/storage/projects.svelte';
 
   let projects = $state([]);
 
+  async function loadProjects() {
+    if (browser) {
+      projects = await ProjectStorage.getProjectsForDisplay();
+    } else {
+      projects = [];
+    }
+  }
+
   $effect(() => {
-    projects =
-      browser && localStorage.getItem('projects')
-        ? JSON.parse(localStorage.getItem('projects'))?.reverse()
-        : [];
+    loadProjects();
   });
 </script>
 
 {#key projects}
   {#if projects?.length}
     <div class="mb-2 flex w-full flex-col items-start justify-center">
-      <h2 class="mt-8 text-xl font-bold">Saved Projects</h2>
-      <p class="mb-2 text-sm">Stored in this browser</p>
+      <h2 class="mt-4 text-xl font-bold">Saved Projects</h2>
+      <p class="text-surface-700-300 mb-2 text-sm">Stored in this browser</p>
       <div class="flex w-full flex-col items-start justify-center gap-2">
         {#each projects as project}
-          {@const { href } = project}
+          {@const { meta } = project}
           <ProjectDetails
-            {project}
-            onclick={() => {
-              const newProjects = projects.filter(
-                (_project) => _project.href !== href,
-              );
-              localStorage.setItem('projects', JSON.stringify(newProjects));
-              projects = newProjects;
+            project={meta}
+            onclick={async () => {
+              await ProjectStorage.removeByHref(meta.href);
+              await loadProjects();
             }}
           />
         {/each}

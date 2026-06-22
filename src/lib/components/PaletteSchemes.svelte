@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -16,8 +16,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script>
   import ColorPalette from '$lib/components/ColorPalette.svelte';
   import SelectNumberOfColors from '$lib/components/SelectNumberOfColors.svelte';
-  import { SCHEMES } from '$lib/constants';
-  import { modal } from '$lib/state';
+  import { SCHEMES } from '$lib/constants/color-constants';
+  import { dialog } from '$lib/state/page-state.svelte';
   import { PaletteIcon } from '@lucide/svelte';
   import chroma from 'chroma-js';
 
@@ -54,40 +54,40 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div
-  class="text-center flex flex-wrap justify-center items-end scroll-mt-[70px] pb-4 gap-4 px-2"
+  class="flex scroll-mt-[70px] flex-wrap items-end justify-center gap-4 px-2 pb-4 text-center"
 >
   <label class="label">
-    <span class="flex items-center gap-2">
-      <PaletteIcon class="size-4" />
-      Color Scheme
-    </span>
-    <select
-      class="select truncate"
-      id="select-sort-by"
-      bind:value={currentScheme}
-    >
-      {#each schemes as scheme}
-        <option value={scheme}>{scheme}</option>
-      {/each}
-    </select>
+    <span class="label-text flex items-center gap-1"> Color Scheme </span>
+    <div class="relative flex items-center">
+      <PaletteIcon class="absolute left-2" />
+      <select
+        class="select truncate pl-10"
+        id="select-sort-by"
+        bind:value={currentScheme}
+      >
+        {#each schemes as scheme}
+          <option value={scheme}>{scheme}</option>
+        {/each}
+      </select>
+    </div>
   </label>
 
   <SelectNumberOfColors bind:numberOfColors />
 </div>
 <div
-  class="flex flex-col items-center scroll-mt-[58px] lg:scroll-mt-[44px] px-2"
+  class="flex scroll-mt-[58px] flex-col items-center px-2 lg:scroll-mt-[44px]"
 >
-  <div class="gap-4 my-2 flex flex-col items-start justify-start w-full">
+  <div class="my-2 flex w-full flex-col items-start justify-start gap-4">
     {#each palettes as { value, label, colors }}
       <button
         type="button"
-        class="cursor-pointer w-full"
+        class="w-full cursor-pointer"
         onclick={() => {
           updateGauge({
             _colors: colors,
             _schemeId: value,
           });
-          modal.close();
+          dialog.close();
         }}
         title="Use This Palette"
       >
@@ -96,7 +96,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {/each}
   </div>
 </div>
-<p class="text-sm w-full mt-4">
+<p class="mt-4 w-full text-sm">
   Color schemes based on <a
     href="https://colorbrewer2.org/"
     target="_blank"

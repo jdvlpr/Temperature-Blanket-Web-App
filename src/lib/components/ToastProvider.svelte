@@ -1,16 +1,9 @@
 <script lang="ts">
   import { run } from 'svelte/legacy';
-
   import { flip } from 'svelte/animate';
-
-  import { toast } from '$lib/state';
-  import { fade, scale } from 'svelte/transition';
-  import {
-    CircleAlertIcon,
-    CircleCheckIcon,
-    InfoIcon,
-    TriangleAlertIcon,
-  } from '@lucide/svelte';
+  import { toast } from '$lib/state/page-state.svelte';
+  import { CircleAlertIcon, CircleCheckIcon, InfoIcon } from '@lucide/svelte';
+  import { fade } from 'svelte/transition';
 
   // Props
 
@@ -61,7 +54,7 @@
     shadow = 'shadow-lg',
     zIndex = 'z-9999',
     buttonAction = 'btn preset-filled',
-    buttonDismiss = 'btn-icon hover:preset-tonal',
+    buttonDismiss = 'btn-icon hover:preset-tonal-surface',
     buttonDismissLabel = '✕',
   }: Props = $props();
 
@@ -72,25 +65,61 @@
   const cToast = 'flex justify-between items-center pointer-events-auto';
   const cToastActions = 'flex items-center space-x-2';
 
-  // Local
-  let cPosition: string = $state();
-  let cAlign: string = $state(); // items-center
-  let animAxis = { x: 0, y: 0 };
+  let { cPosition, cAlign, animAxis } = $derived(getLocalPosition(position));
 
-  // Set Position
-  // prettier-ignore
-  switch (position) {
-		// Middles
-		case('t'): cPosition = 'justify-center items-start'; cAlign = 'items-center'; animAxis = { x: 0, y: -100 }; break;
-		case('b'): cPosition = 'justify-center items-end'; cAlign = 'items-center'; animAxis = { x: 0, y: 100 }; break;
-		case('l'): cPosition = 'justify-start items-center'; cAlign = 'items-start'; animAxis = { x: -100, y: 0 }; break;
-		case('r'): cPosition = 'justify-end items-center'; cAlign = 'items-end'; animAxis = { x: 100, y: 0 }; break;
-		// Corners
-		case ('tl'): cPosition = 'justify-start items-start'; cAlign = 'items-start'; animAxis = { x: -100, y: 0 }; break;
-		case ('tr'): cPosition = 'justify-end items-start'; cAlign = 'items-end'; animAxis = { x: 100, y: 0 }; break;
-		case ('bl'): cPosition = 'justify-start items-end'; cAlign = 'items-start'; animAxis = { x: -100, y: 0 }; break;
-		case ('br'): cPosition = 'justify-end items-end'; cAlign = 'items-end'; animAxis = { x: 100, y: 0 }; break;
-	}
+  function getLocalPosition(position: string) {
+    // Local
+    let cPosition: string = '';
+    let cAlign: string = ''; // items-center
+    let animAxis = { x: 0, y: 0 };
+
+    // Set Position
+    switch (position) {
+      // Middles
+      case 't':
+        cPosition = 'justify-center items-start';
+        cAlign = 'items-center';
+        animAxis = { x: 0, y: -100 };
+        break;
+      case 'b':
+        cPosition = 'justify-center items-end';
+        cAlign = 'items-center';
+        animAxis = { x: 0, y: 100 };
+        break;
+      case 'l':
+        cPosition = 'justify-start items-center';
+        cAlign = 'items-start';
+        animAxis = { x: -100, y: 0 };
+        break;
+      case 'r':
+        cPosition = 'justify-end items-center';
+        cAlign = 'items-end';
+        animAxis = { x: 100, y: 0 };
+        break;
+      // Corners
+      case 'tl':
+        cPosition = 'justify-start items-start';
+        cAlign = 'items-start';
+        animAxis = { x: -100, y: 0 };
+        break;
+      case 'tr':
+        cPosition = 'justify-end items-start';
+        cAlign = 'items-end';
+        animAxis = { x: 100, y: 0 };
+        break;
+      case 'bl':
+        cPosition = 'justify-start items-end';
+        cAlign = 'items-start';
+        animAxis = { x: -100, y: 0 };
+        break;
+      case 'br':
+        cPosition = 'justify-end items-end';
+        cAlign = 'items-end';
+        animAxis = { x: 100, y: 0 };
+        break;
+    }
+    return { cPosition, cAlign, animAxis };
+  }
 
   function onAction(index: number): void {
     toast.queue[index]?.action?.response();
@@ -111,8 +140,6 @@
     }
   }
 
-  let wrapperVisible = $state(false);
-
   // Reactive
   let classesWrapper = $derived(`${cWrapper} ${cPosition} ${zIndex}`);
 
@@ -124,11 +151,7 @@
   // Filtered Toast Store
   let filteredToasts = $derived(Array.from(toast.queue).slice(0, max));
 
-  run(() => {
-    if (filteredToasts.length) {
-      wrapperVisible = true;
-    }
-  });
+  let wrapperVisible = $derived(filteredToasts.length > 0);
 </script>
 
 {#if filteredToasts.length > 0 || wrapperVisible}
@@ -138,7 +161,7 @@
     <div class="snackbar {classesSnackbar}">
       {#each filteredToasts as t, i (t)}
         <div
-          animate:flip={{ duration: 250 }}
+          animate:flip={{ duration: 400 }}
           transition:fade
           onoutroend={() => {
             const outroFinishedForLastToastOnQueue =
@@ -163,7 +186,13 @@
             ]}
             data-testid="toast"
           >
-            {#if t.category === 'success'}
+            {#if t.icon}
+              {@const CustomIcon = t.icon as any}
+              <div class="flex items-center justify-between gap-4 text-base">
+                <CustomIcon class="inline" />
+                {@html t.message}
+              </div>
+            {:else if t.category === 'success'}
               <div class="flex items-center justify-between gap-4 text-base">
                 <CircleCheckIcon class="inline" />
                 {@html t.message}

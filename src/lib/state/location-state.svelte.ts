@@ -1,4 +1,4 @@
-// Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+// Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 //
 // This file is part of Temperature-Blanket-Web-App.
 //
@@ -14,43 +14,55 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { browser } from '$app/environment';
-import {
-  CHARACTERS_FOR_URL_HASH,
-  MAXIMUM_DAYS_PER_LOCATION,
-} from '$lib/constants';
-import { weather } from '$lib/state';
+import { CHARACTERS_FOR_URL_HASH } from '$lib/constants/page-constants';
+import { MAXIMUM_DAYS_PER_LOCATION } from '$lib/constants/location-constants';
+import { weather } from '$lib/state/weather-state.svelte';
 import type {
   LocationsStateType,
   LocationStateType,
   LocationType,
+} from '$lib/types/location-types';
+import type {
+  TISO8601DateString,
   WeatherSource,
-} from '$lib/types';
-import { getToday, numberOfDays, stringToDate } from '$lib/utils';
+} from '$lib/types/weather-types';
+import {
+  dateToISO8601String,
+  getDaysBetween,
+  stringToDate,
+} from '$lib/utils/date-utils';
 
 export class LocationClass implements LocationType {
-  uuid: string = $state();
-  index: number = $state();
-  duration?: 'c' | 'y' = $state();
-  from?: string = $state();
-  to?: string = $state();
-  label?: string = $state();
-  result?: string = $state();
+  uuid: string = $state('');
+  index: number = $state(0);
+  duration?: 'c' | 'y' = $state('y');
+  from?: TISO8601DateString = $state();
+  to?: TISO8601DateString = $state();
+  label?: string = $state('');
+  result?: string = $state('');
   id?: number = $state();
-  lat?: string = $state();
-  lng?: string = $state();
+  lat?: string = $state('');
+  lng?: string = $state('');
   elevation?: number = $state();
   stations?: null | any[] = $state();
   source?: WeatherSource = $state();
-  wasLoadedFromSavedProject?: boolean = $state();
+  wasLoadedFromURL?: boolean = $state(false);
+  wasLoadedFromStorage?: boolean = $state(false);
 }
 export class LocationState extends LocationClass implements LocationStateType {
-  constructor() {
+  constructor(location?: LocationType) {
     super();
+    if (location) {
+      // for each key in location, set this[key] = location[key]
+      Object.keys(location).forEach((key) => {
+        this[key] = location[key];
+      });
+    }
     this.uuid =
-      crypto && typeof crypto.randomUUID === 'function'
+      browser && crypto && typeof crypto.randomUUID === 'function'
         ? crypto.randomUUID()
         : `${Math.random() * 100}-${Math.random() * 100}-${Math.random() * 100}`;
-    this.#today = browser ? getToday() : null; // caused a build error without the browser check...
+    this.#today = browser ? dateToISO8601String(new Date()) : null; // caused a build error without the browser check...
   }
 
   #fromDate = $derived.by(() => {
@@ -63,18 +75,22 @@ export class LocationState extends LocationClass implements LocationStateType {
     return stringToDate(this.to);
   });
 
-  days = $derived(numberOfDays(this.#fromDate, this.#toDate));
+  days = $derived(
+    this.#fromDate && this.#toDate
+      ? getDaysBetween(this.#fromDate, this.#toDate)
+      : 0,
+  );
 
-  #today = $state();
+  #today = $state<TISO8601DateString | null>(null); // YYYY-MM-DD
 
   daysInFuture = $derived.by(() => {
-    if (this.#toDate >= this.#today)
-      return numberOfDays(this.#today, this.#toDate);
+    if (this.#today && this.to >= this.#today)
+      return getDaysBetween(stringToDate(this.#today), this.#toDate);
     else return 0;
   });
 
   errorMessage = $derived.by(() => {
-    if (this.#fromDate >= this.#today)
+    if (this.from && this.#today && this.from >= this.#today)
       return 'The starting date must be at least one day in the past.';
 
     if (this.days > MAXIMUM_DAYS_PER_LOCATION)
@@ -98,16 +114,16 @@ export class LocationsState implements LocationsStateType {
     this.all.push(location);
   }
 
-  all = $state([]);
+  all = $state<LocationStateType[]>([]);
 
   totalDays = $derived.by(() => {
-    const arrayOfDayCount = this.all.map((n) => {
+    const arrayOfDayCount = this.all.map((n: LocationState) => {
       if (!n.from || !n.to) return null;
       const from = stringToDate(n.from);
       const to = stringToDate(n.to);
 
       if (!from || !to) return null;
-      return numberOfDays(from, to);
+      return getDaysBetween(from, to);
     });
     const sum = arrayOfDayCount.reduce((accumulator, value) => {
       return accumulator + value;
@@ -145,7 +161,7 @@ export class LocationsState implements LocationsStateType {
   });
 
   projectFilename = $derived.by(() => {
-    if (!this.all.length) return false;
+    if (!this.all.length) return '';
     let filename = '';
     this.all.forEach((location) => {
       filename += `${location?.label}-from-${location?.from}-to-${location?.to}`;
@@ -172,16 +188,32 @@ export class LocationsState implements LocationsStateType {
         titles.push(title);
       }
     });
-    if (titles.length === 0) return;
+    if (titles.length === 0) return '';
     let title = titles.join('; ');
     return title;
   });
 
-  add(): void {
-    if (weather.rawData.length > 0) weather.rawData = [];
+  add({ clearWeatherData = true }: { clearWeatherData?: boolean } = {}): void {
+    if (clearWeatherData && weather.rawData.length > 0) weather.rawData = [];
     const newLocation = new LocationState();
     newLocation.index = this.all.length;
     this.all.push(newLocation);
+  }
+
+  load({
+    locations,
+    source = 'storage',
+  }: {
+    locations: LocationType[];
+    source?: 'storage';
+  }): void {
+    this.all = [];
+    for (const location of locations) {
+      const newLocation = new LocationState(location);
+      newLocation.index = this.all.length;
+      if (source === 'storage') newLocation.wasLoadedFromStorage = true;
+      this.all.push(newLocation);
+    }
   }
 
   remove(uuid: string) {
@@ -193,16 +225,6 @@ export class LocationsState implements LocationsStateType {
 }
 
 export const locations = new LocationsState();
-
-// const LOCATIONS_KEY = Symbol('LOCATIONS');
-
-// export function setLocationsState() {
-//   return setContext(LOCATIONS_KEY, new LocationsState());
-// }
-
-// export function getLocationsState() {
-//   return getContext<ReturnType<typeof setLocationsState>>(LOCATIONS_KEY);
-// }
 
 // Controller and signal for when searching for locations
 export const controller = $state({ value: null });

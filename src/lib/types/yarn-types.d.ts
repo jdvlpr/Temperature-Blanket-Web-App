@@ -1,4 +1,4 @@
-// Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+// Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 //
 // This file is part of Temperature-Blanket-Web-App.
 //
@@ -12,6 +12,8 @@
 //
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
+
+import type { TISO8601DateString } from './weather-types';
 
 export interface Brand {
   name: string;
@@ -78,19 +80,43 @@ export interface Colorway {
     name: string;
     href: string;
     /** YYYY-MM-DD date when the colorways were accessed */
-    accessed: string;
+    accessed: TISO8601DateString;
     /** If the href is no longer available or no longer points to the colorways
      * then this is a YYYY-MM-DD date when the href stopped working
      */
-    unavailable?: string;
+    unavailable?: TISO8601DateString;
   };
   colors: Color[];
 }
 
 export interface AffiliateYarn {
-  brand_id: string;
-  yarn_id: string;
-  colors: Color[];
+  affiliate_variant_base_href: string; // affiliate_base_href (base for each colorway)
+  brand_id: string; // brand_id
+  yarn_id: string; // yarn_id
+  colors?: AffiliateColor[]; // optional colors, in case each colorway has a unique variant suffix
+}
+
+export interface AffiliateColor {
+  name: string; // name
+  affiliate_variant_href?: string; // optional variant suffix for the affiliate_base_href
+}
+
+export interface AffiliateYarnCompressed {
+  a: {
+    us?: string; // affiliate_variant_base_href (US)
+    other?: string; // affiliate_variant_base_href (other countries)
+  };
+  b: string; // brand_id
+  y: string; // yarn_id
+  c?: AffiliateColorCompressed[]; // optional colors, in case each colorway has a unique variant suffix
+}
+
+export interface AffiliateColorCompressed {
+  n: string; // name
+  v?: {
+    us?: string;
+    other?: string;
+  }; // optional variant suffix for the affiliate_base_href
 }
 
 export interface Color {

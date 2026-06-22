@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -18,11 +18,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import AppLogo from '$lib/components/AppLogo.svelte';
   import AppShell from '$lib/components/AppShell.svelte';
   import Card from '$lib/components/Card.svelte';
-  import { ICONS } from '$lib/constants';
   import { ArrowLeftIcon } from '@lucide/svelte';
-  import { Modal } from '@skeletonlabs/skeleton-svelte';
+  import { Dialog, Portal } from '@skeletonlabs/skeleton-svelte';
 
   let openTableOfContents = $state(false);
+
+  // The following animations are optional.
+  // These may also be included inline.
+  const animBackdrop =
+    'transition transition-discrete opacity-0 starting:data-[state=open]:opacity-0 data-[state=open]:opacity-100';
+  const animModal =
+    'transition transition-discrete opacity-0 translate-x-full starting:data-[state=open]:opacity-0 starting:data-[state=open]:translate-x-full data-[state=open]:opacity-100 data-[state=open]:translate-x-0';
 </script>
 
 <svelte:head>
@@ -119,20 +125,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {#snippet stickyHeader()}
     <div class="mx-auto hidden lg:inline-flex"><AppLogo /></div>
     <div class="sm:hidden">
-      <Modal
+      <Dialog
         open={openTableOfContents}
         onOpenChange={(e) => {
           openTableOfContents = e.open;
         }}
-        triggerBase="hover:preset-tonal"
-        contentBase="bg-surface-50 dark:bg-surface-950 p-4 space-y-4 shadow-xl w-fit h-screen overflow-auto"
-        positionerJustify="justify-end"
-        positionerAlign=""
-        positionerPadding=""
-        transitionsPositionerIn={{ x: 480, duration: 200 }}
-        transitionsPositionerOut={{ x: 480, duration: 200 }}
       >
-        {#snippet trigger()}
+        <Dialog.Trigger
+          class="btn hover:preset-tonal-surface my-2"
+          aria-label="Content Menu"
+        >
           <div class="flex flex-wrap items-center gap-1">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -145,20 +147,30 @@ If not, see <https://www.gnu.org/licenses/>. -->
             >
 
             <span class="">Content</span>
-          </div>{/snippet}
-        {#snippet content()}
-          <div class="mb-20">
-            {@render tableOfContents()}
           </div>
-        {/snippet}
-      </Modal>
+        </Dialog.Trigger>
+        <Portal>
+          <Dialog.Backdrop
+            class="bg-surface-50-950/50 fixed inset-0 z-50 {animBackdrop}"
+          />
+          <Dialog.Positioner class="fixed inset-0 z-50 flex justify-end">
+            <Dialog.Content
+              class="bg-surface-50 dark:bg-surface-950 h-screen w-fit space-y-4 overflow-auto p-4 shadow-xl {animModal}"
+            >
+              <div class="mb-20">
+                {@render tableOfContents()}
+              </div>
+            </Dialog.Content>
+          </Dialog.Positioner>
+        </Portal>
+      </Dialog>
     </div>
   {/snippet}
   {#snippet main()}
     <main class="pb-8">
       <a
         href="/blog"
-        class="btn hover:preset-tonal mb-2 max-lg:mx-2 max-lg:mt-2"
+        class="btn hover:preset-tonal-surface mb-2 max-lg:mx-2 max-lg:mt-2"
         ><ArrowLeftIcon /> Blog</a
       >
       <div class="flex gap-4 pb-4 text-left">
@@ -186,6 +198,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     </p>
                     <p class="text-sm">February 9, 2024</p>
                   </div>
+
+                  <div class="w-full">
+                    <iframe
+                      width="560"
+                      height="315"
+                      src="https://www.youtube.com/embed/7NRLrpZb0Lo?si=6FfsQcYDxXaqJ-aa"
+                      title="YouTube video player"
+                      frameborder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                      referrerpolicy="strict-origin-when-cross-origin"
+                      allowfullscreen
+                      class="aspect-video h-auto w-full"
+                    ></iframe>
+                  </div>
+
                   <p>
                     Starting a temperature blanket can be a daunting task. Maybe
                     you're thinking of starting, but you feel overwhelmed by
@@ -503,14 +530,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     and
                     <span class="font-bold">which</span> colors to use. A typical
                     project uses between 7 and 15 colors (from now on I'll call them
-                    colorways, since we're talking about yarn). But you are free
-                    to use more or less colorways if you want. In the Project Planner,
+                    colorways, since we're talking about yarn). But you are free to
+                    use more or less colorways if you want. In the Project Planner,
                     there are several ways you can pick colorways:
                   </p>
                   <div class="ml-4">
                     <p>
-                      <span class="font-bold">All at once</span> - use the tools
-                      in the toolbar to choose how many and which colorways to use.
+                      <span class="font-bold">All at once</span> - use the tools in
+                      the toolbar to choose how many and which colorways to use.
                     </p>
                     <img
                       class="rounded-container border-surface-100-900 my-2 h-auto max-h-fit w-full max-w-[540px] border-6 shadow-lg"
@@ -826,8 +853,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         >
                         to follow along with as you make your project. It contains
                         a temperature gauge with your colorways and ranges, the daily
-                        weather data, and it tells you which colorways to use on
-                        which days.
+                        weather data, and it tells you which colorways to use on which
+                        days.
                       </p>
                     </div>
                   </div>
@@ -843,20 +870,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     like to see more details about in this guide, send me an
                     email at hello@temperature-blanket.com.
                   </p>
-
-                  <div
-                    class="rounded-container preset-tonal-tertiary border-tertiary-500 flex flex-col gap-4 border p-4"
-                  >
-                    <p>
-                      🎥 Are you a video creator? Let's collaborate! Make a
-                      video tutorial based on this post and I'd love to feature
-                      it. Contact me at hello@temperature-blanket.com or at <a
-                        href="https://facebook.com/temperatureblanket"
-                        class="link"
-                        target="_blank">facebook.com/temperatureblanket</a
-                      >.
-                    </p>
-                  </div>
                 </div>
               </div>
             {/snippet}

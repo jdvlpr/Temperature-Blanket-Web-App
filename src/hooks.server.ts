@@ -1,4 +1,4 @@
-// Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+// Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 //
 // This file is part of Temperature-Blanket-Web-App.
 //
@@ -15,7 +15,7 @@
 
 import { dev } from '$app/environment';
 import { skeletonThemes } from '$lib/components/ThemeSwitcher.svelte';
-import { THEMES } from '$lib/constants';
+import { THEMES } from '$lib/constants/page-constants';
 import { redirect, type Handle } from '@sveltejs/kit';
 import { sequence } from '@sveltejs/kit/hooks';
 
@@ -62,6 +62,11 @@ const legacyRedirects: Handle = async ({ event, resolve }) => {
     // Construct the new string
     let newPath = path.replace('/info', '/');
     redirect(301, newPath);
+  }
+
+  // Redirect old Yarn Palette Gallery to unified Gallery
+  if (path === '/yarn-palette-gallery' || path === '/yarn-palette-gallery/') {
+    redirect(301, '/gallery?view=yarn-palettes');
   }
 
   return resolve(event);

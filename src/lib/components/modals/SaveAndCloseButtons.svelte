@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -33,7 +33,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div
-  class="mx-auto flex w-full flex-wrap items-center justify-center gap-x-2 gap-y-2 py-2"
+  class="mx-auto flex w-full flex-wrap items-center justify-center gap-2 py-2"
 >
   <CloseButton {onClose} text="Cancel" />
 

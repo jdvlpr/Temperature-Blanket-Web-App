@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -18,8 +18,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
   import StickyPart from '$lib/components/modals/StickyPart.svelte';
   import YarnGridSelect from '$lib/components/modals/YarnGridSelect.svelte';
-  import { modal } from '$lib/state';
-  import { pluralize } from '$lib/utils';
+  import { dialog } from '$lib/state/page-state.svelte';
+  import { pluralize } from '$lib/utils/string-utils';
 
   interface Props {
     updateGauge: any;
@@ -59,7 +59,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <StickyPart position="bottom">
   <div class="p-2">
     {#if selectedColors.length}
-      <div class="mb-2 sm:mb-4">
+      <div class="">
         {#key selectedColors.length}
           <ColorPaletteEditable
             canUserEditColor={false}
@@ -76,10 +76,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
           updateGauge({
             _colors: selectedColors,
           });
-          modal.close();
+          dialog.close();
         }}
         onClose={() => {
-          modal.close();
+          dialog.close();
         }}
         disabled={!selectedColors.length}
       />

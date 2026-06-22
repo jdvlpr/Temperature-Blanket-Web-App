@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -15,7 +15,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import GaugeSettings from '$lib/components/modals/GaugeSettings.svelte';
-  import { gauges, localState, modal } from '$lib/state';
+  import { dialog } from '$lib/state/page-state.svelte';
+  import { gauges } from '$lib/state/gauges-state.svelte';
+  import { preferences } from '$lib/storage/preferences.svelte';
 
   let { index } = $props();
 
@@ -27,7 +29,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <span class="range-input-container">
   <button
-    class="btn hover:preset-tonal h-auto"
+    class="btn hover:preset-tonal-surface h-auto"
     title="Adjust Range"
     onclick={(e) => {
       const wasToClicked =
@@ -39,7 +41,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
       const focusOn = wasToClicked ? 'to' : 'from';
 
-      modal.trigger({
+      dialog.trigger({
         type: 'component',
         component: {
           ref: GaugeSettings,
@@ -55,21 +57,37 @@ If not, see <https://www.gnu.org/licenses/>. -->
       });
     }}
   >
-    <span class="flex flex-col text-left" id="range-{index}-from"
-      ><span class="text-xs">From</span>
+    <span class="flex flex-col text-left" id="range-{index}-from">
+      <div class="flex flex-col">
+        <p class="text-xs">From</p>
+        <p class="-mt-1 text-xs opacity-50">
+          {gauges.activeGauge.rangeOptions.includeFromValue
+            ? 'Including'
+            : 'Excluding'}
+        </p>
+      </div>
+
       <span class="flex items-start"
         ><span class="text-lg">{gauges.activeGauge.ranges[index]?.from}</span>
         <span class="text-xs"
-          >{gauges.activeGauge.unit.label[localState.value.units]}</span
+          >{gauges.activeGauge.unit.label[preferences.value.units]}</span
         ></span
       ></span
     >
-    <span class="flex flex-col text-left" id="range-{index}-to"
-      ><span class="text-xs">To</span>
+    <span class="flex flex-col text-left" id="range-{index}-to">
+      <div class="flex flex-col gap-0">
+        <span class="text-xs">To </span>
+        <span class="-mt-1 text-xs opacity-50"
+          >{gauges.activeGauge.rangeOptions.includeToValue
+            ? 'Including'
+            : 'Excluding'}</span
+        >
+      </div>
+
       <span class="flex items-start"
         ><span class="text-lg">{gauges.activeGauge.ranges[index]?.to}</span>
         <span class="text-xs"
-          >{gauges.activeGauge.unit.label[localState.value.units]}</span
+          >{gauges.activeGauge.unit.label[preferences.value.units]}</span
         ></span
       ></span
     ></button

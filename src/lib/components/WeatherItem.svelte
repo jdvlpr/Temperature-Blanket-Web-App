@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -15,6 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import RecentWeatherDataTooltip from '$lib/components/RecentWeatherDataTooltip.svelte';
+  import { MOON_PHASE_NAMES } from '$lib/constants/weather-constants';
 
   interface Props {
     id: any;
@@ -47,23 +48,25 @@ If not, see <https://www.gnu.org/licenses/>. -->
     snow: '#94a3b8',
     dayt: '#facc15',
   };
+
+  let displayValue = $derived(id === 'moon' ? MOON_PHASE_NAMES[value] : value);
 </script>
 
-<span class="flex flex-col items-center justify-start p-2">
+<div class="flex flex-col items-center justify-start p-2">
   <div
     class={['flex', isRecentDate && '!bg-warning-500/20']}
     class:rounded-container={isRecentDate}
     class:p-1={isRecentDate}
   >
-    <span class="text-xl font-semibold tracking-wide"
-      ><span style="color:{colors[id]}" class="mr-1">{icon}</span>{value}</span
-    >
-    {#if units}<span class="">{units}</span>{/if}
+    <p class="text-xl font-semibold tracking-wide whitespace-nowrap">
+      <span style="color:{colors[id]}" class="mr-1">{icon}</span>{displayValue}
+    </p>
+    {#if units}<p class="">{units}</p>{/if}
     {#if isRecentDate}
       <RecentWeatherDataTooltip />
     {/if}
   </div>
-  <span class="ml-1 text-sm">{label}</span>
+  <p class=" ml-1 text-sm">{label}</p>
   {@render date?.()}
   {@render details?.()}
-</span>
+</div>

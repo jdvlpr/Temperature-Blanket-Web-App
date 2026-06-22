@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -15,19 +15,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import NumberInputButton from '$lib/components/buttons/NumberInputButton.svelte';
-  import { gauges, weather } from '$lib/state';
-  import { capitalizeFirstLetter } from '$lib/utils';
+  import PreviewInfo from '$lib/components/PreviewInfo.svelte';
+  import { gauges } from '$lib/state/gauges-state.svelte';
+  import { weather } from '$lib/state/weather-state.svelte';
+  import { capitalizeFirstLetter } from '$lib/utils/other-utils';
   import { cornerToCornerPreview } from './state.svelte';
 
   let targets = $derived(gauges.allCreated.map((n) => n.targets).flat());
 </script>
 
-<div class="w-full">
-  <p class="">
+<PreviewInfo previewTitle={cornerToCornerPreview.name}>
+  {#snippet description()}
     Days are represented by lines added in a back-and-forth pattern starting
     from the bottom right.
-  </p>
-</div>
+  {/snippet}
+</PreviewInfo>
 
 <div
   class="preset-outlined-surface-300-700 card flex flex-col items-start gap-4 p-4"
@@ -35,12 +37,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <p class="text-2xl font-bold">Settings</p>
 
   <label class="label">
-    <span
+    <span class="label-text"
       >Color Lines Using the {capitalizeFirstLetter(weather.grouping)}'s</span
     >
     <select
       class="select w-fit"
-      id="crnr-param"
       bind:value={cornerToCornerPreview.settings.selectedTarget}
     >
       {#each targets as { id, label, icon }}
@@ -52,15 +53,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <NumberInputButton
     bind:value={cornerToCornerPreview.settings.lineLength}
     title="Line Length"
-    icon={true}
   />
 
   {#if cornerToCornerPreview.dimensionsOptions}
     <label class="label">
-      <span>Size (width x height)</span>
+      <span class="label-text">Size (width x height)</span>
       <select
         class="select w-fit min-w-[100px]"
-        id="crnr-dimensions"
         bind:value={cornerToCornerPreview.settings.dimensions}
       >
         {#each cornerToCornerPreview.dimensionsOptions as value}

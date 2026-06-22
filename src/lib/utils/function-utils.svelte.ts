@@ -1,4 +1,4 @@
-// Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+// Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 //
 // This file is part of Temperature-Blanket-Web-App.
 //
@@ -14,21 +14,12 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { weatherDataUpdatedKey } from '$lib/components/WeatherTableWrapper.svelte';
-import { gauges, project, weather } from '$lib/state';
+import { gauges } from '$lib/state/gauges-state.svelte';
+import { project } from '$lib/state/project-state.svelte';
+import { weather } from '$lib/state/weather-state.svelte';
 
 export const delay = (delayInms) => {
   return new Promise((resolve) => setTimeout(resolve, delayInms));
-};
-
-export const hasParentWithClass = (event, className) => {
-  let element = event.target;
-  while (element.parentElement) {
-    if (element.parentElement.classList.contains(className)) {
-      return true;
-    }
-    element = element.parentElement;
-  }
-  return false;
 };
 
 let debounceTimerPreviewEffect;
@@ -45,6 +36,7 @@ export const runPreview = (callback) => {
       project.url.href;
       weatherDataUpdatedKey.value;
       if (!weather.data.length || !gauges.allCreated.length) return;
+
       debouncePreviewEffect(() => {
         callback();
       }, 0);

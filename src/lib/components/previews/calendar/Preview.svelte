@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -16,12 +16,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script>
   import { calendarPreview } from '$lib/components/previews/calendar/state.svelte';
   import Spinner from '$lib/components/Spinner.svelte';
-  import { localState, weather } from '$lib/state';
-  import {
-    getColorInfo,
-    runPreview,
-    showPreviewImageWeatherDetails,
-  } from '$lib/utils';
+  import { weather } from '$lib/state/weather-state.svelte';
+  import { getColorInfo } from '$lib/utils/color-utils';
+  import { runPreview } from '$lib/utils/function-utils.svelte';
+  import { showPreviewImageWeatherDetails } from '$lib/utils/preview-utils.svelte';
 
   let width = $state(calendarPreview.width);
 
@@ -134,9 +132,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
       ) {
         let color;
         if (isWeatherSquare) {
-          const day = weather.data[_dayIndex];
           let param = calendarPreview.squareSectionParams[squareSectionIndex];
-          let value = day[param][localState.value.units];
+          let value = weather.getWeatherValue({ dayIndex: _dayIndex, param });
           if (
             (calendarPreview.settings.primaryTargetAsBackup === 1 &&
               value === 0) ||
@@ -144,7 +141,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               value === null)
           ) {
             param = calendarPreview.settings.primaryTarget;
-            value = day[param][localState.value.units];
+            value = weather.getWeatherValue({ dayIndex: _dayIndex, param });
           }
 
           // Get the color based on the gauge ID and value

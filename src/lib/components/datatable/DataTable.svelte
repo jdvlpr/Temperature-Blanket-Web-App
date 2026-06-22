@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -15,7 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import RowsPerPage from '$lib/components/datatable/RowsPerPage.svelte';
-  import { weather } from '$lib/state';
+  import { weather } from '$lib/state/weather-state.svelte';
   import {
     CalendarIcon,
     CircleArrowLeftIcon,
@@ -91,7 +91,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </article>
 
   <div
-    class="mx-auto mt-2 mb-4 flex w-full flex-wrap items-start justify-center gap-4 sm:justify-between"
+    class="mx-auto mt-2 mb-4 flex w-full flex-wrap items-start justify-center gap-4 px-2 sm:justify-between"
   >
     <p class="text-sm">
       {#if table.rowCount.total > 0}
@@ -113,7 +113,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <section class="flex flex-wrap items-end justify-end gap-2">
           <button
             aria-label="Previous Page"
-            class="btn-icon hover:preset-tonal"
+            class="btn-icon hover:preset-tonal-surface"
             title="Previous Page"
             disabled={table.currentPage === 1}
             onclick={() => {
@@ -125,7 +125,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </button>
 
           <label class="label flex w-20 flex-col items-start">
-            <span class="text-sm">Page</span>
+            <span class="label-text">Page</span>
             <select
               class="select mx-auto w-fit min-w-[60px]"
               id="datatable-page"
@@ -143,7 +143,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
           <button
             aria-label="Next Page"
-            class="btn-icon hover:preset-tonal"
+            class="btn-icon hover:preset-tonal-surface"
             title="Next Page"
             disabled={table.currentPage === table.pages.length}
             onclick={() => {
@@ -160,7 +160,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {#if includesToday}
       <button
         aria-label="Today"
-        class="btn hover:preset-tonal"
+        class="btn hover:preset-tonal-surface"
         title="Go to Today"
         onclick={() => goToToday()}
       >

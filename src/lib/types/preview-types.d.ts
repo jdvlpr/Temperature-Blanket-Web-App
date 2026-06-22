@@ -1,4 +1,4 @@
-// Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+// Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 //
 // This file is part of Temperature-Blanket-Web-App.
 //
@@ -40,4 +40,8 @@ export interface Preview {
   wpTagSlug: string; // In a Wordpress installation, this is the slug of the taxonomy
   settings: ComponentType;
   preview: ComponentType;
+}
+
+export interface BasePreviewSettings {
+  useSeasonTargets: boolean;
 }

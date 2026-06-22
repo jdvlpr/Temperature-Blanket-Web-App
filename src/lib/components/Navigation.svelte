@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -14,37 +14,92 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
-  import { pageSections, weather } from '$lib/state';
-  import { goToProjectSection } from '$lib/utils';
+  import {
+    pageSections,
+    showNavigationSideBar,
+    goToProjectSection,
+  } from '$lib/state/page-state.svelte';
+  import { weather } from '$lib/state/weather-state.svelte';
+  import { onMount } from 'svelte';
+
+  let indicator = $state({ left: 0, width: 0 });
+  let activeIndex = $derived(
+    pageSections.items.find((section) => section.active === true)?.index || 1,
+  );
+  // element references
+  let containerFn = $state();
+  let buttonRefs = $state([]);
+
+  // Logic to calculate position
+  function updateIndicator() {
+    // Find the active button element based on ID
+    const index = activeIndex;
+    const activeBtn = buttonRefs[index];
+
+    if (activeBtn && containerFn) {
+      // Calculate relative position inside the container
+      const btnRect = activeBtn.getBoundingClientRect();
+      const containerRect = containerFn.getBoundingClientRect();
+
+      indicator = {
+        left: btnRect.left - containerRect.left,
+        width: btnRect.width,
+      };
+    }
+  }
+
+  // Reactive Effect: Re-run when activeId changes
+  $effect(() => {
+    // Just referencing activeId makes this effect run when it changes
+    activeIndex;
+    updateIndicator();
+  });
+
+  // Handle Window Resizing
+  onMount(() => {
+    // Initial calculation after mount
+    updateIndicator();
+
+    const observer = new ResizeObserver(() => updateIndicator());
+    if (containerFn) observer.observe(containerFn);
+
+    return () => observer.disconnect();
+  });
 </script>
 
 <div
-  class="sticky bottom-0 flex justify-center z-10 gap-2 w-full bg-surface-50 dark:bg-surface-950 backdrop-blur-md lg:rounded-t-container overflow-hidden"
+  class={[
+    'bg-surface-50/80 dark:bg-surface-950/80 lg:rounded-t-container fixed bottom-0 z-10 flex h-18 w-full justify-center gap-2 overflow-hidden backdrop-blur-md transition-all',
+    showNavigationSideBar.value
+      ? `lg:left-[284px] lg:max-w-[calc(min(100vw,var(--breakpoint-xl))-302px)] xl:left-[calc(50%-(var(--breakpoint-xl)/2)+278px)] xl:max-w-[calc(min(100vw,var(--breakpoint-xl))-278px)]`
+      : 'lg:left-[78px] lg:max-w-[calc(min(100vw,var(--breakpoint-xl))-96px)] xl:left-[calc(50%-(var(--breakpoint-xl)/2)+78px)]',
+  ]}
+  id="bottom-section-nav"
 >
-  <div class="flex justify-around w-full">
-    {#each pageSections.items as { title, icon, index, active, pinned, tooltipText }}
+  <div
+    class="relative flex w-full justify-around max-lg:mx-2 max-lg:mb-2"
+    bind:this={containerFn}
+  >
+    <div
+      class="bg-primary-500/60 rounded-container absolute top-1.5 bottom-2 z-0 shadow-sm
+        transition-all duration-300 ease-[cubic-bezier(0.23,1,0.32,1)]"
+      style="left: calc({indicator.left}px + 0.5rem); width: calc({indicator.width}px - 1rem);"
+    ></div>
+
+    {#each pageSections.items as { title, icon, index, active, tooltipText }}
       {#if index !== 0}
         <button
+          bind:this={buttonRefs[index]}
           title={tooltipText}
           disabled={!weather.data.length && index !== 1}
           onclick={() => goToProjectSection(index)}
-          data-pinned={pinned}
           data-active={active}
           data-no-weather={!weather.data}
-          class={[
-            `flex flex-col justify-center items-center disabled:opacity-30 p-2 pb-4 md:pb-2 w-full 
-                                data-[active=false]:data-[no-weather=true]:opacity-50 
-                                dark:data-[pinned=false]:data-[active=true]:data-[no-weather=false]:bg-primary-900
-                                dark:data-[pinned=false]:data-[active=true]:data-[no-weather=false]:text-surface-50!
-                                data-[pinned=false]:data-[active=true]:data-[no-weather=false]:bg-primary-300
-                                data-[pinned=false]:data-[active=true]:data-[no-weather=false]:!text-surface-900
-                                hover:data-[no-weather=false]:data-[active=false]:bg-primary-hover-token`,
-            !weather.data && 'bg-none backdrop-blur-none',
-          ]}
+          class="hover:data-[no-weather=false]:data-[active=false]:text-surface-950-50 data-[active=true]:text-surface-950-50 text-surface-700-300 z-10 flex w-full flex-col items-center justify-center p-2 transition-colors duration-200 disabled:opacity-30 data-[active=false]:data-[no-weather=true]:opacity-50"
         >
           <span>
             {@html icon}
-          </span><span class="text-xs flex gap-1 items-center">{title} </span>
+          </span><span class="flex items-center gap-1 text-xs">{title} </span>
         </button>
       {/if}
     {/each}

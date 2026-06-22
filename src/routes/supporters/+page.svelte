@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -17,7 +17,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { PUBLIC_BASE_URL, PUBLIC_KOFI_LINK } from '$env/static/public';
   import AppLogo from '$lib/components/AppLogo.svelte';
   import AppShell from '$lib/components/AppShell.svelte';
-  import Card from '$lib/components/Card.svelte';
   import Supporters from '$lib/components/Supporters.svelte';
   import DonateButton from '$lib/components/buttons/DonateButton.svelte';
 </script>
@@ -37,24 +36,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <div class="mx-auto hidden lg:inline-flex"><AppLogo /></div>
   {/snippet}
   {#snippet main()}
-    <main class="m-auto mx-auto mb-4 max-w-screen-lg px-2 text-center">
-      <div>
-        <div class="p-4">
-          <p class="mt-2 text-center">
-            Thanks to <a
-              href={PUBLIC_KOFI_LINK}
-              target="_blank"
-              rel="noopener noreferrer"
-              class="link">generous one-time donors</a
-            >
-            for their contributions, as well as to the following monthly supporters!
-          </p>
-        </div>
-      </div>
-      <div class="pb-4">
-        <Supporters />
-        <div class="mt-4"><DonateButton /></div>
-      </div>
+    <main
+      class="m-auto mx-auto mt-2 mb-12 flex max-w-3xl flex-col gap-4 px-2 text-center"
+    >
+      <p class="mt-2 text-center text-sm">
+        Thanks to <a
+          href={PUBLIC_KOFI_LINK}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="link">generous one-time donors</a
+        >
+        for their contributions, as well as to the following monthly supporters!
+      </p>
+
+      <div class=""><DonateButton /></div>
+
+      <Supporters />
     </main>
   {/snippet}
 </AppShell>

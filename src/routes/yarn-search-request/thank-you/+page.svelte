@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -17,7 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { PUBLIC_BASE_URL } from '$env/static/public';
   import AppLogo from '$lib/components/AppLogo.svelte';
   import AppShell from '$lib/components/AppShell.svelte';
-  import { ICONS } from '$lib/constants';
+  import { ICONS } from '$lib/constants/icon-constants';
 </script>
 
 <svelte:head>
@@ -38,11 +38,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <AppShell pageName="Received Yarn Suggestion">
   {#snippet stickyHeader()}
-    <div class="hidden lg:inline-flex mx-auto"><AppLogo /></div>
+    <div class="mx-auto hidden lg:inline-flex"><AppLogo /></div>
   {/snippet}
   {#snippet main()}
     <main
-      class="max-w-(--breakpoint-md) mx-auto px-2 m-auto text-center flex flex-col gap-4 mt-4 mb-2 items-center"
+      class="m-auto mx-auto mt-4 mb-2 flex max-w-(--breakpoint-md) flex-col items-center gap-4 px-2 text-center"
     >
       <h2 class="h2 text-gradient flex flex-wrap items-center gap-2">
         <span class="text-success-700-300">{@html ICONS.checkCircle}</span> Success!

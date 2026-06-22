@@ -1,4 +1,4 @@
-// Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+// Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 //
 // This file is part of Temperature-Blanket-Web-App.
 //
@@ -14,7 +14,8 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { browser } from '$app/environment';
-import { consentToMSClarityCookies, localState, toast } from '$lib/state';
+import { consentToMSClarityCookies, toast } from '$lib/state/page-state.svelte';
+import { preferences } from '$lib/storage/preferences.svelte';
 
 export const privacy = {
   get_cookie: function (name) {
@@ -69,7 +70,7 @@ export const privacy = {
     // Microsoft Clarity Cookie Names include '_clck' and '_clsk'
     // See https://learn.microsoft.com/en-us/clarity/setup-and-installation/cookie-list
     if (!this.get_cookie('_clck') || !this.get_cookie('_clsk')) {
-      if (!localState.value.disableToastAnalytics) {
+      if (!preferences.value.disableToastAnalytics) {
         toast.trigger({
           message: `
       <div class="flex flex-col gap-2 justify-start items-start">
@@ -107,8 +108,8 @@ export const privacy = {
               'cookies-dont-show-again',
             );
             if (dontShowAgainElement?.checked)
-              localState.value.disableToastAnalytics = true;
-            else localState.value.disableToastAnalytics = false;
+              preferences.value.disableToastAnalytics = true;
+            else preferences.value.disableToastAnalytics = false;
 
             const consentToggleElement = document.getElementById(
               'clarity-consent-toggle',

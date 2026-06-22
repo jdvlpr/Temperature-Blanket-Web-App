@@ -1,4 +1,4 @@
-// Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+// Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 //
 // This file is part of Temperature-Blanket-Web-App.
 //
@@ -13,16 +13,19 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { SCHEMES } from '$lib/constants';
-import { gauges, localState, toast, weather } from '$lib/state';
-import type { Color, GaugeSettingsType } from '$lib/types';
+import { SCHEMES } from '$lib/constants/color-constants';
+import { toast } from '$lib/state/page-state.svelte';
+import { weather } from '$lib/state/weather-state.svelte';
+import { preferences } from '$lib/storage/preferences.svelte';
+import type { Color } from '$lib/types/yarn-types';
+import type { GaugeSettingsType } from '$lib/types/gauge-types';
+import { displayNumber } from '$lib/utils/number-utils';
 import {
-  displayNumber,
   getDaysInRange,
   getDaysPercent,
   getEvenlyDistributedRangeValuesWithEqualDayCount,
-  pluralize,
-} from '$lib/utils';
+} from '$lib/utils/range-utils.svelte';
+import { pluralize } from '$lib/utils/string-utils';
 import chroma from 'chroma-js';
 
 export function getRanges({
@@ -33,6 +36,7 @@ export function getRanges({
   colors,
   includeFromAndTo,
   dontIncludeFromAndTo,
+  gaugeId = '',
 }) {
   let newRanges;
   let mustUpdateCustomRanges = false;
@@ -48,9 +52,8 @@ export function getRanges({
       if (prop === 'ranges') {
         // Only temp gauges have multiple props (tmax, tavg, tmin)
         // So if it's not a temp gauge, use the gauge id (e.g. prcp, snow)
-        if (gauges.activeGauge?.id !== 'temp') prop = gauges.activeGauge?.id;
+        if (gaugeId !== 'temp') prop = gaugeId;
         // Otherwise if it is a temp gauge, use tmax as default
-        // I don't think the following condition should ever be reached, but it's here just in case
         else prop = 'tmax';
       }
 
@@ -167,9 +170,10 @@ export const getWPGauge = (gauge) => {
       const count = getDaysInRange({
         id: item.id,
         range: gauge.ranges[i],
-        direction: gauge.rangeOptions.direction,
-        includeFromValue: gauge.rangeOptions.includeFromValue,
-        includeToValue: gauge.rangeOptions.includeToValue,
+        direction: gauge?.rangeOptions?.direction,
+        includeFromValue: gauge?.rangeOptions?.includeFromValue,
+        includeToValue: gauge?.rangeOptions?.includeToValue,
+        gaugeUnitType: gauge.unit.type,
       }).length;
       const percentage = `(${getDaysPercent(count)}%)`;
       let label = '';
@@ -181,11 +185,25 @@ export const getWPGauge = (gauge) => {
       return `${count} ${pluralize(weather.grouping, count)} ${percentage} ${label}`;
     });
     // details.reverse();
+    let range;
+    if (gauge.unit.type === 'category') {
+      range = {
+        value: gauge.ranges[i].value,
+        label: gauge.ranges[i].label,
+      };
+    } else {
+      range = {
+        from:
+          gauge.ranges[i].from +
+          ' ' +
+          gauge.unit.label[preferences.value.units],
+        to:
+          gauge.ranges[i].to + ' ' + gauge.unit.label[preferences.value.units],
+      };
+    }
     content.push({
       color: color.hex,
-      from:
-        gauge.ranges[i].from + ' ' + gauge.unit.label[localState.value.units],
-      to: gauge.ranges[i].to + ' ' + gauge.unit.label[localState.value.units],
+      ...range,
       details,
     });
   });

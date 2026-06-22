@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -34,7 +34,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from 'chart.js';
   import { onMount } from 'svelte';
   import { weatherState } from './+page.svelte';
-  import { localState } from '$lib/state';
+  import { preferences } from '$lib/storage/preferences.svelte';
 
   let { data } = $props();
 
@@ -204,7 +204,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             },
             title: {
               text:
-                localState.value.units === 'metric'
+                preferences.value.units === 'metric'
                   ? 'Degrees Celsius'
                   : 'Degrees Fahrenheit',
               display: true,

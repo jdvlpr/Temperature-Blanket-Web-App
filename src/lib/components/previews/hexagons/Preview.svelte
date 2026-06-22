@@ -14,8 +14,12 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 <script>
   import Spinner from '$lib/components/Spinner.svelte';
-  import { gauges, localState, project, weather } from '$lib/state';
-  import { getColorInfo, showPreviewImageWeatherDetails } from '$lib/utils';
+  import { gauges } from '$lib/state/gauges-state.svelte';
+  import { project } from '$lib/state/project-state.svelte';
+  import { weather } from '$lib/state/weather-state.svelte';
+  import { preferences } from '$lib/storage/preferences.svelte';
+  import { getColorInfo } from '$lib/utils/color-utils';
+  import { showPreviewImageWeatherDetails } from '$lib/utils/preview-utils.svelte';
   import { tick } from 'svelte';
   import { hexagonsPreview } from './state.svelte';
 
@@ -134,7 +138,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         let hexagon = [];
         let day = weather.data[i];
         let target = hexagonsPreview.settings.primaryTarget;
-        let value = day[target][localState.value.units];
+        let value = day[target][preferences.value.units];
 
         // Get the color based on the gauge ID and value
         const color = getColorInfo({ param: target, value }).hex;

@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -15,8 +15,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import Spinner from '$lib/components/Spinner.svelte';
-  import { locations, previews, project } from '$lib/state';
-  import { sendToProjectGallery, svgToPNG } from '$lib/utils';
+  import { locations } from '$lib/state/location-state.svelte';
+  import { previews } from '$lib/state/preview-state.svelte';
+  import { project } from '$lib/state/project-state.svelte';
+  import { sendToProjectGallery } from '$lib/utils/project-utils.svelte';
+  import { svgToPNG } from '$lib/utils/preview-utils.svelte';
   import { ExternalLinkIcon } from '@lucide/svelte';
   import StickyPart from './StickyPart.svelte';
 
@@ -51,7 +54,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 </script>
 
-<div class="p-2 text-center">
+<div class="w-full p-4 text-center">
   {#if project.gallery.href && project.gallery.title && project.gallery.title === locations.projectTitle}
     <div class="card preset-filled-surface-100-900 mt-4 p-4 text-center">
       <p class="my-2">
@@ -59,7 +62,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <a
           href={project.gallery.href}
           target="_blank"
-          class="link btn hover:preset-tonal w-fit whitespace-pre-wrap"
+          class="link btn hover:preset-tonal-surface w-fit whitespace-pre-wrap"
           rel="noreferrer"><ExternalLinkIcon />{project.gallery.title}</a
         >
       </p>
@@ -75,8 +78,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <p>
             • I am submitting this project's location and dates, gauge and yarn
             information, URL, preview image, and the current date to be
-            displayed on a public gallery page. No personal information will be
-            sent.
+            displayed as a gallery page in the public <a
+              href="/gallery"
+              target="_blank"
+              class="link">Project Gallery</a
+            >. No personal information will be sent.
           </p>
           <p>
             • This project's gallery page cannot be edited once it is submitted.
@@ -112,7 +118,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <StickyPart position="bottom">
   {#if !submitting && !message}
-    <div class="flex items-center justify-center p-2 py-4 text-center">
+    <div
+      class="flex flex-col items-center justify-center gap-2 p-2 py-4 text-center"
+    >
+      <p class="text-sm italic">This action can't be undone.</p>
       <button
         class="btn preset-filled-primary-500"
         title="Add project to gallery"

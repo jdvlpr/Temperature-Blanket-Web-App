@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -12,19 +12,17 @@ See the GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
-
 <script>
+  import { allGaugesAttributes, gauges } from '$lib/state/gauges-state.svelte';
   import {
-    allGaugesAttributes,
-    gauges,
-    localState,
-    modal,
-    weather,
-  } from '$lib/state';
-  import { downloadPDF } from '$lib/utils';
-  import { CirclePlusIcon, DownloadIcon, Trash2Icon } from '@lucide/svelte';
-  import { onMount, tick } from 'svelte';
-  import RangeOptionsButton from './buttons/RangeOptionsButton.svelte';
+    dialog,
+    pageSections,
+    showNavigationSideBar,
+  } from '$lib/state/page-state.svelte';
+  import { weather } from '$lib/state/weather-state.svelte';
+  import { preferences } from '$lib/storage/preferences.svelte';
+  import { CirclePlusIcon, Trash2Icon } from '@lucide/svelte';
+  import { onMount, tick, untrack } from 'svelte';
   import Gauge from './Gauge.svelte';
   import GaugeCustomizer from './GaugeCustomizer.svelte';
 
@@ -36,9 +34,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     allGaugesAttributes.forEach((gauge) => {
       gauge.targets.forEach((target) => {
         if (
-          weather.data?.some(
-            (day) => day[target.id][localState.value.units] !== null,
-          )
+          weather.data?.some((day) => {
+            if (target.type === 'category') return day[target.id] !== null;
+            else return day[target.id][preferences.value.units] !== null;
+          })
         ) {
           // For each of the gauge's weather parameter targets, check to see if there is any data, and if so setup the default gauge
           gauges.addToAvailable({
@@ -65,48 +64,79 @@ If not, see <https://www.gnu.org/licenses/>. -->
       setupAvailableGauges();
     });
   });
+
+  // Scroll to the active gauge button when the active gauge changes or the color section is activated
+  $effect(() => {
+    gauges.activeGaugeId;
+
+    if (!pageSections.items[3].active) return;
+
+    untrack(() => {
+      if (!gauges.allowScrollToActiveGaugeButton) return;
+      tick().then(() => {
+        const activeGaugeBtn = document.getElementById('active-gauge-button');
+        if (activeGaugeBtn) {
+          activeGaugeBtn.scrollIntoView({
+            behavior: 'smooth',
+            block: 'nearest',
+            inline: 'center',
+          });
+          gauges.allowScrollToActiveGaugeButton = false;
+        }
+      });
+    });
+  });
 </script>
 
-<div class="relative w-full overflow-auto">
-  <div
-    class="rounded-container flex w-full justify-around gap-2 py-2 max-md:overflow-x-scroll"
-  >
-    {#each gauges.allAvailable as { id, label }}
-      <button
-        class={[
-          'btn ',
-          gauges.activeGaugeId === id ? 'preset-filled' : 'hover:preset-tonal',
-        ]}
-        onclick={() => {
-          if (!gauges.allCreated.map((gauge) => gauge.id).includes(id)) {
-            // If the gauge is not created yet, then set it up
-            modal.trigger({
-              type: 'confirm',
-              title: `Add a ${label}?`,
-              body: `This will add a new gauge to your project. You can delete it later.`,
-              response: (response) => {
-                if (response) gauges.addById(id);
-              },
-            });
-          } else {
-            gauges.activeGaugeId = id;
-          }
-        }}
-      >
-        {#if !gauges.allCreated.map((gauge) => gauge.id).includes(id)}
-          <CirclePlusIcon />
-        {/if}
-        {label}
-      </button>
-    {/each}
-  </div>
+<div
+  class={[
+    'mx-auto flex max-w-fit snap-x justify-start overflow-auto py-2',
+    showNavigationSideBar.value
+      ? `lg:max-w-[calc(min(100vw,var(--breakpoint-xl))-306px)] xl:max-w-fit`
+      : 'lg:max-w-[calc(min(100vw,var(--breakpoint-xl))-96px)] xl:max-w-fit',
+  ]}
+>
+  {#each gauges.allAvailable as { id, label }}
+    <button
+      id={gauges.activeGaugeId === id ? 'active-gauge-button' : ''}
+      class={[
+        'btn mx-2',
+        gauges.activeGaugeId === id
+          ? 'preset-filled'
+          : 'hover:preset-tonal-surface',
+      ]}
+      onclick={() => {
+        if (!gauges.allCreated.map((gauge) => gauge.id).includes(id)) {
+          // If the gauge is not created yet, then set it up
+          dialog.trigger({
+            type: 'confirm',
+            title: `Add a ${label}?`,
+            body: `This will add a new gauge to your project. You can delete it later.`,
+            response: (response) => {
+              if (response) {
+                gauges.addById(id);
+              }
+            },
+          });
+        } else {
+          gauges.activeGaugeId = id;
+        }
+      }}
+    >
+      {#if !gauges.allCreated.map((gauge) => gauge.id).includes(id)}
+        <CirclePlusIcon />
+      {/if}
+      {label}
+    </button>
+  {/each}
 </div>
+
 {#if gauges.activeGauge && !gauges.activeGauge?.calculating}
   {#if gauges.activeGauge.id !== 'temp'}
     <!-- If this is not the default temperature gauge and we're on the project planner page -->
-    <div class="mb-4 flex w-full justify-center sm:mb-6">
+    <div class="mb-4 flex w-full justify-center px-2 sm:mb-6">
       <button
-        class="btn hover:preset-tonal relative top-2 justify-start max-sm:mb-2"
+        class="btn hover:preset-tonal-surface relative top-2 justify-start max-sm:mb-2"
         title="Delete {gauges.activeGauge.label}"
         onclick={() => {
           gauges.remove(gauges.activeGauge.id);
@@ -118,25 +148,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
   {/if}
 
-  <Gauge bind:gauge={gauges.activeGauge} />
+  {#if gauges.activeGauge?.isStatic}
+    <p class="px-2 text-sm">
+      This gauge has a fixed number of colors for the eight phases of the moon.
+      You can only edit the colors individually.
+    </p>
+  {/if}
 
-  <div class="mt-4 mb-2">
-    <RangeOptionsButton />
+  <div class="px-2">
+    <Gauge bind:gauge={gauges.activeGauge} />
   </div>
 
   {#key gauges.activeGauge.colors}
-    <GaugeCustomizer bind:gauge={gauges.activeGauge} />
+    <div class="px-2">
+      <GaugeCustomizer bind:gauge={gauges.activeGauge} />
+    </div>
   {/key}
 {/if}
-
-<div
-  class="rounded-container bg-surface-100 dark:bg-surface-900 mt-4 flex flex-wrap justify-center gap-2 px-4 py-2 shadow-inner"
->
-  <button
-    class="btn hover:preset-tonal h-auto text-left whitespace-pre-wrap"
-    onclick={downloadPDF}
-    title="Download PDF File"
-  >
-    <DownloadIcon /> Download Gauges and Weather Data (PDF)
-  </button>
-</div>

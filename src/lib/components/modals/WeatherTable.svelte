@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -15,8 +15,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import DataTable from '$lib/components/datatable/DataTable.svelte';
-  import { allGaugesAttributes, localState, weather } from '$lib/state';
-  import { convertTime, dateToISO8601String } from '$lib/utils';
+  import { MOON_PHASE_NAMES } from '$lib/constants/weather-constants';
+  import { allGaugesAttributes } from '$lib/state/gauges-state.svelte';
+  import { weather } from '$lib/state/weather-state.svelte';
+  import { preferences } from '$lib/storage/preferences.svelte';
+  import { convertTime } from '$lib/utils/unit-utils.svelte';
+  import { dateToISO8601String } from '$lib/utils/date-utils';
   import { TableHandler, ThSort } from '@vincjo/datatables';
 
   let { weatherData } = $props();
@@ -30,15 +34,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
         if (target.id === 'dayt') {
           weather = {
             ...weather,
-            [target.id]: convertTime(n[target.id][localState.value.units], {
+            [target.id]: convertTime(n[target.id][preferences.value.units], {
               displayUnits: false,
               padStart: true,
             }),
           };
+        } else if (target.id === 'moon') {
+          let value =
+            n[target.id] !== null ? MOON_PHASE_NAMES[n[target.id]] : '-';
+          weather = {
+            ...weather,
+            [target.id]: value,
+          };
         } else {
           let value =
-            n[target.id][localState.value.units] !== null
-              ? n[target.id][localState.value.units]
+            n[target.id][preferences.value.units] !== null
+              ? n[target.id][preferences.value.units]
               : '-';
           weather = {
             ...weather,
@@ -59,7 +70,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div
-  class="inline-flex w-full max-w-(--breakpoint-sm) items-center justify-center p-4 text-center"
+  class="inline-flex w-full max-w-(--breakpoint-sm) items-center justify-center text-center"
 >
   <DataTable {table} search={false} uid="">
     <table class="mx-auto w-fit border-separate border-spacing-0 self-center">
@@ -68,18 +79,23 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <ThSort {table} field={'date'}>
             <span class="flex flex-col items-center"
               >{dateHeader}
-              <span class="text-xs">(YYYY-MM-DD)</span></span
+              <span class="text-xs whitespace-nowrap">(YYYY-MM-DD)</span></span
             >
           </ThSort>
           {#each weatherTargets as { id, pdfHeader }}
-            {@const header = pdfHeader[localState.value.units]}
+            {@const header = pdfHeader[preferences.value.units]}
+            {@const hasHeaderUnits = header.includes('(')}
             {@const headerLabel = header.slice(0, header.indexOf('('))}
             {@const headerUnits = header.slice(header.indexOf('('))}
             <ThSort {table} field={id}>
-              <span class="flex flex-col items-center"
-                >{headerLabel}
-                <span class="text-xs">{headerUnits}</span></span
-              >
+              <span class="flex flex-col items-center">
+                {#if hasHeaderUnits}
+                  {headerLabel}
+                  <span class="text-xs">{headerUnits}</span>
+                {:else}
+                  {header}
+                {/if}
+              </span>
             </ThSort>
           {/each}
         </tr>

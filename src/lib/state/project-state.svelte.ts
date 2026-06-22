@@ -1,4 +1,4 @@
-// Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+// Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 //
 // This file is part of Temperature-Blanket-Web-App.
 //
@@ -14,7 +14,12 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { browser, version } from '$app/environment';
-import { gauges, localState, locations, previews, weather } from '$lib/state';
+import { gauges } from '$lib/state/gauges-state.svelte';
+import { locations } from '$lib/state/location-state.svelte';
+import { previews } from '$lib/state/preview-state.svelte';
+import { weather } from '$lib/state/weather-state.svelte';
+import { preferences } from '$lib/storage/preferences.svelte';
+import { seasonsToUrlHash } from '$lib/utils/seasons-utils.svelte';
 
 export class HistoryStateClass {
   stack: string[] = $state([]);
@@ -60,21 +65,36 @@ export class HistoryStateClass {
   }
 }
 
+type ProjectStatusType = {
+  saved: boolean;
+  loading: boolean;
+  error: {
+    code: 1 | null; // 1 = unable to save to local storage
+    message: string;
+  };
+  temporaryProjectsBackup: any[]; // A temporary backup of projects in case migration fails
+  temporaryUid: string;
+  wasLoaded: boolean;
+};
+
 class ProjectClass {
   // *****************
   // Constant Properties
   // *****************
-  loaded = {
+  onLoaded = {
     version: browser
-      ? new URL(window.location).searchParams.get('v') || version
+      ? new URL(window.location.href).searchParams.get('v') || version
       : '',
-    href: browser ? new URL(window.location).href : '',
+    href: browser ? new URL(window.location.href) : null,
+    isProject: browser
+      ? new URL(window.location.href).searchParams.has('project')
+      : false,
   };
 
   // Timestamp identifying when the app was initialized, used as a kind of unique ID for the project (though technically may not be unique if two users initialize at the exact same time).
   // It doesn't have any real meaning apart from an identifier for a project.
   timeStampId = browser
-    ? new URL(window.location).searchParams.get('project') ||
+    ? new URL(window.location.href).searchParams.get('project') ||
       new Date().getTime()?.toString()
     : '';
 
@@ -95,13 +115,36 @@ class ProjectClass {
     hash += locations.urlHash;
     hash += gauges.urlHash;
     hash += previews.hash;
-    if (weather.defaultSource === 'Meteostat') hash += '&s=0';
-    else if (weather.defaultSource === 'Open-Meteo') hash += '&s=1';
-    if (!weather.useSecondarySources) hash += '0';
-    else if (weather.useSecondarySources) hash += '1';
+    if (weather.source.name === 'Meteostat') hash += '&s=0';
+    else if (weather.source.name === 'Open-Meteo') hash += '&s=1';
+    if (!weather.source.useSecondary) hash += '0';
+    else if (weather.source.useSecondary) hash += '1';
+    if (
+      weather.source.name === 'Open-Meteo' &&
+      weather.source.settings?.openMeteo.model !== 'auto'
+    ) {
+      // If openMeteo model is anything but 'auto' (the default), set the model id here
+      if (weather.source.settings?.openMeteo.model === 'era5_land') hash += 'l';
+      if (weather.source.settings?.openMeteo.model === 'era5') hash += 'e';
+    }
+
+    if (
+      weather.source.name === 'Meteostat' &&
+      !weather.source.settings?.meteoStat.model
+    )
+      // If Meteostat model setting is not the default `true`, set `0` here
+      hash += '0';
+
     if (weather.grouping === 'week')
       hash += `&w=${weather.monthGroupingStartDay}`; // Set Weather Grouping to Weeks with the starting Day of Week
-    hash += localState.value.units === 'metric' ? '&u=m' : '&u=i'; // Units
+
+    // Add seasons hash if seasons are enabled
+    if (previews.active && previews.active.settings.useSeasonTargets) {
+      hash += `&n=${seasonsToUrlHash(preferences.value.seasons)}`;
+    }
+
+    // Add units hash
+    hash += preferences.value.units === 'metric' ? '&u=m' : '&u=i';
 
     let href = '';
     const base = browser ? window.location.origin + '/' : '';
@@ -114,9 +157,16 @@ class ProjectClass {
     };
   });
 
-  status = $state({
-    saved: false,
+  status = $state<ProjectStatusType>({
+    error: {
+      code: null,
+      message: '',
+    },
     loading: true,
+    saved: false,
+    temporaryProjectsBackup: [],
+    temporaryUid: '',
+    wasLoaded: false,
   });
 
   gallery = $state({
@@ -128,8 +178,8 @@ class ProjectClass {
   // Methods
   // *****************
   toggleUnits(): void {
-    localState.value.units =
-      localState.value.units === 'imperial' ? 'metric' : 'imperial';
+    preferences.value.units =
+      preferences.value.units === 'imperial' ? 'metric' : 'imperial';
   }
 }
 

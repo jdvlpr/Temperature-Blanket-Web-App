@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -16,26 +16,41 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import NumberInputButton from '$lib/components/buttons/NumberInputButton.svelte';
   import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
-  import { gauges, modal, weather } from '$lib/state';
-  import { capitalizeFirstLetter, pluralize } from '$lib/utils';
-  import { PipetteIcon } from '@lucide/svelte';
+  import PreviewInfo from '$lib/components/PreviewInfo.svelte';
+  import SpanYarnColorSelectIcon from '$lib/components/SpanYarnColorSelectIcon.svelte';
+  import { gauges } from '$lib/state/gauges-state.svelte';
+  import { dialog } from '$lib/state/page-state.svelte';
+  import { weather } from '$lib/state/weather-state.svelte';
+  import { capitalizeFirstLetter } from '$lib/utils/other-utils';
+  import { pluralize } from '$lib/utils/string-utils';
+  import { SquareDashedIcon } from '@lucide/svelte';
   import { monthSquaresPreview } from './state.svelte';
 
   let targets = $derived(gauges.allCreated.flatMap((n) => n.targets));
 </script>
 
-<p class="w-full">
-  Each square represents one month. Each round in a square represents one day,
-  starting with the first of the month in the center of the square. Months with
-  fewer days have extra rounds added, so that each square has the same number of
-  rounds.
-</p>
-
-{#if monthSquaresPreview.details}
-  <p class="w-full italic">
-    Each square has {monthSquaresPreview.details.roundsPerSquare} total rounds.
-  </p>
-{/if}
+<PreviewInfo previewTitle={monthSquaresPreview.name}>
+  {#snippet description()}
+    Each square represents one month. Each round in a square represents one day,
+    starting with the first of the month in the center of the square. Months
+    with fewer days have extra rounds added, so that each square has the same
+    number of rounds.
+  {/snippet}
+  {#snippet details()}
+    {#if monthSquaresPreview.details}
+      There are <span class="font-semibold"
+        >{monthSquaresPreview.weatherMonths.length} month
+        {pluralize('square', monthSquaresPreview.weatherMonths.length)}</span
+      >. Each month square has
+      <span class="font-semibold"
+        >{monthSquaresPreview.details.roundsPerSquare} total {pluralize(
+          'round',
+          monthSquaresPreview.details.roundsPerSquare,
+        )}</span
+      >.
+    {/if}
+  {/snippet}
+</PreviewInfo>
 
 <div
   class="preset-outlined-surface-300-700 card flex flex-col items-start gap-4 p-4"
@@ -43,7 +58,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <p class="text-2xl font-bold">Layout Settings</p>
 
   <label class="label">
-    <span>Size (width x height)</span>
+    <span class="label-text">Size (width x height)</span>
     <select
       class="select w-fit min-w-[210px]"
       id="msqs-dimensions"
@@ -70,13 +85,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
     bind:value={monthSquaresPreview.settings.additionalRoundsPerSquare}
     title="Additional Rounds Per Square"
     min={0}
-    icon={`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-square-dashed size-6"><path d="M5 3a2 2 0 0 0-2 2"/><path d="M19 3a2 2 0 0 1 2 2"/><path d="M21 19a2 2 0 0 1-2 2"/><path d="M5 21a2 2 0 0 1-2-2"/><path d="M9 3h1"/><path d="M9 21h1"/><path d="M14 3h1"/><path d="M14 21h1"/><path d="M3 9v1"/><path d="M21 9v1"/><path d="M3 14v1"/><path d="M21 14v1"/></svg>`}
+    icon={SquareDashedIcon}
   />
   <button
-    class="btn hover:preset-tonal"
+    class="btn hover:preset-tonal-surface"
     title="Choose a Color"
     onclick={() =>
-      modal.trigger({
+      dialog.trigger({
         type: 'component',
         component: {
           ref: ChangeColor,
@@ -84,14 +99,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
             hex: monthSquaresPreview.settings.additionalRoundsColor,
             onChangeColor: ({ hex }) => {
               monthSquaresPreview.settings.additionalRoundsColor = hex;
-              modal.close();
+              dialog.close();
             },
           },
         },
+        options: {
+          size: 'large',
+        },
       })}
   >
-    <PipetteIcon />
-    Color of Additional Rounds
+    <SpanYarnColorSelectIcon
+      color={monthSquaresPreview.settings.additionalRoundsColor}
+    />
+    Accent Color (for additional rounds)
   </button>
 </div>
 
@@ -101,7 +121,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <p class="text-2xl font-bold">Round Settings</p>
 
   <label class="label">
-    <span
+    <span class="label-text"
       >Color Each Round Using the {capitalizeFirstLetter(
         weather.grouping,
       )}'s</span

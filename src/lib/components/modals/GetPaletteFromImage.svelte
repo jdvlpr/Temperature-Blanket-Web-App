@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
@@ -21,13 +21,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Spinner from '$lib/components/Spinner.svelte';
   import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
   import StickyPart from '$lib/components/modals/StickyPart.svelte';
-  import { MAXIMUM_COLORWAYS_MATCHES_FOR_IMAGES } from '$lib/constants';
-  import { defaultYarn, modal } from '$lib/state';
+  import { MAXIMUM_COLORWAYS_MATCHES_FOR_IMAGES } from '$lib/constants/color-constants';
+  import { defaultYarn, dialog } from '$lib/state/page-state.svelte';
   import {
     getColorways,
-    getTextColor,
     stringToBrandAndYarnDetails,
-  } from '$lib/utils';
+  } from '$lib/utils/yarn-utils';
+  import { getTextColor } from '$lib/utils/color-utils';
   import {
     CameraIcon,
     RefreshCcwIcon,
@@ -81,9 +81,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let containerElement = $state(null);
 
   onMount(async () => {
-    const ct = await import(
-      '../../../../node_modules/getimagepalette/dist/color-thief.mjs'
-    );
+    const ct =
+      await import('../../../../node_modules/getimagepalette/dist/color-thief.mjs');
     ColorThief = ct.default;
 
     if (numberOfColors > MAXIMUM_COLORWAYS_MATCHES_FOR_IMAGES)
@@ -355,12 +354,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
       bind:this={input}
       onchange={handleImageChange}
     />
-    <button class="btn hover:preset-tonal" onclick={getRandomImage}>
+    <button class="btn hover:preset-tonal-surface" onclick={getRandomImage}>
       <RefreshCcwIcon />
       Random Image</button
     >
     <button
-      class="btn hover:preset-tonal"
+      class="btn hover:preset-tonal-surface"
       onclick={() => {
         if (typeof input !== 'undefined') input.click();
       }}
@@ -452,33 +451,33 @@ If not, see <https://www.gnu.org/licenses/>. -->
       bind:this={canvas}
       class="h-full w-full cursor-crosshair select-none"
       onmousedown={(e) => {
-        e.preventDefault();
+        if (e.cancelable) e.preventDefault();
         addColor(e);
       }}
       onmousemove={(e) => {
-        e.preventDefault();
+        if (e.cancelable) e.preventDefault();
         showColor(e);
       }}
       ontouchmove={(e) => {
         showColorTouch(e);
       }}
       onmouseenter={(e) => {
-        e.preventDefault();
+        if (e.cancelable) e.preventDefault();
         showColor(e);
         showCursor = false;
       }}
       ontouchstart={(e) => {
-        e.preventDefault();
+        if (e.cancelable) e.preventDefault();
         containerElement.parentElement.style.overflowY = 'hidden';
         showColorTouch(e);
         showCursor = false;
       }}
       onmouseleave={(e) => {
-        e.preventDefault();
+        if (e.cancelable) e.preventDefault();
         showCursor = true;
       }}
       ontouchend={(e) => {
-        e.preventDefault();
+        if (e.cancelable) e.preventDefault();
         containerElement.parentElement.style.overflowY = '';
         addColorTouch(e);
         showCursor = true;
@@ -503,7 +502,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           max={MAXIMUM_COLORWAYS_MATCHES_FOR_IMAGES}
           allowZero={true}
           onchange={(e) => {
-            e.preventDefault();
+            if (e.cancelable) e.preventDefault();
 
             const value = parseInt(e.target.value);
             const lastLockedIndex = matchingYarnColors.findLastIndex(
@@ -548,7 +547,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <div class="text-warning-900-100 flex gap-2">
           <p>{warningMessage}</p>
           <button
-            class="btn hover:preset-tonal"
+            class="btn hover:preset-tonal-surface"
             aria-label="close"
             onclick={() => (warningMessage = null)}
           >
@@ -558,7 +557,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {/if}
 
       <button
-        class="btn hover:preset-tonal"
+        class="btn hover:preset-tonal-surface"
         onclick={() => {
           if (numberOfColors < 2) numberOfColors = 2;
           matchingYarnColors = getMatchingYarnColors({
@@ -573,7 +572,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </button>
 
       <button
-        class="btn hover:preset-tonal"
+        class="btn hover:preset-tonal-surface"
         onclick={() => {
           matchingYarnColors = matchingYarnColors.filter(
             (color) => color.locked,
@@ -588,7 +587,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
   {/if}
 
-  <p class="my-2 text-center text-sm">
+  <p class="text-surface-700-300 my-2 text-center text-sm">
     Random images from <a
       href="https://unsplash.com"
       class="link"
@@ -625,9 +624,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
             return n;
           }),
         });
-        modal.close();
+        dialog.close();
       }}
-      onClose={modal.close}
+      onClose={dialog.close}
     />
   </div>
 </StickyPart>
