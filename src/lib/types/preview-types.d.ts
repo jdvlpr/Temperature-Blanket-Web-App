@@ -24,7 +24,8 @@ export type PreviewCategories =
   | 'Month Rows'
   | 'Month Squares'
   | 'Split Month Squares'
-  | 'Squares';
+  | 'Squares'
+  | '12-Point Star';
 
 export interface Preview {
   name: PreviewCategories;

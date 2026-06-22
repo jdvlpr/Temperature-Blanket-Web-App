@@ -26,6 +26,7 @@ import { rowsPreview } from '$lib/components/previews/rows/state.svelte';
 import { splitMonthSquaresPreview } from '$lib/components/previews/split-month-squares/state.svelte';
 import { squareRoundsPreview } from '$lib/components/previews/square-rounds/state.svelte';
 import { squaresPreview } from '$lib/components/previews/squares/state.svelte';
+import { twelvePointStarPreview } from '$lib/components/previews/twelve-point-star/state.svelte';
 
 export const previewWeatherTargets = $state({
   value: [] as WeatherParam[],
@@ -46,6 +47,7 @@ class PreviewsState {
     splitMonthSquaresPreview,
     squareRoundsPreview,
     squaresPreview,
+    twelvePointStarPreview,
   ]);
 
   activeId = $state<string>();
