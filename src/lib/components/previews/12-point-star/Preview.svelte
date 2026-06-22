@@ -216,12 +216,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
         points={getStarPolygonPoints(
           width / 2,
           height / 2,
-          twelvePointStarPreview.outerPeakR,
-          twelvePointStarPreview.outerValleyR,
+          twelvePointStarPreview.borderPeakR,
+          twelvePointStarPreview.borderValleyR,
         )}
         fill="none"
         stroke={twelvePointStarPreview.settings.borderColor}
-        stroke-width={twelvePointStarPreview.settings.borderThickness}
+        stroke-width={twelvePointStarPreview.settings.borderThickness * twelvePointStarPreview.STITCH_SIZE}
       />
     {/if}
   </svg>

@@ -184,15 +184,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   {#if twelvePointStarPreview.settings.showBorder}
     <label class="label">
-      <span class="label-text">Border Thickness</span>
+      <span class="label-text">Border Size</span>
       <select
-        class="select w-fit min-w-[60px]"
+        class="select w-fit min-w-[80px]"
         bind:value={twelvePointStarPreview.settings.borderThickness}
       >
         {#each Array(5), i}
           {@const value = i + 1}
           <option {value}>
-            {value}px
+            {value} {pluralize('round', value)}
           </option>
         {/each}
       </select>
