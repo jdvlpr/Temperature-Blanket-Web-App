@@ -37,6 +37,18 @@ export const entries: ChangelogItemGroup[] = [
           {
             notes: [
               {
+                icon: ICONS.design,
+                instructions:
+                  'Try it in the Preview tab of the Project Planner',
+                text: `Each of the 12 points represents a month, and each chevron row within a point represents one of your project's days, radiating outward from the center.`,
+                title: 'New Preview Layout: 12-Point Star',
+              },
+            ],
+            version: '5.55.0',
+          },
+          {
+            notes: [
+              {
                 icon: ICONS.checkCircle,
                 text: `10 colorways`,
                 title: 'Added Colorways: Bernat - Blanket',

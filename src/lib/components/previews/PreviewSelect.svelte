@@ -66,7 +66,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 </script>
 
-<div class="mt-4 flex flex-col items-center justify-center gap-2">
+<div class="flex flex-col items-center justify-center gap-2">
   <label class="label">
     <span class="label-text"> Pattern</span>
     <div class="relative flex items-center">
@@ -124,7 +124,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <img
               src={img[theme]}
               alt={name}
-              class="size-[52px] opacity-40"
+              class="size-[48px] opacity-40"
               class:!opacity-100={id === previews.activeId}
             />
             {#if id === 'twsr'}

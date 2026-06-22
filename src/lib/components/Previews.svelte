@@ -37,16 +37,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 </script>
 
+<div class="preset-tonal-surface card p-4 md:shadow-lg mt-4">
+
 <PreviewSelect />
 
 <div class="flex flex-col items-start justify-center gap-2 px-2">
   {#if gauges.activeGauge?.colors}
     {#key previews.active}
-      <div class="flex w-full flex-wrap items-start justify-center gap-4 preset-tonal-surface card p-4 md:shadow-lg">
+      <div class="flex w-full flex-wrap items-start justify-center gap-4">
         <previews.active.settingsComponent>
           {#snippet previewComponent()}
             <previews.active.previewComponent />
-             <p class="text-sm w-full">Touch or click the preview above to see details.</p>
+             <p class="text-sm w-full">Touch or click the preview above to see weather details.</p>
           {/snippet}
         </previews.active.settingsComponent>
 
@@ -111,4 +113,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {/if}
     </div>
   {/if}
+</div>
+
 </div>

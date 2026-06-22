@@ -99,7 +99,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/snippet}
 </PreviewInfo>
 
-{@render previewComponent()}
+{@render previewComponent?.()}
 
 <div
   class="preset-outlined-surface-300-700 card flex flex-col items-start gap-4 p-4"

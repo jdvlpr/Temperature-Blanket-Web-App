@@ -246,7 +246,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/snippet}
 </PreviewInfo>
 
-{@render previewComponent()}
+{@render previewComponent?.()}
 
 
 <div

@@ -185,24 +185,31 @@ export class TwelvePointStarPreviewClass {
     return points.join(' ');
   });
 
+  /** Miter extension of the border when visible */
+  miterExtension = $derived.by(() => {
+    if (!this.settings.showBorder) return 0;
+    const rp = this.outerPeakR;
+    const rv = this.outerValleyR;
+    const angleRad = Math.PI / 12; // 15 degrees
+    const sinAngle = Math.sin(angleRad);
+    const cosAngle = Math.cos(angleRad);
+    const d = Math.sqrt(rp * rp + rv * rv - 2 * rp * rv * cosAngle);
+    if (d === 0) return 0;
+    const sinHalfTheta = (rv * sinAngle) / d;
+    if (sinHalfTheta === 0) return 0;
+    // stroke-width / 2 is borderThickness * STITCH_SIZE
+    const halfStrokeWidth = this.settings.borderThickness * this.STITCH_SIZE;
+    return halfStrokeWidth / sinHalfTheta;
+  });
+
   /** Total SVG width */
   width = $derived(
-    (this.outerPeakR +
-      (this.settings.showBorder
-        ? this.settings.borderThickness * this.peakStep
-        : 0)) *
-      2 +
-      this.STITCH_SIZE * 4,
+    (this.outerPeakR + this.miterExtension) * 2 + this.STITCH_SIZE * 4,
   );
 
   /** Total SVG height */
   height = $derived(
-    (this.outerPeakR +
-      (this.settings.showBorder
-        ? this.settings.borderThickness * this.peakStep
-        : 0)) *
-      2 +
-      this.STITCH_SIZE * 4,
+    (this.outerPeakR + this.miterExtension) * 2 + this.STITCH_SIZE * 4,
   );
 
   targets = $derived(

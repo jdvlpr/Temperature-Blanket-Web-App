@@ -175,6 +175,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
         fill="none"
         stroke={twelvePointStarPreview.settings.borderColor}
         stroke-width={twelvePointStarPreview.settings.borderThickness * twelvePointStarPreview.STITCH_SIZE * 2}
+        stroke-linejoin="miter"
+        stroke-miterlimit="20"
       />
     {/if}
 

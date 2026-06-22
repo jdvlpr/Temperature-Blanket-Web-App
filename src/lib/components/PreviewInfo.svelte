@@ -13,7 +13,16 @@
   <div
     class="mx-auto flex w-full flex-col items-center gap-2 text-left"
   >
-      
+      <button class="btn hover:preset-tonal-surface " onclick={toggleDetails}>
+    <InfoIcon/>
+      {#if previews.showDetails}
+      Information
+      <ChevronUpIcon/>
+      {:else}
+      Information
+      <ChevronDownIcon/>
+      {/if}
+    </button>
       
 
     {#if previews.showDetails}
@@ -33,14 +42,5 @@
       {/if}
       </div>
     {/if}
-    <button class="btn hover:preset-tonal-surface " onclick={toggleDetails}>
-    <InfoIcon/>
-      {#if previews.showDetails}
-      Hide Description & Details
-      <ChevronUpIcon/>
-      {:else}
-      Show Description & Details
-      <ChevronDownIcon/>
-      {/if}
-    </button>
+    
   </div>
