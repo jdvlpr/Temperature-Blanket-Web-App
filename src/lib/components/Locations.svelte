@@ -20,8 +20,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { locations } from '$lib/state/location-state.svelte';
   import { project } from '$lib/state/project-state.svelte';
   import { weather } from '$lib/state/weather-state.svelte';
-  import { pluralize } from '$lib/utils/string-utils';
   import { stringToDate } from '$lib/utils/date-utils';
+  import { pluralize } from '$lib/utils/string-utils';
   import {
     CircleCheckBigIcon,
     CirclePlusIcon,
@@ -29,7 +29,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     TriangleAlertIcon,
   } from '@lucide/svelte';
   import SearchForWeather from './buttons/SearchForWeather.svelte';
-  import WeatherSourceButton from './buttons/WeatherSourceButton.svelte';
 
   const loading = $derived(locations.allValid && project.status.loading);
   const validLoadedProject = $derived(

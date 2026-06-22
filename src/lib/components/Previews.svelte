@@ -37,11 +37,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 </script>
 
-<div class="preset-tonal-surface card p-4 md:shadow-lg mt-4">
+<div class="preset-tonal-surface card p-2 md:p-4 md:shadow-lg mt-4">
 
 <PreviewSelect />
 
-<div class="flex flex-col items-start justify-center gap-2 px-2">
+<div class="flex flex-col items-start justify-center gap-2">
   {#if gauges.activeGauge?.colors}
     {#key previews.active}
       <div class="flex w-full flex-wrap items-start justify-center gap-4">

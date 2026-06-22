@@ -185,32 +185,29 @@ export class TwelvePointStarPreviewClass {
     return points.join(' ');
   });
 
-  /** Miter extension of the border when visible */
-  miterExtension = $derived.by(() => {
-    if (!this.settings.showBorder) return 0;
-    const rp = this.outerPeakR;
-    const rv = this.outerValleyR;
-    const angleRad = Math.PI / 12; // 15 degrees
-    const sinAngle = Math.sin(angleRad);
-    const cosAngle = Math.cos(angleRad);
-    const d = Math.sqrt(rp * rp + rv * rv - 2 * rp * rv * cosAngle);
-    if (d === 0) return 0;
-    const sinHalfTheta = (rv * sinAngle) / d;
-    if (sinHalfTheta === 0) return 0;
-    // stroke-width / 2 is borderThickness * STITCH_SIZE
-    const halfStrokeWidth = this.settings.borderThickness * this.STITCH_SIZE;
-    return halfStrokeWidth / sinHalfTheta;
+  /** Total SVG width */
+  width = $derived.by(() => {
+    let ext = 0;
+    if (this.settings.showBorder) {
+      const rp = this.outerPeakR;
+      const rv = this.outerValleyR;
+      const angleRad = Math.PI / 12; // 15 degrees
+      const sinAngle = Math.sin(angleRad);
+      const cosAngle = Math.cos(angleRad);
+      const d = Math.sqrt(rp * rp + rv * rv - 2 * rp * rv * cosAngle);
+      if (d !== 0) {
+        const sinHalfTheta = (rv * sinAngle) / d;
+        if (sinHalfTheta !== 0) {
+          const halfStrokeWidth = this.settings.borderThickness * this.STITCH_SIZE;
+          ext = halfStrokeWidth / sinHalfTheta;
+        }
+      }
+    }
+    return Math.ceil((this.outerPeakR + ext) * 2 + this.STITCH_SIZE * 4);
   });
 
-  /** Total SVG width */
-  width = $derived(
-    (this.outerPeakR + this.miterExtension) * 2 + this.STITCH_SIZE * 4,
-  );
-
   /** Total SVG height */
-  height = $derived(
-    (this.outerPeakR + this.miterExtension) * 2 + this.STITCH_SIZE * 4,
-  );
+  height = $derived(this.width);
 
   targets = $derived(
     gauges.allCreated
