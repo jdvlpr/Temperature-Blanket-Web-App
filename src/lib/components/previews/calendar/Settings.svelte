@@ -27,6 +27,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { pluralize } from '$lib/utils/string-utils';
   import { SquareSquareIcon } from '@lucide/svelte';
 
+  let { previewComponent } = $props();
+
   let targets = $derived(gauges.allCreated.map((n) => n.targets).flat());
 
   // let factors = $derived(getFactors({ length: calendarPreview.months.length }));
@@ -49,6 +51,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     Squares are arranged in a calendar-like grid, grouped by month.
   {/snippet}
 </PreviewInfo>
+
+{@render previewComponent()}
+
 
 <div
   class="preset-outlined-surface-300-700 card flex flex-col items-start gap-4 p-4"

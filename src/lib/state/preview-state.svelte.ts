@@ -54,6 +54,8 @@ class PreviewsState {
 
   active = $derived(this.all.find((n) => n.id === this.activeId));
 
+  showDetails = $state(false);
+
   hash = $derived(this.active?.hash || '');
 
   add(preview) {

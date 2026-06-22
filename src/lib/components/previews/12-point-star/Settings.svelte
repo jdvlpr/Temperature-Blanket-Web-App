@@ -29,6 +29,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { MONTHS } from '$lib/constants/weather-constants';
   import { displayNumber } from '$lib/utils/number-utils';
 
+  let { previewComponent } = $props();
+
   let targets = $derived(gauges.allCreated.map((n) => n.targets).flat());
 
   const MONTH_NAMES = MONTHS.map((m) => m.name);
@@ -86,13 +88,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/snippet}
 </PreviewInfo>
 
+{@render previewComponent()}
+
 <div
   class="preset-outlined-surface-300-700 card flex flex-col items-start gap-4 p-4"
 >
   <p class="text-2xl font-bold">Star Settings</p>
 
   <div class="w-full max-w-md text-left mb-4">
-    <Slider defaultValue={[twelvePointStarPreview.settings.sharpness]} min={0} max={20} step={1} onValueChange={({value}) => twelvePointStarPreview.settings.sharpness = value[0]}>
+    <Slider value={[twelvePointStarPreview.settings.sharpness]} min={0} max={20} step={1} onValueChange={({value}) => twelvePointStarPreview.settings.sharpness = value[0]}>
     <Slider.Label>Star Sharpness: {displayNumber(twelvePointStarPreview.settings.sharpness / 20 * 100, 0)}%</Slider.Label>
     <Slider.Control>
       <Slider.Track>

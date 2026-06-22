@@ -27,6 +27,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { SquareDashedIcon } from '@lucide/svelte';
   import { monthRowsPreview } from './state.svelte';
 
+  let { previewComponent } = $props();
+
   let targets = $derived(gauges.allCreated.flatMap((n) => n.targets));
 </script>
 
@@ -54,6 +56,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {/snippet}
   </PreviewInfo>
 {/if}
+
+{@render previewComponent()}
 
 <div
   class="preset-outlined-surface-300-700 card flex flex-col items-start gap-4 p-4"

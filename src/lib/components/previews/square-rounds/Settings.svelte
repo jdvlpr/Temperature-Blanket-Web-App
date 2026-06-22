@@ -25,6 +25,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { ArrowRightIcon } from '@lucide/svelte';
   import { squareRoundsPreview } from './state.svelte';
 
+  let { previewComponent } = $props();
+
   let targets = $derived(gauges.allCreated.map((n) => n.targets).flat());
 
   let weatherRoundsPerSquare = $derived(
@@ -96,6 +98,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {/if}
   {/snippet}
 </PreviewInfo>
+
+{@render previewComponent()}
 
 <div
   class="preset-outlined-surface-300-700 card flex flex-col items-start gap-4 p-4"

@@ -151,6 +151,40 @@ export class TwelvePointStarPreviewClass {
   /** Outermost valley radius */
   outerValleyR = $derived(this.centerValleyR + this.maxRows * this.valleyStep);
 
+  /** Pre-computed SVG polygon points for the center star shape */
+  centerStarPoints = $derived.by(() => {
+    const cx = this.width / 2;
+    const cy = this.height / 2;
+    const totalVertices = this.NUM_POINTS * 2;
+    const points: string[] = [];
+    for (let i = 0; i < totalVertices; i++) {
+      const angle =
+        (Math.PI / this.NUM_POINTS) * i -
+        Math.PI / 2 +
+        Math.PI / this.NUM_POINTS;
+      const r = i % 2 === 0 ? this.centerPeakR : this.centerValleyR;
+      points.push(`${cx + r * Math.cos(angle)},${cy + r * Math.sin(angle)}`);
+    }
+    return points.join(' ');
+  });
+
+  /** Pre-computed SVG polygon points for the outer border star shape */
+  borderStarPoints = $derived.by(() => {
+    const cx = this.width / 2;
+    const cy = this.height / 2;
+    const totalVertices = this.NUM_POINTS * 2;
+    const points: string[] = [];
+    for (let i = 0; i < totalVertices; i++) {
+      const angle =
+        (Math.PI / this.NUM_POINTS) * i -
+        Math.PI / 2 +
+        Math.PI / this.NUM_POINTS;
+      const r = i % 2 === 0 ? this.outerPeakR : this.outerValleyR;
+      points.push(`${cx + r * Math.cos(angle)},${cy + r * Math.sin(angle)}`);
+    }
+    return points.join(' ');
+  });
+
   /** Total SVG width */
   width = $derived(
     (this.outerPeakR +

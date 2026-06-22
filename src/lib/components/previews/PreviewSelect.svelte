@@ -66,13 +66,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 </script>
 
-<div class="my-4 flex flex-col items-center justify-center gap-2">
+<div class="mt-4 flex flex-col items-center justify-center gap-2">
   <label class="label">
-    <select
-      class="select mx-auto w-fit min-w-[200px]"
-      id="select-pattern-type"
-      value={activePreviewSelectId}
-      onchange={(e) => {
+    <span class="label-text"> Pattern</span>
+    <div class="relative flex items-center">
+      <select
+        class="select truncate"
+        id="select-pattern-type"
+        value={activePreviewSelectId}
+        onchange={(e) => {
         onChangePattern(e.target.value);
         tick().then(() => {
           const activePreviewBtn = document.getElementById(
@@ -96,7 +98,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {/if}
       {/each}
     </select>
-  </label>
+          </div>
+        </label>
+
 
   <div
     class="relative mx-auto my-2 flex w-fit snap-x justify-start overflow-auto pb-3"

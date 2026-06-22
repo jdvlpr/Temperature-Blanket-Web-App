@@ -42,8 +42,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <div class="flex flex-col items-start justify-center gap-2 px-2">
   {#if gauges.activeGauge?.colors}
     {#key previews.active}
-      <div class="flex w-full flex-col items-center justify-center gap-4">
-        <previews.active.previewComponent />
+      <div class="flex w-full flex-wrap items-start justify-center gap-4 preset-tonal-surface card p-4 md:shadow-lg">
+        <previews.active.settingsComponent>
+          {#snippet previewComponent()}
+            <previews.active.previewComponent />
+             <p class="text-sm w-full">Touch or click the preview above to see details.</p>
+          {/snippet}
+        </previews.active.settingsComponent>
 
         <Drawer.Root bind:open={drawerState.weatherDetails}>
           <Drawer.Portal>
@@ -68,11 +73,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </Drawer.Content>
           </Drawer.Portal>
         </Drawer.Root>
-      </div>
-
-      <div class="flex w-full flex-wrap items-start justify-center gap-4">
-        <previews.active.settingsComponent />
-      </div>
+      </div>      
     {/key}
 
     <div

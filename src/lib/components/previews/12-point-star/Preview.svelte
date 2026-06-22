@@ -24,27 +24,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let width = $state(twelvePointStarPreview.width);
   let height = $state(twelvePointStarPreview.height);
 
-  /**
-   * Generate SVG polygon points for a star shape at a given radius.
-   * The star has NUM_POINTS peaks and NUM_POINTS valleys.
-   * @param cx - center x
-   * @param cy - center y
-   * @param peakR - radius at the peak of each star point
-   * @param valleyR - radius at the valley between star points
-   * @param numPoints - number of star points (12)
-   */
-  function getStarPolygonPoints(cx, cy, peakR, valleyR, numPoints = 12) {
-    const points = [];
-    const totalVertices = numPoints * 2;
-    for (let i = 0; i < totalVertices; i++) {
-      const angle = (Math.PI / numPoints) * i - Math.PI / 2 + Math.PI / numPoints; // start from top with half-step offset to align peaks with chevron peaks
-      const r = i % 2 === 0 ? peakR : valleyR;
-      const x = cx + r * Math.cos(angle);
-      const y = cy + r * Math.sin(angle);
-      points.push(`${x},${y}`);
-    }
-    return points.join(' ');
-  }
 
   /**
    * Generate SVG polygon points for a single chevron section within a wedge.
@@ -192,12 +171,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <!-- Optional outer border (rendered first/underneath) -->
     {#if twelvePointStarPreview.settings.showBorder}
       <polygon
-        points={getStarPolygonPoints(
-          width / 2,
-          height / 2,
-          twelvePointStarPreview.outerPeakR,
-          twelvePointStarPreview.outerValleyR,
-        )}
+        points={twelvePointStarPreview.borderStarPoints}
         fill="none"
         stroke={twelvePointStarPreview.settings.borderColor}
         stroke-width={twelvePointStarPreview.settings.borderThickness * twelvePointStarPreview.STITCH_SIZE * 2}
@@ -206,12 +180,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     <!-- Center star shape -->
     <polygon
-      points={getStarPolygonPoints(
-        width / 2,
-        height / 2,
-        twelvePointStarPreview.centerPeakR,
-        twelvePointStarPreview.centerValleyR,
-      )}
+      points={twelvePointStarPreview.centerStarPoints}
       fill={twelvePointStarPreview.settings.additionalRoundsColor}
       stroke={twelvePointStarPreview.settings.additionalRoundsColor}
       stroke-width="1"
