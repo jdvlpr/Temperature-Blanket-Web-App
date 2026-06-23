@@ -22,12 +22,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { gauges } from '$lib/state/gauges-state.svelte';
   import { dialog } from '$lib/state/page-state.svelte';
   import { weather } from '$lib/state/weather-state.svelte';
-  import { pluralize } from '$lib/utils/string-utils';
   import { capitalizeFirstLetter } from '$lib/utils/other-utils';
+  import { pluralize } from '$lib/utils/string-utils';
   import { SquareDashedIcon } from '@lucide/svelte';
+  import Preview from './Preview.svelte';
   import { monthRowsPreview } from './state.svelte';
-
-  let { previewComponent } = $props();
 
   let targets = $derived(gauges.allCreated.flatMap((n) => n.targets));
 </script>
@@ -61,7 +60,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </PreviewInfo>
 {/if}
 
-{@render previewComponent?.()}
+<Preview />
 
 <div
   class="preset-outlined-surface-300-700 card flex flex-col items-start gap-4 p-4"

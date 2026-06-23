@@ -24,9 +24,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { capitalizeFirstLetter } from '$lib/utils/other-utils';
   import { pluralize } from '$lib/utils/string-utils';
   import { SquareDashedIcon } from '@lucide/svelte';
+  import Preview from './Preview.svelte';
   import { monthSquaresPreview } from './state.svelte';
-
-  let { previewComponent } = $props();
 
   let targets = $derived(gauges.allCreated.flatMap((n) => n.targets));
 </script>
@@ -58,7 +57,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/snippet}
 </PreviewInfo>
 
-{@render previewComponent?.()}
+<Preview />
 
 <div
   class="preset-outlined-surface-300-700 card flex flex-col items-start gap-4 p-4"

@@ -26,8 +26,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { weather } from '$lib/state/weather-state.svelte';
   import { pluralize } from '$lib/utils/string-utils';
   import { SquareSquareIcon } from '@lucide/svelte';
-
-  let { previewComponent } = $props();
+  import Preview from './Preview.svelte';
 
   let targets = $derived(gauges.allCreated.map((n) => n.targets).flat());
 
@@ -48,14 +47,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <PreviewInfo previewTitle={calendarPreview.name}>
   {#snippet description()}
-    <p>
-      Squares are arranged in a calendar-like grid, grouped by month.
-    </p>
+    <p>Squares are arranged in a calendar-like grid, grouped by month.</p>
   {/snippet}
 </PreviewInfo>
 
-{@render previewComponent?.()}
-
+<Preview />
 
 <div
   class="preset-outlined-surface-300-700 card flex flex-col items-start gap-4 p-4"

@@ -41,18 +41,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <PreviewSelect />
 
   <div class="flex flex-col items-start justify-center gap-2">
-    {#if gauges.activeGauge?.colors && previews.active?.previewComponent}
+    {#if gauges.activeGauge?.colors && previews.active?.settingsComponent}
       {#key previews.active}
         <div class="flex w-full flex-wrap items-start justify-center gap-4">
-          <previews.active.settingsComponent>
-            {#snippet previewComponent()}
-              <div class="w-full">
-                {#if previews?.active?.previewComponent}
-                  <previews.active.previewComponent />
-                {/if}
-              </div>
-            {/snippet}
-          </previews.active.settingsComponent>
+          <previews.active.settingsComponent />
 
           <Drawer.Root bind:open={drawerState.weatherDetails}>
             <Drawer.Portal>

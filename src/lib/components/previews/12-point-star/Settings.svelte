@@ -14,22 +14,21 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
+  import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
+  import ToggleSwitchGroup from '$lib/components/buttons/ToggleSwitchGroup.svelte';
   import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
   import PreviewInfo from '$lib/components/PreviewInfo.svelte';
   import SpanYarnColorSelectIcon from '$lib/components/SpanYarnColorSelectIcon.svelte';
-  import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
-  import ToggleSwitchGroup from '$lib/components/buttons/ToggleSwitchGroup.svelte';
-  import { dialog } from '$lib/state/page-state.svelte';
-  import { gauges } from '$lib/state/gauges-state.svelte';
-  import { weather } from '$lib/state/weather-state.svelte';
-  import { pluralize } from '$lib/utils/string-utils';
-  import { capitalizeFirstLetter } from '$lib/utils/other-utils';
-  import { twelvePointStarPreview } from './state.svelte';
-  import { Slider } from '@skeletonlabs/skeleton-svelte';
   import { MONTHS } from '$lib/constants/weather-constants';
+  import { gauges } from '$lib/state/gauges-state.svelte';
+  import { dialog } from '$lib/state/page-state.svelte';
+  import { weather } from '$lib/state/weather-state.svelte';
   import { displayNumber } from '$lib/utils/number-utils';
-
-  let { previewComponent } = $props();
+  import { capitalizeFirstLetter } from '$lib/utils/other-utils';
+  import { pluralize } from '$lib/utils/string-utils';
+  import { Slider } from '@skeletonlabs/skeleton-svelte';
+  import Preview from './Preview.svelte';
+  import { twelvePointStarPreview } from './state.svelte';
 
   let targets = $derived(gauges.allCreated.map((n) => n.targets).flat());
 
@@ -93,7 +92,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/snippet}
 </PreviewInfo>
 
-{@render previewComponent?.()}
+<Preview />
 
 <div
   class="preset-outlined-surface-300-700 card flex flex-col items-start gap-4 p-4"

@@ -19,9 +19,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { gauges } from '$lib/state/gauges-state.svelte';
   import { weather } from '$lib/state/weather-state.svelte';
   import { capitalizeFirstLetter } from '$lib/utils/other-utils';
+  import Preview from './Preview.svelte';
   import { cornerToCornerPreview } from './state.svelte';
-
-  let { previewComponent } = $props();
 
   let targets = $derived(gauges.allCreated.map((n) => n.targets).flat());
 </script>
@@ -35,7 +34,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/snippet}
 </PreviewInfo>
 
-{@render previewComponent?.()}
+<Preview />
 
 <div
   class="preset-outlined-surface-300-700 card flex flex-col items-start gap-4 p-4"

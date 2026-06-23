@@ -18,16 +18,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import DataTable from '$lib/components/datatable/DataTable.svelte';
   import Expand from '$lib/components/Expand.svelte';
   import PreviewInfo from '$lib/components/PreviewInfo.svelte';
+  import { safeSlide } from '$lib/features/transitions/safeSlide';
   import { gauges } from '$lib/state/gauges-state.svelte';
   import { locations } from '$lib/state/location-state.svelte';
   import { weather } from '$lib/state/weather-state.svelte';
-  import { safeSlide } from '$lib/features/transitions/safeSlide';
   import { capitalizeFirstLetter } from '$lib/utils/other-utils';
   import { DownloadIcon } from '@lucide/svelte';
   import { TableHandler } from '@vincjo/datatables';
+  import Preview from './Preview.svelte';
   import { daytimeRowsPreview } from './state.svelte';
-
-  let { previewComponent } = $props();
 
   let targets = $derived(gauges.allCreated.map((n) => n.targets).flat());
 
@@ -248,7 +247,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/snippet}
 </PreviewInfo>
 
-{@render previewComponent?.()}
+<Preview />
 
 <div
   class="preset-outlined-surface-300-700 card flex flex-col items-start gap-4 p-4"

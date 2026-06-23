@@ -18,14 +18,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
   import PreviewInfo from '$lib/components/PreviewInfo.svelte';
   import SpanYarnColorSelectIcon from '$lib/components/SpanYarnColorSelectIcon.svelte';
-  import { dialog } from '$lib/state/page-state.svelte';
   import { gauges } from '$lib/state/gauges-state.svelte';
+  import { dialog } from '$lib/state/page-state.svelte';
   import { weather } from '$lib/state/weather-state.svelte';
   import { capitalizeFirstLetter } from '$lib/utils/other-utils';
   import { pluralize } from '$lib/utils/string-utils';
+  import Preview from './Preview.svelte';
   import { continuousSquarePreview } from './state.svelte';
-
-  let { previewComponent } = $props();
 
   let targets = $derived(gauges.allCreated.map((n) => n.targets).flat());
 </script>
@@ -59,7 +58,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </PreviewInfo>
 {/if}
 
-{@render previewComponent?.()}
+<Preview />
 
 <div
   class="preset-outlined-surface-300-700 card flex flex-col items-start gap-4 p-4"
