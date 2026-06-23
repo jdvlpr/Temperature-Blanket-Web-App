@@ -34,7 +34,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/snippet}
 </PreviewInfo>
 
-<Preview />
+<div class="w-full"><Preview /></div>
 
 <div
   class="preset-outlined-surface-300-700 card flex flex-col items-start gap-4 p-4"
