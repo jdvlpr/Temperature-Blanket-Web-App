@@ -1661,8 +1661,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <h3 class="text-xl font-bold">Link Unavailable</h3>
 
             <p>
-              A yarn that says <span class="italic">Link Unavailable</span> means the webpage from which the
-              colorways were accessed is no longer available.
+              A yarn that says <span class="italic">Link Unavailable</span> means
+              the webpage from which the colorways were accessed is no longer available.
             </p>
             <p>It could mean:</p>
             <ul class="ml-4">
@@ -1673,7 +1673,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 longer exist
               </li>
             </ul>
-            <p>Yarns with unavailable links remain on this web app for legacy purposes, but you may not want to use them for new projects.</p>
+            <p>
+              Yarns with unavailable links remain on this web app for legacy
+              purposes, but you may not want to use them for new projects.
+            </p>
           </section>
           <h2 class="scroll-mt-[58px] text-2xl font-bold" id="preview">
             Preview
@@ -1690,6 +1693,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
               pattern types which you can use to customize your preview:
             </p>
             <ul class="ml-4 flex flex-col gap-2">
+              <li>
+                <span class="font-bold">12-Point Star</span> – Each of the 12 points
+                represents a month (starting with January at the top, moving clockwise).
+                Each chevron row within a point represents one day's weather data,
+                radiating outward from the center.
+              </li>
               <li>
                 <span class="font-bold">Calendar</span> – Squares are arranged in
                 a calendar-like grid, grouped by month.
