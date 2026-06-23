@@ -198,7 +198,8 @@ export class TwelvePointStarPreviewClass {
       if (d !== 0) {
         const sinHalfTheta = (rv * sinAngle) / d;
         if (sinHalfTheta !== 0) {
-          const halfStrokeWidth = this.settings.borderThickness * this.STITCH_SIZE;
+          const halfStrokeWidth =
+            this.settings.borderThickness * this.STITCH_SIZE;
           ext = halfStrokeWidth / sinHalfTheta;
         }
       }
