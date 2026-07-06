@@ -18,6 +18,10 @@ type LocalStatePreferencesType = {
   theme: {
     id: string; // `"classic"` or one of the presets in plugins.themes.presets in [tailwind.config.js])
     mode: 'light' | 'dark' | 'system';
+    roundness?: 'sharp' | 'rounded' | 'pill'; // Controls --radius-base and --radius-container
+    spacing?: 'compact' | 'normal' | 'relaxed'; // Controls --spacing
+    textScale?: 'small' | 'normal' | 'large'; // Controls --text-scaling
+    iconStroke?: 'thin' | 'normal' | 'bold'; // Controls .lucide stroke-width
   };
   units: Unit | null;
 };
@@ -31,6 +35,10 @@ export const preferences = persistedState<LocalStatePreferencesType>(
     theme: {
       id: 'classic',
       mode: 'system',
+      roundness: 'rounded',
+      spacing: 'normal',
+      textScale: 'normal',
+      iconStroke: 'normal',
     },
     units: null,
   },

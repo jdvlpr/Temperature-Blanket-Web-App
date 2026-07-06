@@ -94,57 +94,81 @@ https://www.skeleton.dev/docs/svelte/tailwind-components/forms#windows-bugfix
   --wght: 400;
   --SOFT: 90;
   --WONK: 1;
-
-  --radius-base: 0.75rem;
-  --radius-container: 1.5rem;
 }
 [data-theme='hamlindigo'] {
   --opsz: 76;
   --wght: 900;
   --SOFT: 0;
   --WONK: 0;
-
-  --spacing: 0.22rem;
-  --radius-base: 0.063rem;
-  --radius-container: 0.125rem;
-
-  .lucide {
-    stroke-width: 1px;
-  }
 }
 [data-theme='modern'] {
   --opsz: 12;
   --wght: 900;
   --SOFT: 100;
   --WONK: 1;
-
-  --text-scaling: 1.125;
-  --spacing: 0.28rem;
-  --radius-base: 9999rem;
-  --radius-container: 1.5rem;
 }
 [data-theme='rocket'] {
   --opsz: 24;
   --wght: 300;
   --SOFT: 10;
   --WONK: 0;
-
-  --text-scaling: 1;
-  --radius-base: 0.125rem;
-  --radius-container: 0.25rem;
-
-  .lucide {
-    stroke-width: 1px;
-  }
 }
 [data-theme='legacy'] {
   --opsz: 64;
   --wght: 500;
   --SOFT: 60;
   --WONK: 1;
+}
 
+/* === Independent Style Controls ===
+   Applied via data-* attributes on <html>, separate from color theme.
+   Set by user preferences; survive color theme changes. */
+
+/* Roundness */
+[data-roundness='sharp'] {
+  --radius-base: 0.063rem;
+  --radius-container: 0.125rem;
+}
+[data-roundness='rounded'] {
+  --radius-base: 0.75rem;
+  --radius-container: 1.5rem;
+}
+[data-roundness='pill'] {
   --radius-base: 9999rem;
   --radius-container: 1.5rem;
+}
+
+/* Spacing */
+[data-spacing='compact'] {
+  --spacing: 0.22rem;
+}
+[data-spacing='normal'] {
+  --spacing: 0.25rem;
+}
+[data-spacing='relaxed'] {
+  --spacing: 0.28rem;
+}
+
+/* Text Scale */
+[data-text-scale='small'] {
+  --text-scaling: 1;
+}
+[data-text-scale='normal'] {
+  --text-scaling: 1.067;
+}
+[data-text-scale='large'] {
+  --text-scaling: 1.125;
+}
+
+/* Icon Stroke */
+[data-icon-stroke='thin'] .lucide {
+  stroke-width: 1px;
+}
+[data-icon-stroke='normal'] .lucide {
+  stroke-width: 2px;
+}
+[data-icon-stroke='bold'] .lucide {
+  stroke-width: 2.5px;
 }
 
 @media (prefers-reduced-motion) {

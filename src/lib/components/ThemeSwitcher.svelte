@@ -23,7 +23,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
         secondary: '#075985',
         surface: '#64748b',
       },
-      rounded: '0.375rem',
     },
     {
       id: 'crimson',
@@ -33,7 +32,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
         secondary: '#4785ae',
         surface: '#353a50',
       },
-      rounded: '0.75rem',
     },
     {
       id: 'hamlindigo',
@@ -43,7 +41,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
         secondary: '#a38e5e',
         surface: '#6476a1',
       },
-      rounded: '0.063rem',
     },
     {
       id: 'modern',
@@ -53,7 +50,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
         secondary: '#00b7d6',
         surface: '#6367ef',
       },
-      rounded: '9999rem',
     },
     {
       id: 'rocket',
@@ -63,7 +59,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
         secondary: '#3a82f7',
         surface: '#64748b',
       },
-      rounded: '0.125rem',
     },
     {
       id: 'legacy',
@@ -73,14 +68,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
         primary: '#4f46e5',
         secondary: '#495a90',
       },
-      rounded: '9999rem',
     },
   ];
 </script>
 
 <script>
   import { browser } from '$app/environment';
-  import { THEMES } from '$lib/constants/page-constants';
+  import {
+    THEMES,
+    ROUNDNESS,
+    SPACING,
+    TEXT_SCALE,
+    ICON_STROKE,
+  } from '$lib/constants/page-constants';
   import { preferences } from '$lib/storage/preferences.svelte';
   import { safeSlide } from '$lib/features/transitions/safeSlide';
   import {
@@ -89,10 +89,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     SegmentedControl,
   } from '@skeletonlabs/skeleton-svelte';
   import { ContrastIcon } from '@lucide/svelte';
-
-  let activeTheme = $derived(
-    THEMES.find((n) => n.id === (preferences.value.theme.mode || 'system')),
-  );
 </script>
 
 <div class="w-fit text-left">
@@ -100,7 +96,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <Popover.Trigger class="btn hover:preset-tonal-surface">
       {#key preferences.value?.theme.mode}
         <span><ContrastIcon /></span>
-        Theme
+        Style
       {/key}
     </Popover.Trigger>
     <Portal>
@@ -112,74 +108,175 @@ If not, see <https://www.gnu.org/licenses/>. -->
             {#if !attributes.hidden}
               <div {...attributes} transition:safeSlide>
                 <Popover.Description>
-                  <div class="flex flex-col gap-2">
-                    <SegmentedControl
-                      value={preferences.value.theme.mode}
-                      onValueChange={(e) => {
-                        if (preferences.value?.theme.mode) {
-                          preferences.value.theme.mode = e.value;
-                        }
-                      }}
-                    >
-                      <SegmentedControl.Control
-                        class="bg-surface-100 dark:bg-surface-900 card"
-                      >
-                        <SegmentedControl.Indicator />
-                        {#each THEMES as { name, id, icon, description }}
-                          <SegmentedControl.Item value={id} title={description}>
-                            <SegmentedControl.ItemText>
-                              <span
-                                class="flex items-center justify-center gap-1"
-                              >
-                                {@html icon}
-                                <span
-                                  class={[
-                                    id !== preferences.value.theme.mode &&
-                                      'hidden',
-                                    'text-sm min-[400px]:inline md:text-base',
-                                  ]}>{name}</span
-                                >
-                              </span>
-                            </SegmentedControl.ItemText>
-                            <SegmentedControl.ItemHiddenInput />
-                          </SegmentedControl.Item>
-                        {/each}
-                      </SegmentedControl.Control>
-                    </SegmentedControl>
+                  <div class="flex flex-col gap-4">
 
-                    <div class="flex flex-col items-start gap-2">
-                      {#each skeletonThemes as { name, id, colors, rounded }}
-                        <button
-                          onclick={(e) => {
-                            preferences.value.theme.id = id;
-                          }}
-                          class={[
-                            'btn hover:preset-tonal-surface flex w-full items-center justify-start gap-2',
-                            preferences.value.theme.id === id &&
-                              'preset-filled-secondary-500',
-                          ]}
+                    <!-- 1. Appearance (Light / Dark / System) -->
+                    <div class="flex flex-col gap-1">
+                      <p class="text-xs font-semibold uppercase tracking-wider opacity-60">Appearance</p>
+                      <SegmentedControl
+                        value={preferences.value.theme.mode}
+                        onValueChange={(e) => {
+                          if (preferences.value?.theme.mode) {
+                            preferences.value.theme.mode = e.value;
+                          }
+                        }}
+                      >
+                        <SegmentedControl.Control
+                          class="bg-surface-100 dark:bg-surface-900 card"
                         >
-                          <div
-                            class="border-surface-50-950 flex h-6 w-16 overflow-hidden border"
-                            style="border-radius:{rounded}"
+                          <SegmentedControl.Indicator />
+                          {#each THEMES as { name, id, icon, description }}
+                            <SegmentedControl.Item value={id} title={description}>
+                              <SegmentedControl.ItemText>
+                                <span
+                                  class="flex items-center justify-center gap-1"
+                                >
+                                  {@html icon}
+                                  <span
+                                    class={[
+                                      id !== preferences.value.theme.mode &&
+                                        'hidden',
+                                      'text-sm min-[400px]:inline md:text-base',
+                                    ]}>{name}</span
+                                  >
+                                </span>
+                              </SegmentedControl.ItemText>
+                              <SegmentedControl.ItemHiddenInput />
+                            </SegmentedControl.Item>
+                          {/each}
+                        </SegmentedControl.Control>
+                      </SegmentedControl>
+                    </div>
+
+                    <!-- 2. Color Theme -->
+                    <div class="flex flex-col gap-1">
+                      <p class="text-xs font-semibold uppercase tracking-wider opacity-60">Color Theme</p>
+                      <div class="flex flex-col items-start gap-2">
+                        {#each skeletonThemes as { name, id, colors }}
+                          <button
+                            onclick={() => {
+                              preferences.value.theme.id = id;
+                            }}
+                            class={[
+                              'btn hover:preset-tonal-surface flex w-full items-center justify-start gap-2',
+                              preferences.value.theme.id === id &&
+                                'preset-filled-secondary-500',
+                            ]}
                           >
                             <div
-                              class="flex-auto"
-                              style="background:{colors.surface}"
-                            ></div>
-                            <div
-                              class="flex-auto"
-                              style="background:{colors.primary}"
-                            ></div>
-                            <div
-                              class="flex-auto"
-                              style="background:{colors.secondary}"
-                            ></div>
-                          </div>
-                          {name}
-                        </button>
-                      {/each}
+                              class="border-surface-50-950 flex h-6 w-16 overflow-hidden rounded-sm border"
+                            >
+                              <div
+                                class="flex-auto"
+                                style="background:{colors.surface}"
+                              ></div>
+                              <div
+                                class="flex-auto"
+                                style="background:{colors.primary}"
+                              ></div>
+                              <div
+                                class="flex-auto"
+                                style="background:{colors.secondary}"
+                              ></div>
+                            </div>
+                            {name}
+                          </button>
+                        {/each}
+                      </div>
                     </div>
+
+                    <!-- 3. Roundness -->
+                    <div class="flex flex-col gap-1">
+                      <p class="text-xs font-semibold uppercase tracking-wider opacity-60">Roundness</p>
+                      <SegmentedControl
+                        value={preferences.value.theme.roundness ?? 'rounded'}
+                        onValueChange={(e) => {
+                          preferences.value.theme.roundness = e.value;
+                        }}
+                      >
+                        <SegmentedControl.Control
+                          class="bg-surface-100 dark:bg-surface-900 card"
+                        >
+                          <SegmentedControl.Indicator />
+                          {#each ROUNDNESS as { name, id, description }}
+                            <SegmentedControl.Item value={id} title={description}>
+                              <SegmentedControl.ItemText>{name}</SegmentedControl.ItemText>
+                              <SegmentedControl.ItemHiddenInput />
+                            </SegmentedControl.Item>
+                          {/each}
+                        </SegmentedControl.Control>
+                      </SegmentedControl>
+                    </div>
+
+                    <!-- 4. Spacing -->
+                    <div class="flex flex-col gap-1">
+                      <p class="text-xs font-semibold uppercase tracking-wider opacity-60">Spacing</p>
+                      <SegmentedControl
+                        value={preferences.value.theme.spacing ?? 'normal'}
+                        onValueChange={(e) => {
+                          preferences.value.theme.spacing = e.value;
+                        }}
+                      >
+                        <SegmentedControl.Control
+                          class="bg-surface-100 dark:bg-surface-900 card"
+                        >
+                          <SegmentedControl.Indicator />
+                          {#each SPACING as { name, id, description }}
+                            <SegmentedControl.Item value={id} title={description}>
+                              <SegmentedControl.ItemText>{name}</SegmentedControl.ItemText>
+                              <SegmentedControl.ItemHiddenInput />
+                            </SegmentedControl.Item>
+                          {/each}
+                        </SegmentedControl.Control>
+                      </SegmentedControl>
+                    </div>
+
+                    <!-- 5. Text Size -->
+                    <div class="flex flex-col gap-1">
+                      <p class="text-xs font-semibold uppercase tracking-wider opacity-60">Text Size</p>
+                      <SegmentedControl
+                        value={preferences.value.theme.textScale ?? 'normal'}
+                        onValueChange={(e) => {
+                          preferences.value.theme.textScale = e.value;
+                        }}
+                      >
+                        <SegmentedControl.Control
+                          class="bg-surface-100 dark:bg-surface-900 card"
+                        >
+                          <SegmentedControl.Indicator />
+                          {#each TEXT_SCALE as { name, id, description }}
+                            <SegmentedControl.Item value={id} title={description}>
+                              <SegmentedControl.ItemText>{name}</SegmentedControl.ItemText>
+                              <SegmentedControl.ItemHiddenInput />
+                            </SegmentedControl.Item>
+                          {/each}
+                        </SegmentedControl.Control>
+                      </SegmentedControl>
+                    </div>
+
+                    <!-- 6. Icon Stroke -->
+                    <div class="flex flex-col gap-1">
+                      <p class="text-xs font-semibold uppercase tracking-wider opacity-60">Icon Style</p>
+                      <SegmentedControl
+                        value={preferences.value.theme.iconStroke ?? 'normal'}
+                        onValueChange={(e) => {
+                          preferences.value.theme.iconStroke = e.value;
+                        }}
+                      >
+                        <SegmentedControl.Control
+                          class="bg-surface-100 dark:bg-surface-900 card"
+                        >
+                          <SegmentedControl.Indicator />
+                          {#each ICON_STROKE as { name, id, description }}
+                            <SegmentedControl.Item value={id} title={description}>
+                              <SegmentedControl.ItemText>{name}</SegmentedControl.ItemText>
+                              <SegmentedControl.ItemHiddenInput />
+                            </SegmentedControl.Item>
+                          {/each}
+                        </SegmentedControl.Control>
+                      </SegmentedControl>
+                    </div>
+
                   </div>
                 </Popover.Description>
                 <Popover.Arrow

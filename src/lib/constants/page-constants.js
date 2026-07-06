@@ -123,4 +123,91 @@ export const THEMES = [
   },
 ];
 
+export const ROUNDNESS = [
+  {
+    id: 'sharp',
+    name: 'Sharp',
+    description: 'Square corners on buttons and containers.',
+    radiusBase: '0.063rem',
+    radiusContainer: '0.125rem',
+  },
+  {
+    id: 'rounded',
+    name: 'Rounded',
+    description: 'Gently rounded corners on buttons and containers.',
+    radiusBase: '0.75rem',
+    radiusContainer: '1.5rem',
+  },
+  {
+    id: 'pill',
+    name: 'Pill',
+    description: 'Fully rounded buttons, gently rounded containers.',
+    radiusBase: '9999rem',
+    radiusContainer: '1.5rem',
+  },
+];
+
+export const SPACING = [
+  {
+    id: 'compact',
+    name: 'Compact',
+    description: 'Tighter layout spacing.',
+    value: '0.22rem',
+  },
+  {
+    id: 'normal',
+    name: 'Normal',
+    description: 'Default layout spacing.',
+    value: '0.25rem',
+  },
+  {
+    id: 'relaxed',
+    name: 'Relaxed',
+    description: 'Looser, airier layout spacing.',
+    value: '0.28rem',
+  },
+];
+
+export const TEXT_SCALE = [
+  {
+    id: 'small',
+    name: 'Small',
+    description: 'Tighter typographic scale.',
+    value: '1',
+  },
+  {
+    id: 'normal',
+    name: 'Normal',
+    description: 'Default typographic scale.',
+    value: '1.067',
+  },
+  {
+    id: 'large',
+    name: 'Large',
+    description: 'More expressive typographic scale.',
+    value: '1.125',
+  },
+];
+
+export const ICON_STROKE = [
+  {
+    id: 'thin',
+    name: 'Thin',
+    description: 'Lighter, thinner icon strokes.',
+    value: '1px',
+  },
+  {
+    id: 'normal',
+    name: 'Normal',
+    description: 'Default icon stroke weight.',
+    value: '2px',
+  },
+  {
+    id: 'bold',
+    name: 'Bold',
+    description: 'Heavier, bolder icon strokes.',
+    value: '2.5px',
+  },
+];
+
 export const APP_NAVIGATION_SIDEBAR_WIDTH = 278;

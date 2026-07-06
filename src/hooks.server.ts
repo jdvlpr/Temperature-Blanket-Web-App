@@ -89,9 +89,22 @@ const devRedirects: Handle = async ({ event, resolve }) => {
 const themeCookies: Handle = async ({ event, resolve }) => {
   let theme = '';
   let mode = '';
+  let roundness = '';
+  let spacing = '';
+  let textScale = '';
+  let iconStroke = '';
+
+  const VALID_ROUNDNESS = ['sharp', 'rounded', 'pill'];
+  const VALID_SPACING = ['compact', 'normal', 'relaxed'];
+  const VALID_TEXT_SCALE = ['small', 'normal', 'large'];
+  const VALID_ICON_STROKE = ['thin', 'normal', 'bold'];
 
   const cookieTheme = event.cookies.get('theme');
   const cookieThemeMode = event.cookies.get('theme_mode');
+  const cookieRoundness = event.cookies.get('theme_roundness');
+  const cookieSpacing = event.cookies.get('theme_spacing');
+  const cookieTextScale = event.cookies.get('theme_text_scale');
+  const cookieIconStroke = event.cookies.get('theme_icon_stroke');
 
   if (cookieTheme && skeletonThemes.map((n) => n.id).includes(cookieTheme)) {
     theme = cookieTheme;
@@ -107,13 +120,41 @@ const themeCookies: Handle = async ({ event, resolve }) => {
     mode = 'system';
   }
 
+  if (cookieRoundness && VALID_ROUNDNESS.includes(cookieRoundness)) {
+    roundness = cookieRoundness;
+  } else {
+    event.cookies.set('theme_roundness', 'rounded', { path: '/' });
+    roundness = 'rounded';
+  }
+
+  if (cookieSpacing && VALID_SPACING.includes(cookieSpacing)) {
+    spacing = cookieSpacing;
+  } else {
+    event.cookies.set('theme_spacing', 'normal', { path: '/' });
+    spacing = 'normal';
+  }
+
+  if (cookieTextScale && VALID_TEXT_SCALE.includes(cookieTextScale)) {
+    textScale = cookieTextScale;
+  } else {
+    event.cookies.set('theme_text_scale', 'normal', { path: '/' });
+    textScale = 'normal';
+  }
+
+  if (cookieIconStroke && VALID_ICON_STROKE.includes(cookieIconStroke)) {
+    iconStroke = cookieIconStroke;
+  } else {
+    event.cookies.set('theme_icon_stroke', 'normal', { path: '/' });
+    iconStroke = 'normal';
+  }
+
   return await resolve(event, {
     transformPageChunk: ({ html }) =>
       html
         .replace('data-theme=""', `data-theme="${theme}"`)
         .replace(
           'id="html-root"',
-          mode === 'dark' ? `id="html-root" class="${mode}"` : `id="html-root"`,
+          `id="html-root" data-roundness="${roundness}" data-spacing="${spacing}" data-text-scale="${textScale}" data-icon-stroke="${iconStroke}"${mode === 'dark' ? ' class="dark"' : ''}`,
         ),
   });
 };

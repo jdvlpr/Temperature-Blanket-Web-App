@@ -1,5 +1,4 @@
 [data-theme='classic'] {
-  --text-scaling: 1.067;
   --base-font-color: var(--color-surface-950);
   --base-font-color-dark: var(--color-surface-50);
   --base-font-family: inherit;
@@ -26,9 +25,6 @@
   --anchor-text-decoration-hover: underline;
   --anchor-text-decoration-active: none;
   --anchor-text-decoration-focus: none;
-  --spacing: 0.25rem;
-  --radius-base: 9999rem;
-  --radius-container: 1.5rem;
   --default-border-width: 1px;
   --default-divide-width: 1px;
   --default-ring-width: 1px;

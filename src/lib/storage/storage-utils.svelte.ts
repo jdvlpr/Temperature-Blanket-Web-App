@@ -71,6 +71,10 @@ async function handleLegacyLocalStorageKeys() {
 export async function initializeLocalStorage() {
   preferences.value.theme.id = preferences.value.theme.id || 'classic';
   preferences.value.theme.mode = preferences.value.theme.mode || 'system';
+  preferences.value.theme.roundness = preferences.value.theme.roundness || 'rounded';
+  preferences.value.theme.spacing = preferences.value.theme.spacing || 'normal';
+  preferences.value.theme.textScale = preferences.value.theme.textScale || 'normal';
+  preferences.value.theme.iconStroke = preferences.value.theme.iconStroke || 'normal';
   preferences.value.seasons = preferences.value.seasons || DEFAULT_SEASONS;
 
   try {
@@ -95,12 +99,20 @@ export async function initializeLocalStorage() {
     $effect(() => {
       const theme = preferences.value.theme.id || 'classic';
       const mode = preferences.value.theme.mode || 'system';
+      const roundness = preferences.value.theme.roundness || 'rounded';
+      const spacing = preferences.value.theme.spacing || 'normal';
+      const textScale = preferences.value.theme.textScale || 'normal';
+      const iconStroke = preferences.value.theme.iconStroke || 'normal';
 
       if (skeletonThemes.map((theme) => theme.id).includes(theme)) {
         document.documentElement.setAttribute('data-theme', theme);
+        document.documentElement.setAttribute('data-roundness', roundness);
+        document.documentElement.setAttribute('data-spacing', spacing);
+        document.documentElement.setAttribute('data-text-scale', textScale);
+        document.documentElement.setAttribute('data-icon-stroke', iconStroke);
         fetch('/api/preferences/theme', {
           method: 'POST',
-          body: JSON.stringify({ theme, mode }),
+          body: JSON.stringify({ theme, mode, roundness, spacing, textScale, iconStroke }),
         });
       }
     });

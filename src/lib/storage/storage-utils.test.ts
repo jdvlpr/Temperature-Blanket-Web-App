@@ -53,7 +53,14 @@ vi.mock('$lib/state/location-state.svelte', () => ({
 vi.mock('$lib/storage/preferences.svelte', () => ({
   preferences: {
     value: {
-      theme: { id: 'classic', mode: 'system' },
+      theme: {
+        id: 'classic',
+        mode: 'system',
+        roundness: 'rounded',
+        spacing: 'normal',
+        textScale: 'normal',
+        iconStroke: 'normal',
+      },
       seasons: [],
       layout: 'default',
       disableToastAnalytics: false,
