@@ -32,6 +32,21 @@ export const entries: ChangelogItemGroup[] = [
     year: 2026,
     months: [
       {
+        month: 'July',
+        items: [
+          {
+            notes: [
+              {
+                IconComponent: RocketIcon,
+                text: `...`,
+                title: 'Version 6',
+              },
+            ],
+            version: "6.0.0"
+          },
+        ],
+      },
+      {
         month: 'June',
         items: [
           {

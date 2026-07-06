@@ -35,7 +35,7 @@ import {
 } from '$lib/utils/unit-utils.svelte.js';
 import { getMoonPhase } from '$lib/state/weather-state.svelte';
 import { error, json } from '@sveltejs/kit';
-import SunCalc from 'suncalc';
+import * as SunCalc from 'suncalc';
 
 export async function POST({ request }) {
   const body = await request.json();

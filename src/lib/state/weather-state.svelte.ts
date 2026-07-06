@@ -15,8 +15,8 @@
 
 import { API_SERVICES } from '$lib/constants/api-constants';
 import { MOON_PHASE_NAMES } from '$lib/constants/weather-constants';
-import { locations, signal } from '$lib/state/location-state.svelte';
 import { showDaysInRange } from '$lib/state/gauges-state.svelte';
+import { locations, signal } from '$lib/state/location-state.svelte';
 import { preferences } from '$lib/storage/preferences.svelte';
 import type { GaugeAttributes, WeatherParam } from '$lib/types/gauge-types';
 import type { LocationType } from '$lib/types/location-types';
@@ -25,24 +25,23 @@ import type {
   WeatherDay,
   WeatherSourceOptions,
 } from '$lib/types/weather-types';
-import { createWeeksProperty } from '$lib/utils/date-utils';
+import { getColorInfo } from '$lib/utils/color-utils';
+import {
+  createWeeksProperty, dateToISO8601String,
+  getLocalISODateString,
+  numberOfDays,
+  stringToDate
+} from '$lib/utils/date-utils';
+import { displayNumber, getAverage } from '$lib/utils/number-utils';
+import { pluralize } from '$lib/utils/string-utils';
 import {
   celsiusToFahrenheit,
   convertTime,
   hoursToMinutes,
   millimetersToInches,
 } from '$lib/utils/unit-utils.svelte';
-import {
-  dateToISO8601String,
-  getLocalISODateString,
-  numberOfDays,
-  stringToDate,
-} from '$lib/utils/date-utils';
-import { displayNumber, getAverage } from '$lib/utils/number-utils';
-import { getColorInfo } from '$lib/utils/color-utils';
-import { pluralize } from '$lib/utils/string-utils';
 import { getWeatherTargets } from '$lib/utils/weather-utils.svelte';
-import SunCalc from 'suncalc';
+import * as SunCalc from 'suncalc';
 
 class WeatherClass {
   // ***************
@@ -699,7 +698,9 @@ export const getMoonPhase = (date: Date): MoonPhasesId => {
 };
 
 export const getDayTime = ({ date, lat, lng }) => {
+  console.log('Calculating day time for date:', date, 'lat:', lat, 'lng:', lng);
   const times = SunCalc.getTimes(date, lat, lng);
+  console.log('SunCalc times:', times);
   const isValidSunset =
     times.sunset instanceof Date && !isNaN(times.sunset.getTime());
   const isValidSunRise =

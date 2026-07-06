@@ -1,7 +1,6 @@
-import SunCalc from 'suncalc';
+import * as SunCalc from 'suncalc';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { weather, getDayTime, getMoonPhase } from './weather-state.svelte';
-import { getAverage } from '$lib/utils/number-utils';
+import { getDayTime, getMoonPhase, weather } from './weather-state.svelte';
 
 // Mocking $lib modules
 vi.mock('$lib/constants/api-constants', async (importOriginal) => ({
@@ -38,21 +37,25 @@ vi.mock('suncalc', () => ({
   })),
 }));
 
-const { mockPreferences, mockLocations, mockAllGaugesAttributes, mockShowDaysInRange } =
-  vi.hoisted(() => ({
-    mockPreferences: {
-      value: {
-        units: 'metric',
-      },
+const {
+  mockPreferences,
+  mockLocations,
+  mockAllGaugesAttributes,
+  mockShowDaysInRange,
+} = vi.hoisted(() => ({
+  mockPreferences: {
+    value: {
+      units: 'metric',
     },
-    mockLocations: {
-      all: [] as any[],
-    },
-    mockAllGaugesAttributes: [] as any[],
-    mockShowDaysInRange: {
-      value: false,
-    },
-  }));
+  },
+  mockLocations: {
+    all: [] as any[],
+  },
+  mockAllGaugesAttributes: [] as any[],
+  mockShowDaysInRange: {
+    value: false,
+  },
+}));
 
 vi.mock('$lib/storage/preferences.svelte', () => ({
   preferences: mockPreferences,
@@ -118,7 +121,11 @@ vi.mock('$lib/utils/color-utils', async (importOriginal) => {
   const actual = await importOriginal<any>();
   return {
     ...actual,
-    getColorInfo: vi.fn(() => ({ color: '#ffffff', textColor: '#000000', hex: '#ffffff' })),
+    getColorInfo: vi.fn(() => ({
+      color: '#ffffff',
+      textColor: '#000000',
+      hex: '#ffffff',
+    })),
   };
 });
 
@@ -351,9 +358,9 @@ describe('weather-state', () => {
         ok: false,
       } as any);
 
-      await expect(weather.getOpenMeteo({ location: mockLocation })).rejects.toThrow(
-        'Service Temporarily Unavailable',
-      );
+      await expect(
+        weather.getOpenMeteo({ location: mockLocation }),
+      ).rejects.toThrow('Service Temporarily Unavailable');
     });
   });
 
@@ -415,11 +422,7 @@ describe('weather-state', () => {
     beforeEach(() => {
       // Mock tableWeatherTargets property
       Object.defineProperty(weather, 'tableWeatherTargets', {
-        get: () => [
-          { id: 'tmax' },
-          { id: 'moon' },
-          { id: 'dayt' },
-        ],
+        get: () => [{ id: 'tmax' }, { id: 'moon' }, { id: 'dayt' }],
         configurable: true,
       });
 
