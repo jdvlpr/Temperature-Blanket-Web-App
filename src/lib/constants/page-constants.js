@@ -13,6 +13,18 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
+import {
+  ALargeSmallIcon,
+  CircleIcon,
+  Rows2Icon,
+  Rows3Icon,
+  Rows4Icon,
+  SquareIcon,
+  SquareRoundCorner,
+  ZoomInIcon,
+  ZoomOutIcon,
+} from '@lucide/svelte';
+
 // Symbols used in a project's URL hash
 export const CHARACTERS_FOR_URL_HASH = {
   separator: "'",
@@ -125,6 +137,7 @@ export const THEMES = [
 
 export const ROUNDNESS = [
   {
+    IconComponent: SquareIcon,
     id: 'sharp',
     name: 'Sharp',
     description: 'Square corners on buttons and containers.',
@@ -132,6 +145,7 @@ export const ROUNDNESS = [
     radiusContainer: '0.125rem',
   },
   {
+    IconComponent: SquareRoundCorner,
     id: 'rounded',
     name: 'Rounded',
     description: 'Gently rounded corners on buttons and containers.',
@@ -139,6 +153,7 @@ export const ROUNDNESS = [
     radiusContainer: '1.5rem',
   },
   {
+    IconComponent: CircleIcon,
     id: 'pill',
     name: 'Pill',
     description: 'Fully rounded buttons, gently rounded containers.',
@@ -149,18 +164,21 @@ export const ROUNDNESS = [
 
 export const SPACING = [
   {
+    IconComponent: Rows4Icon,
     id: 'compact',
     name: 'Compact',
     description: 'Tighter layout spacing.',
     value: '0.22rem',
   },
   {
+    IconComponent: Rows3Icon,
     id: 'normal',
     name: 'Normal',
     description: 'Default layout spacing.',
     value: '0.25rem',
   },
   {
+    IconComponent: Rows2Icon,
     id: 'relaxed',
     name: 'Relaxed',
     description: 'Looser, airier layout spacing.',
@@ -170,18 +188,21 @@ export const SPACING = [
 
 export const TEXT_SCALE = [
   {
+    IconComponent: ZoomOutIcon,
     id: 'small',
     name: 'Small',
     description: 'Tighter typographic scale.',
     value: '1',
   },
   {
+    IconComponent: ALargeSmallIcon,
     id: 'normal',
     name: 'Normal',
     description: 'Default typographic scale.',
     value: '1.067',
   },
   {
+    IconComponent: ZoomInIcon,
     id: 'large',
     name: 'Large',
     description: 'More expressive typographic scale.',
