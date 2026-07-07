@@ -49,15 +49,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
     BookmarkIcon,
     BookOpenTextIcon,
     CircleQuestionMarkIcon,
+    CloudyIcon,
     EllipsisVerticalIcon,
+    Icon,
     KeyboardIcon,
     LightbulbIcon,
     MailIcon,
     RedoIcon,
+    SwatchBookIcon,
     UndoIcon,
   } from '@lucide/svelte';
   import { Popover, Portal } from '@skeletonlabs/skeleton-svelte';
   import { onMount } from 'svelte';
+  import { yarnBall } from '@lucide/lab';
 
   let debounceTimer: number;
 
@@ -324,7 +328,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <main class="mx-auto pb-18 text-center" id="main-page">
       <div
         id="page-section-location"
-        class="mx-auto max-w-(--breakpoint-md) scroll-mt-[76px]"
+        class="mx-auto scroll-mt-[76px] max-w-(--breakpoint-md)"
         class:hidden={pageSections.items[1].active === false}
       >
         <div class="w-full px-2 py-4">
@@ -351,7 +355,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </div>
 
         <div
-          class="md:bg-surface-50 dark:md:bg-surface-950 md:rounded-container mb-2 px-2 md:p-4 md:shadow-lg"
+          class="md:bg-surface-50 dark:md:bg-surface-950 md:rounded-container mb-2 px-2 md:p-4 md:shadow-lg mx-auto"
         >
           <Locations />
         </div>

@@ -14,15 +14,12 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import {
+  AArrowDownIcon,
+  AArrowUpIcon,
   ALargeSmallIcon,
-  CircleIcon,
   Rows2Icon,
   Rows3Icon,
   Rows4Icon,
-  SquareIcon,
-  SquareRoundCorner,
-  ZoomInIcon,
-  ZoomOutIcon,
 } from '@lucide/svelte';
 
 // Symbols used in a project's URL hash
@@ -137,15 +134,13 @@ export const THEMES = [
 
 export const ROUNDNESS = [
   {
-    IconComponent: SquareIcon,
     id: 'sharp',
-    name: 'Sharp',
+    name: 'Square',
     description: 'Square corners on buttons and containers.',
     radiusBase: '0.063rem',
     radiusContainer: '0.125rem',
   },
   {
-    IconComponent: SquareRoundCorner,
     id: 'rounded',
     name: 'Rounded',
     description: 'Gently rounded corners on buttons and containers.',
@@ -153,7 +148,6 @@ export const ROUNDNESS = [
     radiusContainer: '1.5rem',
   },
   {
-    IconComponent: CircleIcon,
     id: 'pill',
     name: 'Pill',
     description: 'Fully rounded buttons, gently rounded containers.',
@@ -166,21 +160,21 @@ export const SPACING = [
   {
     IconComponent: Rows4Icon,
     id: 'compact',
-    name: 'Compact',
+    name: 'Tight',
     description: 'Tighter layout spacing.',
     value: '0.22rem',
   },
   {
     IconComponent: Rows3Icon,
     id: 'normal',
-    name: 'Normal',
+    name: 'Default',
     description: 'Default layout spacing.',
     value: '0.25rem',
   },
   {
     IconComponent: Rows2Icon,
     id: 'relaxed',
-    name: 'Relaxed',
+    name: 'Loose',
     description: 'Looser, airier layout spacing.',
     value: '0.28rem',
   },
@@ -188,7 +182,7 @@ export const SPACING = [
 
 export const TEXT_SCALE = [
   {
-    IconComponent: ZoomOutIcon,
+    IconComponent: AArrowDownIcon,
     id: 'small',
     name: 'Small',
     description: 'Tighter typographic scale.',
@@ -197,37 +191,16 @@ export const TEXT_SCALE = [
   {
     IconComponent: ALargeSmallIcon,
     id: 'normal',
-    name: 'Normal',
+    name: 'Medium',
     description: 'Default typographic scale.',
     value: '1.067',
   },
   {
-    IconComponent: ZoomInIcon,
+    IconComponent: AArrowUpIcon,
     id: 'large',
     name: 'Large',
-    description: 'More expressive typographic scale.',
+    description: 'Larger typographic scale.',
     value: '1.125',
-  },
-];
-
-export const ICON_STROKE = [
-  {
-    id: 'thin',
-    name: 'Thin',
-    description: 'Lighter, thinner icon strokes.',
-    value: '1px',
-  },
-  {
-    id: 'normal',
-    name: 'Normal',
-    description: 'Default icon stroke weight.',
-    value: '2px',
-  },
-  {
-    id: 'bold',
-    name: 'Bold',
-    description: 'Heavier, bolder icon strokes.',
-    value: '2.5px',
   },
 ];
 

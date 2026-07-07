@@ -160,17 +160,6 @@ https://www.skeleton.dev/docs/svelte/tailwind-components/forms#windows-bugfix
   --text-scaling: 1.125;
 }
 
-/* Icon Stroke */
-[data-icon-stroke='thin'] .lucide {
-  stroke-width: 1px;
-}
-[data-icon-stroke='normal'] .lucide {
-  stroke-width: 2px;
-}
-[data-icon-stroke='bold'] .lucide {
-  stroke-width: 2.5px;
-}
-
 @media (prefers-reduced-motion) {
   ::view-transition-group(*),
   ::view-transition-old(*),

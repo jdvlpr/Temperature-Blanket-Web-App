@@ -377,6 +377,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   {#snippet main()}
     <main class="m-auto mb-8 max-w-(--breakpoint-xl) text-center" in:fade>
+      <div class="w-full px-2 py-4">
+        <div class="flex flex-col gap-2">
+          <h2 class="h1 text-gradient mb-0">Local Weather Forecast</h2>
+        </div>
+      </div>
       <div class="max-lg:px-2">
         <Location />
       </div>

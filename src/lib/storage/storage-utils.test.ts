@@ -59,7 +59,6 @@ vi.mock('$lib/storage/preferences.svelte', () => ({
         roundness: 'rounded',
         spacing: 'normal',
         textScale: 'normal',
-        iconStroke: 'normal',
       },
       seasons: [],
       layout: 'default',

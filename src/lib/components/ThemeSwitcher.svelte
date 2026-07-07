@@ -74,7 +74,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
   import {
-    ICON_STROKE,
     ROUNDNESS,
     SPACING,
     TEXT_SCALE,
@@ -82,7 +81,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '$lib/constants/page-constants';
   import { safeSlide } from '$lib/features/transitions/safeSlide';
   import { preferences } from '$lib/storage/preferences.svelte';
-  import { ContrastIcon } from '@lucide/svelte';
+  import { ContrastIcon, RotateCcwIcon } from '@lucide/svelte';
   import {
     Popover,
     Portal,
@@ -160,20 +159,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       >
                         Color Theme
                       </p>
-                      <div class="grid grid-cols-3 items-center gap-4">
+                      <div class="grid grid-cols-3 items-center gap-4 p-1">
                         {#each skeletonThemes as { name, id, colors }}
                           <button
                             onclick={() => {
                               preferences.value.theme.id = id;
                             }}
-                            class={[
-                              'btn hover:preset-tonal-surface flex flex-col w-full items-center justify-start gap-0 text-xs p-0',
-                              preferences.value.theme.id === id &&
-                                'preset-filled-secondary-500',
-                            ]}
+                            class="btn hover:ring-2 flex flex-col w-full items-center justify-start gap-0 text-xs p-0"
                           >
                             <div
-                              class="border-surface-50-950 flex h-10 w-full overflow-hidden rounded-base border"
+                              class={[
+                                'flex h-10 w-full overflow-hidden rounded-base border',
+                                id === preferences.value.theme.id &&
+                                  'ring-2 ring-tertiary-500',
+                              ]}
                             >
                               <div
                                 class="flex-auto"
@@ -199,7 +198,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       <p
                         class="text-xs font-semibold uppercase tracking-wider opacity-60"
                       >
-                        Roundness
+                        Buttons
                       </p>
 
                       <SegmentedControl
@@ -212,7 +211,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                           class="bg-surface-100 dark:bg-surface-900 card"
                         >
                           <SegmentedControl.Indicator />
-                          {#each ROUNDNESS as { name, id, description, IconComponent }}
+                          {#each ROUNDNESS as { name, id, description }}
                             <SegmentedControl.Item
                               value={id}
                               title={description}
@@ -221,8 +220,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
                                 class="flex items-center justify-center gap-1"
                               >
                                 <!-- here -->
-                                {#if IconComponent}
-                                  <IconComponent />
+                                {#if id === 'sharp'}
+                                  <div
+                                    class="border-2 border-[currentColor] w-7 h-5 rounded-none"
+                                  ></div>
+                                {:else if id === 'rounded'}
+                                  <div
+                                    class="border-2 border-[currentColor] w-7 h-5 rounded-md"
+                                  ></div>
+                                {:else if id === 'pill'}
+                                  <div
+                                    class="border-2 border-[currentColor] w-7 h-5 rounded-full"
+                                  ></div>
                                 {/if}
                                 <span
                                   class={[
@@ -308,7 +317,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
                               <SegmentedControl.ItemText
                                 class="flex items-center justify-center gap-1"
                               >
-                                <!-- here -->
                                 {#if IconComponent}
                                   <IconComponent />
                                 {/if}
@@ -327,37 +335,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       </SegmentedControl>
                     </div>
 
-                    <!-- 6. Icon Stroke -->
-                    <div class="flex flex-col gap-1">
-                      <p
-                        class="text-xs font-semibold uppercase tracking-wider opacity-60"
-                      >
-                        Icon Style
-                      </p>
-                      <SegmentedControl
-                        value={preferences.value.theme.iconStroke ?? 'normal'}
-                        onValueChange={(e) => {
-                          preferences.value.theme.iconStroke = e.value;
-                        }}
-                      >
-                        <SegmentedControl.Control
-                          class="bg-surface-100 dark:bg-surface-900 card"
-                        >
-                          <SegmentedControl.Indicator />
-                          {#each ICON_STROKE as { name, id, description }}
-                            <SegmentedControl.Item
-                              value={id}
-                              title={description}
-                            >
-                              <SegmentedControl.ItemText
-                                >{name}</SegmentedControl.ItemText
-                              >
-                              <SegmentedControl.ItemHiddenInput />
-                            </SegmentedControl.Item>
-                          {/each}
-                        </SegmentedControl.Control>
-                      </SegmentedControl>
-                    </div>
+                    <button
+                      class="btn hover:preset-tonal-surface w-fit"
+                      onclick={() => {
+                        preferences.value.theme.mode = 'system';
+                        preferences.value.theme.id = 'classic';
+                        preferences.value.theme.roundness = 'rounded';
+                        preferences.value.theme.spacing = 'normal';
+                        preferences.value.theme.textScale = 'normal';
+                      }}
+                    >
+                      <RotateCcwIcon />
+                      Reset All
+                    </button>
                   </div>
                 </Popover.Description>
                 <Popover.Arrow

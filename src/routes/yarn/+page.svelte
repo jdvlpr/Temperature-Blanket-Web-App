@@ -110,16 +110,24 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {#snippet main()}
     <div>
       <main class="m-auto max-w-(--breakpoint-xl) text-center">
+        <div class="w-full px-2 py-4">
+          <div class="flex flex-col gap-2">
+            <h2 class="h1 text-gradient mb-0">Create a Yarn Palette</h2>
+            <p>
+              Create a yarn color palette from a collection of brands and yarns.
+              Find matching colorways from HTML hex color codes or from an
+              image.
+            </p>
+            <p class="mt-2">
+              <span class="font-bold">Note:</span> This is a standalone version
+              of the palette creator used in the Project Planner tool. If you're
+              making a temperature blanket project, use the
+              <a href="/" class="link">Project Planner</a> instead, which will automatically
+              save your yarn palette to your project.
+            </p>
+          </div>
+        </div>
         <Card>
-          {#snippet header()}
-            <div class="bg-surface-100 dark:bg-surface-900 p-4">
-              <p class="text-center">
-                Create a yarn color palette from a collection of brands and
-                yarns. Find matching colorways from HTML hex color codes or from
-                an image.
-              </p>
-            </div>
-          {/snippet}
           {#snippet content()}
             <div class=" mt-4">
               <Gauge bind:gauge={yarnPageState.gauge} />

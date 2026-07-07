@@ -21,7 +21,6 @@ type LocalStatePreferencesType = {
     roundness?: 'sharp' | 'rounded' | 'pill'; // Controls --radius-base and --radius-container
     spacing?: 'compact' | 'normal' | 'relaxed'; // Controls --spacing
     textScale?: 'small' | 'normal' | 'large'; // Controls --text-scaling
-    iconStroke?: 'thin' | 'normal' | 'bold'; // Controls .lucide stroke-width
   };
   units: Unit | null;
 };
@@ -38,7 +37,6 @@ export const preferences = persistedState<LocalStatePreferencesType>(
       roundness: 'rounded',
       spacing: 'normal',
       textScale: 'normal',
-      iconStroke: 'normal',
     },
     units: null,
   },

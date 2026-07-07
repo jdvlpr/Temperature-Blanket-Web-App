@@ -92,7 +92,6 @@ const themeCookies: Handle = async ({ event, resolve }) => {
   let roundness = '';
   let spacing = '';
   let textScale = '';
-  let iconStroke = '';
 
   const VALID_ROUNDNESS = ['sharp', 'rounded', 'pill'];
   const VALID_SPACING = ['compact', 'normal', 'relaxed'];
@@ -141,20 +140,13 @@ const themeCookies: Handle = async ({ event, resolve }) => {
     textScale = 'normal';
   }
 
-  if (cookieIconStroke && VALID_ICON_STROKE.includes(cookieIconStroke)) {
-    iconStroke = cookieIconStroke;
-  } else {
-    event.cookies.set('theme_icon_stroke', 'normal', { path: '/' });
-    iconStroke = 'normal';
-  }
-
   return await resolve(event, {
     transformPageChunk: ({ html }) =>
       html
         .replace('data-theme=""', `data-theme="${theme}"`)
         .replace(
           'id="html-root"',
-          `id="html-root" data-roundness="${roundness}" data-spacing="${spacing}" data-text-scale="${textScale}" data-icon-stroke="${iconStroke}"${mode === 'dark' ? ' class="dark"' : ''}`,
+          `id="html-root" data-roundness="${roundness}" data-spacing="${spacing}" data-text-scale="${textScale}"${mode === 'dark' ? ' class="dark"' : ''}`,
         ),
   });
 };

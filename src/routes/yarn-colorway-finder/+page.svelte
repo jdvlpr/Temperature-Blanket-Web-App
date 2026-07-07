@@ -399,18 +399,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/snippet}
   {#snippet main()}
     <main class="m-auto max-w-(--breakpoint-xl) pb-6">
+      <div class="w-full px-2 py-4 text-center">
+        <div class="flex flex-col gap-2">
+          <h2 class="h1 text-gradient mb-0">Find Yarn by Color</h2>
+          <p>
+            Browse a collection of yarn colorways. Filter by brand or yarn name,
+            and search by HTML hex color code to find matching yarn colorways.
+          </p>
+        </div>
+      </div>
       <Card>
-        {#snippet header()}
-          <div>
-            <div class="bg-surface-100-900 p-4">
-              <p class="text-center">
-                Browse a collection of yarn colorways. Filter by brand or yarn
-                name, and search by HTML hex color code to find matching yarn
-                colorways.
-              </p>
-            </div>
-          </div>
-        {/snippet}
         {#snippet content()}
           <div class=" my-2 flex flex-col items-center">
             <div
@@ -612,7 +610,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       toast.trigger({
                         message: `<div class="flex flex-col"><span class="font-bold">${name}</span><span class="text-xs">Copied to clipboard</span></div>`,
                         category: 'success',
-                        icon: ClipboardCheckIcon
+                        icon: ClipboardCheckIcon,
                       });
                     }}
                     title="Copy {name} to clipboard"
@@ -652,7 +650,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         {brandName} - {yarnName}
                       </span>
 
-                      <span class="text-left text-lg leading-tight pointer-events-none">
+                      <span
+                        class="text-left text-lg leading-tight pointer-events-none"
+                      >
                         {name}
                       </span>
 
@@ -675,7 +675,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                           toast.trigger({
                             message: `<div class="flex flex-col"><span class="font-bold">${hex}</span><span class="text-xs">Copied to clipboard</span></div>`,
                             category: 'success',
-                            icon: ClipboardCheckIcon
+                            icon: ClipboardCheckIcon,
                           });
                         }}>{hex}</span
                       >
