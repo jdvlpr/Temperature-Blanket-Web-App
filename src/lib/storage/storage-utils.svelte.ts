@@ -14,7 +14,7 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { browser } from '$app/environment';
-import { skeletonThemes } from '$lib/components/ThemeSwitcher.svelte';
+import { SKELETON_THEMES } from '$lib/constants/page-constants';
 import { DEFAULT_SEASONS } from '$lib/constants/seasons-constants';
 import { preferences } from '$lib/storage/preferences.svelte';
 import type { PageLayout } from '$lib/types/page-types';
@@ -57,7 +57,7 @@ async function handleLegacyLocalStorageKeys() {
     }
     if (
       parsedSkeletonTheme &&
-      skeletonThemes.some((theme) => theme.id === parsedSkeletonTheme)
+      SKELETON_THEMES.some((theme) => theme.id === parsedSkeletonTheme)
     ) {
       preferences.value.theme.id = parsedSkeletonTheme;
       localStorage.removeItem('skeletonTheme');
@@ -76,6 +76,8 @@ export async function initializeLocalStorage() {
   preferences.value.theme.spacing = preferences.value.theme.spacing || 'normal';
   preferences.value.theme.textScale =
     preferences.value.theme.textScale || 'normal';
+  preferences.value.theme.headingStyle =
+    preferences.value.theme.headingStyle || 'classic';
   preferences.value.seasons = preferences.value.seasons || DEFAULT_SEASONS;
 
   try {
@@ -103,12 +105,17 @@ export async function initializeLocalStorage() {
       const roundness = preferences.value.theme.roundness || 'pill';
       const spacing = preferences.value.theme.spacing || 'normal';
       const textScale = preferences.value.theme.textScale || 'normal';
+      const headingStyle = preferences.value.theme.headingStyle || 'classic';
 
-      if (skeletonThemes.map((theme) => theme.id).includes(theme)) {
+      if (SKELETON_THEMES.map((theme) => theme.id).includes(theme)) {
         document.documentElement.setAttribute('data-theme', theme);
         document.documentElement.setAttribute('data-roundness', roundness);
         document.documentElement.setAttribute('data-spacing', spacing);
         document.documentElement.setAttribute('data-text-scale', textScale);
+        document.documentElement.setAttribute(
+          'data-heading-style',
+          headingStyle,
+        );
         fetch('/api/preferences/theme', {
           method: 'POST',
           body: JSON.stringify({
@@ -117,6 +124,7 @@ export async function initializeLocalStorage() {
             roundness,
             spacing,
             textScale,
+            headingStyle,
           }),
         });
       }

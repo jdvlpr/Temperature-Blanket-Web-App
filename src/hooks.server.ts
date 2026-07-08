@@ -14,8 +14,7 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { dev } from '$app/environment';
-import { skeletonThemes } from '$lib/components/ThemeSwitcher.svelte';
-import { THEMES } from '$lib/constants/page-constants';
+import { THEMES, SKELETON_THEMES } from '$lib/constants/page-constants';
 import { redirect, type Handle } from '@sveltejs/kit';
 import { sequence } from '@sveltejs/kit/hooks';
 
@@ -92,18 +91,21 @@ const themeCookies: Handle = async ({ event, resolve }) => {
   let roundness = '';
   let spacing = '';
   let textScale = '';
+  let headingStyle = '';
 
   const VALID_ROUNDNESS = ['sharp', 'rounded', 'pill'];
   const VALID_SPACING = ['compact', 'normal', 'relaxed'];
   const VALID_TEXT_SCALE = ['small', 'normal', 'large'];
+  const VALID_HEADING_STYLE = ['classic', 'playful', 'refined'];
 
   const cookieTheme = event.cookies.get('theme');
   const cookieThemeMode = event.cookies.get('theme_mode');
   const cookieRoundness = event.cookies.get('theme_roundness');
   const cookieSpacing = event.cookies.get('theme_spacing');
   const cookieTextScale = event.cookies.get('theme_text_scale');
+  const cookieHeadingStyle = event.cookies.get('theme_heading_style');
 
-  if (cookieTheme && skeletonThemes.map((n) => n.id).includes(cookieTheme)) {
+  if (cookieTheme && SKELETON_THEMES.map((n) => n.id).includes(cookieTheme)) {
     theme = cookieTheme;
   } else {
     event.cookies.set('theme', 'classic', { path: '/' });
@@ -138,13 +140,20 @@ const themeCookies: Handle = async ({ event, resolve }) => {
     textScale = 'normal';
   }
 
+  if (cookieHeadingStyle && VALID_HEADING_STYLE.includes(cookieHeadingStyle)) {
+    headingStyle = cookieHeadingStyle;
+  } else {
+    event.cookies.set('theme_heading_style', 'classic', { path: '/' });
+    headingStyle = 'classic';
+  }
+
   return await resolve(event, {
     transformPageChunk: ({ html }) =>
       html
         .replace('data-theme=""', `data-theme="${theme}"`)
         .replace(
           'id="html-root"',
-          `id="html-root" data-roundness="${roundness}" data-spacing="${spacing}" data-text-scale="${textScale}"${mode === 'dark' ? ' class="dark"' : ''}`,
+          `id="html-root" data-roundness="${roundness}" data-spacing="${spacing}" data-text-scale="${textScale}" data-heading-style="${headingStyle}"${mode === 'dark' ? ' class="dark"' : ''}`,
         ),
   });
 };

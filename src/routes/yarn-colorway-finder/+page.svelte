@@ -380,7 +380,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <meta property="og:title" content="Yarn Colorway Finder" />
   <meta
     property="og:description"
-    content="Browse a collection of yarn colorways. Filter by brand or yarn name, and search by HTML color name or hex code to find matching yarn colorways."
+    content="Browse yarn colorways, filter by brand or yarn, and search by hex color code."
   />
   <meta property="og:url" content="{PUBLIC_BASE_URL}/yarn-colorway-finder" />
   <meta property="og:type" content="website" />
@@ -403,8 +403,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <div class="flex flex-col gap-2">
           <h2 class="h1 text-gradient mb-0">Find Yarn by Color</h2>
           <p>
-            Browse a collection of yarn colorways. Filter by brand or yarn name,
-            and search by HTML hex color code to find matching yarn colorways.
+            Browse yarn colorways, filter by brand or yarn, and search by hex
+            color code.
           </p>
         </div>
       </div>

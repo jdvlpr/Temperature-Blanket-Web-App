@@ -59,6 +59,7 @@ vi.mock('$lib/storage/preferences.svelte', () => ({
         roundness: 'pill',
         spacing: 'normal',
         textScale: 'normal',
+        headingStyle: 'classic',
       },
       seasons: [],
       layout: 'default',
@@ -74,7 +75,7 @@ vi.mock('$app/environment', () => ({
 }));
 
 vi.mock('$lib/components/ThemeSwitcher.svelte', () => ({
-  skeletonThemes: [{ id: 'classic', name: 'Classic' }],
+  SKELETON_THEMES: [{ id: 'classic', name: 'Classic' }],
 }));
 
 describe('storage-utils integration', () => {

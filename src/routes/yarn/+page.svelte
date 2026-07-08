@@ -114,20 +114,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <div class="flex flex-col gap-2">
             <h2 class="h1 text-gradient mb-0">Design a Yarn Palette</h2>
             <p>
-              Create a yarn color palette from a collection of brands and yarns.
-              Find matching colorways from HTML hex color codes or from an
-              image.
-            </p>
-            <p class="mt-2 opacity-60">
-              <span class="font-bold">Note:</span> This is a standalone version
-              of the palette creator used in the Project Planner tool. If you're
-              making a temperature blanket project, use the
-              <a href="/" class="link">Project Planner</a> instead, which will automatically
-              save your yarn palette to your project.
+              Create a yarn palette from a collection of brands and yarns. Find
+              matching colors from hex codes or an image.
             </p>
           </div>
         </div>
         <Card>
+          {#snippet header()}
+            <p class="opacity-68 p-4 text-sm">
+              This is a standalone version of the palette creator used in the
+              Project Planner tool. If you're making a temperature blanket
+              project, use the
+              <a href="/" class="link">Project Planner</a> instead, which will automatically
+              save your yarn palette to your project.
+            </p>
+          {/snippet}
           {#snippet content()}
             <div class=" mt-4">
               <Gauge bind:gauge={yarnPageState.gauge} />

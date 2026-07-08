@@ -82,42 +82,25 @@ https://www.skeleton.dev/docs/svelte/tailwind-components/forms#windows-bugfix
   --heading-font-family: 'fraunces-variable', sans-serif;
 }
 
-/* Set custom font variation variables for each theme's headings */
-[data-theme='classic'] {
+/* Heading Style — font-variation-settings for the Fraunces variable font.
+   Independent of color theme; set via data-heading-style on <html>. */
+[data-heading-style='playful'] {
+  --opsz: 32;
+  --wght: 900;
+  --SOFT: 100;
+  --WONK: 1;
+}
+[data-heading-style='classic'] {
   --opsz: 68;
   --wght: 600;
   --SOFT: 50;
   --WONK: 0;
 }
-[data-theme='crimson'] {
-  --opsz: 48;
-  --wght: 400;
-  --SOFT: 90;
-  --WONK: 1;
-}
-[data-theme='hamlindigo'] {
-  --opsz: 76;
-  --wght: 900;
+[data-heading-style='refined'] {
+  --opsz: 100;
+  --wght: 700;
   --SOFT: 0;
   --WONK: 0;
-}
-[data-theme='modern'] {
-  --opsz: 12;
-  --wght: 900;
-  --SOFT: 100;
-  --WONK: 1;
-}
-[data-theme='rocket'] {
-  --opsz: 24;
-  --wght: 300;
-  --SOFT: 10;
-  --WONK: 0;
-}
-[data-theme='legacy'] {
-  --opsz: 64;
-  --wght: 500;
-  --SOFT: 60;
-  --WONK: 1;
 }
 
 /* === Independent Style Controls ===

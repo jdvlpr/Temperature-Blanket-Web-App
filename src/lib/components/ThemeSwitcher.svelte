@@ -13,68 +13,11 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script module>
-  export const skeletonThemes = [
-    {
-      id: 'classic',
-      name: 'Marble',
-      colors: {
-        primary: '#fcd34d',
-        secondary: '#075985',
-        surface: '#64748b',
-      },
-    },
-    {
-      id: 'crimson',
-      name: 'Garnet',
-      colors: {
-        primary: '#d21d3d',
-        secondary: '#4785ae',
-        surface: '#353a50',
-      },
-    },
-    {
-      id: 'hamlindigo',
-      name: 'Lapis Lazuli',
-      colors: {
-        primary: '#a7bef3',
-        secondary: '#a38e5e',
-        surface: '#6476a1',
-      },
-    },
-    {
-      id: 'modern',
-      name: 'Jasper',
-      colors: {
-        primary: '#eb4999',
-        secondary: '#00b7d6',
-        surface: '#6367ef',
-      },
-    },
-    {
-      id: 'rocket',
-      name: 'Geode',
-      colors: {
-        primary: '#00b7d6',
-        secondary: '#3a82f7',
-        surface: '#64748b',
-      },
-    },
-    {
-      id: 'legacy',
-      name: 'Tufa',
-      colors: {
-        surface: '#11ba81',
-        primary: '#4f46e5',
-        secondary: '#495a90',
-      },
-    },
-  ];
-</script>
-
 <script>
   import {
+    HEADING_STYLE,
     ROUNDNESS,
+    SKELETON_THEMES,
     SPACING,
     TEXT_SCALE,
     THEMES,
@@ -92,27 +35,27 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <div class="w-fit text-left">
   <Popover modal={true} autoFocus={true}>
     <Popover.Trigger class="btn hover:preset-tonal-surface">
-      {#key preferences.value?.theme.mode}
-        <span><ContrastIcon /></span>
-        Appearance
-      {/key}
+      <ContrastIcon />
+      Appearance
     </Popover.Trigger>
     <Portal>
       <Popover.Positioner>
         <Popover.Content
-          class="card bg-surface-200-800 z-999 space-y-4 p-2 sm:p-4 shadow-xl max-w-[90vw] max-h-[70vh]! overflow-auto"
+          class="card bg-surface-200-800 z-999 space-y-4 p-4 shadow-xl max-w-[90vw]! max-h-[70vh]! overflow-auto"
         >
           {#snippet element(attributes)}
             {#if !attributes.hidden}
               <div {...attributes} transition:safeSlide>
                 <Popover.Description>
                   <div class="flex flex-col gap-4">
-                    <!-- 1. Appearance (Light / Dark / System) -->
+                    <!-- Appearance (Light / Dark / System) -->
                     <div class="flex flex-col gap-1">
                       <p
                         class="text-xs font-semibold uppercase tracking-wider opacity-60"
                       >
-                        Mode
+                        Mode<span class="sm:hidden"
+                          >: {preferences.value.theme.mode}</span
+                        >
                       </p>
                       <SegmentedControl
                         value={preferences.value.theme.mode}
@@ -132,13 +75,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
                               title={description}
                             >
                               <SegmentedControl.ItemText
-                                class="flex flex-col sm:flex-row items-center justify-center gap-1"
+                                class="flex items-center justify-center gap-1"
                               >
                                 {@html icon}
-                                <span
-                                  class="text-sm min-[400px]:inline md:text-base"
-                                  >{name}</span
-                                >
+                                <span class="sm:inline hidden">{name}</span>
                               </SegmentedControl.ItemText>
                               <SegmentedControl.ItemHiddenInput />
                             </SegmentedControl.Item>
@@ -147,7 +87,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       </SegmentedControl>
                     </div>
 
-                    <!-- 2. Theme -->
+                    <!-- Theme -->
                     <div class="flex flex-col gap-1">
                       <p
                         class="text-xs font-semibold uppercase tracking-wider opacity-60"
@@ -155,12 +95,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         Theme
                       </p>
                       <div class="grid grid-cols-3 items-center gap-4 p-1">
-                        {#each skeletonThemes as { name, id, colors }}
+                        {#each SKELETON_THEMES as { name, id, colors, description }}
                           <button
                             onclick={() => {
                               preferences.value.theme.id = id;
                             }}
                             class="btn flex flex-col w-full items-center justify-start gap-0 p-0"
+                            title={description}
                           >
                             <div
                               class={[
@@ -182,60 +123,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
                                 style="background:{colors.secondary}"
                               ></div>
                             </div>
-                            {#if id === 'classic'}
-                              <div
-                                class="text-lg opacity-60"
-                                style="font-family:var(--heading-font-family);font-variation-settings:'opsz' 68,'wght' 600,'SOFT' 50,'WONK' 0;"
-                              >
-                                Abcd
-                              </div>
-                            {:else if id === 'crimson'}
-                              <div
-                                class="text-lg opacity-60"
-                                style="font-family:var(--heading-font-family);font-variation-settings:'opsz' 48,'wght' 400,'SOFT' 90,'WONK' 1;"
-                              >
-                                Abcd
-                              </div>
-                            {:else if id === 'hamlindigo'}
-                              <div
-                                class="text-lg opacity-60"
-                                style="font-family:var(--heading-font-family);font-variation-settings:'opsz' 76,'wght' 900,'SOFT' 0,'WONK' 0;"
-                              >
-                                Abcd
-                              </div>
-                            {:else if id === 'modern'}
-                              <div
-                                class="text-lg opacity-60"
-                                style="font-family:var(--heading-font-family);font-variation-settings:'opsz' 12,'wght' 900,'SOFT' 100,'WONK' 1;"
-                              >
-                                Abcd
-                              </div>
-                            {:else if id === 'rocket'}
-                              <div
-                                class="text-lg opacity-60"
-                                style="font-family:var(--heading-font-family);font-variation-settings:'opsz' 24,'wght' 300,'SOFT' 10,'WONK' 0;"
-                              >
-                                Abcd
-                              </div>
-                            {:else if id === 'legacy'}
-                              <div
-                                class="text-lg opacity-60"
-                                style="font-family:var(--heading-font-family);font-variation-settings:'opsz' 64,'wght' 500,'SOFT' 60,'WONK' 1;"
-                              >
-                                Abcd
-                              </div>
-                            {/if}
+                            <!-- <span class="text-sm opacity-70">{name}</span> -->
                           </button>
                         {/each}
                       </div>
                     </div>
 
-                    <!-- 3. Roundness -->
+                    <!-- Roundness -->
                     <div class="flex flex-col gap-1">
                       <p
                         class="text-xs font-semibold uppercase tracking-wider opacity-60"
                       >
-                        Buttons
+                        Buttons<span class="sm:hidden"
+                          >: {preferences.value.theme.roundness}</span
+                        >
                       </p>
 
                       <SegmentedControl
@@ -254,9 +155,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
                               title={description}
                             >
                               <SegmentedControl.ItemText
-                                class="flex flex-col sm:flex-row items-center justify-center gap-1"
+                                class="flex items-center justify-center gap-1"
                               >
-                                <!-- here -->
                                 {#if id === 'sharp'}
                                   <div
                                     class="border-2 border-[currentColor] w-7 h-5 rounded-none"
@@ -270,10 +170,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                                     class="border-2 border-[currentColor] w-7 h-5 rounded-full"
                                   ></div>
                                 {/if}
-                                <span
-                                  class="text-sm min-[400px]:inline md:text-base"
-                                  >{name}</span
-                                >
+                                <span class="sm:inline hidden">{name}</span>
                               </SegmentedControl.ItemText>
                               <SegmentedControl.ItemHiddenInput />
                             </SegmentedControl.Item>
@@ -282,38 +179,38 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       </SegmentedControl>
                     </div>
 
-                    <!-- 4. Spacing -->
+                    <!-- Heading Style -->
                     <div class="flex flex-col gap-1">
                       <p
                         class="text-xs font-semibold uppercase tracking-wider opacity-60"
                       >
-                        Spacing
+                        Heading Style<span class="sm:hidden"
+                          >: {preferences.value.theme.headingStyle}</span
+                        >
                       </p>
                       <SegmentedControl
-                        value={preferences.value.theme.spacing ?? 'normal'}
+                        value={preferences.value.theme.headingStyle ??
+                          'classic'}
                         onValueChange={(e) => {
-                          preferences.value.theme.spacing = e.value;
+                          preferences.value.theme.headingStyle = e.value;
                         }}
                       >
                         <SegmentedControl.Control
                           class="bg-surface-100 dark:bg-surface-900 card"
                         >
                           <SegmentedControl.Indicator />
-                          {#each SPACING as { name, id, description, IconComponent }}
+                          {#each HEADING_STYLE as { name, id, description, opsz, wght, SOFT, WONK }}
                             <SegmentedControl.Item
                               value={id}
                               title={description}
                             >
                               <SegmentedControl.ItemText
-                                class="flex flex-col sm:flex-row items-center justify-center gap-1"
+                                class="flex items-center justify-center gap-1"
                               >
-                                <!-- here -->
-                                {#if IconComponent}
-                                  <IconComponent />
-                                {/if}
                                 <span
-                                  class="text-sm min-[400px]:inline md:text-base"
-                                  >{name}</span
+                                  class="text-xl"
+                                  style="font-family:var(--heading-font-family);font-variation-settings:'opsz' {opsz},'wght' {wght},'SOFT' {SOFT},'WONK' {WONK};"
+                                  >Abcd</span
                                 >
                               </SegmentedControl.ItemText>
                               <SegmentedControl.ItemHiddenInput />
@@ -323,12 +220,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       </SegmentedControl>
                     </div>
 
-                    <!-- 5. Text Size -->
+                    <!-- Text Size -->
                     <div class="flex flex-col gap-1">
                       <p
                         class="text-xs font-semibold uppercase tracking-wider opacity-60"
                       >
-                        Text Size
+                        Text Size<span class="sm:hidden"
+                          >: {preferences.value.theme.textScale}</span
+                        >
                       </p>
                       <SegmentedControl
                         value={preferences.value.theme.textScale ?? 'normal'}
@@ -346,15 +245,51 @@ If not, see <https://www.gnu.org/licenses/>. -->
                               title={description}
                             >
                               <SegmentedControl.ItemText
-                                class="flex flex-col sm:flex-row items-center justify-center gap-1"
+                                class="flex items-center justify-center gap-1"
                               >
                                 {#if IconComponent}
                                   <IconComponent />
                                 {/if}
-                                <span
-                                  class="text-sm min-[400px]:inline md:text-base"
-                                  >{name}</span
-                                >
+                                <span class="sm:inline hidden">{name}</span>
+                              </SegmentedControl.ItemText>
+                              <SegmentedControl.ItemHiddenInput />
+                            </SegmentedControl.Item>
+                          {/each}
+                        </SegmentedControl.Control>
+                      </SegmentedControl>
+                    </div>
+
+                    <!-- Spacing -->
+                    <div class="flex flex-col gap-1">
+                      <p
+                        class="text-xs font-semibold uppercase tracking-wider opacity-60"
+                      >
+                        Spacing<span class="sm:hidden"
+                          >: {preferences.value.theme.spacing}</span
+                        >
+                      </p>
+                      <SegmentedControl
+                        value={preferences.value.theme.spacing ?? 'normal'}
+                        onValueChange={(e) => {
+                          preferences.value.theme.spacing = e.value;
+                        }}
+                      >
+                        <SegmentedControl.Control
+                          class="bg-surface-100 dark:bg-surface-900 card"
+                        >
+                          <SegmentedControl.Indicator />
+                          {#each SPACING as { name, id, description, IconComponent }}
+                            <SegmentedControl.Item
+                              value={id}
+                              title={description}
+                            >
+                              <SegmentedControl.ItemText
+                                class="flex items-center justify-center gap-1"
+                              >
+                                {#if IconComponent}
+                                  <IconComponent />
+                                {/if}
+                                <span class="sm:inline hidden">{name}</span>
                               </SegmentedControl.ItemText>
                               <SegmentedControl.ItemHiddenInput />
                             </SegmentedControl.Item>
@@ -371,6 +306,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         preferences.value.theme.roundness = 'pill';
                         preferences.value.theme.spacing = 'normal';
                         preferences.value.theme.textScale = 'normal';
+                        preferences.value.theme.headingStyle = 'classic';
                       }}
                     >
                       <RotateCcwIcon />

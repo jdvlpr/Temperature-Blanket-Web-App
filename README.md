@@ -124,7 +124,7 @@ Settings and user preferences are stored in the browser's Local Storage.
 
 | Key Name              | Description                                                | Default Value                                                                                                                                                                                            | Possible Values                                                      | Version Added\* |
 | --------------------- | ---------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- | --------------- |
-| preferences           | User preferences object                                    | `{ disableToastAnalytics: false, layout: 'list', seasons: [...DEFAULT_SEASONS], theme: { id: 'classic', mode: 'system', roundness: 'pill', spacing: 'normal', textScale: 'normal' }, units: 'imperial'}` | [`LocalStatePreferencesType`](src/lib/storage/preferences.svelte.ts) | 5.0.0           |
+| preferences           | User preferences object                                    | `{ disableToastAnalytics: false, layout: 'list', seasons: [...DEFAULT_SEASONS], theme: { id: 'classic', mode: 'system', roundness: 'pill', spacing: 'normal', textScale: 'normal', headingStyle: 'classic' }, units: 'imperial'}` | [`LocalStatePreferencesType`](src/lib/storage/preferences.svelte.ts) | 5.0.0           |
 | [/weather]units       | Units for the weather forecast page                        | `imperial`                                                                                                                                                                                               | `imperial`, `metric`                                                 | < 3.28.3        |
 | [/weather]hour_format | Time format for the weather forecast page                  | `12`                                                                                                                                                                                                     | `12`, `24`                                                           | < 3.28.3        |
 | [/weather]locations   | Locations the user has added for the weather forecast page | `[]`                                                                                                                                                                                                     | array of [`Location`](src/lib/types/location-types.d.ts) objects     | < 3.28.3        |
@@ -138,8 +138,9 @@ Settings and user preferences are stored in the browser's Local Storage.
 | `roundness` | Button/container corner radius | `'pill'`    | `'sharp'`, `'rounded'`, `'pill'`                                             |
 | `spacing`   | Layout density                 | `'normal'`  | `'compact'`, `'normal'`, `'relaxed'`                                         |
 | `textScale` | Typographic scale ratio        | `'normal'`  | `'small'`, `'normal'`, `'large'`                                             |
+| `headingStyle`  | Heading font-variation-settings      | `'classic'` | `'classic'`, `'playful'`, `'refined'`                                               |
 
-> **Backwards compatibility:** Old `preferences` objects without `roundness`/`spacing`/`textScale` fields automatically receive defaults on next page load. No data is lost.
+> **Backwards compatibility:** Old `preferences` objects without `roundness`/`spacing`/`textScale`/`headingStyle` fields automatically receive defaults on next page load. No data is lost.
 
 _\*Items with a < before the version means sometime before that version, I'm not sure exactly when because I wasn't keeping track before version 3.28.3._
 

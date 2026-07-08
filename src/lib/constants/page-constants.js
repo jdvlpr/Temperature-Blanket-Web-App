@@ -132,10 +132,73 @@ export const THEMES = [
   },
 ];
 
+export const SKELETON_THEMES = [
+  {
+    id: 'classic',
+    description: 'Classic theme with a balanced color palette.',
+    name: 'Marble',
+    colors: {
+      primary: '#fcd34d',
+      secondary: '#075985',
+      surface: '#64748b',
+    },
+  },
+  {
+    id: 'crimson',
+    description: 'A bold theme with deep red and dark tones.',
+    name: 'Garnet',
+    colors: {
+      primary: '#d21d3d',
+      secondary: '#4785ae',
+      surface: '#353a50',
+    },
+  },
+  {
+    id: 'hamlindigo',
+    description: 'A luxurious theme with rich indigo and gold colors.',
+    name: 'Lapis Lazuli',
+    colors: {
+      primary: '#a7bef3',
+      secondary: '#a38e5e',
+      surface: '#6476a1',
+    },
+  },
+  {
+    id: 'modern',
+    description: 'A modern theme with bright pink and cyan colors.',
+    name: 'Jasper',
+    colors: {
+      primary: '#eb4999',
+      secondary: '#00b7d6',
+      surface: '#6367ef',
+    },
+  },
+  {
+    id: 'rocket',
+    description: 'A cool theme with soft blue tones',
+    name: 'Geode',
+    colors: {
+      primary: '#00b7d6',
+      secondary: '#3a82f7',
+      surface: '#64748b',
+    },
+  },
+  {
+    id: 'legacy',
+    description: 'A striking theme with a bold green and purple palette.',
+    name: 'Tufa',
+    colors: {
+      surface: '#11ba81',
+      primary: '#4f46e5',
+      secondary: '#495a90',
+    },
+  },
+];
+
 export const ROUNDNESS = [
   {
     id: 'sharp',
-    name: 'Square',
+    name: 'Sharp',
     description: 'Square corners on buttons and containers.',
     radiusBase: '0.063rem',
     radiusContainer: '0.125rem',
@@ -160,21 +223,21 @@ export const SPACING = [
   {
     IconComponent: Rows4Icon,
     id: 'compact',
-    name: 'Tight',
+    name: 'Compact',
     description: 'Tighter layout spacing.',
     value: '0.22rem',
   },
   {
     IconComponent: Rows3Icon,
     id: 'normal',
-    name: 'Default',
+    name: 'Normal',
     description: 'Default layout spacing.',
     value: '0.25rem',
   },
   {
     IconComponent: Rows2Icon,
     id: 'relaxed',
-    name: 'Loose',
+    name: 'Relaxed',
     description: 'Looser, airier layout spacing.',
     value: '0.28rem',
   },
@@ -191,7 +254,7 @@ export const TEXT_SCALE = [
   {
     IconComponent: ALargeSmallIcon,
     id: 'normal',
-    name: 'Medium',
+    name: 'Normal',
     description: 'Default typographic scale.',
     value: '1.067',
   },
@@ -201,6 +264,36 @@ export const TEXT_SCALE = [
     name: 'Large',
     description: 'Larger typographic scale.',
     value: '1.125',
+  },
+];
+
+export const HEADING_STYLE = [
+  {
+    id: 'playful',
+    name: 'Playful',
+    description: 'Expressive, bouncy, ultra-bold headings.',
+    opsz: 32,
+    wght: 900,
+    SOFT: 100,
+    WONK: 1,
+  },
+  {
+    id: 'classic',
+    name: 'Classic',
+    description: 'Balanced, medium-weight headings.',
+    opsz: 68,
+    wght: 600,
+    SOFT: 50,
+    WONK: 0,
+  },
+  {
+    id: 'refined',
+    name: 'Refined',
+    description: 'Thin, elegant, high-optical-size headings.',
+    opsz: 100,
+    wght: 700,
+    SOFT: 0,
+    WONK: 0,
   },
 ];
 
