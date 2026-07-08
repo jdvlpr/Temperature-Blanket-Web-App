@@ -96,14 +96,12 @@ const themeCookies: Handle = async ({ event, resolve }) => {
   const VALID_ROUNDNESS = ['sharp', 'rounded', 'pill'];
   const VALID_SPACING = ['compact', 'normal', 'relaxed'];
   const VALID_TEXT_SCALE = ['small', 'normal', 'large'];
-  const VALID_ICON_STROKE = ['thin', 'normal', 'bold'];
 
   const cookieTheme = event.cookies.get('theme');
   const cookieThemeMode = event.cookies.get('theme_mode');
   const cookieRoundness = event.cookies.get('theme_roundness');
   const cookieSpacing = event.cookies.get('theme_spacing');
   const cookieTextScale = event.cookies.get('theme_text_scale');
-  const cookieIconStroke = event.cookies.get('theme_icon_stroke');
 
   if (cookieTheme && skeletonThemes.map((n) => n.id).includes(cookieTheme)) {
     theme = cookieTheme;
@@ -122,8 +120,8 @@ const themeCookies: Handle = async ({ event, resolve }) => {
   if (cookieRoundness && VALID_ROUNDNESS.includes(cookieRoundness)) {
     roundness = cookieRoundness;
   } else {
-    event.cookies.set('theme_roundness', 'rounded', { path: '/' });
-    roundness = 'rounded';
+    event.cookies.set('theme_roundness', 'pill', { path: '/' });
+    roundness = 'pill';
   }
 
   if (cookieSpacing && VALID_SPACING.includes(cookieSpacing)) {

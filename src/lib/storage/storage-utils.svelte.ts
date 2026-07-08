@@ -72,7 +72,7 @@ export async function initializeLocalStorage() {
   preferences.value.theme.id = preferences.value.theme.id || 'classic';
   preferences.value.theme.mode = preferences.value.theme.mode || 'system';
   preferences.value.theme.roundness =
-    preferences.value.theme.roundness || 'rounded';
+    preferences.value.theme.roundness || 'pill';
   preferences.value.theme.spacing = preferences.value.theme.spacing || 'normal';
   preferences.value.theme.textScale =
     preferences.value.theme.textScale || 'normal';
@@ -100,7 +100,7 @@ export async function initializeLocalStorage() {
     $effect(() => {
       const theme = preferences.value.theme.id || 'classic';
       const mode = preferences.value.theme.mode || 'system';
-      const roundness = preferences.value.theme.roundness || 'rounded';
+      const roundness = preferences.value.theme.roundness || 'pill';
       const spacing = preferences.value.theme.spacing || 'normal';
       const textScale = preferences.value.theme.textScale || 'normal';
 

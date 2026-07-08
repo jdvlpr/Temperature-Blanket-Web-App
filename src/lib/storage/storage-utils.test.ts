@@ -56,7 +56,7 @@ vi.mock('$lib/storage/preferences.svelte', () => ({
       theme: {
         id: 'classic',
         mode: 'system',
-        roundness: 'rounded',
+        roundness: 'pill',
         spacing: 'normal',
         textScale: 'normal',
       },

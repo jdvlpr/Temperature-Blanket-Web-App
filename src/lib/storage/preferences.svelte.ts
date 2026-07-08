@@ -34,7 +34,7 @@ export const preferences = persistedState<LocalStatePreferencesType>(
     theme: {
       id: 'classic',
       mode: 'system',
-      roundness: 'rounded',
+      roundness: 'pill',
       spacing: 'normal',
       textScale: 'normal',
     },

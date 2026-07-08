@@ -100,14 +100,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <Portal>
       <Popover.Positioner>
         <Popover.Content
-          class="card bg-surface-200-800 z-999 space-y-4 p-4 shadow-xl max-w-[90vw]! max-h-[80vh]! overflow-auto"
+          class="card bg-surface-200-800 z-999 space-y-4 p-2 sm:p-4 shadow-xl max-w-[90vw] max-h-[70vh]! overflow-auto"
         >
           {#snippet element(attributes)}
             {#if !attributes.hidden}
               <div {...attributes} transition:safeSlide>
-                <Popover.Description
-                  class="max-s-screen max-h-screen overflow-auto"
-                >
+                <Popover.Description>
                   <div class="flex flex-col gap-4">
                     <!-- 1. Appearance (Light / Dark / System) -->
                     <div class="flex flex-col gap-1">
@@ -134,15 +132,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
                               title={description}
                             >
                               <SegmentedControl.ItemText
-                                class="flex items-center justify-center gap-1"
+                                class="flex flex-col sm:flex-row items-center justify-center gap-1"
                               >
                                 {@html icon}
                                 <span
-                                  class={[
-                                    id !== preferences.value.theme.mode &&
-                                      'hidden',
-                                    'text-sm min-[400px]:inline md:text-base',
-                                  ]}>{name}</span
+                                  class="text-sm min-[400px]:inline md:text-base"
+                                  >{name}</span
                                 >
                               </SegmentedControl.ItemText>
                               <SegmentedControl.ItemHiddenInput />
@@ -152,12 +147,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       </SegmentedControl>
                     </div>
 
-                    <!-- 2. Color Theme -->
+                    <!-- 2. Theme -->
                     <div class="flex flex-col gap-1">
                       <p
                         class="text-xs font-semibold uppercase tracking-wider opacity-60"
                       >
-                        Color Theme
+                        Theme
                       </p>
                       <div class="grid grid-cols-3 items-center gap-4 p-1">
                         {#each skeletonThemes as { name, id, colors }}
@@ -165,7 +160,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                             onclick={() => {
                               preferences.value.theme.id = id;
                             }}
-                            class="btn hover:ring-2 flex flex-col w-full items-center justify-start gap-0 text-xs p-0"
+                            class="btn flex flex-col w-full items-center justify-start gap-0 p-0"
                           >
                             <div
                               class={[
@@ -187,7 +182,49 @@ If not, see <https://www.gnu.org/licenses/>. -->
                                 style="background:{colors.secondary}"
                               ></div>
                             </div>
-                            <!-- {name} -->
+                            {#if id === 'classic'}
+                              <div
+                                class="text-lg opacity-60"
+                                style="font-family:var(--heading-font-family);font-variation-settings:'opsz' 68,'wght' 600,'SOFT' 50,'WONK' 0;"
+                              >
+                                Abcd
+                              </div>
+                            {:else if id === 'crimson'}
+                              <div
+                                class="text-lg opacity-60"
+                                style="font-family:var(--heading-font-family);font-variation-settings:'opsz' 48,'wght' 400,'SOFT' 90,'WONK' 1;"
+                              >
+                                Abcd
+                              </div>
+                            {:else if id === 'hamlindigo'}
+                              <div
+                                class="text-lg opacity-60"
+                                style="font-family:var(--heading-font-family);font-variation-settings:'opsz' 76,'wght' 900,'SOFT' 0,'WONK' 0;"
+                              >
+                                Abcd
+                              </div>
+                            {:else if id === 'modern'}
+                              <div
+                                class="text-lg opacity-60"
+                                style="font-family:var(--heading-font-family);font-variation-settings:'opsz' 12,'wght' 900,'SOFT' 100,'WONK' 1;"
+                              >
+                                Abcd
+                              </div>
+                            {:else if id === 'rocket'}
+                              <div
+                                class="text-lg opacity-60"
+                                style="font-family:var(--heading-font-family);font-variation-settings:'opsz' 24,'wght' 300,'SOFT' 10,'WONK' 0;"
+                              >
+                                Abcd
+                              </div>
+                            {:else if id === 'legacy'}
+                              <div
+                                class="text-lg opacity-60"
+                                style="font-family:var(--heading-font-family);font-variation-settings:'opsz' 64,'wght' 500,'SOFT' 60,'WONK' 1;"
+                              >
+                                Abcd
+                              </div>
+                            {/if}
                           </button>
                         {/each}
                       </div>
@@ -202,7 +239,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       </p>
 
                       <SegmentedControl
-                        value={preferences.value.theme.roundness ?? 'rounded'}
+                        value={preferences.value.theme.roundness ?? 'pill'}
                         onValueChange={(e) => {
                           preferences.value.theme.roundness = e.value;
                         }}
@@ -217,7 +254,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                               title={description}
                             >
                               <SegmentedControl.ItemText
-                                class="flex items-center justify-center gap-1"
+                                class="flex flex-col sm:flex-row items-center justify-center gap-1"
                               >
                                 <!-- here -->
                                 {#if id === 'sharp'}
@@ -234,11 +271,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
                                   ></div>
                                 {/if}
                                 <span
-                                  class={[
-                                    id !== preferences.value.theme.roundness &&
-                                      'hidden',
-                                    'text-sm min-[400px]:inline md:text-base',
-                                  ]}>{name}</span
+                                  class="text-sm min-[400px]:inline md:text-base"
+                                  >{name}</span
                                 >
                               </SegmentedControl.ItemText>
                               <SegmentedControl.ItemHiddenInput />
@@ -271,18 +305,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
                               title={description}
                             >
                               <SegmentedControl.ItemText
-                                class="flex items-center justify-center gap-1"
+                                class="flex flex-col sm:flex-row items-center justify-center gap-1"
                               >
                                 <!-- here -->
                                 {#if IconComponent}
                                   <IconComponent />
                                 {/if}
                                 <span
-                                  class={[
-                                    id !== preferences.value.theme.spacing &&
-                                      'hidden',
-                                    'text-sm min-[400px]:inline md:text-base',
-                                  ]}>{name}</span
+                                  class="text-sm min-[400px]:inline md:text-base"
+                                  >{name}</span
                                 >
                               </SegmentedControl.ItemText>
                               <SegmentedControl.ItemHiddenInput />
@@ -315,17 +346,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
                               title={description}
                             >
                               <SegmentedControl.ItemText
-                                class="flex items-center justify-center gap-1"
+                                class="flex flex-col sm:flex-row items-center justify-center gap-1"
                               >
                                 {#if IconComponent}
                                   <IconComponent />
                                 {/if}
                                 <span
-                                  class={[
-                                    id !== preferences.value.theme.textScale &&
-                                      'hidden',
-                                    'text-sm min-[400px]:inline md:text-base',
-                                  ]}>{name}</span
+                                  class="text-sm min-[400px]:inline md:text-base"
+                                  >{name}</span
                                 >
                               </SegmentedControl.ItemText>
                               <SegmentedControl.ItemHiddenInput />
@@ -340,7 +368,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       onclick={() => {
                         preferences.value.theme.mode = 'system';
                         preferences.value.theme.id = 'classic';
-                        preferences.value.theme.roundness = 'rounded';
+                        preferences.value.theme.roundness = 'pill';
                         preferences.value.theme.spacing = 'normal';
                         preferences.value.theme.textScale = 'normal';
                       }}
