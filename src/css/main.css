@@ -80,6 +80,9 @@ https://www.skeleton.dev/docs/svelte/tailwind-components/forms#windows-bugfix
 [data-theme] {
   --base-font-family: 'apparat', sans-serif;
   --heading-font-family: 'fraunces-variable', sans-serif;
+  --heading-font-weight: inherit;
+  --heading-font-style: inherit;
+  --heading-letter-spacing: inherit;
 }
 
 /* Heading Style — font-variation-settings for the Fraunces variable font.
@@ -156,7 +159,13 @@ h2,
 h3,
 h4,
 h5,
-h6 {
+h6,
+.h1,
+.h2,
+.h3,
+.h4,
+.h5,
+.h6 {
   font-variation-settings:
     'opsz' var(--opsz),
     'wght' var(--wght),
