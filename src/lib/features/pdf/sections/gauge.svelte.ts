@@ -140,21 +140,16 @@ const pdfGauge = {
 
     // Gauge Item
     const length = gauge.ranges.length;
-    let l =
-      pdfConfig.topMargin + (itemHeight + linePadding) * 2;
+    let l = pdfConfig.topMargin + (itemHeight + linePadding) * 2;
     for (let i = 0; i < length; i++, l += itemTopMargin) {
       if (i % MAX_COLORS_PER_PAGE === 0) {
         doc.addPage();
         pdfGauge.createHeader(doc, gauge);
         if (weather.pdfOptions.showDaysInRange)
-          pdfColorDetails.createColorDetailsHeader(
-            doc,
-            gauge,
-            (d, items) => pdfGauge.createHeaderItems(d, items, gauge),
+          pdfColorDetails.createColorDetailsHeader(doc, gauge, (d, items) =>
+            pdfGauge.createHeaderItems(d, items, gauge),
           );
-        l =
-          pdfConfig.topMargin +
-          (itemHeight + linePadding) * 2;
+        l = pdfConfig.topMargin + (itemHeight + linePadding) * 2;
         const pageCurrent = doc.internal.getCurrentPageInfo().pageNumber - 1;
         pdfFooter.create(doc, pageCurrent, totalPages);
       }
@@ -180,20 +175,10 @@ const pdfGauge = {
       });
       // Item Number
       doc.setFontSize(pdfConfig.font.p);
-      doc.text(
-        (i + 1).toString(),
-        pdfConfig.leftMargin + linePadding,
-        l,
-      );
+      doc.text((i + 1).toString(), pdfConfig.leftMargin + linePadding, l);
       // Item Color
       doc.setFillColor(gauge.colors[i].hex);
-      doc.rect(
-        pdfConfig.leftMargin + 8,
-        l - 8,
-        itemHeight,
-        itemHeight,
-        'F',
-      );
+      doc.rect(pdfConfig.leftMargin + 8, l - 8, itemHeight, itemHeight, 'F');
       // Item Yarn and Name
       if (
         gauge.colors[i]?.name &&
@@ -224,11 +209,7 @@ const pdfGauge = {
 
       if (gauge?.unit.type === 'category') {
         const label = gauge.ranges[i].label;
-        doc.text(
-          label,
-          pdfConfig.leftMargin + headerItems.from.position,
-          l,
-        );
+        doc.text(label, pdfConfig.leftMargin + headerItems.from.position, l);
       } else {
         // Item From & To Values
         const from =
@@ -239,25 +220,15 @@ const pdfGauge = {
           String(gauge.ranges[i].to) +
           ' ' +
           gauge.unit.label[preferences.value.units];
-        doc.text(
-          from,
-          pdfConfig.leftMargin + headerItems.from.position,
-          l,
-        );
-        doc.text(
-          to,
-          pdfConfig.leftMargin + headerItems.to.position,
-          l,
-        );
+        doc.text(from, pdfConfig.leftMargin + headerItems.from.position, l);
+        doc.text(to, pdfConfig.leftMargin + headerItems.to.position, l);
       }
 
       // Underline
       doc.line(
         pdfConfig.leftMargin,
         l + 5,
-        pdfConfig.leftMargin +
-          pdfConfig.colorDetails.positionX -
-          linePadding,
+        pdfConfig.leftMargin + pdfConfig.colorDetails.positionX - linePadding,
         l + 5,
       );
 

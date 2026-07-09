@@ -21,9 +21,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { dialog, toast } from '$lib/state/page-state.svelte';
   import { project } from '$lib/state/project-state.svelte';
   import { weather } from '$lib/state/weather-state.svelte';
-  import type {
-    LocationStateType
-  } from '$lib/types/location-types';
+  import type { LocationStateType } from '$lib/types/location-types';
   import {
     dateToISO8601String,
     stringToDate,
@@ -44,10 +42,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     TriangleAlertIcon,
     XIcon,
   } from '@lucide/svelte';
-  import {
-    Popover,
-    Portal
-  } from '@skeletonlabs/skeleton-svelte';
+  import { Popover, Portal } from '@skeletonlabs/skeleton-svelte';
   import autocomplete from 'autocompleter';
   import { onMount } from 'svelte';
   import '../../css/flag-icons.css';

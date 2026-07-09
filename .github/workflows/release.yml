@@ -31,8 +31,8 @@ jobs:
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Copy Environment Variables
-        run: cp .env.example .env
+      # - name: Copy Environment Variables
+      #   run: cp .env.example .env
 
       # - name: Run Svelte Check
       #   run: pnpm check

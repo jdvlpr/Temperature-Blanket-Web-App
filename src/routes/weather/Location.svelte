@@ -51,8 +51,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let showReset = $derived.by(() => {
     showResetKey;
     return (
-      !searching &&
-      (weatherLocationState.inputLocation?.value?.length ?? 0) > 1
+      !searching && (weatherLocationState.inputLocation?.value?.length ?? 0) > 1
     );
   });
 

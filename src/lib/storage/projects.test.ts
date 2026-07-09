@@ -55,8 +55,6 @@ vi.mock('$lib/utils/date-utils', () => ({
   numberOfDays: vi.fn(() => 1),
 }));
 
-
-
 describe('ProjectStorage', () => {
   beforeEach(() => {
     vi_mockStore.data.clear();

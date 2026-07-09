@@ -14,7 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script module>
-  let selectedVersion = $state({value:'v3'});
+  let selectedVersion = $state({ value: 'v3' });
 </script>
 
 <script>
@@ -210,7 +210,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             >
               Yarn Colorways API
             </h2>
-            
+
             <section
               class="card preset-tonal-surface rounded-container mt-2 flex flex-col gap-2 p-4 lg:mt-0"
             >
@@ -289,7 +289,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <section id="version" class="flex scroll-mt-[58px] flex-col gap-2">
             <h3 class="text-xl font-bold">Choosing a Version</h3>
 
-            <p>Unless you have a specific reason to use a previous version, you should use the latest (v3) version. Selecting a version below will update this page to show the relevant documentation.</p>
+            <p>
+              Unless you have a specific reason to use a previous version, you
+              should use the latest (v3) version. Selecting a version below will
+              update this page to show the relevant documentation.
+            </p>
 
             <label for="version-select" class="label">
               <span class="label-text">API Version</span>
@@ -305,26 +309,63 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </label>
 
             {#if selectedVersion.value === 'v1'}
-                  <p>This is the original version of the API.</p>
+              <p>This is the original version of the API.</p>
             {:else if selectedVersion.value === 'v3'}
-                  <p>This version was introduced on {new Date('2026-04-09').toLocaleDateString()}. Compared to the previous version, the changes are:
-                  </p>
-                  <ul class="list-disc pl-8 text-sm">
-                    <li>For the <a href="#colorways" class="link">Colorways</a> endpoint, the default behavior of the <span class="code px-2">name</span> parameter is now 'contains' instead of 'exact match'. So for example, a request with <span class="code px-2">?name=blue</span> will now return all colorways with 'blue' in the name, instead of only colorways with the exact name 'blue'.</li>
-                    <li>The <a href="#find-yarn-by-color" class="link">Find Yarn by Color</a> endpoint also accepts a <span class="code px-2">name</span> parameter to filter the results by colorway name.</li>
-                    <li>The <a href="#colorways" class="link">Colorways</a> and <a href="#find-yarn-by-color" class="link">Find Yarn by Color</a> endpoints accept an optional <span class="code px-2">exactName</span> parameter for exact matching.</li>
-                    <li>The <a href="#colorways" class="link">Colorways</a>, <a href="#find-yarn-by-color" class="link">Find Yarn by Color</a>, and <a href="#yarns" class="link">Yarns</a> endpoints now return <span class="code px-2">unavailable</span> and <span class="code px-2">unavailableDate</span> if the <a href="/documentation#link-unavailable" target="_blank" class="link">yarn link is no longer available</a>.</li>
-                  </ul>
-              {/if}
+              <p>
+                This version was introduced on {new Date(
+                  '2026-04-09',
+                ).toLocaleDateString()}. Compared to the previous version, the
+                changes are:
+              </p>
+              <ul class="list-disc pl-8 text-sm">
+                <li>
+                  For the <a href="#colorways" class="link">Colorways</a>
+                  endpoint, the default behavior of the
+                  <span class="code px-2">name</span>
+                  parameter is now 'contains' instead of 'exact match'. So for
+                  example, a request with
+                  <span class="code px-2">?name=blue</span> will now return all colorways
+                  with 'blue' in the name, instead of only colorways with the exact
+                  name 'blue'.
+                </li>
+                <li>
+                  The <a href="#find-yarn-by-color" class="link"
+                    >Find Yarn by Color</a
+                  >
+                  endpoint also accepts a <span class="code px-2">name</span> parameter
+                  to filter the results by colorway name.
+                </li>
+                <li>
+                  The <a href="#colorways" class="link">Colorways</a> and
+                  <a href="#find-yarn-by-color" class="link"
+                    >Find Yarn by Color</a
+                  >
+                  endpoints accept an optional
+                  <span class="code px-2">exactName</span> parameter for exact matching.
+                </li>
+                <li>
+                  The <a href="#colorways" class="link">Colorways</a>,
+                  <a href="#find-yarn-by-color" class="link"
+                    >Find Yarn by Color</a
+                  >, and <a href="#yarns" class="link">Yarns</a> endpoints now
+                  return <span class="code px-2">unavailable</span> and
+                  <span class="code px-2">unavailableDate</span>
+                  if the
+                  <a
+                    href="/documentation#link-unavailable"
+                    target="_blank"
+                    class="link">yarn link is no longer available</a
+                  >.
+                </li>
+              </ul>
+            {/if}
           </section>
 
           <section
             id="making-a-request"
             class="flex scroll-mt-[58px] flex-col gap-2"
           >
-            <h3 class="text-xl font-bold">
-              Making a Request
-            </h3>
+            <h3 class="text-xl font-bold">Making a Request</h3>
             <p>This is the base URL for all endpoints:</p>
             <p class="codeblock code w-fit p-4! break-all whitespace-pre-wrap!">
               https://yarn-colorways.p.rapidapi.com/{selectedVersion.value}
@@ -344,9 +385,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             id="reading-a-response"
             class="flex scroll-mt-[58px] flex-col gap-2"
           >
-            <h3 class="text-xl font-bold">
-              Reading a Response
-            </h3>
+            <h3 class="text-xl font-bold">Reading a Response</h3>
             <p>
               A successful response will return a JSON object that contains two
               properties: <span class="font-bold">meta</span>
@@ -399,9 +438,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             id="find-yarn-by-color"
             class="card bg-surface-200 dark:bg-surface-800 flex scroll-mt-[58px] flex-col gap-2 p-4"
           >
-            <h3 class="text-xl font-bold">
-              Find Yarn by Color
-            </h3>
+            <h3 class="text-xl font-bold">Find Yarn by Color</h3>
             <p>Get best-matching yarn colorways for a specified color.</p>
 
             <p>
@@ -454,7 +491,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       <td>name</td>
                       <td
                         >A colorway name, or a comma-separated list of colorway
-                        names to filter the results by. Text case is ignored. By default, it performs a partial (containing) match, so for example <span class="code px-2">blue</span> will include 'Royal Blue' and 'Dark Blue'.</td
+                        names to filter the results by. Text case is ignored. By
+                        default, it performs a partial (containing) match, so
+                        for example <span class="code px-2">blue</span> will include
+                        'Royal Blue' and 'Dark Blue'.</td
                       >
                       <td>String</td>
                       <td>No</td>
@@ -557,12 +597,12 @@ GET https://yarn-colorways.p.rapidapi.com/${selectedVersion.value}/match/rgb%281
 // get matches only from a specified brand and yarn
 GET https://yarn-colorways.p.rapidapi.com/${selectedVersion.value}/match/665e3f?brand=cascade&yarn=anchor_bay`}
 
-{#if selectedVersion.value === 'v3'}
-  {`
+              {#if selectedVersion.value === 'v3'}
+                {`
 
 // get matches by name
 GET https://yarn-colorways.p.rapidapi.com/v3/match/665e3f?name=blue`}
-{/if}
+              {/if}
             </p>
 
             <p class="font-bold">Response</p>
@@ -654,12 +694,27 @@ GET https://yarn-colorways.p.rapidapi.com/v3/match/665e3f?name=blue`}
                   {#if selectedVersion.value === 'v3'}
                     <tr>
                       <td>unavailable</td>
-                      <td>This property is only returned if the yarn link is no longer available. See <a href="/documentation#link-unavailable" class="link" target="_blank">yarn link unavailable</a> for more information.</td>
+                      <td
+                        >This property is only returned if the yarn link is no
+                        longer available. See <a
+                          href="/documentation#link-unavailable"
+                          class="link"
+                          target="_blank">yarn link unavailable</a
+                        > for more information.</td
+                      >
                       <td>Boolean</td>
                     </tr>
                     <tr>
                       <td>unavailableDate</td>
-                      <td>This property is only returned if the yarn link is no longer available. The YYYY-MM-DD date when the colorway's yarn was marked as unavailable. See <a href="/documentation#link-unavailable" class="link" target="_blank">yarn link unavailable</a> for more information.</td>
+                      <td
+                        >This property is only returned if the yarn link is no
+                        longer available. The YYYY-MM-DD date when the
+                        colorway's yarn was marked as unavailable. See <a
+                          href="/documentation#link-unavailable"
+                          class="link"
+                          target="_blank">yarn link unavailable</a
+                        > for more information.</td
+                      >
                       <td>String</td>
                     </tr>
                   {/if}
@@ -723,9 +778,7 @@ GET https://yarn-colorways.p.rapidapi.com/v3/match/665e3f?name=blue`}
                   {#if selectedVersion.value === 'v1'}
                     <tr>
                       <td>name</td>
-                      <td
-                        >Any colorway name. Text case is ignored.</td
-                      >
+                      <td>Any colorway name. Text case is ignored.</td>
                       <td>String</td>
                       <td>No</td>
                       <td><span class="italic">undefined</span></td>
@@ -735,7 +788,10 @@ GET https://yarn-colorways.p.rapidapi.com/v3/match/665e3f?name=blue`}
                       <td>name</td>
                       <td
                         >A colorway name, or a comma-separated list of colorway
-                        names to filter the results by. Text case is ignored. By default, it performs a partial (containing) match, so for example <span class="code px-2">blue</span> will include 'Royal Blue' and 'Dark Blue'.</td
+                        names to filter the results by. Text case is ignored. By
+                        default, it performs a partial (containing) match, so
+                        for example <span class="code px-2">blue</span> will include
+                        'Royal Blue' and 'Dark Blue'.</td
                       >
                       <td>String</td>
                       <td>No</td>
@@ -916,12 +972,27 @@ GET https://yarn-colorways.p.rapidapi.com/${selectedVersion.value}/colorways?nam
                   {#if selectedVersion.value === 'v3'}
                     <tr>
                       <td>unavailable</td>
-                      <td>This property is only returned if the yarn link is no longer available. See <a href="/documentation#link-unavailable" class="link" target="_blank">yarn link unavailable</a> for more information.</td>
+                      <td
+                        >This property is only returned if the yarn link is no
+                        longer available. See <a
+                          href="/documentation#link-unavailable"
+                          class="link"
+                          target="_blank">yarn link unavailable</a
+                        > for more information.</td
+                      >
                       <td>Boolean</td>
                     </tr>
                     <tr>
                       <td>unavailableDate</td>
-                      <td>This property is only returned if the yarn link is no longer available. The YYYY-MM-DD date when the colorway's yarn was marked as unavailable. See <a href="/documentation#link-unavailable" class="link" target="_blank">yarn link unavailable</a> for more information.</td>
+                      <td
+                        >This property is only returned if the yarn link is no
+                        longer available. The YYYY-MM-DD date when the
+                        colorway's yarn was marked as unavailable. See <a
+                          href="/documentation#link-unavailable"
+                          class="link"
+                          target="_blank">yarn link unavailable</a
+                        > for more information.</td
+                      >
                       <td>String</td>
                     </tr>
                   {/if}
@@ -1133,12 +1204,27 @@ GET https://yarn-colorways.p.rapidapi.com/${selectedVersion.value}/yarns?brand=b
                   {#if selectedVersion.value === 'v3'}
                     <tr>
                       <td>unavailable</td>
-                      <td>This property is only returned if the yarn link is no longer available. See <a href="/documentation#link-unavailable" class="link" target="_blank">yarn link unavailable</a> for more information.</td>
+                      <td
+                        >This property is only returned if the yarn link is no
+                        longer available. See <a
+                          href="/documentation#link-unavailable"
+                          class="link"
+                          target="_blank">yarn link unavailable</a
+                        > for more information.</td
+                      >
                       <td>Boolean</td>
                     </tr>
                     <tr>
                       <td>unavailableDate</td>
-                      <td>This property is only returned if the yarn link is no longer available. The YYYY-MM-DD date when the colorway's yarn was marked as unavailable. See <a href="/documentation#link-unavailable" class="link" target="_blank">yarn link unavailable</a> for more information.</td>
+                      <td
+                        >This property is only returned if the yarn link is no
+                        longer available. The YYYY-MM-DD date when the
+                        colorway's yarn was marked as unavailable. See <a
+                          href="/documentation#link-unavailable"
+                          class="link"
+                          target="_blank">yarn link unavailable</a
+                        > for more information.</td
+                      >
                       <td>String</td>
                     </tr>
                   {/if}

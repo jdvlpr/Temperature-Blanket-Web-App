@@ -24,7 +24,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let width = $state(twelvePointStarPreview.width);
   let height = $state(twelvePointStarPreview.height);
 
-
   /**
    * Generate SVG polygon points for a single chevron section within a wedge.
    * Each chevron is the band between innerR and outerR for a given month wedge.
@@ -174,7 +173,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
         points={twelvePointStarPreview.borderStarPoints}
         fill="none"
         stroke={twelvePointStarPreview.settings.borderColor}
-        stroke-width={twelvePointStarPreview.settings.borderThickness * twelvePointStarPreview.STITCH_SIZE * 2}
+        stroke-width={twelvePointStarPreview.settings.borderThickness *
+          twelvePointStarPreview.STITCH_SIZE *
+          2}
         stroke-linejoin="miter"
         stroke-miterlimit="20"
       />

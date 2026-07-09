@@ -187,8 +187,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           inputValue = _tempInputValue || '';
           triggerChange();
           // textAreaInputElement.blur();
-        }}
-      ></textarea>
+        }}></textarea>
     </label>
 
     <div class="my-2 flex flex-col gap-2 text-left">

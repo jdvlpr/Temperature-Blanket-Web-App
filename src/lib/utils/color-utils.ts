@@ -14,7 +14,11 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { CHARACTERS_FOR_URL_HASH } from '$lib/constants/page-constants';
-import { allGaugesAttributes, gauges, getTargetParentGaugeId } from '$lib/state/gauges-state.svelte';
+import {
+  allGaugesAttributes,
+  gauges,
+  getTargetParentGaugeId,
+} from '$lib/state/gauges-state.svelte';
 import type { Color } from '$lib/types/yarn-types';
 import type { WeatherParam } from '$lib/types/gauge-types';
 import { capitalizeFirstLetter } from '$lib/utils/other-utils';

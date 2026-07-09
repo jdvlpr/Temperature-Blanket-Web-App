@@ -5,10 +5,9 @@ import {
   getWeatherTargets,
 } from './weather-utils.svelte';
 
-const { mockAllGaugesAttributes } =
-  vi.hoisted(() => ({
-    mockAllGaugesAttributes: [] as any[],
-  }));
+const { mockAllGaugesAttributes } = vi.hoisted(() => ({
+  mockAllGaugesAttributes: [] as any[],
+}));
 
 vi.mock('$lib/state/gauges-state.svelte', () => ({
   allGaugesAttributes: mockAllGaugesAttributes,

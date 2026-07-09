@@ -26,8 +26,7 @@ const pdfColorDetails = {
   columnWidth,
   createHeaderHorizontalLines: (doc, items) => {
     // Lines
-    const x1 =
-      pdfConfig.leftMargin + positionX - linePadding;
+    const x1 = pdfConfig.leftMargin + positionX - linePadding;
     const x2 =
       pdfConfig.leftMargin +
       positionX +
@@ -97,10 +96,7 @@ const pdfColorDetails = {
     doc.line(
       pdfConfig.leftMargin + positionX - linePadding,
       line + 5,
-      pdfConfig.leftMargin +
-        positionX +
-        width -
-        linePadding,
+      pdfConfig.leftMargin + positionX + width - linePadding,
       line + 5,
     );
     // Vertical Lines

@@ -16,7 +16,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import { toast } from '$lib/state/page-state.svelte';
   import { safeSlide } from '$lib/features/transitions/safeSlide';
-  import { ClipboardCheckIcon, ClipboardCopyIcon, Share2Icon, XIcon } from '@lucide/svelte';
+  import {
+    ClipboardCheckIcon,
+    ClipboardCopyIcon,
+    Share2Icon,
+    XIcon,
+  } from '@lucide/svelte';
   import { Popover } from '@skeletonlabs/skeleton-svelte';
 
   let { href } = $props();
@@ -29,7 +34,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       toast.trigger({
         message: `URL copied to clipboard`,
         category: 'success',
-        icon: ClipboardCheckIcon
+        icon: ClipboardCheckIcon,
       });
     } catch {
       toast.trigger({

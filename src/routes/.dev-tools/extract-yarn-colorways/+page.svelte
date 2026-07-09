@@ -87,7 +87,8 @@
         ? element.getAttribute(options.value.querySelectorAttribute)
         : element.innerText;
       // Remove string
-      if (options.value.exclude) name = name.replaceAll(options.value.excludeString, "");
+      if (options.value.exclude)
+        name = name.replaceAll(options.value.excludeString, '');
 
       // Remove everything before string
       if (options.value.excludeBefore)
@@ -95,13 +96,13 @@
           name.indexOf(options.value.excludeBeforeString) +
             options.value.excludeBeforeString?.length,
         );
-    
+
       // Remove everything after string
       if (options.value.excludeAfter)
-      name = name.substring(
-        0,
-        name.indexOf(options.value.excludeAfterString),
-      );
+        name = name.substring(
+          0,
+          name.indexOf(options.value.excludeAfterString),
+        );
       name = name.toLowerCase(); // lowercase everything
       name = name.replaceAll('\n', ' '); // remove new lines
       name = name.replaceAll('  ', ''); // remove multiple spaces
@@ -148,8 +149,7 @@
             <textarea
               class="textarea w-full grow border-none shadow-inner"
               bind:value={options.value.content}
-              rows="5"
-            ></textarea>
+              rows="5"></textarea>
           </label>
 
           <div class="flex max-w-md flex-col gap-4">

@@ -21,11 +21,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { pluralize } from '$lib/utils/string-utils';
   import { stringToBrandAndYarnDetails } from '$lib/utils/yarn-utils';
   import { yarnBall } from '@lucide/lab';
-  import {
-    ChevronDownIcon,
-    Icon,
-    XIcon
-  } from '@lucide/svelte';
+  import { ChevronDownIcon, Icon, XIcon } from '@lucide/svelte';
   import autocomplete from 'autocompleter';
   import { onMount, untrack } from 'svelte';
   import HelpIcon from './buttons/HelpIcon.svelte';
@@ -61,7 +57,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let isSelectedYarnUnavailable = $derived.by(() => {
     return allYarns.find(
-      (yarn) => yarn.meta.brandId === selectedBrandId && yarn.meta.yarnId === selectedYarnId,
+      (yarn) =>
+        yarn.meta.brandId === selectedBrandId &&
+        yarn.meta.yarnId === selectedYarnId,
     )?.meta.unavailable;
   });
 
@@ -164,7 +162,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             }).length,
             totalBrandColorways,
           };
-          
+
           return {
             group: JSON.stringify(meta),
             meta: {
@@ -175,7 +173,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
               numberOfColorways: yarn.colorways.reduce((a, b) => {
                 return a + b.colors.length;
               }, 0),
-              unavailable: !!yarn.colorways.every((colorway) => colorway.source?.unavailable),
+              unavailable: !!yarn.colorways.every(
+                (colorway) => colorway.source?.unavailable,
+              ),
             },
           };
         });
@@ -261,11 +261,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
         div.innerHTML = `<div class="inline-block ml-4">`;
         div.innerHTML += `${yarn} <span class="text-sm opacity-60">(${yarnWeight ? `${yarnWeight}, ` : ''}${item.meta.numberOfColorways.toLocaleString()} colorways)</span>`;
-        
+
         if (item.meta.unavailable) {
           div.innerHTML += ` <span class="text-sm italic opacity-60">Link Unavailable</span>`;
         }
-        
+
         div.innerHTML += `</div>`;
         div.dataset.id = `${item.meta.brandId}-${item.meta.yarnId}`;
         div.classList.add('selectable-yarn-list-item');

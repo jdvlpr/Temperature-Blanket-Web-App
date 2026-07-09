@@ -92,23 +92,24 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   {#if sourceName === 'Open-Meteo'}
     <div class="flex flex-col items-start justify-center text-sm w-full">
-      
       <p class="">5 day delay</p>
 
-      <p>Website: <a
-        href="https://open-meteo.com/"
-        target="_blank"
-        rel="noopener noreferrer"
-        class="link"
-      > 
-        <span class="inline-flex gap-1 underline">
-          open-meteo.com <ExternalLinkIcon
-            class="relative top-0.5 inline size-4"
-          />
-        </span>
-      </a></p>
+      <p>
+        Website: <a
+          href="https://open-meteo.com/"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="link"
+        >
+          <span class="inline-flex gap-1 underline">
+            open-meteo.com <ExternalLinkIcon
+              class="relative top-0.5 inline size-4"
+            />
+          </span>
+        </a>
+      </p>
 
-    <p class="opacity-60">
+      <p class="opacity-60">
         Includes data from the <a
           href="https://cds.climate.copernicus.eu/cdsapp#!/dataset/reanalysis-era5-land?tab=overview"
           rel="noopener noreferrer"
@@ -128,17 +129,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
           target="_blank"
           class="link"
           rel="noreferrer noopener">CC BY 4.0</a
-        >. All weather data is subject to change if the provider updates their models.
+        >. All weather data is subject to change if the provider updates their
+        models.
       </p>
-      </div>
+    </div>
+  {:else if sourceName === 'Meteostat'}
+    <div class="flex flex-col items-start justify-center w-full text-sm">
+      <p class="">1 to 7 day delay</p>
 
-    {:else if sourceName === 'Meteostat'}
-
-      <div class="flex flex-col items-start justify-center w-full text-sm">
-        
-        <p class="">1 to 7 day delay</p>
-        
-        <p>Website: <a
+      <p>
+        Website: <a
           href="https://meteostat.net"
           rel="noopener noreferrer"
           class="link"
@@ -149,18 +149,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
               class="relative top-0.5 inline size-4"
             />
           </span>
-        </a></p>
+        </a>
+      </p>
 
-        <p class="opacity-60">
+      <p class="opacity-60">
         <a
-            href="https://dev.meteostat.net/quality.html"
-            target="_blank"
-            class="link w-fit">Data Quality</a
-          >. <a
-            href="https://dev.meteostat.net/sources.html"
-            target="_blank"
-            class="link w-fit">Data Sources</a
-          >. Raw data provided by <a
+          href="https://dev.meteostat.net/quality.html"
+          target="_blank"
+          class="link w-fit">Data Quality</a
+        >.
+        <a
+          href="https://dev.meteostat.net/sources.html"
+          target="_blank"
+          class="link w-fit">Data Sources</a
+        >. Raw data provided by
+        <a
           href="https://www.noaa.gov/"
           target="_blank"
           rel="noopener noreferrer"
@@ -185,11 +188,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
           target="_blank"
           rel="noopener noreferrer"
           class="link">CC BY-NC 4.0.</a
-        >  All weather data is subject to change if the provider updates their models.
-        </p>
-      </div>
-    {/if}
-    <div class="">
+        > All weather data is subject to change if the provider updates their models.
+      </p>
+    </div>
+  {/if}
+  <div class="">
     <ToggleSwitch
       bind:checked={useSecondary}
       label="If data is not available, automatically try the other weather source."
@@ -199,64 +202,62 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <p class="font-bold text-xl w-full">Settings</p>
 
   {#if sourceName === 'Open-Meteo'}
-
-    <div class="flex flex-col gap-2 ">
+    <div class="flex flex-col gap-2">
       <p class="font-bold">Choose a Model</p>
 
       {#each OPEN_METEO_MODELS as { value, title, timespan, resolution, details }}
-          <div
-            class={[
-              'rounded-container flex flex-col gap-1 border p-2',
-              openMeteoModel === value && sourceName === 'Open-Meteo'
-                ? 'border-primary-500 bg-primary-100/50 dark:bg-primary-950/30'
-                : 'border-transparent',
-            ]}
-          >
-            <label class="flex items-center gap-2 font-bold">
-              <input
-                type="radio"
-                class="radio flex items-center gap-2"
-                {value}
-                disabled={sourceName !== 'Open-Meteo'}
-                bind:group={openMeteoModel}
-              />
-              {@html title}
-            </label>
-            <div class="ml-4 flex flex-col gap-1 text-sm">
-              <p class="">
-                <ClockIcon class="relative -top-[2px] mr-1 inline size-4" />
-                {timespan}
-              </p>
-              <p class="">
-                <Grid3X3Icon class="relative -top-[2px] mr-1 inline size-4" />
-                {resolution}
-              </p>
-              <p class="">
-                <InfoIcon class="relative -top-[2px] mr-1 inline size-4" />
-                {@html details}
-              </p>
-            </div>
-          </div>
-        {/each}
-      </div>
-      {:else if sourceName === 'Meteostat'}
-      <div class="mt-2 flex flex-col gap-1 w-full">
-          <label class="flex items-center gap-2 pb-1 font-bold">
+        <div
+          class={[
+            'rounded-container flex flex-col gap-1 border p-2',
+            openMeteoModel === value && sourceName === 'Open-Meteo'
+              ? 'border-primary-500 bg-primary-100/50 dark:bg-primary-950/30'
+              : 'border-transparent',
+          ]}
+        >
+          <label class="flex items-center gap-2 font-bold">
             <input
-              type="checkbox"
-              class="checkbox"
-              disabled={sourceName !== 'Meteostat'}
-              bind:checked={meteostatModel}
+              type="radio"
+              class="radio flex items-center gap-2"
+              {value}
+              disabled={sourceName !== 'Open-Meteo'}
+              bind:group={openMeteoModel}
             />
-            Fill Missing Data
-            <span class="badge bg-surface-200-800">On by Default</span>
+            {@html title}
           </label>
-          <span class="text-sm"
-            >Substitute missing records with statistically optimized model data.
-          </span>
+          <div class="ml-4 flex flex-col gap-1 text-sm">
+            <p class="">
+              <ClockIcon class="relative -top-[2px] mr-1 inline size-4" />
+              {timespan}
+            </p>
+            <p class="">
+              <Grid3X3Icon class="relative -top-[2px] mr-1 inline size-4" />
+              {resolution}
+            </p>
+            <p class="">
+              <InfoIcon class="relative -top-[2px] mr-1 inline size-4" />
+              {@html details}
+            </p>
+          </div>
         </div>
-{/if}
-      
+      {/each}
+    </div>
+  {:else if sourceName === 'Meteostat'}
+    <div class="mt-2 flex flex-col gap-1 w-full">
+      <label class="flex items-center gap-2 pb-1 font-bold">
+        <input
+          type="checkbox"
+          class="checkbox"
+          disabled={sourceName !== 'Meteostat'}
+          bind:checked={meteostatModel}
+        />
+        Fill Missing Data
+        <span class="badge bg-surface-200-800">On by Default</span>
+      </label>
+      <span class="text-sm"
+        >Substitute missing records with statistically optimized model data.
+      </span>
+    </div>
+  {/if}
 </div>
 
 <StickyPart position="bottom">

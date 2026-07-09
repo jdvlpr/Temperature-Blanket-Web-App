@@ -24,7 +24,6 @@ import type {
 import type { WeatherDay } from '$lib/types/weather-types';
 import { displayNumber } from '$lib/utils/number-utils';
 
-
 export const getStart = (rangeOptions) => {
   if (rangeOptions?.mode === 'auto') {
     if (rangeOptions?.direction === 'high-to-low')

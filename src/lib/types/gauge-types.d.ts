@@ -107,13 +107,7 @@ export type WeatherParam = {
     | 'Moon Phase';
   type: GaugeAttributes['unit']['type'];
   gaugeLabel:
-    | 'High'
-    | 'Average'
-    | 'Low'
-    | 'Rain'
-    | 'Snow'
-    | 'Daytime'
-    | 'Moon Phase';
+    'High' | 'Average' | 'Low' | 'Rain' | 'Snow' | 'Daytime' | 'Moon Phase';
   shortLabel:
     | 'High Temp'
     | 'Average Temp'

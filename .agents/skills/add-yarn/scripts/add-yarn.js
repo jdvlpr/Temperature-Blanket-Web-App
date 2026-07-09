@@ -23,20 +23,20 @@ function toCamelCase(str) {
 
 // Weight name to ID mapping
 const weightMap = {
-  'thread': 't',
-  'cobweb': 'c',
-  'lace': 'l',
+  thread: 't',
+  cobweb: 'c',
+  lace: 'l',
   'light fingering': 'lf',
-  'lf': 'lf',
-  'fingering': 'f',
-  'sport': 's',
-  'dk': 'd',
-  'worsted': 'w',
-  'aran': 'a',
-  'bulky': 'b',
+  lf: 'lf',
+  fingering: 'f',
+  sport: 's',
+  dk: 'd',
+  worsted: 'w',
+  aran: 'a',
+  bulky: 'b',
   'super bulky': 'sb',
-  'sb': 'sb',
-  'jumbo': 'j',
+  sb: 'sb',
+  jumbo: 'j',
 };
 
 // Resolve weight name or ID to normalized ID
@@ -58,11 +58,16 @@ function extractDomain(href) {
 
 async function main() {
   // Get inputs from command-line arguments
-  const [, , brandNameArg, yarnNameArg, sourceHrefArg, weightArg] = process.argv;
+  const [, , brandNameArg, yarnNameArg, sourceHrefArg, weightArg] =
+    process.argv;
 
   if (!brandNameArg || !yarnNameArg || !sourceHrefArg) {
-    console.error('❌ Usage: node add-yarn.js <brandName> <yarnName> <sourceHref> [weight]');
-    console.error('Example: node add-yarn.js caron "Simply Soft Solids" "https://..." worsted');
+    console.error(
+      '❌ Usage: node add-yarn.js <brandName> <yarnName> <sourceHref> [weight]',
+    );
+    console.error(
+      'Example: node add-yarn.js caron "Simply Soft Solids" "https://..." worsted',
+    );
     process.exit(1);
   }
 
@@ -77,8 +82,17 @@ async function main() {
 
   // Determine base path
   const projectRoot = process.cwd();
-  const yarnDir = path.join(projectRoot, 'src/lib/data/yarns', brandSnake, yarnSnake);
-  const brandYarnsDir = path.join(projectRoot, 'src/lib/data/yarns', brandSnake);
+  const yarnDir = path.join(
+    projectRoot,
+    'src/lib/data/yarns',
+    brandSnake,
+    yarnSnake,
+  );
+  const brandYarnsDir = path.join(
+    projectRoot,
+    'src/lib/data/yarns',
+    brandSnake,
+  );
 
   try {
     // Validate brand directory exists
@@ -144,13 +158,16 @@ export const yarn: Yarn = {
     let brandYarnsContent = fs.readFileSync(brandYarnsFile, 'utf-8');
 
     // Add new import in alphabetical order
-    const importMatch = brandYarnsContent.match(/import\s+{[^}]*}\s+from\s+'\.\//g);
+    const importMatch = brandYarnsContent.match(
+      /import\s+{[^}]*}\s+from\s+'\.\//g,
+    );
     if (importMatch) {
       const newImport = `import { yarn as ${yarnCamel} } from './${yarnSnake}/yarn';`;
 
       // Find insertion point (alphabetically between existing imports)
       const imports = [];
-      const importRegex = /import\s+{\s*yarn as (\w+)\s*}\s+from\s+'\.\/([^']+)\/yarn';/g;
+      const importRegex =
+        /import\s+{\s*yarn as (\w+)\s*}\s+from\s+'\.\/([^']+)\/yarn';/g;
       let match;
       while ((match = importRegex.exec(brandYarnsContent)) !== null) {
         imports.push({ line: match[0], dir: match[2], camel: match[1] });
@@ -165,13 +182,23 @@ export const yarn: Yarn = {
       }
 
       if (insertAfter) {
-        brandYarnsContent = brandYarnsContent.replace(insertAfter.line, insertAfter.line + '\n' + newImport);
+        brandYarnsContent = brandYarnsContent.replace(
+          insertAfter.line,
+          insertAfter.line + '\n' + newImport,
+        );
       } else if (imports.length > 0) {
-        brandYarnsContent = brandYarnsContent.replace(imports[0].line, newImport + '\n' + imports[0].line);
+        brandYarnsContent = brandYarnsContent.replace(
+          imports[0].line,
+          newImport + '\n' + imports[0].line,
+        );
       } else {
         const firstImportPos = brandYarnsContent.indexOf('import {');
         const lineEnd = brandYarnsContent.indexOf('\n', firstImportPos);
-        brandYarnsContent = brandYarnsContent.slice(0, lineEnd) + '\n' + newImport + brandYarnsContent.slice(lineEnd);
+        brandYarnsContent =
+          brandYarnsContent.slice(0, lineEnd) +
+          '\n' +
+          newImport +
+          brandYarnsContent.slice(lineEnd);
       }
 
       // Find the yarns array and add the new yarn in alphabetical order
@@ -179,12 +206,17 @@ export const yarn: Yarn = {
       if (yarnsArrayMatch) {
         const fullMatch = yarnsArrayMatch[0];
         const yarnsArrayContent = yarnsArrayMatch[1];
-        const yarnRefs = (yarnsArrayContent.match(/\b\w+\b/g) || []).filter(r => r !== 'yarns');
+        const yarnRefs = (yarnsArrayContent.match(/\b\w+\b/g) || []).filter(
+          (r) => r !== 'yarns',
+        );
 
         // Find insertion point alphabetically
         let insertAfterRef = null;
         for (const ref of yarnRefs) {
-          const refSnake = ref.replace(/([A-Z])/g, '_$1').toLowerCase().replace(/^_/, '');
+          const refSnake = ref
+            .replace(/([A-Z])/g, '_$1')
+            .toLowerCase()
+            .replace(/^_/, '');
           if (refSnake < yarnSnake) {
             insertAfterRef = ref;
           }
@@ -195,19 +227,22 @@ export const yarn: Yarn = {
           // Insert after insertAfterRef
           newYarnsArray = yarnsArrayContent.replace(
             new RegExp(`\\b${insertAfterRef}\\b`),
-            `${insertAfterRef}, ${yarnCamel}`
+            `${insertAfterRef}, ${yarnCamel}`,
           );
         } else if (yarnRefs.length > 0) {
           // Insert at beginning
           newYarnsArray = yarnsArrayContent.replace(
             new RegExp(`\\b${yarnRefs[0]}\\b`),
-            `${yarnCamel}, ${yarnRefs[0]}`
+            `${yarnCamel}, ${yarnRefs[0]}`,
           );
         } else {
           newYarnsArray = ` ${yarnCamel} `;
         }
 
-        brandYarnsContent = brandYarnsContent.replace(fullMatch, `yarns: [${newYarnsArray}]`);
+        brandYarnsContent = brandYarnsContent.replace(
+          fullMatch,
+          `yarns: [${newYarnsArray}]`,
+        );
       }
 
       fs.writeFileSync(brandYarnsFile, brandYarnsContent);
@@ -225,7 +260,8 @@ export const yarn: Yarn = {
 
       // Find alphabetical insertion point
       const imports = [];
-      const importRegex = /import\s+{\s*brand as (\w+)\s*}\s+from\s+'\.\/([^']+)\/yarns';/g;
+      const importRegex =
+        /import\s+{\s*brand as (\w+)\s*}\s+from\s+'\.\/([^']+)\/yarns';/g;
       let match;
       while ((match = importRegex.exec(brandsContent)) !== null) {
         imports.push({ line: match[0], dir: match[2], camel: match[1] });
@@ -240,13 +276,21 @@ export const yarn: Yarn = {
       }
 
       if (insertAfter) {
-        brandsContent = brandsContent.replace(insertAfter.line, insertAfter.line + '\n' + newImport);
+        brandsContent = brandsContent.replace(
+          insertAfter.line,
+          insertAfter.line + '\n' + newImport,
+        );
       } else if (imports.length > 0) {
-        brandsContent = brandsContent.replace(imports[0].line, newImport + '\n' + imports[0].line);
+        brandsContent = brandsContent.replace(
+          imports[0].line,
+          newImport + '\n' + imports[0].line,
+        );
       }
 
       // Add to export array alphabetically
-      const exportArrayMatch = brandsContent.match(/export\s+const\s+brands:\s+Brand\[\]\s*=\s*\[[\s\S]*?\];/);
+      const exportArrayMatch = brandsContent.match(
+        /export\s+const\s+brands:\s+Brand\[\]\s*=\s*\[[\s\S]*?\];/,
+      );
       if (exportArrayMatch) {
         const exportArray = exportArrayMatch[0];
         const brandRefs = exportArray.match(/\b\w+\b(?=\s*[,\]])/g) || [];
@@ -255,19 +299,34 @@ export const yarn: Yarn = {
         let insertPoint = null;
         for (let i = 0; i < brandRefs.length; i++) {
           const ref = brandRefs[i];
-          const refSnake = ref.replace(/([A-Z])/g, '_$1').toLowerCase().replace(/^_/, '');
-          if (refSnake < brandSnake && (insertPoint === null || refSnake > insertPoint)) {
+          const refSnake = ref
+            .replace(/([A-Z])/g, '_$1')
+            .toLowerCase()
+            .replace(/^_/, '');
+          if (
+            refSnake < brandSnake &&
+            (insertPoint === null || refSnake > insertPoint)
+          ) {
             insertPoint = ref;
           }
         }
 
         let newExportArray;
         if (insertPoint) {
-          newExportArray = exportArray.replace(`${insertPoint},`, `${insertPoint},\n  ${brandCamel},`);
+          newExportArray = exportArray.replace(
+            `${insertPoint},`,
+            `${insertPoint},\n  ${brandCamel},`,
+          );
         } else if (brandRefs.length > 0 && brandSnake < brandRefs[0]) {
-          newExportArray = exportArray.replace(`${brandRefs[0]},`, `${brandCamel},\n  ${brandRefs[0]},`);
+          newExportArray = exportArray.replace(
+            `${brandRefs[0]},`,
+            `${brandCamel},\n  ${brandRefs[0]},`,
+          );
         } else {
-          newExportArray = exportArray.replace(/\];$/, `,\n  ${brandCamel},\n];`);
+          newExportArray = exportArray.replace(
+            /\];$/,
+            `,\n  ${brandCamel},\n];`,
+          );
         }
 
         brandsContent = brandsContent.replace(exportArray, newExportArray);
@@ -278,12 +337,28 @@ export const yarn: Yarn = {
     }
 
     // Update changelog.ts
-    const changelogFile = path.join(projectRoot, 'src/routes/changelog/changelog.ts');
+    const changelogFile = path.join(
+      projectRoot,
+      'src/routes/changelog/changelog.ts',
+    );
     let changelogContent = fs.readFileSync(changelogFile, 'utf-8');
 
     const now = new Date();
     const currentYear = now.getFullYear();
-    const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    const monthNames = [
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December',
+    ];
     const currentMonth = monthNames[now.getMonth()];
 
     // Create new entry — always 2 placeholder colorways; update manually after adding real colors
@@ -294,19 +369,28 @@ export const yarn: Yarn = {
               },`;
 
     // Find the current month's items array and insert before the closing bracket
-    const monthPattern = new RegExp(`month: '${currentMonth}',\\s*items: \\[([\\s\\S]*?)\\]`, 'm');
+    const monthPattern = new RegExp(
+      `month: '${currentMonth}',\\s*items: \\[([\\s\\S]*?)\\]`,
+      'm',
+    );
     const match = changelogContent.match(monthPattern);
 
     if (match) {
       // Month exists, add to it
       const itemsContent = match[1];
       const lastItemEnd = itemsContent.lastIndexOf('},');
-      const updatedItems = itemsContent.slice(0, lastItemEnd + 2) + '\n' + newEntry + itemsContent.slice(lastItemEnd + 2);
+      const updatedItems =
+        itemsContent.slice(0, lastItemEnd + 2) +
+        '\n' +
+        newEntry +
+        itemsContent.slice(lastItemEnd + 2);
       const newMonthBlock = `month: '${currentMonth}',\n        items: [${updatedItems}]`;
       changelogContent = changelogContent.replace(match[0], newMonthBlock);
     } else {
       // Month doesn't exist, need to create it
-      const yearPattern = new RegExp(`year: ${currentYear},\\s*months: \\[([\\s\\S]*?)\\]\\s*}`);
+      const yearPattern = new RegExp(
+        `year: ${currentYear},\\s*months: \\[([\\s\\S]*?)\\]\\s*}`,
+      );
       const yearMatch = changelogContent.match(yearPattern);
 
       if (yearMatch) {
@@ -322,9 +406,13 @@ ${newEntry}
           },
         ],
       },`;
-        const updatedMonths = monthsContent.slice(0, -1) + newMonthBlock + monthsContent.slice(-1);
+        const updatedMonths =
+          monthsContent.slice(0, -1) + newMonthBlock + monthsContent.slice(-1);
         const newYearBlock = `year: ${currentYear},\n    months: [${updatedMonths}]`;
-        changelogContent = changelogContent.replace(yearMatch[0], newYearBlock + '\n    }');
+        changelogContent = changelogContent.replace(
+          yearMatch[0],
+          newYearBlock + '\n    }',
+        );
       } else {
         console.warn('⚠ Could not find year in changelog');
       }
@@ -336,9 +424,12 @@ ${newEntry}
     console.log('\n✅ Successfully added yarn!\n');
     console.log('📝 Next steps:');
     console.log(`  1. Update colorways.ts with actual colors`);
-    console.log(`  2. Update changelog.ts with the real colorway count and proper version`);
-    console.log(`  3. Test the application to verify the yarn displays correctly\n`);
-
+    console.log(
+      `  2. Update changelog.ts with the real colorway count and proper version`,
+    );
+    console.log(
+      `  3. Test the application to verify the yarn displays correctly\n`,
+    );
   } catch (error) {
     console.error(`❌ Error: ${error.message}`);
     process.exit(1);

@@ -122,23 +122,23 @@ Settings and user preferences are stored in the browser's Local Storage.
 <details>
 <summary>View Details</summary>
 
-| Key Name              | Description                                                | Default Value                                                                                                                                                                                            | Possible Values                                                      | Version Added\* |
-| --------------------- | ---------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- | --------------- |
+| Key Name              | Description                                                | Default Value                                                                                                                                                                                                                     | Possible Values                                                      | Version Added\* |
+| --------------------- | ---------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- | --------------- |
 | preferences           | User preferences object                                    | `{ disableToastAnalytics: false, layout: 'list', seasons: [...DEFAULT_SEASONS], theme: { id: 'classic', mode: 'system', roundness: 'pill', spacing: 'normal', textScale: 'normal', headingStyle: 'classic' }, units: 'imperial'}` | [`LocalStatePreferencesType`](src/lib/storage/preferences.svelte.ts) | 5.0.0           |
-| [/weather]units       | Units for the weather forecast page                        | `imperial`                                                                                                                                                                                               | `imperial`, `metric`                                                 | < 3.28.3        |
-| [/weather]hour_format | Time format for the weather forecast page                  | `12`                                                                                                                                                                                                     | `12`, `24`                                                           | < 3.28.3        |
-| [/weather]locations   | Locations the user has added for the weather forecast page | `[]`                                                                                                                                                                                                     | array of [`Location`](src/lib/types/location-types.d.ts) objects     | < 3.28.3        |
+| [/weather]units       | Units for the weather forecast page                        | `imperial`                                                                                                                                                                                                                        | `imperial`, `metric`                                                 | < 3.28.3        |
+| [/weather]hour_format | Time format for the weather forecast page                  | `12`                                                                                                                                                                                                                              | `12`, `24`                                                           | < 3.28.3        |
+| [/weather]locations   | Locations the user has added for the weather forecast page | `[]`                                                                                                                                                                                                                              | array of [`Location`](src/lib/types/location-types.d.ts) objects     | < 3.28.3        |
 
 **`preferences.theme` fields:**
 
-| Field       | Description                    | Default     | Options                                                                      |
-| ----------- | ------------------------------ | ----------- | ---------------------------------------------------------------------------- |
-| `id`        | Color palette                  | `'classic'` | `'classic'`, `'crimson'`, `'hamlindigo'`, `'modern'`, `'rocket'`, `'legacy'` |
-| `mode`      | Light/dark mode                | `'system'`  | `'light'`, `'dark'`, `'system'`                                              |
-| `roundness` | Button/container corner radius | `'pill'`    | `'sharp'`, `'rounded'`, `'pill'`                                             |
-| `spacing`   | Layout density                 | `'normal'`  | `'compact'`, `'normal'`, `'relaxed'`                                         |
-| `textScale` | Typographic scale ratio        | `'normal'`  | `'small'`, `'normal'`, `'large'`                                             |
-| `headingStyle`  | Heading font-variation-settings      | `'classic'` | `'classic'`, `'playful'`, `'refined'`                                               |
+| Field          | Description                     | Default     | Options                                                                      |
+| -------------- | ------------------------------- | ----------- | ---------------------------------------------------------------------------- |
+| `id`           | Color palette                   | `'classic'` | `'classic'`, `'crimson'`, `'hamlindigo'`, `'modern'`, `'rocket'`, `'legacy'` |
+| `mode`         | Light/dark mode                 | `'system'`  | `'light'`, `'dark'`, `'system'`                                              |
+| `roundness`    | Button/container corner radius  | `'pill'`    | `'sharp'`, `'rounded'`, `'pill'`                                             |
+| `spacing`      | Layout density                  | `'normal'`  | `'compact'`, `'normal'`, `'relaxed'`                                         |
+| `textScale`    | Typographic scale ratio         | `'normal'`  | `'small'`, `'normal'`, `'large'`                                             |
+| `headingStyle` | Heading font-variation-settings | `'classic'` | `'classic'`, `'playful'`, `'refined'`                                        |
 
 > **Backwards compatibility:** Old `preferences` objects without `roundness`/`spacing`/`textScale`/`headingStyle` fields automatically receive defaults on next page load. No data is lost.
 

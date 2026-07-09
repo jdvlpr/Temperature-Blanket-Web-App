@@ -14,7 +14,11 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { MOON_PHASE_NAMES } from '$lib/constants/weather-constants';
-import { allGaugesAttributes, gauges, getTargetParentGaugeId } from '$lib/state/gauges-state.svelte';
+import {
+  allGaugesAttributes,
+  gauges,
+  getTargetParentGaugeId,
+} from '$lib/state/gauges-state.svelte';
 import { locations } from '$lib/state/location-state.svelte';
 import { weather } from '$lib/state/weather-state.svelte';
 import { preferences } from '$lib/storage/preferences.svelte';

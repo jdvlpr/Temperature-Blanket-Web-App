@@ -183,8 +183,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 id="other-comments"
                 class="textarea"
                 name="otherComments"
-                placeholder="Other Comments"
-              ></textarea>
+                placeholder="Other Comments"></textarea>
             </div>
 
             <div class="tex-left flex flex-col items-start gap-1">

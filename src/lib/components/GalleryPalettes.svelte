@@ -46,12 +46,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { isDesktop } from '$lib/state/page-state.svelte';
   import { getPalettesFromProjects } from '$lib/utils/color-utils';
   import { fetchProjects, recordPageView } from '$lib/utils/gallery-utils';
-  import {
-    ArrowUpDownIcon,
-    EarthIcon,
-    PlusIcon,
-    XIcon
-  } from '@lucide/svelte';
+  import { ArrowUpDownIcon, EarthIcon, PlusIcon, XIcon } from '@lucide/svelte';
   import { onMount } from 'svelte';
 
   interface Props {
@@ -94,7 +89,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
         projects: galleryPalettesState.projects,
         selectedBrandId: galleryPalettesState.filteredBrandId,
         selectedYarnId: galleryPalettesState.filteredYarnId,
-        palettesContainOnlyFilteredYarn: galleryPalettesState.palettesContainOnlyFilteredYarn,
+        palettesContainOnlyFilteredYarn:
+          galleryPalettesState.palettesContainOnlyFilteredYarn,
       });
       loading = false;
     }, 500);

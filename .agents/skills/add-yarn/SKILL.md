@@ -13,7 +13,7 @@ Automate the process of adding a new yarn to the yarn database. Creates the comp
    - Brand name (e.g., `caron`, `cascade`)
    - Yarn name (e.g., `Simply Soft Solids`)
    - Source URL
-   - Weight *(optional)* (e.g., `worsted`, `dk`, `lace`, or `w`, `d`, `l`)
+   - Weight _(optional)_ (e.g., `worsted`, `dk`, `lace`, or `w`, `d`, `l`)
 
 2. Run the script from the project root:
 
@@ -22,6 +22,7 @@ node .agents/skills/add-yarn/scripts/add-yarn.js <brandName> <yarnName> <sourceH
 ```
 
 **Example:**
+
 ```bash
 node .agents/skills/add-yarn/scripts/add-yarn.js caron "Simply Soft Solids" "https://www.joann.com/caron-simply-soft-yarn/prd23209.html" worsted
 ```

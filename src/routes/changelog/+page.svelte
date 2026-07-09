@@ -70,11 +70,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
     >
       <div class="flex flex-col items-start gap-2" bind:this={container}>
         <h2 class="h2 text-gradient mt-2 max-lg:hidden">What's New?</h2>
-        <p class="text-left text-sm text-surface-700-300">Selected highlights of changes to {PUBLIC_BASE_DOMAIN_NAME}. To see the full changelog, <a
+        <p class="text-left text-sm text-surface-700-300">
+          Selected highlights of changes to {PUBLIC_BASE_DOMAIN_NAME}. To see
+          the full changelog,
+          <a
             href="{PUBLIC_GITHUB_LINK}/commits/main/"
             class="link"
             target="_blank">visit the GitHub repository</a
-          >.</p>
+          >.
+        </p>
       </div>
       <div class="flex flex-col items-start gap-2 py-4 text-left">
         <div class="flex flex-col gap-2">

@@ -217,7 +217,6 @@ th div {
   }
 }
 
-
 .link {
   @apply text-secondary-800 dark:text-secondary-50 underline;
 }

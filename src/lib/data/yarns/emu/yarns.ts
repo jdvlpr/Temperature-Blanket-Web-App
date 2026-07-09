@@ -4,7 +4,5 @@ import { yarn as classicDk } from './classic-dk/yarn';
 export const brand: Brand = {
   name: 'Emu',
   id: 'emu',
-  yarns: [
-    classicDk,
-  ],
+  yarns: [classicDk],
 };

@@ -72,15 +72,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 </span>
               {/if}
             </p>
-            
+
             {#if unavailable}
-                <HelpIcon href="/documentation#link-unavailable">
-                  {#snippet text()}
-                    <span class="font-normal"
-                      >Link Unavailable</span
-                    >
-                  {/snippet}
-                </HelpIcon>
+              <HelpIcon href="/documentation#link-unavailable">
+                {#snippet text()}
+                  <span class="font-normal">Link Unavailable</span>
+                {/snippet}
+              </HelpIcon>
             {/if}
 
             <p>

@@ -137,25 +137,25 @@ If not, see <https://www.gnu.org/licenses/>. -->
         id="select-time-period"
         bind:value={galleryPalettesPopularState.months}
         onchange={async () => {
-        loading = true;
-        galleryPalettesPopularState.projects = [];
-        let results = await fetchPopularProjects({
-          months: galleryPalettesPopularState.months,
-        });
+          loading = true;
+          galleryPalettesPopularState.projects = [];
+          let results = await fetchPopularProjects({
+            months: galleryPalettesPopularState.months,
+          });
 
-        galleryPalettesPopularState.projects = results;
+          galleryPalettesPopularState.projects = results;
 
-        loading = false;
+          loading = false;
 
-        if (typeof document.getElementsByClassName('content') !== 'undefined')
-          document.getElementsByClassName('content')[0].scrollTop = 0;
-      }}
-    >
-      <option value={0.0357}>Day</option>
-      <option value={0.25}>Week</option>
-      <option value={1}>Month</option>
-      <option value={12}>Year</option>
-    </select>
+          if (typeof document.getElementsByClassName('content') !== 'undefined')
+            document.getElementsByClassName('content')[0].scrollTop = 0;
+        }}
+      >
+        <option value={0.0357}>Day</option>
+        <option value={0.25}>Week</option>
+        <option value={1}>Month</option>
+        <option value={12}>Year</option>
+      </select>
     </div>
   </label>
 </div>

@@ -1,7 +1,8 @@
 import { json, type RequestHandler } from '@sveltejs/kit';
 
 export const POST: RequestHandler = async ({ request, cookies }) => {
-  const { theme, mode, roundness, spacing, textScale, headingStyle } = await request.json();
+  const { theme, mode, roundness, spacing, textScale, headingStyle } =
+    await request.json();
 
   cookies.set('theme', theme || 'classic', { path: '/' });
   cookies.set('theme_mode', mode || 'system', { path: '/' });
