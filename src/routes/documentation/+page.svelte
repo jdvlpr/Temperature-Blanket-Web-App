@@ -1402,9 +1402,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
               Here’s a table showing which values would be included in an
               example range from 13 degrees to 12 degrees.
             </p>
-            <figure class="">
+            <figure class="overflow-x-auto">
               <table
-                class="table-autoborder-surface-950-50 bg-surface-200 dark:bg-surface-800 rounded-container border p-2"
+                class="border-surface-300-700 w-full border-separate border-spacing-0 overflow-hidden border text-left"
               >
                 <thead>
                   <tr
@@ -1413,6 +1413,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   >
                 </thead>
                 <tbody
+                  class="[&>tr:nth-child(odd)]:bg-surface-50 [&>tr:nth-child(odd)]:dark:bg-surface-950 [&>tr:nth-child(even)]:bg-surface-100 [&>tr:nth-child(even)]:dark:bg-surface-900"
                   ><tr
                     ><td class="p-2"
                       >Include From, don’t include To (default)</td

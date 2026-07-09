@@ -123,10 +123,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {#snippet header()}
             <p class="opacity-68 p-4 text-sm">
               This is a standalone version of the palette creator used in the
-              Project Planner tool. If you're making a temperature blanket
-              project, use the
-              <a href="/" class="link">Project Planner</a> instead, which will automatically
-              save your yarn palette to your project.
+              <a href="/" class="link">Project Planner</a> tool. If you're making
+              a temperature blanket project, use the Project Planner instead, which
+              will automatically save your yarn palette to your project.
             </p>
           {/snippet}
           {#snippet content()}

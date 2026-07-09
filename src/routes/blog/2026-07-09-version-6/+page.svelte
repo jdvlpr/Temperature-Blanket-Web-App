@@ -82,7 +82,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <p>
               Hello! This is Thomas, the developer of temperature-blanket.com.
-              In this post I'll be sharing what's new in version 6 of the
+              In this post I'll be sharing what's new in Version 6 of the
               Temperature Blanket Web App. It's not a big update compared to
               previous major releases, but it does include a change that may
               affect some saved projects.
@@ -109,7 +109,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <p class="opacity-70 font-bold">
                 Margin of Error for Sunrise/Sunset Times
               </p>
-              <table class="table w-full border border-surface-200-800">
+              <table
+                class="table w-full border border-surface-200-800 overflow-auto"
+              >
                 <thead>
                   <tr
                     class=" bg-surface-50-950 divide-x divide-surface-200-800"
@@ -140,15 +142,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <p class="font-bold">Appearance Customization</p>
             <p>
-              Along with the improved sun position accuracy, version 6
+              Along with the improved sun position accuracy, Version 6
               introduces several new customization options for the web app's
-              appearance. In version 5, many of these styles were bundled
+              appearance. In Version 5, many of these styles were bundled
               together in a single theme, but now you can customize each aspect
               separately, such as colors, button styles, font styles, and
               spacing.
             </p>
-
-            <p class="">Here's the appearance settings you can customize:</p>
             <div class="flex flex-col gap-1">
               <img
                 src="/images/blog-images/2026-07-09-version-6/appearance-menu.png"
@@ -168,7 +168,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </p>
             <p class="font-bold">Which Projects are Affected?</p>
             <p>
-              Most projects will not be affected by the version 6 update.
+              Most projects will not be affected by the Version 6 update.
               However, the following types of projects may be affected <span
                 class="italic">only if fetching new weather data</span
               > (all projects saved locally with weather data are not affected):
@@ -181,7 +181,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   class="link">Daytime Gauge</a
                 >
               </li>
-              <li>Saved projects that used the daytime for stitch counts</li>
               <li>
                 Saved projects that used the <a
                   href="/documentation#create-a-preview"
@@ -221,14 +220,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 >Loaded project and weather data</span
               > notice, then the project is not affected, since it is loading locally
               saved weather data. If you need to click the Search button to get weather
-              data, then the project may be affected by the version 6 update if it
-              meets any of the three criteria listed above.
+              data, then the project may be affected by the Version 6 update if it
+              meets either of the two criteria listed above.
             </p>
 
             <p class="font-bold">What are the Changes to Affected Projects?</p>
             <p>
               Affected projects' daytime data may be slightly different. This is
-              because of the update for how daytime is calculated in version 6.
+              because of the update for how daytime is calculated in Version 6.
             </p>
 
             <div class="flex flex-col gap-1">
@@ -236,80 +235,59 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 Difference in Daytime data from Version 5 to Version 6
               </p>
 
-              <table
-                class="table w-full max-w-sm border border-surface-200-800"
-              >
-                <thead>
-                  <tr
-                    class=" bg-surface-50-950 divide-x divide-surface-200-800"
-                  >
-                    <th class="text-left min-w-25">Date</th>
-                    <th class="text-left">Version 5 Daytime</th>
-                    <th class="text-left">Version 6 Daytime</th>
-                    <th class="text-left">Difference</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr
-                    class="bg-surface-100-900 divide-x divide-surface-200-800"
-                  >
-                    <td>2025-01-01</td>
-                    <td>10:14</td>
-                    <td>10:14</td>
-                    <td>none</td>
-                  </tr>
-                  <tr class="bg-surface-50-950 divide-x divide-surface-200-800">
-                    <td>2025-01-02</td>
-                    <td>10:14</td>
-                    <td>10:15</td>
-                    <td>1 minute</td>
-                  </tr>
-                  <tr
-                    class="bg-surface-100-900 divide-x divide-surface-200-800"
-                  >
-                    <td>2025-01-03</td>
-                    <td>10:15</td>
-                    <td>10:16</td>
-                    <td>1 minute</td>
-                  </tr>
-                  <tr class="bg-surface-50-950 divide-x divide-surface-200-800">
-                    <td>2025-01-04</td>
-                    <td>10:15</td>
-                    <td>10:16</td>
-                    <td>1 minute</td>
-                  </tr>
-                  <tr
-                    class="bg-surface-100-900 divide-x divide-surface-200-800"
-                  >
-                    <td>2025-01-05</td>
-                    <td>10:16</td>
-                    <td>10:17</td>
-                    <td>1 minute</td>
-                  </tr>
-                  <tr class="bg-surface-50-950 divide-x divide-surface-200-800">
-                    <td>2025-01-06</td>
-                    <td>10:16</td>
-                    <td>10:17</td>
-                    <td>1 minute</td>
-                  </tr>
-                  <tr
-                    class="bg-surface-100-900 divide-x divide-surface-200-800"
-                  >
-                    <td>2025-01-07</td>
-                    <td>10:17</td>
-                    <td>10:18</td>
-                    <td>1 minute</td>
-                  </tr>
-                </tbody>
-              </table>
+              <div class="overflow-x-auto">
+                <table
+                  class="table w-sm max-w-[90vw] border border-surface-200-800 overflow-auto"
+                >
+                  <thead>
+                    <tr
+                      class=" bg-surface-50-950 divide-x divide-surface-200-800"
+                    >
+                      <th class="text-left min-w-25">Date</th>
+                      <th class="text-left">Version 5 Daytime</th>
+                      <th class="text-left">Version 6 Daytime</th>
+                      <th class="text-left">Difference</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr
+                      class="bg-surface-100-900 divide-x divide-surface-200-800"
+                    >
+                      <td>2025-01-01</td>
+                      <td>5:37</td>
+                      <td>5:40</td>
+                      <td>3 minutes</td>
+                    </tr>
+                    <tr
+                      class="bg-surface-50-950 divide-x divide-surface-200-800"
+                    >
+                      <td>2025-01-02</td>
+                      <td>5:39</td>
+                      <td>5:43</td>
+                      <td>4 minutes</td>
+                    </tr>
+                    <tr
+                      class="bg-surface-100-900 divide-x divide-surface-200-800"
+                    >
+                      <td>2025-01-03</td>
+                      <td>5:42</td>
+                      <td>5:45</td>
+                      <td>3 minutes</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
               <p class="text-xs italic opacity-50">
-                Example data from Austin, Texas
+                Example data from Anchorage, Alaska
               </p>
             </div>
 
             <p>
-              If there is a difference in daytime, it is usually just a one
-              minute difference.
+              If there is a difference in daytime, it is usually just a few
+              minutes difference. Locations closer to the equator will have less
+              difference in daylight (and often no difference), whereas
+              locations closer to the Earth's poles will have a greater
+              difference in daylight.
             </p>
 
             <p>
@@ -320,101 +298,77 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <div class="flex flex-col gap-1">
               <p class="font-bold opacity-70">
-                Difference in Daytime Rows stich count from Version 5 to Version
-                6
+                Difference in Daytime Rows stitch count from Version 5 to
+                Version 6
               </p>
 
-              <table
-                class="table w-full max-w-lg border border-surface-200-800"
-              >
-                <thead>
-                  <tr
-                    class=" bg-surface-50-950 divide-x divide-surface-200-800"
-                  >
-                    <th class="text-left min-w-25">Date</th>
-                    <th class="text-left"
-                      >Version 5 Daytime stitches (left side)</th
+              <div class="overflow-x-auto">
+                <table
+                  class="table w-sm max-w-[90vw] border border-surface-200-800 overflow-auto"
+                >
+                  <thead>
+                    <tr
+                      class=" bg-surface-50-950 divide-x divide-surface-200-800"
                     >
-                    <th class="text-left"
-                      >Version 6 Daytime stitches (left side)</th
+                      <th class="text-left min-w-25">Date</th>
+                      <th class="text-left"
+                        >Version 5 Daytime stitches (left side)</th
+                      >
+                      <th class="text-left"
+                        >Version 6 Daytime stitches (left side)</th
+                      >
+                      <th class="text-left">Difference</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr
+                      class="bg-surface-100-900 divide-x divide-surface-200-800"
                     >
-                    <th class="text-left">Difference</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr
-                    class="bg-surface-100-900 divide-x divide-surface-200-800"
-                  >
-                    <td>2025-01-01</td>
-                    <td>128</td>
-                    <td>128</td>
-                    <td>none</td>
-                  </tr>
-                  <tr class="bg-surface-50-950 divide-x divide-surface-200-800">
-                    <td>2025-01-02</td>
-                    <td>128</td>
-                    <td>128</td>
-                    <td>none</td>
-                  </tr>
-                  <tr
-                    class="bg-surface-100-900 divide-x divide-surface-200-800"
-                  >
-                    <td>2025-01-03</td>
-                    <td>128</td>
-                    <td>128</td>
-                    <td>none</td>
-                  </tr>
-                  <tr class="bg-surface-50-950 divide-x divide-surface-200-800">
-                    <td>2025-01-04</td>
-                    <td>128</td>
-                    <td>128</td>
-                    <td>none</td>
-                  </tr>
-                  <tr
-                    class="bg-surface-100-900 divide-x divide-surface-200-800"
-                  >
-                    <td>2025-01-05</td>
-                    <td>128</td>
-                    <td>128</td>
-                    <td>none</td>
-                  </tr>
-                  <tr class="bg-surface-50-950 divide-x divide-surface-200-800">
-                    <td>2025-01-06</td>
-                    <td>128</td>
-                    <td>129</td>
-                    <td>1 stitch</td>
-                  </tr>
-                  <tr
-                    class="bg-surface-100-900 divide-x divide-surface-200-800"
-                  >
-                    <td>2025-01-07</td>
-                    <td>129</td>
-                    <td>129</td>
-                    <td>none</td>
-                  </tr>
-                </tbody>
-              </table>
+                      <td>2025-01-01</td>
+                      <td>70</td>
+                      <td>71</td>
+                      <td>1 stitch</td>
+                    </tr>
+                    <tr
+                      class="bg-surface-50-950 divide-x divide-surface-200-800"
+                    >
+                      <td>2025-01-02</td>
+                      <td>71</td>
+                      <td>71</td>
+                      <td>none</td>
+                    </tr>
+                    <tr
+                      class="bg-surface-100-900 divide-x divide-surface-200-800"
+                    >
+                      <td>2025-01-03</td>
+                      <td>71</td>
+                      <td>72</td>
+                      <td>1 stitch</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
               <p class="text-xs italic opacity-50">
-                Example data from Austin, Texas
+                Example data from Anchorage, Alaska
               </p>
             </div>
             <p>
               If there is a difference in the stitch count, it is usually just a
-              one-stitch difference.
+              one-or-two-stitch difference.
             </p>
 
             <p class="font-bold">
-              What Should I do if my Project was Affected?
+              What Should I Do if my Project was Affected?
             </p>
             <div class="flex flex-col gap-1">
               <p class="font-semibold opacity-50">
                 For projects using a Daytime Gauge
               </p>
               <p>
-                If a saved project used a Daytime Gauge, since the gauge ranges
-                were set (either automatically or manually) using the old
-                daytime data, the ranges may not accurately represent the new
-                daytime data. <span class="font-bold"
+                If a saved project used a Daytime Gauge, the ranges may no
+                longer accurately represent the new daytime data, since they
+                were originally set (either automatically or manually) using the
+                old data. <span class="font-bold"
                   >To fix this: Update the gauge ranges (either automatically or
                   manually) using the Configure Ranges button in the Colors tab.
                 </span> Note that if you are currently working on the project, this
@@ -430,44 +384,29 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 For projects using the Daytime Rows preview
               </p>
               <p>
-                If a saved project used the Daytime Rows preview, I would
-                recommend to simply <span class="font-bold"
-                  >use the updated stitch count for your project going forward</span
+                If a saved project used the Daytime Rows preview, <span
+                  class="font-bold"
+                  >I would recommend simply using the updated stitch count for
+                  your project going forward</span
                 >. If you've already saved the old stitch count and want to use
                 that, you can do that too. Since the difference is usually just
-                one stitch and many of the rows may not be affected, it won't
-                make that much of a difference for your project.
+                one or two stitches if any, it won't make that much of a
+                difference for your overall project.
               </p>
             </div>
 
-            <p>
-              If you'd like to access the old version 5 Project Planner, I've
-              made it available as an archived site at
-              <a href="https://archive-v5.temperature-blanket.com" class="link"
-                >archive-v6.temperature-blanket.com</a
-              >. (when opening a saved project URL, just add
-              <span class="italic">archive-v5.</span>
-              before <span class="italic">temperature-blanket.com</span>)
+            <p class="font-semibold opacity-50">
+              Accessing the Older Version 5
             </p>
-
-            <hr class="hr my-2" />
-
-            <h2 class="text-2xl font-bold">Upcoming Features</h2>
             <p>
-              There are several new features planned for upcoming versions of
-              this site. Thanks to those of you who have contributed your ideas!
-              You can visit the <a
-                href="https://github.com/jdvlpr/Temperature-Blanket-Web-App/discussions/categories/ideas"
-                class="link"
-                target="_blank">ideas discussions on GitHub</a
-              >
-              to see what might be coming up. You're welcome to also share your own
-              new ideas, questions, or thoughts by opening a
-              <a
-                href="https://github.com/jdvlpr/Temperature-Blanket-Web-App/discussions/new/choose"
-                class="link"
-                target="_blank">new GitHub discussion</a
-              >.
+              If you'd like to keep using the old Version 5 Project Planner,
+              I've made it available as an archived site at
+              <a href="https://archive-v5.temperature-blanket.com" class="link"
+                >archive-v5.temperature-blanket.com</a
+              >. To open your saved project, simply add
+              <span class="code">archive-v5.</span>
+              before the <span class="code">temperature-blanket.com</span> part of
+              your saved project's URL.
             </p>
 
             <hr class="hr my-2" />
@@ -476,9 +415,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <p>
               As always, if you have feedback of any kind, or encounter any
               issues, please let me know through any of the methods listed on
-              the <a href="/contact" class="link">contact page</a>. Thank you to
-              those of you who have already provided feedback! I look forward to
-              hearing from you.
+              the <a href="/contact" class="link">contact page</a>. Thank you!
             </p>
           </div>
         {/snippet}

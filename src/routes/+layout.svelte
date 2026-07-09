@@ -32,7 +32,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { onMount, type Snippet } from 'svelte';
   import '../css/main.css';
   import { ICONS } from '$lib/constants/icon-constants';
-  import { SquarePlayIcon } from '@lucide/svelte';
+  import { RssIcon, SquarePlayIcon } from '@lucide/svelte';
 
   interface Props {
     children?: Snippet;
@@ -185,18 +185,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
   class="flex w-full flex-col [view-transition-name:top-banner]"
   id="top-banner"
 >
-  <div class="bg-primary-100-900 w-full p-2 text-center">
+  <div class="bg-secondary-100-900 w-full p-2 text-center">
     <a
-      href="https://www.youtube.com/watch?v=7NRLrpZb0Lo"
-      target="_blank"
-      rel="noopener"
+      href="/blog/2026-07-09-version-6"
       class="btn hover:preset-tonal-surface whitespace-pre-wrap"
     >
-      <SquarePlayIcon />
-      <span>
-        Watch: Plan a Temperature Blanket
-        <span class="max-sm:hidden">the Easy Way</span>
-      </span>
+      <RssIcon />
+      News | Version 6: Improved Sun Position Accuracy
     </a>
   </div>
 </div>
