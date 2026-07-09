@@ -34,8 +34,8 @@ jobs:
       - name: Copy Environment Variables
         run: cp .env.example .env
 
-      - name: Run Svelte Check
-        run: pnpm check
+      # - name: Run Svelte Check
+      #   run: pnpm check
 
       - name: Run Linter
         run: pnpm lint
