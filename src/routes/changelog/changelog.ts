@@ -38,6 +38,8 @@ export const entries: ChangelogItemGroup[] = [
             notes: [
               {
                 IconComponent: RocketIcon,
+                instructions:
+                  "<a href='/blog/2026-07-09-version-6' class='link'>Learn more and read the update announcement.</a>",
                 text: `There is a breaking change in that the Daytime calculations are more accurate, which may result in different Daytime and Nighttime stitch counts for some projects.`,
                 title: 'Version 6',
               },
