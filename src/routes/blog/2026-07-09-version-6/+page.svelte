@@ -49,7 +49,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <meta property="og:image:height" content="768" />
 </svelte:head>
 
-<AppShell pageName="Version 6 Update: Improved Sun PositionAccuracy">
+<AppShell pageName="Version 6 Update: Improved Sun Position Accuracy">
   {#snippet stickyHeader()}
     <div class="mx-auto hidden lg:inline-flex"><AppLogo /></div>
   {/snippet}
