@@ -217,17 +217,6 @@ th div {
   }
 }
 
-.group .autocomplete > & {
-  @apply bg-surface-50 dark:bg-surface-950 hover:bg-primary-400/20;
-}
-
-.selected .autocomplete > &div {
-  @apply bg-primary-100/50 dark:bg-primary-900/50;
-  color: var(--base-font-color);
-  @variant dark {
-    color: var(--base-font-color-dark);
-  }
-}
 
 .link {
   @apply text-secondary-800 dark:text-secondary-50 underline;
