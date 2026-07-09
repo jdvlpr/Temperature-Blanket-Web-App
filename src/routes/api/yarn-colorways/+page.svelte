@@ -322,8 +322,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   For the <a href="#colorways" class="link">Colorways</a>
                   endpoint, the default behavior of the
                   <span class="code px-2">name</span>
-                  parameter is now 'contains' instead of 'exact match'. So for
-                  example, a request with
+                  parameter is now 'contains' instead of 'exact match'. So for example,
+                  a request with
                   <span class="code px-2">?name=blue</span> will now return all colorways
                   with 'blue' in the name, instead of only colorways with the exact
                   name 'blue'.
