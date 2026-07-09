@@ -27,10 +27,11 @@ import type {
 } from '$lib/types/weather-types';
 import { getColorInfo } from '$lib/utils/color-utils';
 import {
-  createWeeksProperty, dateToISO8601String,
+  createWeeksProperty,
+  dateToISO8601String,
   getLocalISODateString,
   numberOfDays,
-  stringToDate
+  stringToDate,
 } from '$lib/utils/date-utils';
 import { displayNumber, getAverage } from '$lib/utils/number-utils';
 import { pluralize } from '$lib/utils/string-utils';
@@ -411,7 +412,8 @@ class WeatherClass {
           daysInFuture = numberOfDays(stringToDate(today), to);
         }
 
-        let content = '<p class="font-bold text-xl my-4">Dates Out of Range</p>';
+        let content =
+          '<p class="font-bold text-xl my-4">Dates Out of Range</p>';
 
         if (daysInFuture) {
           content += `It looks like ${daysInFuture} ${pluralize('day', daysInFuture)} ${pluralize({ singular: 'is', plural: 'are' }, daysInFuture)} not in the past.`;
@@ -470,7 +472,9 @@ class WeatherClass {
       const tmin = tmins[index];
       const tmax = tmaxs[index];
       const tavg =
-        tmin === null || tmax === null ? null : displayNumber((tmin + tmax) / 2);
+        tmin === null || tmax === null
+          ? null
+          : displayNumber((tmin + tmax) / 2);
       const snow = snows[index];
       const prcp = prcps[index];
 
@@ -698,9 +702,7 @@ export const getMoonPhase = (date: Date): MoonPhasesId => {
 };
 
 export const getDayTime = ({ date, lat, lng }) => {
-  console.log('Calculating day time for date:', date, 'lat:', lat, 'lng:', lng);
   const times = SunCalc.getTimes(date, lat, lng);
-  console.log('SunCalc times:', times);
   const isValidSunset =
     times.sunset instanceof Date && !isNaN(times.sunset.getTime());
   const isValidSunRise =

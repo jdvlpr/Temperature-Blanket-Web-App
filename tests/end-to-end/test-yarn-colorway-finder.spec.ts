@@ -7,10 +7,8 @@ test.describe('Yarn Colorway Finder', () => {
 
   test('Page loads successfully', async ({ page }) => {
     await expect(page).toHaveTitle('Yarn Colorway Finder');
+    await expect(page.getByText('Find Yarn by Color')).toBeVisible();
     await expect(page.getByText('Search by Color')).toBeVisible();
-    await expect(
-      page.getByText('Browse a collection of yarn colorways'),
-    ).toBeVisible();
   });
 
   test('Search by Color Name works', async ({ page }) => {
