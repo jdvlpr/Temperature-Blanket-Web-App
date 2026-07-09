@@ -32,6 +32,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
   };
   const posts: BlogPostType[] = [
     {
+      date: '2026-07-09',
+      href: '/blog/2026-07-09-version-6',
+      imgSrc: '/images/blog-images/2026-07-09-version-6/featured-image.jpg',
+      imgAlt: 'Version 6: Improved Sun Position Accuracy',
+      title: 'Version 6: Improved Sun Position Accuracy',
+      tags: ['News'],
+    },
+    {
       date: '2025-03-20',
       href: '/blog/2025-03-20-version-5',
       imgSrc: '/images/blog-images/2025-03-20-version-5/featured-image.png',

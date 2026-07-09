@@ -38,11 +38,11 @@ export const entries: ChangelogItemGroup[] = [
             notes: [
               {
                 IconComponent: RocketIcon,
-                text: `...`,
+                text: `There is a breaking change in that the Daytime calculations are more accurate, which may result in different Daytime and Nighttime stitch counts for some projects.`,
                 title: 'Version 6',
               },
             ],
-            version: "6.0.0"
+            version: '6.0.0',
           },
         ],
       },

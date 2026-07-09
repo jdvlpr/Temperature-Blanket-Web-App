@@ -74,10 +74,6 @@ vi.mock('$app/environment', () => ({
   dev: true,
 }));
 
-vi.mock('$lib/components/ThemeSwitcher.svelte', () => ({
-  SKELETON_THEMES: [{ id: 'classic', name: 'Classic' }],
-}));
-
 describe('storage-utils integration', () => {
   let localStorageMock: Record<string, string> = {};
 
