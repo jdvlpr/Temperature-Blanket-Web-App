@@ -77,7 +77,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <h2 class="h2 text-gradient">
                 Version 6: Improved Sun Position Accuracy
               </h2>
-              <p class="text-sm">July 8, 2026</p>
+              <p class="text-sm">July 9, 2026</p>
             </div>
 
             <p>
