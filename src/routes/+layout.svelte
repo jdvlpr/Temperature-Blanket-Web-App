@@ -32,7 +32,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { onMount, type Snippet } from 'svelte';
   import '../css/main.css';
   import { ICONS } from '$lib/constants/icon-constants';
-  import { SquarePlayIcon } from '@lucide/svelte';
+  import { ExternalLinkIcon, SquarePlayIcon } from '@lucide/svelte';
 
   interface Props {
     children?: Snippet;
@@ -185,18 +185,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
   class="flex w-full flex-col [view-transition-name:top-banner]"
   id="top-banner"
 >
-  <div class="bg-primary-100-900 w-full p-2 text-center">
+  <div
+    class="bg-secondary-950-50 w-full p-2 text-center text-surface-contrast-light dark:text-surface-contrast-dark"
+  >
+    This is an archived version of this web app.
     <a
-      href="https://www.youtube.com/watch?v=7NRLrpZb0Lo"
+      href="https://temperature-blanket.com"
       target="_blank"
-      rel="noopener"
-      class="btn hover:preset-tonal-surface whitespace-pre-wrap"
+      class="btn preset-tonal-primary hover:preset-tonal-surface whitespace-pre-wrap"
     >
-      <SquarePlayIcon />
-      <span>
-        Watch: Plan a Temperature Blanket
-        <span class="max-sm:hidden">the Easy Way</span>
-      </span>
+      Main Version
+      <ExternalLinkIcon />
     </a>
   </div>
 </div>
