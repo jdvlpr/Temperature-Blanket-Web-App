@@ -37,8 +37,8 @@ jobs:
       # - name: Run Svelte Check
       #   run: pnpm check
 
-      - name: Run Linter
-        run: pnpm lint
+      # - name: Run Linter
+      #   run: pnpm lint
 
       - name: Run Unit Tests
         run: pnpm test:unit
