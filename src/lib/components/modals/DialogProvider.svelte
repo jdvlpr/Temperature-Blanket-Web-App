@@ -30,10 +30,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 >
   <Portal>
     <Dialog.Backdrop
-      class="bg-surface-50-950/50 fixed inset-0 z-50 backdrop-blur-md"
+      class="bg-surface-50-950/50 fixed inset-0 z-60 backdrop-blur-md"
     />
     <Dialog.Positioner
-      class="fixed inset-0 z-50 flex items-center justify-center"
+      class="fixed inset-0 z-60 flex items-center justify-center"
     >
       <Dialog.Content
         class="card bg-surface-50 dark:bg-surface-950 max-h-dvh space-y-4 overflow-auto shadow-xl max-sm:min-w-screen lg:max-h-[80svh] {dialog
