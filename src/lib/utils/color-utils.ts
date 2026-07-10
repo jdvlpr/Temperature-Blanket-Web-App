@@ -440,14 +440,14 @@ export const sortColorsLightToDark = ({ colors }) => {
     .map((color) => {
       return {
         ...color,
-        delta: chroma.deltaE('#ffffff', color.hex),
+        _delta: chroma.deltaE('#ffffff', color.hex), // underscore to differentiate between potentially existing delta property
       };
     })
     .sort((a, b) => {
-      return a.delta > b.delta ? 1 : b.delta > a.delta ? -1 : 0;
+      return a._delta > b._delta ? 1 : b._delta > a._delta ? -1 : 0;
     })
     .map((color) => {
-      delete color.delta;
+      delete color._delta;
       return color;
     });
 
@@ -471,12 +471,12 @@ export const sortColorsDarktoLight = ({ colors }) => {
     .map((color) => {
       return {
         ...color,
-        delta: chroma.deltaE('#ffffff', color.hex),
+        _delta: chroma.deltaE('#ffffff', color.hex), // underscore to differentiate between potentially existing delta property
       };
     })
-    .sort((a, b) => (a.delta < b.delta ? 1 : b.delta < a.delta ? -1 : 0))
+    .sort((a, b) => (a._delta < b._delta ? 1 : b._delta < a._delta ? -1 : 0))
     .map((color) => {
-      delete color.delta;
+      delete color._delta;
       return color;
     });
 

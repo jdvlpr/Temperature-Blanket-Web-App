@@ -227,8 +227,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             delta: chroma.deltaE(yarnColorwayFinderState.hex, color.hex),
           };
         })
-        .sort((a, b) => (a.delta > b.delta ? 1 : b.delta > a.delta ? -1 : 0))
-        .filter((color) => color.delta < 40);
+        .sort((a, b) => (a.delta > b.delta ? 1 : b.delta > a.delta ? -1 : 0));
 
     switch (yarnColorwayFinderState.sortColors) {
       case 'light-to-dark':
@@ -595,7 +594,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   ? 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5'
                   : 'flex flex-col'}"
               >
-                {#each results as { hex, name, delta, brandName, yarnName, variant_href, affiliate_variant_href, unavailable }}
+                {#each results as { hex, name, delta, brandName, yarnName, variant_href, affiliate_variant_href, unavailable } (hex + name + brandName + yarnName)}
                   {@const percentMatch = Math.floor(100 - delta)}
                   <!-- svelte-ignore a11y_click_events_have_key_events -->
                   <!-- svelte-ignore a11y_no_static_element_interactions -->
@@ -656,7 +655,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         {name}
                       </span>
 
-                      {#if percentMatch}
+                      {#if typeof percentMatch == 'number'}
                         <p class="text-xs pointer-events-none">
                           {percentMatch}% Match
                         </p>
