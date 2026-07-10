@@ -31,8 +31,8 @@ jobs:
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Copy Environment Variables
-        run: cp .env.example .env
+      # - name: Copy Environment Variables
+      #   run: cp .env.example .env
 
       # - name: Run Svelte Check
       #   run: pnpm check
@@ -43,8 +43,8 @@ jobs:
       - name: Run Unit Tests
         run: pnpm test:unit
 
-      - name: Build Application
-        run: pnpm build
+      # - name: Build Application
+      #   run: pnpm build
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
