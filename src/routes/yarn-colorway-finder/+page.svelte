@@ -655,7 +655,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         {name}
                       </span>
 
-                      {#if typeof percentMatch == 'number'}
+                      {#if typeof percentMatch == 'number' && !isNaN(percentMatch)}
                         <p class="text-xs pointer-events-none">
                           {percentMatch}% Match
                         </p>
