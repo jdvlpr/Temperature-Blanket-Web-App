@@ -181,7 +181,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/if}
 </svelte:head>
 
-<div
+<!-- <div
   class="flex w-full flex-col [view-transition-name:top-banner]"
   id="top-banner"
 >
@@ -194,7 +194,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       News | Version 6: Improved Sun Position Accuracy
     </a>
   </div>
-</div>
+</div> -->
 
 {@render children?.()}
 
