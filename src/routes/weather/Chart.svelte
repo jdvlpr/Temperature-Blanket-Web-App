@@ -14,47 +14,19 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
+  import { Chart, registerChartJS } from '$lib/features/charts/chartjs-setup';
   import {
-    BarController,
-    BarElement,
-    CategoryScale,
-    Chart,
-    Filler,
-    Legend,
-    LineController,
-    LineElement,
-    LinearScale,
-    LogarithmicScale,
-    PointElement,
-    RadialLinearScale,
-    TimeScale,
-    TimeSeriesScale,
-    Title,
-    Tooltip,
-  } from 'chart.js';
+    buildXAxis,
+    buildYAxis,
+    buildY2Axis,
+  } from '$lib/features/charts/axis-theme';
   import { onMount } from 'svelte';
   import { weatherState } from './+page.svelte';
   import { preferences } from '$lib/storage/preferences.svelte';
 
   let { data } = $props();
 
-  Chart.register(
-    LineElement,
-    BarElement,
-    PointElement,
-    BarController,
-    LineController,
-    CategoryScale,
-    LinearScale,
-    LogarithmicScale,
-    RadialLinearScale,
-    TimeScale,
-    TimeSeriesScale,
-    Filler,
-    Legend,
-    Title,
-    Tooltip,
-  );
+  registerChartJS();
 
   let dataSets, chart;
 
@@ -183,55 +155,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
           mode: 'index',
         },
         scales: {
-          x: {
-            ticks: {
-              color: '#94a3b8',
-            },
-            title: {
-              color: '#94a3b8',
-            },
-            grid: {
-              drawOnChartArea: false, // only want the grid lines for one axis to show up
-            },
-          },
-          y: {
-            type: 'linear',
-            position: 'left',
-            // display: false,
-            grid: {
-              drawOnChartArea: true, // only want the grid lines for one axis to show up
-              color: '#94a3b8',
-            },
-            title: {
-              text:
-                preferences.value.units === 'metric'
-                  ? 'Degrees Celsius'
-                  : 'Degrees Fahrenheit',
-              display: true,
-              color: '#94a3b8',
-            },
-            ticks: {
-              color: '#94a3b8',
-            },
-          },
-          y2: {
-            type: 'linear',
-            position: 'right',
-            // display: false,
-            beginAtZero: true,
-            max: 100,
-            grid: {
-              drawOnChartArea: false, // only want the grid lines for one axis to show up
-            },
-            title: {
-              text: 'Precipitation %',
-              display: true,
-              color: '#94a3b8',
-            },
-            ticks: {
-              color: '#94a3b8',
-            },
-          },
+          x: buildXAxis(),
+          y: buildYAxis({
+            title:
+              preferences.value.units === 'metric'
+                ? 'Degrees Celsius'
+                : 'Degrees Fahrenheit',
+          }),
+          y2: buildY2Axis({ title: 'Precipitation %', max: 100 }),
         },
       },
     }));

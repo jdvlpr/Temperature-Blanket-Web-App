@@ -119,13 +119,13 @@ export const loadProjectFromURL = async (
 
   // Load Weather Grouping Setting if present
   if (exists(params.w)) {
-    weather.grouping = 'week';
+    weather.setGrouping('week');
     const value = +params.w?.value;
     if (DAYS_OF_THE_WEEK.map((n) => n.value).includes(value))
       weather.monthGroupingStartDay = value;
   } else {
     // Otherwise set to the default 'day'
-    weather.grouping = 'day';
+    weather.setGrouping('day');
   }
 
   // Load Seasons from URL (n parameter)
@@ -166,8 +166,9 @@ const parseLocationURLHash = async (hashString) => {
     const separatorPosition = separatorIndices[i];
 
     if (_locations.length - 1 < i) {
-      // There needs to be another location, so create it
-      locations.add({ clearWeatherData: false });
+      // There needs to be another location, so create it.
+      // (No weather clear here — project load fetches fresh weather anyway.)
+      locations.add();
     }
 
     _locations[i].label = 'Loading...';

@@ -174,7 +174,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         _rawData[index] = day;
       }
 
-      weather.rawData = _rawData;
+      weather.setRawData(_rawData);
 
       imported = true;
       processing = false;

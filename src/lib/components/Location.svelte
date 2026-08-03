@@ -185,7 +185,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   function validate() {
     if (weather.isUserEdited) return;
 
-    weather.rawData = [];
+    weather.setRawData([]);
 
     const value = inputLocation.value;
 
@@ -229,7 +229,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 
   function setDates({ from = null, to = null, unsetWeather = true }) {
-    if (unsetWeather) weather.rawData = [];
+    if (unsetWeather) weather.setRawData([]);
     let setDate = new Date(year, month - 1, day, 1);
     const _padFromMonth = String(setDate.getUTCMonth() + 1).padStart(2, '0');
     const _padFromDate = String(setDate.getUTCDate()).padStart(2, '0');
@@ -320,7 +320,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         class="btn hover:preset-tonal-surface"
                         onclick={() => {
                           locations.remove(location.uuid);
-                          weather.rawData = [];
+                          weather.setRawData([]);
                         }}
                         disabled={weather.isUserEdited ||
                           project.status.loading}
@@ -404,7 +404,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             onclick={() => {
               if (weather.isUserEdited) return;
               showResetKey = !showResetKey;
-              weather.rawData = [];
+              weather.setRawData([]);
               inputLocation.value = '';
               inputLocation.focus();
               location.label = '';
@@ -591,7 +591,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               max={getYesterday()}
               bind:value={location.from}
               bind:this={inputStart}
-              onchange={() => (weather.rawData = [])}
+              onchange={() => weather.setRawData([])}
               disabled={project.status.loading || weather.isUserEdited}
             />
           </label>
@@ -607,7 +607,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               max={getYesterday()}
               bind:value={location.to}
               bind:this={inputEnd}
-              onchange={() => (weather.rawData = [])}
+              onchange={() => weather.setRawData([])}
               disabled={project.status.loading || weather.isUserEdited}
             />
           </label>

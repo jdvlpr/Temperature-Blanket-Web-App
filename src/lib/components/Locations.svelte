@@ -139,7 +139,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
         weather.isUserEdited && 'hidden',
       ]}
       disabled={project.status.loading}
-      onclick={() => locations.add()}
+      onclick={() => {
+        // Clear now-stale weather data before adding the new location.
+        if (weather.rawData.length > 0) weather.setRawData([]);
+        locations.add();
+      }}
       title="Add a New Location"
     >
       <CirclePlusIcon /> Add Location

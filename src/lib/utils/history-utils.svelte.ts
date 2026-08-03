@@ -46,13 +46,13 @@ export const loadFromHistory = ({ action }: { action: 'Undo' | 'Redo' }) => {
   // Change Weather Grouping
   if (exists(newParams.w)) {
     if (!exists(oldParams.w) || oldParams.w?.value !== newParams.w?.value) {
-      weather.grouping = 'week';
+      weather.setGrouping('week');
       weather.monthGroupingStartDay = +newParams.w.value;
       message = 'Weather Grouping set to Weekly';
     }
   } else {
     if (weather.grouping !== 'day') {
-      weather.grouping = 'day';
+      weather.setGrouping('day');
       message = 'Weather Grouping set to Daily';
     }
   }

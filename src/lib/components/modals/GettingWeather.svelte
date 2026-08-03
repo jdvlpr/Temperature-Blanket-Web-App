@@ -41,7 +41,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   async function getWeatherData() {
     controller.value = new AbortController();
-    weather.rawData = [];
+    weather.setRawData([]);
     weather.currentIndex = 0;
     await fetchData()
       .then(async () => {
@@ -57,7 +57,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       })
       .catch((e) => {
         controller.value = null;
-        weather.rawData = [];
+        weather.setRawData([]);
         weather.isUserEdited = false;
         weather.wasLoadedFromStorage = false;
         error = e?.message;
@@ -176,7 +176,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     tempAllData = tempAllData.flat();
     tempAllData.sort((a, b) => a.date - b.date); // Sort by date, regardless of location
 
-    weather.rawData = tempAllData;
+    weather.setRawData(tempAllData);
     tempAllData = null;
   }
 </script>

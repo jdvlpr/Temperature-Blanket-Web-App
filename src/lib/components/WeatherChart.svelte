@@ -17,38 +17,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { browser } from '$app/environment';
   import { weather } from '$lib/state/weather-state.svelte';
   import { preferences } from '$lib/storage/preferences.svelte';
+  import { Chart, registerChartJS } from '$lib/features/charts/chartjs-setup';
   import {
-    CategoryScale,
-    Chart,
-    Filler,
-    Legend,
-    LinearScale,
-    LineController,
-    LineElement,
-    LogarithmicScale,
-    PointElement,
-    RadialLinearScale,
-    TimeScale,
-    TimeSeriesScale,
-    Title,
-    Tooltip,
-  } from 'chart.js';
+    buildXAxis,
+    buildYAxis,
+    buildY2Axis,
+  } from '$lib/features/charts/axis-theme';
 
-  Chart.register(
-    LineElement,
-    PointElement,
-    LineController,
-    CategoryScale,
-    LinearScale,
-    LogarithmicScale,
-    RadialLinearScale,
-    TimeScale,
-    TimeSeriesScale,
-    Filler,
-    Legend,
-    Title,
-    Tooltip,
-  );
+  registerChartJS();
 
   let ctx = $state(null);
 
@@ -182,57 +158,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
           maintainAspectRatio: false,
           aspectRatio: 3,
           scales: {
-            x: {
-              ticks: {
-                color: '#94a3b8',
-              },
-              title: {
-                color: '#94a3b8',
-              },
-              grid: {
-                drawOnChartArea: false, // only want the grid lines for one axis to show up
-              },
-            },
-            y: {
-              type: 'linear',
-              position: 'left',
-              // display: false,
-              grid: {
-                drawOnChartArea: true, // only want the grid lines for one axis to show up
-                color: '#94a3b8',
-              },
-              title: {
-                text:
-                  preferences.value.units === 'metric'
-                    ? 'Degrees Celsius'
-                    : 'Degrees Fahrenheit',
-                display: true,
-                color: '#94a3b8',
-              },
-              ticks: {
-                color: '#94a3b8',
-              },
-            },
-            y2: {
-              type: 'linear',
-              position: 'right',
-              // display: false,
-              beginAtZero: true,
-              grid: {
-                drawOnChartArea: false, // only want the grid lines for one axis to show up
-              },
-              title: {
-                text:
-                  preferences.value.units === 'metric'
-                    ? 'Millimeters / Minutes'
-                    : 'Inches / Hours',
-                display: true,
-                color: '#94a3b8',
-              },
-              ticks: {
-                color: '#94a3b8',
-              },
-            },
+            x: buildXAxis(),
+            y: buildYAxis({
+              title:
+                preferences.value.units === 'metric'
+                  ? 'Degrees Celsius'
+                  : 'Degrees Fahrenheit',
+            }),
+            y2: buildY2Axis({
+              title:
+                preferences.value.units === 'metric'
+                  ? 'Millimeters / Minutes'
+                  : 'Inches / Hours',
+            }),
           },
         },
       });

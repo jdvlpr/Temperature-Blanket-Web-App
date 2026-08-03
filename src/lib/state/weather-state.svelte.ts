@@ -172,10 +172,10 @@ class WeatherClass {
     return _weather;
   });
 
-  // The currently used weather data
+  // The currently used weather data.
+  // Pure derived: resetting `currentIndex` happens in setRawData()/setGrouping(),
+  // not here, so reading `data` never mutates state.
   data: WeatherDay[] = $derived.by(() => {
-    this.currentIndex = 0;
-
     if (this.grouping === 'week' && this.groupedByWeek.length)
       return this.groupedByWeek;
     else return this.rawData;
@@ -294,6 +294,26 @@ class WeatherClass {
   // ***************
 
   /**
+   * Assign the raw weather data. Resets `currentIndex` to 0 because the
+   * previously-selected day index no longer maps to the new dataset.
+   * Prefer this over assigning `weather.rawData` directly so the reset stays
+   * co-located with the write (keeps the `data` derived pure).
+   */
+  setRawData(value: WeatherDay[]) {
+    this.currentIndex = 0;
+    this.rawData = value;
+  }
+
+  /**
+   * Set the day/week grouping. Resets `currentIndex` to 0 because the index
+   * addresses a different list depending on grouping.
+   */
+  setGrouping(value: 'day' | 'week') {
+    this.currentIndex = 0;
+    this.grouping = value;
+  }
+
+  /**
    * Calculates the sum of a specific parameter from the weather data.
    * If the parameter is not available for a specific day, it calculates the average of that parameter.
    * If the parameter is "tmax", "tavg", "tmin", "prcp", "snow", or "dayt", it calculates the average of the corresponding parameter.
@@ -353,7 +373,7 @@ class WeatherClass {
   }
 
   async getOpenMeteo({ location }: { location: LocationType }) {
-    let allData: WeatherDay[] = [];
+    const allData: WeatherDay[] = [];
     let totalDaysInFuture = 0;
 
     const todayStr = getLocalISODateString();
@@ -516,7 +536,7 @@ class WeatherClass {
         moon: getMoonPhase(date),
       };
 
-      allData = [...allData, dayData];
+      allData.push(dayData);
     }
 
     // Add future days with null values if needed
@@ -562,7 +582,7 @@ class WeatherClass {
           moon: getMoonPhase(_date),
         };
 
-        allData = [...allData, _day];
+        allData.push(_day);
       }
     }
 
