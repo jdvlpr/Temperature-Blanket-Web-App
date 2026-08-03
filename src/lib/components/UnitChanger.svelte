@@ -29,14 +29,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
     class="bg-surface-100 dark:bg-surface-900 rounded-container border-0 shadow-sm"
   >
     <SegmentedControl.Indicator />
-    <SegmentedControl.Item value={'metric'}>
+    <SegmentedControl.Item value="metric">
       <SegmentedControl.ItemText
         >{`${UNIT_LABELS.temperature.metric} /
   	    ${UNIT_LABELS.height.metric}`}</SegmentedControl.ItemText
       >
       <SegmentedControl.ItemHiddenInput />
     </SegmentedControl.Item>
-    <SegmentedControl.Item value={'imperial'}>
+    <SegmentedControl.Item value="imperial">
       <SegmentedControl.ItemText
         >{`${UNIT_LABELS.temperature.imperial} /
   	    ${UNIT_LABELS.height.imperial}`}</SegmentedControl.ItemText
