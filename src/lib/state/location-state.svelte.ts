@@ -16,7 +16,6 @@
 import { browser } from '$app/environment';
 import { CHARACTERS_FOR_URL_HASH } from '$lib/constants/page-constants';
 import { MAXIMUM_DAYS_PER_LOCATION } from '$lib/constants/location-constants';
-import { weather } from '$lib/state/weather-state.svelte';
 import type {
   LocationsStateType,
   LocationStateType,
@@ -193,8 +192,10 @@ export class LocationsState implements LocationsStateType {
     return title;
   });
 
-  add({ clearWeatherData = true }: { clearWeatherData?: boolean } = {}): void {
-    if (clearWeatherData && weather.rawData.length > 0) weather.rawData = [];
+  // Note: clearing now-stale weather data is the caller's responsibility (e.g.
+  // Locations.svelte does weather.setRawData([]) before adding). Keeping that
+  // out of here avoids a location-state -> weather-state import cycle.
+  add(): void {
     const newLocation = new LocationState();
     newLocation.index = this.all.length;
     this.all.push(newLocation);

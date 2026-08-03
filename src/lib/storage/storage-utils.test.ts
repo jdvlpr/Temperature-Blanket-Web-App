@@ -23,7 +23,17 @@ vi.mock('$lib/state/weather-state.svelte', () => ({
     source: { name: 'Meteostat', useSecondary: false, settings: {} },
     isUserEdited: false,
     rawData: [],
+    currentIndex: 0,
+    grouping: 'day',
     isFromLocalStorage: false,
+    setRawData(value: unknown[]) {
+      this.currentIndex = 0;
+      this.rawData = value;
+    },
+    setGrouping(value: 'day' | 'week') {
+      this.currentIndex = 0;
+      this.grouping = value;
+    },
   },
   getMoonPhase: vi.fn(() => 0),
 }));

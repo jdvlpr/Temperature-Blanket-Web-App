@@ -19,27 +19,22 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 
 export const POST: RequestHandler = async function ({ fetch, request }) {
-  let data = await request.json();
+  const data = await request.json();
 
-  try {
-    // Note: On the Wordpress site, add the following line to wp-config.php:
-    // define('PROJECT_CREATION_AUTH_KEY', 'create_your_own_auth_key');
-    // And also set SECRET_WORDPRESS_PROJECT_CREATION_AUTH_KEY to the same 'create_your_own_auth_key' in your .env file
-    const postRequest = await fetch(
-      `${PUBLIC_WORDPRESS_BASE_URL}/wp-json/tbgalleryapi/v1/project`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Project-Creation-Auth-Key':
-            SECRET_WORDPRESS_PROJECT_CREATION_AUTH_KEY,
-        },
-        body: JSON.stringify(data), // body data type must match "Content-Type" header
+  // Note: On the Wordpress site, add the following line to wp-config.php:
+  // define('PROJECT_CREATION_AUTH_KEY', 'create_your_own_auth_key');
+  // And also set SECRET_WORDPRESS_PROJECT_CREATION_AUTH_KEY to the same 'create_your_own_auth_key' in your .env file
+  const postRequest = await fetch(
+    `${PUBLIC_WORDPRESS_BASE_URL}/wp-json/tbgalleryapi/v1/project`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Project-Creation-Auth-Key': SECRET_WORDPRESS_PROJECT_CREATION_AUTH_KEY,
       },
-    );
-    const response = await postRequest.json();
-    return json(response);
-  } catch (error) {
-    throw error;
-  }
+      body: JSON.stringify(data), // body data type must match "Content-Type" header
+    },
+  );
+  const response = await postRequest.json();
+  return json(response);
 };

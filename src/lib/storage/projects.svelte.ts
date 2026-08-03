@@ -275,7 +275,7 @@ export class ProjectStorage {
     if (daysInFuture > 0 && !matchedProject.isCustomWeatherData) return;
 
     // Set the weather data and indicate that it was loaded from storage
-    weather.rawData = newWeatherUngrouped;
+    weather.setRawData(newWeatherUngrouped);
     weather.wasLoadedFromStorage = true;
   }
 

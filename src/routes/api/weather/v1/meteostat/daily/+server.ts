@@ -45,7 +45,7 @@ export async function POST({ request }) {
   if (!location || typeof location !== 'object')
     throw error(400, 'Missing location object');
 
-  let allData: WeatherDay[] = [];
+  const allData: WeatherDay[] = [];
 
   let url = API_SERVICES.meteostat.baseURL;
   url += `?lat=${location.lat}`;
@@ -192,7 +192,7 @@ export async function POST({ request }) {
 
     dayData.moon = getMoonPhase(dayDate);
 
-    allData = [...allData, dayData];
+    allData.push(dayData);
   }
 
   // Sort by date

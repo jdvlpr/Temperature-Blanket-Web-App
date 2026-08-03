@@ -20,6 +20,13 @@ import { preferences } from '$lib/storage/preferences.svelte';
 import type { PageLayout } from '$lib/types/page-types';
 import { MigrationManager } from './migration-manager';
 
+// Debounce timer for persisting theme prefs to cookies. The theme effect can
+// fire several times in quick succession (e.g. dragging a settings slider), and
+// only the final state needs to be POSTed. DOM attribute updates stay immediate;
+// only the network write is debounced.
+let themePostTimer: ReturnType<typeof setTimeout> | undefined;
+const THEME_POST_DEBOUNCE_MS = 400;
+
 /**
  * Cleans up old local storage keys which are no longer used or which have been migrated to different locations
  * Added in version 5.0.0
@@ -116,17 +123,20 @@ export async function initializeLocalStorage() {
           'data-heading-style',
           headingStyle,
         );
-        fetch('/api/preferences/theme', {
-          method: 'POST',
-          body: JSON.stringify({
-            theme,
-            mode,
-            roundness,
-            spacing,
-            textScale,
-            headingStyle,
-          }),
-        });
+        clearTimeout(themePostTimer);
+        themePostTimer = setTimeout(() => {
+          fetch('/api/preferences/theme', {
+            method: 'POST',
+            body: JSON.stringify({
+              theme,
+              mode,
+              roundness,
+              spacing,
+              textScale,
+              headingStyle,
+            }),
+          });
+        }, THEME_POST_DEBOUNCE_MS);
       }
     });
 

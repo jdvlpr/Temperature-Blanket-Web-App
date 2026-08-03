@@ -23,7 +23,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <SegmentedControl
       value={weather.grouping}
       onValueChange={(e) => {
-        weather.grouping = e.value;
+        weather.setGrouping(e.value);
       }}
     >
       <SegmentedControl.Control
