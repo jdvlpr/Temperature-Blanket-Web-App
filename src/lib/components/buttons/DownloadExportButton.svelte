@@ -122,7 +122,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   Gauges & Weather Data
                 </p>
               </div>
-              <span class="badge preset-filled-secondary-500">New</span>
             </button>
           </Menu.Item>
         {/if}

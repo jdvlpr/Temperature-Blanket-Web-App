@@ -126,12 +126,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
               class="size-[48px] opacity-40"
               class:!opacity-100={id === previews.activeId}
             />
-            {#if id === 'twsr'}
-              <span
-                class="badge bg-tertiary-100-900 absolute -bottom-3 left-0 w-full"
-                >New</span
-              >
-            {/if}
           </button>
         {/key}
       {/if}
