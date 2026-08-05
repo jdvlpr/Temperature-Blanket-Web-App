@@ -620,7 +620,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               >
               <textarea
                 id="archiveResult"
-                class="textarea"
+                class="textarea rounded-container"
                 name="archiveResult"
                 rows="5"
                 placeholder="e.g. When I used the archived version, the weather data was back to normal; it was not shifted."
@@ -647,7 +647,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             >
             <textarea
               id="description"
-              class="textarea"
+              class="textarea rounded-container"
               name="description"
               rows="5"
               placeholder="e.g. I open my project from it's saved URL. After I get the weather data and look at the table, the weather data changed from what it used to be."
@@ -659,7 +659,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <span class="label-text">Any other comments</span>
           <textarea
             id="comments"
-            class="textarea"
+            class="textarea rounded-container"
             name="comments"
             rows="5"
             placeholder="e.g. this feature works really well, but this features does not work well. I also have some ideas about how to improve this feature."

@@ -176,7 +176,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <textarea
         bind:this={textAreaInputElement}
         id="palette-code"
-        class="textarea select-all"
+        class="textarea select-all rounded-container"
         placeholder="e.g. red, FFA500, #ADD8E6"
         bind:value={inputValue}
         onkeyup={triggerChange}

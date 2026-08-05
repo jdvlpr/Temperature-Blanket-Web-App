@@ -147,7 +147,7 @@
           <label class="text-sm"
             >Paste HTML Here
             <textarea
-              class="textarea w-full grow border-none shadow-inner"
+              class="textarea w-full grow border-none shadow-inner rounded-container"
               bind:value={options.value.content}
               rows="5"></textarea>
           </label>
