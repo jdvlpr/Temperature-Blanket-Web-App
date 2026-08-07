@@ -25,6 +25,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import YarnSources from '$lib/components/YarnSources.svelte';
   import ViewToggle from '$lib/components/buttons/ViewToggle.svelte';
   import { ALL_YARN_WEIGHTS } from '$lib/constants/color-constants';
+  import { ensureYarnData } from '$lib/data/yarns/colorways.svelte';
   import { safeSlide } from '$lib/features/transitions/safeSlide';
   import { allGaugesAttributes } from '$lib/state/gauges-state.svelte';
   import { locations } from '$lib/state/location-state.svelte';
@@ -35,7 +36,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     getTitleFromLocationsMeta,
   } from '$lib/utils/project-utils.svelte';
   import { getTextColor } from '$lib/utils/color-utils';
-  import { parseGaugeURLHash } from '$lib/utils/load-project-utils.svelte';
+  import {
+    gaugeParamsHaveYarnDetails,
+    parseGaugeURLHash,
+  } from '$lib/utils/load-project-utils.svelte';
   import { pluralize, stripHTMLTags } from '$lib/utils/string-utils';
   import {
     ArrowLeftIcon,
@@ -65,6 +69,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let params = $derived(getProjectParametersFromURLHash(hash));
   let gauges = $derived(getGauges(params));
   let flatColors = $derived(gauges.flatMap((item) => item.colors));
+
+  // Warm the yarn dataset only when this project's gauges reference yarn
+  // details; `gauges` above self-heals once the data resolves.
+  $effect(() => {
+    if (gaugeParamsHaveYarnDetails(params)) ensureYarnData();
+  });
 
   let aboutState = $state([]);
 

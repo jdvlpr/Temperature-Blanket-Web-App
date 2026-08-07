@@ -15,7 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import { ALL_YARN_WEIGHTS } from '$lib/constants/color-constants';
-  import { brands } from '$lib/data/yarns/brands';
+  import { ensureYarnData, getBrands } from '$lib/data/yarns/colorways.svelte';
   import { defaultYarn } from '$lib/state/page-state.svelte';
   import { delay } from '$lib/utils/function-utils.svelte';
   import { pluralize } from '$lib/utils/string-utils';
@@ -87,7 +87,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     yarn = allYarns.find((yarn) => yarn?.meta.brandId === brandId);
 
     if (yarn) {
-      const numberOfYarns = brands
+      const numberOfYarns = getBrands()
         .find((brand) => brand.id === yarn.meta.brandId)
         .yarns.filter((yarn) => {
           if (!selectedYarnWeightId) return true;
@@ -132,8 +132,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     );
   }
 
-  function getAllYarns(selectedYarnWeightId = null) {
-    return brands.flatMap((brand) => {
+  function getAllYarns(selectedYarnWeightId: string | null = null) {
+    return getBrands().flatMap((brand) => {
       return brand.yarns
         .filter((yarn) => {
           if (!selectedYarnWeightId) return true;
@@ -183,6 +183,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 
   onMount(() => {
+    initYarnPicker();
+  });
+
+  async function initYarnPicker() {
+    await ensureYarnData();
+    allYarns = getAllYarns(selectedYarnWeightId);
+
     if (selectedBrandId || selectedYarnId) {
       inputValue = getYarnValue({
         brandId: selectedBrandId,
@@ -331,7 +338,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         e.fetch();
       },
     });
-  });
+  }
 
   $effect(() => {
     selectedYarnWeightId;

@@ -19,6 +19,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Expand from '$lib/components/Expand.svelte';
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
   import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
+  import { ensureYarnData } from '$lib/data/yarns/colorways.svelte';
   import { dialog, toast } from '$lib/state/page-state.svelte';
   import { safeSlide } from '$lib/features/transitions/safeSlide';
   import {
@@ -141,6 +142,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   onMount(() => {
     includeHexInImage =
       !includeBrandInImage && !includeYarnInImage && !includeColorwayInImage;
+    ensureYarnData();
   });
 </script>
 

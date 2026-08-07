@@ -43,11 +43,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ToTopButton from '$lib/components/buttons/ToTopButton.svelte';
   import ViewToggleBindable from '$lib/components/buttons/ViewToggleBindable.svelte';
   import {
-    ALL_COLORWAYS_WITH_AFFILIATE_LINKS,
     ALL_YARN_WEIGHTS,
     YARN_COLORWAYS_PER_PAGE,
   } from '$lib/constants/color-constants';
-  import { brands } from '$lib/data/yarns/brands';
+  import {
+    ensureYarnData,
+    getBrands,
+    getColorwaysWithAffiliateLinks,
+  } from '$lib/data/yarns/colorways.svelte';
   import { safeSlide } from '$lib/features/transitions/safeSlide';
   import { toast } from '$lib/state/page-state.svelte';
   import type { YarnWeight } from '$lib/types/yarn-types';
@@ -90,6 +93,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let accordionState = $state([]);
 
   onMount(() => {
+    initPage();
+  });
+
+  async function initPage() {
+    await ensureYarnData();
+
     urlParams = new URLSearchParams(window.location.search);
     // Load URL
     if (urlParams?.has('f')) getURLYarnParams(urlParams.get('f'));
@@ -131,7 +140,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     scrollObserver.observe(filtersContainer);
     isLoaded = true;
     getResults();
-  });
+  }
 
   function getShareableURL({
     selectedBrandId,
@@ -168,11 +177,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   function getURLYarnParams(paramString) {
     if (!paramString?.includes('-')) {
       // check if brandId exists
-      if (brands.find((brand) => brand.id === paramString))
+      if (getBrands().find((brand) => brand.id === paramString))
         yarnColorwayFinderState.selectedBrandId = paramString;
       // check if yarnId exists
       if (
-        brands
+        getBrands()
           .flatMap((brand) => brand.yarns)
           .find((yarn) => yarn.id === paramString)
       )
@@ -182,11 +191,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
     const [brandId, yarnId] = paramString.split('-');
 
     // check if brandId exists
-    if (brands.find((brand) => brand.id === brandId))
+    if (getBrands().find((brand) => brand.id === brandId))
       yarnColorwayFinderState.selectedBrandId = brandId;
     // check if yarnId exists
     if (
-      brands.flatMap((brand) => brand.yarns).find((yarn) => yarn.id === yarnId)
+      getBrands()
+        .flatMap((brand) => brand.yarns)
+        .find((yarn) => yarn.id === yarnId)
     )
       yarnColorwayFinderState.selectedYarnId = yarnId;
   }
@@ -194,7 +205,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   function getResults() {
     if (!isLoaded || !browser) return;
     gettingResults = true;
-    let _results = ALL_COLORWAYS_WITH_AFFILIATE_LINKS.filter((colorway) =>
+    let _results = getColorwaysWithAffiliateLinks().filter((colorway) =>
       yarnColorwayFinderState.selectedBrandId
         ? colorway.brandId === yarnColorwayFinderState.selectedBrandId
         : true,
@@ -290,13 +301,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
   let yarns = $derived(
     yarnColorwayFinderState.selectedBrandId === ''
-      ? brands
+      ? getBrands()
           .flatMap((n, i) =>
             n.yarns.map((n) => {
               return {
                 ...n,
-                brandId: brands[i].id,
-                brandName: brands[i].name,
+                brandId: getBrands()[i].id,
+                brandName: getBrands()[i].name,
               };
             }),
           )
@@ -312,7 +323,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             // names must be equal
             return 0;
           })
-      : brands
+      : getBrands()
           ?.filter(
             (brand) => brand.id === yarnColorwayFinderState.selectedBrandId,
           )
@@ -483,20 +494,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 </div>
               {/key}
 
-              {#key yarnColorwayFinderState.selectedBrandId || yarnColorwayFinderState.selectedYarnId}
-                <div
-                  class="col-span-12 w-full md:col-span-3"
-                  class:hidden={!!yarnColorwayFinderState.selectedBrandId &&
-                    !!yarnColorwayFinderState.selectedYarnId}
-                >
-                  <SelectYarnWeight
-                    selectedBrandId={yarnColorwayFinderState.selectedBrandId}
-                    bind:selectedYarnWeightId={
-                      yarnColorwayFinderState.selectedYarnWeightId
-                    }
-                  />
-                </div>
-              {/key}
+              {#if isLoaded}
+                {#key yarnColorwayFinderState.selectedBrandId || yarnColorwayFinderState.selectedYarnId}
+                  <div
+                    class="col-span-12 w-full md:col-span-3"
+                    class:hidden={!!yarnColorwayFinderState.selectedBrandId &&
+                      !!yarnColorwayFinderState.selectedYarnId}
+                  >
+                    <SelectYarnWeight
+                      selectedBrandId={yarnColorwayFinderState.selectedBrandId}
+                      bind:selectedYarnWeightId={
+                        yarnColorwayFinderState.selectedYarnWeightId
+                      }
+                    />
+                  </div>
+                {/key}
+              {/if}
 
               <div
                 class="col-span-12 flex w-full flex-col justify-start gap-1 md:col-span-4"

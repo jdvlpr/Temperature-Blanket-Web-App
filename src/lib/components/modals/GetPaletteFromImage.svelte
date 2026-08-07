@@ -22,6 +22,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
   import StickyPart from '$lib/components/modals/StickyPart.svelte';
   import { MAXIMUM_COLORWAYS_MATCHES_FOR_IMAGES } from '$lib/constants/color-constants';
+  import { ensureYarnData } from '$lib/data/yarns/colorways.svelte';
   import { defaultYarn, dialog } from '$lib/state/page-state.svelte';
   import {
     getColorways,
@@ -81,6 +82,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let containerElement = $state(null);
 
   onMount(async () => {
+    await ensureYarnData();
+
     const ct =
       await import('../../../../node_modules/getimagepalette/dist/color-thief.mjs');
     ColorThief = ct.default;
