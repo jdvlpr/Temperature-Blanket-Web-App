@@ -122,6 +122,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     selectedYarnId;
     selectedYarnWeightId;
     numberOfColors;
+    yarnDataReady;
     getRandomColors();
   });
 </script>
