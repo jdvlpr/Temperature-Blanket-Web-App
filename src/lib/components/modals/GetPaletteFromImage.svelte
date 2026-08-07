@@ -83,6 +83,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   onMount(async () => {
     await ensureYarnData();
+    colorways = getColorways({
+      selectedBrandId,
+      selectedYarnId,
+      selectedYarnWeightId,
+    });
 
     const ct =
       await import('../../../../node_modules/getimagepalette/dist/color-thief.mjs');
