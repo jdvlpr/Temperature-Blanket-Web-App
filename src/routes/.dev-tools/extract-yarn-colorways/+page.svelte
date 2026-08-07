@@ -31,7 +31,7 @@
   import Footer from '$lib/components/Footer.svelte';
   import SelectYarn from '$lib/components/SelectYarn.svelte';
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
-  import { brands } from '$lib/data/yarns/brands';
+  import { getBrands } from '$lib/data/yarns/colorways.svelte';
   import { toast } from '$lib/state/page-state.svelte';
   import type { Color } from '$lib/types/yarn-types';
   import { getTextColor } from '$lib/utils/color-utils';
@@ -48,7 +48,7 @@
       return [];
     // Fetch existing colorways based on selected brand and yarn
     return (
-      brands
+      getBrands()
         .find((b) => b.id === options.value.selectedYarn.brandId)
         ?.yarns.find((y) => y.id === options.value.selectedYarn.yarnId)
         ?.colorways.flatMap((colorway) => colorway.colors) || []

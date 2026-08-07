@@ -20,6 +20,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import SelectYarn from '$lib/components/SelectYarn.svelte';
   import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
   import StickyPart from '$lib/components/modals/StickyPart.svelte';
+  import { ensureYarnData } from '$lib/data/yarns/colorways.svelte';
   import { dialog } from '$lib/state/page-state.svelte';
   import { getColorways, getFilteredYarns } from '$lib/utils/yarn-utils';
   import { getSortedPalette } from '$lib/utils/color-utils';
@@ -29,10 +30,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
     ExternalLinkIcon,
     ShuffleIcon,
   } from '@lucide/svelte';
+  import { onMount } from 'svelte';
   import SelectYarnWeight from '../SelectYarnWeight.svelte';
   import HelpIcon from '../buttons/HelpIcon.svelte';
 
   let { numberOfColors, updateGauge } = $props();
+
+  let yarnDataReady = $state(false);
+  onMount(() => {
+    ensureYarnData().then(() => {
+      yarnDataReady = true;
+    });
+  });
 
   let debounceTimer;
   const debounce = (callback, time) => {
@@ -152,14 +161,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </div>
     {/if}
 
-    {#key selectedBrandId}
-      <div
-        class="order-3 col-span-full w-full md:order-2 md:col-span-3"
-        class:hidden={!!selectedBrandId && !!selectedYarnId}
-      >
-        <SelectYarnWeight {selectedBrandId} bind:selectedYarnWeightId />
-      </div>
-    {/key}
+    {#if yarnDataReady}
+      {#key selectedBrandId}
+        <div
+          class="order-3 col-span-full w-full md:order-2 md:col-span-3"
+          class:hidden={!!selectedBrandId && !!selectedYarnId}
+        >
+          <SelectYarnWeight {selectedBrandId} bind:selectedYarnWeightId />
+        </div>
+      {/key}
+    {/if}
 
     <div class="order-5 col-span-full justify-self-start sm:col-span-3">
       <SelectNumberOfColors

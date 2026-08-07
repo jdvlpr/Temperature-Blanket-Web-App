@@ -1,6 +1,6 @@
 <script lang="ts">
   import { ALL_YARN_WEIGHTS } from '$lib/constants/color-constants';
-  import { brands } from '$lib/data/yarns/brands';
+  import { getBrands } from '$lib/data/yarns/colorways.svelte';
   import type { YarnWeight } from '$lib/types/yarn-types';
   import { pluralize } from '$lib/utils/string-utils';
   import { CircleQuestionMarkIcon, SpoolIcon } from '@lucide/svelte';
@@ -19,7 +19,7 @@
 
   const yarnWeightIds: YarnWeight['id'][] = [
     ...new Set(
-      brands
+      getBrands()
         .filter((brand) => {
           if (!selectedBrandId) return true;
           return brand.id === selectedBrandId;
@@ -38,7 +38,7 @@
   const yarnWeights = ALL_YARN_WEIGHTS.filter((y) =>
     yarnWeightIds.includes(y.id),
   ).map((n) => {
-    const numberOfYarns = brands
+    const numberOfYarns = getBrands()
       .filter((brand) => {
         if (!selectedBrandId) return true;
         return brand.id === selectedBrandId;

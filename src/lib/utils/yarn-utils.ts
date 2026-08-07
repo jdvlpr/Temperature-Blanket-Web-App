@@ -13,10 +13,12 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { ALL_COLORWAYS_WITH_AFFILIATE_LINKS } from '$lib/constants/color-constants';
 import { getColorName } from '$lib/utils/color-utils';
 import { getTextColor } from '$lib/utils/color-utils';
-import { brands } from '$lib/data/yarns/brands';
+import {
+  getBrands,
+  getColorwaysWithAffiliateLinks,
+} from '$lib/data/yarns/colorways.svelte';
 
 /**
  * [getColorPropertiesFromYarnStringAndHex description]
@@ -29,7 +31,7 @@ import { brands } from '$lib/data/yarns/brands';
 export const getColorPropertiesFromYarnStringAndHex = ({ yarnString, hex }) => {
   const { brandId, yarnId } = stringToBrandAndYarnDetails(yarnString);
 
-  const matchingColor = ALL_COLORWAYS_WITH_AFFILIATE_LINKS.find(
+  const matchingColor = getColorwaysWithAffiliateLinks().find(
     (color) =>
       color.brandId === brandId && color.yarnId === yarnId && color.hex === hex,
   );
@@ -53,7 +55,7 @@ export const stringToBrandAndYarnDetails = (text) => {
 
   const [brandCode, yarnCode] = text.split('-');
 
-  const brand = brands.find((brand) => brand.id === brandCode);
+  const brand = getBrands().find((brand) => brand.id === brandCode);
   const brandId = brand ? brand.id : null;
   const brandName = brand ? brand.name : null;
 
@@ -104,8 +106,8 @@ export const paletteContiansAllNamedColorways = ({
 
 export const getFilteredYarns = ({ selectedBrandId }) => {
   return selectedBrandId
-    ? brands?.filter((brand) => brand.id === selectedBrandId)[0]?.yarns
-    : brands.flatMap((n) => n.yarns);
+    ? getBrands()?.filter((brand) => brand.id === selectedBrandId)[0]?.yarns
+    : getBrands().flatMap((n) => n.yarns);
 };
 
 export const getColorways = ({
@@ -113,7 +115,7 @@ export const getColorways = ({
   selectedYarnId,
   selectedYarnWeightId,
 }) => {
-  return ALL_COLORWAYS_WITH_AFFILIATE_LINKS.filter((colorway) => {
+  return getColorwaysWithAffiliateLinks().filter((colorway) => {
     if (!selectedBrandId) return true;
     return colorway.brandId === selectedBrandId;
   })

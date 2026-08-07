@@ -17,41 +17,6 @@ vi.mock('./color-utils', () => ({
   },
 }));
 
-// Mock constants and yarns data
-vi.mock('$lib/constants/color-constants', () => {
-  return {
-    ALL_COLORWAYS_WITH_AFFILIATE_LINKS: [
-      {
-        brandId: 'brand1',
-        yarnId: 'yarn1',
-        yarnWeightId: 'weight1',
-        hex: '#ff0000',
-        name: 'Red',
-        brandName: 'Brand 1',
-        yarnName: 'Yarn 1',
-      },
-      {
-        brandId: 'brand1',
-        yarnId: 'yarn2',
-        yarnWeightId: 'weight2',
-        hex: '#00ff00',
-        name: 'Green',
-        brandName: 'Brand 1',
-        yarnName: 'Yarn 2',
-      },
-      {
-        brandId: 'brand2',
-        yarnId: 'yarn3',
-        yarnWeightId: 'weight1',
-        hex: '#0000ff',
-        name: 'Blue',
-        brandName: 'Brand 2',
-        yarnName: 'Yarn 3',
-      },
-    ],
-  };
-});
-
 vi.mock('$lib/constants/seasons-constants', () => {
   return {
     SEASON_PRESETS: {
@@ -64,8 +29,9 @@ vi.mock('$lib/constants/seasons-constants', () => {
   };
 });
 
-vi.mock('$lib/data/yarns/brands', () => ({
-  brands: [
+vi.mock('$lib/data/yarns/colorways.svelte', () => ({
+  ensureYarnData: async () => {},
+  getBrands: () => [
     {
       id: 'brand1',
       name: 'Brand 1',
@@ -96,6 +62,35 @@ vi.mock('$lib/data/yarns/brands', () => ({
           colorways: [],
         },
       ],
+    },
+  ],
+  getColorwaysWithAffiliateLinks: () => [
+    {
+      brandId: 'brand1',
+      yarnId: 'yarn1',
+      yarnWeightId: 'weight1',
+      hex: '#ff0000',
+      name: 'Red',
+      brandName: 'Brand 1',
+      yarnName: 'Yarn 1',
+    },
+    {
+      brandId: 'brand1',
+      yarnId: 'yarn2',
+      yarnWeightId: 'weight2',
+      hex: '#00ff00',
+      name: 'Green',
+      brandName: 'Brand 1',
+      yarnName: 'Yarn 2',
+    },
+    {
+      brandId: 'brand2',
+      yarnId: 'yarn3',
+      yarnWeightId: 'weight1',
+      hex: '#0000ff',
+      name: 'Blue',
+      brandName: 'Brand 2',
+      yarnName: 'Yarn 3',
     },
   ],
 }));

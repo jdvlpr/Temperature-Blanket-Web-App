@@ -24,6 +24,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import GaugeCustomizer from '$lib/components/GaugeCustomizer.svelte';
   import Share from '$lib/components/Share.svelte';
   import YarnSources from '$lib/components/YarnSources.svelte';
+  import { ensureYarnData } from '$lib/data/yarns/colorways.svelte';
   import {
     colorsToCode,
     colorsToYarnDetails,
@@ -37,6 +38,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let isFinishedOnMount = $state(false);
 
   onMount(() => {
+    initPage();
+  });
+
+  async function initPage() {
     urlParams = new URLSearchParams(window.location.search);
     // Load URL
     if (urlParams?.has('s')) {
@@ -47,6 +52,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     }
 
     if (urlParams?.has('f')) {
+      await ensureYarnData();
+
       let _yarnString = urlParams.get('f');
 
       yarnPageState.gauge.colors = yarnDetailsToColors({
@@ -56,7 +63,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     }
 
     isFinishedOnMount = true;
-  });
+  }
 
   function getYarnFilterParams(colors) {
     const details = colorsToYarnDetails({ colors });

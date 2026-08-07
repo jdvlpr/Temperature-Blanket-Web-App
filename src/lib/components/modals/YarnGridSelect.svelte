@@ -19,7 +19,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Spinner from '$lib/components/Spinner.svelte';
   import ToTopButton from '$lib/components/buttons/ToTopButton.svelte';
   import { YARN_COLORWAYS_PER_PAGE } from '$lib/constants/color-constants';
-  import { brands } from '$lib/data/yarns/brands';
+  import { ensureYarnData, getBrands } from '$lib/data/yarns/colorways.svelte';
   import { defaultYarn } from '$lib/state/page-state.svelte';
   import type { Color } from '$lib/types/yarn-types';
   import {
@@ -41,7 +41,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     SearchIcon,
   } from '@lucide/svelte';
   import chroma from 'chroma-js';
-  import { tick } from 'svelte';
+  import { onMount, tick } from 'svelte';
   import SelectYarnWeight from '../SelectYarnWeight.svelte';
 
   interface Props {
@@ -113,13 +113,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let yarns = $derived(
     selectedBrandId === ''
-      ? brands
+      ? getBrands()
           .flatMap((n, i) =>
             n.yarns.map((n) => {
               return {
                 ...n,
-                brandId: brands[i].id,
-                brandName: brands[i].name,
+                brandId: getBrands()[i].id,
+                brandName: getBrands()[i].name,
               };
             }),
           )
@@ -135,7 +135,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             // names must be equal
             return 0;
           })
-      : brands
+      : getBrands()
           ?.filter((brand) => brand.id === selectedBrandId)
           ?.flatMap((n) => {
             return n.yarns.map((yarn) => {
@@ -165,6 +165,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let selectedIds = $derived(
     selectedColors.map((n) => `${n.hex}${n.name}${n.brandId}${n.yarnId}`),
   );
+
+  let yarnDataReady = $state(false);
+
+  onMount(() => {
+    ensureYarnData().then(() => {
+      yarnDataReady = true;
+    });
+  });
 
   function getResults() {
     gettingResults = true;
@@ -335,14 +343,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
   {/if}
 
-  {#key selectedBrandId}
-    <div
-      class="order-3 col-span-full w-full md:order-2 md:col-span-3"
-      class:hidden={!!selectedBrandId && !!selectedYarnId}
-    >
-      <SelectYarnWeight {selectedBrandId} bind:selectedYarnWeightId />
-    </div>
-  {/key}
+  {#if yarnDataReady}
+    {#key selectedBrandId}
+      <div
+        class="order-3 col-span-full w-full md:order-2 md:col-span-3"
+        class:hidden={!!selectedBrandId && !!selectedYarnId}
+      >
+        <SelectYarnWeight {selectedBrandId} bind:selectedYarnWeightId />
+      </div>
+    {/key}
+  {/if}
 
   <div
     class="label order-4 col-span-full flex w-full flex-col items-start md:col-span-5"

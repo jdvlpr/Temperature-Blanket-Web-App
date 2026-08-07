@@ -15,10 +15,11 @@
 
 import { dev } from '$app/environment';
 import { SECRET_RAPID_API_PROXY_HEADER_KEY } from '$env/static/private';
+import { ALL_YARN_WEIGHTS } from '$lib/constants/color-constants';
 import {
-  ALL_COLORWAYS,
-  ALL_YARN_WEIGHTS,
-} from '$lib/constants/color-constants';
+  ensureYarnData,
+  getAllColorways,
+} from '$lib/data/yarns/colorways.svelte';
 import {
   sortColorsByName,
   sortColorsLightToDark,
@@ -40,7 +41,8 @@ export async function GET({ url, request }) {
 
   const { searchParams } = url;
 
-  let colorways = ALL_COLORWAYS;
+  await ensureYarnData();
+  let colorways = getAllColorways();
 
   if (searchParams.has('brand')) {
     let brand = searchParams.get('brand');

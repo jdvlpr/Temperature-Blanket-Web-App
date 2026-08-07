@@ -20,6 +20,7 @@ import {
   UNIT_LABELS,
 } from '$lib/constants/weather-constants';
 import { NO_DATA_SRTM3 } from '$lib/constants/location-constants';
+import { ensureYarnData } from '$lib/data/yarns/colorways.svelte';
 import { allGaugesAttributes, gauges } from '$lib/state/gauges-state.svelte';
 import { locations } from '$lib/state/location-state.svelte';
 import { previews } from '$lib/state/preview-state.svelte';
@@ -42,6 +43,19 @@ import {
 import { getColorsFromInput } from '$lib/utils/color-utils';
 import { getProjectParametersFromURLHash } from '$lib/utils/project-utils.svelte';
 import { seasonsFromUrlHash } from '$lib/utils/seasons-utils.svelte';
+
+// Gauge hash values can carry a second `!`-delimited section with yarn
+// details (brandId-yarnId); only those need the yarn dataset loaded.
+export const gaugeParamsHaveYarnDetails = (
+  params: Record<string, { value: string }>,
+) =>
+  allGaugesAttributes.some((gauge) => {
+    const raw = params[gauge.id]?.value;
+    if (!raw) return false;
+    const firstBang = raw.indexOf('!');
+    if (firstBang === -1) return false;
+    return raw.indexOf('!', firstBang + 1) !== -1;
+  });
 
 export const loadProjectFromURL = async (
   hash = window.location.hash.substring(1),
@@ -72,6 +86,8 @@ export const loadProjectFromURL = async (
   if (exists(params.l)) await parseLocationURLHash(params.l.value);
 
   // Load Gauges
+  if (gaugeParamsHaveYarnDetails(params)) await ensureYarnData();
+
   allGaugesAttributes.forEach((gauge) => {
     if (!exists(params[gauge.id])) return;
     gauges.addById(gauge.id);

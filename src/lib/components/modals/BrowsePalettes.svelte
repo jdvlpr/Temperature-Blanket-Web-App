@@ -18,7 +18,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import GalleryPalettesPopular from '$lib/components/GalleryPalettesPopular.svelte';
   import PaletteSchemes from '$lib/components/PaletteSchemes.svelte';
   import ToTopButton from '$lib/components/buttons/ToTopButton.svelte';
+  import { ensureYarnData } from '$lib/data/yarns/colorways.svelte';
   import { SegmentedControl } from '@skeletonlabs/skeleton-svelte';
+  import { onMount } from 'svelte';
 
   interface Props {
     schemeId?: string;
@@ -52,6 +54,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     { threshold: 1 },
   );
   const categories = ['Gallery', 'Featured', 'Schemes'];
+
+  onMount(() => {
+    ensureYarnData();
+  });
 
   function getParentCategory(schemeId) {
     if (schemeId === 'Custom') return 'Gallery';

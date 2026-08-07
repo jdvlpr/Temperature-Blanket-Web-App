@@ -29,7 +29,7 @@ import {
 } from '$lib/utils/project-utils.svelte';
 import { isValueInRange } from '$lib/utils/range-utils.svelte';
 import { pluralize } from '$lib/utils/string-utils';
-import { brands } from '$lib/data/yarns/brands';
+import { getBrands } from '$lib/data/yarns/colorways.svelte';
 import chroma from 'chroma-js';
 
 /**
@@ -392,7 +392,7 @@ export const getColorName = ({
       showGenericName,
       showNamedHexCodes,
     });
-  const yarn = brands
+  const yarn = getBrands()
     .find((brand) => brand.id === brandId)
     ?.yarns.find((yarn) => yarn.id === yarnId);
   if (!yarn)
