@@ -102,9 +102,11 @@ export const loadProjectFromURL = async (
   });
 
   // Load Preview
-  previews.all.forEach((p) => {
-    if (exists(params[p.id])) p.load(params[p.id].value);
-  });
+  const previewEntry = previews.all.find((p) => exists(params[p.id]));
+  if (previewEntry) {
+    const previewInstance = await previews.load(previewEntry.id);
+    if (previewInstance) previewInstance.load(params[previewEntry.id].value);
+  }
 
   // Load Weather Source (added in v1.823)
   loadWeatherSource: if (exists(params.s)) {

@@ -25,15 +25,31 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '$lib/state/preview-state.svelte';
   import { project } from '$lib/state/project-state.svelte';
   import { downloadPreviewPNG } from '$lib/utils/preview-utils.svelte';
+  import { exists } from '$lib/utils/other-utils';
+  import { getProjectParametersFromURLHash } from '$lib/utils/project-utils.svelte';
   import { ImageIcon } from '@lucide/svelte';
   import { onMount } from 'svelte';
   import { Drawer } from 'vaul-svelte';
   import SendToGalleryButton from './buttons/SendToGalleryButton.svelte';
 
+  function initDefaultPreview() {
+    if (previews.activeId) return;
+
+    // If this is a saved/shared project whose URL hash names a preview,
+    // don't default to Rows here — loadProjectFromURL's restore path will
+    // load and activate the right one. Racing both loads could let whichever
+    // dynamic import resolves last win, clobbering the real preview.
+    const params = getProjectParametersFromURLHash(
+      window.location.hash.substring(1),
+    );
+    const hasPreviewParam = previews.all.some((p) => exists(params[p.id]));
+    if (project.onLoaded.isProject && hasPreviewParam) return;
+
+    previews.load('rows');
+  }
+
   onMount(() => {
-    if (!previews.activeId) {
-      previews.activeId = 'rows';
-    }
+    initDefaultPreview();
   });
 </script>
 

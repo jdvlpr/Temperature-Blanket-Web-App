@@ -23,6 +23,13 @@ interface SquareRoundsPreviewSettings extends BasePreviewSettings {
 
 export class SquareRoundsPreviewClass {
   constructor() {
+    // Seed the default layout border immediately from the current weather
+    // data length. This preview is now constructed lazily right as it
+    // becomes active, so the "not active" effect below would otherwise
+    // never get a chance to run before `previews.activeId` is set.
+    if (weather.data.length === 365) this.settings.layoutBorder = 1;
+    else if (weather.data.length === 366) this.settings.layoutBorder = 2;
+
     $effect.root(() => {
       // If a gauge is created or deleted, handle updating the available weather parameter targets
       $effect(() => {

@@ -39,7 +39,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 
   function onChangePattern(newId) {
-    previews.activeId = newId;
+    // Update optimistically so the select/thumbnails reflect the click
+    // immediately; the $effect below reconciles once previews.activeId
+    // catches up after the (possibly async) load resolves.
+    activePreviewSelectId = newId;
+    previews.load(newId);
   }
 
   onMount(() => {

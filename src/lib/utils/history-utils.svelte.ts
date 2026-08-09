@@ -27,7 +27,11 @@ import { getProjectParametersFromURLHash } from '$lib/utils/project-utils.svelte
 import { parseGaugeURLHash } from '$lib/utils/load-project-utils.svelte';
 import { seasonsFromUrlHash } from '$lib/utils/seasons-utils.svelte';
 
-export const loadFromHistory = ({ action }: { action: 'Undo' | 'Redo' }) => {
+export const loadFromHistory = async ({
+  action,
+}: {
+  action: 'Undo' | 'Redo';
+}) => {
   let oldHistoryState = project.history.current;
   let newHistoryState;
   if (action === 'Undo') {
@@ -42,6 +46,26 @@ export const loadFromHistory = ({ action }: { action: 'Undo' | 'Redo' }) => {
   const newParams = getProjectParametersFromURLHash(newHistoryState);
 
   let message = '';
+
+  // Resolve a preview change first (this is the only async step) so it
+  // settles before any of the synchronous mutations below, all of which
+  // feed the debounced updateHistory/URL push via `project.url`. Otherwise
+  // a slow chunk import could let a history entry be captured with the new
+  // gauges/settings but the still-loading (old) preview.
+  let previewChanged = false;
+  const previewEntry = previews.all.find((p) => exists(newParams[p.id]));
+  if (previewEntry) {
+    if (
+      !exists(oldParams[previewEntry.id]) ||
+      oldParams[previewEntry.id].value !== newParams[previewEntry.id].value
+    ) {
+      const previewInstance = await previews.load(previewEntry.id);
+      if (previewInstance) {
+        previewInstance.load(newParams[previewEntry.id].value);
+        previewChanged = true;
+      }
+    }
+  }
 
   // Change Weather Grouping
   if (exists(newParams.w)) {
@@ -128,17 +152,7 @@ export const loadFromHistory = ({ action }: { action: 'Undo' | 'Redo' }) => {
   }
 
   // Change Preview
-  previews.all.forEach((p) => {
-    if (exists(newParams[p.id])) {
-      if (
-        !exists(oldParams[p.id]) ||
-        oldParams[p.id].value !== newParams[p.id].value
-      ) {
-        p.load(newParams[p.id].value);
-        message = 'Preview';
-      }
-    }
-  });
+  if (previewChanged) message = 'Preview';
 
   if (message) {
     toast.trigger({
