@@ -25,9 +25,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     preferences.value.layout = e.value;
   }}
 >
-  <SegmentedControl.Control
-    class="bg-surface-100 dark:bg-surface-900 rounded-container border-0 shadow-sm"
-  >
+  <SegmentedControl.Control class="bg-surface-100 dark:bg-surface-900">
     <SegmentedControl.Indicator />
     <SegmentedControl.Item value="list">
       <SegmentedControl.ItemText

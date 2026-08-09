@@ -81,9 +81,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         category = e.value;
       }}
     >
-      <SegmentedControl.Control
-        class="bg-surface-100 dark:bg-surface-950 rounded-container border-none shadow-sm"
-      >
+      <SegmentedControl.Control class="bg-surface-100 dark:bg-surface-950">
         <SegmentedControl.Indicator />
         {#each categories as categoryItem}
           <SegmentedControl.Item value={categoryItem}>

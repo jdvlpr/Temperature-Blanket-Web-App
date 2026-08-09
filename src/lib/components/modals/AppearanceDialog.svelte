@@ -35,7 +35,7 @@
         }
       }}
     >
-      <SegmentedControl.Control class="bg-surface-100 dark:bg-surface-900 card">
+      <SegmentedControl.Control class="bg-surface-100 dark:bg-surface-900">
         <SegmentedControl.Indicator />
         {#each THEMES as { name, id, icon, description }}
           <SegmentedControl.Item value={id} title={description}>
@@ -106,9 +106,7 @@
           preferences.value.theme.roundness = e.value;
         }}
       >
-        <SegmentedControl.Control
-          class="bg-surface-100 dark:bg-surface-900 card"
-        >
+        <SegmentedControl.Control class="bg-surface-100 dark:bg-surface-900">
           <SegmentedControl.Indicator />
           {#each ROUNDNESS as { name, id, description }}
             <SegmentedControl.Item value={id} title={description}>
@@ -150,9 +148,7 @@
           preferences.value.theme.headingStyle = e.value;
         }}
       >
-        <SegmentedControl.Control
-          class="bg-surface-100 dark:bg-surface-900 card"
-        >
+        <SegmentedControl.Control class="bg-surface-100 dark:bg-surface-900">
           <SegmentedControl.Indicator />
           {#each HEADING_STYLE as { name, id, description, opsz, wght, SOFT, WONK }}
             <SegmentedControl.Item value={id} title={description}>
@@ -185,9 +181,7 @@
           preferences.value.theme.textScale = e.value;
         }}
       >
-        <SegmentedControl.Control
-          class="bg-surface-100 dark:bg-surface-900 card"
-        >
+        <SegmentedControl.Control class="bg-surface-100 dark:bg-surface-900">
           <SegmentedControl.Indicator />
           {#each TEXT_SCALE as { name, id, description, IconComponent }}
             <SegmentedControl.Item value={id} title={description}>
@@ -218,9 +212,7 @@
           preferences.value.theme.spacing = e.value;
         }}
       >
-        <SegmentedControl.Control
-          class="bg-surface-100 dark:bg-surface-900 card"
-        >
+        <SegmentedControl.Control class="bg-surface-100 dark:bg-surface-900">
           <SegmentedControl.Indicator />
           {#each SPACING as { name, id, description, IconComponent }}
             <SegmentedControl.Item value={id} title={description}>

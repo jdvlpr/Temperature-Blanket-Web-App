@@ -26,9 +26,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         weather.setGrouping(e.value);
       }}
     >
-      <SegmentedControl.Control
-        class="bg-surface-100 dark:bg-surface-900 rounded-container border-none shadow-sm"
-      >
+      <SegmentedControl.Control class="bg-surface-100 dark:bg-surface-900">
         <SegmentedControl.Indicator />
         <SegmentedControl.Item value="day"
           ><SegmentedControl.ItemText>Daily</SegmentedControl.ItemText>

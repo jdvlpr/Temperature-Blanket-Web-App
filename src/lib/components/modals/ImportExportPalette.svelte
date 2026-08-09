@@ -155,7 +155,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       }}
     >
       <SegmentedControl.Control
-        class="wrap bg-surface-200 dark:bg-surface-800 rounded-container mx-auto flex w-fit gap-y-2 border-none shadow-sm"
+        class="bg-surface-200 dark:bg-surface-800 mx-auto"
       >
         <SegmentedControl.Indicator />
         <SegmentedControl.Item value={'export'}

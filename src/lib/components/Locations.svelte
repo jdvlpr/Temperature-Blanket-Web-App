@@ -130,7 +130,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </div>
 
 <div
-  class="rounded-container bg-surface-100 dark:bg-surface-900 mx-auto mt-4 mb-2 flex max-w-(--breakpoint-md) flex-wrap justify-center gap-2 px-4 py-2 shadow-inner lg:mb-4"
+  class="rounded-base bg-surface-100 dark:bg-surface-900 mx-auto mt-4 mb-2 flex max-w-(--breakpoint-md) flex-wrap justify-center gap-2 px-4 py-2 shadow-inner lg:mb-4"
 >
   {#if locations.all.length < MAXIMUM_LOCATIONS}
     <button
