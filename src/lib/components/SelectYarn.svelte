@@ -188,6 +188,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   async function initYarnPicker() {
     await ensureYarnData();
+    if (!inputElement) return; // component was unmounted before yarn data resolved
     allYarns = getAllYarns(selectedYarnWeightId);
 
     if (selectedBrandId || selectedYarnId) {

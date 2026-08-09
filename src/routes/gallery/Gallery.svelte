@@ -77,8 +77,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       { threshold: 0 },
     );
 
-    if (typeof scrollContainer !== 'undefined')
-      scrollObserver.observe(scrollContainer);
+    if (scrollContainer) scrollObserver.observe(scrollContainer);
 
     const url = `${PUBLIC_WORDPRESS_BASE_URL}/wp-json/wp/v2/projects?_=${new Date().getTime()}`;
     const response = await fetch(url);
