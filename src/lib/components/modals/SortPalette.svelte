@@ -21,7 +21,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { getSortedPalette } from '$lib/utils/color-utils';
   import { ArrowDownWideNarrow, ArrowLeftRightIcon } from '@lucide/svelte';
 
-  let { colors, updateGauge } = $props();
+  let { colors: initialColors, updateGauge } = $props();
+
+  let colors = $state(initialColors);
 
   let sortColors = $state('custom');
 
@@ -91,7 +93,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <SaveAndCloseButtons
       onSave={() => {
         updateGauge({
-          colors: colors.map((n) => {
+          _colors: colors.map((n) => {
             delete n.id;
             return n;
           }),

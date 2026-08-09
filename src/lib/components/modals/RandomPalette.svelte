@@ -20,6 +20,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import SelectYarn from '$lib/components/SelectYarn.svelte';
   import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
   import StickyPart from '$lib/components/modals/StickyPart.svelte';
+  import Spinner from '$lib/components/Spinner.svelte';
   import { ensureYarnData } from '$lib/data/yarns/colorways.svelte';
   import { dialog } from '$lib/state/page-state.svelte';
   import { getColorways, getFilteredYarns } from '$lib/utils/yarn-utils';
@@ -57,6 +58,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   function getRandomColors() {
     debounce(() => {
+      // colorways is empty until the lazy-loaded yarn dataset resolves;
+      // bail out instead of generating colors with missing hex values
+      if (!colorways.length) return;
+
       const tempYarnColorways = [];
 
       // Create a set of existing color hex values for faster lookup
@@ -221,20 +226,27 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <StickyPart position="bottom">
   <div class="p-2 sm:p-4">
     <div class="">
-      {#key randomPalette}
-        <ColorPaletteEditable
-          canUserEditColor={false}
-          typeId="randomPalette"
-          bind:colors={randomPalette}
-          onchanged={(eventColors) => {
-            if (eventColors) randomPalette = eventColors;
-            numberOfColors = randomPalette.length;
-          }}
-        />
-      {/key}
+      {#if !yarnDataReady}
+        <div class="mx-auto my-6">
+          <Spinner />
+        </div>
+      {:else}
+        {#key randomPalette}
+          <ColorPaletteEditable
+            canUserEditColor={false}
+            typeId="randomPalette"
+            bind:colors={randomPalette}
+            onchanged={(eventColors) => {
+              if (eventColors) randomPalette = eventColors;
+              numberOfColors = randomPalette.length;
+            }}
+          />
+        {/key}
+      {/if}
     </div>
 
     <SaveAndCloseButtons
+      disabled={!yarnDataReady}
       onSave={() => {
         updateGauge({
           _colors: randomPalette.map((color) => {

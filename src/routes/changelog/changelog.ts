@@ -18,6 +18,7 @@ import { ICONS } from '$lib/constants/icon-constants';
 import type { ChangelogItemGroup } from '$lib/types/page-types';
 import {
   CloudCogIcon,
+  CogIcon,
   GlobeIcon,
   ImageIcon,
   MoonStarIcon,
@@ -31,6 +32,21 @@ export const entries: ChangelogItemGroup[] = [
   {
     year: 2026,
     months: [
+      {
+        month: 'August',
+        items: [
+          {
+            notes: [
+              {
+                IconComponent: CogIcon,
+                text: `Fixed an issue where sorting colors wasn't saving, and improved performance by only loading yarn colorway data when necessary.`,
+                title: 'Bug fixes & performance improvements',
+              },
+            ],
+            version: '6.0.13',
+          },
+        ],
+      },
       {
         month: 'July',
         items: [

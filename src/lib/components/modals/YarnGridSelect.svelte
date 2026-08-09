@@ -465,7 +465,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {/if}
   {/if}
 </div>
-{#if !results?.length && !loadingAllColors}
+{#if !yarnDataReady}
+  <div class="mx-auto my-6">
+    <Spinner />
+  </div>
+{:else if !results?.length && !loadingAllColors}
   <p class="text-center italic">No Matching Colorways</p>
 {/if}
 {#if showScrollToTopButton}
