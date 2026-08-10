@@ -13,7 +13,6 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { getColorName } from '$lib/utils/color-utils';
 import { getTextColor } from '$lib/utils/color-utils';
 import {
   getBrands,
@@ -68,42 +67,6 @@ export const stringToBrandAndYarnDetails = (text) => {
   return { brandId, yarnId, brandName, yarnName };
 };
 
-export const paletteContiansSomeNamedColorways = ({
-  palette,
-  brandId,
-  yarnId,
-}) => {
-  if (!palette || !brandId || !yarnId) return;
-  return palette.some((n) => {
-    const name = getColorName({
-      color: n,
-      brandId,
-      yarnId,
-      showGenericName: false,
-      showNamedHexCodes: false,
-    });
-    return !!name;
-  });
-};
-
-export const paletteContiansAllNamedColorways = ({
-  palette,
-  brandId,
-  yarnId,
-}) => {
-  if (!palette || !brandId || !yarnId) return;
-  return palette.every((n) => {
-    const name = getColorName({
-      color: n,
-      brandId,
-      yarnId,
-      showGenericName: false,
-      showNamedHexCodes: false,
-    });
-    return !!name;
-  });
-};
-
 export const getFilteredYarns = ({ selectedBrandId }) => {
   return selectedBrandId
     ? getBrands()?.filter((brand) => brand.id === selectedBrandId)[0]?.yarns
@@ -115,10 +78,11 @@ export const getColorways = ({
   selectedYarnId,
   selectedYarnWeightId,
 }) => {
-  return getColorwaysWithAffiliateLinks().filter((colorway) => {
-    if (!selectedBrandId) return true;
-    return colorway.brandId === selectedBrandId;
-  })
+  return getColorwaysWithAffiliateLinks()
+    .filter((colorway) => {
+      if (!selectedBrandId) return true;
+      return colorway.brandId === selectedBrandId;
+    })
     .filter((colorway) => {
       if (!selectedYarnId) return true;
       return colorway.yarnId === selectedYarnId;

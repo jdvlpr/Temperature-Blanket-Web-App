@@ -99,4 +99,122 @@ test.describe('Project Planner', () => {
       page.getByRole('button', { name: 'Download Image (PNG)' }),
     ).toBeVisible();
   });
+
+  test('Shared-URL preview restore and Undo/Redo (B2 async preview lazy-load)', async ({
+    page,
+    context,
+  }) => {
+    // Pre-seed the analytics-consent cookies so the app's persistent,
+    // non-auto-dismissing consent toast (bottom-anchored, same collision zone as
+    // the fixed bottom-section-nav tab bar) never renders and can't intercept
+    // clicks below -- re-navigate so this take effect on the page from
+    // `beforeEach`, not just pages created later in this test.
+    await context.addCookies([
+      { name: '_clck', value: '1', url: 'https://localhost:4173' },
+      { name: '_clsk', value: '1', url: 'https://localhost:4173' },
+    ]);
+    await page.goto('/');
+
+    // 1. Build a project with a non-default preview ("Rows" is the default; switch to "Calendar").
+    await page.getByPlaceholder('Enter a place').click();
+    await page.getByPlaceholder('Enter a place').fill('Austin');
+    await page
+      .getByRole('option', { name: 'Austin, Texas, United States' })
+      .click();
+    await page.getByRole('button', { name: 'Search', exact: true }).click();
+    await expect(page.getByText('°C / mm °F / in')).toBeVisible();
+
+    const toast = page.getByTestId('toast');
+    if (await toast.isVisible()) {
+      const closeButton = toast.locator('button').first();
+      if (await closeButton.isVisible()) {
+        await closeButton.click();
+        await page.waitForTimeout(200);
+      }
+    }
+
+    // The bottom section-nav tab bar renders exactly one button per section, but
+    // several other elements on the page also have "Weather"/"Colors"/"Preview"
+    // as a substring of their accessible name (e.g. "Weather Source: Open-Meteo"),
+    // so scope to the tab bar's own container instead of matching by name alone.
+    const tabBar = page.locator('#bottom-section-nav');
+    await tabBar.getByRole('button', { name: 'Colors', exact: true }).click();
+    await tabBar.getByRole('button', { name: 'Preview', exact: true }).click();
+    await page
+      .locator('#select-pattern-type')
+      .selectOption({ label: 'Calendar' });
+    await expect(page.locator('#select-pattern-type')).toHaveValue('clnr');
+
+    // 2. Save -- this is the app's own mechanism for writing the current project
+    // state into a shareable URL (SaveProjectModal calls replaceState on mount).
+    await page.getByRole('button', { name: 'Save', exact: true }).click();
+    await expect(
+      page.getByText(/Saved Locally|problem saving your project/),
+    ).toBeVisible();
+    const savedUrl = page.url();
+    expect(savedUrl).toContain('#');
+
+    // 3. Restore in a brand-new tab -- reusing the same tab can be intercepted by
+    // SvelteKit's client-side router as a same-document navigation and never
+    // re-run onMount/loadProjectFromURL, which would make this test pass
+    // vacuously even if the async restore path were broken. (Consent cookies
+    // seeded above already cover this new page -- they're context-scoped.)
+    const restoredPage = await context.newPage();
+    restoredPage.on('dialog', (dialog) => dialog.accept());
+    await restoredPage.goto(savedUrl);
+    // A restored project lands on the Location tab, not Weather -- confirm the
+    // restore actually happened before navigating to Colors/Preview.
+    await expect(
+      restoredPage.getByText('Loaded project and weather data'),
+    ).toBeVisible();
+
+    const restoredTabBar = restoredPage.locator('#bottom-section-nav');
+    await restoredTabBar
+      .getByRole('button', { name: 'Weather', exact: true })
+      .click();
+    await expect(restoredPage.getByText('°C / mm °F / in')).toBeVisible();
+
+    await restoredTabBar
+      .getByRole('button', { name: 'Colors', exact: true })
+      .click();
+    await restoredTabBar
+      .getByRole('button', { name: 'Preview', exact: true })
+      .click();
+    await expect(restoredPage.locator('#select-pattern-type')).toHaveValue(
+      'clnr',
+    );
+
+    // 4. Undo/Redo must both be disabled immediately after a fresh restore --
+    // no user edits have happened yet on this page.
+    const undoButton = restoredPage.locator('#undo');
+    const redoButton = restoredPage.locator('#redo');
+    await expect(undoButton).toBeDisabled();
+    await expect(redoButton).toBeDisabled();
+
+    // 5. Switching the pattern is a new edit -- Undo should enable, and Undo must
+    // restore the true pristine preview (Calendar), not a default/broken one.
+    await restoredPage
+      .locator('#select-pattern-type')
+      .selectOption({ label: 'Chevrons' });
+    await expect(restoredPage.locator('#select-pattern-type')).toHaveValue(
+      'chev',
+    );
+    await expect(undoButton).toBeEnabled();
+
+    await undoButton.click();
+    await expect(restoredPage.locator('#select-pattern-type')).toHaveValue(
+      'clnr',
+    );
+    await expect(undoButton).toBeDisabled();
+    await expect(redoButton).toBeEnabled();
+
+    // 6. Redo restores the discarded edit.
+    await redoButton.click();
+    await expect(restoredPage.locator('#select-pattern-type')).toHaveValue(
+      'chev',
+    );
+    await expect(redoButton).toBeDisabled();
+
+    await restoredPage.close();
+  });
 });

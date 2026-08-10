@@ -3,19 +3,8 @@ import {
   getColorPropertiesFromYarnStringAndHex,
   getColorways,
   getFilteredYarns,
-  paletteContiansAllNamedColorways,
-  paletteContiansSomeNamedColorways,
   stringToBrandAndYarnDetails,
 } from './yarn-utils';
-
-// Mock color-utils
-vi.mock('./color-utils', () => ({
-  getColorName: ({ color }: { color: string }) => {
-    if (color === '#ff0000') return 'Red';
-    if (color === '#0000ff') return 'Blue';
-    return undefined; // Green (#00ff00) returns undefined
-  },
-}));
 
 vi.mock('$lib/constants/seasons-constants', () => {
   return {
@@ -129,43 +118,6 @@ describe('yarn-utils', () => {
       expect(result!.hex).toBe('#ff0000');
       expect(result!.brandName).toBe('Brand 1');
       expect(result!.yarnName).toBe('Yarn 1');
-    });
-  });
-
-  describe('paletteContiansSomeNamedColorways', () => {
-    it('should return true if some colorways have names', () => {
-      const palette = ['#ff0000', '#00ff00'];
-      expect(
-        paletteContiansSomeNamedColorways({
-          palette: palette as any,
-          brandId: 'brand1',
-          yarnId: 'yarn1',
-        }),
-      ).toBe(true);
-    });
-  });
-
-  describe('paletteContiansAllNamedColorways', () => {
-    it('should return false if some colorways are missing names', () => {
-      const palette = ['#ff0000', '#00ff00'];
-      expect(
-        paletteContiansAllNamedColorways({
-          palette: palette as any,
-          brandId: 'brand1',
-          yarnId: 'yarn1',
-        }),
-      ).toBe(false); // Green is not in yarn1
-    });
-
-    it('should return true if all colorways have names', () => {
-      const palette = ['#ff0000'];
-      expect(
-        paletteContiansAllNamedColorways({
-          palette: palette as any,
-          brandId: 'brand1',
-          yarnId: 'yarn1',
-        }),
-      ).toBe(true);
     });
   });
 

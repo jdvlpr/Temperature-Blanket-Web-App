@@ -409,7 +409,7 @@ export const getColorName = ({
     });
   for (const colorway of yarn.colorways) {
     for (const item of colorway.colors) {
-      const delta = chroma.deltaE(color, item.color);
+      const delta = chroma.deltaE(color, item.hex);
       if (delta === 0) return item.name; // TODO: allow for setting the threshold?
     }
   }
