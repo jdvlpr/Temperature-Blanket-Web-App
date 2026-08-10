@@ -22,9 +22,33 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { stringToBrandAndYarnDetails } from '$lib/utils/yarn-utils';
   import { yarnBall } from '@lucide/lab';
   import { ChevronDownIcon, Icon, XIcon } from '@lucide/svelte';
-  import autocomplete from 'autocompleter';
+  import autocomplete, { type AutocompleteItem } from 'autocompleter';
   import { onMount, untrack } from 'svelte';
   import HelpIcon from './buttons/HelpIcon.svelte';
+
+  interface YarnMeta {
+    brandName: string;
+    brandId: string;
+    totalBrandYarns: number;
+    totalBrandColorways: number;
+    yarnName: string;
+    yarnId: string;
+    yarnWeightId: string | undefined;
+    numberOfColorways: number;
+    unavailable: boolean;
+  }
+
+  interface YarnGroupMeta {
+    brandName: string;
+    brandId: string;
+    totalBrandYarns: number;
+    totalBrandColorways: number;
+  }
+
+  interface YarnAutocompleteItem extends AutocompleteItem {
+    group: string;
+    meta: YarnMeta;
+  }
 
   interface Props {
     selectedBrandId?: string;
@@ -33,7 +57,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     context?: string;
     disabled?: boolean;
     preselectDefaultYarn?: boolean;
-    onselectautocomplete?;
+    onselectautocomplete?: (detail: {
+      selectedBrandId: string | undefined;
+      selectedYarnId: string | undefined;
+    }) => void;
   }
 
   let {
@@ -46,14 +73,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
     onselectautocomplete = () => {},
   }: Props = $props();
 
-  let inputElement = $state();
-  let autocompleteContainer = $state();
-  let inputGroup = $state();
+  let inputElement: HTMLInputElement | undefined = $state();
+  let autocompleteContainer: HTMLDivElement | undefined = $state();
+  let inputGroup: HTMLDivElement | undefined = $state();
   let forceDisplayAll = $state(false);
   let inputValue = $state('');
   let showingAutocomplete = $state(false);
 
-  let allYarns = $state(getAllYarns());
+  let allYarns: YarnAutocompleteItem[] = $state(getAllYarns());
 
   let isSelectedYarnUnavailable = $derived.by(() => {
     return allYarns.find(
@@ -72,7 +99,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
     }
   }
 
-  function getYarnValue({ brandId, yarnId }) {
+  function getYarnValue({
+    brandId,
+    yarnId,
+  }: {
+    brandId: string | undefined;
+    yarnId: string | undefined;
+  }) {
     let yarn = allYarns.find(
       (yarn) => yarn.meta.brandId === brandId && yarn.meta.yarnId === yarnId,
     );
@@ -87,12 +120,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
     yarn = allYarns.find((yarn) => yarn?.meta.brandId === brandId);
 
     if (yarn) {
-      const numberOfYarns = getBrands()
-        .find((brand) => brand.id === yarn.meta.brandId)
-        .yarns.filter((yarn) => {
-          if (!selectedYarnWeightId) return true;
-          return yarn.weightId === selectedYarnWeightId;
-        }).length;
+      const numberOfYarns =
+        getBrands()
+          .find((brand) => brand.id === yarn.meta.brandId)
+          ?.yarns.filter((yarn) => {
+            if (!selectedYarnWeightId) return true;
+            return yarn.weightId === selectedYarnWeightId;
+          }).length ?? 0;
 
       return `${yarn.meta.brandName} (${numberOfYarns} ${pluralize(
         'yarn',
@@ -103,28 +137,33 @@ If not, see <https://www.gnu.org/licenses/>. -->
     return '';
   }
 
-  function getSearchText(text) {
-    if (text.includes('(')) {
-      text = text.split('(')[0].trim();
+  function getSearchText(text: string): string | string[] {
+    let result: string | string[] = text;
+    if (typeof result === 'string' && result.includes('(')) {
+      result = result.split('(')[0].trim();
     }
-    if (text.includes('-')) {
-      text = text.split('-');
+    if (typeof result === 'string' && result.includes('-')) {
+      result = result.split('-');
     }
-    if (text.includes(',')) {
-      text = text.split(',');
+    if (typeof result === 'string' && result.includes(',')) {
+      result = result.split(',');
     }
-    return text;
+    return result;
   }
 
-  function matches(find, n) {
-    find = find?.toLowerCase().trim() || null;
+  function matches(
+    find: string | undefined,
+    n: { meta?: { brandName?: string; yarnName?: string } },
+  ) {
+    const search = find?.toLowerCase().trim() || null;
+    if (!search) return false;
     return (
-      n.meta?.brandName?.toLowerCase().includes(find) ||
-      n.meta?.yarnName?.toLowerCase().includes(find)
+      !!n.meta?.brandName?.toLowerCase().includes(search) ||
+      !!n.meta?.yarnName?.toLowerCase().includes(search)
     );
   }
 
-  function boldMe(string, searchText) {
+  function boldMe(string: string, searchText: string | string[]) {
     const regex = new RegExp(`(${searchText})`, 'gi'); // Case-insensitive search
     return string.replace(
       regex,
@@ -207,17 +246,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
       });
     }
 
-    autocomplete({
+    autocomplete<YarnAutocompleteItem>({
       onSelect: function (item, input) {
         inputValue = `${item.meta.brandName} - ${item.meta.yarnName}${
           item.meta.yarnWeightId
-            ? ` (${ALL_YARN_WEIGHTS.find((y) => y.id === item.meta.yarnWeightId).name})`
+            ? ` (${ALL_YARN_WEIGHTS.find((y) => y.id === item.meta.yarnWeightId)?.name})`
             : ''
         }`;
         selectedBrandId = item.meta.brandId;
         selectedYarnId = item.meta.yarnId;
         showingAutocomplete = false;
-        inputElement.blur();
+        inputElement?.blur();
         onselectautocomplete({
           selectedBrandId,
           selectedYarnId,
@@ -253,7 +292,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         let yarn = item.meta.yarnName;
 
         let yarnWeight = item.meta.yarnWeightId
-          ? ALL_YARN_WEIGHTS.find((y) => y.id === item.meta.yarnWeightId).name
+          ? ALL_YARN_WEIGHTS.find((y) => y.id === item.meta.yarnWeightId)?.name
           : null;
 
         if (currentValue) {
@@ -281,7 +320,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       },
       renderGroup: function (groupName, currentValue) {
         var div = document.createElement('div');
-        const meta = JSON.parse(groupName);
+        const meta = JSON.parse(groupName) as YarnGroupMeta;
         const item = { meta };
 
         let { brandName, brandId, totalBrandColorways, totalBrandYarns } = meta;
@@ -308,7 +347,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         div.classList.add('selectable-yarn-list-item');
         div.onclick = (e) => {
           e.preventDefault();
-          inputElement.blur();
+          inputElement?.blur();
           inputValue = `${meta.brandName} (${totalBrandYarns} ${pluralize('yarn', +totalBrandYarns)})`;
           selectedBrandId = brandId;
           selectedYarnId = '';
@@ -328,7 +367,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
           if (typeof searchText !== 'string' && searchText.length === 2) {
             return matches(searchText[0], n) || matches(searchText[1], n);
           } else {
-            return matches(searchText, n);
+            return matches(
+              typeof searchText === 'string' ? searchText : undefined,
+              n,
+            );
           }
         });
         update(suggestions);
@@ -373,7 +415,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
         if (selectedBrandId && selectedYarnId) {
           await delay(100);
-          const element = document.querySelector(
+          const element = document.querySelector<HTMLElement>(
             `[data-id="${selectedBrandId}-${selectedYarnId}"]`,
           );
           if (element) {
@@ -389,7 +431,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           }
         } else if (selectedBrandId) {
           await delay(100);
-          const element = document.querySelector(
+          const element = document.querySelector<HTMLElement>(
             `[data-id="${selectedBrandId}"]`,
           );
           if (element) {
@@ -424,7 +466,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         class="ig-btn hover:preset-tonal-surface"
         onclick={() => {
           forceDisplayAll = true;
-          inputElement.focus();
+          inputElement?.focus();
         }}
       >
         <ChevronDownIcon />

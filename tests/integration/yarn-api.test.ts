@@ -15,8 +15,10 @@
 
 import fetch from 'node-fetch';
 import { describe, expect, test } from 'vitest';
-import routes from './.svelte-kit/cloudflare/_routes.json';
+import routes from '../../.svelte-kit/cloudflare/_routes.json';
 import fs from 'node:fs';
+
+type ApiResponse<T> = { data: T[]; meta: unknown };
 
 // Constants for base URL
 const PORT = 5180;
@@ -33,7 +35,14 @@ const BASE_URL = process.env.TEST_BASE_URL || `${PROTOCOL}://${HOST}:${PORT}`;
 describe('Yarn Colorways API', () => {
   test('Endpoint /colorways', async () => {
     const response = await fetch(`${BASE_URL}/api/yarn-colorways/v1/colorways`);
-    const data = await response.json();
+    const data = (await response.json()) as ApiResponse<{
+      hex: string;
+      name: string;
+      brandId: string;
+      yarnId: string;
+      yarnName: string;
+      yarnWeightId: string;
+    }>;
 
     expect(response.status).toBe(200);
     expect(data).toHaveProperty('data');
@@ -50,7 +59,14 @@ describe('Yarn Colorways API', () => {
     const response = await fetch(
       `${BASE_URL}/api/yarn-colorways/v1/match/green`,
     );
-    const data = await response.json();
+    const data = (await response.json()) as ApiResponse<{
+      hex: string;
+      name: string;
+      brandId: string;
+      yarnId: string;
+      yarnName: string;
+      yarnWeightId: string;
+    }>;
 
     expect(response.status).toBe(200);
     expect(data).toHaveProperty('data');
@@ -65,7 +81,11 @@ describe('Yarn Colorways API', () => {
 
   test('Endpoint /brands', async () => {
     const response = await fetch(`${BASE_URL}/api/yarn-colorways/v1/brands`);
-    const data = await response.json();
+    const data = (await response.json()) as ApiResponse<{
+      brandId: string;
+      brandName: string;
+      yarns: unknown;
+    }>;
 
     expect(response.status).toBe(200);
     expect(data).toHaveProperty('data');
@@ -77,7 +97,11 @@ describe('Yarn Colorways API', () => {
 
   test('Endpoint /yarns', async () => {
     const response = await fetch(`${BASE_URL}/api/yarn-colorways/v1/yarns`);
-    const data = await response.json();
+    const data = (await response.json()) as ApiResponse<{
+      yarnId: string;
+      yarnName: string;
+      colorways: unknown;
+    }>;
 
     expect(response.status).toBe(200);
     expect(data).toHaveProperty('data');
@@ -89,7 +113,11 @@ describe('Yarn Colorways API', () => {
 
   test('Endpoint /weights', async () => {
     const response = await fetch(`${BASE_URL}/api/yarn-colorways/v1/weights`);
-    const data = await response.json();
+    const data = (await response.json()) as ApiResponse<{
+      id: string;
+      name: string;
+      yarns: unknown;
+    }>;
 
     expect(response.status).toBe(200);
     expect(data).toHaveProperty('data');
@@ -109,7 +137,13 @@ describe('Yarn Colorways API', () => {
   // v2 endpoint tests
   test('Endpoint v3 /colorways', async () => {
     const response = await fetch(`${BASE_URL}/api/yarn-colorways/v3/colorways`);
-    const data = await response.json();
+    const data = (await response.json()) as ApiResponse<{
+      hex: string;
+      name: string;
+      brandId: string;
+      yarnId: string;
+      yarnWeightId: string;
+    }>;
 
     expect(response.status).toBe(200);
     expect(data).toHaveProperty('data');
@@ -125,12 +159,12 @@ describe('Yarn Colorways API', () => {
     const response = await fetch(
       `${BASE_URL}/api/yarn-colorways/v3/colorways?name=blue`,
     );
-    const data = await response.json();
+    const data = (await response.json()) as ApiResponse<{ name: string }>;
 
     expect(response.status).toBe(200);
     expect(data).toHaveProperty('data');
     // All results should have names containing "blue" (case-insensitive)
-    data.data.forEach((colorway: { name: string }) => {
+    data.data.forEach((colorway) => {
       expect(colorway.name.toLowerCase()).toContain('blue');
     });
   });
@@ -139,12 +173,12 @@ describe('Yarn Colorways API', () => {
     const response = await fetch(
       `${BASE_URL}/api/yarn-colorways/v3/colorways?name=blue&exactName=true`,
     );
-    const data = await response.json();
+    const data = (await response.json()) as ApiResponse<{ name: string }>;
 
     expect(response.status).toBe(200);
     expect(data).toHaveProperty('data');
     // All results should have names exactly equal to "blue" (case-insensitive)
-    data.data.forEach((colorway: { name: string }) => {
+    data.data.forEach((colorway) => {
       expect(colorway.name.toLowerCase()).toBe('blue');
     });
   });
@@ -153,7 +187,10 @@ describe('Yarn Colorways API', () => {
     const response = await fetch(
       `${BASE_URL}/api/yarn-colorways/v3/match/green`,
     );
-    const data = await response.json();
+    const data = (await response.json()) as ApiResponse<{
+      delta: number;
+      percentMatch: number;
+    }>;
 
     expect(response.status).toBe(200);
     expect(data).toHaveProperty('data');
@@ -166,19 +203,19 @@ describe('Yarn Colorways API', () => {
     const response = await fetch(
       `${BASE_URL}/api/yarn-colorways/v3/match/green?name=green`,
     );
-    const data = await response.json();
+    const data = (await response.json()) as ApiResponse<{ name: string }>;
 
     expect(response.status).toBe(200);
     expect(data).toHaveProperty('data');
     // All results should have names containing "green" (case-insensitive)
-    data.data.forEach((colorway: { name: string }) => {
+    data.data.forEach((colorway) => {
       expect(colorway.name.toLowerCase()).toContain('green');
     });
   });
 
   test('Endpoint v3 /brands', async () => {
     const response = await fetch(`${BASE_URL}/api/yarn-colorways/v3/brands`);
-    const data = await response.json();
+    const data = (await response.json()) as ApiResponse<{ brandId: string }>;
 
     expect(response.status).toBe(200);
     expect(data).toHaveProperty('data');
@@ -188,7 +225,7 @@ describe('Yarn Colorways API', () => {
 
   test('Endpoint v3 /yarns', async () => {
     const response = await fetch(`${BASE_URL}/api/yarn-colorways/v3/yarns`);
-    const data = await response.json();
+    const data = (await response.json()) as ApiResponse<{ yarnId: string }>;
 
     expect(response.status).toBe(200);
     expect(data).toHaveProperty('data');
@@ -198,7 +235,7 @@ describe('Yarn Colorways API', () => {
 
   test('Endpoint v3 /weights', async () => {
     const response = await fetch(`${BASE_URL}/api/yarn-colorways/v3/weights`);
-    const data = await response.json();
+    const data = (await response.json()) as ApiResponse<{ id: string }>;
 
     expect(response.status).toBe(200);
     expect(data).toHaveProperty('data');

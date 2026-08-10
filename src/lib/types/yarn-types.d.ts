@@ -132,6 +132,8 @@ export interface Color {
   href?: string;
   variant_href?: string;
   affiliate_variant_href?: string | null;
+  unavailable?: boolean;
+  unavailableDate?: TISO8601DateString;
   //* Id used for draggable sorting */
   id?: number;
   locked?: boolean;

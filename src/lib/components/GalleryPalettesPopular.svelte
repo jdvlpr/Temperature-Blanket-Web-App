@@ -13,16 +13,18 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script module>
+<script module lang="ts">
+  import type { PopularProject } from '$lib/utils/gallery-utils';
+
   class GalleryPalettesPopularState {
-    projects = $state([]);
+    projects: PopularProject[] = $state([]);
     months = $state(0.25);
   }
 
   export const galleryPalettesPopularState = new GalleryPalettesPopularState();
 </script>
 
-<script>
+<script lang="ts">
   import ColorPalette from '$lib/components/ColorPalette.svelte';
   import PlaceholderPalettes from '$lib/components/PlaceholderPalettes.svelte';
   import { allGaugesAttributes } from '$lib/state/gauges-state.svelte';
@@ -30,22 +32,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
     fetchPopularProjects,
     recordPageView,
   } from '$lib/utils/gallery-utils';
+  import type { GalleryPalette } from '$lib/utils/color-utils';
   import { getColorsFromInput } from '$lib/utils/color-utils';
   import {
     getProjectParametersFromURLHash,
     getTitleFromLocationsMeta,
   } from '$lib/utils/project-utils.svelte';
   import { pluralize } from '$lib/utils/string-utils';
-  import { getContext, onMount } from 'svelte';
+  import { onMount } from 'svelte';
   import { ClockIcon } from '@lucide/svelte';
-
-  let close = $state(null);
-  if (typeof getContext === 'function')
-    close = getContext('simple-modal')?.close;
 
   let { updateGauge } = $props();
 
-  let palettes = $state([]);
+  let palettes: GalleryPalette[] = $state([]);
   let loading = $state(true);
 
   onMount(async () => {
@@ -59,63 +58,74 @@ If not, see <https://www.gnu.org/licenses/>. -->
     } else loading = false;
   });
 
-  function getPalettesFromPopularProjects(projects) {
-    let _palettes = [];
+  function getPalettesFromPopularProjects(
+    projects: PopularProject[],
+  ): GalleryPalette[] {
+    let _palettes: GalleryPalette[] = [];
     // {#each $popularProjects as { title, date, featured_image_src, id }}
     projects.forEach((project) => {
       const params = getProjectParametersFromURLHash(
         new URL(project.meta.project_url).hash.substring(1),
       );
 
-      JSON.parse(project.meta.yarn_urls).forEach((yarn_url, i) => {
-        const isNotPresetScheme = allGaugesAttributes.every(
-          (p) => !params?.[p.id]?.value?.includes('~'),
-        );
-        const colors = getColorsFromInput({
-          string: yarn_url,
-        });
-        const someColorsAreYarn = colors?.some(
-          (color) => color?.name && color?.brandName && color?.yarnName,
-        );
-        const isUniquePalette = !_palettes
-          .map((palette) => JSON.stringify(palette.colors))
-          .includes(JSON.stringify(colors));
+      (JSON.parse(project.meta.yarn_urls) as string[]).forEach(
+        (yarn_url, i) => {
+          const isNotPresetScheme = allGaugesAttributes.every(
+            (p) => !params?.[p.id]?.value?.includes('~'),
+          );
+          const colors = getColorsFromInput({
+            string: yarn_url,
+          });
+          const someColorsAreYarn =
+            colors &&
+            colors.some(
+              (color) => color?.name && color?.brandName && color?.yarnName,
+            );
+          const isUniquePalette = !_palettes
+            .map((palette) => JSON.stringify(palette.colors))
+            .includes(JSON.stringify(colors));
 
-        if (isNotPresetScheme && someColorsAreYarn && isUniquePalette) {
-          const title = getTitleFromLocationsMeta(project.meta.locations);
+          if (
+            isNotPresetScheme &&
+            someColorsAreYarn &&
+            isUniquePalette &&
+            colors
+          ) {
+            const title = getTitleFromLocationsMeta(project.meta.locations);
 
-          // Check that the colors are not already in the palettes array
-          let schemeName =
-            "<div class='flex flex-wrap justify-start items-center gap-x-4 text-xs'>";
-          schemeName += '<p class="line-clamp-1">'; // start line-clamp-1
-          schemeName += `<span class="mr-4">${colors.length} ${pluralize('color', colors.length)}</span>`;
-          let yarnDetails = colors
-            .filter((color) => color?.brandId && color?.yarnId)
-            .map((color) => {
-              return color.brandName + ' - ' + color.yarnName;
-            });
-          if (yarnDetails.length) {
-            yarnDetails = [...new Set([...yarnDetails])];
-            yarnDetails.forEach((yarnDetail, index, allitems) => {
-              schemeName += `${yarnDetail}`;
-              if (index + 1 !== allitems.length) schemeName += ', ';
+            // Check that the colors are not already in the palettes array
+            let schemeName =
+              "<div class='flex flex-wrap justify-start items-center gap-x-4 text-xs'>";
+            schemeName += '<p class="line-clamp-1">'; // start line-clamp-1
+            schemeName += `<span class="mr-4">${colors.length} ${pluralize('color', colors.length)}</span>`;
+            let yarnDetails = colors
+              .filter((color) => color?.brandId && color?.yarnId)
+              .map((color) => {
+                return color.brandName + ' - ' + color.yarnName;
+              });
+            if (yarnDetails.length) {
+              yarnDetails = [...new Set([...yarnDetails])];
+              yarnDetails.forEach((yarnDetail, index, allitems) => {
+                schemeName += `${yarnDetail}`;
+                if (index + 1 !== allitems.length) schemeName += ', ';
+              });
+            }
+            schemeName += '</p>'; // end line-clamp-1
+
+            schemeName += `<a href="/gallery/${
+              project.id
+            }" target="_blank" rel="noreferrer" class="underline line-clamp-1" title="Open Project Preview Page" onclick="event.stopPropagation()"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-external-link size-4 inline"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
+<span class="whitespace-pre-wrap">${title} ${i > 0 ? ` - ${i + 1}` : ''}</span></a>`;
+            schemeName += '</div>';
+
+            _palettes.push({
+              colors,
+              projectId: project.id,
+              schemeName,
             });
           }
-          schemeName += '</p>'; // end line-clamp-1
-
-          schemeName += `<a href="/gallery/${
-            project.id
-          }" target="_blank" rel="noreferrer" class="underline line-clamp-1" title="Open Project Preview Page" onclick="event.stopPropagation()"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-external-link size-4 inline"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
-<span class="whitespace-pre-wrap">${title} ${i > 0 ? ` - ${i + 1}` : ''}</span></a>`;
-          schemeName += '</div>';
-
-          _palettes.push({
-            colors,
-            projectId: project.id,
-            schemeName,
-          });
-        }
-      });
+        },
+      );
     });
     return _palettes;
   }
@@ -178,7 +188,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
               _colors: colors,
               _schemeId: 'Custom',
             });
-            if (close) close();
           }}
           title="Use This Palette"
         >

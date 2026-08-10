@@ -20,11 +20,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ToTopButton from '$lib/components/buttons/ToTopButton.svelte';
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
   import { allGaugesAttributes } from '$lib/state/gauges-state.svelte';
+  import type { PopularProject } from '$lib/utils/gallery-utils';
   import {
     fetchPopularProjects,
     fetchProjects,
     recordPageView,
   } from '$lib/utils/gallery-utils';
+  import type { GalleryPalette } from '$lib/utils/color-utils';
   import {
     getColorsFromInput,
     getPalettesFromProjects,
@@ -48,7 +50,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let first = 40;
   let loading = $state(true);
-  let scrollContainer = $state();
+  let scrollContainer: HTMLDivElement | undefined = $state();
   let showScrollToTopButton = $state(false);
 
   onMount(async () => {
@@ -156,9 +158,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     );
   }
 
-  function getPalettesFromPopularProjects(projects) {
+  function getPalettesFromPopularProjects(
+    projects: PopularProject[],
+  ): GalleryPalette[] {
     if (!projects.length) return [];
-    let _palettes = [];
+    let _palettes: GalleryPalette[] = [];
 
     const MIN_COLORS = 3;
     projects.forEach((project) => {
@@ -166,60 +170,65 @@ If not, see <https://www.gnu.org/licenses/>. -->
         new URL(project.meta.project_url).hash.substring(1),
       );
 
-      JSON.parse(project.meta.yarn_urls).forEach((yarn_url, i) => {
-        const isNotPresetScheme = allGaugesAttributes.every(
-          (p) => !params?.[p.id]?.value?.includes('~'),
-        );
-        const colors = getColorsFromInput({
-          string: yarn_url,
-        });
-        const someColorsAreYarn = colors?.some(
-          (color) => color?.name && color?.brandName && color?.yarnName,
-        );
-        const isUniquePalette = !_palettes
-          .map((palette) => JSON.stringify(palette.colors))
-          .includes(JSON.stringify(colors));
+      (JSON.parse(project.meta.yarn_urls) as string[]).forEach(
+        (yarn_url, i) => {
+          const isNotPresetScheme = allGaugesAttributes.every(
+            (p) => !params?.[p.id]?.value?.includes('~'),
+          );
+          const colors = getColorsFromInput({
+            string: yarn_url,
+          });
+          const someColorsAreYarn =
+            colors &&
+            colors.some(
+              (color) => color?.name && color?.brandName && color?.yarnName,
+            );
+          const isUniquePalette = !_palettes
+            .map((palette) => JSON.stringify(palette.colors))
+            .includes(JSON.stringify(colors));
 
-        const hasEnoughColors = colors?.length > MIN_COLORS;
+          const hasEnoughColors = !!colors && colors.length > MIN_COLORS;
 
-        if (
-          isNotPresetScheme &&
-          someColorsAreYarn &&
-          isUniquePalette &&
-          hasEnoughColors
-        ) {
-          const title = getTitleFromLocationsMeta(project.meta.locations);
-          let schemeName =
-            "<div class='flex flex-wrap justify-start items-center gap-x-4 text-xs'>";
-          schemeName += '<p class="line-clamp-1">'; // start line-clamp-1
-          schemeName += `<span class="mr-4">${colors.length} ${pluralize('color', colors.length)}</span>`;
-          let yarnDetails = colors
-            .filter((color) => color?.brandId && color?.yarnId)
-            .map((color) => {
-              return color.brandName + ' - ' + color.yarnName;
-            });
-          if (yarnDetails.length) {
-            yarnDetails = [...new Set([...yarnDetails])];
-            yarnDetails.forEach((yarnDetail, index, allitems) => {
-              schemeName += `${yarnDetail}`;
-              if (index + 1 !== allitems.length) schemeName += ', ';
+          if (
+            isNotPresetScheme &&
+            someColorsAreYarn &&
+            isUniquePalette &&
+            hasEnoughColors &&
+            colors
+          ) {
+            const title = getTitleFromLocationsMeta(project.meta.locations);
+            let schemeName =
+              "<div class='flex flex-wrap justify-start items-center gap-x-4 text-xs'>";
+            schemeName += '<p class="line-clamp-1">'; // start line-clamp-1
+            schemeName += `<span class="mr-4">${colors.length} ${pluralize('color', colors.length)}</span>`;
+            let yarnDetails = colors
+              .filter((color) => color?.brandId && color?.yarnId)
+              .map((color) => {
+                return color.brandName + ' - ' + color.yarnName;
+              });
+            if (yarnDetails.length) {
+              yarnDetails = [...new Set([...yarnDetails])];
+              yarnDetails.forEach((yarnDetail, index, allitems) => {
+                schemeName += `${yarnDetail}`;
+                if (index + 1 !== allitems.length) schemeName += ', ';
+              });
+            }
+            schemeName += '</p>'; // end line-clamp-2
+
+            schemeName += `<a href="/gallery/${
+              project.id
+            }" target="_blank" rel="noreferrer" class="underline line-clamp-1" title="Open Project Preview Page" onclick="event.stopPropagation()"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-external-link size-4 inline"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
+<span class="whitespace-pre-wrap">${title} ${i > 0 ? ` - ${i + 1}` : ''}</span></a>`;
+            schemeName += '</div>';
+
+            _palettes.push({
+              colors,
+              projectId: project.id,
+              schemeName,
             });
           }
-          schemeName += '</p>'; // end line-clamp-2
-
-          schemeName += `<a href="/gallery/${
-            project.id
-          }" target="_blank" rel="noreferrer" class="underline line-clamp-1" title="Open Project Preview Page" onclick="event.stopPropagation()"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-external-link size-4 inline"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
-<span class="whitespace-pre-wrap">${title} ${i > 0 ? ` - ${i + 1}` : ''}</span></a>`;
-          schemeName += '</div>';
-
-          _palettes.push({
-            colors,
-            projectId: project.id,
-            schemeName,
-          });
-        }
-      });
+        },
+      );
     });
     return _palettes;
   }
@@ -425,7 +434,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 {#if showScrollToTopButton && yarnPaletteGalleryState.projects.length}
   <ToTopButton
     onClick={() => {
-      scrollContainer.scrollIntoView({
+      scrollContainer?.scrollIntoView({
         behavior: 'smooth',
         block: 'start',
       });

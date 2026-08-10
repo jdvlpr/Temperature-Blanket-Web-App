@@ -13,7 +13,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script>
+<script lang="ts">
   import ColorPaletteEditable from '$lib/components/ColorPaletteEditable.svelte';
   import DefaultYarnSet from '$lib/components/DefaultYarnSet.svelte';
   import SelectNumberOfColors from '$lib/components/SelectNumberOfColors.svelte';
@@ -26,6 +26,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { getColorways, getFilteredYarns } from '$lib/utils/yarn-utils';
   import { getSortedPalette } from '$lib/utils/color-utils';
   import { pickRandomFromArray } from '$lib/utils/number-utils';
+  import type { Color } from '$lib/types/yarn-types';
   import {
     ArrowDownWideNarrowIcon,
     ExternalLinkIcon,
@@ -44,15 +45,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
     });
   });
 
-  let debounceTimer;
-  const debounce = (callback, time) => {
+  let debounceTimer: number | undefined;
+  const debounce = (callback: () => void, time: number) => {
     window.clearTimeout(debounceTimer);
     debounceTimer = window.setTimeout(callback, time);
   };
 
-  let randomPalette = $state([getRandomColors()]);
-  let selectedBrandId = $state();
-  let selectedYarnId = $state();
+  let randomPalette: Color[] = $state([]);
+  let selectedBrandId = $state<string | undefined>();
+  let selectedYarnId = $state<string | undefined>();
   let selectedYarnWeightId = $state('');
   let sortColors = $state('light-to-dark');
 
@@ -62,7 +63,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       // bail out instead of generating colors with missing hex values
       if (!colorways.length) return;
 
-      const tempYarnColorways = [];
+      const tempYarnColorways: Color[] = [];
 
       // Create a set of existing color hex values for faster lookup
       const existingColorways = new Set();
@@ -73,17 +74,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
       while (tempYarnColorways.length < numberOfColors) {
         // Check if the current index has a locked color
         const currentIndex = tempYarnColorways.length;
-        let color;
-        if (randomPalette[currentIndex]?.locked) {
+        let color: Color;
+        const lockedColor = randomPalette[currentIndex];
+        if (lockedColor?.locked) {
           // Use the locked color instead of a random one
-          color = randomPalette[currentIndex];
+          color = lockedColor;
           const colorId = `${color.hex}-${color.name}-${color.brandId}-${color.yarnId}`;
           tempYarnColorways.push(color);
           existingColorways.add(colorId);
         } else {
           // Get a random color from the colorways array
           color = {
-            ...pickRandomFromArray({
+            ...pickRandomFromArray<Color>({
               array: colorways,
             }),
           };
@@ -135,10 +137,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <svelte:window
   onkeydown={(e) => {
     if (
-      e.target.tagName === 'INPUT' ||
-      e.target.tagName === 'TD' ||
-      e.target.tagName === 'SELECT' ||
-      e.target.tagName === 'BUTTON'
+      e.target instanceof HTMLElement &&
+      (e.target.tagName === 'INPUT' ||
+        e.target.tagName === 'TD' ||
+        e.target.tagName === 'SELECT' ||
+        e.target.tagName === 'BUTTON')
     )
       return;
     if (e.key === 'r') {
@@ -182,7 +185,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <SelectNumberOfColors
         {numberOfColors}
         max={99}
-        onchange={(e) => (numberOfColors = +e.target.value)}
+        onchange={(e) =>
+          (numberOfColors = +(e.target as HTMLSelectElement).value)}
       />
     </div>
 
@@ -234,9 +238,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {#key randomPalette}
           <ColorPaletteEditable
             canUserEditColor={false}
-            typeId="randomPalette"
             bind:colors={randomPalette}
-            onchanged={(eventColors) => {
+            onchanged={(eventColors: Color[] | undefined) => {
               if (eventColors) randomPalette = eventColors;
               numberOfColors = randomPalette.length;
             }}

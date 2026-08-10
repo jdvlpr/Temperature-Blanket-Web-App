@@ -1,3 +1,10 @@
+import type { GalleryPalette } from '$lib/utils/color-utils';
+import type {
+  GalleryPageInfo,
+  GalleryProjectNode,
+  PopularProject,
+} from '$lib/utils/gallery-utils';
+
 class GalleryState {
   search = $state('');
   filteredYarn = $state(null);
@@ -6,10 +13,10 @@ class GalleryState {
   palettesContainOnlyFilteredYarn = $state(false);
   filteredPatternType = $state('');
   orderBy = $state('DESC');
-  projects = $state([]);
-  displayedProjects = $state([]);
-  popularProjects = $state([]);
-  gallery = $state({});
+  projects: GalleryProjectNode[] = $state([]);
+  displayedProjects: GalleryProjectNode[] = $state([]);
+  popularProjects: PopularProject[] = $state([]);
+  gallery: { pageInfo?: GalleryPageInfo } = $state({});
   timePeriod = $state(0.25);
 
   getYarnSearch = ({
@@ -32,10 +39,10 @@ class YarnPaletteGalleryState {
   filteredYarnId = $state('');
   palettesContainOnlyFilteredYarn = $state(false);
   orderBy = $state('DESC');
-  projects = $state([]);
-  palettes = $state([]);
-  popularPalettes = $state([]);
-  gallery = $state({});
+  projects: GalleryProjectNode[] = $state([]);
+  palettes: GalleryPalette[] = $state([]);
+  popularPalettes: GalleryPalette[] = $state([]);
+  gallery: { pageInfo?: GalleryPageInfo } = $state({});
   timePeriod = $state(0.25);
 
   getYarnSearch = ({

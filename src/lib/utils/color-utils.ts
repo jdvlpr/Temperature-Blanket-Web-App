@@ -531,11 +531,7 @@ export const sortColorsDarktoLight = ({
   return sortedColors;
 };
 
-export const sortColorsByName = ({
-  colors,
-}: {
-  colors: Color[];
-}): Color[] => {
+export const sortColorsByName = ({ colors }: { colors: Color[] }): Color[] => {
   const unlockedColors = colors
     .filter((color) => !color?.locked)
     .sort((a, b) => {
@@ -614,7 +610,7 @@ type GalleryProjectSummary = {
   databaseId: string | number;
 };
 
-type GalleryPalette = {
+export type GalleryPalette = {
   colors: Color[];
   projectId: string | number;
   schemeName: string;
@@ -655,26 +651,30 @@ export const getPalettesFromProjects = ({
       let hasSelectedBrandAndYarn = true;
       if (selectedBrandId && selectedYarnId) {
         if (palettesContainOnlyFilteredYarn)
-          hasSelectedBrandAndYarn = !!colors && colors.every(
-            (color) =>
-              color?.brandId === selectedBrandId &&
-              color?.yarnId === selectedYarnId,
-          );
+          hasSelectedBrandAndYarn =
+            !!colors &&
+            colors.every(
+              (color) =>
+                color?.brandId === selectedBrandId &&
+                color?.yarnId === selectedYarnId,
+            );
         else
-          hasSelectedBrandAndYarn = !!colors && colors.some(
-            (color) =>
-              color?.brandId === selectedBrandId &&
-              color?.yarnId === selectedYarnId,
-          );
+          hasSelectedBrandAndYarn =
+            !!colors &&
+            colors.some(
+              (color) =>
+                color?.brandId === selectedBrandId &&
+                color?.yarnId === selectedYarnId,
+            );
       } else if (selectedBrandId) {
         if (palettesContainOnlyFilteredYarn)
-          hasSelectedBrandAndYarn = !!colors && colors.every(
-            (color) => color?.brandId === selectedBrandId,
-          );
+          hasSelectedBrandAndYarn =
+            !!colors &&
+            colors.every((color) => color?.brandId === selectedBrandId);
         else
-          hasSelectedBrandAndYarn = !!colors && colors.some(
-            (color) => color?.brandId === selectedBrandId,
-          );
+          hasSelectedBrandAndYarn =
+            !!colors &&
+            colors.some((color) => color?.brandId === selectedBrandId);
       }
 
       if (

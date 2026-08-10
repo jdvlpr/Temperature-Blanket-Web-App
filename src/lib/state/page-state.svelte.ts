@@ -149,7 +149,7 @@ class ToastService {
   };
 
   // All Toasts
-  queue = $state([]);
+  queue: Toast[] = $state([]);
 
   /** Remove toast in queue*/
   close = (id: string) => {

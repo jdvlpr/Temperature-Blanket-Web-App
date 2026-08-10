@@ -17,9 +17,13 @@ import { gauges } from '$lib/state/gauges-state.svelte';
 import { weather } from '$lib/state/weather-state.svelte';
 import { preferences } from '$lib/storage/preferences.svelte';
 import type {
+  GaugeAttributes,
+  GaugeRange,
+  GaugeRangeCategory,
   GaugeRangeOptions,
   GaugeStateInterface,
 } from '$lib/types/gauge-types';
+import type { jsPDF } from 'jspdf';
 import pdfConfig from '../pdf-config';
 import pdfColorDetails from './color-details.svelte';
 import pdfFooter from './footer.svelte';
@@ -35,6 +39,9 @@ const {
   headerItems,
 } = pdfConfig.gauge;
 
+type HeaderItem = { name: string; position: number };
+type HeaderItems = Record<string, HeaderItem>;
+
 const pdfGauge = {
   MAX_COLORS_PER_PAGE,
   titleTopMargin,
@@ -44,7 +51,7 @@ const pdfGauge = {
   linePadding,
   headerItems,
 
-  createHeaderHorizontalLines: (doc, x1, x2) => {
+  createHeaderHorizontalLines: (doc: jsPDF, x1: number, x2: number) => {
     // OverLine
     let y = pdfConfig.topMargin + linePadding * 3;
     doc.line(x1, y, pdfConfig.leftMargin + x2, y);
@@ -53,7 +60,11 @@ const pdfGauge = {
     doc.line(x1, y, pdfConfig.leftMargin + x2, y);
   },
 
-  createHeaderItems: (doc, items, gauge: GaugeStateInterface) => {
+  createHeaderItems: (
+    doc: jsPDF,
+    items: HeaderItems,
+    gauge: GaugeStateInterface,
+  ) => {
     for (let index = 0; index < Object.entries(items).length; index += 1) {
       doc.setFontSize(pdfConfig.font.p);
       doc.setFont(pdfConfig.font.paragraph, '');
@@ -109,8 +120,9 @@ const pdfGauge = {
     rangeOptions,
   }: {
     title: string;
-    rangeOptions: GaugeRangeOptions;
+    rangeOptions: GaugeRangeOptions | undefined;
   }) => {
+    if (!rangeOptions) return '';
     const includeFrom = rangeOptions.includeFromValue;
     const includeTo = rangeOptions.includeToValue;
     const excluding = 'Excluding';
@@ -122,7 +134,7 @@ const pdfGauge = {
     return '';
   },
 
-  createHeader: (doc, gauge: GaugeStateInterface) => {
+  createHeader: (doc: jsPDF, gauge: GaugeStateInterface) => {
     // Gauge Title
     doc.setFontSize(pdfConfig.font.h2);
     doc.setFont(pdfConfig.font.heading, 'normal');
@@ -135,8 +147,13 @@ const pdfGauge = {
     );
   },
 
-  create: function (doc, gaugeId, totalPages: number) {
-    let gauge = gauges.allCreated.find((g) => g.id === gaugeId);
+  create: function (
+    doc: jsPDF,
+    gaugeId: GaugeAttributes['id'],
+    totalPages: number,
+  ) {
+    const gauge = gauges.allCreated.find((g) => g.id === gaugeId);
+    if (!gauge) return;
 
     // Gauge Item
     const length = gauge.ranges.length;
@@ -146,11 +163,14 @@ const pdfGauge = {
         doc.addPage();
         pdfGauge.createHeader(doc, gauge);
         if (weather.pdfOptions.showDaysInRange)
-          pdfColorDetails.createColorDetailsHeader(doc, gauge, (d, items) =>
-            pdfGauge.createHeaderItems(d, items, gauge),
+          pdfColorDetails.createColorDetailsHeader(
+            doc,
+            gauge,
+            (d: jsPDF, items: HeaderItems) =>
+              pdfGauge.createHeaderItems(d, items, gauge),
           );
         l = pdfConfig.topMargin + (itemHeight + linePadding) * 2;
-        const pageCurrent = doc.internal.getCurrentPageInfo().pageNumber - 1;
+        const pageCurrent = doc.getCurrentPageInfo().pageNumber - 1;
         pdfFooter.create(doc, pageCurrent, totalPages);
       }
       // Vertical Lines
@@ -177,7 +197,7 @@ const pdfGauge = {
       doc.setFontSize(pdfConfig.font.p);
       doc.text((i + 1).toString(), pdfConfig.leftMargin + linePadding, l);
       // Item Color
-      doc.setFillColor(gauge.colors[i].hex);
+      doc.setFillColor(gauge.colors[i].hex ?? '#ffffff');
       doc.rect(pdfConfig.leftMargin + 8, l - 8, itemHeight, itemHeight, 'F');
       // Item Yarn and Name
       if (
@@ -187,18 +207,18 @@ const pdfGauge = {
       ) {
         doc.setFontSize(pdfConfig.font.micro);
         doc.text(
-          gauge.colors[i]?.brandName,
+          gauge.colors[i]?.brandName ?? '',
           pdfConfig.leftMargin + headerItems.name.position,
           l - 6.2,
         );
         doc.text(
-          gauge.colors[i]?.yarnName,
+          gauge.colors[i]?.yarnName ?? '',
           pdfConfig.leftMargin + headerItems.name.position,
           l - 4,
         );
         doc.setFontSize(pdfConfig.font.mini);
         doc.text(
-          gauge.colors[i]?.name,
+          gauge.colors[i]?.name ?? '',
           pdfConfig.leftMargin + headerItems.name.position,
           l,
         );
@@ -207,17 +227,19 @@ const pdfGauge = {
       // Range Values
       doc.setFontSize(pdfConfig.font.p);
 
-      if (gauge?.unit.type === 'category') {
-        const label = gauge.ranges[i].label;
+      if (gauge.unit.type === 'category') {
+        const range = gauge.ranges[i] as GaugeRangeCategory;
+        const label = range.label;
         doc.text(label, pdfConfig.leftMargin + headerItems.from.position, l);
       } else {
         // Item From & To Values
+        const range = gauge.ranges[i] as GaugeRange;
         const from =
-          String(gauge.ranges[i].from) +
+          String(range.from) +
           ' ' +
           gauge.unit.label[preferences.value.units ?? 'metric'];
         const to =
-          String(gauge.ranges[i].to) +
+          String(range.to) +
           ' ' +
           gauge.unit.label[preferences.value.units ?? 'metric'];
         doc.text(from, pdfConfig.leftMargin + headerItems.from.position, l);

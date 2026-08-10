@@ -140,10 +140,10 @@ export const displayNumber = (
 /**
  * Returns a random element from the given array.
  *
- * @param {{ array: any[] }} options - The options object.
- * @returns {object | undefined} The randomly selected element from the array.
+ * @param {{ array: T[] }} options - The options object.
+ * @returns {T | undefined} The randomly selected element from the array.
  */
-export const pickRandomFromArray = ({ array }: { array: any[] }) => {
+export const pickRandomFromArray = <T>({ array }: { array: T[] }) => {
   if (!array || !array.length) {
     return;
   }
