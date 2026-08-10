@@ -162,7 +162,12 @@ export const loadFromHistory = async ({
   }
 };
 export const updateHistory = () => {
-  if (!weather.data || !project.url.hash || !locations.allValid || !browser)
+  if (
+    !weather.data.length ||
+    !project.url.hash ||
+    !locations.allValid ||
+    !browser
+  )
     return;
 
   let live = project.url.hash;
@@ -180,17 +185,12 @@ export const updateHistory = () => {
   // This excludes the location param ('l=...'); changes to the location or dates are not considered to be an undoable or redoable change
   live = live.substring(live.indexOf('&'));
 
-  if (
-    live !== project.history.current &&
-    live !== project.history.previous &&
-    live !== project.history.next
-  )
-    project.history.push(live);
+  // `previous`/`next` are no longer checked here: now that push() truncates
+  // a stale redo branch when mid-history, a live value that happens to match
+  // the about-to-be-discarded `next` entry must still be pushed - otherwise
+  // that edit is silently dropped. `current` is the only value a new push
+  // can legitimately duplicate (push() itself also guards this).
+  if (live !== project.history.current) project.history.push(live);
 
   project.history.isUpdating = false;
-};
-
-export const updateURL = () => {
-  const newURL = new URL(project.url.href);
-  window.history.pushState({ path: newURL.href }, '', newURL.href);
 };

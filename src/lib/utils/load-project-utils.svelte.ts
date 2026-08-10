@@ -102,6 +102,12 @@ export const loadProjectFromURL = async (
   });
 
   // Load Preview
+  // Must resolve before the weather grouping block below: Previews.svelte
+  // wraps <Previews> in `{#key weather.grouping}`, so setting the grouping
+  // remounts it and re-runs its default-preview guard. That guard's first
+  // check is `if (previews.activeId) return`, so `activeId` needs to already
+  // be set by the time grouping changes, or it could fall through and load
+  // the 'rows' default over the real restored preview.
   const previewEntry = previews.all.find((p) => exists(params[p.id]));
   if (previewEntry) {
     const previewInstance = await previews.load(previewEntry.id);

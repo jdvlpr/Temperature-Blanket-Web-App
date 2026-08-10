@@ -88,7 +88,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 
   $effect(() => {
-    if (project.url.hash) debounce(() => updateHistory(), 300);
+    const hash = project.url.hash;
+    const loading = project.status.loading;
+    // Skip mid-restore: loadProjectFromURL changes project.url.hash across
+    // several awaited steps, so this could otherwise debounce on an
+    // intermediate (e.g. preview-less) hash and push it to history.
+    if (hash && !loading) debounce(() => updateHistory(), 300);
   });
 
   onMount(async () => {

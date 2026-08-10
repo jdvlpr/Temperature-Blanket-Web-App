@@ -481,10 +481,12 @@ export const handleKeyDown = (ev) => {
     if (weather.data.length) {
       if (isUndo(ev)) {
         ev.preventDefault();
-        loadFromHistory({ action: 'Undo' });
+        if (!project.history.isFirst && !project.history.isUpdating)
+          loadFromHistory({ action: 'Undo' });
       } else if (isRedo(ev)) {
         ev.preventDefault();
-        loadFromHistory({ action: 'Redo' });
+        if (!project.history.isLast && !project.history.isUpdating)
+          loadFromHistory({ action: 'Redo' });
       } else if ((ev.metaKey || ev.ctrlKey) && ev.key === 's') {
         ev.preventDefault();
         dialog.trigger({

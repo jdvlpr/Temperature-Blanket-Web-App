@@ -86,7 +86,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       style="left: calc({indicator.left}px + 0.5rem); width: calc({indicator.width}px - 1rem);"
     ></div>
 
-    {#each pageSections.items as { title, icon, index, active, tooltipText }}
+    {#each pageSections.items as { title, icon, index, active, tooltipText } (index)}
       {#if index !== 0}
         <button
           bind:this={buttonRefs[index]}

@@ -34,6 +34,7 @@ const {
       isUpdating: false,
       undo: vi.fn(),
       redo: vi.fn(),
+      push: vi.fn(),
     },
     url: { hash: '' },
     status: { saved: false },
@@ -110,7 +111,8 @@ vi.mock('$lib/utils/seasons-utils.svelte', () => ({
   seasonsFromUrlHash: vi.fn(),
 }));
 
-const { loadFromHistory } = await import('./history-utils.svelte');
+const { loadFromHistory, updateHistory } =
+  await import('./history-utils.svelte');
 
 describe('loadFromHistory - preview switching', () => {
   beforeEach(() => {
@@ -146,5 +148,45 @@ describe('loadFromHistory - preview switching', () => {
 
     expect(mockProject.history.redo).toHaveBeenCalledOnce();
     expect(mockPreviews.load).not.toHaveBeenCalled();
+  });
+});
+
+describe('updateHistory', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    // Mutate in place - the mocked `gauges-state.svelte` module binds this
+    // array reference once, so reassigning `mockGauges.allGaugesAttributes`
+    // wouldn't be visible to `updateHistory`'s import of it.
+    mockGauges.allGaugesAttributes.length = 0;
+    mockGauges.allGaugesAttributes.push({ id: 'temp' });
+    mockLocations.allValid = true;
+    mockWeather.data = [{}];
+    mockProject.url.hash = '';
+  });
+
+  it('pushes a live value that matches the stale "next" (redo) entry, not just a brand new value', () => {
+    // After an Undo, `next` points at the entry that's about to be discarded
+    // if the user makes a new edit instead of redoing. If the new edit's
+    // hash happens to coincide with that stale entry, it must still be
+    // pushed - otherwise the edit is silently dropped and Undo stays stuck.
+    mockProject.url.hash = 'l=1&temp=b';
+    mockProject.history.current = '&temp=a';
+    mockProject.history.previous = null;
+    mockProject.history.next = '&temp=b';
+
+    updateHistory();
+
+    expect(mockProject.history.push).toHaveBeenCalledExactlyOnceWith('&temp=b');
+  });
+
+  it('does not push a live value that matches current', () => {
+    mockProject.url.hash = 'l=1&temp=a';
+    mockProject.history.current = '&temp=a';
+    mockProject.history.previous = null;
+    mockProject.history.next = null;
+
+    updateHistory();
+
+    expect(mockProject.history.push).not.toHaveBeenCalled();
   });
 });

@@ -50,8 +50,11 @@ export class HistoryStateClass {
   isUpdating = $state(false);
 
   push(value: string) {
-    // If it's the same as the previous value, don't add it, or if it's not on the last stack item
-    if (this.previous === value || !this.isLast) return;
+    if (this.current === value) return;
+    // Pushing from a mid-history position (after an Undo not followed by a
+    // matching Redo) discards the stale "redo" branch, like a standard
+    // undo/redo stack.
+    if (!this.isLast) this.stack.splice(this.currentIndex + 1);
     this.stack.push(value);
     this.currentIndex = this.length - 1;
   }
@@ -61,7 +64,7 @@ export class HistoryStateClass {
   }
 
   redo() {
-    if (this.currentIndex < this.stack.length) this.currentIndex++;
+    if (!this.isLast) this.currentIndex++;
   }
 }
 
