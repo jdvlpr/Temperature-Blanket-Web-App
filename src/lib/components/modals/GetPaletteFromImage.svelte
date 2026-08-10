@@ -40,46 +40,57 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { onMount, tick } from 'svelte';
   import { fade } from 'svelte/transition';
   import SelectYarnWeight from '../SelectYarnWeight.svelte';
+  import type { Color } from '$lib/types/yarn-types';
+  import type { GaugeSettingsType } from '$lib/types/gauge-types';
 
-  let { updateGauge, numberOfColors } = $props();
+  type MatchedColor = Color & { delta?: number };
 
-  let debounceTimer;
-  const debounce = (callback, time) => {
+  interface Props {
+    updateGauge: (params: {
+      _colors: Color[];
+      _schemeId?: GaugeSettingsType['schemeId'];
+    }) => void;
+    numberOfColors: number;
+  }
+
+  let { updateGauge, numberOfColors }: Props = $props();
+
+  let debounceTimer: number | undefined;
+  const debounce = (callback: () => void, time: number) => {
     window.clearTimeout(debounceTimer);
     debounceTimer = window.setTimeout(callback, time);
   };
 
   let coords = $state({ x: 0, y: 0 });
-  let canvas = $state();
-  let ctx = $state();
-  let matchingYarnColors = $state([]);
-  let rect;
-  let img = $state();
-  let cursorColor = $state({});
-  let cursorX, cursorY;
-  let input = $state();
-  let showCursor = $state(null);
-  let ColorThief;
+  let canvas: HTMLCanvasElement | undefined = $state();
+  let ctx: CanvasRenderingContext2D | null = $state(null);
+  let matchingYarnColors: MatchedColor[] = $state([]);
+  let rect: DOMRect | undefined;
+  let img: HTMLImageElement | undefined = $state();
+  let cursorColor: MatchedColor = $state({});
+  let cursorX: number | undefined, cursorY: number | undefined;
+  let input: HTMLInputElement | undefined = $state();
+  let showCursor = $state<boolean | null>(null);
+  let ColorThief: new () => {
+    getPalette: (
+      img: HTMLImageElement,
+      colorCount: number,
+    ) => [number, number, number][];
+  };
   let loading = $state(true);
-  let selectedBrandId = $state();
-  let selectedYarnId = $state();
-  let selectedYarnWeightId = $state();
-  let colorways = $state(
-    getColorways({
-      selectedBrandId: null,
-      selectedYarnId: null,
-      selectedYarnWeightId: null,
-    }),
-  );
-  let hoverDiv = $state();
-  let colorHoverDiv = $state();
-  let hoverName = $state();
+  let selectedBrandId: string | undefined = $state();
+  let selectedYarnId: string | undefined = $state();
+  let selectedYarnWeightId: string | undefined = $state();
+  let colorways: Color[] = $state(getColorways({}));
+  let hoverDiv: HTMLDivElement | undefined = $state();
+  let colorHoverDiv: HTMLDivElement | undefined = $state();
+  let hoverName: HTMLParagraphElement | undefined = $state();
   let key = $state(false);
   let numberOfColorsKey = $state(false);
 
-  let warningMessage = $state<String | null>(null);
+  let warningMessage = $state<string | null>(null);
 
-  let containerElement = $state(null);
+  let containerElement: HTMLDivElement | null = $state(null);
 
   onMount(async () => {
     await ensureYarnData();
@@ -99,13 +110,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     img = new Image();
     img.crossOrigin = 'Anonymous';
-    img.cache;
-    img.onload = function () {
+    img.onload = () => {
+      if (!canvas || !img) return;
       canvas.width = img.naturalWidth;
       canvas.height = img.naturalHeight;
       ctx = canvas.getContext('2d', {
         willReadFrequently: true,
       });
+      if (!ctx) return;
       ctx.drawImage(img, 0, 0);
       matchingYarnColors = getMatchingYarnColors({
         img,
@@ -117,8 +129,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     if (defaultYarn.value) {
       const details = stringToBrandAndYarnDetails(defaultYarn.value);
-      selectedBrandId = details.brandId;
-      selectedYarnId = details.yarnId;
+      selectedBrandId = details.brandId ?? undefined;
+      selectedYarnId = details.yarnId ?? undefined;
       colorways = getColorways({
         selectedBrandId,
         selectedYarnId,
@@ -126,13 +138,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
     }
   });
 
-  function getColor(x, y) {
+  function getColor(x: number, y: number): Color['hex'] {
+    if (!ctx) return '#000000';
     let data = ctx.getImageData(x, y, 1, 1).data;
-    return chroma(data[0], data[1], data[2]).hex();
+    return chroma(data[0], data[1], data[2]).hex() as Color['hex'];
   }
 
-  function addColor(e) {
-    if (matchingYarnColors.length === MAXIMUM_COLORWAYS_MATCHES_FOR_IMAGES)
+  function addColor(e: MouseEvent) {
+    if (
+      !canvas ||
+      matchingYarnColors.length === MAXIMUM_COLORWAYS_MATCHES_FOR_IMAGES
+    )
       return;
     tick().then(() => {
       // Allows for animation
@@ -147,45 +163,48 @@ If not, see <https://www.gnu.org/licenses/>. -->
     let ratio = rect.width / canvas.width;
     let x = (e.clientX - rect.left) / ratio;
     let y = (e.clientY - rect.top) / ratio;
-    let color = {
+    let color: MatchedColor = {
       hex: getColor(x, y),
     };
     handelAddColor({ color });
   }
 
-  function addColorTouch(e) {
-    if (matchingYarnColors.length === MAXIMUM_COLORWAYS_MATCHES_FOR_IMAGES)
+  function addColorTouch(e: TouchEvent) {
+    if (
+      !canvas ||
+      matchingYarnColors.length === MAXIMUM_COLORWAYS_MATCHES_FOR_IMAGES
+    )
       return;
     rect = canvas.getBoundingClientRect();
-    let x = cursorX;
-    let y = cursorY;
+    let x = cursorX ?? 0;
+    let y = cursorY ?? 0;
     if (x < 0 || x > canvas.width || y < 0 || y > canvas.height) return;
-    let color = {
+    let color: MatchedColor = {
       hex: getColor(x, y),
     };
     handelAddColor({ color });
   }
 
-  function handelAddColor({ color }) {
-    color = getBestMatch({ color });
-    color.id = new Date().getTime();
-    color.locked = false;
-    matchingYarnColors.push(color);
+  function handelAddColor({ color }: { color: MatchedColor }) {
+    const match = getBestMatch({ color });
+    match.id = new Date().getTime();
+    match.locked = false;
+    matchingYarnColors.push(match);
     numberOfColors = matchingYarnColors.length;
   }
 
-  function showColor(e) {
-    if (!ctx) return;
+  function showColor(e: MouseEvent) {
+    if (!ctx || !canvas) return;
     debounce(() => {
+      if (!canvas) return;
       rect = canvas.getBoundingClientRect();
       let ratio = rect.width / canvas.width;
       let x = (e.clientX - rect.left) / ratio;
       let y = (e.clientY - rect.top) / ratio;
-      let color = {
+      let color: MatchedColor = {
         hex: getColor(x, y),
       };
-      color = getBestMatch({ color });
-      cursorColor = color;
+      cursorColor = getBestMatch({ color });
       coords = {
         x: e.pageX - rect.left,
         y: e.pageY - rect.top - window.scrollY,
@@ -193,9 +212,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     }, 0);
   }
 
-  function showColorTouch(e) {
-    if (!ctx) return;
+  function showColorTouch(e: TouchEvent) {
+    if (!ctx || !canvas) return;
     debounce(() => {
+      if (!canvas) return;
       if (hoverName && hoverName.classList?.contains('hidden'))
         hoverName.classList.remove('hidden');
       rect = canvas.getBoundingClientRect();
@@ -209,11 +229,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
         hoverName?.classList.add('hidden');
         return;
       }
-      let color = {
+      let color: MatchedColor = {
         hex: getColor(x, y),
       };
-      color = getBestMatch({ color });
-      cursorColor = color;
+      cursorColor = getBestMatch({ color });
       coords = {
         x: e.touches[0].pageX - rect.left,
         y: e.touches[0].pageY - rect.top - window.scrollY,
@@ -221,44 +240,61 @@ If not, see <https://www.gnu.org/licenses/>. -->
     }, 0);
   }
 
-  function handleImageChange(e) {
+  function handleImageChange(e: Event) {
+    const target = e.target as HTMLInputElement;
+    if (!canvas || !target.files) return;
     var reader = new FileReader();
-    reader.onload = function (event) {
+    reader.onload = (event) => {
+      if (!canvas) return;
       const context = canvas.getContext('2d');
-      context.clearRect(0, 0, canvas.width, canvas.height);
+      context?.clearRect(0, 0, canvas.width, canvas.height);
       img = new Image();
       img.crossOrigin = 'Anonymous';
-      img.onload = function () {
+      img.onload = () => {
+        if (!canvas || !img) return;
         canvas.width = img.naturalWidth;
         canvas.height = img.naturalHeight;
         ctx = canvas.getContext('2d', {
           willReadFrequently: true,
         });
+        if (!ctx) return;
         ctx.drawImage(img, 0, 0);
         matchingYarnColors = getMatchingYarnColors({
           img,
           numberOfColors,
         });
       };
-      img.src = event.target.result;
+      img.src = event.target?.result as string;
     };
-    reader.readAsDataURL(e.target.files[0]);
+    reader.readAsDataURL(target.files[0]);
     key = !key;
   }
 
-  function getPalette({ img, numberOfColors }) {
+  function getPalette({
+    img,
+    numberOfColors,
+  }: {
+    img: HTMLImageElement;
+    numberOfColors: number;
+  }): MatchedColor[] {
     const colorThief = new ColorThief();
     const palette = colorThief.getPalette(img, numberOfColors);
     return palette.map((n, i) => {
       return {
-        hex: chroma(n[0], n[1], n[2]).hex(),
+        hex: chroma(n[0], n[1], n[2]).hex() as Color['hex'],
         id: i,
       };
     });
   }
 
-  function getMatchingYarnColors({ img, numberOfColors }) {
-    let _yarnColors = [];
+  function getMatchingYarnColors({
+    img,
+    numberOfColors,
+  }: {
+    img: HTMLImageElement;
+    numberOfColors: number;
+  }): MatchedColor[] {
+    let _yarnColors: MatchedColor[] = [];
 
     let index = 0;
     let skip = 0;
@@ -283,7 +319,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       }
     }
 
-    let lockedIndexes = [];
+    let lockedIndexes: number[] = [];
 
     matchingYarnColors?.forEach((n, i) => {
       if (n.locked) lockedIndexes.push(i);
@@ -302,11 +338,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
     return _yarnColors;
   }
 
-  function getBestMatch({ color, index = 0 }) {
+  function getBestMatch({
+    color,
+    index = 0,
+  }: {
+    color: MatchedColor;
+    index?: number;
+  }): MatchedColor {
     const sortedColorways = colorways
       .map((n) => ({
         ...n,
-        delta: chroma.deltaE(color.hex, n.hex),
+        delta: chroma.deltaE(color.hex ?? '#ffffff', n.hex ?? '#ffffff'),
       }))
       .sort((a, b) => a.delta - b.delta);
     if (index >= sortedColorways.length)
@@ -314,12 +356,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
     return sortedColorways[index];
   }
 
-  function onYarnFilterChange(e) {
+  function onYarnFilterChange() {
     colorways = getColorways({
       selectedBrandId,
       selectedYarnId,
       selectedYarnWeightId,
     });
+    if (!img) return;
     matchingYarnColors = getMatchingYarnColors({
       img,
       numberOfColors,
@@ -328,20 +371,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 
   function getRandomImage() {
+    if (!canvas) return;
     const context = canvas.getContext('2d');
-    context.clearRect(0, 0, canvas.width, canvas.height);
+    context?.clearRect(0, 0, canvas.width, canvas.height);
     canvas.style.display = 'none';
     loading = true;
     img = new Image();
     img.crossOrigin = 'Anonymous';
-    img.cache;
-    img.onload = function () {
+    img.onload = () => {
+      if (!canvas || !img) return;
       canvas.style.display = 'inline';
       canvas.width = img.naturalWidth;
       canvas.height = img.naturalHeight;
       ctx = canvas.getContext('2d', {
         willReadFrequently: true,
       });
+      if (!ctx) return;
       ctx.drawImage(img, 0, 0);
       loading = false;
       matchingYarnColors = getMatchingYarnColors({
@@ -430,7 +475,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           class="rounded-container pointer-events-none absolute z-10 box-border flex max-w-[180px] min-w-[140px] -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center p-2 shadow-lg"
           style="left:{coords.x}px;top:{coords.y -
             70}px;background:{cursorColor.hex};color:{getTextColor(
-            cursorColor.hex,
+            cursorColor.hex ?? '#ffffff',
           )};"
         >
           {#if cursorColor.name && cursorColor.brandName && cursorColor.yarnName}
@@ -440,7 +485,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             >
             <span class="">{cursorColor.name}</span>
             <span class="text-xs"
-              >{Math.floor(100 - cursorColor?.delta)}% Match</span
+              >{Math.floor(100 - (cursorColor.delta ?? 0))}% Match</span
             >
           {:else}
             <span class="">{cursorColor.hex}</span>
@@ -450,7 +495,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           bind:this={colorHoverDiv}
           class="rounded-container pointer-events-none absolute box-border h-10 w-10 -translate-x-1/2 -translate-y-1/2 shadow-lg transition-transform"
           style="left:{coords.x}px;top:{coords.y}px;background:{cursorColor.hex};border:2px solid {getTextColor(
-            cursorColor.hex,
+            cursorColor.hex ?? '#ffffff',
           )}"
         ></div>
       </div>
@@ -476,7 +521,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
       }}
       ontouchstart={(e) => {
         if (e.cancelable) e.preventDefault();
-        containerElement.parentElement.style.overflowY = 'hidden';
+        if (containerElement?.parentElement)
+          containerElement.parentElement.style.overflowY = 'hidden';
         showColorTouch(e);
         showCursor = false;
       }}
@@ -486,7 +532,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
       }}
       ontouchend={(e) => {
         if (e.cancelable) e.preventDefault();
-        containerElement.parentElement.style.overflowY = '';
+        if (containerElement?.parentElement)
+          containerElement.parentElement.style.overflowY = '';
         addColorTouch(e);
         showCursor = true;
       }}
@@ -511,8 +558,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           allowZero={true}
           onchange={(e) => {
             if (e.cancelable) e.preventDefault();
+            if (!img) return;
 
-            const value = parseInt(e.target.value);
+            const value = parseInt((e.target as HTMLInputElement).value);
             const lastLockedIndex = matchingYarnColors.findLastIndex(
               (color) => color.locked,
             );
@@ -567,6 +615,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <button
         class="btn hover:preset-tonal-surface"
         onclick={() => {
+          if (!img) return;
           if (numberOfColors < 2) numberOfColors = 2;
           matchingYarnColors = getMatchingYarnColors({
             img,

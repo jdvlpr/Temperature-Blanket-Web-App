@@ -70,7 +70,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <span class="flex items-start"
         ><span class="text-lg">{gauges.activeGauge.ranges[index]?.from}</span>
         <span class="text-xs"
-          >{gauges.activeGauge.unit.label[preferences.value.units]}</span
+          >{gauges.activeGauge.unit.label[preferences.value.units ?? 'metric']}</span
         ></span
       ></span
     >
@@ -87,7 +87,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <span class="flex items-start"
         ><span class="text-lg">{gauges.activeGauge.ranges[index]?.to}</span>
         <span class="text-xs"
-          >{gauges.activeGauge.unit.label[preferences.value.units]}</span
+          >{gauges.activeGauge.unit.label[preferences.value.units ?? 'metric']}</span
         ></span
       ></span
     ></button

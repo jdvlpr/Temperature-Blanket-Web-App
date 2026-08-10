@@ -59,7 +59,7 @@ export class SquareRoundsPreviewClass {
 
   id = 'sqrd';
 
-  svg = $state();
+  svg = $state<SVGSVGElement | null>(null);
 
   img = {
     light: './images/preview_icons/Square Rounds.png',

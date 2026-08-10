@@ -37,7 +37,7 @@ export class ChevronsPreviewClass {
 
   id = 'chev';
 
-  svg = $state();
+  svg = $state<SVGSVGElement | null>(null);
 
   img = {
     light: './images/preview_icons/Chevrons.png',

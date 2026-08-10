@@ -43,6 +43,12 @@ import {
 import { getColorsFromInput } from '$lib/utils/color-utils';
 import { getProjectParametersFromURLHash } from '$lib/utils/project-utils.svelte';
 import { seasonsFromUrlHash } from '$lib/utils/seasons-utils.svelte';
+import type {
+  GaugeAttributes,
+  GaugeRange,
+  GaugeSettingsType,
+} from '$lib/types/gauge-types';
+import type { TISO8601DateString } from '$lib/types/weather-types';
 
 // Gauge hash values can carry a second `!`-delimited section with yarn
 // details (brandId-yarnId); only those need the yarn dataset loaded.
@@ -98,7 +104,7 @@ export const loadProjectFromURL = async (
     );
 
     const _gauge = gauges.allCreated.find((g) => g.id === gauge.id);
-    if (_gauge) _gauge.updateSettings({ settings });
+    if (_gauge && settings) _gauge.updateSettings({ settings });
   });
 
   // Load Preview
@@ -162,7 +168,7 @@ export const loadProjectFromURL = async (
   }
 };
 
-const parseLocationURLHash = async (hashString) => {
+const parseLocationURLHash = async (hashString: string) => {
   const wasLoadedFromStorage = locations.all.every(
     (location) => location.wasLoadedFromStorage,
   );
@@ -171,7 +177,7 @@ const parseLocationURLHash = async (hashString) => {
   if (wasLoadedFromStorage) return;
   // First, get all the positions of the separator character(s)
   // This determines the number of locations
-  const separatorIndices = [];
+  const separatorIndices: number[] = [];
   for (let i = 0; i < hashString.length; i++) {
     if (
       hashString[i] === CHARACTERS_FOR_URL_HASH.separator ||
@@ -259,10 +265,10 @@ const parseLocationURLHash = async (hashString) => {
     currentPosition += thisLocationStringLength + 1;
 
     // Set the location's from date
-    _locations[i].from = from;
+    _locations[i].from = from as TISO8601DateString;
 
     // Set the location's to date
-    _locations[i].to = to;
+    _locations[i].to = to as TISO8601DateString;
 
     // Get  data from GeoNames using the location's id
     try {
@@ -273,7 +279,7 @@ const parseLocationURLHash = async (hashString) => {
       if (!response.ok) throw new Error(data.message);
 
       // Set the location's id
-      _locations[i].id = id;
+      _locations[i].id = Number(id);
 
       // Set the location's latitude
       _locations[i].lat = data.lat;
@@ -313,7 +319,12 @@ const parseLocationURLHash = async (hashString) => {
   locations.all = _locations;
 };
 
-export const parseGaugeURLHash = (hashString: string, gauge) => {
+export const parseGaugeURLHash = (
+  hashString: string,
+  gauge: (GaugeAttributes & Partial<GaugeSettingsType>) | undefined,
+) => {
+  if (!gauge) return;
+
   // Each gauge should have a '!' which separates the gauge colors from the gauge settings
 
   let hashStringParts;
@@ -402,7 +413,7 @@ export const parseGaugeURLHash = (hashString: string, gauge) => {
     return gauge;
   }
 
-  const ranges = [];
+  const ranges: GaugeRange[] = [];
   for (let i = 0; i < rangeFromIndices.length; i++) {
     // The color's From range value is the number from the '(' character to the "'" separator character
     let from = +hashStringColors.substring(
@@ -422,13 +433,13 @@ export const parseGaugeURLHash = (hashString: string, gauge) => {
       if (preferences.value.units === 'imperial') {
         switch (gauge.id) {
           case 'temp':
-            from = celsiusToFahrenheit(from);
-            to = celsiusToFahrenheit(to);
+            from = celsiusToFahrenheit(from) ?? from;
+            to = celsiusToFahrenheit(to) ?? to;
             break;
           case 'prcp':
           case 'snow':
-            from = millimetersToInches(from);
-            to = millimetersToInches(to);
+            from = millimetersToInches(from) ?? from;
+            to = millimetersToInches(to) ?? to;
             break;
           default:
             break;
@@ -576,8 +587,8 @@ export const parseGaugeURLHash = (hashString: string, gauge) => {
       !upToDate(project.onLoaded.version, '1.700') &&
       preferences.value.units === 'imperial'
     ) {
-      increment = celsiusToFahrenheit(increment);
-      start = celsiusToFahrenheit(start);
+      increment = celsiusToFahrenheit(increment) ?? increment;
+      start = celsiusToFahrenheit(start) ?? start;
     }
 
     gauge.rangeOptions.manual.increment = increment;
@@ -594,9 +605,10 @@ export const parseGaugeURLHash = (hashString: string, gauge) => {
   }
 
   // From v2.4.4, the roundIncrement setting is determined by checking if all range From and To values are integers.
-  gauge.rangeOptions.auto.roundIncrement = gauge?.ranges.every(
-    (range) => Number.isInteger(range.from) && Number.isInteger(range.to),
-  );
+  gauge.rangeOptions.auto.roundIncrement =
+    (gauge?.ranges as GaugeRange[] | undefined)?.every(
+      (range) => Number.isInteger(range.from) && Number.isInteger(range.to),
+    ) ?? true;
 
   return gauge;
 };

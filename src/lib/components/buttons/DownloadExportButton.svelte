@@ -85,11 +85,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
               class="flex h-auto items-center gap-2 text-left whitespace-pre-wrap"
               title="Download PNG File"
               onclick={() => {
-                downloadPreviewPNG(
-                  previews.active.width,
-                  previews.active.height,
-                  previews.active.svg,
-                );
+                const active = previews.active;
+                if (!active?.width || !active?.height || !active?.svg)
+                  return;
+                downloadPreviewPNG(active.width, active.height, active.svg);
               }}
             >
               <ImageIcon />

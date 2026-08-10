@@ -59,7 +59,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     const value =
       targetId === 'moon'
         ? day[targetId]
-        : day[targetId][preferences.value.units];
+        : day[targetId][preferences.value.units ?? 'metric'];
     return getColorInfo({
       param: targetId,
       value,
@@ -143,7 +143,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {@const { name, hex, index, gaugeLength, brandName, yarnName } =
             colorInfo(id, day)}
           {@const value =
-            id === 'moon' ? day[id] : day[id][preferences.value.units]}
+            id === 'moon' ? day[id] : day[id][preferences.value.units ?? 'metric']}
           {#if exists(day) && value !== null}
             {#if id === 'dayt'}
               <WeatherItem {id} {label} {icon} value={convertTime(value)}>
@@ -193,7 +193,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 {label}
                 {icon}
                 {value}
-                units={UNIT_LABELS[type][preferences.value.units]}
+                units={UNIT_LABELS[type][preferences.value.units ?? 'metric']}
                 {isRecentDate}
               >
                 {#snippet details()}
@@ -243,7 +243,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               {label}
               {icon}
               value="?"
-              units={UNIT_LABELS[type][preferences.value.units]}
+              units={UNIT_LABELS[type][preferences.value.units ?? 'metric']}
             />
           {/if}
         {/each}

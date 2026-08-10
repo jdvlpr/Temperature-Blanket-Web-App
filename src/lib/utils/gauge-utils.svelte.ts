@@ -18,7 +18,15 @@ import { toast } from '$lib/state/page-state.svelte';
 import { weather } from '$lib/state/weather-state.svelte';
 import { preferences } from '$lib/storage/preferences.svelte';
 import type { Color } from '$lib/types/yarn-types';
-import type { GaugeSettingsType } from '$lib/types/gauge-types';
+import type {
+  GaugeAttributes,
+  GaugeRange,
+  GaugeRangeCategory,
+  GaugeRangeOptions,
+  GaugeSettingsType,
+  GaugeStateInterface,
+  WeatherParam,
+} from '$lib/types/gauge-types';
 import { displayNumber } from '$lib/utils/number-utils';
 import {
   getDaysInRange,
@@ -37,8 +45,22 @@ export function getRanges({
   includeFromAndTo,
   dontIncludeFromAndTo,
   gaugeId = '',
-}) {
-  let newRanges;
+}: {
+  rangeOptions: GaugeRangeOptions;
+  ranges: GaugeRange[];
+  start: number | undefined;
+  increment: number | undefined;
+  colors: Color[];
+  includeFromAndTo: boolean;
+  dontIncludeFromAndTo: boolean;
+  gaugeId?: 'temp' | 'prcp' | 'snow' | 'dayt' | '';
+}): {
+  ranges: GaugeRange[];
+  mustUpdateCustomRanges: boolean;
+  mode: GaugeRangeOptions['mode'];
+  isCustomRanges: boolean;
+} {
+  let newRanges: GaugeRange[];
   let mustUpdateCustomRanges = false;
   let mode = rangeOptions.mode;
   let isCustomRanges = rangeOptions.isCustomRanges;
@@ -48,11 +70,12 @@ export function getRanges({
 
     if (colors.length === ranges.length) newRanges = ranges;
     else {
-      let prop = rangeOptions.auto.optimization;
+      let prop: 'tmax' | 'tavg' | 'tmin' | 'prcp' | 'snow' | 'dayt' | 'ranges' =
+        rangeOptions.auto.optimization;
       if (prop === 'ranges') {
         // Only temp gauges have multiple props (tmax, tavg, tmin)
         // So if it's not a temp gauge, use the gauge id (e.g. prcp, snow)
-        if (gaugeId !== 'temp') prop = gaugeId;
+        if (gaugeId !== 'temp' && gaugeId !== '') prop = gaugeId;
         // Otherwise if it is a temp gauge, use tmax as default
         else prop = 'tmax';
       }
@@ -92,19 +115,19 @@ export function getRanges({
     mustUpdateCustomRanges = true;
   } else {
     // If 'auto' range calculations and 'equal ranges' is set
-    let _start = start;
+    let _start = start ?? 0;
+    const _increment = increment ?? 0;
 
     newRanges = colors.map((n, i) => {
-      const isFirstRange = i === 0;
       const isLastRange = i === colors.length - 1;
 
       let from = _start;
-      let to = _start + increment;
+      let to = _start + _increment;
 
       if (!isLastRange && rangeOptions.mode !== 'manual')
         to += includeFromAndTo ? 0.01 : dontIncludeFromAndTo ? -0.01 : 0;
 
-      _start += increment;
+      _start += _increment;
 
       const decimals =
         rangeOptions.auto.roundIncrement && rangeOptions.mode !== 'manual'
@@ -129,21 +152,21 @@ export const createGaugeColors = ({
   numberOfColors,
   colors,
 }: {
-  schemeId: GaugeSettingsType['schemeId'];
-  numberOfColors: GaugeSettingsType['numberOfColors'];
+  schemeId: NonNullable<GaugeSettingsType['schemeId']>;
+  numberOfColors: number;
   colors: Color[];
-}) => {
+}): Color[] => {
   if (schemeId === 'Custom') {
     if (numberOfColors > colors.length) {
       const diff = numberOfColors - colors.length;
 
       if (diff === 1) {
         // Generate a single random color and add it to the colors array
-        colors.push({ hex: chroma.random().hex() });
+        colors.push({ hex: chroma.random().hex() as Color['hex'] });
       } else {
         // Generate an array of random colors and add them to the colors array
         const randomColors = Array.from({ length: diff }, () => ({
-          hex: chroma.random().hex(),
+          hex: chroma.random().hex() as Color['hex'],
         }));
         colors.push(...randomColors);
       }
@@ -154,22 +177,27 @@ export const createGaugeColors = ({
   } else {
     // Use chroma.scale(schemeId) to generate colors based on the schemeId
     colors = chroma
-      .scale(schemeId)
+      .scale(schemeId as chroma.BrewerPaletteName)
       .colors(numberOfColors)
-      .map((n) => ({ hex: n }));
+      .map((n) => ({ hex: n as Color['hex'] }));
   }
 
   return colors;
 };
 
-export const getWPGauge = (gauge) => {
-  const content = [];
+export const getWPGauge = (
+  gauge: GaugeStateInterface,
+): Record<string, unknown>[] => {
+  const content: Record<string, unknown>[] = [];
 
-  gauge.colors.forEach((color, i) => {
+  if (!gauge.colors || !gauge.ranges) return content;
+  const { colors, ranges } = gauge;
+
+  colors.forEach((color, i) => {
     const details = gauge.targets.map((item, index, self) => {
       const count = getDaysInRange({
         id: item.id,
-        range: gauge.ranges[i],
+        range: ranges[i],
         direction: gauge?.rangeOptions?.direction,
         includeFromValue: gauge?.rangeOptions?.includeFromValue,
         includeToValue: gauge?.rangeOptions?.includeToValue,
@@ -187,18 +215,16 @@ export const getWPGauge = (gauge) => {
     // details.reverse();
     let range;
     if (gauge.unit.type === 'category') {
+      const r = ranges[i] as GaugeRangeCategory;
       range = {
-        value: gauge.ranges[i].value,
-        label: gauge.ranges[i].label,
+        value: r.value,
+        label: r.label,
       };
     } else {
+      const r = ranges[i] as GaugeRange;
       range = {
-        from:
-          gauge.ranges[i].from +
-          ' ' +
-          gauge.unit.label[preferences.value.units],
-        to:
-          gauge.ranges[i].to + ' ' + gauge.unit.label[preferences.value.units],
+        from: r.from + ' ' + gauge.unit.label[preferences.value.units ?? 'metric'],
+        to: r.to + ' ' + gauge.unit.label[preferences.value.units ?? 'metric'],
       };
     }
     content.push({
@@ -210,13 +236,15 @@ export const getWPGauge = (gauge) => {
   return content;
 };
 
-export const getTargetParentGaugeId = (targetId) => {
+export const getTargetParentGaugeId = (
+  targetId: WeatherParam['id'],
+): GaugeAttributes['id'] => {
   return targetId === 'tmax' || targetId === 'tavg' || targetId === 'tmin'
     ? 'temp'
     : targetId;
 };
 
-export const getSchemeName = (id) => {
+export const getSchemeName = (id: string): string => {
   if (SCHEMES.some((n) => n.value === id))
     return SCHEMES.filter((scheme) => scheme.value === id)[0].label;
   return 'Custom';

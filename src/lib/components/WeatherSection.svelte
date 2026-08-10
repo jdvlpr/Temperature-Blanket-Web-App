@@ -126,9 +126,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
       .map((day, index) => {
         return { ...day, index };
       })
-      .filter((day) => day.tmin[preferences.value.units] !== null)
+      .filter((day) => day.tmin[preferences.value.units ?? 'metric'] !== null)
       .reduce((prev, curr) =>
-        prev.tmin[preferences.value.units] < curr.tmin[preferences.value.units]
+        prev.tmin[preferences.value.units ?? 'metric'] < curr.tmin[preferences.value.units ?? 'metric']
           ? prev
           : curr,
       ) || null,
@@ -138,9 +138,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
       .map((day, index) => {
         return { ...day, index };
       })
-      .filter((day) => day.tmax[preferences.value.units] !== null)
+      .filter((day) => day.tmax[preferences.value.units ?? 'metric'] !== null)
       .reduce((prev, curr) =>
-        prev.tmax[preferences.value.units] > curr.tmax[preferences.value.units]
+        prev.tmax[preferences.value.units ?? 'metric'] > curr.tmax[preferences.value.units ?? 'metric']
           ? prev
           : curr,
       ) || null,
@@ -285,7 +285,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           value={Math.max(
             ...(weather.params.tmax?.filter((n) => n !== null) as number[]),
           )}
-          units={UNIT_LABELS.temperature[preferences.value.units]}
+          units={UNIT_LABELS.temperature[preferences.value.units ?? 'metric']}
         >
           {#snippet date()}
             <p class="text-xs">
@@ -308,7 +308,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           value={getAverage(
             weather.params.tavg?.filter((n) => n !== null) as number[],
           )}
-          units={UNIT_LABELS.temperature[preferences.value.units]}
+          units={UNIT_LABELS.temperature[preferences.value.units ?? 'metric']}
         />
       </div>
     {/if}
@@ -322,7 +322,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           value={Math.min(
             ...(weather.params.tmin?.filter((n) => n !== null) as number[]),
           )}
-          units={UNIT_LABELS.temperature[preferences.value.units]}
+          units={UNIT_LABELS.temperature[preferences.value.units ?? 'metric']}
         >
           {#snippet date()}
             <p class="text-xs">
@@ -349,7 +349,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   ?.filter((n) => n !== null)
                   ?.reduce((partialSum: number, a: any) => partialSum + a, 0),
               )}
-          units={UNIT_LABELS.height[preferences.value.units]}
+          units={UNIT_LABELS.height[preferences.value.units ?? 'metric']}
         />
       </div>
     {/if}
@@ -375,7 +375,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     ?.filter((n) => n !== null)
                     ?.reduce((partialSum: number, a: any) => partialSum + a, 0),
                 )}
-          units={UNIT_LABELS.height[preferences.value.units]}
+          units={UNIT_LABELS.height[preferences.value.units ?? 'metric']}
         >
           {#snippet button()}
             <div class="my-2 text-sm">

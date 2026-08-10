@@ -49,7 +49,7 @@ export class ContinuousSquarePreviewClass {
 
   id = 'cosq';
 
-  svg = $state();
+  svg = $state<SVGSVGElement | null>(null);
 
   img = {
     light: './images/preview_icons/cosq_black.png',

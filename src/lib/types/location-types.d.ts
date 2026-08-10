@@ -57,3 +57,30 @@ export interface LocationsStateType {
   projectFilename: string;
   projectTitle: string;
 }
+
+/** A single result from the GeoNames search/nearby APIs, e.g.
+ * `src/routes/api/location/search/[text]/+server.ts`. */
+export interface GeoNamesSearchResult {
+  geonameId: number;
+  name: string;
+  adminName1?: string;
+  countryName?: string;
+  countryCode?: string;
+  lat: string;
+  lng: string;
+  fclName?: string;
+  population?: number;
+}
+
+/** A `GeoNamesSearchResult` formatted for display in the location autocomplete. */
+export type LocationSuggestion = Pick<
+  LocationType,
+  | 'id'
+  | 'label'
+  | 'lat'
+  | 'lng'
+  | 'result'
+  | 'fclName'
+  | 'flagIcon'
+  | 'population'
+>;

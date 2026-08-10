@@ -34,7 +34,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         if (target.id === 'dayt') {
           weather = {
             ...weather,
-            [target.id]: convertTime(n[target.id][preferences.value.units], {
+            [target.id]: convertTime(n[target.id][preferences.value.units ?? 'metric'], {
               displayUnits: false,
               padStart: true,
             }),
@@ -48,8 +48,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
           };
         } else {
           let value =
-            n[target.id][preferences.value.units] !== null
-              ? n[target.id][preferences.value.units]
+            n[target.id][preferences.value.units ?? 'metric'] !== null
+              ? n[target.id][preferences.value.units ?? 'metric']
               : '-';
           weather = {
             ...weather,
@@ -83,7 +83,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             >
           </ThSort>
           {#each weatherTargets as { id, pdfHeader }}
-            {@const header = pdfHeader[preferences.value.units]}
+            {@const header = pdfHeader[preferences.value.units ?? 'metric']}
             {@const hasHeaderUnits = header.includes('(')}
             {@const headerLabel = header.slice(0, header.indexOf('('))}
             {@const headerUnits = header.slice(header.indexOf('('))}

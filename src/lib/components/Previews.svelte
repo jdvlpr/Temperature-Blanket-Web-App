@@ -95,11 +95,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           class="btn hover:preset-tonal-surface"
           title="Download PNG"
           onclick={() => {
-            downloadPreviewPNG(
-              previews.active.width,
-              previews.active.height,
-              previews.active.svg,
-            );
+            const active = previews.active;
+            if (!active?.width || !active?.height || !active?.svg) return;
+            downloadPreviewPNG(active.width, active.height, active.svg);
           }}
         >
           <ImageIcon />

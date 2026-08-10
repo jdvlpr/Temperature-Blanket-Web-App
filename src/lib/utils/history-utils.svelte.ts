@@ -42,8 +42,8 @@ export const loadFromHistory = async ({
     project.history.redo();
   }
 
-  const oldParams = getProjectParametersFromURLHash(oldHistoryState);
-  const newParams = getProjectParametersFromURLHash(newHistoryState);
+  const oldParams = getProjectParametersFromURLHash(oldHistoryState ?? '');
+  const newParams = getProjectParametersFromURLHash(newHistoryState ?? '');
 
   let message = '';
 
@@ -124,9 +124,8 @@ export const loadFromHistory = async ({
           gauges.getSnapshot(gauge.id),
         );
 
-        gauges.allCreated
-          .find((g) => g.id === gauge.id)
-          .updateSettings({ settings });
+        const _gauge = gauges.allCreated.find((g) => g.id === gauge.id);
+        if (_gauge && settings) _gauge.updateSettings({ settings });
 
         message = 'Colors';
       }

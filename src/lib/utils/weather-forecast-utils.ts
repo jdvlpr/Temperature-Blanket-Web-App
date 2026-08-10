@@ -17,9 +17,13 @@ export const getWeatherCodeDetails = ({
   weathercode,
   is_day,
   precipitation_probability,
-}) => {
+}: {
+  weathercode: number | null;
+  is_day: number | null;
+  precipitation_probability?: number | null;
+}): { icon: string | null; description: string | null } => {
   const variant = is_day === 0 ? 'night' : '';
-  let details = {
+  let details: { icon: string | null; description: string | null } = {
     icon: null,
     description: null,
   };

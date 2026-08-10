@@ -56,7 +56,7 @@ export class TwelvePointStarPreviewClass {
 
   id = 'twsr';
 
-  svg = $state();
+  svg = $state<SVGSVGElement | null>(null);
 
   img = {
     light: './images/preview_icons/12 Point Star.png',

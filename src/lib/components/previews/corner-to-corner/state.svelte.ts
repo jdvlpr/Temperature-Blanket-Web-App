@@ -35,7 +35,7 @@ export class CornerToCornerPreviewClass {
 
   id = 'crnr';
 
-  svg = $state();
+  svg = $state<SVGSVGElement | null>(null);
 
   img = {
     light: './images/preview_icons/Corner to Corner.png',

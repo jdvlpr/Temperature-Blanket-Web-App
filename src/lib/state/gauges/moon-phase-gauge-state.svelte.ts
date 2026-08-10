@@ -3,7 +3,9 @@ import type { Color } from '$lib/types/yarn-types';
 import type {
   GaugeAttributes,
   GaugeRangeCategory,
+  GaugeRangeOptions,
   GaugeSettingsType,
+  WeatherParam,
 } from '$lib/types/gauge-types';
 import chroma from 'chroma-js';
 
@@ -34,7 +36,18 @@ export const gaugeAttributes: GaugeAttributes = {
   ],
 };
 
-export class MoonPhaseGauge {
+export class MoonPhaseGauge implements GaugeAttributes {
+  // Assigned at runtime in the constructor via Object.assign(this, gaugeAttributes)
+  id!: GaugeAttributes['id'];
+  isStatic!: boolean;
+  label!: GaugeAttributes['label'];
+  unit!: GaugeAttributes['unit'];
+  targets!: WeatherParam[];
+
+  // Category gauges don't use range options, but the shared GaugeStateInterface requires the keys to exist
+  rangeOptions: GaugeRangeOptions | undefined = undefined;
+  autoRangeOptions: GaugeRangeOptions | undefined = undefined;
+
   constructor() {
     // Assign the gauge attributes as properties
     Object.assign(this, gaugeAttributes);
@@ -50,12 +63,12 @@ export class MoonPhaseGauge {
     return { value: i, label: n };
   });
 
-  colors = $state(
+  colors: Color[] = $state(
     chroma
       .scale('BrBG')
       .colors(8)
       .map((n) => {
-        return { hex: n };
+        return { hex: n as Color['hex'] };
       }),
   );
 
@@ -68,16 +81,16 @@ export class MoonPhaseGauge {
   // *************************
   // Methods
   // *************************
-  updateColors({ colors }) {
+  updateColors({ colors }: { colors: Color[] }) {
     this.calculating = true;
     this.colors = colors;
     this.calculating = false;
   }
 
-  updateSettings({ settings }: { settings: GaugeSettingsType }) {
+  updateSettings({ settings }: { settings: Partial<GaugeSettingsType> }) {
     this.calculating = true;
-    this.colors = settings.colors;
-    this.schemeId = settings.schemeId;
+    this.colors = settings.colors ?? this.colors;
+    this.schemeId = settings.schemeId ?? this.schemeId;
     this.calculating = false;
   }
 }

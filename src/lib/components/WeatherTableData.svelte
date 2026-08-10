@@ -49,7 +49,7 @@
           >
         </ThSort>
         {#each weather.tableWeatherTargets as { id, pdfHeader }}
-          {@const header = pdfHeader[preferences.value.units]}
+          {@const header = pdfHeader[preferences.value.units ?? 'metric']}
           {@const hasHeaderUnits = header.includes('(')}
           {@const headerLabel = header.slice(0, header.indexOf('('))}
           {@const headerUnits = header.slice(header.indexOf('('))}
@@ -154,7 +154,7 @@
                         props: {
                           max: 1000,
                           value: row[id],
-                          title: `<div class="flex flex-col items-center justify-center"><span class="font-bold">${row.date}</span><span>${label} <span class="text-sm">(${UNIT_LABELS[type][preferences.value.units]})</span></span></div>`,
+                          title: `<div class="flex flex-col items-center justify-center"><span class="font-bold">${row.date}</span><span>${label} <span class="text-sm">(${UNIT_LABELS[type][preferences.value.units ?? 'metric']})</span></span></div>`,
                           noMinMax: true,
                           showSlider: false,
                           onOkay: async (_value) => {

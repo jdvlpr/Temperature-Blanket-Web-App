@@ -57,7 +57,7 @@ export class MonthSquaresPreviewClass {
 
   id = 'msqs';
 
-  svg = $state();
+  svg = $state<SVGSVGElement | null>(null);
 
   img = {
     light: './images/preview_icons/msqs_black.png',

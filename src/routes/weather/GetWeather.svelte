@@ -13,11 +13,15 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script context="module">
+<script module lang="ts">
   import { project } from '$lib/state/project-state.svelte';
   import { signal } from '$lib/state/location-state.svelte';
   import { preferences } from '$lib/storage/preferences.svelte';
   import { weatherState } from './+page.svelte';
+  import type {
+    OpenMeteoForecastData,
+    WeatherLocation,
+  } from './open-meteo-types';
 
   export async function fetchData() {
     project.status.loading = true;
@@ -25,25 +29,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
     let _locations = weatherState.weatherLocations;
 
     // Update All Locations
-    let newWeatherForcastData = [];
+    let newWeatherForcastData: WeatherLocation[] = [];
     for (let index = 0; index < _locations.length; index++) {
       let location = _locations[index];
 
       const needsUpdate = needsRefresh({
         date1: new Date(),
-        date2: new Date(location.update_time),
+        date2: new Date(location.update_time ?? 0),
       });
       if (needsUpdate || location.units !== preferences.value.units) {
-        try {
-          const data = await getOpenMeteoForecast({ location });
-          location.source = 'Open-Meteo';
-          // savedLocation.current_weather = data.current_weather;
-          location.update_time = new Date().toUTCString();
-          location.units = preferences.value.units;
-          location.data = data;
-        } catch (error) {
-          throw error;
-        }
+        const data = await getOpenMeteoForecast({ location });
+        location.source = 'Open-Meteo';
+        // savedLocation.current_weather = data.current_weather;
+        location.update_time = new Date().toUTCString();
+        location.units = preferences.value.units ?? undefined;
+        location.data = data;
       }
       newWeatherForcastData.push(location);
     }
@@ -53,10 +53,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
     project.status.loading = false;
 
     if (!weatherState.activeLocationID)
-      weatherState.activeLocationID = weatherState.weatherLocations[0]?.id;
+      weatherState.activeLocationID =
+        weatherState.weatherLocations[0]?.id ?? null;
   }
 
-  const getOpenMeteoForecast = async ({ location }) => {
+  const getOpenMeteoForecast = async ({
+    location,
+  }: {
+    location: WeatherLocation;
+  }): Promise<OpenMeteoForecastData> => {
     let url = 'https://api.open-meteo.com/v1/forecast';
     url += `?latitude=${location.lat}&longitude=${location.lng}`;
     // const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || "auto";
@@ -104,7 +109,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
       );
     }
 
-    if (data.hourly?.temperature_2m.every((value) => value === null)) {
+    if (
+      data.hourly?.temperature_2m.every(
+        (value: number | null) => value === null,
+      )
+    ) {
       // Empty data
       throw new Error(
         '<p class="font-bold text-xl my-4">Something Went Wrong</p><p class="mt-4">There appears to be insufficient weather data, please try a different location.</p>',
@@ -113,8 +122,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     return data;
   };
 
-  const needsRefresh = ({ date1, date2 }) => {
-    const msDiff = date1 - date2;
+  const needsRefresh = ({ date1, date2 }: { date1: Date; date2: Date }) => {
+    const msDiff = date1.getTime() - date2.getTime();
     const thirtyMin = 60000 * 30;
     const hourDiff = Math.abs(date1.getUTCHours() - date2.getUTCHours());
     return msDiff > thirtyMin || hourDiff > 0;

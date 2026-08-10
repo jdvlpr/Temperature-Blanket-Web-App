@@ -221,7 +221,7 @@ const pdfWeatherData = {
 
     targets.forEach((target, i) => {
       const x = this.weatherDataPositionX + this.weatherDataColumnWidth * i;
-      let heading = target.pdfHeader[preferences.value.units];
+      let heading = target.pdfHeader[preferences.value.units ?? 'metric'];
       let unitLabel = '';
       if (heading.includes('(')) {
         const [title, label] = heading.split('(');
@@ -282,19 +282,19 @@ const pdfWeatherData = {
       let sValue;
       if (param === 'moon') {
         sValue = MOON_PHASE_NAMES[day[param]];
-      } else if (day[param][preferences.value.units] === null) {
+      } else if (day[param][preferences.value.units ?? 'metric'] === null) {
         sValue = '';
       } else {
         if (param === 'dayt') {
-          sValue = convertTime(day[param][preferences.value.units], {
+          sValue = convertTime(day[param][preferences.value.units ?? 'metric'], {
             displayUnits: false,
           });
         } else {
-          sValue = String(day[param][preferences.value.units]); // gauge.unit.label[preferences.value.units]
+          sValue = String(day[param][preferences.value.units ?? 'metric']); // gauge.unit.label[preferences.value.units ?? 'metric']
         }
       }
 
-      // const sValue = param.id.toString(); //gauge.unit.label[preferences.value.units]
+      // const sValue = param.id.toString(); //gauge.unit.label[preferences.value.units ?? 'metric']
       if (param === 'moon') doc.setFontSize(pdfConfig.font.micro);
       else doc.setFontSize(pdfConfig.font.p);
 
@@ -320,7 +320,7 @@ const pdfWeatherData = {
       if (hasGauge) {
         // Color box
         const value =
-          param === 'moon' ? day[param] : day[param][preferences.value.units];
+          param === 'moon' ? day[param] : day[param][preferences.value.units ?? 'metric'];
         const colorInfo = getColorInfo({
           param,
           value,

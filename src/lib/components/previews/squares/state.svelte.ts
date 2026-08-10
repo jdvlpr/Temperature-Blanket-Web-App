@@ -2,7 +2,10 @@ import { CHARACTERS_FOR_URL_HASH } from '$lib/constants/page-constants';
 import { gauges } from '$lib/state/gauges-state.svelte';
 import { previews } from '$lib/state/preview-state.svelte';
 import { weather } from '$lib/state/weather-state.svelte';
-import type { BasePreviewSettings } from '$lib/types/preview-types';
+import type {
+  BasePreviewSettings,
+  SecondaryTarget,
+} from '$lib/types/preview-types';
 import type { Color } from '$lib/types/yarn-types';
 import type { WeatherParam } from '$lib/types/gauge-types';
 import {
@@ -20,7 +23,7 @@ interface SquaresPreviewSettings extends BasePreviewSettings {
   primaryTarget: WeatherParam['id'];
   squareSize: number;
   columns: number;
-  secondaryTargets: { indexes: number; targetId: WeatherParam['id'] }[];
+  secondaryTargets: SecondaryTarget[];
   squaresAtBeginning: number;
   squaresBetweenMonthsCount: number;
   joinStitches: number;

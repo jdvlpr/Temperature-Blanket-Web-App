@@ -16,28 +16,43 @@
 import { WEATHER_DATA_DECIMALS } from '$lib/constants/weather-constants';
 import { windowLanguage } from '$lib/state/page-state.svelte';
 import { preferences } from '$lib/storage/preferences.svelte';
+import type { Unit } from '$lib/types/weather-types';
 import { displayNumber } from '$lib/utils/number-utils';
 import { exists } from '$lib/utils/other-utils';
 import { pluralize } from '$lib/utils/string-utils';
 /**
  * [description]
  */
-export const fahrenheitToCelsius = (value, decimals = WEATHER_DATA_DECIMALS) =>
+export const fahrenheitToCelsius = (
+  value: number | null,
+  decimals: number = WEATHER_DATA_DECIMALS,
+): number | null =>
   value === null ? null : displayNumber((+value - 32) * (5 / 9), decimals);
 /**
  * [description]
  */
-export const celsiusToFahrenheit = (value, decimals = WEATHER_DATA_DECIMALS) =>
+export const celsiusToFahrenheit = (
+  value: number | null,
+  decimals: number = WEATHER_DATA_DECIMALS,
+): number | null =>
   value === null ? null : displayNumber((+value * 9) / 5 + 32, decimals);
 
-export const millimetersToInches = (value, decimals = WEATHER_DATA_DECIMALS) =>
+export const millimetersToInches = (
+  value: number | null,
+  decimals: number = WEATHER_DATA_DECIMALS,
+): number | null =>
   value === null ? null : displayNumber(+value / 25.4, decimals);
 
-export const inchesToMillimeters = (value, decimals = WEATHER_DATA_DECIMALS) =>
+export const inchesToMillimeters = (
+  value: number | null,
+  decimals: number = WEATHER_DATA_DECIMALS,
+): number | null =>
   value === null ? null : displayNumber(+value * 25.4, decimals);
 
-export const hoursToMinutes = (value, decimals = WEATHER_DATA_DECIMALS) =>
-  displayNumber(value * 60, decimals);
+export const hoursToMinutes = (
+  value: number,
+  decimals: number = WEATHER_DATA_DECIMALS,
+): number => displayNumber(value * 60, decimals);
 
 /**
  * [convertTime description]
@@ -47,18 +62,23 @@ export const hoursToMinutes = (value, decimals = WEATHER_DATA_DECIMALS) =>
  * @return  {[String]}         [return description]
  */
 export const convertTime = (
-  value,
-  props = { displayUnits: true, padStart: false, forceUnits: null },
-) => {
-  let hours, minutes;
-  const { displayUnits, padStart, forceUnits } = props;
+  value: number | null,
+  props: {
+    displayUnits?: boolean;
+    padStart?: boolean;
+    forceUnits?: Unit | null;
+  } = { displayUnits: true, padStart: false, forceUnits: null },
+): string => {
+  let hours: number | string, minutes: number | string;
+  const { displayUnits = true, padStart = false, forceUnits = null } = props;
   const _units = forceUnits || preferences.value.units;
+  const _value = value ?? 0;
   if (_units === 'metric') {
-    hours = Math.floor(value / 60);
-    minutes = value % 60;
+    hours = Math.floor(_value / 60);
+    minutes = _value % 60;
   } else {
-    hours = Math.floor(value);
-    minutes = (value * 60) % 60;
+    hours = Math.floor(_value);
+    minutes = (_value * 60) % 60;
   }
 
   hours = displayNumber(hours);
@@ -70,7 +90,11 @@ export const convertTime = (
 
   if (displayUnits)
     return (
-      hours + pluralize('hr', hours) + ' ' + minutes + pluralize('min', minutes)
+      hours +
+      (pluralize('hr', Number(hours)) ?? '') +
+      ' ' +
+      minutes +
+      (pluralize('min', Number(minutes)) ?? '')
     );
 
   return hours + ':' + minutes;

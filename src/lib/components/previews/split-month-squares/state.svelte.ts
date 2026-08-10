@@ -56,7 +56,7 @@ export class SplitMonthSquaresPreviewClass {
 
   id = 'smsq';
 
-  svg = $state();
+  svg = $state<SVGSVGElement | null>(null);
 
   img = {
     light: './images/preview_icons/smsq_black.png',

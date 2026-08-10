@@ -215,11 +215,11 @@ const pdfGauge = {
         const from =
           String(gauge.ranges[i].from) +
           ' ' +
-          gauge.unit.label[preferences.value.units];
+          gauge.unit.label[preferences.value.units ?? 'metric'];
         const to =
           String(gauge.ranges[i].to) +
           ' ' +
-          gauge.unit.label[preferences.value.units];
+          gauge.unit.label[preferences.value.units ?? 'metric'];
         doc.text(from, pdfConfig.leftMargin + headerItems.from.position, l);
         doc.text(to, pdfConfig.leftMargin + headerItems.to.position, l);
       }

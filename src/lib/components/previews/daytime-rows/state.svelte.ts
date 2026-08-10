@@ -37,7 +37,7 @@ export class DaytimeRowsPreviewClass {
 
   id = 'rsun';
 
-  svg = $state();
+  svg = $state<SVGSVGElement | null>(null);
 
   img = {
     light: './images/preview_icons/Daylight Rows.png',

@@ -34,22 +34,29 @@ import {
   getLocalISODateString,
   stringToDate,
 } from '$lib/utils/date-utils';
+import type { GaugeAttributes } from '$lib/types/gauge-types';
+import type { Color } from '$lib/types/yarn-types';
 
-export const getProjectParametersFromURLHash = (hash) => {
-  return hash.split('&').reduce(function (res, item) {
-    const parts = item.split('=');
-    res[parts[0]] = {
-      key: parts[0],
-      value: decodeURIComponent(parts[1]),
-    };
-    return res;
-  }, {});
+export const getProjectParametersFromURLHash = (
+  hash: string,
+): Record<string, { key: string; value: string }> => {
+  return hash.split('&').reduce(
+    (res: Record<string, { key: string; value: string }>, item) => {
+      const parts = item.split('=');
+      res[parts[0]] = {
+        key: parts[0],
+        value: decodeURIComponent(parts[1]),
+      };
+      return res;
+    },
+    {},
+  );
 };
 
 export const downloadPDF = async () => {
   dialog.trigger({
     type: 'choose-weather-params',
-    response: async (response) => {
+    response: async (response: boolean) => {
       if (response) {
         await import('jspdf')
           .then((module) => {
@@ -71,7 +78,7 @@ export const downloadPDF = async () => {
 };
 
 export const downloadWeatherCSV = () => {
-  const labels = [];
+  const labels: string[] = [];
   allGaugesAttributes.forEach((gauge) => {
     gauge.targets.forEach((target) => {
       if (target?.id === 'dayt') {
@@ -80,38 +87,39 @@ export const downloadWeatherCSV = () => {
         labels.push(`${target.label}`);
       } else {
         labels.push(
-          `${target.label} (${gauge.unit.label[preferences.value.units]})`,
+          `${target.label} (${gauge.unit.label[preferences.value.units ?? 'metric']})`,
         );
       }
     });
   });
   if (!weather.data) return;
-  const _units = preferences.value.units;
+  const _units = preferences.value.units ?? 'metric';
   const _weather = [...weather.data].map((day, index) => {
-    const gaugeInfo = [];
+    const gaugeInfo: (string | number | null)[] = [];
     allGaugesAttributes?.forEach((gauge) => {
       gauge.targets?.forEach((target) => {
         if (target?.id === 'dayt') {
           gaugeInfo.push(
-            convertTime(day[target?.id][_units], {
+            convertTime(day[target.id][_units], {
               displayUnits: false,
               padStart: true,
             }),
           );
         } else if (target?.id === 'moon') {
-          gaugeInfo.push(MOON_PHASE_NAMES[day[target?.id]]);
+          const moon = day[target.id];
+          gaugeInfo.push(moon !== null ? MOON_PHASE_NAMES[moon] : null);
         } else {
-          gaugeInfo.push(day[target?.id][_units]);
+          gaugeInfo.push(day[target.id][_units]);
         }
       });
     });
     return [
       index + 1,
       dateToISO8601String(day.date),
-      locations.all.filter((n) => n.index === day.location)[0]?.index,
-      ...locations.all
+      locations.all?.filter((n) => n.index === day.location)[0]?.index,
+      ...(locations.all
         ?.filter((n) => n.index === day.location)?.[0]
-        ?.label.split(','),
+        ?.label?.split(',') ?? []),
       gaugeInfo,
     ];
   });
@@ -139,30 +147,31 @@ export const downloadWeatherCSV = () => {
   document.body.removeChild(link);
 };
 
-export const sendToProjectGallery = async (img) => {
-  const colors = [];
-  const palettes = [];
-  const yarnUrls = [];
-  const yarnDetails = [];
-  const labels = [];
-  const tables = [];
+export const sendToProjectGallery = async (img: string) => {
+  const colors: Color[][] = [];
+  const palettes: string[] = [];
+  const yarnUrls: string[] = [];
+  const yarnDetails: { name: string }[] = [];
+  const labels: (GaugeAttributes['label'] | undefined)[] = [];
+  const tables: Record<string, unknown>[][] = [];
   gauges.allCreated.forEach((gauge) => {
-    colors.push(gauge.colors);
+    const gaugeColors = gauge.colors ?? [];
+    colors.push(gaugeColors);
     labels.push(gauge.label);
-    palettes.push(colorsToCode(gauge.colors, { includePrefixes: true }));
-    const colorsCode = colorsToCode(gauge.colors, {
+    palettes.push(colorsToCode(gaugeColors, { includePrefixes: true }));
+    const colorsCode = colorsToCode(gaugeColors, {
       includePrefixes: false,
     });
     const names = [
       ...new Set(
-        gauge.colors
+        gaugeColors
           .filter((n) => !!n?.brandName && !!n?.yarnName)
           .map((n) => `${n.brandName} - ${n.yarnName}`),
       ),
     ].join(', ');
     yarnDetails.push({ name: names });
     const yarnURLDetails = colorsToYarnDetails({
-      colors: gauge.colors,
+      colors: gaugeColors,
     });
     let yarnSearchUrl = `${window.location.origin}/yarn?s=${colorsCode}&f=${yarnURLDetails}`;
     yarnUrls.push(yarnSearchUrl);
@@ -197,7 +206,7 @@ export const sendToProjectGallery = async (img) => {
     yarn_details: JSON.stringify(yarnDetails),
     weather_grouping: weather.grouping,
     weather_sources: JSON.stringify(weather.getWeatherSourceDetails()),
-    wp_tag_id: previews.active.wpTagId,
+    wp_tag_id: previews.active?.wpTagId,
   };
   let message = '';
   try {
@@ -241,12 +250,13 @@ export const sendToProjectGallery = async (img) => {
 
 // In the backend db, each project has a locations meta key
 // locations is a stringified array of objects `{ label: '', from: '', to: '', latlong: '' }`
-export const getTitleFromLocationsMeta = (locations) => {
-  const _locations = locations ? JSON.parse(locations) : null;
+export const getTitleFromLocationsMeta = (locations: string | null): string => {
+  const _locations: { label: string; from: string; to: string }[] | null =
+    locations ? JSON.parse(locations) : null;
   if (!locations) return '';
 
   // Older project gallery items didn't always use the standard ISO 8601 date format, so we need to be able to check if it's a valid date.
-  const isValidDate = (string) => {
+  const isValidDate = (string: string): boolean => {
     return !isNaN(new Date(string).getTime());
   };
 
@@ -257,8 +267,8 @@ export const getTitleFromLocationsMeta = (locations) => {
           // Some locations have a missing city name `, ,`, so replace that with just one comma `,`
           const label = item.label.replace(', ,', ',');
 
-          let from = item.from;
-          let to = item.to;
+          let from: string = item.from;
+          let to: string = item.to;
 
           // Before version 3.36.0, projects' location from and to dates were saved in the user's locale format,
           // which means different project's displayed other locale's formats, not always the user's locale formate.

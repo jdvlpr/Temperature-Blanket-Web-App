@@ -13,12 +13,14 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script module>
+<script module lang="ts">
+  import type { WeatherLocation } from './open-meteo-types';
+
   class WeatherState {
-    hour = $state('24');
-    weatherLocations = $state([]);
-    activeLocationID = $state(null);
-    weatherDataElement = $state(null);
+    hour: '12' | '24' = $state('24');
+    weatherLocations: WeatherLocation[] = $state([]);
+    activeLocationID: number | null = $state(null);
+    weatherDataElement: HTMLDivElement | null = $state(null);
   }
 
   export const weatherState = new WeatherState();
@@ -41,6 +43,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { delay } from '$lib/utils/function-utils.svelte';
   import { getWeatherCodeDetails } from '$lib/utils/weather-forecast-utils';
   import { setUnitsFromNavigator } from '$lib/utils/unit-utils.svelte';
+  import type { Unit } from '$lib/types/weather-types';
   import { ListIcon, PlusIcon, SettingsIcon } from '@lucide/svelte';
   import { onDestroy, onMount, tick } from 'svelte';
   import { fade } from 'svelte/transition';
@@ -49,6 +52,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Location from './Location.svelte';
   import Menu from './Menu.svelte';
   import Symbols from './Symbols.svelte';
+  import type { WeatherHourlyItem, WeatherDailyItem } from './open-meteo-types';
 
   let showChart = $state(true);
 
@@ -56,18 +60,26 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let mounted = $state(true);
 
-  let windowWidth;
+  let windowWidth: number | undefined;
 
-  let debounceTimer;
-  const debounce = (callback, time) => {
+  let debounceTimer: number | undefined;
+  const debounce = (callback: () => void, time: number) => {
     if (!browser) return;
     window.clearTimeout(debounceTimer);
     debounceTimer = window.setTimeout(callback, time);
   };
 
-  function getShareableURL({ id, units, hourFormat }) {
+  function getShareableURL({
+    id,
+    units,
+    hourFormat,
+  }: {
+    id: number | null;
+    units: Unit | null;
+    hourFormat: '12' | '24';
+  }) {
     if (!id || !units || !hourFormat) return; // prevents from running durring mount, I think ?
-    page.url.searchParams.set('id', id);
+    page.url.searchParams.set('id', String(id));
     page.url.searchParams.set('h', hourFormat === '12' ? '0' : '1');
     page.url.searchParams.set('u', units === 'metric' ? 'm' : 'i');
     shareableURL = page.url.href;
@@ -95,18 +107,24 @@ If not, see <https://www.gnu.org/licenses/>. -->
     }, 450);
   }
 
-  function getCurrentTime({ weatherData, hourFormat }) {
+  function getCurrentTime({
+    weatherData,
+    hourFormat,
+  }: {
+    weatherData: WeatherLocation['data'] | null;
+    hourFormat: '12' | '24';
+  }) {
     if (!browser || !weatherData) return;
     const locale = navigator.languages
       ? navigator.languages[0]
       : navigator.language;
-    const date = new Date(weatherData?.current_weather.time).toLocaleDateString(
+    const date = new Date(weatherData.current_weather.time).toLocaleDateString(
       locale,
       {
         dateStyle: 'short',
       },
     );
-    const time = new Date(weatherData?.current_weather.time).toLocaleTimeString(
+    const time = new Date(weatherData.current_weather.time).toLocaleTimeString(
       locale,
       {
         timeStyle: 'short',
@@ -120,7 +138,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   // function to calculate local time
   // in a different city
   // given the city’s UTC offset
-  function timezoneOffsetToLocalDate(offset) {
+  function timezoneOffsetToLocalDate(offset: number) {
     // create Date object for current location
     let d = new Date();
 
@@ -137,17 +155,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
     return nd;
   }
 
-  let weatherData = $derived(
+  let weatherData: WeatherLocation['data'] | null = $derived(
     weatherState.weatherLocations?.find(
       (item) => item.id === weatherState.activeLocationID,
-    )?.data || null,
+    )?.data ?? null,
   );
 
-  let hourlyData = $derived(
-    weatherData?.hourly.time.map((item, index) => {
+  let hourlyData: WeatherHourlyItem[] | undefined = $derived.by(() => {
+    const _weatherData = weatherData;
+    if (!_weatherData) return undefined;
+    return _weatherData.hourly.time.map((item, index): WeatherHourlyItem => {
       const date = new Date(item);
 
-      const tzItemOffsetHr = weatherData.utc_offset_seconds / 60 / 60;
+      const tzItemOffsetHr = _weatherData.utc_offset_seconds / 60 / 60;
 
       const localDateInTimeZone = timezoneOffsetToLocalDate(tzItemOffsetHr);
 
@@ -159,29 +179,31 @@ If not, see <https://www.gnu.org/licenses/>. -->
       return {
         isNow,
         time: item,
-        apparent_temperature: weatherData?.hourly.apparent_temperature[index],
-        cloudcover: weatherData?.hourly.cloudcover[index],
-        is_day: weatherData?.hourly.is_day[index],
+        apparent_temperature: _weatherData.hourly.apparent_temperature[index],
+        cloudcover: _weatherData.hourly.cloudcover[index],
+        is_day: _weatherData.hourly.is_day[index],
         precipitation_probability:
-          weatherData?.hourly.precipitation_probability[index],
-        temperature_2m: weatherData?.hourly.temperature_2m[index],
-        weathercode: weatherData?.hourly.weathercode[index],
+          _weatherData.hourly.precipitation_probability[index],
+        temperature_2m: _weatherData.hourly.temperature_2m[index],
+        weathercode: _weatherData.hourly.weathercode[index],
       };
-    }),
-  );
+    });
+  });
 
-  let dailyWeatherData = $derived(
-    weatherData?.daily.time.map((item, index) => {
+  let dailyWeatherData: WeatherDailyItem[] | undefined = $derived.by(() => {
+    const _weatherData = weatherData;
+    if (!_weatherData) return undefined;
+    return _weatherData.daily.time.map((item, index): WeatherDailyItem => {
       return {
         time: item,
-        temperature_2m_max: weatherData?.daily.temperature_2m_max[index],
-        temperature_2m_min: weatherData?.daily.temperature_2m_min[index],
+        temperature_2m_max: _weatherData.daily.temperature_2m_max[index],
+        temperature_2m_min: _weatherData.daily.temperature_2m_min[index],
         precipitation_probability_max:
-          weatherData?.daily.precipitation_probability_max[index],
-        weathercode: weatherData?.daily.weathercode[index],
+          _weatherData.daily.precipitation_probability_max[index],
+        weathercode: _weatherData.daily.weathercode[index],
       };
-    }),
-  );
+    });
+  });
 
   let hourlyForcastData = $derived(
     hourlyData?.slice(
@@ -214,37 +236,40 @@ If not, see <https://www.gnu.org/licenses/>. -->
     });
   });
 
-  $effect(async () => {
+  $effect(() => {
+    if (!preferences.value.units) return;
     localStorage.setItem('[/weather]units', preferences.value.units);
     if (
       weatherState.weatherLocations?.some(
         (item) => item.units !== preferences.value.units,
       )
     )
-      await fetchData();
+      fetchData();
   });
 
   onMount(async () => {
     // units
     const paramUnits = page.url.searchParams.get('u');
+    const storedUnits = localStorage.getItem('[/weather]units');
     if (paramUnits === 'i') preferences.value.units = 'imperial';
     else if (paramUnits === 'm') preferences.value.units = 'metric';
-    else if (localStorage.getItem('[/weather]units'))
-      preferences.value.units = localStorage.getItem('[/weather]units');
+    else if (storedUnits) preferences.value.units = storedUnits as Unit;
     else setUnitsFromNavigator();
 
     // hour12
     const hourFormat = page.url.searchParams.get('h');
+    const storedHourFormat = localStorage.getItem('[/weather]hour_format');
     if (hourFormat === '0') weatherState.hour = '12';
     else if (hourFormat === '1') weatherState.hour = '24';
-    else if (localStorage.getItem('[/weather]hour_format'))
-      weatherState.hour = localStorage.getItem('[/weather]hour_format');
+    else if (storedHourFormat)
+      weatherState.hour = storedHourFormat as '12' | '24';
     else weatherState.hour = preferences.value.units === 'metric' ? '24' : '12';
 
     // saved weather locations
-    if (localStorage.getItem('[/weather]locations')) {
-      weatherState.weatherLocations = JSON.parse(
-        localStorage.getItem('[/weather]locations'),
+    const storedLocations = localStorage.getItem('[/weather]locations');
+    if (storedLocations) {
+      weatherState.weatherLocations = (
+        JSON.parse(storedLocations) as WeatherLocation[]
       ).map((item) => {
         return { ...item, id: +item.id };
       });
@@ -255,20 +280,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
       if (weatherState.activeLocationID) await fetchData();
     }
 
-    if (
-      !weatherState.activeLocationID &&
-      locations.all.length > 0 &&
-      locations.all[0].id
-    ) {
+    const firstLocation = locations.all[0];
+    if (!weatherState.activeLocationID && firstLocation?.id) {
       weatherState.weatherLocations.push({
-        id: $state.snapshot(locations.all[0].id),
-        elevation: $state.snapshot(locations.all[0].elevation),
-        label: $state.snapshot(locations.all[0].label),
-        lat: $state.snapshot(locations.all[0].lat),
-        lng: $state.snapshot(locations.all[0].lng),
-        result: $state.snapshot(locations.all[0].result),
+        id: $state.snapshot(firstLocation.id),
+        elevation: $state.snapshot(firstLocation.elevation),
+        label: $state.snapshot(firstLocation.label),
+        lat: $state.snapshot(firstLocation.lat),
+        lng: $state.snapshot(firstLocation.lng),
+        result: $state.snapshot(firstLocation.result),
       });
-      weatherState.activeLocationID = $state.snapshot(locations.all[0].id);
+      weatherState.activeLocationID = $state.snapshot(firstLocation.id);
     }
 
     windowWidth = window.innerWidth;
@@ -411,7 +433,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         });
                         page.url.searchParams.set(
                           'id',
-                          weatherState.activeLocationID,
+                          String(weatherState.activeLocationID),
                         );
                         page.url.searchParams.set(
                           'h',
@@ -448,7 +470,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 <p class="font-bold md:text-xl">
                   {@html weatherState.weatherLocations.find(
                     (item) => item.id === weatherState.activeLocationID,
-                  ).result}
+                  )?.result ?? ''}
                 </p>
 
                 <p>
@@ -480,11 +502,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 <div class="flex justify-center gap-2 text-xl">
                   <p class="">
                     <span class="" style="color: rgb(248, 113, 113);">↑</span>
-                    {dailyWeatherData[0].temperature_2m_max}°
+                    {dailyWeatherData?.[0]?.temperature_2m_max}°
                   </p>
                   <p class="">
                     <span class=" " style="color: rgb(56, 189, 248);">↓</span>
-                    {dailyWeatherData[0].temperature_2m_min}°
+                    {dailyWeatherData?.[0]?.temperature_2m_min}°
                   </p>
                 </div>
               </div>
@@ -590,6 +612,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     )}
                     {@const details = getWeatherCodeDetails({
                       weathercode,
+                      is_day: 1,
                       precipitation_probability: precipitation_probability_max,
                     })}
                     <div

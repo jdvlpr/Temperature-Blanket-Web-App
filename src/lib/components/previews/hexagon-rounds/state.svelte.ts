@@ -74,7 +74,7 @@ export class HexagonRoundsPreviewClass {
 
   id = 'hxrd';
 
-  svg = $state();
+  svg = $state<SVGSVGElement | null>(null);
 
   img = {
     light: './images/preview_icons/Hexagon Rounds.png',

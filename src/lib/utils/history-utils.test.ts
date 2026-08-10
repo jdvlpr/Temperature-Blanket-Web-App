@@ -26,9 +26,9 @@ const {
 } = vi.hoisted(() => ({
   mockProject: {
     history: {
-      current: '',
-      previous: '',
-      next: '',
+      current: '' as string | null,
+      previous: '' as string | null | undefined,
+      next: '' as string | null | undefined,
       isFirst: false,
       isLast: false,
       isUpdating: false,

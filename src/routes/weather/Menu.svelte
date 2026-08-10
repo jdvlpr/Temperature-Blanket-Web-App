@@ -13,7 +13,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script>
+<script lang="ts">
   import UnitChanger from '$lib/components/UnitChanger.svelte';
   import { dialog } from '$lib/state/page-state.svelte';
   import { getWeatherCodeDetails } from '$lib/utils/weather-forecast-utils';
@@ -23,13 +23,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { fetchData } from './GetWeather.svelte';
   import { weatherLocationState } from './Location.svelte';
 
-  /**
-   * @typedef {Object} Props
-   * @property {string} [page]
-   */
+  interface Props {
+    page?: 'settings' | 'locations';
+  }
 
-  /** @type {Props} */
-  let { page = 'settings' } = $props();
+  let { page = 'settings' }: Props = $props();
 
   let savedWeatherLocations = $derived(
     weatherState.weatherLocations.filter((item) => item.saved),
@@ -68,7 +66,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 {data?.current_weather.temperature}°
               </p>
               <p class="text-xs">
-                {new Date(data?.current_weather.time).toLocaleTimeString(
+                {new Date(data?.current_weather.time ?? 0).toLocaleTimeString(
                   navigator.language,
                   {
                     timeStyle: 'short',
@@ -82,19 +80,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
               class="flex flex-1 basis-1/2 flex-col items-start justify-start text-left sm:flex-wrap"
             >
               <p class="font-bold">
-                {@html label.slice(0, label.split(',', 2).join(',').length)}
+                {@html (label ?? '').slice(
+                  0,
+                  (label ?? '').split(',', 2).join(',').length,
+                )}
               </p>
               <div class="flex flex-wrap items-center justify-center gap-x-1">
                 <p>
                   {@html getWeatherCodeDetails({
-                    weathercode: data?.current_weather.weathercode,
-                    is_day: data?.current_weather.is_day,
+                    weathercode: data?.current_weather.weathercode ?? null,
+                    is_day: data?.current_weather.is_day ?? null,
                   }).description}
                 </p>
                 <p>
                   {@html getWeatherCodeDetails({
-                    weathercode: data?.current_weather.weathercode,
-                    is_day: data?.current_weather.is_day,
+                    weathercode: data?.current_weather.weathercode ?? null,
+                    is_day: data?.current_weather.is_day ?? null,
                   }).icon}
                 </p>
               </div>
@@ -144,7 +145,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <SegmentedControl
               value={weatherState.hour}
               onValueChange={(e) => {
-                weatherState.hour = e.value;
+                weatherState.hour = e.value as '12' | '24';
               }}
             >
               <SegmentedControl.Control

@@ -127,7 +127,7 @@ export interface ToastSettings {
   /** Provide arbitrary CSS classes to style the toast. */
   classes?: string;
   /** Category of the toast. */
-  category?: 'success' | 'error' | 'warning' | null;
+  category?: 'success' | 'error' | 'warning' | 'info' | null;
   /** Custom Icon Component */
   icon?: Component;
   /** Callback function that fires on trigger and close. */
@@ -214,7 +214,9 @@ export const showNavigationSideBar = $state({ value: true });
 
 export const isDesktop = new MediaQuery('(min-width: 768px)');
 
-export const windowLanguage = $state({ value: null });
+export const windowLanguage: { value: string | null } = $state({
+  value: null,
+});
 
 class DrawerStateClass {
   weatherDetails = $state(false);

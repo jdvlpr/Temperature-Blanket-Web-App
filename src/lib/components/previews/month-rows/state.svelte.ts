@@ -59,7 +59,7 @@ export class MonthRowsPreviewClass {
 
   id = 'mrws';
 
-  svg = $state();
+  svg = $state<SVGSVGElement | null>(null);
 
   img = {
     light: './images/preview_icons/mrws_black.png',

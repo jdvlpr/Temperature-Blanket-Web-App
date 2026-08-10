@@ -18,6 +18,7 @@ import {
   getBrands,
   getColorwaysWithAffiliateLinks,
 } from '$lib/data/yarns/colorways.svelte';
+import type { Color, Yarn } from '$lib/types/yarn-types';
 
 /**
  * [getColorPropertiesFromYarnStringAndHex description]
@@ -27,7 +28,13 @@ import {
  *
  * @return  {object}              color object
  */
-export const getColorPropertiesFromYarnStringAndHex = ({ yarnString, hex }) => {
+export const getColorPropertiesFromYarnStringAndHex = ({
+  yarnString,
+  hex,
+}: {
+  yarnString: string;
+  hex: Color['hex'];
+}): Color | null => {
   const { brandId, yarnId } = stringToBrandAndYarnDetails(yarnString);
 
   const matchingColor = getColorwaysWithAffiliateLinks().find(
@@ -45,7 +52,14 @@ export const getColorPropertiesFromYarnStringAndHex = ({ yarnString, hex }) => {
  *
  * @return  {object}        {brandId: string | null, yarnId: string | null, brandName: string | null, yarnName: string | null}
  */
-export const stringToBrandAndYarnDetails = (text) => {
+export const stringToBrandAndYarnDetails = (
+  text: string,
+): {
+  brandId: string | null;
+  yarnId: string | null;
+  brandName?: string | null;
+  yarnName?: string | null;
+} => {
   if (!text.includes('-')) return { brandId: null, yarnId: null };
 
   if (text.includes('worsted-8')) {
@@ -59,7 +73,7 @@ export const stringToBrandAndYarnDetails = (text) => {
   const brandName = brand ? brand.name : null;
 
   const yarn = brandId
-    ? brand.yarns.find((yarn) => yarn.id === yarnCode)
+    ? brand?.yarns.find((yarn) => yarn.id === yarnCode)
     : null;
   const yarnId = yarn ? yarn.id : null;
   const yarnName = yarn ? yarn.name : null;
@@ -67,7 +81,11 @@ export const stringToBrandAndYarnDetails = (text) => {
   return { brandId, yarnId, brandName, yarnName };
 };
 
-export const getFilteredYarns = ({ selectedBrandId }) => {
+export const getFilteredYarns = ({
+  selectedBrandId,
+}: {
+  selectedBrandId?: string;
+}): Yarn[] | undefined => {
   return selectedBrandId
     ? getBrands()?.filter((brand) => brand.id === selectedBrandId)[0]?.yarns
     : getBrands().flatMap((n) => n.yarns);
@@ -77,7 +95,11 @@ export const getColorways = ({
   selectedBrandId,
   selectedYarnId,
   selectedYarnWeightId,
-}) => {
+}: {
+  selectedBrandId?: string;
+  selectedYarnId?: string;
+  selectedYarnWeightId?: string;
+}): Color[] => {
   return getColorwaysWithAffiliateLinks()
     .filter((colorway) => {
       if (!selectedBrandId) return true;

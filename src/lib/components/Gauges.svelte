@@ -36,7 +36,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         if (
           weather.data?.some((day) => {
             if (target.type === 'category') return day[target.id] !== null;
-            else return day[target.id][preferences.value.units] !== null;
+            else return day[target.id][preferences.value.units ?? 'metric'] !== null;
           })
         ) {
           // For each of the gauge's weather parameter targets, check to see if there is any data, and if so setup the default gauge

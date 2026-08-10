@@ -160,13 +160,16 @@ export const getDaysBetween = (startDate: Date, endDate: Date): number => {
   return Math.round((endDate.getTime() - startDate.getTime()) / msPerDay) + 1;
 };
 
-export function getWeekNumber(d, dowOffset) {
+export function getWeekNumber(
+  d: Date,
+  dowOffset?: number,
+): [number, number] {
   // --- 1. Parameter Handling & Validation ---
   // Set default offset to Sunday (ISO 8601) if not provided or invalid type
-  dowOffset = typeof dowOffset === 'number' ? dowOffset : 0;
+  const _dowOffset = typeof dowOffset === 'number' ? dowOffset : 0;
 
   // Validate the offset value
-  if (dowOffset < 0 || dowOffset > 6) {
+  if (_dowOffset < 0 || _dowOffset > 6) {
     throw new Error(
       'dowOffset must be an integer between 0 (Sunday) and 6 (Saturday).',
     );
@@ -184,7 +187,7 @@ export function getWeekNumber(d, dowOffset) {
   // We want a 1-7 representation where 1 is the start day defined by dowOffset.
   // Example: if dowOffset = 1 (Monday), then Mon=1, Tue=2, ..., Sun=7
   // Example: if dowOffset = 0 (Sunday), then Sun=1, Mon=2, ..., Sat=7
-  var dayOfWeek = ((date.getUTCDay() - dowOffset + 7) % 7) + 1;
+  var dayOfWeek = ((date.getUTCDay() - _dowOffset + 7) % 7) + 1;
 
   // Adjust the date to the 4th day (e.g., Thursday if week starts Monday) of the *current* week.
   // Why the 4th day? Because the week belongs to the year containing the majority (>=4) of its days.
@@ -196,7 +199,7 @@ export function getWeekNumber(d, dowOffset) {
   var yearStart = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
 
   // Calculate the number of days between the start of the year and the adjusted date (the 4th day of the week).
-  var days = (date - yearStart) / 86400000; // 86400000 = ms per day
+  var days = (date.getTime() - yearStart.getTime()) / 86400000; // 86400000 = ms per day
 
   // Calculate the week number. Add 1 because days is zero-based, divide by 7, and round up.
   var weekNo = Math.ceil((days + 1) / 7);
@@ -212,10 +215,10 @@ export const createWeeksProperty = ({
   dowOffset = weather.monthGroupingStartDay,
 }: {
   weatherData: WeatherDay[];
-  dowOffset: number;
-}) => {
-  if (!weatherData.length) return weatherData;
-  const data = weatherData.map((day, i) => {
+  dowOffset?: number;
+}): (WeatherDay & { weekId: string })[] => {
+  if (!weatherData.length) return weatherData as (WeatherDay & { weekId: string })[];
+  const data = weatherData.map((day) => {
     const [year, week] = getWeekNumber(day.date, dowOffset);
 
     return { ...day, weekId: `${year}-${week}` };

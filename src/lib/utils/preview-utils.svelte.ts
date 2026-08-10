@@ -21,6 +21,7 @@ import { previewWeatherTargets } from '$lib/state/preview-state.svelte';
 import { weather } from '$lib/state/weather-state.svelte';
 import type { WeatherDay } from '$lib/types/weather-types';
 import type { WeatherParam } from '$lib/types/gauge-types';
+import type { SecondaryTarget } from '$lib/types/preview-types';
 import { exists } from '$lib/utils/other-utils';
 
 export const showPreviewImageWeatherDetails = (
@@ -51,7 +52,13 @@ export const svgToPNG = async ({
   height,
   download = true,
   canvasId = 'temporary-canvas',
-}) => {
+}: {
+  svgNode: Node;
+  width: number;
+  height: number;
+  download?: boolean;
+  canvasId?: string;
+}): Promise<string> => {
   const canvas = document.createElement('canvas');
   canvas.id = canvasId;
   canvas.width = width;
@@ -59,6 +66,7 @@ export const svgToPNG = async ({
   canvas.style.display = 'none';
   document.getElementsByTagName('body')[0].appendChild(canvas);
   const ctx = canvas.getContext('2d');
+  if (!ctx) throw new Error('Could not get canvas 2d context.');
 
   const outerHTML = new XMLSerializer().serializeToString(svgNode);
 
@@ -77,9 +85,9 @@ export const svgToPNG = async ({
 };
 
 export const downloadPreviewPNG = async (
-  /** @type {number} */ width,
-  /** @type {number} */ height,
-  /** @type {Node} */ svg,
+  width: number,
+  height: number,
+  svg: Node,
 ) => {
   const img = await svgToPNG({ svgNode: svg, width, height });
 
@@ -98,7 +106,10 @@ export const downloadPreviewPNG = async (
  *
  * @return  {string[]}                 [secondaryTargets]
  */
-export const setSecondaryTargets = (newItem, existingItems) => {
+export const setSecondaryTargets = (
+  newItem: [WeatherParam['id'], number],
+  existingItems: SecondaryTarget[],
+): SecondaryTarget[] | undefined => {
   if (!existingItems) return;
   const targetId = newItem[0];
   const index = +newItem[1];
@@ -139,9 +150,11 @@ export const setSecondaryTargets = (newItem, existingItems) => {
  * @param {Array<{index: number, targetId: string}>} secondaryTargets - The array of secondary targets.
  * @returns {Array<{index: number, targetId: string}>} - An array of objects with the index and target ID.
  */
-export const getSecondaryTargetIndexes = (secondaryTargets) => {
+export const getSecondaryTargetIndexes = (
+  secondaryTargets: SecondaryTarget[],
+): { index: number; targetId: WeatherParam['id'] }[] => {
   if (!secondaryTargets) return [];
-  const indexes: { index: number; targetId: string }[] = [];
+  const indexes: { index: number; targetId: WeatherParam['id'] }[] = [];
   secondaryTargets.forEach((item) => {
     item.indexes.forEach((position) => {
       indexes.push({
@@ -187,12 +200,12 @@ export const getMonthSepparatorIndexes = (): number[] => {
  */
 export const getSquareSectionTargetIds = (
   squareSectionsCount: number,
-  primaryTarget: string,
-  secondaryTargets: { indexes: number; targetId: WeatherParam['id'] }[],
-): WeatherParam['id'] => {
+  primaryTarget: WeatherParam['id'],
+  secondaryTargets: SecondaryTarget[],
+): WeatherParam['id'][] => {
   const secondaryParamIndexes = getSecondaryTargetIndexes(secondaryTargets);
   const defaultParam = primaryTarget;
-  const params = [];
+  const params: WeatherParam['id'][] = [];
 
   for (
     let sectionIndex = 0;
@@ -219,7 +232,7 @@ export const getSquareSectionTargetIds = (
   return params;
 };
 
-type WeatherMonthsDataType = {
+export type WeatherMonthsDataType = {
   location: WeatherDay['location'];
   year: number;
   month: number;
@@ -260,12 +273,14 @@ export const weatherMonthsData = ({
   return data;
 };
 
-export const getDaysInLongestMonth = (monthsData) => {
+export const getDaysInLongestMonth = (
+  monthsData: WeatherMonthsDataType[],
+): number => {
   return Math.max(...monthsData.map((month) => month.days));
 };
 
-export const getFactors = ({ length }) => {
-  const factors = [];
+export const getFactors = ({ length }: { length: number }): number[] => {
+  const factors: number[] = [];
   for (let i = 0; i < length; i++) {
     if (length % i === 0) factors.push(i);
   }
@@ -273,9 +288,15 @@ export const getFactors = ({ length }) => {
   return factors;
 };
 
-export const getPossibleDimensions = ({ factors, currentDimensions }) => {
-  const dimensions = [];
-  const opposite = [];
+export const getPossibleDimensions = ({
+  factors,
+  currentDimensions,
+}: {
+  factors: number[];
+  currentDimensions?: string;
+}): string[] => {
+  const dimensions: [number, number][] = [];
+  const opposite: [number, number][] = [];
 
   // Iterate over the factors array
   for (let index = 0; index < factors.length / 2; index++) {
@@ -299,12 +320,12 @@ export const getPossibleDimensions = ({ factors, currentDimensions }) => {
     return [value];
   }
 
-  let options = [...dimensions, ...opposite.reverse()];
+  const dimensionPairs = [...dimensions, ...opposite.reverse()];
 
   // Use a Set to filter out duplicates and convert back to an array
-  options = [...new Set(options.map((n) => n[0] + 'x' + n[1]))];
+  const options = [...new Set(dimensionPairs.map((n) => n[0] + 'x' + n[1]))];
 
-  if (!options.includes(currentDimensions)) {
+  if (!currentDimensions || !options.includes(currentDimensions)) {
     currentDimensions = options[Math.ceil(options.length / 2) - 1];
   }
 
@@ -318,10 +339,16 @@ export const getPossibleDimensions = ({ factors, currentDimensions }) => {
  *
  * @return  {String || Array}
  */
-export const setTargets = (data) => {
+export function setTargets(data: WeatherParam['id']): WeatherParam['id'];
+export function setTargets(
+  data: WeatherParam['id'][],
+): WeatherParam['id'][];
+export function setTargets(data: SecondaryTarget[]): SecondaryTarget[];
+export function setTargets(
+  data: WeatherParam['id'] | WeatherParam['id'][] | SecondaryTarget[],
+): WeatherParam['id'] | WeatherParam['id'][] | SecondaryTarget[] {
   if (typeof data === 'string') {
     // If a gauge gets removed and it contains the target weather param, reset the primary weather param
-    if (data === null) return gauges.allCreated[0].targets[0].id;
     return gauges.allCreated
       .map((g) => g.id)
       .includes(getTargetParentGaugeId(data))
@@ -329,40 +356,43 @@ export const setTargets = (data) => {
       : gauges.allCreated[0].targets[0].id;
   }
 
-  if (typeof data === 'object') {
-    // If a gauge gets removed and it contains the target weather param, reset the secondary weather param
+  // If a gauge gets removed and it contains the target weather param, reset the secondary weather param
+  if (data.length === 0) return [];
 
-    if (data.length === 0) return [];
+  // for square secondary params, arrays contain objects, not just strings
+  const isSecondarySquareParamData = data.some(
+    (n): n is SecondaryTarget => typeof n === 'object' && !!n?.targetId,
+  );
 
-    let _targets = data;
+  let _targets: WeatherParam['id'][] = isSecondarySquareParamData
+    ? (data as SecondaryTarget[]).map((n) => n.targetId)
+    : (data as WeatherParam['id'][]);
 
-    const isSecondarySquareParamData = data.some((n) => n?.targetId); // for square secondary params, arrays contain objects, not just strings
+  _targets = _targets.filter((n) => {
+    const parentId = getTargetParentGaugeId(n);
+    return $state.snapshot(
+      gauges.allCreated.map((g) => g.id).includes(parentId),
+    );
+  });
 
-    if (isSecondarySquareParamData)
-      _targets = data.map((n) => n.targetId).flat();
-    _targets = _targets.filter((n) => {
-      n = getTargetParentGaugeId(n);
-      return $state.snapshot(gauges.allCreated.map((g) => g.id).includes(n));
-    });
-
-    if (_targets.length === 0) {
-      _targets = [gauges.allCreated[0]?.targets[0].id];
-    }
-
-    if (isSecondarySquareParamData) {
-      const _data = [];
-      _targets.forEach((target) => {
-        if (
-          data
-            .map((n) => n.targetId)
-            .flat()
-            .includes(target)
-        ) {
-          _data.push(data.filter((n) => n.targetId === target)[0]);
-        }
-      });
-      _targets = _data;
-    }
-    return _targets;
+  if (_targets.length === 0) {
+    _targets = [gauges.allCreated[0]?.targets[0].id];
   }
-};
+
+  if (isSecondarySquareParamData) {
+    const _data: SecondaryTarget[] = [];
+    _targets.forEach((target) => {
+      if (
+        (data as SecondaryTarget[]).map((n) => n.targetId).includes(target)
+      ) {
+        _data.push(
+          (data as SecondaryTarget[]).filter(
+            (n) => n.targetId === target,
+          )[0],
+        );
+      }
+    });
+    return _data;
+  }
+  return _targets;
+}

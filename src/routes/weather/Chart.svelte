@@ -13,7 +13,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script>
+<script lang="ts">
   import { Chart, registerChartJS } from '$lib/features/charts/chartjs-setup';
   import {
     buildXAxis,
@@ -23,20 +23,35 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { onMount } from 'svelte';
   import { weatherState } from './+page.svelte';
   import { preferences } from '$lib/storage/preferences.svelte';
+  import type { ChartDataset } from 'chart.js';
+  import type { WeatherHourlyItem, WeatherDailyItem } from './open-meteo-types';
 
-  let { data } = $props();
+  interface Props {
+    data: (WeatherHourlyItem | WeatherDailyItem)[] | undefined;
+  }
+
+  let { data }: Props = $props();
 
   registerChartJS();
 
-  let dataSets, chart;
+  type WeatherChartDataset = ChartDataset<'line' | 'bar', (number | null)[]> & {
+    id: string;
+  };
+
+  let dataSets: WeatherChartDataset[] = [];
+  let chart: Chart | undefined;
 
   onMount(() => {
-    if (data.some((item) => item?.temperature_2m_max)) {
+    if (!data) return;
+    const isDaily = data.some((item) => 'temperature_2m_max' in item);
+
+    if (isDaily) {
+      const dailyData = data as WeatherDailyItem[];
       dataSets = [
         {
           label: 'Temperature Max',
           id: 'tmin',
-          data: data.map((item) => item.temperature_2m_max),
+          data: dailyData.map((item) => item.temperature_2m_max),
           borderColor: '#f8717170',
           pointHoverBorderColor: '#f8717120',
           pointBorderColor: '#f87171',
@@ -49,7 +64,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {
           label: 'Temperature Min',
           id: 'tmax',
-          data: data.map((item) => item.temperature_2m_min),
+          data: dailyData.map((item) => item.temperature_2m_min),
           borderColor: '#38bdf870',
           pointHoverBorderColor: '#38bdf820',
           pointBorderColor: '#38bdf8',
@@ -60,18 +75,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {
           label: 'Precipitation Probability',
           id: 'prcp',
-          data: data.map((item) => item.precipitation_probability_max),
+          data: dailyData.map((item) => item.precipitation_probability_max),
           backgroundColor: '#62BAF350',
           yAxisID: 'y2',
           type: 'bar',
         },
       ];
     } else {
+      const hourlyData = data as WeatherHourlyItem[];
       dataSets = [
         {
           label: 'Temperature',
           id: 'temp',
-          data: data.map((item) => item.temperature_2m),
+          data: hourlyData.map((item) => item.temperature_2m),
           borderColor: '#94a3b870',
           pointHoverBorderColor: '#94a3b820',
           pointBorderColor: '#94a3b8',
@@ -82,7 +98,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {
           label: 'Precipitation Probability',
           id: 'prcp',
-          data: data.map((item) => item.precipitation_probability),
+          data: hourlyData.map((item) => item.precipitation_probability),
           backgroundColor: '#62BAF350',
           yAxisID: 'y2',
           type: 'bar',
@@ -90,7 +106,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
       ];
     }
 
-    const events = (chart = new Chart(ctx, {
+    if (!ctx) return;
+
+    chart = new Chart(ctx, {
       type: 'line',
       data: {
         labels: data.map((item) => {
@@ -98,7 +116,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             ? navigator.languages[0]
             : navigator.language;
           let time;
-          if (item.temperature_2m_max) {
+          if ('temperature_2m_max' in item) {
             time = new Date(item.time).toLocaleString(
               window.navigator.language,
               {
@@ -127,11 +145,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
             borderWidth: 6,
           },
           point: {
-            pointRadius: 1,
-            pointHitRadius: 15,
+            radius: 1,
+            hitRadius: 15,
             borderWidth: 0,
-            fill: false,
-            pointHoverRadius: 6,
+            hoverRadius: 6,
             hoverBorderWidth: 25,
           },
         },
@@ -150,7 +167,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
         maintainAspectRatio: false,
         aspectRatio: 3,
         interaction: {
-          position: 'nearest',
           intersect: false,
           mode: 'index',
         },
@@ -165,10 +181,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
           y2: buildY2Axis({ title: 'Precipitation %', max: 100 }),
         },
       },
-    }));
+    });
   });
 
-  let ctx = $state();
+  let ctx: HTMLCanvasElement | undefined = $state();
 </script>
 
 <div class="rounded-container my-2 h-[240px]">
