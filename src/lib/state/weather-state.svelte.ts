@@ -86,7 +86,9 @@ class WeatherClass {
         if (i === 0) return; // Skip the first day because it is the weekData object
 
         // Update max temperature for the week if a higher value is found
-        if ((day.tmax.metric ?? -Infinity) > (weekData.tmax.metric ?? -Infinity))
+        if (
+          (day.tmax.metric ?? -Infinity) > (weekData.tmax.metric ?? -Infinity)
+        )
           weekData.tmax.metric = day.tmax.metric;
         if (
           (day.tmax.imperial ?? -Infinity) >
@@ -95,7 +97,8 @@ class WeatherClass {
           weekData.tmax.imperial = day.tmax.imperial;
 
         // Calculate average temperature for the week
-        weekData.tavg.metric = (weekData.tavg.metric ?? 0) + (day.tavg.metric ?? 0);
+        weekData.tavg.metric =
+          (weekData.tavg.metric ?? 0) + (day.tavg.metric ?? 0);
         weekData.tavg.imperial =
           (weekData.tavg.imperial ?? 0) + (day.tavg.imperial ?? 0);
 
@@ -103,13 +106,13 @@ class WeatherClass {
         if ((day.tmin.metric ?? Infinity) < (weekData.tmin.metric ?? Infinity))
           weekData.tmin.metric = day.tmin.metric;
         if (
-          (day.tmin.imperial ?? Infinity) <
-          (weekData.tmin.imperial ?? Infinity)
+          (day.tmin.imperial ?? Infinity) < (weekData.tmin.imperial ?? Infinity)
         )
           weekData.tmin.imperial = day.tmin.imperial;
 
         // Calculate aggregated precipitation for the week
-        weekData.prcp.metric = (weekData.prcp.metric ?? 0) + (day.prcp.metric ?? 0);
+        weekData.prcp.metric =
+          (weekData.prcp.metric ?? 0) + (day.prcp.metric ?? 0);
         weekData.prcp.imperial =
           (weekData.prcp.imperial ?? 0) + (day.prcp.imperial ?? 0);
 
@@ -126,13 +129,15 @@ class WeatherClass {
             weekData.snow.imperial = day.snow.imperial;
         } else {
           // Calculate aggregated snowfall for the week
-          weekData.snow.metric = (weekData.snow.metric ?? 0) + (day.snow.metric ?? 0);
+          weekData.snow.metric =
+            (weekData.snow.metric ?? 0) + (day.snow.metric ?? 0);
           weekData.snow.imperial =
             (weekData.snow.imperial ?? 0) + (day.snow.imperial ?? 0);
         }
 
         // Calculate average daylight for the week
-        weekData.dayt.metric = (weekData.dayt.metric ?? 0) + (day.dayt.metric ?? 0);
+        weekData.dayt.metric =
+          (weekData.dayt.metric ?? 0) + (day.dayt.metric ?? 0);
         weekData.dayt.imperial =
           (weekData.dayt.imperial ?? 0) + (day.dayt.imperial ?? 0);
       });
@@ -224,12 +229,24 @@ class WeatherClass {
         moon,
       };
 
-    tmin = this.data.map((day) => day.tmin[preferences.value.units ?? 'metric']);
-    tavg = this.data.map((day) => day.tavg[preferences.value.units ?? 'metric']);
-    tmax = this.data.map((day) => day.tmax[preferences.value.units ?? 'metric']);
-    prcp = this.data.map((day) => day.prcp[preferences.value.units ?? 'metric']);
-    snow = this.data.map((day) => day.snow[preferences.value.units ?? 'metric']);
-    dayt = this.data.map((day) => day.dayt[preferences.value.units ?? 'metric']);
+    tmin = this.data.map(
+      (day) => day.tmin[preferences.value.units ?? 'metric'],
+    );
+    tavg = this.data.map(
+      (day) => day.tavg[preferences.value.units ?? 'metric'],
+    );
+    tmax = this.data.map(
+      (day) => day.tmax[preferences.value.units ?? 'metric'],
+    );
+    prcp = this.data.map(
+      (day) => day.prcp[preferences.value.units ?? 'metric'],
+    );
+    snow = this.data.map(
+      (day) => day.snow[preferences.value.units ?? 'metric'],
+    );
+    dayt = this.data.map(
+      (day) => day.dayt[preferences.value.units ?? 'metric'],
+    );
     moon = this.data.map((day) => day.moon);
 
     return {

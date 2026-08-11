@@ -85,7 +85,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     ) as RangeGaugeSnapshot,
   );
 
-  let unitLabel = $derived(_gauge.unit.label[preferences.value.units ?? 'metric']);
+  let unitLabel = $derived(
+    _gauge.unit.label[preferences.value.units ?? 'metric'],
+  );
 
   let incrementMode = $state<GaugeRangeOptions['mode'] | null>(
     _gauge.rangeOptions?.isCustomRanges ? null : _gauge.rangeOptions.mode,

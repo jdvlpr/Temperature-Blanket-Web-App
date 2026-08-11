@@ -340,9 +340,7 @@ export const getPossibleDimensions = ({
  * @return  {String || Array}
  */
 export function setTargets(data: WeatherParam['id']): WeatherParam['id'];
-export function setTargets(
-  data: WeatherParam['id'][],
-): WeatherParam['id'][];
+export function setTargets(data: WeatherParam['id'][]): WeatherParam['id'][];
 export function setTargets(data: SecondaryTarget[]): SecondaryTarget[];
 export function setTargets(
   data: WeatherParam['id'] | WeatherParam['id'][] | SecondaryTarget[],
@@ -382,13 +380,9 @@ export function setTargets(
   if (isSecondarySquareParamData) {
     const _data: SecondaryTarget[] = [];
     _targets.forEach((target) => {
-      if (
-        (data as SecondaryTarget[]).map((n) => n.targetId).includes(target)
-      ) {
+      if ((data as SecondaryTarget[]).map((n) => n.targetId).includes(target)) {
         _data.push(
-          (data as SecondaryTarget[]).filter(
-            (n) => n.targetId === target,
-          )[0],
+          (data as SecondaryTarget[]).filter((n) => n.targetId === target)[0],
         );
       }
     });

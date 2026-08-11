@@ -46,11 +46,7 @@ import {
 export const showDaysInRange: { value: boolean } = $state({ value: true });
 
 type AnyGauge =
-  | TemperatureGauge
-  | RainGauge
-  | SnowGauge
-  | DayTimeGauge
-  | MoonPhaseGauge;
+  TemperatureGauge | RainGauge | SnowGauge | DayTimeGauge | MoonPhaseGauge;
 
 class GaugesState {
   allCreated: AnyGauge[] = $state([]);
@@ -110,10 +106,7 @@ class GaugesState {
           hash += '1';
         else if (rangeOptions.includeFromValue && rangeOptions.includeToValue)
           hash += '2';
-        else if (
-          !rangeOptions.includeFromValue &&
-          !rangeOptions.includeToValue
-        )
+        else if (!rangeOptions.includeFromValue && !rangeOptions.includeToValue)
           hash += '3';
 
         hash += rangeOptions.isCustomRanges === true ? 't' : 'f'; // Save custom ranges setting

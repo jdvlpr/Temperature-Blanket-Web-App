@@ -40,17 +40,16 @@ import type { Color } from '$lib/types/yarn-types';
 export const getProjectParametersFromURLHash = (
   hash: string,
 ): Record<string, { key: string; value: string }> => {
-  return hash.split('&').reduce(
-    (res: Record<string, { key: string; value: string }>, item) => {
+  return hash
+    .split('&')
+    .reduce((res: Record<string, { key: string; value: string }>, item) => {
       const parts = item.split('=');
       res[parts[0]] = {
         key: parts[0],
         value: decodeURIComponent(parts[1]),
       };
       return res;
-    },
-    {},
-  );
+    }, {});
 };
 
 export const downloadPDF = async () => {

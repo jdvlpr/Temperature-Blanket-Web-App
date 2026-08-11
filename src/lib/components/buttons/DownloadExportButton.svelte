@@ -86,8 +86,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               title="Download PNG File"
               onclick={() => {
                 const active = previews.active;
-                if (!active?.width || !active?.height || !active?.svg)
-                  return;
+                if (!active?.width || !active?.height || !active?.svg) return;
                 downloadPreviewPNG(active.width, active.height, active.svg);
               }}
             >

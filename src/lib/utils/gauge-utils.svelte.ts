@@ -223,7 +223,8 @@ export const getWPGauge = (
     } else {
       const r = ranges[i] as GaugeRange;
       range = {
-        from: r.from + ' ' + gauge.unit.label[preferences.value.units ?? 'metric'],
+        from:
+          r.from + ' ' + gauge.unit.label[preferences.value.units ?? 'metric'],
         to: r.to + ' ' + gauge.unit.label[preferences.value.units ?? 'metric'],
       };
     }
