@@ -35,7 +35,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     onOkay,
   } = $props();
 
-  const colors = {
+  const colors: Record<string, string> = {
     tmin: '#38bdf8',
     tavg: '#a3a3a3',
     tmax: '#f87171',
@@ -65,22 +65,32 @@ If not, see <https://www.gnu.org/licenses/>. -->
     _secondaryTargets = [];
   }
 
-  function createSquares(_squareSize, _secondaryTargetIndexes, _primaryTarget) {
+  function createSquares(
+    _squareSize: number,
+    _secondaryTargetIndexes: { index: number; targetId: string }[] | undefined,
+    _primaryTarget: string,
+  ) {
     const _squares = [];
     for (let i = 0; i < _squareSize * _squareSize; i++) {
       let targetId;
       if (
         _secondaryTargetIndexes &&
-        _secondaryTargetIndexes.some((item) => item.index === i)
+        _secondaryTargetIndexes.some(
+          (item: { index: number; targetId: string }) => item.index === i,
+        )
       ) {
-        targetId = _secondaryTargetIndexes.filter((item) => item.index === i)[0]
-          .targetId;
+        targetId = _secondaryTargetIndexes.filter(
+          (item: { index: number; targetId: string }) => item.index === i,
+        )[0].targetId;
       } else {
         targetId = _primaryTarget;
       }
-      const icon = targets.filter((target) => target.id === targetId)[0].icon;
-      const label = targets.filter((target) => target.id === targetId)[0]
-        .shortLabel;
+      const icon = targets.filter(
+        (target: (typeof targets)[number]) => target.id === targetId,
+      )[0].icon;
+      const label = targets.filter(
+        (target: (typeof targets)[number]) => target.id === targetId,
+      )[0].shortLabel;
       _squares.push({
         icon,
         label,
@@ -161,7 +171,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             type="button"
             onclick={() => {
               const currentTarget = targets.filter(
-                (target) => target.id === targetId,
+                (target: (typeof targets)[number]) => target.id === targetId,
               )[0];
               const targetIndex = targets.indexOf(currentTarget);
               const nextTargetIndex =

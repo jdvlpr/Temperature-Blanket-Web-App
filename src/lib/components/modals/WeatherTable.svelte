@@ -28,16 +28,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let weatherTargets = allGaugesAttributes.map((gauge) => gauge.targets).flat();
 
   let tableData = $derived([
-    ...weatherData.map((n) => {
+    ...weatherData.map((n: Record<string, any>) => {
       let weather = {};
       weatherTargets.forEach((target) => {
         if (target.id === 'dayt') {
           weather = {
             ...weather,
-            [target.id]: convertTime(n[target.id][preferences.value.units ?? 'metric'], {
-              displayUnits: false,
-              padStart: true,
-            }),
+            [target.id]: convertTime(
+              n[target.id][preferences.value.units ?? 'metric'],
+              {
+                displayUnits: false,
+                padStart: true,
+              },
+            ),
           };
         } else if (target.id === 'moon') {
           let value =

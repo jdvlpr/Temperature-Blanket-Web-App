@@ -28,10 +28,11 @@
       Mode<span class="sm:hidden">: {preferences.value.theme.mode}</span>
     </p>
     <SegmentedControl
-      value={preferences.value.theme.mode}
+      value={(preferences.value.theme.mode ?? 'system') as
+        'light' | 'dark' | 'system'}
       onValueChange={(e) => {
         if (preferences.value?.theme.mode) {
-          preferences.value.theme.mode = e.value;
+          preferences.value.theme.mode = e.value as 'light' | 'dark' | 'system';
         }
       }}
     >
@@ -103,7 +104,8 @@
       <SegmentedControl
         value={preferences.value.theme.roundness ?? 'pill'}
         onValueChange={(e) => {
-          preferences.value.theme.roundness = e.value;
+          preferences.value.theme.roundness = e.value as
+            'sharp' | 'rounded' | 'pill' | undefined;
         }}
       >
         <SegmentedControl.Control class="bg-surface-100 dark:bg-surface-900">
@@ -145,7 +147,8 @@
       <SegmentedControl
         value={preferences.value.theme.headingStyle ?? 'classic'}
         onValueChange={(e) => {
-          preferences.value.theme.headingStyle = e.value;
+          preferences.value.theme.headingStyle = e.value as
+            'classic' | 'playful' | 'refined' | undefined;
         }}
       >
         <SegmentedControl.Control class="bg-surface-100 dark:bg-surface-900">
@@ -178,7 +181,8 @@
       <SegmentedControl
         value={preferences.value.theme.textScale ?? 'normal'}
         onValueChange={(e) => {
-          preferences.value.theme.textScale = e.value;
+          preferences.value.theme.textScale = e.value as
+            'normal' | 'small' | 'large' | undefined;
         }}
       >
         <SegmentedControl.Control class="bg-surface-100 dark:bg-surface-900">
@@ -209,7 +213,8 @@
       <SegmentedControl
         value={preferences.value.theme.spacing ?? 'normal'}
         onValueChange={(e) => {
-          preferences.value.theme.spacing = e.value;
+          preferences.value.theme.spacing = e.value as
+            'compact' | 'normal' | 'relaxed' | undefined;
         }}
       >
         <SegmentedControl.Control class="bg-surface-100 dark:bg-surface-900">

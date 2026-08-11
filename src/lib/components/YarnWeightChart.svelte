@@ -3,7 +3,7 @@
   import { ALL_YARN_WEIGHTS } from '$lib/constants/color-constants';
   import { yarnWeightIcons } from '$lib/constants/yarn-weight-icon-constants';
 
-  let highlight = $state(null);
+  let highlight: string | null = $state(null);
 
   $effect(() => {
     highlight = page.url.searchParams.get('highlight') || null;
@@ -15,75 +15,78 @@
     }
   });
 
+  const iconFor = (name: string): string =>
+    yarnWeightIcons.find((n) => n.name === name)?.icon ?? '';
+
   const yarnDetails = [
     {
       standard_name: '0: Lace',
-      icon: yarnWeightIcons.find((n) => n.name === '0').icon,
+      icon: iconFor('0'),
       wpi: '',
       ply: '',
     },
     {
       standard_name: '0: Lace',
-      icon: yarnWeightIcons.find((n) => n.name === '0').icon,
+      icon: iconFor('0'),
       wpi: '',
       ply: '1',
     },
     {
       standard_name: '0: Lace',
-      icon: yarnWeightIcons.find((n) => n.name === '0').icon,
+      icon: iconFor('0'),
       wpi: '',
       ply: '2',
     },
     {
       standard_name: '0: Lace',
-      icon: yarnWeightIcons.find((n) => n.name === '0').icon,
+      icon: iconFor('0'),
       wpi: '',
       ply: '3',
     },
     {
       standard_name: '1: Super Fine',
-      icon: yarnWeightIcons.find((n) => n.name === '1').icon,
+      icon: iconFor('1'),
       wpi: '14',
       ply: '4',
     },
     {
       standard_name: '2: Fine',
-      icon: yarnWeightIcons.find((n) => n.name === '2').icon,
+      icon: iconFor('2'),
       wpi: '12',
       ply: '5',
     },
     {
       standard_name: '3: Light',
-      icon: yarnWeightIcons.find((n) => n.name === '3').icon,
+      icon: iconFor('3'),
       wpi: '11',
       ply: '8',
     },
     {
       standard_name: '4: Medium',
-      icon: yarnWeightIcons.find((n) => n.name === '4').icon,
+      icon: iconFor('4'),
       wpi: '9',
       ply: '10',
     },
     {
       standard_name: '4: Medium',
-      icon: yarnWeightIcons.find((n) => n.name === '4').icon,
+      icon: iconFor('4'),
       wpi: '8',
       ply: '10',
     },
     {
       standard_name: '5: Bulky',
-      icon: yarnWeightIcons.find((n) => n.name === '5').icon,
+      icon: iconFor('5'),
       wpi: '7',
       ply: '12',
     },
     {
       standard_name: '6: Super Bulky',
-      icon: yarnWeightIcons.find((n) => n.name === '6').icon,
+      icon: iconFor('6'),
       wpi: '5-6',
     },
     {
       standard_name: '7: Jumbo',
-      icon: yarnWeightIcons.find((n) => n.name === '7').icon,
+      icon: iconFor('7'),
       wpi: '0-4',
     },
   ];

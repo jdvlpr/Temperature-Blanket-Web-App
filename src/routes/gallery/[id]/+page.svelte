@@ -13,7 +13,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script>
+<script lang="ts">
   import { browser } from '$app/environment';
   import { page } from '$app/state';
   import { PUBLIC_BASE_URL } from '$env/static/public';
@@ -50,11 +50,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { Accordion } from '@skeletonlabs/skeleton-svelte';
   import { onMount } from 'svelte';
   import { yarnPageState } from '../../yarn/state.svelte';
+  import type { PageData } from './$types';
+  import type { Color } from '$lib/types/yarn-types';
+  import type { GaugeRange, GaugeRangeCategory } from '$lib/types/gauge-types';
 
-  let { data } = $props();
+  let { data }: { data: PageData } = $props();
 
-  let imageWidth = $state();
-  let imageHeight = $state();
+  let imageWidth = $state<number | undefined>();
+  let imageHeight = $state<number | undefined>();
 
   let project = $derived(data.project);
   let projectURL = $derived(project?.projectUrl);
@@ -68,7 +71,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let hash = $derived(projectURL ? new URL(projectURL).hash.substring(1) : '');
   let params = $derived(getProjectParametersFromURLHash(hash));
   let gauges = $derived(getGauges(params));
-  let flatColors = $derived(gauges.flatMap((item) => item.colors));
+  let flatColors = $derived(
+    gauges.flatMap((item) => (item.colors ? item.colors : [])),
+  );
 
   // Warm the yarn dataset only when this project's gauges reference yarn
   // details; `gauges` above self-heals once the data resolves.
@@ -76,19 +81,26 @@ If not, see <https://www.gnu.org/licenses/>. -->
     if (gaugeParamsHaveYarnDetails(params)) ensureYarnData();
   });
 
-  let aboutState = $state([]);
+  let aboutState = $state<string[]>([]);
 
-  let yarns = [];
+  let reshapedColors = $derived.by(() => {
+    if (!flatColors) return null;
+    const yarns: Array<{
+      brandId: any;
+      brandName: any;
+      yarnWeightId: any;
+      yarnId: any;
+      yarnName: any;
+      colors: Array<{ name: any; hex: any }>;
+    }> = [];
 
-  let reshapedColors = $derived(
-    flatColors?.reduce((acc, color) => {
+    flatColors.forEach((color: Color) => {
       const { brandId, yarnId, brandName, yarnName, name, hex, yarnWeightId } =
         color;
-      if (
-        !yarns.find(
-          (item) => item.brandId === brandId && item.yarnId === yarnId,
-        )
-      ) {
+      const existingYarn = yarns.find(
+        (item) => item.brandId === brandId && item.yarnId === yarnId,
+      );
+      if (!existingYarn) {
         yarns.push({
           brandId,
           brandName,
@@ -98,36 +110,46 @@ If not, see <https://www.gnu.org/licenses/>. -->
           colors: [],
         });
       }
-      yarns
-        .find((item) => item.brandId === brandId && item.yarnId === yarnId)
-        .colors.push({ name, hex });
-      return yarns;
-    }, {}) || null,
+      const yarnToUpdate = yarns.find(
+        (item) => item.brandId === brandId && item.yarnId === yarnId,
+      );
+      if (yarnToUpdate) {
+        yarnToUpdate.colors.push({ name, hex });
+      }
+    });
+    return yarns;
+  });
+
+  let projectUnits = $derived<'imperial' | 'metric'>(
+    params?.u?.value === 'i' ? 'imperial' : 'metric',
   );
 
-  let projectUnits = $derived(params?.u?.value === 'i' ? 'imperial' : 'metric');
-
-  function getGauges(params) {
+  function getGauges(params: Record<string, { key: string; value: string }>) {
     if (!browser) return [];
-    let _gauges = [];
+    let _gauges: Exclude<ReturnType<typeof parseGaugeURLHash>, undefined>[] =
+      [];
 
     allGaugesAttributes.forEach((gauge) => {
       if (!exists(params[gauge.id])) return;
       const settings = parseGaugeURLHash(params[gauge.id].value, gauge);
-      _gauges.push(settings);
+      if (settings) {
+        _gauges.push(settings);
+      }
     });
 
     return _gauges;
   }
 
-  const preloadImage = (src) => {
+  const preloadImage = (src: string) => {
     if (!browser) return;
-    return new Promise(async (resolve) => {
+    return new Promise<void>((resolve) => {
       let img = new Image();
-      img.onload = resolve();
+      img.onload = () => {
+        imageWidth = img.width;
+        imageHeight = img.height;
+        resolve();
+      };
       img.src = src;
-      imageWidth = img.width;
-      imageHeight = img.height;
     });
   };
 
@@ -157,10 +179,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     content={project?.featuredImage?.node.mediaItemUrl}
   />
   {#key imageWidth}
-    <meta property="og:image:width" content={imageWidth} />
+    <meta property="og:image:width" content={imageWidth?.toString()} />
   {/key}
   {#key imageHeight}
-    <meta property="og:image:height" content={imageHeight} />
+    <meta property="og:image:height" content={imageHeight?.toString()} />
   {/key}
 </svelte:head>
 
@@ -392,12 +414,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     {#key gauges}
                       {#each gauges as { colors, ranges, id, rangeOptions }, gaugeIndex}
                         {@const gaugeType = gauges[gaugeIndex].unit.type}
-                        {@const item = ranges.map((range, index) => {
-                          return {
-                            range,
-                            ...colors[index],
-                          };
-                        })}
+                        {@const item = (ranges ?? []).map(
+                          (
+                            range: GaugeRange | GaugeRangeCategory,
+                            index: number,
+                          ) => {
+                            return {
+                              range,
+                              ...colors?.[index],
+                            };
+                          },
+                        )}
                         {@const unitLabel = allGaugesAttributes.find(
                           (item) => item.id === id,
                         )?.unit.label[projectUnits]}
@@ -407,16 +434,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         } Yarn Palette`}
                         {@const hasAffiliateLinks = colors
                           ? colors?.some(
-                              (color) => !!color.affiliate_variant_href,
+                              (color: Color) => !!color.affiliate_variant_href,
                             )
                           : false}
                         <div class="flex flex-col">
                           <div class="flex flex-col">
-                            <ColorPalette {colors} schemeName={gaugeLabel} />
+                            <ColorPalette
+                              colors={colors ?? []}
+                              schemeName={gaugeLabel}
+                            />
                             <a
                               class="btn preset-tonal-primary border-primary-500 m-auto mt-4 w-fit gap-1 border"
                               onclick={() => {
-                                yarnPageState.gauge.colors = colors;
+                                if (colors) {
+                                  yarnPageState.gauge.colors = colors;
+                                }
                               }}
                               href="/yarn"
                             >
@@ -461,7 +493,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                                   ? 'rounded-container flex-auto basis-1/3 sm:basis-1/4 md:basis-1/5'
                                   : ''}"
                                 style="background-color:{hex};color:{getTextColor(
-                                  hex,
+                                  hex ?? '#000000',
                                 )}"
                               >
                                 <p class="text-xs">
@@ -471,7 +503,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
                                   class="flex items-center justify-start gap-2"
                                 >
                                   {#if gaugeType === 'category'}
-                                    <p id="range-{i}-value">{range.label}</p>
+                                    <p id="range-{i}-value">
+                                      {(range as GaugeRangeCategory).label}
+                                    </p>
                                   {:else}
                                     <div
                                       class="flex flex-col items-start text-left"
@@ -479,12 +513,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
                                     >
                                       <p class="text-xs">From</p>
                                       <p class="-mt-1 text-xs opacity-50">
-                                        {rangeOptions.includeFromValue
+                                        {rangeOptions?.includeFromValue
                                           ? 'Including'
                                           : 'Excluding'}
                                       </p>
                                       <div class="flex items-start">
-                                        <p class="text-lg">{range.from}</p>
+                                        <p class="text-lg">
+                                          {(range as GaugeRange).from}
+                                        </p>
                                         <p class="text-xs">{unitLabel}</p>
                                       </div>
                                     </div>
@@ -494,12 +530,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
                                     >
                                       <p class="text-xs">To</p>
                                       <p class="-mt-1 text-xs opacity-50">
-                                        {rangeOptions.includeToValue
+                                        {rangeOptions?.includeToValue
                                           ? 'Including'
                                           : 'Excluding'}
                                       </p>
                                       <div class="flex items-start">
-                                        <p class="text-lg">{range.to}</p>
+                                        <p class="text-lg">
+                                          {(range as GaugeRange).to}
+                                        </p>
                                         <p class="text-xs">{unitLabel}</p>
                                       </div>
                                     </div>

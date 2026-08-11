@@ -82,10 +82,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <SegmentedControl
           value={view}
           onValueChange={(e) => {
-            view = e.value;
+            view = e.value ?? 'projects';
             // Optionally update search params so links can be shared to specific views
             if (browser) {
-              goto(`?view=${e.value}`);
+              goto(`?view=${e.value ?? 'projects'}`);
             }
           }}
         >

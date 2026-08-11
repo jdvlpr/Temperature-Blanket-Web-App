@@ -29,7 +29,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let key = $state(false);
 
-  let allColorsHaveNames = $derived(colors.every((color) => color?.name));
+  let allColorsHaveNames = $derived(colors.every((color: any) => color?.name));
 </script>
 
 <div class="px-4 pt-8 sm:min-w-[600px]">
@@ -93,7 +93,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <SaveAndCloseButtons
       onSave={() => {
         updateGauge({
-          _colors: colors.map((n) => {
+          _colors: colors.map((n: any) => {
             delete n.id;
             return n;
           }),

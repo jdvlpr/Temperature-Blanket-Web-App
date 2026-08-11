@@ -74,7 +74,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     ) {
       let location = locations.all[thisLocation];
 
-      title = location.label;
+      title = location.label ?? 'Searching...';
       currentIndex = thisLocation;
       // Setup Weather Data Object
 
@@ -130,7 +130,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             if (data?.message) throw Error(data.message);
 
-            data = data.map((day) => {
+            data = data.map((day: Record<string, any>) => {
               return {
                 ...day,
                 date: new Date(day.date),
@@ -177,7 +177,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     tempAllData.sort((a, b) => a.date - b.date); // Sort by date, regardless of location
 
     weather.setRawData(tempAllData);
-    tempAllData = null;
+    tempAllData = [];
   }
 </script>
 

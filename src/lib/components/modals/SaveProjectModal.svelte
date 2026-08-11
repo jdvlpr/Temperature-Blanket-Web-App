@@ -31,7 +31,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let storedProject: StoredProjectIndexItem | null = $state(null);
 
-  let urlInputElement = $state();
+  let urlInputElement: HTMLInputElement | undefined = $state();
 
   async function saveProject({ copy = true }) {
     // Copy window url to clipboard
@@ -131,8 +131,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
           value={project.url.href}
           class="ig-input w-full truncate select-all"
           readonly
-          onfocus={() => urlInputElement.select()}
-          onclick={() => urlInputElement.select()}
+          onfocus={() => urlInputElement?.select()}
+          onclick={() => urlInputElement?.select()}
         />
       </div>
       <button

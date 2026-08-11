@@ -94,11 +94,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
     } else return missingData;
   }
 
-  let missingTmin = $derived(weather.params.tmin.filter((n) => n === null));
-  let missingTavg = $derived(weather.params.tavg.filter((n) => n === null));
-  let missingTmax = $derived(weather.params.tmax.filter((n) => n === null));
-  let missingPrcp = $derived(weather.params.prcp.filter((n) => n === null));
-  let missingSnow = $derived(weather.params.snow.filter((n) => n === null));
+  let missingTmin = $derived(
+    weather.params.tmin?.filter((n) => n === null) ?? [],
+  );
+  let missingTavg = $derived(
+    weather.params.tavg?.filter((n) => n === null) ?? [],
+  );
+  let missingTmax = $derived(
+    weather.params.tmax?.filter((n) => n === null) ?? [],
+  );
+  let missingPrcp = $derived(
+    weather.params.prcp?.filter((n) => n === null) ?? [],
+  );
+  let missingSnow = $derived(
+    weather.params.snow?.filter((n) => n === null) ?? [],
+  );
   let missingData = $derived([
     {
       count: missingTmin.length,
@@ -128,7 +138,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
       })
       .filter((day) => day.tmin[preferences.value.units ?? 'metric'] !== null)
       .reduce((prev, curr) =>
-        prev.tmin[preferences.value.units ?? 'metric'] < curr.tmin[preferences.value.units ?? 'metric']
+        (prev.tmin[preferences.value.units ?? 'metric'] ?? Infinity) <
+        (curr.tmin[preferences.value.units ?? 'metric'] ?? Infinity)
           ? prev
           : curr,
       ) || null,
@@ -140,7 +151,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
       })
       .filter((day) => day.tmax[preferences.value.units ?? 'metric'] !== null)
       .reduce((prev, curr) =>
-        prev.tmax[preferences.value.units ?? 'metric'] > curr.tmax[preferences.value.units ?? 'metric']
+        (prev.tmax[preferences.value.units ?? 'metric'] ?? -Infinity) >
+        (curr.tmax[preferences.value.units ?? 'metric'] ?? -Infinity)
           ? prev
           : curr,
       ) || null,
@@ -177,11 +189,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
           >
           {#if weather.groupedByWeek}
             Your project starts on {DAYS_OF_THE_WEEK.filter(
-              (n) => n.value === weather.groupedByWeek[0].date.getUTCDay(),
+              (n) => n.value === weather.groupedByWeek?.[0]?.date.getUTCDay(),
             )[0].label},
             {MONTHS.filter(
               (n) =>
-                n.value - 1 === weather.groupedByWeek[0].date.getUTCMonth(),
+                n.value - 1 === weather.groupedByWeek?.[0]?.date.getUTCMonth(),
             )[0]?.name}
             {weather.groupedByWeek[0].date.getUTCDate()},
             {weather.groupedByWeek[0].date.getUTCFullYear()}. It spans {weather
@@ -347,7 +359,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
             : displayNumber(
                 weather.params.prcp
                   ?.filter((n) => n !== null)
-                  ?.reduce((partialSum: number, a: any) => partialSum + a, 0),
+                  ?.reduce((partialSum: number, a: any) => partialSum + a, 0) ??
+                  0,
               )}
           units={UNIT_LABELS.height[preferences.value.units ?? 'metric']}
         />
@@ -373,7 +386,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
               : displayNumber(
                   weather.params.snow
                     ?.filter((n) => n !== null)
-                    ?.reduce((partialSum: number, a: any) => partialSum + a, 0),
+                    ?.reduce(
+                      (partialSum: number, a: any) => partialSum + a,
+                      0,
+                    ) ?? 0,
                 )}
           units={UNIT_LABELS.height[preferences.value.units ?? 'metric']}
         >

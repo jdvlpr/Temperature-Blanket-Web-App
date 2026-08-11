@@ -26,6 +26,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     isRecentDate?: boolean;
     date?: import('svelte').Snippet;
     details?: import('svelte').Snippet;
+    button?: import('svelte').Snippet;
   }
 
   let {
@@ -37,6 +38,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     isRecentDate = false,
     date,
     details,
+    button,
   }: Props = $props();
 
   // Colors from tailwind.config.js
@@ -67,6 +69,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {/if}
   </div>
   <p class=" ml-1 text-sm">{label}</p>
+  {@render button?.()}
   {@render date?.()}
   {@render details?.()}
 </div>

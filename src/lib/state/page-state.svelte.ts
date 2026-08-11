@@ -51,7 +51,10 @@ class DialogClass {
     size: 'small',
   });
 
-  contentComponent = $state({
+  contentComponent = $state<{
+    ref: Component<any> | null;
+    props: Record<string, any> | null;
+  }>({
     ref: null,
     props: null,
   });

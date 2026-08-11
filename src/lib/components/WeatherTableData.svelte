@@ -115,7 +115,7 @@
                         props: {
                           value: row[id],
                           title: `<div class="flex flex-col items-center justify-center"><span class="font-bold">${row.date}</span><span>${label}</span></div>`,
-                          onOkay: async (_value) => {
+                          onOkay: async (_value: string) => {
                             weather.isUserEdited = true;
 
                             const time = _value.split(':');
@@ -157,7 +157,7 @@
                           title: `<div class="flex flex-col items-center justify-center"><span class="font-bold">${row.date}</span><span>${label} <span class="text-sm">(${UNIT_LABELS[type][preferences.value.units ?? 'metric']})</span></span></div>`,
                           noMinMax: true,
                           showSlider: false,
-                          onOkay: async (_value) => {
+                          onOkay: async (_value: number) => {
                             weather.isUserEdited = true;
                             const mappedWeather = weather.rawData.map(
                               (n) =>
@@ -170,23 +170,26 @@
                             weather.table.rowsPerPage = table.rowsPerPage;
                             weather.table.page = table.currentPage;
 
-                            if (preferences.value.units === 'metric') {
-                              weather.rawData[i][id].metric = _value;
-                              if (type === 'temperature')
-                                weather.rawData[i][id].imperial =
-                                  celsiusToFahrenheit(_value);
-                              if (type === 'height')
-                                weather.rawData[i][id].imperial =
-                                  millimetersToInches(_value);
-                            }
-                            if (preferences.value.units === 'imperial') {
-                              weather.rawData[i][id].imperial = _value;
-                              if (type === 'temperature')
-                                weather.rawData[i][id].metric =
-                                  fahrenheitToCelsius(_value);
-                              if (type === 'height')
-                                weather.rawData[i][id].metric =
-                                  inchesToMillimeters(_value);
+                            const target = weather.rawData[i][id];
+                            if (
+                              target &&
+                              typeof target === 'object' &&
+                              'metric' in target
+                            ) {
+                              if (preferences.value.units === 'metric') {
+                                target.metric = _value;
+                                if (type === 'temperature')
+                                  target.imperial = celsiusToFahrenheit(_value);
+                                if (type === 'height')
+                                  target.imperial = millimetersToInches(_value);
+                              }
+                              if (preferences.value.units === 'imperial') {
+                                target.imperial = _value;
+                                if (type === 'temperature')
+                                  target.metric = fahrenheitToCelsius(_value);
+                                if (type === 'height')
+                                  target.metric = inchesToMillimeters(_value);
+                              }
                             }
 
                             updateTable();

@@ -13,7 +13,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script>
+<script lang="ts">
   import Spinner from '$lib/components/Spinner.svelte';
   import HelpIcon from '$lib/components/buttons/HelpIcon.svelte';
   import { weather } from '$lib/state/weather-state.svelte';
@@ -27,24 +27,26 @@ If not, see <https://www.gnu.org/licenses/>. -->
     millimetersToInches,
   } from '$lib/utils/unit-utils.svelte';
   import { dateToISO8601String, stringToDate } from '$lib/utils/date-utils';
+  import type { TISO8601DateString } from '$lib/types/weather-types';
   import { displayNumber } from '$lib/utils/number-utils';
   import { FileIcon } from '@lucide/svelte';
   import { FileUpload } from '@skeletonlabs/skeleton-svelte';
 
   let imported = $state(false);
   let processing = $state(false);
-  let errorMessages = $state([]);
-  let csvUpload = $state();
+  let errorMessages: string[] = $state([]);
+  let csvUpload: File[] | undefined = $state();
 
-  function submitForm(event) {
-    if (!csvUpload[0]) return;
+  function submitForm() {
+    if (!csvUpload?.[0]) return;
     const input = csvUpload[0];
     const reader = new FileReader();
     processing = true;
 
-    reader.onload = (e) => {
+    reader.onload = (e: ProgressEvent<FileReader>) => {
       errorMessages = [];
-      const text = e.target.result;
+      const text = e.target?.result;
+      if (typeof text !== 'string') return;
       const data = CSVtoArray({ str: text });
       if (!weather.rawData.length) return;
       const weatherToMatch = weather.rawData.map(
@@ -56,15 +58,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
       for (var i = 0; i < data.length; i++) {
         const row = data[i];
         const date = row?.['Date'] || row?.['date'];
-        const locationIndex =
+        const locationIndexRaw =
           row?.['Location Index'] ||
           row?.['location index'] ||
           row?.['Location'];
+        const locationIndex =
+          typeof locationIndexRaw === 'string'
+            ? parseInt(locationIndexRaw, 10)
+            : locationIndexRaw;
 
         const index =
           date && !isNaN(locationIndex)
             ? weatherToMatch.indexOf(
-                `${dateToISO8601String(stringToDate(date))}-${locationIndex}`,
+                `${dateToISO8601String(stringToDate(date as TISO8601DateString))}-${locationIndex}`,
               )
             : null;
 
@@ -87,7 +93,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             );
           continue;
         }
-        let day = _rawData[index];
+        let day = _rawData[index!];
 
         const highF = +row?.['High Temperature (°F)'];
         if (!isNaN(highF)) {
@@ -203,12 +209,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <FileUpload
         name="files"
         class="mt-4 justify-center"
-        onFileAccept={(e) => {
+        onFileAccept={(e: { files: File[] }) => {
           csvUpload = e.files;
-          submitForm(e);
+          submitForm();
         }}
         accept=".csv"
-        subtext="Only CSV files allowed"
       >
         <FileUpload.Dropzone>
           <FileIcon class="size-10" />

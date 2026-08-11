@@ -36,11 +36,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     context = '',
   }: Props = $props();
 
-  let category = $state(getParentCategory(() => schemeId));
-  let container = $state();
+  let category = $state(getParentCategory(schemeId));
+  let container: HTMLElement | undefined = $state();
   let showScrollToTopButton = $state(false);
 
-  let filtersContainer: HTMLElement;
+  let filtersContainer: HTMLElement | null = null;
   let scrollObserver = new IntersectionObserver(
     (entries, observer) => {
       entries.forEach((entry) => {
@@ -59,13 +59,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
     ensureYarnData();
   });
 
-  function getParentCategory(schemeId) {
+  function getParentCategory(schemeId: string | undefined) {
     if (schemeId === 'Custom') return 'Gallery';
     else return 'Schemes';
   }
 
   $effect(() => {
-    scrollObserver.observe(filtersContainer);
+    if (filtersContainer) {
+      scrollObserver.observe(filtersContainer);
+    }
   });
 </script>
 
@@ -78,7 +80,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <SegmentedControl
       value={category}
       onValueChange={(e) => {
-        category = e.value;
+        if (e.value) {
+          category = e.value as string;
+        }
       }}
     >
       <SegmentedControl.Control class="bg-surface-100 dark:bg-surface-950">
@@ -108,10 +112,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {#if showScrollToTopButton}
     <ToTopButton
       onClick={() => {
-        container.scrollIntoView({
-          behavior: 'smooth',
-          block: 'start',
-        });
+        if (container) {
+          container.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start',
+          });
+        }
       }}
       bottom="1rem"
     />

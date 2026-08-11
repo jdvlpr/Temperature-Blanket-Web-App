@@ -62,7 +62,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 {#if dialog.contentComponent.ref}
                   {#key dialog.contentComponent.ref}
                     <dialog.contentComponent.ref
-                      {...dialog.contentComponent.props}
+                      {...dialog.contentComponent.props ?? {}}
                     />
                   {/key}
                 {/if}
