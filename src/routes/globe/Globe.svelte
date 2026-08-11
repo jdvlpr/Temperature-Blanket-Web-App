@@ -221,8 +221,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         globeState.globe.resumeAnimation();
       } else {
         // First time: create the globe from scratch
-        globeState.globe = globeState
-          .Globe()(globeContainer)
+        globeState.globe = new globeState.Globe(globeContainer)
           .globeImageUrl('/images/earth-lowres.jpg')
           .backgroundImageUrl('/images/night-sky.png')
           .bumpImageUrl('/images/earthbumps.jpeg')
@@ -232,7 +231,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           .pointsData(globeState.data)
           .pointLat('lat')
           .pointLng('lng')
-          .pointLabel(null) // Disable hover tooltips
+          .pointLabel(null as any) // Disable hover tooltips (null not in type def)
           .pointResolution(10)
           .pointAltitude((d: any) =>
             Math.min((d.projects?.length || 1) * 0.009 + 0.02, 0.5),
@@ -247,7 +246,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             // Pause rotation when a point is clicked
             if (isAutoRotating) {
               isAutoRotating = false;
-              globeState.globe.controls().autoRotate = false;
+              globeState.globe!.controls().autoRotate = false;
             }
 
             updateGlobe();

@@ -13,7 +13,8 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script>
+<script lang="ts">
+  import type { GaugeRange, GaugeRangeOptions } from '$lib/types/gauge-types';
   import GaugeSettings from '$lib/components/modals/GaugeSettings.svelte';
   import { dialog } from '$lib/state/page-state.svelte';
   import { gauges } from '$lib/state/gauges-state.svelte';
@@ -21,78 +22,102 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let { index } = $props();
 
-  function onSaveRangeOptinos(e) {
-    gauges.activeGauge.ranges = e.ranges;
-    gauges.activeGauge.rangeOptions = e.rangeOptions;
+  function onSaveRangeOptinos(e: {
+    ranges: GaugeRange[];
+    rangeOptions: GaugeRangeOptions;
+  }) {
+    if (gauges.activeGauge) {
+      gauges.activeGauge.ranges = e.ranges;
+      gauges.activeGauge.rangeOptions = e.rangeOptions;
+    }
   }
 </script>
 
-<span class="range-input-container">
-  <button
-    class="btn hover:preset-tonal-surface h-auto"
-    title="Adjust Range"
-    onclick={(e) => {
-      const wasToClicked =
-        e.target.id === `range-${index}-to` ||
-        e.target.parentElement.id === `range-${index}-to` ||
-        e.target.parentElement.parentElement.id === `range-${index}-to` ||
-        e.target.parentElement.parentElement.parentElement.id ===
-          `range-${index}-to`;
+{#if gauges.activeGauge && gauges.activeGauge.rangeOptions && gauges.activeGauge.ranges}
+  <span class="range-input-container">
+    <button
+      class="btn hover:preset-tonal-surface h-auto"
+      title="Adjust Range"
+      onclick={(e: Event) => {
+        const target = e.target as HTMLElement;
+        let currentElement: HTMLElement | null = target;
+        let wasToClicked = false;
 
-      const focusOn = wasToClicked ? 'to' : 'from';
+        while (currentElement) {
+          if (currentElement.id === `range-${index}-to`) {
+            wasToClicked = true;
+            break;
+          }
+          currentElement = currentElement.parentElement;
+        }
 
-      dialog.trigger({
-        type: 'component',
-        component: {
-          ref: GaugeSettings,
-          props: {
-            index,
-            focusOn,
-            onSave: onSaveRangeOptinos,
+        const focusOn = wasToClicked ? 'to' : 'from';
+
+        dialog.trigger({
+          type: 'component',
+          component: {
+            ref: GaugeSettings,
+            props: {
+              index,
+              focusOn,
+              onSave: onSaveRangeOptinos,
+            },
           },
-        },
-        options: {
-          size: 'large',
-        },
-      });
-    }}
-  >
-    <span class="flex flex-col text-left" id="range-{index}-from">
-      <div class="flex flex-col">
-        <p class="text-xs">From</p>
-        <p class="-mt-1 text-xs opacity-50">
-          {gauges.activeGauge.rangeOptions.includeFromValue
-            ? 'Including'
-            : 'Excluding'}
-        </p>
-      </div>
-
-      <span class="flex items-start"
-        ><span class="text-lg">{gauges.activeGauge.ranges[index]?.from}</span>
-        <span class="text-xs"
-          >{gauges.activeGauge.unit.label[preferences.value.units ?? 'metric']}</span
-        ></span
-      ></span
+          options: {
+            size: 'large',
+          },
+        });
+      }}
     >
-    <span class="flex flex-col text-left" id="range-{index}-to">
-      <div class="flex flex-col gap-0">
-        <span class="text-xs">To </span>
-        <span class="-mt-1 text-xs opacity-50"
-          >{gauges.activeGauge.rangeOptions.includeToValue
-            ? 'Including'
-            : 'Excluding'}</span
-        >
-      </div>
+      <span class="flex flex-col text-left" id="range-{index}-from">
+        <div class="flex flex-col">
+          <p class="text-xs">From</p>
+          <p class="-mt-1 text-xs opacity-50">
+            {gauges.activeGauge.rangeOptions.includeFromValue
+              ? 'Including'
+              : 'Excluding'}
+          </p>
+        </div>
 
-      <span class="flex items-start"
-        ><span class="text-lg">{gauges.activeGauge.ranges[index]?.to}</span>
-        <span class="text-xs"
-          >{gauges.activeGauge.unit.label[preferences.value.units ?? 'metric']}</span
+        <span class="flex items-start"
+          ><span class="text-lg">
+            {#if 'from' in gauges.activeGauge.ranges[index]}
+              {gauges.activeGauge.ranges[index].from}
+            {/if}
+          </span>
+          <span class="text-xs"
+            >{gauges.activeGauge.unit.label[
+              preferences.value.units ?? 'metric'
+            ]}</span
+          ></span
         ></span
-      ></span
-    ></button
-  >
-</span>
+      >
+      <span class="flex flex-col text-left" id="range-{index}-to">
+        <div class="flex flex-col gap-0">
+          <span class="text-xs">To </span>
+          <span class="-mt-1 text-xs opacity-50"
+            >{gauges.activeGauge.rangeOptions.includeToValue
+              ? 'Including'
+              : 'Excluding'}</span
+          >
+        </div>
+
+        <span class="flex items-start"
+          ><span class="text-lg">
+            {#if 'to' in gauges.activeGauge.ranges[index]}
+              {gauges.activeGauge.ranges[index].to}
+            {/if}
+          </span>
+          <span class="text-xs"
+            >{gauges.activeGauge.unit.label[
+              preferences.value.units ?? 'metric'
+            ]}</span
+          ></span
+        ></span
+      ></button
+    >
+  </span>
+{/if}
 
 <style>
   .range-input-container {

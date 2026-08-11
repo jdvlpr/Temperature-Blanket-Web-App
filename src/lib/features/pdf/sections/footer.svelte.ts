@@ -15,6 +15,7 @@
 
 import { PUBLIC_BASE_DOMAIN_NAME, PUBLIC_BASE_URL } from '$env/static/public';
 import { locations } from '$lib/state/location-state.svelte';
+import type { jsPDF } from 'jspdf';
 import pdfConfig from '../pdf-config';
 
 const pdfFooter = {
@@ -24,7 +25,7 @@ const pdfFooter = {
    * @param page      - current (1-based) page number
    * @param totalPages - total page count (computed by the caller to avoid circular imports)
    */
-  create: (doc, page, totalPages) => {
+  create: (doc: jsPDF, page: number, totalPages: number) => {
     // page number
     doc.setFontSize(pdfConfig.font.p);
     doc.setFont(pdfConfig.font.paragraph, 'normal');

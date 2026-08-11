@@ -25,9 +25,10 @@ import {
   sortColorsLightToDark,
 } from '$lib/utils/color-utils.js';
 import { error, json } from '@sveltejs/kit';
+import type { RequestHandler } from './$types';
 import chroma from 'chroma-js';
 
-export async function GET({ url, request }) {
+export const GET: RequestHandler = async ({ url, request }) => {
   if (!dev) {
     const { headers } = request;
     if (!headers.has('X-RapidAPI-Proxy-Secret'))
@@ -52,14 +53,16 @@ export async function GET({ url, request }) {
       let brands = brand.split(',');
       colorways = colorways.filter(
         (colorway) =>
-          brands.includes(colorway.brandId) ||
-          brands.includes(colorway.brandName.toLowerCase()),
+          (colorway.brandId !== undefined &&
+            brands.includes(colorway.brandId)) ||
+          (colorway.brandName !== undefined &&
+            brands.includes(colorway.brandName.toLowerCase())),
       );
     } else
       colorways = colorways.filter(
         (colorway) =>
-          colorway.brandId.toLowerCase() === brand ||
-          colorway.brandName.toLowerCase() === brand,
+          colorway.brandId?.toLowerCase() === brand ||
+          colorway.brandName?.toLowerCase() === brand,
       );
   }
 
@@ -71,14 +74,15 @@ export async function GET({ url, request }) {
       const yarns = yarn.split(',');
       colorways = colorways.filter(
         (colorway) =>
-          yarns.includes(colorway.yarnId) ||
-          yarns.includes(colorway.yarnName.toLowerCase()),
+          (colorway.yarnId !== undefined && yarns.includes(colorway.yarnId)) ||
+          (colorway.yarnName !== undefined &&
+            yarns.includes(colorway.yarnName.toLowerCase())),
       );
     } else
       colorways = colorways.filter(
         (colorway) =>
-          colorway.yarnId.toLowerCase() === yarn ||
-          colorway.yarnName.toLowerCase() === yarn,
+          colorway.yarnId?.toLowerCase() === yarn ||
+          colorway.yarnName?.toLowerCase() === yarn,
       );
   }
 
@@ -89,7 +93,7 @@ export async function GET({ url, request }) {
         message: "Parameter 'weight' is empty",
       });
 
-    const yarnWeightIds = ALL_YARN_WEIGHTS.map((n) => n.id);
+    const yarnWeightIds: string[] = ALL_YARN_WEIGHTS.map((n) => n.id);
     const yarnWeightNames = ALL_YARN_WEIGHTS.map((n) => n.name.toLowerCase());
 
     if (yarnWeightIds.includes(weight)) {
@@ -124,7 +128,7 @@ export async function GET({ url, request }) {
   if (searchParams.has('name')) {
     const name = searchParams.get('name');
     colorways = colorways.filter(
-      (colorway) => colorway.name.toLowerCase() === name?.toLowerCase(),
+      (colorway) => colorway.name?.toLowerCase() === name?.toLowerCase(),
     );
   }
 
@@ -187,4 +191,4 @@ export async function GET({ url, request }) {
     },
     data: colorways,
   });
-}
+};

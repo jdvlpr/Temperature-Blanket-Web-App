@@ -36,11 +36,12 @@ import {
 import { getMoonPhase } from '$lib/state/weather-state.svelte';
 import { cachedJSON } from '$lib/features/cache/edge-cache';
 import { error, json } from '@sveltejs/kit';
+import type { RequestHandler } from './$types';
 import * as SunCalc from 'suncalc';
 
 const CACHE_TTL_SECONDS = 60 * 60 * 24; // 24h — short enough to avoid stale past/future-day nulling near date boundaries
 
-export async function POST({ request, platform }) {
+export const POST: RequestHandler = async ({ request, platform }) => {
   const body = await request.json();
 
   const location = body?.location;
@@ -70,7 +71,7 @@ export async function POST({ request, platform }) {
   for (const day of allData) day.location = location.index;
 
   return json(allData);
-}
+};
 
 async function fetchAndProcessDailyWeather(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -131,7 +132,7 @@ async function fetchAndProcessDailyWeather(
     // No data property returned from meteostat
     throw error(400, { message: errorMessage });
   }
-  if (data.data.every((day) => day.tavg === null)) {
+  if (data.data.every((day: { tavg: number | null }) => day.tavg === null)) {
     // Empty data array
     throw error(400, { message: errorMessage });
   }
@@ -204,13 +205,19 @@ async function fetchAndProcessDailyWeather(
     const times = SunCalc.getTimes(dayDate, location.lat, location.lng);
     // dayData.sunrise = times.sunrise;
     // dayData.sunset = times.sunset;
-    const isValidSunset =
-      times.sunset instanceof Date && !isNaN(times.sunset.getTime());
-    const isValidSunRise =
-      times.sunrise instanceof Date && !isNaN(times.sunrise.getTime());
-    if (isValidSunset && isValidSunRise) {
+    if (
+      times.sunset instanceof Date &&
+      !isNaN(times.sunset.getTime()) &&
+      times.sunrise instanceof Date &&
+      !isNaN(times.sunrise.getTime())
+    ) {
       const daytime = parseFloat(
-        ((times.sunset - times.sunrise) / 1000 / 60 / 60).toFixed(6),
+        (
+          (times.sunset.getTime() - times.sunrise.getTime()) /
+          1000 /
+          60 /
+          60
+        ).toFixed(6),
       );
       // Convert metric to minutes because of Weather chart scale
       dayData.dayt = {
@@ -227,7 +234,7 @@ async function fetchAndProcessDailyWeather(
   }
 
   // Sort by date
-  allData.sort((a, b) => a.date - b.date);
+  allData.sort((a, b) => a.date.getTime() - b.date.getTime());
 
   return allData;
 }

@@ -79,8 +79,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
     yarnName,
     variant_href,
     affiliate_variant_href,
+  }: {
+    index: number;
+    hex?: string;
+    name?: string;
+    brandId?: string;
+    yarnId?: string;
+    brandName?: string;
+    yarnName?: string;
+    variant_href?: string;
+    affiliate_variant_href?: string | null;
   }) {
-    const _colors = [];
+    const _colors: Color[] = [];
     colors.forEach((color, i) => {
       if (i === index) {
         _colors.push({
@@ -104,14 +114,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 
   function getSortableColors() {
-    const _sortableColors = [];
+    const _sortableColors: (Color & { id: number })[] = [];
     colors.forEach((color, i) => {
       _sortableColors.push({ ...color, id: i });
     });
     return _sortableColors;
   }
 
-  function handleConsider(e) {
+  function handleConsider(
+    e: CustomEvent<{
+      items: (Color & { id: number })[];
+      info: { source: string; trigger: string };
+    }>,
+  ) {
     isDragging.value = true;
 
     const {
@@ -127,7 +142,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     }
   }
 
-  function handleFinalize(e) {
+  function handleFinalize(
+    e: CustomEvent<{
+      items: (Color & { id: number })[];
+      info: { source: string };
+    }>,
+  ) {
     const {
       items: newItems,
       info: { source },
@@ -136,8 +156,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     sortableColors = newItems;
 
     colors = $state.snapshot(sortableColors).map((color) => {
-      delete color.id;
-      return color;
+      const { id, ...rest } = color;
+      return rest as Color;
     });
 
     // Ensure dragging is stopped on drag finish via pointer (mouse, touch)
@@ -147,20 +167,27 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     if (onchanged) onchanged();
   }
-  function startDrag(e) {
+  function startDrag(e: MouseEvent | TouchEvent) {
     // preventing default to prevent lag on touch devices (because of the browser checking for screen scrolling)
-    if (e.cancelable) e.preventDefault();
+    if (e instanceof Event && e.cancelable) e.preventDefault();
     isDragging.value = true;
   }
 
-  function handleKeyDown(e) {
+  function handleKeyDown(e: KeyboardEvent) {
     if ((e.key === 'Enter' || e.key === ' ') && !isDragging.value)
       isDragging.value = true;
   }
 
   // Hide the tooltip when dragging a color
-  function transformDraggedElement(draggedEl, data, index) {
-    const tooltipElement = draggedEl.querySelector('.tooltip');
+  function transformDraggedElement(
+    draggedEl: HTMLElement | undefined,
+    data: unknown,
+    index: number | undefined,
+  ): void {
+    if (!draggedEl) return;
+    const tooltipElement = draggedEl.querySelector(
+      '.tooltip',
+    ) as HTMLElement | null;
 
     if (tooltipElement) tooltipElement.style.display = 'none';
 
@@ -224,10 +251,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
           class="flex h-full w-full flex-auto flex-col items-center justify-center {fullscreen
             ? 'h-full'
             : 'h-[70px]'}"
-          style="background:{hex};color:{getTextColor(hex)}"
+          style="background:{hex ?? '#ffffff'};color:{getTextColor(
+            hex ?? '#ffffff',
+          )}"
           title={brandName && yarnName && name
             ? `${brandName} - ${yarnName}: ${name}`
-            : hex}
+            : (hex ?? '#ffffff')}
         >
           {#if isLocked}
             <LockKeyholeIcon size="20" class="opacity-30" />
@@ -238,7 +267,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               class:sm:block={sortableColors.length > 30 &&
                 sortableColors.length <= 50}
               class:xl:block={sortableColors.length > 50}
-              style="background:{getTextColor(hex)}"
+              style="background:{getTextColor(hex ?? '#ffffff')}"
             ></div>
           {/if}
         </div>
@@ -247,7 +276,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <div
             {...popover.floating()}
             in:scale={{ duration: 150, delay: 150 }}
-            style="background:{hex};color:{getTextColor(hex)};"
+            style="background:{hex ?? '#ffffff'};color:{getTextColor(
+              hex ?? '#ffffff',
+            )};"
             class="tooltip rounded-container z-30 flex w-full max-w-screen flex-wrap items-center justify-center gap-4 p-2 text-center break-all"
             data-floating
           >
@@ -399,7 +430,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               aria-label="Drag handle to reorder color {index + 1}"
               aria-pressed={isDragging.value}
               class="w-fit"
-              style="color:{getTextColor(hex)}; {isDragging.value
+              style="color:{getTextColor(hex ?? '#ffffff')}; {isDragging.value
                 ? 'cursor: grab'
                 : 'cursor: grabbing'}"
               onmousedown={startDrag}
@@ -412,7 +443,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
             <div
               class="popover-arrow"
-              style="background:{hex}"
+              style="background:{hex ?? '#ffffff'}"
               {...popover.arrow()}
             ></div>
           </div>

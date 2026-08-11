@@ -20,10 +20,14 @@ import {
   ensureYarnData,
   getAllColorways,
 } from '$lib/data/yarns/colorways.svelte';
+import type { Color } from '$lib/types/yarn-types';
 import { error, json } from '@sveltejs/kit';
+import type { RequestHandler } from './$types';
 import chroma from 'chroma-js';
 
-export async function GET({ url, params, request }) {
+type MatchedColorway = Color & { delta: number; percentMatch: number };
+
+export const GET: RequestHandler = async ({ url, params, request }) => {
   if (!dev) {
     const { headers } = request;
     if (!headers.has('X-RapidAPI-Proxy-Secret'))
@@ -59,14 +63,16 @@ export async function GET({ url, params, request }) {
       let brands = brand.split(',');
       colorways = colorways.filter(
         (colorway) =>
-          brands.includes(colorway.brandId) ||
-          brands.includes(colorway.brandName.toLowerCase()),
+          (colorway.brandId !== undefined &&
+            brands.includes(colorway.brandId)) ||
+          (colorway.brandName !== undefined &&
+            brands.includes(colorway.brandName.toLowerCase())),
       );
     } else
       colorways = colorways.filter(
         (colorway) =>
-          colorway.brandId.toLowerCase() === brand ||
-          colorway.brandName.toLowerCase() === brand,
+          colorway.brandId?.toLowerCase() === brand ||
+          colorway.brandName?.toLowerCase() === brand,
       );
   }
 
@@ -81,14 +87,15 @@ export async function GET({ url, params, request }) {
       const yarns = yarn.split(',');
       colorways = colorways.filter(
         (colorway) =>
-          yarns.includes(colorway.yarnId) ||
-          yarns.includes(colorway.yarnName.toLowerCase()),
+          (colorway.yarnId !== undefined && yarns.includes(colorway.yarnId)) ||
+          (colorway.yarnName !== undefined &&
+            yarns.includes(colorway.yarnName.toLowerCase())),
       );
     } else
       colorways = colorways.filter(
         (colorway) =>
-          colorway.yarnId.toLowerCase() === yarn ||
-          colorway.yarnName.toLowerCase() === yarn,
+          colorway.yarnId?.toLowerCase() === yarn ||
+          colorway.yarnName?.toLowerCase() === yarn,
       );
   }
 
@@ -99,7 +106,7 @@ export async function GET({ url, params, request }) {
         message: "Parameter 'weight' is empty",
       });
 
-    const yarnWeightIds = ALL_YARN_WEIGHTS.map((n) => n.id);
+    const yarnWeightIds: string[] = ALL_YARN_WEIGHTS.map((n) => n.id);
     const yarnWeightNames = ALL_YARN_WEIGHTS.map((n) => n.name.toLowerCase());
 
     if (yarnWeightIds.includes(weight)) {
@@ -121,7 +128,8 @@ export async function GET({ url, params, request }) {
   }
 
   const hex = chroma(color).hex();
-  colorways = colorways
+  const matches: MatchedColorway[] = colorways
+    .filter((n): n is Color & { hex: string } => typeof n.hex === 'string')
     .map((n) => {
       const delta = chroma.deltaE(hex, n.hex);
       return {
@@ -142,11 +150,11 @@ export async function GET({ url, params, request }) {
       });
   }
 
-  colorways = colorways.filter(
+  let filtered = matches.filter(
     (colorway) => colorway.percentMatch >= threshold,
   );
 
-  const numberOfResults = colorways.length;
+  const numberOfResults = filtered.length;
 
   let offset = 0; // maximum 500
   if (searchParams.has('offset')) {
@@ -157,7 +165,7 @@ export async function GET({ url, params, request }) {
       });
   }
 
-  colorways = colorways.slice(offset);
+  filtered = filtered.slice(offset);
 
   let limit = 50; // default number of results is 50, maximum is 500
   if (searchParams.has('limit')) {
@@ -171,7 +179,7 @@ export async function GET({ url, params, request }) {
         message: "Parameter 'limit' must be less than 501",
       });
   }
-  if (colorways.length > limit) colorways.length = limit;
+  if (filtered.length > limit) filtered.length = limit;
 
   return json({
     meta: {
@@ -179,6 +187,6 @@ export async function GET({ url, params, request }) {
       offset,
       total: numberOfResults,
     },
-    data: colorways,
+    data: filtered,
   });
-}
+};

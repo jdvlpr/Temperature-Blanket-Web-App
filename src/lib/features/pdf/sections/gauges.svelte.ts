@@ -15,8 +15,9 @@
 
 import { gauges } from '$lib/state/gauges-state.svelte';
 import { weather } from '$lib/state/weather-state.svelte';
+import type { jsPDF } from 'jspdf';
 import pdfConfig from '../pdf-config';
-import pdfGauge from './gauge.svelte.ts';
+import pdfGauge from './gauge.svelte';
 
 const gaugeGroup = {
   pages: () => {
@@ -30,7 +31,7 @@ const gaugeGroup = {
       });
     return pages;
   },
-  create: (doc, totalPages) => {
+  create: (doc: jsPDF, totalPages: number) => {
     gauges.allCreated
       .filter((gauge) => weather.pdfOptions.gauges.includes(gauge.id))
       .forEach((gauge) => {

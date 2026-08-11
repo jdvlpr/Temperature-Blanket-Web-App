@@ -14,17 +14,28 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { weather } from '$lib/state/weather-state.svelte';
+import type { GaugeStateInterface } from '$lib/types/gauge-types';
 import { getDaysInRange, getDaysPercent } from '$lib/utils/range-utils.svelte';
+import type { jsPDF } from 'jspdf';
 import pdfConfig from '../pdf-config';
 
 // Read shared layout constants from pdf-config (avoids importing gauge.svelte.ts)
 const { positionX, columnWidth } = pdfConfig.colorDetails;
 const { linePadding, itemHeight } = pdfConfig.gauge;
 
+type HeaderItem = { name: string; position: number };
+type HeaderItems = Record<string, HeaderItem>;
+type HeaderItemsWithOptionalDays = HeaderItems & {
+  days?: HeaderItem;
+  davg?: HeaderItem;
+  dmax?: HeaderItem;
+  dmin?: HeaderItem;
+};
+
 const pdfColorDetails = {
   positionX,
   columnWidth,
-  createHeaderHorizontalLines: (doc, items) => {
+  createHeaderHorizontalLines: (doc: jsPDF, items: HeaderItems) => {
     // Lines
     const x1 = pdfConfig.leftMargin + positionX - linePadding;
     const x2 =
@@ -39,9 +50,13 @@ const pdfColorDetails = {
     y = pdfConfig.topMargin + itemHeight + linePadding;
     doc.line(x1, y, x2, y);
   },
-  createColorDetailsHeader: (doc, gauge, createHeaderItemsFn) => {
+  createColorDetailsHeader: (
+    doc: jsPDF,
+    gauge: GaugeStateInterface,
+    createHeaderItemsFn: (doc: jsPDF, items: HeaderItems) => void,
+  ) => {
     const header = weather.grouping === 'week' ? 'Weeks' : 'Days';
-    const items = {
+    const items: HeaderItemsWithOptionalDays = {
       davg: {
         name: `${header} High`,
         position: positionX,
@@ -64,15 +79,20 @@ const pdfColorDetails = {
         position: positionX,
       };
     }
-    createHeaderItemsFn(doc, items);
-    pdfColorDetails.createHeaderHorizontalLines(doc, items);
+    createHeaderItemsFn(doc, items as HeaderItems);
+    pdfColorDetails.createHeaderHorizontalLines(doc, items as HeaderItems);
   },
-  create: (doc, gauge, colorIndex, line) => {
+  create: (
+    doc: jsPDF,
+    gauge: GaugeStateInterface,
+    colorIndex: number,
+    line: number,
+  ) => {
     // Setup Details
     const details = gauge.targets.map((item) => {
       const count = getDaysInRange({
         id: item.id,
-        range: gauge.ranges[colorIndex],
+        range: gauge.ranges![colorIndex],
         direction: gauge?.rangeOptions?.direction,
         includeFromValue: gauge?.rangeOptions?.includeFromValue,
         includeToValue: gauge?.rangeOptions?.includeToValue,
