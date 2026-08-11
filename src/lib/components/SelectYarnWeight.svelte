@@ -27,17 +27,24 @@
         .flatMap((brand) =>
           brand.yarns
             .filter((yarn) => yarn.weightId)
-            .map((yarn) => yarn.weightId),
+            .map((yarn) => yarn.weightId as YarnWeight['id']),
         ),
     ),
   ];
 
-  if (!yarnWeightIds.length || !yarnWeightIds.includes(selectedYarnWeightId))
+  if (
+    selectedYarnWeightId &&
+    !yarnWeightIds.includes(selectedYarnWeightId as YarnWeight['id'])
+  ) {
     selectedYarnWeightId = '';
+  } else if (!yarnWeightIds.length) {
+    selectedYarnWeightId = '';
+  }
 
-  const yarnWeights = ALL_YARN_WEIGHTS.filter((y) =>
-    yarnWeightIds.includes(y.id),
-  ).map((n) => {
+  const yarnWeights = ALL_YARN_WEIGHTS.filter((y) => {
+    if (!y.id) return false;
+    return yarnWeightIds.includes(y.id);
+  }).map((n) => {
     const numberOfYarns = getBrands()
       .filter((brand) => {
         if (!selectedBrandId) return true;

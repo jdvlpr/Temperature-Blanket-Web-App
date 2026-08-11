@@ -100,7 +100,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let filteredPosts = $derived(
     selectedTag === 'All'
       ? posts
-      : posts.filter((post) => post.tags?.includes(selectedTag)),
+      : posts.filter((post) =>
+          post.tags?.includes(selectedTag as 'Help' | 'News'),
+        ),
   );
 </script>
 
@@ -132,7 +134,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <SegmentedControl
         value={selectedTag}
         onValueChange={(e) => {
-          selectedTag = e.value;
+          selectedTag = (e.value as string) || 'All';
         }}
       >
         <SegmentedControl.Control
@@ -173,7 +175,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 <div class="flex w-full items-baseline justify-center gap-2">
                   {#if date}
                     <p class="text-surface-500 text-sm">
-                      {stringToDate(date).toLocaleDateString(undefined, {
+                      {stringToDate(date ?? '').toLocaleDateString(undefined, {
                         timeZone: 'UTC',
                       })}
                     </p>

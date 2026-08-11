@@ -40,7 +40,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     : '';
 
   onMount(() => {
-    scrollObserver.observe(container);
+    if (typeof scrollObserver !== 'string') {
+      scrollObserver.observe(container);
+    }
   });
 </script>
 

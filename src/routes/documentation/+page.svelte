@@ -44,7 +44,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <svelte:document
   onclick={(event) => {
-    if (event.target.classList.contains('toc-anchor')) {
+    if (
+      event.target instanceof HTMLElement &&
+      event.target.classList.contains('toc-anchor')
+    ) {
       openTableOfContents = false;
     }
   }}

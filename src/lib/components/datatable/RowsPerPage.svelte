@@ -32,12 +32,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
     id="rows-per-page"
     title="Choose how many rows per page"
     onchange={(e) => {
-      weather.table.rowsPerPage = +e.target.value;
-      table.setRowsPerPage(+e.target.value);
+      if (e.currentTarget instanceof HTMLSelectElement) {
+        weather.table.rowsPerPage = +e.currentTarget.value;
+        table.setRowsPerPage(+e.currentTarget.value);
 
-      if (table.currentPage > table.pages.length) {
-        weather.table.page = 1;
-        table.setPage(1);
+        if (table.currentPage > table.pages.length) {
+          weather.table.page = 1;
+          table.setPage(1);
+        }
       }
     }}
   >

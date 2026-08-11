@@ -13,31 +13,38 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script>
+<script lang="ts">
   import ColorPalette from '$lib/components/ColorPalette.svelte';
   import { MAXIMUM_YARN_DETAILS_DESCRIPTIONS } from '$lib/constants/color-constants';
   import { getColorsFromInput } from '$lib/utils/color-utils';
   import { pluralize } from '$lib/utils/string-utils';
+  import type { Color } from '$lib/types/yarn-types';
   import { Trash2Icon } from '@lucide/svelte';
 
-  /**
-   * @typedef {Object} Props
-   * @property {any} project
-   * @property {boolean} [canRemove]
-   * @property {() => void} [onclick]
-   */
+  interface Props {
+    project: any;
+    canRemove?: boolean;
+    onclick?: () => void;
+  }
 
-  /** @type {Props} */
-  let { project, canRemove = true, onclick } = $props();
+  let { project, canRemove = true, onclick }: Props = $props();
 
   const href = $derived(project.href);
   const title = $derived(project.title);
   const date = $derived(project.date);
   const isCustomWeatherData = $derived(project.isCustomWeatherData);
 
-  let colors = $derived(getColorsFromInput({ string: href }));
+  const colors: Color[] | false = $derived(
+    getColorsFromInput({ string: href }),
+  );
 
-  function getProjectDescription({ colors, date }) {
+  function getProjectDescription({
+    colors,
+    date,
+  }: {
+    colors: Color[];
+    date: string;
+  }) {
     let schemeName =
       "<p class='flex flex-wrap justify-start items-center gap-x-4'>";
     schemeName += `<span class="inline-flex items-center justify-center gap-1"> Saved ${date}</span>`;
@@ -48,7 +55,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     let yarnDetails = colors
       .filter((color) => color?.brandId && color?.yarnId)
       .map((color) => {
-        return color.brandName + ' - ' + color.yarnName;
+        return (color.brandName ?? '') + ' - ' + (color.yarnName ?? '');
       });
     if (yarnDetails.length) {
       yarnDetails = [...new Set([...yarnDetails])];
@@ -57,7 +64,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         yarnDetails.length = MAXIMUM_YARN_DETAILS_DESCRIPTIONS;
         hasMore = true;
       }
-      yarnDetails.forEach((yarnDetail) => {
+      yarnDetails.forEach((yarnDetail: string) => {
         schemeName += `<span class="">${yarnDetail}</span>`;
       });
 
@@ -79,11 +86,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
       rel="noopener noreferrer"
       class="line-clamp-4 underline">{title}</a
     >
-    <ColorPalette
-      {colors}
-      height="24px"
-      schemeName={getProjectDescription({ colors, date })}
-    />
+    {#if colors !== false}
+      <ColorPalette
+        {colors}
+        height="24px"
+        schemeName={getProjectDescription({ colors, date })}
+      />
+    {/if}
   </div>
   {#if canRemove}
     <button class="btn-icon hover:preset-tonal-surface" {onclick}>

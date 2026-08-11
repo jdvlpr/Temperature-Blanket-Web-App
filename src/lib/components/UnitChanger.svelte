@@ -13,17 +13,21 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script>
+<script lang="ts">
   import { UNIT_LABELS } from '$lib/constants/weather-constants';
   import { preferences } from '$lib/storage/preferences.svelte';
+  import type { Unit } from '$lib/types/weather-types';
   import { SegmentedControl } from '@skeletonlabs/skeleton-svelte';
+
+  function handleUnitChange(e: { value: string | null }): void {
+    const value = e.value as Unit | null;
+    preferences.value.units = value;
+  }
 </script>
 
 <SegmentedControl
-  value={preferences.value.units}
-  onValueChange={(e) => {
-    preferences.value.units = e.value;
-  }}
+  value={preferences.value.units ?? ''}
+  onValueChange={handleUnitChange}
 >
   <SegmentedControl.Control class="bg-surface-100 dark:bg-surface-900">
     <SegmentedControl.Indicator />

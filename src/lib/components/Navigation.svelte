@@ -13,7 +13,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script>
+<script lang="ts">
   import {
     pageSections,
     showNavigationSideBar,
@@ -27,8 +27,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     pageSections.items.find((section) => section.active === true)?.index || 1,
   );
   // element references
-  let containerFn = $state();
-  let buttonRefs = $state([]);
+  let containerFn = $state<HTMLDivElement | undefined>();
+  let buttonRefs = $state<(HTMLButtonElement | undefined)[]>([]);
 
   // Logic to calculate position
   function updateIndicator() {

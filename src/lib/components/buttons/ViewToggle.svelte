@@ -13,17 +13,21 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script>
+<script lang="ts">
   import { preferences } from '$lib/storage/preferences.svelte';
+  import type { PageLayout } from '$lib/types/page-types';
   import { LayoutGridIcon, LayoutListIcon } from '@lucide/svelte';
   import { SegmentedControl } from '@skeletonlabs/skeleton-svelte';
+
+  function handleLayoutChange(e: { value: string | null }): void {
+    const value = (e.value || 'list') as PageLayout;
+    preferences.value.layout = value;
+  }
 </script>
 
 <SegmentedControl
   value={preferences.value.layout}
-  onValueChange={(e) => {
-    preferences.value.layout = e.value;
-  }}
+  onValueChange={handleLayoutChange}
 >
   <SegmentedControl.Control class="bg-surface-100 dark:bg-surface-900">
     <SegmentedControl.Indicator />

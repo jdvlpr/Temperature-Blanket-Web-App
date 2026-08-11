@@ -13,12 +13,13 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script>
+<script lang="ts">
   import { browser } from '$app/environment';
   import ProjectDetails from '$lib/components/ProjectDetails.svelte';
+  import type { StoredProjectIndexItem } from '$lib/storage/projects.svelte';
   import { ProjectStorage } from '$lib/storage/projects.svelte';
 
-  let projects = $state([]);
+  let projects = $state<StoredProjectIndexItem[]>([]);
 
   async function loadProjects() {
     if (browser) {

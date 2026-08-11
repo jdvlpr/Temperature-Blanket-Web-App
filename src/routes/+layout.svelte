@@ -48,7 +48,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       project.status.temporaryUid = uid;
       dialog.trigger({
         type: 'component',
-        component: { ref: LegacyMigrationError, props: { uid, error } },
+        component: { ref: LegacyMigrationError, props: { uid, error: e } },
         options: {
           size: 'large',
         },

@@ -13,7 +13,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script>
+<script lang="ts">
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
   import { defaultYarn } from '$lib/state/page-state.svelte';
   let { selectedBrandId, selectedYarnId } = $props();
@@ -24,9 +24,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     label="Set as Default Yarn"
     details="Automatically select this yarn for certain areas of this web app, like for colors with no assigned yarn."
     onchange={(e) => {
-      if (e.target.checked) {
-        defaultYarn.value = `${selectedBrandId}-${selectedYarnId}`;
-      } else defaultYarn.value = '';
+      if (e.currentTarget instanceof HTMLInputElement) {
+        if (e.currentTarget.checked) {
+          defaultYarn.value = `${selectedBrandId}-${selectedYarnId}`;
+        } else defaultYarn.value = '';
+      }
     }}
     checked={defaultYarn.value === `${selectedBrandId}-${selectedYarnId}`}
   />

@@ -21,6 +21,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { project } from '$lib/state/project-state.svelte';
   import { weather } from '$lib/state/weather-state.svelte';
   import { stringToDate } from '$lib/utils/date-utils';
+  import type { TISO8601DateString } from '$lib/types/weather-types';
   import { pluralize } from '$lib/utils/string-utils';
   import {
     CircleCheckBigIcon,
@@ -60,11 +61,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <p class="flex flex-wrap items-center justify-center gap-x-1">
           <span class="font-bold">{@html location.result}</span>
           <span>
-            {stringToDate(location.from).toLocaleDateString(undefined, {
-              timeZone: 'UTC',
-            })} to {stringToDate(location.to).toLocaleDateString(undefined, {
-              timeZone: 'UTC',
-            })}
+            {location.from
+              ? stringToDate(
+                  location.from as TISO8601DateString,
+                ).toLocaleDateString(undefined, {
+                  timeZone: 'UTC',
+                })
+              : ''} to {location.to
+              ? stringToDate(
+                  location.to as TISO8601DateString,
+                ).toLocaleDateString(undefined, {
+                  timeZone: 'UTC',
+                })
+              : ''}
           </span>
 
           <span class="p-2 text-sm">

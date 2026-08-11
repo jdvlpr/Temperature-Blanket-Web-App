@@ -12,6 +12,7 @@ declare global {
 
   interface Window {
     clarity?: (action: string, ...args: unknown[]) => void;
+    MS_CLARITY_ID?: string | null;
   }
 }
 

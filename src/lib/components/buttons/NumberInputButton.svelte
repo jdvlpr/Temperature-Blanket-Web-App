@@ -52,7 +52,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           title,
           min,
           max,
-          onOkay: (_value) => {
+          onOkay: (_value: number) => {
             value = _value;
           },
         },

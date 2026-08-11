@@ -13,7 +13,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script module>
+<script module lang="ts">
   import { browser } from '$app/environment';
   import { weather } from '$lib/state/weather-state.svelte';
   import { preferences } from '$lib/storage/preferences.svelte';
@@ -26,7 +26,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   registerChartJS();
 
-  let ctx = $state(null);
+  let ctx: HTMLCanvasElement | null = $state(null);
 
   class WeatherChartClass {
     #labels = $derived(
@@ -47,7 +47,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         pointBorderColor: '#f87171',
         pointHoverBackgroundColor: '#f87171',
         yAxisID: 'y',
-        type: 'line',
+        type: 'line' as const,
         hidden: !weather.table.showParameters.tmax,
       },
       {
@@ -59,7 +59,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         pointBorderColor: '#a3a3a3',
         pointHoverBackgroundColor: '#a3a3a3',
         yAxisID: 'y',
-        type: 'line',
+        type: 'line' as const,
         hidden: !weather.table.showParameters.tavg,
       },
       {
@@ -71,7 +71,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         pointBorderColor: '#38bdf8',
         pointHoverBackgroundColor: '#38bdf8',
         yAxisID: 'y',
-        type: 'line',
+        type: 'line' as const,
         hidden: !weather.table.showParameters.tmin,
       },
       {
@@ -83,7 +83,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         pointBorderColor: '#818cf8',
         pointHoverBackgroundColor: '#818cf8',
         yAxisID: 'y2',
-        type: 'line',
+        type: 'line' as const,
         hidden: !weather.table.showParameters.prcp,
       },
       {
@@ -95,7 +95,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         pointBorderColor: '#94a3b8',
         pointHoverBackgroundColor: '#94a3b8',
         yAxisID: 'y2',
-        type: 'line',
+        type: 'line' as const,
         hidden: !weather.table.showParameters.snow,
       },
       {
@@ -115,65 +115,68 @@ If not, see <https://www.gnu.org/licenses/>. -->
       },
     ]);
 
-    current;
+    current: Chart<'line', (number | null)[] | undefined, string> | null = null;
 
     setup() {
-      this.current = new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: $state.snapshot(this.#labels),
-          datasets: $state.snapshot(this.#dataSets),
-        },
-        options: {
-          elements: {
-            line: {
-              tension: 0,
-            },
-            point: {
-              pointRadius: 1,
-              pointHitRadius: 15,
-              borderWidth: 1,
-              fill: false,
-              pointHoverRadius: 6,
-              hoverBorderWidth: 25,
-            },
+      if (!ctx) return;
+      this.current = new Chart<'line', (number | null)[] | undefined, string>(
+        ctx,
+        {
+          type: 'line' as const,
+          data: {
+            labels: $state.snapshot(this.#labels),
+            datasets: $state.snapshot(this.#dataSets),
           },
-          // events: ["click", "mousemove", "touchstart", "touchmove"],
-          events: ['click'],
-          animation: false,
-          plugins: {
-            tooltip: {
-              enabled: true,
-              interaction: {
-                mode: 'index',
-                axis: 'y',
+          options: {
+            elements: {
+              line: {
+                tension: 0,
               },
-              usePointStyle: true,
+              point: {
+                radius: 1,
+                hitRadius: 15,
+                borderWidth: 1,
+                hoverRadius: 6,
+                hoverBorderWidth: 25,
+              },
             },
-            legend: {
-              display: false,
+            // events: ["click", "mousemove", "touchstart", "touchmove"],
+            events: ['click'],
+            animation: false,
+            interaction: {
+              mode: 'index',
+              axis: 'y',
             },
-          },
-          responsive: true,
-          maintainAspectRatio: false,
-          aspectRatio: 3,
-          scales: {
-            x: buildXAxis(),
-            y: buildYAxis({
-              title:
-                preferences.value.units === 'metric'
-                  ? 'Degrees Celsius'
-                  : 'Degrees Fahrenheit',
-            }),
-            y2: buildY2Axis({
-              title:
-                preferences.value.units === 'metric'
-                  ? 'Millimeters / Minutes'
-                  : 'Inches / Hours',
-            }),
+            plugins: {
+              tooltip: {
+                enabled: true,
+                usePointStyle: true,
+              },
+              legend: {
+                display: false,
+              },
+            },
+            responsive: true,
+            maintainAspectRatio: false,
+            aspectRatio: 3,
+            scales: {
+              x: buildXAxis(),
+              y: buildYAxis({
+                title:
+                  preferences.value.units === 'metric'
+                    ? 'Degrees Celsius'
+                    : 'Degrees Fahrenheit',
+              }),
+              y2: buildY2Axis({
+                title:
+                  preferences.value.units === 'metric'
+                    ? 'Millimeters / Minutes'
+                    : 'Inches / Hours',
+              }),
+            },
           },
         },
-      });
+      );
     }
 
     update() {
@@ -185,21 +188,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
   export let weatherChart = browser ? new WeatherChartClass() : null;
 </script>
 
-<script>
+<script lang="ts">
   import { onMount } from 'svelte';
 
   onMount(() => {
-    weatherChart.setup();
+    weatherChart?.setup();
   });
 
   $effect(() => {
     if (weather.data) {
-      weatherChart.update();
+      weatherChart?.update();
     }
   });
   $effect(() => {
     weather.table.showParameters;
-    weatherChart.update();
+    weatherChart?.update();
   });
 </script>
 

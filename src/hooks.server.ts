@@ -15,7 +15,7 @@
 
 import { dev } from '$app/environment';
 import { THEMES, SKELETON_THEMES } from '$lib/constants/page-constants';
-import { redirect, type Handle } from '@sveltejs/kit';
+import { redirect, type Handle, type HandleServerError } from '@sveltejs/kit';
 import { sequence } from '@sveltejs/kit/hooks';
 
 // Legacy urls from previous versions of the app
@@ -164,6 +164,6 @@ export const handle: Handle = sequence(
   themeCookies,
 );
 
-export function handleError({ event, error }) {
-  console.error(error.stack);
-}
+export const handleError: HandleServerError = ({ error }) => {
+  console.error(error instanceof Error ? error.stack : String(error));
+};

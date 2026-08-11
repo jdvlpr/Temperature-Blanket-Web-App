@@ -69,7 +69,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let submitting = $state(false);
 
-  function getProjectLinkURL(projectLink) {
+  function getProjectLinkURL(projectLink: string): URL | null {
     try {
       return new URL(projectLink);
     } catch (error) {
@@ -77,11 +77,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     }
   }
 
-  async function submitForm(event) {
+  async function submitForm(event: SubmitEvent): Promise<void> {
     if (event.cancelable) event.preventDefault();
     submitting = true;
 
-    const formData = new FormData(event.target);
+    const formData = new FormData(event.target as HTMLFormElement);
 
     // Convert FormData to a JSON object
     const jsonObject = Object.fromEntries(formData.entries());
@@ -115,7 +115,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     if (locations.allValid && locations.all.length && project.url.hash)
       projectLink = project.url.href;
     else if (page.url.searchParams.has('projectURL')) {
-      projectLink = page.url.searchParams.get('projectURL');
+      projectLink = page.url.searchParams.get('projectURL') || '';
     }
   });
 </script>
@@ -802,11 +802,23 @@ If not, see <https://www.gnu.org/licenses/>. -->
           />
 
           {#if browser}
-            <input type="hidden" name="pageURL" value={params.get('pageURL')} />
+            <input
+              type="hidden"
+              name="pageURL"
+              value={params?.get('pageURL') ?? ''}
+            />
 
-            <input type="hidden" name="data0" value={params.get('data0')} />
+            <input
+              type="hidden"
+              name="data0"
+              value={params?.get('data0') ?? ''}
+            />
 
-            <input type="hidden" name="table0" value={params.get('table0')} />
+            <input
+              type="hidden"
+              name="table0"
+              value={params?.get('table0') ?? ''}
+            />
           {/if}
 
           {#if weather.data.length}

@@ -45,10 +45,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
     urlParams = new URLSearchParams(window.location.search);
     // Load URL
     if (urlParams?.has('s')) {
-      yarnPageState.gauge.colors =
-        stringToColors({
-          string: urlParams.get('s'),
-        }) || yarnPageState.gauge.colors;
+      const s = urlParams.get('s');
+      if (s) {
+        yarnPageState.gauge.colors =
+          stringToColors({
+            string: s,
+          }) || yarnPageState.gauge.colors;
+      }
     }
 
     if (urlParams?.has('f')) {
@@ -56,22 +59,25 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
       let _yarnString = urlParams.get('f');
 
-      yarnPageState.gauge.colors = yarnDetailsToColors({
-        string: _yarnString,
-        colors: $state.snapshot(yarnPageState.gauge.colors),
-      });
+      if (_yarnString) {
+        yarnPageState.gauge.colors =
+          yarnDetailsToColors({
+            string: _yarnString,
+            colors: $state.snapshot(yarnPageState.gauge.colors),
+          }) || yarnPageState.gauge.colors;
+      }
     }
 
     isFinishedOnMount = true;
   }
 
-  function getYarnFilterParams(colors) {
+  function getYarnFilterParams(colors: any[]): string {
     const details = colorsToYarnDetails({ colors });
     if (!details) return '';
     return `&f=${details}`;
   }
 
-  function getShareableURL(colors) {
+  function getShareableURL(colors: any[]): string | undefined {
     if (!browser || !isFinishedOnMount) return;
     const yarnFilterText = getYarnFilterParams(colors);
     const url = `${window.location.origin}${window.location.pathname}?s=${colorsToCode(
