@@ -1,6 +1,7 @@
 import * as SunCalc from 'suncalc';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { getDayTime, getMoonPhase, weather } from './weather-state.svelte';
+import type { LocationType } from '$lib/types/location-types';
 
 // Mocking $lib modules
 vi.mock('$lib/constants/api-constants', async (importOriginal) => ({
@@ -282,11 +283,11 @@ describe('weather-state', () => {
   });
 
   describe('getOpenMeteo', () => {
-    const mockLocation = {
-      lat: 50,
-      lng: 10,
-      from: '2023-01-01',
-      to: '2023-01-02',
+    const mockLocation: LocationType = {
+      lat: '50',
+      lng: '10',
+      from: '2023-01-01' as any,
+      to: '2023-01-02' as any,
       label: 'Test Location',
       index: 0,
       stations: null,
@@ -331,7 +332,10 @@ describe('weather-state', () => {
     });
 
     it('should clamp future "to" date to yesterday', async () => {
-      const futureLocation = { ...mockLocation, to: '2024-01-05' };
+      const futureLocation: LocationType = {
+        ...mockLocation,
+        to: '2024-01-05' as any,
+      };
 
       vi.mocked(fetch).mockResolvedValue({
         ok: true,
@@ -445,7 +449,7 @@ describe('weather-state', () => {
     });
 
     it('should format data for table display', () => {
-      const result = weather.getTableData();
+      const result = weather.getTableData() as any[];
       expect(result).toHaveLength(1);
       expect(result[0].date).toBe('2024-01-01');
       expect(result[0].tmax).toBe(20);
@@ -455,7 +459,7 @@ describe('weather-state', () => {
 
     it('should handle null values in table data', () => {
       weather.rawData[0].tmax.metric = null;
-      const result = weather.getTableData();
+      const result = weather.getTableData() as any[];
       expect(result[0].tmax).toBe('-');
     });
   });

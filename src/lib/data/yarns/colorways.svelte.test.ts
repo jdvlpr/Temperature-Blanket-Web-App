@@ -99,9 +99,10 @@ describe('colorways.svelte', () => {
   it('getColorName resolves the real colorway name for a matching brand/yarn/hex', () => {
     const [sample] = getAllColorways();
     expect(sample).toBeDefined();
+    expect(sample.hex).toBeDefined();
 
     const name = getColorName({
-      color: sample.hex,
+      color: sample.hex!,
       brandId: sample.brandId,
       yarnId: sample.yarnId,
     });

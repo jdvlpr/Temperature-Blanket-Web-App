@@ -341,9 +341,9 @@ export const goToProjectSection = async (
     if (activeSection?.id === 'page-section-gauges') {
       await tick();
       const activeGaugeBtn = document.getElementById('active-gauge-button');
+      const rect = activeGaugeBtn?.getBoundingClientRect();
       const isHidden =
-        activeGaugeBtn?.getBoundingClientRect().left < 0 ||
-        activeGaugeBtn?.getBoundingClientRect().right > window.innerWidth;
+        !!rect && (rect.left < 0 || rect.right > window.innerWidth);
       if (activeGaugeBtn && isHidden) {
         activeGaugeBtn.scrollIntoView({
           behavior: 'smooth',
@@ -357,9 +357,9 @@ export const goToProjectSection = async (
     if (activeSection?.id === 'page-section-preview') {
       await tick();
       const activePreviewBtn = document.getElementById('active-preview-button');
+      const rect = activePreviewBtn?.getBoundingClientRect();
       const isHidden =
-        activePreviewBtn?.getBoundingClientRect().left < 0 ||
-        activePreviewBtn?.getBoundingClientRect().right > window.innerWidth;
+        !!rect && (rect.left < 0 || rect.right > window.innerWidth);
       if (activePreviewBtn && isHidden) {
         activePreviewBtn.scrollIntoView({
           behavior: 'smooth',
@@ -371,7 +371,7 @@ export const goToProjectSection = async (
   }
 };
 
-const setSections = (index) => {
+const setSections = (index: number) => {
   const currentScrollTop = document.documentElement.scrollTop;
 
   pageSections.items.forEach((section, i, sections) => {
@@ -390,7 +390,11 @@ const setSections = (index) => {
   });
 };
 
-const checkUndoRedo = (ev, style, shift) => {
+const checkUndoRedo = (
+  ev: KeyboardEvent,
+  style?: 'mac' | 'windows',
+  shift?: boolean,
+) => {
   const macAllow = !style || style === 'mac';
   const winAllow = !style || style === 'windows';
   const code = ev.keyCode || ev.which;
@@ -407,22 +411,23 @@ const checkUndoRedo = (ev, style, shift) => {
   return false;
 };
 
-const isUndo = (ev, style) => {
+const isUndo = (ev: KeyboardEvent, style?: 'mac' | 'windows') => {
   return checkUndoRedo(ev, style, !ev.shiftKey);
 };
 
-const isRedo = (ev, style) => {
+const isRedo = (ev: KeyboardEvent, style?: 'mac' | 'windows') => {
   return checkUndoRedo(ev, style, ev.shiftKey);
 };
 
-export const handleKeyDown = (ev) => {
+export const handleKeyDown = (ev: KeyboardEvent) => {
+  const target = ev.target as HTMLElement | null;
   if (
     dialog.opened ||
-    ev.target.tagName === 'INPUT' ||
-    ev.target.tagName === 'TEXTAREA' ||
-    ev.target.tagName === 'TD' ||
-    ev.target.tagName === 'SELECT' ||
-    ev.target.tagName === 'BUTTON'
+    target?.tagName === 'INPUT' ||
+    target?.tagName === 'TEXTAREA' ||
+    target?.tagName === 'TD' ||
+    target?.tagName === 'SELECT' ||
+    target?.tagName === 'BUTTON'
   )
     return;
 

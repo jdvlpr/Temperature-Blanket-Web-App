@@ -304,12 +304,16 @@ export class PopoverInstance {
       top: `${y}px`,
     });
 
-    const staticSide = {
+    const staticSideMap = {
       top: 'bottom',
       right: 'left',
       bottom: 'top',
       left: 'right',
-    }[placement.split('-')[0]];
+    } as const;
+    const basePlacement = (placement as string).split(
+      '-',
+    )[0] as keyof typeof staticSideMap;
+    const staticSide = staticSideMap[basePlacement];
 
     // Position the arrow element (if present). Floating UI returns `middlewareData.arrow`
     // with `x` and/or `y` depending on placement. We set left/top on the arrow.

@@ -13,11 +13,11 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-export const exists = (variable) => {
+export const exists = (variable: unknown) => {
   return (
     !!variable &&
     variable !== '' &&
-    variable.length !== 0 &&
+    (variable as any).length !== 0 &&
     typeof variable !== 'undefined' &&
     JSON.stringify(variable) !== '{}'
   );
@@ -34,20 +34,27 @@ export const exists = (variable) => {
  *
  * @return  {Boolean}          [return description]
  */
-export const upToDate = (local, remote) => {
+export const upToDate = (local: string | number, remote: string | number) => {
   const VPAT = /^\d+(\.\d+){0,2}$/;
-  if (!local || !remote || local.length === 0 || remote.length === 0) {
+  const localStr = String(local);
+  const remoteStr = String(remote);
+  if (
+    !localStr ||
+    !remoteStr ||
+    localStr.length === 0 ||
+    remoteStr.length === 0
+  ) {
     return false;
   }
-  if (local === remote) {
+  if (localStr === remoteStr) {
     return true;
   }
-  if (VPAT.test(local) && VPAT.test(remote)) {
-    let lparts = local.split('.');
+  if (VPAT.test(localStr) && VPAT.test(remoteStr)) {
+    let lparts = localStr.split('.');
     while (lparts.length < 3) {
       lparts.push('0');
     }
-    let rparts = remote.split('.');
+    let rparts = remoteStr.split('.');
     while (rparts.length < 3) {
       rparts.push('0');
     }
@@ -76,10 +83,10 @@ export const upToDate = (local, remote) => {
     }
     return true;
   } else {
-    return local >= remote;
+    return localStr >= remoteStr;
   }
 };
 
-export const capitalizeFirstLetter = (string) => {
+export const capitalizeFirstLetter = (string: string) => {
   return string.charAt(0).toUpperCase() + string.slice(1);
 };

@@ -53,9 +53,7 @@ export class LocationState extends LocationClass implements LocationStateType {
     super();
     if (location) {
       // for each key in location, set this[key] = location[key]
-      Object.keys(location).forEach((key) => {
-        this[key] = location[key];
-      });
+      Object.assign(this, location);
     }
     this.uuid =
       browser && crypto && typeof crypto.randomUUID === 'function'
@@ -83,7 +81,7 @@ export class LocationState extends LocationClass implements LocationStateType {
   #today = $state<TISO8601DateString | null>(null); // YYYY-MM-DD
 
   daysInFuture = $derived.by(() => {
-    if (this.#today && this.to >= this.#today)
+    if (this.#today && this.to && this.to >= this.#today && this.#toDate)
       return getDaysBetween(stringToDate(this.#today), this.#toDate);
     else return 0;
   });
@@ -116,7 +114,7 @@ export class LocationsState implements LocationsStateType {
   all = $state<LocationStateType[]>([]);
 
   totalDays = $derived.by(() => {
-    const arrayOfDayCount = this.all.map((n: LocationState) => {
+    const arrayOfDayCount = this.all.map((n) => {
       if (!n.from || !n.to) return null;
       const from = stringToDate(n.from);
       const to = stringToDate(n.to);
@@ -124,8 +122,8 @@ export class LocationsState implements LocationsStateType {
       if (!from || !to) return null;
       return getDaysBetween(from, to);
     });
-    const sum = arrayOfDayCount.reduce((accumulator, value) => {
-      return accumulator + value;
+    const sum = arrayOfDayCount.reduce((accumulator: number, value) => {
+      return accumulator + (value ?? 0);
     }, 0);
     return sum;
   });
@@ -174,7 +172,7 @@ export class LocationsState implements LocationsStateType {
       !this.all?.every((item) => item?.label && item?.from && item?.to)
     )
       return '';
-    let titles = [];
+    let titles: string[] = [];
     this.all.forEach((location) => {
       if (location?.from && location?.to) {
         let from = stringToDate(location.from).toLocaleDateString(undefined, {
@@ -228,7 +226,9 @@ export class LocationsState implements LocationsStateType {
 export const locations = new LocationsState();
 
 // Controller and signal for when searching for locations
-export const controller = $state({ value: null });
+export const controller = $state<{ value: AbortController | null }>({
+  value: null,
+});
 
 class SignalClass {
   value = $derived(controller.value?.signal || null);

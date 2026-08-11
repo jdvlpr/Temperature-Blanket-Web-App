@@ -22,11 +22,11 @@ vi.mock('$lib/state/weather-state.svelte', () => ({
   weather: {
     source: { name: 'Meteostat', useSecondary: false, settings: {} },
     isUserEdited: false,
-    rawData: [],
+    rawData: [] as any[],
     currentIndex: 0,
     grouping: 'day',
     isFromLocalStorage: false,
-    setRawData(value: unknown[]) {
+    setRawData(value: any[]) {
       this.currentIndex = 0;
       this.rawData = value;
     },
@@ -137,9 +137,7 @@ describe('storage-utils integration', () => {
   });
 
   it('should save project through storage class', async () => {
-    const saveSpy = vi
-      .spyOn(ProjectStorage, 'save')
-      .mockResolvedValue(undefined);
+    const saveSpy = vi.spyOn(ProjectStorage, 'save').mockResolvedValue(null);
 
     await ProjectStorage.save({ id: '123' });
 

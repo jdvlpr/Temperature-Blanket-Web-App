@@ -33,7 +33,7 @@ import type {
  * @param {string} date - The ISO 8601 `YYYY-MM-DD` date to check.
  * @returns {boolean} - True if the date is recent, false otherwise.
  */
-export const getIsRecentDate = (date) => {
+export const getIsRecentDate = (date: string | null) => {
   if (!date || weather.isUserEdited) return false;
   const weatherSource = weather.source.name;
   if (weatherSource === 'Open-Meteo') {
@@ -56,7 +56,7 @@ export const getIsRecentDate = (date) => {
   return false;
 };
 
-export const getIsFutureDate = (date) => {
+export const getIsFutureDate = (date: string | null) => {
   if (!date || weather.isUserEdited) return false;
 
   return (
@@ -73,7 +73,15 @@ export const getIsFutureDate = (date) => {
  */
 export const yearFrom = (date: string): Date => {
   // Ensure the input is a Date object
-  let _date = typeof date === 'string' ? stringToDate(date) : date;
+  let _date =
+    typeof date === 'string'
+      ? stringToDate(
+          date as
+            | TISO8601DateString
+            | TISO8601DateStringPeriodSeparated
+            | TISO8601DateStringSlashSeparated,
+        )
+      : date;
 
   // Add one year
   _date.setUTCFullYear(_date.getUTCFullYear() + 1);
@@ -98,7 +106,7 @@ export const dateToISO8601String = (date: Date): TISO8601DateString => {
 };
 
 // Archived function
-export const dateToISO8601StringVersion2 = (date) => {
+export const dateToISO8601StringVersion2 = (date: Date | string) => {
   // Note: don't use .toIsoString, because it sometimes returns the previous date
   // I'm not exactly sure why it doesn't work as expected
   // For example don't do this: const str = new Date(date).toISOString().split('T')[0];
@@ -135,7 +143,7 @@ export const stringToDate = (
 };
 
 // Archived function
-export const stringToDateVersion2 = (str) => {
+export const stringToDateVersion2 = (str: string) => {
   if (str.includes('-')) return new Date(str.replace(/-/g, '/'));
   else if (str.includes('.')) return new Date(str.replace(/./g, '/'));
   else if (str.includes('/')) return new Date(str);
@@ -145,13 +153,20 @@ export const stringToDateVersion2 = (str) => {
 /**
  * Calculates the number of days between two dates, inclusive.
  *
- * @param {Date} startDate - The start date.
- * @param {Date} endDate - The end date.
+ * @param {Date | number} startDate - The start date or millisecond timestamp.
+ * @param {Date | number} endDate - The end date or millisecond timestamp.
  * @returns {number} The number of days between the start and end dates.
  */
-export const numberOfDays = (startDate, endDate) => {
+export const numberOfDays = (
+  startDate: Date | number | null,
+  endDate: Date | number | null,
+): number => {
   if (!startDate || !endDate) return 0;
-  return Math.round((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1; // changed from ceil to round in v1.741 seems to have fixed a rounding bug
+  const startMs =
+    startDate instanceof Date ? startDate.getTime() : (startDate as number);
+  const endMs =
+    endDate instanceof Date ? endDate.getTime() : (endDate as number);
+  return Math.round((endMs - startMs) / (1000 * 60 * 60 * 24)) + 1; // changed from ceil to round in v1.741 seems to have fixed a rounding bug
 };
 
 export const getDaysBetween = (startDate: Date, endDate: Date): number => {
@@ -160,10 +175,7 @@ export const getDaysBetween = (startDate: Date, endDate: Date): number => {
   return Math.round((endDate.getTime() - startDate.getTime()) / msPerDay) + 1;
 };
 
-export function getWeekNumber(
-  d: Date,
-  dowOffset?: number,
-): [number, number] {
+export function getWeekNumber(d: Date, dowOffset?: number): [number, number] {
   // --- 1. Parameter Handling & Validation ---
   // Set default offset to Sunday (ISO 8601) if not provided or invalid type
   const _dowOffset = typeof dowOffset === 'number' ? dowOffset : 0;
@@ -217,7 +229,8 @@ export const createWeeksProperty = ({
   weatherData: WeatherDay[];
   dowOffset?: number;
 }): (WeatherDay & { weekId: string })[] => {
-  if (!weatherData.length) return weatherData as (WeatherDay & { weekId: string })[];
+  if (!weatherData.length)
+    return weatherData as (WeatherDay & { weekId: string })[];
   const data = weatherData.map((day) => {
     const [year, week] = getWeekNumber(day.date, dowOffset);
 
@@ -226,7 +239,7 @@ export const createWeeksProperty = ({
   return data;
 };
 
-export const isDateWithinLastSevenDays = (date) => {
+export const isDateWithinLastSevenDays = (date: string | Date) => {
   // Get the current date
   const currentDate = new Date();
 

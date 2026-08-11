@@ -24,7 +24,7 @@ import { online } from 'svelte/reactivity/window';
  * @param   {string}  message  error message
  *
  */
-export const displayGeoNamesErrorMessage = (message) => {
+export const displayGeoNamesErrorMessage = (message: string) => {
   let text = `
   <p class='font-bold text-2xl'>Whoa!</p>
   <p class='font-bold'>There's been a problem.</p>`;

@@ -47,11 +47,14 @@ describe('MigrationManager', () => {
     localStorageMock['projects'] = JSON.stringify(legacy);
 
     vi.mocked(ProjectStorage.getById).mockResolvedValue(null);
-    vi.mocked(ProjectStorage.save).mockResolvedValue(undefined);
+    vi.mocked(ProjectStorage.save).mockResolvedValue(null);
 
     await MigrationManager.migrateFromLocalStorage();
 
-    expect(ProjectStorage.save).toHaveBeenCalledWith('1', legacy[0]);
+    expect(ProjectStorage.save).toHaveBeenCalledWith({
+      id: '1',
+      localProject: legacy[0],
+    });
     expect(localStorageMock['projects']).toBeUndefined();
   });
 
@@ -75,7 +78,7 @@ describe('MigrationManager', () => {
     localStorageMock['projects'] = JSON.stringify(legacy);
 
     vi.mocked(ProjectStorage.save)
-      .mockResolvedValueOnce(undefined)
+      .mockResolvedValueOnce(null)
       .mockRejectedValueOnce(new Error('Save failed'));
 
     await expect(MigrationManager.migrateFromLocalStorage()).rejects.toThrow(

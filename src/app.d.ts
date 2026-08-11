@@ -9,6 +9,10 @@ declare global {
     // interface PageData {}
     // interface Platform {}
   }
+
+  interface Window {
+    clarity?: (action: string, ...args: unknown[]) => void;
+  }
 }
 
 export {};

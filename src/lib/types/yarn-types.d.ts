@@ -121,8 +121,8 @@ export interface AffiliateColorCompressed {
 
 export interface Color {
   name?: string;
-  /** lowercase HTML hex code */
-  hex?: Lowercase<string>;
+  /** HTML hex code */
+  hex?: string;
   brandId?: string;
   brandName?: string;
   yarnId?: string;

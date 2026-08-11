@@ -18,18 +18,18 @@ import { gauges } from '$lib/state/gauges-state.svelte';
 import { project } from '$lib/state/project-state.svelte';
 import { weather } from '$lib/state/weather-state.svelte';
 
-export const delay = (delayInms) => {
+export const delay = (delayInms: number) => {
   return new Promise((resolve) => setTimeout(resolve, delayInms));
 };
 
-let debounceTimerPreviewEffect;
-const debouncePreviewEffect = (callback, time) => {
+let debounceTimerPreviewEffect: number | undefined;
+const debouncePreviewEffect = (callback: () => void, time: number) => {
   if (!window) return;
   window.clearTimeout(debounceTimerPreviewEffect);
   debounceTimerPreviewEffect = window.setTimeout(callback, time);
 };
 
-export const runPreview = (callback) => {
+export const runPreview = (callback: () => void) => {
   if (!window) return;
   $effect.root(() => {
     $effect(() => {

@@ -179,7 +179,10 @@ export class TemperatureGauge implements GaugeAttributes {
     getEvenlyDistributedRangeValuesWithEqualDayCount({
       weatherData: weather.data,
       numRanges: this.colors.length,
-      prop: this.rangeOptions.auto.optimization,
+      prop: (this.rangeOptions.auto.optimization === 'ranges'
+        ? 'tmax'
+        : this.rangeOptions.auto.optimization) as
+        'tmax' | 'tavg' | 'tmin' | 'prcp' | 'snow' | 'dayt',
       gaugeDirection: this.rangeOptions.direction,
       roundIncrement: this.rangeOptions.auto.roundIncrement,
       includeFrom: this.rangeOptions.includeFromValue,

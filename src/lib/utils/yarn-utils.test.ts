@@ -123,15 +123,15 @@ describe('yarn-utils', () => {
 
   describe('getFilteredYarns', () => {
     it('should return all yarns if no brand selected', () => {
-      const result = getFilteredYarns({ selectedBrandId: null });
+      const result = getFilteredYarns({ selectedBrandId: undefined });
       expect(result).toHaveLength(3); // 2 from brand1, 1 from brand2
     });
 
     it('should return only yarns for specific brand', () => {
       const result = getFilteredYarns({ selectedBrandId: 'brand1' });
       expect(result).toHaveLength(2);
-      expect(result[0].id).toBe('yarn1');
-      expect(result[1].id).toBe('yarn2');
+      expect(result![0].id).toBe('yarn1');
+      expect(result![1].id).toBe('yarn2');
     });
   });
 
@@ -144,17 +144,17 @@ describe('yarn-utils', () => {
     it('should filter by brand', () => {
       const result = getColorways({
         selectedBrandId: 'brand1',
-        selectedYarnId: null,
-        selectedYarnWeightId: null,
+        selectedYarnId: undefined,
+        selectedYarnWeightId: undefined,
       });
       expect(result).toHaveLength(2);
     });
 
     it('should filter by yarn', () => {
       const result = getColorways({
-        selectedBrandId: null,
+        selectedBrandId: undefined,
         selectedYarnId: 'yarn1',
-        selectedYarnWeightId: null,
+        selectedYarnWeightId: undefined,
       });
       expect(result).toHaveLength(1);
       expect(result[0].yarnId).toBe('yarn1');
@@ -162,8 +162,8 @@ describe('yarn-utils', () => {
 
     it('should filter by weight', () => {
       const result = getColorways({
-        selectedBrandId: null,
-        selectedYarnId: null,
+        selectedBrandId: undefined,
+        selectedYarnId: undefined,
         selectedYarnWeightId: 'weight1',
       });
       expect(result).toHaveLength(2); // Red (brand1,yarn1) and Blue (brand2,yarn3)

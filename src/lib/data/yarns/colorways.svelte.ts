@@ -161,7 +161,7 @@ function buildColorwaysWithAffiliateLinks(
 
           const variant_href = color?.variant_href || colorway.source.href;
           // Normalize hex values using chroma
-          const hex = chroma(color.hex).hex();
+          const hex = color.hex ? chroma(color.hex).hex() : color.hex;
 
           return {
             ...color,
@@ -187,7 +187,7 @@ function buildAllColorways(brandsList: Brand[]): Color[] {
       return yarn.colorways.flatMap((colorway) => {
         return colorway.colors.map((color) => {
           const href = color?.variant_href || colorway.source.href;
-          const hex = chroma(color.hex).hex();
+          const hex = color.hex ? chroma(color.hex).hex() : color.hex;
           return {
             name: color.name,
             hex,

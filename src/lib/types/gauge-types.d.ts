@@ -131,6 +131,7 @@ export type WeatherParam = {
       | 'Low (°F)'
       | 'Rain (in)'
       | 'Snow (in)'
+      | 'Sun (h:m)'
       | 'Moon';
   };
   icon: '↑' | '~' | '↓' | '∴' | '∗' | '☼' | '●'; // TODO: try using different icons: '☔' '☀'
