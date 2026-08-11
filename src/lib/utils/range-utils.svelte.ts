@@ -79,7 +79,10 @@ export const getEvenlyDistributedRangeValuesWithEqualDayCount = ({
 }: {
   weatherData: WeatherDay[] | undefined;
   numRanges: number;
-  prop: keyof Pick<WeatherDay, 'tmax' | 'tavg' | 'tmin' | 'prcp' | 'snow' | 'dayt'>;
+  prop: keyof Pick<
+    WeatherDay,
+    'tmax' | 'tavg' | 'tmin' | 'prcp' | 'snow' | 'dayt'
+  >;
   gaugeDirection: GaugeRangeOptions['direction'];
   roundIncrement: boolean;
   includeFrom: boolean;
@@ -91,6 +94,11 @@ export const getEvenlyDistributedRangeValuesWithEqualDayCount = ({
 
   let _weatherData = [...weatherData];
   _weatherData = _weatherData.filter((day) => day[prop][_units] !== null); // filter out any missing values
+
+  // With no days to distribute there are no meaningful ranges, and the min/max below
+  // would be ±Infinity, which the `currentTo === currentFrom` loop can never separate.
+  // This is the normal state at module init, before any weather has been fetched.
+  if (_weatherData.length === 0) return [];
 
   // day[prop][_units] is guaranteed non-null for every remaining day by the filter above
   if (gaugeDirection === 'low-to-high')
@@ -149,9 +157,15 @@ export const getEvenlyDistributedRangeValuesWithEqualDayCount = ({
         : _weatherData[weatherIndex][prop][_units]!;
     }
 
-    // If the from and to values are the same, add or subtract one until they are not equal
-    while (currentTo === currentFrom)
-      gaugeDirection === 'high-to-low' ? currentTo-- : currentTo++;
+    // If the from and to values are the same, add or subtract one until they are not
+    // equal. Stop if ±1 can no longer change the value (±Infinity, or magnitudes past
+    // the safe-integer range), which would otherwise loop forever.
+    while (currentTo === currentFrom) {
+      const next =
+        gaugeDirection === 'high-to-low' ? currentTo - 1 : currentTo + 1;
+      if (next === currentTo) break;
+      currentTo = next;
+    }
 
     rangeValues.push({
       from: displayNumber(currentFrom),

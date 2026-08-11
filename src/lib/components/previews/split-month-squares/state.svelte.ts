@@ -21,8 +21,14 @@ interface SplitMonthSquaresPreviewSettings extends BasePreviewSettings {
   leftTarget: WeatherParam['id'];
   rightTarget: WeatherParam['id'];
   dimensions: string;
-  additionalRoundsColor: Color['hex'];
+  additionalRoundsColor: NonNullable<Color['hex']>;
   additionalRoundsPerSquare: number;
+}
+
+export interface SplitMonthSquaresSection {
+  isWeather: boolean;
+  dayIndex: number;
+  sides: { color: Color['hex']; points: string }[];
 }
 
 export class SplitMonthSquaresPreviewClass {
@@ -71,7 +77,7 @@ export class SplitMonthSquaresPreviewClass {
 
   previewComponent = Preview;
 
-  sections = $state([]);
+  sections = $state<SplitMonthSquaresSection[]>([]);
 
   STITCH_SIZE = 10;
 
@@ -148,10 +154,10 @@ export class SplitMonthSquaresPreviewClass {
   // *******************
   // Method for loading settings from a url hash string
   // *******************
-  load(hash) {
-    let startIndex = [],
-      endIndex = [];
-    const separatorIndex = [];
+  load(hash: string) {
+    const startIndex: number[] = [],
+      endIndex: number[] = [];
+    const separatorIndex: number[] = [];
     for (let i = 0; i < hash.length; i++) {
       if (hash[i] === '(') startIndex.push(i);
       if (
@@ -161,13 +167,14 @@ export class SplitMonthSquaresPreviewClass {
         separatorIndex.push(i);
       if (hash[i] === ')') endIndex.push(i);
     }
-    if (!startIndex || !separatorIndex || !endIndex) return; // format of hash was wrong, so stop processing
+    if (!startIndex.length || !separatorIndex.length || !endIndex.length)
+      return; // format of hash was wrong, so stop processing
 
     // targets
-    let targets = hash.substring(0, startIndex[0]);
-    targets = targets.match(/.{1,4}/g);
-    this.settings.leftTarget = targets[0];
-    this.settings.rightTarget = targets[1];
+    const targets = hash.substring(0, startIndex[0]).match(/.{1,4}/g);
+    if (!targets) return; // format of hash was wrong, so stop processing
+    this.settings.leftTarget = targets[0] as WeatherParam['id'];
+    this.settings.rightTarget = targets[1] as WeatherParam['id'];
 
     this.settings.dimensions = hash.substring(
       startIndex[0] + 1,
@@ -180,7 +187,7 @@ export class SplitMonthSquaresPreviewClass {
     );
     this.settings.additionalRoundsColor = chroma(
       hash.substring(separatorIndex[1] + 1, endIndex[0]),
-    ).hex();
+    ).hex() as NonNullable<Color['hex']>;
 
     previews.activeId = this.id;
   }

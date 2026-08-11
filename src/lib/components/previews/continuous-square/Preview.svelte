@@ -13,13 +13,17 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script>
+<script lang="ts">
   import Spinner from '$lib/components/Spinner.svelte';
   import { weather } from '$lib/state/weather-state.svelte';
   import { getColorInfo } from '$lib/utils/color-utils';
   import { runPreview } from '$lib/utils/function-utils.svelte';
   import { showPreviewImageWeatherDetails } from '$lib/utils/preview-utils.svelte';
-  import { continuousSquarePreview } from './state.svelte';
+  import type { Color } from '$lib/types/yarn-types';
+  import {
+    continuousSquarePreview,
+    type ContinuousSquareSection,
+  } from './state.svelte';
 
   let width = $state(continuousSquarePreview.width);
 
@@ -28,7 +32,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let unit = $derived(continuousSquarePreview.STITCH_SIZE * 2);
   let doubleUnit = $derived(unit * 2);
 
-  function getNextStitch({ x, y, stitch, round }) {
+  function getNextStitch({
+    x,
+    y,
+    stitch,
+    round,
+  }: {
+    x: number;
+    y: number;
+    stitch: number;
+    round: number;
+  }): { x: number; y: number; isEndOfRound: boolean } {
     const endOfRoundStitch = getEndOfRoundStitch(round);
 
     if (stitch === endOfRoundStitch)
@@ -55,28 +69,28 @@ If not, see <https://www.gnu.org/licenses/>. -->
     if (stitch === topLeft) return { x: x + unit, y: y - unit, isEndOfRound }; // Up Right
     if (stitch < topLeft) return { x, y: y - doubleUnit, isEndOfRound }; // Up
 
-    if (stitch > topLeft && stitch < topRight)
-      return { x: x + doubleUnit, y, isEndOfRound }; // Right
+    // stitch > topLeft && stitch < topRight
+    return { x: x + doubleUnit, y, isEndOfRound }; // Right
   }
 
-  function nextStitchDownRight(round) {
+  function nextStitchDownRight(round: number): number {
     if (round <= 1) return round;
     return 4 * round - 2 + nextStitchDownRight(round - 1);
   }
-  function nextStitchDownLeft(round) {
+  function nextStitchDownLeft(round: number): number {
     if (round <= 1) return round + 1;
     return 4 * round - 1 + nextStitchDownLeft(round - 1);
   }
-  function nextStitchUpLeft(round) {
+  function nextStitchUpLeft(round: number): number {
     if (round <= 1) return round + 2;
     return 4 * round + nextStitchUpLeft(round - 1);
   }
-  function nextStitchUpRight(round) {
+  function nextStitchUpRight(round: number): number {
     if (round <= 2) return round + 3;
     return 4 * round - 3 + nextStitchUpRight(round - 1);
   }
 
-  function getEndOfRoundStitch(round) {
+  function getEndOfRoundStitch(round: number): number {
     if (round <= 1) return round * 4;
     return 4 * round + getEndOfRoundStitch(round - 1);
   }
@@ -90,9 +104,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
       continuousSquarePreview.STITCH_SIZE * 4;
     let round = 1;
     let dayIndex = 0;
-    let value, color;
+    let value: number | null;
+    let color: Color['hex'];
     let isExtraStitch = false;
-    const sections = [];
+    const sections: ContinuousSquareSection[] = [];
 
     for (
       let stitch = 1;
@@ -151,10 +166,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     viewBox="0 0 {width} {height}"
     bind:this={continuousSquarePreview.svg}
     onclick={(e) => {
+      if (!(e.target instanceof SVGElement)) return;
       if (e.target.tagName !== 'rect') return;
       if (e.target.dataset.isextrastitch === 'true') return;
 
-      weather.currentIndex = +e.target.dataset.dayindex;
+      weather.currentIndex = +(e.target.dataset.dayindex ?? NaN);
       showPreviewImageWeatherDetails(continuousSquarePreview.targets);
     }}
   >
