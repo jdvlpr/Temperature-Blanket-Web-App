@@ -21,10 +21,10 @@ import { online } from 'svelte/reactivity/window';
  * Display error message
  * Status codes are from https://www.geonames.org/export/webservice-exception.html
  *
- * @param   {string}  message  error message
+ * @param   {unknown}  message  error message, usually a caught error
  *
  */
-export const displayGeoNamesErrorMessage = (message: string) => {
+export const displayGeoNamesErrorMessage = (message: unknown) => {
   let text = `
   <p class='font-bold text-2xl'>Whoa!</p>
   <p class='font-bold'>There's been a problem.</p>`;
@@ -35,7 +35,8 @@ export const displayGeoNamesErrorMessage = (message: string) => {
     text += `<p class='my-4'>It appears the location-fetching service is experiencing technical difficulties.
   You can refresh this webpage, or try again later. Sorry for the inconvenience.</p>`;
 
-    if (message) text += `<p class="my-4 italic text-xs">${message}</p>`;
+    if (message)
+      text += `<p class="my-4 italic text-xs">${String(message)}</p>`;
   }
 
   dialog.trigger({
