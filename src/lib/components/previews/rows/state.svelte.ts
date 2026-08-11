@@ -25,7 +25,7 @@ interface RowsPreviewSettings extends BasePreviewSettings {
   stitchesPerRow: number;
   stitchesPerDay: number;
   lengthTarget: 'none' | 'custom' | WeatherParam['id'];
-  extrasColor: Color['hex'];
+  extrasColor: NonNullable<Color['hex']>;
   seasonTargets: [
     WeatherParam['id'][],
     WeatherParam['id'][],
@@ -47,7 +47,12 @@ export class RowsPreviewClass {
           if (this.settings.useSeasonTargets) {
             this.settings.seasonTargets = this.settings.seasonTargets.map(
               (target) => setTargets(target) || target,
-            );
+            ) as [
+              WeatherParam['id'][],
+              WeatherParam['id'][],
+              WeatherParam['id'][],
+              WeatherParam['id'][],
+            ];
           }
         }
       });
@@ -239,7 +244,7 @@ export class RowsPreviewClass {
           paramIndex < activeTargets.length;
           paramIndex++, y2 += this.stitchSize
         ) {
-          let color: string;
+          let color: NonNullable<Color['hex']>;
 
           if (isWeatherSection) {
             let param = activeTargets[paramIndex] as any;
@@ -248,7 +253,7 @@ export class RowsPreviewClass {
             } else {
               let value = weather.getWeatherValue({ dayIndex, param });
               const colorInfo = getColorInfo({ param, value });
-              color = colorInfo.hex || '#cccccc';
+              color = (colorInfo.hex || '#cccccc') as NonNullable<Color['hex']>;
             }
           } else {
             color = this.settings.extrasColor;
@@ -406,7 +411,7 @@ export class RowsPreviewClass {
       targetsStr.includes(CHARACTERS_FOR_URL_HASH.separator_alt)
     ) {
       // Season targets are being used
-      let seasonsTargets: string[] | string[][] = [];
+      let seasonsTargets: string[] = [];
       if (targetsStr.includes(CHARACTERS_FOR_URL_HASH.separator))
         seasonsTargets = targetsStr.split(CHARACTERS_FOR_URL_HASH.separator);
       if (targetsStr.includes(CHARACTERS_FOR_URL_HASH.separator_alt))
@@ -414,22 +419,30 @@ export class RowsPreviewClass {
           CHARACTERS_FOR_URL_HASH.separator_alt,
         );
 
-      seasonsTargets = seasonsTargets.map((seasonTargetStr) => {
+      const processedSeasonTargets = seasonsTargets.map((seasonTargetStr) => {
         const targetsMatch = seasonTargetStr.match(/.{1,4}/g);
-        if (targetsMatch) return targetsMatch;
-        return [];
-      });
+        if (targetsMatch) return targetsMatch as WeatherParam['id'][];
+        return [] as WeatherParam['id'][];
+      }) as unknown as [
+        WeatherParam['id'][],
+        WeatherParam['id'][],
+        WeatherParam['id'][],
+        WeatherParam['id'][],
+      ];
 
-      if (seasonsTargets && seasonsTargets.length === DEFAULT_SEASONS.length) {
+      if (
+        processedSeasonTargets &&
+        processedSeasonTargets.length === DEFAULT_SEASONS.length
+      ) {
         // if there are valid season targets, update the settings
         this.settings.useSeasonTargets = true;
-        this.settings.seasonTargets = seasonsTargets as string[][];
+        this.settings.seasonTargets = processedSeasonTargets;
       }
     } else {
       // Season targets are not being used, so extract targets every four characters
       const targetsMatch = targetsStr.match(/.{1,4}/g);
       if (targetsMatch) {
-        this.settings.selectedTargets = targetsMatch;
+        this.settings.selectedTargets = targetsMatch as WeatherParam['id'][];
       }
     }
 
@@ -452,12 +465,16 @@ export class RowsPreviewClass {
     } else if (separatorIndex && lengthEndIndex) {
       color = hash.substring(separatorIndex + 1, lengthEndIndex);
     }
-    if (chroma.valid(color)) this.settings.extrasColor = chroma(color).hex();
+    if (chroma.valid(color))
+      this.settings.extrasColor = chroma(color).hex() as NonNullable<
+        Color['hex']
+      >;
 
     // Extract the length target or stitches per row from the hash and update the settings
     if (exclamationIndex) {
       let content = hash.substring(exclamationIndex + 1, lengthEndIndex);
-      if (isNaN(+content)) this.settings.lengthTarget = content;
+      if (isNaN(+content))
+        this.settings.lengthTarget = content as WeatherParam['id'];
       else if (!isNaN(+content)) {
         this.settings.stitchesPerDay = +content;
         this.settings.lengthTarget = 'custom';

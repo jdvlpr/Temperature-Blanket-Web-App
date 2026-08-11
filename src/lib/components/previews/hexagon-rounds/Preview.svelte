@@ -13,7 +13,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script>
+<script lang="ts">
   import Spinner from '$lib/components/Spinner.svelte';
   import { weather } from '$lib/state/weather-state.svelte';
   import { getColorInfo } from '$lib/utils/color-utils';
@@ -24,7 +24,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let width = $state(hexagonRoundsPreview.width);
   let height = $state(hexagonRoundsPreview.height);
 
-  function getHexagonPoints(cx, cy, size) {
+  function getHexagonPoints(cx: number, cy: number, size: number): string {
     // Returns a string of points for a regular hexagon centered at (cx, cy)
     const points = [];
     for (let i = 0; i < 6; i++) {
@@ -99,12 +99,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
         }
       }
 
-      let hex = {
-        x,
-        y,
-        size: roundSize,
-      };
-
       const day = daysInSquare ? daysInSquare[roundInSquare - 1] : undefined;
       let _dayIndex = dayIndex;
       let color;
@@ -118,23 +112,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
           value,
         }).hex;
         isWeather = true;
-        hex = {
-          ...hex,
-          isWeather,
-          dayIndex: _dayIndex,
-          color,
-        };
         dayIndex += 1;
       } else {
         color = hexagonRoundsPreview.settings.additionalRoundsColor;
         isWeather = false;
-        hex = {
-          ...hex,
-          isWeather,
-          dayIndex: _dayIndex,
-          color,
-        };
       }
+
+      const hex = {
+        x,
+        y,
+        size: roundSize,
+        isWeather,
+        dayIndex: _dayIndex,
+        color,
+      };
+
       sections.push(hex);
 
       const isLastRoundInHexagon =
@@ -176,9 +168,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
       hexagonRoundsPreview.STITCH_SIZE / 2} {width} {height}"
     bind:this={hexagonRoundsPreview.svg}
     onclick={(e) => {
+      if (!(e.target instanceof SVGElement)) return;
       if (e.target.tagName !== 'polygon') return;
-      if (e.target.dataset.isweather !== 'true') return;
-      weather.currentIndex = +e.target.dataset.dayindex;
+      if (e.target.getAttribute('data-isweather') !== 'true') return;
+      weather.currentIndex = +(
+        (e.target as SVGPolygonElement).getAttribute('data-dayindex') ?? 0
+      );
       showPreviewImageWeatherDetails(hexagonRoundsPreview.targets);
     }}
   >

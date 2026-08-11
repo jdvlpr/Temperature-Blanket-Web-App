@@ -24,7 +24,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     showPreviewImageWeatherDetails,
   } from '$lib/utils/preview-utils.svelte';
   import { runPreview } from '$lib/utils/function-utils.svelte';
-  import { squaresPreview } from './state.svelte';
+  import { squaresPreview, type SquaresSection } from './state.svelte';
 
   let width = $state(squaresPreview.width);
 
@@ -45,7 +45,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   runPreview(() => {
     // Get the target IDs for each square section
     let row = 0;
-    const sections = [];
+    const sections: SquaresSection[][] = [];
     let isWeatherSquare: boolean;
     let dayIndex = 0;
 
@@ -63,7 +63,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         column = 0;
         row++;
       }
-      let square: object[] = [];
+      let square: SquaresSection[] = [];
 
       // Check if the square is a weather square or an additional square
       isWeatherSquare =
@@ -119,17 +119,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
           // Check if the primary target value is 0 or null, use the primary target as a backup
           if (
-            (squaresPreview.settings.primaryTargetAsBackup === 1 &&
-              value === 0) ||
-            (squaresPreview.settings.primaryTargetAsBackup === 1 &&
-              value === null)
+            (squaresPreview.settings.primaryTargetAsBackup && value === 0) ||
+            (squaresPreview.settings.primaryTargetAsBackup && value === null)
           ) {
             targetId = squaresPreview.settings.primaryTarget;
             value = weather.getWeatherValue({ dayIndex, param: targetId });
           }
 
           // Get the color based on the gauge ID and value
-          color = getColorInfo({ param: targetId, value }).hex;
+          color = getColorInfo({ param: targetId, value }).hex as NonNullable<
+            Color['hex']
+          >;
         } else {
           // Use the additional squares color
           color = squaresPreview.settings.additionalSquaresColor;
@@ -180,13 +180,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
     viewBox="0 0 {width} {height}"
     bind:this={squaresPreview.svg}
     onclick={(e) => {
+      if (!(e.target instanceof SVGElement)) return;
       if (e.target.tagName !== 'rect') return;
       const group = e.target.parentElement;
-      if (group.tagName !== 'g') return;
+      if (!group || group.tagName !== 'g') return;
 
       if (group.dataset.isweathersquare === 'true') {
-        weather.currentIndex = +group.dataset.dayindex;
-        showPreviewImageWeatherDetails(squaresPreview.targets);
+        const dayIndex = group.dataset.dayindex;
+        if (dayIndex !== undefined) {
+          weather.currentIndex = +dayIndex;
+          showPreviewImageWeatherDetails(squaresPreview.targets);
+        }
       }
     }}
   >

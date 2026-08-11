@@ -31,9 +31,18 @@ interface HexagonRoundsPreviewSettings extends BasePreviewSettings {
   selectedTarget: WeatherParam['id'];
   roundsPerHexagon: number;
   columns: number;
-  additionalRoundsColor: Color['hex'];
+  additionalRoundsColor: NonNullable<Color['hex']>;
   hexagonBorder: number;
   layoutBorder: number;
+}
+
+export interface HexagonRoundsSection {
+  x: number;
+  y: number;
+  size: number;
+  color: Color['hex'];
+  isWeather: boolean;
+  dayIndex: number;
 }
 
 export class HexagonRoundsPreviewClass {
@@ -89,9 +98,9 @@ export class HexagonRoundsPreviewClass {
 
   previewComponent = Preview;
 
-  sections = $state([]);
+  sections = $state<HexagonRoundsSection[]>([]);
 
-  borderHexagons = $state([]);
+  borderHexagons = $state<HexagonRoundsSection[]>([]);
 
   STITCH_SIZE = 10;
 
@@ -238,7 +247,7 @@ export class HexagonRoundsPreviewClass {
     hash += `${this.id}=`;
     hash += `${this.settings.selectedTarget}`;
     hash += '(';
-    hash += `${this.settings.roundsPerHexagon}${CHARACTERS_FOR_URL_HASH.separator}${this.settings.columns}${CHARACTERS_FOR_URL_HASH.separator}${this.settings.hexagonBorder}${CHARACTERS_FOR_URL_HASH.separator}${this.settings.layoutBorder}${CHARACTERS_FOR_URL_HASH.separator}${chroma(this.settings.additionalRoundsColor).hex().substring(1)}`;
+    hash += `${this.settings.roundsPerHexagon}${CHARACTERS_FOR_URL_HASH.separator}${this.settings.columns}${CHARACTERS_FOR_URL_HASH.separator}${this.settings.hexagonBorder}${CHARACTERS_FOR_URL_HASH.separator}${this.settings.layoutBorder}${CHARACTERS_FOR_URL_HASH.separator}${(chroma(this.settings.additionalRoundsColor).hex() as NonNullable<Color['hex']>).substring(1)}`;
     hash += ')';
     return hash;
   });
@@ -255,7 +264,7 @@ export class HexagonRoundsPreviewClass {
 
     // Extract the part before the parentheses as targets
     const targets = hash.substring(0, openParen);
-    this.settings.selectedTarget = targets;
+    this.settings.selectedTarget = targets as WeatherParam['id'];
 
     // Set the current active id to this
     previews.activeId = this.id;
@@ -308,7 +317,7 @@ export class HexagonRoundsPreviewClass {
       try {
         this.settings.additionalRoundsColor = chroma(
           additionalRoundsColor,
-        ).hex();
+        ).hex() as NonNullable<Color['hex']>;
       } catch (e) {
         console.warn('Invalid color value in hash:', additionalRoundsColor);
       }

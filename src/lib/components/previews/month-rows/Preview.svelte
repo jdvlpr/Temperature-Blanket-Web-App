@@ -13,7 +13,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script>
+<script lang="ts">
   import Spinner from '$lib/components/Spinner.svelte';
   import { weather } from '$lib/state/weather-state.svelte';
   import { getColorInfo } from '$lib/utils/color-utils';
@@ -144,14 +144,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
         paramIndex < monthRowsPreview.settings.selectedTargets.length;
         paramIndex += 1
       ) {
-        let row = {
-          x,
-          y,
-          width:
-            monthRowsPreview.settings.stitchesPerRow *
-            monthRowsPreview.STITCH_SIZE,
-          height: monthRowsPreview.STITCH_SIZE,
-        };
         let color;
         if (day.length) {
           const value = weather.getWeatherValue({
@@ -165,22 +157,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
             value,
           }).hex;
           isWeather = true;
-          row = {
-            ...row,
-            isWeather,
-            dayIndex: _dayIndex,
-            color,
-          };
         } else {
           color = monthRowsPreview.settings.extrasColor;
           isWeather = false;
-          row = {
-            ...row,
-            isWeather,
-            dayIndex: _dayIndex,
-            color,
-          };
         }
+
+        const row = {
+          x,
+          y,
+          width:
+            monthRowsPreview.settings.stitchesPerRow *
+            monthRowsPreview.STITCH_SIZE,
+          height: monthRowsPreview.STITCH_SIZE,
+          isWeather,
+          dayIndex: _dayIndex,
+          color,
+        };
 
         months.push(row);
         y += monthRowsPreview.STITCH_SIZE;
@@ -209,9 +201,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     viewBox="0 0 {width} {height}"
     bind:this={monthRowsPreview.svg}
     onclick={(e) => {
+      if (!(e.target instanceof SVGElement)) return;
       if (e.target.tagName !== 'rect') return;
-      if (e.target.dataset.isweather !== 'true') return;
-      weather.currentIndex = +e.target.dataset.dayindex;
+      if (e.target.getAttribute('data-isweather') !== 'true') return;
+      weather.currentIndex = +(
+        (e.target as SVGRectElement).getAttribute('data-dayindex') ?? 0
+      );
 
       showPreviewImageWeatherDetails(monthRowsPreview.targets);
     }}

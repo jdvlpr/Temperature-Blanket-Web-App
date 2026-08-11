@@ -21,8 +21,18 @@ import Settings from './Settings.svelte';
 interface MonthSquaresPreviewSettings extends BasePreviewSettings {
   selectedTarget: WeatherParam['id'];
   dimensions: string;
-  additionalRoundsColor: Color['hex'];
+  additionalRoundsColor: NonNullable<Color['hex']>;
   additionalRoundsPerSquare: number;
+}
+
+export interface MonthSquaresSection {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  isWeather: boolean;
+  dayIndex: number;
+  color: Color['hex'];
 }
 
 export class MonthSquaresPreviewClass {
@@ -72,7 +82,7 @@ export class MonthSquaresPreviewClass {
 
   previewComponent = Preview;
 
-  sections = $state([]);
+  sections = $state<MonthSquaresSection[]>([]);
 
   STITCH_SIZE = 10;
 
@@ -82,7 +92,7 @@ export class MonthSquaresPreviewClass {
   settings = $state<MonthSquaresPreviewSettings>({
     selectedTarget: 'tmax',
     dimensions: '6x6',
-    additionalRoundsColor: '#f0f3f3',
+    additionalRoundsColor: '#f0f3f3' as NonNullable<Color['hex']>,
     additionalRoundsPerSquare: 1,
     useSeasonTargets: false,
   });
@@ -137,14 +147,14 @@ export class MonthSquaresPreviewClass {
     hash += `${this.id}=`;
     hash += `${this.settings.selectedTarget}(${this.settings.dimensions}${CHARACTERS_FOR_URL_HASH.separator}${
       this.settings.additionalRoundsPerSquare
-    }${CHARACTERS_FOR_URL_HASH.separator}${chroma(this.settings.additionalRoundsColor).hex().substring(1)})`;
+    }${CHARACTERS_FOR_URL_HASH.separator}${(chroma(this.settings.additionalRoundsColor).hex() as NonNullable<Color['hex']>).substring(1)})`;
     return hash;
   });
 
   // *******************
   // Method for loading settings from a url hash string
   // *******************
-  load(hash) {
+  load(hash: string) {
     let startIndex = [],
       endIndex = [];
     const separatorIndex = [];
@@ -159,7 +169,10 @@ export class MonthSquaresPreviewClass {
     }
     if (!startIndex || !separatorIndex || !endIndex) return; // format of hash was wrong, so stop processing
 
-    this.settings.selectedTarget = hash.substring(0, startIndex[0]);
+    this.settings.selectedTarget = hash.substring(
+      0,
+      startIndex[0],
+    ) as WeatherParam['id'];
     this.settings.dimensions = hash.substring(
       startIndex[0] + 1,
       separatorIndex[0],
@@ -173,7 +186,7 @@ export class MonthSquaresPreviewClass {
 
     this.settings.additionalRoundsColor = chroma(
       hash.substring(separatorIndex[1] + 1, endIndex[0]),
-    ).hex();
+    ).hex() as NonNullable<Color['hex']>;
 
     previews.activeId = this.id;
   }

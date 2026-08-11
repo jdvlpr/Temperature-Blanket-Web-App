@@ -13,20 +13,24 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script>
+<script lang="ts">
   import Spinner from '$lib/components/Spinner.svelte';
+  import type { Color } from '$lib/types/yarn-types';
   import { weather } from '$lib/state/weather-state.svelte';
   import { getColorInfo } from '$lib/utils/color-utils';
   import { runPreview } from '$lib/utils/function-utils.svelte';
   import { showPreviewImageWeatherDetails } from '$lib/utils/preview-utils.svelte';
-  import { monthSquaresPreview } from './state.svelte';
+  import {
+    monthSquaresPreview,
+    type MonthSquaresSection,
+  } from './state.svelte';
 
   let width = $state(monthSquaresPreview.width);
 
   let height = $state(monthSquaresPreview.height);
 
   runPreview(() => {
-    const sections = [];
+    const sections: MonthSquaresSection[] = [];
     let squareIndex = 0;
     let x = monthSquaresPreview.squareSize / 2;
     let y = monthSquaresPreview.squareSize / 2;
@@ -78,12 +82,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
         }
       }
 
-      let square = {
-        x,
-        y,
-        width: roundWidth,
-        height: roundHeight,
-      };
       const day = daysInSquare?.filter(
         (n) => n.date.getUTCDate() === roundInSquare,
       );
@@ -93,8 +91,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
         _dayIndex = Math.ceil((dayIndex - weather.monthGroupingStartDay) / 7);
       }
 
-      let color;
-      if (day.length) {
+      let color: Color['hex'] | undefined;
+      let isWeather: boolean;
+
+      if (day?.length) {
         const value = weather.getWeatherValue({
           dayIndex: _dayIndex,
           param: monthSquaresPreview.settings.selectedTarget,
@@ -104,30 +104,26 @@ If not, see <https://www.gnu.org/licenses/>. -->
         color = getColorInfo({
           param: monthSquaresPreview.settings.selectedTarget,
           value,
-        }).hex;
+        }).hex as Color['hex'];
 
         isWeather = true;
 
-        square = {
-          ...square,
-          isWeather,
-          dayIndex: _dayIndex,
-          color,
-        };
         dayIndex += 1;
         dateInMonth += 1;
       } else {
         color = monthSquaresPreview.settings.additionalRoundsColor;
-
         isWeather = false;
-
-        square = {
-          ...square,
-          isWeather,
-          dayIndex: _dayIndex,
-          color,
-        };
       }
+
+      const square: MonthSquaresSection = {
+        x,
+        y,
+        width: roundWidth,
+        height: roundHeight,
+        isWeather,
+        dayIndex: _dayIndex,
+        color,
+      };
 
       roundInSquare += 1;
 
@@ -161,9 +157,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     viewBox="0 0 {width} {height}"
     bind:this={monthSquaresPreview.svg}
     onclick={(e) => {
+      if (!(e.target instanceof SVGElement)) return;
       if (e.target.tagName !== 'rect') return;
       if (e.target.dataset.isweather !== 'true') return;
-      weather.currentIndex = +e.target.dataset.dayindex;
+      weather.currentIndex = +(e.target.dataset.dayindex ?? NaN);
       showPreviewImageWeatherDetails(monthSquaresPreview.targets);
     }}
   >

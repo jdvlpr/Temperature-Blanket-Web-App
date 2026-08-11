@@ -25,6 +25,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { capitalizeFirstLetter } from '$lib/utils/other-utils';
   import { pluralize } from '$lib/utils/string-utils';
   import { SquareDashedIcon } from '@lucide/svelte';
+  import type { Color } from '$lib/types/yarn-types';
   import Preview from './Preview.svelte';
   import { monthRowsPreview } from './state.svelte';
 
@@ -120,7 +121,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             ref: ChangeColor,
             props: {
               hex: monthRowsPreview.settings.borderColor,
-              onChangeColor: ({ hex }) => {
+              onChangeColor: ({ hex }: { hex: NonNullable<Color['hex']> }) => {
                 monthRowsPreview.settings.borderColor = hex;
                 dialog.close();
               },
@@ -163,7 +164,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           ref: ChangeColor,
           props: {
             hex: monthRowsPreview.settings.extrasColor,
-            onChangeColor: ({ hex }) => {
+            onChangeColor: ({ hex }: { hex: NonNullable<Color['hex']> }) => {
               monthRowsPreview.settings.extrasColor = hex;
               dialog.close();
             },

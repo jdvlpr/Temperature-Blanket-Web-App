@@ -23,6 +23,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { weather } from '$lib/state/weather-state.svelte';
   import { capitalizeFirstLetter } from '$lib/utils/other-utils';
   import { pluralize } from '$lib/utils/string-utils';
+  import type { Color } from '$lib/types/yarn-types';
   import { SquareDashedIcon } from '@lucide/svelte';
   import Preview from './Preview.svelte';
   import { monthSquaresPreview } from './state.svelte';
@@ -104,7 +105,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           ref: ChangeColor,
           props: {
             hex: monthSquaresPreview.settings.additionalRoundsColor,
-            onChangeColor: ({ hex }) => {
+            onChangeColor: ({ hex }: { hex: NonNullable<Color['hex']> }) => {
               monthSquaresPreview.settings.additionalRoundsColor = hex;
               dialog.close();
             },

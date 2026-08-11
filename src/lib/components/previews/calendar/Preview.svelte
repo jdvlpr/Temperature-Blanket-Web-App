@@ -13,9 +13,13 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script>
-  import { calendarPreview } from '$lib/components/previews/calendar/state.svelte';
+<script lang="ts">
+  import {
+    calendarPreview,
+    type CalendarSection,
+  } from '$lib/components/previews/calendar/state.svelte';
   import Spinner from '$lib/components/Spinner.svelte';
+  import type { Color } from '$lib/types/yarn-types';
   import { weather } from '$lib/state/weather-state.svelte';
   import { getColorInfo } from '$lib/utils/color-utils';
   import { runPreview } from '$lib/utils/function-utils.svelte';
@@ -37,7 +41,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     let columnPadding = 0;
     let x = 0,
       y = 0; // Yes, these are necessary.
-    const sections = [];
+    const sections: CalendarSection[][] = [];
     for (
       let squareIndex = 0, column = 0, isWeatherSquare = true;
       squareIndex < total;
@@ -75,7 +79,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         row += 1;
         weekIndex += 1;
       }
-      const square = [];
+      const square: CalendarSection[] = [];
       let dayIndex = squareIndex - additionalSquaresAddedCount;
 
       if (calendarPreview.extraSquares.includes(squareIndex)) {
@@ -145,7 +149,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           }
 
           // Get the color based on the gauge ID and value
-          color = getColorInfo({ param, value }).hex;
+          color = getColorInfo({ param, value }).hex as NonNullable<
+            Color['hex']
+          >;
         } else {
           color = calendarPreview.settings.additionalSquaresColor;
         }
@@ -187,15 +193,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
     viewBox="0 0 {width} {height}"
     bind:this={calendarPreview.svg}
     onclick={(e) => {
+      if (!(e.target instanceof SVGElement)) return;
       if (e.target.tagName !== 'rect') return;
       const group = e.target.parentElement;
-      if (group.tagName !== 'g') return;
+      if (!group || group.tagName !== 'g') return;
 
       if (group.dataset.isweathersquare === 'true') {
-        let index = +group.dataset.dayindex;
-        weather.currentIndex = index;
+        const dayIndex = group.dataset.dayindex;
+        if (dayIndex !== undefined) {
+          let index = +dayIndex;
+          weather.currentIndex = index;
 
-        showPreviewImageWeatherDetails(calendarPreview.targets);
+          showPreviewImageWeatherDetails(calendarPreview.targets);
+        }
       }
     }}
   >

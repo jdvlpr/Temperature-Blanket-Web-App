@@ -23,6 +23,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { capitalizeFirstLetter } from '$lib/utils/other-utils';
   import { pluralize } from '$lib/utils/string-utils';
   import { ArrowRightIcon } from '@lucide/svelte';
+  import type { Color } from '$lib/types/yarn-types';
   import Preview from './Preview.svelte';
   import { hexagonRoundsPreview } from './state.svelte';
 
@@ -204,7 +205,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           ref: ChangeColor,
           props: {
             hex: hexagonRoundsPreview.settings.additionalRoundsColor,
-            onChangeColor: ({ hex }) => {
+            onChangeColor: ({ hex }: { hex: NonNullable<Color['hex']> }) => {
               hexagonRoundsPreview.settings.additionalRoundsColor = hex;
               dialog.close();
             },

@@ -17,6 +17,14 @@ interface DaytimeRowsPreviewSettings extends BasePreviewSettings {
   daytimePosition: 'left' | 'right' | 'center' | 'sides';
 }
 
+export interface DaytimeRowsSection {
+  color: string | undefined;
+  width: number | undefined;
+  height: number;
+  x: number;
+  y: number;
+}
+
 export class DaytimeRowsPreviewClass {
   constructor() {
     $effect.root(() => {
@@ -52,7 +60,7 @@ export class DaytimeRowsPreviewClass {
 
   previewComponent = Preview;
 
-  sections = $state([]);
+  sections = $state<DaytimeRowsSection[][]>([]);
 
   STITCH_SIZE = 10;
 
@@ -117,10 +125,14 @@ export class DaytimeRowsPreviewClass {
   });
 
   tableData = $derived.by(() => {
-    return weather.data?.map((n, i) => {
+    if (!weather.data) return [];
+    return weather.data.map((n, i) => {
       let left, center, right, divided;
+      if (!n?.dayt)
+        return { row: i + 1, date: '', left: 0, center: 0, right: 0 };
       let daytimeStitches = displayNumber(
-        (n.dayt['imperial'] * this.settings.stitchesPerRow) / HOURS_PER_DAY,
+        ((n.dayt!['imperial'] as number) * this.settings.stitchesPerRow) /
+          HOURS_PER_DAY,
         0,
       );
 
@@ -201,7 +213,7 @@ export class DaytimeRowsPreviewClass {
   // *******************
   // Method for loading settings from a url hash string
   // *******************
-  load(hash) {
+  load(hash: string) {
     let startIndex, lengthEndIndex;
 
     for (let i = 0; i < hash.length; i++) {
@@ -211,10 +223,12 @@ export class DaytimeRowsPreviewClass {
 
     if (!startIndex || !lengthEndIndex) return; // format of hash was wrong, so stop processing
     // targets
-    let targets = hash.substring(0, startIndex);
-    targets = targets.match(/.{1,4}/g);
-    this.settings.daytimeTarget = targets[0];
-    this.settings.nightTarget = targets[1];
+    let targetsStr = hash.substring(0, startIndex);
+    const targets = targetsStr.match(/.{1,4}/g);
+    if (targets && targets.length >= 2) {
+      this.settings.daytimeTarget = targets[0] as WeatherParam['id'];
+      this.settings.nightTarget = targets[1] as WeatherParam['id'];
+    }
 
     // stitches per row
     this.settings.stitchesPerRow = +hash.substring(

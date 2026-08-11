@@ -22,6 +22,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { weather } from '$lib/state/weather-state.svelte';
   import { capitalizeFirstLetter } from '$lib/utils/other-utils';
   import { pluralize } from '$lib/utils/string-utils';
+  import type { Color } from '$lib/types/yarn-types';
   import { ArrowRightIcon } from '@lucide/svelte';
   import Preview from './Preview.svelte';
   import { squareRoundsPreview } from './state.svelte';
@@ -196,7 +197,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           ref: ChangeColor,
           props: {
             hex: squareRoundsPreview.settings.additionalRoundsColor,
-            onChangeColor: ({ hex }) => {
+            onChangeColor: ({ hex }: { hex: NonNullable<Color['hex']> }) => {
               squareRoundsPreview.settings.additionalRoundsColor = hex;
               dialog.close();
             },

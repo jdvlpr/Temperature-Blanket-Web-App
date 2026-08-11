@@ -13,7 +13,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script>
+<script lang="ts">
   import { browser } from '$app/environment';
   import { THEMES } from '$lib/constants/page-constants';
   import { previews } from '$lib/state/preview-state.svelte';
@@ -21,7 +21,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { onDestroy, onMount, tick } from 'svelte';
 
   let theme = $state(
-    getTheme(THEMES.find((n) => n.id === preferences.value.theme.mode)),
+    getTheme(THEMES.find((n) => n.id === preferences.value.theme.mode)?.id),
   );
 
   let activePreviewSelectId = $state(previews.activeId);
@@ -31,14 +31,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
     theme = getTheme(preferences.value.theme.mode || 'system');
   }
 
-  function getTheme(id) {
-    if (id !== 'system') return id;
+  function getTheme(id: string | undefined): string {
+    if (id && id !== 'system') return id;
     if (window.matchMedia('(prefers-color-scheme: dark)').matches)
       return 'dark';
     return 'light';
   }
 
-  function onChangePattern(newId) {
+  function onChangePattern(newId: string) {
     // Update optimistically so the select/thumbnails reflect the click
     // immediately; the $effect below reconciles once previews.activeId
     // catches up after the (possibly async) load resolves.
@@ -79,6 +79,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         id="select-pattern-type"
         value={activePreviewSelectId}
         onchange={(e) => {
+          if (!(e.target instanceof HTMLSelectElement)) return;
           onChangePattern(e.target.value);
           tick().then(() => {
             const activePreviewBtn = document.getElementById(
@@ -125,7 +126,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             title="Preview {name} Layout"
           >
             <img
-              src={img[theme]}
+              src={img[theme as 'light' | 'dark']}
               alt={name}
               class="size-[48px] opacity-40"
               class:!opacity-100={id === previews.activeId}

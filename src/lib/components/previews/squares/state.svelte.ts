@@ -27,9 +27,17 @@ interface SquaresPreviewSettings extends BasePreviewSettings {
   squaresAtBeginning: number;
   squaresBetweenMonthsCount: number;
   joinStitches: number;
-  joinColor: Color['hex'];
-  additionalSquaresColor: Color['hex'];
+  joinColor: NonNullable<Color['hex']>;
+  additionalSquaresColor: NonNullable<Color['hex']>;
   primaryTargetAsBackup: boolean;
+}
+
+export interface SquaresSection {
+  isWeatherSquare: boolean;
+  dayIndex: number;
+  color: NonNullable<Color['hex']>;
+  x: number;
+  y: number;
 }
 
 export class SquaresPreviewClass {
@@ -72,7 +80,7 @@ export class SquaresPreviewClass {
 
   SQUARE_SECTION_SIZE = 10;
 
-  sections = $state([]);
+  sections = $state<SquaresSection[][]>([]);
 
   // *******************
   // User settings properties
@@ -98,7 +106,7 @@ export class SquaresPreviewClass {
 
   monthSepparatorSquaresIndexes = $derived.by(() => {
     if (this.settings.squaresBetweenMonthsCount === 0) return [];
-    let squaresIndexes = [];
+    let squaresIndexes: number[] = [];
     let monthSepparatorIndexes = getMonthSepparatorIndexes();
     monthSepparatorIndexes = monthSepparatorIndexes.map(
       (n) => n + this.settings.squaresAtBeginning,
@@ -235,7 +243,7 @@ export class SquaresPreviewClass {
   // *******************
   // Method for loading settings from a url hash string
   // *******************
-  load(hash) {
+  load(hash: string) {
     let startIndex = [],
       endIndex = [];
     let exclamationIndex: number[] = [];
@@ -252,7 +260,10 @@ export class SquaresPreviewClass {
     }
     if (!startIndex || !separatorIndex || !endIndex) return; // format of hash was wrong, so stop processing
 
-    this.settings.primaryTarget = hash.substring(0, startIndex[0]);
+    this.settings.primaryTarget = hash.substring(
+      0,
+      startIndex[0],
+    ) as WeatherParam['id'];
     // SquareSize
     this.settings.squareSize = +hash.substring(
       startIndex[0] + 1,
@@ -283,7 +294,7 @@ export class SquaresPreviewClass {
 
     this.settings.additionalSquaresColor = chroma(
       hash.substring(separatorIndex[2] + 1, endIndex[0]),
-    ).hex();
+    ).hex() as NonNullable<Color['hex']>;
 
     // primarytargetAsBackup
     const _primaryTargetAsBackup = hash.substring(
@@ -308,8 +319,9 @@ export class SquaresPreviewClass {
     // Secondary Targets
     if (startIndex.length > 1) {
       for (let i = 1; i < startIndex.length; i++) {
-        let targetId = hash.substring(startIndex[i] - 4, startIndex[i]);
-        if (targetId === 'time') targetId = 'dayt'; // Bug fix in 1.67 (previous id was 'daytime' so it got cut off because it wasn't four characters long)
+        let targetIdStr = hash.substring(startIndex[i] - 4, startIndex[i]);
+        if (targetIdStr === 'time') targetIdStr = 'dayt'; // Bug fix in 1.67 (previous id was 'daytime' so it got cut off because it wasn't four characters long)
+        let targetId: WeatherParam['id'] = targetIdStr as WeatherParam['id'];
         const secondaryParamSeparatorIndex = separatorIndex.filter(
           (item) => item > startIndex[i] && item < endIndex[i],
         );
@@ -322,10 +334,11 @@ export class SquaresPreviewClass {
           let end = secondaryParamSeparatorIndex[positionIndex] || endIndex[i];
           let value = hash.substring(start, end);
           start = end + 1;
-          this.settings.secondaryTargets = setSecondaryTargets(
-            [targetId, +value],
-            this.settings.secondaryTargets,
-          );
+          this.settings.secondaryTargets =
+            setSecondaryTargets(
+              [targetId, +value],
+              this.settings.secondaryTargets,
+            ) || [];
         }
       }
     }
@@ -356,7 +369,9 @@ export class SquaresPreviewClass {
 
         // Get the color
         // The characters are from the divider position 'till the end of the hash
-        let joinColor = chroma(hash.substring(dividerIndex + 1)).hex();
+        let joinColor = chroma(
+          hash.substring(dividerIndex + 1),
+        ).hex() as NonNullable<Color['hex']>;
         if (chroma.valid(joinColor)) {
           this.settings.joinColor = joinColor;
         }

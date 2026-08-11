@@ -29,10 +29,17 @@ interface TwelvePointStarPreviewSettings extends BasePreviewSettings {
   selectedTargets: WeatherParam['id'][];
   sharpness: number; // 1-20, controls star pointiness (divided by 50 for actual ratio)
   centerSize: number; // multiplier of STITCH_SIZE for center star radius
-  additionalRoundsColor: Color['hex'];
+  additionalRoundsColor: NonNullable<Color['hex']>;
   showBorder: boolean;
   borderThickness: number;
-  borderColor: Color['hex'];
+  borderColor: NonNullable<Color['hex']>;
+}
+
+export interface TwelvePointStarSection {
+  points: string;
+  color: NonNullable<Color['hex']>;
+  isWeather: boolean;
+  dayIndex: number;
 }
 
 export class TwelvePointStarPreviewClass {
@@ -71,14 +78,7 @@ export class TwelvePointStarPreviewClass {
 
   previewComponent = Preview;
 
-  sections = $state<
-    {
-      points: string;
-      color: string;
-      isWeather: boolean;
-      dayIndex: number;
-    }[]
-  >([]);
+  sections = $state<TwelvePointStarSection[]>([]);
 
   STITCH_SIZE = 10;
 
@@ -245,9 +245,9 @@ export class TwelvePointStarPreviewClass {
 
     // Extract the part before the parentheses as targets
     const targetsStr = hash.substring(0, openParen);
-    const targets = targetsStr.match(/.{1,4}/g);
+    const targets = targetsStr.match(/.{1,4}/g) as string[];
     if (targets && targets.length) {
-      this.settings.selectedTargets = targets;
+      this.settings.selectedTargets = targets as WeatherParam['id'][];
     }
 
     // Set the current active id to this
@@ -262,7 +262,7 @@ export class TwelvePointStarPreviewClass {
       CHARACTERS_FOR_URL_HASH.separator_alt,
     ];
 
-    let parts = null;
+    let parts: string[] | null = null;
 
     for (const sep of separators) {
       if (innerContent.includes(sep)) {
@@ -296,7 +296,7 @@ export class TwelvePointStarPreviewClass {
       try {
         this.settings.additionalRoundsColor = chroma(
           additionalRoundsColor,
-        ).hex();
+        ).hex() as NonNullable<Color['hex']>;
       } catch (e) {
         console.warn('Invalid color value in hash:', additionalRoundsColor);
       }
@@ -319,7 +319,9 @@ export class TwelvePointStarPreviewClass {
       borderColor !== ''
     ) {
       try {
-        this.settings.borderColor = chroma(borderColor).hex();
+        this.settings.borderColor = chroma(borderColor).hex() as NonNullable<
+          Color['hex']
+        >;
       } catch (e) {
         console.warn('Invalid border color value in hash:', borderColor);
       }

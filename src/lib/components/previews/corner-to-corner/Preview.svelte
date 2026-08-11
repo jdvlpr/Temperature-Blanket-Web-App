@@ -3,29 +3,38 @@
 This file is part of Temperature-Blanket-Web-App.
 
 Temperature-Blanket-Web-App is free software: you can redistribute it and/or modify it
-under the terms of the GNU General Public License as published by the Free Software Foundation, 
+under the terms of the GNU General Public License as published by the Free Software Foundation,
 either version 3 of the License, or (at your option) any later version.
 
-Temperature-Blanket-Web-App is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
-without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+Temperature-Blanket-Web-App is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 See the GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
+You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script>
+<script lang="ts">
   import Spinner from '$lib/components/Spinner.svelte';
   import { weather } from '$lib/state/weather-state.svelte';
   import { getColorInfo } from '$lib/utils/color-utils';
   import { runPreview } from '$lib/utils/function-utils.svelte';
   import { showPreviewImageWeatherDetails } from '$lib/utils/preview-utils.svelte';
-  import { cornerToCornerPreview } from './state.svelte';
+  import {
+    cornerToCornerPreview,
+    type CornerToCornerSection,
+  } from './state.svelte';
 
   let width = $state(cornerToCornerPreview.width);
 
   let height = $state(cornerToCornerPreview.height);
 
-  const getX = (props) => {
+  interface CornerProps {
+    x: number;
+    y: number;
+    row: number;
+  }
+
+  const getX = (props: CornerProps): number | undefined => {
     if (reachedTop(props)) return props.x - cornerToCornerPreview.STITCH_SIZE;
     if (reachedRight(props)) return props.x;
     if (reachedBottom(props) && reachedLeft(props)) return props.x;
@@ -37,7 +46,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     if (isDownRow(props.row))
       return props.x - cornerToCornerPreview.STITCH_SIZE;
   };
-  const getY = (props) => {
+  const getY = (props: CornerProps): number | undefined => {
     if (reachedTop(props)) return props.y;
     if (reachedRight(props)) return props.y - cornerToCornerPreview.STITCH_SIZE;
     if (reachedBottom(props) && reachedLeft(props))
@@ -49,7 +58,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     if (isDownRow(props.row))
       return props.y + cornerToCornerPreview.STITCH_SIZE;
   };
-  const getRow = (props) => {
+  const getRow = (props: CornerProps): number => {
     if (
       reachedTop(props) ||
       reachedRight(props) ||
@@ -60,11 +69,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     return props.row;
   };
 
-  const reachedTop = (props) => {
+  const reachedTop = (props: CornerProps): boolean => {
     return props.y === 0 && props.row % 2 !== 0;
   };
 
-  const reachedRight = (props) => {
+  const reachedRight = (props: CornerProps): boolean => {
     return (
       props.x ===
         cornerToCornerPreview.width - cornerToCornerPreview.STITCH_SIZE &&
@@ -72,7 +81,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     );
   };
 
-  const reachedBottom = (props) => {
+  const reachedBottom = (props: CornerProps): boolean => {
     return (
       props.y ===
         cornerToCornerPreview.height - cornerToCornerPreview.STITCH_SIZE &&
@@ -80,15 +89,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
     );
   };
 
-  const reachedLeft = (props) => {
+  const reachedLeft = (props: CornerProps): boolean => {
     return props.x === 0 && props.row % 2 === 0;
   };
 
-  const isUpRow = (row) => {
+  const isUpRow = (row: number): boolean => {
     return row % 2 !== 0;
   };
 
-  const isDownRow = (row) => {
+  const isDownRow = (row: number): boolean => {
     return row % 2 === 0;
   };
 
@@ -97,14 +106,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
       x = 0,
       y = 0,
       dayIndex = 0;
-    const sections = [];
+    const sections: CornerToCornerSection[][] = [];
     for (
       let x = cornerToCornerPreview.width - cornerToCornerPreview.STITCH_SIZE,
         y = cornerToCornerPreview.height - cornerToCornerPreview.STITCH_SIZE;
       dayIndex < weather.data?.length;
       dayIndex++
     ) {
-      let section = [];
+      let section: CornerToCornerSection[] = [];
       let target = cornerToCornerPreview.settings.selectedTarget;
       let value = weather.getWeatherValue({ dayIndex, param: target });
 
@@ -125,9 +134,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
           dayIndex,
         });
         y += cornerToCornerPreview.STITCH_SIZE;
-        const props = { x, y, row };
-        x = getX(props);
-        y = getY(props);
+        const props: CornerProps = { x, y, row };
+        const newX = getX(props);
+        const newY = getY(props);
+        if (newX !== undefined) x = newX;
+        if (newY !== undefined) y = newY;
         row = getRow(props);
       }
       sections.push(section);
@@ -150,11 +161,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
     viewBox="0 0 {width} {height}"
     bind:this={cornerToCornerPreview.svg}
     onclick={(e) => {
+      if (!(e.currentTarget instanceof SVGSVGElement)) return;
+      if (!(e.target instanceof Element)) return;
       if (e.target.tagName !== 'rect') return;
       const group = e.target.parentElement;
-      if (group.tagName !== 'g') return;
+      if (!group || group.tagName !== 'g') return;
 
-      weather.currentIndex = +group.dataset.dayindex;
+      weather.currentIndex = +(group.dataset.dayindex ?? 0);
 
       showPreviewImageWeatherDetails(cornerToCornerPreview.targets);
     }}
