@@ -38,12 +38,47 @@ export const entries: ChangelogItemGroup[] = [
           {
             notes: [
               {
+                icon: ICONS.checkCircle,
+                text: `3 colorways`,
+                title: 'Added New Yarn: Ferner Wolle - Merino 160',
+              },
+              {
+                icon: ICONS.checkCircle,
+                text: `3 colorways`,
+                title: 'Added New Yarn: Handy Hands - Lizbeth Size 40',
+              },
+              {
+                icon: ICONS.checkCircle,
+                text: `3 colorways`,
+                title: 'Added New Yarn: Knit Picks - Comfy Fingering Yarn',
+              },
+              {
+                icon: ICONS.checkCircle,
+                text: `3 colorways`,
+                title: 'Added New Yarn: Premier - Basix Chenille Brights',
+              },
+              {
+                icon: ICONS.checkCircle,
+                text: `3 colorways`,
+                title: 'Added New Yarn: Wendy - Supreme DK',
+              },
+              {
+                icon: ICONS.checkCircle,
+                text: `2 colorways`,
+                title: 'Added New Yarn: handy-hands - Test Sample Yarn',
+              },
+            ],
+            version: '6.1.0',
+          },
+          {
+            notes: [
+              {
                 IconComponent: CogIcon,
                 text: `Fixed an issue where sorting colors wasn't saving, and improved performance by only loading yarn colorway data when necessary.`,
                 title: 'Bug fixes & performance improvements',
               },
             ],
-            version: '6.0.13',
+            version: '6.0.14',
           },
         ],
       },

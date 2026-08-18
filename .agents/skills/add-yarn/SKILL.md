@@ -29,8 +29,8 @@ node .agents/skills/add-yarn/scripts/add-yarn.js caron "Simply Soft Solids" "htt
 
 The script automatically:
 
-1. Creates the yarn directory under `src/lib/data/yarns/{brand}/`
-2. Generates `yarn.ts` with metadata (using snake_case for IDs)
+1. Creates the yarn directory under `src/lib/data/yarns/{brand}/` using kebab-case folder names (for example `merino-160`)
+2. Generates `yarn.ts` with metadata using snake_case IDs (for example `merino_160`)
 3. Generates `colorways.ts` with two placeholder colorways (colors: white and black)
 4. Updates the brand's `yarns.ts` to export the new yarn (maintains alphabetical order)
 5. Updates the main `src/lib/data/yarns/brands.ts` if this is the first yarn for a new brand (maintains alphabetical order)
@@ -51,7 +51,7 @@ src/lib/data/yarns/{brand}/{yarn-directory}/
 
 > **Note:** The script never fetches external URLs or scrapes colorway data. All colorways are placeholders to be replaced with real data manually.
 
-**Note:** All IDs are in `snake_case` format.
+**Note:** Folder names use `kebab-case` (for example `merino-160`) and IDs use `snake_case` (for example `merino_160`).
 
 ## Supported weights
 

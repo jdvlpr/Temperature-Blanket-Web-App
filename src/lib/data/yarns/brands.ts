@@ -19,11 +19,13 @@ import { brand as ellaRae } from './ella-rae/yarns';
 import { brand as elle } from './elle/yarns';
 import { brand as emu } from './emu/yarns';
 import { brand as euroroma } from './euroroma/yarns';
+import { brand as fernerWolle } from './ferner-wolle/yarns';
 import { brand as fiddlesticks } from './fiddlesticks/yarns';
 import { brand as filaturaDiCrosa } from './filatura-di-crosa/yarns';
 import { brand as garnmanufaktur } from './garnmanufaktur/yarns';
 import { brand as gepard } from './gepard/yarns';
 import { brand as grundl } from './grundl/yarns';
+import { brand as handyHands } from './handy-hands/yarns';
 import { brand as herrschners } from './herrschners/yarns';
 import { brand as himalaya } from './himalaya/yarns';
 import { brand as hobbii } from './hobbii/yarns';
@@ -74,6 +76,7 @@ import { brand as tuftingEurope } from './tufting-europe/yarns';
 import { brand as valleyYarns } from './valley-yarns/yarns';
 import { brand as weLoveYarn } from './we-love-yarn/yarns';
 import { brand as westYorkshireSpinners } from './west-yorkshire-spinners/yarns';
+import { brand as wendy } from './wendy/yarns';
 import { brand as willowYarns } from './willow-yarns/yarns';
 import { brand as wollButt } from './woll-butt/yarns';
 import { brand as yarnAndColors } from './yarn-and-colors/yarns';
@@ -102,11 +105,13 @@ export const brands: Brand[] = [
   elle,
   emu,
   euroroma,
+  fernerWolle,
   fiddlesticks,
   filaturaDiCrosa,
   garnmanufaktur,
   gepard,
   grundl,
+  handyHands,
   herrschners,
   himalaya,
   hobbii,
@@ -157,6 +162,7 @@ export const brands: Brand[] = [
   valleyYarns,
   weLoveYarn,
   westYorkshireSpinners,
+  wendy,
   willowYarns,
   wollButt,
   yarnAndColors,

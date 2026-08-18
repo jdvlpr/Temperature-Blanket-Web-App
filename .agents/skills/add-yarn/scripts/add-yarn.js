@@ -6,7 +6,7 @@ import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-// Helper to convert strings to snake_case
+// Helper to convert strings to snake_case for IDs
 function toSnakeCase(str) {
   return str
     .toLowerCase()
@@ -14,6 +14,17 @@ function toSnakeCase(str) {
     .replace(/[^\w\s]/g, '')
     .replace(/\s+/g, '_')
     .replace(/_+/g, '_');
+}
+
+// Helper to convert strings to kebab-case for directory names
+function toKebabCase(str) {
+  return str
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, '')
+    .replace(/[_\s]+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-+|-+$/g, '');
 }
 
 // Helper to convert snake_case to camelCase
@@ -77,7 +88,9 @@ async function main() {
   const weightId = resolveWeightId(weightArg);
 
   const brandSnake = toSnakeCase(brandName);
+  const brandKebab = toKebabCase(brandName);
   const yarnSnake = toSnakeCase(yarnName);
+  const yarnKebab = toKebabCase(yarnName);
   const yarnCamel = toCamelCase(yarnSnake);
 
   // Determine base path
@@ -85,19 +98,19 @@ async function main() {
   const yarnDir = path.join(
     projectRoot,
     'src/lib/data/yarns',
-    brandSnake,
-    yarnSnake,
+    brandKebab,
+    yarnKebab,
   );
   const brandYarnsDir = path.join(
     projectRoot,
     'src/lib/data/yarns',
-    brandSnake,
+    brandKebab,
   );
 
   try {
     // Validate brand directory exists
     if (!fs.existsSync(brandYarnsDir)) {
-      console.error(`❌ Brand directory not found: ${brandSnake}`);
+      console.error(`❌ Brand directory not found: ${brandKebab}`);
       process.exit(1);
     }
 
@@ -162,7 +175,7 @@ export const yarn: Yarn = {
       /import\s+{[^}]*}\s+from\s+'\.\//g,
     );
     if (importMatch) {
-      const newImport = `import { yarn as ${yarnCamel} } from './${yarnSnake}/yarn';`;
+      const newImport = `import { yarn as ${yarnCamel} } from './${yarnKebab}/yarn';`;
 
       // Find insertion point (alphabetically between existing imports)
       const imports = [];
@@ -246,17 +259,17 @@ export const yarn: Yarn = {
       }
 
       fs.writeFileSync(brandYarnsFile, brandYarnsContent);
-      console.log(`✓ Updated ${brandSnake}/yarns.ts`);
+      console.log(`✓ Updated ${brandKebab}/yarns.ts`);
     }
 
     // Check if brand needs to be added to brands.ts
     const brandsFile = path.join(projectRoot, 'src/lib/data/yarns/brands.ts');
     let brandsContent = fs.readFileSync(brandsFile, 'utf-8');
 
-    if (!brandsContent.includes(`from './${brandSnake}/yarns'`)) {
+    if (!brandsContent.includes(`from './${brandKebab}/yarns'`)) {
       // Brand doesn't exist in brands.ts, add it alphabetically
       const brandCamel = toCamelCase(brandSnake);
-      const newImport = `import { brand as ${brandCamel} } from './${brandSnake}/yarns';`;
+      const newImport = `import { brand as ${brandCamel} } from './${brandKebab}/yarns';`;
 
       // Find alphabetical insertion point
       const imports = [];

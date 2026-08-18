@@ -3,6 +3,7 @@ import { yarn as animation } from './animation/yarn';
 import { yarn as bravaSport } from './brava-sport/yarn';
 import { yarn as bravaTweed } from './brava-tweed/yarn';
 import { yarn as bravaWorsted } from './brava-worsted/yarn';
+import { yarn as comfyFingeringYarn } from './comfy-fingering-yarn/yarn';
 import { yarn as cotlin } from './cotlin/yarn';
 import { yarn as heatherlySport } from './heatherly-sport/yarn';
 import { yarn as mightyStitch } from './mighty-stitch/yarn';
@@ -23,6 +24,7 @@ export const brand: Brand = {
     bravaSport,
     bravaTweed,
     bravaWorsted,
+    comfyFingeringYarn,
     cotlin,
     heatherlySport,
     mightyStitch,
