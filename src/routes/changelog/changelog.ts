@@ -39,33 +39,33 @@ export const entries: ChangelogItemGroup[] = [
             notes: [
               {
                 icon: ICONS.checkCircle,
-                text: `3 colorways`,
-                title: 'Added New Yarn: Ferner Wolle - Merino 160',
+                text: `43 colorways`,
+                title:
+                  'Added New Yarn: <a href="/yarn-colorway-finder?f=ferner_wolle-merino_160&v=6.1.0" class="link">Ferner Wolle - Merino 160</a>',
               },
               {
                 icon: ICONS.checkCircle,
-                text: `3 colorways`,
-                title: 'Added New Yarn: Handy Hands - Lizbeth Size 40',
+                text: `115 colorways`,
+                title:
+                  'Added New Yarn: <a href="/yarn-colorway-finder?f=handy_hands-lizbeth_size_40&v=6.1.0" class="link">Handy Hands - Lizbeth Size 40</a>',
               },
               {
                 icon: ICONS.checkCircle,
-                text: `3 colorways`,
-                title: 'Added New Yarn: Knit Picks - Comfy Fingering Yarn',
+                text: `22 colorways`,
+                title:
+                  'Added New Yarn: <a href="/yarn-colorway-finder?f=knit_picks-comfy_fingering&v=6.1.0" class="link">Knit Picks - Comfy Fingering</a>',
               },
               {
                 icon: ICONS.checkCircle,
-                text: `3 colorways`,
-                title: 'Added New Yarn: Premier - Basix Chenille Brights',
+                text: `45 colorways`,
+                title:
+                  'Added New Yarn: <a href="/yarn-colorway-finder?f=premier-basix_chenille_brights&v=6.1.0" class="link">Premier - Basix Chenille Brights</a>',
               },
               {
                 icon: ICONS.checkCircle,
-                text: `3 colorways`,
-                title: 'Added New Yarn: Wendy - Supreme DK',
-              },
-              {
-                icon: ICONS.checkCircle,
-                text: `2 colorways`,
-                title: 'Added New Yarn: handy-hands - Test Sample Yarn',
+                text: `90 colorways`,
+                title:
+                  'Added New Yarn: <a href="/yarn-colorway-finder?f=wendy-supreme_dk&v=6.1.0" class="link">Wendy - Supreme DK</a>',
               },
             ],
             version: '6.1.0',
