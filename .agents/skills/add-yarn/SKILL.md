@@ -1,6 +1,6 @@
 ---
 name: add-yarn
-description: Add a new yarn to the Temperature Blanket database, creating yarn structure and updating changelog. Use when adding a new yarn product to a brand's collection or creating a new brand.
+description: Add a new yarn to the Temperature Blanket database, creating a new yarn template and updating the changelog.
 ---
 
 # Add Yarn
