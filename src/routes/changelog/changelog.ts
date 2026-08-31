@@ -39,6 +39,23 @@ export const entries: ChangelogItemGroup[] = [
             notes: [
               {
                 icon: ICONS.checkCircle,
+                text: `84 colorways`,
+                title:
+                  'Added New Yarn: <a href="/yarn-colorway-finder?f=dharma-acid_dyes&v=6.2.0" class="link">Dharma - Acid Dyes</a>',
+              },
+              {
+                icon: ICONS.checkCircle,
+                text: `168 colorways`,
+                title:
+                  'Added New Yarn: <a href="/yarn-colorway-finder?f=dharma-fiber_reactive_procion_dyes&v=6.2.0" class="link">Dharma - Fiber Reactive Procion Dyes</a>',
+              },
+            ],
+            version: '6.2.0',
+          },
+          {
+            notes: [
+              {
+                icon: ICONS.checkCircle,
                 text: `43 colorways`,
                 title:
                   'Added New Yarn: <a href="/yarn-colorway-finder?f=ferner_wolle-merino_160&v=6.1.0" class="link">Ferner Wolle - Merino 160</a>',

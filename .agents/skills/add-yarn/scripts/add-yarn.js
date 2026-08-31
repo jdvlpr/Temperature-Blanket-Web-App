@@ -48,6 +48,9 @@ const weightMap = {
   'super bulky': 'sb',
   sb: 'sb',
   jumbo: 'j',
+  any: 'any',
+  'any weight': 'any',
+  'all weights': 'any',
 };
 
 // Resolve weight name or ID to normalized ID

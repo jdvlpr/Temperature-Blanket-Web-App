@@ -1,10 +1,11 @@
 <script module lang="ts">
   import { persistedState } from '$lib/storage/preferences.svelte';
 
-  const options = persistedState('[/.dev-tools]options', {
+  const initialOptions = {
     content: '',
     columnWidth: 200,
     querySelector: '',
+    colorQuerySelector: '',
     useElementAttribute: false,
     querySelectorAttribute: '',
     exclude: false,
@@ -14,12 +15,18 @@
     excludeAfter: false,
     excludeAfterString: '',
     removeNumbers: true,
+    extractColorFromAttribute: false,
+    colorAttribute: '',
     mergeWithExistingColors: false,
     selectedYarn: {
       brandId: '',
       yarnId: '',
     },
     names: [],
+  };
+
+  const options = persistedState('[/.dev-tools]options', initialOptions, {
+    beforeRead: (value) => ({ ...initialOptions, ...value }),
   });
 </script>
 
@@ -77,12 +84,25 @@
     return html;
   }
 
+  function extractHexColor(value: string | null) {
+    const hexColor = value?.match(
+      /#(?:[0-9a-f]{8}|[0-9a-f]{6}|[0-9a-f]{4}|[0-9a-f]{3})\b/i,
+    )?.[0];
+    console.log({ hexColor });
+
+    return hexColor ? chroma(hexColor).hex().toLowerCase() : '';
+  }
+
   async function getNames() {
     options.value.names = [];
-    let i = 1;
-    for (const element of [
+    const nameElements = [
       ...htmlObject.querySelectorAll(options.value.querySelector),
-    ]) {
+    ];
+    const colorElements = options.value.colorQuerySelector
+      ? [...htmlObject.querySelectorAll(options.value.colorQuerySelector)]
+      : nameElements;
+
+    for (const [index, element] of nameElements.entries()) {
       let name = options.value.useElementAttribute
         ? element.getAttribute(options.value.querySelectorAttribute)
         : element.innerText;
@@ -118,9 +138,14 @@
 
       let colorHex = '';
 
+      if (options.value.extractColorFromAttribute)
+        colorHex = extractHexColor(
+          colorElements[index]?.getAttribute(
+            options.value.colorAttribute || '',
+          ),
+        );
+
       options.value.names.push({ name, hex: colorHex });
-      i = Number(i);
-      i++;
     }
   }
 
@@ -187,6 +212,39 @@
                       placeholder="e.g., title, data-name"
                       class="input w-full"
                       bind:value={options.value.querySelectorAttribute}
+                    />
+                  </label>
+                </div>
+              {/if}
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <ToggleSwitch
+                bind:checked={options.value.extractColorFromAttribute}
+                label="Extract Color From Element Attribute"
+              />
+
+              {#if options.value.extractColorFromAttribute}
+                <div class="flex flex-col items-start text-left">
+                  <label class="w-full text-sm">
+                    Color Element Query Selector
+                    <input
+                      type="text"
+                      placeholder="e.g., .color, [data-color-style]"
+                      class="input w-full"
+                      bind:value={options.value.colorQuerySelector}
+                    />
+                  </label>
+                </div>
+
+                <div class="flex flex-col items-start text-left">
+                  <label class="w-full text-sm">
+                    Color Attribute
+                    <input
+                      type="text"
+                      placeholder="e.g., data-color-style, style"
+                      class="input w-full"
+                      bind:value={options.value.colorAttribute}
                     />
                   </label>
                 </div>

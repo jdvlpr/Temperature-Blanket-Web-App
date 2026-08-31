@@ -34,6 +34,7 @@ export const ALL_YARN_WEIGHTS: YarnWeight[] = [
   { name: 'Bulky', id: 'b' },
   { name: 'Super Bulky', id: 'sb' },
   { name: 'Jumbo', id: 'j' },
+  { name: 'Any', id: 'any' },
 ];
 
 // Preset color schemes

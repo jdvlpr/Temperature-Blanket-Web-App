@@ -36,7 +36,8 @@ export type YarnWeight =
   | { name: 'Aran'; id: 'a' }
   | { name: 'Bulky'; id: 'b' }
   | { name: 'Super Bulky'; id: 'sb' }
-  | { name: 'Jumbo'; id: 'j' };
+  | { name: 'Jumbo'; id: 'j' }
+  | { name: 'Any'; id: 'any' };
 
 export interface Yarn {
   colorways: Colorway[];
@@ -69,6 +70,8 @@ export interface Yarn {
   Super Bulky = sb
   
   Jumbo = j
+
+  Any = any
   
   */
   weightId?: YarnWeight['id'];

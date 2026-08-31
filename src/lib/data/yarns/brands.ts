@@ -14,6 +14,7 @@ import { brand as cascade } from './cascade/yarns';
 import { brand as circulo } from './circulo/yarns';
 import { brand as coopKnits } from './coop-knits/yarns';
 import { brand as dmc } from './dmc/yarns';
+import { brand as dharma } from './dharma/yarns';
 import { brand as drops } from './drops/yarns';
 import { brand as ellaRae } from './ella-rae/yarns';
 import { brand as elle } from './elle/yarns';
@@ -100,6 +101,7 @@ export const brands: Brand[] = [
   circulo,
   coopKnits,
   dmc,
+  dharma,
   drops,
   ellaRae,
   elle,
