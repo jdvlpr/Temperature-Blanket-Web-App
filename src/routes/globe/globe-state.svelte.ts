@@ -24,6 +24,12 @@ class GlobeState {
   } | null>(null);
   globe = $state<GlobeInstance | null>(null);
   isHighResolution = $state<boolean>(false);
+  /** The user's *intent* for auto-rotation, as set by the play/pause button.
+   * Lives here rather than in the component because the globe instance is
+   * reused across mounts (see Globe.svelte's onMount), so a component-local
+   * flag would desync from the instance's actual autoRotate on remount.
+   * Transient hover-suppression is tracked separately, in the component. */
+  rotationEnabled = $state<boolean>(true);
   error = $state<string>('');
 }
 export const globeState = new GlobeState();

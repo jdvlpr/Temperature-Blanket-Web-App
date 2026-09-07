@@ -34,7 +34,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   // Reactivity
   let selectedPoint = $state(null);
-  let isAutoRotating = $state(true);
+  // Transient hover-suppression, distinct from the user's play/pause intent
+  // (globeState.rotationEnabled). Keeping them separate is what lets a
+  // deliberate pause survive the mouse leaving the globe.
+  let isPointerOver = $state(false);
   let globeContainer: HTMLElement | undefined = $state();
   let resizeObserver: ResizeObserver | undefined = $state();
   let updatePointRadiusFn: ((...args: any[]) => void) | null = null;
@@ -113,6 +116,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
     return el;
   }
 
+  // The one place that writes controls().autoRotate. Re-runs on remount once
+  // globeState.globe is set, which keeps a reused instance in sync with intent.
+  $effect(() => {
+    if (!globeState.globe) return;
+    globeState.globe.controls().autoRotate =
+      globeState.rotationEnabled && !isPointerOver;
+  });
+
   function updateGlobe() {
     if (!globeState.globe) return;
 
@@ -144,26 +155,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 
   function handleToggleRotate() {
-    if (!globeState.globe) return;
-    isAutoRotating = !isAutoRotating;
-
-    globeState.globe.controls().autoRotate = isAutoRotating;
+    globeState.rotationEnabled = !globeState.rotationEnabled;
   }
 
   function handleMouseEnter() {
     if (!canHover.current) return;
-    if (globeState.globe && isAutoRotating) {
-      globeState.globe.controls().autoRotate = false;
-      isAutoRotating = false;
-    }
+    isPointerOver = true;
   }
 
   function handleMouseLeave() {
     if (!canHover.current) return;
-    if (globeState.globe && !isAutoRotating) {
-      globeState.globe.controls().autoRotate = true;
-      isAutoRotating = true;
-    }
+    isPointerOver = false;
   }
 
   onMount(async () => {
@@ -243,11 +245,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           .onPointClick((d: any) => {
             selectedPoint = d;
 
-            // Pause rotation when a point is clicked
-            if (isAutoRotating) {
-              isAutoRotating = false;
-              globeState.globe!.controls().autoRotate = false;
-            }
+            // Opening a popup anchored to the sphere sets pause *intent*, not a
+            // transient stop: resuming on mouse-out would drag the popup away.
+            globeState.rotationEnabled = false;
 
             updateGlobe();
           })
@@ -261,7 +261,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
             }
           });
 
-        globeState.globe.controls().autoRotate = isAutoRotating;
         globeState.globe.controls().autoRotateSpeed = 1;
 
         // Throttled point radius update based on zoom (altitude)
@@ -363,10 +362,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <button
         onclick={handleToggleRotate}
         class="bg-surface-800/30 hover:bg-surface-700 border-surface-600/40 rounded-lg border p-2 text-white shadow-lg backdrop-blur-sm transition-all"
-        title={isAutoRotating ? 'Pause Rotation' : 'Resume Rotation'}
+        title={globeState.rotationEnabled
+          ? 'Pause Rotation'
+          : 'Resume Rotation'}
         disabled={globeState.loading}
       >
-        {#if isAutoRotating}
+        {#if globeState.rotationEnabled}
           <PauseIcon />
         {:else}
           <PlayIcon />
@@ -403,7 +404,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <div
         class="text-surface-400 pointer-events-none absolute inset-0 z-0 flex items-center justify-center"
       >
-        Error getting projects.
+        No projects to show yet.
       </div>
     {/if}
   </div>
