@@ -252,6 +252,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
       class="flex scroll-mt-[70px] flex-wrap items-end justify-center text-center"
     >
       <p class="text-surface-700-300 text-xl font-semibold">All Projects</p>
+      <div class="mb-2 flex w-full flex-col items-center justify-center gap-1">
+        <a
+          href="/globe"
+          class="btn btn-sm hover:preset-tonal-surface text-surface-700-300 gap-1 text-xs"
+        >
+          <EarthIcon class="size-4" />
+          Browse by location on the globe
+        </a>
+      </div>
       <div class="mb-2 flex w-full justify-center">
         {#if totalProjects === 0}
           <p class="animate-pulse text-xs">...</p>

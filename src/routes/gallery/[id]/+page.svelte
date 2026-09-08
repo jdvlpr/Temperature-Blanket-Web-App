@@ -3,14 +3,14 @@
 This file is part of Temperature-Blanket-Web-App.
 
 Temperature-Blanket-Web-App is free software: you can redistribute it and/or modify it
-under the terms of the GNU General Public License as published by the Free Software Foundation, 
+under the terms of the GNU General Public License as published by the Free Software Foundation,
 either version 3 of the License, or (at your option) any later version.
 
-Temperature-Blanket-Web-App is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
-without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+Temperature-Blanket-Web-App is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 See the GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
+You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
@@ -29,6 +29,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { safeSlide } from '$lib/features/transitions/safeSlide';
   import { allGaugesAttributes } from '$lib/state/gauges-state.svelte';
   import { locations } from '$lib/state/location-state.svelte';
+  import { buildGlobeLinkFromLocationsMeta } from '../../globe/globe-utils';
   import { preferences } from '$lib/storage/preferences.svelte';
   import { exists } from '$lib/utils/other-utils';
   import {
@@ -44,7 +45,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import {
     ArrowLeftIcon,
     ChevronDown,
+    GlobeIcon,
     InfoIcon,
+    NotebookPenIcon,
     ShoppingCartIcon,
   } from '@lucide/svelte';
   import { Accordion } from '@skeletonlabs/skeleton-svelte';
@@ -65,6 +68,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     project ? getTitleFromLocationsMeta(project.locations) : '',
   );
   let projectTitleNoHTML = $derived(stripHTMLTags(projectTitle));
+  // Null when the project has no usable coordinates, which hides the link.
+  let globeLink = $derived(
+    project ? buildGlobeLinkFromLocationsMeta(project.locations) : null,
+  );
   let weatherSources = $derived(
     project?.weatherSources ? JSON.parse(project?.weatherSources) : null,
   );
@@ -215,31 +222,31 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 {/if}
               </p>
 
+              <div class="flex flex-wrap items-center justify-center gap-4">
               {#if projectURL}
                 <a
-                  class="btn preset-filled-primary-500 m-auto w-fit items-center gap-1"
+                  class="btn preset-filled-primary-500"
                   href={projectURL}
                   target={locations.allValid ? '_blank' : '_self'}
                 >
+                <NotebookPenIcon />
                   Open in {#if locations.allValid}
                     New
                   {/if} Project Planner
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke-width="1.5"
-                    stroke="currentColor"
-                    class="size-5"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="m8.25 4.5 7.5 7.5-7.5 7.5"
-                    />
-                  </svg>
                 </a>
               {/if}
+
+              {#if globeLink}
+                <a
+                  class="btn hover:preset-tonal-surface"
+                  href={globeLink}
+                >
+                  <GlobeIcon />
+                  View on the Globe
+                </a>
+              {/if}
+              </div>
+
               <div
                 class="preset-tonal-tertiary rounded-container mx-auto mt-2 w-full max-w-(--breakpoint-sm) text-left"
               >

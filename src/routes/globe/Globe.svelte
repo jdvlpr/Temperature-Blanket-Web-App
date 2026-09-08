@@ -3,19 +3,19 @@
 This file is part of Temperature-Blanket-Web-App.
 
 Temperature-Blanket-Web-App is free software: you can redistribute it and/or modify it
-under the terms of the GNU General Public License as published by the Free Software Foundation, 
+under the terms of the GNU General Public License as published by the Free Software Foundation,
 either version 3 of the License, or (at your option) any later version.
 
-Temperature-Blanket-Web-App is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
-without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+Temperature-Blanket-Web-App is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 See the GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
+You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import { browser } from '$app/environment';
-  import { pluralize } from '$lib/utils/string-utils';
+  import { page } from '$app/state';
   import {
     LoaderCircleIcon,
     PauseIcon,
@@ -27,93 +27,151 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { onDestroy, onMount, tick } from 'svelte';
   import { MediaQuery } from 'svelte/reactivity';
   import { globeState } from './globe-state.svelte';
+  import GlobePlacesPanel from './GlobePlacesPanel.svelte';
+  import {
+    findNearestRegion,
+    hasLabels,
+    parseDeepLink,
+    regionKey,
+    regionsInView,
+    searchRegions,
+    type GlobeRegion,
+    type GlobeRegionInView,
+    type GlobeSearchResult,
+  } from './globe-utils';
   import { PUBLIC_WORDPRESS_BASE_URL } from '$env/static/public';
+
+  /** How many places the panel lists at once. The cap is what keeps the DOM
+   * small while the camera moves; the panel reports what it leaves out. */
+  const PANEL_LIMIT = 30;
 
   // Modern devices detection for hover support
   const canHover = new MediaQuery('(hover: hover)');
 
   // Reactivity
-  let selectedPoint = $state(null);
+  let selectedRegion = $state<GlobeRegion | null>(null);
+  let highlightedRegion = $state<GlobeRegion | null>(null);
   // Transient hover-suppression, distinct from the user's play/pause intent
   // (globeState.rotationEnabled). Keeping them separate is what lets a
-  // deliberate pause survive the mouse leaving the globe.
+  // deliberate pause survive the mouse leaving the globe. It covers the panel
+  // as well as the globe, so the list holds still while it is being read.
   let isPointerOver = $state(false);
+  let searchQuery = $state('');
+  const searchResults = $derived(
+    searchRegions(globeState.data as GlobeRegion[], searchQuery),
+  );
   let globeContainer: HTMLElement | undefined = $state();
   let resizeObserver: ResizeObserver | undefined = $state();
-  let updatePointRadiusFn: ((...args: any[]) => void) | null = null;
+  let handleCameraChange: ((...args: any[]) => void) | null = null;
 
-  // Local throttle utility
+  /**
+   * The places the panel shows.
+   *
+   * The selected region is pinned to the front when the camera has moved it
+   * out of the ranked list, so clicking a point never expands a row that is
+   * not there to expand.
+   */
+  const placesInView = $derived.by(() => {
+    const globe = globeState.globe;
+
+    // Built once per recompute rather than per region, so the canvas
+    // dimensions aren't re-read hundreds of times. Points behind the globe
+    // also project onto the canvas, which is why regionsInView applies its
+    // horizon test first and only then asks this.
+    let isOnScreen: ((region: GlobeRegion) => boolean) | undefined;
+    if (globe) {
+      const width = globe.width();
+      const height = globe.height();
+      isOnScreen = (region) => {
+        const { x, y } = globe.getScreenCoords(region.lat, region.lng, 0);
+        return x >= 0 && x <= width && y >= 0 && y <= height;
+      };
+    }
+
+    const { regions, total } = regionsInView(
+      globeState.data as GlobeRegion[],
+      globeState.pov,
+      PANEL_LIMIT,
+      isOnScreen,
+    );
+
+    if (selectedRegion && !regions.some((r) => r.region === selectedRegion)) {
+      const pinned: GlobeRegionInView = {
+        region: selectedRegion,
+        centrality: 1,
+      };
+      return { regions: [pinned, ...regions], total };
+    }
+
+    return { regions, total };
+  });
+
+  // Local throttle utility. Fires on the leading edge, then once more after the
+  // last call in a burst — without that trailing call the camera's final
+  // resting position after a fly-to can land inside the throttle window and be
+  // dropped, leaving the panel showing where the camera used to be.
   function throttle<T extends (...args: any[]) => any>(
     func: T,
     limit: number,
   ): (...args: Parameters<T>) => void {
-    let inThrottle: boolean;
+    let inThrottle = false;
+    let trailingArgs: Parameters<T> | null = null;
+
     return function (this: any, ...args: Parameters<T>) {
-      const context = this;
-      if (!inThrottle) {
-        func.apply(context, args);
-        inThrottle = true;
-        setTimeout(() => (inThrottle = false), limit);
+      if (inThrottle) {
+        trailingArgs = args;
+        return;
       }
+
+      func.apply(this, args);
+      inThrottle = true;
+
+      const settle = () => {
+        if (trailingArgs) {
+          const pending = trailingArgs;
+          trailingArgs = null;
+          func.apply(this, pending);
+          setTimeout(settle, limit);
+          return;
+        }
+        inThrottle = false;
+      };
+
+      setTimeout(settle, limit);
     };
   }
 
-  function createLabelElement(d: any) {
-    const el = document.createElement('div');
-    el.className = 'globe-label absolute z-50 pointer-events-auto';
+  /** Expand a region in the panel. Shared by point clicks, rows and search. */
+  function selectRegion(region: GlobeRegion) {
+    selectedRegion = region;
 
-    let html = `<div class="bg-surface-800 p-2 rounded-lg shadow-xl border border-surface-600 text-white text-xs min-w-[240px] max-w-[280px] flex flex-col gap-2 relative cursor-default">
-        <div class="flex justify-between items-center border-b border-surface-600 pb-1 mb-1">
-            <p class="text-xs font-semibold uppercase tracking-wider opacity-60">${d.projects.length} ${pluralize('Project', d.projects.length)} in this area</p>
-            <button class="close-btn hover:text-primary-500 transition-colors px-1">✕</button>
-        </div>
-        <div class="max-h-[220px] overflow-y-auto pr-1 flex flex-col gap-3 scrollbar-thin">`;
+    // Opening a region is a deliberate stop, not a transient one: letting the
+    // globe spin on would carry its point away from where the user is looking.
+    globeState.rotationEnabled = false;
+  }
 
-    d.projects.forEach((proj: any) => {
-      html += `<div class="group flex flex-col gap-1 border-b border-surface-700/50 pb-2 last:border-0">
-            <div class="flex gap-2 items-start">
-               ${proj.image ? `<img src="${proj.image}" alt="" class="size-24 object-cover rounded border border-surface-600 shrink-0" />` : ''}
-               <div class="flex flex-col gap-1 min-w-0">
-                    <p class="text-xs font-semibold line-clamp-4 leading-tight">${proj.title}</p>
-                    <button class="open-btn text-xs btn bg-primary-700 text-white py-0.5 w-fit" data-id="${proj.id}">
-                        View Details
-                    </button>
-               </div>
-            </div>
-        </div>`;
-    });
+  function toggleRegion(region: GlobeRegion) {
+    if (selectedRegion === region) {
+      selectedRegion = null;
+      return;
+    }
+    selectRegion(region);
+  }
 
-    html += `</div></div>`;
-    el.innerHTML = html;
+  function chooseResult(result: GlobeSearchResult) {
+    goToRegion(result.region);
+    searchQuery = '';
+  }
 
-    // Handle open buttons
-    el.querySelectorAll('.open-btn').forEach((btn) => {
-      btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const id = (btn as HTMLElement).dataset.id;
-        window.open(`/gallery/${id}`, '_blank');
-        selectedPoint = null;
-        updateGlobe();
-      });
-    });
-
-    // Prevent interactions on the label from reaching the globe
-    const stopPropagation = (e: Event) => e.stopPropagation();
-    el.addEventListener('click', stopPropagation);
-    el.addEventListener('pointerdown', stopPropagation);
-    el.addEventListener('pointerup', stopPropagation);
-    el.addEventListener('mousedown', stopPropagation);
-    el.addEventListener('mouseup', stopPropagation);
-    el.addEventListener('wheel', stopPropagation); // Allow scrolling within the popup
-
-    // Handle close button
-    el.querySelector('.close-btn')?.addEventListener('click', (e) => {
-      e.stopPropagation();
-      selectedPoint = null;
-      updateGlobe();
-    });
-
-    return el;
+  /** Fly the camera to a region and expand it. */
+  function goToRegion(region: GlobeRegion) {
+    if (!globeState.globe) return;
+    const { altitude } = globeState.globe.pointOfView();
+    globeState.globe.pointOfView(
+      { lat: region.lat, lng: region.lng, altitude: Math.min(altitude, 0.6) },
+      800,
+    );
+    selectRegion(region);
   }
 
   // The one place that writes controls().autoRotate. Re-runs on remount once
@@ -124,12 +182,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
       globeState.rotationEnabled && !isPointerOver;
   });
 
-  function updateGlobe() {
+  // Hovering a row pulses its point. A single-datum rings layer rather than
+  // re-feeding pointsData, which would re-diff every point on the sphere.
+  $effect(() => {
     if (!globeState.globe) return;
-
-    // Use htmlElements layer for the interactive popup
-    globeState.globe.htmlElementsData(selectedPoint ? [selectedPoint] : []);
-  }
+    globeState.globe.ringsData(highlightedRegion ? [highlightedRegion] : []);
+  });
 
   function handleZoomIn() {
     if (!globeState.globe) return;
@@ -150,12 +208,64 @@ If not, see <https://www.gnu.org/licenses/>. -->
   function handleReset() {
     if (!globeState.globe) return;
     globeState.globe.pointOfView({ lat: 0, lng: 0, altitude: 2.5 }, 500);
-    selectedPoint = null;
-    updateGlobe();
+    selectedRegion = null;
   }
 
   function handleToggleRotate() {
     globeState.rotationEnabled = !globeState.rotationEnabled;
+  }
+
+  /**
+   * Keyboard equivalent of dragging and scrolling the globe. Without this the
+   * only reachable controls are the buttons below it — the globe itself could
+   * not be moved at all without a pointer.
+   */
+  function handleKeydown(event: KeyboardEvent) {
+    if (!globeState.globe) return;
+
+    const { lat, lng, altitude } = globeState.globe.pointOfView();
+    const step = 12 * Math.min(1, altitude);
+    let next: { lat: number; lng: number; altitude: number } | null = null;
+
+    switch (event.key) {
+      case 'ArrowLeft':
+        next = { lat, lng: lng - step, altitude };
+        break;
+      case 'ArrowRight':
+        next = { lat, lng: lng + step, altitude };
+        break;
+      case 'ArrowUp':
+        next = { lat: Math.min(90, lat + step), lng, altitude };
+        break;
+      case 'ArrowDown':
+        next = { lat: Math.max(-90, lat - step), lng, altitude };
+        break;
+      case '+':
+      case '=':
+        next = { lat, lng, altitude: Math.max(0.1, altitude * 0.7) };
+        break;
+      case '-':
+      case '_':
+        next = { lat, lng, altitude: Math.min(5, altitude * 1.4) };
+        break;
+      case 'Escape':
+        if (selectedRegion) {
+          event.preventDefault();
+          selectedRegion = null;
+        }
+        return;
+      default:
+        return;
+    }
+
+    // Only preventDefault once we know the key is one we handle, so Tab and
+    // browser shortcuts still work while the globe has focus.
+    event.preventDefault();
+
+    // Driving the camera by keyboard is an explicit navigation intent; letting
+    // auto-rotation keep spinning would fight the user for control.
+    globeState.rotationEnabled = false;
+    globeState.globe.pointOfView(next, 250);
   }
 
   function handleMouseEnter() {
@@ -189,6 +299,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         const json = await res.json();
         globeState.data = json.data || [];
         globeState.updatedAt = json.updated_at || '';
+        globeState.hasLabels = hasLabels(globeState.data as GlobeRegion[]);
         globeState.error = '';
       } catch (e) {
         console.error(e);
@@ -203,6 +314,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
     await tick();
 
     if (globeState.Globe && globeContainer) {
+      // Read deep-link params before the branch below. The reuse arm is the one
+      // that runs on every return visit, so reading these inside the creation
+      // arm would make /globe?lat=..&lng=.. work only on a hard page load and
+      // silently do nothing when arriving via client-side navigation.
+      const params = page.url.searchParams;
+      const deepLink = parseDeepLink(params);
+
       // If globe already exists, reuse it — just move its DOM back in
       if (globeState.globe) {
         // The globe's internal container div was detached on last unmount;
@@ -234,40 +352,55 @@ If not, see <https://www.gnu.org/licenses/>. -->
           .pointLat('lat')
           .pointLng('lng')
           .pointLabel(null as any) // Disable hover tooltips (null not in type def)
-          .pointResolution(10)
+          // Each point is a cylinder, so this multiplies across every region on
+          // the sphere; 6 segments is indistinguishable at these radii.
+          .pointResolution(6)
           .pointAltitude((d: any) =>
-            Math.min((d.projects?.length || 1) * 0.009 + 0.02, 0.5),
+            Math.max((d.projects?.length || 1) * 0.002, 0),
           )
           .pointRadius(0.5)
           .pointColor((d: any) => {
             return d.popular_color?.hex || '#ffcc00';
           })
           .onPointClick((d: any) => {
-            selectedPoint = d;
-
-            // Opening a popup anchored to the sphere sets pause *intent*, not a
-            // transient stop: resuming on mouse-out would drag the popup away.
-            globeState.rotationEnabled = false;
-
-            updateGlobe();
+            selectRegion(d as GlobeRegion);
           })
-          .htmlLat('lat')
-          .htmlLng('lng')
-          .htmlElement(createLabelElement)
+          // A single-datum layer driven by panel hover. Empty by default.
+          .ringsData([])
+          .ringLat('lat')
+          .ringLng('lng')
+          .ringAltitude(0.015)
+          .ringColor(() => (t: number) => `rgba(255,255,255,${1 - t})`)
+          .ringMaxRadius(4)
+          .ringPropagationSpeed(3)
+          .ringRepeatPeriod(700)
+          .ringResolution(32)
+          .onGlobeReady(() => {
+            // The instance exists well before the earth texture has decoded,
+            // so keying the overlay off construction flashed a black square.
+            globeState.loading = false;
+          })
           .onGlobeClick(() => {
-            if (selectedPoint) {
-              selectedPoint = null;
-              updateGlobe();
-            }
+            selectedRegion = null;
           });
 
         globeState.globe.controls().autoRotateSpeed = 1;
 
-        // Throttled point radius update based on zoom (altitude)
+        // Throttled reaction to camera movement: resizes the points for the
+        // current zoom and publishes the camera position the panel reads.
         let lastAltitude = -1;
-        updatePointRadiusFn = throttle(() => {
+        handleCameraChange = throttle(() => {
           if (!globeState.globe) return;
-          const { altitude } = globeState.globe.pointOfView();
+          const pov = globeState.globe.pointOfView();
+
+          // Written to the singleton, not to component state: this closure is
+          // registered once against a globe instance that outlives the
+          // component, so it must not capture a field that dies with a remount.
+          // Must stay above the early returns below — the panel is derived from
+          // this, so skipping the write leaves it showing a stale camera.
+          globeState.pov = pov;
+
+          const { altitude } = pov;
 
           if (altitude < 2 && !globeState.isHighResolution) {
             globeState.globe.globeImageUrl('/images/earth-highres.jpg');
@@ -286,8 +419,29 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
         globeState.globe
           .controls()
-          .addEventListener('change', updatePointRadiusFn);
+          .addEventListener('change', handleCameraChange);
       }
+
+      if (deepLink) {
+        globeState.globe.pointOfView(deepLink, 0);
+        // A deep link is a deliberate destination; spinning away from it
+        // immediately would undo the thing the link was for.
+        globeState.rotationEnabled = false;
+
+        // Open the place the link points at. Arriving from a gallery project
+        // should land on that project's region, not on an unexplained camera
+        // position the visitor still has to click to make sense of.
+        const target = findNearestRegion(
+          globeState.data as GlobeRegion[],
+          deepLink.lat,
+          deepLink.lng,
+        );
+        if (target) selectRegion(target);
+      }
+
+      // Seed the panel from wherever the camera actually is, covering both the
+      // first mount and a return visit to a globe left pointing somewhere else.
+      globeState.pov = globeState.globe.pointOfView();
 
       // Handle responsiveness
       resizeObserver = new ResizeObserver((entries) => {
@@ -313,6 +467,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     // Instead, we just pause and detach the DOM.
     if (globeState.globe) {
       globeState.globe.pauseAnimation();
+      // The rings layer is driven by hover on a panel that is going away.
+      globeState.globe.ringsData([]);
     }
     if (resizeObserver) {
       resizeObserver.disconnect();
@@ -333,80 +489,101 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </button>
   </div>
 {:else}
-  <div
-    class="lg:rounded-container relative h-[70dvh] w-full overflow-hidden bg-black sm:h-[75dvh] lg:shadow-md"
-    onmouseenter={handleMouseEnter}
-    onmouseleave={handleMouseLeave}
-    role="application"
-    aria-label="Interactive 3D Globe Visualization"
-  >
-    <div bind:this={globeContainer} class="h-full w-full cursor-move"></div>
+  <div class="flex w-full flex-col gap-2 lg:flex-row lg:items-start">
+    <!--
+      role="application" is the correct ARIA role for a canvas-driven widget that
+      handles its own keys, and it has to be focusable to be reachable at all by
+      keyboard. Svelte's a11y rules don't treat "application" as interactive, so
+      both warnings below are false positives for this specific markup — the
+      alternative (dropping tabindex) would make the globe pointer-only.
+    -->
+    <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+    <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+    <div
+      class="lg:rounded-container relative h-[42dvh] w-full flex-1 overflow-hidden bg-black sm:h-[52dvh] lg:h-[75dvh] lg:shadow-md"
+      onmouseenter={handleMouseEnter}
+      onmouseleave={handleMouseLeave}
+      onkeydown={handleKeydown}
+      role="application"
+      tabindex="0"
+      aria-label="Interactive 3D globe of temperature blanket projects. Use the arrow keys to rotate, plus and minus to zoom. The places currently in view are listed beside the globe."
+    >
+      <div bind:this={globeContainer} class="h-full w-full cursor-move"></div>
 
-    {#if globeState.loading}
-      <div
-        class="absolute inset-0 z-10 flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm"
-      >
+      {#if globeState.loading}
         <div
-          class="bg-surface-500/20 mb-4 flex size-74 items-center justify-center rounded-full shadow-xl"
+          class="absolute inset-0 z-10 flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm"
         >
-          <LoaderCircleIcon class="text-surface-300 size-12 animate-spin" />
+          <div
+            class="bg-surface-500/20 mb-4 flex size-52 items-center justify-center rounded-full shadow-xl"
+          >
+            <LoaderCircleIcon class="text-surface-300 size-12 animate-spin" />
+          </div>
+          <p class="text-surface-400 animate-pulse font-medium">
+            Loading world...
+          </p>
         </div>
-        <p class="text-surface-400 animate-pulse font-medium">
-          Loading world...
-        </p>
+      {/if}
+
+      <!-- UI Controls Overlay -->
+      <div class="absolute right-1/2 bottom-2 z-20 flex translate-x-1/2 gap-2">
+        <button
+          onclick={handleToggleRotate}
+          class="bg-surface-800/30 hover:bg-surface-700 border-surface-600/40 rounded-lg border p-2 text-white shadow-lg backdrop-blur-sm transition-all"
+          title={globeState.rotationEnabled
+            ? 'Pause Rotation'
+            : 'Resume Rotation'}
+          disabled={globeState.loading}
+        >
+          {#if globeState.rotationEnabled}
+            <PauseIcon />
+          {:else}
+            <PlayIcon />
+          {/if}
+        </button>
+        <button
+          onclick={handleReset}
+          class="bg-surface-800/30 hover:bg-surface-700 border-surface-600/40 rounded-lg border p-2 text-white shadow-lg backdrop-blur-sm transition-all"
+          title="Reset View"
+          disabled={globeState.loading}
+        >
+          <RotateCcwIcon />
+        </button>
+
+        <button
+          onclick={handleZoomOut}
+          class="bg-surface-800/30 hover:bg-surface-700 border-surface-600/40 rounded-lg border p-2 text-white shadow-lg backdrop-blur-sm transition-all"
+          title="Zoom Out"
+          disabled={globeState.loading}
+        >
+          <ZoomOutIcon />
+        </button>
+        <button
+          onclick={handleZoomIn}
+          class="bg-surface-800/30 hover:bg-surface-700 border-surface-600/40 rounded-lg border p-2 text-white shadow-lg backdrop-blur-sm transition-all"
+          title="Zoom In"
+          disabled={globeState.loading}
+        >
+          <ZoomInIcon />
+        </button>
       </div>
-    {/if}
-
-    <!-- UI Controls Overlay -->
-    <div class="absolute right-1/2 bottom-2 z-20 flex translate-x-1/2 gap-2">
-      <button
-        onclick={handleToggleRotate}
-        class="bg-surface-800/30 hover:bg-surface-700 border-surface-600/40 rounded-lg border p-2 text-white shadow-lg backdrop-blur-sm transition-all"
-        title={globeState.rotationEnabled
-          ? 'Pause Rotation'
-          : 'Resume Rotation'}
-        disabled={globeState.loading}
-      >
-        {#if globeState.rotationEnabled}
-          <PauseIcon />
-        {:else}
-          <PlayIcon />
-        {/if}
-      </button>
-      <button
-        onclick={handleReset}
-        class="bg-surface-800/30 hover:bg-surface-700 border-surface-600/40 rounded-lg border p-2 text-white shadow-lg backdrop-blur-sm transition-all"
-        title="Reset View"
-        disabled={globeState.loading}
-      >
-        <RotateCcwIcon />
-      </button>
-
-      <button
-        onclick={handleZoomOut}
-        class="bg-surface-800/30 hover:bg-surface-700 border-surface-600/40 rounded-lg border p-2 text-white shadow-lg backdrop-blur-sm transition-all"
-        title="Zoom Out"
-        disabled={globeState.loading}
-      >
-        <ZoomOutIcon />
-      </button>
-      <button
-        onclick={handleZoomIn}
-        class="bg-surface-800/30 hover:bg-surface-700 border-surface-600/40 rounded-lg border p-2 text-white shadow-lg backdrop-blur-sm transition-all"
-        title="Zoom In"
-        disabled={globeState.loading}
-      >
-        <ZoomInIcon />
-      </button>
     </div>
 
-    {#if !globeState.loading && globeState.data.length === 0 && globeState.error === ''}
-      <div
-        class="text-surface-400 pointer-events-none absolute inset-0 z-0 flex items-center justify-center"
-      >
-        No projects to show yet.
-      </div>
-    {/if}
+    <GlobePlacesPanel
+      inView={placesInView.regions}
+      totalInView={placesInView.total}
+      bind:searchQuery
+      {searchResults}
+      selectedKey={selectedRegion ? regionKey(selectedRegion) : null}
+      hasLabels={globeState.hasLabels}
+      loading={globeState.loading}
+      isEmpty={globeState.data.length === 0}
+      onSelect={toggleRegion}
+      onHover={(region) => (highlightedRegion = region)}
+      onChooseResult={chooseResult}
+      onPointerEnter={handleMouseEnter}
+      onPointerLeave={handleMouseLeave}
+    />
   </div>
 
   {#if !globeState.loading}
@@ -414,7 +591,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       class="mt-2 mb-4 flex w-full flex-col items-center justify-center gap-2 px-2 text-center"
     >
       <p class="text-surface-700-300 text-sm">
-        Touch or click a point to see projects.
+        Click a point on the globe, or a place in the list, to see its projects.
       </p>
       <!-- Last Updated Notice -->
       {#if globeState.updatedAt}
@@ -427,25 +604,3 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
   {/if}
 {/if}
-
-<style>
-  /* Ensure the globe container allows for the absolute labels relative to it */
-  :global(.globe-label) {
-    transform: translate(-50%, -100%);
-    margin-top: -10px;
-  }
-
-  :global(.scrollbar-thin::-webkit-scrollbar) {
-    width: 4px;
-  }
-  :global(.scrollbar-thin::-webkit-scrollbar-track) {
-    background: rgba(0, 0, 0, 0.1);
-  }
-  :global(.scrollbar-thin::-webkit-scrollbar-thumb) {
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 2px;
-  }
-  :global(.scrollbar-thin::-webkit-scrollbar-thumb:hover) {
-    background: rgba(255, 255, 255, 0.3);
-  }
-</style>
