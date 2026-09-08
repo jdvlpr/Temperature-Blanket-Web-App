@@ -28,6 +28,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { MediaQuery } from 'svelte/reactivity';
   import { globeState } from './globe-state.svelte';
   import GlobePlacesPanel from './GlobePlacesPanel.svelte';
+  import GlobeSpikePanel from './GlobeSpikePanel.svelte';
+  import {
+    applyAnisotropy,
+    applySurface,
+    clearTileCache,
+    countTileRequests,
+    findTileSource,
+    isManualSurface,
+    loadWorldLines,
+    setManualSurface,
+    tileLevelForAltitude,
+    type SurfaceMode,
+  } from './globe-textures';
   import {
     findNearestRegion,
     hasLabels,
@@ -44,6 +57,36 @@ If not, see <https://www.gnu.org/licenses/>. -->
   /** How many places the panel lists at once. The cap is what keeps the DOM
    * small while the camera moves; the panel reports what it leaves out. */
   const PANEL_LIMIT = 30;
+
+  // ---------------------------------------------------------------------------
+  // Zoom-detail spike (dev only, /globe?spike=1). Delete with globe-textures.ts
+  // and GlobeSpikePanel.svelte once the surface question is settled.
+  // ---------------------------------------------------------------------------
+  const spikeActive = $derived(
+    import.meta.env.DEV && page.url.searchParams.has('spike'),
+  );
+  let surface = $state<SurfaceMode>('lowres');
+  let anisotropy = $state(false);
+  let overlay = $state(false);
+  let anisotropyLevel = $state(1);
+  let fps = $state(0);
+  let tileRequests = $state(0);
+  let worldPaths = $state<[number, number][][]>([]);
+
+  const tileLevel = $derived.by(() => {
+    if (!import.meta.env.DEV) return null;
+    const source = findTileSource(surface);
+    if (!source) return null;
+    return tileLevelForAltitude(globeState.pov.altitude, source.maxLevel);
+  });
+
+  async function handleOverlay(enabled: boolean) {
+    if (!import.meta.env.DEV) return;
+    overlay = enabled;
+    if (!enabled || worldPaths.length) return;
+    const lines = await loadWorldLines();
+    if (lines) worldPaths = [...lines.coastline, ...lines.borders];
+  }
 
   // Modern devices detection for hover support
   const canHover = new MediaQuery('(hover: hover)');
@@ -187,6 +230,64 @@ If not, see <https://www.gnu.org/licenses/>. -->
   $effect(() => {
     if (!globeState.globe) return;
     globeState.globe.ringsData(highlightedRegion ? [highlightedRegion] : []);
+  });
+
+  // --- spike effects ---------------------------------------------------------
+
+  // Tell the camera listener to stop swapping textures on its own.
+  $effect(() => {
+    if (!import.meta.env.DEV) return;
+    setManualSurface(spikeActive);
+  });
+
+  $effect(() => {
+    if (!import.meta.env.DEV) return;
+    if (!spikeActive || !globeState.globe) return;
+    applySurface(globeState.globe, surface);
+  });
+
+  // Applied here so a toggle takes effect at once; the frame loop below
+  // reapplies it as textures and tiles finish loading.
+  $effect(() => {
+    if (!import.meta.env.DEV) return;
+    if (!spikeActive || !globeState.globe) return;
+    anisotropyLevel = applyAnisotropy(globeState.globe, anisotropy);
+  });
+
+  // Only the data changes here; the accessors are set once at creation. Paths
+  // are left unstroked on purpose — a stroke builds a TubeGeometry per path,
+  // the same per-object cost that made the old label layer unusable.
+  $effect(() => {
+    if (!import.meta.env.DEV) return;
+    if (!globeState.globe) return;
+    globeState.globe.pathsData(spikeActive && overlay ? worldPaths : []);
+  });
+
+  // One frame loop drives the FPS readout, the request count, and the
+  // reapplication of anisotropy to textures that load asynchronously. Reading
+  // `anisotropy` inside the callback is deliberate: it is untracked there, so
+  // the loop is not torn down and rebuilt every time the box is ticked.
+  $effect(() => {
+    if (!import.meta.env.DEV || !spikeActive) return;
+
+    let frames = 0;
+    let last = performance.now();
+    let raf = requestAnimationFrame(function tick() {
+      frames++;
+      const now = performance.now();
+      if (now - last >= 500) {
+        fps = Math.round((frames * 1000) / (now - last));
+        frames = 0;
+        last = now;
+        tileRequests = countTileRequests();
+        if (globeState.globe) {
+          anisotropyLevel = applyAnisotropy(globeState.globe, anisotropy);
+        }
+      }
+      raf = requestAnimationFrame(tick);
+    });
+
+    return () => cancelAnimationFrame(raf);
   });
 
   function handleZoomIn() {
@@ -384,6 +485,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
             selectedRegion = null;
           });
 
+        // Spike-only path styling, configured once. Folds away in production.
+        if (import.meta.env.DEV) {
+          globeState.globe
+            .pathColor(() => 'rgba(255, 255, 255, 0.4)')
+            .pathPointAlt(() => 0.003)
+            .pathTransitionDuration(0);
+        }
+
         globeState.globe.controls().autoRotateSpeed = 1;
 
         // Throttled reaction to camera movement: resizes the points for the
@@ -402,7 +511,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
           const { altitude } = pov;
 
-          if (altitude < 2 && !globeState.isHighResolution) {
+          // Skipped while the spike drives the surface by hand — the
+          // automatic swap would fight it, and this texture is one of the
+          // things being compared. Read from module scope, not component
+          // state: this closure outlives the component (see below).
+          if (
+            !(import.meta.env.DEV && isManualSurface()) &&
+            altitude < 2 &&
+            !globeState.isHighResolution
+          ) {
             globeState.globe.globeImageUrl('/images/earth-highres.jpg');
             globeState.isHighResolution = true;
           }
@@ -473,6 +590,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     if (resizeObserver) {
       resizeObserver.disconnect();
     }
+    // Module state, so it would otherwise outlive the page that set it and be
+    // read by the camera listener on a plain /globe visit.
+    if (import.meta.env.DEV) setManualSurface(false);
   });
 </script>
 
@@ -584,6 +704,24 @@ If not, see <https://www.gnu.org/licenses/>. -->
       onPointerEnter={handleMouseEnter}
       onPointerLeave={handleMouseLeave}
     />
+
+    {#if import.meta.env.DEV && spikeActive}
+      <GlobeSpikePanel
+        {surface}
+        {anisotropy}
+        {overlay}
+        {anisotropyLevel}
+        altitude={globeState.pov.altitude}
+        {tileLevel}
+        {tileRequests}
+        {fps}
+        onSurface={(mode) => (surface = mode)}
+        onAnisotropy={(enabled) => (anisotropy = enabled)}
+        onOverlay={handleOverlay}
+        onClearCache={() =>
+          globeState.globe && clearTileCache(globeState.globe)}
+      />
+    {/if}
   </div>
 
   {#if !globeState.loading}

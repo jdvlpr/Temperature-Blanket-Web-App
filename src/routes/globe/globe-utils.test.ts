@@ -142,14 +142,14 @@ describe('buildGlobeLinkFromLocationsMeta', () => {
   it('reads a "lat,lng" latlong string', () => {
     const meta = JSON.stringify([{ label: 'Oslo', latlong: '59.913,10.739' }]);
     expect(buildGlobeLinkFromLocationsMeta(meta)).toBe(
-      '/globe?lat=59.913&lng=10.739&z=0.6',
+      '/globe?lat=59.913&lng=10.739&z=0.2',
     );
   });
 
   it('falls back to separate lat/lng fields', () => {
     const meta = JSON.stringify([{ label: 'Oslo', lat: 59.913, lng: 10.739 }]);
     expect(buildGlobeLinkFromLocationsMeta(meta)).toBe(
-      '/globe?lat=59.913&lng=10.739&z=0.6',
+      '/globe?lat=59.913&lng=10.739&z=0.2',
     );
   });
 
