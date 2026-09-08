@@ -3,14 +3,14 @@
 This file is part of Temperature-Blanket-Web-App.
 
 Temperature-Blanket-Web-App is free software: you can redistribute it and/or modify it
-under the terms of the GNU General Public License as published by the Free Software Foundation, 
+under the terms of the GNU General Public License as published by the Free Software Foundation,
 either version 3 of the License, or (at your option) any later version.
 
-Temperature-Blanket-Web-App is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
-without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+Temperature-Blanket-Web-App is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 See the GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
+You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
@@ -31,6 +31,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     ChevronRightIcon,
     ClockIcon,
     EarthIcon,
+    GlobeIcon,
     Grid3x3,
     XIcon,
   } from '@lucide/svelte';
@@ -252,15 +253,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
       class="flex scroll-mt-[70px] flex-wrap items-end justify-center text-center"
     >
       <p class="text-surface-700-300 text-xl font-semibold">All Projects</p>
-      <div class="mb-2 flex w-full flex-col items-center justify-center gap-1">
-        <a
-          href="/globe"
-          class="btn btn-sm hover:preset-tonal-surface text-surface-700-300 gap-1 text-xs"
-        >
-          <EarthIcon class="size-4" />
-          Browse by location on the globe
-        </a>
-      </div>
       <div class="mb-2 flex w-full justify-center">
         {#if totalProjects === 0}
           <p class="animate-pulse text-xs">...</p>
