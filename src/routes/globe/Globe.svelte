@@ -28,19 +28,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { MediaQuery } from 'svelte/reactivity';
   import { globeState } from './globe-state.svelte';
   import GlobePlacesPanel from './GlobePlacesPanel.svelte';
-  import GlobeSpikePanel from './GlobeSpikePanel.svelte';
   import {
+    IMAGERY,
     applyAnisotropy,
-    applySurface,
-    clearTileCache,
-    countTileRequests,
-    findTileSource,
-    isManualSurface,
-    loadWorldLines,
-    setManualSurface,
-    tileLevelForAltitude,
-    type SurfaceMode,
-  } from './globe-textures';
+    applyImagery,
+    whenFirstTileLoads,
+  } from './globe-imagery';
   import {
     findNearestRegion,
     hasLabels,
@@ -57,36 +50,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   /** How many places the panel lists at once. The cap is what keeps the DOM
    * small while the camera moves; the panel reports what it leaves out. */
   const PANEL_LIMIT = 30;
-
-  // ---------------------------------------------------------------------------
-  // Zoom-detail spike (dev only, /globe?spike=1). Delete with globe-textures.ts
-  // and GlobeSpikePanel.svelte once the surface question is settled.
-  // ---------------------------------------------------------------------------
-  const spikeActive = $derived(
-    import.meta.env.DEV && page.url.searchParams.has('spike'),
-  );
-  let surface = $state<SurfaceMode>('lowres');
-  let anisotropy = $state(false);
-  let overlay = $state(false);
-  let anisotropyLevel = $state(1);
-  let fps = $state(0);
-  let tileRequests = $state(0);
-  let worldPaths = $state<[number, number][][]>([]);
-
-  const tileLevel = $derived.by(() => {
-    if (!import.meta.env.DEV) return null;
-    const source = findTileSource(surface);
-    if (!source) return null;
-    return tileLevelForAltitude(globeState.pov.altitude, source.maxLevel);
-  });
-
-  async function handleOverlay(enabled: boolean) {
-    if (!import.meta.env.DEV) return;
-    overlay = enabled;
-    if (!enabled || worldPaths.length) return;
-    const lines = await loadWorldLines();
-    if (lines) worldPaths = [...lines.coastline, ...lines.borders];
-  }
 
   // Modern devices detection for hover support
   const canHover = new MediaQuery('(hover: hover)');
@@ -106,6 +69,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let globeContainer: HTMLElement | undefined = $state();
   let resizeObserver: ResizeObserver | undefined = $state();
   let handleCameraChange: ((...args: any[]) => void) | null = null;
+  let stopWaitingForTiles: (() => void) | null = null;
 
   /**
    * The places the panel shows.
@@ -232,64 +196,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     globeState.globe.ringsData(highlightedRegion ? [highlightedRegion] : []);
   });
 
-  // --- spike effects ---------------------------------------------------------
-
-  // Tell the camera listener to stop swapping textures on its own.
-  $effect(() => {
-    if (!import.meta.env.DEV) return;
-    setManualSurface(spikeActive);
-  });
-
-  $effect(() => {
-    if (!import.meta.env.DEV) return;
-    if (!spikeActive || !globeState.globe) return;
-    applySurface(globeState.globe, surface);
-  });
-
-  // Applied here so a toggle takes effect at once; the frame loop below
-  // reapplies it as textures and tiles finish loading.
-  $effect(() => {
-    if (!import.meta.env.DEV) return;
-    if (!spikeActive || !globeState.globe) return;
-    anisotropyLevel = applyAnisotropy(globeState.globe, anisotropy);
-  });
-
-  // Only the data changes here; the accessors are set once at creation. Paths
-  // are left unstroked on purpose — a stroke builds a TubeGeometry per path,
-  // the same per-object cost that made the old label layer unusable.
-  $effect(() => {
-    if (!import.meta.env.DEV) return;
-    if (!globeState.globe) return;
-    globeState.globe.pathsData(spikeActive && overlay ? worldPaths : []);
-  });
-
-  // One frame loop drives the FPS readout, the request count, and the
-  // reapplication of anisotropy to textures that load asynchronously. Reading
-  // `anisotropy` inside the callback is deliberate: it is untracked there, so
-  // the loop is not torn down and rebuilt every time the box is ticked.
-  $effect(() => {
-    if (!import.meta.env.DEV || !spikeActive) return;
-
-    let frames = 0;
-    let last = performance.now();
-    let raf = requestAnimationFrame(function tick() {
-      frames++;
-      const now = performance.now();
-      if (now - last >= 500) {
-        fps = Math.round((frames * 1000) / (now - last));
-        frames = 0;
-        last = now;
-        tileRequests = countTileRequests();
-        if (globeState.globe) {
-          anisotropyLevel = applyAnisotropy(globeState.globe, anisotropy);
-        }
-      }
-      raf = requestAnimationFrame(tick);
-    });
-
-    return () => cancelAnimationFrame(raf);
-  });
-
   function handleZoomIn() {
     if (!globeState.globe) return;
     const { lat, lng, altitude } = globeState.globe.pointOfView();
@@ -406,9 +312,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
         console.error(e);
         globeState.error =
           'Could not load visualization data. Please try again later.';
-      } finally {
-        globeState.loading = false;
       }
+      // Deliberately no `loading = false` here. The data arriving is not the
+      // globe being ready to look at; that is decided below, once imagery has
+      // actually painted. A failed fetch renders the error branch instead.
+      if (globeState.error) globeState.loading = false;
     }
 
     // Wait for DOM to catch up (specifically globeContainer being bound)
@@ -440,12 +348,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
         // Resume animation
         globeState.globe.resumeAnimation();
+
+        // A reused instance still has its tiles, so there is nothing to wait for.
+        globeState.loading = false;
       } else {
         // First time: create the globe from scratch
         globeState.globe = new globeState.Globe(globeContainer)
-          .globeImageUrl('/images/earth-lowres.jpg')
           .backgroundImageUrl('/images/night-sky.png')
-          .bumpImageUrl('/images/earthbumps.jpeg')
           .atmosphereAltitude(0.2)
           .atmosphereColor('lightskyblue')
           .globeCurvatureResolution(8)
@@ -476,22 +385,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
           .ringPropagationSpeed(3)
           .ringRepeatPeriod(700)
           .ringResolution(32)
-          .onGlobeReady(() => {
-            // The instance exists well before the earth texture has decoded,
-            // so keying the overlay off construction flashed a black square.
-            globeState.loading = false;
-          })
           .onGlobeClick(() => {
             selectedRegion = null;
           });
 
-        // Spike-only path styling, configured once. Folds away in production.
-        if (import.meta.env.DEV) {
-          globeState.globe
-            .pathColor(() => 'rgba(255, 255, 255, 0.4)')
-            .pathPointAlt(() => 0.003)
-            .pathTransitionDuration(0);
-        }
+        // Surface imagery. Kept out of the constructor chain because the
+        // tile-engine methods are absent from globe.gl's type definitions.
+        applyImagery(globeState.globe);
+
+        // three-globe reports itself ready the moment a tile url is set,
+        // without waiting for imagery, and the engine parks a black sphere
+        // just under the surface — so the overlay waits for a real tile.
+        stopWaitingForTiles = whenFirstTileLoads(() => {
+          globeState.loading = false;
+          if (globeState.globe) applyAnisotropy(globeState.globe);
+        });
 
         globeState.globe.controls().autoRotateSpeed = 1;
 
@@ -511,18 +419,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
           const { altitude } = pov;
 
-          // Skipped while the spike drives the surface by hand — the
-          // automatic swap would fight it, and this texture is one of the
-          // things being compared. Read from module scope, not component
-          // state: this closure outlives the component (see below).
-          if (
-            !(import.meta.env.DEV && isManualSurface()) &&
-            altitude < 2 &&
-            !globeState.isHighResolution
-          ) {
-            globeState.globe.globeImageUrl('/images/earth-highres.jpg');
-            globeState.isHighResolution = true;
-          }
+          // Tiles that stream in after this point start at anisotropy 1, so
+          // this is reapplied as the camera moves. It only writes when a value
+          // actually differs, so the repeat costs nothing.
+          applyAnisotropy(globeState.globe);
 
           if (Math.abs(altitude - lastAltitude) < 0.015) return;
           lastAltitude = altitude;
@@ -571,8 +471,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
         }
       });
       resizeObserver.observe(globeContainer);
-
-      // Set loading to false once the globe is ready to be shown
+    } else {
+      // No globe to wait on, so nothing will ever clear the overlay otherwise.
       globeState.loading = false;
     }
   });
@@ -590,9 +490,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     if (resizeObserver) {
       resizeObserver.disconnect();
     }
-    // Module state, so it would otherwise outlive the page that set it and be
-    // read by the camera listener on a plain /globe visit.
-    if (import.meta.env.DEV) setManualSurface(false);
+    stopWaitingForTiles?.();
+    stopWaitingForTiles = null;
   });
 </script>
 
@@ -704,24 +603,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
       onPointerEnter={handleMouseEnter}
       onPointerLeave={handleMouseLeave}
     />
-
-    {#if import.meta.env.DEV && spikeActive}
-      <GlobeSpikePanel
-        {surface}
-        {anisotropy}
-        {overlay}
-        {anisotropyLevel}
-        altitude={globeState.pov.altitude}
-        {tileLevel}
-        {tileRequests}
-        {fps}
-        onSurface={(mode) => (surface = mode)}
-        onAnisotropy={(enabled) => (anisotropy = enabled)}
-        onOverlay={handleOverlay}
-        onClearCache={() =>
-          globeState.globe && clearTileCache(globeState.globe)}
-      />
-    {/if}
   </div>
 
   {#if !globeState.loading}
@@ -730,6 +611,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     >
       <p class="text-surface-700-300 text-sm">
         Click a point on the globe, or a place in the list, to see its projects.
+      </p>
+      <!-- Required by the imagery licence; see globe-imagery.ts. -->
+      <p class="text-surface-400-600 text-xs">
+        Imagery: {IMAGERY.attribution}
       </p>
       <!-- Last Updated Notice -->
       {#if globeState.updatedAt}

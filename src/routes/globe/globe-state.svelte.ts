@@ -24,7 +24,6 @@ class GlobeState {
     new (element: HTMLElement, configOptions?: ConfigOptions): GlobeInstance;
   } | null>(null);
   globe = $state<GlobeInstance | null>(null);
-  isHighResolution = $state<boolean>(false);
   /** The user's *intent* for auto-rotation, as set by the play/pause button.
    * Lives here rather than in the component because the globe instance is
    * reused across mounts (see Globe.svelte's onMount), so a component-local
