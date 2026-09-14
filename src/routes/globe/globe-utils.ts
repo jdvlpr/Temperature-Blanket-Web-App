@@ -157,7 +157,7 @@ export interface GlobePointOfView {
 }
 
 /** Altitude bounds, matching what the zoom buttons already allow. */
-const MIN_ALTITUDE = 0.1;
+export const MIN_ALTITUDE = 0.005;
 const MAX_ALTITUDE = 5;
 
 /**
@@ -246,7 +246,7 @@ export function buildGlobeLinkFromLocationsMeta(
   // Placeholder/missing data, same filter the plugin applies.
   if (Math.abs(lat) < 0.0001 && Math.abs(lng) < 0.0001) return null;
 
-  return buildDeepLink({ lat, lng, altitude: 0.2 });
+  return buildDeepLink({ lat, lng, altitude: 0.05 });
 }
 
 /** Stable identity for a region, for keyed `{#each}` blocks and selection. */

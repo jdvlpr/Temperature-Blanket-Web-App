@@ -76,9 +76,10 @@ export interface TileSource {
 
 /** Below this level Blue Marble is used, at and above it Landsat WELD.
  *
- * The page's zoom buttons span roughly level 2 (altitude 2.5) to level 7
- * (altitude 0.1), so this has to sit inside that range or the detailed layer
- * would never be reached by anything but a mouse wheel. */
+ * The page's zoom buttons span roughly level 2 (altitude 2.5) down to
+ * altitude 0.005, well past Landsat's own level-12 ceiling, so this has to
+ * sit inside that range or the detailed layer would never be reached by
+ * anything but a mouse wheel. */
 const LANDSAT_FROM_LEVEL = 6;
 
 const GIBS = 'https://gibs.earthdata.nasa.gov/wmts/epsg3857/best';

@@ -35,6 +35,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     whenFirstTileLoads,
   } from './globe-imagery';
   import {
+    MIN_ALTITUDE,
     declutterRegions,
     findNearestRegion,
     hasLabels,
@@ -384,7 +385,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   function handleZoomIn() {
     if (!globeState.globe) return;
     const { lat, lng, altitude } = globeState.globe.pointOfView();
-    if (altitude > 0.1) {
+    if (altitude > MIN_ALTITUDE) {
       globeState.globe.pointOfView({ lat, lng, altitude: altitude * 0.7 }, 500);
     }
   }
@@ -434,7 +435,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         break;
       case '+':
       case '=':
-        next = { lat, lng, altitude: Math.max(0.1, altitude * 0.7) };
+        next = { lat, lng, altitude: Math.max(MIN_ALTITUDE, altitude * 0.7) };
         break;
       case '-':
       case '_':

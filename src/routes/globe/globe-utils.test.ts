@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  MIN_ALTITUDE,
   buildDeepLink,
   declutterRegions,
   markerApparentPx,
@@ -126,7 +127,7 @@ describe('parseDeepLink', () => {
 
   it('clamps the altitude into the range the zoom buttons allow', () => {
     expect(parse('lat=0&lng=0&z=99')?.altitude).toBe(5);
-    expect(parse('lat=0&lng=0&z=0.0001')?.altitude).toBe(0.1);
+    expect(parse('lat=0&lng=0&z=0.0001')?.altitude).toBe(MIN_ALTITUDE);
   });
 
   it('round-trips through buildDeepLink', () => {
@@ -147,14 +148,14 @@ describe('buildGlobeLinkFromLocationsMeta', () => {
   it('reads a "lat,lng" latlong string', () => {
     const meta = JSON.stringify([{ label: 'Oslo', latlong: '59.913,10.739' }]);
     expect(buildGlobeLinkFromLocationsMeta(meta)).toBe(
-      '/globe?lat=59.913&lng=10.739&z=0.2',
+      '/globe?lat=59.913&lng=10.739&z=0.05',
     );
   });
 
   it('falls back to separate lat/lng fields', () => {
     const meta = JSON.stringify([{ label: 'Oslo', lat: 59.913, lng: 10.739 }]);
     expect(buildGlobeLinkFromLocationsMeta(meta)).toBe(
-      '/globe?lat=59.913&lng=10.739&z=0.2',
+      '/globe?lat=59.913&lng=10.739&z=0.05',
     );
   });
 
@@ -296,10 +297,13 @@ describe('point sizing', () => {
     (pointRadiusDegrees(markerApparentPx(altitude, count), altitude, FOV, H) *
       ((2 * Math.PI * 100) / 360) *
       H) /
-    (2 * 100 * Math.max(altitude, 0.1) * Math.tan((FOV / 2) * (Math.PI / 180)));
+    (2 *
+      100 *
+      Math.max(altitude, MIN_ALTITUDE) *
+      Math.tan((FOV / 2) * (Math.PI / 180)));
 
   it('round-trips: the degrees it returns render at the pixels it was asked for', () => {
-    for (const altitude of [5, 2.5, 0.6, 0.1]) {
+    for (const altitude of [5, 2.5, 0.6, 0.1, MIN_ALTITUDE]) {
       expect(apparentAt(altitude)).toBeCloseTo(
         markerApparentPx(altitude, 1),
         6,
