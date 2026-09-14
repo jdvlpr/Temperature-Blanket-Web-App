@@ -14,7 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. */
 
 import type { GlobeInstance, ConfigOptions } from 'globe.gl';
-import type { GlobePointOfView } from './globe-utils';
+import type { GlobePointOfView, GlobeRegion } from './globe-utils';
 
 class GlobeState {
   data = $state<object[]>([]);
@@ -43,5 +43,40 @@ class GlobeState {
    * dead component and the live one would never update. */
   pov = $state<GlobePointOfView>({ lat: 0, lng: 0, altitude: 2.5 });
   error = $state<string>('');
+
+  /** The region being pointed at, from either the globe or the panel; drives
+   * the ring pulse. Lives here, not in the component, for the same reason pov
+   * does: the globe's hover handler is registered once against an instance
+   * that is reused across mounts, so it must write somewhere that survives a
+   * remount. Keeping one source also makes hovering a point highlight its row
+   * and vice versa. */
+  highlighted = $state<GlobeRegion | null>(null);
+
+  /** True while the cursor is over a point, so the canvas can offer a pointer
+   * instead of the drag cursor. */
+  hoveringPoint = $state<boolean>(false);
+
+  /**
+   * Keys (`regionKey`) of the regions the last declutter recompute kept.
+   * Not `$state` — nothing renders from this directly, it only feeds the
+   * next recompute's hysteresis (see `declutterRegions`) and lets
+   * `nearestPointTo` restrict a near-miss click to regions that actually
+   * have a dot drawn. Plain field so it survives remount for the same
+   * reason `onSelectRegion` does: the throttled camera listener that
+   * maintains it is bound once, to a globe instance kept alive across
+   * mounts.
+   */
+  previouslyKeptKeys = new Set<string>();
+
+  /**
+   * What clicking the globe should select; null clears the selection.
+   *
+   * An indirection because `onPointClick` and `onGlobeClick` are registered
+   * once, when the globe is built, and that globe is deliberately kept alive
+   * across mounts. A handler that closed over the component's own state would
+   * keep writing to the *first* component after a navigation away and back,
+   * leaving clicks on the live page doing nothing. Each mount re-assigns this.
+   */
+  onSelectRegion: ((region: GlobeRegion | null) => void) | null = null;
 }
 export const globeState = new GlobeState();

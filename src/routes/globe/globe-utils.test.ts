@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import {
   buildDeepLink,
+  declutterRegions,
+  markerApparentPx,
+  memoizeScreenOf,
+  pointRadiusDegrees,
   buildGlobeLinkFromLocationsMeta,
   findNearestRegion,
   getRegionLabel,
@@ -10,6 +14,7 @@ import {
   regionsInView,
   searchRegions,
   type GlobeRegion,
+  type ScreenPoint,
 } from './globe-utils';
 
 const region = (
@@ -273,5 +278,232 @@ describe('findNearestRegion', () => {
 
   it('returns null for unusable coordinates', () => {
     expect(findNearestRegion(regions, NaN, 10)).toBeNull();
+  });
+});
+
+describe('point sizing', () => {
+  // The canvas the numbers below assume; the helpers take it as an argument so
+  // a phone gets the same apparent size from a different number of degrees.
+  const H = 700;
+  const FOV = 50;
+  // Mirrors pointRadiusDegrees' own distance-to-marker math (100 * altitude,
+  // not 100 * (1 + altitude) — see that function's doc comment for why).
+  // Deliberately independent of the implementation's internal variable
+  // names, but it does still share the same *formula*, which is why the
+  // anchored test below exists: a self-inverting round-trip can't catch both
+  // sides drifting together back onto the old, wrong distance.
+  const apparentAt = (altitude: number, count = 1) =>
+    (pointRadiusDegrees(markerApparentPx(altitude, count), altitude, FOV, H) *
+      ((2 * Math.PI * 100) / 360) *
+      H) /
+    (2 * 100 * Math.max(altitude, 0.1) * Math.tan((FOV / 2) * (Math.PI / 180)));
+
+  it('round-trips: the degrees it returns render at the pixels it was asked for', () => {
+    for (const altitude of [5, 2.5, 0.6, 0.1]) {
+      expect(apparentAt(altitude)).toBeCloseTo(
+        markerApparentPx(altitude, 1),
+        6,
+      );
+    }
+  });
+
+  it('sizes a point by its distance to the marker, not to the globe center', () => {
+    // Anchored to independently hand-computed values, not to the function's
+    // own inverse — a round-trip test can't catch a bug where both sides
+    // share the same wrong assumption (which is exactly how this shipped
+    // undetected: the distance to the globe's center, 100 * (1 + altitude),
+    // was used where the distance to the marker itself, 100 * altitude,
+    // was needed). Regression coverage for the 2026-09-14 fix: reverting to
+    // the center distance makes every dot render 5x (at altitude 0.25) to
+    // 11x (at the zoom floor, 0.1) too big — exactly the ratio asserted
+    // below — which is what made dots overlap however small
+    // markerApparentPx's own constants were tuned.
+    expect(pointRadiusDegrees(10, 0.25, 50, 642)).toBeCloseTo(0.2080799, 6);
+    expect(pointRadiusDegrees(3, 0.1, 50, 642)).toBeCloseTo(0.0249696, 6);
+  });
+
+  it('grows as the camera comes in, which the old law got backwards', () => {
+    // The law this replaces produced 0.75px at altitude 2.5 but only 0.60px at
+    // the zoom floor, so points shrank exactly where they were being aimed at.
+    expect(markerApparentPx(0.1, 1)).toBeGreaterThan(markerApparentPx(0.6, 1));
+    expect(markerApparentPx(0.6, 1)).toBeGreaterThan(markerApparentPx(2.5, 1));
+  });
+
+  it('is comfortably bigger than the old law at the zoom floor', () => {
+    // Old: 0.60px radius at altitude 0.1. Anything near that is unclickable.
+    expect(markerApparentPx(0.1, 1)).toBeGreaterThan(2);
+  });
+
+  it('stays narrow enough not to overlap at the zoom floor', () => {
+    // Neighbouring regions sit ~16px apart in the densest areas at altitude
+    // 0.1, so even the busiest point has to stay well inside that.
+    expect(markerApparentPx(0.1, 1000)).toBeLessThan(4);
+  });
+
+  it('keeps the wide view close to how it looked before', () => {
+    // Old law gave 0.75px at altitude 2.5. Much fatter would turn dense
+    // regions into one blob, which is the look that was rejected.
+    expect(markerApparentPx(2.5, 1)).toBeLessThan(1.6);
+  });
+
+  it('widens with project count, but only slightly and with a hard cap', () => {
+    const quiet = markerApparentPx(0.1, 1);
+    const busy = markerApparentPx(0.1, 69);
+    expect(busy).toBeGreaterThan(quiet);
+    // The cap is what stops a busy place swallowing its neighbours.
+    expect(busy / quiet).toBeLessThan(1.45);
+    expect(markerApparentPx(0.1, 100000)).toBe(markerApparentPx(0.1, 81));
+  });
+
+  it('survives unusable inputs rather than sizing a point to NaN', () => {
+    expect(Number.isFinite(markerApparentPx(NaN, NaN))).toBe(true);
+    expect(pointRadiusDegrees(3, 0.5, FOV, 0)).toBe(0);
+    expect(pointRadiusDegrees(3, NaN, FOV, H)).toBeGreaterThan(0);
+  });
+});
+
+describe('memoizeScreenOf', () => {
+  it('projects a given region only once, however many times it is asked', () => {
+    let calls = 0;
+    const a = region([{ id: 1, title: 'A' }], 1, 2);
+    const b = region([{ id: 2, title: 'B' }], 3, 4);
+    const screenOf = memoizeScreenOf((r) => {
+      calls++;
+      return { x: r.lat, y: r.lng };
+    });
+
+    expect(screenOf(a)).toEqual({ x: 1, y: 2 });
+    expect(screenOf(b)).toEqual({ x: 3, y: 4 });
+    expect(screenOf(a)).toEqual({ x: 1, y: 2 });
+    expect(calls).toBe(2);
+  });
+});
+
+describe('declutterRegions', () => {
+  // The function under test only ever looks at whatever screenOf returns, so
+  // tests reuse a region's (lat, lng) directly as its (x, y) — there is no
+  // real projection to fake.
+  const screenOf = (r: GlobeRegion): ScreenPoint => ({ x: r.lat, y: r.lng });
+
+  it('keeps every region when they are all far apart', () => {
+    const regions = [
+      region([{ id: 1, title: 'A' }], 0, 0),
+      region([{ id: 2, title: 'B' }], 100, 0),
+      region([{ id: 3, title: 'C' }], 0, 100),
+    ];
+    expect(
+      declutterRegions(regions, screenOf, { spacingPx: 10, budget: 10 }),
+    ).toHaveLength(3);
+  });
+
+  it('drops the lower-priority region when two are too close', () => {
+    const busy = region(
+      [
+        { id: 1, title: 'A' },
+        { id: 2, title: 'A2' },
+      ],
+      0,
+      0,
+    );
+    const quiet = region([{ id: 3, title: 'B' }], 3, 0);
+    // Passed in the opposite of priority order, to prove the result reflects
+    // project count and not array order.
+    expect(
+      declutterRegions([quiet, busy], screenOf, { spacingPx: 10, budget: 10 }),
+    ).toEqual([busy]);
+  });
+
+  it('keeps both once they clear the spacing', () => {
+    const a = region([{ id: 1, title: 'A' }], 0, 0);
+    const b = region([{ id: 2, title: 'B' }], 20, 0);
+    expect(
+      declutterRegions([a, b], screenOf, { spacingPx: 10, budget: 10 }),
+    ).toHaveLength(2);
+  });
+
+  it('enforces the budget after spacing, favouring the busiest regions', () => {
+    const quiet = region([{ id: 1, title: 'A' }], 0, 0);
+    const medium = region(
+      [
+        { id: 2, title: 'B' },
+        { id: 3, title: 'B2' },
+      ],
+      100,
+      0,
+    );
+    const busiest = region(
+      [
+        { id: 4, title: 'C' },
+        { id: 5, title: 'C2' },
+        { id: 6, title: 'C3' },
+      ],
+      200,
+      0,
+    );
+    const kept = declutterRegions([quiet, medium, busiest], screenOf, {
+      spacingPx: 10,
+      budget: 2,
+    });
+    expect(kept).toEqual([busiest, medium]);
+  });
+
+  it('breaks equal-count ties by regionKey, regardless of input order', () => {
+    const a = region([{ id: 1, title: 'A' }], 0, 0); // regionKey "0,0"
+    const b = region([{ id: 2, title: 'B' }], 0, 1); // regionKey "0,1"
+    const opts = { spacingPx: 10, budget: 10 };
+    expect(declutterRegions([a, b], screenOf, opts)).toEqual([a]);
+    expect(declutterRegions([b, a], screenOf, opts)).toEqual([a]);
+  });
+
+  it('lets a previously-kept region survive on less clearance than a fresh candidate needs', () => {
+    const winner = region(
+      Array.from({ length: 5 }, (_, i) => ({ id: i, title: `W${i}` })),
+      0,
+      0,
+    );
+    // Distance 12 from the winner: inside the fresh-entry buffer (10 * 1.4 =
+    // 14, so a first-time candidate is blocked) but outside the bare floor
+    // (10, so an incumbent is not).
+    const contender = region([{ id: 99, title: 'Q' }], 12, 0);
+    const opts = { spacingPx: 10, budget: 10 };
+
+    expect(declutterRegions([contender, winner], screenOf, opts)).toEqual([
+      winner,
+    ]);
+
+    expect(
+      declutterRegions([contender, winner], screenOf, {
+        ...opts,
+        previouslyKept: new Set([regionKey(contender)]),
+      }),
+    ).toEqual([winner, contender]);
+  });
+
+  it('never draws two marks closer than spacingPx, even for two incumbents', () => {
+    // Every other tuning decision (dot radius, DOM tap-target size) assumes
+    // this floor is unconditional — hysteresis is only allowed to make a
+    // fresh candidate's bar *higher*, never let an incumbent's bar drop
+    // below the floor everyone else relies on.
+    const a = region([{ id: 1, title: 'A' }], 0, 0);
+    const b = region([{ id: 2, title: 'B' }], 6, 0); // 6px apart, under the floor
+    const kept = declutterRegions([a, b], screenOf, {
+      spacingPx: 10,
+      budget: 10,
+      previouslyKept: new Set([regionKey(a), regionKey(b)]),
+    });
+    expect(kept.length).toBeLessThanOrEqual(1);
+  });
+
+  it('survives unusable options rather than throwing', () => {
+    const regions = [region([{ id: 1, title: 'A' }], 0, 0)];
+    expect(
+      declutterRegions(regions, screenOf, { spacingPx: 10, budget: 0 }),
+    ).toEqual([]);
+    expect(
+      declutterRegions(regions, screenOf, { spacingPx: 0, budget: 10 }),
+    ).toEqual([]);
+    expect(
+      declutterRegions([], screenOf, { spacingPx: 10, budget: 10 }),
+    ).toEqual([]);
   });
 });

@@ -35,9 +35,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
     whenFirstTileLoads,
   } from './globe-imagery';
   import {
+    declutterRegions,
     findNearestRegion,
     hasLabels,
+    markerApparentPx,
+    memoizeScreenOf,
     parseDeepLink,
+    pointRadiusDegrees,
     regionKey,
     regionsInView,
     searchRegions,
@@ -51,12 +55,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
    * small while the camera moves; the panel reports what it leaves out. */
   const PANEL_LIMIT = 30;
 
+  /** How far a click may miss a point and still count, in canvas pixels.
+   * This is what lets the points stay small: the hit target no longer has to
+   * be the same size as the dot. */
+  const CLICK_TOLERANCE_PX = 20;
+
   // Modern devices detection for hover support
   const canHover = new MediaQuery('(hover: hover)');
 
   // Reactivity
   let selectedRegion = $state<GlobeRegion | null>(null);
-  let highlightedRegion = $state<GlobeRegion | null>(null);
   // Transient hover-suppression, distinct from the user's play/pause intent
   // (globeState.rotationEnabled). Keeping them separate is what lets a
   // deliberate pause survive the mouse leaving the globe. It covers the panel
@@ -148,6 +156,181 @@ If not, see <https://www.gnu.org/licenses/>. -->
     };
   }
 
+  /**
+   * How much bigger to draw a dot than `markerApparentPx`'s own constants
+   * alone would. Safe because declutter guarantees `SPACING_PX` (9px) of
+   * screen-space clearance between any two kept marks — the reason the dot
+   * was ever held down near 1px was overlap, and that constraint is gone
+   * once declutter is thinning the set. The biggest a dot gets is a
+   * max-weight region at the zoom floor, ~3.6px radius unscaled; 1.2x keeps
+   * two such neighbours' combined diameter (~8.7px) under the 9px spacing
+   * with a little margin, so the worst case still doesn't touch.
+   */
+  const DOT_SCALE = 1.2;
+
+  /**
+   * The `pointRadius` accessor, in degrees, for the camera as it is now.
+   *
+   * Handed to the layer afresh whenever the altitude moves, because
+   * three-globe only re-evaluates an accessor when the prop is set. The fov
+   * and canvas height are read from the live globe so the dot is the same size
+   * on a phone as on a desktop.
+   */
+  function pointRadiusAccessor(): (d: object) => number {
+    const globe = globeState.globe;
+    const height = globe?.height() ?? 0;
+    // camera() is typed as the base Camera, which has no fov; the default
+    // perspective camera three.js builds uses 50.
+    const camera = globe?.camera() as { fov?: number } | undefined;
+    const fov = typeof camera?.fov === 'number' ? camera.fov : 50;
+
+    return (d: object) => {
+      const altitude = globeState.pov.altitude;
+      const count = (d as GlobeRegion).projects?.length ?? 0;
+      return pointRadiusDegrees(
+        markerApparentPx(altitude, count) * DOT_SCALE,
+        altitude,
+        fov,
+        height,
+      );
+    };
+  }
+
+  /**
+   * The visible point nearest a spot on the globe, within the click tolerance.
+   *
+   * Compared in canvas pixels rather than degrees, because a tolerance in
+   * degrees would cover a different amount of screen at every zoom and shrink
+   * toward the poles. Runs per click rather than being kept as derived state —
+   * a click is rare, and this way there is nothing extra to keep in sync.
+   *
+   * Returns null on a genuine miss, which the caller reads as "clear".
+   */
+  function nearestPointTo(lat: number, lng: number): GlobeRegion | null {
+    const globe = globeState.globe;
+    if (!globe) return null;
+
+    const width = globe.width();
+    const height = globe.height();
+    const isOnScreen = (region: GlobeRegion) => {
+      const { x, y } = globe.getScreenCoords(region.lat, region.lng, 0);
+      return x >= 0 && x <= width && y >= 0 && y <= height;
+    };
+
+    // Uncapped: the panel's cap of 30 is about what is worth reading, and
+    // clicking a point outside that list still has to work.
+    const { regions } = regionsInView(
+      globeState.data as GlobeRegion[],
+      globeState.pov,
+      Infinity,
+      isOnScreen,
+    );
+
+    // Declutter only draws a dot for the last recompute's kept set, not
+    // every in-view region — falling back to the full in-view list here
+    // would let a tap select a region with no visible dot under it, which is
+    // worse than the overlap this whole change exists to fix.
+    const candidates = regions.filter((r) =>
+      globeState.previouslyKeptKeys.has(regionKey(r.region)),
+    );
+
+    const click = globe.getScreenCoords(lat, lng, 0);
+    let best: GlobeRegion | null = null;
+    let bestDistance = CLICK_TOLERANCE_PX;
+
+    for (const { region } of candidates) {
+      const { x, y } = globe.getScreenCoords(region.lat, region.lng, 0);
+      const distance = Math.hypot(x - click.x, y - click.y);
+      if (distance < bestDistance) {
+        bestDistance = distance;
+        best = region;
+      }
+    }
+    return best;
+  }
+
+  /** Minimum on-screen distance, in canvas pixels, a kept dot guarantees from
+   * every other kept dot — see `declutterRegions`. Small, because the dots
+   * themselves stay only a couple of pixels wide; a small gap is enough to
+   * stop them merging into a blob. */
+  const SPACING_PX = 9;
+  /** Hard cap on how many dots are kept, applied after spacing so a very
+   * dense view degrades to "busiest N regions" rather than an unbounded mesh
+   * count. */
+  const BUDGET = 700;
+
+  /**
+   * Recomputes which regions actually get a dot and hands the result to the
+   * points layer.
+   *
+   * A plain function, not a closure captured once: it reads and writes
+   * nothing but `globeState`, so it is safe to call both from the
+   * once-per-globe-instance throttled camera listener (see onMount) and,
+   * separately, from whichever component instance is live right now — a
+   * reused globe survives remounts, but this function doesn't need to care.
+   */
+  function updatePointSet() {
+    const globe = globeState.globe;
+    if (!globe) return;
+
+    const width = globe.width();
+    const height = globe.height();
+
+    // Memoized per recompute: the on-screen test below and declutterRegions'
+    // own screenOf both need the same region's projected position.
+    const screenOf = memoizeScreenOf((region) =>
+      globe.getScreenCoords(region.lat, region.lng, 0),
+    );
+    const isOnScreen = (region: GlobeRegion) => {
+      const { x, y } = screenOf(region);
+      return x >= 0 && x <= width && y >= 0 && y <= height;
+    };
+
+    // Uncapped candidate set: horizon + on-screen is what should decide
+    // membership, not an arbitrary top-N handed to declutter before it runs.
+    const { regions: onScreen } = regionsInView(
+      globeState.data as GlobeRegion[],
+      globeState.pov,
+      Infinity,
+      isOnScreen,
+    );
+
+    const kept = declutterRegions(
+      onScreen.map((r) => r.region),
+      screenOf,
+      {
+        spacingPx: SPACING_PX,
+        budget: BUDGET,
+        previouslyKept: globeState.previouslyKeptKeys,
+      },
+    );
+    const keptKeys = new Set(kept.map(regionKey));
+    globeState.previouslyKeptKeys = keptKeys;
+
+    // A region can lose its slot mid-hover, with no pointerleave or
+    // onPointHover(null) to clear it — the mesh is just gone. Without this
+    // the ring pulse and pointer cursor stay locked onto a mark that no
+    // longer exists.
+    if (
+      globeState.highlighted &&
+      !keptKeys.has(regionKey(globeState.highlighted))
+    ) {
+      globeState.highlighted = null;
+      globeState.hoveringPoint = false;
+    }
+
+    globe.pointsData(kept);
+  }
+
+  /** Select a region, or clear the selection when passed null. */
+  function selectOrClear(region: GlobeRegion | null) {
+    if (!region) {
+      selectedRegion = null;
+      return;
+    }
+    selectRegion(region);
+  }
+
   /** Expand a region in the panel. Shared by point clicks, rows and search. */
   function selectRegion(region: GlobeRegion) {
     selectedRegion = region;
@@ -193,7 +376,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   // re-feeding pointsData, which would re-diff every point on the sphere.
   $effect(() => {
     if (!globeState.globe) return;
-    globeState.globe.ringsData(highlightedRegion ? [highlightedRegion] : []);
+    globeState.globe.ringsData(
+      globeState.highlighted ? [globeState.highlighted] : [],
+    );
   });
 
   function handleZoomIn() {
@@ -285,6 +470,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
     isPointerOver = false;
   }
 
+  /**
+   * Touch has no hover, so neither handler above ever fires on a phone and the
+   * sphere keeps rotating while the user is trying to aim at a point. Treat
+   * the first touch as the same explicit navigation intent the arrow keys
+   * already carry; the play button puts rotation back.
+   */
+  function handlePointerDown() {
+    if (canHover.current) return;
+    globeState.rotationEnabled = false;
+  }
+
   onMount(async () => {
     if (!browser) return;
 
@@ -363,17 +559,26 @@ If not, see <https://www.gnu.org/licenses/>. -->
           .pointLng('lng')
           .pointLabel(null as any) // Disable hover tooltips (null not in type def)
           // Each point is a cylinder, so this multiplies across every region on
-          // the sphere; 6 segments is indistinguishable at these radii.
-          .pointResolution(6)
-          .pointAltitude((d: any) =>
-            Math.max((d.projects?.length || 1) * 0.002, 0),
+          // the sphere; 8 segments is indistinguishable at these radii.
+          .pointResolution(8)
+          // Flat. Height used to encode the project count uncapped, which made
+          // the busiest region a 94px spike at the zoom floor beside a target
+          // 0.6px wide — it hid its neighbours, and clicking the spike
+          // selected the region at its base rather than under the pointer.
+          // The count is a small width difference now instead.
+          .pointAltitude(0)
+          .pointRadius(pointRadiusAccessor())
+          .pointColor(
+            (d: object) => (d as GlobeRegion).popular_color?.hex ?? '#ffcc00',
           )
-          .pointRadius(0.5)
-          .pointColor((d: any) => {
-            return d.popular_color?.hex || '#ffcc00';
+          .onPointClick((d: object) => {
+            // Through the singleton, never captured: these handlers are bound
+            // once to a globe that outlives the component.
+            globeState.onSelectRegion?.(d as GlobeRegion);
           })
-          .onPointClick((d: any) => {
-            selectRegion(d as GlobeRegion);
+          .onPointHover((d: object | null) => {
+            globeState.hoveringPoint = !!d;
+            globeState.highlighted = (d as GlobeRegion | null) ?? null;
           })
           // A single-datum layer driven by panel hover. Empty by default.
           .ringsData([])
@@ -385,8 +590,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
           .ringPropagationSpeed(3)
           .ringRepeatPeriod(700)
           .ringResolution(32)
-          .onGlobeClick(() => {
-            selectedRegion = null;
+          .onGlobeClick(({ lat, lng }) => {
+            // Clicking near a point counts as clicking it, so the dots can
+            // stay small without being fiddly. A genuine miss still clears.
+            globeState.onSelectRegion?.(nearestPointTo(lat, lng));
           });
 
         // Surface imagery. Kept out of the constructor chain because the
@@ -424,20 +631,29 @@ If not, see <https://www.gnu.org/licenses/>. -->
           // actually differs, so the repeat costs nothing.
           applyAnisotropy(globeState.globe);
 
+          // Every tick, not gated on the altitude check below: rotating at a
+          // constant altitude still moves every region's screen position (and
+          // its foreshortening near the horizon), so which marks are too
+          // close to draw changes on a drag too, not only on a zoom.
+          updatePointSet();
+
           if (Math.abs(altitude - lastAltitude) < 0.015) return;
           lastAltitude = altitude;
 
-          // Generally bigger points: increased multiplier and min/max bounds
-          const newRadius =
-            Math.round(Math.max(0.02, Math.min(0.2, altitude * 0.5)) * 1000) /
-            1000;
-          globeState.globe.pointRadius(newRadius);
+          // Re-hand the accessor so the layer re-reads it at the new altitude:
+          // three-globe only re-evaluates an accessor when the prop is set.
+          globeState.globe.pointRadius(pointRadiusAccessor());
         }, 350);
 
         globeState.globe
           .controls()
           .addEventListener('change', handleCameraChange);
       }
+
+      // Re-registered on every mount, reuse included: the globe's click
+      // handlers were bound once, to the first component, so without this a
+      // return visit would leave clicks updating a component that is gone.
+      globeState.onSelectRegion = selectOrClear;
 
       if (deepLink) {
         globeState.globe.pointOfView(deepLink, 0);
@@ -459,6 +675,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
       // Seed the panel from wherever the camera actually is, covering both the
       // first mount and a return visit to a globe left pointing somewhere else.
       globeState.pov = globeState.globe.pointOfView();
+
+      // Seed the mark set immediately rather than waiting for the first
+      // throttled camera-change tick, which — on a reused globe with rotation
+      // already paused from a prior visit — might not fire at all for a while.
+      updatePointSet();
 
       // Handle responsiveness
       resizeObserver = new ResizeObserver((entries) => {
@@ -487,6 +708,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
       // The rings layer is driven by hover on a panel that is going away.
       globeState.globe.ringsData([]);
     }
+    globeState.highlighted = null;
+    globeState.hoveringPoint = false;
     if (resizeObserver) {
       resizeObserver.disconnect();
     }
@@ -522,12 +745,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
       class="lg:rounded-container relative h-[42dvh] w-full flex-1 overflow-hidden bg-black sm:h-[52dvh] lg:h-[75dvh] lg:shadow-md"
       onmouseenter={handleMouseEnter}
       onmouseleave={handleMouseLeave}
+      onpointerdown={handlePointerDown}
       onkeydown={handleKeydown}
       role="application"
       tabindex="0"
       aria-label="Interactive 3D globe of temperature blanket projects. Use the arrow keys to rotate, plus and minus to zoom. The places currently in view are listed beside the globe."
     >
-      <div bind:this={globeContainer} class="h-full w-full cursor-move"></div>
+      <div
+        bind:this={globeContainer}
+        class="h-full w-full {globeState.hoveringPoint
+          ? 'cursor-pointer'
+          : 'cursor-move'}"
+      ></div>
 
       {#if globeState.loading}
         <div
@@ -598,7 +827,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       loading={globeState.loading}
       isEmpty={globeState.data.length === 0}
       onSelect={toggleRegion}
-      onHover={(region) => (highlightedRegion = region)}
+      onHover={(region) => (globeState.highlighted = region)}
       onChooseResult={chooseResult}
       onPointerEnter={handleMouseEnter}
       onPointerLeave={handleMouseLeave}

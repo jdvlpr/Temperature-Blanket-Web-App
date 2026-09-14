@@ -395,3 +395,238 @@ export function findNearestRegion(
 
   return best;
 }
+
+/**
+ * Point sizing.
+ *
+ * Two defects in the sizing this replaces, both measured:
+ *
+ * 1. The old radius law, `clamp(altitude * 0.5, 0.02, 0.2)`, made points
+ *    *smallest* at the zoom floor — 0.60px at altitude 0.1 against 1.64px at
+ *    0.6 — because the clamp stops tracking altitude below 0.4 while the
+ *    perspective divisor keeps shrinking. Points were at their least clickable
+ *    exactly when the camera was closest and the user was aiming at them.
+ *
+ * 2. Height was `projectCount * 0.002` globe radii, uncapped, which at the
+ *    zoom floor made the busiest region a 94px spike beside a 0.6px-wide
+ *    target. Spikes hid their neighbours, and clicking one selected the region
+ *    at its base rather than under the pointer. Points are flat now, and the
+ *    project count moves into a tightly capped width instead.
+ */
+
+/** Target radius on screen, in canvas pixels, for a point at the camera's
+ * centre. Tapered so a wide view keeps the fine, stippled look of thousands of
+ * separate places rather than turning dense regions into one blob. */
+const BASE_RADIUS_PX = 2.75;
+const ZOOM_OUT_TAPER = 0.6;
+/** How much a busy place is allowed to outgrow a quiet one. Deliberately
+ * small: the whole complaint about the previous attempt was overlap. */
+const WEIGHT_SPREAD = 0.4;
+/** Project count at which the width bonus is already maxed out. */
+const WEIGHT_REFERENCE = 9;
+
+/** Degrees per world unit of arc, matching three-globe's own conversion
+ * (`pxPerDeg` at three-globe.mjs:952) on its radius-100 globe. */
+const PX_PER_DEG = (2 * Math.PI * 100) / 360;
+
+/**
+ * The apparent radius a point should have, in canvas pixels.
+ *
+ * Grows as the camera comes in — the opposite of the law it replaces — and
+ * widens only slightly with the project count.
+ */
+export function markerApparentPx(
+  altitude: number,
+  projectCount: number,
+): number {
+  const alt = Number.isFinite(altitude) ? Math.max(0, altitude) : 0;
+  const count = Number.isFinite(projectCount) ? Math.max(projectCount, 0) : 0;
+  const weight =
+    1 + WEIGHT_SPREAD * Math.min(1, Math.sqrt(count) / WEIGHT_REFERENCE);
+  return (BASE_RADIUS_PX / (1 + ZOOM_OUT_TAPER * alt)) * weight;
+}
+
+/**
+ * Convert a wanted on-screen radius into the degrees `pointRadius` expects.
+ *
+ * three-globe scales a point to `radius * PX_PER_DEG` world units. What that
+ * subtends on screen depends on the *marker's* distance from the camera, not
+ * the camera's distance to the globe's center. The camera sits `100 * (1 +
+ * altitude)` from the center; a marker on the surface, near the middle of
+ * the view, sits `100` units closer along that same ray — its actual depth
+ * is `100 * altitude`, not `100 * (1 + altitude)`. Using the center's
+ * distance here (a bug fixed 2026-09-14, present since this function was
+ * first written) overstated the marker's depth by a factor of
+ * `(1 + altitude) / altitude`, which grows without bound as the camera
+ * comes in — 11x too large at the zoom floor (altitude 0.1) — and is why
+ * every dot rendered far bigger than `markerApparentPx` asked for, no
+ * matter how small its constants were tuned; a self-consistency unit test
+ * across `pointRadiusDegrees`/its own inverse can't catch this, since both
+ * sides shared the same wrong assumption. A perspective camera shows
+ * `2 * distance * tan(fov / 2)` world units of height at a given distance;
+ * inverting that, at the corrected distance, gives a point whose size on
+ * screen is what was asked for, at any zoom. The fov and canvas height are
+ * passed in rather than assumed so this stays right on a phone, and if the
+ * camera is ever changed.
+ */
+export function pointRadiusDegrees(
+  apparentPx: number,
+  altitude: number,
+  fovDegrees: number,
+  canvasHeightPx: number,
+): number {
+  if (!(canvasHeightPx > 0) || !(fovDegrees > 0)) return 0;
+  const alt = Number.isFinite(altitude) ? Math.max(0, altitude) : 0;
+  const distanceToMarker = 100 * Math.max(alt, MIN_ALTITUDE);
+  const visibleWorldHeight =
+    2 * distanceToMarker * Math.tan((fovDegrees / 2) * DEG);
+  return (apparentPx * visibleWorldHeight) / (PX_PER_DEG * canvasHeightPx);
+}
+
+/**
+ * Screen-space declutter.
+ *
+ * No amount of shrinking the dot fixes overlap in the densest areas: at the
+ * default altitude the median neighbour gap there is ~1px, well under even
+ * an invisible dot's minimum useful size. The only way to stop marks
+ * overlapping is to draw fewer of them — this is a greedy pick of which
+ * regions get a mark at all, not a merge of several regions into one. Every
+ * mark that survives is still exactly one region; nothing is aggregated, no
+ * count bubble, no cluster level. (Zoom-step clustering with count bubbles
+ * was tried and rejected on look/feel — see the project memory. This is a
+ * different mechanism: it thins, it does not merge.)
+ */
+
+/** An on-screen position, in canvas pixels. */
+export interface ScreenPoint {
+  x: number;
+  y: number;
+}
+
+/**
+ * A brand-new mark needs this much *more* clearance than an already-kept one
+ * needs to hold its spot. The gap between the two — 1x to 1.4x spacingPx —
+ * is a dead zone: a region drifting slowly across it, as the camera turns,
+ * settles into whichever state (drawn or not) it already had rather than
+ * flapping every recompute. This never relaxes the floor itself — an
+ * incumbent still needs the *full* spacingPx, never less — so every pair of
+ * marks this function returns is guaranteed at least spacingPx apart,
+ * unconditionally. That guarantee is load-bearing: the caller sizes the dot
+ * radius against it (see Globe.svelte's `DOT_SCALE`).
+ */
+const FRESH_ENTRY_BUFFER = 1.4;
+
+export interface DeclutterOptions {
+  /** Minimum on-screen distance any two kept marks are guaranteed to keep
+   * from each other — see `FRESH_ENTRY_BUFFER` for why this is a hard floor
+   * regardless of hysteresis, not just what a first-time candidate needs. */
+  spacingPx: number;
+  /** Hard cap on how many marks are kept, applied after spacing so a very
+   * dense view degrades to "busiest N regions" rather than an unbounded mesh
+   * count. */
+  budget: number;
+  /** Keys (see `regionKey`) of the regions kept on the previous recompute,
+   * for the hysteresis described above. Omit for a first run. */
+  previouslyKept?: ReadonlySet<string>;
+}
+
+/**
+ * Greedily picks which regions get a mark, in priority order, dropping any
+ * region that would land within `spacingPx` of a higher-priority mark
+ * already picked.
+ *
+ * Priority is project count, descending, then `regionKey` — deterministic on
+ * purpose. It must not depend on anything that changes with camera angle, or
+ * which region wins a spacing conflict would flip as the camera moved even
+ * when neither region's own rank changed, which reads as random flicker
+ * rather than a stable "busiest wins" rule.
+ *
+ * Uses a spatial hash grid sized to `spacingPx`, so a candidate only has to
+ * check the (at most) nine cells that could possibly hold a conflicting
+ * point, rather than every mark kept so far. That keeps this O(n) rather
+ * than the O(n^2) an all-pairs check would be — the difference between
+ * ~5000 and ~25,000,000 distance checks per recompute.
+ */
+export function declutterRegions(
+  regions: GlobeRegion[],
+  screenOf: (region: GlobeRegion) => ScreenPoint,
+  { spacingPx, budget, previouslyKept }: DeclutterOptions,
+): GlobeRegion[] {
+  if (!regions.length || budget <= 0 || !(spacingPx > 0)) return [];
+
+  const ranked = [...regions].sort((a, b) => {
+    const byCount = (b.projects?.length ?? 0) - (a.projects?.length ?? 0);
+    if (byCount !== 0) return byCount;
+    const ka = regionKey(a);
+    const kb = regionKey(b);
+    return ka < kb ? -1 : ka > kb ? 1 : 0;
+  });
+
+  // Cell size equals spacingPx, the largest distance that can ever matter, so
+  // any point within range of a candidate is guaranteed to fall in one of its
+  // own cell's eight neighbours. The *entry* threshold (spacingPx *
+  // FRESH_ENTRY_BUFFER) is only ever used to decide whether a fresh candidate
+  // gets blocked — it never widens the cell, since a fresh candidate that
+  // clears the floor but not the buffer is still rejected by the ordinary
+  // distance check against cells within spacingPx.
+  const grid = new Map<string, ScreenPoint[]>();
+  const kept: GlobeRegion[] = [];
+
+  for (const region of ranked) {
+    if (kept.length >= budget) break;
+
+    const p = screenOf(region);
+    const cx = Math.floor(p.x / spacingPx);
+    const cy = Math.floor(p.y / spacingPx);
+    // The floor (spacingPx) applies unconditionally; an incumbent only ever
+    // gets *more* lenient treatment relative to a fresh candidate, never less.
+    const threshold = previouslyKept?.has(regionKey(region))
+      ? spacingPx
+      : spacingPx * FRESH_ENTRY_BUFFER;
+
+    let blocked = false;
+    for (let dx = -1; dx <= 1 && !blocked; dx++) {
+      for (let dy = -1; dy <= 1; dy++) {
+        const bucket = grid.get(`${cx + dx},${cy + dy}`);
+        if (!bucket) continue;
+        if (bucket.some((q) => Math.hypot(p.x - q.x, p.y - q.y) < threshold)) {
+          blocked = true;
+          break;
+        }
+      }
+    }
+    if (blocked) continue;
+
+    const cellKey = `${cx},${cy}`;
+    const bucket = grid.get(cellKey);
+    if (bucket) bucket.push(p);
+    else grid.set(cellKey, [p]);
+    kept.push(region);
+  }
+
+  return kept;
+}
+
+/**
+ * Wraps a screen-projection function with a per-region memo.
+ *
+ * A declutter recompute needs the same region's projected position twice —
+ * once for the on-screen test, once inside `declutterRegions` — and doing
+ * that projection twice per region, every ~350ms while the camera moves, is
+ * the kind of doubled cost that shows up as stutter on a phone rather than
+ * in a unit test. A plain `Map`, not component state: the cache is rebuilt
+ * fresh every recompute and never read by anything that renders from it.
+ */
+export function memoizeScreenOf(
+  project: (region: GlobeRegion) => ScreenPoint,
+): (region: GlobeRegion) => ScreenPoint {
+  const cache = new Map<GlobeRegion, ScreenPoint>();
+  return (region) => {
+    let p = cache.get(region);
+    if (!p) {
+      p = project(region);
+      cache.set(region, p);
+    }
+    return p;
+  };
+}

@@ -235,16 +235,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   {/if} Project Planner
                 </a>
               {/if}
-
-              {#if globeLink}
-                <a
-                  class="btn hover:preset-tonal-surface"
-                  href={globeLink}
-                >
-                  <GlobeIcon />
-                  View on the Globe
-                </a>
-              {/if}
               </div>
 
               <div
@@ -401,6 +391,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   </Accordion.Item>
                 </Accordion>
               </div>
+
+              {#if globeLink}
+                <a
+                  class="link w-fit mx-auto"
+                  href={globeLink}
+                >
+                  View Nearby Projects on the Globe
+                </a>
+              {/if}
             </div>
           {/snippet}
           {#snippet content()}
