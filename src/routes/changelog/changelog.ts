@@ -21,11 +21,13 @@ import {
   CogIcon,
   GlobeIcon,
   ImageIcon,
+  LandmarkIcon,
   MoonStarIcon,
   RocketIcon,
   SquarePlayIcon,
   SquareTerminalIcon,
   WrenchIcon,
+
 } from '@lucide/svelte';
 
 export const entries: ChangelogItemGroup[] = [
@@ -43,7 +45,7 @@ export const entries: ChangelogItemGroup[] = [
                 title: 'Globe Improvements',
               },
               {
-                IconComponent: ImageIcon,
+                IconComponent: LandmarkIcon,
                 text: `Project pages in the <a href="/gallery" class="link">Project Gallery</a> have a new "See nearby projects" button that opens the project's location on the Globe. Project details now open from an "About" button.`,
                 title: 'Project Gallery Updates',
               },
