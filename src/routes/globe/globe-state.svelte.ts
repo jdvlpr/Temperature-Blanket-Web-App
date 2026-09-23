@@ -24,6 +24,15 @@ class GlobeState {
     new (element: HTMLElement, configOptions?: ConfigOptions): GlobeInstance;
   } | null>(null);
   globe = $state<GlobeInstance | null>(null);
+  /** The flat-disc marker module (globe-discs.ts), loaded alongside globe.gl
+   * so three.js stays out of the server bundle. Not reactive: only the
+   * globe's own layer accessors read it. */
+  discs: typeof import('./globe-discs') | null = null;
+  /** Canvas pixels at the top and bottom of the globe hidden behind the
+   * sticky header and the mobile bottom sheet. A region under either is not
+   * "in view": it gets no dot, no list row, and can't be tapped. Zero when the
+   * globe sits beside the panel instead. */
+  viewInsets = $state<{ top: number; bottom: number }>({ top: 0, bottom: 0 });
   /** The user's *intent* for auto-rotation, as set by the play/pause button.
    * Lives here rather than in the component because the globe instance is
    * reused across mounts (see Globe.svelte's onMount), so a component-local

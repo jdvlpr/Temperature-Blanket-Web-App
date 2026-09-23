@@ -15,6 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import { browser } from '$app/environment';
+  import { replaceState } from '$app/navigation';
   import { page } from '$app/state';
   import {
     LoaderCircleIcon,
@@ -24,10 +25,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     ZoomInIcon,
     ZoomOutIcon,
   } from '@lucide/svelte';
-  import { onDestroy, onMount, tick } from 'svelte';
+  import { onDestroy, onMount, tick, untrack } from 'svelte';
   import { MediaQuery } from 'svelte/reactivity';
   import { globeState } from './globe-state.svelte';
   import GlobePlacesPanel from './GlobePlacesPanel.svelte';
+  import GlobeSheet from './GlobeSheet.svelte';
+  import { pluralize } from '$lib/utils/string-utils';
   import {
     IMAGERY,
     applyAnisotropy,
@@ -36,19 +39,24 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from './globe-imagery';
   import {
     MIN_ALTITUDE,
+    PX_PER_DEG,
     declutterRegions,
     findNearestRegion,
+    formatUpdatedAt,
     hasLabels,
     markerApparentPx,
+    markerSpacingPx,
     memoizeScreenOf,
     parseDeepLink,
     pointRadiusDegrees,
     regionKey,
     regionsInView,
     searchRegions,
+    sheetSnapHeights,
     type GlobeRegion,
     type GlobeRegionInView,
     type GlobeSearchResult,
+    type SheetSnap,
   } from './globe-utils';
   import { PUBLIC_WORDPRESS_BASE_URL } from '$env/static/public';
 
@@ -63,6 +71,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   // Modern devices detection for hover support
   const canHover = new MediaQuery('(hover: hover)');
+
+  /** A phone (or small tablet) in portrait: the globe fills the screen and the
+   * places panel is a bottom sheet over it. In landscape the panel sits
+   * beside the globe instead, since a sheet would leave almost no globe. */
+  const sheetMode = new MediaQuery(
+    '(width < 64rem) and (orientation: portrait)',
+  );
+  /** Collapsed on arrival, so the globe gets the whole screen first. */
+  let sheetSnap = $state<SheetSnap>('peek');
+  let sheetLiveHeight = $state(0);
+  let sheetDragging = $state(false);
+  let headerHeight = $state(0);
+  let viewportHeight = $state(0);
+  let globeSize = $state({ width: 0, height: 0 });
+  let headerObserver: ResizeObserver | undefined;
+  const sheetHeights = $derived(sheetSnapHeights(viewportHeight, headerHeight));
 
   // Reactivity
   let selectedRegion = $state<GlobeRegion | null>(null);
@@ -98,9 +122,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     if (globe) {
       const width = globe.width();
       const height = globe.height();
+      const { top: insetTop, bottom: insetBottom } = globeState.viewInsets;
       isOnScreen = (region) => {
         const { x, y } = globe.getScreenCoords(region.lat, region.lng, 0);
-        return x >= 0 && x <= width && y >= 0 && y <= height;
+        return (
+          x >= 0 && x <= width && y >= insetTop && y <= height - insetBottom
+        );
       };
     }
 
@@ -158,18 +185,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 
   /**
-   * How much bigger to draw a dot than `markerApparentPx`'s own constants
-   * alone would. Safe because declutter guarantees `SPACING_PX` (9px) of
-   * screen-space clearance between any two kept marks — the reason the dot
-   * was ever held down near 1px was overlap, and that constraint is gone
-   * once declutter is thinning the set. The biggest a dot gets is a
-   * max-weight region at the zoom floor, ~3.6px radius unscaled; 1.2x keeps
-   * two such neighbours' combined diameter (~8.7px) under the 9px spacing
-   * with a little margin, so the worst case still doesn't touch.
-   */
-  const DOT_SCALE = 1.2;
-
-  /**
    * The `pointRadius` accessor, in degrees, for the camera as it is now.
    *
    * Handed to the layer afresh whenever the altitude moves, because
@@ -189,7 +204,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       const altitude = globeState.pov.altitude;
       const count = (d as GlobeRegion).projects?.length ?? 0;
       return pointRadiusDegrees(
-        markerApparentPx(altitude, count) * DOT_SCALE,
+        markerApparentPx(altitude, count),
         altitude,
         fov,
         height,
@@ -213,9 +228,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     const width = globe.width();
     const height = globe.height();
+    const { top: insetTop, bottom: insetBottom } = globeState.viewInsets;
     const isOnScreen = (region: GlobeRegion) => {
       const { x, y } = globe.getScreenCoords(region.lat, region.lng, 0);
-      return x >= 0 && x <= width && y >= 0 && y <= height;
+      return x >= 0 && x <= width && y >= insetTop && y <= height - insetBottom;
     };
 
     // Uncapped: the panel's cap of 30 is about what is worth reading, and
@@ -250,11 +266,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     return best;
   }
 
-  /** Minimum on-screen distance, in canvas pixels, a kept dot guarantees from
-   * every other kept dot — see `declutterRegions`. Small, because the dots
-   * themselves stay only a couple of pixels wide; a small gap is enough to
-   * stop them merging into a blob. */
-  const SPACING_PX = 9;
   /** Hard cap on how many dots are kept, applied after spacing so a very
    * dense view degrades to "busiest N regions" rather than an unbounded mesh
    * count. */
@@ -276,6 +287,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     const width = globe.width();
     const height = globe.height();
+    const { top: insetTop, bottom: insetBottom } = globeState.viewInsets;
 
     // Memoized per recompute: the on-screen test below and declutterRegions'
     // own screenOf both need the same region's projected position.
@@ -284,7 +296,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     );
     const isOnScreen = (region: GlobeRegion) => {
       const { x, y } = screenOf(region);
-      return x >= 0 && x <= width && y >= 0 && y <= height;
+      return x >= 0 && x <= width && y >= insetTop && y <= height - insetBottom;
     };
 
     // Uncapped candidate set: horizon + on-screen is what should decide
@@ -300,7 +312,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       onScreen.map((r) => r.region),
       screenOf,
       {
-        spacingPx: SPACING_PX,
+        spacingPx: markerSpacingPx(globeState.pov.altitude),
         budget: BUDGET,
         previouslyKept: globeState.previouslyKeptKeys,
       },
@@ -309,7 +321,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     globeState.previouslyKeptKeys = keptKeys;
 
     // A region can lose its slot mid-hover, with no pointerleave or
-    // onPointHover(null) to clear it — the mesh is just gone. Without this
+    // onCustomLayerHover(null) to clear it — the mesh is just gone. Without this
     // the ring pulse and pointer cursor stay locked onto a mark that no
     // longer exists.
     if (
@@ -320,16 +332,38 @@ If not, see <https://www.gnu.org/licenses/>. -->
       globeState.hoveringPoint = false;
     }
 
-    globe.pointsData(kept);
+    // Every recompute re-places and re-sizes every kept disc for the current
+    // camera (three-globe runs the update accessor across the whole set), so
+    // this is also what keeps the discs the right size as the camera zooms.
+    globe.customLayerData(kept);
   }
 
   /** Select a region, or clear the selection when passed null. */
   function selectOrClear(region: GlobeRegion | null) {
     if (!region) {
       selectedRegion = null;
+      // Tapping empty globe on a phone means "let me see the globe".
+      if (sheetMode.current) sheetSnap = 'peek';
       return;
     }
     selectRegion(region);
+    if (sheetMode.current) {
+      // The sheet is about to cover the bottom half of the screen, where the
+      // tapped dot may well be; centre it in the part left showing, the way a
+      // map app does, and open its details.
+      centreOn(region);
+      sheetSnap = 'half';
+    }
+  }
+
+  /** Pan the camera onto a region without changing the zoom. */
+  function centreOn(region: GlobeRegion) {
+    if (!globeState.globe) return;
+    const { altitude } = globeState.globe.pointOfView();
+    globeState.globe.pointOfView(
+      { lat: region.lat, lng: region.lng, altitude },
+      600,
+    );
   }
 
   /** Expand a region in the panel. Shared by point clicks, rows and search. */
@@ -352,6 +386,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   function chooseResult(result: GlobeSearchResult) {
     goToRegion(result.region);
     searchQuery = '';
+    if (sheetMode.current) {
+      // Searching opened the sheet fully; drop it to half so the place the
+      // camera is flying to is visible above it.
+      (document.activeElement as HTMLElement | null)?.blur();
+      sheetSnap = 'half';
+    }
   }
 
   /** Fly the camera to a region and expand it. */
@@ -374,12 +414,88 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 
   // Hovering a row pulses its point. A single-datum rings layer rather than
-  // re-feeding pointsData, which would re-diff every point on the sphere.
+  // re-feeding customLayerData, which would re-diff every point on the sphere.
   $effect(() => {
     if (!globeState.globe) return;
     globeState.globe.ringsData(
       globeState.highlighted ? [globeState.highlighted] : [],
     );
+  });
+
+  /**
+   * On a phone the canvas fills the screen, but the header covers its top and
+   * the sheet its bottom. Shift the camera's projection so the point it looks
+   * at — what zooming, "reset" and a centred region all aim for — lands in the
+   * middle of the part still showing, rather than behind the sheet.
+   *
+   * globe.gl's globeOffset (a three.js view offset underneath) only slides the
+   * rendered image; the camera itself doesn't move, and getScreenCoords and
+   * click picking both go through the same projection, so they stay
+   * consistent with it. globeOffset is what survives a resize — the renderer
+   * re-applies it — but it lands on a debounce, so the camera is also set
+   * directly for the recompute in settle() to see the new position at once.
+   *
+   * Follows the sheet's resting height, not a drag in progress: the globe
+   * shouldn't slide around under the user's finger. A full sheet counts as
+   * half, since the list it shows is of what was visible at half.
+   */
+  let viewOffsetY = 0;
+  let viewOffsetFrame = 0;
+
+  $effect(() => {
+    const globe = globeState.globe;
+    const { width, height } = globeSize;
+    if (!globe || !width || !height) return;
+
+    let top = 0;
+    let bottom = 0;
+    if (sheetMode.current) {
+      top = headerHeight;
+      bottom =
+        sheetSnap === 'full' ? sheetHeights.half : sheetHeights[sheetSnap];
+    }
+    const target = sheetMode.current ? (bottom - top) / 2 : 0;
+
+    const camera = globe.camera() as import('three').PerspectiveCamera;
+    const apply = (offset: number) => {
+      viewOffsetY = offset;
+      // globeOffset moves the globe, so it is the negated view offset.
+      globe.globeOffset([0, -offset]);
+      if (offset === 0) camera.clearViewOffset();
+      else camera.setViewOffset(width, height, 0, offset, width, height);
+      camera.updateProjectionMatrix();
+    };
+    // Untracked: updatePointSet reads and writes globeState, which would
+    // otherwise make this effect depend on — and re-trigger — itself.
+    const settle = () =>
+      untrack(() => {
+        globeState.viewInsets = { top, bottom };
+        // setViewOffset doesn't fire the controls' change event, so recompute
+        // which dots are showing here.
+        updatePointSet();
+      });
+
+    cancelAnimationFrame(viewOffsetFrame);
+    const from = viewOffsetY;
+    const reduceMotion = window.matchMedia(
+      '(prefers-reduced-motion: reduce)',
+    ).matches;
+    if (reduceMotion || Math.abs(target - from) < 1) {
+      apply(target);
+      settle();
+      return;
+    }
+
+    // Eased over the same 300ms the sheet's own transition takes.
+    const start = performance.now();
+    const step = (now: number) => {
+      const t = Math.min(1, (now - start) / 300);
+      const eased = 1 - (1 - t) ** 3;
+      apply(from + (target - from) * eased);
+      if (t < 1) viewOffsetFrame = requestAnimationFrame(step);
+      else settle();
+    };
+    viewOffsetFrame = requestAnimationFrame(step);
   });
 
   function handleZoomIn() {
@@ -402,6 +518,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
     if (!globeState.globe) return;
     globeState.globe.pointOfView({ lat: 0, lng: 0, altitude: 2.5 }, 500);
     selectedRegion = null;
+    if (sheetMode.current) sheetSnap = 'peek';
+    clearDeepLink();
+  }
+
+  /**
+   * Drop a deep link's camera params (see parseDeepLink) from the address bar,
+   * so after a reset a refresh or a shared link doesn't jump back to the
+   * project the visitor arrived from. Replaced rather than pushed: Back should
+   * still return to that project, not to the same globe with the link intact.
+   */
+  function clearDeepLink() {
+    const url = new URL(page.url);
+    const params = ['lat', 'lng', 'z'];
+    if (!params.some((name) => url.searchParams.has(name))) return;
+    for (const name of params) url.searchParams.delete(name);
+    replaceState(url, page.state);
   }
 
   function handleToggleRotate() {
@@ -477,18 +609,35 @@ If not, see <https://www.gnu.org/licenses/>. -->
    * the first touch as the same explicit navigation intent the arrow keys
    * already carry; the play button puts rotation back.
    */
-  function handlePointerDown() {
+  function handlePointerDown(event: PointerEvent) {
     if (canHover.current) return;
+    // The control buttons sit inside the globe's container. Without this, a
+    // tap on pause stops rotation here and the button's own click then
+    // toggles it straight back on.
+    if ((event.target as Element | null)?.closest('button')) return;
     globeState.rotationEnabled = false;
   }
 
   onMount(async () => {
     if (!browser) return;
 
+    // The sheet stops below the sticky app header, and the camera centres
+    // between the two, so both need its real height.
+    const header = document.getElementById('top-navbar');
+    if (header) {
+      headerObserver = new ResizeObserver(() => {
+        headerHeight = header.getBoundingClientRect().height;
+      });
+      headerObserver.observe(header);
+    }
+
     // Ensure library is loaded
     if (!globeState.Globe) {
       const module = await import('globe.gl');
       globeState.Globe = module.default;
+    }
+    if (!globeState.discs) {
+      globeState.discs = await import('./globe-discs');
     }
 
     // Fetch data if needed
@@ -555,29 +704,32 @@ If not, see <https://www.gnu.org/licenses/>. -->
           .atmosphereAltitude(0.2)
           .atmosphereColor('lightskyblue')
           .globeCurvatureResolution(8)
-          .pointsData(globeState.data)
-          .pointLat('lat')
-          .pointLng('lng')
-          .pointLabel(null as any) // Disable hover tooltips (null not in type def)
-          // Each point is a cylinder, so this multiplies across every region on
-          // the sphere; 8 segments is indistinguishable at these radii.
-          .pointResolution(8)
-          // Flat. Height used to encode the project count uncapped, which made
-          // the busiest region a 94px spike at the zoom floor beside a target
-          // 0.6px wide — it hid its neighbours, and clicking the spike
-          // selected the region at its base rather than under the pointer.
-          // The count is a small width difference now instead.
-          .pointAltitude(0)
-          .pointRadius(pointRadiusAccessor())
-          .pointColor(
-            (d: object) => (d as GlobeRegion).popular_color?.hex ?? '#ffcc00',
+          // Flat discs lying on the surface, one per kept region — see
+          // globe-discs.ts for why this isn't three-globe's points layer
+          // (its cylinders always stick up). Seeded by updatePointSet below.
+          .customLayerData([])
+          .customLayerLabel(null as any) // Disable hover tooltips (null not in type def)
+          .customThreeObject((d: object) =>
+            globeState.discs!.createDisc(
+              (d as GlobeRegion).popular_color?.hex ?? '#ffcc00',
+            ),
           )
-          .onPointClick((d: object) => {
+          .customThreeObjectUpdate((obj, d: object) => {
+            const globe = globeState.globe;
+            if (!globe || !globeState.discs) return;
+            const region = d as GlobeRegion;
+            globeState.discs.placeDisc(
+              obj,
+              globe.getCoords(region.lat, region.lng, 0),
+              pointRadiusAccessor()(d) * PX_PER_DEG,
+            );
+          })
+          .onCustomLayerClick((d: object) => {
             // Through the singleton, never captured: these handlers are bound
             // once to a globe that outlives the component.
             globeState.onSelectRegion?.(d as GlobeRegion);
           })
-          .onPointHover((d: object | null) => {
+          .onCustomLayerHover((d: object | null) => {
             globeState.hoveringPoint = !!d;
             globeState.highlighted = (d as GlobeRegion | null) ?? null;
           })
@@ -585,10 +737,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
           .ringsData([])
           .ringLat('lat')
           .ringLng('lng')
-          .ringAltitude(0.015)
+          // On the surface, like the discs: any real height floats the ring
+          // visibly above the map once the camera is close in.
+          .ringAltitude(0.00005)
           .ringColor(() => (t: number) => `rgba(255,255,255,${1 - t})`)
-          .ringMaxRadius(4)
-          .ringPropagationSpeed(3)
+          // In degrees, like the disc radius, so the pulse is sized to the dot
+          // at any zoom rather than covering the whole view when close in.
+          .ringMaxRadius((d: object) => 3 * pointRadiusAccessor()(d))
+          // Degrees per second: scaled with the radius so one pulse always
+          // takes the same time to expand, at any zoom.
+          .ringPropagationSpeed(
+            (d: object) => (3 * pointRadiusAccessor()(d)) / 0.7,
+          )
           .ringRepeatPeriod(700)
           .ringResolution(32)
           .onGlobeClick(({ lat, lng }) => {
@@ -609,11 +769,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
           if (globeState.globe) applyAnisotropy(globeState.globe);
         });
 
-        globeState.globe.controls().autoRotateSpeed = 1;
+        globeState.globe.controls().autoRotateSpeed = 0.08;
 
-        // Throttled reaction to camera movement: resizes the points for the
-        // current zoom and publishes the camera position the panel reads.
-        let lastAltitude = -1;
+        // Throttled reaction to camera movement: re-picks and resizes the
+        // discs for the current view and publishes the camera position the
+        // panel reads.
         handleCameraChange = throttle(() => {
           if (!globeState.globe) return;
           const pov = globeState.globe.pointOfView();
@@ -621,29 +781,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
           // Written to the singleton, not to component state: this closure is
           // registered once against a globe instance that outlives the
           // component, so it must not capture a field that dies with a remount.
-          // Must stay above the early returns below — the panel is derived from
-          // this, so skipping the write leaves it showing a stale camera.
+          // Must also stay above updatePointSet, which sizes and spaces the
+          // discs from this altitude.
           globeState.pov = pov;
-
-          const { altitude } = pov;
 
           // Tiles that stream in after this point start at anisotropy 1, so
           // this is reapplied as the camera moves. It only writes when a value
           // actually differs, so the repeat costs nothing.
           applyAnisotropy(globeState.globe);
 
-          // Every tick, not gated on the altitude check below: rotating at a
+          // Every tick, not only on a zoom: rotating at a
           // constant altitude still moves every region's screen position (and
           // its foreshortening near the horizon), so which marks are too
           // close to draw changes on a drag too, not only on a zoom.
           updatePointSet();
-
-          if (Math.abs(altitude - lastAltitude) < 0.015) return;
-          lastAltitude = altitude;
-
-          // Re-hand the accessor so the layer re-reads it at the new altitude:
-          // three-globe only re-evaluates an accessor when the prop is set.
-          globeState.globe.pointRadius(pointRadiusAccessor());
         }, 350);
 
         globeState.globe
@@ -670,7 +821,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
           deepLink.lat,
           deepLink.lng,
         );
-        if (target) selectRegion(target);
+        if (target) {
+          selectRegion(target);
+          if (sheetMode.current) sheetSnap = 'half';
+        }
       }
 
       // Seed the panel from wherever the camera actually is, covering both the
@@ -686,6 +840,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       resizeObserver = new ResizeObserver((entries) => {
         for (let entry of entries) {
           const { width, height } = entry.contentRect;
+          globeSize = { width, height };
           if (globeState.globe) {
             globeState.globe.width(width);
             globeState.globe.height(height);
@@ -708,7 +863,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
       globeState.globe.pauseAnimation();
       // The rings layer is driven by hover on a panel that is going away.
       globeState.globe.ringsData([]);
+      // The instance outlives this component but the offset's bookkeeping
+      // (viewOffsetY) doesn't, so hand the next mount a clean camera.
+      globeState.globe.globeOffset([0, 0]);
+      const camera =
+        globeState.globe.camera() as import('three').PerspectiveCamera;
+      camera.clearViewOffset();
+      camera.updateProjectionMatrix();
     }
+    // onDestroy also runs during prerendering, where there are no frames.
+    if (browser) cancelAnimationFrame(viewOffsetFrame);
+    globeState.viewInsets = { top: 0, bottom: 0 };
+    headerObserver?.disconnect();
     globeState.highlighted = null;
     globeState.hoveringPoint = false;
     if (resizeObserver) {
@@ -718,6 +884,56 @@ If not, see <https://www.gnu.org/licenses/>. -->
     stopWaitingForTiles = null;
   });
 </script>
+
+<svelte:window bind:innerHeight={viewportHeight} />
+
+{#snippet notes()}
+  {#if !globeState.loading}
+    <div
+      class="flex w-full flex-col items-center justify-center gap-2 px-2 text-center"
+    >
+      <p class="text-surface-700-300 text-sm">
+        Select a point on the globe, or a place in the list, to see its
+        projects.
+      </p>
+      <!-- Required by the imagery licence; see globe-imagery.ts. -->
+      <p class="text-surface-400-600 text-xs">
+        Imagery: {IMAGERY.attribution}
+      </p>
+      {#if globeState.updatedAt}
+        <p class="text-surface-400-600 text-xs">
+          Last updated: {formatUpdatedAt(globeState.updatedAt)}
+        </p>
+      {/if}
+    </div>
+  {/if}
+{/snippet}
+
+{#snippet placesPanel(sheet: boolean)}
+  <GlobePlacesPanel
+    {sheet}
+    inView={placesInView.regions}
+    totalInView={placesInView.total}
+    bind:searchQuery
+    {searchResults}
+    selectedKey={selectedRegion ? regionKey(selectedRegion) : null}
+    hasLabels={globeState.hasLabels}
+    loading={globeState.loading}
+    isEmpty={globeState.data.length === 0}
+    onSelect={toggleRegion}
+    onHover={(region) => (globeState.highlighted = region)}
+    onChooseResult={chooseResult}
+    onPointerEnter={handleMouseEnter}
+    onPointerLeave={handleMouseLeave}
+    onSearchFocus={sheet ? () => (sheetSnap = 'full') : undefined}
+  >
+    {#snippet footer()}
+      <!-- Below lg the panel is as tall as the screen, so the notes that sit
+           under the globe on a desktop live at the end of the list instead. -->
+      <div class="py-4 lg:hidden">{@render notes()}</div>
+    {/snippet}
+  </GlobePlacesPanel>
+{/snippet}
 
 {#if globeState.error !== ''}
   <div
@@ -732,7 +948,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </button>
   </div>
 {:else}
-  <div class="flex w-full flex-col gap-2 lg:flex-row lg:items-start">
+  <div
+    class="flex w-full gap-2 max-lg:landscape:flex-row max-lg:portrait:flex-col lg:flex-row lg:items-start"
+    style:--globe-header-h="{headerHeight}px"
+  >
     <!--
       role="application" is the correct ARIA role for a canvas-driven widget that
       handles its own keys, and it has to be focusable to be reachable at all by
@@ -743,7 +962,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
     <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
     <div
-      class="lg:rounded-container relative h-[42dvh] w-full flex-1 overflow-hidden bg-black sm:h-[52dvh] lg:h-[75dvh] lg:shadow-md"
+      class="lg:rounded-container relative w-full flex-1 overflow-hidden bg-black max-lg:landscape:h-[calc(100dvh-var(--globe-header-h,4rem)-0.5rem)] max-lg:portrait:fixed max-lg:portrait:inset-0 lg:h-[75dvh] lg:shadow-md"
       onmouseenter={handleMouseEnter}
       onmouseleave={handleMouseLeave}
       onpointerdown={handlePointerDown}
@@ -774,8 +993,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </div>
       {/if}
 
-      <!-- UI Controls Overlay -->
-      <div class="absolute right-1/2 bottom-2 z-20 flex translate-x-1/2 gap-2">
+      <!-- UI Controls Overlay. On a phone in portrait, a column at the right
+           edge riding just above the sheet (capped at half height, so a full
+           sheet doesn't carry them up under the header). -->
+      <div
+        class={[
+          'absolute right-1/2 bottom-2 z-20 flex translate-x-1/2 gap-2 max-lg:portrait:right-3 max-lg:portrait:translate-x-0 max-lg:portrait:flex-col',
+          sheetMode.current &&
+            !sheetDragging &&
+            'transition-[bottom] duration-300 ease-out motion-reduce:transition-none',
+        ]}
+        style:bottom={sheetMode.current
+          ? `${Math.min(sheetLiveHeight, sheetHeights.half) + 12}px`
+          : undefined}
+      >
         <button
           onclick={handleToggleRotate}
           class="bg-surface-800/30 hover:bg-surface-700 border-surface-600/40 rounded-lg border p-2 text-white shadow-lg backdrop-blur-sm transition-all"
@@ -818,42 +1049,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </div>
     </div>
 
-    <GlobePlacesPanel
-      inView={placesInView.regions}
-      totalInView={placesInView.total}
-      bind:searchQuery
-      {searchResults}
-      selectedKey={selectedRegion ? regionKey(selectedRegion) : null}
-      hasLabels={globeState.hasLabels}
-      loading={globeState.loading}
-      isEmpty={globeState.data.length === 0}
-      onSelect={toggleRegion}
-      onHover={(region) => (globeState.highlighted = region)}
-      onChooseResult={chooseResult}
-      onPointerEnter={handleMouseEnter}
-      onPointerLeave={handleMouseLeave}
-    />
+    {#if sheetMode.current}
+      <GlobeSheet
+        bind:snap={sheetSnap}
+        bind:liveHeight={sheetLiveHeight}
+        bind:dragging={sheetDragging}
+        heights={sheetHeights}
+        label={globeState.loading
+          ? 'Loading places...'
+          : `${placesInView.total} ${pluralize('place', placesInView.total)} in view`}
+      >
+        {@render placesPanel(true)}
+      </GlobeSheet>
+    {:else}
+      {@render placesPanel(false)}
+    {/if}
   </div>
 
-  {#if !globeState.loading}
-    <div
-      class="mt-2 mb-4 flex w-full flex-col items-center justify-center gap-2 px-2 text-center"
-    >
-      <p class="text-surface-700-300 text-sm">
-        Click a point on the globe, or a place in the list, to see its projects.
-      </p>
-      <!-- Required by the imagery licence; see globe-imagery.ts. -->
-      <p class="text-surface-400-600 text-xs">
-        Imagery: {IMAGERY.attribution}
-      </p>
-      <!-- Last Updated Notice -->
-      {#if globeState.updatedAt}
-        <p class="text-surface-400-600 pointer-events-none text-xs">
-          Updated once a day. Last updated: {new Date(
-            globeState.updatedAt.replace(' ', 'T'),
-          ).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}
-        </p>
-      {/if}
-    </div>
-  {/if}
+  <div class="mt-2 mb-4 max-lg:hidden">{@render notes()}</div>
 {/if}

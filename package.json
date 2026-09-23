@@ -30,7 +30,8 @@
     "idb-keyval": "^6.2.6",
     "jspdf": "^4.2.1",
     "node-fetch": "^3.3.2",
-    "suncalc": "^2.0.0"
+    "suncalc": "^2.0.0",
+    "three": "0.183.2"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
@@ -47,6 +48,7 @@
     "@types/google.accounts": "^0.0.18",
     "@types/node": "^26.2.0",
     "@types/suncalc": "^1.9.2",
+    "@types/three": "~0.183.1",
     "@typescript-eslint/eslint-plugin": "^8.62.1",
     "@typescript-eslint/parser": "^8.62.1",
     "@vincjo/datatables": "^2.8.1",

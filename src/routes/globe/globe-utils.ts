@@ -199,6 +199,32 @@ export function buildDeepLink({
 }
 
 /**
+ * The first location's name from a gallery project's `locations` meta — the
+ * place the globe link points at — or null when there is none. Cleaned the
+ * same way the project title is: older projects can carry a blank city
+ * (`", ,"`) or stray HTML.
+ */
+export function firstLocationLabelFromLocationsMeta(
+  locations: string | null | undefined,
+): string | null {
+  if (!locations) return null;
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(locations);
+  } catch {
+    return null;
+  }
+  if (!Array.isArray(parsed) || !parsed.length) return null;
+  const raw = (parsed[0] as { label?: unknown })?.label;
+  if (typeof raw !== 'string') return null;
+  const label = raw
+    .replace(/<[^>]*>/g, '')
+    .replace(/,\s*,/g, ',')
+    .trim();
+  return label || null;
+}
+
+/**
  * Build a "see this place on the globe" link from a gallery project's
  * `locations` meta (a JSON string).
  *
@@ -414,36 +440,61 @@ export function findNearestRegion(
  *    project count moves into a tightly capped width instead.
  */
 
-/** Target radius on screen, in canvas pixels, for a point at the camera's
- * centre. Tapered so a wide view keeps the fine, stippled look of thousands of
- * separate places rather than turning dense regions into one blob. */
-const BASE_RADIUS_PX = 2.75;
-const ZOOM_OUT_TAPER = 0.6;
-/** How much a busy place is allowed to outgrow a quiet one. Deliberately
- * small: the whole complaint about the previous attempt was overlap. */
-const WEIGHT_SPREAD = 0.4;
+/** Target radius on screen, in canvas pixels, at the default whole-globe
+ * view — a ~10px dot, big enough to aim at with a finger or a mouse. */
+const BASE_RADIUS_PX = 5;
+/** The altitude `BASE_RADIUS_PX` applies at; zooming out past it keeps it. */
+const GROWTH_FROM_ALTITUDE = 2.5;
+/** How quickly dots grow as the camera comes in: radius goes as
+ * `altitude^-GROWTH_EXPONENT`, i.e. ~14px dots at altitude 0.6, ~20px at 0.1.
+ * Close in, neighbouring places are far apart on screen, so there is room for
+ * a dot big enough to read as a marker on the map rather than a speck. */
+const GROWTH_EXPONENT = 0.22;
+/** Cap on the growth, reached around altitude 0.02 (~24px dots). */
+const MAX_BASE_RADIUS_PX = 12;
+/** How much a busy place is allowed to outgrow a quiet one. */
+const WEIGHT_SPREAD = 0.3;
 /** Project count at which the width bonus is already maxed out. */
 const WEIGHT_REFERENCE = 9;
+/** Clear screen space kept between the edges of the two widest dots. */
+const MARKER_GAP_PX = 4;
 
-/** Degrees per world unit of arc, matching three-globe's own conversion
+/** World units of arc per degree, matching three-globe's own conversion
  * (`pxPerDeg` at three-globe.mjs:952) on its radius-100 globe. */
-const PX_PER_DEG = (2 * Math.PI * 100) / 360;
+export const PX_PER_DEG = (2 * Math.PI * 100) / 360;
+
+function baseRadiusPx(altitude: number): number {
+  const alt = Number.isFinite(altitude)
+    ? Math.max(MIN_ALTITUDE, altitude)
+    : GROWTH_FROM_ALTITUDE;
+  const growth = Math.max(1, (GROWTH_FROM_ALTITUDE / alt) ** GROWTH_EXPONENT);
+  return Math.min(MAX_BASE_RADIUS_PX, BASE_RADIUS_PX * growth);
+}
 
 /**
  * The apparent radius a point should have, in canvas pixels.
  *
- * Grows as the camera comes in — the opposite of the law it replaces — and
- * widens only slightly with the project count.
+ * Grows as the camera comes in and widens only slightly with the project
+ * count. Never overlaps a neighbour: `markerSpacingPx` is derived from it.
  */
 export function markerApparentPx(
   altitude: number,
   projectCount: number,
 ): number {
-  const alt = Number.isFinite(altitude) ? Math.max(0, altitude) : 0;
   const count = Number.isFinite(projectCount) ? Math.max(projectCount, 0) : 0;
   const weight =
     1 + WEIGHT_SPREAD * Math.min(1, Math.sqrt(count) / WEIGHT_REFERENCE);
-  return (BASE_RADIUS_PX / (1 + ZOOM_OUT_TAPER * alt)) * weight;
+  return baseRadiusPx(altitude) * weight;
+}
+
+/**
+ * Minimum on-screen distance, in canvas pixels, between the centres of any two
+ * dots `declutterRegions` keeps at this altitude: two of the widest possible
+ * dots side by side, plus a visible gap. Scales with the dots, so bigger dots
+ * close in never touch, and the wide view isn't thinned more than it needs.
+ */
+export function markerSpacingPx(altitude: number): number {
+  return 2 * baseRadiusPx(altitude) * (1 + WEIGHT_SPREAD) + MARKER_GAP_PX;
 }
 
 /**
@@ -512,7 +563,7 @@ export interface ScreenPoint {
  * incumbent still needs the *full* spacingPx, never less — so every pair of
  * marks this function returns is guaranteed at least spacingPx apart,
  * unconditionally. That guarantee is load-bearing: the caller sizes the dot
- * radius against it (see Globe.svelte's `DOT_SCALE`).
+ * radius against it (see `markerSpacingPx` and `markerApparentPx`).
  */
 const FRESH_ENTRY_BUFFER = 1.4;
 
@@ -629,4 +680,95 @@ export function memoizeScreenOf(
     }
     return p;
   };
+}
+
+/**
+ * Formats the globe data's `updated_at` for display.
+ *
+ * WordPress writes it with `current_time('mysql')` — the site's own timezone
+ * (Europe/Sarajevo) with no offset — so parsing it as a `Date` would read it
+ * as the *visitor's* local time and show the wrong hour anywhere else. Without
+ * an offset, only the calendar date is shown, taken straight from the string.
+ * A timestamp that does carry an offset (or `Z`) is shown in local time.
+ */
+export function formatUpdatedAt(
+  updatedAt: string,
+  locales?: Intl.LocalesArgument,
+): string {
+  const value = updatedAt.trim();
+  if (/(Z|[+-]\d{2}:?\d{2})$/.test(value)) {
+    const date = new Date(value.replace(' ', 'T'));
+    if (!Number.isNaN(date.getTime())) {
+      return date.toLocaleString(locales, {
+        dateStyle: 'medium',
+        timeStyle: 'short',
+      });
+    }
+  }
+  const match = /^(\d{4})-(\d{2})-(\d{2})/.exec(value);
+  if (!match) return value;
+  const [, year, month, day] = match.map(Number);
+  // Built and formatted in UTC so the date can't shift a day either way.
+  return new Date(Date.UTC(year, month - 1, day)).toLocaleDateString(locales, {
+    dateStyle: 'medium',
+    timeZone: 'UTC',
+  });
+}
+
+/**
+ * Mobile bottom sheet.
+ *
+ * On a phone in portrait the globe fills the screen and the places panel is a
+ * sheet over its bottom edge, dragged by its handle between three resting
+ * heights — the pattern map apps use, so a swipe on the globe always moves
+ * the globe and a swipe on the handle always moves the sheet.
+ */
+export type SheetSnap = 'peek' | 'half' | 'full';
+
+/** Resting height of the collapsed sheet: the handle, a summary line and the
+ * search box. */
+export const SHEET_PEEK_PX = 116;
+
+/** Resting heights, in CSS pixels, for a viewport of this height below a
+ * header of this height. Always ordered peek <= half <= full. */
+export function sheetSnapHeights(
+  viewportHeight: number,
+  headerHeight: number,
+): Record<SheetSnap, number> {
+  const vh = Number.isFinite(viewportHeight) ? Math.max(0, viewportHeight) : 0;
+  const header = Number.isFinite(headerHeight) ? Math.max(0, headerHeight) : 0;
+  const full = Math.max(SHEET_PEEK_PX, Math.round(vh - header - 12));
+  const half = Math.min(full, Math.max(SHEET_PEEK_PX, Math.round(vh * 0.5)));
+  return { peek: SHEET_PEEK_PX, half, full };
+}
+
+/** A release faster than this, in px/ms, is a fling: it goes to the next
+ * resting height in its direction rather than the nearest one. */
+const SHEET_FLING_PX_PER_MS = 0.5;
+
+/**
+ * Where the sheet should come to rest after a drag released at `height`.
+ * `velocity` is in px/ms, positive when moving up (the sheet growing).
+ */
+export function settleSheet(
+  height: number,
+  velocity: number,
+  heights: Record<SheetSnap, number>,
+): SheetSnap {
+  const order: SheetSnap[] = ['peek', 'half', 'full'];
+  if (Number.isFinite(velocity) && Math.abs(velocity) > SHEET_FLING_PX_PER_MS) {
+    if (velocity > 0) {
+      return order.find((snap) => heights[snap] > height + 1) ?? 'full';
+    }
+    return (
+      [...order].reverse().find((snap) => heights[snap] < height - 1) ?? 'peek'
+    );
+  }
+  let best: SheetSnap = 'peek';
+  for (const snap of order) {
+    if (Math.abs(heights[snap] - height) < Math.abs(heights[best] - height)) {
+      best = snap;
+    }
+  }
+  return best;
 }

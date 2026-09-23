@@ -21,41 +21,41 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import AppShell from '$lib/components/AppShell.svelte';
   import Card from '$lib/components/Card.svelte';
   import ColorPalette from '$lib/components/ColorPalette.svelte';
-  import Spinner from '$lib/components/Spinner.svelte';
   import YarnSources from '$lib/components/YarnSources.svelte';
   import ViewToggle from '$lib/components/buttons/ViewToggle.svelte';
-  import { ALL_YARN_WEIGHTS } from '$lib/constants/color-constants';
   import { ensureYarnData } from '$lib/data/yarns/colorways.svelte';
-  import { safeSlide } from '$lib/features/transitions/safeSlide';
   import { allGaugesAttributes } from '$lib/state/gauges-state.svelte';
   import { locations } from '$lib/state/location-state.svelte';
-  import { buildGlobeLinkFromLocationsMeta } from '../../globe/globe-utils';
+  import { dialog } from '$lib/state/page-state.svelte';
   import { preferences } from '$lib/storage/preferences.svelte';
-  import { exists } from '$lib/utils/other-utils';
-  import {
-    getProjectParametersFromURLHash,
-    getTitleFromLocationsMeta,
-  } from '$lib/utils/project-utils.svelte';
+  import type { GaugeRange, GaugeRangeCategory } from '$lib/types/gauge-types';
+  import type { Color } from '$lib/types/yarn-types';
   import { getTextColor } from '$lib/utils/color-utils';
   import {
     gaugeParamsHaveYarnDetails,
     parseGaugeURLHash,
   } from '$lib/utils/load-project-utils.svelte';
-  import { pluralize, stripHTMLTags } from '$lib/utils/string-utils';
+  import { exists } from '$lib/utils/other-utils';
+  import {
+    getProjectParametersFromURLHash,
+    getTitleFromLocationsMeta,
+  } from '$lib/utils/project-utils.svelte';
+  import { stripHTMLTags } from '$lib/utils/string-utils';
   import {
     ArrowLeftIcon,
-    ChevronDown,
     GlobeIcon,
     InfoIcon,
     NotebookPenIcon,
     ShoppingCartIcon,
+    SwatchBookIcon
   } from '@lucide/svelte';
-  import { Accordion } from '@skeletonlabs/skeleton-svelte';
-  import { onMount } from 'svelte';
+  import {
+    buildGlobeLinkFromLocationsMeta,
+    firstLocationLabelFromLocationsMeta,
+  } from '../../globe/globe-utils';
   import { yarnPageState } from '../../yarn/state.svelte';
   import type { PageData } from './$types';
-  import type { Color } from '$lib/types/yarn-types';
-  import type { GaugeRange, GaugeRangeCategory } from '$lib/types/gauge-types';
+  import AboutProjectDialog from './AboutProjectDialog.svelte';
 
   let { data }: { data: PageData } = $props();
 
@@ -72,6 +72,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let globeLink = $derived(
     project ? buildGlobeLinkFromLocationsMeta(project.locations) : null,
   );
+  // The link goes to the first location, so name that one: short button text,
+  // with the place spelled out for screen readers and on hover.
+  let globeLinkLabel = $derived.by(() => {
+    const place = project
+      ? firstLocationLabelFromLocationsMeta(project.locations)
+      : null;
+    return place
+      ? `See projects near ${place} on the globe`
+      : 'See nearby projects on the globe';
+  });
   let weatherSources = $derived(
     project?.weatherSources ? JSON.parse(project?.weatherSources) : null,
   );
@@ -88,7 +98,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
     if (gaugeParamsHaveYarnDetails(params)) ensureYarnData();
   });
 
-  let aboutState = $state<string[]>([]);
+  function openAbout() {
+    dialog.trigger({
+      type: 'component',
+      component: {
+        ref: AboutProjectDialog,
+        props: {
+          project,
+          title: projectTitleNoHTML,
+          reshapedColors,
+          weatherSources,
+        },
+      },
+      options: { size: 'medium' },
+    });
+  }
 
   let reshapedColors = $derived.by(() => {
     if (!flatColors) return null;
@@ -223,183 +247,46 @@ If not, see <https://www.gnu.org/licenses/>. -->
               </p>
 
               <div class="flex flex-wrap items-center justify-center gap-4">
-              {#if projectURL}
-                <a
-                  class="btn preset-filled-primary-500"
-                  href={projectURL}
-                  target={locations.allValid ? '_blank' : '_self'}
-                >
-                <NotebookPenIcon />
-                  Open in {#if locations.allValid}
-                    New
-                  {/if} Project Planner
-                </a>
-              {/if}
+                {#if projectURL}
+                  <a
+                    class="btn preset-filled-primary-500"
+                    href={projectURL}
+                    target={locations.allValid ? '_blank' : '_self'}
+                  >
+                    <NotebookPenIcon />
+                    Open in {#if locations.allValid}
+                      New
+                    {/if} Project Planner
+                  </a>
+                {/if}
+                {#if globeLink}
+                  <!-- Secondary to the planner: tonal rather than filled. -->
+                  <a
+                    class="btn hover:preset-tonal-surface"
+                    href={globeLink}
+                    aria-label={globeLinkLabel}
+                    title={globeLinkLabel}
+                  >
+                    <GlobeIcon />
+                    See Nearby Projects
+                  </a>
+                {/if}
+                {#if project}
+                  <!-- The least prominent of the three: reference details,
+                       in a dialog rather than an inline accordion that pushed
+                       the preview image down when opened. -->
+                  <button
+                    type="button"
+                    class="btn hover:preset-tonal-surface"
+                    aria-label="About this project"
+                    title="About this project"
+                    onclick={openAbout}
+                  >
+                    <InfoIcon />
+                    About
+                  </button>
+                {/if}
               </div>
-
-              <div
-                class="preset-tonal-tertiary rounded-container mx-auto mt-2 w-full max-w-(--breakpoint-sm) text-left"
-              >
-                <Accordion
-                  value={aboutState}
-                  onValueChange={(e) => (aboutState = e.value)}
-                  collapsible
-                >
-                  <Accordion.Item value="weather-data-inaccurate">
-                    <Accordion.ItemTrigger
-                      class="flex items-center justify-between gap-2"
-                    >
-                      <InfoIcon />
-
-                      <p class="">About this Project</p>
-
-                      <Accordion.ItemIndicator class="group">
-                        <ChevronDown
-                          class="h-5 w-5 transition group-data-[state=open]:rotate-180"
-                        />
-                      </Accordion.ItemIndicator>
-                    </Accordion.ItemTrigger>
-                    <Accordion.ItemContent>
-                      {#snippet element(attributes)}
-                        {#if !attributes.hidden}
-                          <div {...attributes} transition:safeSlide>
-                            <div class="flex flex-col gap-2">
-                              <p class="">
-                                <span class="font-bold">Date Created:</span>
-                                {new Date(project?.date).toLocaleDateString(
-                                  undefined,
-                                  {
-                                    timeZone: 'UTC',
-                                  },
-                                )}
-                              </p>
-
-                              {#if JSON.stringify(reshapedColors) !== '{}'}
-                                {#if reshapedColors?.some((item) => item.brandName && item.yarnName)}
-                                  <span class="">
-                                    <span class="font-bold">Yarn</span>:
-                                    <div class="flex flex-col gap-2 pl-4">
-                                      {#each reshapedColors as { brandName, yarnName, yarnWeightId, colors }}
-                                        {@const yarnWeightName =
-                                          ALL_YARN_WEIGHTS.find(
-                                            (n) => n.id === yarnWeightId,
-                                          )?.name}
-                                        {#if brandName && yarnName}
-                                          <div>
-                                            <span>
-                                              {brandName}
-                                              -
-                                              {yarnName}
-                                              <span class="text-sm opacity-70">
-                                                ({#if yarnWeightName}
-                                                  <a
-                                                    href="/blog/yarn-weights?highlight={yarnWeightName}"
-                                                    class="link"
-                                                    target="_blank"
-                                                    title="See the yarn weights chart"
-                                                    >{yarnWeightName}</a
-                                                  >,
-                                                {/if}{colors.length}
-                                                {pluralize(
-                                                  'colorway',
-                                                  colors.length,
-                                                )})
-                                              </span>
-                                            </span>
-                                            <div class="pl-4">
-                                              {#each colors as { name, hex }, index}
-                                                <div
-                                                  class="flex items-center gap-2"
-                                                >
-                                                  <div
-                                                    class="h-4 w-4 rounded-full"
-                                                    style="background:{hex};"
-                                                  ></div>
-                                                  <p class="">
-                                                    {name}
-                                                  </p>
-                                                </div>
-                                              {/each}
-                                            </div>
-                                          </div>
-                                        {/if}
-                                      {/each}
-                                    </div>
-                                  </span>
-                                {/if}
-                              {/if}
-
-                              {#if project?.projectTags.nodes[0].name}
-                                <p>
-                                  <span class="font-bold">Pattern Type</span>:
-                                  <span class=""
-                                    >{project?.projectTags.nodes[0].name}</span
-                                  >
-                                </p>
-                              {/if}
-
-                              {#if project?.projectTags.nodes[0].description}
-                                <p>
-                                  <span class="font-bold"
-                                    >Pattern Description</span
-                                  >:
-                                  <span class="">
-                                    {project?.projectTags.nodes[0]
-                                      .description}</span
-                                  >
-                                </p>
-                              {/if}
-
-                              {#if project?.totalDays}
-                                <p>
-                                  <span class="font-bold">Total Days</span>:
-                                  <span class="">{project?.totalDays}</span>
-                                </p>
-                              {/if}
-
-                              {#if project?.missingDays}
-                                <p>
-                                  <span class="font-bold"
-                                    >Days Without Weather Data</span
-                                  >:
-                                  <span class="">{project?.missingDays}</span>
-                                </p>
-                              {/if}
-
-                              {#if weatherSources}
-                                {#each weatherSources as { name, url }}
-                                  <p>
-                                    <span class="font-bold">Weather Source</span
-                                    >:
-                                    <a href={url} target="_blank" class="link"
-                                      >{name}</a
-                                    >
-                                  </p>
-                                {/each}
-                              {/if}
-
-                              <p class="italic">
-                                The preview image below may not reflect the most
-                                recent weather information. Open the project in
-                                the Project Planner to see any updates.
-                              </p>
-                            </div>
-                          </div>
-                        {/if}
-                      {/snippet}
-                    </Accordion.ItemContent>
-                  </Accordion.Item>
-                </Accordion>
-              </div>
-
-              {#if globeLink}
-                <a
-                  class="link w-fit mx-auto"
-                  href={globeLink}
-                >
-                  View Nearby Projects on the Globe
-                </a>
-              {/if}
             </div>
           {/snippet}
           {#snippet content()}
@@ -458,6 +345,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
                               }}
                               href="/yarn"
                             >
+                                <SwatchBookIcon />
+
                               Open in Yarn Palette Creator
                               <svg
                                 xmlns="http://www.w3.org/2000/svg"

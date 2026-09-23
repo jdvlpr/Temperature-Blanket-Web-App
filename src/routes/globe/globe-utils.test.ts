@@ -2,18 +2,23 @@ import { describe, expect, it } from 'vitest';
 import {
   MIN_ALTITUDE,
   buildDeepLink,
+  formatUpdatedAt,
   declutterRegions,
   markerApparentPx,
+  markerSpacingPx,
   memoizeScreenOf,
   pointRadiusDegrees,
   buildGlobeLinkFromLocationsMeta,
   findNearestRegion,
+  firstLocationLabelFromLocationsMeta,
   getRegionLabel,
   hasLabels,
   parseDeepLink,
   regionKey,
   regionsInView,
   searchRegions,
+  settleSheet,
+  sheetSnapHeights,
   type GlobeRegion,
   type ScreenPoint,
 } from './globe-utils';
@@ -333,21 +338,31 @@ describe('point sizing', () => {
     expect(markerApparentPx(0.6, 1)).toBeGreaterThan(markerApparentPx(2.5, 1));
   });
 
-  it('is comfortably bigger than the old law at the zoom floor', () => {
-    // Old: 0.60px radius at altitude 0.1. Anything near that is unclickable.
-    expect(markerApparentPx(0.1, 1)).toBeGreaterThan(2);
+  it('is big enough to click at every zoom level', () => {
+    // A ~2px dot at the default view was the complaint; 3.5px radius (a 7px
+    // dot) is the floor anywhere from the zoom floor out past the default.
+    for (const altitude of [MIN_ALTITUDE, 0.1, 0.6, 2.5, 3]) {
+      expect(markerApparentPx(altitude, 1)).toBeGreaterThanOrEqual(3.5);
+    }
   });
 
-  it('stays narrow enough not to overlap at the zoom floor', () => {
-    // Neighbouring regions sit ~16px apart in the densest areas at altitude
-    // 0.1, so even the busiest point has to stay well inside that.
-    expect(markerApparentPx(0.1, 1000)).toBeLessThan(4);
+  it('is noticeably bigger when zoomed in than at the whole-globe view', () => {
+    // The complaint was dots "still too small, especially when zoomed in":
+    // close in, a dot should read as a marker on the map, not a speck.
+    expect(markerApparentPx(0.1, 1)).toBeGreaterThanOrEqual(
+      2 * markerApparentPx(2.5, 1),
+    );
+    expect(2 * markerApparentPx(MIN_ALTITUDE, 1)).toBeGreaterThanOrEqual(20);
   });
 
-  it('keeps the wide view close to how it looked before', () => {
-    // Old law gave 0.75px at altitude 2.5. Much fatter would turn dense
-    // regions into one blob, which is the look that was rejected.
-    expect(markerApparentPx(2.5, 1)).toBeLessThan(1.6);
+  it('never lets two of the widest dots touch at declutter spacing', () => {
+    // Declutter keeps dot centres markerSpacingPx apart. Two maxed-out dots
+    // side by side must still leave a visible gap at every zoom, or the size
+    // and spacing have drifted apart.
+    for (const altitude of [MIN_ALTITUDE, 0.02, 0.1, 0.6, 2.5, 5]) {
+      const widest = markerApparentPx(altitude, 1_000_000);
+      expect(2 * widest + 2).toBeLessThanOrEqual(markerSpacingPx(altitude));
+    }
   });
 
   it('widens with project count, but only slightly and with a hard cap', () => {
@@ -355,7 +370,7 @@ describe('point sizing', () => {
     const busy = markerApparentPx(0.1, 69);
     expect(busy).toBeGreaterThan(quiet);
     // The cap is what stops a busy place swallowing its neighbours.
-    expect(busy / quiet).toBeLessThan(1.45);
+    expect(busy / quiet).toBeLessThan(1.35);
     expect(markerApparentPx(0.1, 100000)).toBe(markerApparentPx(0.1, 81));
   });
 
@@ -509,5 +524,99 @@ describe('declutterRegions', () => {
     expect(
       declutterRegions([], screenOf, { spacingPx: 10, budget: 10 }),
     ).toEqual([]);
+  });
+});
+
+describe('formatUpdatedAt', () => {
+  it('shows only the date for an offset-less WordPress timestamp', () => {
+    // No offset means the time is the site's, not the visitor's, so showing
+    // it would be wrong for anyone outside the site's timezone.
+    expect(formatUpdatedAt('2026-09-23 13:54:20', 'en-US')).toBe(
+      'Sep 23, 2026',
+    );
+  });
+
+  it('keeps the calendar date even just after midnight', () => {
+    expect(formatUpdatedAt('2026-01-01 00:05:00', 'en-US')).toBe('Jan 1, 2026');
+  });
+
+  it('shows a time when the timestamp carries an offset', () => {
+    expect(formatUpdatedAt('2026-09-23T13:54:20+02:00', 'en-US')).toMatch(
+      /2026.*\d{1,2}:\d{2}/,
+    );
+  });
+
+  it('passes an unrecognised value through untouched', () => {
+    expect(formatUpdatedAt('unknown')).toBe('unknown');
+  });
+});
+
+describe('sheetSnapHeights', () => {
+  it('orders the resting heights and keeps full below the header', () => {
+    const h = sheetSnapHeights(800, 56);
+    expect(h.peek).toBeLessThan(h.half);
+    expect(h.half).toBeLessThan(h.full);
+    expect(h.full).toBe(800 - 56 - 12);
+    expect(h.half).toBe(400);
+  });
+
+  it('never inverts on a very short viewport', () => {
+    const h = sheetSnapHeights(150, 56);
+    expect(h.peek).toBeLessThanOrEqual(h.half);
+    expect(h.half).toBeLessThanOrEqual(h.full);
+  });
+
+  it('survives unusable inputs', () => {
+    const h = sheetSnapHeights(NaN, NaN);
+    expect(Number.isFinite(h.full)).toBe(true);
+  });
+});
+
+describe('settleSheet', () => {
+  const heights = { peek: 116, half: 400, full: 732 };
+
+  it('rests at the nearest height after a slow drag', () => {
+    expect(settleSheet(200, 0, heights)).toBe('peek');
+    expect(settleSheet(350, 0, heights)).toBe('half');
+    expect(settleSheet(650, 0.1, heights)).toBe('full');
+  });
+
+  it('goes one step in the direction of a fling', () => {
+    // Flung up from just above peek: half, even though peek is nearer.
+    expect(settleSheet(130, 1, heights)).toBe('half');
+    // Flung down from just below full: half, even though full is nearer.
+    expect(settleSheet(720, -1, heights)).toBe('half');
+    expect(settleSheet(500, 1, heights)).toBe('full');
+    expect(settleSheet(300, -1, heights)).toBe('peek');
+  });
+
+  it('clamps a fling past either end', () => {
+    expect(settleSheet(732, 2, heights)).toBe('full');
+    expect(settleSheet(116, -2, heights)).toBe('peek');
+  });
+});
+
+describe('firstLocationLabelFromLocationsMeta', () => {
+  it("returns the first location's name", () => {
+    const meta = JSON.stringify([
+      { label: 'New York, New York, United States', from: '', to: '' },
+      { label: 'Paris, France', from: '', to: '' },
+    ]);
+    expect(firstLocationLabelFromLocationsMeta(meta)).toBe(
+      'New York, New York, United States',
+    );
+  });
+
+  it('cleans a blank city and stray HTML', () => {
+    const meta = JSON.stringify([{ label: 'Nigeria, , <b>Nigeria</b>' }]);
+    expect(firstLocationLabelFromLocationsMeta(meta)).toBe('Nigeria, Nigeria');
+  });
+
+  it('returns null when there is nothing usable', () => {
+    expect(firstLocationLabelFromLocationsMeta(null)).toBeNull();
+    expect(firstLocationLabelFromLocationsMeta('not json')).toBeNull();
+    expect(firstLocationLabelFromLocationsMeta('[]')).toBeNull();
+    expect(firstLocationLabelFromLocationsMeta('[{"label":"  "}]')).toBeNull();
+    expect(firstLocationLabelFromLocationsMeta('[{}]')).toBeNull();
   });
 });

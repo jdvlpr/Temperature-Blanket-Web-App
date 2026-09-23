@@ -25,6 +25,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import { pluralize } from '$lib/utils/string-utils';
   import { ChevronDownIcon, SearchIcon } from '@lucide/svelte';
+  import type { Snippet } from 'svelte';
   import GlobeRegionDetails from './GlobeRegionDetails.svelte';
   import {
     getRegionLabel,
@@ -53,6 +54,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     onChooseResult: (result: GlobeSearchResult) => void;
     onPointerEnter: () => void;
     onPointerLeave: () => void;
+    /** Rendered inside the mobile bottom sheet rather than beside the globe. */
+    sheet?: boolean;
+    onSearchFocus?: () => void;
+    /** Shown after the list, e.g. the imagery credit. */
+    footer?: Snippet;
   }
 
   let {
@@ -69,6 +75,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     onChooseResult,
     onPointerEnter,
     onPointerLeave,
+    sheet = false,
+    onSearchFocus,
+    footer,
   }: Props = $props();
 
   let listElement: HTMLElement | undefined = $state();
@@ -107,10 +116,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
   onmouseleave={onPointerLeave}
   onfocusin={onPointerEnter}
   onfocusout={onPointerLeave}
-  class="bg-surface-50-950 lg:rounded-container flex h-[38dvh] w-full flex-col overflow-hidden lg:h-[75dvh] lg:w-[22rem] lg:shadow-md p-4"
-  aria-label="Places on the globe"
+  class={sheet
+    ? 'flex h-full w-full flex-col overflow-hidden px-2'
+    : // Below lg this only renders on a phone in landscape (portrait gets the
+      // sheet), where it sits beside a globe as tall as the screen.
+      'bg-surface-50-950 lg:rounded-container flex w-full flex-col overflow-hidden p-4 max-lg:h-[calc(100dvh-var(--globe-header-h,4rem)-0.5rem)] max-lg:w-72 max-lg:shrink-0 max-lg:p-2 lg:h-[75dvh] lg:w-[22rem] lg:shadow-md'}
+  aria-label={sheet ? undefined : 'Places on the globe'}
 >
-  <div class="border-surface-300-700 shrink-0 border-b p-2">
+  <!-- In the bottom sheet a swipe here always moves the sheet (GlobeSheet),
+       so the browser must not claim it for scrolling. -->
+  <div
+    class="border-surface-300-700 shrink-0 border-b p-2 in-data-sheet-snap:touch-none"
+  >
     <div class="relative">
       <SearchIcon
         class="text-surface-500 pointer-events-none absolute top-1/2 left-2 size-4 -translate-y-1/2"
@@ -118,6 +135,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <input
         type="search"
         bind:value={searchQuery}
+        onfocus={onSearchFocus}
         placeholder={hasLabels
           ? 'Search places or projects'
           : 'Search projects'}
@@ -128,7 +146,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
   </div>
 
-  <div bind:this={listElement} class="min-h-0 flex-1 overflow-y-auto">
+  <!-- In the bottom sheet the list only scrolls once the sheet is fully open;
+       before that a swipe on it moves the sheet (see GlobeSheet). -->
+  <div
+    bind:this={listElement}
+    data-sheet-scroll
+    class="min-h-0 flex-1 overflow-y-auto overscroll-contain in-data-[sheet-snap=full]:touch-pan-y in-data-[sheet-snap=half]:touch-none in-data-[sheet-snap=peek]:touch-none"
+  >
     {#if loading}
       <p class="text-surface-600-400 p-3 text-sm">Loading places...</p>
     {:else if isEmpty}
@@ -212,5 +236,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </p>
       {/if}
     {/if}
+    {@render footer?.()}
   </div>
 </aside>
