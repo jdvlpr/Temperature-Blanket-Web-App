@@ -27,7 +27,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { setSeasonsByLocation } from '$lib/utils/seasons-utils.svelte';
   import { onMount } from 'svelte';
   import Spinner from '../Spinner.svelte';
-  import type { LocationType } from '$lib/types';
 
   let title = $state('Searching...');
 
@@ -73,9 +72,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
       thisLocation < locations.all.length;
       thisLocation += 1
     ) {
-      let location: LocationType = locations.all[thisLocation];
+      let location = locations.all[thisLocation];
 
-      title = location.label || 'Searching...';
+      title = location.label ?? 'Searching...';
       currentIndex = thisLocation;
       // Setup Weather Data Object
 

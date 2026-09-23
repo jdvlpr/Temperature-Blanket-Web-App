@@ -14,20 +14,6 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import type { WeatherParam } from '$lib/types/gauge-types';
-<<<<<<< HEAD
-import { chevronsPreview } from '$lib/components/previews/chevrons/state.svelte';
-import { continuousSquarePreview } from '$lib/components/previews/continuous-square/state.svelte';
-import { cornerToCornerPreview } from '$lib/components/previews/corner-to-corner/state.svelte';
-import { daytimeRowsPreview } from '$lib/components/previews/daytime-rows/state.svelte';
-import { hexagonRoundsPreview } from '$lib/components/previews/hexagon-rounds/state.svelte';
-import { hexagonsPreview } from '$lib/components/previews/hexagons/state.svelte';
-import { monthRowsPreview } from '$lib/components/previews/month-rows/state.svelte';
-import { monthSquaresPreview } from '$lib/components/previews/month-squares/state.svelte';
-import { rowsPreview } from '$lib/components/previews/rows/state.svelte';
-import { splitMonthSquaresPreview } from '$lib/components/previews/split-month-squares/state.svelte';
-import { squareRoundsPreview } from '$lib/components/previews/square-rounds/state.svelte';
-import { squaresPreview } from '$lib/components/previews/squares/state.svelte';
-=======
 import type { TwelvePointStarPreviewClass } from '$lib/components/previews/12-point-star/state.svelte';
 import type { CalendarPreviewClass } from '$lib/components/previews/calendar/state.svelte';
 import type { ChevronsPreviewClass } from '$lib/components/previews/chevrons/state.svelte';
@@ -35,13 +21,13 @@ import type { ContinuousSquarePreviewClass } from '$lib/components/previews/cont
 import type { CornerToCornerPreviewClass } from '$lib/components/previews/corner-to-corner/state.svelte';
 import type { DaytimeRowsPreviewClass } from '$lib/components/previews/daytime-rows/state.svelte';
 import type { HexagonRoundsPreviewClass } from '$lib/components/previews/hexagon-rounds/state.svelte';
+import type { HexagonsPreviewClass } from '$lib/components/previews/hexagons/state.svelte';
 import type { MonthRowsPreviewClass } from '$lib/components/previews/month-rows/state.svelte';
 import type { MonthSquaresPreviewClass } from '$lib/components/previews/month-squares/state.svelte';
 import type { RowsPreviewClass } from '$lib/components/previews/rows/state.svelte';
 import type { SplitMonthSquaresPreviewClass } from '$lib/components/previews/split-month-squares/state.svelte';
 import type { SquareRoundsPreviewClass } from '$lib/components/previews/square-rounds/state.svelte';
 import type { SquaresPreviewClass } from '$lib/components/previews/squares/state.svelte';
->>>>>>> main
 
 export const previewWeatherTargets = $state({
   value: [] as WeatherParam[],
@@ -59,6 +45,7 @@ type PreviewInstance =
   | CornerToCornerPreviewClass
   | DaytimeRowsPreviewClass
   | HexagonRoundsPreviewClass
+  | HexagonsPreviewClass
   | MonthRowsPreviewClass
   | MonthSquaresPreviewClass
   | RowsPreviewClass
@@ -151,6 +138,18 @@ const manifest: PreviewManifestEntry[] = [
         .daytimeRowsPreview,
   },
   {
+    id: 'hxgs',
+    name: 'Hexagons',
+    img: {
+      light: './images/preview_icons/Hexagons.png',
+      dark: './images/preview_icons/Hexagons White.png',
+    },
+    wpTagSlug: 'hexagons',
+    importFn: async () =>
+      (await import('$lib/components/previews/hexagons/state.svelte'))
+        .hexagonsPreview,
+  },
+  {
     id: 'hxrd',
     name: 'Hexagon Rounds',
     img: {
@@ -237,29 +236,11 @@ const manifest: PreviewManifestEntry[] = [
 ];
 
 class PreviewsState {
-<<<<<<< HEAD
-  all = $state([
-    calendarPreview,
-    chevronsPreview,
-    continuousSquarePreview,
-    cornerToCornerPreview,
-    daytimeRowsPreview,
-    hexagonsPreview,
-    hexagonRoundsPreview,
-    monthRowsPreview,
-    monthSquaresPreview,
-    rowsPreview,
-    splitMonthSquaresPreview,
-    squareRoundsPreview,
-    squaresPreview,
-  ]);
-=======
   // The runtime array holds a mix of not-yet-loaded manifest entries and
   // loaded instances; `load()` is the only place that swaps one for the
   // other. Every other reader in the app only ever sees a fully-loaded
   // instance via `active` (see below), so it's typed as such.
   all = $state<(PreviewManifestEntry | PreviewInstance)[]>([...manifest]);
->>>>>>> main
 
   activeId = $state<string>();
 
