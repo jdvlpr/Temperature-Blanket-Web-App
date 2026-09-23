@@ -33,6 +33,26 @@ export const entries: ChangelogItemGroup[] = [
     year: 2026,
     months: [
       {
+        month: 'September',
+        items: [
+          {
+            notes: [
+              {
+                IconComponent: GlobeIcon,
+                text: `The <a href="/globe" class="link">Globe</a> now shows detailed NASA satellite imagery you can zoom much closer into. Project markers lie flat on the map, grow as you zoom in, and never overlap, so they're easier to tap. A searchable list shows the places in view, and on phones it's a panel you can swipe up from the bottom of the screen.`,
+                title: 'Globe Improvements',
+              },
+              {
+                IconComponent: ImageIcon,
+                text: `Project pages in the <a href="/gallery" class="link">Project Gallery</a> have a new "See nearby projects" button that opens the project's location on the Globe. Project details now open from an "About" button.`,
+                title: 'Project Gallery Updates',
+              },
+            ],
+            version: '6.2.1',
+          },
+        ],
+      },
+      {
         month: 'August',
         items: [
           {
