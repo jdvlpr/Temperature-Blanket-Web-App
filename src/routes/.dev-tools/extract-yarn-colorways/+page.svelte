@@ -1,10 +1,11 @@
 <script module lang="ts">
   import { persistedState } from '$lib/storage/preferences.svelte';
 
-  const options = persistedState('[/.dev-tools]options', {
+  const initialOptions = {
     content: '',
     columnWidth: 200,
     querySelector: '',
+    colorQuerySelector: '',
     useElementAttribute: false,
     querySelectorAttribute: '',
     exclude: false,
@@ -14,12 +15,18 @@
     excludeAfter: false,
     excludeAfterString: '',
     removeNumbers: true,
+    extractColorFromAttribute: false,
+    colorAttribute: '',
     mergeWithExistingColors: false,
     selectedYarn: {
       brandId: '',
       yarnId: '',
     },
     names: [],
+  };
+
+  const options = persistedState('[/.dev-tools]options', initialOptions, {
+    beforeRead: (value) => ({ ...initialOptions, ...value }),
   });
 </script>
 
@@ -31,7 +38,7 @@
   import Footer from '$lib/components/Footer.svelte';
   import SelectYarn from '$lib/components/SelectYarn.svelte';
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
-  import { brands } from '$lib/data/yarns/brands';
+  import { getBrands } from '$lib/data/yarns/colorways.svelte';
   import { toast } from '$lib/state/page-state.svelte';
   import type { Color } from '$lib/types/yarn-types';
   import { getTextColor } from '$lib/utils/color-utils';
@@ -48,7 +55,7 @@
       return [];
     // Fetch existing colorways based on selected brand and yarn
     return (
-      brands
+      getBrands()
         .find((b) => b.id === options.value.selectedYarn.brandId)
         ?.yarns.find((y) => y.id === options.value.selectedYarn.yarnId)
         ?.colorways.flatMap((colorway) => colorway.colors) || []
@@ -77,17 +84,31 @@
     return html;
   }
 
+  function extractHexColor(value: string | null) {
+    const hexColor = value?.match(
+      /#(?:[0-9a-f]{8}|[0-9a-f]{6}|[0-9a-f]{4}|[0-9a-f]{3})\b/i,
+    )?.[0];
+    console.log({ hexColor });
+
+    return hexColor ? chroma(hexColor).hex().toLowerCase() : '';
+  }
+
   async function getNames() {
     options.value.names = [];
-    let i = 1;
-    for (const element of [
+    const nameElements = [
       ...htmlObject.querySelectorAll(options.value.querySelector),
-    ]) {
+    ];
+    const colorElements = options.value.colorQuerySelector
+      ? [...htmlObject.querySelectorAll(options.value.colorQuerySelector)]
+      : nameElements;
+
+    for (const [index, element] of nameElements.entries()) {
       let name = options.value.useElementAttribute
         ? element.getAttribute(options.value.querySelectorAttribute)
         : element.innerText;
       // Remove string
-      if (options.value.exclude) name = name.replaceAll(options.value.excludeString, "");
+      if (options.value.exclude)
+        name = name.replaceAll(options.value.excludeString, '');
 
       // Remove everything before string
       if (options.value.excludeBefore)
@@ -95,13 +116,13 @@
           name.indexOf(options.value.excludeBeforeString) +
             options.value.excludeBeforeString?.length,
         );
-    
+
       // Remove everything after string
       if (options.value.excludeAfter)
-      name = name.substring(
-        0,
-        name.indexOf(options.value.excludeAfterString),
-      );
+        name = name.substring(
+          0,
+          name.indexOf(options.value.excludeAfterString),
+        );
       name = name.toLowerCase(); // lowercase everything
       name = name.replaceAll('\n', ' '); // remove new lines
       name = name.replaceAll('  ', ''); // remove multiple spaces
@@ -117,9 +138,14 @@
 
       let colorHex = '';
 
+      if (options.value.extractColorFromAttribute)
+        colorHex = extractHexColor(
+          colorElements[index]?.getAttribute(
+            options.value.colorAttribute || '',
+          ),
+        );
+
       options.value.names.push({ name, hex: colorHex });
-      i = Number(i);
-      i++;
     }
   }
 
@@ -146,10 +172,9 @@
           <label class="text-sm"
             >Paste HTML Here
             <textarea
-              class="textarea w-full grow border-none shadow-inner"
+              class="textarea w-full grow border-none shadow-inner rounded-container"
               bind:value={options.value.content}
-              rows="5"
-            ></textarea>
+              rows="5"></textarea>
           </label>
 
           <div class="flex max-w-md flex-col gap-4">
@@ -187,6 +212,39 @@
                       placeholder="e.g., title, data-name"
                       class="input w-full"
                       bind:value={options.value.querySelectorAttribute}
+                    />
+                  </label>
+                </div>
+              {/if}
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <ToggleSwitch
+                bind:checked={options.value.extractColorFromAttribute}
+                label="Extract Color From Element Attribute"
+              />
+
+              {#if options.value.extractColorFromAttribute}
+                <div class="flex flex-col items-start text-left">
+                  <label class="w-full text-sm">
+                    Color Element Query Selector
+                    <input
+                      type="text"
+                      placeholder="e.g., .color, [data-color-style]"
+                      class="input w-full"
+                      bind:value={options.value.colorQuerySelector}
+                    />
+                  </label>
+                </div>
+
+                <div class="flex flex-col items-start text-left">
+                  <label class="w-full text-sm">
+                    Color Attribute
+                    <input
+                      type="text"
+                      placeholder="e.g., data-color-style, style"
+                      class="input w-full"
+                      bind:value={options.value.colorAttribute}
                     />
                   </label>
                 </div>

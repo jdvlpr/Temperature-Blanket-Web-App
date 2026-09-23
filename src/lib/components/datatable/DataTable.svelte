@@ -39,7 +39,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     uid = '',
   }: Props = $props();
 
-  let searchInput = $state(null);
+  let searchInput: ReturnType<typeof table.createSearch> | null = $state(null);
 
   let includesToday = $derived.by(() => {
     if (uid === '' || weather.grouping === 'week') return false;
@@ -169,13 +169,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </button>
     {/if}
 
-    {#if search && searchInput !== null}
+    {#if search && searchInput}
       <input
         type="text"
         class="input w-full sm:max-w-[200px]"
         bind:value={searchInput.value}
         placeholder="Search weather data..."
-        oninput={() => searchInput.set()}
+        oninput={() => searchInput?.set()}
       />
     {/if}
   </div>

@@ -13,25 +13,39 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script>
+<script lang="ts">
   import Spinner from '$lib/components/Spinner.svelte';
   import { weather } from '$lib/state/weather-state.svelte';
   import { getColorInfo } from '$lib/utils/color-utils';
   import { runPreview } from '$lib/utils/function-utils.svelte';
   import { showPreviewImageWeatherDetails } from '$lib/utils/preview-utils.svelte';
-  import { splitMonthSquaresPreview } from './state.svelte';
+  import type { Color } from '$lib/types/yarn-types';
+  import {
+    splitMonthSquaresPreview,
+    type SplitMonthSquaresSection,
+  } from './state.svelte';
 
   let width = $state(splitMonthSquaresPreview.width);
   let height = $state(splitMonthSquaresPreview.height);
 
-  function getPoints({ x, y, roundWidth, roundHeight }) {
+  function getPoints({
+    x,
+    y,
+    roundWidth,
+    roundHeight,
+  }: {
+    x: number;
+    y: number;
+    roundWidth: number;
+    roundHeight: number;
+  }): { left: string; right: string } {
     const right = `${x},${y + roundHeight} ${x + roundWidth},${y + roundHeight} ${x + roundWidth},${y}`;
     const left = `${x},${y + roundHeight + splitMonthSquaresPreview.STITCH_SIZE / 2} ${x},${y} ${x + roundWidth + splitMonthSquaresPreview.STITCH_SIZE / 2},${y}`;
     return { left, right };
   }
 
   runPreview(() => {
-    const sections = [];
+    const sections: SplitMonthSquaresSection[] = [];
     let squareIndex = 0;
     let x = splitMonthSquaresPreview.squareSize / 2;
     let y = splitMonthSquaresPreview.squareSize / 2;
@@ -84,7 +98,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         }
       }
 
-      let square;
+      let square: SplitMonthSquaresSection;
       const day = daysInSquare?.filter(
         (n) => n.date.getUTCDate() === roundInSquare,
       );
@@ -94,7 +108,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
         _dayIndex = Math.ceil((dayIndex - weather.monthGroupingStartDay) / 7);
       }
 
-      let color = { left: '', right: '' };
+      const color: { left: Color['hex']; right: Color['hex'] } = {
+        left: '',
+        right: '',
+      };
       if (day.length) {
         const leftValue = weather.getWeatherValue({
           dayIndex: _dayIndex,
@@ -175,9 +192,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     viewBox="0 0 {width} {height}"
     bind:this={splitMonthSquaresPreview.svg}
     onclick={(e) => {
+      if (!(e.target instanceof SVGElement)) return;
       if (e.target.tagName !== 'polyline') return;
       if (e.target.dataset.isweather !== 'true') return;
-      weather.currentIndex = +e.target.dataset.dayindex;
+      weather.currentIndex = +(e.target.dataset.dayindex ?? NaN);
       showPreviewImageWeatherDetails(splitMonthSquaresPreview.targets);
     }}
   >

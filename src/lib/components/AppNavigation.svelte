@@ -21,7 +21,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { version } from '$app/environment';
   import { page } from '$app/state';
   import { PUBLIC_GITHUB_LINK } from '$env/static/public';
-  import ThemeSwitcher from '$lib/components/ThemeSwitcher.svelte';
+  import AppearanceDialog from '$lib/components/modals/AppearanceDialog.svelte';
   import { safeSlide } from '$lib/features/transitions/safeSlide';
   import { dialog } from '$lib/state/page-state.svelte';
   import { project } from '$lib/state/project-state.svelte';
@@ -30,8 +30,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     BookOpenTextIcon,
     ChevronDownIcon,
     CircleQuestionMarkIcon,
-    CodeIcon,
     CloudyIcon,
+    CodeIcon,
+    ContrastIcon,
     ExternalLinkIcon,
     GiftIcon,
     GlobeIcon,
@@ -49,7 +50,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { Accordion } from '@skeletonlabs/skeleton-svelte';
   import { untrack } from 'svelte';
   import LegacyMigrationError from './modals/LegacyMigrationError.svelte';
-  import { ICONS } from '$lib/constants/icon-constants';
 
   // Set opened navigation items based on current page
   $effect(() => {
@@ -119,7 +119,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
     >
   {/if}
 
-  <div><ThemeSwitcher /></div>
+  <button
+    class="btn hover:preset-tonal-surface"
+    onclick={() =>
+      dialog.trigger({
+        component: {
+          ref: AppearanceDialog,
+        },
+        type: 'component',
+      })}
+  >
+    <ContrastIcon />
+    Appearance
+  </button>
 
   <a
     href="/supporters"

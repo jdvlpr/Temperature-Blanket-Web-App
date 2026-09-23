@@ -1,8 +1,12 @@
 import { weather } from '$lib/state/weather-state.svelte';
 import type {
   GaugeAttributes,
+  GaugeRange,
+  GaugeRangeOptions,
   GaugeSettingsType,
+  WeatherParam,
 } from '$lib/types/gauge-types';
+import type { Color } from '$lib/types/yarn-types';
 import { displayNumber } from '$lib/utils/number-utils';
 import { getIncrement, getStart } from '$lib/utils/range-utils.svelte';
 import { getRanges } from '$lib/utils/gauge-utils.svelte';
@@ -42,7 +46,14 @@ function getFirstRanges({
   colors,
   includeFromAndTo,
   dontIncludeFromAndTo,
-}) {
+}: {
+  rangeOptions: GaugeRangeOptions;
+  start: number | undefined;
+  increment: number | undefined;
+  colors: Color[];
+  includeFromAndTo: boolean;
+  dontIncludeFromAndTo: boolean;
+}): GaugeRange[] {
   const { ranges } = getRanges({
     rangeOptions,
     ranges: [],
@@ -56,7 +67,14 @@ function getFirstRanges({
   return ranges;
 }
 
-export class SnowGauge {
+export class SnowGauge implements GaugeAttributes {
+  // Assigned at runtime in the constructor via Object.assign(this, gaugeAttributes)
+  id!: GaugeAttributes['id'];
+  isStatic!: boolean;
+  label!: GaugeAttributes['label'];
+  unit!: GaugeAttributes['unit'];
+  targets!: WeatherParam[];
+
   constructor() {
     // Assign the gauge attributes as properties
     Object.assign(this, gaugeAttributes);
@@ -94,10 +112,14 @@ export class SnowGauge {
   // *************************
 
   // All the high temperatures, without missing values
-  #maxes = $derived(weather.params?.snow.filter((n) => n !== null) || []);
+  #maxes = $derived(
+    weather.params?.snow?.filter((n): n is number => n !== null) || [],
+  );
 
   // All the low temperatures, without missing values
-  #mins = $derived(weather.params?.snow?.filter((n) => n !== null) || []);
+  #mins = $derived(
+    weather.params?.snow?.filter((n): n is number => n !== null) || [],
+  );
 
   // Set the max value to above the highest integer based on the weather data
   #max = $derived.by(() => {
@@ -113,16 +135,16 @@ export class SnowGauge {
       : Math.floor(Math.min(...this.#mins));
   });
 
-  colors = $state(
+  colors: Color[] = $state(
     chroma
       .scale('PuBu')
       .colors(4)
       .map((n) => {
-        return { hex: n };
+        return { hex: n as Color['hex'] };
       }),
   );
 
-  rangeOptions = {
+  rangeOptions: GaugeRangeOptions = {
     auto: {
       optimization: 'ranges',
       start: {
@@ -198,7 +220,7 @@ export class SnowGauge {
 
   schemeId = $state('PuBu');
 
-  ranges = $state(
+  ranges: GaugeRange[] = $state(
     getFirstRanges({
       rangeOptions: this.rangeOptions,
       start: this.#start,
@@ -214,7 +236,7 @@ export class SnowGauge {
   // *************************
   // Methods
   // *************************
-  updateColors({ colors }) {
+  updateColors({ colors }: { colors: Color[] }) {
     this.calculating = true;
     this.colors = colors;
     const { ranges, mode, isCustomRanges } = getRanges({
@@ -235,13 +257,13 @@ export class SnowGauge {
     this.calculating = false;
   }
 
-  updateSettings({ settings }: { settings: GaugeSettingsType }) {
+  updateSettings({ settings }: { settings: Partial<GaugeSettingsType> }) {
     this.calculating = true;
-    this.colors = settings.colors;
-    this.numberOfColors = settings.numberOfColors;
+    this.colors = settings.colors ?? this.colors;
+    this.numberOfColors = settings.numberOfColors ?? this.numberOfColors;
     this.rangeOptions = { ...this.rangeOptions, ...settings.rangeOptions };
-    this.ranges = settings.ranges;
-    this.schemeId = settings.schemeId;
+    this.ranges = (settings.ranges as GaugeRange[]) ?? this.ranges;
+    this.schemeId = settings.schemeId ?? this.schemeId;
     this.calculating = false;
   }
 }

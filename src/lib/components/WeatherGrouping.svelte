@@ -23,12 +23,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <SegmentedControl
       value={weather.grouping}
       onValueChange={(e) => {
-        weather.grouping = e.value;
+        if (e.value === 'day' || e.value === 'week') {
+          weather.setGrouping(e.value);
+        }
       }}
     >
-      <SegmentedControl.Control
-        class="bg-surface-100 dark:bg-surface-900 rounded-container border-none shadow-sm"
-      >
+      <SegmentedControl.Control class="bg-surface-100 dark:bg-surface-900">
         <SegmentedControl.Indicator />
         <SegmentedControl.Item value="day"
           ><SegmentedControl.ItemText>Daily</SegmentedControl.ItemText>

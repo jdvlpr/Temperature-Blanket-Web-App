@@ -34,10 +34,14 @@ import {
   millimetersToInches,
 } from '$lib/utils/unit-utils.svelte.js';
 import { getMoonPhase } from '$lib/state/weather-state.svelte';
+import { cachedJSON } from '$lib/features/cache/edge-cache';
 import { error, json } from '@sveltejs/kit';
-import SunCalc from 'suncalc';
+import type { RequestHandler } from './$types';
+import * as SunCalc from 'suncalc';
 
-export async function POST({ request }) {
+const CACHE_TTL_SECONDS = 60 * 60 * 24; // 24h — short enough to avoid stale past/future-day nulling near date boundaries
+
+export const POST: RequestHandler = async ({ request, platform }) => {
   const body = await request.json();
 
   const location = body?.location;
@@ -45,7 +49,35 @@ export async function POST({ request }) {
   if (!location || typeof location !== 'object')
     throw error(400, 'Missing location object');
 
-  let allData: WeatherDay[] = [];
+  // `location.index` is a positional slot in a multi-location project (it shifts
+  // when locations are reordered/removed), not part of what makes a weather
+  // response unique -- so it's stamped on after the cache lookup instead of
+  // being part of the cache key or the cached payload.
+  const allData = await cachedJSON(
+    platform,
+    request.url,
+    [
+      dev ? 'dev' : 'prod',
+      location.lat,
+      location.lng,
+      location.elevation ?? 'none',
+      location.from,
+      location.to,
+    ],
+    CACHE_TTL_SECONDS,
+    () => fetchAndProcessDailyWeather(location),
+  );
+
+  for (const day of allData) day.location = location.index;
+
+  return json(allData);
+};
+
+async function fetchAndProcessDailyWeather(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  location: any,
+): Promise<WeatherDay[]> {
+  const allData: WeatherDay[] = [];
 
   let url = API_SERVICES.meteostat.baseURL;
   url += `?lat=${location.lat}`;
@@ -100,7 +132,7 @@ export async function POST({ request }) {
     // No data property returned from meteostat
     throw error(400, { message: errorMessage });
   }
-  if (data.data.every((day) => day.tavg === null)) {
+  if (data.data.every((day: { tavg: number | null }) => day.tavg === null)) {
     // Empty data array
     throw error(400, { message: errorMessage });
   }
@@ -173,13 +205,19 @@ export async function POST({ request }) {
     const times = SunCalc.getTimes(dayDate, location.lat, location.lng);
     // dayData.sunrise = times.sunrise;
     // dayData.sunset = times.sunset;
-    const isValidSunset =
-      times.sunset instanceof Date && !isNaN(times.sunset.getTime());
-    const isValidSunRise =
-      times.sunrise instanceof Date && !isNaN(times.sunrise.getTime());
-    if (isValidSunset && isValidSunRise) {
+    if (
+      times.sunset instanceof Date &&
+      !isNaN(times.sunset.getTime()) &&
+      times.sunrise instanceof Date &&
+      !isNaN(times.sunrise.getTime())
+    ) {
       const daytime = parseFloat(
-        ((times.sunset - times.sunrise) / 1000 / 60 / 60).toFixed(6),
+        (
+          (times.sunset.getTime() - times.sunrise.getTime()) /
+          1000 /
+          60 /
+          60
+        ).toFixed(6),
       );
       // Convert metric to minutes because of Weather chart scale
       dayData.dayt = {
@@ -192,11 +230,11 @@ export async function POST({ request }) {
 
     dayData.moon = getMoonPhase(dayDate);
 
-    allData = [...allData, dayData];
+    allData.push(dayData);
   }
 
   // Sort by date
-  allData.sort((a, b) => a.date - b.date);
+  allData.sort((a, b) => a.date.getTime() - b.date.getTime());
 
-  return json(allData);
+  return allData;
 }

@@ -39,10 +39,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import '../../css/flag-icons.css';
   import { weatherState } from './+page.svelte';
   import { fetchData } from './GetWeather.svelte';
+  import type { WeatherLocation } from './open-meteo-types';
+  import type { LocationSuggestion } from '$lib/types/location-types';
 
   let searching = $state(false); // Autocomplete searching status
 
-  let locationGroup = $state();
+  let locationGroup: HTMLDivElement | undefined = $state();
 
   let navigatorAvailable = $state(true);
 
@@ -51,8 +53,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let showReset = $derived.by(() => {
     showResetKey;
     return (
-      !searching &&
-      (weatherLocationState.inputLocation?.value?.length ?? 0) > 1
+      !searching && (weatherLocationState.inputLocation?.value?.length ?? 0) > 1
     );
   });
 
@@ -67,13 +68,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
       navigatorAvailable = false;
     }
     // Setup the autocomplete location
-    autocomplete({
+    autocomplete<LocationSuggestion>({
       input: weatherLocationState.inputLocation!,
       minLength: 2,
       debounceWaitMs: 550,
       showOnFocus: false,
       emptyMsg: 'Trouble getting location. Please search again.',
-      customize: function (input, inputRect, container, maxHeight) {
+      customize: function (input, inputRect, container) {
+        if (!locationGroup) return;
         const group = locationGroup.getBoundingClientRect();
         container.style.width = `${group.width}px`;
         container.style.left = `${group.left}px`;
@@ -107,14 +109,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
       onSelect: async function (item) {
         if (
           !weatherState.weatherLocations.some(
-            (location) => location.id === +item.id,
-          )
+            (location) => location.id === Number(item.id),
+          ) &&
+          item.id
         ) {
-          weatherState.weatherLocations.unshift(item);
+          weatherState.weatherLocations.unshift(item as WeatherLocation);
         }
         await fetchData();
-        weatherState.activeLocationID = item.id;
-        weatherLocationState.inputLocation.value = '';
+        weatherState.activeLocationID = item.id ?? null;
+        if (weatherLocationState.inputLocation)
+          weatherLocationState.inputLocation.value = '';
         showResetKey = !showResetKey;
         weatherLocationState.validId = true;
       },
@@ -158,7 +162,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     }
   }
 
-  function validateKeyup(e) {
+  function validateKeyup(e: KeyboardEvent) {
     if (!e) {
       weatherLocationState.validId = true;
       return;
@@ -173,8 +177,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     weatherLocationState.validId = false;
   }
 
-  const setLocationFromId = async ({ id }) => {
-    weatherLocationState.inputLocation.value = 'Loading...';
+  const setLocationFromId = async ({ id }: { id: string }) => {
+    if (weatherLocationState.inputLocation)
+      weatherLocationState.inputLocation.value = 'Loading...';
 
     // Get location information from GeoNames using the location's id
     try {
@@ -185,16 +190,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
       if (!response.ok) throw new Error(data.message);
 
       const label = `${data.name}, ${data.adminName1}, ${data.countryName}`;
-      const _location = {};
-      _location.id = +id;
-      _location.lat = data.lat;
-      _location.lng = data.lng;
+      const _location: WeatherLocation = {
+        id: +id,
+        lat: data.lat,
+        lng: data.lng,
+        label,
+        result: `<span class="fflag fflag-${data.countryCode?.toUpperCase()}"></span>${label}`,
+      };
 
       if (data.srtm3 !== NO_DATA_SRTM3) _location.elevation = data.srtm3; // TODO: I think this is handled in the server endpoint, check if it is ok to remove.
 
-      _location.label = label;
-      _location.result = `<span class="fflag fflag-${data.countryCode?.toUpperCase()}"></span>${label}`;
-      weatherLocationState.inputLocation.value = '';
+      if (weatherLocationState.inputLocation)
+        weatherLocationState.inputLocation.value = '';
 
       if (!weatherState.weatherLocations.map((item) => item.id).includes(+id))
         weatherState.weatherLocations.unshift(_location);
@@ -207,7 +214,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     }
   };
 
-  const setLocationFromCoords = async ({ coords }) => {
+  const setLocationFromCoords = async ({
+    coords,
+  }: {
+    coords: GeolocationCoordinates;
+  }) => {
     try {
       const response = await fetch(
         `/api/location/near?lat=${encodeURIComponent(coords.latitude)}&lng=${encodeURIComponent(coords.longitude)}`,
@@ -217,14 +228,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
       if (!response.ok) throw new Error(data.message);
 
       const geonames = data.geonames[0];
-      const _location = {};
-      _location.id = +geonames.geonameId;
-      _location.lat = geonames.lat;
-      _location.lng = geonames.lng;
-      // _location.elevation = geonames.srtm3; // Elevation not necessary for weather forecast location, only for a location for a project
       const label = `${geonames.name}, ${geonames.adminName1}, ${geonames.countryName}`;
-      _location.label = label;
-      _location.result = `<span class="fflag fflag-${geonames.countryCode?.toUpperCase()}"></span>${label}`;
+      const _location: WeatherLocation = {
+        id: +geonames.geonameId,
+        lat: geonames.lat,
+        lng: geonames.lng,
+        // elevation: geonames.srtm3, // Elevation not necessary for weather forecast location, only for a location for a project
+        label,
+        result: `<span class="fflag fflag-${geonames.countryCode?.toUpperCase()}"></span>${label}`,
+      };
 
       if (
         !weatherState.weatherLocations
@@ -297,16 +309,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
           class="ig-btn hover:preset-tonal-surface"
           title="Reset Location Search"
           onclick={async () => {
-            weatherLocationState.inputLocation.value = '';
+            if (weatherLocationState.inputLocation)
+              weatherLocationState.inputLocation.value = '';
             // $location.label = "";
             // $location.id = null;
             showResetKey = !showResetKey;
             weatherLocationState.validId = false;
-            if (document.querySelector('.autocomplete'))
-              document.querySelector('.autocomplete').remove();
+            document.querySelector('.autocomplete')?.remove();
             // await goto('?');
             // showReset = false;
-            weatherLocationState.inputLocation.focus();
+            weatherLocationState.inputLocation?.focus();
           }}
         >
           <XIcon />
@@ -316,16 +328,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
           class="ig-btn hover:preset-tonal-surface"
           title="Use My Location"
           onclick={async () => {
-            weatherLocationState.inputLocation.value = 'Loading...';
+            if (weatherLocationState.inputLocation)
+              weatherLocationState.inputLocation.value = 'Loading...';
             navigator.geolocation.getCurrentPosition(
               async (response) => {
                 await setLocationFromCoords({
                   coords: response.coords,
                 });
-                weatherLocationState.inputLocation.value = '';
+                if (weatherLocationState.inputLocation)
+                  weatherLocationState.inputLocation.value = '';
               },
-              (error) => {
-                weatherLocationState.inputLocation.value = '';
+              () => {
+                if (weatherLocationState.inputLocation)
+                  weatherLocationState.inputLocation.value = '';
               },
             );
           }}

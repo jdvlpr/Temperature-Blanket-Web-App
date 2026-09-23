@@ -13,42 +13,57 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script>
+<script lang="ts">
   import ColorPaletteEditable from '$lib/components/ColorPaletteEditable.svelte';
   import DefaultYarnSet from '$lib/components/DefaultYarnSet.svelte';
   import SelectNumberOfColors from '$lib/components/SelectNumberOfColors.svelte';
   import SelectYarn from '$lib/components/SelectYarn.svelte';
   import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
   import StickyPart from '$lib/components/modals/StickyPart.svelte';
+  import Spinner from '$lib/components/Spinner.svelte';
+  import { ensureYarnData } from '$lib/data/yarns/colorways.svelte';
   import { dialog } from '$lib/state/page-state.svelte';
   import { getColorways, getFilteredYarns } from '$lib/utils/yarn-utils';
   import { getSortedPalette } from '$lib/utils/color-utils';
   import { pickRandomFromArray } from '$lib/utils/number-utils';
+  import type { Color } from '$lib/types/yarn-types';
   import {
     ArrowDownWideNarrowIcon,
     ExternalLinkIcon,
     ShuffleIcon,
   } from '@lucide/svelte';
+  import { onMount } from 'svelte';
   import SelectYarnWeight from '../SelectYarnWeight.svelte';
   import HelpIcon from '../buttons/HelpIcon.svelte';
 
   let { numberOfColors, updateGauge } = $props();
 
-  let debounceTimer;
-  const debounce = (callback, time) => {
+  let yarnDataReady = $state(false);
+  onMount(() => {
+    ensureYarnData().then(() => {
+      yarnDataReady = true;
+    });
+  });
+
+  let debounceTimer: number | undefined;
+  const debounce = (callback: () => void, time: number) => {
     window.clearTimeout(debounceTimer);
     debounceTimer = window.setTimeout(callback, time);
   };
 
-  let randomPalette = $state([getRandomColors()]);
-  let selectedBrandId = $state();
-  let selectedYarnId = $state();
+  let randomPalette: Color[] = $state([]);
+  let selectedBrandId = $state<string | undefined>();
+  let selectedYarnId = $state<string | undefined>();
   let selectedYarnWeightId = $state('');
   let sortColors = $state('light-to-dark');
 
   function getRandomColors() {
     debounce(() => {
-      const tempYarnColorways = [];
+      // colorways is empty until the lazy-loaded yarn dataset resolves;
+      // bail out instead of generating colors with missing hex values
+      if (!colorways.length) return;
+
+      const tempYarnColorways: Color[] = [];
 
       // Create a set of existing color hex values for faster lookup
       const existingColorways = new Set();
@@ -59,17 +74,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
       while (tempYarnColorways.length < numberOfColors) {
         // Check if the current index has a locked color
         const currentIndex = tempYarnColorways.length;
-        let color;
-        if (randomPalette[currentIndex]?.locked) {
+        let color: Color;
+        const lockedColor = randomPalette[currentIndex];
+        if (lockedColor?.locked) {
           // Use the locked color instead of a random one
-          color = randomPalette[currentIndex];
+          color = lockedColor;
           const colorId = `${color.hex}-${color.name}-${color.brandId}-${color.yarnId}`;
           tempYarnColorways.push(color);
           existingColorways.add(colorId);
         } else {
           // Get a random color from the colorways array
           color = {
-            ...pickRandomFromArray({
+            ...pickRandomFromArray<Color>({
               array: colorways,
             }),
           };
@@ -113,6 +129,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     selectedYarnId;
     selectedYarnWeightId;
     numberOfColors;
+    yarnDataReady;
     getRandomColors();
   });
 </script>
@@ -120,10 +137,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <svelte:window
   onkeydown={(e) => {
     if (
-      e.target.tagName === 'INPUT' ||
-      e.target.tagName === 'TD' ||
-      e.target.tagName === 'SELECT' ||
-      e.target.tagName === 'BUTTON'
+      e.target instanceof HTMLElement &&
+      (e.target.tagName === 'INPUT' ||
+        e.target.tagName === 'TD' ||
+        e.target.tagName === 'SELECT' ||
+        e.target.tagName === 'BUTTON')
     )
       return;
     if (e.key === 'r') {
@@ -152,20 +170,23 @@ If not, see <https://www.gnu.org/licenses/>. -->
       </div>
     {/if}
 
-    {#key selectedBrandId}
-      <div
-        class="order-3 col-span-full w-full md:order-2 md:col-span-3"
-        class:hidden={!!selectedBrandId && !!selectedYarnId}
-      >
-        <SelectYarnWeight {selectedBrandId} bind:selectedYarnWeightId />
-      </div>
-    {/key}
+    {#if yarnDataReady}
+      {#key selectedBrandId}
+        <div
+          class="order-3 col-span-full w-full md:order-2 md:col-span-3"
+          class:hidden={!!selectedBrandId && !!selectedYarnId}
+        >
+          <SelectYarnWeight {selectedBrandId} bind:selectedYarnWeightId />
+        </div>
+      {/key}
+    {/if}
 
     <div class="order-5 col-span-full justify-self-start sm:col-span-3">
       <SelectNumberOfColors
         {numberOfColors}
         max={99}
-        onchange={(e) => (numberOfColors = +e.target.value)}
+        onchange={(e) =>
+          (numberOfColors = +(e.target as HTMLSelectElement).value)}
       />
     </div>
 
@@ -209,20 +230,26 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <StickyPart position="bottom">
   <div class="p-2 sm:p-4">
     <div class="">
-      {#key randomPalette}
-        <ColorPaletteEditable
-          canUserEditColor={false}
-          typeId="randomPalette"
-          bind:colors={randomPalette}
-          onchanged={(eventColors) => {
-            if (eventColors) randomPalette = eventColors;
-            numberOfColors = randomPalette.length;
-          }}
-        />
-      {/key}
+      {#if !yarnDataReady}
+        <div class="mx-auto my-6">
+          <Spinner />
+        </div>
+      {:else}
+        {#key randomPalette}
+          <ColorPaletteEditable
+            canUserEditColor={false}
+            bind:colors={randomPalette}
+            onchanged={(eventColors: Color[] | undefined) => {
+              if (eventColors) randomPalette = eventColors;
+              numberOfColors = randomPalette.length;
+            }}
+          />
+        {/key}
+      {/if}
     </div>
 
     <SaveAndCloseButtons
+      disabled={!yarnDataReady}
       onSave={() => {
         updateGauge({
           _colors: randomPalette.map((color) => {

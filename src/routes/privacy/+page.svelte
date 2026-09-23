@@ -195,6 +195,28 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </p>
       </div>
 
+      <div class="flex flex-col">
+        <p class="text-xl font-bold">Map imagery on the Globe page</p>
+        <p>
+          The <a href="/globe" class="link">Globe</a> page draws the Earth's surface
+          using map tiles served by NASA's Global Imagery Browse Services (GIBS),
+          part of NASA's Earth Observing System Data and Information System. These
+          images are public domain and require no account or key.
+        </p>
+        <p>
+          Because your browser requests these tiles directly from NASA, NASA
+          receives your IP address, and the tiles you request indicate which
+          part of the world you are looking at. No account information, project
+          data, or other personal details are sent. This happens only while you
+          are on the Globe page. To learn more, see the <a
+            href="https://www.nasa.gov/privacy/"
+            class="link"
+            rel="noreferrer noopener"
+            target="_blank">NASA privacy policy</a
+          >.
+        </p>
+      </div>
+
       <div class="mb-8 flex flex-col">
         <p class="text-xl font-bold">Changes to this Privacy Policy</p>
         <p>
@@ -205,7 +227,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             class="link">GitHub</a
           >.
         </p>
-        <p class="italic">Last updated February 19, 2025</p>
+        <p class="italic">Last updated September 8, 2026</p>
       </div>
     </main>
   {/snippet}

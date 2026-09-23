@@ -3,17 +3,17 @@
 This file is part of Temperature-Blanket-Web-App.
 
 Temperature-Blanket-Web-App is free software: you can redistribute it and/or modify it
-under the terms of the GNU General Public License as published by the Free Software Foundation, 
+under the terms of the GNU General Public License as published by the Free Software Foundation,
 either version 3 of the License, or (at your option) any later version.
 
-Temperature-Blanket-Web-App is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
-without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+Temperature-Blanket-Web-App is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 See the GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
+You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script>
+<script lang="ts">
   import { browser } from '$app/environment';
   import { THEMES } from '$lib/constants/page-constants';
   import { previews } from '$lib/state/preview-state.svelte';
@@ -21,7 +21,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { onDestroy, onMount, tick } from 'svelte';
 
   let theme = $state(
-    getTheme(THEMES.find((n) => n.id === preferences.value.theme.mode)),
+    getTheme(THEMES.find((n) => n.id === preferences.value.theme.mode)?.id),
   );
 
   let activePreviewSelectId = $state(previews.activeId);
@@ -31,15 +31,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
     theme = getTheme(preferences.value.theme.mode || 'system');
   }
 
-  function getTheme(id) {
-    if (id !== 'system') return id;
+  function getTheme(id: string | undefined): string {
+    if (id && id !== 'system') return id;
     if (window.matchMedia('(prefers-color-scheme: dark)').matches)
       return 'dark';
     return 'light';
   }
 
-  function onChangePattern(newId) {
-    previews.activeId = newId;
+  function onChangePattern(newId: string) {
+    // Update optimistically so the select/thumbnails reflect the click
+    // immediately; the $effect below reconciles once previews.activeId
+    // catches up after the (possibly async) load resolves.
+    activePreviewSelectId = newId;
+    previews.load(newId);
   }
 
   onMount(() => {
@@ -66,32 +70,40 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 </script>
 
-<div class="my-4 flex flex-col items-center justify-center gap-2">
+<div class="flex flex-col items-center justify-center gap-2">
   <label class="label">
-    <select
-      class="select mx-auto w-fit min-w-[200px]"
-      id="select-pattern-type"
-      value={activePreviewSelectId}
-      onchange={(e) => {
-        onChangePattern(e.target.value);
-        tick().then(() => {
-          const activePreviewBtn = document.getElementById(
-            'active-preview-button',
-          );
-          if (activePreviewBtn) {
-            activePreviewBtn.scrollIntoView({
-              behavior: 'smooth',
-              block: 'nearest',
-              inline: 'center',
-            });
-          }
-        });
-      }}
-    >
-      {#each previews.all as { name, id }}
-        <option value={id}>{name}</option>
-      {/each}
-    </select>
+    <span class="label-text"> Pattern</span>
+    <div class="relative flex items-center">
+      <select
+        class="select truncate"
+        id="select-pattern-type"
+        value={activePreviewSelectId}
+        onchange={(e) => {
+          if (!(e.target instanceof HTMLSelectElement)) return;
+          onChangePattern(e.target.value);
+          tick().then(() => {
+            const activePreviewBtn = document.getElementById(
+              'active-preview-button',
+            );
+            if (activePreviewBtn) {
+              activePreviewBtn.scrollIntoView({
+                behavior: 'smooth',
+                block: 'nearest',
+                inline: 'center',
+              });
+            }
+          });
+        }}
+      >
+        {#each previews.all as { name, id }}
+          {#if id === 'twsr'}
+            <option value={id}>{name}</option>
+          {:else}
+            <option value={id}>{name}</option>
+          {/if}
+        {/each}
+      </select>
+    </div>
   </label>
 
   <div
@@ -114,9 +126,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
             title="Preview {name} Layout"
           >
             <img
-              src={img[theme]}
+              src={img[theme as 'light' | 'dark']}
               alt={name}
-              class="size-[52px] opacity-40"
+              class="size-[48px] opacity-40"
               class:!opacity-100={id === previews.activeId}
             />
           </button>

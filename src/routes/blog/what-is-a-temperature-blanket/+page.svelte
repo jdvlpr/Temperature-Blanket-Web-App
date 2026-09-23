@@ -22,7 +22,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { ArrowLeftIcon } from '@lucide/svelte';
 
   const colorsCode = `palette:ca2c29a4435b46203cea9d5deec06697b2dc5ea1de3271c51838971a2d46yarn:hobbii-amigo`;
-  const colors = getColorsFromInput({ string: colorsCode });
+  const colorsResult = getColorsFromInput({ string: colorsCode });
+  const colors = colorsResult || [];
   const ranges = [
     [96, 76],
     [76, 71],
@@ -152,7 +153,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   <div
                     class="rounded-container flex flex-col overflow-hidden shadow-md"
                   >
-                    {#each colors as { hex, brandName, yarnName, name }, _i}
+                    {#each colors as color, _i}
+                      {@const hex = color.hex ?? '#000000'}
+                      {@const brandName = color.brandName}
+                      {@const yarnName = color.yarnName}
+                      {@const name = color.name}
                       {@const textColor = getTextColor(hex)}
                       <div
                         style="background:{hex}; color:{textColor}"

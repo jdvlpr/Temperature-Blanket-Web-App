@@ -48,23 +48,52 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { SegmentedControl } from '@skeletonlabs/skeleton-svelte';
   import { onMount, tick } from 'svelte';
   import { fade } from 'svelte/transition';
+  import type {
+    GaugeAttributes,
+    GaugeRange,
+    GaugeRangeOptions,
+    GaugeStateInterface,
+  } from '$lib/types/gauge-types';
+  import type { Color } from '$lib/types/yarn-types';
+
+  // GaugeSettings is only ever opened for range-type gauges (see
+  // GaugeCustomizer.svelte, which hides RangeOptionsButton for
+  // `isStatic` gauges - only the moon gauge is static), so these
+  // range-related fields are always populated here.
+  type RangeGaugeSnapshot = Omit<GaugeStateInterface, 'id'> & {
+    id: 'temp' | 'prcp' | 'snow' | 'dayt';
+    rangeOptions: GaugeRangeOptions;
+    autoRangeOptions: GaugeRangeOptions;
+    ranges: GaugeRange[];
+    colors: Color[];
+  };
+
   interface Props {
-    onSave: any;
-    index?: any;
-    focusOn?: any;
+    onSave: (data: {
+      ranges: GaugeRange[];
+      rangeOptions: GaugeRangeOptions;
+    }) => void;
+    index?: number | null;
+    focusOn?: 'to' | 'from' | null;
   }
 
   let { onSave, index = null, focusOn = null }: Props = $props();
 
-  let _gauge = $state(gauges.getSnapshot(gauges.activeGaugeId));
+  let _gauge = $state(
+    gauges.getSnapshot(
+      gauges.activeGaugeId as GaugeAttributes['id'],
+    ) as RangeGaugeSnapshot,
+  );
 
-  let unitLabel = $derived(_gauge.unit.label[preferences.value.units]);
+  let unitLabel = $derived(
+    _gauge.unit.label[preferences.value.units ?? 'metric'],
+  );
 
-  let incrementMode = $state(
+  let incrementMode = $state<GaugeRangeOptions['mode'] | null>(
     _gauge.rangeOptions?.isCustomRanges ? null : _gauge.rangeOptions.mode,
   );
 
-  let customRanges = $state(gauges.getSnapshot(gauges.activeGaugeId).ranges);
+  let customRanges = $state(_gauge.ranges);
 
   let showAdvancedControls = $state(true);
 
@@ -99,10 +128,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let calculatedIncrement = $derived(
     dontIncludeFromAndTo
-      ? increment - 0.01
+      ? (increment ?? 0) - 0.01
       : includeFromAndTo
-        ? increment + 0.01
-        : increment,
+        ? (increment ?? 0) + 0.01
+        : (increment ?? 0),
   );
 
   let displayedIncrement = $derived(Math.abs(calculatedIncrement));
@@ -182,7 +211,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 
   onMount(() => {
-    scrollObserver.observe(setupContainer);
+    if (setupContainer) scrollObserver.observe(setupContainer);
 
     if (index !== null) {
       setTimeout(() => {
@@ -227,7 +256,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <p class="text-xs">Direction</p>
           <ChooseRangeDirection
             direction={_gauge.rangeOptions.direction}
-            onchange={(e) => {
+            onchange={(e: { value: GaugeRangeOptions['direction'] }) => {
               _gauge.rangeOptions.direction = e.value;
 
               changedGaugeDirectionOnCustomRanges =
@@ -258,11 +287,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <SegmentedControl
               value={incrementMode}
               onValueChange={(e) => {
-                incrementMode = e.value;
+                incrementMode = e.value as GaugeRangeOptions['mode'] | null;
               }}
             >
               <SegmentedControl.Control
-                class="bg-surface-100 dark:bg-surface-900 rounded-container bordern-none flex-wrap gap-y-2 shadow-sm"
+                class="bg-surface-100 dark:bg-surface-900 flex-wrap gap-y-2"
               >
                 <SegmentedControl.Indicator />
                 <SegmentedControl.Item value="auto">
@@ -480,7 +509,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     class="select max-w-[500px] truncate pl-10"
                     value={initialValueSelectRangeCalculationMethod}
                     onchange={(e) => {
-                      switch (e.target.value) {
+                      switch ((e.target as HTMLSelectElement).value) {
                         case 'true-false':
                           _gauge.rangeOptions.includeFromValue = true;
                           _gauge.rangeOptions.includeToValue = false;
@@ -560,7 +589,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               {@const { hex } = _gauge.colors[index]}
               <div
                 class="w-full items-center gap-2 p-2 max-xl:flex max-xl:flex-col max-xl:justify-center xl:grid xl:grid-cols-12"
-                style="background:{hex};color:{getTextColor(hex)}"
+                style="background:{hex};color:{getTextColor(hex ?? '#ffffff')}"
               >
                 <p class="col-span-1 text-xs">
                   {index + 1}
@@ -586,7 +615,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       class="input max-w-[100px] text-lg"
                       value={from}
                       onchange={(e) => {
-                        const value = +e.target.value;
+                        const value = +(e.target as HTMLInputElement).value;
                         _gauge.rangeOptions.isCustomRanges = true;
 
                         _gauge.ranges[index].from = value;
@@ -596,7 +625,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         incrementMode = null;
                       }}
                       onkeyup={(e) => {
-                        const value = +e.target.value;
+                        const value = +(e.target as HTMLInputElement).value;
                         _gauge.rangeOptions.isCustomRanges = true;
 
                         _gauge.ranges[index].from = value;
@@ -625,7 +654,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       class="input max-w-[100px] text-lg"
                       value={to}
                       onchange={(e) => {
-                        const value = +e.target.value;
+                        const value = +(e.target as HTMLInputElement).value;
 
                         _gauge.rangeOptions.isCustomRanges = true;
 
@@ -640,7 +669,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         incrementMode = null;
                       }}
                       onkeyup={(e) => {
-                        const value = +e.target.value;
+                        const value = +(e.target as HTMLInputElement).value;
 
                         _gauge.rangeOptions.isCustomRanges = true;
 
@@ -665,6 +694,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     range={_gauge.ranges[index]}
                     rangeOptions={_gauge.rangeOptions}
                     targets={_gauge.targets}
+                    gaugeUnitType={_gauge.unit.type}
                   />
                 </div>
               </div>
@@ -681,7 +711,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       transition:fade
       class="btn bg-surface-50-950/70 absolute right-2 bottom-[5.4rem] z-20 m-2 inline-flex w-fit items-center justify-center px-4 py-2 shadow-sm backdrop-blur transition-all lg:hidden"
       onclick={() =>
-        setupContainer.scrollIntoView({
+        setupContainer?.scrollIntoView({
           behavior: 'smooth',
           block: 'start',
         })}

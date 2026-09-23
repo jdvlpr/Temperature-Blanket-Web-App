@@ -20,8 +20,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { locations } from '$lib/state/location-state.svelte';
   import { project } from '$lib/state/project-state.svelte';
   import { weather } from '$lib/state/weather-state.svelte';
-  import { pluralize } from '$lib/utils/string-utils';
   import { stringToDate } from '$lib/utils/date-utils';
+  import type { TISO8601DateString } from '$lib/types/weather-types';
+  import { pluralize } from '$lib/utils/string-utils';
   import {
     CircleCheckBigIcon,
     CirclePlusIcon,
@@ -29,7 +30,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     TriangleAlertIcon,
   } from '@lucide/svelte';
   import SearchForWeather from './buttons/SearchForWeather.svelte';
-  import WeatherSourceButton from './buttons/WeatherSourceButton.svelte';
 
   const loading = $derived(locations.allValid && project.status.loading);
   const validLoadedProject = $derived(
@@ -61,11 +61,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <p class="flex flex-wrap items-center justify-center gap-x-1">
           <span class="font-bold">{@html location.result}</span>
           <span>
-            {stringToDate(location.from).toLocaleDateString(undefined, {
-              timeZone: 'UTC',
-            })} to {stringToDate(location.to).toLocaleDateString(undefined, {
-              timeZone: 'UTC',
-            })}
+            {location.from
+              ? stringToDate(
+                  location.from as TISO8601DateString,
+                ).toLocaleDateString(undefined, {
+                  timeZone: 'UTC',
+                })
+              : ''} to {location.to
+              ? stringToDate(
+                  location.to as TISO8601DateString,
+                ).toLocaleDateString(undefined, {
+                  timeZone: 'UTC',
+                })
+              : ''}
           </span>
 
           <span class="p-2 text-sm">
@@ -131,7 +139,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </div>
 
 <div
-  class="rounded-container bg-surface-100 dark:bg-surface-900 mx-auto mt-4 mb-2 flex max-w-(--breakpoint-md) flex-wrap justify-center gap-2 px-4 py-2 shadow-inner lg:mb-4"
+  class="rounded-base bg-surface-100 dark:bg-surface-900 mx-auto mt-4 mb-2 flex max-w-(--breakpoint-md) flex-wrap justify-center gap-2 px-4 py-2 shadow-inner lg:mb-4"
 >
   {#if locations.all.length < MAXIMUM_LOCATIONS}
     <button
@@ -140,7 +148,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
         weather.isUserEdited && 'hidden',
       ]}
       disabled={project.status.loading}
-      onclick={() => locations.add()}
+      onclick={() => {
+        // Clear now-stale weather data before adding the new location.
+        if (weather.rawData.length > 0) weather.setRawData([]);
+        locations.add();
+      }}
       title="Add a New Location"
     >
       <CirclePlusIcon /> Add Location

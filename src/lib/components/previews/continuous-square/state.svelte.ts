@@ -25,7 +25,15 @@ function getEndOfRoundStitch(round: number): number {
 interface ContinuousSquarePreviewSettings extends BasePreviewSettings {
   selectedTarget: WeatherParam['id'];
   stitchesPerDay: number;
-  extrasColor: Color['hex'];
+  extrasColor: NonNullable<Color['hex']>;
+}
+
+export interface ContinuousSquareSection {
+  color: Color['hex'];
+  x: number;
+  y: number;
+  isExtraStitch: boolean;
+  dayIndex: number;
 }
 
 export class ContinuousSquarePreviewClass {
@@ -49,7 +57,7 @@ export class ContinuousSquarePreviewClass {
 
   id = 'cosq';
 
-  svg = $state();
+  svg = $state<SVGSVGElement | null>(null);
 
   img = {
     light: './images/preview_icons/cosq_black.png',
@@ -64,7 +72,7 @@ export class ContinuousSquarePreviewClass {
 
   previewComponent = Preview;
 
-  sections = $state([]);
+  sections = $state<ContinuousSquareSection[]>([]);
 
   STITCH_SIZE = 5;
 
@@ -167,10 +175,10 @@ export class ContinuousSquarePreviewClass {
     this.settings.selectedTarget = target;
 
     // stitches per day
-    let stitchesPerDay;
+    let stitchesPerDay: number;
     if (separatorIndex) {
       stitchesPerDay = +hash.substring(startIndex + 1, separatorIndex);
-    } else if (lengthEndIndex) {
+    } else {
       stitchesPerDay = +hash.substring(startIndex + 1, lengthEndIndex);
     }
     this.settings.stitchesPerDay = stitchesPerDay;
@@ -180,7 +188,10 @@ export class ContinuousSquarePreviewClass {
     if (separatorIndex && lengthEndIndex) {
       color = hash.substring(separatorIndex + 1, lengthEndIndex);
     }
-    if (chroma.valid(color)) this.settings.extrasColor = chroma(color).hex();
+    if (chroma.valid(color))
+      this.settings.extrasColor = chroma(color).hex() as NonNullable<
+        Color['hex']
+      >;
 
     previews.activeId = this.id;
   }

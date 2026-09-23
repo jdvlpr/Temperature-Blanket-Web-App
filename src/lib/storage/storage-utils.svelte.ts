@@ -14,11 +14,18 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { browser } from '$app/environment';
-import { skeletonThemes } from '$lib/components/ThemeSwitcher.svelte';
+import { SKELETON_THEMES } from '$lib/constants/page-constants';
 import { DEFAULT_SEASONS } from '$lib/constants/seasons-constants';
 import { preferences } from '$lib/storage/preferences.svelte';
 import type { PageLayout } from '$lib/types/page-types';
 import { MigrationManager } from './migration-manager';
+
+// Debounce timer for persisting theme prefs to cookies. The theme effect can
+// fire several times in quick succession (e.g. dragging a settings slider), and
+// only the final state needs to be POSTed. DOM attribute updates stay immediate;
+// only the network write is debounced.
+let themePostTimer: ReturnType<typeof setTimeout> | undefined;
+const THEME_POST_DEBOUNCE_MS = 400;
 
 /**
  * Cleans up old local storage keys which are no longer used or which have been migrated to different locations
@@ -57,7 +64,7 @@ async function handleLegacyLocalStorageKeys() {
     }
     if (
       parsedSkeletonTheme &&
-      skeletonThemes.some((theme) => theme.id === parsedSkeletonTheme)
+      SKELETON_THEMES.some((theme) => theme.id === parsedSkeletonTheme)
     ) {
       preferences.value.theme.id = parsedSkeletonTheme;
       localStorage.removeItem('skeletonTheme');
@@ -71,6 +78,13 @@ async function handleLegacyLocalStorageKeys() {
 export async function initializeLocalStorage() {
   preferences.value.theme.id = preferences.value.theme.id || 'classic';
   preferences.value.theme.mode = preferences.value.theme.mode || 'system';
+  preferences.value.theme.roundness =
+    preferences.value.theme.roundness || 'pill';
+  preferences.value.theme.spacing = preferences.value.theme.spacing || 'normal';
+  preferences.value.theme.textScale =
+    preferences.value.theme.textScale || 'normal';
+  preferences.value.theme.headingStyle =
+    preferences.value.theme.headingStyle || 'classic';
   preferences.value.seasons = preferences.value.seasons || DEFAULT_SEASONS;
 
   try {
@@ -95,13 +109,34 @@ export async function initializeLocalStorage() {
     $effect(() => {
       const theme = preferences.value.theme.id || 'classic';
       const mode = preferences.value.theme.mode || 'system';
+      const roundness = preferences.value.theme.roundness || 'pill';
+      const spacing = preferences.value.theme.spacing || 'normal';
+      const textScale = preferences.value.theme.textScale || 'normal';
+      const headingStyle = preferences.value.theme.headingStyle || 'classic';
 
-      if (skeletonThemes.map((theme) => theme.id).includes(theme)) {
+      if (SKELETON_THEMES.map((theme) => theme.id).includes(theme)) {
         document.documentElement.setAttribute('data-theme', theme);
-        fetch('/api/preferences/theme', {
-          method: 'POST',
-          body: JSON.stringify({ theme, mode }),
-        });
+        document.documentElement.setAttribute('data-roundness', roundness);
+        document.documentElement.setAttribute('data-spacing', spacing);
+        document.documentElement.setAttribute('data-text-scale', textScale);
+        document.documentElement.setAttribute(
+          'data-heading-style',
+          headingStyle,
+        );
+        clearTimeout(themePostTimer);
+        themePostTimer = setTimeout(() => {
+          fetch('/api/preferences/theme', {
+            method: 'POST',
+            body: JSON.stringify({
+              theme,
+              mode,
+              roundness,
+              spacing,
+              textScale,
+              headingStyle,
+            }),
+          });
+        }, THEME_POST_DEBOUNCE_MS);
       }
     });
 

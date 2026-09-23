@@ -28,16 +28,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let weatherTargets = allGaugesAttributes.map((gauge) => gauge.targets).flat();
 
   let tableData = $derived([
-    ...weatherData.map((n) => {
+    ...weatherData.map((n: Record<string, any>) => {
       let weather = {};
       weatherTargets.forEach((target) => {
         if (target.id === 'dayt') {
           weather = {
             ...weather,
-            [target.id]: convertTime(n[target.id][preferences.value.units], {
-              displayUnits: false,
-              padStart: true,
-            }),
+            [target.id]: convertTime(
+              n[target.id][preferences.value.units ?? 'metric'],
+              {
+                displayUnits: false,
+                padStart: true,
+              },
+            ),
           };
         } else if (target.id === 'moon') {
           let value =
@@ -48,8 +51,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
           };
         } else {
           let value =
-            n[target.id][preferences.value.units] !== null
-              ? n[target.id][preferences.value.units]
+            n[target.id][preferences.value.units ?? 'metric'] !== null
+              ? n[target.id][preferences.value.units ?? 'metric']
               : '-';
           weather = {
             ...weather,
@@ -83,7 +86,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             >
           </ThSort>
           {#each weatherTargets as { id, pdfHeader }}
-            {@const header = pdfHeader[preferences.value.units]}
+            {@const header = pdfHeader[preferences.value.units ?? 'metric']}
             {@const hasHeaderUnits = header.includes('(')}
             {@const headerLabel = header.slice(0, header.indexOf('('))}
             {@const headerUnits = header.slice(header.indexOf('('))}

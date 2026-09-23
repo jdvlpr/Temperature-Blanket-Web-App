@@ -25,89 +25,101 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '$lib/state/preview-state.svelte';
   import { project } from '$lib/state/project-state.svelte';
   import { downloadPreviewPNG } from '$lib/utils/preview-utils.svelte';
+  import { exists } from '$lib/utils/other-utils';
+  import { getProjectParametersFromURLHash } from '$lib/utils/project-utils.svelte';
   import { ImageIcon } from '@lucide/svelte';
   import { onMount } from 'svelte';
   import { Drawer } from 'vaul-svelte';
   import SendToGalleryButton from './buttons/SendToGalleryButton.svelte';
 
+  function initDefaultPreview() {
+    if (previews.activeId) return;
+
+    // If this is a saved/shared project whose URL hash names a preview,
+    // don't default to Rows here — loadProjectFromURL's restore path will
+    // load and activate the right one. Racing both loads could let whichever
+    // dynamic import resolves last win, clobbering the real preview.
+    const params = getProjectParametersFromURLHash(
+      window.location.hash.substring(1),
+    );
+    const hasPreviewParam = previews.all.some((p) => exists(params[p.id]));
+    if (project.onLoaded.isProject && hasPreviewParam) return;
+
+    previews.load('rows');
+  }
+
   onMount(() => {
-    if (!previews.activeId) {
-      previews.activeId = 'rows';
-    }
+    initDefaultPreview();
   });
 </script>
 
-<PreviewSelect />
+<div class="preset-tonal-surface card p-2 md:p-4 md:shadow-lg mt-4">
+  <PreviewSelect />
 
-<div class="flex flex-col items-start justify-center gap-2 px-2">
-  {#if gauges.activeGauge?.colors}
-    {#key previews.active}
-      <div class="flex w-full flex-col items-center justify-center gap-4">
-        <previews.active.previewComponent />
+  <div class="flex flex-col items-start justify-center gap-2">
+    {#if gauges.activeGauge?.colors && previews.active?.settingsComponent}
+      {#key previews.active}
+        <div class="flex w-full flex-wrap items-start justify-center gap-4">
+          <previews.active.settingsComponent />
 
-        <Drawer.Root bind:open={drawerState.weatherDetails}>
-          <Drawer.Portal>
-            <Drawer.Overlay class="fixed inset-0 z-40 bg-black/40" />
+          <Drawer.Root bind:open={drawerState.weatherDetails}>
+            <Drawer.Portal>
+              <Drawer.Overlay class="fixed inset-0 z-40 bg-black/40" />
 
-            <Drawer.Content
-              class="bg-surface-50 dark:bg-surface-950 rounded-tl-container rounded-tr-container fixed right-0 bottom-0 left-0 z-50 mt-24 flex flex-col"
-            >
-              <div
-                class="rounded-tl-container rounded-tr-container overflow-auto pt-4"
+              <Drawer.Content
+                class="bg-surface-50 dark:bg-surface-950 rounded-tl-container rounded-tr-container fixed right-0 bottom-0 left-0 z-50 mt-24 flex flex-col"
               >
                 <div
-                  class="bg-surface-950-50 mx-auto mb-4 h-1.5 w-12 shrink-0 rounded-full"
-                ></div>
-                <div class="mx-auto text-center">
-                  <WeatherDetails
-                    weatherTargets={previewWeatherTargets.value}
-                    getTargets={previewWeatherTargets.getter}
-                  />
+                  class="rounded-tl-container rounded-tr-container overflow-auto pt-4"
+                >
+                  <div
+                    class="bg-surface-950-50 mx-auto mb-4 h-1.5 w-12 shrink-0 rounded-full"
+                  ></div>
+                  <div class="mx-auto text-center">
+                    <WeatherDetails
+                      weatherTargets={previewWeatherTargets.value}
+                      getTargets={previewWeatherTargets.getter}
+                    />
+                  </div>
                 </div>
-              </div>
-            </Drawer.Content>
-          </Drawer.Portal>
-        </Drawer.Root>
-      </div>
-
-      <div class="flex w-full flex-wrap items-start justify-center gap-4">
-        <previews.active.settingsComponent />
-      </div>
-    {/key}
-
-    <div
-      class="rounded-container bg-surface-100 dark:bg-surface-900 mt-2 flex w-full flex-wrap justify-center gap-2 px-4 py-2 shadow-inner"
-    >
-      <button
-        class="btn hover:preset-tonal-surface"
-        title="Download PNG"
-        onclick={() => {
-          downloadPreviewPNG(
-            previews.active.width,
-            previews.active.height,
-            previews.active.svg,
-          );
-        }}
-      >
-        <ImageIcon />
-        Download Image (PNG)
-      </button>
-
-      <SendToGalleryButton isPrimary={true} />
-
-      {#if project.gallery.href && project.gallery.title && project.gallery.title === locations.projectTitle}
-        <div class="flex w-full flex-col justify-center gap-1">
-          <p>View this project's gallery page:</p>
-          <p>
-            <a
-              href={project.gallery.href}
-              target="_blank"
-              class="btn hover:preset-tonal-surface w-fit whitespace-pre-wrap underline"
-              rel="noreferrer">{project.gallery.title}</a
-            >
-          </p>
+              </Drawer.Content>
+            </Drawer.Portal>
+          </Drawer.Root>
         </div>
-      {/if}
-    </div>
-  {/if}
+      {/key}
+
+      <div
+        class="rounded-container bg-surface-100 dark:bg-surface-900 mt-2 flex w-full flex-wrap justify-center gap-2 px-4 py-2 shadow-inner"
+      >
+        <button
+          class="btn hover:preset-tonal-surface"
+          title="Download PNG"
+          onclick={() => {
+            const active = previews.active;
+            if (!active?.width || !active?.height || !active?.svg) return;
+            downloadPreviewPNG(active.width, active.height, active.svg);
+          }}
+        >
+          <ImageIcon />
+          Download Image (PNG)
+        </button>
+
+        <SendToGalleryButton isPrimary={true} />
+
+        {#if project.gallery.href && project.gallery.title && project.gallery.title === locations.projectTitle}
+          <div class="flex w-full flex-col justify-center gap-1">
+            <p>View this project's gallery page:</p>
+            <p>
+              <a
+                href={project.gallery.href}
+                target="_blank"
+                class="btn hover:preset-tonal-surface w-fit whitespace-pre-wrap underline"
+                rel="noreferrer">{project.gallery.title}</a
+              >
+            </p>
+          </div>
+        {/if}
+      </div>
+    {/if}
+  </div>
 </div>

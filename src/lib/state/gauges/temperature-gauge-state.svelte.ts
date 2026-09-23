@@ -1,8 +1,12 @@
 import { weather } from '$lib/state/weather-state.svelte';
 import type {
   GaugeAttributes,
+  GaugeRange,
+  GaugeRangeOptions,
   GaugeSettingsType,
+  WeatherParam,
 } from '$lib/types/gauge-types';
+import type { Color } from '$lib/types/yarn-types';
 import { displayNumber } from '$lib/utils/number-utils';
 import {
   getEvenlyDistributedRangeValuesWithEqualDayCount,
@@ -63,7 +67,14 @@ export const gaugeAttributes: GaugeAttributes = {
   ],
 };
 
-export class TemperatureGauge {
+export class TemperatureGauge implements GaugeAttributes {
+  // Assigned at runtime in the constructor via Object.assign(this, gaugeAttributes)
+  id!: GaugeAttributes['id'];
+  isStatic!: boolean;
+  label!: GaugeAttributes['label'];
+  unit!: GaugeAttributes['unit'];
+  targets!: WeatherParam[];
+
   constructor() {
     // Assign the gauge attributes as properties
     Object.assign(this, gaugeAttributes);
@@ -104,11 +115,13 @@ export class TemperatureGauge {
   #maxes = $derived.by(() => {
     weather.params?.tmax;
     const tmaxes = weather.params.tmax;
-    return tmaxes?.filter((n) => n !== null) || [];
+    return tmaxes?.filter((n): n is number => n !== null) || [];
   });
 
   // All the low temperatures, without missing values
-  #mins = $derived(weather.params?.tmin?.filter((n) => n !== null));
+  #mins = $derived(
+    weather.params?.tmin?.filter((n): n is number => n !== null) || [],
+  );
 
   // Set the max value to above the highest integer based on the weather data
   #max = $derived.by(() => {
@@ -129,18 +142,18 @@ export class TemperatureGauge {
   // User can update these
   // *************************
 
-  colors = $state(
+  colors: Color[] = $state(
     chroma
       .scale('Spectral')
       .colors(10)
       .map((n) => {
-        return { hex: n };
+        return { hex: n as Color['hex'] };
       }),
   );
 
   numberOfColors = $state(10);
 
-  rangeOptions = {
+  rangeOptions: GaugeRangeOptions = {
     auto: {
       optimization: 'tmax',
       start: {
@@ -162,11 +175,14 @@ export class TemperatureGauge {
     isCustomRanges: false,
   };
 
-  ranges = $state(
+  ranges: GaugeRange[] = $state(
     getEvenlyDistributedRangeValuesWithEqualDayCount({
       weatherData: weather.data,
       numRanges: this.colors.length,
-      prop: this.rangeOptions.auto.optimization,
+      prop: (this.rangeOptions.auto.optimization === 'ranges'
+        ? 'tmax'
+        : this.rangeOptions.auto.optimization) as
+        'tmax' | 'tavg' | 'tmin' | 'prcp' | 'snow' | 'dayt',
       gaugeDirection: this.rangeOptions.direction,
       roundIncrement: this.rangeOptions.auto.roundIncrement,
       includeFrom: this.rangeOptions.includeFromValue,
@@ -231,7 +247,7 @@ export class TemperatureGauge {
   // *************************
   // Methods
   // *************************
-  updateColors({ colors }) {
+  updateColors({ colors }: { colors: Color[] }) {
     this.calculating = true;
     this.colors = colors;
     const { ranges, mode, isCustomRanges } = getRanges({
@@ -253,13 +269,13 @@ export class TemperatureGauge {
     this.calculating = false;
   }
 
-  updateSettings({ settings }: { settings: GaugeSettingsType }) {
+  updateSettings({ settings }: { settings: Partial<GaugeSettingsType> }) {
     this.calculating = true;
-    this.colors = settings.colors;
-    this.numberOfColors = settings.numberOfColors;
+    this.colors = settings.colors ?? this.colors;
+    this.numberOfColors = settings.numberOfColors ?? this.numberOfColors;
     this.rangeOptions = { ...this.rangeOptions, ...settings.rangeOptions };
-    this.ranges = settings.ranges;
-    this.schemeId = settings.schemeId;
+    this.ranges = (settings.ranges as GaugeRange[]) ?? this.ranges;
+    this.schemeId = settings.schemeId ?? this.schemeId;
     this.calculating = false;
   }
 }

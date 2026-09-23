@@ -65,7 +65,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     const weatherGrouping = getWeatherGrouping(project.href);
 
-    const labels = [];
+    const labels: string[] = [];
     allGaugesAttributes.forEach((gauge) => {
       gauge.targets.forEach((target) => {
         if (target?.id === 'dayt') {
@@ -79,7 +79,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     });
 
     const _weather = [...weatherData].map((day, index) => {
-      const gaugeInfo = [];
+      const gaugeInfo: (string | number)[] = [];
       allGaugesAttributes?.forEach((gauge) => {
         gauge.targets?.forEach((target) => {
           if (target?.id === 'dayt') {
@@ -90,16 +90,24 @@ If not, see <https://www.gnu.org/licenses/>. -->
               }),
             );
           } else if (target?.id === 'moon') {
-            gaugeInfo.push(MOON_PHASE_NAMES[day[target?.id]]);
+            const dayIndex = day[target?.id];
+            gaugeInfo.push(
+              typeof dayIndex === 'number' ? MOON_PHASE_NAMES[dayIndex] : '',
+            );
           } else {
-            gaugeInfo.push(day[target?.id][units]);
+            const value = day[target?.id][units];
+            gaugeInfo.push(value ?? '');
           }
         });
       });
-      return [index + 1, day.date, day.location, gaugeInfo];
+      const dateStr =
+        day.date instanceof Date
+          ? day.date.toISOString()
+          : (day.date as string);
+      return [index + 1, dateStr, day.location, gaugeInfo];
     });
 
-    const data = [
+    const data: any[][] = [
       ['Item Number', weatherGrouping, 'Location Index', ...labels],
       ..._weather,
     ];

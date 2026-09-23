@@ -13,6 +13,15 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
+import {
+  AArrowDownIcon,
+  AArrowUpIcon,
+  ALargeSmallIcon,
+  Rows2Icon,
+  Rows3Icon,
+  Rows4Icon,
+} from '@lucide/svelte';
+
 // Symbols used in a project's URL hash
 export const CHARACTERS_FOR_URL_HASH = {
   separator: "'",
@@ -120,6 +129,171 @@ export const THEMES = [
     id: 'system',
     name: 'System',
     icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-monitor-cog size-6"><path d="M12 17v4"/><path d="m15.2 4.9-.9-.4"/><path d="m15.2 7.1-.9.4"/><path d="m16.9 3.2-.4-.9"/><path d="m16.9 8.8-.4.9"/><path d="m19.5 2.3-.4.9"/><path d="m19.5 9.7-.4-.9"/><path d="m21.7 4.5-.9.4"/><path d="m21.7 7.5-.9-.4"/><path d="M22 13v2a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7"/><path d="M8 21h8"/><circle cx="18" cy="6" r="3"/></svg>`,
+  },
+];
+
+export const SKELETON_THEMES = [
+  {
+    id: 'classic',
+    description: 'Classic theme with a balanced color palette.',
+    name: 'Marble',
+    colors: {
+      primary: '#fcd34d',
+      secondary: '#075985',
+      surface: '#64748b',
+    },
+  },
+  {
+    id: 'crimson',
+    description: 'A bold theme with deep red and dark tones.',
+    name: 'Garnet',
+    colors: {
+      primary: '#d21d3d',
+      secondary: '#4785ae',
+      surface: '#353a50',
+    },
+  },
+  {
+    id: 'hamlindigo',
+    description: 'A luxurious theme with rich indigo and gold colors.',
+    name: 'Lapis Lazuli',
+    colors: {
+      primary: '#a7bef3',
+      secondary: '#a38e5e',
+      surface: '#6476a1',
+    },
+  },
+  {
+    id: 'modern',
+    description: 'A modern theme with bright pink and cyan colors.',
+    name: 'Jasper',
+    colors: {
+      primary: '#eb4999',
+      secondary: '#00b7d6',
+      surface: '#6367ef',
+    },
+  },
+  {
+    id: 'rocket',
+    description: 'A cool theme with soft blue tones',
+    name: 'Geode',
+    colors: {
+      primary: '#00b7d6',
+      secondary: '#3a82f7',
+      surface: '#64748b',
+    },
+  },
+  {
+    id: 'legacy',
+    description: 'A striking theme with a bold green and purple palette.',
+    name: 'Tufa',
+    colors: {
+      surface: '#11ba81',
+      primary: '#4f46e5',
+      secondary: '#495a90',
+    },
+  },
+];
+
+export const ROUNDNESS = [
+  {
+    id: 'sharp',
+    name: 'Sharp',
+    description: 'Square corners on buttons and containers.',
+    radiusBase: '0.063rem',
+    radiusContainer: '0.125rem',
+  },
+  {
+    id: 'rounded',
+    name: 'Rounded',
+    description: 'Gently rounded corners on buttons and containers.',
+    radiusBase: '0.75rem',
+    radiusContainer: '1.5rem',
+  },
+  {
+    id: 'pill',
+    name: 'Pill',
+    description: 'Fully rounded buttons, gently rounded containers.',
+    radiusBase: '9999rem',
+    radiusContainer: '1.5rem',
+  },
+];
+
+export const SPACING = [
+  {
+    IconComponent: Rows4Icon,
+    id: 'compact',
+    name: 'Compact',
+    description: 'Tighter layout spacing.',
+    value: '0.22rem',
+  },
+  {
+    IconComponent: Rows3Icon,
+    id: 'normal',
+    name: 'Normal',
+    description: 'Default layout spacing.',
+    value: '0.25rem',
+  },
+  {
+    IconComponent: Rows2Icon,
+    id: 'relaxed',
+    name: 'Relaxed',
+    description: 'Looser, airier layout spacing.',
+    value: '0.28rem',
+  },
+];
+
+export const TEXT_SCALE = [
+  {
+    IconComponent: AArrowDownIcon,
+    id: 'small',
+    name: 'Small',
+    description: 'Tighter typographic scale.',
+    value: '1',
+  },
+  {
+    IconComponent: ALargeSmallIcon,
+    id: 'normal',
+    name: 'Normal',
+    description: 'Default typographic scale.',
+    value: '1.067',
+  },
+  {
+    IconComponent: AArrowUpIcon,
+    id: 'large',
+    name: 'Large',
+    description: 'Larger typographic scale.',
+    value: '1.125',
+  },
+];
+
+export const HEADING_STYLE = [
+  {
+    id: 'playful',
+    name: 'Playful',
+    description: 'Expressive, bouncy, ultra-bold headings.',
+    opsz: 32,
+    wght: 900,
+    SOFT: 100,
+    WONK: 1,
+  },
+  {
+    id: 'classic',
+    name: 'Classic',
+    description: 'Balanced, medium-weight headings.',
+    opsz: 68,
+    wght: 600,
+    SOFT: 50,
+    WONK: 0,
+  },
+  {
+    id: 'refined',
+    name: 'Refined',
+    description: 'Thin, elegant, high-optical-size headings.',
+    opsz: 100,
+    wght: 700,
+    SOFT: 0,
+    WONK: 0,
   },
 ];
 

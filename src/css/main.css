@@ -80,71 +80,70 @@ https://www.skeleton.dev/docs/svelte/tailwind-components/forms#windows-bugfix
 [data-theme] {
   --base-font-family: 'apparat', sans-serif;
   --heading-font-family: 'fraunces-variable', sans-serif;
+  --heading-font-weight: inherit;
+  --heading-font-style: inherit;
+  --heading-letter-spacing: inherit;
 }
 
-/* Set custom font variation variables for each theme's headings */
-[data-theme='classic'] {
+/* Heading Style — font-variation-settings for the Fraunces variable font.
+   Independent of color theme; set via data-heading-style on <html>. */
+[data-heading-style='playful'] {
+  --opsz: 32;
+  --wght: 900;
+  --SOFT: 100;
+  --WONK: 1;
+}
+[data-heading-style='classic'] {
   --opsz: 68;
   --wght: 600;
   --SOFT: 50;
   --WONK: 0;
 }
-[data-theme='crimson'] {
-  --opsz: 48;
-  --wght: 400;
-  --SOFT: 90;
-  --WONK: 1;
+[data-heading-style='refined'] {
+  --opsz: 100;
+  --wght: 700;
+  --SOFT: 0;
+  --WONK: 0;
+}
 
+/* === Independent Style Controls ===
+   Applied via data-* attributes on <html>, separate from color theme.
+   Set by user preferences; survive color theme changes. */
+
+/* Roundness */
+[data-roundness='sharp'] {
+  --radius-base: 0.063rem;
+  --radius-container: 0.125rem;
+}
+[data-roundness='rounded'] {
   --radius-base: 0.75rem;
   --radius-container: 1.5rem;
 }
-[data-theme='hamlindigo'] {
-  --opsz: 76;
-  --wght: 900;
-  --SOFT: 0;
-  --WONK: 0;
+[data-roundness='pill'] {
+  --radius-base: 9999rem;
+  --radius-container: 1.5rem;
+}
 
+/* Spacing */
+[data-spacing='compact'] {
   --spacing: 0.22rem;
-  --radius-base: 0.063rem;
-  --radius-container: 0.125rem;
-
-  .lucide {
-    stroke-width: 1px;
-  }
 }
-[data-theme='modern'] {
-  --opsz: 12;
-  --wght: 900;
-  --SOFT: 100;
-  --WONK: 1;
-
-  --text-scaling: 1.125;
+[data-spacing='normal'] {
+  --spacing: 0.25rem;
+}
+[data-spacing='relaxed'] {
   --spacing: 0.28rem;
-  --radius-base: 9999rem;
-  --radius-container: 1.5rem;
 }
-[data-theme='rocket'] {
-  --opsz: 24;
-  --wght: 300;
-  --SOFT: 10;
-  --WONK: 0;
 
+/* Text Scale */
+[data-text-scale='small'] {
   --text-scaling: 1;
-  --radius-base: 0.125rem;
-  --radius-container: 0.25rem;
-
-  .lucide {
-    stroke-width: 1px;
-  }
 }
-[data-theme='legacy'] {
-  --opsz: 64;
-  --wght: 500;
-  --SOFT: 60;
-  --WONK: 1;
-
-  --radius-base: 9999rem;
-  --radius-container: 1.5rem;
+[data-text-scale='normal'] {
+  --text-scaling: 1.067;
+}
+[data-text-scale='large'] {
+  --text-scaling: 1.125;
 }
 
 @media (prefers-reduced-motion) {
@@ -160,7 +159,13 @@ h2,
 h3,
 h4,
 h5,
-h6 {
+h6,
+.h1,
+.h2,
+.h3,
+.h4,
+.h5,
+.h6 {
   font-variation-settings:
     'opsz' var(--opsz),
     'wght' var(--wght),
@@ -209,18 +214,6 @@ th div {
     @variant dark {
       color: var(--base-font-color-dark);
     }
-  }
-}
-
-.group .autocomplete > & {
-  @apply bg-surface-50 dark:bg-surface-950 hover:bg-primary-400/20;
-}
-
-.selected .autocomplete > &div {
-  @apply bg-primary-100/50 dark:bg-primary-900/50;
-  color: var(--base-font-color);
-  @variant dark {
-    color: var(--base-font-color-dark);
   }
 }
 

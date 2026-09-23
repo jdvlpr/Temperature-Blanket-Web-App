@@ -32,6 +32,8 @@ import {
 } from '$lib/state/gauges/daytime-gauge-state.svelte';
 import type {
   GaugeAttributes,
+  GaugeRange,
+  GaugeRangeCategory,
   GaugeStateInterface,
 } from '$lib/types/gauge-types';
 import { colorsToYarnDetails } from '$lib/utils/color-utils';
@@ -43,15 +45,18 @@ import {
 
 export const showDaysInRange: { value: boolean } = $state({ value: true });
 
+type AnyGauge =
+  TemperatureGauge | RainGauge | SnowGauge | DayTimeGauge | MoonPhaseGauge;
+
 class GaugesState {
-  allCreated: GaugeStateInterface[] = $state([]);
+  allCreated: AnyGauge[] = $state([]);
 
   allAvailable: {
     id: GaugeAttributes['id'];
     label: GaugeAttributes['label'];
   }[] = $state([]);
 
-  activeGaugeId = $state('');
+  activeGaugeId: GaugeAttributes['id'] | '' = $state('');
 
   activeGauge = $derived(
     this.allCreated.find((gauge) => gauge.id === this.activeGaugeId),
@@ -63,96 +68,91 @@ class GaugesState {
   urlHash = $derived.by(() => {
     let hash = '';
     this.allCreated.forEach((gauge) => {
+      const { rangeOptions, colors, ranges } = gauge;
+
       if (
-        (!gauge.rangeOptions || !gauge.colors || !gauge.ranges) &&
+        (!rangeOptions || !colors || !ranges) &&
         gauge.unit.type !== 'category'
       )
         return hash;
 
-      if (gauge.ranges?.length !== gauge.colors?.length) return hash;
+      if (ranges?.length !== colors?.length) return hash;
 
       hash += '&';
       hash += `${gauge.id}=`;
       hash += gauge.schemeId === 'Custom' ? '' : `${gauge.schemeId}~`;
 
       if (gauge.unit.type !== 'category') {
-        gauge.colors.forEach((color, index) => {
+        if (!rangeOptions || !colors || !ranges) return hash;
+
+        colors.forEach((color, index) => {
+          if (!color.hex) return;
           const code = color.hex.substring(color.hex.indexOf('#') + 1);
+          const range = ranges[index] as GaugeRange;
           hash += encodeURIComponent(
-            `${code}(${gauge.ranges[index].from + CHARACTERS_FOR_URL_HASH.separator + gauge.ranges[index].to})`,
+            `${code}(${range.from + CHARACTERS_FOR_URL_HASH.separator + range.to})`,
           );
         });
 
         hash += '!';
-        hash += gauge.rangeOptions.mode === 'auto' ? 'a' : 'm'; // Manual or auto ranges
-        hash += gauge.rangeOptions.linked === true ? 'l' : 'u'; // linked or unlinked ranges
-        hash += gauge.rangeOptions.direction === 'high-to-low' ? 'h' : 'l'; // high-to-low or low-to-high direction
+        hash += rangeOptions.mode === 'auto' ? 'a' : 'm'; // Manual or auto ranges
+        hash += rangeOptions.linked === true ? 'l' : 'u'; // linked or unlinked ranges
+        hash += rangeOptions.direction === 'high-to-low' ? 'h' : 'l'; // high-to-low or low-to-high direction
 
         // Include From or To values included in v1.808
-        if (
-          gauge.rangeOptions.includeFromValue &&
-          !gauge.rangeOptions.includeToValue
-        )
+        if (rangeOptions.includeFromValue && !rangeOptions.includeToValue)
           hash += '0';
-        else if (
-          !gauge.rangeOptions.includeFromValue &&
-          gauge.rangeOptions.includeToValue
-        )
+        else if (!rangeOptions.includeFromValue && rangeOptions.includeToValue)
           hash += '1';
-        else if (
-          gauge.rangeOptions.includeFromValue &&
-          gauge.rangeOptions.includeToValue
-        )
+        else if (rangeOptions.includeFromValue && rangeOptions.includeToValue)
           hash += '2';
-        else if (
-          !gauge.rangeOptions.includeFromValue &&
-          !gauge.rangeOptions.includeToValue
-        )
+        else if (!rangeOptions.includeFromValue && !rangeOptions.includeToValue)
           hash += '3';
 
-        hash += gauge.rangeOptions.isCustomRanges === true ? 't' : 'f'; // Save custom ranges setting
+        hash += rangeOptions.isCustomRanges === true ? 't' : 'f'; // Save custom ranges setting
 
         if (
-          gauge.rangeOptions.mode === 'manual' &&
-          gauge.rangeOptions.isCustomRanges === false
+          rangeOptions.mode === 'manual' &&
+          rangeOptions.isCustomRanges === false
         ) {
           // If manual ranges, include integer and starting value '10'100'
-          hash += `${displayNumber(gauge.rangeOptions.manual.increment)}${CHARACTERS_FOR_URL_HASH.separator}${displayNumber(gauge.rangeOptions.manual.start)}`;
+          hash += `${displayNumber(rangeOptions.manual.increment)}${CHARACTERS_FOR_URL_HASH.separator}${displayNumber(rangeOptions.manual.start)}`;
         }
 
         // Save range Balance Auto Focus mode for temperature gauges
         // Added in version 2.5.0
         if (
           gauge.id === 'temp' &&
-          gauge.rangeOptions.mode === 'auto' &&
-          !gauge.rangeOptions.isCustomRanges
+          rangeOptions.mode === 'auto' &&
+          !rangeOptions.isCustomRanges
         ) {
-          if (gauge.rangeOptions.auto.optimization === 'ranges') hash += '_r';
-          if (gauge.rangeOptions.auto.optimization === 'tmax') hash += '_h';
-          else if (gauge.rangeOptions.auto.optimization === 'tavg')
-            hash += '_a';
-          else if (gauge.rangeOptions.auto.optimization === 'tmin')
-            hash += '_l';
+          if (rangeOptions.auto.optimization === 'ranges') hash += '_r';
+          if (rangeOptions.auto.optimization === 'tmax') hash += '_h';
+          else if (rangeOptions.auto.optimization === 'tavg') hash += '_a';
+          else if (rangeOptions.auto.optimization === 'tmin') hash += '_l';
         }
       } else {
         // if the gauge is a 'category' type
+        if (!colors || !ranges) return hash;
 
         // must include the settings `!` for parsing purposes, but doesn't need to have real data following the '!'
         // so only include the '!'
 
-        gauge.colors.forEach((color, index) => {
+        colors.forEach((color, index) => {
+          if (!color.hex) return;
           const code = color.hex.substring(color.hex.indexOf('#') + 1);
+          const range = ranges[index] as GaugeRangeCategory;
 
-          hash += encodeURIComponent(`${code}(${gauge.ranges[index].value})`);
+          hash += encodeURIComponent(`${code}(${range.value})`);
         });
         hash += '!';
       }
 
-      if (gauge.colors.some((color) => color?.brandId && color?.yarnId)) {
+      if (colors?.some((color) => color?.brandId && color?.yarnId)) {
         hash +=
           '!' +
           colorsToYarnDetails({
-            colors: gauge.colors,
+            colors,
           });
       }
     });
@@ -167,16 +167,13 @@ class GaugesState {
     )
       return;
 
-    let newGauge;
+    let newGauge: AnyGauge;
 
     if (id === 'temp') newGauge = new TemperatureGauge();
-    if (id === 'prcp') newGauge = new RainGauge();
-    if (id === 'snow') newGauge = new SnowGauge();
-    if (id === 'dayt') newGauge = new DayTimeGauge();
-    if (id === 'moon') newGauge = new MoonPhaseGauge();
-
-    // if (id === 'prcp') newGauge = new RainGauge();
-    // else newGauge = new GaugeState({ attributes, settings });
+    else if (id === 'prcp') newGauge = new RainGauge();
+    else if (id === 'snow') newGauge = new SnowGauge();
+    else if (id === 'dayt') newGauge = new DayTimeGauge();
+    else newGauge = new MoonPhaseGauge();
 
     this.allowScrollToActiveGaugeButton = true;
 
@@ -213,22 +210,21 @@ class GaugesState {
 
   // I think this is necessary because a simple $state.snapshot(gauge) does not include deeply reactive objects, only the top level ones.
   // So this "freezes" what I need from the whole gauge
-  getSnapshot(id) {
+  getSnapshot(id: GaugeAttributes['id']): GaugeStateInterface | undefined {
     const _gauge = this.allCreated.find((gauge) => gauge.id === id);
+    if (!_gauge) return undefined;
 
-    const colors = _gauge?.colors;
+    const colors = _gauge.colors;
 
-    if (_gauge?.unit.type === 'category') return { ..._gauge, colors };
+    if (_gauge.unit.type === 'category') return { ..._gauge, colors };
 
-    const rangeOptions = _gauge?.rangeOptions;
+    const rangeOptions = _gauge.rangeOptions;
 
-    const autoRangeOptions = _gauge?.autoRangeOptions;
+    const autoRangeOptions = _gauge.autoRangeOptions;
 
-    const ranges = _gauge?.ranges;
+    const ranges = _gauge.ranges;
 
-    const gauge = _gauge;
-
-    return { ...gauge, rangeOptions, ranges, colors, autoRangeOptions };
+    return { ..._gauge, rangeOptions, ranges, colors, autoRangeOptions };
   }
 }
 

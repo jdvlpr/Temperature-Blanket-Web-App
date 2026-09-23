@@ -24,6 +24,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import GaugeCustomizer from '$lib/components/GaugeCustomizer.svelte';
   import Share from '$lib/components/Share.svelte';
   import YarnSources from '$lib/components/YarnSources.svelte';
+  import { ensureYarnData } from '$lib/data/yarns/colorways.svelte';
   import {
     colorsToCode,
     colorsToYarnDetails,
@@ -37,34 +38,46 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let isFinishedOnMount = $state(false);
 
   onMount(() => {
+    initPage();
+  });
+
+  async function initPage() {
     urlParams = new URLSearchParams(window.location.search);
     // Load URL
     if (urlParams?.has('s')) {
-      yarnPageState.gauge.colors =
-        stringToColors({
-          string: urlParams.get('s'),
-        }) || yarnPageState.gauge.colors;
+      const s = urlParams.get('s');
+      if (s) {
+        yarnPageState.gauge.colors =
+          stringToColors({
+            string: s,
+          }) || yarnPageState.gauge.colors;
+      }
     }
 
     if (urlParams?.has('f')) {
+      await ensureYarnData();
+
       let _yarnString = urlParams.get('f');
 
-      yarnPageState.gauge.colors = yarnDetailsToColors({
-        string: _yarnString,
-        colors: $state.snapshot(yarnPageState.gauge.colors),
-      });
+      if (_yarnString) {
+        yarnPageState.gauge.colors =
+          yarnDetailsToColors({
+            string: _yarnString,
+            colors: $state.snapshot(yarnPageState.gauge.colors),
+          }) || yarnPageState.gauge.colors;
+      }
     }
 
     isFinishedOnMount = true;
-  });
+  }
 
-  function getYarnFilterParams(colors) {
+  function getYarnFilterParams(colors: any[]): string {
     const details = colorsToYarnDetails({ colors });
     if (!details) return '';
     return `&f=${details}`;
   }
 
-  function getShareableURL(colors) {
+  function getShareableURL(colors: any[]): string | undefined {
     if (!browser || !isFinishedOnMount) return;
     const yarnFilterText = getYarnFilterParams(colors);
     const url = `${window.location.origin}${window.location.pathname}?s=${colorsToCode(
@@ -110,15 +123,23 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {#snippet main()}
     <div>
       <main class="m-auto max-w-(--breakpoint-xl) text-center">
+        <div class="w-full px-2 py-4">
+          <div class="flex flex-col gap-2">
+            <h2 class="h1 text-gradient mb-0">Design a Yarn Palette</h2>
+            <p>
+              Create a yarn palette from a collection of brands and yarns. Find
+              matching colors from hex codes or an image.
+            </p>
+          </div>
+        </div>
         <Card>
           {#snippet header()}
-            <div class="bg-surface-100 dark:bg-surface-900 p-4">
-              <p class="text-center">
-                Create a yarn color palette from a collection of brands and
-                yarns. Find matching colorways from HTML hex color codes or from
-                an image.
-              </p>
-            </div>
+            <p class="opacity-68 p-4 text-sm">
+              This is a standalone version of the palette creator used in the
+              <a href="/" class="link">Project Planner</a> tool. If you're making
+              a temperature blanket project, use the Project Planner instead, which
+              will automatically save your yarn palette to your project.
+            </p>
           {/snippet}
           {#snippet content()}
             <div class=" mt-4">

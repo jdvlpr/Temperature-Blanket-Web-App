@@ -13,23 +13,27 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script>
+<script lang="ts">
   import Spinner from '$lib/components/Spinner.svelte';
   import { HOURS_PER_DAY } from '$lib/constants/weather-constants';
+  import type { WeatherParam } from '$lib/types/gauge-types';
   import { weather } from '$lib/state/weather-state.svelte';
   import { displayNumber } from '$lib/utils/number-utils';
   import { getColorInfo } from '$lib/utils/color-utils';
   import { runPreview } from '$lib/utils/function-utils.svelte';
   import { showPreviewImageWeatherDetails } from '$lib/utils/preview-utils.svelte';
-  import { daytimeRowsPreview } from './state.svelte';
+  import { daytimeRowsPreview, type DaytimeRowsSection } from './state.svelte';
 
   let width = $state(daytimeRowsPreview.width);
 
   let height = $state(daytimeRowsPreview.height);
 
   runPreview(() => {
-    const sections = [];
-    let weatherParams = [];
+    const sections: DaytimeRowsSection[][] = [];
+    let weatherParams: WeatherParam['id'][] = [];
+    const weatherData = weather.data;
+    if (!weatherData) return;
+
     switch (daytimeRowsPreview.settings.daytimePosition) {
       case 'left':
         weatherParams = [
@@ -64,63 +68,67 @@ If not, see <https://www.gnu.org/licenses/>. -->
         ];
         break;
     }
+
     for (
       let sectionIndex = 0, dayIndex = 0, y = 0;
-      sectionIndex < weather.data?.length;
+      sectionIndex < weatherData.length;
       sectionIndex++, dayIndex++, y += daytimeRowsPreview.STITCH_SIZE
     ) {
-      const daytime =
-        displayNumber(
-          (weather.data[dayIndex].dayt['imperial'] *
-            daytimeRowsPreview.settings.stitchesPerRow) /
-            HOURS_PER_DAY,
-          0,
-        ) * daytimeRowsPreview.STITCH_SIZE;
-      const _day = [];
-      for (
-        let paramIndex = 0, x = 0;
-        paramIndex < weatherParams.length;
-        paramIndex++
-      ) {
-        let calcWidth;
-        switch (daytimeRowsPreview.settings.daytimePosition) {
-          case 'left':
-            if (paramIndex === 0) calcWidth = daytime;
-            if (paramIndex === 1)
-              calcWidth = daytimeRowsPreview.width - daytime;
-            break;
-          case 'right':
-            if (paramIndex === 0)
-              calcWidth = daytimeRowsPreview.width - daytime;
-            if (paramIndex === 1) calcWidth = daytime;
-            break;
-          case 'center':
-            if (paramIndex === 0 || paramIndex === 2)
-              calcWidth = (daytimeRowsPreview.width - daytime) / 2;
-            if (paramIndex === 1) calcWidth = daytime;
-            break;
-          case 'sides':
-            if (paramIndex === 0 || paramIndex === 2) calcWidth = daytime / 2;
-            if (paramIndex === 1)
-              calcWidth = daytimeRowsPreview.width - daytime;
-            break;
+      const weatherDataPoint = weatherData[dayIndex];
+      if (weatherDataPoint && weatherDataPoint.dayt) {
+        const daytime =
+          displayNumber(
+            ((weatherDataPoint.dayt['imperial'] as number) *
+              daytimeRowsPreview.settings.stitchesPerRow) /
+              HOURS_PER_DAY,
+            0,
+          ) * daytimeRowsPreview.STITCH_SIZE;
+        const _day = [];
+        for (
+          let paramIndex = 0, x = 0;
+          paramIndex < weatherParams.length;
+          paramIndex++
+        ) {
+          let calcWidth: number = 0;
+          switch (daytimeRowsPreview.settings.daytimePosition) {
+            case 'left':
+              if (paramIndex === 0) calcWidth = daytime;
+              if (paramIndex === 1)
+                calcWidth = daytimeRowsPreview.width - daytime;
+              break;
+            case 'right':
+              if (paramIndex === 0)
+                calcWidth = daytimeRowsPreview.width - daytime;
+              if (paramIndex === 1) calcWidth = daytime;
+              break;
+            case 'center':
+              if (paramIndex === 0 || paramIndex === 2)
+                calcWidth = (daytimeRowsPreview.width - daytime) / 2;
+              if (paramIndex === 1) calcWidth = daytime;
+              break;
+            case 'sides':
+              if (paramIndex === 0 || paramIndex === 2) calcWidth = daytime / 2;
+              if (paramIndex === 1)
+                calcWidth = daytimeRowsPreview.width - daytime;
+              break;
+          }
+          let param = weatherParams[paramIndex];
+          let value = weather.getWeatherValue({ dayIndex, param });
+
+          // Get the color based on the gauge ID and value
+          const color = getColorInfo({ param, value }).hex;
+
+          _day.push({
+            color,
+            width: calcWidth,
+            height: daytimeRowsPreview.STITCH_SIZE,
+            x,
+            y,
+          });
+          x += calcWidth;
         }
-        let param = weatherParams[paramIndex];
-        let value = weather.getWeatherValue({ dayIndex, param });
-
-        // Get the color based on the gauge ID and value
-        const color = getColorInfo({ param, value }).hex;
-
-        _day.push({
-          color,
-          width: calcWidth,
-          height: daytimeRowsPreview.STITCH_SIZE,
-          x,
-          y,
-        });
-        x += calcWidth;
+        sections.push(_day);
       }
-      sections.push(_day);
     }
     width = daytimeRowsPreview.width;
     height = daytimeRowsPreview.height;
@@ -140,11 +148,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
     viewBox="0 0 {width} {height}"
     bind:this={daytimeRowsPreview.svg}
     onclick={(e) => {
+      if (!(e.target instanceof SVGElement)) return;
       if (e.target.tagName !== 'rect') return;
       const group = e.target.parentElement;
+      if (!group || !(group instanceof SVGElement)) return;
       if (group.tagName !== 'g') return;
 
-      weather.currentIndex = +group.dataset.dayindex;
+      weather.currentIndex = +(group.dataset.dayindex ?? NaN);
 
       showPreviewImageWeatherDetails(daytimeRowsPreview.targets);
     }}

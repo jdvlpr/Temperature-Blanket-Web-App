@@ -17,12 +17,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
   import PreviewInfo from '$lib/components/PreviewInfo.svelte';
   import SpanYarnColorSelectIcon from '$lib/components/SpanYarnColorSelectIcon.svelte';
-  import { dialog } from '$lib/state/page-state.svelte';
   import { gauges } from '$lib/state/gauges-state.svelte';
+  import { dialog } from '$lib/state/page-state.svelte';
   import { weather } from '$lib/state/weather-state.svelte';
-  import { pluralize } from '$lib/utils/string-utils';
   import { capitalizeFirstLetter } from '$lib/utils/other-utils';
+  import { pluralize } from '$lib/utils/string-utils';
+  import type { Color } from '$lib/types/yarn-types';
   import { ArrowRightIcon } from '@lucide/svelte';
+  import Preview from './Preview.svelte';
   import { squareRoundsPreview } from './state.svelte';
 
   let targets = $derived(gauges.allCreated.map((n) => n.targets).flat());
@@ -46,42 +48,47 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <PreviewInfo previewTitle={squareRoundsPreview.name}>
   {#snippet description()}
-    Each round in a square represents one {weather.grouping}. Squares are added
-    from left to right, top to bottom.
+    <p>
+      Each round in a square represents one {weather.grouping}. Squares are
+      added from left to right, top to bottom.
+    </p>
   {/snippet}
   {#snippet details()}
     {#if squareRoundsPreview.rows}
-      There are <span class="font-semibold"
-        >{squareRoundsPreview.totalSquares}
-        total {pluralize('square', squareRoundsPreview.totalSquares)}</span
-      >
-      (<span class="font-semibold"
-        >{squareRoundsPreview.settings.columns}
-        {pluralize('column', squareRoundsPreview.settings.columns)}</span
-      >
-      and
-      <span class="font-semibold"
-        >{squareRoundsPreview.rows}
-        {pluralize('row', squareRoundsPreview.rows)}</span
-      >)
-      {#if extraRounds}
-        , 1 square has <span class="font-semibold">{extraRounds}</span> of
-        <span class="font-semibold"
-          >{weatherRoundsPerSquare}
-          {pluralize('round', weatherRoundsPerSquare)}</span
-        > of weather data
-      {/if}
-
-      {#if squareRoundsPreview.extraSquares}
-        , <span class="font-semibold"
-          >{squareRoundsPreview.extraSquares}
-          {pluralize('square', squareRoundsPreview.extraSquares)}</span
+      <p>
+        There are <span class="font-semibold"
+          >{squareRoundsPreview.totalSquares}
+          total {pluralize('square', squareRoundsPreview.totalSquares)}</span
         >
-        {pluralize(
-          { singular: 'has', plural: 'have' },
-          squareRoundsPreview.extraSquares,
-        )} no weather data.
-      {/if}{#if extraRounds || squareRoundsPreview.extraSquares}
+        (<span class="font-semibold"
+          >{squareRoundsPreview.settings.columns}
+          {pluralize('column', squareRoundsPreview.settings.columns)}</span
+        >
+        and
+        <span class="font-semibold"
+          >{squareRoundsPreview.rows}
+          {pluralize('row', squareRoundsPreview.rows)}</span
+        >)
+        {#if extraRounds}
+          , 1 square has <span class="font-semibold">{extraRounds}</span> of
+          <span class="font-semibold"
+            >{weatherRoundsPerSquare}
+            {pluralize('round', weatherRoundsPerSquare)}</span
+          > of weather data
+        {/if}
+
+        {#if squareRoundsPreview.extraSquares}
+          , <span class="font-semibold"
+            >{squareRoundsPreview.extraSquares}
+            {pluralize('square', squareRoundsPreview.extraSquares)}</span
+          >
+          {pluralize(
+            { singular: 'has', plural: 'have' },
+            squareRoundsPreview.extraSquares,
+          )} no weather data.
+        {/if}
+      </p>
+      {#if extraRounds || squareRoundsPreview.extraSquares}
         <p class="italic">
           Adjust the <span class="inline font-bold">Layout Settings</span>
           or
@@ -96,6 +103,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {/if}
   {/snippet}
 </PreviewInfo>
+
+<div class="w-full"><Preview /></div>
 
 <div
   class="preset-outlined-surface-300-700 card flex flex-col items-start gap-4 p-4"
@@ -188,7 +197,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           ref: ChangeColor,
           props: {
             hex: squareRoundsPreview.settings.additionalRoundsColor,
-            onChangeColor: ({ hex }) => {
+            onChangeColor: ({ hex }: { hex: NonNullable<Color['hex']> }) => {
               squareRoundsPreview.settings.additionalRoundsColor = hex;
               dialog.close();
             },

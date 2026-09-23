@@ -13,18 +13,18 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script>
+<script lang="ts">
   import { weather } from '$lib/state/weather-state.svelte';
   import { getColorInfo } from '$lib/utils/color-utils';
   import { runPreview } from '$lib/utils/function-utils.svelte';
   import { showPreviewImageWeatherDetails } from '$lib/utils/preview-utils.svelte';
-  import { chevronsPreview } from './state.svelte';
+  import { chevronsPreview, type ChevronsSection } from './state.svelte';
 
   let width = $state(chevronsPreview.width);
 
   let height = $state(chevronsPreview.height);
 
-  let sections = [];
+  let sections: ChevronsSection[][] = [];
 
   runPreview(() => {
     let total = weather.data?.length;
@@ -86,11 +86,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   viewBox="0 0 {width} {height}"
   bind:this={chevronsPreview.svg}
   onclick={(e) => {
+    if (!(e.target instanceof SVGElement)) return;
     if (e.target.tagName !== 'polyline') return;
     const group = e.target.parentElement;
-    if (group.tagName !== 'g') return;
+    if (!group || group.tagName !== 'g') return;
 
-    weather.currentIndex = +group.dataset.dayindex;
+    weather.currentIndex = +(group.getAttribute('data-dayindex') ?? 0);
 
     showPreviewImageWeatherDetails(chevronsPreview.targets);
   }}

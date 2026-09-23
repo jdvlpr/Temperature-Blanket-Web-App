@@ -18,12 +18,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
   import PreviewInfo from '$lib/components/PreviewInfo.svelte';
   import SpanYarnColorSelectIcon from '$lib/components/SpanYarnColorSelectIcon.svelte';
-  import { dialog } from '$lib/state/page-state.svelte';
   import { gauges } from '$lib/state/gauges-state.svelte';
+  import { dialog } from '$lib/state/page-state.svelte';
   import { weather } from '$lib/state/weather-state.svelte';
-  import { pluralize } from '$lib/utils/string-utils';
   import { capitalizeFirstLetter } from '$lib/utils/other-utils';
+  import { pluralize } from '$lib/utils/string-utils';
   import { SquareDashedIcon } from '@lucide/svelte';
+  import type { Color } from '$lib/types/yarn-types';
+  import Preview from './Preview.svelte';
   import { splitMonthSquaresPreview } from './state.svelte';
 
   let targets = $derived(gauges.allCreated.flatMap((n) => n.targets));
@@ -31,27 +33,34 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <PreviewInfo previewTitle={splitMonthSquaresPreview.name}>
   {#snippet description()}
-    Each square represents one month. Months are added from left to right, top
-    to bottom. Each round in a square represents one day, starting with the
-    first of the month in the center of the square. Each round is split in half
-    to represent two different weather parameters. Months with fewer days have
-    extra rounds added, so that each square has the same number of rounds.
+    <p>
+      Each square represents one month. Months are added from left to right, top
+      to bottom. Each round in a square represents one day, starting with the
+      first of the month in the center of the square. Each round is split in
+      half to represent two different weather parameters. Months with fewer days
+      have extra rounds added, so that each square has the same number of
+      rounds.
+    </p>
   {/snippet}
   {#snippet details()}
     {#if splitMonthSquaresPreview.details}
-      There are <span class="font-semibold"
-        >{splitMonthSquaresPreview.weatherMonths.length} month
-        {pluralize(
-          'square',
-          splitMonthSquaresPreview.weatherMonths.length,
-        )}</span
-      >. Each month square has
-      <span class="font-semibold"
-        >{splitMonthSquaresPreview.details.roundsPerSquare} total rounds</span
-      >.
+      <p>
+        There are <span class="font-semibold"
+          >{splitMonthSquaresPreview.weatherMonths.length} month
+          {pluralize(
+            'square',
+            splitMonthSquaresPreview.weatherMonths.length,
+          )}</span
+        >. Each month square has
+        <span class="font-semibold"
+          >{splitMonthSquaresPreview.details.roundsPerSquare} total rounds</span
+        >.
+      </p>
     {/if}
   {/snippet}
 </PreviewInfo>
+
+<div class="w-full"><Preview /></div>
 
 <div
   class="preset-outlined-surface-300-700 card flex flex-col items-start gap-4 p-4"
@@ -99,7 +108,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           ref: ChangeColor,
           props: {
             hex: splitMonthSquaresPreview.settings.additionalRoundsColor,
-            onChangeColor: ({ hex }) => {
+            onChangeColor: ({ hex }: { hex: NonNullable<Color['hex']> }) => {
               splitMonthSquaresPreview.settings.additionalRoundsColor = hex;
               dialog.close();
             },

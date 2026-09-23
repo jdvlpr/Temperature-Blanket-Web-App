@@ -4,7 +4,10 @@ import { CHARACTERS_FOR_URL_HASH } from '$lib/constants/page-constants';
 import { gauges } from '$lib/state/gauges-state.svelte';
 import { previews } from '$lib/state/preview-state.svelte';
 import { weather } from '$lib/state/weather-state.svelte';
-import type { BasePreviewSettings } from '$lib/types/preview-types';
+import type {
+  BasePreviewSettings,
+  SecondaryTarget,
+} from '$lib/types/preview-types';
 import type { Color } from '$lib/types/yarn-types';
 import type { WeatherParam } from '$lib/types/gauge-types';
 import {
@@ -23,14 +26,22 @@ import chroma from 'chroma-js';
 interface CalendarPreviewSettings extends BasePreviewSettings {
   primaryTarget: WeatherParam['id'];
   squareSize: number;
-  secondaryTargets: { indexes: number; targetId: WeatherParam['id'] }[];
+  secondaryTargets: SecondaryTarget[];
   dimensions: string;
   weekStartCode: number;
-  monthPadding: number;
-  additionalSquaresColor: Color['hex'];
+  monthPadding: boolean;
+  additionalSquaresColor: NonNullable<Color['hex']>;
   primaryTargetAsBackup: number;
   joinStitches: number;
-  joinColor: Color['hex'];
+  joinColor: NonNullable<Color['hex']>;
+}
+
+export interface CalendarSection {
+  color: NonNullable<Color['hex']>;
+  x: number;
+  y: number;
+  isWeatherSquare: boolean;
+  dayIndex: number;
 }
 
 export class CalendarPreviewClass {
@@ -77,9 +88,9 @@ export class CalendarPreviewClass {
 
   name = 'Calendar';
 
-  sections = $state([]);
+  sections = $state<CalendarSection[][]>([]);
 
-  svg = $state(null);
+  svg = $state<SVGSVGElement | null>(null);
 
   img = $state({
     light: './images/preview_icons/Calendar.png',
@@ -104,7 +115,7 @@ export class CalendarPreviewClass {
     secondaryTargets: [],
     dimensions: '3x4',
     weekStartCode: 1,
-    monthPadding: 0,
+    monthPadding: false,
     additionalSquaresColor: '#f0f3f3',
     primaryTargetAsBackup: 1,
     joinStitches: 0,
@@ -154,7 +165,7 @@ export class CalendarPreviewClass {
   );
 
   extraSquares = $derived.by(() => {
-    let data = [];
+    let data: number[] = [];
     let max = this.squaresPerMonth;
     this.months.forEach((month, index) => {
       let days = [
@@ -286,7 +297,7 @@ export class CalendarPreviewClass {
   // *******************
   // Method for loading settings from a url hash string
   // *******************
-  load(hash) {
+  load(hash: string) {
     let startIndex = [],
       endIndex = [],
       exclamationIndex = [];
@@ -303,7 +314,10 @@ export class CalendarPreviewClass {
     }
     if (!startIndex || !separatorIndex || !endIndex) return; // format of hash was wrong, so stop processing
 
-    this.settings.primaryTarget = hash.substring(0, startIndex[0]);
+    this.settings.primaryTarget = hash.substring(
+      0,
+      startIndex[0],
+    ) as WeatherParam['id'];
     this.settings.squareSize = +hash.substring(
       startIndex[0] + 1,
       separatorIndex[0],
@@ -317,13 +331,13 @@ export class CalendarPreviewClass {
       separatorIndex[1] + 1,
       separatorIndex[2],
     );
-    this.settings.monthPadding = +hash.substring(
+    this.settings.monthPadding = !!+hash.substring(
       separatorIndex[2] + 1,
       separatorIndex[3],
     );
     this.settings.additionalSquaresColor = chroma(
       hash.substring(separatorIndex[3] + 1, endIndex[0]),
-    ).hex();
+    ).hex() as NonNullable<Color['hex']>;
     this.settings.primaryTargetAsBackup = +hash.substring(
       endIndex[0] + 1,
       endIndex[0] + 2,
@@ -331,8 +345,9 @@ export class CalendarPreviewClass {
     // Secondary Targets
     if (startIndex.length > 1) {
       for (let i = 1; i < startIndex.length; i++) {
-        let targetId = hash.substring(startIndex[i] - 4, startIndex[i]);
-        if (targetId === 'time') targetId = 'dayt'; // Bug fix in 1.67 (previous id was daytime so it got cut off)
+        let targetIdStr = hash.substring(startIndex[i] - 4, startIndex[i]);
+        if (targetIdStr === 'time') targetIdStr = 'dayt'; // Bug fix in 1.67 (previous id was daytime so it got cut off)
+        let targetId: WeatherParam['id'] = targetIdStr as WeatherParam['id'];
         const secondaryParamSeparatorIndex = separatorIndex.filter(
           (item) => item > startIndex[i] && item < endIndex[i],
         );
@@ -348,10 +363,11 @@ export class CalendarPreviewClass {
               : secondaryParamSeparatorIndex[positionIndex];
           let value = hash.substring(start, end);
           start = end + 1;
-          this.settings.secondaryTargets = setSecondaryTargets(
-            [targetId, +value],
-            this.settings.secondaryTargets,
-          );
+          this.settings.secondaryTargets =
+            setSecondaryTargets(
+              [targetId, +value],
+              this.settings.secondaryTargets,
+            ) || [];
         }
       }
     }
@@ -383,7 +399,9 @@ export class CalendarPreviewClass {
 
         // Get the color
         // The characters are from the divider position 'till the end of the hash
-        let joinColor = chroma(hash.substring(dividerIndex + 1)).hex();
+        let joinColor = chroma(
+          hash.substring(dividerIndex + 1),
+        ).hex() as NonNullable<Color['hex']>;
         if (chroma.valid(joinColor)) {
           this.settings.joinColor = joinColor;
         }

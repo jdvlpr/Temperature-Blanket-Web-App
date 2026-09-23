@@ -18,13 +18,16 @@ import { ICONS } from '$lib/constants/icon-constants';
 import type { ChangelogItemGroup } from '$lib/types/page-types';
 import {
   CloudCogIcon,
+  CogIcon,
   GlobeIcon,
   ImageIcon,
+  LandmarkIcon,
   MoonStarIcon,
   RocketIcon,
   SquarePlayIcon,
   SquareTerminalIcon,
   WrenchIcon,
+
 } from '@lucide/svelte';
 
 export const entries: ChangelogItemGroup[] = [
@@ -32,8 +35,124 @@ export const entries: ChangelogItemGroup[] = [
     year: 2026,
     months: [
       {
+        month: 'September',
+        items: [
+          {
+            notes: [
+              {
+                IconComponent: GlobeIcon,
+                text: `The <a href="/globe" class="link">Globe</a> now shows detailed NASA satellite imagery you can zoom much closer into. Project markers lie flat on the map, grow as you zoom in, and never overlap, so they're easier to tap. A searchable list shows the places in view, and on phones it's a panel you can swipe up from the bottom of the screen.`,
+                title: 'Globe Improvements',
+              },
+              {
+                IconComponent: LandmarkIcon,
+                text: `Project pages in the <a href="/gallery" class="link">Project Gallery</a> have a new "See nearby projects" button that opens the project's location on the Globe. Project details now open from an "About" button.`,
+                title: 'Project Gallery Updates',
+              },
+            ],
+            version: '6.2.1',
+          },
+        ],
+      },
+      {
+        month: 'August',
+        items: [
+          {
+            notes: [
+              {
+                icon: ICONS.checkCircle,
+                text: `84 colorways`,
+                title:
+                  'Added New Yarn: <a href="/yarn-colorway-finder?f=dharma-acid_dyes&v=6.2.0" class="link">Dharma - Acid Dyes</a>',
+              },
+              {
+                icon: ICONS.checkCircle,
+                text: `168 colorways`,
+                title:
+                  'Added New Yarn: <a href="/yarn-colorway-finder?f=dharma-fiber_reactive_procion_dyes&v=6.2.0" class="link">Dharma - Fiber Reactive Procion Dyes</a>',
+              },
+            ],
+            version: '6.2.0',
+          },
+          {
+            notes: [
+              {
+                icon: ICONS.checkCircle,
+                text: `43 colorways`,
+                title:
+                  'Added New Yarn: <a href="/yarn-colorway-finder?f=ferner_wolle-merino_160&v=6.1.0" class="link">Ferner Wolle - Merino 160</a>',
+              },
+              {
+                icon: ICONS.checkCircle,
+                text: `115 colorways`,
+                title:
+                  'Added New Yarn: <a href="/yarn-colorway-finder?f=handy_hands-lizbeth_size_40&v=6.1.0" class="link">Handy Hands - Lizbeth Size 40</a>',
+              },
+              {
+                icon: ICONS.checkCircle,
+                text: `22 colorways`,
+                title:
+                  'Added New Yarn: <a href="/yarn-colorway-finder?f=knit_picks-comfy_fingering&v=6.1.0" class="link">Knit Picks - Comfy Fingering</a>',
+              },
+              {
+                icon: ICONS.checkCircle,
+                text: `45 colorways`,
+                title:
+                  'Added New Yarn: <a href="/yarn-colorway-finder?f=premier-basix_chenille_brights&v=6.1.0" class="link">Premier - Basix Chenille Brights</a>',
+              },
+              {
+                icon: ICONS.checkCircle,
+                text: `90 colorways`,
+                title:
+                  'Added New Yarn: <a href="/yarn-colorway-finder?f=wendy-supreme_dk&v=6.1.0" class="link">Wendy - Supreme DK</a>',
+              },
+            ],
+            version: '6.1.0',
+          },
+          {
+            notes: [
+              {
+                IconComponent: CogIcon,
+                text: `Fixed an issue where sorting colors wasn't saving, and improved performance by only loading yarn colorway data when necessary.`,
+                title: 'Bug fixes & performance improvements',
+              },
+            ],
+            version: '6.0.14',
+          },
+        ],
+      },
+      {
+        month: 'July',
+        items: [
+          {
+            notes: [
+              {
+                IconComponent: RocketIcon,
+                instructions:
+                  "<a href='/blog/2026-07-09-version-6' class='link'>Learn more and read the update announcement.</a>",
+                text: `There is a breaking change in that the Daytime calculations are more accurate, which may result in different Daytime and Nighttime stitch counts for some projects.`,
+                title: 'Version 6',
+              },
+            ],
+            version: '6.0.0',
+          },
+        ],
+      },
+      {
         month: 'June',
         items: [
+          {
+            notes: [
+              {
+                icon: ICONS.design,
+                instructions:
+                  'Try it in the Preview tab of the Project Planner',
+                text: `Each of the 12 points represents a month, and each chevron row within a point represents one of your project's days, radiating outward from the center.`,
+                title: 'New Preview Layout: 12-Point Star',
+              },
+            ],
+            version: '5.55.0',
+          },
           {
             notes: [
               {

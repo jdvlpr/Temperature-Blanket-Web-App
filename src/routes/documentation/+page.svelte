@@ -44,7 +44,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <svelte:document
   onclick={(event) => {
-    if (event.target.classList.contains('toc-anchor')) {
+    if (
+      event.target instanceof HTMLElement &&
+      event.target.classList.contains('toc-anchor')
+    ) {
       openTableOfContents = false;
     }
   }}
@@ -1402,9 +1405,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
               Here’s a table showing which values would be included in an
               example range from 13 degrees to 12 degrees.
             </p>
-            <figure class="">
+            <figure class="overflow-x-auto">
               <table
-                class="table-autoborder-surface-950-50 bg-surface-200 dark:bg-surface-800 rounded-container border p-2"
+                class="border-surface-300-700 w-full border-separate border-spacing-0 overflow-hidden border text-left"
               >
                 <thead>
                   <tr
@@ -1413,6 +1416,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   >
                 </thead>
                 <tbody
+                  class="[&>tr:nth-child(odd)]:bg-surface-50 [&>tr:nth-child(odd)]:dark:bg-surface-950 [&>tr:nth-child(even)]:bg-surface-100 [&>tr:nth-child(even)]:dark:bg-surface-900"
                   ><tr
                     ><td class="p-2"
                       >Include From, don’t include To (default)</td
@@ -1661,8 +1665,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <h3 class="text-xl font-bold">Link Unavailable</h3>
 
             <p>
-              A yarn that says <span class="italic">Link Unavailable</span> means the webpage from which the
-              colorways were accessed is no longer available.
+              A yarn that says <span class="italic">Link Unavailable</span> means
+              the webpage from which the colorways were accessed is no longer available.
             </p>
             <p>It could mean:</p>
             <ul class="ml-4">
@@ -1673,7 +1677,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 longer exist
               </li>
             </ul>
-            <p>Yarns with unavailable links remain on this web app for legacy purposes, but you may not want to use them for new projects.</p>
+            <p>
+              Yarns with unavailable links remain on this web app for legacy
+              purposes, but you may not want to use them for new projects.
+            </p>
           </section>
           <h2 class="scroll-mt-[58px] text-2xl font-bold" id="preview">
             Preview
@@ -1690,6 +1697,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
               pattern types which you can use to customize your preview:
             </p>
             <ul class="ml-4 flex flex-col gap-2">
+              <li>
+                <span class="font-bold">12-Point Star</span> – Each of the 12 points
+                represents a month (starting with January at the top, moving clockwise).
+                Each chevron row within a point represents one day's weather data,
+                radiating outward from the center.
+              </li>
               <li>
                 <span class="font-bold">Calendar</span> – Squares are arranged in
                 a calendar-like grid, grouped by month.

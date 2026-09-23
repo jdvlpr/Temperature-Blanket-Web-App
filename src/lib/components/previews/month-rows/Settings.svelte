@@ -22,9 +22,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { gauges } from '$lib/state/gauges-state.svelte';
   import { dialog } from '$lib/state/page-state.svelte';
   import { weather } from '$lib/state/weather-state.svelte';
-  import { pluralize } from '$lib/utils/string-utils';
   import { capitalizeFirstLetter } from '$lib/utils/other-utils';
+  import { pluralize } from '$lib/utils/string-utils';
   import { SquareDashedIcon } from '@lucide/svelte';
+  import type { Color } from '$lib/types/yarn-types';
+  import Preview from './Preview.svelte';
   import { monthRowsPreview } from './state.svelte';
 
   let targets = $derived(gauges.allCreated.flatMap((n) => n.targets));
@@ -33,27 +35,33 @@ If not, see <https://www.gnu.org/licenses/>. -->
 {#if monthRowsPreview.details}
   <PreviewInfo previewTitle={monthRowsPreview.name}>
     {#snippet description()}
-      Rows are grouped by month from <span class="font-semibold"
-        >{#if monthRowsPreview.settings?.direction === 'left-to-right'}left to
-          right{:else if monthRowsPreview.settings.direction === 'top-to-bottom'}top
-          to bottom{/if}</span
-      >. Months with fewer days have extra rows added, so that each month
-      section has the same number of rows.
+      <p>
+        Rows are grouped by month from <span class="font-semibold"
+          >{#if monthRowsPreview.settings?.direction === 'left-to-right'}left to
+            right{:else if monthRowsPreview.settings.direction === 'top-to-bottom'}top
+            to bottom{/if}</span
+        >. Months with fewer days have extra rows added, so that each month
+        section has the same number of rows.
+      </p>
     {/snippet}
     {#snippet details()}
-      There are <span class="font-semibold"
-        >{monthRowsPreview.monthsInData.length} month
-        {pluralize('section', monthRowsPreview.monthsInData.length)}</span
-      >. Each month section has
-      <span class="font-semibold"
-        >{monthRowsPreview.details.rowsPerMonth} total {pluralize(
-          'row',
-          monthRowsPreview.details.rowsPerMonth,
-        )}</span
-      >.
+      <p>
+        There are <span class="font-semibold"
+          >{monthRowsPreview.monthsInData.length} month
+          {pluralize('section', monthRowsPreview.monthsInData.length)}</span
+        >. Each month section has
+        <span class="font-semibold"
+          >{monthRowsPreview.details.rowsPerMonth} total {pluralize(
+            'row',
+            monthRowsPreview.details.rowsPerMonth,
+          )}</span
+        >.
+      </p>
     {/snippet}
   </PreviewInfo>
 {/if}
+
+<div class="w-full"><Preview /></div>
 
 <div
   class="preset-outlined-surface-300-700 card flex flex-col items-start gap-4 p-4"
@@ -113,7 +121,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             ref: ChangeColor,
             props: {
               hex: monthRowsPreview.settings.borderColor,
-              onChangeColor: ({ hex }) => {
+              onChangeColor: ({ hex }: { hex: NonNullable<Color['hex']> }) => {
                 monthRowsPreview.settings.borderColor = hex;
                 dialog.close();
               },
@@ -156,7 +164,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           ref: ChangeColor,
           props: {
             hex: monthRowsPreview.settings.extrasColor,
-            onChangeColor: ({ hex }) => {
+            onChangeColor: ({ hex }: { hex: NonNullable<Color['hex']> }) => {
               monthRowsPreview.settings.extrasColor = hex;
               dialog.close();
             },

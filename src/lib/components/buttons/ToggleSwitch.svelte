@@ -39,7 +39,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <label
   for="{uid}-checkbox"
   class={[
-    'bg-surface-100 dark:bg-surface-900 rounded-container flex w-full justify-between gap-4 px-4 py-2 shadow-sm',
+    'bg-surface-100 dark:bg-surface-900 rounded-container flex w-full justify-between gap-4 px-4 py-2 border border-gray-300 dark:border-gray-700',
     !disabled && 'cursor-pointer',
   ]}
 >

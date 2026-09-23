@@ -24,18 +24,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import StickyPart from './StickyPart.svelte';
 
   let submitting = $state(false),
-    message = $state();
+    message = $state<{ text: string; icon: 'spinner' | 'none' } | undefined>();
 
   async function submit() {
+    const active = previews.active;
+    if (!active?.svg || !active?.width || !active?.height) return;
+
     submitting = true;
     message = {
       text: "<p class='font-bold text-xl my-4 text-center'>Sending Project...</p><p class='italic'>This could take up to a few minutes. Please don't navigate away.</p>",
       icon: 'spinner',
     };
     const imgSrc = await svgToPNG({
-      svgNode: previews.active.svg,
-      width: previews.active.width,
-      height: previews.active.height,
+      svgNode: active.svg,
+      width: active.width,
+      height: active.height,
       download: false,
     });
 
@@ -98,7 +101,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
         class="bg-surface-50 dark:bg-surface-950 rounded-container pointer-events-none col-span-full m-auto mb-4 flex w-full max-w-[250px] flex-col gap-2 p-4 sm:col-span-1"
       >
         <span class="line-clamp-4 font-bold">{locations.projectTitle}</span>
-        <previews.active.previewComponent />
+        {#if previews.active}
+          <previews.active.previewComponent />
+        {/if}
       </div>
     {:else}
       <div

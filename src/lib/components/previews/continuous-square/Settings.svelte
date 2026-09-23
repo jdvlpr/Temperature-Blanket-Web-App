@@ -18,11 +18,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
   import PreviewInfo from '$lib/components/PreviewInfo.svelte';
   import SpanYarnColorSelectIcon from '$lib/components/SpanYarnColorSelectIcon.svelte';
-  import { dialog } from '$lib/state/page-state.svelte';
   import { gauges } from '$lib/state/gauges-state.svelte';
+  import { dialog } from '$lib/state/page-state.svelte';
   import { weather } from '$lib/state/weather-state.svelte';
   import { capitalizeFirstLetter } from '$lib/utils/other-utils';
   import { pluralize } from '$lib/utils/string-utils';
+  import type { Color } from '$lib/types/yarn-types';
+  import Preview from './Preview.svelte';
   import { continuousSquarePreview } from './state.svelte';
 
   let targets = $derived(gauges.allCreated.map((n) => n.targets).flat());
@@ -31,26 +33,33 @@ If not, see <https://www.gnu.org/licenses/>. -->
 {#if continuousSquarePreview.details?.rounds}
   <PreviewInfo previewTitle={continuousSquarePreview.name}>
     {#snippet description()}
-      Starting from the center, stitches are added in a clockwise square
-      pattern. Possible crochet patterns: Granny Square, Moss Stitch/Linen
-      Stitch Square.
+      <p>
+        Starting from the center, stitches are added in a clockwise square
+        pattern. Possible crochet patterns: Granny Square, Moss Stitch/Linen
+        Stitch Square.
+      </p>
     {/snippet}
     {#snippet details()}
-      There are <span class="font-semibold"
-        >{continuousSquarePreview.details.rounds}
-        rounds</span
-      >
-      with
-      <span class="font-semibold"
-        >{continuousSquarePreview.details.countOfAdditionalStitches} additional {pluralize(
-          'stitch',
-          continuousSquarePreview.details.countOfAdditionalStitches,
-          'es',
-        )}</span
-      >.
+      <p>
+        There are <span class="font-semibold"
+          >{continuousSquarePreview.details.rounds}
+          rounds</span
+        >
+        with
+        <span class="font-semibold"
+          >{continuousSquarePreview.details.countOfAdditionalStitches} additional
+          {pluralize(
+            'stitch',
+            continuousSquarePreview.details.countOfAdditionalStitches,
+            'es',
+          )}</span
+        >.
+      </p>
     {/snippet}
   </PreviewInfo>
 {/if}
+
+<div class="w-full"><Preview /></div>
 
 <div
   class="preset-outlined-surface-300-700 card flex flex-col items-start gap-4 p-4"
@@ -91,7 +100,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
               ref: ChangeColor,
               props: {
                 hex: continuousSquarePreview.settings.extrasColor,
-                onChangeColor: ({ hex }) => {
+                onChangeColor: ({
+                  hex,
+                }: {
+                  hex: NonNullable<Color['hex']>;
+                }) => {
                   continuousSquarePreview.settings.extrasColor = hex;
                   dialog.close();
                 },

@@ -13,26 +13,37 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script>
+<script lang="ts">
   import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
   import SquareDesigner from '$lib/components/modals/SquareDesigner.svelte';
   import PreviewInfo from '$lib/components/PreviewInfo.svelte';
   import SpanYarnColorSelectIcon from '$lib/components/SpanYarnColorSelectIcon.svelte';
-  import { dialog } from '$lib/state/page-state.svelte';
+  import type { Color } from '$lib/types/yarn-types';
+  import type { SecondaryTarget } from '$lib/types/preview-types';
+  import type { WeatherParam } from '$lib/types/gauge-types';
   import { gauges } from '$lib/state/gauges-state.svelte';
+  import { dialog } from '$lib/state/page-state.svelte';
   import { weather } from '$lib/state/weather-state.svelte';
   import { pluralize } from '$lib/utils/string-utils';
   import { SquareDashedIcon, SquareSquareIcon } from '@lucide/svelte';
+  import Preview from './Preview.svelte';
   import { squaresPreview } from './state.svelte';
 
   let targets = $derived(gauges.allCreated.map((n) => n.targets).flat());
 
-  function handelOkaySquareDesigner(e) {
+  function handelOkaySquareDesigner(e: {
+    squareSize: number;
+    primaryTarget: unknown;
+    secondaryTargets: unknown;
+    primaryTargetAsBackup: boolean;
+  }) {
     squaresPreview.settings = {
       ...squaresPreview.settings,
       squareSize: e.squareSize,
-      primaryTarget: e.primaryTarget,
-      secondaryTargets: e.secondaryTargets,
+      primaryTarget: e.primaryTarget as WeatherParam['id'],
+      secondaryTargets: Array.isArray(e.secondaryTargets)
+        ? (e.secondaryTargets as SecondaryTarget[])
+        : [],
       primaryTargetAsBackup: e.primaryTargetAsBackup,
     };
   }
@@ -40,30 +51,39 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <PreviewInfo previewTitle={squaresPreview.name}>
   {#snippet description()}
-    Each square represents one {weather.grouping}. Squares are added from left
-    to right, top to bottom.
+    <p>
+      Each square represents one {weather.grouping}. Squares are added from left
+      to right, top to bottom.
+    </p>
   {/snippet}
   {#snippet details()}
     {#if squaresPreview.details}
-      There are <span class="font-semibold"
-        >{squaresPreview.squaresTotalCount} total {pluralize(
-          'square',
-          squaresPreview.squaresTotalCount,
-        )}</span
-      >
-      in
-      <span class="font-semibold"
-        >{squaresPreview.details.rows}
-        {pluralize('row', squaresPreview.details.rows)}</span
-      >{#if squaresPreview.details.additionalSquares}.
+      <p>
+        There are <span class="font-semibold"
+          >{squaresPreview.squaresTotalCount} total {pluralize(
+            'square',
+            squaresPreview.squaresTotalCount,
+          )}</span
+        >
+        in
         <span class="font-semibold"
-          >{squaresPreview.details.additionalSquares}
-          {pluralize('square', squaresPreview.details.additionalSquares)}</span
-        > have no weather data
-      {/if}.
+          >{squaresPreview.details.rows}
+          {pluralize('row', squaresPreview.details.rows)}</span
+        >{#if squaresPreview.details.additionalSquares}.
+          <span class="font-semibold"
+            >{squaresPreview.details.additionalSquares}
+            {pluralize(
+              'square',
+              squaresPreview.details.additionalSquares,
+            )}</span
+          > have no weather data
+        {/if}.
+      </p>
     {/if}
   {/snippet}
 </PreviewInfo>
+
+<div class="w-full"><Preview /></div>
 
 <div
   class="preset-outlined-surface-300-700 card flex flex-col items-start gap-4 p-4"
@@ -157,7 +177,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             ref: ChangeColor,
             props: {
               hex: squaresPreview.settings.additionalSquaresColor,
-              onChangeColor: ({ hex }) => {
+              onChangeColor: ({ hex }: { hex: NonNullable<Color['hex']> }) => {
                 squaresPreview.settings.additionalSquaresColor = hex;
                 dialog.close();
               },
@@ -205,7 +225,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             ref: ChangeColor,
             props: {
               hex: squaresPreview.settings.joinColor,
-              onChangeColor: ({ hex }) => {
+              onChangeColor: ({ hex }: { hex: NonNullable<Color['hex']> }) => {
                 squaresPreview.settings.joinColor = hex;
                 dialog.close();
               },

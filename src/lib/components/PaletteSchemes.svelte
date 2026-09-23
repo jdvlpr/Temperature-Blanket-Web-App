@@ -13,11 +13,12 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script>
+<script lang="ts">
   import ColorPalette from '$lib/components/ColorPalette.svelte';
   import SelectNumberOfColors from '$lib/components/SelectNumberOfColors.svelte';
   import { SCHEMES } from '$lib/constants/color-constants';
   import { dialog } from '$lib/state/page-state.svelte';
+  import type { Color } from '$lib/types/yarn-types';
   import { PaletteIcon } from '@lucide/svelte';
   import chroma from 'chroma-js';
 
@@ -32,16 +33,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
     ),
   ];
 
-  function getPresetPalettes(numberOfColors) {
+  function getPresetPalettes(numberOfColors: number) {
     return SCHEMES.map((scheme) => {
-      const colors = chroma
-        .scale(scheme.value)
-        .colors(numberOfColors)
-        .map((n) => {
+      const scale = chroma.scale(scheme.value as chroma.BrewerPaletteName);
+      const colors: Color[] = (scale.colors(numberOfColors) as string[]).map(
+        (n) => {
           return {
             hex: n,
           };
-        });
+        },
+      );
       return { ...scheme, colors };
     });
   }

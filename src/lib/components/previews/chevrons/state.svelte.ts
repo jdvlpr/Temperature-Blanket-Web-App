@@ -4,6 +4,7 @@ import { previews } from '$lib/state/preview-state.svelte';
 import { project } from '$lib/state/project-state.svelte';
 import { weather } from '$lib/state/weather-state.svelte';
 import type { BasePreviewSettings } from '$lib/types/preview-types';
+import type { Color } from '$lib/types/yarn-types';
 import type { WeatherParam } from '$lib/types/gauge-types';
 import { setTargets } from '$lib/utils/preview-utils.svelte';
 import { upToDate } from '$lib/utils/other-utils';
@@ -14,6 +15,12 @@ interface ChevronsPreviewSettings extends BasePreviewSettings {
   selectedTargets: WeatherParam['id'][];
   chevronsPerRow: number;
   chevronSideLength: number;
+}
+
+export interface ChevronsSection {
+  color: Color['hex'];
+  p: string;
+  dayIndex: number;
 }
 
 export class ChevronsPreviewClass {
@@ -37,7 +44,7 @@ export class ChevronsPreviewClass {
 
   id = 'chev';
 
-  svg = $state();
+  svg = $state<SVGSVGElement | null>(null);
 
   img = {
     light: './images/preview_icons/Chevrons.png',
@@ -52,7 +59,7 @@ export class ChevronsPreviewClass {
 
   previewComponent = Preview;
 
-  sections = $state([]);
+  sections = $state<ChevronsSection[][]>([]);
 
   ROW_HEIGHT = 5;
 
@@ -107,7 +114,7 @@ export class ChevronsPreviewClass {
   // *******************
   // Method for loading settings from a url hash string
   // *******************
-  load(hash) {
+  load(hash: string) {
     let startIndex, endIndex, separatorIndex;
     for (let i = 0; i < hash.length; i++) {
       if (hash[i] === '(') startIndex = i;
@@ -120,7 +127,7 @@ export class ChevronsPreviewClass {
     }
     if (!startIndex || !separatorIndex || !endIndex) return; // format of hash was wrong, so stop processing
     const params = hash.substring(0, startIndex).match(/.{1,4}/g);
-    this.settings.selectedTargets = params;
+    if (params) this.settings.selectedTargets = params as WeatherParam['id'][];
     this.settings.chevronsPerRow = +hash.substring(
       startIndex + 1,
       separatorIndex,

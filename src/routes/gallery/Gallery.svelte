@@ -40,10 +40,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let first = 40;
   let loading = $state(true);
   let showScrollToTopButton = $state();
-  let scrollContainer = $state();
+  let scrollContainer: HTMLDivElement | undefined = $state();
   let projectsList = $state();
-  let totalProjects = $state(0);
-  let featuredProjectsEl = $state();
+  let totalProjects: number | string | undefined = $state(0);
+  let featuredProjectsEl: HTMLDivElement | undefined = $state();
   let layout = $state('grid');
 
   onMount(async () => {
@@ -77,16 +77,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
       { threshold: 0 },
     );
 
-    if (typeof scrollContainer !== 'undefined')
-      scrollObserver.observe(scrollContainer);
+    if (scrollContainer) scrollObserver.observe(scrollContainer);
 
     const url = `${PUBLIC_WORDPRESS_BASE_URL}/wp-json/wp/v2/projects?_=${new Date().getTime()}`;
     const response = await fetch(url);
     const headers = response.headers;
+    const totalProjectsHeader = headers.get('x-wp-total');
     totalProjects =
-      headers.get('x-wp-total') !== null
-        ? +headers.get('x-wp-total')
-        : undefined;
+      totalProjectsHeader !== null ? +totalProjectsHeader : undefined;
     totalProjects =
       totalProjects !== undefined && typeof totalProjects === 'number'
         ? totalProjects.toLocaleString()
@@ -110,34 +108,40 @@ If not, see <https://www.gnu.org/licenses/>. -->
     return galleryState.projects.filter((project) => {
       if (!galleryState.filteredBrandId && !galleryState.filteredYarnId)
         return true;
-      const yarnURLs = JSON.parse(project?.yarnUrls);
+      const yarnURLs = JSON.parse(project?.yarnUrls) as string[];
       if (!galleryState.palettesContainOnlyFilteredYarn)
         return yarnURLs?.some((yarnURL) => {
           let colors = getColorsFromInput({
             string: yarnURL,
           });
-          return colors?.some((color) => {
-            if (galleryState.filteredBrandId && galleryState.filteredYarnId)
-              return (
-                color?.brandId === galleryState.filteredBrandId &&
-                color?.yarnId === galleryState.filteredYarnId
-              );
-            return color?.brandId === galleryState.filteredBrandId;
-          });
+          return (
+            colors &&
+            colors.some((color) => {
+              if (galleryState.filteredBrandId && galleryState.filteredYarnId)
+                return (
+                  color?.brandId === galleryState.filteredBrandId &&
+                  color?.yarnId === galleryState.filteredYarnId
+                );
+              return color?.brandId === galleryState.filteredBrandId;
+            })
+          );
         });
       else
         return yarnURLs?.every((yarnURL) => {
           let colors = getColorsFromInput({
             string: yarnURL,
           });
-          return colors?.every((color) => {
-            if (galleryState.filteredBrandId && galleryState.filteredYarnId)
-              return (
-                color?.brandId === galleryState.filteredBrandId &&
-                color?.yarnId === galleryState.filteredYarnId
-              );
-            return color?.brandId === galleryState.filteredBrandId;
-          });
+          return (
+            colors &&
+            colors.every((color) => {
+              if (galleryState.filteredBrandId && galleryState.filteredYarnId)
+                return (
+                  color?.brandId === galleryState.filteredBrandId &&
+                  color?.yarnId === galleryState.filteredYarnId
+                );
+              return color?.brandId === galleryState.filteredBrandId;
+            })
+          );
         });
     });
   }
@@ -199,7 +203,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             onchange={() => {
               galleryState.popularProjects = [];
               fetchPopularProjectsWrapper();
-              featuredProjectsEl.scrollLeft = 0;
+              if (featuredProjectsEl) featuredProjectsEl.scrollLeft = 0;
             }}
           >
             <option value={0.0357}>Day</option>
@@ -461,7 +465,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <ToTopButton
     bottom="1rem"
     onClick={() => {
-      scrollContainer.scrollIntoView({
+      scrollContainer?.scrollIntoView({
         behavior: 'smooth',
         block: 'start',
       });

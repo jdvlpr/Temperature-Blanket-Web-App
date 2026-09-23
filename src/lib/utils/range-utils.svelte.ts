@@ -24,8 +24,9 @@ import type {
 import type { WeatherDay } from '$lib/types/weather-types';
 import { displayNumber } from '$lib/utils/number-utils';
 
-
-export const getStart = (rangeOptions) => {
+export const getStart = (
+  rangeOptions: GaugeRangeOptions | undefined,
+): number | undefined => {
   if (rangeOptions?.mode === 'auto') {
     if (rangeOptions?.direction === 'high-to-low')
       return rangeOptions?.auto.start.high;
@@ -33,15 +34,18 @@ export const getStart = (rangeOptions) => {
   } else return rangeOptions?.manual.start;
 };
 
-export const getIncrement = (rangeOptions, autoRangeOptions) => {
+export const getIncrement = (
+  rangeOptions: GaugeRangeOptions | undefined,
+  autoRangeOptions: GaugeRangeOptions | undefined,
+): number | undefined => {
   if (rangeOptions?.mode === 'auto') {
     if (rangeOptions.direction === 'high-to-low')
-      return -autoRangeOptions?.auto.increment;
+      return autoRangeOptions ? -autoRangeOptions.auto.increment : undefined;
     else return autoRangeOptions?.auto.increment;
   } else {
-    if (rangeOptions.direction === 'high-to-low')
+    if (rangeOptions?.direction === 'high-to-low')
       return -rangeOptions.manual.increment;
-    else return rangeOptions.manual.increment;
+    else return rangeOptions?.manual.increment;
   }
 };
 
@@ -72,67 +76,96 @@ export const getEvenlyDistributedRangeValuesWithEqualDayCount = ({
   roundIncrement,
   includeFrom,
   includeTo,
-}) => {
+}: {
+  weatherData: WeatherDay[] | undefined;
+  numRanges: number;
+  prop: keyof Pick<
+    WeatherDay,
+    'tmax' | 'tavg' | 'tmin' | 'prcp' | 'snow' | 'dayt'
+  >;
+  gaugeDirection: GaugeRangeOptions['direction'];
+  roundIncrement: boolean;
+  includeFrom: boolean;
+  includeTo: boolean;
+}): GaugeRange[] => {
   if (!weatherData) weatherData = weather.data;
 
-  const _units = preferences.value.units;
+  const _units = preferences.value.units ?? 'metric';
 
   let _weatherData = [...weatherData];
   _weatherData = _weatherData.filter((day) => day[prop][_units] !== null); // filter out any missing values
 
+  // With no days to distribute there are no meaningful ranges, and the min/max below
+  // would be ±Infinity, which the `currentTo === currentFrom` loop can never separate.
+  // This is the normal state at module init, before any weather has been fetched.
+  if (_weatherData.length === 0) return [];
+
+  // day[prop][_units] is guaranteed non-null for every remaining day by the filter above
   if (gaugeDirection === 'low-to-high')
-    _weatherData.sort((a, b) => a[prop][_units] - b[prop][_units]); // Sort the weather data lowest to highest
+    _weatherData.sort((a, b) => a[prop][_units]! - b[prop][_units]!); // Sort the weather data lowest to highest
   else if (gaugeDirection === 'high-to-low')
-    _weatherData.sort((a, b) => b[prop][_units] - a[prop][_units]); // Sort the weather data highest to lowest
+    _weatherData.sort((a, b) => b[prop][_units]! - a[prop][_units]!); // Sort the weather data highest to lowest
 
   // Calculate the number of days in each range (rounded down).
   let daysPerRange = Math.ceil(_weatherData.length / numRanges);
   if (daysPerRange < 2) daysPerRange = 2;
 
   // Create a list to store the from and to values for each range.
-  const rangeValues = [];
-  let startValue;
-  const maxValue = Math.max(..._weatherData.map((day) => day.tmax[_units]));
-  const minValue = Math.min(..._weatherData.map((day) => day.tmin[_units]));
+  const rangeValues: GaugeRange[] = [];
+  let startValue: number;
+  const maxValue = Math.max(
+    ..._weatherData
+      .map((day) => day.tmax[_units])
+      .filter((n): n is number => n !== null),
+  );
+  const minValue = Math.min(
+    ..._weatherData
+      .map((day) => day.tmin[_units])
+      .filter((n): n is number => n !== null),
+  );
   if (roundIncrement && gaugeDirection === 'high-to-low')
     startValue = Math.ceil(maxValue + 0.01);
   else if (roundIncrement && gaugeDirection === 'low-to-high')
     startValue = Math.floor(minValue - 0.01);
   else if (!roundIncrement && gaugeDirection === 'high-to-low')
     startValue = maxValue + 0.01;
-  else if (!roundIncrement && gaugeDirection === 'low-to-high')
-    startValue = minValue - 0.01;
+  else startValue = minValue - 0.01;
 
   let currentFrom = startValue;
-  let currentTo;
+  let currentTo = currentFrom;
   for (let i = 0; i < numRanges; i++) {
     // Find the to value for the current range.
     let weatherIndex = (i + 1) * (daysPerRange - 1);
     if (i === numRanges - 1) {
       // It's the last range, so use the highest or lowest value possible in order to include every day
       weatherIndex = _weatherData.length - 1;
-      let endValue;
+      let endValue: number;
       if (roundIncrement && gaugeDirection === 'high-to-low')
         endValue = Math.floor(minValue - 0.01);
       else if (roundIncrement && gaugeDirection === 'low-to-high')
         endValue = Math.ceil(maxValue + 0.01);
       else if (!roundIncrement && gaugeDirection === 'high-to-low')
         endValue = minValue - 0.01;
-      else if (!roundIncrement && gaugeDirection === 'low-to-high')
-        endValue = maxValue + 0.01;
+      else endValue = maxValue + 0.01;
       currentTo = endValue;
     } else if (weatherIndex >= _weatherData.length) {
       // there are more ranges than days of weather, so just add one.
       currentTo += gaugeDirection === 'high-to-low' ? -1 : 1;
     } else {
       currentTo = roundIncrement
-        ? Math.round(_weatherData[weatherIndex][prop][_units])
-        : _weatherData[weatherIndex][prop][_units];
+        ? Math.round(_weatherData[weatherIndex][prop][_units]!)
+        : _weatherData[weatherIndex][prop][_units]!;
     }
 
-    // If the from and to values are the same, add or subtract one until they are not equal
-    while (currentTo === currentFrom)
-      gaugeDirection === 'high-to-low' ? currentTo-- : currentTo++;
+    // If the from and to values are the same, add or subtract one until they are not
+    // equal. Stop if ±1 can no longer change the value (±Infinity, or magnitudes past
+    // the safe-integer range), which would otherwise loop forever.
+    while (currentTo === currentFrom) {
+      const next =
+        gaugeDirection === 'high-to-low' ? currentTo - 1 : currentTo + 1;
+      if (next === currentTo) break;
+      currentTo = next;
+    }
 
     rangeValues.push({
       from: displayNumber(currentFrom),
@@ -182,7 +215,7 @@ export const getDaysInRange = ({
   if (gaugeUnitType === 'category') {
     const days = weather.data.filter((day, i) => {
       const value = weather.getWeatherValue({ dayIndex: i, param: id });
-      if (value === 'null') return false;
+      if (value === null) return false;
       return 'value' in range && range.value === value;
     });
 
@@ -192,7 +225,8 @@ export const getDaysInRange = ({
   if (
     !direction ||
     typeof includeFromValue === 'undefined' ||
-    typeof includeToValue === 'undefined'
+    typeof includeToValue === 'undefined' ||
+    !('from' in range)
   )
     return [];
 
@@ -215,7 +249,13 @@ export const isValueInRange = ({
   direction,
   includeFromValue,
   includeToValue,
-}) => {
+}: {
+  value: number | null;
+  range: GaugeRange;
+  direction: GaugeRangeOptions['direction'] | undefined;
+  includeFromValue: boolean | undefined;
+  includeToValue: boolean | undefined;
+}): boolean => {
   if (value === null) return false;
   if (direction === 'high-to-low') {
     if (includeFromValue && includeToValue)
@@ -224,8 +264,7 @@ export const isValueInRange = ({
       return value > range.to && value <= range.from; // default
     if (!includeFromValue && includeToValue)
       return value >= range.to && value < range.from;
-    if (!includeFromValue && !includeToValue)
-      return value > range.to && value < range.from;
+    return value > range.to && value < range.from;
   } else {
     if (includeFromValue && includeToValue)
       return value >= range.from && value <= range.to;
@@ -233,8 +272,7 @@ export const isValueInRange = ({
       return value >= range.from && value < range.to; // default
     if (!includeFromValue && includeToValue)
       return value > range.from && value <= range.to;
-    if (!includeFromValue && !includeToValue)
-      return value > range.from && value <= range.to;
+    return value > range.from && value <= range.to;
   }
 };
 
@@ -245,7 +283,7 @@ export const isValueInRange = ({
  *
  * @return  {Number}             Percentage (supply your own sign %)
  */
-export const getDaysPercent = (daysCount) => {
+export const getDaysPercent = (daysCount: number): number => {
   const weatherLength = weather.data.length;
   let round = displayNumber((daysCount / weatherLength) * 100);
   if (daysCount > 0 && round === 0) {
@@ -258,7 +296,11 @@ export const getRangeExample = ({
   direction,
   includeFromValue,
   includeToValue,
-}) => {
+}: {
+  direction: GaugeRangeOptions['direction'] | undefined;
+  includeFromValue: boolean | undefined;
+  includeToValue: boolean | undefined;
+}): string => {
   if (direction === 'high-to-low') {
     if (includeFromValue && !includeToValue)
       return '<span class="">From</span> <span class="">≥ Range &#62;</span> <span class="">To</span>';
@@ -266,8 +308,7 @@ export const getRangeExample = ({
       return '<span class="">From</span> <span class="">&#62; Range ≥</span> <span class="">To</span>';
     if (includeFromValue && includeToValue)
       return '<span class="">From</span> <span class="">≥ Range ≥</span> <span class="">To</span>';
-    if (!includeFromValue && !includeToValue)
-      return '<span class="">From</span> <span class="">&#62; Range &#62;</span> <span class="">To</span>';
+    return '<span class="">From</span> <span class="">&#62; Range &#62;</span> <span class="">To</span>';
   } else {
     if (includeFromValue && !includeToValue)
       return '<span class="">From</span> <span class="">≤ Range &#60;</span> <span class="">To</span>';
@@ -275,7 +316,6 @@ export const getRangeExample = ({
       return '<span class="">From</span> <span class="">&#60; Range ≤</span> <span class="">To</span>';
     if (includeFromValue && includeToValue)
       return '<span class="">From</span> <span class="">≤ Range ≤</span> <span class="">To</span>';
-    if (!includeFromValue && !includeToValue)
-      return '<span class="">From</span> <span class="">&#60; Range &#60;</span> <span class="">To</span>';
+    return '<span class="">From</span> <span class="">&#60; Range &#60;</span> <span class="">To</span>';
   }
 };

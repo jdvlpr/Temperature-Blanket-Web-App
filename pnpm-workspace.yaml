@@ -1,6 +1,9 @@
+packages:
+  - '.'
+
 allowBuilds:
-  '@parcel/watcher': set this to true or false
+  '@parcel/watcher': true
   core-js: true
-  esbuild: set this to true or false
+  esbuild: true
   sharp: true
-  workerd: set this to true or false
+  workerd: true

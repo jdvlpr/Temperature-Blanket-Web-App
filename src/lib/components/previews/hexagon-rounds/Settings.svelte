@@ -17,12 +17,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
   import PreviewInfo from '$lib/components/PreviewInfo.svelte';
   import SpanYarnColorSelectIcon from '$lib/components/SpanYarnColorSelectIcon.svelte';
-  import { dialog } from '$lib/state/page-state.svelte';
   import { gauges } from '$lib/state/gauges-state.svelte';
+  import { dialog } from '$lib/state/page-state.svelte';
   import { weather } from '$lib/state/weather-state.svelte';
-  import { pluralize } from '$lib/utils/string-utils';
   import { capitalizeFirstLetter } from '$lib/utils/other-utils';
+  import { pluralize } from '$lib/utils/string-utils';
   import { ArrowRightIcon } from '@lucide/svelte';
+  import type { Color } from '$lib/types/yarn-types';
+  import Preview from './Preview.svelte';
   import { hexagonRoundsPreview } from './state.svelte';
 
   let targets = $derived(gauges.allCreated.map((n) => n.targets).flat());
@@ -46,41 +48,45 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <PreviewInfo previewTitle={hexagonRoundsPreview.name}>
   {#snippet description()}
-    Each round in a hexagon represents one {weather.grouping}. Hexagons are
-    added from left to right, top to bottom.
+    <p>
+      Each round in a hexagon represents one {weather.grouping}. Hexagons are
+      added from left to right, top to bottom.
+    </p>
   {/snippet}
 
   {#snippet details()}
     {#if hexagonRoundsPreview.rows}
-      There are <span class="font-semibold"
-        >{hexagonRoundsPreview.totalHexagons}
-        total {pluralize('hexagon', hexagonRoundsPreview.totalHexagons)}</span
-      >
-      in
-      <span class="font-semibold"
-        >{hexagonRoundsPreview.rows}
-        {pluralize('row', hexagonRoundsPreview.rows)}</span
-      >{#if extraRounds}, <span class="font-semibold">1</span> hexagon has
-        <span class="font-semibold">{extraRounds}</span>
-        of
-        <span class="font-semibold"
-          >{weatherRoundsPerHexagon}
-          {pluralize('round', weatherRoundsPerHexagon)}
-        </span> of weather data
-      {/if}
-      {#if hexagonRoundsPreview.hexagonsWithNoWeatherData}, and <span
-          class="font-semibold"
-          >{hexagonRoundsPreview.hexagonsWithNoWeatherData}
-          {pluralize(
-            'hexagon',
-            hexagonRoundsPreview.hexagonsWithNoWeatherData,
-          )}</span
+      <p>
+        There are <span class="font-semibold"
+          >{hexagonRoundsPreview.totalHexagons}
+          total {pluralize('hexagon', hexagonRoundsPreview.totalHexagons)}</span
         >
-        {pluralize(
-          { singular: 'has', plural: 'have' },
-          hexagonRoundsPreview.hexagonsWithNoWeatherData,
-        )} no weather data.
-      {/if}
+        in
+        <span class="font-semibold"
+          >{hexagonRoundsPreview.rows}
+          {pluralize('row', hexagonRoundsPreview.rows)}</span
+        >{#if extraRounds}, <span class="font-semibold">1</span> hexagon has
+          <span class="font-semibold">{extraRounds}</span>
+          of
+          <span class="font-semibold"
+            >{weatherRoundsPerHexagon}
+            {pluralize('round', weatherRoundsPerHexagon)}
+          </span> of weather data
+        {/if}
+        {#if hexagonRoundsPreview.hexagonsWithNoWeatherData}, and <span
+            class="font-semibold"
+            >{hexagonRoundsPreview.hexagonsWithNoWeatherData}
+            {pluralize(
+              'hexagon',
+              hexagonRoundsPreview.hexagonsWithNoWeatherData,
+            )}</span
+          >
+          {pluralize(
+            { singular: 'has', plural: 'have' },
+            hexagonRoundsPreview.hexagonsWithNoWeatherData,
+          )} no weather data.
+        {/if}
+      </p>
       {#if extraRounds || hexagonRoundsPreview.hexagonsWithNoWeatherData}
         <p class="italic">
           To potentially avoid rounds with no weather data, adjust the <span
@@ -98,6 +104,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {/if}
   {/snippet}
 </PreviewInfo>
+
+<div class="w-full"><Preview /></div>
 
 <div
   class="preset-outlined-surface-300-700 card flex flex-col items-start gap-4 p-4"
@@ -197,7 +205,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           ref: ChangeColor,
           props: {
             hex: hexagonRoundsPreview.settings.additionalRoundsColor,
-            onChangeColor: ({ hex }) => {
+            onChangeColor: ({ hex }: { hex: NonNullable<Color['hex']> }) => {
               hexagonRoundsPreview.settings.additionalRoundsColor = hex;
               dialog.close();
             },

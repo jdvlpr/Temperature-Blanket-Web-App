@@ -16,16 +16,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import RecentWeatherDataTooltip from '$lib/components/RecentWeatherDataTooltip.svelte';
   import { MOON_PHASE_NAMES } from '$lib/constants/weather-constants';
+  import type { WeatherParam } from '$lib/types/gauge-types';
 
   interface Props {
-    id: any;
-    icon: any;
-    label: any;
-    value: any;
+    id: WeatherParam['id'];
+    icon: string;
+    label: string;
+    value: string | number;
     units?: string | undefined;
     isRecentDate?: boolean;
     date?: import('svelte').Snippet;
     details?: import('svelte').Snippet;
+    button?: import('svelte').Snippet;
   }
 
   let {
@@ -37,10 +39,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     isRecentDate = false,
     date,
     details,
+    button,
   }: Props = $props();
 
   // Colors from tailwind.config.js
-  const colors = {
+  const colors: Partial<Record<WeatherParam['id'], string>> = {
     tmin: '#38bdf8',
     tavg: '#a3a3a3',
     tmax: '#f87171',
@@ -49,7 +52,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     dayt: '#facc15',
   };
 
-  let displayValue = $derived(id === 'moon' ? MOON_PHASE_NAMES[value] : value);
+  let displayValue = $derived(
+    id === 'moon' ? MOON_PHASE_NAMES[value as number] : value,
+  );
 </script>
 
 <div class="flex flex-col items-center justify-start p-2">
@@ -67,6 +72,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {/if}
   </div>
   <p class=" ml-1 text-sm">{label}</p>
+  {@render button?.()}
   {@render date?.()}
   {@render details?.()}
 </div>

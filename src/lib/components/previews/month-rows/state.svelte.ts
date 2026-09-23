@@ -22,9 +22,24 @@ interface MonthRowsPreviewSettings extends BasePreviewSettings {
   dimensions: string;
   direction: 'top-to-bottom' | 'left-to-right';
   stitchesPerRow: number;
-  extrasColor: Color['hex'];
+  extrasColor: NonNullable<Color['hex']>;
   borderStitches: number;
-  borderColor: Color['hex'];
+  borderColor: NonNullable<Color['hex']>;
+}
+
+export interface MonthRowsMonth {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  color: Color['hex'];
+  isWeather: boolean;
+  dayIndex: number;
+}
+
+export interface MonthRowsBorder {
+  x: number;
+  y: number;
 }
 
 export class MonthRowsPreviewClass {
@@ -59,7 +74,7 @@ export class MonthRowsPreviewClass {
 
   id = 'mrws';
 
-  svg = $state();
+  svg = $state<SVGSVGElement | null>(null);
 
   img = {
     light: './images/preview_icons/mrws_black.png',
@@ -74,9 +89,9 @@ export class MonthRowsPreviewClass {
 
   previewComponent = Preview;
 
-  months = $state([]);
+  months = $state<MonthRowsMonth[]>([]);
 
-  borders = $state([]);
+  borders = $state<MonthRowsBorder[]>([]);
 
   STITCH_SIZE = 10;
 
@@ -167,7 +182,7 @@ export class MonthRowsPreviewClass {
   // *******************
   // Method for loading settings from a url hash string
   // *******************
-  load(hash) {
+  load(hash: string) {
     let separatorIndex = [];
 
     for (let i = 0; i < hash.length; i++) {
@@ -182,8 +197,9 @@ export class MonthRowsPreviewClass {
 
     let position = 0;
     let targets = hash.substring(position, separatorIndex[0]);
-    targets = targets.match(/.{1,4}/g);
-    this.settings.selectedTargets = targets;
+    const parsedTargets = targets.match(/.{1,4}/g);
+    if (parsedTargets)
+      this.settings.selectedTargets = parsedTargets as WeatherParam['id'][];
 
     position = separatorIndex[0] + 1;
     this.settings.dimensions = hash.substring(position, separatorIndex[1]); // dimensions
@@ -202,7 +218,9 @@ export class MonthRowsPreviewClass {
     this.settings.extrasColor = chroma.valid(
       hash.substring(position, position + 6),
     )
-      ? chroma(hash.substring(position, position + 6)).hex()
+      ? (chroma(hash.substring(position, position + 6)).hex() as NonNullable<
+          Color['hex']
+        >)
       : this.settings.extrasColor;
 
     position += 6;
@@ -212,7 +230,9 @@ export class MonthRowsPreviewClass {
     this.settings.borderColor = chroma.valid(
       hash.substring(position, position + 6),
     )
-      ? chroma(hash.substring(position, position + 6)).hex()
+      ? (chroma(hash.substring(position, position + 6)).hex() as NonNullable<
+          Color['hex']
+        >)
       : this.settings.borderColor;
 
     previews.activeId = this.id;

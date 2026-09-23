@@ -12,7 +12,7 @@ See the GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
-<script>
+<script lang="ts">
   import { allGaugesAttributes, gauges } from '$lib/state/gauges-state.svelte';
   import {
     dialog,
@@ -36,7 +36,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
         if (
           weather.data?.some((day) => {
             if (target.type === 'category') return day[target.id] !== null;
-            else return day[target.id][preferences.value.units] !== null;
+            else {
+              const value = day[target.id];
+              if (value && typeof value === 'object' && 'metric' in value) {
+                return value[preferences.value.units ?? 'metric'] !== null;
+              }
+              return false;
+            }
           })
         ) {
           // For each of the gauge's weather parameter targets, check to see if there is any data, and if so setup the default gauge
@@ -112,7 +118,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             type: 'confirm',
             title: `Add a ${label}?`,
             body: `This will add a new gauge to your project. You can delete it later.`,
-            response: (response) => {
+            response: (response: boolean) => {
               if (response) {
                 gauges.addById(id);
               }
@@ -137,9 +143,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <div class="mb-4 flex w-full justify-center px-2 sm:mb-6">
       <button
         class="btn hover:preset-tonal-surface relative top-2 justify-start max-sm:mb-2"
-        title="Delete {gauges.activeGauge.label}"
+        title="Delete {gauges.activeGauge?.label}"
         onclick={() => {
-          gauges.remove(gauges.activeGauge.id);
+          if (gauges.activeGauge) {
+            gauges.remove(gauges.activeGauge.id);
+          }
         }}
       >
         <Trash2Icon />

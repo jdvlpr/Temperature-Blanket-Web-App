@@ -18,20 +18,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import DataTable from '$lib/components/datatable/DataTable.svelte';
   import Expand from '$lib/components/Expand.svelte';
   import PreviewInfo from '$lib/components/PreviewInfo.svelte';
+  import { safeSlide } from '$lib/features/transitions/safeSlide';
   import { gauges } from '$lib/state/gauges-state.svelte';
   import { locations } from '$lib/state/location-state.svelte';
   import { weather } from '$lib/state/weather-state.svelte';
-  import { safeSlide } from '$lib/features/transitions/safeSlide';
   import { capitalizeFirstLetter } from '$lib/utils/other-utils';
   import { DownloadIcon } from '@lucide/svelte';
   import { TableHandler } from '@vincjo/datatables';
+  import Preview from './Preview.svelte';
   import { daytimeRowsPreview } from './state.svelte';
 
   let targets = $derived(gauges.allCreated.map((n) => n.targets).flat());
 
   let isTableExpanded = $state(false);
 
-  let table = $state();
+  let table = $state<TableHandler>(undefined!);
 
   let tableIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-table inline size-6"><path d="M12 3v18"/><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/></svg>`;
 
@@ -76,7 +77,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     link.setAttribute('href', encodedUri);
     link.setAttribute(
       'download',
-      `Stitches Table for ${locations.projectFilename}`,
+      `Stitches Per Row for ${locations.projectFilename}`,
     );
     link.className = 'hidden';
     document.body.appendChild(link);
@@ -87,7 +88,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <PreviewInfo previewTitle={daytimeRowsPreview.name}>
   {#snippet description()}
-    Each row is split according to the duration of sunlight that {weather.grouping}.
+    <p>
+      Each row is split according to the duration of sunlight that {weather.grouping}.
+    </p>
   {/snippet}
   {#snippet details()}
     {#if daytimeRowsPreview.settings.daytimePosition === 'left'}
@@ -173,12 +176,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <div class="mt-2 w-full">
       <Expand
         bind:isExpanded={isTableExpanded}
-        label="{tableIcon} Stitches Table"
+        label="{tableIcon} Stitches Per Row"
       />
     </div>
     {#if isTableExpanded}
       <div transition:safeSlide class="relative mx-auto w-full max-w-[90vw]">
-        <DataTable {table} search={false}>
+        <DataTable {table} search={false} uid="daytime-rows-table">
           <table class="w-full border-separate border-spacing-0">
             <thead>
               <tr>
@@ -236,13 +239,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
             title="Download CSV File"
           >
             <DownloadIcon />
-            Download Stitches Table (CSV File)</button
+            Download Stitches Per Row (CSV File)</button
           >
         </div>
       </div>
     {/if}
   {/snippet}
 </PreviewInfo>
+
+<div class="w-full"><Preview /></div>
 
 <div
   class="preset-outlined-surface-300-700 card flex flex-col items-start gap-4 p-4"

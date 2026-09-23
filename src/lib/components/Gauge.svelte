@@ -48,7 +48,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let { gauge = $bindable() } = $props();
 
-  let gaugeContainerElement = $state();
+  let gaugeContainerElement = $state<HTMLDivElement | undefined>(undefined);
 
   function updateGauge({
     _colors,
@@ -69,25 +69,29 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 
   $effect(() => {
-    if (fullscreen.value) {
-      gaugeContainerElement.style.zIndex = '40';
-      document.body.style.overflow = 'hidden';
-    } else {
-      gaugeContainerElement.style.zIndex = '';
-      document.body.style.overflow = '';
+    if (gaugeContainerElement) {
+      if (fullscreen.value) {
+        gaugeContainerElement.style.zIndex = '40';
+        document.body.style.overflow = 'hidden';
+      } else {
+        gaugeContainerElement.style.zIndex = '';
+        document.body.style.overflow = '';
+      }
     }
   });
 </script>
 
 <svelte:window
-  onkeydown={(e) => {
-    if (
-      e.target.tagName === 'INPUT' ||
-      e.target.tagName === 'TEXTAREA' ||
-      e.target.tagName === 'TD' ||
-      e.target.tagName === 'SELECT'
-    )
-      return;
+  onkeydown={(e: KeyboardEvent) => {
+    if (e.target instanceof HTMLElement) {
+      if (
+        e.target.tagName === 'INPUT' ||
+        e.target.tagName === 'TEXTAREA' ||
+        e.target.tagName === 'TD' ||
+        e.target.tagName === 'SELECT'
+      )
+        return;
+    }
     if (e.key === 'f') {
       if (
         !pageSections.items.find((p) => p.id === 'page-section-gauges')
@@ -139,10 +143,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <SelectNumberOfColors
         hideText={fullscreen.value}
         numberOfColors={gauge.colors.length}
-        onchange={(e) => {
+        onchange={(e: Event) => {
+          const target = e.target as HTMLSelectElement;
           const colors = createGaugeColors({
             schemeId: gauge.schemeId,
-            numberOfColors: +e.target.value,
+            numberOfColors: +target.value,
             colors: $state.snapshot(gauge.colors),
           });
           gauge.updateColors({ colors });

@@ -78,11 +78,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
     yarnName,
     variant_href,
     affiliate_variant_href,
+  }: {
+    index: number;
+    hex?: string;
+    name?: string;
+    brandId?: string;
+    yarnId?: string;
+    brandName?: string;
+    yarnName?: string;
+    variant_href?: string;
+    affiliate_variant_href?: string | null;
   }) {
     gauge.schemeId = 'Custom';
 
-    const _colors = [];
-    gauge.colors.forEach((color, i) => {
+    const _colors: Color[] = [];
+    gauge.colors.forEach((color: Color, i: number) => {
       if (i === index) {
         _colors.push({
           hex,
@@ -105,22 +115,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 
   // Handle drag and drop events
-  function handleConsider(e: any) {
-    sortableColors = e.detail.items;
+  function handleConsider(e: Event) {
+    const event = e as CustomEvent<{ items: Color[] }>;
+    sortableColors = event.detail.items as (Color & { id: number })[];
   }
 
   // On drag end, update the gauge colors
-  function handleFinalize(e: any) {
-    const {
-      items: newItems,
-      info: { source },
-    } = e.detail;
+  function handleFinalize(e: Event) {
+    const event = e as CustomEvent<{ items: Color[] }>;
+    const newItems = event.detail.items as (Color & { id: number })[];
 
     sortableColors = newItems;
 
-    gauge.colors = sortableColors.map((color: Color) => {
-      delete color.id;
-      return color;
+    gauge.colors = sortableColors.map((color) => {
+      const { id, ...rest } = color;
+      return rest as Color;
     });
 
     gauge.schemeId = 'Custom';
@@ -128,8 +137,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   // Prepare sortable colors with IDs for svelte-dnd-action
   function getSortableColors() {
-    const _sortableColors = [];
-    gauge.colors.forEach((color, i) => {
+    const _sortableColors: (Color & { id: number })[] = [];
+    gauge.colors.forEach((color: Color, i: number) => {
       _sortableColors.push({ ...color, id: i });
     });
     return _sortableColors;
@@ -214,7 +223,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
         .value.layout === 'grid'
         ? 'rounded-container flex-auto basis-1/3  sm:basis-1/4 md:basis-1/5'
         : `${isProjectPlannerPage ? numberOfColumns < 5 && 'lg:grid lg:grid-cols-[1fr_3fr_1fr]' : 'lg:grid lg:grid-cols-[1fr_1.4fr_1fr]'}`}"
-      style="background:{hex};color:{getTextColor(hex)}"
+      style="background:{hex ?? '#ffffff'};color:{getTextColor(
+        hex ?? '#ffffff',
+      )}"
       animate:flip={{ duration: flipDurationMs }}
     >
       <!-- The following empty div is necessary to center content in list view -->

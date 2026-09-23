@@ -6,6 +6,7 @@ import type { LocationType } from '$lib/types/location-types';
 import type {
   WeatherDay,
   WeatherSourceOptions,
+  TISO8601DateString,
 } from '$lib/types/weather-types';
 import {
   dateToISO8601String,
@@ -215,7 +216,9 @@ export class ProjectStorage {
   static async load() {
     if (!ProjectStorage.isAvailable()) return;
 
-    const pageURL = new URL(project.onLoaded.href);
+    const href = project.onLoaded.href;
+    if (!href) return;
+    const pageURL = new URL(href);
     const id = pageURL.searchParams.get('project');
     if (!id) return;
 
@@ -249,7 +252,9 @@ export class ProjectStorage {
     if (!weatherLocalStorage || !weatherLocalStorage.length) return;
 
     const newWeatherUngrouped = weatherLocalStorage.map((n) => {
-      const date = stringToDate(n.date);
+      const dateStr =
+        typeof n.date === 'string' ? n.date : dateToISO8601String(n.date);
+      const date = stringToDate(dateStr as TISO8601DateString);
       const moon = n.moon || getMoonPhase(date);
       return { ...n, date, moon };
     });
@@ -275,7 +280,7 @@ export class ProjectStorage {
     if (daysInFuture > 0 && !matchedProject.isCustomWeatherData) return;
 
     // Set the weather data and indicate that it was loaded from storage
-    weather.rawData = newWeatherUngrouped;
+    weather.setRawData(newWeatherUngrouped);
     weather.wasLoadedFromStorage = true;
   }
 

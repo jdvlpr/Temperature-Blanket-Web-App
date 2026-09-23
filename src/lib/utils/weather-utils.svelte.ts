@@ -15,7 +15,11 @@
 
 import { allGaugesAttributes } from '$lib/state/gauges-state.svelte';
 
-export const getWeatherTargets = ({ weatherParameters }) => {
+export const getWeatherTargets = ({
+  weatherParameters,
+}: {
+  weatherParameters: Record<string, boolean>;
+}) => {
   const props = allGaugesAttributes?.flatMap((gauge) => gauge.targets);
   return props.filter((n) => weatherParameters?.[n.id]);
 };
@@ -28,11 +32,17 @@ export const getWeatherTargets = ({ weatherParameters }) => {
  * @param {string} [options.delimiter=','] - The delimiter used in the CSV string.
  * @returns {Array<object>} - The array of objects representing the CSV data.
  */
-export const CSVtoArray = ({ str, delimiter = ',' }) => {
+export const CSVtoArray = ({
+  str,
+  delimiter = ',',
+}: {
+  str: string;
+  delimiter?: string;
+}) => {
   // slice from start of text to the first \n index
   // use split to create an array from string by delimiter
   const headers = str.slice(0, str.indexOf('\n')).split(delimiter);
-  headers.forEach((header, index, headers) => {
+  headers.forEach((header: string, index: number, headers: string[]) => {
     if (header.includes('\r')) {
       headers[index] = header.replace('\r', '');
     }
@@ -41,7 +51,7 @@ export const CSVtoArray = ({ str, delimiter = ',' }) => {
   // slice from \n index + 1 to the end of the text
   // use split to create an array of each csv value row
   const rows = str.slice(str.indexOf('\n') + 1).split('\n');
-  rows.forEach((row, index, rows) => {
+  rows.forEach((row: string, index: number, rows: string[]) => {
     if (row.includes('\r')) {
       rows[index] = row.replace('\r', '');
     }
@@ -52,9 +62,13 @@ export const CSVtoArray = ({ str, delimiter = ',' }) => {
   // use headers.reduce to create an object
   // object properties derived from headers:values
   // the object passed as an element of the array
-  const arr = rows.map(function (row) {
+  const arr = rows.map(function (row: string) {
     const values = row.split(delimiter);
-    const el = headers.reduce(function (object, header, index) {
+    const el = headers.reduce(function (
+      object: Record<string, string>,
+      header: string,
+      index: number,
+    ) {
       object[header] = values[index];
       return object;
     }, {});
@@ -65,8 +79,8 @@ export const CSVtoArray = ({ str, delimiter = ',' }) => {
   return arr;
 };
 
-export const chunkArray = (array, chunkSize) => {
-  const chunks = [];
+export const chunkArray = <T>(array: T[], chunkSize: number): T[][] => {
+  const chunks: T[][] = [];
   for (let i = 0; i < array.length; i += chunkSize) {
     const chunk = array.slice(i, i + chunkSize);
     chunks.push(chunk);

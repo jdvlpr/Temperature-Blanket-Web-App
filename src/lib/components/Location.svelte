@@ -22,8 +22,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { project } from '$lib/state/project-state.svelte';
   import { weather } from '$lib/state/weather-state.svelte';
   import type {
-    LocationStateType
+    LocationStateType,
+    LocationSuggestion,
   } from '$lib/types/location-types';
+  import type { TISO8601DateString } from '$lib/types/weather-types';
   import {
     dateToISO8601String,
     stringToDate,
@@ -44,10 +46,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     TriangleAlertIcon,
     XIcon,
   } from '@lucide/svelte';
-  import {
-    Popover,
-    Portal
-  } from '@skeletonlabs/skeleton-svelte';
+  import { Popover, Portal } from '@skeletonlabs/skeleton-svelte';
   import autocomplete from 'autocompleter';
   import { onMount } from 'svelte';
   import '../../css/flag-icons.css';
@@ -62,10 +61,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   const years = createYears();
 
-  let inputLocation: HTMLInputElement = $state();
-  let inputStart: HTMLInputElement = $state();
-  let inputEnd: HTMLInputElement = $state();
-  let locationGroup: HTMLElement;
+  let inputLocation: HTMLInputElement | undefined = $state();
+  let inputStart: HTMLInputElement | undefined = $state();
+  let inputEnd: HTMLInputElement | undefined = $state();
+  let locationGroup: HTMLElement | undefined = $state();
 
   let year = $state(getLastYear());
   let month = $state(1);
@@ -79,7 +78,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let showReset = $derived.by(() => {
     showResetKey;
     return (
-      (!searching && inputLocation?.value?.length > 1) ||
+      (!searching && (inputLocation?.value?.length ?? 0) > 1) ||
       (!searching && location?.label)
     );
   });
@@ -127,13 +126,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   onMount(() => {
     // Setup the autocomplete location
-    autocomplete({
-      input: inputLocation,
+    autocomplete<LocationSuggestion>({
+      input: inputLocation!,
       minLength: 2,
       debounceWaitMs: 550,
       showOnFocus: false,
       emptyMsg: 'Trouble getting location. Please search again.',
-      customize: function (input, inputRect, container, maxHeight) {
+      customize: function (input, inputRect, container) {
+        if (!locationGroup) return;
         const group = locationGroup.getBoundingClientRect();
         container.style.width = `${group.width}px`;
         container.style.left = `${group.left}px`;
@@ -178,8 +178,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         location.id = item?.id;
         location.lat = item?.lat;
         location.lng = item?.lng;
-        location.lng = item?.lng;
-        location.elevation = null;
+        location.elevation = undefined;
         location.fclName = item?.fclName;
         location.flagIcon = item?.flagIcon;
         location.population = item?.population;
@@ -189,8 +188,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   function validate() {
     if (weather.isUserEdited) return;
+    if (!inputLocation) return;
 
-    weather.rawData = [];
+    weather.setRawData([]);
 
     const value = inputLocation.value;
 
@@ -198,7 +198,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     // which happens when a user "selects all" in the input field in order to search for a new location)
     let hasUserSelectedInputValue = false;
     if (typeof window.getSelection != 'undefined')
-      hasUserSelectedInputValue = window.getSelection().toString() === value;
+      hasUserSelectedInputValue = window.getSelection()?.toString() === value;
 
     // If the input has at least two characters and it is not selected, show the searching icon
     if (value.length > 1 && !hasUserSelectedInputValue) {
@@ -207,14 +207,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
       searching = false;
     }
 
-    if (inputLocation.value?.length < 2) {
+    if (value.length < 2) {
       invalidate();
       return;
     }
   }
 
   // Listen for backspace keypress, in which case invalidate the location
-  function validateKeyup(e) {
+  function validateKeyup(e: KeyboardEvent) {
     if (e.key === 'Backspace') {
       invalidate();
     }
@@ -233,27 +233,39 @@ If not, see <https://www.gnu.org/licenses/>. -->
     return _years;
   }
 
-  function setDates({ from = null, to = null, unsetWeather = true }) {
-    if (unsetWeather) weather.rawData = [];
+  function setDates({
+    from,
+    to,
+    unsetWeather = true,
+  }: {
+    from?: TISO8601DateString;
+    to?: TISO8601DateString;
+    unsetWeather?: boolean;
+  }) {
+    if (unsetWeather) weather.setRawData([]);
     let setDate = new Date(year, month - 1, day, 1);
     const _padFromMonth = String(setDate.getUTCMonth() + 1).padStart(2, '0');
     const _padFromDate = String(setDate.getUTCDate()).padStart(2, '0');
-    from = from || `${year}-${_padFromMonth}-${_padFromDate}`;
+    const _from: TISO8601DateString =
+      from ??
+      (`${year}-${_padFromMonth}-${_padFromDate}` as TISO8601DateString);
+
+    let _to: TISO8601DateString | undefined = to;
 
     if (location.duration === 'y') {
-      let yearFromSetDate = yearFrom(setDate);
+      let yearFromSetDate = yearFrom(_from);
       const _padToMonth = String(yearFromSetDate.getUTCMonth() + 1).padStart(
         2,
         '0',
       );
       const _padToDate = String(yearFromSetDate.getUTCDate()).padStart(2, '0');
-      to =
-        to ||
-        `${yearFromSetDate.getUTCFullYear()}-${_padToMonth}-${_padToDate}`;
+      _to =
+        to ??
+        (`${yearFromSetDate.getUTCFullYear()}-${_padToMonth}-${_padToDate}` as TISO8601DateString);
     }
 
-    location.from = from;
-    location.to = to;
+    location.from = _from;
+    location.to = _to;
   }
 
   // Get's the date of yesterday to set the max date
@@ -277,7 +289,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
    * @param {number} _year - The year.
    * @returns {number} - The number of days in the given month and year.
    */
-  function getDays(_month, _year) {
+  function getDays(_month: number, _year: number): number {
     switch (_month) {
       case 1:
       case 3:
@@ -324,8 +336,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       <button
                         class="btn hover:preset-tonal-surface"
                         onclick={() => {
-                          locations.remove(location.uuid);
-                          weather.rawData = [];
+                          locations.remove(location.uuid ?? '');
+                          weather.setRawData([]);
                         }}
                         disabled={weather.isUserEdited ||
                           project.status.loading}
@@ -409,14 +421,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
             onclick={() => {
               if (weather.isUserEdited) return;
               showResetKey = !showResetKey;
-              weather.rawData = [];
-              inputLocation.value = '';
-              inputLocation.focus();
+              weather.setRawData([]);
+              if (inputLocation) {
+                inputLocation.value = '';
+                inputLocation.focus();
+              }
               location.label = '';
               invalidate();
               location.result = '';
-              if (document.querySelector('.autocomplete'))
-                document.querySelector('.autocomplete').remove();
+              document.querySelector('.autocomplete')?.remove();
             }}
           >
             <XIcon />
@@ -428,9 +441,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
             disabled={weather.isUserEdited || project.status.loading}
             onclick={async () => {
               searching = true;
-              inputLocation.placeholder = 'Requesting your location...';
+              if (inputLocation)
+                inputLocation.placeholder = 'Requesting your location...';
 
-              async function success(position) {
+              async function success(position: GeolocationPosition) {
                 const latitude = position.coords.latitude;
                 const longitude = position.coords.longitude;
 
@@ -446,7 +460,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     message: data.message,
                   });
                   searching = false;
-                  inputLocation.placeholder = 'Enter a place';
+                  if (inputLocation)
+                    inputLocation.placeholder = 'Enter a place';
                   return;
                 }
 
@@ -454,9 +469,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
                 const first = suggestions[0];
 
-                inputLocation.value = first.label;
+                if (inputLocation) inputLocation.value = first.label ?? '';
 
-                location.elevation = first.elevation;
                 location.fclName = first.fclName;
                 location.flagIcon = first.flagIcon;
                 location.population = first.population;
@@ -467,7 +481,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 location.label = first.label;
 
                 searching = false;
-                inputLocation.placeholder = 'Enter a place';
+                if (inputLocation) inputLocation.placeholder = 'Enter a place';
               }
 
               async function error() {
@@ -492,7 +506,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 });
 
                 searching = false;
-                inputLocation.placeholder = 'Enter a place';
+                if (inputLocation) inputLocation.placeholder = 'Enter a place';
               }
 
               navigator.geolocation.getCurrentPosition(success, error);
@@ -596,7 +610,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               max={getYesterday()}
               bind:value={location.from}
               bind:this={inputStart}
-              onchange={() => (weather.rawData = [])}
+              onchange={() => weather.setRawData([])}
               disabled={project.status.loading || weather.isUserEdited}
             />
           </label>
@@ -612,7 +626,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               max={getYesterday()}
               bind:value={location.to}
               bind:this={inputEnd}
-              onchange={() => (weather.rawData = [])}
+              onchange={() => weather.setRawData([])}
               disabled={project.status.loading || weather.isUserEdited}
             />
           </label>
@@ -629,10 +643,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
           bind:value={location.duration}
           disabled={weather.isUserEdited || project.status.loading}
           onchange={() => {
-            if (location?.duration === 'y') {
-              year = stringToDate(location.from).getUTCFullYear();
-              month = stringToDate(location.from).getUTCMonth() + 1;
-              day = stringToDate(location.from).getUTCDate();
+            if (location?.duration === 'y' && location.from) {
+              const fromDate = stringToDate(location.from);
+              year = fromDate.getUTCFullYear();
+              month = fromDate.getUTCMonth() + 1;
+              day = fromDate.getUTCDate();
               setDates({});
             }
           }}

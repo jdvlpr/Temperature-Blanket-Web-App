@@ -31,9 +31,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let paletteTitleText = $derived(getPaletteTitleText(selectedColors));
 
-  let container = null;
+  let container: HTMLElement | null = $state(null);
 
-  function getPaletteTitleText(colors) {
+  function getPaletteTitleText(colors: object[]) {
     if (colors.length) {
       return `${colors.length}
 				${pluralize('Colorway', colors.length)}`;
@@ -47,7 +47,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <YarnGridSelect
     bind:selectedColors
     onClickScrollToTop={() => {
-      container.scrollIntoView({
+      container?.scrollIntoView({
         behavior: 'smooth',
         block: 'start',
       });

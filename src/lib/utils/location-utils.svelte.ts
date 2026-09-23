@@ -13,7 +13,12 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-export const formatFeatureName = (fclName) => {
+import type {
+  GeoNamesSearchResult,
+  LocationSuggestion,
+} from '$lib/types/location-types';
+
+export const formatFeatureName = (fclName: string): string => {
   let _featureName = fclName;
   // remove '...'
   if (_featureName.includes('...')) {
@@ -64,7 +69,7 @@ export const formatFeatureName = (fclName) => {
   return _featureName;
 };
 
-export const formatLocationLabel = (item) => {
+export const formatLocationLabel = (item: GeoNamesSearchResult): string => {
   let labelText = item.name;
 
   if (
@@ -80,7 +85,9 @@ export const formatLocationLabel = (item) => {
   return labelText;
 };
 
-export const getSuggestions = (data) => {
+export const getSuggestions = (
+  data: GeoNamesSearchResult[],
+): LocationSuggestion[] => {
   return data.map((item) => {
     let labelText = formatLocationLabel(item);
 
@@ -88,7 +95,7 @@ export const getSuggestions = (data) => {
     if (item.countryCode)
       icon = `<span class="fflag fflag-${item.countryCode.toUpperCase()} shrink-0"></span>`;
 
-    const featureName = formatFeatureName(item.fclName);
+    const featureName = formatFeatureName(item.fclName ?? '');
 
     return {
       // adminName: item.adminName1,
@@ -107,7 +114,7 @@ export const getSuggestions = (data) => {
   });
 };
 
-export const renderResult = (item) => {
+export const renderResult = (item: LocationSuggestion): string => {
   return `
     <div class="flex items-center gap-2">
         <div class="">${item.flagIcon}</div>

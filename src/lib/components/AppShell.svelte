@@ -13,7 +13,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script>
+<script lang="ts">
   import AppNavigation from '$lib/components/AppNavigation.svelte';
   import { safeSlide } from '$lib/features/transitions/safeSlide';
   import {
@@ -30,21 +30,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import AppLogo from './AppLogo.svelte';
   import { weatherChart } from './WeatherChart.svelte';
 
-  /**
-   * @typedef {Object} Props
-   * @property {string} [pageName]
-   * @property {import('svelte').Snippet} [stickyHeader]
-   * @property {import('svelte').Snippet} [main]
-   * @property {import('svelte').Snippet} [footer]
-   */
+  interface Props {
+    pageName?: string;
+    stickyHeader?: import('svelte').Snippet;
+    main?: import('svelte').Snippet;
+    footer?: import('svelte').Snippet;
+  }
 
-  /** @type {Props} */
-  let { pageName = 'Menu', stickyHeader, main, footer } = $props();
+  let { pageName = 'Menu', stickyHeader, main, footer }: Props = $props();
 
   let sidebarWidth = $state(0);
 
-  let debounceTimer;
-  const debounce = (callback, time) => {
+  let debounceTimer: number | undefined;
+  const debounce = (callback: () => void, time: number) => {
     window.clearTimeout(debounceTimer);
     debounceTimer = window.setTimeout(callback, time);
   };

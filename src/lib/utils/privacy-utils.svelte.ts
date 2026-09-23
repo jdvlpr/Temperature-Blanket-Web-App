@@ -18,12 +18,16 @@ import { consentToMSClarityCookies, toast } from '$lib/state/page-state.svelte';
 import { preferences } from '$lib/storage/preferences.svelte';
 
 export const privacy = {
-  get_cookie: function (name) {
+  get_cookie: function (name: string) {
     return document.cookie.split(';').some((c) => {
       return c.trim().startsWith(name + '=');
     });
   },
-  delete_cookie: function (name, path, domain) {
+  delete_cookie: function (
+    name: string,
+    path: string | undefined,
+    domain: string | undefined,
+  ) {
     if (this.get_cookie(name)) {
       document.cookie =
         name +
@@ -106,14 +110,14 @@ export const privacy = {
             if (response.status !== 'closed') return;
             const dontShowAgainElement = document.getElementById(
               'cookies-dont-show-again',
-            );
+            ) as HTMLInputElement | null;
             if (dontShowAgainElement?.checked)
               preferences.value.disableToastAnalytics = true;
             else preferences.value.disableToastAnalytics = false;
 
             const consentToggleElement = document.getElementById(
               'clarity-consent-toggle',
-            );
+            ) as HTMLInputElement | null;
 
             let consentEvent;
             if (consentToggleElement?.checked)

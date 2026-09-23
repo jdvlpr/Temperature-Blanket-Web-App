@@ -1,12 +1,23 @@
 import { SECRET_GEONAMES_USERNAME } from '$env/static/private';
 import { API_SERVICES } from '$lib/constants/api-constants';
+import { cachedJSON } from '$lib/features/cache/edge-cache';
 import { error, json, type RequestHandler } from '@sveltejs/kit';
 
-export const GET: RequestHandler = async ({ params, fetch }) => {
+const CACHE_TTL_SECONDS = 60 * 60 * 4; // 4h
+
+export const GET: RequestHandler = async ({ params, fetch, url, platform }) => {
   const { text } = params;
 
   if (!text) throw error(400, 'Missing or invalid search text');
 
+  const data = await cachedJSON(platform, url, [text], CACHE_TTL_SECONDS, () =>
+    searchGeonames(text, fetch),
+  );
+
+  return json(data);
+};
+
+async function searchGeonames(text: string, fetch: typeof globalThis.fetch) {
   let fetchURL = API_SERVICES.geonames.baseURL;
   fetchURL += '?q=' + encodeURIComponent(text);
   fetchURL += '&name_startsWith=' + encodeURIComponent(text);
@@ -39,5 +50,5 @@ export const GET: RequestHandler = async ({ params, fetch }) => {
     error(404, 'no data found.');
   }
 
-  return json(data);
-};
+  return data;
+}

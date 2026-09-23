@@ -17,7 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import HelpIcon from '$lib/components/buttons/HelpIcon.svelte';
   import Expand from '$lib/components/Expand.svelte';
   import { ALL_YARN_WEIGHTS } from '$lib/constants/color-constants';
-  import { brands } from '$lib/data/yarns/brands';
+  import { ensureYarnData, getBrands } from '$lib/data/yarns/colorways.svelte';
   import { safeSlide } from '$lib/features/transitions/safeSlide';
   import { pluralize } from '$lib/utils/string-utils';
   import { stringToDate } from '$lib/utils/date-utils';
@@ -28,6 +28,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 
   let { viewSources = $bindable(false) }: Props = $props();
+
+  $effect(() => {
+    if (viewSources) ensureYarnData();
+  });
 </script>
 
 <div class="my-4 flex flex-wrap justify-center gap-2">
@@ -48,7 +52,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       transition:safeSlide
       class="flex flex-wrap items-start justify-start gap-2 text-sm"
     >
-      {#each brands as brand}
+      {#each getBrands() as brand}
         {#each brand.yarns as yarn}
           {@const unavailable = yarn.colorways.every(
             (n) => !!n.source?.unavailable,
@@ -72,15 +76,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 </span>
               {/if}
             </p>
-            
+
             {#if unavailable}
-                <HelpIcon href="/documentation#link-unavailable">
-                  {#snippet text()}
-                    <span class="font-normal"
-                      >Link Unavailable</span
-                    >
-                  {/snippet}
-                </HelpIcon>
+              <HelpIcon href="/documentation#link-unavailable">
+                {#snippet text()}
+                  <span class="font-normal">Link Unavailable</span>
+                {/snippet}
+              </HelpIcon>
             {/if}
 
             <p>

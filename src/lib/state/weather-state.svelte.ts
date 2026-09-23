@@ -15,8 +15,8 @@
 
 import { API_SERVICES } from '$lib/constants/api-constants';
 import { MOON_PHASE_NAMES } from '$lib/constants/weather-constants';
-import { locations, signal } from '$lib/state/location-state.svelte';
 import { showDaysInRange } from '$lib/state/gauges-state.svelte';
+import { locations, signal } from '$lib/state/location-state.svelte';
 import { preferences } from '$lib/storage/preferences.svelte';
 import type { GaugeAttributes, WeatherParam } from '$lib/types/gauge-types';
 import type { LocationType } from '$lib/types/location-types';
@@ -25,24 +25,24 @@ import type {
   WeatherDay,
   WeatherSourceOptions,
 } from '$lib/types/weather-types';
-import { createWeeksProperty } from '$lib/utils/date-utils';
+import { getColorInfo, type ColorInfo } from '$lib/utils/color-utils';
 import {
-  celsiusToFahrenheit,
-  convertTime,
-  hoursToMinutes,
-  millimetersToInches,
-} from '$lib/utils/unit-utils.svelte';
-import {
+  createWeeksProperty,
   dateToISO8601String,
   getLocalISODateString,
   numberOfDays,
   stringToDate,
 } from '$lib/utils/date-utils';
 import { displayNumber, getAverage } from '$lib/utils/number-utils';
-import { getColorInfo } from '$lib/utils/color-utils';
 import { pluralize } from '$lib/utils/string-utils';
+import {
+  celsiusToFahrenheit,
+  convertTime,
+  hoursToMinutes,
+  millimetersToInches,
+} from '$lib/utils/unit-utils.svelte';
 import { getWeatherTargets } from '$lib/utils/weather-utils.svelte';
-import SunCalc from 'suncalc';
+import * as SunCalc from 'suncalc';
 
 class WeatherClass {
   // ***************
@@ -86,40 +86,60 @@ class WeatherClass {
         if (i === 0) return; // Skip the first day because it is the weekData object
 
         // Update max temperature for the week if a higher value is found
-        if (day.tmax.metric > weekData.tmax.metric)
+        if (
+          (day.tmax.metric ?? -Infinity) > (weekData.tmax.metric ?? -Infinity)
+        )
           weekData.tmax.metric = day.tmax.metric;
-        if (day.tmax.imperial > weekData.tmax.imperial)
+        if (
+          (day.tmax.imperial ?? -Infinity) >
+          (weekData.tmax.imperial ?? -Infinity)
+        )
           weekData.tmax.imperial = day.tmax.imperial;
 
         // Calculate average temperature for the week
-        weekData.tavg.metric += day.tavg.metric;
-        weekData.tavg.imperial += day.tavg.imperial;
+        weekData.tavg.metric =
+          (weekData.tavg.metric ?? 0) + (day.tavg.metric ?? 0);
+        weekData.tavg.imperial =
+          (weekData.tavg.imperial ?? 0) + (day.tavg.imperial ?? 0);
 
         // Update min temperature for the week if a lower value is found
-        if (day.tmin.metric < weekData.tmin.metric)
+        if ((day.tmin.metric ?? Infinity) < (weekData.tmin.metric ?? Infinity))
           weekData.tmin.metric = day.tmin.metric;
-        if (day.tmin.imperial < weekData.tmin.imperial)
+        if (
+          (day.tmin.imperial ?? Infinity) < (weekData.tmin.imperial ?? Infinity)
+        )
           weekData.tmin.imperial = day.tmin.imperial;
 
         // Calculate aggregated precipitation for the week
-        weekData.prcp.metric += day.prcp.metric;
-        weekData.prcp.imperial += day.prcp.imperial;
+        weekData.prcp.metric =
+          (weekData.prcp.metric ?? 0) + (day.prcp.metric ?? 0);
+        weekData.prcp.imperial =
+          (weekData.prcp.imperial ?? 0) + (day.prcp.imperial ?? 0);
 
         // Update snowfall for the week if every day is from Meteostat
         if (isEveryDayFromMeteostat) {
-          if (day.snow.metric > weekData.snow.metric)
+          if (
+            (day.snow.metric ?? -Infinity) > (weekData.snow.metric ?? -Infinity)
+          )
             weekData.snow.metric = day.snow.metric;
-          if (day.snow.imperial > weekData.snow.imperial)
+          if (
+            (day.snow.imperial ?? -Infinity) >
+            (weekData.snow.imperial ?? -Infinity)
+          )
             weekData.snow.imperial = day.snow.imperial;
         } else {
           // Calculate aggregated snowfall for the week
-          weekData.snow.metric += day.snow.metric;
-          weekData.snow.imperial += day.snow.imperial;
+          weekData.snow.metric =
+            (weekData.snow.metric ?? 0) + (day.snow.metric ?? 0);
+          weekData.snow.imperial =
+            (weekData.snow.imperial ?? 0) + (day.snow.imperial ?? 0);
         }
 
         // Calculate average daylight for the week
-        weekData.dayt.metric += day.dayt.metric;
-        weekData.dayt.imperial += day.dayt.imperial;
+        weekData.dayt.metric =
+          (weekData.dayt.metric ?? 0) + (day.dayt.metric ?? 0);
+        weekData.dayt.imperial =
+          (weekData.dayt.imperial ?? 0) + (day.dayt.imperial ?? 0);
       });
 
       // Calculate average temperature for the week
@@ -172,11 +192,11 @@ class WeatherClass {
     return _weather;
   });
 
-  // The currently used weather data
+  // The currently used weather data.
+  // Pure derived: resetting `currentIndex` happens in setRawData()/setGrouping(),
+  // not here, so reading `data` never mutates state.
   data: WeatherDay[] = $derived.by(() => {
-    this.currentIndex = 0;
-
-    if (this.grouping === 'week' && this.groupedByWeek.length)
+    if (this.grouping === 'week' && this.groupedByWeek?.length)
       return this.groupedByWeek;
     else return this.rawData;
   });
@@ -187,7 +207,15 @@ class WeatherClass {
     });
   });
 
-  params = $derived.by(() => {
+  params: {
+    tmin: (number | null)[] | undefined;
+    tavg: (number | null)[] | undefined;
+    tmax: (number | null)[] | undefined;
+    prcp: (number | null)[] | undefined;
+    snow: (number | null)[] | undefined;
+    dayt: (number | null)[] | undefined;
+    moon: (MoonPhasesId | null)[] | undefined;
+  } = $derived.by(() => {
     let tmin, tavg, tmax, prcp, snow, dayt, moon;
 
     if (!this.data)
@@ -201,12 +229,24 @@ class WeatherClass {
         moon,
       };
 
-    tmin = this.data.map((day) => day.tmin[preferences.value.units]);
-    tavg = this.data.map((day) => day.tavg[preferences.value.units]);
-    tmax = this.data.map((day) => day.tmax[preferences.value.units]);
-    prcp = this.data.map((day) => day.prcp[preferences.value.units]);
-    snow = this.data.map((day) => day.snow[preferences.value.units]);
-    dayt = this.data.map((day) => day.dayt[preferences.value.units]);
+    tmin = this.data.map(
+      (day) => day.tmin[preferences.value.units ?? 'metric'],
+    );
+    tavg = this.data.map(
+      (day) => day.tavg[preferences.value.units ?? 'metric'],
+    );
+    tmax = this.data.map(
+      (day) => day.tmax[preferences.value.units ?? 'metric'],
+    );
+    prcp = this.data.map(
+      (day) => day.prcp[preferences.value.units ?? 'metric'],
+    );
+    snow = this.data.map(
+      (day) => day.snow[preferences.value.units ?? 'metric'],
+    );
+    dayt = this.data.map(
+      (day) => day.dayt[preferences.value.units ?? 'metric'],
+    );
     moon = this.data.map((day) => day.moon);
 
     return {
@@ -294,6 +334,26 @@ class WeatherClass {
   // ***************
 
   /**
+   * Assign the raw weather data. Resets `currentIndex` to 0 because the
+   * previously-selected day index no longer maps to the new dataset.
+   * Prefer this over assigning `weather.rawData` directly so the reset stays
+   * co-located with the write (keeps the `data` derived pure).
+   */
+  setRawData(value: WeatherDay[]) {
+    this.currentIndex = 0;
+    this.rawData = value;
+  }
+
+  /**
+   * Set the day/week grouping. Resets `currentIndex` to 0 because the index
+   * addresses a different list depending on grouping.
+   */
+  setGrouping(value: 'day' | 'week') {
+    this.currentIndex = 0;
+    this.grouping = value;
+  }
+
+  /**
    * Calculates the sum of a specific parameter from the weather data.
    * If the parameter is not available for a specific day, it calculates the average of that parameter.
    * If the parameter is "tmax", "tavg", "tmin", "prcp", "snow", or "dayt", it calculates the average of the corresponding parameter.
@@ -301,19 +361,21 @@ class WeatherClass {
    * @param {string} param - The parameter to calculate the sum for.
    * @returns {number} - The sum of the specified parameter.
    */
-  sum(param) {
+  sum(param: WeatherParam['id']): number {
+    if (param === 'moon') return 0;
+    const _param = param;
     return this.data
       .map((n) => {
-        let value = n[param];
-        if (typeof value !== 'undefined' && value !== null)
-          value = value[preferences.value.units];
-        else {
-          if (param === 'tmax') return getAverage(this.params.tmax);
-          if (param === 'tavg') return getAverage(this.params.tavg);
-          if (param === 'tmin') return getAverage(this.params.tmin);
-          if (param === 'prcp') return getAverage(this.params.prcp);
-          if (param === 'snow') return getAverage(this.params.snow);
-          if (param === 'dayt') return getAverage(this.params.dayt);
+        const paramValue = n[_param];
+        let value: number | null =
+          paramValue != null
+            ? paramValue[preferences.value.units ?? 'metric']
+            : null;
+        if (value === null) {
+          const numbers = (this.params[_param] ?? []).filter(
+            (v): v is number => v !== null,
+          );
+          return numbers.length ? getAverage(numbers) : 0;
         }
         value = Math.abs(value);
         value = value === 0 ? 1 : value;
@@ -329,7 +391,7 @@ class WeatherClass {
    * @returns {number} The count of missing days.
    */
   missingDaysCount() {
-    const _units = preferences.value.units;
+    const _units = preferences.value.units ?? 'metric';
     const missingDays = this.data.filter(
       (day) =>
         day?.tavg[_units] === null &&
@@ -349,15 +411,21 @@ class WeatherClass {
     param: WeatherParam['id'];
   }) {
     if (param === 'moon') return this.data[dayIndex][param];
-    return this.data[dayIndex][param][preferences.value.units];
+    return this.data[dayIndex][param][preferences.value.units ?? 'metric'];
   }
 
   async getOpenMeteo({ location }: { location: LocationType }) {
-    let allData: WeatherDay[] = [];
+    if (!location.from || !location.to) {
+      throw new Error('Location is missing a date range.');
+    }
+    const from = location.from;
+    const to = location.to;
+
+    const allData: WeatherDay[] = [];
     let totalDaysInFuture = 0;
 
     const todayStr = getLocalISODateString();
-    let _to = location.to;
+    let _to = to;
 
     // If the end date is in the future, set it instead to yesterday
     // The reason for this is because Open-Meteo does not accept end dates in the future
@@ -377,7 +445,7 @@ class WeatherClass {
 
     let url = API_SERVICES.openMeteo.baseURL;
     url += `?latitude=${location.lat}&longitude=${location.lng}`;
-    url += `&start_date=${location.from}`;
+    url += `&start_date=${from}`;
     url += `&end_date=${_to}`;
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'auto';
     url += `&daily=temperature_2m_max,temperature_2m_min,rain_sum,snowfall_sum&timezone=${timezone}`;
@@ -402,24 +470,25 @@ class WeatherClass {
     if (data?.error === true) {
       // Example Reason: "Parameter 'start_date' is out of allowed range from 1959-01-01 to 2023-02-01"
       if (data?.reason.includes('is out of allowed range')) {
-        const from = stringToDate(location.from);
-        const to = stringToDate(location.to);
+        const fromDate = stringToDate(from);
+        const toDate = stringToDate(to);
 
         let today = getLocalISODateString();
 
         let daysInFuture = null;
-        if (location.to >= today) {
-          daysInFuture = numberOfDays(stringToDate(today), to);
+        if (to >= today) {
+          daysInFuture = numberOfDays(stringToDate(today), toDate);
         }
 
-        let content = '<p class="font-bold text-xl my-4">Dates Out of Range</p>';
+        let content =
+          '<p class="font-bold text-xl my-4">Dates Out of Range</p>';
 
         if (daysInFuture) {
           content += `It looks like ${daysInFuture} ${pluralize('day', daysInFuture)} ${pluralize({ singular: 'is', plural: 'are' }, daysInFuture)} not in the past.`;
           content += ' Change the dates so that all days are in the past.';
         }
 
-        if (from < new Date('1940-01-01')) {
+        if (fromDate < new Date('1940-01-01')) {
           content += 'There may not be weather data for dates before 1940.';
         }
 
@@ -435,9 +504,9 @@ class WeatherClass {
         `<p class="font-bold text-xl my-4">Something Went Wrong</p>
       <p>A search request for weather data from <span class="font-bold">${
         location.label
-      }</span> (${stringToDate(location.from).toLocaleDateString(undefined, {
+      }</span> (${stringToDate(from).toLocaleDateString(undefined, {
         timeZone: 'UTC',
-      })} - ${stringToDate(location.to).toLocaleDateString(undefined, {
+      })} - ${stringToDate(to).toLocaleDateString(undefined, {
         timeZone: 'UTC',
       })}) was sent to <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer" class="link">Open-Meteo.com</a>, but the response returned an error.</p>
                             <p class="my-4">Try again with a different location or dates.</p>
@@ -452,7 +521,11 @@ class WeatherClass {
       );
     }
 
-    if (data.daily?.temperature_2m_max.every((value) => value === null)) {
+    if (
+      data.daily?.temperature_2m_max.every(
+        (value: number | null) => value === null,
+      )
+    ) {
       // Empty data
       throw new Error(
         '<p class="font-bold text-xl my-4">Something Went Wrong</p><p class="mt-4">There appears to be insufficient weather data, please try a different location or dates.</p>',
@@ -471,7 +544,9 @@ class WeatherClass {
       const tmin = tmins[index];
       const tmax = tmaxs[index];
       const tavg =
-        tmin === null || tmax === null ? null : displayNumber((tmin + tmax) / 2);
+        tmin === null || tmax === null
+          ? null
+          : displayNumber((tmin + tmax) / 2);
       const snow = snows[index];
       const prcp = prcps[index];
 
@@ -479,12 +554,12 @@ class WeatherClass {
 
       const dayTime = getDayTime({
         date,
-        lat: location.lat,
-        lng: location.lng,
+        lat: Number(location.lat),
+        lng: Number(location.lng),
       });
 
       const dayData: WeatherDay = {
-        location: location.index,
+        location: location.index ?? 0,
         date,
         tavg: {
           metric: tavg,
@@ -513,7 +588,7 @@ class WeatherClass {
         moon: getMoonPhase(date),
       };
 
-      allData = [...allData, dayData];
+      allData.push(dayData);
     }
 
     // Add future days with null values if needed
@@ -525,12 +600,12 @@ class WeatherClass {
         _date.setUTCDate(_date.getUTCDate() + index);
         const _dayTime = getDayTime({
           date: _date,
-          lat: location.lat,
-          lng: location.lng,
+          lat: Number(location.lat),
+          lng: Number(location.lng),
         });
 
         const _day: WeatherDay = {
-          location: location.index,
+          location: location.index ?? 0,
           date: _date,
           tavg: {
             metric: null,
@@ -559,7 +634,7 @@ class WeatherClass {
           moon: getMoonPhase(_date),
         };
 
-        allData = [...allData, _day];
+        allData.push(_day);
       }
     }
 
@@ -606,8 +681,9 @@ class WeatherClass {
   getTableData() {
     return [
       ...this.data.map((n, i) => {
-        let _weather = {};
-        _weather.color = {};
+        let _weather: Record<string, unknown> & {
+          color: Record<string, ColorInfo>;
+        } = { color: {} };
         this.tableWeatherTargets.forEach((target) => {
           const value = this.getWeatherValue({ dayIndex: i, param: target.id });
           const colorInfo = getColorInfo({
@@ -620,23 +696,24 @@ class WeatherClass {
             // make sure daytime is always in the same hr:mn format
             _weather = {
               ..._weather,
-              [target.id]: convertTime(n[target.id][preferences.value.units], {
-                displayUnits: false,
-                padStart: true,
-              }),
+              [target.id]: convertTime(
+                n[target.id][preferences.value.units ?? 'metric'],
+                {
+                  displayUnits: false,
+                  padStart: true,
+                },
+              ),
             };
           } else if (target.id === 'moon') {
-            let value =
-              n[target.id] !== null ? MOON_PHASE_NAMES[n[target.id]] : '-';
+            const moon = n[target.id];
+            let value = moon !== null ? MOON_PHASE_NAMES[moon] : '-';
             _weather = {
               ..._weather,
               [target.id]: value,
             };
           } else {
-            let value =
-              n[target.id][preferences.value.units] !== null
-                ? n[target.id][preferences.value.units]
-                : '-';
+            const rawValue = n[target.id][preferences.value.units ?? 'metric'];
+            let value = rawValue !== null ? rawValue : '-';
             _weather = {
               ..._weather,
               [target.id]: value,
@@ -669,7 +746,7 @@ export const weather = new WeatherClass();
  */
 export const getMoonPhase = (date: Date): MoonPhasesId => {
   // Ensure input is a Date object
-  if (!(date instanceof Date) || isNaN(date)) {
+  if (!(date instanceof Date) || isNaN(date.getTime())) {
     throw new Error('Invalid Date object provided.');
   }
 
@@ -695,18 +772,32 @@ export const getMoonPhase = (date: Date): MoonPhasesId => {
   // Calculate an index from 0 to 7, slightly offset to center phases
   const phaseIndex = Math.floor((normalizedPhase * 8 + 0.5) % 8);
 
-  return phaseIndex;
+  return phaseIndex as MoonPhasesId;
 };
 
-export const getDayTime = ({ date, lat, lng }) => {
+export const getDayTime = ({
+  date,
+  lat,
+  lng,
+}: {
+  date: Date;
+  lat: number;
+  lng: number;
+}): { metric: number | null; imperial: number | null } => {
   const times = SunCalc.getTimes(date, lat, lng);
-  const isValidSunset =
-    times.sunset instanceof Date && !isNaN(times.sunset.getTime());
-  const isValidSunRise =
-    times.sunrise instanceof Date && !isNaN(times.sunrise.getTime());
-  if (isValidSunset && isValidSunRise) {
+  if (
+    times.sunset instanceof Date &&
+    !isNaN(times.sunset.getTime()) &&
+    times.sunrise instanceof Date &&
+    !isNaN(times.sunrise.getTime())
+  ) {
     const daytime = parseFloat(
-      ((times.sunset - times.sunrise) / 1000 / 60 / 60).toFixed(6),
+      (
+        (times.sunset.getTime() - times.sunrise.getTime()) /
+        1000 /
+        60 /
+        60
+      ).toFixed(6),
     );
     return {
       metric: hoursToMinutes(daytime, 4),

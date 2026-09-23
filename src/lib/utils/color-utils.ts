@@ -14,9 +14,13 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { CHARACTERS_FOR_URL_HASH } from '$lib/constants/page-constants';
-import { allGaugesAttributes, gauges, getTargetParentGaugeId } from '$lib/state/gauges-state.svelte';
+import {
+  allGaugesAttributes,
+  gauges,
+  getTargetParentGaugeId,
+} from '$lib/state/gauges-state.svelte';
 import type { Color } from '$lib/types/yarn-types';
-import type { WeatherParam } from '$lib/types/gauge-types';
+import type { GaugeRange, WeatherParam } from '$lib/types/gauge-types';
 import { capitalizeFirstLetter } from '$lib/utils/other-utils';
 import { getColorPropertiesFromYarnStringAndHex } from '$lib/utils/yarn-utils';
 import {
@@ -25,7 +29,7 @@ import {
 } from '$lib/utils/project-utils.svelte';
 import { isValueInRange } from '$lib/utils/range-utils.svelte';
 import { pluralize } from '$lib/utils/string-utils';
-import { brands } from '$lib/data/yarns/brands';
+import { getBrands } from '$lib/data/yarns/colorways.svelte';
 import chroma from 'chroma-js';
 
 /**
@@ -34,7 +38,7 @@ import chroma from 'chroma-js';
  * @param {string} color - The color to determine the text color for.
  * @return {string} The text color, either "black" or "white".
  */
-export const getTextColor = (color) => {
+export const getTextColor = (color: string): 'black' | 'white' => {
   return chroma.valid(color)
     ? chroma(color).luminance() >= 0.5
       ? 'black'
@@ -49,7 +53,11 @@ export const getTextColor = (color) => {
  * @param {object[]} options.colors - The array of color objects.
  * @return {string} The string representation of yarn details.
  */
-export const colorsToYarnDetails = ({ colors }) => {
+export const colorsToYarnDetails = ({
+  colors,
+}: {
+  colors: Color[];
+}): string => {
   const yarnDetailsIds = [
     ...new Set(
       colors
@@ -59,8 +67,8 @@ export const colorsToYarnDetails = ({ colors }) => {
   ];
 
   let allColorsMatchDetails = false;
-  const details = yarnDetailsIds.map((n, i) => {
-    const indexes = [];
+  const details = yarnDetailsIds.map((n) => {
+    const indexes: number[] = [];
     colors.forEach((color, i) => {
       const id = `${color?.brandId}-${color?.yarnId}`;
       if (n === id) indexes.push(i);
@@ -80,11 +88,17 @@ export const colorsToYarnDetails = ({ colors }) => {
  *
  * @return  {object[]}         colors objects {hex, name, brandId, yarnId, brandName, yarnName}[]
  */
-export const yarnDetailsToColors = ({ string, colors }) => {
-  if (string === ' ' || !string.length || string === null) return colors;
-  const parentesisStartIndexes = [];
-  const parentesisEndIndexes = [];
-  const yarnDetailsSeparatorIndexes = [];
+export const yarnDetailsToColors = ({
+  string,
+  colors,
+}: {
+  string: string;
+  colors: Color[];
+}): Color[] => {
+  if (string === ' ' || !string.length) return colors;
+  const parentesisStartIndexes: number[] = [];
+  const parentesisEndIndexes: number[] = [];
+  const yarnDetailsSeparatorIndexes: number[] = [];
 
   for (let i = 0; i < string.length; i++) {
     if (string[i] === '(') parentesisStartIndexes.push(i);
@@ -120,9 +134,10 @@ export const yarnDetailsToColors = ({ string, colors }) => {
       parentesisStartIndexes[i] + 1,
       parentesisEndIndexes[i],
     );
-    let colorIndexes;
+    let colorIndexes: number[] = [];
 
-    if (!isNaN(colorIndexesString)) colorIndexes = [Number(colorIndexesString)];
+    if (!isNaN(Number(colorIndexesString)))
+      colorIndexes = [Number(colorIndexesString)];
     else if (colorIndexesString.includes(CHARACTERS_FOR_URL_HASH.separator))
       colorIndexes = colorIndexesString
         .split(CHARACTERS_FOR_URL_HASH.separator)
@@ -149,11 +164,14 @@ export const yarnDetailsToColors = ({ string, colors }) => {
   return colors;
 };
 
-export const colorsToCode = (colors, params = { includePrefixes: true }) => {
+export const colorsToCode = (
+  colors: Color[],
+  params: { includePrefixes: boolean } = { includePrefixes: true },
+): string => {
   const { includePrefixes } = params;
   let text = colors
     .map((n) =>
-      n.hex.includes('#') ? n.hex.substring(n.hex.indexOf('#') + 1) : n.hex,
+      n.hex?.includes('#') ? n.hex.substring(n.hex.indexOf('#') + 1) : n.hex,
     )
     .join('');
   if (includePrefixes) text = 'palette:' + text;
@@ -177,7 +195,7 @@ export const stringToColors = ({
   _colors = _colors.filter((color) => color !== ''); // remove empty colors
   if (!_colors.every((color) => chroma.valid(color))) return false;
   return _colors.map((color) => {
-    return { hex: chroma(color).hex() };
+    return { hex: chroma(color).hex() as Color['hex'] };
   });
 };
 
@@ -185,12 +203,11 @@ export const getColorsFromInput = ({
   string,
 }: {
   string: string;
-}): Color[] | boolean => {
-  if (!string || string === ' ' || !string?.length || string === null)
-    return false;
+}): Color[] | false => {
+  if (!string || string === ' ' || !string?.length) return false;
 
   // project checker
-  let colors =
+  let colors: Color[] | false =
     getColorsFromProjectURL(string) || getColorsFromYarnSearchURL(string);
 
   if (colors) return colors;
@@ -207,10 +224,15 @@ export const getColorsFromInput = ({
   // yarn details
   colors = stringToColors({ string });
 
-  if (yarnDetails)
+  if (yarnDetails && colors)
     colors = yarnDetailsToColors({ string: yarnDetails, colors });
 
   return colors;
+};
+
+export type ColorInfo = Color & {
+  index?: number;
+  gaugeLength: number | undefined;
 };
 
 export const getColorInfo = ({
@@ -219,9 +241,9 @@ export const getColorInfo = ({
 }: {
   param: WeatherParam['id'];
   value: number | null;
-}) => {
-  let color: { hex: Color['hex']; gaugeLength: undefined | number } = {
-    hex: '#ffffff',
+}): ColorInfo => {
+  let color: ColorInfo = {
+    hex: '#ffffff' as Color['hex'],
     gaugeLength: undefined,
   }; // default white color will show on the preview if the weather value has no range associated with it
 
@@ -239,28 +261,30 @@ export const getColorInfo = ({
     return color;
   }
 
-  const gaugeLength = gauge.ranges.length;
+  const { ranges, colors, rangeOptions } = gauge;
+  const gaugeLength = ranges.length;
 
   if (gauge.unit.type === 'category') {
     color = {
-      ...gauge.colors[value],
+      ...colors[value],
       index: value,
       gaugeLength,
     };
   } else {
+    if (!rangeOptions) return color;
     for (let i = 0; i < gaugeLength; i++) {
-      const { from, to } = gauge.ranges[i];
+      const range = ranges[i] as GaugeRange;
       if (
         isValueInRange({
           value,
-          range: { from, to },
-          direction: gauge.rangeOptions.direction,
-          includeFromValue: gauge.rangeOptions.includeFromValue,
-          includeToValue: gauge.rangeOptions.includeToValue,
+          range,
+          direction: rangeOptions.direction,
+          includeFromValue: rangeOptions.includeFromValue,
+          includeToValue: rangeOptions.includeToValue,
         })
       ) {
         color = {
-          ...gauge.colors[i],
+          ...colors[i],
           index: i,
           gaugeLength,
         };
@@ -279,7 +303,7 @@ export const getColorInfo = ({
  * @param {string} string - The project URL.
  * @returns {string[]} - An array of colors extracted from the URL, or false if the URL is invalid.
  */
-const getColorsFromProjectURL = (string: string): string[] | false => {
+const getColorsFromProjectURL = (string: string): Color[] | false => {
   let url;
   try {
     url = new URL(string);
@@ -292,16 +316,19 @@ const getColorsFromProjectURL = (string: string): string[] | false => {
   if (!urlParams.has('project')) return false; // it doesn't have project
 
   // hash params
-  const params = url.hash.split('&').reduce(function (res, item) {
-    const parts = item.split('=');
-    res[parts[0]] = {
-      key: parts[0],
-      value: decodeURIComponent(parts[1]),
-    };
-    return res;
-  }, {});
+  const params = url.hash.split('&').reduce(
+    (res, item) => {
+      const parts = item.split('=');
+      res[parts[0]] = {
+        key: parts[0],
+        value: decodeURIComponent(parts[1]),
+      };
+      return res;
+    },
+    {} as Record<string, { key: string; value: string }>,
+  );
 
-  let colors = [];
+  let colors: Color[] = [];
   allGaugesAttributes.forEach((gauge) => {
     if (gauge.id in params === true) {
       let text = params[gauge.id].value;
@@ -321,12 +348,14 @@ const getColorsFromProjectURL = (string: string): string[] | false => {
           // if has yarn details too
           let yarnDetails = extraText.substring(extraText.lastIndexOf('!') + 1);
 
-          let colorsWithYarnDetails = yarnDetailsToColors({
-            string: yarnDetails,
-            colors: newColors,
-          });
-          colors = [...colors, ...colorsWithYarnDetails];
-        } else {
+          if (newColors) {
+            const colorsWithYarnDetails = yarnDetailsToColors({
+              string: yarnDetails,
+              colors: newColors,
+            });
+            colors = [...colors, ...colorsWithYarnDetails];
+          }
+        } else if (newColors) {
           colors = [...colors, ...newColors];
         }
       } else {
@@ -334,7 +363,7 @@ const getColorsFromProjectURL = (string: string): string[] | false => {
         let newColors = stringToColors({
           string: text,
         });
-        colors = [...colors, ...newColors];
+        if (newColors) colors = [...colors, ...newColors];
       }
     }
   });
@@ -347,7 +376,7 @@ const getColorsFromProjectURL = (string: string): string[] | false => {
  * @param {string} string - The yarn search URL to parse.
  * @returns {string[]} - An array of colors extracted from the URL, or false if the URL is invalid.
  */
-const getColorsFromYarnSearchURL = (string) => {
+const getColorsFromYarnSearchURL = (string: string): Color[] | false => {
   let url;
   try {
     url = new URL(string);
@@ -361,11 +390,11 @@ const getColorsFromYarnSearchURL = (string) => {
 
   if (!urlParams.has('s')) return false; // it doesn't have search query
 
-  let colors = stringToColors({ string: urlParams.get('s') });
+  let colors = stringToColors({ string: urlParams.get('s') ?? '' });
 
   if (urlParams.has('f')) {
     const yarnDetails = urlParams.get('f');
-    if (yarnDetails?.includes('-')) {
+    if (yarnDetails?.includes('-') && colors) {
       colors = yarnDetailsToColors({
         string: yarnDetails,
         colors,
@@ -381,14 +410,20 @@ export const getColorName = ({
   yarnId,
   showGenericName = true,
   showNamedHexCodes = true,
-}) => {
+}: {
+  color: string;
+  brandId: string | undefined;
+  yarnId: string | undefined;
+  showGenericName?: boolean;
+  showNamedHexCodes?: boolean;
+}): string | null => {
   if (!brandId || !yarnId)
     return getGenericColorName({
       color,
       showGenericName,
       showNamedHexCodes,
     });
-  const yarn = brands
+  const yarn = getBrands()
     .find((brand) => brand.id === brandId)
     ?.yarns.find((yarn) => yarn.id === yarnId);
   if (!yarn)
@@ -405,8 +440,8 @@ export const getColorName = ({
     });
   for (const colorway of yarn.colorways) {
     for (const item of colorway.colors) {
-      const delta = chroma.deltaE(color, item.color);
-      if (delta === 0) return item.name; // TODO: allow for setting the threshold?
+      const delta = chroma.deltaE(color, item.hex ?? '#ffffff');
+      if (delta === 0) return item.name ?? null; // TODO: allow for setting the threshold?
     }
   }
   return getGenericColorName({
@@ -420,8 +455,12 @@ export const getGenericColorName = ({
   color,
   showGenericName = true,
   showNamedHexCodes = true,
-}) => {
-  let name = null;
+}: {
+  color: string;
+  showGenericName?: boolean;
+  showNamedHexCodes?: boolean;
+}): string | null => {
+  let name: string | null = null;
   if (chroma(color).name().includes('#')) name = chroma(color).name();
   else
     name = `${chroma(color).hex()} (${capitalizeFirstLetter(chroma(color).name())})`;
@@ -430,25 +469,26 @@ export const getGenericColorName = ({
   return null;
 };
 
-export const sortColorsLightToDark = ({ colors }) => {
+export const sortColorsLightToDark = ({
+  colors,
+}: {
+  colors: Color[];
+}): Color[] => {
   const unlockedColors = colors
     .filter((color) => !color?.locked)
     .map((color) => {
       return {
         ...color,
-        delta: chroma.deltaE('#ffffff', color.hex),
+        _delta: chroma.deltaE('#ffffff', color.hex ?? '#ffffff'), // underscore to differentiate between potentially existing delta property
       };
     })
     .sort((a, b) => {
-      return a.delta > b.delta ? 1 : b.delta > a.delta ? -1 : 0;
+      return a._delta > b._delta ? 1 : b._delta > a._delta ? -1 : 0;
     })
-    .map((color) => {
-      delete color.delta;
-      return color;
-    });
+    .map(({ _delta, ...color }) => color);
 
   // Insert locked colors back into the sorted list based on their original index
-  const sortedColors = [];
+  const sortedColors: Color[] = [];
   let addedLockedColors = 0;
   for (let i = 0; i < colors.length; i++) {
     if (colors[i]?.locked) {
@@ -461,23 +501,24 @@ export const sortColorsLightToDark = ({ colors }) => {
   return sortedColors;
 };
 
-export const sortColorsDarktoLight = ({ colors }) => {
+export const sortColorsDarktoLight = ({
+  colors,
+}: {
+  colors: Color[];
+}): Color[] => {
   const unlockedColors = colors
     .filter((color) => !color?.locked)
     .map((color) => {
       return {
         ...color,
-        delta: chroma.deltaE('#ffffff', color.hex),
+        _delta: chroma.deltaE('#ffffff', color.hex ?? '#ffffff'), // underscore to differentiate between potentially existing delta property
       };
     })
-    .sort((a, b) => (a.delta < b.delta ? 1 : b.delta < a.delta ? -1 : 0))
-    .map((color) => {
-      delete color.delta;
-      return color;
-    });
+    .sort((a, b) => (a._delta < b._delta ? 1 : b._delta < a._delta ? -1 : 0))
+    .map(({ _delta, ...color }) => color);
 
   // Insert locked colors back into the sorted list based on their original index
-  const sortedColors = [];
+  const sortedColors: Color[] = [];
   let addedLockedColors = 0;
   for (let i = 0; i < colors.length; i++) {
     if (colors[i]?.locked) {
@@ -490,16 +531,16 @@ export const sortColorsDarktoLight = ({ colors }) => {
   return sortedColors;
 };
 
-export const sortColorsByName = ({ colors }) => {
+export const sortColorsByName = ({ colors }: { colors: Color[] }): Color[] => {
   const unlockedColors = colors
     .filter((color) => !color?.locked)
     .sort((a, b) => {
-      var textA = a.name.toUpperCase();
-      var textB = b.name.toUpperCase();
+      var textA = (a.name ?? '').toUpperCase();
+      var textB = (b.name ?? '').toUpperCase();
       return textA < textB ? -1 : textA > textB ? 1 : 0;
     });
   // Insert locked colors back into the sorted list based on their original index
-  const sortedColors = [];
+  const sortedColors: Color[] = [];
   let addedLockedColors = 0;
   for (let i = 0; i < colors.length; i++) {
     if (colors[i]?.locked) {
@@ -512,16 +553,20 @@ export const sortColorsByName = ({ colors }) => {
   return sortedColors;
 };
 
-export const sortColorsByNameZtoA = ({ colors }) => {
+export const sortColorsByNameZtoA = ({
+  colors,
+}: {
+  colors: Color[];
+}): Color[] => {
   const unlockedColors = colors
     .filter((color) => !color?.locked)
     .sort((a, b) => {
-      var textA = a.name.toUpperCase();
-      var textB = b.name.toUpperCase();
+      var textA = (a.name ?? '').toUpperCase();
+      var textB = (b.name ?? '').toUpperCase();
       return textA > textB ? -1 : textA < textB ? 1 : 0;
     });
   // Insert locked colors back into the sorted list based on their original index
-  const sortedColors = [];
+  const sortedColors: Color[] = [];
   let addedLockedColors = 0;
   for (let i = 0; i < colors.length; i++) {
     if (colors[i]?.locked) {
@@ -534,7 +579,13 @@ export const sortColorsByNameZtoA = ({ colors }) => {
   return sortedColors;
 };
 
-export const getSortedPalette = ({ palette, sortColors }) => {
+export const getSortedPalette = ({
+  palette,
+  sortColors,
+}: {
+  palette: Color[];
+  sortColors: string;
+}): Color[] => {
   switch (sortColors) {
     case 'none':
     case 'custom':
@@ -552,27 +603,47 @@ export const getSortedPalette = ({ palette, sortColors }) => {
   }
 };
 
+type GalleryProjectSummary = {
+  projectUrl: string;
+  yarnUrls: string;
+  locations: string;
+  databaseId: string | number;
+};
+
+export type GalleryPalette = {
+  colors: Color[];
+  projectId: string | number;
+  schemeName: string;
+};
+
 export const getPalettesFromProjects = ({
   projects,
   selectedBrandId = '',
   selectedYarnId = '',
   palettesContainOnlyFilteredYarn = false,
-}) => {
+}: {
+  projects: GalleryProjectSummary[];
+  selectedBrandId?: string;
+  selectedYarnId?: string;
+  palettesContainOnlyFilteredYarn?: boolean;
+}): GalleryPalette[] => {
   if (!projects.length) return [];
-  let _palettes = [];
+  let _palettes: GalleryPalette[] = [];
   projects.forEach((project) => {
     const params = getProjectParametersFromURLHash(
       new URL(project.projectUrl).hash.substring(1),
     );
 
-    JSON.parse(project.yarnUrls).forEach((yarn_url, i) => {
+    (JSON.parse(project.yarnUrls) as string[]).forEach((yarn_url, i) => {
       const isNotPresetScheme = allGaugesAttributes.every(
         (p) => !params?.[p.id]?.value?.includes('~'),
       );
       let colors = getColorsFromInput({ string: yarn_url });
-      const someColorsAreYarn = colors?.some(
-        (color) => color?.name && color?.brandName && color?.yarnName,
-      );
+      const someColorsAreYarn =
+        colors &&
+        colors.some(
+          (color) => color?.name && color?.brandName && color?.yarnName,
+        );
       const isUniquePalette = !_palettes
         .map((palette) => JSON.stringify(palette.colors))
         .includes(JSON.stringify(colors));
@@ -580,33 +651,38 @@ export const getPalettesFromProjects = ({
       let hasSelectedBrandAndYarn = true;
       if (selectedBrandId && selectedYarnId) {
         if (palettesContainOnlyFilteredYarn)
-          hasSelectedBrandAndYarn = colors?.every(
-            (color) =>
-              color?.brandId === selectedBrandId &&
-              color?.yarnId === selectedYarnId,
-          );
+          hasSelectedBrandAndYarn =
+            !!colors &&
+            colors.every(
+              (color) =>
+                color?.brandId === selectedBrandId &&
+                color?.yarnId === selectedYarnId,
+            );
         else
-          hasSelectedBrandAndYarn = colors?.some(
-            (color) =>
-              color?.brandId === selectedBrandId &&
-              color?.yarnId === selectedYarnId,
-          );
+          hasSelectedBrandAndYarn =
+            !!colors &&
+            colors.some(
+              (color) =>
+                color?.brandId === selectedBrandId &&
+                color?.yarnId === selectedYarnId,
+            );
       } else if (selectedBrandId) {
         if (palettesContainOnlyFilteredYarn)
-          hasSelectedBrandAndYarn = colors?.every(
-            (color) => color?.brandId === selectedBrandId,
-          );
+          hasSelectedBrandAndYarn =
+            !!colors &&
+            colors.every((color) => color?.brandId === selectedBrandId);
         else
-          hasSelectedBrandAndYarn = colors?.some(
-            (color) => color?.brandId === selectedBrandId,
-          );
+          hasSelectedBrandAndYarn =
+            !!colors &&
+            colors.some((color) => color?.brandId === selectedBrandId);
       }
 
       if (
         isNotPresetScheme &&
         someColorsAreYarn &&
         isUniquePalette &&
-        hasSelectedBrandAndYarn
+        hasSelectedBrandAndYarn &&
+        colors
       ) {
         const title = getTitleFromLocationsMeta(project.locations);
         let schemeName =

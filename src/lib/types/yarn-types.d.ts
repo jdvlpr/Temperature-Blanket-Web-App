@@ -36,7 +36,8 @@ export type YarnWeight =
   | { name: 'Aran'; id: 'a' }
   | { name: 'Bulky'; id: 'b' }
   | { name: 'Super Bulky'; id: 'sb' }
-  | { name: 'Jumbo'; id: 'j' };
+  | { name: 'Jumbo'; id: 'j' }
+  | { name: 'Any'; id: 'any' };
 
 export interface Yarn {
   colorways: Colorway[];
@@ -69,6 +70,8 @@ export interface Yarn {
   Super Bulky = sb
   
   Jumbo = j
+
+  Any = any
   
   */
   weightId?: YarnWeight['id'];
@@ -121,8 +124,8 @@ export interface AffiliateColorCompressed {
 
 export interface Color {
   name?: string;
-  /** lowercase HTML hex code */
-  hex?: Lowercase<string>;
+  /** HTML hex code */
+  hex?: string;
   brandId?: string;
   brandName?: string;
   yarnId?: string;
@@ -132,6 +135,8 @@ export interface Color {
   href?: string;
   variant_href?: string;
   affiliate_variant_href?: string | null;
+  unavailable?: boolean;
+  unavailableDate?: TISO8601DateString;
   //* Id used for draggable sorting */
   id?: number;
   locked?: boolean;

@@ -21,8 +21,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import PreviewInfo from '$lib/components/PreviewInfo.svelte';
   import SeasonEditor from '$lib/components/SeasonEditor.svelte';
   import SpanYarnColorSelectIcon from '$lib/components/SpanYarnColorSelectIcon.svelte';
-  import { dialog } from '$lib/state/page-state.svelte';
   import { gauges } from '$lib/state/gauges-state.svelte';
+  import { dialog } from '$lib/state/page-state.svelte';
   import { previews } from '$lib/state/preview-state.svelte';
   import { weather } from '$lib/state/weather-state.svelte';
   import { preferences } from '$lib/storage/preferences.svelte';
@@ -30,6 +30,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { formatDateRange } from '$lib/utils/seasons-utils.svelte';
   import { pluralize } from '$lib/utils/string-utils';
   import { PencilIcon } from '@lucide/svelte';
+  import Preview from './Preview.svelte';
   import { rowsPreview } from './state.svelte';
 
   let targets = $derived(gauges.allCreated.map((n) => n.targets).flat());
@@ -38,38 +39,44 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <PreviewInfo previewTitle={rowsPreview.name}>
   {#snippet description()}
-    Each {weather.grouping} is represented by a row of stitches, added from {#if rowsPreview.countOfAdditionalStitches}
-      left to right and ‎{/if}top to bottom.
+    <p>
+      Each {weather.grouping} is represented by a row of stitches, added from {#if rowsPreview.countOfAdditionalStitches}
+        left to right and ‎{/if}top to bottom.
+    </p>
   {/snippet}
   {#snippet details()}
-    There are <span class="font-semibold"
-      >{rowsPreview.totalRows}
-      {pluralize('row', rowsPreview.totalRows)}</span
-    >{#if rowsPreview.countOfAdditionalStitches}
-      ‎ and <span class="font-semibold">
-        {Number.isInteger(rowsPreview.countOfAdditionalStitches)
-          ? rowsPreview.countOfAdditionalStitches
-          : ` ${Math.round(rowsPreview.countOfAdditionalStitches)}`}
-        additional {pluralize(
-          {
-            singular: 'stitch',
-            plural: 'stitches',
-          },
-          Math.round(rowsPreview.countOfAdditionalStitches),
-        )}
-      </span>
-    {/if}.
+    <p>
+      There are <span class="font-semibold"
+        >{rowsPreview.totalRows}
+        {pluralize('row', rowsPreview.totalRows)}</span
+      >{#if rowsPreview.countOfAdditionalStitches}
+        ‎ and <span class="font-semibold">
+          {Number.isInteger(rowsPreview.countOfAdditionalStitches)
+            ? rowsPreview.countOfAdditionalStitches
+            : ` ${Math.round(rowsPreview.countOfAdditionalStitches)}`}
+          additional {pluralize(
+            {
+              singular: 'stitch',
+              plural: 'stitches',
+            },
+            Math.round(rowsPreview.countOfAdditionalStitches),
+          )}
+        </span>
+      {/if}.
 
-    {#if rowsPreview.countOfAdditionalStitches}
-      <span class="mt-1 inline-block text-sm">
-        Stitches are counted using the parameter's absolute value rounded to the
-        nearest non-zero integer. A temperature or height of zero is rounded up
-        to one. Any missing values use the custom stitches per {weather.grouping}
-        value.
-      </span>
-    {/if}
+      {#if rowsPreview.countOfAdditionalStitches}
+        <span class="mt-1 inline-block text-sm">
+          Stitches are counted using the parameter's absolute value rounded to
+          the nearest non-zero integer. A temperature or height of zero is
+          rounded up to one. Any missing values use the custom stitches per {weather.grouping}
+          value.
+        </span>
+      {/if}
+    </p>
   {/snippet}
 </PreviewInfo>
+
+<div class="w-full"><Preview /></div>
 
 <div
   class="preset-outlined-surface-300-700 card flex flex-col items-start gap-4 p-4"

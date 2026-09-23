@@ -17,11 +17,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import GaugeSettings from '$lib/components/modals/GaugeSettings.svelte';
   import { dialog } from '$lib/state/page-state.svelte';
   import { gauges } from '$lib/state/gauges-state.svelte';
+  import type { GaugeRange, GaugeRangeOptions } from '$lib/types/gauge-types';
   import { Settings2Icon } from '@lucide/svelte';
 
-  function onSaveRangeOptions(e) {
-    gauges.activeGauge.ranges = e.ranges;
-    gauges.activeGauge.rangeOptions = e.rangeOptions;
+  function onSaveRangeOptions(e: {
+    ranges: GaugeRange[];
+    rangeOptions: GaugeRangeOptions;
+  }) {
+    if (gauges.activeGauge) {
+      gauges.activeGauge.ranges = e.ranges;
+      gauges.activeGauge.rangeOptions = e.rangeOptions;
+    }
   }
 </script>
 

@@ -21,6 +21,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { weather } from '$lib/state/weather-state.svelte';
   import { capitalizeFirstLetter } from '$lib/utils/other-utils';
   import { pluralize } from '$lib/utils/string-utils';
+  import Preview from './Preview.svelte';
   import { chevronsPreview } from './state.svelte';
 
   let targets = $derived(gauges.allCreated.map((n) => n.targets).flat());
@@ -28,18 +29,24 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <PreviewInfo previewTitle={chevronsPreview.name}>
   {#snippet description()}
-    Each {weather.grouping} is represented by a row of chevrons, added from top to
-    bottom.
+    <p>
+      Each {weather.grouping} is represented by a row of chevrons, added from top
+      to bottom.
+    </p>
   {/snippet}
   {#snippet details()}
     {#if chevronsPreview.details.rows}
-      There are <span class="font-semibold"
-        >{chevronsPreview.details.rows}
-        {pluralize('row', chevronsPreview.details.rows)}</span
-      >.
+      <p>
+        There are <span class="font-semibold"
+          >{chevronsPreview.details.rows}
+          {pluralize('row', chevronsPreview.details.rows)}</span
+        >.
+      </p>
     {/if}
   {/snippet}
 </PreviewInfo>
+
+<div class="w-full"><Preview /></div>
 
 <div
   class="preset-outlined-surface-300-700 card flex flex-col items-start gap-4 p-4"

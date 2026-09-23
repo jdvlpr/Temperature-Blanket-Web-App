@@ -1,7 +1,7 @@
-import SunCalc from 'suncalc';
+import * as SunCalc from 'suncalc';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { weather, getDayTime, getMoonPhase } from './weather-state.svelte';
-import { getAverage } from '$lib/utils/number-utils';
+import { getDayTime, getMoonPhase, weather } from './weather-state.svelte';
+import type { LocationType } from '$lib/types/location-types';
 
 // Mocking $lib modules
 vi.mock('$lib/constants/api-constants', async (importOriginal) => ({
@@ -38,21 +38,25 @@ vi.mock('suncalc', () => ({
   })),
 }));
 
-const { mockPreferences, mockLocations, mockAllGaugesAttributes, mockShowDaysInRange } =
-  vi.hoisted(() => ({
-    mockPreferences: {
-      value: {
-        units: 'metric',
-      },
+const {
+  mockPreferences,
+  mockLocations,
+  mockAllGaugesAttributes,
+  mockShowDaysInRange,
+} = vi.hoisted(() => ({
+  mockPreferences: {
+    value: {
+      units: 'metric',
     },
-    mockLocations: {
-      all: [] as any[],
-    },
-    mockAllGaugesAttributes: [] as any[],
-    mockShowDaysInRange: {
-      value: false,
-    },
-  }));
+  },
+  mockLocations: {
+    all: [] as any[],
+  },
+  mockAllGaugesAttributes: [] as any[],
+  mockShowDaysInRange: {
+    value: false,
+  },
+}));
 
 vi.mock('$lib/storage/preferences.svelte', () => ({
   preferences: mockPreferences,
@@ -118,7 +122,11 @@ vi.mock('$lib/utils/color-utils', async (importOriginal) => {
   const actual = await importOriginal<any>();
   return {
     ...actual,
-    getColorInfo: vi.fn(() => ({ color: '#ffffff', textColor: '#000000', hex: '#ffffff' })),
+    getColorInfo: vi.fn(() => ({
+      color: '#ffffff',
+      textColor: '#000000',
+      hex: '#ffffff',
+    })),
   };
 });
 
@@ -275,11 +283,11 @@ describe('weather-state', () => {
   });
 
   describe('getOpenMeteo', () => {
-    const mockLocation = {
-      lat: 50,
-      lng: 10,
-      from: '2023-01-01',
-      to: '2023-01-02',
+    const mockLocation: LocationType = {
+      lat: '50',
+      lng: '10',
+      from: '2023-01-01' as any,
+      to: '2023-01-02' as any,
       label: 'Test Location',
       index: 0,
       stations: null,
@@ -324,7 +332,10 @@ describe('weather-state', () => {
     });
 
     it('should clamp future "to" date to yesterday', async () => {
-      const futureLocation = { ...mockLocation, to: '2024-01-05' };
+      const futureLocation: LocationType = {
+        ...mockLocation,
+        to: '2024-01-05' as any,
+      };
 
       vi.mocked(fetch).mockResolvedValue({
         ok: true,
@@ -351,9 +362,9 @@ describe('weather-state', () => {
         ok: false,
       } as any);
 
-      await expect(weather.getOpenMeteo({ location: mockLocation })).rejects.toThrow(
-        'Service Temporarily Unavailable',
-      );
+      await expect(
+        weather.getOpenMeteo({ location: mockLocation }),
+      ).rejects.toThrow('Service Temporarily Unavailable');
     });
   });
 
@@ -415,11 +426,7 @@ describe('weather-state', () => {
     beforeEach(() => {
       // Mock tableWeatherTargets property
       Object.defineProperty(weather, 'tableWeatherTargets', {
-        get: () => [
-          { id: 'tmax' },
-          { id: 'moon' },
-          { id: 'dayt' },
-        ],
+        get: () => [{ id: 'tmax' }, { id: 'moon' }, { id: 'dayt' }],
         configurable: true,
       });
 
@@ -442,7 +449,7 @@ describe('weather-state', () => {
     });
 
     it('should format data for table display', () => {
-      const result = weather.getTableData();
+      const result = weather.getTableData() as any[];
       expect(result).toHaveLength(1);
       expect(result[0].date).toBe('2024-01-01');
       expect(result[0].tmax).toBe(20);
@@ -452,7 +459,7 @@ describe('weather-state', () => {
 
     it('should handle null values in table data', () => {
       weather.rawData[0].tmax.metric = null;
-      const result = weather.getTableData();
+      const result = weather.getTableData() as any[];
       expect(result[0].tmax).toBe('-');
     });
   });

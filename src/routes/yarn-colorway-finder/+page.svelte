@@ -21,7 +21,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     search = $state('');
     hex = $state('');
     inputTypeTextValue = $state('');
-    inputTypeColorElement = $state(null);
+    inputTypeColorElement: HTMLInputElement | null = $state(null);
     sortColors = $state('default');
   }
 
@@ -43,14 +43,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ToTopButton from '$lib/components/buttons/ToTopButton.svelte';
   import ViewToggleBindable from '$lib/components/buttons/ViewToggleBindable.svelte';
   import {
-    ALL_COLORWAYS_WITH_AFFILIATE_LINKS,
     ALL_YARN_WEIGHTS,
     YARN_COLORWAYS_PER_PAGE,
   } from '$lib/constants/color-constants';
-  import { brands } from '$lib/data/yarns/brands';
+  import {
+    ensureYarnData,
+    getBrands,
+    getColorwaysWithAffiliateLinks,
+  } from '$lib/data/yarns/colorways.svelte';
   import { safeSlide } from '$lib/features/transitions/safeSlide';
   import { toast } from '$lib/state/page-state.svelte';
-  import type { YarnWeight } from '$lib/types/yarn-types';
+  import type { Color, YarnWeight } from '$lib/types/yarn-types';
   import {
     getTextColor,
     sortColorsByName,
@@ -74,47 +77,61 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import chroma from 'chroma-js';
   import { onMount, tick } from 'svelte';
 
-  let loadMoreSpinner = $state();
-  let urlParams;
+  type ColorWithDelta = Color & { delta?: number };
+
+  let loadMoreSpinner = $state<HTMLButtonElement>();
+  let urlParams: URLSearchParams | undefined;
   let isLoaded = $state(false);
-  let filtersContainer = $state();
+  let filtersContainer: HTMLDivElement | undefined = $state();
   let showScrollToTopButton = $state(false);
   let itemsToShow = $state(YARN_COLORWAYS_PER_PAGE);
 
-  let results = $state([]);
+  let results: ColorWithDelta[] = $state([]);
   let gettingResults = $state(true);
   let loadingAllColors = $state(false);
 
   let layout = $state('grid');
 
-  let accordionState = $state([]);
+  let accordionState: string[] = $state([]);
 
   onMount(() => {
+    initPage();
+  });
+
+  async function initPage() {
+    await ensureYarnData();
+
     urlParams = new URLSearchParams(window.location.search);
     // Load URL
-    if (urlParams?.has('f')) getURLYarnParams(urlParams.get('f'));
+    if (urlParams.has('f')) {
+      const f = urlParams.get('f');
+      if (f) getURLYarnParams(f);
+    }
 
-    if (urlParams?.has('fw')) {
-      const weightId: YarnWeight['id'] = urlParams.get('fw');
-      if (weightId && ALL_YARN_WEIGHTS.map((n) => n.id).includes(weightId)) {
-        yarnColorwayFinderState.selectedYarnWeightId = weightId;
+    if (urlParams.has('fw')) {
+      const weightId = urlParams.get('fw');
+      if (weightId && ALL_YARN_WEIGHTS.some((n) => n.id === weightId)) {
+        yarnColorwayFinderState.selectedYarnWeightId =
+          weightId as YarnWeight['id'];
       }
     }
 
-    if (urlParams?.has('c')) {
+    if (urlParams.has('c')) {
       const color = urlParams.get('c');
-      if (chroma.valid(color)) {
+      if (color && chroma.valid(color)) {
         yarnColorwayFinderState.hex = chroma(color).hex('rgb');
         yarnColorwayFinderState.inputTypeTextValue = color;
-        yarnColorwayFinderState.inputTypeColorElement.value =
-          chroma(color).hex('rgb');
-        yarnColorwayFinderState.inputTypeColorElement.dispatchEvent(
-          new Event('change'),
-        );
+        if (yarnColorwayFinderState.inputTypeColorElement) {
+          yarnColorwayFinderState.inputTypeColorElement.value =
+            chroma(color).hex('rgb');
+          yarnColorwayFinderState.inputTypeColorElement.dispatchEvent(
+            new Event('change'),
+          );
+        }
       }
     }
-    if (urlParams?.has('n'))
-      yarnColorwayFinderState.search = urlParams.get('n');
+    if (urlParams.has('n'))
+      yarnColorwayFinderState.search = urlParams.get('n') ?? '';
 
     const scrollObserver = new IntersectionObserver(
       (entries) => {
@@ -128,10 +145,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
       },
       { threshold: 1 },
     );
-    scrollObserver.observe(filtersContainer);
+    if (filtersContainer) scrollObserver.observe(filtersContainer);
     isLoaded = true;
     getResults();
-  });
+  }
 
   function getShareableURL({
     selectedBrandId,
@@ -139,12 +156,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
     selectedYarnWeightId,
     search,
     hex,
+  }: {
+    selectedBrandId: string;
+    selectedYarnId: string;
+    selectedYarnWeightId: YarnWeight['id'] | '';
+    search: string;
+    hex: string;
   }) {
     if (!browser) return;
 
     let url = `${window.location.origin}${window.location.pathname}`;
 
-    const params = {};
+    const params: Record<string, string> = {};
 
     if (selectedBrandId && selectedYarnId)
       params.f = `${selectedBrandId}-${selectedYarnId}`;
@@ -156,7 +179,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     if (hex) params.c = hex.includes('#') ? hex.substring(1) : hex;
     if (search) params.n = search;
 
-    if (params?.f || params?.fw || params?.c || params?.n) {
+    if (params.f || params.fw || params.c || params.n) {
       params.v = version;
       url += '?';
       url += new URLSearchParams(params).toString();
@@ -165,14 +188,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
     return href;
   }
 
-  function getURLYarnParams(paramString) {
-    if (!paramString?.includes('-')) {
+  function getURLYarnParams(paramString: string) {
+    if (!paramString.includes('-')) {
       // check if brandId exists
-      if (brands.find((brand) => brand.id === paramString))
+      if (getBrands().find((brand) => brand.id === paramString))
         yarnColorwayFinderState.selectedBrandId = paramString;
       // check if yarnId exists
       if (
-        brands
+        getBrands()
           .flatMap((brand) => brand.yarns)
           .find((yarn) => yarn.id === paramString)
       )
@@ -182,11 +205,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
     const [brandId, yarnId] = paramString.split('-');
 
     // check if brandId exists
-    if (brands.find((brand) => brand.id === brandId))
+    if (getBrands().find((brand) => brand.id === brandId))
       yarnColorwayFinderState.selectedBrandId = brandId;
     // check if yarnId exists
     if (
-      brands.flatMap((brand) => brand.yarns).find((yarn) => yarn.id === yarnId)
+      getBrands()
+        .flatMap((brand) => brand.yarns)
+        .find((yarn) => yarn.id === yarnId)
     )
       yarnColorwayFinderState.selectedYarnId = yarnId;
   }
@@ -194,11 +219,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   function getResults() {
     if (!isLoaded || !browser) return;
     gettingResults = true;
-    let _results = ALL_COLORWAYS_WITH_AFFILIATE_LINKS.filter((colorway) =>
-      yarnColorwayFinderState.selectedBrandId
-        ? colorway.brandId === yarnColorwayFinderState.selectedBrandId
-        : true,
-    )
+    let _results = getColorwaysWithAffiliateLinks()
+      .filter((colorway) =>
+        yarnColorwayFinderState.selectedBrandId
+          ? colorway.brandId === yarnColorwayFinderState.selectedBrandId
+          : true,
+      )
       .filter((colorway) =>
         yarnColorwayFinderState.selectedYarnId
           ? colorway.yarnId === yarnColorwayFinderState.selectedYarnId
@@ -215,7 +241,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     if (yarnColorwayFinderState.search !== '') {
       _results = _results.filter((color) => {
         let find = yarnColorwayFinderState.search.toLowerCase();
-        return color.name.toLowerCase().includes(find);
+        return (color.name ?? '').toLowerCase().includes(find);
       });
     }
 
@@ -224,11 +250,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
         .map((color) => {
           return {
             ...color,
-            delta: chroma.deltaE(yarnColorwayFinderState.hex, color.hex),
+            delta: chroma.deltaE(
+              yarnColorwayFinderState.hex,
+              color.hex ?? '#ffffff',
+            ),
           };
         })
-        .sort((a, b) => (a.delta > b.delta ? 1 : b.delta > a.delta ? -1 : 0))
-        .filter((color) => color.delta < 40);
+        .sort((a, b) => (a.delta > b.delta ? 1 : b.delta > a.delta ? -1 : 0));
 
     switch (yarnColorwayFinderState.sortColors) {
       case 'light-to-dark':
@@ -261,26 +289,26 @@ If not, see <https://www.gnu.org/licenses/>. -->
     loadingAllColors = false;
   }
 
-  function inputTypeColorOnChange({ value }) {
+  function inputTypeColorOnChange({ value }: { value: string }) {
     let __color = value;
     if (!chroma.valid(__color)) {
       return;
     }
     yarnColorwayFinderState.inputTypeTextValue = __color;
     yarnColorwayFinderState.hex = chroma(__color).hex('rgb'); // use 'rgb' to prevent alpha hex codes
-    if (browser) {
+    if (browser && yarnColorwayFinderState.inputTypeColorElement) {
       yarnColorwayFinderState.inputTypeColorElement.value =
         chroma(__color).hex('rgb');
     }
   }
 
-  function inputTypeTextOnChange({ value }) {
+  function inputTypeTextOnChange({ value }: { value: string }) {
     let __color = value;
     if (!chroma.valid(__color)) {
       return;
     }
     yarnColorwayFinderState.inputTypeTextValue = __color;
-    if (browser) {
+    if (browser && yarnColorwayFinderState.inputTypeColorElement) {
       yarnColorwayFinderState.inputTypeColorElement.value =
         chroma(__color).hex('rgb');
       yarnColorwayFinderState.inputTypeColorElement.dispatchEvent(
@@ -291,13 +319,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
   let yarns = $derived(
     yarnColorwayFinderState.selectedBrandId === ''
-      ? brands
+      ? getBrands()
           .flatMap((n, i) =>
             n.yarns.map((n) => {
               return {
                 ...n,
-                brandId: brands[i].id,
-                brandName: brands[i].name,
+                brandId: getBrands()[i].id,
+                brandName: getBrands()[i].name,
               };
             }),
           )
@@ -313,7 +341,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             // names must be equal
             return 0;
           })
-      : brands
+      : getBrands()
           ?.filter(
             (brand) => brand.id === yarnColorwayFinderState.selectedBrandId,
           )
@@ -380,7 +408,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <meta property="og:title" content="Yarn Colorway Finder" />
   <meta
     property="og:description"
-    content="Browse a collection of yarn colorways. Filter by brand or yarn name, and search by HTML color name or hex code to find matching yarn colorways."
+    content="Browse yarn colorways, filter by brand or yarn, and search by hex color code."
   />
   <meta property="og:url" content="{PUBLIC_BASE_URL}/yarn-colorway-finder" />
   <meta property="og:type" content="website" />
@@ -399,18 +427,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/snippet}
   {#snippet main()}
     <main class="m-auto max-w-(--breakpoint-xl) pb-6">
+      <div class="w-full px-2 py-4 text-center">
+        <div class="flex flex-col gap-2">
+          <h2 class="h1 text-gradient mb-0">Find Yarn by Color</h2>
+          <p>
+            Browse yarn colorways, filter by brand or yarn, and search by hex
+            color code.
+          </p>
+        </div>
+      </div>
       <Card>
-        {#snippet header()}
-          <div>
-            <div class="bg-surface-100-900 p-4">
-              <p class="text-center">
-                Browse a collection of yarn colorways. Filter by brand or yarn
-                name, and search by HTML hex color code to find matching yarn
-                colorways.
-              </p>
-            </div>
-          </div>
-        {/snippet}
         {#snippet content()}
           <div class=" my-2 flex flex-col items-center">
             <div
@@ -426,7 +452,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     bind:this={yarnColorwayFinderState.inputTypeColorElement}
                     onchange={(e) => {
                       inputTypeColorOnChange({
-                        value: e.target.value,
+                        value: e.currentTarget.value,
                       });
                     }}
                   />
@@ -441,7 +467,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     value={yarnColorwayFinderState.inputTypeTextValue}
                     onkeyup={(e) =>
                       inputTypeTextOnChange({
-                        value: e.target.value,
+                        value: e.currentTarget.value,
                       })}
                     onpaste={(e) => {
                       if (e.cancelable) e.preventDefault();
@@ -459,7 +485,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
                       onclick={() => {
                         yarnColorwayFinderState.hex = '';
                         yarnColorwayFinderState.inputTypeTextValue = '';
-                        if (browser)
+                        if (
+                          browser &&
+                          yarnColorwayFinderState.inputTypeColorElement
+                        )
                           yarnColorwayFinderState.inputTypeColorElement.value =
                             '#000000';
                       }}
@@ -486,20 +515,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 </div>
               {/key}
 
-              {#key yarnColorwayFinderState.selectedBrandId || yarnColorwayFinderState.selectedYarnId}
-                <div
-                  class="col-span-12 w-full md:col-span-3"
-                  class:hidden={!!yarnColorwayFinderState.selectedBrandId &&
-                    !!yarnColorwayFinderState.selectedYarnId}
-                >
-                  <SelectYarnWeight
-                    selectedBrandId={yarnColorwayFinderState.selectedBrandId}
-                    bind:selectedYarnWeightId={
-                      yarnColorwayFinderState.selectedYarnWeightId
-                    }
-                  />
-                </div>
-              {/key}
+              {#if isLoaded}
+                {#key yarnColorwayFinderState.selectedBrandId || yarnColorwayFinderState.selectedYarnId}
+                  <div
+                    class="col-span-12 w-full md:col-span-3"
+                    class:hidden={!!yarnColorwayFinderState.selectedBrandId &&
+                      !!yarnColorwayFinderState.selectedYarnId}
+                  >
+                    <SelectYarnWeight
+                      selectedBrandId={yarnColorwayFinderState.selectedBrandId}
+                      bind:selectedYarnWeightId={
+                        yarnColorwayFinderState.selectedYarnWeightId
+                      }
+                    />
+                  </div>
+                {/key}
+              {/if}
 
               <div
                 class="col-span-12 flex w-full flex-col justify-start gap-1 md:col-span-4"
@@ -597,8 +628,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   ? 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5'
                   : 'flex flex-col'}"
               >
-                {#each results as { hex, name, delta, brandName, yarnName, variant_href, affiliate_variant_href, unavailable }}
-                  {@const percentMatch = Math.floor(100 - delta)}
+                {#each results as { hex, name, delta, brandName, yarnName, variant_href, affiliate_variant_href, unavailable } ((hex ?? '') + (name ?? '') + (brandName ?? '') + (yarnName ?? ''))}
+                  {@const percentMatch = Math.floor(100 - Number(delta))}
                   <!-- svelte-ignore a11y_click_events_have_key_events -->
                   <!-- svelte-ignore a11y_no_static_element_interactions -->
                   <div
@@ -606,13 +637,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     'grid'
                       ? 'justify-center'
                       : ''}"
-                    style="background:{hex}; color:{getTextColor(hex)};"
+                    style="background:{hex}; color:{getTextColor(
+                      hex ?? '#ffffff',
+                    )};"
                     onclick={() => {
-                      window.navigator.clipboard.writeText(name);
+                      window.navigator.clipboard.writeText(name ?? '');
                       toast.trigger({
                         message: `<div class="flex flex-col"><span class="font-bold">${name}</span><span class="text-xs">Copied to clipboard</span></div>`,
                         category: 'success',
-                        icon: ClipboardCheckIcon
+                        icon: ClipboardCheckIcon,
                       });
                     }}
                     title="Copy {name} to clipboard"
@@ -652,11 +685,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         {brandName} - {yarnName}
                       </span>
 
-                      <span class="text-left text-lg leading-tight pointer-events-none">
+                      <span
+                        class="text-left text-lg leading-tight pointer-events-none"
+                      >
                         {name}
                       </span>
 
-                      {#if percentMatch}
+                      {#if typeof percentMatch == 'number' && !isNaN(percentMatch)}
                         <p class="text-xs pointer-events-none">
                           {percentMatch}% Match
                         </p>
@@ -671,11 +706,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         title="Copy {hex} to clipboard"
                         onclick={(e) => {
                           e.stopPropagation();
-                          window.navigator.clipboard.writeText(hex);
+                          window.navigator.clipboard.writeText(hex ?? '');
                           toast.trigger({
                             message: `<div class="flex flex-col"><span class="font-bold">${hex}</span><span class="text-xs">Copied to clipboard</span></div>`,
                             category: 'success',
-                            icon: ClipboardCheckIcon
+                            icon: ClipboardCheckIcon,
                           });
                         }}>{hex}</span
                       >
@@ -808,7 +843,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <ToTopButton
     bottom="10px"
     onClick={() =>
-      filtersContainer.scrollIntoView({
+      filtersContainer?.scrollIntoView({
         behavior: 'smooth',
         block: 'start',
       })}

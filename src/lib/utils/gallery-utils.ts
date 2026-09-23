@@ -16,6 +16,50 @@
 import { browser, dev } from '$app/environment';
 import { PUBLIC_WORDPRESS_BASE_URL } from '$env/static/public';
 
+export type GalleryPageInfo = {
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+  startCursor: string | null;
+  endCursor: string | null;
+};
+
+export type GalleryProjectNode = {
+  title: string;
+  databaseId: number;
+  projectUrl: string;
+  yarnUrls: string;
+  locations: string;
+  featuredImage: {
+    node: {
+      mediaItemUrl: string;
+      mediaDetails: {
+        sizes: { sourceUrl: string }[];
+      };
+    };
+  } | null;
+  date: string;
+};
+
+export type FetchProjectsResult = {
+  pageInfo: GalleryPageInfo;
+  edges: { node: GalleryProjectNode }[];
+};
+
+export type PopularProjectMeta = {
+  project_url: string;
+  yarn_urls: string;
+  locations: string;
+};
+
+export type PopularProject = {
+  id: number;
+  title: string;
+  date: string;
+  featured_media: number;
+  featured_image_src: string;
+  meta: PopularProjectMeta;
+};
+
 export const fetchProjects = async ({
   first = 40,
   last = null, // TODO: is this being used by anything? I don't think so.
@@ -25,10 +69,16 @@ export const fetchProjects = async ({
   order = 'DESC',
   yarn = '',
   pattern = '',
-}) => {
-  let variables = { first, last, after, before, search, order };
-  if (pattern) variables.projectTag = `[${pattern}]`;
-  if (yarn) variables.yarn = yarn;
+}: {
+  first?: number;
+  last?: string | null;
+  after?: string | null;
+  before?: string | null;
+  search?: string;
+  order?: string;
+  yarn?: string;
+  pattern?: string;
+}): Promise<FetchProjectsResult> => {
   const url = `${PUBLIC_WORDPRESS_BASE_URL}/graphql`;
   const query = `
             query GET_PAGINATED_PROJECTS
@@ -105,7 +155,7 @@ export const fetchProjects = async ({
   return data;
 };
 
-export const recordPageView = async (id) => {
+export const recordPageView = async (id: string | number) => {
   if (dev || !browser) return;
   await fetch(
     `${PUBLIC_WORDPRESS_BASE_URL}/wp-json/wordpress-popular-posts/v2/views/${id}`,
@@ -119,7 +169,11 @@ export const fetchPopularProjects = async ({
   months = 3,
   limit = 40,
   timeUnit = 'month',
-}) => {
+}: {
+  months?: number;
+  limit?: number;
+  timeUnit?: string;
+}): Promise<PopularProject[]> => {
   if (months == 0.25) {
     // 0.25 months means 1 week
     timeUnit = 'week';

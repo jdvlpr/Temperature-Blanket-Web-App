@@ -18,7 +18,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import GalleryPalettesPopular from '$lib/components/GalleryPalettesPopular.svelte';
   import PaletteSchemes from '$lib/components/PaletteSchemes.svelte';
   import ToTopButton from '$lib/components/buttons/ToTopButton.svelte';
+  import { ensureYarnData } from '$lib/data/yarns/colorways.svelte';
   import { SegmentedControl } from '@skeletonlabs/skeleton-svelte';
+  import { onMount } from 'svelte';
 
   interface Props {
     schemeId?: string;
@@ -34,11 +36,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     context = '',
   }: Props = $props();
 
-  let category = $state(getParentCategory(() => schemeId));
-  let container = $state();
+  let category = $state(getParentCategory(schemeId));
+  let container: HTMLElement | undefined = $state();
   let showScrollToTopButton = $state(false);
 
-  let filtersContainer: HTMLElement;
+  let filtersContainer: HTMLElement | null = null;
   let scrollObserver = new IntersectionObserver(
     (entries, observer) => {
       entries.forEach((entry) => {
@@ -53,13 +55,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
   );
   const categories = ['Gallery', 'Featured', 'Schemes'];
 
-  function getParentCategory(schemeId) {
+  onMount(() => {
+    ensureYarnData();
+  });
+
+  function getParentCategory(schemeId: string | undefined) {
     if (schemeId === 'Custom') return 'Gallery';
     else return 'Schemes';
   }
 
   $effect(() => {
-    scrollObserver.observe(filtersContainer);
+    if (filtersContainer) {
+      scrollObserver.observe(filtersContainer);
+    }
   });
 </script>
 
@@ -72,12 +80,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <SegmentedControl
       value={category}
       onValueChange={(e) => {
-        category = e.value;
+        if (e.value) {
+          category = e.value as string;
+        }
       }}
     >
-      <SegmentedControl.Control
-        class="bg-surface-100 dark:bg-surface-950 rounded-container border-none shadow-sm"
-      >
+      <SegmentedControl.Control class="bg-surface-100 dark:bg-surface-950">
         <SegmentedControl.Indicator />
         {#each categories as categoryItem}
           <SegmentedControl.Item value={categoryItem}>
@@ -104,10 +112,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {#if showScrollToTopButton}
     <ToTopButton
       onClick={() => {
-        container.scrollIntoView({
-          behavior: 'smooth',
-          block: 'start',
-        });
+        if (container) {
+          container.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start',
+          });
+        }
       }}
       bottom="1rem"
     />

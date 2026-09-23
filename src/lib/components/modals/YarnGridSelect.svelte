@@ -19,7 +19,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Spinner from '$lib/components/Spinner.svelte';
   import ToTopButton from '$lib/components/buttons/ToTopButton.svelte';
   import { YARN_COLORWAYS_PER_PAGE } from '$lib/constants/color-constants';
-  import { brands } from '$lib/data/yarns/brands';
+  import { ensureYarnData, getBrands } from '$lib/data/yarns/colorways.svelte';
   import { defaultYarn } from '$lib/state/page-state.svelte';
   import type { Color } from '$lib/types/yarn-types';
   import {
@@ -41,7 +41,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     SearchIcon,
   } from '@lucide/svelte';
   import chroma from 'chroma-js';
-  import { tick } from 'svelte';
+  import { onMount, tick } from 'svelte';
   import SelectYarnWeight from '../SelectYarnWeight.svelte';
 
   interface Props {
@@ -68,13 +68,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
     scrollToTopButtonBottom = '100px',
   }: Props = $props();
 
-  let loadMoreSpinner = $state();
+  let loadMoreSpinner = $state<HTMLDivElement>();
 
-  let loadMoreColors = $state();
+  let loadMoreColors = $state<IntersectionObserver>();
 
   let selectedYarnWeightId = $state('');
 
-  let filtersContainer = $state();
+  let filtersContainer = $state<HTMLDivElement>();
 
   let showScrollToTopButton = $state(false);
 
@@ -105,7 +105,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let sortColors = $state(hasIncomingColor ? 'best-match' : 'default');
 
-  let results = $state([]);
+  let results = $state<(Color & { delta?: number })[]>([]);
 
   let gettingResults = $state(true);
 
@@ -113,13 +113,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let yarns = $derived(
     selectedBrandId === ''
-      ? brands
+      ? getBrands()
           .flatMap((n, i) =>
             n.yarns.map((n) => {
               return {
                 ...n,
-                brandId: brands[i].id,
-                brandName: brands[i].name,
+                brandId: getBrands()[i].id,
+                brandName: getBrands()[i].name,
               };
             }),
           )
@@ -135,7 +135,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             // names must be equal
             return 0;
           })
-      : brands
+      : getBrands()
           ?.filter((brand) => brand.id === selectedBrandId)
           ?.flatMap((n) => {
             return n.yarns.map((yarn) => {
@@ -166,6 +166,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
     selectedColors.map((n) => `${n.hex}${n.name}${n.brandId}${n.yarnId}`),
   );
 
+  let yarnDataReady = $state(false);
+
+  onMount(() => {
+    ensureYarnData().then(() => {
+      yarnDataReady = true;
+    });
+  });
+
   function getResults() {
     gettingResults = true;
     let _results = getColorways({
@@ -176,19 +184,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     // filter by search text
     if (search !== '') {
-      _results = _results.filter((color) => {
+      _results = _results.filter((color: Color) => {
         let find = search.toLowerCase();
-        return color.name.toLowerCase().includes(find);
+        return color.name ? color.name.toLowerCase().includes(find) : false;
       });
     }
 
     switch (sortColors) {
       case 'best-match':
         _results = _results
-          .map((color) => {
+          .map((color: Color) => {
             return {
               ...color,
-              delta: chroma.deltaE(incomingColor.hex, color.hex),
+              delta: chroma.deltaE(
+                incomingColor.hex ?? '#ffffff',
+                color.hex ?? '#ffffff',
+              ),
             };
           })
           .sort((a, b) => (a.delta > b.delta ? 1 : b.delta > a.delta ? -1 : 0));
@@ -233,7 +244,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     yarnName,
     variant_href,
     affiliate_variant_href,
-  }) {
+  }: Color) {
     if (canMarkIfHexMatches) canMarkIfHexMatches = false;
 
     const matchId = `${hex}${name}${brandId}${yarnId}`;
@@ -264,7 +275,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     if (limit && selectedColors.length) {
       selectedColors = selectedColors.slice(selectedColors.length - 1);
       if (sortColors === 'best-match')
-        filtersContainer?.parentElement.scrollIntoView({
+        filtersContainer?.parentElement?.scrollIntoView({
           behavior: 'smooth',
           block: 'start',
         });
@@ -274,7 +285,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 
   $effect(() => {
-    scrollObserver.observe(filtersContainer);
+    if (filtersContainer) {
+      scrollObserver.observe(filtersContainer);
+    }
     loadMoreColors = new IntersectionObserver(
       function (element) {
         // isIntersecting is true when element and viewport are overlapping
@@ -295,7 +308,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   });
 
   $effect(() => {
-    if (loadMoreSpinner) loadMoreColors.observe(loadMoreSpinner);
+    if (loadMoreSpinner && loadMoreColors) {
+      loadMoreColors.observe(loadMoreSpinner);
+    }
   });
 
   $effect(() => {
@@ -335,14 +350,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
   {/if}
 
-  {#key selectedBrandId}
-    <div
-      class="order-3 col-span-full w-full md:order-2 md:col-span-3"
-      class:hidden={!!selectedBrandId && !!selectedYarnId}
-    >
-      <SelectYarnWeight {selectedBrandId} bind:selectedYarnWeightId />
-    </div>
-  {/key}
+  {#if yarnDataReady}
+    {#key selectedBrandId}
+      <div
+        class="order-3 col-span-full w-full md:order-2 md:col-span-3"
+        class:hidden={!!selectedBrandId && !!selectedYarnId}
+      >
+        <SelectYarnWeight {selectedBrandId} bind:selectedYarnWeightId />
+      </div>
+    {/key}
+  {/if}
 
   <div
     class="label order-4 col-span-full flex w-full flex-col items-start md:col-span-5"
@@ -409,11 +426,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
         (selectedIds.includes(`${hex}${name}${brandId}${yarnId}`) &&
           (hasIncomingColor ? incomingColor.hex === hex : true)) ||
         (canMarkIfHexMatches && incomingColor.hex === hex)}
-      {@const percentMatch = Math.floor(100 - delta)}
+      {@const percentMatch =
+        delta !== undefined ? Math.floor(100 - delta) : undefined}
       <button
         type="button"
         class="rounded-container flex min-w-fit flex-1 cursor-pointer flex-col items-start justify-start gap-2 p-1 shadow-xs sm:p-2"
-        style="background:{hex}; color:{getTextColor(hex)};"
+        style="background:{hex ?? '#ffffff'}; color:{getTextColor(
+          hex ?? '#ffffff',
+        )};"
         onclick={() =>
           toggleSelected({
             brandId,
@@ -455,7 +475,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {/if}
   {/if}
 </div>
-{#if !results?.length && !loadingAllColors}
+{#if !yarnDataReady}
+  <div class="mx-auto my-6">
+    <Spinner />
+  </div>
+{:else if !results?.length && !loadingAllColors}
   <p class="text-center italic">No Matching Colorways</p>
 {/if}
 {#if showScrollToTopButton}

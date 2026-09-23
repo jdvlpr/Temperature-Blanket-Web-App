@@ -76,21 +76,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <main
       class="m-auto mb-8 flex max-w-(--breakpoint-xl) flex-col justify-start gap-2"
     >
-      <h2 class="h2 text-gradient text-center">Gallery</h2>
+      <!-- <h2 class="h2 text-gradient text-center">Gallery</h2> -->
+      <h2 class="h1 text-gradient mt-4 text-center">Gallery</h2>
       <div class="mx-auto w-full max-w-sm px-2">
         <SegmentedControl
           value={view}
           onValueChange={(e) => {
-            view = e.value;
+            view = e.value ?? 'projects';
             // Optionally update search params so links can be shared to specific views
             if (browser) {
-              goto(`?view=${e.value}`);
+              goto(`?view=${e.value ?? 'projects'}`);
             }
           }}
         >
-          <SegmentedControl.Control
-            class="bg-surface-100 dark:bg-surface-900 rounded-container border-0 shadow-sm"
-          >
+          <SegmentedControl.Control class="bg-surface-100 dark:bg-surface-900">
             <SegmentedControl.Indicator />
             <SegmentedControl.Item value={'projects'}>
               <SegmentedControl.ItemText

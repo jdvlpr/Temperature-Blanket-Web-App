@@ -18,7 +18,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   export let showColorDetails = $state({ value: false });
 </script>
 
-<script>
+<script lang="ts">
   import { page } from '$app/state';
   import { gauges } from '$lib/state/gauges-state.svelte';
   import { project } from '$lib/state/project-state.svelte';
@@ -34,8 +34,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   const uid = $props.id();
 
-  let debounceTimer;
-  const debounce = (callback, time) => {
+  let debounceTimer: number | undefined;
+  const debounce = (callback: () => void, time: number) => {
     window.clearTimeout(debounceTimer);
     debounceTimer = window.setTimeout(callback, time);
   };

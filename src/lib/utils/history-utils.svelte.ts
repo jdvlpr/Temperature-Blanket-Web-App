@@ -27,7 +27,11 @@ import { getProjectParametersFromURLHash } from '$lib/utils/project-utils.svelte
 import { parseGaugeURLHash } from '$lib/utils/load-project-utils.svelte';
 import { seasonsFromUrlHash } from '$lib/utils/seasons-utils.svelte';
 
-export const loadFromHistory = ({ action }: { action: 'Undo' | 'Redo' }) => {
+export const loadFromHistory = async ({
+  action,
+}: {
+  action: 'Undo' | 'Redo';
+}) => {
   let oldHistoryState = project.history.current;
   let newHistoryState;
   if (action === 'Undo') {
@@ -38,21 +42,41 @@ export const loadFromHistory = ({ action }: { action: 'Undo' | 'Redo' }) => {
     project.history.redo();
   }
 
-  const oldParams = getProjectParametersFromURLHash(oldHistoryState);
-  const newParams = getProjectParametersFromURLHash(newHistoryState);
+  const oldParams = getProjectParametersFromURLHash(oldHistoryState ?? '');
+  const newParams = getProjectParametersFromURLHash(newHistoryState ?? '');
 
   let message = '';
+
+  // Resolve a preview change first (this is the only async step) so it
+  // settles before any of the synchronous mutations below, all of which
+  // feed the debounced updateHistory/URL push via `project.url`. Otherwise
+  // a slow chunk import could let a history entry be captured with the new
+  // gauges/settings but the still-loading (old) preview.
+  let previewChanged = false;
+  const previewEntry = previews.all.find((p) => exists(newParams[p.id]));
+  if (previewEntry) {
+    if (
+      !exists(oldParams[previewEntry.id]) ||
+      oldParams[previewEntry.id].value !== newParams[previewEntry.id].value
+    ) {
+      const previewInstance = await previews.load(previewEntry.id);
+      if (previewInstance) {
+        previewInstance.load(newParams[previewEntry.id].value);
+        previewChanged = true;
+      }
+    }
+  }
 
   // Change Weather Grouping
   if (exists(newParams.w)) {
     if (!exists(oldParams.w) || oldParams.w?.value !== newParams.w?.value) {
-      weather.grouping = 'week';
+      weather.setGrouping('week');
       weather.monthGroupingStartDay = +newParams.w.value;
       message = 'Weather Grouping set to Weekly';
     }
   } else {
     if (weather.grouping !== 'day') {
-      weather.grouping = 'day';
+      weather.setGrouping('day');
       message = 'Weather Grouping set to Daily';
     }
   }
@@ -100,9 +124,8 @@ export const loadFromHistory = ({ action }: { action: 'Undo' | 'Redo' }) => {
           gauges.getSnapshot(gauge.id),
         );
 
-        gauges.allCreated
-          .find((g) => g.id === gauge.id)
-          .updateSettings({ settings });
+        const _gauge = gauges.allCreated.find((g) => g.id === gauge.id);
+        if (_gauge && settings) _gauge.updateSettings({ settings });
 
         message = 'Colors';
       }
@@ -128,17 +151,7 @@ export const loadFromHistory = ({ action }: { action: 'Undo' | 'Redo' }) => {
   }
 
   // Change Preview
-  previews.all.forEach((p) => {
-    if (exists(newParams[p.id])) {
-      if (
-        !exists(oldParams[p.id]) ||
-        oldParams[p.id].value !== newParams[p.id].value
-      ) {
-        p.load(newParams[p.id].value);
-        message = 'Preview';
-      }
-    }
-  });
+  if (previewChanged) message = 'Preview';
 
   if (message) {
     toast.trigger({
@@ -148,7 +161,12 @@ export const loadFromHistory = ({ action }: { action: 'Undo' | 'Redo' }) => {
   }
 };
 export const updateHistory = () => {
-  if (!weather.data || !project.url.hash || !locations.allValid || !browser)
+  if (
+    !weather.data.length ||
+    !project.url.hash ||
+    !locations.allValid ||
+    !browser
+  )
     return;
 
   let live = project.url.hash;
@@ -166,17 +184,12 @@ export const updateHistory = () => {
   // This excludes the location param ('l=...'); changes to the location or dates are not considered to be an undoable or redoable change
   live = live.substring(live.indexOf('&'));
 
-  if (
-    live !== project.history.current &&
-    live !== project.history.previous &&
-    live !== project.history.next
-  )
-    project.history.push(live);
+  // `previous`/`next` are no longer checked here: now that push() truncates
+  // a stale redo branch when mid-history, a live value that happens to match
+  // the about-to-be-discarded `next` entry must still be pushed - otherwise
+  // that edit is silently dropped. `current` is the only value a new push
+  // can legitimately duplicate (push() itself also guards this).
+  if (live !== project.history.current) project.history.push(live);
 
   project.history.isUpdating = false;
-};
-
-export const updateURL = () => {
-  const newURL = new URL(project.url.href);
-  window.history.pushState({ path: newURL.href }, '', newURL.href);
 };

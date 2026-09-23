@@ -22,7 +22,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { weather } from '$lib/state/weather-state.svelte';
   import { preferences } from '$lib/storage/preferences.svelte';
   import type { WeatherParam } from '$lib/types/gauge-types';
-  import { getColorInfo, getTextColor } from '$lib/utils/color-utils';
+  import type { LocationStateType } from '$lib/types/location-types';
+  import type { WeatherDay } from '$lib/types/weather-types';
+  import {
+    getColorInfo,
+    getTextColor,
+    type ColorInfo,
+  } from '$lib/utils/color-utils';
   import { getIsRecentDate } from '$lib/utils/date-utils';
   import { capitalizeFirstLetter, exists } from '$lib/utils/other-utils';
   import { convertTime } from '$lib/utils/unit-utils.svelte';
@@ -34,7 +40,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     weatherTargets,
     getTargets,
   }: {
-    data?: any[];
+    data?: WeatherDay[];
     viewGaugeInfo?: boolean;
     weatherTargets: WeatherParam[];
     getTargets?: (index: number) => WeatherParam[];
@@ -52,21 +58,33 @@ If not, see <https://www.gnu.org/licenses/>. -->
     )[0],
   );
 
-  let day = $derived({ ...dayWeather, ...dayLocation });
+  let day = $derived.by(
+    (): (WeatherDay & Partial<LocationStateType>) | undefined => {
+      if (!dayWeather) return undefined;
+      return Object.assign({}, dayWeather, dayLocation);
+    },
+  );
 
-  let colorInfo = $derived((targetId, day) => {
-    if (!exists(day)) return null;
-    const value =
-      targetId === 'moon'
-        ? day[targetId]
-        : day[targetId][preferences.value.units];
-    return getColorInfo({
-      param: targetId,
-      value,
-    });
-  });
+  let colorInfo = $derived(
+    (
+      targetId: WeatherParam['id'],
+      day: (WeatherDay & Partial<LocationStateType>) | undefined,
+    ): ColorInfo | null => {
+      if (!day || !exists(day)) return null;
+      const value =
+        targetId === 'moon'
+          ? day[targetId]
+          : day[targetId][preferences.value.units ?? 'metric'];
+      return getColorInfo({
+        param: targetId,
+        value,
+      });
+    },
+  );
 
-  let isRecentDate = $derived(getIsRecentDate(day?.date));
+  let isRecentDate = $derived(
+    getIsRecentDate(day?.date ? day.date.toISOString() : null),
+  );
 
   let currentWeatherTargets = $derived(
     getTargets ? getTargets(weather.currentIndex) : weatherTargets,
@@ -133,24 +151,32 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </div>
 
   <p class="my-2 text-lg font-bold">
-    {@html day.result}
+    {@html day?.result}
   </p>
 
   {#key weather.currentIndex}
     <div class="weather-details">
       <div class="my-2 flex flex-wrap items-start justify-center gap-x-4">
         {#each currentWeatherTargets as { id, label, icon, type }}
+          {@const colorData = colorInfo(id, day)}
           {@const { name, hex, index, gaugeLength, brandName, yarnName } =
-            colorInfo(id, day)}
+            colorData ?? {}}
           {@const value =
-            id === 'moon' ? day[id] : day[id][preferences.value.units]}
+            id === 'moon'
+              ? day?.[id]
+              : day?.[id]?.[preferences.value.units ?? 'metric']}
           {#if exists(day) && value !== null}
             {#if id === 'dayt'}
-              <WeatherItem {id} {label} {icon} value={convertTime(value)}>
+              <WeatherItem
+                {id}
+                {label}
+                {icon}
+                value={convertTime(value ?? null)}
+              >
                 {#snippet details()}
                   <span>
                     {#if viewGaugeInfo !== false && value !== null}
-                      {#if typeof index === 'number'}
+                      {#if typeof index === 'number' && hex}
                         <div
                           class="rounded-container my-2 px-4 py-2 text-center"
                           style={viewGaugeInfo
@@ -192,14 +218,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 {id}
                 {label}
                 {icon}
-                {value}
-                units={UNIT_LABELS[type][preferences.value.units]}
+                value={value ?? 0}
+                units={UNIT_LABELS[type][preferences.value.units ?? 'metric']}
                 {isRecentDate}
               >
                 {#snippet details()}
                   <span>
                     {#if viewGaugeInfo !== false && value !== null}
-                      {#if typeof index === 'number'}
+                      {#if typeof index === 'number' && hex}
                         <div
                           class="rounded-container my-2 px-4 py-2 text-center"
                           style={viewGaugeInfo
@@ -243,7 +269,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               {label}
               {icon}
               value="?"
-              units={UNIT_LABELS[type][preferences.value.units]}
+              units={UNIT_LABELS[type][preferences.value.units ?? 'metric']}
             />
           {/if}
         {/each}

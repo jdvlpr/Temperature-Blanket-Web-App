@@ -13,7 +13,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script>
+<script lang="ts">
   import WeatherTableWrapper from '$lib/components/WeatherTableWrapper.svelte';
   import ImportWeatherData from '$lib/components/modals/ImportWeatherData.svelte';
   import { dialog } from '$lib/state/page-state.svelte';
@@ -22,8 +22,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { weatherChart } from './WeatherChart.svelte';
   import DownloadExportButton from './buttons/DownloadExportButton.svelte';
 
-  let debounceTimer;
-  const debounce = (callback, time) => {
+  let debounceTimer: number | undefined;
+  const debounce = (callback: () => void, time: number) => {
     window.clearTimeout(debounceTimer);
     debounceTimer = window.setTimeout(callback, time);
   };
@@ -34,7 +34,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     debounce(() => {
       // when resizing the window, at certain widths the chart does not automatically resize
       // so force it to update
-      if (weatherChart.current) weatherChart?.update();
+      if (weatherChart && weatherChart.current) weatherChart.update();
     }, 101);
   }}
 />

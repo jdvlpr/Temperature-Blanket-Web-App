@@ -16,13 +16,30 @@ interface SquareRoundsPreviewSettings extends BasePreviewSettings {
   selectedTarget: WeatherParam['id'];
   daysPerSquare: number;
   columns: number;
-  additionalRoundsColor: Color['hex'];
+  additionalRoundsColor: NonNullable<Color['hex']>;
   squareBorder: number;
   layoutBorder: number;
 }
 
+export interface SquareRoundsSection {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  isWeather: boolean;
+  dayIndex: number;
+  color: Color['hex'];
+}
+
 export class SquareRoundsPreviewClass {
   constructor() {
+    // Seed the default layout border immediately from the current weather
+    // data length. This preview is now constructed lazily right as it
+    // becomes active, so the "not active" effect below would otherwise
+    // never get a chance to run before `previews.activeId` is set.
+    if (weather.data.length === 365) this.settings.layoutBorder = 1;
+    else if (weather.data.length === 366) this.settings.layoutBorder = 2;
+
     $effect.root(() => {
       // If a gauge is created or deleted, handle updating the available weather parameter targets
       $effect(() => {
@@ -52,7 +69,7 @@ export class SquareRoundsPreviewClass {
 
   id = 'sqrd';
 
-  svg = $state();
+  svg = $state<SVGSVGElement | null>(null);
 
   img = {
     light: './images/preview_icons/Square Rounds.png',
@@ -67,7 +84,7 @@ export class SquareRoundsPreviewClass {
 
   previewComponent = Preview;
 
-  sections = $state([]);
+  sections = $state<SquareRoundsSection[]>([]);
 
   STITCH_SIZE = 10;
 
@@ -78,7 +95,7 @@ export class SquareRoundsPreviewClass {
     selectedTarget: 'tmax',
     daysPerSquare: 13,
     columns: 4,
-    additionalRoundsColor: '#f0f3f3',
+    additionalRoundsColor: '#f0f3f3' as NonNullable<Color['hex']>,
     squareBorder: 0,
     layoutBorder: 2,
     useSeasonTargets: false,
@@ -147,7 +164,7 @@ export class SquareRoundsPreviewClass {
     hash += `${this.id}=`;
     hash += `${this.settings.selectedTarget}`;
     hash += '(';
-    hash += `${this.settings.daysPerSquare}${CHARACTERS_FOR_URL_HASH.separator}${this.settings.columns}${CHARACTERS_FOR_URL_HASH.separator}${this.settings.squareBorder}${CHARACTERS_FOR_URL_HASH.separator}${this.settings.layoutBorder}${CHARACTERS_FOR_URL_HASH.separator}${chroma(this.settings.additionalRoundsColor).hex().substring(1)}`;
+    hash += `${this.settings.daysPerSquare}${CHARACTERS_FOR_URL_HASH.separator}${this.settings.columns}${CHARACTERS_FOR_URL_HASH.separator}${this.settings.squareBorder}${CHARACTERS_FOR_URL_HASH.separator}${this.settings.layoutBorder}${CHARACTERS_FOR_URL_HASH.separator}${(chroma(this.settings.additionalRoundsColor).hex() as NonNullable<Color['hex']>).substring(1)}`;
     hash += ')';
     return hash;
   });
@@ -155,7 +172,7 @@ export class SquareRoundsPreviewClass {
   // *******************
   // Method for loading settings from a url hash string
   // *******************
-  load(hash) {
+  load(hash: string) {
     const openParen = hash.indexOf('(');
     const closeParen = hash.indexOf(')');
 
@@ -164,7 +181,7 @@ export class SquareRoundsPreviewClass {
 
     // Extract the part before the parentheses as targets
     const targets = hash.substring(0, openParen);
-    this.settings.selectedTarget = targets;
+    this.settings.selectedTarget = targets as WeatherParam['id'];
 
     // Set the current active id to this
     previews.activeId = this.id;
@@ -209,7 +226,9 @@ export class SquareRoundsPreviewClass {
       this.settings.layoutBorder = +layoutBorder;
 
     try {
-      this.settings.additionalRoundsColor = chroma(additionalRoundsColor).hex();
+      this.settings.additionalRoundsColor = chroma(
+        additionalRoundsColor,
+      ).hex() as NonNullable<Color['hex']>;
     } catch (e) {
       console.warn('Invalid color value in hash:', additionalRoundsColor);
     }

@@ -181,10 +181,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <label for="other-comments" class="label">Other Comments </label>
               <textarea
                 id="other-comments"
-                class="textarea"
+                class="textarea rounded-container"
                 name="otherComments"
-                placeholder="Other Comments"
-              ></textarea>
+                placeholder="Other Comments"></textarea>
             </div>
 
             <div class="tex-left flex flex-col items-start gap-1">

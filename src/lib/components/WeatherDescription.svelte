@@ -25,12 +25,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let stations = $derived(
     locations.all
       ?.filter((location) => exists(location.stations))
-      ?.map((location) =>
-        location.stations.map(
+      ?.map((location) => {
+        if (!location.stations) return [];
+        return location.stations.map(
           (station) =>
             `<a href="https://meteostat.net/en/station/${station}?t=${location.from}/${location.to}" target="_blank" rel="noreferrer" class="link">#${station}</a>`,
-        ),
-      )
+        );
+      })
       ?.flat(),
   );
 
@@ -39,10 +40,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
       (n) => n.source === weather.source.name,
     );
 
-    if (weather.params.prcp.every((n) => n === null))
+    if (weather.params.prcp && weather.params.prcp.every((n) => n === null))
       weather.table.showParameters.prcp = false;
     else weather.table.showParameters.prcp = true;
-    if (weather.params.snow.every((n) => n === null))
+    if (weather.params.snow && weather.params.snow.every((n) => n === null))
       weather.table.showParameters.snow = false;
     else weather.table.showParameters.snow = true;
   });
@@ -63,7 +64,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
           ...new Set(
             locations.all
               .filter((n) => n.source === 'Meteostat')
-              .map((n) => n.label),
+              .map((n) => n.label)
+              .filter((label) => label !== undefined),
           ),
         ])}`
       : ''}
@@ -91,7 +93,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
           ...new Set(
             locations.all
               .filter((n) => n.source === 'Open-Meteo')
-              .map((n) => n.label),
+              .map((n) => n.label)
+              .filter((label) => label !== undefined),
           ),
         ])}`
       : ''}.

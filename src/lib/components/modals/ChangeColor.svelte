@@ -18,6 +18,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import StickyPart from '$lib/components/modals/StickyPart.svelte';
   import YarnGridSelect from '$lib/components/modals/YarnGridSelect.svelte';
   import { dialog } from '$lib/state/page-state.svelte';
+  import type { Color } from '$lib/types/yarn-types';
   import { ExternalLinkIcon, ShoppingCartIcon } from '@lucide/svelte';
   import chroma from 'chroma-js';
 
@@ -47,7 +48,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     onChangeColor,
   }: Props = $props();
 
-  let container: HTMLElement = $state();
+  let container: HTMLElement | undefined = $state();
 
   let valid = $state(true);
 
@@ -85,7 +86,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
     if (prop === 'yarnId') return yarnId;
   }
 
-  function inputTypeColorOnChange({ value, color }) {
+  function inputTypeColorOnChange({
+    value,
+    color,
+  }: {
+    value: string;
+    color?: Color;
+  }) {
     name = color?.name;
     brandId = color?.brandId;
     yarnId = color?.yarnId;
@@ -106,7 +113,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
     hex = chroma(inputTypeColorValue).hex('rgb'); // use 'rgb' to prevent alpha hex codes
   }
 
-  function inputTypeTextOnChange({ value, color }) {
+  function inputTypeTextOnChange({
+    value,
+    color,
+  }: {
+    value: string;
+    color?: Color;
+  }) {
     name = color?.name;
     brandId = color?.brandId;
     yarnId = color?.yarnId;
@@ -181,10 +194,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
           type="color"
           class="input"
           value={inputTypeColorValue}
-          onchange={(e) =>
-            inputTypeColorOnChange({
-              value: e.target.value,
-            })}
+          onchange={(e) => {
+            if (e.currentTarget instanceof HTMLInputElement) {
+              inputTypeColorOnChange({
+                value: e.currentTarget.value,
+              });
+            }
+          }}
         />
       </label>
       <label class=" flex-1" title="Enter a Color">
@@ -192,10 +208,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
           type="text"
           class="input w-full grow"
           value={inputTypeTextValue}
-          onkeyup={(e) =>
-            inputTypeTextOnChange({
-              value: e.target.value,
-            })}
+          onkeyup={(e) => {
+            if (e.currentTarget instanceof HTMLInputElement) {
+              inputTypeTextOnChange({
+                value: e.currentTarget.value,
+              });
+            }
+          }}
         />
       </label>
     </div>
@@ -208,14 +227,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
     selectedYarnId={yarnIdCopy}
     incomingColor={currentColor}
     onClickScrollToTop={() => {
-      container.scrollIntoView({
+      container?.scrollIntoView({
         behavior: 'smooth',
         block: 'start',
       });
     }}
-    onSelection={(e) => {
+    onSelection={(e: Color[]) => {
       const color = e[0];
-      inputTypeColorOnChange({ value: color.hex, color });
+      inputTypeColorOnChange({ value: color.hex ?? '#ffffff', color });
     }}
     scrollToTopButtonBottom="4rem"
   />

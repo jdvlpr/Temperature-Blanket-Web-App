@@ -23,7 +23,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { weather } from '$lib/state/weather-state.svelte';
   import { capitalizeFirstLetter } from '$lib/utils/other-utils';
   import { pluralize } from '$lib/utils/string-utils';
+  import type { Color } from '$lib/types/yarn-types';
   import { SquareDashedIcon } from '@lucide/svelte';
+  import Preview from './Preview.svelte';
   import { monthSquaresPreview } from './state.svelte';
 
   let targets = $derived(gauges.allCreated.flatMap((n) => n.targets));
@@ -31,26 +33,32 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <PreviewInfo previewTitle={monthSquaresPreview.name}>
   {#snippet description()}
-    Each square represents one month. Each round in a square represents one day,
-    starting with the first of the month in the center of the square. Months
-    with fewer days have extra rounds added, so that each square has the same
-    number of rounds.
+    <p>
+      Each square represents one month. Each round in a square represents one
+      day, starting with the first of the month in the center of the square.
+      Months with fewer days have extra rounds added, so that each square has
+      the same number of rounds.
+    </p>
   {/snippet}
   {#snippet details()}
     {#if monthSquaresPreview.details}
-      There are <span class="font-semibold"
-        >{monthSquaresPreview.weatherMonths.length} month
-        {pluralize('square', monthSquaresPreview.weatherMonths.length)}</span
-      >. Each month square has
-      <span class="font-semibold"
-        >{monthSquaresPreview.details.roundsPerSquare} total {pluralize(
-          'round',
-          monthSquaresPreview.details.roundsPerSquare,
-        )}</span
-      >.
+      <p>
+        There are <span class="font-semibold"
+          >{monthSquaresPreview.weatherMonths.length} month
+          {pluralize('square', monthSquaresPreview.weatherMonths.length)}</span
+        >. Each month square has
+        <span class="font-semibold"
+          >{monthSquaresPreview.details.roundsPerSquare} total {pluralize(
+            'round',
+            monthSquaresPreview.details.roundsPerSquare,
+          )}</span
+        >.
+      </p>
     {/if}
   {/snippet}
 </PreviewInfo>
+
+<div class="w-full"><Preview /></div>
 
 <div
   class="preset-outlined-surface-300-700 card flex flex-col items-start gap-4 p-4"
@@ -97,7 +105,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           ref: ChangeColor,
           props: {
             hex: monthSquaresPreview.settings.additionalRoundsColor,
-            onChangeColor: ({ hex }) => {
+            onChangeColor: ({ hex }: { hex: NonNullable<Color['hex']> }) => {
               monthSquaresPreview.settings.additionalRoundsColor = hex;
               dialog.close();
             },

@@ -13,10 +13,12 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { ALL_COLORWAYS_WITH_AFFILIATE_LINKS } from '$lib/constants/color-constants';
-import { getColorName } from '$lib/utils/color-utils';
 import { getTextColor } from '$lib/utils/color-utils';
-import { brands } from '$lib/data/yarns/brands';
+import {
+  getBrands,
+  getColorwaysWithAffiliateLinks,
+} from '$lib/data/yarns/colorways.svelte';
+import type { Color, Yarn } from '$lib/types/yarn-types';
 
 /**
  * [getColorPropertiesFromYarnStringAndHex description]
@@ -26,10 +28,16 @@ import { brands } from '$lib/data/yarns/brands';
  *
  * @return  {object}              color object
  */
-export const getColorPropertiesFromYarnStringAndHex = ({ yarnString, hex }) => {
+export const getColorPropertiesFromYarnStringAndHex = ({
+  yarnString,
+  hex,
+}: {
+  yarnString: string;
+  hex: Color['hex'];
+}): Color | null => {
   const { brandId, yarnId } = stringToBrandAndYarnDetails(yarnString);
 
-  const matchingColor = ALL_COLORWAYS_WITH_AFFILIATE_LINKS.find(
+  const matchingColor = getColorwaysWithAffiliateLinks().find(
     (color) =>
       color.brandId === brandId && color.yarnId === yarnId && color.hex === hex,
   );
@@ -44,7 +52,14 @@ export const getColorPropertiesFromYarnStringAndHex = ({ yarnString, hex }) => {
  *
  * @return  {object}        {brandId: string | null, yarnId: string | null, brandName: string | null, yarnName: string | null}
  */
-export const stringToBrandAndYarnDetails = (text) => {
+export const stringToBrandAndYarnDetails = (
+  text: string,
+): {
+  brandId: string | null;
+  yarnId: string | null;
+  brandName?: string | null;
+  yarnName?: string | null;
+} => {
   if (!text.includes('-')) return { brandId: null, yarnId: null };
 
   if (text.includes('worsted-8')) {
@@ -53,12 +68,12 @@ export const stringToBrandAndYarnDetails = (text) => {
 
   const [brandCode, yarnCode] = text.split('-');
 
-  const brand = brands.find((brand) => brand.id === brandCode);
+  const brand = getBrands().find((brand) => brand.id === brandCode);
   const brandId = brand ? brand.id : null;
   const brandName = brand ? brand.name : null;
 
   const yarn = brandId
-    ? brand.yarns.find((yarn) => yarn.id === yarnCode)
+    ? brand?.yarns.find((yarn) => yarn.id === yarnCode)
     : null;
   const yarnId = yarn ? yarn.id : null;
   const yarnName = yarn ? yarn.name : null;
@@ -66,57 +81,30 @@ export const stringToBrandAndYarnDetails = (text) => {
   return { brandId, yarnId, brandName, yarnName };
 };
 
-export const paletteContiansSomeNamedColorways = ({
-  palette,
-  brandId,
-  yarnId,
-}) => {
-  if (!palette || !brandId || !yarnId) return;
-  return palette.some((n) => {
-    const name = getColorName({
-      color: n,
-      brandId,
-      yarnId,
-      showGenericName: false,
-      showNamedHexCodes: false,
-    });
-    return !!name;
-  });
-};
-
-export const paletteContiansAllNamedColorways = ({
-  palette,
-  brandId,
-  yarnId,
-}) => {
-  if (!palette || !brandId || !yarnId) return;
-  return palette.every((n) => {
-    const name = getColorName({
-      color: n,
-      brandId,
-      yarnId,
-      showGenericName: false,
-      showNamedHexCodes: false,
-    });
-    return !!name;
-  });
-};
-
-export const getFilteredYarns = ({ selectedBrandId }) => {
+export const getFilteredYarns = ({
+  selectedBrandId,
+}: {
+  selectedBrandId?: string;
+}): Yarn[] | undefined => {
   return selectedBrandId
-    ? brands?.filter((brand) => brand.id === selectedBrandId)[0]?.yarns
-    : brands.flatMap((n) => n.yarns);
+    ? getBrands()?.filter((brand) => brand.id === selectedBrandId)[0]?.yarns
+    : getBrands().flatMap((n) => n.yarns);
 };
 
 export const getColorways = ({
   selectedBrandId,
   selectedYarnId,
   selectedYarnWeightId,
-}) => {
-  return ALL_COLORWAYS_WITH_AFFILIATE_LINKS.filter((colorway) => {
-    if (!selectedBrandId) return true;
-    return colorway.brandId === selectedBrandId;
-  })
+}: {
+  selectedBrandId?: string;
+  selectedYarnId?: string;
+  selectedYarnWeightId?: string;
+}): Color[] => {
+  return getColorwaysWithAffiliateLinks()
+    .filter((colorway) => {
+      if (!selectedBrandId) return true;
+      return colorway.brandId === selectedBrandId;
+    })
     .filter((colorway) => {
       if (!selectedYarnId) return true;
       return colorway.yarnId === selectedYarnId;

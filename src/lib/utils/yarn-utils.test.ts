@@ -3,54 +3,8 @@ import {
   getColorPropertiesFromYarnStringAndHex,
   getColorways,
   getFilteredYarns,
-  paletteContiansAllNamedColorways,
-  paletteContiansSomeNamedColorways,
   stringToBrandAndYarnDetails,
 } from './yarn-utils';
-
-// Mock color-utils
-vi.mock('./color-utils', () => ({
-  getColorName: ({ color }: { color: string }) => {
-    if (color === '#ff0000') return 'Red';
-    if (color === '#0000ff') return 'Blue';
-    return undefined; // Green (#00ff00) returns undefined
-  },
-}));
-
-// Mock constants and yarns data
-vi.mock('$lib/constants/color-constants', () => {
-  return {
-    ALL_COLORWAYS_WITH_AFFILIATE_LINKS: [
-      {
-        brandId: 'brand1',
-        yarnId: 'yarn1',
-        yarnWeightId: 'weight1',
-        hex: '#ff0000',
-        name: 'Red',
-        brandName: 'Brand 1',
-        yarnName: 'Yarn 1',
-      },
-      {
-        brandId: 'brand1',
-        yarnId: 'yarn2',
-        yarnWeightId: 'weight2',
-        hex: '#00ff00',
-        name: 'Green',
-        brandName: 'Brand 1',
-        yarnName: 'Yarn 2',
-      },
-      {
-        brandId: 'brand2',
-        yarnId: 'yarn3',
-        yarnWeightId: 'weight1',
-        hex: '#0000ff',
-        name: 'Blue',
-        brandName: 'Brand 2',
-        yarnName: 'Yarn 3',
-      },
-    ],
-  };
-});
 
 vi.mock('$lib/constants/seasons-constants', () => {
   return {
@@ -64,8 +18,9 @@ vi.mock('$lib/constants/seasons-constants', () => {
   };
 });
 
-vi.mock('$lib/data/yarns/brands', () => ({
-  brands: [
+vi.mock('$lib/data/yarns/colorways.svelte', () => ({
+  ensureYarnData: async () => {},
+  getBrands: () => [
     {
       id: 'brand1',
       name: 'Brand 1',
@@ -96,6 +51,35 @@ vi.mock('$lib/data/yarns/brands', () => ({
           colorways: [],
         },
       ],
+    },
+  ],
+  getColorwaysWithAffiliateLinks: () => [
+    {
+      brandId: 'brand1',
+      yarnId: 'yarn1',
+      yarnWeightId: 'weight1',
+      hex: '#ff0000',
+      name: 'Red',
+      brandName: 'Brand 1',
+      yarnName: 'Yarn 1',
+    },
+    {
+      brandId: 'brand1',
+      yarnId: 'yarn2',
+      yarnWeightId: 'weight2',
+      hex: '#00ff00',
+      name: 'Green',
+      brandName: 'Brand 1',
+      yarnName: 'Yarn 2',
+    },
+    {
+      brandId: 'brand2',
+      yarnId: 'yarn3',
+      yarnWeightId: 'weight1',
+      hex: '#0000ff',
+      name: 'Blue',
+      brandName: 'Brand 2',
+      yarnName: 'Yarn 3',
     },
   ],
 }));
@@ -137,54 +121,17 @@ describe('yarn-utils', () => {
     });
   });
 
-  describe('paletteContiansSomeNamedColorways', () => {
-    it('should return true if some colorways have names', () => {
-      const palette = ['#ff0000', '#00ff00'];
-      expect(
-        paletteContiansSomeNamedColorways({
-          palette: palette as any,
-          brandId: 'brand1',
-          yarnId: 'yarn1',
-        }),
-      ).toBe(true);
-    });
-  });
-
-  describe('paletteContiansAllNamedColorways', () => {
-    it('should return false if some colorways are missing names', () => {
-      const palette = ['#ff0000', '#00ff00'];
-      expect(
-        paletteContiansAllNamedColorways({
-          palette: palette as any,
-          brandId: 'brand1',
-          yarnId: 'yarn1',
-        }),
-      ).toBe(false); // Green is not in yarn1
-    });
-
-    it('should return true if all colorways have names', () => {
-      const palette = ['#ff0000'];
-      expect(
-        paletteContiansAllNamedColorways({
-          palette: palette as any,
-          brandId: 'brand1',
-          yarnId: 'yarn1',
-        }),
-      ).toBe(true);
-    });
-  });
-
   describe('getFilteredYarns', () => {
     it('should return all yarns if no brand selected', () => {
-      const result = getFilteredYarns({ selectedBrandId: null });
+      const result = getFilteredYarns({ selectedBrandId: undefined });
       expect(result).toHaveLength(3); // 2 from brand1, 1 from brand2
     });
 
     it('should return only yarns for specific brand', () => {
       const result = getFilteredYarns({ selectedBrandId: 'brand1' });
       expect(result).toHaveLength(2);
-      expect(result[0].id).toBe('yarn1');
-      expect(result[1].id).toBe('yarn2');
+      expect(result![0].id).toBe('yarn1');
+      expect(result![1].id).toBe('yarn2');
     });
   });
 
@@ -197,17 +144,17 @@ describe('yarn-utils', () => {
     it('should filter by brand', () => {
       const result = getColorways({
         selectedBrandId: 'brand1',
-        selectedYarnId: null,
-        selectedYarnWeightId: null,
+        selectedYarnId: undefined,
+        selectedYarnWeightId: undefined,
       });
       expect(result).toHaveLength(2);
     });
 
     it('should filter by yarn', () => {
       const result = getColorways({
-        selectedBrandId: null,
+        selectedBrandId: undefined,
         selectedYarnId: 'yarn1',
-        selectedYarnWeightId: null,
+        selectedYarnWeightId: undefined,
       });
       expect(result).toHaveLength(1);
       expect(result[0].yarnId).toBe('yarn1');
@@ -215,8 +162,8 @@ describe('yarn-utils', () => {
 
     it('should filter by weight', () => {
       const result = getColorways({
-        selectedBrandId: null,
-        selectedYarnId: null,
+        selectedBrandId: undefined,
+        selectedYarnId: undefined,
         selectedYarnWeightId: 'weight1',
       });
       expect(result).toHaveLength(2); // Red (brand1,yarn1) and Blue (brand2,yarn3)

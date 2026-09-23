@@ -19,6 +19,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import Expand from '$lib/components/Expand.svelte';
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
   import SaveAndCloseButtons from '$lib/components/modals/SaveAndCloseButtons.svelte';
+  import { ensureYarnData } from '$lib/data/yarns/colorways.svelte';
   import { dialog, toast } from '$lib/state/page-state.svelte';
   import { safeSlide } from '$lib/features/transitions/safeSlide';
   import {
@@ -28,6 +29,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '$lib/utils/color-utils';
   import { generatePaletteImage } from '$lib/utils/yarn-utils';
   import { pluralize } from '$lib/utils/string-utils';
+  import type { Color } from '$lib/types/yarn-types';
   import {
     ArrowLeftIcon,
     ClipboardCopyIcon,
@@ -43,9 +45,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let inputValue = $state('');
 
-  let textAreaInputElement = $state();
+  let textAreaInputElement = $state<HTMLTextAreaElement>();
 
-  let inputColors = $state([]);
+  let inputColors = $state<Color[]>([]);
 
   let colorNamesAsArray = $state(false);
 
@@ -53,9 +55,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let colorHexesWithHashes = $state(true);
 
-  let includeBrandInImage = $derived(colors.some((n) => n.brandName));
-  let includeYarnInImage = $derived(colors.some((n) => n.yarnName));
-  let includeColorwayInImage = $derived(colors.some((n) => n.name));
+  let includeBrandInImage = $derived(colors.some((n: Color) => n.brandName));
+  let includeYarnInImage = $derived(colors.some((n: Color) => n.yarnName));
+  let includeColorwayInImage = $derived(colors.some((n: Color) => n.name));
   let includeHexInImage = $state(false);
   let includeSpacingInImage = $state(false);
 
@@ -83,14 +85,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
     })}${colorsToYarnDetails({ colors }) ? 'yarn:' + colorsToYarnDetails({ colors }) : ''}`,
   );
 
-  let palette = $derived(colors.map((n) => n?.hex));
+  let palette = $derived(colors.map((n: Color) => n?.hex));
 
   let colorNames = $derived(
     colorNamesAsArray
-      ? JSON.stringify(colors.filter((n) => n.name).map((n) => n.name))
+      ? JSON.stringify(
+          colors.filter((n: Color) => n.name).map((n: Color) => n.name),
+        )
       : colors
-          .filter((n) => n.name)
-          .map((n) => n.name)
+          .filter((n: Color) => n.name)
+          .map((n: Color) => n.name)
           .join(', '),
   );
 
@@ -110,9 +114,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
     inputColors = getColorsFromInput({ string: inputValue }) || [];
   }
 
-  function getColorHexes({ palette, asArray, withHashes }) {
+  function getColorHexes({
+    palette,
+    asArray,
+    withHashes,
+  }: {
+    palette: (string | undefined)[];
+    asArray: boolean;
+    withHashes: boolean;
+  }) {
     if (!Array.isArray(palette)) return false;
-    if (!withHashes) palette = palette.map((n) => n.slice(1));
+    if (!withHashes)
+      palette = palette.map((n: string | undefined) => n?.slice(1));
     if (asArray) return JSON.stringify(palette);
     return palette.join(', ');
   }
@@ -122,7 +135,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       // Create a temporary link element using the preview URL
       const link = document.createElement('a');
       link.download = 'Yarn Palette.png';
-      link.href = previewImageUrl;
+      link.href = previewImageUrl ?? '';
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -141,6 +154,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   onMount(() => {
     includeHexInImage =
       !includeBrandInImage && !includeYarnInImage && !includeColorwayInImage;
+    ensureYarnData();
   });
 </script>
 
@@ -149,11 +163,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <SegmentedControl
       value={segmentValue}
       onValueChange={(e) => {
-        segmentValue = e.value;
+        if (e.value) segmentValue = e.value;
       }}
     >
       <SegmentedControl.Control
-        class="wrap bg-surface-200 dark:bg-surface-800 rounded-container mx-auto flex w-fit gap-y-2 border-none shadow-sm"
+        class="bg-surface-200 dark:bg-surface-800 mx-auto"
       >
         <SegmentedControl.Indicator />
         <SegmentedControl.Item value={'export'}
@@ -176,7 +190,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <textarea
         bind:this={textAreaInputElement}
         id="palette-code"
-        class="textarea select-all"
+        class="textarea select-all rounded-container"
         placeholder="e.g. red, FFA500, #ADD8E6"
         bind:value={inputValue}
         onkeyup={triggerChange}
@@ -187,8 +201,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           inputValue = _tempInputValue || '';
           triggerChange();
           // textAreaInputElement.blur();
-        }}
-      ></textarea>
+        }}></textarea>
     </label>
 
     <div class="my-2 flex flex-col gap-2 text-left">
@@ -351,7 +364,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               <p class="text-2xl font-bold">Image Settings</p>
               <p class="">Choose what to include for each colorway</p>
               <div class="flex flex-wrap gap-4">
-                {#if colors.some((n) => n.brandName)}
+                {#if colors.some((n: Color) => n.brandName)}
                   <div class="flex cursor-pointer items-center gap-2">
                     <ToggleSwitch
                       bind:checked={includeBrandInImage}
@@ -359,7 +372,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     />
                   </div>
                 {/if}
-                {#if colors.some((n) => n.yarnName)}
+                {#if colors.some((n: Color) => n.yarnName)}
                   <div class="flex cursor-pointer items-center gap-2">
                     <ToggleSwitch
                       bind:checked={includeYarnInImage}
@@ -367,7 +380,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                     />
                   </div>
                 {/if}
-                {#if colors.some((n) => n.name)}
+                {#if colors.some((n: Color) => n.name)}
                   <div class="flex cursor-pointer items-center gap-2">
                     <ToggleSwitch
                       bind:checked={includeColorwayInImage}
@@ -391,7 +404,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </div>
 
             <div class="flex flex-wrap items-start gap-4">
-              {#if previewImageUrl}
+              {#if previewImageUrl !== null}
                 <div class="card preset-tonal-primary w-fit overflow-auto p-4">
                   <img
                     src={previewImageUrl}
@@ -440,7 +453,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
               class="btn hover:preset-tonal-surface mt-4"
               onclick={() => {
                 try {
-                  window.navigator.clipboard.writeText(colorHexes);
+                  if (typeof colorHexes === 'string') {
+                    window.navigator.clipboard.writeText(colorHexes);
+                  }
                   toast.trigger({
                     message: 'Copied',
                     category: 'success',

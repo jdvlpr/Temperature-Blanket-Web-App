@@ -4,6 +4,7 @@ import { previews } from '$lib/state/preview-state.svelte';
 import { weather } from '$lib/state/weather-state.svelte';
 import type { BasePreviewSettings } from '$lib/types/preview-types';
 import type { WeatherParam } from '$lib/types/gauge-types';
+import type { Color } from '$lib/types/yarn-types';
 import { setTargets } from '$lib/utils/preview-utils.svelte';
 import Preview from './Preview.svelte';
 import Settings from './Settings.svelte';
@@ -12,6 +13,15 @@ interface CornerToCornerPreviewSettings extends BasePreviewSettings {
   selectedTarget: WeatherParam['id'];
   lineLength: number;
   dimensions: string;
+}
+
+export interface CornerToCornerSection {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  color: Color['hex'];
+  dayIndex: number;
 }
 
 export class CornerToCornerPreviewClass {
@@ -35,7 +45,7 @@ export class CornerToCornerPreviewClass {
 
   id = 'crnr';
 
-  svg = $state();
+  svg = $state<SVGSVGElement | null>(null);
 
   img = {
     light: './images/preview_icons/Corner to Corner.png',
@@ -50,7 +60,7 @@ export class CornerToCornerPreviewClass {
 
   previewComponent = Preview;
 
-  sections = $state([]);
+  sections = $state<CornerToCornerSection[][]>([]);
 
   STITCH_SIZE = 5;
 
@@ -86,7 +96,7 @@ export class CornerToCornerPreviewClass {
 
   lengthFactors = $derived.by(() => {
     if (!this.totalLength) return;
-    const factors = [];
+    const factors: number[] = [];
     for (let i = 0; i < this.totalLength; i++) {
       if (this.totalLength % i === 0) factors.push(i);
     }
@@ -96,7 +106,7 @@ export class CornerToCornerPreviewClass {
 
   possibleDimensions = $derived.by(() => {
     if (!this.lengthFactors) return;
-    const dimensions = [];
+    const dimensions: (number | number[])[] = [];
     this.lengthFactors.forEach((factor, index, factors) => {
       if (index < factors.length / 2) {
         dimensions.push([factor, factors[factors.length - index - 1]]);
@@ -107,9 +117,11 @@ export class CornerToCornerPreviewClass {
 
   dimensionsOptions = $derived.by(() => {
     if (!this.possibleDimensions) return;
-    const options = [];
+    const options: string[] = [];
     this.possibleDimensions.forEach((item) => {
-      options.push(item.join('x'));
+      if (Array.isArray(item)) {
+        options.push(item.join('x'));
+      }
     });
     if (!options.includes(this.settings.dimensions)) {
       this.settings.dimensions = options[options.length - 1];
@@ -131,9 +143,10 @@ export class CornerToCornerPreviewClass {
   // *******************
   // Method for loading settings from a url hash string
   // *******************
-  load(hash) {
-    let startIndex, endIndex;
-    const separatorIndex = [];
+  load(hash: string) {
+    let startIndex: number | undefined;
+    let endIndex: number | undefined;
+    const separatorIndex: number[] = [];
     for (let i = 0; i < hash.length; i++) {
       if (hash[i] === '(') startIndex = i;
       if (
@@ -144,12 +157,15 @@ export class CornerToCornerPreviewClass {
       if (hash[i] === ')') endIndex = i;
     }
     if (!startIndex || !separatorIndex[0] || !endIndex) return; // format of hash was wrong, so stop processing
-    this.settings.selectedTarget = hash.substring(0, startIndex);
+    this.settings.selectedTarget = hash.substring(
+      0,
+      startIndex,
+    ) as WeatherParam['id'];
     this.settings.lineLength = +hash.substring(
       startIndex + 1,
       separatorIndex[0],
     );
-    let dimensions;
+    let dimensions: string;
     if (separatorIndex[1]) {
       // Legacy (before v1.700, to accommodate for total length, but it's not needed
       // _details.totalLength = +hash.substring(separatorIndex[0] + 1, separatorIndex[1]);

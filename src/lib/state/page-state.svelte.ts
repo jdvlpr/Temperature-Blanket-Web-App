@@ -51,7 +51,10 @@ class DialogClass {
     size: 'small',
   });
 
-  contentComponent = $state({
+  contentComponent = $state<{
+    ref: Component<any> | null;
+    props: Record<string, any> | null;
+  }>({
     ref: null,
     props: null,
   });
@@ -127,7 +130,7 @@ export interface ToastSettings {
   /** Provide arbitrary CSS classes to style the toast. */
   classes?: string;
   /** Category of the toast. */
-  category?: 'success' | 'error' | 'warning' | null;
+  category?: 'success' | 'error' | 'warning' | 'info' | null;
   /** Custom Icon Component */
   icon?: Component;
   /** Callback function that fires on trigger and close. */
@@ -149,7 +152,7 @@ class ToastService {
   };
 
   // All Toasts
-  queue = $state([]);
+  queue: Toast[] = $state([]);
 
   /** Remove toast in queue*/
   close = (id: string) => {
@@ -214,7 +217,9 @@ export const showNavigationSideBar = $state({ value: true });
 
 export const isDesktop = new MediaQuery('(min-width: 768px)');
 
-export const windowLanguage = $state({ value: null });
+export const windowLanguage: { value: string | null } = $state({
+  value: null,
+});
 
 class DrawerStateClass {
   weatherDetails = $state(false);
@@ -339,9 +344,9 @@ export const goToProjectSection = async (
     if (activeSection?.id === 'page-section-gauges') {
       await tick();
       const activeGaugeBtn = document.getElementById('active-gauge-button');
+      const rect = activeGaugeBtn?.getBoundingClientRect();
       const isHidden =
-        activeGaugeBtn?.getBoundingClientRect().left < 0 ||
-        activeGaugeBtn?.getBoundingClientRect().right > window.innerWidth;
+        !!rect && (rect.left < 0 || rect.right > window.innerWidth);
       if (activeGaugeBtn && isHidden) {
         activeGaugeBtn.scrollIntoView({
           behavior: 'smooth',
@@ -355,9 +360,9 @@ export const goToProjectSection = async (
     if (activeSection?.id === 'page-section-preview') {
       await tick();
       const activePreviewBtn = document.getElementById('active-preview-button');
+      const rect = activePreviewBtn?.getBoundingClientRect();
       const isHidden =
-        activePreviewBtn?.getBoundingClientRect().left < 0 ||
-        activePreviewBtn?.getBoundingClientRect().right > window.innerWidth;
+        !!rect && (rect.left < 0 || rect.right > window.innerWidth);
       if (activePreviewBtn && isHidden) {
         activePreviewBtn.scrollIntoView({
           behavior: 'smooth',
@@ -369,7 +374,7 @@ export const goToProjectSection = async (
   }
 };
 
-const setSections = (index) => {
+const setSections = (index: number) => {
   const currentScrollTop = document.documentElement.scrollTop;
 
   pageSections.items.forEach((section, i, sections) => {
@@ -388,7 +393,11 @@ const setSections = (index) => {
   });
 };
 
-const checkUndoRedo = (ev, style, shift) => {
+const checkUndoRedo = (
+  ev: KeyboardEvent,
+  style?: 'mac' | 'windows',
+  shift?: boolean,
+) => {
   const macAllow = !style || style === 'mac';
   const winAllow = !style || style === 'windows';
   const code = ev.keyCode || ev.which;
@@ -405,22 +414,23 @@ const checkUndoRedo = (ev, style, shift) => {
   return false;
 };
 
-const isUndo = (ev, style) => {
+const isUndo = (ev: KeyboardEvent, style?: 'mac' | 'windows') => {
   return checkUndoRedo(ev, style, !ev.shiftKey);
 };
 
-const isRedo = (ev, style) => {
+const isRedo = (ev: KeyboardEvent, style?: 'mac' | 'windows') => {
   return checkUndoRedo(ev, style, ev.shiftKey);
 };
 
-export const handleKeyDown = (ev) => {
+export const handleKeyDown = (ev: KeyboardEvent) => {
+  const target = ev.target as HTMLElement | null;
   if (
     dialog.opened ||
-    ev.target.tagName === 'INPUT' ||
-    ev.target.tagName === 'TEXTAREA' ||
-    ev.target.tagName === 'TD' ||
-    ev.target.tagName === 'SELECT' ||
-    ev.target.tagName === 'BUTTON'
+    target?.tagName === 'INPUT' ||
+    target?.tagName === 'TEXTAREA' ||
+    target?.tagName === 'TD' ||
+    target?.tagName === 'SELECT' ||
+    target?.tagName === 'BUTTON'
   )
     return;
 
@@ -481,10 +491,12 @@ export const handleKeyDown = (ev) => {
     if (weather.data.length) {
       if (isUndo(ev)) {
         ev.preventDefault();
-        loadFromHistory({ action: 'Undo' });
+        if (!project.history.isFirst && !project.history.isUpdating)
+          loadFromHistory({ action: 'Undo' });
       } else if (isRedo(ev)) {
         ev.preventDefault();
-        loadFromHistory({ action: 'Redo' });
+        if (!project.history.isLast && !project.history.isUpdating)
+          loadFromHistory({ action: 'Redo' });
       } else if ((ev.metaKey || ev.ctrlKey) && ev.key === 's') {
         ev.preventDefault();
         dialog.trigger({

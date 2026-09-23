@@ -13,18 +13,30 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script module>
+<script module lang="ts">
+  import type {
+    GalleryProjectNode,
+    GalleryPageInfo,
+  } from '$lib/utils/gallery-utils';
+  import type { GalleryPalette } from '$lib/utils/color-utils';
+
   class GalleryPalettesState {
     search = $state('');
     filteredBrandId = $state('');
     filteredYarnId = $state('');
     palettesContainOnlyFilteredYarn = $state(false);
     orderBy = $state('DESC');
-    projects = $state([]);
-    palettes = $state([]);
-    gallery = $state({});
+    projects = $state<GalleryProjectNode[]>([]);
+    palettes = $state<GalleryPalette[]>([]);
+    gallery = $state<{ pageInfo?: GalleryPageInfo }>({});
 
-    getYarnSearch = ({ brandId, yarnId }) => {
+    getYarnSearch = ({
+      brandId,
+      yarnId,
+    }: {
+      brandId: string;
+      yarnId: string;
+    }) => {
       if (brandId && yarnId) return `${brandId}-${yarnId}`;
       else if (brandId) return brandId;
       else if (yarnId) return yarnId;
@@ -46,12 +58,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { isDesktop } from '$lib/state/page-state.svelte';
   import { getPalettesFromProjects } from '$lib/utils/color-utils';
   import { fetchProjects, recordPageView } from '$lib/utils/gallery-utils';
-  import {
-    ArrowUpDownIcon,
-    EarthIcon,
-    PlusIcon,
-    XIcon
-  } from '@lucide/svelte';
+  import { ArrowUpDownIcon, EarthIcon, PlusIcon, XIcon } from '@lucide/svelte';
   import { onMount } from 'svelte';
 
   interface Props {
@@ -94,7 +101,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
         projects: galleryPalettesState.projects,
         selectedBrandId: galleryPalettesState.filteredBrandId,
         selectedYarnId: galleryPalettesState.filteredYarnId,
-        palettesContainOnlyFilteredYarn: galleryPalettesState.palettesContainOnlyFilteredYarn,
+        palettesContainOnlyFilteredYarn:
+          galleryPalettesState.palettesContainOnlyFilteredYarn,
       });
       loading = false;
     }, 500);

@@ -126,7 +126,9 @@ describe('color-utils', () => {
 
   describe('colorsToYarnDetails', () => {
     it('should encode colors to yarn details string', () => {
-      const colors = [{ hex: '#ff0000', brandId: 'b1', yarnId: 'y1' }];
+      const colors = [
+        { hex: '#ff0000' as Lowercase<string>, brandId: 'b1', yarnId: 'y1' },
+      ];
       const result = colorsToYarnDetails({ colors });
       expect(typeof result).toBe('string');
     });
@@ -134,21 +136,21 @@ describe('color-utils', () => {
 
   describe('yarnDetailsToColors', () => {
     it('should apply yarn details to colors', () => {
-      const colors = [{ hex: '#ff0000' }];
+      const colors = [{ hex: '#ff0000' as Lowercase<string> }];
       const string = 'brand1-yarn1(0)'; // apply brand1-yarn1 to index 0
       const result = yarnDetailsToColors({ string, colors });
       expect(result[0].brandId).toBe('brand1');
     });
 
     it('should handle simple yarn string without parenthesis', () => {
-      const colors = [{ hex: '#ff0000' }];
+      const colors = [{ hex: '#ff0000' as Lowercase<string> }];
       const string = 'brand1-yarn1';
       const result = yarnDetailsToColors({ string, colors });
       expect(result[0].brandId).toBe('brand1');
     });
 
     it('should handle empty or invalid strings', () => {
-      const colors = [{ hex: '#ff0000' }];
+      const colors = [{ hex: '#ff0000' as Lowercase<string> }];
       expect(yarnDetailsToColors({ string: '', colors })).toBe(colors);
       expect(yarnDetailsToColors({ string: ' ', colors })).toBe(colors);
     });
@@ -156,12 +158,15 @@ describe('color-utils', () => {
 
   describe('colorsToCode', () => {
     it('should generate palette code', () => {
-      const colors = [{ hex: '#ff0000' }, { hex: '#00ff00' }];
+      const colors = [
+        { hex: '#ff0000' as Lowercase<string> },
+        { hex: '#00ff00' as Lowercase<string> },
+      ];
       expect(colorsToCode(colors)).toBe('palette:ff000000ff00');
     });
 
     it('should respect includePrefixes option', () => {
-      const colors = [{ hex: '#ff0000' }];
+      const colors = [{ hex: '#ff0000' as Lowercase<string> }];
       expect(colorsToCode(colors, { includePrefixes: false })).toBe('ff0000');
     });
   });

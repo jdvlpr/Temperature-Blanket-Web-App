@@ -14,6 +14,7 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import type { ComponentType } from 'svelte';
+import type { WeatherParam } from './gauge-types';
 
 export type PreviewCategories =
   | 'Calendar'
@@ -24,7 +25,8 @@ export type PreviewCategories =
   | 'Month Rows'
   | 'Month Squares'
   | 'Split Month Squares'
-  | 'Squares';
+  | 'Squares'
+  | '12-Point Star';
 
 export interface Preview {
   name: PreviewCategories;
@@ -44,4 +46,10 @@ export interface Preview {
 
 export interface BasePreviewSettings {
   useSeasonTargets: boolean;
+}
+
+/** A secondary weather param assigned to one or more square/section indexes. */
+export interface SecondaryTarget {
+  indexes: number[];
+  targetId: WeatherParam['id'];
 }

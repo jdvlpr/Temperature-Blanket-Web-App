@@ -32,6 +32,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
   };
   const posts: BlogPostType[] = [
     {
+      date: '2026-07-09',
+      href: '/blog/2026-07-09-version-6',
+      imgSrc: '/images/blog-images/2026-07-09-version-6/featured-image.jpg',
+      imgAlt: 'Version 6: Improved Sun Position Accuracy',
+      title: 'Version 6: Improved Sun Position Accuracy',
+      tags: ['News'],
+    },
+    {
       date: '2025-03-20',
       href: '/blog/2025-03-20-version-5',
       imgSrc: '/images/blog-images/2025-03-20-version-5/featured-image.png',
@@ -92,7 +100,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let filteredPosts = $derived(
     selectedTag === 'All'
       ? posts
-      : posts.filter((post) => post.tags?.includes(selectedTag)),
+      : posts.filter((post) =>
+          post.tags?.includes(selectedTag as 'Help' | 'News'),
+        ),
   );
 </script>
 
@@ -124,11 +134,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <SegmentedControl
         value={selectedTag}
         onValueChange={(e) => {
-          selectedTag = e.value;
+          selectedTag = (e.value as string) || 'All';
         }}
       >
         <SegmentedControl.Control
-          class="bg-surface-100 dark:bg-surface-900 rounded-container mt-4 border-none shadow-sm"
+          class="bg-surface-100 dark:bg-surface-900  mt-4"
         >
           <SegmentedControl.Indicator />
           {#each tags as tag}
@@ -165,7 +175,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 <div class="flex w-full items-baseline justify-center gap-2">
                   {#if date}
                     <p class="text-surface-500 text-sm">
-                      {stringToDate(date).toLocaleDateString(undefined, {
+                      {stringToDate(date ?? '').toLocaleDateString(undefined, {
                         timeZone: 'UTC',
                       })}
                     </p>

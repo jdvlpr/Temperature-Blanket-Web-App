@@ -22,8 +22,18 @@ vi.mock('$lib/state/weather-state.svelte', () => ({
   weather: {
     source: { name: 'Meteostat', useSecondary: false, settings: {} },
     isUserEdited: false,
-    rawData: [],
+    rawData: [] as any[],
+    currentIndex: 0,
+    grouping: 'day',
     isFromLocalStorage: false,
+    setRawData(value: any[]) {
+      this.currentIndex = 0;
+      this.rawData = value;
+    },
+    setGrouping(value: 'day' | 'week') {
+      this.currentIndex = 0;
+      this.grouping = value;
+    },
   },
   getMoonPhase: vi.fn(() => 0),
 }));
@@ -53,7 +63,14 @@ vi.mock('$lib/state/location-state.svelte', () => ({
 vi.mock('$lib/storage/preferences.svelte', () => ({
   preferences: {
     value: {
-      theme: { id: 'classic', mode: 'system' },
+      theme: {
+        id: 'classic',
+        mode: 'system',
+        roundness: 'pill',
+        spacing: 'normal',
+        textScale: 'normal',
+        headingStyle: 'classic',
+      },
       seasons: [],
       layout: 'default',
       disableToastAnalytics: false,
@@ -65,10 +82,6 @@ vi.mock('$lib/storage/preferences.svelte', () => ({
 vi.mock('$app/environment', () => ({
   browser: true,
   dev: true,
-}));
-
-vi.mock('$lib/components/ThemeSwitcher.svelte', () => ({
-  skeletonThemes: [{ id: 'classic', name: 'Classic' }],
 }));
 
 describe('storage-utils integration', () => {
@@ -124,9 +137,7 @@ describe('storage-utils integration', () => {
   });
 
   it('should save project through storage class', async () => {
-    const saveSpy = vi
-      .spyOn(ProjectStorage, 'save')
-      .mockResolvedValue(undefined);
+    const saveSpy = vi.spyOn(ProjectStorage, 'save').mockResolvedValue(null);
 
     await ProjectStorage.save({ id: '123' });
 

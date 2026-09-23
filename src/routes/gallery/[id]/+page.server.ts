@@ -22,7 +22,7 @@ export const load: PageServerLoad = async (event) => {
   return { project };
 };
 
-async function getProject(event) {
+async function getProject(event: Parameters<PageServerLoad>[0]) {
   const id = +event.params.id;
 
   const response = await fetch(`${PUBLIC_WORDPRESS_BASE_URL}/graphql`, {

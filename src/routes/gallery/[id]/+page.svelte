@@ -3,17 +3,17 @@
 This file is part of Temperature-Blanket-Web-App.
 
 Temperature-Blanket-Web-App is free software: you can redistribute it and/or modify it
-under the terms of the GNU General Public License as published by the Free Software Foundation, 
+under the terms of the GNU General Public License as published by the Free Software Foundation,
 either version 3 of the License, or (at your option) any later version.
 
-Temperature-Blanket-Web-App is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
-without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+Temperature-Blanket-Web-App is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 See the GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
+You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<script>
+<script lang="ts">
   import { browser } from '$app/environment';
   import { page } from '$app/state';
   import { PUBLIC_BASE_URL } from '$env/static/public';
@@ -21,62 +21,117 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import AppShell from '$lib/components/AppShell.svelte';
   import Card from '$lib/components/Card.svelte';
   import ColorPalette from '$lib/components/ColorPalette.svelte';
-  import Spinner from '$lib/components/Spinner.svelte';
   import YarnSources from '$lib/components/YarnSources.svelte';
   import ViewToggle from '$lib/components/buttons/ViewToggle.svelte';
-  import { ALL_YARN_WEIGHTS } from '$lib/constants/color-constants';
-  import { safeSlide } from '$lib/features/transitions/safeSlide';
+  import { ensureYarnData } from '$lib/data/yarns/colorways.svelte';
   import { allGaugesAttributes } from '$lib/state/gauges-state.svelte';
   import { locations } from '$lib/state/location-state.svelte';
+  import { dialog } from '$lib/state/page-state.svelte';
   import { preferences } from '$lib/storage/preferences.svelte';
+  import type { GaugeRange, GaugeRangeCategory } from '$lib/types/gauge-types';
+  import type { Color } from '$lib/types/yarn-types';
+  import { getTextColor } from '$lib/utils/color-utils';
+  import {
+    gaugeParamsHaveYarnDetails,
+    parseGaugeURLHash,
+  } from '$lib/utils/load-project-utils.svelte';
   import { exists } from '$lib/utils/other-utils';
   import {
     getProjectParametersFromURLHash,
     getTitleFromLocationsMeta,
   } from '$lib/utils/project-utils.svelte';
-  import { getTextColor } from '$lib/utils/color-utils';
-  import { parseGaugeURLHash } from '$lib/utils/load-project-utils.svelte';
-  import { pluralize, stripHTMLTags } from '$lib/utils/string-utils';
+  import { stripHTMLTags } from '$lib/utils/string-utils';
   import {
     ArrowLeftIcon,
-    ChevronDown,
+    GlobeIcon,
     InfoIcon,
+    NotebookPenIcon,
     ShoppingCartIcon,
+    SwatchBookIcon
   } from '@lucide/svelte';
-  import { Accordion } from '@skeletonlabs/skeleton-svelte';
-  import { onMount } from 'svelte';
+  import {
+    buildGlobeLinkFromLocationsMeta,
+    firstLocationLabelFromLocationsMeta,
+  } from '../../globe/globe-utils';
   import { yarnPageState } from '../../yarn/state.svelte';
+  import type { PageData } from './$types';
+  import AboutProjectDialog from './AboutProjectDialog.svelte';
 
-  let { data } = $props();
+  let { data }: { data: PageData } = $props();
 
-  let imageWidth = $state();
-  let imageHeight = $state();
+  let imageWidth = $state<number | undefined>();
+  let imageHeight = $state<number | undefined>();
 
   let project = $derived(data.project);
   let projectURL = $derived(project?.projectUrl);
-  let projectTitle = $derived(project ? getTitleFromLocationsMeta(project.locations) : '');
+  let projectTitle = $derived(
+    project ? getTitleFromLocationsMeta(project.locations) : '',
+  );
   let projectTitleNoHTML = $derived(stripHTMLTags(projectTitle));
-  let weatherSources = $derived(project?.weatherSources
-    ? JSON.parse(project?.weatherSources)
-    : null);
+  // Null when the project has no usable coordinates, which hides the link.
+  let globeLink = $derived(
+    project ? buildGlobeLinkFromLocationsMeta(project.locations) : null,
+  );
+  // The link goes to the first location, so name that one: short button text,
+  // with the place spelled out for screen readers and on hover.
+  let globeLinkLabel = $derived.by(() => {
+    const place = project
+      ? firstLocationLabelFromLocationsMeta(project.locations)
+      : null;
+    return place
+      ? `See projects near ${place} on the globe`
+      : 'See nearby projects on the globe';
+  });
+  let weatherSources = $derived(
+    project?.weatherSources ? JSON.parse(project?.weatherSources) : null,
+  );
   let hash = $derived(projectURL ? new URL(projectURL).hash.substring(1) : '');
   let params = $derived(getProjectParametersFromURLHash(hash));
   let gauges = $derived(getGauges(params));
-  let flatColors = $derived(gauges.flatMap((item) => item.colors));
+  let flatColors = $derived(
+    gauges.flatMap((item) => (item.colors ? item.colors : [])),
+  );
 
-  let aboutState = $state([]);
+  // Warm the yarn dataset only when this project's gauges reference yarn
+  // details; `gauges` above self-heals once the data resolves.
+  $effect(() => {
+    if (gaugeParamsHaveYarnDetails(params)) ensureYarnData();
+  });
 
-  let yarns = [];
+  function openAbout() {
+    dialog.trigger({
+      type: 'component',
+      component: {
+        ref: AboutProjectDialog,
+        props: {
+          project,
+          title: projectTitleNoHTML,
+          reshapedColors,
+          weatherSources,
+        },
+      },
+      options: { size: 'medium' },
+    });
+  }
 
-  let reshapedColors = $derived(
-    flatColors?.reduce((acc, color) => {
+  let reshapedColors = $derived.by(() => {
+    if (!flatColors) return null;
+    const yarns: Array<{
+      brandId: any;
+      brandName: any;
+      yarnWeightId: any;
+      yarnId: any;
+      yarnName: any;
+      colors: Array<{ name: any; hex: any }>;
+    }> = [];
+
+    flatColors.forEach((color: Color) => {
       const { brandId, yarnId, brandName, yarnName, name, hex, yarnWeightId } =
         color;
-      if (
-        !yarns.find(
-          (item) => item.brandId === brandId && item.yarnId === yarnId,
-        )
-      ) {
+      const existingYarn = yarns.find(
+        (item) => item.brandId === brandId && item.yarnId === yarnId,
+      );
+      if (!existingYarn) {
         yarns.push({
           brandId,
           brandName,
@@ -86,36 +141,46 @@ If not, see <https://www.gnu.org/licenses/>. -->
           colors: [],
         });
       }
-      yarns
-        .find((item) => item.brandId === brandId && item.yarnId === yarnId)
-        .colors.push({ name, hex });
-      return yarns;
-    }, {}) || null,
+      const yarnToUpdate = yarns.find(
+        (item) => item.brandId === brandId && item.yarnId === yarnId,
+      );
+      if (yarnToUpdate) {
+        yarnToUpdate.colors.push({ name, hex });
+      }
+    });
+    return yarns;
+  });
+
+  let projectUnits = $derived<'imperial' | 'metric'>(
+    params?.u?.value === 'i' ? 'imperial' : 'metric',
   );
 
-  let projectUnits = $derived(params?.u?.value === 'i' ? 'imperial' : 'metric');
-
-  function getGauges(params) {
+  function getGauges(params: Record<string, { key: string; value: string }>) {
     if (!browser) return [];
-    let _gauges = [];
+    let _gauges: Exclude<ReturnType<typeof parseGaugeURLHash>, undefined>[] =
+      [];
 
     allGaugesAttributes.forEach((gauge) => {
       if (!exists(params[gauge.id])) return;
       const settings = parseGaugeURLHash(params[gauge.id].value, gauge);
-      _gauges.push(settings);
+      if (settings) {
+        _gauges.push(settings);
+      }
     });
 
     return _gauges;
   }
 
-  const preloadImage = (src) => {
+  const preloadImage = (src: string) => {
     if (!browser) return;
-    return new Promise(async (resolve) => {
+    return new Promise<void>((resolve) => {
       let img = new Image();
-      img.onload = resolve();
+      img.onload = () => {
+        imageWidth = img.width;
+        imageHeight = img.height;
+        resolve();
+      };
       img.src = src;
-      imageWidth = img.width;
-      imageHeight = img.height;
     });
   };
 
@@ -145,10 +210,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     content={project?.featuredImage?.node.mediaItemUrl}
   />
   {#key imageWidth}
-    <meta property="og:image:width" content={imageWidth} />
+    <meta property="og:image:width" content={imageWidth?.toString()} />
   {/key}
   {#key imageHeight}
-    <meta property="og:image:height" content={imageHeight} />
+    <meta property="og:image:height" content={imageHeight?.toString()} />
   {/key}
 </svelte:head>
 
@@ -181,361 +246,236 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 {/if}
               </p>
 
-              {#if projectURL}
-                <a
-                  class="btn preset-filled-primary-500 m-auto w-fit items-center gap-1"
-                  href={projectURL}
-                  target={locations.allValid ? '_blank' : '_self'}
-                >
-                  Open in {#if locations.allValid}
-                    New
-                  {/if} Project Planner
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke-width="1.5"
-                    stroke="currentColor"
-                    class="size-5"
+              <div class="flex flex-wrap items-center justify-center gap-4">
+                {#if projectURL}
+                  <a
+                    class="btn preset-filled-primary-500"
+                    href={projectURL}
+                    target={locations.allValid ? '_blank' : '_self'}
                   >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="m8.25 4.5 7.5 7.5-7.5 7.5"
-                    />
-                  </svg>
-                </a>
-              {/if}
-              <div
-                class="preset-tonal-tertiary rounded-container mx-auto mt-2 w-full max-w-(--breakpoint-sm) text-left"
-              >
-                <Accordion
-                  value={aboutState}
-                  onValueChange={(e) => (aboutState = e.value)}
-                  collapsible
-                >
-                  <Accordion.Item value="weather-data-inaccurate">
-                    <Accordion.ItemTrigger
-                      class="flex items-center justify-between gap-2"
-                    >
-                      <InfoIcon />
-
-                      <p class="">About this Project</p>
-
-                      <Accordion.ItemIndicator class="group">
-                        <ChevronDown
-                          class="h-5 w-5 transition group-data-[state=open]:rotate-180"
-                        />
-                      </Accordion.ItemIndicator>
-                    </Accordion.ItemTrigger>
-                    <Accordion.ItemContent>
-                      {#snippet element(attributes)}
-                        {#if !attributes.hidden}
-                          <div {...attributes} transition:safeSlide>
-                            <div class="flex flex-col gap-2">
-                              <p class="">
-                                <span class="font-bold">Date Created:</span>
-                                {new Date(project?.date).toLocaleDateString(
-                                  undefined,
-                                  {
-                                    timeZone: 'UTC',
-                                  },
-                                )}
-                              </p>
-
-                              {#if JSON.stringify(reshapedColors) !== '{}'}
-                                {#if reshapedColors?.some((item) => item.brandName && item.yarnName)}
-                                  <span class="">
-                                    <span class="font-bold">Yarn</span>:
-                                    <div class="flex flex-col gap-2 pl-4">
-                                      {#each reshapedColors as { brandName, yarnName, yarnWeightId, colors }}
-                                        {@const yarnWeightName =
-                                          ALL_YARN_WEIGHTS.find(
-                                            (n) => n.id === yarnWeightId,
-                                          )?.name}
-                                        {#if brandName && yarnName}
-                                          <div>
-                                            <span>
-                                              {brandName}
-                                              -
-                                              {yarnName}
-                                              <span
-                                                class="text-sm opacity-70"
-                                              >
-                                                ({#if yarnWeightName}
-                                                  <a
-                                                    href="/blog/yarn-weights?highlight={yarnWeightName}"
-                                                    class="link"
-                                                    target="_blank"
-                                                    title="See the yarn weights chart"
-                                                    >{yarnWeightName}</a
-                                                  >,
-                                                {/if}{colors.length}
-                                                {pluralize(
-                                                  'colorway',
-                                                  colors.length,
-                                                )})
-                                              </span>
-                                            </span>
-                                            <div class="pl-4">
-                                              {#each colors as { name, hex }, index}
-                                                <div
-                                                  class="flex items-center gap-2"
-                                                >
-                                                  <div
-                                                    class="h-4 w-4 rounded-full"
-                                                    style="background:{hex};"
-                                                  ></div>
-                                                  <p class="">
-                                                    {name}
-                                                  </p>
-                                                </div>
-                                              {/each}
-                                            </div>
-                                          </div>
-                                        {/if}
-                                      {/each}
-                                    </div>
-                                  </span>
-                                {/if}
-                              {/if}
-
-                              {#if project?.projectTags.nodes[0].name}
-                                <p>
-                                  <span class="font-bold">Pattern Type</span>:
-                                  <span class=""
-                                    >{project?.projectTags.nodes[0]
-                                      .name}</span
-                                  >
-                                </p>
-                              {/if}
-
-                              {#if project?.projectTags.nodes[0].description}
-                                <p>
-                                  <span class="font-bold"
-                                    >Pattern Description</span
-                                  >:
-                                  <span class="">
-                                    {project?.projectTags.nodes[0]
-                                      .description}</span
-                                  >
-                                </p>
-                              {/if}
-
-                              {#if project?.totalDays}
-                                <p>
-                                  <span class="font-bold">Total Days</span>:
-                                  <span class="">{project?.totalDays}</span>
-                                </p>
-                              {/if}
-
-                              {#if project?.missingDays}
-                                <p>
-                                  <span class="font-bold"
-                                    >Days Without Weather Data</span
-                                  >:
-                                  <span class="">{project?.missingDays}</span>
-                                </p>
-                              {/if}
-
-                              {#if weatherSources}
-                                {#each weatherSources as { name, url }}
-                                  <p>
-                                    <span class="font-bold"
-                                      >Weather Source</span
-                                    >:
-                                    <a href={url} target="_blank" class="link"
-                                      >{name}</a
-                                    >
-                                  </p>
-                               {/each}
-                              {/if}
-
-                              <p class="italic">
-                                The preview image below may not reflect the
-                                most recent weather information. Open the
-                                project in the Project Planner to see any
-                                updates.
-                              </p>
-                            </div>
-                          </div>
-                        {/if}
-                      {/snippet}
-                    </Accordion.ItemContent>
-                  </Accordion.Item>
-                </Accordion>
+                    <NotebookPenIcon />
+                    Open in {#if locations.allValid}
+                      New
+                    {/if} Project Planner
+                  </a>
+                {/if}
+                {#if globeLink}
+                  <!-- Secondary to the planner: tonal rather than filled. -->
+                  <a
+                    class="btn hover:preset-tonal-surface"
+                    href={globeLink}
+                    aria-label={globeLinkLabel}
+                    title={globeLinkLabel}
+                  >
+                    <GlobeIcon />
+                    See Nearby Projects
+                  </a>
+                {/if}
+                {#if project}
+                  <!-- The least prominent of the three: reference details,
+                       in a dialog rather than an inline accordion that pushed
+                       the preview image down when opened. -->
+                  <button
+                    type="button"
+                    class="btn hover:preset-tonal-surface"
+                    aria-label="About this project"
+                    title="About this project"
+                    onclick={openAbout}
+                  >
+                    <InfoIcon />
+                    About
+                  </button>
+                {/if}
               </div>
             </div>
           {/snippet}
           {#snippet content()}
             <div class="grid grid-cols-1 gap-2 py-2">
               <div class="mt-2 text-center">
-                  {#if project}
-                    <img
-                      src={project?.featuredImage?.node.mediaItemUrl}
-                      alt="Project Preview"
-                      class="m-auto max-h-[60vh]"
-                    />
-                  {/if}
+                {#if project}
+                  <img
+                    src={project?.featuredImage?.node.mediaItemUrl}
+                    alt="Project Preview"
+                    class="m-auto max-h-[60vh]"
+                  />
+                {/if}
               </div>
 
-                <div class="mt-2 flex flex-col gap-4 text-center">
-                  <div class="flex flex-col gap-8">
-                    {#if gauges?.length}
-                      {#key gauges}
-                        {#each gauges as { colors, ranges, id, rangeOptions }, gaugeIndex}
-                          {@const gaugeType = gauges[gaugeIndex].unit.type}
-                          {@const item = ranges.map((range, index) => {
+              <div class="mt-2 flex flex-col gap-4 text-center">
+                <div class="flex flex-col gap-8">
+                  {#if gauges?.length}
+                    {#key gauges}
+                      {#each gauges as { colors, ranges, id, rangeOptions }, gaugeIndex}
+                        {@const gaugeType = gauges[gaugeIndex].unit.type}
+                        {@const item = (ranges ?? []).map(
+                          (
+                            range: GaugeRange | GaugeRangeCategory,
+                            index: number,
+                          ) => {
                             return {
                               range,
-                              ...colors[index],
+                              ...colors?.[index],
                             };
-                          })}
-                          {@const unitLabel = allGaugesAttributes.find(
-                            (item) => item.id === id,
-                          )?.unit.label[projectUnits]}
-                          {@const gaugeLabel = `${
-                            allGaugesAttributes.find((item) => item.id === id)
-                              ?.label
-                          } Yarn Palette`}
-                          {@const hasAffiliateLinks = colors
-                            ? colors?.some(
-                                (color) => !!color.affiliate_variant_href,
-                              )
-                            : false}
+                          },
+                        )}
+                        {@const unitLabel = allGaugesAttributes.find(
+                          (item) => item.id === id,
+                        )?.unit.label[projectUnits]}
+                        {@const gaugeLabel = `${
+                          allGaugesAttributes.find((item) => item.id === id)
+                            ?.label
+                        } Yarn Palette`}
+                        {@const hasAffiliateLinks = colors
+                          ? colors?.some(
+                              (color: Color) => !!color.affiliate_variant_href,
+                            )
+                          : false}
+                        <div class="flex flex-col">
                           <div class="flex flex-col">
-                            <div class="flex flex-col">
-                              <ColorPalette {colors} schemeName={gaugeLabel} />
-                              <a
-                                class="btn preset-tonal-primary border-primary-500 m-auto mt-4 w-fit gap-1 border"
-                                onclick={() => {
+                            <ColorPalette
+                              colors={colors ?? []}
+                              schemeName={gaugeLabel}
+                            />
+                            <a
+                              class="btn preset-tonal-primary border-primary-500 m-auto mt-4 w-fit gap-1 border"
+                              onclick={() => {
+                                if (colors) {
                                   yarnPageState.gauge.colors = colors;
-                                }}
-                                href="/yarn"
-                              >
-                                Open in Yarn Palette Creator
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  fill="none"
-                                  viewBox="0 0 24 24"
-                                  stroke-width="1.5"
-                                  stroke="currentColor"
-                                  class="size-5"
-                                >
-                                  <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    d="m8.25 4.5 7.5 7.5-7.5 7.5"
-                                  />
-                                </svg>
-                              </a>
-                            </div>
-                            {#if hasAffiliateLinks}
-                              <p class="mt-4 px-2 text-sm">
-                                Purchases via links with a shopping cart icon <ShoppingCartIcon
-                                  class="relative -top-px inline size-4"
-                                /> support the developer of this web app at no extra
-                                cost to you.
-                              </p>
-                            {/if}
-                            <div class="mx-auto mt-4 w-fit">
-                              <ViewToggle />
-                            </div>
-                            <div
-                              class="rounded-container mt-4 mb-2 overflow-hidden xl:mb-4 {preferences
-                                .value.layout === 'grid'
-                                ? 'grid grid-cols-2 gap-1 md:grid-cols-3 xl:grid-cols-4'
-                                : 'flex flex-col'}"
+                                }
+                              }}
+                              href="/yarn"
                             >
-                              {#each item as { range, hex, name, yarnName, brandName, affiliate_variant_href, variant_href }, i}
+                                <SwatchBookIcon />
+
+                              Open in Yarn Palette Creator
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke-width="1.5"
+                                stroke="currentColor"
+                                class="size-5"
+                              >
+                                <path
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  d="m8.25 4.5 7.5 7.5-7.5 7.5"
+                                />
+                              </svg>
+                            </a>
+                          </div>
+                          {#if hasAffiliateLinks}
+                            <p class="mt-4 px-2 text-sm">
+                              Purchases via links with a shopping cart icon <ShoppingCartIcon
+                                class="relative -top-px inline size-4"
+                              /> support the developer of this web app at no extra
+                              cost to you.
+                            </p>
+                          {/if}
+                          <div class="mx-auto mt-4 w-fit">
+                            <ViewToggle />
+                          </div>
+                          <div
+                            class="rounded-container mt-4 mb-2 overflow-hidden xl:mb-4 {preferences
+                              .value.layout === 'grid'
+                              ? 'grid grid-cols-2 gap-1 md:grid-cols-3 xl:grid-cols-4'
+                              : 'flex flex-col'}"
+                          >
+                            {#each item as { range, hex, name, yarnName, brandName, affiliate_variant_href, variant_href }, i}
+                              <div
+                                class="flex flex-wrap items-center justify-around gap-2 p-2 {preferences
+                                  .value.layout === 'grid'
+                                  ? 'rounded-container flex-auto basis-1/3 sm:basis-1/4 md:basis-1/5'
+                                  : ''}"
+                                style="background-color:{hex};color:{getTextColor(
+                                  hex ?? '#000000',
+                                )}"
+                              >
+                                <p class="text-xs">
+                                  {i + 1}
+                                </p>
                                 <div
-                                  class="flex flex-wrap items-center justify-around gap-2 p-2 {preferences
-                                    .value.layout === 'grid'
-                                    ? 'rounded-container flex-auto basis-1/3 sm:basis-1/4 md:basis-1/5'
-                                    : ''}"
-                                  style="background-color:{hex};color:{getTextColor(
-                                    hex,
-                                  )}"
+                                  class="flex items-center justify-start gap-2"
                                 >
-                                  <p class="text-xs">
-                                    {i + 1}
-                                  </p>
-                                  <div
-                                    class="flex items-center justify-start gap-2"
-                                  >
-                                    {#if gaugeType === 'category'}
-                                      <p id="range-{i}-value">{range.label}</p>
-                                    {:else}
-                                      <div
-                                        class="flex flex-col items-start text-left"
-                                        id="range-{i}-from"
-                                      >
-                                        <p class="text-xs">From</p>
-                                        <p class="-mt-1 text-xs opacity-50">
-                                          {rangeOptions.includeFromValue
-                                            ? 'Including'
-                                            : 'Excluding'}
-                                        </p>
-                                        <div class="flex items-start">
-                                          <p class="text-lg">{range.from}</p>
-                                          <p class="text-xs">{unitLabel}</p>
-                                        </div>
-                                      </div>
-                                      <div
-                                        class="flex flex-col items-start text-left"
-                                        id="range-{i}-to"
-                                      >
-                                        <p class="text-xs">To</p>
-                                        <p class="-mt-1 text-xs opacity-50">
-                                          {rangeOptions.includeToValue
-                                            ? 'Including'
-                                            : 'Excluding'}
-                                        </p>
-                                        <div class="flex items-start">
-                                          <p class="text-lg">{range.to}</p>
-                                          <p class="text-xs">{unitLabel}</p>
-                                        </div>
-                                      </div>
-                                    {/if}
-                                  </div>
-                                  {#if affiliate_variant_href}
-                                    <a
-                                      class="btn hover:preset-tonal-surface flex flex-wrap items-center justify-start"
-                                      href={affiliate_variant_href}
-                                      target="_blank"
-                                      rel="noreferrer nofollow"
-                                    >
-                                      <ShoppingCartIcon />
-                                      <span class="underline">Buy</span></a
-                                    >
-                                  {/if}
-                                  {#if brandName && yarnName}
-                                    <div
-                                      class="flex flex-col items-start justify-start text-left text-wrap whitespace-normal"
-                                    >
-                                      <span class="text-xs"
-                                        >{brandName}
-                                        -
-                                        {yarnName}</span
-                                      >
-                                      <span
-                                        class="flex flex-wrap items-start justify-start text-lg leading-tight"
-                                      >
-                                        {name}
-                                      </span>
-                                    </div>
+                                  {#if gaugeType === 'category'}
+                                    <p id="range-{i}-value">
+                                      {(range as GaugeRangeCategory).label}
+                                    </p>
                                   {:else}
-                                    {hex}
+                                    <div
+                                      class="flex flex-col items-start text-left"
+                                      id="range-{i}-from"
+                                    >
+                                      <p class="text-xs">From</p>
+                                      <p class="-mt-1 text-xs opacity-50">
+                                        {rangeOptions?.includeFromValue
+                                          ? 'Including'
+                                          : 'Excluding'}
+                                      </p>
+                                      <div class="flex items-start">
+                                        <p class="text-lg">
+                                          {(range as GaugeRange).from}
+                                        </p>
+                                        <p class="text-xs">{unitLabel}</p>
+                                      </div>
+                                    </div>
+                                    <div
+                                      class="flex flex-col items-start text-left"
+                                      id="range-{i}-to"
+                                    >
+                                      <p class="text-xs">To</p>
+                                      <p class="-mt-1 text-xs opacity-50">
+                                        {rangeOptions?.includeToValue
+                                          ? 'Including'
+                                          : 'Excluding'}
+                                      </p>
+                                      <div class="flex items-start">
+                                        <p class="text-lg">
+                                          {(range as GaugeRange).to}
+                                        </p>
+                                        <p class="text-xs">{unitLabel}</p>
+                                      </div>
+                                    </div>
                                   {/if}
                                 </div>
-                              {/each}
-                            </div>
+                                {#if affiliate_variant_href}
+                                  <a
+                                    class="btn hover:preset-tonal-surface flex flex-wrap items-center justify-start"
+                                    href={affiliate_variant_href}
+                                    target="_blank"
+                                    rel="noreferrer nofollow"
+                                  >
+                                    <ShoppingCartIcon />
+                                    <span class="underline">Buy</span></a
+                                  >
+                                {/if}
+                                {#if brandName && yarnName}
+                                  <div
+                                    class="flex flex-col items-start justify-start text-left text-wrap whitespace-normal"
+                                  >
+                                    <span class="text-xs"
+                                      >{brandName}
+                                      -
+                                      {yarnName}</span
+                                    >
+                                    <span
+                                      class="flex flex-wrap items-start justify-start text-lg leading-tight"
+                                    >
+                                      {name}
+                                    </span>
+                                  </div>
+                                {:else}
+                                  {hex}
+                                {/if}
+                              </div>
+                            {/each}
                           </div>
-                        {/each}
-                      {/key}
-                    {/if}
-                  </div>
+                        </div>
+                      {/each}
+                    {/key}
+                  {/if}
                 </div>
+              </div>
             </div>
           {/snippet}
         </Card>

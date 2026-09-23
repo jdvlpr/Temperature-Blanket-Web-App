@@ -69,7 +69,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let submitting = $state(false);
 
-  function getProjectLinkURL(projectLink) {
+  function getProjectLinkURL(projectLink: string): URL | null {
     try {
       return new URL(projectLink);
     } catch (error) {
@@ -77,11 +77,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     }
   }
 
-  async function submitForm(event) {
+  async function submitForm(event: SubmitEvent): Promise<void> {
     if (event.cancelable) event.preventDefault();
     submitting = true;
 
-    const formData = new FormData(event.target);
+    const formData = new FormData(event.target as HTMLFormElement);
 
     // Convert FormData to a JSON object
     const jsonObject = Object.fromEntries(formData.entries());
@@ -115,7 +115,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     if (locations.allValid && locations.all.length && project.url.hash)
       projectLink = project.url.href;
     else if (page.url.searchParams.has('projectURL')) {
-      projectLink = page.url.searchParams.get('projectURL');
+      projectLink = page.url.searchParams.get('projectURL') || '';
     }
   });
 </script>
@@ -620,7 +620,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
               >
               <textarea
                 id="archiveResult"
-                class="textarea"
+                class="textarea rounded-container"
                 name="archiveResult"
                 rows="5"
                 placeholder="e.g. When I used the archived version, the weather data was back to normal; it was not shifted."
@@ -647,7 +647,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             >
             <textarea
               id="description"
-              class="textarea"
+              class="textarea rounded-container"
               name="description"
               rows="5"
               placeholder="e.g. I open my project from it's saved URL. After I get the weather data and look at the table, the weather data changed from what it used to be."
@@ -659,7 +659,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <span class="label-text">Any other comments</span>
           <textarea
             id="comments"
-            class="textarea"
+            class="textarea rounded-container"
             name="comments"
             rows="5"
             placeholder="e.g. this feature works really well, but this features does not work well. I also have some ideas about how to improve this feature."
@@ -802,11 +802,23 @@ If not, see <https://www.gnu.org/licenses/>. -->
           />
 
           {#if browser}
-            <input type="hidden" name="pageURL" value={params.get('pageURL')} />
+            <input
+              type="hidden"
+              name="pageURL"
+              value={params?.get('pageURL') ?? ''}
+            />
 
-            <input type="hidden" name="data0" value={params.get('data0')} />
+            <input
+              type="hidden"
+              name="data0"
+              value={params?.get('data0') ?? ''}
+            />
 
-            <input type="hidden" name="table0" value={params.get('table0')} />
+            <input
+              type="hidden"
+              name="table0"
+              value={params?.get('table0') ?? ''}
+            />
           {/if}
 
           {#if weather.data.length}

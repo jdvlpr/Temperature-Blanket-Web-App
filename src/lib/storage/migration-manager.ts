@@ -61,7 +61,7 @@ export class MigrationManager {
         // Check if already exists to avoid unnecessary writes
         const existing = await ProjectStorage.getById(id);
         if (!existing) {
-          await ProjectStorage.save(id, legacyProject);
+          await ProjectStorage.save({ id, localProject: legacyProject });
         }
         migratedIds.push(id);
       } catch (err: any) {

@@ -20,6 +20,7 @@ import {
   UNIT_LABELS,
 } from '$lib/constants/weather-constants';
 import { NO_DATA_SRTM3 } from '$lib/constants/location-constants';
+import { ensureYarnData } from '$lib/data/yarns/colorways.svelte';
 import { allGaugesAttributes, gauges } from '$lib/state/gauges-state.svelte';
 import { locations } from '$lib/state/location-state.svelte';
 import { previews } from '$lib/state/preview-state.svelte';
@@ -42,6 +43,25 @@ import {
 import { getColorsFromInput } from '$lib/utils/color-utils';
 import { getProjectParametersFromURLHash } from '$lib/utils/project-utils.svelte';
 import { seasonsFromUrlHash } from '$lib/utils/seasons-utils.svelte';
+import type {
+  GaugeAttributes,
+  GaugeRange,
+  GaugeSettingsType,
+} from '$lib/types/gauge-types';
+import type { TISO8601DateString } from '$lib/types/weather-types';
+
+// Gauge hash values can carry a second `!`-delimited section with yarn
+// details (brandId-yarnId); only those need the yarn dataset loaded.
+export const gaugeParamsHaveYarnDetails = (
+  params: Record<string, { value: string }>,
+) =>
+  allGaugesAttributes.some((gauge) => {
+    const raw = params[gauge.id]?.value;
+    if (!raw) return false;
+    const firstBang = raw.indexOf('!');
+    if (firstBang === -1) return false;
+    return raw.indexOf('!', firstBang + 1) !== -1;
+  });
 
 export const loadProjectFromURL = async (
   hash = window.location.hash.substring(1),
@@ -72,6 +92,8 @@ export const loadProjectFromURL = async (
   if (exists(params.l)) await parseLocationURLHash(params.l.value);
 
   // Load Gauges
+  if (gaugeParamsHaveYarnDetails(params)) await ensureYarnData();
+
   allGaugesAttributes.forEach((gauge) => {
     if (!exists(params[gauge.id])) return;
     gauges.addById(gauge.id);
@@ -82,13 +104,21 @@ export const loadProjectFromURL = async (
     );
 
     const _gauge = gauges.allCreated.find((g) => g.id === gauge.id);
-    if (_gauge) _gauge.updateSettings({ settings });
+    if (_gauge && settings) _gauge.updateSettings({ settings });
   });
 
   // Load Preview
-  previews.all.forEach((p) => {
-    if (exists(params[p.id])) p.load(params[p.id].value);
-  });
+  // Must resolve before the weather grouping block below: Previews.svelte
+  // wraps <Previews> in `{#key weather.grouping}`, so setting the grouping
+  // remounts it and re-runs its default-preview guard. That guard's first
+  // check is `if (previews.activeId) return`, so `activeId` needs to already
+  // be set by the time grouping changes, or it could fall through and load
+  // the 'rows' default over the real restored preview.
+  const previewEntry = previews.all.find((p) => exists(params[p.id]));
+  if (previewEntry) {
+    const previewInstance = await previews.load(previewEntry.id);
+    if (previewInstance) previewInstance.load(params[previewEntry.id].value);
+  }
 
   // Load Weather Source (added in v1.823)
   loadWeatherSource: if (exists(params.s)) {
@@ -119,13 +149,13 @@ export const loadProjectFromURL = async (
 
   // Load Weather Grouping Setting if present
   if (exists(params.w)) {
-    weather.grouping = 'week';
+    weather.setGrouping('week');
     const value = +params.w?.value;
     if (DAYS_OF_THE_WEEK.map((n) => n.value).includes(value))
       weather.monthGroupingStartDay = value;
   } else {
     // Otherwise set to the default 'day'
-    weather.grouping = 'day';
+    weather.setGrouping('day');
   }
 
   // Load Seasons from URL (n parameter)
@@ -138,7 +168,7 @@ export const loadProjectFromURL = async (
   }
 };
 
-const parseLocationURLHash = async (hashString) => {
+const parseLocationURLHash = async (hashString: string) => {
   const wasLoadedFromStorage = locations.all.every(
     (location) => location.wasLoadedFromStorage,
   );
@@ -147,7 +177,7 @@ const parseLocationURLHash = async (hashString) => {
   if (wasLoadedFromStorage) return;
   // First, get all the positions of the separator character(s)
   // This determines the number of locations
-  const separatorIndices = [];
+  const separatorIndices: number[] = [];
   for (let i = 0; i < hashString.length; i++) {
     if (
       hashString[i] === CHARACTERS_FOR_URL_HASH.separator ||
@@ -166,8 +196,9 @@ const parseLocationURLHash = async (hashString) => {
     const separatorPosition = separatorIndices[i];
 
     if (_locations.length - 1 < i) {
-      // There needs to be another location, so create it
-      locations.add({ clearWeatherData: false });
+      // There needs to be another location, so create it.
+      // (No weather clear here — project load fetches fresh weather anyway.)
+      locations.add();
     }
 
     _locations[i].label = 'Loading...';
@@ -234,10 +265,10 @@ const parseLocationURLHash = async (hashString) => {
     currentPosition += thisLocationStringLength + 1;
 
     // Set the location's from date
-    _locations[i].from = from;
+    _locations[i].from = from as TISO8601DateString;
 
     // Set the location's to date
-    _locations[i].to = to;
+    _locations[i].to = to as TISO8601DateString;
 
     // Get  data from GeoNames using the location's id
     try {
@@ -248,7 +279,7 @@ const parseLocationURLHash = async (hashString) => {
       if (!response.ok) throw new Error(data.message);
 
       // Set the location's id
-      _locations[i].id = id;
+      _locations[i].id = Number(id);
 
       // Set the location's latitude
       _locations[i].lat = data.lat;
@@ -288,7 +319,12 @@ const parseLocationURLHash = async (hashString) => {
   locations.all = _locations;
 };
 
-export const parseGaugeURLHash = (hashString: string, gauge) => {
+export const parseGaugeURLHash = (
+  hashString: string,
+  gauge: (GaugeAttributes & Partial<GaugeSettingsType>) | undefined,
+) => {
+  if (!gauge) return;
+
   // Each gauge should have a '!' which separates the gauge colors from the gauge settings
 
   let hashStringParts;
@@ -377,7 +413,7 @@ export const parseGaugeURLHash = (hashString: string, gauge) => {
     return gauge;
   }
 
-  const ranges = [];
+  const ranges: GaugeRange[] = [];
   for (let i = 0; i < rangeFromIndices.length; i++) {
     // The color's From range value is the number from the '(' character to the "'" separator character
     let from = +hashStringColors.substring(
@@ -397,13 +433,13 @@ export const parseGaugeURLHash = (hashString: string, gauge) => {
       if (preferences.value.units === 'imperial') {
         switch (gauge.id) {
           case 'temp':
-            from = celsiusToFahrenheit(from);
-            to = celsiusToFahrenheit(to);
+            from = celsiusToFahrenheit(from) ?? from;
+            to = celsiusToFahrenheit(to) ?? to;
             break;
           case 'prcp':
           case 'snow':
-            from = millimetersToInches(from);
-            to = millimetersToInches(to);
+            from = millimetersToInches(from) ?? from;
+            to = millimetersToInches(to) ?? to;
             break;
           default:
             break;
@@ -551,8 +587,8 @@ export const parseGaugeURLHash = (hashString: string, gauge) => {
       !upToDate(project.onLoaded.version, '1.700') &&
       preferences.value.units === 'imperial'
     ) {
-      increment = celsiusToFahrenheit(increment);
-      start = celsiusToFahrenheit(start);
+      increment = celsiusToFahrenheit(increment) ?? increment;
+      start = celsiusToFahrenheit(start) ?? start;
     }
 
     gauge.rangeOptions.manual.increment = increment;
@@ -569,9 +605,10 @@ export const parseGaugeURLHash = (hashString: string, gauge) => {
   }
 
   // From v2.4.4, the roundIncrement setting is determined by checking if all range From and To values are integers.
-  gauge.rangeOptions.auto.roundIncrement = gauge?.ranges.every(
-    (range) => Number.isInteger(range.from) && Number.isInteger(range.to),
-  );
+  gauge.rangeOptions.auto.roundIncrement =
+    (gauge?.ranges as GaugeRange[] | undefined)?.every(
+      (range) => Number.isInteger(range.from) && Number.isInteger(range.to),
+    ) ?? true;
 
   return gauge;
 };
