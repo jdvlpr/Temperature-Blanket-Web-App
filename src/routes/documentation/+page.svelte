@@ -1733,6 +1733,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 left to right, top to bottom.
               </li>
               <li>
+                <span class="font-bold">Hexagons</span> – Each hexagon represents
+                one day. Hexagons are added from left to right, top to bottom. Every
+                other row can have one fewer or one more hexagon, or be offset by
+                half a hexagon. Each round of a hexagon can use a different weather
+                parameter, and hexagons can be added at the beginning or between months.
+              </li>
+              <li>
                 <span class="font-bold">Month Rows</span> – Rows are grouped by month from
                 top to bottom or left to right. Months with fewer days have extra
                 rows added, so that each month has the same number of rows.

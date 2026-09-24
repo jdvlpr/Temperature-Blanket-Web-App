@@ -1,172 +1,72 @@
-<!-- Copyright (c) 2024, Thomas (https://github.com/jdvlpr)
+<!-- Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
 
 This file is part of Temperature-Blanket-Web-App.
 
 Temperature-Blanket-Web-App is free software: you can redistribute it and/or modify it
-under the terms of the GNU General Public License as published by the Free Software Foundation, 
+under the terms of the GNU General Public License as published by the Free Software Foundation,
 either version 3 of the License, or (at your option) any later version.
 
-Temperature-Blanket-Web-App is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
-without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+Temperature-Blanket-Web-App is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 See the GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
+You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 If not, see <https://www.gnu.org/licenses/>. -->
-<script>
+<script lang="ts">
   import Spinner from '$lib/components/Spinner.svelte';
-  import { gauges } from '$lib/state/gauges-state.svelte';
-  import { project } from '$lib/state/project-state.svelte';
   import { weather } from '$lib/state/weather-state.svelte';
-  import { preferences } from '$lib/storage/preferences.svelte';
+  import type { WeatherParam } from '$lib/types/gauge-types';
+  import type { Color } from '$lib/types/yarn-types';
   import { getColorInfo } from '$lib/utils/color-utils';
+  import { runPreview } from '$lib/utils/function-utils.svelte';
   import { showPreviewImageWeatherDetails } from '$lib/utils/preview-utils.svelte';
-  import { tick } from 'svelte';
-  import { hexagonsPreview } from './state.svelte';
+  import { hexagonsPreview, type HexagonsSection } from './state.svelte';
 
   let width = $state(hexagonsPreview.width);
+
   let height = $state(hexagonsPreview.height);
 
-  // Adjust constants for proper hexagon tiling
-  const HEX_SIZE = hexagonsPreview.STITCH_SIZE;
-  // Width of the hex is 2× the size (flat-to-flat)
-  const HEX_WIDTH = HEX_SIZE * 2;
-  // Height is √3 × size for a regular hexagon
-  const HEX_HEIGHT = Math.round(HEX_SIZE * Math.sqrt(3));
+  // Returns the color for one round of a day's hexagon
+  function getRoundColor(dayIndex: number, targetId: WeatherParam['id']) {
+    const { primaryTarget, primaryTargetAsBackup } = hexagonsPreview.settings;
+    let param = targetId;
+    let value = weather.getWeatherValue({ dayIndex, param });
 
-  // Precise calculations for perfect hexagon tiling with flat-topped hexagons
-  // Horizontal spacing should be exactly the width (no overlap)
-  const HEX_HORIZ_SPACING = HEX_WIDTH * 0.75; // This is key - 3/4 width for proper tiling
-  // Vertical spacing should account for the pointy parts
-  const HEX_VERT_SPACING = HEX_HEIGHT;
+    // If the secondary target value is 0 or null, use the primary target as a backup
+    if (primaryTargetAsBackup && (value === 0 || value === null)) {
+      param = primaryTarget;
+      value = weather.getWeatherValue({ dayIndex, param });
+    }
 
-  // Add generous padding to ensure hexagons at edges are fully visible
-  const PADDING = {
-    TOP: Math.round(HEX_HEIGHT * 0.5),
-    LEFT: Math.round(HEX_WIDTH * 0.5),
-    RIGHT: Math.round(HEX_WIDTH * 0.5),
-    BOTTOM: Math.round(HEX_HEIGHT * 0.5),
-  };
+    return getColorInfo({ param, value }).hex as NonNullable<Color['hex']>;
+  }
 
-  // Generate a honeycomb pattern in a corner-to-corner, back-and-forth pattern
-  function generateCornerToCornerPositions() {
-    // Calculate usable area
-    const usableWidth = width - PADDING.LEFT - PADDING.RIGHT;
-    const usableHeight = height - PADDING.TOP - PADDING.BOTTOM;
-
-    // Calculate how many hexagons can fit horizontally and vertically
-    const cols = Math.max(1, Math.floor(usableWidth / HEX_HORIZ_SPACING));
-    const rows = Math.max(
-      1,
-      Math.floor(usableHeight / (HEX_VERT_SPACING * 0.75)),
+  runPreview(() => {
+    const sections: HexagonsSection[] = [];
+    const { roundTargetIds } = hexagonsPreview;
+    const additionalIndexes = new Set(
+      hexagonsPreview.additionalHexagonsIndexes,
     );
+    let dayIndex = 0;
 
-    // Calculate all positions in a grid
-    const grid = [];
-    for (let row = 0; row < rows; row++) {
-      grid[row] = [];
-      for (let col = 0; col < cols; col++) {
-        // Offset every other row horizontally by half the spacing for perfect tiling
-        const xOffset = row % 2 === 1 ? HEX_HORIZ_SPACING / 2 : 0;
+    hexagonsPreview.positions.forEach((position, index) => {
+      const isWeatherHexagon =
+        !additionalIndexes.has(index) && dayIndex < weather.data.length;
+      const colors = roundTargetIds.map((targetId) =>
+        isWeatherHexagon
+          ? getRoundColor(dayIndex, targetId)
+          : hexagonsPreview.settings.additionalHexagonsColor,
+      );
 
-        // Calculate center position with padding
-        const centerX = PADDING.LEFT + col * HEX_HORIZ_SPACING + xOffset;
-        // Use exact vertical spacing to prevent overlap
-        const centerY = PADDING.TOP + row * (HEX_HEIGHT * 0.75);
+      sections.push({ isWeatherHexagon, dayIndex, colors, ...position });
 
-        // Convert from center position to top-left of symbol
-        const x = centerX - HEX_WIDTH / 2;
-        const y = centerY - HEX_HEIGHT / 2;
-
-        // Skip if the hexagon would go beyond the bounds
-        if (
-          centerX + HEX_WIDTH / 2 > width - PADDING.RIGHT ||
-          centerY + HEX_HEIGHT / 2 > height - PADDING.BOTTOM
-        ) {
-          grid[row][col] = null;
-          continue;
-        }
-
-        grid[row][col] = {
-          x,
-          y,
-          row,
-          col,
-        };
-      }
-    }
-
-    // Create a diagonal traversal pattern
-    const positions = [];
-    const maxSum = rows + cols - 2; // Maximum row+col sum
-
-    // First corner-to-corner pass (top-left to bottom-right)
-    for (let sum = 0; sum <= maxSum; sum++) {
-      const diagonalPositions = [];
-
-      // Collect positions on this diagonal
-      for (let r = 0; r <= sum; r++) {
-        const c = sum - r;
-        if (r < rows && c < cols && grid[r][c]) {
-          diagonalPositions.push(grid[r][c]);
-        }
-      }
-
-      // Alternate the direction of each diagonal
-      if (sum % 2 === 1) {
-        diagonalPositions.reverse();
-      }
-
-      positions.push(...diagonalPositions);
-    }
-
-    return positions;
-  }
-
-  $effect(() => {
-    project.url.href;
-    if (!weather.data.length || !gauges.allCreated.length) return;
-
-    tick().then(() => {
-      const cornerPositions = generateCornerToCornerPositions();
-      const sections = [];
-
-      // Use as many positions as we have weather data for
-      const dataLength = Math.min(cornerPositions.length, weather.data?.length);
-
-      for (let i = 0; i < dataLength; i++) {
-        const pos = cornerPositions[i];
-        let hexagon = [];
-        let day = weather.data[i];
-        let target = hexagonsPreview.settings.primaryTarget;
-        let value = day[target][preferences.value.units];
-
-        // Get the color based on the gauge ID and value
-        const color = getColorInfo({ param: target, value }).hex;
-
-        hexagon.push({
-          x: pos.x,
-          y: pos.y,
-          width: HEX_WIDTH,
-          height: HEX_HEIGHT,
-          color,
-          dayIndex: i,
-        });
-
-        sections.push(hexagon);
-      }
-
-      width = hexagonsPreview.width;
-      height = hexagonsPreview.height;
-      hexagonsPreview.sections = sections;
+      if (isWeatherHexagon) dayIndex++;
     });
-  });
 
-  // Optional debug function to visualize the grid
-  function debugGrid() {
-    const positions = generateCornerToCornerPositions();
-    console.log(`Generated ${positions.length} hexagon positions`);
-    // You could add a visual debug mode by setting a class on the SVG
-  }
+    width = hexagonsPreview.width;
+    height = hexagonsPreview.height;
+    hexagonsPreview.sections = sections;
+  });
 </script>
 
 {#if !hexagonsPreview.sections.length}
@@ -178,33 +78,44 @@ If not, see <https://www.gnu.org/licenses/>. -->
     id="preview-svg-image"
     class="mx-auto max-h-[80svh]"
     aria-hidden="true"
-    preserveAspectRatio="xMidYMid meet"
     viewBox="0 0 {width} {height}"
     bind:this={hexagonsPreview.svg}
     onclick={(e) => {
-      if (e.target.tagName !== 'use') return;
+      if (!(e.target instanceof SVGElement)) return;
+      if (e.target.tagName !== 'polygon') return;
       const group = e.target.parentElement;
-      if (group.tagName !== 'g') return;
+      if (!group || group.tagName !== 'g') return;
 
-      weather.currentIndex = +group.dataset.dayindex;
-
-      showPreviewImageWeatherDetails(hexagonsPreview.targets);
+      const dayIndex = group.dataset.dayindex;
+      if (group.dataset.isweatherhexagon === 'true' && dayIndex !== undefined) {
+        weather.currentIndex = +dayIndex;
+        showPreviewImageWeatherDetails(hexagonsPreview.targets);
+      }
     }}
   >
-    <defs xmlns="http://www.w3.org/2000/svg">
-      <symbol id="hex" viewBox="0 0 100 86.6">
-        <polygon
-          points="50,0 100,25 100,75 50,100 0,75 0,25"
-          stroke="currentColor"
-          stroke-width="0.5"
-          fill="inherit"
-        />
-      </symbol>
-    </defs>
-    {#each hexagonsPreview.sections as section}
-      <g data-dayindex={section[0].dayIndex}>
-        {#each section as { x, y, width, height, color }}
-          <use href="#hex" {x} {y} {width} {height} fill={color} />
+    {#each hexagonsPreview.sections as { isWeatherHexagon, dayIndex, colors, x, y }, index (index)}
+      <g data-isweatherhexagon={isWeatherHexagon} data-dayindex={dayIndex}>
+        {#if hexagonsPreview.settings.joinStitches > 0}
+          <!-- The border is a larger hexagon behind the day's hexagon -->
+          <polygon
+            points={hexagonsPreview.getPoints(
+              x,
+              y,
+              hexagonsPreview.outerRadius,
+            )}
+            fill={hexagonsPreview.settings.joinColor}
+          />
+        {/if}
+        <!-- Rounds are drawn from the outside in, so each one covers the center of the previous -->
+        {#each [...colors].reverse() as color, reversedRound (reversedRound)}
+          <polygon
+            points={hexagonsPreview.getPoints(
+              x,
+              y,
+              hexagonsPreview.getRoundRadius(colors.length - 1 - reversedRound),
+            )}
+            fill={color}
+          />
         {/each}
       </g>
     {/each}
