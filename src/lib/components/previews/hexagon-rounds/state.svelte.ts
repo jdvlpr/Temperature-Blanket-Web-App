@@ -22,6 +22,11 @@ import type { BasePreviewSettings } from '$lib/types/preview-types';
 import type { Color } from '$lib/types/yarn-types';
 import { setTargets } from '$lib/utils/preview-utils.svelte';
 import { chunkArray } from '$lib/utils/weather-utils.svelte';
+import {
+  resolveExtraColors,
+  type ExtraColorDetails,
+  type PreviewExtraColor,
+} from '$lib/utils/extra-colors-utils';
 import chroma from 'chroma-js';
 import { untrack } from 'svelte';
 import Preview from './Preview.svelte';
@@ -237,6 +242,26 @@ export class HexagonRoundsPreviewClass {
       .map((n) => n.targets)
       .flat()
       .filter((n) => this.settings.selectedTarget.includes(n.id)),
+  );
+
+  // *******************
+  // Extra (non-gauge) colors and their yarn details
+  // *******************
+
+  extraColorDetails = $state<ExtraColorDetails>({});
+
+  extraColors = $derived<PreviewExtraColor[]>(
+    resolveExtraColors(
+      [
+        {
+          role: 'accent',
+          label: 'Accent Color (for borders and additional rounds)',
+          hex: this.settings.additionalRoundsColor,
+          inUse: true,
+        },
+      ],
+      this.extraColorDetails,
+    ),
   );
 
   // *******************

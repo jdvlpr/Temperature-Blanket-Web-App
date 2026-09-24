@@ -14,6 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
+  import { withExtraColorDetails } from '$lib/utils/extra-colors-utils';
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
   import ToggleSwitchGroup from '$lib/components/buttons/ToggleSwitchGroup.svelte';
   import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
@@ -160,9 +161,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
         component: {
           ref: ChangeColor,
           props: {
-            hex: twelvePointStarPreview.settings.additionalRoundsColor,
-            onChangeColor: ({ hex }: { hex: NonNullable<Color['hex']> }) => {
-              twelvePointStarPreview.settings.additionalRoundsColor = hex;
+            ...withExtraColorDetails(
+              twelvePointStarPreview.settings.additionalRoundsColor,
+              twelvePointStarPreview.extraColorDetails.accent,
+            ),
+            onChangeColor: (color: Color) => {
+              twelvePointStarPreview.settings.additionalRoundsColor =
+                color.hex as NonNullable<Color['hex']>;
+              twelvePointStarPreview.extraColorDetails.accent = color;
               dialog.close();
             },
           },
@@ -211,9 +217,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
           component: {
             ref: ChangeColor,
             props: {
-              hex: twelvePointStarPreview.settings.borderColor,
-              onChangeColor: ({ hex }: { hex: NonNullable<Color['hex']> }) => {
-                twelvePointStarPreview.settings.borderColor = hex;
+              ...withExtraColorDetails(
+                twelvePointStarPreview.settings.borderColor,
+                twelvePointStarPreview.extraColorDetails.border,
+              ),
+              onChangeColor: (color: Color) => {
+                twelvePointStarPreview.settings.borderColor =
+                  color.hex as NonNullable<Color['hex']>;
+                twelvePointStarPreview.extraColorDetails.border = color;
                 dialog.close();
               },
             },

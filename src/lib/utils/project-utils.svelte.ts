@@ -14,6 +14,7 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { MOON_PHASE_NAMES } from '$lib/constants/weather-constants';
+import pdfExtraColors from '$lib/features/pdf/sections/extra-colors.svelte';
 import pdfGauges from '$lib/features/pdf/sections/gauges.svelte';
 import pdfWeatherData from '$lib/features/pdf/sections/weather-data.svelte';
 import {
@@ -61,8 +62,12 @@ export const downloadPDF = async () => {
           .then((module) => {
             const JsPDF = module.default;
             const doc = new JsPDF();
-            const totalPages = pdfGauges.pages() + pdfWeatherData.pages();
+            const totalPages =
+              pdfGauges.pages() +
+              pdfExtraColors.pages() +
+              pdfWeatherData.pages();
             pdfGauges.create(doc, totalPages);
+            pdfExtraColors.create(doc, totalPages);
             pdfWeatherData.create(doc, totalPages);
             // Remove blank first page, ugly hack
             doc.deletePage(1);

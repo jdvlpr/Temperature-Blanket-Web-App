@@ -14,6 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
+  import { withExtraColorDetails } from '$lib/utils/extra-colors-utils';
   import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
   import HexagonDesigner from '$lib/components/modals/HexagonDesigner.svelte';
   import PreviewInfo from '$lib/components/PreviewInfo.svelte';
@@ -176,9 +177,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
           component: {
             ref: ChangeColor,
             props: {
-              hex: hexagonsPreview.settings.additionalHexagonsColor,
-              onChangeColor: ({ hex }: { hex: NonNullable<Color['hex']> }) => {
-                hexagonsPreview.settings.additionalHexagonsColor = hex;
+              ...withExtraColorDetails(
+                hexagonsPreview.settings.additionalHexagonsColor,
+                hexagonsPreview.extraColorDetails.accent,
+              ),
+              onChangeColor: (color: Color) => {
+                hexagonsPreview.settings.additionalHexagonsColor =
+                  color.hex as NonNullable<Color['hex']>;
+                hexagonsPreview.extraColorDetails.accent = color;
                 dialog.close();
               },
             },
@@ -224,9 +230,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
           component: {
             ref: ChangeColor,
             props: {
-              hex: hexagonsPreview.settings.joinColor,
-              onChangeColor: ({ hex }: { hex: NonNullable<Color['hex']> }) => {
-                hexagonsPreview.settings.joinColor = hex;
+              ...withExtraColorDetails(
+                hexagonsPreview.settings.joinColor,
+                hexagonsPreview.extraColorDetails.border,
+              ),
+              onChangeColor: (color: Color) => {
+                hexagonsPreview.settings.joinColor = color.hex as NonNullable<
+                  Color['hex']
+                >;
+                hexagonsPreview.extraColorDetails.border = color;
                 dialog.close();
               },
             },

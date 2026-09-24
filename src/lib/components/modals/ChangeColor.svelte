@@ -140,19 +140,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 
   function _onOkay() {
-    if (index !== null)
-      onChangeColor({
-        index,
-        hex,
-        name,
-        brandId,
-        yarnId,
-        brandName,
-        yarnName,
-        variant_href,
-        affiliate_variant_href,
-      });
-    else onChangeColor({ hex });
+    const color = {
+      hex,
+      name,
+      brandId,
+      yarnId,
+      brandName,
+      yarnName,
+      variant_href,
+      affiliate_variant_href,
+    };
+    if (index !== null) onChangeColor({ index, ...color });
+    else onChangeColor(color);
   }
 </script>
 

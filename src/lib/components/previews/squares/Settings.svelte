@@ -14,6 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
+  import { withExtraColorDetails } from '$lib/utils/extra-colors-utils';
   import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
   import SquareDesigner from '$lib/components/modals/SquareDesigner.svelte';
   import PreviewInfo from '$lib/components/PreviewInfo.svelte';
@@ -176,9 +177,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
           component: {
             ref: ChangeColor,
             props: {
-              hex: squaresPreview.settings.additionalSquaresColor,
-              onChangeColor: ({ hex }: { hex: NonNullable<Color['hex']> }) => {
-                squaresPreview.settings.additionalSquaresColor = hex;
+              ...withExtraColorDetails(
+                squaresPreview.settings.additionalSquaresColor,
+                squaresPreview.extraColorDetails.accent,
+              ),
+              onChangeColor: (color: Color) => {
+                squaresPreview.settings.additionalSquaresColor =
+                  color.hex as NonNullable<Color['hex']>;
+                squaresPreview.extraColorDetails.accent = color;
                 dialog.close();
               },
             },
@@ -224,9 +230,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
           component: {
             ref: ChangeColor,
             props: {
-              hex: squaresPreview.settings.joinColor,
-              onChangeColor: ({ hex }: { hex: NonNullable<Color['hex']> }) => {
-                squaresPreview.settings.joinColor = hex;
+              ...withExtraColorDetails(
+                squaresPreview.settings.joinColor,
+                squaresPreview.extraColorDetails.border,
+              ),
+              onChangeColor: (color: Color) => {
+                squaresPreview.settings.joinColor = color.hex as NonNullable<
+                  Color['hex']
+                >;
+                squaresPreview.extraColorDetails.border = color;
                 dialog.close();
               },
             },

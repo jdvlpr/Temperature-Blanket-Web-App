@@ -14,6 +14,10 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import type { WeatherParam } from '$lib/types/gauge-types';
+import {
+  extraColorsToUrlHash,
+  type PreviewExtraColor,
+} from '$lib/utils/extra-colors-utils';
 import type { TwelvePointStarPreviewClass } from '$lib/components/previews/12-point-star/state.svelte';
 import type { CalendarPreviewClass } from '$lib/components/previews/calendar/state.svelte';
 import type { ChevronsPreviewClass } from '$lib/components/previews/chevrons/state.svelte';
@@ -254,6 +258,13 @@ class PreviewsState {
   showInformation = $state(false);
 
   hash = $derived(this.active?.hash || '');
+
+  // Accent/border colors (and their yarn details) used by the active preview
+  extraColors = $derived<PreviewExtraColor[]>(
+    this.active && 'extraColors' in this.active ? this.active.extraColors : [],
+  );
+
+  extraColorsHash = $derived(extraColorsToUrlHash(this.extraColors));
 
   // Loads (if needed) and activates the preview with the given id. Manifest
   // entries are dynamically imported on first load and swapped in place for

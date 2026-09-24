@@ -26,6 +26,10 @@ import { exists } from '$lib/utils/other-utils';
 import { getProjectParametersFromURLHash } from '$lib/utils/project-utils.svelte';
 import { parseGaugeURLHash } from '$lib/utils/load-project-utils.svelte';
 import { seasonsFromUrlHash } from '$lib/utils/seasons-utils.svelte';
+import {
+  EXTRA_COLORS_HASH_KEY,
+  extraColorDetailsFromUrlHash,
+} from '$lib/utils/extra-colors-utils';
 
 export const loadFromHistory = async ({
   action,
@@ -65,6 +69,19 @@ export const loadFromHistory = async ({
         previewChanged = true;
       }
     }
+  }
+
+  // Change the preview's accent/border color yarn details (the `x` param)
+  const oldExtraColors = oldParams[EXTRA_COLORS_HASH_KEY]?.value ?? '';
+  const newExtraColors = newParams[EXTRA_COLORS_HASH_KEY]?.value ?? '';
+  if (
+    (previewChanged || oldExtraColors !== newExtraColors) &&
+    previews.active &&
+    'extraColorDetails' in previews.active
+  ) {
+    previews.active.extraColorDetails =
+      extraColorDetailsFromUrlHash(newExtraColors);
+    if (oldExtraColors !== newExtraColors) previewChanged = true;
   }
 
   // Change Weather Grouping

@@ -149,6 +149,29 @@ describe('loadFromHistory - preview switching', () => {
     expect(mockProject.history.redo).toHaveBeenCalledOnce();
     expect(mockPreviews.load).not.toHaveBeenCalled();
   });
+
+  it('restores accent/border color details when only the x param changed', async () => {
+    mockPreviews.active = {
+      id: 'clnr',
+      extraColorDetails: { accent: { hex: '#000000', name: 'Old' } },
+    };
+    mockProject.history.current = '&clnr=1&x=a000000';
+    mockProject.history.previous = '&clnr=1&x=af0f3f3!be8e3e2';
+
+    await loadFromHistory({ action: 'Undo' });
+
+    expect(mockPreviews.load).not.toHaveBeenCalled();
+    expect(mockPreviews.active.extraColorDetails).toEqual({
+      accent: { hex: '#f0f3f3' },
+      border: { hex: '#e8e3e2' },
+    });
+    expect(mockToast.trigger).toHaveBeenCalledExactlyOnceWith(
+      expect.objectContaining({
+        message: expect.stringContaining('Undo: Preview'),
+      }),
+    );
+    mockPreviews.active = undefined;
+  });
 });
 
 describe('updateHistory', () => {

@@ -14,6 +14,8 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
+  import { withExtraColorDetails } from '$lib/utils/extra-colors-utils';
+  import type { Color } from '$lib/types/yarn-types';
   import NumberInputButton from '$lib/components/buttons/NumberInputButton.svelte';
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
   import ToggleSwitchGroup from '$lib/components/buttons/ToggleSwitchGroup.svelte';
@@ -178,9 +180,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
           component: {
             ref: ChangeColor,
             props: {
-              hex: rowsPreview.settings.extrasColor,
-              onChangeColor: ({ hex }: any) => {
-                rowsPreview.settings.extrasColor = hex;
+              ...withExtraColorDetails(
+                rowsPreview.settings.extrasColor,
+                rowsPreview.extraColorDetails.accent,
+              ),
+              onChangeColor: (color: Color) => {
+                rowsPreview.settings.extrasColor = color.hex as NonNullable<
+                  Color['hex']
+                >;
+                rowsPreview.extraColorDetails.accent = color;
                 dialog.close();
               },
             },

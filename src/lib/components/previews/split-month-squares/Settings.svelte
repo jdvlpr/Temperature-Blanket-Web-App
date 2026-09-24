@@ -14,6 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
+  import { withExtraColorDetails } from '$lib/utils/extra-colors-utils';
   import NumberInputButton from '$lib/components/buttons/NumberInputButton.svelte';
   import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
   import PreviewInfo from '$lib/components/PreviewInfo.svelte';
@@ -107,9 +108,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
         component: {
           ref: ChangeColor,
           props: {
-            hex: splitMonthSquaresPreview.settings.additionalRoundsColor,
-            onChangeColor: ({ hex }: { hex: NonNullable<Color['hex']> }) => {
-              splitMonthSquaresPreview.settings.additionalRoundsColor = hex;
+            ...withExtraColorDetails(
+              splitMonthSquaresPreview.settings.additionalRoundsColor,
+              splitMonthSquaresPreview.extraColorDetails.accent,
+            ),
+            onChangeColor: (color: Color) => {
+              splitMonthSquaresPreview.settings.additionalRoundsColor =
+                color.hex as NonNullable<Color['hex']>;
+              splitMonthSquaresPreview.extraColorDetails.accent = color;
               dialog.close();
             },
           },

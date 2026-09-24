@@ -14,6 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
+  import { withExtraColorDetails } from '$lib/utils/extra-colors-utils';
   import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
   import PreviewInfo from '$lib/components/PreviewInfo.svelte';
   import SpanYarnColorSelectIcon from '$lib/components/SpanYarnColorSelectIcon.svelte';
@@ -204,9 +205,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
         component: {
           ref: ChangeColor,
           props: {
-            hex: hexagonRoundsPreview.settings.additionalRoundsColor,
-            onChangeColor: ({ hex }: { hex: NonNullable<Color['hex']> }) => {
-              hexagonRoundsPreview.settings.additionalRoundsColor = hex;
+            ...withExtraColorDetails(
+              hexagonRoundsPreview.settings.additionalRoundsColor,
+              hexagonRoundsPreview.extraColorDetails.accent,
+            ),
+            onChangeColor: (color: Color) => {
+              hexagonRoundsPreview.settings.additionalRoundsColor =
+                color.hex as NonNullable<Color['hex']>;
+              hexagonRoundsPreview.extraColorDetails.accent = color;
               dialog.close();
             },
           },

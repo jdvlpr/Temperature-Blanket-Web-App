@@ -21,6 +21,11 @@ import {
 } from '$lib/utils/preview-utils.svelte';
 import { getMiddleValueOfArray } from '$lib/utils/number-utils';
 import { getWeatherTargets } from '$lib/utils/weather-utils.svelte';
+import {
+  resolveExtraColors,
+  type ExtraColorDetails,
+  type PreviewExtraColor,
+} from '$lib/utils/extra-colors-utils';
 import chroma from 'chroma-js';
 
 interface CalendarPreviewSettings extends BasePreviewSettings {
@@ -262,6 +267,32 @@ export class CalendarPreviewClass {
   // *******************
   // URL hash derived from settings
   // *******************
+
+  // *******************
+  // Extra (non-gauge) colors and their yarn details
+  // *******************
+
+  extraColorDetails = $state<ExtraColorDetails>({});
+
+  extraColors = $derived<PreviewExtraColor[]>(
+    resolveExtraColors(
+      [
+        {
+          role: 'accent',
+          label: 'Accent Color (for additional squares)',
+          hex: this.settings.additionalSquaresColor,
+          inUse: true,
+        },
+        {
+          role: 'border',
+          label: 'Border Color',
+          hex: this.settings.joinColor,
+          inUse: this.settings.joinStitches > 0,
+        },
+      ],
+      this.extraColorDetails,
+    ),
+  );
 
   hash = $derived.by(() => {
     let hash = '&';

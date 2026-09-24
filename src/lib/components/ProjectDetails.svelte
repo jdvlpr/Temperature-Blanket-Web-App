@@ -17,6 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ColorPalette from '$lib/components/ColorPalette.svelte';
   import { MAXIMUM_YARN_DETAILS_DESCRIPTIONS } from '$lib/constants/color-constants';
   import { getColorsFromInput } from '$lib/utils/color-utils';
+  import { extraColorsFromProjectHref } from '$lib/utils/extra-colors-utils';
   import { pluralize } from '$lib/utils/string-utils';
   import type { Color } from '$lib/types/yarn-types';
   import { Trash2Icon } from '@lucide/svelte';
@@ -38,6 +39,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     getColorsFromInput({ string: href }),
   );
 
+  // The preview's accent/border colors (only in projects saved after the
+  // `x` param was added)
+  const extraColors: Color[] = $derived(
+    extraColorsFromProjectHref(href).map((extra) => extra.color),
+  );
+
   function getProjectDescription({
     colors,
     date,
@@ -50,9 +57,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     schemeName += `<span class="inline-flex items-center justify-center gap-1"> Saved ${date}</span>`;
     if (isCustomWeatherData)
       schemeName += `<span class="">Custom Weather Data</span>`;
-    schemeName += `<span class="">${colors.length} ${pluralize('color', colors.length)}</span>`;
+    const colorsCount = colors.length + extraColors.length;
+    schemeName += `<span class="">${colorsCount} ${pluralize('color', colorsCount)}</span>`;
 
-    let yarnDetails = colors
+    let yarnDetails = [...colors, ...extraColors]
       .filter((color) => color?.brandId && color?.yarnId)
       .map((color) => {
         return (color.brandName ?? '') + ' - ' + (color.yarnName ?? '');

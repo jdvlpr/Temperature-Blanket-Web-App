@@ -15,6 +15,11 @@ import {
   setTargets,
 } from '$lib/utils/preview-utils.svelte';
 import { getWeatherTargets } from '$lib/utils/weather-utils.svelte';
+import {
+  resolveExtraColors,
+  type ExtraColorDetails,
+  type PreviewExtraColor,
+} from '$lib/utils/extra-colors-utils';
 import chroma from 'chroma-js';
 import Preview from './Preview.svelte';
 import Settings from './Settings.svelte';
@@ -202,6 +207,34 @@ export class SquaresPreviewClass {
         {},
       ),
     }),
+  );
+
+  // *******************
+  // Extra (non-gauge) colors and their yarn details
+  // *******************
+
+  extraColorDetails = $state<ExtraColorDetails>({});
+
+  extraColors = $derived<PreviewExtraColor[]>(
+    resolveExtraColors(
+      [
+        {
+          role: 'accent',
+          label: 'Accent Color (for additional squares)',
+          hex: this.settings.additionalSquaresColor,
+          inUse:
+            this.additionalSquaresIndexes.length > 0 ||
+            this.settings.squaresBetweenMonthsCount > 0,
+        },
+        {
+          role: 'border',
+          label: 'Border Color',
+          hex: this.settings.joinColor,
+          inUse: this.settings.joinStitches > 0,
+        },
+      ],
+      this.extraColorDetails,
+    ),
   );
 
   // *******************

@@ -41,6 +41,11 @@ import {
   formatLocationLabel,
 } from '$lib/utils/location-utils.svelte';
 import { getColorsFromInput } from '$lib/utils/color-utils';
+import {
+  EXTRA_COLORS_HASH_KEY,
+  extraColorDetailsFromUrlHash,
+  extraColorsHaveYarnDetails,
+} from '$lib/utils/extra-colors-utils';
 import { getProjectParametersFromURLHash } from '$lib/utils/project-utils.svelte';
 import { seasonsFromUrlHash } from '$lib/utils/seasons-utils.svelte';
 import type {
@@ -92,7 +97,8 @@ export const loadProjectFromURL = async (
   if (exists(params.l)) await parseLocationURLHash(params.l.value);
 
   // Load Gauges
-  if (gaugeParamsHaveYarnDetails(params)) await ensureYarnData();
+  if (gaugeParamsHaveYarnDetails(params) || extraColorsHaveYarnDetails(params))
+    await ensureYarnData();
 
   allGaugesAttributes.forEach((gauge) => {
     if (!exists(params[gauge.id])) return;
@@ -117,7 +123,16 @@ export const loadProjectFromURL = async (
   const previewEntry = previews.all.find((p) => exists(params[p.id]));
   if (previewEntry) {
     const previewInstance = await previews.load(previewEntry.id);
-    if (previewInstance) previewInstance.load(params[previewEntry.id].value);
+    if (previewInstance) {
+      previewInstance.load(params[previewEntry.id].value);
+      // Yarn details for the preview's accent/border colors (added in the `x` param)
+      if ('extraColorDetails' in previewInstance)
+        previewInstance.extraColorDetails = exists(
+          params[EXTRA_COLORS_HASH_KEY],
+        )
+          ? extraColorDetailsFromUrlHash(params[EXTRA_COLORS_HASH_KEY].value)
+          : {};
+    }
   }
 
   // Load Weather Source (added in v1.823)

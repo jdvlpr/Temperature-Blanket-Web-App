@@ -35,6 +35,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     gaugeParamsHaveYarnDetails,
     parseGaugeURLHash,
   } from '$lib/utils/load-project-utils.svelte';
+  import {
+    EXTRA_COLORS_HASH_KEY,
+    extraColorsFromUrlHash,
+    extraColorsHaveYarnDetails,
+  } from '$lib/utils/extra-colors-utils';
   import { exists } from '$lib/utils/other-utils';
   import {
     getProjectParametersFromURLHash,
@@ -47,7 +52,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     InfoIcon,
     NotebookPenIcon,
     ShoppingCartIcon,
-    SwatchBookIcon
+    SwatchBookIcon,
   } from '@lucide/svelte';
   import {
     buildGlobeLinkFromLocationsMeta,
@@ -92,10 +97,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
     gauges.flatMap((item) => (item.colors ? item.colors : [])),
   );
 
-  // Warm the yarn dataset only when this project's gauges reference yarn
-  // details; `gauges` above self-heals once the data resolves.
+  // The preview's accent/border colors, from the `x` param (only in projects
+  // saved after it was added). Self-heals like `gauges` once yarn data loads.
+  let extraColors = $derived(
+    browser
+      ? extraColorsFromUrlHash(params[EXTRA_COLORS_HASH_KEY]?.value ?? '')
+      : [],
+  );
+
+  // Warm the yarn dataset only when this project's gauges or extra colors
+  // reference yarn details; `gauges` above self-heals once the data resolves.
   $effect(() => {
-    if (gaugeParamsHaveYarnDetails(params)) ensureYarnData();
+    if (
+      gaugeParamsHaveYarnDetails(params) ||
+      extraColorsHaveYarnDetails(params)
+    )
+      ensureYarnData();
   });
 
   function openAbout() {
@@ -125,7 +142,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
       colors: Array<{ name: any; hex: any }>;
     }> = [];
 
-    flatColors.forEach((color: Color) => {
+    const extras = extraColors.map((extra) => extra.color);
+    [...flatColors, ...extras].forEach((color: Color, colorIndex: number) => {
+      const isExtra = colorIndex >= flatColors.length;
       const { brandId, yarnId, brandName, yarnName, name, hex, yarnWeightId } =
         color;
       const existingYarn = yarns.find(
@@ -145,6 +164,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
         (item) => item.brandId === brandId && item.yarnId === yarnId,
       );
       if (yarnToUpdate) {
+        // Don't list an accent/border colorway twice if a gauge already uses it
+        if (isExtra && yarnToUpdate.colors.some((c) => c.hex === hex)) return;
         yarnToUpdate.colors.push({ name, hex });
       }
     });
@@ -345,7 +366,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                               }}
                               href="/yarn"
                             >
-                                <SwatchBookIcon />
+                              <SwatchBookIcon />
 
                               Open in Yarn Palette Creator
                               <svg
@@ -473,6 +494,60 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         </div>
                       {/each}
                     {/key}
+                  {/if}
+                  {#if extraColors.length}
+                    <div class="flex flex-col">
+                      <p class="text-lg font-semibold">Additional Colors</p>
+                      <div
+                        class="rounded-container mt-4 mb-2 overflow-hidden xl:mb-4 {preferences
+                          .value.layout === 'grid'
+                          ? 'grid grid-cols-2 gap-1 md:grid-cols-3 xl:grid-cols-4'
+                          : 'flex flex-col'}"
+                      >
+                        {#each extraColors as { role, label, color: { hex, name, yarnName, brandName, affiliate_variant_href } } (role)}
+                          <div
+                            class="flex flex-wrap items-center justify-around gap-2 p-2 {preferences
+                              .value.layout === 'grid'
+                              ? 'rounded-container flex-auto basis-1/3 sm:basis-1/4 md:basis-1/5'
+                              : ''}"
+                            style="background-color:{hex};color:{getTextColor(
+                              hex ?? '#000000',
+                            )}"
+                          >
+                            <p class="text-sm">{label}</p>
+                            {#if affiliate_variant_href}
+                              <a
+                                class="btn hover:preset-tonal-surface flex flex-wrap items-center justify-start"
+                                href={affiliate_variant_href}
+                                target="_blank"
+                                rel="noreferrer nofollow"
+                              >
+                                <ShoppingCartIcon />
+                                <span class="underline">Buy</span></a
+                              >
+                            {/if}
+                            {#if brandName && yarnName}
+                              <div
+                                class="flex flex-col items-start justify-start text-left text-wrap whitespace-normal"
+                              >
+                                <span class="text-xs"
+                                  >{brandName}
+                                  -
+                                  {yarnName}</span
+                                >
+                                <span
+                                  class="flex flex-wrap items-start justify-start text-lg leading-tight"
+                                >
+                                  {name}
+                                </span>
+                              </div>
+                            {:else}
+                              {hex}
+                            {/if}
+                          </div>
+                        {/each}
+                      </div>
+                    </div>
                   {/if}
                 </div>
               </div>

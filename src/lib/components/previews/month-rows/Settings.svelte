@@ -14,6 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
+  import { withExtraColorDetails } from '$lib/utils/extra-colors-utils';
   import NumberInputButton from '$lib/components/buttons/NumberInputButton.svelte';
   import ToggleSwitchGroup from '$lib/components/buttons/ToggleSwitchGroup.svelte';
   import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
@@ -120,9 +121,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
           component: {
             ref: ChangeColor,
             props: {
-              hex: monthRowsPreview.settings.borderColor,
-              onChangeColor: ({ hex }: { hex: NonNullable<Color['hex']> }) => {
-                monthRowsPreview.settings.borderColor = hex;
+              ...withExtraColorDetails(
+                monthRowsPreview.settings.borderColor,
+                monthRowsPreview.extraColorDetails.border,
+              ),
+              onChangeColor: (color: Color) => {
+                monthRowsPreview.settings.borderColor =
+                  color.hex as NonNullable<Color['hex']>;
+                monthRowsPreview.extraColorDetails.border = color;
                 dialog.close();
               },
             },
@@ -163,9 +169,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
         component: {
           ref: ChangeColor,
           props: {
-            hex: monthRowsPreview.settings.extrasColor,
-            onChangeColor: ({ hex }: { hex: NonNullable<Color['hex']> }) => {
-              monthRowsPreview.settings.extrasColor = hex;
+            ...withExtraColorDetails(
+              monthRowsPreview.settings.extrasColor,
+              monthRowsPreview.extraColorDetails.accent,
+            ),
+            onChangeColor: (color: Color) => {
+              monthRowsPreview.settings.extrasColor = color.hex as NonNullable<
+                Color['hex']
+              >;
+              monthRowsPreview.extraColorDetails.accent = color;
               dialog.close();
             },
           },

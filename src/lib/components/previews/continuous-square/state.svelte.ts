@@ -8,6 +8,11 @@ import type { WeatherParam } from '$lib/types/gauge-types';
 import { displayNumber } from '$lib/utils/number-utils';
 import { getWeatherTargets } from '$lib/utils/weather-utils.svelte';
 import { setTargets } from '$lib/utils/preview-utils.svelte';
+import {
+  resolveExtraColors,
+  type ExtraColorDetails,
+  type PreviewExtraColor,
+} from '$lib/utils/extra-colors-utils';
 import chroma from 'chroma-js';
 import Preview from './Preview.svelte';
 import Settings from './Settings.svelte';
@@ -136,6 +141,26 @@ export class ContinuousSquarePreviewClass {
     getWeatherTargets({
       weatherParameters: { [this.settings.selectedTarget]: true },
     }),
+  );
+
+  // *******************
+  // Extra (non-gauge) colors and their yarn details
+  // *******************
+
+  extraColorDetails = $state<ExtraColorDetails>({});
+
+  extraColors = $derived<PreviewExtraColor[]>(
+    resolveExtraColors(
+      [
+        {
+          role: 'accent',
+          label: 'Accent Color (for additional stitches)',
+          hex: this.settings.extrasColor,
+          inUse: !!this.countOfAdditionalStitches,
+        },
+      ],
+      this.extraColorDetails,
+    ),
   );
 
   // *******************

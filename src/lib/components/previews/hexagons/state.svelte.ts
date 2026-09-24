@@ -30,6 +30,11 @@ import {
   setTargets,
 } from '$lib/utils/preview-utils.svelte';
 import { getWeatherTargets } from '$lib/utils/weather-utils.svelte';
+import {
+  resolveExtraColors,
+  type ExtraColorDetails,
+  type PreviewExtraColor,
+} from '$lib/utils/extra-colors-utils';
 import chroma from 'chroma-js';
 import Preview from './Preview.svelte';
 import Settings from './Settings.svelte';
@@ -130,7 +135,7 @@ export class HexagonsPreviewClass {
     hexagonSize: 3,
     secondaryTargets: [],
     primaryTargetAsBackup: true,
-    columns: 17,
+    columns: 14,
     rowLayout: 'fewer',
     hexagonsAtBeginning: 0,
     hexagonsBetweenMonthsCount: 0,
@@ -279,6 +284,32 @@ export class HexagonsPreviewClass {
     }
     return points.join(' ');
   }
+
+  // *******************
+  // Extra (non-gauge) colors and their yarn details
+  // *******************
+
+  extraColorDetails = $state<ExtraColorDetails>({});
+
+  extraColors = $derived<PreviewExtraColor[]>(
+    resolveExtraColors(
+      [
+        {
+          role: 'accent',
+          label: 'Accent Color (for additional hexagons)',
+          hex: this.settings.additionalHexagonsColor,
+          inUse: this.additionalHexagonsIndexes.length > 0,
+        },
+        {
+          role: 'border',
+          label: 'Border Color',
+          hex: this.settings.joinColor,
+          inUse: this.settings.joinStitches > 0,
+        },
+      ],
+      this.extraColorDetails,
+    ),
+  );
 
   // *******************
   // URL hash derived from settings

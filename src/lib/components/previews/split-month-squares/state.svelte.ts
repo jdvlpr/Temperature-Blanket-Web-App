@@ -13,6 +13,11 @@ import {
   weatherMonthsData,
 } from '$lib/utils/preview-utils.svelte';
 import { getMiddleValueOfArray } from '$lib/utils/number-utils';
+import {
+  resolveExtraColors,
+  type ExtraColorDetails,
+  type PreviewExtraColor,
+} from '$lib/utils/extra-colors-utils';
 import chroma from 'chroma-js';
 import Preview from './Preview.svelte';
 import Settings from './Settings.svelte';
@@ -138,6 +143,26 @@ export class SplitMonthSquaresPreviewClass {
   details = $derived({ roundsPerSquare: this.roundsPerSquare });
 
   totalRounds = $derived(this.weatherMonths.length * this.roundsPerSquare);
+
+  // *******************
+  // Extra (non-gauge) colors and their yarn details
+  // *******************
+
+  extraColorDetails = $state<ExtraColorDetails>({});
+
+  extraColors = $derived<PreviewExtraColor[]>(
+    resolveExtraColors(
+      [
+        {
+          role: 'accent',
+          label: 'Accent Color (for additional rounds)',
+          hex: this.settings.additionalRoundsColor,
+          inUse: true,
+        },
+      ],
+      this.extraColorDetails,
+    ),
+  );
 
   // *******************
   // URL hash derived from settings

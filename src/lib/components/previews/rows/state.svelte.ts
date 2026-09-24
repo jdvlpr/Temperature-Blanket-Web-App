@@ -13,6 +13,11 @@ import { displayNumber } from '$lib/utils/number-utils';
 import { getColorInfo } from '$lib/utils/color-utils';
 import { setTargets } from '$lib/utils/preview-utils.svelte';
 import { getSeasonForDate } from '$lib/utils/seasons-utils.svelte';
+import {
+  resolveExtraColors,
+  type ExtraColorDetails,
+  type PreviewExtraColor,
+} from '$lib/utils/extra-colors-utils';
 import chroma from 'chroma-js';
 import Preview from './Preview.svelte';
 import Settings from './Settings.svelte';
@@ -342,6 +347,27 @@ export class RowsPreviewClass {
     }
     return rowCount;
   });
+
+  // *******************
+  // Extra (non-gauge) colors and their yarn details
+  // *******************
+
+  extraColorDetails = $state<ExtraColorDetails>({});
+
+  extraColors = $derived<PreviewExtraColor[]>(
+    resolveExtraColors(
+      [
+        {
+          role: 'accent',
+          label: 'Accent Color (for additional stitches)',
+          hex: this.settings.extrasColor,
+          inUse:
+            !!this.countOfAdditionalStitches || this.hasDatesOutOfSeasonsRanges,
+        },
+      ],
+      this.extraColorDetails,
+    ),
+  );
 
   // *******************
   // URL hash derived from settings

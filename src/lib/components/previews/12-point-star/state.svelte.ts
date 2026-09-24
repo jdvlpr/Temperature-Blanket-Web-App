@@ -21,6 +21,11 @@ import type { WeatherParam } from '$lib/types/gauge-types';
 import type { BasePreviewSettings } from '$lib/types/preview-types';
 import type { Color } from '$lib/types/yarn-types';
 import { setTargets } from '$lib/utils/preview-utils.svelte';
+import {
+  resolveExtraColors,
+  type ExtraColorDetails,
+  type PreviewExtraColor,
+} from '$lib/utils/extra-colors-utils';
 import chroma from 'chroma-js';
 import Preview from './Preview.svelte';
 import Settings from './Settings.svelte';
@@ -215,6 +220,32 @@ export class TwelvePointStarPreviewClass {
       .map((n) => n.targets)
       .flat()
       .filter((n) => this.settings.selectedTargets.includes(n.id)),
+  );
+
+  // *******************
+  // Extra (non-gauge) colors and their yarn details
+  // *******************
+
+  extraColorDetails = $state<ExtraColorDetails>({});
+
+  extraColors = $derived<PreviewExtraColor[]>(
+    resolveExtraColors(
+      [
+        {
+          role: 'accent',
+          label: 'Accent Color (for center and padding rows)',
+          hex: this.settings.additionalRoundsColor,
+          inUse: true,
+        },
+        {
+          role: 'border',
+          label: 'Border Color',
+          hex: this.settings.borderColor,
+          inUse: this.settings.showBorder,
+        },
+      ],
+      this.extraColorDetails,
+    ),
   );
 
   // *******************

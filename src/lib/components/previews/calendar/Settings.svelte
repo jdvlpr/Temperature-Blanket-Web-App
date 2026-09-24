@@ -14,6 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
+  import { withExtraColorDetails } from '$lib/utils/extra-colors-utils';
   import ToggleSwitch from '$lib/components/buttons/ToggleSwitch.svelte';
   import ChangeColor from '$lib/components/modals/ChangeColor.svelte';
   import SquareDesigner from '$lib/components/modals/SquareDesigner.svelte';
@@ -148,9 +149,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
         component: {
           ref: ChangeColor,
           props: {
-            hex: calendarPreview.settings.additionalSquaresColor,
-            onChangeColor: ({ hex }: { hex: NonNullable<Color['hex']> }) => {
-              calendarPreview.settings.additionalSquaresColor = hex;
+            ...withExtraColorDetails(
+              calendarPreview.settings.additionalSquaresColor,
+              calendarPreview.extraColorDetails.accent,
+            ),
+            onChangeColor: (color: Color) => {
+              calendarPreview.settings.additionalSquaresColor =
+                color.hex as NonNullable<Color['hex']>;
+              calendarPreview.extraColorDetails.accent = color;
               dialog.close();
             },
           },
@@ -195,9 +201,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
           component: {
             ref: ChangeColor,
             props: {
-              hex: calendarPreview.settings.joinColor,
-              onChangeColor: ({ hex }: { hex: NonNullable<Color['hex']> }) => {
-                calendarPreview.settings.joinColor = hex;
+              ...withExtraColorDetails(
+                calendarPreview.settings.joinColor,
+                calendarPreview.extraColorDetails.border,
+              ),
+              onChangeColor: (color: Color) => {
+                calendarPreview.settings.joinColor = color.hex as NonNullable<
+                  Color['hex']
+                >;
+                calendarPreview.extraColorDetails.border = color;
                 dialog.close();
               },
             },

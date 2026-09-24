@@ -118,6 +118,7 @@ class ProjectClass {
     hash += locations.urlHash;
     hash += gauges.urlHash;
     hash += previews.hash;
+    hash += previews.extraColorsHash;
     if (weather.source.name === 'Meteostat') hash += '&s=0';
     else if (weather.source.name === 'Open-Meteo') hash += '&s=1';
     if (!weather.source.useSecondary) hash += '0';
