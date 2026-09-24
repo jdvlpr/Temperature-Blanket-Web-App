@@ -161,4 +161,14 @@ User's saved projects and saved palettes are stored in the browser's IndexedDB.
 
 Since 6.4.0, a saved project and its `projects_index` entry can have an optional `name` (given on My Projects); when it's missing, the project's `title` is shown.
 
+**Project IDs** are opaque strings (`^[A-Za-z0-9-]{1,64}$`), carried in the URL as `?project=<id>`. New projects currently use the millisecond timestamp of when the app was loaded, but code must not rely on that: use the stored `createdAt` for the creation date.
+
+**`p_{id}` fields added after 5.35.0:**
+
+| Field       | Description                                                           | Version Added            |
+| ----------- | --------------------------------------------------------------------- | ------------------------ |
+| `createdAt` | When the project was first created (ISO 8601, UTC); kept across saves | unreleased (after 6.3.2) |
+
+> **Backwards compatibility:** Changes to IndexedDB are additive only. Projects without `createdAt` fall back to the time in their legacy timestamp ID, and get `createdAt` the next time they're saved.
+
 </details>
