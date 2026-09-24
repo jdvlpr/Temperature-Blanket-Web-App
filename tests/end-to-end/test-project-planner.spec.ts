@@ -103,6 +103,7 @@ test.describe('Project Planner', () => {
   test('Shared-URL preview restore and Undo/Redo (B2 async preview lazy-load)', async ({
     page,
     context,
+    baseURL,
   }) => {
     // Pre-seed the analytics-consent cookies so the app's persistent,
     // non-auto-dismissing consent toast (bottom-anchored, same collision zone as
@@ -110,8 +111,8 @@ test.describe('Project Planner', () => {
     // clicks below -- re-navigate so this take effect on the page from
     // `beforeEach`, not just pages created later in this test.
     await context.addCookies([
-      { name: '_clck', value: '1', url: 'https://localhost:4173' },
-      { name: '_clsk', value: '1', url: 'https://localhost:4173' },
+      { name: '_clck', value: '1', url: baseURL },
+      { name: '_clsk', value: '1', url: baseURL },
     ]);
     await page.goto('/');
 
