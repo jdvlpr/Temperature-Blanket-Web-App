@@ -29,6 +29,7 @@ import { project } from '$lib/state/project-state.svelte';
 import { weather } from '$lib/state/weather-state.svelte';
 import { preferences } from '$lib/storage/preferences.svelte';
 import { colorsToCode, colorsToYarnDetails } from '$lib/utils/color-utils';
+import { buildGalleryRequestBody } from '$lib/utils/gallery-upload-utils';
 import { convertTime } from '$lib/utils/unit-utils.svelte';
 import {
   dateToISO8601String,
@@ -214,12 +215,16 @@ export const sendToProjectGallery = async (img: string) => {
   };
   let message = '';
   try {
+    const body = await buildGalleryRequestBody(data);
+    if (!body) {
+      return 'Sorry, this project is too large to add to the gallery. Try a shorter date range or fewer locations.';
+    }
     const request = await fetch('/api/project', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(data),
+      body,
     });
     const response = await request.json();
 
