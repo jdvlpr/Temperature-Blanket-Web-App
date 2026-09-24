@@ -19,7 +19,10 @@ import { locations } from '$lib/state/location-state.svelte';
 import { previews } from '$lib/state/preview-state.svelte';
 import { weather } from '$lib/state/weather-state.svelte';
 import { preferences } from '$lib/storage/preferences.svelte';
-import { timestampFromLegacyProjectId } from '$lib/utils/project-id-utils';
+import {
+  newProjectId,
+  timestampFromLegacyProjectId,
+} from '$lib/utils/project-id-utils';
 import { seasonsToUrlHash } from '$lib/utils/seasons-utils.svelte';
 
 export class HistoryStateClass {
@@ -96,10 +99,10 @@ class ProjectClass {
   };
 
   // Opaque string identifying the project, carried in the URL as ?project=<id>.
-  // It's currently the millisecond timestamp of when the app was first loaded, but don't read a date from it: use createdAt.
+  // Older projects use the millisecond timestamp of when the app was first loaded; newer projects use a UUID.
   id = browser
     ? new URL(window.location.href).searchParams.get('project') ||
-      new Date().getTime()?.toString()
+      newProjectId()
     : '';
 
   // When the project was first created (ISO 8601, UTC). Kept across saves, never re-stamped.

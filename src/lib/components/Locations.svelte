@@ -21,6 +21,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { project } from '$lib/state/project-state.svelte';
   import { weather } from '$lib/state/weather-state.svelte';
   import { stringToDate } from '$lib/utils/date-utils';
+  import { newProjectId } from '$lib/utils/project-id-utils';
   import type { TISO8601DateString } from '$lib/types/weather-types';
   import { pluralize } from '$lib/utils/string-utils';
   import {
@@ -78,7 +79,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
           <span class="p-2 text-sm">
             To edit location details, reload weather data below or <a
-              href={`/?project=${new Date().getTime()?.toString()}&v=${version}#${project.url.hash.substring(
+              href={`/?project=${newProjectId()}&v=${version}#${project.url.hash.substring(
                 0,
                 project.url.hash.indexOf('l='),
               )}${project.url.hash.substring(project.url.hash.indexOf('temp'))}`}

@@ -46,6 +46,7 @@ import {
   extraColorDetailsFromUrlHash,
   extraColorsHaveYarnDetails,
 } from '$lib/utils/extra-colors-utils';
+import { newProjectId } from '$lib/utils/project-id-utils';
 import { getProjectParametersFromURLHash } from '$lib/utils/project-utils.svelte';
 import { seasonsFromUrlHash } from '$lib/utils/seasons-utils.svelte';
 import type {
@@ -410,7 +411,7 @@ export const parseGaugeURLHash = (
   // If the current url doesn't have project and version parameters, add them
   const search = window.location.search.includes('project')
     ? window.location.search
-    : `?project=${new Date().getTime()}&v=${version}`;
+    : `?project=${newProjectId()}&v=${version}`;
   const href = origin + search + '#&' + gauge.id + '=' + hashString;
 
   // Get the colors from the href string

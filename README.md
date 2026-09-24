@@ -179,7 +179,7 @@ User's saved projects are stored in the browser's IndexedDB.
 | projects_index | An index of projects the user has saved | `[]`          | array of [`LocalStorageProjectIndexItem`](src/lib/storage/projects.svelte.ts) objects    | 5.35.0        |
 | p\_{id}        | An individual saved project             | _not set_     | [`LocalStorageProject`](src/lib/storage/projects.svelte.ts) objects, keyed by project id | 5.35.0        |
 
-**Project IDs** are opaque strings (`^[A-Za-z0-9-]{1,64}$`), carried in the URL as `?project=<id>`. New projects currently use the millisecond timestamp of when the app was loaded, but code must not rely on that: use the stored `createdAt` for the creation date.
+**Project IDs** are opaque strings (`^[A-Za-z0-9-]{1,64}$`), carried in the URL as `?project=<id>`. Projects created before the change use the millisecond timestamp of when the app was loaded; newer projects use a UUID. Both stay valid.
 
 **`p_{id}` fields added after 5.35.0:**
 
