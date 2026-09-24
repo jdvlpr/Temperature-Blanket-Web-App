@@ -92,7 +92,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {#if continuousSquarePreview.details}
     {#if continuousSquarePreview.details.countOfAdditionalStitches}
       <button
-        class="btn hover:preset-tonal-surface"
+        class="btn hover:preset-tonal-surface text-left whitespace-pre-wrap"
         title="Choose a Color"
         onclick={() =>
           dialog.trigger({

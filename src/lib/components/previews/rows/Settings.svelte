@@ -172,7 +172,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   {#if rowsPreview.countOfAdditionalStitches || rowsPreview.hasDatesOutOfSeasonsRanges}
     <button
-      class="btn hover:preset-tonal-surface"
+      class="btn hover:preset-tonal-surface text-left whitespace-pre-wrap"
       title="Choose a color for any additional stitches"
       onclick={() =>
         dialog.trigger({

@@ -169,7 +169,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   {#if hexagonsPreview.details.additionalHexagons}
     <button
-      class="btn hover:preset-tonal-surface"
+      class="btn hover:preset-tonal-surface text-left whitespace-pre-wrap"
       title="Choose a color for any additional hexagons"
       onclick={() =>
         dialog.trigger({

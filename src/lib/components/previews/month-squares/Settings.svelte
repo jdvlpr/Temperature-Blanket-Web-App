@@ -97,7 +97,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     icon={SquareDashedIcon}
   />
   <button
-    class="btn hover:preset-tonal-surface"
+    class="btn hover:preset-tonal-surface text-left whitespace-pre-wrap"
     title="Choose a Color"
     onclick={() =>
       dialog.trigger({
