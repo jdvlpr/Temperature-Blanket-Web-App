@@ -13,6 +13,7 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 import { previews } from '$lib/state/preview-state.svelte';
+import { weather } from '$lib/state/weather-state.svelte';
 import type { jsPDF } from 'jspdf';
 import pdfConfig from '../pdf-config';
 import pdfFooter from './footer.svelte';
@@ -32,11 +33,14 @@ const tableWidth = 185;
  * details, after the gauge pages.
  */
 const pdfExtraColors = {
-  pages: () => (previews.extraColors.length ? 1 : 0),
+  include: () =>
+    weather.pdfOptions.additionalColors && previews.extraColors.length > 0,
+
+  pages: () => (pdfExtraColors.include() ? 1 : 0),
 
   create: (doc: jsPDF, totalPages: number) => {
+    if (!pdfExtraColors.include()) return;
     const extraColors = previews.extraColors;
-    if (!extraColors.length) return;
 
     doc.addPage();
 
@@ -64,6 +68,21 @@ const pdfExtraColors = {
 
     let l = pdfConfig.topMargin + (itemHeight + linePadding) * 2;
     extraColors.forEach(({ label, color }, i) => {
+      // Vertical Lines
+      [
+        0,
+        columns.name.position - linePadding,
+        columns.usedFor.position - linePadding,
+        tableWidth,
+      ].forEach((position) => {
+        doc.line(
+          pdfConfig.leftMargin + position,
+          pdfConfig.topMargin + linePadding * 3,
+          pdfConfig.leftMargin + position,
+          l + 5,
+        );
+      });
+
       // Item Number
       doc.setFontSize(pdfConfig.font.p);
       doc.text((i + 1).toString(), pdfConfig.leftMargin + linePadding, l);
@@ -87,13 +106,6 @@ const pdfExtraColors = {
         );
         doc.setFontSize(pdfConfig.font.mini);
         doc.text(color.name, pdfConfig.leftMargin + columns.name.position, l);
-      } else {
-        doc.setFontSize(pdfConfig.font.mini);
-        doc.text(
-          color.hex ?? '',
-          pdfConfig.leftMargin + columns.name.position,
-          l,
-        );
       }
 
       // Used For

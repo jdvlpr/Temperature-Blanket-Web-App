@@ -302,10 +302,12 @@ class WeatherClass {
     gauges: GaugeAttributes['id'][];
     showDaysInRange: boolean;
     weatherDataParams: WeatherParam['id'][];
+    additionalColors: boolean;
   } = $derived({
     gauges: ['temp'],
     showDaysInRange: showDaysInRange.value,
     weatherDataParams: ['tmax', 'tavg', 'tmin'],
+    additionalColors: true,
   });
 
   // ***************

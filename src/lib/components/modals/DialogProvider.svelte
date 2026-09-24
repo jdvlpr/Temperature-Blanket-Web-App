@@ -16,6 +16,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import { allGaugesAttributes, gauges } from '$lib/state/gauges-state.svelte';
   import { dialog } from '$lib/state/page-state.svelte';
+  import { previews } from '$lib/state/preview-state.svelte';
   import { weather } from '$lib/state/weather-state.svelte';
   import { Dialog, Portal } from '@skeletonlabs/skeleton-svelte';
   import { fly } from 'svelte/transition';
@@ -133,6 +134,26 @@ If not, see <https://www.gnu.org/licenses/>. -->
                           <p class="">Show number of days in ranges</p>
                         </label>
                       </div>
+                    </div>
+                  {/if}
+
+                  {#if previews.extraColors.length > 0}
+                    <div class="flex flex-col gap-1">
+                      <div class="flex flex-col">
+                        <p class="font-bold">Additional Colors</p>
+                        <p class="text-surface-700-300 text-xs">
+                          Accent & border colors used in the preview
+                        </p>
+                      </div>
+                      <label class="flex items-center space-x-2">
+                        <input
+                          type="checkbox"
+                          name="additionalColors"
+                          class="checkbox"
+                          bind:checked={weather.pdfOptions.additionalColors}
+                        />
+                        <p>Include additional colors page</p>
+                      </label>
                     </div>
                   {/if}
 
