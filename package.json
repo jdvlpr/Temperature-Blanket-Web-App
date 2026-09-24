@@ -15,7 +15,8 @@
     "test": "pnpm test:unit && pnpm test:integration && pnpm test:e2e",
     "test:unit": "vitest run src",
     "test:integration": "node scripts/test-integration.js",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "test:e2e:cloudflare": "playwright test --config playwright.cloudflare.config.ts"
   },
   "dependencies": {
     "@floating-ui/dom": "^1.7.6",
