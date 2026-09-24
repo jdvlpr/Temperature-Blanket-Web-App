@@ -195,30 +195,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     finishDrag(event.clientY, event.timeStamp, cancelled);
   }
 
-  /*
-   * The page itself must never move under the sheet. It has no content to
-   * scroll in this layout, but iOS still rubber-bands the document (and can
-   * scroll it to hide the address bar), which drags the fixed globe and
-   * sheet along with it.
-   */
-  $effect(() => {
-    const targets = [document.documentElement, document.body];
-    const previous = targets.map((el) => [
-      el.style.overflow,
-      el.style.overscrollBehavior,
-    ]);
-    for (const el of targets) {
-      el.style.overflow = 'hidden';
-      el.style.overscrollBehavior = 'none';
-    }
-    return () => {
-      targets.forEach((el, i) => {
-        el.style.overflow = previous[i][0];
-        el.style.overscrollBehavior = previous[i][1];
-      });
-    };
-  });
-
   function handleClick() {
     // A drag also ends in a click on the handle; only a real tap toggles.
     if (moved) {
@@ -243,6 +219,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <section
   bind:this={sectionElement}
+  data-globe-sheet
   data-sheet-snap={snap}
   class={[
     'bg-surface-50-950 fixed inset-x-0 bottom-0 z-10 flex flex-col overscroll-none rounded-t-2xl shadow-[0_-4px_24px_rgba(0,0,0,0.3)]',
@@ -275,3 +252,24 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {@render children()}
   </div>
 </section>
+
+<style>
+  /*
+   * The page itself must never move under the sheet. It has no content to
+   * scroll in this layout, but iOS still rubber-bands the document (and can
+   * scroll it to hide the address bar), which drags the fixed globe and
+   * sheet along with it.
+   *
+   * Done in CSS rather than by saving and restoring inline styles on
+   * <html>/<body>: the menu dialog (Zag) locks body scroll the same way, and
+   * when its lifetime overlapped the sheet's — opening the globe from the
+   * menu — each captured the other's lock as the "original" style and put it
+   * back afterwards, leaving every later page unscrollable on iOS. This lock
+   * simply ends when the sheet leaves the DOM.
+   */
+  :global(html:has([data-globe-sheet])),
+  :global(html:has([data-globe-sheet]) body) {
+    overflow: hidden;
+    overscroll-behavior: none;
+  }
+</style>
