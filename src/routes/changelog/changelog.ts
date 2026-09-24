@@ -26,8 +26,8 @@ import {
   RocketIcon,
   SquarePlayIcon,
   SquareTerminalIcon,
+  SwatchBookIcon,
   WrenchIcon,
-
 } from '@lucide/svelte';
 
 export const entries: ChangelogItemGroup[] = [
@@ -37,6 +37,23 @@ export const entries: ChangelogItemGroup[] = [
       {
         month: 'September',
         items: [
+          {
+            notes: [
+              {
+                icon: ICONS.design,
+                instructions:
+                  'Try it in the Preview tab of the Project Planner',
+                text: `Each hexagon represents one day. Choose the number of columns and how the rows fit together, add extra hexagons at the beginning or between months, add a border around each hexagon, and customize the hexagon design to use a different weather value for each round.`,
+                title: 'New Preview Layout: Hexagons',
+              },
+              {
+                IconComponent: SwatchBookIcon,
+                text: `When you pick a yarn colorway for a preview's accent or border color, the yarn brand and colorway are now saved with your project. They're listed on a new Additional Colors page in the PDF (you can leave it out when downloading) and on project pages in the <a href="/gallery" class="link">Project Gallery</a>.`,
+                title: 'Yarn Details for Accent & Border Colors',
+              },
+            ],
+            version: '6.3.0',
+          },
           {
             notes: [
               {

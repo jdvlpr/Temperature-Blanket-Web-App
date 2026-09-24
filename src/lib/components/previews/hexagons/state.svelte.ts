@@ -113,7 +113,7 @@ export class HexagonsPreviewClass {
     dark: './images/preview_icons/Hexagons White.png',
   });
 
-  wpTagId: number | null = null; //TODO: create in wp
+  wpTagId: number = 17;
 
   wpTagSlug = 'hexagons';
 
