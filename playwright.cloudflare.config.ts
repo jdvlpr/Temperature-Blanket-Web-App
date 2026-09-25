@@ -7,7 +7,7 @@ import type { PlaywrightTestConfig } from '@playwright/test';
 const config: PlaywrightTestConfig = {
   webServer: {
     command:
-      'pnpm build && pnpm db:migrate:local && pnpm exec wrangler pages dev .svelte-kit/cloudflare --port 8788',
+      'PUBLIC_ACCOUNTS_ENABLED=true pnpm build && pnpm db:migrate:local && pnpm exec wrangler pages dev .svelte-kit/cloudflare --port 8788',
     url: 'http://localhost:8788',
     reuseExistingServer: !process.env.CI,
     timeout: 300_000,

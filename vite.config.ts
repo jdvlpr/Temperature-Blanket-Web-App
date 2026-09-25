@@ -44,6 +44,12 @@ export default defineConfig(({ mode }) => {
         'top-level-await': true,
       },
     },
+    define: {
+      // Off unless set at build time, so builds never fail for a missing variable
+      __ACCOUNTS_ENABLED__: JSON.stringify(
+        env.PUBLIC_ACCOUNTS_ENABLED === 'true',
+      ),
+    },
     plugins: [tailwindcss(), sveltekit()],
     test: {
       include: [

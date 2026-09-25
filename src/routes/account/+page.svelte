@@ -1,0 +1,108 @@
+<!-- Copyright (c) 2024 - 2026, Thomas (https://github.com/jdvlpr)
+
+This file is part of Temperature-Blanket-Web-App.
+
+Temperature-Blanket-Web-App is free software: you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the Free Software Foundation,
+either version 3 of the License, or (at your option) any later version.
+
+Temperature-Blanket-Web-App is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
+If not, see <https://www.gnu.org/licenses/>. -->
+
+<script lang="ts">
+  import AppLogo from '$lib/components/AppLogo.svelte';
+  import AppShell from '$lib/components/AppShell.svelte';
+  import {
+    accountErrorMessage,
+    getSession,
+    signOut,
+    type AccountUser,
+  } from '$lib/accounts/client';
+  import { LoaderCircleIcon, LogOutIcon } from '@lucide/svelte';
+  import { resolve } from '$app/paths';
+  import { onMount } from 'svelte';
+
+  let status: 'loading' | 'signed-in' | 'signed-out' | 'error' =
+    $state('loading');
+  let user: AccountUser | null = $state(null);
+  let busy = $state(false);
+  let errorMessage = $state('');
+
+  onMount(async () => {
+    if (!__ACCOUNTS_ENABLED__) return;
+    try {
+      const session = await getSession();
+      user = session?.user ?? null;
+      status = user ? 'signed-in' : 'signed-out';
+    } catch (e) {
+      errorMessage = accountErrorMessage(e);
+      status = 'error';
+    }
+  });
+
+  async function handleSignOut() {
+    busy = true;
+    errorMessage = '';
+    try {
+      await signOut();
+      user = null;
+      status = 'signed-out';
+    } catch (e) {
+      errorMessage = accountErrorMessage(e);
+    } finally {
+      busy = false;
+    }
+  }
+</script>
+
+<svelte:head>
+  <title>Account</title>
+  <meta name="robots" content="noindex" />
+</svelte:head>
+
+<AppShell pageName="Account">
+  {#snippet stickyHeader()}
+    <div class="mx-auto hidden lg:inline-flex"><AppLogo /></div>
+  {/snippet}
+  {#snippet main()}
+    <main
+      class="mx-auto my-2 flex w-full max-w-(--breakpoint-sm) flex-col gap-4 px-2"
+    >
+      <h2 class="h2 text-gradient mt-2 max-lg:hidden">Account</h2>
+
+      {#if !__ACCOUNTS_ENABLED__}
+        <p>Accounts aren’t available yet.</p>
+      {:else if status === 'loading'}
+        <p class="flex items-center gap-2">
+          <LoaderCircleIcon class="animate-spin" /> Loading…
+        </p>
+      {:else if status === 'signed-in' && user}
+        <p>
+          Signed in as <strong data-testid="account-email">{user.email}</strong>
+        </p>
+        {#if errorMessage}
+          <p class="text-error-700-300" role="alert">{errorMessage}</p>
+        {/if}
+        <button
+          type="button"
+          class="btn preset-tonal-surface w-fit"
+          onclick={handleSignOut}
+          disabled={busy}
+        >
+          <LogOutIcon /> Sign out
+        </button>
+      {:else if status === 'signed-out'}
+        <p>You’re not signed in.</p>
+        <a href={resolve('/auth/sign-in')} class="btn preset-filled-primary-500 w-fit"
+          >Sign in</a
+        >
+      {:else}
+        <p class="text-error-700-300" role="alert">{errorMessage}</p>
+      {/if}
+    </main>
+  {/snippet}
+</AppShell>

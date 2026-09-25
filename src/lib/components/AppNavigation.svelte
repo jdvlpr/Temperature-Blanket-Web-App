@@ -46,6 +46,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     SquareTerminalIcon,
     SwatchBookIcon,
     TriangleAlertIcon,
+    UserIcon,
   } from '@lucide/svelte';
   import { Accordion } from '@skeletonlabs/skeleton-svelte';
   import { untrack } from 'svelte';
@@ -143,6 +144,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <HeartIcon fill="#EE6E6C" color="#EE6E6C" />
     Supporters
   </a>
+
+  {#if __ACCOUNTS_ENABLED__}
+    <a
+      href="/account"
+      class={[
+        'btn hover:preset-tonal-surface w-fit',
+        page.url.pathname === '/account' && 'preset-tonal-secondary',
+      ]}
+    >
+      <UserIcon />
+      Account
+    </a>
+  {/if}
 
   {#snippet indicator()}
     <Accordion.ItemIndicator class="">

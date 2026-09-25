@@ -53,6 +53,27 @@ It also enables dev-only routes, which return 404 anywhere `ENABLE_DEV_ROUTES` i
 - `/api/dev/platform` checks the D1 and R2 bindings.
 - `/api/dev/outbox?to=<address>` lists emails "sent" by the fake sender (`EMAIL_SENDER=dev-outbox`), which stores them in the local R2 bucket instead of sending.
 
+#### Accounts
+
+Accounts use [Better Auth](https://www.better-auth.com) (pinned to an exact version) on D1, with sign-in by emailed code; there are no passwords. Its API is `/api/auth/*`, loaded only for those requests. The UI (`/auth/sign-in`, `/account` and the Account link) is built in only when `PUBLIC_ACCOUNTS_ENABLED=true` at build time; `pnpm test:e2e:cloudflare` builds with it on.
+
+Server settings, read from the Cloudflare environment (local values are in `wrangler.jsonc`):
+
+| Variable             | Purpose                                                                                                            |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `ACCOUNTS_ENABLED`   | `"true"` turns on `/api/auth/*`; anything else returns 404                                                         |
+| `BETTER_AUTH_SECRET` | At least 32 characters; signs session cookies. Set as an encrypted secret in production                            |
+| `AUTH_ALLOWED_HOSTS` | Comma-separated hosts the app is served on, e.g. `temperature-blanket.com` or `*.<project>.pages.dev` for previews |
+| `AUTH_PROTOCOL`      | `https` (default), `http`, or `auto`                                                                               |
+| `EMAIL_SENDER`       | Which email provider sends sign-in codes; `dev-outbox` locally                                                     |
+
+After changing Better Auth plugins or options, generate the matching migration and apply it:
+
+```bash
+node scripts/generate-auth-migration.ts <name>
+pnpm db:migrate:local
+```
+
 ### ✅ Testing
 
 First build the app (to generate cloudflare \_routes.json file)

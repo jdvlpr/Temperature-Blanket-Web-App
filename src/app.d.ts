@@ -17,9 +17,16 @@ declare global {
         PROJECTS?: R2Bucket;
         ENABLE_DEV_ROUTES?: string;
         EMAIL_SENDER?: string;
+        ACCOUNTS_ENABLED?: string;
+        BETTER_AUTH_SECRET?: string;
+        AUTH_ALLOWED_HOSTS?: string;
+        AUTH_PROTOCOL?: string;
       };
     }
   }
+
+  // Whether account UI is built in: PUBLIC_ACCOUNTS_ENABLED=true at build time (vite.config.ts)
+  const __ACCOUNTS_ENABLED__: boolean;
 
   interface Window {
     clarity?: (action: string, ...args: unknown[]) => void;
