@@ -419,4 +419,45 @@ test.describe('Accounts: Ravelry (against fake-ravelry-server.mjs)', () => {
       ravelry.getByRole('button', { name: 'Link Ravelry' }),
     ).toBeVisible();
   });
+
+  test('deleting the account removes its linked sign-ins', async ({
+    page,
+    context,
+    request,
+    baseURL,
+  }) => {
+    const email = uniqueEmail('delete-linked');
+    await context.addCookies([
+      { name: 'fake_ravelry_user', value: fakeRavelryUser(), url: baseURL },
+    ]);
+    await signIn(page, request, email);
+    const ravelry = page.getByTestId('provider-ravelry');
+    await ravelry.getByRole('button', { name: 'Link Ravelry' }).click();
+    await expect(ravelry.getByText('Linked')).toBeVisible();
+
+    const userId = (
+      await (await page.request.get('/api/account/export')).json()
+    ).account.id as string;
+
+    await page.getByRole('button', { name: 'Delete account' }).click();
+    await page.getByRole('button', { name: 'Yes, delete my account' }).click();
+    await expect(page.getByText('Your account was deleted.')).toBeVisible();
+
+    const output = execFileSync('pnpm', [
+      'exec',
+      'wrangler',
+      'd1',
+      'execute',
+      'DB',
+      '--local',
+      '--json',
+      '--command',
+      `select (select count(*) from "account" where "userId" = '${userId}') as accounts, (select count(*) from "session" where "userId" = '${userId}') as sessions, (select count(*) from "user" where "id" = '${userId}') as users`,
+    ]).toString();
+    expect(JSON.parse(output)[0].results[0]).toEqual({
+      accounts: 0,
+      sessions: 0,
+      users: 0,
+    });
+  });
 });

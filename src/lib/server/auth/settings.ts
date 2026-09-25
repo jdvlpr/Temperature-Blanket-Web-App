@@ -13,10 +13,11 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
+import { emailConfigProblem, type EmailEnv } from '$lib/server/email';
 import type { AuthConfig } from './options';
 
 /** Where the app's own settings for accounts come from (platform.env on Cloudflare). */
-export type AuthEnv = {
+export type AuthEnv = EmailEnv & {
   ACCOUNTS_ENABLED?: string;
   BETTER_AUTH_SECRET?: string;
   AUTH_ALLOWED_HOSTS?: string;
@@ -79,6 +80,9 @@ export function readAuthSettings(env: AuthEnv | undefined): AuthSettings {
       status: 'misconfigured',
       reason: 'AUTH_PROTOCOL must be https, http or auto',
     };
+
+  const emailProblem = emailConfigProblem(env);
+  if (emailProblem) return { status: 'misconfigured', reason: emailProblem };
 
   // Each sign-in provider is on only when both its ID and secret are set
   const google =

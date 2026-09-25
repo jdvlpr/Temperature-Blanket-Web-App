@@ -8,6 +8,9 @@ const ready = {
   ACCOUNTS_ENABLED: 'true',
   BETTER_AUTH_SECRET: SECRET,
   AUTH_ALLOWED_HOSTS: 'temperature-blanket.com',
+  EMAIL_SENDER: 'resend',
+  RESEND_API_KEY: 're_test',
+  EMAIL_FROM: 'Temperature Blanket <sign-in@example.test>',
 };
 
 describe('readAuthSettings', () => {
@@ -33,6 +36,15 @@ describe('readAuthSettings', () => {
       expect(
         readAuthSettings({ ...ready, AUTH_ALLOWED_HOSTS: hosts }).status,
       ).toBe('misconfigured');
+  });
+
+  it('refuses to run without a way to send codes', () => {
+    expect(readAuthSettings({ ...ready, EMAIL_SENDER: undefined }).status).toBe(
+      'misconfigured',
+    );
+    expect(
+      readAuthSettings({ ...ready, EMAIL_SENDER: 'dev-outbox' }).status,
+    ).toBe('misconfigured');
   });
 
   it('rejects an unknown protocol and defaults to https', () => {

@@ -55,7 +55,11 @@ describe('getEmailSender', () => {
   it('uses the dev outbox only when configured', () => {
     const { bucket } = fakeBucket();
     const sender = getEmailSender({
-      env: { EMAIL_SENDER: 'dev-outbox', PROJECTS: bucket },
+      env: {
+        EMAIL_SENDER: 'dev-outbox',
+        ENABLE_DEV_ROUTES: 'true',
+        PROJECTS: bucket,
+      },
     } as App.Platform);
     expect(sender).toBeInstanceOf(DevOutboxSender);
   });
@@ -67,6 +71,8 @@ describe('getEmailSender', () => {
       { env: {} },
       { env: { PROJECTS: bucket } },
       { env: { EMAIL_SENDER: 'dev-outbox' } },
+      // The outbox is readable by anyone who can reach dev routes; never without them
+      { env: { EMAIL_SENDER: 'dev-outbox', PROJECTS: bucket } },
     ]) {
       try {
         getEmailSender(platform as App.Platform | undefined);

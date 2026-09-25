@@ -51,6 +51,9 @@ describe('provider settings', () => {
     ACCOUNTS_ENABLED: 'true',
     BETTER_AUTH_SECRET: 'x'.repeat(32),
     AUTH_ALLOWED_HOSTS: 'temperature-blanket.com',
+    EMAIL_SENDER: 'resend',
+    RESEND_API_KEY: 're_test',
+    EMAIL_FROM: 'Temperature Blanket <sign-in@example.test>',
   };
 
   it('turns a provider on only with both its ID and secret', () => {
