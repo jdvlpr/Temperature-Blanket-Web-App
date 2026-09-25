@@ -363,101 +363,57 @@ test.describe('Accounts: managing the account', () => {
   });
 });
 
-test.describe('Accounts: Ravelry (against fake-ravelry-server.mjs)', () => {
-  const fakeRavelryUser = () =>
-    String(100000 + Math.floor(Math.random() * 900000));
+/** Runs SQL against the local D1 database that wrangler pages dev uses. */
+function localD1(sql: string): Record<string, unknown>[] {
+  const output = execFileSync('pnpm', [
+    'exec',
+    'wrangler',
+    'd1',
+    'execute',
+    'DB',
+    '--local',
+    '--json',
+    '--command',
+    sql,
+  ]).toString();
+  return JSON.parse(output)[0].results;
+}
 
-  test('only configured providers are offered', async ({ request }) => {
+test.describe('Accounts: other sign-in methods', () => {
+  test('only configured providers are offered', async ({ page, request }) => {
+    // Google isn't configured in the e2e run
     const response = await request.get('/api/account/sign-in-options');
-    expect(await response.json()).toEqual({ google: false, ravelry: true });
-  });
-
-  test('Ravelry can’t create an account', async ({
-    page,
-    context,
-    baseURL,
-  }) => {
-    await context.addCookies([
-      { name: 'fake_ravelry_user', value: fakeRavelryUser(), url: baseURL },
-    ]);
+    expect(await response.json()).toEqual({ google: false });
     await page.goto('/auth/sign-in');
-    await page.getByRole('button', { name: 'Sign in with Ravelry' }).click();
-    await expect(page).toHaveURL(/\/auth\/sign-in\?error=signup_disabled/);
-    await expect(page.getByRole('main').getByRole('alert')).toContainText(
-      'isn’t linked to an account here yet',
-    );
-    expect(
-      (await context.cookies()).some((c) => c.name === 'tb_signed_in'),
-    ).toBe(false);
-  });
-
-  test('link Ravelry, sign in with it, then unlink', async ({
-    page,
-    context,
-    request,
-    baseURL,
-  }) => {
-    const email = uniqueEmail('ravelry');
-    await context.addCookies([
-      { name: 'fake_ravelry_user', value: fakeRavelryUser(), url: baseURL },
-    ]);
-    await signIn(page, request, email);
-
-    const ravelry = page.getByTestId('provider-ravelry');
-    await ravelry.getByRole('button', { name: 'Link Ravelry' }).click();
-    await expect(page).toHaveURL(/\/account$/);
-    await expect(ravelry.getByText('Linked')).toBeVisible();
-
-    await page.getByRole('button', { name: 'Sign out', exact: true }).click();
-    await page.goto('/auth/sign-in');
-    await page.getByRole('button', { name: 'Sign in with Ravelry' }).click();
-    // The same account, not one for the email Ravelry reports
-    await expect(page.getByTestId('account-email')).toHaveText(email);
-
-    await ravelry.getByRole('button', { name: 'Unlink Ravelry' }).click();
     await expect(
-      ravelry.getByRole('button', { name: 'Link Ravelry' }),
-    ).toBeVisible();
+      page.getByRole('button', { name: 'Continue with Google' }),
+    ).toHaveCount(0);
   });
 
   test('deleting the account removes its linked sign-ins', async ({
     page,
-    context,
     request,
-    baseURL,
   }) => {
     const email = uniqueEmail('delete-linked');
-    await context.addCookies([
-      { name: 'fake_ravelry_user', value: fakeRavelryUser(), url: baseURL },
-    ]);
     await signIn(page, request, email);
-    const ravelry = page.getByTestId('provider-ravelry');
-    await ravelry.getByRole('button', { name: 'Link Ravelry' }).click();
-    await expect(ravelry.getByText('Linked')).toBeVisible();
-
     const userId = (
       await (await page.request.get('/api/account/export')).json()
     ).account.id as string;
+
+    // A linked Google sign-in, as linking would store it (Google can't run here)
+    const now = new Date().toISOString();
+    localD1(
+      `insert into "account" ("id", "accountId", "providerId", "userId", "createdAt", "updatedAt") values ('google-${userId}', 'google-user-${userId}', 'google', '${userId}', '${now}', '${now}')`,
+    );
 
     await page.getByRole('button', { name: 'Delete account' }).click();
     await page.getByRole('button', { name: 'Yes, delete my account' }).click();
     await expect(page.getByText('Your account was deleted.')).toBeVisible();
 
-    const output = execFileSync('pnpm', [
-      'exec',
-      'wrangler',
-      'd1',
-      'execute',
-      'DB',
-      '--local',
-      '--json',
-      '--command',
-      `select (select count(*) from "account" where "userId" = '${userId}') as accounts, (select count(*) from "session" where "userId" = '${userId}') as sessions, (select count(*) from "user" where "id" = '${userId}') as users`,
-    ]).toString();
-    expect(JSON.parse(output)[0].results[0]).toEqual({
-      accounts: 0,
-      sessions: 0,
-      users: 0,
-    });
+    expect(
+      localD1(
+        `select (select count(*) from "account" where "userId" = '${userId}') as accounts, (select count(*) from "session" where "userId" = '${userId}') as sessions, (select count(*) from "user" where "id" = '${userId}') as users`,
+      )[0],
+    ).toEqual({ accounts: 0, sessions: 0, users: 0 });
   });
 });

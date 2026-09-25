@@ -26,16 +26,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { LoaderCircleIcon } from '@lucide/svelte';
   import { onMount } from 'svelte';
   import GoogleIcon from './GoogleIcon.svelte';
-  import RavelryIcon from './RavelryIcon.svelte';
 
   const PROVIDERS: { id: SignInProvider; name: string }[] = [
     { id: 'google', name: 'Google' },
-    { id: 'ravelry', name: 'Ravelry' },
   ];
 
   let available: Record<SignInProvider, boolean> = $state({
     google: false,
-    ravelry: false,
   });
   let linked: string[] = $state([]);
   let loading = $state(true);
@@ -48,7 +45,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     if (error) errorMessage = providerErrorMessage(error);
     try {
       available = await getSignInOptions();
-      if (available.google || available.ravelry)
+      if (available.google)
         linked = (await listLinkedProviders()).map((a) => a.providerId);
     } catch (e) {
       errorMessage = accountErrorMessage(e);
@@ -92,7 +89,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         class="flex flex-wrap items-center gap-2"
         data-testid={`provider-${provider.id}`}
       >
-        {#if provider.id === 'google'}<GoogleIcon />{:else}<RavelryIcon />{/if}
+        <GoogleIcon />
         <span class="font-bold">{provider.name}</span>
         {#if linked.includes(provider.id)}
           <span>Linked</span>

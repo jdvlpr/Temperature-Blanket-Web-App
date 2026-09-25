@@ -25,10 +25,6 @@ declare global {
         EMAIL_FROM?: string;
         GOOGLE_CLIENT_ID?: string;
         GOOGLE_CLIENT_SECRET?: string;
-        RAVELRY_CLIENT_ID?: string;
-        RAVELRY_CLIENT_SECRET?: string;
-        RAVELRY_OAUTH_URL?: string;
-        RAVELRY_API_URL?: string;
       };
     }
   }

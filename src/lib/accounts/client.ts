@@ -126,7 +126,7 @@ export const confirmEmailChange = (newEmail: string, newEmailCode: string) =>
 export const deleteAccount = () =>
   call<{ success: boolean }>('/delete-user', {});
 
-export type SignInProvider = 'google' | 'ravelry';
+export type SignInProvider = 'google';
 
 /** Which providers are configured on the server. */
 export async function getSignInOptions(): Promise<
@@ -138,13 +138,10 @@ export async function getSignInOptions(): Promise<
   } catch {
     // Fall through: offer email only
   }
-  return { google: false, ravelry: false };
+  return { google: false };
 }
 
-/**
- * Starts signing in with a provider; the browser leaves for its site. Ravelry
- * (a generic OAuth provider) uses the same endpoints as Google.
- */
+/** Starts signing in with a provider; the browser leaves for its site. */
 export async function signInWithProvider(provider: SignInProvider) {
   const { url } = await call<{ url: string }>('/sign-in/social', {
     provider,
@@ -172,8 +169,6 @@ export const unlinkProvider = (provider: SignInProvider) =>
 
 /** A message for the ?error= that a failed provider sign-in or link returns with. */
 export function providerErrorMessage(error: string): string {
-  if (error === 'signup_disabled')
-    return 'That Ravelry account isn’t linked to an account here yet. Sign in with your email, then link Ravelry from your account page.';
   if (error === 'account_not_linked')
     return 'An account with this email already exists. Sign in with your email, then link it from your account page.';
   if (error === 'access_denied') return 'Sign-in was canceled.';

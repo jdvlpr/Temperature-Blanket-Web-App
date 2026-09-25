@@ -48,14 +48,8 @@ const options = buildAuthOptions({
   sendSignInCode: async () => {},
   runInBackground: () => {},
   validateSchema: false,
-  // Every optional provider on, so their schema needs are included
+  // Optional providers on, so their schema needs are included
   google: { clientId: 'x', clientSecret: 'x' },
-  ravelry: {
-    clientId: 'x',
-    clientSecret: 'x',
-    oauthUrl: 'https://www.ravelry.com',
-    apiUrl: 'https://api.ravelry.com',
-  },
 });
 
 const { compileMigrations } = await getMigrations(options);

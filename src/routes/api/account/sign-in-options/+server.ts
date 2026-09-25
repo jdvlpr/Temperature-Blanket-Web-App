@@ -27,6 +27,5 @@ export const GET: RequestHandler = async ({ platform }) => {
     return json({ message: 'Not found' }, { status: 404 });
   return json({
     google: Boolean(result.settings.google),
-    ravelry: Boolean(result.settings.ravelry),
   });
 };

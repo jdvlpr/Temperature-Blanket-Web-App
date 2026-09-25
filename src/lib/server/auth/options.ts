@@ -18,12 +18,6 @@
 
 import type { BetterAuthOptions } from 'better-auth';
 import { emailOTP } from 'better-auth/plugins/email-otp';
-import { genericOAuth } from 'better-auth/plugins/generic-oauth';
-import {
-  RAVELRY_PROVIDER_ID,
-  ravelryProvider,
-  type RavelrySettings,
-} from './ravelry';
 
 export type SignInCodePurpose =
   'sign-in' | 'email-verification' | 'forget-password' | 'change-email';
@@ -46,8 +40,6 @@ export type AuthConfig = {
   validateSchema: boolean;
   /** Sign in with Google, when configured */
   google?: { clientId: string; clientSecret: string };
-  /** Sign in with Ravelry (linked accounts only), when configured */
-  ravelry?: RavelrySettings;
 };
 
 export const AUTH_BASE_PATH = '/api/auth';
@@ -75,7 +67,7 @@ export function buildAuthOptions(config: AuthConfig) {
     trustedOrigins: trustedOriginsFor(config.allowedHosts, config.protocol),
     secret: config.secret,
     database: config.database,
-    // No passwords: sign in with an emailed code, Google or Ravelry
+    // No passwords: sign in with an emailed code or Google
     emailAndPassword: { enabled: false },
     session: {
       expiresIn: SESSION_EXPIRES_DAYS * DAY,
@@ -104,14 +96,10 @@ export function buildAuthOptions(config: AuthConfig) {
       encryptOAuthTokens: true,
       accountLinking: {
         enabled: true,
-        // Linking happens while signed in, and Ravelry's placeholder email never matches
+        // Linking happens while signed in, so a Google account with another address is fine
         allowDifferentEmails: true,
         // Every account can still sign in with an emailed code
         allowUnlinkingAll: true,
-        // Needed to link Ravelry at all, since it never reports a verified email.
-        // Safe because Ravelry's email is always a .invalid placeholder that no
-        // account can have, so this never links by email during sign-in.
-        trustedProviders: config.ravelry ? [RAVELRY_PROVIDER_ID] : [],
       },
     },
     socialProviders: config.google
@@ -135,9 +123,6 @@ export function buildAuthOptions(config: AuthConfig) {
           config.runInBackground(config.sendSignInCode(email, otp, type));
         },
       }),
-      ...(config.ravelry
-        ? [genericOAuth({ config: [ravelryProvider(config.ravelry)] })]
-        : []),
     ],
   } satisfies BetterAuthOptions;
 }

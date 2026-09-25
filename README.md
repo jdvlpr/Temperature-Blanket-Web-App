@@ -59,18 +59,17 @@ Accounts use [Better Auth](https://www.better-auth.com) (pinned to an exact vers
 
 Server settings, read from the Cloudflare environment (local values are in `wrangler.jsonc`):
 
-| Variable                                     | Purpose                                                                                                                                                               |
-| -------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `ACCOUNTS_ENABLED`                           | `"true"` turns on `/api/auth/*`; anything else returns 404                                                                                                            |
-| `BETTER_AUTH_SECRET`                         | At least 32 characters; signs session cookies. Set as an encrypted secret in production                                                                               |
-| `AUTH_ALLOWED_HOSTS`                         | Comma-separated hosts the app is served on, e.g. `temperature-blanket.com` or `*.<project>.pages.dev` for previews                                                    |
-| `AUTH_PROTOCOL`                              | `https` (default), `http`, or `auto`                                                                                                                                  |
-| `EMAIL_SENDER`                               | `resend`, or `dev-outbox` locally (only allowed where `ENABLE_DEV_ROUTES` is `"true"`, since anyone can read the outbox). Anything else turns accounts off with a 503 |
-| `RESEND_API_KEY`, `EMAIL_FROM`               | For `resend`: an API key (as a secret) and the from-address, e.g. `Temperature Blanket <sign-in@mail.temperature-blanket.com>`                                        |
-| `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`   | Optional: turns on “Continue with Google”. Redirect URI: `<site>/api/auth/callback/google`                                                                            |
-| `RAVELRY_CLIENT_ID`, `RAVELRY_CLIENT_SECRET` | Optional: turns on Ravelry (sign-in for accounts that linked it). Redirect URI: `<site>/api/auth/callback/ravelry`                                                    |
+| Variable                                   | Purpose                                                                                                                                                               |
+| ------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ACCOUNTS_ENABLED`                         | `"true"` turns on `/api/auth/*`; anything else returns 404                                                                                                            |
+| `BETTER_AUTH_SECRET`                       | At least 32 characters; signs session cookies. Set as an encrypted secret in production                                                                               |
+| `AUTH_ALLOWED_HOSTS`                       | Comma-separated hosts the app is served on, e.g. `temperature-blanket.com` or `*.<project>.pages.dev` for previews                                                    |
+| `AUTH_PROTOCOL`                            | `https` (default), `http`, or `auto`                                                                                                                                  |
+| `EMAIL_SENDER`                             | `resend`, or `dev-outbox` locally (only allowed where `ENABLE_DEV_ROUTES` is `"true"`, since anyone can read the outbox). Anything else turns accounts off with a 503 |
+| `RESEND_API_KEY`, `EMAIL_FROM`             | For `resend`: an API key (as a secret) and the from-address, e.g. `Temperature Blanket <sign-in@mail.temperature-blanket.com>`                                        |
+| `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | Optional: turns on “Continue with Google”. Redirect URI: `<site>/api/auth/callback/google`                                                                            |
 
-Secrets for local development (for example real Google or Ravelry credentials) go in `.dev.vars`, which wrangler reads and git ignores. Ravelry never creates accounts, and its email is never used: people link it from the account page while signed in. The e2e run tests Ravelry against `tests/cloudflare/fake-ravelry-server.mjs`.
+Secrets for local development (for example real Google credentials) go in `.dev.vars`, which wrangler reads and git ignores.
 
 After changing Better Auth plugins or options, generate the matching migration and apply it:
 

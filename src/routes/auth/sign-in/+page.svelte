@@ -26,7 +26,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     type SignInProvider,
   } from '$lib/accounts/client';
   import GoogleIcon from '$lib/components/account/GoogleIcon.svelte';
-  import RavelryIcon from '$lib/components/account/RavelryIcon.svelte';
   import { LoaderCircleIcon, LogInIcon, MailIcon } from '@lucide/svelte';
   import { onMount } from 'svelte';
 
@@ -37,7 +36,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let errorMessage = $state('');
   let providers: Record<SignInProvider, boolean> = $state({
     google: false,
-    ravelry: false,
   });
 
   onMount(async () => {
@@ -106,28 +104,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {#if !__ACCOUNTS_ENABLED__}
         <p>Accounts aren’t available yet.</p>
       {:else if step === 'email'}
-        {#if providers.google || providers.ravelry}
-          <div class="flex flex-col gap-2">
-            {#if providers.google}
-              <button
-                type="button"
-                class="btn preset-tonal-surface w-full"
-                onclick={() => continueWith('google')}
-                disabled={busy}><GoogleIcon /> Continue with Google</button
-              >
-            {/if}
-            {#if providers.ravelry}
-              <button
-                type="button"
-                class="btn preset-tonal-surface w-full"
-                onclick={() => continueWith('ravelry')}
-                disabled={busy}><RavelryIcon /> Sign in with Ravelry</button
-              >
-              <p class="text-sm opacity-80">
-                Ravelry works once you’ve linked it from your account page.
-              </p>
-            {/if}
-          </div>
+        {#if providers.google}
+          <button
+            type="button"
+            class="btn preset-tonal-surface w-full"
+            onclick={() => continueWith('google')}
+            disabled={busy}><GoogleIcon /> Continue with Google</button
+          >
           <p class="text-center text-sm opacity-80">or</p>
         {/if}
         <p>

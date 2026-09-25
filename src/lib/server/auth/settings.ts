@@ -24,11 +24,6 @@ export type AuthEnv = EmailEnv & {
   AUTH_PROTOCOL?: string;
   GOOGLE_CLIENT_ID?: string;
   GOOGLE_CLIENT_SECRET?: string;
-  RAVELRY_CLIENT_ID?: string;
-  RAVELRY_CLIENT_SECRET?: string;
-  /** Overrides for tests; default to Ravelry's real URLs */
-  RAVELRY_OAUTH_URL?: string;
-  RAVELRY_API_URL?: string;
 };
 
 export type AuthSettings =
@@ -38,7 +33,7 @@ export type AuthSettings =
       status: 'ready';
       settings: Pick<
         AuthConfig,
-        'secret' | 'allowedHosts' | 'protocol' | 'google' | 'ravelry'
+        'secret' | 'allowedHosts' | 'protocol' | 'google'
       >;
     };
 
@@ -84,7 +79,7 @@ export function readAuthSettings(env: AuthEnv | undefined): AuthSettings {
   const emailProblem = emailConfigProblem(env);
   if (emailProblem) return { status: 'misconfigured', reason: emailProblem };
 
-  // Each sign-in provider is on only when both its ID and secret are set
+  // Google sign-in is on only when both its ID and secret are set
   const google =
     env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET
       ? {
@@ -92,18 +87,9 @@ export function readAuthSettings(env: AuthEnv | undefined): AuthSettings {
           clientSecret: env.GOOGLE_CLIENT_SECRET,
         }
       : undefined;
-  const ravelry =
-    env.RAVELRY_CLIENT_ID && env.RAVELRY_CLIENT_SECRET
-      ? {
-          clientId: env.RAVELRY_CLIENT_ID,
-          clientSecret: env.RAVELRY_CLIENT_SECRET,
-          oauthUrl: env.RAVELRY_OAUTH_URL || 'https://www.ravelry.com',
-          apiUrl: env.RAVELRY_API_URL || 'https://api.ravelry.com',
-        }
-      : undefined;
 
   return {
     status: 'ready',
-    settings: { secret, allowedHosts, protocol, google, ravelry },
+    settings: { secret, allowedHosts, protocol, google },
   };
 }
