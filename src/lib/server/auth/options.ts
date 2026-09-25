@@ -40,6 +40,8 @@ export type AuthConfig = {
   validateSchema: boolean;
   /** Sign in with Google, when configured */
   google?: { clientId: string; clientSecret: string };
+  /** Deletes what the account stores outside the auth tables (synced projects in R2) */
+  deleteUserData?: (userId: string) => Promise<void>;
 };
 
 export const AUTH_BASE_PATH = '/api/auth';
@@ -107,7 +109,13 @@ export function buildAuthOptions(config: AuthConfig) {
       : undefined,
     user: {
       // Needs a session less than freshAge old; the account page confirms with a new code first
-      deleteUser: { enabled: true },
+      deleteUser: {
+        enabled: true,
+        // Before the user row goes, so a failure here leaves nothing orphaned
+        beforeDelete: async (user) => {
+          await config.deleteUserData?.(user.id);
+        },
+      },
     },
     telemetry: { enabled: false },
     plugins: [

@@ -5,7 +5,7 @@ import {
   CODE_REQUESTS_PER_EMAIL,
   CODE_REQUEST_WINDOW_MS,
 } from './code-request-limit';
-import { createTestD1 } from './test-d1';
+import { createTestD1 } from '$lib/server/test-d1';
 
 describe('allowCodeRequest', () => {
   it('allows 5 codes per email per hour, ignoring case and spaces', async () => {
