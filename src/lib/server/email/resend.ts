@@ -21,7 +21,9 @@ export class ResendSender implements EmailSender {
     private apiKey: string,
     /** e.g. "Temperature Blanket <sign-in@mail.temperature-blanket.com>" */
     private from: string,
-    private fetchFn: typeof fetch = fetch,
+    // A wrapper, not fetch itself: Workers throw "Illegal invocation" when
+    // fetch is called as a method of another object (this.fetchFn(...))
+    private fetchFn: typeof fetch = (input, init) => fetch(input, init),
   ) {}
 
   async send(message: EmailMessage): Promise<void> {

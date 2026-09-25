@@ -75,6 +75,26 @@ describe('ResendSender', () => {
     });
   });
 
+  it('calls the global fetch unbound by default, as Workers require', async () => {
+    const workersFetch = vi.fn(function (this: unknown) {
+      // Like Workers: fetch called as a method of another object is illegal
+      if (this !== undefined && this !== globalThis)
+        throw new TypeError('Illegal invocation');
+      return Promise.resolve(new Response('{"id":"1"}'));
+    });
+    vi.stubGlobal('fetch', workersFetch);
+    try {
+      await new ResendSender('re_key', 'a@example.test').send({
+        to: 'b@example.test',
+        subject: 'Hi',
+        text: 'Body',
+      });
+      expect(workersFetch).toHaveBeenCalledOnce();
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
   it('throws when Resend refuses, so the failure is logged', async () => {
     const fetchFn = vi.fn(
       async () => new Response('{"message":"bad key"}', { status: 401 }),
