@@ -28,6 +28,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ProjectDetails from '../ProjectDetails.svelte';
   import DownloadExportButton from '../buttons/DownloadExportButton.svelte';
   import SendToGalleryButton from '../buttons/SendToGalleryButton.svelte';
+  import { account } from '$lib/accounts/summary.svelte';
+  import SyncStatus from '$lib/components/sync/SyncStatus.svelte';
+  import { sync } from '$lib/sync/status.svelte';
+
+  // Signed in: saved projects sync to the account
+  const toAccount = $derived(
+    __ACCOUNTS_ENABLED__ && Boolean(account.summary?.id) && sync.active,
+  );
 
   let storedProject: StoredProjectIndexItem | null = $state(null);
 
@@ -76,7 +84,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
   class="mb-8 flex w-full flex-col items-start justify-center gap-2 p-4 pt-0"
 >
   {#if browser && typeof window.localStorage !== 'undefined' && weather.data.length}
-    {#if project.status.saved}
+    {#if project.status.saved && toAccount}
+      <div class="flex flex-col gap-1">
+        <p
+          class="inline-flex w-full items-center justify-start gap-2 text-lg font-bold"
+        >
+          <CircleCheckIcon style="size-4" class="text-success-900-100" />
+          Saved to Your Account
+        </p>
+        <p class="text-surface-700-300 text-sm">
+          Progress and {#if weather.isUserEdited}custom weather{:else}weather{/if}
+          data is saved in this browser and syncs to every device where you’re signed
+          in.
+        </p>
+        <SyncStatus class="text-surface-700-300" />
+      </div>
+    {:else if project.status.saved}
       <div>
         <p
           class="inline-flex w-full items-center justify-start gap-2 text-lg font-bold"
