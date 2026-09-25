@@ -38,6 +38,21 @@ Start a development server:
 pnpm dev
 ```
 
+#### Local Cloudflare bindings (accounts)
+
+`wrangler.jsonc` gives local development a D1 database (`DB`) and an R2 bucket (`PROJECTS`), stored under `.wrangler/state`. It has no `pages_build_output_dir`, so Cloudflare Pages ignores it for deployed builds; production bindings are set in the Pages dashboard. `pnpm dev`, `pnpm preview` and `wrangler pages dev` all use it.
+
+Apply database migrations (from `migrations/`) to the local database:
+
+```bash
+pnpm db:migrate:local
+```
+
+It also enables dev-only routes, which return 404 anywhere `ENABLE_DEV_ROUTES` isn't `"true"`:
+
+- `/api/dev/platform` checks the D1 and R2 bindings.
+- `/api/dev/outbox?to=<address>` lists emails "sent" by the fake sender (`EMAIL_SENDER=dev-outbox`), which stores them in the local R2 bucket instead of sending.
+
 ### ✅ Testing
 
 First build the app (to generate cloudflare \_routes.json file)
@@ -62,6 +77,12 @@ End-to-end tests (for pages and ui flows)
 
 ```bash
 pnpm test:e2e
+```
+
+End-to-end tests against the Cloudflare build under `wrangler pages dev`, which honors `_routes.json` and provides the local D1 and R2 bindings (also checks every static route is prerendered)
+
+```bash
+pnpm test:e2e:cloudflare
 ```
 
 Run all tests (unit, integration, and end-to-end)

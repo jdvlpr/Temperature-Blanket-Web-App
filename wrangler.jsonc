@@ -1,0 +1,28 @@
+// Local development and test configuration only.
+//
+// This file has no `pages_build_output_dir`, so Cloudflare Pages ignores it for
+// deployed builds: production and preview bindings are still set in the Pages
+// dashboard. It gives `pnpm dev` (through the adapter's platformProxy),
+// `wrangler pages dev` and `wrangler d1 migrations apply --local` the same
+// local D1 database and R2 bucket, stored under .wrangler/state.
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "temperature-blanket",
+  // Pinned because the local runtime rejects today's date
+  "compatibility_date": "2026-08-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "tb-accounts",
+      "database_id": "00000000-0000-0000-0000-000000000000",
+      "migrations_dir": "migrations",
+    },
+  ],
+  "r2_buckets": [{ "binding": "PROJECTS", "bucket_name": "tb-projects" }],
+  "vars": {
+    // Enables the /api/dev/* routes and the dev email outbox. Never set in production.
+    "ENABLE_DEV_ROUTES": "true",
+    "EMAIL_SENDER": "dev-outbox",
+  },
+}

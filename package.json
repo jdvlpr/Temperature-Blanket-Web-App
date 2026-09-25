@@ -16,7 +16,8 @@
     "test:unit": "vitest run src",
     "test:integration": "node scripts/test-integration.js",
     "test:e2e": "playwright test",
-    "test:e2e:cloudflare": "playwright test --config playwright.cloudflare.config.ts"
+    "test:e2e:cloudflare": "playwright test --config playwright.cloudflare.config.ts",
+    "db:migrate:local": "wrangler d1 migrations apply DB --local"
   },
   "dependencies": {
     "@floating-ui/dom": "^1.7.6",
@@ -35,6 +36,7 @@
     "three": "0.183.2"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "^4.20260702.1",
     "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.61.1",
     "@skeletonlabs/skeleton": "^4.15.2",
