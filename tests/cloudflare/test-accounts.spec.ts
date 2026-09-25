@@ -71,8 +71,8 @@ async function signIn(page: Page, request: APIRequestContext, email: string) {
   await page.getByLabel('Email').fill(email);
   await page.getByRole('button', { name: 'Email me a code' }).click();
   await expect(page.getByText(`We sent a code to ${email}`)).toBeVisible();
+  // The code field submits itself on the sixth digit
   await page.getByLabel('Code').fill(await latestCode(request, email));
-  await page.getByRole('button', { name: 'Sign in', exact: true }).click();
   await expect(page.getByTestId('account-email')).toHaveText(email);
 }
 
@@ -86,7 +86,6 @@ test.describe('Accounts: sign in with an emailed code', () => {
     await expect(page.getByText(`We sent a code to ${email}`)).toBeVisible();
 
     await page.getByLabel('Code').fill(await latestCode(request, email));
-    await page.getByRole('button', { name: 'Sign in', exact: true }).click();
 
     await expect(page).toHaveURL(/\/account$/);
     await expect(page.getByTestId('account-email')).toHaveText(email);
@@ -111,12 +110,48 @@ test.describe('Accounts: sign in with an emailed code', () => {
     const wrong = code === '000000' ? '111111' : '000000';
 
     await page.getByLabel('Code').fill(wrong);
-    await page.getByRole('button', { name: 'Sign in', exact: true }).click();
     // Scoped to the page: the analytics consent toast is also an alert
     await expect(page.getByRole('main').getByRole('alert')).toHaveText(
       'That code isn’t right, or it has expired.',
     );
     await expect(page).toHaveURL(/\/auth\/sign-in$/);
+  });
+
+  test('signing in returns to the page it started from', async ({
+    page,
+    request,
+  }) => {
+    const email = uniqueEmail('redirect');
+    await page.goto('/auth/sign-in?redirect=/faq');
+    await page.getByLabel('Email').fill(email);
+    await page.getByRole('button', { name: 'Email me a code' }).click();
+    // Pasted codes may carry spaces
+    const code = await latestCode(request, email);
+    await page.getByLabel('Code').fill(`${code.slice(0, 3)} ${code.slice(3)}`);
+    await expect(page).toHaveURL(/\/faq$/);
+
+    // A redirect to another site is ignored
+    await page.goto('/account');
+    await page.getByRole('button', { name: 'Sign out', exact: true }).click();
+    await page.goto('/auth/sign-in?redirect=//evil.example');
+    await page.getByLabel('Email').fill(email);
+    await page.getByRole('button', { name: 'Email me a code' }).click();
+    await page.getByLabel('Code').fill(await latestCode(request, email));
+    await expect(page).toHaveURL(/\/account$/);
+  });
+
+  test('the account page signs in in place when signed out', async ({
+    page,
+    request,
+  }) => {
+    const email = uniqueEmail('in-place');
+    await page.goto('/account');
+    await expect(page.getByText('You’re not signed in.')).toBeVisible();
+    await page.getByLabel('Email').fill(email);
+    await page.getByRole('button', { name: 'Email me a code' }).click();
+    await page.getByLabel('Code').fill(await latestCode(request, email));
+    await expect(page.getByTestId('account-email')).toHaveText(email);
+    await expect(page).toHaveURL(/\/account$/);
   });
 
   test('requests from another site are refused', async ({ request }) => {
@@ -279,7 +314,6 @@ test.describe('Accounts: managing the account', () => {
     await page
       .getByLabel('Code sent to your new email')
       .fill(await latestCode(request, newEmail));
-    await page.getByRole('button', { name: 'Change email' }).click();
     await expect(
       page.getByText(`Your email is now ${newEmail}.`),
     ).toBeVisible();
@@ -341,7 +375,6 @@ test.describe('Accounts: managing the account', () => {
       page.getByText('To delete your account, confirm it’s you'),
     ).toBeVisible();
     await page.getByLabel('Code').fill(await latestCode(request, email));
-    await page.getByRole('button', { name: 'Confirm and delete' }).click();
     await expect(page.getByText('Your account was deleted.')).toBeVisible();
   });
 
@@ -459,7 +492,6 @@ test.describe('Accounts: Google', () => {
       page.getByText('To unlink Google, confirm it’s you'),
     ).toBeVisible();
     await page.getByLabel('Code').fill(await latestCode(request, email));
-    await page.getByRole('button', { name: 'Confirm and unlink' }).click();
     await expect(
       google.getByRole('button', { name: 'Link Google' }),
     ).toBeVisible();

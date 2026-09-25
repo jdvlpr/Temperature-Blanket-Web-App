@@ -27,7 +27,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     type LinkedAccount,
     type SignInProvider,
   } from '$lib/accounts/client';
-  import { LoaderCircleIcon } from '@lucide/svelte';
+  import { safeSlide } from '$lib/features/transitions/safeSlide';
+  import { CheckIcon, LoaderCircleIcon, MailIcon } from '@lucide/svelte';
+  import CodeInput from './CodeInput.svelte';
+  import EmailText from './EmailText.svelte';
   import { onMount } from 'svelte';
   import GoogleIcon from './GoogleIcon.svelte';
 
@@ -118,72 +121,83 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 </script>
 
-<div class="flex flex-col gap-2">
-  <p>You can always sign in with a code sent to your email.</p>
+<div class="divide-surface-200-800 flex flex-col divide-y">
+  <div class="flex min-h-14 items-center gap-3 px-4 py-3">
+    <MailIcon class="shrink-0 opacity-70" />
+    <div class="min-w-0 flex-1">
+      <p class="font-bold">Email code</p>
+      <p class="text-sm opacity-70">A 6-digit code sent to your email</p>
+    </div>
+    <span class="flex shrink-0 items-center gap-1 text-sm opacity-80"
+      ><CheckIcon size="16" /> Always on</span
+    >
+  </div>
   {#if loading}
-    <LoaderCircleIcon class="animate-spin" />
+    <div class="flex min-h-14 items-center px-4 py-3">
+      <LoaderCircleIcon class="animate-spin" />
+    </div>
   {:else}
     {#each PROVIDERS.filter((p) => available[p.id]) as provider (provider.id)}
       <div
-        class="flex flex-wrap items-center gap-2"
+        class="flex min-h-14 items-center gap-3 px-4 py-3"
         data-testid={`provider-${provider.id}`}
       >
         <GoogleIcon />
-        <span class="font-bold">{provider.name}</span>
+        <div class="min-w-0 flex-1">
+          <p class="font-bold">{provider.name}</p>
+          <p class="text-sm opacity-70">
+            {#if isLinked(provider.id)}Linked{:else}Sign in with one tap{/if}
+          </p>
+        </div>
         {#if isLinked(provider.id)}
-          <span>Linked</span>
           <button
             type="button"
-            class="btn btn-sm preset-tonal-surface"
+            class="btn btn-sm preset-tonal-surface shrink-0"
+            aria-label={`Unlink ${provider.name}`}
             onclick={() => unlink(provider)}
-            disabled={busy}>Unlink {provider.name}</button
+            disabled={busy}>Unlink</button
           >
         {:else}
           <button
             type="button"
-            class="btn btn-sm preset-tonal-surface"
+            class="btn btn-sm preset-filled-primary-500 shrink-0"
+            aria-label={`Link ${provider.name}`}
             onclick={() => link(provider.id)}
-            disabled={busy}>Link {provider.name}</button
+            disabled={busy}>Link</button
           >
         {/if}
       </div>
     {/each}
-    {#if reconfirming}
-      <form class="flex flex-col gap-2" onsubmit={reconfirm}>
-        <p>
-          To unlink {reconfirming.name}, confirm it’s you: we sent a code to
-          <strong>{email}</strong>.
-        </p>
-        <label class="label">
-          <span class="label-text">Code</span>
-          <input
-            type="text"
-            class="input tracking-widest"
-            inputmode="numeric"
-            autocomplete="one-time-code"
-            pattern={'[0-9]{6}'}
-            maxlength="6"
-            required
-            bind:value={code}
-            disabled={busy}
-          />
-        </label>
-        <div class="flex gap-2">
-          <button type="submit" class="btn preset-filled w-fit" disabled={busy}
-            >{#if busy}<LoaderCircleIcon class="animate-spin" />{/if}
-            Confirm and unlink</button
-          >
-          <button
-            type="button"
-            class="btn preset-tonal-surface w-fit"
-            onclick={() => (reconfirming = null)}
-            disabled={busy}>Cancel</button
-          >
-        </div>
-      </form>
-    {/if}
+  {/if}
+  {#if reconfirming}
+    <form
+      class="flex flex-col gap-3 px-4 py-3"
+      onsubmit={reconfirm}
+      in:safeSlide
+    >
+      <p>
+        To unlink {reconfirming.name}, confirm it’s you: we sent a code to
+        <EmailText {email} />.
+      </p>
+      <CodeInput bind:value={code} disabled={busy} />
+      <div class="flex flex-wrap gap-2">
+        <button
+          type="submit"
+          class="btn preset-filled-primary-500 max-sm:w-full"
+          disabled={busy}
+          >{#if busy}<LoaderCircleIcon class="animate-spin" />{/if}
+          Confirm and unlink</button
+        >
+        <button
+          type="button"
+          class="btn preset-tonal-surface max-sm:w-full"
+          onclick={() => (reconfirming = null)}
+          disabled={busy}>Cancel</button
+        >
+      </div>
+    </form>
   {/if}
   {#if errorMessage}
-    <p class="text-error-700-300" role="alert">{errorMessage}</p>
+    <p class="text-error-700-300 px-4 py-3" role="alert">{errorMessage}</p>
   {/if}
 </div>

@@ -18,13 +18,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { CheckIcon, LoaderCircleIcon } from '@lucide/svelte';
   import { untrack } from 'svelte';
 
-  let { name: savedName }: { name: string } = $props();
+  let {
+    name: savedName,
+    onsaved,
+  }: { name: string; onsaved?: (name: string) => void } = $props();
 
   // An editable copy of the saved name
   let name = $state(untrack(() => savedName));
+  let lastSaved = $state(untrack(() => savedName));
   let busy = $state(false);
   let saved = $state(false);
   let errorMessage = $state('');
+
+  let changed = $derived(name.trim() !== lastSaved);
 
   async function save(event: Event) {
     event.preventDefault();
@@ -32,9 +38,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     saved = false;
     errorMessage = '';
     try {
-      await updateName(name.trim());
-      name = name.trim();
+      const trimmed = name.trim();
+      await updateName(trimmed);
+      name = lastSaved = trimmed;
       saved = true;
+      onsaved?.(trimmed);
     } catch (e) {
       errorMessage = accountErrorMessage(e);
     } finally {
@@ -43,37 +51,42 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 </script>
 
-<form class="flex flex-col gap-2" onsubmit={save}>
-  <label class="label">
+<form class="flex flex-col gap-2 px-4 py-3" onsubmit={save}>
+  <label class="label" for="display-name">
     <span class="label-text">Display name</span>
+  </label>
+  <div class="flex items-center gap-2">
     <input
+      id="display-name"
       type="text"
-      class="input"
+      class="input h-11"
       maxlength="80"
       autocomplete="nickname"
+      enterkeyhint="done"
+      placeholder="Add a name"
       bind:value={name}
       oninput={() => (saved = false)}
       disabled={busy}
     />
-  </label>
-  <p class="text-sm opacity-80">
-    Optional. Only shown if you choose to show it on a gallery page.
-  </p>
-  <div class="flex items-center gap-2">
-    <button
-      type="submit"
-      class="btn preset-tonal-surface w-fit"
-      disabled={busy}
-    >
-      {#if busy}<LoaderCircleIcon class="animate-spin" />{/if}
-      Save name
-    </button>
-    {#if saved}
-      <span class="flex items-center gap-1 text-sm" role="status"
-        ><CheckIcon size="16" /> Saved</span
+    {#if changed}
+      <button
+        type="submit"
+        class="btn preset-filled-primary-500 h-11 shrink-0"
+        disabled={busy}
+      >
+        {#if busy}<LoaderCircleIcon class="animate-spin" />{/if}
+        Save name
+      </button>
+    {:else if saved}
+      <span
+        class="text-success-700-300 flex shrink-0 items-center gap-1 text-sm"
+        role="status"><CheckIcon size="16" /> Saved</span
       >
     {/if}
   </div>
+  <p class="text-sm opacity-70">
+    Optional. Only shown if you choose to show it on a gallery page.
+  </p>
   {#if errorMessage}
     <p class="text-error-700-300" role="alert">{errorMessage}</p>
   {/if}

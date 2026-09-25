@@ -20,7 +20,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     requestEmailChange,
     sendCurrentEmailCode,
   } from '$lib/accounts/client';
-  import { LoaderCircleIcon } from '@lucide/svelte';
+  import { safeSlide } from '$lib/features/transitions/safeSlide';
+  import { LoaderCircleIcon, MailIcon } from '@lucide/svelte';
+  import CodeInput from './CodeInput.svelte';
+  import EmailText from './EmailText.svelte';
 
   let {
     email,
@@ -82,93 +85,89 @@ If not, see <https://www.gnu.org/licenses/>. -->
   };
 </script>
 
-<div class="flex flex-col gap-2">
-  {#if step === 'idle'}
-    <p>Email: <strong data-testid="account-email">{email}</strong></p>
-    {#if doneMessage}<p role="status">{doneMessage}</p>{/if}
-    <button
-      type="button"
-      class="btn preset-tonal-surface w-fit"
-      onclick={start}
-      disabled={busy}
-    >
-      {#if busy}<LoaderCircleIcon class="animate-spin" />{/if}
-      Change email
-    </button>
+<div class="flex flex-col gap-3 px-4 py-3">
+  <div class="flex min-h-11 items-center gap-3">
+    <MailIcon class="shrink-0 opacity-70" />
+    <div class="min-w-0 flex-1">
+      <p class="text-sm opacity-70">Email</p>
+      <p><EmailText {email} testid="account-email" /></p>
+    </div>
+    {#if step === 'idle'}
+      <button
+        type="button"
+        class="btn btn-sm preset-outlined-surface-300-700 hover:preset-tonal-surface shrink-0"
+        aria-label="Change email"
+        onclick={start}
+        disabled={busy}
+      >
+        {#if busy}<LoaderCircleIcon class="animate-spin" size="16" />{/if}
+        Change
+      </button>
+    {/if}
+  </div>
+  {#if step === 'idle' && doneMessage}
+    <p class="text-success-700-300 text-sm" role="status">{doneMessage}</p>
   {:else if step === 'current'}
-    <form class="flex flex-col gap-2" onsubmit={submitCurrent}>
+    <form class="flex flex-col gap-3" onsubmit={submitCurrent} in:safeSlide>
       <p>
-        First, confirm it’s you: we sent a code to <strong>{email}</strong>.
+        First, confirm it’s you: we sent a code to <EmailText {email} />.
       </p>
-      <label class="label">
-        <span class="label-text">Code sent to your current email</span>
-        <input
-          type="text"
-          class="input tracking-widest"
-          inputmode="numeric"
-          autocomplete="one-time-code"
-          pattern={'[0-9]{6}'}
-          maxlength="6"
-          required
-          bind:value={currentCode}
-          disabled={busy}
-        />
-      </label>
+      <CodeInput
+        label="Code sent to your current email"
+        bind:value={currentCode}
+        disabled={busy}
+      />
       <label class="label">
         <span class="label-text">New email</span>
         <input
           type="email"
-          class="input"
+          class="input h-11"
           autocomplete="email"
+          autocapitalize="off"
+          spellcheck="false"
+          inputmode="email"
           required
           bind:value={newEmail}
           disabled={busy}
         />
       </label>
-      <div class="flex gap-2">
+      <div class="flex flex-wrap gap-2">
         <button
           type="submit"
-          class="btn preset-filled-primary-500 w-fit"
+          class="btn preset-filled-primary-500 max-sm:w-full"
           disabled={busy}
           >{#if busy}<LoaderCircleIcon class="animate-spin" />{/if}
           Send a code to the new email</button
         >
         <button
           type="button"
-          class="btn preset-tonal-surface w-fit"
+          class="btn preset-tonal-surface max-sm:w-full"
           onclick={cancel}
           disabled={busy}>Cancel</button
         >
       </div>
     </form>
-  {:else}
-    <form class="flex flex-col gap-2" onsubmit={submitNew}>
-      <p>We sent a code to <strong>{newEmail}</strong>.</p>
-      <label class="label">
-        <span class="label-text">Code sent to your new email</span>
-        <input
-          type="text"
-          class="input tracking-widest"
-          inputmode="numeric"
-          autocomplete="one-time-code"
-          pattern={'[0-9]{6}'}
-          maxlength="6"
-          required
-          bind:value={newCode}
-          disabled={busy}
-        />
-      </label>
-      <div class="flex gap-2">
+  {:else if step === 'new'}
+    <form class="flex flex-col gap-3" onsubmit={submitNew} in:safeSlide>
+      <p>
+        Now enter the code we sent to <EmailText email={newEmail} />.
+      </p>
+      <CodeInput
+        label="Code sent to your new email"
+        bind:value={newCode}
+        disabled={busy}
+      />
+      <div class="flex flex-wrap gap-2">
         <button
           type="submit"
-          class="btn preset-filled-primary-500 w-fit"
+          class="btn preset-filled-primary-500 max-sm:w-full"
           disabled={busy}
           >{#if busy}<LoaderCircleIcon class="animate-spin" />{/if}
-          Change email</button
+          Confirm new email</button
         >
         <button
           type="button"
-          class="btn preset-tonal-surface w-fit"
+          class="btn preset-tonal-surface max-sm:w-full"
           onclick={cancel}
           disabled={busy}>Cancel</button
         >

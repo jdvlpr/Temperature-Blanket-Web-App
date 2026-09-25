@@ -14,12 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
-  import AppLogo from '$lib/components/AppLogo.svelte';
-  import AppShell from '$lib/components/AppShell.svelte';
-  import ChangeEmail from '$lib/components/account/ChangeEmail.svelte';
-  import DeleteAccount from '$lib/components/account/DeleteAccount.svelte';
-  import DisplayName from '$lib/components/account/DisplayName.svelte';
-  import SignInMethods from '$lib/components/account/SignInMethods.svelte';
+  import { resolve } from '$app/paths';
   import {
     accountErrorMessage,
     clearSignedInHint,
@@ -30,31 +25,67 @@ If not, see <https://www.gnu.org/licenses/>. -->
     type AccountUser,
   } from '$lib/accounts/client';
   import {
+    forgetAccountSummary,
+    rememberAccountSummary,
+  } from '$lib/accounts/summary.svelte';
+  import AppLogo from '$lib/components/AppLogo.svelte';
+  import AppShell from '$lib/components/AppShell.svelte';
+  import AccountAvatar from '$lib/components/account/AccountAvatar.svelte';
+  import ChangeEmail from '$lib/components/account/ChangeEmail.svelte';
+  import DeleteAccount from '$lib/components/account/DeleteAccount.svelte';
+  import DisplayName from '$lib/components/account/DisplayName.svelte';
+  import SignInCard from '$lib/components/account/SignInCard.svelte';
+  import SignInMethods from '$lib/components/account/SignInMethods.svelte';
+  import {
+    ChevronRightIcon,
     DownloadIcon,
     LoaderCircleIcon,
     LogOutIcon,
     MonitorSmartphoneIcon,
   } from '@lucide/svelte';
-  import { resolve } from '$app/paths';
   import { onMount } from 'svelte';
+
+  const CARD =
+    'bg-surface-50-950 rounded-container divide-surface-200-800 flex flex-col divide-y overflow-hidden shadow-lg';
+  const ROW =
+    'hover:preset-tonal-surface flex min-h-14 w-full items-center gap-3 px-4 py-3 text-left transition-colors disabled:opacity-50';
 
   let status: 'loading' | 'signed-in' | 'signed-out' | 'deleted' | 'error' =
     $state('loading');
-  let user: AccountUser | null = $state(null);
+  let user = $state<AccountUser | null>(null);
   let busy = $state(false);
   let errorMessage = $state('');
+
+  let memberSince = $derived(
+    user?.createdAt
+      ? new Date(user.createdAt).toLocaleDateString(undefined, {
+          month: 'long',
+          year: 'numeric',
+        })
+      : '',
+  );
+
+  function showSignedIn(signedInUser: AccountUser) {
+    user = signedInUser;
+    rememberAccountSummary(signedInUser);
+    status = 'signed-in';
+  }
 
   onMount(async () => {
     if (!__ACCOUNTS_ENABLED__) return;
     if (!hasSignedInHint()) {
+      forgetAccountSummary();
       status = 'signed-out';
       return;
     }
     try {
       const session = await getSession();
-      user = session?.user ?? null;
-      if (!user) clearSignedInHint();
-      status = user ? 'signed-in' : 'signed-out';
+      if (session?.user) showSignedIn(session.user);
+      else {
+        clearSignedInHint();
+        forgetAccountSummary();
+        status = 'signed-out';
+      }
     } catch (e) {
       errorMessage = accountErrorMessage(e);
       status = 'error';
@@ -67,6 +98,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     try {
       if (everywhere) await signOutEverywhere();
       else await signOut();
+      forgetAccountSummary();
       user = null;
       status = 'signed-out';
     } catch (e) {
@@ -87,96 +119,161 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <div class="mx-auto hidden lg:inline-flex"><AppLogo /></div>
   {/snippet}
   {#snippet main()}
-    <main
-      class="mx-auto my-2 flex w-full max-w-(--breakpoint-sm) flex-col gap-4 px-2"
-    >
-      <h2 class="h2 text-gradient mt-2 max-lg:hidden">Account</h2>
-
+    <main class="mx-auto flex w-full max-w-(--breakpoint-md) flex-col pb-8">
       {#if !__ACCOUNTS_ENABLED__}
-        <p>Accounts aren’t available yet.</p>
+        <div class="flex flex-col gap-2 px-2 py-4 text-center">
+          <h2 class="h1 text-gradient mb-0">Account</h2>
+          <p>Accounts aren’t available yet.</p>
+        </div>
       {:else if status === 'loading'}
-        <p class="flex items-center gap-2">
-          <LoaderCircleIcon class="animate-spin" /> Loading…
-        </p>
+        <div class="flex justify-center py-16" aria-label="Loading">
+          <LoaderCircleIcon class="size-8 animate-spin opacity-70" />
+        </div>
       {:else if status === 'signed-in' && user}
-        <section class="flex flex-col gap-2">
-          <h3 class="h4">Profile</h3>
-          <DisplayName name={user.name} />
-        </section>
+        <div class="mx-auto flex w-full max-w-lg flex-col gap-6 px-2 py-4">
+          <header class="flex flex-col items-center gap-2 text-center">
+            <AccountAvatar summary={user} class="size-20 text-2xl shadow-lg" />
+            <div>
+              <h2 class="h3">{user.name || 'Welcome!'}</h2>
+              {#if memberSince}
+                <p class="text-sm opacity-70">Member since {memberSince}</p>
+              {/if}
+            </div>
+          </header>
 
-        <section class="flex flex-col gap-2">
-          <h3 class="h4">Email</h3>
-          <ChangeEmail
-            email={user.email}
-            onchanged={(newEmail) => {
-              if (user) user.email = newEmail;
-            }}
-          />
-        </section>
+          <section class="flex flex-col gap-2" aria-labelledby="profile">
+            <h3 id="profile" class="px-2 text-sm font-bold opacity-70">
+              Profile
+            </h3>
+            <div class={CARD}>
+              <DisplayName
+                name={user.name}
+                onsaved={(name) => {
+                  if (!user) return;
+                  user.name = name;
+                  rememberAccountSummary(user);
+                }}
+              />
+              <ChangeEmail
+                email={user.email}
+                onchanged={(newEmail) => {
+                  if (!user) return;
+                  user.email = newEmail;
+                  rememberAccountSummary(user);
+                }}
+              />
+            </div>
+          </section>
 
-        <section class="flex flex-col gap-2">
-          <h3 class="h4">Sign-in methods</h3>
-          <SignInMethods email={user.email} />
-        </section>
-
-        <section class="flex flex-col gap-2">
-          <h3 class="h4">Signing out</h3>
-          {#if errorMessage}
-            <p class="text-error-700-300" role="alert">{errorMessage}</p>
-          {/if}
-          <div class="flex flex-wrap gap-2">
-            <button
-              type="button"
-              class="btn preset-tonal-surface w-fit"
-              onclick={() => handleSignOut()}
-              disabled={busy}
-            >
-              <LogOutIcon /> Sign out
-            </button>
-            <button
-              type="button"
-              class="btn preset-tonal-surface w-fit"
-              onclick={() => handleSignOut(true)}
-              disabled={busy}
-            >
-              <MonitorSmartphoneIcon /> Sign out everywhere
-            </button>
-          </div>
-          <p class="text-sm opacity-80">
-            Sign out everywhere ends your sessions on every device and browser.
-          </p>
-        </section>
-
-        <section class="flex flex-col gap-2">
-          <h3 class="h4">Your data</h3>
-          <a
-            href={resolve('/api/account/export')}
-            download
-            class="btn preset-tonal-surface w-fit"
-            ><DownloadIcon /> Download my data</a
+          <section
+            class="flex flex-col gap-2"
+            aria-labelledby="sign-in-methods"
           >
-        </section>
+            <h3 id="sign-in-methods" class="px-2 text-sm font-bold opacity-70">
+              Sign-in methods
+            </h3>
+            <div class={CARD}>
+              <SignInMethods email={user.email} />
+            </div>
+          </section>
 
-        <section class="flex flex-col gap-2">
-          <h3 class="h4">Delete account</h3>
-          <DeleteAccount
-            email={user.email}
-            ondeleted={() => {
-              user = null;
-              status = 'deleted';
-            }}
-          />
-        </section>
+          <section class="flex flex-col gap-2" aria-labelledby="devices-data">
+            <h3 id="devices-data" class="px-2 text-sm font-bold opacity-70">
+              Devices and data
+            </h3>
+            <div class={CARD}>
+              <button
+                type="button"
+                class={ROW}
+                aria-label="Sign out"
+                onclick={() => handleSignOut()}
+                disabled={busy}
+              >
+                <LogOutIcon class="shrink-0 opacity-70" />
+                <span class="flex-1">
+                  <span class="block font-bold">Sign out</span>
+                  <span class="block text-sm opacity-70">On this device</span>
+                </span>
+                <ChevronRightIcon class="shrink-0 opacity-50" />
+              </button>
+              <button
+                type="button"
+                class={ROW}
+                aria-label="Sign out everywhere"
+                onclick={() => handleSignOut(true)}
+                disabled={busy}
+              >
+                <MonitorSmartphoneIcon class="shrink-0 opacity-70" />
+                <span class="flex-1">
+                  <span class="block font-bold">Sign out everywhere</span>
+                  <span class="block text-sm opacity-70"
+                    >Ends your sessions on every device and browser</span
+                  >
+                </span>
+                <ChevronRightIcon class="shrink-0 opacity-50" />
+              </button>
+              <a
+                href={resolve('/api/account/export')}
+                download
+                class={ROW}
+                aria-label="Download my data"
+              >
+                <DownloadIcon class="shrink-0 opacity-70" />
+                <span class="flex-1">
+                  <span class="block font-bold">Download my data</span>
+                  <span class="block text-sm opacity-70"
+                    >Your account details as a JSON file</span
+                  >
+                </span>
+                <ChevronRightIcon class="shrink-0 opacity-50" />
+              </a>
+              {#if errorMessage}
+                <p class="text-error-700-300 px-4 py-3" role="alert">
+                  {errorMessage}
+                </p>
+              {/if}
+            </div>
+          </section>
+
+          <section
+            class="rounded-container border-error-500/40 bg-error-500/5 flex flex-col gap-2 border p-4"
+            aria-labelledby="delete-account"
+          >
+            <h3 id="delete-account" class="text-error-700-300 font-bold">
+              Delete account
+            </h3>
+            <DeleteAccount
+              email={user.email}
+              ondeleted={() => {
+                forgetAccountSummary();
+                user = null;
+                status = 'deleted';
+              }}
+            />
+          </section>
+        </div>
       {:else if status === 'deleted'}
-        <p role="status">Your account was deleted.</p>
+        <div class="flex flex-col items-center gap-4 px-2 py-8 text-center">
+          <h2 class="h1 text-gradient mb-0">Account</h2>
+          <p role="status">Your account was deleted.</p>
+          <a href={resolve('/')} class="btn preset-filled-primary-500"
+            >Back to the Project Planner</a
+          >
+        </div>
       {:else if status === 'signed-out'}
-        <p>You’re not signed in.</p>
-        <a
-          href={resolve('/auth/sign-in')}
-          class="btn preset-filled-primary-500 w-fit">Sign in</a
-        >
+        <div class="flex flex-col gap-2 px-2 py-4 text-center">
+          <h2 class="h1 text-gradient mb-0">Account</h2>
+          <p>You’re not signed in.</p>
+          <p class="text-sm opacity-80">
+            Sign in to save your projects and pick them up on any device.
+          </p>
+        </div>
+        <SignInCard onsignedin={showSignedIn} />
       {:else}
-        <p class="text-error-700-300" role="alert">{errorMessage}</p>
+        <div class="flex flex-col gap-2 px-2 py-4 text-center">
+          <h2 class="h1 text-gradient mb-0">Account</h2>
+          <p class="text-error-700-300" role="alert">{errorMessage}</p>
+        </div>
       {/if}
     </main>
   {/snippet}

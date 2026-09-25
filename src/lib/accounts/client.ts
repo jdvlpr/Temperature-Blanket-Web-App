@@ -21,6 +21,8 @@ export type AccountUser = {
   name: string;
   emailVerified: boolean;
   image: string | null;
+  /** ISO date the account was created */
+  createdAt: string;
 };
 
 export class AccountError extends Error {
@@ -150,12 +152,20 @@ export async function getSignInOptions(): Promise<
   return { google: false };
 }
 
-/** Starts signing in with a provider; the browser leaves for its site. */
-export async function signInWithProvider(provider: SignInProvider) {
+/**
+ * Starts signing in with a provider; the browser leaves for its site, then
+ * returns to `returnTo` (a path from safeRedirect), or to `errorReturnTo` with
+ * ?error= if it failed.
+ */
+export async function signInWithProvider(
+  provider: SignInProvider,
+  returnTo = '/account',
+  errorReturnTo = '/auth/sign-in',
+) {
   const { url } = await call<{ url: string }>('/sign-in/social', {
     provider,
-    callbackURL: '/account',
-    errorCallbackURL: '/auth/sign-in',
+    callbackURL: returnTo,
+    errorCallbackURL: errorReturnTo,
   });
   window.location.assign(url);
 }

@@ -94,6 +94,8 @@ describe('signInCodeEmail', () => {
     expect(email.subject).toBe('123456 is your Temperature Blanket code');
     expect(email.text).toContain('\n123456\n');
     expect(email.text).toContain('to sign in');
+    expect(email.html).toContain('>123456</p>');
+    expect(email.html).toContain('Your code to sign in:');
   });
 
   it('describes an email change', () => {

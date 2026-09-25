@@ -22,7 +22,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     sendSignInCode,
     signInWithCode,
   } from '$lib/accounts/client';
+  import { safeSlide } from '$lib/features/transitions/safeSlide';
   import { LoaderCircleIcon, Trash2Icon } from '@lucide/svelte';
+  import CodeInput from './CodeInput.svelte';
+  import EmailText from './EmailText.svelte';
 
   let { email, ondeleted }: { email: string; ondeleted: () => void } = $props();
 
@@ -71,67 +74,60 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 </script>
 
-<div class="flex flex-col gap-2">
+<div class="flex flex-col gap-3">
   {#if step === 'idle'}
+    <p class="text-sm opacity-80">
+      Permanently deletes your account and signs you out everywhere. Projects
+      saved in this browser stay here.
+    </p>
     <button
       type="button"
-      class="btn preset-tonal-error w-fit"
+      class="btn preset-tonal-error w-fit max-sm:w-full"
       onclick={() => (step = 'confirm')}
     >
       <Trash2Icon /> Delete account
     </button>
   {:else if step === 'confirm'}
-    <p>
-      This permanently deletes your account and signs you out everywhere.
-      Projects saved in this browser stay here.
-    </p>
-    <div class="flex gap-2">
-      <button
-        type="button"
-        class="btn preset-filled-error-500 w-fit"
-        onclick={remove}
-        disabled={busy}
-        >{#if busy}<LoaderCircleIcon class="animate-spin" />{/if}
-        Yes, delete my account</button
-      >
-      <button
-        type="button"
-        class="btn preset-tonal-surface w-fit"
-        onclick={() => (step = 'idle')}
-        disabled={busy}>Cancel</button
-      >
+    <div class="flex flex-col gap-3" in:safeSlide>
+      <p class="font-bold">Delete your account for good?</p>
+      <p class="text-sm opacity-80">
+        This can’t be undone. Projects saved in this browser stay here.
+      </p>
+      <div class="flex flex-wrap gap-2">
+        <button
+          type="button"
+          class="btn preset-filled-error-500 max-sm:w-full"
+          onclick={remove}
+          disabled={busy}
+          >{#if busy}<LoaderCircleIcon class="animate-spin" />{/if}
+          Yes, delete my account</button
+        >
+        <button
+          type="button"
+          class="btn preset-tonal-surface max-sm:w-full"
+          onclick={() => (step = 'idle')}
+          disabled={busy}>Cancel</button
+        >
+      </div>
     </div>
   {:else}
-    <form class="flex flex-col gap-2" onsubmit={reconfirm}>
+    <form class="flex flex-col gap-3" onsubmit={reconfirm} in:safeSlide>
       <p>
         To delete your account, confirm it’s you: we sent a code to
-        <strong>{email}</strong>.
+        <EmailText {email} />.
       </p>
-      <label class="label">
-        <span class="label-text">Code</span>
-        <input
-          type="text"
-          class="input tracking-widest"
-          inputmode="numeric"
-          autocomplete="one-time-code"
-          pattern={'[0-9]{6}'}
-          maxlength="6"
-          required
-          bind:value={code}
-          disabled={busy}
-        />
-      </label>
-      <div class="flex gap-2">
+      <CodeInput bind:value={code} disabled={busy} />
+      <div class="flex flex-wrap gap-2">
         <button
           type="submit"
-          class="btn preset-filled-error-500 w-fit"
+          class="btn preset-filled-error-500 max-sm:w-full"
           disabled={busy}
           >{#if busy}<LoaderCircleIcon class="animate-spin" />{/if}
           Confirm and delete</button
         >
         <button
           type="button"
-          class="btn preset-tonal-surface w-fit"
+          class="btn preset-tonal-surface max-sm:w-full"
           onclick={() => (step = 'idle')}
           disabled={busy}>Cancel</button
         >
