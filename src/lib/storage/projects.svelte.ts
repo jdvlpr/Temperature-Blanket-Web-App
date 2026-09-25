@@ -14,6 +14,7 @@ import {
   stringToDate,
 } from '$lib/utils/date-utils';
 import { getMoonPhase } from '$lib/state/weather-state.svelte';
+import { projectCreatedAtTime } from '$lib/utils/project-id-utils';
 import { del, get, set } from 'idb-keyval';
 
 export type StoredProjectIndexItem = {
@@ -27,6 +28,8 @@ export type StoredProjectIndexItem = {
 };
 
 export type StoredProject = {
+  /** When the project was first created (ISO 8601, UTC). Missing on projects saved by older versions; use projectCreatedAtTime() to fall back to a legacy timestamp ID. */
+  createdAt?: string;
   date: string;
   href: string;
   locations?: LocationType[];
@@ -225,6 +228,9 @@ export class ProjectStorage {
     const matchedProject = await ProjectStorage.getById(id);
     if (!matchedProject) return;
 
+    // Keep the original creation date so re-saving never re-stamps it
+    if (matchedProject.createdAt) project.createdAt = matchedProject.createdAt;
+
     // Set weather source
     const weatherSource: WeatherSourceOptions = matchedProject.weatherSource;
     if (weatherSource) {
@@ -260,24 +266,27 @@ export class ProjectStorage {
     });
 
     // Check if there are any days in the project past the day the project was created
-    let url = new URL(matchedProject.href);
-    let timestamp: string | number | null = new URLSearchParams(url.search).get(
-      'project',
-    );
+    const createdAtTime = projectCreatedAtTime({
+      createdAt: matchedProject.createdAt,
+      id,
+    });
 
-    if (timestamp === null || !Number.isFinite(+timestamp)) return;
+    // User-edited weather can't be fetched again, so always load it.
+    // Otherwise, if the creation date is unknown the stored weather may be incomplete, so don't load it.
+    if (createdAtTime === null && !matchedProject.isCustomWeatherData) return;
 
-    timestamp = Number(timestamp);
-    const latestDay = new Date(
-      Math.max(...newWeatherUngrouped.map((n) => n.date.getTime())),
-    ).getTime();
+    if (createdAtTime !== null) {
+      const latestDay = new Date(
+        Math.max(...newWeatherUngrouped.map((n) => n.date.getTime())),
+      ).getTime();
 
-    let daysInFuture = 0;
-    if (latestDay >= timestamp)
-      daysInFuture = numberOfDays(timestamp, latestDay);
+      let daysInFuture = 0;
+      if (latestDay >= createdAtTime)
+        daysInFuture = numberOfDays(createdAtTime, latestDay);
 
-    // If there are days in the future and the weather is not custom, do not load weather from local storage
-    if (daysInFuture > 0 && !matchedProject.isCustomWeatherData) return;
+      // If there are days in the future and the weather is not custom, do not load weather from local storage
+      if (daysInFuture > 0 && !matchedProject.isCustomWeatherData) return;
+    }
 
     // Set the weather data and indicate that it was loaded from storage
     weather.setRawData(newWeatherUngrouped);
@@ -325,6 +334,7 @@ export class ProjectStorage {
     });
 
     return {
+      createdAt: project.createdAt,
       date,
       isCustomWeatherData,
       href,
