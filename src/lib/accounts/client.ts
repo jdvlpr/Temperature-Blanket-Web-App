@@ -126,6 +126,60 @@ export const confirmEmailChange = (newEmail: string, newEmailCode: string) =>
 export const deleteAccount = () =>
   call<{ success: boolean }>('/delete-user', {});
 
+export type SignInProvider = 'google' | 'ravelry';
+
+/** Which providers are configured on the server. */
+export async function getSignInOptions(): Promise<
+  Record<SignInProvider, boolean>
+> {
+  try {
+    const response = await fetch('/api/account/sign-in-options');
+    if (response.ok) return await response.json();
+  } catch {
+    // Fall through: offer email only
+  }
+  return { google: false, ravelry: false };
+}
+
+/**
+ * Starts signing in with a provider; the browser leaves for its site. Ravelry
+ * (a generic OAuth provider) uses the same endpoints as Google.
+ */
+export async function signInWithProvider(provider: SignInProvider) {
+  const { url } = await call<{ url: string }>('/sign-in/social', {
+    provider,
+    callbackURL: '/account',
+    errorCallbackURL: '/auth/sign-in',
+  });
+  window.location.assign(url);
+}
+
+/** Starts linking a provider to the signed-in account. */
+export async function linkProvider(provider: SignInProvider) {
+  const { url } = await call<{ url: string }>('/link-social', {
+    provider,
+    callbackURL: '/account',
+    errorCallbackURL: '/account',
+  });
+  window.location.assign(url);
+}
+
+export const listLinkedProviders = () =>
+  call<{ providerId: string }[]>('/list-accounts');
+
+export const unlinkProvider = (provider: SignInProvider) =>
+  call<{ status: boolean }>('/unlink-account', { providerId: provider });
+
+/** A message for the ?error= that a failed provider sign-in or link returns with. */
+export function providerErrorMessage(error: string): string {
+  if (error === 'signup_disabled')
+    return 'That Ravelry account isn’t linked to an account here yet. Sign in with your email, then link Ravelry from your account page.';
+  if (error === 'account_not_linked')
+    return 'An account with this email already exists. Sign in with your email, then link it from your account page.';
+  if (error === 'access_denied') return 'Sign-in was canceled.';
+  return 'That didn’t work. Try again, or use your email.';
+}
+
 /** Ends every session for this account, including this one. */
 export async function signOutEverywhere() {
   await call<{ status: boolean }>('/revoke-sessions', {});

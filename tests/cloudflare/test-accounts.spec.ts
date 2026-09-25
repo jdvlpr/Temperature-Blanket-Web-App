@@ -362,3 +362,61 @@ test.describe('Accounts: managing the account', () => {
     expect((await request.get('/api/account/export')).status()).toBe(401);
   });
 });
+
+test.describe('Accounts: Ravelry (against fake-ravelry-server.mjs)', () => {
+  const fakeRavelryUser = () =>
+    String(100000 + Math.floor(Math.random() * 900000));
+
+  test('only configured providers are offered', async ({ request }) => {
+    const response = await request.get('/api/account/sign-in-options');
+    expect(await response.json()).toEqual({ google: false, ravelry: true });
+  });
+
+  test('Ravelry can’t create an account', async ({
+    page,
+    context,
+    baseURL,
+  }) => {
+    await context.addCookies([
+      { name: 'fake_ravelry_user', value: fakeRavelryUser(), url: baseURL },
+    ]);
+    await page.goto('/auth/sign-in');
+    await page.getByRole('button', { name: 'Sign in with Ravelry' }).click();
+    await expect(page).toHaveURL(/\/auth\/sign-in\?error=signup_disabled/);
+    await expect(page.getByRole('main').getByRole('alert')).toContainText(
+      'isn’t linked to an account here yet',
+    );
+    expect(
+      (await context.cookies()).some((c) => c.name === 'tb_signed_in'),
+    ).toBe(false);
+  });
+
+  test('link Ravelry, sign in with it, then unlink', async ({
+    page,
+    context,
+    request,
+    baseURL,
+  }) => {
+    const email = uniqueEmail('ravelry');
+    await context.addCookies([
+      { name: 'fake_ravelry_user', value: fakeRavelryUser(), url: baseURL },
+    ]);
+    await signIn(page, request, email);
+
+    const ravelry = page.getByTestId('provider-ravelry');
+    await ravelry.getByRole('button', { name: 'Link Ravelry' }).click();
+    await expect(page).toHaveURL(/\/account$/);
+    await expect(ravelry.getByText('Linked')).toBeVisible();
+
+    await page.getByRole('button', { name: 'Sign out', exact: true }).click();
+    await page.goto('/auth/sign-in');
+    await page.getByRole('button', { name: 'Sign in with Ravelry' }).click();
+    // The same account, not one for the email Ravelry reports
+    await expect(page.getByTestId('account-email')).toHaveText(email);
+
+    await ravelry.getByRole('button', { name: 'Unlink Ravelry' }).click();
+    await expect(
+      ravelry.getByRole('button', { name: 'Link Ravelry' }),
+    ).toBeVisible();
+  });
+});

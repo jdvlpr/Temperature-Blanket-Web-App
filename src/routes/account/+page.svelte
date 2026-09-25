@@ -19,6 +19,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ChangeEmail from '$lib/components/account/ChangeEmail.svelte';
   import DeleteAccount from '$lib/components/account/DeleteAccount.svelte';
   import DisplayName from '$lib/components/account/DisplayName.svelte';
+  import SignInMethods from '$lib/components/account/SignInMethods.svelte';
   import {
     accountErrorMessage,
     clearSignedInHint,
@@ -111,6 +112,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
               if (user) user.email = newEmail;
             }}
           />
+        </section>
+
+        <section class="flex flex-col gap-2">
+          <h3 class="h4">Sign-in methods</h3>
+          <SignInMethods />
         </section>
 
         <section class="flex flex-col gap-2">

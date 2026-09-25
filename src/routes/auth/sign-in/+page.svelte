@@ -18,16 +18,46 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import AppShell from '$lib/components/AppShell.svelte';
   import {
     accountErrorMessage,
+    getSignInOptions,
+    providerErrorMessage,
     sendSignInCode,
     signInWithCode,
+    signInWithProvider,
+    type SignInProvider,
   } from '$lib/accounts/client';
+  import GoogleIcon from '$lib/components/account/GoogleIcon.svelte';
+  import RavelryIcon from '$lib/components/account/RavelryIcon.svelte';
   import { LoaderCircleIcon, LogInIcon, MailIcon } from '@lucide/svelte';
+  import { onMount } from 'svelte';
 
   let step: 'email' | 'code' = $state('email');
   let email = $state('');
   let code = $state('');
   let busy = $state(false);
   let errorMessage = $state('');
+  let providers: Record<SignInProvider, boolean> = $state({
+    google: false,
+    ravelry: false,
+  });
+
+  onMount(async () => {
+    if (!__ACCOUNTS_ENABLED__) return;
+    // A failed provider sign-in returns here with ?error=
+    const error = new URL(window.location.href).searchParams.get('error');
+    if (error) errorMessage = providerErrorMessage(error);
+    providers = await getSignInOptions();
+  });
+
+  async function continueWith(provider: SignInProvider) {
+    errorMessage = '';
+    busy = true;
+    try {
+      await signInWithProvider(provider);
+    } catch (e) {
+      errorMessage = accountErrorMessage(e);
+      busy = false;
+    }
+  }
 
   async function requestCode(event: Event) {
     event.preventDefault();
@@ -76,6 +106,30 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {#if !__ACCOUNTS_ENABLED__}
         <p>Accounts aren’t available yet.</p>
       {:else if step === 'email'}
+        {#if providers.google || providers.ravelry}
+          <div class="flex flex-col gap-2">
+            {#if providers.google}
+              <button
+                type="button"
+                class="btn preset-tonal-surface w-full"
+                onclick={() => continueWith('google')}
+                disabled={busy}><GoogleIcon /> Continue with Google</button
+              >
+            {/if}
+            {#if providers.ravelry}
+              <button
+                type="button"
+                class="btn preset-tonal-surface w-full"
+                onclick={() => continueWith('ravelry')}
+                disabled={busy}><RavelryIcon /> Sign in with Ravelry</button
+              >
+              <p class="text-sm opacity-80">
+                Ravelry works once you’ve linked it from your account page.
+              </p>
+            {/if}
+          </div>
+          <p class="text-center text-sm opacity-80">or</p>
+        {/if}
         <p>
           Enter your email and we’ll send you a 6-digit code. If you don’t have
           an account yet, this creates one.

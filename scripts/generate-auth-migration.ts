@@ -8,9 +8,26 @@
 // adding or changing a plugin.
 
 import { readdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { register } from 'node:module';
 import { DatabaseSync } from 'node:sqlite';
 import { getMigrations } from 'better-auth/db/migration';
-import { buildAuthOptions } from '../src/lib/server/auth/options.ts';
+
+// The app's own modules import each other without file extensions (resolved by
+// Vite). Node needs them, so retry extensionless relative imports with .ts.
+register(
+  'data:text/javascript,' +
+    encodeURIComponent(`
+      export async function resolve(specifier, context, next) {
+        try {
+          return await next(specifier, context);
+        } catch (error) {
+          if (specifier.startsWith('.') && !/\\.[cm]?[jt]s$/.test(specifier))
+            return next(specifier + '.ts', context);
+          throw error;
+        }
+      }`),
+);
+const { buildAuthOptions } = await import('../src/lib/server/auth/options.ts');
 
 const MIGRATIONS_DIR = 'migrations';
 
@@ -31,6 +48,14 @@ const options = buildAuthOptions({
   sendSignInCode: async () => {},
   runInBackground: () => {},
   validateSchema: false,
+  // Every optional provider on, so their schema needs are included
+  google: { clientId: 'x', clientSecret: 'x' },
+  ravelry: {
+    clientId: 'x',
+    clientSecret: 'x',
+    oauthUrl: 'https://www.ravelry.com',
+    apiUrl: 'https://api.ravelry.com',
+  },
 });
 
 const { compileMigrations } = await getMigrations(options);

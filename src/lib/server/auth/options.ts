@@ -18,6 +18,12 @@
 
 import type { BetterAuthOptions } from 'better-auth';
 import { emailOTP } from 'better-auth/plugins/email-otp';
+import { genericOAuth } from 'better-auth/plugins/generic-oauth';
+import {
+  RAVELRY_PROVIDER_ID,
+  ravelryProvider,
+  type RavelrySettings,
+} from './ravelry';
 
 export type SignInCodePurpose =
   'sign-in' | 'email-verification' | 'forget-password' | 'change-email';
@@ -38,6 +44,10 @@ export type AuthConfig = {
   runInBackground: (promise: Promise<unknown>) => void;
   /** Introspects the database when the instance starts; used locally to catch schema drift */
   validateSchema: boolean;
+  /** Sign in with Google, when configured */
+  google?: { clientId: string; clientSecret: string };
+  /** Sign in with Ravelry (linked accounts only), when configured */
+  ravelry?: RavelrySettings;
 };
 
 export const AUTH_BASE_PATH = '/api/auth';
@@ -89,6 +99,24 @@ export function buildAuthOptions(config: AuthConfig) {
       database: { validateSchema: config.validateSchema },
       backgroundTasks: { handler: config.runInBackground },
     },
+    account: {
+      // Sign-in doesn't need provider tokens afterwards; don't keep them readable
+      encryptOAuthTokens: true,
+      accountLinking: {
+        enabled: true,
+        // Linking happens while signed in, and Ravelry's placeholder email never matches
+        allowDifferentEmails: true,
+        // Every account can still sign in with an emailed code
+        allowUnlinkingAll: true,
+        // Needed to link Ravelry at all, since it never reports a verified email.
+        // Safe because Ravelry's email is always a .invalid placeholder that no
+        // account can have, so this never links by email during sign-in.
+        trustedProviders: config.ravelry ? [RAVELRY_PROVIDER_ID] : [],
+      },
+    },
+    socialProviders: config.google
+      ? { google: { ...config.google, prompt: 'select_account' as const } }
+      : undefined,
     user: {
       // Needs a session less than freshAge old; the account page confirms with a new code first
       deleteUser: { enabled: true },
@@ -107,6 +135,9 @@ export function buildAuthOptions(config: AuthConfig) {
           config.runInBackground(config.sendSignInCode(email, otp, type));
         },
       }),
+      ...(config.ravelry
+        ? [genericOAuth({ config: [ravelryProvider(config.ravelry)] })]
+        : []),
     ],
   } satisfies BetterAuthOptions;
 }

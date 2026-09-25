@@ -59,13 +59,17 @@ Accounts use [Better Auth](https://www.better-auth.com) (pinned to an exact vers
 
 Server settings, read from the Cloudflare environment (local values are in `wrangler.jsonc`):
 
-| Variable             | Purpose                                                                                                            |
-| -------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| `ACCOUNTS_ENABLED`   | `"true"` turns on `/api/auth/*`; anything else returns 404                                                         |
-| `BETTER_AUTH_SECRET` | At least 32 characters; signs session cookies. Set as an encrypted secret in production                            |
-| `AUTH_ALLOWED_HOSTS` | Comma-separated hosts the app is served on, e.g. `temperature-blanket.com` or `*.<project>.pages.dev` for previews |
-| `AUTH_PROTOCOL`      | `https` (default), `http`, or `auto`                                                                               |
-| `EMAIL_SENDER`       | Which email provider sends sign-in codes; `dev-outbox` locally                                                     |
+| Variable                                     | Purpose                                                                                                            |
+| -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `ACCOUNTS_ENABLED`                           | `"true"` turns on `/api/auth/*`; anything else returns 404                                                         |
+| `BETTER_AUTH_SECRET`                         | At least 32 characters; signs session cookies. Set as an encrypted secret in production                            |
+| `AUTH_ALLOWED_HOSTS`                         | Comma-separated hosts the app is served on, e.g. `temperature-blanket.com` or `*.<project>.pages.dev` for previews |
+| `AUTH_PROTOCOL`                              | `https` (default), `http`, or `auto`                                                                               |
+| `EMAIL_SENDER`                               | Which email provider sends sign-in codes; `dev-outbox` locally                                                     |
+| `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`   | Optional: turns on “Continue with Google”. Redirect URI: `<site>/api/auth/callback/google`                         |
+| `RAVELRY_CLIENT_ID`, `RAVELRY_CLIENT_SECRET` | Optional: turns on Ravelry (sign-in for accounts that linked it). Redirect URI: `<site>/api/auth/callback/ravelry` |
+
+Secrets for local development (for example real Google or Ravelry credentials) go in `.dev.vars`, which wrangler reads and git ignores. Ravelry never creates accounts, and its email is never used: people link it from the account page while signed in. The e2e run tests Ravelry against `tests/cloudflare/fake-ravelry-server.mjs`.
 
 After changing Better Auth plugins or options, generate the matching migration and apply it:
 

@@ -21,6 +21,13 @@ export type AuthEnv = {
   BETTER_AUTH_SECRET?: string;
   AUTH_ALLOWED_HOSTS?: string;
   AUTH_PROTOCOL?: string;
+  GOOGLE_CLIENT_ID?: string;
+  GOOGLE_CLIENT_SECRET?: string;
+  RAVELRY_CLIENT_ID?: string;
+  RAVELRY_CLIENT_SECRET?: string;
+  /** Overrides for tests; default to Ravelry's real URLs */
+  RAVELRY_OAUTH_URL?: string;
+  RAVELRY_API_URL?: string;
 };
 
 export type AuthSettings =
@@ -28,7 +35,10 @@ export type AuthSettings =
   | { status: 'misconfigured'; reason: string }
   | {
       status: 'ready';
-      settings: Pick<AuthConfig, 'secret' | 'allowedHosts' | 'protocol'>;
+      settings: Pick<
+        AuthConfig,
+        'secret' | 'allowedHosts' | 'protocol' | 'google' | 'ravelry'
+      >;
     };
 
 const MIN_SECRET_LENGTH = 32;
@@ -70,5 +80,26 @@ export function readAuthSettings(env: AuthEnv | undefined): AuthSettings {
       reason: 'AUTH_PROTOCOL must be https, http or auto',
     };
 
-  return { status: 'ready', settings: { secret, allowedHosts, protocol } };
+  // Each sign-in provider is on only when both its ID and secret are set
+  const google =
+    env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET
+      ? {
+          clientId: env.GOOGLE_CLIENT_ID,
+          clientSecret: env.GOOGLE_CLIENT_SECRET,
+        }
+      : undefined;
+  const ravelry =
+    env.RAVELRY_CLIENT_ID && env.RAVELRY_CLIENT_SECRET
+      ? {
+          clientId: env.RAVELRY_CLIENT_ID,
+          clientSecret: env.RAVELRY_CLIENT_SECRET,
+          oauthUrl: env.RAVELRY_OAUTH_URL || 'https://www.ravelry.com',
+          apiUrl: env.RAVELRY_API_URL || 'https://api.ravelry.com',
+        }
+      : undefined;
+
+  return {
+    status: 'ready',
+    settings: { secret, allowedHosts, protocol, google, ravelry },
+  };
 }
