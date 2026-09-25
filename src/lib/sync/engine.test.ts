@@ -4,6 +4,8 @@ import { describe, expect, it } from 'vitest';
 import {
   rehomeHref,
   syncAccount,
+  unchangedSince,
+  type Seen,
   SyncHttpError,
   type AccountSyncState,
   type LocalStore,
@@ -127,8 +129,19 @@ class FakeDevice implements LocalStore {
   async read(id: string) {
     return this.projects.get(id)?.project ?? null;
   }
-  async put(id: string, project: StoredProject, sync: ProjectSyncState) {
+  async put(
+    id: string,
+    project: StoredProject,
+    sync: ProjectSyncState,
+    seen: Seen,
+  ) {
+    if (!unchangedSince(await this.item(id), seen)) return false;
     this.projects.set(id, { project: structuredClone(project), sync });
+    return true;
+  }
+  private async item(id: string) {
+    const item = this.projects.get(id);
+    return item && { id, sync: item.sync };
   }
   async updateSync(
     id: string,
@@ -137,8 +150,11 @@ class FakeDevice implements LocalStore {
     const item = this.projects.get(id);
     if (item) item.sync = update(item.sync);
   }
-  async remove(id: string) {
+  async remove(id: string, seen: Seen) {
+    const item = await this.item(id);
+    if (!item || !unchangedSince(item, seen)) return false;
     this.projects.delete(id);
+    return true;
   }
   async accountState(userId: string) {
     return this.states.get(userId) ?? { since: 0, pendingDeletes: [] };
@@ -411,6 +427,55 @@ describe('syncAccount', () => {
     });
     await phone.sync();
     expect(server.rows.get('a')?.title).toBe('Saved during upload');
+  });
+
+  it('never replaces a project saved while its download was on the way', async () => {
+    const { server, phone, laptop } = twoDevices();
+    phone.edit('a', 'v1');
+    await phone.sync();
+    await laptop.sync();
+    phone.edit('a', 'v2');
+    await phone.sync();
+
+    const api = server.api();
+    const download = api.download;
+    let edited = false;
+    api.download = async (id) => {
+      const data = await download(id);
+      if (!edited) laptop.edit('a', 'Saved on the laptop meanwhile');
+      edited = true;
+      return data;
+    };
+    await syncAccount('u1', laptop, api, { origin: laptop.origin, sha256 });
+
+    // Not overwritten: both changed, so both are kept
+    expect(Object.values(laptop.titles()).sort()).toEqual([
+      expect.stringMatching(/^Saved on the laptop meanwhile \(copy/),
+      'v2',
+    ]);
+  });
+
+  it('never removes a project saved while its deletion arrived', async () => {
+    const { server, phone, laptop } = twoDevices();
+    phone.edit('a', 'v1');
+    await phone.sync();
+    await laptop.sync();
+    await phone.delete('a');
+    await phone.sync();
+
+    const api = server.api();
+    const changes = api.changes;
+    let edited = false;
+    api.changes = async (since) => {
+      const page = await changes(since);
+      if (!edited) laptop.edit('a', 'Saved on the laptop meanwhile');
+      edited = true;
+      return page;
+    };
+    await syncAccount('u1', laptop, api, { origin: laptop.origin, sha256 });
+    expect(laptop.titles()).toEqual({ a: 'Saved on the laptop meanwhile' });
+    // And the edit wins over the deletion
+    expect(server.rows.get('a')).toMatchObject({ deleted: false });
   });
 
   it("leaves guest projects and other accounts' projects alone", async () => {

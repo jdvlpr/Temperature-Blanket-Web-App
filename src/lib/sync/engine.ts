@@ -24,6 +24,7 @@
 
 import type { StoredProject } from '$lib/storage/projects.svelte';
 import type { ChangesResponse, ProjectMeta, SyncErrorCode } from './protocol';
+import type { Seen } from './seen';
 
 /** Sync bookkeeping kept with each saved project on this device. */
 export type ProjectSyncState = {
@@ -52,22 +53,28 @@ export type AccountSyncState = {
   importAsked?: boolean;
 };
 
+export { unchangedSince, type Seen } from './seen';
+
 export interface LocalStore {
   list(): Promise<LocalItem[]>;
   read(id: string): Promise<StoredProject | null>;
-  /** Writes a project as given; never marks it changed */
+  /**
+   * Writes a project as given, never marking it changed, if it's still as
+   * `seen`. Returns whether it wrote. Checking and writing must be atomic.
+   */
   put(
     id: string,
     project: StoredProject,
     sync: ProjectSyncState,
-  ): Promise<void>;
+    seen: Seen,
+  ): Promise<boolean>;
   /** Updates a project's sync state from its current one, if it still exists */
   updateSync(
     id: string,
     update: (current: ProjectSyncState | undefined) => ProjectSyncState,
   ): Promise<void>;
-  /** Removes a project from this device only */
-  remove(id: string): Promise<void>;
+  /** Removes a project from this device only, if it's still as `seen` */
+  remove(id: string, seen: Seen): Promise<boolean>;
   accountState(userId: string): Promise<AccountSyncState>;
   setAccountState(userId: string, state: AccountSyncState): Promise<void>;
 }
@@ -221,25 +228,43 @@ export async function syncAccount(
     return project ? fingerprint(project) : null;
   }
 
-  /** Replaces the device copy with the server's. False if it's gone from the server. */
-  async function download(id: string, base?: ProjectSyncState) {
+  /**
+   * Marks a project synced at `rev`, unless it was saved again since `seen`:
+   * then it stays changed, now based on `rev`.
+   */
+  const settle = (id: string, rev: number, seen: ProjectSyncState) =>
+    local.updateSync(id, (s) =>
+      s && s.updatedAt !== seen.updatedAt
+        ? { ...s, rev, error: null }
+        : syncedState(rev, s),
+    );
+
+  /**
+   * Replaces the device copy with the server's, unless it changed since `seen`.
+   * 'gone' if the server no longer has it.
+   */
+  async function download(id: string, seen: Seen) {
     const data = await server.download(id);
-    if (!data) return false;
+    if (!data) return 'gone';
     const project = JSON.parse(data.json) as StoredProject;
     project.href = rehomeHref(project.href, options.origin, id);
-    await local.put(id, project, syncedState(data.rev, base));
-    report.downloaded.push(id);
-    return true;
+    const base = seen === 'absent' ? undefined : seen;
+    if (await local.put(id, project, syncedState(data.rev, base), seen))
+      report.downloaded.push(id);
+    return 'done';
   }
 
   /** Both sides changed: keep the device's version as a new project, take the server's. */
-  async function keepBoth(id: string): Promise<string | null> {
+  async function keepBoth(
+    id: string,
+    seen: ProjectSyncState,
+  ): Promise<string | null> {
     const mine = await local.read(id);
     let copyId: string | null = null;
     if (mine) {
       copyId = await newId();
       const title = mine.title?.trim() || 'Untitled project';
-      await local.put(
+      const wrote = await local.put(
         copyId,
         {
           ...mine,
@@ -254,10 +279,13 @@ export async function syncAccount(
           lastSyncedAt: null,
           error: null,
         },
+        'absent',
       );
-      report.copies.push(copyId);
+      if (wrote) report.copies.push(copyId);
+      else copyId = null;
     }
-    if (!(await download(id))) await local.remove(id);
+    // Saved again meanwhile: nothing is replaced, and the next pass looks again
+    if ((await download(id, seen)) === 'gone') await local.remove(id, seen);
     return copyId;
   }
 
@@ -297,8 +325,7 @@ export async function syncAccount(
             ...(s ?? sync),
             rev: meta.rev,
           }));
-        } else {
-          await local.remove(meta.id);
+        } else if (await local.remove(meta.id, sync)) {
           report.removed.push(meta.id);
         }
         continue;
@@ -307,13 +334,15 @@ export async function syncAccount(
       if (sync?.dirty) {
         const hash = await localHash(meta.id);
         if (hash && hash === meta.contentHash)
-          await local.updateSync(meta.id, (s) => syncedState(meta.rev, s));
-        else await keepBoth(meta.id);
+          await settle(meta.id, meta.rev, sync);
+        else await keepBoth(meta.id, sync);
         continue;
       }
 
-      // Not here, or unchanged here: take the server's
-      if (sync || !(await local.read(meta.id))) await download(meta.id, sync);
+      // Not here, or unchanged here: take the server's. A project of this
+      // browser only (no account) with the same ID is left alone.
+      if (sync || !(await local.read(meta.id)))
+        await download(meta.id, sync ?? 'absent');
     }
 
     since = page.nextSince;
@@ -327,10 +356,7 @@ export async function syncAccount(
       if (sync.rev === null || seenOnServer.has(id)) continue;
       if (sync.dirty)
         await local.updateSync(id, (s) => ({ ...(s ?? sync), rev: null }));
-      else {
-        await local.remove(id);
-        report.removed.push(id);
-      }
+      else if (await local.remove(id, sync)) report.removed.push(id);
     }
 
   // 3. Push what changed here, including copies made along the way
@@ -372,13 +398,8 @@ export async function syncAccount(
     }
 
     if (outcome.ok) {
-      const { rev } = outcome.meta;
       // Saved again while uploading: stays changed, now based on the new revision
-      await local.updateSync(id, (s) =>
-        s && s.updatedAt !== sync.updatedAt
-          ? { ...s, rev, error: null }
-          : syncedState(rev, s),
-      );
+      await settle(id, outcome.meta.rev, sync);
       report.uploaded.push(id);
       continue;
     }
@@ -386,9 +407,9 @@ export async function syncAccount(
     // Another device saved first
     const current = outcome.current;
     if (current && current.contentHash === contentHash)
-      await local.updateSync(id, (s) => syncedState(current.rev, s));
+      await settle(id, current.rev, sync);
     else {
-      const copyId = await keepBoth(id);
+      const copyId = await keepBoth(id, sync);
       if (copyId) queue.push(copyId);
     }
   }

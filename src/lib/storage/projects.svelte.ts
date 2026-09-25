@@ -21,6 +21,7 @@ import type {
   LocalStore,
   ProjectSyncState,
 } from '$lib/sync/engine';
+import { unchangedSince } from '$lib/sync/seen';
 import { del, get, set } from 'idb-keyval';
 
 export type StoredProjectIndexItem = {
@@ -148,17 +149,18 @@ export class ProjectStorage {
 
     const _project = localProject || this.project();
 
-    // Atomic-like update: set the project data first
-    await set(`${PROJECT_PREFIX}${_id}`, _project);
-
-    // Verify written data (Safety check)
-    const verified = await this.getById(_id);
-    if (!verified) {
-      throw new Error(`Failed to verify project storage for ID: ${_id}`);
-    }
-
-    // Then update index
+    // The data and the index change together, so a sync can't land in between
     const indexItem = await withIndexLock(async () => {
+      // Atomic-like update: set the project data first
+      await set(`${PROJECT_PREFIX}${_id}`, _project);
+
+      // Verify written data (Safety check)
+      const verified = await this.getById(_id);
+      if (!verified) {
+        throw new Error(`Failed to verify project storage for ID: ${_id}`);
+      }
+
+      // Then update index
       const index = await this.getIndex();
       const existingIndex = index.findIndex((i) => i.id === _id);
       const existing = index[existingIndex]?.sync;
@@ -211,14 +213,19 @@ export class ProjectStorage {
     this.onChange?.();
   }
 
-  /** Removes a project from this browser only. Returns its index entry, if any. */
+  /**
+   * Removes a project from this browser only, if `unless` doesn't object to its
+   * current entry. Returns the entry removed, if any.
+   */
   static async removeLocalOnly(
     id: string,
+    unless?: (item: StoredProjectIndexItem | undefined) => boolean,
   ): Promise<StoredProjectIndexItem | undefined> {
-    await del(`${PROJECT_PREFIX}${id}`);
     return withIndexLock(async () => {
       const index = await this.getIndex();
       const item = index.find((i) => i.id === id);
+      if (unless?.(item)) return undefined;
+      await del(`${PROJECT_PREFIX}${id}`);
       if (item) await this.setIndex(index.filter((i) => i.id !== id));
       return item;
     });
@@ -277,23 +284,29 @@ export class ProjectStorage {
       list: async () =>
         (await this.getIndex()).map(({ id, sync }) => ({ id, sync })),
       read: (id) => this.getById(id),
-      put: async (id, project, sync) => {
-        await set(`${PROJECT_PREFIX}${id}`, project);
-        await withIndexLock(async () => {
+      put: (id, project, sync, seen) =>
+        withIndexLock(async () => {
           const index = await this.getIndex();
-          const item = indexItemFor(id, project, sync);
           const at = index.findIndex((i) => i.id === id);
+          if (!unchangedSince(index[at], seen)) return false;
+          await set(`${PROJECT_PREFIX}${id}`, project);
+          const item = indexItemFor(id, project, sync);
           if (at > -1) index[at] = item;
           else index.push(item);
           await this.setIndex(index);
-        });
-      },
+          return true;
+        }),
       updateSync: (id, update) =>
         this.updateSyncStates((item) =>
           item.id === id ? update(item.sync) : 'unchanged',
         ),
-      remove: async (id) => {
-        await this.removeLocalOnly(id);
+      remove: async (id, seen) => {
+        let unchanged = false;
+        await this.removeLocalOnly(id, (item) => {
+          unchanged = Boolean(item) && unchangedSince(item, seen);
+          return !unchanged;
+        });
+        return unchanged;
       },
       accountState: (userId) => this.accountSyncState(userId),
       setAccountState: (userId, state) =>
@@ -325,10 +338,12 @@ export class ProjectStorage {
    */
   static async getProjectsForDisplay(): Promise<StoredProjectIndexItem[]> {
     const index = await this.getIndex();
-    // Another account's projects stay hidden on a shared browser
+    // While someone is signed in, another account's projects stay hidden (a
+    // shared browser). Signed out, everything shows, including projects of an
+    // account whose session ended.
     const owner = this.syncOwner();
     return index
-      .filter((i) => !i.sync || i.sync.ownerUserId === owner)
+      .filter((i) => !owner || !i.sync || i.sync.ownerUserId === owner)
       .reverse();
   }
 

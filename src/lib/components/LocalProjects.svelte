@@ -59,7 +59,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {@const { meta } = project}
           <ProjectDetails
             project={meta}
-            syncLabel={signedIn ? syncLabelFor(project) : undefined}
+            syncLabel={__ACCOUNTS_ENABLED__
+              ? syncLabelFor(project, signedIn)
+              : undefined}
             onclick={async () => {
               await ProjectStorage.removeByHref(meta.href);
               await loadProjects();

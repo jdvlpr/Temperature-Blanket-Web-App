@@ -44,9 +44,17 @@ export type SyncLabel = {
   tone: 'success' | 'warning' | 'error' | 'surface';
 };
 
-/** Where a saved project is kept, for the list of saved projects. */
-export function syncLabelFor(item: { sync?: ProjectSyncState }): SyncLabel {
+/**
+ * Where a saved project is kept, for the list of saved projects. Nothing for a
+ * guest's projects, so the list looks as it always has.
+ */
+export function syncLabelFor(
+  item: { sync?: ProjectSyncState },
+  signedIn: boolean,
+): SyncLabel | undefined {
   const state = item.sync;
+  if (!signedIn)
+    return state ? { text: 'Sign in to sync', tone: 'warning' } : undefined;
   if (!state) return { text: 'Only in this browser', tone: 'surface' };
   if (state.error === 'QUOTA_EXCEEDED')
     return { text: 'Not synced: account storage full', tone: 'error' };

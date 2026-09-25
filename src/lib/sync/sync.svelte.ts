@@ -31,6 +31,7 @@ export { sync, type SyncState } from './status.svelte';
 
 const SAVE_DELAY_MS = 3000;
 const FOCUS_INTERVAL_MS = 60_000;
+const BUSY_RETRY_MS = 10_000;
 
 let started = false;
 let timer: ReturnType<typeof setTimeout> | undefined;
@@ -89,13 +90,15 @@ export async function syncNow(): Promise<void> {
   running = (async () => {
     do {
       again = false;
-      // Another tab is syncing: it covers this one's changes too
+      // Another tab is syncing. It may have missed a change made here after it
+      // started, so look again shortly.
       if (navigator.locks)
         await navigator.locks.request(
           'tb-sync',
           { ifAvailable: true },
           async (lock) => {
             if (lock) await runPass(userId);
+            else scheduleSync(BUSY_RETRY_MS);
           },
         );
       else await runPass(userId);

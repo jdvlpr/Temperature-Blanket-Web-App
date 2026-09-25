@@ -139,7 +139,7 @@ describe('ProjectStorage with sync', () => {
     });
   });
 
-  it("lists guest projects and the signed-in account's, not another account's", async () => {
+  it("hides another account's projects only while someone is signed in", async () => {
     await ProjectStorage.save({ id: 'guest', localProject: saved });
     owner = 'u1';
     await ProjectStorage.save({ id: 'mine', localProject: saved });
@@ -150,9 +150,10 @@ describe('ProjectStorage with sync', () => {
     const ids = (await ProjectStorage.getProjectsForDisplay()).map((i) => i.id);
     expect(ids).toEqual(['mine', 'guest']);
 
+    // Signed out: a session may have ended, so nothing is hidden
     owner = null;
     expect(
       (await ProjectStorage.getProjectsForDisplay()).map((i) => i.id),
-    ).toEqual(['guest']);
+    ).toEqual(['theirs', 'mine', 'guest']);
   });
 });

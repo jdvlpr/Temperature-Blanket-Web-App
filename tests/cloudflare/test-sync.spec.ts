@@ -126,6 +126,41 @@ async function saveProject(
 }
 
 /** Opens the Project Planner's list of saved projects (shown when there are any). */
+/** Edits a saved project, as saving it again in the Project Planner would. */
+async function editProject(page: Page, id: string, title: string) {
+  await page.evaluate(
+    async ({ id, title }) => {
+      const db = await new Promise<IDBDatabase>((resolve, reject) => {
+        const open = indexedDB.open('keyval-store');
+        open.onsuccess = () => resolve(open.result);
+        open.onerror = () => reject(open.error);
+      });
+      const store = db.transaction('keyval', 'readwrite').objectStore('keyval');
+      const read = <T>(key: string) =>
+        new Promise<T>((resolve) => {
+          const request = store.get(key);
+          request.onsuccess = () => resolve(request.result);
+        });
+      const project = await read<{ title: string }>(`p_${id}`);
+      const index = await read<
+        {
+          id: string;
+          meta: { title: string };
+          sync: Record<string, unknown>;
+        }[]
+      >('projects_index');
+      const item = index.find((i) => i.id === id)!;
+      item.meta.title = title;
+      item.sync = { ...item.sync, dirty: true, updatedAt: Date.now() };
+      store.put({ ...project, title }, `p_${id}`);
+      store.put(index, 'projects_index');
+      await new Promise((resolve) => (store.transaction.oncomplete = resolve));
+      db.close();
+    },
+    { id, title },
+  );
+}
+
 async function openSavedProjects(page: Page, { empty = false } = {}) {
   await page.goto('/');
   // Retried: a click before the page finishes loading does nothing
@@ -310,6 +345,14 @@ test.describe('Sync in the browser', () => {
     await expect(phone.getByRole('link', { name: 'Still here' })).toBeVisible();
     await expect(phone.getByTestId('sync-label')).toHaveText('Waiting to sync');
 
+    // Visiting the account page finds the session over and forgets the account;
+    // the project still shows
+    await phone.goto('/account');
+    await expect(phone.getByText('You’re not signed in.')).toBeVisible();
+    await openSavedProjects(phone);
+    await expect(phone.getByRole('link', { name: 'Still here' })).toBeVisible();
+    await expect(phone.getByTestId('sync-label')).toHaveText('Sign in to sync');
+
     // Someone else signs in on this browser
     await signIn(phone, phone.request, uniqueEmail('sync-other-person'));
     await openSavedProjects(phone, { empty: true });
@@ -319,6 +362,46 @@ test.describe('Sync in the browser', () => {
     expect((await savedIndex(phone)).map((i) => i.meta.title)).toEqual([
       'Still here',
     ]);
+  });
+
+  test('when both devices change a project, both versions are kept', async ({
+    browser,
+    baseURL,
+  }) => {
+    const { phone, laptop } = await twoDevices(browser, baseURL!);
+    const email = uniqueEmail('sync-conflict');
+    await signIn(phone, phone.request, email);
+    await signIn(laptop, laptop.request, email);
+    const id = await saveProject(phone, 'Original', {
+      ownerUserId: await userIdOf(phone),
+      rev: null,
+      dirty: true,
+      updatedAt: Date.now(),
+    });
+    await openSavedProjects(phone);
+    await expect(phone.getByTestId('sync-label')).toHaveText('Synced');
+    await openSavedProjects(laptop);
+    await expect(laptop.getByTestId('sync-label')).toHaveText('Synced');
+
+    // Both edit before either syncs
+    await editProject(phone, id, 'Phone edit');
+    await editProject(laptop, id, 'Laptop edit');
+
+    await openSavedProjects(phone);
+    await expect(phone.getByTestId('sync-label')).toHaveText('Synced');
+
+    await openSavedProjects(laptop);
+    await expect(
+      laptop.getByRole('link', { name: 'Phone edit' }),
+    ).toBeVisible();
+    await expect(
+      laptop.getByRole('link', {
+        name: /^Laptop edit \(copy from this device, /,
+      }),
+    ).toBeVisible();
+    await expect
+      .poll(async () => (await serverProjectIds(laptop)).length)
+      .toBe(2);
   });
 
   test('changes made offline sync when the browser reconnects', async ({
