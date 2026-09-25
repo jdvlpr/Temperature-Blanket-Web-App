@@ -37,6 +37,8 @@ export class AccountError extends Error {
 export function accountErrorMessage(error: unknown): string {
   if (!(error instanceof AccountError))
     return 'Something went wrong. Check your connection and try again.';
+  if (error.code === 'TOO_MANY_REQUESTS')
+    return 'Too many codes have been sent to this email. Try again in an hour.';
   if (error.code === 'TOO_MANY_ATTEMPTS')
     return 'Too many tries. Request a new code.';
   if (error.status === 429)
@@ -88,3 +90,28 @@ export const getSession = () =>
   call<{ user: AccountUser } | null>('/get-session');
 
 export const signOut = () => call<{ success: boolean }>('/sign-out', {});
+
+/** Ends every session for this account, including this one. */
+export async function signOutEverywhere() {
+  await call<{ status: boolean }>('/revoke-sessions', {});
+  // Revoking leaves this browser's cookie in place; signing out clears it
+  await signOut().catch(() => undefined);
+  clearSignedInHint();
+}
+
+const SIGNED_IN_HINT_COOKIE = 'tb_signed_in';
+
+/**
+ * Whether this browser may be signed in (a readable hint set by the server).
+ * Without it, skip asking the server for the session.
+ */
+export function hasSignedInHint(): boolean {
+  return document.cookie
+    .split(';')
+    .some((part) => part.trim().startsWith(`${SIGNED_IN_HINT_COOKIE}=1`));
+}
+
+/** Clears a hint left behind after the session ended on the server. */
+export function clearSignedInHint() {
+  document.cookie = `${SIGNED_IN_HINT_COOKIE}=; Max-Age=0; Path=/; SameSite=Lax`;
+}

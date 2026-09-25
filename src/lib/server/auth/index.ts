@@ -20,7 +20,10 @@ import { getEmailSender } from '$lib/server/email';
 import { json, type RequestEvent } from '@sveltejs/kit';
 import { betterAuth } from 'better-auth';
 import { AsyncLocalStorage } from 'node:async_hooks';
+import { cleanUpExpired } from './cleanup';
+import { allowCodeRequest } from './code-request-limit';
 import { signInCodeEmail } from './emails';
+import { withSignedInHint } from './hint-cookie';
 import { buildAuthOptions } from './options';
 import { readAuthSettings } from './settings';
 
@@ -86,5 +89,35 @@ export async function handleAuthRequest(
     cached = { key, auth: createAuth(platform, result.settings) };
 
   const auth = cached.auth;
-  return requestPlatform.run(platform, () => auth.handler(event.request));
+  const db = platform.env.DB;
+
+  return requestPlatform.run(platform, async () => {
+    if (
+      event.request.method === 'POST' &&
+      event.url.pathname === '/api/auth/email-otp/send-verification-otp'
+    ) {
+      const body = await event.request
+        .clone()
+        .json()
+        .catch(() => null);
+      if (
+        typeof body?.email === 'string' &&
+        !(await allowCodeRequest(db, body.email))
+      )
+        return json(
+          {
+            code: 'TOO_MANY_REQUESTS',
+            message: 'Too many codes requested for this email',
+          },
+          { status: 429 },
+        );
+    }
+
+    const { response, signedIn } = withSignedInHint(
+      await auth.handler(event.request),
+      event.url.protocol === 'https:',
+    );
+    if (signedIn) runInBackground(cleanUpExpired(db));
+    return response;
+  });
 }

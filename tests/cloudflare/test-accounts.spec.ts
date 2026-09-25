@@ -16,7 +16,12 @@
 // Accounts under `wrangler pages dev` (pnpm test:e2e:cloudflare), built with
 // PUBLIC_ACCOUNTS_ENABLED=true. Sign-in codes are read from the dev email outbox.
 
-import { expect, test, type APIRequestContext } from '@playwright/test';
+import {
+  expect,
+  test,
+  type APIRequestContext,
+  type Page,
+} from '@playwright/test';
 
 /** Polls the dev outbox for the newest code sent to an address. */
 async function latestCode(
@@ -53,6 +58,17 @@ test.beforeEach(async ({ page }) => {
 const uniqueEmail = (label: string) =>
   `${label}-${Date.now()}-${Math.floor(Math.random() * 1e6)}@example.test`;
 
+/** Signs in through the sign-in page and waits for the account page. */
+async function signIn(page: Page, request: APIRequestContext, email: string) {
+  await page.goto('/auth/sign-in');
+  await page.getByLabel('Email').fill(email);
+  await page.getByRole('button', { name: 'Email me a code' }).click();
+  await expect(page.getByText(`We sent a code to ${email}`)).toBeVisible();
+  await page.getByLabel('Code').fill(await latestCode(request, email));
+  await page.getByRole('button', { name: 'Sign in', exact: true }).click();
+  await expect(page.getByTestId('account-email')).toHaveText(email);
+}
+
 test.describe('Accounts: sign in with an emailed code', () => {
   test('sign in, see the account, sign out', async ({ page, request }) => {
     const email = uniqueEmail('sign-in');
@@ -72,7 +88,7 @@ test.describe('Accounts: sign in with an emailed code', () => {
     await page.reload();
     await expect(page.getByTestId('account-email')).toHaveText(email);
 
-    await page.getByRole('button', { name: 'Sign out' }).click();
+    await page.getByRole('button', { name: 'Sign out', exact: true }).click();
     await expect(page.getByText('You’re not signed in.')).toBeVisible();
     await page.reload();
     await expect(page.getByText('You’re not signed in.')).toBeVisible();
@@ -120,5 +136,78 @@ test.describe('Accounts: sign in with an emailed code', () => {
     // The email code plugin allows 3 a minute
     for (let i = 0; i < 3; i++) expect((await send()).status()).toBe(200);
     expect((await send()).status()).toBe(429);
+  });
+
+  test('code requests are limited per email address, from any IP', async ({
+    request,
+  }) => {
+    const email = uniqueEmail('per-email');
+    const send = () =>
+      request.post('/api/auth/email-otp/send-verification-otp', {
+        headers: { 'CF-Connecting-IP': randomTestIp() },
+        data: { email, type: 'sign-in' },
+      });
+    for (let i = 0; i < 5; i++) expect((await send()).status()).toBe(200);
+    const blocked = await send();
+    expect(blocked.status()).toBe(429);
+    expect((await blocked.json()).code).toBe('TOO_MANY_REQUESTS');
+  });
+});
+
+test.describe('Accounts: signed-in hint and sessions', () => {
+  test('the hint cookie follows the session, and signed-out pages make no session request', async ({
+    page,
+    context,
+    request,
+  }) => {
+    const sessionRequests: string[] = [];
+    page.on('request', (r) => {
+      if (r.url().includes('/api/auth/get-session'))
+        sessionRequests.push(r.url());
+    });
+
+    await page.goto('/account');
+    await expect(page.getByText('You’re not signed in.')).toBeVisible();
+    expect(sessionRequests).toHaveLength(0);
+
+    await signIn(page, request, uniqueEmail('hint'));
+    const cookies = await context.cookies();
+    const hint = cookies.find((c) => c.name === 'tb_signed_in');
+    const session = cookies.find((c) => c.name.endsWith('tb.session_token'));
+    expect(hint?.value).toBe('1');
+    expect(hint?.httpOnly).toBe(false);
+    expect(session?.httpOnly).toBe(true);
+
+    await page.getByRole('button', { name: 'Sign out', exact: true }).click();
+    await expect(page.getByText('You’re not signed in.')).toBeVisible();
+    expect(
+      (await context.cookies()).some((c) => c.name === 'tb_signed_in'),
+    ).toBe(false);
+  });
+
+  test('sign out everywhere ends sessions in other browsers', async ({
+    browser,
+    request,
+  }) => {
+    const email = uniqueEmail('everywhere');
+    const [first, second] = await Promise.all([
+      browser.newContext(),
+      browser.newContext(),
+    ]);
+    const pageA = await first.newPage();
+    const pageB = await second.newPage();
+    await pageA.setExtraHTTPHeaders({ 'CF-Connecting-IP': randomTestIp() });
+    await pageB.setExtraHTTPHeaders({ 'CF-Connecting-IP': randomTestIp() });
+
+    await signIn(pageA, request, email);
+    await signIn(pageB, request, email);
+
+    await pageA.getByRole('button', { name: 'Sign out everywhere' }).click();
+    await expect(pageA.getByText('You’re not signed in.')).toBeVisible();
+
+    await pageB.reload();
+    await expect(pageB.getByText('You’re not signed in.')).toBeVisible();
+
+    await Promise.all([first.close(), second.close()]);
   });
 });

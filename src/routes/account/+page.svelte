@@ -18,11 +18,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import AppShell from '$lib/components/AppShell.svelte';
   import {
     accountErrorMessage,
+    clearSignedInHint,
     getSession,
+    hasSignedInHint,
     signOut,
+    signOutEverywhere,
     type AccountUser,
   } from '$lib/accounts/client';
-  import { LoaderCircleIcon, LogOutIcon } from '@lucide/svelte';
+  import {
+    LoaderCircleIcon,
+    LogOutIcon,
+    MonitorSmartphoneIcon,
+  } from '@lucide/svelte';
   import { resolve } from '$app/paths';
   import { onMount } from 'svelte';
 
@@ -34,9 +41,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   onMount(async () => {
     if (!__ACCOUNTS_ENABLED__) return;
+    if (!hasSignedInHint()) {
+      status = 'signed-out';
+      return;
+    }
     try {
       const session = await getSession();
       user = session?.user ?? null;
+      if (!user) clearSignedInHint();
       status = user ? 'signed-in' : 'signed-out';
     } catch (e) {
       errorMessage = accountErrorMessage(e);
@@ -44,11 +56,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     }
   });
 
-  async function handleSignOut() {
+  async function handleSignOut(everywhere = false) {
     busy = true;
     errorMessage = '';
     try {
-      await signOut();
+      if (everywhere) await signOutEverywhere();
+      else await signOut();
       user = null;
       status = 'signed-out';
     } catch (e) {
@@ -87,18 +100,32 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {#if errorMessage}
           <p class="text-error-700-300" role="alert">{errorMessage}</p>
         {/if}
-        <button
-          type="button"
-          class="btn preset-tonal-surface w-fit"
-          onclick={handleSignOut}
-          disabled={busy}
-        >
-          <LogOutIcon /> Sign out
-        </button>
+        <div class="flex flex-wrap gap-2">
+          <button
+            type="button"
+            class="btn preset-tonal-surface w-fit"
+            onclick={() => handleSignOut()}
+            disabled={busy}
+          >
+            <LogOutIcon /> Sign out
+          </button>
+          <button
+            type="button"
+            class="btn preset-tonal-surface w-fit"
+            onclick={() => handleSignOut(true)}
+            disabled={busy}
+          >
+            <MonitorSmartphoneIcon /> Sign out everywhere
+          </button>
+        </div>
+        <p class="text-sm opacity-80">
+          Sign out everywhere ends your sessions on every device and browser.
+        </p>
       {:else if status === 'signed-out'}
         <p>You’re not signed in.</p>
-        <a href={resolve('/auth/sign-in')} class="btn preset-filled-primary-500 w-fit"
-          >Sign in</a
+        <a
+          href={resolve('/auth/sign-in')}
+          class="btn preset-filled-primary-500 w-fit">Sign in</a
         >
       {:else}
         <p class="text-error-700-300" role="alert">{errorMessage}</p>
