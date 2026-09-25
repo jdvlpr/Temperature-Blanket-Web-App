@@ -15,10 +15,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import {
-    AccountError,
     accountErrorMessage,
     clearSignedInHint,
     deleteAccount,
+    needsFreshSession,
     sendSignInCode,
     signInWithCode,
   } from '$lib/accounts/client';
@@ -39,7 +39,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       clearSignedInHint();
       ondeleted();
     } catch (e) {
-      if (e instanceof AccountError && e.code === 'SESSION_EXPIRED') {
+      if (needsFreshSession(e)) {
         // More than 10 minutes since sign-in: confirm with a new code first
         try {
           await sendSignInCode(email);

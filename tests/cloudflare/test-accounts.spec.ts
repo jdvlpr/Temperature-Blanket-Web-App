@@ -379,32 +379,100 @@ function localD1(sql: string): Record<string, unknown>[] {
   return JSON.parse(output)[0].results;
 }
 
-test.describe('Accounts: other sign-in methods', () => {
-  test('only configured providers are offered', async ({ page, request }) => {
-    // Google isn't configured in the e2e run
-    const response = await request.get('/api/account/sign-in-options');
-    expect(await response.json()).toEqual({ google: false });
+/** Adds a linked Google sign-in, as linking would store it (Google can't run here). */
+function seedGoogleAccount(userId: string) {
+  const now = new Date().toISOString();
+  localD1(
+    `insert into "account" ("id", "accountId", "providerId", "userId", "createdAt", "updatedAt") values ('google-${userId}', 'google-user-${userId}', 'google', '${userId}', '${now}', '${now}')`,
+  );
+}
+
+const googleAccountCount = (userId: string) =>
+  localD1(
+    `select count(*) as n from "account" where "userId" = '${userId}' and "providerId" = 'google'`,
+  )[0].n;
+
+async function currentUserId(page: Page): Promise<string> {
+  return (await (await page.request.get('/api/account/export')).json()).account
+    .id;
+}
+
+test.describe('Accounts: Google', () => {
+  test('Google is offered when configured, and starts at Google', async ({
+    page,
+    request,
+    baseURL,
+  }) => {
+    const options = await request.get('/api/account/sign-in-options');
+    expect(await options.json()).toEqual({ google: true });
     await page.goto('/auth/sign-in');
     await expect(
       page.getByRole('button', { name: 'Continue with Google' }),
-    ).toHaveCount(0);
+    ).toBeVisible();
+
+    const response = await request.post('/api/auth/sign-in/social', {
+      headers: { Origin: baseURL! },
+      data: { provider: 'google', callbackURL: '/account' },
+    });
+    const url = new URL((await response.json()).url);
+    expect(url.host).toBe('accounts.google.com');
+    expect(url.searchParams.get('redirect_uri')).toBe(
+      `${baseURL}/api/auth/callback/google`,
+    );
+  });
+
+  test('unlink Google', async ({ page, request }) => {
+    await signIn(page, request, uniqueEmail('unlink'));
+    const userId = await currentUserId(page);
+    seedGoogleAccount(userId);
+    await page.reload();
+
+    const google = page.getByTestId('provider-google');
+    await expect(google.getByText('Linked')).toBeVisible();
+    await google.getByRole('button', { name: 'Unlink Google' }).click();
+    await expect(
+      google.getByRole('button', { name: 'Link Google' }),
+    ).toBeVisible();
+    expect(googleAccountCount(userId)).toBe(0);
+  });
+
+  test('unlink with an old session asks for a new code first', async ({
+    page,
+    request,
+  }) => {
+    const email = uniqueEmail('unlink-stale');
+    await signIn(page, request, email);
+    const userId = await currentUserId(page);
+    seedGoogleAccount(userId);
+    // Age the session past the 10-minute freshness limit
+    const twentyMinutesAgo = new Date(
+      Date.now() - 20 * 60 * 1000,
+    ).toISOString();
+    localD1(
+      `update "session" set "createdAt" = '${twentyMinutesAgo}' where "userId" = '${userId}'`,
+    );
+    await page.reload();
+
+    const google = page.getByTestId('provider-google');
+    await google.getByRole('button', { name: 'Unlink Google' }).click();
+    await expect(
+      page.getByText('To unlink Google, confirm it’s you'),
+    ).toBeVisible();
+    await page.getByLabel('Code').fill(await latestCode(request, email));
+    await page.getByRole('button', { name: 'Confirm and unlink' }).click();
+    await expect(
+      google.getByRole('button', { name: 'Link Google' }),
+    ).toBeVisible();
+    expect(googleAccountCount(userId)).toBe(0);
   });
 
   test('deleting the account removes its linked sign-ins', async ({
     page,
     request,
   }) => {
-    const email = uniqueEmail('delete-linked');
-    await signIn(page, request, email);
-    const userId = (
-      await (await page.request.get('/api/account/export')).json()
-    ).account.id as string;
-
-    // A linked Google sign-in, as linking would store it (Google can't run here)
-    const now = new Date().toISOString();
-    localD1(
-      `insert into "account" ("id", "accountId", "providerId", "userId", "createdAt", "updatedAt") values ('google-${userId}', 'google-user-${userId}', 'google', '${userId}', '${now}', '${now}')`,
-    );
+    await signIn(page, request, uniqueEmail('delete-linked'));
+    const userId = await currentUserId(page);
+    seedGoogleAccount(userId);
 
     await page.getByRole('button', { name: 'Delete account' }).click();
     await page.getByRole('button', { name: 'Yes, delete my account' }).click();

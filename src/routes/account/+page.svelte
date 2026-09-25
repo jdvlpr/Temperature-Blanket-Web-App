@@ -116,7 +116,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
         <section class="flex flex-col gap-2">
           <h3 class="h4">Sign-in methods</h3>
-          <SignInMethods />
+          <SignInMethods email={user.email} />
         </section>
 
         <section class="flex flex-col gap-2">

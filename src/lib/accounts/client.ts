@@ -33,6 +33,15 @@ export class AccountError extends Error {
   }
 }
 
+/**
+ * Whether an action refused because the session is over 10 minutes old; confirm
+ * with a new code, then retry. Delete says SESSION_EXPIRED, other actions
+ * SESSION_NOT_FRESH.
+ */
+export const needsFreshSession = (error: unknown) =>
+  error instanceof AccountError &&
+  (error.code === 'SESSION_EXPIRED' || error.code === 'SESSION_NOT_FRESH');
+
 /** A message for people, from an account API error. */
 export function accountErrorMessage(error: unknown): string {
   if (!(error instanceof AccountError))
@@ -161,11 +170,17 @@ export async function linkProvider(provider: SignInProvider) {
   window.location.assign(url);
 }
 
-export const listLinkedProviders = () =>
-  call<{ providerId: string }[]>('/list-accounts');
+/** A sign-in method linked to the account; `id` is the account record's ID. */
+export type LinkedAccount = { id: string; providerId: string };
 
-export const unlinkProvider = (provider: SignInProvider) =>
-  call<{ status: boolean }>('/unlink-account', { providerId: provider });
+export const listLinkedAccounts = () => call<LinkedAccount[]>('/list-accounts');
+
+/**
+ * Unlinks one linked account, by its record ID from listLinkedAccounts. Needs a
+ * session less than 10 minutes old (else SESSION_EXPIRED).
+ */
+export const unlinkAccount = (id: string) =>
+  call<{ status: boolean }>('/unlink-account', { accountId: id });
 
 /** A message for the ?error= that a failed provider sign-in or link returns with. */
 export function providerErrorMessage(error: string): string {
