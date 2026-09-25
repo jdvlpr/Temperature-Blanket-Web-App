@@ -15,6 +15,7 @@
 
 // One synced project: download, save, delete (see $lib/sync/protocol).
 
+import { dev } from '$app/environment';
 import { SYNC_HEADERS, type ProjectMeta } from '$lib/sync/protocol';
 import type { RequestHandler } from './$types';
 
@@ -83,7 +84,11 @@ export const PUT: RequestHandler = async (event) => {
     ...headers.value,
     userId: sync.userId,
     projectId: event.params.id,
-    body: event.request.body as never,
+    // Workers stream a body of known length straight to R2; the dev server's R2
+    // proxy can't take a stream, so there it's read first
+    body: dev
+      ? await event.request.arrayBuffer()
+      : (event.request.body as never),
   });
 
   if (result.status === 'conflict') return conflict(result.current);
