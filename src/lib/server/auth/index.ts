@@ -22,7 +22,7 @@ import { betterAuth } from 'better-auth';
 import { AsyncLocalStorage } from 'node:async_hooks';
 import { cleanUpExpired } from './cleanup';
 import { allowCodeRequest } from './code-request-limit';
-import { signInCodeEmail } from './emails';
+import { emailChangedNotice, signInCodeEmail } from './emails';
 import { withSignedInHint } from './hint-cookie';
 import { buildAuthOptions } from './options';
 import { readAuthSettings } from './settings';
@@ -67,11 +67,10 @@ function createAuth(
 // One instance per isolate: creating it is too costly to repeat on every request
 let cached: { key: string; auth: Auth } | undefined;
 
-/** Handles a request under /api/auth. 404 when accounts are off, 503 when misconfigured. */
-export async function handleAuthRequest(
-  event: RequestEvent,
-): Promise<Response> {
-  const { platform } = event;
+const MAX_DISPLAY_NAME_LENGTH = 80;
+
+/** The shared auth instance, or a 404 (accounts off) or 503 (misconfigured) Response. */
+function authFor(platform: App.Platform | undefined): Auth | Response {
   const result = readAuthSettings(platform?.env);
 
   if (result.status === 'disabled')
@@ -87,19 +86,31 @@ export async function handleAuthRequest(
   const key = JSON.stringify(result.settings);
   if (cached?.key !== key)
     cached = { key, auth: createAuth(platform, result.settings) };
+  return cached.auth;
+}
 
-  const auth = cached.auth;
-  const db = platform.env.DB;
+async function jsonBody(request: Request) {
+  return request
+    .clone()
+    .json()
+    .catch(() => null);
+}
+
+const isPost = (event: RequestEvent, path: string) =>
+  event.request.method === 'POST' && event.url.pathname === path;
+
+/** Handles a request under /api/auth. */
+export async function handleAuthRequest(
+  event: RequestEvent,
+): Promise<Response> {
+  const { platform } = event;
+  const auth = authFor(platform);
+  if (auth instanceof Response) return auth;
+  const db = platform!.env!.DB!;
 
   return requestPlatform.run(platform, async () => {
-    if (
-      event.request.method === 'POST' &&
-      event.url.pathname === '/api/auth/email-otp/send-verification-otp'
-    ) {
-      const body = await event.request
-        .clone()
-        .json()
-        .catch(() => null);
+    if (isPost(event, '/api/auth/email-otp/send-verification-otp')) {
+      const body = await jsonBody(event.request);
       if (
         typeof body?.email === 'string' &&
         !(await allowCodeRequest(db, body.email))
@@ -113,11 +124,60 @@ export async function handleAuthRequest(
         );
     }
 
+    if (isPost(event, '/api/auth/update-user')) {
+      const body = await jsonBody(event.request);
+      if (
+        typeof body?.name === 'string' &&
+        body.name.trim().length > MAX_DISPLAY_NAME_LENGTH
+      )
+        return json(
+          { code: 'NAME_TOO_LONG', message: 'Display name is too long' },
+          { status: 400 },
+        );
+    }
+
+    // Who to notify, and of what, if this request changes the account's email.
+    // Read before Better Auth consumes the request body.
+    let emailChange: { from: string; to: string } | undefined;
+    if (isPost(event, '/api/auth/email-otp/change-email')) {
+      const [session, body] = await Promise.all([
+        auth.api.getSession({ headers: event.request.headers }),
+        jsonBody(event.request),
+      ]);
+      if (session && typeof body?.newEmail === 'string')
+        emailChange = { from: session.user.email, to: body.newEmail };
+    }
+
     const { response, signedIn } = withSignedInHint(
       await auth.handler(event.request),
       event.url.protocol === 'https:',
     );
     if (signedIn) runInBackground(cleanUpExpired(db));
+
+    if (emailChange && response.ok)
+      runInBackground(
+        getEmailSender(platform).send(
+          emailChangedNotice(emailChange.from, emailChange.to),
+        ),
+      );
     return response;
   });
+}
+
+/**
+ * The signed-in user for an app route under /api/account, with the auth
+ * instance for further calls. A Response (404, 503 or 401) when there's none.
+ */
+export async function requireAccount(
+  event: RequestEvent,
+): Promise<
+  { auth: Auth; user: { id: string; email: string; name: string } } | Response
+> {
+  const auth = authFor(event.platform);
+  if (auth instanceof Response) return auth;
+  const session = await auth.api.getSession({
+    headers: event.request.headers,
+  });
+  if (!session) return json({ message: 'Not signed in' }, { status: 401 });
+  return { auth, user: session.user };
 }

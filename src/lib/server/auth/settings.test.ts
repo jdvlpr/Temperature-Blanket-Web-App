@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { signInCodeEmail } from './emails';
+import { emailChangedNotice, signInCodeEmail } from './emails';
 import { trustedOriginsFor } from './options';
 import { readAuthSettings } from './settings';
 
@@ -88,5 +88,17 @@ describe('signInCodeEmail', () => {
     expect(
       signInCodeEmail('a@example.test', '123456', 'change-email').text,
     ).toContain('confirm your new email address');
+  });
+});
+
+describe('emailChangedNotice', () => {
+  it('goes to the old address and masks the new one', () => {
+    const notice = emailChangedNotice(
+      'old@example.test',
+      'newname@example.test',
+    );
+    expect(notice.to).toBe('old@example.test');
+    expect(notice.text).toContain('changed to n***@example.test');
+    expect(notice.text).not.toContain('newname');
   });
 });

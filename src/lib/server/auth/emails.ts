@@ -41,3 +41,19 @@ export function signInCodeEmail(
     ].join('\n'),
   };
 }
+
+/** Sent to the old address after the account's email changes. */
+export function emailChangedNotice(to: string, newEmail: string): EmailMessage {
+  const [name, domain] = newEmail.split('@');
+  const masked = `${name.slice(0, 1)}***@${domain ?? ''}`;
+  return {
+    to,
+    subject: 'Your Temperature Blanket email was changed',
+    text: [
+      `The email address for your temperature-blanket.com account was changed to ${masked}.`,
+      '',
+      'If you made this change, you don’t need to do anything.',
+      'If you didn’t, contact info@temperature-blanket.com.',
+    ].join('\n'),
+  };
+}

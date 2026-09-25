@@ -39,6 +39,7 @@ export function accountErrorMessage(error: unknown): string {
     return 'Something went wrong. Check your connection and try again.';
   if (error.code === 'TOO_MANY_REQUESTS')
     return 'Too many codes have been sent to this email. Try again in an hour.';
+  if (error.code === 'NAME_TOO_LONG') return 'Use 80 characters or fewer.';
   if (error.code === 'TOO_MANY_ATTEMPTS')
     return 'Too many tries. Request a new code.';
   if (error.status === 429)
@@ -90,6 +91,40 @@ export const getSession = () =>
   call<{ user: AccountUser } | null>('/get-session');
 
 export const signOut = () => call<{ success: boolean }>('/sign-out', {});
+
+export const updateName = (name: string) =>
+  call<{ status: boolean }>('/update-user', { name });
+
+/** Step 1 of changing email: a code to the current address. */
+export const sendCurrentEmailCode = (currentEmail: string) =>
+  call<{ success: boolean }>('/email-otp/send-verification-otp', {
+    email: currentEmail,
+    type: 'email-verification',
+  });
+
+/** Step 2: prove the current address, and send a code to the new one. */
+export const requestEmailChange = (
+  newEmail: string,
+  currentEmailCode: string,
+) =>
+  call<{ success: boolean }>('/email-otp/request-email-change', {
+    newEmail,
+    otp: currentEmailCode,
+  });
+
+/** Step 3: prove the new address. */
+export const confirmEmailChange = (newEmail: string, newEmailCode: string) =>
+  call<{ status: boolean }>('/email-otp/change-email', {
+    newEmail,
+    otp: newEmailCode,
+  });
+
+/**
+ * Deletes the account. Throws an AccountError with code SESSION_EXPIRED when
+ * the session is more than 10 minutes old: sign in again with a code first.
+ */
+export const deleteAccount = () =>
+  call<{ success: boolean }>('/delete-user', {});
 
 /** Ends every session for this account, including this one. */
 export async function signOutEverywhere() {

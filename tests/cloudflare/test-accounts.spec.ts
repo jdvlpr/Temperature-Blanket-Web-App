@@ -22,6 +22,7 @@ import {
   type APIRequestContext,
   type Page,
 } from '@playwright/test';
+import { execFileSync } from 'node:child_process';
 
 /** Polls the dev outbox for the newest code sent to an address. */
 async function latestCode(
@@ -51,8 +52,14 @@ async function latestCode(
 const randomTestIp = () =>
   `10.${Math.floor(Math.random() * 256)}.${Math.floor(Math.random() * 256)}.${1 + Math.floor(Math.random() * 254)}`;
 
-test.beforeEach(async ({ page }) => {
+test.beforeEach(async ({ page, context, baseURL }) => {
   await page.setExtraHTTPHeaders({ 'CF-Connecting-IP': randomTestIp() });
+  // Pre-answer the analytics consent toast, which otherwise covers buttons at the
+  // bottom of the page (as in test-project-planner.spec.ts)
+  await context.addCookies([
+    { name: '_clck', value: '1', url: baseURL },
+    { name: '_clsk', value: '1', url: baseURL },
+  ]);
 });
 
 const uniqueEmail = (label: string) =>
@@ -209,5 +216,149 @@ test.describe('Accounts: signed-in hint and sessions', () => {
     await expect(pageB.getByText('You’re not signed in.')).toBeVisible();
 
     await Promise.all([first.close(), second.close()]);
+  });
+});
+
+/** Polls the dev outbox until a message whose subject matches arrives. */
+async function expectEmail(
+  request: APIRequestContext,
+  to: string,
+  subject: RegExp,
+) {
+  await expect
+    .poll(
+      async () => {
+        const response = await request.get(
+          `/api/dev/outbox?to=${encodeURIComponent(to)}`,
+        );
+        const messages: { subject: string }[] = await response.json();
+        return messages.some((message) => subject.test(message.subject));
+      },
+      { message: `an email to ${to} matching ${subject}` },
+    )
+    .toBe(true);
+}
+
+test.describe('Accounts: managing the account', () => {
+  test('display name is saved, and an overlong one is refused', async ({
+    page,
+    request,
+  }) => {
+    await signIn(page, request, uniqueEmail('name'));
+    await page.getByLabel('Display name').fill('Blanket Maker');
+    await page.getByRole('button', { name: 'Save name' }).click();
+    await expect(page.getByRole('status')).toHaveText('Saved');
+    await page.reload();
+    await expect(page.getByLabel('Display name')).toHaveValue('Blanket Maker');
+
+    const tooLong = await page.request.post('/api/auth/update-user', {
+      data: { name: 'x'.repeat(81) },
+    });
+    expect(tooLong.status()).toBe(400);
+    expect((await tooLong.json()).code).toBe('NAME_TOO_LONG');
+  });
+
+  test('email change needs codes from both addresses and notifies the old one', async ({
+    page,
+    request,
+  }) => {
+    const oldEmail = uniqueEmail('old');
+    const newEmail = uniqueEmail('new');
+    await signIn(page, request, oldEmail);
+
+    await page.getByRole('button', { name: 'Change email' }).click();
+    await expect(page.getByText('First, confirm it’s you')).toBeVisible();
+    await page
+      .getByLabel('Code sent to your current email')
+      .fill(await latestCode(request, oldEmail));
+    await page.getByLabel('New email').fill(newEmail);
+    await page
+      .getByRole('button', { name: 'Send a code to the new email' })
+      .click();
+
+    await page
+      .getByLabel('Code sent to your new email')
+      .fill(await latestCode(request, newEmail));
+    await page.getByRole('button', { name: 'Change email' }).click();
+    await expect(
+      page.getByText(`Your email is now ${newEmail}.`),
+    ).toBeVisible();
+    await expect(page.getByTestId('account-email')).toHaveText(newEmail);
+    await expectEmail(request, oldEmail, /email was changed/);
+
+    // The new address signs in to the same account
+    await page.getByRole('button', { name: 'Sign out', exact: true }).click();
+    await signIn(page, request, newEmail);
+  });
+
+  test('delete with a fresh session; signing in again starts a new account', async ({
+    page,
+    context,
+    request,
+  }) => {
+    const email = uniqueEmail('delete');
+    await signIn(page, request, email);
+    await page.getByLabel('Display name').fill('Soon Gone');
+    await page.getByRole('button', { name: 'Save name' }).click();
+    await expect(page.getByRole('status')).toHaveText('Saved');
+
+    await page.getByRole('button', { name: 'Delete account' }).click();
+    await page.getByRole('button', { name: 'Yes, delete my account' }).click();
+    await expect(page.getByText('Your account was deleted.')).toBeVisible();
+    expect(
+      (await context.cookies()).some((c) => c.name === 'tb_signed_in'),
+    ).toBe(false);
+
+    await signIn(page, request, email);
+    await expect(page.getByLabel('Display name')).toHaveValue('');
+  });
+
+  test('delete with an old session asks for a new code first', async ({
+    page,
+    request,
+  }) => {
+    const email = uniqueEmail('stale');
+    await signIn(page, request, email);
+
+    // Age the session past the 10-minute freshness limit in the local database
+    const twentyMinutesAgo = new Date(
+      Date.now() - 20 * 60 * 1000,
+    ).toISOString();
+    execFileSync('pnpm', [
+      'exec',
+      'wrangler',
+      'd1',
+      'execute',
+      'DB',
+      '--local',
+      '--command',
+      `update "session" set "createdAt" = '${twentyMinutesAgo}' where "userId" = (select "id" from "user" where "email" = '${email}')`,
+    ]);
+
+    await page.getByRole('button', { name: 'Delete account' }).click();
+    await page.getByRole('button', { name: 'Yes, delete my account' }).click();
+    await expect(
+      page.getByText('To delete your account, confirm it’s you'),
+    ).toBeVisible();
+    await page.getByLabel('Code').fill(await latestCode(request, email));
+    await page.getByRole('button', { name: 'Confirm and delete' }).click();
+    await expect(page.getByText('Your account was deleted.')).toBeVisible();
+  });
+
+  test('export returns the account, and 401 when signed out', async ({
+    page,
+    request,
+  }) => {
+    const email = uniqueEmail('export');
+    await signIn(page, request, email);
+
+    const response = await page.request.get('/api/account/export');
+    expect(response.status()).toBe(200);
+    expect(response.headers()['content-disposition']).toContain('attachment');
+    const data = await response.json();
+    expect(data.account.email).toBe(email);
+    expect(data.sessions.length).toBeGreaterThan(0);
+
+    expect((await request.get('/api/account/export')).status()).toBe(401);
   });
 });

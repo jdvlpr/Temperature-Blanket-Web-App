@@ -89,6 +89,10 @@ export function buildAuthOptions(config: AuthConfig) {
       database: { validateSchema: config.validateSchema },
       backgroundTasks: { handler: config.runInBackground },
     },
+    user: {
+      // Needs a session less than freshAge old; the account page confirms with a new code first
+      deleteUser: { enabled: true },
+    },
     telemetry: { enabled: false },
     plugins: [
       emailOTP({
@@ -96,6 +100,8 @@ export function buildAuthOptions(config: AuthConfig) {
         expiresIn: 5 * 60,
         allowedAttempts: 3,
         storeOTP: 'hashed',
+        // A code to the current address and another to the new one
+        changeEmail: { enabled: true, verifyCurrentEmail: true },
         // Not awaited, so response time doesn't reveal whether an account exists
         sendVerificationOTP: async ({ email, otp, type }) => {
           config.runInBackground(config.sendSignInCode(email, otp, type));

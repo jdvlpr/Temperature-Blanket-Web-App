@@ -16,6 +16,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <script lang="ts">
   import AppLogo from '$lib/components/AppLogo.svelte';
   import AppShell from '$lib/components/AppShell.svelte';
+  import ChangeEmail from '$lib/components/account/ChangeEmail.svelte';
+  import DeleteAccount from '$lib/components/account/DeleteAccount.svelte';
+  import DisplayName from '$lib/components/account/DisplayName.svelte';
   import {
     accountErrorMessage,
     clearSignedInHint,
@@ -26,6 +29,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     type AccountUser,
   } from '$lib/accounts/client';
   import {
+    DownloadIcon,
     LoaderCircleIcon,
     LogOutIcon,
     MonitorSmartphoneIcon,
@@ -33,7 +37,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { resolve } from '$app/paths';
   import { onMount } from 'svelte';
 
-  let status: 'loading' | 'signed-in' | 'signed-out' | 'error' =
+  let status: 'loading' | 'signed-in' | 'signed-out' | 'deleted' | 'error' =
     $state('loading');
   let user: AccountUser | null = $state(null);
   let busy = $state(false);
@@ -94,33 +98,71 @@ If not, see <https://www.gnu.org/licenses/>. -->
           <LoaderCircleIcon class="animate-spin" /> Loading…
         </p>
       {:else if status === 'signed-in' && user}
-        <p>
-          Signed in as <strong data-testid="account-email">{user.email}</strong>
-        </p>
-        {#if errorMessage}
-          <p class="text-error-700-300" role="alert">{errorMessage}</p>
-        {/if}
-        <div class="flex flex-wrap gap-2">
-          <button
-            type="button"
+        <section class="flex flex-col gap-2">
+          <h3 class="h4">Profile</h3>
+          <DisplayName name={user.name} />
+        </section>
+
+        <section class="flex flex-col gap-2">
+          <h3 class="h4">Email</h3>
+          <ChangeEmail
+            email={user.email}
+            onchanged={(newEmail) => {
+              if (user) user.email = newEmail;
+            }}
+          />
+        </section>
+
+        <section class="flex flex-col gap-2">
+          <h3 class="h4">Signing out</h3>
+          {#if errorMessage}
+            <p class="text-error-700-300" role="alert">{errorMessage}</p>
+          {/if}
+          <div class="flex flex-wrap gap-2">
+            <button
+              type="button"
+              class="btn preset-tonal-surface w-fit"
+              onclick={() => handleSignOut()}
+              disabled={busy}
+            >
+              <LogOutIcon /> Sign out
+            </button>
+            <button
+              type="button"
+              class="btn preset-tonal-surface w-fit"
+              onclick={() => handleSignOut(true)}
+              disabled={busy}
+            >
+              <MonitorSmartphoneIcon /> Sign out everywhere
+            </button>
+          </div>
+          <p class="text-sm opacity-80">
+            Sign out everywhere ends your sessions on every device and browser.
+          </p>
+        </section>
+
+        <section class="flex flex-col gap-2">
+          <h3 class="h4">Your data</h3>
+          <a
+            href={resolve('/api/account/export')}
+            download
             class="btn preset-tonal-surface w-fit"
-            onclick={() => handleSignOut()}
-            disabled={busy}
+            ><DownloadIcon /> Download my data</a
           >
-            <LogOutIcon /> Sign out
-          </button>
-          <button
-            type="button"
-            class="btn preset-tonal-surface w-fit"
-            onclick={() => handleSignOut(true)}
-            disabled={busy}
-          >
-            <MonitorSmartphoneIcon /> Sign out everywhere
-          </button>
-        </div>
-        <p class="text-sm opacity-80">
-          Sign out everywhere ends your sessions on every device and browser.
-        </p>
+        </section>
+
+        <section class="flex flex-col gap-2">
+          <h3 class="h4">Delete account</h3>
+          <DeleteAccount
+            email={user.email}
+            ondeleted={() => {
+              user = null;
+              status = 'deleted';
+            }}
+          />
+        </section>
+      {:else if status === 'deleted'}
+        <p role="status">Your account was deleted.</p>
       {:else if status === 'signed-out'}
         <p>You’re not signed in.</p>
         <a
