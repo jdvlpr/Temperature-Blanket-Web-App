@@ -46,9 +46,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     SquareTerminalIcon,
     SwatchBookIcon,
     TriangleAlertIcon,
+    UserIcon,
   } from '@lucide/svelte';
   import { Accordion } from '@skeletonlabs/skeleton-svelte';
-  import { untrack } from 'svelte';
+  import { onMount, untrack } from 'svelte';
+  import { account, loadAccountSummary } from '$lib/accounts/summary.svelte';
+  import AccountAvatar from '$lib/components/account/AccountAvatar.svelte';
   import LegacyMigrationError from './modals/LegacyMigrationError.svelte';
 
   // Set opened navigation items based on current page
@@ -91,6 +94,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
           openedNavigationItems = [...openedNavigationItems, 'about'];
       }
     });
+  });
+
+  onMount(() => {
+    if (__ACCOUNTS_ENABLED__) loadAccountSummary();
   });
 </script>
 
@@ -143,6 +150,23 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <HeartIcon fill="#EE6E6C" color="#EE6E6C" />
     Supporters
   </a>
+
+  {#if __ACCOUNTS_ENABLED__}
+    <a
+      href="/account"
+      class={[
+        'btn hover:preset-tonal-surface w-fit',
+        page.url.pathname === '/account' && 'preset-tonal-secondary',
+      ]}
+    >
+      {#if account.summary}
+        <AccountAvatar summary={account.summary} class="size-6 text-[10px]" />
+      {:else}
+        <UserIcon />
+      {/if}
+      Account
+    </a>
+  {/if}
 
   {#snippet indicator()}
     <Accordion.ItemIndicator class="">

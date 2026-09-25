@@ -11,3 +11,5 @@ test-results
 .wrangler
 dist
 .claude/worktrees/
+# Local secrets for wrangler (Cloudflare)
+.dev.vars*

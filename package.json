@@ -6,6 +6,7 @@
   "private": true,
   "scripts": {
     "dev": "vite dev",
+    "dev:accounts": "PUBLIC_ACCOUNTS_ENABLED=true vite dev",
     "build": "vite build",
     "preview": "vite preview",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
@@ -24,6 +25,7 @@
     "@lucide/lab": "^0.1.2",
     "@lucide/svelte": "^1.23.0",
     "autocompleter": "^9.3.2",
+    "better-auth": "1.7.5",
     "canvg": "^4.0.3",
     "chart.js": "^4.5.1",
     "chroma-js": "^3.2.0",

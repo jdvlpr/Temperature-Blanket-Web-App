@@ -84,6 +84,13 @@ const devRedirects: Handle = async ({ event, resolve }) => {
   return resolve(event);
 };
 
+// Account API. Imported only for these paths, so other requests never load it.
+const accountsApi: Handle = async ({ event, resolve }) => {
+  if (!event.url.pathname.startsWith('/api/auth/')) return resolve(event);
+  const { handleAuthRequest } = await import('$lib/server/auth');
+  return handleAuthRequest(event);
+};
+
 // Read theme cookies and update the html accordingly
 const themeCookies: Handle = async ({ event, resolve }) => {
   let theme = '';
@@ -159,6 +166,7 @@ const themeCookies: Handle = async ({ event, resolve }) => {
 };
 
 export const handle: Handle = sequence(
+  accountsApi,
   legacyRedirects,
   devRedirects,
   themeCookies,

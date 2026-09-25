@@ -24,5 +24,11 @@
     // Enables the /api/dev/* routes and the dev email outbox. Never set in production.
     "ENABLE_DEV_ROUTES": "true",
     "EMAIL_SENDER": "dev-outbox",
+    // Accounts, with local-only values. Production sets these in the Pages dashboard,
+    // with BETTER_AUTH_SECRET as an encrypted secret.
+    "ACCOUNTS_ENABLED": "true",
+    "BETTER_AUTH_SECRET": "local-development-secret-do-not-use-in-production",
+    "AUTH_ALLOWED_HOSTS": "localhost:5173,localhost:4173,localhost:8788,*.ts.net:5173",
+    "AUTH_PROTOCOL": "auto",
   },
 }

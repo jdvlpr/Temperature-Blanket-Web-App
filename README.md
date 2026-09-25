@@ -53,6 +53,33 @@ It also enables dev-only routes, which return 404 anywhere `ENABLE_DEV_ROUTES` i
 - `/api/dev/platform` checks the D1 and R2 bindings.
 - `/api/dev/outbox?to=<address>` lists emails "sent" by the fake sender (`EMAIL_SENDER=dev-outbox`), which stores them in the local R2 bucket instead of sending.
 
+#### Accounts
+
+Accounts use [Better Auth](https://www.better-auth.com) (pinned to an exact version) on D1, with sign-in by emailed code; there are no passwords. Its API is `/api/auth/*`, loaded only for those requests. The UI (`/auth/sign-in`, `/account` and the Account link) is built in only when `PUBLIC_ACCOUNTS_ENABLED=true` at build time; `pnpm test:e2e:cloudflare` builds with it on.
+
+Server settings, read from the Cloudflare environment (local values are in `wrangler.jsonc`):
+
+| Variable                                   | Purpose                                                                                                                                                               |
+| ------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ACCOUNTS_ENABLED`                         | `"true"` turns on `/api/auth/*`; anything else returns 404                                                                                                            |
+| `BETTER_AUTH_SECRET`                       | At least 32 characters; signs session cookies. Set as an encrypted secret in production                                                                               |
+| `AUTH_ALLOWED_HOSTS`                       | Comma-separated hosts the app is served on, e.g. `temperature-blanket.com` or `*.<project>.pages.dev` for previews                                                    |
+| `AUTH_PROTOCOL`                            | `https` (default), `http`, or `auto`                                                                                                                                  |
+| `EMAIL_SENDER`                             | `resend`, or `dev-outbox` locally (only allowed where `ENABLE_DEV_ROUTES` is `"true"`, since anyone can read the outbox). Anything else turns accounts off with a 503 |
+| `RESEND_API_KEY`, `EMAIL_FROM`             | For `resend`: an API key (as a secret) and the from-address, e.g. `Temperature Blanket <sign-in@mail.temperature-blanket.com>`                                        |
+| `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | Optional: turns on “Continue with Google”. Redirect URI: `<site>/api/auth/callback/google`                                                                            |
+
+Secrets for local development (for example real Google credentials) go in `.dev.vars`, which wrangler reads and git ignores.
+
+To try accounts in the dev server, run `pnpm dev:accounts` (`pnpm dev` with `PUBLIC_ACCOUNTS_ENABLED=true`). No real email is sent: open `/api/dev/outbox?to=<email>` to read the code. It works over HTTPS on the tailnet too (`AUTH_ALLOWED_HOSTS` allows `*.ts.net:5173`). For Google, put `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` in `.dev.vars`, add `https://<host>:5173/api/auth/callback/google` as a redirect URI on the Google client, and restart the dev server.
+
+After changing Better Auth plugins or options, generate the matching migration and apply it:
+
+```bash
+node scripts/generate-auth-migration.ts <name>
+pnpm db:migrate:local
+```
+
 ### ✅ Testing
 
 First build the app (to generate cloudflare \_routes.json file)
@@ -143,12 +170,13 @@ Settings and user preferences are stored in the browser's Local Storage.
 <details>
 <summary>View Details</summary>
 
-| Key Name              | Description                                                | Default Value                                                                                                                                                                                                                     | Possible Values                                                      | Version Added\* |
-| --------------------- | ---------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- | --------------- |
-| preferences           | User preferences object                                    | `{ disableToastAnalytics: false, layout: 'list', seasons: [...DEFAULT_SEASONS], theme: { id: 'classic', mode: 'system', roundness: 'pill', spacing: 'normal', textScale: 'normal', headingStyle: 'classic' }, units: 'imperial'}` | [`LocalStatePreferencesType`](src/lib/storage/preferences.svelte.ts) | 5.0.0           |
-| [/weather]units       | Units for the weather forecast page                        | `imperial`                                                                                                                                                                                                                        | `imperial`, `metric`                                                 | < 3.28.3        |
-| [/weather]hour_format | Time format for the weather forecast page                  | `12`                                                                                                                                                                                                                              | `12`, `24`                                                           | < 3.28.3        |
-| [/weather]locations   | Locations the user has added for the weather forecast page | `[]`                                                                                                                                                                                                                              | array of [`Location`](src/lib/types/location-types.d.ts) objects     | < 3.28.3        |
+| Key Name              | Description                                                                                                    | Default Value                                                                                                                                                                                                                     | Possible Values                                                      | Version Added\*          |
+| --------------------- | -------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- | ------------------------ |
+| preferences           | User preferences object                                                                                        | `{ disableToastAnalytics: false, layout: 'list', seasons: [...DEFAULT_SEASONS], theme: { id: 'classic', mode: 'system', roundness: 'pill', spacing: 'normal', textScale: 'normal', headingStyle: 'classic' }, units: 'imperial'}` | [`LocalStatePreferencesType`](src/lib/storage/preferences.svelte.ts) | 5.0.0                    |
+| [/weather]units       | Units for the weather forecast page                                                                            | `imperial`                                                                                                                                                                                                                        | `imperial`, `metric`                                                 | < 3.28.3                 |
+| [/weather]hour_format | Time format for the weather forecast page                                                                      | `12`                                                                                                                                                                                                                              | `12`, `24`                                                           | < 3.28.3                 |
+| [/weather]locations   | Locations the user has added for the weather forecast page                                                     | `[]`                                                                                                                                                                                                                              | array of [`Location`](src/lib/types/location-types.d.ts) objects     | < 3.28.3                 |
+| tb_account            | The signed-in person's name, email and picture, so the navigation can show them. Removed when the session ends | none                                                                                                                                                                                                                              | [`AccountSummary`](src/lib/accounts/summary.svelte.ts)               | unreleased (after 6.3.2) |
 
 **`preferences.theme` fields:**
 
