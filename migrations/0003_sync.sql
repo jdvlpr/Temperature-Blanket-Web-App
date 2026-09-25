@@ -24,7 +24,8 @@ create table "project" (
   "schemaVersion" integer not null,
   "sizeBytes" integer not null,
   "title" text not null,
-  -- SHA-256 of the uncompressed JSON, so devices can tell identical copies apart without downloading
+  -- SHA-256 of the project's content (ignoring its site and save time), so devices
+  -- can tell identical copies apart without downloading
   "contentHash" text,
   "blobKey" text,
   primary key ("userId", "projectId")

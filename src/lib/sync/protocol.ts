@@ -32,7 +32,7 @@ export const SYNC_HEADERS = {
   schemaVersion: 'x-sync-schema-version',
   /** Percent-encoded, since titles are place names in any language */
   title: 'x-sync-title',
-  /** SHA-256 (hex) of the uncompressed JSON */
+  /** SHA-256 (hex) of the project's content, ignoring its site and save time (projectFingerprintText) */
   contentHash: 'x-sync-content-hash',
   /** On a project download: its revision */
   rev: 'x-sync-rev',

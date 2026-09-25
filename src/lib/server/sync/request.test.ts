@@ -56,13 +56,14 @@ describe('parseSaveHeaders', () => {
   });
 
   it('rejects malformed values', () => {
-    for (const bad of [
+    const bads: Record<string, string>[] = [
       { [SYNC_HEADERS.baseRev]: '-1' },
       { [SYNC_HEADERS.clientUpdatedAt]: 'yesterday' },
       { [SYNC_HEADERS.schemaVersion]: '0' },
       { [SYNC_HEADERS.title]: '%E0%A4%A' },
       { [SYNC_HEADERS.contentHash]: 'not-a-hash' },
-    ])
+    ];
+    for (const bad of bads)
       expect(parse(bad)).toMatchObject({ ok: false, status: 400 });
   });
 });

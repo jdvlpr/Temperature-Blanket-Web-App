@@ -36,8 +36,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import DisplayName from '$lib/components/account/DisplayName.svelte';
   import SignInCard from '$lib/components/account/SignInCard.svelte';
   import SignInMethods from '$lib/components/account/SignInMethods.svelte';
+  import SyncStatus from '$lib/components/sync/SyncStatus.svelte';
+  import { dialog } from '$lib/state/page-state.svelte';
+  import { ProjectStorage } from '$lib/storage/projects.svelte';
+  import { sync } from '$lib/sync/status.svelte';
   import {
     ChevronRightIcon,
+    CloudIcon,
     DownloadIcon,
     LoaderCircleIcon,
     LogOutIcon,
@@ -92,15 +97,90 @@ If not, see <https://www.gnu.org/licenses/>. -->
     }
   });
 
+  /** Ends the session, then settles what happens to the account's projects here. */
+  async function finishSignOut(
+    userId: string,
+    everywhere: boolean,
+    keepProjects: boolean,
+  ) {
+    if (everywhere) await signOutEverywhere();
+    else await signOut();
+    const { leaveAccount } = await import('$lib/sync/sync.svelte');
+    await leaveAccount(userId, keepProjects);
+    forgetAccountSummary();
+    user = null;
+    status = 'signed-out';
+  }
+
   async function handleSignOut(everywhere = false) {
+    if (!user) return;
+    const userId = user.id;
     busy = true;
     errorMessage = '';
     try {
-      if (everywhere) await signOutEverywhere();
-      else await signOut();
-      forgetAccountSummary();
-      user = null;
-      status = 'signed-out';
+      const projectCount = (await ProjectStorage.getIndex()).filter(
+        (item) => item.sync?.ownerUserId === userId,
+      ).length;
+
+      if (!projectCount) {
+        await finishSignOut(userId, everywhere, true);
+        return;
+      }
+
+      const { default: SignOutDialog } =
+        await import('$lib/components/sync/SignOutDialog.svelte');
+      dialog.trigger({
+        type: 'component',
+        component: {
+          ref: SignOutDialog,
+          props: {
+            userId,
+            everywhere,
+            projectCount,
+            onconfirm: async (keepProjects: boolean) => {
+              try {
+                await finishSignOut(userId, everywhere, keepProjects);
+              } catch (e) {
+                errorMessage = accountErrorMessage(e);
+              }
+            },
+          },
+        },
+      });
+    } catch (e) {
+      errorMessage = accountErrorMessage(e);
+    } finally {
+      busy = false;
+    }
+  }
+
+  /** Account details from the server, plus every synced project. */
+  async function downloadMyData() {
+    busy = true;
+    errorMessage = '';
+    try {
+      const response = await fetch('/api/account/export');
+      if (!response.ok) throw new Error(`Export failed: ${response.status}`);
+      const data = await response.json();
+      try {
+        const { downloadAccountProjects } =
+          await import('$lib/sync/sync.svelte');
+        data.projects = await downloadAccountProjects();
+      } catch {
+        data.projects =
+          'Synced projects could not be downloaded. Try again later.';
+      }
+
+      const url = URL.createObjectURL(
+        new Blob([JSON.stringify(data, null, 2)], {
+          type: 'application/json',
+        }),
+      );
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'temperature-blanket-account.json';
+      link.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
     } catch (e) {
       errorMessage = accountErrorMessage(e);
     } finally {
@@ -177,6 +257,27 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </div>
           </section>
 
+          <section class="flex flex-col gap-2" aria-labelledby="projects">
+            <h3 id="projects" class="px-2 text-sm font-bold opacity-70">
+              Projects
+            </h3>
+            <div class="{CARD} px-4 py-3">
+              <div class="flex items-start gap-3">
+                <CloudIcon class="mt-0.5 shrink-0 opacity-70" />
+                <div class="flex flex-col gap-1">
+                  <p class="font-bold">Saved projects sync to your account</p>
+                  <p class="text-sm opacity-70">
+                    Save a project in the Project Planner and open it on any
+                    device where you’re signed in.
+                  </p>
+                  {#if sync.active}
+                    <SyncStatus class="opacity-80" />
+                  {/if}
+                </div>
+              </div>
+            </div>
+          </section>
+
           <section class="flex flex-col gap-2" aria-labelledby="devices-data">
             <h3 id="devices-data" class="px-2 text-sm font-bold opacity-70">
               Devices and data
@@ -212,21 +313,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 </span>
                 <ChevronRightIcon class="shrink-0 opacity-50" />
               </button>
-              <a
-                href={resolve('/api/account/export')}
-                download
+              <button
+                type="button"
                 class={ROW}
                 aria-label="Download my data"
+                onclick={downloadMyData}
+                disabled={busy}
               >
                 <DownloadIcon class="shrink-0 opacity-70" />
                 <span class="flex-1">
                   <span class="block font-bold">Download my data</span>
                   <span class="block text-sm opacity-70"
-                    >Your account details as a JSON file</span
+                    >Your account and synced projects as a JSON file</span
                   >
                 </span>
                 <ChevronRightIcon class="shrink-0 opacity-50" />
-              </a>
+              </button>
               {#if errorMessage}
                 <p class="text-error-700-300 px-4 py-3" role="alert">
                   {errorMessage}
@@ -244,7 +346,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </h3>
             <DeleteAccount
               email={user.email}
-              ondeleted={() => {
+              ondeleted={async () => {
+                // The account's copies are gone; keep this browser's
+                const { leaveAccount } = await import('$lib/sync/sync.svelte');
+                if (user) await leaveAccount(user.id, true);
                 forgetAccountSummary();
                 user = null;
                 status = 'deleted';

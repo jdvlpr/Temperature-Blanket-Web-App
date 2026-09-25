@@ -26,9 +26,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
     project: any;
     canRemove?: boolean;
     onclick?: () => void;
+    /** Where the project is kept, e.g. "Synced" (see $lib/sync) */
+    syncLabel?: {
+      text: string;
+      tone: 'success' | 'warning' | 'error' | 'surface';
+    };
   }
 
-  let { project, canRemove = true, onclick }: Props = $props();
+  let { project, canRemove = true, onclick, syncLabel }: Props = $props();
+
+  const TONES = {
+    success: 'preset-tonal-success',
+    warning: 'preset-tonal-warning',
+    error: 'preset-tonal-error',
+    surface: 'preset-tonal-surface',
+  };
 
   const href = $derived(project.href);
   const title = $derived(project.title);
@@ -94,6 +106,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
       rel="noopener noreferrer"
       class="line-clamp-4 underline">{title}</a
     >
+    {#if syncLabel}
+      <span
+        class="badge {TONES[syncLabel.tone]} mt-1 w-fit text-xs"
+        data-testid="sync-label">{syncLabel.text}</span
+      >
+    {/if}
     {#if colors !== false}
       <ColorPalette
         {colors}
@@ -103,7 +121,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {/if}
   </div>
   {#if canRemove}
-    <button class="btn-icon hover:preset-tonal-surface" {onclick}>
+    <button
+      class="btn-icon hover:preset-tonal-surface"
+      aria-label="Remove {title || 'project'}"
+      {onclick}
+    >
       <Trash2Icon />
     </button>
   {/if}
