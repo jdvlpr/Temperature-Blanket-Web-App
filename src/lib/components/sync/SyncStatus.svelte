@@ -49,7 +49,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <div
   class="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm {className}"
-  role="status"
+  aria-live="polite"
   data-testid="sync-status"
 >
   {#if sync.state === 'syncing'}

@@ -22,6 +22,8 @@ import { execFileSync } from 'node:child_process';
 export async function latestCode(
   request: APIRequestContext,
   email: string,
+  /** A code already used, to wait for the next one instead */
+  except?: string,
 ): Promise<string> {
   let code: string | undefined;
   await expect
@@ -32,9 +34,10 @@ export async function latestCode(
         );
         const messages: { text: string }[] = await response.json();
         code = messages[0]?.text.match(/\b(\d{6})\b/)?.[1];
-        return code;
+        return code !== except && code;
       },
-      { message: `a code emailed to ${email}` },
+      // Sent in the background, which is slower while many tests run
+      { message: `a code emailed to ${email}`, timeout: 15_000 },
     )
     .toBeTruthy();
   return code!;
@@ -64,18 +67,36 @@ export async function signIn(
   await expect(page.getByTestId('account-email')).toHaveText(email);
 }
 
-/** Runs SQL against the local D1 database that wrangler pages dev uses. */
+/**
+ * Runs SQL against the local D1 database that wrangler pages dev uses. Retried:
+ * the database file can be briefly busy while the dev server writes to it.
+ */
 export function localD1(sql: string): Record<string, unknown>[] {
-  const output = execFileSync('pnpm', [
-    'exec',
-    'wrangler',
-    'd1',
-    'execute',
-    'DB',
-    '--local',
-    '--json',
-    '--command',
-    sql,
-  ]).toString();
-  return JSON.parse(output)[0].results;
+  let lastError: unknown;
+  for (let attempt = 0; attempt < 5; attempt++) {
+    try {
+      const output = execFileSync(
+        'pnpm',
+        [
+          'exec',
+          'wrangler',
+          'd1',
+          'execute',
+          'DB',
+          '--local',
+          '--json',
+          '--command',
+          sql,
+        ],
+        { stdio: 'pipe' },
+      ).toString();
+      return JSON.parse(output)[0].results;
+    } catch (e) {
+      lastError = e;
+      Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 500);
+    }
+  }
+  throw new Error(
+    `localD1 failed: ${String((lastError as { stderr?: Buffer })?.stderr ?? lastError)}`,
+  );
 }

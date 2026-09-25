@@ -98,10 +98,11 @@ test.describe('Accounts: sign in with an emailed code', () => {
     // A redirect to another site is ignored
     await page.goto('/account');
     await page.getByRole('button', { name: 'Sign out', exact: true }).click();
+    await expect(page.getByText('You’re not signed in.')).toBeVisible();
     await page.goto('/auth/sign-in?redirect=//evil.example');
     await page.getByLabel('Email').fill(email);
     await page.getByRole('button', { name: 'Email me a code' }).click();
-    await page.getByLabel('Code').fill(await latestCode(request, email));
+    await page.getByLabel('Code').fill(await latestCode(request, email, code));
     await expect(page).toHaveURL(/\/account$/);
   });
 

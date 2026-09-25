@@ -16,7 +16,12 @@
 // The /api/sync routes under `wrangler pages dev`, against real local D1 and R2.
 // The browser side is covered by test-sync.spec.ts.
 
-import { expect, test, type APIRequestContext } from '@playwright/test';
+import {
+  expect,
+  request as playwrightRequest,
+  test,
+  type APIRequestContext,
+} from '@playwright/test';
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { gunzipSync, gzipSync } from 'node:zlib';
@@ -25,11 +30,10 @@ import { latestCode, localD1, randomTestIp, uniqueEmail } from './helpers';
 
 /** An API client signed in with an emailed code. */
 async function signedInApi(
-  playwright: typeof import('@playwright/test'),
   baseURL: string,
   email = uniqueEmail('sync-api'),
 ): Promise<APIRequestContext> {
-  const api = await playwright.request.newContext({
+  const api = await playwrightRequest.newContext({
     baseURL,
     extraHTTPHeaders: { Origin: baseURL, 'CF-Connecting-IP': randomTestIp() },
   });
@@ -74,10 +78,9 @@ test.describe('Sync API', () => {
   });
 
   test('save, list, download, and reject stale saves and deletions', async ({
-    playwright,
     baseURL,
   }) => {
-    const api = await signedInApi(playwright, baseURL!);
+    const api = await signedInApi(baseURL!);
     const id = String(Date.now());
 
     const created = await save(api, id, { title: 'Montréal · 東京' });
@@ -129,10 +132,9 @@ test.describe('Sync API', () => {
   });
 
   test('an edit saved over a deletion brings the project back', async ({
-    playwright,
     baseURL,
   }) => {
-    const api = await signedInApi(playwright, baseURL!);
+    const api = await signedInApi(baseURL!);
     const id = `edit-wins-${Date.now()}`;
     await save(api, id);
     await api.delete(`/api/sync/projects/${id}?baseRev=1`);
@@ -143,8 +145,8 @@ test.describe('Sync API', () => {
     });
   });
 
-  test('rejects bad requests', async ({ playwright, baseURL }) => {
-    const api = await signedInApi(playwright, baseURL!);
+  test('rejects bad requests', async ({ baseURL }) => {
+    const api = await signedInApi(baseURL!);
     expect((await api.get('/api/sync/projects/..%2Fx')).status()).toBe(400);
     expect((await api.get('/api/sync/changes?since=-1')).status()).toBe(400);
     const noHash = await api.put('/api/sync/projects/x', {
@@ -155,10 +157,9 @@ test.describe('Sync API', () => {
   });
 
   test('deleting the account deletes its synced projects', async ({
-    playwright,
     baseURL,
   }) => {
-    const api = await signedInApi(playwright, baseURL!);
+    const api = await signedInApi(baseURL!);
     const id = `account-delete-${Date.now()}`;
     await save(api, id);
     const [{ blobKey, userId }] = localD1(
