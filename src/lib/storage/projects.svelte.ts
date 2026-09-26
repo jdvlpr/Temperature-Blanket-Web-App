@@ -48,6 +48,21 @@ export type StoredProject = {
   weatherSource: WeatherSourceOptions;
 };
 
+/**
+ * When a project last changed, for sorting: its last edit on any device once it
+ * belongs to an account, otherwise when it was saved (IDs are save times).
+ */
+function lastChanged(item: StoredProjectIndexItem): number {
+  return item.sync?.updatedAt ?? (Number(item.id) || 0);
+}
+
+/** Most recently changed first; newer saves first when that's unknown. */
+export function sortByRecent(
+  items: StoredProjectIndexItem[],
+): StoredProjectIndexItem[] {
+  return [...items].reverse().sort((a, b) => lastChanged(b) - lastChanged(a));
+}
+
 const PROJECTS_INDEX_KEY = 'projects_index';
 const PROJECT_PREFIX = 'p_';
 const SYNC_ACCOUNT_PREFIX = 'sync_account_';
@@ -342,9 +357,9 @@ export class ProjectStorage {
     // shared browser). Signed out, everything shows, including projects of an
     // account whose session ended.
     const owner = this.syncOwner();
-    return index
-      .filter((i) => !owner || !i.sync || i.sync.ownerUserId === owner)
-      .reverse();
+    return sortByRecent(
+      index.filter((i) => !owner || !i.sync || i.sync.ownerUserId === owner),
+    );
   }
 
   /**

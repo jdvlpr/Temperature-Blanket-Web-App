@@ -21,6 +21,7 @@ account's list; removing one removes it from the account too. -->
   import ProjectDetails from '$lib/components/ProjectDetails.svelte';
   import {
     ProjectStorage,
+    sortByRecent,
     type StoredProjectIndexItem,
   } from '$lib/storage/projects.svelte';
   import { sync, syncLabelFor } from '$lib/sync/status.svelte';
@@ -31,9 +32,9 @@ account's list; removing one removes it from the account too. -->
 
   async function load() {
     const index = await ProjectStorage.getIndex();
-    projects = index
-      .filter((item) => item.sync?.ownerUserId === userId)
-      .reverse();
+    projects = sortByRecent(
+      index.filter((item) => item.sync?.ownerUserId === userId),
+    );
   }
 
   $effect(() => {

@@ -1,5 +1,9 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
-import { ProjectStorage, type StoredProject } from './projects.svelte';
+import {
+  ProjectStorage,
+  sortByRecent,
+  type StoredProject,
+} from './projects.svelte';
 
 // Shared store for mock
 const vi_mockStore = {
@@ -155,6 +159,34 @@ describe('ProjectStorage', () => {
     const display = await ProjectStorage.getProjectsForDisplay();
     expect(display[0].meta.title).toBe('Second');
     expect(display[1].meta.title).toBe('First');
+  });
+
+  it('lists the most recently changed projects first', () => {
+    const synced = (id: string, updatedAt: number) => ({
+      id,
+      meta: { title: id } as any,
+      sync: {
+        ownerUserId: 'u1',
+        rev: 1,
+        dirty: false,
+        updatedAt,
+        lastSyncedAt: updatedAt,
+        error: null,
+      },
+    });
+    const guest = (id: string) => ({ id, meta: { title: id } as any });
+    const ids = sortByRecent([
+      synced('edited-long-ago', 1_000),
+      guest('1700000000000'),
+      synced('edited-recently', 1_800_000_000_000),
+      guest('no-time'),
+    ]).map((item) => item.id);
+    expect(ids).toEqual([
+      'edited-recently',
+      '1700000000000',
+      'edited-long-ago',
+      'no-time',
+    ]);
   });
 
   describe('createdAt', () => {

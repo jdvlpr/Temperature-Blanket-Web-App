@@ -276,6 +276,20 @@ describe('syncAccount', () => {
     expect(phone.titles()).toEqual({ a: 'Final' });
   });
 
+  it('keeps when a project was last edited, so every device lists it alike', async () => {
+    const { phone, laptop } = twoDevices();
+    phone.edit('a', 'Older');
+    phone.edit('b', 'Newer');
+    await phone.sync();
+    // The laptop downloads much later
+    laptop.clock = 1_000_000;
+    await laptop.sync();
+    for (const id of ['a', 'b'])
+      expect(laptop.projects.get(id)?.sync?.updatedAt).toBe(
+        phone.projects.get(id)?.sync?.updatedAt,
+      );
+  });
+
   it('keeps both versions when both devices changed a project', async () => {
     const { phone, laptop } = twoDevices();
     phone.edit('a', 'Original');

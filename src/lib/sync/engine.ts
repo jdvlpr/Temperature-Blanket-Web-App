@@ -208,14 +208,16 @@ export async function syncAccount(
     return id;
   };
 
+  /** `editedAt`: when the server's copy was last edited, if it's taking over */
   const syncedState = (
     rev: number,
     base?: ProjectSyncState,
+    editedAt?: number,
   ): ProjectSyncState => ({
     ownerUserId: userId,
     rev,
     dirty: false,
-    updatedAt: base?.updatedAt ?? now(),
+    updatedAt: editedAt ?? base?.updatedAt ?? now(),
     lastSyncedAt: now(),
     error: null,
   });
@@ -243,13 +245,15 @@ export async function syncAccount(
    * Replaces the device copy with the server's, unless it changed since `seen`.
    * 'gone' if the server no longer has it.
    */
-  async function download(id: string, seen: Seen) {
+  async function download(id: string, seen: Seen, editedAt?: number) {
     const data = await server.download(id);
     if (!data) return 'gone';
     const project = JSON.parse(data.json) as StoredProject;
     project.href = rehomeHref(project.href, options.origin, id);
     const base = seen === 'absent' ? undefined : seen;
-    if (await local.put(id, project, syncedState(data.rev, base), seen))
+    if (
+      await local.put(id, project, syncedState(data.rev, base, editedAt), seen)
+    )
       report.downloaded.push(id);
     return 'done';
   }
@@ -258,6 +262,7 @@ export async function syncAccount(
   async function keepBoth(
     id: string,
     seen: ProjectSyncState,
+    editedAt?: number,
   ): Promise<string | null> {
     const mine = await local.read(id);
     let copyId: string | null = null;
@@ -285,7 +290,8 @@ export async function syncAccount(
       else copyId = null;
     }
     // Saved again meanwhile: nothing is replaced, and the next pass looks again
-    if ((await download(id, seen)) === 'gone') await local.remove(id, seen);
+    if ((await download(id, seen, editedAt)) === 'gone')
+      await local.remove(id, seen);
     return copyId;
   }
 
@@ -335,14 +341,14 @@ export async function syncAccount(
         const hash = await localHash(meta.id);
         if (hash && hash === meta.contentHash)
           await settle(meta.id, meta.rev, sync);
-        else await keepBoth(meta.id, sync);
+        else await keepBoth(meta.id, sync, meta.clientUpdatedAt);
         continue;
       }
 
       // Not here, or unchanged here: take the server's. A project of this
       // browser only (no account) with the same ID is left alone.
       if (sync || !(await local.read(meta.id)))
-        await download(meta.id, sync ?? 'absent');
+        await download(meta.id, sync ?? 'absent', meta.clientUpdatedAt);
     }
 
     since = page.nextSince;
@@ -409,7 +415,7 @@ export async function syncAccount(
     if (current && current.contentHash === contentHash)
       await settle(id, current.rev, sync);
     else {
-      const copyId = await keepBoth(id, sync);
+      const copyId = await keepBoth(id, sync, current?.clientUpdatedAt);
       if (copyId) queue.push(copyId);
     }
   }
