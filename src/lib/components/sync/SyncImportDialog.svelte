@@ -107,7 +107,7 @@ and device, after signing in, and again whenever someone asks to add projects
     <fieldset>
       <legend class="sr-only">Projects to add</legend>
       <!-- A fieldset can't reliably be a flex box, so the list is a div -->
-      <div class="flex max-h-[50vh] flex-col gap-3 overflow-auto">
+      <div class="flex flex-col gap-3">
         {#each projects as project (project.id)}
           <label class="flex cursor-pointer items-center gap-3">
             <input
@@ -126,66 +126,71 @@ and device, after signing in, and again whenever someone asks to add projects
     </fieldset>
   {/if}
 
-  <!-- Each choice is one row: what it does, and what that means -->
+  <!-- Each choice is one row: what it does, and what that means. Pinned to the
+  bottom of the dialog, so they stay in reach while scrolling a long list. -->
   <div
-    class="rounded-container border-surface-200-800 divide-surface-200-800 flex flex-col divide-y overflow-hidden border"
+    class="bg-surface-50 dark:bg-surface-950 sticky bottom-0 -mx-4 -mb-4 px-4 pt-2 pb-4"
   >
-    <button
-      type="button"
-      class="bg-primary-50-950 hover:bg-primary-100-900 {ROW}"
-      disabled={busy || (choosing && !chosen.length)}
-      onclick={() => answer(choosing ? chosen : ids)}
+    <div
+      class="rounded-container border-surface-200-800 divide-surface-200-800 flex flex-col divide-y overflow-hidden border"
     >
-      <CloudUploadIcon class="text-primary-600-400 {ICON}" />
-      <span class="flex-1">
-        <span class="block font-bold">
-          {#if choosing}
-            Add {chosen.length} {plural(chosen.length)}
-          {:else}
-            Add {ids.length === 1 ? 'it' : `all ${ids.length}`}
-          {/if}
+      <button
+        type="button"
+        class="bg-primary-50-950 hover:bg-primary-100-900 {ROW}"
+        disabled={busy || (choosing && !chosen.length)}
+        onclick={() => answer(choosing ? chosen : ids)}
+      >
+        <CloudUploadIcon class="text-primary-600-400 {ICON}" />
+        <span class="flex-1">
+          <span class="block font-bold">
+            {#if choosing}
+              Add {chosen.length} {plural(chosen.length)}
+            {:else}
+              Add {ids.length === 1 ? 'it' : `all ${ids.length}`}
+            {/if}
+          </span>
+          <span class={DETAIL}>
+            Saved to your account and kept up to date on every device where you
+            sign in.
+          </span>
         </span>
-        <span class={DETAIL}>
-          Saved to your account and kept up to date on every device where you
-          sign in.
-        </span>
-      </span>
-    </button>
+      </button>
 
-    {#if !choosing}
+      {#if !choosing}
+        <button
+          type="button"
+          class="hover:preset-tonal-surface {ROW}"
+          disabled={busy}
+          onclick={() => (choosing = true)}
+        >
+          <ListChecksIcon class={ICON} />
+          <span class="flex-1">
+            <span class="block font-bold">Choose…</span>
+            <span class={DETAIL}>Pick which projects to add.</span>
+          </span>
+          <ChevronRightIcon class="mt-0.5 size-5 shrink-0 opacity-50" />
+        </button>
+      {/if}
+
       <button
         type="button"
         class="hover:preset-tonal-surface {ROW}"
         disabled={busy}
-        onclick={() => (choosing = true)}
+        onclick={() => answer([])}
       >
-        <ListChecksIcon class={ICON} />
+        {#if later}
+          <XIcon class={ICON} />
+        {:else}
+          <ClockIcon class={ICON} />
+        {/if}
         <span class="flex-1">
-          <span class="block font-bold">Choose…</span>
-          <span class={DETAIL}>Pick which projects to add.</span>
+          <span class="block font-bold">{later ? 'Cancel' : 'Not now'}</span>
+          <span class={DETAIL}>
+            They stay only in this browser. You can add them any time from Saved
+            Projects or your Account page.
+          </span>
         </span>
-        <ChevronRightIcon class="mt-0.5 size-5 shrink-0 opacity-50" />
       </button>
-    {/if}
-
-    <button
-      type="button"
-      class="hover:preset-tonal-surface {ROW}"
-      disabled={busy}
-      onclick={() => answer([])}
-    >
-      {#if later}
-        <XIcon class={ICON} />
-      {:else}
-        <ClockIcon class={ICON} />
-      {/if}
-      <span class="flex-1">
-        <span class="block font-bold">{later ? 'Cancel' : 'Not now'}</span>
-        <span class={DETAIL}>
-          They stay only in this browser. You can add them any time from Saved
-          Projects or your Account page.
-        </span>
-      </span>
-    </button>
+    </div>
   </div>
 </div>
