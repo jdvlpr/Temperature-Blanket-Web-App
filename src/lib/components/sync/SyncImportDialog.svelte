@@ -14,19 +14,32 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <!-- "Add the projects on this device to your account?" Shown once per account
-and device, after signing in. -->
+and device, after signing in, and again whenever someone asks to add projects
+(`later`). -->
 
 <script lang="ts">
-  import { dialog } from '$lib/state/page-state.svelte';
+  import ProjectDetails from '$lib/components/ProjectDetails.svelte';
+  import { dialog, toast } from '$lib/state/page-state.svelte';
   import {
     ProjectStorage,
     type StoredProjectIndexItem,
   } from '$lib/storage/projects.svelte';
+  import { sync } from '$lib/sync/status.svelte';
   import { addToAccount, markImportAsked } from '$lib/sync/sync.svelte';
-  import { CloudUploadIcon } from '@lucide/svelte';
+  import {
+    ChevronRightIcon,
+    ClockIcon,
+    CloudUploadIcon,
+    ListChecksIcon,
+    XIcon,
+  } from '@lucide/svelte';
   import { onMount, untrack } from 'svelte';
 
-  let { userId, ids }: { userId: string; ids: string[] } = $props();
+  let {
+    userId,
+    ids,
+    later = false,
+  }: { userId: string; ids: string[]; later?: boolean } = $props();
 
   let projects = $state<StoredProjectIndexItem[]>([]);
   // Everything is chosen to start with
@@ -39,14 +52,32 @@ and device, after signing in. -->
     projects = index.filter((item) => ids.includes(item.id)).reverse();
   });
 
+  const ROW =
+    'flex w-full items-start gap-3 px-4 py-3 text-left transition-colors disabled:opacity-50';
+  const ICON = 'mt-0.5 size-5 shrink-0';
+  const DETAIL = 'block text-sm opacity-75';
+
+  const plural = (n: number) => (n === 1 ? 'project' : 'projects');
+
   async function answer(add: string[]) {
     busy = true;
     await markImportAsked(userId);
     dialog.close();
-    if (add.length) await addToAccount(userId, add);
+    if (!add.length) return;
+    await addToAccount(userId, add);
+    const added = `${add.length} ${plural(add.length)}`;
+    // Problems have toasts of their own (see $lib/sync/sync.svelte)
+    if (sync.state === 'idle')
+      toast.trigger({
+        message: `Added ${added} to your account`,
+        category: 'success',
+      });
+    else if (sync.state === 'offline')
+      toast.trigger({
+        message: `${added} will be added to your account when you’re back online`,
+        category: 'info',
+      });
   }
-
-  const plural = (n: number) => (n === 1 ? 'project' : 'projects');
 </script>
 
 <div
@@ -59,69 +90,102 @@ and device, after signing in. -->
     <CloudUploadIcon class="text-primary-500 mt-1 size-6 shrink-0" />
     <div class="flex flex-col gap-1">
       <h2 id="sync-import-title" class="h4">
-        Add your projects to your account?
+        {later
+          ? 'Add projects to your account'
+          : 'Add your projects to your account?'}
       </h2>
       <p class="text-sm opacity-80">
         This browser has {ids.length}
-        {plural(ids.length)} saved. Add them to your account to open them on your
-        other devices.
+        {plural(ids.length)} that {ids.length === 1 ? 'isn’t' : 'aren’t'} in your
+        account yet.
       </p>
     </div>
   </div>
 
   {#if choosing}
-    <fieldset
-      class="rounded-container border-surface-200-800 flex max-h-72 flex-col overflow-auto border"
-    >
+    <!-- The same cards as in Saved Projects, so projects are easy to tell apart -->
+    <fieldset>
       <legend class="sr-only">Projects to add</legend>
-      {#each projects as project (project.id)}
-        <label
-          class="hover:preset-tonal-surface flex min-h-12 items-start gap-3 px-3 py-2"
-        >
-          <input
-            type="checkbox"
-            class="checkbox mt-1 shrink-0"
-            value={project.id}
-            bind:group={chosen}
-          />
-          <!-- Long titles wrap rather than being cut off -->
-          <span class="flex min-w-0 flex-col">
-            <span class="font-bold [overflow-wrap:anywhere]"
-              >{project.meta.title || 'Untitled project'}</span
-            >
-            <span class="text-xs opacity-70">Saved {project.meta.date}</span>
-          </span>
-        </label>
-      {/each}
+      <!-- A fieldset can't reliably be a flex box, so the list is a div -->
+      <div class="flex max-h-[50vh] flex-col gap-3 overflow-auto">
+        {#each projects as project (project.id)}
+          <label class="flex cursor-pointer items-center gap-3">
+            <input
+              type="checkbox"
+              class="checkbox shrink-0"
+              value={project.id}
+              aria-label="Add {project.meta.title || 'Untitled project'}"
+              bind:group={chosen}
+            />
+            <span class="block min-w-0 flex-1">
+              <ProjectDetails project={project.meta} canRemove={false} />
+            </span>
+          </label>
+        {/each}
+      </div>
     </fieldset>
   {/if}
 
-  <div class="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+  <!-- Each choice is one row: what it does, and what that means -->
+  <div
+    class="rounded-container border-surface-200-800 divide-surface-200-800 flex flex-col divide-y overflow-hidden border"
+  >
     <button
       type="button"
-      class="btn hover:preset-tonal-surface max-sm:w-full"
-      disabled={busy}
-      onclick={() => answer([])}>Not now</button
-    >
-    {#if !choosing}
-      <button
-        type="button"
-        class="btn preset-outlined-surface-300-700 max-sm:w-full"
-        disabled={busy}
-        onclick={() => (choosing = true)}>Choose…</button
-      >
-    {/if}
-    <button
-      type="button"
-      class="btn preset-filled-primary-500 max-sm:w-full"
+      class="bg-primary-50-950 hover:bg-primary-100-900 {ROW}"
       disabled={busy || (choosing && !chosen.length)}
       onclick={() => answer(choosing ? chosen : ids)}
     >
-      {#if choosing}
-        Add {chosen.length} {plural(chosen.length)}
+      <CloudUploadIcon class="text-primary-600-400 {ICON}" />
+      <span class="flex-1">
+        <span class="block font-bold">
+          {#if choosing}
+            Add {chosen.length} {plural(chosen.length)}
+          {:else}
+            Add {ids.length === 1 ? 'it' : `all ${ids.length}`}
+          {/if}
+        </span>
+        <span class={DETAIL}>
+          Saved to your account and kept up to date on every device where you
+          sign in.
+        </span>
+      </span>
+    </button>
+
+    {#if !choosing}
+      <button
+        type="button"
+        class="hover:preset-tonal-surface {ROW}"
+        disabled={busy}
+        onclick={() => (choosing = true)}
+      >
+        <ListChecksIcon class={ICON} />
+        <span class="flex-1">
+          <span class="block font-bold">Choose…</span>
+          <span class={DETAIL}>Pick which projects to add.</span>
+        </span>
+        <ChevronRightIcon class="mt-0.5 size-5 shrink-0 opacity-50" />
+      </button>
+    {/if}
+
+    <button
+      type="button"
+      class="hover:preset-tonal-surface {ROW}"
+      disabled={busy}
+      onclick={() => answer([])}
+    >
+      {#if later}
+        <XIcon class={ICON} />
       {:else}
-        Add {ids.length === 1 ? 'it' : `all ${ids.length}`}
+        <ClockIcon class={ICON} />
       {/if}
+      <span class="flex-1">
+        <span class="block font-bold">{later ? 'Cancel' : 'Not now'}</span>
+        <span class={DETAIL}>
+          They stay only in this browser. You can add them any time from Saved
+          Projects or your Account page.
+        </span>
+      </span>
     </button>
   </div>
 </div>

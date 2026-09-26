@@ -14,6 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
+  import { resolve } from '$app/paths';
   import LocalProjects from '$lib/components/LocalProjects.svelte';
   import UnitChanger from '$lib/components/UnitChanger.svelte';
   import YarnSources from '$lib/components/YarnSources.svelte';
@@ -23,11 +24,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { project } from '$lib/state/project-state.svelte';
   import { weather } from '$lib/state/weather-state.svelte';
   import { pluralize } from '$lib/utils/string-utils';
-  import { BookmarkIcon, PlusIcon } from '@lucide/svelte';
+  import {
+    BookmarkIcon,
+    BookOpenTextIcon,
+    CircleQuestionMarkIcon,
+    KeyboardIcon,
+    LightbulbIcon,
+    MailIcon,
+    PlusIcon,
+  } from '@lucide/svelte';
   import WeatherGrouping from '../WeatherGrouping.svelte';
   import DownloadExportButton from '../buttons/DownloadExportButton.svelte';
   import SendToGalleryButton from '../buttons/SendToGalleryButton.svelte';
   import WeatherSourceButton from '../buttons/WeatherSourceButton.svelte';
+  import GettingStarted from './GettingStarted.svelte';
+  import KeyboardShortcuts from './KeyboardShortcuts.svelte';
   import SaveProjectModal from './SaveProjectModal.svelte';
 </script>
 
@@ -133,6 +144,44 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </div>
 
   <LocalProjects />
+
+  <h2 class="mt-8 mb-2 text-xl font-bold">Help</h2>
+  <div class="my-4 flex w-full flex-wrap gap-2">
+    <button
+      class="btn preset-filled-secondary-500 text-surface-contrast-500"
+      onclick={() =>
+        dialog.trigger({
+          type: 'component',
+          component: { ref: GettingStarted },
+        })}
+    >
+      <LightbulbIcon />
+      Getting Started
+    </button>
+    <a href={resolve('/faq')} class="btn hover:preset-tonal-surface">
+      <CircleQuestionMarkIcon />
+      Frequently Asked Questions
+    </a>
+    <a href={resolve('/documentation')} class="btn hover:preset-tonal-surface">
+      <BookOpenTextIcon />
+      Documentation
+    </a>
+    <a href={resolve('/contact')} class="btn hover:preset-tonal-surface">
+      <MailIcon />
+      Contact
+    </a>
+    <button
+      class="btn hover:preset-tonal-surface"
+      onclick={() =>
+        dialog.trigger({
+          type: 'component',
+          component: { ref: KeyboardShortcuts },
+        })}
+    >
+      <KeyboardIcon />
+      Keyboard Shortcuts
+    </button>
+  </div>
 
   <h2 class="mt-8 mb-2 text-xl font-bold">Data Sources</h2>
   <div class=" flex w-full flex-col items-start gap-2 text-sm">

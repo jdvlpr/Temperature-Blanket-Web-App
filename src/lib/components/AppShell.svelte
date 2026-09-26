@@ -15,6 +15,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import AppNavigation from '$lib/components/AppNavigation.svelte';
+  import AccountButton from '$lib/components/account/AccountButton.svelte';
   import { safeSlide } from '$lib/features/transitions/safeSlide';
   import {
     drawerState,
@@ -98,7 +99,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </Dialog>
       </div>
 
-      {@render stickyHeader?.()}
+      <!-- The page's own items sit on the right, next to the account link; the
+      first (usually the logo, shown on wide screens) stays on the left -->
+      <div
+        class="flex min-w-0 flex-1 items-center justify-end max-sm:gap-1 sm:gap-2 [&>:first-child]:mr-auto"
+      >
+        {@render stickyHeader?.()}
+      </div>
+
+      <!-- Always the last item in the top bar -->
+      <AccountButton />
     </div>
   </div>
 

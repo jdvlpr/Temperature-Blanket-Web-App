@@ -19,6 +19,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import type { StoredProjectIndexItem } from '$lib/storage/projects.svelte';
   import { ProjectStorage } from '$lib/storage/projects.svelte';
   import { account } from '$lib/accounts/summary.svelte';
+  import AddToAccountButton from '$lib/components/sync/AddToAccountButton.svelte';
   import SyncStatus from '$lib/components/sync/SyncStatus.svelte';
   import { sync, syncLabelFor } from '$lib/sync/status.svelte';
 
@@ -51,6 +52,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <h2 class="mt-4 text-xl font-bold">Saved Projects</h2>
       {#if signedIn && sync.active}
         <SyncStatus class="text-surface-700-300 mb-2" />
+        <AddToAccountButton class="mb-2" />
       {:else}
         <p class="text-surface-700-300 mb-2 text-sm">Stored in this browser</p>
       {/if}

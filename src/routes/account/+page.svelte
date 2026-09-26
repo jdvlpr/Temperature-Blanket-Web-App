@@ -37,6 +37,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import SignInCard from '$lib/components/account/SignInCard.svelte';
   import SignInMethods from '$lib/components/account/SignInMethods.svelte';
   import AccountProjects from '$lib/components/sync/AccountProjects.svelte';
+  import AddToAccountButton from '$lib/components/sync/AddToAccountButton.svelte';
   import SyncStatus from '$lib/components/sync/SyncStatus.svelte';
   import { dialog } from '$lib/state/page-state.svelte';
   import { ProjectStorage } from '$lib/storage/projects.svelte';
@@ -274,6 +275,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   {#if sync.active}
                     <SyncStatus class="opacity-80" />
                   {/if}
+                  <AddToAccountButton class="mt-1" />
                 </div>
               </div>
               <AccountProjects userId={user.id} />

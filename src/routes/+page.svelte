@@ -26,12 +26,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import DonateButton from '$lib/components/buttons/DonateButton.svelte';
   import SectionNavigationButtons from '$lib/components/buttons/SectionNavigationButtons.svelte';
   import ChooseWeatherSource from '$lib/components/modals/ChooseWeatherSource.svelte';
-  import GettingStarted from '$lib/components/modals/GettingStarted.svelte';
-  import KeyboardShortcuts from '$lib/components/modals/KeyboardShortcuts.svelte';
   import LegacyNotification from '$lib/components/modals/LegacyNotification.svelte';
   import Menu from '$lib/components/modals/Menu.svelte';
   import SaveProjectModal from '$lib/components/modals/SaveProjectModal.svelte';
-  import { safeSlide } from '$lib/features/transitions/safeSlide';
   import { dialog, pageSections } from '$lib/state/page-state.svelte';
   import { locations } from '$lib/state/location-state.svelte';
   import { project } from '$lib/state/project-state.svelte';
@@ -45,21 +42,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { setUnitsFromNavigator } from '$lib/utils/unit-utils.svelte';
   import { upToDate } from '$lib/utils/other-utils';
   import {
-    BadgeQuestionMarkIcon,
     BookmarkIcon,
-    BookOpenTextIcon,
-    CircleQuestionMarkIcon,
     CloudyIcon,
     EllipsisVerticalIcon,
     Icon,
-    KeyboardIcon,
-    LightbulbIcon,
-    MailIcon,
     RedoIcon,
     SwatchBookIcon,
     UndoIcon,
   } from '@lucide/svelte';
-  import { Popover, Portal } from '@skeletonlabs/skeleton-svelte';
   import { onMount } from 'svelte';
   import { yarnBall } from '@lucide/lab';
 
@@ -198,102 +188,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </div>
       {/if}
     </div>
-
-    <Popover>
-      <Popover.Trigger
-        class="btn hover:preset-tonal-surface"
-        aria-label="Help"
-        title="Help"
-      >
-        <BadgeQuestionMarkIcon />
-        <span class="hidden sm:inline-block">Help</span>
-      </Popover.Trigger>
-      <Portal>
-        <Popover.Positioner>
-          <Popover.Content class="card bg-surface-200-800 z-49 p-2 shadow-xl">
-            {#snippet element(attributes)}
-              {#if !attributes.hidden}
-                <div {...attributes} transition:safeSlide>
-                  <Popover.Description>
-                    <div
-                      class="flex flex-col gap-2 p-2"
-                      aria-orientation="vertical"
-                      aria-label="Help Menu"
-                    >
-                      <button
-                        aria-label="Getting Started Guide"
-                        onclick={() => {
-                          dialog.trigger({
-                            type: 'component',
-                            component: { ref: GettingStarted },
-                          });
-                        }}
-                        class="btn preset-filled-secondary-500 text-surface-contrast-500 gap-2"
-                      >
-                        <LightbulbIcon />
-                        Getting Started
-                      </button>
-
-                      <p>
-                        <a
-                          href="/faq"
-                          title="View Frequently Asked Questions"
-                          class="btn hover:preset-tonal-surface"
-                        >
-                          <CircleQuestionMarkIcon />
-                          Frequently Asked Questions</a
-                        >
-                      </p>
-
-                      <p>
-                        <a
-                          href="/documentation"
-                          class="btn hover:preset-tonal-surface"
-                        >
-                          <BookOpenTextIcon />
-                          Documentation</a
-                        >
-                      </p>
-
-                      <p>
-                        <a
-                          href="/contact"
-                          class="btn hover:preset-tonal-surface"
-                        >
-                          <MailIcon />
-                          Contact</a
-                        >
-                      </p>
-
-                      <button
-                        class="btn hover:preset-tonal-surface w-fit"
-                        onclick={() => {
-                          dialog.trigger({
-                            type: 'component',
-                            component: { ref: KeyboardShortcuts },
-                          });
-                        }}
-                        title="View Keyboard Shortcuts"
-                      >
-                        <KeyboardIcon />
-                        <span class="text-left whitespace-pre-wrap"
-                          >Keyboard Shortcuts</span
-                        >
-                      </button>
-                    </div>
-                  </Popover.Description>
-                  <Popover.Arrow
-                    style="--arrow-size: calc(var(--spacing) * 4); --arrow-background: var(--color-surface-200-800);"
-                  >
-                    <Popover.ArrowTip />
-                  </Popover.Arrow>
-                </div>
-              {/if}
-            {/snippet}
-          </Popover.Content>
-        </Popover.Positioner>
-      </Portal>
-    </Popover>
 
     {#if weather.data.length && locations.allValid}
       <div class="hidden sm:inline-flex">

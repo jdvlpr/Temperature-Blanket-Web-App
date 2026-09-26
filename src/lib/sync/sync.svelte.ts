@@ -21,7 +21,10 @@
 // the free plan's daily request cap is shared by everyone. Only one tab syncs at
 // a time, and a change during a sync schedules another pass.
 
+import { goto } from '$app/navigation';
+import { resolve } from '$app/paths';
 import { account } from '$lib/accounts/summary.svelte';
+import { toast } from '$lib/state/page-state.svelte';
 import { ProjectStorage } from '$lib/storage/projects.svelte';
 import { syncAccount, SyncHttpError, type SyncReport } from './engine';
 import { createHttpSyncServer, sha256 } from './http';
@@ -38,6 +41,8 @@ let timer: ReturnType<typeof setTimeout> | undefined;
 let running: Promise<void> | null = null;
 let again = false;
 let lastFocusSync = 0;
+/** The problem last shown in a toast, so each one is shown once */
+let shownProblem: Problem | null = null;
 
 const server = createHttpSyncServer();
 
@@ -75,6 +80,53 @@ async function runPass(userId: string) {
   } finally {
     sync.version++;
   }
+  await toastNewProblem(userId).catch(() => {});
+}
+
+type Problem = 'signed-out' | 'storage-full' | 'too-large';
+
+const PROBLEMS: Record<Problem, { message: string; action: string }> = {
+  'signed-out': {
+    message: 'You’re signed out, so your projects aren’t syncing.',
+    action: 'Sign in',
+  },
+  'storage-full': {
+    message:
+      'Your account’s storage is full, so some projects aren’t syncing. Remove projects you no longer need.',
+    action: 'Your projects',
+  },
+  'too-large': {
+    message:
+      'A project is too large to sync. It’s still saved in this browser.',
+    action: 'Your projects',
+  },
+};
+
+async function currentProblem(userId: string): Promise<Problem | null> {
+  if (sync.state === 'signed-out') return 'signed-out';
+  const errors = new Set(
+    (await ProjectStorage.getIndex())
+      .filter((item) => item.sync?.ownerUserId === userId)
+      .map((item) => item.sync?.error),
+  );
+  if (errors.has('QUOTA_EXCEEDED')) return 'storage-full';
+  if (errors.has('PROJECT_TOO_LARGE')) return 'too-large';
+  return null;
+}
+
+/** A toast when a problem someone must act on starts; routine syncs stay quiet. */
+async function toastNewProblem(userId: string) {
+  const problem = await currentProblem(userId);
+  if (problem && problem !== shownProblem) {
+    const { message, action } = PROBLEMS[problem];
+    toast.trigger({
+      message,
+      category: 'error',
+      autohide: false,
+      action: { label: action, response: () => goto(resolve('/account')) },
+    });
+  }
+  shownProblem = problem;
 }
 
 /** Syncs now, or right after the pass in progress. */
@@ -142,6 +194,7 @@ export function stopSync() {
   window.removeEventListener('online', onOnline);
   sync.state = 'idle';
   sync.lastSyncedAt = null;
+  shownProblem = null;
   sync.version++;
 }
 
