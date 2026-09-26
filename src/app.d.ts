@@ -25,6 +25,8 @@ declare global {
         EMAIL_FROM?: string;
         GOOGLE_CLIENT_ID?: string;
         GOOGLE_CLIENT_SECRET?: string;
+        SYNC_ENABLED?: string;
+        SYNC_BETA_EMAILS?: string;
       };
     }
   }

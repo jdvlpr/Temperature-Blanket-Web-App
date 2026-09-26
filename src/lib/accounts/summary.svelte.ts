@@ -19,7 +19,10 @@
 
 import { hasSignedInHint, type AccountUser } from './client';
 
-export type AccountSummary = Pick<AccountUser, 'name' | 'email' | 'image'>;
+export type AccountSummary = Pick<AccountUser, 'name' | 'email' | 'image'> & {
+  /** Which saved projects are this account's. Missing from summaries saved before sync. */
+  id?: string;
+};
 
 const STORAGE_KEY = 'tb_account';
 
@@ -41,8 +44,13 @@ export function loadAccountSummary() {
   }
 }
 
-export function rememberAccountSummary({ name, email, image }: AccountSummary) {
-  account.summary = { name, email, image };
+export function rememberAccountSummary({
+  id,
+  name,
+  email,
+  image,
+}: AccountSummary) {
+  account.summary = { id, name, email, image };
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(account.summary));
   } catch {

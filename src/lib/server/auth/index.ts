@@ -24,6 +24,7 @@ import { cleanUpExpired } from './cleanup';
 import { allowCodeRequest } from './code-request-limit';
 import { emailChangedNotice, signInCodeEmail } from './emails';
 import { withSignedInHint } from './hint-cookie';
+import { deleteUserProjectData } from '$lib/server/sync/store';
 import { buildAuthOptions } from './options';
 import { readAuthSettings } from './settings';
 
@@ -56,6 +57,10 @@ function createAuth(
         await sender.send(signInCodeEmail(email, code, purpose));
       },
       runInBackground,
+      deleteUserData: async (userId) => {
+        const bucket = requestPlatform.getStore()?.env?.PROJECTS;
+        if (bucket) await deleteUserProjectData(bucket, userId);
+      },
       // Better Auth 1.7.3-1.7.5 can't validate the schema on D1 (issue #11346, fixed
       // in 1.7.6). After upgrading, enable it where dev routes are on:
       // platform.env?.ENABLE_DEV_ROUTES === 'true'

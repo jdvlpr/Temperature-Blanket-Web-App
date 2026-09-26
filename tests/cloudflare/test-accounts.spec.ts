@@ -23,34 +23,13 @@ import {
   type Page,
 } from '@playwright/test';
 import { execFileSync } from 'node:child_process';
-
-/** Polls the dev outbox for the newest code sent to an address. */
-async function latestCode(
-  request: APIRequestContext,
-  email: string,
-): Promise<string> {
-  let code: string | undefined;
-  await expect
-    .poll(
-      async () => {
-        const response = await request.get(
-          `/api/dev/outbox?to=${encodeURIComponent(email)}`,
-        );
-        const messages: { text: string }[] = await response.json();
-        code = messages[0]?.text.match(/\b(\d{6})\b/)?.[1];
-        return code;
-      },
-      { message: `a code emailed to ${email}` },
-    )
-    .toBeTruthy();
-  return code!;
-}
-
-// Rate limits are per client IP, and every local request comes from the same one.
-// Locally, wrangler passes a client-sent CF-Connecting-IP through (Cloudflare's edge
-// overwrites it in production), so each test gets its own address and limit.
-const randomTestIp = () =>
-  `10.${Math.floor(Math.random() * 256)}.${Math.floor(Math.random() * 256)}.${1 + Math.floor(Math.random() * 254)}`;
+import {
+  latestCode,
+  localD1,
+  randomTestIp,
+  signIn,
+  uniqueEmail,
+} from './helpers';
 
 test.beforeEach(async ({ page, context, baseURL }) => {
   await page.setExtraHTTPHeaders({ 'CF-Connecting-IP': randomTestIp() });
@@ -61,20 +40,6 @@ test.beforeEach(async ({ page, context, baseURL }) => {
     { name: '_clsk', value: '1', url: baseURL },
   ]);
 });
-
-const uniqueEmail = (label: string) =>
-  `${label}-${Date.now()}-${Math.floor(Math.random() * 1e6)}@example.test`;
-
-/** Signs in through the sign-in page and waits for the account page. */
-async function signIn(page: Page, request: APIRequestContext, email: string) {
-  await page.goto('/auth/sign-in');
-  await page.getByLabel('Email').fill(email);
-  await page.getByRole('button', { name: 'Email me a code' }).click();
-  await expect(page.getByText(`We sent a code to ${email}`)).toBeVisible();
-  // The code field submits itself on the sixth digit
-  await page.getByLabel('Code').fill(await latestCode(request, email));
-  await expect(page.getByTestId('account-email')).toHaveText(email);
-}
 
 test.describe('Accounts: sign in with an emailed code', () => {
   test('sign in, see the account, sign out', async ({ page, request }) => {
@@ -133,10 +98,11 @@ test.describe('Accounts: sign in with an emailed code', () => {
     // A redirect to another site is ignored
     await page.goto('/account');
     await page.getByRole('button', { name: 'Sign out', exact: true }).click();
+    await expect(page.getByText('You’re not signed in.')).toBeVisible();
     await page.goto('/auth/sign-in?redirect=//evil.example');
     await page.getByLabel('Email').fill(email);
     await page.getByRole('button', { name: 'Email me a code' }).click();
-    await page.getByLabel('Code').fill(await latestCode(request, email));
+    await page.getByLabel('Code').fill(await latestCode(request, email, code));
     await expect(page).toHaveURL(/\/account$/);
   });
 
@@ -395,22 +361,6 @@ test.describe('Accounts: managing the account', () => {
     expect((await request.get('/api/account/export')).status()).toBe(401);
   });
 });
-
-/** Runs SQL against the local D1 database that wrangler pages dev uses. */
-function localD1(sql: string): Record<string, unknown>[] {
-  const output = execFileSync('pnpm', [
-    'exec',
-    'wrangler',
-    'd1',
-    'execute',
-    'DB',
-    '--local',
-    '--json',
-    '--command',
-    sql,
-  ]).toString();
-  return JSON.parse(output)[0].results;
-}
 
 /** Adds a linked Google sign-in, as linking would store it (Google can't run here). */
 function seedGoogleAccount(userId: string) {

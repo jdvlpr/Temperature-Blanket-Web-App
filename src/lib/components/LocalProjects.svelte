@@ -18,8 +18,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ProjectDetails from '$lib/components/ProjectDetails.svelte';
   import type { StoredProjectIndexItem } from '$lib/storage/projects.svelte';
   import { ProjectStorage } from '$lib/storage/projects.svelte';
+  import { account } from '$lib/accounts/summary.svelte';
+  import SyncStatus from '$lib/components/sync/SyncStatus.svelte';
+  import { sync, syncLabelFor } from '$lib/sync/status.svelte';
 
   let projects = $state<StoredProjectIndexItem[]>([]);
+
+  // Signed in: show where each project is kept
+  const signedIn = $derived(
+    __ACCOUNTS_ENABLED__ && Boolean(account.summary?.id),
+  );
 
   async function loadProjects() {
     if (browser) {
@@ -30,6 +38,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 
   $effect(() => {
+    // Reload after each sync pass, and when someone signs in or out
+    void sync.version;
+    void account.summary?.id;
     loadProjects();
   });
 </script>
@@ -38,12 +49,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {#if projects?.length}
     <div class="mb-2 flex w-full flex-col items-start justify-center">
       <h2 class="mt-4 text-xl font-bold">Saved Projects</h2>
-      <p class="text-surface-700-300 mb-2 text-sm">Stored in this browser</p>
+      {#if signedIn && sync.active}
+        <SyncStatus class="text-surface-700-300 mb-2" />
+      {:else}
+        <p class="text-surface-700-300 mb-2 text-sm">Stored in this browser</p>
+      {/if}
       <div class="flex w-full flex-col items-start justify-center gap-2">
-        {#each projects as project}
+        {#each projects as project (project.id)}
           {@const { meta } = project}
           <ProjectDetails
             project={meta}
+            syncLabel={__ACCOUNTS_ENABLED__
+              ? syncLabelFor(project, signedIn)
+              : undefined}
             onclick={async () => {
               await ProjectStorage.removeByHref(meta.href);
               await loadProjects();

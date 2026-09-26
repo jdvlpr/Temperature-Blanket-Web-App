@@ -1,4 +1,5 @@
 import { browser } from '$app/environment';
+import { account } from '$lib/accounts/summary.svelte';
 import { locations } from '$lib/state/location-state.svelte';
 import { project } from '$lib/state/project-state.svelte';
 import { weather } from '$lib/state/weather-state.svelte';
@@ -15,6 +16,12 @@ import {
 } from '$lib/utils/date-utils';
 import { getMoonPhase } from '$lib/state/weather-state.svelte';
 import { projectCreatedAtTime } from '$lib/utils/project-id-utils';
+import type {
+  AccountSyncState,
+  LocalStore,
+  ProjectSyncState,
+} from '$lib/sync/engine';
+import { unchangedSince } from '$lib/sync/seen';
 import { del, get, set } from 'idb-keyval';
 
 export type StoredProjectIndexItem = {
@@ -25,6 +32,8 @@ export type StoredProjectIndexItem = {
     title: string;
     isCustomWeatherData: boolean;
   };
+  /** Present once the project belongs to an account (see $lib/sync) */
+  sync?: ProjectSyncState;
 };
 
 export type StoredProject = {
@@ -41,6 +50,33 @@ export type StoredProject = {
 
 const PROJECTS_INDEX_KEY = 'projects_index';
 const PROJECT_PREFIX = 'p_';
+const SYNC_ACCOUNT_PREFIX = 'sync_account_';
+
+// Index updates read, change and write the whole index, so they take turns,
+// across tabs too where the browser supports it.
+let indexQueue: Promise<unknown> = Promise.resolve();
+function withIndexLock<T>(task: () => Promise<T>): Promise<T> {
+  if (typeof navigator !== 'undefined' && navigator.locks)
+    return navigator.locks.request('tb-projects-index', task);
+  const run = indexQueue.then(task, task);
+  indexQueue = run.catch(() => {});
+  return run;
+}
+
+const indexItemFor = (
+  id: string,
+  project: StoredProject,
+  sync: ProjectSyncState | undefined,
+): StoredProjectIndexItem => ({
+  id,
+  meta: {
+    date: project.date,
+    href: project.href,
+    title: project.title || '',
+    isCustomWeatherData: project.isCustomWeatherData || false,
+  },
+  ...(sync && { sync }),
+});
 
 export class ProjectStorage {
   /**
@@ -113,37 +149,44 @@ export class ProjectStorage {
 
     const _project = localProject || this.project();
 
-    // Atomic-like update: set the project data first
-    await set(`${PROJECT_PREFIX}${_id}`, _project);
+    // The data and the index change together, so a sync can't land in between
+    const indexItem = await withIndexLock(async () => {
+      // Atomic-like update: set the project data first
+      await set(`${PROJECT_PREFIX}${_id}`, _project);
 
-    // Verify written data (Safety check)
-    const verified = await this.getById(_id);
-    if (!verified) {
-      throw new Error(`Failed to verify project storage for ID: ${_id}`);
-    }
+      // Verify written data (Safety check)
+      const verified = await this.getById(_id);
+      if (!verified) {
+        throw new Error(`Failed to verify project storage for ID: ${_id}`);
+      }
 
-    // Then update index
-    const index = await this.getIndex();
-    const existingIndex = index.findIndex((i) => i.id === _id);
+      // Then update index
+      const index = await this.getIndex();
+      const existingIndex = index.findIndex((i) => i.id === _id);
+      const existing = index[existingIndex]?.sync;
 
-    const indexItem: StoredProjectIndexItem = {
-      id: _id,
-      meta: {
-        date: _project.date,
-        href: _project.href,
-        title: _project.title || '',
-        isCustomWeatherData: _project.isCustomWeatherData || false,
-      },
-    };
+      // Signed in: the project is the account's, and has changes to upload
+      const owner = this.syncOwner() ?? existing?.ownerUserId;
+      const sync: ProjectSyncState | undefined = owner
+        ? {
+            ownerUserId: owner,
+            rev: existing?.ownerUserId === owner ? existing.rev : null,
+            dirty: true,
+            updatedAt: Date.now(),
+            lastSyncedAt:
+              existing?.ownerUserId === owner ? existing.lastSyncedAt : null,
+            error: null,
+          }
+        : undefined;
 
-    if (existingIndex > -1) {
-      index[existingIndex] = indexItem;
-    } else {
-      index.push(indexItem);
-    }
+      const item = indexItemFor(_id, _project, sync);
+      if (existingIndex > -1) index[existingIndex] = item;
+      else index.push(item);
+      await this.setIndex(index);
+      return item;
+    });
 
-    await this.setIndex(index);
-
+    this.onChange?.();
     return indexItem;
   }
 
@@ -153,13 +196,122 @@ export class ProjectStorage {
   static async removeById(id: string | null): Promise<void> {
     if (!id || !this.isAvailable()) return;
 
-    await del(`${PROJECT_PREFIX}${id}`);
+    const removed = await this.removeLocalOnly(id);
 
-    const index = await this.getIndex();
-    const newIndex = index.filter((i) => i.id !== id);
-    if (newIndex.length !== index.length) {
-      await this.setIndex(newIndex);
+    // Synced: tell the server on the next sync, so other devices remove it too
+    const sync = removed?.sync;
+    if (sync && sync.rev !== null) {
+      const state = await this.accountSyncState(sync.ownerUserId);
+      await this.setAccountSyncState(sync.ownerUserId, {
+        ...state,
+        pendingDeletes: [
+          ...state.pendingDeletes.filter((p) => p.id !== id),
+          { id, baseRev: sync.rev },
+        ],
+      });
     }
+    this.onChange?.();
+  }
+
+  /**
+   * Removes a project from this browser only, if `unless` doesn't object to its
+   * current entry. Returns the entry removed, if any.
+   */
+  static async removeLocalOnly(
+    id: string,
+    unless?: (item: StoredProjectIndexItem | undefined) => boolean,
+  ): Promise<StoredProjectIndexItem | undefined> {
+    return withIndexLock(async () => {
+      const index = await this.getIndex();
+      const item = index.find((i) => i.id === id);
+      if (unless?.(item)) return undefined;
+      await del(`${PROJECT_PREFIX}${id}`);
+      if (item) await this.setIndex(index.filter((i) => i.id !== id));
+      return item;
+    });
+  }
+
+  // *****************
+  // Sync (see $lib/sync). Unused unless accounts are on and someone signs in.
+  // *****************
+
+  /** The signed-in account's ID, which new saves belong to */
+  static syncOwner = (): string | null =>
+    __ACCOUNTS_ENABLED__ ? (account.summary?.id ?? null) : null;
+
+  /** Called after a save or removal, to schedule a sync. Set by $lib/sync. */
+  static onChange: (() => void) | undefined;
+
+  static async accountSyncState(userId: string): Promise<AccountSyncState> {
+    const saved = await get<AccountSyncState>(
+      `${SYNC_ACCOUNT_PREFIX}${userId}`,
+    ).catch(() => undefined);
+    return saved ?? { since: 0, pendingDeletes: [] };
+  }
+
+  static async setAccountSyncState(userId: string, state: AccountSyncState) {
+    await set(`${SYNC_ACCOUNT_PREFIX}${userId}`, state);
+  }
+
+  static async clearAccountSyncState(userId: string) {
+    await del(`${SYNC_ACCOUNT_PREFIX}${userId}`);
+  }
+
+  /** Changes the sync state of several projects at once; undefined removes it. */
+  static async updateSyncStates(
+    update: (
+      item: StoredProjectIndexItem,
+    ) => ProjectSyncState | undefined | 'unchanged',
+  ) {
+    await withIndexLock(async () => {
+      const index = await this.getIndex();
+      let changed = false;
+      const next = index.map((item) => {
+        const sync = update(item);
+        if (sync === 'unchanged') return item;
+        changed = true;
+        const next: StoredProjectIndexItem = { ...item, sync };
+        if (!sync) delete next.sync;
+        return next;
+      });
+      if (changed) await this.setIndex(next);
+    });
+  }
+
+  /** The IndexedDB side of the sync engine. */
+  static localStore(): LocalStore {
+    return {
+      list: async () =>
+        (await this.getIndex()).map(({ id, sync }) => ({ id, sync })),
+      read: (id) => this.getById(id),
+      put: (id, project, sync, seen) =>
+        withIndexLock(async () => {
+          const index = await this.getIndex();
+          const at = index.findIndex((i) => i.id === id);
+          if (!unchangedSince(index[at], seen)) return false;
+          await set(`${PROJECT_PREFIX}${id}`, project);
+          const item = indexItemFor(id, project, sync);
+          if (at > -1) index[at] = item;
+          else index.push(item);
+          await this.setIndex(index);
+          return true;
+        }),
+      updateSync: (id, update) =>
+        this.updateSyncStates((item) =>
+          item.id === id ? update(item.sync) : 'unchanged',
+        ),
+      remove: async (id, seen) => {
+        let unchanged = false;
+        await this.removeLocalOnly(id, (item) => {
+          unchanged = Boolean(item) && unchangedSince(item, seen);
+          return !unchanged;
+        });
+        return unchanged;
+      },
+      accountState: (userId) => this.accountSyncState(userId),
+      setAccountState: (userId, state) =>
+        this.setAccountSyncState(userId, state),
+    };
   }
 
   /**
@@ -186,7 +338,13 @@ export class ProjectStorage {
    */
   static async getProjectsForDisplay(): Promise<StoredProjectIndexItem[]> {
     const index = await this.getIndex();
-    return index.slice().reverse();
+    // While someone is signed in, another account's projects stay hidden (a
+    // shared browser). Signed out, everything shows, including projects of an
+    // account whose session ended.
+    const owner = this.syncOwner();
+    return index
+      .filter((i) => !owner || !i.sync || i.sync.ownerUserId === owner)
+      .reverse();
   }
 
   /**

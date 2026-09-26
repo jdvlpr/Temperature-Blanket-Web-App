@@ -19,6 +19,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import DialogProvider from '$lib/components/modals/DialogProvider.svelte';
   import LegacyMigrationError from '$lib/components/modals/LegacyMigrationError.svelte';
   import ToastProvider from '$lib/components/ToastProvider.svelte';
+  import AccountSync from '$lib/components/sync/AccountSync.svelte';
   import {
     consentToMSClarityCookies,
     dialog,
@@ -201,6 +202,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 <ToastProvider />
 
 <DialogProvider />
+
+{#if __ACCOUNTS_ENABLED__}
+  <AccountSync />
+{/if}
 
 <style>
   @keyframes fade-in {
