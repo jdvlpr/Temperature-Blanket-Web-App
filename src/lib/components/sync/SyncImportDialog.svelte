@@ -76,16 +76,17 @@ and device, after signing in. -->
       <legend class="sr-only">Projects to add</legend>
       {#each projects as project (project.id)}
         <label
-          class="hover:preset-tonal-surface flex min-h-12 items-center gap-3 px-3 py-2"
+          class="hover:preset-tonal-surface flex min-h-12 items-start gap-3 px-3 py-2"
         >
           <input
             type="checkbox"
-            class="checkbox"
+            class="checkbox mt-1 shrink-0"
             value={project.id}
             bind:group={chosen}
           />
+          <!-- Long titles wrap rather than being cut off -->
           <span class="flex min-w-0 flex-col">
-            <span class="truncate font-bold"
+            <span class="font-bold [overflow-wrap:anywhere]"
               >{project.meta.title || 'Untitled project'}</span
             >
             <span class="text-xs opacity-70">Saved {project.meta.date}</span>

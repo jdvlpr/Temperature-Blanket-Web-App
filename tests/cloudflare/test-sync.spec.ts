@@ -296,6 +296,11 @@ test.describe('Sync in the browser', () => {
 
     // Remove from the laptop
     await laptop.goto('/account');
+    await expect(
+      laptop
+        .getByRole('list', { name: 'Your projects' })
+        .getByRole('link', { name: 'Kept or not' }),
+    ).toBeVisible();
     await laptop.getByRole('button', { name: 'Sign out', exact: true }).click();
     await expect(
       laptop.getByText('1 project from your account is saved in this browser.'),

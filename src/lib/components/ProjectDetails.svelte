@@ -20,6 +20,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { extraColorsFromProjectHref } from '$lib/utils/extra-colors-utils';
   import { pluralize } from '$lib/utils/string-utils';
   import type { Color } from '$lib/types/yarn-types';
+  import SyncIcon from '$lib/components/sync/SyncIcon.svelte';
+  import type { SyncLabel } from '$lib/sync/status.svelte';
   import { Trash2Icon } from '@lucide/svelte';
 
   interface Props {
@@ -27,20 +29,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     canRemove?: boolean;
     onclick?: () => void;
     /** Where the project is kept, e.g. "Synced" (see $lib/sync) */
-    syncLabel?: {
-      text: string;
-      tone: 'success' | 'warning' | 'error' | 'surface';
-    };
+    syncLabel?: SyncLabel;
   }
 
   let { project, canRemove = true, onclick, syncLabel }: Props = $props();
-
-  const TONES = {
-    success: 'preset-tonal-success',
-    warning: 'preset-tonal-warning',
-    error: 'preset-tonal-error',
-    surface: 'preset-tonal-surface',
-  };
 
   const href = $derived(project.href);
   const title = $derived(project.title);
@@ -100,17 +92,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
   class="bg-surface-100 dark:bg-surface-900 rounded-container flex w-full items-center justify-start gap-2 p-4"
 >
   <div class="flex w-full flex-col">
-    <a
-      {href}
-      target="_blank"
-      rel="noopener noreferrer"
-      class="line-clamp-4 underline">{title}</a
-    >
-    {#if syncLabel}
-      <span
-        class="badge {TONES[syncLabel.tone]} mt-1 w-fit text-xs"
-        data-testid="sync-label">{syncLabel.text}</span
+    <div class="flex items-start gap-2">
+      {#if syncLabel}
+        <span class="mt-1"><SyncIcon label={syncLabel} /></span>
+      {/if}
+      <a
+        {href}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="line-clamp-4 min-w-0 underline">{title}</a
       >
+    </div>
+    {#if syncLabel?.tone === 'error'}
+      <p class="text-error-700-300 text-sm">{syncLabel.text}</p>
     {/if}
     {#if colors !== false}
       <ColorPalette

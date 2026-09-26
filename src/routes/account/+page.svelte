@@ -36,6 +36,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import DisplayName from '$lib/components/account/DisplayName.svelte';
   import SignInCard from '$lib/components/account/SignInCard.svelte';
   import SignInMethods from '$lib/components/account/SignInMethods.svelte';
+  import AccountProjects from '$lib/components/sync/AccountProjects.svelte';
   import SyncStatus from '$lib/components/sync/SyncStatus.svelte';
   import { dialog } from '$lib/state/page-state.svelte';
   import { ProjectStorage } from '$lib/storage/projects.svelte';
@@ -261,8 +262,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <h3 id="projects" class="px-2 text-sm font-bold opacity-70">
               Projects
             </h3>
-            <div class="{CARD} px-4 py-3">
-              <div class="flex items-start gap-3">
+            <div class={CARD}>
+              <div class="flex items-start gap-3 px-4 py-3">
                 <CloudIcon class="mt-0.5 shrink-0 opacity-70" />
                 <div class="flex flex-col gap-1">
                   <p class="font-bold">Saved projects sync to your account</p>
@@ -275,6 +276,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   {/if}
                 </div>
               </div>
+              <AccountProjects userId={user.id} />
             </div>
           </section>
 

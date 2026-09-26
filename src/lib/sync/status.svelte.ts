@@ -42,6 +42,7 @@ export const sync = $state({
 export type SyncLabel = {
   text: string;
   tone: 'success' | 'warning' | 'error' | 'surface';
+  icon: 'synced' | 'waiting' | 'error' | 'local';
 };
 
 /**
@@ -54,13 +55,21 @@ export function syncLabelFor(
 ): SyncLabel | undefined {
   const state = item.sync;
   if (!signedIn)
-    return state ? { text: 'Sign in to sync', tone: 'warning' } : undefined;
-  if (!state) return { text: 'Only in this browser', tone: 'surface' };
+    return state
+      ? { text: 'Sign in to sync', tone: 'warning', icon: 'local' }
+      : undefined;
+  if (!state)
+    return { text: 'Only in this browser', tone: 'surface', icon: 'local' };
   if (state.error === 'QUOTA_EXCEEDED')
-    return { text: 'Not synced: account storage full', tone: 'error' };
+    return {
+      text: 'Not synced: account storage full',
+      tone: 'error',
+      icon: 'error',
+    };
   if (state.error === 'PROJECT_TOO_LARGE')
-    return { text: 'Not synced: too large', tone: 'error' };
-  if (state.error) return { text: 'Not synced', tone: 'error' };
-  if (state.dirty) return { text: 'Waiting to sync', tone: 'warning' };
-  return { text: 'Synced', tone: 'success' };
+    return { text: 'Not synced: too large', tone: 'error', icon: 'error' };
+  if (state.error) return { text: 'Not synced', tone: 'error', icon: 'error' };
+  if (state.dirty)
+    return { text: 'Waiting to sync', tone: 'warning', icon: 'waiting' };
+  return { text: 'Synced', tone: 'success', icon: 'synced' };
 }
