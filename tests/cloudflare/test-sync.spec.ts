@@ -32,7 +32,7 @@ const expect = baseExpect.configure({ timeout: 15_000 });
 
 type IndexItem = {
   id: string;
-  meta: { title: string };
+  meta: { title: string; href?: string };
   sync?: {
     ownerUserId: string;
     rev: number | null;
@@ -427,5 +427,119 @@ test.describe('Sync in the browser', () => {
 
     await phone.context().setOffline(false);
     await expect.poll(() => serverProjectIds(phone)).toEqual([id]);
+  });
+});
+
+/** Builds a project in the Project Planner, with live weather for Austin. */
+async function buildProject(page: Page) {
+  await page.goto('/');
+  await page.getByPlaceholder('Enter a place').fill('Austin');
+  await page
+    .getByRole('option', { name: 'Austin, Texas, United States' })
+    .click();
+  await page.getByRole('button', { name: 'Search', exact: true }).click();
+  await expect(page.getByText('°C / mm °F / in')).toBeVisible();
+}
+
+async function choosePattern(page: Page, label: string) {
+  const tabBar = page.locator('#bottom-section-nav');
+  await tabBar.getByRole('button', { name: 'Preview', exact: true }).click();
+  await page.locator('#select-pattern-type').selectOption({ label });
+}
+
+/**
+ * Two devices for the Project Planner: the test IP header goes only to this
+ * site, since weather services reject cross-site requests that carry it.
+ */
+async function plannerDevices(browser: Browser, baseURL: string) {
+  const pages: Page[] = [];
+  for (let i = 0; i < 2; i++) {
+    const context = await browser.newContext();
+    contexts.push(context);
+    const ip = randomTestIp();
+    await context.route(`${new URL(baseURL).origin}/**`, (route) =>
+      route.continue({
+        headers: { ...route.request().headers(), 'CF-Connecting-IP': ip },
+      }),
+    );
+    await context.addCookies([
+      { name: '_clck', value: '1', url: baseURL },
+      { name: '_clsk', value: '1', url: baseURL },
+    ]);
+    pages.push(await context.newPage());
+  }
+  return { phone: pages[0], laptop: pages[1] };
+}
+
+const openProjectId = (page: Page) =>
+  new URL(page.url()).searchParams.get('project')!;
+
+test.describe('Auto-save', () => {
+  test('after the first Save, changes save and sync by themselves', async ({
+    browser,
+    baseURL,
+  }) => {
+    const { phone, laptop } = await plannerDevices(browser, baseURL!);
+    const email = uniqueEmail('autosave');
+    await signIn(laptop, laptop.request, email);
+    await buildProject(laptop);
+
+    await laptop.getByRole('button', { name: 'Save', exact: true }).click();
+    await expect(laptop.getByText('Saved to Your Account')).toBeVisible();
+    await laptop.keyboard.press('Escape');
+    const status = laptop.getByTestId('autosave-status');
+    await expect(status).toHaveText('Saved');
+    const id = openProjectId(laptop);
+
+    // An edit, and no Save
+    await choosePattern(laptop, 'Calendar');
+    await expect(status).toHaveText('Saving…');
+    // Saved, the address bar holds the edited project
+    await expect(laptop).toHaveURL(/clnr=/);
+    await expect
+      .poll(async () => {
+        const item = (await savedIndex(laptop)).find((i) => i.id === id);
+        return item?.sync?.dirty === false && item.meta.href === laptop.url();
+      })
+      .toBe(true);
+    await expect(status).toHaveText('Saved');
+
+    // The other device gets the edited project
+    await signIn(phone, phone.request, email);
+    await expect
+      .poll(
+        async () =>
+          (await savedIndex(phone)).find((i) => i.id === id)?.meta.href,
+      )
+      .toBe(laptop.url());
+
+    // Opening it again isn't a change: nothing is uploaded
+    const before = (await savedIndex(laptop)).find((i) => i.id === id)!.sync;
+    await laptop.reload();
+    await expect(
+      laptop.getByText('Loaded project and weather data'),
+    ).toBeVisible();
+    await expect(status).toHaveText('Saved');
+    await laptop.waitForTimeout(4000);
+    const after = (await savedIndex(laptop)).find((i) => i.id === id)!.sync;
+    expect(after?.rev).toBe(before?.rev);
+    expect(after?.updatedAt).toBe(before?.updatedAt);
+  });
+
+  test('a new project isn’t saved until someone saves it', async ({
+    browser,
+    baseURL,
+  }) => {
+    const { laptop } = await plannerDevices(browser, baseURL!);
+    await signIn(laptop, laptop.request, uniqueEmail('autosave-new'));
+    await buildProject(laptop);
+    await choosePattern(laptop, 'Calendar');
+    await laptop.waitForTimeout(4000);
+
+    expect(await savedIndex(laptop)).toEqual([]);
+    await expect(laptop.getByTestId('autosave-status')).toHaveCount(0);
+    await expect(
+      laptop.getByRole('button', { name: 'Save', exact: true }),
+    ).toBeVisible();
   });
 });

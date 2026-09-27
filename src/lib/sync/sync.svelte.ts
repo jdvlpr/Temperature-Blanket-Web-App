@@ -32,7 +32,8 @@ import { sync } from './status.svelte';
 
 export { sync, type SyncState } from './status.svelte';
 
-const SAVE_DELAY_MS = 3000;
+// Only long enough to fold writes that land together into one pass
+const SAVE_DELAY_MS = 300;
 const FOCUS_INTERVAL_MS = 60_000;
 const BUSY_RETRY_MS = 10_000;
 

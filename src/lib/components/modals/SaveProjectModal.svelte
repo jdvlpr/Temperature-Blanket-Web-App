@@ -25,6 +25,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '$lib/storage/projects.svelte';
   import { CircleCheckIcon, ClipboardCopyIcon, LinkIcon } from '@lucide/svelte';
   import { onMount } from 'svelte';
+  import { projectSaved } from '$lib/storage/autosave.svelte';
   import ProjectDetails from '../ProjectDetails.svelte';
   import DownloadExportButton from '../buttons/DownloadExportButton.svelte';
   import SendToGalleryButton from '../buttons/SendToGalleryButton.svelte';
@@ -64,6 +65,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     try {
       storedProject = await ProjectStorage.save();
       project.status.saved = true;
+      projectSaved();
     } catch (e) {
       storedProject = null;
       project.status.saved = false;
@@ -95,7 +97,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <p class="text-surface-700-300 text-sm">
           Progress and {#if weather.isUserEdited}custom weather{:else}weather{/if}
           data is saved in this browser and syncs to every device where you’re signed
-          in.
+          in. From now on, changes save automatically.
         </p>
         <SyncStatus class="text-surface-700-300" />
       </div>

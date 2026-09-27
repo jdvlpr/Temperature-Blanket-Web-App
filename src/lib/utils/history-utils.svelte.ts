@@ -13,6 +13,7 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
+import { projectChanged } from '$lib/storage/autosave.svelte';
 import { browser } from '$app/environment';
 import { ICONS } from '$lib/constants/icon-constants';
 import { allGaugesAttributes, gauges } from '$lib/state/gauges-state.svelte';
@@ -209,4 +210,5 @@ export const updateHistory = () => {
   if (live !== project.history.current) project.history.push(live);
 
   project.history.isUpdating = false;
+  projectChanged();
 };

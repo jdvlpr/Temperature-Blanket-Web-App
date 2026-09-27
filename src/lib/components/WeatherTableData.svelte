@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { projectChanged } from '$lib/storage/autosave.svelte';
   import { UNIT_LABELS } from '$lib/constants/weather-constants';
   import { dialog } from '$lib/state/page-state.svelte';
   import { weather } from '$lib/state/weather-state.svelte';
@@ -117,6 +118,7 @@
                           title: `<div class="flex flex-col items-center justify-center"><span class="font-bold">${row.date}</span><span>${label}</span></div>`,
                           onOkay: async (_value: string) => {
                             weather.isUserEdited = true;
+                            projectChanged({ weather: true });
 
                             const time = _value.split(':');
 
@@ -159,6 +161,7 @@
                           showSlider: false,
                           onOkay: async (_value: number) => {
                             weather.isUserEdited = true;
+                            projectChanged({ weather: true });
                             const mappedWeather = weather.rawData.map(
                               (n) =>
                                 `${dateToISO8601String(n.date)}-${n.location}`,

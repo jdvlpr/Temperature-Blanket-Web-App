@@ -43,14 +43,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { upToDate } from '$lib/utils/other-utils';
   import {
     BookmarkIcon,
+    CloudAlertIcon,
+    CloudCheckIcon,
     CloudyIcon,
     EllipsisVerticalIcon,
     Icon,
+    LoaderCircleIcon,
     RedoIcon,
     SwatchBookIcon,
     UndoIcon,
   } from '@lucide/svelte';
   import { onMount } from 'svelte';
+  import { autosave } from '$lib/storage/autosave.svelte';
   import { yarnBall } from '@lucide/lab';
 
   let debounceTimer: number;
@@ -191,18 +195,43 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     {#if weather.data.length && locations.allValid}
       <div class="hidden sm:inline-flex">
-        <button
-          class="btn bg-primary-50-950 border-primary-500 hover:preset-tonal-primary border"
-          title="Save your project in this browser and as a URL."
-          onclick={() =>
-            dialog.trigger({
-              type: 'component',
-              component: { ref: SaveProjectModal },
-            })}
-        >
-          <BookmarkIcon />
-          <span class="inline-block max-sm:hidden">Save</span>
-        </button>
+        {#if autosave.on}
+          <!-- Changes save by themselves; this still opens the link and exports -->
+          <button
+            class="btn hover:preset-tonal-surface"
+            title="Changes save to your account automatically"
+            data-testid="autosave-status"
+            onclick={() =>
+              dialog.trigger({
+                type: 'component',
+                component: { ref: SaveProjectModal },
+              })}
+          >
+            {#if autosave.state === 'error'}
+              <CloudAlertIcon class="text-error-700-300" />
+              <span>Not saved</span>
+            {:else if autosave.state === 'saved'}
+              <CloudCheckIcon class="text-success-700-300" />
+              <span>Saved</span>
+            {:else}
+              <LoaderCircleIcon class="animate-spin opacity-70" />
+              <span>Saving…</span>
+            {/if}
+          </button>
+        {:else}
+          <button
+            class="btn bg-primary-50-950 border-primary-500 hover:preset-tonal-primary border"
+            title="Save your project in this browser and as a URL."
+            onclick={() =>
+              dialog.trigger({
+                type: 'component',
+                component: { ref: SaveProjectModal },
+              })}
+          >
+            <BookmarkIcon />
+            <span class="inline-block max-sm:hidden">Save</span>
+          </button>
+        {/if}
       </div>
     {/if}
 
