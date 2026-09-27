@@ -238,9 +238,7 @@ test.describe('Sync in the browser', () => {
       new URL(`/?project=${id}`, baseURL).href,
     );
     await expect(laptop.getByTestId('sync-label')).toHaveText('Synced');
-    await expect(laptop.getByTestId('sync-status')).toContainText(
-      'Synced with your account',
-    );
+    await expect(laptop.getByTestId('sync-status')).toContainText('Synced');
   });
 
   test('a project removed on one device is removed on the other', async ({

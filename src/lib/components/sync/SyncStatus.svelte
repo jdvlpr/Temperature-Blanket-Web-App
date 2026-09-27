@@ -23,7 +23,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     CloudCheckIcon,
     CloudOffIcon,
     LoaderCircleIcon,
-    RefreshCwIcon,
   } from '@lucide/svelte';
 
   let { class: className = '' }: { class?: string } = $props();
@@ -75,15 +74,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <button type="button" class="anchor" onclick={syncNow}>Try again</button>
   {:else}
     <CloudCheckIcon class="text-success-700-300 size-4 shrink-0" />
-    <span>Synced with your account{time ? ` at ${time}` : ''}</span>
-    <button
-      type="button"
-      class="btn-icon btn-icon-sm hover:preset-tonal-surface"
-      aria-label="Sync now"
-      title="Sync now"
-      onclick={syncNow}
-    >
-      <RefreshCwIcon class="size-4" />
-    </button>
+    <span>Synced{time ? ` at ${time}` : ''}</span>
   {/if}
 </div>

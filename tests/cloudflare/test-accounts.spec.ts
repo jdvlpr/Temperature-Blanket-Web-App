@@ -65,6 +65,34 @@ test.describe('Accounts: sign in with an emailed code', () => {
     await expect(page.getByText('You’re not signed in.')).toBeVisible();
   });
 
+  test('the account menu in the top bar shows the account and signs out', async ({
+    page,
+    request,
+  }) => {
+    const email = uniqueEmail('menu');
+    await signIn(page, request, email);
+
+    await page.goto('/faq');
+    await page.getByTestId('account-button').click();
+    await expect(page.getByRole('dialog').getByText(email)).toBeVisible();
+    await page.getByRole('link', { name: 'Account settings' }).click();
+    await expect(page).toHaveURL(/\/account$/);
+
+    await page.goto('/faq');
+    await page.getByTestId('account-button').click();
+    await page
+      .getByRole('dialog')
+      .getByRole('button', { name: 'Sign out', exact: true })
+      .click();
+    await expect(page.getByTestId('account-button')).toHaveAccessibleName(
+      'Sign in',
+    );
+    await page.reload();
+    await expect(page.getByTestId('account-button')).toHaveAccessibleName(
+      'Sign in',
+    );
+  });
+
   test('a wrong code is rejected', async ({ page, request }) => {
     const email = uniqueEmail('wrong-code');
 

@@ -20,11 +20,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
     clearSignedInHint,
     getSession,
     hasSignedInHint,
-    signOut,
-    signOutEverywhere,
     type AccountUser,
   } from '$lib/accounts/client';
   import {
+    account,
     forgetAccountSummary,
     rememberAccountSummary,
   } from '$lib/accounts/summary.svelte';
@@ -39,8 +38,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import AccountProjects from '$lib/components/sync/AccountProjects.svelte';
   import AddToAccountButton from '$lib/components/sync/AddToAccountButton.svelte';
   import SyncStatus from '$lib/components/sync/SyncStatus.svelte';
-  import { dialog } from '$lib/state/page-state.svelte';
-  import { ProjectStorage } from '$lib/storage/projects.svelte';
   import { sync } from '$lib/sync/status.svelte';
   import {
     ChevronRightIcon,
@@ -99,62 +96,26 @@ If not, see <https://www.gnu.org/licenses/>. -->
     }
   });
 
-  /** Ends the session, then settles what happens to the account's projects here. */
-  async function finishSignOut(
-    userId: string,
-    everywhere: boolean,
-    keepProjects: boolean,
-  ) {
-    if (everywhere) await signOutEverywhere();
-    else await signOut();
-    const { leaveAccount } = await import('$lib/sync/sync.svelte');
-    await leaveAccount(userId, keepProjects);
-    forgetAccountSummary();
-    user = null;
-    status = 'signed-out';
-  }
-
   async function handleSignOut(everywhere = false) {
     if (!user) return;
-    const userId = user.id;
     busy = true;
     errorMessage = '';
-    try {
-      const projectCount = (await ProjectStorage.getIndex()).filter(
-        (item) => item.sync?.ownerUserId === userId,
-      ).length;
-
-      if (!projectCount) {
-        await finishSignOut(userId, everywhere, true);
-        return;
-      }
-
-      const { default: SignOutDialog } =
-        await import('$lib/components/sync/SignOutDialog.svelte');
-      dialog.trigger({
-        type: 'component',
-        component: {
-          ref: SignOutDialog,
-          props: {
-            userId,
-            everywhere,
-            projectCount,
-            onconfirm: async (keepProjects: boolean) => {
-              try {
-                await finishSignOut(userId, everywhere, keepProjects);
-              } catch (e) {
-                errorMessage = accountErrorMessage(e);
-              }
-            },
-          },
-        },
-      });
-    } catch (e) {
-      errorMessage = accountErrorMessage(e);
-    } finally {
-      busy = false;
-    }
+    const { startSignOut } = await import('$lib/accounts/sign-out');
+    await startSignOut({
+      userId: user.id,
+      everywhere,
+      onError: (message) => (errorMessage = message),
+    });
+    busy = false;
   }
+
+  // Signed out here or from the account menu in the top bar
+  $effect(() => {
+    if (status === 'signed-in' && !account.summary) {
+      user = null;
+      status = 'signed-out';
+    }
+  });
 
   /** Account details from the server, plus every synced project. */
   async function downloadMyData() {

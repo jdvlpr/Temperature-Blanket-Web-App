@@ -170,6 +170,14 @@ function onFocus() {
 
 const onOnline = () => scheduleSync(0);
 
+const LOOK_INTERVAL_MS = 10_000;
+
+/** Syncs now when someone looks at their sync status, unless it just did. */
+export function refreshSync() {
+  if (Date.now() - (sync.lastSyncedAt ?? 0) < LOOK_INTERVAL_MS) return;
+  scheduleSync(0);
+}
+
 /** Starts syncing the signed-in account. Safe to call again. */
 export function startSync() {
   if (started) return;
