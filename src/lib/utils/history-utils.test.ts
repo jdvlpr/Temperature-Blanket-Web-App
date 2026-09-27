@@ -70,6 +70,7 @@ const {
 }));
 
 vi.mock('$app/environment', () => ({ browser: true }));
+vi.mock('$lib/storage/autosave.svelte', () => ({ projectChanged: vi.fn() }));
 
 vi.mock('$lib/state/gauges-state.svelte', () => ({
   allGaugesAttributes: mockGauges.allGaugesAttributes,

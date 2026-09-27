@@ -7,7 +7,10 @@ const state = vi.hoisted(() => ({
   },
   sync: { active: true },
   owner: 'u1' as string | null,
-  index: [] as { id: string; sync?: { ownerUserId: string } }[],
+  index: [] as {
+    id: string;
+    sync?: { ownerUserId: string; updatedAt?: number };
+  }[],
   save: vi.fn(async () => null),
 }));
 
@@ -143,6 +146,46 @@ describe('autosave', () => {
     await Promise.resolve();
     vi.useFakeTimers();
     edit('b');
+    await vi.advanceTimersByTimeAsync(IDLE_MS * 2);
+    expect(state.save).not.toHaveBeenCalled();
+  });
+
+  it('stops rather than overwrite a newer version from another device', async () => {
+    state.index = [{ id: 'p1', sync: { ownerUserId: 'u1', updatedAt: 1 } }];
+    await open();
+    // A sync brings in the other device's edit
+    state.index = [{ id: 'p1', sync: { ownerUserId: 'u1', updatedAt: 2 } }];
+    vi.useFakeTimers();
+    edit('b');
+    await vi.advanceTimersByTimeAsync(IDLE_MS * 2);
+    expect(state.save).not.toHaveBeenCalled();
+    expect(autosave.state).toBe('conflict');
+    expect(state.project.status.saved).toBe(false);
+  });
+
+  it('its own saves are not mistaken for another device', async () => {
+    state.index = [{ id: 'p1', sync: { ownerUserId: 'u1', updatedAt: 1 } }];
+    state.save.mockImplementation(async () => {
+      state.index = [{ id: 'p1', sync: { ownerUserId: 'u1', updatedAt: 5 } }];
+      return null;
+    });
+    await open();
+    vi.useFakeTimers();
+    edit('b');
+    await vi.advanceTimersByTimeAsync(IDLE_MS);
+    edit('c');
+    await vi.advanceTimersByTimeAsync(IDLE_MS);
+    expect(state.save).toHaveBeenCalledTimes(2);
+    expect(autosave.state).toBe('saved');
+    state.save.mockImplementation(async () => null);
+  });
+
+  it('opening another project starts over rather than saving it', async () => {
+    await open();
+    vi.useFakeTimers();
+    state.index.push({ id: 'p2', sync: { ownerUserId: 'u1' } });
+    state.project.url.href = 'https://x.test/?project=p2#z';
+    projectChanged();
     await vi.advanceTimersByTimeAsync(IDLE_MS * 2);
     expect(state.save).not.toHaveBeenCalled();
   });

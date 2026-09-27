@@ -524,6 +524,66 @@ test.describe('Auto-save', () => {
     const after = (await savedIndex(laptop)).find((i) => i.id === id)!.sync;
     expect(after?.rev).toBe(before?.rev);
     expect(after?.updatedAt).toBe(before?.updatedAt);
+
+    // Nor is opening the Save dialog to get the link
+    await status.click();
+    await expect(laptop.getByText('Saved to Your Account')).toBeVisible();
+    await laptop.keyboard.press('Escape');
+    await laptop.waitForTimeout(2000);
+    expect((await savedIndex(laptop)).find((i) => i.id === id)!.sync).toEqual(
+      after,
+    );
+  });
+
+  test('a change from another device isn’t overwritten by one here', async ({
+    browser,
+    baseURL,
+  }) => {
+    const { phone, laptop } = await plannerDevices(browser, baseURL!);
+    const email = uniqueEmail('autosave-conflict');
+    await signIn(laptop, laptop.request, email);
+    await buildProject(laptop);
+    await laptop.getByRole('button', { name: 'Save', exact: true }).click();
+    await expect(laptop.getByText('Saved to Your Account')).toBeVisible();
+    await laptop.keyboard.press('Escape');
+    const status = laptop.getByTestId('autosave-status');
+    await expect(status).toHaveText('Saved');
+    const id = openProjectId(laptop);
+    await expect
+      .poll(async () => (await serverProjectIds(laptop)).includes(id))
+      .toBe(true);
+
+    // The phone changes it while the laptop still has it open
+    await signIn(phone, phone.request, email);
+    await expect
+      .poll(async () => (await savedIndex(phone)).some((i) => i.id === id))
+      .toBe(true);
+    await editProject(phone, id, 'Changed on the phone');
+    await openSavedProjects(phone);
+    await expect(
+      phone.getByRole('link', { name: 'Changed on the phone' }),
+    ).toBeVisible();
+    const serverTitle = async () => {
+      const body = await (
+        await laptop.request.get('/api/sync/changes?since=0')
+      ).json();
+      return body.changes.find((c: { id: string }) => c.id === id)?.title;
+    };
+    await expect.poll(serverTitle).toBe('Changed on the phone');
+
+    // The laptop syncs (opening the account menu syncs, at most every 10 s)
+    await laptop.waitForTimeout(10_000);
+    await laptop.getByTestId('account-button').click();
+    await expect(status).toHaveText('Not saved');
+    await expect(
+      laptop.getByText('This project was changed on another device'),
+    ).toBeVisible();
+    await laptop.keyboard.press('Escape');
+
+    // An edit here doesn't replace the phone's version
+    await choosePattern(laptop, 'Calendar');
+    await laptop.waitForTimeout(4000);
+    expect(await serverTitle()).toBe('Changed on the phone');
   });
 
   test('a new project isn’t saved until someone saves it', async ({

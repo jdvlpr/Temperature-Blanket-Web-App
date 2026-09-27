@@ -29,7 +29,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import LegacyNotification from '$lib/components/modals/LegacyNotification.svelte';
   import Menu from '$lib/components/modals/Menu.svelte';
   import SaveProjectModal from '$lib/components/modals/SaveProjectModal.svelte';
-  import { dialog, pageSections } from '$lib/state/page-state.svelte';
+  import { dialog, pageSections, toast } from '$lib/state/page-state.svelte';
   import { locations } from '$lib/state/location-state.svelte';
   import { project } from '$lib/state/project-state.svelte';
   import { weather } from '$lib/state/weather-state.svelte';
@@ -53,7 +53,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     SwatchBookIcon,
     UndoIcon,
   } from '@lucide/svelte';
-  import { onMount } from 'svelte';
+  import { onMount, untrack } from 'svelte';
   import { autosave } from '$lib/storage/autosave.svelte';
   import { yarnBall } from '@lucide/lab';
 
@@ -80,6 +80,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
     if (locations.allValid) project.status.wasLoaded = true;
   }
+
+  // Another device changed the open project: say so once, since changes here
+  // stop saving rather than overwrite it
+  $effect(() => {
+    if (autosave.state !== 'conflict') return;
+    untrack(() =>
+      toast.trigger({
+        message:
+          'This project was changed on another device, so changes here aren’t being saved. Reload to get the latest version.',
+        category: 'warning',
+        autohide: false,
+        action: { label: 'Reload', response: () => location.reload() },
+      }),
+    );
+  });
 
   $effect(() => {
     const hash = project.url.hash;
@@ -194,12 +209,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
 
     {#if weather.data.length && locations.allValid}
-      <div class="hidden sm:inline-flex">
+      <!-- Saving by itself shows on phones too; Save is in the Project menu there -->
+      <div class={autosave.on ? 'inline-flex' : 'hidden sm:inline-flex'}>
         {#if autosave.on}
           <!-- Changes save by themselves; this still opens the link and exports -->
           <button
             class="btn hover:preset-tonal-surface"
-            title="Changes save to your account automatically"
+            title={autosave.state === 'conflict'
+              ? 'Changed on another device: reload to get the latest version'
+              : 'Changes save to your account automatically'}
             data-testid="autosave-status"
             onclick={() =>
               dialog.trigger({
@@ -207,15 +225,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 component: { ref: SaveProjectModal },
               })}
           >
-            {#if autosave.state === 'error'}
+            {#if autosave.state === 'error' || autosave.state === 'conflict'}
               <CloudAlertIcon class="text-error-700-300" />
-              <span>Not saved</span>
+              <span class="max-sm:sr-only">Not saved</span>
             {:else if autosave.state === 'saved'}
               <CloudCheckIcon class="text-success-700-300" />
-              <span>Saved</span>
+              <span class="max-sm:sr-only">Saved</span>
             {:else}
               <LoaderCircleIcon class="animate-spin opacity-70" />
-              <span>Saving…</span>
+              <span class="max-sm:sr-only">Saving…</span>
             {/if}
           </button>
         {:else}

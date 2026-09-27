@@ -254,6 +254,9 @@ export class ProjectStorage {
   static syncOwner = (): string | null =>
     __ACCOUNTS_ENABLED__ ? (account.summary?.id ?? null) : null;
 
+  /** The saved project this page opened, and when it was last changed */
+  static opened: { id: string; updatedAt: number | null } | null = null;
+
   /** Called after a save or removal, to schedule a sync. Set by $lib/sync. */
   static onChange: (() => void) | undefined;
 
@@ -397,6 +400,14 @@ export class ProjectStorage {
     const pageURL = new URL(href);
     const id = pageURL.searchParams.get('project');
     if (!id) return;
+
+    // Which saved version this page opens, so autosave can tell when a sync
+    // brings in a newer one from another device
+    const indexItem = (await this.getIndex()).find((i) => i.id === id);
+    ProjectStorage.opened = {
+      id,
+      updatedAt: indexItem?.sync?.updatedAt ?? null,
+    };
 
     const matchedProject = await ProjectStorage.getById(id);
     if (!matchedProject) return;

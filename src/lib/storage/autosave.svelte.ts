@@ -32,33 +32,81 @@ export const MAX_WAIT_MS = 60_000;
 export const autosave: {
   /** Whether changes to the open project save by themselves */
   on: boolean;
-  state: 'saved' | 'waiting' | 'saving' | 'error';
+  /** `conflict`: another device changed it since it opened here, so saving
+  stops rather than overwrite that change */
+  state: 'saved' | 'waiting' | 'saving' | 'error' | 'conflict';
 } = $state({ on: false, state: 'saved' });
 
 /** The project as last opened or saved, to tell a real change from none */
 let baseline: string | null = null;
+let baselineId: string | null = null;
+/** When the stored copy was last changed, as this page knows it */
+let knownUpdatedAt: number | null = null;
 let weatherEdited = false;
 let timer: ReturnType<typeof setTimeout> | undefined;
 let waitingSince = 0;
 let saving: Promise<void> | null = null;
 
-const openProjectId = () =>
-  new URL(project.url.href).searchParams.get('project');
+function openProjectId(): string | null {
+  try {
+    return new URL(project.url.href).searchParams.get('project');
+  } catch {
+    return null;
+  }
+}
+
+async function storedItem() {
+  const id = openProjectId();
+  return (await ProjectStorage.getIndex()).find((i) => i.id === id);
+}
 
 /** Whether the open project is saved, and the signed-in account's. */
 async function isAccountProject(): Promise<boolean> {
   // The signed-in account, when accounts are on
   const userId = ProjectStorage.syncOwner();
-  const id = openProjectId();
-  if (!userId || !sync.active || !id) return false;
-  const item = (await ProjectStorage.getIndex()).find((i) => i.id === id);
-  return item?.sync?.ownerUserId === userId;
+  if (!userId || !sync.active || !openProjectId()) return false;
+  return (await storedItem())?.sync?.ownerUserId === userId;
+}
+
+/**
+ * Whether a sync brought in another device's version since this page opened
+ * or last saved. Only a save here or a download changes `updatedAt`.
+ */
+async function changedElsewhere(): Promise<boolean> {
+  const updatedAt = (await storedItem())?.sync?.updatedAt ?? null;
+  return knownUpdatedAt !== null && updatedAt !== knownUpdatedAt;
 }
 
 async function refresh() {
   autosave.on = await isAccountProject();
+  if (!autosave.on) return;
+  if (await changedElsewhere()) {
+    clearTimeout(timer);
+    autosave.state = 'conflict';
+    project.status.saved = false;
+  }
   // Nothing waiting: leaving the page loses nothing
-  if (autosave.on && autosave.state === 'saved') project.status.saved = true;
+  else if (autosave.state === 'saved') project.status.saved = true;
+}
+
+async function rememberStored() {
+  knownUpdatedAt = (await storedItem())?.sync?.updatedAt ?? null;
+}
+
+/** A project opened, or another one did */
+function opened(href: string) {
+  baseline = href;
+  baselineId = openProjectId();
+  weatherEdited = false;
+  clearTimeout(timer);
+  waitingSince = 0;
+  autosave.state = 'saved';
+  // The version the page loaded, recorded before a sync could replace it
+  const loaded = ProjectStorage.opened;
+  if (loaded && loaded.id === baselineId) {
+    knownUpdatedAt = loaded.updatedAt;
+    void refresh();
+  } else void rememberStored().then(refresh);
 }
 
 /**
@@ -66,13 +114,13 @@ async function refresh() {
  * the project as opened, not a change.
  */
 export function projectChanged({ weather = false } = {}) {
-  if (weather) weatherEdited = true;
   const href = project.url.href;
-  if (baseline === null) {
-    baseline = href;
-    void refresh();
+  if (baseline === null || openProjectId() !== baselineId) {
+    opened(href);
     return;
   }
+  if (weather) weatherEdited = true;
+  if (autosave.state === 'conflict') return;
   if (href === baseline && !weatherEdited) {
     // Back to how it was saved, as with Undo
     clearTimeout(timer);
@@ -104,6 +152,11 @@ export async function saveNow() {
       autosave.on = false;
       return;
     }
+    if (await changedElsewhere()) {
+      autosave.state = 'conflict';
+      project.status.saved = false;
+      return;
+    }
     autosave.state = 'saving';
     const href = project.url.href;
     try {
@@ -111,6 +164,7 @@ export async function saveNow() {
       // eslint-disable-next-line svelte/no-navigation-without-resolve
       replaceState(new URL(href), '');
       await ProjectStorage.save();
+      await rememberStored();
       baseline = href;
       weatherEdited = false;
       // Changes made while saving wait for the next save
@@ -128,13 +182,15 @@ export async function saveNow() {
 }
 
 /** After a Save from the Save dialog: that's now the saved project. */
-export function projectSaved() {
+export async function projectSaved() {
   baseline = project.url.href;
+  baselineId = openProjectId();
   weatherEdited = false;
   clearTimeout(timer);
   waitingSince = 0;
   autosave.state = 'saved';
-  void refresh();
+  await rememberStored();
+  await refresh();
 }
 
 if (typeof document !== 'undefined') {
@@ -143,10 +199,12 @@ if (typeof document !== 'undefined') {
     if (document.visibilityState === 'hidden') void saveNow();
   });
 
-  // Signing in or out, or sync starting after the project opened
+  // Signing in or out, sync starting after the project opened, or a sync
+  // bringing in another device's version
   $effect.root(() => {
     $effect(() => {
       void sync.active;
+      void sync.version;
       void account.summary?.id;
       if (baseline !== null) void refresh();
     });
@@ -157,6 +215,8 @@ if (typeof document !== 'undefined') {
 export function resetAutosave() {
   clearTimeout(timer);
   baseline = null;
+  baselineId = null;
+  knownUpdatedAt = null;
   weatherEdited = false;
   waitingSince = 0;
   saving = null;

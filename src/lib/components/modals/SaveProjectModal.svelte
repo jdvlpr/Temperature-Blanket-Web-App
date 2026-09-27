@@ -25,7 +25,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   } from '$lib/storage/projects.svelte';
   import { CircleCheckIcon, ClipboardCopyIcon, LinkIcon } from '@lucide/svelte';
   import { onMount } from 'svelte';
-  import { projectSaved } from '$lib/storage/autosave.svelte';
+  import {
+    autosave,
+    projectSaved,
+    saveNow,
+  } from '$lib/storage/autosave.svelte';
   import ProjectDetails from '../ProjectDetails.svelte';
   import DownloadExportButton from '../buttons/DownloadExportButton.svelte';
   import SendToGalleryButton from '../buttons/SendToGalleryButton.svelte';
@@ -59,13 +63,24 @@ If not, see <https://www.gnu.org/licenses/>. -->
       }
     }
 
+    // Saving by itself: only a waiting change needs saving, and never over
+    // another device's newer version
+    if (autosave.on) {
+      await saveNow();
+      const id = new URL(project.url.href).searchParams.get('project');
+      storedProject =
+        (await ProjectStorage.getIndex()).find((i) => i.id === id) ?? null;
+      project.status.saved = autosave.state === 'saved';
+      return;
+    }
+
     const newURL = new URL(project.url.href);
     replaceState(newURL, '');
 
     try {
       storedProject = await ProjectStorage.save();
       project.status.saved = true;
-      projectSaved();
+      await projectSaved();
     } catch (e) {
       storedProject = null;
       project.status.saved = false;
@@ -116,6 +131,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
           cleared, you'll lose access to this project unless you save the link
           below or send it to the Project Gallery.
         </p>
+      </div>
+    {:else if autosave.state === 'conflict'}
+      <div class="text-warning-700-300 flex flex-col gap-2">
+        <p class="font-bold">Changed on another device</p>
+        <p>
+          This project was changed on another device after it opened here, so
+          changes here aren’t being saved. Reload to get the latest version.
+        </p>
+        <button
+          type="button"
+          class="btn preset-filled-primary-500 w-fit"
+          onclick={() => location.reload()}>Reload</button
+        >
       </div>
     {:else if project.status.error.code === 1}
       <div class="text-warning-500 flex flex-col gap-2">
