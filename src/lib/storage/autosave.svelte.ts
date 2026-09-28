@@ -23,6 +23,7 @@ import { account } from '$lib/accounts/summary.svelte';
 import { project } from '$lib/state/project-state.svelte';
 import { ProjectStorage } from '$lib/storage/projects.svelte';
 import { sync } from '$lib/sync/status.svelte';
+import { newProjectId } from '$lib/utils/project-id-utils';
 
 /** Saves this long after the last change */
 export const IDLE_MS = 2000;
@@ -191,6 +192,24 @@ export async function projectSaved() {
   autosave.state = 'saved';
   await rememberStored();
   await refresh();
+}
+
+/**
+ * Saves the open project as a new one, leaving the saved original as it was.
+ * Signed in, the copy is the account's and saves by itself from then on.
+ * Also how changes are kept when another device changed the original.
+ */
+export async function saveCopy() {
+  clearTimeout(timer);
+  if (saving) await saving;
+  project.id = newProjectId();
+  project.createdAt = new Date().toISOString();
+  // eslint-disable-next-line svelte/no-navigation-without-resolve
+  replaceState(new URL(project.url.href), '');
+  const item = await ProjectStorage.save();
+  project.status.saved = true;
+  await projectSaved();
+  return item;
 }
 
 if (typeof document !== 'undefined') {

@@ -97,10 +97,13 @@ class ProjectClass {
 
   // Opaque string identifying the project, carried in the URL as ?project=<id>.
   // It's currently the millisecond timestamp of when the app was first loaded, but don't read a date from it: use createdAt.
-  id = browser
-    ? new URL(window.location.href).searchParams.get('project') ||
-      new Date().getTime()?.toString()
-    : '';
+  // Reactive, since saving a copy gives the open project a new one
+  id = $state(
+    browser
+      ? new URL(window.location.href).searchParams.get('project') ||
+          new Date().getTime()?.toString()
+      : '',
+  );
 
   // When the project was first created (ISO 8601, UTC). Kept across saves, never re-stamped.
   // For legacy timestamp IDs this is the time encoded in the ID; ProjectStorage.load() replaces it with the stored value.

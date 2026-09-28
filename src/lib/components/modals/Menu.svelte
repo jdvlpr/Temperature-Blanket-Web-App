@@ -19,12 +19,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import UnitChanger from '$lib/components/UnitChanger.svelte';
   import YarnSources from '$lib/components/YarnSources.svelte';
   import { DAYS_OF_THE_WEEK, MONTHS } from '$lib/constants/weather-constants';
-  import { dialog } from '$lib/state/page-state.svelte';
+  import { dialog, toast } from '$lib/state/page-state.svelte';
+  import { saveCopy } from '$lib/storage/autosave.svelte';
   import { locations } from '$lib/state/location-state.svelte';
   import { project } from '$lib/state/project-state.svelte';
   import { weather } from '$lib/state/weather-state.svelte';
   import { pluralize } from '$lib/utils/string-utils';
   import {
+    CopyPlusIcon,
     BookmarkIcon,
     BookOpenTextIcon,
     CircleQuestionMarkIcon,
@@ -59,6 +61,31 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <BookmarkIcon />
         Save
       </button>
+      {#if weather.data.length && locations.allValid}
+        <button
+          class="btn hover:preset-tonal-surface w-fit"
+          title="Save these settings as a new project, and leave this one as it is"
+          onclick={async () => {
+            try {
+              await saveCopy();
+              dialog.close();
+              toast.trigger({
+                message: 'Saved a copy. You’re now working on the copy.',
+                category: 'success',
+              });
+            } catch (e) {
+              console.warn("Can't save a copy", { e });
+              toast.trigger({
+                message: 'Unable to save a copy',
+                category: 'error',
+              });
+            }
+          }}
+        >
+          <CopyPlusIcon />
+          Save a copy
+        </button>
+      {/if}
       <a
         href="/"
         target="_blank"

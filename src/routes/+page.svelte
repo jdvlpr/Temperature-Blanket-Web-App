@@ -54,7 +54,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     UndoIcon,
   } from '@lucide/svelte';
   import { onMount, untrack } from 'svelte';
-  import { autosave } from '$lib/storage/autosave.svelte';
+  import { autosave, saveCopy } from '$lib/storage/autosave.svelte';
   import { yarnBall } from '@lucide/lab';
 
   let debounceTimer: number;
@@ -88,10 +88,19 @@ If not, see <https://www.gnu.org/licenses/>. -->
     untrack(() =>
       toast.trigger({
         message:
-          'This project was changed on another device, so changes here aren’t being saved. Reload to get the latest version.',
+          'This project was changed on another device, so changes here aren’t being saved. Save them as a copy, or reload to get the latest version.',
         category: 'warning',
         autohide: false,
-        action: { label: 'Reload', response: () => location.reload() },
+        action: {
+          label: 'Save a copy',
+          response: async () => {
+            await saveCopy();
+            toast.trigger({
+              message: 'Saved a copy. You’re now working on the copy.',
+              category: 'success',
+            });
+          },
+        },
       }),
     );
   });
@@ -168,10 +177,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </div>
     <div class="flex flex-1 justify-between gap-2 sm:justify-end">
       {#if weather.data.length}
-        <div class="mx-auto sm:mx-0">
+        <!-- One row: icon buttons on smaller screens, never wrapping -->
+        <div class="mx-auto flex shrink-0 sm:mx-0">
           <button
             aria-label="Undo"
-            class="btn hover:preset-tonal-surface"
+            class="max-md:btn-icon md:btn hover:preset-tonal-surface"
             title="Undo [Cmd ⌘]+[z] or [Ctrl]+[z]"
             id="undo"
             disabled={!weather.data.length ||
@@ -189,7 +199,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
           <button
             aria-label="Redo"
-            class="btn hover:preset-tonal-surface"
+            class="max-md:btn-icon md:btn hover:preset-tonal-surface"
             id="redo"
             title="Redo [Cmd ⌘]+[Shift ⇧]+[z] or [Ctrl]+[Shift ⇧]+[Z]"
             disabled={!weather.data.length ||
@@ -214,7 +224,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {#if autosave.on}
           <!-- Changes save by themselves; this still opens the link and exports -->
           <button
-            class="btn hover:preset-tonal-surface"
+            class="max-sm:btn-icon sm:btn hover:preset-tonal-surface"
             title={autosave.state === 'conflict'
               ? 'Changed on another device: reload to get the latest version'
               : 'Changes save to your account automatically'}
@@ -256,7 +266,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <button
       aria-label="Project Options"
       title="Project Options"
-      class="btn hover:preset-tonal-surface gap-1"
+      class="max-[360px]:btn-icon min-[360px]:btn hover:preset-tonal-surface gap-1"
       onclick={() =>
         dialog.trigger({
           type: 'component',
@@ -266,7 +276,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
         })}
     >
       <EllipsisVerticalIcon />
-      <span class="">Project</span>
+      <!-- Only the dots on the narrowest phones, where the row runs out of room -->
+      <span class="max-[360px]:sr-only">Project</span>
     </button>
   {/snippet}
 

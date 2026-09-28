@@ -23,11 +23,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
     ProjectStorage,
     type StoredProjectIndexItem,
   } from '$lib/storage/projects.svelte';
-  import { CircleCheckIcon, ClipboardCopyIcon, LinkIcon } from '@lucide/svelte';
+  import {
+    CircleCheckIcon,
+    ClipboardCopyIcon,
+    CopyPlusIcon,
+    LinkIcon,
+    RefreshCwIcon,
+  } from '@lucide/svelte';
   import { onMount } from 'svelte';
   import {
     autosave,
     projectSaved,
+    saveCopy,
     saveNow,
   } from '$lib/storage/autosave.svelte';
   import ProjectDetails from '../ProjectDetails.svelte';
@@ -92,6 +99,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
     }
   }
 
+  /** A new project from this one, which is left as it was saved */
+  async function copyProject() {
+    try {
+      storedProject = await saveCopy();
+      toast.trigger({
+        message: 'Saved a copy. You’re now working on the copy.',
+        category: 'success',
+      });
+    } catch (e) {
+      console.warn("Can't save a copy", { e });
+      toast.trigger({ message: 'Unable to save a copy', category: 'error' });
+    }
+  }
+
   onMount(async () => {
     await saveProject({ copy: false });
   });
@@ -137,13 +158,21 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <p class="font-bold">Changed on another device</p>
         <p>
           This project was changed on another device after it opened here, so
-          changes here aren’t being saved. Reload to get the latest version.
+          changes here aren’t being saved. Save them as a copy, or reload to get
+          the latest version.
         </p>
-        <button
-          type="button"
-          class="btn preset-filled-primary-500 w-fit"
-          onclick={() => location.reload()}>Reload</button
-        >
+        <div class="flex flex-wrap gap-2">
+          <button
+            type="button"
+            class="btn preset-filled-primary-500"
+            onclick={copyProject}><CopyPlusIcon /> Save a copy</button
+          >
+          <button
+            type="button"
+            class="btn hover:preset-tonal-surface"
+            onclick={() => location.reload()}><RefreshCwIcon /> Reload</button
+          >
+        </div>
       </div>
     {:else if project.status.error.code === 1}
       <div class="text-warning-500 flex flex-col gap-2">
@@ -164,6 +193,17 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <div class="w-full">
         <ProjectDetails project={storedProject.meta} canRemove={false} />
       </div>
+      {#if autosave.state !== 'conflict'}
+        <button
+          type="button"
+          class="btn hover:preset-tonal-surface -ml-2"
+          title="Save these settings as a new project, and leave this one as it is"
+          onclick={copyProject}
+        >
+          <CopyPlusIcon />
+          Save a copy
+        </button>
+      {/if}
     {/if}
 
     <div>

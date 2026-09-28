@@ -533,6 +533,22 @@ test.describe('Auto-save', () => {
     expect((await savedIndex(laptop)).find((i) => i.id === id)!.sync).toEqual(
       after,
     );
+
+    // A copy from the Save dialog leaves the original as it was
+    await status.click();
+    await laptop
+      .getByRole('dialog')
+      .getByRole('button', { name: 'Save a copy' })
+      .click();
+    await expect(laptop.getByText('Saved a copy.')).toBeVisible();
+    const copyId = openProjectId(laptop);
+    expect(copyId).not.toBe(id);
+    await expect
+      .poll(async () => (await serverProjectIds(laptop)).length)
+      .toBe(2);
+    expect((await savedIndex(laptop)).find((i) => i.id === id)!.sync).toEqual(
+      after,
+    );
   });
 
   test('a change from another device isn’t overwritten by one here', async ({
@@ -584,6 +600,21 @@ test.describe('Auto-save', () => {
     await choosePattern(laptop, 'Calendar');
     await laptop.waitForTimeout(4000);
     expect(await serverTitle()).toBe('Changed on the phone');
+
+    // Saved as a copy instead: a new project, which saves by itself from now on
+    await laptop.getByRole('button', { name: 'Save a copy' }).click();
+    await expect(status).toHaveText('Saved');
+    const copyId = openProjectId(laptop);
+    expect(copyId).not.toBe(id);
+    await expect(laptop).toHaveURL(/clnr=/);
+    await expect
+      .poll(async () => (await serverProjectIds(laptop)).sort())
+      .toEqual([id, copyId].sort());
+    expect(await serverTitle()).toBe('Changed on the phone');
+    await choosePattern(laptop, 'Chevrons');
+    await expect(status).toHaveText('Saving…');
+    await expect(status).toHaveText('Saved');
+    await expect(laptop).toHaveURL(new RegExp(`project=${copyId}`));
   });
 
   test('a new project isn’t saved until someone saves it', async ({
