@@ -28,7 +28,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ChooseWeatherSource from '$lib/components/modals/ChooseWeatherSource.svelte';
   import LegacyNotification from '$lib/components/modals/LegacyNotification.svelte';
   import Menu from '$lib/components/modals/Menu.svelte';
-  import SaveProjectModal from '$lib/components/modals/SaveProjectModal.svelte';
   import { dialog, pageSections, toast } from '$lib/state/page-state.svelte';
   import { locations } from '$lib/state/location-state.svelte';
   import { project } from '$lib/state/project-state.svelte';
@@ -42,13 +41,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { setUnitsFromNavigator } from '$lib/utils/unit-utils.svelte';
   import { upToDate } from '$lib/utils/other-utils';
   import {
-    BookmarkIcon,
-    CloudAlertIcon,
-    CloudCheckIcon,
     CloudyIcon,
     EllipsisVerticalIcon,
     Icon,
-    LoaderCircleIcon,
     RedoIcon,
     SwatchBookIcon,
     UndoIcon,
@@ -218,55 +213,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
       {/if}
     </div>
 
-    {#if weather.data.length && locations.allValid}
-      <!-- Saving by itself shows on phones too; Save is in the Project menu there -->
-      <div class={autosave.on ? 'inline-flex' : 'hidden sm:inline-flex'}>
-        {#if autosave.on}
-          <!-- Changes save by themselves; this still opens the link and exports -->
-          <button
-            class="max-sm:btn-icon sm:btn hover:preset-tonal-surface"
-            title={autosave.state === 'conflict'
-              ? 'Changed on another device: reload to get the latest version'
-              : 'Changes save to your account automatically'}
-            data-testid="autosave-status"
-            onclick={() =>
-              dialog.trigger({
-                type: 'component',
-                component: { ref: SaveProjectModal },
-              })}
-          >
-            {#if autosave.state === 'error' || autosave.state === 'conflict'}
-              <CloudAlertIcon class="text-error-700-300" />
-              <span class="max-sm:sr-only">Not saved</span>
-            {:else if autosave.state === 'saved'}
-              <CloudCheckIcon class="text-success-700-300" />
-              <span class="max-sm:sr-only">Saved</span>
-            {:else}
-              <LoaderCircleIcon class="animate-spin opacity-70" />
-              <span class="max-sm:sr-only">Saving…</span>
-            {/if}
-          </button>
-        {:else}
-          <button
-            class="btn bg-primary-50-950 border-primary-500 hover:preset-tonal-primary border"
-            title="Save your project in this browser and as a URL."
-            onclick={() =>
-              dialog.trigger({
-                type: 'component',
-                component: { ref: SaveProjectModal },
-              })}
-          >
-            <BookmarkIcon />
-            <span class="inline-block max-sm:hidden">Save</span>
-          </button>
-        {/if}
-      </div>
-    {/if}
-
     <button
       aria-label="Project Options"
       title="Project Options"
-      class="max-[360px]:btn-icon min-[360px]:btn hover:preset-tonal-surface gap-1"
+      class="btn hover:preset-tonal-surface gap-1"
       onclick={() =>
         dialog.trigger({
           type: 'component',
@@ -276,8 +226,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         })}
     >
       <EllipsisVerticalIcon />
-      <!-- Only the dots on the narrowest phones, where the row runs out of room -->
-      <span class="max-[360px]:sr-only">Project</span>
+      <span>Project</span>
     </button>
   {/snippet}
 

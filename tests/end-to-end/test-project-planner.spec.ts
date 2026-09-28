@@ -32,7 +32,9 @@ test.describe('Project Planner', () => {
   });
 
   test('Loads successfully', async ({ page }) => {
-    await expect(page.getByRole('button', { name: 'Save' })).toBeVisible();
+    await expect(
+      page.getByRole('button', { name: 'Project Options' }),
+    ).toBeVisible();
     await expect(page.getByPlaceholder('Enter a place')).toBeVisible();
   });
 
@@ -148,7 +150,11 @@ test.describe('Project Planner', () => {
 
     // 2. Save -- this is the app's own mechanism for writing the current project
     // state into a shareable URL (SaveProjectModal calls replaceState on mount).
-    await page.getByRole('button', { name: 'Save', exact: true }).click();
+    await page.getByRole('button', { name: 'Project Options' }).click();
+    await page
+      .getByRole('dialog')
+      .getByRole('button', { name: 'Save', exact: true })
+      .click();
     await expect(
       page.getByText(/Saved Locally|problem saving your project/),
     ).toBeVisible();

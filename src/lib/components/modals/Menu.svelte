@@ -20,7 +20,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import YarnSources from '$lib/components/YarnSources.svelte';
   import { DAYS_OF_THE_WEEK, MONTHS } from '$lib/constants/weather-constants';
   import { dialog, toast } from '$lib/state/page-state.svelte';
-  import { saveCopy } from '$lib/storage/autosave.svelte';
+  import { autosave, saveCopy } from '$lib/storage/autosave.svelte';
   import { locations } from '$lib/state/location-state.svelte';
   import { project } from '$lib/state/project-state.svelte';
   import { weather } from '$lib/state/weather-state.svelte';
@@ -28,6 +28,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import {
     CopyPlusIcon,
     BookmarkIcon,
+    CloudAlertIcon,
+    CloudCheckIcon,
+    LoaderCircleIcon,
     BookOpenTextIcon,
     CircleQuestionMarkIcon,
     KeyboardIcon,
@@ -56,10 +59,25 @@ If not, see <https://www.gnu.org/licenses/>. -->
             component: { ref: SaveProjectModal },
           });
         }}
-        title="Save Project"
+        title={autosave.on
+          ? 'Changes save to your account automatically'
+          : 'Save Project'}
+        data-testid={autosave.on ? 'autosave-status' : undefined}
       >
-        <BookmarkIcon />
-        Save
+        <!-- Saving by itself: the state, and still the way to the link -->
+        {#if !autosave.on}
+          <BookmarkIcon />
+          Save
+        {:else if autosave.state === 'error' || autosave.state === 'conflict'}
+          <CloudAlertIcon class="text-error-700-300" />
+          Not saved
+        {:else if autosave.state === 'saved'}
+          <CloudCheckIcon class="text-success-700-300" />
+          Saved
+        {:else}
+          <LoaderCircleIcon class="animate-spin opacity-70" />
+          Saving…
+        {/if}
       </button>
       {#if weather.data.length && locations.allValid}
         <button

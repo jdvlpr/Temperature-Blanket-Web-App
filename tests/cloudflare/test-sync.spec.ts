@@ -474,6 +474,38 @@ async function plannerDevices(browser: Browser, baseURL: string) {
 const openProjectId = (page: Page) =>
   new URL(page.url()).searchParams.get('project')!;
 
+/** Opens the Project menu, where Save and the auto-save state are. */
+async function openMenu(page: Page) {
+  // Retried: a click before the page finishes loading does nothing
+  await expect(async () => {
+    await page.getByRole('button', { name: 'Project Options' }).click();
+    await expect(
+      page
+        .getByRole('dialog')
+        .getByRole('heading', { name: 'Project', exact: true }),
+    ).toBeVisible({ timeout: 1000 });
+  }).toPass();
+}
+
+/** Saves from the Project menu, as someone does the first time. */
+async function saveFromMenu(page: Page) {
+  await openMenu(page);
+  await page
+    .getByRole('dialog')
+    .getByRole('button', { name: 'Save', exact: true })
+    .click();
+  await expect(page.getByText('Saved to Your Account')).toBeVisible();
+  await page.keyboard.press('Escape');
+}
+
+/** The auto-save state the Project menu shows, then closes it. */
+async function saveState(page: Page) {
+  await openMenu(page);
+  const text = await page.getByTestId('autosave-status').innerText();
+  await page.keyboard.press('Escape');
+  return text.trim();
+}
+
 test.describe('Auto-save', () => {
   test('after the first Save, changes save and sync by themselves', async ({
     browser,
@@ -483,18 +515,12 @@ test.describe('Auto-save', () => {
     const email = uniqueEmail('autosave');
     await signIn(laptop, laptop.request, email);
     await buildProject(laptop);
-
-    await laptop.getByRole('button', { name: 'Save', exact: true }).click();
-    await expect(laptop.getByText('Saved to Your Account')).toBeVisible();
-    await laptop.keyboard.press('Escape');
-    const status = laptop.getByTestId('autosave-status');
-    await expect(status).toHaveText('Saved');
+    await saveFromMenu(laptop);
+    expect(await saveState(laptop)).toBe('Saved');
     const id = openProjectId(laptop);
 
-    // An edit, and no Save
+    // An edit, and no Save: once saved, the address bar holds the edited project
     await choosePattern(laptop, 'Calendar');
-    await expect(status).toHaveText('Saving…');
-    // Saved, the address bar holds the edited project
     await expect(laptop).toHaveURL(/clnr=/);
     await expect
       .poll(async () => {
@@ -502,7 +528,7 @@ test.describe('Auto-save', () => {
         return item?.sync?.dirty === false && item.meta.href === laptop.url();
       })
       .toBe(true);
-    await expect(status).toHaveText('Saved');
+    expect(await saveState(laptop)).toBe('Saved');
 
     // The other device gets the edited project
     await signIn(phone, phone.request, email);
@@ -519,23 +545,22 @@ test.describe('Auto-save', () => {
     await expect(
       laptop.getByText('Loaded project and weather data'),
     ).toBeVisible();
-    await expect(status).toHaveText('Saved');
+    await expect.poll(() => saveState(laptop)).toBe('Saved');
     await laptop.waitForTimeout(4000);
     const after = (await savedIndex(laptop)).find((i) => i.id === id)!.sync;
     expect(after?.rev).toBe(before?.rev);
     expect(after?.updatedAt).toBe(before?.updatedAt);
 
     // Nor is opening the Save dialog to get the link
-    await status.click();
+    await openMenu(laptop);
+    await laptop.getByTestId('autosave-status').click();
     await expect(laptop.getByText('Saved to Your Account')).toBeVisible();
-    await laptop.keyboard.press('Escape');
     await laptop.waitForTimeout(2000);
     expect((await savedIndex(laptop)).find((i) => i.id === id)!.sync).toEqual(
       after,
     );
 
     // A copy from the Save dialog leaves the original as it was
-    await status.click();
     await laptop
       .getByRole('dialog')
       .getByRole('button', { name: 'Save a copy' })
@@ -559,11 +584,7 @@ test.describe('Auto-save', () => {
     const email = uniqueEmail('autosave-conflict');
     await signIn(laptop, laptop.request, email);
     await buildProject(laptop);
-    await laptop.getByRole('button', { name: 'Save', exact: true }).click();
-    await expect(laptop.getByText('Saved to Your Account')).toBeVisible();
-    await laptop.keyboard.press('Escape');
-    const status = laptop.getByTestId('autosave-status');
-    await expect(status).toHaveText('Saved');
+    await saveFromMenu(laptop);
     const id = openProjectId(laptop);
     await expect
       .poll(async () => (await serverProjectIds(laptop)).includes(id))
@@ -590,11 +611,11 @@ test.describe('Auto-save', () => {
     // The laptop syncs (opening the account menu syncs, at most every 10 s)
     await laptop.waitForTimeout(10_000);
     await laptop.getByTestId('account-button').click();
-    await expect(status).toHaveText('Not saved');
     await expect(
       laptop.getByText('This project was changed on another device'),
     ).toBeVisible();
     await laptop.keyboard.press('Escape');
+    expect(await saveState(laptop)).toBe('Not saved');
 
     // An edit here doesn't replace the phone's version
     await choosePattern(laptop, 'Calendar');
@@ -603,7 +624,7 @@ test.describe('Auto-save', () => {
 
     // Saved as a copy instead: a new project, which saves by itself from now on
     await laptop.getByRole('button', { name: 'Save a copy' }).click();
-    await expect(status).toHaveText('Saved');
+    await expect(laptop.getByText('Saved a copy.')).toBeVisible();
     const copyId = openProjectId(laptop);
     expect(copyId).not.toBe(id);
     await expect(laptop).toHaveURL(/clnr=/);
@@ -612,9 +633,9 @@ test.describe('Auto-save', () => {
       .toEqual([id, copyId].sort());
     expect(await serverTitle()).toBe('Changed on the phone');
     await choosePattern(laptop, 'Chevrons');
-    await expect(status).toHaveText('Saving…');
-    await expect(status).toHaveText('Saved');
+    await expect(laptop).not.toHaveURL(/clnr=/);
     await expect(laptop).toHaveURL(new RegExp(`project=${copyId}`));
+    expect(await saveState(laptop)).toBe('Saved');
   });
 
   test('a new project isn’t saved until someone saves it', async ({
@@ -628,9 +649,12 @@ test.describe('Auto-save', () => {
     await laptop.waitForTimeout(4000);
 
     expect(await savedIndex(laptop)).toEqual([]);
+    await openMenu(laptop);
     await expect(laptop.getByTestId('autosave-status')).toHaveCount(0);
     await expect(
-      laptop.getByRole('button', { name: 'Save', exact: true }),
+      laptop
+        .getByRole('dialog')
+        .getByRole('button', { name: 'Save', exact: true }),
     ).toBeVisible();
   });
 });
