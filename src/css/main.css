@@ -78,7 +78,7 @@ https://www.skeleton.dev/docs/svelte/tailwind-components/forms#windows-bugfix
 
 /* Override default theme font families */
 [data-theme] {
-  --base-font-family: 'Plus Jakarta Sans Variable', sans-serif;
+  --base-font-family: 'Figtree Variable', sans-serif;
   /* A little heavier than regular, which reads thin */
   --base-font-weight: 450;
   --heading-font-family: 'Fraunces Variable', serif;

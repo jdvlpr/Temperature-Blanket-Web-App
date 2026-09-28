@@ -32,8 +32,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { privacy } from '$lib/utils/privacy-utils.svelte';
   import { onMount, type Snippet } from 'svelte';
   // Fonts are served from this site, so pages load nothing from font services
-  import '@fontsource-variable/plus-jakarta-sans';
-  import '@fontsource-variable/plus-jakarta-sans/wght-italic.css';
+  import '@fontsource-variable/figtree';
+  import '@fontsource-variable/figtree/wght-italic.css';
   import '@fontsource-variable/fraunces/full.css';
   import '../css/main.css';
   import { ICONS } from '$lib/constants/icon-constants';
@@ -184,20 +184,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
   {/if}
 </svelte:head>
 
-<!-- <div
-  class="flex w-full flex-col [view-transition-name:top-banner]"
-  id="top-banner"
->
-  <div class="bg-secondary-100-900 w-full p-2 text-center">
-    <a
-      href="/blog/2026-07-09-version-6"
-      class="btn hover:preset-tonal-surface whitespace-pre-wrap"
-    >
-      <RssIcon />
-      News | Version 6: Improved Sun Position Accuracy
-    </a>
+{#if __ACCOUNTS_ENABLED__}
+  <div
+    class="flex w-full flex-col [view-transition-name:top-banner]"
+    id="top-banner"
+  >
+    <div class="bg-secondary-100-900 w-full p-2 text-center">
+      <a
+        href="/blog/2026-09-28-accounts-beta"
+        class="btn hover:preset-tonal-surface whitespace-pre-wrap"
+      >
+        <RssIcon />
+        News | Accounts (Beta): Your Projects on Every Device
+      </a>
+    </div>
   </div>
-</div> -->
+{/if}
 
 {@render children?.()}
 

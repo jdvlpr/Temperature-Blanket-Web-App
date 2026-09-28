@@ -31,6 +31,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
     tags: ('Help' | 'News')[];
   };
   const posts: BlogPostType[] = [
+    // Listed once accounts are on for everyone
+    ...(__ACCOUNTS_ENABLED__
+      ? [
+          {
+            date: '2026-09-28',
+            href: '/blog/2026-09-28-accounts-beta',
+            imgSrc:
+              '/images/blog-images/2026-09-28-accounts-beta/featured-image.svg',
+            imgAlt: 'Accounts (Beta): Your Projects on Every Device',
+            title: 'Accounts (Beta): Your Projects on Every Device',
+            tags: ['News'],
+          } satisfies BlogPostType,
+        ]
+      : []),
     {
       date: '2026-07-09',
       href: '/blog/2026-07-09-version-6',

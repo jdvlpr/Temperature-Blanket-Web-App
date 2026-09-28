@@ -11,10 +11,10 @@ importers:
       '@floating-ui/dom':
         specifier: ^1.7.6
         version: 1.7.6
-      '@fontsource-variable/fraunces':
+      '@fontsource-variable/figtree':
         specifier: ^5.3.0
         version: 5.3.0
-      '@fontsource-variable/plus-jakarta-sans':
+      '@fontsource-variable/fraunces':
         specifier: ^5.3.0
         version: 5.3.0
       '@lucide/lab':
@@ -529,11 +529,11 @@ packages:
   '@floating-ui/utils@0.2.11':
     resolution: {integrity: sha512-RiB/yIh78pcIxl6lLMG0CgBXAZ2Y0eVHqMPYugu+9U0AeT6YBeiJpf7lbdJNIugFP5SIjwNRgo4DhR1Qxi26Gg==}
 
+  '@fontsource-variable/figtree@5.3.0':
+    resolution: {integrity: sha512-VRVodD7OiG7apQwE8/2fMjaqpY/a0qRJqL5HtYj8CKIVps+9amaFcdfKmDIf7iqYQx6iPLlArVXAfKeIZmVcNQ==}
+
   '@fontsource-variable/fraunces@5.3.0':
     resolution: {integrity: sha512-9BYGySn4AHEJdgp9Z28tQ3X+laJMEOITXkQarZXeloWQZDq5oOvXJ3kDA8c7MGIfpogIaZfjrQBqmda8POOCKA==}
-
-  '@fontsource-variable/plus-jakarta-sans@5.3.0':
-    resolution: {integrity: sha512-/l/4r0yyWK9JzAlmA0LiYgGgmJe/Gswt4jTJEzr5QhJfwMbvJZDmYWyW0M4X7yCK69BajMVlV/Lx8g7WDc1+sw==}
 
   '@hapi/address@5.1.1':
     resolution: {integrity: sha512-A+po2d/dVoY7cYajycYI43ZbYMXukuopIsqCjh5QzsBCipDtdofHntljDlpccMjIfTy6UOkg+5KPriwYch2bXA==}
@@ -3259,9 +3259,9 @@ snapshots:
 
   '@floating-ui/utils@0.2.11': {}
 
-  '@fontsource-variable/fraunces@5.3.0': {}
+  '@fontsource-variable/figtree@5.3.0': {}
 
-  '@fontsource-variable/plus-jakarta-sans@5.3.0': {}
+  '@fontsource-variable/fraunces@5.3.0': {}
 
   '@hapi/address@5.1.1':
     dependencies:
