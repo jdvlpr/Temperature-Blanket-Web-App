@@ -13,28 +13,15 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<!-- One line about the account's sync, with a way to sync now or fix it. -->
+<!-- A notice when the account's sync needs attention, with a way to fix it.
+Shows nothing while syncing works, which is the usual case. -->
 
 <script lang="ts">
   import { page } from '$app/state';
   import { sync } from '$lib/sync/status.svelte';
-  import {
-    CloudAlertIcon,
-    CloudCheckIcon,
-    CloudOffIcon,
-    LoaderCircleIcon,
-  } from '@lucide/svelte';
+  import { CloudAlertIcon, CloudOffIcon } from '@lucide/svelte';
 
   let { class: className = '' }: { class?: string } = $props();
-
-  const time = $derived(
-    sync.lastSyncedAt
-      ? new Date(sync.lastSyncedAt).toLocaleTimeString([], {
-          hour: 'numeric',
-          minute: '2-digit',
-        })
-      : '',
-  );
 
   const signInHref = $derived(
     `/auth/sign-in?redirect=${encodeURIComponent(page.url.pathname + page.url.search)}`,
@@ -46,34 +33,30 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 </script>
 
-<div
-  class="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm {className}"
-  aria-live="polite"
-  data-testid="sync-status"
->
-  {#if sync.state === 'syncing'}
-    <LoaderCircleIcon class="size-4 shrink-0 animate-spin opacity-70" />
-    <span>Syncing…</span>
-  {:else if sync.state === 'offline'}
-    <CloudOffIcon class="size-4 shrink-0 opacity-70" />
-    <span>Offline. Changes sync when you’re back online.</span>
-  {:else if sync.state === 'paused'}
-    <CloudOffIcon class="size-4 shrink-0 opacity-70" />
-    <span>Sync paused. Your projects are safe in this browser.</span>
-  {:else if sync.state === 'not-invited'}
-    <CloudOffIcon class="size-4 shrink-0 opacity-70" />
-    <span>Sync is in a private beta for now.</span>
-  {:else if sync.state === 'signed-out'}
-    <CloudAlertIcon class="text-warning-700-300 size-4 shrink-0" />
-    <span>Your session ended.</span>
-    <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
-    <a class="anchor" href={signInHref}>Sign in to sync</a>
-  {:else if sync.state === 'error'}
-    <CloudAlertIcon class="text-error-700-300 size-4 shrink-0" />
-    <span>Couldn’t sync.</span>
-    <button type="button" class="anchor" onclick={syncNow}>Try again</button>
-  {:else}
-    <CloudCheckIcon class="text-success-700-300 size-4 shrink-0" />
-    <span>Synced{time ? ` at ${time}` : ''}</span>
-  {/if}
-</div>
+{#if sync.state !== 'idle' && sync.state !== 'syncing'}
+  <div
+    class="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm {className}"
+    aria-live="polite"
+    data-testid="sync-status"
+  >
+    {#if sync.state === 'offline'}
+      <CloudOffIcon class="size-4 shrink-0 opacity-70" />
+      <span>Offline. Changes sync when you’re back online.</span>
+    {:else if sync.state === 'paused'}
+      <CloudOffIcon class="size-4 shrink-0 opacity-70" />
+      <span>Sync paused. Your projects are safe in this browser.</span>
+    {:else if sync.state === 'not-invited'}
+      <CloudOffIcon class="size-4 shrink-0 opacity-70" />
+      <span>Sync is in a private beta for now.</span>
+    {:else if sync.state === 'signed-out'}
+      <CloudAlertIcon class="text-warning-700-300 size-4 shrink-0" />
+      <span>Your session ended.</span>
+      <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
+      <a class="anchor" href={signInHref}>Sign in to sync</a>
+    {:else if sync.state === 'error'}
+      <CloudAlertIcon class="text-error-700-300 size-4 shrink-0" />
+      <span>Couldn’t sync.</span>
+      <button type="button" class="anchor" onclick={syncNow}>Try again</button>
+    {/if}
+  </div>
+{/if}

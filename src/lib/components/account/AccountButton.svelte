@@ -116,7 +116,8 @@ when accounts are off. -->
                   </div>
 
                   {#if sync.active}
-                    <div class="flex flex-col gap-2 px-4 py-3">
+                    <!-- Hidden when there's no notice and nothing to add -->
+                    <div class="hidden flex-col gap-2 px-4 py-3 has-[*]:flex">
                       <SyncStatus />
                       <AddToAccountButton />
                     </div>
