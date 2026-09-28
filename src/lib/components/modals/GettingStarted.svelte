@@ -14,6 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
+  import YouTubeVideo from '$lib/components/YouTubeVideo.svelte';
   import { LightbulbIcon } from '@lucide/svelte';
 </script>
 
@@ -29,16 +30,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </p>
 
   <div class="w-full">
-    <iframe
-      width="560"
-      height="315"
-      src="https://www.youtube.com/embed/7NRLrpZb0Lo?si=n4fmzlt9_0GKGNad"
-      title="YouTube video player"
-      frameborder="0"
-      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-      referrerpolicy="strict-origin-when-cross-origin"
-      allowfullscreen
-      class="aspect-video h-auto w-full"
-    ></iframe>
+    <YouTubeVideo id="7NRLrpZb0Lo" title="How to use the Project Planner" />
   </div>
 </div>

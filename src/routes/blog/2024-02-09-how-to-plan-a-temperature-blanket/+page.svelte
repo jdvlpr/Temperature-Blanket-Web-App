@@ -14,6 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
+  import YouTubeVideo from '$lib/components/YouTubeVideo.svelte';
   import { PUBLIC_BASE_URL } from '$env/static/public';
   import AppLogo from '$lib/components/AppLogo.svelte';
   import AppShell from '$lib/components/AppShell.svelte';
@@ -203,17 +204,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   </div>
 
                   <div class="w-full">
-                    <iframe
-                      width="560"
-                      height="315"
-                      src="https://www.youtube.com/embed/7NRLrpZb0Lo?si=6FfsQcYDxXaqJ-aa"
-                      title="YouTube video player"
-                      frameborder="0"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                      referrerpolicy="strict-origin-when-cross-origin"
-                      allowfullscreen
-                      class="aspect-video h-auto w-full"
-                    ></iframe>
+                    <YouTubeVideo
+                      id="7NRLrpZb0Lo"
+                      title="How to plan a temperature blanket"
+                    />
                   </div>
 
                   <p>

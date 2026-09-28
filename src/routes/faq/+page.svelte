@@ -14,6 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script>
+  import YouTubeVideo from '$lib/components/YouTubeVideo.svelte';
   import { PUBLIC_BASE_DOMAIN_NAME, PUBLIC_BASE_URL } from '$env/static/public';
   import AppLogo from '$lib/components/AppLogo.svelte';
   import AppShell from '$lib/components/AppShell.svelte';
@@ -179,17 +180,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
                         at 8:49).
                       </p>
                       <div class="my-2 w-full">
-                        <iframe
-                          width="560"
-                          height="315"
-                          src="https://www.youtube.com/embed/7NRLrpZb0Lo?si=n4fmzlt9_0GKGNad&amp;start=529"
-                          title="YouTube video player"
-                          frameborder="0"
-                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                          referrerpolicy="strict-origin-when-cross-origin"
-                          allowfullscreen
-                          class="aspect-video h-auto w-full"
-                        ></iframe>
+                        <YouTubeVideo
+                          id="7NRLrpZb0Lo"
+                          start={529}
+                          title="How to use the Project Planner"
+                        />
                       </div>
 
                       <p>

@@ -3,14 +3,14 @@
 This file is part of Temperature-Blanket-Web-App.
 
 Temperature-Blanket-Web-App is free software: you can redistribute it and/or modify it
-under the terms of the GNU General Public License as published by the Free Software Foundation, 
+under the terms of the GNU General Public License as published by the Free Software Foundation,
 either version 3 of the License, or (at your option) any later version.
 
-Temperature-Blanket-Web-App is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
-without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+Temperature-Blanket-Web-App is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 See the GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
+You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script module>
@@ -46,12 +46,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     SquareTerminalIcon,
     SwatchBookIcon,
     TriangleAlertIcon,
-    UserIcon,
   } from '@lucide/svelte';
   import { Accordion } from '@skeletonlabs/skeleton-svelte';
-  import { onMount, untrack } from 'svelte';
-  import { account, loadAccountSummary } from '$lib/accounts/summary.svelte';
-  import AccountAvatar from '$lib/components/account/AccountAvatar.svelte';
+  import { untrack } from 'svelte';
   import LegacyMigrationError from './modals/LegacyMigrationError.svelte';
 
   // Set opened navigation items based on current page
@@ -73,11 +70,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
           break;
         case '/faq':
         case '/contact':
-        case '/privacy':
         case '/documentation':
+          if (!openedNavigationItems.includes('help'))
+            openedNavigationItems = [...openedNavigationItems, 'help'];
+          break;
+        case '/privacy':
         case '/changelog':
-          if (!openedNavigationItems.includes('about'))
-            openedNavigationItems = [...openedNavigationItems, 'about'];
+          if (!openedNavigationItems.includes('more'))
+            openedNavigationItems = [...openedNavigationItems, 'more'];
           break;
         case '/supporters':
           if (!openedNavigationItems.includes(''))
@@ -86,18 +86,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
       }
 
       if (page.route.id?.includes('api')) {
-        openedNavigationItems = [...openedNavigationItems, 'developer'];
+        openedNavigationItems = [...openedNavigationItems, 'more'];
       }
 
       if (page.route.id?.includes('/blog')) {
-        if (!openedNavigationItems.includes('about'))
-          openedNavigationItems = [...openedNavigationItems, 'about'];
+        if (!openedNavigationItems.includes('explore'))
+          openedNavigationItems = [...openedNavigationItems, 'explore'];
       }
     });
-  });
-
-  onMount(() => {
-    if (__ACCOUNTS_ENABLED__) loadAccountSummary();
   });
 </script>
 
@@ -150,23 +146,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <HeartIcon fill="#EE6E6C" color="#EE6E6C" />
     Supporters
   </a>
-
-  {#if __ACCOUNTS_ENABLED__}
-    <a
-      href="/account"
-      class={[
-        'btn hover:preset-tonal-surface w-fit',
-        page.url.pathname === '/account' && 'preset-tonal-secondary',
-      ]}
-    >
-      {#if account.summary}
-        <AccountAvatar summary={account.summary} class="size-6 text-[10px]" />
-      {:else}
-        <UserIcon />
-      {/if}
-      Account
-    </a>
-  {/if}
 
   {#snippet indicator()}
     <Accordion.ItemIndicator class="">
@@ -266,6 +245,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 <LandmarkIcon />
                 Gallery
               </a>
+
               <a
                 href="/globe"
                 class={[
@@ -276,16 +256,28 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 <GlobeIcon />
                 Globe
               </a>
+
+              <a
+                href="/blog"
+                class={[
+                  'btn hover:preset-tonal-surface w-fit text-left',
+                  (page.url.pathname === '/blog' ||
+                    page.url.pathname.includes('/blog')) &&
+                    'preset-tonal-secondary',
+                ]}
+              >
+                <RssIcon /> Blog
+              </a>
             </div>
           {/if}
         {/snippet}
       </Accordion.ItemContent>
     </Accordion.Item>
 
-    <Accordion.Item value="about" class="group gap-0">
+    <Accordion.Item value="help" class="group gap-0">
       <h3>
         <Accordion.ItemTrigger class="flex items-center justify-between">
-          About
+          Help
           {@render indicator()}
         </Accordion.ItemTrigger>
       </h3>
@@ -305,18 +297,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
               </a>
 
               <a
-                href="/changelog"
-                class={[
-                  'btn hover:preset-tonal-surface w-fit',
-                  page.url.pathname === '/changelog' &&
-                    'preset-tonal-secondary',
-                ]}
-              >
-                <GiftIcon />
-                What's New
-              </a>
-
-              <a
                 href="/contact"
                 class={[
                   'btn hover:preset-tonal-surface w-fit',
@@ -325,18 +305,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
               >
                 <MailIcon />
                 Contact
-              </a>
-
-              <a
-                href="/blog"
-                class={[
-                  'btn hover:preset-tonal-surface w-fit text-left',
-                  (page.url.pathname === '/blog' ||
-                    page.url.pathname.includes('/blog')) &&
-                    'preset-tonal-secondary',
-                ]}
-              >
-                <RssIcon /> Blog
               </a>
 
               <a
@@ -350,26 +318,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 <BookOpenTextIcon />
                 Documentation
               </a>
-
-              <a
-                href="/privacy"
-                class={[
-                  'btn hover:preset-tonal-surface w-fit',
-                  page.url.pathname === '/privacy' && 'preset-tonal-secondary',
-                ]}
-              >
-                <ShieldAlertIcon />
-                Privacy
-              </a>
             </div>
           {/if}
         {/snippet}
       </Accordion.ItemContent>
     </Accordion.Item>
-    <Accordion.Item value="developer" class="group gap-0">
+    <Accordion.Item value="more" class="group gap-0">
       <h3>
         <Accordion.ItemTrigger class="flex items-center justify-between">
-          Developer
+          More
           {@render indicator()}
         </Accordion.ItemTrigger>
       </h3>
@@ -377,6 +334,30 @@ If not, see <https://www.gnu.org/licenses/>. -->
         {#snippet element(attributes)}
           {#if !attributes.hidden}
             <div {...attributes} transition:safeSlide>
+
+                <a
+                  href="/changelog"
+                  class={[
+                    'btn hover:preset-tonal-surface w-fit',
+                    page.url.pathname === '/changelog' &&
+                      'preset-tonal-secondary',
+                  ]}
+                >
+                  <GiftIcon />
+                  What's New
+                </a>
+
+                <a
+                  href="/privacy"
+                  class={[
+                    'btn hover:preset-tonal-surface w-fit',
+                    page.url.pathname === '/privacy' && 'preset-tonal-secondary',
+                  ]}
+                >
+                  <ShieldAlertIcon />
+                  Privacy
+                </a>
+
               <a
                 href="/api/yarn-colorways"
                 class={[

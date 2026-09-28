@@ -31,6 +31,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { initializeLocalStorage } from '$lib/storage/storage-utils.svelte';
   import { privacy } from '$lib/utils/privacy-utils.svelte';
   import { onMount, type Snippet } from 'svelte';
+  // Fonts are served from this site, so pages load nothing from font services
+  import '@fontsource-variable/plus-jakarta-sans';
+  import '@fontsource-variable/plus-jakarta-sans/wght-italic.css';
+  import '@fontsource-variable/fraunces/full.css';
   import '../css/main.css';
   import { ICONS } from '$lib/constants/icon-constants';
   import { RssIcon, SquarePlayIcon } from '@lucide/svelte';
@@ -149,8 +153,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     href="/images/favicon-16x16.png"
   />
   <link rel="shortcut icon" href="/favicon.ico" />
-
-  <link rel="stylesheet" href="https://use.typekit.net/obw5vhr.css" />
 
   <meta name="theme-color" content="#f5f5f5" />
 
