@@ -32,8 +32,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { privacy } from '$lib/utils/privacy-utils.svelte';
   import { onMount, type Snippet } from 'svelte';
   // Fonts are served from this site, so pages load nothing from font services
-  import '@fontsource-variable/figtree';
-  import '@fontsource-variable/figtree/wght-italic.css';
+  import '@fontsource/be-vietnam-pro/300.css';
+  import '@fontsource/be-vietnam-pro/400.css';
+  import '@fontsource/be-vietnam-pro/400-italic.css';
+  import '@fontsource/be-vietnam-pro/500.css';
+  import '@fontsource/be-vietnam-pro/600.css';
+  import '@fontsource/be-vietnam-pro/700.css';
+  import '@fontsource/be-vietnam-pro/700-italic.css';
   import '@fontsource-variable/fraunces/full.css';
   import '../css/main.css';
   import { ICONS } from '$lib/constants/icon-constants';
