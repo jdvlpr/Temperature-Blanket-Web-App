@@ -19,7 +19,7 @@
 import { SECRET_WORDPRESS_PROJECT_CREATION_AUTH_KEY } from '$env/static/private';
 import { PUBLIC_WORDPRESS_BASE_URL } from '$env/static/public';
 import { requireAccount } from '$lib/server/auth';
-import { getProjectMeta, PROJECT_ID_PATTERN } from '$lib/server/sync/store';
+import { PROJECT_ID_PATTERN } from '$lib/server/sync/store';
 import type { D1Database } from '@cloudflare/workers-types';
 import { json, type RequestEvent } from '@sveltejs/kit';
 import {
@@ -90,8 +90,8 @@ export function projectIdFromLink(projectUrl: unknown): string | null {
 
 /**
  * Publishes the browser's gallery payload (as sent to /api/project) as this user.
- * The project must be one of the account's saved projects: ownership comes from
- * the session, and the project row ties the page to it. WordPress's own answers
+ * Ownership comes from the session, so the project needn't be saved to the
+ * account; its ID (?project=) is kept to tie the page to it. WordPress's own answers
  * (400, 409 duplicate, 500) come back unchanged with status 200, as /api/project
  * does, adding `linked: true` when the page was recorded to the account.
  */
@@ -107,16 +107,8 @@ export async function publishFromAccount(
     return galleryError(400, 'INVALID_REQUEST', 'Invalid gallery payload');
   }
 
-  const projectId = projectIdFromLink(payload?.project_url);
-  const project = projectId
-    ? await getProjectMeta(gallery.db, gallery.userId, projectId)
-    : null;
-  if (!projectId || !project || project.deleted)
-    return galleryError(
-      422,
-      'NOT_IN_ACCOUNT',
-      'Save this project to your account to publish it from there',
-    );
+  // Every planner link has one; '' just leaves the page unconnected to a project
+  const projectId = projectIdFromLink(payload?.project_url) ?? '';
 
   // Forwarded as sent, so a large payload is parsed once and never re-encoded
   const response = await gallery.api.publish(payloadText, gallery.userId);
@@ -130,7 +122,7 @@ export async function publishFromAccount(
     const title =
       typeof payload.title === 'string' && payload.title.trim()
         ? payload.title.trim().slice(0, MAX_TITLE_LENGTH)
-        : project.title;
+        : 'Untitled project';
     await recordPost(gallery.db, gallery.userId, {
       postId: response.id,
       projectId,

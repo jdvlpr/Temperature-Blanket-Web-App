@@ -18,6 +18,7 @@ show the account's name, and removing them. Hidden until the account has a page 
 publishing from accounts is on. -->
 
 <script lang="ts">
+  import { resolve } from '$app/paths';
   import {
     getGalleryPages,
     removeGalleryPage,
@@ -131,7 +132,7 @@ publishing from accounts is on. -->
       </label>
       {#if showName && hasName && publicId}
         <a
-          href="/gallery/by/{publicId}"
+          href={resolve('/gallery/by/[ownerId]', { ownerId: publicId })}
           target="_blank"
           class={ROW_LINK}
           data-testid="gallery-owner-page"
@@ -150,7 +151,7 @@ publishing from accounts is on. -->
                 <ImageIcon class="shrink-0 opacity-70" />
                 <div class="flex min-w-0 flex-1 flex-col">
                   <a
-                    href="/gallery/{page.postId}"
+                    href={resolve('/gallery/[id]', { id: String(page.postId) })}
                     target="_blank"
                     class="link line-clamp-2 break-words"
                     >{page.title}

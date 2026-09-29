@@ -15,14 +15,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import { browser } from '$app/environment';
-  import { replaceState } from '$app/navigation';
   import { project } from '$lib/state/project-state.svelte';
   import { toast } from '$lib/state/page-state.svelte';
   import { weather } from '$lib/state/weather-state.svelte';
-  import {
-    ProjectStorage,
-    type StoredProjectIndexItem,
-  } from '$lib/storage/projects.svelte';
+  import type { StoredProjectIndexItem } from '$lib/storage/projects.svelte';
   import {
     CircleCheckIcon,
     ClipboardCopyIcon,
@@ -33,9 +29,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { onMount } from 'svelte';
   import {
     autosave,
-    projectSaved,
     saveCopy,
-    saveNow,
+    saveOpenProject,
   } from '$lib/storage/autosave.svelte';
   import ProjectDetails from '../ProjectDetails.svelte';
   import DownloadExportButton from '../buttons/DownloadExportButton.svelte';
@@ -70,33 +65,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       }
     }
 
-    // Saving by itself: only a waiting change needs saving, and never over
-    // another device's newer version
-    if (autosave.on) {
-      await saveNow();
-      const id = new URL(project.url.href).searchParams.get('project');
-      storedProject =
-        (await ProjectStorage.getIndex()).find((i) => i.id === id) ?? null;
-      project.status.saved = autosave.state === 'saved';
-      return;
-    }
-
-    const newURL = new URL(project.url.href);
-    replaceState(newURL, '');
-
-    try {
-      storedProject = await ProjectStorage.save();
-      project.status.saved = true;
-      await projectSaved();
-    } catch (e) {
-      storedProject = null;
-      project.status.saved = false;
-      project.status.error = {
-        code: 1,
-        message: 'Unable to save project to storage',
-      };
-      console.warn("Can't save project", { e });
-    }
+    storedProject = await saveOpenProject();
   }
 
   /** A new project from this one, which is left as it was saved */

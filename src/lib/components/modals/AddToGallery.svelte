@@ -14,6 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
+  import { resolve } from '$app/paths';
   import Spinner from '$lib/components/Spinner.svelte';
   import { locations } from '$lib/state/location-state.svelte';
   import { previews } from '$lib/state/preview-state.svelte';
@@ -48,6 +49,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     if (!active?.svg || !active?.width || !active?.height) return;
 
     submitting = true;
+    if (fromAccount) {
+      // Published from the account, it's kept there too, next to its gallery page
+      const { saveOpenProject } = await import('$lib/storage/autosave.svelte');
+      await saveOpenProject();
+    }
     if (fromAccount && showName !== savedShowName) {
       const { updateGallerySettings } = await import('$lib/accounts/gallery');
       // Unsaved, the page just goes out with the account's previous choice
@@ -116,8 +122,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
           {#if fromAccount}
             <p>
               • It will be linked to your account, so you can remove it later
-              from your <a href="/account" target="_blank" class="link"
-                >Account page</a
+              from your <a
+                href={resolve('/account')}
+                target="_blank"
+                class="link">Account page</a
               >.
             </p>
           {/if}

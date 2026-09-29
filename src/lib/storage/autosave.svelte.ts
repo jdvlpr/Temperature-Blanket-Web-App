@@ -195,6 +195,38 @@ export async function projectSaved() {
 }
 
 /**
+ * Saves the open project, as the Save dialog does: through autosave when it's
+ * already on (never over another device's newer version), otherwise as a
+ * first save, which signed in also adds it to the account. Returns the stored
+ * project, or null when it couldn't be saved.
+ */
+export async function saveOpenProject() {
+  if (autosave.on) {
+    await saveNow();
+    const id = openProjectId();
+    project.status.saved = autosave.state === 'saved';
+    return (await ProjectStorage.getIndex()).find((i) => i.id === id) ?? null;
+  }
+
+  // eslint-disable-next-line svelte/no-navigation-without-resolve
+  replaceState(new URL(project.url.href), '');
+  try {
+    const item = await ProjectStorage.save();
+    project.status.saved = true;
+    await projectSaved();
+    return item;
+  } catch (e) {
+    project.status.saved = false;
+    project.status.error = {
+      code: 1,
+      message: 'Unable to save project to storage',
+    };
+    console.warn("Can't save project", { e });
+    return null;
+  }
+}
+
+/**
  * Saves the open project as a new one, leaving the saved original as it was.
  * Signed in, the copy is the account's and saves by itself from then on.
  * Also how changes are kept when another device changed the original.

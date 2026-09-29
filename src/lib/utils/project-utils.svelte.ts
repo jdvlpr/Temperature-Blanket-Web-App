@@ -229,14 +229,10 @@ export const sendToProjectGallery = async (
     }
     // WordPress's answer, from either route
     let response: Awaited<ReturnType<Response['json']>> | undefined;
-    let accountNote = '';
     if (fromAccount) {
       const { publishFromAccount } = await import('$lib/accounts/gallery');
       const result = await publishFromAccount(body);
       if (result.status === 'answered') response = result.response;
-      else if (result.reason === 'not-saved')
-        accountNote =
-          '<p class="text-sm opacity-80">It isn’t linked to your account, because this project isn’t saved to your account.</p>';
     }
     if (!response) {
       const request = await fetch('/api/project', {
@@ -255,7 +251,6 @@ export const sendToProjectGallery = async (
       if (response.linked)
         message +=
           '<p class="text-sm opacity-80">It’s linked to your account, so you can remove it from your Account page.</p>';
-      message += accountNote;
       project.gallery.href = response.link;
       project.gallery.title = response.title;
       // reloadRecentGalleryProjects();

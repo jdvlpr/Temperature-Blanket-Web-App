@@ -104,15 +104,19 @@ describe('publishFromAccount', () => {
   });
 
   it.each([
-    ['not saved to the account', 'https://t.com/?project=other#h'],
-    ['deleted from the account', 'https://t.com/?project=p2#h'],
-    ['without a project ID', 'https://t.com/#h'],
-  ])('refuses a project %s, so the browser falls back', async (_, url) => {
-    const { gallery, calls } = await setup(() => answered({ code: 200 }));
-    const response = await publishFromAccount(gallery, payload(url));
-    expect(response.status).toBe(422);
-    expect((await response.json()).code).toBe('NOT_IN_ACCOUNT');
-    expect(calls).toHaveLength(0);
+    ['not saved to the account', 'https://t.com/?project=other#h', 'other'],
+    ['deleted from the account', 'https://t.com/?project=p2#h', 'p2'],
+    ['without a project ID', 'https://t.com/#h', ''],
+  ])('publishes a project %s too', async (_, url, projectId) => {
+    const { d1, gallery, calls } = await setup(() =>
+      answered({ code: 200, id: 5 }),
+    );
+    const response = await publishFromAccount(gallery, payload(url), 9);
+    expect(await response.json()).toMatchObject({ linked: true });
+    expect(calls).toHaveLength(1);
+    expect(await listPosts(d1, 'u1')).toEqual([
+      expect.objectContaining({ postId: 5, projectId }),
+    ]);
   });
 
   it('passes WordPress refusals through without recording', async () => {

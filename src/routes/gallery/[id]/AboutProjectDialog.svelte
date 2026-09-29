@@ -22,6 +22,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 -->
 
 <script lang="ts">
+  import { resolve } from '$app/paths';
   import { ALL_YARN_WEIGHTS } from '$lib/constants/color-constants';
   import { pluralize } from '$lib/utils/string-utils';
   import type { PageData } from './$types';
@@ -62,7 +63,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {#if owner}
       <p>
         <span class="font-bold">Made by:</span>
-        <a class="link" href="/gallery/by/{owner.publicId}">{owner.name}</a>
+        <a
+          class="link"
+          href={resolve('/gallery/by/[ownerId]', { ownerId: owner.publicId })}
+          >{owner.name}</a
+        >
       </p>
     {/if}
 

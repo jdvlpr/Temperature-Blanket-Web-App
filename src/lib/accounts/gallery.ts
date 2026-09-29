@@ -71,8 +71,8 @@ export async function removeGalleryPage(postId: number) {
 export type AccountPublishResult =
   /** WordPress's answer, as /api/project gives it; `linked` when recorded to the account */
   | { status: 'answered'; response: Record<string, unknown> }
-  /** Publish anonymously instead; 'not-saved' when the project isn't in the account */
-  | { status: 'fallback'; reason: 'not-saved' | 'unavailable' };
+  /** Publishing from accounts is off or unavailable: publish anonymously instead */
+  | { status: 'fallback' };
 
 /** Publishes the gallery payload as the signed-in user. */
 export async function publishFromAccount(
@@ -85,9 +85,5 @@ export async function publishFromAccount(
   });
   if (response.ok)
     return { status: 'answered', response: await response.json() };
-  const error = await response.json().catch(() => null);
-  return {
-    status: 'fallback',
-    reason: error?.code === 'NOT_IN_ACCOUNT' ? 'not-saved' : 'unavailable',
-  };
+  return { status: 'fallback' };
 }

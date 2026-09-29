@@ -17,11 +17,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
 "By <name>" on their gallery pages. -->
 
 <script lang="ts">
+  import { resolve } from '$app/paths';
   import { page } from '$app/state';
   import { PUBLIC_BASE_URL } from '$env/static/public';
   import AppLogo from '$lib/components/AppLogo.svelte';
   import AppShell from '$lib/components/AppShell.svelte';
   import { getTitleFromLocationsMeta } from '$lib/utils/project-utils.svelte';
+  import { stripHTMLTags } from '$lib/utils/string-utils';
   import { ArrowLeftIcon } from '@lucide/svelte';
   import type { PageData } from './$types';
 
@@ -50,7 +52,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       class="m-auto flex w-full max-w-(--breakpoint-xl) flex-col justify-start gap-2 pb-8"
     >
       <a
-        href="/gallery"
+        href={resolve('/gallery')}
         class="btn hover:preset-tonal-surface mx-2 mt-2 flex w-fit items-center lg:mx-0 lg:mt-0"
       >
         <ArrowLeftIcon />
@@ -70,10 +72,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
           aria-label={heading}
         >
           {#each data.projects as { databaseId, featuredImage, locations } (databaseId)}
-            {@const title = getTitleFromLocationsMeta(locations)}
+            {@const title = stripHTMLTags(getTitleFromLocationsMeta(locations))}
             <li>
               <a
-                href="/gallery/{databaseId}"
+                href={resolve('/gallery/[id]', { id: String(databaseId) })}
                 class="rounded-container hover:preset-tonal-surface flex flex-col items-center justify-center gap-1 p-2 text-center"
               >
                 <img
@@ -83,7 +85,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   class="max-w-[130px] sm:max-w-[210px] md:max-w-[215px]"
                 />
                 <p class="line-clamp-4 text-xs">
-                  {@html title || ''}
+                  {title}
                 </p>
               </a>
             </li>
