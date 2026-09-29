@@ -56,10 +56,9 @@ function createAuth(
         await sender.send(signInCodeEmail(email, code, purpose));
       },
       runInBackground,
-      // Better Auth 1.7.3-1.7.5 can't validate the schema on D1 (issue #11346, fixed
-      // in 1.7.6). After upgrading, enable it where dev routes are on:
-      // platform.env?.ENABLE_DEV_ROUTES === 'true'
-      validateSchema: false,
+      // Catch schema drift locally only: introspecting D1 on every cold start
+      // costs CPU the free plan can't spare (works on D1 since 1.7.6, issue #11346)
+      validateSchema: platform.env?.ENABLE_DEV_ROUTES === 'true',
     }),
   );
 }
