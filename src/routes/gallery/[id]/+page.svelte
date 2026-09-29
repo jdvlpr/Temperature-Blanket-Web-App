@@ -123,7 +123,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         props: {
           project,
           title: projectTitleNoHTML,
-          ownerName: data.ownerName,
+          owner: data.owner,
           reshapedColors,
           weatherSources,
         },
@@ -267,9 +267,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   This project gallery page cannot be found.
                 {/if}
               </p>
-              {#if project && data.ownerName}
+              {#if project && data.owner}
                 <p class="text-surface-600-400" data-testid="gallery-owner">
-                  By {data.ownerName}
+                  By <a class="link" href="/gallery/by/{data.owner.publicId}"
+                    >{data.owner.name}</a
+                  >
                 </p>
               {/if}
 

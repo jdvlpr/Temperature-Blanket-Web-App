@@ -30,6 +30,7 @@ publishing from accounts is on. -->
     ImageIcon,
     LoaderCircleIcon,
     Trash2Icon,
+    UserRoundIcon,
   } from '@lucide/svelte';
   import { onMount } from 'svelte';
 
@@ -49,11 +50,15 @@ publishing from accounts is on. -->
   let publishing = $state(false);
   let pages = $state<GalleryPage[]>([]);
   let showName = $state(false);
+  let publicId = $state<string | null>(null);
   let confirming = $state<number | null>(null);
   let busy = $state(false);
   let errorMessage = $state('');
 
   let hasName = $derived(Boolean(name.trim()));
+
+  const ROW_LINK =
+    'hover:preset-tonal-surface flex min-h-12 w-full items-center gap-3 px-4 py-3 transition-colors';
 
   async function load() {
     const gallery = await getGalleryPages();
@@ -61,6 +66,7 @@ publishing from accounts is on. -->
     pages = gallery.posts;
     pageCount = pages.length;
     showName = gallery.settings.showName;
+    publicId = gallery.settings.publicId;
     publishing = gallery.publishing;
     loaded = true;
   }
@@ -70,7 +76,9 @@ publishing from accounts is on. -->
   async function saveShowName() {
     errorMessage = '';
     try {
-      showName = (await updateGallerySettings({ showName })).showName;
+      const settings = await updateGallerySettings({ showName });
+      showName = settings.showName;
+      publicId = settings.publicId;
     } catch {
       showName = !showName;
       errorMessage = 'That setting couldn’t be saved. Try again.';
@@ -113,13 +121,26 @@ publishing from accounts is on. -->
           <span class="font-bold">Show my name on my gallery pages</span>
           <span class="text-sm opacity-70">
             {#if hasName}
-              Pages you publish while signed in will say “By {name}”.
+              Pages you publish while signed in will say “By {name}”, linking to
+              a page that lists them all.
             {:else}
               Add a display name above first.
             {/if}
           </span>
         </span>
       </label>
+      {#if showName && hasName && publicId}
+        <a
+          href="/gallery/by/{publicId}"
+          target="_blank"
+          class={ROW_LINK}
+          data-testid="gallery-owner-page"
+        >
+          <UserRoundIcon class="shrink-0 opacity-70" />
+          <span class="flex-1">Your page in the gallery</span>
+          <ExternalLinkIcon class="size-4 shrink-0 opacity-50" />
+        </a>
+      {/if}
 
       {#if pages.length}
         <ul class="flex flex-col" aria-label="Your gallery pages">

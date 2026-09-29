@@ -15,27 +15,28 @@
 
 import { PUBLIC_WORDPRESS_BASE_URL } from '$env/static/public';
 import { recordPageView } from '$lib/utils/gallery-utils';
+import type { GalleryOwner } from '$lib/server/gallery/store';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async (event) => {
-  const [{ project }, ownerName] = await Promise.all([
+  const [{ project }, owner] = await Promise.all([
     getProject(event),
-    getOwnerName(event),
+    getOwner(event),
   ]);
-  return { project, ownerName };
+  return { project, owner };
 };
 
-/** The name of the account that published this page, if its owner chose to show it. */
-async function getOwnerName(
+/** The account that published this page, if its owner chose to show their name. */
+async function getOwner(
   event: Parameters<PageServerLoad>[0],
-): Promise<string | null> {
+): Promise<GalleryOwner | null> {
   const env = event.platform?.env;
   const id = Number(event.params.id);
   if (env?.ACCOUNTS_ENABLED !== 'true' || !env.DB || !Number.isSafeInteger(id))
     return null;
   try {
-    const { ownerNameForPost } = await import('$lib/server/gallery/store');
-    return await ownerNameForPost(env.DB, id);
+    const { ownerForPost } = await import('$lib/server/gallery/store');
+    return await ownerForPost(env.DB, id);
   } catch (e) {
     // Before migration 0004, or D1 unavailable: the page renders without a name
     console.error('Could not look up gallery page owner', e);

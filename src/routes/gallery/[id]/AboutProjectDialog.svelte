@@ -30,8 +30,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     project: PageData['project'];
     /** The project's title as plain text, for the dialog heading. */
     title: string;
-    /** The publishing account's name, when its owner chose to show it. */
-    ownerName?: string | null;
+    /** The publishing account, when its owner chose to show their name. */
+    owner?: { name: string; publicId: string } | null;
     /** The project's colours grouped by yarn (see +page.svelte). */
     reshapedColors: Array<{
       brandName: string;
@@ -42,7 +42,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     weatherSources: Array<{ name: string; url: string }> | null;
   }
 
-  let { project, title, ownerName, reshapedColors, weatherSources }: Props =
+  let { project, title, owner, reshapedColors, weatherSources }: Props =
     $props();
 </script>
 
@@ -59,8 +59,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
         timeZone: 'UTC',
       })}
     </p>
-    {#if ownerName}
-      <p><span class="font-bold">Made by:</span> {ownerName}</p>
+    {#if owner}
+      <p>
+        <span class="font-bold">Made by:</span>
+        <a class="link" href="/gallery/by/{owner.publicId}">{owner.name}</a>
+      </p>
     {/if}
 
     {#if JSON.stringify(reshapedColors) !== '{}'}

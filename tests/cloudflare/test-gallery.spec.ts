@@ -52,7 +52,7 @@ test.describe('Gallery pages from accounts', () => {
     const listed = await api.get('/api/account/gallery');
     expect(await listed.json()).toEqual({
       posts: [],
-      settings: { showName: false, removeOnDelete: false },
+      settings: { showName: false, removeOnDelete: false, publicId: null },
       publishing: false,
     });
 
@@ -68,6 +68,7 @@ test.describe('Gallery pages from accounts', () => {
     expect((await patched.json()).settings).toEqual({
       showName: true,
       removeOnDelete: false,
+      publicId: expect.stringMatching(/^[A-Za-z0-9]{12}$/),
     });
     expect(
       (await api.patch('/api/account/gallery', { data: {} })).status(),
@@ -131,5 +132,52 @@ test.describe('Gallery pages from accounts', () => {
         url: expect.stringMatching(new RegExp(`/gallery/${postId}$`)),
       }),
     ]);
+  });
+
+  test('an owner who shows their name gets a page listing their gallery pages', async ({
+    page,
+    request,
+  }) => {
+    const email = uniqueEmail('gallery-owner');
+    await signIn(page, request, email);
+    const userId = userIdFor(email);
+    localD1(
+      `update "user" set "name" = 'Grace Hopper' where "id" = '${userId}'`,
+    );
+    // One published page, so the account page shows its gallery section
+    localD1(
+      `insert into "galleryPost" ("postId", "userId", "projectId", "title", "publishedAt")
+       values (${800_000_000 + Math.floor(Math.random() * 1e8)}, '${userId}', 'p1', 'Lima', ${Date.now()})`,
+    );
+
+    expect((await request.get('/gallery/by/AAAAAAAAAAAA')).status()).toBe(404);
+    expect((await request.get('/gallery/by/not-an-id')).status()).toBe(404);
+
+    const { settings } = await (
+      await page.request.patch('/api/account/gallery', {
+        data: { showName: true },
+      })
+    ).json();
+    expect(settings.publicId).toMatch(/^[A-Za-z0-9]{12}$/);
+
+    await page.goto(`/gallery/by/${settings.publicId}`);
+    await expect(
+      page.getByRole('heading', { name: 'Projects by Grace Hopper' }),
+    ).toBeVisible();
+
+    // Linked from the account page
+    await page.goto('/account');
+    await expect(page.getByTestId('gallery-owner-page')).toHaveAttribute(
+      'href',
+      `/gallery/by/${settings.publicId}`,
+    );
+
+    // Hiding the name takes the page down
+    await page.request.patch('/api/account/gallery', {
+      data: { showName: false },
+    });
+    expect(
+      (await request.get(`/gallery/by/${settings.publicId}`)).status(),
+    ).toBe(404);
   });
 });

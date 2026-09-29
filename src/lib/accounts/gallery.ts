@@ -30,9 +30,14 @@ export type GallerySettings = {
 const PATH = '/api/account/gallery';
 
 /** The account's gallery pages and settings, or null when they aren't available. */
+/** The settings, and the owner page's ID once the name has been shown */
+export type GalleryOwnerSettings = GallerySettings & {
+  publicId: string | null;
+};
+
 export async function getGalleryPages(): Promise<{
   posts: GalleryPage[];
-  settings: GallerySettings;
+  settings: GalleryOwnerSettings;
   /** Whether publishing from accounts is switched on */
   publishing: boolean;
 } | null> {
@@ -46,7 +51,7 @@ export async function getGalleryPages(): Promise<{
 
 export async function updateGallerySettings(
   changes: Partial<GallerySettings>,
-): Promise<GallerySettings> {
+): Promise<GalleryOwnerSettings> {
   const response = await fetch(PATH, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },

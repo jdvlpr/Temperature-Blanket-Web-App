@@ -92,56 +92,126 @@ export async function forgetPost(
     .run();
 }
 
+/** The settings, and the owner page's ID once they've shown their name. */
+export type GalleryOwnerSettings = GallerySettings & {
+  publicId: string | null;
+};
+
+const PUBLIC_ID_ALPHABET =
+  'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+const PUBLIC_ID_LENGTH = 12;
+export const PUBLIC_ID_PATTERN = /^[A-Za-z0-9]{12}$/;
+
+/** A random ID for an owner page, e.g. /gallery/by/Xk3pQ9aZr2Lm. */
+export function newPublicId() {
+  const bytes = crypto.getRandomValues(new Uint8Array(PUBLIC_ID_LENGTH));
+  // 62 letters, so 248 = 4 × 62 keeps every letter equally likely
+  let id = '';
+  while (id.length < PUBLIC_ID_LENGTH) {
+    for (const byte of bytes)
+      if (byte < 248 && id.length < PUBLIC_ID_LENGTH)
+        id += PUBLIC_ID_ALPHABET[byte % 62];
+    crypto.getRandomValues(bytes);
+  }
+  return id;
+}
+
 export async function getSettings(
   db: D1Database,
   userId: string,
-): Promise<GallerySettings> {
+): Promise<GalleryOwnerSettings> {
   const row = await db
     .prepare(
-      `select "showName", "removeOnDelete" from "galleryOwner" where "userId" = ?`,
+      `select "showName", "removeOnDelete", "publicId" from "galleryOwner" where "userId" = ?`,
     )
     .bind(userId)
-    .first<{ showName: number; removeOnDelete: number }>();
+    .first<{
+      showName: number;
+      removeOnDelete: number;
+      publicId: string | null;
+    }>();
   return row
-    ? { showName: row.showName === 1, removeOnDelete: row.removeOnDelete === 1 }
-    : { ...DEFAULT_SETTINGS };
+    ? {
+        showName: row.showName === 1,
+        removeOnDelete: row.removeOnDelete === 1,
+        publicId: row.publicId,
+      }
+    : { ...DEFAULT_SETTINGS, publicId: null };
 }
 
-/** Changes the settings given; the rest keep their current values. */
+/**
+ * Changes the settings given; the rest keep their current values. Showing the
+ * name for the first time gives the owner a page ID, which then never changes.
+ */
 export async function updateSettings(
   db: D1Database,
   userId: string,
   changes: Partial<GallerySettings>,
-): Promise<GallerySettings> {
-  const settings = { ...(await getSettings(db, userId)), ...changes };
+): Promise<GalleryOwnerSettings> {
+  const current = await getSettings(db, userId);
+  const settings = { ...current, ...changes };
+  if (settings.showName && !settings.publicId)
+    settings.publicId = newPublicId();
   await db
     .prepare(
-      `insert into "galleryOwner" ("userId", "showName", "removeOnDelete") values (?, ?, ?)
+      `insert into "galleryOwner" ("userId", "showName", "removeOnDelete", "publicId")
+       values (?, ?, ?, ?)
        on conflict ("userId") do update set "showName" = excluded."showName",
-         "removeOnDelete" = excluded."removeOnDelete"`,
+         "removeOnDelete" = excluded."removeOnDelete",
+         "publicId" = coalesce("galleryOwner"."publicId", excluded."publicId")`,
     )
-    .bind(userId, Number(settings.showName), Number(settings.removeOnDelete))
+    .bind(
+      userId,
+      Number(settings.showName),
+      Number(settings.removeOnDelete),
+      settings.publicId,
+    )
     .run();
   return settings;
 }
 
+export type GalleryOwner = { name: string; publicId: string };
+
+// Only owners who chose to show their name and have one
+const SHOWN_OWNER = `"galleryOwner"."showName" = 1
+  and "galleryOwner"."publicId" is not null and trim("user"."name") != ''`;
+
 /**
- * The display name to show on a gallery page, or null: only for pages published
- * from an account whose owner opted in and has a name. Read at render time, so a
- * rename updates every page.
+ * Who published a gallery page, when they chose to show their name: null for
+ * anonymous pages and owners who haven't. Read at render time, so a rename
+ * updates every page.
  */
-export async function ownerNameForPost(
+export async function ownerForPost(
   db: D1Database,
   postId: number,
-): Promise<string | null> {
+): Promise<GalleryOwner | null> {
   const row = await db
     .prepare(
-      `select "user"."name" as "name" from "galleryPost"
+      `select "user"."name" as "name", "galleryOwner"."publicId" as "publicId"
+       from "galleryPost"
        join "galleryOwner" on "galleryOwner"."userId" = "galleryPost"."userId"
        join "user" on "user"."id" = "galleryPost"."userId"
-       where "galleryPost"."postId" = ? and "galleryOwner"."showName" = 1`,
+       where "galleryPost"."postId" = ? and ${SHOWN_OWNER}`,
     )
     .bind(postId)
-    .first<{ name: string }>();
-  return row?.name.trim() || null;
+    .first<GalleryOwner>();
+  return row ? { name: row.name.trim(), publicId: row.publicId } : null;
+}
+
+/** An owner's page: their name and gallery pages, newest first, or null. */
+export async function ownerPage(
+  db: D1Database,
+  publicId: string,
+): Promise<{ name: string; postIds: number[] } | null> {
+  const owner = await db
+    .prepare(
+      `select "user"."id" as "userId", "user"."name" as "name" from "galleryOwner"
+       join "user" on "user"."id" = "galleryOwner"."userId"
+       where "galleryOwner"."publicId" = ? and ${SHOWN_OWNER}`,
+    )
+    .bind(publicId)
+    .first<{ userId: string; name: string }>();
+  if (!owner) return null;
+  const posts = await listPosts(db, owner.userId);
+  return { name: owner.name.trim(), postIds: posts.map((p) => p.postId) };
 }

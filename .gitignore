@@ -1,6 +1,8 @@
 .dev
 .DS_Store
 .env
+.env.local
+.env.*.local
 .htaccess
 .svelte-kit
 .vscode

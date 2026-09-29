@@ -4,7 +4,10 @@ import {
   forgetPost,
   getSettings,
   listPosts,
-  ownerNameForPost,
+  newPublicId,
+  ownerForPost,
+  ownerPage,
+  PUBLIC_ID_PATTERN,
   ownsPost,
   recordPost,
   updateSettings,
@@ -56,15 +59,16 @@ describe('gallery store', () => {
     expect(await getSettings(d1, 'u1')).toEqual({
       showName: false,
       removeOnDelete: false,
+      publicId: null,
     });
     await updateSettings(d1, 'u1', { showName: true });
-    expect(await updateSettings(d1, 'u1', { removeOnDelete: true })).toEqual({
-      showName: true,
-      removeOnDelete: true,
-    });
+    expect(
+      await updateSettings(d1, 'u1', { removeOnDelete: true }),
+    ).toMatchObject({ showName: true, removeOnDelete: true });
     expect(await getSettings(d1, 'u2')).toEqual({
       showName: false,
       removeOnDelete: false,
+      publicId: null,
     });
   });
 
@@ -72,17 +76,56 @@ describe('gallery store', () => {
     const { d1, sqlite } = setup();
     await recordPost(d1, 'u1', post(10));
     await recordPost(d1, 'u2', post(11));
-    expect(await ownerNameForPost(d1, 10)).toBeNull();
+    expect(await ownerForPost(d1, 10)).toBeNull();
 
-    await updateSettings(d1, 'u1', { showName: true });
-    expect(await ownerNameForPost(d1, 10)).toBe('Ada Lovelace');
+    const { publicId } = await updateSettings(d1, 'u1', { showName: true });
+    expect(publicId).toMatch(PUBLIC_ID_PATTERN);
+    expect(await ownerForPost(d1, 10)).toEqual({
+      name: 'Ada Lovelace',
+      publicId,
+    });
     sqlite.exec(`update "user" set "name" = 'Ada King' where "id" = 'u1'`);
-    expect(await ownerNameForPost(d1, 10)).toBe('Ada King');
+    expect((await ownerForPost(d1, 10))?.name).toBe('Ada King');
 
     // Opted in without a name, or an anonymous page
     await updateSettings(d1, 'u2', { showName: true });
-    expect(await ownerNameForPost(d1, 11)).toBeNull();
-    expect(await ownerNameForPost(d1, 99)).toBeNull();
+    expect(await ownerForPost(d1, 11)).toBeNull();
+    expect(await ownerForPost(d1, 99)).toBeNull();
+  });
+
+  it('keeps the owner page ID through name changes and opting out', async () => {
+    const { d1 } = setup();
+    expect(
+      (await updateSettings(d1, 'u1', { removeOnDelete: true })).publicId,
+    ).toBeNull();
+    const { publicId } = await updateSettings(d1, 'u1', { showName: true });
+    await updateSettings(d1, 'u1', { showName: false });
+    expect((await getSettings(d1, 'u1')).publicId).toBe(publicId);
+    expect((await updateSettings(d1, 'u1', { showName: true })).publicId).toBe(
+      publicId,
+    );
+  });
+
+  it('lists an owner page only while the owner shows their name', async () => {
+    const { d1 } = setup();
+    await recordPost(d1, 'u1', post(10, 1));
+    await recordPost(d1, 'u1', post(11, 2));
+    await recordPost(d1, 'u2', post(12, 3));
+    const { publicId } = await updateSettings(d1, 'u1', { showName: true });
+
+    expect(await ownerPage(d1, publicId!)).toEqual({
+      name: 'Ada Lovelace',
+      postIds: [11, 10],
+    });
+    expect(await ownerPage(d1, 'AAAAAAAAAAAA')).toBeNull();
+    await updateSettings(d1, 'u1', { showName: false });
+    expect(await ownerPage(d1, publicId!)).toBeNull();
+  });
+
+  it('makes page IDs of the expected shape', () => {
+    const ids = new Set(Array.from({ length: 200 }, newPublicId));
+    expect(ids.size).toBe(200);
+    for (const id of ids) expect(id).toMatch(PUBLIC_ID_PATTERN);
   });
 
   it('goes with the account', async () => {
@@ -90,7 +133,7 @@ describe('gallery store', () => {
     await recordPost(d1, 'u1', post(10));
     await updateSettings(d1, 'u1', { showName: true });
     sqlite.exec(`delete from "user" where "id" = 'u1'`);
-    expect(await ownerNameForPost(d1, 10)).toBeNull();
+    expect(await ownerForPost(d1, 10)).toBeNull();
     expect(
       sqlite.prepare(`select count(*) as n from "galleryPost"`).get(),
     ).toEqual({ n: 0 });
