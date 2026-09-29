@@ -33,6 +33,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import ChangeEmail from '$lib/components/account/ChangeEmail.svelte';
   import DeleteAccount from '$lib/components/account/DeleteAccount.svelte';
   import DisplayName from '$lib/components/account/DisplayName.svelte';
+  import GalleryPages from '$lib/components/account/GalleryPages.svelte';
   import SignInCard from '$lib/components/account/SignInCard.svelte';
   import SignInMethods from '$lib/components/account/SignInMethods.svelte';
   import AccountProjects from '$lib/components/sync/AccountProjects.svelte';
@@ -59,6 +60,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let user = $state<AccountUser | null>(null);
   let busy = $state(false);
   let errorMessage = $state('');
+  let galleryPageCount = $state(0);
 
   let memberSince = $derived(
     user?.createdAt
@@ -243,6 +245,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </div>
           </section>
 
+          <GalleryPages
+            name={user.name}
+            cardClass={CARD}
+            bind:pageCount={galleryPageCount}
+          />
+
           <section class="flex flex-col gap-2" aria-labelledby="devices-data">
             <h3 id="devices-data" class="px-2 text-sm font-bold opacity-70">
               Devices and data
@@ -289,7 +297,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
                 <span class="flex-1">
                   <span class="block font-bold">Download my data</span>
                   <span class="block text-sm opacity-70"
-                    >Your account and synced projects as a JSON file</span
+                    >Your account, synced projects and gallery pages as a JSON
+                    file</span
                   >
                 </span>
                 <ChevronRightIcon class="shrink-0 opacity-50" />
@@ -311,6 +320,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </h3>
             <DeleteAccount
               email={user.email}
+              {galleryPageCount}
               ondeleted={async () => {
                 // The account's copies are gone; keep this browser's
                 const { leaveAccount } = await import('$lib/sync/sync.svelte');

@@ -13,8 +13,9 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-// Download everything the account holds, as JSON. Projects are added with sync (Phase 2).
+// Download everything the account holds, as JSON. The page adds synced projects.
 
+import type { D1Database } from '@cloudflare/workers-types';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 
@@ -26,9 +27,10 @@ export const GET: RequestHandler = async (event) => {
   if (account instanceof Response) return account;
 
   const headers = event.request.headers;
-  const [signInMethods, sessions] = await Promise.all([
+  const [signInMethods, sessions, gallery] = await Promise.all([
     account.auth.api.listUserAccounts({ headers }),
     account.auth.api.listSessions({ headers }),
+    galleryPages(event.platform?.env?.DB, account.user.id, event.url.origin),
   ]);
 
   const data = {
@@ -43,6 +45,7 @@ export const GET: RequestHandler = async (event) => {
       expiresAt: session.expiresAt,
       userAgent: session.userAgent,
     })),
+    gallery,
   };
 
   return json(data, {
@@ -53,3 +56,32 @@ export const GET: RequestHandler = async (event) => {
     },
   });
 };
+
+/** Gallery pages published from the account, with the gallery settings. */
+async function galleryPages(
+  db: D1Database | undefined,
+  userId: string,
+  origin: string,
+) {
+  if (!db) return null;
+  const { listPosts, getSettings } = await import('$lib/server/gallery/store');
+  try {
+    const [posts, settings] = await Promise.all([
+      listPosts(db, userId),
+      getSettings(db, userId),
+    ]);
+    return {
+      settings,
+      pages: posts.map((post) => ({
+        title: post.title,
+        url: `${origin}/gallery/${post.postId}`,
+        projectId: post.projectId,
+        publishedAt: new Date(post.publishedAt).toISOString(),
+      })),
+    };
+  } catch (e) {
+    // Before migration 0004
+    console.error('Could not export gallery pages', e);
+    return null;
+  }
+}

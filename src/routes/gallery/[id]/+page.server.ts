@@ -18,9 +18,30 @@ import { recordPageView } from '$lib/utils/gallery-utils';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async (event) => {
-  const { project } = await getProject(event);
-  return { project };
+  const [{ project }, ownerName] = await Promise.all([
+    getProject(event),
+    getOwnerName(event),
+  ]);
+  return { project, ownerName };
 };
+
+/** The name of the account that published this page, if its owner chose to show it. */
+async function getOwnerName(
+  event: Parameters<PageServerLoad>[0],
+): Promise<string | null> {
+  const env = event.platform?.env;
+  const id = Number(event.params.id);
+  if (env?.ACCOUNTS_ENABLED !== 'true' || !env.DB || !Number.isSafeInteger(id))
+    return null;
+  try {
+    const { ownerNameForPost } = await import('$lib/server/gallery/store');
+    return await ownerNameForPost(env.DB, id);
+  } catch (e) {
+    // Before migration 0004, or D1 unavailable: the page renders without a name
+    console.error('Could not look up gallery page owner', e);
+    return null;
+  }
+}
 
 async function getProject(event: Parameters<PageServerLoad>[0]) {
   const id = +event.params.id;

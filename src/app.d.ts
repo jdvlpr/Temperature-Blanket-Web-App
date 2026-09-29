@@ -27,6 +27,7 @@ declare global {
         GOOGLE_CLIENT_SECRET?: string;
         SYNC_ENABLED?: string;
         SYNC_BETA_EMAILS?: string;
+        GALLERY_PUBLISH_ENABLED?: string;
       };
     }
   }

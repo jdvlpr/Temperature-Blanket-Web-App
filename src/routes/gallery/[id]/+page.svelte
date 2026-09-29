@@ -123,6 +123,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         props: {
           project,
           title: projectTitleNoHTML,
+          ownerName: data.ownerName,
           reshapedColors,
           weatherSources,
         },
@@ -266,6 +267,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
                   This project gallery page cannot be found.
                 {/if}
               </p>
+              {#if project && data.ownerName}
+                <p class="text-surface-600-400" data-testid="gallery-owner">
+                  By {data.ownerName}
+                </p>
+              {/if}
 
               <div class="flex flex-wrap items-center justify-center gap-4">
                 {#if projectURL}

@@ -20,17 +20,39 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { project } from '$lib/state/project-state.svelte';
   import { sendToProjectGallery } from '$lib/utils/project-utils.svelte';
   import { svgToPNG } from '$lib/utils/preview-utils.svelte';
+  import { account } from '$lib/accounts/summary.svelte';
   import { ExternalLinkIcon } from '@lucide/svelte';
+  import { onMount } from 'svelte';
   import StickyPart from './StickyPart.svelte';
 
   let submitting = $state(false),
     message = $state<{ text: string; icon: 'spinner' | 'none' } | undefined>();
+
+  // Signed in with publishing from accounts on: the page is linked to the account
+  let fromAccount = $state(false);
+  let showName = $state(false);
+  let savedShowName = false;
+  let ownerName = $derived(account.summary?.name?.trim() ?? '');
+
+  onMount(async () => {
+    if (!__ACCOUNTS_ENABLED__ || !account.summary) return;
+    const { getGalleryPages } = await import('$lib/accounts/gallery');
+    const gallery = await getGalleryPages();
+    if (!gallery?.publishing) return;
+    savedShowName = showName = gallery.settings.showName;
+    fromAccount = true;
+  });
 
   async function submit() {
     const active = previews.active;
     if (!active?.svg || !active?.width || !active?.height) return;
 
     submitting = true;
+    if (fromAccount && showName !== savedShowName) {
+      const { updateGallerySettings } = await import('$lib/accounts/gallery');
+      // Unsaved, the page just goes out with the account's previous choice
+      await updateGallerySettings({ showName }).catch(() => {});
+    }
     message = {
       text: "<p class='font-bold text-xl my-4 text-center'>Sending Project...</p><p class='italic'>This could take up to a few minutes. Please don't navigate away.</p>",
       icon: 'spinner',
@@ -45,7 +67,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     const img = new Image();
     img.onload = async () => {
       message = {
-        text: await sendToProjectGallery(imgSrc),
+        text: await sendToProjectGallery(imgSrc, { fromAccount }),
         icon: 'none',
       };
       submitting = false;
@@ -85,8 +107,20 @@ If not, see <https://www.gnu.org/licenses/>. -->
               href="/gallery"
               target="_blank"
               class="link">Project Gallery</a
-            >. No personal information will be sent.
+            >.{#if fromAccount && showName && ownerName}
+              Your display name, {ownerName}, will be shown on it.
+            {:else}
+              No personal information will be sent.
+            {/if}
           </p>
+          {#if fromAccount}
+            <p>
+              • It will be linked to your account, so you can remove it later
+              from your <a href="/account" target="_blank" class="link"
+                >Account page</a
+              >.
+            </p>
+          {/if}
           <p>
             • This project's gallery page cannot be edited once it is submitted.
           </p>
@@ -96,6 +130,24 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </p>
           <p>• Gallery pages are subject to change.</p>
         </div>
+        {#if fromAccount}
+          <label class="flex items-center gap-2 text-left">
+            <input
+              type="checkbox"
+              class="checkbox"
+              bind:checked={showName}
+              disabled={!ownerName}
+            />
+            <span>
+              Show my name on my gallery pages
+              {#if !ownerName}
+                <span class="block text-sm opacity-70"
+                  >Add a display name on your Account page first</span
+                >
+              {/if}
+            </span>
+          </label>
+        {/if}
       </div>
       <div
         class="bg-surface-50 dark:bg-surface-950 rounded-container pointer-events-none col-span-full m-auto mb-4 flex w-full max-w-[250px] flex-col gap-2 p-4 sm:col-span-1"
@@ -126,7 +178,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <div
       class="flex flex-col items-center justify-center gap-2 p-2 py-4 text-center"
     >
-      <p class="text-sm italic">This action can't be undone.</p>
+      <p class="text-sm italic">
+        {#if fromAccount}
+          You can remove it later from your Account page.
+        {:else}
+          This action can't be undone.
+        {/if}
+      </p>
       <button
         class="btn preset-filled-primary-500"
         title="Add project to gallery"

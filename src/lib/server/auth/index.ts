@@ -58,8 +58,13 @@ function createAuth(
       },
       runInBackground,
       deleteUserData: async (userId) => {
-        const bucket = requestPlatform.getStore()?.env?.PROJECTS;
-        if (bucket) await deleteUserProjectData(bucket, userId);
+        const env = requestPlatform.getStore()?.env;
+        if (env?.DB) {
+          const { releaseGalleryPosts, defaultGalleryApi } =
+            await import('$lib/server/gallery');
+          await releaseGalleryPosts(env.DB, defaultGalleryApi(), userId);
+        }
+        if (env?.PROJECTS) await deleteUserProjectData(env.PROJECTS, userId);
       },
       // Catch schema drift locally only: introspecting D1 on every cold start
       // costs CPU the free plan can't spare (works on D1 since 1.7.6, issue #11346)

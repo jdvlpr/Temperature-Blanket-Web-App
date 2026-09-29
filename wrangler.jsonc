@@ -32,5 +32,9 @@
     "AUTH_PROTOCOL": "auto",
     // Project sync. SYNC_BETA_EMAILS (comma-separated) would limit it to those accounts.
     "SYNC_ENABLED": "true",
+    // Publishing to the gallery from accounts stays off here, since
+    // PUBLIC_WORDPRESS_BASE_URL may be the live gallery. To test it, point .env at
+    // the Local WordPress site (plugin dev/README.md) and pass
+    // --binding GALLERY_PUBLISH_ENABLED=true to wrangler pages dev.
   },
 }

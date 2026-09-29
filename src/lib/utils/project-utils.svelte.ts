@@ -152,7 +152,15 @@ export const downloadWeatherCSV = () => {
   document.body.removeChild(link);
 };
 
-export const sendToProjectGallery = async (img: string) => {
+/**
+ * Sends the project to the gallery. `fromAccount` publishes it as the signed-in
+ * user when it's saved to their account, falling back to an anonymous submission
+ * when that isn't possible.
+ */
+export const sendToProjectGallery = async (
+  img: string,
+  { fromAccount = false } = {},
+) => {
   const colors: Color[][] = [];
   const palettes: string[] = [];
   const yarnUrls: string[] = [];
@@ -219,18 +227,35 @@ export const sendToProjectGallery = async (img: string) => {
     if (!body) {
       return 'Sorry, this project is too large to add to the gallery. Try a shorter date range or fewer locations.';
     }
-    const request = await fetch('/api/project', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body,
-    });
-    const response = await request.json();
+    // WordPress's answer, from either route
+    let response: Awaited<ReturnType<Response['json']>> | undefined;
+    let accountNote = '';
+    if (fromAccount) {
+      const { publishFromAccount } = await import('$lib/accounts/gallery');
+      const result = await publishFromAccount(body);
+      if (result.status === 'answered') response = result.response;
+      else if (result.reason === 'not-saved')
+        accountNote =
+          '<p class="text-sm opacity-80">It isn’t linked to your account, because this project isn’t saved to your account.</p>';
+    }
+    if (!response) {
+      const request = await fetch('/api/project', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body,
+      });
+      response = await request.json();
+    }
 
     if (response.code === 200) {
       // success
       message = `<p class="font-bold text-xl my-2">${response.message}</p><p>The project gallery webpage has been created.</p>`;
+      if (response.linked)
+        message +=
+          '<p class="text-sm opacity-80">It’s linked to your account, so you can remove it from your Account page.</p>';
+      message += accountNote;
       project.gallery.href = response.link;
       project.gallery.title = response.title;
       // reloadRecentGalleryProjects();

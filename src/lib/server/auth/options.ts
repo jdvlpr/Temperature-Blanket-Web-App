@@ -40,7 +40,7 @@ export type AuthConfig = {
   validateSchema: boolean;
   /** Sign in with Google, when configured */
   google?: { clientId: string; clientSecret: string };
-  /** Deletes what the account stores outside the auth tables (synced projects in R2) */
+  /** Deletes what the account stores outside the auth tables (synced projects in R2), and releases its gallery pages */
   deleteUserData?: (userId: string) => Promise<void>;
 };
 

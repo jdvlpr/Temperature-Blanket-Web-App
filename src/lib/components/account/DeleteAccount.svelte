@@ -27,7 +27,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import CodeInput from './CodeInput.svelte';
   import EmailText from './EmailText.svelte';
 
-  let { email, ondeleted }: { email: string; ondeleted: () => void } = $props();
+  let {
+    email,
+    galleryPageCount = 0,
+    ondeleted,
+  }: {
+    email: string;
+    /** Gallery pages published from the account: ask whether to keep them */
+    galleryPageCount?: number;
+    ondeleted: () => void;
+  } = $props();
+
+  let galleryPages: 'keep' | 'remove' = $state('keep');
 
   let step: 'idle' | 'confirm' | 'reconfirm' = $state('idle');
   let code = $state('');
@@ -38,6 +49,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
     busy = true;
     errorMessage = '';
     try {
+      if (galleryPageCount) {
+        // The server removes or keeps them as the account is deleted
+        const { updateGallerySettings } = await import('$lib/accounts/gallery');
+        const removeOnDelete = galleryPages === 'remove';
+        await updateGallerySettings({ removeOnDelete }).catch((e) => {
+          // Keeping them needs nothing saved, unless removal was chosen before
+          if (removeOnDelete) throw e;
+        });
+      }
       await deleteAccount();
       clearSignedInHint();
       ondeleted();
@@ -93,6 +113,33 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <p class="text-sm opacity-80">
         This can’t be undone. Projects saved in this browser stay here.
       </p>
+      {#if galleryPageCount}
+        <fieldset class="flex flex-col gap-2 text-sm">
+          <legend class="mb-1 font-bold">
+            Your {galleryPageCount === 1
+              ? 'gallery page'
+              : `${galleryPageCount} gallery pages`}
+          </legend>
+          <label class="flex items-start gap-2">
+            <input
+              type="radio"
+              class="radio mt-0.5"
+              value="keep"
+              bind:group={galleryPages}
+            />
+            <span>Keep in the gallery, without your name</span>
+          </label>
+          <label class="flex items-start gap-2">
+            <input
+              type="radio"
+              class="radio mt-0.5"
+              value="remove"
+              bind:group={galleryPages}
+            />
+            <span>Remove from the gallery</span>
+          </label>
+        </fieldset>
+      {/if}
       <div class="flex flex-wrap gap-2">
         <button
           type="button"
