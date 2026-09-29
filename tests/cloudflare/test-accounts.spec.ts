@@ -73,12 +73,20 @@ test.describe('Accounts: sign in with an emailed code', () => {
     await signIn(page, request, email);
 
     await page.goto('/faq');
+    // The prerendered page links to sign-in until the account loads
+    await expect(page.getByTestId('account-button')).toHaveAccessibleName(
+      'Account',
+    );
     await page.getByTestId('account-button').click();
     await expect(page.getByRole('dialog').getByText(email)).toBeVisible();
     await page.getByRole('link', { name: 'Account settings' }).click();
     await expect(page).toHaveURL(/\/account$/);
 
     await page.goto('/faq');
+    // The prerendered page links to sign-in until the account loads
+    await expect(page.getByTestId('account-button')).toHaveAccessibleName(
+      'Account',
+    );
     await page.getByTestId('account-button').click();
     await page
       .getByRole('dialog')
