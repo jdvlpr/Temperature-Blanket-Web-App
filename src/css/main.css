@@ -223,6 +223,9 @@ th div {
 
 .text-gradient {
   @apply from-secondary-200 to-secondary-800 dark:from-secondary-50 dark:to-secondary-200 bg-linear-to-br box-decoration-clone bg-clip-text text-transparent dark:text-transparent;
+  /* The gradient is painted only inside the box, and Fraunces' descenders
+  (y, g, p) hang below its tight heading line height */
+  padding-bottom: 0.15em;
 }
 
 .label {

@@ -87,7 +87,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
         {#snippet content()}
           <div class="px-2 pb-4">
-            <h2 class="h2 text-gradient py-4">
+            <h2 class="h2 text-gradient mb-4 pt-4">
               What is a Temperature Blanket?
             </h2>
             <div class="flex flex-col gap-4">
