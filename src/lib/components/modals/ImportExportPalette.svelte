@@ -14,6 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
+  import { version } from '$app/environment';
   import { PUBLIC_COOLORS_LINK } from '$env/static/public';
   import ColorPalette from '$lib/components/ColorPalette.svelte';
   import Expand from '$lib/components/Expand.svelte';
@@ -23,9 +24,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { dialog, toast } from '$lib/state/page-state.svelte';
   import { safeSlide } from '$lib/features/transitions/safeSlide';
   import {
-    colorsToCode,
-    colorsToYarnDetails,
+    colorsToPaletteCode,
     getColorsFromInput,
+    getYarnPageURL,
   } from '$lib/utils/color-utils';
   import { generatePaletteImage } from '$lib/utils/yarn-utils';
   import { pluralize } from '$lib/utils/string-utils';
@@ -37,6 +38,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     DownloadIcon,
     FileCodeIcon,
     ImageIcon,
+    LinkIcon,
   } from '@lucide/svelte';
   import { SegmentedControl } from '@skeletonlabs/skeleton-svelte';
   import { onMount } from 'svelte';
@@ -64,7 +66,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   let isExpanded = $state(false);
 
   let segmentValue = $state('export');
-  let selectedExportType = $state('main'); // Can be: 'main', 'image', 'html', 'palette', 'colorway'
+  let selectedExportType = $state('main'); // Can be: 'main', 'image', 'html', 'palette', 'colorway', 'link'
 
   let previewImageUrl = $derived(
     colors
@@ -79,10 +81,10 @@ If not, see <https://www.gnu.org/licenses/>. -->
       : null,
   );
 
-  let paletteCode = $derived(
-    `${colorsToCode(colors, {
-      includePrefixes: true,
-    })}${colorsToYarnDetails({ colors }) ? 'yarn:' + colorsToYarnDetails({ colors }) : ''}`,
+  let paletteCode = $derived(colorsToPaletteCode(colors));
+
+  let paletteLink = $derived(
+    getYarnPageURL({ colors, origin: window.location.origin, version }),
   );
 
   let palette = $derived(colors.map((n: Color) => n?.hex));
@@ -328,6 +330,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </div>
         </button>
 
+        <!-- Link Button -->
+        <button
+          class="card hover:preset-tonal-surface p-4 text-left"
+          onclick={() => (selectedExportType = 'link')}
+        >
+          <div class="flex items-center gap-2">
+            <LinkIcon />
+            <div>
+              <p class="text-lg font-bold">Link</p>
+              <p class="text-xs">
+                Open this palette in the Yarn Palette Creator
+              </p>
+            </div>
+          </div>
+        </button>
+
         <!-- Yarn Colorway Names Button -->
         {#if colorNames}
           <button
@@ -508,6 +526,44 @@ If not, see <https://www.gnu.org/licenses/>. -->
             >
               <ClipboardCopyIcon />
               Copy Palette Code
+            </button>
+          </div>
+        </div>
+      {/if}
+
+      <!-- Link Section -->
+      {#if selectedExportType === 'link' && paletteLink}
+        <div class="my-4 flex w-full flex-wrap items-start gap-4">
+          <p class="text-sm">
+            Anyone with this link can open the palette in the Yarn Palette
+            Creator.
+          </p>
+          <div class="w-full">
+            <p
+              class="card preset-tonal-primary w-full p-4 break-all select-all"
+            >
+              {paletteLink}
+            </p>
+
+            <button
+              class="btn hover:preset-tonal-surface mt-4"
+              onclick={() => {
+                try {
+                  window.navigator.clipboard.writeText(paletteLink);
+                  toast.trigger({
+                    message: 'Copied',
+                    category: 'success',
+                  });
+                } catch {
+                  toast.trigger({
+                    message: 'Unable to copy to clipboard',
+                    category: 'error',
+                  });
+                }
+              }}
+            >
+              <ClipboardCopyIcon />
+              Copy Link
             </button>
           </div>
         </div>

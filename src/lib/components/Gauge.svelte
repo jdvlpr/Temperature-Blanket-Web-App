@@ -26,6 +26,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import GetPaletteFromImage from '$lib/components/modals/GetPaletteFromImage.svelte';
   import ImportExportPalette from '$lib/components/modals/ImportExportPalette.svelte';
   import RandomPalette from '$lib/components/modals/RandomPalette.svelte';
+  import SavePalette from '$lib/components/modals/SavePalette.svelte';
   import SortPalette from '$lib/components/modals/SortPalette.svelte';
   import {
     drawerState,
@@ -37,6 +38,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { createGaugeColors } from '$lib/state/gauges-state.svelte';
   import {
     ArrowDownWideNarrowIcon,
+    BookmarkPlusIcon,
     CircleCheckIcon,
     ExpandIcon,
     ImageIcon,
@@ -258,6 +260,32 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <ShuffleIcon />
       {#if !fullscreen.value}
         Random
+      {/if}
+    </button>
+
+    <button
+      class={[
+        'hover:preset-tonal-surface',
+        fullscreen.value ? 'btn-icon' : 'btn justify-start',
+      ]}
+      title="Save This Palette to Use Again Later"
+      onclick={() =>
+        dialog.trigger({
+          type: 'component',
+          component: {
+            ref: SavePalette,
+            props: {
+              colors: $state.snapshot(gauge.colors),
+            },
+          },
+          options: {
+            size: 'medium',
+          },
+        })}
+    >
+      <BookmarkPlusIcon />
+      {#if !fullscreen.value}
+        Save Palette
       {/if}
     </button>
 

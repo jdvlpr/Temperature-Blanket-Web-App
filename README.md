@@ -148,14 +148,15 @@ _\*Items with a < before the version means sometime before that version, I'm not
 
 ### 🗃️ IndexedDB Storage
 
-User's saved projects are stored in the browser's IndexedDB.
+User's saved projects and saved palettes are stored in the browser's IndexedDB.
 
 <details>
 <summary>View Details</summary>
 
-| Key Name       | Description                             | Default Value | Possible Values                                                                          | Version Added |
-| -------------- | --------------------------------------- | ------------- | ---------------------------------------------------------------------------------------- | ------------- |
-| projects_index | An index of projects the user has saved | `[]`          | array of [`LocalStorageProjectIndexItem`](src/lib/storage/projects.svelte.ts) objects    | 5.35.0        |
-| p\_{id}        | An individual saved project             | _not set_     | [`LocalStorageProject`](src/lib/storage/projects.svelte.ts) objects, keyed by project id | 5.35.0        |
+| Key Name       | Description                                                      | Default Value | Possible Values                                                                          | Version Added |
+| -------------- | ---------------------------------------------------------------- | ------------- | ---------------------------------------------------------------------------------------- | ------------- |
+| projects_index | An index of projects the user has saved                          | `[]`          | array of [`LocalStorageProjectIndexItem`](src/lib/storage/projects.svelte.ts) objects    | 5.35.0        |
+| p\_{id}        | An individual saved project                                      | _not set_     | [`LocalStorageProject`](src/lib/storage/projects.svelte.ts) objects, keyed by project id | 5.35.0        |
+| saved_palettes | Palettes the user saved (deleted ones are kept with `deletedAt`) | _not set_     | array of [`SavedPalette`](src/lib/storage/palettes.svelte.ts) objects                    | 6.4.0         |
 
 </details>

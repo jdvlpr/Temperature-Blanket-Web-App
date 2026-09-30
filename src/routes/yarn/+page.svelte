@@ -26,8 +26,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import YarnSources from '$lib/components/YarnSources.svelte';
   import { ensureYarnData } from '$lib/data/yarns/colorways.svelte';
   import {
-    colorsToCode,
-    colorsToYarnDetails,
+    getYarnPageURL,
     stringToColors,
     yarnDetailsToColors,
   } from '$lib/utils/color-utils';
@@ -71,23 +70,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
     isFinishedOnMount = true;
   }
 
-  function getYarnFilterParams(colors: any[]): string {
-    const details = colorsToYarnDetails({ colors });
-    if (!details) return '';
-    return `&f=${details}`;
-  }
-
   function getShareableURL(colors: any[]): string | undefined {
     if (!browser || !isFinishedOnMount) return;
-    const yarnFilterText = getYarnFilterParams(colors);
-    const url = `${window.location.origin}${window.location.pathname}?s=${colorsToCode(
-      colors,
-      {
-        includePrefixes: false,
-      },
-    )}${yarnFilterText}&v=${version}`;
-    const href = new URL(url).href;
-    return href;
+    return new URL(
+      getYarnPageURL({ colors, origin: window.location.origin, version }),
+    ).href;
   }
 
   let shareableURL = $derived(getShareableURL(yarnPageState.gauge.colors));

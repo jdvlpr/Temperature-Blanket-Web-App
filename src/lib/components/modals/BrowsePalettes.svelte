@@ -17,6 +17,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import GalleryPalettes from '$lib/components/GalleryPalettes.svelte';
   import GalleryPalettesPopular from '$lib/components/GalleryPalettesPopular.svelte';
   import PaletteSchemes from '$lib/components/PaletteSchemes.svelte';
+  import SavedPalettes from '$lib/components/SavedPalettes.svelte';
   import ToTopButton from '$lib/components/buttons/ToTopButton.svelte';
   import { ensureYarnData } from '$lib/data/yarns/colorways.svelte';
   import { SegmentedControl } from '@skeletonlabs/skeleton-svelte';
@@ -53,7 +54,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     },
     { threshold: 1 },
   );
-  const categories = ['Gallery', 'Featured', 'Schemes'];
+  const categories = ['Saved', 'Gallery', 'Featured', 'Schemes'];
 
   onMount(() => {
     ensureYarnData();
@@ -88,7 +89,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
       <SegmentedControl.Control class="bg-surface-100 dark:bg-surface-950">
         <SegmentedControl.Indicator />
         {#each categories as categoryItem}
-          <SegmentedControl.Item value={categoryItem}>
+          <!-- Tighter on phones so all four tabs fit -->
+          <SegmentedControl.Item
+            value={categoryItem}
+            class="max-sm:px-2 max-[380px]:text-xs min-[380px]:max-sm:text-sm"
+          >
             <SegmentedControl.ItemText
               ><span class="flex items-center justify-center gap-1">
                 {categoryItem}
@@ -101,7 +106,9 @@ If not, see <https://www.gnu.org/licenses/>. -->
     </SegmentedControl>
   </div>
 
-  {#if category === 'Gallery'}
+  {#if category === 'Saved'}
+    <SavedPalettes {updateGauge} />
+  {:else if category === 'Gallery'}
     <GalleryPalettes {updateGauge} />
   {:else if category === 'Featured'}
     <GalleryPalettesPopular {updateGauge} />

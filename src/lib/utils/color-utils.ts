@@ -178,6 +178,54 @@ export const colorsToCode = (
   return text;
 };
 
+/**
+ * A palette code with its yarn details, e.g. "palette:ff0000ffa500yarn:bernat-super_value".
+ * Hex codes plus brand and yarn ids are the source of truth; colorway names are
+ * looked up again when the code is read with getColorsFromInput.
+ */
+export const colorsToPaletteCode = (colors: Color[]): string => {
+  const yarnDetails = colorsToYarnDetails({ colors });
+  return `${colorsToCode(colors, { includePrefixes: true })}${yarnDetails ? 'yarn:' + yarnDetails : ''}`;
+};
+
+/**
+ * A link that opens the palette in the Yarn Palette Creator (/yarn?s=…&f=…).
+ */
+export const getYarnPageURL = ({
+  colors,
+  origin,
+  version,
+}: {
+  colors: Color[];
+  origin: string;
+  version?: string;
+}): string => {
+  const yarnDetails = colorsToYarnDetails({ colors });
+  let url = `${origin}/yarn?s=${colorsToCode(colors, { includePrefixes: false })}`;
+  if (yarnDetails) url += `&f=${yarnDetails}`;
+  if (version) url += `&v=${version}`;
+  return url;
+};
+
+/**
+ * A name for a palette that has none, e.g. "Bernat Super Value, 8 colors".
+ * Colors must already have their yarn details (see getColorsFromInput).
+ */
+export const getPaletteFallbackName = (colors: Color[]): string => {
+  const count = `${colors.length} ${pluralize('color', colors.length)}`;
+  const yarns = [
+    ...new Set(
+      colors
+        .filter((color) => color?.brandName && color?.yarnName)
+        .map((color) => `${color.brandName} ${color.yarnName}`),
+    ),
+  ];
+  if (!yarns.length) return count;
+  if (yarns.length === 1) return `${yarns[0]}, ${count}`;
+  const more = yarns.length - 1;
+  return `${yarns[0]} + ${more} more ${pluralize('yarn', more)}, ${count}`;
+};
+
 export const stringToColors = ({
   string,
 }: {
