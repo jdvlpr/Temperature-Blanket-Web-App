@@ -89,7 +89,7 @@ test.describe('Project Planner', () => {
     // Go to Colors Tab (using nth(1) as there are 2 "Colors" buttons)
     await page.getByRole('button', { name: 'Colors' }).nth(1).click();
     await expect(
-      page.getByRole('button', { name: 'Browse Palettes' }),
+      page.getByRole('button', { name: 'Get Colors' }),
     ).toBeVisible();
 
     // Go to Preview Tab

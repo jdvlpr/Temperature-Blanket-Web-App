@@ -147,8 +147,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <div class="my-8 flex max-w-prose flex-col gap-2 text-center">
       <p class="font-bold">No saved palettes yet</p>
       <p class="text-sm">
-        Use the Save Palette button under any palette to keep it here. Saved
-        palettes are stored in this browser.
+        Use the Save button under any palette to keep it here. Saved palettes
+        are stored in this browser.
       </p>
     </div>
   {:else}

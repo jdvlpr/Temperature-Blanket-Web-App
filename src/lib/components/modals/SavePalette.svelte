@@ -43,7 +43,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
       });
       toast.trigger({
         message: added
-          ? 'Palette saved. Find it under Browse Palettes, Saved.'
+          ? 'Palette saved. Find it in Get Colors, Browse Palettes.'
           : 'This palette is already saved',
         category: added ? 'success' : 'info',
       });
@@ -80,8 +80,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
   </label>
 
   <p class="text-sm opacity-68">
-    Saved palettes are stored in this browser. Use them in any project from
-    Browse Palettes.
+    Saved palettes are stored in this browser. Use them in any project from Get
+    Colors, Browse Palettes.
   </p>
 
   <SaveAndCloseButtons

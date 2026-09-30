@@ -40,10 +40,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
     ImageIcon,
     LinkIcon,
   } from '@lucide/svelte';
-  import { SegmentedControl } from '@skeletonlabs/skeleton-svelte';
   import { onMount } from 'svelte';
 
-  let { colors, updateGauge } = $props();
+  let {
+    colors = [],
+    updateGauge,
+    mode = 'export',
+  }: {
+    colors?: Color[];
+    updateGauge?: (update: { _colors: Color[] }) => void;
+    /** 'export' shares the current palette; 'import' pastes colors in */
+    mode?: 'export' | 'import';
+  } = $props();
 
   let inputValue = $state('');
 
@@ -65,13 +73,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let isExpanded = $state(false);
 
-  let segmentValue = $state('export');
   let selectedExportType = $state('main'); // Can be: 'main', 'image', 'html', 'palette', 'colorway', 'link'
 
   let previewImageUrl = $derived(
-    colors
+    mode === 'export' && colors.length
       ? generatePaletteImage({
-          colors,
+          colors: colors.filter(
+            (color): color is Color & { hex: string } => !!color.hex,
+          ),
           includeColorway: includeColorwayInImage,
           includeHex: includeHexInImage,
           includeBrand: includeBrandInImage,
@@ -161,30 +170,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
 </script>
 
 <div class="p-4">
-  <div class="mx-auto mb-4 flex w-fit flex-col gap-1 text-left">
-    <SegmentedControl
-      value={segmentValue}
-      onValueChange={(e) => {
-        if (e.value) segmentValue = e.value;
-      }}
-    >
-      <SegmentedControl.Control
-        class="bg-surface-200 dark:bg-surface-800 mx-auto"
-      >
-        <SegmentedControl.Indicator />
-        <SegmentedControl.Item value={'export'}
-          ><SegmentedControl.ItemText>Export</SegmentedControl.ItemText>
-          <SegmentedControl.ItemHiddenInput /></SegmentedControl.Item
-        >
-        <SegmentedControl.Item value={'import'}>
-          <SegmentedControl.ItemText>Import</SegmentedControl.ItemText>
-          <SegmentedControl.ItemHiddenInput />
-        </SegmentedControl.Item>
-      </SegmentedControl.Control>
-    </SegmentedControl>
-  </div>
+  <h2 class="h3 mb-4 px-8 text-center">
+    {mode === 'import' ? 'Paste Colors or Code' : 'Export Palette'}
+  </h2>
 
-  {#if segmentValue === 'import'}
+  {#if mode === 'import'}
     <label for="palette-code" class="label">
       <span class="label-text"
         >Enter HTML colors, a palette code, or a project URL</span
@@ -258,7 +248,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <div class="mx-auto my-4 inline-block w-full">
           <SaveAndCloseButtons
             onSave={() => {
-              updateGauge({ _colors: inputColors });
+              updateGauge?.({ _colors: inputColors });
               dialog.close();
             }}
             disabled={!inputColors.length}
