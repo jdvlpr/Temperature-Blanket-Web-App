@@ -15,11 +15,22 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
   import { browser } from '$app/environment';
+  import { resolve } from '$app/paths';
   import ProjectDetails from '$lib/components/ProjectDetails.svelte';
   import type { StoredProjectIndexItem } from '$lib/storage/projects.svelte';
   import { ProjectStorage } from '$lib/storage/projects.svelte';
+  import { FolderOpenIcon } from '@lucide/svelte';
+
+  // The Menu shows a few recent projects with a link to the My Projects page,
+  // which shows them all under its own heading
+  let {
+    limit,
+    onMyProjectsPage = false,
+  }: { limit?: number; onMyProjectsPage?: boolean } = $props();
 
   let projects = $state<StoredProjectIndexItem[]>([]);
+  let loaded = $state(false);
+  let shown = $derived(limit ? projects.slice(0, limit) : projects);
 
   async function loadProjects() {
     if (browser) {
@@ -27,6 +38,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     } else {
       projects = [];
     }
+    loaded = true;
   }
 
   $effect(() => {
@@ -37,13 +49,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
 {#key projects}
   {#if projects?.length}
     <div class="mb-2 flex w-full flex-col items-start justify-center">
-      <h2 class="mt-4 text-xl font-bold">Saved Projects</h2>
-      <p class="text-surface-700-300 mb-2 text-sm">Stored in this browser</p>
+      {#if !onMyProjectsPage}
+        <h2 class="mt-4 text-xl font-bold">Saved Projects</h2>
+        <p class="text-surface-700-300 mb-2 text-sm">Stored in this browser</p>
+      {/if}
       <div class="flex w-full flex-col items-start justify-center gap-2">
-        {#each projects as project}
+        {#each shown as project (project.id)}
           {@const { meta } = project}
           <ProjectDetails
             project={meta}
+            newTab={!onMyProjectsPage}
             onclick={async () => {
               await ProjectStorage.removeByHref(meta.href);
               await loadProjects();
@@ -51,6 +66,25 @@ If not, see <https://www.gnu.org/licenses/>. -->
           />
         {/each}
       </div>
+      {#if limit}
+        <a
+          href={resolve('/my-projects')}
+          class="btn hover:preset-tonal-surface mt-2"
+        >
+          <FolderOpenIcon />
+          {projects.length > shown.length
+            ? `See All ${projects.length} Projects`
+            : 'My Projects'}
+        </a>
+      {/if}
+    </div>
+  {:else if onMyProjectsPage && loaded}
+    <div class="my-8 flex w-full flex-col gap-2 text-center">
+      <p class="font-bold">No saved projects yet</p>
+      <p class="text-sm">
+        In the Project Planner, press Save to keep a project here. On a small
+        screen, press Project, then Save.
+      </p>
     </div>
   {/if}
 {/key}

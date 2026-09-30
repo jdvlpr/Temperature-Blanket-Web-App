@@ -14,6 +14,7 @@ You should have received a copy of the GNU General Public License along with Tem
 If not, see <https://www.gnu.org/licenses/>. -->
 
 <script lang="ts">
+  import { version } from '$app/environment';
   import ColorPalette from '$lib/components/ColorPalette.svelte';
   import PlaceholderPalettes from '$lib/components/PlaceholderPalettes.svelte';
   import { ensureYarnData } from '$lib/data/yarns/colorways.svelte';
@@ -28,21 +29,25 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import {
     getColorsFromInput,
     getPaletteFallbackName,
+    getYarnPageURL,
   } from '$lib/utils/color-utils';
   import { escapeHtml } from '$lib/utils/string-utils';
   import {
     CheckIcon,
     PencilIcon,
+    SwatchBookIcon,
     Trash2Icon,
     Undo2Icon,
     XIcon,
   } from '@lucide/svelte';
   import { onMount } from 'svelte';
 
+  // With updateGauge (Browse Palettes), choosing a palette uses it; without it
+  // (the My Projects page), each palette links to the Yarn Palette Creator
   let {
     updateGauge,
   }: {
-    updateGauge: (update: { _colors: Color[]; _schemeId?: string }) => void;
+    updateGauge?: (update: { _colors: Color[]; _schemeId?: string }) => void;
   } = $props();
 
   // Codes only carry hex and brand/yarn ids, so names need the yarn data first
@@ -116,13 +121,16 @@ If not, see <https://www.gnu.org/licenses/>. -->
   }
 
   function use(colors: Color[]) {
-    updateGauge({ _colors: colors, _schemeId: 'Custom' });
+    updateGauge?.({ _colors: colors, _schemeId: 'Custom' });
   }
 </script>
 
 <!-- The dialog sizes to its content, so keep this as wide as the other Browse Palettes tabs -->
 <div
-  class="flex w-full flex-col items-center px-2 md:min-w-[44rem] lg:min-w-[62rem]"
+  class={[
+    'flex w-full flex-col items-center',
+    updateGauge && 'px-2 md:min-w-[44rem] lg:min-w-[62rem]',
+  ]}
 >
   {#if lastDeleted}
     <div
@@ -197,14 +205,33 @@ If not, see <https://www.gnu.org/licenses/>. -->
               </div>
             </div>
           {:else}
-            <button
-              type="button"
-              class="w-full min-w-0 cursor-pointer"
-              title="Use This Palette"
-              onclick={() => use(colors)}
-            >
-              <ColorPalette {colors} schemeName={escapeHtml(label)} />
-            </button>
+            {#if updateGauge}
+              <button
+                type="button"
+                class="w-full min-w-0 cursor-pointer"
+                title="Use This Palette"
+                onclick={() => use(colors)}
+              >
+                <ColorPalette {colors} schemeName={escapeHtml(label)} />
+              </button>
+            {:else}
+              <div class="flex w-full min-w-0 flex-col items-start gap-1">
+                <ColorPalette {colors} schemeName={escapeHtml(label)} />
+                <!-- eslint-disable svelte/no-navigation-without-resolve -- a full URL with the palette in its query -->
+                <a
+                  href={getYarnPageURL({
+                    colors,
+                    origin: window.location.origin,
+                    version,
+                  })}
+                  class="btn hover:preset-tonal-surface -ml-2 px-2"
+                >
+                  <SwatchBookIcon />
+                  Open in Yarn Palette Creator
+                </a>
+                <!-- eslint-enable svelte/no-navigation-without-resolve -->
+              </div>
+            {/if}
             <!-- Centered on the 70px color bar, not the label under it -->
             <div class="flex h-[70px] shrink-0 items-center gap-1">
               <button

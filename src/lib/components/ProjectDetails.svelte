@@ -25,10 +25,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
   interface Props {
     project: any;
     canRemove?: boolean;
+    newTab?: boolean;
     onclick?: () => void;
   }
 
-  let { project, canRemove = true, onclick }: Props = $props();
+  let { project, canRemove = true, newTab = true, onclick }: Props = $props();
 
   const href = $derived(project.href);
   const title = $derived(project.title);
@@ -90,7 +91,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   <div class="flex w-full flex-col">
     <a
       {href}
-      target="_blank"
+      target={newTab ? '_blank' : undefined}
       rel="noopener noreferrer"
       class="line-clamp-4 underline">{title}</a
     >
@@ -103,7 +104,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
     {/if}
   </div>
   {#if canRemove}
-    <button class="btn-icon hover:preset-tonal-surface" {onclick}>
+    <button
+      class="btn-icon hover:preset-tonal-surface"
+      title="Delete Project"
+      aria-label="Delete {title || 'Project'}"
+      {onclick}
+    >
       <Trash2Icon />
     </button>
   {/if}

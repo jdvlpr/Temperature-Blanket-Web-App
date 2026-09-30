@@ -132,7 +132,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
     <WeatherSourceButton />
   </div>
 
-  <LocalProjects />
+  <LocalProjects limit={5} />
 
   <h2 class="mt-8 mb-2 text-xl font-bold">Data Sources</h2>
   <div class=" flex w-full flex-col items-start gap-2 text-sm">

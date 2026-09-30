@@ -86,7 +86,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </p>
         <p class="text-surface-700-300 text-sm">
           Progress and {#if weather.isUserEdited}custom weather{:else}weather{/if}
-          data has been saved to this web browser.
+          data has been saved to this web browser. Find it any time in
+          <a href="/my-projects" class="link">My Projects</a>.
           <span class="font-bold">Note</span>: If your browser's site data is
           cleared, you'll lose access to this project unless you save the link
           below or send it to the Project Gallery.

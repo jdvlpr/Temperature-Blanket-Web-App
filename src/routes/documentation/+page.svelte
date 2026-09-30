@@ -582,9 +582,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
           >
             <h3 class="text-xl font-bold">Open Project</h3>
             <p>
-              Recently saved projects are stored in your browser’s local
-              storage. Open the menu and select a project to load it’s settings
-              and weather data.
+              Saved projects are stored in your browser. To open one, go to My
+              Projects in the site menu, or press Project in the Project
+              Planner, and select a project to load its settings and weather
+              data. My Projects also lists your
+              <a href="#saved-palettes" class="link">saved palettes</a>.
             </p>
             <p>
               You can also open any project by pasting the project’s URL in your
@@ -1574,6 +1576,11 @@ If not, see <https://www.gnu.org/licenses/>. -->
               To use a saved palette, press Get Colors, then Browse Palettes,
               then choose the Saved category. Use the pencil button to rename a
               palette, or the trash button to delete it.
+            </p>
+            <p>
+              You can also see all your saved palettes on the
+              <a href="/my-projects" class="link">My Projects</a> page, and open any
+              of them in the Yarn Palette Creator.
             </p>
           </section>
           <section

@@ -1,0 +1,88 @@
+<!-- Copyright (c) 2026, Thomas (https://github.com/jdvlpr)
+
+This file is part of Temperature-Blanket-Web-App.
+
+Temperature-Blanket-Web-App is free software: you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the Free Software Foundation,
+either version 3 of the License, or (at your option) any later version.
+
+Temperature-Blanket-Web-App is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
+If not, see <https://www.gnu.org/licenses/>. -->
+
+<!-- Everything someone has saved, in one place. It's all stored in this
+browser for now; with accounts, this is where synced projects and palettes show. -->
+
+<script>
+  import { browser } from '$app/environment';
+  import { resolve } from '$app/paths';
+  import { PUBLIC_BASE_URL } from '$env/static/public';
+  import AppLogo from '$lib/components/AppLogo.svelte';
+  import AppShell from '$lib/components/AppShell.svelte';
+  import LocalProjects from '$lib/components/LocalProjects.svelte';
+  import SavedPalettes from '$lib/components/SavedPalettes.svelte';
+  import { PlusIcon } from '@lucide/svelte';
+</script>
+
+<svelte:head>
+  <title>My Projects</title>
+  <meta
+    name="description"
+    content="Your saved temperature blanket projects and yarn palettes"
+  />
+  <meta name="robots" content="noindex" />
+
+  <meta property="og:title" content="My Projects" />
+  <meta
+    property="og:description"
+    content="Your saved temperature blanket projects and yarn palettes"
+  />
+  <meta property="og:url" content="{PUBLIC_BASE_URL}/my-projects" />
+  <meta property="og:type" content="website" />
+</svelte:head>
+
+<AppShell pageName="My Projects">
+  {#snippet stickyHeader()}
+    <div class="mx-auto hidden lg:inline-flex"><AppLogo /></div>
+  {/snippet}
+  {#snippet main()}
+    <main
+      class="m-auto mx-auto mt-2 mb-12 flex w-full max-w-3xl flex-col gap-8 px-2 text-left"
+    >
+      <p class="text-surface-700-300 text-center text-sm">
+        Your saved projects and yarn palettes are stored in this browser, so
+        they won't show up on other devices. If this browser's site data is
+        cleared, they'll be lost.
+      </p>
+
+      <section class="flex flex-col gap-2" aria-labelledby="projects">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <h2 id="projects" class="h3">Projects</h2>
+          <a href={resolve('/')} class="btn hover:preset-tonal-surface">
+            <PlusIcon />
+            New Project
+          </a>
+        </div>
+        {#if browser}
+          <LocalProjects onMyProjectsPage />
+        {/if}
+      </section>
+
+      <section class="flex flex-col gap-2" aria-labelledby="palettes">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <h2 id="palettes" class="h3">Yarn Palettes</h2>
+          <a href={resolve('/yarn')} class="btn hover:preset-tonal-surface">
+            <PlusIcon />
+            Create a Palette
+          </a>
+        </div>
+        {#if browser}
+          <SavedPalettes />
+        {/if}
+      </section>
+    </main>
+  {/snippet}
+</AppShell>

@@ -81,7 +81,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   <p class="text-sm opacity-68">
     Saved palettes are stored in this browser. To use one in any project, press
-    Get Colors, then Browse Palettes, then Saved.
+    Get Colors, then Browse Palettes, then Saved. They're also listed on the My
+    Projects page.
   </p>
 
   <SaveAndCloseButtons
