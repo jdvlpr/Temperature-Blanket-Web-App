@@ -56,6 +56,17 @@ test.describe('Palette toolbar', () => {
     ).toBeVisible();
   });
 
+  test('old palette codes can still be pasted', async ({ page }) => {
+    // The Palette Code export was removed, but codes people saved still work
+    await page.getByRole('button', { name: 'Get Colors' }).click();
+    await page.getByRole('menuitem', { name: /Paste Colors or Code/ }).click();
+    const dialog = page.getByRole('dialog');
+    await dialog
+      .getByLabel('Enter HTML colors, a palette code, or a project URL')
+      .pressSequentially('palette:ff0000ffa500');
+    await expect(dialog.getByText('2 Colors')).toBeVisible();
+  });
+
   test('a menu item chosen with the keyboard opens its dialog', async ({
     page,
   }) => {

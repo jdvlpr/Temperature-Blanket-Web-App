@@ -23,11 +23,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import { ensureYarnData } from '$lib/data/yarns/colorways.svelte';
   import { dialog, toast } from '$lib/state/page-state.svelte';
   import { safeSlide } from '$lib/features/transitions/safeSlide';
-  import {
-    colorsToPaletteCode,
-    getColorsFromInput,
-    getYarnPageURL,
-  } from '$lib/utils/color-utils';
+  import { getColorsFromInput, getYarnPageURL } from '$lib/utils/color-utils';
   import { generatePaletteImage } from '$lib/utils/yarn-utils';
   import { pluralize } from '$lib/utils/string-utils';
   import type { Color } from '$lib/types/yarn-types';
@@ -36,7 +32,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
     ClipboardCopyIcon,
     CodeIcon,
     DownloadIcon,
-    FileCodeIcon,
     ImageIcon,
     LinkIcon,
   } from '@lucide/svelte';
@@ -73,7 +68,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
 
   let isExpanded = $state(false);
 
-  let selectedExportType = $state('main'); // Can be: 'main', 'image', 'html', 'palette', 'colorway', 'link'
+  let selectedExportType = $state('main'); // Can be: 'main', 'image', 'html', 'colorway', 'link'
 
   let previewImageUrl = $derived(
     mode === 'export' && colors.length
@@ -89,8 +84,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
         })
       : null,
   );
-
-  let paletteCode = $derived(colorsToPaletteCode(colors));
 
   let paletteLink = $derived(
     getYarnPageURL({ colors, origin: window.location.origin, version }),
@@ -217,15 +210,15 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <pre class="pre select-all">#FF0000 #FFA500 #ADD8E6</pre>
             <pre class="pre select-all">red, FFA500, #ADD8E6</pre>
           </div>
-          <p>• A palette code from this web app</p>
+          <p>
+            • A palette link, saved project URL, or yarn search result URL from
+            this web app
+          </p>
+          <p>• A palette code from this web app (from older versions)</p>
           <div class="my-2 ml-2 flex flex-wrap gap-2">
             <pre
               class="pre break-all select-all">palette:40004bae8bbdf7f7f780c58100441b</pre>
           </div>
-          <p>
-            • The URL of a saved project or yarn search result from this web
-            app.
-          </p>
           <p>
             • The URL of a palette from <a
               href={PUBLIC_COOLORS_LINK}
@@ -306,21 +299,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
           </div>
         </button>
 
-        <!-- Palette Code Button -->
-        <button
-          class="card hover:preset-tonal-surface p-4 text-left"
-          onclick={() => (selectedExportType = 'palette')}
-        >
-          <div class="flex items-center gap-2">
-            <FileCodeIcon />
-            <div>
-              <p class="text-lg font-bold">Palette Code</p>
-              <p class="text-xs">Share between palettes on this site</p>
-            </div>
-          </div>
-        </button>
-
-        <!-- Link Button -->
+        <!-- Link Button (replaces the old Palette Code; pasting old codes still works) -->
         <button
           class="card hover:preset-tonal-surface p-4 text-left"
           onclick={() => (selectedExportType = 'link')}
@@ -330,7 +309,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <div>
               <p class="text-lg font-bold">Link</p>
               <p class="text-xs">
-                Open this palette in the Yarn Palette Creator
+                Share it, or paste it into another palette on this site
               </p>
             </div>
           </div>
@@ -483,50 +462,13 @@ If not, see <https://www.gnu.org/licenses/>. -->
         </div>
       {/if}
 
-      <!-- Palette Code Section -->
-      {#if selectedExportType === 'palette' && paletteCode}
-        <div class="my-4 flex w-full flex-wrap items-start gap-4">
-          <p class="text-sm">
-            Copy this Palette Code, then import it into another palette on this
-            site.
-          </p>
-          <div class="w-full">
-            <p
-              class="card preset-tonal-primary w-full p-4 break-all select-all"
-            >
-              {paletteCode}
-            </p>
-
-            <button
-              class="btn hover:preset-tonal-surface mt-4"
-              onclick={() => {
-                try {
-                  window.navigator.clipboard.writeText(paletteCode);
-                  toast.trigger({
-                    message: 'Copied',
-                    category: 'success',
-                  });
-                } catch {
-                  toast.trigger({
-                    message: 'Unable to copy to clipboard',
-                    category: 'error',
-                  });
-                }
-              }}
-            >
-              <ClipboardCopyIcon />
-              Copy Palette Code
-            </button>
-          </div>
-        </div>
-      {/if}
-
       <!-- Link Section -->
       {#if selectedExportType === 'link' && paletteLink}
         <div class="my-4 flex w-full flex-wrap items-start gap-4">
           <p class="text-sm">
             Anyone with this link can open the palette in the Yarn Palette
-            Creator.
+            Creator. You can also paste it into another palette with Get Colors,
+            Paste Colors or Code.
           </p>
           <div class="w-full">
             <p
