@@ -467,8 +467,8 @@ If not, see <https://www.gnu.org/licenses/>. -->
         <div class="my-4 flex w-full flex-wrap items-start gap-4">
           <p class="text-sm">
             Anyone with this link can open the palette in the Yarn Palette
-            Creator. You can also paste it into another palette with Get Colors,
-            Paste Colors or Code.
+            Creator. To use it in another palette, press Get Colors, then Paste
+            Colors or Code, and paste the link.
           </p>
           <div class="w-full">
             <p
