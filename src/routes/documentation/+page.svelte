@@ -1565,7 +1565,7 @@ If not, see <https://www.gnu.org/licenses/>. -->
             <h3 class="text-xl font-bold">Saved Palettes</h3>
 
             <p>
-              To keep a palette to use again later, press Save under the
+              To keep a palette to use again later, press Save Palette under the
               palette. You can give it a name, or leave the name empty to use
               its yarn and number of colors. Saved palettes are stored in this
               browser.

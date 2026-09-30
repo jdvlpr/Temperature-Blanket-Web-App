@@ -69,4 +69,21 @@ test.describe('Palette toolbar', () => {
     await expect(page.getByRole('menuitem')).toHaveCount(0);
     await expect(page.getByRole('dialog')).toBeVisible();
   });
+
+  test('Browse Palettes shows categories as a grid on phones', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 320, height: 700 });
+    await page.getByRole('button', { name: 'Get Colors' }).click();
+    await page.getByRole('menuitem', { name: /Browse Palettes/ }).click();
+
+    const dialog = page.getByRole('dialog');
+    const categories = dialog.getByRole('group', { name: 'Category' });
+    await expect(categories.getByRole('button')).toHaveCount(4);
+    await categories.getByRole('button', { name: 'Saved' }).click();
+    await expect(
+      categories.getByRole('button', { name: 'Saved' }),
+    ).toHaveAttribute('aria-pressed', 'true');
+    await expect(dialog.getByText('No saved palettes yet')).toBeVisible();
+  });
 });

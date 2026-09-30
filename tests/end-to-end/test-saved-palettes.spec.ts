@@ -18,7 +18,9 @@ test.describe('Saved palettes', () => {
     page,
   }) => {
     // Save with a name
-    await page.getByRole('button', { name: 'Save', exact: true }).click();
+    await page
+      .getByRole('button', { name: 'Save Palette', exact: true })
+      .click();
     let dialog = page.getByRole('dialog');
     await dialog.getByLabel('Name (optional)').fill('Test Sunset');
     await dialog
@@ -28,7 +30,9 @@ test.describe('Saved palettes', () => {
     await expect(page.getByRole('dialog')).toHaveCount(0);
 
     // The same palette isn't saved twice
-    await page.getByRole('button', { name: 'Save', exact: true }).click();
+    await page
+      .getByRole('button', { name: 'Save Palette', exact: true })
+      .click();
     await page
       .getByRole('dialog')
       .getByRole('button', { name: 'Save Palette', exact: true })
@@ -40,7 +44,11 @@ test.describe('Saved palettes', () => {
     await page.getByRole('button', { name: 'Get Colors' }).click();
     await page.getByRole('menuitem', { name: /Browse Palettes/ }).click();
     dialog = page.getByRole('dialog');
-    await dialog.getByText('Saved', { exact: true }).click();
+    // The hidden phone dropdown also has a "Saved" option
+    await dialog
+      .getByText('Saved', { exact: true })
+      .filter({ visible: true })
+      .click();
     const list = dialog.getByRole('list', { name: 'Saved palettes' });
     await expect(list.getByRole('listitem')).toHaveCount(1);
     await expect(list.getByText('Test Sunset')).toBeVisible();

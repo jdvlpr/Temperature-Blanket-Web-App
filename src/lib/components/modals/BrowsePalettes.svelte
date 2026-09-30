@@ -20,6 +20,12 @@ If not, see <https://www.gnu.org/licenses/>. -->
   import SavedPalettes from '$lib/components/SavedPalettes.svelte';
   import ToTopButton from '$lib/components/buttons/ToTopButton.svelte';
   import { ensureYarnData } from '$lib/data/yarns/colorways.svelte';
+  import {
+    BlendIcon,
+    BookmarkIcon,
+    LandmarkIcon,
+    StarIcon,
+  } from '@lucide/svelte';
   import { SegmentedControl } from '@skeletonlabs/skeleton-svelte';
   import { onMount } from 'svelte';
 
@@ -56,6 +62,14 @@ If not, see <https://www.gnu.org/licenses/>. -->
   );
   const categories = ['Saved', 'Gallery', 'Featured', 'Schemes'];
 
+  // Bookmark matches the Save button; Landmark matches Gallery in the sidebar
+  const categoryIcons = {
+    Saved: BookmarkIcon,
+    Gallery: LandmarkIcon,
+    Featured: StarIcon,
+    Schemes: BlendIcon,
+  };
+
   onMount(() => {
     ensureYarnData();
   });
@@ -78,32 +92,59 @@ If not, see <https://www.gnu.org/licenses/>. -->
     class:pt-4={context === 'drawer'}
     bind:this={filtersContainer}
   >
-    <SegmentedControl
-      value={category}
-      onValueChange={(e) => {
-        if (e.value) {
-          category = e.value as string;
-        }
-      }}
+    <!-- Four tabs don't fit on phones, so they become a 2x2 grid there -->
+    <div
+      class="bg-surface-100 dark:bg-surface-950 rounded-container grid w-full grid-cols-2 gap-1 p-1 sm:hidden"
+      role="group"
+      aria-label="Category"
     >
-      <SegmentedControl.Control class="bg-surface-100 dark:bg-surface-950">
-        <SegmentedControl.Indicator />
-        {#each categories as categoryItem}
-          <!-- Tighter on phones so all four tabs fit -->
-          <SegmentedControl.Item
-            value={categoryItem}
-            class="max-sm:px-2 max-[380px]:text-xs min-[380px]:max-sm:text-sm"
-          >
-            <SegmentedControl.ItemText
-              ><span class="flex items-center justify-center gap-1">
-                {categoryItem}
-              </span></SegmentedControl.ItemText
-            >
-            <SegmentedControl.ItemHiddenInput />
-          </SegmentedControl.Item>
-        {/each}
-      </SegmentedControl.Control>
-    </SegmentedControl>
+      {#each categories as categoryItem}
+        {@const Icon =
+          categoryIcons[categoryItem as keyof typeof categoryIcons]}
+        <button
+          type="button"
+          class={[
+            'btn justify-center',
+            category === categoryItem
+              ? 'preset-filled'
+              : 'hover:preset-tonal-surface',
+          ]}
+          aria-pressed={category === categoryItem}
+          onclick={() => (category = categoryItem)}
+        >
+          <Icon size={18} />
+          {categoryItem}
+        </button>
+      {/each}
+    </div>
+
+    <div class="max-sm:hidden">
+      <SegmentedControl
+        value={category}
+        onValueChange={(e) => {
+          if (e.value) {
+            category = e.value as string;
+          }
+        }}
+      >
+        <SegmentedControl.Control class="bg-surface-100 dark:bg-surface-950">
+          <SegmentedControl.Indicator />
+          {#each categories as categoryItem}
+            {@const Icon =
+              categoryIcons[categoryItem as keyof typeof categoryIcons]}
+            <SegmentedControl.Item value={categoryItem}>
+              <SegmentedControl.ItemText
+                ><span class="flex items-center justify-center gap-1">
+                  <Icon size={18} />
+                  {categoryItem}
+                </span></SegmentedControl.ItemText
+              >
+              <SegmentedControl.ItemHiddenInput />
+            </SegmentedControl.Item>
+          {/each}
+        </SegmentedControl.Control>
+      </SegmentedControl>
+    </div>
   </div>
 
   {#if category === 'Saved'}
