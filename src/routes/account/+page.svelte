@@ -210,18 +210,6 @@ If not, see <https://www.gnu.org/licenses/>. -->
             </div>
           </section>
 
-          <section
-            class="flex flex-col gap-2"
-            aria-labelledby="sign-in-methods"
-          >
-            <h3 id="sign-in-methods" class="px-2 text-sm font-bold opacity-70">
-              Sign-in methods
-            </h3>
-            <div class={CARD}>
-              <SignInMethods email={user.email} />
-            </div>
-          </section>
-
           <section class="flex flex-col gap-2" aria-labelledby="projects">
             <h3 id="projects" class="px-2 text-sm font-bold opacity-70">
               Projects
@@ -250,6 +238,18 @@ If not, see <https://www.gnu.org/licenses/>. -->
             cardClass={CARD}
             bind:pageCount={galleryPageCount}
           />
+
+          <section
+            class="flex flex-col gap-2"
+            aria-labelledby="sign-in-methods"
+          >
+            <h3 id="sign-in-methods" class="px-2 text-sm font-bold opacity-70">
+              Sign-in methods
+            </h3>
+            <div class={CARD}>
+              <SignInMethods email={user.email} />
+            </div>
+          </section>
 
           <section class="flex flex-col gap-2" aria-labelledby="devices-data">
             <h3 id="devices-data" class="px-2 text-sm font-bold opacity-70">

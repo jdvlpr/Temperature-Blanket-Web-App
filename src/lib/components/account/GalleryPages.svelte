@@ -138,7 +138,7 @@ publishing from accounts is on. -->
           data-testid="gallery-owner-page"
         >
           <UserRoundIcon class="shrink-0 opacity-70" />
-          <span class="flex-1">Your page in the gallery</span>
+          <span class="flex-1">Your Gallery profile page</span>
           <ExternalLinkIcon class="size-4 shrink-0 opacity-50" />
         </a>
       {/if}
