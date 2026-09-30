@@ -250,9 +250,9 @@ export async function unsyncedCount(userId: string): Promise<number> {
 }
 
 /**
- * Before signing out: keep the account's projects here as projects of this
- * device (the account keeps its copies), or remove them from this device.
- * Projects that haven't finished uploading are always kept.
+ * Leaving the account on this device: signing out removes its projects from
+ * here (`keep` false); deleting the account keeps them as projects of this
+ * device. Projects that haven't finished uploading are always kept.
  */
 export async function leaveAccount(userId: string, keep: boolean) {
   stopSync();

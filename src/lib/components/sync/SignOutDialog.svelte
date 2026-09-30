@@ -13,8 +13,9 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App. 
 If not, see <https://www.gnu.org/licenses/>. -->
 
-<!-- Signing out with the account's projects on this device: keep them here, or
-remove them. Projects that haven't finished syncing are never removed. -->
+<!-- Shown before signing out only when some of the account's projects here
+haven't finished syncing. Signing out removes the synced ones from this
+browser; these stay, since the account doesn't have them yet. -->
 
 <script lang="ts">
   import { dialog } from '$lib/state/page-state.svelte';
@@ -25,16 +26,13 @@ remove them. Projects that haven't finished syncing are never removed. -->
   let {
     userId,
     everywhere,
-    projectCount,
     onconfirm,
   }: {
     userId: string;
     everywhere: boolean;
-    projectCount: number;
-    onconfirm: (keepProjects: boolean) => Promise<void>;
+    onconfirm: () => Promise<void>;
   } = $props();
 
-  let keep = $state('keep');
   let unsynced = $state(0);
   let busy = $state(false);
 
@@ -49,7 +47,7 @@ remove them. Projects that haven't finished syncing are never removed. -->
   async function confirm() {
     busy = true;
     try {
-      await onconfirm(keep === 'keep');
+      await onconfirm();
       dialog.close();
     } finally {
       busy = false;
@@ -67,40 +65,9 @@ remove them. Projects that haven't finished syncing are never removed. -->
     confirm();
   }}
 >
-  <div class="flex flex-col gap-1">
-    <h2 id="sign-out-title" class="h4">
-      {everywhere ? 'Sign out everywhere' : 'Sign out'}
-    </h2>
-    <p class="text-sm opacity-80">
-      {projects(projectCount)} from your account {projectCount === 1
-        ? 'is'
-        : 'are'} saved in this browser.
-    </p>
-  </div>
-
-  <fieldset
-    class="rounded-container border-surface-200-800 divide-surface-200-800 flex flex-col divide-y border"
-  >
-    <legend class="sr-only">Projects in this browser</legend>
-    <label class="hover:preset-tonal-surface flex items-start gap-3 p-3">
-      <input type="radio" class="radio mt-1" value="keep" bind:group={keep} />
-      <span>
-        <span class="block font-bold">Keep them in this browser</span>
-        <span class="block text-sm opacity-70"
-          >Anyone using it can open them. Your account keeps its copies.</span
-        >
-      </span>
-    </label>
-    <label class="hover:preset-tonal-surface flex items-start gap-3 p-3">
-      <input type="radio" class="radio mt-1" value="remove" bind:group={keep} />
-      <span>
-        <span class="block font-bold">Remove them from this browser</span>
-        <span class="block text-sm opacity-70"
-          >Sign in again to get them back.</span
-        >
-      </span>
-    </label>
-  </fieldset>
+  <h2 id="sign-out-title" class="h4">
+    {everywhere ? 'Sign out everywhere' : 'Sign out'}
+  </h2>
 
   {#if unsynced}
     <div
@@ -111,10 +78,11 @@ remove them. Projects that haven't finished syncing are never removed. -->
         <TriangleAlertIcon class="text-warning-700-300 size-5 shrink-0" />
         <span>
           {projects(unsynced)}
-          {unsynced === 1 ? 'hasn’t' : 'haven’t'} finished syncing, so {unsynced ===
-          1
-            ? 'it stays'
-            : 'they stay'} in this browser either way.
+          {unsynced === 1 ? 'hasn’t' : 'haven’t'} finished syncing to your account,
+          so {unsynced === 1 ? 'it stays' : 'they stay'} in this browser after you
+          sign out. Anyone using this browser can open {unsynced === 1
+            ? 'it'
+            : 'them'}.
         </span>
       </p>
       <button
@@ -130,7 +98,16 @@ remove them. Projects that haven't finished syncing are never removed. -->
         {/if}
       </button>
     </div>
+  {:else}
+    <p class="text-sm opacity-80" role="status">
+      Everything is synced. Your projects are in your account.
+    </p>
   {/if}
+
+  <p class="text-sm opacity-80">
+    Your synced projects are removed from this browser. Sign in again to get
+    them back.
+  </p>
 
   <div class="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
     <button

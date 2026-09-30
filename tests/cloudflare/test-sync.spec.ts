@@ -271,7 +271,7 @@ test.describe('Sync in the browser', () => {
     await expect.poll(async () => (await savedIndex(laptop)).length).toBe(0);
   });
 
-  test('signing out keeps or removes the account’s projects, as chosen', async ({
+  test('signing out removes synced projects, and asks only when some haven’t synced', async ({
     browser,
     baseURL,
   }) => {
@@ -279,7 +279,7 @@ test.describe('Sync in the browser', () => {
     const email = uniqueEmail('sync-sign-out');
     await signIn(phone, phone.request, email);
     const userId = await userIdOf(phone);
-    await saveProject(phone, 'Kept or not', {
+    await saveProject(phone, 'Synced', {
       ownerUserId: userId,
       rev: null,
       dirty: true,
@@ -291,37 +291,44 @@ test.describe('Sync in the browser', () => {
     await signIn(laptop, laptop.request, email);
     await expect
       .poll(async () => (await savedIndex(laptop)).map((i) => i.meta.title))
-      .toEqual(['Kept or not']);
+      .toEqual(['Synced']);
 
-    // Remove from the laptop
+    // Everything synced: no question, and the project leaves the laptop
     await laptop.goto('/account');
     await expect(
       laptop
         .getByRole('list', { name: 'Your projects' })
-        .getByRole('link', { name: 'Kept or not' }),
+        .getByRole('link', { name: 'Synced' }),
     ).toBeVisible();
     await laptop.getByRole('button', { name: 'Sign out', exact: true }).click();
-    await expect(
-      laptop.getByText('1 project from your account is saved in this browser.'),
-    ).toBeVisible();
-    await laptop.getByLabel('Remove them from this browser').check();
-    await laptop
-      .getByRole('dialog')
-      .getByRole('button', { name: 'Sign out', exact: true })
-      .click();
     await expect(laptop.getByText('You’re not signed in.')).toBeVisible();
+    await expect(laptop.getByRole('dialog')).toHaveCount(0);
     expect(await savedIndex(laptop)).toEqual([]);
 
-    // Keep on the phone: it stays, as a project of this browser
+    // A project that can't upload: asked first, and only that one stays
+    await phone.route(`${new URL(baseURL!).origin}/api/sync/**`, (route) =>
+      route.request().method() === 'GET' ? route.fallback() : route.abort(),
+    );
+    await saveProject(phone, 'Not synced yet', {
+      ownerUserId: userId,
+      rev: null,
+      dirty: true,
+      updatedAt: Date.now(),
+    });
     await phone.goto('/account');
     await phone.getByRole('button', { name: 'Sign out', exact: true }).click();
+    await expect(
+      phone
+        .getByRole('dialog')
+        .getByText('1 project hasn’t finished syncing to your account'),
+    ).toBeVisible();
     await phone
       .getByRole('dialog')
       .getByRole('button', { name: 'Sign out', exact: true })
       .click();
     await expect(phone.getByText('You’re not signed in.')).toBeVisible();
     const kept = await savedIndex(phone);
-    expect(kept.map((i) => i.meta.title)).toEqual(['Kept or not']);
+    expect(kept.map((i) => i.meta.title)).toEqual(['Not synced yet']);
     expect(kept[0].sync).toBeUndefined();
   });
 

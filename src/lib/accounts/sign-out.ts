@@ -13,29 +13,26 @@
 // You should have received a copy of the GNU General Public License along with Temperature-Blanket-Web-App.
 // If not, see <https://www.gnu.org/licenses/>.
 
-// Signing out, from the account page or the account menu in the top bar. When
-// the account has projects in this browser, asks whether to keep them first.
+// Signing out, from the account page or the account menu in the top bar. The
+// account's projects leave this browser (the account keeps them), except ones
+// that haven't finished syncing: those stay, so it asks first.
 
 import { accountErrorMessage, signOut, signOutEverywhere } from './client';
 import { forgetAccountSummary } from './summary.svelte';
 import { dialog } from '$lib/state/page-state.svelte';
-import { ProjectStorage } from '$lib/storage/projects.svelte';
 
-/** Ends the session, then settles what happens to the account's projects here. */
-async function finishSignOut(
-  userId: string,
-  everywhere: boolean,
-  keepProjects: boolean,
-) {
+/** Ends the session, then removes the account's synced projects from here. */
+async function finishSignOut(userId: string, everywhere: boolean) {
   if (everywhere) await signOutEverywhere();
   else await signOut();
   const { leaveAccount } = await import('$lib/sync/sync.svelte');
-  await leaveAccount(userId, keepProjects);
+  await leaveAccount(userId, false);
   forgetAccountSummary();
 }
 
 /**
- * Signs out, asking first about the account's projects in this browser.
+ * Signs out, asking first only when some of the account's projects here
+ * haven't finished syncing.
  * `onSignedOut` runs once the session has ended; `onError` gets a message to
  * show, including for failures after the question was answered.
  */
@@ -51,12 +48,9 @@ export async function startSignOut({
   onError: (message: string) => void;
 }) {
   try {
-    const projectCount = (await ProjectStorage.getIndex()).filter(
-      (item) => item.sync?.ownerUserId === userId,
-    ).length;
-
-    if (!projectCount) {
-      await finishSignOut(userId, everywhere, true);
+    const { unsyncedCount } = await import('$lib/sync/sync.svelte');
+    if (!(await unsyncedCount(userId))) {
+      await finishSignOut(userId, everywhere);
       onSignedOut?.();
       return;
     }
@@ -70,10 +64,9 @@ export async function startSignOut({
         props: {
           userId,
           everywhere,
-          projectCount,
-          onconfirm: async (keepProjects: boolean) => {
+          onconfirm: async () => {
             try {
-              await finishSignOut(userId, everywhere, keepProjects);
+              await finishSignOut(userId, everywhere);
               onSignedOut?.();
             } catch (e) {
               onError(accountErrorMessage(e));
