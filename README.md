@@ -153,21 +153,20 @@ User's saved projects and saved palettes are stored in the browser's IndexedDB.
 <details>
 <summary>View Details</summary>
 
-| Key Name       | Description                                                      | Default Value | Possible Values                                                                          | Version Added |
-| -------------- | ---------------------------------------------------------------- | ------------- | ---------------------------------------------------------------------------------------- | ------------- |
-| projects_index | An index of projects the user has saved                          | `[]`          | array of [`LocalStorageProjectIndexItem`](src/lib/storage/projects.svelte.ts) objects    | 5.35.0        |
-| p\_{id}        | An individual saved project                                      | _not set_     | [`LocalStorageProject`](src/lib/storage/projects.svelte.ts) objects, keyed by project id | 5.35.0        |
-| saved_palettes | Palettes the user saved (deleted ones are kept with `deletedAt`) | _not set_     | array of [`SavedPalette`](src/lib/storage/palettes.svelte.ts) objects                    | 6.4.0         |
-
-Since 6.4.0, a saved project and its `projects_index` entry can have an optional `name` (given on My Projects); when it's missing, the project's `title` is shown.
+| Key Name       | Description                                                      | Default Value | Possible Values                                                                          | Version Added            |
+| -------------- | ---------------------------------------------------------------- | ------------- | ---------------------------------------------------------------------------------------- | ------------------------ |
+| projects_index | An index of projects the user has saved                          | `[]`          | array of [`LocalStorageProjectIndexItem`](src/lib/storage/projects.svelte.ts) objects    | 5.35.0                   |
+| p\_{id}        | An individual saved project                                      | _not set_     | [`LocalStorageProject`](src/lib/storage/projects.svelte.ts) objects, keyed by project id | 5.35.0                   |
+| saved_palettes | Palettes the user saved (deleted ones are kept with `deletedAt`) | _not set_     | array of [`SavedPalette`](src/lib/storage/palettes.svelte.ts) objects                    | unreleased (after 6.3.2) |
 
 **Project IDs** are opaque strings (`^[A-Za-z0-9-]{1,64}$`), carried in the URL as `?project=<id>`. New projects currently use the millisecond timestamp of when the app was loaded, but code must not rely on that: use the stored `createdAt` for the creation date.
 
 **`p_{id}` fields added after 5.35.0:**
 
-| Field       | Description                                                           | Version Added            |
-| ----------- | --------------------------------------------------------------------- | ------------------------ |
-| `createdAt` | When the project was first created (ISO 8601, UTC); kept across saves | unreleased (after 6.3.2) |
+| Field       | Description                                                                                                                    | Version Added            |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------ | ------------------------ |
+| `createdAt` | When the project was first created (ISO 8601, UTC); kept across saves                                                          | unreleased (after 6.3.2) |
+| `name`      | The name given on My Projects, kept across saves (also on the `projects_index` entry's `meta`); when missing, `title` is shown | unreleased (after 6.3.2) |
 
 > **Backwards compatibility:** Changes to IndexedDB are additive only. Projects without `createdAt` fall back to the time in their legacy timestamp ID, and get `createdAt` the next time they're saved.
 
